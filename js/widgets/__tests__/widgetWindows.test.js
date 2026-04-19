@@ -81,6 +81,8 @@ beforeEach(() => {
     };
     window.widgetWindows.openWindows = {};
     window.widgetWindows._posCache = {};
+    window.widgetWindows._globalListenersInitialized = false;
+    window.widgetWindows.draggingWindow = null;
     // Restore functions
     Object.assign(window.widgetWindows, savedFunctions);
 });
@@ -103,12 +105,6 @@ describe("widgetWindows", () => {
             const win = createTestWindow();
 
             expect(win._rolled).toBe(false);
-        });
-
-        test("creates a window with _dragging set to false", () => {
-            const win = createTestWindow();
-
-            expect(win._dragging).toBe(false);
         });
 
         test("creates a window with _buttons as empty array", () => {
@@ -156,6 +152,22 @@ describe("widgetWindows", () => {
             const win = createTestWindow("My Custom Title");
 
             expect(win._title).toBe("My Custom Title");
+        });
+
+        test("registers global listeners only once regardless of window count", () => {
+            const addSpy = jest.spyOn(document, "addEventListener");
+
+            createTestWindow("Window 1");
+            createTestWindow("Window 2");
+            createTestWindow("Window 3");
+
+            // mouseup, mousemove, mousedown (each once)
+            const globalMouseListeners = addSpy.mock.calls.filter(call =>
+                ["mouseup", "mousemove", "mousedown"].includes(call[0])
+            );
+            expect(globalMouseListeners).toHaveLength(3);
+
+            addSpy.mockRestore();
         });
     });
 
@@ -359,36 +371,16 @@ describe("widgetWindows", () => {
             expect(spy).toHaveBeenCalled();
         });
 
-        test("removes mouseup event listener", () => {
-            const win = createTestWindow();
+        test("does not remove global listeners (delegation persists)", () => {
             const removeSpy = jest.spyOn(document, "removeEventListener");
-            win.onclose = jest.fn();
+            const win = createTestWindow();
 
             win.close();
 
-            expect(removeSpy).toHaveBeenCalledWith("mouseup", win._dragTopHandler, true);
-            removeSpy.mockRestore();
-        });
-
-        test("removes mousemove event listener", () => {
-            const win = createTestWindow();
-            const removeSpy = jest.spyOn(document, "removeEventListener");
-            win.onclose = jest.fn();
-
-            win.close();
-
-            expect(removeSpy).toHaveBeenCalledWith("mousemove", win._docMouseMoveHandler, true);
-            removeSpy.mockRestore();
-        });
-
-        test("removes mousedown event listener", () => {
-            const win = createTestWindow();
-            const removeSpy = jest.spyOn(document, "removeEventListener");
-            win.onclose = jest.fn();
-
-            win.close();
-
-            expect(removeSpy).toHaveBeenCalledWith("mousedown", win._docMouseDownHandler, true);
+            const globalMouseRemovals = removeSpy.mock.calls.filter(call =>
+                ["mouseup", "mousemove", "mousedown"].includes(call[0])
+            );
+            expect(globalMouseRemovals).toHaveLength(0);
             removeSpy.mockRestore();
         });
     });
@@ -424,16 +416,53 @@ describe("widgetWindows", () => {
             expect(window.widgetWindows.openWindows[key]).toBeUndefined();
         });
 
-        test("removes all three event listeners", () => {
-            const win = createTestWindow();
+        test("does not remove global listeners (delegation persists)", () => {
             const removeSpy = jest.spyOn(document, "removeEventListener");
+            const win = createTestWindow();
 
             win.destroy();
 
-            expect(removeSpy).toHaveBeenCalledWith("mouseup", win._dragTopHandler, true);
-            expect(removeSpy).toHaveBeenCalledWith("mousemove", win._docMouseMoveHandler, true);
-            expect(removeSpy).toHaveBeenCalledWith("mousedown", win._docMouseDownHandler, true);
+            const globalMouseRemovals = removeSpy.mock.calls.filter(call =>
+                ["mouseup", "mousemove", "mousedown"].includes(call[0])
+            );
+            expect(globalMouseRemovals).toHaveLength(0);
             removeSpy.mockRestore();
+        });
+
+        test("removes widget-local wheel listeners", () => {
+            const win = createTestWindow();
+            const removeSpy = jest.spyOn(win._widget, "removeEventListener");
+
+            win.destroy();
+
+            expect(removeSpy).toHaveBeenCalledWith("wheel", win._widgetWheelHandler, false);
+            expect(removeSpy).toHaveBeenCalledWith(
+                "DOMMouseScroll",
+                win._widgetWheelHandler,
+                false
+            );
+            removeSpy.mockRestore();
+        });
+    });
+
+    describe("widget scroll handling", () => {
+        test("keeps window.onscroll untouched when scrolling inside a widget", () => {
+            const win = createTestWindow();
+            const existingScrollHandler = jest.fn();
+            window.onscroll = existingScrollHandler;
+            win._widget.scrollTop = 10;
+
+            const event = new window.WheelEvent("wheel", {
+                deltaY: 30,
+                bubbles: true,
+                cancelable: true
+            });
+
+            win._widget.dispatchEvent(event);
+
+            expect(win._widget.scrollTop).toBe(40);
+            expect(event.defaultPrevented).toBe(true);
+            expect(window.onscroll).toBe(existingScrollHandler);
         });
     });
 

@@ -42,7 +42,7 @@ function AIWidget() {
     const SAMPLEANALYSERSIZE = 8192;
     const SAMPLEOSCCOLORS = ["#3030FF", "#FF3050"];
     let abcNotationSong = "";
-    let midiBuffer;
+    this.midiBuffer = null;
     /**
      * Reference to the timbre block.
      * @type {number | null}
@@ -118,7 +118,9 @@ function AIWidget() {
      * @returns {void}
      */
     this.pause = function () {
-        midiBuffer.stop();
+        if (this.midiBuffer) {
+            this.midiBuffer.stop();
+        }
     };
 
     /**
@@ -511,23 +513,22 @@ function AIWidget() {
         }
 
         const finalBlock = [];
-
-        //Some Error are here need to be fixed
         for (const staffIndex in staffBlocksMap) {
-            staffBlocksMap[staffIndex].startBlock[
-                staffBlocksMap[staffIndex].startBlock.length - 3
-            ][4][2] =
-                staffBlocksMap[staffIndex].baseBlocks[0][0][
-                    staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4
-                ][0];
+            const startBlockArray = staffBlocksMap[staffIndex].startBlock;
+            const baseBlocks = staffBlocksMap[staffIndex].baseBlocks;
 
-            // Update the first namedo block with settimbre
-            staffBlocksMap[staffIndex].baseBlocks[0][0][
-                staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4
-            ][4][0] =
-                staffBlocksMap[staffIndex].startBlock[
-                    staffBlocksMap[staffIndex].startBlock.length - 3
-                ][0];
+            if (baseBlocks.length > 0 && baseBlocks[0].length > 0) {
+                const firstNoteBlockId = baseBlocks[0][0][0];
+
+                // Find the meter block to connect it to the first note
+                const meterBlock = startBlockArray.find(
+                    b => b[1] === "meter" || b[1][0] === "meter"
+                );
+                if (meterBlock) {
+                    meterBlock[4][3] = firstNoteBlockId;
+                }
+            }
+
             const repeatBlock = [];
 
             const repeatblockids = staffBlocksMap[staffIndex].repeatArray;
@@ -804,6 +805,15 @@ function AIWidget() {
             if (this._octavesWheel !== undefined) {
                 this._octavesWheel.removeWheel();
             }
+            for (const id in this.pitchAnalysers) {
+                const analyser = this.pitchAnalysers[id];
+                if (analyser) {
+                    for (const synth in instruments[0]) {
+                        instruments[0][synth].disconnect(analyser);
+                    }
+                    analyser.dispose();
+                }
+            }
             this.pitchAnalysers = {};
             widgetWindow.destroy();
         };
@@ -832,7 +842,7 @@ function AIWidget() {
         };
 
         this._save_lock = false;
-        widgetWindow.addButton("export-chunk.svg", ICONSIZE, _("Save sample"), "").onclick =
+        widgetWindow.addButton("export-chunk.svg", ICONSIZE, _("Generate blocks"), "").onclick =
             function () {
                 // Debounce button
                 if (!that._get_save_lock()) {
@@ -841,6 +851,17 @@ function AIWidget() {
                     setTimeout(function () {
                         that._save_lock = false;
                     }, 1000);
+                }
+            };
+
+        widgetWindow.addButton("utility-button.svg", ICONSIZE, _("Set API Key"), "").onclick =
+            function () {
+                const key = prompt(
+                    _("Enter your Groq API Key:"),
+                    that.activity.storage.groq_api_key || ""
+                );
+                if (key !== null) {
+                    that.activity.storage.groq_api_key = key.trim();
                 }
             };
 
@@ -872,66 +893,40 @@ function AIWidget() {
      * Plays the reference pitch based on the current sample's pitch, accidental, and octave.
      * @returns {void}
      */
-    // Reuse a single AudioContext across plays to avoid the browser limit
-    // on the number of AudioContexts that can be created.
-    let _sharedAudioContext = null;
-    function _getAudioContext() {
-        window.AudioContext =
-            window.AudioContext ||
-            window.webkitAudioContext ||
-            navigator.mozAudioContext ||
-            navigator.msAudioContext;
-        if (!_sharedAudioContext || _sharedAudioContext.state === "closed") {
-            _sharedAudioContext = new window.AudioContext();
-        }
-        return _sharedAudioContext;
-    }
-
     this._playABCSong = async function () {
         await ensureABCJS();
         const abc = abcNotationSong;
-        const stopAudioButton = document.querySelector(".stop-audio");
 
         const visualObj = ABCJS.renderAbc("*", abc, {
             responsive: "resize"
         })[0];
 
         if (ABCJS.synth.supportsAudio()) {
-            const audioContext = _getAudioContext();
-            audioContext.resume().then(function () {
-                // In theory the AC shouldn't start suspended because it is being initialized in a click handler, but iOS seems to anyway.
+            const audioContext = this.activity.logo.synth.tone.context;
+            try {
+                await audioContext.resume();
 
-                // This does a bare minimum so this object could be created in advance, or whenever convenient.
-                midiBuffer = new ABCJS.synth.CreateSynth();
+                if (this.midiBuffer) {
+                    this.midiBuffer.stop();
+                }
 
-                // midiBuffer.init preloads and caches all the notes needed. There may be significant network traffic here.
-                return midiBuffer
-                    .init({
-                        visualObj: visualObj,
-                        audioContext: audioContext,
-                        millisecondsPerMeasure: visualObj.millisecondsPerMeasure()
-                    })
-                    .then(function (response) {
-                        // midiBuffer.prime actually builds the output buffer.
-                        return midiBuffer.prime();
-                    })
-                    .then(function (response) {
-                        // At this point, everything slow has happened. midiBuffer.start will return very quickly and will start playing very quickly without lag.
-                        midiBuffer.start();
+                this.midiBuffer = new ABCJS.synth.CreateSynth();
 
-                        return Promise.resolve();
-                    })
-                    .catch(function (error) {
-                        if (error.status === "NotSupported") {
-                            stopAudioButton.setAttribute("style", "display:none;");
-                            const audioError = document.querySelector(".audio-error");
-                            audioError.setAttribute("style", "");
-                        } else console.warn("synth error", error);
-                    });
-            });
+                await this.midiBuffer.init({
+                    visualObj: visualObj,
+                    audioContext: audioContext,
+                    millisecondsPerMeasure: visualObj.millisecondsPerMeasure(),
+                    soundFontUrl: "https://paulrosen.github.io/abcjs-soundfonts/FluidR3_GM"
+                });
+
+                await this.midiBuffer.prime();
+                console.log("Playing ABC:", abc);
+                this.midiBuffer.start();
+            } catch (error) {
+                console.warn("synth error", error);
+            }
         } else {
-            const audioError = document.querySelector(".audio-error");
-            audioError.setAttribute("style", "");
+            console.warn("Audio not supported in this browser");
         }
     };
 
@@ -1004,7 +999,7 @@ function AIWidget() {
      */
     this.reconnectSynthsToAnalyser = function () {
         // Make two pitchAnalysers for the ref tone and the sample.
-        for (const instrument in [0, 1]) {
+        for (const instrument of [0, 1]) {
             if (this.pitchAnalysers[instrument] === undefined) {
                 this.pitchAnalysers[instrument] = new Tone.Analyser({
                     type: "waveform",
@@ -1018,11 +1013,19 @@ function AIWidget() {
             let analyser = 1;
             if (synth === REFERENCESAMPLE) {
                 analyser = 0;
+            }
+
+            if (this.pitchAnalysers[analyser]) {
+                instruments[0][synth].disconnect(this.pitchAnalysers[analyser]);
                 instruments[0][synth].connect(this.pitchAnalysers[analyser]);
             }
+
             if (synth === "customsample_" + this.originalSampleName) {
                 analyser = 1;
-                instruments[0][synth].connect(this.pitchAnalysers[analyser]);
+                if (this.pitchAnalysers[analyser]) {
+                    instruments[0][synth].disconnect(this.pitchAnalysers[analyser]);
+                    instruments[0][synth].connect(this.pitchAnalysers[analyser]);
+                }
             }
         }
     };
@@ -1033,11 +1036,14 @@ function AIWidget() {
      */
     this._scale = function () {
         let width, height;
-        const canvas = document.getElementsByClassName("samplerCanvas");
         const body = this.widgetWindow.getWidgetBody();
-        for (let i = canvas.length - 1; i >= 0; i--) {
-            body.removeChild(canvas[i]);
+
+        // Properly remove the entire previous interface container to avoid leaks
+        const containers = body.getElementsByClassName("ai-interface-container");
+        for (let i = containers.length - 1; i >= 0; i--) {
+            body.removeChild(containers[i]);
         }
+
         if (!this.widgetWindow.isMaximized()) {
             width = SAMPLEWIDTH;
             height = SAMPLEHEIGHT;
@@ -1045,7 +1051,7 @@ function AIWidget() {
             width = this.widgetWindow.getWidgetBody().getBoundingClientRect().width;
             height = this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 70;
         }
-        document.getElementsByTagName("canvas")[0].innerHTML = "";
+
         this.makeCanvas(width, height, 0, true);
         this.reconnectSynthsToAnalyser();
     };
@@ -1058,12 +1064,14 @@ function AIWidget() {
      * @returns {void}
      */
     this.makeCanvas = function (width, height) {
+        const that = this;
         // Build the entire widget DOM off-screen in a DocumentFragment,
         // then append once to avoid multiple reflows.
         const fragment = document.createDocumentFragment();
 
         // Create a container to center the elements
         const container = document.createElement("div");
+        container.className = "ai-interface-container";
         fragment.appendChild(container);
 
         // Create a scrollable container for the textarea
@@ -1145,6 +1153,14 @@ function AIWidget() {
                 return;
             }
 
+            const apiKey = that.activity.storage.groq_api_key;
+            if (!apiKey) {
+                alert(
+                    _("Please set your Groq API Key using the settings button (wrench icon) first.")
+                );
+                return;
+            }
+
             const apiUrl = "https://api.groq.com/openai/v1/chat/completions";
             const prompt_eng = `
             Generate an ABC notation song based on the following description:
@@ -1182,7 +1198,7 @@ function AIWidget() {
                         content: prompt_eng
                     }
                 ],
-                model: "llama3-8b-8192"
+                model: "llama-3.1-8b-instant"
             });
 
             submitButton.disabled = true;
@@ -1192,23 +1208,41 @@ function AIWidget() {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${env.GROQ_API_KEY}` // Replace with your actual API key
+                    "Authorization": `Bearer ${apiKey}`
                 },
                 body: requestBody
             })
                 .then(response => response.json())
                 .then(data => {
-                    const responseText = data.choices[0].message?.content || "";
-                    const abcStartIndex = responseText.indexOf("X:");
-
-                    let abcNotation = responseText.substring(abcStartIndex);
-
-                    const closingBraceIndex = abcNotation.indexOf("}");
-                    if (closingBraceIndex !== -1) {
-                        abcNotation = abcNotation.substring(0, closingBraceIndex + 1);
-                    } else {
-                        console.warn("No closing brace found in the response.");
+                    if (data.error) {
+                        textarea.value = "Groq API Error: " + data.error.message;
+                        return;
                     }
+
+                    if (!data.choices || data.choices.length === 0) {
+                        textarea.value = "Error: Unexpected response format from AI.";
+                        return;
+                    }
+
+                    let responseText = data.choices[0].message?.content || "";
+
+                    // Robustly strip markdown code blocks and JSON wrappers
+                    responseText = responseText
+                        .replace(/```[a-z]*\n?/gi, "")
+                        .replace(/```/g, "")
+                        .trim();
+                    if (responseText.startsWith("{") && responseText.includes('"abc":')) {
+                        try {
+                            const parsed = JSON.parse(responseText);
+                            responseText = parsed.abc || responseText;
+                        } catch (e) {
+                            // Fallback to substring search if JSON parse fails
+                        }
+                    }
+
+                    const abcStartIndex = responseText.indexOf("X:");
+                    let abcNotation =
+                        abcStartIndex !== -1 ? responseText.substring(abcStartIndex) : responseText;
 
                     abcNotation = abcNotation.replace(/"|\}/g, "").trim();
 

@@ -1260,11 +1260,13 @@ class Block {
                 artwork = that.artwork
                     .replace(/fill_color/g, DISABLEDFILLCOLOR)
                     .replace(/stroke_color/g, DISABLEDSTROKECOLOR)
+                    .replace(/block_text_color/g, platformColor.blockText)
                     .replace("block_label", safeSVG(block_label));
             } else {
                 artwork = that.artwork
                     .replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[that.protoblock.palette.name])
                     .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
+                    .replace(/block_text_color/g, platformColor.blockText)
                     .replace("block_label", safeSVG(block_label));
             }
 
@@ -1300,6 +1302,7 @@ class Block {
                 artwork = that.artwork
                     .replace(/fill_color/g, DISABLEDFILLCOLOR)
                     .replace(/stroke_color/g, DISABLEDSTROKECOLOR)
+                    .replace(/block_text_color/g, platformColor.blockText)
                     .replace("block_label", safeSVG(block_label));
             } else {
                 artwork = that.artwork
@@ -1308,6 +1311,7 @@ class Block {
                         platformColor.paletteColors[that.protoblock.palette.name][3]
                     )
                     .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
+                    .replace(/block_text_color/g, platformColor.blockText)
                     .replace("block_label", safeSVG(block_label));
             }
 
@@ -1340,11 +1344,13 @@ class Block {
                 artwork = that.artwork
                     .replace(/fill_color/g, DISABLEDFILLCOLOR)
                     .replace(/stroke_color/g, DISABLEDSTROKECOLOR)
+                    .replace(/block_text_color/g, platformColor.blockText)
                     .replace("block_label", safeSVG(block_label));
             } else {
                 artwork = that.artwork
                     .replace(/fill_color/g, platformColor.disconnected)
                     .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
+                    .replace(/block_text_color/g, platformColor.blockText)
                     .replace("block_label", safeSVG(block_label));
             }
 
@@ -1405,11 +1411,13 @@ class Block {
             artwork = this.artwork
                 .replace(/fill_color/g, DISABLEDFILLCOLOR)
                 .replace(/stroke_color/g, DISABLEDSTROKECOLOR)
+                .replace(/block_text_color/g, platformColor.blockText)
                 .replace("block_label", safeSVG(block_label));
         } else {
             artwork = this.artwork
                 .replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name])
                 .replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name])
+                .replace(/block_text_color/g, platformColor.blockText)
                 .replace("block_label", safeSVG(block_label));
         }
 
@@ -1879,6 +1887,7 @@ class Block {
             that.blocks.blockCollapseArt[that.blockIndex] = that.collapseArtwork
                 .replace(/fill_color/g, PALETTEFILLCOLORS[that.protoblock.palette.name])
                 .replace(/stroke_color/g, PALETTESTROKECOLORS[that.protoblock.palette.name])
+                .replace(/block_text_color/g, platformColor.blockText)
                 .replace("block_label", safeSVG(that.collapseText.text));
 
             __processExpandButton(that);
@@ -1903,6 +1912,7 @@ class Block {
                 artwork
                     .replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[that.protoblock.palette.name])
                     .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
+                    .replace(/block_text_color/g, platformColor.blockText)
                     .replace("block_label", ""),
                 __processHighlightCollapseBitmap,
                 that
@@ -1912,6 +1922,7 @@ class Block {
         const artwork = this.collapseArtwork
             .replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name])
             .replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name])
+            .replace(/block_text_color/g, platformColor.blockText)
             .replace("block_label", "");
         _blockMakeBitmap(artwork, __processCollapseBitmap, this);
     }
@@ -3177,8 +3188,10 @@ class Block {
             that.blocks.raiseStackToTop(thisBlock);
 
             // And possibly the collapse button.
+            // eslint-disable-next-line eqeqeq
             if (that.collapseContainer != null) {
                 // Ensure the blocksContainer still exisits.
+                // eslint-disable-next-line eqeqeq
                 if (that.activity.blocksContainer != null) {
                     that.activity.blocksContainer.setChildIndex(
                         that.collapseContainer,
@@ -3210,6 +3223,7 @@ class Block {
             // mouse move event.
             _dragHasRest2 = false;
             let checkBlock = that.blocks.blockList[that.connections[1]];
+            // eslint-disable-next-line eqeqeq
             while (checkBlock != null) {
                 if (checkBlock?.name === "rest2") {
                     _dragHasRest2 = true;
@@ -3371,6 +3385,7 @@ class Block {
         this.container.on("mouseout", event => {
             // Ignore transient mouseout while actively dragging.
             if (that._dragPointerDown) {
+                // eslint-disable-next-line eqeqeq
                 if (that.blocks.longPressTimeout != null) {
                     clearTimeout(that.blocks.longPressTimeout);
                     that.blocks.longPressTimeout = null;
@@ -4858,3 +4873,7 @@ window.hasMouse = false;
 document.addEventListener("mousemove", () => {
     window.hasMouse = true;
 });
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = Block;
+}

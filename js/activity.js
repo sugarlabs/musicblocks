@@ -1722,6 +1722,11 @@ class Activity {
             this.blocks.activeBlock = null;
             hideDOMLabel();
 
+            // If music is currently playing, stop it first
+            if (this.turtles.running()) {
+                this.logo.doStopTurtles();
+            }
+
             const currentDelay = this.logo.turtleDelay;
             this.logo.turtleDelay = 0;
             if (this.logo?.synth?.resume) {
@@ -1747,18 +1752,29 @@ class Activity {
                 }
 
                 this.logo.runLogoCommands(null, env);
+                const stopBtn = document.getElementById("stop");
+                if (stopBtn) {
+                    stopBtn.style.display = "inline-block";
+                    stopBtn.style.color = window.platformColor.stopIconcolor;
+                }
             } else {
                 if (currentDelay !== 0) {
                     // Keep playing at full speed.
                     this.logo.step();
                 } else {
                     // Stop and restart.
-                    document.getElementById("stop").style.color = "white";
+                    const stopBtn = document.getElementById("stop");
+                    if (stopBtn) {
+                        stopBtn.style.color = "white";
+                    }
                     this.logo.doStopTurtles();
 
                     const that = this;
                     setTimeout(() => {
-                        document.getElementById("stop").style.color = "#ea174c";
+                        const stopBtnDelay = document.getElementById("stop");
+                        if (stopBtnDelay) {
+                            stopBtnDelay.style.color = window.platformColor.stopIconcolor;
+                        }
                         that.logo.runLogoCommands(null, env);
                     }, 500);
                 }
@@ -2250,6 +2266,7 @@ class Activity {
             }
 
             this.logo.doStopTurtles();
+            document.getElementById("stop").style.display = "none";
 
             const widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
@@ -3414,7 +3431,10 @@ class Activity {
                             document.getElementById("ui-id-1").contains(e.target))
                     ) {
                         //do nothing when clicked on the menu
-                    } else if (document.getElementsByTagName("tr")[2].contains(e.target)) {
+                    } else if (
+                        document.querySelector("#palette tbody tr") &&
+                        document.querySelector("#palette tbody tr").contains(e.target)
+                    ) {
                         //do nothing when clicked on the search row
                     } else {
                         // this will hide the search bar if someone clicks on menu items
@@ -4865,6 +4885,14 @@ class Activity {
          * When turtle stops running restore stop button to normal state
          */
         this.onStopTurtle = () => {
+            if (this.showBlocksAfterRun) {
+                this.blocks.showBlocks();
+                const stopIcon = document.getElementById("stop");
+                if (stopIcon) {
+                    stopIcon.style.color = "white";
+                }
+                this.showBlocksAfterRun = false;
+            }
             // TODO: plugin support
         };
 
@@ -6809,14 +6837,26 @@ class Activity {
 
         this._doOpenPlugin = () => {
             this.toolbar.closeAuxToolbar(showHideAuxMenu);
-            const name = prompt(
+            const rawName = prompt(
                 _("Enter the name of a built-in plugin, or leave blank to upload a plugin file:")
             );
-            if (name === null) {
+            if (rawName === null) {
                 return; // User cancelled the operation
             }
-            if (name.trim() !== "") {
-                this._loadBuiltInPlugin(name.trim().toLowerCase());
+
+            const name = rawName.trim().toLowerCase();
+            if (name !== "") {
+                // Validate: only allow safe characters (alphanumeric, hyphens, and underscores)
+                // This prevents path traversal attacks like "../../secrets"
+                if (!/^[a-z0-9\-_]+$/.test(name)) {
+                    alert(
+                        _(
+                            "Invalid plugin name. Only alphanumeric characters, hyphens, and underscores are allowed."
+                        )
+                    );
+                    return;
+                }
+                this._loadBuiltInPlugin(name);
             } else {
                 this.pluginChooser.focus();
                 this.pluginChooser.click();
@@ -7989,6 +8029,12 @@ class Activity {
             if (this._initialized) return;
             this._initialized = true;
 
+            // Hide stop button on startup
+            const stopBtn = document.getElementById("stop");
+            if (stopBtn) {
+                stopBtn.style.display = "none";
+            }
+
             // Batch DOM reads before any writes to avoid forced synchronous layout
             this._perfMark("activity.init.start");
             this._clientWidth = document.body.clientWidth;
@@ -8318,10 +8364,20 @@ class Activity {
                     };
 
                     midiReader.onload = e => {
-                        const midi = new Midi(e.target.result);
-
-                        console.debug(midi);
-                        midiImportBlocks(midi);
+                        try {
+                            const midi = new Midi(e.target.result);
+                            console.debug(midi);
+                            midiImportBlocks(midi);
+                        } catch (err) {
+                            console.error("MIDI import failed:", err);
+                            if (that && typeof that.errorMsg === "function") {
+                                that.errorMsg(
+                                    _(
+                                        "Cannot load project from the file. Please check the file type."
+                                    )
+                                );
+                            }
+                        }
                     };
 
                     const file = that.fileChooser.files[0];
@@ -8415,10 +8471,18 @@ class Activity {
                     }, 200);
                 };
                 midiReader.onload = e => {
-                    const midi = new Midi(e.target.result);
-
-                    console.debug(midi);
-                    midiImportBlocks(midi);
+                    try {
+                        const midi = new Midi(e.target.result);
+                        console.debug(midi);
+                        midiImportBlocks(midi);
+                    } catch (err) {
+                        console.error("MIDI import failed:", err);
+                        if (that && typeof that.errorMsg === "function") {
+                            that.errorMsg(
+                                _("Cannot load project from the file. Please check the file type.")
+                            );
+                        }
+                    }
                 };
 
                 // Music Block Parser from abc to MB

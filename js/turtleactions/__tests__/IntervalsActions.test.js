@@ -38,7 +38,29 @@ describe("setupIntervalsActions", () => {
             minor: [2, 1, 2, 2, 1, 2, 2]
         };
 
-        global.ALLNOTESTEP = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+        global.ALLNOTESTEP = {
+            "Cb": 0,
+            "C": 1,
+            "C#": 2,
+            "Db": 2,
+            "D": 3,
+            "D#": 4,
+            "Eb": 4,
+            "E": 5,
+            "E#": 6,
+            "Fb": 5,
+            "F": 6,
+            "F#": 7,
+            "Gb": 7,
+            "G": 8,
+            "G#": 9,
+            "Ab": 9,
+            "A": 10,
+            "A#": 11,
+            "Bb": 11,
+            "B": 12,
+            "B#": 0
+        };
         global.NOTENAMES = ["C", "D", "E", "F", "G", "A", "B"];
 
         global.SEMITONETOINTERVALMAP = Array(13)
@@ -177,6 +199,56 @@ describe("setupIntervalsActions", () => {
             octave: -3
         });
         expect(typeof Singer.IntervalsActions.GetIntervalNumber(0)).toBe("number");
+    });
+
+    test("GetIntervalNumber handles B to B# enharmonic (same octave)", () => {
+        // B (12) to B# (0) should be 1 semitone (minor second), not 12
+        GetNotesForInterval.mockReturnValueOnce({
+            firstNote: "B",
+            secondNote: "B#",
+            octave: 0
+        });
+        expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(1);
+    });
+
+    test("GetIntervalNumber handles B to Cb enharmonic (same octave)", () => {
+        // B (12) to Cb (0) should be 1 semitone (minor second), not 12
+        GetNotesForInterval.mockReturnValueOnce({
+            firstNote: "B",
+            secondNote: "Cb",
+            octave: 0
+        });
+        expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(1);
+    });
+
+    test("GetIntervalNumber handles C to Cb (same octave)", () => {
+        // C (1) to Cb (0) should be 1 semitone
+        GetNotesForInterval.mockReturnValueOnce({
+            firstNote: "C",
+            secondNote: "Cb",
+            octave: 0
+        });
+        expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(1);
+    });
+
+    test("GetIntervalNumber handles Cb to B (same octave)", () => {
+        // Cb (0) to B (12) should be 1 semitone (wrap-around)
+        GetNotesForInterval.mockReturnValueOnce({
+            firstNote: "Cb",
+            secondNote: "B",
+            octave: 0
+        });
+        expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(1);
+    });
+
+    test("GetIntervalNumber handles normal interval correctly", () => {
+        // C (1) to G (8) should be 7 semitones (perfect fifth)
+        GetNotesForInterval.mockReturnValueOnce({
+            firstNote: "C",
+            secondNote: "G",
+            octave: 0
+        });
+        expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(7);
     });
 
     test("GetCurrentInterval normal", () => {

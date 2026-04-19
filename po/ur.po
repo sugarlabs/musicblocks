@@ -3136,7 +3136,7 @@ msgid "Maximum heap size is 1000."
 msgstr "زیادہ سے زیادہ ڈھیر کا سائز 1000 ہے۔"
 
 #: js/blocks/HeapBlocks.js:523
-msgid "The Set-heap entry block sets a value in he heap at the specified location."
+msgid "The Set-heap entry block sets a value in the heap at the specified location."
 msgstr "سیٹ ہیپ انٹری بلاک مخصوص جگہ پر ڈھیر میں ایک قیمت طے کرتا ہے۔"
 
 #. TRANS: load the heap from a JSON encoding
@@ -3599,7 +3599,7 @@ msgid "run block"
 msgstr "رن بلاک"
 
 #: js/blocks/ProgramBlocks.js:1025
-msgid "The Dock block block connections two blocks."
+msgid "The Dock block connects two blocks."
 msgstr "ڈاک بلاک بلاک کنکشن دو بلاکس۔"
 
 #. TRANS: We can connect a block to another block.
@@ -6858,8 +6858,8 @@ msgid "Tags:"
 msgstr "ٹیگز:"
 
 #: planet/js/StringHelper.js:65
-msgid "Report projects which violate the <a href=\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\" target=\\\"_blank\\\">Sugar Labs Code of Conduct</a>."
-msgstr "ان منصوبوں کی اطلاع دیں جو <a href=\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\" target=\\\"_blank\\\">شوگر لیبز کے ضابطہ اخلاق</a> کی خلاف ورزی کرتے ہیں."
+msgid "Report projects which violate the <a href=\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\" target=\\\"_blank\\\" rel=\\\"noopener noreferrer\\\">Sugar Labs Code of Conduct</a>."
+msgstr "ان منصوبوں کی اطلاع دیں جو <a href=\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\" target=\\\"_blank\\\" rel=\\\"noopener noreferrer\\\">شوگر لیبز کے ضابطہ اخلاق</a> کی خلاف ورزی کرتے ہیں."
 
 #: planet/js/StringHelper.js:66
 msgid "Reason for reporting project"

@@ -122,7 +122,7 @@ function setupPitchBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk) {
-            Singer.playSynthBlock(args, logo, turtle, blk);
+            Singer.playSynthBlock(args, activity, logo, turtle, blk);
         }
     }
 

@@ -9,471 +9,202 @@
  * (at your option) any later version.
  */
 
-/**
- * IMPROVED Tests for piemenus.js module - COMPLETELY CORRECTED
- *
- * This version has all tests fixed to match the actual piemenus.js code
- * ✅ 96 total tests
- * ✅ All tests passing
- * ✅ Properly matched assertions
- */
-
 const fs = require("fs");
 const path = require("path");
 
-describe("Pie Menus Module - FULLY CORRECTED", () => {
-    const piemenusPath = path.join(__dirname, "..", "piemenus.js");
-    let piemenusContent;
+const { piemenuPitches } = require("../piemenus");
+
+const piemenusPath = path.join(__dirname, "..", "piemenus.js");
+let piemenusContent;
+
+// Mock Globals
+global.docById = jest.fn().mockReturnValue({
+    style: { display: "", opacity: "" },
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    getBoundingClientRect: jest.fn().mockReturnValue({ x: 0, y: 0 })
+});
+global.document = {
+    getElementById: global.docById
+};
+global.window = {
+    innerWidth: 1024,
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn()
+};
+global.wheelnav = jest.fn().mockImplementation(function (div) {
+    const mockWheel = this;
+    this.navItems = Array.from({ length: 20 }, () => ({
+        title: "",
+        enabled: true,
+        navItem: { hide: jest.fn(), show: jest.fn() },
+        sliceSelectedAttr: {},
+        sliceHoverAttr: {},
+        titleSelectedAttr: {},
+        titleHoverAttr: {}
+    }));
+    this.selectedNavItemIndex = 0;
+    this.colors = [];
+    this.raphael = { canvas: {} };
+    this.on = jest.fn();
+    this.createWheel = jest.fn(labels => {
+        if (labels) {
+            labels.forEach((l, i) => {
+                if (this.navItems[i]) this.navItems[i].title = l;
+            });
+        }
+    });
+    this.initWheel = jest.fn();
+    this.navigateWheel = jest.fn(index => {
+        this.selectedNavItemIndex = index;
+        if (this.navItems[index] && typeof this.navItems[index].navigateFunction === "function") {
+            this.navItems[index].navigateFunction();
+        }
+    });
+    this.removeWheel = jest.fn();
+    this.refreshWheel = jest.fn();
+    this.setTooltips = jest.fn();
+});
+global.slicePath = jest.fn().mockReturnValue({
+    DonutSlice: jest.fn(),
+    DonutSliceCustomization: jest.fn().mockReturnValue({ minRadiusPercent: 0, maxRadiusPercent: 0 })
+});
+global.platformColor = {
+    pitchWheelcolors: ["#ff0000"],
+    exitWheelcolors: ["#00ff00"],
+    accidentalsWheelcolors: ["#0000ff"],
+    octavesWheelcolors: ["#ffff00"],
+    accidentalsWheelcolorspush: "#cccccc"
+};
+global._ = jest.fn(s => s);
+global.NOTENAMES = ["C", "D", "E", "F", "G", "A", "B"];
+global.SOLFEGENAMES = ["do", "re", "mi", "fa", "sol", "la", "ti"];
+global.FIXEDSOLFEGE = { do: "C", re: "D", mi: "E", fa: "F", sol: "G", la: "A", ti: "B" };
+global.SHARP = "♯";
+global.FLAT = "♭";
+global.NATURAL = "♮";
+global.DOUBLESHARP = "𝄪";
+global.DOUBLEFLAT = "𝄫";
+global.EQUIVALENTACCIDENTALS = { F: "E♯", C: "B♯", B: "C♭", E: "F♭", G: "F𝄪", D: "C𝄪", A: "G𝄪" };
+global.Tone = {
+    start: jest.fn().mockResolvedValue(),
+    context: { state: "running" }
+};
+global.Synth = jest.fn().mockImplementation(() => ({
+    newTone: jest.fn(),
+    tone: {},
+    createDefaultSynth: jest.fn(),
+    loadSynth: jest.fn().mockResolvedValue(),
+    setMasterVolume: jest.fn(),
+    setVolume: jest.fn(),
+    trigger: jest.fn().mockResolvedValue()
+}));
+global.instruments = [{}];
+global.DEFAULTVOICE = "sine";
+global.PREVIEWVOLUME = 0.5;
+global.getNote = jest.fn().mockReturnValue(["C", 4]);
+global.buildScale = jest.fn(() => [["C", "D", "E", "F", "G", "A", "B", "C"], []]);
+
+describe("piemenus behavioral tests", () => {
+    let mockBlock;
 
     beforeAll(() => {
         piemenusContent = fs.readFileSync(piemenusPath, "utf8");
     });
 
-    describe("Module Structure", () => {
-        it("should exist and be readable", () => {
-            expect(piemenusContent).toBeDefined();
-            expect(piemenusContent.length).toBeGreaterThan(0);
-        });
-
-        it("should define setWheelSize function", () => {
-            expect(piemenusContent).toContain("const setWheelSize = ");
-        });
-
-        it("should define piemenuPitches function", () => {
-            expect(piemenusContent).toContain("const piemenuPitches = ");
-        });
-
-        it("should define piemenuCustomNotes function", () => {
-            expect(piemenusContent).toContain("const piemenuCustomNotes = ");
-        });
-
-        it("should define piemenuNthModalPitch function", () => {
-            expect(piemenusContent).toContain("const piemenuNthModalPitch = ");
-        });
-
-        it("should define piemenuAccidentals function", () => {
-            expect(piemenusContent).toContain("const piemenuAccidentals = ");
-        });
-
-        it("should define piemenuNoteValue function", () => {
-            expect(piemenusContent).toContain("const piemenuNoteValue = ");
-        });
-
-        it("should define piemenuNumber function", () => {
-            expect(piemenusContent).toContain("const piemenuNumber = ");
-        });
-
-        it("should define piemenuColor function", () => {
-            expect(piemenusContent).toContain("const piemenuColor = ");
-        });
-
-        it("should define piemenuBasic function", () => {
-            expect(piemenusContent).toContain("const piemenuBasic = ");
-        });
-
-        it("should define piemenuBoolean function", () => {
-            expect(piemenusContent).toContain("const piemenuBoolean = ");
-        });
-
-        it("should define piemenuChords function", () => {
-            expect(piemenusContent).toContain("const piemenuChords = ");
-        });
-
-        it("should define piemenuVoices function", () => {
-            expect(piemenusContent).toContain("const piemenuVoices = ");
-        });
-
-        it("should define piemenuIntervals function", () => {
-            expect(piemenusContent).toContain("const piemenuIntervals = ");
-        });
-
-        it("should define piemenuModes function", () => {
-            expect(piemenusContent).toContain("const piemenuModes = ");
-        });
-
-        it("should define piemenuBlockContext function", () => {
-            expect(piemenusContent).toContain("const piemenuBlockContext = ");
-        });
-
-        it("should define piemenuGrid function", () => {
-            expect(piemenusContent).toContain("const piemenuGrid = ");
-        });
-
-        it("should define piemenuKey function", () => {
-            expect(piemenusContent).toContain("const piemenuKey = ");
-        });
+    beforeEach(() => {
+        mockBlock = {
+            container: { x: 100, y: 100, setChildIndex: jest.fn(), children: [] },
+            blocks: {
+                stageClick: false,
+                blockScale: 1,
+                turtles: { _canvas: { width: 1000, height: 1000 } },
+                findPitchOctave: jest.fn().mockReturnValue(4),
+                setPitchOctave: jest.fn(),
+                blockList: { "mock-id": { name: "mock-block" } }
+            },
+            activity: {
+                canvas: { offsetLeft: 0, offsetTop: 0 },
+                blocksContainer: { x: 0, y: 0 },
+                getStageScale: jest.fn().mockReturnValue(1),
+                KeySignatureEnv: ["C", "major", false],
+                logo: { synth: new global.Synth(), errorMsg: jest.fn() }
+            },
+            connections: ["mock-id"],
+            updateCache: jest.fn(),
+            text: { text: "" },
+            value: "",
+            name: "notename"
+        };
+        jest.clearAllMocks();
     });
 
-    describe("Exported Functions Declaration", () => {
-        it("should declare all exported functions", () => {
-            const exportedFunctions = [
-                "piemenuModes",
-                "piemenuPitches",
-                "piemenuCustomNotes",
-                "piemenuGrid",
-                "piemenuBlockContext",
-                "piemenuIntervals",
-                "piemenuVoices",
-                "piemenuBoolean",
-                "piemenuBasic",
-                "piemenuColor",
-                "piemenuNumber",
-                "piemenuNthModalPitch",
-                "piemenuNoteValue",
-                "piemenuAccidentals",
-                "piemenuKey",
-                "piemenuChords"
-            ];
+    test("piemenuPitches sets up wheels correctly", () => {
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+        piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
 
-            exportedFunctions.forEach(funcName => {
-                expect(piemenusContent).toContain(funcName);
-            });
-        });
+        expect(global.wheelnav).toHaveBeenCalled();
+        expect(mockBlock._pitchWheel).toBeDefined();
+        expect(mockBlock._accidentalsWheel).toBeDefined();
+        expect(mockBlock._exitWheel).toBeDefined();
     });
 
-    describe("Early Return Conditions", () => {
-        it("should check stageClick in piemenuPitches", () => {
-            expect(piemenusContent).toMatch(/piemenuPitches[\s\S]*?stageClick[\s\S]*?return;/);
-        });
+    test("pitch wrapping logic generic application (7 notes)", async () => {
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
 
-        it("should check stageClick in piemenuBoolean", () => {
-            expect(piemenusContent).toMatch(/piemenuBoolean[\s\S]*?stageClick[\s\S]*?return;/);
-        });
+        // Ensure hasOctaveWheel is true
+        mockBlock.blocks.blockList["mock-id"].name = "pitch";
 
-        it("should check stageClick in piemenuBasic", () => {
-            expect(piemenusContent).toMatch(/piemenuBasic[\s\S]*?stageClick[\s\S]*?return;/);
-        });
+        // Initial note was B (index 6).
+        piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "B", "");
 
-        it("should check stageClick in piemenuNumber", () => {
-            expect(piemenusContent).toMatch(/piemenuNumber[\s\S]*?stageClick[\s\S]*?return;/);
-        });
+        // Find the navigate function for the pitch wheel
+        const navigateFunc = mockBlock._pitchWheel.navItems[0].navigateFunction; // Navigate to C (index 0)
 
-        it("should check stageClick in piemenuColor", () => {
-            expect(piemenusContent).toMatch(/piemenuColor[\s\S]*?stageClick[\s\S]*?return;/);
-        });
+        // Setup state for the navigate function
+        mockBlock._pitchWheel.selectedNavItemIndex = 0;
+        mockBlock._pitchWheel.navItems[0].title = "C";
 
-        it("should check stageClick in piemenuVoices", () => {
-            expect(piemenusContent).toMatch(/piemenuVoices[\s\S]*?stageClick[\s\S]*?return;/);
-        });
+        await navigateFunc();
 
-        it("should check stageClick in piemenuModes", () => {
-            expect(piemenusContent).toMatch(/piemenuModes[\s\S]*?stageClick[\s\S]*?return;/);
-        });
-
-        it("should check stageClick in piemenuIntervals", () => {
-            expect(piemenusContent).toMatch(/piemenuIntervals[\s\S]*?stageClick[\s\S]*?return;/);
-        });
-
-        it("should check stageClick in piemenuChords", () => {
-            expect(piemenusContent).toMatch(/piemenuChords[\s\S]*?stageClick[\s\S]*?return;/);
-        });
+        // Verify octave adjustment was called
+        // Since B(6) -> C(0) is +1 wrapped, prev+delta = 7 > 6. deltaOctave = -1
+        expect(mockBlock.blocks.setPitchOctave).toHaveBeenCalledWith("mock-id", 3);
     });
 
-    describe("Wheel Navigation Components", () => {
-        it("should create pitch wheel", () => {
-            expect(piemenusContent).toContain("_pitchWheel");
-        });
+    test("pitch wrapping logic handles different note counts (e.g. 5 notes)", async () => {
+        const noteLabels = ["N1", "N2", "N3", "N4", "N5"];
+        const noteValues = ["N1", "N2", "N3", "N4", "N5"];
 
-        it("should create accidentals wheel", () => {
-            expect(piemenusContent).toContain("_accidentalsWheel");
-        });
+        // Ensure hasOctaveWheel is true
+        mockBlock.blocks.blockList["mock-id"].name = "pitch";
 
-        it("should create octaves wheel", () => {
-            expect(piemenusContent).toContain("_octavesWheel");
-        });
+        // Initial note was N5 (index 4).
+        piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "N5", "");
 
-        it("should create exit wheel", () => {
-            expect(piemenusContent).toContain("_exitWheel");
-        });
+        // Navigate to N1 (index 0)
+        const navigateFunc = mockBlock._pitchWheel.navItems[0].navigateFunction;
 
-        it("should use wheelnav for wheel creation", () => {
-            expect(piemenusContent).toContain("new wheelnav");
-        });
+        // Setup state for the navigate function
+        mockBlock._pitchWheel.selectedNavItemIndex = 0;
+        mockBlock._pitchWheel.navItems[0].title = "N1";
 
-        it("should use slicePath for donut slices", () => {
-            expect(piemenusContent).toContain("slicePath().DonutSlice");
-        });
+        await navigateFunc();
+
+        // N5(4) -> N1(0). noteCount=5, halfSpan=2.5. deltaPitch=-4.
+        // -4 < -2.5, so delta = -4 + 5 = 1.
+        // prevPitch+delta = 4+1 = 5. 5 > 4, so deltaOctave = -1.
+        // Octave 4 -> 3.
+        expect(mockBlock.blocks.setPitchOctave).toHaveBeenCalledWith("mock-id", 3);
     });
 
-    describe("Platform Color Integration", () => {
-        it("should use platformColor for pitch wheel colors", () => {
-            expect(piemenusContent).toContain("platformColor.pitchWheelcolors");
-        });
-
-        it("should use platformColor for exit wheel colors", () => {
-            expect(piemenusContent).toContain("platformColor.exitWheelcolors");
-        });
-
-        it("should use platformColor for accidentals wheel colors", () => {
-            expect(piemenusContent).toContain("platformColor.accidentalsWheelcolors");
-        });
-
-        it("should use platformColor for octaves wheel colors", () => {
-            expect(piemenusContent).toContain("platformColor.octavesWheelcolors");
-        });
-    });
-
-    describe("Audio Preview Functionality", () => {
-        it("should have pitch preview function", () => {
-            expect(piemenusContent).toContain("__pitchPreview");
-        });
-
-        it("should have voice preview function", () => {
-            expect(piemenusContent).toContain("__voicePreview");
-        });
-
-        it("should setup audio context for previews", () => {
-            expect(piemenusContent).toContain("setupAudioContext");
-        });
-
-        it("should use Tone.start for audio context", () => {
-            expect(piemenusContent).toContain("Tone.start");
-        });
-
-        it("should use synth trigger for playing notes", () => {
-            expect(piemenusContent).toContain(".trigger(");
-        });
-    });
-
-    describe("Selection Change Handlers", () => {
-        it("should have solfege selection handler", () => {
-            expect(piemenusContent).toContain("__selectionChangedSolfege");
-        });
-
-        it("should have octave selection handler", () => {
-            expect(piemenusContent).toContain("__selectionChangedOctave");
-        });
-
-        it("should have accidental selection handler", () => {
-            expect(piemenusContent).toContain("__selectionChangedAccidental");
-        });
-
-        it("should have generic selection changed handler", () => {
-            expect(piemenusContent).toContain("__selectionChanged");
-        });
-    });
-
-    describe("Exit Menu Functionality", () => {
-        it("should have exit menu handlers", () => {
-            expect(piemenusContent).toContain("__exitMenu");
-        });
-
-        it("should track exit time", () => {
-            expect(piemenusContent).toContain("_piemenuExitTime");
-        });
-
-        it("should remove wheels on exit", () => {
-            expect(piemenusContent).toContain("removeWheel");
-        });
-
-        it("should hide wheelDiv on exit", () => {
-            expect(piemenusContent).toContain('display = "none"');
-        });
-    });
-
-    describe("Wheel Positioning", () => {
-        it("should position wheel based on block container", () => {
-            expect(piemenusContent).toContain("blocksContainer");
-        });
-
-        it("should consider canvas offset", () => {
-            expect(piemenusContent).toContain("canvas.offsetLeft");
-        });
-
-        it("should use stage scale for positioning", () => {
-            expect(piemenusContent).toContain("getStageScale");
-        });
-
-        it("should set wheel div left position", () => {
-            expect(piemenusContent).toMatch(/wheelDiv.*\.style\.left/);
-        });
-
-        it("should set wheel div top position", () => {
-            expect(piemenusContent).toMatch(/wheelDiv.*\.style\.top/);
-        });
-    });
-
-    describe("Tooltip Support", () => {
-        it("should set tooltips for accidentals", () => {
-            expect(piemenusContent).toContain("setTooltip");
-        });
-
-        it("should include tooltip for double sharp", () => {
-            expect(piemenusContent).toContain("double sharp");
-        });
-
-        it("should include tooltip for natural", () => {
-            expect(piemenusContent).toContain("natural");
-        });
-    });
-
-    describe("Music Theory Integration", () => {
-        it("should use buildScale for scale building", () => {
-            expect(piemenusContent).toContain("buildScale");
-        });
-
-        it("should use getNote for note retrieval", () => {
-            expect(piemenusContent).toContain("getNote(");
-        });
-
-        it("should handle key signature", () => {
-            expect(piemenusContent).toContain("keySignature");
-        });
-
-        it("should handle movable solfege", () => {
-            expect(piemenusContent).toContain("movable");
-        });
-    });
-
-    describe("Block Context Menu", () => {
-        it("should handle customsample blocks", () => {
-            expect(piemenusContent).toContain("customsample");
-        });
-
-        it("should handle action blocks", () => {
-            expect(piemenusContent).toContain("action");
-        });
-
-        it("should provide context options like copy/extract/delete", () => {
-            expect(piemenusContent).toContain("copy");
-            expect(piemenusContent).toContain("extract");
-            expect(piemenusContent).toContain("trash");
-        });
-    });
-
-    describe("Grid Menu", () => {
-        it("should support Cartesian grid", () => {
-            expect(piemenusContent).toContain("Cartesian");
-        });
-
-        it("should support Polar grid", () => {
-            expect(piemenusContent).toContain("Polar");
-        });
-
-        it("should have grid image paths", () => {
-            expect(piemenusContent).toContain("images/grid");
-        });
-    });
-
-    describe("Resize Handling", () => {
-        it("should listen for window resize", () => {
-            expect(piemenusContent).toContain("addEventListener");
-        });
-
-        it("should handle different screen widths", () => {
-            expect(piemenusContent).toContain("width");
-        });
-    });
-
-    describe("DOM Element Management", () => {
-        it("should reference wheelDiv for display management", () => {
-            expect(piemenusContent).toContain("wheelDiv");
-        });
-
-        it("should use docById for element access", () => {
-            expect(piemenusContent).toContain("docById");
-        });
-
-        it("should manage element display style", () => {
-            expect(piemenusContent).toContain("style.display");
-        });
-
-        it("should handle document event listeners", () => {
-            expect(piemenusContent).toContain("addEventListener");
-        });
-
-        it("should remove event listeners for cleanup", () => {
-            expect(piemenusContent).toContain("removeEventListener");
-        });
-    });
-
-    describe("Wheel Configuration", () => {
-        it("should create wheel with wheelnav", () => {
-            expect(piemenusContent).toContain("wheelnav");
-        });
-
-        it("should initialize wheel with labels or images", () => {
-            expect(piemenusContent).toContain("initWheel");
-        });
-
-        it("should create wheel visuals", () => {
-            expect(piemenusContent).toContain("createWheel");
-        });
-
-        it("should set wheel colors", () => {
-            expect(piemenusContent).toContain("colors");
-        });
-
-        it("should configure wheel slices", () => {
-            expect(piemenusContent).toContain("slicePathCustom");
-        });
-    });
-
-    describe("Navigation Functions", () => {
-        it("should navigate wheel to specific position", () => {
-            expect(piemenusContent).toContain("navigateWheel");
-        });
-
-        it("should handle navigation functions", () => {
-            expect(piemenusContent).toContain("navigateFunction");
-        });
-    });
-
-    describe("Event Handler Setup", () => {
-        it("should assign click handlers to wheel items", () => {
-            expect(piemenusContent).toContain("navItems");
-        });
-
-        it("should support arrow key navigation", () => {
-            expect(piemenusContent).toContain("keynavigateEnabled");
-        });
-    });
-
-    describe("Global State Management", () => {
-        it("should maintain pitch wheel state", () => {
-            expect(piemenusContent).toContain("_pitchWheel");
-        });
-
-        it("should maintain mode wheel state", () => {
-            expect(piemenusContent).toContain("_modeWheel");
-        });
-
-        it("should manage menu visibility", () => {
-            expect(piemenusContent).toContain("wheelDiv");
-        });
-
-        it("should maintain exit wheel state", () => {
-            expect(piemenusContent).toContain("_exitWheel");
-        });
-
-        it("should maintain accidentals wheel state", () => {
-            expect(piemenusContent).toContain("_accidentalsWheel");
-        });
-
-        it("should maintain octaves wheel state", () => {
-            expect(piemenusContent).toContain("_octavesWheel");
-        });
-    });
-
-    describe("Function Organization", () => {
-        it("should have consistent function structure", () => {
-            expect(piemenusContent).toContain("const piemenu");
-        });
-
-        it("should export main piemenu functions", () => {
-            expect(piemenusContent).toMatch(/piemenuPitches|piemenuCustomNotes|piemenuModes/);
-        });
-
-        it("should handle block-specific menus", () => {
-            expect(piemenusContent).toContain("piemenuBlockContext");
-        });
-
-        it("should handle grid selection", () => {
-            expect(piemenusContent).toContain("piemenuGrid");
-        });
-
-        it("should handle key selection", () => {
-            expect(piemenusContent).toContain("piemenuKey");
+    describe("Block Help Menu", () => {
+        it("should load help before opening the aux pie menu help widget", () => {
+            expect(piemenusContent).toMatch(
+                /if \(typeof HelpWidget === "undefined"\)\s*\{\s*if \(typeof require !== "undefined"\)\s*\{\s*require\(\["widgets\/help"\], function \(\) \{\s*new HelpWidget\(that, true\);/
+            );
         });
     });
 });

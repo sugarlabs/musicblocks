@@ -1409,11 +1409,13 @@ class PaletteModel {
             artwork = artwork
                 .replace(/fill_color/g, DISABLEDFILLCOLOR)
                 .replace(/stroke_color/g, DISABLEDSTROKECOLOR)
+                .replace(/block_text_color/g, platformColor.blockText)
                 .replace("block_label", safeSVG(label));
         } else {
             artwork = artwork
                 .replace(/fill_color/g, PALETTEFILLCOLORS[protoBlock.palette.name])
                 .replace(/stroke_color/g, PALETTESTROKECOLORS[protoBlock.palette.name])
+                .replace(/block_text_color/g, platformColor.blockText)
                 .replace("block_label", safeSVG(label));
         }
 

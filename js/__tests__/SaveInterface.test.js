@@ -90,6 +90,13 @@ new Function("require", "module", "exports", _code)(_amdRequire, _moduleObj, _mo
 const { SaveInterface } = _moduleObj.exports;
 const { escapeHTML } = require("../utils/utils");
 global.escapeHTML = escapeHTML;
+const util = require("util");
+global.TextEncoder = util.TextEncoder;
+global.TextDecoder = util.TextDecoder;
+global.normalizeNoteAccidentals = note => {
+    const map = { "♭": "b", "♯": "#", "𝄫": "bb", "𝄪": "x" };
+    return note.replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
+};
 const { LILYPONDHEADER } = require("../lilypond");
 global.LILYPONDHEADER = LILYPONDHEADER;
 global.instance = new SaveInterface();

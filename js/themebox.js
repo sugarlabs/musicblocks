@@ -339,7 +339,6 @@ class ThemeBox {
                 if (block && block.protoblock && block.protoblock.palette) {
                     // Redraw block to update other colors
                     if (typeof block.regenerateArtwork === "function") {
-                        // Ensure blockfactory uses the correct theme information
                         block.regenerateArtwork(false);
                     }
                     // Update text color
@@ -458,6 +457,14 @@ class ThemeBox {
                             row.style.backgroundColor = platformColor.paletteBackground;
                         }
                     }
+                }
+
+                // Refresh the currently open palette menu so block artwork
+                // SVGs are regenerated with the updated blockText color.
+                const activeName = this.activity.palettes.activePalette;
+                if (activeName && this.activity.palettes.dict[activeName]) {
+                    this.activity.palettes.dict[activeName].hideMenu();
+                    this.activity.palettes.showPalette(activeName);
                 }
             } catch (e) {
                 console.debug("Could not refresh palette:", e);

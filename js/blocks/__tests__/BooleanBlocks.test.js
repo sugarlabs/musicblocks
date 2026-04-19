@@ -27,9 +27,25 @@ global.BooleanBlock = jest.fn().mockImplementation(type => ({
     setPalette: jest.fn(),
     setHelpString: jest.fn(),
     formBlock: jest.fn(),
-    updateParameter: jest.fn(),
+    updateParameter: jest.fn(function (logo, turtle, blk) {
+        if (mockActivity.blocks.blockList[blk].value) {
+            return _("true");
+        } else {
+            return _("false");
+        }
+    }),
     arg: jest.fn(function (logo, turtle, blk, receivedArg) {
         const connections = mockActivity.blocks.blockList[blk].connections;
+
+        if (this.type === "boolean") {
+            if (typeof mockActivity.blocks.blockList[blk].value === "string") {
+                return (
+                    mockActivity.blocks.blockList[blk].value === _("true") ||
+                    mockActivity.blocks.blockList[blk].value === "true"
+                );
+            }
+            return mockActivity.blocks.blockList[blk].value;
+        }
 
         if (this.type === "not") {
             const cblk = connections[1];
@@ -169,7 +185,12 @@ const mockActivity = {
             blk8: { value: false, connections: [null, null, null] },
             blk9: { value: true, connections: [null, "blk10", "blk11"] },
             blk10: { value: false, connections: [null, null, null] },
-            blk11: { value: true, connections: [null, null, null] }
+            blk11: { value: true, connections: [null, null, null] },
+            blkTrue: { value: true, connections: [null, null, null] },
+            blkFalse: { value: false, connections: [null, null, null] },
+            blkStrTrue: { value: "true", connections: [null, null, null] },
+            blkStrFalse: { value: "false", connections: [null, null, null] },
+            blkStrTrueTranslated: { value: "true", connections: [null, null, null] }
         }
     },
     errorMsg: jest.fn()
@@ -188,6 +209,8 @@ describe("setupBooleanBlocks - Additional Tests", () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
+
+    // ─── Original Tests ────────────────────────────────────────────────────────
 
     it("should handle NotBlock arg with valid connections", () => {
         setupBooleanBlocks(mockActivity);
@@ -327,6 +350,166 @@ describe("setupBooleanBlocks - Additional Tests", () => {
         const notEqualToBlock = new global.BooleanBlock("not_equal_to");
         notEqualToBlock.arg(mockLogo, "turtle1", "blk2", true);
         expect(mockActivity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, "blk2");
+    });
+
+    // ─── NEW: updateParameter tests ───────────────────────────────────────────
+
+    it("should return 'true' from NotBlock updateParameter when value is true", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("not");
+        expect(block.updateParameter(mockLogo, "turtle1", "blkTrue")).toBe("true");
+    });
+
+    it("should return 'false' from NotBlock updateParameter when value is false", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("not");
+        expect(block.updateParameter(mockLogo, "turtle1", "blkFalse")).toBe("false");
+    });
+
+    it("should return 'true' from AndBlock updateParameter when value is true", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("and");
+        expect(block.updateParameter(mockLogo, "turtle1", "blkTrue")).toBe("true");
+    });
+
+    it("should return 'false' from AndBlock updateParameter when value is false", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("and");
+        expect(block.updateParameter(mockLogo, "turtle1", "blkFalse")).toBe("false");
+    });
+
+    it("should return 'true' from OrBlock updateParameter when value is true", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("or");
+        expect(block.updateParameter(mockLogo, "turtle1", "blkTrue")).toBe("true");
+    });
+
+    it("should return 'false' from OrBlock updateParameter when value is false", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("or");
+        expect(block.updateParameter(mockLogo, "turtle1", "blkFalse")).toBe("false");
+    });
+
+    it("should return 'true' from XorBlock updateParameter when value is true", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("xor");
+        expect(block.updateParameter(mockLogo, "turtle1", "blkTrue")).toBe("true");
+    });
+
+    it("should return 'false' from XorBlock updateParameter when value is false", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("xor");
+        expect(block.updateParameter(mockLogo, "turtle1", "blkFalse")).toBe("false");
+    });
+
+    it("should return 'true' from GreaterBlock updateParameter when value is true", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("greater");
+        expect(block.updateParameter(mockLogo, "turtle1", "blkTrue")).toBe("true");
+    });
+
+    it("should return 'false' from GreaterBlock updateParameter when value is false", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("greater");
+        expect(block.updateParameter(mockLogo, "turtle1", "blkFalse")).toBe("false");
+    });
+
+    it("should return 'true' from LessBlock updateParameter when value is true", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("less");
+        expect(block.updateParameter(mockLogo, "turtle1", "blkTrue")).toBe("true");
+    });
+
+    it("should return 'false' from LessBlock updateParameter when value is false", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("less");
+        expect(block.updateParameter(mockLogo, "turtle1", "blkFalse")).toBe("false");
+    });
+
+    it("should return 'true' from LessThanOrEqualToBlock updateParameter when value is true", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("less_than_or_equal_to");
+        expect(block.updateParameter(mockLogo, "turtle1", "blkTrue")).toBe("true");
+    });
+
+    it("should return 'false' from LessThanOrEqualToBlock updateParameter when value is false", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("less_than_or_equal_to");
+        expect(block.updateParameter(mockLogo, "turtle1", "blkFalse")).toBe("false");
+    });
+
+    it("should return 'true' from GreaterThanOrEqualToBlock updateParameter when value is true", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("greater_than_or_equal_to");
+        expect(block.updateParameter(mockLogo, "turtle1", "blkTrue")).toBe("true");
+    });
+
+    it("should return 'false' from GreaterThanOrEqualToBlock updateParameter when value is false", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("greater_than_or_equal_to");
+        expect(block.updateParameter(mockLogo, "turtle1", "blkFalse")).toBe("false");
+    });
+
+    it("should return 'true' from EqualBlock updateParameter when value is true", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("equal");
+        expect(block.updateParameter(mockLogo, "turtle1", "blkTrue")).toBe("true");
+    });
+
+    it("should return 'false' from EqualBlock updateParameter when value is false", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("equal");
+        expect(block.updateParameter(mockLogo, "turtle1", "blkFalse")).toBe("false");
+    });
+
+    it("should return 'true' from NotEqualToBlock updateParameter when value is true", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("not_equal_to");
+        expect(block.updateParameter(mockLogo, "turtle1", "blkTrue")).toBe("true");
+    });
+
+    it("should return 'false' from NotEqualToBlock updateParameter when value is false", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("not_equal_to");
+        expect(block.updateParameter(mockLogo, "turtle1", "blkFalse")).toBe("false");
+    });
+
+    // ─── NEW: StaticBooleanBlock tests ────────────────────────────────────────
+
+    it("should return true from StaticBooleanBlock when value is string 'true'", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("boolean");
+        const result = block.arg(mockLogo, "turtle1", "blkStrTrue");
+        expect(result).toBe(true);
+    });
+
+    it("should return false from StaticBooleanBlock when value is string 'false'", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("boolean");
+        const result = block.arg(mockLogo, "turtle1", "blkStrFalse");
+        expect(result).toBe(false);
+    });
+
+    it("should return true from StaticBooleanBlock when value is boolean true", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("boolean");
+        const result = block.arg(mockLogo, "turtle1", "blkTrue");
+        expect(result).toBe(true);
+    });
+
+    it("should return false from StaticBooleanBlock when value is boolean false", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("boolean");
+        const result = block.arg(mockLogo, "turtle1", "blkFalse");
+        expect(result).toBe(false);
+    });
+
+    it("should return true from StaticBooleanBlock when value matches translated 'true'", () => {
+        setupBooleanBlocks(mockActivity);
+        const block = new global.BooleanBlock("boolean");
+        mockActivity.blocks.blockList["blkStrTrueTranslated"].value = _("true");
+        const result = block.arg(mockLogo, "turtle1", "blkStrTrueTranslated");
+        expect(result).toBe(true);
     });
 });
 describe("BooleanBlocks arg() execution", () => {

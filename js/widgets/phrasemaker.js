@@ -19,7 +19,7 @@
    noteIsSolfege, isCustomTemperament, i18nSolfege, getNote, DEFAULTDRUM, last,
    DRUMS, SHARP, FLAT, PREVIEWVOLUME, DEFAULTVOLUME, noteToFrequency,
    LCD, calcNoteValueToDisplay, NOTESYMBOLS,
-   EIGHTHNOTEWIDTH, docBySelector, getTemperament
+   EIGHTHNOTEWIDTH, docBySelector, getTemperament, normalizeNoteAccidentals
 */
 
 /*
@@ -4380,7 +4380,7 @@ class PhraseMaker {
                     if (typeof note === "string") {
                         this.activity.logo.synth.trigger(
                             0,
-                            note.replace(/♭/g, "b").replace(/♯/g, "#"),
+                            normalizeNoteAccidentals(note),
                             noteValue,
                             this._instrumentName,
                             null,

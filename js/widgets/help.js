@@ -41,6 +41,7 @@ class HelpWidget {
         this.appendedBlockList = [];
         this.index = 0;
         this.isOpen = true;
+        this._prevKeyHandler = document.onkeydown;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help", false);
         //widgetWindow.getWidgetBody().style.overflowY = "auto";
@@ -51,7 +52,7 @@ class HelpWidget {
         widgetWindow.show();
         widgetWindow.onclose = () => {
             this.isOpen = false;
-            document.onkeydown = activity.__keyPressed;
+            document.onkeydown = this._prevKeyHandler;
             widgetWindow.destroy();
             // Trigger the hint only if they were on the first page of the tour
             if (this.index === 0 && typeof this.activity.textMsg === "function") {

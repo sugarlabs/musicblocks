@@ -237,15 +237,18 @@ describe("Toolbar Class", () => {
         const elements = {
             play: {
                 onclick: null,
-                addEventListener: jest.fn()
+                addEventListener: jest.fn(),
+                setAttribute: jest.fn()
             },
             stop: {
                 style: { color: "" },
                 addEventListener: jest.fn(),
-                removeEventListener: jest.fn()
+                removeEventListener: jest.fn(),
+                setAttribute: jest.fn()
             },
             record: {
-                className: ""
+                className: "",
+                setAttribute: jest.fn()
             }
         };
 
@@ -284,7 +287,12 @@ describe("Toolbar Class", () => {
     });
 
     test("renderStopIcon sets onclick and updates stop button behavior", () => {
-        const stopIcon = { onclick: null, style: { color: "" } };
+        const stopIcon = {
+            onclick: null,
+            style: { color: "" },
+            setAttribute: jest.fn(),
+            addEventListener: jest.fn()
+        };
         const recordButton = { className: "recording" };
 
         global.docById.mockImplementation(id =>

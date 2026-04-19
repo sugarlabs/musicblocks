@@ -57,3 +57,7 @@ function showZoomOverlay(scale) {
         style.opacity = "0";
     }, 1200);
 }
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = showZoomOverlay;
+}

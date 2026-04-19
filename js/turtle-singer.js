@@ -24,7 +24,7 @@
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
    noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction,
-   SEMITONES
+   SEMITONES, normalizeNoteAccidentals
  */
 
 /*
@@ -271,6 +271,11 @@ class Singer {
             }
         });
         this.activeVoices.clear();
+
+        const stopBtn = document.getElementById("stop");
+        if (stopBtn) {
+            stopBtn.style.display = "none";
+        }
     }
 
     // ========= Class variables ==============================================
@@ -2238,6 +2243,15 @@ class Singer {
                     }
 
                     if (notes.length > 0) {
+                        const stopBtn = document.getElementById("stop");
+                        if (stopBtn) {
+                            if (stopBtn.style.display !== "inline-block") {
+                                stopBtn.style.display = "inline-block";
+                            }
+                            if (stopBtn.style.color !== "#ea174c") {
+                                stopBtn.style.color = "#ea174c";
+                            }
+                        }
                         const len = notes[0].length;
                         if (typeof notes[0] === "number") {
                             tur.singer.currentOctave = frequencyToPitch(notes[0])[1];
@@ -2248,7 +2262,7 @@ class Singer {
 
                         for (let i = 0; i < notes.length; i++) {
                             if (typeof notes[i] === "string") {
-                                notes[i] = notes[i].replace(/♭/g, "b").replace(/♯/g, "#");
+                                notes[i] = normalizeNoteAccidentals(notes[i]);
                             }
                         }
 
@@ -2580,7 +2594,7 @@ class Singer {
                     if (activity.blocks.visible && blk in activity.blocks.blockList) {
                         activity.blocks.unhighlight(blk);
                         if (activity.stage) {
-                            activity.stage.update();
+                            activity.stageDirty = true;
                         }
                     }
                     delete tur.singer._unhighlightTimers[blk];

@@ -815,9 +815,9 @@
     "kanji": "音量を「0」にせっていします。",
     "kana": "おんりょうを 「0」に せってい します。"
   },
-  "Report projects which violate the <a href=\\\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\\\" target=\\\\\"_blank\\\\\">Sugar Labs Code of Conduct</a>.": {
-    "kanji": "<a href=\\\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\\\" target=\\\\\"_blank\\\\\">シュガー・ラボ ",
-    "kana": "<a href=\\\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\\\" target=\\\\\"_blank\\\\\">シュガー・ラボ "
+  "Report projects which violate the <a href=\\\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\\\" target=\\\\\"_blank\\\\\" rel=\\\\\"noopener noreferrer\\\\\">Sugar Labs Code of Conduct</a>.": {
+    "kanji": "<a href=\\\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\\\" target=\\\\\"_blank\\\\\" rel=\\\\\"noopener noreferrer\\\\\">シュガー・ラボ ",
+    "kana": "<a href=\\\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\\\" target=\\\\\"_blank\\\\\" rel=\\\\\"noopener noreferrer\\\\\">シュガー・ラボ "
   },
   "The Random block returns a random number.": {
     "kanji": "<h2>すうちブロック（ランダム）</h2><br>指定したさいしょうちからさいだいちまでのはんいで、ランダムなすうちになる。<br><br>★ランダムとは<br>サイコロの目のように、何が出るか分からないすうちのこと。ランダム（random）は日本語で「らんすう」「でたらめな」という意味。ランダムを使うと、実行のたびにえんそう順じょが変わる曲などを作ることができる。",
@@ -2355,9 +2355,9 @@
     "kanji": "音階的",
     "kana": "おんかいてき"
   },
-  "The Set-heap entry block sets a value in he heap at the specified location.": {
+  "The Set-heap entry block sets a value in the heap at the specified location.": {
     "kanji": "Set-heapエントリーブロックは指定された位置のヒープに値を設定します。",
-    "kana": "The Set-heap entry block sets a value in he heap at the specified location."
+    "kana": "The Set-heap entry block sets a value in the heap at the specified location."
   },
   "heap": {
     "kanji": "ヒープ",
@@ -3711,9 +3711,9 @@
     "kanji": "ネズミを同期させる",
     "kana": "ネズミを どうき させる"
   },
-  "The Dock block block connections two blocks.": {
+  "The Dock block connects two blocks.": {
     "kanji": "Dock blockブロックは2つのブロックを接続します。",
-    "kana": "The Dock block block connections two blocks."
+    "kana": "The Dock block connects two blocks."
   },
   "The Hide blocks block hides the blocks.": {
     "kanji": "ハイド・ブロックスブロックはブロックを非表示にします。",

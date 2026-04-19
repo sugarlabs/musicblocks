@@ -83,8 +83,8 @@ class Toolbar {
                 ["play", _("Play")],
                 ["stop", _("Stop")],
                 ["record", _("Record")],
-                ["Full screen", _("Full screen")],
-                ["FullScreen", _("Full screen")],
+                ["Full screen", _("Enter Fullscreen")],
+                ["FullScreen", _("Enter Fullscreen")],
                 ["Toggle Fullscreen", _("Toggle Fullscreen")],
                 ["newFile", _("New project")],
                 ["load", _("Load project from file")],
@@ -155,8 +155,8 @@ class Toolbar {
                 _("Play"),
                 _("Stop"),
                 _("Record"),
-                _("Full screen"),
-                _("Full screen"),
+                _("Enter Fullscreen"),
+                _("Enter Fullscreen"),
                 _("Toggle Fullscreen"),
                 _("New project"),
                 _("Load project from file"),
@@ -231,8 +231,8 @@ class Toolbar {
                 ["play", _("Play")],
                 ["stop", _("Stop")],
                 ["record", _("Record")],
-                ["Full screen", _("Full screen")],
-                ["FullScreen", _("Full screen")],
+                ["Full screen", _("Enter Fullscreen")],
+                ["FullScreen", _("Enter Fullscreen")],
                 ["Toggle Fullscreen", _("Toggle Fullscreen")],
                 ["newFile", _("New project")],
                 ["load", _("Load project from file")],
@@ -297,8 +297,8 @@ class Toolbar {
                 _("Play"),
                 _("Stop"),
                 _("Record"),
-                _("Full screen"),
-                _("Full screen"),
+                _("Enter Fullscreen"),
+                _("Enter Fullscreen"),
                 _("Toggle Fullscreen"),
                 _("New project"),
                 _("Load project from file"),
@@ -467,6 +467,15 @@ class Toolbar {
         const playIcon = docById("play");
         const stopIcon = docById("stop");
         const recordButton = docById("record");
+        playIcon.setAttribute("role", "button");
+        playIcon.setAttribute("aria-label", _("Play project"));
+        playIcon.setAttribute("tabindex", "0");
+        playIcon.addEventListener("keydown", e => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                playIcon.click();
+            }
+        });
         let isPlayIconRunning = false;
 
         function handleClick() {
@@ -520,6 +529,15 @@ class Toolbar {
     renderStopIcon(onclick) {
         const stopIcon = docById("stop");
         const recordButton = docById("record");
+        stopIcon.setAttribute("role", "button");
+        stopIcon.setAttribute("aria-label", _("Stop project"));
+        stopIcon.setAttribute("tabindex", "0");
+        stopIcon.addEventListener("keydown", e => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                stopIcon.click();
+            }
+        });
         stopIcon.onclick = () => {
             onclick(this.activity);
             stopIcon.style.color = "white";
