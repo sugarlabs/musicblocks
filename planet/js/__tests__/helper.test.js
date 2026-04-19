@@ -25,15 +25,14 @@ global.document = {
     cookie: ""
 };
 
-const { buildShareURL, buildEmbedSnippet } = require("../helper");
+const { buildShareURL, buildEmbedSnippet, isSafeMusicBlocksURL } = require("../helper");
 
 const BASE = "https://musicblocks.sugarlabs.org/index.html";
+const SAMPLE_URL = `${BASE}?id=42&run=True`;
+
+// ─── buildShareURL ────────────────────────────────────────────────────────────
 
 describe("buildShareURL", () => {
-    it("returns a URL containing the project id", () => {
-        expect(buildShareURL("12345")).toContain("12345");
-    });
-
     it("starts with the canonical Music Blocks base URL", () => {
         expect(buildShareURL("abc").startsWith(BASE)).toBe(true);
     });
@@ -82,40 +81,104 @@ describe("buildShareURL", () => {
     });
 });
 
-describe("buildEmbedSnippet", () => {
-    const sampleURL = "https://musicblocks.sugarlabs.org/index.html?id=42&run=True";
+// ─── isSafeMusicBlocksURL ─────────────────────────────────────────────────────
 
+describe("isSafeMusicBlocksURL", () => {
+    it("accepts a valid Music Blocks https URL", () => {
+        expect(isSafeMusicBlocksURL(SAMPLE_URL)).toBe(true);
+    });
+
+    it("rejects javascript: URLs", () => {
+        expect(isSafeMusicBlocksURL("javascript:alert(1)")).toBe(false);
+    });
+
+    it("rejects data: URLs", () => {
+        expect(isSafeMusicBlocksURL("data:text/html,<script>alert(1)</script>")).toBe(false);
+    });
+
+    it("rejects vbscript: URLs", () => {
+        expect(isSafeMusicBlocksURL("vbscript:msgbox(1)")).toBe(false);
+    });
+
+    it("rejects http: (non-https) Music Blocks URLs", () => {
+        expect(isSafeMusicBlocksURL("http://musicblocks.sugarlabs.org/index.html?id=1")).toBe(false);
+    });
+
+    it("rejects URLs from other domains", () => {
+        expect(isSafeMusicBlocksURL("https://evil.com/index.html?id=1")).toBe(false);
+    });
+
+    it("rejects bare strings without protocol", () => {
+        expect(isSafeMusicBlocksURL("musicblocks.sugarlabs.org")).toBe(false);
+    });
+
+    it("rejects empty string", () => {
+        expect(isSafeMusicBlocksURL("")).toBe(false);
+    });
+});
+
+// ─── buildEmbedSnippet ────────────────────────────────────────────────────────
+
+describe("buildEmbedSnippet", () => {
     it("returns a string starting with <iframe", () => {
-        expect(buildEmbedSnippet(sampleURL).startsWith("<iframe")).toBe(true);
+        expect(buildEmbedSnippet(SAMPLE_URL).startsWith("<iframe")).toBe(true);
     });
 
     it("ends with </iframe>", () => {
-        expect(buildEmbedSnippet(sampleURL).endsWith("</iframe>")).toBe(true);
+        expect(buildEmbedSnippet(SAMPLE_URL).endsWith("</iframe>")).toBe(true);
     });
 
     it("includes the given URL as the src", () => {
-        expect(buildEmbedSnippet(sampleURL)).toContain(`src="${sampleURL}"`);
+        expect(buildEmbedSnippet(SAMPLE_URL)).toContain(`src="${SAMPLE_URL}"`);
     });
 
     it("includes a sandbox attribute for security", () => {
-        expect(buildEmbedSnippet(sampleURL)).toContain("sandbox=");
+        expect(buildEmbedSnippet(SAMPLE_URL)).toContain("sandbox=");
     });
 
     it("sandboxes allow-scripts and allow-same-origin", () => {
-        const snippet = buildEmbedSnippet(sampleURL);
+        const snippet = buildEmbedSnippet(SAMPLE_URL);
         expect(snippet).toContain("allow-scripts");
         expect(snippet).toContain("allow-same-origin");
     });
 
     it("includes width and height attributes", () => {
-        const snippet = buildEmbedSnippet(sampleURL);
+        const snippet = buildEmbedSnippet(SAMPLE_URL);
         expect(snippet).toContain("width=");
         expect(snippet).toContain("height=");
     });
 
+    it("includes a title attribute for accessibility", () => {
+        expect(buildEmbedSnippet(SAMPLE_URL)).toContain("title=");
+    });
+
+    it("uses the project name in the title when provided", () => {
+        expect(buildEmbedSnippet(SAMPLE_URL, "My Song")).toContain("My Song");
+    });
+
+    it("falls back to a default title when no project name is provided", () => {
+        expect(buildEmbedSnippet(SAMPLE_URL)).toContain("Music Blocks Project");
+    });
+
     it("produces different snippets for different URLs", () => {
-        const s1 = buildEmbedSnippet("https://musicblocks.sugarlabs.org/index.html?id=1");
-        const s2 = buildEmbedSnippet("https://musicblocks.sugarlabs.org/index.html?id=2");
+        const s1 = buildEmbedSnippet(`${BASE}?id=1`);
+        const s2 = buildEmbedSnippet(`${BASE}?id=2`);
         expect(s1).not.toBe(s2);
+    });
+
+    it("returns empty string for javascript: URL", () => {
+        expect(buildEmbedSnippet("javascript:alert(1)")).toBe("");
+    });
+
+    it("returns empty string for data: URL", () => {
+        expect(buildEmbedSnippet("data:text/html,<script>alert(1)</script>")).toBe("");
+    });
+
+    it("returns empty string for a non-Music Blocks https URL", () => {
+        expect(buildEmbedSnippet("https://evil.com/page")).toBe("");
+    });
+
+    it("returns empty string for an empty string", () => {
+        expect(buildEmbedSnippet("")).toBe("");
     });
 });

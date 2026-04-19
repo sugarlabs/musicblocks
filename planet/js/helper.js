@@ -136,15 +136,42 @@ function buildShareURL(id, options) {
 }
 
 /**
- * buildEmbedSnippet(url)
- * Build an <iframe> embed snippet string for the given share URL.
+ * isSafeMusicBlocksURL(url)
+ * Validate that a URL is a safe https Music Blocks origin URL.
+ * Rejects javascript:, data:, vbscript:, and any non-https schemes.
  *
- * @param {string} url - A Music Blocks share URL
- * @returns {string} Ready-to-paste iframe HTML
+ * @param {string} url
+ * @returns {boolean}
  */
-function buildEmbedSnippet(url) {
+function isSafeMusicBlocksURL(url) {
+    try {
+        const parsed = new URL(url);
+        return (
+            parsed.protocol === "https:" &&
+            parsed.hostname === "musicblocks.sugarlabs.org"
+        );
+    } catch (e) {
+        return false;
+    }
+}
+
+/**
+ * buildEmbedSnippet(url, projectName)
+ * Build an <iframe> embed snippet string for the given share URL.
+ * Returns an empty string if the URL fails validation.
+ *
+ * @param {string} url         - A Music Blocks share URL
+ * @param {string} [projectName] - Optional project name for the iframe title
+ * @returns {string} Ready-to-paste iframe HTML, or "" if URL is unsafe
+ */
+function buildEmbedSnippet(url, projectName) {
+    if (!isSafeMusicBlocksURL(url)) return "";
+    const title = projectName
+        ? `Music Blocks Project: ${projectName}`
+        : "Music Blocks Project";
     return (
         `<iframe src="${url}" ` +
+        `title="${title}" ` +
         `width="400" height="300" ` +
         `frameborder="0" ` +
         `allowfullscreen ` +
@@ -172,7 +199,7 @@ function updateCheckboxes(id) {
 
     const twitterBtn = document.getElementById(`global-share-twitter-${projectId}`);
     if (twitterBtn) {
-        twitterBtn.href = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(socialText)}`;
+        twitterBtn.href = `https://x.com/intent/post?url=${encodeURIComponent(url)}&text=${encodeURIComponent(socialText)}`;
     }
 
     const whatsappBtn = document.getElementById(`global-share-whatsapp-${projectId}`);
@@ -183,17 +210,17 @@ function updateCheckboxes(id) {
     // Sync embed snippet textarea and copy button
     const embedArea = document.getElementById(`global-embed-${projectId}`);
     if (embedArea) {
-        embedArea.value = buildEmbedSnippet(url);
+        embedArea.value = buildEmbedSnippet(url, projectName);
     }
 
     const embedCopyBtn = document.getElementById(`global-copy-embed-${projectId}`);
     if (embedCopyBtn) {
-        embedCopyBtn.setAttribute("data-clipboard-text", buildEmbedSnippet(url));
+        embedCopyBtn.setAttribute("data-clipboard-text", buildEmbedSnippet(url, projectName));
     }
 }
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { buildShareURL, buildEmbedSnippet };
+    module.exports = { buildShareURL, buildEmbedSnippet, isSafeMusicBlocksURL };
 }
 
 $(document).ready(() => {

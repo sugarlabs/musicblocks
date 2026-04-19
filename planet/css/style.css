@@ -548,17 +548,19 @@ a {
 
 /* Embed snippet section */
 .embed-section {
-    margin-top: 12px;
+    margin-top: 16px;
+    padding-top: 8px;
+    border-top: 1px solid #e0e0e0;
 }
 
 .embed-title {
-    margin-bottom: 4px;
+    margin-bottom: 8px;
 }
 
 .embed-row {
     display: flex;
     align-items: flex-start;
-    gap: 4px;
+    gap: 8px;
 }
 
 .embed-snippetarea {
@@ -566,9 +568,11 @@ a {
     font-size: 0.75em;
     font-family: monospace;
     resize: none;
-    padding: 4px;
+    padding: 8px;
     border: 1px solid #ccc;
     border-radius: 2px;
+    line-height: 1.4;
+    min-height: 60px;
 }
 
 /* Attribution badge (exported HTML) */
