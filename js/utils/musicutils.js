@@ -4292,6 +4292,7 @@ function getNote(
             case FLAT + SHARP:
             case SHARP + FLAT:
             default:
+                noteArg += articulation;
                 break;
         }
 
@@ -4742,6 +4743,7 @@ function getNote(
             case FLAT + SHARP:
             case SHARP + FLAT:
             default:
+                noteArg += articulation;
                 break;
         }
 
