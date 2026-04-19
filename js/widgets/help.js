@@ -389,8 +389,8 @@ class HelpWidget {
             img.src = HELPCONTENT[page][2];
             img.alt = `${HELPCONTENT[page][0]} icon`;
             img.loading = "lazy";
-            img.width = 64;
-            img.height = 64;
+            img.setAttribute("width", "64px");
+            img.setAttribute("height", "64px");
             figure.append(img);
             bodyFragment.append(figure);
         }
