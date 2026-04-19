@@ -734,7 +734,7 @@ class RhythmRuler {
                 rulerSubCell.border = "0px";
                 rulerSubCell.padding = "0px";
                 rulerSubCell.style.padding = "0px";
-                rulerSubCell.style.lineHeight = 60 + " % ";
+                rulerSubCell.style.lineHeight = "60%";
                 if (i % 2 === 0) {
                     if (j % 2 === 0) {
                         rulerSubCell.style.backgroundColor = platformColor.selectorBackground;
