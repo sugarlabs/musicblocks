@@ -72,7 +72,7 @@ class GlobalPlanet {
             t = new GlobalTag(Planet);
             t.init({ id: keys[i] });
             this.tags.push(t);
-            if (this.defaultMainTags.indexOf(Planet.TagsManifest[keys[i]].TagName) != -1) {
+            if (this.defaultMainTags.indexOf(Planet.TagsManifest[keys[i]].TagName) !== -1) {
                 t.selected = true;
                 tagsToInitialise.push(t);
             }
@@ -80,7 +80,7 @@ class GlobalPlanet {
 
         this.sortBy = document.getElementById("sort-select").value;
 
-        if (this.defaultTag != false) this.selectSpecialTag(this.defaultTag);
+        if (this.defaultTag !== false) this.selectSpecialTag(this.defaultTag);
 
         for (let i = 0; i < tagsToInitialise.length; i++) tagsToInitialise[i].select();
 
@@ -235,7 +235,6 @@ class GlobalPlanet {
         const toDownload = [];
 
         for (let i = 0; i < data.length; i++) {
-            // eslint-disable-next-line no-prototype-builtins
             if (this.cache.hasOwnProperty(data[i][0])) {
                 if (this.cache[data[i][0]].ProjectLastUpdated !== data[i][1])
                     toDownload.push(data[i]);
@@ -256,25 +255,36 @@ class GlobalPlanet {
         } else if (l === this.page + 1) {
             this.downloadProjectsToCache(
                 toDownload,
+                function (id) {
+                    this.renderSingleProject(id);
+                }.bind(this),
                 function () {
-                    this.render(data);
+                    this.hideLoading();
                     this.showLoadMore();
+                    this.index += this.page;
                 }.bind(this)
             );
         } else {
             this.downloadProjectsToCache(
                 toDownload,
+                function (id) {
+                    this.renderSingleProject(id);
+                }.bind(this),
                 function () {
-                    this.render(data);
+                    this.hideLoading();
                     this.hideLoadMore();
+                    this.index += this.page;
                 }.bind(this)
             );
         }
     }
 
-    downloadProjectsToCache(data, callback) {
+    downloadProjectsToCache(data, onEachComplete, onAllComplete) {
         const Planet = this.Planet;
         this.loadCount = data.length;
+
+        this.loadedCount = 0;
+        const totalCount = data.length;
 
         for (let i = 0; i < data.length; i++) {
             (function () {
@@ -283,30 +293,45 @@ class GlobalPlanet {
                     id,
                     function (d) {
                         const tempid = id;
-                        this.addProjectToCache(tempid, d, callback);
+                        this.addProjectToCache(
+                            tempid,
+                            d,
+                            onEachComplete,
+                            onAllComplete,
+                            totalCount
+                        );
                     }.bind(this)
                 );
             }).bind(this)();
         }
     }
 
-    addProjectToCache(id, data, callback) {
+    addProjectToCache(id, data, onEachComplete, onAllComplete, totalCount) {
         if (data.success) {
             this.cache[id] = data.data;
             this.cache[id].ProjectData = null;
-        } else {
-            this.throwOfflineError();
-        }
+            this.loadCount -= 1;
+            this.loadedCount += 1;
 
-        this.loadCount -= 1;
-        if (this.loadCount <= 0) callback();
+            if (onEachComplete) {
+                onEachComplete(id);
+            }
+
+            this.updateLoadingProgress(this.loadedCount, totalCount);
+
+            if (this.loadCount <= 0 && onAllComplete) {
+                onAllComplete();
+            }
+        } else this.throwOfflineError();
+
+        // if (this.loadCount <= 0) callback();
     }
 
     forceAddToCache(id, callback) {
         this.Planet.ServerInterface.getProjectDetails(
             id,
             function (d) {
-                this.addProjectToCache(id, d, callback);
+                this.addProjectToCache(id, d, null, callback, 1);
             }.bind(this)
         );
     }
@@ -372,7 +397,6 @@ class GlobalPlanet {
         this.cleanContainer();
 
         for (let i = 0; i < data.length; i++) {
-            // eslint-disable-next-line no-prototype-builtins
             if (this.cache.hasOwnProperty(data[i][0])) {
                 const g = new GlobalCard(this.Planet);
                 g.init(data[i][0]);
@@ -386,6 +410,16 @@ class GlobalPlanet {
 
         jQuery(".tooltipped").tooltip({ delay: 50 });
         this.afterAddProjects();
+    }
+
+    renderSingleProject(id) {
+        if (Object.prototype.hasOwnProperty.call(this.cache, id)) {
+            const g = new GlobalCard(this.Planet);
+            g.init(id);
+            g.render();
+            this.cards.push(g);
+            jQuery(".tooltipped").tooltip({ delay: 50 });
+        }
     }
 
     afterAddProjects() {
@@ -419,6 +453,11 @@ class GlobalPlanet {
 
     showLoading() {
         document.getElementById("global-load").style.display = "block";
+    }
+
+    updateLoadingProgress(loaded, total) {
+        // Progress is shown by cards appearing incrementally
+        // The loading spinner remains visible until all projects are loaded
     }
 
     hideLoadMore() {
