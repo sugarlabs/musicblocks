@@ -44,7 +44,7 @@ try {
    PALETTESTROKECOLORS, PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
    Palettes, PasteBox, PlanetInterface, platform, platformColor,
    piemenuKey, POLAR, preparePluginExports, processMacroData,
-   processPluginData, processRawPluginData, SaveInterface,
+    processPluginData, processRawPluginData, setPluginSafeMode, SaveInterface,
    SHOWBLOCKSBUTTON, SMALLERBUTTON, SMALLERDISABLEBUTTON, SOPRANO,
    SPECIALINPUTS, STANDARDBLOCKHEIGHT, StatsWindow, STROKECOLORS,
    TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, TURTLESVG,
@@ -2597,6 +2597,7 @@ class Activity {
                 }
 
                 this.storage.plugins = JSON.stringify(obj);
+                setPluginSafeMode(this, false);
                 this.textMsg(
                     this.palettes.activePalette + " " + _("plugins will be removed upon restart.")
                 );
@@ -8260,8 +8261,20 @@ class Activity {
             // Load any plugins saved in local storage.
             this.pluginData = this.storage.plugins;
             if (this.pluginData !== null && this.pluginData !== "null") {
-                const obj = await processPluginData(this, this.pluginData, "localStorage:plugins");
-                updatePluginObj(this, obj);
+                if (this.storage.pluginSafeMode === "true") {
+                    console.warn(
+                        "Plugin safe mode is enabled. Skipping stored plugin execution.",
+                        this.storage.pluginSafeModeReason || ""
+                    );
+                    this.textMsg(_("Plugin safe mode is enabled: stored plugins were not loaded."));
+                } else {
+                    const obj = await processPluginData(
+                        this,
+                        this.pluginData,
+                        "localStorage:plugins"
+                    );
+                    updatePluginObj(this, obj);
+                }
             }
 
             // Load custom mode saved in local storage.

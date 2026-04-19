@@ -729,6 +729,93 @@ if (typeof window !== "undefined") {
     window.isSafeUrl = isSafeUrl;
 }
 
+const TRUSTED_PLUGIN_HASHES_KEY = "trustedPluginHashesV1";
+const PLUGIN_SAFE_MODE_KEY = "pluginSafeMode";
+const PLUGIN_SAFE_MODE_REASON_KEY = "pluginSafeModeReason";
+
+const getPluginStorage = activity => {
+    if (activity && activity.storage) {
+        return activity.storage;
+    }
+
+    if (typeof localStorage !== "undefined") {
+        return localStorage;
+    }
+
+    return null;
+};
+
+const getPluginTrustStorage = () => {
+    if (typeof sessionStorage !== "undefined") {
+        return sessionStorage;
+    }
+
+    return null;
+};
+
+const hashPluginData = pluginData => {
+    const input = typeof pluginData === "string" ? pluginData : JSON.stringify(pluginData || "");
+    let hash = 0x811c9dc5;
+
+    for (let i = 0; i < input.length; i++) {
+        hash ^= input.charCodeAt(i);
+        hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+    }
+
+    return "fnv1a32:" + (hash >>> 0).toString(16).padStart(8, "0");
+};
+
+const getTrustedPluginHashes = storage => {
+    if (!storage) return new Set();
+
+    const raw = storage[TRUSTED_PLUGIN_HASHES_KEY];
+    if (!raw) return new Set();
+
+    try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+            return new Set(parsed.filter(item => typeof item === "string"));
+        }
+    } catch (e) {
+        console.warn("Failed to parse trusted plugin hash list:", e);
+    }
+
+    return new Set();
+};
+
+const setTrustedPluginHashes = (storage, hashSet) => {
+    if (!storage) return;
+    storage[TRUSTED_PLUGIN_HASHES_KEY] = JSON.stringify(Array.from(hashSet));
+};
+
+const isPluginHashTrusted = (activity, pluginData) => {
+    const storage = getPluginTrustStorage();
+    const hash = hashPluginData(pluginData);
+    const trustedHashes = getTrustedPluginHashes(storage);
+    return {
+        hash,
+        trusted: trustedHashes.has(hash)
+    };
+};
+
+const trustPluginDataHash = (activity, pluginData) => {
+    const storage = getPluginTrustStorage();
+    if (!storage) return;
+
+    const hash = hashPluginData(pluginData);
+    const trustedHashes = getTrustedPluginHashes(storage);
+    trustedHashes.add(hash);
+    setTrustedPluginHashes(storage, trustedHashes);
+};
+
+const setPluginSafeMode = (activity, enabled, reason = "") => {
+    const storage = getPluginStorage(activity);
+    if (!storage) return;
+
+    storage[PLUGIN_SAFE_MODE_KEY] = enabled ? "true" : "false";
+    storage[PLUGIN_SAFE_MODE_REASON_KEY] = enabled ? reason : "";
+};
+
 /**
  * Processes plugin data and updates the activity based on the provided JSON-encoded dictionary.
  * @param {object} activity - The activity object to update.
@@ -747,29 +834,59 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
         if (source.startsWith("plugins/") || source.startsWith("./plugins/")) {
             return true;
         }
-        // Known plugins from local storage are also trusted as they were approved previously
-        if (source === "localStorage:plugins") {
-            return true;
-        }
         return false;
     };
 
-    // Use the vetted check to determine initial trust
+    const isStoredPluginSource = pluginSource === "localStorage:plugins";
+
+    // Built-in plugins are trusted by source. Persisted plugins are trusted by hash allowlist.
     let userConfirmed = isVettedPlugin(pluginSource);
+    let executionTrusted = userConfirmed;
+
+    if (isStoredPluginSource) {
+        const trustStatus = isPluginHashTrusted(activity, pluginData);
+        userConfirmed = trustStatus.trusted;
+        executionTrusted = trustStatus.trusted;
+
+        if (!userConfirmed) {
+            const shortHash = trustStatus.hash.slice(-8);
+            userConfirmed = confirm(
+                _("Security Warning") +
+                    "\n\n" +
+                    _(
+                        "Stored plugin code is not approved for this browser profile. If storage was modified by malicious code, loading it could execute attacker-controlled scripts."
+                    ) +
+                    "\n\n" +
+                    _("Do you want to approve and run the stored plugins?") +
+                    "\n\n" +
+                    _("Plugin signature: ") +
+                    shortHash
+            );
+
+            if (userConfirmed) {
+                trustPluginDataHash(activity, pluginData);
+                executionTrusted = true;
+                setPluginSafeMode(activity, false);
+            }
+        }
+    }
 
     if (!userConfirmed) {
-        userConfirmed = confirm(
-            _("Security Warning") +
-                "\n\n" +
-                _(
-                    "This plugin contains code that will be executed in your browser. It has not been loaded from the built-in plugins directory and may contain unsafe code."
-                ) +
-                "\n\n" +
-                _("Do you want to allow this plugin to run?") +
-                "\n\n" +
-                _("Source: ") +
-                (pluginSource || _("unknown"))
-        );
+        if (!isStoredPluginSource) {
+            userConfirmed = confirm(
+                _("Security Warning") +
+                    "\n\n" +
+                    _(
+                        "This plugin contains code that will be executed in your browser. It has not been loaded from the built-in plugins directory and may contain unsafe code."
+                    ) +
+                    "\n\n" +
+                    _("Do you want to allow this plugin to run?") +
+                    "\n\n" +
+                    _("Source: ") +
+                    (pluginSource || _("unknown"))
+            );
+            executionTrusted = userConfirmed;
+        }
 
         if (!userConfirmed) {
             console.warn("User declined unvetted plugin execution:", pluginSource);
@@ -799,8 +916,14 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
     try {
         obj = JSON.parse(pluginData);
     } catch (error) {
-        console.error(`PluginProcessor: Failed to parse plugin data from source "${pluginSource}":`, error);
+        console.error(
+            `PluginProcessor: Failed to parse plugin data from source "${pluginSource}":`,
+            error
+        );
         console.debug("Malformed plugin data:", pluginData);
+        if (isStoredPluginSource) {
+            setPluginSafeMode(activity, true, "stored-plugin-parse-error");
+        }
         return null;
     }
     // Create a palette entry.
@@ -887,7 +1010,7 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
             // Pre-compile trusted plugins for performance.
             // UNTRUSTED plugins (if any made it past confirmation) are stored as strings
             // and handled via whitelist in safePluginExecute.
-            if (isVettedPlugin(pluginSource)) {
+            if (executionTrusted) {
                 const flowCode = obj["FLOWPLUGINS"][flow];
                 const registryName = `flow_${flow}_${Math.random().toString(36).substr(2, 9)}`;
                 blobScriptContent += `
@@ -905,7 +1028,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, rec
     // Populate the arg-block dictionary
     if ("ARGPLUGINS" in obj) {
         for (const arg in obj["ARGPLUGINS"]) {
-            if (isVettedPlugin(pluginSource)) {
+            if (executionTrusted) {
                 const argCode = obj["ARGPLUGINS"][arg];
                 const registryName = `arg_${arg}_${Math.random().toString(36).substr(2, 9)}`;
                 blobScriptContent += `
@@ -937,7 +1060,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, par
     // Populate the setter dictionary
     if ("SETTERPLUGINS" in obj) {
         for (const setter in obj["SETTERPLUGINS"]) {
-            if (isVettedPlugin(pluginSource)) {
+            if (executionTrusted) {
                 const setterCode = obj["SETTERPLUGINS"][setter];
                 const registryName = `setter_${setter}_${Math.random().toString(36).substr(2, 9)}`;
                 blobScriptContent += `
@@ -972,7 +1095,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, blk, value, turt
 
     if ("PARAMETERPLUGINS" in obj) {
         for (const parameter in obj["PARAMETERPLUGINS"]) {
-            if (isVettedPlugin(pluginSource)) {
+            if (executionTrusted) {
                 const paramCode = obj["PARAMETERPLUGINS"][parameter];
                 const registryName = `param_${parameter}_${Math.random().toString(36).substr(2, 9)}`;
                 blobScriptContent += `
@@ -997,7 +1120,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk) {
     // Code to execute when turtle code is started
     if ("ONSTART" in obj) {
         for (const arg in obj["ONSTART"]) {
-            if (isVettedPlugin(pluginSource)) {
+            if (executionTrusted) {
                 const onStartCode = obj["ONSTART"][arg];
                 const registryName = `onstart_${arg}_${Math.random().toString(36).substr(2, 9)}`;
                 blobScriptContent += `
@@ -1015,7 +1138,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
     // Code to execute when turtle code is stopped
     if ("ONSTOP" in obj) {
         for (const arg in obj["ONSTOP"]) {
-            if (isVettedPlugin(pluginSource)) {
+            if (executionTrusted) {
                 const onStopCode = obj["ONSTOP"][arg];
                 const registryName = `onstop_${arg}_${Math.random().toString(36).substr(2, 9)}`;
                 blobScriptContent += `
@@ -1137,6 +1260,10 @@ window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivi
     setTimeout(() => {
         activity.palettes.show();
     }, 2000);
+
+    if (isStoredPluginSource) {
+        setPluginSafeMode(activity, false);
+    }
 
     // Return the object in case we need to save it to local storage.
     return obj;
@@ -1261,8 +1388,13 @@ const updatePluginObj = (activity, obj) => {
 let preparePluginExports = (activity, obj) => {
     // add obj to plugin dictionary and return as JSON encoded text
     updatePluginObj(activity, obj);
+    const pluginExport = JSON.stringify(activity.pluginObjs);
 
-    return JSON.stringify(activity.pluginObjs);
+    // Any plugin set that was just loaded through the explicit plugin flow is considered approved.
+    trustPluginDataHash(activity, pluginExport);
+    setPluginSafeMode(activity, false);
+
+    return pluginExport;
 };
 
 /**
@@ -2076,6 +2208,10 @@ if (typeof module !== "undefined" && module.exports) {
         closeBlkWidgets,
         resolveObject,
         importMembers,
-        escapeHTML
+        escapeHTML,
+        hashPluginData,
+        isPluginHashTrusted,
+        trustPluginDataHash,
+        setPluginSafeMode
     };
 }

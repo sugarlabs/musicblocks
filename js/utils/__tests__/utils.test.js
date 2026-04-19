@@ -57,6 +57,13 @@ global.localStorage = {
     kanaPreference: ""
 };
 
+global.sessionStorage = {
+    getItem: jest.fn(),
+    setItem: jest.fn(),
+    removeItem: jest.fn(),
+    clear: jest.fn()
+};
+
 global.XMLHttpRequest = class {
     open() {}
     setRequestHeader() {}
@@ -91,10 +98,54 @@ const {
     closeWidgets,
     closeBlkWidgets,
     resolveObject,
-    importMembers
+    importMembers,
+    hashPluginData,
+    isPluginHashTrusted,
+    trustPluginDataHash,
+    setPluginSafeMode
 } = require("../utils.js");
 
 describe("Utility Functions (logic-only)", () => {
+    describe("plugin trust helpers", () => {
+        const pluginPayload = '{"FLOWPLUGINS":{"demo":"return 1;"}}';
+
+        beforeEach(() => {
+            delete global.localStorage.trustedPluginHashesV1;
+            delete global.localStorage.pluginSafeMode;
+            delete global.localStorage.pluginSafeModeReason;
+            delete global.sessionStorage.trustedPluginHashesV1;
+        });
+
+        it("creates deterministic plugin hashes", () => {
+            const hashA = hashPluginData(pluginPayload);
+            const hashB = hashPluginData(pluginPayload);
+            expect(hashA).toBe(hashB);
+            expect(hashA.startsWith("fnv1a32:")).toBe(true);
+        });
+
+        it("trusts stored plugin hash after approval", () => {
+            const activity = { storage: global.localStorage };
+            expect(isPluginHashTrusted(activity, pluginPayload).trusted).toBe(false);
+
+            trustPluginDataHash(activity, pluginPayload);
+
+            expect(isPluginHashTrusted(activity, pluginPayload).trusted).toBe(true);
+            expect(global.sessionStorage.trustedPluginHashesV1).toBeDefined();
+        });
+
+        it("toggles plugin safe mode and reason", () => {
+            const activity = { storage: global.localStorage };
+
+            setPluginSafeMode(activity, true, "test-reason");
+            expect(global.localStorage.pluginSafeMode).toBe("true");
+            expect(global.localStorage.pluginSafeModeReason).toBe("test-reason");
+
+            setPluginSafeMode(activity, false);
+            expect(global.localStorage.pluginSafeMode).toBe("false");
+            expect(global.localStorage.pluginSafeModeReason).toBe("");
+        });
+    });
+
     describe("toTitleCase()", () => {
         it("converts first character to uppercase", () => {
             expect(toTitleCase("hello")).toBe("Hello");
