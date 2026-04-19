@@ -156,6 +156,22 @@ function isSafeMusicBlocksURL(url) {
 }
 
 /**
+ * escapeHTMLAttr(str)
+ * Escape a string for safe use inside an HTML attribute value.
+ *
+ * @param {string} str
+ * @returns {string}
+ */
+function escapeHTMLAttr(str) {
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+}
+
+/**
  * buildEmbedSnippet(url, projectName)
  * Build an <iframe> embed snippet string for the given share URL.
  * Returns an empty string if the URL fails validation.
@@ -165,14 +181,17 @@ function isSafeMusicBlocksURL(url) {
  * @returns {string} Ready-to-paste iframe HTML, or "" if URL is unsafe
  */
 function buildEmbedSnippet(url, projectName) {
-    if (!isSafeMusicBlocksURL(url)) return "";
+    if (!isSafeMusicBlocksURL(url)) {
+        console.warn(`buildEmbedSnippet: unsafe URL rejected: ${url}`);
+        return "";
+    }
     const title = projectName
-        ? `Music Blocks Project: ${projectName}`
+        ? `Music Blocks Project: ${escapeHTMLAttr(projectName)}`
         : "Music Blocks Project";
     return (
         `<iframe src="${url}" ` +
         `title="${title}" ` +
-        `width="400" height="300" ` +
+        `width="800" height="600" ` +
         `frameborder="0" ` +
         `allowfullscreen ` +
         `sandbox="allow-scripts allow-same-origin">` +
@@ -199,7 +218,7 @@ function updateCheckboxes(id) {
 
     const twitterBtn = document.getElementById(`global-share-twitter-${projectId}`);
     if (twitterBtn) {
-        twitterBtn.href = `https://x.com/intent/post?url=${encodeURIComponent(url)}&text=${encodeURIComponent(socialText)}`;
+        twitterBtn.href = `https://x.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(socialText)}`;
     }
 
     const whatsappBtn = document.getElementById(`global-share-whatsapp-${projectId}`);
@@ -220,7 +239,7 @@ function updateCheckboxes(id) {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { buildShareURL, buildEmbedSnippet, isSafeMusicBlocksURL };
+    module.exports = { buildShareURL, buildEmbedSnippet, isSafeMusicBlocksURL, escapeHTMLAttr };
 }
 
 $(document).ready(() => {

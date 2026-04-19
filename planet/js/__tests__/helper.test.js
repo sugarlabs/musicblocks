@@ -148,6 +148,12 @@ describe("buildEmbedSnippet", () => {
         expect(snippet).toContain("height=");
     });
 
+    it("uses 800x600 dimensions for usable embed size", () => {
+        const snippet = buildEmbedSnippet(SAMPLE_URL);
+        expect(snippet).toContain('width="800"');
+        expect(snippet).toContain('height="600"');
+    });
+
     it("includes a title attribute for accessibility", () => {
         expect(buildEmbedSnippet(SAMPLE_URL)).toContain("title=");
     });
@@ -180,5 +186,17 @@ describe("buildEmbedSnippet", () => {
 
     it("returns empty string for an empty string", () => {
         expect(buildEmbedSnippet("")).toBe("");
+    });
+
+    it("escapes quotes in project name to prevent XSS", () => {
+        const snippet = buildEmbedSnippet(SAMPLE_URL, 'My Project" onload="alert(1)');
+        expect(snippet).not.toContain('onload="alert(1)"');
+        expect(snippet).toContain("&quot;");
+    });
+
+    it("escapes angle brackets in project name", () => {
+        const snippet = buildEmbedSnippet(SAMPLE_URL, "<script>bad</script>");
+        expect(snippet).not.toContain("<script>");
+        expect(snippet).toContain("&lt;script&gt;");
     });
 });
