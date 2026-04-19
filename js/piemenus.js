@@ -1370,7 +1370,7 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
 
     // enable changing values while pie-menu is open
     const labelElem = docById("labelDiv");
-    labelElem.innerHTML = `<input id="numberLabel" style="position: absolute; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;" class="number" type="number" value="${note}" />`;
+    labelElem.replaceChildren(createNumberLabelInput(note));
     labelElem.classList.add("hasKeyboard");
 
     block.label = docById("numberLabel");
@@ -1821,7 +1821,7 @@ const piemenuNoteValue = (block, noteValue) => {
     };
 
     const labelElem = docById("labelDiv");
-    labelElem.innerHTML = `<input id="numberLabel" style="position: absolute; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;" class="number" type="number" value="${noteValue}" />`;
+    labelElem.replaceChildren(createNumberLabelInput(noteValue));
     labelElem.classList.add("hasKeyboard");
     block.label = docById("numberLabel");
 
@@ -2061,7 +2061,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     };
 
     const labelElem = docById("labelDiv");
-    labelElem.innerHTML = `<input id="numberLabel" style="position: absolute; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;" class="number" type="number" value="${selectedValue}" />`;
+    labelElem.replaceChildren(createNumberLabelInput(selectedValue));
     labelElem.classList.add("hasKeyboard");
     block.label = docById("numberLabel");
 
@@ -2262,6 +2262,24 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
 };
 
 /**
+ * Creates the numeric input used by pie menus without relying on HTML injection.
+ * @param {number|string} value
+ * @returns {HTMLInputElement}
+ */
+const createNumberLabelInput = value => {
+    const input = document.createElement("input");
+    input.id = "numberLabel";
+    input.style.position = "absolute";
+    input.style.webkitUserSelect = "text";
+    input.style.MozUserSelect = "text";
+    input.style.msUserSelect = "text";
+    input.className = "number";
+    input.type = "number";
+    input.value = value;
+    return input;
+};
+
+/**
  * Builds the color-selection pie menu for turtle and paint blocks.
  *
  * @param {Object} block Block instance invoking the menu
@@ -2371,7 +2389,7 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     };
 
     const labelElem = docById("labelDiv");
-    labelElem.innerHTML = `<input id="numberLabel" style="position: absolute; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;" class="number" type="number" value="${selectedValue}" />`;
+    labelElem.replaceChildren(createNumberLabelInput(selectedValue));
     labelElem.classList.add("hasKeyboard");
     block.label = docById("numberLabel");
 
