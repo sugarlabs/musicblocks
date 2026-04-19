@@ -257,7 +257,7 @@ function setupVolumeActions(activity) {
             }
 
             if (synth === null) {
-                activity.errorMsg(synth + "not found");
+                activity.errorMsg(_(`${synthname} not found`));
                 synth = DEFAULTVOICE;
             }
 
