@@ -259,12 +259,19 @@ class MusicBlocks {
                     }
                 }
                 if (!cname) {
-                    throw new Error(`Class ${cname} not found`);
+                    throw new Error(`Command "${command}" not found in any class`);
                 }
 
                 const classRef = cname === "Painter" ? this.turtle.painter : resolvePath(cname);
+
                 if (!classRef) {
-                    throw new Error(`Class ${cname} not found`);
+                    throw new Error(
+                        `Class "${cname}" could not be resolved for command "${command}"`
+                    );
+                }
+
+                if (typeof classRef[command] !== "function") {
+                    throw new Error(`Command "${command}" not found on class "${cname}"`);
                 }
 
                 returnVal =
