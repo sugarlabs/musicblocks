@@ -1559,6 +1559,14 @@ class Activity {
             const importConfirm = document.createElement("button");
             importConfirm.classList.add("confirm-button");
             importConfirm.textContent = _("Confirm");
+            importConfirm.style.backgroundColor = platformColor.blueButton;
+            importConfirm.style.color = platformColor.blueButtonText;
+            importConfirm.style.border = "none";
+            importConfirm.style.borderRadius = "4px";
+            importConfirm.style.padding = "8px 16px";
+            importConfirm.style.fontWeight = "bold";
+            importConfirm.style.cursor = "pointer";
+            importConfirm.style.marginRight = "16px";
             importConfirm.addEventListener("click", () => {
                 const maxNoteBlocks = select.value;
                 require(["activity/midi"], function () {
