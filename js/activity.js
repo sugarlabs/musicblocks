@@ -1605,7 +1605,7 @@ class Activity {
             confirmBtn.classList.add("confirm-button");
             confirmBtn.textContent = _("Confirm");
             confirmBtn.style.backgroundColor = platformColor.blueButton;
-            confirmBtn.style.color = "white";
+            confirmBtn.style.color = platformColor.blueButtonText;
             confirmBtn.style.border = "none";
             confirmBtn.style.borderRadius = "4px";
             confirmBtn.style.padding = "8px 16px";
@@ -5620,8 +5620,25 @@ class Activity {
             }
 
             const finalBlock = [];
-            // Some Error are here need to be fixed
             for (const staffIndex in staffBlocksMap) {
+                // Validate that the staff has sufficient block data for linking.
+                // Staves with no notes or incomplete structures from certain
+                // ABC notation inputs can cause crashes when accessing nested
+                // array elements without bounds checking.
+                if (
+                    !staffBlocksMap[staffIndex].baseBlocks ||
+                    staffBlocksMap[staffIndex].baseBlocks.length === 0 ||
+                    !staffBlocksMap[staffIndex].baseBlocks[0] ||
+                    !staffBlocksMap[staffIndex].baseBlocks[0][0] ||
+                    staffBlocksMap[staffIndex].baseBlocks[0][0].length < 4 ||
+                    staffBlocksMap[staffIndex].startBlock.length < 3 ||
+                    !staffBlocksMap[staffIndex].nameddoArray ||
+                    !staffBlocksMap[staffIndex].nameddoArray[staffIndex] ||
+                    staffBlocksMap[staffIndex].nameddoArray[staffIndex].length === 0
+                ) {
+                    finalBlock.push(...staffBlocksMap[staffIndex].startBlock);
+                    continue;
+                }
                 staffBlocksMap[staffIndex].startBlock[
                     staffBlocksMap[staffIndex].startBlock.length - 3
                 ][4][2] =
@@ -5637,6 +5654,16 @@ class Activity {
                     ][0];
                 const repeatblockids = staffBlocksMap[staffIndex].repeatArray;
                 for (const repeatId of repeatblockids) {
+                    // Skip repeat entries with out-of-bounds block indices
+                    if (
+                        repeatId.start < 0 ||
+                        repeatId.end < 0 ||
+                        repeatId.start >= staffBlocksMap[staffIndex].baseBlocks.length ||
+                        repeatId.end >= staffBlocksMap[staffIndex].baseBlocks.length
+                    ) {
+                        continue;
+                    }
+
                     if (repeatId.start === 0) {
                         staffBlocksMap[staffIndex].repeatBlock.push([
                             blockId,

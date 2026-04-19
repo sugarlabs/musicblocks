@@ -517,22 +517,47 @@ function AIWidget() {
             const startBlockArray = staffBlocksMap[staffIndex].startBlock;
             const baseBlocks = staffBlocksMap[staffIndex].baseBlocks;
 
-            if (baseBlocks.length > 0 && baseBlocks[0].length > 0) {
-                const firstNoteBlockId = baseBlocks[0][0][0];
+            // Validate that the staff has sufficient block data for linking.
+            // Staves with no notes or incomplete structures from certain
+            // ABC notation inputs can cause crashes when accessing nested
+            // array elements without bounds checking.
+            if (
+                !baseBlocks ||
+                baseBlocks.length === 0 ||
+                !baseBlocks[0] ||
+                !baseBlocks[0][0] ||
+                baseBlocks[0][0].length < 4 ||
+                startBlockArray.length < 3 ||
+                !staffBlocksMap[staffIndex].nameddoArray ||
+                !staffBlocksMap[staffIndex].nameddoArray[staffIndex] ||
+                staffBlocksMap[staffIndex].nameddoArray[staffIndex].length === 0
+            ) {
+                finalBlock.push(...startBlockArray);
+                continue;
+            }
 
-                // Find the meter block to connect it to the first note
-                const meterBlock = startBlockArray.find(
-                    b => b[1] === "meter" || b[1][0] === "meter"
-                );
-                if (meterBlock) {
-                    meterBlock[4][3] = firstNoteBlockId;
-                }
+            const firstNoteBlockId = baseBlocks[0][0][0];
+
+            // Find the meter block to connect it to the first note
+            const meterBlock = startBlockArray.find(b => b[1] === "meter" || b[1][0] === "meter");
+            if (meterBlock) {
+                meterBlock[4][3] = firstNoteBlockId;
             }
 
             const repeatBlock = [];
 
             const repeatblockids = staffBlocksMap[staffIndex].repeatArray;
             for (const repeatId of repeatblockids) {
+                // Skip repeat entries with out-of-bounds block indices
+                if (
+                    repeatId.start < 0 ||
+                    repeatId.end < 0 ||
+                    repeatId.start >= baseBlocks.length ||
+                    repeatId.end >= baseBlocks.length
+                ) {
+                    continue;
+                }
+
                 if (repeatId.start === 0) {
                     staffBlocksMap[staffIndex].repeatBlock.push([
                         blockId,
