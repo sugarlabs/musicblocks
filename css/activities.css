@@ -1277,6 +1277,11 @@ table {
     width: 100%;
 }
 
+#helpBodyDiv figure {
+    margin-left: 0.5rem; 
+    margin-bottom: 1rem;
+}
+
 #helpBodyDiv .blockImage {
     padding-top: 2rem;
     object-fit: contain;

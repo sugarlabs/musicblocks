@@ -17,10 +17,10 @@
  */
 
 /*
-   globals
+   global
 
    createjs, DEFAULTVOLUME, delayExecution, importMembers, Painter, Singer,
-   DEFAULTVOICE
+   DEFAULTVOICE, retryWithBackoff, base64Encode
  */
 /* exported Turtle */
 /**
@@ -86,42 +86,68 @@ class Turtle {
 
     /**
      * Internal function for creating cache.
-     * Includes workaround for a race condition.
+     * Uses bounded retry with exponential backoff to handle the race
+     * condition where container bounds are not yet available.
      *
      * @private
+     * @returns {Promise} Resolves when cache is created, rejects after max retries.
      */
     _createCache() {
-        this.bounds = this.container.getBounds();
+        const that = this;
+        const MAX_RETRIES = 20;
+        const INITIAL_DELAY = 50;
 
-        if (this.bounds == null) {
-            setTimeout(() => {
-                this._createCache();
-            }, 200);
-        } else {
-            this.container.cache(
-                this.bounds.x,
-                this.bounds.y,
-                this.bounds.width,
-                this.bounds.height
-            );
-        }
+        return retryWithBackoff({
+            check: () => {
+                that.bounds = that.container.getBounds();
+                return that.bounds;
+            },
+            onSuccess: bounds => {
+                that.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+            },
+            maxRetries: MAX_RETRIES,
+            initialDelay: INITIAL_DELAY,
+            errorMessage:
+                "Turtle._createCache: could not get container bounds after " +
+                MAX_RETRIES +
+                " attempts"
+        });
     }
 
     /**
      * Internal function for updating cache.
-     * Includes workaround for a race condition.
+     * Uses bounded retry with exponential backoff to handle the race
+     * condition where bounds are not yet available.
      *
-     * @async
+     * @returns {Promise} Resolves when cache is updated, rejects after max retries.
      */
-    async updateCache() {
-        if (this.bounds == null) {
-            console.debug("Block container for " + this.name + " not yet ready.");
-            await delayExecution(300);
-            this.updateCache();
-        } else {
-            this.container.updateCache();
-            this.activity.refreshCanvas();
-        }
+    updateCache() {
+        const that = this;
+        const MAX_RETRIES = 15;
+        const INITIAL_DELAY = 100;
+
+        return retryWithBackoff({
+            check: () => that.bounds !== null && that.container && that.container.bitmapCache,
+            onSuccess: () => {
+                that.container.updateCache();
+                that.activity.refreshCanvas();
+            },
+            onRetry: attempt => {
+                console.debug(
+                    "Turtle container for " +
+                        that.name +
+                        " not yet ready (attempt " +
+                        (attempt + 1) +
+                        "/" +
+                        MAX_RETRIES +
+                        ")"
+                );
+            },
+            maxRetries: MAX_RETRIES,
+            initialDelay: INITIAL_DELAY,
+            errorMessage:
+                "Turtle.updateCache: bounds not available after " + MAX_RETRIES + " attempts"
+        });
     }
 
     /**
@@ -130,6 +156,7 @@ class Turtle {
      * (if they have not been already changed).
      */
     stopBlink() {
+        // eslint-disable-next-line eqeqeq
         if (this._blinkTimeout != null || !this._blinkFinished) {
             clearTimeout(this._blinkTimeout);
             this._blinkTimeout = null;
@@ -656,6 +683,7 @@ Turtle.TurtleModel = class {
 
         const startBlock = this._startBlock;
         // Use the name on the label of the start block
+        // eslint-disable-next-line eqeqeq
         if (startBlock != null) {
             startBlock.overrideName = this._name;
             startBlock.collapseText.text = this._name;
@@ -852,7 +880,9 @@ Turtle.TurtleView = class {
             this.container.hitArea = hitArea;
 
             const startBlock = this._startBlock;
+            // eslint-disable-next-line eqeqeq
             if (startBlock != null) {
+                // eslint-disable-next-line eqeqeq
                 if (this._decorationBitmap != null) {
                     startBlock.container.removeChild(this._decorationBitmap);
                 }
@@ -895,7 +925,7 @@ Turtle.TurtleView = class {
     }
 
     /**
-     * Adds a text object to the canvas.
+     * Adds a text object to the canvas with auto-wrapping.
      *
      * @param  size - specifies text size
      * @param  myText - string of text to be displayed
@@ -906,38 +936,79 @@ Turtle.TurtleView = class {
         }
 
         const textList = typeof myText !== "string" ? [myText.toString()] : myText.split("\\n");
-
         const textSize = size.toString() + "px " + this.painter.font;
-        for (let i = 0; i < textList.length; i++) {
-            const text = new createjs.Text(textList[i], textSize, this.painter.canvasColor);
-            text.textAlign = "left";
-            text.textBaseline = "alphabetic";
-            this.turtles.stage.addChild(text);
-            this._media.push(text);
-            text.x = this.container.x;
-            text.y = this.container.y + i * size;
-            text.rotation = this.orientation;
 
-            const xScaled = text.x * this.turtles.scale;
-            const yScaled = text.y * this.turtles.scale;
-            const sizeScaled = size * this.turtles.scale;
-            this.painter.svgOutput +=
-                '<text x="' +
-                xScaled +
-                '" y = "' +
-                yScaled +
-                '" fill="' +
-                this.painter.canvasColor +
-                '" font-family = "' +
-                this.painter.font +
-                '" font-size = "' +
-                sizeScaled +
-                '">' +
-                myText +
-                "</text>";
+        // Skip wrapping for rotated text.
+        const isRotated = this.orientation % 360 !== 0;
 
-            this.activity.refreshCanvas();
+        let maxWidth = Infinity;
+        if (!isRotated) {
+            const stageCanvas = this.turtles.stage && this.turtles.stage.canvas;
+            const canvasWidth = stageCanvas ? stageCanvas.width : window.innerWidth;
+            const available = canvasWidth - this.container.x - 20;
+            maxWidth = Math.max(size, available); // at least one char wide
         }
+
+        const wrapText = (str, maxW) => {
+            if (maxW === Infinity) return [str];
+
+            const lines = [];
+            const tempText = new createjs.Text("", textSize, this.painter.canvasColor);
+            let currentLine = "";
+
+            for (let j = 0; j < str.length; j++) {
+                const testLine = currentLine + str[j];
+                tempText.text = testLine;
+                if (tempText.getMeasuredWidth() > maxW && currentLine.length > 0) {
+                    lines.push(currentLine);
+                    currentLine = str[j];
+                } else {
+                    currentLine = testLine;
+                }
+            }
+            if (currentLine.length > 0) {
+                lines.push(currentLine);
+            }
+            return lines.length > 0 ? lines : [str];
+        };
+
+        let currentYOffset = 0;
+
+        for (let i = 0; i < textList.length; i++) {
+            const wrappedLines = wrapText(textList[i], maxWidth);
+
+            for (let k = 0; k < wrappedLines.length; k++) {
+                const lineContent = wrappedLines[k];
+                const text = new createjs.Text(lineContent, textSize, this.painter.canvasColor);
+                text.textAlign = "left";
+                text.textBaseline = "alphabetic";
+                this.turtles.stage.addChild(text);
+                this._media.push(text);
+                text.x = this.container.x;
+                text.y = this.container.y + currentYOffset;
+                text.rotation = this.orientation;
+                currentYOffset += text.getMeasuredHeight() + size * 0.2;
+
+                const xScaled = text.x * this.turtles.scale;
+                const yScaled = text.y * this.turtles.scale;
+                const sizeScaled = size * this.turtles.scale;
+                this.painter.svgOutput +=
+                    '<text x="' +
+                    xScaled +
+                    '" y = "' +
+                    yScaled +
+                    '" fill="' +
+                    this.painter.canvasColor +
+                    '" font-family = "' +
+                    this.painter.font +
+                    '" font-size = "' +
+                    sizeScaled +
+                    '">' +
+                    lineContent +
+                    "</text>";
+            }
+        }
+        this.activity.refreshCanvas();
     }
 
     /**
@@ -962,6 +1033,7 @@ Turtle.TurtleView = class {
             this._createCache();
 
             const startBlock = this._startBlock;
+            // eslint-disable-next-line eqeqeq
             if (useTurtleArtwork && startBlock != null) {
                 startBlock.updateCache();
                 this._decorationBitmap = this._bitmap.clone();
@@ -988,4 +1060,8 @@ Turtle.TurtleView = class {
 
 if (typeof window !== "undefined") {
     window.Turtle = Turtle;
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = Turtle;
 }

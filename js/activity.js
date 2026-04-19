@@ -14,10 +14,21 @@
 // (https://github.com/walterbender/turtleart), but implemented from
 // scratch. -- Walter Bender, October 2014.
 
+try {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has("layoutProfiling")) {
+        window.__ENABLE_REFRESH_PROFILING__ = urlParams.get("layoutProfiling") !== "false";
+    } else {
+        window.__ENABLE_REFRESH_PROFILING__ = false;
+    }
+} catch (e) {
+    window.__ENABLE_REFRESH_PROFILING__ = false;
+}
+
 /*
    global
 
-   ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON,
+   ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON, debugLog,
    ActivityContext,
    Boundary, CARTESIAN, changeImage, closeWidgets,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
@@ -79,9 +90,10 @@ let MYDEFINES = [
     // on demand when the widget is opened, saving ~3-5 MB of heap memory.
     // "Chart",
     "utils/utils",
+    "utils/retryWithBackoff",
+    "utils/debugLog",
     "activity/artwork",
     "widgets/status",
-    "widgets/help",
     "utils/munsell",
     "activity/toolbar",
     "activity/trash",
@@ -112,24 +124,6 @@ let MYDEFINES = [
     "activity/pastebox",
     "prefixfree.min",
     "Tone",
-    "activity/js-export/samples/sample",
-    "activity/js-export/export",
-    "activity/js-export/interface",
-    "activity/js-export/constraints",
-    "activity/js-export/ASTutils",
-    "activity/js-export/generate",
-    "activity/js-export/ast2blocklist",
-    "activity/js-export/API/GraphicsBlocksAPI",
-    "activity/js-export/API/PenBlocksAPI",
-    "activity/js-export/API/RhythmBlocksAPI",
-    "activity/js-export/API/MeterBlocksAPI",
-    "activity/js-export/API/PitchBlocksAPI",
-    "activity/js-export/API/IntervalsBlocksAPI",
-    "activity/js-export/API/ToneBlocksAPI",
-    "activity/js-export/API/OrnamentBlocksAPI",
-    "activity/js-export/API/VolumeBlocksAPI",
-    "activity/js-export/API/DrumBlocksAPI",
-    "activity/js-export/API/DictBlocksAPI",
     "activity/turtleactions/RhythmActions",
     "activity/turtleactions/MeterActions",
     "activity/turtleactions/PitchActions",
@@ -163,10 +157,30 @@ let MYDEFINES = [
     "activity/blocks/MediaBlocks",
     "activity/blocks/SensorsBlocks",
     "activity/blocks/EnsembleBlocks",
-    "widgets/widgetWindows",
-    "widgets/statistics",
-    "widgets/jseditor"
+    "widgets/widgetWindows"
 ];
+
+/**
+ * Dynamically load one or more RequireJS modules on demand.
+ * Returns a Promise that resolves once all modules are loaded.
+ * RequireJS caches modules, so subsequent calls are instant.
+ *
+ * @param {string|string[]} modulePaths - Module path(s) to load.
+ * @returns {Promise<void>}
+ */
+function lazyLoad(modulePaths) {
+    // In Node/Jest (CommonJS), modules are already available as globals — resolve immediately.
+    if (typeof define !== "function" || !define.amd) {
+        return Promise.resolve();
+    }
+
+    // In browser with RequireJS (AMD), load modules dynamically.
+    return new Promise(resolve => {
+        require(Array.isArray(modulePaths) ? modulePaths : [modulePaths], function () {
+            resolve();
+        });
+    });
+}
 
 if (_THIS_IS_MUSIC_BLOCKS_) {
     const MUSICBLOCKS_EXTRAS = [
@@ -191,11 +205,7 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
         "widgets/oscilloscope",
         "widgets/sampler",
         "widgets/reflection",
-        "widgets/legobricks",
-        "activity/lilypond",
-        "activity/abc",
-        "activity/midi",
-        "activity/mxml"
+        "widgets/legobricks"
     ];
     MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
 }
@@ -1258,7 +1268,7 @@ class Activity {
                         const protoblk = obj[0];
                         const paletteName = obj[1];
                         const protoName = obj[2];
-                        // eslint-disable-next-line no-prototype-builtins
+
                         if (that.blocks.protoBlockDict.hasOwnProperty(protoName)) {
                             that.palettes.dict[paletteName].makeBlockFromSearch(
                                 protoblk,
@@ -1279,7 +1289,7 @@ class Activity {
                     }
 
                     setTimeout(() => {
-                        console.log("Saving help artwork: " + name + "_block.svg");
+                        debugLog("Saving help artwork: " + name + "_block.svg");
                         const svg = "data:image/svg+xml;utf8," + that.printBlockSVG();
                         that.save.download("svg", svg, name + "_block.svg");
                     }, 500);
@@ -1551,7 +1561,9 @@ class Activity {
             importConfirm.textContent = _("Confirm");
             importConfirm.addEventListener("click", () => {
                 const maxNoteBlocks = select.value;
-                transcribeMidi(midi, maxNoteBlocks);
+                require(["activity/midi"], function () {
+                    transcribeMidi(midi, maxNoteBlocks);
+                });
                 document.body.removeChild(modal);
             });
             modal.appendChild(importConfirm);
@@ -1593,7 +1605,7 @@ class Activity {
             confirmBtn.classList.add("confirm-button");
             confirmBtn.textContent = _("Confirm");
             confirmBtn.style.backgroundColor = platformColor.blueButton;
-            confirmBtn.style.color = "white";
+            confirmBtn.style.color = platformColor.blueButtonText;
             confirmBtn.style.border = "none";
             confirmBtn.style.borderRadius = "4px";
             confirmBtn.style.padding = "8px 16px";
@@ -1679,6 +1691,10 @@ class Activity {
                     helpfulWheelDiv.style.display = "none";
                     this.__tick();
                 }
+
+                if (this.cleanupIdleWatcher) {
+                    this.cleanupIdleWatcher();
+                }
             };
 
             if (skipConfirmation) {
@@ -1706,9 +1722,17 @@ class Activity {
             this.blocks.activeBlock = null;
             hideDOMLabel();
 
+            // If music is currently playing, stop it first
+            if (this.turtles.running()) {
+                this.logo.doStopTurtles();
+            }
+
             const currentDelay = this.logo.turtleDelay;
             this.logo.turtleDelay = 0;
-            this.logo.synth.resume();
+            if (this.logo?.synth?.resume) {
+                this.logo.synth.resume();
+            }
+
             const widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
                 if (widgetTitle[i].innerHTML === "tempo") {
@@ -1728,18 +1752,29 @@ class Activity {
                 }
 
                 this.logo.runLogoCommands(null, env);
+                const stopBtn = document.getElementById("stop");
+                if (stopBtn) {
+                    stopBtn.style.display = "inline-block";
+                    stopBtn.style.color = window.platformColor.stopIconcolor;
+                }
             } else {
                 if (currentDelay !== 0) {
                     // Keep playing at full speed.
                     this.logo.step();
                 } else {
                     // Stop and restart.
-                    document.getElementById("stop").style.color = "white";
+                    const stopBtn = document.getElementById("stop");
+                    if (stopBtn) {
+                        stopBtn.style.color = "white";
+                    }
                     this.logo.doStopTurtles();
 
                     const that = this;
                     setTimeout(() => {
-                        document.getElementById("stop").style.color = "#ea174c";
+                        const stopBtnDelay = document.getElementById("stop");
+                        if (stopBtnDelay) {
+                            stopBtnDelay.style.color = window.platformColor.stopIconcolor;
+                        }
                         that.logo.runLogoCommands(null, env);
                     }, 500);
                 }
@@ -1926,20 +1961,20 @@ class Activity {
                         flag = 0;
                         recording();
                         doRecordButton();
-                        return; // Exit without saving the file
+                        return;
                     }
-                    const downloadLink = document.createElement("a");
-                    downloadLink.href = URL.createObjectURL(blob);
-                    downloadLink.download = `${filename}.webm`;
-                    document.body.appendChild(downloadLink);
-                    downloadLink.click();
-                    URL.revokeObjectURL(blob);
-                    document.body.removeChild(downloadLink);
+
+                    const blob = new Blob(recordedChunks, { type: "video/webm" });
+                    const url = URL.createObjectURL(blob);
+
+                    activity.save.download("webm", url, filename);
+
+                    recordedChunks = [];
                     flag = 0;
+
                     // Allow multiple recordings
                     recording();
                     doRecordButton();
-                    that.textMsg(_("Recording stopped. File saved."));
                 };
                 // Prevent zero-byte files
                 if (!recordedChunks || recordedChunks.length === 0) {
@@ -1970,6 +2005,27 @@ class Activity {
                 }
                 mediaRecorder = null;
                 // Prompt to save file
+                const filename = window.prompt(_("Enter file name"));
+                if (filename === null || filename.trim() === "") {
+                    alert(_("File save canceled"));
+                    flag = 0;
+                    recording();
+                    doRecordButton();
+                    return; // Exit without saving the file
+                }
+                const downloadLink = document.createElement("a");
+                downloadLink.href = URL.createObjectURL(blob);
+                downloadLink.download = `${filename}.webm`;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                that.textMsg(_("Saved! Check your Downloads folder."));
+                URL.revokeObjectURL(blob);
+                document.body.removeChild(downloadLink);
+                flag = 0;
+                // Allow multiple recordings
+                recording();
+                doRecordButton();
+                that.textMsg(_("Recording stopped. File saved."));
                 if (window.MBDialog && typeof window.MBDialog.prompt === "function") {
                     window.MBDialog.prompt({
                         title: _("Save recording"),
@@ -2016,13 +2072,21 @@ class Activity {
                 let recordedChunks = [];
                 mediaRecorder = new MediaRecorder(stream);
                 stream.oninactive = function () {
-                    console.log("Recording is ready to save");
+                    debugLog("Recording is ready to save");
                     stopRec();
                     flag = 0;
                 };
 
                 mediaRecorder.onstop = function () {
-                    saveFile(recordedChunks);
+                    //saveFile(recordedChunks);
+                    //recordedChunks = [];
+                    //flag = 0;
+                    //recInside.setAttribute("fill", "#ffffff");
+                    const blob = new Blob(recordedChunks, { type: "video/webm" });
+                    const url = URL.createObjectURL(blob);
+
+                    activity.save.download("webm", url, null);
+
                     recordedChunks = [];
                     flag = 0;
                     recInside.setAttribute("fill", "#ffffff");
@@ -2036,7 +2100,7 @@ class Activity {
 
                 mediaRecorder.start(200);
                 setTimeout(() => {
-                    console.log("Resizing for Record", that.canvas.height);
+                    debugLog("Resizing for Record", that.canvas.height);
                     that._onResize();
                 }, 500);
                 return mediaRecorder;
@@ -2055,7 +2119,7 @@ class Activity {
                         const stream = await recordScreen();
                         const mimeType = "video/webm";
                         mediaRecorder = createRecorder(stream, mimeType);
-                        if (flag == 1) {
+                        if (flag === 1) {
                             start.removeEventListener("click", handler);
                             // Add stop handler
                             const stopHandler = function stopHandler() {
@@ -2094,7 +2158,7 @@ class Activity {
             }
 
             // Start recording process if not already executing
-            if (flag == 0 && isExecuting) {
+            if (flag === 0 && isExecuting) {
                 recording();
                 start.dispatchEvent(clickEvent);
             }
@@ -2118,7 +2182,9 @@ class Activity {
             hideDOMLabel();
 
             this.logo.turtleDelay = DEFAULTDELAY;
-            this.logo.synth.resume();
+            if (this.logo?.synth?.resume) {
+                this.logo.synth.resume();
+            }
 
             if (!this.turtles.running()) {
                 this.logo.runLogoCommands();
@@ -2145,7 +2211,9 @@ class Activity {
             hideDOMLabel();
 
             const turtleCount = Object.keys(this.logo.stepQueue).length;
-            this.logo.synth.resume();
+            if (this.logo?.synth?.resume) {
+                this.logo.synth.resume();
+            }
 
             if (turtleCount === 0 || this.logo.turtleDelay !== this.TURTLESTEP) {
                 // Either we haven't set up a queue or we are
@@ -2198,6 +2266,7 @@ class Activity {
             }
 
             this.logo.doStopTurtles();
+            document.getElementById("stop").style.display = "none";
 
             const widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
@@ -2207,6 +2276,10 @@ class Activity {
                     }
                     break;
                 }
+            }
+
+            if (this.cleanupIdleWatcher) {
+                this.cleanupIdleWatcher();
             }
         };
 
@@ -2466,18 +2539,28 @@ class Activity {
          */
         this._deletePlugin = () => {
             if (this.palettes.activePalette !== null) {
-                const obj = JSON.parse(this.storage.plugins);
+                const obj = safeJSONParse(this.storage.plugins);
+                if (!obj) return;
 
-                if (this.palettes.activePalette in obj["PALETTEPLUGINS"]) {
+                if (obj["PALETTEPLUGINS"] && this.palettes.activePalette in obj["PALETTEPLUGINS"]) {
                     delete obj["PALETTEPLUGINS"][this.palettes.activePalette];
                 }
-                if (this.palettes.activePalette in obj["PALETTEFILLCOLORS"]) {
+                if (
+                    obj["PALETTEFILLCOLORS"] &&
+                    this.palettes.activePalette in obj["PALETTEFILLCOLORS"]
+                ) {
                     delete obj["PALETTEFILLCOLORS"][this.palettes.activePalette];
                 }
-                if (this.palettes.activePalette in obj["PALETTESTROKECOLORS"]) {
+                if (
+                    obj["PALETTESTROKECOLORS"] &&
+                    this.palettes.activePalette in obj["PALETTESTROKECOLORS"]
+                ) {
                     delete obj["PALETTESTROKECOLORS"][this.palettes.activePalette];
                 }
-                if (this.palettes.activePalette in obj["PALETTEHIGHLIGHTCOLORS"]) {
+                if (
+                    obj["PALETTEHIGHLIGHTCOLORS"] &&
+                    this.palettes.activePalette in obj["PALETTEHIGHLIGHTCOLORS"]
+                ) {
                     delete obj["PALETTEHIGHLIGHTCOLORS"][this.palettes.activePalette];
                 }
                 for (
@@ -2487,16 +2570,16 @@ class Activity {
                 ) {
                     const name =
                         this.palettes.dict[this.palettes.activePalette].protoList[i]["name"];
-                    if (name in obj["FLOWPLUGINS"]) {
-                        console.log("deleting " + name);
+                    if (obj["FLOWPLUGINS"] && name in obj["FLOWPLUGINS"]) {
+                        debugLog("deleting " + name);
                         delete obj["FLOWPLUGINS"][name];
                     }
                     if (name in obj["BLOCKPLUGINS"]) {
-                        console.log("deleting " + name);
+                        debugLog("deleting " + name);
                         delete obj["BLOCKPLUGINS"][name];
                     }
                     if (name in obj["ARGPLUGINS"]) {
-                        console.log("deleting " + name);
+                        debugLog("deleting " + name);
                         delete obj["ARGPLUGINS"][name];
                     }
                 }
@@ -3056,6 +3139,11 @@ class Activity {
             let lastActivity = Date.now();
             this.isAppIdle = false;
 
+            // Prevent duplicate intervals
+            if (this._idleWatcherIntervalId) {
+                clearInterval(this._idleWatcherIntervalId);
+            }
+
             // Wake up function - restores full framerate
             // Stored as instance property for cleanup
             this._resetIdleTimer = () => {
@@ -3073,7 +3161,7 @@ class Activity {
             this.addEventListener(window, "mousedown", this._resetIdleTimer);
             this.addEventListener(window, "keydown", this._resetIdleTimer);
             this.addEventListener(window, "touchstart", this._resetIdleTimer);
-            this.addEventListener(window, "wheel", this._resetIdleTimer);
+            this.addEventListener(window, "wheel", this._resetIdleTimer, { passive: true });
 
             // Periodic check for idle state - store interval ID for cleanup
             this._idleWatcherInterval = setInterval(() => {
@@ -3084,7 +3172,7 @@ class Activity {
                     if (!this.isAppIdle) {
                         this.isAppIdle = true;
                         createjs.Ticker.framerate = IDLE_FPS;
-                        console.log("⚡ Idle mode: Throttling to 1 FPS to save battery");
+                        debugLog("⚡ Idle mode: Throttling to 1 FPS to save battery");
                     }
                 } else if (this.isAppIdle && isMusicPlaying) {
                     // Music started playing - wake up immediately
@@ -3343,7 +3431,10 @@ class Activity {
                             document.getElementById("ui-id-1").contains(e.target))
                     ) {
                         //do nothing when clicked on the menu
-                    } else if (document.getElementsByTagName("tr")[2].contains(e.target)) {
+                    } else if (
+                        document.querySelector("#palette tbody tr") &&
+                        document.querySelector("#palette tbody tr").contains(e.target)
+                    ) {
                         //do nothing when clicked on the search row
                     } else {
                         // this will hide the search bar if someone clicks on menu items
@@ -3518,7 +3609,7 @@ class Activity {
                         });
 
                         li.append(img);
-                        li.append("<a> " + item.label + "</a>");
+                        li.append($j("<a>").text(" " + item.label));
 
                         return li.appendTo(
                             ul.css({
@@ -3680,15 +3771,21 @@ class Activity {
             const KEYCODE_DOWN = 40;
             const DEL = 46;
             const V = 86;
+            const lilypondModal = document.getElementById("lilypondModal");
+            const samplerPrompt = document.getElementById("samplerPrompt");
+            const planetIframe = document.getElementById("planet-iframe");
+            const pasteEl = this.paste;
+            const wheelDiv = document.getElementById("wheelDiv");
+            const stopbtn = document.getElementById("stop");
             const disableKeys =
-                document.getElementById("lilypondModal").style.display === "block" ||
+                lilypondModal.style.display === "block" ||
                 this.searchWidget.style.visibility === "visible" ||
                 this.helpfulSearchWidget.style.visibility === "visible" ||
                 this.isInputON ||
-                document.getElementById("samplerPrompt") ||
-                document.getElementById("planet-iframe").style.display === "" ||
-                document.getElementById("paste").style.visibility === "visible" ||
-                document.getElementById("wheelDiv").style.display === "" ||
+                samplerPrompt ||
+                planetIframe.style.display === "" ||
+                pasteEl.style.visibility === "visible" ||
+                wheelDiv.style.display === "" ||
                 this.turtles.running();
             const widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
@@ -3699,9 +3796,9 @@ class Activity {
             }
             if (
                 (event.altKey && !disableKeys) ||
-                event.keyCode == 13 ||
-                event.key == "/" ||
-                event.key == "\\"
+                event.keyCode === 13 ||
+                event.key === "/" ||
+                event.key === "\\"
             ) {
                 switch (event.keyCode) {
                     case 66: // 'B'
@@ -3719,7 +3816,6 @@ class Activity {
                     case 82: {
                         // 'R or ENTER'
                         this.textMsg("Alt-R " + _("Play"));
-                        const stopbtn = document.getElementById("stop");
                         if (stopbtn) {
                             stopbtn.style.color = platformColor.stopIconcolor;
                         }
@@ -3733,9 +3829,9 @@ class Activity {
                         if (this.searchWidget.style.visibility === "visible") {
                             return;
                         }
-                        if (document.getElementById("paste").style.visibility === "visible") {
+                        if (pasteEl.style.visibility === "visible") {
                             this.pasted();
-                            document.getElementById("paste").style.visibility = "hidden";
+                            pasteEl.style.visibility = "hidden";
                             return;
                         }
 
@@ -3746,7 +3842,6 @@ class Activity {
                         if (this.turtles.running()) {
                             this._doHardStopButton();
                         } else if (!hasOpenWidget) {
-                            const stopbtn = document.getElementById("stop");
                             if (stopbtn) {
                                 stopbtn.style.color = platformColor.stopIconcolor;
                             }
@@ -3768,9 +3863,9 @@ class Activity {
                         break;
                     case 191:
                         if (
-                            event.key == "/" &&
+                            event.key === "/" &&
                             !this.beginnerMode &&
-                            disableHorizScrollIcon.style.display == "block"
+                            disableHorizScrollIcon.style.display === "block"
                         ) {
                             this.blocksContainer.x += this.canvas.width / 10;
                             this.stageDirty = true;
@@ -3778,9 +3873,9 @@ class Activity {
                     // fall through
                     case 220:
                         if (
-                            event.key == "\\" &&
+                            event.key === "\\" &&
                             !this.beginnerMode &&
-                            disableHorizScrollIcon.style.display == "block"
+                            disableHorizScrollIcon.style.display === "block"
                         ) {
                             this.blocksContainer.x -= this.canvas.width / 10;
                             this.stageDirty = true;
@@ -3792,12 +3887,12 @@ class Activity {
                         // this.textMsg("Ctl-V " + _("Paste"));
                         this.pasteBox.createBox(this.turtleBlocksScale, 200, 200);
                         this.pasteBox.show();
-                        document.getElementById("paste").style.left =
+                        pasteEl.style.left =
                             (this.pasteBox.getPos()[0] + 10) * this.turtleBlocksScale + "px";
-                        document.getElementById("paste").style.top =
+                        pasteEl.style.top =
                             (this.pasteBox.getPos()[1] + 10) * this.turtleBlocksScale + "px";
-                        document.getElementById("paste").focus();
-                        document.getElementById("paste").style.visibility = "visible";
+                        pasteEl.focus();
+                        pasteEl.style.visibility = "visible";
                         this.update = true;
                         break;
                 }
@@ -3813,11 +3908,8 @@ class Activity {
                         break;
                 }
             } else {
-                if (
-                    document.getElementById("paste").style.visibility === "visible" &&
-                    event.keyCode === RETURN
-                ) {
-                    if (document.getElementById("paste").value.length > 0) {
+                if (pasteEl.style.visibility === "visible" && event.keyCode === RETURN) {
+                    if (pasteEl.value.length > 0) {
                         this.pasted();
                     }
                 } else if (event.keyCode === SPACE) {
@@ -3830,7 +3922,6 @@ class Activity {
                         this._doHardStopButton();
                     } else if (!disableKeys && !hasOpenWidget) {
                         event.preventDefault();
-                        const stopbtn = document.getElementById("stop");
                         if (stopbtn) {
                             stopbtn.style.color = platformColor.stopIconcolor;
                         }
@@ -4252,8 +4343,6 @@ class Activity {
 
                 container.style.width = windowWidth + "px";
                 container.style.height = windowHeight + "px";
-                canvas.width = windowWidth;
-                canvas.height = windowHeight;
                 overCanvas.width = canvas.width;
                 overCanvas.height = canvas.height;
                 canvasHolder.width = canvas.width;
@@ -4796,6 +4885,14 @@ class Activity {
          * When turtle stops running restore stop button to normal state
          */
         this.onStopTurtle = () => {
+            if (this.showBlocksAfterRun) {
+                this.blocks.showBlocks();
+                const stopIcon = document.getElementById("stop");
+                if (stopIcon) {
+                    stopIcon.style.color = "white";
+                }
+                this.showBlocksAfterRun = false;
+            }
             // TODO: plugin support
         };
 
@@ -4831,13 +4928,19 @@ class Activity {
          * Updates all canvas elements by marking stage as dirty.
          * The actual render will happen on the next animation frame.
          */
+        let refreshCount = 0;
+        let totalRefreshTime = 0;
+        let maxRefreshTime = 0;
+        let lastRefreshReport = performance.now();
+
         this.refreshCanvas = () => {
             if (this.blockRefreshCanvas) {
                 return;
             }
 
+            const start = window.__ENABLE_REFRESH_PROFILING__ ? performance.now() : 0;
+
             this.blockRefreshCanvas = true;
-            // Mark stage as needing update
             this.stageDirty = true;
             this.update = true;
 
@@ -4845,6 +4948,27 @@ class Activity {
             setTimeout(() => {
                 that.blockRefreshCanvas = false;
                 that.stageDirty = true;
+
+                if (window.__ENABLE_REFRESH_PROFILING__) {
+                    const duration = performance.now() - start;
+                    refreshCount++;
+                    totalRefreshTime += duration;
+                    maxRefreshTime = Math.max(maxRefreshTime, duration);
+
+                    if (refreshCount % 25 === 0) {
+                        const now = performance.now();
+                        const cps = (25 / (now - lastRefreshReport)) * 1000;
+                        console.log(
+                            `refreshCanvas | Avg: ${(totalRefreshTime / refreshCount).toFixed(
+                                2
+                            )}ms | Max: ${maxRefreshTime.toFixed(2)}ms | Rate: ${cps.toFixed(
+                                1
+                            )} calls/sec`
+                        );
+                        maxRefreshTime = 0;
+                        lastRefreshReport = now;
+                    }
+                }
             }, 5);
         };
 
@@ -5175,7 +5299,7 @@ class Activity {
             const pitch = pitches;
             pitchDuration = toFraction(pitchDuration);
             const adjustedNote = _adjustPitch(pitch.name, keySignature).toUpperCase();
-            if (triplet !== undefined && triplet !== null) {
+            if (triplet !== null) {
                 pitchDuration[1] = meterDen * triplet;
             }
 
@@ -5329,7 +5453,7 @@ class Activity {
                                     blockId + 13,
                                     [
                                         "modename",
-                                        { value: staff.key.mode == "m" ? "minor" : "major" }
+                                        { value: staff.key.mode === "m" ? "minor" : "major" }
                                     ],
                                     0,
                                     0,
@@ -5416,7 +5540,7 @@ class Activity {
 
                         // Update the namedo block if not first
                         // nameddo block appear
-                        if (staffBlocksMap[lineId].baseBlocks.length != 0) {
+                        if (staffBlocksMap[lineId].baseBlocks.length !== 0) {
                             staffBlocksMap[lineId].baseBlocks[
                                 staffBlocksMap[lineId].baseBlocks.length - 1
                             ][0][
@@ -5496,8 +5620,25 @@ class Activity {
             }
 
             const finalBlock = [];
-            // Some Error are here need to be fixed
             for (const staffIndex in staffBlocksMap) {
+                // Validate that the staff has sufficient block data for linking.
+                // Staves with no notes or incomplete structures from certain
+                // ABC notation inputs can cause crashes when accessing nested
+                // array elements without bounds checking.
+                if (
+                    !staffBlocksMap[staffIndex].baseBlocks ||
+                    staffBlocksMap[staffIndex].baseBlocks.length === 0 ||
+                    !staffBlocksMap[staffIndex].baseBlocks[0] ||
+                    !staffBlocksMap[staffIndex].baseBlocks[0][0] ||
+                    staffBlocksMap[staffIndex].baseBlocks[0][0].length < 4 ||
+                    staffBlocksMap[staffIndex].startBlock.length < 3 ||
+                    !staffBlocksMap[staffIndex].nameddoArray ||
+                    !staffBlocksMap[staffIndex].nameddoArray[staffIndex] ||
+                    staffBlocksMap[staffIndex].nameddoArray[staffIndex].length === 0
+                ) {
+                    finalBlock.push(...staffBlocksMap[staffIndex].startBlock);
+                    continue;
+                }
                 staffBlocksMap[staffIndex].startBlock[
                     staffBlocksMap[staffIndex].startBlock.length - 3
                 ][4][2] =
@@ -5513,7 +5654,17 @@ class Activity {
                     ][0];
                 const repeatblockids = staffBlocksMap[staffIndex].repeatArray;
                 for (const repeatId of repeatblockids) {
-                    if (repeatId.start == 0) {
+                    // Skip repeat entries with out-of-bounds block indices
+                    if (
+                        repeatId.start < 0 ||
+                        repeatId.end < 0 ||
+                        repeatId.start >= staffBlocksMap[staffIndex].baseBlocks.length ||
+                        repeatId.end >= staffBlocksMap[staffIndex].baseBlocks.length
+                    ) {
+                        continue;
+                    }
+
+                    if (repeatId.start === 0) {
                         staffBlocksMap[staffIndex].repeatBlock.push([
                             blockId,
                             "repeat",
@@ -5569,7 +5720,7 @@ class Activity {
                                 ]
                             );
 
-                            if (secondnammedo != -1) {
+                            if (secondnammedo !== -1) {
                                 staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0][
                                     secondnammedo
                                 ][4][0] = blockId;
@@ -5640,7 +5791,7 @@ class Activity {
                             100,
                             [blockId]
                         ]);
-                        if (prevnameddo != -1) {
+                        if (prevnameddo !== -1) {
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.start - 1][0][
                                 prevnameddo
                             ][4][1] = blockId;
@@ -6114,10 +6265,10 @@ class Activity {
             this.trebleBitmap.updateCache();
             this._hideAccidentals();
 
-            console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
+            debugLog(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
             const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
 
-            console.log(scale);
+            debugLog(scale);
             const _sharps = [
                 "F" + SHARP,
                 "C" + SHARP,
@@ -6181,10 +6332,10 @@ class Activity {
             this.grandBitmap.updateCache();
             this._hideAccidentals();
 
-            console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
+            debugLog(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
             const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
 
-            console.log(scale);
+            debugLog(scale);
             const _sharps = [
                 "F" + SHARP,
                 "C" + SHARP,
@@ -6246,10 +6397,10 @@ class Activity {
             this.sopranoBitmap.updateCache();
             this._hideAccidentals();
 
-            console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
+            debugLog(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
             const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
 
-            console.log(scale);
+            debugLog(scale);
             const _sharps = [
                 "F" + SHARP,
                 "C" + SHARP,
@@ -6317,10 +6468,10 @@ class Activity {
             this.altoBitmap.updateCache();
             this._hideAccidentals();
 
-            console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
+            debugLog(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
             const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
 
-            console.log(scale);
+            debugLog(scale);
             const _sharps = [
                 "F" + SHARP,
                 "C" + SHARP,
@@ -6383,10 +6534,10 @@ class Activity {
             this.tenorBitmap.updateCache();
             this._hideAccidentals();
 
-            console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
+            debugLog(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
             const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
 
-            console.log(scale);
+            debugLog(scale);
             const _sharps = [
                 "F" + SHARP,
                 "C" + SHARP,
@@ -6450,10 +6601,10 @@ class Activity {
             this.bassBitmap.updateCache();
             this._hideAccidentals();
 
-            console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
+            debugLog(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
             const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
 
-            console.log(scale);
+            debugLog(scale);
             const _sharps = [
                 "F" + SHARP,
                 "C" + SHARP,
@@ -6582,11 +6733,11 @@ class Activity {
                                         this.blocks.blockList[myBlock.connections[1]].value;
                                 }
 
-                                console.log(customName);
+                                debugLog(customName);
                                 args = {
                                     customName: customName,
                                     customTemperamentNotes: getTemperament(customName),
-                                    startingPitch: this.logo.synth.startingPitch,
+                                    startingPitch: this.logo?.synth?.startingPitch || 392,
                                     octaveSpace: getOctaveRatio()
                                 };
                             }
@@ -6686,10 +6837,57 @@ class Activity {
             activity._doOpenPlugin();
         };
 
+        this._loadBuiltInPlugin = name => {
+            const url = "plugins/" + name + ".json";
+            const xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            const that = this;
+            xhr.onload = async () => {
+                if (xhr.status === 200) {
+                    const obj = await processRawPluginData(that, xhr.responseText, url);
+                    // Save plugins to local storage.
+                    if (obj !== null) {
+                        that.storage.plugins = preparePluginExports(that, obj);
+                    }
+                    // Refresh the palettes.
+                    setTimeout(() => {
+                        if (that.palettes.visible) {
+                            that.palettes.hide();
+                        }
+                    }, 1000);
+                } else {
+                    console.error("Could not load built-in plugin: " + name);
+                }
+            };
+            xhr.send();
+        };
+
         this._doOpenPlugin = () => {
             this.toolbar.closeAuxToolbar(showHideAuxMenu);
-            this.pluginChooser.focus();
-            this.pluginChooser.click();
+            const rawName = prompt(
+                _("Enter the name of a built-in plugin, or leave blank to upload a plugin file:")
+            );
+            if (rawName === null) {
+                return; // User cancelled the operation
+            }
+
+            const name = rawName.trim().toLowerCase();
+            if (name !== "") {
+                // Validate: only allow safe characters (alphanumeric, hyphens, and underscores)
+                // This prevents path traversal attacks like "../../secrets"
+                if (!/^[a-z0-9\-_]+$/.test(name)) {
+                    alert(
+                        _(
+                            "Invalid plugin name. Only alphanumeric characters, hyphens, and underscores are allowed."
+                        )
+                    );
+                    return;
+                }
+                this._loadBuiltInPlugin(name);
+            } else {
+                this.pluginChooser.focus();
+                this.pluginChooser.click();
+            }
         };
 
         /*
@@ -7014,17 +7212,13 @@ class Activity {
                 const instance = $helpfulSearch.autocomplete("instance");
                 if (instance) {
                     instance._renderItem = (ul, item) => {
-                        return $j("<li></li>")
-                            .append(
-                                '<img src="' +
-                                    (item.artwork || "") +
-                                    '" height = "20px">' +
-                                    "<a>" +
-                                    " " +
-                                    item.label +
-                                    "</a>"
-                            )
-                            .appendTo(ul.css("z-index", 35000));
+                        const li = $j("<li></li>");
+                        const img = document.createElement("img");
+                        img.src = item.artwork || "";
+                        img.height = 20;
+                        li.append(img);
+                        li.append($j("<a>").text(" " + item.label));
+                        return li.appendTo(ul.css("z-index", 35000));
                     };
                 }
                 $helpfulSearch.data("autocomplete-init", true);
@@ -7073,12 +7267,34 @@ class Activity {
         /**
          * Toggles display of javaScript editor widget.
          */
-        const toggleJSWindow = activity => {
+        const toggleJSWindow = async activity => {
+            await lazyLoad([
+                "widgets/jseditor",
+                "activity/js-export/samples/sample",
+                "activity/js-export/export",
+                "activity/js-export/interface",
+                "activity/js-export/constraints",
+                "activity/js-export/ASTutils",
+                "activity/js-export/generate",
+                "activity/js-export/ast2blocklist",
+                "activity/js-export/API/GraphicsBlocksAPI",
+                "activity/js-export/API/PenBlocksAPI",
+                "activity/js-export/API/RhythmBlocksAPI",
+                "activity/js-export/API/MeterBlocksAPI",
+                "activity/js-export/API/PitchBlocksAPI",
+                "activity/js-export/API/IntervalsBlocksAPI",
+                "activity/js-export/API/ToneBlocksAPI",
+                "activity/js-export/API/OrnamentBlocksAPI",
+                "activity/js-export/API/VolumeBlocksAPI",
+                "activity/js-export/API/DrumBlocksAPI",
+                "activity/js-export/API/DictBlocksAPI"
+            ]);
             new JSEditor(activity);
         };
 
-        const doAnalytics = activity => {
+        const doAnalytics = async activity => {
             if (!activity.statsWindow || !activity.statsWindow.isOpen) {
+                await lazyLoad("widgets/statistics");
                 activity.statsWindow = new StatsWindow(activity);
             }
         };
@@ -7087,12 +7303,261 @@ class Activity {
          * Shows help page
          */
         const showHelp = activity => {
+            if (window.widgetWindows?.isOpen("keyboard-shortcuts")) {
+                window.widgetWindows.clear("keyboard-shortcuts");
+            }
             activity._showHelp();
         };
 
-        this._showHelp = () => {
+        this._showHelp = async () => {
             // Will show welcome page by default.
+            await lazyLoad("widgets/help");
             new HelpWidget(this, false);
+        };
+
+        const showKeyboardShortcuts = activity => {
+            if (window.widgetWindows?.isOpen("help")) {
+                window.widgetWindows.clear("help");
+            }
+            activity._showKeyboardShortcuts();
+        };
+
+        this._showKeyboardShortcuts = () => {
+            const platformKeys = (windowsKeys, macKeys = windowsKeys) =>
+                `${_("Windows/Linux")}: ${windowsKeys}\n${_("Mac")}: ${macKeys}`;
+
+            const shortcutSections = [
+                {
+                    title: _("Workspace"),
+                    items: [
+                        {
+                            keys: platformKeys("Alt + R", "Option + R"),
+                            action: _("Play project")
+                        },
+                        {
+                            keys: platformKeys("Alt + S", "Option + S"),
+                            action: _("Stop project")
+                        },
+                        {
+                            keys: platformKeys("Alt + Enter", "Option + Enter"),
+                            action: _("Play or stop depending on the current state")
+                        },
+                        {
+                            keys: platformKeys("Space", "Space"),
+                            action: _("Play or stop when no text input or widget is active")
+                        },
+                        {
+                            keys: platformKeys("Shift + Space", "Shift + Space"),
+                            action: _("Toggle stage scale")
+                        },
+                        {
+                            keys: platformKeys("Home", "Home"),
+                            action: _("Jump to home position")
+                        },
+                        {
+                            keys: platformKeys("End", "End"),
+                            action: _("Jump to the bottom of the workspace")
+                        },
+                        {
+                            keys: platformKeys("Page Up", "Page Up"),
+                            action: _("Scroll workspace up")
+                        },
+                        {
+                            keys: platformKeys("Page Down", "Page Down"),
+                            action: _("Scroll workspace down")
+                        },
+                        {
+                            keys: platformKeys("Esc", "Esc"),
+                            action: _("Hide block search when it is open")
+                        },
+                        {
+                            keys: platformKeys("d,r,m,f,s,l,t", "d,r,m,f,s,l,t"),
+                            action: _(
+                                "You can type d to create a do block and r to create a re block etc."
+                            )
+                        }
+                    ]
+                },
+                {
+                    title: _("Editing"),
+                    items: [
+                        {
+                            keys: platformKeys("Alt + C", "Option + C"),
+                            action: _("Copy selected stack")
+                        },
+                        {
+                            keys: platformKeys("Alt + V", "Option + V"),
+                            action: _("Paste previous stack")
+                        },
+                        {
+                            keys: platformKeys("Ctrl + V", "Control + V"),
+                            action: _("Open the JSON paste box")
+                        },
+                        {
+                            keys: platformKeys("Enter", "Enter"),
+                            action: _("Paste JSON when the paste box is focused")
+                        },
+                        {
+                            keys: platformKeys("Delete", "Delete"),
+                            action: _("Extract the active block")
+                        },
+                        {
+                            keys: platformKeys("Alt + E", "Option + E"),
+                            action: _("Clear workspace")
+                        },
+                        {
+                            keys: platformKeys("Alt + B", "Option + B"),
+                            action: _("Save block artwork")
+                        },
+                        {
+                            keys: platformKeys("Alt + H", "Option + H"),
+                            action: _("Save block help")
+                        }
+                    ]
+                },
+                {
+                    title: _("Navigation"),
+                    items: [
+                        {
+                            keys: platformKeys("Tab / Shift + Tab", "Tab / Shift + Tab"),
+                            action: _("Move focus between the toolbar, palettes, and workspace")
+                        },
+                        {
+                            keys: platformKeys(_("Arrow keys"), _("Arrow keys")),
+                            action: _(
+                                "Move the active block, scroll palettes, adjust the tempo widget, or pan the workspace depending on context"
+                            )
+                        },
+                        {
+                            keys: platformKeys("/", "/"),
+                            action: _("Pan workspace right when horizontal scrolling is enabled")
+                        },
+                        {
+                            keys: platformKeys("\\", "\\"),
+                            action: _("Pan workspace left when horizontal scrolling is enabled")
+                        }
+                    ]
+                },
+                {
+                    title: _("Toolbar"),
+                    items: [
+                        {
+                            keys: platformKeys(
+                                _("Arrow Left / Arrow Right"),
+                                _("Arrow Left / Arrow Right")
+                            ),
+                            action: _("Move focus within the current toolbar")
+                        },
+                        {
+                            keys: platformKeys(
+                                _("Arrow Up / Arrow Down"),
+                                _("Arrow Up / Arrow Down")
+                            ),
+                            action: _("Move focus between main and auxiliary toolbars")
+                        },
+                        {
+                            keys: platformKeys("Enter", "Enter"),
+                            action: _("Activate the focused toolbar button")
+                        },
+                        {
+                            keys: platformKeys("Esc", "Esc"),
+                            action: _("Exit toolbar keyboard navigation")
+                        }
+                    ]
+                },
+                {
+                    title: _("Widget Windows"),
+                    items: [
+                        {
+                            keys: platformKeys("Esc", "Esc"),
+                            action: _("Close the focused widget window")
+                        },
+                        {
+                            keys: platformKeys("Ctrl + Shift + M", "Command + Shift + M"),
+                            action: _("Maximize or restore the focused widget window")
+                        }
+                    ]
+                },
+                {
+                    title: _("Help and Pitch Slider"),
+                    items: [
+                        {
+                            keys: platformKeys(
+                                _("Arrow Left / Arrow Right"),
+                                _("Arrow Left / Arrow Right")
+                            ),
+                            action: _("Move between help pages when Help is open")
+                        },
+                        {
+                            keys: platformKeys(_("Arrow keys"), _("Arrow keys")),
+                            action: _("Adjust pitch by semitone when Pitch Slider is open")
+                        }
+                    ]
+                }
+            ];
+
+            const widgetWindow = window.widgetWindows.windowFor(
+                this,
+                _("Keyboard shortcuts"),
+                "keyboard-shortcuts",
+                true
+            );
+            widgetWindow.clear();
+            widgetWindow.show();
+
+            const widgetBody = widgetWindow.getWidgetBody();
+            widgetBody.className = "wfbWidget keyboard-shortcuts-widget";
+            widgetBody.style.padding = "0";
+            widgetBody.style.display = "block";
+            widgetBody.style.height = "min(72vh, 680px)";
+            widgetBody.style.width = "min(68vw, 760px)";
+            widgetBody.style.maxWidth = "100%";
+            widgetBody.style.overflow = "hidden";
+
+            const wrapper = document.createElement("div");
+            wrapper.className = "keyboard-shortcuts-panel";
+
+            const intro = document.createElement("div");
+            intro.className = "keyboard-shortcuts-hero";
+            intro.innerHTML =
+                `<div class="keyboard-shortcuts-hero-title">${_("Keyboard shortcuts")}</div>` +
+                `<div class="keyboard-shortcuts-hero-copy">${_(
+                    "Shortcuts are context-sensitive. Some only work when a related panel, widget, or mode is active. Windows/Linux and Mac equivalents are shown together."
+                )}</div>`;
+            wrapper.appendChild(intro);
+
+            shortcutSections.forEach(section => {
+                const sectionCard = document.createElement("section");
+                sectionCard.className = "keyboard-shortcuts-section";
+
+                const heading = document.createElement("div");
+                heading.textContent = section.title;
+                heading.className = "keyboard-shortcuts-section-title";
+                sectionCard.appendChild(heading);
+
+                section.items.forEach(item => {
+                    const row = document.createElement("div");
+                    row.className = "keyboard-shortcuts-row";
+
+                    const key = document.createElement("div");
+                    key.textContent = item.keys;
+                    key.className = "keyboard-shortcuts-key";
+
+                    const action = document.createElement("div");
+                    action.textContent = item.action;
+                    action.className = "keyboard-shortcuts-action";
+
+                    row.appendChild(key);
+                    row.appendChild(action);
+                    sectionCard.appendChild(row);
+                });
+
+                wrapper.appendChild(sectionCard);
+            });
+
+            widgetBody.appendChild(wrapper);
+            widgetWindow.sendToCenter();
+            requestAnimationFrame(() => widgetWindow.sendToCenter());
         };
 
         /*
@@ -7102,8 +7567,9 @@ class Activity {
             activity._showAboutPage();
         };
 
-        this._showAboutPage = () => {
+        this._showAboutPage = async () => {
             // Will show welcome page by default.
+            await lazyLoad("widgets/help");
             new HelpWidget(this, false);
         };
 
@@ -7181,10 +7647,15 @@ class Activity {
             }
 
             const cleanData = rawData.replace("\n", " ");
+
             try {
                 obj = JSON.parse(cleanData);
             } catch (e) {
-                this.errorMsg(_("Could not parse JSON input."));
+                this.errorMsg(
+                    _(
+                        "Invalid clipboard data. To paste blocks, first copy them from the Music Blocks canvas. To paste text, click inside an input field."
+                    )
+                );
                 return;
             }
 
@@ -7232,7 +7703,14 @@ class Activity {
             this.update = true;
 
             // Get things started
+            this._perfMark("activity.domReady.start");
             await this.init();
+            this._perfMark("activity.domReady.end");
+            this._perfMeasure(
+                "activity.domReady_total",
+                "activity.domReady.start",
+                "activity.domReady.end"
+            );
         };
 
         this.__saveLocally = () => {
@@ -7578,7 +8056,14 @@ class Activity {
             if (this._initialized) return;
             this._initialized = true;
 
+            // Hide stop button on startup
+            const stopBtn = document.getElementById("stop");
+            if (stopBtn) {
+                stopBtn.style.display = "none";
+            }
+
             // Batch DOM reads before any writes to avoid forced synchronous layout
+            this._perfMark("activity.init.start");
             this._clientWidth = document.body.clientWidth;
             this._clientHeight = document.body.clientHeight;
             this._innerWidth = window.innerWidth;
@@ -7601,11 +8086,7 @@ class Activity {
 
             const that = this;
 
-            if (!jQuery.browser.mozilla) {
-                window.onblur = () => {
-                    doHardStopButton(that, true);
-                };
-            }
+            this.setupWindowBlurHandler(doHardStopButton);
 
             this.stage = new createjs.Stage(this.canvas);
             createjs.Touch.enable(this.stage);
@@ -7640,7 +8121,13 @@ class Activity {
             // Use managed addEventListener for automatic cleanup
             this.addEventListener(document, "mousemove", this.handleMouseMove);
             this.addEventListener(document, "click", this.handleDocumentClick);
-            this.addEventListener(window, "beforeunload", this._stopRenderLoop);
+            this.addEventListener(window, "beforeunload", () => {
+                this._stopRenderLoop();
+                if (this._autoSaveInterval !== null) {
+                    clearInterval(this._autoSaveInterval);
+                    this._autoSaveInterval = null;
+                }
+            });
 
             this._createMsgContainer(
                 "#ffffff",
@@ -7689,6 +8176,10 @@ class Activity {
             this.pasteBox = new PasteBox(this);
             this.languageBox = new LanguageBox(this);
             this.themeBox = new ThemeBox(this);
+            // Initialize theme state on page load if method exists
+            if (this.themeBox && typeof this.themeBox.initializeTheme === "function") {
+                this.themeBox.initializeTheme();
+            }
 
             // Show help on startup if first-time user.
             if (this.firstTimeUser) {
@@ -7727,7 +8218,7 @@ class Activity {
             );
             this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
             this.toolbar.renderMenuIcon(showHideAuxMenu);
-            this.toolbar.renderHelpIcon(showHelp);
+            this.toolbar.renderHelpIcon(showHelp, showKeyboardShortcuts);
             this.toolbar.renderModeSelectIcon(
                 doSwitchMode,
                 () => doRecordButton(this),
@@ -7747,6 +8238,7 @@ class Activity {
             this.toolbar.renderJavaScriptIcon(toggleJSWindow);
             this.toolbar.renderLanguageSelectIcon(this.languageBox);
             this.toolbar.renderWrapIcon();
+            this._perfMark("activity.init.ui_ready");
 
             initPalettes(this.palettes);
 
@@ -7757,6 +8249,27 @@ class Activity {
             }
 
             window.saveLocally = this.saveLocally;
+
+            // Auto-save live workspace every 5 minutes to guard against
+            // data loss from browser crashes (see issue #2994).
+            // Deferred while the project is actively running to avoid
+            // interrupting playback.
+            this._autoSaveInterval = setInterval(
+                () => {
+                    try {
+                        if (this.logo && this.logo._alreadyRunning) {
+                            return;
+                        }
+
+                        if (this.saveLocally !== null && this.saveLocally !== undefined) {
+                            this.saveLocally();
+                        }
+                    } catch (e) {
+                        console.error("[AutoSave] Failed:", e);
+                    }
+                },
+                5 * 60 * 1000
+            );
 
             initBasicProtoBlocks(this);
 
@@ -7770,10 +8283,8 @@ class Activity {
             // Load any plugins saved in local storage.
             this.pluginData = this.storage.plugins;
             if (this.pluginData !== null && this.pluginData !== "null") {
-                updatePluginObj(
-                    this,
-                    processPluginData(this, this.pluginData, "localStorage:plugins")
-                );
+                const obj = await processPluginData(this, this.pluginData, "localStorage:plugins");
+                updatePluginObj(this, obj);
             }
 
             // Load custom mode saved in local storage.
@@ -7887,10 +8398,20 @@ class Activity {
                     };
 
                     midiReader.onload = e => {
-                        const midi = new Midi(e.target.result);
-
-                        console.debug(midi);
-                        midiImportBlocks(midi);
+                        try {
+                            const midi = new Midi(e.target.result);
+                            console.debug(midi);
+                            midiImportBlocks(midi);
+                        } catch (err) {
+                            console.error("MIDI import failed:", err);
+                            if (that && typeof that.errorMsg === "function") {
+                                that.errorMsg(
+                                    _(
+                                        "Cannot load project from the file. Please check the file type."
+                                    )
+                                );
+                            }
+                        }
                     };
 
                     const file = that.fileChooser.files[0];
@@ -7984,10 +8505,18 @@ class Activity {
                     }, 200);
                 };
                 midiReader.onload = e => {
-                    const midi = new Midi(e.target.result);
-
-                    console.debug(midi);
-                    midiImportBlocks(midi);
+                    try {
+                        const midi = new Midi(e.target.result);
+                        console.debug(midi);
+                        midiImportBlocks(midi);
+                    } catch (err) {
+                        console.error("MIDI import failed:", err);
+                        if (that && typeof that.errorMsg === "function") {
+                            that.errorMsg(
+                                _("Cannot load project from the file. Please check the file type.")
+                            );
+                        }
+                    }
                 };
 
                 // Music Block Parser from abc to MB
@@ -7999,7 +8528,7 @@ class Activity {
                     await ensureABCJS();
                     const tunebook = new ABCJS.parseOnly(abcData);
 
-                    console.log(tunebook);
+                    debugLog(tunebook);
                     tunebook.forEach(tune => {
                         //call parseABC to parse abcdata to MB json
                         this.parseABC(tune);
@@ -8011,13 +8540,13 @@ class Activity {
                 if (files[0] !== undefined) {
                     const extension = files[0].name.split(".").pop().toLowerCase(); //file extension from input file
 
-                    const isMidi = extension == "mid" || extension == "midi";
+                    const isMidi = extension === "mid" || extension === "midi";
                     if (isMidi) {
                         midiReader.readAsArrayBuffer(files[0]);
                         return;
                     }
 
-                    const isABC = extension == "abc";
+                    const isABC = extension === "abc";
                     if (isABC) {
                         abcReader.readAsText(files[0]);
                         return;
@@ -8060,11 +8589,13 @@ class Activity {
                         document.body.style.cursor = "wait";
                         //doLoadAnimation();
 
-                        setTimeout(() => {
-                            const obj = processRawPluginData(
+                        setTimeout(async () => {
+                            const obj = await processRawPluginData(
                                 that,
                                 reader.result,
-                                pluginFile && pluginFile.name ? pluginFile.name : "local-file"
+                                pluginFile && pluginFile.name
+                                    ? "file:" + pluginFile.name
+                                    : "file:local-file"
                             );
                             // Save plugins to local storage.
                             if (obj !== null) {
@@ -8100,72 +8631,50 @@ class Activity {
             // Enabled mouse over and mouse out events.
             this.stage.enableMouseOver(10); // default is 20
 
-            this.cartesianBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(base64Encode(CARTESIAN))
-            );
-            this.polarBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(base64Encode(POLAR))
-            );
-            this.trebleBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE))
-            );
-            this.grandBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(base64Encode(GRAND))
-            );
-            this.sopranoBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(base64Encode(SOPRANO))
-            );
-            this.altoBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(base64Encode(ALTO))
-            );
-            this.tenorBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(base64Encode(TENOR))
-            );
-            this.bassBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(base64Encode(BASS))
-            );
+            // Cache encoded SVG data URIs to avoid re-encoding identical artwork on startup.
+            const gridDataUri = svg =>
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(svg));
+            const encodedGridUris = {
+                cartesian: gridDataUri(CARTESIAN),
+                polar: gridDataUri(POLAR),
+                treble: gridDataUri(TREBLE),
+                grand: gridDataUri(GRAND),
+                soprano: gridDataUri(SOPRANO),
+                alto: gridDataUri(ALTO),
+                tenor: gridDataUri(TENOR),
+                bass: gridDataUri(BASS),
+                grandG: gridDataUri(GRAND_G),
+                grandF: gridDataUri(GRAND_F),
+                trebleG: gridDataUri(TREBLE_G),
+                trebleF: gridDataUri(TREBLE_F)
+            };
+
+            this.cartesianBitmap = this._createGrid(encodedGridUris.cartesian);
+            this.polarBitmap = this._createGrid(encodedGridUris.polar);
+            this.trebleBitmap = this._createGrid(encodedGridUris.treble);
+            this.grandBitmap = this._createGrid(encodedGridUris.grand);
+            this.sopranoBitmap = this._createGrid(encodedGridUris.soprano);
+            this.altoBitmap = this._createGrid(encodedGridUris.alto);
+            this.tenorBitmap = this._createGrid(encodedGridUris.tenor);
+            this.bassBitmap = this._createGrid(encodedGridUris.bass);
 
             // We use G (one sharp) and F (one flat) as prototypes for all
             // of the accidentals. When applied, these graphics are offset
             // vertically to rendering different sharps and flats and
             // horizontally so as not to overlap.
             for (let i = 0; i < 7; i++) {
-                this.grandSharpBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(base64Encode(GRAND_G))
-                );
-                this.grandFlatBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(base64Encode(GRAND_F))
-                );
-                this.trebleSharpBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_G))
-                );
-                this.trebleFlatBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_F))
-                );
-                this.sopranoSharpBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_G))
-                );
-                this.sopranoFlatBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_F))
-                );
-                this.altoSharpBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_G))
-                );
-                this.altoFlatBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_F))
-                );
-                this.tenorSharpBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_G))
-                );
-                this.tenorFlatBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_F))
-                );
-                this.bassSharpBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_G))
-                );
-                this.bassFlatBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_F))
-                );
+                this.grandSharpBitmap[i] = this._createGrid(encodedGridUris.grandG);
+                this.grandFlatBitmap[i] = this._createGrid(encodedGridUris.grandF);
+                this.trebleSharpBitmap[i] = this._createGrid(encodedGridUris.trebleG);
+                this.trebleFlatBitmap[i] = this._createGrid(encodedGridUris.trebleF);
+                this.sopranoSharpBitmap[i] = this._createGrid(encodedGridUris.trebleG);
+                this.sopranoFlatBitmap[i] = this._createGrid(encodedGridUris.trebleF);
+                this.altoSharpBitmap[i] = this._createGrid(encodedGridUris.trebleG);
+                this.altoFlatBitmap[i] = this._createGrid(encodedGridUris.trebleF);
+                this.tenorSharpBitmap[i] = this._createGrid(encodedGridUris.trebleG);
+                this.tenorFlatBitmap[i] = this._createGrid(encodedGridUris.trebleF);
+                this.bassSharpBitmap[i] = this._createGrid(encodedGridUris.trebleG);
+                this.bassFlatBitmap[i] = this._createGrid(encodedGridUris.trebleF);
             }
 
             const URL = window.location.href;
@@ -8294,7 +8803,71 @@ class Activity {
             if (this.planet !== undefined) {
                 this.planet.planet.setAnalyzeProject(doAnalyzeProject);
             }
+
+            this._perfMark("activity.init.end");
+            this._perfMeasure("activity.init_total", "activity.init.start", "activity.init.end");
+            this._perfMeasure(
+                "activity.init_to_ui_ready",
+                "activity.init.start",
+                "activity.init.ui_ready"
+            );
+            this._perfMeasure(
+                "loader_to_activity_init_complete",
+                "loader.main.start",
+                "activity.init.end"
+            );
+
+            if (
+                typeof window !== "undefined" &&
+                window.__mbPerf &&
+                typeof window.__mbPerf.report === "function"
+            ) {
+                window.__mbPerf.report();
+            }
         };
+    }
+
+    /**
+     * Record a named performance mark in the global mbPerf tracker.
+     * @param {string} markName - The mark identifier.
+     * @returns {void}
+     */
+    _perfMark(markName) {
+        if (
+            typeof window === "undefined" ||
+            !window.__mbPerf ||
+            !window.__mbPerf.enabled ||
+            !window.__mbPerf.marks
+        ) {
+            return;
+        }
+        if (typeof performance === "undefined" || typeof performance.now !== "function") {
+            return;
+        }
+        window.__mbPerf.marks[markName] = performance.now();
+    }
+
+    /**
+     * Measure elapsed milliseconds between two mbPerf marks.
+     * @param {string} measureName - The measure identifier.
+     * @param {string} startMark - Start mark name.
+     * @param {string} endMark - End mark name.
+     * @returns {void}
+     */
+    _perfMeasure(measureName, startMark, endMark) {
+        if (
+            typeof window === "undefined" ||
+            !window.__mbPerf ||
+            !window.__mbPerf.enabled ||
+            !window.__mbPerf.marks ||
+            !window.__mbPerf.measures
+        ) {
+            return;
+        }
+        const start = window.__mbPerf.marks[startMark];
+        const end = window.__mbPerf.marks[endMark];
+        if (typeof start !== "number" || typeof end !== "number") return;
+        window.__mbPerf.measures[measureName] = +(end - start).toFixed(2);
     }
 
     /**
@@ -8308,6 +8881,24 @@ class Activity {
         if (!target || typeof target.addEventListener !== "function") return;
         target.addEventListener(type, listener, options);
         this._listeners.push({ target, type, listener, options });
+    }
+
+    /**
+     * Installs the shared blur-stop hook without overwriting any existing
+     * global blur handler.
+     *
+     * @param {Function} doHardStopButton - Shared stop action callback.
+     */
+    setupWindowBlurHandler(doHardStopButton) {
+        if (jQuery.browser.mozilla) {
+            return;
+        }
+
+        this._handleWindowBlur = () => {
+            doHardStopButton(this, true);
+        };
+
+        this.addEventListener(window, "blur", this._handleWindowBlur);
     }
 
     /**
@@ -8419,19 +9010,11 @@ class Activity {
                 this.palettes.hide();
             }
 
-            if (typeof this.palettes.clear !== "function") {
-                console.warn("Palettes clear method not available");
-                // Fallback clear implementation
-                this.palettes.dict = {};
-                this.palettes.visible = false;
-                this.palettes.activePalette = null;
-                this.palettes.paletteObject = null;
-            } else {
-                this.palettes.clear();
-            }
+            this.palettes.reinitialize(this.palettes);
 
-            // Reinitialize palettes
-            initPalettes(this.palettes);
+            // Increase palette element style.top value for correct alignment
+            const element = docById("palette");
+            element.style.top = `${60 + this.palettes.top}px`;
 
             // Reinitialize blocks
             if (this.blocks) {

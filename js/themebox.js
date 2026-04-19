@@ -24,7 +24,7 @@
 const themeConfigs = {
     dark: {
         textColor: "#E2E2E2",
-        blockText: "#000000",
+        blockText: "#FFFFFF",
         dialogueBox: "#1C1C1C",
         strokeColor: "#E2E2E2",
         fillColor: "#F9F9F9",
@@ -253,6 +253,34 @@ class ThemeBox {
     }
 
     /**
+     * Initialize theme on page load - apply theme state without notification
+     * @public
+     * @returns {void}
+     */
+    initializeTheme() {
+        const body = document.body;
+        // Update body classes
+        this._themes.forEach(theme => {
+            if (theme === this._theme) {
+                body.classList.add(theme);
+            } else {
+                body.classList.remove(theme);
+            }
+        });
+
+        // Sync platformColor with the active theme config on startup
+        if (themeConfigs[this._theme] && window.platformColor) {
+            Object.assign(window.platformColor, themeConfigs[this._theme]);
+        }
+
+        // Update theme icon immediately if DOM is ready
+        this.updateThemeIcon();
+
+        // Refresh UI components (including planet iframe) if they exist
+        this.refreshUIComponents();
+    }
+
+    /**
      * Apply theme instantly without page reload
      * @private
      * @returns {void}
@@ -311,7 +339,6 @@ class ThemeBox {
                 if (block && block.protoblock && block.protoblock.palette) {
                     // Redraw block to update other colors
                     if (typeof block.regenerateArtwork === "function") {
-                        // Ensure blockfactory uses the correct theme information
                         block.regenerateArtwork(false);
                     }
                     // Update text color
@@ -431,6 +458,14 @@ class ThemeBox {
                         }
                     }
                 }
+
+                // Refresh the currently open palette menu so block artwork
+                // SVGs are regenerated with the updated blockText color.
+                const activeName = this.activity.palettes.activePalette;
+                if (activeName && this.activity.palettes.dict[activeName]) {
+                    this.activity.palettes.dict[activeName].hideMenu();
+                    this.activity.palettes.showPalette(activeName);
+                }
             } catch (e) {
                 console.debug("Could not refresh palette:", e);
             }
@@ -491,21 +526,38 @@ class ThemeBox {
 
         // Update planet iframe theme if it exists
         const planetIframe = document.getElementById("planet-iframe");
-        if (planetIframe && planetIframe.contentDocument) {
-            try {
-                const planetBody = planetIframe.contentDocument.body;
-                if (planetBody) {
-                    this._themes.forEach(theme => {
-                        if (theme === this._theme) {
-                            planetBody.classList.add(theme);
-                        } else {
-                            planetBody.classList.remove(theme);
+        if (planetIframe) {
+            const applyPlanetTheme = () => {
+                if (
+                    planetIframe.contentDocument &&
+                    planetIframe.contentDocument.readyState === "complete"
+                ) {
+                    try {
+                        const planetBody = planetIframe.contentDocument.body;
+                        if (planetBody) {
+                            this._themes.forEach(theme => {
+                                if (theme === this._theme) {
+                                    planetBody.classList.add(theme);
+                                } else {
+                                    planetBody.classList.remove(theme);
+                                }
+                            });
                         }
-                    });
+                    } catch (e) {
+                        // Cross-origin restriction may prevent this
+                        console.debug("Could not update planet iframe theme:", e);
+                    }
                 }
-            } catch (e) {
-                // Cross-origin restriction may prevent this
-                console.debug("Could not update planet iframe theme:", e);
+            };
+
+            // Apply immediately if already loaded, otherwise wait for load event
+            if (
+                planetIframe.contentDocument &&
+                planetIframe.contentDocument.readyState === "complete"
+            ) {
+                applyPlanetTheme();
+            } else {
+                planetIframe.addEventListener("load", applyPlanetTheme, { once: true });
             }
         }
     }

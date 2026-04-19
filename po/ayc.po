@@ -4221,7 +4221,7 @@ msgstr "El tamaño máximo de pilas es 1000."
 
 #: js/blocks/HeapBlocks.js:523
 #. TRANS: El bloque Fijar entrada de pila establece un valor en la pila en la ubicación especificada.
-msgid "The Set-heap entry block sets a value in he heap at the specified location."
+msgid "The Set-heap entry block sets a value in the heap at the specified location."
 msgstr ""
 
 #: js/blocks/HeapBlocks.js:539
@@ -4818,7 +4818,7 @@ msgstr "kay chiqasta ruray"
 
 #: js/blocks/ProgramBlocks.js:1025
 #. TRANS: El bloque connectar conecta dos bloques
-msgid "The Dock block block connections two blocks."
+msgid "The Dock block connects two blocks."
 msgstr "El bloque connectar conecta dos bloques"
 
 #: js/blocks/ProgramBlocks.js:1036
@@ -9057,9 +9057,9 @@ msgid "Tags:"
 msgstr "Etiquetas:"
 
 #: planet/js/StringHelper.js:65
-#. TRANS: Reportar proyectos que violen <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">el código de conducta de Sugar Labs</a>.
-msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">Sugar Labs Code of Conduct</a>."
-msgstr "Reportar proyectos que violen <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">el código de conducta de Sugar Labs</a>."
+#. TRANS: Reportar proyectos que violen <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">el código de conducta de Sugar Labs</a>.
+msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">Sugar Labs Code of Conduct</a>."
+msgstr "Reportar proyectos que violen <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">el código de conducta de Sugar Labs</a>."
 
 #: planet/js/StringHelper.js:66
 #. TRANS: Razón para informar el proyecto

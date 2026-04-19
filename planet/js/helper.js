@@ -131,7 +131,7 @@ $(document).ready(() => {
 
     document.getElementById("global-search").addEventListener("input", evt => {
         document.getElementById("search-close").style.display =
-            this.value === "" ? "none" : "initial";
+            evt.target.value === "" ? "none" : "initial";
     });
 
     document.getElementById("local-tab").addEventListener("click", evt => {

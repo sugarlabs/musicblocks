@@ -9,6 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+/* eslint-disable no-redeclare */
 /*
    global
 
@@ -37,7 +38,7 @@
   EIGHTHNOTEWIDTH, MATRIXBUTTONHEIGHT, MATRIXBUTTONHEIGHT2,
   MATRIXSOLFEHEIGHT, NOTESYMBOLS, SELECTORSTRINGS, ACCIDENTALLABELS,
   ACCIDENTALNAMES, ACCIDENTALVALUES, INTERVALS, MODE_PIE_MENUS,
-  updateTemperaments, DEFAULTINVERT, DEFAULTINTERVAL, DEFAULTEFFECT,
+  DEFAULTINVERT, DEFAULTINTERVAL, DEFAULTEFFECT,
   DEFAULTMODE, DEFAULTOSCILLATORTYPE, DEFAULTACCIDENTAL,
   getInvertMode, getIntervalNumber, getIntervalDirection,
   getModeNumbers, getDrumIndex, getDrumName, getDrumSymbol,
@@ -57,6 +58,16 @@
   GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
   SEMITONES, CHROMATIC_SOLFEGE
 */
+
+/**
+ * Normalize Unicode accidental symbols in a note string to ASCII equivalents.
+ * @param {string} note
+ * @returns {string}
+ */
+function normalizeNoteAccidentals(note) {
+    const map = { "♭": "b", "♯": "#", "𝄫": "bb", "𝄪": "x" };
+    return note.replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
+}
 
 /**
  * Scalable sinewave graphic.
@@ -405,9 +416,9 @@ const SOLFEGENAMES1 = [
     "sol",
     "sol" + SHARP,
     "sol" + DOUBLESHARP,
-    "la",
     "la" + DOUBLEFLAT,
     "la" + FLAT,
+    "la",
     "la" + SHARP,
     "la" + DOUBLESHARP,
     "ti" + DOUBLEFLAT,
@@ -487,9 +498,9 @@ const NOTENAMES1 = [
     "G",
     "G" + SHARP,
     "G" + DOUBLESHARP,
-    "A",
     "A" + DOUBLEFLAT,
     "A" + FLAT,
+    "A",
     "A" + SHARP,
     "A" + DOUBLESHARP,
     "B" + DOUBLEFLAT,
@@ -1585,66 +1596,79 @@ const MODE_PIE_MENUS = {
 // The table contains the intervals that define the modes.
 // All of these modes assume 12 semitones per octave.
 // See http://www.pianoscales.org <== this is in no way definitive
-// TODO: better system of organizing and naming collections of pitches
-const MUSICALMODES = {
-    // 12 notes in an octave
-    "chromatic": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 
-    // 8 notes in an octave
-    "algerian": [2, 1, 2, 1, 1, 1, 3, 1],
-    "diminished": [2, 1, 2, 1, 2, 1, 2, 1],
-    "spanish": [1, 2, 1, 1, 1, 2, 2, 2],
-    "octatonic": [1, 2, 1, 2, 1, 2, 1, 2],
-    "bebop": [1, 1, 1, 2, 2, 1, 2, 2],
-
-    // 7 notes in an octave
-    "major": [2, 2, 1, 2, 2, 2, 1],
-    "harmonic major": [2, 2, 1, 2, 1, 3, 1],
-    "natural minor": [2, 1, 2, 2, 1, 2, 2],
-    "harmonic minor": [2, 1, 2, 2, 1, 3, 1],
-    "melodic minor": [2, 1, 2, 2, 2, 2, 1],
-
-    "ionian": [2, 2, 1, 2, 2, 2, 1],
-    "dorian": [2, 1, 2, 2, 2, 1, 2],
-    "phrygian": [1, 2, 2, 2, 1, 2, 2],
-    "lydian": [2, 2, 2, 1, 2, 2, 1],
-    "mixolydian": [2, 2, 1, 2, 2, 1, 2],
-    "minor": [2, 1, 2, 2, 1, 2, 2],
-    "aeolian": [2, 1, 2, 2, 1, 2, 2],
-    "locrian": [1, 2, 2, 1, 2, 2, 2],
-
-    "jazz minor": [2, 1, 2, 2, 2, 2, 1],
-
-    "arabic": [2, 2, 1, 1, 2, 2, 2],
-    "byzantine": [1, 3, 1, 2, 1, 3, 1],
-    "enigmatic": [1, 3, 2, 2, 2, 1, 1],
-    "ethiopian": [2, 1, 2, 2, 1, 2, 2],
-    "geez": [2, 1, 2, 2, 1, 2, 2],
-    "hindu": [2, 2, 1, 2, 1, 2, 2],
-    "hungarian": [2, 1, 3, 1, 1, 3, 1],
-    "maqam": [1, 3, 1, 2, 1, 3, 1],
-    "romanian minor": [2, 1, 3, 1, 2, 1, 2],
-    "spanish gypsy": [1, 3, 1, 2, 1, 2, 2],
-
-    // 6 notes in an octave
-    "minor blues": [3, 2, 1, 1, 3, 2],
-    "major blues": [2, 1, 1, 3, 2, 2],
-    "whole tone": [2, 2, 2, 2, 2, 2],
-
-    // 5 notes in an octave
-    "major pentatonic": [2, 2, 3, 2, 3],
-    "minor pentatonic": [3, 2, 2, 3, 2],
-    "chinese": [4, 2, 1, 4, 1],
-    "egyptian": [2, 3, 2, 3, 2],
-    "hirajoshi": [1, 4, 1, 4, 2],
-    "in": [1, 4, 2, 1, 4],
-    "minyo": [3, 2, 2, 3, 2],
-    "fibonacci": [1, 1, 2, 3, 5],
-    "alt pentatonic": [2, 3, 2, 2, 3],
-
-    // User definition overrides this constant
-    "custom": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+const PITCH_COLLECTIONS = {
+    12: {
+        chromatic: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    },
+    8: {
+        algerian: [2, 1, 2, 1, 1, 1, 3, 1],
+        diminished: [2, 1, 2, 1, 2, 1, 2, 1],
+        spanish: [1, 2, 1, 1, 1, 2, 2, 2],
+        octatonic: [1, 2, 1, 2, 1, 2, 1, 2],
+        bebop: [1, 1, 1, 2, 2, 1, 2, 2]
+    },
+    7: {
+        "major": [2, 2, 1, 2, 2, 2, 1],
+        "harmonic major": [2, 2, 1, 2, 1, 3, 1],
+        "natural minor": [2, 1, 2, 2, 1, 2, 2],
+        "harmonic minor": [2, 1, 2, 2, 1, 3, 1],
+        "melodic minor": [2, 1, 2, 2, 2, 2, 1],
+        "dorian": [2, 1, 2, 2, 2, 1, 2],
+        "phrygian": [1, 2, 2, 2, 1, 2, 2],
+        "lydian": [2, 2, 2, 1, 2, 2, 1],
+        "mixolydian": [2, 2, 1, 2, 2, 1, 2],
+        "locrian": [1, 2, 2, 1, 2, 2, 2],
+        "arabic": [2, 2, 1, 1, 2, 2, 2],
+        "byzantine": [1, 3, 1, 2, 1, 3, 1],
+        "enigmatic": [1, 3, 2, 2, 2, 1, 1],
+        "hindu": [2, 2, 1, 2, 1, 2, 2],
+        "hungarian": [2, 1, 3, 1, 1, 3, 1],
+        "romanian minor": [2, 1, 3, 1, 2, 1, 2],
+        "spanish gypsy": [1, 3, 1, 2, 1, 2, 2]
+    },
+    6: {
+        "minor blues": [3, 2, 1, 1, 3, 2],
+        "major blues": [2, 1, 1, 3, 2, 2],
+        "whole tone": [2, 2, 2, 2, 2, 2]
+    },
+    5: {
+        "major pentatonic": [2, 2, 3, 2, 3],
+        "minor pentatonic": [3, 2, 2, 3, 2],
+        "chinese": [4, 2, 1, 4, 1],
+        "egyptian": [2, 3, 2, 3, 2],
+        "hirajoshi": [1, 4, 1, 4, 2],
+        "in": [1, 4, 2, 1, 4],
+        "fibonacci": [1, 1, 2, 3, 5],
+        "alt pentatonic": [2, 3, 2, 2, 3]
+    }
 };
+
+const PITCH_COLLECTION_ALIASES = {
+    "ionian": "major",
+    "minor": "natural minor",
+    "aeolian": "natural minor",
+    "ethiopian": "natural minor",
+    "geez": "natural minor",
+    "jazz minor": "melodic minor",
+    "maqam": "byzantine",
+    "minyo": "minor pentatonic"
+};
+
+const MUSICALMODES = {};
+for (const count in PITCH_COLLECTIONS) {
+    const collections = PITCH_COLLECTIONS[count];
+    for (const name in collections) {
+        MUSICALMODES[name] = collections[name];
+    }
+}
+
+for (const alias in PITCH_COLLECTION_ALIASES) {
+    MUSICALMODES[alias] = MUSICALMODES[PITCH_COLLECTION_ALIASES[alias]];
+}
+
+// User definition overrides this constant.
+MUSICALMODES["custom"] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 
 /**
  * Maqam table mapping specific maqams to their corresponding keys.
@@ -2851,6 +2875,10 @@ const getVoiceSynthName = name => {
  * @returns {boolean} True if the temperament is custom, false otherwise.
  */
 const isCustomTemperament = temperament => {
+    // Treat invalid/null temperaments as custom to avoid errors
+    if (!temperament || typeof temperament !== "string") {
+        return true;
+    }
     return !(temperament in PreDefinedTemperaments);
 };
 
@@ -3983,7 +4011,7 @@ const getNoteFromInterval = (pitch, interval) => {
  * @param {number} [offset=0] - The offset value (default is 0).
  * @returns {Array} An array containing the note and octave.
  */
-const numberToPitch = (i, temperament, startPitch, offset) => {
+const numberToPitch = (i, temperament, startPitch, offset, activity) => {
     // Calculate the pitch and octave based on index.
     // We start at A0.
     if (temperament === undefined) {
@@ -4020,6 +4048,17 @@ const numberToPitch = (i, temperament, startPitch, offset) => {
     let interval;
     if (isCustomTemperament(temperament)) {
         // The index may be outside of the octave.
+        // Ensure the temperament exists in TEMPERAMENT before accessing it
+        if (!TEMPERAMENT[temperament] || !TEMPERAMENT[temperament]["pitchNumber"]) {
+            // Fallback to equal temperament if custom temperament is not found
+            if (activity && activity.errorMsg) {
+                activity.errorMsg(
+                    _("Invalid temperament. Falling back to equal temperament."),
+                    3000
+                );
+            }
+            temperament = "equal";
+        }
         const octaveLength = TEMPERAMENT[temperament]["pitchNumber"];
         const pitchIdx = pitchNumber % octaveLength;
         const octaveFactor = Math.floor(pitchNumber / octaveLength);
@@ -4089,10 +4128,8 @@ const GetNotesForInterval = tur => {
         octave = octaveblk[octaveblk.length - 1] - octaveblk[0];
     }
 
-    firstNote = firstNote.replace("♭", "b");
-    secondNote = secondNote.replace("♭", "b");
-    firstNote = firstNote.replace("♯", "#");
-    secondNote = secondNote.replace("♯", "#");
+    firstNote = normalizeNoteAccidentals(firstNote);
+    secondNote = normalizeNoteAccidentals(secondNote);
 
     return { firstNote, secondNote, octave };
 };
@@ -4135,6 +4172,11 @@ function getNote(
     if (temperament === undefined) {
         temperament = "equal";
     }
+
+    const octaveLength =
+        TEMPERAMENT[temperament] && typeof TEMPERAMENT[temperament].pitchNumber === "number"
+            ? TEMPERAMENT[temperament].pitchNumber
+            : 12;
 
     let sharpFlat = false;
     let rememberFlat = false;
@@ -4322,7 +4364,7 @@ function getNote(
                 // All keys Gb -- B would be in octave three (since
                 // going down is closer than going up)
                 if (offset > 5) {
-                    transpositionFloor -= 12; // go down one octave
+                    transpositionFloor -= octaveLength; // go down one octave
                 }
             } else {
                 offset = 0;
@@ -4370,10 +4412,10 @@ function getNote(
                     case "dorian":
                         i = SOLFEGENAMES.indexOf(solfegePart);
                         if (i > 0) {
-                            transpositionFloor += 12;
+                            transpositionFloor += octaveLength;
                         }
 
-                        transpositionFloor -= 12;
+                        transpositionFloor -= octaveLength;
                         i += 6;
                         if (i > 6) {
                             i -= 7;
@@ -4384,7 +4426,7 @@ function getNote(
                     case "phrygian":
                         i = SOLFEGENAMES.indexOf(solfegePart);
                         if (i > 1) {
-                            transpositionFloor += 12;
+                            transpositionFloor += octaveLength;
                         }
 
                         i += 5;
@@ -4397,7 +4439,7 @@ function getNote(
                     case "lydian":
                         i = SOLFEGENAMES.indexOf(solfegePart);
                         if (i > 2) {
-                            transpositionFloor += 12;
+                            transpositionFloor += octaveLength;
                         }
 
                         i += 4;
@@ -4410,7 +4452,7 @@ function getNote(
                     case "mixolydian":
                         i = SOLFEGENAMES.indexOf(solfegePart);
                         if (i > 3) {
-                            transpositionFloor += 12;
+                            transpositionFloor += octaveLength;
                         }
 
                         i += 3;
@@ -4424,7 +4466,7 @@ function getNote(
                     case "aeolian":
                         i = SOLFEGENAMES.indexOf(solfegePart);
                         if (i > 4) {
-                            transpositionFloor += 12;
+                            transpositionFloor += octaveLength;
                         }
 
                         i += 2;
@@ -4437,7 +4479,7 @@ function getNote(
                     case "locrian":
                         i = SOLFEGENAMES.indexOf(solfegePart);
                         if (i > 5) {
-                            transpositionFloor += 12;
+                            transpositionFloor += octaveLength;
                         }
 
                         i += 1;
@@ -4457,11 +4499,11 @@ function getNote(
             let index;
             if (halfSteps.includes(solfegePart)) {
                 index = halfSteps.indexOf(solfegePart) + offset;
-                if (index > 11) {
-                    index -= 12;
+                if (index >= octaveLength) {
+                    index -= octaveLength;
                     octave += 1;
                 } else if (index < 0) {
-                    index += 12;
+                    index += octaveLength;
                     octave -= 1;
                 }
 
@@ -4486,11 +4528,11 @@ function getNote(
         if (transpositionFloor && transpositionFloor !== 0) {
             let deltaOctave, deltaNote;
             if (transpositionFloor < 0) {
-                deltaOctave = -Math.floor(-transpositionFloor / 12);
-                deltaNote = -(-transpositionFloor % 12);
+                deltaOctave = -Math.floor(-transpositionFloor / octaveLength);
+                deltaNote = -(-transpositionFloor % octaveLength);
             } else {
-                deltaOctave = Math.floor(transpositionFloor / 12);
-                deltaNote = transpositionFloor % 12;
+                deltaOctave = Math.floor(transpositionFloor / octaveLength);
+                deltaNote = transpositionFloor % octaveLength;
             }
 
             octave += deltaOctave;
@@ -4605,22 +4647,25 @@ function getNote(
     } else if (isCustomTemperament(temperament)) {
         note = getCustomNote(noteArg);
         let pitchNumber = null;
-        for (const number in TEMPERAMENT[temperament]) {
-            if (number !== "pitchNumber" && number != "interval") {
-                if (note === TEMPERAMENT[temperament][number][3]) {
-                    if (typeof number === "string") {
-                        pitchNumber = Number(number);
-                    } else {
-                        pitchNumber = number;
+        // Ensure the temperament exists before accessing it
+        if (TEMPERAMENT[temperament]) {
+            for (const number in TEMPERAMENT[temperament]) {
+                if (number !== "pitchNumber" && number != "interval") {
+                    if (note === TEMPERAMENT[temperament][number][3]) {
+                        if (typeof number === "string") {
+                            pitchNumber = Number(number);
+                        } else {
+                            pitchNumber = number;
+                        }
+                        break;
+                    } else if (note === TEMPERAMENT[temperament][number][1]) {
+                        if (typeof number === "string") {
+                            pitchNumber = Number(number);
+                        } else {
+                            pitchNumber = number;
+                        }
+                        break;
                     }
-                    break;
-                } else if (note === TEMPERAMENT[temperament][number][1]) {
-                    if (typeof number === "string") {
-                        pitchNumber = Number(number);
-                    } else {
-                        pitchNumber = number;
-                    }
-                    break;
                 }
             }
         }
@@ -4640,7 +4685,7 @@ function getNote(
         }
 
         let inOctave = octave;
-        const octaveLength = TEMPERAMENT[temperamentFloor]["pitchNumber"];
+        // octaveLength already defined at top of function
         let deltaOctave, deltaNote;
         if (transpositionFloor !== 0) {
             if (transpositionFloor < 0) {
@@ -4710,11 +4755,11 @@ function getNote(
         let deltaOctave, deltaNote;
         if (transpositionFloor && transpositionFloor !== 0) {
             if (transpositionFloor < 0) {
-                deltaOctave = -Math.floor(-transpositionFloor / 12);
-                deltaNote = -(-transpositionFloor % 12);
+                deltaOctave = -Math.floor(-transpositionFloor / octaveLength);
+                deltaNote = -(-transpositionFloor % octaveLength);
             } else {
-                deltaOctave = Math.floor(transpositionFloor / 12);
-                deltaNote = transposition % 12;
+                deltaOctave = Math.floor(transpositionFloor / octaveLength);
+                deltaNote = transposition % octaveLength;
             }
 
             octave += deltaOctave;
@@ -4732,7 +4777,7 @@ function getNote(
                 octave1 = octave - 1;
                 pitch = note + "" + octave1;
                 for (const interval in INTERVALVALUES) {
-                    if (12 + deltaNote === INTERVALVALUES[interval][0]) {
+                    if (octaveLength + deltaNote === INTERVALVALUES[interval][0]) {
                         note1 = getNoteFromInterval(pitch, interval);
                         break;
                     }
@@ -6410,6 +6455,7 @@ if (typeof module !== "undefined" && module.exports) {
         convertFactor,
         getPitchInfo,
         noteToFrequency,
+        normalizeNoteAccidentals,
         TEMPERAMENT,
         setOctaveRatio,
         getOctaveRatio,
@@ -6470,6 +6516,12 @@ if (typeof module !== "undefined" && module.exports) {
         NOTESTEP,
         MUSICALMODES,
         SHARP,
-        FLAT
+        FLAT,
+        NOTENAMES,
+        SOLFEGENAMES1,
+        ALLNOTENAMES,
+        NOTENAMES1,
+        PITCHES1,
+        PITCHES3
     };
 }

@@ -124,6 +124,7 @@ afterEach(() => {
 function createMockActivity(options = {}) {
     return {
         __keyPressed: jest.fn(),
+        textMsg: jest.fn(),
         blocks: {
             activeBlock: options.activeBlock || null,
             blockList: options.blockList || {},
@@ -225,13 +226,15 @@ describe("HelpWidget", () => {
             expect(mockWidgetWindow.destroy).toHaveBeenCalled();
         });
 
-        test("onclose restores document.onkeydown", () => {
+        test("onclose restores document.onkeydown to the handler active before Help opened", () => {
             const activity = createMockActivity();
-            new HelpWidget(activity, false);
+            const prevHandler = jest.fn();
+            document.onkeydown = prevHandler;
 
+            new HelpWidget(activity, false);
             mockWidgetWindow.onclose();
 
-            expect(document.onkeydown).toBe(activity.__keyPressed);
+            expect(document.onkeydown).toBe(prevHandler);
         });
 
         test("calls windowFor with correct arguments", () => {

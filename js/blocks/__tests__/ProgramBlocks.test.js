@@ -26,6 +26,14 @@ global._ = s => s;
 global.NOINPUTERRORMSG = "NO_INPUT";
 global.XMLHttpRequest = jest.fn();
 global.getTargetTurtle = jest.fn();
+global.isSafeUrl = function (urlString) {
+    try {
+        const parsed = new URL(urlString);
+        return parsed.protocol === "http:" || parsed.protocol === "https:";
+    } catch (e) {
+        return false;
+    }
+};
 global.Turtle = {
     DictActions: {
         setDictValue: jest.fn(),
@@ -209,7 +217,7 @@ describe("ProgramBlocks", () => {
             // Wait for the async fetch to complete
             await new Promise(resolve => setTimeout(resolve, 0));
 
-            expect(activity.errorMsg).toHaveBeenCalledWith("404: Page not found");
+            expect(activity.errorMsg).toHaveBeenCalledWith("404: Page not found", 1);
         });
 
         test("handles JSON parse error", async () => {
@@ -274,7 +282,8 @@ describe("ProgramBlocks", () => {
             block.flow(["nonexistent", "http://test.com"], logo, 0, 1);
 
             expect(activity.errorMsg).toHaveBeenCalledWith(
-                "Cannot find a valid heap for nonexistent"
+                "Cannot find a valid heap for nonexistent",
+                1
             );
         });
     });
@@ -310,7 +319,8 @@ describe("ProgramBlocks", () => {
             block.flow([[null, null]], logo, 0, blk);
 
             expect(activity.errorMsg).toHaveBeenCalledWith(
-                "The file you selected does not contain a valid heap."
+                "The file you selected does not contain a valid heap.",
+                blk
             );
         });
 
@@ -328,7 +338,8 @@ describe("ProgramBlocks", () => {
             block.flow([[null, null]], logo, 0, blk);
 
             expect(activity.errorMsg).toHaveBeenCalledWith(
-                "The file you selected does not contain a valid heap."
+                "The file you selected does not contain a valid heap.",
+                blk
             );
         });
 
@@ -345,7 +356,8 @@ describe("ProgramBlocks", () => {
             block.flow([[null, null]], logo, 0, blk);
 
             expect(activity.errorMsg).toHaveBeenCalledWith(
-                "The loadHeap block needs a loadFile block."
+                "The loadHeap block needs a loadFile block.",
+                blk
             );
         });
     });
@@ -379,7 +391,8 @@ describe("ProgramBlocks", () => {
             block.flow([null], logo, 0, blk);
 
             expect(activity.errorMsg).toHaveBeenCalledWith(
-                "The block you selected does not contain a valid heap."
+                "The block you selected does not contain a valid heap.",
+                blk
             );
         });
 
@@ -392,7 +405,7 @@ describe("ProgramBlocks", () => {
             const block = getBlock("setHeap");
             block.flow([null], logo, 0, blk);
 
-            expect(activity.errorMsg).toHaveBeenCalledWith("The Set heap block needs a heap.");
+            expect(activity.errorMsg).toHaveBeenCalledWith("The Set heap block needs a heap.", blk);
         });
     });
 
@@ -468,7 +481,8 @@ describe("ProgramBlocks", () => {
             block.flow(["MyDict", [null, null]], logo, 0, blk);
 
             expect(activity.errorMsg).toHaveBeenCalledWith(
-                "The load dictionary block needs a load file block."
+                "The load dictionary block needs a load file block.",
+                blk
             );
         });
 
@@ -489,7 +503,8 @@ describe("ProgramBlocks", () => {
             block.flow(["MyDict", [null, null]], logo, turtle, blk);
 
             expect(activity.errorMsg).toHaveBeenCalledWith(
-                "The file you selected does not contain a valid dictionary."
+                "The file you selected does not contain a valid dictionary.",
+                blk
             );
         });
     });
@@ -537,7 +552,8 @@ describe("ProgramBlocks", () => {
             block.flow(["MyDict", {}], logo, turtle, blk);
 
             expect(activity.errorMsg).toHaveBeenCalledWith(
-                "The block you selected does not contain a valid dictionary."
+                "The block you selected does not contain a valid dictionary.",
+                blk
             );
         });
     });
@@ -766,33 +782,83 @@ describe("ProgramBlocks", () => {
             window.alert = originalAlert;
         });
 
-        test("opens valid URL", () => {
-            const block = getBlock("openProject");
-            const mockWindow = { focus: jest.fn() };
-
-            // Mock window.open
+        beforeEach(() => {
             delete window.open;
-            window.open = jest.fn(() => mockWindow);
-
-            block.flow(["http://example.com"], logo, 0, 5);
-
-            expect(window.open).toHaveBeenCalledWith("http://example.com", "_blank");
-            expect(mockWindow.focus).toHaveBeenCalled();
-        });
-
-        test("validates URL", () => {
-            const block = getBlock("openProject");
-
-            // Mock window.open and alert
-            delete window.open;
-            window.open = jest.fn();
+            window.open = jest.fn(() => ({}));
             delete window.alert;
             window.alert = jest.fn();
+        });
 
-            block.flow(["invalid-url"], logo, 0, 5);
+        test("opens valid http URL", () => {
+            const block = getBlock("openProject");
+            block.flow(["http://example.com"], logo, 0, 5);
+
+            expect(window.open).toHaveBeenCalledWith(
+                "http://example.com",
+                "_blank",
+                "noopener,noreferrer"
+            );
+        });
+
+        test("opens valid https URL", () => {
+            const block = getBlock("openProject");
+            block.flow(["https://musicblocks.sugarlabs.org/index.html"], logo, 0, 5);
+
+            expect(window.open).toHaveBeenCalledWith(
+                "https://musicblocks.sugarlabs.org/index.html",
+                "_blank",
+                "noopener,noreferrer"
+            );
+        });
+
+        test("blocks javascript: protocol (CVE-11 open redirect)", () => {
+            const block = getBlock("openProject");
+            block.flow(["javascript:alert(document.cookie)"], logo, 0, 5);
 
             expect(window.open).not.toHaveBeenCalled();
-            expect(activity.errorMsg).toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith("Please enter a valid URL.", 5);
+        });
+
+        test("blocks data: URI scheme", () => {
+            const block = getBlock("openProject");
+            block.flow(["data:text/html,<script>alert(1)</script>"], logo, 0, 5);
+
+            expect(window.open).not.toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith("Please enter a valid URL.", 5);
+        });
+
+        test("blocks vbscript: protocol", () => {
+            const block = getBlock("openProject");
+            block.flow(["vbscript:MsgBox('xss')"], logo, 0, 5);
+
+            expect(window.open).not.toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith("Please enter a valid URL.", 5);
+        });
+
+        test("rejects bare domain without protocol", () => {
+            const block = getBlock("openProject");
+            block.flow(["evil.com"], logo, 0, 5);
+
+            expect(window.open).not.toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith("Please enter a valid URL.", 5);
+        });
+
+        test("rejects null input", () => {
+            const block = getBlock("openProject");
+            block.flow([null], logo, 0, 5);
+
+            expect(window.open).not.toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith("NO_INPUT", 5);
+        });
+
+        test("handles popup blocker", () => {
+            const block = getBlock("openProject");
+            window.open = jest.fn(() => null);
+
+            block.flow(["https://example.com"], logo, 0, 5);
+
+            expect(window.open).toHaveBeenCalled();
+            expect(window.alert).toHaveBeenCalledWith("Please allow popups for this site");
         });
     });
 
@@ -820,6 +886,135 @@ describe("ProgramBlocks", () => {
         test("MakeBlock has correct form", () => {
             const block = getBlock("makeblock");
             expect(block.formDefn.outType).toBe("numberout");
+        });
+    });
+    describe("MakeBlockBlock branch coverage", () => {
+        const setupArg = (name, argValues = []) => {
+            activity.blocks.blockList = [
+                {
+                    connections: [null, 10, ...argValues.map((_, i) => i + 10)],
+                    argClampSlots: argValues.map((_, i) => i)
+                }
+            ];
+            const allMocks = [...argValues, name];
+            logo.parseArg = jest.fn();
+            allMocks.forEach(v => logo.parseArg.mockReturnValueOnce(v));
+        };
+
+        test("creates 'start' block", () => {
+            setupArg("start");
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        });
+
+        test("creates 'silence' block", () => {
+            setupArg("silence");
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        });
+
+        test("creates 'tempo' block with 1 arg", () => {
+            setupArg("tempo", [90]);
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        });
+
+        test("creates 'tempo' block with 2 args", () => {
+            setupArg("tempo", [90, 4]);
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        });
+
+        test("creates 'tempo' block with 3 args", () => {
+            setupArg("tempo", [90, 4, 8]);
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        });
+
+        test("creates 'volume' block with 1 arg", () => {
+            setupArg("volume", [50]);
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        });
+
+        test("creates 'volume' block with 2 args", () => {
+            setupArg("volume", ["piano", 50]);
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        });
+
+        test("creates 'volume' block with 3 args", () => {
+            setupArg("volume", ["piano", 75, "extra"]);
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        });
+
+        test("creates 'instrument' block with default", () => {
+            setupArg("instrument", []);
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        });
+
+        test("creates 'instrument' block with specified instrument", () => {
+            setupArg("instrument", ["guitar"]);
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        });
+
+        test("returns 0 when block not found", () => {
+            setupArg("unknownblock");
+            activity.blocks.palettes.getProtoNameAndPalette.mockReturnValue([null, null, null]);
+            const result = getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.errorMsg).toHaveBeenCalled();
+            expect(result).toBe(0);
+        });
+
+        test("handles number arg with dock type mismatch", () => {
+            setupArg("customblock", [42]);
+            activity.blocks.palettes.getProtoNameAndPalette.mockReturnValue([
+                "proto1",
+                "program",
+                "customblock"
+            ]);
+            activity.blocks.protoBlockDict["proto1"] = { dockTypes: [null, "textin"] };
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("Warning"), 0);
+        });
+
+        test("handles string arg with dock type mismatch", () => {
+            setupArg("customblock", ["hello"]);
+            activity.blocks.palettes.getProtoNameAndPalette.mockReturnValue([
+                "proto1",
+                "program",
+                "customblock"
+            ]);
+            activity.blocks.protoBlockDict["proto1"] = { dockTypes: [null, "numberin"] };
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("Warning"), 0);
+        });
+
+        test("handles boolean arg with dock type mismatch", () => {
+            setupArg("customblock", [true]);
+            activity.blocks.palettes.getProtoNameAndPalette.mockReturnValue([
+                "proto1",
+                "program",
+                "customblock"
+            ]);
+            activity.blocks.protoBlockDict["proto1"] = { dockTypes: [null, "textin"] };
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("Warning"), 0);
+        });
+
+        test("handles unhandled arg type (object)", () => {
+            setupArg("customblock", [{ obj: true }]);
+            activity.blocks.palettes.getProtoNameAndPalette.mockReturnValue([
+                "proto1",
+                "program",
+                "customblock"
+            ]);
+            activity.blocks.protoBlockDict["proto1"] = { dockTypes: [null, "textin"] };
+            getBlock("makeblock").arg(logo, 0, 0, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("Warning"), 0);
         });
     });
 });

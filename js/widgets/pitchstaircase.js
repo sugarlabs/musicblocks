@@ -15,7 +15,8 @@
 /*
    global
 
-   platformColor, _, SYNTHSVG, frequencyToPitch, DEFAULTVOICE
+   platformColor, _, SYNTHSVG, frequencyToPitch, DEFAULTVOICE,
+   normalizeNoteAccidentals
  */
 
 /*
@@ -310,7 +311,7 @@ class PitchStaircase {
 
         for (let i = 0; i < this.Stairs.length; i++) {
             const note = this.Stairs[i][0] + this.Stairs[i][1];
-            pitchnotes.push(note.replace(/♭/g, "b").replace(/♯/g, "#"));
+            pitchnotes.push(normalizeNoteAccidentals(note));
             const stepCell = this._stepTables[i].rows[0].cells[1];
             stepCell.style.backgroundColor = platformColor.selectorBackground;
             this.activity.logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
@@ -332,7 +333,7 @@ class PitchStaircase {
         const pitchnotes = [];
         const note =
             this.Stairs[this.Stairs.length - 1][0] + this.Stairs[this.Stairs.length - 1][1];
-        pitchnotes.push(note.replace(/♭/g, "b").replace(/♯/g, "#"));
+        pitchnotes.push(normalizeNoteAccidentals(note));
         const last = this.Stairs.length - 1;
         const stepCell = this._stepTables[last].rows[0].cells[1];
         stepCell.style.backgroundColor = platformColor.selectorBackground;
@@ -376,12 +377,12 @@ class PitchStaircase {
 
         const pitchnotes = [];
         const note = this.Stairs[index][0] + this.Stairs[index][1];
-        pitchnotes.push(note.replace(/♭/g, "b").replace(/♯/g, "#"));
+        pitchnotes.push(normalizeNoteAccidentals(note));
         const previousRowNumber = index - next;
         const pscTableCell = this._stepTables[previousRowNumber];
 
         setTimeout(() => {
-            if (pscTableCell != null) {
+            if (pscTableCell !== null) {
                 const stepCell = pscTableCell.rows[0].cells[1];
                 stepCell.style.backgroundColor = platformColor.selectorBackground;
             }

@@ -1,0 +1,43 @@
+name: Label Conflicting PRs
+
+on:
+    push:
+        branches: [master]
+    pull_request_target:
+        types: [synchronize]
+
+permissions:
+    contents: read
+    pull-requests: write
+
+jobs:
+    check:
+        name: Detect merge conflicts
+        runs-on: ubuntu-latest
+        steps:
+            - uses: eps1lon/actions-label-merge-conflict@v3
+              with:
+                  dirtyLabel: "needs-rebase"
+                  repoToken: "${{ secrets.GITHUB_TOKEN }}"
+                  retryAfter: 120
+                  retryMax: 5
+                  continueOnMissingPermissions: true
+                  commentOnDirty: |
+                      **This PR has merge conflicts with `master`.**
+
+                      Please rebase your branch:
+                      ```bash
+                      # Add upstream remote (one-time setup)
+                      git remote add upstream https://github.com/sugarlabs/musicblocks.git
+
+                      # Fetch latest master and rebase
+                      git fetch upstream
+                      git rebase upstream/master
+
+                      # Resolve any conflicts, then:
+                      git push --force-with-lease origin YOUR_BRANCH
+                      ```
+
+                      > **Tip:** Enable "Allow edits from maintainers" on this PR so we can auto-rebase for you next time. This only grants access to your PR branch. Your fork's other branches are not affected.
+                  commentOnClean: |
+                      Merge conflicts resolved. Ready for review.

@@ -15,10 +15,9 @@
    i18nSolfege, NUMBERBLOCKDEFAULT, TEXTWIDTH, STRINGLEN,
    DEFAULTBLOCKSCALE, SVG, DISABLEDFILLCOLOR, DISABLEDSTROKECOLOR,
    PALETTEFILLCOLORS, PALETTESTROKECOLORS, last, getTextWidth,
-   STANDARDBLOCKHEIGHT, CLOSEICON, BUILTINPALETTES,
-   safeSVG, blockIsMacro, getMacroExpansion,
-   base64Encode, StatusMatrix, activity
-   cameraPALETTE, mediaPALETTE, videoPALETTE
+   STANDARDBLOCKHEIGHT, CLOSEICON, BUILTINPALETTES, base64Encode,
+   safeSVG, blockIsMacro, getMacroExpansion, StatusMatrix,
+   activity, cameraPALETTE, mediaPALETTE, videoPALETTE
 */
 
 /* exported Palettes, initPalettes */
@@ -102,6 +101,11 @@ class Palettes {
         this._navBlockIndex = 0;
         this._navPaletteBlockIndex = 0; // For navigating actual blocks in the right panel
         this._keyboardNavActive = false;
+        this._menuOpenTimeout = null;
+        // Tracks whether the palette was collapsed before Tab focus entered,
+        // so we can restore its state when focus leaves.
+        this._wasCollapsedBeforeFocus = false;
+        this._expandedForKeyboardFocus = false;
     }
 
     init() {
@@ -250,6 +254,44 @@ class Palettes {
             }
         });
 
+        // Auto-expand the palette when it receives Tab focus (if it was collapsed),
+        // and restore the previous state when focus leaves.
+        palette.addEventListener("focus", () => {
+            // Mouse clicks can also focus the palette container. Only auto-expand
+            // when focus was entered via keyboard navigation.
+            if (!this._keyboardNavActive) {
+                this._wasCollapsedBeforeFocus = false;
+                this._expandedForKeyboardFocus = false;
+                return;
+            }
+
+            // Record the state at the moment Tab focus enters.
+            this._wasCollapsedBeforeFocus = this.collapsed;
+            this._expandedForKeyboardFocus = false;
+
+            // If the palette is collapsed, open it so the user can see it.
+            if (this.collapsed) {
+                this.toggleCollapse();
+                this._expandedForKeyboardFocus = true;
+            }
+        });
+
+        palette.addEventListener("focusout", event => {
+            // relatedTarget is where focus is moving to.
+            // If it's still inside the palette, do nothing.
+            if (palette.contains(event.relatedTarget)) return;
+            // Restore the palette to the state it was in before Tab focus entered.
+            if (
+                this._expandedForKeyboardFocus &&
+                this._wasCollapsedBeforeFocus &&
+                !this.collapsed
+            ) {
+                this.toggleCollapse();
+            }
+            this._wasCollapsedBeforeFocus = false;
+            this._expandedForKeyboardFocus = false;
+        });
+
         // Clear keyboard nav highlight on mouse movement and restore mouse hover
         palette.addEventListener("mousemove", () => {
             if (this._keyboardNavActive) {
@@ -326,6 +368,50 @@ class Palettes {
             el.style.backgroundColor = platformColor.paletteBackground;
             delete el.dataset.keyboardFocus;
         });
+    }
+
+    /**
+     * Clears any delayed hover-triggered palette open so it cannot fire
+     * after keyboard focus has already moved to another zone.
+     */
+    _clearPendingMenuOpen() {
+        if (this._menuOpenTimeout !== null) {
+            clearTimeout(this._menuOpenTimeout);
+            this._menuOpenTimeout = null;
+        }
+    }
+
+    /**
+     * Resets palette keyboard navigation and optionally closes open menus.
+     * Used when focus leaves the palette via Tab or mouse interaction.
+     *
+     * @param {{closeMenus?: boolean, blur?: boolean}} options
+     * @returns {void}
+     */
+    resetKeyboardNavigation(options = {}) {
+        const { closeMenus = false, blur = false } = options;
+
+        this._keyboardNavActive = false;
+        this._navSection = "type";
+        this._navTypeIndex = 0;
+        this._navBlockIndex = 0;
+        this._navPaletteBlockIndex = 0;
+        this.activePalette = null;
+        this._clearPendingMenuOpen();
+        this._clearKeyboardFocus();
+
+        if (closeMenus) {
+            for (const name in this.dict) {
+                if (this.dict[name] && typeof this.dict[name].hideMenu === "function") {
+                    this.dict[name].hideMenu();
+                }
+            }
+            this._hideMenus();
+        }
+
+        if (blur) {
+            docById("palette")?.blur?.();
+        }
     }
 
     /**
@@ -677,6 +763,7 @@ class Palettes {
 
     getPluginMacroExpansion(blkname, x, y) {
         const obj = this.pluginMacros[blkname];
+        // eslint-disable-next-line eqeqeq
         if (obj != null) {
             obj[0][2] = x;
             obj[0][3] = y;
@@ -851,6 +938,7 @@ class Palettes {
         // Hide the menu buttons and the palettes themselves.
 
         this.activity.hideSearchWidget(true);
+        this.activePalette = null;
 
         if (docById("PaletteBody"))
             docById("PaletteBody").parentNode.removeChild(docById("PaletteBody"));
@@ -863,6 +951,7 @@ class Palettes {
     }
 
     updatePalettes(showPalette) {
+        // eslint-disable-next-line eqeqeq
         if (showPalette != null) {
             // Show the action palette after adding/deleting new
             // nameddo blocks.
@@ -892,87 +981,34 @@ class Palettes {
         docById("palette").style.visibility = "visible";
     }
 
-    clear() {
-        try {
-            // First hide all palettes
-            for (const name in this.dict) {
-                if (Object.prototype.hasOwnProperty.call(this.dict, name)) {
-                    const palette = this.dict[name];
-                    if (palette && typeof palette.hideMenu === "function") {
-                        palette.hideMenu();
-                    }
+    reinitialize(palettes) {
+        // First hide all palettes
+        for (const name in this.dict) {
+            if (Object.prototype.hasOwnProperty.call(this.dict, name)) {
+                const palette = this.dict[name];
+                if (palette && typeof palette.hideMenu === "function") {
+                    palette.hideMenu();
                 }
             }
-
-            // Remove the palette DOM element if it exists
-            const paletteElement = docById("palette");
-            if (paletteElement) {
-                paletteElement.parentNode.removeChild(paletteElement);
-            }
-
-            // Clear the dictionary and reset state
-            this.dict = {};
-            this.visible = false;
-            this.activePalette = null;
-            this.paletteObject = null;
-
-            // Recreate the palette using the original initialization code
-            const element = document.createElement("div");
-            element.id = "palette";
-            element.setAttribute("class", "disable_highlighting");
-            element.classList.add("flex-palette");
-            element.setAttribute(
-                "style",
-                `position: fixed; z-index: 1000; left: 0px; top: ${
-                    60 + this.top
-                }px; overflow-y: auto;`
-            );
-            element.innerHTML = `<div style="height:fit-content">
-                    <table width="${1.5 * this.cellSize}" bgcolor="white">
-                        <thead>
-                            <tr></tr>
-                        </thead>
-                    </table>
-                    <table width="${4.5 * this.cellSize}" bgcolor="white">
-                        <thead>
-                            <tr>
-                                <td style= "width:28px"></td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>`;
-            element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
-            document.body.appendChild(element);
-
-            const toggleBtn = document.createElement("div");
-            toggleBtn.innerHTML = "◀";
-            toggleBtn.id = "paletteToggle";
-
-            toggleBtn.style.position = "absolute";
-            toggleBtn.style.top = "12px";
-            toggleBtn.style.right = "-18px";
-            toggleBtn.style.width = "22px";
-            toggleBtn.style.height = "40px";
-            toggleBtn.style.display = "flex";
-            toggleBtn.style.alignItems = "center";
-            toggleBtn.style.justifyContent = "center";
-            toggleBtn.style.cursor = "pointer";
-            toggleBtn.style.background = platformColor.selectorSelected;
-            toggleBtn.style.color = "white";
-
-            toggleBtn.style.borderRadius = "0 6px 6px 0";
-            toggleBtn.style.boxShadow = "0 2px 4px rgba(0,0,0,0.15)";
-            toggleBtn.style.fontWeight = "bold";
-            toggleBtn.style.fontSize = "14px";
-
-            toggleBtn.onclick = () => this.toggleCollapse();
-
-            element.appendChild(toggleBtn);
-        } catch (e) {
-            console.error("Error clearing palettes:", e);
         }
+
+        // Remove the palette DOM element if it exists
+        const paletteElement = docById("palette");
+        if (paletteElement) {
+            paletteElement.parentNode.removeChild(paletteElement);
+        }
+
+        // Clear the dictionary and reset state
+        this.dict = {};
+        this.visible = false;
+        this.activePalette = null;
+        this.paletteObject = null;
+
+        // Initialize palettes
+        initPalettes(palettes);
+
+        // Reset palette collapsed state
+        this.collapsed = false;
     }
 
     setBlocks(blocks) {
@@ -987,22 +1023,23 @@ class Palettes {
 
     // Palette Button event handlers
     _loadPaletteButtonHandler(name, row) {
-        let timeout;
-
         row.onmouseover = () => {
             if (name === "search") {
                 document.body.style.cursor = "text";
             } else {
                 document.body.style.cursor = "pointer";
-                clearTimeout(timeout);
-                timeout = setTimeout(() => this.showPalette(name), 400);
+                this._clearPendingMenuOpen();
+                this._menuOpenTimeout = setTimeout(() => {
+                    this._menuOpenTimeout = null;
+                    this.showPalette(name);
+                }, 400);
             }
         };
 
-        row.onmouseout = () => clearTimeout(timeout);
+        row.onmouseout = () => this._clearPendingMenuOpen();
 
         row.onclick = () => {
-            if (name == "search") {
+            if (name === "search") {
                 this._hideMenus();
                 this.activity.showSearchWidget();
             } else {
@@ -1224,7 +1261,7 @@ class PaletteModel {
                 label = _("pitch converter");
                 break;
             default:
-                if (blkname != modname) {
+                if (blkname !== modname) {
                     // Override label for do, storein, box, and namedarg
                     if (blkname === "storein" && block.defaults[0] === _("box")) {
                         label = _("store in");
@@ -1261,7 +1298,8 @@ class PaletteModel {
                 "calcArg",
                 "nameddoArg",
                 "namedcalcArg"
-            ].indexOf(protoBlock.name) != -1 &&
+            ].indexOf(protoBlock.name) !== -1 &&
+            // eslint-disable-next-line eqeqeq
             label != null
         ) {
             if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
@@ -1318,11 +1356,13 @@ class PaletteModel {
             artwork = artwork
                 .replace(/fill_color/g, DISABLEDFILLCOLOR)
                 .replace(/stroke_color/g, DISABLEDSTROKECOLOR)
+                .replace(/block_text_color/g, platformColor.blockText)
                 .replace("block_label", safeSVG(label));
         } else {
             artwork = artwork
                 .replace(/fill_color/g, PALETTEFILLCOLORS[protoBlock.palette.name])
                 .replace(/stroke_color/g, PALETTESTROKECOLORS[protoBlock.palette.name])
+                .replace(/block_text_color/g, platformColor.blockText)
                 .replace("block_label", safeSVG(label));
         }
 
@@ -1504,7 +1544,7 @@ class Palette {
         const blocks = this.model.blocks;
         blocks.reverse();
         const protoListScope = [...this.protoList];
-        if (last(blocks).blkname != last(protoListScope).name) protoListScope.reverse();
+        if (last(blocks).blkname !== last(protoListScope).name) protoListScope.reverse();
         const fragment = document.createDocumentFragment();
         for (const blk in blocks) {
             const b = blocks[blk];
@@ -1544,10 +1584,14 @@ class Palette {
                 // to make it positioned relative to the body
                 document.body.appendChild(img);
 
+                // Cache dimensions once to avoid forced layout on every mousemove
+                const halfW = img.offsetWidth / 2;
+                const halfH = img.offsetHeight / 2;
+
                 // centers the img at (pageX, pageY) coordinates
                 const moveAt = (pageX, pageY) => {
-                    img.style.left = pageX - img.offsetWidth / 2 + "px";
-                    img.style.top = pageY - img.offsetHeight / 2 + "px";
+                    img.style.left = pageX - halfW + "px";
+                    img.style.top = pageY - halfH + "px";
                 };
 
                 const onMouseMove = e => {
@@ -1956,7 +2000,7 @@ class Palette {
                 // Add variables first
                 for (let i = 0; i < foundVariables.length; i++) {
                     const [blockId, blockType] = foundVariables[i];
-                    const block = activity.blocks.blockList[blockId];
+                    const block = this.activity.blocks.blockList[blockId];
                     const isLastVar = i === foundVariables.length - 1;
                     const hasBoxes = boxBlocks.length > 0;
 
@@ -1987,7 +2031,7 @@ class Palette {
                 // Then add box blocks
                 for (let i = 0; i < boxBlocks.length; i++) {
                     const boxBlockId = boxBlocks[i];
-                    const boxBlock = activity.blocks.blockList[boxBlockId];
+                    const boxBlock = this.activity.blocks.blockList[boxBlockId];
 
                     statusBlocks.push([
                         lastBlockIndex + 1,

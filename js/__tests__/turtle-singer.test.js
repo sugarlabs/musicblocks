@@ -28,7 +28,8 @@ const mockGlobals = {
     isCustomTemperament: jest.fn(),
     getStepSizeUp: jest.fn().mockReturnValue(1),
     numberToPitch: jest.fn().mockReturnValue(["C", 4]),
-    pitchToNumber: jest.fn().mockReturnValue(60)
+    pitchToNumber: jest.fn().mockReturnValue(60),
+    getTemperament: jest.fn().mockReturnValue({ pitchNumber: 12 })
 };
 
 global.getNote = mockGlobals.getNote;
@@ -36,6 +37,7 @@ global.isCustomTemperament = mockGlobals.isCustomTemperament;
 global.getStepSizeUp = mockGlobals.getStepSizeUp;
 global.numberToPitch = mockGlobals.numberToPitch;
 global.pitchToNumber = mockGlobals.pitchToNumber;
+global.getTemperament = mockGlobals.getTemperament;
 global.last = jest.fn(array => array[array.length - 1]);
 global.deepClone = value => {
     if (typeof structuredClone === "function") {
@@ -983,5 +985,105 @@ describe("scalarDistance edge cases", () => {
     test("should return negative distance when lastNote < firstNote", () => {
         const result = Singer.scalarDistance(logoMock, turtleMock, 65, 60);
         expect(result).toBeLessThanOrEqual(0);
+    });
+});
+
+describe("processPitch internal addPitch behavior", () => {
+    let turtleMock;
+    let activityMock;
+
+    beforeEach(() => {
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+
+        const blk = "blk";
+        turtleMock.singer.notePitches = { [blk]: [] };
+        turtleMock.singer.noteOctaves = { [blk]: [] };
+        turtleMock.singer.noteCents = { [blk]: [] };
+        turtleMock.singer.noteHertz = { [blk]: [] };
+        turtleMock.singer.noteBeatValues = { [blk]: [] };
+        turtleMock.singer.inNoteBlock = [];
+        activityMock = createActivityMock(turtleMock);
+        activityMock.logo.clearNoteParams = jest.fn((tur, blkId) => {
+            tur.singer.notePitches[blkId] = [];
+            tur.singer.noteOctaves[blkId] = [];
+            tur.singer.noteCents[blkId] = [];
+            tur.singer.noteHertz[blkId] = [];
+            tur.singer.noteBeatValues[blkId] = [];
+        });
+
+        // Prevent deep runtime execution
+        // Mocking processNote to isolate pitch-processing behavior.
+        // Full execution requires playback/scheduling subsystems,
+        // which are outside the scope of this regression test.
+        jest.spyOn(Singer, "processNote").mockImplementation(() => {});
+    });
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    test("should push pitch data through internal addPitch", () => {
+        const blk = "blk";
+        Singer.processPitch(activityMock, "C", 4, 0, turtleMock, blk);
+        expect(turtleMock.singer.notePitches[blk].length).toBe(1);
+        expect(turtleMock.singer.noteOctaves[blk].length).toBe(1);
+        expect(turtleMock.singer.noteCents[blk][0]).toBe(0);
+        expect(turtleMock.singer.noteHertz[blk][0]).toBe(0);
+        expect(turtleMock.singer.pushedNote).toBe(true);
+    });
+
+    test("should map pitch to drum when drumStyle is active", () => {
+        const blk = "blk";
+        turtleMock.singer.drumStyle = ["snare"];
+        Singer.processPitch(activityMock, "C", 4, 0, turtleMock, blk);
+        expect(Object.keys(turtleMock.singer.pitchDrumTable).length).toBe(1);
+    });
+
+    test("should compute hertz when cents is non-zero", () => {
+        const blk = "blk";
+        Singer.processPitch(activityMock, "C", 4, 50, turtleMock, blk);
+        expect(turtleMock.singer.noteHertz[blk][0]).toBe(440);
+    });
+
+    test("should compute hertz when cents is negative", () => {
+        const blk = "blk";
+        Singer.processPitch(activityMock, "C", 4, -25, turtleMock, blk);
+        expect(turtleMock.singer.noteHertz[blk][0]).toBe(440);
+    });
+
+    test("should store correct pitch-to-drum mapping", () => {
+        const blk = "blk";
+        turtleMock.singer.drumStyle = ["snare"];
+        Singer.processPitch(activityMock, "C", 4, 0, turtleMock, blk);
+        const mapping = turtleMock.singer.pitchDrumTable;
+        expect(mapping["C4"]).toBe("snare");
+    });
+
+    it("should maintain consistent state relationships when updating pitch (invariant)", () => {
+        const blk = "blk";
+        Singer.processPitch(activityMock, "C", 4, 0, turtleMock, blk);
+
+        const after = turtleMock.singer;
+
+        // invariant: pitch should be added
+        expect(after.notePitches[blk].length).toBeGreaterThan(0);
+
+        // invariant: beat values align with number of pitches
+        expect(after.noteBeatValues[blk].length).toBe(after.notePitches[blk].length);
+
+        // invariant: octave + cents structure still valid
+        expect(after.noteOctaves[blk].length).toBe(after.notePitches[blk].length);
+        expect(after.noteCents[blk].length).toBe(after.notePitches[blk].length);
+    });
+
+    it("should not mutate previously computed pitch data across calls (regression)", () => {
+        const blk = "blk";
+        Singer.processPitch(activityMock, "C", 4, 0, turtleMock, blk);
+        const firstState = [...turtleMock.singer.notePitches[blk]];
+        Singer.processPitch(activityMock, "D", 4, 0, turtleMock, blk);
+
+        // regression guard: previous data should not be overwritten unexpectedly
+        expect(firstState.length).toBe(1);
+        expect(turtleMock.singer.notePitches[blk].length).toBe(2);
     });
 });

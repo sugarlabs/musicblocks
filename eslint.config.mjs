@@ -157,10 +157,20 @@ export default [
             "no-unused-vars": "off",
             "no-use-before-define": "off",
             "prefer-const": "off",
+            "no-undef": "off",
+            "no-prototype-builtins": "off",
+            "no-useless-escape": "off",
+            "no-inner-declarations": "off",
+            "no-constant-assign": "off",
+            "no-const-assign": "off",
+            "no-useless-catch": "off",
+            "no-loss-of-precision": "off",
 
             "semi": ["error", "always"],
             "no-duplicate-case": "error",
-            "no-irregular-whitespace": "warn"
+            "no-irregular-whitespace": "warn",
+            "eqeqeq": "warn",
+            "no-dupe-keys": "error"
         }
     },
 

@@ -38,8 +38,8 @@
    importMembers, isSVGEmpty, last, mixedNumber, nearestBeat,
    oneHundredToFraction, prepareMacroExports, preparePluginExports,
    processMacroData, processRawPluginData, rationalSum, rgbToHex,
-   safeSVG, toFixed2, toTitleCase, windowHeight, windowWidth,
-    fnBrowserDetect, waitForReadiness
+   safeSVG, safeJSONParse, toFixed2, toTitleCase, windowHeight, windowWidth,
+    fnBrowserDetect, waitForReadiness, isSafeUrl
 */
 
 /**
@@ -58,13 +58,39 @@ const changeImage = (imgElement, from, to) => {
 };
 
 /**
+ * Safely parses a JSON string, wrapping the operation in a try/catch block
+ * to prevent the application from crashing on malformed JSON payload data (e.g. from localStorage).
+ *
+ * @function
+ * @param {string} data - The JSON string to parse
+ * @param {*} fallback - The fallback value to return if JSON.parse throws an error. Defaults to null.
+ * @returns {*} The successfully parsed Object/Array, or the fallback value upon failure.
+ */
+const safeJSONParse = (data, fallback = null) => {
+    if (typeof data !== "string" || !data) return fallback;
+    try {
+        return JSON.parse(data);
+    } catch (e) {
+        console.warn("Failed to safely parse JSON:", e);
+        return fallback;
+    }
+};
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports.safeJSONParse = safeJSONParse;
+}
+if (typeof window !== "undefined") {
+    window.safeJSONParse = safeJSONParse;
+}
+
+/**
  * Enhanced _() method to handle case variations for translations
  * prioritize exact matches and preserve the case of the input text.
  * @function
  * @param {string} text - The input text to be translated.
  * @returns {string} The translated text.
  */
-// eslint-disable-next-line no-redeclare
+
 function _(text, options = {}) {
     if (!text) return "";
 
@@ -442,7 +468,7 @@ window.onload = () => {
         );
     }
 
-    if (typeof DetectVersionOfIE != "undefined") {
+    if (typeof DetectVersionOfIE !== "undefined") {
         document.body.innerHTML = "<div style='margin: 200px;'>";
         document.body.innerHTML +=
             "<h1 style='font-size: 100px; font-family: Arial; text-align: center; color: #F00;'>Music Blocks</h1>";
@@ -656,59 +682,125 @@ if (typeof window !== "undefined") {
 }
 
 /**
+ * Escapes HTML special characters to prevent XSS when injecting
+ * user-provided values into HTML.
+ * @param {string} str - The string to escape.
+ * @returns {string} The escaped string safe for HTML insertion.
+ */
+function escapeHTML(str) {
+    const escapeMap = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+    };
+    return String(str).replace(/[&<>"']/g, char => escapeMap[char]);
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports.escapeHTML = escapeHTML;
+}
+if (typeof window !== "undefined") {
+    window.escapeHTML = escapeHTML;
+}
+
+/**
+ * Validates that a URL string uses a safe protocol (http or https).
+ * Uses the URL API for robust parsing instead of fragile regex patterns.
+ * This prevents open redirect attacks via javascript:, data:, vbscript:,
+ * or other dangerous URI schemes.
+ * @param {string} urlString - The URL string to validate.
+ * @returns {boolean} True if the URL uses http: or https: protocol.
+ */
+function isSafeUrl(urlString) {
+    try {
+        const parsed = new URL(urlString);
+        return parsed.protocol === "http:" || parsed.protocol === "https:";
+    } catch (e) {
+        return false;
+    }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports.isSafeUrl = isSafeUrl;
+}
+if (typeof window !== "undefined") {
+    window.isSafeUrl = isSafeUrl;
+}
+
+/**
  * Processes plugin data and updates the activity based on the provided JSON-encoded dictionary.
  * @param {object} activity - The activity object to update.
  * @param {string} pluginData - The JSON-encoded plugin data.
  * @returns {object|null} The processed plugin data object or null if parsing fails.
  */
-const processPluginData = (activity, pluginData, pluginSource) => {
+const processPluginData = async (activity, pluginData, pluginSource) => {
     // Plugins are JSON-encoded dictionaries.
     if (pluginData === undefined) {
         return null;
     }
 
-    const isTrustedPluginSource = src => {
-        if (!src) return false;
-
-        // allow only local paths
-        return (
-            src.startsWith("./") ||
-            src.startsWith("../") ||
-            src.startsWith("/") ||
-            (!src.includes("http://") && !src.includes("https://"))
-        );
+    const isVettedPlugin = source => {
+        if (!source) return false;
+        // Plugins from the local plugins folder are considered vetted (provenance)
+        if (source.startsWith("plugins/") || source.startsWith("./plugins/")) {
+            return true;
+        }
+        // Known plugins from local storage are also trusted as they were approved previously
+        if (source === "localStorage:plugins") {
+            return true;
+        }
+        return false;
     };
 
-    const safeEval = (code, label = "plugin") => {
-        if (typeof code !== "string") return;
+    // Use the vetted check to determine initial trust
+    let userConfirmed = isVettedPlugin(pluginSource);
 
-        // basic sanity limit (prevents huge payloads)
+    if (!userConfirmed) {
+        userConfirmed = confirm(
+            _("Security Warning") +
+                "\n\n" +
+                _(
+                    "This plugin contains code that will be executed in your browser. It has not been loaded from the built-in plugins directory and may contain unsafe code."
+                ) +
+                "\n\n" +
+                _("Do you want to allow this plugin to run?") +
+                "\n\n" +
+                _("Source: ") +
+                (pluginSource || _("unknown"))
+        );
+
+        if (!userConfirmed) {
+            console.warn("User declined unvetted plugin execution:", pluginSource);
+            return null;
+        }
+    }
+
+    // We accumulate scripts that need to be executed in a Blob URL to avoid unsafe-eval.
+    let blobScriptContent = "";
+    const pendingSafeEvals = [];
+
+    const safeEval = (code, label = "plugin") => {
+        if (typeof code !== "string" || !userConfirmed) return;
+
+        // Basic sanity limit
         if (code.length > 500000) {
             console.warn("Plugin code too large:", label);
             return;
         }
 
-        // NOTE: This eval is required for the Plugin system to load dynamic block definitions.
-        // The content comes from plugin JSON files which satisfy the isTrustedPluginSource check.
-        try {
-            eval(code);
-        } catch (e) {
-            console.error("Plugin execution failed:", label, e);
-        }
+        // We wrap the code in a closure that provides activity and globalActivity.
+        // We'll execute these after the Blob script is loaded and populates the registry.
+        pendingSafeEvals.push({ code, label });
     };
-
-    if (!isTrustedPluginSource(pluginSource)) {
-        console.warn("Blocked untrusted plugin source:", pluginSource);
-        return null;
-    }
 
     let obj;
     try {
         obj = JSON.parse(pluginData);
-    } catch (e) {
-        console.log(pluginData);
-
-        console.log(e);
+    } catch (error) {
+        console.error(`PluginProcessor: Failed to parse plugin data from source "${pluginSource}":`, error);
+        console.debug("Malformed plugin data:", pluginData);
         return null;
     }
     // Create a palette entry.
@@ -792,21 +884,20 @@ const processPluginData = (activity, pluginData, pluginSource) => {
     // compiled into a function for hot-path execution.
     if ("FLOWPLUGINS" in obj) {
         for (const flow in obj["FLOWPLUGINS"]) {
-            try {
-                // SECURITY: Plugins are trusted code.
-                activity.logo.evalFlowDict[flow] = new Function(
-                    "logo",
-                    "turtle",
-                    "blk",
-                    "receivedArg",
-                    "actionArgs",
-                    "args",
-                    "isflow",
-                    obj["FLOWPLUGINS"][flow]
-                );
-            } catch (e) {
-                console.error("Failed to compile FLOWPLUGIN:", flow, e);
-                activity.logo.evalFlowDict[flow] = null;
+            // Pre-compile trusted plugins for performance.
+            // UNTRUSTED plugins (if any made it past confirmation) are stored as strings
+            // and handled via whitelist in safePluginExecute.
+            if (isVettedPlugin(pluginSource)) {
+                const flowCode = obj["FLOWPLUGINS"][flow];
+                const registryName = `flow_${flow}_${Math.random().toString(36).substr(2, 9)}`;
+                blobScriptContent += `
+window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, receivedArg, actionArgs, args, isflow) {
+    ${flowCode}
+};
+`;
+                activity.logo.evalFlowDict[flow] = registryName; // Will be replaced by function after load
+            } else {
+                activity.logo.evalFlowDict[flow] = obj["FLOWPLUGINS"][flow];
             }
         }
     }
@@ -814,24 +905,17 @@ const processPluginData = (activity, pluginData, pluginSource) => {
     // Populate the arg-block dictionary
     if ("ARGPLUGINS" in obj) {
         for (const arg in obj["ARGPLUGINS"]) {
-            try {
-                // Pre-compile the plugin code into a function to avoid eval() in parseArg
-                // NOTE: Plugins are trusted code.
-                // SECURITY: Only safe because ARGPLUGINS are trusted code.
-                // new Function is used intentionally to precompile plugin execution.
-                // Standard scope exposure: logo, turtle, blk, parentBlk, receivedArg, tur
-                activity.logo.evalArgDict[arg] = new Function(
-                    "logo",
-                    "turtle",
-                    "blk",
-                    "parentBlk",
-                    "receivedArg",
-                    "tur",
-                    obj["ARGPLUGINS"][arg]
-                );
-            } catch (e) {
-                console.error("Failed to compile ARGPLUGIN:", arg, e);
-                activity.logo.evalArgDict[arg] = null;
+            if (isVettedPlugin(pluginSource)) {
+                const argCode = obj["ARGPLUGINS"][arg];
+                const registryName = `arg_${arg}_${Math.random().toString(36).substr(2, 9)}`;
+                blobScriptContent += `
+window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, parentBlk, receivedArg, tur) {
+    ${argCode}
+};
+`;
+                activity.logo.evalArgDict[arg] = registryName;
+            } else {
+                activity.logo.evalArgDict[arg] = obj["ARGPLUGINS"][arg];
             }
         }
     }
@@ -853,18 +937,17 @@ const processPluginData = (activity, pluginData, pluginSource) => {
     // Populate the setter dictionary
     if ("SETTERPLUGINS" in obj) {
         for (const setter in obj["SETTERPLUGINS"]) {
-            try {
-                // SECURITY: Plugins are trusted code.
-                activity.logo.evalSetterDict[setter] = new Function(
-                    "logo",
-                    "blk",
-                    "value",
-                    "turtle",
-                    obj["SETTERPLUGINS"][setter]
-                );
-            } catch (e) {
-                console.error("Failed to compile SETTERPLUGIN:", setter, e);
-                activity.logo.evalSetterDict[setter] = null;
+            if (isVettedPlugin(pluginSource)) {
+                const setterCode = obj["SETTERPLUGINS"][setter];
+                const registryName = `setter_${setter}_${Math.random().toString(36).substr(2, 9)}`;
+                blobScriptContent += `
+window.__mb_plugin_registry["${registryName}"] = function(logo, blk, value, turtle) {
+    ${setterCode}
+};
+`;
+                activity.logo.evalSetterDict[setter] = registryName;
+            } else {
+                activity.logo.evalSetterDict[setter] = obj["SETTERPLUGINS"][setter];
             }
         }
     }
@@ -889,17 +972,17 @@ const processPluginData = (activity, pluginData, pluginSource) => {
 
     if ("PARAMETERPLUGINS" in obj) {
         for (const parameter in obj["PARAMETERPLUGINS"]) {
-            try {
-                // SECURITY: Plugins are trusted code.
-                activity.logo.evalParameterDict[parameter] = new Function(
-                    "logo",
-                    "turtle",
-                    "blk",
-                    obj["PARAMETERPLUGINS"][parameter]
-                );
-            } catch (e) {
-                console.error("Failed to compile PARAMETERPLUGIN:", parameter, e);
-                activity.logo.evalParameterDict[parameter] = null;
+            if (isVettedPlugin(pluginSource)) {
+                const paramCode = obj["PARAMETERPLUGINS"][parameter];
+                const registryName = `param_${parameter}_${Math.random().toString(36).substr(2, 9)}`;
+                blobScriptContent += `
+window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk) {
+    ${paramCode}
+};
+`;
+                activity.logo.evalParameterDict[parameter] = registryName;
+            } else {
+                activity.logo.evalParameterDict[parameter] = obj["PARAMETERPLUGINS"][parameter];
             }
         }
     }
@@ -914,12 +997,17 @@ const processPluginData = (activity, pluginData, pluginSource) => {
     // Code to execute when turtle code is started
     if ("ONSTART" in obj) {
         for (const arg in obj["ONSTART"]) {
-            try {
-                // SECURITY: Plugins are trusted code.
-                activity.logo.evalOnStartList[arg] = new Function("logo", obj["ONSTART"][arg]);
-            } catch (e) {
-                console.error("Failed to compile ONSTART plugin:", arg, e);
-                activity.logo.evalOnStartList[arg] = null;
+            if (isVettedPlugin(pluginSource)) {
+                const onStartCode = obj["ONSTART"][arg];
+                const registryName = `onstart_${arg}_${Math.random().toString(36).substr(2, 9)}`;
+                blobScriptContent += `
+window.__mb_plugin_registry["${registryName}"] = function(logo) {
+    ${onStartCode}
+};
+`;
+                activity.logo.evalOnStartList[arg] = registryName;
+            } else {
+                activity.logo.evalOnStartList[arg] = obj["ONSTART"][arg];
             }
         }
     }
@@ -927,14 +1015,101 @@ const processPluginData = (activity, pluginData, pluginSource) => {
     // Code to execute when turtle code is stopped
     if ("ONSTOP" in obj) {
         for (const arg in obj["ONSTOP"]) {
-            try {
-                // SECURITY: Plugins are trusted code.
-                activity.logo.evalOnStopList[arg] = new Function("logo", obj["ONSTOP"][arg]);
-            } catch (e) {
-                console.error("Failed to compile ONSTOP plugin:", arg, e);
-                activity.logo.evalOnStopList[arg] = null;
+            if (isVettedPlugin(pluginSource)) {
+                const onStopCode = obj["ONSTOP"][arg];
+                const registryName = `onstop_${arg}_${Math.random().toString(36).substr(2, 9)}`;
+                blobScriptContent += `
+window.__mb_plugin_registry["${registryName}"] = function(logo) {
+    ${onStopCode}
+};
+`;
+                activity.logo.evalOnStopList[arg] = registryName;
+            } else {
+                activity.logo.evalOnStopList[arg] = obj["ONSTOP"][arg];
             }
         }
+    }
+
+    // Now execute the Blob script injection if we have collected any trusted code
+    if (blobScriptContent) {
+        window.__mb_plugin_registry = window.__mb_plugin_registry || {};
+        const fullScript = `
+(function() {
+    window.__mb_plugin_registry = window.__mb_plugin_registry || {};
+    ${blobScriptContent}
+})();
+`;
+        const blob = new Blob([fullScript], { type: "application/javascript" });
+        const url = URL.createObjectURL(blob);
+        const script = document.createElement("script");
+        script.src = url;
+
+        await new Promise((resolve, reject) => {
+            script.onload = () => {
+                URL.revokeObjectURL(url);
+                resolve();
+            };
+            script.onerror = e => {
+                URL.revokeObjectURL(url);
+                console.error("Failed to load CSP Blob script for plugins", e);
+                reject(e);
+            };
+            document.head.appendChild(script);
+        });
+
+        // Map Registry back to dictionaries
+        const mapDict = dict => {
+            for (const key in dict) {
+                if (typeof dict[key] === "string" && dict[key].indexOf("_") !== -1) {
+                    const registryName = dict[key];
+                    if (window.__mb_plugin_registry[registryName]) {
+                        dict[key] = window.__mb_plugin_registry[registryName];
+                        delete window.__mb_plugin_registry[registryName];
+                    }
+                }
+            }
+        };
+
+        mapDict(activity.logo.evalFlowDict);
+        mapDict(activity.logo.evalArgDict);
+        mapDict(activity.logo.evalSetterDict);
+        mapDict(activity.logo.evalParameterDict);
+        mapDict(activity.logo.evalOnStartList);
+        mapDict(activity.logo.evalOnStopList);
+    }
+
+    // Finally, execute safeEvals by creating new Blob scripts for each setup logic block.
+    // This is because even setup logic can be blocked by CSP if it contains unsafe-eval.
+    for (const item of pendingSafeEvals) {
+        const registryName = `setup_${item.label.replace(/[^a-zA-Z0-9]/g, "_")}_${Math.random().toString(36).substr(2, 9)}`;
+        const setupScript = `
+window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivity) {
+    ${item.code}
+};
+`;
+        const sBlob = new Blob([setupScript], { type: "application/javascript" });
+        const sUrl = URL.createObjectURL(sBlob);
+        const sScript = document.createElement("script");
+        sScript.src = sUrl;
+        await new Promise(resolve => {
+            sScript.onload = () => {
+                if (window.__mb_plugin_registry[registryName]) {
+                    try {
+                        window.__mb_plugin_registry[registryName](activity, activity);
+                    } catch (e) {
+                        console.error("Plugin setup failed:", item.label, e);
+                    }
+                    delete window.__mb_plugin_registry[registryName];
+                }
+                URL.revokeObjectURL(sUrl);
+                resolve();
+            };
+            sScript.onerror = () => {
+                URL.revokeObjectURL(sUrl);
+                resolve(); // Still resolve to let others run
+            };
+            document.head.appendChild(sScript);
+        });
     }
 
     for (const protoblock in activity.blocks.protoBlockDict) {
@@ -969,11 +1144,12 @@ const processPluginData = (activity, pluginData, pluginSource) => {
 
 /**
  * Processes raw plugin data, removes blank lines and comments, and then calls `processPluginData` to update the activity.
+ * @async
  * @param {object} activity - The activity object to update.
  * @param {string} rawData - Raw plugin data to process.
- * @returns {object|null} The processed plugin data object or null if parsing fails.
+ * @returns {Promise<object|null>} The processed plugin data object or null if parsing fails.
  */
-const processRawPluginData = (activity, rawData, pluginSource) => {
+const processRawPluginData = async (activity, rawData, pluginSource) => {
     const lineData = rawData.split("\n");
     let cleanData = "";
 
@@ -995,7 +1171,7 @@ const processRawPluginData = (activity, rawData, pluginSource) => {
     // try/catch while debugging your plugin.
     let obj;
     try {
-        obj = processPluginData(activity, cleanData.replace(/\n/g, ""), pluginSource);
+        obj = await processPluginData(activity, cleanData.replace(/\n/g, ""), pluginSource);
     } catch (e) {
         obj = null;
 
@@ -1257,7 +1433,16 @@ function doStopVideoCam(cameraID, setCameraID) {
     }
 
     setCameraID(null);
-    document.querySelector("#camVideo").pause();
+    const video = document.querySelector("#camVideo");
+    if (video) {
+        video.pause();
+        if (video.srcObject) {
+            const tracks = video.srcObject.getTracks();
+            tracks.forEach(track => track.stop());
+            video.srcObject = null;
+        }
+    }
+    CameraManager.reset();
 }
 
 /**
@@ -1467,6 +1652,21 @@ const LCD = (a, b) => {
  * @returns {Array} The sum of the two rational numbers in the form [numerator, denominator].
  */
 let rationalSum = (a, b) => {
+    if (
+        !Array.isArray(a) ||
+        a.length < 2 ||
+        !Array.isArray(b) ||
+        b.length < 2 ||
+        typeof a[0] !== "number" ||
+        typeof a[1] !== "number" ||
+        typeof b[0] !== "number" ||
+        typeof b[1] !== "number" ||
+        a[1] === 0 ||
+        b[1] === 0
+    ) {
+        console.warn("Invalid input passed to rationalSum:", a, b);
+        return [0, 1];
+    }
     if (a === 0 || b === 0) {
         // console.debug("divide by zero?");
         return [0, 1];
@@ -1875,6 +2075,7 @@ if (typeof module !== "undefined" && module.exports) {
         closeWidgets,
         closeBlkWidgets,
         resolveObject,
-        importMembers
+        importMembers,
+        escapeHTML
     };
 }

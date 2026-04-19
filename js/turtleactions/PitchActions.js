@@ -22,7 +22,7 @@
 
 /*
    globals Singer, pitchToNumber, getStepSizeUp, getStepSizeDown, calcOctave, last, getNote,
-   nthDegreeToPitch, SHARP, FLAT, _, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
+   nthDegreeToPitch, SHARP, FLAT, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    numberToPitch, ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
    keySignatureToMode, getInterval, EFFECTSNAMES, NANERRORMSG, frequencyToPitch,
    MusicBlocks, Mouse, isCustomTemperament
@@ -42,7 +42,7 @@
         MusicBlocks, Mouse
     - js/utils/musicutils.js
         pitchToNumber, getStepSizeUp, getStepSizeDown, calcOctave, getNote, nthDegreeToPitch,
-        SHARP, FLAT, _, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE, numberToPitch,
+        SHARP, FLAT, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE, numberToPitch,
         ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
         keySignatureToMode, getInterval, frequencyToPitch, isCustomTemperament
 */
@@ -184,7 +184,13 @@ function setupPitchActions(activity) {
             number = Math.abs(number);
 
             const obj = keySignatureToMode(tur.singer.keySignature);
-            const modeLength = MUSICALMODES[obj[1]].length;
+            let modeLength;
+
+            if (isCustomTemperament(activity.logo.synth.inTemperament)) {
+                modeLength = Singer.IntervalsActions.getTemperamentLength();
+            } else {
+                modeLength = MUSICALMODES[obj[1]].length;
+            }
             let scaleDegree;
 
             // Choose a reference based on the key selected.
@@ -234,7 +240,7 @@ function setupPitchActions(activity) {
                 scaleDegree = (number % modeLength) + 1;
             }
 
-            const [note, offset] = nthDegreeToPitch(tur.singer.keySignature, scaleDegree);
+            const [note, _offset] = nthDegreeToPitch(tur.singer.keySignature, scaleDegree);
             let semitones = ref;
             semitones += NOTESFLAT.includes(note)
                 ? NOTESFLAT.indexOf(note) - ref
@@ -283,7 +289,8 @@ function setupPitchActions(activity) {
                     pitchNumber + tur.singer.pitchNumberOffset,
                     activity.logo.synth.inTemperament,
                     activity.logo.synth.startingPitch,
-                    tur.singer.pitchNumberOffset
+                    tur.singer.pitchNumberOffset,
+                    activity
                 );
                 Singer.processPitch(activity, obj[0], obj[1], 0, turtle, blk);
                 return;
@@ -553,7 +560,12 @@ function setupPitchActions(activity) {
         static numToPitch(number, outType, turtle) {
             if (number !== null && typeof number === "number") {
                 const obj = numberToPitch(
-                    Math.floor(number) + activity.turtles.ithTurtle(turtle).singer.pitchNumberOffset
+                    Math.floor(number) +
+                        activity.turtles.ithTurtle(turtle).singer.pitchNumberOffset,
+                    undefined,
+                    undefined,
+                    undefined,
+                    activity
                 );
                 if (outType === "pitch") {
                     return obj[0];
@@ -561,7 +573,7 @@ function setupPitchActions(activity) {
                     return obj[1];
                 }
             } else {
-                throw "NoArgError";
+                throw new Error("NoArgError");
             }
         }
 
@@ -591,6 +603,7 @@ function setupPitchActions(activity) {
         static deltaPitch(outType, turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
 
+            // eslint-disable-next-line eqeqeq
             if (tur.singer.previousNotePlayed == null) {
                 return 0;
             } else {

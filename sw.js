@@ -1,3 +1,14 @@
+// Copyright (c) 2014-26 Sugar Labs
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
 /*
   global
 
@@ -31,7 +42,7 @@ self.addEventListener("activate", function (event) {
     console.log("[PWA Builder] Claiming clients for current page");
     event.waitUntil(self.clients.claim());
 });
-/*
+
 function isPrecachedRequest(request) {
     try {
         const url = new URL(request.url);
@@ -100,22 +111,14 @@ function shouldCacheResponse(request, response) {
     // Only cache responses for allowlisted requests (static assets + explicit precache URLs).
     return isStaticAssetRequest(request) || isPrecachedRequest(request);
 }
-*/
-// Filter out unsupported URL schemes before caching
+
 function updateCache(request, response) {
     // Cache API only supports http:// and https:// requests.
-    // Attempting to cache other schemes (e.g. chrome-extension://, moz-extension://)
-    // throws a TypeError. We silently skip them to avoid flooding the console
-    // with repeated errors that obscure real issues.
     if (!request.url.startsWith("http")) {
         return Promise.resolve();
     }
 
-    // Partial responses (HTTP 206) cannot be cached reliably
-    // because they represent incomplete content (e.g. range requests).
-    // Caching them could serve corrupt or incomplete data later.
-    if (response.status === 206) {
-        console.log("Partial response is unsupported for caching.");
+    if (!shouldCacheResponse(request, response)) {
         return Promise.resolve();
     }
 
@@ -124,6 +127,7 @@ function updateCache(request, response) {
         return cache.put(request, response);
     });
 }
+
 function fromCache(request) {
     // Check to see if you have it in the cache
     // Return response

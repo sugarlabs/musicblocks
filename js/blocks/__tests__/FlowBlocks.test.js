@@ -279,6 +279,31 @@ describe("FlowBlocks integration", () => {
         expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, blk);
     });
 
+    test("DuplicateBlock releases lock even when critical section throws", () => {
+        const block = getBlock("duplicatenotes");
+        const blk = 0;
+
+        // Set up a minimal blockList that will cause an error during
+        // the connection-breaking loop (accessing undefined block)
+        activity.blocks.blockList = {
+            0: { name: "duplicatenotes", connections: [null, 1, null, 2] },
+            1: { name: "visibleA", connections: [0, 99] }
+        };
+        activity.blocks.findBottomBlock = jest.fn(() => 1);
+        // Block 99 doesn't exist, so accessing blockList[99].name will throw
+        logo.connectionStore = { 0: {} };
+        logo.connectionStoreLock = false;
+
+        // The flow should not propagate the error (try/finally handles it)
+        // but the lock MUST be released afterward
+        expect(() => {
+            block.flow([2, 1], logo, 0, blk, ["arg"]);
+        }).toThrow();
+
+        // The critical guarantee: lock is released even after an error
+        expect(logo.connectionStoreLock).toBe(false);
+    });
+
     test("DefaultCaseBlock validates switch context", () => {
         const block = getBlock("defaultcase");
         const blk = 2;

@@ -1563,4 +1563,37 @@ describe("AST2BlockList Class", () => {
         let blockList = AST2BlockList.toBlockList(AST, config);
         expect(blockList).toEqual(expectedBlockList);
     });
+
+    test("should generate heap blocks from JS", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.print(mouse.HEAP);
+            await mouse.print(mouse.HEAPLENGTH);
+            await mouse.print(mouse.HEAPEMPTY);
+            await mouse.emptyHeap();
+            await mouse.reverseHeap();
+            await mouse.push(9);
+            await mouse.setHeapEntry(2, 5);
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        let blockList = AST2BlockList.toBlockList(AST, config);
+        const blockNames = blockList.map(block =>
+            Array.isArray(block[1]) ? block[1][0] : block[1]
+        );
+
+        expect(blockNames).toEqual(
+            expect.arrayContaining([
+                "heap",
+                "heapLength",
+                "heapEmpty",
+                "emptyHeap",
+                "reverseHeap",
+                "push",
+                "setHeapEntry"
+            ])
+        );
+    });
 });

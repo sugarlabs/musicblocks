@@ -22,6 +22,14 @@
 
 // Set up globals required by oscilloscope.js
 global._ = str => str;
+global.platformColor = {
+    fillColor: "#F9F9F9",
+    textColor: "#000000",
+    strokeColor: "#E2E2E2",
+    background: "#303030",
+    selectorBackground: "#64B5F6",
+    selectorSelected: "#1E88E5"
+};
 global.BIGGERBUTTON = "<svg>bigger</svg>";
 global.SMALLERBUTTON = "<svg>smaller</svg>";
 global.base64Encode = str => str;
@@ -80,11 +88,7 @@ function createMockWidgetWindow() {
     };
 }
 
-// Load the Oscilloscope class by reading the source and wrapping it
-// so the class is assigned to global (class declarations are block-scoped)
-const fs = require("fs");
-const path = require("path");
-const oscilloscopeSource = fs.readFileSync(path.resolve(__dirname, "../oscilloscope.js"), "utf-8");
+const Oscilloscope = require("../oscilloscope.js");
 
 let mockWidgetWindow;
 
@@ -95,10 +99,6 @@ window.widgetWindows = {
     _posCache: {},
     windowFor: jest.fn(() => mockWidgetWindow)
 };
-
-// Wrap source: execute the class definition and assign to global
-const wrappedSource = oscilloscopeSource + "\nglobal.Oscilloscope = Oscilloscope;\n";
-new Function(wrappedSource)();
 
 beforeEach(() => {
     mockWidgetWindow = createMockWidgetWindow();

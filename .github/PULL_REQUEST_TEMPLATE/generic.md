@@ -56,6 +56,7 @@ This PR fixes #
 -   [ ] I have followed the project's coding style guidelines.
 -   [ ] I have run `npm run lint` and `npx prettier --check .` with no errors.
 -   [ ] I have addressed the code review feedback from the previous submission, if applicable.
+-   [ ] I have enabled **"Allow edits from maintainers"** _(required for auto-rebase; this only affects the PR branch, not your fork)_.
 
 ## Additional Notes for Reviewers
 

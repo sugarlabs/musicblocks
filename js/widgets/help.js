@@ -41,6 +41,7 @@ class HelpWidget {
         this.appendedBlockList = [];
         this.index = 0;
         this.isOpen = true;
+        this._prevKeyHandler = document.onkeydown;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help", false);
         //widgetWindow.getWidgetBody().style.overflowY = "auto";
@@ -51,9 +52,18 @@ class HelpWidget {
         widgetWindow.show();
         widgetWindow.onclose = () => {
             this.isOpen = false;
-            document.onkeydown = activity.__keyPressed;
+            document.onkeydown = this._prevKeyHandler;
             widgetWindow.destroy();
+            // Trigger the hint only if they were on the first page of the tour
+            if (this.index === 0 && typeof this.activity.textMsg === "function") {
+                this.activity.textMsg(
+                    _(
+                        "Start by dragging a block from the left panel and connect it to the Start block."
+                    )
+                );
+            }
         };
+
         // Position the widget and make it visible.
         this._helpDiv = document.createElement("div");
 
@@ -79,8 +89,12 @@ class HelpWidget {
         // this._helpDiv.style.overflowY = "auto";
 
         const innerHTML = `
-                    <div id="right-arrow" class="hover" tabindex="-1"></div>
-                    <div id="left-arrow" class="hover" tabindex="-1"></div>
+                    <div id="right-arrow" class="hover" tabindex="0" role="button" aria-label="${_(
+                        "Next"
+                    )}"></div>
+                    <div id="left-arrow" class="hover" tabindex="0" role="button" aria-label="${_(
+                        "Previous"
+                    )}"></div>
                     <div id="helpButtonsDiv" tabindex="-1"></div>
                     <div id="helpScrollWrapper">
                         <div id="helpBodyDiv" tabindex="-1"></div>
@@ -92,7 +106,7 @@ class HelpWidget {
 
         let leftArrow, rightArrow;
         if (!useActiveBlock) {
-            if (page == 0) {
+            if (page === 0) {
                 this.widgetWindow.updateTitle(_("Take a tour"));
             } else {
                 this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
@@ -125,7 +139,7 @@ class HelpWidget {
                 if (page > 0) {
                     page = page - 1;
                     leftArrow.classList.remove("disabled");
-                    if (page == 0) {
+                    if (page === 0) {
                         this.widgetWindow.updateTitle(_("Take a tour"));
                     } else {
                         this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
@@ -155,7 +169,7 @@ class HelpWidget {
                 const label =
                     this.activity.blocks.blockList[this.activity.blocks.activeBlock].protoblock
                         .staticLabels[0];
-                if (page == 0) {
+                if (page === 0) {
                     this.widgetWindow.updateTitle(_("Take a tour"));
                 } else {
                     this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
@@ -232,7 +246,7 @@ class HelpWidget {
 
                         switch (language) {
                             case "ja":
-                                if (localStorage.kanaPreference == "kana") {
+                                if (localStorage.kanaPreference === "kana") {
                                     path = path + "-kana";
                                 } else {
                                     path = path + "-ja";
@@ -354,9 +368,9 @@ class HelpWidget {
             ].includes(HELPCONTENT[page][0])
         ) {
             // body = body + '<p>&nbsp;<img src="' + HELPCONTENT[page][2] + '"></p>';
-            body = `<figure>&nbsp;<img src=" ${HELPCONTENT[page][2]}"></figure>`;
+            body = `<figure><img src="${HELPCONTENT[page][2]}" alt="${HELPCONTENT[page][0]} icon" loading="lazy"></figure>`;
         } else {
-            body = `<figure>&nbsp;<img src=" ${HELPCONTENT[page][2]}" width="64px" height="64px"></figure>`;
+            body = `<figure><img src="${HELPCONTENT[page][2]}" alt="${HELPCONTENT[page][0]} icon" loading="lazy" width="64px" height="64px"></figure>`;
         }
 
         const helpContentHTML = `<h1 class="heading">${HELPCONTENT[page][0]}</h1> 
@@ -368,7 +382,7 @@ class HelpWidget {
         if (HELPCONTENT[page].length > 3) {
             const link = HELPCONTENT[page][3];
             // console.debug(page + " " + link);
-            body += `<p><a href="${link}" target="_blank">${HELPCONTENT[page][4]}</a></p>`;
+            body += `<p><a href="${link}" target="_blank" rel="noopener noreferrer">${HELPCONTENT[page][4]}</a></p>`;
         }
 
         if ([_("Congratulations.")].includes(HELPCONTENT[page][0])) {
@@ -398,7 +412,7 @@ class HelpWidget {
                 if (page > 0) {
                     page = page - 1;
                     leftArrow.classList.remove("disabled");
-                    if (page == 0) {
+                    if (page === 0) {
                         this.widgetWindow.updateTitle(_("Take a tour"));
                     } else {
                         this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
@@ -469,7 +483,11 @@ class HelpWidget {
         // this._helpDiv.style.backgroundColor = "#e8e8e8";
 
         const helpDivHTML =
-            '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpScrollWrapper"><div id="helpBodyDiv" tabindex="-1"></div></div>';
+            '<div id="right-arrow" class="hover" tabindex="0" role="button" aria-label="' +
+            _("Next") +
+            '"></div><div id="left-arrow" class="hover" tabindex="0" role="button" aria-label="' +
+            _("Previous") +
+            '"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpScrollWrapper"><div id="helpBodyDiv" tabindex="-1"></div></div>';
         this._helpDiv.insertAdjacentHTML("afterbegin", helpDivHTML);
 
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
@@ -485,7 +503,7 @@ class HelpWidget {
             }
         };
 
-        if (this.index == this.appendedBlockList.length - 1) {
+        if (this.index === this.appendedBlockList.length - 1) {
             rightArrow.classList.add("disabled");
         }
         cell.onclick = () => {
@@ -500,7 +518,7 @@ class HelpWidget {
         cell = docById("left-arrow");
 
         cell.onclick = () => {
-            if (this.index == 0) {
+            if (this.index === 0) {
                 const widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
                 this.widgetWindow = widgetWindow;
                 widgetWindow.clear();
@@ -564,7 +582,7 @@ class HelpWidget {
 
                     switch (language) {
                         case "ja":
-                            if (localStorage.kanaPreference == "kana") {
+                            if (localStorage.kanaPreference === "kana") {
                                 path = path + "-kana";
                             } else {
                                 path = path + "-ja";

@@ -10,8 +10,18 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 /*
+   global debugLog
+*/
+
+/*
    exported CacheManager
 */
+
+const cacheDebugLog = (...args) => {
+    if (typeof debugLog === "function") {
+        debugLog(...args);
+    }
+};
 
 /**
  * CacheManager - Handles IndexedDB caching for Planet projects
@@ -60,7 +70,7 @@ class CacheManager {
             // Clean up expired entries on init
             await this.clearExpired();
 
-            console.debug("[CacheManager] Initialized successfully");
+            cacheDebugLog("[CacheManager] Initialized successfully");
             return true;
         } catch (error) {
             console.error("[CacheManager] Initialization failed:", error);
@@ -141,7 +151,7 @@ class CacheManager {
 
             return null;
         } catch (error) {
-            console.debug("[CacheManager] Error getting metadata:", error);
+            cacheDebugLog("[CacheManager] Error getting metadata:", error);
             return null;
         }
     }
@@ -168,7 +178,7 @@ class CacheManager {
             await this._enforceMaxSize(this.STORES.METADATA);
             return true;
         } catch (error) {
-            console.debug("[CacheManager] Error caching metadata:", error);
+            cacheDebugLog("[CacheManager] Error caching metadata:", error);
             return false;
         }
     }
@@ -191,7 +201,7 @@ class CacheManager {
 
             return null;
         } catch (error) {
-            console.debug("[CacheManager] Error getting project:", error);
+            cacheDebugLog("[CacheManager] Error getting project:", error);
             return null;
         }
     }
@@ -218,7 +228,7 @@ class CacheManager {
             await this._enforceMaxSize(this.STORES.PROJECTS);
             return true;
         } catch (error) {
-            console.debug("[CacheManager] Error caching project:", error);
+            cacheDebugLog("[CacheManager] Error caching project:", error);
             return false;
         }
     }
@@ -282,12 +292,12 @@ class CacheManager {
             try {
                 cleared += await this._clearExpiredFromStore(storeName, now);
             } catch (error) {
-                console.debug(`[CacheManager] Error clearing expired from ${storeName}:`, error);
+                cacheDebugLog(`[CacheManager] Error clearing expired from ${storeName}:`, error);
             }
         }
 
         if (cleared > 0) {
-            console.debug(`[CacheManager] Cleared ${cleared} expired entries`);
+            cacheDebugLog(`[CacheManager] Cleared ${cleared} expired entries`);
         }
 
         return cleared;
@@ -433,7 +443,7 @@ class CacheManager {
                 });
             }
 
-            console.debug("[CacheManager] All cache cleared");
+            cacheDebugLog("[CacheManager] All cache cleared");
             return true;
         } catch (error) {
             console.error("[CacheManager] Error clearing cache:", error);
