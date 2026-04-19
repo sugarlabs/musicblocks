@@ -177,89 +177,6 @@ function AIWidget() {
             this.activity.errorMsg(_("Warning: Sample is bigger than 1MB."), this.timbreBlock);
         }
     };
-    function adjustPitch(note, keySignature) {
-        const accidental = keySignature.accidentals.find(acc => {
-            const noteToCompare = acc.note.toUpperCase().replace(",", "");
-            note = note.replace(",", "");
-            return noteToCompare.toLowerCase() === note.toLowerCase();
-        });
-
-        if (accidental) {
-            return note + (accidental.acc === "sharp" ? "♯" : accidental.acc === "flat" ? "♭" : "");
-        } else {
-            return note;
-        }
-    }
-    //when converting to pitch value from abc to mb there is issue with the pithc standard comming out to be odd, using below function map the pitch to audible pitch
-    function abcToStandardValue(pitchValue) {
-        const octave = Math.floor(pitchValue / 7) + 4;
-        return octave;
-    }
-    //creates  pitch which consist of note pitch notename you could see them in the function
-    function createPitchBlocks(
-        pitches,
-        blockId,
-        pitchDuration,
-        keySignature,
-        actionBlock,
-        triplet,
-        meterDen
-    ) {
-        const blocks = [];
-
-        const pitch = pitches;
-        pitchDuration = toFraction(pitchDuration);
-        const adjustedNote = adjustPitch(pitch.name, keySignature).toUpperCase();
-        if (triplet !== null) {
-            pitchDuration[1] = meterDen * triplet;
-        }
-
-        actionBlock.push(
-            [
-                blockId,
-                ["newnote", { collapsed: true }],
-                0,
-                0,
-                [blockId - 1, blockId + 1, blockId + 4, blockId + 8]
-            ],
-            [blockId + 1, "divide", 0, 0, [blockId, blockId + 2, blockId + 3]],
-            [blockId + 2, ["number", { value: pitchDuration[0] }], 0, 0, [blockId + 1]],
-            [blockId + 3, ["number", { value: pitchDuration[1] }], 0, 0, [blockId + 1]],
-            [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]],
-            [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
-            [blockId + 6, ["notename", { value: adjustedNote }], 0, 0, [blockId + 5]],
-            [
-                blockId + 7,
-                ["number", { value: abcToStandardValue(pitch.pitch) }],
-                0,
-                0,
-                [blockId + 5]
-            ],
-            [blockId + 8, "hidden", 0, 0, [blockId, blockId + 9]]
-        );
-
-        return blocks;
-    }
-
-    // Fast index lookup — builds a one-time Map for O(1) repeated searches
-    // on the same array, with a transparent fallback to linear scan.
-    const _indexMaps = new WeakMap();
-    function searchIndexForMusicBlock(array, x) {
-        let map = _indexMaps.get(array);
-        // Cache an index map on the array using WeakMap to convert O(n) array scanning
-        // into O(1) map lookups. Rebuild the map if the array length changes.
-        if (!map || array.length !== map.size) {
-            map = new Map();
-            for (let i = 0; i < array.length; i++) {
-                if (array[i] && array[i][0] !== undefined) {
-                    map.set(array[i][0], i);
-                }
-            }
-            _indexMaps.set(array, map);
-        }
-        const index = map.get(x);
-        return index !== undefined ? index : -1;
-    }
 
     this._parseABC = async function (tune) {
         const musicBlocksJSON = [];
@@ -1289,5 +1206,95 @@ function AIWidget() {
 
         // Single DOM append — all elements are now in the fragment
         this.widgetWindow.getWidgetBody().appendChild(fragment);
+    };
+}
+
+function adjustPitch(note, keySignature) {
+    const accidental = keySignature.accidentals.find(acc => {
+        const noteToCompare = acc.note.toUpperCase().replace(",", "");
+        note = note.replace(",", "");
+        return noteToCompare.toLowerCase() === note.toLowerCase();
+    });
+
+    if (accidental) {
+        return note + (accidental.acc === "sharp" ? "♯" : accidental.acc === "flat" ? "♭" : "");
+    } else {
+        return note;
+    }
+}
+
+//when converting to pitch value from abc to mb there is issue with the pithc standard comming out to be odd, using below function map the pitch to audible pitch
+function abcToStandardValue(pitchValue) {
+    const octave = Math.floor(pitchValue / 7) + 4;
+    return octave;
+}
+
+//creates  pitch which consist of note pitch notename you could see them in the function
+function createPitchBlocks(
+    pitches,
+    blockId,
+    pitchDuration,
+    keySignature,
+    actionBlock,
+    triplet,
+    meterDen
+) {
+    const blocks = [];
+
+    const pitch = pitches;
+    pitchDuration = toFraction(pitchDuration);
+    const adjustedNote = adjustPitch(pitch.name, keySignature).toUpperCase();
+    if (triplet !== null) {
+        pitchDuration[1] = meterDen * triplet;
+    }
+
+    actionBlock.push(
+        [
+            blockId,
+            ["newnote", { collapsed: true }],
+            0,
+            0,
+            [blockId - 1, blockId + 1, blockId + 4, blockId + 8]
+        ],
+        [blockId + 1, "divide", 0, 0, [blockId, blockId + 2, blockId + 3]],
+        [blockId + 2, ["number", { value: pitchDuration[0] }], 0, 0, [blockId + 1]],
+        [blockId + 3, ["number", { value: pitchDuration[1] }], 0, 0, [blockId + 1]],
+        [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]],
+        [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
+        [blockId + 6, ["notename", { value: adjustedNote }], 0, 0, [blockId + 5]],
+        [blockId + 7, ["number", { value: abcToStandardValue(pitch.pitch) }], 0, 0, [blockId + 5]],
+        [blockId + 8, "hidden", 0, 0, [blockId, blockId + 9]]
+    );
+
+    return blocks;
+}
+
+// Fast index lookup — builds a one-time Map for O(1) repeated searches
+// on the same array, with a transparent fallback to linear scan.
+const _indexMaps = new WeakMap();
+function searchIndexForMusicBlock(array, x) {
+    let map = _indexMaps.get(array);
+    // Cache an index map on the array using WeakMap to convert O(n) array scanning
+    // into O(1) map lookups. Rebuild the map if the array length changes.
+    if (!map || array.length !== map.size) {
+        map = new Map();
+        for (let i = 0; i < array.length; i++) {
+            if (array[i] && array[i][0] !== undefined) {
+                map.set(array[i][0], i);
+            }
+        }
+        _indexMaps.set(array, map);
+    }
+    const index = map.get(x);
+    return index !== undefined ? index : -1;
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        AIWidget,
+        adjustPitch,
+        abcToStandardValue,
+        createPitchBlocks,
+        searchIndexForMusicBlock
     };
 }
