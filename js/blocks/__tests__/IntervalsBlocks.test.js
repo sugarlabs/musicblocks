@@ -65,6 +65,7 @@ describe("setupIntervalsBlocks", () => {
 
         global._ = jest.fn(msg => msg);
         global.last = jest.fn(arr => arr[arr.length - 1]);
+        global.deepClone = obj => JSON.parse(JSON.stringify(obj));
 
         global.ValueBlock = DummyValueBlock;
         global.FlowBlock = DummyFlowBlock;
@@ -737,7 +738,7 @@ describe("setupIntervalsBlocks", () => {
             expect(logo.setDispatchBlock).toHaveBeenCalledWith(
                 "blkArp",
                 turtleIndex,
-                "_duplicate_0"
+                "_duplicate_0_blkArp"
             );
             expect(logo.setTurtleListener).toHaveBeenCalled();
             expect(global.Queue).toHaveBeenCalled();
