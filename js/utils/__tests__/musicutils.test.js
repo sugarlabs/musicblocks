@@ -2302,13 +2302,13 @@ describe("_calculate_pitch_number", () => {
     });
 
     it("calculates pitch number for a standard note string", () => {
-        const val = _calculate_pitch_number(activity, "C4", tur);
+        const val = _calculate_pitch_number("C", 4, 0);
         expect(typeof val).toBe("number");
     });
 
     it("calculates pitch number relative to another note", () => {
-        const valC4 = _calculate_pitch_number(activity, "C4", tur);
-        const valC5 = _calculate_pitch_number(activity, "C5", tur);
+        const valC4 = _calculate_pitch_number("C", 4, 0);
+        const valC5 = _calculate_pitch_number("C", 5, 0);
         expect(valC5).toBeGreaterThan(valC4);
     });
 });
