@@ -24,7 +24,7 @@
    exported
 
    debounce, getCookie, setCookie, hideOnClickOutside,
-   updateCheckboxes
+   updateCheckboxes, buildShareURL, buildEmbedSnippet
 */
 
 function debounce(func, wait, immediate) {
@@ -114,6 +114,45 @@ function hideOnClickOutside(eles, other) {
     document.addEventListener("click", outsideClickListener);
 }
 
+/**
+ * buildShareURL(id, options)
+ * Construct a Music Blocks share URL for a given project id.
+ *
+ * @param {string} id - Project ID
+ * @param {object} [options] - Optional flags
+ * @param {boolean} [options.run]      - Append &run=True
+ * @param {boolean} [options.show]     - Append &show=True
+ * @param {boolean} [options.collapse] - Append &collapse=True
+ * @returns {string} Full share URL
+ */
+function buildShareURL(id, options) {
+    let url = `https://musicblocks.sugarlabs.org/index.html?id=${encodeURIComponent(id)}`;
+    if (options) {
+        if (options.run) url += "&run=True";
+        if (options.show) url += "&show=True";
+        if (options.collapse) url += "&collapse=True";
+    }
+    return url;
+}
+
+/**
+ * buildEmbedSnippet(url)
+ * Build an <iframe> embed snippet string for the given share URL.
+ *
+ * @param {string} url - A Music Blocks share URL
+ * @returns {string} Ready-to-paste iframe HTML
+ */
+function buildEmbedSnippet(url) {
+    return (
+        `<iframe src="${url}" ` +
+        `width="400" height="300" ` +
+        `frameborder="0" ` +
+        `allowfullscreen ` +
+        `sandbox="allow-scripts allow-same-origin">` +
+        `</iframe>`
+    );
+}
+
 function updateCheckboxes(id) {
     const elements = document.getElementById(id).querySelectorAll("input:checked");
     const urlel = document.getElementById(id).querySelectorAll("input[type=text]")[0];
@@ -122,6 +161,39 @@ function updateCheckboxes(id) {
     for (let i = 0; i < elements.length; i++) url += `&${elements[i].name}=True`;
 
     urlel.value = url;
+
+    // Sync social share buttons if present
+    const projectId = id.replace("global-sharebox-", "");
+    const shareboxEl = document.getElementById(id);
+    const projectName = shareboxEl ? shareboxEl.getAttribute("data-projectname") || "" : "";
+    const socialText = projectName
+        ? `${_("Check out this Music Blocks project")} "${projectName}"!`
+        : _("Check out this Music Blocks project!");
+
+    const twitterBtn = document.getElementById(`global-share-twitter-${projectId}`);
+    if (twitterBtn) {
+        twitterBtn.href = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(socialText)}`;
+    }
+
+    const whatsappBtn = document.getElementById(`global-share-whatsapp-${projectId}`);
+    if (whatsappBtn) {
+        whatsappBtn.href = `https://wa.me/?text=${encodeURIComponent(`${socialText} ${url}`)}`;
+    }
+
+    // Sync embed snippet textarea and copy button
+    const embedArea = document.getElementById(`global-embed-${projectId}`);
+    if (embedArea) {
+        embedArea.value = buildEmbedSnippet(url);
+    }
+
+    const embedCopyBtn = document.getElementById(`global-copy-embed-${projectId}`);
+    if (embedCopyBtn) {
+        embedCopyBtn.setAttribute("data-clipboard-text", buildEmbedSnippet(url));
+    }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { buildShareURL, buildEmbedSnippet };
 }
 
 $(document).ready(() => {
