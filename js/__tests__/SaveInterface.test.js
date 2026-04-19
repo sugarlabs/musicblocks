@@ -66,28 +66,13 @@ global.docById = jest.fn(id => document.getElementById(id));
 global.docByClass = jest.fn(classname => document.getElementsByClassName(classname));
 global.mockRunLogoCommands = jest.fn();
 global.mockDownload = jest.fn();
-// Load SaveInterface with an AMD-compatible require shim.
+// Load SaveInterface using CommonJS export (added for Jest compatibility)
 // Jest's CommonJS require does not support the RequireJS pattern:
 //     require(["module"], callback)
 // Since SaveInterface.js uses this pattern for lazy-loaded exports,
 // we load it manually with a custom require that detects array arguments
 // and immediately invokes the callback (globals are already mocked above).
-const fs = require("fs");
-const path = require("path");
-
-const _jestRequire = require;
-const _amdRequire = function (moduleName, callback) {
-    if (Array.isArray(moduleName) && typeof callback === "function") {
-        callback();
-        return;
-    }
-    return _jestRequire(moduleName);
-};
-
-const _moduleObj = { exports: {} };
-const _code = fs.readFileSync(path.resolve(__dirname, "../SaveInterface.js"), "utf8");
-new Function("require", "module", "exports", _code)(_amdRequire, _moduleObj, _moduleObj.exports);
-const { SaveInterface } = _moduleObj.exports;
+const { SaveInterface } = require("../SaveInterface");
 const { escapeHTML } = require("../utils/utils");
 global.escapeHTML = escapeHTML;
 const util = require("util");
@@ -99,7 +84,6 @@ global.normalizeNoteAccidentals = note => {
 };
 const { LILYPONDHEADER } = require("../lilypond");
 global.LILYPONDHEADER = LILYPONDHEADER;
-global.instance = new SaveInterface();
 
 describe("SaveInterface", () => {
     let mockActivity;
@@ -141,11 +125,17 @@ describe("download", () => {
         };
         instance = new SaveInterface(mockActivity);
         document.body.innerHTML = "";
-        mockDownloadURL = jest.spyOn(instance, "downloadURL"); // Spy on downloadURL
+        delete window.MBDialog;
+        mockDownloadURL = jest.spyOn(instance, "downloadURL");
         Object.defineProperty(window, "prompt", {
             writable: true,
             value: jest.fn(() => "My Project.abc")
         });
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+        jest.restoreAllMocks();
     });
 
     it("should set correct filename and extension when defaultfilename is provided", () => {
@@ -168,7 +158,68 @@ describe("download", () => {
         expect(mockDownloadURL).toHaveBeenCalledWith("My Project.xml", "data");
     });
 
-    instance = new SaveInterface();
+    it("should handle null data safely in download", () => {
+        const other = new SaveInterface({
+            PlanetInterface: { getCurrentProjectName: () => "Test" }
+        });
+        const spy = jest.spyOn(other, "downloadURL");
+        other.download("abc", null, null);
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it("should NOT download when user cancels prompt", () => {
+        const other = new SaveInterface({
+            PlanetInterface: { getCurrentProjectName: () => "Test" }
+        });
+        window.prompt = jest.fn(() => null);
+        const spy = jest.spyOn(other, "downloadURL");
+        other.download("abc", "data", null);
+        expect(spy).not.toHaveBeenCalled();
+    });
+
+    it("should handle empty extension gracefully", () => {
+        const other = new SaveInterface({
+            PlanetInterface: { getCurrentProjectName: () => "Test" }
+        });
+        const spy = jest.spyOn(other, "downloadURL");
+        other.download("", "data", "file");
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it("should sanitize filename with spaces", () => {
+        const other = new SaveInterface({
+            PlanetInterface: { getCurrentProjectName: () => "My Project Name" }
+        });
+        delete window.MBDialog;
+        window.prompt = jest.fn(() => "My Project Name.abc");
+        const spy = jest.spyOn(other, "downloadURL");
+        other.download("abc", "data", null);
+        expect(spy).toHaveBeenCalledWith("My Project Name.abc", "data");
+    });
+
+    it("should use MBDialog prompt when available", async () => {
+        const mockPrompt = jest.fn(() => Promise.resolve("file"));
+        window.MBDialog = { prompt: mockPrompt };
+        const other = new SaveInterface({
+            PlanetInterface: { getCurrentProjectName: () => "Test" }
+        });
+        await other.download("abc", "data", null);
+        expect(mockPrompt).toHaveBeenCalled();
+    });
+});
+
+describe("downloadURL", () => {
+    let instance;
+    const mockActivity = { PlanetInterface: { getCurrentProjectName: jest.fn(() => "Test") } };
+
+    beforeEach(() => {
+        instance = new SaveInterface(mockActivity);
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+        jest.restoreAllMocks();
+    });
 
     it("should create an anchor tag and trigger a download", () => {
         const filename = "test.txt";
@@ -191,15 +242,20 @@ describe("download", () => {
         expect(document.body.appendChild).toHaveBeenCalled();
         expect(document.body.removeChild).toHaveBeenCalled();
     });
-    afterEach(() => {
-        jest.restoreAllMocks();
+
+    it("should revoke object URL after download", () => {
+        global.URL.revokeObjectURL = jest.fn();
+        instance.downloadURL("file.txt", "blob:url");
+        expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:url");
     });
 });
 
 describe("save HTML methods", () => {
+    let instance;
     let activity;
 
     beforeEach(() => {
+        jest.useFakeTimers();
         activity = {
             htmlSaveTemplate:
                 "<html><body><h1>{{ project_name }}</h1><p>{{ project_description }}</p><img src='{{ project_image }}'/><div>{{ data }}</div></body></html>",
@@ -210,6 +266,13 @@ describe("save HTML methods", () => {
                 getCurrentProjectImage: jest.fn(() => "mock-image.png")
             }
         };
+        instance = new SaveInterface(activity);
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+        jest.restoreAllMocks();
+        jest.useRealTimers();
     });
 
     it("should replace placeholders with actual project data", () => {
@@ -257,6 +320,59 @@ describe("save HTML methods", () => {
         expect(escapeHTML("&<>\"'")).toBe("&amp;&lt;&gt;&quot;&#039;");
     });
 
+    it("should handle missing project fields gracefully in prepareHTML", () => {
+        const activity = {
+            PlanetInterface: {
+                getCurrentProjectName: jest.fn(() => null),
+                getCurrentProjectDescription: jest.fn(() => null),
+                getCurrentProjectImage: jest.fn(() => null)
+            },
+            prepareExport: jest.fn(() => null)
+        };
+
+        const si = new SaveInterface(activity);
+        const html = si.prepareHTML();
+
+        expect(html).toBeDefined();
+    });
+
+    it("should handle undefined project name", () => {
+        const activity = {
+            PlanetInterface: {
+                getCurrentProjectName: jest.fn(() => undefined)
+            },
+            prepareExport: jest.fn(() => "data")
+        };
+
+        const si = new SaveInterface(activity);
+        const html = si.prepareHTML();
+
+        expect(html).toBeDefined();
+    });
+
+    it("should handle missing htmlSaveTemplate", () => {
+        const si = new SaveInterface({
+            PlanetInterface: {},
+            prepareExport: () => "data"
+        });
+
+        const html = si.prepareHTML();
+
+        expect(html).toBeDefined();
+    });
+
+    it("should handle empty export data", () => {
+        const activity = {
+            PlanetInterface: {},
+            prepareExport: jest.fn(() => "")
+        };
+
+        const si = new SaveInterface(activity);
+        const html = si.prepareHTML();
+
+        expect(html).toContain("");
+    });
+
     it("should call prepareHTML and download the file", () => {
         const mockPrepareHTML = jest.fn(() => "<html>Mock HTML</html>");
 
@@ -276,8 +392,6 @@ describe("save HTML methods", () => {
             null
         );
     });
-
-    jest.useFakeTimers();
 
     it("should call prepareHTML and download the file with the correct filename", () => {
         const mockPrepareHTML = jest.fn(() => "<html>Mock HTML</html>");
@@ -302,9 +416,27 @@ describe("save HTML methods", () => {
             "data:text/plain;charset=utf-8,%3Chtml%3EMock%20HTML%3C%2Fhtml%3E"
         );
     });
+
+    it("should fallback filename when PlanetInterface is missing", () => {
+        const activity = {
+            save: {
+                prepareHTML: jest.fn(() => "<html></html>"),
+                downloadURL: jest.fn()
+            }
+        };
+
+        instance.saveHTMLNoPrompt(activity);
+        jest.runAllTimers();
+
+        expect(activity.save.downloadURL).toHaveBeenCalledWith(
+            "My_Project.html",
+            expect.any(String)
+        );
+    });
 });
 
 describe("saveMIDI Method", () => {
+    let instance;
     let activity, mockLogo;
 
     beforeEach(() => {
@@ -312,9 +444,13 @@ describe("saveMIDI Method", () => {
             runningMIDI: false,
             runLogoCommands: jest.fn()
         };
-        activity = {
-            logo: mockLogo
-        };
+        activity = { logo: mockLogo };
+        instance = new SaveInterface(activity);
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+        jest.restoreAllMocks();
     });
 
     it("should set runningMIDI to true and run logo commands", () => {
@@ -326,8 +462,12 @@ describe("saveMIDI Method", () => {
 });
 
 describe("afterSaveMIDI", () => {
+    let instance;
+    let mockActivity;
+
     beforeEach(() => {
-        global.activity = {
+        jest.useFakeTimers();
+        mockActivity = {
             logo: {
                 _midiData: {
                     0: [
@@ -350,15 +490,14 @@ describe("afterSaveMIDI", () => {
                 download: jest.fn()
             }
         };
+        instance = new SaveInterface(mockActivity);
+        instance.activity = mockActivity;
 
         global.URL.createObjectURL = jest.fn(() => "mockURL");
-        jest.useFakeTimers();
-
         global.getMidiInstrument = jest.fn(() => ({
             default: 0,
             guitar: 25
         }));
-
         global.getMidiDrum = jest.fn(() => ({
             "snare drum": 38,
             "kick drum": 36
@@ -367,6 +506,8 @@ describe("afterSaveMIDI", () => {
 
     afterEach(() => {
         jest.clearAllMocks();
+        jest.restoreAllMocks();
+        jest.useRealTimers();
     });
 
     it("should generate MIDI and trigger download", () => {
@@ -374,9 +515,16 @@ describe("afterSaveMIDI", () => {
         jest.runAllTimers();
 
         expect(Midi).toHaveBeenCalled();
-        expect(activity.save.download).toHaveBeenCalledWith("midi", "mockURL", null);
-        expect(activity.logo._midiData).toEqual({});
+        expect(mockActivity.save.download).toHaveBeenCalledWith("midi", "mockURL", null);
+        expect(mockActivity.logo._midiData).toEqual({});
         expect(document.body.style.cursor).toBe("default");
+    });
+
+    it("should handle empty MIDI data gracefully", () => {
+        mockActivity.logo._midiData = {};
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+        expect(mockActivity.save.download).toHaveBeenCalled();
     });
 
     it("should create instrument tracks and add notes correctly", () => {
@@ -402,12 +550,20 @@ describe("afterSaveMIDI", () => {
 });
 
 describe("save artwork methods", () => {
+    let instance;
+    const mockActivity = { PlanetInterface: { getCurrentProjectName: jest.fn(() => "Test") } };
+
     beforeEach(() => {
+        instance = new SaveInterface(mockActivity);
         document.body.innerHTML = `
             <canvas id="overlayCanvas"></canvas>
         `;
-
         docById.mockImplementation(id => document.getElementById(id));
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+        jest.restoreAllMocks();
     });
 
     it("should call doSVG and download the SVG file", () => {
@@ -486,9 +642,18 @@ describe("save artwork methods", () => {
 });
 
 describe("saveWAV & saveABC methods", () => {
+    let instance;
+    const mockActivity = { PlanetInterface: { getCurrentProjectName: jest.fn(() => "Test") } };
+
     beforeEach(() => {
+        instance = new SaveInterface(mockActivity);
         global._ = jest.fn(key => key);
         global.ABCHEADER = "X:1\nT:Music Blocks composition\nC:Mr. Mouse\nL:1/16\nM:C\n";
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+        jest.restoreAllMocks();
     });
 
     it("should start audio recording and update UI", () => {
@@ -551,6 +716,44 @@ describe("saveWAV & saveABC methods", () => {
         expect(mockRunLogoCommands).toHaveBeenCalled();
     });
 
+    it("should not crash when already recording", () => {
+        const activity = {
+            logo: {
+                recording: true,
+                synth: {
+                    setupRecorder: jest.fn(),
+                    recorder: { start: jest.fn() }
+                },
+                runLogoCommands: jest.fn()
+            },
+            textMsg: jest.fn()
+        };
+
+        instance.saveWAV(activity);
+        expect(activity.logo.recording).toBe(true);
+    });
+
+    it("should handle empty turtle list in saveAbc", () => {
+        const activity = {
+            logo: {
+                runningAbc: false,
+                recordingBuffer: { hasData: false },
+                notation: {
+                    notationStaging: {},
+                    notationDrumStaging: {}
+                },
+                runLogoCommands: jest.fn()
+            },
+            turtles: {
+                turtleList: [],
+                getTurtleCount: jest.fn(() => 0),
+                getTurtle: jest.fn()
+            }
+        };
+        instance.saveAbc(activity);
+        expect(activity.logo.runningAbc).toBe(true);
+    });
+
     it("should encode and download ABC notation output", () => {
         const mockSaveAbcOutput = jest.fn(() => "mock_abc_data");
 
@@ -566,6 +769,36 @@ describe("saveWAV & saveABC methods", () => {
 
         expect(mockSaveAbcOutput).toHaveBeenCalledWith(activity);
         expect(mockDownload).toHaveBeenCalledWith("abc", "data:text;utf8,mock_abc_data", null);
+    });
+});
+
+describe("beforeunload warning", () => {
+    it("should trigger beforeunload warning when unsaved changes exist", () => {
+        let savedHandler;
+
+        const mockOn = jest.fn((event, handler) => {
+            if (event === "beforeunload") {
+                savedHandler = handler;
+            }
+        });
+
+        global.jQuery = jest.fn(() => ({
+            on: mockOn,
+            trigger: jest.fn()
+        }));
+
+        const instance = new SaveInterface({ beginnerMode: false });
+
+        instance.PlanetInterface = {
+            getTimeLastSaved: () => 100
+        };
+        instance.timeLastSaved = 0;
+
+        const preventDefault = jest.fn();
+
+        savedHandler({ preventDefault });
+
+        expect(preventDefault).toHaveBeenCalled();
     });
 });
 
@@ -694,6 +927,19 @@ describe("saveLilypond Methods", () => {
         document.body.style.cursor = "";
     });
 
+    afterEach(() => {
+        jest.clearAllMocks();
+        if (originalClipboard === undefined) {
+            delete navigator.clipboard;
+        } else {
+            navigator.clipboard = originalClipboard;
+        }
+        Object.defineProperty(window, "isSecureContext", {
+            value: originalSecureContext,
+            configurable: true
+        });
+    });
+
     it("should open the Lilypond modal and populate fields", () => {
         instance.saveLilypond(activity);
 
@@ -720,19 +966,6 @@ describe("saveLilypond Methods", () => {
         saveButton.click();
 
         expect(activity.save.saveLYFile).toHaveBeenCalledWith(false);
-    });
-
-    afterEach(() => {
-        jest.clearAllMocks();
-        if (originalClipboard === undefined) {
-            delete navigator.clipboard;
-        } else {
-            navigator.clipboard = originalClipboard;
-        }
-        Object.defineProperty(window, "isSecureContext", {
-            value: originalSecureContext,
-            configurable: true
-        });
     });
 
     it("should save a Lilypond file with default settings", () => {
@@ -879,7 +1112,6 @@ describe("MXML Methods", () => {
     let instance, activity, mockLogo, mockTurtles;
 
     beforeEach(() => {
-        // Mock turtleList with painters
         const mockPainter1 = { doClear: jest.fn() };
         const mockPainter2 = { doClear: jest.fn() };
 
@@ -893,7 +1125,6 @@ describe("MXML Methods", () => {
             }
         };
 
-        // Mock logo object
         mockLogo = {
             runningMxml: false,
             notation: {
@@ -908,13 +1139,15 @@ describe("MXML Methods", () => {
             turtles: mockTurtles
         };
 
-        // Create SaveInterface instance
-        instance = new SaveInterface();
-        instance.activity = activity;
+        instance = new SaveInterface(activity);
         instance.download = jest.fn();
 
-        // Mock saveMxmlOutput
         global.saveMxmlOutput = jest.fn().mockReturnValue("<score>Mock MXML Data</score>");
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+        jest.restoreAllMocks();
     });
 
     it("should initialize MXML state and clear turtle canvases", () => {

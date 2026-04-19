@@ -294,28 +294,30 @@ class SaveInterface {
     prepareHTML() {
         let file = this.htmlSaveTemplate;
         let description = _("No description provided");
-        if (this.activity.PlanetInterface !== undefined) {
+        if (
+            this.activity.PlanetInterface &&
+            this.activity.PlanetInterface.getCurrentProjectDescription
+        ) {
             description = this.activity.PlanetInterface.getCurrentProjectDescription();
         }
-
         // let author = '';
         // Currently we're using anonymous for authors - not storing names.
         let name = STR_MY_PROJECT;
-        if (this.activity.PlanetInterface !== undefined) {
+        if (this.activity.PlanetInterface && this.activity.PlanetInterface.getCurrentProjectName) {
             name = this.activity.PlanetInterface.getCurrentProjectName();
         }
-
         const data = this.activity.prepareExport();
         let image = "";
-        if (this.activity.PlanetInterface !== undefined) {
+        if (this.activity.PlanetInterface && this.activity.PlanetInterface.getCurrentProjectImage) {
             image = this.activity.PlanetInterface.getCurrentProjectImage();
         }
 
         file = file
-            .replace(new RegExp("{{ project_description }}", "g"), escapeHTML(description))
-            .replace(new RegExp("{{ project_name }}", "g"), escapeHTML(name))
-            .replace(new RegExp("{{ data }}", "g"), escapeHTML(data))
-            .replace(new RegExp("{{ project_image }}", "g"), escapeHTML(image));
+            .replace(/{{ project_description }}/g, escapeHTML(description))
+            .replace(/{{ project_name }}/g, escapeHTML(name))
+            .replace(/{{ data }}/g, escapeHTML(data))
+            .replace(/{{ project_image }}/g, escapeHTML(image));
+
         return file;
     }
 
@@ -466,12 +468,12 @@ class SaveInterface {
             const midiData = midi.toArray();
             const blob = new Blob([midiData], { type: "audio/midi" });
             const url = URL.createObjectURL(blob);
-            activity.save.download("midi", url, null);
+            this.activity.save.download("midi", url, null);
         };
-        const data = activity.logo._midiData;
+        const data = this.activity.logo._midiData;
         setTimeout(() => {
             generateMidi(data);
-            activity.logo._midiData = {};
+            this.activity.logo._midiData = {};
             document.body.style.cursor = "default";
         }, 500);
     }
