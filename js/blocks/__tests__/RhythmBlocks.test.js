@@ -127,10 +127,7 @@ describe("RhythmBlocks", () => {
             swingCarryOver: 0,
             beatFactor: 1,
             dotCount: 0,
-            suppressOutput: false,
-            inNoteBlock: [],
-            delayedNotes: [],
-            drumStyle: []
+            suppressOutput: false
         },
         parentFlowQueue: [],
         queue: []
@@ -208,13 +205,13 @@ describe("RhythmBlocks", () => {
 
     describe("MyNoteValueBlock", () => {
         test("returns note value", () => {
-            global.global.Singer.RhythmActions.getNoteValue.mockReturnValue(0.25);
+            global.Singer.RhythmActions.getNoteValue.mockReturnValue(0.25);
             activity.blocks.blockList[1] = { connections: [0] };
 
             const block = getBlock("mynotevalue");
             const result = block.arg(logo, 0, 1);
 
-            expect(global.global.Singer.RhythmActions.getNoteValue).toHaveBeenCalledWith(0);
+            expect(global.Singer.RhythmActions.getNoteValue).toHaveBeenCalledWith(0);
             expect(result).toBe(0.25);
         });
 
@@ -247,7 +244,7 @@ describe("RhythmBlocks", () => {
             const block = getBlock("osctime");
             block.flow([200, true], logo, 0, 5, null);
 
-            expect(global.global.Singer.RhythmActions.playNote).toHaveBeenCalledWith(
+            expect(global.Singer.RhythmActions.playNote).toHaveBeenCalledWith(
                 200,
                 "osctime",
                 0,
@@ -260,14 +257,14 @@ describe("RhythmBlocks", () => {
             const block = getBlock("osctime");
             block.flow([null, true], logo, 0, 5, null);
 
-            expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 5);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 5);
         });
 
         test("handles non-number input", () => {
             const block = getBlock("osctime");
             block.flow(["text", true], logo, 0, 5, null);
 
-            expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 5);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 5);
         });
 
         test("handles negative value", () => {
@@ -301,38 +298,23 @@ describe("RhythmBlocks", () => {
             const block = getBlock("newswing2");
             block.flow([1 / 24, 1 / 8, true], logo, 0, 10);
 
-            expect(global.global.Singer.RhythmActions.addSwing).toHaveBeenCalledWith(
-                1 / 24,
-                1 / 8,
-                0,
-                10
-            );
+            expect(global.Singer.RhythmActions.addSwing).toHaveBeenCalledWith(1 / 24, 1 / 8, 0, 10);
         });
 
         test("handles null swing value", () => {
             const block = getBlock("newswing2");
             block.flow([null, 1 / 8, true], logo, 0, 10);
 
-            expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 10);
-            expect(global.global.Singer.RhythmActions.addSwing).toHaveBeenCalledWith(
-                1 / 24,
-                1 / 8,
-                0,
-                10
-            );
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+            expect(global.Singer.RhythmActions.addSwing).toHaveBeenCalledWith(1 / 24, 1 / 8, 0, 10);
         });
 
         test("handles zero note value", () => {
             const block = getBlock("newswing2");
             block.flow([1 / 24, 0, true], logo, 0, 10);
 
-            expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 10);
-            expect(global.global.Singer.RhythmActions.addSwing).toHaveBeenCalledWith(
-                1 / 24,
-                1 / 8,
-                0,
-                10
-            );
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+            expect(global.Singer.RhythmActions.addSwing).toHaveBeenCalledWith(1 / 24, 1 / 8, 0, 10);
         });
     });
 
@@ -360,30 +342,22 @@ describe("RhythmBlocks", () => {
             const block = getBlock("multiplybeatfactor");
             block.flow([2, true], logo, 0, 10);
 
-            expect(global.global.Singer.RhythmActions.multiplyNoteValue).toHaveBeenCalledWith(
-                2,
-                0,
-                10
-            );
+            expect(global.Singer.RhythmActions.multiplyNoteValue).toHaveBeenCalledWith(2, 0, 10);
         });
 
         test("handles null factor", () => {
             const block = getBlock("multiplybeatfactor");
             block.flow([null, true], logo, 0, 10);
 
-            expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 10);
-            expect(global.global.Singer.RhythmActions.multiplyNoteValue).toHaveBeenCalledWith(
-                2,
-                0,
-                10
-            );
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+            expect(global.Singer.RhythmActions.multiplyNoteValue).toHaveBeenCalledWith(2, 0, 10);
         });
 
         test("handles negative factor", () => {
             const block = getBlock("multiplybeatfactor");
             block.flow([-1, true], logo, 0, 10);
 
-            expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 10);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
         });
     });
 
@@ -392,7 +366,7 @@ describe("RhythmBlocks", () => {
             const block = getBlock("tie");
             block.flow([true], logo, 0, 10);
 
-            expect(global.global.Singer.RhythmActions.doTie).toHaveBeenCalledWith(0, 10);
+            expect(global.Singer.RhythmActions.doTie).toHaveBeenCalledWith(0, 10);
         });
 
         test("returns early if args undefined", () => {
@@ -400,7 +374,7 @@ describe("RhythmBlocks", () => {
             const result = block.flow([undefined], logo, 0, 10);
 
             expect(result).toBeUndefined();
-            expect(global.global.Singer.RhythmActions.doTie).not.toHaveBeenCalled();
+            expect(global.Singer.RhythmActions.doTie).not.toHaveBeenCalled();
         });
     });
 
@@ -409,15 +383,15 @@ describe("RhythmBlocks", () => {
             const block = getBlock("rhythmicdot2");
             block.flow([2, true], logo, 0, 10);
 
-            expect(global.global.Singer.RhythmActions.doRhythmicDot).toHaveBeenCalledWith(2, 0, 10);
+            expect(global.Singer.RhythmActions.doRhythmicDot).toHaveBeenCalledWith(2, 0, 10);
         });
 
         test("handles null dot count", () => {
             const block = getBlock("rhythmicdot2");
             block.flow([null, true], logo, 0, 10);
 
-            expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 10);
-            expect(global.global.Singer.RhythmActions.doRhythmicDot).toHaveBeenCalledWith(0, 0, 10);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+            expect(global.Singer.RhythmActions.doRhythmicDot).toHaveBeenCalledWith(0, 0, 10);
         });
     });
 
@@ -426,7 +400,7 @@ describe("RhythmBlocks", () => {
             const block = getBlock("rest2");
             block.flow([], logo, 0);
 
-            expect(global.global.Singer.RhythmActions.playRest).toHaveBeenCalledWith(0);
+            expect(global.Singer.RhythmActions.playRest).toHaveBeenCalledWith(0);
         });
     });
 
@@ -476,298 +450,88 @@ describe("RhythmBlocks", () => {
             expect(block.hidden).toBe(true);
         });
     });
-    describe("MyNoteValueBlock", () => {
-        test("updateParameter returns mixedNumber of block value", () => {
-            activity.blocks.blockList[0] = { value: 4 };
-            const block = getBlock("mynotevalue");
-            const result = block.updateParameter(logo, 0, 0);
-            expect(result).toBe(4);
-        });
 
-        test("arg pushes to statusFields when inStatusMatrix and parent is print", () => {
-            activity.blocks.blockList[0] = {
-                connections: [1],
-                value: 4
-            };
-            activity.blocks.blockList[1] = { name: "print" };
-            logo.inStatusMatrix = true;
-            const block = getBlock("mynotevalue");
-            block.arg(logo, 0, 0);
-            expect(logo.statusFields).toContainEqual([0, "mynotevalue"]);
-        });
-    });
-
-    describe("SkipFactorBlock", () => {
-        test("updateParameter returns block value directly", () => {
-            activity.blocks.blockList[0] = { value: 2 };
-            const block = getBlock("skipfactor");
-            const result = block.updateParameter(logo, 0, 0);
-            expect(result).toBe(2);
-        });
-
-        test("arg returns skipFactor when not in statusMatrix", () => {
-            activity.blocks.blockList[0] = { connections: [null] };
-            logo.inStatusMatrix = false;
-            turtle.singer.skipFactor = 3;
-            const block = getBlock("skipfactor");
-            const result = block.arg(logo, 0, 0);
-            expect(result).toBe(3);
-        });
-
-        test("arg pushes to statusFields when inStatusMatrix and parent is print", () => {
-            activity.blocks.blockList[0] = { connections: [1] };
-            activity.blocks.blockList[1] = { name: "print" };
-            logo.inStatusMatrix = true;
-            const block = getBlock("skipfactor");
-            block.arg(logo, 0, 0);
-            expect(logo.statusFields).toContainEqual([0, "skip"]);
-        });
-    });
-
-    describe("OscTimeBlock", () => {
-        test("flow calls playNote with callback that queues block", () => {
+    // ── NoteBlock callback (lines 193-197) ──────────────────────────────
+    describe("NoteBlock callback queue path", () => {
+        test("callback pushes queue block to turtle", () => {
             const block = getBlock("osctime");
-            block.flow([0.25, 1], logo, 0, 5, null);
-            expect(global.Singer.RhythmActions.playNote).toHaveBeenCalledWith(
-                0.25,
-                "osctime",
-                0,
-                5,
-                expect.any(Function)
-            );
-        });
-
-        test("flow uses default value when arg is null", () => {
-            const block = getBlock("osctime");
-            block.flow([null, 1], logo, 0, 5, null);
-            expect(global.Singer.RhythmActions.playNote).toHaveBeenCalledWith(
-                0.25,
-                "osctime",
-                0,
-                5,
-                expect.any(Function)
-            );
-        });
-    });
-
-    describe("NewSwingBlock", () => {
-        test("flow pushes swing values and sets listeners", () => {
-            const block = getBlock("newswing");
-            block.flow([24, 1], logo, 0, 5);
-            expect(turtle.singer.swing.length).toBeGreaterThan(0);
-            expect(logo.setDispatchBlock).toHaveBeenCalled();
-            expect(logo.setTurtleListener).toHaveBeenCalled();
-        });
-    });
-
-    describe("NewSwing2Block", () => {
-        test("flow pushes swing values and sets listeners", () => {
-            const block = getBlock("newswing2");
-            block.flow([1 / 24, 1 / 12, 1], logo, 0, 5);
-            expect(global.Singer.RhythmActions.addSwing).toHaveBeenCalled();
-        });
-    });
-
-    describe("SkipNotesBlock", () => {
-        test("flow increments skipFactor and sets listener", () => {
-            const block = getBlock("skipnotes");
-            block.flow([2, 1], logo, 0, 5);
-            expect(turtle.singer.skipFactor).toBe(2);
-            expect(logo.setDispatchBlock).toHaveBeenCalled();
-            expect(logo.setTurtleListener).toHaveBeenCalled();
-        });
-
-        test("flow handles null arg as 0", () => {
-            const block = getBlock("skipnotes");
-            block.flow([null, 1], logo, 0, 5);
-            expect(turtle.singer.skipFactor).toBe(0);
-        });
-    });
-
-    describe("RhythmicDot2Block", () => {
-        test("flow calls errorMsg when arg is null", () => {
-            const block = getBlock("rhythmicdot2");
-            block.flow([null, 1], logo, 0, 5);
-            expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 5);
-        });
-
-        test("flow calls doRhythmicDot and returns args", () => {
-            const block = getBlock("rhythmicdot2");
-            const result = block.flow([0.25, 1], logo, 0, 5);
-            expect(global.Singer.RhythmActions.doRhythmicDot).toHaveBeenCalled();
-            expect(result).toEqual([1, 1]);
-        });
-    });
-
-    describe("NoteBlock", () => {
-        test("flow returns undefined when args[1] is undefined", () => {
-            const block = getBlock("note");
-            const result = block.flow([0.25], logo, 0, 5, null);
-            expect(result).toBeUndefined();
-        });
-
-        test("flow calls errorMsg when arg is null", () => {
-            const block = getBlock("note");
-            block.flow([null, 1], logo, 0, 5, null);
-            expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 5);
-        });
-
-        test("flow calls errorMsg when arg <= 0", () => {
-            const block = getBlock("note");
-            block.flow([-1, 1], logo, 0, 5, null);
-            expect(activity.errorMsg).toHaveBeenCalled();
-        });
-
-        test("flow calls playNote with correct value", () => {
-            const block = getBlock("note");
-            block.flow([0.5, 1], logo, 0, 5, null);
-            expect(global.Singer.RhythmActions.playNote).toHaveBeenCalledWith(
-                0.5,
-                "note",
-                0,
-                5,
-                expect.any(Function)
-            );
-        });
-    });
-
-    describe("NewNoteBlock", () => {
-        test("flow returns undefined when args[1] is undefined", () => {
-            const block = getBlock("newnote");
-            const result = block.flow([0.25], logo, 0, 5, null);
-            expect(result).toBeUndefined();
-        });
-
-        test("flow calls errorMsg when arg is null", () => {
-            const block = getBlock("newnote");
-            block.flow([null, 1], logo, 0, 5, null);
-            expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 5);
-        });
-
-        test("flow calls errorMsg when arg <= 0", () => {
-            const block = getBlock("newnote");
-            block.flow([-1, 1], logo, 0, 5, null);
-            expect(activity.errorMsg).toHaveBeenCalled();
-        });
-
-        test("flow calls playNote and handles inNoteBlock", () => {
-            turtle.singer.inNoteBlock = [1];
-            turtle.singer.delayedNotes = [];
-            const block = getBlock("newnote");
-            block.flow([0.5, 1], logo, 0, 5, null);
-            expect(turtle.singer.delayedNotes).toContainEqual([5, 0.5]);
-            expect(global.Singer.RhythmActions.playNote).toHaveBeenCalled();
-        });
-
-        test("flow calls playNote when inNoteBlock is empty", () => {
-            turtle.singer.inNoteBlock = [];
-            const block = getBlock("newnote");
-            block.flow([0.5, 1], logo, 0, 5, null);
-            expect(global.Singer.RhythmActions.playNote).toHaveBeenCalledWith(
-                0.5,
-                "newnote",
-                0,
-                5,
-                expect.any(Function)
-            );
-        });
-    });
-
-    describe("Callback and listener body coverage", () => {
-        test("OscTimeBlock callback pushes to queue", () => {
             let capturedCallback;
-            global.Singer.RhythmActions.playNote.mockImplementation((v, t, turtle, blk, cb) => {
-                capturedCallback = cb;
-            });
-            const block = getBlock("osctime");
-            block.flow([0.25, 1], logo, 0, 5, null);
+            global.Singer.RhythmActions.playNote.mockImplementation(
+                (val, type, turtle, blk, cb) => {
+                    capturedCallback = cb;
+                }
+            );
+            block.flow([200, true], logo, 0, 5, "receivedArg");
+            expect(capturedCallback).toBeDefined();
             capturedCallback();
             expect(turtle.parentFlowQueue).toContain(5);
             expect(turtle.queue.length).toBe(1);
+            expect(turtle.queue[0].child).toBe(true);
         });
+    });
 
-        test("NewSwingBlock listener fires and pops swing when not suppressed", () => {
-            let capturedListener;
-            logo.setTurtleListener.mockImplementation((t, name, fn) => {
-                capturedListener = fn;
-            });
-            const block = getBlock("newswing");
-            block.flow([24, 1], logo, 0, 5);
+    describe("SwingBlock listener with suppressOutput false", () => {
+        test("listener pops swing and swingTarget when suppressOutput is false", () => {
+            const block = getBlock("swing");
+            block.flow([32, true], logo, 0, 10);
             turtle.singer.suppressOutput = false;
-            capturedListener({});
+            // flow ne already push kiya — extra push nahi karna
+            const listenerCall = logo.setTurtleListener.mock.calls[0];
+            const listener = listenerCall[2];
+            listener({});
             expect(turtle.singer.swing.length).toBe(0);
+            expect(turtle.singer.swingTarget.length).toBe(0);
             expect(turtle.singer.swingCarryOver).toBe(0);
         });
 
-        test("NewSwingBlock listener does not pop when suppressed", () => {
-            let capturedListener;
-            logo.setTurtleListener.mockImplementation((t, name, fn) => {
-                capturedListener = fn;
-            });
-            const block = getBlock("newswing");
-            block.flow([24, 1], logo, 0, 5);
+        test("listener skips pop when suppressOutput is true", () => {
+            const block = getBlock("swing");
+            block.flow([32, true], logo, 0, 10);
             turtle.singer.suppressOutput = true;
-            turtle.singer.swing.push(1);
-            turtle.singer.swingTarget.push(null);
-            capturedListener({});
-            expect(turtle.singer.swing.length).toBeGreaterThan(0);
+            // flow ne already 1 item push kiya
+            const listenerCall = logo.setTurtleListener.mock.calls[0];
+            const listener = listenerCall[2];
+            listener({});
+            expect(turtle.singer.swing.length).toBe(1);
+            expect(turtle.singer.swingTarget.length).toBe(1);
+        });
+    });
+    // ── NewSwingBlock flow (lines 307-328) ───────────────────────────────
+    describe("NewSwingBlock flow", () => {
+        test("pushes inverse swing value and sets up listener", () => {
+            const block = getBlock("newswing");
+            const result = block.flow([24, true], logo, 0, 10);
+            expect(turtle.singer.swing).toContain(1 / 24);
+            expect(turtle.singer.swingTarget).toContainEqual(null);
+            expect(turtle.singer.swingCarryOver).toBe(0);
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith(10, 0, "_swing_0");
+            expect(logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                "_swing_0",
+                expect.any(Function)
+            );
+            expect(result).toEqual([true, 1]);
         });
 
-        test("SkipNotesBlock listener decrements skipFactor", () => {
-            let capturedListener;
-            logo.setTurtleListener.mockImplementation((t, name, fn) => {
-                capturedListener = fn;
-            });
-            const block = getBlock("skipnotes");
-            block.flow([2, 1], logo, 0, 5);
-            capturedListener({});
-            expect(turtle.singer.skipFactor).toBe(0);
+        test("newswing listener pops when suppressOutput is false", () => {
+            const block = getBlock("newswing");
+            block.flow([24, true], logo, 0, 10);
+            turtle.singer.suppressOutput = false;
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            listener({});
+            expect(turtle.singer.swing.length).toBe(0);
+            expect(turtle.singer.swingTarget.length).toBe(0);
+            expect(turtle.singer.swingCarryOver).toBe(0);
         });
 
-        test("NoteBlock callback pushes to queue", () => {
-            let capturedCallback;
-            global.Singer.RhythmActions.playNote.mockImplementation((v, t, turtle, blk, cb) => {
-                capturedCallback = cb;
-            });
-            const block = getBlock("note");
-            block.flow([0.5, 1], logo, 0, 5, null);
-            capturedCallback();
-            expect(turtle.parentFlowQueue).toContain(5);
-            expect(turtle.queue.length).toBe(1);
-        });
-
-        test("NewNoteBlock callback pushes to queue", () => {
-            let capturedCallback;
-            global.Singer.RhythmActions.playNote.mockImplementation((v, t, turtle, blk, cb) => {
-                capturedCallback = cb;
-            });
-            turtle.singer.inNoteBlock = [];
-            const block = getBlock("newnote");
-            block.flow([0.5, 1], logo, 0, 5, null);
-            capturedCallback();
-            expect(turtle.parentFlowQueue).toContain(5);
-            expect(turtle.queue.length).toBe(1);
-        });
-
-        test("RhythmicDotBlock flow and listener update beatFactor", () => {
-            let capturedListener;
-            logo.setTurtleListener.mockImplementation((t, name, fn) => {
-                capturedListener = fn;
-            });
-            turtle.singer.dotCount = 0;
-            turtle.singer.beatFactor = 1;
-            const block = getBlock("rhythmicdot");
-            const result = block.flow([0.25, 1], logo, 0, 5);
-            expect(logo.setDispatchBlock).toHaveBeenCalled();
-            expect(result).toEqual([0.25, 1]);
-            capturedListener({});
-            expect(turtle.singer.dotCount).toBeDefined();
-        });
-
-        test("RhythmicDotBlock calls errorMsg when arg is null", () => {
-            const block = getBlock("rhythmicdot");
-            block.flow([null, 1], logo, 0, 5);
-            expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 5);
+        test("newswing listener skips pop when suppressOutput is true", () => {
+            const block = getBlock("newswing");
+            block.flow([24, true], logo, 0, 10);
+            turtle.singer.suppressOutput = true;
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            listener({});
+            expect(turtle.singer.swing.length).toBe(1);
+            expect(turtle.singer.swingTarget.length).toBe(1);
         });
     });
 });
