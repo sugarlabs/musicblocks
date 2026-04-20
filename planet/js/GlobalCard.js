@@ -171,7 +171,7 @@ class GlobalCard {
         frag.getElementById(`global-project-share-${this.id}`).addEventListener("click", evt => {
             const s = document.getElementById(`global-sharebox-${this.id}`);
 
-            if (s.style.display == "none") {
+            if (s.style.display === "none") {
                 s.style.display = "initial";
                 hideOnClickOutside(
                     [document.getElementById(`global-share-${this.id}`)],
@@ -215,14 +215,12 @@ class GlobalCard {
         this.clipboard = new ClipboardJS(`.copyshareurl[data-clipboard-text*="${this.id}"]`);
 
         this.clipboard.on("success", e => {
-            // eslint-disable-next-line no-console
             console.info("Copied:", e.text);
             e.clearSelection();
         });
 
         this.clipboard.on("error", e => {
-            alert("Failed to copy!");
-            // eslint-disable-next-line no-console
+            console.warn("Failed to copy to clipboard");
             console.error("Failed to copy:", e.action);
         });
     }
