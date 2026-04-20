@@ -94,6 +94,20 @@ describe("Tests for Singer.PitchActions setup", () => {
             logo: {
                 inMatrix: false,
                 inMusicKeyboard: false,
+                inLegoWidget: false,
+                inPitchSlider: false,
+                pitchBlocks: [],
+                phraseMaker: {
+                    addRowBlock: jest.fn(),
+                    rowLabels: [],
+                    rowArgs: []
+                },
+                legoWidget: {
+                    addRowBlock: jest.fn(),
+                    rowLabels: [],
+                    rowArgs: []
+                },
+                pitchSlider: {},
                 synth: { inTemperament: "equal", startingPitch: "A0" },
                 runningLilypond: false,
                 setDispatchBlock(name, t, l) {
@@ -347,6 +361,26 @@ describe("Tests for Singer.PitchActions setup", () => {
         expect(spyMark).not.toHaveBeenCalled();
 
         spyMark.mockRestore();
+    });
+
+    test("playSynthFrequency preserves matrix row frequency", () => {
+        activity.logo.inMatrix = true;
+        activity.blocks.blockList[blkId] = { name: "square" };
+
+        Singer.PitchActions.playSynthFrequency(440, 0, blkId);
+
+        expect(activity.logo.phraseMaker.addRowBlock).toHaveBeenCalledWith(blkId);
+        expect(activity.logo.phraseMaker.rowLabels).toContain("square");
+        expect(activity.logo.phraseMaker.rowArgs).toContain(440);
+    });
+
+    test("playSynthFrequency preserves pitch slider frequency", () => {
+        activity.logo.inPitchSlider = true;
+        activity.logo.pitchSlider.frequency = null;
+
+        Singer.PitchActions.playSynthFrequency(440, 0, blkId);
+
+        expect(activity.logo.pitchSlider.frequency).toBe(440);
     });
 
     describe("Tests for setAccidental", () => {

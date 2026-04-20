@@ -199,6 +199,7 @@ describe("setupPitchBlocks", () => {
                 numToPitch: jest.fn(() => "C"),
                 playPitch: jest.fn(),
                 playHertz: jest.fn(),
+                playSynthFrequency: jest.fn(),
                 playPitchNumber: jest.fn(),
                 playNthModalPitch: jest.fn(),
                 setScalarTranspose: jest.fn(),
@@ -319,11 +320,15 @@ describe("setupPitchBlocks", () => {
 
     describe("Synth Blocks", () => {
         ["square", "triangle", "sine", "sawtooth"].forEach(name => {
-            it(`${name} block flow calls Singer.PitchActions.playHertz`, () => {
+            it(`${name} block flow calls Singer.PitchActions.playSynthFrequency`, () => {
                 const block = createdBlocks[name];
                 if (block) {
                     block.flow([440], logo, 0, 10);
-                    expect(global.Singer.PitchActions.playHertz).toHaveBeenCalledWith(440, 0, 10);
+                    expect(global.Singer.PitchActions.playSynthFrequency).toHaveBeenCalledWith(
+                        440,
+                        0,
+                        10
+                    );
                     // Coverage for updateParameter if applicable
                     if (block.updateParameter) block.updateParameter(logo, 0, 10);
                 }
