@@ -100,6 +100,24 @@ class GlobalCard {
          `;
     }
 
+    showToast(message, isError = false) {
+        // Reuse existing SaveInterface.showToast but add error styling if needed
+        if (this.Planet && this.Planet.SaveInterface) {
+            this.Planet.SaveInterface.showToast(message);
+
+            // If it's an error, modify the toast to be red
+            if (isError) {
+                setTimeout(() => {
+                    const toasts = document.querySelectorAll(".toast");
+                    if (toasts.length > 0) {
+                        const lastToast = toasts[toasts.length - 1];
+                        lastToast.style.background = "#f44336"; // Red for errors
+                    }
+                }, 10);
+            }
+        }
+    }
+
     render() {
         const Planet = this.Planet;
         const html = this.renderData.replace(new RegExp("{ID}", "g"), this.id);
@@ -216,12 +234,14 @@ class GlobalCard {
 
         this.clipboard.on("success", e => {
             console.info("Copied:", e.text);
+            this.showToast(_("Link copied to clipboard!"));
             e.clearSelection();
         });
 
         this.clipboard.on("error", e => {
             console.warn("Failed to copy to clipboard");
             console.error("Failed to copy:", e.action);
+            this.showToast(_("Failed to copy link to clipboard"), true);
         });
     }
 
