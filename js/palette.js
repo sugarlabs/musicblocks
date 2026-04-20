@@ -106,6 +106,9 @@ class Palettes {
         // so we can restore its state when focus leaves.
         this._wasCollapsedBeforeFocus = false;
         this._expandedForKeyboardFocus = false;
+
+        this._searchResultIndex = 0;
+        this._handleSearchKeydown = this._handleSearchKeydown.bind(this);
     }
 
     init() {
@@ -117,6 +120,7 @@ class Palettes {
             this._makeSelectorButton(i);
         }
         this._setupPaletteKeyboardNav();
+        this._setupSearchKeyboardNav();
     }
 
     /**
@@ -324,6 +328,97 @@ class Palettes {
     }
 
     /**
+     * Sets up keyboard navigation for the search widget.
+     * Attaches a single keydown listener to the search input.
+     */
+    _setupSearchKeyboardNav() {
+        const searchWidget = document.getElementById("search");
+        if (searchWidget) {
+            searchWidget.addEventListener("keydown", this._handleSearchKeydown);
+        }
+    }
+
+    /**
+     * Handles keydown events on the search widget for result navigation.
+     * @param {KeyboardEvent} event
+     */
+    _handleSearchKeydown(event) {
+        const exitKeys = ["Escape", "ArrowLeft", "ArrowRight"];
+        if (exitKeys.includes(event.key)) {
+            event.preventDefault();
+            event.stopPropagation();
+            this.activity.hideSearchWidget();
+
+            // Return focus to palette
+            const palette = docById("palette");
+            if (palette) {
+                palette.focus();
+                this._navSection = "search";
+                const tr = palette.children[0]?.children[0]?.children[0]?.children[0];
+                const listBody = docById("palette")?.children[0]?.children[1]?.children[1];
+                const blockRows = listBody ? Array.from(listBody.children) : [];
+                this._updateKeyboardFocus(tr, blockRows);
+            }
+        } else if (["ArrowUp", "ArrowDown"].includes(event.key)) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const searchResults = document.querySelectorAll(".ui-menu-item");
+            if (searchResults.length === 0) return;
+
+            // Navigate through search results
+            searchResults.forEach(row => {
+                row.classList.remove("ui-state-active");
+                row.classList.remove("ui-state-focus");
+                row.style.backgroundColor = "";
+                delete row.dataset.keyboardFocus;
+            });
+
+            if (event.key === "ArrowDown") {
+                this._searchResultIndex = Math.min(
+                    this._searchResultIndex + 1,
+                    searchResults.length - 1
+                );
+            } else if (event.key === "ArrowUp") {
+                this._searchResultIndex = Math.max(this._searchResultIndex - 1, 0);
+            }
+
+            const currentResult = searchResults[this._searchResultIndex];
+            if (currentResult) {
+                currentResult.classList.add("ui-state-active");
+                currentResult.style.backgroundColor = platformColor.hoverColor;
+                currentResult.dataset.keyboardFocus = "true";
+                currentResult.scrollIntoView({
+                    block: "nearest",
+                    behavior: "smooth"
+                });
+            }
+        } else if (event.key === "Enter") {
+            const searchResults = document.querySelectorAll(".ui-menu-item");
+
+            if (searchResults[this._searchResultIndex]) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                // Trigger click on the item to select it
+                searchResults[this._searchResultIndex].click();
+
+                // Close search and return focus to palette
+                this.activity.hideSearchWidget();
+                const palette = docById("palette");
+                if (palette) {
+                    palette.focus();
+                    this._navSection = "search";
+                    const tr = palette.children[0]?.children[0]?.children[0]?.children[0];
+                    const listBody = docById("palette")?.children[0]?.children[1]?.children[1];
+                    const blockRows = listBody ? Array.from(listBody.children) : [];
+                    this._updateKeyboardFocus(tr, blockRows);
+                }
+            }
+        }
+    }
+
+    /**
      * Updates visual focus for keyboard navigation
      */
     _updateKeyboardFocus(tr, blockRows) {
@@ -421,103 +516,7 @@ class Palettes {
         if (this._navSection === "search") {
             this._hideMenus();
             this.activity.showSearchWidget();
-
-            // Set up keyboard listener on search widget to allow navigation of results
-            setTimeout(() => {
-                const searchWidget = document.getElementById("search");
-                if (searchWidget) {
-                    // Track navigation state within search results
-                    let searchResultIndex = 0;
-
-                    const searchKeyHandler = event => {
-                        const exitKeys = ["Escape", "ArrowLeft", "ArrowRight"];
-                        if (exitKeys.includes(event.key)) {
-                            event.preventDefault();
-                            event.stopPropagation(); // Prevent global handlers
-                            this.activity.hideSearchWidget();
-
-                            // Return focus to palette
-                            const palette = docById("palette");
-                            if (palette) {
-                                palette.focus();
-                                this._navSection = "search";
-                                const tr =
-                                    palette.children[0]?.children[0]?.children[0]?.children[0];
-                                const listBody =
-                                    docById("palette")?.children[0]?.children[1]?.children[1];
-                                const blockRows = listBody ? Array.from(listBody.children) : [];
-                                this._updateKeyboardFocus(tr, blockRows);
-                            }
-
-                            searchWidget.removeEventListener("keydown", searchKeyHandler);
-                        } else if (["ArrowUp", "ArrowDown"].includes(event.key)) {
-                            event.preventDefault();
-                            event.stopPropagation(); // Prevent global/jQuery UI conflicts
-
-                            // Use jQuery UI autocomplete selectors
-                            const searchResults = document.querySelectorAll(".ui-menu-item");
-
-                            if (searchResults.length === 0) return;
-
-                            // Navigate through search results
-                            searchResults.forEach(row => {
-                                // Clear all potential highlight classes
-                                row.classList.remove("ui-state-active");
-                                row.classList.remove("ui-state-focus");
-                                row.style.backgroundColor = "";
-                                delete row.dataset.keyboardFocus;
-                            });
-
-                            if (event.key === "ArrowDown") {
-                                searchResultIndex = Math.min(
-                                    searchResultIndex + 1,
-                                    searchResults.length - 1
-                                );
-                            } else if (event.key === "ArrowUp") {
-                                searchResultIndex = Math.max(searchResultIndex - 1, 0);
-                            }
-
-                            const currentResult = searchResults[searchResultIndex];
-                            if (currentResult) {
-                                currentResult.classList.add("ui-state-active");
-                                currentResult.style.backgroundColor = platformColor.hoverColor;
-                                currentResult.dataset.keyboardFocus = "true";
-                                currentResult.scrollIntoView({
-                                    block: "nearest",
-                                    behavior: "smooth"
-                                });
-                            }
-                        } else if (event.key === "Enter") {
-                            event.preventDefault();
-                            event.stopPropagation(); // CRITICAL: Stop global "Play" shortcut
-
-                            const searchResults = document.querySelectorAll(".ui-menu-item");
-
-                            if (searchResults[searchResultIndex]) {
-                                // Trigger click on the item to select it
-                                searchResults[searchResultIndex].click();
-
-                                // Close search and return focus to palette
-                                this.activity.hideSearchWidget();
-                                const palette = docById("palette");
-                                if (palette) {
-                                    palette.focus();
-                                    this._navSection = "search";
-                                    const tr =
-                                        palette.children[0]?.children[0]?.children[0]?.children[0];
-                                    const listBody =
-                                        docById("palette")?.children[0]?.children[1]?.children[1];
-                                    const blockRows = listBody ? Array.from(listBody.children) : [];
-                                    this._updateKeyboardFocus(tr, blockRows);
-                                }
-                                searchWidget.removeEventListener("keydown", searchKeyHandler);
-                            }
-                        }
-                    };
-
-                    searchWidget.addEventListener("keydown", searchKeyHandler);
-                }
-            }, 600); // Wait for search widget to be shown and focused
+            this._searchResultIndex = 0;
         } else if (this._navSection === "blocks" && blockRows[this._navBlockIndex]) {
             const row = blockRows[this._navBlockIndex];
             if (row && row.onclick) {
