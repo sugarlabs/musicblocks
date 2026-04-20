@@ -319,6 +319,25 @@ describe("setupPitchBlocks", () => {
     });
 
     describe("Synth Blocks", () => {
+        let warnSpy;
+
+        beforeEach(() => {
+            warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+        });
+
+        afterEach(() => {
+            warnSpy.mockRestore();
+        });
+
+        it("warns when deprecated synth blocks are used", () => {
+            const block = createdBlocks["square"];
+
+            block.flow([440], logo, 0, 10);
+
+            expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("square is deprecated"));
+            expect(global.Singer.playSynthBlock).toHaveBeenCalled();
+        });
+
         ["square", "triangle", "sine", "sawtooth"].forEach(name => {
             it(`${name} block flow calls Singer.playSynthBlock`, () => {
                 const block = createdBlocks[name];
