@@ -25,25 +25,6 @@
 
 /* exported setupPitchBlocks */
 
-const shouldWarnOnDeprecatedSynthBlocks =
-    typeof process !== "undefined" &&
-    process !== null &&
-    process.env &&
-    process.env.NODE_ENV !== "production";
-
-const deprecatedSynthBlocksWarned = new Set();
-
-function warnDeprecatedSynthBlock(blockName) {
-    if (!shouldWarnOnDeprecatedSynthBlocks || deprecatedSynthBlocksWarned.has(blockName)) {
-        return;
-    }
-
-    deprecatedSynthBlocksWarned.add(blockName);
-    console.warn(
-        `${blockName} is deprecated and still relies on Singer.playSynthBlock(); migrate it before removing the legacy path.`
-    );
-}
-
 function setupPitchBlocks(activity) {
     class RestBlock extends ValueBlock {
         constructor() {
@@ -72,8 +53,7 @@ function setupPitchBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk) {
-            warnDeprecatedSynthBlock("square");
-            Singer.playSynthBlock(args, activity, logo, turtle, blk);
+            Singer.PitchActions.playHertz(args[0], turtle, blk);
         }
     }
 
@@ -96,8 +76,7 @@ function setupPitchBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk) {
-            warnDeprecatedSynthBlock("triangle");
-            Singer.playSynthBlock(args, activity, logo, turtle, blk);
+            Singer.PitchActions.playHertz(args[0], turtle, blk);
         }
     }
 
@@ -120,8 +99,7 @@ function setupPitchBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk) {
-            warnDeprecatedSynthBlock("sine");
-            Singer.playSynthBlock(args, activity, logo, turtle, blk);
+            Singer.PitchActions.playHertz(args[0], turtle, blk);
         }
     }
 
@@ -144,8 +122,7 @@ function setupPitchBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk) {
-            warnDeprecatedSynthBlock("sawtooth");
-            Singer.playSynthBlock(args, activity, logo, turtle, blk);
+            Singer.PitchActions.playHertz(args[0], turtle, blk);
         }
     }
 

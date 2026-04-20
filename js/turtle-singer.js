@@ -290,63 +290,6 @@ class Singer {
             : 1;
     static masterVolume = [typeof DEFAULTVOLUME !== "undefined" ? DEFAULTVOLUME : 50];
 
-    // ========= Deprecated ===================================================
-
-    /**
-     * @deprecated
-     * @static
-     * @param {*[]} args - arguments (parameters)
-     * @param {Object} logo - Logo object
-     * @param {Object} turtle - Turtle object
-     * @param {Object} blk - corresponding Block object index in blocks.blockList
-     */
-    static playSynthBlock(args, activity, logo, turtle, blk) {
-        if (args.length === 1) {
-            const obj = frequencyToPitch(args[0]);
-
-            if (logo.inMatrix) {
-                logo.phraseMaker.addRowBlock(blk);
-                if (!logo.pitchBlocks.includes(blk)) {
-                    logo.pitchBlocks.push(blk);
-                }
-
-                logo.phraseMaker.rowLabels.push(activity.logo.blocks.blockList[blk].name);
-                logo.phraseMaker.rowArgs.push(args[0]);
-            } else if (logo.inLegoWidget && !logo.inMatrix) {
-                logo.legoWidget.addRowBlock(blk);
-                if (!logo.pitchBlocks.includes(blk)) {
-                    logo.pitchBlocks.push(blk);
-                }
-
-                logo.legoWidget.rowLabels.push(activity.logo.blocks.blockList[blk].name);
-                logo.legoWidget.rowArgs.push(args[0]);
-            } else if (logo.inPitchSlider) {
-                logo.pitchSlider.frequency = args[0];
-            } else {
-                const tur = activity.turtles.ithTurtle(turtle);
-
-                tur.singer.oscList[last(tur.singer.inNoteBlock)].push(
-                    activity.blocks.blockList[blk].name
-                );
-
-                // We keep track of pitch and octave for notation purposes
-                tur.singer.notePitches[last(tur.singer.inNoteBlock)].push(obj[0]);
-                tur.singer.noteOctaves[last(tur.singer.inNoteBlock)].push(obj[1]);
-                tur.singer.noteCents[last(tur.singer.inNoteBlock)].push(obj[2]);
-                if (obj[2] !== 0) {
-                    tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(
-                        getCachedPitchToFrequency(obj[0], obj[1], obj[2], tur.singer.keySignature)
-                    );
-                } else {
-                    tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(0);
-                }
-
-                tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(tur.singer.beatFactor);
-                tur.singer.pushedNote = true;
-            }
-        }
-    }
-
     // ========= Utilities ====================================================
 
     /**
