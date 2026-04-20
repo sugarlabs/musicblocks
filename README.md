@@ -204,6 +204,10 @@ Snap Users](./Music_Blocks_for_Snap_Users.md).
 Looking for a block? Find it in the
 [Palette Tables](./Docs/guide/README.md#6-appendix).
 
+Are you an educator? See the [Lesson Plans](./lesson-plans/README.md)
+for structured, classroom-ready activities covering beginner through
+advanced levels.
+
 ## <a name="CODEOFCONDUCT"></a>Code of Conduct
 
 The Music Blocks project adheres to the [Sugar Labs Code of
