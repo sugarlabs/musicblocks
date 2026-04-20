@@ -823,55 +823,62 @@ class Painter {
 
         if (this._fillState || !wrap || !out) {
             this._move(ox, oy, nx, ny, true, linePart);
-            this._scheduleCanvasUpdate();
-        } else {
-            const stepUnit = 5;
-        let remainingSteps = Math.abs(steps);
+ this._scheduleCanvasUpdate();
+} else {
+    const stepUnit = 5;
+    let remainingSteps = Math.abs(steps);
+    const angleRadians = (this.turtle.heading * Math.PI) / 180;
 
-        while (remainingSteps > 0) {
-        let currentStep = Math.min(stepUnit, remainingSteps);
+    while (remainingSteps > 0) {
+        // Calculate the next chunk of movement (max 5 units)
+        const currentStep = Math.min(stepUnit, remainingSteps);
         let xIncrease, yIncrease;
 
         if (steps > 0) {
-        xIncrease = currentStep * Math.sin(angleRadians);
-        yIncrease = currentStep * Math.cos(angleRadians);
+            xIncrease = currentStep * Math.sin(angleRadians);
+            yIncrease = currentStep * Math.cos(angleRadians);
         } else {
-        xIncrease = -currentStep * Math.sin(angleRadians);
-        yIncrease = -currentStep * Math.cos(angleRadians);
-       }
-
-    
-       remainingSteps -= currentStep;
-       }
-
-            this._scheduleCanvasUpdate();
+            xIncrease = -currentStep * Math.sin(angleRadians);
+            yIncrease = -currentStep * Math.cos(angleRadians);
         }
-        // Update media positions
-        const view = this.turtle._view;
-        if (view && typeof view._updateMediaPositions === "function") {
-            view._updateMediaPositions();
+
+        // 1. Wrap-around logic: Check if turtle crossed screen boundaries
+        if (this.turtle.container.x > w) {
+            this.turtle.container.x = 0;
+            this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
+        } else if (this.turtle.container.x < 0) {
+            this.turtle.container.x = w;
+            this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
         }
+
+        if (this.turtle.container.y > h) {
+            this.turtle.container.y = 0;
+            this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
+        } else if (this.turtle.container.y < 0) {
+            this.turtle.container.y = h;
+            this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
+        }
+
+        // 2. Get current position (Old X, Old Y)
+        const ox = turtles.screenX2turtleX(this.turtle.container.x);
+        const oy = turtles.screenY2turtleY(this.turtle.container.y);
+
+        // 3. Calculate target position (New X, New Y)
+        const nx = ox + xIncrease;
+        const ny = oy + yIncrease;
+
+        // 4. Move the turtle and update the canvas
+        this._move(ox, oy, nx, ny, true);
+        this.turtle.container.x = turtles.turtleX2screenX(nx);
+        this.turtle.container.y = turtles.turtleY2screenY(ny);
+        this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
+
+        // Reduce the distance left to travel
+        remainingSteps -= currentStep;
     }
 
-    /**
-     * Turn right and display corresponding turtle graphic by rotating bitmap.
-     *
-     * @param degrees - degrees for right turn
-     */
-    doRight(degrees) {
-        this.turtle.orientation += Number(degrees);
-        while (this.turtle.orientation < 0) {
-            this.turtle.orientation += 360;
-        }
-
-        this.turtle.orientation %= 360;
-        this.turtle.container.rotation = this.turtle.orientation;
-
-        // We cannot update the cache during the 'tween'
-        if (!this.turtle.blinking()) {
-            this.turtle.updateCache();
-        }
-    }
+    this._scheduleCanvasUpdate();
+}
 
     /**
      * Moves turtle to specific point (x, y).
