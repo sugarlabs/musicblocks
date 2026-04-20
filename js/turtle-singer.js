@@ -789,6 +789,10 @@ class Singer {
     static setSynthVolume(logo, turtle, synth, volume, blk) {
         volume = Math.min(Math.max(volume, 0), 100);
 
+        if (logo.synth && typeof logo.synth.resolveInstrumentName === "function") {
+            synth = logo.synth.resolveInstrumentName(synth);
+        }
+
         switch (synth) {
             case "noise1":
             case "noise2":
