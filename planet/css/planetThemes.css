@@ -248,6 +248,31 @@
 .highcontrast #view-more-chips {
     color: #ffff00 !important;
 }
+
+.highcontrast .chipselect {
+    background-color: #000000;
+    color: #ffff00;
+    border: 2px solid #ffff00;
+}
+
+.highcontrast .chipselect.selected,
+.highcontrast .chipselect.selected-special {
+    background-color: #ffff00;
+    color: #000000;
+    border: 2px solid #ffff00;
+}
+
+.highcontrast .chipselect.cursor:hover:not(.selected-special) {
+    background-color: #000080;
+    color: #ffff00;
+}
+
+.highcontrast .chipselect:focus,
+.highcontrast .chipselect:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 2px;
+}
+
 .highcontrast #local-projects .card {
     background-color: #000000;
     color: #ffff00;
