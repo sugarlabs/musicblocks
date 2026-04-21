@@ -437,7 +437,7 @@ function waitForReadiness(callback, options = {}) {
 
 // Check for Internet Explorer
 
-window.onload = () => {
+window.addEventListener("load", () => {
     const userAgent = window.navigator.userAgent;
     // For IE 10 or older
     const MSIE = userAgent.indexOf("MSIE ");
@@ -484,7 +484,7 @@ window.onload = () => {
             "<a href='https://www.mozilla.org/en-US/firefox/new/' style='float: left; margin-left: 40px;display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Firefox</a>";
         document.body.innerHTML += "</div></div>";
     }
-};
+});
 
 /**
  * Retrieves a collection of elements by class name.
@@ -799,7 +799,10 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
     try {
         obj = JSON.parse(pluginData);
     } catch (error) {
-        console.error(`PluginProcessor: Failed to parse plugin data from source "${pluginSource}":`, error);
+        console.error(
+            `PluginProcessor: Failed to parse plugin data from source "${pluginSource}":`,
+            error
+        );
         console.debug("Malformed plugin data:", pluginData);
         return null;
     }

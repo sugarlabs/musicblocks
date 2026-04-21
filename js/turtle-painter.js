@@ -897,7 +897,13 @@ class Painter {
      * @param degrees - degrees for right turn
      */
     doRight(degrees) {
-        this.turtle.orientation += Number(degrees);
+        degrees = Number(degrees);
+        if (!Number.isFinite(degrees)) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
+
+        this.turtle.orientation += degrees;
         while (this.turtle.orientation < 0) {
             this.turtle.orientation += 360;
         }
@@ -949,7 +955,13 @@ class Painter {
      * @param degrees - degrees turned to set the 'heading' of turtle
      */
     doSetHeading(degrees) {
-        this.turtle.orientation = Number(degrees);
+        degrees = Number(degrees);
+        if (!Number.isFinite(degrees)) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
+
+        this.turtle.orientation = degrees;
         while (this.turtle.orientation < 0) {
             this.turtle.orientation += 360;
         }

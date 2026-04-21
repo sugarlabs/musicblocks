@@ -47,7 +47,7 @@ class Mouse {
             this.turtle = globalActivity.turtles.getTurtle(Mouse.MouseList.length);
         } else {
             globalActivity.turtles.addTurtle();
-            this.turtle = globalActivity.turtles.getTurtle(numberOfTurtles - 1);
+            this.turtle = globalActivity.turtles.getTurtle(numberOfTurtles);
             Mouse.AddedTurtles.push(this.turtle);
         }
 

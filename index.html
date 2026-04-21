@@ -92,6 +92,15 @@
                 this.rel = 'stylesheet';
             "
         />
+        <link
+            rel="preload"
+            href="css/svgAssetSelector.css"
+            as="style"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
+        />
         <link rel="prefetch" as="video" href="loading-animation.webm" type="video/webm" />
         <link rel="prefetch" as="video" href="loading-animation.mp4" type="video/mp4" />
 
@@ -159,6 +168,7 @@
         </script>
         <script src="lib/astring.min.js" defer></script>
         <script src="js/utils/mb-dialog.js" defer></script>
+        <script src="js/svgAssetSelector.js" defer></script>
         <script src="lib/acorn.min.js" defer></script>
         <script src="env.js" defer></script>
 
