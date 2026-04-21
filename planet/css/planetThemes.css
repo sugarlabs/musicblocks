@@ -388,12 +388,26 @@
 .highcontrast .dropdown-content {
     background-color: #000000 !important;
     border: 2px solid #ffff00;
-    color: #ffff00 !important;
+    color: #00ffff !important;
 }
 
 .highcontrast .dropdown-content li > a {
-    color: #ffff00 !important;
+    color: #00ffff !important;
     padding: 0.5rem 1rem;
+}
+
+.highcontrast .select-dropdown.dropdown-content li > span {
+    color: #00ffff !important;
+}
+
+.highcontrast .select-dropdown.dropdown-content li.selected > span,
+.highcontrast .select-dropdown.dropdown-content li.active > span {
+    color: #ffff00 !important;
+}
+
+.highcontrast .select-dropdown.dropdown-content li:hover > span {
+    background-color: #000080 !important;
+    color: #ffff00 !important;
 }
 
 .highcontrast .dropdown-content li > a:hover {
