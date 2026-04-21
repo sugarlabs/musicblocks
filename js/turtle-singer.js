@@ -24,7 +24,7 @@
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
    noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction,
-   SEMITONES, normalizeNoteAccidentals
+   SEMITONES, normalizeNoteAccidentals, noteToPitchOctave
  */
 
 /*
@@ -34,7 +34,7 @@
     js/utils/musicutils.js
         frequencyToPitch, pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp, getStepSizeDown,
         numberToPitch, pitchToNumber, noteIsSolfege, getSolfege, SOLFEGENAMES1,
-        SOLFEGECONVERSIONTABLE, getInterval, noteToFrequency, getTemperament, getOctaveRatio
+        SOLFEGECONVERSIONTABLE, getInterval, noteToFrequency, getTemperament, getOctaveRatio, noteToPitchOctave
     js/utils/utils.js
         rationalSum, _, rationalToFraction
     js/utils/synthutils.js
@@ -2157,9 +2157,10 @@ class Singer {
                               activity.logo.synth.changeInTemperament
                           );
                     const startingPitch = activity.logo.synth.startingPitch;
+                    const [startingNote, startingOctave] = noteToPitchOctave(startingPitch);
                     const frequency = getCachedPitchToFrequency(
-                        startingPitch.substring(0, startingPitch.length - 1),
-                        Number(startingPitch.slice(-1)),
+                        startingNote,
+                        startingOctave,
                         0,
                         null
                     );

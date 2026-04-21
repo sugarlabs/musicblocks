@@ -19,7 +19,7 @@
    noteIsSolfege, isCustomTemperament, i18nSolfege, getNote, DEFAULTDRUM, last,
    DRUMS, SHARP, FLAT, PREVIEWVOLUME, DEFAULTVOLUME, noteToFrequency,
    LCD, calcNoteValueToDisplay, NOTESYMBOLS,
-   EIGHTHNOTEWIDTH, docBySelector, getTemperament, normalizeNoteAccidentals
+   EIGHTHNOTEWIDTH, docBySelector, getTemperament, normalizeNoteAccidentals, noteToPitchOctave
 */
 
 /*
@@ -31,7 +31,7 @@ Globals location
     EIGHTHNOTEWIDTH, NOTESYMBOLS, calcNoteValueToDisplay, getDrumIndex, noteToFrequency,
     FLAT, SHARP, DRUMS, MATRIXSOLFEHEIGHT, toFraction, SOLFEGECONVERSIONTABLE, DEFAULTVOICE,
     getDrumName, MATRIXSOLFEWIDTH, getDrumIcon, noteIsSolfege, isCustomTemperament, i18nSolfege,
-    getNote, DEFAULTDRUM, getTemperament
+    getNote, DEFAULTDRUM, getTemperament, noteToPitchOctave
 
 - js/utils/utils.js
     _, delayExecution, last, LCD, docById, docBySelector
@@ -4732,7 +4732,7 @@ class PhraseMaker {
                                     [
                                         "customNote",
                                         {
-                                            value: note[0][j].substring(0, note[0][j].length - 1)
+                                            value: noteToPitchOctave(note[0][j])[0]
                                         }
                                     ],
                                     0,
@@ -4741,7 +4741,7 @@ class PhraseMaker {
                                 ]);
                                 newStack.push([
                                     thisBlock + 2,
-                                    ["number", { value: note[0][j].slice(-1) }],
+                                    ["number", { value: noteToPitchOctave(note[0][j])[1] }],
                                     0,
                                     0,
                                     [thisBlock]
@@ -4798,7 +4798,7 @@ class PhraseMaker {
                                     [
                                         "customNote",
                                         {
-                                            value: note[0][j].substring(0, note[0][j].length - 1)
+                                            value: noteToPitchOctave(note[0][j])[0]
                                         }
                                     ],
                                     0,
@@ -4807,7 +4807,7 @@ class PhraseMaker {
                                 ]);
                                 newStack.push([
                                     thisBlock + 2,
-                                    ["number", { value: note[0][j].slice(-1) }],
+                                    ["number", { value: noteToPitchOctave(note[0][j])[1] }],
                                     0,
                                     0,
                                     [thisBlock]
@@ -4860,7 +4860,7 @@ class PhraseMaker {
                                     [
                                         "customNote",
                                         {
-                                            value: note[0][j].substring(0, note[0][j].length - 1)
+                                            value: noteToPitchOctave(note[0][j])[0]
                                         }
                                     ],
                                     0,
@@ -4869,7 +4869,7 @@ class PhraseMaker {
                                 ]);
                                 newStack.push([
                                     thisBlock + 2,
-                                    ["number", { value: note[0][j].slice(-1) }],
+                                    ["number", { value: noteToPitchOctave(note[0][j])[1] }],
                                     0,
                                     0,
                                     [thisBlock]

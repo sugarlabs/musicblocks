@@ -56,7 +56,7 @@
   DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
   INTERVALVALUES, getIntervalRatio, frequencyToPitch, NOTESTEP,
   GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
-  SEMITONES, CHROMATIC_SOLFEGE
+  SEMITONES, CHROMATIC_SOLFEGE, noteToPitchOctave
 */
 
 /**
@@ -3709,10 +3709,8 @@ const getNumber = (notename, octave) => {
  * @returns {Array} An array containing the note and octave.
  */
 const getNoteFromInterval = (pitch, interval) => {
-    const len = pitch.length;
-    const pitch1 = pitch.substring(0, 1);
-    const note1 = pitch.substring(0, len - 1);
-    const octave1 = Number(pitch.slice(-1));
+    const [note1, octave1] = noteToPitchOctave(pitch);
+    const pitch1 = note1.substring(0, 1);
     const number = pitchToNumber(note1, octave1, "C major");
     const pitches = ["C", "D", "E", "F", "G", "A", "B"];
     const priorAttrs = [DOUBLEFLAT, FLAT, "", SHARP, DOUBLESHARP];
@@ -5862,8 +5860,11 @@ const durationToNoteValue = duration => {
  * @returns {Array} An array containing pitch and octave.
  */
 const noteToPitchOctave = note => {
-    const len = note.length;
-    return [note.substring(0, len - 1), Number(last(note))];
+    const match = note.match(/^(.*?)(\d+)$/);
+    if (match) {
+        return [match[1], Number(match[2])];
+    }
+    return [note, 4];
 };
 
 /**
@@ -6452,6 +6453,7 @@ if (typeof module !== "undefined" && module.exports) {
         convertFactor,
         getPitchInfo,
         noteToFrequency,
+        noteToPitchOctave,
         normalizeNoteAccidentals,
         TEMPERAMENT,
         setOctaveRatio,

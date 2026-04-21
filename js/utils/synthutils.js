@@ -18,7 +18,7 @@
    getOctaveRatio, isCustomTemperament, Singer, DOUBLEFLAT, DOUBLESHARP,
    DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
    getArticulation, piemenuPitches, docById, slicePath, wheelnav, platformColor,
-   DEFAULTVOICE, normalizeNoteAccidentals
+   DEFAULTVOICE, normalizeNoteAccidentals, noteToPitchOctave
 */
 
 /*
@@ -28,7 +28,7 @@
     - js/utils/musicutils.js
         pitchToNumber, getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
         isCustomTemperament, DOUBLEFLAT, DOUBLESHARP, DEFAULTDRUM, getOscillatorTypes, numberToPitch,
-        getArticulation, getOctaveRatio, getTemperament, DEFAULTVOICE
+        getArticulation, getOctaveRatio, getTemperament, DEFAULTVOICE, noteToPitchOctave
     - js/turtle-singer.js
         Singer
     - js/utils/platformstyle.js
@@ -596,29 +596,23 @@ function Synth() {
             console.error("Temperament not found: " + temperament);
             return;
         }
-        const len = startPitch.length;
-        const number = pitchToNumber(
-            startPitch.substring(0, len - 1),
-            startPitch.slice(-1),
-            "C major"
-        );
+        const [pitch, octave] = noteToPitchOctave(startPitch);
+        const number = pitchToNumber(pitch, octave, "C major");
         const startPitchObj = numberToPitch(number);
         startPitch = (startPitchObj[0] + startPitchObj[1]).toString();
 
-        if (startPitch.substring(1, len - 1) === FLAT || startPitch.substring(1, len - 1) === "b") {
+        if (pitch.substring(1) === FLAT || pitch.substring(1) === "b") {
             startPitch = startPitch.replace(FLAT, "b");
-        } else if (
-            startPitch.substring(1, len - 1) === SHARP ||
-            startPitch.substring(1, len - 1) === "#"
-        ) {
+        } else if (pitch.substring(1) === SHARP || pitch.substring(1) === "#") {
             startPitch = startPitch.replace(SHARP, "#");
         }
 
         const frequency = Tone.Frequency(startPitch).toFrequency();
 
+        const [startNote, startOctave] = noteToPitchOctave(startingPitch);
         this.noteFrequencies = {
             // note: [octave, Frequency]
-            [startingPitch.substring(0, len - 1)]: [Number(startingPitch.slice(-1)), frequency]
+            [startNote]: [startOctave, frequency]
         };
 
         for (const interval in t) {
@@ -685,9 +679,7 @@ function Synth() {
         if (this.inTemperament === "equal") {
             let len, note, octave;
             if (typeof notes === "string") {
-                len = notes.length;
-                note = notes.substring(0, len - 1);
-                octave = Number(notes.slice(-1));
+                const [note, octave] = noteToPitchOctave(notes);
                 return pitchToFrequency(note, octave, 0, "c major");
             } else if (typeof notes === "number") {
                 return notes;
@@ -695,9 +687,7 @@ function Synth() {
                 const results = [];
                 for (let i = 0; i < notes.length; i++) {
                     if (typeof notes[i] === "string") {
-                        len = notes[i].length;
-                        note = notes[i].substring(0, len - 1);
-                        octave = Number(notes[i].slice(-1));
+                        const [note, octave] = noteToPitchOctave(notes[i]);
                         results.push(pitchToFrequency(note, octave, 0, "c major"));
                     } else {
                         results.push(notes[i]);
@@ -708,16 +698,15 @@ function Synth() {
         }
 
         const __getFrequency = oneNote => {
-            const len = oneNote.length;
-
+            const [noteName, octave] = noteToPitchOctave(oneNote);
             for (const note in this.noteFrequencies) {
-                if (note === oneNote.substring(0, len - 1)) {
-                    if (this.noteFrequencies[note][0] === Number(oneNote.slice(-1))) {
-                        //Note to be played is in the same octave.
+                if (note === noteName) {
+                    if (this.noteFrequencies[note][0] === octave) {
+                        // Note to be played is in the same octave.
                         return this.noteFrequencies[note][1];
                     } else {
-                        //Note to be played is not in the same octave.
-                        const power = Number(oneNote.slice(-1)) - this.noteFrequencies[note][0];
+                        // Note to be played is not in the same octave.
+                        const power = octave - this.noteFrequencies[note][0];
                         return this.noteFrequencies[note][1] * Math.pow(2, power);
                     }
                 }
@@ -752,12 +741,13 @@ function Synth() {
      */
     this.getCustomFrequency = (notes, customID) => {
         const __getCustomFrequency = (oneNote, startingPitch) => {
-            const octave = oneNote.slice(-1);
-            oneNote = getCustomNote(oneNote.substring(0, oneNote.length - 1));
+            const [notePart, octave] = noteToPitchOctave(oneNote);
+            oneNote = getCustomNote(notePart);
             const pitch = startingPitch;
+            const [startingNoteName, startingOctave] = noteToPitchOctave(pitch);
             const startPitchFrequency = pitchToFrequency(
-                pitch.substring(0, pitch.length - 1),
-                pitch.slice(-1),
+                startingNoteName,
+                startingOctave,
                 0,
                 "C Major"
             );
