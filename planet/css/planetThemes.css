@@ -1,5 +1,9 @@
-/* Dark Mode */
+/* Base Colors */
+.planet-page-title {
+    color: #8bc34a; /* Materialize light-green fallback */
+}
 
+/* Dark Mode */
 .dark {
     background-color: #303030;
     color: #e0e0e0;
@@ -63,7 +67,7 @@
 .dark #local-projects .card .card-content {
     color: #bdbdbd;
 }
-s .dark #local-projects .card:hover {
+.dark #local-projects .card:hover {
     background-color: #242424;
     box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.5);
 }
@@ -109,7 +113,9 @@ s .dark #local-projects .card:hover {
 .dark .modal-footer .btn-flat {
     color: #ffffff !important;
     background-color: transparent !important;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease;
     font-weight: bold;
 }
 
@@ -177,6 +183,10 @@ s .dark #local-projects .card:hover {
 .highcontrast {
     background-color: #000080;
     color: #ffff00;
+}
+
+.highcontrast .planet-page-title {
+    color: #ffffff !important;
 }
 
 .highcontrast .nav-extended {
@@ -252,7 +262,7 @@ s .dark #local-projects .card:hover {
 .highcontrast #local-projects .card .card-content {
     color: #ffff00;
 }
-s .highcontrast #local-projects .card:hover {
+.highcontrast #local-projects .card:hover {
     background-color: #000080;
     box-shadow: 0px 6px 8px rgba(255, 255, 0, 0.5);
 }
@@ -300,7 +310,9 @@ s .highcontrast #local-projects .card:hover {
 .highcontrast .modal-footer .btn-flat {
     color: #ffff00 !important;
     background-color: transparent !important;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease;
     font-weight: bold;
     border: 2px solid #ffff00;
 }
