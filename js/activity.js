@@ -249,6 +249,7 @@ class Activity {
 
         this.cellSize = 55;
         this.searchSuggestions = [];
+        this._searchCloseListener = null;
         this.homeButtonContainer;
 
         this.msgTimeoutID = null;
@@ -3384,6 +3385,12 @@ class Activity {
                 obj[0].style.visibility = "hidden";
             }
 
+            // Remove the document mousedown listener if it exists
+            if (this._searchCloseListener) {
+                this.removeEventListener(document, "mousedown", this._searchCloseListener);
+                this._searchCloseListener = null;
+            }
+
             this.searchWidget.style.visibility = "hidden";
             this.searchWidget.idInput_custom = "";
         };
@@ -3439,10 +3446,10 @@ class Activity {
                     } else {
                         // this will hide the search bar if someone clicks on menu items
                         that.hideSearchWidget();
-                        document.removeEventListener("mousedown", closeListener);
                     }
                 };
-                document.addEventListener("mousedown", closeListener);
+                this._searchCloseListener = closeListener;
+                this.addEventListener(document, "mousedown", closeListener);
 
                 // Give the browser time to update before selecting
                 // focus.
