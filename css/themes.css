@@ -563,6 +563,8 @@ body.highcontrast {
 
 .highcontrast .modalBox {
     background-color: #000000;
+    border: 2px solid #cccccc;
+    box-shadow: 0 0 8px rgba(255, 255, 0, 0.45);
 }
 
 .highcontrast .modal-message {
