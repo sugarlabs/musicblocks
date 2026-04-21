@@ -1212,35 +1212,6 @@ describe("Utility Functions (logic-only)", () => {
             expect(Synth.audioURL).toBeNull();
         });
     });
-
-    describe("resolveInstrumentName", () => {
-        it("should return the internal key for a translated voice name", () => {
-            // In English, _("piano") is "piano".
-            // Our resolveInstrumentName matches against BOTH VOICENAMES[i][0] and [1].
-            expect(resolveInstrumentName("piano")).toBe("piano");
-        });
-
-        it("should return the internal key for a raw internal voice name", () => {
-            expect(resolveInstrumentName("electric guitar")).toBe("electric guitar");
-        });
-
-        it("should return the internal key for a drum name", () => {
-            expect(resolveInstrumentName("snare drum")).toBe("snare drum");
-        });
-
-        it("should return the internal key for a translated noise name", () => {
-            expect(resolveInstrumentName("white noise")).toBe("noise1");
-        });
-
-        it("should return the original name if not found in any mapping", () => {
-            expect(resolveInstrumentName("unknown-synth")).toBe("unknown-synth");
-        });
-
-        it("should handle null or undefined gracefully", () => {
-            expect(resolveInstrumentName(null)).toBe(null);
-            expect(resolveInstrumentName(undefined)).toBe(undefined);
-        });
-    });
 });
 
 describe("Tuner Utilities (Audio Test Functions)", () => {
@@ -1724,5 +1695,34 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
 
         expect(synthRef.triggers).toHaveLength(0);
         expect(synthRef.disposed).toBe(true);
+    });
+
+    describe("resolveInstrumentName", () => {
+        it("should return the internal key for a translated voice name", () => {
+            // In English, _("piano") is "piano".
+            // Our resolveInstrumentName matches against BOTH VOICENAMES[i][0] and [1].
+            expect(resolveInstrumentName("piano")).toBe("piano");
+        });
+
+        it("should return the internal key for a raw internal voice name", () => {
+            expect(resolveInstrumentName("electric guitar")).toBe("electric guitar");
+        });
+
+        it("should return the internal key for a drum name", () => {
+            expect(resolveInstrumentName("snare drum")).toBe("snare drum");
+        });
+
+        it("should return the internal key for a translated noise name", () => {
+            expect(resolveInstrumentName("white noise")).toBe("noise1");
+        });
+
+        it("should return the original name if not found in any mapping", () => {
+            expect(resolveInstrumentName("unknown-synth")).toBe("unknown-synth");
+        });
+
+        it("should handle null or undefined gracefully", () => {
+            expect(resolveInstrumentName(null)).toBe(null);
+            expect(resolveInstrumentName(undefined)).toBe(undefined);
+        });
     });
 });
