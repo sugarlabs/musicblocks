@@ -125,14 +125,14 @@ class SaveInterface {
             '";' +
             "  }" +
             "}" +
-            "window.onload = function() {" +
+            'window.addEventListener("load", function() {' +
             '  var codeBlock = document.getElementById("codeBlock");' +
             '  var showHideButton = document.getElementById("showhide");' +
             '  codeBlock.style.display = "none";' +
             '  showHideButton.textContent = "' +
             STR_SHOW +
             '";' +
-            "};" +
+            "});" +
             "function copyCode() {" +
             '  var text = document.getElementById("codeBlock").innerText;' +
             "  navigator.clipboard.writeText(text).then(function() {" +

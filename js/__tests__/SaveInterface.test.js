@@ -316,6 +316,22 @@ describe("save HTML methods", () => {
         expect(html).toContain("&lt;/script&gt;");
     });
 
+    it("should compose exported page initialization with other load handlers", () => {
+        const si = new SaveInterface({
+            PlanetInterface: {
+                getCurrentProjectName: jest.fn(() => "Mock Project"),
+                getCurrentProjectDescription: jest.fn(() => "Mock Description"),
+                getCurrentProjectImage: jest.fn(() => "mock-image.png")
+            },
+            prepareExport: jest.fn(() => "Mock Exported Data")
+        });
+
+        const html = si.prepareHTML();
+
+        expect(html).toContain('window.addEventListener("load", function() {');
+        expect(html).not.toContain("window.onload = function()");
+    });
+
     it("escapeHTML should encode all five HTML special characters", () => {
         expect(escapeHTML("&<>\"'")).toBe("&amp;&lt;&gt;&quot;&#039;");
     });
