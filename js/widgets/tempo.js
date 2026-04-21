@@ -80,6 +80,16 @@ class Tempo {
         };
 
         const pauseBtn = widgetWindow.addButton("pause-button.svg", Tempo.ICONSIZE, _("Pause"));
+        // --- INSERT THIS ACCESSIBILITY BLOCK ---
+        pauseBtn.setAttribute("tabindex", "0");
+        pauseBtn.setAttribute("role", "button");
+        pauseBtn.addEventListener("keydown", event => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                pauseBtn.click(); // Triggers the onclick logic below
+            }
+        });
+        // ----------------------------------------
         pauseBtn.onclick = () => {
             if (this.isMoving) {
                 this.pause();
@@ -107,15 +117,33 @@ class Tempo {
         };
 
         this._save_lock = false;
-        widgetWindow.addButton("export-chunk.svg", Tempo.ICONSIZE, _("Save tempo"), "").onclick =
-            () => {
-                // Debounce button
-                if (!this._get_save_lock()) {
-                    this._save_lock = true;
-                    this._saveTempo();
-                    setTimeout(() => (this._save_lock = false), 1000);
-                }
-            };
+        // Assign to a variable so we can add attributes
+        const saveBtn = widgetWindow.addButton(
+            "export-chunk.svg",
+            Tempo.ICONSIZE,
+            _("Save tempo"),
+            ""
+        );
+
+        // --- ADD ACCESSIBILITY ---
+        saveBtn.setAttribute("tabindex", "0");
+        saveBtn.setAttribute("role", "button");
+        saveBtn.addEventListener("keydown", e => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                saveBtn.click();
+            }
+        });
+        // -------------------------
+
+        saveBtn.onclick = () => {
+            // Debounce button
+            if (!this._get_save_lock()) {
+                this._save_lock = true;
+                this._saveTempo();
+                setTimeout(() => (this._save_lock = false), 1000);
+            }
+        };
 
         this.bodyTable = document.createElement("table");
         this.widgetWindow.getWidgetBody().appendChild(this.bodyTable);
@@ -134,24 +162,47 @@ class Tempo {
             r1 = this.bodyTable.insertRow();
             r2 = this.bodyTable.insertRow();
             r3 = this.bodyTable.insertRow();
-            widgetWindow.addButton(
+
+            // --- REPLACEMENT FOR SPEED UP BUTTON ---
+            const upBtn = widgetWindow.addButton(
                 "up.svg",
                 Tempo.ICONSIZE,
                 _("speed up"),
                 r1.insertCell()
-            ).onclick = (
+            );
+            upBtn.setAttribute("tabindex", "0");
+            upBtn.setAttribute("role", "button");
+            upBtn.addEventListener("keydown", e => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    upBtn.click();
+                }
+            });
+            upBtn.onclick = (
                 i => () =>
                     this.speedUp(i)
             )(i);
-            widgetWindow.addButton(
+
+            // --- REPLACEMENT FOR SLOW DOWN BUTTON ---
+            const downBtn = widgetWindow.addButton(
                 "down.svg",
                 Tempo.ICONSIZE,
                 _("slow down"),
                 r2.insertCell()
-            ).onclick = (
+            );
+            downBtn.setAttribute("tabindex", "0");
+            downBtn.setAttribute("role", "button");
+            downBtn.addEventListener("keydown", e => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    downBtn.click();
+                }
+            });
+            downBtn.onclick = (
                 i => () =>
                     this.slowDown(i)
             )(i);
+            // ------------------------------------------
 
             this.BPMInputs[i] = widgetWindow.addInputButton(this.BPMs[i], r3.insertCell());
             this.tempoCanvases[i] = document.createElement("canvas");
