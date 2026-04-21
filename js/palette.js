@@ -108,6 +108,7 @@ class Palettes {
         this._expandedForKeyboardFocus = false;
 
         this._searchResultIndex = 0;
+        this._searchNavInitialized = false;
         this._handleSearchKeydown = this._handleSearchKeydown.bind(this);
     }
 
@@ -333,8 +334,9 @@ class Palettes {
      */
     _setupSearchKeyboardNav() {
         const searchWidget = document.getElementById("search");
-        if (searchWidget) {
+        if (searchWidget && !this._searchNavInitialized) {
             searchWidget.addEventListener("keydown", this._handleSearchKeydown);
+            this._searchNavInitialized = true;
         }
     }
 
