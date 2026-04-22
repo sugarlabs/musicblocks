@@ -5859,9 +5859,11 @@ const durationToNoteValue = duration => {
  * @returns {Array} An array containing pitch and octave.
  */
 const noteToPitchOctave = note => {
-    const match = note.match(/^(.*?)(\d+)$/);
+    const match = note.match(/^([a-zA-Z#b♭♯𝄫𝄪x]+)(\d+)?(.*)$/);
     if (match) {
-        return [match[1], Number(match[2])];
+        const pitch = match[1];
+        const octave = match[2] ? Number(match[2]) : 4;
+        return [pitch, octave];
     }
     return [note, 4];
 };

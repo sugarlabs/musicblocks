@@ -1764,7 +1764,12 @@ describe("noteToPitchOctave", () => {
 
     it("should handle multi-character note names with no octave", () => {
         const result = noteToPitchOctave("B#");
-        expect(result).toEqual(["B", NaN]); // No octave, returns NaN for octave
+        expect(result).toEqual(["B#", 4]); // Returns default octave 4
+    });
+
+    it("should handle note strings with trailing suffixes", () => {
+        const result = noteToPitchOctave("C4_");
+        expect(result).toEqual(["C", 4]); // Pitch is 'C', octave is 4, suffix '_' is ignored
     });
 });
 
