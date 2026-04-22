@@ -288,10 +288,10 @@ s .dark #local-projects .card:hover {
     background-color: #001133;
     border: 2px solid #ffff00;
     outline: 1px solid #ffffff;
-    box-shadow:
-        0 0 0 3px #000000,
-        0 10px 24px rgba(0, 0, 0, 0.9);
+    outline-offset: -2px;
+    box-shadow: 0 0 0 3px #000000, 0 10px 24px rgba(0, 0, 0, 0.9);
     color: #ffff00;
+    bottom: -5px;
 }
 
 .highcontrast #projectviewer-report-card .card-content,
