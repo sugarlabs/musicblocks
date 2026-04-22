@@ -106,6 +106,13 @@ class Palettes {
         // so we can restore its state when focus leaves.
         this._wasCollapsedBeforeFocus = false;
         this._expandedForKeyboardFocus = false;
+
+        // Listen for language changes and update palette labels
+        if (typeof i18next !== "undefined") {
+            i18next.on("languageChanged", () => {
+                this._updatePaletteLabels();
+            });
+        }
     }
 
     init() {
@@ -847,6 +854,9 @@ class Palettes {
         img.style.width = `${this.cellSize}px`;
         img.style.height = `${this.cellSize}px`;
         label.textContent = toTitleCase(_(name));
+        // Add data attributes for language change updates
+        label.setAttribute("data-palette-label", "true");
+        label.setAttribute("data-palette-name", name);
         label.style.color = platformColor.paletteText;
         row.style.borderBottom = "1px solid #0CAFFF";
         label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
@@ -888,6 +898,9 @@ class Palettes {
         img.style.width = `${this.cellSize}px`;
         img.style.height = `${this.cellSize}px`;
         label.textContent = toTitleCase(_(name));
+        // Add data attributes for language change updates
+        label.setAttribute("data-palette-label", "true");
+        label.setAttribute("data-palette-name", name);
         label.style.color = platformColor.paletteText;
         label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
         label.style.padding = "4px";
@@ -920,6 +933,38 @@ class Palettes {
         });
 
         this._loadPaletteButtonHandler(name, row);
+    }
+
+    /**
+     * Updates palette button labels when language changes.
+     * This method is called when i18next detects a language change event.
+     * @private
+     * @returns {void}
+     */
+    _updatePaletteLabels() {
+        // Update all visible palette button labels (search and palette menus)
+        const labels = document.querySelectorAll("[data-palette-label]");
+        labels.forEach(label => {
+            const paletteName = label.getAttribute("data-palette-name");
+            if (paletteName) {
+                label.textContent = toTitleCase(_(paletteName));
+            }
+        });
+
+        // Update all palette menu header labels
+        for (const [name, menu] of Object.entries(this.dict)) {
+            if (menu.menuContainer && menu.menuContainer.children[0]) {
+                const headerLabels = menu.menuContainer.children[0].querySelectorAll(
+                    "[data-palette-header-label]"
+                );
+                headerLabels.forEach(label => {
+                    const paletteName = label.getAttribute("data-palette-name");
+                    if (paletteName) {
+                        label.textContent = toTitleCase(_(paletteName));
+                    }
+                });
+            }
+        }
     }
 
     showPalette(name) {
@@ -1490,6 +1535,9 @@ class Palette {
             label.textContent = toTitleCase(_(this.name));
             label.style.fontWeight = "bold";
             label.style.color = platformColor.textColor;
+            // Add data attributes for language change updates
+            label.setAttribute("data-palette-header-label", "true");
+            label.setAttribute("data-palette-name", this.name);
             header.appendChild(label);
 
             const closeDownImg = document.createElement("span");
