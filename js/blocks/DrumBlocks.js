@@ -13,7 +13,7 @@
    global
 
    _, last, Singer, FlowBlock, ValueBlock, FlowClampBlock,
-   DEFAULTDRUM, DEFAULTEFFECT, NOINPUTERRORMSG, DEFAULTNOISE
+   DEFAULTDRUM, DEFAULTEFFECT, NOINPUTERRORMSG, NANERRORMSG, DEFAULTNOISE
 */
 
 /* exported setupDrumBlocks */
@@ -213,7 +213,7 @@ function setupDrumBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             let arg = args[0];
-            if (args.length !== 1 || arg == null || typeof arg !== "string") {
+            if (args.length !== 1 || arg === null || arg === undefined || typeof arg !== "string") {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg = "noise1";
             }
@@ -481,6 +481,84 @@ function setupDrumBlocks(activity) {
             ]);
         }
     }
+
+    /**
+     * Class representing a PitchShiftDrumBlock, extending FlowBlock.
+     */
+    class PitchShiftDrumBlock extends FlowBlock {
+        /**
+         * Create a PitchShiftDrumBlock.
+         */
+        constructor() {
+            super("pitchshiftdrum", _("pitch-shift drum"));
+
+            this.setPalette("drum", activity);
+            this.beginnerBlock(true);
+            this.formBlock({
+                args: 2,
+                defaults: [DEFAULTDRUM, 0],
+                argTypes: ["anyin", "numberin"]
+            });
+            this.setHelpString([
+                _(
+                    "The Pitch-shift drum block plays a drum or sound effect shifted by the specified number of semitones."
+                ),
+                "documentation",
+                ""
+            ]);
+            this.makeMacro((x, y) => [
+                [0, "pitchshiftdrum", x, y, [null, 1, 2, null]],
+                [1, ["drumname", { value: DEFAULTDRUM }], 0, 0, [0]],
+                [2, ["number", { value: 0 }], 0, 0, [0]]
+            ]);
+        }
+
+        /**
+         * Perform the flow of the block.
+         *
+         * @param {Array} args - The arguments for the flow.
+         * @param {Object} logo - The logo object.
+         * @param {Object} turtle - The turtle object.
+         * @param {Object} blk - The block object.
+         */
+        flow(args, logo, turtle, blk) {
+            let drumArg = args[0];
+            let shiftArg = args[1];
+
+            if (
+                args.length !== 2 ||
+                drumArg === null ||
+                drumArg === undefined ||
+                typeof drumArg !== "string"
+            ) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                drumArg = DEFAULTDRUM;
+            }
+
+            if (typeof shiftArg !== "number" || Number.isNaN(shiftArg)) {
+                activity.errorMsg(NANERRORMSG, blk);
+                shiftArg = 0;
+            }
+
+            const tur = activity.turtles.ithTurtle(turtle);
+            const isStandalone =
+                activity.blocks.blockList[blk].connections[0] === null &&
+                last(activity.blocks.blockList[blk].connections) === null;
+
+            if (tur.singer.inNoteBlock.length > 0 || isStandalone) {
+                Singer.DrumActions.playPitchDrum(drumArg, shiftArg, turtle, blk);
+            } else {
+                console.debug("PITCH SHIFT DRUM ERROR: missing context");
+                return;
+            }
+
+            if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(tur.singer.beatFactor);
+            }
+
+            tur.singer.pushedNote = true;
+        }
+    }
     /**
      * Class representing a PlayDrumBlock, extending FlowBlock.
      */
@@ -535,7 +613,7 @@ function setupDrumBlocks(activity) {
             /**
              * Validate input and handle errors.
              */
-            if (args.length !== 1 || arg == null || typeof arg !== "string") {
+            if (args.length !== 1 || arg === null || arg === undefined || typeof arg !== "string") {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg = DEFAULTDRUM;
             }
@@ -576,8 +654,8 @@ function setupDrumBlocks(activity) {
                 logo.musicKeyboard.addRowBlock(blk);
             } else if (
                 tur.singer.inNoteBlock.length > 0 ||
-                (activity.blocks.blockList[blk].connections[0] == null &&
-                    last(activity.blocks.blockList[blk].connections) == null)
+                (activity.blocks.blockList[blk].connections[0] === null &&
+                    last(activity.blocks.blockList[blk].connections) === null)
             ) {
                 // Handle other contexts
                 Singer.DrumActions.playDrum(args[0], turtle, blk);
@@ -605,6 +683,7 @@ function setupDrumBlocks(activity) {
     new MapDrumBlock().setup(activity);
     new SetDrumBlock().setup(activity);
     new PlayEffectBlock().setup(activity);
+    new PitchShiftDrumBlock().setup(activity);
     new PlayDrumBlock().setup(activity);
 }
 if (typeof module !== "undefined" && module.exports) {

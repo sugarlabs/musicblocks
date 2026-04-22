@@ -205,6 +205,7 @@ class JSInterface {
         synthvolumefactor: "getSynthVolume",
         // Drum blocks
         playdrum: "playDrum",
+        pitchshiftdrum: "playPitchDrum",
         setdrum: "setDrum",
         mapdrum: "mapPitchToDrum",
         playnoise: "playNoise",
@@ -1469,6 +1470,17 @@ class JSInterface {
                 constraints: {
                     type: "drum"
                 }
+            }
+        ],
+        playPitchDrum: [
+            {
+                type: "string",
+                constraints: {
+                    type: "drum"
+                }
+            },
+            {
+                type: "number"
             }
         ],
         setDrum: [

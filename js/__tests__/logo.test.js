@@ -341,7 +341,8 @@ describe("Logo Class", () => {
                     noteCents: {},
                     noteHertz: {},
                     embeddedGraphics: {},
-                    noteDrums: {}
+                    noteDrums: {},
+                    noteDrumTranspositions: {}
                 }
             };
 
@@ -352,6 +353,7 @@ describe("Logo Class", () => {
             expect(mockTurtle.singer.noteValue[0]).toBeNull();
             expect(mockTurtle.singer.notePitches[0]).toEqual([]);
             expect(mockTurtle.singer.noteDrums[0]).toEqual([]);
+            expect(mockTurtle.singer.noteDrumTranspositions[0]).toEqual([]);
         });
 
         test("uses provided drums array when not null", () => {
@@ -366,7 +368,8 @@ describe("Logo Class", () => {
                     noteCents: {},
                     noteHertz: {},
                     embeddedGraphics: {},
-                    noteDrums: {}
+                    noteDrums: {},
+                    noteDrumTranspositions: {}
                 }
             };
 

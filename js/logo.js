@@ -596,6 +596,7 @@ class Logo {
         turtle.singer.noteHertz[blk] = [];
         turtle.singer.embeddedGraphics[blk] = [];
         turtle.singer.noteDrums[blk] = drums !== null ? drums : [];
+        turtle.singer.noteDrumTranspositions[blk] = [];
     }
 
     /**
@@ -1681,7 +1682,8 @@ class Logo {
                 } else {
                     nextFlow = logo.blockList[blk].connections[0];
                     if (
-                        nextFlow != null &&
+                        nextFlow !== null &&
+                        nextFlow !== undefined &&
                         (logo.blockList[nextFlow].name === "action" ||
                             logo.blockList[nextFlow].name === "backward")
                     ) {

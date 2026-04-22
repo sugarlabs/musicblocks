@@ -167,6 +167,7 @@ function setupRhythmActions(activity) {
                 delete tur.singer.noteCents[last(tur.singer.inNoteBlock)];
                 delete tur.singer.noteHertz[last(tur.singer.inNoteBlock)];
                 delete tur.singer.noteDrums[last(tur.singer.inNoteBlock)];
+                delete tur.singer.noteDrumTranspositions[last(tur.singer.inNoteBlock)];
                 delete tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)];
                 tur.singer.inNoteBlock.splice(-1, 1);
 
@@ -265,6 +266,7 @@ function setupRhythmActions(activity) {
             tur.singer.tieNoteExtras = [];
             tur.singer.tieCarryOver = 0;
             tur.singer.tieFirstDrums = [];
+            tur.singer.tieFirstDrumTranspositions = [];
 
             const listenerName = "_tie_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
@@ -316,12 +318,13 @@ function setupRhythmActions(activity) {
                     tur.singer.noteBeat[saveBlk] = tur.singer.tieNoteExtras[2];
                     tur.singer.noteBeatValues[saveBlk] = tur.singer.tieNoteExtras[3];
                     tur.singer.noteDrums[saveBlk] = tur.singer.tieNoteExtras[4];
+                    tur.singer.noteDrumTranspositions[saveBlk] = tur.singer.tieNoteExtras[5];
                     tur.singer.embeddedGraphics[saveBlk] = []; // graphics will have already been rendered
 
                     Singer.processNote(
                         activity,
-                        tur.singer.tieNoteExtras[7], // rawDurationValue
-                        tur.singer.tieNoteExtras[6], // isOsc
+                        tur.singer.tieNoteExtras[8], // rawDurationValue
+                        tur.singer.tieNoteExtras[7], // isOsc
                         saveBlk,
                         turtle
                     );
@@ -332,8 +335,8 @@ function setupRhythmActions(activity) {
                         (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
 
                     if (!tur.singer.suppressOutput) {
-                        const rawDuration = tur.singer.tieNoteExtras[7];
-                        const wasOsc = tur.singer.tieNoteExtras[6];
+                        const rawDuration = tur.singer.tieNoteExtras[8];
+                        const wasOsc = tur.singer.tieNoteExtras[7];
 
                         const waitSeconds = wasOsc ? rawDuration / 1000 : bpmFactor / rawDuration;
 
@@ -351,6 +354,7 @@ function setupRhythmActions(activity) {
                     delete tur.singer.noteBeat[saveBlk];
                     delete tur.singer.noteBeatValues[saveBlk];
                     delete tur.singer.noteDrums[saveBlk];
+                    delete tur.singer.noteDrumTranspositions[saveBlk];
                     delete tur.singer.embeddedGraphics[saveBlk];
 
                     // Remove duplicate note

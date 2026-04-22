@@ -233,6 +233,7 @@ class Turtle {
         this.singer.noteValue = {};
         this.singer.oscList = {};
         this.singer.noteDrums = {};
+        this.singer.noteDrumTranspositions = {};
         this.singer.notePitches = {};
         this.singer.noteOctaves = {};
         this.singer.noteCents = {};
@@ -284,6 +285,7 @@ class Turtle {
         this.singer.tieNoteExtras = [];
         this.singer.tieCarryOver = 0;
         this.singer.tieFirstDrums = [];
+        this.singer.tieFirstDrumTranspositions = [];
         this.singer.drift = 0;
         this.singer.maxLagCorrectionRatio = 0.25;
         this.singer.drumStyle = [];

@@ -67,6 +67,7 @@ describe("setupRhythmActions", () => {
                 noteCents: {},
                 noteHertz: {},
                 noteDrums: {},
+                noteDrumTranspositions: {},
                 embeddedGraphics: {}
             }
         };
@@ -336,6 +337,7 @@ describe("setupRhythmActions", () => {
             targetTurtle.singer.tieNoteExtras = [];
             targetTurtle.singer.tieCarryOver = 0;
             targetTurtle.singer.tieFirstDrums = [];
+            targetTurtle.singer.tieFirstDrumTranspositions = [];
             targetTurtle.singer.justCounting = [];
             targetTurtle.singer.bpm = [];
             activity.logo.notation = {
@@ -365,6 +367,7 @@ describe("setupRhythmActions", () => {
             expect(targetTurtle.singer.tieNoteExtras).toEqual([]);
             expect(targetTurtle.singer.tieCarryOver).toBe(0);
             expect(targetTurtle.singer.tieFirstDrums).toEqual([]);
+            expect(targetTurtle.singer.tieFirstDrumTranspositions).toEqual([]);
         });
 
         it("sets dispatch block when blk is in blockList", () => {
@@ -398,7 +401,7 @@ describe("setupRhythmActions", () => {
 
             // Simulate some tie data that should be cleaned up
             targetTurtle.singer.tieNotePitches = [["C", 4, 0, 0]];
-            targetTurtle.singer.tieNoteExtras = [1, [], [], [], []];
+            targetTurtle.singer.tieNoteExtras = [1, [], [], [], [], [], [], false, 4];
             targetTurtle.singer.tieCarryOver = 0;
 
             listener();
@@ -434,7 +437,11 @@ describe("setupRhythmActions", () => {
                 ["sine"], // oscList
                 1, // noteBeat
                 [1], // noteBeatValues
-                [] // noteDrums
+                [], // noteDrums
+                [], // noteDrumTranspositions
+                [], // embeddedGraphics
+                false, // isOsc
+                4 // rawDurationValue
             ];
             targetTurtle.singer.bpm = [120];
 
@@ -467,7 +474,7 @@ describe("setupRhythmActions", () => {
             targetTurtle.singer.justCounting = [];
             targetTurtle.singer.tieCarryOver = 2;
             targetTurtle.singer.tieNotePitches = [["C", 4, 0, 261.63]];
-            targetTurtle.singer.tieNoteExtras = [5, ["sine"], 1, [1], []];
+            targetTurtle.singer.tieNoteExtras = [5, ["sine"], 1, [1], [], [], [], false, 4];
             targetTurtle.singer.bpm = [120];
 
             listener();

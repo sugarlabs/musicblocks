@@ -89,7 +89,11 @@ function setupDrumActions(activity) {
             }
 
             if (tur.singer.inNoteBlock.length > 0) {
+                if (tur.singer.noteDrumTranspositions[last(tur.singer.inNoteBlock)] === undefined) {
+                    tur.singer.noteDrumTranspositions[last(tur.singer.inNoteBlock)] = [];
+                }
                 tur.singer.noteDrums[last(tur.singer.inNoteBlock)].push(drumname);
+                tur.singer.noteDrumTranspositions[last(tur.singer.inNoteBlock)].push(0);
                 if (tur.singer.synthVolume[drumname] === undefined) {
                     tur.singer.synthVolume[drumname] = [DEFAULTVOLUME];
                     tur.singer.crescendoInitialVolume[drumname] = [DEFAULTVOLUME];
@@ -98,7 +102,58 @@ function setupDrumActions(activity) {
                 // Play a stand-alone drum block as a quarter note.
                 activity.logo.clearNoteParams(tur, blk, []);
                 tur.singer.inNoteBlock.push(blk);
+                if (tur.singer.noteDrumTranspositions[last(tur.singer.inNoteBlock)] === undefined) {
+                    tur.singer.noteDrumTranspositions[last(tur.singer.inNoteBlock)] = [];
+                }
                 tur.singer.noteDrums[last(tur.singer.inNoteBlock)].push(drumname);
+                tur.singer.noteDrumTranspositions[last(tur.singer.inNoteBlock)].push(0);
+
+                const noteBeatValue = 4;
+
+                const __callback = () =>
+                    tur.singer.inNoteBlock.splice(tur.singer.inNoteBlock.indexOf(blk), 1);
+
+                Singer.processNote(activity, noteBeatValue, false, blk, turtle, __callback);
+            }
+
+            tur.singer.pushedNote = true;
+        }
+
+        /**
+         * Plays a pitch-shifted drum sound.
+         *
+         * @param {String} drum - drum name
+         * @param {Number} shift - number of semitones
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} blk - corresponding Block object in blocks.blockList
+         */
+        static playPitchDrum(drum, shift, turtle, blk) {
+            let drumname = Singer.DrumActions.GetDrumname(drum);
+
+            const tur = activity.turtles.ithTurtle(turtle);
+
+            if (tur.singer.drumStyle.length > 0) {
+                drumname = last(tur.singer.drumStyle);
+            }
+
+            if (tur.singer.inNoteBlock.length > 0) {
+                if (tur.singer.noteDrumTranspositions[last(tur.singer.inNoteBlock)] === undefined) {
+                    tur.singer.noteDrumTranspositions[last(tur.singer.inNoteBlock)] = [];
+                }
+                tur.singer.noteDrums[last(tur.singer.inNoteBlock)].push(drumname);
+                tur.singer.noteDrumTranspositions[last(tur.singer.inNoteBlock)].push(shift);
+                if (tur.singer.synthVolume[drumname] === undefined) {
+                    tur.singer.synthVolume[drumname] = [DEFAULTVOLUME];
+                    tur.singer.crescendoInitialVolume[drumname] = [DEFAULTVOLUME];
+                }
+            } else {
+                activity.logo.clearNoteParams(tur, blk, []);
+                tur.singer.inNoteBlock.push(blk);
+                if (tur.singer.noteDrumTranspositions[last(tur.singer.inNoteBlock)] === undefined) {
+                    tur.singer.noteDrumTranspositions[last(tur.singer.inNoteBlock)] = [];
+                }
+                tur.singer.noteDrums[last(tur.singer.inNoteBlock)].push(drumname);
+                tur.singer.noteDrumTranspositions[last(tur.singer.inNoteBlock)].push(shift);
 
                 const noteBeatValue = 4;
 
@@ -215,7 +270,11 @@ function setupDrumActions(activity) {
 
             if (tur.singer.inNoteBlock.length > 0) {
                 // Add the noise sound as if it were a drum
+                if (tur.singer.noteDrumTranspositions[last(tur.singer.inNoteBlock)] === undefined) {
+                    tur.singer.noteDrumTranspositions[last(tur.singer.inNoteBlock)] = [];
+                }
                 tur.singer.noteDrums[last(tur.singer.inNoteBlock)].push(noisename);
+                tur.singer.noteDrumTranspositions[last(tur.singer.inNoteBlock)].push(0);
                 if (tur.singer.synthVolume[noisename] === undefined) {
                     tur.singer.synthVolume[noisename] = [DEFAULTVOLUME];
                     tur.singer.crescendoInitialVolume[noisename] = [DEFAULTVOLUME];

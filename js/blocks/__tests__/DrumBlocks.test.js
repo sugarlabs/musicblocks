@@ -54,6 +54,7 @@ global.FlowClampBlock = jest.fn().mockImplementation(name => ({
 global.DEFAULTDRUM = "defaultDrum";
 global.DEFAULTEFFECT = "defaultEffect";
 global.NOINPUTERRORMSG = "No input error message";
+global.NANERRORMSG = "Not a number";
 global.DEFAULTNOISE = "defaultNoise";
 global.mock = jest.fn(() => ({
     setupDrumBlocks: jest.fn(activity => {
@@ -251,12 +252,22 @@ describe("setupDrumBlocks", () => {
         expect(() => setupDrumBlocks(activity)).not.toThrow();
     });
 
+    it("should register the pitch-shift drum block", () => {
+        setupDrumBlocks(activity);
+        expect(global.FlowBlock).toHaveBeenCalledWith("pitchshiftdrum", "pitch-shift drum");
+    });
+
     it("should call errorMsg when flow args are invalid in PlayNoiseBlock", () => {
         setupDrumBlocks(activity);
         const playNoiseBlock = new (class extends global.FlowBlock {
             flow = args => {
                 const arg = args[0];
-                if (args.length !== 1 || arg == null || typeof arg !== "string") {
+                if (
+                    args.length !== 1 ||
+                    arg === null ||
+                    arg === undefined ||
+                    typeof arg !== "string"
+                ) {
                     activity.errorMsg(global.NOINPUTERRORMSG, 0);
                 }
             };
@@ -322,7 +333,7 @@ describe("setupDrumBlocks", () => {
         setupDrumBlocks(activity);
         const playDrumBlock = new (class extends global.FlowBlock {
             flow = args => {
-                if (args.length !== 1 || args[0] == null) {
+                if (args.length !== 1 || args[0] === null || args[0] === undefined) {
                     console.debug("PLAY DRUM ERROR: missing context");
                 }
             };
@@ -339,7 +350,12 @@ describe("setupDrumBlocks", () => {
         const playDrumBlock = new (class extends global.FlowBlock {
             flow = args => {
                 let arg = args[0];
-                if (args.length !== 1 || arg == null || typeof arg !== "string") {
+                if (
+                    args.length !== 1 ||
+                    arg === null ||
+                    arg === undefined ||
+                    typeof arg !== "string"
+                ) {
                     activity.errorMsg(global.NOINPUTERRORMSG, 0);
                     arg = global.DEFAULTDRUM;
                 }
@@ -364,7 +380,12 @@ describe("setupDrumBlocks", () => {
         const playDrumBlock = new (class extends global.FlowBlock {
             flow = args => {
                 let arg = args[0];
-                if (args.length !== 1 || arg == null || typeof arg !== "string") {
+                if (
+                    args.length !== 1 ||
+                    arg === null ||
+                    arg === undefined ||
+                    typeof arg !== "string"
+                ) {
                     activity.errorMsg(global.NOINPUTERRORMSG, 0);
                     arg = global.DEFAULTDRUM;
                 }
@@ -391,7 +412,12 @@ describe("setupDrumBlocks", () => {
         const playDrumBlock = new (class extends global.FlowBlock {
             flow = args => {
                 let arg = args[0];
-                if (args.length !== 1 || arg == null || typeof arg !== "string") {
+                if (
+                    args.length !== 1 ||
+                    arg === null ||
+                    arg === undefined ||
+                    typeof arg !== "string"
+                ) {
                     activity.errorMsg(global.NOINPUTERRORMSG, 0);
                     arg = global.DEFAULTDRUM;
                 }
@@ -428,7 +454,12 @@ describe("setupDrumBlocks", () => {
         const playDrumBlock = new (class extends global.FlowBlock {
             flow = args => {
                 let arg = args[0];
-                if (args.length !== 1 || arg == null || typeof arg !== "string") {
+                if (
+                    args.length !== 1 ||
+                    arg === null ||
+                    arg === undefined ||
+                    typeof arg !== "string"
+                ) {
                     activity.errorMsg(global.NOINPUTERRORMSG, 0);
                     arg = global.DEFAULTDRUM;
                 }

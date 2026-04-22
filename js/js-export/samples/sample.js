@@ -96,6 +96,7 @@ get synth volume            : [R] getSynthVolume(synth)
 
     // Drum
 drum                        : playDrum(drum)
+pitch-shift drum            : playPitchDrum(drum, semitones)
 noise                       : playNoise(noise)
 
     // Graphics
