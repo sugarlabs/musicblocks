@@ -142,7 +142,11 @@ describe("Browser Action Behavior", () => {
 
         mockChrome.browserAction.onClicked.callback({ id: "tab-123" });
 
-        expect(window.open).toHaveBeenCalledWith("chrome-extension://fake-id/index.html");
+        expect(window.open).toHaveBeenCalledWith(
+            "chrome-extension://fake-id/index.html",
+            "_blank",
+            "noopener,noreferrer"
+        );
         expect(mockChrome.runtime.getURL).toHaveBeenCalledWith("index.html");
     });
 
@@ -155,7 +159,11 @@ describe("Browser Action Behavior", () => {
 
         mockChrome.runtime.onInstalled.callback({ reason: "install" });
 
-        expect(window.open).toHaveBeenCalledWith("chrome-extension://fake-id/index.html");
+        expect(window.open).toHaveBeenCalledWith(
+            "chrome-extension://fake-id/index.html",
+            "_blank",
+            "noopener,noreferrer"
+        );
         expect(mockChrome.runtime.getURL).toHaveBeenCalledWith("index.html");
     });
 

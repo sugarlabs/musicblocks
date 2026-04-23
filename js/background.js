@@ -23,11 +23,11 @@ if (navigator.userAgent.search("Firefox") !== -1) {
     });
 } else {
     chrome.browserAction.onClicked.addListener(tab => {
-        window.open(chrome.runtime.getURL("index.html"));
+        window.open(chrome.runtime.getURL("index.html"), "_blank", "noopener,noreferrer");
     });
 
     chrome.runtime.onInstalled.addListener(details => {
-        window.open(chrome.runtime.getURL("index.html"));
+        window.open(chrome.runtime.getURL("index.html"), "_blank", "noopener,noreferrer");
     });
 }
 if (typeof module !== "undefined" && module.exports) {
