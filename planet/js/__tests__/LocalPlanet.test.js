@@ -3,7 +3,7 @@
  *
  * @author Sapnil Biswas
  *
- * @copyright 2026 Sapnil Biswas
+ * @copyright 2026 Musicblock Contributor
  *
  * @license
  * This program is free software: you can redistribute it and/or modify
