@@ -148,9 +148,36 @@ describe("AIWidget Utilities", () => {
 describe("AIWidget Instance", () => {
     let aiWidget;
     let mockActivity;
+    let widgetButtons;
 
     beforeEach(() => {
+        widgetButtons = {};
+        global.prompt = jest.fn();
+        global.alert = jest.fn();
+        const sessionStorageMock = {
+            getItem: jest.fn(),
+            setItem: jest.fn(),
+            removeItem: jest.fn()
+        };
+        Object.defineProperty(window, "sessionStorage", {
+            value: sessionStorageMock,
+            configurable: true
+        });
+        global.sessionStorage = sessionStorageMock;
+        const localStorageMock = {
+            getItem: jest.fn(),
+            setItem: jest.fn(),
+            removeItem: jest.fn()
+        };
+        Object.defineProperty(window, "localStorage", {
+            value: localStorageMock,
+            configurable: true
+        });
+        global.localStorage = localStorageMock;
         mockActivity = {
+            storage: {
+                groq_api_key: "legacy-storage-key"
+            },
             logo: {
                 synth: {
                     loadSynth: jest.fn()
@@ -180,9 +207,14 @@ describe("AIWidget Instance", () => {
                     div.getBoundingClientRect = jest.fn(() => ({ width: 800, height: 600 }));
                     return div;
                 }),
-                addButton: jest.fn(() => ({
-                    onclick: null
-                })),
+                addButton: jest.fn((...args) => {
+                    const label = args[2];
+                    const button = {
+                        onclick: null
+                    };
+                    widgetButtons[label] = button;
+                    return button;
+                }),
                 addCheckbox: jest.fn(() => ({
                     onclick: null
                 })),
@@ -215,5 +247,20 @@ describe("AIWidget Instance", () => {
             "Warning: Sample is bigger than 1MB.",
             undefined
         );
+    });
+
+    it("should keep the Groq API key in sessionStorage", () => {
+        sessionStorage.getItem.mockReturnValue("stored-session-key");
+        prompt.mockReturnValue("  new-groq-key  ");
+
+        aiWidget.init(mockActivity);
+
+        widgetButtons["Set API Key"].onclick();
+
+        expect(prompt).toHaveBeenCalledWith("Enter your Groq API Key:", "stored-session-key");
+        expect(sessionStorage.setItem).toHaveBeenCalledWith("groq_api_key", "new-groq-key");
+        expect(localStorage.setItem).not.toHaveBeenCalled();
+        expect(localStorage.removeItem).not.toHaveBeenCalled();
+        expect(mockActivity.storage.groq_api_key).toBe("legacy-storage-key");
     });
 });

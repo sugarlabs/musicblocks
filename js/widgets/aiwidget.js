@@ -37,6 +37,43 @@ function AIWidget() {
     const DEFAULTSAMPLE = "electronic synth";
     const CENTERPITCHHERTZ = 220;
     const SAMPLEWAITTIME = 500;
+    const GROQ_API_KEY_STORAGE_KEY = "groq_api_key";
+
+    // Keep the API key out of localStorage. Fall back to memory when sessionStorage
+    // is unavailable so the widget still works in restricted environments.
+    let groqApiKeyMemory = "";
+
+    function getGroqApiKey() {
+        try {
+            if (typeof sessionStorage !== "undefined") {
+                const stored = sessionStorage.getItem(GROQ_API_KEY_STORAGE_KEY);
+                if (stored !== null) {
+                    return stored;
+                }
+            }
+        } catch (e) {
+            // Ignore storage access failures and use the in-memory fallback below.
+        }
+
+        return groqApiKeyMemory;
+    }
+
+    function setGroqApiKey(value) {
+        const normalizedValue = (value || "").trim();
+        groqApiKeyMemory = normalizedValue;
+
+        try {
+            if (typeof sessionStorage !== "undefined") {
+                if (normalizedValue) {
+                    sessionStorage.setItem(GROQ_API_KEY_STORAGE_KEY, normalizedValue);
+                } else {
+                    sessionStorage.removeItem(GROQ_API_KEY_STORAGE_KEY);
+                }
+            }
+        } catch (e) {
+            // Ignore storage access failures and keep the in-memory fallback.
+        }
+    }
 
     // Oscilloscope constants
     const SAMPLEANALYSERSIZE = 8192;
@@ -798,12 +835,9 @@ function AIWidget() {
 
         widgetWindow.addButton("utility-button.svg", ICONSIZE, _("Set API Key"), "").onclick =
             function () {
-                const key = prompt(
-                    _("Enter your Groq API Key:"),
-                    that.activity.storage.groq_api_key || ""
-                );
+                const key = prompt(_("Enter your Groq API Key:"), getGroqApiKey());
                 if (key !== null) {
-                    that.activity.storage.groq_api_key = key.trim();
+                    setGroqApiKey(key.trim());
                 }
             };
 
@@ -1095,7 +1129,7 @@ function AIWidget() {
                 return;
             }
 
-            const apiKey = that.activity.storage.groq_api_key;
+            const apiKey = getGroqApiKey();
             if (!apiKey) {
                 alert(
                     _("Please set your Groq API Key using the settings button (wrench icon) first.")
