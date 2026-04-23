@@ -4342,10 +4342,10 @@ function getNote(
                 if (offset === -1) {
                     console.debug(
                         "WARNING: Key " +
-                        myKeySignature +
-                        " not found in " +
-                        thisScale +
-                        ". Using default of C"
+                            myKeySignature +
+                            " not found in " +
+                            thisScale +
+                            ". Using default of C"
                     );
                     offset = 0;
                     thisScale = NOTESSHARP;
