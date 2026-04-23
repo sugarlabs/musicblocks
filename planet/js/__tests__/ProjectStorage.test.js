@@ -194,6 +194,149 @@ describe("ProjectStorage", () => {
             await storage.save();
             expect(storage.TimeLastSaved).toBeGreaterThan(0);
         });
+
+        describe("storage quota handling", () => {
+            it("should detect QuotaExceededError by name", () => {
+                const error = new Error("Storage quota exceeded");
+                error.name = "QuotaExceededError";
+                expect(storage._isQuotaExceededError(error)).toBe(true);
+            });
+
+            it("should detect NS_ERROR_DOM_QUOTA_REACHED by name", () => {
+                const error = new Error("Quota reached");
+                error.name = "NS_ERROR_DOM_QUOTA_REACHED";
+                expect(storage._isQuotaExceededError(error)).toBe(true);
+            });
+
+            it("should detect quota error by message containing QUOTA_EXCEEDED", () => {
+                const error = new Error("QUOTA_EXCEEDED_ERR: storage limit reached");
+                expect(storage._isQuotaExceededError(error)).toBe(true);
+            });
+
+            it("should detect quota error by message containing 'quota exceeded'", () => {
+                const error = new Error("The quota exceeded");
+                expect(storage._isQuotaExceededError(error)).toBe(true);
+            });
+
+            it("should detect quota error by code 22", () => {
+                const error = new Error("Quota");
+                error.code = 22;
+                expect(storage._isQuotaExceededError(error)).toBe(true);
+            });
+
+            it("should detect quota error by code 1014", () => {
+                const error = new Error("Quota");
+                error.code = 1014;
+                expect(storage._isQuotaExceededError(error)).toBe(true);
+            });
+
+            it("should return false for null error", () => {
+                expect(storage._isQuotaExceededError(null)).toBe(false);
+            });
+
+            it("should return false for non-quota errors", () => {
+                const error = new Error("Random disk error");
+                error.name = "DiskError";
+                expect(storage._isQuotaExceededError(error)).toBe(false);
+            });
+
+            it("should drop cached project images and retry successfully on quota error", async () => {
+                const warnSpy = jest.spyOn(console, "warn").mockImplementation();
+                storage.data = {
+                    Projects: {
+                        proj1: { ProjectName: "A", ProjectImage: "image1" },
+                        proj2: { ProjectName: "B", ProjectImage: "image2" },
+                        proj3: { ProjectName: "C", ProjectImage: null }
+                    }
+                };
+
+                mockLocalforage.setItem.mockImplementation(async (key, value) => {
+                    if (key === storage.BackupStorageKey) {
+                        mockLocalforage._store[key] = value;
+                    } else if (key === storage.LocalStorageKey) {
+                        if (!mockLocalforage._store[key]) {
+                            mockLocalforage._store[key] = value;
+                            const quotaError = new Error("Quota exceeded");
+                            quotaError.name = "QuotaExceededError";
+                            throw quotaError;
+                        }
+                    }
+                });
+
+                await storage.save();
+
+                expect(mockLocalforage._store[storage.LocalStorageKey]).not.toBeNull();
+                expect(storage.data.Projects["proj1"].ProjectImage).toBeNull();
+                expect(storage.data.Projects["proj2"].ProjectImage).toBeNull();
+                expect(storage.data.Projects["proj3"].ProjectImage).toBeNull();
+                expect(warnSpy).toHaveBeenCalledWith(
+                    expect.stringContaining("Storage quota exceeded") &&
+                        expect.stringContaining("Removed 2 cached project image")
+                );
+            });
+
+            it("should fail gracefully when quota error occurs but no images to drop", async () => {
+                const warnSpy = jest.spyOn(console, "warn").mockImplementation();
+                storage.data = {
+                    Projects: {
+                        proj1: { ProjectName: "A", ProjectImage: null }
+                    }
+                };
+
+                mockLocalforage.setItem.mockImplementation(async key => {
+                    if (key === storage.LocalStorageKey) {
+                        const quotaError = new Error("Quota exceeded");
+                        quotaError.name = "QuotaExceededError";
+                        throw quotaError;
+                    }
+                });
+
+                await storage.save();
+
+                expect(warnSpy).toHaveBeenCalledWith(
+                    expect.stringContaining("Storage quota exceeded") &&
+                        expect.stringContaining("No cached images to drop")
+                );
+            });
+
+            it("should fail gracefully when retry also fails after dropping images", async () => {
+                const warnSpy = jest.spyOn(console, "warn").mockImplementation();
+                storage.data = {
+                    Projects: {
+                        proj1: { ProjectName: "A", ProjectImage: "image1" }
+                    }
+                };
+
+                mockLocalforage.setItem.mockImplementation(async () => {
+                    const quotaError = new Error("Still quota exceeded");
+                    quotaError.name = "QuotaExceededError";
+                    throw quotaError;
+                });
+
+                await storage.save();
+
+                expect(storage.data.Projects["proj1"].ProjectImage).toBeNull();
+                expect(warnSpy).toHaveBeenCalledWith(
+                    expect.stringContaining("Storage quota still exceeded after dropping images")
+                );
+            });
+
+            it("should log error normally for non-quota errors", async () => {
+                const errorSpy = jest.spyOn(console, "error").mockImplementation();
+                storage.data = { Projects: {} };
+
+                mockLocalforage.setItem.mockImplementation(async () => {
+                    throw new Error("Random disk error");
+                });
+
+                await storage.save();
+
+                expect(errorSpy).toHaveBeenCalledWith(
+                    "[ProjectStorage] Save failed:",
+                    expect.any(Error)
+                );
+            });
+        });
     });
 
     describe("restore()", () => {

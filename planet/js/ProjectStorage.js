@@ -57,6 +57,35 @@ class ProjectStorage {
         return prefix + suffix;
     }
 
+    _isQuotaExceededError(e) {
+        if (e == null) return false; // eslint-disable-line eqeqeq
+        const name = e.name || "";
+        const message = e.message || "";
+        const code = e.code;
+        return (
+            name === "QuotaExceededError" ||
+            name === "NS_ERROR_DOM_QUOTA_REACHED" ||
+            message.includes("QUOTA_EXCEEDED") ||
+            message.includes("quota exceeded") ||
+            code === 22 ||
+            code === 1014
+        );
+    }
+
+    _dropProjectImages() {
+        let count = 0;
+        for (const id in this.data.Projects) {
+            if (
+                this.data.Projects[id].ProjectImage !== null &&
+                this.data.Projects[id].ProjectImage !== undefined
+            ) {
+                this.data.Projects[id].ProjectImage = null;
+                count++;
+            }
+        }
+        return count;
+    }
+
     async saveLocally(data, image) {
         if (this.data.CurrentProject === undefined) this.initialiseNewProject();
 
@@ -210,6 +239,28 @@ class ProjectStorage {
                 this.TimeLastSaved = Date.now();
                 await this.set(this.LocalStorageKey, this.data);
             } catch (e) {
+                if (this._isQuotaExceededError(e)) {
+                    const removedCount = this._dropProjectImages();
+                    if (removedCount > 0) {
+                        try {
+                            await this.set(this.LocalStorageKey, this.data);
+                            console.warn(
+                                `[ProjectStorage] Storage quota exceeded. Removed ${removedCount} cached project image(s) and retried save.`
+                            );
+                            return;
+                        } catch (retryError) {
+                            console.warn(
+                                "[ProjectStorage] Storage quota still exceeded after dropping images. Please clear local storage space."
+                            );
+                            return;
+                        }
+                    } else {
+                        console.warn(
+                            "[ProjectStorage] Storage quota exceeded. No cached images to drop. Please clear local storage space."
+                        );
+                        return;
+                    }
+                }
                 console.error("[ProjectStorage] Save failed:", e);
             } finally {
                 this._saveInProgress = false;
