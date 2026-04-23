@@ -9,7 +9,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* eslint-disable no-redeclare */
 /*
    global
 
@@ -892,7 +891,6 @@ const CENTS_PER_OCTAVE = SEMITONES * CENTS_PER_SEMITONE;
 const POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
 
 const TWELTHROOT2 = 1.0594630943592953;
-// eslint-disable-next-line no-loss-of-precision
 const TWELVEHUNDRETHROOT2 = 1.0005777895065549;
 
 /**
