@@ -210,21 +210,37 @@ class PlanetInterface {
                 320 / this.activity.canvas.width
             );
             try {
-                if (svgData == null || svgData === "") {
-                    this.planet.ProjectStorage.saveLocally(data, null);
+                if (svgData === null || svgData === undefined || svgData === "") {
+                    return Promise.resolve(this.planet.ProjectStorage.saveLocally(data, null));
                 } else {
+                    const fallbackImage =
+                        typeof this.planet.ProjectStorage.getCurrentProjectImage === "function"
+                            ? this.planet.ProjectStorage.getCurrentProjectImage()
+                            : null;
+                    const savePromise = Promise.resolve(
+                        this.planet.ProjectStorage.saveLocally(data, fallbackImage)
+                    );
                     const img = new Image();
                     const t = this;
                     img.onload = () => {
-                        const bitmap = new createjs.Bitmap(img);
-                        const bounds = bitmap.getBounds();
-                        bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-                        t.planet.ProjectStorage.saveLocally(
-                            data,
-                            bitmap.bitmapCache.getCacheDataURL()
-                        );
+                        try {
+                            const bitmap = new createjs.Bitmap(img);
+                            const bounds = bitmap.getBounds();
+                            bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+                            Promise.resolve(
+                                t.planet.ProjectStorage.saveLocally(
+                                    data,
+                                    bitmap.bitmapCache.getCacheDataURL()
+                                )
+                            ).catch(error => {
+                                console.error(error);
+                            });
+                        } catch (error) {
+                            console.error(error);
+                        }
                     };
                     img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svgData));
+                    return savePromise;
                 }
             } catch (e) {
                 if (

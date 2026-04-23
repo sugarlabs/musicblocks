@@ -191,9 +191,10 @@ describe("PlanetInterface", () => {
         mockActivity.prepareExport.mockReturnValue(D);
 
         planetInterface.planet = { ProjectStorage: { saveLocally: jest.fn() } };
-        planetInterface.saveLocally();
 
-        expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenCalledWith(D, null);
+        return planetInterface.saveLocally().then(() => {
+            expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenCalledWith(D, null);
+        });
     });
 
     test("getCurrentProjectDescription/Image/TimeLastSaved", () => {
@@ -283,7 +284,10 @@ describe("PlanetInterface", () => {
         mockActivity.prepareExport.mockReturnValue("EXPORT");
         global.base64Encode = jest.fn(s => s);
         planetInterface.planet = {
-            ProjectStorage: { saveLocally: jest.fn() }
+            ProjectStorage: {
+                getCurrentProjectImage: jest.fn(() => "OLD_IMAGE"),
+                saveLocally: jest.fn()
+            }
         };
 
         global.Image = class {
@@ -304,15 +308,63 @@ describe("PlanetInterface", () => {
             }
         };
 
-        planetInterface.saveLocally();
-
-        setTimeout(() => {
-            expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenCalledWith(
+        planetInterface.saveLocally().then(() => {
+            expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenNthCalledWith(
+                1,
+                "EXPORT",
+                "OLD_IMAGE"
+            );
+            expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenNthCalledWith(
+                2,
                 "EXPORT",
                 "DATAURL"
             );
             done();
-        }, 0);
+        });
+    });
+    test("saveLocally resolves after project data is persisted", () => {
+        doSVG.mockReturnValue("<svg/>");
+        mockActivity.prepareExport.mockReturnValue("EXPORT");
+        global.base64Encode = jest.fn(s => s);
+
+        let resolveSave;
+        planetInterface.planet = {
+            ProjectStorage: {
+                getCurrentProjectImage: jest.fn(() => "OLD_IMAGE"),
+                saveLocally: jest.fn(
+                    () =>
+                        new Promise(resolve => {
+                            resolveSave = resolve;
+                        })
+                )
+            }
+        };
+
+        global.Image = class {
+            set src(_v) {}
+        };
+
+        const savePromise = planetInterface.saveLocally();
+
+        expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenCalledWith(
+            "EXPORT",
+            "OLD_IMAGE"
+        );
+
+        let resolved = false;
+        savePromise.then(() => {
+            resolved = true;
+        });
+
+        return Promise.resolve()
+            .then(() => {
+                expect(resolved).toBe(false);
+                resolveSave();
+                return savePromise;
+            })
+            .then(() => {
+                expect(resolved).toBe(true);
+            });
     });
     it("loadProjectFromData shows error and returns early if data is undefined", () => {
         const saved_ = global._;
