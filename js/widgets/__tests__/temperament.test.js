@@ -59,6 +59,13 @@ describe("TemperamentWidget basic tests", () => {
 
         global.FLAT = "♭";
         global.SHARP = "♯";
+        global.noteToPitchOctave = note => {
+            const match = note.match(/^((?:[a-zA-Z#bx]|♭|♯|𝄫|𝄪)+)(\d+)?(.*)$/u);
+            if (match) {
+                return [match[1], match[2] ? Number(match[2]) : 4];
+            }
+            return [note, 4];
+        };
 
         const createMockElement = id => ({
             id: id,

@@ -59,6 +59,13 @@ global.DEFAULTDRUM = "kick drum";
 global.DEFAULTVOLUME = 50;
 global.PREVIEWVOLUME = 50;
 global.normalizeNoteAccidentals = note => note;
+global.noteToPitchOctave = note => {
+    const match = note.match(/^((?:[a-zA-Z#bx]|♭|♯|𝄫|𝄪)+)(\d+)?(.*)$/u);
+    if (match) {
+        return [match[1], match[2] ? Number(match[2]) : 4];
+    }
+    return [note, 4];
+};
 global.SHARP = "♯";
 global.FLAT = "♭";
 global.MATRIXSOLFEHEIGHT = 30;
