@@ -3127,6 +3127,12 @@ const piemenuIntervals = (block, selectedInterval) => {
         }
     }
     block._intervalWheel.createWheel(numbers);
+    // Initially hide all numeric tabs; we'll show only active ones
+    for (let idx = 0; idx < block._intervalWheel.navItems.length; idx++) {
+        if (block._intervalWheel.navItems[idx] && block._intervalWheel.navItems[idx].navItem) {
+            block._intervalWheel.navItems[idx].navItem.hide();
+        }
+    }
 
     block._exitWheel.colors = platformColor.exitWheelcolors;
     block._exitWheel.slicePathFunction = slicePath().DonutSlice;
@@ -3180,7 +3186,7 @@ const piemenuIntervals = (block, selectedInterval) => {
         ) + "px";
 
     // Add function to each main menu for show/hide sub menus
-    // TODO: Add all tabs to each interval
+    // Status: tabs gating implemented
     const __setupAction = (i, activeTabs) => {
         that._intervalNameWheel.navItems[i].navigateFunction = () => {
             for (let l = 0; l < labels.length; l++) {
@@ -3217,6 +3223,14 @@ const piemenuIntervals = (block, selectedInterval) => {
     }
 
     block._intervalNameWheel.navigateWheel(i);
+
+    // Ensure the corresponding numeric tabs are shown for the selected interval
+    if (
+        block._intervalNameWheel.navItems[i] &&
+        typeof block._intervalNameWheel.navItems[i].navigateFunction === "function"
+    ) {
+        block._intervalNameWheel.navItems[i].navigateFunction();
+    }
 
     // Enable scroll-to-rotate
     enableWheelScroll(block._intervalNameWheel, labels.length);
@@ -4530,5 +4544,5 @@ const piemenuDissectNumber = widget => {
 };
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { piemenuPitches };
+    module.exports = { piemenuPitches, piemenuIntervals };
 }
