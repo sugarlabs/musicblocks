@@ -88,7 +88,14 @@ describe("loader.js coverage", () => {
             expect.objectContaining({
                 baseUrl: "./",
                 paths: expect.any(Object),
-                shim: expect.any(Object)
+                shim: expect.objectContaining({
+                    "tweenjs.min": expect.objectContaining({
+                        deps: ["easeljs.min"]
+                    }),
+                    "preloadjs.min": expect.objectContaining({
+                        deps: ["easeljs.min", "tweenjs.min"]
+                    })
+                })
             })
         );
     });
