@@ -4342,10 +4342,10 @@ function getNote(
                 if (offset === -1) {
                     console.debug(
                         "WARNING: Key " +
-                            myKeySignature +
-                            " not found in " +
-                            thisScale +
-                            ". Using default of C"
+                        myKeySignature +
+                        " not found in " +
+                        thisScale +
+                        ". Using default of C"
                     );
                     offset = 0;
                     thisScale = NOTESSHARP;
@@ -5859,7 +5859,7 @@ const durationToNoteValue = duration => {
  * @returns {Array} An array containing pitch and octave.
  */
 const noteToPitchOctave = note => {
-    const match = note.match(/^([a-zA-Z#b♭♯𝄫𝄪x]+)(\d+)?(.*)$/);
+    const match = note.match(/^((?:[a-zA-Z#bx]|♭|♯|𝄫|𝄪)+)(\d+)?(.*)$/u);
     if (match) {
         const pitch = match[1];
         const octave = match[2] ? Number(match[2]) : 4;
