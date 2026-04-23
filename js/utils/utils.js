@@ -39,7 +39,7 @@
    oneHundredToFraction, prepareMacroExports, preparePluginExports,
    processMacroData, processRawPluginData, rationalSum, rgbToHex,
    safeSVG, safeJSONParse, toFixed2, toTitleCase, windowHeight, windowWidth,
-    fnBrowserDetect, waitForReadiness, isSafeUrl
+    fnBrowserDetect, waitForReadiness, isSafeUrl, unescapeHTML
 */
 
 /**
@@ -703,6 +703,30 @@ if (typeof module !== "undefined" && module.exports) {
 }
 if (typeof window !== "undefined") {
     window.escapeHTML = escapeHTML;
+}
+
+/**
+ * Reverses HTML entity escaping produced by escapeHTML().
+ * Used when loading project data that was escaped for safe HTML embedding.
+ * @param {string} str - The HTML-escaped string to unescape.
+ * @returns {string} The unescaped string with original characters restored.
+ */
+function unescapeHTML(str) {
+    const unescapeMap = {
+        "&amp;": "&",
+        "&lt;": "<",
+        "&gt;": ">",
+        "&quot;": '"',
+        "&#039;": "'"
+    };
+    return String(str).replace(/&amp;|&lt;|&gt;|&quot;|&#039;/g, match => unescapeMap[match]);
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports.unescapeHTML = unescapeHTML;
+}
+if (typeof window !== "undefined") {
+    window.unescapeHTML = unescapeHTML;
 }
 
 /**

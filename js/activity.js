@@ -52,7 +52,8 @@ try {
    SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
    MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
-   SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS
+   SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS,
+   unescapeHTML
  */
 
 /*
@@ -8343,17 +8344,17 @@ class Activity {
                                 let obj;
                                 try {
                                     if (cleanData.includes("html")) {
+                                        let extracted;
                                         if (cleanData.includes('id="codeBlock"')) {
-                                            obj = JSON.parse(
-                                                cleanData.match(
-                                                    '<div class="code" id="codeBlock">(.+?)</div>'
-                                                )[1]
-                                            );
+                                            extracted = cleanData.match(
+                                                '<div class="code" id="codeBlock">(.+?)</div>'
+                                            )[1];
                                         } else {
-                                            obj = JSON.parse(
-                                                cleanData.match('<div class="code">(.+?)</div>')[1]
-                                            );
+                                            extracted = cleanData.match(
+                                                '<div class="code">(.+?)</div>'
+                                            )[1];
                                         }
+                                        obj = JSON.parse(unescapeHTML(extracted));
                                     } else {
                                         obj = JSON.parse(cleanData);
                                     }
@@ -8468,9 +8469,17 @@ class Activity {
                             let obj;
                             try {
                                 if (cleanData.includes("html")) {
-                                    obj = JSON.parse(
-                                        cleanData.match('<div class="code">(.+?)</div>')[1]
-                                    );
+                                    let extracted;
+                                    if (cleanData.includes('id="codeBlock"')) {
+                                        extracted = cleanData.match(
+                                            '<div class="code" id="codeBlock">(.+?)</div>'
+                                        )[1];
+                                    } else {
+                                        extracted = cleanData.match(
+                                            '<div class="code">(.+?)</div>'
+                                        )[1];
+                                    }
+                                    obj = JSON.parse(unescapeHTML(extracted));
                                 } else {
                                     obj = JSON.parse(cleanData);
                                 }
