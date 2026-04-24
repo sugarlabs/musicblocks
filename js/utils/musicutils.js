@@ -3195,13 +3195,13 @@ const modeMapper = (key, mode) => {
                     key = "b";
                     break;
                 case "d" + SHARP:
-                    key = "b";
+                    key = "c" + SHARP;
                     break;
                 case "f" + SHARP:
-                    key = "f";
+                    key = "e";
                     break;
                 case "g" + SHARP:
-                    key = "b";
+                    key = "f" + SHARP;
                     break;
                 case "a" + SHARP:
                     key = "g" + SHARP;
@@ -3241,7 +3241,7 @@ const modeMapper = (key, mode) => {
                     key = "c";
                     break;
                 case "f":
-                    key = "b";
+                    key = "d" + FLAT;
                     break;
                 case "g":
                     key = "c";
@@ -3376,7 +3376,7 @@ const modeMapper = (key, mode) => {
                     key = "e";
                     break;
                 case "c" + SHARP:
-                    key = "b";
+                    key = "f" + SHARP;
                     break;
                 case "d" + SHARP:
                     key = "g" + SHARP;
@@ -3385,7 +3385,7 @@ const modeMapper = (key, mode) => {
                     key = "b";
                     break;
                 case "g" + SHARP:
-                    key = "b";
+                    key = "c" + SHARP;
                     break;
                 case "a" + SHARP:
                     key = "c";
@@ -3427,7 +3427,7 @@ const modeMapper = (key, mode) => {
                     key = "f";
                     break;
                 case "f":
-                    key = "b";
+                    key = "g" + FLAT;
                     break;
                 case "g":
                     key = "g" + SHARP;
@@ -3448,7 +3448,7 @@ const modeMapper = (key, mode) => {
                     key = "g";
                     break;
                 case "g" + SHARP:
-                    key = "a ";
+                    key = "a";
                     break;
                 case "a" + SHARP:
                     key = "b";
