@@ -2548,6 +2548,41 @@ class Blocks {
         };
 
         /**
+         * Update a list of blocks in chunks to maintain UI responsiveness.
+         * Coalesces updates into small batches processed over multiple animation frames.
+         * @param {Block[]} blocks - List of blocks to update.
+         * @param {Function} updateFn - Callback function to execute for each block.
+         * @private
+         */
+        this._updateBlocksInChunks = (blocks, updateFn) => {
+            if (!blocks || blocks.length === 0) return;
+
+            const CHUNK_SIZE = 20;
+            let index = 0;
+
+            const processChunk = () => {
+                const chunkEnd = Math.min(index + CHUNK_SIZE, blocks.length);
+                for (let i = index; i < chunkEnd; i++) {
+                    const block = blocks[i];
+                    try {
+                        updateFn(block);
+                    } catch (e) {
+                        console.error("Failed to process block update:", e);
+                    }
+                }
+
+                index = chunkEnd;
+                if (index < blocks.length) {
+                    requestAnimationFrame(processChunk);
+                } else {
+                    this.activity.refreshCanvas();
+                }
+            };
+
+            requestAnimationFrame(processChunk);
+        };
+
+        /**
          * Relative move of a block (and its label) by dx, dy
          * @param - blk - block
          * @param - dx - updated x position
@@ -4090,18 +4125,12 @@ class Blocks {
                 }
             }
 
-            // Batch update caches using requestAnimationFrame
-            if (blocksToUpdate.length > 0) {
-                requestAnimationFrame(() => {
-                    for (const block of blocksToUpdate) {
-                        try {
-                            block.container.updateCache();
-                        } catch (e) {
-                            console.debug(e);
-                        }
-                    }
-                });
-            }
+            // Batch update caches using requestAnimationFrame in chunks
+            this._updateBlocksInChunks(blocksToUpdate, block => {
+                if (block.container) {
+                    block.container.updateCache();
+                }
+            });
         };
 
         /**
@@ -4139,24 +4168,19 @@ class Blocks {
                         } else {
                             block.overrideName = newName;
                         }
-                        block.regenerateArtwork();
                         blocksToUpdate.push(block);
                     }
                 }
             }
 
-            // Batch update caches using requestAnimationFrame
-            if (blocksToUpdate.length > 0) {
-                requestAnimationFrame(() => {
-                    for (const block of blocksToUpdate) {
-                        try {
-                            block.container.updateCache();
-                        } catch (e) {
-                            console.debug(e);
-                        }
-                    }
-                });
-            }
+            // Batch update caches using requestAnimationFrame in chunks
+            this._updateBlocksInChunks(blocksToUpdate, block => {
+                if (block.name === "storein2") {
+                    block.regenerateArtwork();
+                } else if (block.container) {
+                    block.container.updateCache();
+                }
+            });
         };
 
         /**
@@ -4185,24 +4209,15 @@ class Blocks {
                         } else {
                             block.overrideName = newName;
                         }
-                        block.regenerateArtwork();
                         blocksToUpdate.push(block);
                     }
                 }
             }
 
-            // Batch update caches using requestAnimationFrame
-            if (blocksToUpdate.length > 0) {
-                requestAnimationFrame(() => {
-                    for (const block of blocksToUpdate) {
-                        try {
-                            block.container.updateCache();
-                        } catch (e) {
-                            console.debug(e);
-                        }
-                    }
-                });
-            }
+            // Batch update caches using requestAnimationFrame in chunks
+            this._updateBlocksInChunks(blocksToUpdate, block => {
+                block.regenerateArtwork();
+            });
         };
 
         /**
@@ -4231,25 +4246,15 @@ class Blocks {
                         } else {
                             block.overrideName = newName;
                         }
-                        block.regenerateArtwork();
-                        /** Update label... */
                         blocksToUpdate.push(block);
                     }
                 }
             }
 
-            // Batch update caches using requestAnimationFrame
-            if (blocksToUpdate.length > 0) {
-                requestAnimationFrame(() => {
-                    for (const block of blocksToUpdate) {
-                        try {
-                            block.container.updateCache();
-                        } catch (e) {
-                            console.debug(e);
-                        }
-                    }
-                });
-            }
+            // Batch update caches using requestAnimationFrame in chunks
+            this._updateBlocksInChunks(blocksToUpdate, block => {
+                block.regenerateArtwork();
+            });
         };
 
         /**
@@ -4315,18 +4320,12 @@ class Blocks {
                 }
             }
 
-            // Batch update caches using requestAnimationFrame
-            if (blocksToUpdate.length > 0) {
-                requestAnimationFrame(() => {
-                    for (const block of blocksToUpdate) {
-                        try {
-                            block.container.updateCache();
-                        } catch (e) {
-                            console.debug(e);
-                        }
-                    }
-                });
-            }
+            // Batch update caches using requestAnimationFrame in chunks
+            this._updateBlocksInChunks(blocksToUpdate, block => {
+                if (block.container) {
+                    block.container.updateCache();
+                }
+            });
         };
 
         /**
@@ -4366,18 +4365,10 @@ class Blocks {
                 }
             }
 
-            // Batch regenerate artwork using requestAnimationFrame
-            if (blocksToUpdate.length > 0) {
-                requestAnimationFrame(() => {
-                    for (const block of blocksToUpdate) {
-                        try {
-                            block.regenerateArtwork();
-                        } catch (e) {
-                            console.debug(e);
-                        }
-                    }
-                });
-            }
+            // Batch regenerate artwork using requestAnimationFrame in chunks
+            this._updateBlocksInChunks(blocksToUpdate, block => {
+                block.regenerateArtwork();
+            });
 
             /** Update the palette */
             const actionsPalette = this.activity.palettes.dict["action"];
