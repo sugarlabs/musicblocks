@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
+const EventManager = require("../EventManager");
 
 const loadActivity = ({ isMusicBlocks = true, isMozilla = false } = {}) => {
     const activityPath = path.resolve(__dirname, "../activity.js");
@@ -16,12 +17,27 @@ const loadActivity = ({ isMusicBlocks = true, isMozilla = false } = {}) => {
         `const _THIS_IS_MUSIC_BLOCKS_ = ${isMusicBlocks};`
     );
 
-    code = code.replace(/constructor\s*\(\)\s*\{/, "constructor() { this._listeners = []; return;");
+    code = code.replace(
+        /constructor\s*\(\)\s*\{/,
+        `constructor() {
+            this.eventManager = new EventManager();
+            Object.defineProperty(this, "_listeners", {
+                get: () => this.eventManager.listeners,
+                set: listeners => {
+                    this.eventManager.listeners = listeners;
+                },
+                configurable: true,
+                enumerable: true
+            });
+            return;
+        `
+    );
 
     const sandbox = {
         window: global.window,
         document: global.document,
         console: global.console,
+        EventManager,
         _: key => key,
         define: () => {},
         require: () => {},

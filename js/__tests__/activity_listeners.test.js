@@ -4,11 +4,14 @@ const vm = require("vm");
 
 describe("Activity Event Listener Management", () => {
     let Activity;
+    let EventManager;
     let activity;
     let target;
     let listener;
 
     beforeAll(() => {
+        EventManager = require("../EventManager");
+
         // Load activity.js manually to bypass RequireJS/Global complexity
         const activityPath = path.resolve(__dirname, "../activity.js");
         let code = fs.readFileSync(activityPath, "utf8");
@@ -23,7 +26,18 @@ describe("Activity Event Listener Management", () => {
         // Short-circuit the constructor to avoid dependencies
         code = code.replace(
             /constructor\s*\(\)\s*\{/,
-            "constructor() { this._listeners = []; return;"
+            `constructor() {
+                this.eventManager = new EventManager();
+                Object.defineProperty(this, "_listeners", {
+                    get: () => this.eventManager.listeners,
+                    set: listeners => {
+                        this.eventManager.listeners = listeners;
+                    },
+                    configurable: true,
+                    enumerable: true
+                });
+                return;
+            `
         );
 
         // Mock global environment required by activity.js
@@ -31,6 +45,7 @@ describe("Activity Event Listener Management", () => {
             window: global.window,
             document: global.document,
             console: global.console,
+            EventManager,
             _: key => key, // Mock translation function
             define: () => {},
             require: () => {},

@@ -70,8 +70,27 @@ requirejs.config({
             deps: ["activity/turtledefs", "utils/retryWithBackoff"],
             exports: "Block"
         },
+        "activity/BlockSerializer": {
+            exports: "BlockSerializer"
+        },
+        "activity/BlockConnectionManager": {
+            deps: ["utils/utils"],
+            exports: "BlockConnectionManager"
+        },
+        "activity/BlockDragManager": {
+            exports: "BlockDragManager"
+        },
+        "activity/BlockLayoutManager": {
+            exports: "BlockLayoutManager"
+        },
         "activity/blocks": {
-            deps: ["activity/block"],
+            deps: [
+                "activity/block",
+                "activity/BlockConnectionManager",
+                "activity/BlockDragManager",
+                "activity/BlockLayoutManager",
+                "activity/BlockSerializer"
+            ],
             exports: "Blocks"
         },
         "activity/turtle-singer": {
@@ -103,6 +122,24 @@ requirejs.config({
         "utils/ManagedTimer": {
             exports: "ManagedTimer"
         },
+        "activity/EventManager": {
+            exports: "EventManager"
+        },
+        "activity/KeyboardHandler": {
+            exports: "KeyboardHandler"
+        },
+        "activity/ResponsiveLayout": {
+            exports: "ResponsiveLayout"
+        },
+        "activity/RenderLoop": {
+            exports: "RenderLoop"
+        },
+        "activity/StageSetup": {
+            exports: "setupStage"
+        },
+        "activity/FileIOHandler": {
+            exports: "FileIOHandler"
+        },
         "activity/logo": {
             deps: [
                 "activity/turtles",
@@ -117,6 +154,14 @@ requirejs.config({
             deps: [
                 "utils/utils",
                 "activity/activity-context",
+                "activity/artwork-data",
+                "activity/artwork",
+                "activity/EventManager",
+                "activity/KeyboardHandler",
+                "activity/ResponsiveLayout",
+                "activity/RenderLoop",
+                "activity/StageSetup",
+                "activity/FileIOHandler",
                 "activity/logo",
                 "activity/blocks",
                 "activity/turtles"
