@@ -1973,6 +1973,12 @@ function Synth() {
                                     }
                                 });
                             }
+
+                            // Re-establish the dry path so subsequent notes
+                            // that do not use effects still reach the speakers.
+                            if (synth && typeof synth.toDestination === "function") {
+                                synth.toDestination();
+                            }
                         } catch (e) {
                             console.debug("Error disposing effects:", e);
                         }
@@ -1993,6 +1999,11 @@ function Synth() {
                     filter.dispose();
                 }
             });
+
+            // Re-establish the dry path on error as well.
+            if (synth && typeof synth.toDestination === "function") {
+                synth.toDestination();
+            }
         }
     };
 
