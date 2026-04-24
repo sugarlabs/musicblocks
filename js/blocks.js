@@ -4379,7 +4379,6 @@ class Blocks {
                 });
             }
 
-
             /** Update the palette */
             const actionsPalette = this.activity.palettes.dict["action"];
             let nameChanged = false;
