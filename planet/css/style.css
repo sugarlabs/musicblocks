@@ -251,6 +251,18 @@ div.select-wrapper * {
 	top: 100% !important ;
 }
 
+#globalcontents .select-wrapper ul.dropdown-content {
+	z-index: 99 !important;
+	width: auto !important;
+	min-width: 100%;
+	right: 0 !important;
+	left: auto !important;
+}
+
+#globalcontents .select-wrapper ul.dropdown-content li span {
+	white-space: nowrap;
+}
+
 .centre-button {
 	left: 50%;
 	-webkit-transform: translateX(-50%);
