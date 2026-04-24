@@ -1539,7 +1539,13 @@ class Singer {
                 const synth = synthKeys[i];
                 const oldVol = last(tur.singer.synthVolume[synth]);
                 const len = tur.singer.synthVolume[synth].length;
-                tur.singer.synthVolume[synth][len - 1] += last(tur.singer.crescendoDelta);
+                tur.singer.synthVolume[synth][len - 1] = Math.min(
+                    Math.max(
+                        tur.singer.synthVolume[synth][len - 1] + last(tur.singer.crescendoDelta),
+                        0
+                    ),
+                    100
+                );
                 if (!tur.singer.suppressOutput) {
                     Singer.setSynthVolume(activity.logo, turtle, synth, oldVol);
                     activity.logo.synth.rampTo(
