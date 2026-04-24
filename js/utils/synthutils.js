@@ -2224,7 +2224,9 @@ function Synth() {
     };
 
     this.startSound = (turtle, instrumentName, note) => {
-        if (!instrumentsSource[instrumentName] || !instruments[turtle]?.[instrumentName]) return;
+        if (!instrumentsSource[instrumentName] || !instruments[turtle]?.[instrumentName]) {
+            throw new Error(`Instrument ${instrumentName} not found for turtle ${turtle}`);
+        }
         const flag = instrumentsSource[instrumentName][0];
         switch (flag) {
             case 1: // drum
@@ -2237,7 +2239,9 @@ function Synth() {
     };
 
     this.stopSound = (turtle, instrumentName, note) => {
-        if (!instrumentsSource[instrumentName] || !instruments[turtle]?.[instrumentName]) return;
+        if (!instrumentsSource[instrumentName] || !instruments[turtle]?.[instrumentName]) {
+            throw new Error(`Instrument ${instrumentName} not found for turtle ${turtle}`);
+        }
         const flag = instrumentsSource[instrumentName][0];
         switch (flag) {
             case 1: // drum
