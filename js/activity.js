@@ -3235,6 +3235,8 @@ class Activity {
                 container.addChild(text);
                 text.x = 70;
                 text.y = 10;
+                const detailText = new createjs.Text("", "bold 16px Sans", "#ff0000");
+                container.addChild(detailText);
 
                 const bounds = container.getBounds();
                 container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
@@ -6113,7 +6115,32 @@ class Activity {
                     );
                     break;
                 case NOINPUTERRORMSG:
+                    this.errorArtwork["noinput"].children[1].text = _(NOINPUTERRORMSG);
+                    this.errorArtwork["noinput"].children[2].text = "";
+                    if (
+                        blk !== undefined &&
+                        blk !== null &&
+                        blk in this.blocks.blockList &&
+                        this.blocks.blockList[blk].protoblock.staticLabels.length > 0
+                    ) {
+                        const blockLabel = this.blocks.blockList[blk].protoblock.staticLabels[0];
+                        const shortLabel =
+                            blockLabel.length > 8 ? blockLabel.substr(0, 8) + "..." : blockLabel;
+                        this.errorArtwork["noinput"].children[2].text = shortLabel;
+                    }
+                    this.errorArtwork["noinput"].children[1].font = "16px Sans";
+                    this.errorArtwork["noinput"].children[1].color = "#ff0000";
+                    this.errorArtwork["noinput"].children[1].x = 170;
+                    this.errorArtwork["noinput"].children[1].y = 13;
+                    this.errorArtwork["noinput"].children[2].font = "bold 16px Sans";
+                    this.errorArtwork["noinput"].children[2].color = "#ff0000";
+                    this.errorArtwork["noinput"].children[2].x =
+                        this.errorArtwork["noinput"].children[1].x +
+                        this.errorArtwork["noinput"].children[1].getMeasuredWidth() +
+                        5;
+                    this.errorArtwork["noinput"].children[2].y = 13;
                     this.errorArtwork["noinput"].visible = true;
+                    this.errorArtwork["noinput"].updateCache();
                     this.stage.setChildIndex(
                         this.errorArtwork["noinput"],
                         this.stage.children.length - 1

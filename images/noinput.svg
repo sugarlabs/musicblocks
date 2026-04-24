@@ -8,7 +8,7 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    id="svg2"
    height="42"
-   width="300"
+   width="380"
    version="1.0">
   <metadata
      id="metadata73">
@@ -568,7 +568,7 @@
      ry="3.3251483"
      rx="2.979018"
      height="39.901779"
-     width="297.90176" />
+     width="377.90176" />
   <g
      id="g17"
      transform="translate(6,2)">
@@ -608,7 +608,7 @@
        style="font-size:24px;fill:#ff0000;fill-opacity:1"
        id="tspan2620"
        y="31"
-       x="187.27734">???</tspan></text>
+       x="187.27734"></tspan></text>
   <g
      id="g4701"
      transform="matrix(1.5,0,0,1.5,75,3)">
@@ -619,7 +619,7 @@
   </g>
   <g
      id="g929"
-     transform="translate(9)">
+     transform="translate(89)">
     <rect
        style="opacity:1;fill:#b0b0b0;fill-opacity:1;stroke:none;stroke-width:13.86169147;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect920"
