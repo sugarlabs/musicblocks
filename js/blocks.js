@@ -4264,6 +4264,7 @@ class Blocks {
                 return;
             }
 
+            const blocksToUpdate = [];
             /** Update the blocks, do->oldName should be do->newName */
             /** Named dos are modified in a separate function below. */
             for (const blk in this.blockList) {
@@ -4310,8 +4311,21 @@ class Blocks {
                         label = label.substr(0, STRINGLEN) + "...";
                     }
                     myBlock.text.text = label;
-                    myBlock.container.updateCache();
+                    blocksToUpdate.push(myBlock);
                 }
+            }
+
+            // Batch update caches using requestAnimationFrame
+            if (blocksToUpdate.length > 0) {
+                requestAnimationFrame(() => {
+                    for (const block of blocksToUpdate) {
+                        try {
+                            block.container.updateCache();
+                        } catch (e) {
+                            console.debug(e);
+                        }
+                    }
+                });
             }
         };
 
@@ -4327,6 +4341,7 @@ class Blocks {
                 return;
             }
 
+            const blocksToUpdate = [];
             /** Update the blocks, do->oldName should be do->newName */
             for (const blk in this.blockList) {
                 if (this.blockList[blk].trash) {
@@ -4346,10 +4361,24 @@ class Blocks {
                         }
 
                         this.blockList[blk].overrideName = label;
-                        this.blockList[blk].regenerateArtwork();
+                        blocksToUpdate.push(this.blockList[blk]);
                     }
                 }
             }
+
+            // Batch regenerate artwork using requestAnimationFrame
+            if (blocksToUpdate.length > 0) {
+                requestAnimationFrame(() => {
+                    for (const block of blocksToUpdate) {
+                        try {
+                            block.regenerateArtwork();
+                        } catch (e) {
+                            console.debug(e);
+                        }
+                    }
+                });
+            }
+
 
             /** Update the palette */
             const actionsPalette = this.activity.palettes.dict["action"];
