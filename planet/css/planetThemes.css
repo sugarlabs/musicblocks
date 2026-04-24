@@ -109,7 +109,9 @@ s .dark #local-projects .card:hover {
 .dark .modal-footer .btn-flat {
     color: #ffffff !important;
     background-color: transparent !important;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease;
     font-weight: bold;
 }
 
@@ -235,6 +237,108 @@ s .dark #local-projects .card:hover {
     box-shadow: 0 0 10px #ffff00 !important;
 }
 
+/* Report Project card readability */
+
+.dark #projectviewer-report-card {
+    background-color: #2f2f2f;
+    border: 1px solid #555555;
+    color: #f1f1f1;
+}
+
+.dark #projectviewer-report-card .card-content,
+.dark #projectviewer-report-card .card-action {
+    background-color: #2f2f2f;
+    color: #f1f1f1;
+}
+
+.dark #projectviewer-report-title,
+.dark #projectviewer-reportsubmit-title {
+    color: #f1f1f1;
+}
+
+.dark #projectviewer-report-conduct,
+.dark #submittext,
+.dark #projectviewer-report-reason {
+    color: #c7c7c7 !important;
+}
+
+.dark #projectviewer-report-card a {
+    color: #a8d5a8 !important;
+}
+
+.dark #projectviewer-report-card a:hover {
+    color: #c6e7c6 !important;
+}
+
+.dark #reportdescription {
+    color: #ffffff;
+    border-bottom: 1px solid #7a7a7a;
+}
+
+.dark #reportdescription:focus {
+    border-bottom: 1px solid #a8d5a8;
+    box-shadow: 0 1px 0 0 #a8d5a8;
+}
+
+.dark #report-error {
+    color: #ff8a80;
+}
+
+.highcontrast #projectviewer-report-card {
+    background-color: #001133;
+    border: 2px solid #ffff00;
+    outline: 1px solid #ffffff;
+    outline-offset: -2px;
+    box-shadow: 0 0 0 3px #000000, 0 10px 24px rgba(0, 0, 0, 0.9);
+    color: #ffff00;
+    bottom: -5px;
+}
+
+.highcontrast #projectviewer-report-card .card-content,
+.highcontrast #projectviewer-report-card .card-action {
+    background-color: #001133;
+    color: #ffff00;
+}
+
+.highcontrast #projectviewer-report-card .card-action {
+    background-color: #000a26;
+    border-top: 1px solid #ffff00;
+}
+
+.highcontrast #projectviewer-report-title,
+.highcontrast #projectviewer-reportsubmit-title {
+    color: #ffff00;
+}
+
+.highcontrast #projectviewer-report-conduct,
+.highcontrast #submittext,
+.highcontrast #projectviewer-report-reason {
+    color: #ffffff !important;
+}
+
+.highcontrast #projectviewer-report-card a {
+    color: #ffff00 !important;
+}
+
+.highcontrast #projectviewer-report-card a:hover {
+    background-color: #000080 !important;
+    color: #ffff00 !important;
+}
+
+.highcontrast #reportdescription {
+    color: #ffff00;
+    border-bottom: 2px solid #ffff00;
+}
+
+.highcontrast #reportdescription:focus {
+    border-bottom: 2px solid #ffffff;
+    box-shadow: 0 0 0 1px #ffffff;
+}
+
+.highcontrast #report-error {
+    color: #ff4d4d;
+}
+
 .highcontrast #view-more-chips {
     color: #ffff00 !important;
 }
@@ -252,7 +356,7 @@ s .dark #local-projects .card:hover {
 .highcontrast #local-projects .card .card-content {
     color: #ffff00;
 }
-s .highcontrast #local-projects .card:hover {
+.highcontrast #local-projects .card:hover {
     background-color: #000080;
     box-shadow: 0px 6px 8px rgba(255, 255, 0, 0.5);
 }
@@ -300,7 +404,9 @@ s .highcontrast #local-projects .card:hover {
 .highcontrast .modal-footer .btn-flat {
     color: #ffff00 !important;
     background-color: transparent !important;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease;
     font-weight: bold;
     border: 2px solid #ffff00;
 }

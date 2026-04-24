@@ -442,7 +442,9 @@ a {
 	-ms-transform: translateX(-50%);
 	transform: translateX(10%);
 	min-width: 350px;
-	bottom: 40px;
+	bottom: 10px;
+	max-height: calc(100vh - 200px);
+	overflow-y: auto;
 	text-align: left;
 }
 
