@@ -98,4 +98,6 @@ class StringHelper {
     }
 }
 
-if (typeof module !== "undefined") module.exports = StringHelper;
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = StringHelper;
+}
