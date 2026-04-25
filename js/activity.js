@@ -3133,6 +3133,7 @@ class Activity {
             this._stopIdleWatcher();
 
             const IDLE_THRESHOLD = 5000; // 5 seconds
+            const ACTIVE_RESET_INTERVAL = 500;
             const ACTIVE_FPS = 60;
             const IDLE_FPS = 1;
             const idleEvents = ["mousemove", "mousedown", "keydown", "touchstart", "wheel"];
@@ -3149,6 +3150,7 @@ class Activity {
             }
 
             let lastActivity = Date.now();
+            let lastIdleReset = lastActivity;
             this.isAppIdle = false;
 
             // Prevent duplicate intervals
@@ -3159,7 +3161,13 @@ class Activity {
             // Wake up function - restores full framerate
             // Stored as instance property for cleanup
             this._resetIdleTimer = () => {
-                lastActivity = Date.now();
+                const now = Date.now();
+                if (!this.isAppIdle && now - lastIdleReset < ACTIVE_RESET_INTERVAL) {
+                    return;
+                }
+
+                lastActivity = now;
+                lastIdleReset = now;
                 if (this.isAppIdle) {
                     this.isAppIdle = false;
                     createjs.Ticker.framerate = ACTIVE_FPS;
