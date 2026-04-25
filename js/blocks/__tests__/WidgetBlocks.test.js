@@ -58,7 +58,7 @@ class DummyFlowBlock {
         this.beginner = bool;
     }
     makeMacro(fn) {
-        this.macro = fn;
+        this.macroFunc = fn;
     }
 }
 
@@ -84,6 +84,7 @@ global.last = arr => (arr && arr.length ? arr[arr.length - 1] : undefined);
 global.MeterWidget = jest.fn();
 global.Oscilloscope = jest.fn();
 global.ModeWidget = jest.fn();
+global.StatusMatrix = jest.fn(() => ({ init: jest.fn() }));
 global.Tempo = jest.fn(() => ({ BPMBlocks: [], BPMs: [], init: jest.fn() }));
 global.TimbreWidget = jest.fn(() => ({
     instrumentName: "testInstrument",
@@ -513,6 +514,37 @@ describe("setupWidgetBlocks", () => {
             expect(res).toEqual([null, 0, true]);
             // Should not trigger another runFromBlockNow or lazy load callback
             expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("StatusBlock", () => {
+        it("defines its default macro with all monitors and print wrappers", () => {
+            const status = getBlock("status");
+            const macro = status.macroFunc(0, 0);
+            expect(macro).toHaveLength(13);
+            expect(macro[0][1]).toBe("status");
+            expect(macro[1][1]).toBe("hiddennoflow");
+            expect(macro[2][1]).toBe("print");
+            expect(macro[3][1]).toEqual(["outputtools", { value: "letter class" }]);
+            expect(macro[4][1]).toBe("currentpitch");
+            expect(macro[5][1]).toBe("print");
+            expect(macro[6][1]).toBe("beatvalue");
+            expect(macro[7][1]).toBe("print");
+            expect(macro[8][1]).toBe("measurevalue");
+            expect(macro[9][1]).toBe("print");
+            expect(macro[10][1]).toBe("elapsednotes");
+            expect(macro[11][1]).toBe("print");
+            expect(macro[12][1]).toBe("bpmfactor");
+        });
+
+        it("returns code 1 to run children once in flow", () => {
+            const status = getBlock("status");
+            activity.blocks.blockList["statusBlk"] = {
+                name: "status",
+                connections: [null, null, null]
+            };
+            const res = status.flow(["childBlk"], logo, 0, "statusBlk");
+            expect(res).toEqual(["childBlk", 1]);
         });
     });
 });

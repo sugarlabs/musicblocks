@@ -161,6 +161,9 @@ class StatusMatrix {
                     break;
                 case "outputtools":
                     label = this.activity.blocks.blockList[statusField[0]].privateData;
+                    if (typeof label === "object" && label !== null && label.value) {
+                        label = label.value;
+                    }
                     break;
                 default:
                     label =

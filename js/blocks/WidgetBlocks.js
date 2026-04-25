@@ -1689,8 +1689,7 @@ function setupWidgetBlocks(activity) {
                         // converted to notes.
                         switch (logo.tupletRhythms[i][0]) {
                             case "notes":
-                            case "simple":
-                                // eslint-disable-next-line no-case-declarations
+                            case "simple": {
                                 const tupletParam = [logo.tupletParams[logo.tupletRhythms[i][1]]];
                                 tupletParam.push([]);
                                 for (let j = 2; j < logo.tupletRhythms[i].length; j++) {
@@ -1699,6 +1698,7 @@ function setupWidgetBlocks(activity) {
 
                                 logo.phraseMaker.addTuplet(tupletParam);
                                 break;
+                            }
                             default:
                                 logo.phraseMaker.addNotes(
                                     logo.tupletRhythms[i][1],
@@ -1741,6 +1741,21 @@ function setupWidgetBlocks(activity) {
             ]);
 
             this.formBlock({ name: _("status"), canCollapse: true });
+            this.makeMacro((x, y) => [
+                [0, "status", x, y, [null, 2, 1]],
+                [1, "hiddennoflow", 0, 0, [0, null]],
+                [2, "print", 0, 0, [0, 3, 5]],
+                [3, ["outputtools", { value: "letter class" }], 0, 0, [2, 4]],
+                [4, "currentpitch", 0, 0, [3]],
+                [5, "print", 0, 0, [2, 6, 7]],
+                [6, "beatvalue", 0, 0, [5]],
+                [7, "print", 0, 0, [5, 8, 9]],
+                [8, "measurevalue", 0, 0, [7]],
+                [9, "print", 0, 0, [7, 10, 11]],
+                [10, "elapsednotes", 0, 0, [9]],
+                [11, "print", 0, 0, [9, 12, null]],
+                [12, "bpmfactor", 0, 0, [11]]
+            ]);
         }
 
         /**
@@ -1749,14 +1764,48 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @returns {Array} The result of the flow.
          */
         flow(args, logo, turtle, blk) {
-            if (logo.statusMatrix === null) {
+            if (!logo.statusMatrix) {
                 logo.statusMatrix = new StatusMatrix();
             }
 
+            // If the matrix is not open or we are starting fresh,
+            // manually register the children to ensure rows appear on first run.
+            if (!logo.statusMatrix.isOpen || logo.statusFields.length === 0) {
+                const saveStatus = logo.inStatusMatrix;
+                logo.inStatusMatrix = true;
+
+                // Helper to register monitoring blocks recursively
+                const registerMonitors = b => {
+                    if (b === null || !(b in activity.blocks.blockList)) return;
+                    const block = activity.blocks.blockList[b];
+
+                    if (block.name === "print") {
+                        const arg = block.connections[1];
+                        if (arg !== null && arg in activity.blocks.blockList) {
+                            logo.parseArg(logo, turtle, arg);
+                        }
+                    }
+
+                    // Traverse mouth of status or next block in stack
+                    if (block.name === "status") {
+                        registerMonitors(block.connections[1]);
+                    } else if (
+                        block.connections.length > 2 &&
+                        block.connections[block.connections.length - 1] !== null
+                    ) {
+                        registerMonitors(block.connections[block.connections.length - 1]);
+                    }
+                };
+
+                registerMonitors(blk);
+                logo.inStatusMatrix = saveStatus;
+            }
+
             logo.statusMatrix.init(activity);
-            logo.statusFields = [];
+            logo.statusFields = []; // Clear for the actual interpreter run
 
             logo.inStatusMatrix = true;
 
