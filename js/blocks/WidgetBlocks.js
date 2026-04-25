@@ -1689,7 +1689,8 @@ function setupWidgetBlocks(activity) {
                         // converted to notes.
                         switch (logo.tupletRhythms[i][0]) {
                             case "notes":
-                            case "simple": {
+                            case "simple":
+                                // eslint-disable-next-line no-case-declarations
                                 const tupletParam = [logo.tupletParams[logo.tupletRhythms[i][1]]];
                                 tupletParam.push([]);
                                 for (let j = 2; j < logo.tupletRhythms[i].length; j++) {
@@ -1698,7 +1699,6 @@ function setupWidgetBlocks(activity) {
 
                                 logo.phraseMaker.addTuplet(tupletParam);
                                 break;
-                            }
                             default:
                                 logo.phraseMaker.addNotes(
                                     logo.tupletRhythms[i][1],
@@ -1771,6 +1771,24 @@ function setupWidgetBlocks(activity) {
                 logo.statusMatrix = new StatusMatrix();
             }
 
+            const dedupeStatusFields = () => {
+                if (!Array.isArray(logo.statusFields)) {
+                    logo.statusFields = [];
+                    return;
+                }
+
+                const seen = new Set();
+                logo.statusFields = logo.statusFields.filter(([fieldBlk, fieldName]) => {
+                    const key = fieldBlk + ":" + fieldName;
+                    if (seen.has(key)) {
+                        return false;
+                    }
+
+                    seen.add(key);
+                    return true;
+                });
+            };
+
             // If the matrix is not open or we are starting fresh,
             // manually register the children to ensure rows appear on first run.
             if (!logo.statusMatrix.isOpen || logo.statusFields.length === 0) {
@@ -1789,13 +1807,21 @@ function setupWidgetBlocks(activity) {
                         }
                     }
 
-                    // Traverse mouth of status or next block in stack
                     if (block.name === "status") {
-                        registerMonitors(block.connections[1]);
-                    } else if (
-                        block.connections.length > 2 &&
-                        block.connections[block.connections.length - 1] !== null
-                    ) {
+                        for (let i = 1; i < block.connections.length; i++) {
+                            const child = block.connections[i];
+                            if (child === null || !(child in activity.blocks.blockList)) {
+                                continue;
+                            }
+
+                            const childBlock = activity.blocks.blockList[child];
+                            if (childBlock.name === "hidden") {
+                                registerMonitors(childBlock.connections[1]);
+                            } else if (childBlock.name !== "hiddennoflow") {
+                                registerMonitors(child);
+                            }
+                        }
+                    } else if (block.connections.length > 2) {
                         registerMonitors(block.connections[block.connections.length - 1]);
                     }
                 };
@@ -1804,6 +1830,7 @@ function setupWidgetBlocks(activity) {
                 logo.inStatusMatrix = saveStatus;
             }
 
+            dedupeStatusFields();
             logo.statusMatrix.init(activity);
             logo.statusFields = []; // Clear for the actual interpreter run
 
@@ -1813,6 +1840,7 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
+                dedupeStatusFields();
                 logo.statusMatrix.init(activity);
                 logo.inStatusMatrix = false;
             };
