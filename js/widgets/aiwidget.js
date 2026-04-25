@@ -864,6 +864,7 @@ function AIWidget() {
                 await this.midiBuffer.prime();
                 this.midiBuffer.start();
             } catch (error) {
+                console.warn("synth error", error);
                 this.activity.errorMsg(_("Synth error: ") + error.message);
             }
         } else {
