@@ -260,7 +260,7 @@ let httpGet = async projectName => {
     const response = await fetch(url, {
         method: "GET",
         headers: {
-            "x-api-key": "3tgTzMXbbw6xEKX7"
+            "x-api-key": window.MB_PROJECT_API_KEY || ""
         }
     });
 
@@ -282,7 +282,7 @@ let httpPost = async (projectName, data) => {
     const response = await fetch(window.server + projectName, {
         method: "POST",
         headers: {
-            "x-api-key": "3tgTzMXbbw6xEKX7"
+            "x-api-key": window.MB_PROJECT_API_KEY || ""
         },
         body: data
     });
