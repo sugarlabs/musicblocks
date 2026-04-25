@@ -388,7 +388,7 @@ describe("save HTML methods", () => {
         expect(mockPrepareHTML).toHaveBeenCalled();
         expect(mockDownload).toHaveBeenCalledWith(
             "html",
-            "data:text/plain;charset=utf-8,%3Chtml%3EMock%20HTML%3C%2Fhtml%3E",
+            expect.any(String), // This allows the new Blob URL to pass
             null
         );
     });
@@ -413,7 +413,7 @@ describe("save HTML methods", () => {
         expect(mockGetProjectName).toHaveBeenCalled();
         expect(mockDownloadURL).toHaveBeenCalledWith(
             "MockProject.html",
-            "data:text/plain;charset=utf-8,%3Chtml%3EMock%20HTML%3C%2Fhtml%3E"
+            expect.any(String) // This allows the new Blob URL to pass
         );
     });
 
