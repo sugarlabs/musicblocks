@@ -1801,7 +1801,13 @@ describe("Palettes Class", () => {
             const palette = palettes.dict.test;
             const protoblk = {
                 name: "status",
-                macroFunc: jest.fn(() => [[0, "status", 10, 20, [null, 1, 2]], [1, "hidden", 0, 0, [0, 3]], [2, "hiddennoflow", 0, 0, [0, null]], [3, "print", 0, 0, [1, 4, null]], [4, "beatvalue", 0, 0, [3]]])
+                macroFunc: jest.fn(() => [
+                    [0, "status", 10, 20, [null, 1, 2]],
+                    [1, "hidden", 0, 0, [0, 3]],
+                    [2, "hiddennoflow", 0, 0, [0, null]],
+                    [3, "print", 0, 0, [1, 4, null]],
+                    [4, "beatvalue", 0, 0, [3]]
+                ])
             };
 
             mockActivity.palettes = palettes;
@@ -1840,7 +1846,11 @@ describe("Palettes Class", () => {
             const palette = palettes.dict.test;
             const protoblk = {
                 name: "status",
-                macroFunc: jest.fn(() => [[0, "status", 10, 20, [null, 1, 2]], [1, "hidden", 0, 0, [0, null]], [2, "hiddennoflow", 0, 0, [0, null]]])
+                macroFunc: jest.fn(() => [
+                    [0, "status", 10, 20, [null, 1, 2]],
+                    [1, "hidden", 0, 0, [0, null]],
+                    [2, "hiddennoflow", 0, 0, [0, null]]
+                ])
             };
 
             mockActivity.blocks = {

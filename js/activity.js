@@ -3357,9 +3357,6 @@ class Activity {
 
                         // Build a list of lowercased search terms (primary label + extra terms)
                         // so we can match synonyms without duplicating the visual entry.
-                        const searchPos = this.palettes.getSearchPos();
-                        this.search.style.left = searchPos.x + "px";
-                        this.search.style.top = searchPos.y + "px";
                         const searchTerms = [];
                         if (label && label.length > 0) {
                             searchTerms.push(label.toLowerCase());
@@ -3425,12 +3422,13 @@ class Activity {
                     obj[0].style.visibility = "visible";
                 }
 
-                this.searchWidget.value = null;
-                this.searchWidget.style.visibility = "visible";
-                this.searchWidget.style.left =
-                    this.palettes.getSearchPos()[0] * this.turtleBlocksScale * 1.5 + "px";
-                this.searchWidget.style.top =
-                    this.palettes.getSearchPos()[1] * this.turtleBlocksScale * 0.95 + "px";
+                if (this.searchWidget) {
+                    this.searchWidget.value = null;
+                    this.searchWidget.style.visibility = "visible";
+                    const searchPos = this.palettes.getSearchPos();
+                    this.searchWidget.style.left = searchPos.x + "px";
+                    this.searchWidget.style.top = searchPos.y + "px";
+                }
 
                 this.searchBlockPosition = [100, 100];
                 this.prepSearchWidget();
@@ -6711,10 +6709,12 @@ class Activity {
                         case "start":
                         case "drum":
                             // Find the turtle associated with this block.
-                            // eslint-disable-next-line no-case-declarations
+                            const turtleIdx = parseInt(myBlock.value);
                             const turtle =
-                                myBlock.value < this.turtles.getTurtleCount()
-                                    ? this.turtles.getTurtle(myBlock.value)
+                                !isNaN(turtleIdx) &&
+                                turtleIdx >= 0 &&
+                                turtleIdx < this.turtles.getTurtleCount()
+                                    ? this.turtles.getTurtle(turtleIdx)
                                     : null;
                             if (turtle === null || turtle === undefined) {
                                 args = {

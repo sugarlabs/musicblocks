@@ -2030,7 +2030,11 @@ class Palette {
                         "print",
                         0,
                         0,
-                        [lastConnection, valBlockId, i < boxBlocks.length - 1 ? valBlockId + 1 : null]
+                        [
+                            lastConnection,
+                            valBlockId,
+                            i < boxBlocks.length - 1 ? valBlockId + 1 : null
+                        ]
                     ]);
 
                     // Add box value block
