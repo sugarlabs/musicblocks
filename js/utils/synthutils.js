@@ -1932,6 +1932,7 @@ function Synth() {
 
                 if (!paramsEffects.doNeighbor) {
                     if (setNote !== undefined && setNote) {
+                        if (this._instrumentEpoch !== epoch) return;
                         if (synth.oscillator !== undefined) {
                             synth.setNote(notes);
                         } else if (synth.voices !== undefined) {
