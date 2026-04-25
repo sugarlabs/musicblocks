@@ -323,7 +323,12 @@ class Activity {
         this.keyboardEnableFlag;
         this.inTempoWidget = false;
         this.projectID = null;
-        this.storage = localStorage;
+        try {
+            this.storage = localStorage;
+        } catch (e) {
+            // Fall back to in-memory storage when browser storage is restricted.
+            this.storage = {};
+        }
 
         // Flag to indicate whether the user is performing a 2D drag operation.
         this.isDragging = false;
@@ -1837,7 +1842,12 @@ class Activity {
              */
 
             async function recordScreen() {
-                const mode = localStorage.getItem("musicBlocksRecordMode");
+                let mode = null;
+                try {
+                    mode = localStorage.getItem("musicBlocksRecordMode");
+                } catch (e) {
+                    mode = null;
+                }
 
                 if (mode === "canvas") {
                     return await recordCanvasOnly();
