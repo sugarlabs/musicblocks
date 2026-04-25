@@ -153,6 +153,7 @@ requirejs.config({
     },
     paths: {
         "utils": "js/utils",
+        "safeStorage": "utils/safeStorage",
         "widgets": "js/widgets",
         "activity": "js",
         "easeljs.min": "lib/easeljs.min",
