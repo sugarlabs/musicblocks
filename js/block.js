@@ -4907,9 +4907,13 @@ class Block {
 // Track mouse presence
 window.hasMouse = false;
 // Mousemove is not emulated for touch
-document.addEventListener("mousemove", () => {
-    window.hasMouse = true;
-});
+document.addEventListener(
+    "mousemove",
+    () => {
+        window.hasMouse = true;
+    },
+    { once: true }
+);
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = Block;
