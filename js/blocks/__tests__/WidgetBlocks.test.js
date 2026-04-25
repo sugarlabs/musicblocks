@@ -582,5 +582,49 @@ describe("setupWidgetBlocks", () => {
 
             expect(initSnapshots[1]).toEqual(["3:outputtools", "6:beatvalue"]);
         });
+
+        it("rebuilds status fields from the stack when runtime registration is empty", () => {
+            const status = getBlock("status");
+            const initSnapshots = [];
+
+            logo.inStatusMatrix = false;
+            logo.statusFields = [];
+            logo.parseArg = jest.fn((logoRef, turtleRef, blkRef) => {
+                if (blkRef === "field1") {
+                    logoRef.statusFields.push(["field1", "beatvalue"]);
+                }
+            });
+            logo.statusMatrix = {
+                isOpen: true,
+                init: jest.fn(() => {
+                    initSnapshots.push(logo.statusFields.map(field => field.join(":")));
+                })
+            };
+            activity.blocks.blockList = {
+                statusBlk: {
+                    name: "status",
+                    connections: [null, "print1", null]
+                },
+                print1: {
+                    name: "print",
+                    connections: ["statusBlk", "field1", null]
+                },
+                field1: {
+                    name: "beatvalue",
+                    connections: ["print1"]
+                }
+            };
+
+            status.flow(["childBlk"], logo, 0, "statusBlk");
+
+            expect(initSnapshots[0]).toEqual(["field1:beatvalue"]);
+
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            logo.statusFields = [];
+
+            listener();
+
+            expect(initSnapshots[1]).toEqual(["field1:beatvalue"]);
+        });
     });
 });

@@ -1771,31 +1771,27 @@ function setupWidgetBlocks(activity) {
                 logo.statusMatrix = new StatusMatrix();
             }
 
-            const dedupeStatusFields = () => {
-                if (!Array.isArray(logo.statusFields)) {
-                    logo.statusFields = [];
-                    return;
-                }
-
+            const collectStatusFields = () => {
+                const structuralFields = [];
                 const seen = new Set();
-                logo.statusFields = logo.statusFields.filter(([fieldBlk, fieldName]) => {
-                    const key = fieldBlk + ":" + fieldName;
+
+                const registerStatusField = field => {
+                    if (!Array.isArray(field)) {
+                        return;
+                    }
+
+                    const key = field[0] + ":" + field[1];
                     if (seen.has(key)) {
-                        return false;
+                        return;
                     }
 
                     seen.add(key);
-                    return true;
-                });
-            };
+                    structuralFields.push(field);
+                };
 
-            // If the matrix is not open or we are starting fresh,
-            // manually register the children to ensure rows appear on first run.
-            if (!logo.statusMatrix.isOpen || logo.statusFields.length === 0) {
                 const saveStatus = logo.inStatusMatrix;
                 logo.inStatusMatrix = true;
 
-                // Helper to register monitoring blocks recursively
                 const registerMonitors = b => {
                     if (b === null || !(b in activity.blocks.blockList)) return;
                     const block = activity.blocks.blockList[b];
@@ -1803,7 +1799,13 @@ function setupWidgetBlocks(activity) {
                     if (block.name === "print") {
                         const arg = block.connections[1];
                         if (arg !== null && arg in activity.blocks.blockList) {
+                            const beforeCount = logo.statusFields.length;
                             logo.parseArg(logo, turtle, arg);
+                            const newFields = logo.statusFields.slice(beforeCount);
+                            for (const field of newFields) {
+                                registerStatusField(field);
+                            }
+                            logo.statusFields.length = beforeCount;
                         }
                     }
 
@@ -1828,6 +1830,31 @@ function setupWidgetBlocks(activity) {
 
                 registerMonitors(blk);
                 logo.inStatusMatrix = saveStatus;
+
+                return structuralFields;
+            };
+
+            const dedupeStatusFields = () => {
+                if (!Array.isArray(logo.statusFields)) {
+                    logo.statusFields = [];
+                    return;
+                }
+
+                const seen = new Set();
+                logo.statusFields = logo.statusFields.filter(([fieldBlk, fieldName]) => {
+                    const key = fieldBlk + ":" + fieldName;
+                    if (seen.has(key)) {
+                        return false;
+                    }
+
+                    seen.add(key);
+                    return true;
+                });
+            };
+
+            const structuralFields = collectStatusFields();
+            if (!logo.statusMatrix.isOpen || logo.statusFields.length === 0) {
+                logo.statusFields = structuralFields.slice();
             }
 
             dedupeStatusFields();
@@ -1840,6 +1867,9 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
+                if (logo.statusFields.length === 0) {
+                    logo.statusFields = structuralFields.slice();
+                }
                 dedupeStatusFields();
                 logo.statusMatrix.init(activity);
                 logo.inStatusMatrix = false;
