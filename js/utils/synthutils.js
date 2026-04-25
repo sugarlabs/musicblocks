@@ -1278,7 +1278,7 @@ function Synth() {
      */
     this.createDefaultSynth = turtle => {
         console.debug("create default poly/default/custom synth for turtle " + turtle);
-        const default_synth = new Tone.PolySynth(Tone.AMSynth, POLYCOUNT).toDestination();
+        const default_synth = new Tone.PolySynth(Tone.AMSynth, { maxPolyphony: POLYCOUNT }).toDestination();
         instruments[turtle]["electronic synth"] = default_synth;
         instrumentsSource["electronic synth"] = [0, "electronic synth"];
         instruments[turtle]["custom"] = default_synth;
@@ -1424,7 +1424,7 @@ function Synth() {
             case "poly":
                 instrumentsSource[instrumentName] = [0, "poly"];
                 // console.debug("poly");
-                builtin_synth = new Tone.PolySynth(Tone.AMSynth, synthOptions.polyphony);
+                builtin_synth = new Tone.PolySynth(Tone.AMSynth, { maxPolyphony: synthOptions.polyphony });
                 break;
             case "noise1":
             case "noise2":
@@ -1436,7 +1436,7 @@ function Synth() {
             default:
                 instrumentsSource[instrumentName] = [0, "poly"];
                 // console.debug("poly (default)");
-                builtin_synth = new Tone.PolySynth(Tone.AMSynth, POLYCOUNT);
+                builtin_synth = new Tone.PolySynth(Tone.AMSynth, { maxPolyphony: POLYCOUNT });
                 break;
         }
 
@@ -1464,7 +1464,7 @@ function Synth() {
         } else if (sourceName.toLowerCase() === "duosynth") {
             tempSynth = new Tone.DuoSynth(synthOptions);
         } else {
-            tempSynth = new Tone.PolySynth(Tone.AMSynth, POLYCOUNT);
+            tempSynth = new Tone.PolySynth(Tone.AMSynth, { maxPolyphony: POLYCOUNT });
         }
 
         return tempSynth;
