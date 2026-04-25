@@ -41,7 +41,7 @@ class HelpWidget {
         this.appendedBlockList = [];
         this.index = 0;
         this.isOpen = true;
-        this._prevKeyHandler = document.onkeydown;
+        this._keydownHandler = null;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help", false);
         //widgetWindow.getWidgetBody().style.overflowY = "auto";
@@ -52,7 +52,10 @@ class HelpWidget {
         widgetWindow.show();
         widgetWindow.onclose = () => {
             this.isOpen = false;
-            document.onkeydown = this._prevKeyHandler;
+            if (this._keydownHandler) {
+                document.removeEventListener("keydown", this._keydownHandler);
+                this._keydownHandler = null;
+            }
             widgetWindow.destroy();
             // Trigger the hint only if they were on the first page of the tour
             if (this.index === 0 && typeof this.activity.textMsg === "function") {
@@ -123,13 +126,17 @@ class HelpWidget {
             leftArrow.setAttribute("title", _("Previous"));
             leftArrow.setAttribute("aria-label", _("Previous"));
 
-            document.onkeydown = function handleArrowKeys(event) {
+            if (this._keydownHandler) {
+                document.removeEventListener("keydown", this._keydownHandler);
+            }
+            this._keydownHandler = (event) => {
                 if (event.key === "ArrowLeft") {
                     leftArrow.click();
                 } else if (event.key === "ArrowRight") {
                     rightArrow.click();
                 }
             };
+            document.addEventListener("keydown", this._keydownHandler);
 
             let cell = docById("left-arrow");
             if (page === 0) {
@@ -531,13 +538,17 @@ class HelpWidget {
         const rightArrow = docById("right-arrow");
         const leftArrow = docById("left-arrow");
 
-        document.onkeydown = function handleArrowKeys(event) {
+        if (this._keydownHandler) {
+            document.removeEventListener("keydown", this._keydownHandler);
+        }
+        this._keydownHandler = (event) => {
             if (event.key === "ArrowLeft") {
                 leftArrow.click();
             } else if (event.key === "ArrowRight") {
                 rightArrow.click();
             }
         };
+        document.addEventListener("keydown", this._keydownHandler);
 
         if (this.index === this.appendedBlockList.length - 1) {
             rightArrow.classList.add("disabled");
