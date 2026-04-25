@@ -73,10 +73,8 @@ function createMockWidgetWindow() {
     };
 }
 
-// Load HelpWidget class via Function constructor wrapping
-const fs = require("fs");
-const path = require("path");
-const helpSource = fs.readFileSync(path.resolve(__dirname, "../help.js"), "utf-8");
+// Load HelpWidget via require for proper coverage instrumentation
+const HelpWidget = require("../help");
 
 let mockWidgetWindow;
 
@@ -92,10 +90,6 @@ Object.defineProperty(window, "localStorage", {
     writable: true,
     value: { languagePreference: "en" }
 });
-
-// Wrap source and assign HelpWidget to global
-const wrappedSource = helpSource + "\nglobal.HelpWidget = HelpWidget;\n";
-new Function(wrappedSource)();
 
 beforeEach(() => {
     // Reset DOM
@@ -634,6 +628,187 @@ describe("HelpWidget", () => {
     describe("static properties", () => {
         test("ICONSIZE is 32", () => {
             expect(HelpWidget.ICONSIZE).toBe(32);
+        });
+    });
+
+    describe("_blockHelp interactions", () => {
+        function createBlockMock(overrides = {}) {
+            return {
+                name: "forward",
+                staticLabels: ["Forward"],
+                helpString: ["Move forward"],
+                beginnerModeBlock: true,
+                palette: {
+                    name: "turtle",
+                    palettes: { showPalette: jest.fn() }
+                },
+                ...overrides
+            };
+        }
+
+        test("load button loads simple block when helpString length < 4", () => {
+            const activity = createMockActivity();
+            activity.blocks.palettes.getProtoNameAndPalette.mockReturnValue([
+                "proto",
+                "turtle",
+                "forward"
+            ]);
+            activity.blocks.protoBlockDict["forward"] = createBlockMock();
+            activity.blocks.palettes.dict["turtle"] = {
+                makeBlockFromSearch: jest.fn((p, n, cb) => cb("newBlock"))
+            };
+
+            const hw = new HelpWidget(activity, false);
+            hw._blockHelp(createBlockMock());
+
+            const loadButton = document.getElementById("loadButton");
+            expect(loadButton).not.toBeNull();
+            loadButton.onclick();
+
+            expect(activity.blocks.palettes.dict["turtle"].makeBlockFromSearch).toHaveBeenCalled();
+            expect(activity.blocks.moveBlock).toHaveBeenCalledWith("newBlock", 100, 100);
+        });
+
+        test("load button loads macro when helpString[3] is a string", () => {
+            const block = createBlockMock({
+                helpString: ["Move forward", "doc", "macro", "forward_macro"]
+            });
+            global.getMacroExpansion.mockReturnValue(["block1", "block2"]);
+
+            const activity = createMockActivity();
+            const hw = new HelpWidget(activity, false);
+            hw._blockHelp(block);
+
+            const loadButton = document.getElementById("loadButton");
+            loadButton.onclick();
+
+            expect(global.getMacroExpansion).toHaveBeenCalledWith(
+                activity,
+                "forward_macro",
+                100,
+                100
+            );
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith(["block1", "block2"]);
+        });
+
+        test("load button loads raw blocks when helpString[3] is not a string", () => {
+            const rawBlocks = [[0, "forward", 100, 100, [null, 1]]];
+            const block = createBlockMock({
+                helpString: ["Move forward", "doc", "macro", rawBlocks]
+            });
+
+            const activity = createMockActivity();
+            const hw = new HelpWidget(activity, false);
+            hw._blockHelp(block);
+
+            const loadButton = document.getElementById("loadButton");
+            loadButton.onclick();
+
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith(rawBlocks);
+        });
+
+        test("find icon opens the block palette", () => {
+            const block = createBlockMock();
+            const activity = createMockActivity();
+            const hw = new HelpWidget(activity, false);
+            hw._blockHelp(block);
+
+            const findIcon = document.getElementById("findIcon");
+            expect(findIcon).not.toBeNull();
+            findIcon.onclick();
+
+            expect(block.palette.palettes.showPalette).toHaveBeenCalledWith("turtle");
+        });
+
+        test("shows advanced icon for non-beginner blocks", () => {
+            const block = createBlockMock({ beginnerModeBlock: false });
+            const activity = createMockActivity();
+            const hw = new HelpWidget(activity, false);
+            hw._blockHelp(block);
+
+            const advIcon = document.getElementById("advIconText");
+            expect(advIcon).not.toBeNull();
+        });
+
+        test("does not show advanced icon for beginner blocks", () => {
+            const block = createBlockMock({ beginnerModeBlock: true });
+            const activity = createMockActivity();
+            const hw = new HelpWidget(activity, false);
+            hw._blockHelp(block);
+
+            const advIcon = document.getElementById("advIconText");
+            expect(advIcon).toBeNull();
+        });
+
+        test("right arrow advances to next block", () => {
+            const block1 = createBlockMock({ name: "forward", staticLabels: ["Forward"] });
+            const block2 = createBlockMock({ name: "back", staticLabels: ["Back"] });
+            const activity = createMockActivity({
+                protoBlockDict: { forward: block1, back: block2 }
+            });
+
+            const hw = new HelpWidget(activity, false);
+            hw.appendedBlockList = ["forward", "back"];
+            hw.index = 0;
+            hw._blockHelp(block1);
+
+            const rightArrow = document.getElementById("right-arrow");
+            rightArrow.click();
+
+            expect(hw.index).toBe(1);
+        });
+
+        test("left arrow goes to previous block", () => {
+            const block1 = createBlockMock({ name: "forward", staticLabels: ["Forward"] });
+            const block2 = createBlockMock({ name: "back", staticLabels: ["Back"] });
+            const activity = createMockActivity({
+                protoBlockDict: { forward: block1, back: block2 }
+            });
+
+            const hw = new HelpWidget(activity, false);
+            hw.appendedBlockList = ["forward", "back"];
+            hw.index = 1;
+            hw._blockHelp(block2);
+
+            const leftArrow = document.getElementById("left-arrow");
+            leftArrow.click();
+
+            expect(hw.index).toBe(0);
+        });
+
+        test("keyboard arrow keys trigger navigation", () => {
+            const block = createBlockMock();
+            const activity = createMockActivity({
+                protoBlockDict: { forward: block }
+            });
+
+            const hw = new HelpWidget(activity, false);
+            hw.appendedBlockList = ["forward"];
+            hw.index = 0;
+            hw._blockHelp(block);
+
+            const rightArrow = document.getElementById("right-arrow");
+            const clickSpy = jest.spyOn(rightArrow, "click");
+
+            const event = new KeyboardEvent("keydown", { key: "ArrowRight" });
+            document.onkeydown(event);
+
+            expect(clickSpy).toHaveBeenCalled();
+        });
+
+        test("right arrow is disabled on last block", () => {
+            const block = createBlockMock();
+            const activity = createMockActivity({
+                protoBlockDict: { forward: block }
+            });
+
+            const hw = new HelpWidget(activity, false);
+            hw.appendedBlockList = ["forward"];
+            hw.index = 0;
+            hw._blockHelp(block);
+
+            const rightArrow = document.getElementById("right-arrow");
+            expect(rightArrow.classList.contains("disabled")).toBe(true);
         });
     });
 });
