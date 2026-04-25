@@ -6707,7 +6707,7 @@ class Activity {
                 } else {
                     switch (myBlock.name) {
                         case "start":
-                        case "drum":
+                        case "drum": {
                             // Find the turtle associated with this block.
                             const turtleIdx = parseInt(myBlock.value);
                             const turtle =
@@ -6743,6 +6743,7 @@ class Activity {
                                 };
                             }
                             break;
+                        }
                         case "temperament1":
                             if (this.blocks.customTemperamentDefined) {
                                 // If a define temperament block is
