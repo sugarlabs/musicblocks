@@ -879,74 +879,30 @@ describe("BooleanBlocks single null connection edge cases", () => {
         jest.clearAllMocks();
     });
 
-    test("AndBlock arg() returns false when only first connection is null", () => {
+    // Parameterized tests for single null connection scenarios
+    test.each([
+        ["and", "AndBlock"],
+        ["or", "OrBlock"],
+        ["xor", "XorBlock"],
+        ["greater", "GreaterBlock"],
+        ["less", "LessBlock"],
+        ["equal", "EqualBlock"],
+        ["not_equal_to", "NotEqualToBlock"]
+    ])("%s arg() returns false when only first connection is null", blockType => {
         mockActivity.blocks.blockList["blk1"].connections[1] = null;
         mockActivity.blocks.blockList["blk1"].connections[2] = "blkA";
-        const result = instances["and"].arg(mockLogo, "turtle1", "blk1", null);
+        const result = instances[blockType].arg(mockLogo, "turtle1", "blk1", null);
         expect(result).toBe(false);
         expect(mockActivity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, "blk1");
     });
 
-    test("AndBlock arg() returns false when only second connection is null", () => {
+    test.each([
+        ["and", "AndBlock"],
+        ["or", "OrBlock"]
+    ])("%s arg() returns false when only second connection is null", blockType => {
         mockActivity.blocks.blockList["blk1"].connections[1] = "blkA";
         mockActivity.blocks.blockList["blk1"].connections[2] = null;
-        const result = instances["and"].arg(mockLogo, "turtle1", "blk1", null);
-        expect(result).toBe(false);
-        expect(mockActivity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, "blk1");
-    });
-
-    test("OrBlock arg() returns false when only first connection is null", () => {
-        mockActivity.blocks.blockList["blk1"].connections[1] = null;
-        mockActivity.blocks.blockList["blk1"].connections[2] = "blkA";
-        const result = instances["or"].arg(mockLogo, "turtle1", "blk1", null);
-        expect(result).toBe(false);
-        expect(mockActivity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, "blk1");
-    });
-
-    test("OrBlock arg() returns false when only second connection is null", () => {
-        mockActivity.blocks.blockList["blk1"].connections[1] = "blkA";
-        mockActivity.blocks.blockList["blk1"].connections[2] = null;
-        const result = instances["or"].arg(mockLogo, "turtle1", "blk1", null);
-        expect(result).toBe(false);
-        expect(mockActivity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, "blk1");
-    });
-
-    test("XorBlock arg() returns false when only first connection is null", () => {
-        mockActivity.blocks.blockList["blk1"].connections[1] = null;
-        mockActivity.blocks.blockList["blk1"].connections[2] = "blkA";
-        const result = instances["xor"].arg(mockLogo, "turtle1", "blk1", null);
-        expect(result).toBe(false);
-        expect(mockActivity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, "blk1");
-    });
-
-    test("GreaterBlock arg() returns false when only first connection is null", () => {
-        mockActivity.blocks.blockList["blk1"].connections[1] = null;
-        mockActivity.blocks.blockList["blk1"].connections[2] = "blkA";
-        const result = instances["greater"].arg(mockLogo, "turtle1", "blk1", null);
-        expect(result).toBe(false);
-        expect(mockActivity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, "blk1");
-    });
-
-    test("LessBlock arg() returns false when only first connection is null", () => {
-        mockActivity.blocks.blockList["blk1"].connections[1] = null;
-        mockActivity.blocks.blockList["blk1"].connections[2] = "blkA";
-        const result = instances["less"].arg(mockLogo, "turtle1", "blk1", null);
-        expect(result).toBe(false);
-        expect(mockActivity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, "blk1");
-    });
-
-    test("EqualBlock arg() returns false when only first connection is null", () => {
-        mockActivity.blocks.blockList["blk1"].connections[1] = null;
-        mockActivity.blocks.blockList["blk1"].connections[2] = "blkA";
-        const result = instances["equal"].arg(mockLogo, "turtle1", "blk1", null);
-        expect(result).toBe(false);
-        expect(mockActivity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, "blk1");
-    });
-
-    test("NotEqualToBlock arg() returns false when only first connection is null", () => {
-        mockActivity.blocks.blockList["blk1"].connections[1] = null;
-        mockActivity.blocks.blockList["blk1"].connections[2] = "blkA";
-        const result = instances["not_equal_to"].arg(mockLogo, "turtle1", "blk1", null);
+        const result = instances[blockType].arg(mockLogo, "turtle1", "blk1", null);
         expect(result).toBe(false);
         expect(mockActivity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, "blk1");
     });
