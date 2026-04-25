@@ -368,6 +368,10 @@ describe("TimbreWidget", () => {
 
     describe("phaser defaults", () => {
         test("should keep UI, block, and cached defaults in sync for Phaser", async () => {
+            const originalDocById = global.docById;
+            const originalDocByName = global.docByName;
+            const originalGetElementById = global.document.getElementById;
+            const originalDelayExecution = global.delayExecution;
             const createNode = () => ({
                 style: {},
                 value: "",
@@ -420,16 +424,23 @@ describe("TimbreWidget", () => {
             timbre.blockNo = 0;
             timbre.clampConnection = jest.fn();
 
-            timbre._effects();
-            await effectsRadios[3].onclick({ target: { value: "Phaser" } });
+            try {
+                timbre._effects();
+                await effectsRadios[3].onclick({ target: { value: "Phaser" } });
 
-            expect(getNode("myRangeFx2").value).toBe(100);
-            expect(getNode("myspanFx2").textContent).toBe("100");
-            expect(timbre.phaserParams).toEqual([5, 3, 100]);
-            expect(instrumentsEffects[0][timbre.instrumentName]["baseFrequency"]).toBe(100);
+                expect(getNode("myRangeFx2").value).toBe(100);
+                expect(getNode("myspanFx2").textContent).toBe("100");
+                expect(timbre.phaserParams).toEqual([5, 3, 100]);
+                expect(instrumentsEffects[0][timbre.instrumentName]["baseFrequency"]).toBe(100);
 
-            const phaserBlock = timbre.activity.blocks.loadNewBlocks.mock.calls[0][0];
-            expect(phaserBlock[3][1][1].value).toBe(100);
+                const phaserBlock = timbre.activity.blocks.loadNewBlocks.mock.calls[0][0];
+                expect(phaserBlock[3][1][1].value).toBe(100);
+            } finally {
+                global.docById = originalDocById;
+                global.docByName = originalDocByName;
+                global.document.getElementById = originalGetElementById;
+                global.delayExecution = originalDelayExecution;
+            }
         });
     });
 
