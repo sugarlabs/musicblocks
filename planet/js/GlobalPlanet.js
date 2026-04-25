@@ -235,7 +235,6 @@ class GlobalPlanet {
         const toDownload = [];
 
         for (let i = 0; i < data.length; i++) {
-            // eslint-disable-next-line no-prototype-builtins
             if (this.cache.hasOwnProperty(data[i][0])) {
                 if (this.cache[data[i][0]].ProjectLastUpdated !== data[i][1])
                     toDownload.push(data[i]);
@@ -372,7 +371,6 @@ class GlobalPlanet {
         this.cleanContainer();
 
         for (let i = 0; i < data.length; i++) {
-            // eslint-disable-next-line no-prototype-builtins
             if (this.cache.hasOwnProperty(data[i][0])) {
                 const g = new GlobalCard(this.Planet);
                 g.init(data[i][0]);

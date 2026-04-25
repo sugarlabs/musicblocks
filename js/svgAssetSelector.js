@@ -218,7 +218,6 @@ function openSvgAssetSelector(onSelectBuiltIn, onUploadFromDevice) {
             });
         })
         .catch(function (error) {
-            // eslint-disable-next-line no-console
             console.error("Failed to load SVG assets:", error);
             // Fallback to upload from device if built-in fails to load
             if (typeof onUploadFromDevice === "function") {
@@ -249,12 +248,10 @@ function _fetchAsDataURL(path, callback) {
             };
             reader.readAsDataURL(xhr.response);
         } else {
-            // eslint-disable-next-line no-console
             console.error("Failed to load built-in asset: " + path);
         }
     };
     xhr.onerror = function () {
-        // eslint-disable-next-line no-console
         console.error("Network error loading built-in asset: " + path);
     };
     xhr.send();
