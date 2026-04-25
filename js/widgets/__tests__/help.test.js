@@ -220,15 +220,19 @@ describe("HelpWidget", () => {
             expect(mockWidgetWindow.destroy).toHaveBeenCalled();
         });
 
-        test("onclose restores document.onkeydown to the handler active before Help opened", () => {
+        test("onclose removes the keydown listener added by Help", () => {
             const activity = createMockActivity();
-            const prevHandler = jest.fn();
-            document.onkeydown = prevHandler;
+            const removeSpy = jest.spyOn(document, "removeEventListener");
 
-            new HelpWidget(activity, false);
+            const hw = new HelpWidget(activity, false);
+            // Trigger _blockHelp so _keydownHandler is set
+            jest.runAllTimers();
+
             mockWidgetWindow.onclose();
 
-            expect(document.onkeydown).toBe(prevHandler);
+            expect(removeSpy).toHaveBeenCalledWith("keydown", expect.any(Function));
+            expect(hw._keydownHandler).toBeNull();
+            removeSpy.mockRestore();
         });
 
         test("calls windowFor with correct arguments", () => {
@@ -791,7 +795,7 @@ describe("HelpWidget", () => {
             const clickSpy = jest.spyOn(rightArrow, "click");
 
             const event = new KeyboardEvent("keydown", { key: "ArrowRight" });
-            document.onkeydown(event);
+            document.dispatchEvent(event);
 
             expect(clickSpy).toHaveBeenCalled();
         });
