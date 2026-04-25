@@ -64,3 +64,7 @@ class Converter {
 
     init() {}
 }
+
+if (typeof module !== "undefined" && module !== null) {
+    module.exports = Converter;
+}

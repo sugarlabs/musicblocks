@@ -103,7 +103,7 @@ global.Singer = {
     }
 };
 
-const setupIntervalsBlocks = require("../blocks/IntervalsBlocks.js");
+const { setupIntervalsBlocks } = require("../blocks/IntervalsBlocks.js");
 
 function makeTurSinger(overrides = {}) {
     return {

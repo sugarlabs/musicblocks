@@ -97,6 +97,11 @@ const {
     POSNUMBER
 } = require("../logo");
 
+// Expose constants that logo.js references as bare globals at runtime
+// (e.g. TURTLESTEP in runFromBlock, NOTEDIV in dispatchTurtleSignals).
+const logoconstants = require("../logoconstants");
+Object.assign(global, logoconstants);
+
 describe("Queue Class", () => {
     test("constructor initializes all properties correctly", () => {
         const queue = new Queue(1, 5, 0, ["arg1", "arg2"]);
@@ -477,6 +482,27 @@ describe("Logo Class", () => {
             logo.doStopTurtles();
 
             expect(logo.stepQueue).toEqual({});
+        });
+
+        test("executes ONSTOP plugin hooks", () => {
+            logo.sounds = [];
+            logo.synth = {
+                stop: jest.fn(),
+                stopSound: jest.fn(),
+                disposeAllInstruments: jest.fn(),
+                recorder: null
+            };
+            logo.evalOnStopList = {
+                firstHook: "code-first",
+                secondHook: "code-second"
+            };
+            logo.safePluginExecute = jest.fn();
+
+            logo.doStopTurtles();
+
+            expect(logo.safePluginExecute).toHaveBeenCalledTimes(2);
+            expect(logo.safePluginExecute).toHaveBeenNthCalledWith(1, "code-first", logo);
+            expect(logo.safePluginExecute).toHaveBeenNthCalledWith(2, "code-second", logo);
         });
     });
 

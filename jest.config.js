@@ -6,7 +6,18 @@ module.exports = {
     collectCoverage: true,
     collectCoverageFrom: [
         "js/**/*.js",
-        "!js/vendor/**",
+        "!js/__tests__/**",
+        "planet/js/**/*.js",
+        "!planet/js/__tests__/**"
     ],
-    coverageReporters: ["text-summary", "text", "lcov"],
+    coverageReporters: ["text-summary", "text", "lcov", "json-summary"],
+    coverageThreshold: {
+        global: {
+            statements: 34,
+            branches: 29,
+            functions: 41,
+            lines: 34
+        }
+    },
+    setupFilesAfterEnv: ["<rootDir>/jest.setup.js"]
 };

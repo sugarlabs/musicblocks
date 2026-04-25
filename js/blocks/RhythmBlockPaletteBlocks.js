@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Bottersnike
+﻿// Copyright (c) 2019 Bottersnike
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -26,6 +26,19 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
 }
 
 function setupRhythmBlockPaletteBlocks(activity) {
+    /**
+     * Schedules a note to be played after a timeout.
+     * @param {object} activity - The activity object.
+     * @param {number} beat - The beat value.
+     * @param {string} blk - The block ID.
+     * @param {string} turtle - The turtle ID.
+     * @param {function} callback - The callback function.
+     * @param {number} timeout - The timeout in milliseconds.
+     */
+    const scheduleNote = (activity, beat, blk, turtle, callback, timeout) => {
+        setTimeout(() => Singer.processNote(activity, beat, false, blk, turtle, callback), timeout);
+    };
+
     /**
      * Represents a block for handling rhythms.
      * @extends {FlowBlock}
@@ -171,21 +184,6 @@ function setupRhythmBlockPaletteBlocks(activity) {
 
                 const beatValue = bpmFactor == null ? 1 : bpmFactor / noteBeatValue;
 
-                /**
-                 * Plays a note in the rhythm.
-                 *
-                 * @param {number} thisBeat - Beat value for the note.
-                 * @param {string} blk - Block identifier.
-                 * @param {string} turtle - Turtle identifier.
-                 * @param {Function} callback - Callback function.
-                 * @param {number} timeout - Timeout value.
-                 */
-                const __rhythmPlayNote = (thisBeat, blk, turtle, callback, timeout) => {
-                    setTimeout(
-                        () => Singer.processNote(activity, thisBeat, false, blk, turtle, callback),
-                        timeout
-                    );
-                };
                 let __callback;
 
                 for (let i = 0; i < arg0; i++) {
@@ -198,7 +196,14 @@ function setupRhythmBlockPaletteBlocks(activity) {
                         __callback = null;
                     }
 
-                    __rhythmPlayNote(noteBeatValue, blk, turtle, __callback, i * beatValue * 1000);
+                    scheduleNote(
+                        activity,
+                        noteBeatValue,
+                        blk,
+                        turtle,
+                        __callback,
+                        i * beatValue * 1000
+                    );
                 }
 
                 tur.doWait((arg0 - 1) * beatValue);
@@ -552,7 +557,6 @@ function setupRhythmBlockPaletteBlocks(activity) {
             const listenerName = "_tuplet_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 if (logo.inMatrix) {
                     logo.tuplet = false;
@@ -701,7 +705,6 @@ function setupRhythmBlockPaletteBlocks(activity) {
             const listenerName = "_tuplet_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 const tur = activity.turtles.ithTurtle(turtle);
 
@@ -739,23 +742,6 @@ function setupRhythmBlockPaletteBlocks(activity) {
                             ? last(tur.singer.bpm)
                             : Singer.masterBPM;
 
-                    let totalBeats = 0;
-
-                    const __tupletPlayNote = (thisBeat, blk, turtle, callback, timeout) => {
-                        setTimeout(
-                            () =>
-                                Singer.processNote(
-                                    activity,
-                                    thisBeat,
-                                    false,
-                                    blk,
-                                    turtle,
-                                    callback
-                                ),
-                            timeout
-                        );
-                    };
-
                     let timeout = 0;
                     let beatValue;
                     let __callback = null;
@@ -775,7 +761,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                             __callback = null;
                         }
 
-                        __tupletPlayNote(thisBeat, blk, turtle, __callback, timeout);
+                        scheduleNote(activity, thisBeat, blk, turtle, __callback, timeout);
 
                         timeout += beatValue * 1000;
                         totalBeats += beatValue;

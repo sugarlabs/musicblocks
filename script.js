@@ -8,7 +8,7 @@ $(document).ready(function () {
      * The user's selected mode, stored in local storage.
      * @type {string}
      */
-    var mode;
+    let mode;
     try {
         mode = localStorage.getItem("beginnerMode") || "true";
     } catch (error) {
@@ -21,13 +21,13 @@ $(document).ready(function () {
      * The icon element that displays the user's current mode.
      * @type {HTMLElement}
      */
-    var modeIcon = document.getElementById("mode");
+    const modeIcon = document.getElementById("mode");
 
     /**
      * The text element that displays the tooltip for the mode icon.
      * @type {HTMLElement}
      */
-    var modeText = document.getElementById("modeText");
+    const modeText = document.getElementById("modeText");
 
     // Defensive: avoid crashing if expected DOM nodes are missing.
     if (!modeIcon || !modeText) {
@@ -35,11 +35,11 @@ $(document).ready(function () {
     }
 
     // Set the mode icon and tooltip based on the user's selected mode.
-    if (mode === null || mode === "true") {
-        modeIcon.innerHTML = "star_border";
+    if (mode === "true") {
+        modeIcon.textContent = "star_border";
         modeText.setAttribute("data-tooltip", "Switch to advanced mode");
     } else {
-        modeIcon.innerHTML = "star";
+        modeIcon.textContent = "star";
         modeText.setAttribute("data-tooltip", "Switch to beginner mode");
     }
 

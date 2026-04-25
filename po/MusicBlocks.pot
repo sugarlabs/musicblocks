@@ -4607,7 +4607,7 @@ msgid "index heap"
 msgstr ""
 
 #: js/blocks/HeapBlocks.js:521
-msgid "The Set-heap entry block sets a value in he heap at the specified location."
+msgid "The Set-heap entry block sets a value in the heap at the specified location."
 msgstr ""
 
 #: js/blocks/HeapBlocks.js:537
@@ -5698,7 +5698,7 @@ msgid "run block"
 msgstr ""
 
 #: js/blocks/ProgramBlocks.js:1023
-msgid "The Dock block block connections two blocks."
+msgid "The Dock block connects two blocks."
 msgstr ""
 
 #: js/blocks/ProgramBlocks.js:1034
@@ -8220,7 +8220,7 @@ msgid "Tags:"
 msgstr ""
 
 #: planet/js/StringHelper.js:65
-msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">Sugar Labs Code of Conduct</a>."
+msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">Sugar Labs Code of Conduct</a>."
 msgstr ""
 
 #: planet/js/StringHelper.js:66
@@ -8468,6 +8468,6 @@ msgstr ""
 #~msgstr ""
 
 #: planet/js/StringHelper.js:65
-#~msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">Sugar Labs Code of Conduct</a>."
+#~msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">Sugar Labs Code of Conduct</a>."
 #~msgstr ""
 

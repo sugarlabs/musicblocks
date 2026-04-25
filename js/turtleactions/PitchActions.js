@@ -22,7 +22,7 @@
 
 /*
    globals Singer, pitchToNumber, getStepSizeUp, getStepSizeDown, calcOctave, last, getNote,
-   nthDegreeToPitch, SHARP, FLAT, _, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
+   nthDegreeToPitch, SHARP, FLAT, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    numberToPitch, ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
    keySignatureToMode, getInterval, EFFECTSNAMES, NANERRORMSG, frequencyToPitch,
    MusicBlocks, Mouse, isCustomTemperament
@@ -42,7 +42,7 @@
         MusicBlocks, Mouse
     - js/utils/musicutils.js
         pitchToNumber, getStepSizeUp, getStepSizeDown, calcOctave, getNote, nthDegreeToPitch,
-        SHARP, FLAT, _, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE, numberToPitch,
+        SHARP, FLAT, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE, numberToPitch,
         ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
         keySignatureToMode, getInterval, frequencyToPitch, isCustomTemperament
 */
@@ -174,8 +174,8 @@ function setupPitchActions(activity) {
         static playNthModalPitch(number, octave, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            //  (0, 4) --> ti 3; (-1, 4) --> la 3, (-6, 4) --> do 3
-            //  (1, 4) --> do 4; ( 2, 4) --> re 4; ( 8, 4) --> do 5
+            //  (0, 4) --> do 4; ( 1, 4) --> re 4; ( 7, 4) --> do 5
+            //  (-1, 4) --> ti 3; (-2, 4) --> la 3, (-7, 4) --> do 3
 
             // If number is a float value then round-off to the nearest integer
             number = Math.round(number);
@@ -184,8 +184,14 @@ function setupPitchActions(activity) {
             number = Math.abs(number);
 
             const obj = keySignatureToMode(tur.singer.keySignature);
-            const modeLength = MUSICALMODES[obj[1]].length;
-            let scaleDegree = (Math.floor(number - 1) % modeLength) + 1;
+            let modeLength;
+
+            if (isCustomTemperament(activity.logo.synth.inTemperament)) {
+                modeLength = Singer.IntervalsActions.getTemperamentLength();
+            } else {
+                modeLength = MUSICALMODES[obj[1]].length;
+            }
+            let scaleDegree;
 
             // Choose a reference based on the key selected.
             // This is based on the position of a note on the circle of fifths e.g C --> 1, G-->8.
@@ -218,19 +224,23 @@ function setupPitchActions(activity) {
             deltaOctave doesn't directly affect the octave that will play; instead it changes what we say is the reference octave i.e the value connected to the octave argument of this block.
 
             You may see this as a cyclical process:
-            e.g Repeat the scale degree block 14 times while in G major starting from note value --> 1 and octave arg --> 4
-            Till we reach B --> Both deltaOctave and deltaSemi are {0,0}
-            As we cross B and reach C --> no. of semitones < ref, deltaSemi = 1, deltaOctave = 0 and this causes note C to play in octave 5
-            This behavious continues till E, as we reach F# (or Gb) --> deltaOctave becomes 1 and deltaSemi goes back to zero since we've traversed
+            e.g Repeat the scale degree block 14 times while in G major starting from note value --> 0 and octave arg --> 4
+            Till we reach B (note value 2) --> Both deltaOctave and deltaSemi are {0,0}
+            As we cross B and reach C (note value 3) --> no. of semitones < ref, deltaSemi = 1, deltaOctave = 0 and this causes note C to play in octave 5
+            This continues till F# (note value 6), as we reach G (note value 7) --> deltaOctave becomes 1 and deltaSemi goes back to zero since we've traversed
             our modeLength ( 7 ) once.
             Again on C deltaSemi will be 1, deltaOctave was already 1 and thus a total change of 2 octaves --> C6. Thus, deltaOctave brings a change
             to the reference octave.
             So this process can continue indefinitely producing our desired results.
             */
 
-            scaleDegree = isNegativeArg ? modeLength - scaleDegree : scaleDegree;
+            if (isNegativeArg) {
+                scaleDegree = modeLength - ((number - 1) % modeLength);
+            } else {
+                scaleDegree = (number % modeLength) + 1;
+            }
 
-            const [note, offset] = nthDegreeToPitch(tur.singer.keySignature, scaleDegree);
+            const [note, _offset] = nthDegreeToPitch(tur.singer.keySignature, scaleDegree);
             let semitones = ref;
             semitones += NOTESFLAT.includes(note)
                 ? NOTESFLAT.indexOf(note) - ref
@@ -279,7 +289,8 @@ function setupPitchActions(activity) {
                     pitchNumber + tur.singer.pitchNumberOffset,
                     activity.logo.synth.inTemperament,
                     activity.logo.synth.startingPitch,
-                    tur.singer.pitchNumberOffset
+                    tur.singer.pitchNumberOffset,
+                    activity
                 );
                 Singer.processPitch(activity, obj[0], obj[1], 0, turtle, blk);
                 return;
@@ -334,12 +345,65 @@ function setupPitchActions(activity) {
                         transformedHertz = pitchToFrequency(p, o, c, tur.singer.keySignature);
 
                         if (c !== 0) {
-                            activity.logo.notation.notationMarkup(turtle, transformedHertz);
+                            const formattedHertz = Number(transformedHertz.toFixed(2));
+                            activity.logo.notation.notationMarkup(turtle, formattedHertz);
                         }
                     }
                 }
             }
             return;
+        }
+
+        /**
+         * Plays a synth block from a raw frequency input while preserving the
+         * legacy widget behavior for matrix, LEGO, and pitch slider contexts.
+         *
+         * @param {Number} hertz - frequency in hertz
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number|String} blk - corresponding Block object index in blocks.blockList
+         */
+        static playSynthFrequency(hertz, turtle, blk) {
+            const tur = activity.turtles.ithTurtle(turtle);
+            const obj = frequencyToPitch(hertz);
+
+            if (activity.logo.inMatrix) {
+                activity.logo.phraseMaker.addRowBlock(blk);
+                if (!activity.logo.pitchBlocks.includes(blk)) {
+                    activity.logo.pitchBlocks.push(blk);
+                }
+
+                activity.logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
+                activity.logo.phraseMaker.rowArgs.push(hertz);
+            } else if (activity.logo.inLegoWidget && !activity.logo.inMatrix) {
+                activity.logo.legoWidget.addRowBlock(blk);
+                if (!activity.logo.pitchBlocks.includes(blk)) {
+                    activity.logo.pitchBlocks.push(blk);
+                }
+
+                activity.logo.legoWidget.rowLabels.push(activity.blocks.blockList[blk].name);
+                activity.logo.legoWidget.rowArgs.push(hertz);
+            } else if (activity.logo.inPitchSlider) {
+                activity.logo.pitchSlider.frequency = hertz;
+            } else {
+                tur.singer.oscList[last(tur.singer.inNoteBlock)].push(
+                    activity.blocks.blockList[blk].name
+                );
+
+                // We keep track of pitch and octave for notation purposes.
+                tur.singer.notePitches[last(tur.singer.inNoteBlock)].push(obj[0]);
+                tur.singer.noteOctaves[last(tur.singer.inNoteBlock)].push(obj[1]);
+                tur.singer.noteCents[last(tur.singer.inNoteBlock)].push(obj[2]);
+                if (obj[2] !== 0) {
+                    tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(
+                        pitchToFrequency(obj[0], obj[1], obj[2], tur.singer.keySignature)
+                    );
+                } else {
+                    tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(0);
+                }
+
+                tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(tur.singer.beatFactor);
+                tur.singer.pushedNote = true;
+            }
         }
 
         /**
@@ -548,7 +612,12 @@ function setupPitchActions(activity) {
         static numToPitch(number, outType, turtle) {
             if (number !== null && typeof number === "number") {
                 const obj = numberToPitch(
-                    Math.floor(number) + activity.turtles.ithTurtle(turtle).singer.pitchNumberOffset
+                    Math.floor(number) +
+                        activity.turtles.ithTurtle(turtle).singer.pitchNumberOffset,
+                    undefined,
+                    undefined,
+                    undefined,
+                    activity
                 );
                 if (outType === "pitch") {
                     return obj[0];
@@ -556,7 +625,7 @@ function setupPitchActions(activity) {
                     return obj[1];
                 }
             } else {
-                throw "NoArgError";
+                throw new Error("NoArgError");
             }
         }
 
@@ -586,6 +655,7 @@ function setupPitchActions(activity) {
         static deltaPitch(outType, turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
 
+            // eslint-disable-next-line eqeqeq
             if (tur.singer.previousNotePlayed == null) {
                 return 0;
             } else {

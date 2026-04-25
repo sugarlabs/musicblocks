@@ -4254,7 +4254,7 @@ msgid "Maximum heap size is 1000."
 msgstr "堆的最大大小为1000。"
 
 #: js/blocks/HeapBlocks.js:523
-msgid "The Set-heap entry block sets a value in he heap at the specified location."
+msgid "The Set-heap entry block sets a value in the heap at the specified location."
 # TRANS: machine translation
 msgstr "Set-heap entry 块在指定位置设置堆中的值。"
 
@@ -4841,7 +4841,7 @@ msgid "run block"
 msgstr "运行块"
 
 #: js/blocks/ProgramBlocks.js:1025
-msgid "The Dock block block connections two blocks."
+msgid "The Dock block connects two blocks."
 # TRANS: machine translation
 msgstr "Dock block 块连接两个块。"
 
@@ -9037,7 +9037,7 @@ msgid "Tags:"
 msgstr "标签："
 
 #: planet/js/StringHelper.js:65
-msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">Sugar Labs Code of Conduct</a>."
+msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">Sugar Labs Code of Conduct</a>."
 msgstr ""
 
 #: planet/js/StringHelper.js:66
@@ -12529,7 +12529,7 @@ msgstr "移动"
 
 #: js/SaveInterface.js:24
 
-#~ msgid "For more information, please consult the <a href=\"https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md\" target=\"_blank\">Music Blocks guide</a>."
+#~ msgid "For more information, please consult the <a href=\"https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md\" target=\"_blank\" rel=\"noopener noreferrer\">Music Blocks guide</a>."
 #~ msgstr ""
 
 #: js/lilypond.js:21
@@ -12695,7 +12695,7 @@ msgstr "移动"
 
 #: js/turtledefs.js:413
 
-#~ msgid "The <em>Setheapentry</em> block sets a value in he heap at the specified location."
+#~ msgid "The <em>Setheapentry</em> block sets a value in the heap at the specified location."
 #~ msgstr ""
 
 #: js/turtledefs.js:29
@@ -14115,7 +14115,7 @@ msgstr "移动"
 
 #: js/turtledefs.js:421
 
-#~ msgid "The Setheapentry block sets a value in he heap at the specified location."
+#~ msgid "The Setheapentry block sets a value in the heap at the specified location."
 #~ msgstr ""
 
 #: js/utilitybox.js:281

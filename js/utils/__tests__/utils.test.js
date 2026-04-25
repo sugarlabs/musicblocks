@@ -29,6 +29,7 @@ global.window = {
     },
     server: "http://localhost/",
     onload: null,
+    addEventListener: jest.fn(),
     setInterval: jest.fn(),
     clearInterval: jest.fn()
 };
@@ -95,6 +96,27 @@ const {
 } = require("../utils.js");
 
 describe("Utility Functions (logic-only)", () => {
+    describe("load handler registration", () => {
+        it("registers the IE check without overwriting an existing window.onload", () => {
+            const existingOnload = jest.fn();
+            const originalOnload = window.onload;
+            const addEventListenerSpy = jest.spyOn(window, "addEventListener");
+
+            jest.resetModules();
+            window.onload = existingOnload;
+
+            jest.isolateModules(() => {
+                require("../utils.js");
+            });
+
+            expect(window.onload).toBe(existingOnload);
+            expect(addEventListenerSpy).toHaveBeenCalledWith("load", expect.any(Function));
+
+            addEventListenerSpy.mockRestore();
+            window.onload = originalOnload;
+        });
+    });
+
     describe("toTitleCase()", () => {
         it("converts first character to uppercase", () => {
             expect(toTitleCase("hello")).toBe("Hello");
@@ -765,6 +787,14 @@ describe("Utility Functions (logic-only)", () => {
             expect(obj.viewVar).toBe(20);
             expect(obj.modelMethod()).toBe("model");
             expect(obj.viewMethod()).toBe("view");
+        });
+        it("should return empty string for missing nested property", () => {
+            const result = format("User: {user.age}", { user: { name: "Alice" } });
+            expect(result).toBe("User: ");
+        });
+        it("should return original string if no placeholders exist", () => {
+            const result = format("Hello world", { name: "User" });
+            expect(result).toBe("Hello world");
         });
     });
 });

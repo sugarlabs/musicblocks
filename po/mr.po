@@ -3627,7 +3627,7 @@ msgid "Maximum heap size is 1000."
 msgstr "कमाल हीप आकार 1000 आहे."
 
 #: js/blocks/HeapBlocks.js:523
-msgid "The Set-heap entry block sets a value in he heap at the specified location."
+msgid "The Set-heap entry block sets a value in the heap at the specified location."
 msgstr "सेट-हीप एंट्री ब्लॉक दिलेल्या स्थानावर हीपमध्ये मूल्य सेट करतो."
 
 #: js/blocks/HeapBlocks.js:539
@@ -4118,7 +4118,7 @@ msgid "run block"
 msgstr "ब्लॉक चालवा"
 
 #: js/blocks/ProgramBlocks.js:1025
-msgid "The Dock block block connections two blocks."
+msgid "The Dock block connects two blocks."
 msgstr "Dock block दोन ब्लॉक्स जोडतो."
 
 #: js/blocks/ProgramBlocks.js:1036
@@ -7608,8 +7608,8 @@ msgid "Tags:"
 msgstr "टॅग:"
 
 #: planet/js/StringHelper.js:65
-msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">Sugar Labs Code of Conduct</a>."
-msgstr "जे प्रकल्प <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">शुगर लॅब्स आचारसंहिता</a> चे उल्लंघन करतात त्यांचा अहवाल द्या."
+msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">Sugar Labs Code of Conduct</a>."
+msgstr "जे प्रकल्प <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">शुगर लॅब्स आचारसंहिता</a> चे उल्लंघन करतात त्यांचा अहवाल द्या."
 
 #: planet/js/StringHelper.js:66
 msgid "Reason for reporting project"
@@ -11046,8 +11046,8 @@ msgstr "हलवा"
 
 #: js/SaveInterface.js:24
 
-#~ msgid "For more information, please consult the <a href=\"https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md\" target=\"_blank\">Music Blocks guide</a>."
-#~ msgstr "अधिक माहितीसाठी, कृपया <a href=\"https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md\" target=\"_blank\">म्युझिक ब्लॉक्स गाइड</a> पहा."
+#~ msgid "For more information, please consult the <a href=\"https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md\" target=\"_blank\" rel=\"noopener noreferrer\">Music Blocks guide</a>."
+#~ msgstr "अधिक माहितीसाठी, कृपया <a href=\"https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md\" target=\"_blank\" rel=\"noopener noreferrer\">म्युझिक ब्लॉक्स गाइड</a> पहा."
 
 #: js/lilypond.js:21
 
@@ -11212,7 +11212,7 @@ msgstr "हलवा"
 
 #: js/turtledefs.js:413
 
-#~ msgid "The <em>Setheapentry</em> block sets a value in he heap at the specified location."
+#~ msgid "The <em>Setheapentry</em> block sets a value in the heap at the specified location."
 #~ msgstr "<em>Setheapentry</em> ब्लॉक निर्दिष्ट ठिकाणी हीपमध्ये एक मूल्य सेट करतो."
 
 #: js/turtledefs.js:29
@@ -12622,7 +12622,7 @@ msgstr "हलवा"
 
 #: js/turtledefs.js:421
 
-#~ msgid "The Setheapentry block sets a value in he heap at the specified location."
+#~ msgid "The Setheapentry block sets a value in the heap at the specified location."
 #~ msgstr "सेटहीपएंट्री ब्लॉक निर्दिष्ट ठिकाणी हिपमध्ये एक मूल्य सेट करतो."
 
 #: js/utilitybox.js:281

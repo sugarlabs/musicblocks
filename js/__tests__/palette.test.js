@@ -1,3 +1,4 @@
+/* global MULTIPALETTES, platformColor, docById, TEXTWIDTH */
 /**
  * @license
  * MusicBlocks v3.7.0
@@ -97,6 +98,9 @@ describe("Palettes Class", () => {
     beforeEach(() => {
         const paletteMock = {
             style: { visibility: "visible", top: "100px" },
+            setAttribute: jest.fn(),
+            addEventListener: jest.fn(),
+            focus: jest.fn(),
             children: [
                 {
                     children: [
@@ -121,6 +125,7 @@ describe("Palettes Class", () => {
                                             appendChild: jest.fn(),
                                             style: {}
                                         })),
+                                        dataset: {},
                                         style: {},
                                         addEventListener: jest.fn()
                                     }))
@@ -140,6 +145,7 @@ describe("Palettes Class", () => {
                 classList: { add: jest.fn() },
                 appendChild: jest.fn(),
                 style: {},
+                dataset: {},
                 innerHTML: "",
                 childNodes: [{ style: {} }]
             })),
@@ -198,6 +204,7 @@ describe("Palettes Class", () => {
                                                     style: {},
                                                     textContent: ""
                                                 })),
+                                                dataset: {},
                                                 style: {},
                                                 addEventListener: jest.fn()
                                             }))
@@ -314,6 +321,7 @@ describe("Palettes Class", () => {
                 const handlers = {};
                 const row = {
                     insertCell: jest.fn(),
+                    dataset: {},
                     style: {},
                     addEventListener: jest.fn((event, handler) => {
                         handlers[event] = handler;
@@ -350,6 +358,7 @@ describe("Palettes Class", () => {
                 const handlers = {};
                 const row = {
                     insertCell: jest.fn(),
+                    dataset: {},
                     style: {},
                     addEventListener: jest.fn((event, handler) => {
                         handlers[event] = handler;
@@ -1539,8 +1548,12 @@ describe("Palettes Class", () => {
                         style: {},
                         appendChild: jest.fn()
                     }))
-                }))
+                })),
+                appendChild: jest.fn()
             };
+            document.createDocumentFragment = jest.fn(() => ({
+                appendChild: jest.fn()
+            }));
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
                 return null;
@@ -1563,29 +1576,44 @@ describe("Palettes Class", () => {
 
             palette._showMenuItems();
 
-            expect(paletteList.insertRow).toHaveBeenCalled();
+            expect(paletteList.appendChild).toHaveBeenCalled();
         });
 
         test("_showMenuItems handles image blocks and drag events", () => {
+            let capturedImg;
             const paletteList = {
-                insertRow: jest.fn(() => ({
-                    insertCell: jest.fn(() => {
-                        let capturedImg;
-                        return {
-                            style: {},
-                            appendChild: jest.fn(img => {
-                                capturedImg = img;
-                            }),
-                            get _capturedImg() {
-                                return capturedImg;
-                            }
-                        };
-                    })
-                }))
+                appendChild: jest.fn()
             };
+            document.createDocumentFragment = jest.fn(() => ({
+                appendChild: jest.fn()
+            }));
+
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
                 return null;
+            });
+
+            // Mock DOM elements created inside _showMenuItems
+            document.createElement = jest.fn(tag => {
+                if (tag === "tr") {
+                    return {
+                        children: [],
+                        appendChild(child) {
+                            this.children.push(child);
+                        }
+                    };
+                }
+
+                if (tag === "td") {
+                    return {
+                        style: {},
+                        appendChild(img) {
+                            capturedImg = img;
+                        }
+                    };
+                }
+
+                return {};
             });
             global.mediaPALETTE = "<svg></svg>";
             global.cameraPALETTE = "<svg></svg>";
@@ -1620,9 +1648,8 @@ describe("Palettes Class", () => {
 
             palette._showMenuItems();
 
-            const itemCell =
-                paletteList.insertRow.mock.results[0].value.insertCell.mock.results[0].value;
-            const img = itemCell._capturedImg;
+            const img = capturedImg;
+            expect(img).toBeDefined();
             img.offsetWidth = 10;
             img.offsetHeight = 10;
             document.body.appendChild = jest.fn();
@@ -1633,7 +1660,6 @@ describe("Palettes Class", () => {
             img.onmouseleave();
             expect(document.body.style.cursor).toBe("default");
             expect(img.ondragstart()).toBe(false);
-
             img.onmousedown({
                 pageX: 10,
                 pageY: 20,
@@ -1648,29 +1674,43 @@ describe("Palettes Class", () => {
                 pageY: 25,
                 preventDefault: jest.fn()
             });
+
             img.onmouseup({});
         });
 
         test("_showMenuItems handles touch drag", () => {
+            let capturedImg;
             const paletteList = {
-                insertRow: jest.fn(() => ({
-                    insertCell: jest.fn(() => {
-                        let capturedImg;
-                        return {
-                            style: {},
-                            appendChild: jest.fn(img => {
-                                capturedImg = img;
-                            }),
-                            get _capturedImg() {
-                                return capturedImg;
-                            }
-                        };
-                    })
-                }))
+                appendChild: jest.fn()
             };
+            document.createDocumentFragment = jest.fn(() => ({
+                appendChild: jest.fn()
+            }));
+
             global.docById = jest.fn(id => {
                 if (id === "PaletteBody_items") return paletteList;
                 return null;
+            });
+
+            document.createElement = jest.fn(tag => {
+                if (tag === "tr") {
+                    return {
+                        children: [],
+                        appendChild(child) {
+                            this.children.push(child);
+                        }
+                    };
+                }
+
+                if (tag === "td") {
+                    return {
+                        style: {},
+                        appendChild(img) {
+                            capturedImg = img;
+                        }
+                    };
+                }
+                return {};
             });
             document.addEventListener = jest.fn();
             document.removeEventListener = jest.fn();
@@ -1694,14 +1734,12 @@ describe("Palettes Class", () => {
 
             palette._showMenuItems();
 
-            const itemCell =
-                paletteList.insertRow.mock.results[0].value.insertCell.mock.results[0].value;
-            const img = itemCell._capturedImg;
+            const img = capturedImg;
+            expect(img).toBeDefined();
             img.offsetWidth = 10;
             img.offsetHeight = 10;
             document.body.appendChild = jest.fn();
             document.body.removeChild = jest.fn();
-
             img.ontouchstart({
                 touches: [{ clientX: 10, clientY: 20 }],
                 preventDefault: jest.fn()
@@ -1724,7 +1762,8 @@ describe("Palettes Class", () => {
                         style: {},
                         appendChild: jest.fn()
                     }))
-                }))
+                })),
+                appendChild: jest.fn()
             };
             const palDiv = { childNodes: [{ style: {} }], removeChild: jest.fn() };
             global.docById = jest.fn(id => {
@@ -2147,6 +2186,59 @@ describe("Palettes Class", () => {
         });
     });
 
+    describe("resetKeyboardNavigation method", () => {
+        test("closes menus, clears keyboard focus, and cancels pending submenu opens", () => {
+            jest.useFakeTimers();
+
+            const row = {};
+            const focused = {
+                style: { backgroundColor: platformColor.hoverColor },
+                dataset: { keyboardFocus: "true" }
+            };
+            const paletteElement = { blur: jest.fn() };
+            const hideMenu = jest.fn();
+
+            global.document.querySelectorAll = jest.fn(() => [focused]);
+            global.docById = jest.fn(id => {
+                if (id === "palette") {
+                    return paletteElement;
+                }
+                return null;
+            });
+
+            palettes.dict = { rhythm: { hideMenu } };
+            palettes._keyboardNavActive = true;
+            palettes._navSection = "palette";
+            palettes._navTypeIndex = 2;
+            palettes._navBlockIndex = 3;
+            palettes._navPaletteBlockIndex = 4;
+            palettes.activePalette = "rhythm";
+
+            const showSpy = jest.spyOn(palettes, "showPalette").mockImplementation(() => {});
+            const hideMenusSpy = jest.spyOn(palettes, "_hideMenus").mockImplementation(() => {});
+
+            palettes._loadPaletteButtonHandler("rhythm", row);
+            row.onmouseover();
+            palettes.resetKeyboardNavigation({ closeMenus: true, blur: true });
+            jest.advanceTimersByTime(400);
+
+            expect(hideMenu).toHaveBeenCalled();
+            expect(hideMenusSpy).toHaveBeenCalled();
+            expect(showSpy).not.toHaveBeenCalled();
+            expect(focused.style.backgroundColor).toBe(platformColor.paletteBackground);
+            expect(focused.dataset.keyboardFocus).toBeUndefined();
+            expect(palettes._keyboardNavActive).toBe(false);
+            expect(palettes._navSection).toBe("type");
+            expect(palettes._navTypeIndex).toBe(0);
+            expect(palettes._navBlockIndex).toBe(0);
+            expect(palettes._navPaletteBlockIndex).toBe(0);
+            expect(palettes.activePalette).toBeNull();
+            expect(paletteElement.blur).toHaveBeenCalled();
+
+            jest.useRealTimers();
+        });
+    });
+
     describe("_hideMenus method", () => {
         test("calls hideSearchWidget", () => {
             palettes._hideMenus();
@@ -2312,46 +2404,46 @@ describe("Palettes Class", () => {
         });
     });
 
-    describe("clear method", () => {
-        test("clears dict and resets state", () => {
-            // Setup document mock for clear method
-            global.document = {
-                createElement: jest.fn(() => ({
-                    id: "",
-                    setAttribute: jest.fn(),
-                    classList: { add: jest.fn() },
-                    innerHTML: "",
-                    childNodes: [{ style: {} }]
-                })),
-                body: { appendChild: jest.fn() }
+    describe("reinitialize method", () => {
+        test("hides existing menus, removes old palette element, and reinitialize palettes", () => {
+            const hideMenu1 = jest.fn();
+            const hideMenu2 = jest.fn();
+            const paletteElement = {
+                parentNode: {
+                    removeChild: jest.fn()
+                },
+                style: {}
             };
-            global.docById = jest.fn(id => {
-                if (id === "palette") {
-                    return { parentNode: { removeChild: jest.fn() } };
-                }
-                return null;
-            });
 
-            palettes.dict = { test: { hideMenu: jest.fn() } };
+            palettes.dict = {
+                rhythm: { hideMenu: hideMenu1 },
+                pitch: { hideMenu: hideMenu2 }
+            };
             palettes.visible = true;
-            palettes.activePalette = "test";
+            palettes.activePalette = "rhythm";
+            palettes.paletteObject = { id: "old" };
+            palettes.collapsed = true;
 
-            palettes.clear();
+            global.BUILTINPALETTES = [];
+            global.docById = jest.fn(id => (id === "palette" ? paletteElement : null));
 
+            const mockInitTarget = {
+                add: jest.fn().mockReturnThis(),
+                init_selectors: jest.fn(),
+                makePalettes: jest.fn(),
+                show: jest.fn()
+            };
+
+            palettes.reinitialize(mockInitTarget);
+
+            expect(hideMenu1).toHaveBeenCalled();
+            expect(hideMenu2).toHaveBeenCalled();
+            expect(paletteElement.parentNode.removeChild).toHaveBeenCalledWith(paletteElement);
             expect(palettes.dict).toEqual({});
             expect(palettes.visible).toBe(false);
             expect(palettes.activePalette).toBeNull();
-        });
-
-        test("handles errors gracefully", () => {
-            // Make docById throw to test error handling
-            global.docById = jest.fn(() => {
-                throw new Error("Test error");
-            });
-            palettes.dict = {};
-
-            // Should not throw due to try-catch
-            expect(() => palettes.clear()).not.toThrow();
+            expect(palettes.paletteObject).toBeNull();
+            expect(palettes.collapsed).toBe(false);
         });
     });
 

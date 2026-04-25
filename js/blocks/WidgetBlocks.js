@@ -19,7 +19,7 @@
    RhythmRuler, FILTERTYPES, instrumentsFilters, DEFAULTFILTERTYPE,
    TemperamentWidget, TimbreWidget, ModeWidget, PitchSlider,
    MusicKeyboard, PitchStaircase, SampleWidget, _THIS_IS_MUSIC_BLOCKS_,
-   Arpeggio, LegoWidget
+   AIWidget, AIDebuggerWidget, Arpeggio, LegoWidget
  */
 
 /*
@@ -73,6 +73,47 @@
  * @param {string} activity - The activity for which blocks are being set up.
  */
 function setupWidgetBlocks(activity) {
+    /**
+     * Environment-aware lazy module loader.
+     * Uses AMD require() in the browser; calls callback synchronously in Node/Jest.
+     */
+    function _lazyRequire(modules, callback) {
+        if (typeof define === "function" && define.amd) {
+            require(Array.isArray(modules) ? modules : [modules], callback);
+        } else {
+            callback();
+        }
+    }
+
+    /**
+     * Ensures that a widget is loaded and initialized before executing block logic.
+     * If the widget is missing, it initiates a lazy load and returns an interruption signal.
+     *
+     * @param {object} logo - The logo object.
+     * @param {string} widgetKey - The key for the widget in the logo object.
+     * @param {string[]} modules - The modules to require.
+     * @param {Function} initFn - Callback to initialize the widget instance.
+     * @param {object} turtle - The turtle object.
+     * @param {object} blk - The block object.
+     * @param {any} receivedArg - The received argument.
+     * @returns {[null, number, boolean]|null} - Interruption signal or null if already loaded.
+     */
+    function _ensureWidget(logo, widgetKey, modules, initFn, turtle, blk, receivedArg) {
+        if (logo[widgetKey] === null || logo[widgetKey] === undefined) {
+            logo[widgetKey] = "loading"; // Guard against multiple simultaneous loads
+            _lazyRequire(modules, function () {
+                logo[widgetKey] = initFn();
+                if (typeof logo.runFromBlockNow === "function") {
+                    logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
+                }
+            });
+            return [null, 0, true];
+        } else if (logo[widgetKey] === "loading") {
+            return [null, 0, true]; // Still loading, continue to interrupt
+        }
+        return null;
+    }
+
     /**
      * Represents a block for controlling sound envelope (ADSR).
      * @extends FlowBlock
@@ -141,7 +182,7 @@ function setupWidgetBlocks(activity) {
                 logo.timbre.synthVals["envelope"]["sustain"] = last(tur.singer.sustain);
                 logo.timbre.synthVals["envelope"]["release"] = last(tur.singer.release);
 
-                if (logo.timbre.env.length != 0) {
+                if (logo.timbre.env.length !== 0) {
                     activity.errorMsg(_("You are adding multiple envelope blocks."));
                 } else {
                     // Create the synth for the instrument.
@@ -283,11 +324,19 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          */
-        flow(args, logo, turtle, blk) {
-            if (logo.temperament === null) {
-                logo.temperament = new TemperamentWidget();
-            }
+        flow(args, logo, turtle, blk, receivedArg) {
+            const interruption = _ensureWidget(
+                logo,
+                "temperament",
+                ["widgets/temperament"],
+                () => new TemperamentWidget(),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
 
             logo.insideTemperament = true;
             logo.temperament.inTemperament = args[0];
@@ -363,17 +412,23 @@ function setupWidgetBlocks(activity) {
          * @param {object} blk - The block object.
          * @returns {number[]} - The output values.
          */
-        flow(args, logo, turtle, blk) {
-            if (logo.sample === null) {
-                logo.sample = new SampleWidget();
-            }
+        flow(args, logo, turtle, blk, receivedArg) {
+            const interruption = _ensureWidget(
+                logo,
+                "sample",
+                ["widgets/sampler"],
+                () => new SampleWidget(),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
+
             logo.inSample = true;
-            logo.sample = new SampleWidget();
 
             const listenerName = "_sampler_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 logo.sample.init(activity);
             };
@@ -444,12 +499,20 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          * @returns {number[]} - The output values.
          */
-        flow(args, logo, turtle, blk) {
-            if (logo.timbre === null) {
-                logo.timbre = new TimbreWidget();
-            }
+        flow(args, logo, turtle, blk, receivedArg) {
+            const interruption = _ensureWidget(
+                logo,
+                "timbre",
+                ["widgets/timbre"],
+                () => new TimbreWidget(),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
 
             logo.inTimbre = true;
 
@@ -552,9 +615,10 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
-                logo.meterWidget = new MeterWidget(activity, blk);
-
-                logo.insideMeterWidget = false;
+                _lazyRequire(["widgets/meterwidget"], function () {
+                    logo.meterWidget = new MeterWidget(activity, blk);
+                    logo.insideMeterWidget = false;
+                });
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -593,12 +657,11 @@ function setupWidgetBlocks(activity) {
                 let blocks = [[0, "oscilloscope", x, y, [null, 1, null]]];
                 for (const turtle of activity.turtles.turtleList) {
                     if (!turtle.inTrash)
-                        // eslint-disable-next-line max-len
                         blocks = addPrintTurtle(
                             blocks,
                             turtle,
                             Math.max(0, blocks.length - 2),
-                            turtle ==
+                            turtle ===
                                 activity.turtles.getTurtle(activity.turtles.getTurtleCount() - 1)
                         );
                 }
@@ -624,8 +687,10 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
-                logo.Oscilloscope = new Oscilloscope(activity);
-                logo.inOscilloscope = false;
+                _lazyRequire(["widgets/oscilloscope"], function () {
+                    logo.Oscilloscope = new Oscilloscope(activity);
+                    logo.inOscilloscope = false;
+                });
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -681,8 +746,10 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
-                logo.modeWidget = new ModeWidget(activity);
-                logo.insideModeWidget = false;
+                _lazyRequire(["widgets/modewidget"], function () {
+                    logo.modeWidget = new ModeWidget(activity);
+                    logo.insideModeWidget = false;
+                });
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -731,12 +798,20 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          * @returns {number[]} - The output values.
          */
-        flow(args, logo, turtle, blk) {
-            if (logo.tempo === null) {
-                logo.tempo = new Tempo();
-            }
+        flow(args, logo, turtle, blk, receivedArg) {
+            const interruption = _ensureWidget(
+                logo,
+                "tempo",
+                ["widgets/tempo"],
+                () => new Tempo(),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
 
             logo.inTempo = true;
             logo.tempo.BPMBlocks = [];
@@ -800,12 +875,20 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          * @returns {number[]} - The output values.
          */
-        flow(args, logo, turtle, blk) {
-            if (logo.arpeggio === null) {
-                logo.arpeggio = new Arpeggio();
-            }
+        flow(args, logo, turtle, blk, receivedArg) {
+            const interruption = _ensureWidget(
+                logo,
+                "arpeggio",
+                ["widgets/arpeggio"],
+                () => new Arpeggio(),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
 
             logo.inArpeggio = true;
 
@@ -875,11 +958,19 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          */
-        flow(args, logo, turtle, blk) {
-            if (logo.pitchDrumMatrix === null) {
-                logo.pitchDrumMatrix = new PitchDrumMatrix();
-            }
+        flow(args, logo, turtle, blk, receivedArg) {
+            const interruption = _ensureWidget(
+                logo,
+                "pitchDrumMatrix",
+                ["widgets/pitchdrummatrix"],
+                () => new PitchDrumMatrix(),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
 
             logo.inPitchDrumMatrix = true;
             logo.pitchDrumMatrix.rowLabels = [];
@@ -947,12 +1038,20 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          * @returns {array} - The output array.
          */
-        flow(args, logo, turtle, blk) {
-            if (logo.pitchSlider === null) {
-                logo.pitchSlider = new PitchSlider();
-            }
+        flow(args, logo, turtle, blk, receivedArg) {
+            const interruption = _ensureWidget(
+                logo,
+                "pitchSlider",
+                ["widgets/pitchslider"],
+                () => new PitchSlider(),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
 
             logo.inPitchSlider = true;
             logo.pitchSlider.frequencies = [];
@@ -1098,12 +1197,20 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          * @returns {any[]} - Returns an array of arguments.
          */
-        flow(args, logo, turtle, blk) {
-            if (logo.musicKeyboard === null) {
-                logo.musicKeyboard = new MusicKeyboard(activity);
-            }
+        flow(args, logo, turtle, blk, receivedArg) {
+            const interruption = _ensureWidget(
+                logo,
+                "musicKeyboard",
+                ["widgets/musickeyboard"],
+                () => new MusicKeyboard(activity),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
 
             logo.inMusicKeyboard = true;
             logo.musicKeyboard.blockNo = blk;
@@ -1162,12 +1269,20 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          * @returns {any[]} - Returns an array of arguments.
          */
-        flow(args, logo, turtle, blk) {
-            if (logo.pitchStaircase === null) {
-                logo.pitchStaircase = new PitchStaircase();
-            }
+        flow(args, logo, turtle, blk, receivedArg) {
+            const interruption = _ensureWidget(
+                logo,
+                "pitchStaircase",
+                ["widgets/pitchstaircase"],
+                () => new PitchStaircase(),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
 
             logo.pitchStaircase.Stairs = [];
             logo.pitchStaircase.stairPitchBlocks = [];
@@ -1269,12 +1384,20 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          * @returns {any[]} - Returns an array of arguments.
          */
-        flow(args, logo, turtle, blk) {
-            if (logo.rhythmRuler == null) {
-                logo.rhythmRuler = new RhythmRuler();
-            }
+        flow(args, logo, turtle, blk, receivedArg) {
+            const interruption = _ensureWidget(
+                logo,
+                "rhythmRuler",
+                ["widgets/rhythmruler"],
+                () => new RhythmRuler(),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
 
             logo.rhythmRuler.Rulers = [];
             logo.rhythmRuler.Drums = [];
@@ -1468,49 +1591,66 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          */
-        flow(args, logo, turtle, blk) {
+        flow(args, logo, turtle, blk, receivedArg) {
             logo.inMatrix = true;
 
-            if (logo.phraseMaker === null) {
-                // Create explicit dependency object for PhraseMaker
-                const phraseMakerDeps = {
-                    activity: activity,
-                    _: _,
-                    platformColor: platformColor,
-                    docById: docById,
-                    docBySelector: docBySelector,
-                    MATRIXSOLFEHEIGHT: MATRIXSOLFEHEIGHT,
-                    MATRIXSOLFEWIDTH: MATRIXSOLFEWIDTH,
-                    toFraction: toFraction,
-                    Singer: Singer,
-                    SOLFEGECONVERSIONTABLE: SOLFEGECONVERSIONTABLE,
-                    slicePath: slicePath,
-                    wheelnav: wheelnav,
-                    delayExecution: delayExecution,
-                    DEFAULTVOICE: DEFAULTVOICE,
-                    getDrumName: getDrumName,
-                    getDrumIcon: getDrumIcon,
-                    noteIsSolfege: noteIsSolfege,
-                    isCustomTemperament: isCustomTemperament,
-                    i18nSolfege: i18nSolfege,
-                    getNote: getNote,
-                    DEFAULTDRUM: DEFAULTDRUM,
-                    last: last,
-                    DRUMS: DRUMS,
-                    SHARP: SHARP,
-                    FLAT: FLAT,
-                    PREVIEWVOLUME: PREVIEWVOLUME,
-                    DEFAULTVOLUME: DEFAULTVOLUME,
-                    noteToFrequency: noteToFrequency,
-                    LCD: LCD,
-                    calcNoteValueToDisplay: calcNoteValueToDisplay,
-                    NOTESYMBOLS: NOTESYMBOLS,
-                    EIGHTHNOTEWIDTH: EIGHTHNOTEWIDTH,
-                    getTemperament: getTemperament
-                };
-                logo.phraseMaker = new PhraseMaker(phraseMakerDeps);
-            }
+            const interruption = _ensureWidget(
+                logo,
+                "phraseMaker",
+                [
+                    "widgets/PhraseMakerUtils",
+                    "widgets/PhraseMakerGrid",
+                    "widgets/PhraseMakerUI",
+                    "widgets/PhraseMakerAudio",
+                    "widgets/phrasemaker"
+                ],
+                () => {
+                    // Create explicit dependency object for PhraseMaker
+                    const phraseMakerDeps = {
+                        activity: activity,
+                        _: _,
+                        platformColor: platformColor,
+                        docById: docById,
+                        docBySelector: docBySelector,
+                        MATRIXSOLFEHEIGHT: MATRIXSOLFEHEIGHT,
+                        MATRIXSOLFEWIDTH: MATRIXSOLFEWIDTH,
+                        toFraction: toFraction,
+                        Singer: Singer,
+                        SOLFEGECONVERSIONTABLE: SOLFEGECONVERSIONTABLE,
+                        slicePath: slicePath,
+                        wheelnav: wheelnav,
+                        delayExecution: delayExecution,
+                        DEFAULTVOICE: DEFAULTVOICE,
+                        getDrumName: getDrumName,
+                        getDrumIcon: getDrumIcon,
+                        noteIsSolfege: noteIsSolfege,
+                        isCustomTemperament: isCustomTemperament,
+                        i18nSolfege: i18nSolfege,
+                        getNote: getNote,
+                        DEFAULTDRUM: DEFAULTDRUM,
+                        last: last,
+                        DRUMS: DRUMS,
+                        SHARP: SHARP,
+                        FLAT: FLAT,
+                        PREVIEWVOLUME: PREVIEWVOLUME,
+                        DEFAULTVOLUME: DEFAULTVOLUME,
+                        noteToFrequency: noteToFrequency,
+                        LCD: LCD,
+                        calcNoteValueToDisplay: calcNoteValueToDisplay,
+                        NOTESYMBOLS: NOTESYMBOLS,
+                        EIGHTHNOTEWIDTH: EIGHTHNOTEWIDTH,
+                        getTemperament: getTemperament
+                    };
+                    return new PhraseMaker(phraseMakerDeps);
+                },
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
+
             logo.phraseMaker.blockNo = blk;
 
             logo.phraseMaker._instrumentName = DEFAULTVOICE;
@@ -1540,7 +1680,7 @@ function setupWidgetBlocks(activity) {
                     // Process queued up rhythms.
                     logo.phraseMaker.blockNo = blk;
                     logo.phraseMaker.sorted = false;
-                    logo.phraseMaker.init(activity);
+                    logo.phraseMaker.init(activity, turtle);
 
                     for (let i = 0; i < logo.tupletRhythms.length; i++) {
                         // We have two cases: (1) notes in a tuplet;
@@ -1673,18 +1813,23 @@ function setupWidgetBlocks(activity) {
          * @returns {number[]} - The output values.
          */
         flow(args, logo, turtle, blk) {
-            if (logo.sample === null) {
-                logo.sample = new AIWidget();
-            }
             logo.inSample = true;
-            logo.sample = new AIWidget();
 
             const listenerName = "_sampler_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
-                logo.sample.init(activity);
+                const interruption = _ensureWidget(
+                    logo,
+                    "aiMusic",
+                    ["widgets/aiwidget"],
+                    () => new AIWidget(),
+                    turtle,
+                    blk,
+                    ""
+                );
+                if (interruption) return interruption;
+                logo.aiMusic.init(activity);
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -1722,11 +1867,19 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          */
-        flow(args, logo, turtle, blk) {
-            if (logo.reflection === null) {
-                logo.reflection = new ReflectionMatrix();
-            }
+        flow(args, logo, turtle, blk, receivedArg) {
+            const interruption = _ensureWidget(
+                logo,
+                "reflection",
+                ["widgets/reflection"],
+                () => new ReflectionMatrix(),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
 
             logo.reflection.init(activity);
             logo.statusFields = [];
@@ -1796,14 +1949,23 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @param {any} receivedArg - The argument received from the previous block.
          * @returns {number[]} - The output values.
          */
-        flow(args, logo, turtle, blk) {
+        flow(args, logo, turtle, blk, receivedArg) {
             logo.inLegoWidget = true;
 
-            if (logo.legoWidget === null) {
-                logo.legoWidget = new LegoWidget();
-            }
+            const interruption = _ensureWidget(
+                logo,
+                "legoWidget",
+                ["widgets/legobricks"],
+                () => new LegoWidget(),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
+
             logo.legoWidget.blockNo = blk;
 
             logo.legoWidget.rowLabels = [];
@@ -1862,18 +2024,23 @@ function setupWidgetBlocks(activity) {
          * @param {object} blk - The block object.
          * @returns {number[]} - The output values.
          */
-        flow(args, logo, turtle, blk) {
-            if (logo.sample === null) {
-                logo.sample = new AIDebuggerWidget();
-            }
-            logo.inSample = true;
-            logo.sample = new AIDebuggerWidget();
+        flow(args, logo, turtle, blk, receivedArg) {
+            const interruption = _ensureWidget(
+                logo,
+                "aiDebugger",
+                ["widgets/aidebugger"],
+                () => new AIDebuggerWidget(),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
 
-            const listenerName = "_sampler_" + turtle;
+            const listenerName = "_aidebugger_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = event => {
-                logo.sample.init(activity);
+                logo.aiDebugger.init(activity);
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -1898,7 +2065,7 @@ function setupWidgetBlocks(activity) {
         new ChromaticBlock().setup(activity);
         new LegoBricksBlock().setup(activity);
         new ReflectionBlock().setup(activity);
-        // new AIMusicBlocks().setup(activity);
+        new AIMusicBlocks().setup(activity);
         new MusicKeyboard2Block().setup(activity);
         new MusicKeyboardBlock().setup(activity);
         new PitchStaircaseBlock().setup(activity);

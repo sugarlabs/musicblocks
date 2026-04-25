@@ -13,7 +13,7 @@
    global
 
    docById, analyzeProject, runAnalytics, scoreToChartData,
-   getChartOptions, Chart
+   getChartOptions
  */
 
 /* exported StatsWindow */
@@ -36,7 +36,22 @@ class StatsWindow {
             this.widgetWindow.destroy();
             this.activity.logo.statsWindow = null;
         };
-        this.doAnalytics();
+
+        // Lazy-load Chart.js on demand instead of eagerly at startup.
+        // This saves ~3-5 MB of heap memory when the statistics widget
+        // is never opened (the common case).
+        // If Chart is already loaded (e.g. previously used), call synchronously.
+        if (typeof window.Chart !== "undefined") {
+            this.doAnalytics();
+        } else {
+            this._ensureChartLoaded()
+                .then(() => {
+                    this.doAnalytics();
+                })
+                .catch(err => {
+                    console.error("Failed to load Chart.js:", err);
+                });
+        }
 
         this.widgetWindow.onmaximize = () => {
             this.widgetWindow.getWidgetBody().innerHTML = "";
@@ -50,6 +65,25 @@ class StatsWindow {
             this.doAnalytics();
         };
         this.widgetWindow.sendToCenter();
+    }
+
+    /**
+     * Lazily loads Chart.js via RequireJS if not already available.
+     * @returns {Promise<void>}
+     */
+    _ensureChartLoaded() {
+        if (typeof window.Chart !== "undefined") {
+            return Promise.resolve();
+        }
+        return new Promise((resolve, reject) => {
+            require(["Chart"], () => {
+                if (typeof window.Chart !== "undefined") {
+                    resolve();
+                } else {
+                    reject(new Error("Chart global not found after loading"));
+                }
+            }, reject);
+        });
     }
 
     /**
@@ -84,7 +118,7 @@ class StatsWindow {
             document.body.style.cursor = "default";
         };
         const options = getChartOptions(__callback);
-        myRadarChart = new Chart(ctx).Radar(data, options);
+        myRadarChart = new window.Chart(ctx).Radar(data, options);
 
         this.jsonObject = document.createElement("ul");
         this.jsonObject.style.float = "left";
@@ -99,21 +133,29 @@ class StatsWindow {
     displayInfo(stats) {
         const lowHertz = stats["lowestNote"][2] + 0.5;
         const highHertz = stats["highestNote"][2] + 0.5;
-        this.jsonObject.innerHTML = `<li>duples: ${stats["duples"]}</li>
-            <li>triplets: ${stats["triplets"]}</li>
-            <li>quintuplets: ${stats["quintuplets"]}</li>
-            <li style=\"white-space: pre-wrap; width: 150px\">pitch names: ${Array.from(
-                stats["pitchNames"]
-            ).join(", ")}</li>
-            <li>number of notes: ${stats["numberOfNotes"]}</li>
-            <li style=\"white-space: pre-wrap; width: 150px\">lowest note: ${
-                stats["lowestNote"][0]
-            },${lowHertz.toFixed(0)}Hz</li>
-            <li style=\"white-space: pre-wrap; width: 150px\">highest note: ${
-                stats["highestNote"][0]
-            },${highHertz.toFixed(0)}Hz</li>
-            <li>rests used: ${stats["rests"]}</li>
-            <li>ornaments used: ${stats["ornaments"]}</li>`;
+        const items = [
+            ["duples", stats["duples"]],
+            ["triplets", stats["triplets"]],
+            ["quintuplets", stats["quintuplets"]],
+            ["pitch names", Array.from(stats["pitchNames"]).join(", ")],
+            ["number of notes", stats["numberOfNotes"]],
+            ["lowest note", `${stats["lowestNote"][0]},${lowHertz.toFixed(0)}Hz`],
+            ["highest note", `${stats["highestNote"][0]},${highHertz.toFixed(0)}Hz`],
+            ["rests used", stats["rests"]],
+            ["ornaments used", stats["ornaments"]]
+        ];
+
+        this.jsonObject.replaceChildren(
+            ...items.map(([label, value], index) => {
+                const li = document.createElement("li");
+                li.textContent = `${label}: ${value}`;
+                if (index === 3 || index === 5 || index === 6) {
+                    li.style.whiteSpace = "pre-wrap";
+                    li.style.width = "150px";
+                }
+                return li;
+            })
+        );
     }
 }
 /* istanbul ignore next */

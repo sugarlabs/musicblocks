@@ -23,6 +23,7 @@ global._ = jest.fn(str => str);
 global.window = {
     btoa: jest.fn(str => Buffer.from(str, "utf8").toString("base64"))
 };
+global.INVALIDPITCH = "Not a valid pitch name";
 
 const {
     scaleDegreeToPitchMapping,
@@ -97,17 +98,71 @@ const {
     numberToPitchSharp,
     getNumber,
     getNoteFromInterval,
-    numberToPitch,
-    GetNotesForInterval,
-    base64Encode,
-    NOTESFLAT,
     NOTESSHARP,
     MUSICALMODES,
     getStepSizeUp,
-    getStepSizeDown
+    getStepSizeDown,
+    INVALIDPITCH,
+    numberToPitch,
+    GetNotesForInterval,
+    base64Encode,
+    NOTESTEP,
+    ACCIDENTALNAMES,
+    NOTESFLAT,
+    NOTENAMES,
+    SOLFEGENAMES1,
+    ALLNOTENAMES,
+    NOTENAMES1,
+    PITCHES1,
+    PITCHES3
 } = require("../musicutils");
 
 describe("musicutils", () => {
+    describe("musicutils core constants", () => {
+        const last = arr => arr[arr.length - 1];
+
+        it("keeps NOTENAMES as the seven natural note letters", () => {
+            expect(NOTENAMES).toEqual(["C", "D", "E", "F", "G", "A", "B"]);
+        });
+
+        it("keeps the expected solfege base syllables in SOLFEGENAMES1 without duplicates", () => {
+            const baseSolfegeNames = [
+                ...new Set(SOLFEGENAMES1.map(name => name.replace(/[♯♭𝄪𝄫]/gu, "")))
+            ];
+
+            expect(baseSolfegeNames).toEqual(["do", "re", "mi", "fa", "sol", "la", "ti"]);
+            expect(baseSolfegeNames).toHaveLength(7);
+        });
+
+        it("preserves the first and last entries for NOTENAMES and SOLFEGENAMES1", () => {
+            expect(NOTENAMES[0]).toBe("C");
+            expect(last(NOTENAMES)).toBe("B");
+            expect(SOLFEGENAMES1[0]).toBe("do");
+            expect(last(SOLFEGENAMES1)).toBe("ti");
+        });
+
+        it("includes sharps, flats, and double accidentals in ALLNOTENAMES", () => {
+            expect(ALLNOTENAMES).toEqual(
+                expect.arrayContaining(["C#", "Db", "Cx", "Dbb", "Fx", "Cb"])
+            );
+        });
+
+        it("keeps note and pitch collections as non-empty arrays of strings", () => {
+            [NOTENAMES, ALLNOTENAMES, NOTENAMES1, PITCHES1, PITCHES3].forEach(collection => {
+                expect(Array.isArray(collection)).toBe(true);
+                expect(collection.length).toBeGreaterThan(0);
+                expect(collection.every(item => typeof item === "string")).toBe(true);
+            });
+        });
+
+        it("keeps major and minor mode definitions at seven steps and one octave", () => {
+            expect(MUSICALMODES.major).toHaveLength(7);
+            expect(MUSICALMODES.minor).toHaveLength(7);
+            expect(MUSICALMODES.major.reduce((sum, step) => sum + step, 0)).toBe(12);
+            expect(MUSICALMODES.minor.reduce((sum, step) => sum + step, 0)).toBe(12);
+        });
+    });
+
     it("should set and get Octave Ratio", () => {
         setOctaveRatio(4);
         const octaveR = getOctaveRatio();
@@ -799,9 +854,9 @@ describe("getArticulation", () => {
         expect(getArticulation("do")).toBe("");
         expect(getArticulation("re")).toBe("");
     });
-    it("should handle combinations of articulations", () => {
-        expect(getArticulation("do^")).toBe("");
-        expect(getArticulation("C^^")).toBe("");
+    it("should extract articulation symbols (extract from do^ or C^^)", () => {
+        expect(getArticulation("do^")).toBe("^");
+        expect(getArticulation("C^^")).toBe("^^");
     });
     it("should preserve non-articulation characters", () => {
         expect(getArticulation("X")).toBe("X");
@@ -809,7 +864,13 @@ describe("getArticulation", () => {
     });
     it("should handle empty and special cases", () => {
         expect(getArticulation("")).toBe("");
-        expect(getArticulation("doremifa")).toBe("");
+        expect(getArticulation("doremifa")).toBe("remifa"); // Only strips the first prefix
+    });
+    it("should handle custom note names like BAGPIPE_D correctly", () => {
+        // "BAGPIPE_D" should not have internal letters stripped.
+        // If "B" is seen as a note name prefix, it extracts "AGPIPE_D".
+        // Crucially, it no longer removes A, G, E, or D from the middle.
+        expect(getArticulation("BAGPIPE_D")).toBe("AGPIPE_D");
     });
 });
 
@@ -901,17 +962,23 @@ describe("modeMapper", () => {
         global.FLAT = "♭";
     });
 
-    it("should map Ionian to major", () => {
-        expect(modeMapper("C", "ionian")).toEqual(["c", "major"]);
-        expect(modeMapper("D", "ionian")).toEqual(["d", "major"]);
-    });
-    it("should handle flats in Dorian mode", () => {
-        expect(modeMapper("E♭", "dorian")).toEqual(["e♭", "minor"]);
-        expect(modeMapper("B♭", "dorian")).toEqual(["f", "minor"]);
-    });
-    it("should handle flats in Locrian mode", () => {
-        expect(modeMapper("E♭", "locrian")).toEqual(["d♭", "minor"]);
-        expect(modeMapper("B♭", "locrian")).toEqual(["d♭", "minor"]);
+    it.each([
+        ["C", "ionian", ["c", "major"]],
+        ["D", "ionian", ["d", "major"]],
+        ["E♭", "dorian", ["e♭", "minor"]],
+        ["B♭", "dorian", ["f", "minor"]],
+        ["E♭", "locrian", ["d♭", "minor"]],
+        ["B♭", "locrian", ["d♭", "minor"]],
+        ["A", "aeolian", ["a", "minor"]],
+        ["C", "aeolian", ["c", "minor"]],
+        ["D", "natural minor", ["d", "minor"]],
+        ["E", "major", ["e", "major"]],
+        ["F♯", "minor", ["f♯", "minor"]],
+        ["C", "phrygian", ["g♯", "major"]],
+        ["A♯", "mixolydian", ["c", "minor"]],
+        ["C", "DORIAN", ["a♯", "major"]]
+    ])("should correctly map %s %s to %j", (key, mode, expected) => {
+        expect(modeMapper(key, mode)).toEqual(expected);
     });
 });
 
@@ -980,6 +1047,38 @@ describe("pitchToNumber", () => {
     it("should handle basic notes", () => {
         expect(pitchToNumber("C", 4, "C major")).toBe(39);
         expect(pitchToNumber("A", 4, "C major")).toBe(48);
+    });
+    it("should handle single flat and sharp", () => {
+        expect(pitchToNumber("Db", 4, "C major")).toBe(40);
+        expect(pitchToNumber("C#", 4, "C major")).toBe(40);
+        // D index = 1 -> 4*12 + 1 - 5 - 1 = 40
+    });
+    it("should handle double flat and double sharp", () => {
+        expect(pitchToNumber("D𝄫", 4, "C major")).toBe(39);
+        expect(pitchToNumber("C𝄪", 4, "C major")).toBe(41);
+    });
+    it("should handle mixed accidental and normalize pitch", () => {
+        expect(pitchToNumber("C#b", 4, "C major")).toBe(39);
+        expect(pitchToNumber("c#", 4, "C major")).toBe(40);
+    });
+    it("should use solfege mapping when pitch not in PITCHES", () => {
+        expect(pitchToNumber("do", 4, "C major")).toBe(39);
+    });
+
+    it("should fallback using FIXEDSOLFEGE1 when solfege not found", () => {
+        global.getScaleAndHalfSteps = jest
+            .fn()
+            .mockReturnValue([["C", "D", "E", "F", "G", "A", "B"], []]);
+
+        expect(pitchToNumber("do", 4, "C major")).toBe(39);
+        expect(pitchToNumber("re", 4, "C major")).toBe(41);
+    });
+    it("should fallback to index 0 and log debg for invalid pitch", () => {
+        global.getScaleAndHalfSteps = jest
+            .fn()
+            .mockReturnValue([["C", "D", "E", "F", "G", "A", "B"], []]);
+        expect(pitchToNumber("xyz", 4, "C major")).toBe(39);
+        expect(console.debug).toHaveBeenCalled();
     });
 });
 
@@ -1091,6 +1190,20 @@ describe("getNoteFromInterval", () => {
     it("should calculate augmented intervals correctly", () => {
         expect(getNoteFromInterval("C4", "augmented 4")).toEqual(["F♯", 4]);
         expect(getNoteFromInterval("F4", "augmented 5")).toEqual(["C♯", 5]);
+    });
+    it("should calculate minor 3rd correctly", () => {
+        expect(getNoteFromInterval("C4", "minor 3")).toEqual(["E♭", 4]);
+    });
+    it("should calculate diminished interval correctly", () => {
+        expect(getNoteFromInterval("B4", "diminished 5")).toBeDefined();
+    });
+    it("should handle octave rollover correctly", () => {
+        const result = getNoteFromInterval("B4", "major 2");
+        expect(result[1]).toBe(5);
+        expect(result[0]).toBeDefined();
+    });
+    it("should handle perfect octave correctly", () => {
+        expect(getNoteFromInterval("C4", "perfect 8")).toEqual(["C", 5]);
     });
 });
 
@@ -1244,6 +1357,34 @@ describe("getNote", () => {
     it("should return the correct note for G♯4 in G major", () => {
         const result = getNote("G♯", 4, 0, "G major");
         expect(result).toEqual(["G♯", 4, 0]);
+    });
+
+    it("should handle negative transposition", () => {
+        const result = getNote("D", 4, -2, "C major");
+        expect(result[0]).toBe("C");
+        expect(result[1]).toBe(4);
+        expect(Math.abs(result[2])).toBe(0);
+    });
+
+    it("should handle octave increment on transposition overflow", () => {
+        const result = getNote("B", 4, 1, "C major");
+        expect(result[1]).toBe(5);
+    });
+
+    it("should normalize lowercase note input", () => {
+        const result = getNote("c", 4, 0, "C major");
+        expect(result[0]).toBeDefined();
+        expect(result[1]).toBe(4);
+    });
+
+    it("should preserve sharp accidental when no transposition", () => {
+        const result = getNote("A♯", 4, 0, "A major");
+        expect(result[0]).toBe("A♯");
+    });
+
+    it("should fallback safely for unknown note", () => {
+        const result = getNote("invalidNote", 4, 0, "C major");
+        expect(result).toBeDefined();
     });
 });
 
@@ -1629,7 +1770,7 @@ describe("noteToPitchOctave", () => {
 
 describe("pitchToFrequency", () => {
     global.TWELTHROOT2 = 1.0594630943592953;
-    global.TWELVEHUNDRETHROOT2 = 1.0005777895065549;
+    global.TWELVEHUNDRETHROOT2 = Number("1.0005777895065549");
     global.A0 = 27.5;
 
     it("calculates frequency with 0 cents", () => {
@@ -1654,7 +1795,7 @@ describe("pitchToFrequency", () => {
 
 describe("noteToFrequency", () => {
     global.TWELTHROOT2 = 1.0594630943592953;
-    global.TWELVEHUNDRETHROOT2 = 1.0005777895065549;
+    global.TWELVEHUNDRETHROOT2 = Number("1.0005777895065549");
     global.A0 = 27.5;
     it("converts note to frequency correctly", () => {
         const result = noteToFrequency("A4", "C");
@@ -1752,6 +1893,15 @@ describe("getSolfege", () => {
 
     it("should return undefined for invalid notes not present in the conversion table", () => {
         expect(getSolfege("X")).toBe("X");
+    });
+
+    it("should return correct movable solfege", () => {
+        // G Major: G=do, A=re, B=mi, C=fa, D=sol, E=la, F#=ti
+        expect(getSolfege("G", "G major", true)).toBe("do");
+        expect(getSolfege("F#", "G major", true)).toBe("ti");
+        // Fixed Do fallback (movable=false)
+        expect(getSolfege("G", "G major", false)).toBe("sol");
+        // Unknown note in scale fallbacks to fixed do behavior
     });
 });
 
@@ -2175,6 +2325,53 @@ describe("getPitchInfo", () => {
         expect(getPitchInfo(activity, "alphabet", "C4", tur)).toBe("C");
     });
 
+    it("should correctly parse string inputs", () => {
+        expect(getPitchInfo("C#5")).toEqual({
+            name: "C#",
+            octave: 5,
+            pitchNumber: 73
+        });
+
+        // High octave and textual variants
+        expect(getPitchInfo("C10").pitchNumber).toBe(132);
+        expect(getPitchInfo("Fx10").pitchNumber).toBe(139);
+        expect(getPitchInfo("Cx4").pitchNumber).toBe(62);
+
+        // Unicode double accidentals
+        // F𝄪5 (F double-sharp) → same pitch as G5 = 79
+        const infoDoubleSharp = getPitchInfo("F\u{1D12A}5");
+        expect(infoDoubleSharp.pitchNumber).toBe(79);
+
+        // Bb𝄫5 (B double-flat) → same pitch as A5 = 81
+        const infoDoubleFlat = getPitchInfo("B\u{1D12B}5");
+        expect(infoDoubleFlat.pitchNumber).toBe(81);
+    });
+
+    it("should correctly parse numeric inputs", () => {
+        expect(getPitchInfo(60)).toEqual({
+            name: "C",
+            octave: 4,
+            pitchNumber: 60
+        });
+    });
+
+    it("should handle invalid inputs", () => {
+        expect(getPitchInfo("InvalidNote")).toEqual({
+            name: null,
+            octave: null,
+            pitchNumber: "Not a valid pitch name"
+        });
+    });
+
+    it("should handle accidental offset accumulation edge cases", () => {
+        // Gb-1
+        expect(getPitchInfo("Gb-1").pitchNumber).toBe(6);
+        // D𝄫-1
+        expect(getPitchInfo("D\u{1D12B}-1").pitchNumber).toBe(0);
+        // E##4
+        expect(getPitchInfo("E##4").pitchNumber).toBe(66);
+    });
+
     it("returns correct alphabet class", () => {
         expect(getPitchInfo(activity, "alphabet class", "C4", tur)).toBe("C");
         expect(getPitchInfo(activity, "letter class", "D#4", tur)).toBe("E");
@@ -2238,39 +2435,6 @@ describe("getPitchInfo", () => {
 
     it("handles invalid type", () => {
         expect(getPitchInfo(activity, "unknown type", "C4", tur)).toBe("__INVALID_INPUT__");
-    });
-});
-
-describe("_calculate_pitch_number", () => {
-    let activity, tur;
-
-    beforeEach(() => {
-        activity = {
-            errorMsg: jest.fn()
-        };
-
-        tur = {
-            singer: {
-                lastNotePlayed: null,
-                inNoteBlock: {},
-                notePitches: {},
-                noteOctaves: {},
-                keySignature: "C major",
-                movable: false,
-                pitchNumberOffset: 0
-            }
-        };
-    });
-
-    it("calculates pitch number for a standard note string", () => {
-        const val = _calculate_pitch_number(activity, "C4", tur);
-        expect(typeof val).toBe("number");
-    });
-
-    it("calculates pitch number relative to another note", () => {
-        const valC4 = _calculate_pitch_number(activity, "C4", tur);
-        const valC5 = _calculate_pitch_number(activity, "C5", tur);
-        expect(valC5).toBeGreaterThan(valC4);
     });
 });
 
@@ -2402,5 +2566,49 @@ describe("getStepSizeUp", () => {
     it("should return 0 for an invalid temperament", () => {
         const result = getStepSizeUp("C major", "C", 0, "invalid");
         expect(result).toBe(0);
+    });
+});
+
+describe("_calculate_pitch_number", () => {
+    it("should return the correct pitch number for common notes", () => {
+        expect(_calculate_pitch_number("C", 4)).toBe(60);
+        expect(_calculate_pitch_number("A", 4)).toBe(69);
+        expect(_calculate_pitch_number("C", 5)).toBe(72);
+    });
+
+    it("should maintain enharmonic consistency", () => {
+        expect(_calculate_pitch_number("C#", 4)).toBe(61);
+        expect(_calculate_pitch_number("Db", 4)).toBe(61);
+    });
+
+    it("should return INVALIDPITCH for invalid input", () => {
+        expect(_calculate_pitch_number("Invalid", 4)).toBe("Not a valid pitch name");
+        expect(_calculate_pitch_number(null, 4)).toBe("Not a valid pitch name");
+    });
+});
+
+describe("NOTESTEP", () => {
+    it("should map all seven natural notes to their correct step values", () => {
+        expect(NOTESTEP).toEqual({
+            C: 1,
+            D: 3,
+            E: 5,
+            F: 6,
+            G: 8,
+            A: 10,
+            B: 12
+        });
+    });
+});
+
+describe("ACCIDENTALNAMES", () => {
+    it("should contain all five accidental names with correct symbols", () => {
+        expect(ACCIDENTALNAMES).toEqual([
+            "double sharp \ud834\udd2a",
+            "sharp \u266f",
+            "natural \u266e",
+            "flat \u266d",
+            "double flat \ud834\udd2b"
+        ]);
     });
 });

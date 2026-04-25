@@ -12,7 +12,7 @@
 /*
    global
 
-   last, _, ValueBlock, FlowClampBlock, FlowBlock, NOINPUTERRORMSG,
+   deepClone, last, _, ValueBlock, FlowClampBlock, FlowBlock, NOINPUTERRORMSG,
    LeftBlock, Singer, CHORDNAMES, CHORDVALUES, DEFAULTCHORD,
    Queue, INTERVALVALUES
  */
@@ -412,9 +412,11 @@ function setupIntervalsBlocks(activity) {
             const saveSuppressStatus = tur.singer.suppressOutput;
 
             // Save the state of the boxes, dicts, and heap
-            const saveBoxes = JSON.stringify(logo.boxes);
-            const saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
-            const saveTurtleDicts = JSON.stringify(logo.turtleDicts[turtle]);
+            const saveBoxes = deepClone(logo.boxes);
+            const saveTurtleHeaps =
+                logo.turtleHeaps[turtle] != null ? deepClone(logo.turtleHeaps[turtle]) : undefined;
+            const saveTurtleDicts =
+                logo.turtleDicts[turtle] != null ? deepClone(logo.turtleDicts[turtle]) : undefined;
 
             // Save the turtle state
             const saveX = tur.x;
@@ -427,7 +429,7 @@ function setupIntervalsBlocks(activity) {
             const saveOrientation = tur.orientation;
             const savePenState = tur.painter.penState;
             const previousButNotThese = tur.butNotThese;
-            tur.butNotThese = JSON.parse(JSON.stringify(tur.butNotThese));
+            tur.butNotThese = deepClone(tur.butNotThese);
 
             tur.singer.suppressOutput = true;
             tur.singer.justCounting.push(true);
@@ -463,9 +465,9 @@ function setupIntervalsBlocks(activity) {
             tur.singer.notesPlayed = saveNoteCount;
 
             // Restore previous state
-            logo.boxes = JSON.parse(saveBoxes);
-            logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
-            logo.turtleDicts[turtle] = JSON.parse(saveTurtleDicts);
+            logo.boxes = saveBoxes;
+            logo.turtleHeaps[turtle] = saveTurtleHeaps != null ? saveTurtleHeaps : {};
+            logo.turtleDicts[turtle] = saveTurtleDicts != null ? saveTurtleDicts : {};
 
             tur.painter.doPenUp();
             tur.painter.doSetXY(saveX, saveY);
@@ -531,9 +533,11 @@ function setupIntervalsBlocks(activity) {
             // We need to save the state of the boxes, dicts, and heap
             // although there is a potential of a boxes
             // collision with other turtles.
-            const saveBoxes = JSON.stringify(logo.boxes);
-            const saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
-            const saveTurtleDicts = JSON.stringify(logo.turtleDicts[turtle]);
+            const saveBoxes = deepClone(logo.boxes);
+            const saveTurtleHeaps =
+                logo.turtleHeaps[turtle] != null ? deepClone(logo.turtleHeaps[turtle]) : undefined;
+            const saveTurtleDicts =
+                logo.turtleDicts[turtle] != null ? deepClone(logo.turtleDicts[turtle]) : undefined;
             // And the turtle state
             const saveX = tur.x;
             const saveY = tur.y;
@@ -545,7 +549,7 @@ function setupIntervalsBlocks(activity) {
             const saveOrientation = tur.orientation;
             const savePenState = tur.painter.penState;
             const previousButNotThese = tur.butNotThese;
-            tur.butNotThese = JSON.parse(JSON.stringify(tur.butNotThese));
+            tur.butNotThese = deepClone(tur.butNotThese);
 
             tur.singer.suppressOutput = true;
 
@@ -582,9 +586,9 @@ function setupIntervalsBlocks(activity) {
             tur.singer.notesPlayed = saveNoteCount;
 
             // Restore previous state
-            logo.boxes = JSON.parse(saveBoxes);
-            logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
-            logo.turtleDicts[turtle] = JSON.parse(saveTurtleDicts);
+            logo.boxes = saveBoxes;
+            logo.turtleHeaps[turtle] = saveTurtleHeaps != null ? saveTurtleHeaps : {};
+            logo.turtleDicts[turtle] = saveTurtleDicts != null ? saveTurtleDicts : {};
 
             tur.painter.doPenUp();
             tur.painter.doSetXY(saveX, saveY);
@@ -832,7 +836,6 @@ function setupIntervalsBlocks(activity) {
                 });
             };
 
-            // eslint-disable-next-line no-unused-vars
             const __listener = async event => {
                 tur.singer.inDuplicate = false;
                 tur.singer.duplicateFactor /= factor;
@@ -862,81 +865,90 @@ function setupIntervalsBlocks(activity) {
 
             logo.setTurtleListener(turtle, listenerName, __listener);
 
-            // Acquire lock synchronously for the main flow
-            // Note: This section runs synchronously, so we use a simple spin-wait
-            // with a maximum iteration count to prevent infinite loops
-            let lockAttempts = 0;
-            const maxLockAttempts = 1000;
-            while (logo.connectionStoreLock && lockAttempts < maxLockAttempts) {
-                lockAttempts++;
-            }
-            if (lockAttempts >= maxLockAttempts) {
-                console.warn("connectionStoreLock: Max attempts reached in ArpeggioBlock flow");
+            // Acquire lock for the main flow
+            // JavaScript is single-threaded, so if the lock is held here it means
+            // a previous critical section did not release it (likely due to an error).
+            // We warn and force-acquire since no spin-wait can help in a single thread.
+            if (logo.connectionStoreLock) {
+                console.warn(
+                    "connectionStoreLock: Lock already held in ArpeggioBlock flow, forcing acquisition"
+                );
             }
             logo.connectionStoreLock = true;
 
-            // Check to see if another turtle has already disconnected these blocks
-            const otherTurtle = __lookForOtherTurtles(blk, turtle);
-            if (otherTurtle != null) {
-                // Copy the connections and queue the blocks.
-                logo.connectionStore[turtle][blk] = [];
-                for (let i = logo.connectionStore[otherTurtle][blk].length; i > 0; i--) {
-                    const obj = [
-                        logo.connectionStore[otherTurtle][blk][i - 1][0],
-                        logo.connectionStore[otherTurtle][blk][i - 1][1],
-                        logo.connectionStore[otherTurtle][blk][i - 1][2]
-                    ];
-                    logo.connectionStore[turtle][blk].push(obj);
-                    let child = obj[0];
-                    if (activity.blocks.blockList[child].name === "hidden") {
-                        child = activity.blocks.blockList[child].connections[0];
-                    }
+            try {
+                // Check to see if another turtle has already disconnected these blocks
+                const otherTurtle = __lookForOtherTurtles(blk, turtle);
+                if (otherTurtle != null) {
+                    // Copy the connections and queue the blocks.
+                    logo.connectionStore[turtle][blk] = [];
+                    for (let i = logo.connectionStore[otherTurtle][blk].length; i > 0; i--) {
+                        const obj = [
+                            logo.connectionStore[otherTurtle][blk][i - 1][0],
+                            logo.connectionStore[otherTurtle][blk][i - 1][1],
+                            logo.connectionStore[otherTurtle][blk][i - 1][2]
+                        ];
+                        logo.connectionStore[turtle][blk].push(obj);
+                        let child = obj[0];
+                        if (activity.blocks.blockList[child].name === "hidden") {
+                            child = activity.blocks.blockList[child].connections[0];
+                        }
 
-                    const queueBlock = new Queue(child, factor, blk, receivedArg);
-                    tur.parentFlowQueue.push(blk);
-                    tur.queue.push(queueBlock);
-                }
-            } else {
-                let child = activity.blocks.findBottomBlock(args[1]);
-                while (child != blk) {
-                    if (activity.blocks.blockList[child].name !== "hidden") {
                         const queueBlock = new Queue(child, factor, blk, receivedArg);
                         tur.parentFlowQueue.push(blk);
                         tur.queue.push(queueBlock);
                     }
-                    child = activity.blocks.blockList[child].connections[0];
-                }
-
-                // Break the connections between blocks in the clamp so
-                // that when we run the queues, only the individual blocks,
-                // each inserted into a semitoneinterval block, run.
-                logo.connectionStore[turtle][blk] = [];
-                child = args[1];
-                while (child != null) {
-                    const lastConnection = activity.blocks.blockList[child].connections.length - 1;
-                    const nextBlk = activity.blocks.blockList[child].connections[lastConnection];
-                    // Don't disconnect a hidden block from its parent.
-                    if (nextBlk != null && activity.blocks.blockList[nextBlk].name === "hidden") {
-                        logo.connectionStore[turtle][blk].push([
-                            nextBlk,
-                            1,
-                            activity.blocks.blockList[nextBlk].connections[1]
-                        ]);
-                        child = activity.blocks.blockList[nextBlk].connections[1];
-                        activity.blocks.blockList[nextBlk].connections[1] = null;
-                    } else {
-                        logo.connectionStore[turtle][blk].push([child, lastConnection, nextBlk]);
-                        activity.blocks.blockList[child].connections[lastConnection] = null;
-                        child = nextBlk;
+                } else {
+                    let child = activity.blocks.findBottomBlock(args[1]);
+                    while (child != blk) {
+                        if (activity.blocks.blockList[child].name !== "hidden") {
+                            const queueBlock = new Queue(child, factor, blk, receivedArg);
+                            tur.parentFlowQueue.push(blk);
+                            tur.queue.push(queueBlock);
+                        }
+                        child = activity.blocks.blockList[child].connections[0];
                     }
 
-                    if (child != null) {
-                        activity.blocks.blockList[child].connections[0] = null;
+                    // Break the connections between blocks in the clamp so
+                    // that when we run the queues, only the individual blocks,
+                    // each inserted into a semitoneinterval block, run.
+                    logo.connectionStore[turtle][blk] = [];
+                    child = args[1];
+                    while (child != null) {
+                        const lastConnection =
+                            activity.blocks.blockList[child].connections.length - 1;
+                        const nextBlk =
+                            activity.blocks.blockList[child].connections[lastConnection];
+                        // Don't disconnect a hidden block from its parent.
+                        if (
+                            nextBlk != null &&
+                            activity.blocks.blockList[nextBlk].name === "hidden"
+                        ) {
+                            logo.connectionStore[turtle][blk].push([
+                                nextBlk,
+                                1,
+                                activity.blocks.blockList[nextBlk].connections[1]
+                            ]);
+                            child = activity.blocks.blockList[nextBlk].connections[1];
+                            activity.blocks.blockList[nextBlk].connections[1] = null;
+                        } else {
+                            logo.connectionStore[turtle][blk].push([
+                                child,
+                                lastConnection,
+                                nextBlk
+                            ]);
+                            activity.blocks.blockList[child].connections[lastConnection] = null;
+                            child = nextBlk;
+                        }
+
+                        if (child != null) {
+                            activity.blocks.blockList[child].connections[0] = null;
+                        }
                     }
                 }
+            } finally {
+                logo.connectionStoreLock = false;
             }
-
-            logo.connectionStoreLock = false;
         }
     }
 
@@ -1051,7 +1063,6 @@ function setupIntervalsBlocks(activity) {
                 if (intervalName in INTERVALVALUES) {
                     r = INTERVALVALUES[intervalName][2];
                 } else {
-                    // eslint-disable-next-line no-console
                     console.log("could not find " + intervalName + " in INTERVALVALUES");
                     r = 1;
                 }
@@ -1059,7 +1070,7 @@ function setupIntervalsBlocks(activity) {
 
             if (isNaN(r) || r < 0) {
                 r = 1;
-                // eslint-disable-next-line no-console
+
                 console.debug("ratio " + r + " must be a number > 0");
             }
             Singer.IntervalsActions.setRatioInterval(r, turtle, blk);
@@ -1532,7 +1543,49 @@ function setupIntervalsBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for getting the length of the current temperament.
+     * @extends {ValueBlock}
+     */
+    class TemperamentLengthBlock extends ValueBlock {
+        constructor() {
+            //.TRANS: the number of pitches in the current temperament system
+            super("temperamentlength", _("temperament length"));
+            this.setPalette("intervals", activity);
+            this.beginnerBlock(true);
+            this.parameter = true;
+            this.setHelpString([
+                _(
+                    "The Temperament length block returns the number of pitches in the current temperament system. For example, 12 for standard equal temperament or 31 for a 31-tone temperament."
+                ),
+                "documentation",
+                ""
+            ]);
+            this.formBlock({ outType: "numberout" });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return activity.blocks.blockList[blk].value;
+        }
+
+        arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
+            if (
+                logo.inStatusMatrix &&
+                parentId != null &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
+            ) {
+                logo.statusFields.push([blk, "temperamentlength"]);
+            } else {
+                return Singer.IntervalsActions.getTemperamentLength();
+            }
+        }
+    }
+
     new SetTemperamentBlock().setup(activity);
+    new TemperamentLengthBlock().setup(activity);
     new TemperamentNameBlock().setup(activity);
     new ChordNameBlock().setup(activity);
     new ModeNameBlock().setup(activity);
@@ -1558,6 +1611,7 @@ function setupIntervalsBlocks(activity) {
     new SetKeyBlock().setup(activity);
     new SetKey2Block().setup(activity);
 }
+
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = setupIntervalsBlocks;
+    module.exports = { setupIntervalsBlocks };
 }

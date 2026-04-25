@@ -40,6 +40,12 @@ const DEFAULTVALUE = 50; // also used in turtles.js
 const DEFAULTCHROMA = 100; // also used in turtles.js
 const DEFAULTSTROKE = 5;
 const DEFAULTFONT = "sans-serif"; // also used in PenBlocks.js
+/**
+ * Multiplier for scroll buffer canvas size relative to main canvas.
+ * The auxiliary canvas used during scrolling is this many times larger
+ * than the main canvas to accommodate scroll operations without losing content.
+ */
+const SCROLL_CANVAS_SCALE = 3;
 
 /**
  * Class pertaining to visual actions for each turtle.
@@ -316,8 +322,12 @@ class Painter {
             // Save the current stroke width
             const savedStroke = this.stroke;
             this.stroke = 1;
-            this.turtle.ctx.lineWidth = this.stroke;
-            this.turtle.ctx.lineCap = "round";
+            if (this.turtle.ctx.lineWidth !== this.stroke) {
+                this.turtle.ctx.lineWidth = this.stroke;
+            }
+            if (this.turtle.ctx.lineCap !== "round") {
+                this.turtle.ctx.lineCap = "round";
+            }
 
             // Draw a hollow line
             const step = savedStroke < 3 ? 0.5 : (savedStroke - 2) / 2;
@@ -346,7 +356,7 @@ class Painter {
             let sa = oAngleRadians - Math.PI;
             let ea = oAngleRadians;
 
-            const steps = Math.max(Math.floor(savedStroke, 1));
+            const steps = Math.max(Math.floor(savedStroke), 1);
             this._svgArc(steps, cx, cy, step, sa, ea, false, true);
 
             this.turtle.ctx.lineTo(ox + dx, oy + dy);
@@ -364,7 +374,7 @@ class Painter {
             sa = oAngleRadians - Math.PI;
             ea = oAngleRadians;
 
-            const stepsFinal = Math.max(Math.floor(savedStroke, 1));
+            const stepsFinal = Math.max(Math.floor(savedStroke), 1);
             this._svgArc(stepsFinal, cx, cy, step, sa, ea, false, true);
 
             this.closeSVG();
@@ -374,14 +384,20 @@ class Painter {
 
             // Restore stroke
             this.stroke = savedStroke;
-            this.turtle.ctx.lineWidth = this.stroke;
-            this.turtle.ctx.lineCap = "round";
+            if (this.turtle.ctx.lineWidth !== this.stroke) {
+                this.turtle.ctx.lineWidth = this.stroke;
+            }
+            if (this.turtle.ctx.lineCap !== "round") {
+                this.turtle.ctx.lineCap = "round";
+            }
             this.turtle.ctx.moveTo(nx, ny);
         } else if (this._penDown) {
             const capAngleRadians = (this.turtle.orientation * Math.PI) / 180.0;
 
             if (linePart) {
-                this.turtle.ctx.lineCap = "butt";
+                if (this.turtle.ctx.lineCap !== "butt") {
+                    this.turtle.ctx.lineCap = "butt";
+                }
                 if (linePart === "first") {
                     this.turtle.ctx.beginPath();
                     this.turtle.ctx.arc(
@@ -575,8 +591,12 @@ class Painter {
             // Save the current stroke width
             const savedStroke = this.stroke;
             this.stroke = 1;
-            this.turtle.ctx.lineWidth = this.stroke;
-            this.turtle.ctx.lineCap = "round";
+            if (this.turtle.ctx.lineWidth !== this.stroke) {
+                this.turtle.ctx.lineWidth = this.stroke;
+            }
+            if (this.turtle.ctx.lineCap !== "round") {
+                this.turtle.ctx.lineCap = "round";
+            }
 
             // Draw a hollow line
             const step = savedStroke < 3 ? 0.5 : (savedStroke - 2) / 2;
@@ -604,7 +624,7 @@ class Painter {
                 diff -= 2 * Math.PI;
             }
             const nsteps = Math.max(Math.floor((radius * Math.abs(diff)) / 2), 2);
-            const steps = Math.max(Math.floor(savedStroke, 1));
+            const steps = Math.max(Math.floor(savedStroke), 1);
 
             this._svgArc(nsteps, cx, cy, radius + step, sa, ea, anticlockwise, true);
 
@@ -630,8 +650,12 @@ class Painter {
 
             // Restore stroke
             this.stroke = savedStroke;
-            this.turtle.ctx.lineWidth = this.stroke;
-            this.turtle.ctx.lineCap = "round";
+            if (this.turtle.ctx.lineWidth !== this.stroke) {
+                this.turtle.ctx.lineWidth = this.stroke;
+            }
+            if (this.turtle.ctx.lineCap !== "round") {
+                this.turtle.ctx.lineCap = "round";
+            }
             this.turtle.ctx.moveTo(nx, ny);
         } else if (this._penDown) {
             if (!this._svgPath) {
@@ -682,8 +706,12 @@ class Painter {
         this._processColor();
 
         if (!this._fillState) {
-            this.turtle.ctx.lineWidth = this.stroke;
-            this.turtle.ctx.lineCap = "round";
+            if (this.turtle.ctx.lineWidth !== this.stroke) {
+                this.turtle.ctx.lineWidth = this.stroke;
+            }
+            if (this.turtle.ctx.lineCap !== "round") {
+                this.turtle.ctx.lineCap = "round";
+            }
             this.turtle.ctx.beginPath();
             this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
         }
@@ -786,11 +814,21 @@ class Painter {
      * @param steps - the number of steps the turtle goes forward by
      */
     doForward(steps, linePart) {
+        steps = Number(steps);
+        if (!Number.isFinite(steps)) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
+
         this._processColor();
 
         if (!this._fillState) {
-            this.turtle.ctx.lineWidth = this.stroke;
-            this.turtle.ctx.lineCap = "round";
+            if (this.turtle.ctx.lineWidth !== this.stroke) {
+                this.turtle.ctx.lineWidth = this.stroke;
+            }
+            if (this.turtle.ctx.lineCap !== "round") {
+                this.turtle.ctx.lineCap = "round";
+            }
             this.turtle.ctx.beginPath();
             this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
         }
@@ -877,9 +915,34 @@ class Painter {
         remainingSteps -= currentStep;
     }
 
-    this._scheduleCanvasUpdate();
+this._scheduleCanvasUpdate();
 }
 
+/**
+ * Turn right and display corresponding turtle graphic by rotating bitmap.
+ *
+ * @param degrees - degrees for right turn
+ */
+doRight(degrees) {
+    degrees = Number(degrees);
+    if (!Number.isFinite(degrees)) {
+        this.turtles.activity.errorMsg(NANERRORMSG);
+        return;
+    }
+
+    this.turtle.orientation += degrees;
+    while (this.turtle.orientation < 0) {
+        this.turtle.orientation += 360;
+    }
+
+    this.turtle.orientation %= 360;
+    this.turtle.container.rotation = this.turtle.orientation;
+
+    // We cannot update the cache during the 'tween'
+    if (!this.turtle.blinking()) {
+        this.turtle.updateCache();
+    }
+}
     /**
      * Moves turtle to specific point (x, y).
      *
@@ -887,11 +950,22 @@ class Painter {
      * @param y - on-screen y coordinate of the point to where the turtle is moved
      */
     doSetXY(x, y) {
+        x = Number(x);
+        y = Number(y);
+        if (!Number.isFinite(x) || !Number.isFinite(y)) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
+
         this._processColor();
 
         if (!this._fillState) {
-            this.turtle.ctx.lineWidth = this.stroke;
-            this.turtle.ctx.lineCap = "round";
+            if (this.turtle.ctx.lineWidth !== this.stroke) {
+                this.turtle.ctx.lineWidth = this.stroke;
+            }
+            if (this.turtle.ctx.lineCap !== "round") {
+                this.turtle.ctx.lineCap = "round";
+            }
             this.turtle.ctx.beginPath();
             this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
         }
@@ -901,8 +975,8 @@ class Painter {
         const oy = this.turtles.screenY2turtleY(this.turtle.container.y);
 
         // New turtle point
-        const nx = Number(x);
-        const ny = Number(y);
+        const nx = x;
+        const ny = y;
 
         this._move(ox, oy, nx, ny, true);
         this._scheduleCanvasUpdate();
@@ -918,7 +992,13 @@ class Painter {
      * @param degrees - degrees turned to set the 'heading' of turtle
      */
     doSetHeading(degrees) {
-        this.turtle.orientation = Number(degrees);
+        degrees = Number(degrees);
+        if (!Number.isFinite(degrees)) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
+
+        this.turtle.orientation = degrees;
         while (this.turtle.orientation < 0) {
             this.turtle.orientation += 360;
         }
@@ -941,11 +1021,18 @@ class Painter {
      * @param radius - radius of arc
      */
     doArc(angle, radius) {
+        angle = Number(angle);
+        radius = Number(radius);
+        if (!Number.isFinite(angle) || !Number.isFinite(radius)) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
+
         if (radius < 0) {
             radius = -radius;
         }
 
-        let adeg = Number(angle),
+        let adeg = angle,
             factor;
         if (adeg < 0) {
             factor = -1;
@@ -1015,11 +1102,15 @@ class Painter {
 
             const savedStroke = this.stroke;
             this.stroke = 1;
-            this.turtle.ctx.lineWidth = this.stroke;
-            this.turtle.ctx.lineCap = "round";
+            if (this.turtle.ctx.lineWidth !== this.stroke) {
+                this.turtle.ctx.lineWidth = this.stroke;
+            }
+            if (this.turtle.ctx.lineCap !== "round") {
+                this.turtle.ctx.lineCap = "round";
+            }
 
             const step = savedStroke < 3 ? 0.5 : (savedStroke - 2) / 2;
-            const steps = Math.max(Math.floor(savedStroke, 1));
+            const steps = Math.max(Math.floor(savedStroke), 1);
 
             let degreesInitial = Math.atan2(cp1x - this.turtle.x, cp1y - this.turtle.y);
             degreesInitial = (180 * degreesInitial) / Math.PI;
@@ -1137,20 +1228,26 @@ class Painter {
 
             // Restore stroke
             this.stroke = savedStroke;
-            this.turtle.ctx.lineWidth = this.stroke;
-            this.turtle.ctx.lineCap = "round";
+            if (this.turtle.ctx.lineWidth !== this.stroke) {
+                this.turtle.ctx.lineWidth = this.stroke;
+            }
+            if (this.turtle.ctx.lineCap !== "round") {
+                this.turtle.ctx.lineCap = "round";
+            }
             this.turtle.ctx.moveTo(fx, fy);
             this.turtle.x = x2;
             this.turtle.y = y2;
 
             // IMPORTANT: allow next normal stroke to start a new SVG path
             this._svgPath = false;
-
-            /* eslint-enable no-unused-vars */
         } else if (this._penDown) {
             this._processColor();
-            this.turtle.ctx.lineWidth = this.stroke;
-            this.turtle.ctx.lineCap = "round";
+            if (this.turtle.ctx.lineWidth !== this.stroke) {
+                this.turtle.ctx.lineWidth = this.stroke;
+            }
+            if (this.turtle.ctx.lineCap !== "round") {
+                this.turtle.ctx.lineCap = "round";
+            }
 
             // Convert from turtle coordinates to screen coordinates
             fx = turtles.turtleX2screenX(x2);
@@ -1313,13 +1410,13 @@ class Painter {
         this.turtle.penstrokes.image = null;
         this.turtle.ctx.beginPath();
         this.turtle.ctx.clearRect(0, 0, this.turtle.canvas.width, this.turtle.canvas.height);
-        if (turtles.c1ctx != null) {
+        if (turtles.c1ctx) {
             turtles.c1ctx.beginPath();
             turtles.c1ctx.clearRect(
                 0,
                 0,
-                3 * this.turtle.canvas.width,
-                3 * this.turtle.canvas.height
+                SCROLL_CANVAS_SCALE * this.turtle.canvas.width,
+                SCROLL_CANVAS_SCALE * this.turtle.canvas.height
             );
         }
         this.turtle.penstrokes.image = this.turtle.canvas;
@@ -1333,7 +1430,7 @@ class Painter {
      * @param dy - change in y coordinate
      */
     doScrollXY(dx, dy) {
-        // FIXME: how big?
+        // Scroll canvas uses SCROLL_CANVAS_SCALE multiplier for buffer sizing
 
         const imgData = this.turtle.ctx.getImageData(
             0,
@@ -1343,20 +1440,20 @@ class Painter {
         );
 
         const turtles = this.turtles;
-        if (turtles.canvas1 == null) {
+        if (!turtles.canvas1) {
             turtles.gx = this.turtle.ctx.canvas.width;
             turtles.gy = this.turtle.ctx.canvas.height;
             turtles.canvas1 = document.createElement("canvas");
             // Use 2x viewport instead of 3x to save ~40 MB of memory.
             // At 1920x1080: 2x = 3840x2160x4 = 33 MB vs 3x = 5760x3240x4 = 75 MB.
-            turtles.canvas1.width = 2 * this.turtle.ctx.canvas.width;
-            turtles.canvas1.height = 2 * this.turtle.ctx.canvas.height;
-            turtles.c1ctx = turtles.canvas1.getContext("2d", { willReadFrequently: true });
+            turtles.canvas1.width = (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.width;
+            turtles.canvas1.height = (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.height;
+            turtles.c1ctx = turtles.canvas1.getContext("2d");
             turtles.c1ctx.rect(
                 0,
                 0,
-                2 * this.turtle.ctx.canvas.width,
-                2 * this.turtle.ctx.canvas.height
+                (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.width,
+                (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.height
             );
             turtles.c1ctx.fillStyle = "#F9F9F9";
             turtles.c1ctx.fill();
@@ -1366,13 +1463,11 @@ class Painter {
 
         turtles.gy -= dy;
         turtles.gx -= dx;
-        // Clamp to the bounds of the 2x scroll canvas (max offset = 1x viewport)
-        turtles.gx =
-            this.turtle.ctx.canvas.width > turtles.gx ? turtles.gx : this.turtle.ctx.canvas.width;
-        turtles.gx = 0 > turtles.gx ? 0 : turtles.gx;
-        turtles.gy =
-            this.turtle.ctx.canvas.height > turtles.gy ? turtles.gy : this.turtle.ctx.canvas.height;
-        turtles.gy = 0 > turtles.gy ? 0 : turtles.gy;
+        // Clamp scroll position to stay within buffer canvas bounds
+        const maxScrollX = (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.width;
+        const maxScrollY = (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.height;
+        turtles.gx = Math.max(0, Math.min(turtles.gx, maxScrollX));
+        turtles.gy = Math.max(0, Math.min(turtles.gy, maxScrollY));
 
         const newImgData = turtles.c1ctx.getImageData(
             turtles.gx,
@@ -1392,8 +1487,12 @@ class Painter {
 
             if (turtle.painter.penState) {
                 turtle.painter._processColor();
-                this.turtle.ctx.lineWidth = turtle.painter.stroke;
-                this.turtle.ctx.lineCap = "round";
+                if (this.turtle.ctx.lineWidth !== turtle.painter.stroke) {
+                    this.turtle.ctx.lineWidth = turtle.painter.stroke;
+                }
+                if (this.turtle.ctx.lineCap !== "round") {
+                    this.turtle.ctx.lineCap = "round";
+                }
                 this.turtle.ctx.beginPath();
                 this.turtle.ctx.moveTo(turtle.container.x + dx, turtle.container.y + dy);
                 this.turtle.ctx.lineTo(turtle.container.x, turtle.container.y);
@@ -1476,7 +1575,9 @@ class Painter {
     doSetPensize(size) {
         this.closeSVG();
         this.stroke = size;
-        this.turtle.ctx.lineWidth = this.stroke;
+        if (this.turtle.ctx.lineWidth !== this.stroke) {
+            this.turtle.ctx.lineWidth = this.stroke;
+        }
     }
 
     /**
@@ -1541,4 +1642,9 @@ class Painter {
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = Painter;
+}
+
+// Export to global scope for browser (RequireJS shim)
+if (typeof window !== "undefined") {
+    window.Painter = Painter;
 }

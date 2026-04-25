@@ -23,16 +23,42 @@
 const PhraseMaker = require("../phrasemaker.js");
 
 // --- Global Mocks ---
+
 global._ = msg => msg;
 global.last = arr => arr[arr.length - 1];
 global.LCD = (a, b) => (a * b) / gcd(a, b);
 function gcd(a, b) {
     return b === 0 ? a : gcd(b, a % b);
 }
+global.PhraseMakerGrid = {
+    mapNotesBlocks: jest.fn(() => []),
+    clearBlocks: jest.fn(),
+    addRowBlock: jest.fn(),
+    addColBlock: jest.fn(),
+    addNode: jest.fn(),
+    removeNode: jest.fn(),
+    lookForNoteBlocksOrRepeat: jest.fn(),
+    syncMarkedBlocks: jest.fn()
+};
+
+global.PhraseMakerUtils = {
+    generateDataURI: jest.fn(str => "data:text/html;base64," + str),
+    recalculateBlocks: jest.fn(() => [
+        [4, 1],
+        [8, 2]
+    ]),
+    MATRIXGRAPHICS: [],
+    MATRIXGRAPHICS2: []
+};
+
+global.PhraseMakerUI = {
+    calculateNoteWidth: jest.fn(() => 100)
+};
 global.DEFAULTVOICE = "electronic synth";
 global.DEFAULTDRUM = "kick drum";
 global.DEFAULTVOLUME = 50;
 global.PREVIEWVOLUME = 50;
+global.normalizeNoteAccidentals = note => note;
 global.SHARP = "♯";
 global.FLAT = "♭";
 global.MATRIXSOLFEHEIGHT = 30;
@@ -57,7 +83,7 @@ global.isCustomTemperament = jest.fn(() => false);
 global.i18nSolfege = jest.fn(s => s);
 global.getNote = jest.fn(() => ["C", "", 4]);
 global.noteToFrequency = jest.fn(() => 440);
-global.calcNoteValueToDisplay = jest.fn(() => ["1/4", "♩"]);
+global.calcNoteValueToDisplay = jest.fn(() => "1/4");
 global.delayExecution = jest.fn(ms => new Promise(r => setTimeout(r, ms)));
 global.getTemperament = jest.fn(() => ({ pitchNumber: 12 }));
 global.docBySelector = jest.fn(() => []);
@@ -168,7 +194,20 @@ describe("PhraseMaker Widget", () => {
             _: global._,
             wheelnav: jest.fn(),
             slicePath: jest.fn(),
-            DEFAULTVOICE: "electronic synth"
+            DEFAULTVOICE: "electronic synth",
+
+            last: arr => arr[arr.length - 1],
+            LCD: (a, b) => (a * b) / (b === 0 ? 1 : 1), // simple stub
+            calcNoteValueToDisplay: jest.fn(() => "1/4"),
+            getDrumName: jest.fn(() => null),
+            getDrumIcon: jest.fn(() => ""),
+            getDrumSynthName: jest.fn(() => "kick"),
+            noteIsSolfege: jest.fn(() => false),
+            isCustomTemperament: jest.fn(() => false),
+            i18nSolfege: jest.fn(s => s),
+            getNote: jest.fn(() => ["C", "", 4]),
+            noteToFrequency: jest.fn(() => 440),
+            toFraction: jest.fn(v => v)
         };
 
         phraseMaker = new PhraseMaker(mockDeps);
@@ -272,6 +311,35 @@ describe("PhraseMaker Widget", () => {
             expect(Object.keys(phraseMaker._blockMap)).toHaveLength(2);
         });
 
+        test("loads default drum row synths before grid preview playback", () => {
+            const loadSynth = jest.fn();
+            const setSynthVolume = jest.fn();
+            const instrumentNames = [];
+            const pm = new PhraseMaker({
+                getDrumName: jest.fn(label => (label === "snare drum" ? "snare drum" : null)),
+                Singer: { setSynthVolume }
+            });
+
+            pm.activity = {
+                logo: {
+                    synth: { loadSynth }
+                },
+                turtles: {
+                    ithTurtle: jest.fn(() => ({
+                        singer: { instrumentNames }
+                    }))
+                }
+            };
+            pm.rowLabels = ["snare drum", "sol", "snare drum"];
+
+            pm._loadDrumSynthsForRows();
+
+            expect(instrumentNames).toEqual(["snare drum"]);
+            expect(loadSynth).toHaveBeenCalledTimes(1);
+            expect(loadSynth).toHaveBeenCalledWith(0, "snare drum");
+            expect(setSynthVolume).toHaveBeenCalledWith(pm.activity.logo, 0, "snare drum", 50);
+        });
+
         test("should track lyrics", () => {
             phraseMaker._lyrics.push("do");
             phraseMaker._lyrics.push("re");
@@ -339,6 +407,80 @@ describe("PhraseMaker Widget", () => {
         });
     });
 
+    describe("init() turtleIndex parameter", () => {
+        /**
+         * Builds a minimal activity mock. ithTurtle() returns singer data for
+         * turtles defined in meterByIndex; omitted turtles return undefined
+         * beats/noteValue, which exercises the `|| 4` fallback in init().
+         */
+        function makeActivity(meterByIndex) {
+            return {
+                turtles: {
+                    ithTurtle: jest.fn(i => ({
+                        singer: {
+                            beatsPerMeasure: meterByIndex[i]?.beats,
+                            noteValuePerBeat: meterByIndex[i]?.noteValue,
+                            keySignature: "C major"
+                        }
+                    }))
+                }
+            };
+        }
+
+        /**
+         * Invoke init() and absorb any downstream errors thrown once the DOM
+         * setup begins (after _measureLimit has already been set). This lets us
+         * assert on _measureLimit without providing full DOM stubs for the rest
+         * of the 400-line init() method.
+         */
+        function callInitPartial(pm, activity, turtleIndex) {
+            try {
+                pm.init(activity, turtleIndex);
+            } catch (_) {
+                // Tolerated: errors from un-stubbed DOM APIs further in init().
+                // _measureLimit is computed before any DOM access.
+            }
+        }
+
+        test("defaults to turtle 0 when turtleIndex is omitted", () => {
+            const pm = new PhraseMaker(mockDeps);
+            const activity = makeActivity({ 0: { beats: 4, noteValue: 4 } });
+            callInitPartial(pm, activity, undefined);
+            // 4/4: 4 / 4 = 1.0
+            expect(pm._measureLimit).toBeCloseTo(1.0);
+            expect(activity.turtles.ithTurtle).toHaveBeenCalledWith(0);
+        });
+
+        test("uses turtleIndex 0 explicitly to read 4/4 meter", () => {
+            const pm = new PhraseMaker(mockDeps);
+            const activity = makeActivity({ 0: { beats: 4, noteValue: 4 } });
+            callInitPartial(pm, activity, 0);
+            expect(pm._measureLimit).toBeCloseTo(1.0);
+            expect(activity.turtles.ithTurtle).toHaveBeenCalledWith(0);
+        });
+
+        test("uses turtleIndex 1 to read 3/4 meter from turtle 1", () => {
+            const pm = new PhraseMaker(mockDeps);
+            const activity = makeActivity({
+                0: { beats: 4, noteValue: 4 },
+                1: { beats: 3, noteValue: 4 }
+            });
+            callInitPartial(pm, activity, 1);
+            // 3/4: 3 / 4 = 0.75
+            expect(pm._measureLimit).toBeCloseTo(0.75);
+            expect(activity.turtles.ithTurtle).toHaveBeenCalledWith(1);
+        });
+
+        test("falls back to 4/4 when singer meter is not yet initialized", () => {
+            const pm = new PhraseMaker(mockDeps);
+            // meterByIndex is empty: beats/noteValue are undefined, || 4 applies
+            const activity = makeActivity({});
+            callInitPartial(pm, activity, 0);
+            // undefined || 4 = 4; 4 / 4 = 1.0
+            expect(pm._measureLimit).toBeCloseTo(1.0);
+        });
+    });
+
     describe("dependency injection", () => {
         test("should use injected deps", () => {
             const customDeps = {
@@ -365,5 +507,867 @@ describe("PhraseMaker Widget", () => {
             const pm = new PhraseMaker(null);
             expect(pm.rowLabels).toEqual([]);
         });
+    });
+    test("_generateDataURI calls PhraseMakerUtils", () => {
+        const uri = phraseMaker._generateDataURI("<html></html>");
+        expect(uri).toContain("data:text/html");
+    });
+    test("_get_save_lock returns save lock state", () => {
+        phraseMaker._save_lock = true;
+        expect(phraseMaker._get_save_lock()).toBe(true);
+    });
+    test("_blockReplace reconnects blocks", () => {
+        const mockBlockList = [
+            { connections: [null, 1], isClampBlock: () => false },
+            { connections: [0, null], isClampBlock: () => false }
+        ];
+
+        phraseMaker.activity = {
+            blocks: {
+                blockList: mockBlockList,
+                clampBlocksToCheck: [],
+                adjustDocks: jest.fn(),
+                sendStackToTrash: jest.fn()
+            },
+            refreshCanvas: jest.fn()
+        };
+
+        phraseMaker.blockNo = 0;
+
+        phraseMaker._blockReplace(0, 1);
+
+        expect(phraseMaker.activity.blocks.adjustDocks).toHaveBeenCalled();
+    });
+    test("addNotes populates _notesToPlay", () => {
+        phraseMaker.rowLabels = ["C"];
+        phraseMaker._rows = [
+            {
+                insertCell: jest.fn(() => ({
+                    style: {},
+                    setAttribute: jest.fn(),
+                    addEventListener: jest.fn(),
+                    appendChild: jest.fn()
+                }))
+            }
+        ];
+        phraseMaker._noteValueRow = {
+            insertCell: jest.fn(() => ({
+                style: {},
+                setAttribute: jest.fn(),
+                appendChild: jest.fn()
+            }))
+        };
+
+        phraseMaker.addNotes(2, 4);
+
+        expect(phraseMaker._notesToPlay.length).toBe(2);
+    });
+    test("addTuplet pushes notes to _notesToPlay", () => {
+        const createMockCell = () => ({
+            style: {},
+            innerHTML: "",
+            setAttribute: jest.fn(),
+            addEventListener: jest.fn(),
+            appendChild: jest.fn()
+        });
+
+        phraseMaker._rows = [
+            {
+                cells: [
+                    { style: { width: "20px" } },
+                    { style: { width: "20px" } },
+                    { style: { width: "20px" } }
+                ],
+                insertCell: jest.fn(() => createMockCell())
+            }
+        ];
+
+        phraseMaker._tupletNoteValueRow = {
+            insertCell: jest.fn(() => createMockCell())
+        };
+
+        phraseMaker._tupletValueRow = {
+            insertCell: jest.fn(() => createMockCell())
+        };
+
+        phraseMaker._noteValueRow = {
+            insertCell: jest.fn(() => createMockCell())
+        };
+
+        phraseMaker._tupletNoteLabel = createMockCell();
+        phraseMaker._tupletValueLabel = createMockCell();
+
+        phraseMaker.rowLabels = ["C"];
+
+        phraseMaker.addTuplet([
+            [1, 4],
+            [8, 8, 8]
+        ]);
+
+        expect(phraseMaker._notesToPlay.length).toBe(3);
+    });
+    test("_sort sets sorted true", () => {
+        phraseMaker.init = jest.fn();
+        phraseMaker.makeClickable = jest.fn();
+        phraseMaker.rowLabels = ["C", "D"];
+        phraseMaker.rowArgs = [4, 4];
+        phraseMaker._rows = [{ cells: [] }, { cells: [] }];
+        phraseMaker._noteStored = ["C4", "D4"];
+        phraseMaker.columnBlocksMap = [[0], [1]];
+
+        phraseMaker.activity = {
+            turtles: { ithTurtle: () => ({ singer: { keySignature: 0 } }) },
+            logo: { tupletRhythms: [] }
+        };
+
+        phraseMaker._sort();
+
+        expect(phraseMaker.sorted).toBe(true);
+    });
+    test("recalculateBlocks calls PhraseMakerUtils", () => {
+        phraseMaker.activity = {
+            logo: { tupletRhythms: [] }
+        };
+
+        const result = phraseMaker.recalculateBlocks();
+        expect(result.length).toBeGreaterThan(0);
+    });
+    test("_noteWidth delegates to PhraseMakerUI", () => {
+        const width = phraseMaker._noteWidth(4);
+        expect(width).toBe(100);
+    });
+    test("_update tupletnote branch fully updates both number blocks", () => {
+        phraseMaker._deps.toFraction = jest.fn(v => v);
+
+        phraseMaker.activity = {
+            blocks: {
+                blockList: [
+                    // 0 main block
+                    { connections: [null, 1] },
+
+                    // 1 divide block
+                    { connections: [null, 2, 3] },
+
+                    // 2 denominator block
+                    { value: 0, text: { text: "" }, updateCache: jest.fn() },
+
+                    // 3 numerator block
+                    { value: 0, text: { text: "" }, updateCache: jest.fn() }
+                ]
+            },
+            refreshCanvas: jest.fn(),
+            saveLocally: jest.fn()
+        };
+
+        phraseMaker._update(0, [1, 4], 2, "tupletnote");
+
+        expect(phraseMaker.activity.blocks.blockList[2].value).toBe(4);
+
+        expect(phraseMaker.activity.blocks.blockList[3].value).toBe(1);
+    });
+    test("blockConnection connects blocks correctly", () => {
+        phraseMaker.blockNo = 0;
+
+        phraseMaker.activity = {
+            blocks: {
+                blockList: [
+                    { connections: [null, null, null] },
+                    { connections: [null, null, null] }
+                ],
+                clampBlocksToCheck: [],
+                adjustDocks: jest.fn()
+            }
+        };
+
+        phraseMaker.blockConnection(1, null);
+
+        expect(phraseMaker.activity.blocks.clampBlocksToCheck.length).toBe(1);
+    });
+    test("_deleteRhythmBlock sends stack to trash", () => {
+        phraseMaker.blockNo = 0;
+
+        phraseMaker.activity = {
+            blocks: {
+                blockList: [{ connections: [null, null, 1] }, { connections: [null] }],
+                sendStackToTrash: jest.fn(),
+                adjustDocks: jest.fn()
+            },
+            refreshCanvas: jest.fn()
+        };
+
+        phraseMaker._deleteRhythmBlock(0);
+
+        expect(phraseMaker.activity.blocks.sendStackToTrash).toHaveBeenCalled();
+    });
+    test("_addRhythmBlock loads new rhythm blocks safely", () => {
+        phraseMaker.blockNo = 0;
+
+        phraseMaker._deps.toFraction = jest.fn(v => v);
+        phraseMaker.blockConnection = jest.fn();
+        jest.spyOn(global, "setTimeout").mockImplementation(fn => fn());
+
+        phraseMaker.activity = {
+            blocks: {
+                blockList: [{ connections: [null, 1] }, { name: "vspace", connections: [] }],
+                findBottomBlock: jest.fn(() => 1),
+                loadNewBlocks: jest.fn()
+            },
+            refreshCanvas: jest.fn()
+        };
+
+        phraseMaker._addRhythmBlock([1, 4], 2);
+
+        expect(phraseMaker.activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        expect(phraseMaker.blockConnection).toHaveBeenCalled();
+    });
+    test("_readjustNotesBlocks updates and adds blocks", () => {
+        phraseMaker._mapNotesBlocks = jest.fn(() => [0]);
+        phraseMaker.recalculateBlocks = jest.fn(() => [[[1, 4], 2]]);
+        phraseMaker._update = jest.fn();
+        phraseMaker._addRhythmBlock = jest.fn();
+        phraseMaker._deleteRhythmBlock = jest.fn();
+
+        phraseMaker._readjustNotesBlocks();
+
+        expect(phraseMaker._update).toHaveBeenCalled();
+    });
+    test("_restartGrid regenerates grid", () => {
+        phraseMaker.init = jest.fn();
+        phraseMaker.addTuplet = jest.fn();
+        phraseMaker.addNotes = jest.fn();
+        phraseMaker.makeClickable = jest.fn();
+
+        phraseMaker._menuWheel = { removeWheel: jest.fn() };
+        phraseMaker._exitWheel = { removeWheel: jest.fn() };
+
+        phraseMaker.activity = {
+            logo: {
+                tupletRhythms: [["simple", 0, 1, 2]],
+                tupletParams: [[1, 4]]
+            }
+        };
+
+        phraseMaker._restartGrid();
+
+        expect(phraseMaker.init).toHaveBeenCalled();
+    });
+    test("_clear resets matrix cells", () => {
+        phraseMaker.rowLabels = ["C"];
+
+        phraseMaker._rows = [
+            {
+                cells: [
+                    {
+                        style: { backgroundColor: "black" },
+                        getAttribute: jest.fn(() => "white")
+                    }
+                ]
+            }
+        ];
+
+        phraseMaker._notesToPlay = [[[1], 4]];
+        phraseMaker._setNotes = jest.fn();
+
+        phraseMaker._clear();
+
+        expect(phraseMaker._setNotes).toHaveBeenCalled();
+    });
+    test("_divideNotes modifies tupletRhythms", () => {
+        phraseMaker._readjustNotesBlocks = jest.fn();
+        phraseMaker._syncMarkedBlocks = jest.fn();
+        phraseMaker._restartGrid = jest.fn();
+
+        phraseMaker.activity = {
+            logo: {
+                tupletRhythms: [["notes", 0, 4]]
+            }
+        };
+
+        phraseMaker._colBlocks = [[0, 0]];
+
+        phraseMaker._divideNotes(0, 2);
+
+        expect(phraseMaker._readjustNotesBlocks).toHaveBeenCalled();
+    });
+    test("_updateTupletValue increases tuplet size", () => {
+        phraseMaker._mapNotesBlocks = jest.fn(() => [0]);
+        phraseMaker._restartGrid = jest.fn();
+        phraseMaker._syncMarkedBlocks = jest.fn();
+        phraseMaker._update = jest.fn();
+
+        phraseMaker.activity = {
+            logo: {
+                tupletRhythms: [["notes", 0, 4, 4]]
+            }
+        };
+
+        phraseMaker._colBlocks = [
+            [0, 0],
+            [0, 1]
+        ];
+
+        phraseMaker._updateTupletValue(0, 1, 3);
+
+        expect(phraseMaker._update).toHaveBeenCalled();
+    });
+    test("_updateTupletValue increase and decrease paths", () => {
+        phraseMaker._mapNotesBlocks = jest.fn(() => [0]);
+        phraseMaker._restartGrid = jest.fn();
+        phraseMaker._syncMarkedBlocks = jest.fn();
+        phraseMaker._update = jest.fn();
+
+        phraseMaker._colBlocks = [
+            [0, 0],
+            [0, 1],
+            [0, 2]
+        ];
+
+        phraseMaker.activity = {
+            logo: {
+                tupletRhythms: [["notes", 0, 4, 4]]
+            }
+        };
+
+        // Increase
+        phraseMaker._updateTupletValue(0, 1, 3);
+
+        // Decrease
+        phraseMaker._updateTupletValue(0, 3, 1);
+
+        expect(phraseMaker._update).toHaveBeenCalled();
+    });
+    test("_tieNotes merges note durations", () => {
+        phraseMaker._readjustNotesBlocks = jest.fn();
+        phraseMaker._syncMarkedBlocks = jest.fn();
+        phraseMaker._restartGrid = jest.fn();
+
+        phraseMaker._colBlocks = [
+            [0, 0],
+            [0, 1],
+            [0, 2]
+        ];
+
+        phraseMaker.activity = {
+            logo: {
+                tupletRhythms: [
+                    ["notes", 0, 4],
+                    ["notes", 0, 4],
+                    ["notes", 0, 4]
+                ]
+            }
+        };
+
+        phraseMaker._tieNotes({ id: 0 }, { id: 2 });
+
+        expect(phraseMaker._readjustNotesBlocks).toHaveBeenCalled();
+    });
+    test("_setNoteCell handles pitch and hertz", () => {
+        phraseMaker._noteStored = ["C4", "440"];
+        phraseMaker.rowLabels = ["C", "hertz"];
+
+        phraseMaker._rows = [
+            { cells: [{ getAttribute: jest.fn(() => 1), style: {} }] },
+            { cells: [{ getAttribute: jest.fn(() => 1), style: {} }] }
+        ];
+
+        phraseMaker._deps.getDrumName = jest.fn(() => null);
+        phraseMaker._deps.Singer = {
+            defaultBPMFactor: 1
+        };
+
+        phraseMaker.activity = {
+            logo: {
+                synth: {
+                    trigger: jest.fn(),
+                    inTemperament: "equal"
+                }
+            }
+        };
+
+        phraseMaker._setNoteCell(0, 0, phraseMaker._rows[0].cells[0], true);
+        phraseMaker._setNoteCell(1, 0, phraseMaker._rows[1].cells[0], true);
+
+        expect(phraseMaker.activity.logo.synth.trigger).toHaveBeenCalled();
+    });
+    test("_createpiesubmenu rhythmnote branch", () => {
+        phraseMaker.docById = jest.fn(() => ({
+            style: {},
+            children: [{ textContent: "" }]
+        }));
+
+        phraseMaker.wheelnav = jest.fn(() => ({
+            createWheel: jest.fn(),
+            navItems: Array(20).fill({
+                navigateFunction: null,
+                navItem: { hide: jest.fn(), show: jest.fn() }
+            }),
+            slicePathCustom: {},
+            removeWheel: jest.fn()
+        }));
+
+        phraseMaker.slicePath = jest.fn(() => ({
+            DonutSlice: jest.fn(),
+            DonutSliceCustomization: jest.fn(() => ({}))
+        }));
+
+        phraseMaker.platformColor = {};
+
+        phraseMaker.activity = {
+            canvas: { width: 800, height: 600 },
+            getStageScale: jest.fn(() => 1)
+        };
+
+        phraseMaker._noteValueRow = {
+            cells: [
+                {
+                    getBoundingClientRect: jest.fn(() => ({ x: 0, y: 0 }))
+                }
+            ]
+        };
+
+        phraseMaker._createpiesubmenu(0, 2, "rhythmnote");
+    });
+    test("_restartGrid handles default case", () => {
+        phraseMaker.init = jest.fn();
+        phraseMaker.addNotes = jest.fn();
+        phraseMaker.makeClickable = jest.fn();
+
+        phraseMaker._menuWheel = { removeWheel: jest.fn() };
+        phraseMaker._exitWheel = { removeWheel: jest.fn() };
+
+        phraseMaker.activity = {
+            logo: {
+                tupletRhythms: [["other", 2, 4]]
+            }
+        };
+
+        phraseMaker._restartGrid();
+
+        expect(phraseMaker.addNotes).toHaveBeenCalled();
+    });
+    test("_setNoteCell covers MATRIXSYNTHS branch", () => {
+        phraseMaker._noteStored = ["sine: 440"];
+        phraseMaker.rowLabels = ["C"];
+
+        phraseMaker._rows = [{ cells: [{ getAttribute: jest.fn(() => 1), style: {} }] }];
+
+        phraseMaker._deps.Singer = { defaultBPMFactor: 1 };
+        phraseMaker._deps.getDrumName = jest.fn(() => null);
+
+        global.PhraseMakerUtils = {
+            MATRIXSYNTHS: ["sine"],
+            MATRIXGRAPHICS: [],
+            MATRIXGRAPHICS2: []
+        };
+
+        phraseMaker.activity = {
+            logo: {
+                synth: { trigger: jest.fn() }
+            }
+        };
+
+        phraseMaker._setNoteCell(0, 0, phraseMaker._rows[0].cells[0], true);
+    });
+    test("_clear resets matrix safely", () => {
+        phraseMaker.rowLabels = ["C"];
+        phraseMaker._rows = [
+            {
+                cells: [
+                    {
+                        style: { backgroundColor: "black" },
+                        getAttribute: jest.fn(() => "white")
+                    }
+                ]
+            }
+        ];
+
+        phraseMaker._notesToPlay = [[["C"], 4]];
+        phraseMaker._lyrics = ["text"];
+        phraseMaker._setNotes = jest.fn();
+
+        phraseMaker._clear();
+
+        expect(phraseMaker._setNotes).toHaveBeenCalled();
+    });
+    test("makeClickable executes without crash", () => {
+        phraseMaker.rowLabels = ["C"];
+        phraseMaker._rows = [
+            {
+                cells: [
+                    {
+                        style: {},
+                        setAttribute: jest.fn(),
+                        addEventListener: jest.fn(),
+                        removeEventListener: jest.fn(),
+                        getAttribute: jest.fn(() => 1)
+                    }
+                ]
+            }
+        ];
+
+        phraseMaker._noteValueRow = { cells: phraseMaker._rows[0].cells };
+        phraseMaker._tupletValueRow = { cells: [] };
+
+        phraseMaker._notesToPlay = [[["C"], 4]];
+        phraseMaker._colBlocks = [[0, 0]];
+        phraseMaker._rowBlocks = [0];
+        phraseMaker._rowMap = [0];
+        phraseMaker._rowOffset = [0];
+        phraseMaker._blockMap = { 0: [] };
+        phraseMaker.blockNo = 0;
+
+        phraseMaker.makeClickable();
+    });
+    test("audio proxy methods execute", () => {
+        global.PhraseMakerAudio = {
+            playAll: jest.fn(),
+            collectNotesToPlay: jest.fn(),
+            __playNote: jest.fn(),
+            _playChord: jest.fn(),
+            _processGraphics: jest.fn()
+        };
+
+        global.PhraseMakerUI = {
+            resetMatrix: jest.fn()
+        };
+
+        phraseMaker.playAll();
+        phraseMaker.collectNotesToPlay();
+        phraseMaker.__playNote(0, 0);
+        phraseMaker._playChord([1, 2], 4);
+        phraseMaker._processGraphics(["cmd"]);
+        phraseMaker._resetMatrix();
+    });
+    test("FORCE full pitch decision tree", () => {
+        phraseMaker._rows = [];
+        phraseMaker._rowBlocks = [];
+        phraseMaker._colBlocks = [];
+        phraseMaker._blockMap = {};
+        phraseMaker._rowMap = [];
+        phraseMaker._rowOffset = [];
+
+        phraseMaker.lyricsON = true;
+        phraseMaker._lyrics = ["a", "b", "c", "d", "e", "f", "g", "h"];
+
+        phraseMaker._notesToPlay = [
+            [["R"], 4], // rest
+            [["440"], 4], // hertz
+            [["kick"], 4], // drum
+            [["http://x.wav"], 4], // url
+            [["forward: 100"], 4], // graphics 1 arg
+            [["arc: 50: 90"], 4], // graphics 2 arg
+            [["C♯4"], 4], // sharp
+            [["D♭4"], 4], // flat
+            [["E4"], 4], // plain pitch
+            [["C4", "E4", "G4"], 4], // multi pitch
+            [["C4"], 1.5] // dotted
+        ];
+
+        phraseMaker._outputAsTuplet = Array(11).fill([1, 4]);
+
+        phraseMaker._deps.getDrumName = jest.fn(n => (n === "kick" ? "kick" : null));
+        phraseMaker._deps.toFraction = jest.fn(() => [3, 2]);
+        phraseMaker._deps.SOLFEGECONVERSIONTABLE = {
+            "C": "do",
+            "D": "re",
+            "E": "mi",
+            "G": "so",
+            "C♯": "do#",
+            "D♭": "re♭"
+        };
+
+        global.PhraseMakerUtils = {
+            MATRIXGRAPHICS: ["forward", "arc"],
+            MATRIXGRAPHICS2: ["arc"],
+            MATRIXSYNTHS: []
+        };
+
+        phraseMaker.activity = {
+            blocks: {
+                palettes: { dict: {} },
+                loadNewBlocks: jest.fn()
+            },
+            refreshCanvas: jest.fn(),
+            textMsg: jest.fn(),
+            logo: {
+                synth: { inTemperament: "custom" }
+            }
+        };
+
+        // RUN custom temperament first
+        phraseMaker._deps.isCustomTemperament = jest.fn(() => true);
+        phraseMaker._save();
+
+        // RUN equal temperament second
+        phraseMaker.activity.logo.synth.inTemperament = "equal";
+        phraseMaker._deps.isCustomTemperament = jest.fn(() => false);
+        phraseMaker._save();
+
+        expect(phraseMaker.activity.blocks.loadNewBlocks).toHaveBeenCalled();
+    });
+    test("_save covers 7-block tuplet branch", () => {
+        phraseMaker._rows = [];
+        phraseMaker._rowBlocks = [];
+        phraseMaker._colBlocks = [];
+        phraseMaker._blockMap = {};
+        phraseMaker._rowMap = [];
+        phraseMaker._rowOffset = [];
+
+        phraseMaker._notesToPlay = [[["C4"], 4]];
+
+        // THIS triggers 7-block branch
+        phraseMaker._outputAsTuplet = [
+            [3, 4] // numerator ≠ 1 and integer denominator
+        ];
+
+        phraseMaker._deps.getDrumName = jest.fn(() => null);
+        phraseMaker._deps.toFraction = jest.fn(() => [1, 4]);
+        phraseMaker._deps.SOLFEGECONVERSIONTABLE = { C: "do" };
+
+        phraseMaker.activity = {
+            blocks: {
+                palettes: { dict: {} },
+                loadNewBlocks: jest.fn()
+            },
+            refreshCanvas: jest.fn(),
+            textMsg: jest.fn(),
+            logo: {
+                synth: { inTemperament: "equal" }
+            }
+        };
+
+        phraseMaker._save();
+
+        expect(phraseMaker.activity.blocks.loadNewBlocks).toHaveBeenCalled();
+    });
+    test("_save covers non-integer tuplet branch", () => {
+        phraseMaker._rows = [];
+        phraseMaker._notesToPlay = [[["C4"], 4]];
+
+        phraseMaker._outputAsTuplet = [
+            [3, 4.5] // denominator not integer
+        ];
+
+        phraseMaker._deps.getDrumName = jest.fn(() => null);
+        phraseMaker._deps.toFraction = jest.fn(() => [1, 4]);
+        phraseMaker._deps.SOLFEGECONVERSIONTABLE = { C: "do" };
+
+        phraseMaker.activity = {
+            blocks: {
+                palettes: { dict: {} },
+                loadNewBlocks: jest.fn()
+            },
+            refreshCanvas: jest.fn(),
+            textMsg: jest.fn(),
+            logo: { synth: { inTemperament: "equal" } }
+        };
+
+        phraseMaker._save();
+    });
+    test("init builds grid deeply", () => {
+        const mockActivity = {
+            turtles: {
+                ithTurtle: jest.fn(() => ({
+                    singer: {
+                        beatsPerMeasure: 4,
+                        noteValuePerBeat: 4,
+                        keySignature: 0
+                    }
+                }))
+            },
+            logo: {
+                tupletRhythms: [],
+                synth: {
+                    inTemperament: "equal",
+                    stopSound: jest.fn(),
+                    stop: jest.fn(),
+                    loadSynth: jest.fn()
+                }
+            },
+            blocks: {
+                protoBlockDict: {
+                    forward: {
+                        staticLabels: ["Forward"]
+                    }
+                }
+            },
+            canvas: { width: 800, height: 600 },
+            getStageScale: jest.fn(() => 1),
+            hideMsgs: jest.fn(),
+            textMsg: jest.fn()
+        };
+
+        phraseMaker._rows = [];
+        phraseMaker._headcols = [];
+        phraseMaker._labelcols = [];
+        phraseMaker._blockMap = {};
+        phraseMaker.blockNo = 0;
+        phraseMaker.rowLabels = ["C", "kick", "forward"];
+        phraseMaker.rowArgs = [4, 4, 100];
+        phraseMaker._deps.getDrumName = jest.fn(name => (name === "kick" ? "kick" : null));
+        phraseMaker.lyricsON = true;
+        mockActivity.logo.tupletRhythms = [["notes", 0, 4]];
+
+        global.PhraseMakerUtils = {
+            MATRIXGRAPHICS: ["forward"],
+            MATRIXGRAPHICS2: [],
+            MATRIXSYNTHS: []
+        };
+
+        global.window.widgetWindows = {
+            windowFor: jest.fn().mockReturnValue({
+                clear: jest.fn(),
+                show: jest.fn(),
+                addButton: jest.fn().mockReturnValue({
+                    onclick: null,
+                    innerHTML: "",
+                    style: {},
+                    setAttribute: jest.fn()
+                }),
+                getWidgetBody: jest.fn().mockReturnValue({
+                    appendChild: jest.fn(),
+                    append: jest.fn()
+                }),
+                sendToCenter: jest.fn(),
+                destroy: jest.fn()
+            })
+        };
+        global.PhraseMakerUI = {
+            calculateNoteWidth: jest.fn(() => 80),
+            resetMatrix: jest.fn()
+        };
+        phraseMaker.init(mockActivity);
+
+        expect(mockActivity.textMsg).toHaveBeenCalled();
+    });
+    test("_createColumnPieSubmenu executes", () => {
+        phraseMaker.platformColor = {
+            pitchWheelcolors: [],
+            exitWheelcolors: [],
+            accidentalsWheelcolors: [],
+            accidentalsWheelcolorspush: "#fff",
+            octavesWheelcolors: [],
+            piemenuVoicesColors: []
+        };
+        phraseMaker.docById = jest.fn(() => ({
+            style: {},
+            children: [{ textContent: "" }]
+        }));
+        phraseMaker._deps.DRUMS = ["kick", "snare"];
+        phraseMaker._deps.getDrumIcon = jest.fn(() => "");
+        phraseMaker._deps.getDrumSynthName = jest.fn(() => "kick");
+        phraseMaker._labelcols = [
+            {
+                getBoundingClientRect: jest.fn(() => ({ x: 100, y: 100 })),
+                style: {}
+            }
+        ];
+        phraseMaker._noteBlocks = false;
+
+        phraseMaker.columnBlocksMap = [[0]];
+
+        phraseMaker.activity = {
+            canvas: { width: 800, height: 600 },
+            getStageScale: jest.fn(() => 1),
+            turtles: {
+                ithTurtle: jest.fn(() => ({
+                    singer: { keySignature: 0 }
+                }))
+            },
+            logo: {
+                synth: { inTemperament: "equal" }
+            },
+            blocks: {
+                blockList: [
+                    {
+                        connections: [null, 1, 2]
+                    },
+                    { value: "C" },
+                    { value: 4 }
+                ]
+            }
+        };
+
+        function FakeWheel() {
+            this.createWheel = jest.fn();
+            this.navigateWheel = jest.fn();
+            this.removeWheel = jest.fn();
+            this.setTooltips = jest.fn();
+            this.navItems = Array(12).fill({
+                title: "C",
+                navigateFunction: null,
+                navItem: { hide: jest.fn(), show: jest.fn() }
+            });
+            this.colors = [];
+            this.animatetime = 0;
+            this.slicePathFunction = null;
+            this.slicePathCustom = {};
+            this.sliceSelectedPathCustom = {};
+            this.sliceInitPathCustom = {};
+            this.selectedNavItemIndex = 0;
+            this.raphael = {};
+        }
+
+        phraseMaker.wheelnav = jest.fn().mockImplementation(function () {
+            return new FakeWheel();
+        });
+        phraseMaker.platformColor.accidentalsWheelcolorspush = "#fff";
+        phraseMaker.platformColor.exitWheelcolors = [];
+
+        phraseMaker.slicePath = jest.fn(() => ({
+            DonutSlice: jest.fn(),
+            DonutSliceCustomization: jest.fn(() => ({}))
+        }));
+
+        phraseMaker._noteValueRow = {
+            cells: [
+                {
+                    getBoundingClientRect: jest.fn(() => ({ x: 0, y: 0 }))
+                }
+            ]
+        };
+        phraseMaker._deps.slicePath = jest.fn(() => ({
+            DonutSlice: jest.fn(),
+            DonutSliceCustomization: jest.fn(() => ({
+                minRadiusPercent: 0,
+                maxRadiusPercent: 0
+            }))
+        }));
+
+        phraseMaker._createColumnPieSubmenu(0, "pitchblocks");
+    });
+    test("_lookForNoteBlocksOrRepeat executes", () => {
+        global.PhraseMakerGrid = {
+            lookForNoteBlocksOrRepeat: jest.fn()
+        };
+
+        phraseMaker._lookForNoteBlocksOrRepeat();
+
+        expect(PhraseMakerGrid.lookForNoteBlocksOrRepeat).toHaveBeenCalled();
+    });
+    test("_lookForNoteBlocksOrRepeat executes", () => {
+        global.PhraseMakerGrid = {
+            lookForNoteBlocksOrRepeat: jest.fn()
+        };
+
+        phraseMaker._lookForNoteBlocksOrRepeat();
+
+        expect(PhraseMakerGrid.lookForNoteBlocksOrRepeat).toHaveBeenCalled();
+    });
+    test("_blockReplace deep branch", () => {
+        phraseMaker.activity = {
+            blocks: {
+                blockList: [
+                    { connections: [null, 1], isClampBlock: () => false },
+                    { connections: [0, null], isClampBlock: () => false }
+                ],
+                clampBlocksToCheck: [],
+                adjustDocks: jest.fn(),
+                sendStackToTrash: jest.fn()
+            },
+            refreshCanvas: jest.fn()
+        };
+
+        phraseMaker._blockReplace(0, 1);
     });
 });

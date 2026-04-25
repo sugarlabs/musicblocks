@@ -145,7 +145,7 @@ const PhraseMakerGrid = {
             }
         }
 
-        while (pm._deps.last(myBlock.connections) != null) {
+        while (pm._deps.last(myBlock.connections) !== null) {
             bottomBlockLoop += 1;
             if (bottomBlockLoop > 2 * pm.activity.blocks.blockList.length) {
                 // Could happen if the block data is malformed.
@@ -192,7 +192,6 @@ const PhraseMakerGrid = {
             }
 
             if (pm.activity.blocks.blockList[blk] === undefined) {
-                //eslint-disable-next-line no-console
                 console.debug("block " + blk + " is undefined");
                 continue;
             }

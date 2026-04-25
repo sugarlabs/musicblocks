@@ -132,7 +132,7 @@ class GlobalPlanet {
         const Planet = this.Planet;
 
         this.index = 0;
-        this.cards = [];
+        this._cleanupCards();
         document.getElementById("global-projects").innerHTML = "";
         this.showLoading();
         this.hideLoadMore();
@@ -196,7 +196,7 @@ class GlobalPlanet {
 
             this.oldSearchString = this.searchString;
             this.index = 0;
-            this.cards = [];
+            this._cleanupCards();
             document.getElementById("global-projects").innerHTML = "";
             this.showLoading();
             this.hideLoadMore();
@@ -208,6 +208,17 @@ class GlobalPlanet {
                 this.afterRefreshProjects.bind(this)
             );
         }
+    }
+
+    _cleanupCards() {
+        if (Array.isArray(this.cards)) {
+            this.cards.forEach(card => {
+                if (card && card.cleanup) {
+                    card.cleanup();
+                }
+            });
+        }
+        this.cards = [];
     }
 
     afterSearch() {
@@ -224,7 +235,6 @@ class GlobalPlanet {
         const toDownload = [];
 
         for (let i = 0; i < data.length; i++) {
-            // eslint-disable-next-line no-prototype-builtins
             if (this.cache.hasOwnProperty(data[i][0])) {
                 if (this.cache[data[i][0]].ProjectLastUpdated !== data[i][1])
                     toDownload.push(data[i]);
@@ -275,7 +285,7 @@ class GlobalPlanet {
                         this.addProjectToCache(tempid, d, callback);
                     }.bind(this)
                 );
-            }.bind(this)());
+            }).bind(this)();
         }
     }
 
@@ -283,10 +293,12 @@ class GlobalPlanet {
         if (data.success) {
             this.cache[id] = data.data;
             this.cache[id].ProjectData = null;
-            this.loadCount -= 1;
+        } else {
+            this.throwOfflineError();
+        }
 
-            if (this.loadCount <= 0) callback();
-        } else this.throwOfflineError();
+        this.loadCount -= 1;
+        if (this.loadCount <= 0) callback();
     }
 
     forceAddToCache(id, callback) {
@@ -359,7 +371,6 @@ class GlobalPlanet {
         this.cleanContainer();
 
         for (let i = 0; i < data.length; i++) {
-            // eslint-disable-next-line no-prototype-builtins
             if (this.cache.hasOwnProperty(data[i][0])) {
                 const g = new GlobalCard(this.Planet);
                 g.init(data[i][0]);
@@ -501,7 +512,6 @@ class GlobalPlanet {
                 .getElementById("globalcontents")
                 .insertAdjacentHTML("afterbegin", this.offlineHTML);
         } else {
-            // eslint-disable-next-line no-unused-vars
             jQuery("#sort-select").material_select(evt => {
                 this.sortBy = document.getElementById("sort-select").value;
                 this.refreshProjects();
@@ -539,7 +549,6 @@ class GlobalPlanet {
 
             this.initTagList();
 
-            // eslint-disable-next-line no-unused-vars
             document.getElementById("load-more-projects").addEventListener("click", evt => {
                 if (this.loadButtonShown) {
                     this.loadMoreProjects();
@@ -548,7 +557,6 @@ class GlobalPlanet {
 
             const debouncedfunction = debounce(this.search.bind(this), 250);
 
-            // eslint-disable-next-line no-unused-vars
             document.getElementById("global-search").addEventListener("input", evt => {
                 this.searchString = document.getElementById("global-search").value;
                 debouncedfunction();
@@ -559,7 +567,6 @@ class GlobalPlanet {
                 debouncedfunction();
             });
 
-            // eslint-disable-next-line no-unused-vars
             document.getElementById("search-close").addEventListener("click", evt => {
                 document.getElementById("global-search").value = "";
                 this.searchString = "";

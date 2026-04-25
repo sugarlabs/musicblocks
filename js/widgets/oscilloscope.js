@@ -40,6 +40,7 @@
 class Oscilloscope {
     static ICONSIZE = 40;
     static analyserSize = 8192;
+    static DRAW_TIMEOUT = 1000;
 
     constructor(activity) {
         this.activity = activity;
@@ -147,7 +148,7 @@ class Oscilloscope {
 
         // Start timeout scheduler if not already running
         if (this._timeoutId === null) {
-            this._timeoutId = setTimeout(this.draw, 1000);
+            this._timeoutId = setTimeout(this.draw, Oscilloscope.DRAW_TIMEOUT);
         }
     }
 
@@ -247,7 +248,7 @@ class Oscilloscope {
             const dataArray = analyser.getValue();
             const bufferLength = dataArray.length;
 
-            ctx.fillStyle = "#FFFFFF";
+            ctx.fillStyle = platformColor.background || "#FFFFFF";
             ctx.fillRect(0, 0, state.width, state.height);
             ctx.lineWidth = 2;
             ctx.strokeStyle = state.turtle.painter._canvasColor;
@@ -281,7 +282,7 @@ class Oscilloscope {
             this.widgetWindow._rolled
         ) {
             // Use setTimeout for idle mode (1 FPS)
-            this._timeoutId = setTimeout(this.draw, 1000);
+            this._timeoutId = setTimeout(this.draw, Oscilloscope.DRAW_TIMEOUT);
         } else {
             // Use RAF for active mode (~60 FPS)
             this._rafId = requestAnimationFrame(this.draw);
@@ -325,4 +326,8 @@ class Oscilloscope {
             this._stopAnimation();
         }
     }
+}
+
+if (typeof module !== "undefined") {
+    module.exports = Oscilloscope;
 }

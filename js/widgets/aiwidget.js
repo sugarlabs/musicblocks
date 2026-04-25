@@ -14,7 +14,7 @@
 
    _, docById, DOUBLEFLAT, FLAT, NATURAL, SHARP, DOUBLESHARP,
    CUSTOMSAMPLES, wheelnav, getVoiceSynthName, Singer, DRUMS, Tone,
-   instruments, slicePath, platformColor
+   instruments, slicePath, platformColor, ABCJS, ensureABCJS
 */
 
 /* exported Abhijeet Singh */
@@ -42,7 +42,7 @@ function AIWidget() {
     const SAMPLEANALYSERSIZE = 8192;
     const SAMPLEOSCCOLORS = ["#3030FF", "#FF3050"];
     let abcNotationSong = "";
-    let midiBuffer;
+    this.midiBuffer = null;
     /**
      * Reference to the timbre block.
      * @type {number | null}
@@ -118,7 +118,9 @@ function AIWidget() {
      * @returns {void}
      */
     this.pause = function () {
-        midiBuffer.stop();
+        if (this.midiBuffer) {
+            this.midiBuffer.stop();
+        }
     };
 
     /**
@@ -144,7 +146,7 @@ function AIWidget() {
      */
     this._usePitch = function (p) {
         const number = SOLFEGENAMES.indexOf(p);
-        this.pitchCenter = number == -1 ? 0 : number;
+        this.pitchCenter = number === -1 ? 0 : number;
     };
 
     /**
@@ -175,83 +177,6 @@ function AIWidget() {
             this.activity.errorMsg(_("Warning: Sample is bigger than 1MB."), this.timbreBlock);
         }
     };
-    function adjustPitch(note, keySignature) {
-        const accidental = keySignature.accidentals.find(acc => {
-            const noteToCompare = acc.note.toUpperCase().replace(",", "");
-            note = note.replace(",", "");
-            return noteToCompare.toLowerCase() === note.toLowerCase();
-        });
-
-        if (accidental) {
-            return note + (accidental.acc === "sharp" ? "♯" : accidental.acc === "flat" ? "♭" : "");
-        } else {
-            return note;
-        }
-    }
-    //when converting to pitch value from abc to mb there is issue with the pithc standard comming out to be odd, using below function map the pitch to audible pitch
-    function abcToStandardValue(pitchValue) {
-        const octave = Math.floor(pitchValue / 7) + 4;
-        return octave;
-    }
-    //creates  pitch which consist of note pitch notename you could see them in the function
-    function createPitchBlocks(
-        pitches,
-        blockId,
-        pitchDuration,
-        keySignature,
-        actionBlock,
-        triplet,
-        meterDen
-    ) {
-        const blocks = [];
-
-        const pitch = pitches;
-        pitchDuration = toFraction(pitchDuration);
-        const adjustedNote = adjustPitch(pitch.name, keySignature).toUpperCase();
-        if (triplet !== undefined && triplet !== null) {
-            pitchDuration[1] = meterDen * triplet;
-        }
-
-        actionBlock.push(
-            [
-                blockId,
-                ["newnote", { collapsed: true }],
-                0,
-                0,
-                [blockId - 1, blockId + 1, blockId + 4, blockId + 8]
-            ],
-            [blockId + 1, "divide", 0, 0, [blockId, blockId + 2, blockId + 3]],
-            [blockId + 2, ["number", { value: pitchDuration[0] }], 0, 0, [blockId + 1]],
-            [blockId + 3, ["number", { value: pitchDuration[1] }], 0, 0, [blockId + 1]],
-            [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]],
-            [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
-            [blockId + 6, ["notename", { value: adjustedNote }], 0, 0, [blockId + 5]],
-            [
-                blockId + 7,
-                ["number", { value: abcToStandardValue(pitch.pitch) }],
-                0,
-                0,
-                [blockId + 5]
-            ],
-            [blockId + 8, "hidden", 0, 0, [blockId, blockId + 9]]
-        );
-
-        return blocks;
-    }
-
-    //function to search index for particular type of block mainly used to find nammeddo block in repeat block
-    function searchIndexForMusicBlock(array, x) {
-        // Iterate over each sub-array in the main array
-        for (let i = 0; i < array.length; i++) {
-            // Check if the 0th element of the sub-array matches x
-            if (array[i][0] === x) {
-                // Return the index if a match is found
-                return i;
-            }
-        }
-        // Return -1 if no match is found
-        return -1;
-    }
 
     this._parseABC = async function (tune) {
         const musicBlocksJSON = [];
@@ -266,7 +191,7 @@ function AIWidget() {
 
         tune.lines?.forEach(line => {
             line.staff?.forEach((staff, staffIndex) => {
-                if (!organizeBlock.hasOwnProperty(staffIndex)) {
+                if (!Object.prototype.hasOwnProperty.call(organizeBlock, staffIndex)) {
                     organizeBlock[staffIndex] = {
                         arrangedBlocks: []
                     };
@@ -277,8 +202,10 @@ function AIWidget() {
         });
         for (const lineId in organizeBlock) {
             organizeBlock[lineId].arrangedBlocks?.forEach(staff => {
-                if (!staffBlocksMap.hasOwnProperty(lineId)) {
-                    staffBlocksMap[lineId] = {
+                // Cache the entry for this lineId to avoid repeated property lookups
+                let entry = staffBlocksMap[lineId];
+                if (!entry) {
+                    entry = {
                         meterNum: staff?.meter?.value[0]?.num || 4,
                         meterDen: staff?.meter?.value[0]?.den || 4,
                         keySignature: staff.key,
@@ -347,7 +274,7 @@ function AIWidget() {
                             ],
                             [
                                 blockId + 13,
-                                ["modename", { value: staff.key.mode == "m" ? "minor" : "major" }],
+                                ["modename", { value: staff.key.mode === "m" ? "minor" : "major" }],
                                 0,
                                 0,
                                 [blockId + 11]
@@ -376,6 +303,7 @@ function AIWidget() {
 
                     //for adding above 17 blocks above
                     blockId = blockId + 17;
+                    staffBlocksMap[lineId] = entry;
                 }
 
                 const actionBlock = [];
@@ -398,9 +326,9 @@ function AIWidget() {
                                 staff.key,
                                 actionBlock,
                                 tripletFinder,
-                                staffBlocksMap[lineId].meterDen
+                                entry.meterDen
                             );
-                            if (element?.endTriplet !== null && element?.endTriplet !== undefined) {
+                            if (element?.endTriplet !== null) {
                                 tripletFinder = null;
                             }
                             blockId = blockId + 9;
@@ -417,7 +345,7 @@ function AIWidget() {
                                 const endBlockSearch = staffBlocksMap[lineId].repeatArray;
 
                                 for (const repeatbar in endBlockSearch) {
-                                    if (endBlockSearch[repeatbar].end == -1) {
+                                    if (endBlockSearch[repeatbar].end === -1) {
                                         staffBlocksMap[lineId].repeatArray[repeatbar].end =
                                             staffBlocksMap[lineId].baseBlocks.length;
                                     }
@@ -431,14 +359,10 @@ function AIWidget() {
                     actionBlock[actionBlock.length - 1][4][1] = null;
 
                     //update the namedo block if not first nameddo block appear
-                    if (staffBlocksMap[lineId].baseBlocks.length != 0) {
-                        staffBlocksMap[lineId].baseBlocks[
-                            staffBlocksMap[lineId].baseBlocks.length - 1
-                        ][0][
-                            staffBlocksMap[lineId].baseBlocks[
-                                staffBlocksMap[lineId].baseBlocks.length - 1
-                            ][0].length - 4
-                        ][4][1] = blockId;
+                    const baseBlocks = entry.baseBlocks;
+                    if (baseBlocks.length !== 0) {
+                        const lastBase = baseBlocks[baseBlocks.length - 1];
+                        lastBase[0][lastBase[0].length - 4][4][1] = blockId;
                     }
                     //add the nameddo action text and hidden block for each line
                     actionBlock.push(
@@ -448,21 +372,17 @@ function AIWidget() {
                                 "nameddo",
                                 {
                                     value: `V: ${parseInt(lineId) + 1} Line ${
-                                        staffBlocksMap[lineId]?.baseBlocks?.length + 1
+                                        baseBlocks.length + 1
                                     }`
                                 }
                             ],
                             0,
                             0,
                             [
-                                staffBlocksMap[lineId].baseBlocks.length === 0
+                                baseBlocks.length === 0
                                     ? null
-                                    : staffBlocksMap[lineId].baseBlocks[
-                                          staffBlocksMap[lineId].baseBlocks.length - 1
-                                      ][0][
-                                          staffBlocksMap[lineId].baseBlocks[
-                                              staffBlocksMap[lineId].baseBlocks.length - 1
-                                          ][0].length - 4
+                                    : baseBlocks[baseBlocks.length - 1][0][
+                                          baseBlocks[baseBlocks.length - 1][0].length - 4
                                       ][0],
                                 null
                             ]
@@ -480,7 +400,7 @@ function AIWidget() {
                                 "text",
                                 {
                                     value: `V: ${parseInt(lineId) + 1} Line ${
-                                        staffBlocksMap[lineId]?.baseBlocks?.length + 1
+                                        baseBlocks.length + 1
                                     }`
                                 }
                             ],
@@ -491,47 +411,71 @@ function AIWidget() {
                         [blockId + 3, "hidden", 0, 0, [blockId + 1, actionBlock[0][0]]]
                     ); // blockid of topaction block
 
-                    if (!staffBlocksMap[lineId].nameddoArray) {
-                        staffBlocksMap[lineId].nameddoArray = {};
+                    if (!entry.nameddoArray) {
+                        entry.nameddoArray = {};
                     }
 
                     // Ensure the array at nameddoArray[lineId] is initialized if it doesn't exist
-                    if (!staffBlocksMap[lineId].nameddoArray[lineId]) {
-                        staffBlocksMap[lineId].nameddoArray[lineId] = [];
+                    if (!entry.nameddoArray[lineId]) {
+                        entry.nameddoArray[lineId] = [];
                     }
 
-                    staffBlocksMap[lineId].nameddoArray[lineId].push(blockId);
+                    entry.nameddoArray[lineId].push(blockId);
                     blockId = blockId + 4;
 
                     musicBlocksJSON.push(actionBlock);
-                    staffBlocksMap[lineId].baseBlocks.push([actionBlock]);
+                    baseBlocks.push([actionBlock]);
                 });
             });
         }
 
         const finalBlock = [];
-
-        //Some Error are here need to be fixed
         for (const staffIndex in staffBlocksMap) {
-            staffBlocksMap[staffIndex].startBlock[
-                staffBlocksMap[staffIndex].startBlock.length - 3
-            ][4][2] =
-                staffBlocksMap[staffIndex].baseBlocks[0][0][
-                    staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4
-                ][0];
+            const startBlockArray = staffBlocksMap[staffIndex].startBlock;
+            const baseBlocks = staffBlocksMap[staffIndex].baseBlocks;
 
-            // Update the first namedo block with settimbre
-            staffBlocksMap[staffIndex].baseBlocks[0][0][
-                staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4
-            ][4][0] =
-                staffBlocksMap[staffIndex].startBlock[
-                    staffBlocksMap[staffIndex].startBlock.length - 3
-                ][0];
+            // Validate that the staff has sufficient block data for linking.
+            // Staves with no notes or incomplete structures from certain
+            // ABC notation inputs can cause crashes when accessing nested
+            // array elements without bounds checking.
+            if (
+                !baseBlocks ||
+                baseBlocks.length === 0 ||
+                !baseBlocks[0] ||
+                !baseBlocks[0][0] ||
+                baseBlocks[0][0].length < 4 ||
+                startBlockArray.length < 3 ||
+                !staffBlocksMap[staffIndex].nameddoArray ||
+                !staffBlocksMap[staffIndex].nameddoArray[staffIndex] ||
+                staffBlocksMap[staffIndex].nameddoArray[staffIndex].length === 0
+            ) {
+                finalBlock.push(...startBlockArray);
+                continue;
+            }
+
+            const firstNoteBlockId = baseBlocks[0][0][0];
+
+            // Find the meter block to connect it to the first note
+            const meterBlock = startBlockArray.find(b => b[1] === "meter" || b[1][0] === "meter");
+            if (meterBlock) {
+                meterBlock[4][3] = firstNoteBlockId;
+            }
+
             const repeatBlock = [];
 
             const repeatblockids = staffBlocksMap[staffIndex].repeatArray;
             for (const repeatId of repeatblockids) {
-                if (repeatId.start == 0) {
+                // Skip repeat entries with out-of-bounds block indices
+                if (
+                    repeatId.start < 0 ||
+                    repeatId.end < 0 ||
+                    repeatId.start >= baseBlocks.length ||
+                    repeatId.end >= baseBlocks.length
+                ) {
+                    continue;
+                }
+
+                if (repeatId.start === 0) {
                     staffBlocksMap[staffIndex].repeatBlock.push([
                         blockId,
                         "repeat",
@@ -584,7 +528,7 @@ function AIWidget() {
                             staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end + 1]
                         );
 
-                        if (secondnammedo != -1) {
+                        if (secondnammedo !== -1) {
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0][
                                 secondnammedo
                             ][4][0] = blockId;
@@ -613,7 +557,7 @@ function AIWidget() {
                         ][4][1]
                     );
                     let prevrepeatnameddo = -1;
-                    if (prevnameddo == -1) {
+                    if (prevnameddo === -1) {
                         prevrepeatnameddo = searchIndexForMusicBlock(
                             staffBlocksMap[staffIndex].repeatBlock,
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
@@ -657,14 +601,14 @@ function AIWidget() {
                         [blockId]
                     ]);
 
-                    if (prevnameddo != -1) {
+                    if (prevnameddo !== -1) {
                         staffBlocksMap[staffIndex].baseBlocks[repeatId.start - 1][0][
                             prevnameddo
                         ][4][1] = blockId;
                     } else {
                         staffBlocksMap[staffIndex].repeatBlock[prevrepeatnameddo][4][3] = blockId;
                     }
-                    if (afternamedo != -1) {
+                    if (afternamedo !== -1) {
                         staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][afternamedo][4][1] =
                             null;
                     }
@@ -673,7 +617,7 @@ function AIWidget() {
                         currentnammeddo
                     ][4][0] = blockId;
 
-                    if (nextBlockId != null) {
+                    if (nextBlockId !== null) {
                         const nextnameddo = searchIndexForMusicBlock(
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0],
                             nextBlockId
@@ -687,11 +631,8 @@ function AIWidget() {
                 }
             }
 
-            const lineBlock = staffBlocksMap[staffIndex].baseBlocks.reduce(
-                (acc, curr) => acc.concat(curr),
-                []
-            );
-            const flattenedLineBlock = lineBlock.flat(); // Flatten the multidimensional array
+            // Flatten the multidimensional array (equivalent to flat(1) + flat(1))
+            const flattenedLineBlock = staffBlocksMap[staffIndex].baseBlocks.flat(2);
             const combinedBlock = [...staffBlocksMap[staffIndex].startBlock, ...flattenedLineBlock];
 
             finalBlock.push(...staffBlocksMap[staffIndex].startBlock);
@@ -720,7 +661,8 @@ function AIWidget() {
      * @private
      * @returns {void}
      */
-    this.__save = function () {
+    this.__save = async function () {
+        await ensureABCJS();
         const tunebook = new ABCJS.parseOnly(abcNotationSong);
 
         tunebook.forEach(tune => {
@@ -805,6 +747,15 @@ function AIWidget() {
             if (this._octavesWheel !== undefined) {
                 this._octavesWheel.removeWheel();
             }
+            for (const id in this.pitchAnalysers) {
+                const analyser = this.pitchAnalysers[id];
+                if (analyser) {
+                    for (const synth in instruments[0]) {
+                        instruments[0][synth].disconnect(analyser);
+                    }
+                    analyser.dispose();
+                }
+            }
             this.pitchAnalysers = {};
             widgetWindow.destroy();
         };
@@ -825,7 +776,7 @@ function AIWidget() {
                     >`;
                 this.isMoving = false;
             } else {
-                if (!(abcNotationSong == "")) {
+                if (!(abcNotationSong === "")) {
                     this.resume();
                     this._playABCSong();
                 }
@@ -833,7 +784,7 @@ function AIWidget() {
         };
 
         this._save_lock = false;
-        widgetWindow.addButton("export-chunk.svg", ICONSIZE, _("Save sample"), "").onclick =
+        widgetWindow.addButton("export-chunk.svg", ICONSIZE, _("Generate blocks"), "").onclick =
             function () {
                 // Debounce button
                 if (!that._get_save_lock()) {
@@ -842,6 +793,17 @@ function AIWidget() {
                     setTimeout(function () {
                         that._save_lock = false;
                     }, 1000);
+                }
+            };
+
+        widgetWindow.addButton("utility-button.svg", ICONSIZE, _("Set API Key"), "").onclick =
+            function () {
+                const key = prompt(
+                    _("Enter your Groq API Key:"),
+                    that.activity.storage.groq_api_key || ""
+                );
+                if (key !== null) {
+                    that.activity.storage.groq_api_key = key.trim();
                 }
             };
 
@@ -862,7 +824,7 @@ function AIWidget() {
      */
     this._addSample = function () {
         for (let i = 0; i < CUSTOMSAMPLES.length; i++) {
-            if (CUSTOMSAMPLES[i][0] == this.sampleName) {
+            if (CUSTOMSAMPLES[i][0] === this.sampleName) {
                 return;
             }
         }
@@ -873,59 +835,40 @@ function AIWidget() {
      * Plays the reference pitch based on the current sample's pitch, accidental, and octave.
      * @returns {void}
      */
-    this._playABCSong = function () {
+    this._playABCSong = async function () {
+        await ensureABCJS();
         const abc = abcNotationSong;
-        const stopAudioButton = document.querySelector(".stop-audio");
 
         const visualObj = ABCJS.renderAbc("*", abc, {
             responsive: "resize"
         })[0];
 
         if (ABCJS.synth.supportsAudio()) {
-            // An audio context is needed - this can be passed in for two reasons:
-            // 1) So that you can share this audio context with other elements on your page.
-            // 2) So that you can create it during a user interaction so that the browser doesn't block the sound.
-            // Setting this is optional - if you don't set an audioContext, then abcjs will create one.
-            window.AudioContext =
-                window.AudioContext ||
-                window.webkitAudioContext ||
-                navigator.mozAudioContext ||
-                navigator.msAudioContext;
-            const audioContext = new window.AudioContext();
-            audioContext.resume().then(function () {
-                // In theory the AC shouldn't start suspended because it is being initialized in a click handler, but iOS seems to anyway.
+            const audioContext = this.activity.logo.synth.tone.context;
+            try {
+                await audioContext.resume();
 
-                // This does a bare minimum so this object could be created in advance, or whenever convenient.
-                midiBuffer = new ABCJS.synth.CreateSynth();
+                if (this.midiBuffer) {
+                    this.midiBuffer.stop();
+                }
 
-                // midiBuffer.init preloads and caches all the notes needed. There may be significant network traffic here.
-                return midiBuffer
-                    .init({
-                        visualObj: visualObj,
-                        audioContext: audioContext,
-                        millisecondsPerMeasure: visualObj.millisecondsPerMeasure()
-                    })
-                    .then(function (response) {
-                        // midiBuffer.prime actually builds the output buffer.
-                        return midiBuffer.prime();
-                    })
-                    .then(function (response) {
-                        // At this point, everything slow has happened. midiBuffer.start will return very quickly and will start playing very quickly without lag.
-                        midiBuffer.start();
+                this.midiBuffer = new ABCJS.synth.CreateSynth();
 
-                        return Promise.resolve();
-                    })
-                    .catch(function (error) {
-                        if (error.status === "NotSupported") {
-                            stopAudioButton.setAttribute("style", "display:none;");
-                            const audioError = document.querySelector(".audio-error");
-                            audioError.setAttribute("style", "");
-                        } else console.warn("synth error", error);
-                    });
-            });
+                await this.midiBuffer.init({
+                    visualObj: visualObj,
+                    audioContext: audioContext,
+                    millisecondsPerMeasure: visualObj.millisecondsPerMeasure(),
+                    soundFontUrl: "https://paulrosen.github.io/abcjs-soundfonts/FluidR3_GM"
+                });
+
+                await this.midiBuffer.prime();
+                console.log("Playing ABC:", abc);
+                this.midiBuffer.start();
+            } catch (error) {
+                console.warn("synth error", error);
+            }
         } else {
-            const audioError = document.querySelector(".audio-error");
-            audioError.setAttribute("style", "");
+            console.warn("Audio not supported in this browser");
         }
     };
 
@@ -934,7 +877,7 @@ function AIWidget() {
      * @returns {void}
      */
     this._playSample = function () {
-        if (this.sampleName != null && this.sampleName != "") {
+        if (this.sampleName !== null && this.sampleName !== "") {
             this.reconnectSynthsToAnalyser();
 
             this.activity.logo.synth.trigger(
@@ -998,7 +941,7 @@ function AIWidget() {
      */
     this.reconnectSynthsToAnalyser = function () {
         // Make two pitchAnalysers for the ref tone and the sample.
-        for (const instrument in [0, 1]) {
+        for (const instrument of [0, 1]) {
             if (this.pitchAnalysers[instrument] === undefined) {
                 this.pitchAnalysers[instrument] = new Tone.Analyser({
                     type: "waveform",
@@ -1012,11 +955,19 @@ function AIWidget() {
             let analyser = 1;
             if (synth === REFERENCESAMPLE) {
                 analyser = 0;
+            }
+
+            if (this.pitchAnalysers[analyser]) {
+                instruments[0][synth].disconnect(this.pitchAnalysers[analyser]);
                 instruments[0][synth].connect(this.pitchAnalysers[analyser]);
             }
+
             if (synth === "customsample_" + this.originalSampleName) {
                 analyser = 1;
-                instruments[0][synth].connect(this.pitchAnalysers[analyser]);
+                if (this.pitchAnalysers[analyser]) {
+                    instruments[0][synth].disconnect(this.pitchAnalysers[analyser]);
+                    instruments[0][synth].connect(this.pitchAnalysers[analyser]);
+                }
             }
         }
     };
@@ -1027,10 +978,14 @@ function AIWidget() {
      */
     this._scale = function () {
         let width, height;
-        const canvas = document.getElementsByClassName("samplerCanvas");
-        Array.prototype.forEach.call(canvas, ele => {
-            this.widgetWindow.getWidgetBody().removeChild(ele);
-        });
+        const body = this.widgetWindow.getWidgetBody();
+
+        // Properly remove the entire previous interface container to avoid leaks
+        const containers = body.getElementsByClassName("ai-interface-container");
+        for (let i = containers.length - 1; i >= 0; i--) {
+            body.removeChild(containers[i]);
+        }
+
         if (!this.widgetWindow.isMaximized()) {
             width = SAMPLEWIDTH;
             height = SAMPLEHEIGHT;
@@ -1038,7 +993,7 @@ function AIWidget() {
             width = this.widgetWindow.getWidgetBody().getBoundingClientRect().width;
             height = this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 70;
         }
-        document.getElementsByTagName("canvas")[0].innerHTML = "";
+
         this.makeCanvas(width, height, 0, true);
         this.reconnectSynthsToAnalyser();
     };
@@ -1051,52 +1006,57 @@ function AIWidget() {
      * @returns {void}
      */
     this.makeCanvas = function (width, height) {
+        const that = this;
+        // Build the entire widget DOM off-screen in a DocumentFragment,
+        // then append once to avoid multiple reflows.
+        const fragment = document.createDocumentFragment();
+
         // Create a container to center the elements
         const container = document.createElement("div");
-
-        this.widgetWindow.getWidgetBody().appendChild(container);
+        container.className = "ai-interface-container";
+        fragment.appendChild(container);
 
         // Create a scrollable container for the textarea
         const scrollContainer = document.createElement("div");
-        scrollContainer.style.overflowY = "auto"; // Enable vertical scrolling
-        scrollContainer.style.height = height + "px"; // Set the height of the scroll container
-        scrollContainer.style.border = "1px solid #ccc"; // Optional: Add a border for visibility
-        scrollContainer.style.marginBottom = "8px";
-        scrollContainer.style.marginLeft = "8px";
-        scrollContainer.style.display = "flex"; // Use flexbox for centering
-        scrollContainer.style.flexDirection = "column"; // Stack elements vertically
-        scrollContainer.style.alignItems = "center"; // Center items horizontally
+        scrollContainer.style.cssText =
+            "overflow-y:auto;" +
+            "height:" +
+            height +
+            "px;" +
+            "border:1px solid #ccc;" +
+            "margin-bottom:8px;" +
+            "margin-left:8px;" +
+            "display:flex;" +
+            "flex-direction:column;" +
+            "align-items:center";
         container.appendChild(scrollContainer);
 
         // Create the textarea element
         const textarea = document.createElement("textarea");
-        textarea.style.height = height + "px"; // Keep the height for the scrollable area
-        textarea.style.width = width + "px";
+        textarea.style.cssText =
+            "height:" +
+            height +
+            "px;" +
+            "width:" +
+            width +
+            "px;" +
+            "margin-left:20px;" +
+            "font-size:20px;" +
+            "padding:10px";
         textarea.className = "samplerTextarea";
-        textarea.style.marginLeft = "20px";
-        textarea.style.fontSize = "20px";
-        textarea.style.padding = "10px";
         scrollContainer.appendChild(textarea); // Append textarea to scroll container
 
         // Create hint text elements
         const hintsContainer = document.createElement("div");
-        hintsContainer.style.marginBottom = "10px";
-
-        hintsContainer.style.display = "flex";
-        hintsContainer.style.justifyContent = "center";
-        hintsContainer.style.marginTop = "8px";
+        hintsContainer.style.cssText =
+            "margin-bottom:10px;display:flex;justify-content:center;margin-top:8px";
         const hints = ["Dance tune", "Fiddle jig", "Nice melody", "Fun song", "Simple canon"];
         hints.forEach(hintText => {
             const hint = document.createElement("span");
             hint.textContent = hintText;
-            hint.style.marginRight = "20px";
-            hint.style.cursor = "pointer";
-            hint.style.marginRight = "4px";
-            hint.style.fontSize = "20px";
-            hint.style.color = "blue";
-            hint.style.backgroundColor = "rgb(227 162 162 / 80%)"; // Light white background
-            hint.style.padding = "10px"; // Add padding for spacing
-            hint.style.borderRadius = "5px"; // Optional: Rounded corners
+            hint.style.cssText =
+                "cursor:pointer;margin-right:4px;font-size:20px;color:blue;" +
+                "background-color:rgb(227 162 162 / 80%);padding:10px;border-radius:5px";
 
             hint.onclick = function () {
                 inputField.value = hintText;
@@ -1112,12 +1072,9 @@ function AIWidget() {
         inputField.type = "text";
         inputField.className = "inputField";
         inputField.placeholder = "Enter text here";
-        inputField.style.fontSize = "20px";
-        inputField.style.marginRight = "2px";
-        inputField.style.marginLeft = "64px";
-        inputField.style.padding = "10px";
-        inputField.style.marginBottom = "10px";
-        inputField.style.width = "60%";
+        inputField.style.cssText =
+            "font-size:20px;margin-right:2px;margin-left:64px;" +
+            "padding:10px;margin-bottom:10px;width:60%";
         container.appendChild(inputField);
 
         inputField.addEventListener("click", function () {
@@ -1135,6 +1092,14 @@ function AIWidget() {
         submitButton.onclick = function () {
             const inputText = inputField.value.trim();
             if (inputText === "") {
+                return;
+            }
+
+            const apiKey = that.activity.storage.groq_api_key;
+            if (!apiKey) {
+                alert(
+                    _("Please set your Groq API Key using the settings button (wrench icon) first.")
+                );
                 return;
             }
 
@@ -1175,7 +1140,7 @@ function AIWidget() {
                         content: prompt_eng
                     }
                 ],
-                model: "llama3-8b-8192"
+                model: "llama-3.1-8b-instant"
             });
 
             submitButton.disabled = true;
@@ -1185,23 +1150,41 @@ function AIWidget() {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${env.GROQ_API_KEY}` // Replace with your actual API key
+                    "Authorization": `Bearer ${apiKey}`
                 },
                 body: requestBody
             })
                 .then(response => response.json())
                 .then(data => {
-                    const responseText = data.choices[0].message?.content || "";
-                    const abcStartIndex = responseText.indexOf("X:");
-
-                    let abcNotation = responseText.substring(abcStartIndex);
-
-                    const closingBraceIndex = abcNotation.indexOf("}");
-                    if (closingBraceIndex !== -1) {
-                        abcNotation = abcNotation.substring(0, closingBraceIndex + 1);
-                    } else {
-                        console.warn("No closing brace found in the response.");
+                    if (data.error) {
+                        textarea.value = "Groq API Error: " + data.error.message;
+                        return;
                     }
+
+                    if (!data.choices || data.choices.length === 0) {
+                        textarea.value = "Error: Unexpected response format from AI.";
+                        return;
+                    }
+
+                    let responseText = data.choices[0].message?.content || "";
+
+                    // Robustly strip markdown code blocks and JSON wrappers
+                    responseText = responseText
+                        .replace(/```[a-z]*\n?/gi, "")
+                        .replace(/```/g, "")
+                        .trim();
+                    if (responseText.startsWith("{") && responseText.includes('"abc":')) {
+                        try {
+                            const parsed = JSON.parse(responseText);
+                            responseText = parsed.abc || responseText;
+                        } catch (e) {
+                            // Fallback to substring search if JSON parse fails
+                        }
+                    }
+
+                    const abcStartIndex = responseText.indexOf("X:");
+                    let abcNotation =
+                        abcStartIndex !== -1 ? responseText.substring(abcStartIndex) : responseText;
 
                     abcNotation = abcNotation.replace(/"|\}/g, "").trim();
 
@@ -1245,5 +1228,98 @@ function AIWidget() {
         textarea.addEventListener("input", function () {
             abcNotationSong = textarea.value;
         });
+
+        // Single DOM append — all elements are now in the fragment
+        this.widgetWindow.getWidgetBody().appendChild(fragment);
+    };
+}
+
+function adjustPitch(note, keySignature) {
+    const accidental = keySignature.accidentals.find(acc => {
+        const noteToCompare = acc.note.toUpperCase().replace(",", "");
+        note = note.replace(",", "");
+        return noteToCompare.toLowerCase() === note.toLowerCase();
+    });
+
+    if (accidental) {
+        return note + (accidental.acc === "sharp" ? "♯" : accidental.acc === "flat" ? "♭" : "");
+    } else {
+        return note;
+    }
+}
+
+//when converting to pitch value from abc to mb there is issue with the pithc standard comming out to be odd, using below function map the pitch to audible pitch
+function abcToStandardValue(pitchValue) {
+    const octave = Math.floor(pitchValue / 7) + 4;
+    return octave;
+}
+
+//creates  pitch which consist of note pitch notename you could see them in the function
+function createPitchBlocks(
+    pitches,
+    blockId,
+    pitchDuration,
+    keySignature,
+    actionBlock,
+    triplet,
+    meterDen
+) {
+    const blocks = [];
+
+    const pitch = pitches;
+    pitchDuration = toFraction(pitchDuration);
+    const adjustedNote = adjustPitch(pitch.name, keySignature).toUpperCase();
+    if (triplet !== null) {
+        pitchDuration[1] = meterDen * triplet;
+    }
+
+    actionBlock.push(
+        [
+            blockId,
+            ["newnote", { collapsed: true }],
+            0,
+            0,
+            [blockId - 1, blockId + 1, blockId + 4, blockId + 8]
+        ],
+        [blockId + 1, "divide", 0, 0, [blockId, blockId + 2, blockId + 3]],
+        [blockId + 2, ["number", { value: pitchDuration[0] }], 0, 0, [blockId + 1]],
+        [blockId + 3, ["number", { value: pitchDuration[1] }], 0, 0, [blockId + 1]],
+        [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]],
+        [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
+        [blockId + 6, ["notename", { value: adjustedNote }], 0, 0, [blockId + 5]],
+        [blockId + 7, ["number", { value: abcToStandardValue(pitch.pitch) }], 0, 0, [blockId + 5]],
+        [blockId + 8, "hidden", 0, 0, [blockId, blockId + 9]]
+    );
+
+    return blocks;
+}
+
+// Fast index lookup — builds a one-time Map for O(1) repeated searches
+// on the same array, with a transparent fallback to linear scan.
+const _indexMaps = new WeakMap();
+function searchIndexForMusicBlock(array, x) {
+    let map = _indexMaps.get(array);
+    // Cache an index map on the array using WeakMap to convert O(n) array scanning
+    // into O(1) map lookups. Rebuild the map if the array length changes.
+    if (!map || array.length !== map.size) {
+        map = new Map();
+        for (let i = 0; i < array.length; i++) {
+            if (array[i] && array[i][0] !== undefined) {
+                map.set(array[i][0], i);
+            }
+        }
+        _indexMaps.set(array, map);
+    }
+    const index = map.get(x);
+    return index !== undefined ? index : -1;
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        AIWidget,
+        adjustPitch,
+        abcToStandardValue,
+        createPitchBlocks,
+        searchIndexForMusicBlock
     };
 }

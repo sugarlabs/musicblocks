@@ -13,12 +13,12 @@
 /*
    global
 
-   _, last, Tone, require, getTemperament, pitchToNumber,
+   last, Tone, getTemperament, pitchToNumber,
    getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
    getOctaveRatio, isCustomTemperament, Singer, DOUBLEFLAT, DOUBLESHARP,
    DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
    getArticulation, piemenuPitches, docById, slicePath, wheelnav, platformColor,
-   DEFAULTVOICE
+   DEFAULTVOICE, normalizeNoteAccidentals
 */
 
 /*
@@ -48,11 +48,13 @@
 
 /**
  * The number of voices in polyphony.
+ * Raised from 3 to 6 to prevent voice exhaustion and audio engine crashes
+ * during infinite-loop playback with chords or multiple turtles.
  * @constant
  * @type {number}
- * @default 3
+ * @default 6
  */
-const POLYCOUNT = 3;
+const POLYCOUNT = 6;
 
 /**
  * Array of names and details for various noise synthesizers.
@@ -497,7 +499,6 @@ function Synth() {
     this.tone = null;
 
     Tone.Buffer.onload = () => {
-        // eslint-disable-next-line no-console
         console.debug("sample loaded");
     };
     /**
@@ -550,6 +551,21 @@ function Synth() {
      * @type {function|null}
      */
     this.detectPitch = null;
+    /**
+     * Flag to track whether tuner update loop is active.
+     * @type {boolean}
+     */
+    this._tunerActive = false;
+    /**
+     * Animation frame id for the tuner update loop.
+     * @type {number|null}
+     */
+    this._tunerRafId = null;
+    /**
+     * Cached tuner segments to avoid querying on every frame.
+     * @type {NodeList|null}
+     */
+    this._tunerSegments = null;
 
     /**
      * Function to initialize a new Tone.js instance.
@@ -576,6 +592,10 @@ function Synth() {
     this.temperamentChanged = (temperament, startingPitch) => {
         let startPitch = startingPitch;
         const t = getTemperament(temperament);
+        if (!t) {
+            console.error("Temperament not found: " + temperament);
+            return;
+        }
         const len = startPitch.length;
         const number = pitchToNumber(
             startPitch.substring(0, len - 1),
@@ -596,102 +616,29 @@ function Synth() {
 
         const frequency = Tone.Frequency(startPitch).toFrequency();
 
-        // Cache getNoteFromInterval results to avoid duplicate calls (performance optimization)
-        const intervalCache = {
-            "minor 2": getNoteFromInterval(startingPitch, "minor 2"),
-            "augmented 1": getNoteFromInterval(startingPitch, "augmented 1"),
-            "major 2": getNoteFromInterval(startingPitch, "major 2"),
-            "minor 3": getNoteFromInterval(startingPitch, "minor 3"),
-            "augmented 2": getNoteFromInterval(startingPitch, "augmented 2"),
-            "major 3": getNoteFromInterval(startingPitch, "major 3"),
-            "augmented 3": getNoteFromInterval(startingPitch, "augmented 3"),
-            "diminished 4": getNoteFromInterval(startingPitch, "diminished 4"),
-            "perfect 4": getNoteFromInterval(startingPitch, "perfect 4"),
-            "augmented 4": getNoteFromInterval(startingPitch, "augmented 4"),
-            "diminished 5": getNoteFromInterval(startingPitch, "diminished 5"),
-            "perfect 5": getNoteFromInterval(startingPitch, "perfect 5"),
-            "augmented 5": getNoteFromInterval(startingPitch, "augmented 5"),
-            "minor 6": getNoteFromInterval(startingPitch, "minor 6"),
-            "major 6": getNoteFromInterval(startingPitch, "major 6"),
-            "augmented 6": getNoteFromInterval(startingPitch, "augmented 6"),
-            "minor 7": getNoteFromInterval(startingPitch, "minor 7"),
-            "major 7": getNoteFromInterval(startingPitch, "major 7"),
-            "augmented 7": getNoteFromInterval(startingPitch, "augmented 7"),
-            "diminished 8": getNoteFromInterval(startingPitch, "diminished 8"),
-            "perfect 8": getNoteFromInterval(startingPitch, "perfect 8")
-        };
-
         this.noteFrequencies = {
             // note: [octave, Frequency]
-            [startingPitch.substring(0, len - 1)]: [Number(startingPitch.slice(-1)), frequency],
-            [intervalCache["minor 2"][0]]: [intervalCache["minor 2"][1], t["minor 2"] * frequency],
-            [intervalCache["augmented 1"][0]]: [
-                intervalCache["augmented 1"][1],
-                t["augmented 1"] * frequency
-            ],
-            [intervalCache["major 2"][0]]: [intervalCache["major 2"][1], t["major 2"] * frequency],
-            [intervalCache["minor 3"][0]]: [intervalCache["minor 3"][1], t["minor 3"] * frequency],
-            [intervalCache["augmented 2"][0]]: [
-                intervalCache["augmented 2"][1],
-                t["augmented 2"] * frequency
-            ],
-            [intervalCache["major 3"][0]]: [intervalCache["major 3"][1], t["major 3"] * frequency],
-            [intervalCache["augmented 3"][0]]: [
-                intervalCache["augmented 3"][1],
-                t["augmented 3"] * frequency
-            ],
-            [intervalCache["diminished 4"][0]]: [
-                intervalCache["diminished 4"][1],
-                t["diminished 4"] * frequency
-            ],
-            [intervalCache["perfect 4"][0]]: [
-                intervalCache["perfect 4"][1],
-                t["perfect 4"] * frequency
-            ],
-            [intervalCache["augmented 4"][0]]: [
-                intervalCache["augmented 4"][1],
-                t["augmented 4"] * frequency
-            ],
-            [intervalCache["diminished 5"][0]]: [
-                intervalCache["diminished 5"][1],
-                t["diminished 5"] * frequency
-            ],
-            [intervalCache["perfect 5"][0]]: [
-                intervalCache["perfect 5"][1],
-                t["perfect 5"] * frequency
-            ],
-            [intervalCache["augmented 5"][0]]: [
-                intervalCache["augmented 5"][1],
-                t["augmented 5"] * frequency
-            ],
-            [intervalCache["minor 6"][0]]: [intervalCache["minor 6"][1], t["minor 6"] * frequency],
-            [intervalCache["major 6"][0]]: [intervalCache["major 6"][1], t["major 6"] * frequency],
-            [intervalCache["augmented 6"][0]]: [
-                intervalCache["augmented 6"][1],
-                t["augmented 6"] * frequency
-            ],
-            [intervalCache["minor 7"][0]]: [intervalCache["minor 7"][1], t["minor 7"] * frequency],
-            [intervalCache["major 7"][0]]: [intervalCache["major 7"][1], t["major 7"] * frequency],
-            [intervalCache["augmented 7"][0]]: [
-                intervalCache["augmented 7"][1],
-                t["augmented 7"] * frequency
-            ],
-            [intervalCache["diminished 8"][0]]: [
-                intervalCache["diminished 8"][1],
-                t["diminished 8"] * frequency
-            ],
-            [intervalCache["perfect 8"][0]]: [
-                intervalCache["perfect 8"][1],
-                t["perfect 8"] * frequency
-            ]
+            [startingPitch.substring(0, len - 1)]: [Number(startingPitch.slice(-1)), frequency]
         };
+
+        for (const interval in t) {
+            if (
+                interval !== "pitchNumber" &&
+                interval !== "interval" &&
+                interval !== "octave" &&
+                typeof t[interval] === "number"
+            ) {
+                const noteInfo = getNoteFromInterval(startingPitch, interval);
+                this.noteFrequencies[noteInfo[0]] = [noteInfo[1], t[interval] * frequency];
+            }
+        }
 
         for (const key in this.noteFrequencies) {
             let note;
             if (key.substring(1, key.length) === FLAT || key.substring(1, key.length) === "b") {
                 note = key.substring(0, 1) + "" + "b";
                 this.noteFrequencies[note] = this.noteFrequencies[key];
-                // eslint-disable-next-line no-delete-var
+
                 delete this.noteFrequencies[key];
             } else if (
                 key.substring(1, key.length) === SHARP ||
@@ -699,7 +646,7 @@ function Synth() {
             ) {
                 note = key.substring(0, 1) + "" + "#";
                 this.noteFrequencies[note] = this.noteFrequencies[key];
-                // eslint-disable-next-line no-delete-var
+
                 delete this.noteFrequencies[key];
             }
         }
@@ -867,13 +814,11 @@ function Synth() {
         this.tone.context.resume();
     };
 
-    /*eslint-disable no-undef*/
     /**
      * Function to load samples.
      * @function
      */
     this.loadSamples = () => {
-        /*eslint-disable no-prototype-builtins*/
         if (this.samples === null) {
             this.samples = { voice: {}, drum: {} };
             // Pre-populate with null to indicate they exist as valid instruments but are not loaded
@@ -929,7 +874,6 @@ function Synth() {
             // Load the sample module using require
             require([sampleInfo.path], () => {
                 try {
-                    // eslint-disable-next-line no-undef
                     const sampleData = window[sampleInfo.global];
                     if (sampleData) {
                         this.samples[sampleType][sampleName] = sampleData();
@@ -944,6 +888,9 @@ function Synth() {
                     console.error(`Error processing sample ${sampleName}:`, e);
                     reject(e);
                 }
+            }, err => {
+                console.error(`Failed to load sample module for ${sampleName}:`, err);
+                reject(err);
             });
         });
     };
@@ -1095,12 +1042,36 @@ function Synth() {
             }
             chunks = [];
             const url = URL.createObjectURL(blob);
-            // Prompt the user for the file name
-            const fileName = window.prompt("Enter file name", "recording");
-            if (fileName) {
-                download(url, fileName + (platform.FF ? ".wav" : ".ogg"));
+            const t = text => (typeof window._ === "function" ? window._(text) : text);
+            const ext = platform.FF ? ".wav" : ".ogg";
+            const showCancelMessage = () => {
+                if (window.MBDialog && typeof window.MBDialog.alert === "function") {
+                    window.MBDialog.alert(t("Download cancelled."), t("Save recording"));
+                } else {
+                    alert(t("Download cancelled."));
+                }
+            };
+            const finishDownload = name => {
+                if (name === null || name.trim() === "") {
+                    showCancelMessage();
+                    return;
+                }
+
+                download(url, name + ext);
+            };
+
+            if (window.MBDialog && typeof window.MBDialog.prompt === "function") {
+                window.MBDialog.prompt({
+                    title: t("Save recording"),
+                    message: t("Filename:"),
+                    defaultValue: t("recording"),
+                    okText: t("Save"),
+                    cancelText: t("Cancel")
+                }).then(result => finishDownload(result));
             } else {
-                alert("Download cancelled.");
+                // Fallback to browser prompt if MBDialog is not available.
+                const fileName = window.prompt(t("Enter file name"), t("recording"));
+                finishDownload(fileName);
             }
         };
         // this.recorder.start();
@@ -1306,7 +1277,6 @@ function Synth() {
      * @param {string} turtle - The turtle identifier.
      */
     this.createDefaultSynth = turtle => {
-        // eslint-disable-next-line no-console
         console.debug("create default poly/default/custom synth for turtle " + turtle);
         const default_synth = new Tone.PolySynth(Tone.AMSynth, POLYCOUNT).toDestination();
         instruments[turtle]["electronic synth"] = default_synth;
@@ -1406,12 +1376,9 @@ function Synth() {
         } else if (fragment in letterDict) {
             chromaticNumber = letterDict[fragment];
         } else {
-            // eslint-disable-next-line no-console
             console.debug("Cannot parse " + fragment);
         }
         const pitchNumber = octave * 12 + chromaticNumber + attr;
-        // eslint-disable-next-line no-console
-        console.log(solfege + octave + " = " + pitchNumber);
         return pitchNumber.toString();
     };
 
@@ -1653,6 +1620,39 @@ function Synth() {
     };
 
     /**
+     * Resolves an instrument/drum/noise name (which might be a translated label)
+     * to its internal technical key.
+     * @param {string} name - The name to resolve.
+     * @returns {string} The resolved internal key.
+     */
+    this.resolveInstrumentName = name => {
+        if (!name || typeof name !== "string") return name;
+
+        // 1. Check VoiceNames
+        for (let i = 0; i < VOICENAMES.length; i++) {
+            if (VOICENAMES[i][0] === name || VOICENAMES[i][1] === name) {
+                return VOICENAMES[i][1];
+            }
+        }
+
+        // 2. Check DrumNames
+        for (let i = 0; i < DRUMNAMES.length; i++) {
+            if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1] === name) {
+                return DRUMNAMES[i][1];
+            }
+        }
+
+        // 3. Check NoiseNames
+        for (let i = 0; i < NOISENAMES.length; i++) {
+            if (NOISENAMES[i][0] === name || NOISENAMES[i][1] === name) {
+                return NOISENAMES[i][1];
+            }
+        }
+
+        return name; // Fallback to original (e.g. custom sample URL)
+    };
+
+    /**
      * Loads a synth based on the user's input, creating and setting volume for the specified turtle.
      * @function
      * @memberof Synth
@@ -1662,6 +1662,7 @@ function Synth() {
      */
     this.loadSynth = async (turtle, sourceName) => {
         /* eslint-disable */
+        sourceName = this.resolveInstrumentName(sourceName);
         if (sourceName.substring(0, 13) === "customsample_") {
             console.debug("loading custom " + sourceName);
         } else {
@@ -1737,17 +1738,73 @@ function Synth() {
         let numFilters;
         const temp_filters = [];
         const effectsToDispose = [];
+        const epoch = this._instrumentEpoch;
 
         try {
             if (paramsEffects === null && paramsFilters === null) {
                 // See https://github.com/sugarlabs/musicblocks/issues/2951
                 try {
                     await Tone.ToneAudioBuffer.loaded();
+                    if (this._instrumentEpoch !== epoch) return;
                     synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
                 } catch (e) {
                     console.debug("Error triggering note:", e);
                 }
             } else {
+                // ── Perf fix: fast-path for notes with no real graph-level effect nodes ──
+                // doPartials and doPortamento only mutate synth properties in-place and
+                // do NOT require new audio graph nodes.  Skipping disconnect/reconnect
+                // for every plain note eliminates per-note audio-graph rewiring, which
+                // is the primary cause of buffer underruns in long/infinite sessions.
+                const _needsGraphRewire =
+                    (paramsFilters !== null &&
+                        paramsFilters !== undefined &&
+                        paramsFilters.length > 0) ||
+                    (paramsEffects !== null &&
+                        paramsEffects !== undefined &&
+                        (paramsEffects.doVibrato ||
+                            paramsEffects.doDistortion ||
+                            paramsEffects.doTremolo ||
+                            paramsEffects.doPhaser ||
+                            paramsEffects.doChorus ||
+                            paramsEffects.doNeighbor));
+
+                if (!_needsGraphRewire) {
+                    // Apply in-place property mutations then take the fast path.
+                    if (paramsEffects !== null && paramsEffects !== undefined) {
+                        if (paramsEffects.doPartials) {
+                            if (synth.oscillator !== undefined) {
+                                synth.oscillator.partials = paramsEffects.partials;
+                            } else if (synth.voices !== undefined) {
+                                for (let i = 0; i < synth.voices.length; i++) {
+                                    if (synth.voices[i].oscillator) {
+                                        synth.voices[i].oscillator.partials =
+                                            paramsEffects.partials;
+                                    }
+                                }
+                            }
+                        }
+                        if (paramsEffects.doPortamento) {
+                            if (synth.oscillator !== undefined) {
+                                synth.portamento = paramsEffects.portamento;
+                            } else if (synth.voices !== undefined) {
+                                for (let i = 0; i < synth.voices.length; i++) {
+                                    synth.voices[i].portamento = paramsEffects.portamento;
+                                }
+                            }
+                        }
+                    }
+                    try {
+                        await Tone.ToneAudioBuffer.loaded();
+                        if (this._instrumentEpoch !== epoch) return;
+                        synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
+                    } catch (e) {
+                        console.debug("Error triggering note (no-graph-rewire fast path):", e);
+                    }
+                    return;
+                }
+                // ─────────────────────────────────────────────────────────────────────
+
                 // Remove the dry path so effects are routed serially, not in parallel
                 synth.disconnect(Tone.Destination);
                 const chainNodes = [];
@@ -1851,12 +1908,12 @@ function Synth() {
                         // for each note.
                         const obj = [];
                         for (let i = 0; i < paramsEffects["neighborArgNote1"].length; i++) {
-                            const note1 = paramsEffects["neighborArgNote1"][i]
-                                .replace("♯", "#")
-                                .replace("♭", "b");
-                            const note2 = paramsEffects["neighborArgNote2"][i]
-                                .replace("♯", "#")
-                                .replace("♭", "b");
+                            const note1 = normalizeNoteAccidentals(
+                                paramsEffects["neighborArgNote1"][i]
+                            );
+                            const note2 = normalizeNoteAccidentals(
+                                paramsEffects["neighborArgNote2"][i]
+                            );
                             obj.push(
                                 { time: 0, note: note1, duration: firstTwoBeats },
                                 { time: firstTwoBeats, note: note2, duration: firstTwoBeats },
@@ -1885,35 +1942,49 @@ function Synth() {
                     } else {
                         try {
                             await Tone.ToneAudioBuffer.loaded();
-                            synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
+                            if (this._instrumentEpoch === epoch) {
+                                synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
+                            }
                         } catch (e) {
                             console.debug("Error triggering note:", e);
                         }
                     }
                 }
 
-                // Schedule cleanup after the note duration
-                setTimeout(() => {
-                    try {
-                        // Dispose of effects
-                        effectsToDispose.forEach(effect => {
-                            if (effect && typeof effect.dispose === "function") {
-                                effect.dispose();
-                            }
-                        });
-
-                        // Dispose of filters
-                        if (temp_filters.length > 0) {
-                            temp_filters.forEach(filter => {
-                                if (filter && typeof filter.dispose === "function") {
-                                    filter.dispose();
+                // Schedule cleanup after the note duration.
+                // A 500 ms safety buffer is added beyond the note duration to prevent
+                // premature disposal caused by audio-clock drift or scheduler jitter,
+                // which would otherwise produce crackling artefacts in long sessions.
+                setTimeout(
+                    () => {
+                        try {
+                            // Dispose of effects
+                            effectsToDispose.forEach(effect => {
+                                if (effect && typeof effect.dispose === "function") {
+                                    effect.dispose();
                                 }
                             });
+
+                            // Dispose of filters
+                            if (temp_filters.length > 0) {
+                                temp_filters.forEach(filter => {
+                                    if (filter && typeof filter.dispose === "function") {
+                                        filter.dispose();
+                                    }
+                                });
+                            }
+
+                            // Re-establish the dry path so subsequent notes
+                            // that do not use effects still reach the speakers.
+                            if (synth && typeof synth.toDestination === "function") {
+                                synth.toDestination();
+                            }
+                        } catch (e) {
+                            console.debug("Error disposing effects:", e);
                         }
-                    } catch (e) {
-                        console.debug("Error disposing effects:", e);
-                    }
-                }, beatValue * 1000);
+                    },
+                    beatValue * 1000 + 500
+                );
             }
         } catch (e) {
             console.error("Error in _performNotes:", e);
@@ -1928,6 +1999,11 @@ function Synth() {
                     filter.dispose();
                 }
             });
+
+            // Re-establish the dry path on error as well.
+            if (synth && typeof synth.toDestination === "function") {
+                synth.toDestination();
+            }
         }
     };
 
@@ -1980,6 +2056,9 @@ function Synth() {
         setNote,
         future
     ) => {
+        // Capture the current instrument epoch to detect disposal during async operations
+        const epoch = this._instrumentEpoch;
+
         // If audio is not running, try to start it
         if (Tone.context.state !== "running") {
             Tone.start().catch(function (e) {
@@ -1992,7 +2071,9 @@ function Synth() {
                 if (Tone.context.state !== "running" && !window.hasShownAudioWarning) {
                     window.hasShownAudioWarning = true;
                     alert(
-                        "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
+                        _(
+                            "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
+                        )
                     );
                 }
             }, 2000);
@@ -2068,7 +2149,18 @@ function Synth() {
                 console.warn("Synth not initialized, creating default synth");
                 this.createDefaultSynth(turtle);
                 await this.loadSynth(turtle, instrumentName);
+
+                // Check if instruments were disposed while we were waiting
+                if (this._instrumentEpoch !== epoch) {
+                    return; // Exit gracefully - instruments were disposed
+                }
+
                 tempSynth = instruments[turtle][instrumentName];
+            }
+
+            // Final validation: ensure synth still exists and is valid
+            if (!tempSynth || !instruments[turtle] || !instruments[turtle][instrumentName]) {
+                return; // Exit gracefully - synth is no longer available
             }
 
             switch (flag) {
@@ -2143,6 +2235,7 @@ function Synth() {
     };
 
     this.startSound = (turtle, instrumentName, note) => {
+        if (!instrumentsSource[instrumentName] || !instruments[turtle]?.[instrumentName]) return;
         const flag = instrumentsSource[instrumentName][0];
         switch (flag) {
             case 1: // drum
@@ -2155,6 +2248,7 @@ function Synth() {
     };
 
     this.stopSound = (turtle, instrumentName, note) => {
+        if (!instrumentsSource[instrumentName] || !instruments[turtle]?.[instrumentName]) return;
         const flag = instrumentsSource[instrumentName][0];
         switch (flag) {
             case 1: // drum
@@ -2171,6 +2265,8 @@ function Synth() {
     };
 
     this.loop = (turtle, instrumentName, note, duration, start, bpm, velocity) => {
+        if (!instrumentsSource[instrumentName] || !instruments[turtle]?.[instrumentName])
+            return null;
         const synthA = instruments[turtle][instrumentName];
         const flag = instrumentsSource[instrumentName][0];
         const now = Tone.now();
@@ -2221,7 +2317,6 @@ function Synth() {
             synth = instruments[turtle][instrumentName];
         }
 
-        // eslint-disable-next-line no-console
         console.debug(
             "Crescendo(decibels)",
             instrumentName,
@@ -2232,7 +2327,7 @@ function Synth() {
             "t:",
             rampTime
         );
-        // eslint-disable-next-line no-console
+
         console.debug("Crescendo", instrumentName, ":", oldVol, "to", volume, "t:", rampTime);
 
         synth.volume.linearRampToValueAtTime(db, Tone.now() + rampTime);
@@ -2262,6 +2357,8 @@ function Synth() {
      * @param {number} volume - The volume level (0 to 100).
      */
     this.setVolume = (turtle, instrumentName, volume) => {
+        // Resolve instrumentName to internal key
+        instrumentName = this.resolveInstrumentName(instrumentName);
         // guard invalid UI/programmatic input (audio boundary safety)
         volume = Math.max(0, Math.min(volume, 100));
         // We pass in volume as a number from 0 to 100.
@@ -2333,13 +2430,46 @@ function Synth() {
         await this.mic
             .open()
             .then(() => {
-                console.log("Mic opened");
                 this.mic.connect(this.recorder);
                 this.recorder.start();
             })
             .catch(error => {
-                console.log(error);
+                console.error(error);
             });
+    };
+
+    const _disposeRecordingPlayer = () => {
+        if (this.player) {
+            try {
+                if (typeof this.player.stop === "function") {
+                    this.player.stop();
+                }
+            } catch (e) {
+                console.debug("Error stopping recording player:", e);
+            }
+
+            try {
+                if (typeof this.player.dispose === "function") {
+                    this.player.dispose();
+                }
+            } catch (e) {
+                console.debug("Error disposing recording player:", e);
+            }
+
+            this.player = null;
+        }
+    };
+
+    const _revokeRecordingURL = () => {
+        if (this.audioURL) {
+            try {
+                URL.revokeObjectURL(this.audioURL);
+            } catch (e) {
+                console.debug("Error revoking recording URL:", e);
+            }
+
+            this.audioURL = null;
+        }
     };
 
     /**
@@ -2348,6 +2478,8 @@ function Synth() {
      * @memberof Synth
      */
     this.stopRecording = async () => {
+        _disposeRecordingPlayer();
+        _revokeRecordingURL();
         this.recording = await this.recorder.stop();
         this.mic.close();
         this.audioURL = URL.createObjectURL(this.recording);
@@ -2360,6 +2492,7 @@ function Synth() {
      * @memberof Synth
      */
     this.playRecording = async () => {
+        _disposeRecordingPlayer();
         this.player = new Tone.Player().toDestination();
         await this.player.load(this.audioURL);
         this.player.start();
@@ -2371,7 +2504,7 @@ function Synth() {
      * @memberof Synth
      */
     this.stopPlayBackRecording = () => {
-        this.player.stop();
+        _disposeRecordingPlayer();
     };
 
     /**
@@ -2415,7 +2548,6 @@ function Synth() {
             // In practice this runs in the browser; keep a safe fallback for tests.
             try {
                 if (typeof module !== "undefined" && module.exports) {
-                    // eslint-disable-next-line global-require
                     const ctx = require("../activity-context");
                     if (ctx && typeof ctx.getActivity === "function") {
                         return ctx.getActivity();
@@ -2485,6 +2617,12 @@ function Synth() {
 
         this.tunerAnalyser = new Tone.Analyser("waveform", 2048);
         this.tunerMic.connect(this.tunerAnalyser);
+        this._tunerActive = true;
+        this._tunerSegments = null;
+        if (this._tunerRafId !== null && typeof cancelAnimationFrame === "function") {
+            cancelAnimationFrame(this._tunerRafId);
+        }
+        this._tunerRafId = null;
 
         const YIN = (sampleRate, bufferSize = 2048, threshold = 0.1) => {
             // Low-Pass Filter to remove high-frequency noise
@@ -2566,6 +2704,15 @@ function Synth() {
         let targetPitch = { note: "A4", frequency: 440 }; // Default target pitch
 
         const updatePitch = () => {
+            if (!this._tunerActive) return;
+
+            const tunerContainer = document.getElementById("tunerContainer");
+            if (!tunerContainer || !this.tunerAnalyser || !this.detectPitch) {
+                this._tunerActive = false;
+                this._tunerRafId = null;
+                return;
+            }
+
             const buffer = this.tunerAnalyser.getValue();
             const pitch = this.detectPitch(buffer);
 
@@ -2583,14 +2730,6 @@ function Synth() {
                     // Target pitch mode
                     // Show current note in display but calculate cents from target
                     note = currentNote.note; // Show the current note being played
-
-                    // Debug logging
-                    console.log("Debug values:", {
-                        detectedPitch: pitch,
-                        targetNote: targetPitch.note,
-                        targetFrequency: targetPitch.frequency,
-                        currentNote: note
-                    });
 
                     // Ensure we have valid frequencies before calculation
                     if (pitch > 0 && targetPitch.frequency > 0) {
@@ -2632,17 +2771,8 @@ function Synth() {
                     }
                 }
 
-                // Debug logging
-                console.log({
-                    frequency: pitch.toFixed(1),
-                    detectedNote: note,
-                    centsDeviation: cents,
-                    mode: tunerMode
-                });
-
                 // Initialize display elements if they don't exist
                 let noteDisplayContainer = document.getElementById("noteDisplayContainer");
-                const tunerContainer = document.getElementById("tunerContainer");
 
                 if (!noteDisplayContainer && tunerContainer) {
                     // Create container
@@ -2939,12 +3069,6 @@ function Synth() {
 
                                         targetPitch.frequency = freq;
 
-                                        // Debug logging
-                                        console.log("Target pitch updated:", {
-                                            note: noteWithOctave,
-                                            frequency: targetPitch.frequency
-                                        });
-
                                         // Validate frequency
                                         if (
                                             isNaN(targetPitch.frequency) ||
@@ -3143,7 +3267,11 @@ function Synth() {
                 }
 
                 // Update tuner segments
-                const tunerSegments = document.querySelectorAll("#tunerContainer svg path");
+                let tunerSegments = this._tunerSegments;
+                if (!tunerSegments || tunerSegments.length === 0 || !tunerSegments[0].isConnected) {
+                    tunerSegments = tunerContainer.querySelectorAll("svg path");
+                    this._tunerSegments = tunerSegments;
+                }
 
                 // Define colors for the gradient
                 const colors = {
@@ -3299,16 +3427,25 @@ function Synth() {
                 });
             }
 
-            requestAnimationFrame(updatePitch);
+            if (this._tunerActive && typeof requestAnimationFrame === "function") {
+                this._tunerRafId = requestAnimationFrame(updatePitch);
+            }
         };
 
         updatePitch();
     };
 
     this.stopTuner = () => {
+        this._tunerActive = false;
+        if (this._tunerRafId !== null && typeof cancelAnimationFrame === "function") {
+            cancelAnimationFrame(this._tunerRafId);
+        }
+        this._tunerRafId = null;
+        this._tunerSegments = null;
         if (this.tunerMic) {
             this.tunerMic.close();
         }
+        this.tunerAnalyser = null;
     };
 
     const frequencyToNote = frequency => {
@@ -3525,6 +3662,10 @@ function Synth() {
      * @returns {void}
      */
     this.disposeAllInstruments = () => {
+        this._instrumentEpoch++;
+        _disposeRecordingPlayer();
+        _revokeRecordingURL();
+
         for (const turtle in instruments) {
             for (const instrumentName in instruments[turtle]) {
                 if (
@@ -3578,9 +3719,13 @@ function Synth() {
         }
     };
 
+    this._instrumentEpoch = 0;
     this.tone = null;
     this.noteFrequencies = {};
     this.startingPitch = "C4";
+    this.audioURL = null;
+    this.player = null;
+    this.recording = null;
     this.startingPitchOctave = 4;
     this.octaveTranspose = 0;
     this.inTemperament = "equal";

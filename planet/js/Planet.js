@@ -12,7 +12,7 @@
 /*
    global
 
-   setCookie, getCookie, StringHelper, ProjectStorage, ServerInterface,
+   _, setCookie, getCookie, StringHelper, ProjectStorage, ServerInterface,
    Converter, SaveInterface, LocalPlanet, GlobalPlanet
 */
 /*
@@ -55,7 +55,7 @@ class Planet {
 
     open(image) {
         if (this.LocalPlanet === null) {
-            console.log("Local Planet unavailable");
+            console.warn("Local Planet unavailable");
         } else {
             this.LocalPlanet.setCurrentProjectImage(image);
             this.LocalPlanet.updateProjects();
@@ -95,6 +95,106 @@ class Planet {
         this.GlobalPlanet.openGlobalProject(id, error);
     }
 
+    showNewProjectConfirmation() {
+        // Remove existing confirmation if one is already open
+        const existing = document.getElementById("new-project-confirmation");
+        if (existing) existing.remove();
+
+        // Use platformColor from the parent window for theme-aware colors
+        const colors = window.parent.platformColor;
+
+        // Overlay to block interaction behind the modal
+        const overlay = document.createElement("div");
+        overlay.id = "new-project-confirmation";
+        overlay.style.position = "fixed";
+        overlay.style.top = "0";
+        overlay.style.left = "0";
+        overlay.style.width = "100%";
+        overlay.style.height = "100%";
+        overlay.style.backgroundColor = "rgba(0, 0, 0, 0.4)";
+        overlay.style.zIndex = "9999";
+        overlay.style.display = "flex";
+        overlay.style.alignItems = "center";
+        overlay.style.justifyContent = "center";
+
+        // Modal container
+        const modal = document.createElement("div");
+        modal.style.borderRadius = "8px";
+        modal.style.padding = "24px";
+        modal.style.width = "400px";
+        modal.style.maxWidth = "90%";
+        modal.style.textAlign = "left";
+        modal.style.fontFamily = "sans-serif";
+        modal.style.backgroundColor = colors.dialogueBox;
+        modal.style.color = colors.textColor;
+        modal.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.3)";
+
+        // Title
+        const title = document.createElement("h4");
+        title.textContent = _("New Project");
+        title.style.fontSize = "24px";
+        title.style.margin = "0 0 16px 0";
+        title.style.color = colors.textColor;
+        modal.appendChild(title);
+
+        // Message
+        const message = document.createElement("p");
+        message.textContent = _("Unsaved changes will be lost. Are you sure?");
+        message.style.fontSize = "16px";
+        message.style.marginBottom = "24px";
+        message.style.color = colors.textColor;
+        modal.appendChild(message);
+
+        // Button container
+        const buttonContainer = document.createElement("div");
+        buttonContainer.style.display = "flex";
+        buttonContainer.style.justifyContent = "flex-start";
+
+        // Confirm button
+        const confirmBtn = document.createElement("button");
+        confirmBtn.textContent = _("Confirm");
+        confirmBtn.style.backgroundColor = colors.blueButton;
+        confirmBtn.style.color = colors.blueButtonText;
+        confirmBtn.style.border = "none";
+        confirmBtn.style.borderRadius = "4px";
+        confirmBtn.style.padding = "8px 16px";
+        confirmBtn.style.fontWeight = "bold";
+        confirmBtn.style.cursor = "pointer";
+        confirmBtn.style.marginRight = "16px";
+        confirmBtn.addEventListener("click", () => {
+            overlay.remove();
+            this.loadNewProject();
+        });
+
+        // Cancel button
+        const cancelBtn = document.createElement("button");
+        cancelBtn.textContent = _("Cancel");
+        cancelBtn.style.backgroundColor = colors.cancelButton;
+        cancelBtn.style.color = "black";
+        cancelBtn.style.border = "none";
+        cancelBtn.style.borderRadius = "4px";
+        cancelBtn.style.padding = "8px 16px";
+        cancelBtn.style.fontWeight = "bold";
+        cancelBtn.style.cursor = "pointer";
+        cancelBtn.addEventListener("click", () => {
+            overlay.remove();
+        });
+
+        buttonContainer.appendChild(confirmBtn);
+        buttonContainer.appendChild(cancelBtn);
+        modal.appendChild(buttonContainer);
+        overlay.appendChild(modal);
+
+        // Click on overlay background to dismiss
+        overlay.addEventListener("click", e => {
+            if (e.target === overlay) {
+                overlay.remove();
+            }
+        });
+
+        document.body.appendChild(overlay);
+    }
+
     async init() {
         this.StringHelper = new StringHelper(this);
         this.StringHelper.init();
@@ -104,19 +204,16 @@ class Planet {
         this.ServerInterface = new ServerInterface(this);
         this.ServerInterface.init();
 
-        // eslint-disable-next-line no-unused-vars
         document.getElementById("close-planet").addEventListener("click", evt => {
             this.closeButton();
         });
 
-        // eslint-disable-next-line no-unused-vars
         document.getElementById("planet-open-file").addEventListener("click", evt => {
             this.loadProjectFromFile();
         });
 
-        // eslint-disable-next-line no-unused-vars
         document.getElementById("planet-new-project").addEventListener("click", evt => {
-            this.loadNewProject();
+            this.showNewProjectConfirmation();
         });
 
         this.ServerInterface.getTagManifest(
@@ -126,9 +223,9 @@ class Planet {
         );
     }
 
-    closeButton() {
+    async closeButton() {
         if (this.ProjectStorage.getCurrentProjectID() !== this.oldCurrentProjectID) {
-            const data = this.ProjectStorage.getCurrentProjectData();
+            const data = await this.ProjectStorage.getCurrentProjectData();
             !data ? this.loadNewProject() : this.loadProjectFromData(data);
         } else this.planetClose();
     }
@@ -152,7 +249,7 @@ class Planet {
 
 // sync the dark mode of the planet with the main page and themePreference
 document.addEventListener("DOMContentLoaded", function () {
-    let themes = ["light", "dark"];
+    let themes = ["light", "dark", "highcontrast"];
     for (let i = 0; i < themes.length; i++) {
         if (themes[i] === localStorage.getItem("themePreference")) {
             document.body.classList.add(themes[i]);
