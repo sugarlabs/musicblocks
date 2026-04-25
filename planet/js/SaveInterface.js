@@ -118,3 +118,6 @@ class SaveInterface {
         this.downloadURL(name + ".html", html);
     }
 }
+if (typeof module !== "undefined") {
+    module.exports = SaveInterface;
+}
