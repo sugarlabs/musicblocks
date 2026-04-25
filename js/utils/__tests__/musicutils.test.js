@@ -1771,6 +1771,41 @@ describe("noteToPitchOctave", () => {
         const result = noteToPitchOctave("C4_");
         expect(result).toEqual(["C", 4]); // Pitch is 'C', octave is 4, suffix '_' is ignored
     });
+
+    it("should correctly handle multi-digit octaves like C10", () => {
+        const result = noteToPitchOctave("C10");
+        expect(result).toEqual(["C", 10]);
+    });
+
+    it("should handle multi-digit octaves with trailing suffixes", () => {
+        const result = noteToPitchOctave("C10_suffix");
+        expect(result).toEqual(["C", 10]);
+    });
+
+    it("should handle double flat using letters", () => {
+        const result = noteToPitchOctave("Dbb5");
+        expect(result).toEqual(["Dbb", 5]);
+    });
+
+    it("should handle double sharp using 'x'", () => {
+        const result = noteToPitchOctave("Cx4");
+        expect(result).toEqual(["Cx", 4]);
+    });
+
+    it("should handle double flat symbols", () => {
+        const result = noteToPitchOctave("E𝄫3");
+        expect(result).toEqual(["E𝄫", 3]);
+    });
+
+    it("should handle double sharp symbols", () => {
+        const result = noteToPitchOctave("F𝄪2");
+        expect(result).toEqual(["F𝄪", 2]);
+    });
+
+    it("should return the entire string as pitch if no match is found", () => {
+        const result = noteToPitchOctave("?");
+        expect(result).toEqual(["?", 4]);
+    });
 });
 
 describe("pitchToFrequency", () => {
