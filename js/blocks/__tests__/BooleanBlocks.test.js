@@ -394,124 +394,46 @@ describe("real BooleanBlock instances - direct method coverage", () => {
         global.BooleanBlock = origBooleanBlock;
     });
 
-    test("real NotBlock arg() returns false when connection is null", () => {
+    // Parameterized tests for null connection scenarios
+    test.each([
+        "not",
+        "and",
+        "or",
+        "xor",
+        "greater",
+        "less",
+        "equal",
+        "not_equal_to",
+        "less_than_or_equal_to",
+        "greater_than_or_equal_to"
+    ])("real %sBlock arg() returns false when connection is null", blockType => {
         mockActivity.blocks.blockList["blk1"].connections[1] = null;
-        const result = instances["not"].arg(mockLogo, "turtle1", "blk1", null);
+        const result = instances[blockType].arg(mockLogo, "turtle1", "blk1", null);
         expect(result).toBe(false);
         expect(mockActivity.errorMsg).toHaveBeenCalled();
     });
 
+    // Parameterized tests for valid connections
+    test.each([
+        "not",
+        "and",
+        "or",
+        "xor",
+        "greater",
+        "less",
+        "equal",
+        "not_equal_to",
+        "less_than_or_equal_to",
+        "greater_than_or_equal_to"
+    ])("real %sBlock arg() returns boolean with valid connections", blockType => {
+        const result = instances[blockType].arg(mockLogo, "turtle1", "blk3", null);
+        expect(typeof result).toBe("boolean");
+    });
+
+    // Special case for NotBlock with specific connection test
     test("real NotBlock arg() returns true when arg is false", () => {
         mockActivity.blocks.blockList["blk1"].connections[1] = "blk2";
         const result = instances["not"].arg(mockLogo, "turtle1", "blk1", null);
-        expect(typeof result).toBe("boolean");
-    });
-
-    test("real AndBlock arg() returns false when connection is null", () => {
-        mockActivity.blocks.blockList["blk1"].connections[1] = null;
-        const result = instances["and"].arg(mockLogo, "turtle1", "blk1", null);
-        expect(result).toBe(false);
-        expect(mockActivity.errorMsg).toHaveBeenCalled();
-    });
-
-    test("real AndBlock arg() returns boolean with valid connections", () => {
-        const result = instances["and"].arg(mockLogo, "turtle1", "blk3", null);
-        expect(typeof result).toBe("boolean");
-    });
-
-    test("real OrBlock arg() returns false when connection is null", () => {
-        mockActivity.blocks.blockList["blk1"].connections[1] = null;
-        const result = instances["or"].arg(mockLogo, "turtle1", "blk1", null);
-        expect(result).toBe(false);
-        expect(mockActivity.errorMsg).toHaveBeenCalled();
-    });
-
-    test("real OrBlock arg() returns boolean with valid connections", () => {
-        const result = instances["or"].arg(mockLogo, "turtle1", "blk3", null);
-        expect(typeof result).toBe("boolean");
-    });
-
-    test("real XorBlock arg() returns false when connection is null", () => {
-        mockActivity.blocks.blockList["blk1"].connections[1] = null;
-        const result = instances["xor"].arg(mockLogo, "turtle1", "blk1", null);
-        expect(result).toBe(false);
-        expect(mockActivity.errorMsg).toHaveBeenCalled();
-    });
-
-    test("real XorBlock arg() returns boolean with valid connections", () => {
-        const result = instances["xor"].arg(mockLogo, "turtle1", "blk3", null);
-        expect(typeof result).toBe("boolean");
-    });
-
-    test("real GreaterBlock arg() returns false when connection is null", () => {
-        mockActivity.blocks.blockList["blk1"].connections[1] = null;
-        const result = instances["greater"].arg(mockLogo, "turtle1", "blk1", null);
-        expect(result).toBe(false);
-        expect(mockActivity.errorMsg).toHaveBeenCalled();
-    });
-
-    test("real GreaterBlock arg() returns boolean with valid connections", () => {
-        const result = instances["greater"].arg(mockLogo, "turtle1", "blk3", null);
-        expect(typeof result).toBe("boolean");
-    });
-
-    test("real LessBlock arg() returns false when connection is null", () => {
-        mockActivity.blocks.blockList["blk1"].connections[1] = null;
-        const result = instances["less"].arg(mockLogo, "turtle1", "blk1", null);
-        expect(result).toBe(false);
-        expect(mockActivity.errorMsg).toHaveBeenCalled();
-    });
-
-    test("real LessBlock arg() returns boolean with valid connections", () => {
-        const result = instances["less"].arg(mockLogo, "turtle1", "blk3", null);
-        expect(typeof result).toBe("boolean");
-    });
-
-    test("real EqualBlock arg() returns false when connection is null", () => {
-        mockActivity.blocks.blockList["blk1"].connections[1] = null;
-        const result = instances["equal"].arg(mockLogo, "turtle1", "blk1", null);
-        expect(result).toBe(false);
-        expect(mockActivity.errorMsg).toHaveBeenCalled();
-    });
-
-    test("real EqualBlock arg() returns boolean with valid connections", () => {
-        const result = instances["equal"].arg(mockLogo, "turtle1", "blk3", null);
-        expect(typeof result).toBe("boolean");
-    });
-
-    test("real NotEqualToBlock arg() returns false when connection is null", () => {
-        mockActivity.blocks.blockList["blk1"].connections[1] = null;
-        const result = instances["not_equal_to"].arg(mockLogo, "turtle1", "blk1", null);
-        expect(result).toBe(false);
-        expect(mockActivity.errorMsg).toHaveBeenCalled();
-    });
-
-    test("real NotEqualToBlock arg() returns boolean with valid connections", () => {
-        const result = instances["not_equal_to"].arg(mockLogo, "turtle1", "blk3", null);
-        expect(typeof result).toBe("boolean");
-    });
-
-    test("real LessThanOrEqualToBlock arg() returns false when connection is null", () => {
-        mockActivity.blocks.blockList["blk1"].connections[1] = null;
-        const result = instances["less_than_or_equal_to"].arg(mockLogo, "turtle1", "blk1", null);
-        expect(result).toBe(false);
-        expect(mockActivity.errorMsg).toHaveBeenCalled();
-    });
-
-    test("real LessThanOrEqualToBlock arg() returns boolean with valid connections", () => {
-        const result = instances["less_than_or_equal_to"].arg(mockLogo, "turtle1", "blk3", null);
-        expect(typeof result).toBe("boolean");
-    });
-
-    test("real GreaterThanOrEqualToBlock arg() returns false when connection is null", () => {
-        mockActivity.blocks.blockList["blk1"].connections[1] = null;
-        const result = instances["greater_than_or_equal_to"].arg(mockLogo, "turtle1", "blk1", null);
-        expect(result).toBe(false);
-        expect(mockActivity.errorMsg).toHaveBeenCalled();
-    });
-
-    test("real GreaterThanOrEqualToBlock arg() returns boolean with valid connections", () => {
-        const result = instances["greater_than_or_equal_to"].arg(mockLogo, "turtle1", "blk3", null);
         expect(typeof result).toBe("boolean");
     });
 });
