@@ -3357,6 +3357,9 @@ class Activity {
 
                         // Build a list of lowercased search terms (primary label + extra terms)
                         // so we can match synonyms without duplicating the visual entry.
+                        const searchPos = this.palettes.getSearchPos();
+                        this.search.style.left = searchPos.x + "px";
+                        this.search.style.top = searchPos.y + "px";
                         const searchTerms = [];
                         if (label && label.length > 0) {
                             searchTerms.push(label.toLowerCase());
