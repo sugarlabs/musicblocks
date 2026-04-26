@@ -1040,8 +1040,15 @@
         <script>
             // Register service worker only in production (not on localhost)
             if ("serviceWorker" in navigator) {
+                const readStorage = key => {
+                    try {
+                        return localStorage.getItem(key);
+                    } catch (e) {
+                        return null;
+                    }
+                };
                 // Localhost SW is disabled to avoid caching; set allowLocalPwa to test installs.
-                const allowLocalPwa = localStorage.getItem("allowLocalPwa") === "true";
+                const allowLocalPwa = readStorage("allowLocalPwa") === "true";
 
                 // Detect if running on localhost for development
                 const runtimeEnv = window.MB_ENV;
@@ -1121,12 +1128,28 @@
         <script>
             document.addEventListener("DOMContentLoaded", function () {
                 window._ = window._ || (x => x);
+                const readStorage = key => {
+                    try {
+                        return localStorage.getItem(key);
+                    } catch (e) {
+                        return null;
+                    }
+                };
+                const writeStorage = (key, value) => {
+                    try {
+                        localStorage.setItem(key, value);
+                        return true;
+                    } catch (e) {
+                        return false;
+                    }
+                };
                 let loadL10nSplashScreen = function () {
                     console.debug("The browser is set to " + navigator.language);
                     let lang = navigator.language;
-                    if (localStorage.languagePreference) {
-                        console.debug("Music Blocks is set to " + localStorage.languagePreference);
-                        lang = localStorage.languagePreference;
+                    const savedLanguage = readStorage("languagePreference");
+                    if (savedLanguage) {
+                        console.debug("Music Blocks is set to " + savedLanguage);
+                        lang = savedLanguage;
                     }
 
                     console.debug("Using " + lang);
@@ -1169,9 +1192,8 @@
                         link.addEventListener("click", function (e) {
                             e.preventDefault(); // prevent default <a> behavior
                             const selectedLang = this.id; // ID corresponds to language code
-                            const currentLang = localStorage.getItem("languagePreference");
-                            if (currentLang !== selectedLang) {
-                                localStorage.setItem("languagePreference", selectedLang);
+                            const currentLang = readStorage("languagePreference");
+                            if (currentLang !== selectedLang && writeStorage("languagePreference", selectedLang)) {
                                 location.reload(); // automatically reload
                             }
                         });

@@ -278,39 +278,6 @@ class Arpeggio {
     }
 
     /**
-     * @deprecated
-     */
-    _addButton(row, icon, iconSize, label) {
-        const cell = row.insertCell(-1);
-        cell.innerHTML = `&nbsp;&nbsp;<img 
-                src="header-icons/${icon}" 
-                title="${label}" 
-                alt="${label}" 
-                height="${iconSize}" 
-                width="${iconSize}" 
-                vertical-align="middle" 
-                align-content="center"
-            >&nbsp;&nbsp;`;
-        cell.style.width = Arpeggio.BUTTONSIZE + "px";
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = cell.style.width;
-        cell.style.minHeight = cell.style.height;
-        cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
-
-        cell.onmouseover = () => {
-            cell.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        };
-
-        cell.onmouseout = () => {
-            cell.style.backgroundColor = platformColor.selectorBackground;
-        };
-
-        return cell;
-    }
-
-    /**
      * @private
      * @param {number} row index
      * @returns {boolean} true/false

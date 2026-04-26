@@ -116,6 +116,7 @@ function SampleWidget() {
     this.tunerCanvas = null;
     this.tunerContext = null;
     this.tunerAnimationFrame = null;
+    this.tunerSegments = [];
     this.centsValue = 0;
     this.sliderVisible = false;
     this.sliderDiv = null;
@@ -989,12 +990,14 @@ function SampleWidget() {
                 if (tunerContainer) {
                     tunerContainer.remove();
                 }
+                this.tunerSegments = [];
             }
         };
 
         this._tunerBtn.onclick = async () => {
             if (docById("tunerContainer") && !tunerOn) {
                 docById("tunerContainer").remove();
+                this.tunerSegments = [];
             }
 
             // Close the cent adjustment window if it's open
@@ -1048,6 +1051,7 @@ function SampleWidget() {
                 tunerContainer.appendChild(sharpSymbol);
 
                 // Add tuner segments
+                this.tunerSegments = [];
                 const segments = [
                     "M5.0064 173.531C2.24508 173.507 0.0184649 171.249 0.121197 168.49C0.579513 156.179 2.33654 143.951 5.36299 132.009C6.04138 129.332 8.81378 127.792 11.4701 128.546L57.9638 141.754C60.6202 142.508 62.1508 145.271 61.5107 147.958C59.8652 154.863 58.8534 161.905 58.488 168.995C58.3459 171.752 56.0992 173.973 53.3379 173.949L5.0064 173.531Z",
                     "M12.3057 125.699C9.66293 124.899 8.16276 122.104 9.03876 119.486C12.9468 107.802 18.0776 96.5645 24.3458 85.959C25.7508 83.5817 28.8448 82.885 31.181 84.3574L72.0707 110.128C74.4068 111.601 75.0971 114.683 73.7261 117.08C70.2017 123.243 67.2471 129.714 64.8991 136.414C63.9858 139.02 61.2047 140.517 58.5619 139.716L12.3057 125.699Z",
@@ -1066,6 +1070,7 @@ function SampleWidget() {
                     const segment = document.createElementNS("http://www.w3.org/2000/svg", "path");
                     segment.setAttribute("d", d);
                     segment.setAttribute("fill", platformColor.selectorBackground || "#808080");
+                    this.tunerSegments.push(segment);
                     tunerSvg.appendChild(segment);
                 });
 
@@ -2022,10 +2027,7 @@ function SampleWidget() {
                                 this.tunerDisplay.update(note, cents, this.centsValue);
 
                                 // Update segments
-                                const tunerSegments = document.querySelectorAll(
-                                    "#tunerContainer svg path"
-                                );
-                                tunerSegments.forEach((segment, i) => {
+                                this.tunerSegments.forEach((segment, i) => {
                                     const segmentCents = (i - 5) * 10;
                                     if (Math.abs(cents - segmentCents) <= 5) {
                                         segment.setAttribute("fill", "#00ff00"); // In tune (green)

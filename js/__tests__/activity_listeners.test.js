@@ -148,6 +148,14 @@ describe("Activity Event Listener Management", () => {
         expect(activity._listeners).toHaveLength(0);
     });
 
+    test("should delegate idle watcher cleanup through _stopIdleWatcher", () => {
+        activity._stopIdleWatcher = jest.fn();
+
+        activity.cleanupEventListeners();
+
+        expect(activity._stopIdleWatcher).toHaveBeenCalledTimes(1);
+    });
+
     test("should handle boolean options vs object options", () => {
         // true === { capture: true } in our logic?
         // _areOptionsEqual logic: normalize boolean to boolean, object to !!opt.capture

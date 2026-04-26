@@ -613,6 +613,7 @@ function AIDebuggerWidget() {
         this.chatHistory = [];
         this.promptCount = 0; // Reset prompt count
         this.conversationId = this._generateConversationId();
+        this._hideTypingIndicator();
         this.chatLog.innerHTML = "";
 
         this._loadProjectAndInitialize();
