@@ -32,6 +32,7 @@ const mockActivity = {
     _loadStart: jest.fn(),
     doLoadAnimation: jest.fn(),
     textMsg: jest.fn(),
+    errorMsg: jest.fn(),
     stage: { enableDOMEvents: jest.fn(), update: jest.fn() },
     blocks: { loadNewBlocks: jest.fn(), palettes: { _hideMenus: jest.fn() }, trashStacks: [] },
     logo: { doStopTurtles: jest.fn() },
@@ -75,6 +76,7 @@ describe("PlanetInterface", () => {
 
     beforeEach(() => {
         planetInterface = new PlanetInterface(mockActivity);
+        mockActivity.errorMsg.mockClear();
     });
 
     test("hideMusicBlocks hides relevant elements and disables DOM events", () => {
@@ -369,10 +371,9 @@ describe("PlanetInterface", () => {
     it("loadProjectFromData shows error and returns early if data is undefined", () => {
         const saved_ = global._;
         global._ = jest.fn(str => str);
-        planetInterface.errorMsg = jest.fn();
         planetInterface.iframe = { style: { display: "" } };
         planetInterface.loadProjectFromData(undefined, false);
-        expect(planetInterface.errorMsg).toHaveBeenCalledWith("project undefined");
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith("project undefined");
         global._ = saved_;
     });
 
@@ -399,12 +400,11 @@ describe("PlanetInterface", () => {
         delete document.attachEvent;
     });
 
-    it("loadProjectFromData catches JSON parse errors and calls errorMsg", () => {
+    it("loadProjectFromData catches JSON parse errors and calls activity.errorMsg", () => {
         planetInterface.iframe = { style: { display: "" } };
         planetInterface.getCurrentProjectName = jest.fn(() => "foo");
-        planetInterface.errorMsg = jest.fn();
         planetInterface.loadProjectFromData("invalid json");
-        expect(planetInterface.errorMsg).toHaveBeenCalledWith(expect.any(SyntaxError));
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith(expect.any(SyntaxError));
     });
 
     it("saveLocally handles quota exceeded error and shows storage warning", () => {

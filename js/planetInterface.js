@@ -127,7 +127,7 @@ class PlanetInterface {
             }
 
             if (data === undefined) {
-                this.errorMsg(_("project undefined"));
+                this.activity.errorMsg(_("project undefined"));
                 return;
             }
             this.activity.textMsg(this.getCurrentProjectName());
@@ -153,7 +153,7 @@ class PlanetInterface {
                 const obj = JSON.parse(data);
                 this.activity.blocks.loadNewBlocks(obj);
             } catch (e) {
-                this.errorMsg(e);
+                this.activity.errorMsg(e);
             }
 
             this.activity.loading = false;
