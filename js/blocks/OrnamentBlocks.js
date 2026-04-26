@@ -417,7 +417,11 @@ function setupOrnamentBlocks(activity) {
                 logo.notation.notationBeginSlur(turtle);
             }
 
-            tur.singer.glideOverride = Singer.noteCounter(logo, turtle, args[1]);
+            // Signal the start of a glissando to the singer
+            tur.singer.inGlide = true;
+            tur.singer.glideDuration = 0;
+            tur.singer.glideStartTime = tur.singer.turtleTime;
+            tur.singer.glideBuffer = [];
 
             const listenerName = "_glide_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
@@ -427,6 +431,13 @@ function setupOrnamentBlocks(activity) {
                     logo.notation.notationEndSlur(turtle);
                 }
 
+                // Play the buffered glissando
+                if (tur.singer.glideBuffer.length > 0) {
+                    Singer.playGlideBuffer(activity, turtle);
+                }
+
+                // Signal the end of the glissando
+                tur.singer.inGlide = false;
                 tur.singer.glide.pop();
             };
 
