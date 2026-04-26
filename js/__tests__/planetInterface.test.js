@@ -404,7 +404,7 @@ describe("PlanetInterface", () => {
     it("loadProjectFromData catches JSON parse errors and calls activity.errorMsg", () => {
         planetInterface.iframe = { style: { display: "" } };
         planetInterface.getCurrentProjectName = jest.fn(() => "foo");
-        planetInterface.errorMsg = jest.fn();
+
         planetInterface.loadProjectFromData("invalid json");
         expect(mockActivity.errorMsg).toHaveBeenCalledWith(expect.any(SyntaxError));
     });
