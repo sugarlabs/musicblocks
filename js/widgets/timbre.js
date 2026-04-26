@@ -212,41 +212,6 @@ class TimbreWidget {
     }
 
     /**
-     * @deprecated
-     */
-    _addButton(row, icon, iconSize, label) {
-        const cell = row.insertCell(-1);
-        cell.textContent = "\u00A0\u00A0";
-        const img = document.createElement("img");
-        img.src = `header-icons/${icon}`;
-        img.title = label;
-        img.alt = label;
-        img.setAttribute("height", iconSize);
-        img.setAttribute("width", iconSize);
-        img.setAttribute("vertical-align", "middle");
-        img.setAttribute("align-content", "center");
-        cell.appendChild(img);
-        cell.appendChild(document.createTextNode("\u00A0\u00A0"));
-        cell.style.width = TimbreWidget.BUTTONSIZE + "px";
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = cell.style.width;
-        cell.style.minHeight = cell.style.height;
-        cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
-
-        cell.onmouseover = () => {
-            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        };
-
-        cell.onmouseout = () => {
-            this.style.backgroundColor = platformColor.selectorBackground;
-        };
-
-        return cell;
-    }
-
-    /**
      * @private
      * used to update the parameters in the blocks contained in the timbre widget clamp.
      * @param {number} i - is the index into the parameter array. (For example, there can be multiple filter blocks associated with a timbre.)
@@ -1030,8 +995,6 @@ class TimbreWidget {
             () => {
                 this._undo();
             };
-
-        // let cell = this._addButton(row, 'close-button.svg', TimbreWidget.ICONSIZE, _('Close'));
 
         // cell.onclick = function () {
         //     docById('timbreDiv').style.visibility = 'hidden';

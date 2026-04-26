@@ -862,13 +862,13 @@ function AIWidget() {
                 });
 
                 await this.midiBuffer.prime();
-                console.log("Playing ABC:", abc);
                 this.midiBuffer.start();
             } catch (error) {
                 console.warn("synth error", error);
+                this.activity.errorMsg(_("Synth error: ") + error.message);
             }
         } else {
-            console.warn("Audio not supported in this browser");
+            this.activity.errorMsg(_("Audio not supported in this browser."));
         }
     };
 
@@ -1216,7 +1216,6 @@ function AIWidget() {
                     textarea.value = abcNotationSong;
                 })
                 .catch(error => {
-                    console.error("Error:", error);
                     textarea.value = "An error occurred: " + error.message;
                 })
                 .finally(() => {
