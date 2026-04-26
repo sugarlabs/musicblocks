@@ -401,12 +401,12 @@ describe("PlanetInterface", () => {
         delete document.attachEvent;
     });
 
-    it("loadProjectFromData catches JSON parse errors and calls errorMsg", () => {
+    it("loadProjectFromData catches JSON parse errors and calls activity.errorMsg", () => {
         planetInterface.iframe = { style: { display: "" } };
         planetInterface.getCurrentProjectName = jest.fn(() => "foo");
-        planetInterface.mockActivityerrorMsg = jest.fn();
+        planetInterface.errorMsg = jest.fn();
         planetInterface.loadProjectFromData("invalid json");
-        expect(planetInterface.errorMsg).toHaveBeenCalledWith(expect.any(SyntaxError));
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith(expect.any(SyntaxError));
     });
 
     it("saveLocally handles quota exceeded error and shows storage warning", () => {
