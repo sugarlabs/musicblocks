@@ -98,6 +98,9 @@ class Logo {
     }
 
     constructor(activityOrDeps) {
+        if (!activityOrDeps || typeof activityOrDeps !== "object") {
+            throw new Error("dependencies must be an object");
+        }
         // Check if this is a LogoDependencies instance
         const isExplicitDeps =
             activityOrDeps &&
@@ -1955,7 +1958,7 @@ class Logo {
                         tur.parentFlowQueue.length > 0 &&
                         tur.queue.length > 0 &&
                         logo.deps.utils.last(tur.queue).parentBlk !==
-                            logo.deps.utils.last(tur.parentFlowQueue)
+                        logo.deps.utils.last(tur.parentFlowQueue)
                     ) {
                         tur.unhighlightQueue.push(logo.deps.utils.last(tur.parentFlowQueue));
                     } else if (tur.unhighlightQueue.length > 0) {
