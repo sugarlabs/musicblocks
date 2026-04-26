@@ -1694,10 +1694,6 @@ let rationalSum = (a, b) => {
         console.warn("Invalid input passed to rationalSum:", a, b);
         return [0, 1];
     }
-    if (a === 0 || b === 0) {
-        // console.debug("divide by zero?");
-        return [0, 1];
-    }
 
     // Make sure a and b components are integers.
     let obja0, objb0, obja1, objb1;
