@@ -17,7 +17,7 @@
 /*
    global
 
-   TONEBPM, Singer, _, delayExecution, docById,
+   TONEBPM, Singer, _, delayExecution, docById, ManagedTimer,
    calcNoteValueToDisplay, platformColor, beginnerMode, last,
    EIGHTHNOTEWIDTH, nearestBeat, rationalToFraction, DRUMNAMES,
    VOICENAMES, EFFECTSNAMES
@@ -30,6 +30,8 @@
         Singer
     - js/utils/utils.js
         _, docById, delayExecution, last, nearestBeat, rationalToFraction
+    - js/utils/ManagedTimer.js
+        ManagedTimer
     - js/utils/musicutils.js
         calcNoteValueToDisplay, EIGHTHNOTEWIDTH
     - js/utils/platformstyle.js
@@ -315,6 +317,142 @@ class RhythmRuler {
          * @private
          */
         this._fullscreenScaleFactor = 3;
+
+        /**
+         * Tracks timers owned by this widget so they can be cancelled when playback stops
+         * or the widget closes.
+         * @type {ManagedTimer|null}
+         * @private
+         */
+        this._timerManager = typeof ManagedTimer !== "undefined" ? new ManagedTimer() : null;
+
+        /**
+         * Fallback timeout tracking for test/runtime environments where ManagedTimer is unavailable.
+         * @type {Set<number>}
+         * @private
+         */
+        this._activeTimeouts = new Set();
+
+        /**
+         * Fallback interval tracking for test/runtime environments where ManagedTimer is unavailable.
+         * @type {Set<number>}
+         * @private
+         */
+        this._activeIntervals = new Set();
+    }
+
+    /**
+     * Schedules a timeout owned by the widget lifecycle.
+     * @private
+     * @param {Function} callback - Callback to run after the delay.
+     * @param {number} delay - Delay in milliseconds.
+     * @returns {number} Timer ID.
+     */
+    _setWidgetTimeout(callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+
+        let id;
+        id = setTimeout(() => {
+            this._activeTimeouts.delete(id);
+            callback();
+        }, delay);
+        this._activeTimeouts.add(id);
+        return id;
+    }
+
+    /**
+     * Clears a timeout owned by the widget lifecycle.
+     * @private
+     * @param {number} id - Timer ID returned by _setWidgetTimeout.
+     * @returns {boolean} Whether the timeout was tracked and cleared.
+     */
+    _clearWidgetTimeout(id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+
+        if (this._timerManager !== null && this._timerManager.clearTimeout(id)) {
+            return true;
+        }
+
+        if (this._activeTimeouts.has(id)) {
+            clearTimeout(id);
+            this._activeTimeouts.delete(id);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Schedules an interval owned by the widget lifecycle.
+     * @private
+     * @param {Function} callback - Callback to run repeatedly.
+     * @param {number} interval - Interval in milliseconds.
+     * @returns {number} Interval ID.
+     */
+    _setWidgetInterval(callback, interval) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setInterval(callback, interval);
+        }
+
+        const id = setInterval(callback, interval);
+        this._activeIntervals.add(id);
+        return id;
+    }
+
+    /**
+     * Clears an interval owned by the widget lifecycle.
+     * @private
+     * @param {number} id - Interval ID returned by _setWidgetInterval.
+     * @returns {boolean} Whether the interval was tracked and cleared.
+     */
+    _clearWidgetInterval(id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+
+        if (this._timerManager !== null && this._timerManager.clearInterval(id)) {
+            return true;
+        }
+
+        if (this._activeIntervals.has(id)) {
+            clearInterval(id);
+            this._activeIntervals.delete(id);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Clears all timers owned by the widget lifecycle.
+     * @private
+     * @returns {number} Number of tracked timers and intervals cleared.
+     */
+    _clearWidgetTimers() {
+        let count = 0;
+
+        if (this._timerManager !== null) {
+            count += this._timerManager.clearAll();
+        }
+
+        for (const id of this._activeTimeouts) {
+            clearTimeout(id);
+            count++;
+        }
+        this._activeTimeouts.clear();
+
+        for (const id of this._activeIntervals) {
+            clearInterval(id);
+            count++;
+        }
+        this._activeIntervals.clear();
+
+        this._longPressBeep = null;
+        return count;
     }
 
     /**
@@ -439,6 +577,7 @@ class RhythmRuler {
             if (this._playing) {
                 this.__pause();
             }
+            this._clearWidgetTimers();
             // Save the new dissect history.
             const dissectHistory = [];
             const drums = [];
@@ -680,9 +819,11 @@ class RhythmRuler {
                                 this._startingTime = null;
                                 this._elapsedTimes[id] = 0;
                                 this._offsets[id] = 0;
-                                setTimeout(() => this._calculateZebraStripes(id), 1000);
+                                this._clearWidgetTimers();
+                                this._setWidgetTimeout(() => this._calculateZebraStripes(id), 1000);
                             }
                         } else if (this._playingOne === false) {
+                            this._clearWidgetTimers();
                             this._rulerSelected = id;
                             this.activity.logo.turtleDelay = 0;
                             this._playing = true;
@@ -999,7 +1140,7 @@ class RhythmRuler {
 
                 // Play count-off based on meter (e.g., 4 beats for 4/4, 3 beats for 3/4)
                 for (let i = 0; i < beatsPerMeasure; i++) {
-                    setTimeout(
+                    this._setWidgetTimeout(
                         () => {
                             this.activity.logo.synth.trigger(
                                 0,
@@ -1014,7 +1155,7 @@ class RhythmRuler {
                     );
                 }
 
-                setTimeout(() => {
+                this._setWidgetTimeout(() => {
                     this.__startTapping(interval, event);
                 }, interval);
             }
@@ -1049,7 +1190,7 @@ class RhythmRuler {
         this._tapEndTime = this._tapTimes[0] + interval;
 
         // Set a timeout to end tapping
-        setTimeout(() => {
+        this._setWidgetTimeout(() => {
             this.__endTapping(event);
         }, interval);
 
@@ -1057,9 +1198,9 @@ class RhythmRuler {
         const __move = (tick, stepSize) => {
             let width = 1;
 
-            const id = setInterval(() => {
+            const id = this._setWidgetInterval(() => {
                 if (width >= 100) {
-                    clearInterval(id);
+                    this._clearWidgetInterval(id);
                 } else {
                     width += stepSize;
                     this._progressBar.style.width = width + "%";
@@ -1223,7 +1364,7 @@ class RhythmRuler {
             this._longPressStartTime = d.getTime();
             this._inLongPress = false;
 
-            this._longPressBeep = setTimeout(() => {
+            this._longPressBeep = this._setWidgetTimeout(() => {
                 // Removing audio feedback on long press since it
                 // occasionally confuses tone.js during rapid clicking
                 // in the widget.
@@ -1246,7 +1387,8 @@ class RhythmRuler {
          * @returns {void}
          */
         const __mouseUpHandler = event => {
-            clearTimeout(this._longPressBeep);
+            this._clearWidgetTimeout(this._longPressBeep);
+            this._longPressBeep = null;
             const cell = event.target;
             this._mouseUpCell = cell;
             if (this._mouseDownCell !== this._mouseUpCell) {
@@ -1837,6 +1979,7 @@ class RhythmRuler {
         this._playingOne = false;
         this._rulerPlaying = -1;
         this._startingTime = null;
+        this._clearWidgetTimers();
         for (let i = 0; i < this.Rulers.length; i++) {
             this._calculateZebraStripes(i);
         }
@@ -1859,7 +2002,7 @@ class RhythmRuler {
                 // Wait for pause to complete before restarting.
                 this._playingAll = true;
 
-                setTimeout(() => {
+                this._setWidgetTimeout(() => {
                     this.__resume();
                 }, 1000);
             }
@@ -1874,6 +2017,7 @@ class RhythmRuler {
      * @returns {void}
      */
     __resume() {
+        this._clearWidgetTimers();
         this._playAllCell.innerHTML = `<img 
                 src="header-icons/pause-button.svg" 
                 title="${_("Pause")}" 
@@ -2036,7 +2180,7 @@ class RhythmRuler {
             this._offsets[rulerNo] = d.getTime() - this._startingTime - this._elapsedTimes[rulerNo];
         }
 
-        setTimeout(
+        this._setWidgetTimeout(
             () => {
                 colIndex += 1;
                 if (colIndex === noteValues.length) {

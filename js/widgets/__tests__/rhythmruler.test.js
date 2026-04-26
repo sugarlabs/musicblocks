@@ -21,6 +21,7 @@
  */
 
 const RhythmRuler = require("../rhythmruler.js");
+const ManagedTimer = require("../../utils/ManagedTimer.js");
 
 // --- Global Mocks (Fake the Browser Environment) ---
 
@@ -58,6 +59,7 @@ global.DRUMNAMES = [];
 global.VOICENAMES = [];
 global.EFFECTSNAMES = [];
 global.getComputedStyle = jest.fn().mockReturnValue({ backgroundColor: "#303030" });
+global.ManagedTimer = ManagedTimer;
 
 // Mock Window Manager
 
@@ -198,6 +200,10 @@ describe("RhythmRuler Widget", () => {
     });
 
     afterEach(() => {
+        if (rhythmRuler && typeof rhythmRuler._clearWidgetTimers === "function") {
+            rhythmRuler._clearWidgetTimers();
+        }
+        jest.useRealTimers();
         jest.clearAllMocks();
     });
 
@@ -238,6 +244,62 @@ describe("RhythmRuler Widget", () => {
             expect(rhythmRuler._offsets).toEqual([]);
             expect(rhythmRuler._startingTime).toBeNull();
             expect(rhythmRuler._tapTimes).toEqual([]);
+        });
+    });
+
+    // =========================================================================
+    // TIMER LIFECYCLE TESTS
+    // =========================================================================
+    describe("Timer Lifecycle", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+        });
+
+        test("should track and clear widget timeouts", () => {
+            const callback = jest.fn();
+
+            const timerId = rhythmRuler._setWidgetTimeout(callback, 1000);
+
+            expect(rhythmRuler._timerManager.activeTimeoutCount).toBe(1);
+            expect(rhythmRuler._clearWidgetTimeout(timerId)).toBe(true);
+
+            jest.advanceTimersByTime(1000);
+
+            expect(callback).not.toHaveBeenCalled();
+            expect(rhythmRuler._timerManager.activeTimeoutCount).toBe(0);
+        });
+
+        test("should clear all widget timeouts and intervals", () => {
+            const timeoutCallback = jest.fn();
+            const intervalCallback = jest.fn();
+
+            rhythmRuler._setWidgetTimeout(timeoutCallback, 1000);
+            rhythmRuler._setWidgetInterval(intervalCallback, 100);
+
+            expect(rhythmRuler._timerManager.activeCount).toBe(2);
+            expect(rhythmRuler._clearWidgetTimers()).toBe(2);
+
+            jest.advanceTimersByTime(1000);
+
+            expect(timeoutCallback).not.toHaveBeenCalled();
+            expect(intervalCallback).not.toHaveBeenCalled();
+            expect(rhythmRuler._timerManager.activeCount).toBe(0);
+        });
+
+        test("__pause should clear pending playback timers", () => {
+            const callback = jest.fn();
+            rhythmRuler._playAllCell = { innerHTML: "" };
+            rhythmRuler.Rulers = [[[4], []]];
+            rhythmRuler._playing = true;
+            jest.spyOn(rhythmRuler, "_calculateZebraStripes").mockImplementation();
+            jest.spyOn(rhythmRuler, "_refreshCircularView").mockImplementation();
+
+            rhythmRuler._setWidgetTimeout(callback, 1000);
+            rhythmRuler.__pause();
+            jest.advanceTimersByTime(1000);
+
+            expect(callback).not.toHaveBeenCalled();
+            expect(rhythmRuler._timerManager.activeCount).toBe(0);
         });
     });
 
