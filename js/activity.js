@@ -3135,26 +3135,9 @@ class Activity {
             const IDLE_THRESHOLD = 5000; // 5 seconds
             const ACTIVE_FPS = 60;
             const IDLE_FPS = 1;
-            const idleEvents = ["mousemove", "mousedown", "keydown", "touchstart", "wheel"];
-
-            if (this._idleWatcherResetHandler) {
-                idleEvents.forEach(eventType => {
-                    window.removeEventListener(eventType, this._idleWatcherResetHandler);
-                });
-            }
-
-            if (this._idleWatcherIntervalId) {
-                clearInterval(this._idleWatcherIntervalId);
-                this._idleWatcherIntervalId = null;
-            }
 
             let lastActivity = Date.now();
             this.isAppIdle = false;
-
-            // Prevent duplicate intervals
-            if (this._idleWatcherIntervalId) {
-                clearInterval(this._idleWatcherIntervalId);
-            }
 
             // Wake up function - restores full framerate
             // Stored as instance property for cleanup
@@ -8354,8 +8337,8 @@ class Activity {
                 }
             }
 
-            this.fileChooser.addEventListener("click", () => {
-                that.value = null;
+            this.fileChooser.addEventListener("click", event => {
+                event.currentTarget.value = "";
             });
 
             this.fileChooser.addEventListener(
@@ -8629,13 +8612,13 @@ class Activity {
             dropZone.addEventListener("dragover", __handleDragOver, false);
             dropZone.addEventListener("drop", __handleFileSelect, false);
 
-            this.allFilesChooser.addEventListener("click", () => {
-                this.value = null;
+            this.allFilesChooser.addEventListener("click", event => {
+                event.currentTarget.value = "";
             });
 
-            this.pluginChooser.addEventListener("click", () => {
+            this.pluginChooser.addEventListener("click", event => {
                 window.scroll(0, 0);
-                this.value = null;
+                event.currentTarget.value = "";
             });
 
             this.pluginChooser.addEventListener(
@@ -9010,16 +8993,9 @@ class Activity {
             }
         }
 
-        if (this._idleWatcherResetHandler) {
-            ["mousemove", "mousedown", "keydown", "touchstart", "wheel"].forEach(eventType => {
-                window.removeEventListener(eventType, this._idleWatcherResetHandler);
-            });
-            this._idleWatcherResetHandler = null;
-        }
-
-        if (this._idleWatcherIntervalId) {
-            clearInterval(this._idleWatcherIntervalId);
-            this._idleWatcherIntervalId = null;
+        // Keep idle watcher cleanup centralized to avoid stale field mismatches.
+        if (typeof this._stopIdleWatcher === "function") {
+            this._stopIdleWatcher();
         }
     }
 

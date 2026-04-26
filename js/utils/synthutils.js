@@ -1305,7 +1305,6 @@ function Synth() {
                 for (let i = 0; i < MULTIPITCH[sourceName].length; i++) {
                     noteDict[MULTIPITCH[sourceName][i]] = this.samples.voice[sourceName][i];
                 }
-                tempSynth = new Tone.Sampler(noteDict);
             } else {
                 noteDict["C4"] = this.samples.voice[sourceName];
             }
@@ -1932,6 +1931,7 @@ function Synth() {
 
                 if (!paramsEffects.doNeighbor) {
                     if (setNote !== undefined && setNote) {
+                        if (this._instrumentEpoch !== epoch) return;
                         if (synth.oscillator !== undefined) {
                             synth.setNote(notes);
                         } else if (synth.voices !== undefined) {

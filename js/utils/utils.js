@@ -260,7 +260,7 @@ let httpGet = async projectName => {
     const response = await fetch(url, {
         method: "GET",
         headers: {
-            "x-api-key": "3tgTzMXbbw6xEKX7"
+            "x-api-key": window.MB_PROJECT_API_KEY || ""
         }
     });
 
@@ -282,7 +282,7 @@ let httpPost = async (projectName, data) => {
     const response = await fetch(window.server + projectName, {
         method: "POST",
         headers: {
-            "x-api-key": "3tgTzMXbbw6xEKX7"
+            "x-api-key": window.MB_PROJECT_API_KEY || ""
         },
         body: data
     });
@@ -1692,10 +1692,6 @@ let rationalSum = (a, b) => {
         b[1] === 0
     ) {
         console.warn("Invalid input passed to rationalSum:", a, b);
-        return [0, 1];
-    }
-    if (a === 0 || b === 0) {
-        // console.debug("divide by zero?");
         return [0, 1];
     }
 

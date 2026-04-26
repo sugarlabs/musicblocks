@@ -371,7 +371,6 @@ describe("PlanetInterface", () => {
     it("loadProjectFromData shows error and returns early if data is undefined", () => {
         const saved_ = global._;
         global._ = jest.fn(str => str);
-
         planetInterface.iframe = { style: { display: "" } };
         planetInterface.loadProjectFromData(undefined, false);
         expect(mockActivity.errorMsg).toHaveBeenCalledWith("project undefined");
@@ -404,7 +403,6 @@ describe("PlanetInterface", () => {
     it("loadProjectFromData catches JSON parse errors and calls activity.errorMsg", () => {
         planetInterface.iframe = { style: { display: "" } };
         planetInterface.getCurrentProjectName = jest.fn(() => "foo");
-
         planetInterface.loadProjectFromData("invalid json");
         expect(mockActivity.errorMsg).toHaveBeenCalledWith(expect.any(SyntaxError));
     });
