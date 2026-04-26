@@ -19,7 +19,7 @@
    noteIsSolfege, isCustomTemperament, i18nSolfege, getNote, DEFAULTDRUM, last,
    DRUMS, SHARP, FLAT, PREVIEWVOLUME, DEFAULTVOLUME, noteToFrequency,
    LCD, calcNoteValueToDisplay, NOTESYMBOLS,
-   EIGHTHNOTEWIDTH, docBySelector, getTemperament, normalizeNoteAccidentals
+   EIGHTHNOTEWIDTH, docBySelector, getTemperament, normalizeNoteAccidentals, ManagedTimer
 */
 
 /*
@@ -35,6 +35,9 @@ Globals location
 
 - js/utils/utils.js
     _, delayExecution, last, LCD, docById, docBySelector
+
+- js/utils/ManagedTimer.js
+    ManagedTimer
 
 - js/turtle-singer.js
     Singer
@@ -268,6 +271,63 @@ class PhraseMaker {
          * @type {boolean}
          */
         this.lyricsON = false;
+
+        /**
+         * Tracks timers owned by this widget so delayed callbacks can be cancelled
+         * when playback stops or the widget closes.
+         * @type {ManagedTimer|null}
+         * @private
+         */
+        this._timerManager = typeof ManagedTimer !== "undefined" ? new ManagedTimer() : null;
+
+        /**
+         * Fallback timeout tracking for environments where ManagedTimer is unavailable.
+         * @type {Set<number>}
+         * @private
+         */
+        this._activeTimeouts = new Set();
+    }
+
+    /**
+     * Schedules a timeout owned by the widget lifecycle.
+     * @private
+     * @param {Function} callback - Callback to run after the delay.
+     * @param {number} delay - Delay in milliseconds.
+     * @returns {number} Timer ID.
+     */
+    _setWidgetTimeout(callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+
+        let id;
+        id = setTimeout(() => {
+            this._activeTimeouts.delete(id);
+            callback();
+        }, delay);
+        this._activeTimeouts.add(id);
+        return id;
+    }
+
+    /**
+     * Clears all timers owned by the widget lifecycle.
+     * @private
+     * @returns {number} Number of tracked timers cleared.
+     */
+    _clearWidgetTimers() {
+        let count = 0;
+
+        if (this._timerManager !== null) {
+            count += this._timerManager.clearAll();
+        }
+
+        for (const id of this._activeTimeouts) {
+            clearTimeout(id);
+            count++;
+        }
+        this._activeTimeouts.clear();
+
+        return count;
     }
 
     /**
@@ -428,6 +488,8 @@ class PhraseMaker {
             this.activity.logo.synth.stopSound(0, this._instrumentName);
             this.activity.logo.synth.stop();
             this._stopOrCloseClicked = true;
+            this.playingNow = false;
+            this._clearWidgetTimers();
             this.activity.hideMsgs();
             this.docById("wheelDivptm").style.display = "none";
             widgetWindow.destroy();
@@ -995,7 +1057,7 @@ class PhraseMaker {
 
         // Sort them if there are note blocks.
         if (!this.sorted) {
-            setTimeout(() => {
+            this._setWidgetTimeout(() => {
                 this._sort();
             }, 1000);
         } else {
@@ -1210,12 +1272,18 @@ class PhraseMaker {
             }
 
             if (aboveBlock === this.blockNo) {
-                setTimeout(() => this._addNotesBlockBetween(aboveBlock, newBlock, true), 500);
+                this._setWidgetTimeout(
+                    () => this._addNotesBlockBetween(aboveBlock, newBlock, true),
+                    500
+                );
                 this.rowLabels.splice(0, 0, rLabel);
                 this.rowArgs.splice(0, 0, rArg);
                 this._rowBlocks.splice(0, 0, newBlock);
             } else {
-                setTimeout(() => this._addNotesBlockBetween(aboveBlock, newBlock, false), 500);
+                this._setWidgetTimeout(
+                    () => this._addNotesBlockBetween(aboveBlock, newBlock, false),
+                    500
+                );
                 let i;
                 for (i = 0; i < this.columnBlocksMap.length; i++) {
                     if (this.columnBlocksMap[i][0] === aboveBlock) {
@@ -1256,7 +1324,7 @@ class PhraseMaker {
 
             this.makeClickable();
             if (label === "pitch") {
-                setTimeout(() => {
+                this._setWidgetTimeout(() => {
                     this.pitchBlockAdded(newBlock);
                 }, 200);
             }
@@ -1283,7 +1351,7 @@ class PhraseMaker {
             }
         }
 
-        setTimeout(() => this._createColumnPieSubmenu(i, "pitchblocks", true), 500);
+        this._setWidgetTimeout(() => this._createColumnPieSubmenu(i, "pitchblocks", true), 500);
     }
 
     /**
@@ -2291,7 +2359,7 @@ class PhraseMaker {
                     timeout = 0;
                 }
 
-                setTimeout(() => {
+                this._setWidgetTimeout(() => {
                     this.activity.logo.synth.setMasterVolume(DEFAULTVOLUME);
                     this._deps.Singer.setSynthVolume(this.activity.logo, 0, label, DEFAULTVOLUME);
                     this.activity.logo.synth.trigger(0, "G4", 1 / 4, label, null, null, false);
@@ -2566,8 +2634,8 @@ class PhraseMaker {
                 console.debug("skipping " + obj[1] + " " + this._deps.last(this.rowLabels));
                 this._sortedRowMap.push(this._deps.last(this._sortedRowMap));
                 if (oldColumnBlockMap[sortedList[lastObj][3]] !== undefined) {
-                    setTimeout(
-                        this._removePitchBlock(oldColumnBlockMap[sortedList[lastObj][3]][0]),
+                    this._setWidgetTimeout(
+                        () => this._removePitchBlock(oldColumnBlockMap[sortedList[lastObj][3]][0]),
                         500
                     );
                     this.columnBlocksMap = this.columnBlocksMap.filter(ele => {
@@ -3333,9 +3401,9 @@ class PhraseMaker {
         }
         this.activity.blocks.loadNewBlocks(RHYTHMOBJ);
         if (this.activity.blocks.blockList[bottomOfClamp].name === "vspace") {
-            setTimeout(() => this.blockConnection(6, bottomOfClamp), 500);
+            this._setWidgetTimeout(() => this.blockConnection(6, bottomOfClamp), 500);
         } else {
-            setTimeout(() => this.blockConnection(7, bottomOfClamp), 500);
+            this._setWidgetTimeout(() => this.blockConnection(7, bottomOfClamp), 500);
         }
         this.activity.refreshCanvas();
     }
