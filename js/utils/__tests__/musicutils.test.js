@@ -106,6 +106,7 @@ const {
     numberToPitch,
     GetNotesForInterval,
     base64Encode,
+    normalizeNoteAccidentals,
     NOTESTEP,
     ACCIDENTALNAMES,
     NOTESFLAT,
@@ -2610,5 +2611,51 @@ describe("ACCIDENTALNAMES", () => {
             "flat \u266d",
             "double flat \ud834\udd2b"
         ]);
+    });
+});
+
+describe("normalizeNoteAccidentals", () => {
+    it("replaces unicode flat ♭ with ascii b", () => {
+        expect(normalizeNoteAccidentals("C♭")).toBe("Cb");
+    });
+
+    it("replaces unicode sharp ♯ with ascii #", () => {
+        expect(normalizeNoteAccidentals("D♯")).toBe("D#");
+    });
+
+    it("replaces double-flat symbol 𝄫 with bb", () => {
+        expect(normalizeNoteAccidentals("E𝄫")).toBe("Ebb");
+    });
+
+    it("replaces double-sharp symbol 𝄪 with x", () => {
+        expect(normalizeNoteAccidentals("F𝄪")).toBe("Fx");
+    });
+
+    it("returns a natural note letter unchanged", () => {
+        expect(normalizeNoteAccidentals("G")).toBe("G");
+    });
+
+    it("returns an empty string unchanged", () => {
+        expect(normalizeNoteAccidentals("")).toBe("");
+    });
+
+    it("replaces multiple unicode flats ♭♭ with bb", () => {
+        expect(normalizeNoteAccidentals("A♭♭")).toBe("Abb");
+    });
+
+    it("replaces multiple unicode sharps ♯♯ with ##", () => {
+        expect(normalizeNoteAccidentals("B♯♯")).toBe("B##");
+    });
+
+    it("handles a note string that includes an octave digit", () => {
+        expect(normalizeNoteAccidentals("C♭4")).toBe("Cb4");
+    });
+
+    it("leaves a non-note string like solfege name unchanged", () => {
+        expect(normalizeNoteAccidentals("do")).toBe("do");
+    });
+
+    it("handles mixed unicode accidentals in one string", () => {
+        expect(normalizeNoteAccidentals("C♭♯")).toBe("Cb#");
     });
 });
