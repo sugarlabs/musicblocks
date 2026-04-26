@@ -9,16 +9,164 @@ permissions:
     contents: write
     pull-requests: write
 
+# Prevent two rebase runs from fighting over the same PR branches
+concurrency:
+    group: auto-rebase
+    cancel-in-progress: true
+
 jobs:
     rebase:
         name: Auto-rebase all open PRs onto latest master
         runs-on: ubuntu-latest
         steps:
-            - uses: peter-evans/rebase@v4
+            - uses: actions/checkout@v4
               with:
-                  base: master
-                  exclude-labels: |
-                      no-rebase
-                      wip
-                      do-not-merge
-                  exclude-drafts: true
+                  fetch-depth: 0
+                  token: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Rebase open PRs
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const { execFileSync } = require('child_process');
+                      const excludeLabels = ['no-rebase', 'wip', 'do-not-merge'];
+
+                      // Safe git helper — no shell, prevents injection via branch names
+                      // or committer fields
+                      const git = (...args) =>
+                          execFileSync('git', args, { encoding: 'utf8', stdio: 'pipe' });
+
+                      // Safe cleanup helpers — never throw
+                      const tryGit = (...args) => {
+                          try { git(...args); } catch {}
+                      };
+                      const cleanupIteration = (remoteName) => {
+                          tryGit('rebase', '--abort');
+                          tryGit('checkout', 'master');
+                          tryGit('branch', '-D', '__rebase_tmp');
+                          if (remoteName) tryGit('remote', 'remove', remoteName);
+                      };
+
+                      // Fetch all open, non-draft PRs targeting master
+                      const pulls = await github.paginate(
+                          github.rest.pulls.list,
+                          {
+                              owner: context.repo.owner,
+                              repo: context.repo.repo,
+                              state: 'open',
+                              base: 'master',
+                              per_page: 100
+                          }
+                      );
+
+                      // Filter out drafts and excluded labels
+                      const eligible = pulls.filter(pr => {
+                          if (pr.draft) return false;
+                          const labels = pr.labels.map(l => l.name);
+                          return !excludeLabels.some(ex => labels.includes(ex));
+                      });
+
+                      if (eligible.length === 0) {
+                          core.info('No eligible pull requests found.');
+                          return;
+                      }
+
+                      core.info(`Found ${eligible.length} eligible PR(s) to rebase.`);
+
+                      let rebased = 0;
+                      let skipped = 0;
+                      const failures = [];
+
+                      for (const pr of eligible) {
+                          const headRef = pr.head.ref;
+                          const headRepo = pr.head.repo;
+                          const prNumber = pr.number;
+                          const remoteName = `__pr${prNumber}`;
+
+                          core.info(`\n--- PR #${prNumber}: ${pr.title} (${headRef}) ---`);
+
+                          // Skip PRs whose fork has been deleted (head.repo becomes null)
+                          if (!headRepo) {
+                              core.warning(
+                                  `PR #${prNumber}: skipped — source repository was deleted.`
+                              );
+                              skipped++;
+                              failures.push(`#${prNumber} (repo deleted)`);
+                              continue;
+                          }
+
+                          // Skip PRs from forks that don't allow maintainer edits
+                          if (headRepo.full_name !== `${context.repo.owner}/${context.repo.repo}`) {
+                              if (!pr.maintainer_can_modify) {
+                                  core.warning(
+                                      `PR #${prNumber}: skipped — fork does not allow maintainer edits.`
+                                  );
+                                  skipped++;
+                                  failures.push(`#${prNumber} (no maintainer access)`);
+                                  continue;
+                              }
+                          }
+
+                          try {
+                              // Clean up any leftover state from a previous iteration
+                              cleanupIteration(null);
+
+                              const remoteUrl = headRepo.clone_url;
+
+                              // Add remote for this PR (remove first if exists from a prior run)
+                              tryGit('remote', 'remove', remoteName);
+                              git('remote', 'add', remoteName, remoteUrl);
+                              git('fetch', remoteName, headRef);
+
+                              // Checkout the PR branch locally
+                              git('checkout', '-b', '__rebase_tmp', `${remoteName}/${headRef}`);
+
+                              // Check if already up-to-date with master
+                              const mergeBase = git('merge-base', 'HEAD', 'origin/master').trim();
+                              const masterHead = git('rev-parse', 'origin/master').trim();
+
+                              if (mergeBase === masterHead) {
+                                  core.info(`PR #${prNumber}: already up to date.`);
+                                  cleanupIteration(remoteName);
+                                  continue;
+                              }
+
+                              // Preserve the committer identity from the PR's last commit
+                              const committerName = git('log', '-1', '--format=%cn').trim();
+                              const committerEmail = git('log', '-1', '--format=%ce').trim();
+                              git('config', 'user.name', committerName);
+                              git('config', 'user.email', committerEmail);
+
+                              // Attempt rebase onto latest master
+                              git('rebase', 'origin/master');
+
+                              // Push rebased branch back (force-with-lease for safety)
+                              git('push', '--force-with-lease', remoteName, `HEAD:${headRef}`);
+
+                              core.info(`PR #${prNumber}: successfully rebased.`);
+                              rebased++;
+
+                              // Clean up this iteration's remote and branch
+                              cleanupIteration(remoteName);
+                          } catch (err) {
+                              // Rebase failed (conflicts, permissions, etc.) — skip and continue
+                              core.warning(
+                                  `PR #${prNumber}: rebase failed, skipping. Error: ${err.message}`
+                              );
+                              skipped++;
+                              failures.push(`#${prNumber}`);
+
+                              // Best-effort cleanup so the next iteration starts clean
+                              cleanupIteration(remoteName);
+                          }
+                      }
+
+                      core.info(`\n=== Summary ===`);
+                      core.info(`Rebased: ${rebased}`);
+                      core.info(`Skipped/failed: ${skipped}`);
+                      if (failures.length > 0) {
+                          core.info(`Failed PRs: ${failures.join(', ')}`);
+                      }
+                      core.info(`Total eligible: ${eligible.length}`);
+
+                      core.setOutput('rebased-count', rebased);
