@@ -904,7 +904,7 @@ class Toolbar {
                         1.0
                     );
 
-                    if (svgData == "") {
+                    if (svgData === "") {
                         savePNG.disabled = true;
                         savePNG.className = "grey-text inactiveLink";
                     } else {
@@ -938,7 +938,7 @@ class Toolbar {
                 );
 
                 // if there is no mouse artwork to save then grey out
-                if (svgData == "") {
+                if (svgData === "") {
                     saveSVG.disabled = true;
                     savePNG.disabled = true;
                     saveSVG.className = "grey-text inactiveLink";
@@ -1170,16 +1170,16 @@ class Toolbar {
         menuIcon.onclick = () => {
             const searchBar = docById("search");
             searchBar.classList.toggle("open");
-            if (auxToolbar.style.display == "" || auxToolbar.style.display == "none") {
+            if (auxToolbar.style.display === "" || auxToolbar.style.display === "none") {
                 onclick(this.activity, false);
                 auxToolbar.style.display = "block";
                 menuIcon.innerHTML = "more_vert";
-                docById("toggleAuxBtn").className = "blue darken-1";
+                this._setAuxToolbarButtonState(true);
             } else {
                 onclick(this.activity, true);
                 auxToolbar.style.display = "none";
                 menuIcon.innerHTML = "menu";
-                docById("toggleAuxBtn").className -= "blue darken-1";
+                this._setAuxToolbarButtonState(false);
                 docById("chooseKeyDiv").style.display = "none";
                 docById("movable").style.display = "none";
             }
@@ -2239,9 +2239,40 @@ class Toolbar {
             const menuIcon = docById("menu");
             auxToolbar.style.display = "none";
             menuIcon.innerHTML = "menu";
-            docById("toggleAuxBtn").className -= "blue darken-1";
+            this._setAuxToolbarButtonState(false);
         }
     };
+
+    /**
+     * Updates the auxiliary menu button highlight without corrupting its existing classes.
+     *
+     * @param {boolean} isActive - Whether the auxiliary toolbar is currently open.
+     * @returns {void}
+     */
+    _setAuxToolbarButtonState(isActive) {
+        const toggleAuxBtn = docById("toggleAuxBtn");
+        if (!toggleAuxBtn) return;
+
+        if (toggleAuxBtn.classList) {
+            if (isActive) {
+                toggleAuxBtn.classList.add("blue", "darken-1");
+            } else {
+                toggleAuxBtn.classList.remove("blue", "darken-1");
+            }
+            return;
+        }
+
+        const classNames = new Set((toggleAuxBtn.className || "").split(/\s+/).filter(Boolean));
+        if (isActive) {
+            classNames.add("blue");
+            classNames.add("darken-1");
+        } else {
+            classNames.delete("blue");
+            classNames.delete("darken-1");
+        }
+
+        toggleAuxBtn.className = Array.from(classNames).join(" ");
+    }
 }
 
 /**

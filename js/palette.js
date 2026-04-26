@@ -106,6 +106,10 @@ class Palettes {
         // so we can restore its state when focus leaves.
         this._wasCollapsedBeforeFocus = false;
         this._expandedForKeyboardFocus = false;
+
+        this._searchResultIndex = 0;
+        this._searchNavInitialized = false;
+        this._handleSearchKeydown = this._handleSearchKeydown.bind(this);
     }
 
     init() {
@@ -117,6 +121,7 @@ class Palettes {
             this._makeSelectorButton(i);
         }
         this._setupPaletteKeyboardNav();
+        this._setupSearchKeyboardNav();
     }
 
     /**
@@ -324,6 +329,98 @@ class Palettes {
     }
 
     /**
+     * Sets up keyboard navigation for the search widget.
+     * Attaches a single keydown listener to the search input.
+     */
+    _setupSearchKeyboardNav() {
+        const searchWidget = document.getElementById("search");
+        if (searchWidget && !this._searchNavInitialized) {
+            searchWidget.addEventListener("keydown", this._handleSearchKeydown);
+            this._searchNavInitialized = true;
+        }
+    }
+
+    /**
+     * Handles keydown events on the search widget for result navigation.
+     * @param {KeyboardEvent} event
+     */
+    _handleSearchKeydown(event) {
+        const exitKeys = ["Escape", "ArrowLeft", "ArrowRight"];
+        if (exitKeys.includes(event.key)) {
+            event.preventDefault();
+            event.stopPropagation();
+            this.activity.hideSearchWidget();
+
+            // Return focus to palette
+            const palette = docById("palette");
+            if (palette) {
+                palette.focus();
+                this._navSection = "search";
+                const tr = palette.children[0]?.children[0]?.children[0]?.children[0];
+                const listBody = docById("palette")?.children[0]?.children[1]?.children[1];
+                const blockRows = listBody ? Array.from(listBody.children) : [];
+                this._updateKeyboardFocus(tr, blockRows);
+            }
+        } else if (["ArrowUp", "ArrowDown"].includes(event.key)) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const searchResults = document.querySelectorAll(".ui-menu-item");
+            if (searchResults.length === 0) return;
+
+            // Navigate through search results
+            searchResults.forEach(row => {
+                row.classList.remove("ui-state-active");
+                row.classList.remove("ui-state-focus");
+                row.style.backgroundColor = "";
+                delete row.dataset.keyboardFocus;
+            });
+
+            if (event.key === "ArrowDown") {
+                this._searchResultIndex = Math.min(
+                    this._searchResultIndex + 1,
+                    searchResults.length - 1
+                );
+            } else if (event.key === "ArrowUp") {
+                this._searchResultIndex = Math.max(this._searchResultIndex - 1, 0);
+            }
+
+            const currentResult = searchResults[this._searchResultIndex];
+            if (currentResult) {
+                currentResult.classList.add("ui-state-active");
+                currentResult.style.backgroundColor = platformColor.hoverColor;
+                currentResult.dataset.keyboardFocus = "true";
+                currentResult.scrollIntoView({
+                    block: "nearest",
+                    behavior: "smooth"
+                });
+            }
+        } else if (event.key === "Enter") {
+            const searchResults = document.querySelectorAll(".ui-menu-item");
+
+            if (searchResults[this._searchResultIndex]) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                // Trigger click on the item to select it
+                searchResults[this._searchResultIndex].click();
+
+                // Close search and return focus to palette
+                this.activity.hideSearchWidget();
+                const palette = docById("palette");
+                if (palette) {
+                    palette.focus();
+                    this._navSection = "search";
+                    const tr = palette.children[0]?.children[0]?.children[0]?.children[0];
+                    const listBody = docById("palette")?.children[0]?.children[1]?.children[1];
+                    const blockRows = listBody ? Array.from(listBody.children) : [];
+                    this._updateKeyboardFocus(tr, blockRows);
+                }
+            }
+        }
+    }
+
+    /**
      * Updates visual focus for keyboard navigation
      */
     _updateKeyboardFocus(tr, blockRows) {
@@ -421,103 +518,7 @@ class Palettes {
         if (this._navSection === "search") {
             this._hideMenus();
             this.activity.showSearchWidget();
-
-            // Set up keyboard listener on search widget to allow navigation of results
-            setTimeout(() => {
-                const searchWidget = document.getElementById("search");
-                if (searchWidget) {
-                    // Track navigation state within search results
-                    let searchResultIndex = 0;
-
-                    const searchKeyHandler = event => {
-                        const exitKeys = ["Escape", "ArrowLeft", "ArrowRight"];
-                        if (exitKeys.includes(event.key)) {
-                            event.preventDefault();
-                            event.stopPropagation(); // Prevent global handlers
-                            this.activity.hideSearchWidget();
-
-                            // Return focus to palette
-                            const palette = docById("palette");
-                            if (palette) {
-                                palette.focus();
-                                this._navSection = "search";
-                                const tr =
-                                    palette.children[0]?.children[0]?.children[0]?.children[0];
-                                const listBody =
-                                    docById("palette")?.children[0]?.children[1]?.children[1];
-                                const blockRows = listBody ? Array.from(listBody.children) : [];
-                                this._updateKeyboardFocus(tr, blockRows);
-                            }
-
-                            searchWidget.removeEventListener("keydown", searchKeyHandler);
-                        } else if (["ArrowUp", "ArrowDown"].includes(event.key)) {
-                            event.preventDefault();
-                            event.stopPropagation(); // Prevent global/jQuery UI conflicts
-
-                            // Use jQuery UI autocomplete selectors
-                            const searchResults = document.querySelectorAll(".ui-menu-item");
-
-                            if (searchResults.length === 0) return;
-
-                            // Navigate through search results
-                            searchResults.forEach(row => {
-                                // Clear all potential highlight classes
-                                row.classList.remove("ui-state-active");
-                                row.classList.remove("ui-state-focus");
-                                row.style.backgroundColor = "";
-                                delete row.dataset.keyboardFocus;
-                            });
-
-                            if (event.key === "ArrowDown") {
-                                searchResultIndex = Math.min(
-                                    searchResultIndex + 1,
-                                    searchResults.length - 1
-                                );
-                            } else if (event.key === "ArrowUp") {
-                                searchResultIndex = Math.max(searchResultIndex - 1, 0);
-                            }
-
-                            const currentResult = searchResults[searchResultIndex];
-                            if (currentResult) {
-                                currentResult.classList.add("ui-state-active");
-                                currentResult.style.backgroundColor = platformColor.hoverColor;
-                                currentResult.dataset.keyboardFocus = "true";
-                                currentResult.scrollIntoView({
-                                    block: "nearest",
-                                    behavior: "smooth"
-                                });
-                            }
-                        } else if (event.key === "Enter") {
-                            event.preventDefault();
-                            event.stopPropagation(); // CRITICAL: Stop global "Play" shortcut
-
-                            const searchResults = document.querySelectorAll(".ui-menu-item");
-
-                            if (searchResults[searchResultIndex]) {
-                                // Trigger click on the item to select it
-                                searchResults[searchResultIndex].click();
-
-                                // Close search and return focus to palette
-                                this.activity.hideSearchWidget();
-                                const palette = docById("palette");
-                                if (palette) {
-                                    palette.focus();
-                                    this._navSection = "search";
-                                    const tr =
-                                        palette.children[0]?.children[0]?.children[0]?.children[0];
-                                    const listBody =
-                                        docById("palette")?.children[0]?.children[1]?.children[1];
-                                    const blockRows = listBody ? Array.from(listBody.children) : [];
-                                    this._updateKeyboardFocus(tr, blockRows);
-                                }
-                                searchWidget.removeEventListener("keydown", searchKeyHandler);
-                            }
-                        }
-                    };
-
-                    searchWidget.addEventListener("keydown", searchKeyHandler);
-                }
-            }, 600); // Wait for search widget to be shown and focused
+            this._searchResultIndex = 0;
         } else if (this._navSection === "blocks" && blockRows[this._navBlockIndex]) {
             const row = blockRows[this._navBlockIndex];
             if (row && row.onclick) {
@@ -758,7 +759,10 @@ class Palettes {
     }
 
     getSearchPos() {
-        return [this.cellSize, this.top + this.cellSize * 1.75];
+        return {
+            x: this.cellSize * this.activity.turtleBlocksScale * 1.5,
+            y: (this.top + this.cellSize * 0.95) * this.activity.turtleBlocksScale
+        };
     }
 
     getPluginMacroExpansion(blkname, x, y) {
@@ -981,87 +985,34 @@ class Palettes {
         docById("palette").style.visibility = "visible";
     }
 
-    clear() {
-        try {
-            // First hide all palettes
-            for (const name in this.dict) {
-                if (Object.prototype.hasOwnProperty.call(this.dict, name)) {
-                    const palette = this.dict[name];
-                    if (palette && typeof palette.hideMenu === "function") {
-                        palette.hideMenu();
-                    }
+    reinitialize(palettes) {
+        // First hide all palettes
+        for (const name in this.dict) {
+            if (Object.prototype.hasOwnProperty.call(this.dict, name)) {
+                const palette = this.dict[name];
+                if (palette && typeof palette.hideMenu === "function") {
+                    palette.hideMenu();
                 }
             }
-
-            // Remove the palette DOM element if it exists
-            const paletteElement = docById("palette");
-            if (paletteElement) {
-                paletteElement.parentNode.removeChild(paletteElement);
-            }
-
-            // Clear the dictionary and reset state
-            this.dict = {};
-            this.visible = false;
-            this.activePalette = null;
-            this.paletteObject = null;
-
-            // Recreate the palette using the original initialization code
-            const element = document.createElement("div");
-            element.id = "palette";
-            element.setAttribute("class", "disable_highlighting");
-            element.classList.add("flex-palette");
-            element.setAttribute(
-                "style",
-                `position: fixed; z-index: 1000; left: 0px; top: ${
-                    60 + this.top
-                }px; overflow-y: auto;`
-            );
-            element.innerHTML = `<div style="height:fit-content">
-                    <table width="${1.5 * this.cellSize}" bgcolor="white">
-                        <thead>
-                            <tr></tr>
-                        </thead>
-                    </table>
-                    <table width="${4.5 * this.cellSize}" bgcolor="white">
-                        <thead>
-                            <tr>
-                                <td style= "width:28px"></td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>`;
-            element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
-            document.body.appendChild(element);
-
-            const toggleBtn = document.createElement("div");
-            toggleBtn.innerHTML = "◀";
-            toggleBtn.id = "paletteToggle";
-
-            toggleBtn.style.position = "absolute";
-            toggleBtn.style.top = "12px";
-            toggleBtn.style.right = "-18px";
-            toggleBtn.style.width = "22px";
-            toggleBtn.style.height = "40px";
-            toggleBtn.style.display = "flex";
-            toggleBtn.style.alignItems = "center";
-            toggleBtn.style.justifyContent = "center";
-            toggleBtn.style.cursor = "pointer";
-            toggleBtn.style.background = platformColor.selectorSelected;
-            toggleBtn.style.color = "white";
-
-            toggleBtn.style.borderRadius = "0 6px 6px 0";
-            toggleBtn.style.boxShadow = "0 2px 4px rgba(0,0,0,0.15)";
-            toggleBtn.style.fontWeight = "bold";
-            toggleBtn.style.fontSize = "14px";
-
-            toggleBtn.onclick = () => this.toggleCollapse();
-
-            element.appendChild(toggleBtn);
-        } catch (e) {
-            console.error("Error clearing palettes:", e);
         }
+
+        // Remove the palette DOM element if it exists
+        const paletteElement = docById("palette");
+        if (paletteElement) {
+            paletteElement.parentNode.removeChild(paletteElement);
+        }
+
+        // Clear the dictionary and reset state
+        this.dict = {};
+        this.visible = false;
+        this.activePalette = null;
+        this.paletteObject = null;
+
+        // Initialize palettes
+        initPalettes(palettes);
+
+        // Reset palette collapsed state
+        this.collapsed = false;
     }
 
     setBlocks(blocks) {
@@ -1978,20 +1929,13 @@ class Palette {
                 const statusVariables = [
                     "modelength",
                     "deltapitch2",
-                    "deltapitch",
-                    "currentkey",
+                    "intervalnumber",
+                    "currentinterval",
                     "currentmode",
-                    "x",
-                    "y",
-                    "grey",
-                    "shade",
-                    "pensize",
-                    "color",
-                    "elapsednotes",
-                    "beatfactor",
-                    "notevalue",
+                    "key",
                     "beatvalue",
                     "measurevalue",
+                    "elapsednotes",
                     "bpmfactor",
                     "currentpitch"
                 ];
@@ -2000,16 +1944,14 @@ class Palette {
                 const foundTypes = new Set();
                 for (let blk = 0; blk < this.activity.blocks.blockList.length; blk++) {
                     const block = this.activity.blocks.blockList[blk];
-                    if (!block.trash) {
-                        for (const blockType of statusVariables) {
-                            if (block.name === blockType && !foundTypes.has(blockType)) {
-                                if (this.activity.logo.statusFields) {
-                                    this.activity.logo.statusFields.push([blk, blockType]);
-                                }
-                                foundVariables.push([blk, blockType]);
-                                foundTypes.add(blockType);
-                                break;
+                    if (!block.trash && statusVariables.includes(block.name)) {
+                        const blockType = block.name;
+                        if (!foundTypes.has(blockType)) {
+                            if (this.activity.logo.statusFields) {
+                                this.activity.logo.statusFields.push([blk, blockType]);
                             }
+                            foundVariables.push([blk, blockType]);
+                            foundTypes.add(blockType);
                         }
                     }
                 }
@@ -2033,22 +1975,17 @@ class Palette {
                     }
                 }
 
-                // Create base status block structure
-                const statusBlocks = [
-                    [0, "status", saveX, saveY, [null, 1, 2]],
-                    [
-                        1,
-                        "hidden",
-                        0,
-                        0,
-                        [0, foundVariables.length > 0 || boxBlocks.length > 0 ? 3 : null]
-                    ],
-                    [2, "hiddennoflow", 0, 0, [0, null]]
-                ];
+                // Create base status block structure by calling the protoblock's macro function
+                const statusBlocks = protoblk.macroFunc(saveX, saveY);
 
                 // Add variables and boxes to status block
-                let lastBlockIndex = 2;
-                let lastConnection = 1; // Start from the hidden block
+                let lastBlockIndex = statusBlocks.length - 1;
+                let lastConnection = 8; // Index of the last 'print' block in the base macro
+
+                // Update the connection of the last monitoring block if we have variables to append
+                if (foundVariables.length > 0 || boxBlocks.length > 0) {
+                    statusBlocks[lastConnection][4][2] = lastBlockIndex + 1;
+                }
 
                 // Add variables first
                 for (let i = 0; i < foundVariables.length; i++) {
@@ -2057,28 +1994,27 @@ class Palette {
                     const isLastVar = i === foundVariables.length - 1;
                     const hasBoxes = boxBlocks.length > 0;
 
+                    const varBlockId = ++lastBlockIndex;
+                    const valBlockId = ++lastBlockIndex;
+
                     statusBlocks.push([
-                        lastBlockIndex + 1,
+                        varBlockId,
                         "print",
                         0,
                         0,
-                        [
-                            lastConnection,
-                            lastBlockIndex + 2,
-                            !isLastVar || hasBoxes ? lastBlockIndex + 3 : null
-                        ]
+                        [lastConnection, valBlockId, !isLastVar || hasBoxes ? valBlockId + 1 : null]
                     ]);
-                    lastConnection = lastBlockIndex + 1;
 
                     // Add variable value block
                     statusBlocks.push([
-                        lastBlockIndex + 2,
+                        valBlockId,
                         [blockType, { value: block.value }],
                         0,
                         0,
-                        [lastBlockIndex + 1]
+                        [varBlockId]
                     ]);
-                    lastBlockIndex += 2;
+
+                    lastConnection = varBlockId;
                 }
 
                 // Then add box blocks
@@ -2086,28 +2022,31 @@ class Palette {
                     const boxBlockId = boxBlocks[i];
                     const boxBlock = this.activity.blocks.blockList[boxBlockId];
 
+                    const varBlockId = ++lastBlockIndex;
+                    const valBlockId = ++lastBlockIndex;
+
                     statusBlocks.push([
-                        lastBlockIndex + 1,
+                        varBlockId,
                         "print",
                         0,
                         0,
                         [
                             lastConnection,
-                            lastBlockIndex + 2,
-                            i < boxBlocks.length - 1 ? lastBlockIndex + 3 : null
+                            valBlockId,
+                            i < boxBlocks.length - 1 ? valBlockId + 1 : null
                         ]
                     ]);
-                    lastConnection = lastBlockIndex + 1;
 
                     // Add box value block
                     statusBlocks.push([
-                        lastBlockIndex + 2,
+                        valBlockId,
                         ["namedbox", { value: boxBlock.overrideName }],
                         0,
                         0,
-                        [lastBlockIndex + 1]
+                        [varBlockId]
                     ]);
-                    lastBlockIndex += 2;
+
+                    lastConnection = varBlockId;
                 }
 
                 macroExpansion = statusBlocks;

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -22,13 +22,19 @@
             rel="preload"
             href="https://fonts.googleapis.com/icon?family=Material+Icons"
             as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
         />
         <link
             rel="preload"
             href="fonts/material-icons.css"
             as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
         />
         <!-- NOTE: The exact query-string URL here must be listed in sw.js `precacheFiles`.
          If you change `?v=fixed` (or remove/add a query param), update sw.js so offline still works. -->
@@ -36,37 +42,64 @@
             rel="preload"
             href="css/activities.css?v=fixed"
             as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
         />
         <link
             rel="preload"
             href="dist/css/style.css"
             as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
         />
         <link
             rel="preload"
             href="dist/css/keyboard.css"
             as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
         />
         <link
             rel="preload"
             href="dist/css/windows.css"
             as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
         />
         <link
             rel="preload"
             href="lib/materialize-iso.css"
             as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
         />
         <link
             rel="preload"
             href="css/darkmode.css"
             as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
+        />
+        <link
+            rel="preload"
+            href="css/svgAssetSelector.css"
+            as="style"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
         />
         <link rel="prefetch" as="video" href="loading-animation.webm" type="video/webm" />
         <link rel="prefetch" as="video" href="loading-animation.mp4" type="video/mp4" />
@@ -79,24 +112,24 @@
 
         <script src="lib/reqwest.js" defer></script>
 
-        <script src="lib/jquery-3.7.1.min.js" defer></script>
-        <script src="lib/jquery-ui.js" defer></script>
-        <script src="lib/materialize.min.js" defer></script>
+        <script src="dist/vendor.min.js"></script>
         <link
             rel="preload"
             href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"
             as="style"
             onload="this.onload=null;this.rel='stylesheet'"
         />
-        <noscript><link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" /></noscript>
+        <noscript
+            ><link
+                rel="stylesheet"
+                href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"
+        /></noscript>
         <script src="js/utils/jquery-setup.js" defer></script>
-        <script src="lib/Tone.js" defer></script>
         <script src="lib/midi.js" defer></script>
         <script src="lib/jquery.ruler.js" defer></script>
         <script src="lib/modernizr-2.6.2.min.js" defer></script>
         <script src="lib/raphael.min.js" defer></script>
         <script src="lib/wheelnav.js" defer></script>
-        <script src="lib/abc.min.js" defer></script>
         <script src="lib/codejar/codejar.min.js" defer></script>
         <script src="lib/codejar/highlight.pack.js" defer></script>
         <link
@@ -107,7 +140,13 @@
             crossorigin="anonymous"
             onload="this.onload=null;this.rel='stylesheet'"
         />
-        <noscript><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css" integrity="sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07" crossorigin="anonymous" /></noscript>
+        <noscript
+            ><link
+                rel="stylesheet"
+                href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css"
+                integrity="sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07"
+                crossorigin="anonymous"
+        /></noscript>
 
         <!-- libgif.js (SuperGif) provides low-level GIF frame extraction.
              Browsers expose only the first frame of a GIF; SuperGif lets us
@@ -117,64 +156,86 @@
         <!-- gif-animator.js integrates SuperGif with Music Blocks. It manages
      decoding and drawing GIF frames onto the turtle's overlay canvas.
      Canvas refreshing is handled separately by CreateJS Ticker. -->
-    <script src="js/gif-animator.js" defer></script>
-    <script defer>
-        document.addEventListener("DOMContentLoaded", function () {
-            if (window.hljs) hljs.highlightAll();
-        });
-    </script>
-    <script src="lib/astring.min.js" defer></script>
-    <script src="js/utils/mb-dialog.js" defer></script>
-    <script src="lib/acorn.min.js" defer></script>
-    <script src="env.js" defer></script>
-
-
-    <script data-main="js/loader" src="lib/require.js" defer></script>
-    <link rel="preload" href="/fonts/material-icons.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-    <link
-        rel="preload"
-        href="css/themes.css?v=fixed"
-        as="style"
-        onload="this.onload=null;this.rel='stylesheet'"
-    />
-    <noscript><link rel="stylesheet" href="css/themes.css?v=fixed" /></noscript>
-    <script src="lib/easeljs.min.js" defer></script>
-    <script src="lib/tweenjs.min.js" defer></script>
-    <script>
-        let ast2blocklist_config;
-        window.ast2blocklist_config_failed = false;
-        window.ast2blocklist_config_ready = fetch("js/js-export/ast2blocks.min.json")
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Failed to load AST block config: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                ast2blocklist_config = data;
-                return data;
-            })
-            .catch(() => {
-                window.ast2blocklist_config_failed = true;
-                return null;
+        <script src="js/gif-animator.js" defer></script>
+        <script defer>
+            document.addEventListener("DOMContentLoaded", function () {
+                if (window.hljs) hljs.highlightAll();
             });
-    </script>
-</head>
+        </script>
+        <script src="lib/astring.min.js" defer></script>
+        <script src="js/utils/mb-dialog.js" defer></script>
+        <script src="js/svgAssetSelector.js" defer></script>
+        <script src="lib/acorn.min.js" defer></script>
+        <script src="env.js" defer></script>
 
-<body id="body" data-title="index" style="background: #f9f9f9;">
-    <!-- Fallback for browsers that don't support preload -->
-    <noscript>
-        JavaScript is required to view this page.
-    </noscript>
-    <header>
-        <div id="loading-image-container"
-            style="position: fixed; top: 0; left: 0; width: 100%; height: calc(var(--vh) * 100); display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #FFFFFF; z-index: 9999; contain: paint;">
-            <div id="loading-media" style="width: 100%; padding: 0 20px; box-sizing: border-box;"></div>
-            <div class="loading-text" id="loadingText"
-                style="color:#333; margin-top: 2rem; min-height: 1.5em; font-size: 1.2rem;">
+        <script data-main="js/loader" src="lib/require.js" defer></script>
+        <link
+            rel="preload"
+            href="/fonts/material-icons.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin="anonymous"
+        />
+        <link
+            rel="preload"
+            href="css/themes.css?v=fixed"
+            as="style"
+            onload="this.onload=null;this.rel='stylesheet'"
+        />
+        <noscript><link rel="stylesheet" href="css/themes.css?v=fixed" /></noscript>
+        <script>
+            let ast2blocklist_config;
+            window.ast2blocklist_config_failed = false;
+            window.ast2blocklist_config_ready = fetch("js/js-export/ast2blocks.min.json")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Failed to load AST block config: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    ast2blocklist_config = data;
+                    return data;
+                })
+                .catch(() => {
+                    window.ast2blocklist_config_failed = true;
+                    return null;
+                });
+        </script>
+    </head>
+
+    <body id="body" data-title="index" style="background: #f9f9f9">
+        <!-- Fallback for browsers that don't support preload -->
+        <noscript> JavaScript is required to view this page. </noscript>
+        <header>
+            <div
+                id="loading-image-container"
+                style="
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: calc(var(--vh) * 100);
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    background-color: #ffffff;
+                    z-index: 9999;
+                    contain: paint;
+                "
+            >
+                <div
+                    id="loading-media"
+                    style="width: 100%; padding: 0 20px; box-sizing: border-box"
+                ></div>
+                <div
+                    class="loading-text"
+                    id="loadingText"
+                    style="color: #333; margin-top: 2rem; min-height: 1.5em; font-size: 1.2rem"
+                ></div>
             </div>
-        </div>
-    </header>
+        </header>
 
         <main>
             <!-- #96D3F3-->
@@ -201,31 +262,64 @@
             ></canvas>
 
             <!--hidden at the beginning whilst everything loads-->
+            <div
+                class="popupMsg"
+                id="printText"
+                tabindex="-1"
+                aria-live="polite"
+                role="status"
+                style="
+                    position: absolute;
+                    width: 1px;
+                    height: 1px;
+                    padding: 0;
+                    margin: -1px;
+                    overflow: hidden;
+                    clip: rect(0 0 0 0);
+                    white-space: nowrap;
+                    border: 0;
+                "
+            >
+                <div class="contentWrapper">
+                    <span id="printTextContent"></span>
+                    <img
+                        class="msgCloseIcon"
+                        onclick="hidePrintText()"
+                        src="images/close.svg"
+                        alt="Close"
+                    />
+                </div>
+            </div>
+            <div
+                class="popupMsg"
+                id="errorText"
+                tabindex="-1"
+                aria-live="assertive"
+                role="alert"
+                style="
+                    position: absolute;
+                    width: 1px;
+                    height: 1px;
+                    padding: 0;
+                    margin: -1px;
+                    overflow: hidden;
+                    clip: rect(0 0 0 0);
+                    white-space: nowrap;
+                    border: 0;
+                "
+            >
+                <div class="contentWrapper">
+                    <span id="errorTextContent"></span>
+                    <img
+                        class="msgCloseIcon"
+                        onclick="hideErrorText()"
+                        src="images/close.svg"
+                        alt="Close"
+                    />
+                </div>
+            </div>
             <div id="hideContents" style="display: none" tabindex="-1">
                 <div class="canvasHolder" id="canvasHolder">
-                    <div class="popupMsg" id="printText" tabindex="-1">
-                        <div class="contentWrapper">
-                            <span id="printTextContent"></span>
-                            <img
-                                class="msgCloseIcon"
-                                onclick="hidePrintText()"
-                                src="images/close.svg"
-                                alt="Close"
-                            />
-                        </div>
-                    </div>
-                    <div class="popupMsg" id="errorText" tabindex="-1">
-                        <div class="contentWrapper">
-                            <span id="errorTextContent"></span>
-                            <img
-                                class="msgCloseIcon"
-                                onclick="hideErrorText()"
-                                src="images/close.svg"
-                                alt="Close"
-                            />
-                        </div>
-                    </div>
-
                     <div
                         id="clear-modal-container"
                         style="
@@ -1068,21 +1162,21 @@
                     }, 1500);
                 }, 3000);
 
-            const languageDropdown = document.getElementById("languagedropdown");
-            if (languageDropdown) {
-            const langLinks = languageDropdown.querySelectorAll("a");
-            langLinks.forEach(link => {
-            link.addEventListener("click", function (e) {
-                e.preventDefault(); // prevent default <a> behavior
-                const selectedLang = this.id; // ID corresponds to language code
-                const currentLang = localStorage.getItem("languagePreference");
-                if (currentLang !== selectedLang) {
-                    localStorage.setItem("languagePreference", selectedLang);
-                    location.reload(); // automatically reload
+                const languageDropdown = document.getElementById("languagedropdown");
+                if (languageDropdown) {
+                    const langLinks = languageDropdown.querySelectorAll("a");
+                    langLinks.forEach(link => {
+                        link.addEventListener("click", function (e) {
+                            e.preventDefault(); // prevent default <a> behavior
+                            const selectedLang = this.id; // ID corresponds to language code
+                            const currentLang = localStorage.getItem("languagePreference");
+                            if (currentLang !== selectedLang) {
+                                localStorage.setItem("languagePreference", selectedLang);
+                                location.reload(); // automatically reload
+                            }
+                        });
+                    });
                 }
-            });
-        });
-            }
             });
         </script>
 
@@ -1159,102 +1253,6 @@
         <script>
             var elem = document.documentElement;
 
-        function openFullscreen() {
-            if (elem.requestFullscreen) {
-                elem.requestFullscreen();
-            } else if (elem.webkitRequestFullscreen) {
-                elem.webkitRequestFullscreen();
-            } else if (elem.msRequestFullscreen) {
-                elem.msRequestFullscreen();
-            } else if (elem.mozRequestFullscreen) {
-                elem.mozRequestFullscreen();
-            }
-        }
-
-        function closeFullscreen() {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-            } else if (document.msExitFullscreen) {
-                document.msExitFullscreen();
-            } else if (document.mozExitFullscreen) {
-                document.mozExitFullscreen();
-            }
-        }
-
-        function setIcon() {
-            var iconCode = document.querySelector('#FullScrIcon');
-            // Determine fullscreen state using the browser fullscreen API
-            // instead of relying on a manual counter. This keeps the icon
-            // in sync when fullscreen is exited via ESC or browser controls.
-            var isFullscreen =
-                document.fullscreenElement ||
-                document.webkitFullscreenElement ||
-                document.mozFullScreenElement ||
-                document.msFullscreenElement;
-
-            if (!isFullscreen) {
-                openFullscreen();
-                iconCode.textContent = '\ue5d1'; // fullscreen_exit icon
-            } else {
-                closeFullscreen();
-                iconCode.textContent = '\ue5d0'; // fullscreen icon
-            }
-        }
-
-        function handleFullscreenChange() {
-            var iconCode = document.querySelector('#FullScrIcon');
-            var fullScreenBtn = document.querySelector('#FullScreen');
-            // Update fullscreen icon based on actual fullscreen state.
-            // This removes the need for a separate state variable and
-            // prevents incorrect icon state when fullscreen is toggled
-            // outside the button (e.g., ESC key).
-            var isFullscreen =
-                document.fullscreenElement ||
-                document.webkitFullscreenElement ||
-                document.mozFullScreenElement ||
-                document.msFullscreenElement;
-
-            iconCode.textContent = isFullscreen ? '\ue5d1' : '\ue5d0';
-            
-            if (fullScreenBtn && typeof _ === 'function') {
-                var tooltipText = isFullscreen ? _("Exit Fullscreen") : _("Enter Fullscreen");
-                fullScreenBtn.setAttribute('data-tooltip', tooltipText);
-                if (window.jQuery) {
-                    window.jQuery(fullScreenBtn).tooltip({
-                        html: true,
-                        delay: 100
-                    });
-                }
-            }
-        }
-
-        document.addEventListener('fullscreenchange', handleFullscreenChange);
-        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-        document.addEventListener('MSFullscreenChange', handleFullscreenChange);
-    </script>
-
-    <style>
-        #installButton.hidden {
-            display: none !important;
-        }
-    </style>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            let persistentNotification = null;
-
-            function showPersistentNotification() {
-                if (!persistentNotification) {
-                    persistentNotification = document.createElement("div");
-                    persistentNotification.id = "persistentNotification";
-                    persistentNotification.innerHTML = "Play only mode enabled. For full Music Blocks experience, use a larger display.";
-                    document.body.appendChild(persistentNotification);
-                }
-            }} )
-
             function openFullscreen() {
                 if (elem.requestFullscreen) {
                     elem.requestFullscreen();
@@ -1302,10 +1300,6 @@
             function handleFullscreenChange() {
                 var iconCode = document.querySelector("#FullScrIcon");
                 var fullScreenBtn = document.querySelector("#FullScreen");
-                // Update fullscreen icon based on actual fullscreen state.
-                // This removes the need for a separate state variable and
-                // prevents incorrect icon state when fullscreen is toggled
-                // outside the button (e.g., ESC key).
                 var isFullscreen =
                     document.fullscreenElement ||
                     document.webkitFullscreenElement ||
@@ -1337,7 +1331,7 @@
                 display: none !important;
             }
         </style>
-        
+
         <script src="js/utils/zoomOverlay.js"></script>
 
         <script>
@@ -1436,7 +1430,6 @@
                         c.style.height = "100%";
                     });
                 }
-
                 window.addEventListener("resize", resizeCanvasesToScreen);
                 document.addEventListener("fullscreenchange", resizeCanvasesToScreen);
 

@@ -873,4 +873,47 @@ describe("TemperamentWidget basic tests", () => {
 
         expect(widget.inTemperament).toBe("equal");
     });
+
+    describe("cents <-> frequency conversion", () => {
+        test("_freqToCents returns 0 when frequency equals base", () => {
+            expect(widget._freqToCents(440, 440)).toBe(0);
+        });
+
+        test("_freqToCents returns 1200 for one octave up", () => {
+            expect(widget._freqToCents(880, 440)).toBeCloseTo(1200, 6);
+        });
+
+        test("_freqToCents returns -1200 for one octave down", () => {
+            expect(widget._freqToCents(220, 440)).toBeCloseTo(-1200, 6);
+        });
+
+        test("_freqToCents returns ~100 for one equal-tempered semitone up", () => {
+            const semitone = 440 * Math.pow(2, 1 / 12);
+            expect(widget._freqToCents(semitone, 440)).toBeCloseTo(100, 6);
+        });
+
+        test("_centsToFreq returns the base frequency for 0 cents", () => {
+            expect(widget._centsToFreq(0, 440)).toBe(440);
+        });
+
+        test("_centsToFreq doubles the frequency at +1200 cents", () => {
+            expect(widget._centsToFreq(1200, 440)).toBeCloseTo(880, 6);
+        });
+
+        test("_centsToFreq halves the frequency at -1200 cents", () => {
+            expect(widget._centsToFreq(-1200, 440)).toBeCloseTo(220, 6);
+        });
+
+        test("round-trip: freq -> cents -> freq preserves the original", () => {
+            const freq = 523.25;
+            const cents = widget._freqToCents(freq, 440);
+            expect(widget._centsToFreq(cents, 440)).toBeCloseTo(freq, 6);
+        });
+
+        test("round-trip: cents -> freq -> cents preserves the original", () => {
+            const cents = 47;
+            const freq = widget._centsToFreq(cents, 440);
+            expect(widget._freqToCents(freq, 440)).toBeCloseTo(cents, 6);
+        });
+    });
 });

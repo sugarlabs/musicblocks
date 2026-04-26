@@ -60,6 +60,7 @@ describe("Utility Functions (logic-only)", () => {
         stopTuner,
         newTone,
         preloadProjectSamples,
+        resolveInstrumentName,
         Synth;
 
     const turtle = "turtle1";
@@ -126,6 +127,9 @@ describe("Utility Functions (logic-only)", () => {
                 SAMPLECENTERNO: typeof SAMPLECENTERNO !== "undefined" ? SAMPLECENTERNO : undefined,
                 CUSTOMSAMPLES: typeof CUSTOMSAMPLES !== "undefined" ? CUSTOMSAMPLES : undefined,
                 DEFAULTSYNTHVOLUME: typeof DEFAULTSYNTHVOLUME !== "undefined" ? DEFAULTSYNTHVOLUME : undefined,
+                VOICENAMES: typeof VOICENAMES !== "undefined" ? VOICENAMES : undefined,
+                DRUMNAMES: typeof DRUMNAMES !== "undefined" ? DRUMNAMES : undefined,
+                NOISENAMES: typeof NOISENAMES !== "undefined" ? NOISENAMES : undefined,
                   };
         `);
         const results = wrapper();
@@ -168,6 +172,7 @@ describe("Utility Functions (logic-only)", () => {
         stopTuner = Synth.stopTuner;
         newTone = Synth.newTone;
         preloadProjectSamples = Synth.preloadProjectSamples;
+        resolveInstrumentName = Synth.resolveInstrumentName;
     });
 
     describe("setupRecorder", () => {
@@ -623,8 +628,12 @@ describe("Utility Functions (logic-only)", () => {
             const instrumentName = "nonexistent";
             const note = "C4";
 
-            // Act & Assert
-            expect(() => startSound(turtle, instrumentName, note)).toThrow();
+            // Act
+            startSound(turtle, instrumentName, note);
+
+            // Assert
+            expect(instruments[turtle].flute.triggerAttack).not.toHaveBeenCalled();
+            expect(instruments[turtle].guitar.start).not.toHaveBeenCalled();
         });
 
         test("should handle undefined turtle gracefully", () => {
@@ -634,7 +643,7 @@ describe("Utility Functions (logic-only)", () => {
             const note = "C4";
 
             // Act & Assert
-            expect(() => startSound(invalidTurtle, instrumentName, note)).toThrow();
+            expect(() => startSound(invalidTurtle, instrumentName, note)).not.toThrow();
         });
     });
 
@@ -697,8 +706,13 @@ describe("Utility Functions (logic-only)", () => {
             // Arrange
             const instrumentName = "nonexistent";
             const note = "C4";
-            // Act & Assert
-            expect(() => stopSound(turtle, instrumentName, note)).toThrow();
+
+            // Act
+            stopSound(turtle, instrumentName, note);
+
+            // Assert
+            expect(instruments[turtle].flute.triggerRelease).not.toHaveBeenCalled();
+            expect(instruments[turtle].guitar.stop).not.toHaveBeenCalled();
         });
 
         test("should handle invalid turtle gracefully", () => {
@@ -708,7 +722,7 @@ describe("Utility Functions (logic-only)", () => {
             const note = "C4";
 
             // Act & Assert
-            expect(() => stopSound(invalidTurtle, instrumentName, note)).toThrow();
+            expect(() => stopSound(invalidTurtle, instrumentName, note)).not.toThrow();
         });
     });
 
@@ -1205,6 +1219,35 @@ describe("Utility Functions (logic-only)", () => {
             expect(global.URL.revokeObjectURL).toHaveBeenCalledWith("blob:recording-url");
             expect(Synth.player).toBeNull();
             expect(Synth.audioURL).toBeNull();
+        });
+    });
+
+    describe("resolveInstrumentName", () => {
+        it("should return the internal key for a translated voice name", () => {
+            // Verifies lookup against both the translated name (VOICENAMES[i][0])
+            // and the internal key (VOICENAMES[i][1]).
+            expect(resolveInstrumentName("piano")).toBe("piano");
+        });
+
+        it("should return the internal key for a raw internal voice name", () => {
+            expect(resolveInstrumentName("electric guitar")).toBe("electric guitar");
+        });
+
+        it("should return the internal key for a drum name", () => {
+            expect(resolveInstrumentName("snare drum")).toBe("snare drum");
+        });
+
+        it("should return the internal key for a translated noise name", () => {
+            expect(resolveInstrumentName("white noise")).toBe("noise1");
+        });
+
+        it("should return the original name if not found in any mapping", () => {
+            expect(resolveInstrumentName("unknown-synth")).toBe("unknown-synth");
+        });
+
+        it("should handle null or undefined gracefully", () => {
+            expect(resolveInstrumentName(null)).toBe(null);
+            expect(resolveInstrumentName(undefined)).toBe(undefined);
         });
     });
 });

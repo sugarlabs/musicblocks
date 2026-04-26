@@ -256,6 +256,7 @@ function setupExtrasBlocks(activity) {
          */
         flow(args, logo) {
             activity.blocks.showBlocks();
+            logo.activity.showBlocksAfterRun = true;
             logo.turtleDelay = DEFAULTDELAY;
         }
     }

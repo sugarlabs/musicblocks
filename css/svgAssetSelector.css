@@ -1,0 +1,243 @@
+/* SVG Asset Selector Modal Styles */
+
+#svgAssetSelectorOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+#svgAssetSelectorOverlay.visible {
+    opacity: 1;
+}
+
+#svgAssetSelectorModal {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    width: 520px;
+    max-width: 90vw;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: scale(0.9);
+    transition: transform 0.25s ease;
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+}
+
+#svgAssetSelectorOverlay.visible #svgAssetSelectorModal {
+    transform: scale(1);
+}
+
+/* Header */
+.svg-selector-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: #2196f3;
+    color: #fff;
+}
+
+.svg-selector-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.svg-selector-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+    opacity: 0.85;
+    transition: opacity 0.15s;
+}
+
+.svg-selector-close:hover {
+    opacity: 1;
+}
+
+/* Tab buttons for choosing source */
+.svg-selector-tabs {
+    display: flex;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.svg-selector-tab {
+    flex: 1;
+    padding: 12px 16px;
+    background: #f5f5f5;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #616161;
+    transition: background 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.svg-selector-tab:hover {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.svg-selector-tab.active {
+    background: #fff;
+    color: #1976d2;
+    border-bottom: 3px solid #2196f3;
+}
+
+.svg-selector-tab .tab-icon {
+    font-size: 20px;
+}
+
+/* Built-in images grid */
+.svg-selector-grid-container {
+    padding: 16px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 200px;
+    max-height: 50vh;
+}
+
+.svg-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
+}
+
+.svg-asset-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 6px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    background: #fafafa;
+}
+
+.svg-asset-item:hover {
+    border-color: #90caf9;
+    background: #e3f2fd;
+    transform: translateY(-2px);
+}
+
+.svg-asset-item.selected {
+    border-color: #2196f3;
+    background: #bbdefb;
+}
+
+.svg-asset-item img {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+.svg-asset-item .asset-name {
+    margin-top: 6px;
+    font-size: 11px;
+    color: #616161;
+    text-align: center;
+    word-break: break-word;
+    line-height: 1.3;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Upload tab content */
+.svg-selector-upload {
+    padding: 32px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.svg-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    background: #2196f3;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.svg-upload-btn:hover {
+    background: #1976d2;
+}
+
+.svg-upload-hint {
+    font-size: 13px;
+    color: #9e9e9e;
+}
+
+/* Footer with apply button */
+.svg-selector-footer {
+    padding: 12px 20px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    background: #fafafa;
+}
+
+.svg-selector-footer button {
+    padding: 8px 22px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.svg-apply-btn {
+    background: #2196f3;
+    color: #fff;
+    border: none;
+}
+
+.svg-apply-btn:hover {
+    background: #1976d2;
+}
+
+.svg-apply-btn:disabled {
+    background: #bdbdbd;
+    cursor: not-allowed;
+}
+
+.svg-cancel-btn {
+    background: #fff;
+    color: #616161;
+    border: 1px solid #bdbdbd;
+}
+
+.svg-cancel-btn:hover {
+    background: #f5f5f5;
+}

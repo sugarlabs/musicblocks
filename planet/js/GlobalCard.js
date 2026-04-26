@@ -26,6 +26,7 @@ class GlobalCard {
         this.ProjectData = null;
         this.id = null;
         this.likeTimeout = null;
+        this.likePending = false;
         this.clipboard = null;
         this.PlaceholderMBImage = "images/mbgraphic.png";
         this.PlaceholderTBImage = "images/tbgraphic.png";
@@ -100,6 +101,24 @@ class GlobalCard {
          `;
     }
 
+    showToast(message, isError = false) {
+        // Reuse existing SaveInterface.showToast but add error styling if needed
+        if (this.Planet && this.Planet.SaveInterface) {
+            this.Planet.SaveInterface.showToast(message);
+
+            // If it's an error, modify the toast to be red
+            if (isError) {
+                setTimeout(() => {
+                    const toasts = document.querySelectorAll(".toast");
+                    if (toasts.length > 0) {
+                        const lastToast = toasts[toasts.length - 1];
+                        lastToast.style.background = "#f44336"; // Red for errors
+                    }
+                }, 10);
+            }
+        }
+    }
+
     render() {
         const Planet = this.Planet;
         const html = this.renderData.replace(new RegExp("{ID}", "g"), this.id);
@@ -171,7 +190,7 @@ class GlobalCard {
         frag.getElementById(`global-project-share-${this.id}`).addEventListener("click", evt => {
             const s = document.getElementById(`global-sharebox-${this.id}`);
 
-            if (s.style.display == "none") {
+            if (s.style.display === "none") {
                 s.style.display = "initial";
                 hideOnClickOutside(
                     [document.getElementById(`global-share-${this.id}`)],
@@ -215,15 +234,15 @@ class GlobalCard {
         this.clipboard = new ClipboardJS(`.copyshareurl[data-clipboard-text*="${this.id}"]`);
 
         this.clipboard.on("success", e => {
-            // eslint-disable-next-line no-console
             console.info("Copied:", e.text);
+            this.showToast(_("Link copied to clipboard!"));
             e.clearSelection();
         });
 
         this.clipboard.on("error", e => {
-            alert("Failed to copy!");
-            // eslint-disable-next-line no-console
+            console.warn("Failed to copy to clipboard");
             console.error("Failed to copy:", e.action);
+            this.showToast(_("Failed to copy link to clipboard"), true);
         });
     }
 
@@ -243,12 +262,15 @@ class GlobalCard {
     }
 
     like() {
+        if (this.likePending) return;
         const Planet = this.Planet;
         clearTimeout(this.likeTimeout);
         let like = true;
         if (Planet.ProjectStorage.isLiked(this.id)) like = false;
+        this.likePending = true;
         this.likeTimeout = setTimeout(() => {
             Planet.ServerInterface.likeProject(this.id, like, data => {
+                this.likePending = false;
                 this.afterLike(data, like);
             });
         }, 500);

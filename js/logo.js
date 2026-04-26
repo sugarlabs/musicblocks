@@ -267,6 +267,7 @@ class Logo {
         this.cameraID = null;
         this.stopTurtle = false;
         this.lastKeyCode = null;
+        this.setCameraID = this.setCameraID.bind(this);
 
         // Widget-related attributes
         this.showPitchDrumMatrix = false;
@@ -491,6 +492,7 @@ class Logo {
                 for (let i = 0; i < n; i++) {
                     const obj = this.connectionStore[turtle][blk].pop();
                     this.blockList[obj[0]].connections[obj[1]] = obj[2];
+                    // eslint-disable-next-line eqeqeq
                     if (obj[2] != null) {
                         this.blockList[obj[2]].connections[0] = obj[0];
                     }
@@ -570,11 +572,11 @@ class Logo {
         }
 
         this.deps.Singer.setMasterVolume(this.activity.logo, DEFAULTVOLUME);
-        for (const turtle in this.activity.turtles.turtleList) {
+        for (const t in this.activity.turtles.turtleList) {
             // Cache ithTurtle result to avoid redundant function calls in inner loop
-            const tur = this.activity.turtles.ithTurtle(turtle);
+            const tur = this.activity.turtles.ithTurtle(t);
             for (const synth in tur.singer.synthVolume) {
-                this.deps.Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
+                this.deps.Singer.setSynthVolume(this, t, synth, DEFAULTVOLUME);
             }
         }
 
@@ -778,7 +780,7 @@ class Logo {
     parseArg(logo, turtle, blk, parentBlk, receivedArg) {
         const tur = logo.activity.turtles.ithTurtle(turtle);
 
-        // Using loose null check to catch both null and undefined input blocks
+        // eslint-disable-next-line eqeqeq
         if (blk == null) {
             logo.activity.errorMsg(NOINPUTERRORMSG, parentBlk);
             return null;
@@ -829,7 +831,7 @@ class Logo {
                         logo.statusFields.push([blk, "dectofrac"]);
                     } else {
                         const cblk = currentBlock.connections[1];
-                        // Using loose null check for undefined acceptance
+                        // eslint-disable-next-line eqeqeq
                         if (cblk == null) {
                             logo.activity.errorMsg(NOINPUTERRORMSG, blk);
                             currentBlock.value = 0;
@@ -906,6 +908,7 @@ class Logo {
         // already been added to notesPlayed
 
         // Don't split the note if we are already splitting the note
+        // eslint-disable-next-line eqeqeq
         if (split == undefined) split = true;
 
         const tur = this.activity.turtles.ithTurtle(turtle);
@@ -1039,7 +1042,7 @@ class Logo {
                 loopBlkIdx = turtle.queue[i].blk;
                 parentLoopBlock = this.blockList[loopBlkIdx];
                 // Flush the parent from the queue
-                turtle.queue.pop();
+                turtle.queue.splice(i, 1);
                 break;
             } else if (
                 ["forever", "repeat", "while", "until"].includes(
@@ -1050,11 +1053,12 @@ class Logo {
                 loopBlkIdx = turtle.queue[i].parentBlk;
                 parentLoopBlock = this.blockList[loopBlkIdx];
                 // Flush the parent from the queue
-                turtle.queue.pop();
+                turtle.queue.splice(i, 1);
                 break;
             }
         }
 
+        // eslint-disable-next-line eqeqeq
         if (parentLoopBlock == null) {
             // Flush the child flow
             turtle.queue.pop();
@@ -1064,6 +1068,7 @@ class Logo {
         // For while and until, we need to add any childflow from the parent to the queue
         if (parentLoopBlock.name === "while" || parentLoopBlock.name === "until") {
             const childFlow = this.deps.utils.last(parentLoopBlock.connections);
+            // eslint-disable-next-line eqeqeq
             if (childFlow != null) {
                 const queueBlock = new Queue(childFlow, 1, loopBlkIdx);
                 // We need to keep track of the parent block to the child flow so we can
@@ -1148,7 +1153,7 @@ class Logo {
         }
 
         this.synth.stop();
-        if (this.synth.recorder && this.synth.recorder.state == "recording")
+        if (this.synth.recorder && this.synth.recorder.state === "recording")
             this.synth.recorder.stop();
 
         // Dispose all Tone.js instruments to free decoded AudioBuffers
@@ -1156,8 +1161,13 @@ class Logo {
         // on the next run.
         this.synth.disposeAllInstruments();
 
+        // eslint-disable-next-line eqeqeq
         if (this.cameraID != null) {
             this.deps.utils.doStopVideoCam(this.cameraID, this.setCameraID);
+        }
+
+        for (const arg in this.evalOnStopList) {
+            this.safePluginExecute(this.evalOnStopList[arg], this);
         }
 
         this.onStopTurtle();
@@ -1194,6 +1204,7 @@ class Logo {
             if (this.stepQueue[turtle].length > 0) {
                 if (
                     turtle in this._unhighlightStepQueue &&
+                    // eslint-disable-next-line eqeqeq
                     this._unhighlightStepQueue[turtle] != null
                 ) {
                     if (this.activity.blocks.visible) {
@@ -1203,6 +1214,7 @@ class Logo {
                 }
 
                 const blk = this.stepQueue[turtle].pop();
+                // eslint-disable-next-line eqeqeq
                 if (blk != null) {
                     this.runFromBlockNow(this, turtle, blk, 0, null);
                 }
@@ -1249,12 +1261,18 @@ class Logo {
         }
 
         this._prematureRestart = this._alreadyRunning;
+
         if (this._alreadyRunning && this._runningBlock !== null) {
             this._ignoringBlock = this._runningBlock;
         } else {
             this._ignoringBlock = null;
         }
 
+        // NOW reset the flags for the new run
+        this._alreadyRunning = false;
+        this._prematureRestart = false;
+
+        // eslint-disable-next-line eqeqeq
         if (this._lastNoteTimeout != null) {
             clearTimeout(this._lastNoteTimeout);
             this._lastNoteTimeout = null;
@@ -1399,6 +1417,7 @@ class Logo {
                 const c = this.blockList[this.activity.blocks.stackList[blk]].connections[1];
                 // Is there a block in the action clamp?
                 const b = this.blockList[this.activity.blocks.stackList[blk]].connections[2];
+                // eslint-disable-next-line eqeqeq
                 if (c != null && b != null) {
                     // Don't use an action block in the trash
                     if (!this.blockList[this.activity.blocks.stackList[blk]].trash) {
@@ -1450,6 +1469,7 @@ class Logo {
         */
         if (this.activity.turtles.turtleCount() === 0) {
             this.activity.errorMsg(NOACTIONERRORMSG, null, _("start"));
+            // eslint-disable-next-line eqeqeq
         } else if (startHere != null) {
             // If a block to start from was passed, find its associated
             // turtle, i.e., which turtle should we use?
@@ -1549,6 +1569,7 @@ class Logo {
      */
     runFromBlock(logo, turtle, blk, isflow, receivedArg) {
         this._runningBlock = blk;
+        // eslint-disable-next-line eqeqeq
         if (blk == null) return;
 
         this.receivedArg = receivedArg;
@@ -1684,8 +1705,9 @@ class Logo {
                 } else {
                     nextFlow = logo.blockList[blk].connections[0];
                     if (
-                        logo.blockList[nextFlow].name === "action" ||
-                        logo.blockList[nextFlow].name === "backward"
+                        nextFlow != null &&
+                        (logo.blockList[nextFlow].name === "action" ||
+                            logo.blockList[nextFlow].name === "backward")
                     ) {
                         nextFlow = null;
                     } else {
@@ -1711,6 +1733,7 @@ class Logo {
             }
 
             const queueBlock = new Queue(nextFlow, 1, blk, receivedArg);
+            // eslint-disable-next-line eqeqeq
             if (nextFlow != null) {
                 // This could be the last block.
                 tur.queue.push(queueBlock);
@@ -1806,6 +1829,7 @@ class Logo {
                 const blockName = currentBlock.name;
                 const label = blockLabels[blockName];
 
+                // eslint-disable-next-line eqeqeq
                 if (currentBlock.value == null) {
                     logo.activity.textMsg("null block value");
                 } else {
@@ -1830,6 +1854,7 @@ class Logo {
             if (blk in tur.endOfClampSignals) {
                 while (tur.endOfClampSignals[blk].length > 0) {
                     const signal = tur.endOfClampSignals[blk].pop();
+                    // eslint-disable-next-line eqeqeq
                     if (signal != null) {
                         logo.activity.stage.dispatchEvent(signal);
                     }
@@ -1844,6 +1869,7 @@ class Logo {
         }
 
         // If there is a child flow, queue it.
+        // eslint-disable-next-line eqeqeq
         if (childFlow != null) {
             let queueBlock;
             if (logo.blockList[blk].name === "doArg" || logo.blockList[blk].name === "nameddoArg") {
@@ -1854,6 +1880,7 @@ class Logo {
             // We need to keep track of the parent block to the child
             // flow so we can unhighlight the parent block after the
             // child flow completes.
+            // eslint-disable-next-line eqeqeq
             if (tur.parentFlowQueue != undefined) {
                 tur.parentFlowQueue.push(blk);
                 tur.queue.push(queueBlock);
@@ -1882,6 +1909,7 @@ class Logo {
             }
         }
 
+        // eslint-disable-next-line eqeqeq
         if (nextBlock != null) {
             if (parentBlk !== blk) {
                 // The wait block waits _waitTimes longer than other
@@ -1911,8 +1939,10 @@ class Logo {
             }
 
             if (
+                // eslint-disable-next-line eqeqeq
                 (tur.singer.backward.length > 0 && logo.blockList[blk].connections[0] == null) ||
                 (tur.singer.backward.length === 0 &&
+                    // eslint-disable-next-line eqeqeq
                     logo.deps.utils.last(logo.blockList[blk].connections) == null)
             ) {
                 if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
@@ -1977,8 +2007,8 @@ class Logo {
                 logo._syncCounter++;
                 if (logo._syncCounter >= logo._YIELD_AFTER_SYNC_RUNS) {
                     logo._syncCounter = 0;
-                    setTimeout(() => {
-                        if (!logo.stopTurtle) {
+                    logo._timerManager.setGuardedTimeout(
+                        () =>
                             logo.runFromBlockNow(
                                 logo,
                                 turtle,
@@ -1986,9 +2016,10 @@ class Logo {
                                 isflow,
                                 passArg,
                                 queueStart
-                            );
-                        }
-                    }, 0);
+                            ),
+                        0,
+                        () => logo.stopTurtle
+                    );
                 } else {
                     logo.runFromBlockNow(logo, turtle, nextBlock, isflow, passArg, queueStart);
                 }
@@ -2003,8 +2034,10 @@ class Logo {
                 for (const b in tur.endOfClampSignals) {
                     const signalsLength = tur.endOfClampSignals[b].length;
                     for (let i = 0; i < signalsLength; i++) {
+                        // eslint-disable-next-line eqeqeq
                         if (tur.endOfClampSignals[b][i] != null) {
                             if (
+                                // eslint-disable-next-line eqeqeq
                                 tur.butNotThese[b] == null ||
                                 tur.butNotThese[b].indexOf(i) === -1
                             ) {

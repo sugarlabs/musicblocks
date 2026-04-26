@@ -294,3 +294,7 @@ class ServerInterface {
         );
     }
 }
+
+if (typeof module !== "undefined") {
+    module.exports = ServerInterface;
+}

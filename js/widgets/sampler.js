@@ -479,6 +479,13 @@ function SampleWidget() {
 
             this.running = false;
 
+            // Stop current audio
+            if (this.audioPreview) {
+                this.audioPreview.pause();
+                this.audioPreview.currentTime = 0;
+                this.audioPreview = null;
+            }
+
             // Stop pitch detection and release resources (microphone, AudioContext)
             this.stopPitchDetection();
 
@@ -598,6 +605,7 @@ function SampleWidget() {
         // );
 
         let generating = false;
+        this.audioPreview = null;
 
         this._promptBtn.onclick = () => {
             this.widgetWindow.clearScreen();
@@ -727,10 +735,23 @@ function SampleWidget() {
             preview.style.cursor = "pointer";
             preview.innerHTML = "Preview";
             preview.disabled = true;
-            preview.onclick = function () {
+            preview.onclick = () => {
+                if (that.audioPreview) {
+                    that.audioPreview.pause();
+                    that.audioPreview.currentTime = 0;
+                    that.audioPreview = null;
+                }
+
                 const audioURL = `http://13.61.94.100:8000/preview`;
-                const audio = new Audio(audioURL);
-                audio.play();
+                const newAudio = new Audio(audioURL);
+                that.audioPreview = newAudio;
+                newAudio.play();
+
+                newAudio.onended = function () {
+                    if (that.audioPreview === newAudio) {
+                        that.audioPreview = null;
+                    }
+                };
             };
 
             const save = document.createElement("button");

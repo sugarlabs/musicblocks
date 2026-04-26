@@ -57,6 +57,16 @@ function MusicKeyboard(activity) {
     const WHITEKEYS = [65, 83, 68, 70, 71, 72, 74, 75, 76];
     const SPACE = 32;
 
+    const setKeyboardCellLabel = (cell, label, octave, prefix = null) => {
+        cell.replaceChildren();
+        if (prefix !== null) {
+            const small = document.createElement("small");
+            small.textContent = `(${prefix})`;
+            cell.append(small, document.createElement("br"));
+        }
+        cell.append(document.createTextNode(`${label}${octave}`));
+    };
+
     const w = window.innerWidth;
     /**
      * Reference to the activity associated with the keyboard.
@@ -684,7 +694,6 @@ function MusicKeyboard(activity) {
             }
 
             selectedNotes = [];
-            docById("wheelDivptm").style.display = "none";
             docById("wheelDivptm").style.display = "none";
             if (this._menuWheel) this._menuWheel.removeWheel();
             if (this._pitchWheel) this._pitchWheel.removeWheel();
@@ -1597,13 +1606,13 @@ function MusicKeyboard(activity) {
             cell.style.left = "0px";
             cell.className = "headcol"; // This cell is fixed horizontally.
             if (this.displayLayout[i].noteName === "drum") {
-                cell.innerHTML = this.displayLayout[i].voice;
+                cell.textContent = this.displayLayout[i].voice;
             } else if (this.displayLayout[i].noteName === "hertz") {
-                cell.innerHTML = this.displayLayout[i].noteOctave.toString() + "HZ";
+                cell.textContent = this.displayLayout[i].noteOctave.toString() + "HZ";
             } else {
-                cell.innerHTML = `${i18nSolfege(
-                    this.displayLayout[i].noteName
-                )}<sub>${this.displayLayout[i].noteOctave.toString()}</sub>`;
+                cell.textContent = `${i18nSolfege(this.displayLayout[i].noteName)}${this.displayLayout[
+                    i
+                ].noteOctave.toString()}`;
             }
 
             cell.setAttribute("id", "labelcol" + (n - i - 1));
@@ -1647,7 +1656,7 @@ function MusicKeyboard(activity) {
         cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) * 1.5 + "px";
         cell.style.maxWidth = cell.style.minWidth;
         cell.className = "headcol"; // This cell is fixed horizontally.
-        cell.innerHTML = _("Note value");
+        cell.textContent = _("Note value");
         cell.style.position = "sticky";
         cell.style.left = "0px";
         cell.style.zIndex = "1";
@@ -1699,7 +1708,7 @@ function MusicKeyboard(activity) {
             cell.style.maxWidth = cell.style.width;
             cell.style.lineHeight = 60 + "%";
             cell.style.textAlign = "center";
-            cell.innerHTML = `${dur[0].toString()}/${dur[1].toString()}`;
+            cell.textContent = `${dur[0].toString()}/${dur[1].toString()}`;
             cell.setAttribute("id", "cells-" + j);
             cell.setAttribute("start", selectedNotes[j].startTime);
             cell.setAttribute("dur", maxWidth);
@@ -2557,7 +2566,8 @@ function MusicKeyboard(activity) {
 
             const cell = docById("labelcol" + (this.layout.length - index - 1));
             this.layout[index].noteOctave = parseInt(blockValue);
-            cell.innerHTML = this.layout[index].noteName + this.layout[index].noteOctave.toString();
+            cell.textContent =
+                this.layout[index].noteName + this.layout[index].noteOctave.toString();
             this._notesPlayed.map(function (item) {
                 if (item.objId === this.layout[index].blockNumber) {
                     item.noteOctave = parseInt(blockValue);
@@ -2618,7 +2628,8 @@ function MusicKeyboard(activity) {
             const cell = docById("labelcol" + (this.layout.length - index - 1));
             this.layout[index].noteName = label;
             this.layout[index].noteOctave = octave;
-            cell.innerHTML = this.layout[index].noteName + this.layout[index].noteOctave.toString();
+            cell.textContent =
+                this.layout[index].noteName + this.layout[index].noteOctave.toString();
             const temp1 = label;
             let temp2;
             if (temp1 in FIXEDSOLFEGE1) {
@@ -2786,7 +2797,7 @@ function MusicKeyboard(activity) {
                 }
 
                 myrow2Id++;
-                newel2.innerHTML = "";
+                newel2.textContent = "";
                 newel2.style.visibility = "hidden";
                 parenttbl2.appendChild(newel2);
             } else if (this.displayLayout[p].noteName === "drum") {
@@ -2806,11 +2817,12 @@ function MusicKeyboard(activity) {
                     "whiteRow" + myrowId.toString(),
                     this.displayLayout[p].blockNumber
                 ]);
-                newel.innerHTML = `${
-                    myrowId < WHITEKEYS.length
-                        ? `<small>(${String.fromCharCode(WHITEKEYS[myrowId])})</small><br/>`
-                        : ""
-                }${this.displayLayout[p].voice}`;
+                setKeyboardCellLabel(
+                    newel,
+                    this.displayLayout[p].voice,
+                    "",
+                    myrowId < WHITEKEYS.length ? String.fromCharCode(WHITEKEYS[myrowId]) : null
+                );
 
                 this.displayLayout[p].objId = "whiteRow" + myrowId.toString();
 
@@ -2835,11 +2847,12 @@ function MusicKeyboard(activity) {
                     "hertzRow" + myrow3Id.toString(),
                     this.displayLayout[p].blockNumber
                 ]);
-                newel.innerHTML = `${
-                    myrow3Id < HERTZKEYS.length
-                        ? "<small>(${String.fromCharCode(HERTZKEYS[myrow3Id])})</small><br/>"
-                        : ""
-                }${this.displayLayout[p].noteOctave}`;
+                setKeyboardCellLabel(
+                    newel,
+                    "",
+                    this.displayLayout[p].noteOctave,
+                    myrow3Id < HERTZKEYS.length ? String.fromCharCode(HERTZKEYS[myrow3Id]) : null
+                );
 
                 this.displayLayout[p].objId = "hertzRow" + myrow3Id.toString();
 
@@ -2886,10 +2899,14 @@ function MusicKeyboard(activity) {
 
                 nname = this.displayLayout[p].noteName.replace(SHARP, "").replace("#", "");
                 if (this.displayLayout[p].blockNumber >= FAKEBLOCKNUMBER) {
-                    newel2.innerHTML =
+                    setKeyboardCellLabel(
+                        newel2,
+                        "",
+                        "",
                         myrow2Id < BLACKKEYS.length
-                            ? `<small>(${String.fromCharCode(BLACKKEYS[myrow2Id])})</small><br/>`
-                            : "";
+                            ? String.fromCharCode(BLACKKEYS[myrow2Id])
+                            : null
+                    );
                 }
                 if (p < this.layout.length) {
                     this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
@@ -2945,17 +2962,19 @@ function MusicKeyboard(activity) {
                 nname = this.displayLayout[p].noteName.replace(FLAT, "").replace("b", "");
                 if (this.displayLayout[p].blockNumber <= FAKEBLOCKNUMBER) {
                     if (SOLFEGENAMES.includes(nname)) {
-                        newel2.innerHTML = `<small>(${String.fromCharCode(
-                            BLACKKEYS[myrow2Id]
-                        )})</small><br/>${i18nSolfege(nname)}${FLAT}${
-                            this.displayLayout[p].noteOctave
-                        }`;
+                        setKeyboardCellLabel(
+                            newel2,
+                            `${i18nSolfege(nname)}${FLAT}`,
+                            this.displayLayout[p].noteOctave,
+                            String.fromCharCode(BLACKKEYS[myrow2Id])
+                        );
                     } else {
-                        newel2.innerHTML = `<small>(${String.fromCharCode(
-                            BLACKKEYS[myrow2Id]
-                        )})</small><br/>${this.displayLayout[p].noteName}${
-                            this.displayLayout[p].noteOctave
-                        }`;
+                        setKeyboardCellLabel(
+                            newel2,
+                            this.displayLayout[p].noteName,
+                            this.displayLayout[p].noteOctave,
+                            String.fromCharCode(BLACKKEYS[myrow2Id])
+                        );
                     }
                 }
                 if (p < this.layout.length) {
@@ -2989,19 +3008,23 @@ function MusicKeyboard(activity) {
 
                 if (this.displayLayout[p].blockNumber <= FAKEBLOCKNUMBER) {
                     if (SOLFEGENAMES.includes(this.displayLayout[p].noteName)) {
-                        newel.innerHTML = `${
+                        setKeyboardCellLabel(
+                            newel,
+                            i18nSolfege(this.displayLayout[p].noteName),
+                            this.displayLayout[p].noteOctave,
                             myrowId < WHITEKEYS.length
-                                ? `<small>(${String.fromCharCode(WHITEKEYS[myrowId])})</small><br/>`
-                                : ""
-                        }${i18nSolfege(this.displayLayout[p].noteName)}${
-                            this.displayLayout[p].noteOctave
-                        }`;
+                                ? String.fromCharCode(WHITEKEYS[myrowId])
+                                : null
+                        );
                     } else {
-                        newel.innerHTML = `${
+                        setKeyboardCellLabel(
+                            newel,
+                            this.displayLayout[p].noteName,
+                            this.displayLayout[p].noteOctave,
                             myrowId < WHITEKEYS.length
-                                ? `<small>(${String.fromCharCode(WHITEKEYS[myrowId])})</small><br/>`
-                                : ""
-                        }${this.displayLayout[p].noteName}${this.displayLayout[p].noteOctave}`;
+                                ? String.fromCharCode(WHITEKEYS[myrowId])
+                                : null
+                        );
                     }
                 }
                 if (p < this.layout.length) {
@@ -3021,7 +3044,7 @@ function MusicKeyboard(activity) {
         newel.style.textAlign = "center";
         newel.setAttribute("id", "rest");
         newel.setAttribute("alt", "R__");
-        newel.innerHTML = `<small>(${_("rest")})</small><br/>`;
+        setKeyboardCellLabel(newel, "", "", _("rest"));
         newel.style.position = "relative";
         newel.style.zIndex = "100";
 

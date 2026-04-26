@@ -3631,7 +3631,7 @@ msgid "Maximum heap size is 1000."
 msgstr "అత్యధిక హీప్ పరిమాణం 1000."
 
 #: js/blocks/HeapBlocks.js:523
-msgid "The Set-heap entry block sets a value in he heap at the specified location."
+msgid "The Set-heap entry block sets a value in the heap at the specified location."
 msgstr "సెట్-హీప్ ఎంట్రీ బ్లాక్ నిర్దిష్ట ప్రదేశంలో హీప్‌లో ఒక విలువను సెట్ చేస్తుంది."
 
 #: js/blocks/HeapBlocks.js:539
@@ -4122,7 +4122,7 @@ msgid "run block"
 msgstr "ఈ బ్లాక్ను తొలగించండి"
 
 #: js/blocks/ProgramBlocks.js:1025
-msgid "The Dock block block connections two blocks."
+msgid "The Dock block connects two blocks."
 msgstr "డాక్ బ్లాక్ రెండు బ్లాక్‌ల అనుసంధానాలను చేస్తుంది."
 
 #: js/blocks/ProgramBlocks.js:1036
@@ -11266,7 +11266,7 @@ msgstr "చలింపు"
 
 #: js/turtledefs.js:413
 
-#~ msgid "The <em>Setheapentry</em> block sets a value in he heap at the specified location."
+#~ msgid "The <em>Setheapentry</em> block sets a value in the heap at the specified location."
 #~ msgstr "<em>సెట్‌హీప్‌ఎంట్రీ</em> బ్లాక్ నిర్దిష్ట స్థానంలో హీప్‌లో ఒక విలువ నిర్ధారిస్తుంది."
 
 #: js/turtledefs.js:29
@@ -12540,7 +12540,7 @@ msgstr "చలింపు"
 
 #: js/turtledefs.js:421
 
-#~ msgid "The Setheapentry block sets a value in he heap at the specified location."
+#~ msgid "The Setheapentry block sets a value in the heap at the specified location."
 #~ msgstr "సెట్హీప్ ఎంట్రీ బ్లాక్ నిర్దిష్టమైన స్థానంలో హీప్‌లో ఒక విలువ సెట్ చేస్తుంది."
 
 #: js/utilitybox.js:281

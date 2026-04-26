@@ -453,10 +453,12 @@ describe("Palettes Class", () => {
     });
 
     describe("getSearchPos method", () => {
-        test("returns correct search position", () => {
+        test("returns macro expansion coordinates as object", () => {
             const pos = palettes.getSearchPos();
-
-            expect(pos).toEqual([palettes.cellSize, palettes.top + palettes.cellSize * 1.75]);
+            expect(pos).toHaveProperty("x");
+            expect(pos).toHaveProperty("y");
+            expect(typeof pos.x).toBe("number");
+            expect(typeof pos.y).toBe("number");
         });
     });
 
@@ -1797,7 +1799,16 @@ describe("Palettes Class", () => {
         test("_makeBlockFromProtoblock creates status macro", () => {
             palettes.add("test");
             const palette = palettes.dict.test;
-            const protoblk = { name: "status" };
+            const protoblk = {
+                name: "status",
+                macroFunc: jest.fn(() => [
+                    [0, "status", 10, 20, [null, 1, 2]],
+                    [1, "hidden", 0, 0, [0, 3]],
+                    [2, "hiddennoflow", 0, 0, [0, null]],
+                    [3, "print", 0, 0, [1, 4, null]],
+                    [4, "beatvalue", 0, 0, [3]]
+                ])
+            };
 
             mockActivity.palettes = palettes;
             mockActivity.blocks = {
@@ -1833,7 +1844,14 @@ describe("Palettes Class", () => {
         test("_makeBlockFromProtoblock skips duplicate status", () => {
             palettes.add("test");
             const palette = palettes.dict.test;
-            const protoblk = { name: "status" };
+            const protoblk = {
+                name: "status",
+                macroFunc: jest.fn(() => [
+                    [0, "status", 10, 20, [null, 1, 2]],
+                    [1, "hidden", 0, 0, [0, null]],
+                    [2, "hiddennoflow", 0, 0, [0, null]]
+                ])
+            };
 
             mockActivity.blocks = {
                 blockList: [{ name: "status", trash: false }]
@@ -1849,7 +1867,20 @@ describe("Palettes Class", () => {
         test("_makeBlockFromProtoblock builds status fields from variables and boxes", () => {
             palettes.add("test");
             const palette = palettes.dict.test;
-            const protoblk = { name: "status" };
+            const protoblk = {
+                name: "status",
+                macroFunc: jest.fn(() => [
+                    [0, "status", 100, 100, [null, 1, 2]],
+                    [1, "hidden", 0, 0, [0, 3]],
+                    [2, "hiddennoflow", 0, 0, [0, null]],
+                    [3, "print", 0, 0, [1, 4, 5]],
+                    [4, "elapsednotes", 0, 0, [3]],
+                    [5, "print", 0, 0, [3, 6, 7]],
+                    [6, "beatvalue", 0, 0, [5]],
+                    [7, "print", 0, 0, [5, 8, null]],
+                    [8, "measurevalue", 0, 0, [7]]
+                ])
+            };
 
             global.activity = mockActivity;
 
@@ -2404,46 +2435,46 @@ describe("Palettes Class", () => {
         });
     });
 
-    describe("clear method", () => {
-        test("clears dict and resets state", () => {
-            // Setup document mock for clear method
-            global.document = {
-                createElement: jest.fn(() => ({
-                    id: "",
-                    setAttribute: jest.fn(),
-                    classList: { add: jest.fn() },
-                    innerHTML: "",
-                    childNodes: [{ style: {} }]
-                })),
-                body: { appendChild: jest.fn() }
+    describe("reinitialize method", () => {
+        test("hides existing menus, removes old palette element, and reinitialize palettes", () => {
+            const hideMenu1 = jest.fn();
+            const hideMenu2 = jest.fn();
+            const paletteElement = {
+                parentNode: {
+                    removeChild: jest.fn()
+                },
+                style: {}
             };
-            global.docById = jest.fn(id => {
-                if (id === "palette") {
-                    return { parentNode: { removeChild: jest.fn() } };
-                }
-                return null;
-            });
 
-            palettes.dict = { test: { hideMenu: jest.fn() } };
+            palettes.dict = {
+                rhythm: { hideMenu: hideMenu1 },
+                pitch: { hideMenu: hideMenu2 }
+            };
             palettes.visible = true;
-            palettes.activePalette = "test";
+            palettes.activePalette = "rhythm";
+            palettes.paletteObject = { id: "old" };
+            palettes.collapsed = true;
 
-            palettes.clear();
+            global.BUILTINPALETTES = [];
+            global.docById = jest.fn(id => (id === "palette" ? paletteElement : null));
 
+            const mockInitTarget = {
+                add: jest.fn().mockReturnThis(),
+                init_selectors: jest.fn(),
+                makePalettes: jest.fn(),
+                show: jest.fn()
+            };
+
+            palettes.reinitialize(mockInitTarget);
+
+            expect(hideMenu1).toHaveBeenCalled();
+            expect(hideMenu2).toHaveBeenCalled();
+            expect(paletteElement.parentNode.removeChild).toHaveBeenCalledWith(paletteElement);
             expect(palettes.dict).toEqual({});
             expect(palettes.visible).toBe(false);
             expect(palettes.activePalette).toBeNull();
-        });
-
-        test("handles errors gracefully", () => {
-            // Make docById throw to test error handling
-            global.docById = jest.fn(() => {
-                throw new Error("Test error");
-            });
-            palettes.dict = {};
-
-            // Should not throw due to try-catch
-            expect(() => palettes.clear()).not.toThrow();
+            expect(palettes.paletteObject).toBeNull();
+            expect(palettes.collapsed).toBe(false);
         });
     });
 

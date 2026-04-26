@@ -2303,9 +2303,46 @@ class Block {
 
     /**
      * Opens media for the block.
+     * Shows a chooser modal for media blocks that lets the user
+     * either select a built-in SVG image or upload from their device.
      * @param {number} thisBlock - Index of the current block.
      */
     _doOpenMedia(thisBlock) {
+        const that = this;
+
+        // For non-media blocks (e.g., audiofile, loadFile), use the
+        // original file-chooser flow directly.
+        if (that.name !== "media") {
+            that._doOpenMediaFromDevice(thisBlock);
+            return;
+        }
+
+        // Show the built-in SVG asset selector modal.
+        if (typeof openSvgAssetSelector === "function") {
+            openSvgAssetSelector(
+                // Callback when a built-in image is selected
+                function (dataURL) {
+                    that.value = dataURL;
+                    that.loadThumbnail(null);
+                },
+                // Callback when the user chooses to upload from device
+                function () {
+                    that._doOpenMediaFromDevice(thisBlock);
+                }
+            );
+        } else {
+            // Fallback: if the selector module is not loaded,
+            // use the original file upload flow.
+            that._doOpenMediaFromDevice(thisBlock);
+        }
+    }
+
+    /**
+     * Opens a file chooser to upload media from the local device.
+     * This preserves the original upload behavior.
+     * @param {number} thisBlock - Index of the current block.
+     */
+    _doOpenMediaFromDevice(thisBlock) {
         const that = this;
         const fileChooser = that.name === "media" ? docById("myMedia") : docById("audio");
 
@@ -3188,8 +3225,10 @@ class Block {
             that.blocks.raiseStackToTop(thisBlock);
 
             // And possibly the collapse button.
+            // eslint-disable-next-line eqeqeq
             if (that.collapseContainer != null) {
                 // Ensure the blocksContainer still exisits.
+                // eslint-disable-next-line eqeqeq
                 if (that.activity.blocksContainer != null) {
                     that.activity.blocksContainer.setChildIndex(
                         that.collapseContainer,
@@ -3221,6 +3260,7 @@ class Block {
             // mouse move event.
             _dragHasRest2 = false;
             let checkBlock = that.blocks.blockList[that.connections[1]];
+            // eslint-disable-next-line eqeqeq
             while (checkBlock != null) {
                 if (checkBlock?.name === "rest2") {
                     _dragHasRest2 = true;
@@ -3382,6 +3422,7 @@ class Block {
         this.container.on("mouseout", event => {
             // Ignore transient mouseout while actively dragging.
             if (that._dragPointerDown) {
+                // eslint-disable-next-line eqeqeq
                 if (that.blocks.longPressTimeout != null) {
                     clearTimeout(that.blocks.longPressTimeout);
                     that.blocks.longPressTimeout = null;
@@ -4869,3 +4910,7 @@ window.hasMouse = false;
 document.addEventListener("mousemove", () => {
     window.hasMouse = true;
 });
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = Block;
+}

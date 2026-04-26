@@ -1620,6 +1620,39 @@ function Synth() {
     };
 
     /**
+     * Resolves an instrument/drum/noise name (which might be a translated label)
+     * to its internal technical key.
+     * @param {string} name - The name to resolve.
+     * @returns {string} The resolved internal key.
+     */
+    this.resolveInstrumentName = name => {
+        if (!name || typeof name !== "string") return name;
+
+        // 1. Check VoiceNames
+        for (let i = 0; i < VOICENAMES.length; i++) {
+            if (VOICENAMES[i][0] === name || VOICENAMES[i][1] === name) {
+                return VOICENAMES[i][1];
+            }
+        }
+
+        // 2. Check DrumNames
+        for (let i = 0; i < DRUMNAMES.length; i++) {
+            if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1] === name) {
+                return DRUMNAMES[i][1];
+            }
+        }
+
+        // 3. Check NoiseNames
+        for (let i = 0; i < NOISENAMES.length; i++) {
+            if (NOISENAMES[i][0] === name || NOISENAMES[i][1] === name) {
+                return NOISENAMES[i][1];
+            }
+        }
+
+        return name; // Fallback to original (e.g. custom sample URL)
+    };
+
+    /**
      * Loads a synth based on the user's input, creating and setting volume for the specified turtle.
      * @function
      * @memberof Synth
@@ -1629,6 +1662,7 @@ function Synth() {
      */
     this.loadSynth = async (turtle, sourceName) => {
         /* eslint-disable */
+        sourceName = this.resolveInstrumentName(sourceName);
         if (sourceName.substring(0, 13) === "customsample_") {
             console.debug("loading custom " + sourceName);
         } else {
@@ -1939,6 +1973,12 @@ function Synth() {
                                     }
                                 });
                             }
+
+                            // Re-establish the dry path so subsequent notes
+                            // that do not use effects still reach the speakers.
+                            if (synth && typeof synth.toDestination === "function") {
+                                synth.toDestination();
+                            }
                         } catch (e) {
                             console.debug("Error disposing effects:", e);
                         }
@@ -1959,6 +1999,11 @@ function Synth() {
                     filter.dispose();
                 }
             });
+
+            // Re-establish the dry path on error as well.
+            if (synth && typeof synth.toDestination === "function") {
+                synth.toDestination();
+            }
         }
     };
 
@@ -2011,6 +2056,9 @@ function Synth() {
         setNote,
         future
     ) => {
+        // Capture the current instrument epoch to detect disposal during async operations
+        const epoch = this._instrumentEpoch;
+
         // If audio is not running, try to start it
         if (Tone.context.state !== "running") {
             Tone.start().catch(function (e) {
@@ -2101,7 +2149,18 @@ function Synth() {
                 console.warn("Synth not initialized, creating default synth");
                 this.createDefaultSynth(turtle);
                 await this.loadSynth(turtle, instrumentName);
+
+                // Check if instruments were disposed while we were waiting
+                if (this._instrumentEpoch !== epoch) {
+                    return; // Exit gracefully - instruments were disposed
+                }
+
                 tempSynth = instruments[turtle][instrumentName];
+            }
+
+            // Final validation: ensure synth still exists and is valid
+            if (!tempSynth || !instruments[turtle] || !instruments[turtle][instrumentName]) {
+                return; // Exit gracefully - synth is no longer available
             }
 
             switch (flag) {
@@ -2176,6 +2235,7 @@ function Synth() {
     };
 
     this.startSound = (turtle, instrumentName, note) => {
+        if (!instrumentsSource[instrumentName] || !instruments[turtle]?.[instrumentName]) return;
         const flag = instrumentsSource[instrumentName][0];
         switch (flag) {
             case 1: // drum
@@ -2188,6 +2248,7 @@ function Synth() {
     };
 
     this.stopSound = (turtle, instrumentName, note) => {
+        if (!instrumentsSource[instrumentName] || !instruments[turtle]?.[instrumentName]) return;
         const flag = instrumentsSource[instrumentName][0];
         switch (flag) {
             case 1: // drum
@@ -2204,6 +2265,8 @@ function Synth() {
     };
 
     this.loop = (turtle, instrumentName, note, duration, start, bpm, velocity) => {
+        if (!instrumentsSource[instrumentName] || !instruments[turtle]?.[instrumentName])
+            return null;
         const synthA = instruments[turtle][instrumentName];
         const flag = instrumentsSource[instrumentName][0];
         const now = Tone.now();
@@ -2294,6 +2357,8 @@ function Synth() {
      * @param {number} volume - The volume level (0 to 100).
      */
     this.setVolume = (turtle, instrumentName, volume) => {
+        // Resolve instrumentName to internal key
+        instrumentName = this.resolveInstrumentName(instrumentName);
         // guard invalid UI/programmatic input (audio boundary safety)
         volume = Math.max(0, Math.min(volume, 100));
         // We pass in volume as a number from 0 to 100.
