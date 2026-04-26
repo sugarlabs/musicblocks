@@ -326,17 +326,17 @@ class Singer {
                 noteObj[1],
                 steps > 0
                     ? getStepSizeUp(
-                          tur.singer.keySignature,
-                          noteObj[0],
-                          steps,
-                          logo.synth.inTemperament
-                      )
+                        tur.singer.keySignature,
+                        noteObj[0],
+                        steps,
+                        logo.synth.inTemperament
+                    )
                     : getStepSizeDown(
-                          tur.singer.keySignature,
-                          noteObj[0],
-                          steps,
-                          logo.synth.inTemperament
-                      ),
+                        tur.singer.keySignature,
+                        noteObj[0],
+                        steps,
+                        logo.synth.inTemperament
+                    ),
                 tur.singer.keySignature,
                 tur.singer.movable,
                 null,
@@ -1101,11 +1101,11 @@ class Singer {
                     cents === 0
                         ? 0
                         : getCachedPitchToFrequency(
-                              noteObj[0],
-                              noteObj[1],
-                              cents,
-                              tur.singer.keySignature
-                          )
+                            noteObj[0],
+                            noteObj[1],
+                            cents,
+                            tur.singer.keySignature
+                        )
                 );
 
                 return noteObj;
@@ -1152,7 +1152,7 @@ class Singer {
                     noteObj1[0],
                     noteObj1[1],
                     getInterval(chordInterval[0], tur.singer.keySignature, noteObj1[0]) +
-                        chordInterval[1],
+                    chordInterval[1],
                     tur.singer.keySignature,
                     tur.singer.movable,
                     null,
@@ -1304,11 +1304,11 @@ class Singer {
                     cents === 0
                         ? 0
                         : getCachedPitchToFrequency(
-                              noteObj[0],
-                              noteObj[1],
-                              cents,
-                              tur.singer.keySignature
-                          )
+                            noteObj[0],
+                            noteObj[1],
+                            cents,
+                            tur.singer.keySignature
+                        )
                 );
 
                 return noteObj;
@@ -1525,7 +1525,7 @@ class Singer {
         } else if (tur.singer.crescendoDelta.length > 0) {
             if (
                 last(tur.singer.synthVolume[DEFAULTVOICE]) ===
-                    last(tur.singer.crescendoInitialVolume[DEFAULTVOICE]) &&
+                last(tur.singer.crescendoInitialVolume[DEFAULTVOICE]) &&
                 tur.singer.justCounting.length === 0
             ) {
                 activity.logo.notation.notationBeginCrescendo(
@@ -1976,10 +1976,9 @@ class Singer {
                 // to infinity or NaN.
                 if (!isFinite(duration)) return;
 
-                // Use the beatValue of the first note in the group
                 // since there can only be one.
-                const portamento = tur.singer.glide.length > 0 ? last(tur.singer.glide) : 0;
-
+                const glide = tur.singer.glide;
+                const portamento = glide?.length ? bpmFactor * last(glide) : 0;
                 let beatValue = bpmFactor / noteBeatValue;
                 if (tur.singer.staccato.length > 0) {
                     const staccatoBeatValue = last(tur.singer.staccato);
@@ -2009,7 +2008,7 @@ class Singer {
                             if (
                                 i === j ||
                                 tur.singer.noteOctaves[thisBlk][i] !==
-                                    tur.singer.noteOctaves[thisBlk][j]
+                                tur.singer.noteOctaves[thisBlk][j]
                             ) {
                                 continue;
                             }
@@ -2153,9 +2152,9 @@ class Singer {
                     const notesFrequency = isCustomTemperament(activity.logo.synth.inTemperament)
                         ? activity.logo.synth.getCustomFrequency(notes)
                         : activity.logo.synth.getFrequency(
-                              notes,
-                              activity.logo.synth.changeInTemperament
-                          );
+                            notes,
+                            activity.logo.synth.changeInTemperament
+                        );
                     const startingPitch = activity.logo.synth.startingPitch;
                     const frequency = getCachedPitchToFrequency(
                         startingPitch.substring(0, startingPitch.length - 1),
@@ -2271,8 +2270,8 @@ class Singer {
                                     if (notes.length > 1) {
                                         activity.errorMsg(
                                             last(tur.singer.oscList[thisBlk]) +
-                                                ": " +
-                                                _("synth cannot play chords."),
+                                            ": " +
+                                            _("synth cannot play chords."),
                                             blk
                                         );
                                     }
@@ -2343,7 +2342,7 @@ class Singer {
                                                     } else {
                                                         // trigger first note for entire duration of the glissando
                                                         const beatValueOverride =
-                                                            bpmFactor / tur.singer.glideOverride;
+                                                            bpmFactor * tur.singer.glideOverride;
                                                         activity.logo.synth.trigger(
                                                             turtle,
                                                             notes[d],

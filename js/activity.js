@@ -4908,14 +4908,68 @@ class Activity {
                 }
                 this.showBlocksAfterRun = false;
             }
-            // TODO: plugin support
+            // Restore save/record UI state when turtles stop (automatic or manual)
+            try {
+                const saveBtn = document.getElementById("saveButton");
+                const saveBtnAdv = document.getElementById("saveButtonAdvanced");
+                const recordBtn = document.getElementById("record");
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.className = "";
+                }
+                if (saveBtnAdv) {
+                    saveBtnAdv.disabled = false;
+                    saveBtnAdv.className = "";
+                }
+                if (recordBtn) {
+                    // remove inactive styling if present
+                    if (recordBtn.className === "grey-text inactiveLink") {
+                        recordBtn.className = "";
+                    }
+                }
+            } catch (e) {
+                console.error("onStopTurtle UI restore failed:", e);
+            }
         };
 
         /*
          * When turtle starts running change stop button to running state
          */
         this.onRunTurtle = () => {
-            // TODO: plugin support
+            // Mirror the UI behaviour when running from the toolbar:
+            // hide blocks (so they can be restored on stop), show the
+            // stop button and set its running colour.
+            try {
+                if (!this.turtles.isShrunk()) {
+                    this.blocks.hideBlocks();
+                    this.showBlocksAfterRun = true;
+                }
+
+                const stopBtn = document.getElementById("stop");
+                if (stopBtn) {
+                    stopBtn.style.display = "inline-block";
+                    // Prefer toolbar configured colour, fallback to platform colour
+                    stopBtn.style.color = this.toolbar?.stopIconColorWhenPlaying || (window.platformColor && window.platformColor.stopIconcolor) || "#ff0000";
+                }
+
+                const saveBtn = document.getElementById("saveButton");
+                const saveBtnAdv = document.getElementById("saveButtonAdvanced");
+                const recordBtn = document.getElementById("record");
+                if (saveBtn) {
+                    saveBtn.disabled = true;
+                    saveBtn.className = "grey-text inactiveLink";
+                }
+                if (saveBtnAdv) {
+                    saveBtnAdv.disabled = true;
+                    saveBtnAdv.className = "grey-text inactiveLink";
+                }
+                if (recordBtn) {
+                    recordBtn.className = "grey-text inactiveLink";
+                }
+            } catch (e) {
+                // Defensive: do not break runtime if DOM unavailable
+                console.error("onRunTurtle UI update failed:", e);
+            }
         };
 
         /*
