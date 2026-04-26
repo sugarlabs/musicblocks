@@ -188,7 +188,8 @@ class RequestManager {
                     const delay = this.baseRetryDelay * Math.pow(2, attempt);
 
                     console.debug(
-                        `[RequestManager] Retry attempt ${attempt + 1}/${this.maxRetries
+                        `[RequestManager] Retry attempt ${attempt + 1}/${
+                            this.maxRetries
                         } after ${delay}ms`
                     );
 
@@ -210,7 +211,8 @@ class RequestManager {
                 const delay = this.baseRetryDelay * Math.pow(2, attempt);
 
                 console.debug(
-                    `[RequestManager] Retry attempt ${attempt + 1}/${this.maxRetries
+                    `[RequestManager] Retry attempt ${attempt + 1}/${
+                        this.maxRetries
                     } after ${delay}ms (error: ${error.message})`
                 );
 
@@ -234,7 +236,7 @@ class RequestManager {
     _promisifyRequest(requestFn) {
         return new Promise((resolve, reject) => {
             const timeout = setTimeout(() => {
-                resolve({ success: false, error: "REQUEST_TIMEOUT" });;
+                resolve({ success: false, error: "REQUEST_TIMEOUT" });
             }, 30000); // 30 seconds
 
             try {

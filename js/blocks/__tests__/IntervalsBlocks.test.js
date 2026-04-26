@@ -201,13 +201,27 @@ describe("setupIntervalsBlocks", () => {
     });
 
     it("SemitoneIntervalBlock sets interval and returns child block", () => {
-        const result = createdBlocks.semitoneinterval.flow([5, "childBlk"], logo, turtleIndex, "blk");
-        expect(Singer.IntervalsActions.setSemitoneInterval).toHaveBeenCalledWith(5, turtleIndex, "blk");
+        const result = createdBlocks.semitoneinterval.flow(
+            [5, "childBlk"],
+            logo,
+            turtleIndex,
+            "blk"
+        );
+        expect(Singer.IntervalsActions.setSemitoneInterval).toHaveBeenCalledWith(
+            5,
+            turtleIndex,
+            "blk"
+        );
         expect(result).toEqual(["childBlk", 1]);
     });
 
     it("SemitoneIntervalBlock returns early when args[1] undefined", () => {
-        const result = createdBlocks.semitoneinterval.flow([5, undefined], logo, turtleIndex, "blk");
+        const result = createdBlocks.semitoneinterval.flow(
+            [5, undefined],
+            logo,
+            turtleIndex,
+            "blk"
+        );
         expect(result).toBeUndefined();
     });
 
@@ -257,5 +271,4 @@ describe("setupIntervalsBlocks", () => {
         createdBlocks.currentinterval.arg(logo, turtleIndex, "blk1");
         expect(logo.statusFields).toContainEqual(["blk1", "currentinterval"]);
     });
-
 });

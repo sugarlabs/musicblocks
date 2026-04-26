@@ -799,7 +799,10 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
     try {
         obj = JSON.parse(pluginData);
     } catch (error) {
-        console.error(`PluginProcessor: Failed to parse plugin data from source "${pluginSource}":`, error);
+        console.error(
+            `PluginProcessor: Failed to parse plugin data from source "${pluginSource}":`,
+            error
+        );
         console.debug("Malformed plugin data:", pluginData);
         return null;
     }
