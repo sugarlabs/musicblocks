@@ -32,6 +32,7 @@ const mockActivity = {
     _loadStart: jest.fn(),
     doLoadAnimation: jest.fn(),
     textMsg: jest.fn(),
+    errorMsg: jest.fn(),
     stage: { enableDOMEvents: jest.fn(), update: jest.fn() },
     blocks: { loadNewBlocks: jest.fn(), palettes: { _hideMenus: jest.fn() }, trashStacks: [] },
     logo: { doStopTurtles: jest.fn() },
@@ -369,10 +370,10 @@ describe("PlanetInterface", () => {
     it("loadProjectFromData shows error and returns early if data is undefined", () => {
         const saved_ = global._;
         global._ = jest.fn(str => str);
-        planetInterface.errorMsg = jest.fn();
+
         planetInterface.iframe = { style: { display: "" } };
         planetInterface.loadProjectFromData(undefined, false);
-        expect(planetInterface.errorMsg).toHaveBeenCalledWith("project undefined");
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith("project undefined");
         global._ = saved_;
     });
 
