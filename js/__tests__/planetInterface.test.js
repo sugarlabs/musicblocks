@@ -76,6 +76,7 @@ describe("PlanetInterface", () => {
 
     beforeEach(() => {
         planetInterface = new PlanetInterface(mockActivity);
+        mockActivity.errorMsg.mockClear();
     });
 
     test("hideMusicBlocks hides relevant elements and disables DOM events", () => {
@@ -403,7 +404,7 @@ describe("PlanetInterface", () => {
     it("loadProjectFromData catches JSON parse errors and calls errorMsg", () => {
         planetInterface.iframe = { style: { display: "" } };
         planetInterface.getCurrentProjectName = jest.fn(() => "foo");
-        planetInterface.errorMsg = jest.fn();
+        planetInterface.mockActivityerrorMsg = jest.fn();
         planetInterface.loadProjectFromData("invalid json");
         expect(planetInterface.errorMsg).toHaveBeenCalledWith(expect.any(SyntaxError));
     });
