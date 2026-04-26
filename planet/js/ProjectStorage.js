@@ -283,7 +283,16 @@ class ProjectStorage {
     }
 
     async port() {
-        const oldProjectData = localStorage.getItem(this.LocalStorageKey);
+        let oldProjectData = null;
+        try {
+            oldProjectData = localStorage.getItem(this.LocalStorageKey);
+        } catch (e) {
+            console.warn(
+                "[ProjectStorage] Unable to access legacy localStorage during migration:",
+                e
+            );
+        }
+
         const isPortedAlready = await this.get(this.VersionKey);
         if (isPortedAlready !== this.Version) {
             // port
