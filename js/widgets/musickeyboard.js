@@ -3361,46 +3361,6 @@ function MusicKeyboard(activity) {
     };
 
     /**
-     * @deprecated This method is deprecated and should no longer be used.
-     * Adds a button to the specified row with the given icon, icon size, and label.
-     * @memberof ClassName
-     * @param {HTMLTableRowElement} row - The table row element to which the button will be added.
-     * @param {string} icon - The filename of the icon image.
-     * @param {number} iconSize - The size of the icon image (height and width).
-     * @param {string} label - The label or tooltip text for the button.
-     * @returns {HTMLTableCellElement} The cell element containing the button.
-     */
-    this._addButton = function (row, icon, iconSize, label) {
-        const cell = row.insertCell(-1);
-        cell.innerHTML = `&nbsp;&nbsp;<img 
-                src="header-icons/${icon}" 
-                title="${label}" 
-                alt="${label}" 
-                height="${iconSize}" 
-                width="${iconSize}" 
-                vertical-align="middle" 
-                align-content="center"
-            >&nbsp;&nbsp;`;
-        cell.style.width = BUTTONSIZE + "px";
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = cell.style.width;
-        cell.style.minHeight = cell.style.height;
-        cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
-
-        cell.onmouseover = function () {
-            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        };
-
-        cell.onmouseout = function () {
-            this.style.backgroundColor = platformColor.selectorBackground;
-        };
-
-        return cell;
-    };
-
-    /**
      * Initiates MIDI functionality, allowing notes to be triggered by user interaction.
      * @memberof ClassName
      */
