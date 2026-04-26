@@ -25,7 +25,7 @@
    getVoiceSynthName, i18nSolfege, last, MathUtility, mixedNumber,
    piemenuBlockContext, prepareMacroExports, ProtoBlock,
     setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments,
-    docById, define, BlocksDependencies
+    docById, define, BlocksDependencies, deepClone
 */
 
 /* global showZoomOverlay */
@@ -44,7 +44,7 @@
         MathUtility
    - js/utils/utils.js
         _, last, closeBlkWidgets, mixedNumber, prepareMacroExports,
-        getTextWidth, delayExecution
+        getTextWidth, delayExecution, deepClone
    - js/utils/musicutils.js
         addTemperamentToDictionary,
         getDrumSynthName, getNoiseName, getNoiseSynthName,
@@ -5292,7 +5292,7 @@ class Blocks {
             this.selectedStack = this.activeBlock;
 
             /** Copy the selectedStack. */
-            this.selectedBlocksObj = JSON.parse(JSON.stringify(this._copyBlocksToObj(false)));
+            this.selectedBlocksObj = deepClone(this._copyBlocksToObj(false));
 
             /** Reset paste offset. */
             this.pasteDx = 0;

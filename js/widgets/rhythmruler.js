@@ -17,7 +17,7 @@
 /*
    global
 
-   TONEBPM, Singer, _, delayExecution, docById,
+   TONEBPM, Singer, _, delayExecution, deepClone, docById,
    calcNoteValueToDisplay, platformColor, beginnerMode, last,
    EIGHTHNOTEWIDTH, nearestBeat, rationalToFraction, DRUMNAMES,
    VOICENAMES, EFFECTSNAMES
@@ -29,7 +29,7 @@
     - js/turtle-singer.js
         Singer
     - js/utils/utils.js
-        _, docById, delayExecution, last, nearestBeat, rationalToFraction
+        _, deepClone, docById, delayExecution, last, nearestBeat, rationalToFraction
     - js/utils/musicutils.js
         calcNoteValueToDisplay, EIGHTHNOTEWIDTH
     - js/utils/platformstyle.js
@@ -48,6 +48,7 @@
  * @requires Singer
  * @requires _
  * @requires docById
+ * @requires deepClone
  * @requires delayExecution
  * @requires last
  * @requires nearestBeat
@@ -463,12 +464,12 @@ class RhythmRuler {
             for (let i = 0; i < this._dissectHistory.length; i++) {
                 const drum = this._dissectHistory[i][1];
                 if (!drumsSet.has(drum)) {
-                    const history = JSON.parse(JSON.stringify(this._dissectHistory[i][0]));
+                    const history = deepClone(this._dissectHistory[i][0]);
                     dissectHistory.push([history, drum]);
                 }
             }
 
-            this._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
+            this._dissectHistory = deepClone(dissectHistory);
 
             this._playing = false;
             this._playingOne = false;
@@ -2798,12 +2799,12 @@ class RhythmRuler {
         for (let i = 0; i < this._dissectHistory.length; i++) {
             drum = this._dissectHistory[i][1];
             if (!drumsSet.has(drum)) {
-                history = JSON.parse(JSON.stringify(this._dissectHistory[i][0]));
+                history = deepClone(this._dissectHistory[i][0]);
                 dissectHistory.push([history, drum]);
             }
         }
 
-        this._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
+        this._dissectHistory = deepClone(dissectHistory);
     }
 
     /**
