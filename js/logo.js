@@ -363,6 +363,7 @@ class Logo {
                 this._timerManager = {
                     _activeTimers: new Set(),
                     _activeIntervals: new Set(),
+                    _isPaused: false,
                     totalCreated: 0,
                     totalCancelled: 0,
                     totalFired: 0,
@@ -381,9 +382,18 @@ class Logo {
                     clearAll() {
                         return 0;
                     },
+                    pauseAll() {
+                        this._isPaused = true;
+                        return 0;
+                    },
+                    resumeAll() {
+                        this._isPaused = false;
+                        return 0;
+                    },
                     getStats() {
                         return {
                             active: 0,
+                            paused: this._isPaused,
                             created: 0,
                             cancelled: 0,
                             fired: 0,

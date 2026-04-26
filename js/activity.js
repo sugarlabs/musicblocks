@@ -318,6 +318,7 @@ class Activity {
         this.firstTimeUser = false;
         this.beginnerMode = false;
         this.runMode = "normal";
+        this.isPlaying = false;
 
         // Flag to disable keyboard during loading of MB
         this.keyboardEnableFlag;
@@ -1724,9 +1725,76 @@ class Activity {
             activity._doFastButton(env);
         };
 
+        this._setPlaybackState = isPlaying => {
+            this.isPlaying = isPlaying;
+            if (this.toolbar && typeof this.toolbar.updatePlayPauseIcon === "function") {
+                this.toolbar.updatePlayPauseIcon(isPlaying);
+            }
+        };
+
+        this._pausePlayback = () => {
+            if (!this.logo._alreadyRunning || !this.isPlaying) {
+                return;
+            }
+
+            if (this.logo.timerManager && typeof this.logo.timerManager.pauseAll === "function") {
+                this.logo.timerManager.pauseAll();
+            }
+
+            if (this.logo?.synth?.pause) {
+                this.logo.synth.pause();
+            }
+
+            const widgetTitle = document.getElementsByClassName("wftTitle");
+            for (let i = 0; i < widgetTitle.length; i++) {
+                if (widgetTitle[i].innerHTML === "tempo") {
+                    if (this.logo.tempo.isMoving) {
+                        this.logo.tempo.pause();
+                    }
+                    break;
+                }
+            }
+
+            this._setPlaybackState(false);
+        };
+
+        this._resumePlayback = () => {
+            if (!this.logo._alreadyRunning || this.isPlaying) {
+                return;
+            }
+
+            if (this.logo?.synth?.resume) {
+                this.logo.synth.resume();
+            }
+            if (this.logo?.synth?.start) {
+                this.logo.synth.start();
+            }
+            if (this.logo.timerManager && typeof this.logo.timerManager.resumeAll === "function") {
+                this.logo.timerManager.resumeAll();
+            }
+
+            const widgetTitle = document.getElementsByClassName("wftTitle");
+            for (let i = 0; i < widgetTitle.length; i++) {
+                if (widgetTitle[i].innerHTML === "tempo") {
+                    if (this.logo.tempo.isMoving) {
+                        this.logo.tempo.pause();
+                    }
+
+                    this.logo.tempo.resume();
+                    break;
+                }
+            }
+
+            this._setPlaybackState(true);
+        };
+
         this._doFastButton = env => {
-            // Prevent spam-clicking by checking if already running
             if (this.logo._alreadyRunning) {
+                if (this.isPlaying) {
+                    this._pausePlayback();
+                } else {
+                    this._resumePlayback();
+                }
                 return;
             }
 
@@ -1763,6 +1831,7 @@ class Activity {
                     this.showBlocksAfterRun = true;
                 }
 
+                this._setPlaybackState(true);
                 this.logo.runLogoCommands(null, env);
                 const stopBtn = document.getElementById("stop");
                 if (stopBtn) {
@@ -2278,6 +2347,7 @@ class Activity {
             }
 
             this.logo.doStopTurtles();
+            this._setPlaybackState(false);
             document.getElementById("stop").style.display = "none";
 
             const widgetTitle = document.getElementsByClassName("wftTitle");
@@ -3936,12 +4006,9 @@ class Activity {
                     const hasOpenWidget = Object.values(window.widgetWindows.openWindows).some(
                         w => w
                     );
-                    if (this.turtles.running()) {
+                    if (!disableKeys && !hasOpenWidget) {
                         event.preventDefault();
-                        this._doHardStopButton();
-                    } else if (!disableKeys && !hasOpenWidget) {
-                        event.preventDefault();
-                        if (stopbtn) {
+                        if (stopbtn && !this.logo._alreadyRunning) {
                             stopbtn.style.color = platformColor.stopIconcolor;
                         }
                         this._doFastButton();
@@ -4917,6 +4984,7 @@ class Activity {
          * When turtle stops running restore stop button to normal state
          */
         this.onStopTurtle = () => {
+            this._setPlaybackState(false);
             if (this.showBlocksAfterRun) {
                 this.blocks.showBlocks();
                 const stopIcon = document.getElementById("stop");

@@ -149,6 +149,7 @@ class context {
 
 class Transport {
     static start() {}
+    static pause() {}
     static stop() {}
 }
 

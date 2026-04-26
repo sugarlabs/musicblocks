@@ -2283,6 +2283,12 @@ function Synth() {
         Tone.Transport.start();
     };
 
+    this.pause = () => {
+        if (Tone.Transport && typeof Tone.Transport.pause === "function") {
+            Tone.Transport.pause();
+        }
+    };
+
     this.stop = () => {
         Tone.Transport.stop();
     };

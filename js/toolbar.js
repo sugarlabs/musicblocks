@@ -18,7 +18,6 @@
 
 let WRAP = true;
 const $j = window.jQuery;
-let play_button_debounce_timeout = null;
 class Toolbar {
     /**
      * Constructs a new Toolbar instance.
@@ -35,6 +34,7 @@ class Toolbar {
         this._recordDropdownArrowElement = null;
         this._recordDropdownArrowClickHandler = null;
         this._recordDropdownOutsideClickHandler = null;
+        this._playStopClickHandler = () => {};
     }
 
     /**
@@ -468,55 +468,57 @@ class Toolbar {
         const stopIcon = docById("stop");
         const recordButton = docById("record");
         playIcon.setAttribute("role", "button");
-        playIcon.setAttribute("aria-label", _("Play project"));
         playIcon.setAttribute("tabindex", "0");
+        this.updatePlayPauseIcon(false);
         playIcon.addEventListener("keydown", e => {
             if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 playIcon.click();
             }
         });
-        let isPlayIconRunning = false;
-
-        function handleClick() {
-            if (!isPlayIconRunning) {
-                playIcon.onclick = null;
-            } else {
-                playIcon.onclick = tempClick;
-                isPlayIconRunning = false;
-            }
-        }
-
-        // Named handler to prevent memory leak from duplicate listeners
-        const stopClickHandler = () => {
-            clearTimeout(play_button_debounce_timeout);
-            isPlayIconRunning = true;
-            this.activity.hideMsgs();
-            handleClick();
-        };
-
-        var tempClick = (playIcon.onclick = () => {
-            const hideMsgs = () => {
-                this.activity.hideMsgs();
-            };
-            isPlayIconRunning = false;
+        playIcon.onclick = () => {
             onclick(this.activity);
-            handleClick();
-            stopIcon.style.color = this.stopIconColorWhenPlaying;
+            if (stopIcon) {
+                stopIcon.style.color = this.stopIconColorWhenPlaying;
+                stopIcon.removeEventListener("click", this._playStopClickHandler);
+
+                this._playStopClickHandler = () => {
+                    this.activity.hideMsgs();
+                };
+                stopIcon.addEventListener("click", this._playStopClickHandler);
+            }
             saveButton.disabled = true;
             saveButtonAdvanced.disabled = true;
             saveButton.className = "grey-text inactiveLink";
             saveButtonAdvanced.className = "grey-text inactiveLink";
             recordButton.className = "grey-text inactiveLink";
-            isPlayIconRunning = true;
-            play_button_debounce_timeout = setTimeout(function () {
-                handleClick();
-            }, 2000);
+            this.activity.hideMsgs();
+        };
+    }
 
-            // Remove existing listener before adding to prevent accumulation
-            stopIcon.removeEventListener("click", stopClickHandler);
-            stopIcon.addEventListener("click", stopClickHandler);
-        });
+    /**
+     * Updates the play button icon and accessible label to match playback state.
+     *
+     * @param {boolean} isPlaying
+     * @returns {void}
+     */
+    updatePlayPauseIcon(isPlaying) {
+        const playIcon = docById("play");
+        if (!playIcon) {
+            return;
+        }
+
+        const icon =
+            typeof playIcon.querySelector === "function" ? playIcon.querySelector("i") : null;
+        const label = isPlaying ? _("Pause project") : _("Play project");
+
+        if (icon) {
+            icon.textContent = isPlaying ? "pause" : "play_circle_filled";
+        }
+
+        playIcon.setAttribute("aria-label", label);
+        playIcon.setAttribute("title", label);
+        playIcon.setAttribute("data-tooltip", label);
     }
 
     /**

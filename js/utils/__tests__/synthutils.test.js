@@ -50,6 +50,7 @@ describe("Utility Functions (logic-only)", () => {
         stopSound,
         loop,
         start,
+        pause,
         stop,
         rampTo,
         DEFAULTSYNTHVOLUME,
@@ -163,6 +164,7 @@ describe("Utility Functions (logic-only)", () => {
         stopSound = Synth.stopSound;
         loop = Synth.loop;
         start = Synth.start;
+        pause = Synth.pause;
         stop = Synth.stop;
         rampTo = Synth.rampTo;
         setVolume = Synth.setVolume;
@@ -837,6 +839,16 @@ describe("Utility Functions (logic-only)", () => {
             expect(stopSpy).toHaveBeenCalledTimes(1);
 
             stopSpy.mockRestore();
+        });
+
+        test("pause should call Tone.Transport.pause", () => {
+            const pauseSpy = jest.spyOn(Tone.Transport, "pause");
+
+            pause();
+
+            expect(pauseSpy).toHaveBeenCalledTimes(1);
+
+            pauseSpy.mockRestore();
         });
 
         test("start and stop should work in sequence", () => {

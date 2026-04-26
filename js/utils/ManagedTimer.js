@@ -53,14 +53,27 @@ class ManagedTimer {
          * @type {Set<number>}
          * @private
          */
-        this._activeTimers = new Set();
+        this._activeTimers = new Map();
 
         /**
          * Set of currently active interval IDs.
          * @type {Set<number>}
          * @private
          */
-        this._activeIntervals = new Set();
+        this._activeIntervals = new Map();
+
+        /**
+         * Tracks whether managed execution is currently paused.
+         * @type {boolean}
+         */
+        this._isPaused = false;
+
+        /**
+         * Internal ID counter used to track timer metadata separately from native IDs.
+         * @type {number}
+         * @private
+         */
+        this._nextTimerId = 1;
 
         /**
          * Total number of timers created over the lifetime of this instance.
@@ -123,15 +136,17 @@ class ManagedTimer {
      */
     setTimeout(callback, delay = 0) {
         this.totalCreated++;
+        const id = this._nextTimerId++;
+        const entry = {
+            callback,
+            guard: null,
+            delay,
+            nativeId: null,
+            startedAt: 0
+        };
 
-        let id;
-        id = setTimeout(() => {
-            this._activeTimers.delete(id);
-            this.totalFired++;
-            callback();
-        }, delay);
-
-        this._activeTimers.add(id);
+        this._activeTimers.set(id, entry);
+        this._scheduleTimeout(id, entry, delay);
         return id;
     }
 
@@ -152,19 +167,17 @@ class ManagedTimer {
      */
     setGuardedTimeout(callback, delay, aborted) {
         this.totalCreated++;
+        const id = this._nextTimerId++;
+        const entry = {
+            callback,
+            guard: aborted,
+            delay,
+            nativeId: null,
+            startedAt: 0
+        };
 
-        let id;
-        id = setTimeout(() => {
-            this._activeTimers.delete(id);
-            if (aborted()) {
-                this.totalSuppressed++;
-                return;
-            }
-            this.totalFired++;
-            callback();
-        }, delay);
-
-        this._activeTimers.add(id);
+        this._activeTimers.set(id, entry);
+        this._scheduleTimeout(id, entry, delay);
         return id;
     }
 
@@ -177,14 +190,18 @@ class ManagedTimer {
      */
     setInterval(callback, interval) {
         this.totalCreated++;
+        const id = this._nextTimerId++;
+        const entry = {
+            callback,
+            guard: null,
+            interval,
+            nativeId: null,
+            remaining: interval,
+            startedAt: 0
+        };
 
-        let id;
-        id = setInterval(() => {
-            this.totalFired++;
-            callback();
-        }, interval);
-
-        this._activeIntervals.add(id);
+        this._activeIntervals.set(id, entry);
+        this._scheduleInterval(id, entry, interval);
         return id;
     }
 
@@ -200,20 +217,18 @@ class ManagedTimer {
      */
     setGuardedInterval(callback, interval, aborted) {
         this.totalCreated++;
+        const id = this._nextTimerId++;
+        const entry = {
+            callback,
+            guard: aborted,
+            interval,
+            nativeId: null,
+            remaining: interval,
+            startedAt: 0
+        };
 
-        let id;
-        id = setInterval(() => {
-            if (aborted()) {
-                clearInterval(id);
-                this._activeIntervals.delete(id);
-                this.totalSuppressed++;
-                return;
-            }
-            this.totalFired++;
-            callback();
-        }, interval);
-
-        this._activeIntervals.add(id);
+        this._activeIntervals.set(id, entry);
+        this._scheduleInterval(id, entry, interval);
         return id;
     }
 
@@ -224,8 +239,9 @@ class ManagedTimer {
      * @returns {boolean} True if the timer was found and cancelled, false otherwise.
      */
     clearTimeout(id) {
-        if (this._activeTimers.has(id)) {
-            clearTimeout(id);
+        const entry = this._activeTimers.get(id);
+        if (entry) {
+            clearTimeout(entry.nativeId);
             this._activeTimers.delete(id);
             this.totalCancelled++;
             return true;
@@ -240,8 +256,9 @@ class ManagedTimer {
      * @returns {boolean} True if the interval was found and cancelled, false otherwise.
      */
     clearInterval(id) {
-        if (this._activeIntervals.has(id)) {
-            clearInterval(id);
+        const entry = this._activeIntervals.get(id);
+        if (entry) {
+            clearTimeout(entry.nativeId);
             this._activeIntervals.delete(id);
             this.totalCancelled++;
             return true;
@@ -258,19 +275,77 @@ class ManagedTimer {
     clearAll() {
         let count = 0;
 
-        for (const id of this._activeTimers) {
-            clearTimeout(id);
+        for (const entry of this._activeTimers.values()) {
+            clearTimeout(entry.nativeId);
             count++;
         }
         this._activeTimers.clear();
 
-        for (const id of this._activeIntervals) {
-            clearInterval(id);
+        for (const entry of this._activeIntervals.values()) {
+            clearTimeout(entry.nativeId);
             count++;
         }
         this._activeIntervals.clear();
+        this._isPaused = false;
 
         this.totalCancelled += count;
+        return count;
+    }
+
+    /**
+     * Pause all managed timers without discarding their remaining time.
+     *
+     * @returns {number} The number of active timers and intervals paused.
+     */
+    pauseAll() {
+        if (this._isPaused) {
+            return this.activeCount;
+        }
+
+        const now = Date.now();
+        let count = 0;
+
+        for (const entry of this._activeTimers.values()) {
+            clearTimeout(entry.nativeId);
+            entry.delay = Math.max(0, entry.delay - (now - entry.startedAt));
+            entry.nativeId = null;
+            count++;
+        }
+
+        for (const entry of this._activeIntervals.values()) {
+            clearTimeout(entry.nativeId);
+            entry.remaining = Math.max(0, entry.remaining - (now - entry.startedAt));
+            entry.nativeId = null;
+            count++;
+        }
+
+        this._isPaused = true;
+        return count;
+    }
+
+    /**
+     * Resume all previously paused managed timers.
+     *
+     * @returns {number} The number of timers and intervals resumed.
+     */
+    resumeAll() {
+        if (!this._isPaused) {
+            return this.activeCount;
+        }
+
+        let count = 0;
+
+        for (const [id, entry] of this._activeTimers.entries()) {
+            this._scheduleTimeout(id, entry, entry.delay);
+            count++;
+        }
+
+        for (const [id, entry] of this._activeIntervals.entries()) {
+            this._scheduleInterval(id, entry, entry.remaining);
+            count++;
+        }
+
+        this._isPaused = false;
         return count;
     }
 
@@ -295,11 +370,73 @@ class ManagedTimer {
             active: this.activeCount,
             activeTimeouts: this.activeTimeoutCount,
             activeIntervals: this.activeIntervalCount,
+            paused: this._isPaused,
             created: this.totalCreated,
             cancelled: this.totalCancelled,
             fired: this.totalFired,
             suppressed: this.totalSuppressed
         };
+    }
+
+    /**
+     * Schedule a tracked timeout.
+     *
+     * @param {number} id
+     * @param {Object} entry
+     * @param {number} delay
+     * @returns {void}
+     * @private
+     */
+    _scheduleTimeout(id, entry, delay) {
+        entry.delay = delay;
+        entry.startedAt = Date.now();
+        entry.nativeId = setTimeout(() => {
+            if (!this._activeTimers.has(id)) {
+                return;
+            }
+
+            this._activeTimers.delete(id);
+            if (entry.guard && entry.guard()) {
+                this.totalSuppressed++;
+                return;
+            }
+
+            this.totalFired++;
+            entry.callback();
+        }, delay);
+    }
+
+    /**
+     * Schedule the next tracked interval tick.
+     *
+     * @param {number} id
+     * @param {Object} entry
+     * @param {number} delay
+     * @returns {void}
+     * @private
+     */
+    _scheduleInterval(id, entry, delay) {
+        entry.remaining = delay;
+        entry.startedAt = Date.now();
+        entry.nativeId = setTimeout(() => {
+            if (!this._activeIntervals.has(id)) {
+                return;
+            }
+
+            if (entry.guard && entry.guard()) {
+                this._activeIntervals.delete(id);
+                this.totalSuppressed++;
+                return;
+            }
+
+            this.totalFired++;
+            entry.callback();
+            if (!this._activeIntervals.has(id)) {
+                return;
+            }
+
+            this._scheduleInterval(id, entry, entry.interval);
+        }, delay);
     }
 }
 
