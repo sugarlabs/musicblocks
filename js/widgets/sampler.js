@@ -397,11 +397,11 @@ function SampleWidget() {
     };
 
     //Drag-and-Drop sample files
-    this._dragOverHandler = (e) => {
+    this._dragOverHandler = e => {
         e.preventDefault();
     };
 
-    this._dropHandler = (e) => {
+    this._dropHandler = e => {
         e.preventDefault();
         const sampleFiles = e.dataTransfer.files[0];
         this.handleFiles(sampleFiles);
