@@ -36,7 +36,7 @@ try {
    DEFAULTDELAY, define, doBrowserCheck, doBrowserCheck, docByClass,
    doSVG, EMPTYHEAPERRORMSG, EXPANDBUTTON, FILLCOLORS,
    getMacroExpansion, getOctaveRatio, getTemperament, transcribeMidi,
-   GOHOMEBUTTON, GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
+   GOHOMEBUTTON, GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON, StarterTemplates,
    hideDOMLabel, initBasicProtoBlocks, initPalettes,
    INLINECOLLAPSIBLES, JSEditor, LanguageBox, ThemeBox, MSGBLOCK,
    NANERRORMSG, NOACTIONERRORMSG, NOBOXERRORMSG, NOINPUTERRORMSG,
@@ -5172,6 +5172,19 @@ class Activity {
                 }
 
                 document.removeEventListener("finishedLoading", __afterLoad);
+
+                // Show starter templates on first visit if no existing project is loaded.
+                if (
+                    _THIS_IS_MUSIC_BLOCKS_ &&
+                    !that.sessionData &&
+                    typeof StarterTemplates !== "undefined" &&
+                    StarterTemplates.shouldShow()
+                ) {
+                    setTimeout(async () => {
+                        await lazyLoad("widgets/starterTemplates");
+                        new StarterTemplates(that);
+                    }, 1000);
+                }
             };
 
             // Set the flag to zero to disable keyboard
@@ -7357,6 +7370,11 @@ class Activity {
             // Will show welcome page by default.
             await lazyLoad("widgets/help");
             new HelpWidget(this, false);
+        };
+
+        this._showStarterTemplates = async () => {
+            await lazyLoad("widgets/starterTemplates");
+            new StarterTemplates(this);
         };
 
         const showKeyboardShortcuts = activity => {
