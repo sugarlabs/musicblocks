@@ -1109,15 +1109,22 @@ class Blocks {
                     continue;
                 }
 
+                /** Guard against invalid block connections */
+                const blk = this.blockList[cblk];
+                if (!blk || !Array.isArray(blk.connections)) {
+                    console.warn("Invalid block connection detected - skipping.");
+                    continue;
+                }
+
                 /** Find the dock position in the connected block. */
                 let foundMatch = false;
                 let matchingBlock;
                 for (
                     matchingBlock = 0;
-                    matchingBlock < this.blockList[cblk].connections.length;
+                    matchingBlock < blk.connections.length;
                     matchingBlock++
                 ) {
-                    if (this.blockList[cblk].connections[matchingBlock] === blk) {
+                    if (blk.connections[matchingBlock] === blk) {
                         foundMatch = true;
                         break;
                     }
