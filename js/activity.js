@@ -3489,7 +3489,7 @@ class Activity {
                 $search.autocomplete({
                     // Custom source so we can match on extraSearchTerms but show each block only once.
                     source: (request, response) => {
-                        const term = (request.term || "").toLowerCase();
+                        const term = (request.term || "").toLowerCase().trim();
 
                         // Check cache first for performance
                         if (that._searchCache[term] !== undefined) {
@@ -7227,7 +7227,7 @@ class Activity {
             if (!$helpfulSearch.data("autocomplete-init")) {
                 $helpfulSearch.autocomplete({
                     source: (request, response) => {
-                        const term = (request.term || "").toLowerCase();
+                        const term = (request.term || "").toLowerCase().trim();
 
                         // Check cache first for performance
                         if (that._searchCache[term] !== undefined) {
