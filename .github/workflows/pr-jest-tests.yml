@@ -76,19 +76,28 @@ jobs:
 
           # Generate content for the comment file
           {
+            echo "**🧪 Jest Test Results**"
+            echo ""
             if [ "$TESTS_PASSED" = "true" ]; then
               echo "✅ All Jest tests passed! This PR is ready to merge."
               echo ""
               echo "**Coverage:** $COVERAGE_SUMMARY"
             else
+              # Sort failed tests for readability
+              SORTED_FAILED_TESTS=$(echo "$FAILED_TESTS" | sort)
+
               echo "❌ Some Jest tests failed. Please check the logs and fix the issues before merging."
               echo ""
               echo "**Coverage:** $COVERAGE_SUMMARY"
               echo ""
+              echo "_Note: These failures may be introduced by this PR or may already exist in the master branch._"
+              echo "_Tip: Update your branch with the latest master and rerun tests._"
+              echo "_If the same failures are present on master, they are likely not introduced by this PR._"
+              echo ""
               echo "**Failed Tests:**"
               echo ""
               echo '```'
-              echo "$FAILED_TESTS"
+              echo "$SORTED_FAILED_TESTS"
               echo '```'
             fi
           } > "$COMMENT_FILE"
