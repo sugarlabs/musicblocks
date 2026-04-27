@@ -4959,42 +4959,8 @@ class Activity {
         let lastRefreshReport = performance.now();
 
         this.refreshCanvas = () => {
-            if (this.blockRefreshCanvas) {
-                return;
-            }
-
-            const start = window.__ENABLE_REFRESH_PROFILING__ ? performance.now() : 0;
-
-            this.blockRefreshCanvas = true;
             this.stageDirty = true;
             this.update = true;
-
-            const that = this;
-            setTimeout(() => {
-                that.blockRefreshCanvas = false;
-                that.stageDirty = true;
-
-                if (window.__ENABLE_REFRESH_PROFILING__) {
-                    const duration = performance.now() - start;
-                    refreshCount++;
-                    totalRefreshTime += duration;
-                    maxRefreshTime = Math.max(maxRefreshTime, duration);
-
-                    if (refreshCount % 25 === 0) {
-                        const now = performance.now();
-                        const cps = (25 / (now - lastRefreshReport)) * 1000;
-                        console.log(
-                            `refreshCanvas | Avg: ${(totalRefreshTime / refreshCount).toFixed(
-                                2
-                            )}ms | Max: ${maxRefreshTime.toFixed(2)}ms | Rate: ${cps.toFixed(
-                                1
-                            )} calls/sec`
-                        );
-                        maxRefreshTime = 0;
-                        lastRefreshReport = now;
-                    }
-                }
-            }, 5);
         };
 
         /*

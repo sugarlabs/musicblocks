@@ -9,6 +9,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+const _paletteIconCache = new Map();
+
 /* global
    docById, LEADING, DEFAULTPALETTE, MULTIPALETTES, platformColor,
    PALETTEICONS, MULTIPALETTEICONS, SKIPPALETTES, toTitleCase,
@@ -45,8 +47,20 @@ const paletteBlockButtonPush = (blocks, name, arg) => {
 // loadPaletteMenuItemHandler is the event handler for the palette menu.
 
 const makePaletteIcons = (data, width, height) => {
+    const key = `${data}_${width}_${height}`;
+    let src;
+    if (_paletteIconCache.has(key)) {
+        src = _paletteIconCache.get(key);
+    } else {
+        src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data));
+        if (_paletteIconCache.size > 500) {
+            _paletteIconCache.clear();
+        }
+        _paletteIconCache.set(key, src);
+    }
+
     const img = new Image();
-    img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data));
+    img.src = src;
     if (width) img.width = width;
     if (height) img.height = height;
     return img;
