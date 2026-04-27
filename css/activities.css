@@ -316,10 +316,14 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 }
 
 .trash-item-icon {
-    width: 30px;
-    height: 30px;
-    margin-right: 10px;
+    width: 60px;
+    height: 60px;
+    margin-right: 15px;
     vertical-align: middle;
+    object-fit: contain;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    padding: 2px;
 }
 
 #restoreLastIcon,
@@ -338,6 +342,25 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 
 .hidden {
     display: none;
+}
+
+.trash-preview-popup {
+    position: fixed;
+    z-index: 10001;
+    background-color: white;
+    border: 2px solid #2196f3;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    display: none;
+    pointer-events: none;
+}
+
+.trash-preview-popup img {
+    max-width: 400px;
+    max-height: 400px;
+    display: block;
+    object-fit: contain;
 }
 
 .ui-menu {
