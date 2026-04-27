@@ -640,6 +640,8 @@ const analyzeProject = activity => {
             const idx = PALS.indexOf(TAPAL[cats[c]]);
             if (idx !== -1) {
                 scores[idx] += TASCORE[cats[c]];
+            } else {
+                console.warn("rubrics: TAPAL value not found in PALS:", TAPAL[cats[c]]);
             }
         }
     }
@@ -649,6 +651,8 @@ const analyzeProject = activity => {
             const idx = PALS.indexOf(pals[p]);
             if (idx !== -1) {
                 scores[idx] += TASCORE[pals[p]];
+            } else {
+                console.warn("rubrics: pal not found in PALS:", pals[p]);
             }
         }
     }

@@ -1357,6 +1357,8 @@ class Singer {
                 const idx = tur.singer.inNoteBlock.indexOf(blk);
                 if (idx !== -1) {
                     tur.singer.inNoteBlock.splice(idx, 1);
+                } else {
+                    console.warn("Singer: block", blk, "not found in inNoteBlock");
                 }
             });
         }
