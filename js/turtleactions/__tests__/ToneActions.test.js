@@ -629,7 +629,7 @@ describe("setupToneActions", () => {
         it("should define Duo synth correctly", () => {
             Singer.ToneActions.defDuoSynth(10, 20, 0, 1);
             expect(activity.logo.timbre.duoSynthParams).toContain(10);
-            expect(activity.logo.timbre.duoSynthParams).toContain(0.2);
+            expect(activity.logo.timbre.duoSynthParams).toContain(20);
             expect(activity.logo.synth.createSynth).toHaveBeenCalledWith(
                 0,
                 "default-voice",
@@ -653,19 +653,19 @@ describe("setupToneActions", () => {
         it("should handle null vibratoAmount", () => {
             Singer.ToneActions.defDuoSynth(10, null, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Missing input", 1);
-            expect(activity.logo.timbre.duoSynthParams).toContain(0.5);
+            expect(activity.logo.timbre.duoSynthParams).toContain(50);
         });
 
         it("should handle non-numeric vibratoAmount", () => {
             Singer.ToneActions.defDuoSynth(10, "string", 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Missing input", 1);
-            expect(activity.logo.timbre.duoSynthParams).toContain(0.5);
+            expect(activity.logo.timbre.duoSynthParams).toContain(50);
         });
 
         it("should handle negative inputs correctly", () => {
             Singer.ToneActions.defDuoSynth(-10, -20, 0, 1);
             expect(activity.logo.timbre.duoSynthParams).toContain(10);
-            expect(activity.logo.timbre.duoSynthParams).toContain(0.2);
+            expect(activity.logo.timbre.duoSynthParams).toContain(20);
         });
 
         it("should show error when oscillators exist", () => {
