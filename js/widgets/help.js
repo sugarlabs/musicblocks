@@ -516,6 +516,7 @@ class HelpWidget {
      * @returns {void}
      */
     _blockHelp(block) {
+        if (!block) return;
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
