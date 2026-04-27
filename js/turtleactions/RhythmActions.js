@@ -139,14 +139,30 @@ function setupRhythmActions(activity) {
 
                 if (tur.singer.inNoteBlock.length > 0) {
                     if (tur.singer.inNeighbor.length > 0) {
-                        tur.singer.neighborArgBeat.push(
-                            tur.singer.beatFactor * (1 / tur.singer.neighborNoteValue)
-                        );
+                        if (
+                            tur.singer.neighborNoteValue === 0 ||
+                            !isFinite(1 / tur.singer.neighborNoteValue)
+                        ) {
+                            console.warn(
+                                "Neighbor: skipping invalid neighborNoteValue:",
+                                tur.singer.neighborNoteValue
+                            );
+                        } else {
+                            tur.singer.neighborArgBeat.push(
+                                tur.singer.beatFactor * (1 / tur.singer.neighborNoteValue)
+                            );
 
-                        const nextBeat = 1 / noteBeatValue - 2 * tur.singer.neighborNoteValue;
-                        tur.singer.neighborArgCurrentBeat.push(
-                            tur.singer.beatFactor * (1 / nextBeat)
-                        );
+                            const nextBeat = 1 / noteBeatValue - 2 * tur.singer.neighborNoteValue;
+                            if (nextBeat <= 0 || !isFinite(nextBeat)) {
+                                console.warn(
+                                    "Neighbor: note value too large for current duration, skipping"
+                                );
+                            } else {
+                                tur.singer.neighborArgCurrentBeat.push(
+                                    tur.singer.beatFactor * (1 / nextBeat)
+                                );
+                            }
+                        }
                     }
 
                     Singer.processNote(
