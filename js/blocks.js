@@ -1110,9 +1110,9 @@ class Blocks {
                 }
 
                 /** Guard against invalid block connections */
-                const blk = this.blockList[cblk];
-                if (!blk || !Array.isArray(blk.connections)) {
-                    console.warn("Invalid block connection detected - skipping.");
+                const connectedBlock = this.blockList[cblk];
+                if (!connectedBlock || !Array.isArray(connectedBlock.connections)) {
+                    console.debug("Invalid block connection detected - skipping.");
                     continue;
                 }
 
@@ -1121,10 +1121,10 @@ class Blocks {
                 let matchingBlock;
                 for (
                     matchingBlock = 0;
-                    matchingBlock < blk.connections.length;
+                    matchingBlock < connectedBlock.connections.length;
                     matchingBlock++
                 ) {
-                    if (blk.connections[matchingBlock] === blk) {
+                    if (connectedBlock.connections[matchingBlock] === blk) {
                         foundMatch = true;
                         break;
                     }
