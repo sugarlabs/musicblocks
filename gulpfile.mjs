@@ -71,5 +71,11 @@ export function prettify() {
     return gulp.src(paths.scripts.src).pipe(prettier()).pipe(gulp.dest("js"));
 }
 
-export const build = gulp.series(gulp.parallel(jsTask, sassTask));
+export function validate() {
+    return gulp
+        .src(paths.scripts.src)
+        .pipe(prettier.check({ singleQuote: true, trailingComma: "all" }));
+}
+
+export const build = gulp.series(gulp.parallel(jsTask, cssTask, sassTask), validate);
 export default build;
