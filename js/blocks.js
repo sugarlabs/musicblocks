@@ -1179,7 +1179,7 @@ class Blocks {
 
                 if (c > 0) {
                     /** Recurse on connected blocks. */
-                    this.adjustDocks(cblk, true);
+                    this.adjustDocks(cblk);
                 }
             }
 
@@ -7041,8 +7041,9 @@ class Blocks {
             for (let blk = 0; blk < this._adjustTheseDocks.length; blk++) {
                 this.adjustDocks(this._adjustTheseDocks[blk], true);
                 /** blockBlocks._expandTwoArgs(); */
-                this._expandClamps();
             }
+
+            this._expandClamps();
 
             for (let blk = 0; blk < this._adjustTheseStacks.length; blk++) {
                 this.raiseStackToTop(this._adjustTheseStacks[blk]);
