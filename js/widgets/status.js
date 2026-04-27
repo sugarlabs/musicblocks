@@ -334,12 +334,27 @@ class StatusMatrix {
                 value = "";
                 if (tur.singer.noteStatus !== null) {
                     notes = tur.singer.noteStatus[0];
+                    const displayedNotes = [];
+                    const seenNotes = new Set();
                     for (let j = 0; j < notes.length; j++) {
-                        if (typeof notes[j] === "number") {
-                            note += toFixed2(notes[j]);
+                        const noteKey =
+                            typeof notes[j] === "number"
+                                ? "number:" + notes[j]
+                                : "note:" + notes[j];
+                        if (seenNotes.has(noteKey)) {
+                            continue;
+                        }
+
+                        seenNotes.add(noteKey);
+                        displayedNotes.push(notes[j]);
+                    }
+
+                    for (let j = 0; j < displayedNotes.length; j++) {
+                        if (typeof displayedNotes[j] === "number") {
+                            note += toFixed2(displayedNotes[j]);
                             note += "Hz ";
                         } else {
-                            note += notes[j];
+                            note += displayedNotes[j];
                             note += " ";
                         }
                     }

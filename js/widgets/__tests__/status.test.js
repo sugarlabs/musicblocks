@@ -575,6 +575,25 @@ describe("StatusMatrix Widget", () => {
             expect(rationalToFraction).toHaveBeenCalledWith(0.25);
         });
 
+        test("collapses duplicate note names in the note row display", () => {
+            const mockCell = createMockElement("TD");
+            statusMatrix._statusTable.rows[2] = { cells: [createMockElement("TD"), mockCell] };
+
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: {
+                    currentBeat: 1,
+                    currentMeasure: 1,
+                    noteStatus: [["G4", "G4"], 0.125]
+                }
+            });
+
+            rationalToFraction.mockReturnValueOnce([8, 1]);
+
+            statusMatrix.updateAll();
+
+            expect(mockCell.textContent).toBe("G4 1/8");
+        });
+
         test("formats numeric frequencies with Hz suffix", () => {
             mockActivity.turtles.ithTurtle.mockReturnValue({
                 singer: {
