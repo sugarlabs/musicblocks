@@ -218,6 +218,9 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
                 } else {
                     for (const na in notes) {
                         const name = notes[na];
+                        const match = name.match(/^(.+?)(-?\d+)$/);
+                        const noteName = match ? match[1] : name;
+                        const octave = match ? parseInt(match[2]) : 0;
                         const first = na == 0;
                         const last = na == notes.length - 1;
                         ar.push(
@@ -230,14 +233,14 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
                             ],
                             [
                                 x + 1,
-                                ["notename", { value: name.substring(0, name.length - 1) }],
+                                ["notename", { value: noteName }],
                                 0,
                                 0,
                                 [x]
                             ],
                             [
                                 x + 2,
-                                ["number", { value: parseInt(name[name.length - 1]) }],
+                                ["number", { value: octave }],
                                 0,
                                 0,
                                 [x]

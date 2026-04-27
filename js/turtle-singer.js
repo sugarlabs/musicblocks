@@ -19,7 +19,7 @@
    global
 
    DEFAULTVOLUME, TARGETBPM, TONEBPM, MIN_HIGHLIGHT_DURATION_MS, deepClone, frequencyToPitch, last,
-   pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp,
+   pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp, noteToPitchOctave,
    getStepSizeDown, numberToPitch, pitchToNumber, rationalSum,
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
@@ -2163,9 +2163,10 @@ class Singer {
                               activity.logo.synth.changeInTemperament
                           );
                     const startingPitch = activity.logo.synth.startingPitch;
+                    const [sNote, sOctave] = noteToPitchOctave(startingPitch);
                     const frequency = getCachedPitchToFrequency(
-                        startingPitch.substring(0, startingPitch.length - 1),
-                        Number(startingPitch.slice(-1)),
+                        sNote,
+                        sOctave,
                         0,
                         null
                     );

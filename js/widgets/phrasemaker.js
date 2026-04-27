@@ -19,7 +19,7 @@
    noteIsSolfege, isCustomTemperament, i18nSolfege, getNote, DEFAULTDRUM, last,
    DRUMS, SHARP, FLAT, PREVIEWVOLUME, DEFAULTVOLUME, noteToFrequency,
    LCD, calcNoteValueToDisplay, NOTESYMBOLS,
-   EIGHTHNOTEWIDTH, docBySelector, getTemperament, normalizeNoteAccidentals
+   EIGHTHNOTEWIDTH, docBySelector, getTemperament, normalizeNoteAccidentals, noteToPitchOctave
 */
 
 /*
@@ -4727,12 +4727,13 @@ class PhraseMaker {
                                     0,
                                     [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]
                                 ]);
+                                const [noteName, octave] = noteToPitchOctave(note[0][j]);
                                 newStack.push([
                                     thisBlock + 1,
                                     [
                                         "customNote",
                                         {
-                                            value: note[0][j].substring(0, note[0][j].length - 1)
+                                            value: noteName
                                         }
                                     ],
                                     0,
@@ -4741,7 +4742,7 @@ class PhraseMaker {
                                 ]);
                                 newStack.push([
                                     thisBlock + 2,
-                                    ["number", { value: note[0][j].slice(-1) }],
+                                    ["number", { value: octave }],
                                     0,
                                     0,
                                     [thisBlock]
@@ -4793,12 +4794,13 @@ class PhraseMaker {
                                     0,
                                     [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]
                                 ]);
+                                const [noteName, octave] = noteToPitchOctave(note[0][j]);
                                 newStack.push([
                                     thisBlock + 1,
                                     [
                                         "customNote",
                                         {
-                                            value: note[0][j].substring(0, note[0][j].length - 1)
+                                            value: noteName
                                         }
                                     ],
                                     0,
@@ -4807,7 +4809,7 @@ class PhraseMaker {
                                 ]);
                                 newStack.push([
                                     thisBlock + 2,
-                                    ["number", { value: note[0][j].slice(-1) }],
+                                    ["number", { value: octave }],
                                     0,
                                     0,
                                     [thisBlock]
@@ -4855,12 +4857,13 @@ class PhraseMaker {
                                 [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]
                             ]);
                             if (this.activity.logo.synth.inTemperament === "custom") {
+                                const [noteName, octave] = noteToPitchOctave(note[0][j]);
                                 newStack.push([
                                     thisBlock + 1,
                                     [
                                         "customNote",
                                         {
-                                            value: note[0][j].substring(0, note[0][j].length - 1)
+                                            value: noteName
                                         }
                                     ],
                                     0,
@@ -4869,7 +4872,7 @@ class PhraseMaker {
                                 ]);
                                 newStack.push([
                                     thisBlock + 2,
-                                    ["number", { value: note[0][j].slice(-1) }],
+                                    ["number", { value: octave }],
                                     0,
                                     0,
                                     [thisBlock]

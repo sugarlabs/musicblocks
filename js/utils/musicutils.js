@@ -3707,10 +3707,8 @@ const getNumber = (notename, octave) => {
  * @returns {Array} An array containing the note and octave.
  */
 const getNoteFromInterval = (pitch, interval) => {
-    const len = pitch.length;
-    const pitch1 = pitch.substring(0, 1);
-    const note1 = pitch.substring(0, len - 1);
-    const octave1 = Number(pitch.slice(-1));
+    const [note1, octave1] = noteToPitchOctave(pitch);
+    const pitch1 = note1.substring(0, 1);
     const number = pitchToNumber(note1, octave1, "C major");
     const pitches = ["C", "D", "E", "F", "G", "A", "B"];
     const priorAttrs = [DOUBLEFLAT, FLAT, "", SHARP, DOUBLESHARP];
@@ -5860,8 +5858,14 @@ const durationToNoteValue = duration => {
  * @returns {Array} An array containing pitch and octave.
  */
 const noteToPitchOctave = note => {
-    const len = note.length;
-    return [note.substring(0, len - 1), Number(last(note))];
+    if (typeof note !== "string") {
+        return [note, 0];
+    }
+    const match = note.match(/^(.+?)(-?\d+)$/);
+    if (match) {
+        return [match[1], Number(match[2])];
+    }
+    return [note, 0];
 };
 
 /**
@@ -6109,9 +6113,7 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote) => {
     const stepDownCurrentNote = getNumber(note, currentOctave - 1);
 
     if (lastNotePlayed != null) {
-        lastNotePlayed = lastNotePlayed[0];
-        // strip off octave from end of note
-        lastNotePlayed = lastNotePlayed.substring(0, lastNotePlayed.length - 1);
+        lastNotePlayed = noteToPitchOctave(lastNotePlayed[0])[0];
     } else {
         lastNotePlayed = "G";
     }
