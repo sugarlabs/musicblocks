@@ -109,17 +109,46 @@ global.showZoomOverlay = jest.fn();
 describe("Blocks Foundation", () => {
     let mockActivity;
 
+    const makeBlock = (name, connections = [null], overrides = {}) => ({
+        name,
+        connections,
+        trash: false,
+        container: {
+            x: 0,
+            y: 0,
+            children: [],
+            setChildIndex: jest.fn(),
+            updateCache: jest.fn()
+        },
+        width: 100,
+        height: 40,
+        protoblock: {},
+        highlight: jest.fn(),
+        unhighlight: jest.fn(),
+        hide: jest.fn(),
+        show: jest.fn(),
+        regenerateArtwork: jest.fn(),
+        offScreen: jest.fn(() => false),
+        ...overrides
+    });
+
     beforeEach(() => {
         jest.clearAllMocks();
+        global.requestAnimationFrame = jest.fn(callback => callback());
 
         // Create a basic mock activity object as required by Blocks constructor
         mockActivity = {
             storage: {},
             trashcan: {},
             turtles: {},
-            boundary: {},
+            boundary: { hide: jest.fn() },
             macroDict: {},
-            palettes: { dict: {} },
+            palettes: {
+                dict: {},
+                hide: jest.fn(),
+                show: jest.fn(),
+                updatePalettes: jest.fn()
+            },
             logo: { synth: { loadSynth: jest.fn() } },
             blocksContainer: new global.createjs.Container(),
             canvas: { width: 1200, height: 900 },
@@ -194,40 +223,401 @@ describe("Blocks Foundation", () => {
         });
     });
 
-    describe("Sparse Array Safety", () => {
-        it("should not throw TypeError in findStacks when blockList is sparse", () => {
+    describe("Stack Traversal", () => {
+        it("should find the top and bottom blocks in a stack", () => {
             const blocks = new Blocks(mockActivity);
-            blocks.blockList = [];
-            blocks.blockList[1] = { trash: false, connections: [null] }; // Index 0 is undefined
+            blocks.blockList = [
+                makeBlock("start", [null, 1]),
+                makeBlock("forward", [0, 2]),
+                makeBlock("right", [1, null])
+            ];
 
-            expect(() => blocks.findStacks()).not.toThrow();
-            expect(blocks.stackList).toEqual([1]);
+            expect(blocks.findTopBlock(2)).toBe(0);
+            expect(blocks.findBottomBlock(0)).toBe(2);
+            expect(blocks.findTopBlock(null)).toBeNull();
+            expect(blocks.findBottomBlock(null)).toBeNull();
         });
 
-        it("should not throw TypeError in moveAllBlocksExcept when blockList is sparse", () => {
+        it("should detect blocks in the same flow generation", () => {
             const blocks = new Blocks(mockActivity);
-            blocks.blockList = [];
-            blocks.blockList[1] = {
-                trash: false,
-                connections: [null],
-                findTopBlock: jest.fn().mockReturnValue(1),
-                moveBlockRelativeBatched: jest.fn()
-            };
+            blocks.blockList = [
+                makeBlock("start", [null, 1]),
+                makeBlock("forward", [0, 2]),
+                makeBlock("right", [1, null]),
+                makeBlock("solo", [null])
+            ];
 
-            expect(() => blocks.moveAllBlocksExcept(null, 10, 10)).not.toThrow();
+            expect(blocks.sameGeneration(0, 2)).toBe(true);
+            expect(blocks.sameGeneration(0, 3)).toBe(false);
+            expect(blocks.sameGeneration(null, 2)).toBe(false);
+            expect(blocks.sameGeneration(2, null)).toBe(false);
         });
 
-        it("should not throw TypeError in _findTwoArgs when blockList is sparse", () => {
+        it("should collect top-level non-trash stacks", () => {
             const blocks = new Blocks(mockActivity);
-            blocks.blockList = [];
-            blocks.blockList[1] = {
-                trash: false,
-                isArgBlock: jest.fn().mockReturnValue(true),
-                isExpandableBlock: jest.fn().mockReturnValue(true)
+            blocks.blockList = [
+                makeBlock("start", [null, 1]),
+                makeBlock("forward", [0, null]),
+                makeBlock("trashed-start", [null], { trash: true }),
+                makeBlock("solo", [null])
+            ];
+
+            blocks.findStacks();
+
+            expect(blocks.stackList).toEqual([0, 3]);
+        });
+
+        it("should count nested blocks in a stack", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [
+                makeBlock("repeat", [null, 1, 2]),
+                makeBlock("number", [0]),
+                makeBlock("forward", [0, 3]),
+                makeBlock("right", [2, null])
+            ];
+
+            expect(blocks._countBlocksInStack(0)).toBe(4);
+            expect(blocks._countBlocksInStack(null)).toBe(0);
+        });
+
+        it("should find block names inside a stack", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [
+                makeBlock("start", [null, 1]),
+                makeBlock("forward", [0, 2]),
+                makeBlock("right", [1, null])
+            ];
+
+            expect(blocks._blockInStack(0, ["right"])).toBe(true);
+            expect(blocks._blockInStack(0, ["setxy"])).toBe(false);
+        });
+    });
+
+    describe("Drag Groups", () => {
+        it("should find all connected child blocks in a drag group", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [
+                makeBlock("repeat", [null, 1, 2]),
+                makeBlock("number", [0]),
+                makeBlock("forward", [0, 3]),
+                makeBlock("right", [2, null])
+            ];
+
+            blocks.findDragGroup(0);
+
+            expect(blocks.dragGroup).toEqual([0, 1, 2, 3]);
+        });
+
+        it("should cache and clear drag groups", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [makeBlock("start", [null, 1]), makeBlock("forward", [0])];
+
+            blocks.cacheDragGroup(0);
+            expect(blocks._cachedDragGroup).toEqual([0, 1]);
+
+            blocks.clearCachedDragGroup();
+            expect(blocks._cachedDragGroup).toBeNull();
+        });
+    });
+
+    describe("Visibility and Selection", () => {
+        it("should change disabled status for matching non-trash blocks", () => {
+            const blocks = new Blocks(mockActivity);
+            const matchingBlock = makeBlock("sensor");
+            const trashedBlock = makeBlock("sensor", [null], { trash: true });
+            blocks.blockList = [matchingBlock, trashedBlock, makeBlock("other")];
+
+            blocks.changeDisabledStatus("sensor", true);
+
+            expect(matchingBlock.protoblock.disabled).toBe(true);
+            expect(matchingBlock.regenerateArtwork).toHaveBeenCalledWith(false);
+            expect(trashedBlock.protoblock.disabled).toBeUndefined();
+            expect(trashedBlock.regenerateArtwork).not.toHaveBeenCalled();
+        });
+
+        it("should highlight and unhighlight visible blocks", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [makeBlock("start"), makeBlock("forward")];
+
+            blocks.highlight(0, false);
+            expect(blocks.blockList[0].highlight).toHaveBeenCalled();
+            expect(blocks.highlightedBlock).toBe(0);
+
+            blocks.highlight(1, true);
+            expect(blocks.blockList[0].unhighlight).toHaveBeenCalled();
+            expect(blocks.blockList[1].highlight).toHaveBeenCalled();
+            expect(blocks.highlightedBlock).toBe(1);
+
+            blocks.unhighlight(null);
+            expect(blocks.blockList[1].unhighlight).toHaveBeenCalled();
+            expect(blocks.highlightedBlock).toBeNull();
+        });
+
+        it("should unhighlight every non-trash block", () => {
+            const blocks = new Blocks(mockActivity);
+            const firstBlock = makeBlock("start");
+            const trashedBlock = makeBlock("trash", [null], { trash: true });
+            const secondBlock = makeBlock("forward");
+            blocks.blockList = [firstBlock, trashedBlock, secondBlock];
+
+            blocks.unhighlightAll();
+
+            expect(firstBlock.unhighlight).toHaveBeenCalled();
+            expect(trashedBlock.unhighlight).not.toHaveBeenCalled();
+            expect(secondBlock.unhighlight).toHaveBeenCalled();
+        });
+
+        it("should ignore highlight changes while blocks are hidden", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [makeBlock("start")];
+            blocks.visible = false;
+
+            blocks.highlight(0, false);
+            blocks.unhighlight(0);
+
+            expect(blocks.blockList[0].highlight).not.toHaveBeenCalled();
+            expect(blocks.blockList[0].unhighlight).not.toHaveBeenCalled();
+        });
+
+        it("should hide every block and show only non-trash blocks", () => {
+            const blocks = new Blocks(mockActivity);
+            const visibleBlock = makeBlock("forward");
+            const trashedBlock = makeBlock("right", [null], { trash: true });
+            blocks.blockList = [visibleBlock, trashedBlock];
+
+            blocks.hide();
+            expect(visibleBlock.hide).toHaveBeenCalled();
+            expect(trashedBlock.hide).toHaveBeenCalled();
+            expect(blocks.visible).toBe(false);
+
+            blocks.show();
+            expect(visibleBlock.show).toHaveBeenCalled();
+            expect(trashedBlock.show).not.toHaveBeenCalled();
+            expect(blocks.visible).toBe(true);
+        });
+
+        it("should update selection state and notify the activity", () => {
+            const blocks = new Blocks(mockActivity);
+
+            blocks.setSelection(true);
+            blocks.setSelectedBlocks([1, 2]);
+            blocks.setSelectionToActivity(false);
+
+            expect(blocks.selectionModeOn).toBe(true);
+            expect(blocks.selectedBlocks).toEqual([1, 2]);
+            expect(mockActivity.setSelectionMode).toHaveBeenCalledWith(false);
+        });
+
+        it("should detect whether coordinates are inside a non-trash block", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [
+                makeBlock("forward", [null], {
+                    container: { x: 10, y: 20 },
+                    width: 50,
+                    height: 30
+                }),
+                makeBlock("trash", [null], {
+                    trash: true,
+                    container: { x: 0, y: 0 },
+                    width: 200,
+                    height: 200
+                })
+            ];
+
+            expect(blocks.isCoordinateOnBlock(25, 30)).toBe(true);
+            expect(blocks.isCoordinateOnBlock(5, 5)).toBe(false);
+        });
+
+        it("should hide and show blocks through palette wrappers", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.hide = jest.fn();
+            blocks.show = jest.fn();
+            blocks.bringToTop = jest.fn();
+
+            blocks.hideBlocks();
+            expect(mockActivity.palettes.hide).toHaveBeenCalled();
+            expect(blocks.hide).toHaveBeenCalled();
+            expect(mockActivity.refreshCanvas).toHaveBeenCalledTimes(1);
+
+            blocks.showBlocks();
+            expect(mockActivity.palettes.show).toHaveBeenCalled();
+            expect(blocks.show).toHaveBeenCalled();
+            expect(blocks.bringToTop).toHaveBeenCalled();
+            expect(mockActivity.refreshCanvas).toHaveBeenCalledTimes(2);
+        });
+    });
+
+    describe("Connection and Bounds Helpers", () => {
+        it("should validate allowed dock connection types", () => {
+            const blocks = new Blocks(mockActivity);
+
+            expect(blocks._testConnectionType("in", "out")).toBe(true);
+            expect(blocks._testConnectionType("numberin", "textout")).toBe(false);
+        });
+
+        it("should move blocks to rounded positions and check bounds", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.checkBounds = jest.fn();
+            blocks.blockList = [makeBlock("forward")];
+
+            blocks._moveBlock(0, 10.4, 20.6);
+
+            expect(blocks.blockList[0].container.x).toBe(10);
+            expect(blocks.blockList[0].container.y).toBe(21);
+            expect(blocks.checkBounds).toHaveBeenCalled();
+        });
+
+        it("should defer bounds checks while updating block positions", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.checkBounds = jest.fn();
+            blocks.blockList = [
+                makeBlock("start", [null], { container: { x: 1.2, y: 2.6 } }),
+                makeBlock("trash", [null], { trash: true, container: { x: 5, y: 6 } }),
+                makeBlock("solo", [null], { container: { x: 3.7, y: 4.1 } })
+            ];
+
+            blocks.updateBlockPositions();
+
+            expect(blocks.blockList[0].container).toEqual({ x: 1, y: 3 });
+            expect(blocks.blockList[2].container).toEqual({ x: 4, y: 4 });
+            expect(blocks.checkBounds).toHaveBeenCalledTimes(1);
+        });
+
+        it("should update home containers based on offscreen top blocks", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [
+                makeBlock("start", [null], { offScreen: jest.fn(() => true) }),
+                makeBlock("child", [0], { offScreen: jest.fn(() => false) })
+            ];
+
+            blocks.checkBounds();
+            expect(mockActivity.setHomeContainers).toHaveBeenCalledWith(true);
+
+            mockActivity.setHomeContainers.mockClear();
+            blocks.blockList[0].offScreen = jest.fn(() => false);
+            blocks.checkBounds();
+            expect(mockActivity.setHomeContainers).toHaveBeenCalledWith(false);
+            expect(mockActivity.boundary.hide).toHaveBeenCalled();
+        });
+    });
+
+    describe("Name and Palette Helpers", () => {
+        it("should toggle action prototype visibility only when state changes", () => {
+            const blocks = new Blocks(mockActivity);
+            const namedDo = { name: "nameddo", defaults: [], hidden: true };
+            mockActivity.palettes.dict.action = {
+                protoList: [namedDo, { name: "nameddo", defaults: ["arg"], hidden: true }]
             };
 
-            expect(() => blocks._findTwoArgs()).not.toThrow();
-            expect(blocks._expandablesList).toEqual([1]);
+            blocks.setActionProtoVisibility(true);
+
+            expect(namedDo.hidden).toBe(false);
+            expect(mockActivity.palettes.updatePalettes).toHaveBeenCalledWith("action");
+        });
+
+        it("should find unique action names from existing action stacks", () => {
+            const blocks = new Blocks(mockActivity);
+            mockActivity.palettes.dict.action = { protoList: [] };
+            blocks.blockList = [
+                makeBlock("text", [1], { value: "action" }),
+                makeBlock("action", [null]),
+                makeBlock("text", [3], { value: "action1" }),
+                makeBlock("action", [null]),
+                makeBlock("text", [5], { value: "ignored", trash: true }),
+                makeBlock("action", [null])
+            ];
+
+            expect(blocks.findUniqueActionName("action")).toBe("action2");
+        });
+
+        it("should find unique custom and temperament names", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [
+                makeBlock("text", [1], { value: "custom" }),
+                makeBlock("pitch", [null]),
+                makeBlock("text", [3], { value: "custom1" }),
+                makeBlock("pitch", [null]),
+                makeBlock("text", [5], { value: "temperament" }),
+                makeBlock("temperament1", [null])
+            ];
+
+            expect(blocks.findUniqueCustomName("custom")).toBe("custom2");
+            expect(blocks.findUniqueTemperamentName("temperament")).toBe("temperament1");
+        });
+
+        it("should load synths for drum url text blocks", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [
+                makeBlock("text", [1], { value: "https://example.com/drum.wav" }),
+                makeBlock("playdrum", [null]),
+                makeBlock("string", [3], { value: "snare" }),
+                makeBlock("setvoice", [null])
+            ];
+
+            blocks._findDrumURLs();
+
+            expect(mockActivity.logo.synth.loadSynth).toHaveBeenCalledWith(
+                0,
+                "https://example.com/drum.wav"
+            );
+            expect(mockActivity.logo.synth.loadSynth).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("Rename Helpers", () => {
+        it("should rename box labels connected to box blocks", () => {
+            const blocks = new Blocks(mockActivity);
+            const textBlock = makeBlock("text", [1], { value: "old", text: { text: "old" } });
+            blocks.blockList = [textBlock, makeBlock("box", [null])];
+
+            blocks.renameBoxes("old", "new");
+
+            expect(textBlock.value).toBe("new");
+            expect(textBlock.text.text).toBe("new");
+            expect(textBlock.container.updateCache).toHaveBeenCalled();
+        });
+
+        it("should rename storein text labels and storein2 private data", () => {
+            const blocks = new Blocks(mockActivity);
+            const textBlock = makeBlock("text", [1], { value: "old", text: { text: "old" } });
+            const storein2Block = makeBlock("storein2", [null], { privateData: "old" });
+            blocks.blockList = [textBlock, makeBlock("storein", [null]), storein2Block];
+
+            blocks.renameStoreinBoxes("old", "new");
+
+            expect(textBlock.value).toBe("new");
+            expect(textBlock.text.text).toBe("new");
+            expect(storein2Block.privateData).toBe("new");
+            expect(storein2Block.overrideName).toBe("new");
+            expect(storein2Block.regenerateArtwork).toHaveBeenCalled();
+            expect(textBlock.container.updateCache).toHaveBeenCalled();
+            expect(storein2Block.container.updateCache).toHaveBeenCalled();
+        });
+
+        it("should rename storein2 private data with default display names", () => {
+            const blocks = new Blocks(mockActivity);
+            const storein2Block = makeBlock("storein2", [null], { privateData: "old" });
+            blocks.blockList = [storein2Block];
+
+            blocks.renameStorein2Boxes("old", "box1");
+
+            expect(storein2Block.privateData).toBe("box1");
+            expect(storein2Block.overrideName).toBe("box1");
+            expect(storein2Block.regenerateArtwork).toHaveBeenCalled();
+            expect(storein2Block.container.updateCache).toHaveBeenCalled();
+        });
+
+        it("should rename namedbox private data", () => {
+            const blocks = new Blocks(mockActivity);
+            const namedBoxBlock = makeBlock("namedbox", [null], { privateData: "old" });
+            blocks.blockList = [namedBoxBlock];
+
+            blocks.renameNamedboxes("old", "box2");
+
+            expect(namedBoxBlock.privateData).toBe("box2");
+            expect(namedBoxBlock.overrideName).toBe("box2");
+            expect(namedBoxBlock.regenerateArtwork).toHaveBeenCalled();
+            expect(namedBoxBlock.container.updateCache).toHaveBeenCalled();
         });
     });
 });
