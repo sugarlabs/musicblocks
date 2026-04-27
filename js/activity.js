@@ -8379,20 +8379,25 @@ class Activity {
                                     )
                                 );
                             } else {
-                                const cleanData = rawData.replace("\n", " ");
+                                const cleanData = rawData.replace(/\n/g, " ");
                                 let obj;
                                 try {
                                     if (cleanData.includes("html")) {
                                         let extracted;
+                                        let match;
                                         if (cleanData.includes('id="codeBlock"')) {
-                                            extracted = cleanData.match(
+                                            match = cleanData.match(
                                                 '<div class="code" id="codeBlock">(.+?)</div>'
-                                            )[1];
+                                            );
                                         } else {
-                                            extracted = cleanData.match(
+                                            match = cleanData.match(
                                                 '<div class="code">(.+?)</div>'
-                                            )[1];
+                                            );
                                         }
+                                        if (!match) {
+                                            throw new Error("No project data found in HTML file");
+                                        }
+                                        extracted = match[1];
                                         obj = JSON.parse(unescapeHTML(extracted));
                                     } else {
                                         obj = JSON.parse(cleanData);
@@ -8504,20 +8509,23 @@ class Activity {
                                 _("Cannot load project from the file. Please check the file type.")
                             );
                         } else {
-                            const cleanData = rawData.replace("\n", " ");
+                            const cleanData = rawData.replace(/\n/g, " ");
                             let obj;
                             try {
                                 if (cleanData.includes("html")) {
                                     let extracted;
+                                    let match;
                                     if (cleanData.includes('id="codeBlock"')) {
-                                        extracted = cleanData.match(
+                                        match = cleanData.match(
                                             '<div class="code" id="codeBlock">(.+?)</div>'
-                                        )[1];
+                                        );
                                     } else {
-                                        extracted = cleanData.match(
-                                            '<div class="code">(.+?)</div>'
-                                        )[1];
+                                        match = cleanData.match('<div class="code">(.+?)</div>');
                                     }
+                                    if (!match) {
+                                        throw new Error("No project data found in HTML file");
+                                    }
+                                    extracted = match[1];
                                     obj = JSON.parse(unescapeHTML(extracted));
                                 } else {
                                     obj = JSON.parse(cleanData);
