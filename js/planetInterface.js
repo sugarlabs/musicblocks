@@ -76,6 +76,11 @@ class PlanetInterface {
          * Shows the planet interface.
          */
         this.showPlanet = () => {
+            if (!this.planet || typeof this.planet.open !== "function") {
+                console.error("[PlanetInterface] showPlanet called before Planet is ready.");
+                return;
+            }
+
             const png = docById("overlayCanvas").toDataURL("image/png");
             this.planet.open(png); // this.mainCanvas.toDataURL("image/png"));
             this.iframe.style.display = "block";
@@ -98,6 +103,15 @@ class PlanetInterface {
          * Opens the planet interface.
          */
         this.openPlanet = () => {
+            if (
+                !this.planet ||
+                !this.planet.ProjectStorage ||
+                typeof this.planet.open !== "function"
+            ) {
+                console.error("[PlanetInterface] openPlanet called before Planet is ready.");
+                return;
+            }
+
             this.saveLocally();
             this.hideMusicBlocks();
             this.showPlanet();
@@ -199,6 +213,13 @@ class PlanetInterface {
          * Prepares project data for export, generates SVG data, and saves the project data locally.
          */
         this.saveLocally = () => {
+            if (!this.planet || !this.planet.ProjectStorage) {
+                console.error(
+                    "[PlanetInterface] saveLocally called before Planet storage is ready."
+                );
+                return Promise.resolve(null);
+            }
+
             this.activity.stage.update(event);
             const data = this.activity.prepareExport();
             const svgData = doSVG(

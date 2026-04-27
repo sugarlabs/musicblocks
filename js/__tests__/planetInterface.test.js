@@ -110,6 +110,7 @@ describe("PlanetInterface", () => {
     });
 
     test("openPlanet calls saveLocally, hideMusicBlocks, and showPlanet", () => {
+        planetInterface.planet = { ProjectStorage: {}, open: jest.fn() };
         jest.spyOn(planetInterface, "saveLocally").mockImplementation(() => {});
         jest.spyOn(planetInterface, "hideMusicBlocks").mockImplementation(() => {});
         jest.spyOn(planetInterface, "showPlanet").mockImplementation(() => {});
@@ -117,6 +118,23 @@ describe("PlanetInterface", () => {
         expect(planetInterface.saveLocally).toHaveBeenCalled();
         expect(planetInterface.hideMusicBlocks).toHaveBeenCalled();
         expect(planetInterface.showPlanet).toHaveBeenCalled();
+    });
+
+    test("openPlanet: does not crash when Planet backend is unavailable", () => {
+        const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        planetInterface.planet = null;
+        jest.spyOn(planetInterface, "saveLocally");
+        jest.spyOn(planetInterface, "hideMusicBlocks");
+        jest.spyOn(planetInterface, "showPlanet");
+
+        expect(() => planetInterface.openPlanet()).not.toThrow();
+        expect(planetInterface.saveLocally).not.toHaveBeenCalled();
+        expect(planetInterface.hideMusicBlocks).not.toHaveBeenCalled();
+        expect(planetInterface.showPlanet).not.toHaveBeenCalled();
+        expect(errorSpy).toHaveBeenCalledWith(
+            "[PlanetInterface] openPlanet called before Planet is ready."
+        );
+        errorSpy.mockRestore();
     });
 
     test("closePlanet calls hidePlanet and showMusicBlocks", () => {
@@ -199,6 +217,16 @@ describe("PlanetInterface", () => {
         });
     });
 
+    test("saveLocally: returns null without throwing when Planet storage is unavailable", async () => {
+        const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        planetInterface.planet = null;
+
+        await expect(planetInterface.saveLocally()).resolves.toBeNull();
+        expect(errorSpy).toHaveBeenCalledWith(
+            "[PlanetInterface] saveLocally called before Planet storage is ready."
+        );
+        errorSpy.mockRestore();
+    });
     test("getCurrentProjectDescription/Image/TimeLastSaved", () => {
         const D = new Date(2020, 1, 1);
         planetInterface.planet = {
