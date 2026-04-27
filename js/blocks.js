@@ -928,6 +928,7 @@ class Blocks {
             const myBlock = this.blockList[blk];
             if (myBlock == null) {
                 console.debug("Something very broken in _getStackSize.");
+                return size;
             }
 
             let c;
@@ -1104,7 +1105,7 @@ class Blocks {
                 }
 
                 /** Another database integrity check. */
-                if (this.blockList[cblk] === null) {
+                if (this.blockList[cblk] == null) {
                     console.debug("This is not good: we encountered a null block: " + cblk);
                     continue;
                 }
