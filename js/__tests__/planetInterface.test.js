@@ -191,10 +191,12 @@ describe("PlanetInterface", () => {
         doSVG.mockReturnValue("");
         const D = { x: 1 };
         mockActivity.prepareExport.mockReturnValue(D);
+        mockActivity.stage.update.mockClear();
 
         planetInterface.planet = { ProjectStorage: { saveLocally: jest.fn() } };
 
         return planetInterface.saveLocally().then(() => {
+            expect(mockActivity.stage.update).toHaveBeenCalledWith();
             expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenCalledWith(D, null);
         });
     });

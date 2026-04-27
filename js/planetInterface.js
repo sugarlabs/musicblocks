@@ -199,7 +199,7 @@ class PlanetInterface {
          * Prepares project data for export, generates SVG data, and saves the project data locally.
          */
         this.saveLocally = () => {
-            this.activity.stage.update(event);
+            this.activity.stage.update();
             const data = this.activity.prepareExport();
             const svgData = doSVG(
                 this.activity.canvas,
