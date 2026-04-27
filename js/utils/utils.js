@@ -834,7 +834,7 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
     let newPalette = false,
         paletteName = null;
     if ("PALETTEPLUGINS" in obj) {
-        for (const name in obj["PALETTEPLUGINS"]) {
+        for (const name of Object.keys(obj["PALETTEPLUGINS"])) {
             paletteName = name;
             PALETTEICONS[name] = obj["PALETTEPLUGINS"][name];
             let fillColor = "#ff0066";
@@ -902,7 +902,7 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
 
     // Define the image blocks
     if ("IMAGES" in obj) {
-        for (const blkName in obj["IMAGES"]) {
+        for (const blkName of Object.keys(obj["IMAGES"])) {
             activity.pluginsImages[blkName] = obj["IMAGES"][blkName];
         }
     }
@@ -910,7 +910,7 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
     // Populate the flow-block dictionary, i.e., the code that is
     // compiled into a function for hot-path execution.
     if ("FLOWPLUGINS" in obj) {
-        for (const flow in obj["FLOWPLUGINS"]) {
+        for (const flow of Object.keys(obj["FLOWPLUGINS"])) {
             // Pre-compile trusted plugins for performance.
             // UNTRUSTED plugins (if any made it past confirmation) are stored as strings
             // and handled via whitelist in safePluginExecute.
@@ -931,7 +931,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, rec
 
     // Populate the arg-block dictionary
     if ("ARGPLUGINS" in obj) {
-        for (const arg in obj["ARGPLUGINS"]) {
+        for (const arg of Object.keys(obj["ARGPLUGINS"])) {
             if (isVettedPlugin(pluginSource)) {
                 const argCode = obj["ARGPLUGINS"][arg];
                 const registryName = `arg_${arg}_${Math.random().toString(36).substr(2, 9)}`;
@@ -950,7 +950,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, par
     // Populate the macro dictionary, i.e., the code that is
     // eval'd by this block.
     if ("MACROPLUGINS" in obj) {
-        for (const macro in obj["MACROPLUGINS"]) {
+        for (const macro of Object.keys(obj["MACROPLUGINS"])) {
             try {
                 activity.palettes.pluginMacros[macro] = JSON.parse(obj["MACROPLUGINS"][macro]);
             } catch (e) {
@@ -963,7 +963,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, par
 
     // Populate the setter dictionary
     if ("SETTERPLUGINS" in obj) {
-        for (const setter in obj["SETTERPLUGINS"]) {
+        for (const setter of Object.keys(obj["SETTERPLUGINS"])) {
             if (isVettedPlugin(pluginSource)) {
                 const setterCode = obj["SETTERPLUGINS"][setter];
                 const registryName = `setter_${setter}_${Math.random().toString(36).substr(2, 9)}`;
@@ -986,7 +986,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, blk, value, turt
     // let g = (function() { return this ? this : typeof self !== 'undefined' ? self : undefined})() || Function("return this")();
 
     if ("BLOCKPLUGINS" in obj) {
-        for (const block in obj["BLOCKPLUGINS"]) {
+        for (const block of Object.keys(obj["BLOCKPLUGINS"])) {
             console.debug("adding plugin block " + block);
             safeEval(obj["BLOCKPLUGINS"][block], "BLOCKPLUGINS:" + block);
         }
@@ -998,7 +998,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, blk, value, turt
     }
 
     if ("PARAMETERPLUGINS" in obj) {
-        for (const parameter in obj["PARAMETERPLUGINS"]) {
+        for (const parameter of Object.keys(obj["PARAMETERPLUGINS"])) {
             if (isVettedPlugin(pluginSource)) {
                 const paramCode = obj["PARAMETERPLUGINS"][parameter];
                 const registryName = `param_${parameter}_${Math.random().toString(36).substr(2, 9)}`;
@@ -1016,14 +1016,14 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk) {
 
     // Code to execute when plugin is loaded
     if ("ONLOAD" in obj) {
-        for (const arg in obj["ONLOAD"]) {
+        for (const arg of Object.keys(obj["ONLOAD"])) {
             safeEval(obj["ONLOAD"][arg], "ONLOAD:" + arg);
         }
     }
 
     // Code to execute when turtle code is started
     if ("ONSTART" in obj) {
-        for (const arg in obj["ONSTART"]) {
+        for (const arg of Object.keys(obj["ONSTART"])) {
             if (isVettedPlugin(pluginSource)) {
                 const onStartCode = obj["ONSTART"][arg];
                 const registryName = `onstart_${arg}_${Math.random().toString(36).substr(2, 9)}`;
@@ -1041,7 +1041,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
 
     // Code to execute when turtle code is stopped
     if ("ONSTOP" in obj) {
-        for (const arg in obj["ONSTOP"]) {
+        for (const arg of Object.keys(obj["ONSTOP"])) {
             if (isVettedPlugin(pluginSource)) {
                 const onStopCode = obj["ONSTOP"][arg];
                 const registryName = `onstop_${arg}_${Math.random().toString(36).substr(2, 9)}`;
@@ -1221,36 +1221,36 @@ const updatePluginObj = (activity, obj) => {
         return;
     }
 
-    for (const name in obj["PALETTEPLUGINS"]) {
+    for (const name of Object.keys(obj["PALETTEPLUGINS"])) {
         activity.pluginObjs["PALETTEPLUGINS"][name] = obj["PALETTEPLUGINS"][name];
     }
 
-    for (const name in obj["PALETTEFILLCOLORS"]) {
+    for (const name of Object.keys(obj["PALETTEFILLCOLORS"])) {
         activity.pluginObjs["PALETTEFILLCOLORS"][name] = obj["PALETTEFILLCOLORS"][name];
     }
 
-    for (const name in obj["PALETTESTROKECOLORS"]) {
+    for (const name of Object.keys(obj["PALETTESTROKECOLORS"])) {
         activity.pluginObjs["PALETTESTROKECOLORS"][name] = obj["PALETTESTROKECOLORS"][name];
     }
 
-    for (const name in obj["PALETTEHIGHLIGHTCOLORS"]) {
+    for (const name of Object.keys(obj["PALETTEHIGHLIGHTCOLORS"])) {
         activity.pluginObjs["PALETTEHIGHLIGHTCOLORS"][name] = obj["PALETTEHIGHLIGHTCOLORS"][name];
     }
 
-    for (const flow in obj["FLOWPLUGINS"]) {
+    for (const flow of Object.keys(obj["FLOWPLUGINS"])) {
         activity.pluginObjs["FLOWPLUGINS"][flow] = obj["FLOWPLUGINS"][flow];
     }
 
-    for (const arg in obj["ARGPLUGINS"]) {
+    for (const arg of Object.keys(obj["ARGPLUGINS"])) {
         activity.pluginObjs["ARGPLUGINS"][arg] = obj["ARGPLUGINS"][arg];
     }
 
-    for (const block in obj["BLOCKPLUGINS"]) {
+    for (const block of Object.keys(obj["BLOCKPLUGINS"])) {
         activity.pluginObjs["BLOCKPLUGINS"][block] = obj["BLOCKPLUGINS"][block];
     }
 
     if ("MACROPLUGINS" in obj) {
-        for (const macro in obj["MACROPLUGINS"]) {
+        for (const macro of Object.keys(obj["MACROPLUGINS"])) {
             activity.pluginObjs["MACROPLUGINS"][macro] = obj["MACROPLUGINS"][macro];
         }
     }
@@ -1266,15 +1266,15 @@ const updatePluginObj = (activity, obj) => {
         activity.pluginObjs["IMAGES"] = obj["IMAGES"];
     }
 
-    for (const name in obj["ONLOAD"]) {
+    for (const name of Object.keys(obj["ONLOAD"])) {
         activity.pluginObjs["ONLOAD"][name] = obj["ONLOAD"][name];
     }
 
-    for (const name in obj["ONSTART"]) {
+    for (const name of Object.keys(obj["ONSTART"])) {
         activity.pluginObjs["ONSTART"][name] = obj["ONSTART"][name];
     }
 
-    for (const name in obj["ONSTOP"]) {
+    for (const name of Object.keys(obj["ONSTOP"])) {
         activity.pluginObjs["ONSTOP"][name] = obj["ONSTOP"][name];
     }
 };
