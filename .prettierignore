@@ -4,3 +4,4 @@ dist/
 build/
 *.min.js
 *.svg
+activity/SugarAnimation.js
