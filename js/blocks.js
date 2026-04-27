@@ -7321,20 +7321,20 @@ class Blocks {
                     ctx.save();
                     ctx.translate(block.container.x - minX, block.container.y - minY);
                     ctx.scale(block.container.scaleX || 1, block.container.scaleY || 1);
-                    
+
                     // Temporarily uncache to ensure all children (text, etc.) are drawn correctly
                     const wasCached = !!block.container.bitmapCache;
                     if (wasCached) {
                         block.container.uncache();
                     }
-                    
+
                     block.container.draw(ctx);
-                    
+
                     // Re-cache if it was cached (though sendStackToTrash will uncache it anyway)
                     if (wasCached) {
                         block.container.cache(0, 0, block.width, block.height);
                     }
-                    
+
                     ctx.restore();
                 }
             });

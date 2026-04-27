@@ -3420,11 +3420,7 @@ class Activity {
         }
 
         this._renderTrashView = () => {
-            if (
-                !this.blocks ||
-                !this.blocks.trashStacks ||
-                this.blocks.trashStacks.length === 0
-            ) {
+            if (!this.blocks || !this.blocks.trashStacks || this.blocks.trashStacks.length === 0) {
                 return;
             }
             const trashList = document.getElementById("trashList");
