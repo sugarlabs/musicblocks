@@ -4699,6 +4699,7 @@ class Blocks {
 
             const connectedBlock = this.blockList[cblk];
             if (!connectedBlock || typeof connectedBlock.isExpandableBlock !== "function") return null;
+            if (!Array.isArray(connectedBlock.connections)) return null;
 
             if (connectedBlock.isExpandableBlock()) {
                 /** If it is the last connection, keep searching. */
@@ -4732,6 +4733,7 @@ class Blocks {
 
             const connectedBlock = this.blockList[cblk];
             if (!connectedBlock || typeof connectedBlock.isExpandableBlock !== "function") return null;
+            if (!Array.isArray(connectedBlock.connections)) return null;
 
             if (connectedBlock.isExpandableBlock()) {
                 if (block.name === "forever") {
