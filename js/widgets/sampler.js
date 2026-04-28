@@ -398,18 +398,22 @@ function SampleWidget() {
     };
 
     //Drag-and-Drop sample files
+    this._dragOverHandler = e => {
+        e.preventDefault();
+    };
+
+    this._dropHandler = e => {
+        e.preventDefault();
+        const sampleFiles = e.dataTransfer.files[0];
+        this.handleFiles(sampleFiles);
+    };
+
     this.drag_and_drop = () => {
-        const dropZone = document.getElementsByClassName("samplerCanvas")[0];
-
-        dropZone.addEventListener("dragover", e => {
-            e.preventDefault();
-        });
-
-        dropZone.addEventListener("drop", e => {
-            e.preventDefault();
-            const sampleFiles = e.dataTransfer.files[0];
-            this.handleFiles(sampleFiles);
-        });
+        this._dropZone = document.getElementsByClassName("samplerCanvas")[0];
+        if (this._dropZone) {
+            this._dropZone.addEventListener("dragover", this._dragOverHandler);
+            this._dropZone.addEventListener("drop", this._dropHandler);
+        }
     };
 
     /**
@@ -514,6 +518,13 @@ function SampleWidget() {
                 this._octavesWheel.removeWheel();
             }
             this.pitchAnalysers = {};
+
+            if (this._dropZone) {
+                this._dropZone.removeEventListener("dragover", this._dragOverHandler);
+                this._dropZone.removeEventListener("drop", this._dropHandler);
+                this._dropZone = null;
+            }
+
             widgetWindow.destroy();
         };
 
