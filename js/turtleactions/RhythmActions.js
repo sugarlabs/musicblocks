@@ -148,16 +148,15 @@ function setupRhythmActions(activity) {
                                 tur.singer.neighborNoteValue
                             );
                         } else {
-                            tur.singer.neighborArgBeat.push(
-                                tur.singer.beatFactor * (1 / tur.singer.neighborNoteValue)
-                            );
-
                             const nextBeat = 1 / noteBeatValue - 2 * tur.singer.neighborNoteValue;
                             if (nextBeat <= 0 || !isFinite(nextBeat)) {
                                 console.warn(
                                     "Neighbor: note value too large for current duration, skipping"
                                 );
                             } else {
+                                tur.singer.neighborArgBeat.push(
+                                    tur.singer.beatFactor * (1 / tur.singer.neighborNoteValue)
+                                );
                                 tur.singer.neighborArgCurrentBeat.push(
                                     tur.singer.beatFactor * (1 / nextBeat)
                                 );
