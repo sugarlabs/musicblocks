@@ -664,10 +664,34 @@ function setupSensorsBlocks(activity) {
          * @returns {number} - The background color index.
          */
         getBackgroundColor() {
-            const [r, g, b] = platformColor.background
-                .match(/\(([^)]+)\)/)[1]
-                .split(/,\s*/)
-                .map(Number);
+            const background = platformColor.background;
+            let r;
+            let g;
+            let b;
+
+            if (typeof background === "string" && background.startsWith("#")) {
+                let hex = background.slice(1);
+                if (hex.length === 3) {
+                    hex = hex
+                        .split("")
+                        .map(char => char + char)
+                        .join("");
+                }
+                if (hex.length !== 6) {
+                    throw new Error("Invalid hex background color");
+                }
+                r = parseInt(hex.slice(0, 2), 16);
+                g = parseInt(hex.slice(2, 4), 16);
+                b = parseInt(hex.slice(4, 6), 16);
+            } else {
+                const match =
+                    typeof background === "string" ? background.match(/\(([^)]+)\)/) : null;
+                if (!match) {
+                    throw new Error("Invalid rgb/rgba background color");
+                }
+                [r, g, b] = match[1].split(/,\s*/).slice(0, 3).map(Number);
+            }
+
             return searchColors(r, g, b);
         }
 
