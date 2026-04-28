@@ -129,7 +129,7 @@ class HelpWidget {
             if (this._keydownHandler) {
                 document.removeEventListener("keydown", this._keydownHandler);
             }
-            this._keydownHandler = (event) => {
+            this._keydownHandler = event => {
                 if (event.key === "ArrowLeft") {
                     leftArrow.click();
                 } else if (event.key === "ArrowRight") {
@@ -542,7 +542,7 @@ class HelpWidget {
         if (this._keydownHandler) {
             document.removeEventListener("keydown", this._keydownHandler);
         }
-        this._keydownHandler = (event) => {
+        this._keydownHandler = event => {
             if (event.key === "ArrowLeft") {
                 leftArrow.click();
             } else if (event.key === "ArrowRight") {
