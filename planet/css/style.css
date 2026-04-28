@@ -523,3 +523,87 @@ a {
 	font-size: 16px;
 	outline: none;
 }
+
+/* Social sharing buttons */
+.share-social-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.share-social-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    color: #333;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.share-social-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+.share-twitter:hover {
+    background: #000;
+    color: #fff;
+}
+
+.share-whatsapp:hover {
+    background: #25d366;
+    color: #fff;
+}
+
+/* Embed snippet section */
+.embed-section {
+    margin-top: 16px;
+    padding-top: 8px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.embed-title {
+    margin-bottom: 8px;
+}
+
+.embed-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.embed-snippetarea {
+    flex: 1;
+    font-size: 0.75em;
+    font-family: monospace;
+    resize: none;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    line-height: 1.4;
+    min-height: 60px;
+}
+
+/* Attribution badge (exported HTML) */
+.made-with-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #96D3F3;
+    color: #0a3e58;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    text-decoration: none;
+    margin-top: 16px;
+}
+
+.made-with-badge:hover {
+    background: #7bc4e8;
+}

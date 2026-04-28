@@ -24,7 +24,7 @@
    exported
 
    debounce, getCookie, setCookie, hideOnClickOutside,
-   updateCheckboxes
+   updateCheckboxes, buildShareURL, buildEmbedSnippet
 */
 
 function debounce(func, wait, immediate) {
@@ -114,6 +114,91 @@ function hideOnClickOutside(eles, other) {
     document.addEventListener("click", outsideClickListener);
 }
 
+/**
+ * buildShareURL(id, options)
+ * Construct a Music Blocks share URL for a given project id.
+ *
+ * @param {string} id - Project ID
+ * @param {object} [options] - Optional flags
+ * @param {boolean} [options.run]      - Append &run=True
+ * @param {boolean} [options.show]     - Append &show=True
+ * @param {boolean} [options.collapse] - Append &collapse=True
+ * @returns {string} Full share URL
+ */
+function buildShareURL(id, options) {
+    let url = `https://musicblocks.sugarlabs.org/index.html?id=${encodeURIComponent(id)}`;
+    if (options) {
+        if (options.run) url += "&run=True";
+        if (options.show) url += "&show=True";
+        if (options.collapse) url += "&collapse=True";
+    }
+    return url;
+}
+
+/**
+ * isSafeMusicBlocksURL(url)
+ * Validate that a URL is a safe https Music Blocks origin URL.
+ * Rejects javascript:, data:, vbscript:, and any non-https schemes.
+ *
+ * @param {string} url
+ * @returns {boolean}
+ */
+function isSafeMusicBlocksURL(url) {
+    try {
+        const parsed = new URL(url);
+        return (
+            parsed.protocol === "https:" &&
+            parsed.hostname === "musicblocks.sugarlabs.org"
+        );
+    } catch (e) {
+        return false;
+    }
+}
+
+/**
+ * escapeHTMLAttr(str)
+ * Escape a string for safe use inside an HTML attribute value.
+ *
+ * @param {string} str
+ * @returns {string}
+ */
+function escapeHTMLAttr(str) {
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+}
+
+/**
+ * buildEmbedSnippet(url, projectName)
+ * Build an <iframe> embed snippet string for the given share URL.
+ * Returns an empty string if the URL fails validation.
+ *
+ * @param {string} url         - A Music Blocks share URL
+ * @param {string} [projectName] - Optional project name for the iframe title
+ * @returns {string} Ready-to-paste iframe HTML, or "" if URL is unsafe
+ */
+function buildEmbedSnippet(url, projectName) {
+    if (!isSafeMusicBlocksURL(url)) {
+        console.warn(`buildEmbedSnippet: unsafe URL rejected: ${url}`);
+        return "";
+    }
+    const title = projectName
+        ? `Music Blocks Project: ${escapeHTMLAttr(projectName)}`
+        : "Music Blocks Project";
+    return (
+        `<iframe src="${url}" ` +
+        `title="${title}" ` +
+        `width="800" height="600" ` +
+        `frameborder="0" ` +
+        `allowfullscreen ` +
+        `sandbox="allow-scripts allow-same-origin">` +
+        `</iframe>`
+    );
+}
+
 function updateCheckboxes(id) {
     const elements = document.getElementById(id).querySelectorAll("input:checked");
     const urlel = document.getElementById(id).querySelectorAll("input[type=text]")[0];
@@ -122,6 +207,39 @@ function updateCheckboxes(id) {
     for (let i = 0; i < elements.length; i++) url += `&${elements[i].name}=True`;
 
     urlel.value = url;
+
+    // Sync social share buttons if present
+    const projectId = id.replace("global-sharebox-", "");
+    const shareboxEl = document.getElementById(id);
+    const projectName = shareboxEl ? shareboxEl.getAttribute("data-projectname") || "" : "";
+    const socialText = projectName
+        ? `${_("Check out this Music Blocks project")} "${projectName}"!`
+        : _("Check out this Music Blocks project!");
+
+    const twitterBtn = document.getElementById(`global-share-twitter-${projectId}`);
+    if (twitterBtn) {
+        twitterBtn.href = `https://x.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(socialText)}`;
+    }
+
+    const whatsappBtn = document.getElementById(`global-share-whatsapp-${projectId}`);
+    if (whatsappBtn) {
+        whatsappBtn.href = `https://wa.me/?text=${encodeURIComponent(`${socialText} ${url}`)}`;
+    }
+
+    // Sync embed snippet textarea and copy button
+    const embedArea = document.getElementById(`global-embed-${projectId}`);
+    if (embedArea) {
+        embedArea.value = buildEmbedSnippet(url, projectName);
+    }
+
+    const embedCopyBtn = document.getElementById(`global-copy-embed-${projectId}`);
+    if (embedCopyBtn) {
+        embedCopyBtn.setAttribute("data-clipboard-text", buildEmbedSnippet(url, projectName));
+    }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { buildShareURL, buildEmbedSnippet, isSafeMusicBlocksURL, escapeHTMLAttr };
 }
 
 $(document).ready(() => {
