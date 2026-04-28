@@ -4912,12 +4912,31 @@ class Activity {
         this.onStopTurtle = () => {
             if (this.showBlocksAfterRun) {
                 this.blocks.showBlocks();
-                const stopIcon = document.getElementById("stop");
-                if (stopIcon) {
-                    stopIcon.style.color = "white";
-                }
                 this.showBlocksAfterRun = false;
             }
+
+            const stopIcon = document.getElementById("stop");
+            if (stopIcon) {
+                stopIcon.style.color = "white";
+                stopIcon.style.display = "none";
+            }
+
+            const saveBtn = document.getElementById("saveButton");
+            const saveBtnAdv = document.getElementById("saveButtonAdvanced");
+            const recordBtn = document.getElementById("record");
+
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.classList.remove("grey-text", "inactiveLink");
+            }
+            if (saveBtnAdv) {
+                saveBtnAdv.disabled = false;
+                saveBtnAdv.classList.remove("grey-text", "inactiveLink");
+            }
+            if (recordBtn) {
+                recordBtn.classList.remove("grey-text", "inactiveLink");
+            }
+
             // TODO: plugin support
         };
 
@@ -5232,25 +5251,49 @@ class Activity {
             this.doLoadAnimation();
 
             // palettes.updatePalettes();
-            this.textMsg(this.planet.getCurrentProjectName());
+            try {
+                const projectName =
+                    this.planet && typeof this.planet.getCurrentProjectName === "function"
+                        ? this.planet.getCurrentProjectName()
+                        : _("My Project");
+                this.textMsg(projectName);
+            } catch (e) {
+                console.error(e);
+                this.textMsg(_("My Project"));
+            }
 
             const that = this;
             setTimeout(() => {
+                const finishLoading = () => {
+                    that.loading = false;
+                    document.body.style.cursor = "default";
+                    that.update = true;
+                };
+
                 try {
-                    that.planet.openProjectFromPlanet(projectID, () => {
-                        that.loadStartWrapper(loadStart);
-                    });
+                    if (that.planet && typeof that.planet.openProjectFromPlanet === "function") {
+                        that.planet.openProjectFromPlanet(projectID, () => {
+                            that.loadStartWrapper(loadStart);
+                        });
+                    } else {
+                        throw new Error("Planet openProjectFromPlanet is unavailable.");
+                    }
                 } catch (e) {
                     console.error(e);
                     that.loadStartWrapper(loadStart);
                 }
 
-                that.planet.initialiseNewProject();
-                // Restore default cursor
-                that.loading = false;
+                if (that.planet && typeof that.planet.initialiseNewProject === "function") {
+                    try {
+                        that.planet.initialiseNewProject();
+                    } catch (e) {
+                        console.error(e);
+                    }
+                } else {
+                    console.error("Planet initialiseNewProject is unavailable.");
+                }
 
-                document.body.style.cursor = "default";
-                that.update = true;
+                finishLoading();
             }, 2500);
 
             const run = flags.run;
@@ -6723,12 +6766,10 @@ class Activity {
                         case "start":
                         case "drum": {
                             // Find the turtle associated with this block.
-                            const turtleIdx = parseInt(myBlock.value);
+
                             const turtle =
-                                !isNaN(turtleIdx) &&
-                                turtleIdx >= 0 &&
-                                turtleIdx < this.turtles.getTurtleCount()
-                                    ? this.turtles.getTurtle(turtleIdx)
+                                myBlock.value !== null && myBlock.value !== undefined
+                                    ? this.turtles.getTurtle(myBlock.value)
                                     : null;
                             if (turtle === null || turtle === undefined) {
                                 args = {
