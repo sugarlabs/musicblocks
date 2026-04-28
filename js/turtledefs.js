@@ -307,6 +307,14 @@ const getAuxToolbarButtonNames = name => {
     );
 };
 
+const getLanguagePreference = () => {
+    try {
+        return localStorage.languagePreference;
+    } catch (e) {
+        return undefined;
+    }
+};
+
 const createDefaultStack = () => {
     if (_THIS_IS_TURTLE_BLOCKS_) {
         DATAOBJS = [
@@ -320,7 +328,7 @@ const createDefaultStack = () => {
             [7, ["number", { value: 90 }], 0, 0, [6]]
         ];
     } else {
-        let language = localStorage.languagePreference;
+        let language = getLanguagePreference();
         if (language === undefined) {
             language = navigator.language;
         }
@@ -407,7 +415,7 @@ const createDefaultStack = () => {
 };
 
 const createHelpContent = activity => {
-    let language = localStorage.languagePreference;
+    let language = getLanguagePreference();
     if (language === undefined) {
         language = navigator.language;
     }
