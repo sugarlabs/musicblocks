@@ -19,7 +19,14 @@
 
 /* exported setupRhythmBlockPaletteBlocks */
 
-const language = localStorage.languagePreference || navigator.language;
+let language;
+try {
+    language = localStorage.languagePreference;
+} catch (e) {
+    language = undefined;
+}
+language = language || navigator.language;
+
 let rhythmBlockPalette = language === "ja" ? "rhythm" : "widgets";
 if (_THIS_IS_TURTLE_BLOCKS_) {
     rhythmBlockPalette = "rhythm";
@@ -140,7 +147,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 // polyphonic rhythms.
                 if (logo.rhythmRulerMeasure === null) {
                     logo.rhythmRulerMeasure = arg0 * arg1;
-                } else if (logo.rhythmRulerMeasure != arg0 * arg1) {
+                } else if (logo.rhythmRulerMeasure !== arg0 * arg1) {
                     activity.textMsg(_("polyphonic rhythm"));
                 }
 
@@ -182,7 +189,8 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 const bpmFactor =
                     TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
 
-                const beatValue = bpmFactor == null ? 1 : bpmFactor / noteBeatValue;
+                const beatValue =
+                    bpmFactor === null || bpmFactor === undefined ? 1 : bpmFactor / noteBeatValue;
 
                 let __callback;
 
