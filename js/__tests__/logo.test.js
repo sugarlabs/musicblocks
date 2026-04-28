@@ -309,7 +309,7 @@ describe("Logo Class", () => {
                     blocks: null,
                     turtles: {},
                     stage: {},
-                    errorHandler: () => { }
+                    errorHandler: () => {}
                 });
             }).toThrow();
         });
@@ -319,8 +319,6 @@ describe("Logo Class", () => {
                 new Logo({});
             }).toThrow();
         });
-
-
     });
 
     describe("Setters and Getters", () => {
@@ -1032,7 +1030,7 @@ describe("Logo comprehensive method coverage", () => {
     });
 
     test("runLogoCommands handles already-running state and status widget initialization", () => {
-        const clearTimeoutSpy = jest.spyOn(global, "clearTimeout").mockImplementation(() => { });
+        const clearTimeoutSpy = jest.spyOn(global, "clearTimeout").mockImplementation(() => {});
         logo._alreadyRunning = true;
         logo._runningBlock = 7;
         logo._lastNoteTimeout = 99;
@@ -1115,7 +1113,7 @@ describe("Logo comprehensive method coverage", () => {
     });
 
     test("doStopTurtles covers companion/camera/recorder/showBlocks branches", () => {
-        const clearIntervalSpy = jest.spyOn(global, "clearInterval").mockImplementation(() => { });
+        const clearIntervalSpy = jest.spyOn(global, "clearInterval").mockImplementation(() => {});
         logo.deps.instruments = { 0: { flute: {} }, 1: { piano: {} } };
         turtle0.singer.killAllVoices = jest.fn();
         turtle0.companionTurtle = 1;
@@ -1288,7 +1286,7 @@ describe("Logo comprehensive method coverage", () => {
     });
 
     test("clearTurtleRun clears timeout and resumes execution", () => {
-        const clearTimeoutSpy = jest.spyOn(global, "clearTimeout").mockImplementation(() => { });
+        const clearTimeoutSpy = jest.spyOn(global, "clearTimeout").mockImplementation(() => {});
         turtle0.delayTimeout = 123;
         turtle0.delayParameters = { blk: 4, flow: 1, arg: ["p"] };
         logo.runFromBlockNow = jest.fn();
