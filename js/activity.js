@@ -1076,6 +1076,11 @@ class Activity {
                 let y = Math.floor(toppos * this.turtleBlocksScale);
                 let even = true;
 
+                // Defer checkBounds during bulk block moves to avoid O(N²)
+                // overhead: each moveBlockRelative call triggers checkBounds()
+                // which scans all blocks, so N moves × N blocks = O(N²).
+                this.blocks._beginDeferCheckBounds();
+
                 // Position "start" blocks first
                 for (const blk in this.blocks.blockList) {
                     if (!this.blocks.blockList[blk].trash) {
@@ -1147,6 +1152,8 @@ class Activity {
                         }
                     }
                 }
+
+                this.blocks._endDeferCheckBounds();
             } else {
                 // Second click logic (arrange blocks in columns this avoid overlapping of blocks)
                 let toppos;
@@ -1181,6 +1188,9 @@ class Activity {
                 );
                 const columnYPositions = Array(numColumns).fill(initialY);
 
+                // Defer checkBounds during bulk block moves (see first-click path).
+                this.blocks._beginDeferCheckBounds();
+
                 for (const blk in this.blocks.blockList) {
                     if (!this.blocks.blockList[blk].trash) {
                         const myBlock = this.blocks.blockList[blk];
@@ -1209,6 +1219,8 @@ class Activity {
                         }
                     }
                 }
+
+                this.blocks._endDeferCheckBounds();
             }
 
             // Reset go-home button
@@ -4783,6 +4795,12 @@ class Activity {
             let actionBlockCounter = 0;
             const dx = 0;
             const dy = this.cellSize * 3;
+
+            // Defer checkBounds during bulk block moves to avoid O(N²)
+            // overhead: each moveBlockRelative call triggers checkBounds()
+            // which scans all blocks, so N moves × N blocks = O(N²).
+            this.blocks._beginDeferCheckBounds();
+
             for (const blk in this.blocks.blockList) {
                 // If this block is at the top of a stack, push it
                 // onto the trashStacks list.
@@ -4825,6 +4843,8 @@ class Activity {
                     delete this.blocks.blockCollapseArt[blk];
                 }
             }
+
+            this.blocks._endDeferCheckBounds();
 
             if (addStartBlock) {
                 this.blocks.loadNewBlocks(DATAOBJS);
