@@ -5224,6 +5224,7 @@ class Activity {
                     }
                 } catch (e) {
                     console.error(e);
+                    that.justLoadStart();
                 }
             } else {
                 that.justLoadStart();
