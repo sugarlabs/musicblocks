@@ -10,6 +10,8 @@
 
 // This widget displays help about a block or a button.
 
+const HELP_SVG_DATA_PREFIX = "data:image/svg+xml;base64,";
+
 /* global
 
    _, docById, getMacroExpansion, HELPCONTENT,
@@ -360,35 +362,43 @@ class HelpWidget {
         const pageCount = `${page + 1}/${totalPages}`;
         const rightArrow = docById("right-arrow");
         const leftArrow = docById("left-arrow");
+        const title = HELPCONTENT[page][0];
+        const imageSrc = HELPCONTENT[page][2];
 
         rightArrow.classList.toggle("disabled", page === HELPCONTENT.length - 1);
         leftArrow.classList.toggle("disabled", page === 0);
 
         // Previous HTML content is removed, and new one is generated.
         const bodyFragment = document.createDocumentFragment();
-        if (
-            [
-                _("Welcome to Music Blocks"),
-                _("Meet Mr. Mouse!"),
-                _("Guide"),
-                _("About"),
-                _("Congratulations.")
-            ].includes(HELPCONTENT[page][0])
-        ) {
+        if (this._isLargeTourImage(title)) {
             // body = body + '<p>&nbsp;<img src="' + HELPCONTENT[page][2] + '"></p>';
             const figure = document.createElement("figure");
             const img = document.createElement("img");
-            img.src = HELPCONTENT[page][2];
-            img.alt = `${HELPCONTENT[page][0]} icon`;
+            img.src = imageSrc;
+            img.alt = `${title} icon`;
             img.loading = "lazy";
+            img.classList.add("help-tour-image");
+            figure.append(img);
+            bodyFragment.append(figure);
+        } else if (this._isDetailedTourIcon(title)) {
+            const figure = document.createElement("figure");
+            const img = document.createElement("img");
+            img.src = imageSrc;
+            img.alt = `${title} icon`;
+            img.loading = "lazy";
+            img.classList.add("help-tour-detailed-icon");
             figure.append(img);
             bodyFragment.append(figure);
         } else {
             const figure = document.createElement("figure");
             const img = document.createElement("img");
-            img.src = HELPCONTENT[page][2];
-            img.alt = `${HELPCONTENT[page][0]} icon`;
+            img.src = this._getHighContrastHelpIconSrc(imageSrc);
+            img.alt = `${title} icon`;
             img.loading = "lazy";
+            img.classList.add("help-tour-icon");
+            if (this._usesHighContrastWhiteFilter(imageSrc)) {
+                img.classList.add("help-tour-white-icon");
+            }
             img.setAttribute("width", "64px");
             img.setAttribute("height", "64px");
             figure.append(img);
@@ -465,6 +475,120 @@ class HelpWidget {
         helpBody.append(bodyFragment);
 
         this.widgetWindow.takeFocus();
+    }
+
+    /**
+     * @private
+     * @param {string} title
+     * @returns {boolean}
+     */
+    _isLargeTourImage(title) {
+        return [
+            _("Welcome to Music Blocks"),
+            _("Meet Mr. Mouse!"),
+            _("Guide"),
+            _("About"),
+            _("Congratulations."),
+            _("Congratulations!")
+        ].includes(title);
+    }
+
+    /**
+     * @private
+     * @param {string} title
+     * @returns {boolean}
+     */
+    _isDetailedTourIcon(title) {
+        return [
+            _("Tab Navigation"),
+            _("Contextual Menu for Blocks"),
+            _("Contextual Menu for Canvas")
+        ].includes(title);
+    }
+
+    /**
+     * @private
+     * @param {string} src
+     * @returns {string}
+     */
+    _getHighContrastHelpIconSrc(src) {
+        if (
+            !document.body.classList.contains("highcontrast") ||
+            !src.startsWith(HELP_SVG_DATA_PREFIX)
+        ) {
+            return src;
+        }
+
+        try {
+            const svg = this._decodeSvgData(src.slice(HELP_SVG_DATA_PREFIX.length));
+            const highContrastSvg = svg
+                .replace(/fill-opacity\s*:\s*0\.[0-9]+/g, "fill-opacity:1")
+                .replace(/stroke-opacity\s*:\s*0\.[0-9]+/g, "stroke-opacity:1")
+                .replace(/opacity\s*:\s*0\.[0-9]+/g, "opacity:1")
+                .replace(/fill-opacity="0\.[0-9]+"/g, 'fill-opacity="1"')
+                .replace(/stroke-opacity="0\.[0-9]+"/g, 'stroke-opacity="1"')
+                .replace(/opacity="0\.[0-9]+"/g, 'opacity="1"');
+            return HELP_SVG_DATA_PREFIX + this._encodeSvgData(highContrastSvg);
+        } catch (e) {
+            return src;
+        }
+    }
+
+    /**
+     * @private
+     * @param {string} src
+     * @returns {boolean}
+     */
+    _usesHighContrastWhiteFilter(src) {
+        if (
+            !document.body.classList.contains("highcontrast") ||
+            !src.startsWith(HELP_SVG_DATA_PREFIX)
+        ) {
+            return false;
+        }
+
+        try {
+            return !this._hasVisibleWhiteSvgDetail(
+                this._decodeSvgData(src.slice(HELP_SVG_DATA_PREFIX.length))
+            );
+        } catch (e) {
+            return true;
+        }
+    }
+
+    /**
+     * @private
+     * @param {string} svg
+     * @returns {boolean}
+     */
+    _hasVisibleWhiteSvgDetail(svg) {
+        const whiteElements =
+            svg.match(/<[^>]*(?:fill|stroke)\s*[:=]\s*["']?#(?:fff|ffffff)\b[^>]*>/gi) || [];
+
+        return whiteElements.some(
+            element =>
+                !/(?:opacity|fill-opacity|stroke-opacity)\s*[:=]\s*["']?0(?:[;"'\s>]|$)/i.test(
+                    element
+                )
+        );
+    }
+
+    /**
+     * @private
+     * @param {string} encodedSvg
+     * @returns {string}
+     */
+    _decodeSvgData(encodedSvg) {
+        return window.atob(encodedSvg);
+    }
+
+    /**
+     * @private
+     * @param {string} svg
+     * @returns {string}
+     */
+    _encodeSvgData(svg) {
+        return window.btoa(svg);
     }
 
     /**
