@@ -78,10 +78,18 @@ function setupSensorsBlocks(activity) {
             // Pause the flow while waiting for input
             tur.doWait(120);
 
-            // Display the input form.
-            docById("labelDiv").innerHTML =
-                '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="input" type="text" value="" />';
-            const inputElem = docById("textLabel");
+            // Build the input element programmatically to avoid innerHTML XSS risk.
+            const labelDiv = docById("labelDiv");
+            labelDiv.textContent = "";
+            const inputElem = document.createElement("input");
+            inputElem.id = "textLabel";
+            inputElem.type = "text";
+            inputElem.className = "input";
+            inputElem.value = "";
+            inputElem.style.cssText =
+                "position: absolute; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;";
+            labelDiv.appendChild(inputElem);
+
             const cblk = activity.blocks.blockList[blk].connections[1];
             if (cblk !== null) {
                 inputElem.placeholder = activity.blocks.blockList[cblk].value;
@@ -90,13 +98,12 @@ function setupSensorsBlocks(activity) {
             inputElem.style.top = activity.turtles.getTurtle(turtle).container.y + "px";
             inputElem.focus();
 
-            docById("labelDiv").classList.add("hasKeyboard");
+            labelDiv.classList.add("hasKeyboard");
 
-            // Add a handler to continue the flow after the input.
+            // Add a self-cleaning handler to continue the flow after input.
+            // The listener removes itself after Enter is pressed to prevent accumulation.
             function __keyPressed(event) {
-                if (event.keyCode === 13) {
-                    // RETURN
-                    const inputElem = docById("textLabel");
+                if (event.key === "Enter") {
                     const value = inputElem.value;
                     if (isNaN(value)) {
                         logo.inputValues[turtle] = value;
@@ -104,14 +111,15 @@ function setupSensorsBlocks(activity) {
                         logo.inputValues[turtle] = Number(value);
                     }
 
+                    inputElem.removeEventListener("keypress", __keyPressed);
                     inputElem.blur();
                     inputElem.style.display = "none";
                     logo.clearTurtleRun(turtle);
-                    docById("labelDiv").classList.remove("hasKeyboard");
+                    labelDiv.classList.remove("hasKeyboard");
                 }
             }
 
-            docById("textLabel").addEventListener("keypress", __keyPressed);
+            inputElem.addEventListener("keypress", __keyPressed);
         }
     }
     /**
