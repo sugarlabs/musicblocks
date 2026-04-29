@@ -87,10 +87,6 @@ describe("Tempo Widget", () => {
             errorMsg: jest.fn() // This is what the code calls!
         };
 
-        // --- FIX 1: Set the Global 'activity' variable ---
-        // The widget code calls 'activity.errorMsg', relying on it being global.
-        global.activity = mockActivity;
-
         // Manually setup initial state usually handled by init()
         tempoWidget.activity = mockActivity;
         tempoWidget.BPMs = [100]; // Start at 100 BPM
