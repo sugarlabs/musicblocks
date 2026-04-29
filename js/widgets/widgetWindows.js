@@ -207,7 +207,12 @@ class WidgetWindow {
 
         if (this._fullscreenEnabled) {
             this._drag.ondblclick = e => {
-                this._maximize();
+                if (this._maximized) {
+                    this._restore();
+                    this.sendToCenter();
+                } else {
+                    this._maximize();
+                }
                 this.takeFocus();
                 this.onmaximize();
                 e.preventDefault();
@@ -237,20 +242,6 @@ class WidgetWindow {
 
         this._nonclose.onmousedown = e => {
             window.widgetWindows.draggingWindow = this;
-            if (this._maximized) {
-                // Perform special repositioning to make the drag feel right when
-                // restoring a window from maximized.
-                let bcr = this._drag.getBoundingClientRect();
-                let dx = (bcr.left - e.clientX) / (bcr.right - bcr.left);
-                const dy = bcr.top - e.clientY;
-
-                this._restore();
-                this.onmaximize();
-
-                bcr = this._drag.getBoundingClientRect();
-                dx *= bcr.right - bcr.left;
-                this.setPosition(e.clientX + dx, e.clientY + dy);
-            }
 
             this.takeFocus();
 
@@ -339,6 +330,17 @@ class WidgetWindow {
      * @returns {void}
      */
     _docMouseMoveHandler(e) {
+        if (this._maximized) {
+            const bcr = this._drag.getBoundingClientRect();
+            const dxRatio = (bcr.left - e.clientX) / (bcr.right - bcr.left);
+            const dy = bcr.top - e.clientY;
+
+            this._restore();
+            this.onmaximize();
+
+            const newBcr = this._drag.getBoundingClientRect();
+            this.setPosition(e.clientX + dxRatio * (newBcr.right - newBcr.left), e.clientY + dy);
+        }
         // Throttle using requestAnimationFrame to prevent layout thrashing
         if (this._rafTicking) return;
         this._rafTicking = true;
