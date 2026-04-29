@@ -14,7 +14,7 @@
 
    deepClone, last, _, ValueBlock, FlowClampBlock, FlowBlock, NOINPUTERRORMSG,
    LeftBlock, Singer, CHORDNAMES, CHORDVALUES, DEFAULTCHORD,
-   Queue, INTERVALVALUES
+    Queue, INTERVALVALUES, ErrorHandler
  */
 
 /*
@@ -1063,7 +1063,11 @@ function setupIntervalsBlocks(activity) {
                 if (intervalName in INTERVALVALUES) {
                     r = INTERVALVALUES[intervalName][2];
                 } else {
-                    Logger.error("could not find " + intervalName + " in INTERVALVALUES");
+                    ErrorHandler.recoverable("unknown interval name", {
+                        module: "intervals-blocks",
+                        operation: "ratioInterval.lookup",
+                        extra: { intervalName }
+                    });
                     r = 1;
                 }
             }
