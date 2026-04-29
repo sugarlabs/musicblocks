@@ -980,7 +980,7 @@ class Activity {
             const columnYPositions = Array(numColumns).fill(y);
 
             for (const blk in this.blocks.blockList) {
-                if (!this.blocks.blockList[blk].trash) {
+                if (this.blocks.blockList[blk] && !this.blocks.blockList[blk].trash) {
                     const myBlock = this.blocks.blockList[blk];
 
                     // Store original position only once
@@ -1084,7 +1084,7 @@ class Activity {
 
                 // Position "start" blocks first
                 for (const blk in this.blocks.blockList) {
-                    if (!this.blocks.blockList[blk].trash) {
+                    if (this.blocks.blockList[blk] && !this.blocks.blockList[blk].trash) {
                         const myBlock = this.blocks.blockList[blk];
                         if (myBlock.name !== "start") {
                             continue;
@@ -1120,7 +1120,7 @@ class Activity {
 
                 // Position other blocks
                 for (const blk in this.blocks.blockList) {
-                    if (!this.blocks.blockList[blk].trash) {
+                    if (this.blocks.blockList[blk] && !this.blocks.blockList[blk].trash) {
                         const myBlock = this.blocks.blockList[blk];
                         if (myBlock.name === "start") {
                             continue;
@@ -1193,7 +1193,7 @@ class Activity {
                 this.blocks._beginDeferCheckBounds();
 
                 for (const blk in this.blocks.blockList) {
-                    if (!this.blocks.blockList[blk].trash) {
+                    if (this.blocks.blockList[blk] && !this.blocks.blockList[blk].trash) {
                         const myBlock = this.blocks.blockList[blk];
                         if (myBlock.connections[0] === null) {
                             let minYIndex = 0;
@@ -1362,7 +1362,7 @@ class Activity {
             let yMax = 0;
             let parts;
             for (let i = 0; i < this.blocks.blockList.length; i++) {
-                if (this.blocks.blockList[i].ignore()) {
+                if (!this.blocks.blockList[i] || this.blocks.blockList[i].ignore()) {
                     continue;
                 }
 
@@ -4814,23 +4814,23 @@ class Activity {
             this.blocks._beginDeferCheckBounds();
 
             for (const blk in this.blocks.blockList) {
+                const myBlock = this.blocks.blockList[blk];
+                if (!myBlock) continue;
+
                 // If this block is at the top of a stack, push it
                 // onto the trashStacks list.
-                if (this.blocks.blockList[blk].connections[0] === null) {
+                if (myBlock.connections[0] === null) {
                     this.blocks.trashStacks.push(blk);
                 }
 
-                if (
-                    this.blocks.blockList[blk].name === "start" ||
-                    this.blocks.blockList[blk].name === "drum"
-                ) {
-                    const turtle = this.blocks.blockList[blk].value;
-                    if (!this.blocks.blockList[blk].trash && turtle !== null) {
+                if (myBlock.name === "start" || myBlock.name === "drum") {
+                    const turtle = myBlock.value;
+                    if (!myBlock.trash && turtle !== null) {
                         this.turtles.getTurtle(turtle).inTrash = true;
                         this.turtles.getTurtle(turtle).container.visible = false;
                     }
-                } else if (this.blocks.blockList[blk].name === "action") {
-                    if (!this.blocks.blockList[blk].trash) {
+                } else if (myBlock.name === "action") {
+                    if (!myBlock.trash) {
                         this.blocks.deleteActionBlock(this.blocks.blockList[blk]);
                         actionBlockCounter += 1;
                     }
@@ -6756,8 +6756,10 @@ class Activity {
             this.hasMatrixDataBlock = false;
             for (let blk = 0; blk < this.blocks.blockList.length; blk++) {
                 const myBlock = this.blocks.blockList[blk];
-                if (myBlock.trash) {
+                if (myBlock && myBlock.trash) {
                     // Don't save blocks in the trash.
+                    continue;
+                } else if (!myBlock) {
                     continue;
                 }
 
@@ -6768,12 +6770,12 @@ class Activity {
             const data = [];
             for (let blk = 0; blk < this.blocks.blockList.length; blk++) {
                 const myBlock = this.blocks.blockList[blk];
-                let args = null;
-
-                if (myBlock.trash) {
+                if (!myBlock || myBlock.trash) {
                     // Don't save blocks in the trash.
                     continue;
                 }
+
+                let args = null;
 
                 if (
                     myBlock.isValueBlock() ||
