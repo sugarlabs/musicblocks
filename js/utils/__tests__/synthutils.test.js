@@ -61,6 +61,7 @@ describe("Utility Functions (logic-only)", () => {
         newTone,
         preloadProjectSamples,
         resolveInstrumentName,
+        computeTargetPitchFrequency,
         Synth;
 
     const turtle = "turtle1";
@@ -150,6 +151,7 @@ describe("Utility Functions (logic-only)", () => {
                 VOICENAMES: typeof VOICENAMES !== "undefined" ? VOICENAMES : undefined,
                 DRUMNAMES: typeof DRUMNAMES !== "undefined" ? DRUMNAMES : undefined,
                 NOISENAMES: typeof NOISENAMES !== "undefined" ? NOISENAMES : undefined,
+                computeTargetPitchFrequency: typeof computeTargetPitchFrequency !== "undefined" ? computeTargetPitchFrequency : undefined,
                   };
         `);
         const results = wrapper();
@@ -193,6 +195,7 @@ describe("Utility Functions (logic-only)", () => {
         newTone = Synth.newTone;
         preloadProjectSamples = Synth.preloadProjectSamples;
         resolveInstrumentName = Synth.resolveInstrumentName;
+        computeTargetPitchFrequency = results.computeTargetPitchFrequency;
     });
 
     describe("setupRecorder", () => {
@@ -1167,6 +1170,72 @@ describe("Utility Functions (logic-only)", () => {
             Synth.tunerAnalyser = { getValue: jest.fn(() => new Float32Array(16)) };
             Synth.detectPitch = jest.fn(() => 261.63);
             expect(getTunerFrequency()).toBe(261.63);
+        });
+    });
+
+    describe("computeTargetPitchFrequency", () => {
+        // Equal-temperament frequencies relative to A4 = 440 Hz, rounded to
+        // 2 decimals to match the historical baseFrequencies table.
+        const closeTo = (actual, expected) => {
+            expect(actual).toBeCloseTo(expected, 1);
+        };
+
+        it("returns the canonical A4 reference frequency", () => {
+            closeTo(computeTargetPitchFrequency("A4"), 440.0);
+        });
+
+        it("returns correct frequencies for natural notes in octave 4", () => {
+            closeTo(computeTargetPitchFrequency("C4"), 261.63);
+            closeTo(computeTargetPitchFrequency("D4"), 293.66);
+            closeTo(computeTargetPitchFrequency("E4"), 329.63);
+            closeTo(computeTargetPitchFrequency("F4"), 349.23);
+            closeTo(computeTargetPitchFrequency("G4"), 392.0);
+            closeTo(computeTargetPitchFrequency("B4"), 493.88);
+        });
+
+        it("returns correct frequencies for sharp notes", () => {
+            closeTo(computeTargetPitchFrequency("C#4"), 277.18);
+            closeTo(computeTargetPitchFrequency("D#4"), 311.13);
+            closeTo(computeTargetPitchFrequency("F#4"), 369.99);
+            closeTo(computeTargetPitchFrequency("G#4"), 415.3);
+            closeTo(computeTargetPitchFrequency("A#4"), 466.16);
+        });
+
+        it("returns the correct enharmonic frequencies for flat notes", () => {
+            // Regression test for the bug where Db/Eb/Gb/Ab/Bb were
+            // resolved by `note.replace("b","#")`, producing wrong
+            // frequencies (D#/E#/G#/A#/B#) — and silently falling through
+            // to 440 Hz for the ones not present in the lookup table.
+            closeTo(computeTargetPitchFrequency("Db4"), 277.18); // = C#4
+            closeTo(computeTargetPitchFrequency("Eb4"), 311.13); // = D#4
+            closeTo(computeTargetPitchFrequency("Gb4"), 369.99); // = F#4
+            closeTo(computeTargetPitchFrequency("Ab4"), 415.3); // = G#4
+            closeTo(computeTargetPitchFrequency("Bb4"), 466.16); // = A#4
+        });
+
+        it("returns the correct enharmonic frequencies for double accidentals", () => {
+            // The original regex /[A-G][#b]?(\d+)/ rejected the double
+            // accidentals exposed by the same UI, which then defaulted to
+            // 440 Hz.
+            closeTo(computeTargetPitchFrequency("C##4"), 293.66); // = D4
+            closeTo(computeTargetPitchFrequency("D##4"), 329.63); // = E4
+            closeTo(computeTargetPitchFrequency("Cbb4"), 233.08); // = Bb3
+            closeTo(computeTargetPitchFrequency("Dbb4"), 261.63); // = C4
+        });
+
+        it("scales correctly across octaves", () => {
+            closeTo(computeTargetPitchFrequency("A3"), 220.0);
+            closeTo(computeTargetPitchFrequency("A5"), 880.0);
+            closeTo(computeTargetPitchFrequency("Bb3"), 233.08);
+            closeTo(computeTargetPitchFrequency("Bb5"), 932.33);
+        });
+
+        it("returns NaN for invalid input rather than a misleading value", () => {
+            expect(Number.isNaN(computeTargetPitchFrequency(""))).toBe(true);
+            expect(Number.isNaN(computeTargetPitchFrequency("C"))).toBe(true);
+            expect(Number.isNaN(computeTargetPitchFrequency("notapitch"))).toBe(true);
+            expect(Number.isNaN(computeTargetPitchFrequency(null))).toBe(true);
+            expect(Number.isNaN(computeTargetPitchFrequency(undefined))).toBe(true);
         });
     });
 

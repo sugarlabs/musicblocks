@@ -464,6 +464,45 @@ const instrumentsEffects = { 0: {} };
 const instrumentsFilters = { 0: {} };
 
 /**
+ * Compute the equal-temperament frequency of a target pitch string used by
+ * the sampler tuner.
+ *
+ * Accepts notes in the form `<letter><accidental?><octave>` where the
+ * accidental is one of `#`, `b`, `##`, `bb`, `♯`, `♭`, `𝄪`, `𝄫`, or `*`,
+ * and the octave is a (signed) integer. Examples: `"C4"`, `"Bb4"`,
+ * `"C##5"`, `"D𝄫3"`.
+ *
+ * @function
+ * @param {string} noteWithOctave - The target pitch including its octave.
+ * @returns {number} Frequency in Hz, or `NaN` if the input cannot be parsed.
+ */
+const computeTargetPitchFrequency = noteWithOctave => {
+    if (typeof noteWithOctave !== "string" || noteWithOctave.length < 2) {
+        return NaN;
+    }
+    // Split into pitch (letter + optional accidentals) and octave (trailing
+    // signed integer). We do not trust the trailing character to be a single
+    // digit because some accidentals are multi-character (e.g. "##", "bb"),
+    // and very low or high octaves may eventually appear.
+    const match = noteWithOctave.match(/^(.+?)(-?\d+)$/);
+    if (!match) {
+        return NaN;
+    }
+    let pitch = match[1];
+    const octave = parseInt(match[2], 10);
+    if (!pitch || Number.isNaN(octave)) {
+        return NaN;
+    }
+    // pitchToNumber recognises "bb"/`𝄫` for double flat but only the unicode
+    // `𝄪` form for double sharp; ASCII "##" is not handled. Normalise so
+    // callers can use the same accidental form for both.
+    if (pitch.length > 1 && pitch.slice(-2) === "##") {
+        pitch = pitch.slice(0, -2) + DOUBLESHARP;
+    }
+    return pitchToFrequency(pitch, octave, 0, "C major");
+};
+
+/**
  * Synth constructor function.
  * @constructor
  */
@@ -3091,58 +3130,16 @@ function Synth() {
                                     // Update target pitch
                                     targetPitch.note = noteWithOctave;
 
-                                    // Calculate the frequency for the target pitch
+                                    // Calculate the frequency for the target pitch.
+                                    // Delegate to musicutils so single and double accidentals
+                                    // (#, b, ##, bb, ♯, ♭, 𝄪, 𝄫, *) are all handled correctly.
                                     try {
-                                        // Define base frequencies for each note (C4 = 261.63 Hz)
-                                        const baseFrequencies = {
-                                            "C": 261.63,
-                                            "C#": 277.18,
-                                            "D": 293.66,
-                                            "D#": 311.13,
-                                            "E": 329.63,
-                                            "F": 349.23,
-                                            "F#": 369.99,
-                                            "G": 392.0,
-                                            "G#": 415.3,
-                                            "A": 440.0,
-                                            "A#": 466.16,
-                                            "B": 493.88
-                                        };
-
-                                        // Extract note and octave
-                                        const noteMatch = noteWithOctave.match(/([A-G][#b]?)(\d+)/);
-                                        if (!noteMatch) {
-                                            throw new Error("Invalid note format");
-                                        }
-
-                                        const [, note, octave] = noteMatch;
-                                        // Convert flats to sharps for lookup
-                                        const lookupNote = note
-                                            .replace("b", "#")
-                                            .replace("bb", "##");
-
-                                        // Get base frequency for the note
-                                        let freq = baseFrequencies[lookupNote];
-                                        if (!freq) {
-                                            throw new Error("Invalid note");
-                                        }
-
-                                        // Adjust for octave (C4 is the reference octave)
-                                        const octaveDiff = parseInt(octave) - 4;
-                                        freq *= Math.pow(2, octaveDiff);
-
-                                        targetPitch.frequency = freq;
-
-                                        // Validate frequency
-                                        if (
-                                            isNaN(targetPitch.frequency) ||
-                                            targetPitch.frequency <= 0
-                                        ) {
-                                            console.error(
-                                                "Invalid frequency calculated:",
-                                                targetPitch.frequency
-                                            );
+                                        const freq = computeTargetPitchFrequency(noteWithOctave);
+                                        if (!isFinite(freq) || freq <= 0) {
+                                            console.error("Invalid frequency calculated:", freq);
                                             targetPitch.frequency = 440; // Default to A4 if calculation fails
+                                        } else {
+                                            targetPitch.frequency = freq;
                                         }
                                     } catch (error) {
                                         console.error("Error calculating frequency:", error);
@@ -3819,6 +3816,7 @@ if (typeof module !== "undefined" && module.exports) {
         instrumentsFilters,
         instruments,
         instrumentsSource,
+        computeTargetPitchFrequency,
         DEFAULTSYNTHVOLUME
     };
 }
