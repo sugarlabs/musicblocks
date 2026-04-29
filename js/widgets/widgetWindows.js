@@ -124,6 +124,14 @@ window.widgetWindows = {
     }
 };
 
+const getLocalStorageValue = key => {
+    try {
+        return localStorage[key];
+    } catch (e) {
+        return undefined;
+    }
+};
+
 class WidgetWindow {
     /**
      * @param {string} key
@@ -394,7 +402,7 @@ class WidgetWindow {
      * @returns {void}
      */
     _setupLanguage() {
-        let language = localStorage.languagePreference;
+        let language = getLocalStorageValue("languagePreference");
         if (language === undefined) {
             language = navigator.language;
         }

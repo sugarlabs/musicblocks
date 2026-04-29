@@ -55,6 +55,13 @@ Globals location
 /* exported PhraseMaker */
 // The last selected index for piemenu
 let lastIndex = 5;
+const getLocalStorageValue = key => {
+    try {
+        return localStorage[key];
+    } catch (e) {
+        return undefined;
+    }
+};
 
 /**
  * Represents a PhraseMaker widget for creating and managing musical phrases.
@@ -487,7 +494,7 @@ class PhraseMaker {
         widgetWindow.addButton("erase-button.svg", PhraseMaker.ICONSIZE, this._("Clear")).onclick =
             this._clear.bind(this);
 
-        if (!localStorage.beginnerMode) {
+        if (!getLocalStorageValue("beginnerMode")) {
             widgetWindow.addButton(
                 "export-button.svg",
                 PhraseMaker.ICONSIZE,

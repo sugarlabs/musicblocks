@@ -15,6 +15,14 @@
 /* global _, _THIS_IS_MUSIC_BLOCKS_ */
 
 /* exported StatusMatrix */
+const getLocalStorageValue = key => {
+    try {
+        return localStorage[key];
+    } catch (e) {
+        return undefined;
+    }
+};
+
 class StatusMatrix {
     static BUTTONDIVWIDTH = 128;
     static BUTTONSIZE = 53;
@@ -151,7 +159,7 @@ class StatusMatrix {
                     break;
                 case "bpm":
                 case "bpmfactor":
-                    if (localStorage.languagePreference === "ja") {
+                    if (getLocalStorageValue("languagePreference") === "ja") {
                         label = _("beats per minute2");
                     } else {
                         label =
