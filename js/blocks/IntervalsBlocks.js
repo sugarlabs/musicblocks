@@ -834,16 +834,6 @@ function setupIntervalsBlocks(activity) {
 
             logo.setTurtleListener(turtle, listenerName, __listener);
 
-            // Acquire lock for the main flow
-            // JavaScript is single-threaded, so if the lock is held here it means
-            // a previous critical section did not release it (likely due to an error).
-            // We warn and force-acquire since no spin-wait can help in a single thread.
-            if (logo.connectionStoreLock) {
-                ErrorHandler.warn(
-                    "connectionStoreLock: Lock already held in ArpeggioBlock flow, forcing acquisition",
-                    { operation: "arpeggioLock" }
-                );
-            }
             logo.connectionStoreLock = true;
 
             try {

@@ -202,13 +202,7 @@ function setupFlowBlocks(activity) {
                     tur.singer.inDuplicate = false;
                     tur.singer.duplicateFactor /= factor;
 
-                    if (logo.connectionStoreLock) {
-                        console.warn(
-                            "connectionStoreLock: Lock already held in DuplicateBlock listener, forcing acquisition"
-                        );
-                    }
                     logo.connectionStoreLock = true;
-
                     try {
                         // The last turtle should restore the broken connections
                         if (__lookForOtherTurtles(blk, turtle) === null) {
@@ -231,15 +225,6 @@ function setupFlowBlocks(activity) {
                 // Set the turtle listener
                 logo.setTurtleListener(turtle, listenerName, __listener);
 
-                // Acquire lock for the main flow
-                // JavaScript is single-threaded, so if the lock is held here it means
-                // a previous critical section did not release it (likely due to an error).
-                // We warn and force-acquire since no spin-wait can help in a single thread.
-                if (logo.connectionStoreLock) {
-                    console.warn(
-                        "connectionStoreLock: Lock already held in DuplicateBlock flow, forcing acquisition"
-                    );
-                }
                 logo.connectionStoreLock = true;
 
                 try {
