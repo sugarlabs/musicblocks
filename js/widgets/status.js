@@ -180,7 +180,10 @@ class StatusMatrix {
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
             cell.style.backgroundColor = platformColor.selectorBackground;
             cell.style.paddingLeft = "10px";
-            this.activity.turtles.turtleList.forEach(() => {
+            for (const turtle of this.activity.turtles.turtleList) {
+                if (turtle.inTrash) {
+                    continue;
+                }
                 cell = row.insertCell();
                 cell.style.backgroundColor = platformColor.selectorBackground;
                 cell.style.fontSize =
@@ -188,7 +191,7 @@ class StatusMatrix {
                 cell.textContent = "";
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.textAlign = "center";
-            });
+            }
         }
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -205,7 +208,10 @@ class StatusMatrix {
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
             cell.style.backgroundColor = platformColor.selectorBackground;
             cell.style.paddingLeft = "10px";
-            this.activity.turtles.turtleList.forEach(() => {
+            for (const turtle of this.activity.turtles.turtleList) {
+                if (turtle.inTrash) {
+                    continue;
+                }
                 cell = row.insertCell();
                 cell.style.backgroundColor = platformColor.selectorBackground;
                 cell.style.fontSize =
@@ -213,7 +219,7 @@ class StatusMatrix {
                 cell.textContent = "";
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.textAlign = "center";
-            });
+            }
         }
         this.widgetWindow.sendToCenter();
     }
@@ -228,10 +234,10 @@ class StatusMatrix {
 
         let activeTurtles = 0;
         let cell;
-        let t = 0;
-        for (const turtle of this.activity.turtles.turtleList) {
+        const turtleList = this.activity.turtles.turtleList;
+        for (let t = 0; t < turtleList.length; t++) {
+            const turtle = turtleList[t];
             const tur = this.activity.turtles.ithTurtle(t);
-
             if (turtle.inTrash) {
                 continue;
             }
@@ -371,7 +377,6 @@ class StatusMatrix {
             }
 
             activeTurtles += 1;
-            t++;
         }
 
         this.activity.logo.updatingStatusMatrix = false;
