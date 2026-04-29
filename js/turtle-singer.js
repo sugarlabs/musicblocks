@@ -2338,21 +2338,9 @@ class Singer {
                                             }
                                         } else if (last(tur.singer.instrumentNames)) {
                                             if (!tur.singer.suppressOutput) {
-                                                // If we are in a glide, use setNote after the first note
+                                                // If we are in a glide, trigger the first note and then use setNote.
                                                 if (tur.singer.glide.length > 0) {
-                                                    if (tur.singer.glideOverride === 0) {
-                                                        activity.logo.synth.trigger(
-                                                            turtle,
-                                                            notes[d],
-                                                            beatValue,
-                                                            last(tur.singer.instrumentNames),
-                                                            paramsEffects,
-                                                            filters,
-                                                            true,
-                                                            future
-                                                        );
-                                                    } else {
-                                                        // trigger first note for entire duration of the glissando
+                                                    if (tur.singer.glideOverride !== 0) {
                                                         const beatValueOverride =
                                                             bpmFactor / tur.singer.glideOverride;
                                                         activity.logo.synth.trigger(
@@ -2366,6 +2354,17 @@ class Singer {
                                                             future
                                                         );
                                                         tur.singer.glideOverride = 0;
+                                                    } else {
+                                                        activity.logo.synth.trigger(
+                                                            turtle,
+                                                            notes[d],
+                                                            beatValue,
+                                                            last(tur.singer.instrumentNames),
+                                                            paramsEffects,
+                                                            filters,
+                                                            true,
+                                                            future
+                                                        );
                                                     }
                                                 } else {
                                                     activity.logo.synth.trigger(
