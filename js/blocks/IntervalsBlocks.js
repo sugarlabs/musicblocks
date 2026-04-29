@@ -825,7 +825,7 @@ function setupIntervalsBlocks(activity) {
                             setTimeout(tryAcquire, retryInterval);
                         } else {
                             // Force acquire after max retries to prevent deadlock
-                            console.warn(
+                            Logger.warn(
                                 "connectionStoreLock: Max retries reached, forcing lock acquisition"
                             );
                             logo.connectionStoreLock = true;
@@ -870,7 +870,7 @@ function setupIntervalsBlocks(activity) {
             // a previous critical section did not release it (likely due to an error).
             // We warn and force-acquire since no spin-wait can help in a single thread.
             if (logo.connectionStoreLock) {
-                console.warn(
+                Logger.warn(
                     "connectionStoreLock: Lock already held in ArpeggioBlock flow, forcing acquisition"
                 );
             }
@@ -1063,7 +1063,7 @@ function setupIntervalsBlocks(activity) {
                 if (intervalName in INTERVALVALUES) {
                     r = INTERVALVALUES[intervalName][2];
                 } else {
-                    console.log("could not find " + intervalName + " in INTERVALVALUES");
+                    Logger.error("could not find " + intervalName + " in INTERVALVALUES");
                     r = 1;
                 }
             }
@@ -1071,7 +1071,7 @@ function setupIntervalsBlocks(activity) {
             if (isNaN(r) || r < 0) {
                 r = 1;
 
-                console.debug("ratio " + r + " must be a number > 0");
+                Logger.debug("ratio " + r + " must be a number > 0");
             }
             Singer.IntervalsActions.setRatioInterval(r, turtle, blk);
             return [args[1], 1];

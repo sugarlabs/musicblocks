@@ -353,7 +353,7 @@ class Activity {
         if (typeof GIFAnimator !== "undefined") {
             this.gifAnimator = new GIFAnimator();
         } else {
-            console.debug("GIFAnimator not yet available in constructor");
+            Logger.debug("GIFAnimator not yet available in constructor");
             this.gifAnimator = null;
         }
 
@@ -387,7 +387,7 @@ class Activity {
                 }
             }
         } catch (e) {
-            console.error("Error accessing themePreference storage:", e);
+            Logger.error("Error accessing themePreference storage:", e);
         }
 
         this.beginnerMode = true;
@@ -1826,7 +1826,7 @@ class Activity {
             }
 
             if (!activity || typeof activity._doRecordButton !== "function") {
-                console.warn("doRecordButton called without valid activity context");
+                Logger.warn("doRecordButton called without valid activity context");
                 isExecuting = false;
                 return;
             }
@@ -1970,7 +1970,7 @@ class Activity {
                         preferredVideoCodecs: "auto"
                     });
                 } catch (error) {
-                    console.error("Screen capture failed:", error);
+                    Logger.error("Screen capture failed:", error);
                     flag = 0;
                     throw error;
                 }
@@ -2181,7 +2181,7 @@ class Activity {
                         }
                         recInside.setAttribute("fill", "red");
                     } catch (error) {
-                        console.error("Recording failed:", error);
+                        Logger.error("Recording failed:", error);
                         that.textMsg(_("Recording failed: ") + error.message);
                         flag = 0;
                         // Re-enable recording button
@@ -3281,7 +3281,7 @@ class Activity {
 
             // Guard: blocks may not be initialized yet during early loading
             if (!this.blocks || !this.blocks.protoBlockDict) {
-                console.debug("prepSearchWidget: blocks not yet initialized, skipping");
+                Logger.debug("prepSearchWidget: blocks not yet initialized, skipping");
                 return;
             }
 
@@ -3485,7 +3485,7 @@ class Activity {
         this.doSearch = () => {
             // Guard: ensure searchWidget exists before proceeding
             if (!this.searchWidget) {
-                console.debug("doSearch: searchWidget not yet initialized, skipping");
+                Logger.debug("doSearch: searchWidget not yet initialized, skipping");
                 return;
             }
 
@@ -4435,7 +4435,7 @@ class Activity {
                 that._onResize(false);
                 document.getElementById("hideContents").click();
             } catch (error) {
-                console.error("An error occurred in resizeCanvas_:", error);
+                Logger.error("An error occurred in resizeCanvas_:", error);
             }
         };
 
@@ -5034,7 +5034,7 @@ class Activity {
                     if (refreshCount % 25 === 0) {
                         const now = performance.now();
                         const cps = (25 / (now - lastRefreshReport)) * 1000;
-                        console.log(
+                        Logger.debug(
                             `refreshCanvas | Avg: ${(totalRefreshTime / refreshCount).toFixed(
                                 2
                             )}ms | Max: ${maxRefreshTime.toFixed(2)}ms | Rate: ${cps.toFixed(
@@ -6966,7 +6966,7 @@ class Activity {
                         }
                     }, 1000);
                 } else {
-                    console.error("Could not load built-in plugin: " + name);
+                    Logger.error("Could not load built-in plugin: " + name);
                 }
             };
             xhr.send();
@@ -9101,7 +9101,7 @@ class Activity {
             localStorage.setItem("beginnerMode", this.beginnerMode.toString());
             localStorage.setItem("themePreference", this.themePreference.toString());
         } catch (e) {
-            console.error("Error saving to localStorage:", e);
+            Logger.error("Error saving to localStorage:", e);
         }
     }
 
@@ -9132,12 +9132,12 @@ class Activity {
 
             // Safely hide and clear existing palettes
             if (!this.palettes) {
-                console.warn("Palettes object not initialized");
+                Logger.warn("Palettes object not initialized");
                 return;
             }
 
             if (typeof this.palettes.hide !== "function") {
-                console.warn("Palettes hide method not available");
+                Logger.warn("Palettes hide method not available");
             } else {
                 this.palettes.hide();
             }
@@ -9182,7 +9182,7 @@ class Activity {
 
             this.refreshCanvas();
         } catch (e) {
-            console.error("Error regenerating palettes:", e);
+            Logger.error("Error regenerating palettes:", e);
             this.errorMsg(_("Error regenerating palettes. Please refresh the page."));
         }
     }
@@ -9204,14 +9204,14 @@ class Activity {
             configurable: true, // allow removal in the next major version
             enumerable: false,
             get() {
-                console.warn(
+                Logger.warn(
                     "[Deprecated] window.activity is removed. " +
                         "Use ActivityContext.getActivity() instead."
                 );
                 return undefined;
             },
             set() {
-                console.error(
+                Logger.error(
                     "[Deprecated] window.activity is removed and cannot be set. " +
                         "Use ActivityContext.setActivity() via activity-context.js."
                 );
@@ -9220,7 +9220,7 @@ class Activity {
     } catch (e) {
         // Fail silently — defining the property must never break the app.
 
-        console.warn("[ActivityDeprecationGuard] Could not install guard:", e);
+        Logger.warn("[ActivityDeprecationGuard] Could not install guard:", e);
     }
 })();
 
