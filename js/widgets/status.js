@@ -15,7 +15,7 @@
 /* global _, _THIS_IS_MUSIC_BLOCKS_ */
 
 /* exported StatusMatrix */
-const getLocalStorageValue = key => {
+var getLocalStorageValue = key => {
     try {
         return localStorage[key];
     } catch (e) {

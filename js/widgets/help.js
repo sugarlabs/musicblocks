@@ -12,7 +12,7 @@
 
 const HELP_SVG_DATA_PREFIX = "data:image/svg+xml;base64,";
 
-const getLocalStorageValue = key => {
+var getLocalStorageValue = key => {
     try {
         return localStorage[key];
     } catch (e) {

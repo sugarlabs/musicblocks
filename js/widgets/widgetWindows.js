@@ -124,7 +124,7 @@ window.widgetWindows = {
     }
 };
 
-const getLocalStorageValue = key => {
+var getLocalStorageValue = key => {
     try {
         return localStorage[key];
     } catch (e) {

@@ -55,7 +55,7 @@ Globals location
 /* exported PhraseMaker */
 // The last selected index for piemenu
 let lastIndex = 5;
-const getLocalStorageValue = key => {
+var getLocalStorageValue = key => {
     try {
         return localStorage[key];
     } catch (e) {
