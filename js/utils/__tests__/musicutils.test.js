@@ -110,12 +110,18 @@ const {
     ACCIDENTALNAMES,
     NOTESFLAT,
     NOTENAMES,
+    SHARP,
+    FLAT,
     SOLFEGENAMES1,
     ALLNOTENAMES,
     NOTENAMES1,
     PITCHES1,
-    PITCHES3
+    PITCHES3,
+    normalizeNoteAccidentals
 } = require("../musicutils");
+
+const DOUBLESHARP = "\ud834\udd2a";
+const DOUBLEFLAT = "\ud834\udd2b";
 
 describe("musicutils", () => {
     describe("musicutils core constants", () => {
@@ -2610,5 +2616,270 @@ describe("ACCIDENTALNAMES", () => {
             "flat \u266d",
             "double flat \ud834\udd2b"
         ]);
+    });
+});
+
+describe("modeMapper branch coverage", () => {
+    const cases = [
+        ["C", "ionian", ["c", "major"]],
+        ["C", "dorian", ["a" + SHARP, "major"]],
+        ["F", "dorian", ["c", "minor"]],
+        ["D" + FLAT, "dorian", ["e" + FLAT, "minor"]],
+        ["C", "phrygian", ["g" + SHARP, "major"]],
+        ["G", "phrygian", ["c", "minor"]],
+        ["D" + FLAT, "phrygian", ["g" + FLAT, "minor"]],
+        ["C", "lydian", ["g", "major"]],
+        ["G" + SHARP, "lydian", ["c", "minor"]],
+        ["B" + FLAT, "lydian", ["d", "minor"]],
+        ["C", "mixolydian", ["f", "major"]],
+        ["A" + SHARP, "mixolydian", ["c", "minor"]],
+        ["B" + FLAT, "mixolydian", ["c", "minor"]],
+        ["C", "locrian", ["b", "major"]],
+        ["D", "locrian", ["c", "minor"]],
+        ["E" + FLAT, "locrian", ["d" + FLAT, "minor"]],
+        ["A", "aeolian", ["a", "minor"]],
+        ["A", "natural minor", ["a", "minor"]],
+        ["E", "major", ["e", "major"]]
+    ];
+
+    cases.forEach(([key, mode, expected]) => {
+        it(`maps ${key} ${mode}`, () => {
+            expect(modeMapper(key, mode)).toEqual(expected);
+        });
+    });
+});
+
+describe("getScaleAndHalfSteps extended modes", () => {
+    it("builds solfege slots for chromatic modes with duplicate syllables sharpened", () => {
+        const [scale, solfege, key, mode] = getScaleAndHalfSteps("C chromatic");
+
+        expect(scale).toBe(NOTESFLAT);
+        expect(key).toBe("C");
+        expect(mode).toBe("chromatic");
+        expect(solfege).toEqual([
+            "do",
+            "do" + SHARP,
+            "re",
+            "re" + SHARP,
+            "mi",
+            "fa",
+            "fa" + SHARP,
+            "sol",
+            "sol" + SHARP,
+            "la",
+            "la" + SHARP,
+            "ti"
+        ]);
+    });
+
+    it("chooses non-duplicated solfege for pentatonic modes", () => {
+        const [scale, solfege, key, mode] = getScaleAndHalfSteps("G major pentatonic");
+
+        expect(scale).toBe(NOTESFLAT);
+        expect(key).toBe("G");
+        expect(mode).toBe("major pentatonic");
+        expect(solfege.filter(Boolean)).toEqual(["do", "re", "mi", "sol", "la"]);
+    });
+
+    it("uses the flat pitch collection for flat keys", () => {
+        const [scale, , key] = getScaleAndHalfSteps("B" + FLAT + " major");
+
+        expect(scale).toBe(NOTESFLAT);
+        expect(key).toBe("B" + FLAT);
+    });
+});
+
+describe("getNote additional paths", () => {
+    it("parses matrix-style note labels with embedded octave markup", () => {
+        expect(getNote("mi<sub>5</sub>", 4, 0, "C major", false)).toEqual(["E", 5, 0]);
+    });
+
+    it("treats numeric string notes as pitch classes with accidental suffixes", () => {
+        expect(getNote("1#", 4, 0, "C major", false)).toEqual(["D", 4, 0]);
+        expect(getNote("1b", 4, 0, "C major", false)).toEqual(["C", 4, 0]);
+    });
+
+    it("returns rests before attempting pitch conversion", () => {
+        expect(getNote("rest", 4, 7, "C major", false)).toEqual(["R", "", 0]);
+        expect(getNote("r", 4, 7, "C major", false)).toEqual(["R", "", 0]);
+    });
+
+    it("keeps fractional transposition as cents", () => {
+        expect(getNote("C", 4, 1.5, "C major", false)).toEqual(["C" + SHARP, 4, 50]);
+        expect(getNote("C", 4, -1.25, "C major", false)).toEqual(["B", 3, -25]);
+    });
+
+    it("clamps octave output to the supported range", () => {
+        expect(getNote("C", 0, 0, "C major", false)).toEqual(["C", 1, 0]);
+        expect(getNote("C", 11, 0, "C major", false)).toEqual(["C", 10, 0]);
+    });
+
+    it("reports invalid solfege through the supplied error callback", () => {
+        const errorMsg = jest.fn();
+
+        expect(getNote("zz", 4, 0, "C major", false, undefined, errorMsg)).toEqual(["R", "", 0]);
+        expect(errorMsg).toHaveBeenCalledWith(global.INVALIDPITCH, null);
+    });
+
+    it("maps movable solfege across modal rotations", () => {
+        ["D dorian", "E phrygian", "F lydian", "G mixolydian", "A minor", "B locrian"].forEach(
+            keySignature => {
+                const note = getNote("do", 4, 0, keySignature, true);
+                expect(note[0]).not.toBe("R");
+                expect(note[2]).toBe(0);
+            }
+        );
+    });
+
+    it("uses key preference and direction to choose enharmonic spelling", () => {
+        expect(getNote("B#", 4, 0, "C major", false)).toEqual(["C", 5, 0]);
+        expect(getNote("B#", 4, 0, "G major", false, 1)).toEqual(["C", 5, 0]);
+        expect(getNote("C" + FLAT, 4, 0, "F major", false, -1)).toEqual(["B", 3, 0]);
+    });
+
+    it("falls back to equal temperament when a custom temperament cannot resolve a note", () => {
+        expect(getNote("C", 4, 0, "C major", false, undefined, undefined, "custom")).toEqual([
+            "C",
+            4,
+            0
+        ]);
+    });
+
+    it("preserves accidentals for non-predefined temperament systems", () => {
+        addTemperamentToDictionary("nonstrict", {
+            pitchNumber: 12,
+            interval: TEMPERAMENT.equal.interval
+        });
+
+        expect(getNote("do#", 4, 0, "C major", false, undefined, undefined, "nonstrict")).toEqual([
+            "C" + SHARP,
+            4,
+            0
+        ]);
+        expect(getNote("C", 4, 2, "C major", false, undefined, undefined, "nonstrict")).toEqual([
+            "D",
+            4,
+            0
+        ]);
+    });
+});
+
+describe("scaleDegreeToPitchMapping extended modes", () => {
+    it("maps chromatic degrees through a seven-degree preference scale", () => {
+        expect(scaleDegreeToPitchMapping("C chromatic", 2, false, null)).toBe("D");
+        expect(scaleDegreeToPitchMapping("C chromatic", null, false, "F" + SHARP)).toEqual([
+            "4",
+            SHARP
+        ]);
+    });
+
+    it("maps pentatonic degrees through the fallback major scale", () => {
+        expect(scaleDegreeToPitchMapping("C major pentatonic", 4, false, null)).toBe("F");
+        expect(scaleDegreeToPitchMapping("C major pentatonic", null, false, "B" + FLAT)).toEqual([
+            "7",
+            FLAT
+        ]);
+    });
+});
+
+describe("getNoteFromInterval edge intervals", () => {
+    const cases = [
+        ["C4", "diminished 2", ["C" + FLAT, 4]],
+        ["C4", "down 4", ["F" + FLAT, 4]],
+        ["C4", "down-diminished 5", ["G" + DOUBLEFLAT, 4]],
+        ["C4", "up 4", ["F" + SHARP, 4]],
+        ["C4", "up-augmented 4", ["F" + SHARP, 4]],
+        ["C4", "augmented 1", ["C" + SHARP, 4]],
+        ["C4", "augmented 8", ["C" + SHARP, 5]],
+        ["C4", "up-major 3", ["E" + SHARP, 4]],
+        ["C4", "down-minor 3", ["E" + DOUBLEFLAT, 4]],
+        ["C4", "mid 3", ["E" + FLAT, 4]]
+    ];
+
+    cases.forEach(([pitch, interval, expected]) => {
+        it(`finds ${interval} from ${pitch}`, () => {
+            expect(getNoteFromInterval(pitch, interval)).toEqual(expected);
+        });
+    });
+});
+
+describe("numberToPitch additional temperament paths", () => {
+    it("handles negative equal-temperament pitch numbers", () => {
+        expect(numberToPitch(-1)).toEqual(["A" + FLAT, 0]);
+        expect(numberToPitch(-12)).toEqual(["A", -1]);
+    });
+
+    it("reports and falls back when a custom temperament is missing", () => {
+        const activity = { errorMsg: jest.fn() };
+
+        expect(numberToPitch(0, "missing temperament", "C4", 0, activity)).toEqual(["C", 4]);
+        expect(activity.errorMsg).toHaveBeenCalled();
+    });
+
+    it("fills missing custom temperament pitch entries from equal intervals", () => {
+        addTemperamentToDictionary("partial", {
+            pitchNumber: 12,
+            interval: TEMPERAMENT.equal.interval
+        });
+
+        expect(numberToPitch(2, "partial", "C4", 0)).toEqual(["D", 4]);
+        expect(TEMPERAMENT.partial["2"]).toEqual(expect.arrayContaining(["D", 4]));
+    });
+
+    it("uses existing custom temperament entries with octave factors", () => {
+        addTemperamentToDictionary("existing", {
+            pitchNumber: 12,
+            0: [1, "Sa", 3],
+            interval: TEMPERAMENT.equal.interval
+        });
+
+        expect(numberToPitch(12, "existing", "C4", 0)).toEqual(["Sa", 4]);
+    });
+});
+
+describe("normalization and pitch parsing extras", () => {
+    it("normalizes Unicode accidental symbols to ASCII spellings", () => {
+        expect(normalizeNoteAccidentals("C" + SHARP + " D" + FLAT + " E𝄪 F𝄫")).toBe("C# Db Ex Fbb");
+    });
+
+    it("applies pitch-number offsets and unusual accidental combinations", () => {
+        expect(getPitchInfo("C#b4")).toEqual({
+            name: "C",
+            octave: 4,
+            pitchNumber: 60
+        });
+        expect(getPitchInfo("C###4")).toEqual({
+            name: null,
+            octave: null,
+            pitchNumber: global.INVALIDPITCH
+        });
+        expect(getPitchInfo({})).toBe(global.INVALIDPITCH);
+        expect(_calculate_pitch_number("C", 4, 2)).toBe(58);
+    });
+});
+
+describe("actual drum lookup helpers", () => {
+    const actualMusicUtils = jest.requireActual("../musicutils");
+
+    beforeEach(() => {
+        global.DRUMNAMES = [
+            ["snare drum", "snare drum", "images/snaredrum.svg", "sn", "snare"],
+            ["kick drum", "kick drum", "images/kick.svg", "hh", "kick"],
+            ["floor tom", "floor tom", "images/floortom.svg", "tomfl", "tom"]
+        ];
+    });
+
+    it("finds drums by display name, synth name, and default value", () => {
+        expect(actualMusicUtils.getDrumIndex("")).toBe(1);
+        expect(actualMusicUtils.getDrumIndex("SNARE DRUM")).toBe(0);
+        expect(actualMusicUtils.getDrumIndex("missing")).toBe(-1);
+        expect(actualMusicUtils.getDrumName("floor tom")).toBe("floor tom");
+        expect(actualMusicUtils.getDrumName("http://example.test/sample.wav")).toBeNull();
+    });
+
+    it("returns drum symbols with default and fallback handling", () => {
+        expect(actualMusicUtils.getDrumSymbol("")).toBe("hh");
+        expect(actualMusicUtils.getDrumSymbol("snare drum")).toBe("sn");
+        expect(actualMusicUtils.getDrumSymbol("missing")).toBe("hh");
     });
 });
