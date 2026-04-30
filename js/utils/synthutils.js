@@ -3046,7 +3046,8 @@ function Synth() {
                                         };
 
                                         // Extract note and octave (handle double accidentals ##/bb)
-                                        const noteMatch = noteWithOctave.match(/([A-G][#b]{0,2})(\d+)/);
+                                        const noteMatch =
+                                            noteWithOctave.match(/([A-G][#b]{0,2})(\d+)/);
                                         if (!noteMatch) {
                                             throw new Error("Invalid note format");
                                         }
@@ -3054,12 +3055,26 @@ function Synth() {
                                         const [, note, octave] = noteMatch;
                                         // Map enharmonic equivalents to sharp-based names for lookup
                                         const enharmonicMap = {
-                                            "Cb": "B",  "Db": "C#", "Eb": "D#", "Fb": "E",
-                                            "Gb": "F#", "Ab": "G#", "Bb": "A#",
-                                            "Dbb": "C", "Ebb": "D", "Fbb": "D#", "Gbb": "F",
-                                            "Abb": "G", "Bbb": "A", "Cbb": "A#",
-                                            "C##": "D", "D##": "E", "E##": "F#", "F##": "G",
-                                            "G##": "A", "A##": "B"
+                                            "Cb": "B",
+                                            "Db": "C#",
+                                            "Eb": "D#",
+                                            "Fb": "E",
+                                            "Gb": "F#",
+                                            "Ab": "G#",
+                                            "Bb": "A#",
+                                            "Dbb": "C",
+                                            "Ebb": "D",
+                                            "Fbb": "D#",
+                                            "Gbb": "F",
+                                            "Abb": "G",
+                                            "Bbb": "A",
+                                            "Cbb": "A#",
+                                            "C##": "D",
+                                            "D##": "E",
+                                            "E##": "F#",
+                                            "F##": "G",
+                                            "G##": "A",
+                                            "A##": "B"
                                         };
                                         const lookupNote = enharmonicMap[note] || note;
 
