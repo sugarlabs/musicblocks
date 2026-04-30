@@ -52,7 +52,8 @@ try {
    SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
    MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
-   SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS
+   SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS,
+   unescapeHTML
  */
 
 /*
@@ -249,6 +250,8 @@ class Activity {
 
         this.cellSize = 55;
         this.searchSuggestions = [];
+        this._searchCache = {}; // Cache for search results to improve performance
+        this._searchCloseListener = null;
         this.homeButtonContainer;
 
         this.msgTimeoutID = null;
@@ -321,7 +324,12 @@ class Activity {
         this.keyboardEnableFlag;
         this.inTempoWidget = false;
         this.projectID = null;
-        this.storage = localStorage;
+        try {
+            this.storage = localStorage;
+        } catch (e) {
+            // Fall back to in-memory storage when browser storage is restricted.
+            this.storage = {};
+        }
 
         // Flag to indicate whether the user is performing a 2D drag operation.
         this.isDragging = false;
@@ -1069,6 +1077,11 @@ class Activity {
                 let y = Math.floor(toppos * this.turtleBlocksScale);
                 let even = true;
 
+                // Defer checkBounds during bulk block moves to avoid O(N²)
+                // overhead: each moveBlockRelative call triggers checkBounds()
+                // which scans all blocks, so N moves × N blocks = O(N²).
+                this.blocks._beginDeferCheckBounds();
+
                 // Position "start" blocks first
                 for (const blk in this.blocks.blockList) {
                     if (!this.blocks.blockList[blk].trash) {
@@ -1140,6 +1153,8 @@ class Activity {
                         }
                     }
                 }
+
+                this.blocks._endDeferCheckBounds();
             } else {
                 // Second click logic (arrange blocks in columns this avoid overlapping of blocks)
                 let toppos;
@@ -1174,6 +1189,9 @@ class Activity {
                 );
                 const columnYPositions = Array(numColumns).fill(initialY);
 
+                // Defer checkBounds during bulk block moves (see first-click path).
+                this.blocks._beginDeferCheckBounds();
+
                 for (const blk in this.blocks.blockList) {
                     if (!this.blocks.blockList[blk].trash) {
                         const myBlock = this.blocks.blockList[blk];
@@ -1202,6 +1220,8 @@ class Activity {
                         }
                     }
                 }
+
+                this.blocks._endDeferCheckBounds();
             }
 
             // Reset go-home button
@@ -1533,6 +1553,7 @@ class Activity {
             const title = document.createElement("h2");
             title.textContent = _("Import MIDI");
             title.classList.add("modal-title");
+            title.style.color = platformColor.headingColor;
             modal.appendChild(title);
 
             const container = document.createElement("div");
@@ -1559,6 +1580,14 @@ class Activity {
             const importConfirm = document.createElement("button");
             importConfirm.classList.add("confirm-button");
             importConfirm.textContent = _("Confirm");
+            importConfirm.style.backgroundColor = platformColor.blueButton;
+            importConfirm.style.color = platformColor.blueButtonText;
+            importConfirm.style.border = "none";
+            importConfirm.style.borderRadius = "4px";
+            importConfirm.style.padding = "8px 16px";
+            importConfirm.style.fontWeight = "bold";
+            importConfirm.style.cursor = "pointer";
+            importConfirm.style.marginRight = "16px";
             importConfirm.addEventListener("click", () => {
                 const maxNoteBlocks = select.value;
                 require(["activity/midi"], function () {
@@ -1591,6 +1620,7 @@ class Activity {
             const title = document.createElement("h2");
             title.textContent = _("Clear Workspace");
             title.classList.add("modal-title");
+            title.style.color = platformColor.headingColor;
 
             modal.appendChild(title);
             const message = document.createElement("p");
@@ -1605,7 +1635,7 @@ class Activity {
             confirmBtn.classList.add("confirm-button");
             confirmBtn.textContent = _("Confirm");
             confirmBtn.style.backgroundColor = platformColor.blueButton;
-            confirmBtn.style.color = "white";
+            confirmBtn.style.color = platformColor.blueButtonText;
             confirmBtn.style.border = "none";
             confirmBtn.style.borderRadius = "4px";
             confirmBtn.style.padding = "8px 16px";
@@ -1825,7 +1855,12 @@ class Activity {
              */
 
             async function recordScreen() {
-                const mode = localStorage.getItem("musicBlocksRecordMode");
+                let mode = null;
+                try {
+                    mode = localStorage.getItem("musicBlocksRecordMode");
+                } catch (e) {
+                    mode = null;
+                }
 
                 if (mode === "canvas") {
                     return await recordCanvasOnly();
@@ -3123,26 +3158,9 @@ class Activity {
             const IDLE_THRESHOLD = 5000; // 5 seconds
             const ACTIVE_FPS = 60;
             const IDLE_FPS = 1;
-            const idleEvents = ["mousemove", "mousedown", "keydown", "touchstart", "wheel"];
-
-            if (this._idleWatcherResetHandler) {
-                idleEvents.forEach(eventType => {
-                    window.removeEventListener(eventType, this._idleWatcherResetHandler);
-                });
-            }
-
-            if (this._idleWatcherIntervalId) {
-                clearInterval(this._idleWatcherIntervalId);
-                this._idleWatcherIntervalId = null;
-            }
 
             let lastActivity = Date.now();
             this.isAppIdle = false;
-
-            // Prevent duplicate intervals
-            if (this._idleWatcherIntervalId) {
-                clearInterval(this._idleWatcherIntervalId);
-            }
 
             // Wake up function - restores full framerate
             // Stored as instance property for cleanup
@@ -3258,6 +3276,7 @@ class Activity {
             this.searchBlockPosition = [100, 100];
 
             this.searchSuggestions = [];
+            this._searchCache = {}; // Reset cache to prevent memory leaks
             this.deprecatedBlockNames = [];
 
             // Guard: blocks may not be initialized yet during early loading
@@ -3384,6 +3403,12 @@ class Activity {
                 obj[0].style.visibility = "hidden";
             }
 
+            // Remove the document mousedown listener if it exists
+            if (this._searchCloseListener) {
+                this.removeEventListener(document, "mousedown", this._searchCloseListener);
+                this._searchCloseListener = null;
+            }
+
             this.searchWidget.style.visibility = "hidden";
             this.searchWidget.idInput_custom = "";
         };
@@ -3406,12 +3431,13 @@ class Activity {
                     obj[0].style.visibility = "visible";
                 }
 
-                this.searchWidget.value = null;
-                this.searchWidget.style.visibility = "visible";
-                this.searchWidget.style.left =
-                    this.palettes.getSearchPos()[0] * this.turtleBlocksScale * 1.5 + "px";
-                this.searchWidget.style.top =
-                    this.palettes.getSearchPos()[1] * this.turtleBlocksScale * 0.95 + "px";
+                if (this.searchWidget) {
+                    this.searchWidget.value = null;
+                    this.searchWidget.style.visibility = "visible";
+                    const searchPos = this.palettes.getSearchPos();
+                    this.searchWidget.style.left = searchPos.x + "px";
+                    this.searchWidget.style.top = searchPos.y + "px";
+                }
 
                 this.searchBlockPosition = [100, 100];
                 this.prepSearchWidget();
@@ -3439,10 +3465,10 @@ class Activity {
                     } else {
                         // this will hide the search bar if someone clicks on menu items
                         that.hideSearchWidget();
-                        document.removeEventListener("mousedown", closeListener);
                     }
                 };
-                document.addEventListener("mousedown", closeListener);
+                this._searchCloseListener = closeListener;
+                this.addEventListener(document, "mousedown", closeListener);
 
                 // Give the browser time to update before selecting
                 // focus.
@@ -3475,7 +3501,14 @@ class Activity {
                 $search.autocomplete({
                     // Custom source so we can match on extraSearchTerms but show each block only once.
                     source: (request, response) => {
-                        const term = (request.term || "").toLowerCase();
+                        const term = (request.term || "").toLowerCase().trim();
+
+                        // Check cache first for performance
+                        if (that._searchCache[term] !== undefined) {
+                            response(that._searchCache[term]);
+                            return;
+                        }
+
                         const results = that.searchSuggestions.filter(item => {
                             // If there is no active term, show all items.
                             if (!term || term.length === 0) {
@@ -3494,6 +3527,9 @@ class Activity {
                                 item.label.toLowerCase().indexOf(term) !== -1
                             );
                         });
+
+                        // Cache the results for future use
+                        that._searchCache[term] = results;
                         response(results);
                     },
                     appendTo: "body",
@@ -4369,7 +4405,20 @@ class Activity {
         // hidden the resize guards above intentionally skipped any
         // layout work, so we need to catch up now.
         this._handleVisibilityChange = () => {
-            if (!document.hidden && this.stage) {
+            if (document.hidden) {
+                if (typeof this.__saveLocally === "function") {
+                    this.__saveLocally();
+                }
+                if (
+                    typeof this.saveLocally === "function" &&
+                    this.saveLocally !== this.__saveLocally
+                ) {
+                    this.saveLocally();
+                }
+                return;
+            }
+
+            if (this.stage) {
                 // Use a short delay to let the browser finish
                 // exposing the tab and reporting real dimensions.
                 setTimeout(() => {
@@ -4758,6 +4807,12 @@ class Activity {
             let actionBlockCounter = 0;
             const dx = 0;
             const dy = this.cellSize * 3;
+
+            // Defer checkBounds during bulk block moves to avoid O(N²)
+            // overhead: each moveBlockRelative call triggers checkBounds()
+            // which scans all blocks, so N moves × N blocks = O(N²).
+            this.blocks._beginDeferCheckBounds();
+
             for (const blk in this.blocks.blockList) {
                 // If this block is at the top of a stack, push it
                 // onto the trashStacks list.
@@ -4800,6 +4855,8 @@ class Activity {
                     delete this.blocks.blockCollapseArt[blk];
                 }
             }
+
+            this.blocks._endDeferCheckBounds();
 
             if (addStartBlock) {
                 this.blocks.loadNewBlocks(DATAOBJS);
@@ -4887,12 +4944,31 @@ class Activity {
         this.onStopTurtle = () => {
             if (this.showBlocksAfterRun) {
                 this.blocks.showBlocks();
-                const stopIcon = document.getElementById("stop");
-                if (stopIcon) {
-                    stopIcon.style.color = "white";
-                }
                 this.showBlocksAfterRun = false;
             }
+
+            const stopIcon = document.getElementById("stop");
+            if (stopIcon) {
+                stopIcon.style.color = "white";
+                stopIcon.style.display = "none";
+            }
+
+            const saveBtn = document.getElementById("saveButton");
+            const saveBtnAdv = document.getElementById("saveButtonAdvanced");
+            const recordBtn = document.getElementById("record");
+
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.classList.remove("grey-text", "inactiveLink");
+            }
+            if (saveBtnAdv) {
+                saveBtnAdv.disabled = false;
+                saveBtnAdv.classList.remove("grey-text", "inactiveLink");
+            }
+            if (recordBtn) {
+                recordBtn.classList.remove("grey-text", "inactiveLink");
+            }
+
             // TODO: plugin support
         };
 
@@ -5150,6 +5226,12 @@ class Activity {
             // Try restarting where we were when we hit save.
             if (that.planet) {
                 that.sessionData = await that.planet.openCurrentProject();
+                if (!that.sessionData) {
+                    const currentProject = that.storage.currentProject;
+                    if (currentProject !== undefined) {
+                        that.sessionData = that.storage["SESSION" + currentProject];
+                    }
+                }
             } else {
                 const currentProject = that.storage.currentProject;
                 that.sessionData = that.storage["SESSION" + currentProject];
@@ -5201,25 +5283,49 @@ class Activity {
             this.doLoadAnimation();
 
             // palettes.updatePalettes();
-            this.textMsg(this.planet.getCurrentProjectName());
+            try {
+                const projectName =
+                    this.planet && typeof this.planet.getCurrentProjectName === "function"
+                        ? this.planet.getCurrentProjectName()
+                        : _("My Project");
+                this.textMsg(projectName);
+            } catch (e) {
+                console.error(e);
+                this.textMsg(_("My Project"));
+            }
 
             const that = this;
             setTimeout(() => {
+                const finishLoading = () => {
+                    that.loading = false;
+                    document.body.style.cursor = "default";
+                    that.update = true;
+                };
+
                 try {
-                    that.planet.openProjectFromPlanet(projectID, () => {
-                        that.loadStartWrapper(loadStart);
-                    });
+                    if (that.planet && typeof that.planet.openProjectFromPlanet === "function") {
+                        that.planet.openProjectFromPlanet(projectID, () => {
+                            that.loadStartWrapper(loadStart);
+                        });
+                    } else {
+                        throw new Error("Planet openProjectFromPlanet is unavailable.");
+                    }
                 } catch (e) {
                     console.error(e);
                     that.loadStartWrapper(loadStart);
                 }
 
-                that.planet.initialiseNewProject();
-                // Restore default cursor
-                that.loading = false;
+                if (that.planet && typeof that.planet.initialiseNewProject === "function") {
+                    try {
+                        that.planet.initialiseNewProject();
+                    } catch (e) {
+                        console.error(e);
+                    }
+                } else {
+                    console.error("Planet initialiseNewProject is unavailable.");
+                }
 
-                document.body.style.cursor = "default";
-                that.update = true;
+                finishLoading();
             }, 2500);
 
             const run = flags.run;
@@ -5620,8 +5726,25 @@ class Activity {
             }
 
             const finalBlock = [];
-            // Some Error are here need to be fixed
             for (const staffIndex in staffBlocksMap) {
+                // Validate that the staff has sufficient block data for linking.
+                // Staves with no notes or incomplete structures from certain
+                // ABC notation inputs can cause crashes when accessing nested
+                // array elements without bounds checking.
+                if (
+                    !staffBlocksMap[staffIndex].baseBlocks ||
+                    staffBlocksMap[staffIndex].baseBlocks.length === 0 ||
+                    !staffBlocksMap[staffIndex].baseBlocks[0] ||
+                    !staffBlocksMap[staffIndex].baseBlocks[0][0] ||
+                    staffBlocksMap[staffIndex].baseBlocks[0][0].length < 4 ||
+                    staffBlocksMap[staffIndex].startBlock.length < 3 ||
+                    !staffBlocksMap[staffIndex].nameddoArray ||
+                    !staffBlocksMap[staffIndex].nameddoArray[staffIndex] ||
+                    staffBlocksMap[staffIndex].nameddoArray[staffIndex].length === 0
+                ) {
+                    finalBlock.push(...staffBlocksMap[staffIndex].startBlock);
+                    continue;
+                }
                 staffBlocksMap[staffIndex].startBlock[
                     staffBlocksMap[staffIndex].startBlock.length - 3
                 ][4][2] =
@@ -5637,6 +5760,16 @@ class Activity {
                     ][0];
                 const repeatblockids = staffBlocksMap[staffIndex].repeatArray;
                 for (const repeatId of repeatblockids) {
+                    // Skip repeat entries with out-of-bounds block indices
+                    if (
+                        repeatId.start < 0 ||
+                        repeatId.end < 0 ||
+                        repeatId.start >= staffBlocksMap[staffIndex].baseBlocks.length ||
+                        repeatId.end >= staffBlocksMap[staffIndex].baseBlocks.length
+                    ) {
+                        continue;
+                    }
+
                     if (repeatId.start === 0) {
                         staffBlocksMap[staffIndex].repeatBlock.push([
                             blockId,
@@ -6663,10 +6796,13 @@ class Activity {
                 } else {
                     switch (myBlock.name) {
                         case "start":
-                        case "drum":
+                        case "drum": {
                             // Find the turtle associated with this block.
-                            // eslint-disable-next-line no-case-declarations
-                            const turtle = this.turtles.getTurtle(myBlock.value);
+
+                            const turtle =
+                                myBlock.value !== null && myBlock.value !== undefined
+                                    ? this.turtles.getTurtle(myBlock.value)
+                                    : null;
                             if (turtle === null || turtle === undefined) {
                                 args = {
                                     id: this.turtles.getTurtleCount(),
@@ -6694,6 +6830,7 @@ class Activity {
                                 };
                             }
                             break;
+                        }
                         case "temperament1":
                             if (this.blocks.customTemperamentDefined) {
                                 // If a define temperament block is
@@ -7151,7 +7288,14 @@ class Activity {
             if (!$helpfulSearch.data("autocomplete-init")) {
                 $helpfulSearch.autocomplete({
                     source: (request, response) => {
-                        const term = (request.term || "").toLowerCase();
+                        const term = (request.term || "").toLowerCase().trim();
+
+                        // Check cache first for performance
+                        if (that._searchCache[term] !== undefined) {
+                            response(that._searchCache[term]);
+                            return;
+                        }
+
                         const results = that.searchSuggestions.filter(item => {
                             if (!term || term.length === 0) {
                                 return true;
@@ -7167,6 +7311,9 @@ class Activity {
                                 item.label.toLowerCase().indexOf(term) !== -1
                             );
                         });
+
+                        // Cache the results for future use
+                        that._searchCache[term] = results;
                         response(results);
                     },
                     appendTo: "body",
@@ -8059,11 +8206,7 @@ class Activity {
 
             const that = this;
 
-            if (!jQuery.browser.mozilla) {
-                window.onblur = () => {
-                    doHardStopButton(that, true);
-                };
-            }
+            this.setupWindowBlurHandler(doHardStopButton);
 
             this.stage = new createjs.Stage(this.canvas);
             createjs.Touch.enable(this.stage);
@@ -8099,6 +8242,17 @@ class Activity {
             this.addEventListener(document, "mousemove", this.handleMouseMove);
             this.addEventListener(document, "click", this.handleDocumentClick);
             this.addEventListener(window, "beforeunload", () => {
+                // Save synchronously to SESSION* keys so manual reload/F5
+                // still has recoverable data even if async saves are cut short.
+                if (typeof this.__saveLocally === "function") {
+                    this.__saveLocally();
+                }
+                if (
+                    typeof this.saveLocally === "function" &&
+                    this.saveLocally !== this.__saveLocally
+                ) {
+                    this.saveLocally();
+                }
                 this._stopRenderLoop();
                 if (this._autoSaveInterval !== null) {
                     clearInterval(this._autoSaveInterval);
@@ -8276,8 +8430,8 @@ class Activity {
                 }
             }
 
-            this.fileChooser.addEventListener("click", () => {
-                that.value = null;
+            this.fileChooser.addEventListener("click", event => {
+                event.currentTarget.value = "";
             });
 
             this.fileChooser.addEventListener(
@@ -8305,17 +8459,17 @@ class Activity {
                                 let obj;
                                 try {
                                     if (cleanData.includes("html")) {
+                                        let extracted;
                                         if (cleanData.includes('id="codeBlock"')) {
-                                            obj = JSON.parse(
-                                                cleanData.match(
-                                                    '<div class="code" id="codeBlock">(.+?)</div>'
-                                                )[1]
-                                            );
+                                            extracted = cleanData.match(
+                                                '<div class="code" id="codeBlock">(.+?)</div>'
+                                            )[1];
                                         } else {
-                                            obj = JSON.parse(
-                                                cleanData.match('<div class="code">(.+?)</div>')[1]
-                                            );
+                                            extracted = cleanData.match(
+                                                '<div class="code">(.+?)</div>'
+                                            )[1];
                                         }
+                                        obj = JSON.parse(unescapeHTML(extracted));
                                     } else {
                                         obj = JSON.parse(cleanData);
                                     }
@@ -8430,9 +8584,17 @@ class Activity {
                             let obj;
                             try {
                                 if (cleanData.includes("html")) {
-                                    obj = JSON.parse(
-                                        cleanData.match('<div class="code">(.+?)</div>')[1]
-                                    );
+                                    let extracted;
+                                    if (cleanData.includes('id="codeBlock"')) {
+                                        extracted = cleanData.match(
+                                            '<div class="code" id="codeBlock">(.+?)</div>'
+                                        )[1];
+                                    } else {
+                                        extracted = cleanData.match(
+                                            '<div class="code">(.+?)</div>'
+                                        )[1];
+                                    }
+                                    obj = JSON.parse(unescapeHTML(extracted));
                                 } else {
                                     obj = JSON.parse(cleanData);
                                 }
@@ -8543,13 +8705,13 @@ class Activity {
             dropZone.addEventListener("dragover", __handleDragOver, false);
             dropZone.addEventListener("drop", __handleFileSelect, false);
 
-            this.allFilesChooser.addEventListener("click", () => {
-                this.value = null;
+            this.allFilesChooser.addEventListener("click", event => {
+                event.currentTarget.value = "";
             });
 
-            this.pluginChooser.addEventListener("click", () => {
+            this.pluginChooser.addEventListener("click", event => {
                 window.scroll(0, 0);
-                this.value = null;
+                event.currentTarget.value = "";
             });
 
             this.pluginChooser.addEventListener(
@@ -8861,6 +9023,24 @@ class Activity {
     }
 
     /**
+     * Installs the shared blur-stop hook without overwriting any existing
+     * global blur handler.
+     *
+     * @param {Function} doHardStopButton - Shared stop action callback.
+     */
+    setupWindowBlurHandler(doHardStopButton) {
+        if (jQuery.browser.mozilla) {
+            return;
+        }
+
+        this._handleWindowBlur = () => {
+            doHardStopButton(this, true);
+        };
+
+        this.addEventListener(window, "blur", this._handleWindowBlur);
+    }
+
+    /**
      * Managed removeEventListener that also updates the tracker.
      * @param {EventTarget} target - The DOM element or object to remove the listener from.
      * @param {string} type - The event type.
@@ -8906,16 +9086,9 @@ class Activity {
             }
         }
 
-        if (this._idleWatcherResetHandler) {
-            ["mousemove", "mousedown", "keydown", "touchstart", "wheel"].forEach(eventType => {
-                window.removeEventListener(eventType, this._idleWatcherResetHandler);
-            });
-            this._idleWatcherResetHandler = null;
-        }
-
-        if (this._idleWatcherIntervalId) {
-            clearInterval(this._idleWatcherIntervalId);
-            this._idleWatcherIntervalId = null;
+        // Keep idle watcher cleanup centralized to avoid stale field mismatches.
+        if (typeof this._stopIdleWatcher === "function") {
+            this._stopIdleWatcher();
         }
     }
 
@@ -8969,19 +9142,11 @@ class Activity {
                 this.palettes.hide();
             }
 
-            if (typeof this.palettes.clear !== "function") {
-                console.warn("Palettes clear method not available");
-                // Fallback clear implementation
-                this.palettes.dict = {};
-                this.palettes.visible = false;
-                this.palettes.activePalette = null;
-                this.palettes.paletteObject = null;
-            } else {
-                this.palettes.clear();
-            }
+            this.palettes.reinitialize(this.palettes);
 
-            // Reinitialize palettes
-            initPalettes(this.palettes);
+            // Increase palette element style.top value for correct alignment
+            const element = docById("palette");
+            element.style.top = `${60 + this.palettes.top}px`;
 
             // Reinitialize blocks
             if (this.blocks) {

@@ -76,7 +76,7 @@ class ProjectViewer {
         let img = proj.ProjectImage;
         if (img === "" || img === null)
             img =
-                proj.ProjectIsMusicBlocks == 1 ? this.PlaceholderMBImage : this.PlaceholderTBImage;
+                proj.ProjectIsMusicBlocks === 1 ? this.PlaceholderMBImage : this.PlaceholderTBImage;
 
         document.getElementById("projectviewer-image").src = img;
         document.getElementById("projectviewer-description").textContent = proj.ProjectDescription;
@@ -211,4 +211,8 @@ class ProjectViewer {
             this.closeReporter();
         });
     }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = ProjectViewer;
 }

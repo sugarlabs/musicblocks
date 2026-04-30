@@ -1,0 +1,20 @@
+{
+    "svgs": [
+        { "name": "Mouse", "path": "images/mouse.svg" },
+        { "name": "Mouse 2", "path": "images/mouse2.svg" },
+        { "name": "Turtle", "path": "images/turtle.svg" },
+        { "name": "Turtle 2", "path": "images/turtle2.svg" },
+        { "name": "Cat", "path": "images/cat.svg" },
+        { "name": "Dog", "path": "images/dog.svg" },
+        { "name": "Duck", "path": "images/duck.svg" },
+        { "name": "Cricket", "path": "images/cricket.svg" },
+        { "name": "Rodent", "path": "mouse-art/Rodent.svg" },
+        { "name": "Mouse Drum", "path": "mouse-art/mouse-drum.svg" },
+        { "name": "Bubbles", "path": "images/bubbles.svg" },
+        { "name": "Bottle", "path": "images/bottle.svg" },
+        { "name": "Chime", "path": "images/chime.svg" },
+        { "name": "Cup", "path": "images/cup.svg" },
+        { "name": "Voices", "path": "images/voices.svg" },
+        { "name": "Synth", "path": "images/synth.svg" }
+    ]
+}

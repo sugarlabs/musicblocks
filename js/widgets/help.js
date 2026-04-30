@@ -10,6 +10,8 @@
 
 // This widget displays help about a block or a button.
 
+const HELP_SVG_DATA_PREFIX = "data:image/svg+xml;base64,";
+
 /* global
 
    _, docById, getMacroExpansion, HELPCONTENT,
@@ -41,7 +43,7 @@ class HelpWidget {
         this.appendedBlockList = [];
         this.index = 0;
         this.isOpen = true;
-        this._prevKeyHandler = document.onkeydown;
+        this._keydownHandler = null;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help", false);
         //widgetWindow.getWidgetBody().style.overflowY = "auto";
@@ -52,7 +54,10 @@ class HelpWidget {
         widgetWindow.show();
         widgetWindow.onclose = () => {
             this.isOpen = false;
-            document.onkeydown = this._prevKeyHandler;
+            if (this._keydownHandler) {
+                document.removeEventListener("keydown", this._keydownHandler);
+                this._keydownHandler = null;
+            }
             widgetWindow.destroy();
             // Trigger the hint only if they were on the first page of the tour
             if (this.index === 0 && typeof this.activity.textMsg === "function") {
@@ -123,13 +128,17 @@ class HelpWidget {
             leftArrow.setAttribute("title", _("Previous"));
             leftArrow.setAttribute("aria-label", _("Previous"));
 
-            document.onkeydown = function handleArrowKeys(event) {
+            if (this._keydownHandler) {
+                document.removeEventListener("keydown", this._keydownHandler);
+            }
+            this._keydownHandler = event => {
                 if (event.key === "ArrowLeft") {
                     leftArrow.click();
                 } else if (event.key === "ArrowRight") {
                     rightArrow.click();
                 }
             };
+            document.addEventListener("keydown", this._keydownHandler);
 
             let cell = docById("left-arrow");
             if (page === 0) {
@@ -233,7 +242,7 @@ class HelpWidget {
                     const helpBody = docById("helpBodyDiv");
                     helpBody.style.height = "70vh";
 
-                    let body = "";
+                    const bodyFragment = document.createDocumentFragment();
                     if (message.length > 1) {
                         let path = message[1];
                         // We need to add a case here whenever we add
@@ -264,16 +273,24 @@ class HelpWidget {
 
                         // body = body + '<p><img src="' + path + "/" + name + '_block.svg"></p>';
                         const imageSrc = `Docs/${path}/${name}_block.svg`;
-                        body += `<figure style="width:100%;"><img style="max-width:100%;" src=${imageSrc}></figure>`;
+                        const figure = document.createElement("figure");
+                        figure.style.width = "100%";
+                        const img = document.createElement("img");
+                        img.style.maxWidth = "100%";
+                        img.src = imageSrc;
+                        figure.append(img);
+                        bodyFragment.append(figure);
                     }
 
-                    body += `<p>${message[0]}</p>`;
+                    const messageParagraph = document.createElement("p");
+                    messageParagraph.textContent = message[0];
+                    bodyFragment.append(messageParagraph);
 
                     const loadButtonHTML =
                         '<i style="margin-right: 10px" id="loadButton" data-toggle="tooltip" title="Load this block" class="material-icons md-48">get_app</i>';
                     iconsContainer.insertAdjacentHTML("afterbegin", loadButtonHTML);
 
-                    helpBody.insertAdjacentHTML("afterbegin", body);
+                    helpBody.append(bodyFragment);
 
                     if (
                         !this.activity.blocks.blockList[this.activity.blocks.activeBlock].protoblock
@@ -352,37 +369,73 @@ class HelpWidget {
         const pageCount = `${page + 1}/${totalPages}`;
         const rightArrow = docById("right-arrow");
         const leftArrow = docById("left-arrow");
+        const title = HELPCONTENT[page][0];
+        const imageSrc = HELPCONTENT[page][2];
 
         rightArrow.classList.toggle("disabled", page === HELPCONTENT.length - 1);
         leftArrow.classList.toggle("disabled", page === 0);
 
         // Previous HTML content is removed, and new one is generated.
-        let body = "";
-        if (
-            [
-                _("Welcome to Music Blocks"),
-                _("Meet Mr. Mouse!"),
-                _("Guide"),
-                _("About"),
-                _("Congratulations.")
-            ].includes(HELPCONTENT[page][0])
-        ) {
+        const bodyFragment = document.createDocumentFragment();
+        if (this._isLargeTourImage(title)) {
             // body = body + '<p>&nbsp;<img src="' + HELPCONTENT[page][2] + '"></p>';
-            body = `<figure><img src="${HELPCONTENT[page][2]}" alt="${HELPCONTENT[page][0]} icon" loading="lazy"></figure>`;
+            const figure = document.createElement("figure");
+            const img = document.createElement("img");
+            img.src = imageSrc;
+            img.alt = `${title} icon`;
+            img.loading = "lazy";
+            img.classList.add("help-tour-image");
+            figure.append(img);
+            bodyFragment.append(figure);
+        } else if (this._isDetailedTourIcon(title)) {
+            const figure = document.createElement("figure");
+            const img = document.createElement("img");
+            img.src = imageSrc;
+            img.alt = `${title} icon`;
+            img.loading = "lazy";
+            img.classList.add("help-tour-detailed-icon");
+            figure.append(img);
+            bodyFragment.append(figure);
         } else {
-            body = `<figure><img src="${HELPCONTENT[page][2]}" alt="${HELPCONTENT[page][0]} icon" loading="lazy" width="64px" height="64px"></figure>`;
+            const figure = document.createElement("figure");
+            const img = document.createElement("img");
+            img.src = this._getHighContrastHelpIconSrc(imageSrc);
+            img.alt = `${title} icon`;
+            img.loading = "lazy";
+            img.classList.add("help-tour-icon");
+            if (this._usesHighContrastWhiteFilter(imageSrc)) {
+                img.classList.add("help-tour-white-icon");
+            }
+            img.setAttribute("width", "64px");
+            img.setAttribute("height", "64px");
+            figure.append(img);
+            bodyFragment.append(figure);
         }
 
-        const helpContentHTML = `<h1 class="heading">${HELPCONTENT[page][0]}</h1> 
-         <p class="description">${HELPCONTENT[page][1]}</p>
-         <p>${pageCount}</p>`;
+        const heading = document.createElement("h1");
+        heading.classList.add("heading");
+        heading.textContent = HELPCONTENT[page][0];
+        bodyFragment.append(heading);
 
-        body += helpContentHTML;
+        const description = document.createElement("p");
+        description.classList.add("description");
+        description.textContent = HELPCONTENT[page][1];
+        bodyFragment.append(description);
+
+        const count = document.createElement("p");
+        count.textContent = pageCount;
+        bodyFragment.append(count);
 
         if (HELPCONTENT[page].length > 3) {
             const link = HELPCONTENT[page][3];
-            // console.debug(page + " " + link);
-            body += `<p><a href="${link}" target="_blank" rel="noopener noreferrer">${HELPCONTENT[page][4]}</a></p>`;
+            const linkParagraph = document.createElement("p");
+            const anchor = document.createElement("a");
+            anchor.href = link;
+            anchor.target = "_blank";
+            anchor.rel = "noopener noreferrer";
+            anchor.textContent = HELPCONTENT[page][4];
+            linkParagraph.append(anchor);
+            bodyFragment.append(linkParagraph);
         }
 
         if ([_("Congratulations.")].includes(HELPCONTENT[page][0])) {
@@ -426,9 +479,123 @@ class HelpWidget {
         }
 
         helpBody.style.color = "#505050";
-        helpBody.insertAdjacentHTML("afterbegin", body);
+        helpBody.append(bodyFragment);
 
         this.widgetWindow.takeFocus();
+    }
+
+    /**
+     * @private
+     * @param {string} title
+     * @returns {boolean}
+     */
+    _isLargeTourImage(title) {
+        return [
+            _("Welcome to Music Blocks"),
+            _("Meet Mr. Mouse!"),
+            _("Guide"),
+            _("About"),
+            _("Congratulations."),
+            _("Congratulations!")
+        ].includes(title);
+    }
+
+    /**
+     * @private
+     * @param {string} title
+     * @returns {boolean}
+     */
+    _isDetailedTourIcon(title) {
+        return [
+            _("Tab Navigation"),
+            _("Contextual Menu for Blocks"),
+            _("Contextual Menu for Canvas")
+        ].includes(title);
+    }
+
+    /**
+     * @private
+     * @param {string} src
+     * @returns {string}
+     */
+    _getHighContrastHelpIconSrc(src) {
+        if (
+            !document.body.classList.contains("highcontrast") ||
+            !src.startsWith(HELP_SVG_DATA_PREFIX)
+        ) {
+            return src;
+        }
+
+        try {
+            const svg = this._decodeSvgData(src.slice(HELP_SVG_DATA_PREFIX.length));
+            const highContrastSvg = svg
+                .replace(/fill-opacity\s*:\s*0\.[0-9]+/g, "fill-opacity:1")
+                .replace(/stroke-opacity\s*:\s*0\.[0-9]+/g, "stroke-opacity:1")
+                .replace(/opacity\s*:\s*0\.[0-9]+/g, "opacity:1")
+                .replace(/fill-opacity="0\.[0-9]+"/g, 'fill-opacity="1"')
+                .replace(/stroke-opacity="0\.[0-9]+"/g, 'stroke-opacity="1"')
+                .replace(/opacity="0\.[0-9]+"/g, 'opacity="1"');
+            return HELP_SVG_DATA_PREFIX + this._encodeSvgData(highContrastSvg);
+        } catch (e) {
+            return src;
+        }
+    }
+
+    /**
+     * @private
+     * @param {string} src
+     * @returns {boolean}
+     */
+    _usesHighContrastWhiteFilter(src) {
+        if (
+            !document.body.classList.contains("highcontrast") ||
+            !src.startsWith(HELP_SVG_DATA_PREFIX)
+        ) {
+            return false;
+        }
+
+        try {
+            return !this._hasVisibleWhiteSvgDetail(
+                this._decodeSvgData(src.slice(HELP_SVG_DATA_PREFIX.length))
+            );
+        } catch (e) {
+            return true;
+        }
+    }
+
+    /**
+     * @private
+     * @param {string} svg
+     * @returns {boolean}
+     */
+    _hasVisibleWhiteSvgDetail(svg) {
+        const whiteElements =
+            svg.match(/<[^>]*(?:fill|stroke)\s*[:=]\s*["']?#(?:fff|ffffff)\b[^>]*>/gi) || [];
+
+        return whiteElements.some(
+            element =>
+                !/(?:opacity|fill-opacity|stroke-opacity)\s*[:=]\s*["']?0(?:[;"'\s>]|$)/i.test(
+                    element
+                )
+        );
+    }
+
+    /**
+     * @private
+     * @param {string} encodedSvg
+     * @returns {string}
+     */
+    _decodeSvgData(encodedSvg) {
+        return window.atob(encodedSvg);
+    }
+
+    /**
+     * @private
+     * @param {string} svg
+     * @returns {string}
+     */
+    _encodeSvgData(svg) {
+        return window.btoa(svg);
     }
 
     /**
@@ -473,6 +640,7 @@ class HelpWidget {
      * @returns {void}
      */
     _blockHelp(block) {
+        if (!block) return;
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
@@ -495,13 +663,17 @@ class HelpWidget {
         const rightArrow = docById("right-arrow");
         const leftArrow = docById("left-arrow");
 
-        document.onkeydown = function handleArrowKeys(event) {
+        if (this._keydownHandler) {
+            document.removeEventListener("keydown", this._keydownHandler);
+        }
+        this._keydownHandler = event => {
             if (event.key === "ArrowLeft") {
                 leftArrow.click();
             } else if (event.key === "ArrowRight") {
                 rightArrow.click();
             }
         };
+        document.addEventListener("keydown", this._keydownHandler);
 
         if (this.index === this.appendedBlockList.length - 1) {
             rightArrow.classList.add("disabled");
@@ -569,7 +741,7 @@ class HelpWidget {
             helpBody.style.height = "70vh";
             // helpBody.style.backgroundColor = "#e8e8e8";
             if (message) {
-                let body = "";
+                const bodyFragment = document.createDocumentFragment();
                 if (message.length > 1) {
                     let path = message[1];
                     // We need to add a case here whenever we add
@@ -599,11 +771,20 @@ class HelpWidget {
                     }
 
                     const imageSrc = `Docs/documentation/${name}_block.svg`;
-                    body += `<figure class="blockImage-wrapper"><img class="blockImage" src="${imageSrc}"></figure>`;
+                    const figure = document.createElement("figure");
+                    figure.classList.add("blockImage-wrapper");
+                    const img = document.createElement("img");
+                    img.classList.add("blockImage");
+                    img.src = imageSrc;
+                    figure.append(img);
+                    bodyFragment.append(figure);
                 }
 
-                body += `<p class="message">${message[0]}</p>`;
-                helpBody.insertAdjacentHTML("afterbegin", body);
+                const messageParagraph = document.createElement("p");
+                messageParagraph.classList.add("message");
+                messageParagraph.textContent = message[0];
+                bodyFragment.append(messageParagraph);
+                helpBody.append(bodyFragment);
 
                 const loadIconHTML =
                     '<i style="margin-right: 10px" id="loadButton" data-toggle="tooltip" title="Load this block" class="material-icons md-48">get_app</i>';
@@ -684,4 +865,8 @@ class HelpWidget {
             }
         }
     }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = HelpWidget;
 }

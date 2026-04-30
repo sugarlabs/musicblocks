@@ -37,7 +37,9 @@ jobs:
       - name: Run Jest Tests
         id: jest
         run: |
-          npm test -- --json --outputFile=jest-results.json || echo "TESTS_FAILED=true" >> $GITHUB_ENV
+          npm test -- --coverage --json --outputFile=jest-results.json || echo "TESTS_FAILED=true" >> $GITHUB_ENV
+          COVERAGE=$(node -e "const s=require('./coverage/coverage-summary.json').total;console.log('Statements: '+s.statements.pct+'% | Branches: '+s.branches.pct+'% | Functions: '+s.functions.pct+'% | Lines: '+s.lines.pct+'%');" 2>/dev/null || echo "Coverage summary unavailable")
+          echo "COVERAGE_SUMMARY=$COVERAGE" >> $GITHUB_ENV
 
       - name: Read Jest Results
         id: results
@@ -76,8 +78,12 @@ jobs:
           {
             if [ "$TESTS_PASSED" = "true" ]; then
               echo "✅ All Jest tests passed! This PR is ready to merge."
+              echo ""
+              echo "**Coverage:** $COVERAGE_SUMMARY"
             else
               echo "❌ Some Jest tests failed. Please check the logs and fix the issues before merging."
+              echo ""
+              echo "**Coverage:** $COVERAGE_SUMMARY"
               echo ""
               echo "**Failed Tests:**"
               echo ""

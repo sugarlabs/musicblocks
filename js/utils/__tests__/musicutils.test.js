@@ -854,9 +854,9 @@ describe("getArticulation", () => {
         expect(getArticulation("do")).toBe("");
         expect(getArticulation("re")).toBe("");
     });
-    it("should handle combinations of articulations", () => {
-        expect(getArticulation("do^")).toBe("");
-        expect(getArticulation("C^^")).toBe("");
+    it("should extract articulation symbols (extract from do^ or C^^)", () => {
+        expect(getArticulation("do^")).toBe("^");
+        expect(getArticulation("C^^")).toBe("^^");
     });
     it("should preserve non-articulation characters", () => {
         expect(getArticulation("X")).toBe("X");
@@ -864,7 +864,13 @@ describe("getArticulation", () => {
     });
     it("should handle empty and special cases", () => {
         expect(getArticulation("")).toBe("");
-        expect(getArticulation("doremifa")).toBe("");
+        expect(getArticulation("doremifa")).toBe("remifa"); // Only strips the first prefix
+    });
+    it("should handle custom note names like BAGPIPE_D correctly", () => {
+        // "BAGPIPE_D" should not have internal letters stripped.
+        // If "B" is seen as a note name prefix, it extracts "AGPIPE_D".
+        // Crucially, it no longer removes A, G, E, or D from the middle.
+        expect(getArticulation("BAGPIPE_D")).toBe("AGPIPE_D");
     });
 });
 

@@ -1165,6 +1165,18 @@ function setupGraphicsBlocks(activity) {
             // Set the block as hidden
             this.hidden = true;
         }
+
+        /**
+         * Retrieves the current wrap state of the turtle.
+         * @param {object} logo - The logo object.
+         * @param {number} turtle - The turtle number.
+         * @param {number} blk - The block number.
+         * @returns {boolean|null} - The current wrap state.
+         */
+        arg(logo, turtle, blk) {
+            return activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle)).painter
+                .wrap;
+        }
     }
 
     /**

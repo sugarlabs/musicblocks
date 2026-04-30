@@ -24,6 +24,10 @@
  * @class
  * @classdesc pertains to the Mouse (corresponding to Turtle) in JavaScript based Music Blocks programs.
  */
+const resolvePath = path =>
+    path
+        .split(".")
+        .reduce((obj, key) => obj?.[key], typeof window !== "undefined" ? window : globalThis);
 class Mouse {
     /** Mouse objects in program */
     static MouseList = [];
@@ -43,7 +47,7 @@ class Mouse {
             this.turtle = globalActivity.turtles.getTurtle(Mouse.MouseList.length);
         } else {
             globalActivity.turtles.addTurtle();
-            this.turtle = globalActivity.turtles.getTurtle(numberOfTurtles - 1);
+            this.turtle = globalActivity.turtles.getTurtle(numberOfTurtles);
             Mouse.AddedTurtles.push(this.turtle);
         }
 
@@ -156,22 +160,28 @@ class MusicBlocks {
                 "Singer.VolumeActions",
                 "Singer.DrumActions",
                 "Turtle.DictActions"
-            ].forEach(className => {
-                MusicBlocks._methodList[className] = [];
+            ].forEach(path => {
+                MusicBlocks._methodList[path] = [];
 
-                if (className === "Painter") {
-                    for (const methodName of Object.getOwnPropertyNames(
-                        eval(className + ".prototype")
-                    )) {
-                        if (methodName !== "constructor" && !methodName.startsWith("_"))
-                            MusicBlocks._methodList[className].push(methodName);
-                    }
+                const classObj = resolvePath(path);
+
+                if (!classObj) {
+                    console.warn(`Class path "${path}" not found`);
                     return;
                 }
 
-                for (const methodName of Object.getOwnPropertyNames(eval(className))) {
-                    if (methodName !== "length" && methodName !== "prototype")
-                        MusicBlocks._methodList[className].push(methodName);
+                if (path === "Painter") {
+                    for (const methodName of Object.getOwnPropertyNames(classObj.prototype)) {
+                        if (methodName !== "constructor" && !methodName.startsWith("_")) {
+                            MusicBlocks._methodList[path].push(methodName);
+                        }
+                    }
+                } else {
+                    for (const methodName of Object.getOwnPropertyNames(classObj)) {
+                        if (methodName !== "length" && methodName !== "prototype") {
+                            MusicBlocks._methodList[path].push(methodName);
+                        }
+                    }
                 }
             });
         }
@@ -248,13 +258,26 @@ class MusicBlocks {
                         break;
                     }
                 }
+                if (!cname) {
+                    throw new Error(`Command "${command}" not found in any class`);
+                }
 
-                cname = cname === "Painter" ? this.turtle.painter : eval(cname);
+                const classRef = cname === "Painter" ? this.turtle.painter : resolvePath(cname);
+
+                if (!classRef) {
+                    throw new Error(
+                        `Class "${cname}" could not be resolved for command "${command}"`
+                    );
+                }
+
+                if (typeof classRef[command] !== "function") {
+                    throw new Error(`Command "${command}" not found on class "${cname}"`);
+                }
 
                 returnVal =
                     args === undefined || (Array.isArray(args) && args.length === 0)
-                        ? cname[command]()
-                        : cname[command](...args);
+                        ? classRef[command]()
+                        : classRef[command](...args);
             }
 
             const delay = this.turtle.waitTime;

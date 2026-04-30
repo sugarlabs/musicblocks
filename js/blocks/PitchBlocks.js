@@ -53,7 +53,7 @@ function setupPitchBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk) {
-            Singer.playSynthBlock(args, activity, logo, turtle, blk);
+            Singer.PitchActions.playSynthFrequency(args[0], turtle, blk);
         }
     }
 
@@ -76,7 +76,7 @@ function setupPitchBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk) {
-            Singer.playSynthBlock(args, activity, logo, turtle, blk);
+            Singer.PitchActions.playSynthFrequency(args[0], turtle, blk);
         }
     }
 
@@ -99,7 +99,7 @@ function setupPitchBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk) {
-            Singer.playSynthBlock(args, activity, logo, turtle, blk);
+            Singer.PitchActions.playSynthFrequency(args[0], turtle, blk);
         }
     }
 
@@ -122,7 +122,7 @@ function setupPitchBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk) {
-            Singer.playSynthBlock(args, activity, logo, turtle, blk);
+            Singer.PitchActions.playSynthFrequency(args[0], turtle, blk);
         }
     }
 

@@ -702,7 +702,11 @@ describe("Toolbar Class", () => {
                 }
             },
             "toggleAuxBtn": {
-                className: ""
+                className: "tooltipped aux-toggle",
+                classList: {
+                    add: jest.fn(),
+                    remove: jest.fn()
+                }
             },
             "chooseKeyDiv": {
                 style: { display: "" }
@@ -725,7 +729,7 @@ describe("Toolbar Class", () => {
 
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, false);
         expect(elements.menu.innerHTML).toBe("more_vert");
-        expect(elements.toggleAuxBtn.className).toBe("blue darken-1");
+        expect(elements.toggleAuxBtn.classList.add).toHaveBeenCalledWith("blue", "darken-1");
         expect(elements.search.classList.toggle).toHaveBeenCalledWith("open");
 
         elements["aux-toolbar"].style.display = "block";
@@ -734,7 +738,8 @@ describe("Toolbar Class", () => {
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, true);
         expect(elements["aux-toolbar"].style.display).toBe("none");
         expect(elements.menu.innerHTML).toBe("menu");
-        expect(elements.toggleAuxBtn.className).toBe(NaN);
+        expect(elements.toggleAuxBtn.classList.remove).toHaveBeenCalledWith("blue", "darken-1");
+        expect(elements.toggleAuxBtn.className).toBe("tooltipped aux-toggle");
         expect(elements.chooseKeyDiv.style.display).toBe("none");
     });
 
@@ -1058,7 +1063,13 @@ describe("Toolbar Class", () => {
         const elements = {
             "aux-toolbar": { style: { display: "block" } },
             "menu": { innerHTML: "" },
-            "toggleAuxBtn": { className: "some-class blue darken-1" }
+            "toggleAuxBtn": {
+                className: "some-class blue darken-1",
+                classList: {
+                    add: jest.fn(),
+                    remove: jest.fn()
+                }
+            }
         };
 
         global.docById.mockImplementation(id => elements[id] || {});
@@ -1068,6 +1079,7 @@ describe("Toolbar Class", () => {
         expect(elements["aux-toolbar"].style.display).toBe("none");
         expect(elements.menu.innerHTML).toBe("menu");
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, false);
+        expect(elements.toggleAuxBtn.classList.remove).toHaveBeenCalledWith("blue", "darken-1");
     });
     test("renderLanguageSelectIcon highlights Japanese kana variant correctly", () => {
         const mockLangElement = {

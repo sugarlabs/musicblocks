@@ -11,10 +11,12 @@
 
 // Borrowing loosely from tasprite_factory.py in the Python version.
 
-/* global platformColor */
+/* global platformColor, deepClone */
 /* Global Locations 
     js/utils/platformstyle.js
         platformColor
+    js/utils/utils.js
+        deepClone
 */
 /* exported SVG */
 const __svgCache = new Map();
@@ -1108,7 +1110,7 @@ class SVG {
         const finalSvg = this._header(false) + svg;
         __svgCache.set(cacheKey, {
             svg: finalSvg,
-            docks: JSON.parse(JSON.stringify(this.docks)),
+            docks: deepClone(this.docks),
             width: this._width,
             height: this._height
         });
@@ -1430,7 +1432,7 @@ class SVG {
         const finalSvg = this._header(false) + svg;
         __svgCache.set(cacheKey, {
             svg: finalSvg,
-            docks: JSON.parse(JSON.stringify(this.docks)),
+            docks: deepClone(this.docks),
             width: this._width,
             height: this._height
         });
@@ -1679,7 +1681,7 @@ class SVG {
         const finalSvg = this._header(false) + svg;
         __svgCache.set(cacheKey, {
             svg: finalSvg,
-            docks: JSON.parse(JSON.stringify(this.docks)),
+            docks: deepClone(this.docks),
             width: this._width,
             height: this._height
         });
@@ -1834,7 +1836,7 @@ class SVG {
         const finalSvg = this._header(false) + svg;
         __svgCache.set(cacheKey, {
             svg: finalSvg,
-            docks: JSON.parse(JSON.stringify(this.docks)),
+            docks: deepClone(this.docks),
             width: this._width,
             height: this._height
         });
