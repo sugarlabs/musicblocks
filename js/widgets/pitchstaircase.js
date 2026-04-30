@@ -199,6 +199,10 @@ class PitchStaircase {
             inputNum1 = Math.abs(Math.floor(inputNum1));
         }
 
+        if (inputNum1 === 0) {
+            inputNum1 = 3;
+        }
+
         this._musicRatio1.value = inputNum1;
         let inputNum2 = this._musicRatio2.value;
 
@@ -206,6 +210,10 @@ class PitchStaircase {
             inputNum2 = 2;
         } else {
             inputNum2 = Math.abs(Math.floor(inputNum2));
+        }
+
+        if (inputNum2 === 0) {
+            inputNum2 = 2;
         }
 
         this._musicRatio2.value = inputNum2;
