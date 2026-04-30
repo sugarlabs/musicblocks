@@ -1332,6 +1332,13 @@ describe("base64Encode", () => {
             expect(result.charCodeAt(i)).toBe(bytes[i]);
         }
     });
+    it("should handle large strings without stack overflow", () => {
+        const input = "a".repeat(200000);
+        const result = base64Encode(input);
+        expect(result.length).toBe(input.length);
+        expect(result.charCodeAt(0)).toBe("a".charCodeAt(0));
+        expect(result.charCodeAt(result.length - 1)).toBe("a".charCodeAt(0));
+    });
 });
 
 describe("getNote", () => {
