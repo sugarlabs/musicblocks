@@ -3045,17 +3045,23 @@ function Synth() {
                                             "B": 493.88
                                         };
 
-                                        // Extract note and octave
-                                        const noteMatch = noteWithOctave.match(/([A-G][#b]?)(\d+)/);
+                                        // Extract note and octave (handle double accidentals ##/bb)
+                                        const noteMatch = noteWithOctave.match(/([A-G][#b]{0,2})(\d+)/);
                                         if (!noteMatch) {
                                             throw new Error("Invalid note format");
                                         }
 
                                         const [, note, octave] = noteMatch;
-                                        // Convert flats to sharps for lookup
-                                        const lookupNote = note
-                                            .replace("b", "#")
-                                            .replace("bb", "##");
+                                        // Map enharmonic equivalents to sharp-based names for lookup
+                                        const enharmonicMap = {
+                                            "Cb": "B",  "Db": "C#", "Eb": "D#", "Fb": "E",
+                                            "Gb": "F#", "Ab": "G#", "Bb": "A#",
+                                            "Dbb": "C", "Ebb": "D", "Fbb": "D#", "Gbb": "F",
+                                            "Abb": "G", "Bbb": "A", "Cbb": "A#",
+                                            "C##": "D", "D##": "E", "E##": "F#", "F##": "G",
+                                            "G##": "A", "A##": "B"
+                                        };
+                                        const lookupNote = enharmonicMap[note] || note;
 
                                         // Get base frequency for the note
                                         let freq = baseFrequencies[lookupNote];
