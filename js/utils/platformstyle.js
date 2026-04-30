@@ -538,7 +538,10 @@ if (platformThemes[activeTheme]) {
     window.platformColor = platformThemes["light"];
 }
 
-document.querySelector("meta[name=theme-color]").content = platformColor.header;
+const themeColorMeta = document.querySelector("meta[name=theme-color]");
+if (themeColorMeta) {
+    themeColorMeta.content = platformColor.header;
+}
 
 /**
  * @public
