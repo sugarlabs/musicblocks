@@ -15,7 +15,6 @@ if (isDev) {
 
     const livereloadServer = livereload.createServer({
         port: 35729,
-        host: "127.0.0.1",
         exts: ["html", "css", "js", "svg", "webp", "json"],
         exclusions: [
             /[\/\\]node_modules[\/\\]/,
