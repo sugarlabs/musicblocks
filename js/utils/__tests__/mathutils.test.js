@@ -161,6 +161,18 @@ describe("MathUtility", () => {
         test("throws error when second arg is string", () => {
             expect(() => MathUtility.doMod(10, "a")).toThrow("Invalid number input");
         });
+
+        test("throws DivByZeroError when divisor is zero", () => {
+            expect(() => MathUtility.doMod(5, 0)).toThrow("DivByZeroError");
+        });
+
+        test("throws DivByZeroError for negative dividend with zero divisor", () => {
+            expect(() => MathUtility.doMod(-5, 0)).toThrow("DivByZeroError");
+        });
+
+        test("throws DivByZeroError for floating dividend with zero divisor", () => {
+            expect(() => MathUtility.doMod(5.5, 0)).toThrow("DivByZeroError");
+        });
     });
 
     describe("doSqrt", () => {
@@ -557,7 +569,7 @@ describe("MathUtility", () => {
 
     describe("edge cases - Infinity, NaN, and boundary values", () => {
         test("doMod throws an error when divisor is zero", () => {
-            expect(() => MathUtility.doMod(5, 0)).toThrow();
+            expect(() => MathUtility.doMod(5, 0)).toThrow("DivByZeroError");
         });
 
         test("doSqrt handles Infinity", () => {

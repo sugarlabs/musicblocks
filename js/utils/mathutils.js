@@ -125,12 +125,12 @@ class MathUtility {
      * @param {number} a
      * @param {number} b
      * @returns {number} - Result of a modulo b.
-     * @throws {string} DivByZeroError if divisor is zero, or NanError if arguments are not valid numbers.
+     * @throws {Error} DivByZeroError if the divisor is zero, or "Invalid number input" if arguments are not valid numbers.
      */
     static doMod(a, b) {
         if (typeof a === "number" && typeof b === "number") {
             if (Number(b) === 0) {
-                throw new Error("Division by zero");
+                throw new Error("DivByZeroError");
             }
             return Number(a) % Number(b);
         } else {
