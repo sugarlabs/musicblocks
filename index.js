@@ -33,6 +33,10 @@ if (isDev) {
 
     livereloadServer.watch(__dirname);
 
+    livereloadServer.server.on("error", err => {
+        console.warn(`Livereload server error: ${err.message}`);
+    });
+
     app.use(
         connectLivereload({
             port: 35729
