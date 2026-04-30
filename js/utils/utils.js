@@ -84,6 +84,15 @@ const changeImage = (imgElement, from, to) => {
 // have been moved to js/utils/utils-logic.js.
 // They are loaded as a RequireJS dependency and assigned to window globals.
 
+const getLocalStorageItemSafely = (key, fallback = null) => {
+    try {
+        const value = localStorage.getItem(key);
+        return value === null ? fallback : value;
+    } catch (e) {
+        return fallback;
+    }
+};
+
 /**
  * Enhanced _() method to handle case variations for translations
  * prioritize exact matches and preserve the case of the input text.
@@ -124,7 +133,7 @@ function _(text, options = {}) {
         const lang = i18next.language;
 
         if (lang.startsWith("ja")) {
-            const kanaPref = localStorage.getItem("kanaPreference") || "kanji";
+            const kanaPref = getLocalStorageItemSafely("kanaPreference", "kanji");
             const script = kanaPref === "kana" ? "kana" : "kanji";
 
             const resolveObj = key => {
