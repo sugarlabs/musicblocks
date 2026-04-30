@@ -24,6 +24,7 @@ const mockActivity = {
         languagePreference: "enUS",
         kanaPreference: null
     },
+    saveLocally: jest.fn(),
     textMsg: jest.fn()
 };
 
@@ -47,6 +48,7 @@ describe("LanguageBox Class", () => {
         // Reset storage to initial state
         mockActivity.storage.languagePreference = "enUS";
         mockActivity.storage.kanaPreference = null;
+        mockActivity.saveLocally = jest.fn();
         languageBox = new LanguageBox(mockActivity);
     });
 
@@ -68,6 +70,28 @@ describe("LanguageBox Class", () => {
             languageBox.OnClick();
             expect(reloadSpy).toHaveBeenCalled();
             reloadSpy.mockRestore();
+        });
+
+        it("should wait for saveLocally before reloading", async () => {
+            const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+            let resolveSave;
+            mockActivity.saveLocally.mockReturnValue(
+                new Promise(resolve => {
+                    resolveSave = resolve;
+                })
+            );
+
+            languageBox.reload();
+
+            expect(mockActivity.saveLocally).toHaveBeenCalled();
+            expect(consoleSpy).not.toHaveBeenCalled();
+
+            resolveSave();
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(consoleSpy).toHaveBeenCalled();
+            consoleSpy.mockRestore();
         });
     });
 

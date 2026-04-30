@@ -220,7 +220,33 @@ class LanguageBox {
      * @returns {void}
      */
     reload() {
-        window.location.reload();
+        const reloadWindow = () => {
+            window.location.reload();
+        };
+
+        if (!this.activity || typeof this.activity.saveLocally !== "function") {
+            reloadWindow();
+            return;
+        }
+
+        try {
+            const saveResult = this.activity.saveLocally();
+            if (saveResult && typeof saveResult.then === "function") {
+                saveResult
+                    .then(() => {
+                        reloadWindow();
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+                return;
+            }
+        } catch (e) {
+            console.error(e);
+            return;
+        }
+
+        reloadWindow();
     }
 
     hide() {

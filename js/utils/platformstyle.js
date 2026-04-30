@@ -19,7 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* exported showButtonHighlight */
 
-const themePreference = localStorage.themePreference || undefined;
+let themePreference;
+try {
+    themePreference = localStorage.themePreference || undefined;
+} catch (e) {
+    themePreference = undefined;
+}
 
 window.platform = {
     android: /Android/i.test(navigator.userAgent),
@@ -40,8 +45,10 @@ const platformThemes = {
         fillColor: "#F9F9F9",
         blueButton: "#0066FF",
         blueButtonHover: "#023a76",
+        blueButtonText: "white",
         cancelButton: "#f1f1f1",
         cancelButtonHover: "#afafaf",
+        headingColor: "#0066ff",
         hoverColor: "#808080",
         widgetButton: "#225A91",
         widgetButtonSelect: "#979797",
@@ -197,8 +204,10 @@ const platformThemes = {
         fillColor: "#F9F9F9",
         blueButton: "#0066FF",
         blueButtonHover: "#023a76",
+        blueButtonText: "white",
         cancelButton: "#f1f1f1",
         cancelButtonHover: "#afafaf",
+        headingColor: "#0066ff",
         hoverColor: "#E0E0E0",
         widgetBackground: "#ccc",
         widgetButton: "#8cc6ff",
@@ -358,8 +367,10 @@ const platformThemes = {
         fillColor: "#FFFFFF",
         blueButton: "#00FFFF",
         blueButtonHover: "#00CCCC",
+        blueButtonText: "black",
         cancelButton: "#FFFFFF",
         cancelButtonHover: "#CCCCCC",
+        headingColor: "#ffff00",
         hoverColor: "#666666",
         widgetBackground: "#000000",
         widgetButton: "#00FFFF",

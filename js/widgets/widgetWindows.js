@@ -21,7 +21,9 @@ window.widgetWindows = {
     openWindows: {},
     _posCache: {},
     focused: null,
+    draggingWindow: null,
     _shortcutsInitialized: false,
+    _globalListenersInitialized: false,
     _handleGlobalKeyDown(e) {
         const focused = window.widgetWindows.focused;
         if (!focused || e.repeat) return; // Guard against no focus or rapid-fire repeat
@@ -60,6 +62,65 @@ window.widgetWindows = {
                 e.stopPropagation();
             }
         }
+    },
+    _initGlobalListeners() {
+        if (this._globalListenersInitialized) return;
+
+        this._handleGlobalMouseMove = this._handleGlobalMouseMove.bind(this);
+        this._handleGlobalMouseUp = this._handleGlobalMouseUp.bind(this);
+        this._handleGlobalMouseDown = this._handleGlobalMouseDown.bind(this);
+
+        document.addEventListener("mouseup", this._handleGlobalMouseUp, true);
+        document.addEventListener("mousemove", this._handleGlobalMouseMove, true);
+        document.addEventListener("mousedown", this._handleGlobalMouseDown, true);
+
+        this._globalListenersInitialized = true;
+    },
+    _handleGlobalMouseMove(e) {
+        if (this.draggingWindow) {
+            this.draggingWindow._docMouseMoveHandler(e);
+        }
+    },
+    _handleGlobalMouseUp(e) {
+        if (this.draggingWindow) {
+            this.draggingWindow._dragTopHandler(e);
+            this.draggingWindow = null;
+        }
+    },
+    _handleGlobalMouseDown(e) {
+        const isToolbarInteraction =
+            e.target?.closest &&
+            (e.target.closest("#toolbars") ||
+                e.target.closest("#aux-toolbar") ||
+                e.target.closest(".dropdown-content") ||
+                e.target.closest(".dropdown-trigger"));
+
+        const windows = Object.values(this.openWindows).filter(win => win !== undefined);
+        let focusedAny = false;
+
+        for (let i = 0; i < windows.length; i++) {
+            const win = windows[i];
+            if (
+                e.target === win._frame ||
+                win._frame.contains(e.target) ||
+                win._fullscreenEnabled ||
+                isToolbarInteraction
+            ) {
+                // Focus this window
+                win._frame.style.opacity = "1";
+                win._frame.style.zIndex = "10000";
+                this.focused = win;
+                focusedAny = true;
+            } else {
+                // Dim other windows
+                win._frame.style.opacity = ".7";
+                win._frame.style.zIndex = "0";
+            }
+        }
+
+        if (!focusedAny) {
+            this.focused = null;
+        }
     }
 };
 
@@ -83,21 +144,13 @@ class WidgetWindow {
 
         // Drag offset for correct positioning
         this._dx = this._dy = 0;
-        this._dragging = false;
         // RAF throttle flag for mousemove performance
         this._rafTicking = false;
 
         this._createUIelements();
         this._setupLanguage();
 
-        // Global watchers
-        this._dragTopHandler = this._dragTopHandler.bind(this);
-        this._docMouseMoveHandler = this._docMouseMoveHandler.bind(this);
-        this._docMouseDownHandler = this._docMouseDownHandler.bind(this);
-
-        document.addEventListener("mouseup", this._dragTopHandler, true);
-        document.addEventListener("mousemove", this._docMouseMoveHandler, true);
-        document.addEventListener("mousedown", this._docMouseDownHandler, true);
+        window.widgetWindows._initGlobalListeners();
 
         if (!window.widgetWindows._shortcutsInitialized) {
             // Use capture phase (true) to ensure global window control shortcuts are handled
@@ -183,7 +236,7 @@ class WidgetWindow {
         titleEl.id = `${this._key}WidgetID`;
 
         this._nonclose.onmousedown = e => {
-            this._dragging = true;
+            window.widgetWindows.draggingWindow = this;
             if (this._maximized) {
                 // Perform special repositioning to make the drag feel right when
                 // restoring a window from maximized.
@@ -286,8 +339,6 @@ class WidgetWindow {
      * @returns {void}
      */
     _docMouseMoveHandler(e) {
-        if (!this._dragging) return;
-
         // Throttle using requestAnimationFrame to prevent layout thrashing
         if (this._rafTicking) return;
         this._rafTicking = true;
@@ -329,39 +380,7 @@ class WidgetWindow {
      * @param {MouseEvent} e
      * @returns {void}
      */
-    _docMouseDownHandler(e) {
-        const isToolbarInteraction =
-            e.target?.closest &&
-            (e.target.closest("#toolbars") ||
-                e.target.closest("#aux-toolbar") ||
-                e.target.closest(".dropdown-content") ||
-                e.target.closest(".dropdown-trigger"));
-
-        if (
-            e.target === this._frame ||
-            this._frame.contains(e.target) ||
-            this._fullscreenEnabled ||
-            isToolbarInteraction
-        ) {
-            this._frame.style.opacity = "1";
-            this._frame.style.zIndex = "10000";
-            window.widgetWindows.focused = this;
-        } else {
-            this._frame.style.opacity = ".7";
-            this._frame.style.zIndex = "0";
-            if (window.widgetWindows.focused === this) {
-                window.widgetWindows.focused = null;
-            }
-        }
-    }
-
-    /**
-     * @private
-     * @param {MouseEvent} e
-     * @returns {void}
-     */
     _dragTopHandler(e) {
-        this._dragging = false;
         if (this._fullscreenEnabled && this._frame.style.top === "64px" && !this._maximized) {
             this._maximize();
             this.takeFocus();
@@ -435,9 +454,9 @@ class WidgetWindow {
      */
     addSelectorButton(list, initial, parent) {
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
-        el.innerHTML = "";
-        el.insertAdjacentHTML("afterbegin", `<select value="${initial}" />`);
-        const selector = el.querySelector("select");
+        const selector = document.createElement("select");
+        selector.value = initial;
+        el.replaceChildren(selector);
         for (const i of list) {
             const newOption = new Option("turtle " + i, i);
             selector.add(newOption);
@@ -463,12 +482,13 @@ class WidgetWindow {
      * @returns {HTMLElement}
      */
     modifyButton(index, icon, iconSize, label) {
-        const innerHTML = `
-            <img src="header-icons/${icon}" title="${label}" alt="${label}" height="${iconSize}" width="${iconSize}"/> 
-            `;
-
-        this._buttons[index].innerHTML = "";
-        this._buttons[index].insertAdjacentHTML("afterbegin", innerHTML);
+        const img = document.createElement("img");
+        img.src = `header-icons/${icon}`;
+        img.title = label;
+        img.alt = label;
+        img.height = iconSize;
+        img.width = iconSize;
+        this._buttons[index].replaceChildren(img);
         return this._buttons[index];
     }
 
@@ -477,9 +497,6 @@ class WidgetWindow {
      * @returns {void}
      */
     close() {
-        document.removeEventListener("mouseup", this._dragTopHandler, true);
-        document.removeEventListener("mousemove", this._docMouseMoveHandler, true);
-        document.removeEventListener("mousedown", this._docMouseDownHandler, true);
         this.onclose();
     }
 
@@ -521,16 +538,13 @@ class WidgetWindow {
      */
     addButton(icon, iconSize, label, parent) {
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
-
-        const innerHTML = `<img src="header-icons/${icon}" 
-                  title="${label}" 
-                  alt="${label}" 
-                  height="${iconSize}" 
-                  width="${iconSize}" 
-             />`;
-
-        el.innerHTML = "";
-        el.insertAdjacentHTML("afterbegin", innerHTML);
+        const img = document.createElement("img");
+        img.src = `header-icons/${icon}`;
+        img.title = label;
+        img.alt = label;
+        img.height = iconSize;
+        img.width = iconSize;
+        el.replaceChildren(img);
         this._buttons.push(el);
         return el;
     }
@@ -632,15 +646,6 @@ class WidgetWindow {
      * @returns {void}
      */
     destroy() {
-        if (this._dragTopHandler) {
-            document.removeEventListener("mouseup", this._dragTopHandler, true);
-        }
-        if (this._docMouseMoveHandler) {
-            document.removeEventListener("mousemove", this._docMouseMoveHandler, true);
-        }
-        if (this._docMouseDownHandler) {
-            document.removeEventListener("mousedown", this._docMouseDownHandler, true);
-        }
         if (this._widget && this._widgetWheelHandler) {
             this._widget.removeEventListener("wheel", this._widgetWheelHandler, false);
             this._widget.removeEventListener("DOMMouseScroll", this._widgetWheelHandler, false);

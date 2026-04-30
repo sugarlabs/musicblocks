@@ -8,7 +8,7 @@ Use video formats for animated content
 
 Large GIFs are inefficient for delivering animated content. By converting large GIFs to videos, you can save big on users' bandwidth. Consider using MPEG4/WebM videos for animations and PNG/WebP for static images instead of GIF to save network bytes.
 
-<img width="708" alt="image" src="https://user-images.githubusercontent.com/75945709/174280188-2155dcb7-11f3-43e1-a96b-05f0aa211c91.png">
+<img width="708" alt="Lighthouse warning showing that /loading-animation.gif should use a video format for animated content" src="https://user-images.githubusercontent.com/75945709/174280188-2155dcb7-11f3-43e1-a96b-05f0aa211c91.png">
 
 
 **Create MPEG videos**

@@ -76,6 +76,11 @@ class PlanetInterface {
          * Shows the planet interface.
          */
         this.showPlanet = () => {
+            if (!this.planet || typeof this.planet.open !== "function") {
+                console.error("[PlanetInterface] showPlanet called before Planet is ready.");
+                return;
+            }
+
             const png = docById("overlayCanvas").toDataURL("image/png");
             this.planet.open(png); // this.mainCanvas.toDataURL("image/png"));
             this.iframe.style.display = "block";
@@ -98,6 +103,15 @@ class PlanetInterface {
          * Opens the planet interface.
          */
         this.openPlanet = () => {
+            if (
+                !this.planet ||
+                !this.planet.ProjectStorage ||
+                typeof this.planet.open !== "function"
+            ) {
+                console.error("[PlanetInterface] openPlanet called before Planet is ready.");
+                return;
+            }
+
             this.saveLocally();
             this.hideMusicBlocks();
             this.showPlanet();
@@ -127,7 +141,7 @@ class PlanetInterface {
             }
 
             if (data === undefined) {
-                this.errorMsg(_("project undefined"));
+                this.activity.errorMsg(_("project undefined"));
                 return;
             }
             this.activity.textMsg(this.getCurrentProjectName());
@@ -153,7 +167,7 @@ class PlanetInterface {
                 const obj = JSON.parse(data);
                 this.activity.blocks.loadNewBlocks(obj);
             } catch (e) {
-                this.errorMsg(e);
+                this.activity.errorMsg(e);
             }
 
             this.activity.loading = false;
@@ -199,6 +213,13 @@ class PlanetInterface {
          * Prepares project data for export, generates SVG data, and saves the project data locally.
          */
         this.saveLocally = () => {
+            if (!this.planet || !this.planet.ProjectStorage) {
+                console.error(
+                    "[PlanetInterface] saveLocally called before Planet storage is ready."
+                );
+                return Promise.resolve(null);
+            }
+
             this.activity.stage.update(event);
             const data = this.activity.prepareExport();
             const svgData = doSVG(
@@ -210,21 +231,37 @@ class PlanetInterface {
                 320 / this.activity.canvas.width
             );
             try {
-                if (svgData == null || svgData === "") {
-                    this.planet.ProjectStorage.saveLocally(data, null);
+                if (svgData === null || svgData === undefined || svgData === "") {
+                    return Promise.resolve(this.planet.ProjectStorage.saveLocally(data, null));
                 } else {
+                    const fallbackImage =
+                        typeof this.planet.ProjectStorage.getCurrentProjectImage === "function"
+                            ? this.planet.ProjectStorage.getCurrentProjectImage()
+                            : null;
+                    const savePromise = Promise.resolve(
+                        this.planet.ProjectStorage.saveLocally(data, fallbackImage)
+                    );
                     const img = new Image();
                     const t = this;
                     img.onload = () => {
-                        const bitmap = new createjs.Bitmap(img);
-                        const bounds = bitmap.getBounds();
-                        bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-                        t.planet.ProjectStorage.saveLocally(
-                            data,
-                            bitmap.bitmapCache.getCacheDataURL()
-                        );
+                        try {
+                            const bitmap = new createjs.Bitmap(img);
+                            const bounds = bitmap.getBounds();
+                            bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+                            Promise.resolve(
+                                t.planet.ProjectStorage.saveLocally(
+                                    data,
+                                    bitmap.bitmapCache.getCacheDataURL()
+                                )
+                            ).catch(error => {
+                                console.error(error);
+                            });
+                        } catch (error) {
+                            console.error(error);
+                        }
                     };
                     img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svgData));
+                    return savePromise;
                 }
             } catch (e) {
                 if (

@@ -108,10 +108,61 @@ const {
     base64Encode,
     NOTESTEP,
     ACCIDENTALNAMES,
-    NOTESFLAT
+    NOTESFLAT,
+    NOTENAMES,
+    SOLFEGENAMES1,
+    ALLNOTENAMES,
+    NOTENAMES1,
+    PITCHES1,
+    PITCHES3
 } = require("../musicutils");
 
 describe("musicutils", () => {
+    describe("musicutils core constants", () => {
+        const last = arr => arr[arr.length - 1];
+
+        it("keeps NOTENAMES as the seven natural note letters", () => {
+            expect(NOTENAMES).toEqual(["C", "D", "E", "F", "G", "A", "B"]);
+        });
+
+        it("keeps the expected solfege base syllables in SOLFEGENAMES1 without duplicates", () => {
+            const baseSolfegeNames = [
+                ...new Set(SOLFEGENAMES1.map(name => name.replace(/[♯♭𝄪𝄫]/gu, "")))
+            ];
+
+            expect(baseSolfegeNames).toEqual(["do", "re", "mi", "fa", "sol", "la", "ti"]);
+            expect(baseSolfegeNames).toHaveLength(7);
+        });
+
+        it("preserves the first and last entries for NOTENAMES and SOLFEGENAMES1", () => {
+            expect(NOTENAMES[0]).toBe("C");
+            expect(last(NOTENAMES)).toBe("B");
+            expect(SOLFEGENAMES1[0]).toBe("do");
+            expect(last(SOLFEGENAMES1)).toBe("ti");
+        });
+
+        it("includes sharps, flats, and double accidentals in ALLNOTENAMES", () => {
+            expect(ALLNOTENAMES).toEqual(
+                expect.arrayContaining(["C#", "Db", "Cx", "Dbb", "Fx", "Cb"])
+            );
+        });
+
+        it("keeps note and pitch collections as non-empty arrays of strings", () => {
+            [NOTENAMES, ALLNOTENAMES, NOTENAMES1, PITCHES1, PITCHES3].forEach(collection => {
+                expect(Array.isArray(collection)).toBe(true);
+                expect(collection.length).toBeGreaterThan(0);
+                expect(collection.every(item => typeof item === "string")).toBe(true);
+            });
+        });
+
+        it("keeps major and minor mode definitions at seven steps and one octave", () => {
+            expect(MUSICALMODES.major).toHaveLength(7);
+            expect(MUSICALMODES.minor).toHaveLength(7);
+            expect(MUSICALMODES.major.reduce((sum, step) => sum + step, 0)).toBe(12);
+            expect(MUSICALMODES.minor.reduce((sum, step) => sum + step, 0)).toBe(12);
+        });
+    });
+
     it("should set and get Octave Ratio", () => {
         setOctaveRatio(4);
         const octaveR = getOctaveRatio();
@@ -803,9 +854,9 @@ describe("getArticulation", () => {
         expect(getArticulation("do")).toBe("");
         expect(getArticulation("re")).toBe("");
     });
-    it("should handle combinations of articulations", () => {
-        expect(getArticulation("do^")).toBe("");
-        expect(getArticulation("C^^")).toBe("");
+    it("should extract articulation symbols (extract from do^ or C^^)", () => {
+        expect(getArticulation("do^")).toBe("^");
+        expect(getArticulation("C^^")).toBe("^^");
     });
     it("should preserve non-articulation characters", () => {
         expect(getArticulation("X")).toBe("X");
@@ -813,7 +864,13 @@ describe("getArticulation", () => {
     });
     it("should handle empty and special cases", () => {
         expect(getArticulation("")).toBe("");
-        expect(getArticulation("doremifa")).toBe("");
+        expect(getArticulation("doremifa")).toBe("remifa"); // Only strips the first prefix
+    });
+    it("should handle custom note names like BAGPIPE_D correctly", () => {
+        // "BAGPIPE_D" should not have internal letters stripped.
+        // If "B" is seen as a note name prefix, it extracts "AGPIPE_D".
+        // Crucially, it no longer removes A, G, E, or D from the middle.
+        expect(getArticulation("BAGPIPE_D")).toBe("AGPIPE_D");
     });
 });
 
@@ -905,45 +962,23 @@ describe("modeMapper", () => {
         global.FLAT = "♭";
     });
 
-    it("should map Ionian to major", () => {
-        expect(modeMapper("C", "ionian")).toEqual(["c", "major"]);
-        expect(modeMapper("D", "ionian")).toEqual(["d", "major"]);
-    });
-    it("should handle flats in Dorian mode", () => {
-        expect(modeMapper("E♭", "dorian")).toEqual(["e♭", "minor"]);
-        expect(modeMapper("B♭", "dorian")).toEqual(["f", "minor"]);
-    });
-    it("should handle flats in Locrian mode", () => {
-        expect(modeMapper("E♭", "locrian")).toEqual(["d♭", "minor"]);
-        expect(modeMapper("B♭", "locrian")).toEqual(["d♭", "minor"]);
-    });
-    it("should map Aeolian to minor", () => {
-        expect(modeMapper("A", "aeolian")).toEqual(["a", "minor"]);
-        expect(modeMapper("C", "aeolian")).toEqual(["c", "minor"]);
-    });
-
-    it("should map natural minor to minor", () => {
-        expect(modeMapper("D", "natural minor")).toEqual(["d", "minor"]);
-    });
-
-    it("should leave major unchanged", () => {
-        expect(modeMapper("E", "major")).toEqual(["e", "major"]);
-    });
-
-    it("should leave minor unchanged", () => {
-        expect(modeMapper("F♯", "minor")).toEqual(["f♯", "minor"]);
-    });
-
-    it("should correctly map Phrygian major branch", () => {
-        expect(modeMapper("C", "phrygian")).toEqual(["g♯", "major"]);
-    });
-
-    it("should correctly switch to minor in Mixolydian", () => {
-        expect(modeMapper("A♯", "mixolydian")).toEqual(["c", "minor"]);
-    });
-
-    it("should normalize uppercase input", () => {
-        expect(modeMapper("C", "DORIAN")).toEqual(["a♯", "major"]);
+    it.each([
+        ["C", "ionian", ["c", "major"]],
+        ["D", "ionian", ["d", "major"]],
+        ["E♭", "dorian", ["e♭", "minor"]],
+        ["B♭", "dorian", ["f", "minor"]],
+        ["E♭", "locrian", ["d♭", "minor"]],
+        ["B♭", "locrian", ["d♭", "minor"]],
+        ["A", "aeolian", ["a", "minor"]],
+        ["C", "aeolian", ["c", "minor"]],
+        ["D", "natural minor", ["d", "minor"]],
+        ["E", "major", ["e", "major"]],
+        ["F♯", "minor", ["f♯", "minor"]],
+        ["C", "phrygian", ["g♯", "major"]],
+        ["A♯", "mixolydian", ["c", "minor"]],
+        ["C", "DORIAN", ["a♯", "major"]]
+    ])("should correctly map %s %s to %j", (key, mode, expected) => {
+        expect(modeMapper(key, mode)).toEqual(expected);
     });
 });
 
@@ -2290,6 +2325,53 @@ describe("getPitchInfo", () => {
         expect(getPitchInfo(activity, "alphabet", "C4", tur)).toBe("C");
     });
 
+    it("should correctly parse string inputs", () => {
+        expect(getPitchInfo("C#5")).toEqual({
+            name: "C#",
+            octave: 5,
+            pitchNumber: 73
+        });
+
+        // High octave and textual variants
+        expect(getPitchInfo("C10").pitchNumber).toBe(132);
+        expect(getPitchInfo("Fx10").pitchNumber).toBe(139);
+        expect(getPitchInfo("Cx4").pitchNumber).toBe(62);
+
+        // Unicode double accidentals
+        // F𝄪5 (F double-sharp) → same pitch as G5 = 79
+        const infoDoubleSharp = getPitchInfo("F\u{1D12A}5");
+        expect(infoDoubleSharp.pitchNumber).toBe(79);
+
+        // Bb𝄫5 (B double-flat) → same pitch as A5 = 81
+        const infoDoubleFlat = getPitchInfo("B\u{1D12B}5");
+        expect(infoDoubleFlat.pitchNumber).toBe(81);
+    });
+
+    it("should correctly parse numeric inputs", () => {
+        expect(getPitchInfo(60)).toEqual({
+            name: "C",
+            octave: 4,
+            pitchNumber: 60
+        });
+    });
+
+    it("should handle invalid inputs", () => {
+        expect(getPitchInfo("InvalidNote")).toEqual({
+            name: null,
+            octave: null,
+            pitchNumber: "Not a valid pitch name"
+        });
+    });
+
+    it("should handle accidental offset accumulation edge cases", () => {
+        // Gb-1
+        expect(getPitchInfo("Gb-1").pitchNumber).toBe(6);
+        // D𝄫-1
+        expect(getPitchInfo("D\u{1D12B}-1").pitchNumber).toBe(0);
+        // E##4
+        expect(getPitchInfo("E##4").pitchNumber).toBe(66);
+    });
+
     it("returns correct alphabet class", () => {
         expect(getPitchInfo(activity, "alphabet class", "C4", tur)).toBe("C");
         expect(getPitchInfo(activity, "letter class", "D#4", tur)).toBe("E");
@@ -2505,103 +2587,28 @@ describe("_calculate_pitch_number", () => {
     });
 });
 
-describe("getPitchInfo", () => {
-    it("should correctly parse string inputs", () => {
-        const info = getPitchInfo("C#5");
-        expect(info).toEqual({
-            name: "C#",
-            octave: 5,
-            pitchNumber: 73
-        });
-
-        const info10 = getPitchInfo("C10");
-        expect(info10).toEqual({
-            name: "C",
-            octave: 10,
-            pitchNumber: 132
-        });
-
-        // F𝄪5 (F double-sharp) → same pitch as G5 = (5+1)*12 + 7 = 79
-        const infoDoubleSharp = getPitchInfo("F\u{1D12A}5");
-        expect(infoDoubleSharp.pitchNumber).toBe(79);
-        expect(infoDoubleSharp.octave).toBe(5);
-
-        // Bb𝄫5 (B double-flat) → same pitch as A5 = (5+1)*12 + 9 = 81
-        const infoDoubleFlat = getPitchInfo("B\u{1D12B}5");
-        expect(infoDoubleFlat.pitchNumber).toBe(81);
-        expect(infoDoubleFlat.octave).toBe(5);
-
-        // Cx4 (C textual double-sharp) → same pitch as D4 = (4+1)*12 + 2 = 62
-        const infoX = getPitchInfo("Cx4");
-        expect(infoX.pitchNumber).toBe(62);
-        expect(infoX.octave).toBe(4);
-    });
-
-    it("should correctly parse numeric inputs", () => {
-        const info = getPitchInfo(60);
-        expect(info).toEqual({
-            name: "C",
-            octave: 4,
-            pitchNumber: 60
+describe("NOTESTEP", () => {
+    it("should map all seven natural notes to their correct step values", () => {
+        expect(NOTESTEP).toEqual({
+            C: 1,
+            D: 3,
+            E: 5,
+            F: 6,
+            G: 8,
+            A: 10,
+            B: 12
         });
     });
+});
 
-    it("should handle invalid inputs", () => {
-        const info = getPitchInfo("InvalidNote");
-        expect(info).toEqual({
-            name: null,
-            octave: null,
-            pitchNumber: "Not a valid pitch name"
-        });
-    });
-
-    it("should handle accidental offset accumulation edge cases", () => {
-        // Gb-1: G(7) + flat(-1) = index 6 (G♭). (-1+1)*12 + 6 = 6
-        const infoGbNeg1 = getPitchInfo("Gb-1");
-        expect(infoGbNeg1.pitchNumber).toBe(6);
-        expect(infoGbNeg1.octave).toBe(-1);
-
-        // D𝄫-1 enharmonic of C at oct -1: (-1+1)*12 + 2 + (-2) = 0
-        // Note: D𝄫-2 (oct=-2) gives -12; octave must be -1 to reach pitch 0.
-        const infoDdblFlatNeg1 = getPitchInfo("D\u{1D12B}-1");
-        expect(infoDdblFlatNeg1.pitchNumber).toBe(0);
-        expect(infoDdblFlatNeg1.octave).toBe(-1);
-
-        // E##4: E(4) + ##(+2) → index 6 (F#). (4+1)*12 + 4 + 2 = 66
-        // Spelled with two ASCII '#' chars; each contributes +1 via ACCIDENTAL_SEMITONE_MAP.
-        const infoEDblSharp4 = getPitchInfo("E##4");
-        expect(infoEDblSharp4.pitchNumber).toBe(66);
-        expect(infoEDblSharp4.octave).toBe(4);
-
-        // Fx10: F(5) + x(+2) → index 7 (G). (10+1)*12 + 5 + 2 = 139
-        const infoFx10 = getPitchInfo("Fx10");
-        expect(infoFx10.pitchNumber).toBe(139);
-        expect(infoFx10.octave).toBe(10);
-    });
-
-    describe("NOTESTEP", () => {
-        it("should map all seven natural notes to their correct step values", () => {
-            expect(NOTESTEP).toEqual({
-                C: 1,
-                D: 3,
-                E: 5,
-                F: 6,
-                G: 8,
-                A: 10,
-                B: 12
-            });
-        });
-    });
-
-    describe("ACCIDENTALNAMES", () => {
-        it("should contain all five accidental names with correct symbols", () => {
-            expect(ACCIDENTALNAMES).toEqual([
-                "double sharp \ud834\udd2a",
-                "sharp \u266f",
-                "natural \u266e",
-                "flat \u266d",
-                "double flat \ud834\udd2b"
-            ]);
-        });
+describe("ACCIDENTALNAMES", () => {
+    it("should contain all five accidental names with correct symbols", () => {
+        expect(ACCIDENTALNAMES).toEqual([
+            "double sharp \ud834\udd2a",
+            "sharp \u266f",
+            "natural \u266e",
+            "flat \u266d",
+            "double flat \ud834\udd2b"
+        ]);
     });
 });

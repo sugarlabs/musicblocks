@@ -431,7 +431,7 @@ describe("setupVolumeActions", () => {
 
         it("should handle invalid synth name", () => {
             Singer.VolumeActions.setSynthVolume("invalidSynth", 70, 0, "testBlock");
-            expect(activity.errorMsg).toHaveBeenCalledWith("nullnot found");
+            expect(activity.errorMsg).toHaveBeenCalledWith("Synth not found: invalidSynth");
             expect(targetTurtle.singer.synthVolume[DEFAULTVOICE]).toContain(70);
         });
 

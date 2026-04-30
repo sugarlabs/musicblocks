@@ -53,6 +53,8 @@ global.docById = jest.fn(() => ({
     }))
 }));
 global.docByName = jest.fn(() => []);
+const ManagedTimer = require("../../utils/ManagedTimer.js");
+global.ManagedTimer = ManagedTimer;
 
 global.window = {
     innerWidth: 1200,
@@ -111,6 +113,10 @@ describe("TimbreWidget", () => {
     });
 
     afterEach(() => {
+        if (timbre && typeof timbre._clearWidgetTimers === "function") {
+            timbre._clearWidgetTimers();
+        }
+        jest.useRealTimers();
         jest.clearAllMocks();
     });
 
@@ -229,6 +235,52 @@ describe("TimbreWidget", () => {
 
         test("should initialize _eventListeners as empty object", () => {
             expect(timbre._eventListeners).toEqual({});
+        });
+    });
+
+    describe("timer lifecycle", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+        });
+
+        test("should track and clear widget timeouts", () => {
+            const callback = jest.fn();
+
+            timbre._setWidgetTimeout(callback, 500);
+
+            expect(timbre._timerManager.activeTimeoutCount).toBe(1);
+            expect(timbre._clearWidgetTimers()).toBe(1);
+
+            jest.advanceTimersByTime(500);
+
+            expect(callback).not.toHaveBeenCalled();
+            expect(timbre._timerManager.activeTimeoutCount).toBe(0);
+        });
+
+        test("_changeBlock should schedule delayed block replacement through widget timers", () => {
+            timbre.AMSynthesizer = [4];
+            jest.spyOn(timbre, "_blockReplace").mockImplementation();
+
+            timbre._changeBlock(8, "FMSynth", null);
+
+            expect(timbre._timerManager.activeTimeoutCount).toBe(1);
+
+            jest.advanceTimersByTime(500);
+
+            expect(timbre._blockReplace).toHaveBeenCalledWith(4, 8);
+            expect(timbre._timerManager.activeTimeoutCount).toBe(0);
+        });
+
+        test("_clearWidgetTimers should cancel pending delayed block replacement", () => {
+            timbre.AMSynthesizer = [4];
+            jest.spyOn(timbre, "_blockReplace").mockImplementation();
+
+            timbre._changeBlock(8, "FMSynth", null);
+            timbre._clearWidgetTimers();
+            jest.advanceTimersByTime(500);
+
+            expect(timbre._blockReplace).not.toHaveBeenCalled();
+            expect(timbre._timerManager.activeTimeoutCount).toBe(0);
         });
     });
 

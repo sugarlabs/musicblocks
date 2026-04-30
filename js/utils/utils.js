@@ -39,7 +39,7 @@
    oneHundredToFraction, prepareMacroExports, preparePluginExports,
    processMacroData, processRawPluginData, rationalSum, rgbToHex,
    safeSVG, safeJSONParse, toFixed2, toTitleCase, windowHeight, windowWidth,
-    fnBrowserDetect, waitForReadiness, isSafeUrl
+    fnBrowserDetect, waitForReadiness, isSafeUrl, unescapeHTML
 */
 
 /**
@@ -260,7 +260,7 @@ let httpGet = async projectName => {
     const response = await fetch(url, {
         method: "GET",
         headers: {
-            "x-api-key": "3tgTzMXbbw6xEKX7"
+            "x-api-key": window.MB_PROJECT_API_KEY || ""
         }
     });
 
@@ -282,7 +282,7 @@ let httpPost = async (projectName, data) => {
     const response = await fetch(window.server + projectName, {
         method: "POST",
         headers: {
-            "x-api-key": "3tgTzMXbbw6xEKX7"
+            "x-api-key": window.MB_PROJECT_API_KEY || ""
         },
         body: data
     });
@@ -437,7 +437,7 @@ function waitForReadiness(callback, options = {}) {
 
 // Check for Internet Explorer
 
-window.onload = () => {
+window.addEventListener("load", () => {
     const userAgent = window.navigator.userAgent;
     // For IE 10 or older
     const MSIE = userAgent.indexOf("MSIE ");
@@ -484,7 +484,7 @@ window.onload = () => {
             "<a href='https://www.mozilla.org/en-US/firefox/new/' style='float: left; margin-left: 40px;display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Firefox</a>";
         document.body.innerHTML += "</div></div>";
     }
-};
+});
 
 /**
  * Retrieves a collection of elements by class name.
@@ -706,6 +706,30 @@ if (typeof window !== "undefined") {
 }
 
 /**
+ * Reverses HTML entity escaping produced by escapeHTML().
+ * Used when loading project data that was escaped for safe HTML embedding.
+ * @param {string} str - The HTML-escaped string to unescape.
+ * @returns {string} The unescaped string with original characters restored.
+ */
+function unescapeHTML(str) {
+    const unescapeMap = {
+        "&amp;": "&",
+        "&lt;": "<",
+        "&gt;": ">",
+        "&quot;": '"',
+        "&#039;": "'"
+    };
+    return String(str).replace(/&amp;|&lt;|&gt;|&quot;|&#039;/g, match => unescapeMap[match]);
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports.unescapeHTML = unescapeHTML;
+}
+if (typeof window !== "undefined") {
+    window.unescapeHTML = unescapeHTML;
+}
+
+/**
  * Validates that a URL string uses a safe protocol (http or https).
  * Uses the URL API for robust parsing instead of fragile regex patterns.
  * This prevents open redirect attacks via javascript:, data:, vbscript:,
@@ -799,7 +823,10 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
     try {
         obj = JSON.parse(pluginData);
     } catch (error) {
-        console.error(`PluginProcessor: Failed to parse plugin data from source "${pluginSource}":`, error);
+        console.error(
+            `PluginProcessor: Failed to parse plugin data from source "${pluginSource}":`,
+            error
+        );
         console.debug("Malformed plugin data:", pluginData);
         return null;
     }
@@ -1665,10 +1692,6 @@ let rationalSum = (a, b) => {
         b[1] === 0
     ) {
         console.warn("Invalid input passed to rationalSum:", a, b);
-        return [0, 1];
-    }
-    if (a === 0 || b === 0) {
-        // console.debug("divide by zero?");
         return [0, 1];
     }
 

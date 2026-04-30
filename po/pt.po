@@ -3623,7 +3623,7 @@ msgid "Maximum heap size is 1000."
 msgstr "O tamanho máximo da pilha é 1.000"
 
 #: js/blocks/HeapBlocks.js:523
-msgid "The Set-heap entry block sets a value in he heap at the specified location."
+msgid "The Set-heap entry block sets a value in the heap at the specified location."
 msgstr "O bloco de entrada Definir-pilha define um valor na pilha na localização especificada."
 
 #: js/blocks/HeapBlocks.js:539
@@ -4105,7 +4105,7 @@ msgid "run block"
 msgstr "executar bloco"
 
 #: js/blocks/ProgramBlocks.js:1025
-msgid "The Dock block block connections two blocks."
+msgid "The Dock block connects two blocks."
 msgstr "O bloco Dock bloco conecta dois blocos."
 
 #: js/blocks/ProgramBlocks.js:1036
