@@ -2,13 +2,14 @@ FROM node:20-slim
 
 WORKDIR /app
 
-COPY package.json ./
+COPY package.json package-lock.json ./
+
+ENV NODE_ENV=production
 
 RUN npm install --omit=dev --no-audit --no-fund --ignore-scripts
 
 COPY . .
 
-ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=3000
 
