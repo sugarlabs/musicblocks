@@ -311,7 +311,15 @@ const PhraseMakerAudio = {
                 }
             }
             // push [note/chord, relative-duration-inverse (e.g. 8 for 1/8)]
-            notes.push([note, 1 / cell.getAttribute("alt")]);
+            const cellAlt = Number(cell.getAttribute("alt"));
+            if (!cellAlt || !isFinite(cellAlt)) {
+                console.warn(
+                    "PhraseMaker: skipping cell with invalid alt attribute:",
+                    cell.getAttribute("alt")
+                );
+                continue;
+            }
+            notes.push([note, 1 / cellAlt]);
         }
 
         pm._notesToPlay = notes;

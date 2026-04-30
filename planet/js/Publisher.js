@@ -40,13 +40,19 @@ class Publisher {
 
     dataToTags(DATA) {
         // convert to blocks like structure.
-        DATA = JSON.parse(DATA);
+        let parsed;
+        try {
+            parsed = JSON.parse(DATA);
+        } catch (e) {
+            console.error("Publisher.dataToTags: Invalid JSON data", e);
+            return [];
+        }
 
         const blocks = {
             blockList: []
         };
 
-        for (const i of DATA) {
+        for (const i of parsed) {
             const block = {};
             block.name = typeof i[1] === "string" ? i[1] : i[1][0];
             block.connections = i[4];

@@ -70,6 +70,8 @@ describe("GraphicsBlocks", () => {
                 doArc: jest.fn(),
                 doForward: jest.fn(),
                 doRight: jest.fn(),
+                setControlPoint1: jest.fn(),
+                setControlPoint2: jest.fn(),
                 penState: true,
                 wrap: false
             },
@@ -195,5 +197,189 @@ describe("GraphicsBlocks", () => {
 
         block.flow([90, 100], logo, turtle, 1);
         expect(turtleObj.painter.doArc).toHaveBeenCalledWith(90, 100);
+    });
+
+    // ── SetHeadingBlock ─────────────────────────────
+    describe("SetHeadingBlock (setheading)", () => {
+        test("SetHeadingBlock is registered", () => {
+            expect(activity.blocks.setheading).toBeDefined();
+        });
+        test("flow calls doSetHeading with correct angle", () => {
+            const block = new activity.blocks.setheading();
+            block.flow([90], logo, turtle, 1);
+            expect(turtleObj.painter.doSetHeading).toHaveBeenCalledWith(90);
+        });
+        test("flow calls doSetHeading with 0 degrees", () => {
+            const block = new activity.blocks.setheading();
+            block.flow([0], logo, turtle, 1);
+            expect(turtleObj.painter.doSetHeading).toHaveBeenCalledWith(0);
+        });
+        test("flow calls doSetHeading with negative angle", () => {
+            const block = new activity.blocks.setheading();
+            block.flow([-45], logo, turtle, 1);
+            expect(turtleObj.painter.doSetHeading).toHaveBeenCalledWith(-45);
+        });
+    });
+
+    // ── MLeftBlock ───────────────────────────────────
+    describe("MLeftBlock (left)", () => {
+        test("MLeftBlock is registered", () => {
+            expect(activity.blocks.left).toBeDefined();
+        });
+        test("flow turns turtle left (negative right)", () => {
+            const block = new activity.blocks.left();
+            block.flow([90], logo, turtle, 1);
+            expect(turtleObj.painter.doRight).toHaveBeenCalledWith(-90);
+        });
+        test("flow with 0 degrees", () => {
+            const block = new activity.blocks.left();
+            block.flow([0], logo, turtle, 1);
+            expect(turtleObj.painter.doRight).toHaveBeenCalledWith(-0);
+        });
+        test("flow with 180 degrees", () => {
+            const block = new activity.blocks.left();
+            block.flow([180], logo, turtle, 1);
+            expect(turtleObj.painter.doRight).toHaveBeenCalledWith(-180);
+        });
+    });
+
+    // ── BezierBlock ──────────────────────────────────
+    describe("BezierBlock (bezier)", () => {
+        test("BezierBlock is registered", () => {
+            expect(activity.blocks.bezier).toBeDefined();
+        });
+        test("flow calls doBezier with correct args", () => {
+            const block = new activity.blocks.bezier();
+            block.flow([100, 150], logo, turtle, 1);
+            expect(turtleObj.painter.doBezier).toHaveBeenCalledWith(100, 150);
+        });
+        test("flow called with zero values", () => {
+            const block = new activity.blocks.bezier();
+            block.flow([0, 0], logo, turtle, 1);
+            expect(turtleObj.painter.doBezier).toHaveBeenCalledWith(0, 0);
+        });
+        test("flow called with negative values", () => {
+            const block = new activity.blocks.bezier();
+            block.flow([-50, -75], logo, turtle, 1);
+            expect(turtleObj.painter.doBezier).toHaveBeenCalledWith(-50, -75);
+        });
+    });
+
+    // ── ControlPoint1Block ───────────────────────────
+    describe("ControlPoint1Block (controlpoint1)", () => {
+        test("ControlPoint1Block is registered", () => {
+            expect(activity.blocks.controlpoint1).toBeDefined();
+        });
+        test("flow calls setControlPoint1", () => {
+            const block = new activity.blocks.controlpoint1();
+            block.flow([50, 60], logo, turtle, 1);
+            expect(turtleObj.painter.setControlPoint1).toHaveBeenCalledWith([50, 60]);
+        });
+        test("flow with zero values", () => {
+            const block = new activity.blocks.controlpoint1();
+            block.flow([0, 0], logo, turtle, 1);
+            expect(turtleObj.painter.setControlPoint1).toHaveBeenCalledWith([0, 0]);
+        });
+    });
+
+    // ── ControlPoint2Block ───────────────────────────
+    describe("ControlPoint2Block (controlpoint2)", () => {
+        test("ControlPoint2Block is registered", () => {
+            expect(activity.blocks.controlpoint2).toBeDefined();
+        });
+        test("flow calls setControlPoint2", () => {
+            const block = new activity.blocks.controlpoint2();
+            block.flow([70, 80], logo, turtle, 1);
+            expect(turtleObj.painter.setControlPoint2).toHaveBeenCalledWith([70, 80]);
+        });
+        test("flow with negative values", () => {
+            const block = new activity.blocks.controlpoint2();
+            block.flow([-30, -40], logo, turtle, 1);
+            expect(turtleObj.painter.setControlPoint2).toHaveBeenCalledWith([-30, -40]);
+        });
+    });
+
+    // ── WrapModeBlock ────────────────────────────────
+    describe("WrapModeBlock (wrapmode)", () => {
+        test("WrapModeBlock is registered", () => {
+            expect(activity.blocks.wrapmode).toBeDefined();
+        });
+        test("arg returns true when wrap is on", () => {
+            turtleObj.painter.wrap = true;
+            const block = new activity.blocks.wrapmode();
+            expect(block.arg(logo, turtle, 0)).toBe(true);
+        });
+        test("arg returns false when wrap is off", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.wrapmode();
+            expect(block.arg(logo, turtle, 0)).toBe(false);
+        });
+    });
+
+    // ── WrapBlock ────────────────────────────────────
+    describe("WrapBlock (wrap)", () => {
+        test("WrapBlock is registered", () => {
+            expect(activity.blocks.wrap).toBeDefined();
+        });
+        test("flow runs without error", () => {
+            const block = new activity.blocks.wrap();
+            expect(() => block.flow([true], logo, turtle, 1)).not.toThrow();
+        });
+    });
+
+    // ── RightBlock extended ──────────────────────────
+    describe("RightBlock extended", () => {
+        test("RightBlock with 45 degrees", () => {
+            const block = new activity.blocks.right();
+            block.flow([45], logo, turtle, 1);
+            expect(turtleObj.painter.doRight).toHaveBeenCalledWith(45);
+        });
+        test("RightBlock with 360 degrees", () => {
+            const block = new activity.blocks.right();
+            block.flow([360], logo, turtle, 1);
+            expect(turtleObj.painter.doRight).toHaveBeenCalledWith(360);
+        });
+    });
+
+    // ── ForwardBlock extended ────────────────────────
+    describe("ForwardBlock extended", () => {
+        test("ForwardBlock with large value", () => {
+            const block = new activity.blocks.forward();
+            block.flow([500], logo, turtle, 1);
+            expect(turtleObj.painter.doForward).toHaveBeenCalledWith(500);
+        });
+        test("ForwardBlock with zero", () => {
+            const block = new activity.blocks.forward();
+            block.flow([0], logo, turtle, 1);
+            expect(turtleObj.painter.doForward).toHaveBeenCalledWith(0);
+        });
+    });
+
+    // ── ArcBlock extended ────────────────────────────
+    describe("ArcBlock extended", () => {
+        test("ArcBlock with full circle 360 degrees", () => {
+            const block = new activity.blocks.arc();
+            block.flow([360, 100], logo, turtle, 1);
+            expect(turtleObj.painter.doArc).toHaveBeenCalledWith(360, 100);
+        });
+        test("ArcBlock with small radius", () => {
+            const block = new activity.blocks.arc();
+            block.flow([45, 10], logo, turtle, 1);
+            expect(turtleObj.painter.doArc).toHaveBeenCalledWith(45, 10);
+        });
+    });
+
+    // ── SetXYBlock extended ──────────────────────────
+    describe("SetXYBlock extended", () => {
+        test("SetXYBlock with negative coordinates", () => {
+            const block = new activity.blocks.setxy();
+            block.flow([-100, -200], logo, turtle, 1);
+            expect(turtleObj.painter.doSetXY).toHaveBeenCalledWith(-100, -200);
+        });
+        test("SetXYBlock with zero coordinates", () => {
+            const block = new activity.blocks.setxy();
+            block.flow([0, 0], logo, turtle, 1);
+            expect(turtleObj.painter.doSetXY).toHaveBeenCalledWith(0, 0);
+        });
     });
 });

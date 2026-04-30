@@ -25,7 +25,15 @@ const prettier = require("gulp-prettier");
 const files = {
     jsPath: "js/**/*.js",
     cssPath: "css/*.css",
-    sassPath: "css/*.sass"
+    sassPath: "css/*.sass",
+    vendorPath: [
+        "node_modules/jquery/dist/jquery.min.js",
+        "node_modules/jquery-ui-dist/jquery-ui.min.js",
+        "node_modules/materialize-css/dist/js/materialize.min.js",
+        "node_modules/abcjs/dist/abcjs-basic-min.js",
+        "node_modules/howler/howler.min.js",
+        "node_modules/tone/build/Tone.js"
+    ]
 };
 
 const sassTask = () => {
@@ -54,6 +62,11 @@ const jsTask = () => {
         )
         .pipe(uglify())
         .pipe(dest("dist"));
+};
+
+// Vendor task: concatenates vendor libraries into vendor.min.js
+const vendorTask = () => {
+    return src(files.vendorPath).pipe(concat("vendor.min.js")).pipe(dest("dist"));
 };
 
 // Cachebust
@@ -96,8 +109,9 @@ const watchTask = () => {
 // Export the default Gulp task so it can be run
 // Runs the sass ,css and js tasks simultaneously
 // then runs prettify, cacheBust, validate, then starts watch (long-running)
+exports.vendorTask = vendorTask;
 exports.default = series(
-    parallel(jsTask, cssTask, sassTask),
+    parallel(vendorTask, jsTask, cssTask, sassTask),
     prettify,
     cacheBustTask,
     validate,

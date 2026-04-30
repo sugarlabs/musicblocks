@@ -322,8 +322,12 @@ class Painter {
             // Save the current stroke width
             const savedStroke = this.stroke;
             this.stroke = 1;
-            this.turtle.ctx.lineWidth = this.stroke;
-            this.turtle.ctx.lineCap = "round";
+            if (this.turtle.ctx.lineWidth !== this.stroke) {
+                this.turtle.ctx.lineWidth = this.stroke;
+            }
+            if (this.turtle.ctx.lineCap !== "round") {
+                this.turtle.ctx.lineCap = "round";
+            }
 
             // Draw a hollow line
             const step = savedStroke < 3 ? 0.5 : (savedStroke - 2) / 2;
@@ -380,14 +384,20 @@ class Painter {
 
             // Restore stroke
             this.stroke = savedStroke;
-            this.turtle.ctx.lineWidth = this.stroke;
-            this.turtle.ctx.lineCap = "round";
+            if (this.turtle.ctx.lineWidth !== this.stroke) {
+                this.turtle.ctx.lineWidth = this.stroke;
+            }
+            if (this.turtle.ctx.lineCap !== "round") {
+                this.turtle.ctx.lineCap = "round";
+            }
             this.turtle.ctx.moveTo(nx, ny);
         } else if (this._penDown) {
             const capAngleRadians = (this.turtle.orientation * Math.PI) / 180.0;
 
             if (linePart) {
-                this.turtle.ctx.lineCap = "butt";
+                if (this.turtle.ctx.lineCap !== "butt") {
+                    this.turtle.ctx.lineCap = "butt";
+                }
                 if (linePart === "first") {
                     this.turtle.ctx.beginPath();
                     this.turtle.ctx.arc(
@@ -581,8 +591,12 @@ class Painter {
             // Save the current stroke width
             const savedStroke = this.stroke;
             this.stroke = 1;
-            this.turtle.ctx.lineWidth = this.stroke;
-            this.turtle.ctx.lineCap = "round";
+            if (this.turtle.ctx.lineWidth !== this.stroke) {
+                this.turtle.ctx.lineWidth = this.stroke;
+            }
+            if (this.turtle.ctx.lineCap !== "round") {
+                this.turtle.ctx.lineCap = "round";
+            }
 
             // Draw a hollow line
             const step = savedStroke < 3 ? 0.5 : (savedStroke - 2) / 2;
@@ -636,8 +650,12 @@ class Painter {
 
             // Restore stroke
             this.stroke = savedStroke;
-            this.turtle.ctx.lineWidth = this.stroke;
-            this.turtle.ctx.lineCap = "round";
+            if (this.turtle.ctx.lineWidth !== this.stroke) {
+                this.turtle.ctx.lineWidth = this.stroke;
+            }
+            if (this.turtle.ctx.lineCap !== "round") {
+                this.turtle.ctx.lineCap = "round";
+            }
             this.turtle.ctx.moveTo(nx, ny);
         } else if (this._penDown) {
             if (!this._svgPath) {
@@ -688,8 +706,12 @@ class Painter {
         this._processColor();
 
         if (!this._fillState) {
-            this.turtle.ctx.lineWidth = this.stroke;
-            this.turtle.ctx.lineCap = "round";
+            if (this.turtle.ctx.lineWidth !== this.stroke) {
+                this.turtle.ctx.lineWidth = this.stroke;
+            }
+            if (this.turtle.ctx.lineCap !== "round") {
+                this.turtle.ctx.lineCap = "round";
+            }
             this.turtle.ctx.beginPath();
             this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
         }
@@ -801,8 +823,12 @@ class Painter {
         this._processColor();
 
         if (!this._fillState) {
-            this.turtle.ctx.lineWidth = this.stroke;
-            this.turtle.ctx.lineCap = "round";
+            if (this.turtle.ctx.lineWidth !== this.stroke) {
+                this.turtle.ctx.lineWidth = this.stroke;
+            }
+            if (this.turtle.ctx.lineCap !== "round") {
+                this.turtle.ctx.lineCap = "round";
+            }
             this.turtle.ctx.beginPath();
             this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
         }
@@ -897,7 +923,13 @@ class Painter {
      * @param degrees - degrees for right turn
      */
     doRight(degrees) {
-        this.turtle.orientation += Number(degrees);
+        degrees = Number(degrees);
+        if (!Number.isFinite(degrees)) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
+
+        this.turtle.orientation += degrees;
         while (this.turtle.orientation < 0) {
             this.turtle.orientation += 360;
         }
@@ -918,11 +950,22 @@ class Painter {
      * @param y - on-screen y coordinate of the point to where the turtle is moved
      */
     doSetXY(x, y) {
+        x = Number(x);
+        y = Number(y);
+        if (!Number.isFinite(x) || !Number.isFinite(y)) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
+
         this._processColor();
 
         if (!this._fillState) {
-            this.turtle.ctx.lineWidth = this.stroke;
-            this.turtle.ctx.lineCap = "round";
+            if (this.turtle.ctx.lineWidth !== this.stroke) {
+                this.turtle.ctx.lineWidth = this.stroke;
+            }
+            if (this.turtle.ctx.lineCap !== "round") {
+                this.turtle.ctx.lineCap = "round";
+            }
             this.turtle.ctx.beginPath();
             this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
         }
@@ -932,8 +975,8 @@ class Painter {
         const oy = this.turtles.screenY2turtleY(this.turtle.container.y);
 
         // New turtle point
-        const nx = Number(x);
-        const ny = Number(y);
+        const nx = x;
+        const ny = y;
 
         this._move(ox, oy, nx, ny, true);
         this._scheduleCanvasUpdate();
@@ -949,7 +992,13 @@ class Painter {
      * @param degrees - degrees turned to set the 'heading' of turtle
      */
     doSetHeading(degrees) {
-        this.turtle.orientation = Number(degrees);
+        degrees = Number(degrees);
+        if (!Number.isFinite(degrees)) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
+
+        this.turtle.orientation = degrees;
         while (this.turtle.orientation < 0) {
             this.turtle.orientation += 360;
         }
@@ -1053,8 +1102,12 @@ class Painter {
 
             const savedStroke = this.stroke;
             this.stroke = 1;
-            this.turtle.ctx.lineWidth = this.stroke;
-            this.turtle.ctx.lineCap = "round";
+            if (this.turtle.ctx.lineWidth !== this.stroke) {
+                this.turtle.ctx.lineWidth = this.stroke;
+            }
+            if (this.turtle.ctx.lineCap !== "round") {
+                this.turtle.ctx.lineCap = "round";
+            }
 
             const step = savedStroke < 3 ? 0.5 : (savedStroke - 2) / 2;
             const steps = Math.max(Math.floor(savedStroke), 1);
@@ -1175,8 +1228,12 @@ class Painter {
 
             // Restore stroke
             this.stroke = savedStroke;
-            this.turtle.ctx.lineWidth = this.stroke;
-            this.turtle.ctx.lineCap = "round";
+            if (this.turtle.ctx.lineWidth !== this.stroke) {
+                this.turtle.ctx.lineWidth = this.stroke;
+            }
+            if (this.turtle.ctx.lineCap !== "round") {
+                this.turtle.ctx.lineCap = "round";
+            }
             this.turtle.ctx.moveTo(fx, fy);
             this.turtle.x = x2;
             this.turtle.y = y2;
@@ -1185,8 +1242,12 @@ class Painter {
             this._svgPath = false;
         } else if (this._penDown) {
             this._processColor();
-            this.turtle.ctx.lineWidth = this.stroke;
-            this.turtle.ctx.lineCap = "round";
+            if (this.turtle.ctx.lineWidth !== this.stroke) {
+                this.turtle.ctx.lineWidth = this.stroke;
+            }
+            if (this.turtle.ctx.lineCap !== "round") {
+                this.turtle.ctx.lineCap = "round";
+            }
 
             // Convert from turtle coordinates to screen coordinates
             fx = turtles.turtleX2screenX(x2);
@@ -1426,8 +1487,12 @@ class Painter {
 
             if (turtle.painter.penState) {
                 turtle.painter._processColor();
-                this.turtle.ctx.lineWidth = turtle.painter.stroke;
-                this.turtle.ctx.lineCap = "round";
+                if (this.turtle.ctx.lineWidth !== turtle.painter.stroke) {
+                    this.turtle.ctx.lineWidth = turtle.painter.stroke;
+                }
+                if (this.turtle.ctx.lineCap !== "round") {
+                    this.turtle.ctx.lineCap = "round";
+                }
                 this.turtle.ctx.beginPath();
                 this.turtle.ctx.moveTo(turtle.container.x + dx, turtle.container.y + dy);
                 this.turtle.ctx.lineTo(turtle.container.x, turtle.container.y);
@@ -1510,7 +1575,9 @@ class Painter {
     doSetPensize(size) {
         this.closeSVG();
         this.stroke = size;
-        this.turtle.ctx.lineWidth = this.stroke;
+        if (this.turtle.ctx.lineWidth !== this.stroke) {
+            this.turtle.ctx.lineWidth = this.stroke;
+        }
     }
 
     /**

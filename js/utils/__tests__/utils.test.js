@@ -29,6 +29,7 @@ global.window = {
     },
     server: "http://localhost/",
     onload: null,
+    addEventListener: jest.fn(),
     setInterval: jest.fn(),
     clearInterval: jest.fn()
 };
@@ -95,6 +96,27 @@ const {
 } = require("../utils.js");
 
 describe("Utility Functions (logic-only)", () => {
+    describe("load handler registration", () => {
+        it("registers the IE check without overwriting an existing window.onload", () => {
+            const existingOnload = jest.fn();
+            const originalOnload = window.onload;
+            const addEventListenerSpy = jest.spyOn(window, "addEventListener");
+
+            jest.resetModules();
+            window.onload = existingOnload;
+
+            jest.isolateModules(() => {
+                require("../utils.js");
+            });
+
+            expect(window.onload).toBe(existingOnload);
+            expect(addEventListenerSpy).toHaveBeenCalledWith("load", expect.any(Function));
+
+            addEventListenerSpy.mockRestore();
+            window.onload = originalOnload;
+        });
+    });
+
     describe("toTitleCase()", () => {
         it("converts first character to uppercase", () => {
             expect(toTitleCase("hello")).toBe("Hello");

@@ -2303,9 +2303,46 @@ class Block {
 
     /**
      * Opens media for the block.
+     * Shows a chooser modal for media blocks that lets the user
+     * either select a built-in SVG image or upload from their device.
      * @param {number} thisBlock - Index of the current block.
      */
     _doOpenMedia(thisBlock) {
+        const that = this;
+
+        // For non-media blocks (e.g., audiofile, loadFile), use the
+        // original file-chooser flow directly.
+        if (that.name !== "media") {
+            that._doOpenMediaFromDevice(thisBlock);
+            return;
+        }
+
+        // Show the built-in SVG asset selector modal.
+        if (typeof openSvgAssetSelector === "function") {
+            openSvgAssetSelector(
+                // Callback when a built-in image is selected
+                function (dataURL) {
+                    that.value = dataURL;
+                    that.loadThumbnail(null);
+                },
+                // Callback when the user chooses to upload from device
+                function () {
+                    that._doOpenMediaFromDevice(thisBlock);
+                }
+            );
+        } else {
+            // Fallback: if the selector module is not loaded,
+            // use the original file upload flow.
+            that._doOpenMediaFromDevice(thisBlock);
+        }
+    }
+
+    /**
+     * Opens a file chooser to upload media from the local device.
+     * This preserves the original upload behavior.
+     * @param {number} thisBlock - Index of the current block.
+     */
+    _doOpenMediaFromDevice(thisBlock) {
         const that = this;
         const fileChooser = that.name === "media" ? docById("myMedia") : docById("audio");
 

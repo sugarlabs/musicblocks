@@ -148,22 +148,44 @@ describe("ProjectStorage", () => {
             );
         });
 
-        it("should prevent concurrent saves via _saveInProgress guard", async () => {
-            storage.data = { Projects: {} };
+        it("should queue concurrent saves instead of dropping them", async () => {
+            storage.data = { Projects: { 1: { ProjectName: "First" } } };
 
-            // Simulate a save already in progress
-            storage._saveInProgress = true;
+            let releaseFirstSave;
+            let blockFirstRead = true;
+            const originalGet = storage.get.bind(storage);
 
-            const setSpy = jest.spyOn(storage, "set");
-            await storage.save();
+            jest.spyOn(storage, "get").mockImplementation(async key => {
+                if (key === storage.LocalStorageKey && blockFirstRead) {
+                    blockFirstRead = false;
+                    await new Promise(resolve => {
+                        releaseFirstSave = resolve;
+                    });
+                }
 
-            // set() should never have been called because the guard returned early
-            expect(setSpy).not.toHaveBeenCalled();
-            // TimeLastSaved should remain unchanged
-            expect(storage.TimeLastSaved).toBe(-1);
+                return originalGet(key);
+            });
 
-            // Clean up the flag
-            storage._saveInProgress = false;
+            const firstSave = storage.save();
+            await Promise.resolve();
+
+            storage.data = { Projects: { 1: { ProjectName: "Second" } } };
+            const secondSave = storage.save();
+
+            let secondSaveResolved = false;
+            secondSave.then(() => {
+                secondSaveResolved = true;
+            });
+
+            await Promise.resolve();
+            expect(secondSaveResolved).toBe(false);
+
+            await Promise.resolve();
+            releaseFirstSave();
+            await Promise.all([firstSave, secondSave]);
+
+            const saved = await storage.get(storage.LocalStorageKey);
+            expect(saved).toEqual({ Projects: { 1: { ProjectName: "Second" } } });
         });
 
         it("should update TimeLastSaved on successful save", async () => {

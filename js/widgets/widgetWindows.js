@@ -454,9 +454,9 @@ class WidgetWindow {
      */
     addSelectorButton(list, initial, parent) {
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
-        el.innerHTML = "";
-        el.insertAdjacentHTML("afterbegin", `<select value="${initial}" />`);
-        const selector = el.querySelector("select");
+        const selector = document.createElement("select");
+        selector.value = initial;
+        el.replaceChildren(selector);
         for (const i of list) {
             const newOption = new Option("turtle " + i, i);
             selector.add(newOption);
@@ -482,12 +482,13 @@ class WidgetWindow {
      * @returns {HTMLElement}
      */
     modifyButton(index, icon, iconSize, label) {
-        const innerHTML = `
-            <img src="header-icons/${icon}" title="${label}" alt="${label}" height="${iconSize}" width="${iconSize}"/> 
-            `;
-
-        this._buttons[index].innerHTML = "";
-        this._buttons[index].insertAdjacentHTML("afterbegin", innerHTML);
+        const img = document.createElement("img");
+        img.src = `header-icons/${icon}`;
+        img.title = label;
+        img.alt = label;
+        img.height = iconSize;
+        img.width = iconSize;
+        this._buttons[index].replaceChildren(img);
         return this._buttons[index];
     }
 
@@ -537,16 +538,13 @@ class WidgetWindow {
      */
     addButton(icon, iconSize, label, parent) {
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
-
-        const innerHTML = `<img src="header-icons/${icon}" 
-                  title="${label}" 
-                  alt="${label}" 
-                  height="${iconSize}" 
-                  width="${iconSize}" 
-             />`;
-
-        el.innerHTML = "";
-        el.insertAdjacentHTML("afterbegin", innerHTML);
+        const img = document.createElement("img");
+        img.src = `header-icons/${icon}`;
+        img.title = label;
+        img.alt = label;
+        img.height = iconSize;
+        img.width = iconSize;
+        el.replaceChildren(img);
         this._buttons.push(el);
         return el;
     }
