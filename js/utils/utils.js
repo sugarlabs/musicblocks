@@ -83,7 +83,7 @@ if (typeof window !== "undefined") {
     window.safeJSONParse = safeJSONParse;
 }
 
-const getLocalStorageItemSafely = (key, fallback = null) => {
+const getUtilsLocalStorageItemSafely = (key, fallback = null) => {
     try {
         const value = localStorage.getItem(key);
         return value === null ? fallback : value;
@@ -132,7 +132,7 @@ function _(text, options = {}) {
         const lang = i18next.language;
 
         if (lang.startsWith("ja")) {
-            const kanaPref = getLocalStorageItemSafely("kanaPreference", "kanji");
+            const kanaPref = getUtilsLocalStorageItemSafely("kanaPreference", "kanji");
             const script = kanaPref === "kana" ? "kana" : "kanji";
 
             const resolveObj = key => {

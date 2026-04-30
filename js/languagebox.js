@@ -17,7 +17,7 @@
 
 /* exported LanguageBox */
 
-const getLocalStorageItemSafely = key => {
+const getLanguageBoxLocalStorageItemSafely = key => {
     try {
         return localStorage.getItem(key);
     } catch (e) {
@@ -25,7 +25,7 @@ const getLocalStorageItemSafely = key => {
     }
 };
 
-const setLocalStorageItemSafely = (key, value) => {
+const setLanguageBoxLocalStorageItemSafely = (key, value) => {
     try {
         localStorage.setItem(key, value);
     } catch (e) {
@@ -294,12 +294,12 @@ class LanguageBox {
             gug: "Actualice su navegador para cambiar su preferencia de idioma.",
             ur: "اپنی زبان کی ترجیح کو تبدیل کرنے کے لئے اپنے براؤزر کو تازہ دم کریں۔"
         };
-        if (getLocalStorageItemSafely("languagePreference") === this._language) {
+        if (getLanguageBoxLocalStorageItemSafely("languagePreference") === this._language) {
             if (this._language.includes("ja")) {
                 this._language = this._language.split("-")[0];
             }
 
-            setLocalStorageItemSafely("languagePreference", this._language);
+            setLanguageBoxLocalStorageItemSafely("languagePreference", this._language);
             this.activity.textMsg(_("Music Blocks is already set to this language."));
         } else {
             this.activity.storage.languagePreference = this._language;

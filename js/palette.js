@@ -26,7 +26,7 @@
 
 const PALETTE_SCALE_FACTOR = 0.5;
 const PALETTE_WIDTH_FACTOR = 3;
-const getLocalStorageValue = key => {
+const getPaletteLocalStorageValue = key => {
     try {
         return localStorage[key];
     } catch (e) {
@@ -883,7 +883,8 @@ class Palettes {
         label.textContent = toTitleCase(_(name));
         label.style.color = platformColor.paletteText;
         row.style.borderBottom = "1px solid #0CAFFF";
-        label.style.fontSize = getLocalStorageValue("kanaPreference") === "kana" ? "12px" : "16px";
+        label.style.fontSize =
+            getPaletteLocalStorageValue("kanaPreference") === "kana" ? "12px" : "16px";
         label.style.padding = "4px";
         row.style.display = "flex";
         row.style.flexDirection = "row";
@@ -923,7 +924,8 @@ class Palettes {
         img.style.height = `${this.cellSize}px`;
         label.textContent = toTitleCase(_(name));
         label.style.color = platformColor.paletteText;
-        label.style.fontSize = getLocalStorageValue("kanaPreference") === "kana" ? "12px" : "16px";
+        label.style.fontSize =
+            getPaletteLocalStorageValue("kanaPreference") === "kana" ? "12px" : "16px";
         label.style.padding = "4px";
         row.style.display = "flex";
         row.style.flexDirection = "row";
