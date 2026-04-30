@@ -483,6 +483,27 @@ describe("Logo Class", () => {
 
             expect(logo.stepQueue).toEqual({});
         });
+
+        test("executes ONSTOP plugin hooks", () => {
+            logo.sounds = [];
+            logo.synth = {
+                stop: jest.fn(),
+                stopSound: jest.fn(),
+                disposeAllInstruments: jest.fn(),
+                recorder: null
+            };
+            logo.evalOnStopList = {
+                firstHook: "code-first",
+                secondHook: "code-second"
+            };
+            logo.safePluginExecute = jest.fn();
+
+            logo.doStopTurtles();
+
+            expect(logo.safePluginExecute).toHaveBeenCalledTimes(2);
+            expect(logo.safePluginExecute).toHaveBeenNthCalledWith(1, "code-first", logo);
+            expect(logo.safePluginExecute).toHaveBeenNthCalledWith(2, "code-second", logo);
+        });
     });
 
     describe("step", () => {

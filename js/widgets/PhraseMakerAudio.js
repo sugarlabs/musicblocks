@@ -14,7 +14,7 @@
  * @description Audio playback and sound engine logic for PhraseMaker widget.
  */
 
-/* global PhraseMakerUtils, PhraseMakerUI */
+/* global PhraseMakerUtils, PhraseMakerUI, normalizeNoteAccidentals */
 
 const PhraseMakerAudio = {
     /**
@@ -72,7 +72,7 @@ const PhraseMakerAudio = {
                             this._processGraphics(pm, obj);
                         }
                     } else {
-                        pitchNotes.push(note[i].replace(/♭/g, "b").replace(/♯/g, "#"));
+                        pitchNotes.push(normalizeNoteAccidentals(note[i]));
                     }
                 }
 
@@ -311,7 +311,15 @@ const PhraseMakerAudio = {
                 }
             }
             // push [note/chord, relative-duration-inverse (e.g. 8 for 1/8)]
-            notes.push([note, 1 / cell.getAttribute("alt")]);
+            const cellAlt = Number(cell.getAttribute("alt"));
+            if (!cellAlt || !isFinite(cellAlt)) {
+                console.warn(
+                    "PhraseMaker: skipping cell with invalid alt attribute:",
+                    cell.getAttribute("alt")
+                );
+                continue;
+            }
+            notes.push([note, 1 / cellAlt]);
         }
 
         pm._notesToPlay = notes;
@@ -411,7 +419,7 @@ const PhraseMakerAudio = {
                                 } else if (PhraseMakerUtils.MATRIXGRAPHICS2.includes(obj[0])) {
                                     this._processGraphics(pm, obj);
                                 } else {
-                                    pitchNotes.push(note[i].replace(/♭/g, "b").replace(/♯/g, "#"));
+                                    pitchNotes.push(normalizeNoteAccidentals(note[i]));
                                 }
                             }
                         }

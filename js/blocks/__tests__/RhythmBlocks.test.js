@@ -770,4 +770,88 @@ describe("RhythmBlocks", () => {
             expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 5);
         });
     });
+
+    // ── NoteBlock callback (lines 193-197) ──────────────────────────────
+    describe("NoteBlock callback queue path", () => {
+        test("callback pushes queue block to turtle", () => {
+            const block = getBlock("osctime");
+            let capturedCallback;
+            global.Singer.RhythmActions.playNote.mockImplementation(
+                (val, type, turtle, blk, cb) => {
+                    capturedCallback = cb;
+                }
+            );
+            block.flow([200, true], logo, 0, 5, "receivedArg");
+            expect(capturedCallback).toBeDefined();
+            capturedCallback();
+            expect(turtle.parentFlowQueue).toContain(5);
+            expect(turtle.queue.length).toBe(1);
+            expect(turtle.queue[0].child).toBe(true);
+        });
+    });
+
+    // ── SwingBlock listener suppressOutput (lines 253-258) ──────────────
+    describe("SwingBlock listener with suppressOutput false", () => {
+        test("listener pops swing and swingTarget when suppressOutput is false", () => {
+            const block = getBlock("swing");
+            block.flow([32, true], logo, 0, 10);
+            turtle.singer.suppressOutput = false;
+            const listenerCall = logo.setTurtleListener.mock.calls[0];
+            const listener = listenerCall[2];
+            listener({});
+            expect(turtle.singer.swing.length).toBe(0);
+            expect(turtle.singer.swingTarget.length).toBe(0);
+            expect(turtle.singer.swingCarryOver).toBe(0);
+        });
+
+        test("listener skips pop when suppressOutput is true", () => {
+            const block = getBlock("swing");
+            block.flow([32, true], logo, 0, 10);
+            turtle.singer.suppressOutput = true;
+            const listenerCall = logo.setTurtleListener.mock.calls[0];
+            const listener = listenerCall[2];
+            listener({});
+            expect(turtle.singer.swing.length).toBe(1);
+            expect(turtle.singer.swingTarget.length).toBe(1);
+        });
+    });
+
+    // ── NewSwingBlock flow (lines 307-328) ───────────────────────────────
+    describe("NewSwingBlock flow", () => {
+        test("pushes inverse swing value and sets up listener", () => {
+            const block = getBlock("newswing");
+            const result = block.flow([24, true], logo, 0, 10);
+            expect(turtle.singer.swing).toContain(1 / 24);
+            expect(turtle.singer.swingTarget).toContainEqual(null);
+            expect(turtle.singer.swingCarryOver).toBe(0);
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith(10, 0, "_swing_0");
+            expect(logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                "_swing_0",
+                expect.any(Function)
+            );
+            expect(result).toEqual([true, 1]);
+        });
+
+        test("newswing listener pops when suppressOutput is false", () => {
+            const block = getBlock("newswing");
+            block.flow([24, true], logo, 0, 10);
+            turtle.singer.suppressOutput = false;
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            listener({});
+            expect(turtle.singer.swing.length).toBe(0);
+            expect(turtle.singer.swingTarget.length).toBe(0);
+            expect(turtle.singer.swingCarryOver).toBe(0);
+        });
+
+        test("newswing listener skips pop when suppressOutput is true", () => {
+            const block = getBlock("newswing");
+            block.flow([24, true], logo, 0, 10);
+            turtle.singer.suppressOutput = true;
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            listener({});
+            expect(turtle.singer.swing.length).toBe(1);
+            expect(turtle.singer.swingTarget.length).toBe(1);
+        });
+    });
 });

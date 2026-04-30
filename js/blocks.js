@@ -9,8 +9,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* eslint-disable no-redeclare */
-
 /*
    global docById, define,
 
@@ -27,7 +25,7 @@
    getVoiceSynthName, i18nSolfege, last, MathUtility, mixedNumber,
    piemenuBlockContext, prepareMacroExports, ProtoBlock,
     setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments,
-    docById, define, BlocksDependencies
+    docById, define, BlocksDependencies, deepClone
 */
 
 /* global showZoomOverlay */
@@ -46,7 +44,7 @@
         MathUtility
    - js/utils/utils.js
         _, last, closeBlkWidgets, mixedNumber, prepareMacroExports,
-        getTextWidth, delayExecution
+        getTextWidth, delayExecution, deepClone
    - js/utils/musicutils.js
         addTemperamentToDictionary,
         getDrumSynthName, getNoiseName, getNoiseSynthName,
@@ -930,6 +928,7 @@ class Blocks {
             const myBlock = this.blockList[blk];
             if (myBlock == null) {
                 console.debug("Something very broken in _getStackSize.");
+                return size;
             }
 
             let c;
@@ -1106,7 +1105,7 @@ class Blocks {
                 }
 
                 /** Another database integrity check. */
-                if (this.blockList[cblk] === null) {
+                if (this.blockList[cblk] == null) {
                     console.debug("This is not good: we encountered a null block: " + cblk);
                     continue;
                 }
@@ -5294,7 +5293,7 @@ class Blocks {
             this.selectedStack = this.activeBlock;
 
             /** Copy the selectedStack. */
-            this.selectedBlocksObj = JSON.parse(JSON.stringify(this._copyBlocksToObj(false)));
+            this.selectedBlocksObj = deepClone(this._copyBlocksToObj(false));
 
             /** Reset paste offset. */
             this.pasteDx = 0;

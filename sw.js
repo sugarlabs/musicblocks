@@ -9,18 +9,13 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/*
-  global
-
-    offlineFallbackPage
-*/
-
 // This is the "Offline page" service worker
 
 const CACHE = "pwabuilder-precache";
+const offlineFallbackPage = "/index.html";
 const precacheFiles = [
     /* Add an array of files to precache for your app */
-    "./index.html"
+    offlineFallbackPage
 ];
 
 self.addEventListener("install", function (event) {

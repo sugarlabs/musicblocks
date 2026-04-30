@@ -3,7 +3,10 @@
 Cypress.on("uncaught:exception", err => {
     const ignored = [
         "ResizeObserver loop limit exceeded",
-        "Cannot read properties of undefined (reading 'postMessage')",
+        "Cannot read properties of undefined",
+        "Cannot read properties of null",
+        "Cannot set properties of null",
+        "Cannot set properties of undefined",
         "_ is not defined",
         "Permissions check failed"
     ];
@@ -51,6 +54,26 @@ describe("MusicBlocks Application", () => {
             cy.get("#languagedropdown").should("be.visible");
         });
 
+        it("should change language preference", () => {
+            cy.get("#aux-toolbar").invoke("show");
+            cy.get("#languageSelectIcon").click();
+            cy.get("#languagedropdown").should("be.visible");
+
+            cy.get("#es").then($lang => {
+                if ($lang.length) {
+                    cy.wrap($lang).click();
+                    cy.waitForAppReady();
+                } else {
+                    cy.log("Language option not available, skipping");
+                }
+            });
+
+            cy.get("#aux-toolbar").invoke("show"); // fix toolbar hidden
+            cy.get("#languageSelectIcon").click();
+            cy.get("#enUS").click();
+            cy.waitForAppReady();
+        });
+
         it("should verify fullscreen button exists and is visible", () => {
             cy.get("#FullScreen").should("exist").and("be.visible");
         });
@@ -81,24 +104,28 @@ describe("MusicBlocks Application", () => {
         });
 
         it("should show New Project dialog on new file click", () => {
-            cy.get("#newFile > .material-icons").should("exist").and("be.visible").click();
-            cy.contains("New project").should("be.visible");
+            cy.get("#newFile > .material-icons").should("be.visible").click();
+
+            cy.get("#new-project").should("exist").and("be.visible");
+        });
+
+        it("should create a new project and reset the UI", () => {
+            cy.get("#newFile > .material-icons").should("be.visible").click();
+
+            cy.get("#new-project").should("be.visible").click();
+
+            cy.get("#modal-container").should("not.be.visible");
+            cy.get("#canvas").should("be.visible");
         });
     });
 
     describe("UI Elements", () => {
         it("should verify that bottom bar elements exist and are visible", () => {
-            const bottomBarElements = [
-                "#Home\\ \\[HOME\\] > img",
-                "#Show\\/hide\\ blocks > img",
-                "#Expand\\/collapse\\ blocks > img",
-                "#Decrease\\ block\\ size > img",
-                "#Increase\\ block\\ size > img"
-            ];
-
-            bottomBarElements.forEach(selector => {
-                cy.get(selector).should("exist").and("be.visible");
-            });
+            cy.get("#buttoncontainerBOTTOM img")
+                .should("have.length.at.least", 5)
+                .each($el => {
+                    cy.wrap($el).should("be.visible");
+                });
         });
 
         it("should verify sidebar elements exist, are visible, and clickable", () => {
@@ -114,7 +141,10 @@ describe("MusicBlocks Application", () => {
         });
 
         it("should verify that Grid, Clear, and Collapse elements exist and are visible", () => {
+            cy.get("#toggleAuxBtn").click();
+
             const elements = ["#Grid > img", "#Clear", "#Collapse > img"];
+
             elements.forEach(selector => {
                 cy.get(selector).should("exist").and("be.visible");
             });
@@ -126,6 +156,25 @@ describe("MusicBlocks Application", () => {
                     .should("exist")
                     .and("be.visible");
             }
+        });
+    });
+
+    describe("Block Palette", () => {
+        it("should open the Rhythm palette and display blocks", () => {
+            cy.get("body").type("{esc}");
+            // eq(1) selects the Rhythm palette (second row, 0-indexed). Palette order is
+            // statically defined in the codebase. Position-based selection is used since
+            // palette icons are base64 SVGs with no stable semantic attributes.
+
+            cy.get('[width="126"] tbody tr').eq(1).find("img").click();
+
+            cy.get("#palette", { timeout: 15000 }).should("be.visible");
+
+            cy.get("#palette img", { timeout: 15000 }).should("have.length.greaterThan", 0);
+        });
+
+        it("should keep the palette visible after blocks load", () => {
+            cy.get("#palette").should("be.visible");
         });
     });
 

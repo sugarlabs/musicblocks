@@ -45,6 +45,10 @@ function setupOrnamentActions(activity) {
         static setStaccato(value, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
+            if (value === 0) {
+                activity.errorMsg(_("Staccato value must be non-zero."), blk);
+                return;
+            }
             tur.singer.staccato.push(1 / value);
 
             const listenerName = "_staccato_" + turtle + "_" + blk;
@@ -71,6 +75,10 @@ function setupOrnamentActions(activity) {
         static setSlur(value, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
+            if (value === 0) {
+                activity.errorMsg(_("Slur value must be non-zero."), blk);
+                return;
+            }
             tur.singer.staccato.push(-1 / value);
 
             if (tur.singer.justCounting.length === 0) {

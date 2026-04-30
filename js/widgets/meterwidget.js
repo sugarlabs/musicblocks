@@ -426,48 +426,6 @@ class MeterWidget {
     }
 
     /**
-     * Deprecated method to add a button to the widget row.
-     *
-     * @deprecated
-     * @param {object} row - The row to which the button is added.
-     * @param {string} icon - The icon file name.
-     * @param {number} iconSize - The size of the icon.
-     * @param {string} label - The label for the button.
-     * @returns {object} - The cell containing the button.
-     */
-    _addButton(row, icon, iconSize, label) {
-        const cell = row.insertCell(-1);
-        cell.textContent = "\u00A0\u00A0";
-        const img = document.createElement("img");
-        img.src = `header-icons/${icon}`;
-        img.title = label;
-        img.alt = label;
-        img.setAttribute("height", iconSize);
-        img.setAttribute("width", iconSize);
-        img.setAttribute("vertical-align", "middle");
-        img.setAttribute("align-content", "center");
-        cell.appendChild(img);
-        cell.appendChild(document.createTextNode("\u00A0\u00A0"));
-        cell.style.width = MeterWidget.BUTTONSIZE + "px";
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = cell.style.width;
-        cell.style.minHeight = cell.style.height;
-        cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
-
-        cell.onmouseover = () => {
-            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        };
-
-        cell.onmouseout = () => {
-            this.style.backgroundColor = platformColor.selectorBackground;
-        };
-
-        return cell;
-    }
-
-    /**
      * Private method to save the widget state.
      *
      * @private

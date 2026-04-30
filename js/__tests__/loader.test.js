@@ -39,6 +39,15 @@ describe("loader.js coverage", () => {
             Stage: jest.fn(),
             Ticker: { framerate: 60, addEventListener: jest.fn() }
         };
+        global.window.jQuery = jest.fn(() => ({
+            on: jest.fn(),
+            ready: jest.fn(cb => cb())
+        }));
+        global.window.localStorage = {
+            getItem: jest.fn(),
+            setItem: jest.fn(),
+            languagePreference: "en"
+        };
     });
 
     afterEach(() => {
@@ -88,7 +97,14 @@ describe("loader.js coverage", () => {
             expect.objectContaining({
                 baseUrl: "./",
                 paths: expect.any(Object),
-                shim: expect.any(Object)
+                shim: expect.objectContaining({
+                    "tweenjs.min": expect.objectContaining({
+                        deps: ["easeljs.min"]
+                    }),
+                    "preloadjs.min": expect.objectContaining({
+                        deps: ["easeljs.min", "tweenjs.min"]
+                    })
+                })
             })
         );
     });
@@ -117,6 +133,9 @@ describe("loader.js coverage", () => {
         expect(label.textContent).toBe("TRANSLATED_label");
 
         expect(mockI18next.on).toHaveBeenCalledWith("languageChanged", expect.any(Function));
+
+        // Wait a bit more for the multiple requirejs phases to complete
+        await new Promise(resolve => setTimeout(resolve, 300));
 
         // Verify Phase 2 was reached
         expect(mockRequireJS).toHaveBeenCalledWith(

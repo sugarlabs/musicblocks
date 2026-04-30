@@ -520,7 +520,7 @@ function setupHeapBlocks(activity) {
              * @param {string[]} [] - An array with help string information.
              */
             this.setHelpString([
-                _("The Set-heap entry block sets a value in he heap at the specified location."),
+                _("The Set-heap entry block sets a value in the heap at the specified location."),
                 "documentation",
                 ""
             ]);

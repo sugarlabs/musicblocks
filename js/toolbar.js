@@ -19,6 +19,43 @@
 let WRAP = true;
 const $j = window.jQuery;
 let play_button_debounce_timeout = null;
+
+const safeStorageGet = key => {
+    try {
+        if (typeof localStorage === "undefined" || localStorage === null) {
+            return undefined;
+        }
+
+        if (typeof localStorage.getItem === "function") {
+            const value = localStorage.getItem(key);
+            if (value !== null) {
+                return value;
+            }
+        }
+
+        return localStorage[key];
+    } catch (e) {
+        return undefined;
+    }
+};
+
+const safeStorageSet = (key, value) => {
+    try {
+        if (typeof localStorage === "undefined" || localStorage === null) {
+            return;
+        }
+
+        if (typeof localStorage.setItem === "function") {
+            localStorage.setItem(key, value);
+            return;
+        }
+
+        localStorage[key] = value;
+    } catch (e) {
+        console.debug(`Storage write skipped for ${key}:`, e);
+    }
+};
+
 class Toolbar {
     /**
      * Constructs a new Toolbar instance.
@@ -27,7 +64,7 @@ class Toolbar {
      */
     constructor() {
         this.stopIconColorWhenPlaying = window.platformColor.stopIconcolor;
-        this.language = localStorage.languagePreference;
+        this.language = safeStorageGet("languagePreference");
         if (this.language === undefined) {
             this.language = navigator.language;
         }
@@ -467,6 +504,15 @@ class Toolbar {
         const playIcon = docById("play");
         const stopIcon = docById("stop");
         const recordButton = docById("record");
+        playIcon.setAttribute("role", "button");
+        playIcon.setAttribute("aria-label", _("Play project"));
+        playIcon.setAttribute("tabindex", "0");
+        playIcon.addEventListener("keydown", e => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                playIcon.click();
+            }
+        });
         let isPlayIconRunning = false;
 
         function handleClick() {
@@ -520,6 +566,15 @@ class Toolbar {
     renderStopIcon(onclick) {
         const stopIcon = docById("stop");
         const recordButton = docById("record");
+        stopIcon.setAttribute("role", "button");
+        stopIcon.setAttribute("aria-label", _("Stop project"));
+        stopIcon.setAttribute("tabindex", "0");
+        stopIcon.addEventListener("keydown", e => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                stopIcon.click();
+            }
+        });
         stopIcon.onclick = () => {
             onclick(this.activity);
             stopIcon.style.color = "white";
@@ -726,7 +781,7 @@ class Toolbar {
         if (!icon) return;
 
         themes.forEach(theme => {
-            if (localStorage.themePreference === theme) {
+            if (safeStorageGet("themePreference") === theme) {
                 icon.innerHTML = docById(theme).innerHTML;
             }
         });
@@ -886,7 +941,7 @@ class Toolbar {
                         1.0
                     );
 
-                    if (svgData == "") {
+                    if (svgData === "") {
                         savePNG.disabled = true;
                         savePNG.className = "grey-text inactiveLink";
                     } else {
@@ -920,7 +975,7 @@ class Toolbar {
                 );
 
                 // if there is no mouse artwork to save then grey out
-                if (svgData == "") {
+                if (svgData === "") {
                     saveSVG.disabled = true;
                     savePNG.disabled = true;
                     saveSVG.className = "grey-text inactiveLink";
@@ -1013,7 +1068,7 @@ class Toolbar {
 
         // Set the onclick handler
         Record.onclick = function () {
-            const savedMode = localStorage.getItem("musicBlocksRecordMode") || "screen";
+            const savedMode = safeStorageGet("musicBlocksRecordMode") || "screen";
             rec_onclick();
         };
 
@@ -1070,7 +1125,7 @@ class Toolbar {
 
         // Function to update highlighting based on current mode
         const updateModeHighlight = () => {
-            const currentMode = localStorage.getItem("musicBlocksRecordMode") || "screen";
+            const currentMode = safeStorageGet("musicBlocksRecordMode") || "screen";
 
             // Remove highlight from both
             if (recordWithMenus) {
@@ -1098,7 +1153,7 @@ class Toolbar {
         if (recordWithMenus) {
             recordWithMenus.onclick = e => {
                 e.preventDefault();
-                localStorage.setItem("musicBlocksRecordMode", "screen");
+                safeStorageSet("musicBlocksRecordMode", "screen");
                 updateModeHighlight();
                 // Reset arrow after selection
                 const arrowIcon = RecordDropdownArrow.querySelector("i");
@@ -1109,7 +1164,7 @@ class Toolbar {
         if (recordCanvasOnly) {
             recordCanvasOnly.onclick = e => {
                 e.preventDefault();
-                localStorage.setItem("musicBlocksRecordMode", "canvas");
+                safeStorageSet("musicBlocksRecordMode", "canvas");
                 updateModeHighlight();
 
                 // Reset arrow after selection
@@ -1152,16 +1207,16 @@ class Toolbar {
         menuIcon.onclick = () => {
             const searchBar = docById("search");
             searchBar.classList.toggle("open");
-            if (auxToolbar.style.display == "" || auxToolbar.style.display == "none") {
+            if (auxToolbar.style.display === "" || auxToolbar.style.display === "none") {
                 onclick(this.activity, false);
                 auxToolbar.style.display = "block";
                 menuIcon.innerHTML = "more_vert";
-                docById("toggleAuxBtn").className = "blue darken-1";
+                this._setAuxToolbarButtonState(true);
             } else {
                 onclick(this.activity, true);
                 auxToolbar.style.display = "none";
                 menuIcon.innerHTML = "menu";
-                docById("toggleAuxBtn").className -= "blue darken-1";
+                this._setAuxToolbarButtonState(false);
                 docById("chooseKeyDiv").style.display = "none";
                 docById("movable").style.display = "none";
             }
@@ -1401,7 +1456,7 @@ class Toolbar {
             this.activity.beginnerMode = !this.activity.beginnerMode;
 
             try {
-                localStorage.setItem("beginnerMode", this.activity.beginnerMode.toString());
+                safeStorageSet("beginnerMode", this.activity.beginnerMode.toString());
             } catch (e) {
                 console.error(e);
             }
@@ -1629,7 +1684,7 @@ class Toolbar {
 
             // Handle Japanese variants (ja-kanji, ja-kana stored vs ja/kana displayed)
             if (selectedLang && selectedLang.startsWith("ja")) {
-                if (selectedLang === "ja-kana" || localStorage.kanaPreference === "kana") {
+                if (selectedLang === "ja-kana" || safeStorageGet("kanaPreference") === "kana") {
                     langToHighlight = "kana";
                 } else {
                     langToHighlight = "ja";
@@ -1658,7 +1713,7 @@ class Toolbar {
 
         languageSelectIcon.onclick = () => {
             // Get current language preference
-            const currentLang = localStorage.languagePreference || navigator.language;
+            const currentLang = safeStorageGet("languagePreference") || navigator.language;
 
             // Highlight the currently selected language
             updateSelectedLanguageHighlight(currentLang);
@@ -2221,9 +2276,40 @@ class Toolbar {
             const menuIcon = docById("menu");
             auxToolbar.style.display = "none";
             menuIcon.innerHTML = "menu";
-            docById("toggleAuxBtn").className -= "blue darken-1";
+            this._setAuxToolbarButtonState(false);
         }
     };
+
+    /**
+     * Updates the auxiliary menu button highlight without corrupting its existing classes.
+     *
+     * @param {boolean} isActive - Whether the auxiliary toolbar is currently open.
+     * @returns {void}
+     */
+    _setAuxToolbarButtonState(isActive) {
+        const toggleAuxBtn = docById("toggleAuxBtn");
+        if (!toggleAuxBtn) return;
+
+        if (toggleAuxBtn.classList) {
+            if (isActive) {
+                toggleAuxBtn.classList.add("blue", "darken-1");
+            } else {
+                toggleAuxBtn.classList.remove("blue", "darken-1");
+            }
+            return;
+        }
+
+        const classNames = new Set((toggleAuxBtn.className || "").split(/\s+/).filter(Boolean));
+        if (isActive) {
+            classNames.add("blue");
+            classNames.add("darken-1");
+        } else {
+            classNames.delete("blue");
+            classNames.delete("darken-1");
+        }
+
+        toggleAuxBtn.className = Array.from(classNames).join(" ");
+    }
 }
 
 /**

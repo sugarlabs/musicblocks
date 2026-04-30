@@ -9,7 +9,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* eslint-disable no-redeclare */
 /*
    global
 
@@ -58,6 +57,16 @@
   GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
   SEMITONES, CHROMATIC_SOLFEGE
 */
+
+/**
+ * Normalize Unicode accidental symbols in a note string to ASCII equivalents.
+ * @param {string} note
+ * @returns {string}
+ */
+function normalizeNoteAccidentals(note) {
+    const map = { "♭": "b", "♯": "#", "𝄫": "bb", "𝄪": "x" };
+    return note.replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
+}
 
 /**
  * Scalable sinewave graphic.
@@ -406,9 +415,9 @@ const SOLFEGENAMES1 = [
     "sol",
     "sol" + SHARP,
     "sol" + DOUBLESHARP,
-    "la",
     "la" + DOUBLEFLAT,
     "la" + FLAT,
+    "la",
     "la" + SHARP,
     "la" + DOUBLESHARP,
     "ti" + DOUBLEFLAT,
@@ -488,9 +497,9 @@ const NOTENAMES1 = [
     "G",
     "G" + SHARP,
     "G" + DOUBLESHARP,
-    "A",
     "A" + DOUBLEFLAT,
     "A" + FLAT,
+    "A",
     "A" + SHARP,
     "A" + DOUBLESHARP,
     "B" + DOUBLEFLAT,
@@ -882,7 +891,6 @@ const CENTS_PER_OCTAVE = SEMITONES * CENTS_PER_SEMITONE;
 const POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
 
 const TWELTHROOT2 = 1.0594630943592953;
-// eslint-disable-next-line no-loss-of-precision
 const TWELVEHUNDRETHROOT2 = 1.0005777895065549;
 
 /**
@@ -2953,31 +2961,26 @@ const frequencyToPitch = hz => {
 };
 
 /**
- * Get the articulation symbols from a note string.
+ * Get the articulation (accidental/direction) suffix from a note string by
+ * stripping the leading note-name prefix.
+ *
+ * Valid prefixes are the seven solfege syllables (do, re, mi, fa, sol, la, ti)
+ * and the seven letter note names (A–G). The prefix is matched only at the
+ * start of the string so that custom note names that happen to contain these
+ * letters elsewhere are not mangled.
+ *
  * @function
- * @param {string} note - The note string.
- * @returns {string} The note string without articulation symbols.
+ * @param {string} note - The note string (e.g. "C♯", "sol♭", "A^^").
+ * @returns {string} Whatever follows the note-name prefix (the articulation),
+ *     or the full string unchanged if no recognised prefix is found.
  */
 const getArticulation = note => {
-    return note
-        .replace("do", "")
-        .replace("re", "")
-        .replace("mi", "")
-        .replace("fa", "")
-        .replace("sol", "")
-        .replace("la", "")
-        .replace("ti", "")
-        .replace("A", "")
-        .replace("B", "")
-        .replace("C", "")
-        .replace("D", "")
-        .replace("E", "")
-        .replace("F", "")
-        .replace("G", "")
-        .replace("^^", "") // up/down from custom notes
-        .replace("vv", "")
-        .replace("^", "")
-        .replace("v", "");
+    // Match solfege names (longest first to avoid "sol" being shadowed by
+    // a later "la" replacement) or a single letter note name, anchored at
+    // the very start of the string.  Everything after the prefix is the
+    // articulation we want.
+    const match = note.match(/^(?:sol|do|re|mi|fa|la|ti|[A-G])(.*)/);
+    return match ? match[1] : note;
 };
 
 /**
@@ -3191,13 +3194,13 @@ const modeMapper = (key, mode) => {
                     key = "b";
                     break;
                 case "d" + SHARP:
-                    key = "b";
+                    key = "c" + SHARP;
                     break;
                 case "f" + SHARP:
-                    key = "f";
+                    key = "e";
                     break;
                 case "g" + SHARP:
-                    key = "b";
+                    key = "f" + SHARP;
                     break;
                 case "a" + SHARP:
                     key = "g" + SHARP;
@@ -3237,7 +3240,7 @@ const modeMapper = (key, mode) => {
                     key = "c";
                     break;
                 case "f":
-                    key = "b";
+                    key = "d" + FLAT;
                     break;
                 case "g":
                     key = "c";
@@ -3372,7 +3375,7 @@ const modeMapper = (key, mode) => {
                     key = "e";
                     break;
                 case "c" + SHARP:
-                    key = "b";
+                    key = "f" + SHARP;
                     break;
                 case "d" + SHARP:
                     key = "g" + SHARP;
@@ -3381,7 +3384,7 @@ const modeMapper = (key, mode) => {
                     key = "b";
                     break;
                 case "g" + SHARP:
-                    key = "b";
+                    key = "c" + SHARP;
                     break;
                 case "a" + SHARP:
                     key = "c";
@@ -3423,7 +3426,7 @@ const modeMapper = (key, mode) => {
                     key = "f";
                     break;
                 case "f":
-                    key = "b";
+                    key = "g" + FLAT;
                     break;
                 case "g":
                     key = "g" + SHARP;
@@ -3444,7 +3447,7 @@ const modeMapper = (key, mode) => {
                     key = "g";
                     break;
                 case "g" + SHARP:
-                    key = "a ";
+                    key = "a";
                     break;
                 case "a" + SHARP:
                     key = "b";
@@ -4059,7 +4062,7 @@ const numberToPitch = (i, temperament, startPitch, offset, activity) => {
             // store equal temperament notes.
             for (let j = 0; j < 12; j++) {
                 const number = "" + j;
-                interval = TEMPERAMENT["equal"]["interval"][i];
+                interval = TEMPERAMENT["equal"]["interval"][j];
                 TEMPERAMENT[temperament][number] = [
                     Math.pow(2, j / 12),
                     getNoteFromInterval(startPitch, interval)[0],
@@ -4118,10 +4121,8 @@ const GetNotesForInterval = tur => {
         octave = octaveblk[octaveblk.length - 1] - octaveblk[0];
     }
 
-    firstNote = firstNote.replace("♭", "b");
-    secondNote = secondNote.replace("♭", "b");
-    firstNote = firstNote.replace("♯", "#");
-    secondNote = secondNote.replace("♯", "#");
+    firstNote = normalizeNoteAccidentals(firstNote);
+    secondNote = normalizeNoteAccidentals(secondNote);
 
     return { firstNote, secondNote, octave };
 };
@@ -4289,6 +4290,7 @@ function getNote(
             case FLAT + SHARP:
             case SHARP + FLAT:
             default:
+                noteArg += articulation;
                 break;
         }
 
@@ -4739,6 +4741,7 @@ function getNote(
             case FLAT + SHARP:
             case SHARP + FLAT:
             default:
+                noteArg += articulation;
                 break;
         }
 
@@ -6447,6 +6450,7 @@ if (typeof module !== "undefined" && module.exports) {
         convertFactor,
         getPitchInfo,
         noteToFrequency,
+        normalizeNoteAccidentals,
         TEMPERAMENT,
         setOctaveRatio,
         getOctaveRatio,
@@ -6507,6 +6511,12 @@ if (typeof module !== "undefined" && module.exports) {
         NOTESTEP,
         MUSICALMODES,
         SHARP,
-        FLAT
+        FLAT,
+        NOTENAMES,
+        SOLFEGENAMES1,
+        ALLNOTENAMES,
+        NOTENAMES1,
+        PITCHES1,
+        PITCHES3
     };
 }

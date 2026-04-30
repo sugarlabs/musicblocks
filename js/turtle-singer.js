@@ -24,7 +24,7 @@
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
    noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction,
-   SEMITONES
+   SEMITONES, normalizeNoteAccidentals
  */
 
 /*
@@ -271,6 +271,11 @@ class Singer {
             }
         });
         this.activeVoices.clear();
+
+        const stopBtn = document.getElementById("stop");
+        if (stopBtn) {
+            stopBtn.style.display = "none";
+        }
     }
 
     // ========= Class variables ==============================================
@@ -284,63 +289,6 @@ class Singer {
             ? TONEBPM / TARGETBPM
             : 1;
     static masterVolume = [typeof DEFAULTVOLUME !== "undefined" ? DEFAULTVOLUME : 50];
-
-    // ========= Deprecated ===================================================
-
-    /**
-     * @deprecated
-     * @static
-     * @param {*[]} args - arguments (parameters)
-     * @param {Object} logo - Logo object
-     * @param {Object} turtle - Turtle object
-     * @param {Object} blk - corresponding Block object index in blocks.blockList
-     */
-    static playSynthBlock(args, activity, logo, turtle, blk) {
-        if (args.length === 1) {
-            const obj = frequencyToPitch(args[0]);
-
-            if (logo.inMatrix) {
-                logo.phraseMaker.addRowBlock(blk);
-                if (!logo.pitchBlocks.includes(blk)) {
-                    logo.pitchBlocks.push(blk);
-                }
-
-                logo.phraseMaker.rowLabels.push(activity.logo.blocks.blockList[blk].name);
-                logo.phraseMaker.rowArgs.push(args[0]);
-            } else if (logo.inLegoWidget && !logo.inMatrix) {
-                logo.legoWidget.addRowBlock(blk);
-                if (!logo.pitchBlocks.includes(blk)) {
-                    logo.pitchBlocks.push(blk);
-                }
-
-                logo.legoWidget.rowLabels.push(activity.logo.blocks.blockList[blk].name);
-                logo.legoWidget.rowArgs.push(args[0]);
-            } else if (logo.inPitchSlider) {
-                logo.pitchSlider.frequency = args[0];
-            } else {
-                const tur = activity.turtles.ithTurtle(turtle);
-
-                tur.singer.oscList[last(tur.singer.inNoteBlock)].push(
-                    activity.blocks.blockList[blk].name
-                );
-
-                // We keep track of pitch and octave for notation purposes
-                tur.singer.notePitches[last(tur.singer.inNoteBlock)].push(obj[0]);
-                tur.singer.noteOctaves[last(tur.singer.inNoteBlock)].push(obj[1]);
-                tur.singer.noteCents[last(tur.singer.inNoteBlock)].push(obj[2]);
-                if (obj[2] !== 0) {
-                    tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(
-                        getCachedPitchToFrequency(obj[0], obj[1], obj[2], tur.singer.keySignature)
-                    );
-                } else {
-                    tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(0);
-                }
-
-                tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(tur.singer.beatFactor);
-                tur.singer.pushedNote = true;
-            }
-        }
-    }
 
     // ========= Utilities ====================================================
 
@@ -783,6 +731,10 @@ class Singer {
      */
     static setSynthVolume(logo, turtle, synth, volume, blk) {
         volume = Math.min(Math.max(volume, 0), 100);
+
+        if (logo.synth && typeof logo.synth.resolveInstrumentName === "function") {
+            synth = logo.synth.resolveInstrumentName(synth);
+        }
 
         switch (synth) {
             case "noise1":
@@ -1402,7 +1354,12 @@ class Singer {
             tur.singer.pushedNote = true;
 
             Singer.processNote(activity, tur.singer.defaultNoteValue, false, blk, turtle, () => {
-                tur.singer.inNoteBlock.splice(tur.singer.inNoteBlock.indexOf(blk), 1);
+                const idx = tur.singer.inNoteBlock.indexOf(blk);
+                if (idx !== -1) {
+                    tur.singer.inNoteBlock.splice(idx, 1);
+                } else {
+                    console.warn("Singer: block", blk, "not found in inNoteBlock");
+                }
             });
         }
     }
@@ -1587,7 +1544,13 @@ class Singer {
                 const synth = synthKeys[i];
                 const oldVol = last(tur.singer.synthVolume[synth]);
                 const len = tur.singer.synthVolume[synth].length;
-                tur.singer.synthVolume[synth][len - 1] += last(tur.singer.crescendoDelta);
+                tur.singer.synthVolume[synth][len - 1] = Math.min(
+                    Math.max(
+                        tur.singer.synthVolume[synth][len - 1] + last(tur.singer.crescendoDelta),
+                        0
+                    ),
+                    100
+                );
                 if (!tur.singer.suppressOutput) {
                     Singer.setSynthVolume(activity.logo, turtle, synth, oldVol);
                     activity.logo.synth.rampTo(
@@ -2238,6 +2201,15 @@ class Singer {
                     }
 
                     if (notes.length > 0) {
+                        const stopBtn = document.getElementById("stop");
+                        if (stopBtn) {
+                            if (stopBtn.style.display !== "inline-block") {
+                                stopBtn.style.display = "inline-block";
+                            }
+                            if (stopBtn.style.color !== "#ea174c") {
+                                stopBtn.style.color = "#ea174c";
+                            }
+                        }
                         const len = notes[0].length;
                         if (typeof notes[0] === "number") {
                             tur.singer.currentOctave = frequencyToPitch(notes[0])[1];
@@ -2248,7 +2220,7 @@ class Singer {
 
                         for (let i = 0; i < notes.length; i++) {
                             if (typeof notes[i] === "string") {
-                                notes[i] = notes[i].replace(/♭/g, "b").replace(/♯/g, "#");
+                                notes[i] = normalizeNoteAccidentals(notes[i]);
                             }
                         }
 

@@ -4696,7 +4696,7 @@ msgid "index heap"
 msgstr "हीप में स्थिति में से मूल्य प्राप्त करें"
 
 #: js/blocks/HeapBlocks.js:521
-msgid "The Set-heap entry block sets a value in he heap at the specified location."
+msgid "The Set-heap entry block sets a value in the heap at the specified location."
 msgstr "सेट-हीप एंट्री ब्लॉक निर्दिष्ट स्थान पर हीप में मूल्य सेट करता है।"
 
 #: js/blocks/HeapBlocks.js:537
@@ -5791,7 +5791,7 @@ msgid "run block"
 msgstr "रन ब्लॉक"
 
 #: js/blocks/ProgramBlocks.js:1023
-msgid "The Dock block block connections two blocks."
+msgid "The Dock block connects two blocks."
 msgstr "डॉक ब्लॉक ब्लॉक दो ब्लॉकों को जोड़ता है।"
 
 #: js/blocks/ProgramBlocks.js:1034

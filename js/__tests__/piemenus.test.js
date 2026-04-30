@@ -9,7 +9,13 @@
  * (at your option) any later version.
  */
 
+const fs = require("fs");
+const path = require("path");
+
 const { piemenuPitches } = require("../piemenus");
+
+const piemenusPath = path.join(__dirname, "..", "piemenus.js");
+let piemenusContent;
 
 // Mock Globals
 global.docById = jest.fn().mockReturnValue({
@@ -101,6 +107,11 @@ global.buildScale = jest.fn(() => [["C", "D", "E", "F", "G", "A", "B", "C"], []]
 
 describe("piemenus behavioral tests", () => {
     let mockBlock;
+
+    beforeAll(() => {
+        piemenusContent = fs.readFileSync(piemenusPath, "utf8");
+    });
+
     beforeEach(() => {
         mockBlock = {
             container: { x: 100, y: 100, setChildIndex: jest.fn(), children: [] },
@@ -187,5 +198,13 @@ describe("piemenus behavioral tests", () => {
         // prevPitch+delta = 4+1 = 5. 5 > 4, so deltaOctave = -1.
         // Octave 4 -> 3.
         expect(mockBlock.blocks.setPitchOctave).toHaveBeenCalledWith("mock-id", 3);
+    });
+
+    describe("Block Help Menu", () => {
+        it("should load help before opening the aux pie menu help widget", () => {
+            expect(piemenusContent).toMatch(
+                /if \(typeof HelpWidget === "undefined"\)\s*\{\s*if \(typeof require !== "undefined"\)\s*\{\s*require\(\["widgets\/help"\], function \(\) \{\s*new HelpWidget\(that, true\);/
+            );
+        });
     });
 });

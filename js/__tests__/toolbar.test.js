@@ -237,15 +237,18 @@ describe("Toolbar Class", () => {
         const elements = {
             play: {
                 onclick: null,
-                addEventListener: jest.fn()
+                addEventListener: jest.fn(),
+                setAttribute: jest.fn()
             },
             stop: {
                 style: { color: "" },
                 addEventListener: jest.fn(),
-                removeEventListener: jest.fn()
+                removeEventListener: jest.fn(),
+                setAttribute: jest.fn()
             },
             record: {
-                className: ""
+                className: "",
+                setAttribute: jest.fn()
             }
         };
 
@@ -284,7 +287,12 @@ describe("Toolbar Class", () => {
     });
 
     test("renderStopIcon sets onclick and updates stop button behavior", () => {
-        const stopIcon = { onclick: null, style: { color: "" } };
+        const stopIcon = {
+            onclick: null,
+            style: { color: "" },
+            setAttribute: jest.fn(),
+            addEventListener: jest.fn()
+        };
         const recordButton = { className: "recording" };
 
         global.docById.mockImplementation(id =>
@@ -694,7 +702,11 @@ describe("Toolbar Class", () => {
                 }
             },
             "toggleAuxBtn": {
-                className: ""
+                className: "tooltipped aux-toggle",
+                classList: {
+                    add: jest.fn(),
+                    remove: jest.fn()
+                }
             },
             "chooseKeyDiv": {
                 style: { display: "" }
@@ -717,7 +729,7 @@ describe("Toolbar Class", () => {
 
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, false);
         expect(elements.menu.innerHTML).toBe("more_vert");
-        expect(elements.toggleAuxBtn.className).toBe("blue darken-1");
+        expect(elements.toggleAuxBtn.classList.add).toHaveBeenCalledWith("blue", "darken-1");
         expect(elements.search.classList.toggle).toHaveBeenCalledWith("open");
 
         elements["aux-toolbar"].style.display = "block";
@@ -726,7 +738,8 @@ describe("Toolbar Class", () => {
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, true);
         expect(elements["aux-toolbar"].style.display).toBe("none");
         expect(elements.menu.innerHTML).toBe("menu");
-        expect(elements.toggleAuxBtn.className).toBe(NaN);
+        expect(elements.toggleAuxBtn.classList.remove).toHaveBeenCalledWith("blue", "darken-1");
+        expect(elements.toggleAuxBtn.className).toBe("tooltipped aux-toggle");
         expect(elements.chooseKeyDiv.style.display).toBe("none");
     });
 
@@ -1050,7 +1063,13 @@ describe("Toolbar Class", () => {
         const elements = {
             "aux-toolbar": { style: { display: "block" } },
             "menu": { innerHTML: "" },
-            "toggleAuxBtn": { className: "some-class blue darken-1" }
+            "toggleAuxBtn": {
+                className: "some-class blue darken-1",
+                classList: {
+                    add: jest.fn(),
+                    remove: jest.fn()
+                }
+            }
         };
 
         global.docById.mockImplementation(id => elements[id] || {});
@@ -1060,6 +1079,7 @@ describe("Toolbar Class", () => {
         expect(elements["aux-toolbar"].style.display).toBe("none");
         expect(elements.menu.innerHTML).toBe("menu");
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, false);
+        expect(elements.toggleAuxBtn.classList.remove).toHaveBeenCalledWith("blue", "darken-1");
     });
     test("renderLanguageSelectIcon highlights Japanese kana variant correctly", () => {
         const mockLangElement = {

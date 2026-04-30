@@ -16,7 +16,7 @@
    global
 
    platformColor, _, docById, getNote, setCustomChord, keySignatureToMode,
-   getModeNumbers, getTemperament
+   getModeNumbers, getTemperament, normalizeNoteAccidentals
 */
 /*
    Global locations
@@ -275,39 +275,6 @@ class Arpeggio {
      */
     _get_save_lock() {
         return this._save_lock;
-    }
-
-    /**
-     * @deprecated
-     */
-    _addButton(row, icon, iconSize, label) {
-        const cell = row.insertCell(-1);
-        cell.innerHTML = `&nbsp;&nbsp;<img 
-                src="header-icons/${icon}" 
-                title="${label}" 
-                alt="${label}" 
-                height="${iconSize}" 
-                width="${iconSize}" 
-                vertical-align="middle" 
-                align-content="center"
-            >&nbsp;&nbsp;`;
-        cell.style.width = Arpeggio.BUTTONSIZE + "px";
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = cell.style.width;
-        cell.style.minHeight = cell.style.height;
-        cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
-
-        cell.onmouseover = () => {
-            cell.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        };
-
-        cell.onmouseout = () => {
-            cell.style.backgroundColor = platformColor.selectorBackground;
-        };
-
-        return cell;
     }
 
     /**
@@ -605,8 +572,7 @@ class Arpeggio {
             if (this._playList[i][0].length > 0) {
                 this._activity.logo.synth.trigger(
                     0,
-                    this._playList[i][0][0].replace(/♭/g, "b").replace(/♯/g, "#") +
-                        this._playList[i][0][1],
+                    normalizeNoteAccidentals(this._playList[i][0][0]) + this._playList[i][0][1],
                     this._playList[i][1],
                     "default",
                     null,
@@ -697,7 +663,7 @@ class Arpeggio {
             const note = noteObj[0] + noteObj[1];
             this._activity.logo.synth.trigger(
                 0,
-                note.replace(/♭/g, "b").replace(/♯/g, "#"),
+                normalizeNoteAccidentals(note),
                 this.notesToPlay[0][1],
                 "default",
                 null,

@@ -355,6 +355,58 @@ function setupPitchActions(activity) {
         }
 
         /**
+         * Plays a synth block from a raw frequency input while preserving the
+         * legacy widget behavior for matrix, LEGO, and pitch slider contexts.
+         *
+         * @param {Number} hertz - frequency in hertz
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number|String} blk - corresponding Block object index in blocks.blockList
+         */
+        static playSynthFrequency(hertz, turtle, blk) {
+            const tur = activity.turtles.ithTurtle(turtle);
+            const obj = frequencyToPitch(hertz);
+
+            if (activity.logo.inMatrix) {
+                activity.logo.phraseMaker.addRowBlock(blk);
+                if (!activity.logo.pitchBlocks.includes(blk)) {
+                    activity.logo.pitchBlocks.push(blk);
+                }
+
+                activity.logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
+                activity.logo.phraseMaker.rowArgs.push(hertz);
+            } else if (activity.logo.inLegoWidget && !activity.logo.inMatrix) {
+                activity.logo.legoWidget.addRowBlock(blk);
+                if (!activity.logo.pitchBlocks.includes(blk)) {
+                    activity.logo.pitchBlocks.push(blk);
+                }
+
+                activity.logo.legoWidget.rowLabels.push(activity.blocks.blockList[blk].name);
+                activity.logo.legoWidget.rowArgs.push(hertz);
+            } else if (activity.logo.inPitchSlider) {
+                activity.logo.pitchSlider.frequency = hertz;
+            } else {
+                tur.singer.oscList[last(tur.singer.inNoteBlock)].push(
+                    activity.blocks.blockList[blk].name
+                );
+
+                // We keep track of pitch and octave for notation purposes.
+                tur.singer.notePitches[last(tur.singer.inNoteBlock)].push(obj[0]);
+                tur.singer.noteOctaves[last(tur.singer.inNoteBlock)].push(obj[1]);
+                tur.singer.noteCents[last(tur.singer.inNoteBlock)].push(obj[2]);
+                if (obj[2] !== 0) {
+                    tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(
+                        pitchToFrequency(obj[0], obj[1], obj[2], tur.singer.keySignature)
+                    );
+                } else {
+                    tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(0);
+                }
+
+                tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(tur.singer.beatFactor);
+                tur.singer.pushedNote = true;
+            }
+        }
+
+        /**
          * Creates sharps and flats.
          *
          * @param {String} accidental - type of accidental

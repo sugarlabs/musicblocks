@@ -17,7 +17,7 @@
 
    platformColor, _, docById, getNote, getDrumName, getDrumIcon,
    getDrumSynthName, Singer, MATRIXSOLFEHEIGHT, MATRIXSOLFEWIDTH,
-   SOLFEGECONVERSIONTABLE
+   SOLFEGECONVERSIONTABLE, normalizeNoteAccidentals
 */
 /*
    Global locations
@@ -448,49 +448,6 @@ class PitchDrumMatrix {
      */
     _get_save_lock() {
         return this._save_lock;
-    }
-
-    /**
-     * [DEPRECATED] Adds a button to the matrix.
-     *
-     * @private
-     * @deprecated This method is deprecated.
-     * @param {HTMLTableRowElement} row - The table row to which the button will be added.
-     * @param {string} icon - The icon image source.
-     * @param {number} iconSize - The size of the icon.
-     * @param {string} label - The label text for the button.
-     * @returns {HTMLTableCellElement} - The cell element containing the button.
-     */
-    _addButton(row, icon, iconSize, label) {
-        const cell = row.insertCell(-1);
-        cell.textContent = "\u00A0\u00A0";
-        const img = document.createElement("img");
-        img.src = `header-icons/${icon}`;
-        img.title = label;
-        img.alt = label;
-        img.setAttribute("height", iconSize);
-        img.setAttribute("width", iconSize);
-        img.setAttribute("vertical-align", "middle");
-        img.setAttribute("align-content", "center");
-        cell.appendChild(img);
-        cell.appendChild(document.createTextNode("\u00A0\u00A0"));
-        cell.style.width = PitchDrumMatrix.BUTTONSIZE + "px";
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = cell.style.width;
-        cell.style.minHeight = cell.style.height;
-        cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
-
-        cell.onmouseover = () => {
-            cell.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        };
-
-        cell.onmouseout = () => {
-            cell.style.backgroundColor = platformColor.selectorBackground;
-        };
-
-        return cell;
     }
 
     /**
@@ -932,7 +889,7 @@ class PitchDrumMatrix {
             const waitTime = Singer.defaultBPMFactor * 1000 * 0.25;
             this.activity.logo.synth.trigger(
                 0,
-                note.replace(/♭/g, "b").replace(/♯/g, "#"),
+                normalizeNoteAccidentals(note),
                 0.125,
                 "default",
                 null,

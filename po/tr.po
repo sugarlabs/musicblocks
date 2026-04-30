@@ -5741,7 +5741,7 @@ msgid "Maximum heap size is 1000."
 msgstr "maksimum yığın boyutu 1000'dir"
 
 #: js/blocks/HeapBlocks.js:523
-msgid "The Set-heap entry block sets a value in he heap at the specified location."
+msgid "The Set-heap entry block sets a value in the heap at the specified location."
 msgstr ""
 
 #: js/blocks/HeapBlocks.js:539
@@ -6232,7 +6232,7 @@ msgid "run block"
 msgstr "blok çalıştır"
 
 #: js/blocks/ProgramBlocks.js:1025
-msgid "The Dock block block connections two blocks."
+msgid "The Dock block connects two blocks."
 msgstr "rıhtım bloğu blok bağlantıları iki blok"
 
 #: js/blocks/ProgramBlocks.js:1036
@@ -13326,7 +13326,7 @@ msgstr ""
 
 #: js/turtledefs.js:413
 
-#~ msgid "The <em>Setheapentry</em> block sets a value in he heap at the specified location."
+#~ msgid "The <em>Setheapentry</em> block sets a value in the heap at the specified location."
 #~ msgstr ""
 
 #: js/turtledefs.js:29
@@ -14741,7 +14741,7 @@ msgstr ""
 
 #: js/turtledefs.js:421
 
-#~ msgid "The Setheapentry block sets a value in he heap at the specified location."
+#~ msgid "The Setheapentry block sets a value in the heap at the specified location."
 #~ msgstr ""
 
 #: js/utilitybox.js:281

@@ -87,7 +87,7 @@ function setupWidgetBlocks(activity) {
 
     /**
      * Ensures that a widget is loaded and initialized before executing block logic.
-     * If the widget is null, it initiates a lazy load and returns an interruption signal.
+     * If the widget is missing, it initiates a lazy load and returns an interruption signal.
      *
      * @param {object} logo - The logo object.
      * @param {string} widgetKey - The key for the widget in the logo object.
@@ -99,7 +99,7 @@ function setupWidgetBlocks(activity) {
      * @returns {[null, number, boolean]|null} - Interruption signal or null if already loaded.
      */
     function _ensureWidget(logo, widgetKey, modules, initFn, turtle, blk, receivedArg) {
-        if (logo[widgetKey] === null) {
+        if (logo[widgetKey] === null || logo[widgetKey] === undefined) {
             logo[widgetKey] = "loading"; // Guard against multiple simultaneous loads
             _lazyRequire(modules, function () {
                 logo[widgetKey] = initFn();
@@ -412,7 +412,18 @@ function setupWidgetBlocks(activity) {
          * @param {object} blk - The block object.
          * @returns {number[]} - The output values.
          */
-        flow(args, logo, turtle, blk) {
+        flow(args, logo, turtle, blk, receivedArg) {
+            const interruption = _ensureWidget(
+                logo,
+                "sample",
+                ["widgets/sampler"],
+                () => new SampleWidget(),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
+
             logo.inSample = true;
 
             const listenerName = "_sampler_" + turtle;
@@ -1808,7 +1819,17 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = event => {
-                logo.sample.init(activity);
+                const interruption = _ensureWidget(
+                    logo,
+                    "aiMusic",
+                    ["widgets/aiwidget"],
+                    () => new AIWidget(),
+                    turtle,
+                    blk,
+                    ""
+                );
+                if (interruption) return interruption;
+                logo.aiMusic.init(activity);
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -2003,14 +2024,23 @@ function setupWidgetBlocks(activity) {
          * @param {object} blk - The block object.
          * @returns {number[]} - The output values.
          */
-        flow(args, logo, turtle, blk) {
-            logo.inSample = true;
+        flow(args, logo, turtle, blk, receivedArg) {
+            const interruption = _ensureWidget(
+                logo,
+                "aiDebugger",
+                ["widgets/aidebugger"],
+                () => new AIDebuggerWidget(),
+                turtle,
+                blk,
+                receivedArg
+            );
+            if (interruption) return interruption;
 
-            const listenerName = "_sampler_" + turtle;
+            const listenerName = "_aidebugger_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = event => {
-                logo.sample.init(activity);
+                logo.aiDebugger.init(activity);
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -2035,7 +2065,7 @@ function setupWidgetBlocks(activity) {
         new ChromaticBlock().setup(activity);
         new LegoBricksBlock().setup(activity);
         new ReflectionBlock().setup(activity);
-        // new AIMusicBlocks().setup(activity);
+        new AIMusicBlocks().setup(activity);
         new MusicKeyboard2Block().setup(activity);
         new MusicKeyboardBlock().setup(activity);
         new PitchStaircaseBlock().setup(activity);
