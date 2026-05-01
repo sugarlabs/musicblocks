@@ -2119,7 +2119,10 @@ function MusicKeyboard(activity) {
                         lastNote = null;
                     }
 
-                    if (pitchLabels[i].includes(lastNote) || lastNote.includes(pitchLabels[i])) {
+                    if (
+                        lastNote !== null &&
+                        (pitchLabels[i].includes(lastNote) || lastNote.includes(pitchLabels[i]))
+                    ) {
                         break;
                     }
                 }
