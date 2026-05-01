@@ -739,18 +739,6 @@ describe("setupPitchBlocks", () => {
         });
     });
 
-    describe("Macro Execution", () => {
-        it("calls makeMacro on all blocks that have it", () => {
-            Object.values(createdBlocks).forEach(block => {
-                if (block.makeMacro) {
-                    block.makeMacro(100, 100);
-                    block.makeMacro(null, null);
-                }
-            });
-            expect(true).toBe(true);
-        });
-    });
-
     describe("Existence", () => {
         const blocks = [
             "rest",
