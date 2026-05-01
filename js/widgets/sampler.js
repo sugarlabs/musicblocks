@@ -19,6 +19,14 @@
 */
 
 /* exported SampleWidget */
+
+/**
+ * AI sample generation endpoint. Must be HTTPS in production.
+ * Set window.AI_SAMPLE_ENDPOINT to a valid URL to enable the feature.
+ * Leave empty or unset to disable with a user visible message.
+ */
+const AI_SAMPLE_ENDPOINT = window.AI_SAMPLE_ENDPOINT || "";
+
 /**
  * Represents a Sample Widget.
  * @constructor
@@ -654,11 +662,32 @@ function SampleWidget() {
             container.style.gap = "20px";
 
             const h1 = document.createElement("h1");
-            h1.textContent = "AI Sample Generation";
+            h1.textContent = _("AI Sample Generation");
             h1.style.fontSize = "40px";
             h1.style.marginTop = "0";
             h1.style.marginBottom = "0px";
             h1.style.fontWeight = "200";
+
+            if (!AI_SAMPLE_ENDPOINT) {
+                const notice = document.createElement("p");
+                notice.textContent = _(
+                    "AI sample generation is not available. No endpoint configured."
+                );
+                notice.style.fontSize = "20px";
+                notice.style.color = "#888";
+                notice.style.textAlign = "center";
+                notice.style.marginTop = "40px";
+                container.appendChild(h1);
+                container.appendChild(notice);
+                aiDiv.appendChild(container);
+                return;
+            }
+
+            if (AI_SAMPLE_ENDPOINT.startsWith("http://")) {
+                console.warn(
+                    "[SampleWidget] AI endpoint uses insecure HTTP. HTTPS is recommended."
+                );
+            }
 
             const textArea = document.createElement("textarea");
             textArea.style.height = "200px";
@@ -693,12 +722,12 @@ function SampleWidget() {
             submit.style.borderRadius = "10px";
             submit.style.border = "none";
             submit.style.cursor = "pointer";
-            submit.textContent = "Submit";
+            submit.textContent = _("Submit");
             submit.onclick = async function () {
                 submit.disabled = true;
                 const prompt = textArea.value;
                 const encodedPrompt = encodeURIComponent(prompt);
-                const url = `http://13.61.94.100:8000/generate?prompt=${encodedPrompt}`;
+                const url = `${AI_SAMPLE_ENDPOINT}/generate?prompt=${encodedPrompt}`;
 
                 let blinkInterval;
 
@@ -739,7 +768,7 @@ function SampleWidget() {
             preview.style.borderRadius = "10px";
             preview.style.border = "none";
             preview.style.cursor = "pointer";
-            preview.textContent = "Preview";
+            preview.textContent = _("Preview");
             preview.disabled = true;
             preview.onclick = () => {
                 if (that.audioPreview) {
@@ -748,7 +777,7 @@ function SampleWidget() {
                     that.audioPreview = null;
                 }
 
-                const audioURL = `http://13.61.94.100:8000/preview`;
+                const audioURL = `${AI_SAMPLE_ENDPOINT}/preview`;
                 const newAudio = new Audio(audioURL);
                 that.audioPreview = newAudio;
                 newAudio.play();
@@ -767,10 +796,10 @@ function SampleWidget() {
             save.style.borderRadius = "10px";
             save.style.border = "none";
             save.style.cursor = "pointer";
-            save.textContent = "Save";
+            save.textContent = _("Save");
             save.disabled = true;
             save.onclick = function () {
-                const audioURL = `http://13.61.94.100:8000/save`;
+                const audioURL = `${AI_SAMPLE_ENDPOINT}/save`;
                 const link = document.createElement("a");
                 link.href = audioURL;
                 link.download = "output.wav";
@@ -787,162 +816,6 @@ function SampleWidget() {
             container.appendChild(textArea);
             container.appendChild(buttonDiv);
         };
-
-        // Commented out the audio trimmer code because it doesn't provide a visual trimming interface.
-
-        // this._trimBtn.onclick = () => {
-
-        //     this.widgetWindow.clearScreen();
-        //     let width, height;
-        //     if (!this.widgetWindow.isMaximized()) {
-        //         width = SAMPLEWIDTH;
-        //         height = SAMPLEHEIGHT;
-        //     } else {
-        //         width = this.widgetWindow.getWidgetBody().getBoundingClientRect().width;
-        //         height = this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 70;
-        //     }
-
-        //     const container = document.createElement("div");
-        //     container.id = "samplerPrompt";
-        //     this.widgetWindow.getWidgetBody().appendChild(container);
-
-        //     container.style.height = height + "px";
-        //     container.style.width = width + "px";
-        //     container.style.display = "flex";
-        //     container.style.flexDirection = "column";
-        //     container.style.alignItems = "center";
-        //     container.style.justifyContent = "center";
-        //     container.style.gap = "20px";
-
-        //     const h1 = document.createElement("h1");
-        //     h1.innerHTML = "Audio Trimmer";
-        //     h1.style.fontSize = "40px";
-        //     h1.style.marginTop = "0";
-        //     h1.style.marginBottom = "0px";
-        //     h1.style.fontWeight = "200";
-
-        //     const divUploadSample = document.createElement("div");
-        //     divUploadSample.style.backgroundColor = "#8cc6ff";
-        //     divUploadSample.style.width = "50px";
-        //     divUploadSample.style.height = "50px";
-        //     divUploadSample.style.display = "flex";
-        //     divUploadSample.style.cursor = "pointer";
-        //     divUploadSample.style.justifyContent = "center";
-        //     divUploadSample.style.alignItems = "center";
-
-        //     const uploadSample = document.createElement("img");
-        //     uploadSample.setAttribute("src", "/header-icons/load-media.svg");
-        //     uploadSample.style.height = "32px";
-        //     uploadSample.style.width = "32px";
-
-        //     divUploadSample.appendChild(uploadSample);
-
-        //     const fileChooser = document.createElement("input");
-        //     fileChooser.type = "file";
-
-        //     divUploadSample.onclick = function () {
-        //         fileChooser.click();
-        //     };
-
-        //     fileChooser.onchange = function () {
-        //         const file = fileChooser.files[0];
-        //         const audioPlayer = document.createElement("audio");
-        //         audioPlayer.controls = true;
-        //         const fileURL = URL.createObjectURL(file);
-        //         audioPlayer.src = fileURL;
-        //         container.replaceChild(audioPlayer, divUploadSample);
-        //     };
-
-        //     const inputDiv = document.createElement("div");
-        //     inputDiv.style.width = "400px";
-        //     inputDiv.style.display = "flex";
-        //     inputDiv.style.justifyContent = "space-between";
-
-        //     const fromInputBox = document.createElement("input");
-        //     fromInputBox.type = "text";
-        //     fromInputBox.title = "Enter start time (in seconds)";
-        //     fromInputBox.placeholder = "0.00";
-        //     fromInputBox.style.width = "152px";
-        //     fromInputBox.style.height = "61px";
-        //     fromInputBox.style.backgroundColor = "#FFFFFF";
-        //     fromInputBox.style.color = "#766C6C";
-        //     fromInputBox.style.fontSize = "32px";
-        //     fromInputBox.style.font = "Inter";
-        //     fromInputBox.style.borderRadius = "10px"
-        //     fromInputBox.style.border = "none"
-        //     fromInputBox.style.padding = "8px";
-        //     fromInputBox.style.textAlign = "center";
-        //     fromInputBox.type = "number";
-
-        //     const toInputBox = document.createElement("input");
-        //     toInputBox.type = "text";
-        //     toInputBox.title = "Enter end time (in seconds)";
-        //     toInputBox.placeholder = "10.00";
-        //     toInputBox.style.width = "152px";
-        //     toInputBox.style.height = "61px";
-        //     toInputBox.style.backgroundColor = "#FFFFFF";
-        //     toInputBox.style.color = "#766C6C";
-        //     toInputBox.style.fontSize = "32px";
-        //     toInputBox.style.font = "Inter";
-        //     toInputBox.style.borderRadius = "10px";
-        //     toInputBox.style.border = "none";
-        //     toInputBox.style.padding = "8px";
-        //     toInputBox.style.textAlign = "center";
-        //     toInputBox.type = "number";
-
-        //     inputDiv.appendChild(fromInputBox);
-        //     inputDiv.appendChild(toInputBox);
-
-        //     const buttonDiv = document.createElement("div");
-        //     buttonDiv.style.width = "400px";
-        //     buttonDiv.style.display = "flex";
-        //     buttonDiv.style.justifyContent = "space-between";
-
-        //     const preview = document.createElement("button");
-        //     preview.style.width = "152px";
-        //     preview.style.height = "61px";
-        //     preview.style.fontSize = "32px";
-        //     preview.style.borderRadius = "10px";
-        //     preview.style.border = "none";
-        //     preview.style.cursor = "pointer";
-        //     preview.innerHTML = "Preview";
-
-        //     preview.onclick = async function() {
-        //         const from = fromInputBox.value
-        //         const to = toInputBox.value
-        //         const audioURL = `http://13.61.94.100:8000/trim-preview?start=${from}&end=${to}`;
-        //         const audio = new Audio(audioURL);
-        //         audio.play();
-        //         save.disabled = false;
-        //     };
-
-        //     const save = document.createElement("button");
-        //     save.style.width = "152px";
-        //     save.style.height = "61px";
-        //     save.style.fontSize = "32px";
-        //     save.style.borderRadius = "10px";
-        //     save.style.border = "none";
-        //     save.style.cursor = "pointer";
-        //     save.innerHTML = "Save";
-        //     save.disabled = true;
-        //     save.onclick = function (){
-        //         const audioURL = `http://13.61.94.100:8000/trim-save`;
-        //         const link = document.createElement('a');
-        //         link.href = audioURL;
-        //         link.download = 'trimmed-output.wav';
-        //         document.body.appendChild(link);
-        //         link.click();
-        //         document.body.removeChild(link);
-        //     };
-
-        //     buttonDiv.appendChild(preview);
-        //     buttonDiv.appendChild(save);
-
-        //     container.appendChild(h1);
-        //     container.appendChild(divUploadSample);
-        //     container.appendChild(inputDiv);
-        //     container.appendChild(buttonDiv);
-        // };
 
         this._playbackBtn.id = "playbackBtn";
         this._playbackBtn.classList.add("disabled");
@@ -2278,7 +2151,7 @@ function SampleWidget() {
             this.pitchDetectionAnimationId = requestAnimationFrame(updatePitch);
         } catch (err) {
             console.error(`${err.name}: ${err.message}`);
-            alert(_("Microphone access failed: %s").replace(/%s/g, err.message));
+            this.activity.errorMsg(_("Microphone access failed: %s").replace(/%s/g, err.message));
             // Clean up any partially initialized resources
             this.stopPitchDetection();
         }
