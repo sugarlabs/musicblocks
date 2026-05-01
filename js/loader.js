@@ -60,6 +60,10 @@ requirejs.config({
             deps: ["utils/platformstyle"],
             exports: "_"
         },
+        "utils/keyboardShortcuts": {
+            deps: ["utils/utils"],
+            exports: "KeyboardShortcuts"
+        },
         "utils/retryWithBackoff": {
             deps: ["utils/utils"],
             exports: "retryWithBackoff"

@@ -53,7 +53,7 @@ try {
    MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
    SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS,
-   unescapeHTML
+   unescapeHTML, KeyboardShortcuts
  */
 
 /*
@@ -91,6 +91,7 @@ let MYDEFINES = [
     // on demand when the widget is opened, saving ~3-5 MB of heap memory.
     // "Chart",
     "utils/utils",
+    "utils/keyboardShortcuts",
     "utils/retryWithBackoff",
     "utils/debugLog",
     "activity/artwork",
@@ -3812,6 +3813,9 @@ class Activity {
                     this.inTempoWidget = true;
                     break;
                 }
+            }
+            if (!disableKeys && KeyboardShortcuts.handleKeyDown(event, this)) {
+                return false;
             }
             if (
                 (event.altKey && !disableKeys) ||
@@ -8224,6 +8228,7 @@ class Activity {
             this.turtles = new Turtles(this);
             this.boundary = new Boundary(this.blocksContainer);
             this.blocks = new Blocks(this);
+            KeyboardShortcuts.trackBlockSelection(this.blocks);
             this.palettes = new Palettes(this);
             this.palettes.init();
             this.logo = new Logo(this);
