@@ -220,7 +220,11 @@ class PlanetInterface {
                 return Promise.resolve(null);
             }
 
-            this.activity.stage.update(event);
+            if (typeof event !== "undefined") {
+                this.activity.stage.update(event);
+            } else {
+                this.activity.stage.update();
+            }
             const data = this.activity.prepareExport();
             const svgData = doSVG(
                 this.activity.canvas,
