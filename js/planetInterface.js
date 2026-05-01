@@ -209,7 +209,10 @@ class PlanetInterface {
          * @param {string} [name] - The name of the new project.
          */
         this.initialiseNewProject = name => {
-            this.planet.ProjectStorage.initialiseNewProject(name);
+            const projectStorage = this._getProjectStorage();
+            if (!projectStorage) return;
+
+            projectStorage.initialiseNewProject(name);
             this.activity.sendAllToTrash();
             this.activity.refreshCanvas();
             this.activity.blocks.trashStacks = [];
@@ -309,6 +312,8 @@ class PlanetInterface {
          * @param {string} [error] - Error message if project opening fails.
          */
         this.openProjectFromPlanet = (id, error) => {
+            if (!this.planet || typeof this.planet.openProjectFromPlanet !== "function") return;
+
             this.planet.openProjectFromPlanet(id, error);
         };
 

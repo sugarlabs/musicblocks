@@ -180,6 +180,14 @@ describe("PlanetInterface", () => {
         expect(mockActivity.blocks.trashStacks).toEqual([]);
     });
 
+    test("initialiseNewProject returns early when Planet storage is unavailable", () => {
+        planetInterface.planet = null;
+
+        expect(() => planetInterface.initialiseNewProject("New Name")).not.toThrow();
+        expect(mockActivity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(mockActivity.refreshCanvas).not.toHaveBeenCalled();
+    });
+
     test("loadProjectFromData: default merge=false", () => {
         planetInterface.iframe = { style: { display: "block" } };
         mockActivity.blocks.loadNewBlocks.mockClear();
@@ -261,6 +269,11 @@ describe("PlanetInterface", () => {
         planetInterface.planet = { openProjectFromPlanet: jest.fn() };
         planetInterface.openProjectFromPlanet("ID42", "oops");
         expect(planetInterface.planet.openProjectFromPlanet).toHaveBeenCalledWith("ID42", "oops");
+    });
+    test("openProjectFromPlanet returns early when Planet is unavailable", () => {
+        planetInterface.planet = null;
+
+        expect(() => planetInterface.openProjectFromPlanet("ID42", "oops")).not.toThrow();
     });
     test("hideMusicBlocks also calls widgetWindows.hideAllWindows and disables DOM events after 250ms", () => {
         jest.useFakeTimers();
