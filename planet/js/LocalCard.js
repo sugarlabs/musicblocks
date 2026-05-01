@@ -113,7 +113,7 @@ class LocalCard {
         if (this.ProjectData.ProjectImage !== null) imageSrc = this.ProjectData.ProjectImage;
         else {
             imageSrc =
-                Planet.IsMusicBlocks == 1 ? this.PlaceholderMBImage : this.PlaceholderTBImage;
+                Planet.IsMusicBlocks === 1 ? this.PlaceholderMBImage : this.PlaceholderTBImage;
         }
 
         const imageId = `local-project-image-${this.id}`;
@@ -190,4 +190,8 @@ class LocalCard {
         this.id = id;
         this.ProjectData = Planet.LocalPlanet.ProjectTable[this.id];
     }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { LocalCard };
 }
