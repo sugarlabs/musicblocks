@@ -136,6 +136,27 @@ describe("platformstyle", () => {
         expect(document.querySelector("meta[name=theme-color]").content).toBe("#4DA6FF");
     });
 
+    it("does not throw when theme-color meta tag is missing", () => {
+        Object.defineProperty(global.window.navigator, "userAgent", {
+            value: "Chrome/123",
+            configurable: true,
+            writable: true
+        });
+        global.navigator = global.window.navigator;
+        const ls = global.window.localStorage || {};
+        global.localStorage = ls;
+        global.window.localStorage = ls;
+        global.showMaterialHighlight = jest.fn(() => ({ highlight: true }));
+
+        // Do not build the theme-color meta tag in this scenario.
+        jest.isolateModules(() => {
+            require("../platformstyle");
+        });
+
+        expect(global.window.platformColor.header).toBe("#4DA6FF");
+        expect(document.querySelector("meta[name=theme-color]")).toBeNull();
+    });
+
     it("honors dark theme preference", () => {
         Object.defineProperty(global.window.navigator, "userAgent", {
             value: "Chrome/123",
