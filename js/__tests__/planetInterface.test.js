@@ -214,7 +214,7 @@ describe("PlanetInterface", () => {
         planetInterface.planet = { ProjectStorage: { saveLocally: jest.fn() } };
 
         return planetInterface.saveLocally().then(() => {
-            expect(mockActivity.stage.update).toHaveBeenCalledWith();
+            expect(mockActivity.stage.update).toHaveBeenCalledWith(undefined);
             expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenCalledWith(D, null);
         });
     });
@@ -247,6 +247,15 @@ describe("PlanetInterface", () => {
             ProjectStorage: { getCurrentProjectData: jest.fn(async () => 123) }
         };
         await expect(planetInterface.openCurrentProject()).resolves.toBe(123);
+    });
+    test("openCurrentProject returns null when Planet storage is unavailable", async () => {
+        const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        planetInterface.planet = null;
+        await expect(planetInterface.openCurrentProject()).resolves.toBeNull();
+        expect(errorSpy).toHaveBeenCalledWith(
+            "[PlanetInterface] openCurrentProject called before Planet storage is ready."
+        );
+        errorSpy.mockRestore();
     });
     test("openProjectFromPlanet proxies arguments", () => {
         planetInterface.planet = { openProjectFromPlanet: jest.fn() };
@@ -478,14 +487,19 @@ describe("PlanetInterface", () => {
         iframe.contentWindow.makePlanet = jest
             .fn()
             .mockRejectedValue(new Error("Failed to make planet"));
-        try {
-            await planetInterface.init();
-        } catch (e) {
-            expect(e).toBeInstanceOf(TypeError);
-        }
+        await expect(planetInterface.init()).resolves.toBeUndefined();
         expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
         expect(consoleSpy.mock.calls[0][0].message).toBe("Failed to make planet");
         expect(planetInterface.planet).toBeNull();
+        expect(window.Converter).toBeUndefined();
         consoleSpy.mockRestore();
+    });
+
+    it("project getters return safe defaults when Planet storage is unavailable", () => {
+        planetInterface.planet = null;
+        expect(planetInterface.getCurrentProjectName()).toBe("");
+        expect(planetInterface.getCurrentProjectDescription()).toBe("");
+        expect(planetInterface.getCurrentProjectImage()).toBeNull();
+        expect(planetInterface.getTimeLastSaved()).toBeNull();
     });
 });
