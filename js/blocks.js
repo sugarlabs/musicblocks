@@ -1112,7 +1112,7 @@ class Blocks {
                 /** Guard against invalid block connections */
                 const connectedBlock = this.blockList[cblk];
                 if (!connectedBlock || !Array.isArray(connectedBlock.connections)) {
-                    console.debug("Invalid block connection detected - skipping.");
+                    console.warn(`Invalid block connection detected - cblk: ${cblk}, block: ${connectedBlock?.name || 'undefined'}, parent block: ${myBlock.name} (${blk})`);
                     continue;
                 }
 
