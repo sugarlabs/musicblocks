@@ -1594,11 +1594,7 @@ class BaseBlock extends ProtoBlock {
          * Language preference for the block.
          * @type {string}
          */
-        try {
-            this.lang = localStorage.languagePreference || navigator.language;
-        } catch (e) {
-            this.lang = navigator.language;
-        }
+        this.lang = safeGetItem("languagePreference", navigator.language);
     }
 
     /**

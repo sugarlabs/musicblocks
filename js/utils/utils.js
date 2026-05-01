@@ -70,6 +70,59 @@ const changeImage = (imgElement, from, to) => {
 // They are loaded as a RequireJS dependency and assigned to window globals.
 
 /**
+ * Safely retrieves an item from localStorage with a fallback.
+ * @param {string} key - The storage key.
+ * @param {*} defaultValue - Fallback value if storage is unavailable or key missing.
+ * @returns {*} The stored value or defaultValue.
+ */
+const safeGetItem = (key, defaultValue) => {
+    try {
+        const item = localStorage.getItem(key);
+        return item !== null ? item : defaultValue;
+    } catch (e) {
+        // Log for debugging but don't crash
+        console.warn(`localStorage access failed for key "${key}":`, e);
+        return defaultValue;
+    }
+};
+
+/**
+ * Safely sets an item in localStorage.
+ * @param {string} key - The storage key.
+ * @param {*} value - The value to store.
+ */
+const safeSetItem = (key, value) => {
+    try {
+        localStorage.setItem(key, value);
+    } catch (e) {
+        console.warn(`localStorage write failed for key "${key}":`, e);
+    }
+};
+
+/**
+ * Safely removes an item from localStorage.
+ * @param {string} key - The storage key.
+ */
+const safeRemoveItem = key => {
+    try {
+        localStorage.removeItem(key);
+    } catch (e) {
+        console.warn(`localStorage removal failed for key "${key}":`, e);
+    }
+};
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports.safeGetItem = safeGetItem;
+    module.exports.safeSetItem = safeSetItem;
+    module.exports.safeRemoveItem = safeRemoveItem;
+}
+if (typeof window !== "undefined") {
+    window.safeGetItem = safeGetItem;
+    window.safeSetItem = safeSetItem;
+    window.safeRemoveItem = safeRemoveItem;
+}
+
+/**
  * Enhanced _() method to handle case variations for translations
  * prioritize exact matches and preserve the case of the input text.
  * @function
@@ -109,7 +162,7 @@ function _(text, options = {}) {
         const lang = i18next.language;
 
         if (lang.startsWith("ja")) {
-            const kanaPref = localStorage.getItem("kanaPreference") || "kanji";
+            const kanaPref = safeGetItem("kanaPreference", "kanji");
             const script = kanaPref === "kana" ? "kana" : "kanji";
 
             const resolveObj = key => {
@@ -1462,6 +1515,11 @@ if (typeof module !== "undefined" && module.exports) {
         delayExecution,
         closeWidgets,
         closeBlkWidgets,
-        importMembers
+        importMembers,
+        resolveObject,
+        escapeHTML,
+        safeGetItem,
+        safeSetItem,
+        safeRemoveItem
     };
 }
