@@ -343,4 +343,36 @@ describe("Meter Widget", () => {
         expect(meterWidget._strongBeats[1]).toBe(false);
         expect(meterWidget._strongBeats[2]).toBe(false);
     });
+
+    test("should setup default strong beats for 2/4 and call show on wheel", () => {
+        mockBlockList[2].value = 2;
+        const meterWidget2 = new MeterWidget(mockActivity, 1);
+        meterWidget2._setupDefaultStrongWeakBeats(2, 0.25);
+        expect(meterWidget2._strongBeats[0]).toBe(true);
+        expect(meterWidget2._strongBeats[1]).toBe(false);
+        expect(meterWidget2._beatWheel.navItems[0].navItem.show).toHaveBeenCalled();
+    });
+
+    test("should setup default strong beats for 6/8 and call show on wheel", () => {
+        mockBlockList[2].value = 6;
+        mockBlockList[4].value = 0.125;
+        const meterWidget6 = new MeterWidget(mockActivity, 1);
+        meterWidget6._setupDefaultStrongWeakBeats(6, 0.125);
+        expect(meterWidget6._strongBeats[0]).toBe(true);
+        expect(meterWidget6._strongBeats[1]).toBe(false);
+        expect(meterWidget6._strongBeats[2]).toBe(false);
+        expect(meterWidget6._strongBeats[3]).toBe(true);
+        expect(meterWidget6._strongBeats[4]).toBe(false);
+        expect(meterWidget6._strongBeats[5]).toBe(false);
+        expect(meterWidget6._beatWheel.navItems[0].navItem.show).toHaveBeenCalled();
+        expect(meterWidget6._beatWheel.navItems[3].navItem.show).toHaveBeenCalled();
+    });
+
+    test("should handle unrecognized time signature", () => {
+        mockBlockList[2].value = 5;
+        const meterWidgetU = new MeterWidget(mockActivity, 1);
+        meterWidgetU._setupDefaultStrongWeakBeats(5, 0.25);
+        expect(meterWidgetU._strongBeats[0]).toBe(false);
+        expect(meterWidgetU._strongBeats[1]).toBe(false);
+    });
 });
