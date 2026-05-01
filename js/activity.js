@@ -4384,7 +4384,10 @@ class Activity {
                 canvasHolder.width = canvas.width;
                 canvasHolder.height = canvas.height;
             }
-            document.getElementById("hideContents").click();
+            const hideContents = document.getElementById("hideContents");
+            if (hideContents) {
+                hideContents.click();
+            }
             that.refreshCanvas();
         }
 
@@ -4433,7 +4436,10 @@ class Activity {
         const resizeCanvas_ = () => {
             try {
                 that._onResize(false);
-                document.getElementById("hideContents").click();
+                const hideContents = document.getElementById("hideContents");
+                if (hideContents) {
+                    hideContents.click();
+                }
             } catch (error) {
                 console.error("An error occurred in resizeCanvas_:", error);
             }
