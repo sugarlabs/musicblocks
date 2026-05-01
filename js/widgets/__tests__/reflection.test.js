@@ -20,9 +20,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const ReflectionMatrix = require("../reflection");
-const { escapeHTML } = require("../../utils/utils");
+const { escapeHTML, isSafeUrl } = require("../../utils/utils");
 global.escapeHTML = escapeHTML;
+global.isSafeUrl = isSafeUrl;
+
+const ReflectionMatrix = require("../reflection");
 
 // Mock globals
 global._ = str => str;
@@ -620,6 +622,7 @@ describe("ReflectionMatrix", () => {
             expect(reflection.isUnsafeUrl("http://google.com")).toBe(false);
             expect(reflection.isUnsafeUrl("https://example.com")).toBe(false);
             expect(reflection.isUnsafeUrl("mailto:test@test.com")).toBe(false);
+            expect(reflection.isUnsafeUrl("javascript&#58;alert(1)")).toBe(true);
         });
 
         test("sanitizeHTML removes unsafe hrefs and adds target blank", () => {
@@ -633,6 +636,11 @@ describe("ReflectionMatrix", () => {
             expect(output).toContain('href="http://good.com"');
             expect(output).toContain('target="_blank"');
             expect(output).toContain('rel="noopener noreferrer"');
+
+            const input2 = '<a href="javascript&#58;alert(1)">Bypass Link</a>';
+            const output2 = reflection.sanitizeHTML(input2);
+            expect(output2).not.toContain('href="javascript&#58;alert(1)"');
+            expect(output2).not.toContain('href="javascript:alert(1)"');
         });
 
         test("mdToHTML converts markdown to safe HTML", () => {

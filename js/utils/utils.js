@@ -740,7 +740,11 @@ if (typeof window !== "undefined") {
 function isSafeUrl(urlString) {
     try {
         const parsed = new URL(urlString);
-        return parsed.protocol === "http:" || parsed.protocol === "https:";
+        return (
+            parsed.protocol === "http:" ||
+            parsed.protocol === "https:" ||
+            parsed.protocol === "mailto:"
+        );
     } catch (e) {
         return false;
     }
@@ -2097,8 +2101,8 @@ if (typeof module !== "undefined" && module.exports) {
         delayExecution,
         closeWidgets,
         closeBlkWidgets,
-        resolveObject,
         importMembers,
-        escapeHTML
+        escapeHTML,
+        isSafeUrl
     };
 }

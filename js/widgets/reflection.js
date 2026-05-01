@@ -11,6 +11,8 @@
 
 /* This widget provides a chat interface for users to interact with AI mentors for project reflection and analysis.*/
 
+/* global _, escapeHTML, isSafeUrl */
+
 /**
  * Represents Reflection Widget.
  * @constructor
@@ -91,18 +93,6 @@ class ReflectionMatrix {
          * @type {boolean}
          */
         this.isProcessingPendingMessage = false;
-    }
-
-    sanitizeLinks(html) {
-        return html.replace(/<a\s+[^>]*href\s*=\s*(['"]?)([^'">\s]+)\1/gi, (match, quote, url) => {
-            const unsafeSchemes = /^(javascript|data|vbscript):/i;
-
-            if (unsafeSchemes.test(url.trim())) {
-                return match.replace(url, "#");
-            }
-
-            return match;
-        });
     }
 
     /**
@@ -345,13 +335,7 @@ class ReflectionMatrix {
         if (md) {
             const safeText = escapeHTML(reply.response);
             let html = this.mdToHTML(safeText);
-            html = this.sanitizeLinks(html);
-            botReply.textContent = "";
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, "text/html");
-            while (doc.body.firstChild) {
-                botReply.appendChild(doc.body.firstChild);
-            }
+            botReply.innerHTML = html;
         } else {
             botReply.innerText = reply.response;
         }
@@ -752,19 +736,29 @@ class ReflectionMatrix {
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlString, "text/html");
 
-        // Sanitize links
-        const links = doc.getElementsByTagName("a");
-        for (let i = 0; i < links.length; i++) {
-            const link = links[i];
-            const href = link.getAttribute("href");
+        // Sanitize links and other elements
+        const elements = doc.body.querySelectorAll("*");
+        for (const el of elements) {
+            // Remove all event handlers
+            const attrs = el.attributes;
+            for (let i = attrs.length - 1; i >= 0; i--) {
+                const name = attrs[i].name.toLowerCase();
+                if (name.startsWith("on")) {
+                    el.removeAttribute(name);
+                }
+            }
 
-            // If no href, or it's unsafe, remove the attribute
-            if (!href || this.isUnsafeUrl(href)) {
-                link.removeAttribute("href");
-            } else {
-                // Enforce security attributes for external links
-                link.setAttribute("target", "_blank");
-                link.setAttribute("rel", "noopener noreferrer");
+            // Specific check for links
+            if (el.tagName.toLowerCase() === "a") {
+                const href = el.getAttribute("href");
+                if (href) {
+                    if (!isSafeUrl(href)) {
+                        el.removeAttribute("href");
+                    } else {
+                        el.setAttribute("target", "_blank");
+                        el.setAttribute("rel", "noopener noreferrer");
+                    }
+                }
             }
         }
 
@@ -772,18 +766,12 @@ class ReflectionMatrix {
     }
 
     /**
-     * Checks if a URL is unsafe (javascript:, data:, vbscript:).
+     * Checks if a URL is unsafe.
      * @param {string} url - The URL to check.
      * @returns {boolean} - True if unsafe, false otherwise.
      */
     isUnsafeUrl(url) {
-        const trimmed = url.trim().toLowerCase();
-        const unsafeSchemes = ["javascript:", "data:", "vbscript:"];
-        // Check if it starts with any unsafe scheme
-        // Note: DOMParser handles HTML entity decoding, so we check the raw attribute safely here
-        // But for extra safety against control characters, we rely on the fact that
-        // we are operating on the parsed DOM attribute.
-        return unsafeSchemes.some(scheme => trimmed.replace(/\s+/g, "").startsWith(scheme));
+        return !isSafeUrl(url);
     }
 
     /**
