@@ -736,28 +736,48 @@ class ReflectionMatrix {
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlString, "text/html");
 
-        // Sanitize links and other elements
+        // Sanitize all elements
         const elements = doc.body.querySelectorAll("*");
         for (const el of elements) {
-            // Remove all event handlers
+            const tagName = el.tagName.toLowerCase();
             const attrs = el.attributes;
-            for (let i = attrs.length - 1; i >= 0; i--) {
-                const name = attrs[i].name.toLowerCase();
-                if (name.startsWith("on")) {
-                    el.removeAttribute(name);
-                }
-            }
 
-            // Specific check for links
-            if (el.tagName.toLowerCase() === "a") {
-                const href = el.getAttribute("href");
-                if (href) {
-                    if (!isSafeUrl(href)) {
-                        el.removeAttribute("href");
-                    } else {
+            for (let i = attrs.length - 1; i >= 0; i--) {
+                const attrName = attrs[i].name.toLowerCase();
+                const attrValue = attrs[i].value;
+
+                // Remove all event handlers
+                if (attrName.startsWith("on")) {
+                    el.removeAttribute(attrName);
+                    continue;
+                }
+
+                // Sanitize URL attributes (href, src)
+                if (attrName === "href" || attrName === "src") {
+                    if (!isSafeUrl(attrValue)) {
+                        el.removeAttribute(attrName);
+                    } else if (tagName === "a" && attrName === "href") {
+                        // Enforce security attributes for external links
                         el.setAttribute("target", "_blank");
                         el.setAttribute("rel", "noopener noreferrer");
                     }
+                    continue;
+                }
+
+                // Sanitize style attribute
+                if (attrName === "style") {
+                    // Check for dangerous keywords in style properties
+                    const dangerousStyleKeywords = ["javascript:", "url(", "expression", "eval"];
+                    if (dangerousStyleKeywords.some(kw => attrValue.toLowerCase().includes(kw))) {
+                        el.removeAttribute(attrName);
+                    }
+                    continue;
+                }
+
+                // Remove other potentially dangerous attributes (like action, formaction, etc.)
+                const sensitiveAttrs = ["action", "formaction", "data", "codebase"];
+                if (sensitiveAttrs.includes(attrName)) {
+                    el.removeAttribute(attrName);
                 }
             }
         }

@@ -643,6 +643,23 @@ describe("ReflectionMatrix", () => {
             expect(output2).not.toContain('href="javascript:alert(1)"');
         });
 
+        test("sanitizeHTML removes unsafe src and style attributes", () => {
+            const input = `<div>
+                <img src="javascript:alert(1)" alt="bad">
+                <img src="http://good.com/img.png" alt="good">
+                <div style="color: red; background-image: url('javascript:alert(1)')">Bad Style</div>
+                <div style="color: blue;">Good Style</div>
+            </div>`;
+            const output = reflection.sanitizeHTML(input);
+
+            expect(output).not.toContain('src="javascript:alert(1)"');
+            expect(output).toContain('src="http://good.com/img.png"');
+            expect(output).not.toContain(
+                "style=\"color: red; background-image: url('javascript:alert(1)')\""
+            );
+            expect(output).toContain('style="color: blue;"');
+        });
+
         test("mdToHTML converts markdown to safe HTML", () => {
             // Note: because mdToHTML escapes everything first, bold and link
             // transformations are applied on the escaped string.
