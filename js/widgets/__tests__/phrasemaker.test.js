@@ -1370,4 +1370,14 @@ describe("PhraseMaker Widget", () => {
 
         phraseMaker._blockReplace(0, 1);
     });
+
+    test("_export returns safely when popup is blocked", () => {
+        const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+        global.window.open = jest.fn(() => null);
+
+        expect(() => phraseMaker._export()).not.toThrow();
+        expect(debugSpy).toHaveBeenCalledWith("Could not create export window");
+
+        debugSpy.mockRestore();
+    });
 });

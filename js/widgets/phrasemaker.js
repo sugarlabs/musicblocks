@@ -2631,6 +2631,11 @@ class PhraseMaker {
      */
     _export() {
         const exportWindow = window.open("");
+        if (!exportWindow) {
+            console.debug("Could not create export window");
+            return;
+        }
+
         const exportDocument = exportWindow.document;
         if (exportDocument === undefined) {
             console.debug("Could not create export window");
