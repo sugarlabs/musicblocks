@@ -20,11 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* exported showButtonHighlight */
 
 let themePreference;
-try {
-    themePreference = localStorage.themePreference || undefined;
-} catch (e) {
-    themePreference = undefined;
-}
+themePreference = safeGetItem("themePreference", undefined);
 
 window.platform = {
     android: /Android/i.test(navigator.userAgent),
