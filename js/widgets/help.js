@@ -227,7 +227,22 @@ class HelpWidget {
                 // Create a new container which conatains all the icons. IT will be appnded to the helpBodyDiv
                 const iconsContainer = document.createElement("div");
                 iconsContainer.classList.add("icon-container");
-                iconsContainer.insertAdjacentHTML("afterbegin", findIcon);
+                iconsContainer.replaceChildren(
+                    (() => {
+                        const findLink = document.createElement("a");
+                        findLink.className = "tooltipped";
+                        findLink.dataset.toggle = "tooltip";
+                        findLink.title = _("Show Palette containing the block");
+                        findLink.dataset.position = "bottom";
+                        const findIconEl = document.createElement("i");
+                        findIconEl.id = "findIcon";
+                        findIconEl.className = "material-icons md-48";
+                        findIconEl.style.marginRight = "10px";
+                        findIconEl.textContent = "search";
+                        findLink.append(findIconEl);
+                        return findLink;
+                    })()
+                );
 
                 // Each block's help entry contains a help string, the
                 // path of the help svg, an override name for the help
@@ -288,7 +303,14 @@ class HelpWidget {
 
                     const loadButtonHTML =
                         '<i style="margin-right: 10px" id="loadButton" data-toggle="tooltip" title="Load this block" class="material-icons md-48">get_app</i>';
-                    iconsContainer.insertAdjacentHTML("afterbegin", loadButtonHTML);
+                    const loadButton = document.createElement("i");
+                    loadButton.id = "loadButton";
+                    loadButton.className = "material-icons md-48";
+                    loadButton.style.marginRight = "10px";
+                    loadButton.dataset.toggle = "tooltip";
+                    loadButton.title = _("Load this block");
+                    loadButton.textContent = "get_app";
+                    iconsContainer.prepend(loadButton);
 
                     helpBody.append(bodyFragment);
 
@@ -296,7 +318,21 @@ class HelpWidget {
                         !this.activity.blocks.blockList[this.activity.blocks.activeBlock].protoblock
                             .beginnerModeBlock
                     ) {
-                        iconsContainer.insertAdjacentHTML("beforeend", advIcon);
+                        iconsContainer.append(
+                            (() => {
+                                const advLink = document.createElement("a");
+                                advLink.className = "tooltipped";
+                                advLink.dataset.toggle = "tooltip";
+                                advLink.title = _("This block is only available in advance mode");
+                                advLink.dataset.position = "bottom";
+                                const advIconEl = document.createElement("i");
+                                advIconEl.id = "advIconText";
+                                advIconEl.className = "material-icons md-48";
+                                advIconEl.textContent = "star";
+                                advLink.append(advIconEl);
+                                return advLink;
+                            })()
+                        );
                     }
 
                     // append the icons container to the helpBodyDiv. It contains load, find and adv icons.
@@ -304,8 +340,7 @@ class HelpWidget {
 
                     const object = this.activity.blocks.palettes.getProtoNameAndPalette(name);
 
-                    const loadButton = docById("loadButton");
-                    if (loadButton !== null) {
+                    if (loadButton) {
                         loadButton.onclick = () => {
                             if (message.length < 4) {
                                 // If there is nothing specified, just load the block.

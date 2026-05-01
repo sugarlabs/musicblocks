@@ -85,23 +85,35 @@ const PhraseMakerUI = {
         if (!pm._playButton) return;
 
         if (isPlaying) {
-            pm._playButton.innerHTML = `&nbsp;&nbsp;<img 
-                src="header-icons/stop-button.svg"
-                title="${pm._("Stop")}" 
-                alt="${pm._("Stop")}" 
-                height="${pm.constructor.ICONSIZE}" 
-                width="${pm.constructor.ICONSIZE}" 
-                vertical-align="middle"
-            >&nbsp;&nbsp;`;
+            pm._playButton.replaceChildren(
+                document.createTextNode("\u00a0\u00a0"),
+                (() => {
+                    const img = document.createElement("img");
+                    img.src = "header-icons/stop-button.svg";
+                    img.title = pm._("Stop");
+                    img.alt = pm._("Stop");
+                    img.height = pm.constructor.ICONSIZE;
+                    img.width = pm.constructor.ICONSIZE;
+                    img.style.verticalAlign = "middle";
+                    return img;
+                })(),
+                document.createTextNode("\u00a0\u00a0")
+            );
         } else {
-            pm._playButton.innerHTML = `&nbsp;&nbsp;<img 
-                src="header-icons/play-button.svg" 
-                title="${pm._("Play")}" 
-                alt="${pm._("Play")}" 
-                height="${pm.constructor.ICONSIZE}" 
-                width="${pm.constructor.ICONSIZE}" 
-                vertical-align="middle"
-            >&nbsp;&nbsp;`;
+            pm._playButton.replaceChildren(
+                document.createTextNode("\u00a0\u00a0"),
+                (() => {
+                    const img = document.createElement("img");
+                    img.src = "header-icons/play-button.svg";
+                    img.title = pm._("Play");
+                    img.alt = pm._("Play");
+                    img.height = pm.constructor.ICONSIZE;
+                    img.width = pm.constructor.ICONSIZE;
+                    img.style.verticalAlign = "middle";
+                    return img;
+                })(),
+                document.createTextNode("\u00a0\u00a0")
+            );
         }
     },
 
@@ -146,10 +158,10 @@ const PhraseMakerUI = {
 
         if (isActive) {
             cell.style.backgroundColor = pm.platformColor.selectorBackground;
-            cell.innerHTML = "&#x2713;"; // checkmark
+            cell.textContent = "\u2713"; // checkmark
         } else {
             cell.style.backgroundColor = pm.platformColor.rhythmcellcolor;
-            cell.innerHTML = "";
+            cell.textContent = "";
         }
     },
 
