@@ -328,8 +328,12 @@ describe("save HTML methods", () => {
 
         const html = si.prepareHTML();
 
-        expect(html).toContain('window.addEventListener("load", function() {');
+        expect(html).toContain(
+            'document.addEventListener("DOMContentLoaded", initializeEventListeners)'
+        );
         expect(html).not.toContain("window.onload = function()");
+        expect(html).not.toContain("onclick=");
+        expect(html).toContain('addEventListener("click"');
     });
 
     it("escapeHTML should encode all five HTML special characters", () => {
