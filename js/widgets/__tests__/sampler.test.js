@@ -624,6 +624,22 @@ describe("Sampler Widget", () => {
             expect(widget.makeCanvas).toHaveBeenCalledWith(800, 430, 0, true);
         });
 
+        test("_scale cancels an existing animation loop before rebuilding the canvas", () => {
+            const canvas = document.createElement("canvas");
+            canvas.className = "samplerCanvas";
+            widgetWindow.getWidgetBody().appendChild(canvas);
+            widget.widgetWindow = widgetWindow;
+            widget.drawVisualIDs = { 0: 101 };
+            widget.makeCanvas = jest.fn();
+            widget.reconnectSynthsToAnalyser = jest.fn();
+            global.cancelAnimationFrame.mockClear();
+
+            widget._scale();
+
+            expect(global.cancelAnimationFrame).toHaveBeenCalledWith(101);
+            expect(widget.makeCanvas).toHaveBeenCalledWith(800, 400, 0, true);
+        });
+
         test("drag_and_drop wires drop handler to call handleFiles", () => {
             const samplerCanvas = document.createElement("canvas");
             samplerCanvas.className = "samplerCanvas";
@@ -943,6 +959,47 @@ describe("Sampler Widget", () => {
             expect(widget.tunerSegments[0].setAttribute).toHaveBeenCalledWith("fill", "#0000ff");
             expect(querySelectorAll).not.toHaveBeenCalled();
             querySelectorAll.mockRestore();
+        });
+
+        test("makeCanvas performs a one-off redraw while idle without scheduling RAF", () => {
+            widget.widgetWindow = widgetWindow;
+            widget.drawVisualIDs = {};
+            widget.running = true;
+            widget.is_recording = false;
+            widget.isMoving = false;
+            widget.playback = false;
+            widget.pitchAnalysers = {
+                0: { getValue: jest.fn(() => [0.1, -0.1]) },
+                1: { getValue: jest.fn(() => [0.2, -0.2]) }
+            };
+            global.requestAnimationFrame.mockClear();
+
+            widget.makeCanvas(400, 300, 0, false);
+
+            expect(global.requestAnimationFrame).not.toHaveBeenCalled();
+            expect(widget.drawVisualIDs[0]).toBeNull();
+        });
+
+        test("resume restarts the waveform loop only when the sampler becomes active", () => {
+            widget.widgetWindow = widgetWindow;
+            widget.drawVisualIDs = {};
+            widget.playBtn = { innerHTML: "" };
+            widget.running = true;
+            widget.is_recording = false;
+            widget.isMoving = false;
+            widget.playback = false;
+            widget.pitchAnalysers = {
+                0: { getValue: jest.fn(() => [0.1, -0.1]) },
+                1: { getValue: jest.fn(() => [0.2, -0.2]) }
+            };
+
+            widget.makeCanvas(400, 300, 0, false);
+            global.requestAnimationFrame.mockClear();
+
+            widget.resume();
+
+            expect(global.requestAnimationFrame).toHaveBeenCalledTimes(1);
+            expect(widget.drawVisualIDs[0]).toBe(1);
         });
 
         test("makeTuner builds UI and triggers pitch detection", async () => {
