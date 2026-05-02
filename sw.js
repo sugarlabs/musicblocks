@@ -18,6 +18,9 @@
 // This is the "Offline page" service worker
 
 const CACHE = "pwabuilder-precache-v2";
+// Path used when serving an offline fallback for navigations
+const offlineFallbackPage = "./index.html";
+
 const precacheFiles = [
     "./",
     "./index.html",
@@ -47,7 +50,9 @@ const precacheFiles = [
     "./env.js",
     "./loading-animation.webm",
     "./loading-animation.mp4",
-    "./images/logo.svg"
+    "./images/logo.svg",
+    // ensure offline fallback is precached (matches `offlineFallbackPage`)
+    offlineFallbackPage
 ];
 
 self.addEventListener("install", function (event) {
