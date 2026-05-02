@@ -433,6 +433,26 @@ describe("Utility Functions (logic-only)", () => {
         });
     });
 
+    describe("_performNotes", () => {
+        test("should accept numeric frequencies in custom temperaments", async () => {
+            const previousTemperament = Synth.inTemperament;
+            const mockSynth = {
+                triggerAttackRelease: jest.fn()
+            };
+
+            Synth.inTemperament = "custom";
+            await _performNotes(mockSynth, 440, 1 / 8, null, null, false, 0);
+
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalledWith(
+                440,
+                1 / 8,
+                expect.any(Number)
+            );
+
+            Synth.inTemperament = previousTemperament;
+        });
+    });
+
     describe("temperamentChanged", () => {
         it("should change the temperament", () => {
             expect(temperamentChanged("equal", "Bb3")).toBe(undefined);
