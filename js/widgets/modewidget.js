@@ -266,7 +266,7 @@ class ModeWidget {
 
         // console.debug(_(currentModeName[1]));
         const name = currentModeName[0] + " " + _(currentModeName[1]);
-        table.rows[n].cells[0].innerHTML = name;
+        table.rows[n].cells[0].textContent = name;
         this.widgetWindow.updateTitle(name);
 
         // Set the notes for this mode.
@@ -871,7 +871,7 @@ class ModeWidget {
                 }
 
                 const name = currentKey + " " + _(mode);
-                table.rows[n].cells[0].innerHTML = name;
+                table.rows[n].cells[0].textContent = name;
                 this.widgetWindow.updateTitle(name);
                 return;
             }

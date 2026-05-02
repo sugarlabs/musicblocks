@@ -359,7 +359,7 @@ class Arpeggio {
         cell.style.lineHeight = 100 + "%";
         cell.setAttribute("id", arpeggioIdx);
         cell.className = "headcol";
-        cell.innerHTML = arpeggioName;
+        cell.textContent = arpeggioName;
         cell.style.backgroundColor = platformColor.selectorBackground;
     }
 
