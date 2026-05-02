@@ -126,9 +126,40 @@ class Palettes {
         this._handleSearchKeydown = this._handleSearchKeydown.bind(this);
     }
 
+    handleEmptyResults(searchResults) {
+    const menu = document.querySelector(".ui-menu");
+    const searchInput = document.getElementById("search");
+
+    if (!menu || !searchInput || !searchInput.value.trim()) return;
+
+    const existingMessage = menu.querySelector(".no-results");
+
+    if (searchResults.length === 0) {
+        if (!existingMessage) {
+            const messageItem = document.createElement("li");
+            messageItem.className = "ui-menu-item no-results";
+            messageItem.textContent = `No results found for "${searchInput.value}"`;
+
+            messageItem.style.cssText = `
+                opacity: 0.7;
+                pointer-events: none;
+                text-align: center;
+                padding: 6px;
+                font-style: italic;
+            `;
+
+            menu.appendChild(messageItem);
+        }
+    } else {
+        if (existingMessage) {
+            existingMessage.remove();
+        }
+    }
+}
     init() {
         this.halfCellSize = Math.floor(this.cellSize / 2);
     }
+    
 
     init_selectors() {
         for (let i = 0; i < MULTIPALETTES.length; i++) {
@@ -380,7 +411,9 @@ class Palettes {
             event.stopPropagation();
 
             const searchResults = document.querySelectorAll(".ui-menu-item");
+            this.handleEmptyResults(searchResults);
             if (searchResults.length === 0) return;
+            
 
             // Navigate through search results
             searchResults.forEach(row => {
