@@ -410,62 +410,95 @@ class Palettes {
             event.preventDefault();
             event.stopPropagation();
 
-            const searchResults = document.querySelectorAll(".ui-menu-item");
-            this.handleEmptyResults(searchResults);
-            if (searchResults.length === 0) return;
+            // const searchResults = document.querySelectorAll(".ui-menu-item");
+            // this.handleEmptyResults(searchResults);
+            // if (searchResults.length === 0) return;
             
 
-            // Navigate through search results
+            // // Navigate through search results
+            // searchResults.forEach(row => {
+            //     row.classList.remove("ui-state-active");
+            //     row.classList.remove("ui-state-focus");
+            //     row.style.backgroundColor = "";
+            //     delete row.dataset.keyboardFocus;
+            // });
+
+            // if (event.key === "ArrowDown") {
+            //     this._searchResultIndex = Math.min(
+            //         this._searchResultIndex + 1,
+            //         searchResults.length - 1
+            //     );
+            // } else if (event.key === "ArrowUp") {
+            //     this._searchResultIndex = Math.max(this._searchResultIndex - 1, 0);
+            // }
+                 setTimeout(() => {
+            const searchResults = document.querySelectorAll(".ui-menu-item");
+        
+            this.handleEmptyResults(searchResults);
+        
+            if (searchResults.length === 0) return;
+        
+            // Clear previous focus
             searchResults.forEach(row => {
                 row.classList.remove("ui-state-active");
                 row.classList.remove("ui-state-focus");
                 row.style.backgroundColor = "";
                 delete row.dataset.keyboardFocus;
             });
-
+        
+            // Arrow keys
             if (event.key === "ArrowDown") {
                 this._searchResultIndex = Math.min(
                     this._searchResultIndex + 1,
                     searchResults.length - 1
                 );
-            } else if (event.key === "ArrowUp") {
-                this._searchResultIndex = Math.max(this._searchResultIndex - 1, 0);
+            } 
+            else if (event.key === "ArrowUp") {
+                this._searchResultIndex = Math.max(
+                    this._searchResultIndex - 1,
+                    0
+                );
             }
-
+        
+            // Highlight
             const currentResult = searchResults[this._searchResultIndex];
+        
             if (currentResult) {
                 currentResult.classList.add("ui-state-active");
                 currentResult.style.backgroundColor = platformColor.hoverColor;
                 currentResult.dataset.keyboardFocus = "true";
+        
                 currentResult.scrollIntoView({
                     block: "nearest",
                     behavior: "smooth"
                 });
             }
-        } else if (event.key === "Enter") {
-            const searchResults = document.querySelectorAll(".ui-menu-item");
-
-            if (searchResults[this._searchResultIndex]) {
-                event.preventDefault();
-                event.stopPropagation();
-
-                // Trigger click on the item to select it
-                searchResults[this._searchResultIndex].click();
-
-                // Close search and return focus to palette
-                this.activity.hideSearchWidget();
-                const palette = docById("palette");
-                if (palette) {
-                    palette.focus();
-                    this._navSection = "search";
-                    const tr = palette.children[0]?.children[0]?.children[0]?.children[0];
-                    const listBody = docById("palette")?.children[0]?.children[1]?.children[1];
-                    const blockRows = listBody ? Array.from(listBody.children) : [];
-                    this._updateKeyboardFocus(tr, blockRows);
+        
+            // ✅ ENTER (separate block)
+            if (event.key === "Enter") {
+                if (searchResults[this._searchResultIndex]) {
+                    event.preventDefault();
+                    event.stopPropagation();
+        
+                    searchResults[this._searchResultIndex].click();
+        
+                    this.activity.hideSearchWidget();
+        
+                    const palette = docById("palette");
+                    if (palette) {
+                        palette.focus();
+                        this._navSection = "search";
+        
+                        const tr = palette.children[0]?.children[0]?.children[0];
+                        const listBody = docById("palette")?.children[0]?.children[1];
+                        const blockRows = listBody ? Array.from(listBody.children) : [];
+        
+                        this._updateKeyboardFocus(tr, blockRows);
+                    }
                 }
             }
-        }
-    }
+        
+        }, 0);
 
     /**
      * Updates visual focus for keyboard navigation
