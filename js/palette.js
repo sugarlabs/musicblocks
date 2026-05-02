@@ -417,7 +417,7 @@ class Palettes {
 
             const searchResults = document.querySelectorAll(".ui-menu-item");
         // 👇 YAHAN SE ADD KARO
-            const menu = document.querySelector(".ui-menu");
+            const menu = document.querySelector(".ui-autocomplete");
             const searchInput = document.getElementById("search");
             
             // remove old message
