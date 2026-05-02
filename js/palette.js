@@ -415,35 +415,33 @@ class Palettes {
             event.preventDefault();
             event.stopPropagation();
 
-            const searchResults = document.querySelectorAll(".ui-menu-item");
-        // 👇 YAHAN SE ADD KARO
-            const menu = document.querySelector(".ui-autocomplete");
-            const searchInput = document.getElementById("search");
+           const searchResults = document.querySelectorAll(".ui-menu-item");
+
+            setTimeout(() => {
+              const menu = document.querySelector(".ui-autocomplete");
+              const searchInput = document.getElementById("search");
             
-            // remove old message
-            const oldMsg = menu.querySelector(".no-results");
-            if (oldMsg) oldMsg.remove();
+              if (!menu || !searchInput) return;
             
-            // check visible items
-            const visibleResults = Array.from(searchResults)
-              .filter(el => el.offsetParent !== null);
+              // remove old message
+              const old = menu.querySelector(".no-results");
+              if (old) old.remove();
             
-            // show message
-            if (searchInput.value.trim() !== "" && visibleResults.length === 0) {
+              const visibleResults = Array.from(searchResults)
+                .filter(el => el.offsetParent !== null);
+            
+              if (searchInput.value.trim() !== "" && visibleResults.length === 0) {
                 const li = document.createElement("li");
                 li.className = "ui-menu-item no-results";
                 li.textContent = `No results found for "${searchInput.value}"`;
             
-                li.style.cssText = `
-                    opacity: 0.7;
-                    text-align: center;
-                    padding: 6px;
-                    pointer-events: none;
-                `;
+                li.style.padding = "6px";
+                li.style.textAlign = "center";
+                li.style.opacity = "0.7";
             
                 menu.appendChild(li);
-            }
-        // 👆 YAHAN TAK ADD KARO
+              }
+            }, 50);
            // if (searchResults.length === 0) return;
             
 
