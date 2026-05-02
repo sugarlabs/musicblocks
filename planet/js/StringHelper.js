@@ -86,13 +86,20 @@ class StringHelper {
     }
 
     init() {
+        const parser = new DOMParser();
         for (let i = 0; i < this.strings.length; i++) {
             const obj = this.strings[i];
             const elem = document.getElementById(obj[0]);
 
             if (elem) {
-                if (this.strings[i].length === 3) elem.setAttribute(obj[2], obj[1]);
-                else elem.innerHTML += obj[1];
+                if (this.strings[i].length === 3) {
+                    elem.setAttribute(obj[2], obj[1]);
+                } else {
+                    const doc = parser.parseFromString(obj[1], "text/html");
+                    while (doc.body.firstChild) {
+                        elem.appendChild(doc.body.firstChild);
+                    }
+                }
             }
         }
     }
