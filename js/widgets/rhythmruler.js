@@ -1362,6 +1362,10 @@ class RhythmRuler {
      * @returns {void}
      */
     __addCellEventHandlers(cell, cellWidth, noteValue) {
+        // Prevent the browser from scrolling the page when the user drags
+        // across rhythm cells on a touchscreen.
+        cell.style.touchAction = "none";
+
         const __mouseOverHandler = event => {
             const cell = event.currentTarget;
             if (cell === null || cell.parentNode === null) {
@@ -1471,11 +1475,15 @@ class RhythmRuler {
             cell.addEventListener("mouseout", __mouseOutHandler);
         }
 
-        cell.removeEventListener("mousedown", __mouseDownHandler);
-        cell.addEventListener("mousedown", __mouseDownHandler);
+        // Use Pointer Events API instead of legacy mouse events so that rhythm
+        // cells respond to touchscreen taps and stylus input as well as mouse
+        // clicks.  The Pointer Events spec guarantees these fire for all input
+        // device types on modern browsers.
+        cell.removeEventListener("pointerdown", __mouseDownHandler);
+        cell.addEventListener("pointerdown", __mouseDownHandler);
 
-        cell.removeEventListener("mouseup", __mouseUpHandler);
-        cell.addEventListener("mouseup", __mouseUpHandler);
+        cell.removeEventListener("pointerup", __mouseUpHandler);
+        cell.addEventListener("pointerup", __mouseUpHandler);
 
         cell.removeEventListener("click", __clickHandler);
         cell.addEventListener("click", __clickHandler);
@@ -3030,16 +3038,27 @@ class RhythmRuler {
                 this._circularCanvas = document.createElement("canvas");
                 this._circularCanvas.style.display = "block";
                 this._circularCanvas.style.margin = "auto";
-                this._circularCanvas.addEventListener("mousedown", event => {
+                // touch-action: none lets us handle all pointer movement
+                // ourselves without the browser intercepting pinch/pan gestures.
+                this._circularCanvas.style.touchAction = "none";
+                // Use Pointer Events so the circular drag-to-edit works on
+                // touchscreens and stylus devices, not just mouse.
+                this._circularCanvas.addEventListener("pointerdown", event => {
                     this._onCircularMouseDown(event);
                 });
-                this._circularCanvas.addEventListener("mousemove", event => {
+                this._circularCanvas.addEventListener("pointermove", event => {
                     this._onCircularMouseMove(event);
                 });
-                this._circularCanvas.addEventListener("mouseup", event => {
+                this._circularCanvas.addEventListener("pointerup", event => {
                     this._onCircularMouseUp(event);
                 });
-                this._circularCanvas.addEventListener("mouseleave", () => {
+                this._circularCanvas.addEventListener("pointercancel", () => {
+                    if (this._circularDragTo !== null) {
+                        this._circularDragTo = null;
+                        this._drawCircularView();
+                    }
+                });
+                this._circularCanvas.addEventListener("pointerleave", () => {
                     if (this._circularDragTo !== null) {
                         this._circularDragTo = null;
                         this._drawCircularView();
