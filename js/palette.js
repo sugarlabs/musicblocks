@@ -135,27 +135,26 @@ class Palettes {
     const existingMessage = menu.querySelector(".no-results");
 
     if (searchResults.length === 0) {
-        if (!existingMessage) {
-            const messageItem = document.createElement("li");
-            messageItem.className = "ui-menu-item no-results";
-            messageItem.textContent = `No results found for "${searchInput.value}"`;
-
-            messageItem.style.cssText = `
-                opacity: 0.7;
-                pointer-events: none;
-                text-align: center;
-                padding: 6px;
-                font-style: italic;
-            `;
-
-            menu.appendChild(messageItem);
-        }
-    } else {
-        if (existingMessage) {
-            existingMessage.remove();
+            if (!existingMessage) {
+                const messageItem = document.createElement("li");
+                messageItem.className = "ui-menu-item no-results";
+                messageItem.textContent = `No results found for "${searchInput.value}"`;
+        
+                messageItem.style.cssText = `
+                    opacity: 0.7;
+                    pointer-events: none;
+                    text-align: center;
+                    padding: 6px;
+                `;
+        
+                menu.appendChild(messageItem);  // 🔥 IMPORTANT LINE
+            }
+        } else {
+            if (existingMessage) {
+                existingMessage.remove();
+            }
         }
     }
-}
     init() {
         this.halfCellSize = Math.floor(this.cellSize / 2);
     }
@@ -432,7 +431,8 @@ class Palettes {
             //     this._searchResultIndex = Math.max(this._searchResultIndex - 1, 0);
             // }
                  setTimeout(() => {
-            const searchResults = document.querySelectorAll(".ui-menu-item");
+            const searchResults = Array.from(document.querySelectorAll(".ui-menu-item"))
+                .filter(el => el.offsetParent !== null);
         
             this.handleEmptyResults(searchResults);
         
@@ -475,15 +475,39 @@ class Palettes {
             }
         
             // ✅ ENTER (separate block)
-            if (event.key === "Enter") {
-                if (searchResults[this._searchResultIndex]) {
-                    event.preventDefault();
-                    event.stopPropagation();
+            // if (event.key === "Enter") {
+            //     if (searchResults[this._searchResultIndex]) {
+            //         event.preventDefault();
+            //         event.stopPropagation();
         
-                    searchResults[this._searchResultIndex].click();
+            //         searchResults[this._searchResultIndex].click();
         
-                    this.activity.hideSearchWidget();
-        
+            //         this.activity.hideSearchWidget();
+                else if (event.key === "Enter") {
+                    const searchResults = document.querySelectorAll(".ui-menu-item");
+                
+                    if (searchResults[this.__searchResultIndex]) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                
+                        // const item = searchResults[this.__searchResultIndex];
+                
+                        // item.click();
+                
+                        // if (item && item.dataset && item.dataset.block) {
+                        //     this.activity.blocks.loadNewBlocks(item.dataset.block);
+                        // }
+                      const item = searchResults[this.__searchResultIndex];
+
+// force click
+                        item.click();
+                        
+                        // manually trigger palette selection
+                        const event = new Event("click", { bubbles: true });
+                        item.dispatchEvent(event);
+                        
+                        this.activity.hideSearchWidget();
+                                        
                     const palette = docById("palette");
                     if (palette) {
                         palette.focus();
