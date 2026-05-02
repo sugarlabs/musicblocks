@@ -740,6 +740,14 @@ class ReflectionMatrix {
         const elements = doc.body.querySelectorAll("*");
         for (const el of elements) {
             const tagName = el.tagName.toLowerCase();
+
+            // Remove forbidden tags that can execute code or change page behavior
+            const forbiddenTags = ["script", "iframe", "object", "embed", "base", "form"];
+            if (forbiddenTags.includes(tagName)) {
+                el.remove();
+                continue;
+            }
+
             const attrs = el.attributes;
 
             for (let i = attrs.length - 1; i >= 0; i--) {

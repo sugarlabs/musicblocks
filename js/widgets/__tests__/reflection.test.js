@@ -660,6 +660,21 @@ describe("ReflectionMatrix", () => {
             expect(output).toContain('style="color: blue;"');
         });
 
+        test("sanitizeHTML removes forbidden tags", () => {
+            const input = `<div>
+                <p>Safe</p>
+                <script>alert(1)</script>
+                <iframe src="http://example.com"></iframe>
+                <object data="bad.swf"></object>
+            </div>`;
+            const output = reflection.sanitizeHTML(input);
+
+            expect(output).toContain("<p>Safe</p>");
+            expect(output).not.toContain("<script>");
+            expect(output).not.toContain("<iframe>");
+            expect(output).not.toContain("<object>");
+        });
+
         test("mdToHTML converts markdown to safe HTML", () => {
             // Note: because mdToHTML escapes everything first, bold and link
             // transformations are applied on the escaped string.
