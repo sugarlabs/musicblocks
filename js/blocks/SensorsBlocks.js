@@ -111,7 +111,7 @@ function setupSensorsBlocks(activity) {
                         logo.inputValues[turtle] = Number(value);
                     }
 
-                    inputElem.removeEventListener("keypress", __keyPressed);
+                    inputElem.removeEventListener("keydown", __keyPressed);
                     inputElem.blur();
                     inputElem.style.display = "none";
                     logo.clearTurtleRun(turtle);
@@ -119,7 +119,7 @@ function setupSensorsBlocks(activity) {
                 }
             }
 
-            inputElem.addEventListener("keypress", __keyPressed);
+            inputElem.addEventListener("keydown", __keyPressed);
         }
     }
     /**
