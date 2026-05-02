@@ -9,6 +9,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+const _paletteIconCache = new Map();
+
 /* global
    docById, LEADING, DEFAULTPALETTE, MULTIPALETTES, platformColor,
    PALETTEICONS, MULTIPALETTEICONS, SKIPPALETTES, toTitleCase,
@@ -45,8 +47,20 @@ const paletteBlockButtonPush = (blocks, name, arg) => {
 // loadPaletteMenuItemHandler is the event handler for the palette menu.
 
 const makePaletteIcons = (data, width, height) => {
+    const key = `${data}_${width}_${height}`;
+    let src;
+    if (_paletteIconCache.has(key)) {
+        src = _paletteIconCache.get(key);
+    } else {
+        src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data));
+        if (_paletteIconCache.size > 500) {
+            _paletteIconCache.clear();
+        }
+        _paletteIconCache.set(key, src);
+    }
+
     const img = new Image();
-    img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data));
+    img.src = src;
     if (width) img.width = width;
     if (height) img.height = height;
     return img;
@@ -432,17 +446,23 @@ class Palettes {
                 // Use the same selection color as mouse hover (dark blue)
                 td.style.backgroundColor = platformColor.paletteLabelSelected;
                 td.dataset.keyboardFocus = "true";
+                td.tabIndex = 0;
+                td.focus({ preventScroll: true });
             }
         } else if (this._navSection === "search" && blockRows.length > 0) {
             const searchRow = blockRows[0];
             if (searchRow) {
                 searchRow.style.backgroundColor = platformColor.hoverColor;
                 searchRow.dataset.keyboardFocus = "true";
+                searchRow.tabIndex = 0;
+                searchRow.focus({ preventScroll: true });
             }
         } else if (this._navSection === "blocks" && blockRows[this._navBlockIndex]) {
             const row = blockRows[this._navBlockIndex];
             row.style.backgroundColor = platformColor.hoverColor;
             row.dataset.keyboardFocus = "true";
+            row.tabIndex = 0;
+            row.focus({ preventScroll: true });
         } else if (this._navSection === "palette") {
             // Highlight the focused block in the palette panel
             const paletteBlocks = this._getPaletteBlocks();
@@ -450,6 +470,8 @@ class Palettes {
                 const blockRow = paletteBlocks[this._navPaletteBlockIndex];
                 blockRow.style.backgroundColor = platformColor.hoverColor;
                 blockRow.dataset.keyboardFocus = "true";
+                blockRow.tabIndex = 0;
+                blockRow.focus({ preventScroll: true });
                 // Scroll into view if needed
                 blockRow.scrollIntoView({ block: "nearest", behavior: "smooth" });
             }
@@ -464,6 +486,9 @@ class Palettes {
         focused.forEach(el => {
             el.style.backgroundColor = platformColor.paletteBackground;
             delete el.dataset.keyboardFocus;
+            if (typeof el.hasAttribute === "function" && el.hasAttribute("tabindex")) {
+                el.tabIndex = -1;
+            }
         });
     }
 
@@ -571,11 +596,13 @@ class Palettes {
         if (this.collapsed) {
             palette.style.transform = "translateX(-100%)";
             document.getElementById("paletteToggle").innerHTML = "▶";
+            document.getElementById("paletteToggle").setAttribute("aria-expanded", "false");
             palette.style.transition = "transform 0.3s ease";
             this.paletteWidth = 0;
         } else {
             palette.style.transform = "translateX(0)";
             document.getElementById("paletteToggle").innerHTML = "◀";
+            document.getElementById("paletteToggle").setAttribute("aria-expanded", "true");
             this.paletteWidth = 55 * PALETTE_WIDTH_FACTOR;
         }
     }
@@ -587,6 +614,9 @@ class Palettes {
             element.setAttribute("class", "disable_highlighting");
             element.classList.add("flex-palette");
 
+            element.setAttribute("role", "region");
+            element.setAttribute("aria-label", _("Block Palettes"));
+
             element.style.position = "absolute";
             element.style.zIndex = "1000";
             element.style.left = "0px";
@@ -596,7 +626,7 @@ class Palettes {
             element.innerHTML = `<div style="height:fit-content">
                     <table width="${1.5 * this.cellSize}" bgcolor="white">
                         <thead>
-                            <tr></tr>
+                            <tr role="tablist" aria-label="${_("Palette Categories")}"></tr>
                         </thead>
                     </table>
                     <table width ="${4.5 * this.cellSize}" bgcolor="white">
@@ -616,6 +646,10 @@ class Palettes {
             const toggleBtn = document.createElement("div");
             toggleBtn.innerHTML = "◀";
             toggleBtn.id = "paletteToggle";
+            toggleBtn.setAttribute("role", "button");
+            toggleBtn.setAttribute("aria-label", _("Toggle Palette"));
+            toggleBtn.setAttribute("aria-expanded", "true");
+            toggleBtn.tabIndex = 0;
 
             toggleBtn.style.position = "absolute";
             toggleBtn.style.top = "10px";
@@ -672,6 +706,9 @@ class Palettes {
         td.height = 1.5 * this.cellSize;
         td.style.position = "relative";
         td.style.backgroundColor = platformColor.paletteBackground;
+        td.setAttribute("role", "tab");
+        td.setAttribute("aria-label", _(MULTIPALETTES[i]));
+        td.tabIndex = i === 0 ? 0 : -1; // Make only the first tab focusable by default
 
         td.appendChild(
             makePaletteIcons(
@@ -1557,6 +1594,10 @@ class Palette {
                 continue;
             }
             const itemRow = document.createElement("tr");
+            itemRow.setAttribute("role", "button");
+            itemRow.setAttribute("aria-label", _(b.name || b.blkname));
+            itemRow.tabIndex = -1;
+
             const itemCell = document.createElement("td");
             itemRow.appendChild(itemCell);
             let img = makePaletteIcons(b.artwork);

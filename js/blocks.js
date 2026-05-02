@@ -25,7 +25,7 @@
    getVoiceSynthName, i18nSolfege, last, MathUtility, mixedNumber,
    piemenuBlockContext, prepareMacroExports, ProtoBlock,
     setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments,
-    docById, define, BlocksDependencies
+    docById, define, BlocksDependencies, deepClone
 */
 
 /* global showZoomOverlay */
@@ -44,7 +44,7 @@
         MathUtility
    - js/utils/utils.js
         _, last, closeBlkWidgets, mixedNumber, prepareMacroExports,
-        getTextWidth, delayExecution
+        getTextWidth, delayExecution, deepClone
    - js/utils/musicutils.js
         addTemperamentToDictionary,
         getDrumSynthName, getNoiseName, getNoiseSynthName,
@@ -928,6 +928,7 @@ class Blocks {
             const myBlock = this.blockList[blk];
             if (myBlock == null) {
                 console.debug("Something very broken in _getStackSize.");
+                return size;
             }
 
             let c;
@@ -1017,7 +1018,7 @@ class Blocks {
 
             if (this._deferCheckBoundsCount === 0 && this._checkBoundsPending) {
                 this._checkBoundsPending = false;
-                this.checkBounds();
+                this.scheduleCheckBounds();
             }
         };
 
@@ -1104,7 +1105,7 @@ class Blocks {
                 }
 
                 /** Another database integrity check. */
-                if (this.blockList[cblk] === null) {
+                if (this.blockList[cblk] == null) {
                     console.debug("This is not good: we encountered a null block: " + cblk);
                     continue;
                 }
@@ -2538,7 +2539,7 @@ class Blocks {
                 if (this._deferCheckBoundsCount > 0) {
                     this._checkBoundsPending = true;
                 } else {
-                    this.checkBounds();
+                    this.scheduleCheckBounds();
                 }
             } else {
                 console.debug("No container yet for block " + myBlock.name);
@@ -2564,7 +2565,7 @@ class Blocks {
                 if (this._deferCheckBoundsCount > 0) {
                     this._checkBoundsPending = true;
                 } else {
-                    this.checkBounds();
+                    this.scheduleCheckBounds();
                 }
             } else {
                 console.debug("No container yet for block " + myBlock.name);
@@ -5292,7 +5293,7 @@ class Blocks {
             this.selectedStack = this.activeBlock;
 
             /** Copy the selectedStack. */
-            this.selectedBlocksObj = JSON.parse(JSON.stringify(this._copyBlocksToObj(false)));
+            this.selectedBlocksObj = deepClone(this._copyBlocksToObj(false));
 
             /** Reset paste offset. */
             this.pasteDx = 0;

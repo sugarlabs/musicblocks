@@ -284,8 +284,12 @@ describe("Palettes Class", () => {
 
     describe("_makeSelectorButton method", () => {
         test("creates a selector cell and hooks hover handlers", () => {
-            const tdMock = { style: {}, appendChild: jest.fn() };
-            const trMock = { insertCell: jest.fn(() => tdMock), children: [{}, { children: [] }] };
+            const tdMock = { style: {}, appendChild: jest.fn(), setAttribute: jest.fn() };
+            const trMock = {
+                insertCell: jest.fn(() => tdMock),
+                children: [{}, { children: [] }],
+                setAttribute: jest.fn()
+            };
             const paletteElement = {
                 children: [
                     {
@@ -1520,6 +1524,7 @@ describe("Palettes Class", () => {
                 if (tag === "table") return paletteBody;
                 return {
                     style: {},
+                    setAttribute: jest.fn(),
                     appendChild: jest.fn(),
                     children: [],
                     classList: { add: jest.fn() }
@@ -1546,8 +1551,10 @@ describe("Palettes Class", () => {
         test("_showMenuItems renders a basic block", () => {
             const paletteList = {
                 insertRow: jest.fn(() => ({
+                    setAttribute: jest.fn(),
                     insertCell: jest.fn(() => ({
                         style: {},
+                        setAttribute: jest.fn(),
                         appendChild: jest.fn()
                     }))
                 })),
@@ -1600,6 +1607,7 @@ describe("Palettes Class", () => {
                 if (tag === "tr") {
                     return {
                         children: [],
+                        setAttribute: jest.fn(),
                         appendChild(child) {
                             this.children.push(child);
                         }
@@ -1609,6 +1617,7 @@ describe("Palettes Class", () => {
                 if (tag === "td") {
                     return {
                         style: {},
+                        setAttribute: jest.fn(),
                         appendChild(img) {
                             capturedImg = img;
                         }
@@ -1698,6 +1707,7 @@ describe("Palettes Class", () => {
                 if (tag === "tr") {
                     return {
                         children: [],
+                        setAttribute: jest.fn(),
                         appendChild(child) {
                             this.children.push(child);
                         }
@@ -1707,6 +1717,7 @@ describe("Palettes Class", () => {
                 if (tag === "td") {
                     return {
                         style: {},
+                        setAttribute: jest.fn(),
                         appendChild(img) {
                             capturedImg = img;
                         }
@@ -1760,8 +1771,10 @@ describe("Palettes Class", () => {
         test("_showMenuItems hides palette when mobile", () => {
             const paletteList = {
                 insertRow: jest.fn(() => ({
+                    setAttribute: jest.fn(),
                     insertCell: jest.fn(() => ({
                         style: {},
+                        setAttribute: jest.fn(),
                         appendChild: jest.fn()
                     }))
                 })),

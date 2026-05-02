@@ -78,7 +78,7 @@
   "background_color": "#F9F9F9",
   "theme_color": "#2196F3",
   "display": "standalone",
-  "orientation": "landscape",
+  "orientation": "any",
   "dir": "ltr",
   "lang": "en",
   "categories": ["code", "education"],

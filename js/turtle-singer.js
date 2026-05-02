@@ -1354,7 +1354,12 @@ class Singer {
             tur.singer.pushedNote = true;
 
             Singer.processNote(activity, tur.singer.defaultNoteValue, false, blk, turtle, () => {
-                tur.singer.inNoteBlock.splice(tur.singer.inNoteBlock.indexOf(blk), 1);
+                const idx = tur.singer.inNoteBlock.indexOf(blk);
+                if (idx !== -1) {
+                    tur.singer.inNoteBlock.splice(idx, 1);
+                } else {
+                    console.warn("Singer: block", blk, "not found in inNoteBlock");
+                }
             });
         }
     }

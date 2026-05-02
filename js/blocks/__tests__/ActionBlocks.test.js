@@ -964,5 +964,49 @@ describe("ActionBlocks", () => {
             expect(tur.singer.runningFromEvent).toBe(true);
             expect(logo.runFromBlockNow).toHaveBeenCalled();
         });
+
+        test("starts event timing at zero when no note has played yet", () => {
+            const block = activity.registeredBlocks["listen"];
+            logo.actions["testAction"] = [];
+            activity.logo = { firstNoteTime: null };
+            const tur = {
+                running: false,
+                queue: [],
+                parentFlowQueue: [],
+                singer: { justCounting: [], runningFromEvent: false, turtleTime: 0 }
+            };
+            activity.turtles.ithTurtle = jest.fn(() => tur);
+            block.flow(["event1", "testAction"], logo, 0, 10);
+            const listenerCall = logo.setTurtleListener.mock.calls[0];
+            const listenerFn = listenerCall[2];
+
+            listenerFn({});
+
+            expect(tur.singer.turtleTime).toBe(0);
+            expect(logo.runFromBlockNow).toHaveBeenCalled();
+        });
+
+        test("ignores events after stop", () => {
+            const block = activity.registeredBlocks["listen"];
+            logo.actions["testAction"] = [];
+            logo.stopTurtle = true;
+            activity.logo = { firstNoteTime: Date.now() };
+            const tur = {
+                running: false,
+                queue: [],
+                parentFlowQueue: [],
+                singer: { justCounting: [], runningFromEvent: false, turtleTime: 0 }
+            };
+            activity.turtles.ithTurtle = jest.fn(() => tur);
+            block.flow(["event1", "testAction"], logo, 0, 10);
+            const listenerCall = logo.setTurtleListener.mock.calls[0];
+            const listenerFn = listenerCall[2];
+
+            listenerFn({});
+
+            expect(tur.singer.runningFromEvent).toBe(false);
+            expect(tur.singer.turtleTime).toBe(0);
+            expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+        });
     });
 });

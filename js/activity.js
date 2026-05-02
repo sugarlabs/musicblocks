@@ -250,6 +250,7 @@ class Activity {
 
         this.cellSize = 55;
         this.searchSuggestions = [];
+        this._searchCache = {}; // Cache for search results to improve performance
         this._searchCloseListener = null;
         this.homeButtonContainer;
 
@@ -323,7 +324,12 @@ class Activity {
         this.keyboardEnableFlag;
         this.inTempoWidget = false;
         this.projectID = null;
-        this.storage = localStorage;
+        try {
+            this.storage = localStorage;
+        } catch (e) {
+            // Fall back to in-memory storage when browser storage is restricted.
+            this.storage = {};
+        }
 
         // Flag to indicate whether the user is performing a 2D drag operation.
         this.isDragging = false;
@@ -1071,6 +1077,11 @@ class Activity {
                 let y = Math.floor(toppos * this.turtleBlocksScale);
                 let even = true;
 
+                // Defer checkBounds during bulk block moves to avoid O(N²)
+                // overhead: each moveBlockRelative call triggers checkBounds()
+                // which scans all blocks, so N moves × N blocks = O(N²).
+                this.blocks._beginDeferCheckBounds();
+
                 // Position "start" blocks first
                 for (const blk in this.blocks.blockList) {
                     if (!this.blocks.blockList[blk].trash) {
@@ -1142,6 +1153,8 @@ class Activity {
                         }
                     }
                 }
+
+                this.blocks._endDeferCheckBounds();
             } else {
                 // Second click logic (arrange blocks in columns this avoid overlapping of blocks)
                 let toppos;
@@ -1176,6 +1189,9 @@ class Activity {
                 );
                 const columnYPositions = Array(numColumns).fill(initialY);
 
+                // Defer checkBounds during bulk block moves (see first-click path).
+                this.blocks._beginDeferCheckBounds();
+
                 for (const blk in this.blocks.blockList) {
                     if (!this.blocks.blockList[blk].trash) {
                         const myBlock = this.blocks.blockList[blk];
@@ -1204,6 +1220,8 @@ class Activity {
                         }
                     }
                 }
+
+                this.blocks._endDeferCheckBounds();
             }
 
             // Reset go-home button
@@ -1837,7 +1855,12 @@ class Activity {
              */
 
             async function recordScreen() {
-                const mode = localStorage.getItem("musicBlocksRecordMode");
+                let mode = null;
+                try {
+                    mode = localStorage.getItem("musicBlocksRecordMode");
+                } catch (e) {
+                    mode = null;
+                }
 
                 if (mode === "canvas") {
                     return await recordCanvasOnly();
@@ -3135,26 +3158,9 @@ class Activity {
             const IDLE_THRESHOLD = 5000; // 5 seconds
             const ACTIVE_FPS = 60;
             const IDLE_FPS = 1;
-            const idleEvents = ["mousemove", "mousedown", "keydown", "touchstart", "wheel"];
-
-            if (this._idleWatcherResetHandler) {
-                idleEvents.forEach(eventType => {
-                    window.removeEventListener(eventType, this._idleWatcherResetHandler);
-                });
-            }
-
-            if (this._idleWatcherIntervalId) {
-                clearInterval(this._idleWatcherIntervalId);
-                this._idleWatcherIntervalId = null;
-            }
 
             let lastActivity = Date.now();
             this.isAppIdle = false;
-
-            // Prevent duplicate intervals
-            if (this._idleWatcherIntervalId) {
-                clearInterval(this._idleWatcherIntervalId);
-            }
 
             // Wake up function - restores full framerate
             // Stored as instance property for cleanup
@@ -3270,6 +3276,7 @@ class Activity {
             this.searchBlockPosition = [100, 100];
 
             this.searchSuggestions = [];
+            this._searchCache = {}; // Reset cache to prevent memory leaks
             this.deprecatedBlockNames = [];
 
             // Guard: blocks may not be initialized yet during early loading
@@ -3494,7 +3501,14 @@ class Activity {
                 $search.autocomplete({
                     // Custom source so we can match on extraSearchTerms but show each block only once.
                     source: (request, response) => {
-                        const term = (request.term || "").toLowerCase();
+                        const term = (request.term || "").toLowerCase().trim();
+
+                        // Check cache first for performance
+                        if (that._searchCache[term] !== undefined) {
+                            response(that._searchCache[term]);
+                            return;
+                        }
+
                         const results = that.searchSuggestions.filter(item => {
                             // If there is no active term, show all items.
                             if (!term || term.length === 0) {
@@ -3513,6 +3527,9 @@ class Activity {
                                 item.label.toLowerCase().indexOf(term) !== -1
                             );
                         });
+
+                        // Cache the results for future use
+                        that._searchCache[term] = results;
                         response(results);
                     },
                     appendTo: "body",
@@ -4790,6 +4807,12 @@ class Activity {
             let actionBlockCounter = 0;
             const dx = 0;
             const dy = this.cellSize * 3;
+
+            // Defer checkBounds during bulk block moves to avoid O(N²)
+            // overhead: each moveBlockRelative call triggers checkBounds()
+            // which scans all blocks, so N moves × N blocks = O(N²).
+            this.blocks._beginDeferCheckBounds();
+
             for (const blk in this.blocks.blockList) {
                 // If this block is at the top of a stack, push it
                 // onto the trashStacks list.
@@ -4832,6 +4855,8 @@ class Activity {
                     delete this.blocks.blockCollapseArt[blk];
                 }
             }
+
+            this.blocks._endDeferCheckBounds();
 
             if (addStartBlock) {
                 this.blocks.loadNewBlocks(DATAOBJS);
@@ -4919,12 +4944,31 @@ class Activity {
         this.onStopTurtle = () => {
             if (this.showBlocksAfterRun) {
                 this.blocks.showBlocks();
-                const stopIcon = document.getElementById("stop");
-                if (stopIcon) {
-                    stopIcon.style.color = "white";
-                }
                 this.showBlocksAfterRun = false;
             }
+
+            const stopIcon = document.getElementById("stop");
+            if (stopIcon) {
+                stopIcon.style.color = "white";
+                stopIcon.style.display = "none";
+            }
+
+            const saveBtn = document.getElementById("saveButton");
+            const saveBtnAdv = document.getElementById("saveButtonAdvanced");
+            const recordBtn = document.getElementById("record");
+
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.classList.remove("grey-text", "inactiveLink");
+            }
+            if (saveBtnAdv) {
+                saveBtnAdv.disabled = false;
+                saveBtnAdv.classList.remove("grey-text", "inactiveLink");
+            }
+            if (recordBtn) {
+                recordBtn.classList.remove("grey-text", "inactiveLink");
+            }
+
             // TODO: plugin support
         };
 
@@ -4966,42 +5010,8 @@ class Activity {
         let lastRefreshReport = performance.now();
 
         this.refreshCanvas = () => {
-            if (this.blockRefreshCanvas) {
-                return;
-            }
-
-            const start = window.__ENABLE_REFRESH_PROFILING__ ? performance.now() : 0;
-
-            this.blockRefreshCanvas = true;
             this.stageDirty = true;
             this.update = true;
-
-            const that = this;
-            setTimeout(() => {
-                that.blockRefreshCanvas = false;
-                that.stageDirty = true;
-
-                if (window.__ENABLE_REFRESH_PROFILING__) {
-                    const duration = performance.now() - start;
-                    refreshCount++;
-                    totalRefreshTime += duration;
-                    maxRefreshTime = Math.max(maxRefreshTime, duration);
-
-                    if (refreshCount % 25 === 0) {
-                        const now = performance.now();
-                        const cps = (25 / (now - lastRefreshReport)) * 1000;
-                        console.log(
-                            `refreshCanvas | Avg: ${(totalRefreshTime / refreshCount).toFixed(
-                                2
-                            )}ms | Max: ${maxRefreshTime.toFixed(2)}ms | Rate: ${cps.toFixed(
-                                1
-                            )} calls/sec`
-                        );
-                        maxRefreshTime = 0;
-                        lastRefreshReport = now;
-                    }
-                }
-            }, 5);
         };
 
         /*
@@ -5239,25 +5249,49 @@ class Activity {
             this.doLoadAnimation();
 
             // palettes.updatePalettes();
-            this.textMsg(this.planet.getCurrentProjectName());
+            try {
+                const projectName =
+                    this.planet && typeof this.planet.getCurrentProjectName === "function"
+                        ? this.planet.getCurrentProjectName()
+                        : _("My Project");
+                this.textMsg(projectName);
+            } catch (e) {
+                console.error(e);
+                this.textMsg(_("My Project"));
+            }
 
             const that = this;
             setTimeout(() => {
+                const finishLoading = () => {
+                    that.loading = false;
+                    document.body.style.cursor = "default";
+                    that.update = true;
+                };
+
                 try {
-                    that.planet.openProjectFromPlanet(projectID, () => {
-                        that.loadStartWrapper(loadStart);
-                    });
+                    if (that.planet && typeof that.planet.openProjectFromPlanet === "function") {
+                        that.planet.openProjectFromPlanet(projectID, () => {
+                            that.loadStartWrapper(loadStart);
+                        });
+                    } else {
+                        throw new Error("Planet openProjectFromPlanet is unavailable.");
+                    }
                 } catch (e) {
                     console.error(e);
                     that.loadStartWrapper(loadStart);
                 }
 
-                that.planet.initialiseNewProject();
-                // Restore default cursor
-                that.loading = false;
+                if (that.planet && typeof that.planet.initialiseNewProject === "function") {
+                    try {
+                        that.planet.initialiseNewProject();
+                    } catch (e) {
+                        console.error(e);
+                    }
+                } else {
+                    console.error("Planet initialiseNewProject is unavailable.");
+                }
 
-                document.body.style.cursor = "default";
-                that.update = true;
+                finishLoading();
             }, 2500);
 
             const run = flags.run;
@@ -6730,12 +6764,10 @@ class Activity {
                         case "start":
                         case "drum": {
                             // Find the turtle associated with this block.
-                            const turtleIdx = parseInt(myBlock.value);
+
                             const turtle =
-                                !isNaN(turtleIdx) &&
-                                turtleIdx >= 0 &&
-                                turtleIdx < this.turtles.getTurtleCount()
-                                    ? this.turtles.getTurtle(turtleIdx)
+                                myBlock.value !== null && myBlock.value !== undefined
+                                    ? this.turtles.getTurtle(myBlock.value)
                                     : null;
                             if (turtle === null || turtle === undefined) {
                                 args = {
@@ -7222,7 +7254,14 @@ class Activity {
             if (!$helpfulSearch.data("autocomplete-init")) {
                 $helpfulSearch.autocomplete({
                     source: (request, response) => {
-                        const term = (request.term || "").toLowerCase();
+                        const term = (request.term || "").toLowerCase().trim();
+
+                        // Check cache first for performance
+                        if (that._searchCache[term] !== undefined) {
+                            response(that._searchCache[term]);
+                            return;
+                        }
+
                         const results = that.searchSuggestions.filter(item => {
                             if (!term || term.length === 0) {
                                 return true;
@@ -7238,6 +7277,9 @@ class Activity {
                                 item.label.toLowerCase().indexOf(term) !== -1
                             );
                         });
+
+                        // Cache the results for future use
+                        that._searchCache[term] = results;
                         response(results);
                     },
                     appendTo: "body",
@@ -8355,8 +8397,8 @@ class Activity {
                 }
             }
 
-            this.fileChooser.addEventListener("click", () => {
-                that.value = null;
+            this.fileChooser.addEventListener("click", event => {
+                event.currentTarget.value = "";
             });
 
             this.fileChooser.addEventListener(
@@ -8630,13 +8672,13 @@ class Activity {
             dropZone.addEventListener("dragover", __handleDragOver, false);
             dropZone.addEventListener("drop", __handleFileSelect, false);
 
-            this.allFilesChooser.addEventListener("click", () => {
-                this.value = null;
+            this.allFilesChooser.addEventListener("click", event => {
+                event.currentTarget.value = "";
             });
 
-            this.pluginChooser.addEventListener("click", () => {
+            this.pluginChooser.addEventListener("click", event => {
                 window.scroll(0, 0);
-                this.value = null;
+                event.currentTarget.value = "";
             });
 
             this.pluginChooser.addEventListener(
@@ -9011,16 +9053,9 @@ class Activity {
             }
         }
 
-        if (this._idleWatcherResetHandler) {
-            ["mousemove", "mousedown", "keydown", "touchstart", "wheel"].forEach(eventType => {
-                window.removeEventListener(eventType, this._idleWatcherResetHandler);
-            });
-            this._idleWatcherResetHandler = null;
-        }
-
-        if (this._idleWatcherIntervalId) {
-            clearInterval(this._idleWatcherIntervalId);
-            this._idleWatcherIntervalId = null;
+        // Keep idle watcher cleanup centralized to avoid stale field mismatches.
+        if (typeof this._stopIdleWatcher === "function") {
+            this._stopIdleWatcher();
         }
     }
 

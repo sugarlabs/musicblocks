@@ -15,6 +15,8 @@
    _, last, DRUMNAMES, NOISENAMES, VOICENAMES, INVALIDPITCH, CUSTOMSAMPLES
 */
 
+const _b64Cache = new Map();
+
 /*
    Global Locations
     js/utils/utils.js
@@ -4133,9 +4135,16 @@ const GetNotesForInterval = tur => {
  * @returns {string} - The Base64 encoded string.
  */
 function base64Encode(str) {
+    if (_b64Cache.has(str)) {
+        return _b64Cache.get(str);
+    }
     const encoder = new TextEncoder();
     const uint8Array = encoder.encode(str);
     const binaryString = String.fromCharCode(...uint8Array);
+    if (_b64Cache.size > 1000) {
+        _b64Cache.clear();
+    }
+    _b64Cache.set(str, binaryString);
     return binaryString;
 }
 

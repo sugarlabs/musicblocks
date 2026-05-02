@@ -737,7 +737,6 @@ class ReflectionMatrix {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     }
-
     /**
      * Sanitizes HTML content using DOMParser to prevent XSS.
      * Removes unsafe attributes and ensures links are safe.
