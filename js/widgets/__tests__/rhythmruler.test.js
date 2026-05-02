@@ -72,7 +72,9 @@ const mockWindow = {
             destroy: jest.fn(),
             addButton: jest.fn().mockReturnValue({
                 onclick: null,
-                innerHTML: ""
+                innerHTML: "",
+                replaceChildren: jest.fn(),
+                appendChild: jest.fn()
             }),
             addInputButton: jest.fn().mockImplementation(val => ({
                 value: val,
@@ -90,6 +92,7 @@ const mockWindow = {
                     setAttribute: jest.fn(),
                     insertCell: jest.fn().mockReturnValue({
                         appendChild: jest.fn(),
+                        replaceChildren: jest.fn(),
                         setAttribute: jest.fn(),
                         style: {},
                         innerHTML: "",
@@ -115,11 +118,13 @@ global.document = {
         getAttribute: jest.fn(),
         addEventListener: jest.fn(),
         appendChild: jest.fn(),
+        replaceChildren: jest.fn(),
         insertRow: jest.fn().mockReturnValue({
             setAttribute: jest.fn(),
             insertCell: jest.fn().mockReturnValue({
                 style: {},
                 innerHTML: "",
+                replaceChildren: jest.fn(),
                 setAttribute: jest.fn(),
                 addEventListener: jest.fn()
             })
@@ -127,7 +132,8 @@ global.document = {
         cells: [],
         insertCell: jest.fn().mockReturnValue({
             style: {},
-            innerHTML: ""
+            innerHTML: "",
+            replaceChildren: jest.fn()
         }),
         deleteCell: jest.fn(),
         classList: { add: jest.fn(), remove: jest.fn() },
@@ -150,7 +156,8 @@ global.document = {
     })),
     getElementById: jest.fn().mockReturnValue({
         style: {},
-        classList: { add: jest.fn(), remove: jest.fn() }
+        classList: { add: jest.fn(), remove: jest.fn() },
+        replaceChildren: jest.fn()
     })
 };
 
@@ -289,7 +296,11 @@ describe("RhythmRuler Widget", () => {
 
         test("__pause should clear pending playback timers", () => {
             const callback = jest.fn();
-            rhythmRuler._playAllCell = { innerHTML: "" };
+            rhythmRuler._playAllCell = {
+                innerHTML: "",
+                replaceChildren: jest.fn(),
+                appendChild: jest.fn()
+            };
             rhythmRuler.Rulers = [[[4], []]];
             rhythmRuler._playing = true;
             jest.spyOn(rhythmRuler, "_calculateZebraStripes").mockImplementation();
@@ -787,7 +798,11 @@ describe("RhythmRuler Widget", () => {
         test("__pause should clear circular highlights", () => {
             rhythmRuler._circularHighlight = { 0: 2, 1: 1 };
             rhythmRuler._playing = true;
-            rhythmRuler._playAllCell = { innerHTML: "" };
+            rhythmRuler._playAllCell = {
+                innerHTML: "",
+                replaceChildren: jest.fn(),
+                appendChild: jest.fn()
+            };
             rhythmRuler.Rulers = [[[4], []]];
             rhythmRuler._rulers = [
                 {

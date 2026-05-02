@@ -85,23 +85,29 @@ const PhraseMakerUI = {
         if (!pm._playButton) return;
 
         if (isPlaying) {
-            pm._playButton.innerHTML = `&nbsp;&nbsp;<img 
-                src="header-icons/stop-button.svg"
-                title="${pm._("Stop")}" 
-                alt="${pm._("Stop")}" 
-                height="${pm.constructor.ICONSIZE}" 
-                width="${pm.constructor.ICONSIZE}" 
-                vertical-align="middle"
-            >&nbsp;&nbsp;`;
+            pm._playButton.replaceChildren();
+            pm._playButton.appendChild(document.createTextNode("\u00A0\u00A0"));
+            const stopImg = document.createElement("img");
+            stopImg.src = "header-icons/stop-button.svg";
+            stopImg.title = pm._("Stop");
+            stopImg.alt = pm._("Stop");
+            stopImg.height = pm.constructor.ICONSIZE;
+            stopImg.width = pm.constructor.ICONSIZE;
+            stopImg.style.verticalAlign = "middle";
+            pm._playButton.appendChild(stopImg);
+            pm._playButton.appendChild(document.createTextNode("\u00A0\u00A0"));
         } else {
-            pm._playButton.innerHTML = `&nbsp;&nbsp;<img 
-                src="header-icons/play-button.svg" 
-                title="${pm._("Play")}" 
-                alt="${pm._("Play")}" 
-                height="${pm.constructor.ICONSIZE}" 
-                width="${pm.constructor.ICONSIZE}" 
-                vertical-align="middle"
-            >&nbsp;&nbsp;`;
+            pm._playButton.replaceChildren();
+            pm._playButton.appendChild(document.createTextNode("\u00A0\u00A0"));
+            const playImg = document.createElement("img");
+            playImg.src = "header-icons/play-button.svg";
+            playImg.title = pm._("Play");
+            playImg.alt = pm._("Play");
+            playImg.height = pm.constructor.ICONSIZE;
+            playImg.width = pm.constructor.ICONSIZE;
+            playImg.style.verticalAlign = "middle";
+            pm._playButton.appendChild(playImg);
+            pm._playButton.appendChild(document.createTextNode("\u00A0\u00A0"));
         }
     },
 
@@ -146,10 +152,10 @@ const PhraseMakerUI = {
 
         if (isActive) {
             cell.style.backgroundColor = pm.platformColor.selectorBackground;
-            cell.innerHTML = "&#x2713;"; // checkmark
+            cell.textContent = "\u2713"; // checkmark
         } else {
             cell.style.backgroundColor = pm.platformColor.rhythmcellcolor;
-            cell.innerHTML = "";
+            cell.textContent = "";
         }
     },
 

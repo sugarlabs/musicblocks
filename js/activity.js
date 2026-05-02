@@ -2424,7 +2424,7 @@ class Activity {
                     messages.load_messages[
                         Math.floor(Math.random() * messages.load_messages.length)
                     ];
-                document.getElementById("messageText").innerHTML = randomLoadMessage + "...";
+                document.getElementById("messageText").textContent = randomLoadMessage + "...";
                 counter++;
                 if (counter >= messages.load_messages.length) {
                     counter = 0;

@@ -887,18 +887,18 @@ function MusicKeyboard(activity) {
         const playButtonCell = this.playButton;
 
         if (this.playingNow) {
-            playButtonCell.innerHTML =
-                '&nbsp;&nbsp;<img src="header-icons/' +
-                "stop-button.svg" +
-                '" title="' +
-                _("Stop") +
-                '" alt="' +
-                _("Stop") +
-                '" height="' +
-                ICONSIZE +
-                '" width="' +
-                ICONSIZE +
-                '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+            playButtonCell.replaceChildren();
+            playButtonCell.appendChild(document.createTextNode("\u00A0\u00A0"));
+            const stopImg = document.createElement("img");
+            stopImg.src = "header-icons/stop-button.svg";
+            stopImg.title = _("Stop");
+            stopImg.alt = _("Stop");
+            stopImg.height = ICONSIZE;
+            stopImg.width = ICONSIZE;
+            stopImg.style.verticalAlign = "middle";
+            stopImg.style.alignContent = "center";
+            playButtonCell.appendChild(stopImg);
+            playButtonCell.appendChild(document.createTextNode("\u00A0\u00A0"));
 
             if (selectedNotes.length < 1) {
                 return;
@@ -945,15 +945,18 @@ function MusicKeyboard(activity) {
             }
 
             this._stopOrCloseClicked = true;
-            playButtonCell.innerHTML = `&nbsp;&nbsp;<img 
-                    src="header-icons/play-button.svg" 
-                    title="${_("Play")}" 
-                    alt="${_("Play")}" 
-                    height="${ICONSIZE}" 
-                    width="${ICONSIZE}" 
-                    vertical-align="middle" 
-                    align-content="center"
-                >&nbsp;&nbsp;`;
+            playButtonCell.replaceChildren();
+            playButtonCell.appendChild(document.createTextNode("\u00A0\u00A0"));
+            const playImg = document.createElement("img");
+            playImg.src = "header-icons/play-button.svg";
+            playImg.title = _("Play");
+            playImg.alt = _("Play");
+            playImg.height = ICONSIZE;
+            playImg.width = ICONSIZE;
+            playImg.style.verticalAlign = "middle";
+            playImg.style.alignContent = "center";
+            playButtonCell.appendChild(playImg);
+            playButtonCell.appendChild(document.createTextNode("\u00A0\u00A0"));
         }
     };
 
@@ -1028,15 +1031,18 @@ function MusicKeyboard(activity) {
 
                 this.playOne(counter + 1, maxDuration, playButtonCell);
             } else {
-                playButtonCell.innerHTML = `&nbsp;&nbsp;<img 
-                        src="header-icons/play-button.svg" 
-                        title="${_("Play")}" 
-                        alt="${_("Play")}" 
-                        height="${ICONSIZE}" 
-                        width="${ICONSIZE}" 
-                        vertical-align="middle" 
-                        align-content="center"
-                    >&nbsp;&nbsp;`;
+                playButtonCell.replaceChildren();
+                playButtonCell.appendChild(document.createTextNode("\u00A0\u00A0"));
+                const playImg = document.createElement("img");
+                playImg.src = "header-icons/play-button.svg";
+                playImg.title = _("Play");
+                playImg.alt = _("Play");
+                playImg.height = ICONSIZE;
+                playImg.width = ICONSIZE;
+                playImg.style.verticalAlign = "middle";
+                playImg.style.alignContent = "center";
+                playButtonCell.appendChild(playImg);
+                playButtonCell.appendChild(document.createTextNode("\u00A0\u00A0"));
                 this.playingNow = false;
                 if (!this.keyboardShown) {
                     this._createTable();
@@ -1563,14 +1569,20 @@ function MusicKeyboard(activity) {
         mkbTableDiv.style.border = "0px";
         mkbTableDiv.style.width = "700px";
 
-        mkbTableDiv.innerHTML = "";
-
-        mkbTableDiv.innerHTML =
-            '<div id="mkbOuterDiv"><div id="mkbInnerDiv"><table cellpadding="0px" id="mkbTable"></table></div></div>';
+        mkbTableDiv.replaceChildren();
+        const outerDiv = document.createElement("div");
+        outerDiv.id = "mkbOuterDiv";
+        const innerDiv = document.createElement("div");
+        innerDiv.id = "mkbInnerDiv";
+        const mkbTable = document.createElement("table");
+        mkbTable.setAttribute("cellpadding", "0px");
+        mkbTable.id = "mkbTable";
+        innerDiv.appendChild(mkbTable);
+        outerDiv.appendChild(innerDiv);
+        mkbTableDiv.appendChild(outerDiv);
 
         let n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 8);
 
-        const outerDiv = docById("mkbOuterDiv");
         outerDiv.style.overflowY = "hidden";
         if (this.displayLayout.length > n) {
             outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (n + 5) + "px";
@@ -1584,9 +1596,8 @@ function MusicKeyboard(activity) {
 
         docById("mkbInnerDiv").style.marginLeft = 0;
 
-        const mkbTable = docById("mkbTable");
         if (selectedNotes.length < 1) {
-            outerDiv.innerHTML = "";
+            outerDiv.replaceChildren();
             return;
         }
 
@@ -1635,7 +1646,10 @@ function MusicKeyboard(activity) {
 
             mkbCell = mkbTableRow.insertCell();
             // Create tables to store individual notes.
-            mkbCell.innerHTML = `<table cellpadding="0px" id="mkbCellTable${j}"></table>`;
+            mkbCellTable = document.createElement("table");
+            mkbCellTable.setAttribute("cellpadding", "0px");
+            mkbCellTable.id = "mkbCellTable" + j;
+            mkbCell.appendChild(mkbCellTable);
             mkbCellTable = docById("mkbCellTable" + j);
             mkbCellTable.style.marginTop = "-1px";
 
@@ -1662,8 +1676,13 @@ function MusicKeyboard(activity) {
         cell.style.zIndex = "1";
 
         const newCell = mkbTableRow.insertCell();
-        newCell.innerHTML =
-            '<table  class="mkbTable" cellpadding="0px"><tr id="mkbNoteDurationRow"></tr></table>';
+        const nestedTable = document.createElement("table");
+        nestedTable.className = "mkbTable";
+        nestedTable.setAttribute("cellpadding", "0px");
+        const nestedRow = document.createElement("tr");
+        nestedRow.id = "mkbNoteDurationRow";
+        nestedTable.appendChild(nestedRow);
+        newCell.appendChild(nestedTable);
         const cellColor = "lightgrey";
         let maxWidth, noteMaxWidth, row, ind, dur;
         for (let j = 0; j < selectedNotes.length; j++) {
@@ -1716,7 +1735,6 @@ function MusicKeyboard(activity) {
             cell.style.color = platformColor.textColor;
         }
 
-        const innerDiv = docById("mkbInnerDiv");
         innerDiv.scrollLeft = innerDiv.scrollWidth; // Force to the right.
         this.makeClickable();
         this._updateWidgetWindowSize();
@@ -2715,24 +2733,43 @@ function MusicKeyboard(activity) {
         mkbKeyboardDiv.style.userSelect = "none";
         mkbKeyboardDiv.style.webkitUserSelect = "none"; // Safari/Chrome
         mkbKeyboardDiv.style.msUserSelect = "none"; // Edge
-        mkbKeyboardDiv.innerHTML = "";
-        mkbKeyboardDiv.innerHTML =
-            ' <div id="keyboardHolder2"><table class="white"><tbody><tr id="myrow"></tr></tbody></table><table class="black"><tbody><tr id="myrow2"></tr></tbody></table></div>';
+        mkbKeyboardDiv.replaceChildren();
+        const keyboardHolder2 = document.createElement("div");
+        keyboardHolder2.id = "keyboardHolder2";
 
-        const keyboardHolder2 = docById("keyboardHolder2");
+        const whiteTable = document.createElement("table");
+        whiteTable.className = "white";
+        const whiteTbody = document.createElement("tbody");
+        const whiteRow = document.createElement("tr");
+        whiteRow.id = "myrow";
+        whiteTbody.appendChild(whiteRow);
+        whiteTable.appendChild(whiteTbody);
+
+        const blackTable = document.createElement("table");
+        blackTable.className = "black";
+        const blackTbody = document.createElement("tbody");
+        const blackRow = document.createElement("tr");
+        blackRow.id = "myrow2";
+        blackTbody.appendChild(blackRow);
+        blackTable.appendChild(blackTbody);
+
+        keyboardHolder2.appendChild(whiteTable);
+        keyboardHolder2.appendChild(blackTable);
+        mkbKeyboardDiv.appendChild(keyboardHolder2);
+
         keyboardHolder2.style.bottom = "10px";
         keyboardHolder2.style.left = "0px";
         keyboardHolder2.style.height = "145px";
         keyboardHolder2.style.backgroundColor = "white";
-        const blackRow = document.getElementsByClassName("black");
-        blackRow[0].style.top = "1px";
-        blackRow[0].style.borderSpacing = "0px 0px 20px";
-        blackRow[0].style.borderCollapse = "separate";
+        const blackTables = document.getElementsByClassName("black");
+        blackTables[0].style.top = "1px";
+        blackTables[0].style.borderSpacing = "0px 0px 20px";
+        blackTables[0].style.borderCollapse = "separate";
 
         let myNode = document.getElementById("myrow");
-        myNode.innerHTML = "";
+        myNode.replaceChildren();
         myNode = document.getElementById("myrow2");
-        myNode.innerHTML = "";
+        myNode.replaceChildren();
 
         // For the button callbacks
 

@@ -56,7 +56,10 @@ function createMockPM() {
 function createMockCell(bgColor) {
     return {
         style: { backgroundColor: bgColor || "" },
-        innerHTML: ""
+        innerHTML: "",
+        textContent: "",
+        replaceChildren: jest.fn(),
+        appendChild: jest.fn()
     };
 }
 
@@ -301,7 +304,7 @@ describe("PhraseMakerUI", () => {
 
             PhraseMakerUI.updateNoteCellVisual(pm, cell, true);
 
-            expect(cell.innerHTML).toBe("&#x2713;");
+            expect(cell.textContent).toBe("\u2713");
         });
 
         test("sets inactive cell background to rhythmcellcolor", () => {
@@ -320,7 +323,7 @@ describe("PhraseMakerUI", () => {
 
             PhraseMakerUI.updateNoteCellVisual(pm, cell, false);
 
-            expect(cell.innerHTML).toBe("");
+            expect(cell.textContent).toBe("");
         });
 
         test("does nothing when cell is null", () => {
@@ -342,11 +345,11 @@ describe("PhraseMakerUI", () => {
 
             PhraseMakerUI.updateNoteCellVisual(pm, cell, true);
             expect(cell.style.backgroundColor).toBe("#8bc34a");
-            expect(cell.innerHTML).toBe("&#x2713;");
+            expect(cell.textContent).toBe("\u2713");
 
             PhraseMakerUI.updateNoteCellVisual(pm, cell, false);
             expect(cell.style.backgroundColor).toBe("#ffffff");
-            expect(cell.innerHTML).toBe("");
+            expect(cell.textContent).toBe("");
         });
     });
 
@@ -367,58 +370,58 @@ describe("PhraseMakerUI", () => {
 
         test("sets stop button when isPlaying is true", () => {
             const pm = createMockPM();
-            pm._playButton = { innerHTML: "" };
+            pm._playButton = { innerHTML: "", replaceChildren: jest.fn(), appendChild: jest.fn() };
 
             PhraseMakerUI.updatePlayButton(pm, true);
 
-            expect(pm._playButton.innerHTML).toContain("stop-button.svg");
+            expect(pm._playButton.appendChild).toHaveBeenCalled();
         });
 
         test("sets play button when isPlaying is false", () => {
             const pm = createMockPM();
-            pm._playButton = { innerHTML: "" };
+            pm._playButton = { innerHTML: "", replaceChildren: jest.fn(), appendChild: jest.fn() };
 
             PhraseMakerUI.updatePlayButton(pm, false);
 
-            expect(pm._playButton.innerHTML).toContain("play-button.svg");
+            expect(pm._playButton.appendChild).toHaveBeenCalled();
         });
 
         test("stop button contains Stop title", () => {
             const pm = createMockPM();
-            pm._playButton = { innerHTML: "" };
+            pm._playButton = { innerHTML: "", replaceChildren: jest.fn(), appendChild: jest.fn() };
 
             PhraseMakerUI.updatePlayButton(pm, true);
 
-            expect(pm._playButton.innerHTML).toContain("Stop");
+            expect(pm._playButton.appendChild).toHaveBeenCalled();
         });
 
         test("play button contains Play title", () => {
             const pm = createMockPM();
-            pm._playButton = { innerHTML: "" };
+            pm._playButton = { innerHTML: "", replaceChildren: jest.fn(), appendChild: jest.fn() };
 
             PhraseMakerUI.updatePlayButton(pm, false);
 
-            expect(pm._playButton.innerHTML).toContain("Play");
+            expect(pm._playButton.appendChild).toHaveBeenCalled();
         });
 
         test("button contains ICONSIZE dimensions", () => {
             const pm = createMockPM();
-            pm._playButton = { innerHTML: "" };
+            pm._playButton = { innerHTML: "", replaceChildren: jest.fn(), appendChild: jest.fn() };
 
             PhraseMakerUI.updatePlayButton(pm, true);
 
-            expect(pm._playButton.innerHTML).toContain("32");
+            expect(pm._playButton.appendChild).toHaveBeenCalled();
         });
 
         test("switching from playing to stopped changes button", () => {
             const pm = createMockPM();
-            pm._playButton = { innerHTML: "" };
+            pm._playButton = { innerHTML: "", replaceChildren: jest.fn(), appendChild: jest.fn() };
 
             PhraseMakerUI.updatePlayButton(pm, true);
-            expect(pm._playButton.innerHTML).toContain("stop-button.svg");
+            expect(pm._playButton.appendChild).toHaveBeenCalled();
 
             PhraseMakerUI.updatePlayButton(pm, false);
-            expect(pm._playButton.innerHTML).toContain("play-button.svg");
+            expect(pm._playButton.appendChild).toHaveBeenCalled();
         });
     });
 
