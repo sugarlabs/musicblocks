@@ -134,7 +134,13 @@ class Palettes {
 
     const existingMessage = menu.querySelector(".no-results");
 
-    if (searchResults.length === 0) {
+    // if (searchResults.length === 0) {
+        const existingMessage = menu.querySelector(".no-results");
+
+        const visibleResults = Array.from(searchResults)
+            .filter(el => el.offsetParent !== null);
+        
+        if (visibleResults.length === 0) {
             if (!existingMessage) {
                 const messageItem = document.createElement("li");
                 messageItem.className = "ui-menu-item no-results";
@@ -147,7 +153,7 @@ class Palettes {
                     padding: 6px;
                 `;
         
-                menu.appendChild(messageItem);  // 🔥 IMPORTANT LINE
+                menu.appendChild(messageItem);
             }
         } else {
             if (existingMessage) {
