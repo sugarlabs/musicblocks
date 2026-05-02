@@ -126,41 +126,41 @@ class Palettes {
         this._handleSearchKeydown = this._handleSearchKeydown.bind(this);
     }
 
-    handleEmptyResults(searchResults) {
-    const menu = document.querySelector(".ui-menu");
-    const searchInput = document.getElementById("search");
+    // handleEmptyResults(searchResults) {
+    // const menu = document.querySelector(".ui-menu");
+    // const searchInput = document.getElementById("search");
 
-    if (!menu || !searchInput || !searchInput.value.trim()) return;
+    // if (!menu || !searchInput || !searchInput.value.trim()) return;
 
-    const existingMessage = menu.querySelector(".no-results");
+    // const existingMessage = menu.querySelector(".no-results");
 
-    // if (searchResults.length === 0) {
-        const existingMessage = menu.querySelector(".no-results");
+    // // if (searchResults.length === 0) {
+    //     const existingMessage = menu.querySelector(".no-results");
 
-        const visibleResults = Array.from(searchResults)
-            .filter(el => el.offsetParent !== null);
+    //     const visibleResults = Array.from(searchResults)
+    //         .filter(el => el.offsetParent !== null);
         
-        if (visibleResults.length === 0) {
-            if (!existingMessage) {
-                const messageItem = document.createElement("li");
-                messageItem.className = "ui-menu-item no-results";
-                messageItem.textContent = `No results found for "${searchInput.value}"`;
+    //     if (visibleResults.length === 0) {
+    //         if (!existingMessage) {
+    //             const messageItem = document.createElement("li");
+    //             messageItem.className = "ui-menu-item no-results";
+    //             messageItem.textContent = `No results found for "${searchInput.value}"`;
         
-                messageItem.style.cssText = `
-                    opacity: 0.7;
-                    pointer-events: none;
-                    text-align: center;
-                    padding: 6px;
-                `;
+    //             messageItem.style.cssText = `
+    //                 opacity: 0.7;
+    //                 pointer-events: none;
+    //                 text-align: center;
+    //                 padding: 6px;
+    //             `;
         
-                menu.appendChild(messageItem);
-            }
-        } else {
-            if (existingMessage) {
-                existingMessage.remove();
-            }
-        }
-    }
+    //             menu.appendChild(messageItem);
+    //         }
+    //     } else {
+    //         if (existingMessage) {
+    //             existingMessage.remove();
+    //         }
+    //     }
+    // }
     init() {
         this.halfCellSize = Math.floor(this.cellSize / 2);
     }
@@ -415,55 +415,57 @@ class Palettes {
             event.preventDefault();
             event.stopPropagation();
 
-            // const searchResults = document.querySelectorAll(".ui-menu-item");
-            // this.handleEmptyResults(searchResults);
-            // if (searchResults.length === 0) return;
+            const searchResults = document.querySelectorAll(".ui-menu-item");
+        // 👇 YAHAN SE ADD KARO
+            const menu = document.querySelector(".ui-menu");
+            const searchInput = document.getElementById("search");
+            
+            // remove old message
+            const oldMsg = menu.querySelector(".no-results");
+            if (oldMsg) oldMsg.remove();
+            
+            // check visible items
+            const visibleResults = Array.from(searchResults)
+              .filter(el => el.offsetParent !== null);
+            
+            // show message
+            if (searchInput.value.trim() !== "" && visibleResults.length === 0) {
+                const li = document.createElement("li");
+                li.className = "ui-menu-item no-results";
+                li.textContent = `No results found for "${searchInput.value}"`;
+            
+                li.style.cssText = `
+                    opacity: 0.7;
+                    text-align: center;
+                    padding: 6px;
+                    pointer-events: none;
+                `;
+            
+                menu.appendChild(li);
+            }
+        // 👆 YAHAN TAK ADD KARO
+           // if (searchResults.length === 0) return;
             
 
-            // // Navigate through search results
-            // searchResults.forEach(row => {
-            //     row.classList.remove("ui-state-active");
-            //     row.classList.remove("ui-state-focus");
-            //     row.style.backgroundColor = "";
-            //     delete row.dataset.keyboardFocus;
-            // });
-
-            // if (event.key === "ArrowDown") {
-            //     this._searchResultIndex = Math.min(
-            //         this._searchResultIndex + 1,
-            //         searchResults.length - 1
-            //     );
-            // } else if (event.key === "ArrowUp") {
-            //     this._searchResultIndex = Math.max(this._searchResultIndex - 1, 0);
-            // }
-                 setTimeout(() => {
-           const searchResults = document.querySelectorAll(".ui-menu-item");
-
-            this.handleEmptyResults(searchResults);
-    
-            if (searchResults.length === 0) return;
-        
-            // Clear previous focus
+            // Navigate through search results
             searchResults.forEach(row => {
                 row.classList.remove("ui-state-active");
                 row.classList.remove("ui-state-focus");
                 row.style.backgroundColor = "";
                 delete row.dataset.keyboardFocus;
             });
-        
-            // Arrow keys
+
             if (event.key === "ArrowDown") {
                 this._searchResultIndex = Math.min(
                     this._searchResultIndex + 1,
                     searchResults.length - 1
                 );
-            } 
-            else if (event.key === "ArrowUp") {
-                this._searchResultIndex = Math.max(
-                    this._searchResultIndex - 1,
-                    0
-                );
+            } else if (event.key === "ArrowUp") {
+                this._searchResultIndex = Math.max(this._searchResultIndex - 1, 0);
             }
+                 
+        
+            
         
             // Highlight
             const currentResult = searchResults[this._searchResultIndex];
