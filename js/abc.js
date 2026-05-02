@@ -144,7 +144,7 @@ const processABCNotes = function (logo, turtle) {
                     parts.push("!>(!");
                     break;
                 case "end decrescendo":
-                    parts.push("!<(!");
+                    parts.push("!>)!");
                     break;
                 case "begin slur":
                     queueSlur = true;
@@ -210,7 +210,7 @@ const processABCNotes = function (logo, turtle) {
 
             // If it is a tuplet, look ahead to see if it is complete.
             // While you are at it, add up the durations.
-            if (obj[NOTATIONTUPLETVALUE] != null) {
+            if (obj[NOTATIONTUPLETVALUE] !== undefined && obj[NOTATIONTUPLETVALUE] !== null) {
                 targetDuration = 1 / logo.notation.notationStaging[turtle][i][NOTATIONDURATION];
                 tupletDuration = 1 / logo.notation.notationStaging[turtle][i][NOTATIONROUNDDOWN];
                 let j = 1;
