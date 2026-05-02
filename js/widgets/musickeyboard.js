@@ -522,7 +522,9 @@ function MusicKeyboard(activity) {
     };
 
     /**
-     * Handles the loading of musical keyboard elements and defines behavior for mouse events.
+     * Handles the loading of musical keyboard elements and defines pointer event
+     * handlers for each key. Uses the Pointer Events API (pointerdown/pointerup/
+     * pointercancel) to support mouse, touch, and stylus input uniformly.
      * @param {HTMLElement} element - The HTML element representing a musical key.
      * @param {number} i - The index of the musical key in the layout.
      * @param {number} blockNumber - The block number associated with the musical key.
@@ -548,8 +550,12 @@ function MusicKeyboard(activity) {
         let startDate = new Date();
         let startTime = 0;
 
+        // Prevent the browser from scrolling or showing a context menu when the
+        // user presses a key on a touch device.
+        element.style.touchAction = "none";
+
         /**
-         * Start a musical note when the element is clicked.
+         * Start a musical note when the element is pressed (mouse or touch).
          */
         const __startNote = element => {
             startDate = new Date();
@@ -565,10 +571,15 @@ function MusicKeyboard(activity) {
             );
         };
 
-        element.onmousedown = function () {
+        // Use Pointer Events so that mouse clicks, touchscreen taps, and stylus
+        // presses all trigger the same note-start behaviour.  The legacy
+        // onmousedown handler was silently ignored on touch devices.
+        element.addEventListener("pointerdown", function (e) {
+            e.preventDefault(); // prevent ghost mouse events on touch screens
+            element.setPointerCapture(e.pointerId); // keep events even if finger slides off
             activeKey = element;
-            __startNote(this);
-        };
+            __startNote(element);
+        });
 
         /**
          * End a musical note when the element is released.
@@ -613,11 +624,11 @@ function MusicKeyboard(activity) {
             this._updateWidgetWindowSize();
         };
 
-        element.onmouseup = function () {
+        element.addEventListener("pointerup", function () {
             if (activeKey === element) {
-                __endNote(this);
+                __endNote(element);
                 activeKey = null;
-            } else {
+            } else if (activeKey !== null) {
                 const id = activeKey.id;
                 if (id.includes("blackRow")) {
                     activeKey.style.backgroundColor = "black";
@@ -626,7 +637,16 @@ function MusicKeyboard(activity) {
                 }
                 activeKey = null;
             }
-        };
+        });
+
+        // Clean up note state if the pointer is cancelled mid-press
+        // (e.g., an incoming phone call dismisses the touch).
+        element.addEventListener("pointercancel", function () {
+            if (activeKey === element) {
+                __endNote(element);
+                activeKey = null;
+            }
+        });
     };
 
     /**
