@@ -716,7 +716,7 @@ function setupPitchBlocks(activity) {
             super(name || "number2pitch", displayName || _("number to pitch"));
             this.setPalette("pitch", activity);
             this.setHelpString([
-                _("The Number to pitch block will convert a pitch number to a pich name."),
+                _("The Number to pitch block will convert a pitch number to a pitch name."),
                 "documentation",
                 ""
             ]);
