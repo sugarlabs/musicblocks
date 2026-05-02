@@ -17,10 +17,37 @@
 
 // This is the "Offline page" service worker
 
-const CACHE = "pwabuilder-precache";
+const CACHE = "pwabuilder-precache-v2";
 const precacheFiles = [
-    /* Add an array of files to precache for your app */
-    "./index.html"
+    "./",
+    "./index.html",
+    "./android_chrome_manifest.json",
+    "./favicon.ico",
+    "./activity/activity-icon-color-512.png",
+    "./dist/css/style.css",
+    "./css/themes.css?v=fixed",
+    "./dist/vendor.min.js",
+    "./lib/reqwest.js",
+    "./lib/midi.js",
+    "./lib/jquery.ruler.js",
+    "./lib/modernizr-2.6.2.min.js",
+    "./lib/raphael.min.js",
+    "./lib/wheelnav.js",
+    "./lib/codejar/codejar.min.js",
+    "./lib/codejar/highlight.pack.js",
+    "./lib/libgif.js",
+    "./lib/astring.min.js",
+    "./lib/acorn.min.js",
+    "./lib/require.js",
+    "./js/utils/jquery-setup.js",
+    "./js/gif-animator.js",
+    "./js/utils/mb-dialog.js",
+    "./js/svgAssetSelector.js",
+    "./js/loader.js",
+    "./env.js",
+    "./loading-animation.webm",
+    "./loading-animation.mp4",
+    "./images/logo.svg"
 ];
 
 self.addEventListener("install", function (event) {
