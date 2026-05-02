@@ -2424,7 +2424,7 @@ class Activity {
                     messages.load_messages[
                         Math.floor(Math.random() * messages.load_messages.length)
                     ];
-                document.getElementById("messageText").innerHTML = randomLoadMessage + "...";
+                document.getElementById("messageText").textContent = randomLoadMessage + "...";
                 counter++;
                 if (counter >= messages.load_messages.length) {
                     counter = 0;
@@ -7605,11 +7605,18 @@ class Activity {
 
             const intro = document.createElement("div");
             intro.className = "keyboard-shortcuts-hero";
-            intro.innerHTML =
-                `<div class="keyboard-shortcuts-hero-title">${_("Keyboard shortcuts")}</div>` +
-                `<div class="keyboard-shortcuts-hero-copy">${_(
-                    "Shortcuts are context-sensitive. Some only work when a related panel, widget, or mode is active. Windows/Linux and Mac equivalents are shown together."
-                )}</div>`;
+            const titleDiv = document.createElement("div");
+            titleDiv.className = "keyboard-shortcuts-hero-title";
+            titleDiv.textContent = _("Keyboard shortcuts");
+
+            const copyDiv = document.createElement("div");
+            copyDiv.className = "keyboard-shortcuts-hero-copy";
+            copyDiv.textContent = _(
+                "Shortcuts are context-sensitive. Some only work when a related panel, widget, or mode is active. Windows/Linux and Mac equivalents are shown together."
+            );
+
+            intro.appendChild(titleDiv);
+            intro.appendChild(copyDiv);
             wrapper.appendChild(intro);
 
             shortcutSections.forEach(section => {
