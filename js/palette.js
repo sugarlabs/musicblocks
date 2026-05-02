@@ -437,11 +437,10 @@ class Palettes {
             //     this._searchResultIndex = Math.max(this._searchResultIndex - 1, 0);
             // }
                  setTimeout(() => {
-            const searchResults = Array.from(document.querySelectorAll(".ui-menu-item"))
-                .filter(el => el.offsetParent !== null);
-        
+           const searchResults = document.querySelectorAll(".ui-menu-item");
+
             this.handleEmptyResults(searchResults);
-        
+    
             if (searchResults.length === 0) return;
         
             // Clear previous focus
