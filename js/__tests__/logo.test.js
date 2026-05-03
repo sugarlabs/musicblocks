@@ -921,6 +921,85 @@ describe("Logo comprehensive method coverage", () => {
         expect(logo.runFromBlock).toHaveBeenCalledWith(logo, 0, 1, 0, null);
     });
 
+    describe("runFromBlockNow profiling", () => {
+        let originalPerformance;
+        let originalPerformanceTracker;
+
+        beforeEach(() => {
+            originalPerformance = global.performance;
+            originalPerformanceTracker = global.performanceTracker;
+        });
+
+        afterEach(() => {
+            global.performance = originalPerformance;
+            global.performanceTracker = originalPerformanceTracker;
+        });
+
+        test("profiling off does not record block timings", () => {
+            global.performanceTracker = {
+                isEnabled: () => false,
+                enterBlock: jest.fn(),
+                exitBlock: jest.fn(),
+                disable: jest.fn()
+            };
+            global.performance = { now: jest.fn(() => 100) };
+            mockActivity.blocks.visible = false;
+
+            logo.blockList = [
+                {
+                    name: "noop",
+                    protoblock: {
+                        args: 0,
+                        dockTypes: [],
+                        flow: jest.fn(() => [null, null, true])
+                    },
+                    connections: [null],
+                    isValueBlock: () => false,
+                    isArgBlock: () => false
+                }
+            ];
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(logo.blockTimings).toBeUndefined();
+        });
+
+        test("profiling on increments call count", () => {
+            let now = 0;
+            global.performanceTracker = {
+                isEnabled: () => true,
+                enterBlock: jest.fn(),
+                exitBlock: jest.fn(),
+                disable: jest.fn()
+            };
+            global.performance = {
+                now: jest.fn(() => {
+                    now += 5;
+                    return now;
+                })
+            };
+            mockActivity.blocks.visible = false;
+
+            logo.blockList = [
+                {
+                    name: "noop",
+                    protoblock: {
+                        args: 0,
+                        dockTypes: [],
+                        flow: jest.fn(() => [null, null, true])
+                    },
+                    connections: [null],
+                    isValueBlock: () => false,
+                    isArgBlock: () => false
+                }
+            ];
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(logo.blockTimings.noop.calls).toBe(1);
+        });
+    });
+
     test("updateNotation delegates without split and splits across measure boundaries", () => {
         logo.notation.notationDrumStaging[0] = [];
 

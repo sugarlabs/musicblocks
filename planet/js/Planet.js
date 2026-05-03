@@ -134,7 +134,7 @@ class Planet {
         title.textContent = _("New Project");
         title.style.fontSize = "24px";
         title.style.margin = "0 0 16px 0";
-        title.style.color = colors.textColor;
+        title.style.color = colors.headingColor;
         modal.appendChild(title);
 
         // Message

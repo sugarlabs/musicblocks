@@ -110,11 +110,7 @@
 
         <!-- <script src="lib/mespeak.js"></script> -->
 
-        <script src="lib/reqwest.js" defer></script>
-
-        <script src="lib/jquery-3.7.1.min.js" defer></script>
-        <script src="lib/jquery-ui.js" defer></script>
-        <script src="lib/materialize.min.js" defer></script>
+        <script src="dist/vendor.min.js"></script>
         <link
             rel="preload"
             href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"
@@ -127,13 +123,11 @@
                 href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"
         /></noscript>
         <script src="js/utils/jquery-setup.js" defer></script>
-        <script src="lib/Tone.js" defer></script>
         <script src="lib/midi.js" defer></script>
         <script src="lib/jquery.ruler.js" defer></script>
         <script src="lib/modernizr-2.6.2.min.js" defer></script>
         <script src="lib/raphael.min.js" defer></script>
         <script src="lib/wheelnav.js" defer></script>
-        <script src="lib/abc.min.js" defer></script>
         <script src="lib/codejar/codejar.min.js" defer></script>
         <script src="lib/codejar/highlight.pack.js" defer></script>
         <link
@@ -187,8 +181,6 @@
             onload="this.onload=null;this.rel='stylesheet'"
         />
         <noscript><link rel="stylesheet" href="css/themes.css?v=fixed" /></noscript>
-        <script src="lib/easeljs.min.js" defer></script>
-        <script src="lib/tweenjs.min.js" defer></script>
         <script>
             let ast2blocklist_config;
             window.ast2blocklist_config_failed = false;
@@ -1046,8 +1038,15 @@
         <script>
             // Register service worker only in production (not on localhost)
             if ("serviceWorker" in navigator) {
+                const readStorage = key => {
+                    try {
+                        return localStorage.getItem(key);
+                    } catch (e) {
+                        return null;
+                    }
+                };
                 // Localhost SW is disabled to avoid caching; set allowLocalPwa to test installs.
-                const allowLocalPwa = localStorage.getItem("allowLocalPwa") === "true";
+                const allowLocalPwa = readStorage("allowLocalPwa") === "true";
 
                 // Detect if running on localhost for development
                 const runtimeEnv = window.MB_ENV;
@@ -1127,12 +1126,28 @@
         <script>
             document.addEventListener("DOMContentLoaded", function () {
                 window._ = window._ || (x => x);
+                const readStorage = key => {
+                    try {
+                        return localStorage.getItem(key);
+                    } catch (e) {
+                        return null;
+                    }
+                };
+                const writeStorage = (key, value) => {
+                    try {
+                        localStorage.setItem(key, value);
+                        return true;
+                    } catch (e) {
+                        return false;
+                    }
+                };
                 let loadL10nSplashScreen = function () {
                     console.debug("The browser is set to " + navigator.language);
                     let lang = navigator.language;
-                    if (localStorage.languagePreference) {
-                        console.debug("Music Blocks is set to " + localStorage.languagePreference);
-                        lang = localStorage.languagePreference;
+                    const savedLanguage = readStorage("languagePreference");
+                    if (savedLanguage) {
+                        console.debug("Music Blocks is set to " + savedLanguage);
+                        lang = savedLanguage;
                     }
 
                     console.debug("Using " + lang);
@@ -1175,9 +1190,8 @@
                         link.addEventListener("click", function (e) {
                             e.preventDefault(); // prevent default <a> behavior
                             const selectedLang = this.id; // ID corresponds to language code
-                            const currentLang = localStorage.getItem("languagePreference");
-                            if (currentLang !== selectedLang) {
-                                localStorage.setItem("languagePreference", selectedLang);
+                            const currentLang = readStorage("languagePreference");
+                            if (currentLang !== selectedLang && writeStorage("languagePreference", selectedLang)) {
                                 location.reload(); // automatically reload
                             }
                         });

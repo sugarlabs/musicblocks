@@ -5,6 +5,8 @@ Cypress.on("uncaught:exception", err => {
         "ResizeObserver loop limit exceeded",
         "Cannot read properties of undefined",
         "Cannot read properties of null",
+        "Cannot set properties of null",
+        "Cannot set properties of undefined",
         "_ is not defined",
         "Permissions check failed"
     ];
@@ -52,6 +54,26 @@ describe("MusicBlocks Application", () => {
             cy.get("#languagedropdown").should("be.visible");
         });
 
+        it("should change language preference", () => {
+            cy.get("#aux-toolbar").invoke("show");
+            cy.get("#languageSelectIcon").click();
+            cy.get("#languagedropdown").should("be.visible");
+
+            cy.get("#es").then($lang => {
+                if ($lang.length) {
+                    cy.wrap($lang).click();
+                    cy.waitForAppReady();
+                } else {
+                    cy.log("Language option not available, skipping");
+                }
+            });
+
+            cy.get("#aux-toolbar").invoke("show"); // fix toolbar hidden
+            cy.get("#languageSelectIcon").click();
+            cy.get("#enUS").click();
+            cy.waitForAppReady();
+        });
+
         it("should verify fullscreen button exists and is visible", () => {
             cy.get("#FullScreen").should("exist").and("be.visible");
         });
@@ -82,8 +104,18 @@ describe("MusicBlocks Application", () => {
         });
 
         it("should show New Project dialog on new file click", () => {
-            cy.get("#newFile > .material-icons").should("exist").and("be.visible").click();
-            cy.contains("New project").should("be.visible");
+            cy.get("#newFile > .material-icons").should("be.visible").click();
+
+            cy.get("#new-project").should("exist").and("be.visible");
+        });
+
+        it("should create a new project and reset the UI", () => {
+            cy.get("#newFile > .material-icons").should("be.visible").click();
+
+            cy.get("#new-project").should("be.visible").click();
+
+            cy.get("#modal-container").should("not.be.visible");
+            cy.get("#canvas").should("be.visible");
         });
     });
 

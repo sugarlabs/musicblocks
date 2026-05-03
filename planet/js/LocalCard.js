@@ -113,7 +113,7 @@ class LocalCard {
         if (this.ProjectData.ProjectImage !== null) imageSrc = this.ProjectData.ProjectImage;
         else {
             imageSrc =
-                Planet.IsMusicBlocks == 1 ? this.PlaceholderMBImage : this.PlaceholderTBImage;
+                Planet.IsMusicBlocks === 1 ? this.PlaceholderMBImage : this.PlaceholderTBImage;
         }
 
         const imageId = `local-project-image-${this.id}`;
@@ -136,8 +136,8 @@ class LocalCard {
 
         // set merge modify listener
 
-        frag.getElementById(`local-project-merge-${this.id}`).addEventListener("click", evt => {
-            Planet.LocalPlanet.openProject(this.id);
+        frag.getElementById(`local-project-merge-${this.id}`).addEventListener("click", () => {
+            Planet.LocalPlanet.mergeProject(this.id);
         });
 
         // set input modify listener

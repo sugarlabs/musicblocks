@@ -17,7 +17,7 @@
    DEFAULTOSCILLATORTYPE, platformColor, rationalToFraction, last,
    Singer, instrumentsEffects:writeable, instrumentsFilters:writeable,
    docById, DEFAULTFILTERTYPE, docByName, OSCTYPES, FILTERTYPES,
-   oneHundredToFraction, delayExecution
+   oneHundredToFraction, delayExecution, ManagedTimer
  */
 
 /*
@@ -28,6 +28,8 @@
         platformColor
     js/utils/utils.js
         rationalToFraction, last, _, docById, docByName, oneHundredToFraction
+    js/utils/ManagedTimer.js
+        ManagedTimer
     js/utils/synthutils.js
         instrumentsEffects, instrumentsFilters
     js/turtle-singer.js
@@ -48,6 +50,9 @@ class TimbreWidget {
         this.env = [];
         this.ENVs = [];
         this._eventListeners = {}; // Store event listeners for cleanup
+        this._timerManager = typeof ManagedTimer !== "undefined" ? new ManagedTimer() : null;
+        this._activeTimeouts = new Set();
+        this._previewTimerId = null;
         this.synthVals = {
             oscillator: {
                 type: "sine6",
@@ -140,38 +145,70 @@ class TimbreWidget {
     }
 
     /**
-     * @deprecated
+     * Schedules a timeout owned by the widget lifecycle.
+     * @private
+     * @param {Function} callback - Callback to run after the delay.
+     * @param {number} delay - Delay in milliseconds.
+     * @returns {number} Timer ID.
      */
-    _addButton(row, icon, iconSize, label) {
-        const cell = row.insertCell(-1);
-        cell.textContent = "\u00A0\u00A0";
-        const img = document.createElement("img");
-        img.src = `header-icons/${icon}`;
-        img.title = label;
-        img.alt = label;
-        img.setAttribute("height", iconSize);
-        img.setAttribute("width", iconSize);
-        img.setAttribute("vertical-align", "middle");
-        img.setAttribute("align-content", "center");
-        cell.appendChild(img);
-        cell.appendChild(document.createTextNode("\u00A0\u00A0"));
-        cell.style.width = TimbreWidget.BUTTONSIZE + "px";
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = cell.style.width;
-        cell.style.minHeight = cell.style.height;
-        cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
+    _setWidgetTimeout(callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
 
-        cell.onmouseover = () => {
-            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        };
+        let id;
+        id = setTimeout(() => {
+            this._activeTimeouts.delete(id);
+            callback();
+        }, delay);
+        this._activeTimeouts.add(id);
+        return id;
+    }
 
-        cell.onmouseout = () => {
-            this.style.backgroundColor = platformColor.selectorBackground;
-        };
+    /**
+     * Clears a timeout owned by the widget lifecycle.
+     * @private
+     * @param {number} id - Timer ID returned by _setWidgetTimeout.
+     * @returns {boolean} Whether the timeout was tracked and cleared.
+     */
+    _clearWidgetTimeout(id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
 
-        return cell;
+        if (this._timerManager !== null && this._timerManager.clearTimeout(id)) {
+            return true;
+        }
+
+        if (this._activeTimeouts.has(id)) {
+            clearTimeout(id);
+            this._activeTimeouts.delete(id);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Clears all timers owned by the widget lifecycle.
+     * @private
+     * @returns {number} Number of tracked timers cleared.
+     */
+    _clearWidgetTimers() {
+        let count = 0;
+
+        if (this._timerManager !== null) {
+            count += this._timerManager.clearAll();
+        }
+
+        for (const id of this._activeTimeouts) {
+            clearTimeout(id);
+            count++;
+        }
+        this._activeTimeouts.clear();
+        this._previewTimerId = null;
+
+        return count;
     }
 
     /**
@@ -416,6 +453,8 @@ class TimbreWidget {
             cell.appendChild(stopImg);
             cell.appendChild(document.createTextNode("\u00A0\u00A0"));
         } else {
+            this._clearWidgetTimeout(this._previewTimerId);
+            this._previewTimerId = null;
             this.activity.logo.synth.setMasterVolume(0);
             this.activity.logo.synth.stop();
             cell.textContent = "\u00A0\u00A0";
@@ -446,8 +485,9 @@ class TimbreWidget {
 
             i += 1;
             if (i < this.notesToPlay.length && this._playing) {
-                setTimeout(
+                this._previewTimerId = this._setWidgetTimeout(
                     () => {
+                        this._previewTimerId = null;
                         __playLoop(i);
                     },
                     Singer.defaultBPMFactor * 1000 * this.notesToPlay[i - 1][1]
@@ -729,6 +769,8 @@ class TimbreWidget {
         widgetWindow.getWidgetBody().style.overflowY = "auto";
 
         widgetWindow.onclose = () => {
+            this._playing = false;
+            this._clearWidgetTimers();
             // Clean up all event listeners
             this._cleanupEventListeners();
             this.activity.hideMsgs();
@@ -954,8 +996,6 @@ class TimbreWidget {
                 this._undo();
             };
 
-        // let cell = this._addButton(row, 'close-button.svg', TimbreWidget.ICONSIZE, _('Close'));
-
         // cell.onclick = function () {
         //     docById('timbreDiv').style.visibility = 'hidden';
         //     docById('timbreButtonsDiv').style.visibility = 'hidden';
@@ -1046,17 +1086,17 @@ class TimbreWidget {
         let lastBlk = 0;
         if (this.AMSynthesizer.length !== 0 && synthChosen !== "AMSynth") {
             lastBlk = this.AMSynthesizer.pop();
-            setTimeout(() => this._blockReplace(lastBlk, newblk), 500);
+            this._setWidgetTimeout(() => this._blockReplace(lastBlk, newblk), 500);
         } else if (this.FMSynthesizer.length !== 0 && synthChosen !== "FMSynth") {
             lastBlk = this.FMSynthesizer.pop();
-            setTimeout(() => this._blockReplace(lastBlk, newblk), 500);
+            this._setWidgetTimeout(() => this._blockReplace(lastBlk, newblk), 500);
         } else if (this.duoSynthesizer.length !== 0 && synthChosen !== "DuoSynth") {
             lastBlk = this.duoSynthesizer.pop();
-            setTimeout(() => this._blockReplace(lastBlk, newblk), 500);
+            this._setWidgetTimeout(() => this._blockReplace(lastBlk, newblk), 500);
         } else if (synthChosen === "FMSynth" || synthChosen === "AMSynth") {
-            setTimeout(() => this.blockConnection(2, bottomOfClamp), 500);
+            this._setWidgetTimeout(() => this.blockConnection(2, bottomOfClamp), 500);
         } else {
-            setTimeout(() => this.blockConnection(3, bottomOfClamp), 500);
+            this._setWidgetTimeout(() => this.blockConnection(3, bottomOfClamp), 500);
         }
     }
 

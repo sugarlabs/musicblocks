@@ -39,6 +39,11 @@ describe("RequestManager", () => {
             expect(requestManager.maxConcurrent).toBe(2);
         });
 
+        it("should initialize with custom timeout", () => {
+            const rm = new RequestManager({ timeoutMs: 1234 });
+            expect(rm.timeoutMs).toBe(1234);
+        });
+
         it("should initialize empty pending requests", () => {
             expect(requestManager.pendingRequests.size).toBe(0);
         });
@@ -161,6 +166,22 @@ describe("RequestManager", () => {
 
             // After all retries, should return the failure result
             expect(result.success).toBe(false);
+        });
+
+        it("should use configured timeout in the callback wrapper", async () => {
+            jest.useFakeTimers();
+
+            const rm = new RequestManager({ timeoutMs: 25 });
+            const promise = rm._promisifyRequest(() => {});
+
+            jest.advanceTimersByTime(25);
+
+            await expect(promise).resolves.toEqual({
+                success: false,
+                error: "REQUEST_TIMEOUT"
+            });
+
+            jest.useRealTimers();
         });
     });
 

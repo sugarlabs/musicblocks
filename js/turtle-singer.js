@@ -1354,7 +1354,12 @@ class Singer {
             tur.singer.pushedNote = true;
 
             Singer.processNote(activity, tur.singer.defaultNoteValue, false, blk, turtle, () => {
-                tur.singer.inNoteBlock.splice(tur.singer.inNoteBlock.indexOf(blk), 1);
+                const idx = tur.singer.inNoteBlock.indexOf(blk);
+                if (idx !== -1) {
+                    tur.singer.inNoteBlock.splice(idx, 1);
+                } else {
+                    console.warn("Singer: block", blk, "not found in inNoteBlock");
+                }
             });
         }
     }
@@ -1539,7 +1544,13 @@ class Singer {
                 const synth = synthKeys[i];
                 const oldVol = last(tur.singer.synthVolume[synth]);
                 const len = tur.singer.synthVolume[synth].length;
-                tur.singer.synthVolume[synth][len - 1] += last(tur.singer.crescendoDelta);
+                tur.singer.synthVolume[synth][len - 1] = Math.min(
+                    Math.max(
+                        tur.singer.synthVolume[synth][len - 1] + last(tur.singer.crescendoDelta),
+                        0
+                    ),
+                    100
+                );
                 if (!tur.singer.suppressOutput) {
                     Singer.setSynthVolume(activity.logo, turtle, synth, oldVol);
                     activity.logo.synth.rampTo(

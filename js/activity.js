@@ -52,7 +52,8 @@ try {
    SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
    MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
-   SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS
+   SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS,
+   unescapeHTML
  */
 
 /*
@@ -249,6 +250,7 @@ class Activity {
 
         this.cellSize = 55;
         this.searchSuggestions = [];
+        this._searchCache = {}; // Cache for search results to improve performance
         this._searchCloseListener = null;
         this.homeButtonContainer;
 
@@ -322,7 +324,12 @@ class Activity {
         this.keyboardEnableFlag;
         this.inTempoWidget = false;
         this.projectID = null;
-        this.storage = localStorage;
+        try {
+            this.storage = localStorage;
+        } catch (e) {
+            // Fall back to in-memory storage when browser storage is restricted.
+            this.storage = {};
+        }
 
         // Flag to indicate whether the user is performing a 2D drag operation.
         this.isDragging = false;
@@ -1070,6 +1077,11 @@ class Activity {
                 let y = Math.floor(toppos * this.turtleBlocksScale);
                 let even = true;
 
+                // Defer checkBounds during bulk block moves to avoid O(N²)
+                // overhead: each moveBlockRelative call triggers checkBounds()
+                // which scans all blocks, so N moves × N blocks = O(N²).
+                this.blocks._beginDeferCheckBounds();
+
                 // Position "start" blocks first
                 for (const blk in this.blocks.blockList) {
                     if (!this.blocks.blockList[blk].trash) {
@@ -1141,6 +1153,8 @@ class Activity {
                         }
                     }
                 }
+
+                this.blocks._endDeferCheckBounds();
             } else {
                 // Second click logic (arrange blocks in columns this avoid overlapping of blocks)
                 let toppos;
@@ -1175,6 +1189,9 @@ class Activity {
                 );
                 const columnYPositions = Array(numColumns).fill(initialY);
 
+                // Defer checkBounds during bulk block moves (see first-click path).
+                this.blocks._beginDeferCheckBounds();
+
                 for (const blk in this.blocks.blockList) {
                     if (!this.blocks.blockList[blk].trash) {
                         const myBlock = this.blocks.blockList[blk];
@@ -1203,6 +1220,8 @@ class Activity {
                         }
                     }
                 }
+
+                this.blocks._endDeferCheckBounds();
             }
 
             // Reset go-home button
@@ -1534,6 +1553,7 @@ class Activity {
             const title = document.createElement("h2");
             title.textContent = _("Import MIDI");
             title.classList.add("modal-title");
+            title.style.color = platformColor.headingColor;
             modal.appendChild(title);
 
             const container = document.createElement("div");
@@ -1600,6 +1620,7 @@ class Activity {
             const title = document.createElement("h2");
             title.textContent = _("Clear Workspace");
             title.classList.add("modal-title");
+            title.style.color = platformColor.headingColor;
 
             modal.appendChild(title);
             const message = document.createElement("p");
@@ -1834,7 +1855,12 @@ class Activity {
              */
 
             async function recordScreen() {
-                const mode = localStorage.getItem("musicBlocksRecordMode");
+                let mode = null;
+                try {
+                    mode = localStorage.getItem("musicBlocksRecordMode");
+                } catch (e) {
+                    mode = null;
+                }
 
                 if (mode === "canvas") {
                     return await recordCanvasOnly();
@@ -2398,7 +2424,7 @@ class Activity {
                     messages.load_messages[
                         Math.floor(Math.random() * messages.load_messages.length)
                     ];
-                document.getElementById("messageText").innerHTML = randomLoadMessage + "...";
+                document.getElementById("messageText").textContent = randomLoadMessage + "...";
                 counter++;
                 if (counter >= messages.load_messages.length) {
                     counter = 0;
@@ -3132,26 +3158,9 @@ class Activity {
             const IDLE_THRESHOLD = 5000; // 5 seconds
             const ACTIVE_FPS = 60;
             const IDLE_FPS = 1;
-            const idleEvents = ["mousemove", "mousedown", "keydown", "touchstart", "wheel"];
-
-            if (this._idleWatcherResetHandler) {
-                idleEvents.forEach(eventType => {
-                    window.removeEventListener(eventType, this._idleWatcherResetHandler);
-                });
-            }
-
-            if (this._idleWatcherIntervalId) {
-                clearInterval(this._idleWatcherIntervalId);
-                this._idleWatcherIntervalId = null;
-            }
 
             let lastActivity = Date.now();
             this.isAppIdle = false;
-
-            // Prevent duplicate intervals
-            if (this._idleWatcherIntervalId) {
-                clearInterval(this._idleWatcherIntervalId);
-            }
 
             // Wake up function - restores full framerate
             // Stored as instance property for cleanup
@@ -3267,6 +3276,7 @@ class Activity {
             this.searchBlockPosition = [100, 100];
 
             this.searchSuggestions = [];
+            this._searchCache = {}; // Reset cache to prevent memory leaks
             this.deprecatedBlockNames = [];
 
             // Guard: blocks may not be initialized yet during early loading
@@ -3421,12 +3431,13 @@ class Activity {
                     obj[0].style.visibility = "visible";
                 }
 
-                this.searchWidget.value = null;
-                this.searchWidget.style.visibility = "visible";
-                this.searchWidget.style.left =
-                    this.palettes.getSearchPos()[0] * this.turtleBlocksScale * 1.5 + "px";
-                this.searchWidget.style.top =
-                    this.palettes.getSearchPos()[1] * this.turtleBlocksScale * 0.95 + "px";
+                if (this.searchWidget) {
+                    this.searchWidget.value = null;
+                    this.searchWidget.style.visibility = "visible";
+                    const searchPos = this.palettes.getSearchPos();
+                    this.searchWidget.style.left = searchPos.x + "px";
+                    this.searchWidget.style.top = searchPos.y + "px";
+                }
 
                 this.searchBlockPosition = [100, 100];
                 this.prepSearchWidget();
@@ -3490,7 +3501,14 @@ class Activity {
                 $search.autocomplete({
                     // Custom source so we can match on extraSearchTerms but show each block only once.
                     source: (request, response) => {
-                        const term = (request.term || "").toLowerCase();
+                        const term = (request.term || "").toLowerCase().trim();
+
+                        // Check cache first for performance
+                        if (that._searchCache[term] !== undefined) {
+                            response(that._searchCache[term]);
+                            return;
+                        }
+
                         const results = that.searchSuggestions.filter(item => {
                             // If there is no active term, show all items.
                             if (!term || term.length === 0) {
@@ -3509,6 +3527,9 @@ class Activity {
                                 item.label.toLowerCase().indexOf(term) !== -1
                             );
                         });
+
+                        // Cache the results for future use
+                        that._searchCache[term] = results;
                         response(results);
                     },
                     appendTo: "body",
@@ -4384,7 +4405,20 @@ class Activity {
         // hidden the resize guards above intentionally skipped any
         // layout work, so we need to catch up now.
         this._handleVisibilityChange = () => {
-            if (!document.hidden && this.stage) {
+            if (document.hidden) {
+                if (typeof this.__saveLocally === "function") {
+                    this.__saveLocally();
+                }
+                if (
+                    typeof this.saveLocally === "function" &&
+                    this.saveLocally !== this.__saveLocally
+                ) {
+                    this.saveLocally();
+                }
+                return;
+            }
+
+            if (this.stage) {
                 // Use a short delay to let the browser finish
                 // exposing the tab and reporting real dimensions.
                 setTimeout(() => {
@@ -4773,6 +4807,12 @@ class Activity {
             let actionBlockCounter = 0;
             const dx = 0;
             const dy = this.cellSize * 3;
+
+            // Defer checkBounds during bulk block moves to avoid O(N²)
+            // overhead: each moveBlockRelative call triggers checkBounds()
+            // which scans all blocks, so N moves × N blocks = O(N²).
+            this.blocks._beginDeferCheckBounds();
+
             for (const blk in this.blocks.blockList) {
                 // If this block is at the top of a stack, push it
                 // onto the trashStacks list.
@@ -4815,6 +4855,8 @@ class Activity {
                     delete this.blocks.blockCollapseArt[blk];
                 }
             }
+
+            this.blocks._endDeferCheckBounds();
 
             if (addStartBlock) {
                 this.blocks.loadNewBlocks(DATAOBJS);
@@ -4902,12 +4944,31 @@ class Activity {
         this.onStopTurtle = () => {
             if (this.showBlocksAfterRun) {
                 this.blocks.showBlocks();
-                const stopIcon = document.getElementById("stop");
-                if (stopIcon) {
-                    stopIcon.style.color = "white";
-                }
                 this.showBlocksAfterRun = false;
             }
+
+            const stopIcon = document.getElementById("stop");
+            if (stopIcon) {
+                stopIcon.style.color = "white";
+                stopIcon.style.display = "none";
+            }
+
+            const saveBtn = document.getElementById("saveButton");
+            const saveBtnAdv = document.getElementById("saveButtonAdvanced");
+            const recordBtn = document.getElementById("record");
+
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.classList.remove("grey-text", "inactiveLink");
+            }
+            if (saveBtnAdv) {
+                saveBtnAdv.disabled = false;
+                saveBtnAdv.classList.remove("grey-text", "inactiveLink");
+            }
+            if (recordBtn) {
+                recordBtn.classList.remove("grey-text", "inactiveLink");
+            }
+
             // TODO: plugin support
         };
 
@@ -4949,42 +5010,8 @@ class Activity {
         let lastRefreshReport = performance.now();
 
         this.refreshCanvas = () => {
-            if (this.blockRefreshCanvas) {
-                return;
-            }
-
-            const start = window.__ENABLE_REFRESH_PROFILING__ ? performance.now() : 0;
-
-            this.blockRefreshCanvas = true;
             this.stageDirty = true;
             this.update = true;
-
-            const that = this;
-            setTimeout(() => {
-                that.blockRefreshCanvas = false;
-                that.stageDirty = true;
-
-                if (window.__ENABLE_REFRESH_PROFILING__) {
-                    const duration = performance.now() - start;
-                    refreshCount++;
-                    totalRefreshTime += duration;
-                    maxRefreshTime = Math.max(maxRefreshTime, duration);
-
-                    if (refreshCount % 25 === 0) {
-                        const now = performance.now();
-                        const cps = (25 / (now - lastRefreshReport)) * 1000;
-                        console.log(
-                            `refreshCanvas | Avg: ${(totalRefreshTime / refreshCount).toFixed(
-                                2
-                            )}ms | Max: ${maxRefreshTime.toFixed(2)}ms | Rate: ${cps.toFixed(
-                                1
-                            )} calls/sec`
-                        );
-                        maxRefreshTime = 0;
-                        lastRefreshReport = now;
-                    }
-                }
-            }, 5);
         };
 
         /*
@@ -5165,6 +5192,12 @@ class Activity {
             // Try restarting where we were when we hit save.
             if (that.planet) {
                 that.sessionData = await that.planet.openCurrentProject();
+                if (!that.sessionData) {
+                    const currentProject = that.storage.currentProject;
+                    if (currentProject !== undefined) {
+                        that.sessionData = that.storage["SESSION" + currentProject];
+                    }
+                }
             } else {
                 const currentProject = that.storage.currentProject;
                 that.sessionData = that.storage["SESSION" + currentProject];
@@ -5216,25 +5249,49 @@ class Activity {
             this.doLoadAnimation();
 
             // palettes.updatePalettes();
-            this.textMsg(this.planet.getCurrentProjectName());
+            try {
+                const projectName =
+                    this.planet && typeof this.planet.getCurrentProjectName === "function"
+                        ? this.planet.getCurrentProjectName()
+                        : _("My Project");
+                this.textMsg(projectName);
+            } catch (e) {
+                console.error(e);
+                this.textMsg(_("My Project"));
+            }
 
             const that = this;
             setTimeout(() => {
+                const finishLoading = () => {
+                    that.loading = false;
+                    document.body.style.cursor = "default";
+                    that.update = true;
+                };
+
                 try {
-                    that.planet.openProjectFromPlanet(projectID, () => {
-                        that.loadStartWrapper(loadStart);
-                    });
+                    if (that.planet && typeof that.planet.openProjectFromPlanet === "function") {
+                        that.planet.openProjectFromPlanet(projectID, () => {
+                            that.loadStartWrapper(loadStart);
+                        });
+                    } else {
+                        throw new Error("Planet openProjectFromPlanet is unavailable.");
+                    }
                 } catch (e) {
                     console.error(e);
                     that.loadStartWrapper(loadStart);
                 }
 
-                that.planet.initialiseNewProject();
-                // Restore default cursor
-                that.loading = false;
+                if (that.planet && typeof that.planet.initialiseNewProject === "function") {
+                    try {
+                        that.planet.initialiseNewProject();
+                    } catch (e) {
+                        console.error(e);
+                    }
+                } else {
+                    console.error("Planet initialiseNewProject is unavailable.");
+                }
 
-                document.body.style.cursor = "default";
-                that.update = true;
+                finishLoading();
             }, 2500);
 
             const run = flags.run;
@@ -6705,10 +6762,13 @@ class Activity {
                 } else {
                     switch (myBlock.name) {
                         case "start":
-                        case "drum":
+                        case "drum": {
                             // Find the turtle associated with this block.
-                            // eslint-disable-next-line no-case-declarations
-                            const turtle = this.turtles.getTurtle(myBlock.value);
+
+                            const turtle =
+                                myBlock.value !== null && myBlock.value !== undefined
+                                    ? this.turtles.getTurtle(myBlock.value)
+                                    : null;
                             if (turtle === null || turtle === undefined) {
                                 args = {
                                     id: this.turtles.getTurtleCount(),
@@ -6736,6 +6796,7 @@ class Activity {
                                 };
                             }
                             break;
+                        }
                         case "temperament1":
                             if (this.blocks.customTemperamentDefined) {
                                 // If a define temperament block is
@@ -7193,7 +7254,14 @@ class Activity {
             if (!$helpfulSearch.data("autocomplete-init")) {
                 $helpfulSearch.autocomplete({
                     source: (request, response) => {
-                        const term = (request.term || "").toLowerCase();
+                        const term = (request.term || "").toLowerCase().trim();
+
+                        // Check cache first for performance
+                        if (that._searchCache[term] !== undefined) {
+                            response(that._searchCache[term]);
+                            return;
+                        }
+
                         const results = that.searchSuggestions.filter(item => {
                             if (!term || term.length === 0) {
                                 return true;
@@ -7209,6 +7277,9 @@ class Activity {
                                 item.label.toLowerCase().indexOf(term) !== -1
                             );
                         });
+
+                        // Cache the results for future use
+                        that._searchCache[term] = results;
                         response(results);
                     },
                     appendTo: "body",
@@ -7534,11 +7605,18 @@ class Activity {
 
             const intro = document.createElement("div");
             intro.className = "keyboard-shortcuts-hero";
-            intro.innerHTML =
-                `<div class="keyboard-shortcuts-hero-title">${_("Keyboard shortcuts")}</div>` +
-                `<div class="keyboard-shortcuts-hero-copy">${_(
-                    "Shortcuts are context-sensitive. Some only work when a related panel, widget, or mode is active. Windows/Linux and Mac equivalents are shown together."
-                )}</div>`;
+            const titleDiv = document.createElement("div");
+            titleDiv.className = "keyboard-shortcuts-hero-title";
+            titleDiv.textContent = _("Keyboard shortcuts");
+
+            const copyDiv = document.createElement("div");
+            copyDiv.className = "keyboard-shortcuts-hero-copy";
+            copyDiv.textContent = _(
+                "Shortcuts are context-sensitive. Some only work when a related panel, widget, or mode is active. Windows/Linux and Mac equivalents are shown together."
+            );
+
+            intro.appendChild(titleDiv);
+            intro.appendChild(copyDiv);
             wrapper.appendChild(intro);
 
             shortcutSections.forEach(section => {
@@ -8137,6 +8215,17 @@ class Activity {
             this.addEventListener(document, "mousemove", this.handleMouseMove);
             this.addEventListener(document, "click", this.handleDocumentClick);
             this.addEventListener(window, "beforeunload", () => {
+                // Save synchronously to SESSION* keys so manual reload/F5
+                // still has recoverable data even if async saves are cut short.
+                if (typeof this.__saveLocally === "function") {
+                    this.__saveLocally();
+                }
+                if (
+                    typeof this.saveLocally === "function" &&
+                    this.saveLocally !== this.__saveLocally
+                ) {
+                    this.saveLocally();
+                }
                 this._stopRenderLoop();
                 if (this._autoSaveInterval !== null) {
                     clearInterval(this._autoSaveInterval);
@@ -8314,8 +8403,8 @@ class Activity {
                 }
             }
 
-            this.fileChooser.addEventListener("click", () => {
-                that.value = null;
+            this.fileChooser.addEventListener("click", event => {
+                event.currentTarget.value = "";
             });
 
             this.fileChooser.addEventListener(
@@ -8343,17 +8432,17 @@ class Activity {
                                 let obj;
                                 try {
                                     if (cleanData.includes("html")) {
+                                        let extracted;
                                         if (cleanData.includes('id="codeBlock"')) {
-                                            obj = JSON.parse(
-                                                cleanData.match(
-                                                    '<div class="code" id="codeBlock">(.+?)</div>'
-                                                )[1]
-                                            );
+                                            extracted = cleanData.match(
+                                                '<div class="code" id="codeBlock">(.+?)</div>'
+                                            )[1];
                                         } else {
-                                            obj = JSON.parse(
-                                                cleanData.match('<div class="code">(.+?)</div>')[1]
-                                            );
+                                            extracted = cleanData.match(
+                                                '<div class="code">(.+?)</div>'
+                                            )[1];
                                         }
+                                        obj = JSON.parse(unescapeHTML(extracted));
                                     } else {
                                         obj = JSON.parse(cleanData);
                                     }
@@ -8468,9 +8557,17 @@ class Activity {
                             let obj;
                             try {
                                 if (cleanData.includes("html")) {
-                                    obj = JSON.parse(
-                                        cleanData.match('<div class="code">(.+?)</div>')[1]
-                                    );
+                                    let extracted;
+                                    if (cleanData.includes('id="codeBlock"')) {
+                                        extracted = cleanData.match(
+                                            '<div class="code" id="codeBlock">(.+?)</div>'
+                                        )[1];
+                                    } else {
+                                        extracted = cleanData.match(
+                                            '<div class="code">(.+?)</div>'
+                                        )[1];
+                                    }
+                                    obj = JSON.parse(unescapeHTML(extracted));
                                 } else {
                                     obj = JSON.parse(cleanData);
                                 }
@@ -8581,13 +8678,13 @@ class Activity {
             dropZone.addEventListener("dragover", __handleDragOver, false);
             dropZone.addEventListener("drop", __handleFileSelect, false);
 
-            this.allFilesChooser.addEventListener("click", () => {
-                this.value = null;
+            this.allFilesChooser.addEventListener("click", event => {
+                event.currentTarget.value = "";
             });
 
-            this.pluginChooser.addEventListener("click", () => {
+            this.pluginChooser.addEventListener("click", event => {
                 window.scroll(0, 0);
-                this.value = null;
+                event.currentTarget.value = "";
             });
 
             this.pluginChooser.addEventListener(
@@ -8962,16 +9059,9 @@ class Activity {
             }
         }
 
-        if (this._idleWatcherResetHandler) {
-            ["mousemove", "mousedown", "keydown", "touchstart", "wheel"].forEach(eventType => {
-                window.removeEventListener(eventType, this._idleWatcherResetHandler);
-            });
-            this._idleWatcherResetHandler = null;
-        }
-
-        if (this._idleWatcherIntervalId) {
-            clearInterval(this._idleWatcherIntervalId);
-            this._idleWatcherIntervalId = null;
+        // Keep idle watcher cleanup centralized to avoid stale field mismatches.
+        if (typeof this._stopIdleWatcher === "function") {
+            this._stopIdleWatcher();
         }
     }
 

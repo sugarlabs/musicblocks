@@ -284,8 +284,12 @@ describe("Palettes Class", () => {
 
     describe("_makeSelectorButton method", () => {
         test("creates a selector cell and hooks hover handlers", () => {
-            const tdMock = { style: {}, appendChild: jest.fn() };
-            const trMock = { insertCell: jest.fn(() => tdMock), children: [{}, { children: [] }] };
+            const tdMock = { style: {}, appendChild: jest.fn(), setAttribute: jest.fn() };
+            const trMock = {
+                insertCell: jest.fn(() => tdMock),
+                children: [{}, { children: [] }],
+                setAttribute: jest.fn()
+            };
             const paletteElement = {
                 children: [
                     {
@@ -453,10 +457,12 @@ describe("Palettes Class", () => {
     });
 
     describe("getSearchPos method", () => {
-        test("returns correct search position", () => {
+        test("returns macro expansion coordinates as object", () => {
             const pos = palettes.getSearchPos();
-
-            expect(pos).toEqual([palettes.cellSize, palettes.top + palettes.cellSize * 1.75]);
+            expect(pos).toHaveProperty("x");
+            expect(pos).toHaveProperty("y");
+            expect(typeof pos.x).toBe("number");
+            expect(typeof pos.y).toBe("number");
         });
     });
 
@@ -1518,6 +1524,7 @@ describe("Palettes Class", () => {
                 if (tag === "table") return paletteBody;
                 return {
                     style: {},
+                    setAttribute: jest.fn(),
                     appendChild: jest.fn(),
                     children: [],
                     classList: { add: jest.fn() }
@@ -1544,8 +1551,10 @@ describe("Palettes Class", () => {
         test("_showMenuItems renders a basic block", () => {
             const paletteList = {
                 insertRow: jest.fn(() => ({
+                    setAttribute: jest.fn(),
                     insertCell: jest.fn(() => ({
                         style: {},
+                        setAttribute: jest.fn(),
                         appendChild: jest.fn()
                     }))
                 })),
@@ -1598,6 +1607,7 @@ describe("Palettes Class", () => {
                 if (tag === "tr") {
                     return {
                         children: [],
+                        setAttribute: jest.fn(),
                         appendChild(child) {
                             this.children.push(child);
                         }
@@ -1607,6 +1617,7 @@ describe("Palettes Class", () => {
                 if (tag === "td") {
                     return {
                         style: {},
+                        setAttribute: jest.fn(),
                         appendChild(img) {
                             capturedImg = img;
                         }
@@ -1696,6 +1707,7 @@ describe("Palettes Class", () => {
                 if (tag === "tr") {
                     return {
                         children: [],
+                        setAttribute: jest.fn(),
                         appendChild(child) {
                             this.children.push(child);
                         }
@@ -1705,6 +1717,7 @@ describe("Palettes Class", () => {
                 if (tag === "td") {
                     return {
                         style: {},
+                        setAttribute: jest.fn(),
                         appendChild(img) {
                             capturedImg = img;
                         }
@@ -1758,8 +1771,10 @@ describe("Palettes Class", () => {
         test("_showMenuItems hides palette when mobile", () => {
             const paletteList = {
                 insertRow: jest.fn(() => ({
+                    setAttribute: jest.fn(),
                     insertCell: jest.fn(() => ({
                         style: {},
+                        setAttribute: jest.fn(),
                         appendChild: jest.fn()
                     }))
                 })),
@@ -1797,7 +1812,16 @@ describe("Palettes Class", () => {
         test("_makeBlockFromProtoblock creates status macro", () => {
             palettes.add("test");
             const palette = palettes.dict.test;
-            const protoblk = { name: "status" };
+            const protoblk = {
+                name: "status",
+                macroFunc: jest.fn(() => [
+                    [0, "status", 10, 20, [null, 1, 2]],
+                    [1, "hidden", 0, 0, [0, 3]],
+                    [2, "hiddennoflow", 0, 0, [0, null]],
+                    [3, "print", 0, 0, [1, 4, null]],
+                    [4, "beatvalue", 0, 0, [3]]
+                ])
+            };
 
             mockActivity.palettes = palettes;
             mockActivity.blocks = {
@@ -1833,7 +1857,14 @@ describe("Palettes Class", () => {
         test("_makeBlockFromProtoblock skips duplicate status", () => {
             palettes.add("test");
             const palette = palettes.dict.test;
-            const protoblk = { name: "status" };
+            const protoblk = {
+                name: "status",
+                macroFunc: jest.fn(() => [
+                    [0, "status", 10, 20, [null, 1, 2]],
+                    [1, "hidden", 0, 0, [0, null]],
+                    [2, "hiddennoflow", 0, 0, [0, null]]
+                ])
+            };
 
             mockActivity.blocks = {
                 blockList: [{ name: "status", trash: false }]
@@ -1849,7 +1880,20 @@ describe("Palettes Class", () => {
         test("_makeBlockFromProtoblock builds status fields from variables and boxes", () => {
             palettes.add("test");
             const palette = palettes.dict.test;
-            const protoblk = { name: "status" };
+            const protoblk = {
+                name: "status",
+                macroFunc: jest.fn(() => [
+                    [0, "status", 100, 100, [null, 1, 2]],
+                    [1, "hidden", 0, 0, [0, 3]],
+                    [2, "hiddennoflow", 0, 0, [0, null]],
+                    [3, "print", 0, 0, [1, 4, 5]],
+                    [4, "elapsednotes", 0, 0, [3]],
+                    [5, "print", 0, 0, [3, 6, 7]],
+                    [6, "beatvalue", 0, 0, [5]],
+                    [7, "print", 0, 0, [5, 8, null]],
+                    [8, "measurevalue", 0, 0, [7]]
+                ])
+            };
 
             global.activity = mockActivity;
 

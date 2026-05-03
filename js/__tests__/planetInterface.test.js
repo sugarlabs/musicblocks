@@ -32,6 +32,7 @@ const mockActivity = {
     _loadStart: jest.fn(),
     doLoadAnimation: jest.fn(),
     textMsg: jest.fn(),
+    errorMsg: jest.fn(),
     stage: { enableDOMEvents: jest.fn(), update: jest.fn() },
     blocks: { loadNewBlocks: jest.fn(), palettes: { _hideMenus: jest.fn() }, trashStacks: [] },
     logo: { doStopTurtles: jest.fn() },
@@ -75,6 +76,7 @@ describe("PlanetInterface", () => {
 
     beforeEach(() => {
         planetInterface = new PlanetInterface(mockActivity);
+        mockActivity.errorMsg.mockClear();
     });
 
     test("hideMusicBlocks hides relevant elements and disables DOM events", () => {
@@ -108,6 +110,7 @@ describe("PlanetInterface", () => {
     });
 
     test("openPlanet calls saveLocally, hideMusicBlocks, and showPlanet", () => {
+        planetInterface.planet = { ProjectStorage: {}, open: jest.fn() };
         jest.spyOn(planetInterface, "saveLocally").mockImplementation(() => {});
         jest.spyOn(planetInterface, "hideMusicBlocks").mockImplementation(() => {});
         jest.spyOn(planetInterface, "showPlanet").mockImplementation(() => {});
@@ -115,6 +118,23 @@ describe("PlanetInterface", () => {
         expect(planetInterface.saveLocally).toHaveBeenCalled();
         expect(planetInterface.hideMusicBlocks).toHaveBeenCalled();
         expect(planetInterface.showPlanet).toHaveBeenCalled();
+    });
+
+    test("openPlanet: does not crash when Planet backend is unavailable", () => {
+        const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        planetInterface.planet = null;
+        jest.spyOn(planetInterface, "saveLocally");
+        jest.spyOn(planetInterface, "hideMusicBlocks");
+        jest.spyOn(planetInterface, "showPlanet");
+
+        expect(() => planetInterface.openPlanet()).not.toThrow();
+        expect(planetInterface.saveLocally).not.toHaveBeenCalled();
+        expect(planetInterface.hideMusicBlocks).not.toHaveBeenCalled();
+        expect(planetInterface.showPlanet).not.toHaveBeenCalled();
+        expect(errorSpy).toHaveBeenCalledWith(
+            "[PlanetInterface] openPlanet called before Planet is ready."
+        );
+        errorSpy.mockRestore();
     });
 
     test("closePlanet calls hidePlanet and showMusicBlocks", () => {
@@ -160,6 +180,14 @@ describe("PlanetInterface", () => {
         expect(mockActivity.blocks.trashStacks).toEqual([]);
     });
 
+    test("initialiseNewProject returns early when Planet storage is unavailable", () => {
+        planetInterface.planet = null;
+
+        expect(() => planetInterface.initialiseNewProject("New Name")).not.toThrow();
+        expect(mockActivity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(mockActivity.refreshCanvas).not.toHaveBeenCalled();
+    });
+
     test("loadProjectFromData: default merge=false", () => {
         planetInterface.iframe = { style: { display: "block" } };
         mockActivity.blocks.loadNewBlocks.mockClear();
@@ -189,13 +217,26 @@ describe("PlanetInterface", () => {
         doSVG.mockReturnValue("");
         const D = { x: 1 };
         mockActivity.prepareExport.mockReturnValue(D);
+        mockActivity.stage.update.mockClear();
 
         planetInterface.planet = { ProjectStorage: { saveLocally: jest.fn() } };
-        planetInterface.saveLocally();
 
-        expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenCalledWith(D, null);
+        return planetInterface.saveLocally().then(() => {
+            expect(mockActivity.stage.update).toHaveBeenCalledWith(undefined);
+            expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenCalledWith(D, null);
+        });
     });
 
+    test("saveLocally: returns null without throwing when Planet storage is unavailable", async () => {
+        const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        planetInterface.planet = null;
+
+        await expect(planetInterface.saveLocally()).resolves.toBeNull();
+        expect(errorSpy).toHaveBeenCalledWith(
+            "[PlanetInterface] saveLocally called before Planet storage is ready."
+        );
+        errorSpy.mockRestore();
+    });
     test("getCurrentProjectDescription/Image/TimeLastSaved", () => {
         const D = new Date(2020, 1, 1);
         planetInterface.planet = {
@@ -215,10 +256,24 @@ describe("PlanetInterface", () => {
         };
         await expect(planetInterface.openCurrentProject()).resolves.toBe(123);
     });
+    test("openCurrentProject returns null when Planet storage is unavailable", async () => {
+        const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        planetInterface.planet = null;
+        await expect(planetInterface.openCurrentProject()).resolves.toBeNull();
+        expect(errorSpy).toHaveBeenCalledWith(
+            "[PlanetInterface] openCurrentProject called before Planet storage is ready."
+        );
+        errorSpy.mockRestore();
+    });
     test("openProjectFromPlanet proxies arguments", () => {
         planetInterface.planet = { openProjectFromPlanet: jest.fn() };
         planetInterface.openProjectFromPlanet("ID42", "oops");
         expect(planetInterface.planet.openProjectFromPlanet).toHaveBeenCalledWith("ID42", "oops");
+    });
+    test("openProjectFromPlanet returns early when Planet is unavailable", () => {
+        planetInterface.planet = null;
+
+        expect(() => planetInterface.openProjectFromPlanet("ID42", "oops")).not.toThrow();
     });
     test("hideMusicBlocks also calls widgetWindows.hideAllWindows and disables DOM events after 250ms", () => {
         jest.useFakeTimers();
@@ -283,7 +338,10 @@ describe("PlanetInterface", () => {
         mockActivity.prepareExport.mockReturnValue("EXPORT");
         global.base64Encode = jest.fn(s => s);
         planetInterface.planet = {
-            ProjectStorage: { saveLocally: jest.fn() }
+            ProjectStorage: {
+                getCurrentProjectImage: jest.fn(() => "OLD_IMAGE"),
+                saveLocally: jest.fn()
+            }
         };
 
         global.Image = class {
@@ -304,23 +362,70 @@ describe("PlanetInterface", () => {
             }
         };
 
-        planetInterface.saveLocally();
-
-        setTimeout(() => {
-            expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenCalledWith(
+        planetInterface.saveLocally().then(() => {
+            expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenNthCalledWith(
+                1,
+                "EXPORT",
+                "OLD_IMAGE"
+            );
+            expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenNthCalledWith(
+                2,
                 "EXPORT",
                 "DATAURL"
             );
             done();
-        }, 0);
+        });
+    });
+    test("saveLocally resolves after project data is persisted", () => {
+        doSVG.mockReturnValue("<svg/>");
+        mockActivity.prepareExport.mockReturnValue("EXPORT");
+        global.base64Encode = jest.fn(s => s);
+
+        let resolveSave;
+        planetInterface.planet = {
+            ProjectStorage: {
+                getCurrentProjectImage: jest.fn(() => "OLD_IMAGE"),
+                saveLocally: jest.fn(
+                    () =>
+                        new Promise(resolve => {
+                            resolveSave = resolve;
+                        })
+                )
+            }
+        };
+
+        global.Image = class {
+            set src(_v) {}
+        };
+
+        const savePromise = planetInterface.saveLocally();
+
+        expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenCalledWith(
+            "EXPORT",
+            "OLD_IMAGE"
+        );
+
+        let resolved = false;
+        savePromise.then(() => {
+            resolved = true;
+        });
+
+        return Promise.resolve()
+            .then(() => {
+                expect(resolved).toBe(false);
+                resolveSave();
+                return savePromise;
+            })
+            .then(() => {
+                expect(resolved).toBe(true);
+            });
     });
     it("loadProjectFromData shows error and returns early if data is undefined", () => {
         const saved_ = global._;
         global._ = jest.fn(str => str);
-        planetInterface.errorMsg = jest.fn();
         planetInterface.iframe = { style: { display: "" } };
         planetInterface.loadProjectFromData(undefined, false);
-        expect(planetInterface.errorMsg).toHaveBeenCalledWith("project undefined");
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith("project undefined");
         global._ = saved_;
     });
 
@@ -347,12 +452,11 @@ describe("PlanetInterface", () => {
         delete document.attachEvent;
     });
 
-    it("loadProjectFromData catches JSON parse errors and calls errorMsg", () => {
+    it("loadProjectFromData catches JSON parse errors and calls activity.errorMsg", () => {
         planetInterface.iframe = { style: { display: "" } };
         planetInterface.getCurrentProjectName = jest.fn(() => "foo");
-        planetInterface.errorMsg = jest.fn();
         planetInterface.loadProjectFromData("invalid json");
-        expect(planetInterface.errorMsg).toHaveBeenCalledWith(expect.any(SyntaxError));
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith(expect.any(SyntaxError));
     });
 
     it("saveLocally handles quota exceeded error and shows storage warning", () => {
@@ -396,14 +500,19 @@ describe("PlanetInterface", () => {
         iframe.contentWindow.makePlanet = jest
             .fn()
             .mockRejectedValue(new Error("Failed to make planet"));
-        try {
-            await planetInterface.init();
-        } catch (e) {
-            expect(e).toBeInstanceOf(TypeError);
-        }
+        await expect(planetInterface.init()).resolves.toBeUndefined();
         expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
         expect(consoleSpy.mock.calls[0][0].message).toBe("Failed to make planet");
         expect(planetInterface.planet).toBeNull();
+        expect(window.Converter).toBeUndefined();
         consoleSpy.mockRestore();
+    });
+
+    it("project getters return safe defaults when Planet storage is unavailable", () => {
+        planetInterface.planet = null;
+        expect(planetInterface.getCurrentProjectName()).toBe("");
+        expect(planetInterface.getCurrentProjectDescription()).toBe("");
+        expect(planetInterface.getCurrentProjectImage()).toBeNull();
+        expect(planetInterface.getTimeLastSaved()).toBeNull();
     });
 });

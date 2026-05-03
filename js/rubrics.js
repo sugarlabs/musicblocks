@@ -637,13 +637,23 @@ const analyzeProject = activity => {
 
     for (let c = 0; c < cats.length; c++) {
         if (cats[c] in TASCORE) {
-            scores[PALS.indexOf(TAPAL[cats[c]])] += TASCORE[cats[c]];
+            const idx = PALS.indexOf(TAPAL[cats[c]]);
+            if (idx !== -1) {
+                scores[idx] += TASCORE[cats[c]];
+            } else {
+                console.warn("rubrics: TAPAL value not found in PALS:", TAPAL[cats[c]]);
+            }
         }
     }
 
     for (let p = 0; p < pals.length; p++) {
         if (pals[p] in TASCORE) {
-            scores[PALS.indexOf(pals[p])] += TASCORE[pals[p]];
+            const idx = PALS.indexOf(pals[p]);
+            if (idx !== -1) {
+                scores[idx] += TASCORE[pals[p]];
+            } else {
+                console.warn("rubrics: pal not found in PALS:", pals[p]);
+            }
         }
     }
 

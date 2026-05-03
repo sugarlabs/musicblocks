@@ -17,7 +17,7 @@
 /*
    global
 
-   TONEBPM, Singer, _, delayExecution, docById,
+   TONEBPM, Singer, _, delayExecution, deepClone, docById, ManagedTimer,
    calcNoteValueToDisplay, platformColor, beginnerMode, last,
    EIGHTHNOTEWIDTH, nearestBeat, rationalToFraction, DRUMNAMES,
    VOICENAMES, EFFECTSNAMES
@@ -29,7 +29,9 @@
     - js/turtle-singer.js
         Singer
     - js/utils/utils.js
-        _, docById, delayExecution, last, nearestBeat, rationalToFraction
+        _, deepClone, docById, delayExecution, last, nearestBeat, rationalToFraction
+    - js/utils/ManagedTimer.js
+        ManagedTimer
     - js/utils/musicutils.js
         calcNoteValueToDisplay, EIGHTHNOTEWIDTH
     - js/utils/platformstyle.js
@@ -48,6 +50,8 @@
  * @requires Singer
  * @requires _
  * @requires docById
+ * @requires deepClone
+ * @requires ManagedTimer
  * @requires delayExecution
  * @requires last
  * @requires nearestBeat
@@ -315,6 +319,142 @@ class RhythmRuler {
          * @private
          */
         this._fullscreenScaleFactor = 3;
+
+        /**
+         * Tracks timers owned by this widget so they can be cancelled when playback stops
+         * or the widget closes.
+         * @type {ManagedTimer|null}
+         * @private
+         */
+        this._timerManager = typeof ManagedTimer !== "undefined" ? new ManagedTimer() : null;
+
+        /**
+         * Fallback timeout tracking for test/runtime environments where ManagedTimer is unavailable.
+         * @type {Set<number>}
+         * @private
+         */
+        this._activeTimeouts = new Set();
+
+        /**
+         * Fallback interval tracking for test/runtime environments where ManagedTimer is unavailable.
+         * @type {Set<number>}
+         * @private
+         */
+        this._activeIntervals = new Set();
+    }
+
+    /**
+     * Schedules a timeout owned by the widget lifecycle.
+     * @private
+     * @param {Function} callback - Callback to run after the delay.
+     * @param {number} delay - Delay in milliseconds.
+     * @returns {number} Timer ID.
+     */
+    _setWidgetTimeout(callback, delay) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setTimeout(callback, delay);
+        }
+
+        let id;
+        id = setTimeout(() => {
+            this._activeTimeouts.delete(id);
+            callback();
+        }, delay);
+        this._activeTimeouts.add(id);
+        return id;
+    }
+
+    /**
+     * Clears a timeout owned by the widget lifecycle.
+     * @private
+     * @param {number} id - Timer ID returned by _setWidgetTimeout.
+     * @returns {boolean} Whether the timeout was tracked and cleared.
+     */
+    _clearWidgetTimeout(id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+
+        if (this._timerManager !== null && this._timerManager.clearTimeout(id)) {
+            return true;
+        }
+
+        if (this._activeTimeouts.has(id)) {
+            clearTimeout(id);
+            this._activeTimeouts.delete(id);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Schedules an interval owned by the widget lifecycle.
+     * @private
+     * @param {Function} callback - Callback to run repeatedly.
+     * @param {number} interval - Interval in milliseconds.
+     * @returns {number} Interval ID.
+     */
+    _setWidgetInterval(callback, interval) {
+        if (this._timerManager !== null) {
+            return this._timerManager.setInterval(callback, interval);
+        }
+
+        const id = setInterval(callback, interval);
+        this._activeIntervals.add(id);
+        return id;
+    }
+
+    /**
+     * Clears an interval owned by the widget lifecycle.
+     * @private
+     * @param {number} id - Interval ID returned by _setWidgetInterval.
+     * @returns {boolean} Whether the interval was tracked and cleared.
+     */
+    _clearWidgetInterval(id) {
+        if (id === null || id === undefined) {
+            return false;
+        }
+
+        if (this._timerManager !== null && this._timerManager.clearInterval(id)) {
+            return true;
+        }
+
+        if (this._activeIntervals.has(id)) {
+            clearInterval(id);
+            this._activeIntervals.delete(id);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Clears all timers owned by the widget lifecycle.
+     * @private
+     * @returns {number} Number of tracked timers and intervals cleared.
+     */
+    _clearWidgetTimers() {
+        let count = 0;
+
+        if (this._timerManager !== null) {
+            count += this._timerManager.clearAll();
+        }
+
+        for (const id of this._activeTimeouts) {
+            clearTimeout(id);
+            count++;
+        }
+        this._activeTimeouts.clear();
+
+        for (const id of this._activeIntervals) {
+            clearInterval(id);
+            count++;
+        }
+        this._activeIntervals.clear();
+
+        this._longPressBeep = null;
+        return count;
     }
 
     /**
@@ -439,6 +579,7 @@ class RhythmRuler {
             if (this._playing) {
                 this.__pause();
             }
+            this._clearWidgetTimers();
             // Save the new dissect history.
             const dissectHistory = [];
             const drums = [];
@@ -463,12 +604,12 @@ class RhythmRuler {
             for (let i = 0; i < this._dissectHistory.length; i++) {
                 const drum = this._dissectHistory[i][1];
                 if (!drumsSet.has(drum)) {
-                    const history = JSON.parse(JSON.stringify(this._dissectHistory[i][0]));
+                    const history = deepClone(this._dissectHistory[i][0]);
                     dissectHistory.push([history, drum]);
                 }
             }
 
-            this._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
+            this._dissectHistory = deepClone(dissectHistory);
 
             this._playing = false;
             this._playingOne = false;
@@ -680,9 +821,11 @@ class RhythmRuler {
                                 this._startingTime = null;
                                 this._elapsedTimes[id] = 0;
                                 this._offsets[id] = 0;
-                                setTimeout(() => this._calculateZebraStripes(id), 1000);
+                                this._clearWidgetTimers();
+                                this._setWidgetTimeout(() => this._calculateZebraStripes(id), 1000);
                             }
                         } else if (this._playingOne === false) {
+                            this._clearWidgetTimers();
                             this._rulerSelected = id;
                             this.activity.logo.turtleDelay = 0;
                             this._playing = true;
@@ -724,7 +867,7 @@ class RhythmRuler {
             for (let j = 0; j < this.Rulers[i][0].length; j++) {
                 const noteValue = this.Rulers[i][0][j];
                 const rulerSubCell = rulerRow.insertCell(-1);
-                rulerSubCell.textContent = calcNoteValueToDisplay(noteValue, 1);
+                this.__setNoteValueDisplay(rulerSubCell, noteValue, 1);
                 rulerSubCell.style.height = RhythmRuler.RULERHEIGHT + "px";
                 rulerSubCell.style.minHeight = rulerSubCell.style.height;
                 rulerSubCell.style.maxHeight = rulerSubCell.style.height;
@@ -846,6 +989,34 @@ class RhythmRuler {
     }
 
     /**
+     * Renders the note value display returned by calcNoteValueToDisplay without
+     * inserting raw HTML into the widget.
+     * @private
+     * @param {HTMLTableCellElement} cell - The rhythm cell to update.
+     * @param {number} numerator - The numerator passed to calcNoteValueToDisplay.
+     * @param {number} denominator - The denominator passed to calcNoteValueToDisplay.
+     * @param {string} [suffix] - Optional text appended after the note value.
+     * @returns {void}
+     */
+    __setNoteValueDisplay(cell, numerator, denominator, suffix) {
+        const noteValueToDisplay = calcNoteValueToDisplay(numerator, denominator);
+        const parts = noteValueToDisplay.split("<br>");
+
+        cell.textContent = "";
+        for (let i = 0; i < parts.length; i++) {
+            let part = parts[i];
+            if (part === "&mdash;") part = "\u2014";
+
+            cell.appendChild(document.createTextNode(part));
+            if (i < parts.length - 1) cell.appendChild(document.createElement("br"));
+        }
+
+        if (suffix !== undefined) {
+            cell.appendChild(document.createTextNode(" " + suffix));
+        }
+    }
+
+    /**
      * Scales the width of the note cells based on the window size.
      * @private
      * @returns {void}
@@ -932,7 +1103,7 @@ class RhythmRuler {
      * @returns {void}
      */
     _dissectRuler(event, ruler) {
-        const cell = event.target;
+        const cell = event.currentTarget || event.target;
         if (cell === null) {
             return;
         }
@@ -960,7 +1131,7 @@ class RhythmRuler {
             // Tap a rhythm by clicking in a cell.
             if (this._tapCell === null) {
                 const noteValues = this.Rulers[this._rulerSelected][0];
-                this._tapCell = event.target;
+                this._tapCell = cell;
                 if (noteValues[this._tapCell.cellIndex] < 0) {
                     // Don't allow tapping in rests.
                     this._tapCell = null;
@@ -999,7 +1170,7 @@ class RhythmRuler {
 
                 // Play count-off based on meter (e.g., 4 beats for 4/4, 3 beats for 3/4)
                 for (let i = 0; i < beatsPerMeasure; i++) {
-                    setTimeout(
+                    this._setWidgetTimeout(
                         () => {
                             this.activity.logo.synth.trigger(
                                 0,
@@ -1014,7 +1185,7 @@ class RhythmRuler {
                     );
                 }
 
-                setTimeout(() => {
+                this._setWidgetTimeout(() => {
                     this.__startTapping(interval, event);
                 }, interval);
             }
@@ -1049,7 +1220,7 @@ class RhythmRuler {
         this._tapEndTime = this._tapTimes[0] + interval;
 
         // Set a timeout to end tapping
-        setTimeout(() => {
+        this._setWidgetTimeout(() => {
             this.__endTapping(event);
         }, interval);
 
@@ -1057,9 +1228,9 @@ class RhythmRuler {
         const __move = (tick, stepSize) => {
             let width = 1;
 
-            const id = setInterval(() => {
+            const id = this._setWidgetInterval(() => {
                 if (width >= 100) {
-                    clearInterval(id);
+                    this._clearWidgetInterval(id);
                 } else {
                     width += stepSize;
                     this._progressBar.style.width = width + "%";
@@ -1080,7 +1251,7 @@ class RhythmRuler {
      * @returns {void}
      */
     __endTapping(event) {
-        const cell = event.target;
+        const cell = event.currentTarget || event.target;
         if (cell.parentNode === null) {
             // console.debug("Null parent node in endTapping");
             return;
@@ -1192,7 +1363,7 @@ class RhythmRuler {
      */
     __addCellEventHandlers(cell, cellWidth, noteValue) {
         const __mouseOverHandler = event => {
-            const cell = event.target;
+            const cell = event.currentTarget;
             if (cell === null || cell.parentNode === null) {
                 return;
             }
@@ -1203,27 +1374,27 @@ class RhythmRuler {
             let obj;
             if (noteValue < 0) {
                 obj = rationalToFraction(Math.abs(Math.abs(-1 / noteValue)));
-                cell.textContent = `${calcNoteValueToDisplay(obj[1], obj[0])} ${_("silence")}`;
+                this.__setNoteValueDisplay(cell, obj[1], obj[0], _("silence"));
             } else {
                 obj = rationalToFraction(Math.abs(Math.abs(1 / noteValue)));
-                cell.textContent = calcNoteValueToDisplay(obj[1], obj[0]);
+                this.__setNoteValueDisplay(cell, obj[1], obj[0]);
             }
         };
 
         const __mouseOutHandler = event => {
-            const cell = event.target;
+            const cell = event.currentTarget;
             cell.textContent = "";
         };
 
         const __mouseDownHandler = event => {
-            const cell = event.target;
+            const cell = event.currentTarget;
             this._mouseDownCell = cell;
 
             const d = new Date();
             this._longPressStartTime = d.getTime();
             this._inLongPress = false;
 
-            this._longPressBeep = setTimeout(() => {
+            this._longPressBeep = this._setWidgetTimeout(() => {
                 // Removing audio feedback on long press since it
                 // occasionally confuses tone.js during rapid clicking
                 // in the widget.
@@ -1246,8 +1417,9 @@ class RhythmRuler {
          * @returns {void}
          */
         const __mouseUpHandler = event => {
-            clearTimeout(this._longPressBeep);
-            const cell = event.target;
+            this._clearWidgetTimeout(this._longPressBeep);
+            this._longPressBeep = null;
+            const cell = event.currentTarget;
             this._mouseUpCell = cell;
             if (this._mouseDownCell !== this._mouseUpCell) {
                 this._tieRuler(event, cell.parentNode.getAttribute("data-row"));
@@ -1274,7 +1446,7 @@ class RhythmRuler {
         const __clickHandler = event => {
             if (event === undefined) return;
             if (!this.__getLongPressStatus()) {
-                const cell = event.target;
+                const cell = event.currentTarget;
                 if (cell !== null && cell.parentNode !== null) {
                     this._dissectRuler(event, cell.parentNode.getAttribute("data-row"));
                 } else {
@@ -1288,7 +1460,7 @@ class RhythmRuler {
         let obj;
         if (cellWidth >= 18 && noteValue > 0) {
             obj = rationalToFraction(Math.abs(1 / noteValue));
-            cell.textContent = calcNoteValueToDisplay(obj[1], obj[0]);
+            this.__setNoteValueDisplay(cell, obj[1], obj[0]);
         } else {
             cell.textContent = "";
 
@@ -1337,7 +1509,7 @@ class RhythmRuler {
              * @returns {void}
              */
             const __mouseOverHandler = event => {
-                const cell = event.target;
+                const cell = event.currentTarget;
                 if (cell === null) {
                     return;
                 }
@@ -1349,10 +1521,10 @@ class RhythmRuler {
                 const noteValue = noteValues[cell.cellIndex];
                 if (noteValue < 0) {
                     obj = rationalToFraction(Math.abs(Math.abs(-1 / noteValue)));
-                    cell.textContent = calcNoteValueToDisplay(obj[1], obj[0]) + " " + _("silence");
+                    this.__setNoteValueDisplay(cell, obj[1], obj[0], _("silence"));
                 } else {
                     obj = rationalToFraction(Math.abs(Math.abs(1 / noteValue)));
-                    cell.textContent = calcNoteValueToDisplay(obj[1], obj[0]);
+                    this.__setNoteValueDisplay(cell, obj[1], obj[0]);
                 }
             };
 
@@ -1362,14 +1534,14 @@ class RhythmRuler {
              * @returns {void}
              */
             const __mouseOutHandler = event => {
-                const cell = event.target;
+                const cell = event.currentTarget;
                 cell.textContent = "";
             };
 
             let obj;
             if (noteValue < 0) {
                 obj = rationalToFraction(Math.abs(1 / noteValue));
-                cell.textContent = calcNoteValueToDisplay(obj[1], obj[0]);
+                this.__setNoteValueDisplay(cell, obj[1], obj[0]);
                 cell.removeEventListener("mouseover", __mouseOverHandler);
                 cell.removeEventListener("mouseout", __mouseOutHandler);
             } else {
@@ -1540,7 +1712,7 @@ class RhythmRuler {
         }
 
         // Does this work if there are more than 10 rulers?
-        const cell = event.target;
+        const cell = event.currentTarget || event.target;
         if (cell !== null && cell.parentNode !== null) {
             this._rulerSelected = cell.parentNode.getAttribute("data-row");
             this.__tie(true);
@@ -1677,7 +1849,7 @@ class RhythmRuler {
             newCell.style.maxHeight = newCell.style.height;
 
             newCell.style.backgroundColor = platformColor.selectorBackground;
-            newCell.textContent = calcNoteValueToDisplay(oldCellNoteValue / inputNum, 1);
+            this.__setNoteValueDisplay(newCell, oldCellNoteValue / inputNum, 1);
 
             noteValues[newCellIndex] = oldCellNoteValue / inputNum;
             noteValues.splice(newCellIndex + 1, inputNum - 1);
@@ -1711,7 +1883,7 @@ class RhythmRuler {
             newCell.style.backgroundColor = platformColor.selectorBackground;
 
             const obj = rationalToFraction(newNoteValue);
-            newCell.textContent = calcNoteValueToDisplay(obj[1], obj[0]);
+            this.__setNoteValueDisplay(newCell, obj[1], obj[0]);
 
             noteValues[newCellIndex] = newNoteValue;
             noteValues.splice(newCellIndex + 1, oldNoteValues.length - 1);
@@ -1748,7 +1920,7 @@ class RhythmRuler {
                     newCell.style.maxHeight = newCell.style.height;
 
                     noteValues.splice(history[0][0] + i, 0, history[i][1]);
-                    newCell.textContent = calcNoteValueToDisplay(history[i][1], 1);
+                    this.__setNoteValueDisplay(newCell, history[i][1], 1);
 
                     this.__addCellEventHandlers(newCell, newCellWidth, history[i][1]);
                 }
@@ -1837,6 +2009,7 @@ class RhythmRuler {
         this._playingOne = false;
         this._rulerPlaying = -1;
         this._startingTime = null;
+        this._clearWidgetTimers();
         for (let i = 0; i < this.Rulers.length; i++) {
             this._calculateZebraStripes(i);
         }
@@ -1859,7 +2032,7 @@ class RhythmRuler {
                 // Wait for pause to complete before restarting.
                 this._playingAll = true;
 
-                setTimeout(() => {
+                this._setWidgetTimeout(() => {
                     this.__resume();
                 }, 1000);
             }
@@ -1874,6 +2047,7 @@ class RhythmRuler {
      * @returns {void}
      */
     __resume() {
+        this._clearWidgetTimers();
         this._playAllCell.innerHTML = `<img 
                 src="header-icons/pause-button.svg" 
                 title="${_("Pause")}" 
@@ -2036,7 +2210,7 @@ class RhythmRuler {
             this._offsets[rulerNo] = d.getTime() - this._startingTime - this._elapsedTimes[rulerNo];
         }
 
-        setTimeout(
+        this._setWidgetTimeout(
             () => {
                 colIndex += 1;
                 if (colIndex === noteValues.length) {
@@ -2798,12 +2972,12 @@ class RhythmRuler {
         for (let i = 0; i < this._dissectHistory.length; i++) {
             drum = this._dissectHistory[i][1];
             if (!drumsSet.has(drum)) {
-                history = JSON.parse(JSON.stringify(this._dissectHistory[i][0]));
+                history = deepClone(this._dissectHistory[i][0]);
                 dissectHistory.push([history, drum]);
             }
         }
 
-        this._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
+        this._dissectHistory = deepClone(dissectHistory);
     }
 
     /**

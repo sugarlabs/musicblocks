@@ -19,6 +19,43 @@
 let WRAP = true;
 const $j = window.jQuery;
 let play_button_debounce_timeout = null;
+
+const safeStorageGet = key => {
+    try {
+        if (typeof localStorage === "undefined" || localStorage === null) {
+            return undefined;
+        }
+
+        if (typeof localStorage.getItem === "function") {
+            const value = localStorage.getItem(key);
+            if (value !== null) {
+                return value;
+            }
+        }
+
+        return localStorage[key];
+    } catch (e) {
+        return undefined;
+    }
+};
+
+const safeStorageSet = (key, value) => {
+    try {
+        if (typeof localStorage === "undefined" || localStorage === null) {
+            return;
+        }
+
+        if (typeof localStorage.setItem === "function") {
+            localStorage.setItem(key, value);
+            return;
+        }
+
+        localStorage[key] = value;
+    } catch (e) {
+        console.debug(`Storage write skipped for ${key}:`, e);
+    }
+};
+
 class Toolbar {
     /**
      * Constructs a new Toolbar instance.
@@ -27,7 +64,7 @@ class Toolbar {
      */
     constructor() {
         this.stopIconColorWhenPlaying = window.platformColor.stopIconcolor;
-        this.language = localStorage.languagePreference;
+        this.language = safeStorageGet("languagePreference");
         if (this.language === undefined) {
             this.language = navigator.language;
         }
@@ -744,7 +781,7 @@ class Toolbar {
         if (!icon) return;
 
         themes.forEach(theme => {
-            if (localStorage.themePreference === theme) {
+            if (safeStorageGet("themePreference") === theme) {
                 icon.innerHTML = docById(theme).innerHTML;
             }
         });
@@ -1031,7 +1068,7 @@ class Toolbar {
 
         // Set the onclick handler
         Record.onclick = function () {
-            const savedMode = localStorage.getItem("musicBlocksRecordMode") || "screen";
+            const savedMode = safeStorageGet("musicBlocksRecordMode") || "screen";
             rec_onclick();
         };
 
@@ -1088,7 +1125,7 @@ class Toolbar {
 
         // Function to update highlighting based on current mode
         const updateModeHighlight = () => {
-            const currentMode = localStorage.getItem("musicBlocksRecordMode") || "screen";
+            const currentMode = safeStorageGet("musicBlocksRecordMode") || "screen";
 
             // Remove highlight from both
             if (recordWithMenus) {
@@ -1116,7 +1153,7 @@ class Toolbar {
         if (recordWithMenus) {
             recordWithMenus.onclick = e => {
                 e.preventDefault();
-                localStorage.setItem("musicBlocksRecordMode", "screen");
+                safeStorageSet("musicBlocksRecordMode", "screen");
                 updateModeHighlight();
                 // Reset arrow after selection
                 const arrowIcon = RecordDropdownArrow.querySelector("i");
@@ -1127,7 +1164,7 @@ class Toolbar {
         if (recordCanvasOnly) {
             recordCanvasOnly.onclick = e => {
                 e.preventDefault();
-                localStorage.setItem("musicBlocksRecordMode", "canvas");
+                safeStorageSet("musicBlocksRecordMode", "canvas");
                 updateModeHighlight();
 
                 // Reset arrow after selection
@@ -1419,7 +1456,7 @@ class Toolbar {
             this.activity.beginnerMode = !this.activity.beginnerMode;
 
             try {
-                localStorage.setItem("beginnerMode", this.activity.beginnerMode.toString());
+                safeStorageSet("beginnerMode", this.activity.beginnerMode.toString());
             } catch (e) {
                 console.error(e);
             }
@@ -1647,7 +1684,7 @@ class Toolbar {
 
             // Handle Japanese variants (ja-kanji, ja-kana stored vs ja/kana displayed)
             if (selectedLang && selectedLang.startsWith("ja")) {
-                if (selectedLang === "ja-kana" || localStorage.kanaPreference === "kana") {
+                if (selectedLang === "ja-kana" || safeStorageGet("kanaPreference") === "kana") {
                     langToHighlight = "kana";
                 } else {
                     langToHighlight = "ja";
@@ -1676,7 +1713,7 @@ class Toolbar {
 
         languageSelectIcon.onclick = () => {
             // Get current language preference
-            const currentLang = localStorage.languagePreference || navigator.language;
+            const currentLang = safeStorageGet("languagePreference") || navigator.language;
 
             // Highlight the currently selected language
             updateSelectedLanguageHighlight(currentLang);

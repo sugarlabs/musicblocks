@@ -9,12 +9,13 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* eslint-disable no-redeclare */
 /*
    global
 
    _, last, DRUMNAMES, NOISENAMES, VOICENAMES, INVALIDPITCH, CUSTOMSAMPLES
 */
+
+const _b64Cache = new Map();
 
 /*
    Global Locations
@@ -892,7 +893,6 @@ const CENTS_PER_OCTAVE = SEMITONES * CENTS_PER_SEMITONE;
 const POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
 
 const TWELTHROOT2 = 1.0594630943592953;
-// eslint-disable-next-line no-loss-of-precision
 const TWELVEHUNDRETHROOT2 = 1.0005777895065549;
 
 /**
@@ -3196,13 +3196,13 @@ const modeMapper = (key, mode) => {
                     key = "b";
                     break;
                 case "d" + SHARP:
-                    key = "b";
+                    key = "c" + SHARP;
                     break;
                 case "f" + SHARP:
-                    key = "f";
+                    key = "e";
                     break;
                 case "g" + SHARP:
-                    key = "b";
+                    key = "f" + SHARP;
                     break;
                 case "a" + SHARP:
                     key = "g" + SHARP;
@@ -3242,7 +3242,7 @@ const modeMapper = (key, mode) => {
                     key = "c";
                     break;
                 case "f":
-                    key = "b";
+                    key = "d" + FLAT;
                     break;
                 case "g":
                     key = "c";
@@ -3377,7 +3377,7 @@ const modeMapper = (key, mode) => {
                     key = "e";
                     break;
                 case "c" + SHARP:
-                    key = "b";
+                    key = "f" + SHARP;
                     break;
                 case "d" + SHARP:
                     key = "g" + SHARP;
@@ -3386,7 +3386,7 @@ const modeMapper = (key, mode) => {
                     key = "b";
                     break;
                 case "g" + SHARP:
-                    key = "b";
+                    key = "c" + SHARP;
                     break;
                 case "a" + SHARP:
                     key = "c";
@@ -3428,7 +3428,7 @@ const modeMapper = (key, mode) => {
                     key = "f";
                     break;
                 case "f":
-                    key = "b";
+                    key = "g" + FLAT;
                     break;
                 case "g":
                     key = "g" + SHARP;
@@ -3449,7 +3449,7 @@ const modeMapper = (key, mode) => {
                     key = "g";
                     break;
                 case "g" + SHARP:
-                    key = "a ";
+                    key = "a";
                     break;
                 case "a" + SHARP:
                     key = "b";
@@ -4135,9 +4135,16 @@ const GetNotesForInterval = tur => {
  * @returns {string} - The Base64 encoded string.
  */
 function base64Encode(str) {
+    if (_b64Cache.has(str)) {
+        return _b64Cache.get(str);
+    }
     const encoder = new TextEncoder();
     const uint8Array = encoder.encode(str);
     const binaryString = String.fromCharCode(...uint8Array);
+    if (_b64Cache.size > 1000) {
+        _b64Cache.clear();
+    }
+    _b64Cache.set(str, binaryString);
     return binaryString;
 }
 

@@ -446,6 +446,11 @@ const instruments = { 0: {} };
  */
 const instrumentsSource = {};
 
+// Tracks how many _performNotes graph-rewire calls are in-flight per synth instance.
+// Used to prevent the cleanup callback from restoring the dry path while another
+// effects chain is still active on the same synth.
+const _effectsInFlight = new WeakMap();
+
 /**
  * Object containing effects associated with instruments in the timbre widget.
  * @type {Object.<number, Object>}
@@ -1305,7 +1310,6 @@ function Synth() {
                 for (let i = 0; i < MULTIPITCH[sourceName].length; i++) {
                     noteDict[MULTIPITCH[sourceName][i]] = this.samples.voice[sourceName][i];
                 }
-                tempSynth = new Tone.Sampler(noteDict);
             } else {
                 noteDict["C4"] = this.samples.voice[sourceName];
             }
@@ -1806,7 +1810,12 @@ function Synth() {
                 // ─────────────────────────────────────────────────────────────────────
 
                 // Remove the dry path so effects are routed serially, not in parallel
-                synth.disconnect(Tone.Destination);
+                _effectsInFlight.set(synth, (_effectsInFlight.get(synth) || 0) + 1);
+                try {
+                    synth.disconnect();
+                } catch (e) {
+                    /* already disconnected */
+                }
                 const chainNodes = [];
 
                 if (paramsFilters !== null && paramsFilters !== undefined) {
@@ -1932,6 +1941,7 @@ function Synth() {
 
                 if (!paramsEffects.doNeighbor) {
                     if (setNote !== undefined && setNote) {
+                        if (this._instrumentEpoch !== epoch) return;
                         if (synth.oscillator !== undefined) {
                             synth.setNote(notes);
                         } else if (synth.voices !== undefined) {
@@ -1973,6 +1983,19 @@ function Synth() {
                                     }
                                 });
                             }
+
+                            // Re-establish the dry path only when no other effects chain
+                            // is still active on this synth; otherwise the direct
+                            // connection would bypass the in-flight chain.
+                            const remaining = (_effectsInFlight.get(synth) || 1) - 1;
+                            _effectsInFlight.set(synth, remaining);
+                            if (
+                                remaining === 0 &&
+                                synth &&
+                                typeof synth.toDestination === "function"
+                            ) {
+                                synth.toDestination();
+                            }
                         } catch (e) {
                             console.debug("Error disposing effects:", e);
                         }
@@ -1993,6 +2016,12 @@ function Synth() {
                     filter.dispose();
                 }
             });
+
+            const remaining = (_effectsInFlight.get(synth) || 1) - 1;
+            _effectsInFlight.set(synth, remaining);
+            if (remaining === 0 && synth && typeof synth.toDestination === "function") {
+                synth.toDestination();
+            }
         }
     };
 
@@ -2224,6 +2253,7 @@ function Synth() {
     };
 
     this.startSound = (turtle, instrumentName, note) => {
+        if (!instrumentsSource[instrumentName] || !instruments[turtle]?.[instrumentName]) return;
         const flag = instrumentsSource[instrumentName][0];
         switch (flag) {
             case 1: // drum
@@ -2236,6 +2266,7 @@ function Synth() {
     };
 
     this.stopSound = (turtle, instrumentName, note) => {
+        if (!instrumentsSource[instrumentName] || !instruments[turtle]?.[instrumentName]) return;
         const flag = instrumentsSource[instrumentName][0];
         switch (flag) {
             case 1: // drum
@@ -2252,6 +2283,8 @@ function Synth() {
     };
 
     this.loop = (turtle, instrumentName, note, duration, start, bpm, velocity) => {
+        if (!instrumentsSource[instrumentName] || !instruments[turtle]?.[instrumentName])
+            return null;
         const synthA = instruments[turtle][instrumentName];
         const flag = instrumentsSource[instrumentName][0];
         const now = Tone.now();

@@ -53,6 +53,7 @@
     },
     "dependencies": {
         "@tonejs/midi": "^2.0.28",
+        "abcjs": "6.3.0",
         "autoprefixer": "^10.4.16",
         "compression": "^1.8.1",
         "cssnano": "^7.1.2",
@@ -62,9 +63,13 @@
         "gulp-replace": "^1.1.4",
         "gulp-sass": "^6.0.1",
         "gulp-sourcemaps": "^3.0.0",
+        "howler": "1.1.25",
         "http-server": "^14.1.1",
         "i18next": "^25.8.18",
         "i18next-http-backend": "^3.0.2",
+        "jquery": "3.7.1",
+        "jquery-ui-dist": "1.12.1",
+        "materialize-css": "0.100.2",
         "postcss": "^8.5.6",
         "sass": "^1.98.0",
         "tone": "^15.1.22"
@@ -97,13 +102,14 @@
         "@isaacs/brace-expansion": "^5.0.1",
         "immutable": "^5.1.5",
         "svgo": "^4.0.1",
+        "@xmldom/xmldom": "^0.8.13",
         "@gulp-sourcemaps/identity-map": {
             "postcss": "^8.4.31"
         }
     },
     "lint-staged": {
         "*.{js,mjs}": [
-            "eslint --max-warnings=0 --fix",
+            "eslint --max-warnings=0 --fix --no-warn-ignored",
             "prettier --write"
         ]
     }
