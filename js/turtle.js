@@ -220,6 +220,17 @@ class Turtle {
         /** @deprecated */ this.singer.sustain = [];
         /** @deprecated */ this.singer.release = [];
 
+        // Runtime deprecation warning (development only)
+        if (!(typeof process !== "undefined" && process.env && process.env.NODE_ENV === "production")) {
+            try {
+                console.warn(
+                    "[DEPRECATED] singer.attack/decay/sustain/release properties on Turtle are deprecated and will be removed in v4.0. Use the Envelope API instead."
+                );
+            } catch (e) {
+                void e;
+            }
+        }
+
         this.singer.scalarTransposition = 0;
         this.singer.scalarTranspositionValues = [];
         this.singer.transposition = 0;

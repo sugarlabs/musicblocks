@@ -453,6 +453,17 @@ class WidgetWindow {
      * @deprecated
      */
     addSelectorButton(list, initial, parent) {
+        // Development-only deprecation warning
+        if (!(typeof process !== "undefined" && process.env && process.env.NODE_ENV === "production")) {
+            try {
+                console.warn(
+                    "[DEPRECATED] WidgetWindow.addSelectorButton() is deprecated and will be removed in v4.0. Use addSelector() in the new API."
+                );
+            } catch (e) {
+                void e;
+            }
+        }
+
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
         const selector = document.createElement("select");
         selector.value = initial;
@@ -630,6 +641,16 @@ class WidgetWindow {
      * @deprecated
      */
     getDragElement() {
+        if (!(typeof process !== "undefined" && process.env && process.env.NODE_ENV === "production")) {
+            try {
+                console.warn(
+                    "[DEPRECATED] WidgetWindow.getDragElement() is deprecated and will be removed in v4.0. Use getWidgetFrame() or the drag API instead."
+                );
+            } catch (e) {
+                void e;
+            }
+        }
+
         return this._drag;
     }
 
@@ -777,6 +798,17 @@ window.widgetWindows.windowFor = (widget, title, saveAs, fullscreen) => {
  * @deprecated
  */
 window.widgetWindows.clear = name => {
+    // Development-only deprecation warning
+        if (!(typeof process !== "undefined" && process.env && process.env.NODE_ENV === "production")) {
+        try {
+            console.warn(
+                "[DEPRECATED] window.widgetWindows.clear() is deprecated and will be removed in v4.0. Use hideWindow() or close window APIs instead."
+            );
+        } catch (e) {
+            void e;
+        }
+    }
+
     const win = window.widgetWindows.openWindows[name];
     if (!win) return;
     if (typeof win.onclose === "function") win.onclose();

@@ -105,6 +105,16 @@ class Singer {
         /** @deprecated */ this.sustain = [];
         /** @deprecated */ this.release = [];
 
+        // Runtime deprecation warning (development only)
+        if (!(typeof process !== "undefined" && process.env && process.env.NODE_ENV === "production")) {
+            try {
+                console.warn(
+                    "[DEPRECATED] Singer.attack/decay/sustain/release are deprecated and will be removed in v4.0. Use the Envelope API instead."
+                );
+            } catch (e) {
+                void e;
+            }
+        }
         // Parameters used by pitch
         this.scalarTransposition = 0;
         this.scalarTranspositionValues = [];

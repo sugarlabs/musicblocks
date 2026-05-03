@@ -859,6 +859,17 @@ class HelpWidget {
      * @deprecated
      */
     showPageByName(pageName) {
+        // Development-only deprecation warning
+        if (!(typeof process !== "undefined" && process.env && process.env.NODE_ENV === "production")) {
+            try {
+                console.warn(
+                    "[DEPRECATED] HelpWidget.showPageByName() is deprecated and may be removed in v4.0. Prefer the new help navigation API."
+                );
+            } catch (e) {
+                void e;
+            }
+        }
+
         for (let i = 0; i < HELPCONTENT.length; i++) {
             if (HELPCONTENT[i].includes(pageName)) {
                 this._showPage(i);
