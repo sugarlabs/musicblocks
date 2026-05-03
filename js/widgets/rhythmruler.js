@@ -867,7 +867,7 @@ class RhythmRuler {
             for (let j = 0; j < this.Rulers[i][0].length; j++) {
                 const noteValue = this.Rulers[i][0][j];
                 const rulerSubCell = rulerRow.insertCell(-1);
-                rulerSubCell.textContent = calcNoteValueToDisplay(noteValue, 1);
+                rulerSubCell.innerHTML = calcNoteValueToDisplay(noteValue, 1);
                 rulerSubCell.style.height = RhythmRuler.RULERHEIGHT + "px";
                 rulerSubCell.style.minHeight = rulerSubCell.style.height;
                 rulerSubCell.style.maxHeight = rulerSubCell.style.height;
@@ -1346,10 +1346,10 @@ class RhythmRuler {
             let obj;
             if (noteValue < 0) {
                 obj = rationalToFraction(Math.abs(Math.abs(-1 / noteValue)));
-                cell.textContent = `${calcNoteValueToDisplay(obj[1], obj[0])} ${_("silence")}`;
+                cell.innerHTML = `${calcNoteValueToDisplay(obj[1], obj[0])} ${_("silence")}`;
             } else {
                 obj = rationalToFraction(Math.abs(Math.abs(1 / noteValue)));
-                cell.textContent = calcNoteValueToDisplay(obj[1], obj[0]);
+                cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
             }
         };
 
@@ -1432,7 +1432,7 @@ class RhythmRuler {
         let obj;
         if (cellWidth >= 18 && noteValue > 0) {
             obj = rationalToFraction(Math.abs(1 / noteValue));
-            cell.textContent = calcNoteValueToDisplay(obj[1], obj[0]);
+            cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
         } else {
             cell.textContent = "";
 
@@ -1493,10 +1493,10 @@ class RhythmRuler {
                 const noteValue = noteValues[cell.cellIndex];
                 if (noteValue < 0) {
                     obj = rationalToFraction(Math.abs(Math.abs(-1 / noteValue)));
-                    cell.textContent = calcNoteValueToDisplay(obj[1], obj[0]) + " " + _("silence");
+                    cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]) + " " + _("silence");
                 } else {
                     obj = rationalToFraction(Math.abs(Math.abs(1 / noteValue)));
-                    cell.textContent = calcNoteValueToDisplay(obj[1], obj[0]);
+                    cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
                 }
             };
 
@@ -1513,7 +1513,7 @@ class RhythmRuler {
             let obj;
             if (noteValue < 0) {
                 obj = rationalToFraction(Math.abs(1 / noteValue));
-                cell.textContent = calcNoteValueToDisplay(obj[1], obj[0]);
+                cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
                 cell.removeEventListener("mouseover", __mouseOverHandler);
                 cell.removeEventListener("mouseout", __mouseOutHandler);
             } else {
@@ -1821,7 +1821,7 @@ class RhythmRuler {
             newCell.style.maxHeight = newCell.style.height;
 
             newCell.style.backgroundColor = platformColor.selectorBackground;
-            newCell.textContent = calcNoteValueToDisplay(oldCellNoteValue / inputNum, 1);
+            newCell.innerHTML = calcNoteValueToDisplay(oldCellNoteValue / inputNum, 1);
 
             noteValues[newCellIndex] = oldCellNoteValue / inputNum;
             noteValues.splice(newCellIndex + 1, inputNum - 1);
@@ -1855,7 +1855,7 @@ class RhythmRuler {
             newCell.style.backgroundColor = platformColor.selectorBackground;
 
             const obj = rationalToFraction(newNoteValue);
-            newCell.textContent = calcNoteValueToDisplay(obj[1], obj[0]);
+            newCell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
 
             noteValues[newCellIndex] = newNoteValue;
             noteValues.splice(newCellIndex + 1, oldNoteValues.length - 1);
@@ -1892,7 +1892,7 @@ class RhythmRuler {
                     newCell.style.maxHeight = newCell.style.height;
 
                     noteValues.splice(history[0][0] + i, 0, history[i][1]);
-                    newCell.textContent = calcNoteValueToDisplay(history[i][1], 1);
+                    newCell.innerHTML = calcNoteValueToDisplay(history[i][1], 1);
 
                     this.__addCellEventHandlers(newCell, newCellWidth, history[i][1]);
                 }
