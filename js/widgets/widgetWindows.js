@@ -70,9 +70,12 @@ window.widgetWindows = {
         this._handleGlobalMouseUp = this._handleGlobalMouseUp.bind(this);
         this._handleGlobalMouseDown = this._handleGlobalMouseDown.bind(this);
 
-        document.addEventListener("mouseup", this._handleGlobalMouseUp, true);
-        document.addEventListener("mousemove", this._handleGlobalMouseMove, true);
-        document.addEventListener("mousedown", this._handleGlobalMouseDown, true);
+        // Use Pointer Events so that widget-window dragging works on mouse,
+        // touch screens, and stylus devices uniformly. PointerEvent extends
+        // MouseEvent so clientX/clientY are still available in the handlers.
+        document.addEventListener("pointerup", this._handleGlobalMouseUp, true);
+        document.addEventListener("pointermove", this._handleGlobalMouseMove, true);
+        document.addEventListener("pointerdown", this._handleGlobalMouseDown, true);
 
         this._globalListenersInitialized = true;
     },
@@ -235,7 +238,12 @@ class WidgetWindow {
         titleEl.textContent = _(this._title);
         titleEl.id = `${this._key}WidgetID`;
 
-        this._nonclose.onmousedown = e => {
+        // Use pointerdown instead of onmousedown so the title-bar drag works
+        // on touch screens and stylus devices, not just a mouse.
+        // touch-action: none is required on the drag bar so the browser does
+        // not intercept the pointer stream for panning before we can drag.
+        this._drag.style.touchAction = "none";
+        this._nonclose.addEventListener("pointerdown", e => {
             window.widgetWindows.draggingWindow = this;
             if (this._maximized) {
                 // Perform special repositioning to make the drag feel right when
@@ -257,7 +265,7 @@ class WidgetWindow {
             this._dx = e.clientX - this._drag.getBoundingClientRect().left;
             this._dy = e.clientY - this._drag.getBoundingClientRect().top;
             e.preventDefault();
-        };
+        });
 
         this._nonclosebuttons = this._create("div", "nonclosebuttons", this._nonclose);
         this._nonclosebuttons.style.display = "flex";
