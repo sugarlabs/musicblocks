@@ -7,6 +7,45 @@ const app = express();
 // Detect environment (default to development for safety)
 const isDev = process.env.NODE_ENV !== "production";
 
+// Live reloading
+
+if (isDev) {
+    const livereload = require("livereload");
+    const connectLivereload = require("connect-livereload");
+
+    const livereloadServer = livereload.createServer({
+        port: 35729,
+        exts: ["html", "css", "js", "svg", "webp", "json"],
+        exclusions: [
+            /[\/\\]node_modules[\/\\]/,
+            /[\/\\]\.git[\/\\]/,
+            /[\/\\]cypress[\/\\]/,
+            /[\/\\]coverage[\/\\]/,
+            /[\/\\]dist[\/\\]/,
+            /[\/\\]scripts[\/\\]/,
+            /[\/\\]po[\/\\]/,
+            /[\/\\]screenshots[\/\\]/,
+            /[\/\\]Docs[\/\\]/,
+            /[\/\\]usermanual[\/\\]/
+        ],
+        delay: 100
+    });
+
+    livereloadServer.watch(__dirname);
+
+    livereloadServer.server.on("error", err => {
+        console.warn(`Livereload server error: ${err.message}`);
+    });
+
+    app.use(
+        connectLivereload({
+            port: 35729
+        })
+    );
+
+    console.log("Live reload enabled");
+}
+
 // runtime environment for browser
 app.get("/env.js", (req, res) => {
     res.type("application/javascript");
@@ -21,12 +60,14 @@ app.get("/env.js", (req, res) => {
 });
 
 // Enable compression for all responses
-app.use(
-    compression({
-        level: 9,
-        threshold: 0
-    })
-);
+if (!isDev) {
+    app.use(
+        compression({
+            level: 9,
+            threshold: 0
+        })
+    );
+}
 
 // --- Security: Block access to sensitive project files ---
 // express.static(__dirname) serves the entire project root, which exposes
