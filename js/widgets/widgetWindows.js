@@ -86,6 +86,9 @@ window.widgetWindows = {
     },
     _handleGlobalMouseUp(e) {
         if (this.draggingWindow) {
+            try {
+                this.draggingWindow._nonclose.releasePointerCapture(e.pointerId);
+            } catch (err) {}
             this.draggingWindow._dragTopHandler(e);
             this.draggingWindow = null;
         }
@@ -242,8 +245,10 @@ class WidgetWindow {
         // on touch screens and stylus devices, not just a mouse.
         // touch-action: none is required on the drag bar so the browser does
         // not intercept the pointer stream for panning before we can drag.
+        this._nonclose.style.touchAction = "none"; // Ensure title bar specifically disables scrolling
         this._drag.style.touchAction = "none";
         this._nonclose.addEventListener("pointerdown", e => {
+            this._nonclose.setPointerCapture(e.pointerId);
             window.widgetWindows.draggingWindow = this;
             if (this._maximized) {
                 // Perform special repositioning to make the drag feel right when
