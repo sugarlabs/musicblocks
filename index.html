@@ -306,14 +306,17 @@
                     border: 0;
                 "
             >
-                <div class="contentWrapper">
-                    <span id="errorTextContent"></span>
-                    <img
-                        class="msgCloseIcon"
-                        onclick="hideErrorText()"
-                        src="images/close.svg"
-                        alt="Close"
-                    />
+                <div class="contentWrapper" style="display: flex; flex-direction: column; align-items: center;">
+                    <div style="display: flex; align-items: flex-start; width: 100%; gap: 10px;">
+                        <span id="errorTextContent"></span>
+                        <img
+                            class="msgCloseIcon"
+                            onclick="hideErrorText()"
+                            src="images/close.svg"
+                            alt="Close"
+                        />
+                    </div>
+                    <div id="errorSuggestionContainer"></div>
                 </div>
             </div>
             <div id="hideContents" style="display: none" tabindex="-1">
@@ -672,6 +675,17 @@
                                         <i id="menu" class="animated-icon material-icons md-48"
                                             >menu</i
                                         >
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        id="musicHintsIcon"
+                                        class="tooltipped"
+                                        data-position="bottom"
+                                        role="button"
+                                        tabindex="0"
+                                    >
+                                        <i class="material-icons md-48">lightbulb_outline</i>
                                     </a>
                                 </li>
                                 <li>

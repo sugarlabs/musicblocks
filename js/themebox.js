@@ -318,7 +318,7 @@ class ThemeBox {
         }
 
         // Update canvas background using theme config
-        const canvas = document.getElementById("canvas");
+        const canvas = docById("canvas");
         if (canvas) {
             canvas.style.backgroundColor = window.platformColor.background;
         }
@@ -381,9 +381,9 @@ class ThemeBox {
      * @returns {void}
      */
     updateThemeIcon() {
-        const themeSelectIcon = document.getElementById("themeSelectIcon");
+        const themeSelectIcon = docById("themeSelectIcon");
         if (themeSelectIcon) {
-            const currentThemeElement = document.getElementById(this._theme);
+            const currentThemeElement = docById(this._theme);
             if (currentThemeElement) {
                 themeSelectIcon.innerHTML = currentThemeElement.innerHTML;
             }
@@ -400,7 +400,7 @@ class ThemeBox {
         if (this.activity.palettes) {
             try {
                 // Update palette selector border color
-                const paletteElement = document.getElementById("palette");
+                const paletteElement = docById("palette");
                 if (paletteElement && paletteElement.childNodes[0]) {
                     paletteElement.childNodes[0].style.border = `1px solid ${window.platformColor.selectorSelected}`;
                 }
@@ -525,7 +525,7 @@ class ThemeBox {
         }
 
         // Update planet iframe theme if it exists
-        const planetIframe = document.getElementById("planet-iframe");
+        const planetIframe = docById("planet-iframe");
         if (planetIframe) {
             const applyPlanetTheme = () => {
                 if (

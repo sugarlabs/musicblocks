@@ -1361,7 +1361,7 @@ class TimbreWidget {
                         blockValue = this.AMSynthesizer.length - 1;
                     }
 
-                    document.getElementById("wrapperS0").addEventListener("change", event => {
+                    docById("wrapperS0").addEventListener("change", event => {
                         const elem = event.target;
                         docById("myRangeS0").value = parseFloat(elem.value);
                         this.amSynthParamvals["harmonicity"] = parseFloat(elem.value);
@@ -1448,7 +1448,7 @@ class TimbreWidget {
                         blockValue = this.FMSynthesizer.length - 1;
                     }
 
-                    document.getElementById("wrapperS0").addEventListener("change", event => {
+                    docById("wrapperS0").addEventListener("change", event => {
                         const elem = event.target;
                         docById("myRangeS0").value = parseFloat(elem.value);
                         docById("myspanS0").textContent = elem.value;
@@ -1534,7 +1534,7 @@ class TimbreWidget {
                         blockValue = this.NoiseSynthesizer.length - 1;
                     }
 
-                    document.getElementById("wrapperS0").addEventListener("change", event => {
+                    docById("wrapperS0").addEventListener("change", event => {
                         const elem = event.target;
                         docById("myRangeS0").value = parseFloat(elem.value);
                         docById("myspanS0").textContent = elem.value;
@@ -1782,7 +1782,7 @@ class TimbreWidget {
         }
         myDiv.appendChild(selectOsc1);
 
-        document.getElementById("wrapperOsc0").addEventListener("change", event => {
+        docById("wrapperOsc0").addEventListener("change", event => {
             const elem = event.target;
             this.oscParams[0] = elem.value;
             this.synthVals["oscillator"]["type"] = elem.value + this.oscParams[1].toString();
@@ -1797,7 +1797,7 @@ class TimbreWidget {
             this._playNote("G4", 1 / 8);
         });
 
-        document.getElementById("wrapperOsc1").addEventListener("change", event => {
+        docById("wrapperOsc1").addEventListener("change", event => {
             const elem = event.target;
             this.oscParams[1] = parseFloat(elem.value);
             this.synthVals["oscillator"]["type"] = this.oscParams[0] + parseFloat(elem.value);
@@ -1900,7 +1900,7 @@ class TimbreWidget {
         }
 
         for (let i = 0; i < 4; i++) {
-            document.getElementById("wrapperEnv" + i).addEventListener("change", event => {
+            docById("wrapperEnv" + i).addEventListener("change", event => {
                 const elem = event.target;
                 const m = elem.id.slice(-1);
                 docById("myRange" + m).value = parseFloat(elem.value);
@@ -2541,7 +2541,7 @@ class TimbreWidget {
                     }
 
                     // Add the listeners for the sliders.
-                    document.getElementById("wrapperFx0").addEventListener("change", event => {
+                    docById("wrapperFx0").addEventListener("change", event => {
                         const elem = event.target;
                         docById("myRangeFx0").value = parseFloat(elem.value);
                         docById("myspanFx0").textContent = elem.value;
@@ -2552,7 +2552,7 @@ class TimbreWidget {
                         this._playNote("G4", 1 / 8);
                     });
 
-                    document.getElementById("wrapperFx1").addEventListener("change", event => {
+                    docById("wrapperFx1").addEventListener("change", event => {
                         const elem = event.target;
                         docById("myRangeFx1").value = parseFloat(elem.value);
                         const obj = oneHundredToFraction(elem.value);
@@ -2779,7 +2779,7 @@ class TimbreWidget {
                         this.clampConnection(n, 2, topOfClamp);
                     }
 
-                    document.getElementById("wrapperFx0").addEventListener("change", event => {
+                    docById("wrapperFx0").addEventListener("change", event => {
                         const elem = event.target;
                         docById("myRangeFx0").value = parseFloat(elem.value);
                         docById("myspanFx0").textContent = elem.value;

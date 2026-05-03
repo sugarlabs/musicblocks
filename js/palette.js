@@ -157,7 +157,7 @@ class Palettes {
             }
 
             // Don't handle keyboard events if search widget is focused
-            const searchWidget = document.getElementById("search");
+            const searchWidget = docById("search");
             if (searchWidget && document.activeElement === searchWidget) {
                 return;
             }
@@ -347,7 +347,7 @@ class Palettes {
      * Attaches a single keydown listener to the search input.
      */
     _setupSearchKeyboardNav() {
-        const searchWidget = document.getElementById("search");
+        const searchWidget = docById("search");
         if (searchWidget && !this._searchNavInitialized) {
             searchWidget.addEventListener("keydown", this._handleSearchKeydown);
             this._searchNavInitialized = true;
@@ -581,34 +581,43 @@ class Palettes {
 
     deltaY(dy) {
         // Cache DOM element reference to avoid multiple lookups and forced reflow
-        const palette = document.getElementById("palette");
+        const palette = docById("palette");
         const curr = parseInt(palette.style.top);
         palette.style.top = curr + dy + "px";
     }
 
     toggleCollapse() {
-        const palette = document.getElementById("palette");
+        const palette = docById("palette");
 
         if (!palette) return;
 
         this.collapsed = !this.collapsed;
+        const paletteToggle = docById("paletteToggle");
 
         if (this.collapsed) {
             palette.style.transform = "translateX(-100%)";
-            document.getElementById("paletteToggle").innerHTML = "▶";
-            document.getElementById("paletteToggle").setAttribute("aria-expanded", "false");
+            if (paletteToggle) {
+                paletteToggle.textContent = "▶";
+                paletteToggle.setAttribute("aria-expanded", "false");
+            }
             palette.style.transition = "transform 0.3s ease";
             this.paletteWidth = 0;
         } else {
             palette.style.transform = "translateX(0)";
-            document.getElementById("paletteToggle").innerHTML = "◀";
-            document.getElementById("paletteToggle").setAttribute("aria-expanded", "true");
+            if (paletteToggle) {
+                paletteToggle.textContent = "◀";
+                paletteToggle.setAttribute("aria-expanded", "true");
+            }
+            palette.style.transition = "transform 0.3s ease";
             this.paletteWidth = 55 * PALETTE_WIDTH_FACTOR;
+        }
+        if (this.activity.blocks) {
+            this.activity.blocks.checkBounds();
         }
     }
 
     _makeSelectorButton(i) {
-        if (!document.getElementById("palette")) {
+        if (!docById("palette")) {
             const element = document.createElement("div");
             element.id = "palette";
             element.setAttribute("class", "disable_highlighting");

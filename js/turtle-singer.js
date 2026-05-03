@@ -272,7 +272,7 @@ class Singer {
         });
         this.activeVoices.clear();
 
-        const stopBtn = document.getElementById("stop");
+        const stopBtn = docById("stop");
         if (stopBtn) {
             stopBtn.style.display = "none";
         }
@@ -2201,7 +2201,7 @@ class Singer {
                     }
 
                     if (notes.length > 0) {
-                        const stopBtn = document.getElementById("stop");
+                        const stopBtn = docById("stop");
                         if (stopBtn) {
                             if (stopBtn.style.display !== "inline-block") {
                                 stopBtn.style.display = "inline-block";

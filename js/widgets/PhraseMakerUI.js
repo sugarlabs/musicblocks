@@ -24,7 +24,7 @@ const PhraseMakerUI = {
     stylePhraseMaker(pm) {
         const screenWidth = window.innerWidth;
         const screenHeight = window.innerHeight;
-        const floatingWindowsDiv = document.getElementById("floatingWindows");
+        const floatingWindowsDiv = docById("floatingWindows");
         const windowFrameElements = floatingWindowsDiv.querySelectorAll(".windowFrame");
 
         for (let i = 0; i < windowFrameElements.length; i++) {

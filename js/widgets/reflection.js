@@ -221,7 +221,7 @@ class ReflectionMatrix {
         const sendBtn = document.createElement("button");
         sendBtn.className = "confirm-button";
         sendBtn.style.marginRight = "10px";
-        sendBtn.innerText = "Send";
+        sendBtn.textContent = "Send";
         sendBtn.onclick = () => this.sendMessage();
         this.inputContainer.appendChild(sendBtn);
 

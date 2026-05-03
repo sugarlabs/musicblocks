@@ -217,7 +217,7 @@ class Turtles {
             this.activity.refreshCanvas();
         });
 
-        document.getElementById("loader").className = "";
+        docById("loader").className = "";
 
         this.addTurtleGraphicProps(turtle, blkInfoAvailable, infoDict);
         this.activity.refreshCanvas();

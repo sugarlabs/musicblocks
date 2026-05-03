@@ -720,7 +720,7 @@ Turtle.TurtleView = class {
         this._skinChanged = false; // should we reskin the turtle on clear?
         this._orientation = 0; // orientation of the turtle sprite
 
-        this._canvas = document.getElementById("overlayCanvas");
+        this._canvas = docById("overlayCanvas");
         this._ctx = this._canvas.getContext("2d");
     }
 
