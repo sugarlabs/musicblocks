@@ -7658,7 +7658,6 @@ class Activity {
             await lazyLoad("widgets/help");
             new HelpWidget(this, false);
         };
-
         /*
          * Makes non-toolbar buttons, e.g., the palette menu buttons
          */
@@ -7668,6 +7667,21 @@ class Activity {
             container.setAttribute("class", "tooltipped");
             container.setAttribute("data-tooltip", label);
             container.setAttribute("data-position", "top");
+
+            // --- GUIDELINE COMPLIANT ACCESSIBILITY ADDITIONS ---
+            container.setAttribute("tabindex", "0");
+            container.setAttribute("role", "button");
+            const cleanLabel = label ? label.replace(/\s*\[.*\]$/, "") : "Button";
+            container.setAttribute("aria-label", cleanLabel);
+
+            container.addEventListener("keydown", event => {
+                if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    container.dispatchEvent(new MouseEvent("mousedown"));
+                }
+            });
+            // ----------------------------------------------------
+
             window.jQuery(".tooltipped").tooltip({
                 html: true,
                 delay: 100
@@ -7692,11 +7706,9 @@ class Activity {
 
             const img = new Image();
             img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(name));
-            // Accessibility: derive alt text from the button label
             const altText = label ? label.replace(/\s*\[.*\]$/, "") : "Toolbar button";
             img.setAttribute("alt", altText);
 
-            // Batch DOM reads before writes to avoid forced synchronous layout
             const rightPos = document.body.clientWidth - x;
             container.appendChild(img);
             container.setAttribute(
@@ -7706,7 +7718,6 @@ class Activity {
             document.getElementById("buttoncontainerBOTTOM").appendChild(container);
             return container;
         };
-
         /**
          * Handles button dragging, long hovering and prevents multiple button presses.
          * @param container longAction
