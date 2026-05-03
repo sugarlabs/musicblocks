@@ -552,7 +552,10 @@ function MusicKeyboard(activity) {
 
         // Prevent the browser from scrolling or showing a context menu when the
         // user presses a key on a touch device.
-        element.style.touchAction = "none";
+        // Use pan-x instead of none so that the 700 px-wide keyboard can
+        // still be scrolled horizontally on narrow mobile viewports by
+        // dragging on a key; pinch-zoom is still suppressed.
+        element.style.touchAction = "pan-x";
 
         /**
          * Start a musical note when the element is pressed (mouse or touch).
