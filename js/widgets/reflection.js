@@ -93,18 +93,6 @@ class ReflectionMatrix {
         this.isProcessingPendingMessage = false;
     }
 
-    sanitizeLinks(html) {
-        return html.replace(/<a\s+[^>]*href\s*=\s*(['"]?)([^'">\s]+)\1/gi, (match, quote, url) => {
-            const unsafeSchemes = /^(javascript|data|vbscript):/i;
-
-            if (unsafeSchemes.test(url.trim())) {
-                return match.replace(url, "#");
-            }
-
-            return match;
-        });
-    }
-
     /**
      * Initializes the reflection widget.
      */
@@ -343,9 +331,7 @@ class ReflectionMatrix {
         const botReply = document.createElement("div");
 
         if (md) {
-            const safeText = escapeHTML(reply.response);
-            let html = this.mdToHTML(safeText);
-            html = this.sanitizeLinks(html);
+            let html = this.mdToHTML(reply.response);
             botReply.innerHTML = html;
         } else {
             botReply.innerText = reply.response;
@@ -773,13 +759,26 @@ class ReflectionMatrix {
      * @returns {boolean} - True if unsafe, false otherwise.
      */
     isUnsafeUrl(url) {
-        const trimmed = url.trim().toLowerCase();
-        const unsafeSchemes = ["javascript:", "data:", "vbscript:"];
-        // Check if it starts with any unsafe scheme
-        // Note: DOMParser handles HTML entity decoding, so we check the raw attribute safely here
-        // But for extra safety against control characters, we rely on the fact that
-        // we are operating on the parsed DOM attribute.
-        return unsafeSchemes.some(scheme => trimmed.replace(/\s+/g, "").startsWith(scheme));
+        if (!url) return true;
+        try {
+            // Step 1: Decode HTML entities to catch bypass attempts like &#106;avascript:
+            // We use DOMParser as a safe way to decode without executing anything.
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(url, "text/html");
+            const decodedUrl = (doc.body.textContent || "").trim();
+
+            // Step 2: Use the URL API to parse the decoded URL.
+            // This handles normalization and protocol extraction.
+            const parsed = new URL(decodedUrl, window.location.href);
+
+            // Step 3: Allow only specific safe protocols.
+            const safeProtocols = ["http:", "https:", "mailto:"];
+            return !safeProtocols.includes(parsed.protocol);
+        } catch (e) {
+            // If URL parsing fails, it might be a relative path or truly invalid.
+            // For safety in this context, we only allow http/https/mailto.
+            return true;
+        }
     }
 
     /**
