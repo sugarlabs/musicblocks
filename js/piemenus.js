@@ -67,7 +67,7 @@
  * @returns void
  */
 const setWheelSize = (i = 400) => {
-    const wheelDiv = document.getElementById("wheelDiv");
+    const wheelDiv = docById("wheelDiv");
     const screenWidth = window.innerWidth;
 
     if (!wheelDiv) return;
@@ -147,7 +147,7 @@ const hideWheelDiv = () => {
  * @returns void
  */
 const enableWheelScroll = (wheel, itemCount) => {
-    const wheelDiv = document.getElementById("wheelDiv");
+    const wheelDiv = docById("wheelDiv");
     if (!wheelDiv || !wheel) return;
 
     // Remove existing scroll handler if any
@@ -3871,7 +3871,7 @@ const piemenuBlockContext = block => {
     }
 
     window._contextWheelClickHandler = event => {
-        const wheelElement = document.getElementById("contextWheelDiv");
+        const wheelElement = docById("contextWheelDiv");
         const displayStyle = window.getComputedStyle(wheelElement).display;
         if (displayStyle === "block") {
             wheelElement.style.display = "none";

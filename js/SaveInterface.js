@@ -170,7 +170,7 @@ class SaveInterface {
     showToast(message) {
         const toast = document.createElement("div");
         toast.className = "toast";
-        toast.innerText = message;
+        toast.textContent = message;
 
         const canvas = document.querySelector("#canvas");
         const container = canvas ? canvas.parentElement : document.body;

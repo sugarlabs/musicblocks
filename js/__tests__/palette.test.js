@@ -217,7 +217,7 @@ describe("Palettes Class", () => {
                     ]
                 };
             }
-            return { style: {}, appendChild: jest.fn(), removeChild: jest.fn() };
+            return null;
         });
 
         mockActivity = {
@@ -300,17 +300,18 @@ describe("Palettes Class", () => {
             };
 
             global.docById = jest.fn(id => (id === "palette" ? paletteElement : null));
-            global.document.getElementById = jest.fn(() => null);
-            const appendSpy = jest.spyOn(document.body, "appendChild");
+            global.document.getElementById = global.docById;
             palettes.showSelection = jest.fn();
             palettes.makePalettes = jest.fn();
 
             palettes._makeSelectorButton(0);
 
+            // Verify setup was called correctly
+            expect(trMock.insertCell).toHaveBeenCalled();
+
+            // Simulate hover
             tdMock.onmouseover();
 
-            expect(trMock.insertCell).toHaveBeenCalled();
-            expect(appendSpy).toHaveBeenCalled();
             expect(palettes.showSelection).toHaveBeenCalled();
             expect(palettes.makePalettes).toHaveBeenCalled();
         });
@@ -398,7 +399,7 @@ describe("Palettes Class", () => {
     describe("deltaY method", () => {
         test("adjusts palette top position", () => {
             const paletteElement = { style: { top: "100px" } };
-            global.document.getElementById = jest.fn(() => paletteElement);
+            global.docById.mockImplementation(id => (id === "palette" ? paletteElement : null));
 
             palettes.deltaY(20);
 

@@ -22,7 +22,7 @@
 
 // Set up globals required by jseditor.js
 global._ = str => str;
-global.docById = jest.fn(id => document.getElementById(id));
+global.docById = id => document.getElementById(id);
 
 // Mock CodeJar
 global.CodeJar = jest.fn().mockImplementation(() => ({
@@ -360,11 +360,11 @@ describe("JSEditor", () => {
 
             editor._setLinesCount("line1\nline2\nline3\n");
 
-            const linesEl = document.getElementById("editorLines");
+            const linesEl = docById("editorLines");
             expect(linesEl).not.toBeNull();
-            expect(linesEl.innerText).toContain("1");
-            expect(linesEl.innerText).toContain("2");
-            expect(linesEl.innerText).toContain("3");
+            expect(linesEl.textContent).toContain("1");
+            expect(linesEl.textContent).toContain("2");
+            expect(linesEl.textContent).toContain("3");
         });
 
         test("_setLinesCount does nothing when editorLines missing", () => {
@@ -429,7 +429,7 @@ describe("JSEditor", () => {
             const editor = createEditor();
 
             // _setup() already created js_editor_help_btn
-            const helpBtn = document.getElementById("js_editor_help_btn");
+            const helpBtn = docById("js_editor_help_btn");
             expect(helpBtn).not.toBeNull();
 
             editor._toggleHelp();
@@ -453,8 +453,8 @@ describe("JSEditor", () => {
             const editor = createEditor();
 
             // _setup() already created editorConsole and editor_console_btn
-            const consoleEl = document.getElementById("editorConsole");
-            const arrowBtn = document.getElementById("editor_console_btn");
+            const consoleEl = docById("editorConsole");
+            const arrowBtn = docById("editor_console_btn");
             expect(consoleEl).not.toBeNull();
             expect(arrowBtn).not.toBeNull();
 
@@ -468,8 +468,8 @@ describe("JSEditor", () => {
         test("_toggleConsole shows console and changes arrow back", () => {
             const editor = createEditor();
 
-            const consoleEl = document.getElementById("editorConsole");
-            const arrowBtn = document.getElementById("editor_console_btn");
+            const consoleEl = docById("editorConsole");
+            const arrowBtn = docById("editor_console_btn");
 
             editor._toggleConsole(); // hide
             editor._toggleConsole(); // show
@@ -551,7 +551,7 @@ describe("JSEditor", () => {
 
         test("_codeToBlocks logs a clear error when AST config fails", async () => {
             const editor = createEditor();
-            const consoleEl = document.getElementById("editorConsole");
+            const consoleEl = docById("editorConsole");
 
             global.ast2blocklist_config = undefined;
             window.ast2blocklist_config_ready = Promise.reject(new Error("network failed"));
@@ -579,7 +579,7 @@ describe("JSEditor", () => {
             const editor = createEditor();
 
             // The constructor's _setup() already created editorConsole
-            const consoleEl = document.getElementById("editorConsole");
+            const consoleEl = docById("editorConsole");
             expect(consoleEl).not.toBeNull();
             consoleEl.textContent = "previous output";
 
@@ -611,7 +611,7 @@ describe("JSEditor", () => {
         test("_runCode logs syntax error on parse failure", async () => {
             const editor = createEditor();
 
-            const consoleEl = document.getElementById("editorConsole");
+            const consoleEl = docById("editorConsole");
             expect(consoleEl).not.toBeNull();
 
             editor._code = "const = ;";

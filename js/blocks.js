@@ -2386,7 +2386,7 @@ class Blocks {
 
             if (this.activity.turtles.running()) {
                 this.activity.logo.doStopTurtles();
-                const stopBtn = document.getElementById("stop");
+                const stopBtn = docById("stop");
                 if (stopBtn) stopBtn.style.color = "white";
             }
         };
@@ -6996,7 +6996,7 @@ class Blocks {
             }
 
             document.body.style.cursor = "default";
-            document.getElementById("load-container").style.display = "none";
+            docById("load-container").style.display = "none";
             // Stop the loading animation interval to prevent CPU waste
             if (this.activity.stopLoadAnimation) {
                 this.activity.stopLoadAnimation();
@@ -7340,7 +7340,7 @@ class Blocks {
             }
             this.activity.refreshCanvas();
             this.activity.trashcan.stopHighlightAnimation();
-            document.getElementById("hideContents").click();
+            docById("hideContents").click();
         };
 
         /***

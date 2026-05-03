@@ -309,7 +309,7 @@ class ModeWidget {
         // Cache piano key elements to avoid repeated getElementById calls
         this._pianoKeys = [];
         for (let i = 0; i < 12; i++) {
-            this._pianoKeys[i] = document.getElementById("pkey_" + i);
+            this._pianoKeys[i] = docById("pkey_" + i);
         }
 
         const highlightImgs = [

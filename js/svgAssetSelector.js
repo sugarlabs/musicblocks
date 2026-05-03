@@ -25,7 +25,7 @@
  */
 function openSvgAssetSelector(onSelectBuiltIn, onUploadFromDevice) {
     // Prevent duplicate modals
-    const existing = document.getElementById("svgAssetSelectorOverlay");
+    const existing = docById("svgAssetSelectorOverlay");
     if (existing) existing.remove();
 
     fetch("./js/svgAssets.json")
