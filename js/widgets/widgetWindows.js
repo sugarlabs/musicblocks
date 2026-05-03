@@ -247,6 +247,10 @@ class WidgetWindow {
         // not intercept the pointer stream for panning before we can drag.
         this._nonclose.style.touchAction = "none"; // Ensure title bar specifically disables scrolling
         this._drag.style.touchAction = "none";
+        
+        // Bulletproof fix against Chrome DevTools mobile emulation panning:
+        this._drag.addEventListener("touchmove", e => e.preventDefault(), { passive: false });
+        
         this._nonclose.addEventListener("pointerdown", e => {
             this._nonclose.setPointerCapture(e.pointerId);
             window.widgetWindows.draggingWindow = this;
