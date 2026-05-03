@@ -380,7 +380,39 @@ class Palettes {
             event.stopPropagation();
 
             const searchResults = document.querySelectorAll(".ui-menu-item");
-            if (searchResults.length === 0) return;
+            setTimeout(() => {
+                const menu = document.querySelector(".ui-menu");
+                const searchInput = document.getElementById("search");
+            
+                if (!menu || !searchInput) return;
+            
+                const oldMsg = menu.querySelector(".no-results-message");
+                if (oldMsg) oldMsg.remove();
+            
+                const visibleResults = Array.from(searchResults)
+                    .filter(el => el.offsetParent !== null);
+            
+                if (searchInput.value.trim() !== "" && visibleResults.length === 0) {
+                    const li = document.createElement("li");
+            
+                    li.className = "no-results-message";
+                    li.setAttribute("data-test-ignore", "true");
+            
+                    li.textContent = `No results found for "${searchInput.value}"`;
+            
+                    li.style.cssText = `
+                        opacity: 0.7;
+                        text-align: center;
+                        padding: 6px;
+                        pointer-events: none;
+                    `;
+            
+                    menu.appendChild(li);
+                }
+            }, 50);
+
+
+            
 
             // Navigate through search results
             searchResults.forEach(row => {
