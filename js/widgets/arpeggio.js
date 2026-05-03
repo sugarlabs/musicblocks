@@ -115,7 +115,7 @@ class Arpeggio {
         arpeggioTableDiv.style.display = "inline";
         arpeggioTableDiv.style.visibility = "visible";
         arpeggioTableDiv.style.border = "0px";
-        arpeggioTableDiv.innerHTML = "";
+        arpeggioTableDiv.replaceChildren();
 
         // For the button callbacks
         widgetWindow.onclose = () => {
@@ -127,8 +127,16 @@ class Arpeggio {
         this.widgetWindow.onmaximize = this._scale;
 
         // We use an outer div to scroll vertically and an inner div to scroll horizontally.
-        arpeggioTableDiv.innerHTML =
-            '<div id="arpeggioOuterDiv"><div id="arpeggioInnerDiv"><table cellpadding="0px" id="arpeggioTable"></table></div></div>';
+        const outerDiv = document.createElement("div");
+        outerDiv.id = "arpeggioOuterDiv";
+        arpeggioTableDiv.appendChild(outerDiv);
+        const innerDiv = document.createElement("div");
+        innerDiv.id = "arpeggioInnerDiv";
+        outerDiv.appendChild(innerDiv);
+        const table = document.createElement("table");
+        table.id = "arpeggioTable";
+        table.cellPadding = "0px";
+        innerDiv.appendChild(table);
 
         // Each row in the arpeggio table contains a note label in the
         // first column and a table of buttons in the second column.
@@ -152,13 +160,15 @@ class Arpeggio {
             labelCell.style.minWidth = 0;
             labelCell.style.maxWidth = 0;
             labelCell.className = "headcol";
-            labelCell.innerHTML = this._rowLabels[j];
+            labelCell.textContent = this._rowLabels[j];
 
             arpeggioCell = arpeggioTableRow.insertCell();
             // Create tables to store individual notes.
-            arpeggioCell.innerHTML = `<table cellpadding="0px" id="arpeggioCellTable${j}">
-                    <tr></tr>
-                </table>`;
+            const cellTable = document.createElement("table");
+            cellTable.cellPadding = "0px";
+            cellTable.id = "arpeggioCellTable" + j;
+            cellTable.insertRow();
+            arpeggioCell.replaceChildren(cellTable);
             arpeggioCellTable = docById("arpeggioCellTable" + j);
 
             // We'll use this element to put the clickable notes for this row.
@@ -178,22 +188,23 @@ class Arpeggio {
         labelCell.style.minWidth = Arpeggio.CELLSIZE + "px";
         labelCell.style.maxWidth = labelCell.style.minWidth;
         labelCell.className = "headcol";
-        labelCell.innerHTML = "";
+        labelCell.replaceChildren();
 
-        const outerDiv = docById("arpeggioOuterDiv");
         outerDiv.style.height = widgetWindow.getWidgetBody().style.height;
         outerDiv.style.width = widgetWindow.getWidgetBody().style.width;
         outerDiv.style.marginLeft = "0px";
 
-        const innerDiv = docById("arpeggioInnerDiv");
         innerDiv.style.height = widgetWindow.getWidgetBody().style.height;
         innerDiv.style.width = widgetWindow.getWidgetBody().style.width;
         innerDiv.style.marginLeft = "0px";
 
         arpeggioCell = arpeggioTableRow.insertCell();
         // Create table to store arpeggio names.
-        arpeggioCell.innerHTML =
-            '<table cellpadding="0px" id="arpeggioNoteTable"><tr></tr></table>';
+        const noteTable = document.createElement("table");
+        noteTable.cellPadding = "0px";
+        noteTable.id = "arpeggioNoteTable";
+        noteTable.insertRow();
+        arpeggioCell.replaceChildren(noteTable);
 
         // Add any arpeggio blocks here.
         for (let i = 0; i < this.defaultCols; i++) {
@@ -359,7 +370,7 @@ class Arpeggio {
         cell.style.lineHeight = 100 + "%";
         cell.setAttribute("id", arpeggioIdx);
         cell.className = "headcol";
-        cell.innerHTML = arpeggioName;
+        cell.textContent = arpeggioName;
         cell.style.backgroundColor = platformColor.selectorBackground;
     }
 
@@ -478,25 +489,33 @@ class Arpeggio {
         // Play all of the arpeggio cells in the matrix.
         const icon = this.playButton;
         if (this._playing) {
-            icon.innerHTML = `&nbsp;&nbsp;<img 
-                    src="header-icons/stop-button.svg" 
-                    title="${_("Stop")}" 
-                    alt="${_("Stop")}" 
-                    height="${Arpeggio.ICONSIZE}" 
-                    width="${Arpeggio.ICONSIZE}" 
-                    vertical-align="middle" 
-                    align-content="center"
-                >&nbsp;&nbsp;`;
+            const img = document.createElement("img");
+            img.src = "header-icons/stop-button.svg";
+            img.title = _("Stop");
+            img.alt = _("Stop");
+            img.height = Arpeggio.ICONSIZE;
+            img.width = Arpeggio.ICONSIZE;
+            img.style.verticalAlign = "middle";
+            img.style.alignContent = "center";
+            icon.replaceChildren(
+                document.createTextNode("\u00A0\u00A0"),
+                img,
+                document.createTextNode("\u00A0\u00A0")
+            );
         } else {
-            icon.innerHTML = `&nbsp;&nbsp;<img 
-                    src="header-icons/play-button.svg" 
-                    title="${_("Play")}" 
-                    alt="${_("Play")}" 
-                    height="${Arpeggio.ICONSIZE}" 
-                    width="${Arpeggio.ICONSIZE}" 
-                    vertical-align="middle" 
-                    align-content="center"
-                >&nbsp;&nbsp;`;
+            const img = document.createElement("img");
+            img.src = "header-icons/play-button.svg";
+            img.title = _("Play");
+            img.alt = _("Play");
+            img.height = Arpeggio.ICONSIZE;
+            img.width = Arpeggio.ICONSIZE;
+            img.style.verticalAlign = "middle";
+            img.style.alignContent = "center";
+            icon.replaceChildren(
+                document.createTextNode("\u00A0\u00A0"),
+                img,
+                document.createTextNode("\u00A0\u00A0")
+            );
             this._playing = false;
             return;
         }
@@ -585,15 +604,19 @@ class Arpeggio {
             }, 2600 * this._playList[i][1]);
         } else {
             const icon = this.playButton;
-            icon.innerHTML = `&nbsp;&nbsp;<img 
-                    src="header-icons/play-button.svg" 
-                    title="${_("Play")}" 
-                    alt="${_("Play")}" 
-                    height="${Arpeggio.ICONSIZE}" 
-                    width="${Arpeggio.ICONSIZE}" 
-                    vertical-align="middle" 
-                    align-content="center"
-                >&nbsp;&nbsp;`;
+            const img = document.createElement("img");
+            img.src = "header-icons/play-button.svg";
+            img.title = _("Play");
+            img.alt = _("Play");
+            img.height = Arpeggio.ICONSIZE;
+            img.width = Arpeggio.ICONSIZE;
+            img.style.verticalAlign = "middle";
+            img.style.alignContent = "center";
+            icon.replaceChildren(
+                document.createTextNode("\u00A0\u00A0"),
+                img,
+                document.createTextNode("\u00A0\u00A0")
+            );
             this._playing = false;
         }
     }

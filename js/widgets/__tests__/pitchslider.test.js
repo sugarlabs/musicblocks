@@ -42,6 +42,10 @@ const createMockElement = tagName => ({
     style: {},
     appendChild: jest.fn(),
     innerHTML: "",
+    replaceChildren: jest.fn().mockImplementation(function (...nodes) {
+        this.innerHTML = "";
+        nodes.forEach(node => this.appendChild(node));
+    }),
     addEventListener: jest.fn(),
     value: "440", // Default string value for inputs
     dispatchEvent: jest.fn(),

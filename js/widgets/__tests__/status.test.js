@@ -33,6 +33,10 @@ const createMockElement = tagName => ({
     style: {},
     append: jest.fn(),
     innerHTML: "",
+    replaceChildren: jest.fn().mockImplementation(function (...nodes) {
+        this.innerHTML = "";
+        nodes.forEach(node => this.appendChild(node));
+    }),
     textContent: "",
     appendChild: jest.fn(),
     setAttribute: jest.fn(),

@@ -43,6 +43,31 @@
 */
 
 /**
+ * Polyfill for Element.prototype.replaceChildren and DocumentFragment.prototype.replaceChildren
+ * for older browsers and test environments (like jsdom).
+ */
+if (typeof Element !== "undefined" && !Element.prototype.replaceChildren) {
+    Element.prototype.replaceChildren = function (...nodes) {
+        while (this.firstChild) {
+            this.removeChild(this.firstChild);
+        }
+        for (const node of nodes) {
+            this.appendChild(node instanceof Node ? node : document.createTextNode(String(node)));
+        }
+    };
+}
+if (typeof DocumentFragment !== "undefined" && !DocumentFragment.prototype.replaceChildren) {
+    DocumentFragment.prototype.replaceChildren = function (...nodes) {
+        while (this.firstChild) {
+            this.removeChild(this.firstChild);
+        }
+        for (const node of nodes) {
+            this.appendChild(node instanceof Node ? node : document.createTextNode(String(node)));
+        }
+    };
+}
+
+/**
  * Changes the source of an image element from one SVG data URI to another.
  * @function
  * @param {HTMLImageElement} imgElement - The image element to update.

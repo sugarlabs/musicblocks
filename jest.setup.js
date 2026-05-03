@@ -15,21 +15,48 @@ const mockContext = {
     measureText: jest.fn(() => ({
         width: 0,
         actualBoundingBoxAscent: 0,
-        actualBoundingBoxDescent: 0,
+        actualBoundingBoxDescent: 0
     })),
     scale: jest.fn(),
     setTransform: jest.fn(),
     save: jest.fn(),
-    restore: jest.fn(),
+    restore: jest.fn()
 };
 
-Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
+Object.defineProperty(HTMLCanvasElement.prototype, "getContext", {
     configurable: true,
     writable: true,
-    value: jest.fn((type) => {
+    value: jest.fn(type => {
         // Return null for non-2d contexts
-        if (type !== '2d') return null;
+        if (type !== "2d") return null;
 
         return mockContext;
-    }),
+    })
 });
+
+// Polyfill for Element.prototype.replaceChildren and DocumentFragment.prototype.replaceChildren
+// Required because the version of jsdom used in the test suite does not support it.
+const replaceChildrenPolyfill = function (...nodes) {
+    while (this.firstChild) {
+        this.removeChild(this.firstChild);
+    }
+    this.append(...nodes);
+};
+
+if (typeof Element !== "undefined" && !Element.prototype.replaceChildren) {
+    Object.defineProperty(Element.prototype, "replaceChildren", {
+        configurable: true,
+        enumerable: false,
+        writable: true,
+        value: replaceChildrenPolyfill
+    });
+}
+
+if (typeof DocumentFragment !== "undefined" && !DocumentFragment.prototype.replaceChildren) {
+    Object.defineProperty(DocumentFragment.prototype, "replaceChildren", {
+        configurable: true,
+        enumerable: false,
+        writable: true,
+        value: replaceChildrenPolyfill
+    });
+}

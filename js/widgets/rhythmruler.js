@@ -793,27 +793,27 @@ class RhythmRuler {
                 }
             } else {
                 const drumcell = rhythmRulerTableRow.insertCell();
-                drumcell.innerHTML = `<img 
-                        src="header-icons/play-button.svg" 
-                        title="${_("Play")}" 
-                        alt="${_("Play")}" 
-                        height="${iconSize}" 
-                        width="${iconSize}" 
-                    />`;
+                const img = document.createElement("img");
+                img.src = "header-icons/play-button.svg";
+                img.title = _("Play");
+                img.alt = _("Play");
+                img.height = iconSize;
+                img.width = iconSize;
+                drumcell.replaceChildren(img);
                 drumcell.className = "headcol"; // Position fixed when scrolling horizontally
                 drumcell.style.cursor = "pointer";
                 drumcell.onclick = (id => {
                     return () => {
                         if (this._playing) {
                             if (this._rulerPlaying === id) {
-                                drumcell.innerHTML = `<img 
-                                        src="header-icons/play-button.svg" 
-                                        title="${_("Play")}" 
-                                        alt="${_("Play")}" 
-                                        height="${iconSize}" 
-                                        width="${iconSize}" 
-                                        vertical-align="middle"
-                                    >`;
+                                const img = document.createElement("img");
+                                img.src = "header-icons/play-button.svg";
+                                img.title = _("Play");
+                                img.alt = _("Play");
+                                img.height = iconSize;
+                                img.width = iconSize;
+                                img.style.verticalAlign = "middle";
+                                drumcell.replaceChildren(img);
                                 this._playing = false;
                                 this._playingOne = false;
                                 this._playingAll = false;
@@ -834,14 +834,14 @@ class RhythmRuler {
                             this._cellCounter = 0;
                             this._startingTime = null;
                             this._rulerPlaying = id;
-                            drumcell.innerHTML = `<img 
-                                    src="header-icons/pause-button.svg" 
-                                    title="${_("Pause")}" 
-                                    alt="${_("Pause")}" 
-                                    height="${iconSize}" 
-                                    width="${iconSize}" 
-                                    vertical-align="middle"
-                                >`;
+                            const img = document.createElement("img");
+                            img.src = "header-icons/pause-button.svg";
+                            img.title = _("Pause");
+                            img.alt = _("Pause");
+                            img.height = iconSize;
+                            img.width = iconSize;
+                            img.style.verticalAlign = "middle";
+                            drumcell.replaceChildren(img);
                             this._elapsedTimes[id] = 0;
                             this._offsets[id] = 0;
                             this._playOne();
@@ -852,7 +852,9 @@ class RhythmRuler {
 
             const rulerCell = rhythmRulerTableRow.insertCell();
             // Create individual rulers as tables.
-            rulerCell.innerHTML = `<table id="rulerCellTable${i}"></table>`;
+            const table = document.createElement("table");
+            table.id = "rulerCellTable" + i;
+            rulerCell.replaceChildren(table);
 
             const rulerCellTable = docById("rulerCellTable" + i);
             rulerCellTable.style.textAlign = "center";
@@ -1110,14 +1112,14 @@ class RhythmRuler {
                     this._tapMode = false;
                     this._tapTimes = [];
                     this._tapEndTime = null;
-                    this._tapButton.innerHTML = `<img 
-                            src="header-icons/tap-button.svg" 
-                            title="${_("tap a rhythm")}" 
-                            alt="${_("tap a rhythm")}" 
-                            height="${RhythmRuler.ICONSIZE}" 
-                            width="${RhythmRuler.ICONSIZE}" 
-                            vertical-align="middle"
-                        >`;
+                    const img = document.createElement("img");
+                    img.src = "header-icons/tap-button.svg";
+                    img.title = _("tap a rhythm");
+                    img.alt = _("tap a rhythm");
+                    img.height = RhythmRuler.ICONSIZE;
+                    img.width = RhythmRuler.ICONSIZE;
+                    img.style.verticalAlign = "middle";
+                    this._tapButton.replaceChildren(img);
                     return;
                 }
 
@@ -1210,7 +1212,9 @@ class RhythmRuler {
             }, tick);
         };
 
-        this._tapCell.innerHTML = "<div class='progressBar'></div>";
+        const progressBar = document.createElement("div");
+        progressBar.className = "progressBar";
+        this._tapCell.replaceChildren(progressBar);
         this._progressBar = this._tapCell.querySelector(".progressBar");
         // Progress once per 8th note.
         __move(interval / 8, 100 / 8);
@@ -1231,7 +1235,7 @@ class RhythmRuler {
 
         this._rulerSelected = cell.parentNode.getAttribute("data-row");
         if (this._progressBar) this._progressBar.remove();
-        this._tapCell.innerHTML = "";
+        this._tapCell.replaceChildren();
 
         const d = new Date();
         this._tapTimes.push(d.getTime());
@@ -1315,14 +1319,14 @@ class RhythmRuler {
         this._tapCell = null;
         this._tapEndTime = null;
         // let iconSize = RhythmRuler.ICONSIZE;
-        this._tapButton.innerHTML = `<img 
-                src="header-icons/tap-button.svg" 
-                title="${_("tap a rhythm")}" 
-                alt="${_("tap a rhythm")}" 
-                height="${RhythmRuler.ICONSIZE}" 
-                width="${RhythmRuler.ICONSIZE}" 
-                vertical-align="middle"
-            >`;
+        const img = document.createElement("img");
+        img.src = "header-icons/tap-button.svg";
+        img.title = _("tap a rhythm");
+        img.alt = _("tap a rhythm");
+        img.height = RhythmRuler.ICONSIZE;
+        img.width = RhythmRuler.ICONSIZE;
+        img.style.verticalAlign = "middle";
+        this._tapButton.replaceChildren(img);
     }
 
     /**
@@ -1921,14 +1925,14 @@ class RhythmRuler {
     _tap() {
         this._tapMode = true;
         const iconSize = RhythmRuler.ICONSIZE;
-        this._tapButton.innerHTML = `<img 
-                src="header-icons/tap-active-button.svg" 
-                title="${_("tap a rhythm")}" 
-                alt="${_("tap a rhythm")}" 
-                height="${iconSize}" 
-                width="${iconSize}" 
-                vertical-align="middle"
-            >`;
+        const img = document.createElement("img");
+        img.src = "header-icons/tap-active-button.svg";
+        img.title = _("tap a rhythm");
+        img.alt = _("tap a rhythm");
+        img.height = iconSize;
+        img.width = iconSize;
+        img.style.verticalAlign = "middle";
+        this._tapButton.replaceChildren(img);
     }
 
     /**
@@ -1944,14 +1948,14 @@ class RhythmRuler {
         this._playingOne = false;
         this._rulerPlaying = -1;
         this._startingTime = null;
-        this._playAllCell.innerHTML = `<img 
-                src="header-icons/play-button.svg" 
-                title="${_("Play all")}" 
-                alt="${_("Play all")}" 
-                height="${RhythmRuler.ICONSIZE}" 
-                width="${RhythmRuler.ICONSIZE}" 
-                vertical-align="middle"
-            >`;
+        const img = document.createElement("img");
+        img.src = "header-icons/play-button.svg";
+        img.title = _("Play all");
+        img.alt = _("Play all");
+        img.height = RhythmRuler.ICONSIZE;
+        img.width = RhythmRuler.ICONSIZE;
+        img.style.verticalAlign = "middle";
+        this._playAllCell.replaceChildren(img);
         for (let r = 0; r < this.Rulers.length; r++) {
             this._rulerSelected = r;
             while (this.Rulers[r][1].length > 0) {
@@ -2020,14 +2024,14 @@ class RhythmRuler {
      */
     __resume() {
         this._clearWidgetTimers();
-        this._playAllCell.innerHTML = `<img 
-                src="header-icons/pause-button.svg" 
-                title="${_("Pause")}" 
-                alt="${_("Pause")}" 
-                height="${RhythmRuler.ICONSIZE}" 
-                width="${RhythmRuler.ICONSIZE}" 
-                vertical-align="middle"
-            >`;
+        const img = document.createElement("img");
+        img.src = "header-icons/pause-button.svg";
+        img.title = _("Pause");
+        img.alt = _("Pause");
+        img.height = RhythmRuler.ICONSIZE;
+        img.width = RhythmRuler.ICONSIZE;
+        img.style.verticalAlign = "middle";
+        this._playAllCell.replaceChildren(img);
         this.activity.logo.turtleDelay = 0;
         this._playingAll = true;
         this._playing = true;

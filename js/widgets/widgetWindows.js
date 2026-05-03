@@ -231,7 +231,6 @@ class WidgetWindow {
         this._nonclose.style.width = "100%";
 
         const titleEl = this._create("div", "wftTitle", this._nonclose);
-        titleEl.innerHTML = "";
         titleEl.textContent = _(this._title);
         titleEl.id = `${this._key}WidgetID`;
 
@@ -418,10 +417,9 @@ class WidgetWindow {
      */
     addInputButton(initial, parent) {
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
-        el.innerHTML = "";
         const input = document.createElement("input");
         input.value = initial; // Safe - DOM API escapes automatically
-        el.insertAdjacentElement("afterbegin", input);
+        el.replaceChildren(input);
         return input;
     }
 
@@ -711,8 +709,8 @@ class WidgetWindow {
      * @return {WidgetWindow} this
      */
     clear() {
-        this._widget.innerHTML = "";
-        this._toolbar.innerHTML = "";
+        this._widget.replaceChildren();
+        this._toolbar.replaceChildren();
         return this;
     }
 
@@ -723,7 +721,7 @@ class WidgetWindow {
      * Clears the widget window not the toolbar
      */
     clearScreen() {
-        this._widget.innerHTML = "";
+        this._widget.replaceChildren();
         return this;
     }
 

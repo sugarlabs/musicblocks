@@ -27,6 +27,10 @@ global.platformColor = {
 const createMockElement = tagName => ({
     style: {},
     appendChild: jest.fn(),
+    replaceChildren: jest.fn().mockImplementation(function (...nodes) {
+        this.innerHTML = "";
+        nodes.forEach(node => this.appendChild(node));
+    }),
     querySelector: jest.fn().mockReturnValue({ style: {} }),
     onclick: null,
     src: "",

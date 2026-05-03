@@ -69,7 +69,7 @@ class LocalPlanet {
     }
 
     renderAllProjects() {
-        document.getElementById("local-projects").innerHTML = "";
+        document.getElementById("local-projects").replaceChildren();
 
         let index = -1;
         for (let i = 0; i < this.projects.length; i++) {

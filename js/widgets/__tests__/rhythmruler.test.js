@@ -115,11 +115,19 @@ global.document = {
         getAttribute: jest.fn(),
         addEventListener: jest.fn(),
         appendChild: jest.fn(),
+        replaceChildren: jest.fn().mockImplementation(function (...nodes) {
+            this.innerHTML = "";
+            nodes.forEach(node => this.appendChild(node));
+        }),
         insertRow: jest.fn().mockReturnValue({
             setAttribute: jest.fn(),
             insertCell: jest.fn().mockReturnValue({
                 style: {},
                 innerHTML: "",
+                replaceChildren: jest.fn().mockImplementation(function (...nodes) {
+                    this.innerHTML = "";
+                    nodes.forEach(node => this.appendChild(node));
+                }),
                 setAttribute: jest.fn(),
                 addEventListener: jest.fn()
             })
@@ -127,7 +135,11 @@ global.document = {
         cells: [],
         insertCell: jest.fn().mockReturnValue({
             style: {},
-            innerHTML: ""
+            innerHTML: "",
+            replaceChildren: jest.fn().mockImplementation(function (...nodes) {
+                this.innerHTML = "";
+                nodes.forEach(node => this.appendChild(node));
+            })
         }),
         deleteCell: jest.fn(),
         classList: { add: jest.fn(), remove: jest.fn() },
@@ -787,7 +799,7 @@ describe("RhythmRuler Widget", () => {
         test("__pause should clear circular highlights", () => {
             rhythmRuler._circularHighlight = { 0: 2, 1: 1 };
             rhythmRuler._playing = true;
-            rhythmRuler._playAllCell = { innerHTML: "" };
+            rhythmRuler._playAllCell = { innerHTML: "", replaceChildren: jest.fn() };
             rhythmRuler.Rulers = [[[4], []]];
             rhythmRuler._rulers = [
                 {

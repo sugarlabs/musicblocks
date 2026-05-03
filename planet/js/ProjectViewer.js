@@ -81,7 +81,7 @@ class ProjectViewer {
         document.getElementById("projectviewer-image").src = img;
         document.getElementById("projectviewer-description").textContent = proj.ProjectDescription;
         const tagcontainer = document.getElementById("projectviewer-tags");
-        tagcontainer.innerHTML = "";
+        tagcontainer.replaceChildren();
         for (let i = 0; i < proj.ProjectTags.length; i++) {
             const chip = document.createElement("div");
             chip.classList.add("chipselect");

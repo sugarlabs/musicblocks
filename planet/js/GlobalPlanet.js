@@ -26,15 +26,6 @@ class GlobalPlanet {
         this.Planet = Planet;
         this.ProjectViewer = null;
 
-        this.offlineHTML = `<div class= "container center-align">
-                            ${_(
-                                `Feature unavailable - cannot connect to server. Reload ${
-                                    Planet.IsMusicBlocks ? "Music" : "Turtle"
-                                } Blocks to try again.`
-                            )}
-                            </div>`;
-
-        this.noProjects = `<div class= "container center-align">${_("No results found.")}</div>`;
         this.tags = [];
         this.specialTags = null;
         this.defaultTag = false;
@@ -133,7 +124,7 @@ class GlobalPlanet {
 
         this.index = 0;
         this._cleanupCards();
-        document.getElementById("global-projects").innerHTML = "";
+        document.getElementById("global-projects").replaceChildren();
         this.showLoading();
         this.hideLoadMore();
 
@@ -197,7 +188,7 @@ class GlobalPlanet {
             this.oldSearchString = this.searchString;
             this.index = 0;
             this._cleanupCards();
-            document.getElementById("global-projects").innerHTML = "";
+            document.getElementById("global-projects").replaceChildren();
             this.showLoading();
             this.hideLoadMore();
             Planet.ServerInterface.searchProjects(
@@ -398,8 +389,14 @@ class GlobalPlanet {
         this.hideLoadMore();
 
         const element = document.getElementById("global-projects");
-        element.innerHTML = "";
-        element.insertAdjacentHTML("afterbegin", this.offlineHTML);
+        const div = document.createElement("div");
+        div.className = "container center-align";
+        div.textContent = _(
+            `Feature unavailable - cannot connect to server. Reload ${
+                this.Planet.IsMusicBlocks ? "Music" : "Turtle"
+            } Blocks to try again.`
+        );
+        element.replaceChildren(div);
     }
 
     throwNoProjectsError() {
@@ -407,8 +404,10 @@ class GlobalPlanet {
         this.hideLoadMore();
 
         const element = document.getElementById("global-projects");
-        element.innerHTML = "";
-        element.insertAdjacentHTML("afterbegin", this.noProjects);
+        const div = document.createElement("div");
+        div.className = "container center-align";
+        div.textContent = _("No results found.");
+        element.replaceChildren(div);
     }
 
     hideLoading() {
@@ -507,10 +506,14 @@ class GlobalPlanet {
 
         if (!Planet.ConnectedToServer) {
             document.getElementById("globaltitle").textContent = _("Cannot connect to server");
-            document.getElementById("globalcontents").innerHTML = "";
-            document
-                .getElementById("globalcontents")
-                .insertAdjacentHTML("afterbegin", this.offlineHTML);
+            const offlineDiv = document.createElement("div");
+            offlineDiv.className = "container center-align";
+            offlineDiv.textContent = _(
+                `Feature unavailable - cannot connect to server. Reload ${
+                    Planet.IsMusicBlocks ? "Music" : "Turtle"
+                } Blocks to try again.`
+            );
+            document.getElementById("globalcontents").replaceChildren(offlineDiv);
         } else {
             jQuery("#sort-select").material_select(evt => {
                 this.sortBy = document.getElementById("sort-select").value;

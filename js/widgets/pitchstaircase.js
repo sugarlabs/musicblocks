@@ -59,15 +59,21 @@ class PitchStaircase {
      */
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
-        cell.innerHTML = `&nbsp;&nbsp;<img 
-                src="header-icons/play-button.svg" 
-                title="${label}" 
-                alt="${label}" 
-                height="${iconSize}" 
-                width="${iconSize}" 
-                vertical-align="middle" 
-                align-content="center"
-            >&nbsp;&nbsp;`;
+        cell.replaceChildren(
+            document.createTextNode("\u00A0\u00A0"),
+            (() => {
+                const img = document.createElement("img");
+                img.src = "header-icons/play-button.svg";
+                img.title = label;
+                img.alt = label;
+                img.height = iconSize;
+                img.width = iconSize;
+                img.style.verticalAlign = "middle";
+                img.style.alignContent = "center";
+                return img;
+            })(),
+            document.createTextNode("\u00A0\u00A0")
+        );
         cell.style.width = PitchStaircase.BUTTONSIZE + "px";
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
@@ -97,7 +103,7 @@ class PitchStaircase {
          * the first column and a table of buttons in the second column.
          */
         const pscTable = this._pscTable;
-        pscTable.innerHTML = "";
+        pscTable.replaceChildren();
         pscTable.style.textAlign = "center";
 
         for (let i = 0; i < this.Stairs.length; i++) {
@@ -129,9 +135,11 @@ class PitchStaircase {
                     this._cellScale) /
                     3 +
                 "px";
-            stepCell.innerHTML = `${frequency.toFixed(2)}<br>${this.Stairs[i][0]}${
-                this.Stairs[i][1]
-            }`;
+            stepCell.replaceChildren(
+                document.createTextNode(frequency.toFixed(2)),
+                document.createElement("br"),
+                document.createTextNode(`${this.Stairs[i][0]}${this.Stairs[i][1]}`)
+            );
             stepCell.style.minWidth = stepCell.style.width;
             stepCell.style.maxWidth = stepCell.style.width;
             stepCell.style.height = PitchStaircase.BUTTONSIZE + "px";

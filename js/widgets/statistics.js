@@ -54,7 +54,7 @@ class StatsWindow {
         }
 
         this.widgetWindow.onmaximize = () => {
-            this.widgetWindow.getWidgetBody().innerHTML = "";
+            this.widgetWindow.getWidgetBody().replaceChildren();
             if (this.widgetWindow.isMaximized()) {
                 this.widgetWindow.getWidgetBody().style.display = "flex";
                 this.widgetWindow.getWidgetBody().style.justifyContent = "space-between";

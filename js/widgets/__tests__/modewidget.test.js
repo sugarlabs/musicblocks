@@ -42,13 +42,18 @@ global.docById = jest.fn().mockImplementation(id => ({
     style: {},
     innerHTML: "",
     appendChild: jest.fn(),
-    rows: [{ cells: [{ innerHTML: "" }] }, { cells: [{ innerHTML: "" }] }],
-    insertRow: jest.fn().mockReturnValue({
-        insertCell: jest.fn().mockReturnValue({
+    replaceChildren: jest.fn(),
+    rows: [
+        { cells: [{ innerHTML: "", replaceChildren: jest.fn() }] },
+        { cells: [{ innerHTML: "", replaceChildren: jest.fn() }] }
+    ],
+    insertRow: jest.fn().mockImplementation(() => ({
+        insertCell: jest.fn().mockImplementation(() => ({
             style: {},
-            innerHTML: ""
-        })
-    })
+            innerHTML: "",
+            replaceChildren: jest.fn()
+        }))
+    }))
 }));
 
 global.getNote = jest.fn().mockReturnValue(["C", "4"]);
@@ -96,8 +101,11 @@ window.widgetWindows = {
         destroy: jest.fn(),
         updateTitle: jest.fn(),
         addButton: jest.fn().mockImplementation(() => {
-            const btn = {};
-            btn.onclick = jest.fn();
+            const btn = {
+                replaceChildren: jest.fn(),
+                appendChild: jest.fn(),
+                onclick: jest.fn()
+            };
             return btn;
         }),
         getWidgetBody: jest.fn().mockReturnValue({
@@ -124,13 +132,16 @@ document.createElement = jest.fn().mockImplementation(tag => ({
     style: {},
     innerHTML: "",
     append: jest.fn(),
-    insertRow: jest.fn().mockReturnValue({
-        insertCell: jest.fn().mockReturnValue({
+    appendChild: jest.fn(),
+    replaceChildren: jest.fn(),
+    insertRow: jest.fn().mockImplementation(() => ({
+        insertCell: jest.fn().mockImplementation(() => ({
             style: {},
-            innerHTML: ""
-        })
-    }),
-    getElementById: jest.fn().mockReturnValue({ src: "" })
+            innerHTML: "",
+            replaceChildren: jest.fn()
+        }))
+    })),
+    getElementById: jest.fn().mockReturnValue({ src: "", replaceChildren: jest.fn() })
 }));
 document.getElementById = document.createElement; // For internal usage
 

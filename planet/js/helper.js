@@ -78,12 +78,8 @@ function toggleSearch(on) {
 
 function toggleText(id, a, b) {
     const el = document.getElementById(id);
-
-    const prevHTML = el.innerHTML;
-    const updatedHTML = prevHTML.includes(a) ? prevHTML.replace(a, b) : prevHTML.replace(b, a);
-
-    el.innerHTML = "";
-    el.insertAdjacentHTML("afterbegin", updatedHTML);
+    const prevText = el.textContent;
+    el.textContent = prevText.includes(a) ? prevText.replace(a, b) : prevText.replace(b, a);
 }
 
 function toggleExpandable(id, c) {

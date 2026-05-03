@@ -210,14 +210,13 @@ function SampleWidget() {
      * @returns {void}
      */
     this.pause = function () {
-        this.playBtn.innerHTML = `<img 
-                src="header-icons/play-button.svg" 
-                title="${_("Play")}" 
-                alt="${_("Play")}" 
-                height="${ICONSIZE}" 
-                width="${ICONSIZE}" 
-                vertical-align="middle"
-            >`;
+        const img = document.createElement("img");
+        img.src = "header-icons/play-button.svg";
+        img.title = _("Play");
+        img.alt = _("Play");
+        img.height = ICONSIZE;
+        img.width = ICONSIZE;
+        this.playBtn.replaceChildren(img);
         this.isMoving = false;
     };
 
@@ -226,14 +225,13 @@ function SampleWidget() {
      * @returns {void}
      */
     this.resume = function () {
-        this.playBtn.innerHTML = `<img 
-                src="header-icons/pause-button.svg" 
-                title="${_("Pause")}" 
-                alt="${_("Pause")}" 
-                height="${ICONSIZE}" 
-                width="${ICONSIZE}" 
-                vertical-align="middle"
-            >`;
+        const img = document.createElement("img");
+        img.src = "header-icons/pause-button.svg";
+        img.title = _("Pause");
+        img.alt = _("Pause");
+        img.height = ICONSIZE;
+        img.width = ICONSIZE;
+        this.playBtn.replaceChildren(img);
         this.isMoving = true;
     };
 
@@ -660,7 +658,7 @@ function SampleWidget() {
             container.style.gap = "20px";
 
             const h1 = document.createElement("h1");
-            h1.innerHTML = "AI Sample Generation";
+            h1.textContent = "AI Sample Generation";
             h1.style.fontSize = "40px";
             h1.style.marginTop = "0";
             h1.style.marginBottom = "0px";
@@ -699,7 +697,7 @@ function SampleWidget() {
             submit.style.borderRadius = "10px";
             submit.style.border = "none";
             submit.style.cursor = "pointer";
-            submit.innerHTML = "Submit";
+            submit.textContent = "Submit";
             submit.onclick = async function () {
                 submit.disabled = true;
                 const prompt = textArea.value;
@@ -745,7 +743,7 @@ function SampleWidget() {
             preview.style.borderRadius = "10px";
             preview.style.border = "none";
             preview.style.cursor = "pointer";
-            preview.innerHTML = "Preview";
+            preview.textContent = "Preview";
             preview.disabled = true;
             preview.onclick = () => {
                 if (that.audioPreview) {
@@ -773,7 +771,7 @@ function SampleWidget() {
             save.style.borderRadius = "10px";
             save.style.border = "none";
             save.style.cursor = "pointer";
-            save.innerHTML = "Save";
+            save.textContent = "Save";
             save.disabled = true;
             save.onclick = function () {
                 const audioURL = `http://13.61.94.100:8000/save`;
@@ -1885,7 +1883,7 @@ function SampleWidget() {
             width = this.widgetWindow.getWidgetBody().getBoundingClientRect().width;
             height = this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 70;
         }
-        document.getElementsByTagName("canvas")[0].innerHTML = "";
+        document.getElementsByTagName("canvas")[0].replaceChildren();
         // Cancel any existing RAF loop for this canvas before creating a new one
         // to prevent multiple concurrent draw loops accumulating on resize/maximize.
         if (this.drawVisualIDs[0]) {

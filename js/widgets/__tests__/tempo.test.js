@@ -31,19 +31,38 @@ window.widgetWindows = {
     windowFor: jest.fn().mockReturnValue({
         clear: jest.fn(),
         show: jest.fn(),
-        addButton: jest.fn().mockReturnValue({ onclick: () => {} }),
+        addButton: jest.fn().mockImplementation(() => {
+            const btn = {
+                style: {},
+                onclick: () => {},
+                replaceChildren: jest.fn().mockImplementation(function (...nodes) {
+                    this.innerHTML = "";
+                    nodes.forEach(node => {
+                        if (this.appendChild) this.appendChild(node);
+                    });
+                })
+            };
+            return btn;
+        }),
         addInputButton: jest.fn().mockImplementation(val => ({
             value: val,
-            addEventListener: jest.fn()
+            style: {},
+            addEventListener: jest.fn(),
+            replaceChildren: jest.fn()
         })),
         getWidgetBody: jest.fn().mockReturnValue({
             appendChild: jest.fn(),
+            style: {},
+            append: jest.fn(),
             insertRow: jest.fn().mockReturnValue({
                 insertCell: jest.fn().mockReturnValue({
+                    style: {},
                     appendChild: jest.fn(),
-                    setAttribute: jest.fn()
+                    setAttribute: jest.fn(),
+                    replaceChildren: jest.fn()
                 })
-            })
+            }),
+            replaceChildren: jest.fn()
         }),
         sendToCenter: jest.fn(),
         onclose: jest.fn(),
@@ -877,7 +896,16 @@ describe("Tempo Widget", () => {
         });
 
         test("pause button onclick should toggle isMoving, call pause/resume, and update innerHTML (lines 80-101)", () => {
-            const pauseBtnMock = { innerHTML: "" };
+            const pauseBtnMock = {
+                innerHTML: "",
+                appendChild: function (node) {
+                    this.innerHTML += `<img src="${node.getAttribute("src")}">`;
+                },
+                replaceChildren: function (...nodes) {
+                    this.innerHTML = "";
+                    nodes.forEach(node => this.appendChild(node));
+                }
+            };
             const mockWindow = window.widgetWindows.windowFor();
             mockWindow.addButton.mockImplementation(icon => {
                 if (icon === "pause-button.svg") return pauseBtnMock;

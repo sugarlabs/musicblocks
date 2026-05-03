@@ -65,6 +65,10 @@ describe("TemperamentWidget basic tests", () => {
             innerHTML: "",
             textContent: "",
             appendChild: jest.fn(),
+            replaceChildren: jest.fn().mockImplementation(function (...nodes) {
+                this.innerHTML = "";
+                nodes.forEach(node => this.appendChild(node));
+            }),
             setAttribute: jest.fn(),
             style: {},
             width: 100,
