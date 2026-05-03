@@ -252,7 +252,11 @@ class WidgetWindow {
         this._drag.addEventListener("touchmove", e => e.preventDefault(), { passive: false });
         
         this._nonclose.addEventListener("pointerdown", e => {
-            this._nonclose.setPointerCapture(e.pointerId);
+            try {
+                this._nonclose.setPointerCapture(e.pointerId);
+            } catch (err) {
+                console.warn("setPointerCapture failed", err);
+            }
             window.widgetWindows.draggingWindow = this;
             if (this._maximized) {
                 // Perform special repositioning to make the drag feel right when
