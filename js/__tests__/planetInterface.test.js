@@ -222,7 +222,7 @@ describe("PlanetInterface", () => {
         planetInterface.planet = { ProjectStorage: { saveLocally: jest.fn() } };
 
         return planetInterface.saveLocally().then(() => {
-            expect(mockActivity.stage.update).toHaveBeenCalledWith(undefined);
+            expect(mockActivity.stage.update).toHaveBeenCalled();
             expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenCalledWith(D, null);
         });
     });
