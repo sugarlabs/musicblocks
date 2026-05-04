@@ -2099,6 +2099,12 @@ if (typeof module !== "undefined" && module.exports) {
         closeBlkWidgets,
         resolveObject,
         importMembers,
-        escapeHTML
+        escapeHTML,
+        fnBrowserDetect,
+        changeImage,
+        doBrowserCheck,
+        waitForReadiness,
+        docByName,
+        deepClone
     };
 }

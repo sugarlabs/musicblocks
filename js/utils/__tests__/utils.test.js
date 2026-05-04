@@ -92,7 +92,13 @@ const {
     closeWidgets,
     closeBlkWidgets,
     resolveObject,
-    importMembers
+    importMembers,
+    fnBrowserDetect,
+    changeImage,
+    doBrowserCheck,
+    waitForReadiness,
+    docByName,
+    deepClone
 } = require("../utils.js");
 
 describe("Utility Functions (logic-only)", () => {
@@ -795,6 +801,235 @@ describe("Utility Functions (logic-only)", () => {
         it("should return original string if no placeholders exist", () => {
             const result = format("Hello world", { name: "User" });
             expect(result).toBe("Hello world");
+        });
+    });
+
+    describe("safeJSONParse() - missing branches", () => {
+        const safeJSONParse = window.safeJSONParse;
+        beforeAll(() => {
+            jest.spyOn(console, "warn").mockImplementation(() => {});
+        });
+        afterAll(() => {
+            console.warn.mockRestore();
+        });
+        it("returns fallback for non-string input", () => {
+            expect(safeJSONParse(123, "fallback")).toBe("fallback");
+        });
+        it("returns fallback for empty string", () => {
+            expect(safeJSONParse("", "empty")).toBe("empty");
+        });
+        it("returns fallback when JSON.parse throws (catch block)", () => {
+            expect(safeJSONParse("{invalid}", "error")).toBe("error");
+        });
+    });
+
+    describe("fnBrowserDetect() - branch coverage", () => {
+        const setUserAgent = ua => {
+            Object.defineProperty(global.navigator, "userAgent", {
+                value: ua,
+                configurable: true
+            });
+        };
+        it("detects Chrome", () => {
+            setUserAgent("Mozilla Chrome");
+            expect(fnBrowserDetect()).toBe("chrome");
+        });
+        it("detects Firefox", () => {
+            setUserAgent("Mozilla Firefox");
+            expect(fnBrowserDetect()).toBe("firefox");
+        });
+        it("detects Safari", () => {
+            setUserAgent("Mozilla Safari");
+            expect(fnBrowserDetect()).toBe("safari");
+        });
+        it("detects Opera", () => {
+            setUserAgent("OPR/");
+            expect(fnBrowserDetect()).toBe("opera");
+        });
+        it("detects Edge", () => {
+            setUserAgent("Edg/");
+            expect(fnBrowserDetect()).toBe("edge");
+        });
+        it("falls back when no browser matches", () => {
+            setUserAgent("UnknownBrowser");
+            expect(fnBrowserDetect()).toBe("No browser detection");
+        });
+    });
+
+    describe("changeImage()", () => {
+        beforeAll(() => {
+            global.base64Encode = str => str;
+        });
+        it("updates src when matching", () => {
+            const from = "<svg>old</svg>";
+            const to = "<svg>new</svg>";
+            const oldSrc = "data:image/svg+xml;base64," + window.btoa(from);
+            const newSrc = "data:image/svg+xml;base64," + window.btoa(to);
+            const img = { src: oldSrc };
+            changeImage(img, from, to);
+            expect(img.src).toBe(newSrc);
+        });
+        it("does not update src when not matching", () => {
+            const img = { src: "random" };
+            changeImage(img, "<svg>old</svg>", "<svg>new</svg>");
+            expect(img.src).toBe("random");
+        });
+    });
+
+    describe("doBrowserCheck()", () => {
+        let originalUA;
+        let originalJQuery;
+        beforeAll(() => {
+            originalUA = navigator.userAgent;
+            originalJQuery = global.jQuery;
+            global.jQuery = {};
+        });
+        afterAll(() => {
+            Object.defineProperty(global.navigator, "userAgent", {
+                value: originalUA,
+                configurable: true
+            });
+            global.jQuery = originalJQuery;
+        });
+        const setUserAgent = ua => {
+            Object.defineProperty(global.navigator, "userAgent", {
+                value: ua,
+                configurable: true
+            });
+        };
+        it("detects chrome and sets webkit", () => {
+            setUserAgent("Mozilla Chrome/100");
+            doBrowserCheck();
+            expect(jQuery.browser.chrome).toBe(true);
+            expect(jQuery.browser.webkit).toBe(true);
+            expect(jQuery.browser.version).toBe("100");
+        });
+        it("detects webkit and sets safari", () => {
+            setUserAgent("Mozilla WebKit/537");
+            doBrowserCheck();
+            expect(jQuery.browser.webkit).toBe(true);
+            expect(jQuery.browser.safari).toBe(true);
+        });
+        it("detects mozilla fallback", () => {
+            setUserAgent("Mozilla/5.0");
+            doBrowserCheck();
+            expect(jQuery.browser.mozilla).toBe(true);
+        });
+        it("handles unknown user agent safely", () => {
+            setUserAgent("UnknownBrowser");
+            doBrowserCheck();
+            expect(jQuery.browser).toBeDefined();
+        });
+    });
+
+    describe("waitForReadiness()", () => {
+        let rafCallback;
+        let originalRAF;
+        let originalNow;
+        beforeEach(() => {
+            originalRAF = global.requestAnimationFrame;
+            originalNow = Date.now;
+            global.requestAnimationFrame = jest.fn(cb => {
+                rafCallback = cb;
+            });
+        });
+        afterEach(() => {
+            global.requestAnimationFrame = originalRAF;
+            Date.now = originalNow;
+        });
+        const mockReady = () => {
+            global.createjs = { Stage: true };
+            global.Howler = {};
+            global.jQuery = {};
+            document.getElementById = jest.fn(() => ({}));
+        };
+        const mockNotReady = () => {
+            global.createjs = undefined;
+            global.Howler = undefined;
+            global.jQuery = undefined;
+            document.getElementById = jest.fn(() => null);
+        };
+        it("calls callback when ready after minWait", () => {
+            const callback = jest.fn();
+            let time = 0;
+            Date.now = jest.fn(() => time);
+            mockReady();
+            waitForReadiness(callback, { minWait: 100 });
+            time = 150;
+            rafCallback();
+            expect(callback).toHaveBeenCalled();
+        });
+        it("calls callback when maxWait exceeded", () => {
+            const callback = jest.fn();
+            let time = 0;
+            Date.now = jest.fn(() => time);
+            mockNotReady();
+            waitForReadiness(callback, { maxWait: 100 });
+            time = 150;
+            rafCallback();
+            expect(callback).toHaveBeenCalled();
+        });
+        it("does not call callback if not ready and within time", () => {
+            const callback = jest.fn();
+            let time = 0;
+            Date.now = jest.fn(() => time);
+            mockNotReady();
+            waitForReadiness(callback, { minWait: 100, maxWait: 1000 });
+            rafCallback();
+            expect(callback).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("docByName()", () => {
+        let originalGetElementsByName;
+        beforeAll(() => {
+            originalGetElementsByName = document.getElementsByName;
+        });
+        afterAll(() => {
+            document.getElementsByName = originalGetElementsByName;
+        });
+        beforeEach(() => {
+            document.body.innerHTML = "";
+            document.getElementsByName = originalGetElementsByName;
+        });
+        it("returns elements with given name", () => {
+            document.body.innerHTML = `
+                <input name="test-name" />
+                <input name="test-name" />
+            `;
+            const result = docByName("test-name");
+            expect(result.length).toBe(2);
+        });
+        it("returns empty collection if no elements found", () => {
+            const result = docByName("non-existent");
+            expect(result.length).toBe(0);
+        });
+    });
+
+    describe("deepClone()", () => {
+        let originalStructuredClone;
+        beforeAll(() => {
+            originalStructuredClone = global.structuredClone;
+        });
+        afterAll(() => {
+            global.structuredClone = originalStructuredClone;
+        });
+        it("uses structuredClone when available", () => {
+            const mockClone = jest.fn(val => ({ ...val }));
+            global.structuredClone = mockClone;
+            const input = { a: 1 };
+            const result = deepClone(input);
+            expect(mockClone).toHaveBeenCalledWith(input);
+            expect(result).toEqual(input);
+            expect(result).not.toBe(input);
+        });
+        it("falls back to JSON clone when structuredClone is not available", () => {
+            global.structuredClone = undefined;
+            const input = { a: 1, nested: { b: 2 } };
+            const result = deepClone(input);
+            expect(result).toEqual(input);
+            expect(result).not.toBe(input);
+            expect(result.nested).not.toBe(input.nested);
         });
     });
 });
