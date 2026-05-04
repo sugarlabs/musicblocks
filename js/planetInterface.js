@@ -309,8 +309,8 @@ class PlanetInterface {
         /**
          * Opens a project from the Planet by its ID.
          * @param {string} id - The ID of the project to open.
-        * @param {string} [error] - Error message if project opening fails.
-        */
+         * @param {string} [error] - Error message if project opening fails.
+         */
         this.openProjectFromPlanet = (id, error) => {
             if (!this.planet || typeof this.planet.openProjectFromPlanet !== "function") {
                 console.error(
