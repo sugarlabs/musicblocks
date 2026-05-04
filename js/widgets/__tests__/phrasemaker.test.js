@@ -1372,12 +1372,12 @@ describe("PhraseMaker Widget", () => {
     });
 
     test("_export returns safely when popup is blocked", () => {
-        const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+        const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
         global.window.open = jest.fn(() => null);
 
         expect(() => phraseMaker._export()).not.toThrow();
-        expect(debugSpy).toHaveBeenCalledWith("Could not create export window");
+        expect(warnSpy).toHaveBeenCalledWith("Could not create export window");
 
-        debugSpy.mockRestore();
+        warnSpy.mockRestore();
     });
 });

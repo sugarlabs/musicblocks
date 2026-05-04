@@ -2632,7 +2632,7 @@ class PhraseMaker {
     _export() {
         const exportWindow = window.open("");
         if (!exportWindow) {
-            console.debug("Could not create export window");
+            console.warn("Could not create export window");
             return;
         }
 
