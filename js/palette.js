@@ -380,42 +380,34 @@ class Palettes {
             event.stopPropagation();
 
             const searchResults = document.querySelectorAll(".ui-menu-item");
+
           //  if (searchResults.length === 0) return;
 
             // 👇 YAHI PASTE KARO (searchResults ke just niche)
+            const searchResults = document.querySelectorAll(".ui-menu-item");
 
-            setTimeout(() => {
-                const menu = document.querySelector(".ui-menu");
-                const searchInput = document.getElementById("search");
-            
-                if ( !menu || !searchInput) return;
-            
-                const oldMsg = menu.querySelector(".no-results-message");
-                if (oldMsg) oldMsg.remove();
-            
-                const visibleResults = Array.from(searchResults)
-                    .filter(el => el.offsetParent !== null);
-            
-                if (searchInput.value.trim() !== "" && visibleResults.length === 0) {
-                    const li = document.createElement("li");
-            
-                    li.className = "no-results-message";
-                    li.setAttribute("data-test-ignore", "true");
-            
-                    li.textContent = `No results found for "${searchInput.value}"`;
-            
-                    li.style.cssText = `
-                        opacity: 0.7;
-                        text-align: center;
-                        padding: 6px;
-                        pointer-events: none;
-                    `;
-            
-                    menu.appendChild(li);
-                }
-            }, 50);
+// 👇 add this
+          setTimeout(() => {
+            const menu = document.querySelector(".ui-autocomplete");
+            const searchInput = document.getElementById("search");
 
+            if (!menu || !searchInput) return;
 
+            // remove old message
+            const oldMsg = menu.querySelector(".no-results-message");
+            if (oldMsg) oldMsg.remove();
+
+            // count actual results
+            const visibleResults = Array.from(menu.children)
+                .filter(el => !el.classList.contains("no-results-message"));
+
+            if (searchInput.value.trim() !== "" && visibleResults.length === 0) {
+                const li = document.createElement("li");
+                li.className = "no-results-message";
+                li.textContent = `No results found for "${searchInput.value}"`;
+                menu.appendChild(li);
+            }
+        }, 0);
             
             // Navigate through search results
             searchResults.forEach(row => {
