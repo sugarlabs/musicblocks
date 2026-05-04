@@ -442,7 +442,6 @@ class HelpWidget {
         const img = document.createElement("img");
         img.src = imageSrc;
         img.alt = `${title} icon`;
-        img.loading = "lazy";
 
         if (this._isLargeTourImage(title)) {
             img.classList.add("help-tour-image");
