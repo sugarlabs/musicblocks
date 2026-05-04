@@ -237,6 +237,7 @@ describe("ProgramBlocks", () => {
 
         test("handles network error", async () => {
             global.fetch = jest.fn().mockRejectedValue(new Error("Network error"));
+            logo.turtleHeaps.testHeap = ["old-item"];
 
             const block = getBlock("loadHeapFromApp");
             block.flow(["testHeap", "http://test.com"], logo, 0, 1);
@@ -244,7 +245,8 @@ describe("ProgramBlocks", () => {
             // Wait for the async fetch to complete
             await new Promise(resolve => setTimeout(resolve, 0));
 
-            // Should not throw, error is handled gracefully
+            expect(activity.errorMsg).toHaveBeenCalledWith("Failed to load plugin from URL", 1);
+            expect(logo.turtleHeaps.testHeap).toEqual(["old-item"]);
             expect(global.fetch).toHaveBeenCalled();
         });
     });

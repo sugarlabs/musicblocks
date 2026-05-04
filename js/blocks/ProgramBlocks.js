@@ -109,6 +109,9 @@ function setupProgramBlocks(activity) {
                 })
                 .catch(error => {
                     console.debug("Fetch error:", error);
+                    if (error?.message !== "Network response was not ok") {
+                        activity.errorMsg(_("Failed to load plugin from URL"), blk);
+                    }
                     logo.turtleHeaps[name] = oldHeap;
                 });
         }
