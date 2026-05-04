@@ -74,12 +74,20 @@ beforeAll(() => {
 describe("PlanetInterface", () => {
     let planetInterface;
 
-    beforeEach(() => {
+    // beforeEach(() => {
+    //     planetInterface = new PlanetInterface(mockActivity);
+    //     mockActivity.errorMsg.mockClear();
+    // });
+        beforeEach(() => {
+        jest.useFakeTimers();
         planetInterface = new PlanetInterface(mockActivity);
         mockActivity.errorMsg.mockClear();
     });
 
-    test("hideMusicBlocks hides relevant elements and disables DOM events", () => {
+        afterEach(() => {
+        jest.useRealTimers();
+    });
+        test("hideMusicBlocks hides relevant elements and disables DOM events", () => {
         planetInterface.hideMusicBlocks();
 
         expect(mockActivity.hideSearchWidget).toHaveBeenCalled();
