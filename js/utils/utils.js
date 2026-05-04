@@ -86,8 +86,8 @@ const changeImage = (imgElement, from, to) => {
 
 const getUtilsLocalStorageItemSafely = (key, fallback = null) => {
     try {
-        const value = localStorage.getItem(key);
-        return value === null ? fallback : value;
+        const value = localStorage.getItem(key) ?? fallback;
+        return value;
     } catch (e) {
         return fallback;
     }
