@@ -273,10 +273,6 @@ describe("Utility Functions (logic-only)", () => {
         });
     });
 
-    /**
-     * @author Alok Dangre
-     * @copyright 2026 Alok Dangre
-     */
     describe("format() function logic", () => {
         it("should replace simple placeholders", () => {
             const result = format("Hello {name}!", { name: "World" });
@@ -302,24 +298,6 @@ describe("Utility Functions (logic-only)", () => {
             const result = format("Static text", {});
             expect(result).toBe("Static text");
         });
-        /**
-         * @license
-         * MusicBlocks v3.4.1
-         * Copyright (C) 2024 ravjot07
-         *
-         * This program is free software: you can redistribute it and/or modify
-         * it under the terms of the GNU Affero General Public License as published by
-         * the Free Software Foundation, either version 3 of the License, or
-         * (at your option) any later version.
-         *
-         * This program is distributed in the hope that it will be useful,
-         * but WITHOUT ANY WARRANTY; without even the implied warranty of
-         * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-         * GNU Affero General Public License for more details.
-         *
-         * You should have received a copy of the GNU Affero General Public License
-         * along with this program. If not, see <https://www.gnu.org/licenses/>.
-         */
 
         describe("toTitleCase()", () => {
             it("converts first character to uppercase", () => {
@@ -449,10 +427,6 @@ describe("Utility Functions (logic-only)", () => {
             });
         });
 
-        /**
-         * @author Alok Dangre
-         * @copyright 2026 Alok Dangre
-         */
         describe("format() function logic", () => {
             it("should replace simple placeholders", () => {
                 const result = format("Hello {name}!", { name: "World" });
