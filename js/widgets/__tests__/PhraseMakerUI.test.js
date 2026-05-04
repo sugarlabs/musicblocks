@@ -300,7 +300,7 @@ describe("PhraseMakerUI", () => {
 
             PhraseMakerUI.updateNoteCellVisual(pm, cell, true);
 
-            expect(cell.textContent).toBe("\u2713");
+            expect(cell.textContent).toBe("\u00a0\u2713");
         });
 
         test("sets inactive cell background to rhythmcellcolor", () => {
@@ -341,7 +341,7 @@ describe("PhraseMakerUI", () => {
 
             PhraseMakerUI.updateNoteCellVisual(pm, cell, true);
             expect(cell.style.backgroundColor).toBe("rgb(139, 195, 74)");
-            expect(cell.textContent).toBe("\u2713");
+            expect(cell.textContent).toBe("\u00a0\u2713");
 
             PhraseMakerUI.updateNoteCellVisual(pm, cell, false);
             expect(cell.style.backgroundColor).toBe("rgb(255, 255, 255)");

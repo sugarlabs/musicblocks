@@ -2797,10 +2797,8 @@ function MusicKeyboard(activity) {
         blackRow[0].style.borderSpacing = "0px 0px 20px";
         blackRow[0].style.borderCollapse = "separate";
 
-        let myNode = document.getElementById("myrow");
-        myNode.replaceChildren();
-        myNode = document.getElementById("myrow2");
-        myNode.replaceChildren();
+        whiteRow.replaceChildren();
+        blackRowElement.replaceChildren();
 
         // For the button callbacks
 

@@ -158,7 +158,7 @@ const PhraseMakerUI = {
 
         if (isActive) {
             cell.style.backgroundColor = pm.platformColor.selectorBackground;
-            cell.textContent = "\u2713"; // checkmark
+            cell.textContent = "\u00a0\u2713"; // checkmark
         } else {
             cell.style.backgroundColor = pm.platformColor.rhythmcellcolor;
             cell.textContent = "";

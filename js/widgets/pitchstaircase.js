@@ -63,7 +63,7 @@ class PitchStaircase {
             document.createTextNode("\u00a0\u00a0"),
             (() => {
                 const img = document.createElement("img");
-                img.src = "header-icons/play-button.svg";
+                img.src = "header-icons/" + icon;
                 img.title = label;
                 img.alt = label;
                 img.height = iconSize;
@@ -103,7 +103,7 @@ class PitchStaircase {
          * the first column and a table of buttons in the second column.
          */
         const pscTable = this._pscTable;
-        pscTable.innerHTML = "";
+        pscTable.replaceChildren();
         pscTable.style.textAlign = "center";
 
         for (let i = 0; i < this.Stairs.length; i++) {
