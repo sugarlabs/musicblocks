@@ -461,10 +461,12 @@ class HelpWidget {
         bodyFragment.append(imageP);
 
         const heading = document.createElement("h1");
+        heading.classList.add("heading");
         heading.textContent = HELPCONTENT[page][0];
         bodyFragment.append(heading);
 
         const description = document.createElement("p");
+        description.classList.add("description");
         const descParts = HELPCONTENT[page][1].split(/<br\s*\/?>/i);
         descParts.forEach((part, index) => {
             description.append(document.createTextNode(part));

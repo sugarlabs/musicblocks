@@ -159,9 +159,11 @@ const PhraseMakerUI = {
         if (isActive) {
             cell.style.backgroundColor = pm.platformColor.selectorBackground;
             cell.textContent = "\u00a0\u2713"; // checkmark
+            cell.className = "active";
         } else {
             cell.style.backgroundColor = pm.platformColor.rhythmcellcolor;
             cell.textContent = "";
+            cell.className = "";
         }
     },
 
