@@ -282,9 +282,13 @@
                     <span id="printTextContent"></span>
                     <img
                         class="msgCloseIcon"
+                        role="button"
+                        tabindex="0"
+                        aria-label="Close notification"
                         onclick="hidePrintText()"
+                        onkeydown="if(event.key==='Enter'||event.key===' ')hidePrintText()"
                         src="images/close.svg"
-                        alt="Close"
+                        alt="Close notification"
                     />
                 </div>
             </div>
@@ -310,9 +314,13 @@
                     <span id="errorTextContent"></span>
                     <img
                         class="msgCloseIcon"
+                        role="button"
+                        tabindex="0"
+                        aria-label="Close error notification"
                         onclick="hideErrorText()"
+                        onkeydown="if(event.key==='Enter'||event.key===' ')hideErrorText()"
                         src="images/close.svg"
-                        alt="Close"
+                        alt="Close error notification"
                     />
                 </div>
             </div>
