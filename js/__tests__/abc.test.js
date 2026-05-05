@@ -221,38 +221,46 @@ describe("processABCNotes - Tuplet Handling", () => {
         logo = { notationNotes: { 0: "" }, notation: { notationStaging: { 0: [] } } };
     });
 
-    it("should process standard tuplets correctly", () => {
-        logo.notation.notationStaging["0"] = [
-            [["G♯4"], 4, 0, 3, 2, -1, false],
-            [["F4"], 4, 0, 3, 2, -1, false],
-            [["G♯4"], 4, 0, 3, 2, -1, false]
-        ];
-
+    test.each([
+        {
+            desc: "standard tuplets",
+            staging: [
+                [["G♯4"], 4, 0, 3, 2, -1, false],
+                [["F4"], 4, 0, 3, 2, -1, false],
+                [["G♯4"], 4, 0, 3, 2, -1, false]
+            ],
+            expected: "(1:1G^ 2G^ 2G^ 2 "
+        },
+        {
+            desc: "chords inside tuplets",
+            staging: [[["C4", "E4"], 4, 0, 1, 1, -1, false]],
+            expected: "[C E ]"
+        },
+        {
+            desc: "staccato inside tuplets",
+            staging: [[["C4", "E4"], 4, 0, 1, 1, -1, true]],
+            expected: "."
+        },
+        {
+            desc: "incomplete tuplets",
+            staging: [
+                [["A4"], 4, 0, 3, 2, -1, false],
+                [["B4"], 4, 0, 3, 2, -1, false]
+            ],
+            expected: "("
+        },
+        {
+            desc: "mixed tuplet values",
+            staging: [
+                [["A4"], 4, 0, 3, 2, -1, false],
+                [["B4"], 4, 0, 5, 2, -1, false]
+            ],
+            expected: "("
+        }
+    ])("should handle $desc correctly", ({ staging, expected }) => {
+        logo.notation.notationStaging["0"] = staging;
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(1:1G^ 2G^ 2G^ 2 ");
-    });
-
-    it("should handle array of notes (chords) inside tuplets", () => {
-        logo.notation.notationStaging["0"] = [[["C4", "E4"], 4, 0, 1, 1, -1, false]];
-
-        processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toContain("[C E ]");
-    });
-
-    it("should handle staccato inside tuplets", () => {
-        logo.notation.notationStaging["0"] = [[["C4", "E4"], 4, 0, 1, 1, -1, true]];
-
-        processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toContain(".");
-    });
-
-    it("should handle incomplete/mixed tuplets logic", () => {
-        logo.notation.notationStaging["0"] = [
-            [["A4"], 4, 0, 3, 2, -1, false],
-            [["B4"], 4, 0, 3, 2, -1, false]
-        ];
-        processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toContain("(");
+        expect(logo.notationNotes["0"]).toContain(expected);
     });
 
     it("should handle tuplet with matching chord IDs (skip logic)", () => {
@@ -260,6 +268,17 @@ describe("processABCNotes - Tuplet Handling", () => {
             [["A4"], 4, 0, 2, 2, 100, false],
             [["B4"], 4, 0, 2, 2, 100, false],
             [["C4"], 4, 0, 2, 2, -1, false]
+        ];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).not.toBe("");
+    });
+
+    it("should handle closing parenthesis in notation staging", () => {
+        logo.notation.notationStaging["0"] = [
+            [["C4"], 4, 0, 3, 2, -1, false],
+            [["D4"], 4, 0, 3, 2, -1, false],
+            [["E4"], 4, 0, 3, 2, -1, false],
+            ")"
         ];
         processABCNotes(logo, "0");
         expect(logo.notationNotes["0"]).not.toBe("");
@@ -277,24 +296,6 @@ describe("processABCNotes - Edge Cases for 100% Coverage", () => {
         logo.notation.notationStaging["0"] = [[["C4", "E4"], 4, 0, null, null, -1, false]];
         processABCNotes(logo, "0");
         expect(logo.notationNotes["0"]).toContain("C4");
-    });
-    it("should handle incomplete tuplets with different tuplet values", () => {
-        logo.notation.notationStaging["0"] = [
-            [["A4"], 4, 0, 3, 2, -1, false],
-            [["B4"], 4, 0, 5, 2, -1, false]
-        ];
-        processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toContain("(");
-    });
-    it("should handle closing parenthesis in notation staging", () => {
-        logo.notation.notationStaging["0"] = [
-            [["C4"], 4, 0, 3, 2, -1, false],
-            [["D4"], 4, 0, 3, 2, -1, false],
-            [["E4"], 4, 0, 3, 2, -1, false],
-            ")"
-        ];
-        processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).not.toBe("");
     });
     it("should handle chords with multiple notes outside tuplets", () => {
         logo.notation.notationStaging["0"] = [[["C4", "E4", "G4"], 4, 0, null, null, -1, false]];
@@ -347,26 +348,6 @@ describe("saveAbcOutput", () => {
 
         expect(result).toContain("K:Bb MAJOR");
         expect(result).toContain("b");
-    });
-});
-
-describe("processABCNotes - Tuplet Handling", () => {
-    it("should process tuplets correctly", () => {
-        const logo = {
-            notationNotes: { 0: "" },
-            notation: {
-                notationStaging: {
-                    0: [
-                        [["G♯4"], 4, 0, 3, 2, -1, false],
-                        [["F4"], 4, 0, 3, 2, -1, false],
-                        [["G♯4"], 4, 0, 3, 2, -1, false]
-                    ]
-                }
-            }
-        };
-
-        processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(1:1G^ 2G^ 2G^ 2 ");
     });
 });
 
