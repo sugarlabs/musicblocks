@@ -99,30 +99,44 @@ class StatsWindow {
         this.activity.loading = true;
         document.body.style.cursor = "wait";
 
-        let myRadarChart = null;
-        const scores = analyzeProject(this.activity);
-        runAnalytics(this.activity);
-        const data = scoreToChartData(scores);
-        const __callback = () => {
-            const imageData = myRadarChart.toBase64Image();
-            const img = new Image();
-            img.src = imageData;
-            if (this.widgetWindow.isMaximized()) {
-                img.width = this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 80;
-            } else {
-                img.width = 200;
-            }
-            this.widgetWindow.getWidgetBody().appendChild(img);
-            this.activity.blocks.hideBlocks();
-            this.activity.showBlocksAfterRun = false;
-            document.body.style.cursor = "default";
-        };
-        const options = getChartOptions(__callback);
-        myRadarChart = new window.Chart(ctx).Radar(data, options);
+        try {
+            let myRadarChart = null;
+            const scores = analyzeProject(this.activity);
+            runAnalytics(this.activity);
+            const data = scoreToChartData(scores);
+            const __callback = () => {
+                const imageData = myRadarChart.toBase64Image();
+                const img = new Image();
+                img.src = imageData;
+                if (this.widgetWindow.isMaximized()) {
+                    img.width =
+                        this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 80;
+                } else {
+                    img.width = 200;
+                }
+                this.widgetWindow.getWidgetBody().appendChild(img);
+                this.activity.blocks.hideBlocks();
+                this.activity.showBlocksAfterRun = false;
+            };
+            const options = getChartOptions(__callback);
+            myRadarChart = new window.Chart(ctx).Radar(data, options);
 
-        this.jsonObject = document.createElement("ul");
-        this.jsonObject.style.float = "left";
-        this.widgetWindow.getWidgetBody().appendChild(this.jsonObject);
+            this.jsonObject = document.createElement("ul");
+            this.jsonObject.style.float = "left";
+            this.widgetWindow.getWidgetBody().appendChild(this.jsonObject);
+        } catch (err) {
+            console.error("Analysis failed:", err);
+            if (this.activity.errorMsg) {
+                const msg =
+                    typeof window._ === "function"
+                        ? window._("Analysis failed. Please check your project for errors.")
+                        : "Analysis failed. Please check your project for errors.";
+                this.activity.errorMsg(msg);
+            }
+        } finally {
+            this.activity.loading = false;
+            document.body.style.cursor = "default";
+        }
     }
 
     /**

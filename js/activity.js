@@ -9072,7 +9072,8 @@ class Activity {
     saveLocally() {
         try {
             localStorage.setItem("beginnerMode", this.beginnerMode.toString());
-            localStorage.setItem("themePreference", this.themePreference.toString());
+            const activeTheme = this.themeBox ? this.themeBox._theme : (this.storage.themePreference || "light");
+            localStorage.setItem("themePreference", activeTheme);
         } catch (e) {
             console.error("Error saving to localStorage:", e);
         }
