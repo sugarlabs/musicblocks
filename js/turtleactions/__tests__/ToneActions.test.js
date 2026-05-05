@@ -266,6 +266,8 @@ describe("setupToneActions", () => {
                 1
             );
             expect(activity.logo.stopTurtle).toBe(true);
+            expect(targetTurtle.singer.vibratoIntensity).toEqual([]);
+            expect(targetTurtle.singer.vibratoRate).toEqual([]);
         });
 
         it("should show error for invalid vibrato rate", () => {
@@ -275,6 +277,7 @@ describe("setupToneActions", () => {
                 1
             );
             expect(activity.logo.stopTurtle).toBe(true);
+            expect(targetTurtle.singer.vibratoRate).toEqual([]);
         });
 
         it("should use last vibrato intensity in timbre mode", () => {
