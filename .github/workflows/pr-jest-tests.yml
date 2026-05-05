@@ -34,12 +34,43 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Run Jest Tests
+      - name: Run Jest Tests (PR)
         id: jest
         run: |
           npm test -- --coverage --json --outputFile=jest-results.json || echo "TESTS_FAILED=true" >> $GITHUB_ENV
-          COVERAGE=$(node -e "const s=require('./coverage/coverage-summary.json').total;console.log('Statements: '+s.statements.pct+'% | Branches: '+s.branches.pct+'% | Functions: '+s.functions.pct+'% | Lines: '+s.lines.pct+'%');" 2>/dev/null || echo "Coverage summary unavailable")
-          echo "COVERAGE_SUMMARY=$COVERAGE" >> $GITHUB_ENV
+          cp coverage/coverage-summary.json pr-coverage.json 2>/dev/null || echo "{}" > pr-coverage.json
+
+      - name: Run Jest Tests (base branch)
+        run: |
+          git fetch origin ${{ github.event.pull_request.base.ref }}:base-branch
+          git worktree add base-copy base-branch
+          cd base-copy
+          npm ci
+          npm test -- --coverage || true
+          cp coverage/coverage-summary.json ../base-coverage.json 2>/dev/null || echo "{}" > ../base-coverage.json
+          cd ..
+
+      - name: Compare coverage (delta check)
+        run: |
+          node -e "
+            const fs = require('fs');
+            const readJson = (p) => { try { return JSON.parse(fs.readFileSync(p, 'utf8')).total || {}; } catch (e) { return {}; } };
+            const pr = readJson('pr-coverage.json');
+            const base = readJson('base-coverage.json');
+            let dropped = false;
+            const lines = [];
+            for (const metric of ['statements','branches','functions','lines']) {
+              const prPct = (pr[metric] && pr[metric].pct) || 0;
+              const basePct = (base[metric] && base[metric].pct) || 0;
+              const delta = (prPct - basePct).toFixed(2);
+              let arrow = '→';
+              if (prPct < basePct) { dropped = true; arrow = '↓'; }
+              else if (prPct > basePct) { arrow = '↑'; }
+              lines.push('- **' + metric + '**: ' + basePct + '% ' + arrow + ' ' + prPct + '% (Δ ' + delta + '%)');
+            }
+            fs.appendFileSync(process.env.GITHUB_ENV, 'COVERAGE_DROPPED=' + dropped + '\n');
+            fs.appendFileSync(process.env.GITHUB_ENV, 'DELTA_REPORT<<EOF\n' + lines.join('\n') + '\nEOF\n');
+          "
 
       - name: Read Jest Results
         id: results
@@ -77,13 +108,13 @@ jobs:
           # Generate content for the comment file
           {
             if [ "$TESTS_PASSED" = "true" ]; then
-              echo "✅ All Jest tests passed! This PR is ready to merge."
-              echo ""
-              echo "**Coverage:** $COVERAGE_SUMMARY"
+              if [ "$COVERAGE_DROPPED" = "true" ]; then
+                echo "❌ Coverage dropped compared to \`${{ github.event.pull_request.base.ref }}\`. Please add tests for new code."
+              else
+                echo "✅ All Jest tests passed and coverage did not drop."
+              fi
             else
               echo "❌ Some Jest tests failed. Please check the logs and fix the issues before merging."
-              echo ""
-              echo "**Coverage:** $COVERAGE_SUMMARY"
               echo ""
               echo "**Failed Tests:**"
               echo ""
@@ -91,6 +122,9 @@ jobs:
               echo "$FAILED_TESTS"
               echo '```'
             fi
+            echo ""
+            echo "### 📊 Coverage vs \`${{ github.event.pull_request.base.ref }}\`"
+            echo "$DELTA_REPORT"
           } > "$COMMENT_FILE"
 
       - name: PR comment
@@ -99,3 +133,9 @@ jobs:
           file-path: ${{ steps.results.outputs.COMMENT_FILE }}
           pr-number: ${{ steps.results.outputs.PR_NUMBER }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fail if coverage dropped
+        if: env.COVERAGE_DROPPED == 'true'
+        run: |
+          echo "::error::Coverage dropped compared to the base branch. See PR comment for details."
+          exit 1
