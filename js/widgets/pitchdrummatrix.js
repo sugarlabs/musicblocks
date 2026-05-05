@@ -369,7 +369,7 @@ class PitchDrumMatrix {
             }
         };
 
-        activity.textMsg(_("Click in the grid to map notes to drums."), 3000);
+        this.activity.textMsg(_("Click in the grid to map notes to drums."), 3000);
     }
 
     /**
@@ -716,7 +716,7 @@ class PitchDrumMatrix {
             }, pairs.length * 1000);
         } else {
             if (!this.widgetWindow._maximized) {
-                activity.textMsg(_("Click in the grid to map notes to drums."), 3000);
+                this.activity.textMsg(_("Click in the grid to map notes to drums."), 3000);
             }
             icon.textContent = "\u00A0\u00A0";
             const img = document.createElement("img");

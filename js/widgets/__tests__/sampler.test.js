@@ -188,6 +188,7 @@ describe("Sampler Widget", () => {
                 windowFor: jest.fn(() => widgetWindow)
             };
             mockActivity = {
+                errorMsg: jest.fn(),
                 logo: {
                     synth: {
                         trigger: jest.fn(),
@@ -528,6 +529,7 @@ describe("Sampler Widget", () => {
             widget.activity = {
                 blocks: { loadNewBlocks: jest.fn() }
             };
+            widget.activity.textMsg = jest.fn();
             global.activity = { textMsg: jest.fn() };
             widget.sampleName = "sample";
             widget.sampleData = "data";
@@ -541,7 +543,7 @@ describe("Sampler Widget", () => {
 
             expect(widget._addSample).toHaveBeenCalled();
             expect(widget.activity.blocks.loadNewBlocks).toHaveBeenCalled();
-            expect(global.activity.textMsg).toHaveBeenCalled();
+            expect(widget.activity.textMsg).toHaveBeenCalled();
 
             const saveSpy = jest.spyOn(widget, "__save");
             widget._saveSample();

@@ -306,7 +306,7 @@ class MeterWidget {
             this.activity.logo.runLogoCommands(widgetBlock);
         };
 
-        activity.textMsg(_("Click in the circle to select strong beats for the meter."), 3000);
+        this.activity.textMsg(_("Click in the circle to select strong beats for the meter."), 3000);
         widgetWindow.sendToCenter();
         this._scale.call(this.widgetWindow);
     }
