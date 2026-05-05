@@ -103,14 +103,14 @@ describe("Toolbar Class", () => {
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ true", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = true;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(141);
+        expect(global._).toHaveBeenCalledTimes(143);
         expect(global._).toHaveBeenNthCalledWith(1, "About Music Blocks");
     });
 
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ false", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = false;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(123);
+        expect(global._).toHaveBeenCalledTimes(125);
         expect(global._).toHaveBeenNthCalledWith(1, "About Turtle Blocks");
     });
 
@@ -381,6 +381,16 @@ describe("Toolbar Class", () => {
         toolbar.renderLoadIcon(mockOnClick);
         expect(loadIcon.onclick).toBeInstanceOf(Function);
         loadIcon.onclick();
+        expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity);
+    });
+
+    test("renderCenterWorkspaceIcon sets onclick", () => {
+        const centerIcon = { onclick: null };
+        global.docById.mockReturnValue(centerIcon);
+        const mockOnClick = jest.fn();
+        toolbar.renderCenterWorkspaceIcon(mockOnClick);
+        expect(centerIcon.onclick).toBeInstanceOf(Function);
+        centerIcon.onclick();
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity);
     });
 

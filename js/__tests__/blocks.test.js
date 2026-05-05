@@ -193,4 +193,87 @@ describe("Blocks Foundation", () => {
             expect(Array.isArray(blocks.trashStacks)).toBe(true);
         });
     });
+
+    describe("centerWorkspace", () => {
+        let blocks;
+
+        beforeEach(() => {
+            blocks = new Blocks(mockActivity);
+            mockActivity.toolbarHeight = 50;
+            blocks.setBlockScale = jest.fn().mockResolvedValue();
+        });
+
+        it("should reset pan/zoom if no active blocks exist", async () => {
+            await blocks.centerWorkspace();
+
+            expect(mockActivity.blocksContainer.x).toBe(0);
+            expect(mockActivity.blocksContainer.y).toBe(0);
+            expect(blocks.setBlockScale).toHaveBeenCalledWith(global.DEFAULTBLOCKSCALE);
+        });
+
+        it("should calculate bounding box and adjust scale and pan", async () => {
+            const block1 = {
+                container: { x: 100, y: 100 },
+                width: 200,
+                height: 50,
+                trash: false,
+                visible: true
+            };
+            const block2 = {
+                container: { x: 400, y: 500 },
+                width: 100,
+                height: 100,
+                trash: false,
+                visible: true
+            };
+            const block3 = {
+                container: { x: 0, y: 0 },
+                width: 1000,
+                height: 1000,
+                trash: true,
+                visible: true
+            };
+
+            blocks.blockList = [block1, block2, block3];
+            blocks.blockScale = 1.0;
+
+            await blocks.centerWorkspace();
+
+            expect(blocks.setBlockScale).toHaveBeenCalledWith(1.0);
+
+            // Pan calc:
+            // x = (1200 - 600) / 2 = 300
+            // y = (900 + 50 - 700) / 2 = 125
+            expect(mockActivity.blocksContainer.x).toBe(300);
+            expect(mockActivity.blocksContainer.y).toBe(125);
+            expect(mockActivity.refreshCanvas).toHaveBeenCalled();
+        });
+
+        it("should zoom out for large projects", async () => {
+            const block1 = {
+                container: { x: 0, y: 0 },
+                width: 100,
+                height: 100,
+                trash: false,
+                visible: true
+            };
+            const block2 = {
+                container: { x: 2000, y: 2000 },
+                width: 100,
+                height: 100,
+                trash: false,
+                visible: true
+            };
+
+            blocks.blockList = [block1, block2];
+            blocks.blockScale = 1.0;
+
+            await blocks.centerWorkspace();
+
+            expect(blocks.setBlockScale).toHaveBeenCalled();
+            const calledScale = blocks.setBlockScale.mock.calls[0][0];
+            expect(calledScale).toBeLessThan(1.0);
+            expect(calledScale).toBeCloseTo(0.386, 2);
+        });
+    });
 });

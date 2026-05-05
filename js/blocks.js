@@ -7505,6 +7505,82 @@ class Blocks {
                 );
             });
         };
+
+        /**
+         * Center the workspace so that all active blocks are visible.
+         * @public
+         * @returns {void}
+         */
+        this.centerWorkspace = async () => {
+            let minX = Infinity;
+            let maxX = -Infinity;
+            let minY = Infinity;
+            let maxY = -Infinity;
+            let activeBlocksCount = 0;
+
+            for (const block of this.blockList) {
+                if (!block.trash && block.visible) {
+                    const x = block.container.x;
+                    const y = block.container.y;
+                    const w = block.width;
+                    const h = block.height;
+
+                    minX = Math.min(minX, x);
+                    maxX = Math.max(maxX, x + w);
+                    minY = Math.min(minY, y);
+                    maxY = Math.max(maxY, y + h);
+                    activeBlocksCount++;
+                }
+            }
+
+            if (activeBlocksCount === 0) {
+                // If no blocks, reset to default zoom/pan
+                this.activity.blocksContainer.x = 0;
+                this.activity.blocksContainer.y = 0;
+                await this.setBlockScale(DEFAULTBLOCKSCALE);
+                return;
+            }
+
+            const padding = 50;
+            const projectWidth = maxX - minX + padding * 2;
+            const projectHeight = maxY - minY + padding * 2;
+
+            const canvasWidth = this.activity.canvas.width;
+            const canvasHeight = this.activity.canvas.height;
+
+            const scaleX = canvasWidth / projectWidth;
+            const scaleY = (canvasHeight - this.activity.toolbarHeight) / projectHeight;
+            let targetScale = Math.min(scaleX, scaleY) * this.blockScale;
+
+            // Clamp targetScale to a maximum of 1.0x
+            targetScale = Math.min(targetScale, 1.0);
+
+            // Adjust zoom
+            await this.setBlockScale(targetScale);
+
+            // Re-calculate bounds after scaling as adjustDocks might have shifted blocks
+            minX = Infinity;
+            maxX = -Infinity;
+            minY = Infinity;
+            maxY = -Infinity;
+
+            for (const block of this.blockList) {
+                if (!block.trash && block.visible) {
+                    minX = Math.min(minX, block.container.x);
+                    maxX = Math.max(maxX, block.container.x + block.width);
+                    minY = Math.min(minY, block.container.y);
+                    maxY = Math.max(maxY, block.container.y + block.height);
+                }
+            }
+
+            // Center the project
+            this.activity.blocksContainer.x =
+                (canvasWidth - (maxX + minX)) / 2;
+            this.activity.blocksContainer.y =
+                (canvasHeight + this.activity.toolbarHeight - (maxY + minY)) / 2;
+
+            this.activity.refreshCanvas();
+        };
     }
 }
 // Export Blocks
