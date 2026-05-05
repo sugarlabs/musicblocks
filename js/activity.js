@@ -548,9 +548,16 @@ class Activity {
                     if (this.stageDirty || hasActiveTweens || hasActiveGifs) {
                         this.stage.update();
                         this.stageDirty = false;
+                        // Continue the loop only if there's work to do
+                        this._renderLoopRafId = requestAnimationFrame(renderLoop);
+                    } else {
+                        // Nothing to render — let the loop go idle
+                        this._renderLoopRunning = false;
+                        this._renderLoopRafId = null;
                     }
+                } else {
+                    this._renderLoopRafId = requestAnimationFrame(renderLoop);
                 }
-                this._renderLoopRafId = requestAnimationFrame(renderLoop);
             };
 
             this._renderLoopRafId = requestAnimationFrame(renderLoop);
@@ -4415,6 +4422,8 @@ class Activity {
                 ) {
                     this.saveLocally();
                 }
+                // Pause render loop while tab is hidden
+                this._stopRenderLoop();
                 return;
             }
 
@@ -4426,6 +4435,9 @@ class Activity {
                     this._onResize(false);
                 }, 250);
             }
+            // Resume render loop when tab becomes visible again
+            this.stageDirty = true;
+            this._startRenderLoop();
         };
         this.addEventListener(document, "visibilitychange", this._handleVisibilityChange);
 
