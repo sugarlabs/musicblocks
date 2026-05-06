@@ -117,13 +117,38 @@ function hideOnClickOutside(eles, other) {
 }
 
 function updateCheckboxes(id) {
-    const elements = document.getElementById(id).querySelectorAll("input:checked");
-    const urlel = document.getElementById(id).querySelectorAll("input[type=text]")[0];
+    const sharebox = document.getElementById(id);
+    if (!sharebox) return;
+
+    const elements = sharebox.querySelectorAll("input:checked");
+    const urlel = sharebox.querySelector("input[type=text]");
+    if (!urlel) return;
+
     let url = urlel.getAttribute("data-originalurl");
 
     for (let i = 0; i < elements.length; i++) url += `&${elements[i].name}=True`;
 
     urlel.value = url;
+
+    // Sync the clipboard data attribute so clicking the copy icon copies the updated URL
+    const copyBtn = sharebox.querySelector(".copyshareurl");
+    if (copyBtn) {
+        copyBtn.setAttribute("data-clipboard-text", url);
+    }
+
+    // Update social share buttons
+    const projectName = sharebox.getAttribute("data-projectname") || "this Music Blocks project";
+    const socialText = `Check out ${projectName} on Music Blocks!`;
+
+    const twitterBtn = sharebox.querySelector(".share-twitter");
+    if (twitterBtn) {
+        twitterBtn.href = `https://x.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(socialText)}`;
+    }
+
+    const whatsappBtn = sharebox.querySelector(".share-whatsapp");
+    if (whatsappBtn) {
+        whatsappBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(socialText + " " + url)}`;
+    }
 }
 
 $(document).ready(() => {
@@ -151,3 +176,9 @@ $(document).ready(() => {
         toggleText("view-more-chips", showMore, showLess);
     });
 });
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        updateCheckboxes
+    };
+}
