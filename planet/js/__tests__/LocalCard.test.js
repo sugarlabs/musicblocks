@@ -42,6 +42,7 @@ function makeMockPlanet(overrides = {}) {
         LocalPlanet: {
             ProjectTable: {},
             openProject: jest.fn(),
+            mergeProject: jest.fn(),
             openDeleteModal: jest.fn(),
             Publisher: { open: jest.fn() },
             updateProjects: jest.fn()
@@ -194,12 +195,12 @@ describe("LocalCard", () => {
             expect(planet.LocalPlanet.openProject).toHaveBeenCalledWith("p7");
         });
 
-        it("should call openProject when the merge button is clicked", () => {
+        it("should call mergeProject when the merge button is clicked", () => {
             const card = prepareCard("p8");
             card.render();
 
             document.getElementById("local-project-merge-p8").click();
-            expect(planet.LocalPlanet.openProject).toHaveBeenCalledWith("p8");
+            expect(planet.LocalPlanet.mergeProject).toHaveBeenCalledWith("p8");
         });
 
         it("should call openDeleteModal when the delete button is clicked", () => {
