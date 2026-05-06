@@ -75,10 +75,10 @@ function setupIntervalsActions(activity) {
          */
         static getTemperamentLength() {
             const currentTemperament = activity.logo.synth.inTemperament;
-            if (!currentTemperament) {
-                return 12; // Default fallback for tests/uninitialized state
-            }
-            return TEMPERAMENT[currentTemperament]["pitchNumber"];
+            return TEMPERAMENT[currentTemperament] &&
+                typeof TEMPERAMENT[currentTemperament].pitchNumber === "number"
+                ? TEMPERAMENT[currentTemperament].pitchNumber
+                : TEMPERAMENT.equal.pitchNumber;
         }
 
         /**

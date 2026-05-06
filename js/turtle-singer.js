@@ -320,7 +320,7 @@ class Singer {
             logo.synth.inTemperament
         );
 
-        if (isCustomTemperament(logo.synth.inTemperament)) {
+        if (isCustomTemperament(logo.synth.inTemperament) || getOctaveInterval(activity) !== 12) {
             noteObj = getNote(
                 noteObj[0],
                 noteObj[1],

@@ -58,6 +58,7 @@ const {
     TEMPERAMENT,
     getTemperamentsList,
     getTemperament,
+    getTemperamentPitchNumber,
     getTemperamentKeys,
     addTemperamentToList,
     addTemperamentToDictionary,
@@ -246,6 +247,17 @@ describe("Temperament Functions", () => {
         it("should return undefined for an invalid key", () => {
             const invalidTemperament = getTemperament("invalid");
             expect(invalidTemperament).toBeUndefined();
+        });
+    });
+
+    describe("getTemperamentPitchNumber", () => {
+        it("returns the active temperament pitch count", () => {
+            expect(getTemperamentPitchNumber("equal5")).toBe(5);
+            expect(getTemperamentPitchNumber("equal31")).toBe(31);
+        });
+
+        it("falls back to 12 for unknown temperaments", () => {
+            expect(getTemperamentPitchNumber("unknown temperament")).toBe(12);
         });
     });
 
@@ -1533,6 +1545,11 @@ describe("getStepSize", () => {
     it('should return the correct step size for "C" in "C major" with a non-standard temperament', () => {
         const result = _getStepSize("C major", "C", "up", 0, "just");
         expect(result).toBe(0);
+    });
+
+    it("maps scalar steps directly to temperament steps for non-12 EDO", () => {
+        expect(_getStepSize("C major", "C", "up", 3, "equal5")).toBe(3);
+        expect(_getStepSize("C major", "C", "down", 3, "equal5")).toBe(-3);
     });
 });
 
@@ -2834,6 +2851,16 @@ describe("numberToPitch additional temperament paths", () => {
         });
 
         expect(numberToPitch(12, "existing", "C4", 0)).toEqual(["Sa", 4]);
+    });
+
+    it("wraps predefined non-12 EDO pitch numbers by temperament length", () => {
+        expect(numberToPitch(0, "equal5", "C4", 0)).toEqual(["C", 4]);
+        expect(numberToPitch(5, "equal5", "C4", 0)).toEqual(["C", 5]);
+        expect(numberToPitch(6, "equal5", "C4", 0)).toEqual(["D" + FLAT, 5]);
+    });
+
+    it("handles negative predefined non-12 EDO pitch numbers", () => {
+        expect(numberToPitch(-1, "equal5", "C4", 0)).toEqual(["F" + SHARP, 3]);
     });
 });
 

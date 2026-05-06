@@ -184,10 +184,18 @@ function setupPitchActions(activity) {
             number = Math.abs(number);
 
             const obj = keySignatureToMode(tur.singer.keySignature);
+            const temperamentLength =
+                Singer.IntervalsActions &&
+                typeof Singer.IntervalsActions.getTemperamentLength === "function"
+                    ? Singer.IntervalsActions.getTemperamentLength()
+                    : 12;
             let modeLength;
 
-            if (isCustomTemperament(activity.logo.synth.inTemperament)) {
-                modeLength = Singer.IntervalsActions.getTemperamentLength();
+            if (
+                isCustomTemperament(activity.logo.synth.inTemperament) ||
+                temperamentLength !== 12
+            ) {
+                modeLength = temperamentLength;
             } else {
                 modeLength = MUSICALMODES[obj[1]].length;
             }

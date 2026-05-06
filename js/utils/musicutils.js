@@ -46,7 +46,7 @@ const _b64Cache = new Map();
   getFilterTypes, getOscillatorTypes, getDrumIcon, getDrumSynthName,
   getNoiseName, getNoiseIcon, getNoiseSynthName, getVoiceName,
   getVoiceIcon, getVoiceSynthName, getTemperamentKeys,
-  getTemperamentName, getStepSizeUp, getStepSizeDown, getModeLength,
+  getTemperamentName, getStepSizeUp, getStepSizeDown, getModeLength, getTemperamentPitchNumber,
   nthDegreeToPitch, getInterval, calcNoteValueToDisplay,
   durationToNoteValue, noteToFrequency, getSolfege, splitScaleDegree,
   getNumNote, calcOctave, calcOctaveInterval, isInt,
@@ -2340,6 +2340,19 @@ const getTemperament = entry => {
 };
 
 /**
+ * Get the number of pitches in a temperament octave.
+ * @function
+ * @param {string} temperament - The temperament name.
+ * @returns {number} The temperament pitch count, defaulting to 12.
+ */
+const getTemperamentPitchNumber = temperament => {
+    const temperamentDefinition = getTemperament(temperament);
+    return temperamentDefinition && typeof temperamentDefinition.pitchNumber === "number"
+        ? temperamentDefinition.pitchNumber
+        : TEMPERAMENT.equal.pitchNumber;
+};
+
+/**
  * Get the keys of the temperament dictionary.
  * @function
  * @returns {Array<string>} The keys of the temperament dictionary.
@@ -4012,16 +4025,24 @@ const numberToPitch = (i, temperament, startPitch, offset, activity) => {
     if (temperament === undefined) {
         temperament = "equal";
     }
+    if (startPitch === undefined) {
+        startPitch = "A0";
+    } else if (!/\d$/.test(startPitch)) {
+        startPitch += "0";
+    }
+    if (offset === undefined) {
+        offset = 0;
+    }
 
     let n = 0;
     let pitchNumber;
     if (i < 0) {
-        while (i < 0) {
-            i += 12;
-            n += 1; // Count octave bump ups.
-        }
-
         if (temperament === "equal") {
+            while (i < 0) {
+                i += 12;
+                n += 1; // Count octave bump ups.
+            }
+
             return [
                 PITCHES[(i + PITCHES.indexOf("A")) % 12],
                 Math.floor((i + PITCHES.indexOf("A")) / 12) - n
@@ -4040,11 +4061,12 @@ const numberToPitch = (i, temperament, startPitch, offset, activity) => {
         }
     }
 
+    const temperamentDefinition = TEMPERAMENT[temperament];
     let interval;
     if (isCustomTemperament(temperament)) {
         // The index may be outside of the octave.
         // Ensure the temperament exists in TEMPERAMENT before accessing it
-        if (!TEMPERAMENT[temperament] || !TEMPERAMENT[temperament]["pitchNumber"]) {
+        if (!temperamentDefinition || !temperamentDefinition["pitchNumber"]) {
             // Fallback to equal temperament if custom temperament is not found
             if (activity && activity.errorMsg) {
                 activity.errorMsg(
@@ -4054,19 +4076,22 @@ const numberToPitch = (i, temperament, startPitch, offset, activity) => {
             }
             temperament = "equal";
         }
-        const octaveLength = TEMPERAMENT[temperament]["pitchNumber"];
-        const pitchIdx = pitchNumber % octaveLength;
+        const octaveLength = getTemperamentPitchNumber(temperament);
+        const pitchIdx = ((pitchNumber % octaveLength) + octaveLength) % octaveLength;
         const octaveFactor = Math.floor(pitchNumber / octaveLength);
 
         pitchNumber = pitchIdx + "";
         if (TEMPERAMENT[temperament][pitchNumber] === undefined) {
             // If custom temperament is not defined, then it will
-            // store equal temperament notes.
-            for (let j = 0; j < 12; j++) {
+            // store notes from the active temperament's interval table.
+            const sourceTemperament = TEMPERAMENT[temperament].interval
+                ? TEMPERAMENT[temperament]
+                : TEMPERAMENT.equal;
+            for (let j = 0; j < octaveLength; j++) {
                 const number = "" + j;
-                interval = TEMPERAMENT["equal"]["interval"][j];
+                interval = sourceTemperament.interval[j] || sourceTemperament.interval[0];
                 TEMPERAMENT[temperament][number] = [
-                    Math.pow(2, j / 12),
+                    Math.pow(getOctaveRatio(), j / octaveLength),
                     getNoteFromInterval(startPitch, interval)[0],
                     getNoteFromInterval(startPitch, interval)[1]
                 ];
@@ -4082,8 +4107,13 @@ const numberToPitch = (i, temperament, startPitch, offset, activity) => {
             return [TEMPERAMENT[temperament][pitchNumber][1], o];
         }
     } else {
-        interval = TEMPERAMENT[temperament]["interval"][pitchNumber];
-        return getNoteFromInterval(startPitch, interval);
+        const octaveLength = getTemperamentPitchNumber(temperament);
+        const pitchIdx = ((pitchNumber % octaveLength) + octaveLength) % octaveLength;
+        const octaveFactor = Math.floor(pitchNumber / octaveLength);
+        const sourceTemperament = TEMPERAMENT[temperament] || TEMPERAMENT.equal;
+        interval = sourceTemperament.interval[pitchIdx] || sourceTemperament.interval[0];
+        const note = getNoteFromInterval(startPitch, interval);
+        return [note[0], note[1] + octaveFactor];
     }
 };
 
@@ -5059,9 +5089,14 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
     if (temperament === undefined) {
         temperament = "equal";
     }
-    if (isCustomTemperament(temperament)) {
-        //Scalar = Semitone for custom Temperament.
-        return transposition;
+    const temperamentDefinition = getTemperament(temperament);
+    if (!temperamentDefinition) {
+        return 0;
+    }
+    if (isCustomTemperament(temperament) || getTemperamentPitchNumber(temperament) !== 12) {
+        // Scalar steps map directly to temperament steps outside 12EDO.
+        const step = typeof transposition === "number" && transposition !== 0 ? transposition : 1;
+        return direction === "down" ? -Math.abs(step) : Math.abs(step);
     }
 
     let thisPitch = pitch;
@@ -6469,6 +6504,7 @@ if (typeof module !== "undefined" && module.exports) {
         getTemperamentsList,
         getTemperament,
         getTemperamentKeys,
+        getTemperamentPitchNumber,
         addTemperamentToList,
         deleteTemperamentFromList,
         addTemperamentToDictionary,
