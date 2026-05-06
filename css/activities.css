@@ -2233,3 +2233,40 @@ table {
     box-sizing: border-box;
   }
 }
+
+/* ======================================================
+   FIX: Toolbar Responsive Scrolling on Mobile
+   ====================================================== */
+@media screen and (max-width: 600px) {
+    nav .nav-wrapper, nav .blue.darken-1.nav-wrapper {
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+    nav ul.right, nav ul.left, nav ul.aux {
+        display: flex;
+        flex-wrap: nowrap;
+        margin: 0;
+    }
+    nav ul li {
+        display: inline-block;
+        float: none;
+    }
+    nav ul li a {
+        padding: 0 10px;
+        min-width: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    nav .material-icons.md-48 {
+        font-size: 40px;
+    }
+}
+
+/* ======================================================
+   FIX: Prevent Scroll When Dragging Blocks on Mobile
+   ====================================================== */
+#canvasHolder, #myCanvas, #canvas, #overlayCanvas {
+    touch-action: none;
+}
