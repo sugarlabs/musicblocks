@@ -2648,7 +2648,8 @@ class Blocks {
             if (this._topBlockCache === null || this._topBlockCache === undefined) {
                 this._topBlockCache = new Map();
                 for (let i = 0; i < this.blockList.length; i++) {
-                    if (this.blockList[i].trash) continue;
+                    const block = this.blockList[i];
+                    if (!block || block.trash) continue;
                     this._topBlockCache.set(i, this.findTopBlock(i));
                 }
             }
@@ -2658,7 +2659,7 @@ class Blocks {
 
             this._beginDeferCheckBounds();
             for (let i = 0; i < this.blockList.length; i++) {
-                if (this.blockList[i].trash) continue;
+                if (!this.blockList[i] || this.blockList[i].trash) continue;
                 if (this._topBlockCache.get(i) !== excludeTop) {
                     this.moveBlockRelativeBatched(i, dx, dy);
                 }
@@ -3063,11 +3064,9 @@ class Blocks {
         this.findStacks = () => {
             this.stackList = [];
             for (let i = 0; i < this.blockList.length; i++) {
-                if (this.blockList[i].trash) continue;
-                if (
-                    this.blockList[i].connections[0] === null ||
-                    this.blockList[i].connections[0] === undefined
-                ) {
+                const block = this.blockList[i];
+                if (!block || block.trash) continue;
+                if (block.connections[0] === null || block.connections[0] === undefined) {
                     this.stackList.push(i);
                 }
             }
@@ -3097,10 +3096,11 @@ class Blocks {
         this._findTwoArgs = () => {
             this._expandablesList = [];
             for (let i = 0; i < this.blockList.length; i++) {
-                if (this.blockList[i].trash) continue;
-                if (this.blockList[i].isArgBlock() && this.blockList[i].isExpandableBlock()) {
+                const block = this.blockList[i];
+                if (!block || block.trash) continue;
+                if (block.isArgBlock() && block.isExpandableBlock()) {
                     this._expandablesList.push(i);
-                } else if (this.blockList[i].isTwoArgBlock()) {
+                } else if (block.isTwoArgBlock()) {
                     this._expandablesList.push(i);
                 }
             }
@@ -3113,7 +3113,7 @@ class Blocks {
          */
         this._searchForArgFlow = () => {
             for (const [blk, block] of this.blockList.entries()) {
-                if (block.trash) continue;
+                if (!block || block.trash) continue;
                 if (block.isArgFlowClampBlock()) {
                     this._searchCounter = 0;
                     this._searchForExpandables(blk);

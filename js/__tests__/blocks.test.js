@@ -620,4 +620,39 @@ describe("Blocks Foundation", () => {
             expect(namedBoxBlock.container.updateCache).toHaveBeenCalled();
         });
     });
+
+    describe("Sparse Array Safety", () => {
+        it("should not throw TypeError in findStacks when blockList is sparse", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.blockList[1] = makeBlock("start", [null]);
+
+            expect(() => blocks.findStacks()).not.toThrow();
+            expect(blocks.stackList).toEqual([1]);
+        });
+
+        it("should not throw TypeError in moveAllBlocksExcept when blockList is sparse", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.blockList[1] = makeBlock("start", [null]);
+            blocks.findTopBlock = jest.fn().mockReturnValue(1);
+            blocks.moveBlockRelativeBatched = jest.fn();
+
+            expect(() => blocks.moveAllBlocksExcept(null, 10, 10)).not.toThrow();
+            expect(blocks.moveBlockRelativeBatched).toHaveBeenCalledWith(1, 10, 10);
+        });
+
+        it("should not throw TypeError in _findTwoArgs when blockList is sparse", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.blockList[1] = makeBlock("arg", [null], {
+                isArgBlock: jest.fn().mockReturnValue(true),
+                isExpandableBlock: jest.fn().mockReturnValue(true),
+                isTwoArgBlock: jest.fn().mockReturnValue(false)
+            });
+
+            expect(() => blocks._findTwoArgs()).not.toThrow();
+            expect(blocks._expandablesList).toEqual([1]);
+        });
+    });
 });
