@@ -61,6 +61,31 @@ const MINIMUMDOCKDISTANCE = 400;
 /** Soft limit on the number of blocks in a single stack. */
 const LONGSTACK = 300;
 
+/**
+ * Spatial grid cell size in pixels for O(1) nearest-dock lookups.
+ * Chosen so that MINIMUMDOCKDISTANCE (20px radius at default scale)
+ * is always covered by checking a block's cell plus its 8 neighbors.
+ */
+const SPATIAL_GRID_CELL_SIZE = 50;
+
+/**
+ * Lazy-initialized Sets for O(1) collapsible type checks in hot paths.
+ * Built on first access because the COLLAPSIBLES/INLINECOLLAPSIBLES
+ * globals may not yet exist at module parse time in test environments.
+ */
+let _collapsiblesSet = null;
+let _inlineCollapsiblesSet = null;
+
+function getCollapsiblesSet() {
+    if (!_collapsiblesSet) _collapsiblesSet = new Set(COLLAPSIBLES);
+    return _collapsiblesSet;
+}
+
+function getInlineCollapsiblesSet() {
+    if (!_inlineCollapsiblesSet) _inlineCollapsiblesSet = new Set(INLINECOLLAPSIBLES);
+    return _inlineCollapsiblesSet;
+}
+
 /** Special value flags to uniquely identify these media blocks. */
 const CAMERAVALUE = "##__CAMERA__##";
 const VIDEOVALUE = "##__VIDEO__##";
@@ -336,6 +361,12 @@ class Blocks {
         // Throttle timestamp for edge-scroll calls
         this._lastEdgeScrollTime = 0;
 
+        // --- Performance: spatial grid for O(1) nearest-dock lookup ---
+        // Maps "cellX,cellY" -> Set of block indices in that cell
+        this._spatialGrid = new Map();
+        // Tracks each block's current grid cell to avoid redundant updates
+        this._blockGridCell = new Map();
+
         /**
          * We stage deletion of prototype action blocks on the palette so
          * as to avoid palette refresh race conditions.
@@ -358,6 +389,79 @@ class Blocks {
          */
         this.clearLongPress = () => {
             this.inLongPress = false;
+        };
+
+        /**
+         * Updates the spatial grid position for a given block index.
+         * Called after any block position change to keep the grid current.
+         * @param {number} blkIdx - Index into blockList
+         */
+        this._updateSpatialGrid = blkIdx => {
+            const block = this.blockList[blkIdx];
+            if (!block || !block.container) return;
+
+            const cx = Math.floor(block.container.x / SPATIAL_GRID_CELL_SIZE);
+            const cy = Math.floor(block.container.y / SPATIAL_GRID_CELL_SIZE);
+            const newKey = cx + "," + cy;
+
+            const oldKey = this._blockGridCell.get(blkIdx);
+            if (oldKey === newKey) return;
+
+            // Remove from old cell
+            if (oldKey !== undefined) {
+                const oldSet = this._spatialGrid.get(oldKey);
+                if (oldSet) {
+                    oldSet.delete(blkIdx);
+                    if (oldSet.size === 0) this._spatialGrid.delete(oldKey);
+                }
+            }
+
+            // Add to new cell
+            let cellSet = this._spatialGrid.get(newKey);
+            if (!cellSet) {
+                cellSet = new Set();
+                this._spatialGrid.set(newKey, cellSet);
+            }
+            cellSet.add(blkIdx);
+            this._blockGridCell.set(blkIdx, newKey);
+        };
+
+        /**
+         * Returns block indices in the neighborhood of (x, y) using the
+         * spatial grid. Checks the target cell plus all 8 adjacent cells.
+         * @param {number} x - X coordinate in canvas space
+         * @param {number} y - Y coordinate in canvas space
+         * @returns {number[]} Array of block indices near (x, y)
+         */
+        this._getNearbyBlocks = (x, y) => {
+            const cx = Math.floor(x / SPATIAL_GRID_CELL_SIZE);
+            const cy = Math.floor(y / SPATIAL_GRID_CELL_SIZE);
+            const result = [];
+
+            for (let dx = -1; dx <= 1; dx++) {
+                for (let dy = -1; dy <= 1; dy++) {
+                    const key = (cx + dx) + "," + (cy + dy);
+                    const cellSet = this._spatialGrid.get(key);
+                    if (cellSet) {
+                        for (const idx of cellSet) {
+                            result.push(idx);
+                        }
+                    }
+                }
+            }
+            return result;
+        };
+
+        /**
+         * Rebuilds the entire spatial grid from scratch. Called after bulk
+         * operations like project load or block scale changes.
+         */
+        this._rebuildSpatialGrid = () => {
+            this._spatialGrid.clear();
+            this._blockGridCell.clear();
+            for (let i = 0; i < this.blockList.length; i++) {
+                this._updateSpatialGrid(i);
+            }
         };
 
         /**
@@ -396,6 +500,9 @@ class Blocks {
                     this.activity.palettes.dict[palette].protoList[blk].scale = scale;
                 }
             }
+
+            // Rebuild spatial grid after scale change repositions blocks
+            this._rebuildSpatialGrid();
 
             /** Force a refresh. */
             await delayExecution(100);
@@ -1813,7 +1920,12 @@ class Blocks {
             /** Is the added block above or below? */
             let insertAfterDefault = true;
 
-            for (let b = 0; b < this.blockList.length; b++) {
+            // Use spatial grid for O(1) neighbor lookup instead of full blockList scan
+            const nearby = this._getNearbyBlocks(x1, y1);
+
+            for (let bi = 0; bi < nearby.length; bi++) {
+                const b = nearby[bi];
+
                 /** Don't connect to yourself. */
                 if (b === thisBlock) {
                     continue;
@@ -1824,8 +1936,8 @@ class Blocks {
                     continue;
                 }
 
-                if (COLLAPSIBLES.includes(this.blockList[b].name)) {
-                    if (!INLINECOLLAPSIBLES.includes(this.blockList[b].name)) {
+                if (getCollapsiblesSet().has(this.blockList[b].name)) {
+                    if (!getInlineCollapsiblesSet().has(this.blockList[b].name)) {
                         if (this.blockList[b].collapsed) {
                             continue;
                         }
@@ -2536,6 +2648,8 @@ class Blocks {
                 myBlock.container.x = Math.floor(x + 0.5);
                 myBlock.container.y = Math.floor(y + 0.5);
 
+                this._updateSpatialGrid(blk);
+
                 if (this._deferCheckBoundsCount > 0) {
                     this._checkBoundsPending = true;
                 } else {
@@ -2561,6 +2675,8 @@ class Blocks {
             if (myBlock.container != null) {
                 myBlock.container.x += dx;
                 myBlock.container.y += dy;
+
+                this._updateSpatialGrid(blk);
 
                 if (this._deferCheckBoundsCount > 0) {
                     this._checkBoundsPending = true;
@@ -2589,6 +2705,7 @@ class Blocks {
             if (myBlock.container != null) {
                 myBlock.container.x += dx;
                 myBlock.container.y += dy;
+                this._updateSpatialGrid(blk);
             }
         };
 
@@ -6936,6 +7053,9 @@ class Blocks {
             this._findDrumURLs();
 
             this.updateBlockPositions();
+
+            // Rebuild spatial grid after all blocks are positioned
+            this._rebuildSpatialGrid();
 
             this._cleanupStacks();
 
