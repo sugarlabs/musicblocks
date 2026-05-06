@@ -7839,13 +7839,26 @@ class Activity {
             );
 
             img.onload = () => {
-                const bitmap = new createjs.Bitmap(img);
-                const bounds = bitmap.getBounds();
-                bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+                // FIX: createjs.Bitmap.getBounds() returns null for any Bitmap
+                // not added to a live EaselJS stage → TypeError: null.x crash.
+                // doSVG() returns "" on blank canvas → naturalWidth = 0 → guaranteed crash.
+                // Fix: use img.naturalWidth directly + plain offscreen canvas (no EaselJS needed).
                 try {
-                    that.storage["SESSIONIMAGE" + p] = bitmap.bitmapCache.getCacheDataURL();
+                    if (!img.naturalWidth || !img.naturalHeight) {
+                        // Blank canvas — doSVG() returned empty string, nothing to thumbnail.
+                        // SESSION<p> JSON was already saved above, so this is safe to skip.
+                        return;
+                    }
+
+                    const w = img.naturalWidth;
+                    const h = img.naturalHeight;
+                    const offscreen = document.createElement("canvas");
+                    offscreen.width = w;
+                    offscreen.height = h;
+                    offscreen.getContext("2d").drawImage(img, 0, 0);
+                    this.storage["SESSIONIMAGE" + p] = offscreen.toDataURL("image/png");
                 } catch (e) {
-                    console.error(e);
+                    console.error("[saveLocally] Thumbnail save failed:", e);
                 }
             };
 
