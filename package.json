@@ -27,7 +27,9 @@
         "test:coverage": "jest --coverage",
         "cypress:run": "cypress run",
         "electron": "electron .",
-        "dist": "electron-builder"
+        "dist": "electron-builder",
+        "test:mutation": "stryker run",
+        "generate-test": "node scripts/generate-tests.js"
     },
     "devDependencies": {
         "@babel/core": "^7.28.5",

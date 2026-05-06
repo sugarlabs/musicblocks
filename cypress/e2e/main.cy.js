@@ -1,15 +1,8 @@
 /* global Cypress, cy, before */
 
 Cypress.on("uncaught:exception", err => {
-    const ignored = [
-        "ResizeObserver loop limit exceeded",
-        "Cannot read properties of undefined",
-        "Cannot read properties of null",
-        "Cannot set properties of null",
-        "Cannot set properties of undefined",
-        "_ is not defined",
-        "Permissions check failed"
-    ];
+    // Only suppress known third-party/browser errors that are not caused by app logic
+    const ignored = ["ResizeObserver loop limit exceeded", "Permissions check failed"];
     return !ignored.some(msg => err.message.includes(msg));
 });
 
@@ -217,5 +210,50 @@ describe("MusicBlocks Application", () => {
 
             cy.get("#canvas").should("exist").and("be.visible");
         });
+    });
+});
+
+describe("Block Palette Interactions", () => {
+    before(() => {
+        cy.waitForAppReady();
+    });
+
+    it("should open the Pitch palette and display blocks", () => {
+        cy.get('[width="126"] tbody tr').eq(0).find("img").click();
+        cy.get("#palette", { timeout: 15000 }).should("be.visible");
+        cy.get("#palette img", { timeout: 15000 }).should("have.length.greaterThan", 0);
+    });
+
+    it("should close the palette on Escape key", () => {
+        cy.get("body").type("{esc}");
+        cy.get("#palette").should("not.be.visible");
+    });
+});
+
+describe("Music Playback Controls", () => {
+    it("should start audio context on play", () => {
+        cy.get("#play").should("be.visible").click();
+        cy.window().then(win => {
+            expect(win.Tone.context.state).to.eq("running");
+        });
+    });
+
+    it("should stop playback on stop button click", () => {
+        cy.get("#stop").should("be.visible").click();
+        cy.get("#canvas").should("be.visible");
+    });
+});
+
+describe("File Export", () => {
+    it("should open save dropdown and show HTML export option", () => {
+        cy.get("#saveButton").click();
+        cy.get("#saveddropdownbeg").should("be.visible");
+        cy.get("#save-html-beg").should("exist");
+    });
+
+    it("should show PNG export option in save dropdown", () => {
+        cy.get("#saveButton").click();
+        cy.get("#saveddropdownbeg").should("be.visible");
+        cy.get("#save-png-beg").should("exist");
     });
 });

@@ -38,6 +38,7 @@ jobs:
       - name: Run Jest Tests
         id: jest
         run: |
+          set -e
           npm test -- --coverage --json --outputFile=jest-results.json || echo "TESTS_FAILED=true" >> $GITHUB_ENV
           COVERAGE=$(node -e "const s=require('./coverage/coverage-summary.json').total;console.log('Statements: '+s.statements.pct+'% | Branches: '+s.branches.pct+'% | Functions: '+s.functions.pct+'% | Lines: '+s.lines.pct+'%');" 2>/dev/null || echo "Coverage summary unavailable")
           echo "COVERAGE_SUMMARY=$COVERAGE" >> $GITHUB_ENV
@@ -129,6 +130,11 @@ jobs:
         with:
           file-path: ${{ steps.results.outputs.COMMENT_FILE }}
           pr-number: ${{ steps.results.outputs.PR_NUMBER }}
+
+      - name: Fail if tests failed
+        if: env.TESTS_PASSED == 'false'
+        run: exit 1
+
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Fail if tests failed
