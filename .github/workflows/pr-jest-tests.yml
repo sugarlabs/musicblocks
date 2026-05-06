@@ -84,7 +84,7 @@ jobs:
               echo "**Coverage:** $COVERAGE_SUMMARY"
             else
               # Sort failed tests for readability
-              SORTED_FAILED_TESTS=$(echo "$FAILED_TESTS" | sort)
+              SORTED_FAILED_TESTS=$(echo "$FAILED_TESTS" | sed '/^$/d' | sort -f)
 
               echo "❌ Some Jest tests failed. Please check the logs and fix the issues before merging."
               echo ""
