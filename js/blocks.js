@@ -440,7 +440,7 @@ class Blocks {
 
             for (let dx = -1; dx <= 1; dx++) {
                 for (let dy = -1; dy <= 1; dy++) {
-                    const key = (cx + dx) + "," + (cy + dy);
+                    const key = cx + dx + "," + (cy + dy);
                     const cellSet = this._spatialGrid.get(key);
                     if (cellSet) {
                         for (const idx of cellSet) {

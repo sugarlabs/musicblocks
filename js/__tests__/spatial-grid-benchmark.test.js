@@ -61,7 +61,7 @@ function gridScan(grid, blockList, x1, y1, thisBlock) {
 
     for (let dx = -1; dx <= 1; dx++) {
         for (let dy = -1; dy <= 1; dy++) {
-            const key = (cx + dx) + "," + (cy + dy);
+            const key = cx + dx + "," + (cy + dy);
             const cell = grid.get(key);
             if (!cell) continue;
 
