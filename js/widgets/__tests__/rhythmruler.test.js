@@ -92,6 +92,7 @@ const mockWindow = {
                         appendChild: jest.fn(),
                         setAttribute: jest.fn(),
                         style: {},
+                        textContent: "",
                         innerHTML: "",
                         addEventListener: jest.fn()
                     })
@@ -119,6 +120,8 @@ global.document = {
             setAttribute: jest.fn(),
             insertCell: jest.fn().mockReturnValue({
                 style: {},
+                appendChild: jest.fn(),
+                textContent: "",
                 innerHTML: "",
                 setAttribute: jest.fn(),
                 addEventListener: jest.fn()
@@ -127,6 +130,8 @@ global.document = {
         cells: [],
         insertCell: jest.fn().mockReturnValue({
             style: {},
+            appendChild: jest.fn(),
+            textContent: "",
             innerHTML: ""
         }),
         deleteCell: jest.fn(),
@@ -148,6 +153,7 @@ global.document = {
             fillText: jest.fn()
         })
     })),
+    createTextNode: jest.fn().mockImplementation(text => ({ nodeType: 3, textContent: text })),
     getElementById: jest.fn().mockReturnValue({
         style: {},
         classList: { add: jest.fn(), remove: jest.fn() }
@@ -245,6 +251,49 @@ describe("RhythmRuler Widget", () => {
             expect(rhythmRuler._offsets).toEqual([]);
             expect(rhythmRuler._startingTime).toBeNull();
             expect(rhythmRuler._tapTimes).toEqual([]);
+        });
+    });
+
+    // =========================================================================
+    // NOTE VALUE DISPLAY TESTS
+    // =========================================================================
+    describe("Note Value Display", () => {
+        test("should render note value markup as DOM nodes", () => {
+            const cell = {
+                appendChild: jest.fn(),
+                textContent: "old"
+            };
+
+            global.calcNoteValueToDisplay.mockReturnValueOnce("1<br>&mdash;<br>4<br>note");
+
+            rhythmRuler.__setNoteValueDisplay(cell, 4, 1);
+
+            const appendedNodes = cell.appendChild.mock.calls.map(call => call[0]);
+            expect(cell.textContent).toBe("");
+            expect(appendedNodes.map(node => node.textContent)).toEqual([
+                "1",
+                "",
+                "\u2014",
+                "",
+                "4",
+                "",
+                "note"
+            ]);
+            expect(cell.appendChild).toHaveBeenCalledTimes(7);
+        });
+
+        test("should append silence label as text", () => {
+            const cell = {
+                appendChild: jest.fn(),
+                textContent: ""
+            };
+
+            global.calcNoteValueToDisplay.mockReturnValueOnce("1<br>&mdash;<br>4<br>note");
+
+            rhythmRuler.__setNoteValueDisplay(cell, 4, 1, "silence");
+
+            const appendedNodes = cell.appendChild.mock.calls.map(call => call[0]);
+            expect(appendedNodes[appendedNodes.length - 1].textContent).toBe(" silence");
         });
     });
 

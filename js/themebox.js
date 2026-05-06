@@ -405,6 +405,12 @@ class ThemeBox {
                     paletteElement.childNodes[0].style.border = `1px solid ${window.platformColor.selectorSelected}`;
                 }
 
+                const paletteToggle = document.getElementById("paletteToggle");
+                if (paletteToggle) {
+                    paletteToggle.style.backgroundColor = platformColor.paletteLabelBackground;
+                    paletteToggle.style.color = "white";
+                }
+
                 // Refresh palette selector icons with new theme colors
                 const tr = document.querySelector("#palette > div > table > thead > tr");
                 if (tr) {

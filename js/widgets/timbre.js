@@ -610,11 +610,10 @@ class TimbreWidget {
 
             docById("myRangeS0").value = parseFloat(this.duoSynthParams[0]);
             docById("myspanS0").textContent = this.duoSynthParams[0];
-            this.duoSynthParamVals["vibratoRate"] = parseFloat(this.duoSynthParams[0]);
             this._update(blockValue, this.duoSynthParams[0], 0);
             docById("myRangeS1").value = parseFloat(this.duoSynthParams[1]);
             docById("myspanS1").textContent = this.duoSynthParams[1];
-            this.duoSynthParamVals["vibratoAmount"] = parseFloat(this.duoSynthParams[1]);
+            this._setDuoSynthParamVals(this.duoSynthParams[0], this.duoSynthParams[1]);
             this._update(blockValue, this.duoSynthParams[1], 1);
             this.activity.logo.synth.createSynth(
                 0,
@@ -1102,6 +1101,48 @@ class TimbreWidget {
 
     /**
      * @private
+     * Updates DuoSynth values passed to Tone. The widget and block store amount as percent.
+     * @param {number|string} vibratoRate
+     * @param {number|string} vibratoAmount
+     * @returns {void}
+     */
+    _setDuoSynthParamVals(vibratoRate, vibratoAmount) {
+        this.duoSynthParamVals["vibratoRate"] = Math.abs(parseFloat(vibratoRate));
+        this.duoSynthParamVals["vibratoAmount"] = Math.abs(parseFloat(vibratoAmount)) / 100;
+    }
+
+    /**
+     * @private
+     * Creates the DuoSynth block stack and records default widget parameters.
+     * @param {number|null} bottomOfClamp
+     * @param {string} synthChosen
+     * @returns {void}
+     */
+    _addDuoSynthBlock(bottomOfClamp, synthChosen) {
+        const n = this.activity.blocks.blockList.length;
+        const DUOSYNTHOBJ = [
+            [0, ["duosynth", {}], 0, 0, [null, 1, 2, null]],
+            [1, ["number", { value: 10 }], 0, 0, [0]],
+            [2, ["number", { value: 6 }], 0, 0, [0]]
+        ];
+        this.activity.blocks.loadNewBlocks(DUOSYNTHOBJ);
+
+        this.duoSynthesizer.push(n);
+        this.duoSynthParams.push(10);
+        this.duoSynthParams.push(6);
+
+        this._changeBlock(last(this.duoSynthesizer), synthChosen, bottomOfClamp);
+        this._setDuoSynthParamVals(this.duoSynthParams[0], this.duoSynthParams[1]);
+        this.activity.logo.synth.createSynth(
+            0,
+            this.instrumentName,
+            "duosynth",
+            this.duoSynthParamVals
+        );
+    }
+
+    /**
+     * @private
      * Method pertaining to replacing blocks.
      * @param {number} oldblk
      * @param {number} newblk
@@ -1300,14 +1341,13 @@ class TimbreWidget {
                             this.activity.blocks.blockList[this.blockNo].connections[2];
                         const bottomOfClamp = this.activity.blocks.findBottomBlock(topOfClamp);
 
+                        const n = this.activity.blocks.blockList.length;
                         const AMSYNTHOBJ = [
                             [0, ["amsynth", {}], 0, 0, [null, 1, null]],
                             [1, ["number", { value: 1 }], 0, 0, [0]]
                         ];
                         this.activity.blocks.loadNewBlocks(AMSYNTHOBJ);
 
-                        await delayExecution(100);
-                        const n = this.activity.blocks.blockList.length - 2;
                         this.AMSynthesizer.push(n);
                         this.AMSynthParams.push(1);
 
@@ -1385,14 +1425,13 @@ class TimbreWidget {
                             this.activity.blocks.blockList[this.blockNo].connections[2];
                         const bottomOfClamp = this.activity.blocks.findBottomBlock(topOfClamp);
 
+                        const n = this.activity.blocks.blockList.length;
                         const FMSYNTHOBJ = [
                             [0, ["fmsynth", {}], 0, 0, [null, 1, null]],
                             [1, ["number", { value: 10 }], 0, 0, [0]]
                         ];
                         this.activity.blocks.loadNewBlocks(FMSYNTHOBJ);
 
-                        await delayExecution(100);
-                        const n = this.activity.blocks.blockList.length - 2;
                         this.FMSynthesizer.push(n);
                         this.FMSynthParams.push(10);
 
@@ -1473,14 +1512,13 @@ class TimbreWidget {
                             this.activity.blocks.blockList[this.blockNo].connections[2];
                         const bottomOfClamp = this.activity.blocks.findBottomBlock(topOfClamp);
 
+                        const n = this.activity.blocks.blockList.length;
                         const NOISESYNTHOBJ = [
                             [0, ["noisesynth", {}], 0, 0, [null, 1, null]],
                             [1, ["number", { value: 10 }], 0, 0, [0]]
                         ];
                         this.activity.blocks.loadNewBlocks(NOISESYNTHOBJ);
 
-                        await delayExecution(100);
-                        const n = this.activity.blocks.blockList.length - 2;
                         this.NoiseSynthesizer.push(n);
                         this.NoiseSynthParams.push("white");
 
@@ -1558,30 +1596,7 @@ class TimbreWidget {
                             this.activity.blocks.blockList[this.blockNo].connections[2];
                         const bottomOfClamp = this.activity.blocks.findBottomBlock(topOfClamp);
 
-                        const DUOSYNTHOBJ = [
-                            [0, ["duosynth", {}], 0, 0, [null, 1, 2, null]],
-                            [1, ["number", { value: 10 }], 0, 0, [0]],
-                            [2, ["number", { value: 6 }], 0, 0, [0]]
-                        ];
-                        this.activity.blocks.loadNewBlocks(DUOSYNTHOBJ);
-
-                        await delayExecution(100);
-                        const n = this.activity.blocks.blockList.length - 3;
-                        this.duoSynthesizer.push(n);
-                        this.duoSynthParams.push(10);
-                        this.duoSynthParams.push(6);
-
-                        this._changeBlock(last(this.duoSynthesizer), synthChosen, bottomOfClamp);
-                        this.duoSynthParamVals["vibratoRate"] = parseFloat(this.duoSynthParams[0]);
-                        this.duoSynthParamVals["vibratoAmount"] = parseFloat(
-                            this.duoSynthParams[1]
-                        );
-                        this.activity.logo.synth.createSynth(
-                            0,
-                            this.instrumentName,
-                            "duosynth",
-                            this.duoSynthParamVals
-                        );
+                        this._addDuoSynthBlock(bottomOfClamp, synthChosen);
                     }
 
                     const wrapperS0 = document.createElement("div");
@@ -1650,26 +1665,24 @@ class TimbreWidget {
                         blockValue = this.duoSynthesizer.length - 1;
                     }
 
-                    this.duoSynthParamVals["vibratoRate"] = parseFloat(this.duoSynthParams[0]);
-                    this.duoSynthParamVals["vibratoAmount"] = parseFloat(this.duoSynthParams[1]);
+                    this._setDuoSynthParamVals(this.duoSynthParams[0], this.duoSynthParams[1]);
 
                     for (let i = 0; i < 2; i++) {
                         document
                             .getElementById("wrapperS" + i)
                             .addEventListener("change", event => {
                                 const elem = event.target;
-                                const m = elem.id.slice(-1);
+                                const m = Number(elem.id.slice(-1));
+                                this.duoSynthParams[m] = elem.value;
                                 docById("myRangeS" + m).value = parseFloat(elem.value);
                                 if (m === 0) {
-                                    this.duoSynthParamVals["vibratoRate"] = parseFloat(elem.value);
+                                    this._setDuoSynthParamVals(elem.value, this.duoSynthParams[1]);
                                 } else if (m === 1) {
-                                    this.duoSynthParamVals["vibratoAmount"] = parseFloat(
-                                        elem.value
-                                    );
+                                    this._setDuoSynthParamVals(this.duoSynthParams[0], elem.value);
                                 }
 
                                 docById("myspanS" + m).textContent = elem.value;
-                                this._update(blockValue, elem.value, Number(m));
+                                this._update(blockValue, elem.value, m);
                                 this.activity.logo.synth.createSynth(
                                     0,
                                     this.instrumentName,

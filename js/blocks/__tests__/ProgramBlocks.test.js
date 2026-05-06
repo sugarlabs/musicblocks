@@ -770,23 +770,18 @@ describe("ProgramBlocks", () => {
 
     describe("OpenProjectBlock", () => {
         let originalOpen;
-        let originalAlert;
 
         beforeAll(() => {
             originalOpen = window.open;
-            originalAlert = window.alert;
         });
 
         afterAll(() => {
             window.open = originalOpen;
-            window.alert = originalAlert;
         });
 
         beforeEach(() => {
             delete window.open;
             window.open = jest.fn(() => ({}));
-            delete window.alert;
-            window.alert = jest.fn();
         });
 
         test("opens valid http URL", () => {
@@ -858,7 +853,10 @@ describe("ProgramBlocks", () => {
             block.flow(["https://example.com"], logo, 0, 5);
 
             expect(window.open).toHaveBeenCalled();
-            expect(window.alert).toHaveBeenCalledWith("Please allow popups for this site");
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Please allow popups for this site",
+                3000
+            );
         });
     });
 

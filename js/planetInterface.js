@@ -31,6 +31,13 @@ class PlanetInterface {
         this.iframe = null;
         this.mainCanvas = null;
         this.activity = activity;
+        this._getProjectStorage = () => {
+            if (!this.planet || !this.planet.ProjectStorage) {
+                return null;
+            }
+
+            return this.planet.ProjectStorage;
+        };
 
         /**
          * Hides music blocks and related elements.
@@ -202,7 +209,10 @@ class PlanetInterface {
          * @param {string} [name] - The name of the new project.
          */
         this.initialiseNewProject = name => {
-            this.planet.ProjectStorage.initialiseNewProject(name);
+            const projectStorage = this._getProjectStorage();
+            if (!projectStorage) return;
+
+            projectStorage.initialiseNewProject(name);
             this.activity.sendAllToTrash();
             this.activity.refreshCanvas();
             this.activity.blocks.trashStacks = [];
@@ -220,7 +230,7 @@ class PlanetInterface {
                 return Promise.resolve(null);
             }
 
-            this.activity.stage.update(event);
+            this.activity.stage.update();
             const data = this.activity.prepareExport();
             const svgData = doSVG(
                 this.activity.canvas,
@@ -285,7 +295,15 @@ class PlanetInterface {
          * @returns {Promise} - A promise that resolves with the current project data.
          */
         this.openCurrentProject = async () => {
-            return await this.planet.ProjectStorage.getCurrentProjectData();
+            const projectStorage = this._getProjectStorage();
+            if (!projectStorage || typeof projectStorage.getCurrentProjectData !== "function") {
+                console.error(
+                    "[PlanetInterface] openCurrentProject called before Planet storage is ready."
+                );
+                return null;
+            }
+
+            return await projectStorage.getCurrentProjectData();
         };
 
         /**
@@ -294,6 +312,8 @@ class PlanetInterface {
          * @param {string} [error] - Error message if project opening fails.
          */
         this.openProjectFromPlanet = (id, error) => {
+            if (!this.planet || typeof this.planet.openProjectFromPlanet !== "function") return;
+
             this.planet.openProjectFromPlanet(id, error);
         };
 
@@ -310,7 +330,12 @@ class PlanetInterface {
          * @returns {string} - The name of the current project.
          */
         this.getCurrentProjectName = () => {
-            return this.planet.ProjectStorage.getCurrentProjectName();
+            const projectStorage = this._getProjectStorage();
+            if (!projectStorage || typeof projectStorage.getCurrentProjectName !== "function") {
+                return "";
+            }
+
+            return projectStorage.getCurrentProjectName();
         };
 
         /**
@@ -318,7 +343,15 @@ class PlanetInterface {
          * @returns {string} - The description of the current project.
          */
         this.getCurrentProjectDescription = () => {
-            return this.planet.ProjectStorage.getCurrentProjectDescription();
+            const projectStorage = this._getProjectStorage();
+            if (
+                !projectStorage ||
+                typeof projectStorage.getCurrentProjectDescription !== "function"
+            ) {
+                return "";
+            }
+
+            return projectStorage.getCurrentProjectDescription();
         };
 
         /**
@@ -326,7 +359,12 @@ class PlanetInterface {
          * @returns {string} - The URL of the image associated with the current project.
          */
         this.getCurrentProjectImage = () => {
-            return this.planet.ProjectStorage.getCurrentProjectImage();
+            const projectStorage = this._getProjectStorage();
+            if (!projectStorage || typeof projectStorage.getCurrentProjectImage !== "function") {
+                return null;
+            }
+
+            return projectStorage.getCurrentProjectImage();
         };
 
         /**
@@ -334,7 +372,12 @@ class PlanetInterface {
          * @returns {Date} - The timestamp of the last save operation.
          */
         this.getTimeLastSaved = () => {
-            return this.planet.ProjectStorage.TimeLastSaved;
+            const projectStorage = this._getProjectStorage();
+            if (!projectStorage) {
+                return null;
+            }
+
+            return projectStorage.TimeLastSaved ?? null;
         };
 
         /**
@@ -360,7 +403,7 @@ class PlanetInterface {
                 this.planet = null;
             }
 
-            window.Converter = this.planet.Converter;
+            window.Converter = this.planet ? this.planet.Converter : undefined;
             this.mainCanvas = this.activity.canvas;
         };
     }
