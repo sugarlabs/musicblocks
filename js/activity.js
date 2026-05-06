@@ -4538,8 +4538,18 @@ class Activity {
 
             if (restoredBlock.name === "start" || restoredBlock.name === "drum") {
                 const turtle = restoredBlock.value;
-                this.turtles.getTurtle(turtle).inTrash = false;
-                this.turtles.getTurtle(turtle).container.visible = true;
+                const primaryTurtle = this.turtles.getTurtle(turtle);
+                primaryTurtle.inTrash = false;
+                primaryTurtle.container.visible = true;
+
+                const comp = primaryTurtle.companionTurtle;
+                if (comp != null) {
+                    const companionTurtle = this.turtles.getTurtle(comp);
+                    if (companionTurtle) {
+                        companionTurtle.inTrash = false;
+                        companionTurtle.container.visible = true;
+                    }
+                }
             } else if (restoredBlock.name === "action") {
                 const actionArg = this.blocks.blockList[restoredBlock.connections[1]];
                 if (actionArg !== null) {
