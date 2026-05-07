@@ -72,6 +72,9 @@ class GlobalCard {
                                             <a class="copyshareurl tooltipped" data-clipboard-text="https://musicblocks.sugarlabs.org/index.html?id={ID}&run=True" data-delay="50" data-tooltip="${_(
                                                 "Copy link to clipboard"
                                             )}"><i class="material-icons"alt="Copy!">file_copy</i></a>
+                                            <a class="share-social-btn tooltipped" id="global-whatsapp-share-{ID}" data-position="bottom" data-delay="50" data-tooltip="${_(
+                                                "Share on WhatsApp"
+                                            )}" target="_blank" rel="noopener noreferrer"><i class="material-icons">chat</i></a>
                                             <div class="shareurl-advanced" id="global-advanced-{ID}"> 
                                                     <div class="shareurltitle">${_("Flags")}</div> 
                                                     <div><input type="checkbox" name="run" id="global-checkboxrun-{ID}" checked><label for="global-checkboxrun-{ID}">${_(
@@ -198,6 +201,15 @@ class GlobalCard {
                 );
             } else s.style.display = "none";
         });
+
+        // set WhatsApp share link
+        const shareInput = frag.querySelector(`#global-sharebox-${this.id} input[type=text]`);
+        const shareUrl = shareInput
+            ? shareInput.getAttribute("data-originalurl") + "&run=True"
+            : `https://musicblocks.sugarlabs.org/index.html?id=${this.id}&run=True`;
+        const whatsappText = _("Check out this Music Blocks project!") + " " + shareUrl;
+        frag.getElementById(`global-whatsapp-share-${this.id}`).href =
+            `https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappText)}`;
 
         // set share checkbox listener
 

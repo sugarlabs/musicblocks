@@ -523,3 +523,16 @@ a {
 	font-size: 16px;
 	outline: none;
 }
+
+/* Social share button in share card */
+.share-social-btn {
+	display: inline-block;
+	margin-left: 8px;
+	vertical-align: middle;
+	color: #555;
+	cursor: pointer;
+}
+
+.share-social-btn:hover {
+	color: #25D366;
+}
