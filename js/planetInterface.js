@@ -312,7 +312,12 @@ class PlanetInterface {
          * @param {string} [error] - Error message if project opening fails.
          */
         this.openProjectFromPlanet = (id, error) => {
-            if (!this.planet || typeof this.planet.openProjectFromPlanet !== "function") return;
+            if (!this.planet || typeof this.planet.openProjectFromPlanet !== "function") {
+                console.error(
+                    "[PlanetInterface] openProjectFromPlanet called before Planet is ready."
+                );
+                return;
+            }
 
             this.planet.openProjectFromPlanet(id, error);
         };
