@@ -141,4 +141,50 @@ describe("ThemeBox", () => {
         const canvas = document.getElementById("canvas");
         expect(canvas.style.backgroundColor).toBe("rgb(249, 249, 249)");
     });
+
+    test("applyThemeInstantly() repaints sidebar palette buttons immediately (fixes #5825)", () => {
+        global.PALETTEICONS = { search: "<svg></svg>", rhythm: "<svg></svg>" };
+        global.MULTIPALETTEICONS = [];
+        global.makePaletteIcons = jest.fn(() => ({ src: "data:image/svg+xml," }));
+
+        // Build the DOM the palette refresh actually walks — two tables
+        // inside #palette > div, where the second table holds the search row
+        // and the per-palette buttons. One row uses a label that does not map
+        // to a PALETTEICONS key (custom/plugin palette, translated label),
+        // which is the precise scenario the old gate skipped.
+        // Avoid indented innerHTML — the resulting whitespace text node
+        // becomes paletteElement.childNodes[0] and trips an unrelated
+        // existing call elsewhere in refreshUIComponents.
+        const palette = document.getElementById("palette");
+        palette.innerHTML =
+            "<div>" +
+            "<table><thead><tr></tr></thead></table>" +
+            "<table><tbody>" +
+            '<tr id="row-search"><td><img src=""></td><td style="color: #000">Search</td></tr>' +
+            '<tr id="row-rhythm" style="background-color: #FFFFFF"><td><img src=""></td><td style="color: #000">Rhythm</td></tr>' +
+            '<tr id="row-custom" style="background-color: #FFFFFF"><td><img src=""></td><td style="color: #000">Plugin Palette</td></tr>' +
+            "</tbody></table>" +
+            "</div>";
+
+        mockActivity.palettes = { cellSize: 32, dict: {}, activePalette: null };
+
+        themeBox._theme = "dark";
+        themeBox.applyThemeInstantly();
+
+        // Both rows — including the one whose label doesn't match
+        // PALETTEICONS — must reflect the dark theme's palette background.
+        const darkBg = "rgb(28, 28, 28)"; // #1C1C1C
+        const rhythmRow = document.getElementById("row-rhythm");
+        const customRow = document.getElementById("row-custom");
+        expect(rhythmRow.style.backgroundColor).toBe(darkBg);
+        expect(customRow.style.backgroundColor).toBe(darkBg);
+
+        // And switching back to light must repaint both rows again, not leave
+        // them on the dark color until the user hovers.
+        themeBox._theme = "light";
+        themeBox.applyThemeInstantly();
+        const lightBg = "rgb(255, 255, 255)";
+        expect(rhythmRow.style.backgroundColor).toBe(lightBg);
+        expect(customRow.style.backgroundColor).toBe(lightBg);
+    });
 });
