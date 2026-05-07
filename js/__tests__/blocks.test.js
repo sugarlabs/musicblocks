@@ -230,4 +230,69 @@ describe("Blocks Foundation", () => {
             expect(blocks._expandablesList).toEqual([1]);
         });
     });
+
+    describe("_extractBlock", () => {
+        it("refreshes the parent's dock geometry after extracting a special input (fixes #3772)", () => {
+            // SPECIALINPUTS includes "text" in this test scaffolding (see
+            // global setup). Build a parent (id 0, role: accidental) holding a
+            // special-input child (id 1, role: accidentalname stand-in). When
+            // _extractBlock runs the special-input branch, the parent's dock
+            // positions must be recomputed so a follow-up re-attach attempt
+            // sees current coordinates rather than the stale slot geometry.
+            const blocks = new Blocks(mockActivity);
+
+            const parent = {
+                name: "accidental",
+                trash: false,
+                connections: [null, 1, null, null]
+            };
+            const child = {
+                name: "text",
+                trash: false,
+                connections: [0]
+            };
+            blocks.blockList = [parent, child];
+
+            // moveStackRelative + blockMoved walk the workspace; stub them so
+            // the test only exercises the dock-refresh contract.
+            blocks.moveStackRelative = jest.fn();
+            blocks.blockMoved = jest.fn();
+            blocks.adjustDocks = jest.fn();
+
+            blocks._extractBlock(1, true);
+
+            // Parent's slot now points to nothing, child is detached.
+            expect(parent.connections[1]).toBeNull();
+            expect(child.connections[0]).toBeNull();
+
+            // The contract being pinned: the parent (firstConnection) has
+            // its docks re-evaluated so the empty slot reports its current
+            // position to the next find-nearest-dock pass.
+            expect(blocks.adjustDocks).toHaveBeenCalledWith(0, true);
+        });
+
+        it("does not refresh parent docks when adjustDock is false", () => {
+            const blocks = new Blocks(mockActivity);
+
+            const parent = {
+                name: "accidental",
+                trash: false,
+                connections: [null, 1, null, null]
+            };
+            const child = {
+                name: "text",
+                trash: false,
+                connections: [0]
+            };
+            blocks.blockList = [parent, child];
+
+            blocks.moveStackRelative = jest.fn();
+            blocks.blockMoved = jest.fn();
+            blocks.adjustDocks = jest.fn();
+
+            blocks._extractBlock(1, false);
+
+            expect(blocks.adjustDocks).not.toHaveBeenCalled();
+        });
+    });
 });
