@@ -146,17 +146,51 @@ class LogoDependencies {
 
         // Audio and utility dependencies
         this.instruments =
-            instruments || (typeof window !== "undefined" ? window.instruments : null);
+            instruments !== null
+                ? instruments
+                : typeof window !== "undefined" &&
+                    window.instruments !== null &&
+                    window.instruments !== undefined
+                  ? window.instruments
+                  : null;
         this.instrumentsFilters =
-            instrumentsFilters ||
-            (typeof window !== "undefined" ? window.instrumentsFilters : null);
+            instrumentsFilters !== null
+                ? instrumentsFilters
+                : typeof window !== "undefined" &&
+                    window.instrumentsFilters !== null &&
+                    window.instrumentsFilters !== undefined
+                  ? window.instrumentsFilters
+                  : null;
         this.instrumentsEffects =
-            instrumentsEffects ||
-            (typeof window !== "undefined" ? window.instrumentsEffects : null);
+            instrumentsEffects !== null
+                ? instrumentsEffects
+                : typeof window !== "undefined" &&
+                    window.instrumentsEffects !== null &&
+                    window.instrumentsEffects !== undefined
+                  ? window.instrumentsEffects
+                  : null;
         this.widgetWindows =
-            widgetWindows || (typeof window !== "undefined" ? window.widgetWindows : null);
-        this.Singer = Singer || (typeof window !== "undefined" ? window.Singer : null);
-        this.Tone = Tone || (typeof window !== "undefined" ? window.Tone : null);
+            widgetWindows !== null
+                ? widgetWindows
+                : typeof window !== "undefined" &&
+                    window.widgetWindows !== null &&
+                    window.widgetWindows !== undefined
+                  ? window.widgetWindows
+                  : null;
+        this.Singer =
+            Singer !== null
+                ? Singer
+                : typeof window !== "undefined" &&
+                    window.Singer !== null &&
+                    window.Singer !== undefined
+                  ? window.Singer
+                  : null;
+        this.Tone =
+            Tone !== null
+                ? Tone
+                : typeof window !== "undefined" && window.Tone !== null && window.Tone !== undefined
+                  ? window.Tone
+                  : null;
         this.utils = utils || {
             doUseCamera: typeof doUseCamera !== "undefined" ? doUseCamera : null,
             doStopVideoCam: typeof doStopVideoCam !== "undefined" ? doStopVideoCam : null,

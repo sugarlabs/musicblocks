@@ -91,12 +91,12 @@ describe("LogoDependencies", () => {
 
         test("defaults optional deps to null", () => {
             const deps = new LogoDependencies(makeDeps());
-            expect(deps.instruments == null).toBe(true);
-            expect(deps.instrumentsFilters == null).toBe(true);
-            expect(deps.instrumentsEffects == null).toBe(true);
-            expect(deps.widgetWindows == null).toBe(true);
-            expect(deps.Singer == null).toBe(true);
-            expect(deps.Tone == null).toBe(true);
+            expect(deps.instruments === null).toBe(true);
+            expect(deps.instrumentsFilters === null).toBe(true);
+            expect(deps.instrumentsEffects === null).toBe(true);
+            expect(deps.widgetWindows === null).toBe(true);
+            expect(deps.Singer === null).toBe(true);
+            expect(deps.Tone === null).toBe(true);
         });
 
         test("stores optional deps when provided", () => {
