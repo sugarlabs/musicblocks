@@ -742,7 +742,7 @@ function setupMediaBlocks(activity) {
          * @param {Logo} logo - The logo object.
          */
         flow(args, logo) {
-            if (logo.cameraID != null) {
+            if (logo.cameraID !== null) {
                 doStopVideoCam(logo.cameraID, logo.setCameraID);
             }
         }
