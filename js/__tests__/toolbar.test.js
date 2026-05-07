@@ -265,6 +265,13 @@ describe("Toolbar Class", () => {
         const mockOnClick = jest.fn();
         toolbar.renderPlayIcon(mockOnClick);
 
+        // The stop click listener is bound once during renderPlayIcon, before any
+        // play click — not from inside the play handler.
+        const clickAddCalls = elements.stop.addEventListener.mock.calls.filter(
+            c => c[0] === "click"
+        );
+        expect(clickAddCalls).toHaveLength(1);
+
         elements.play.onclick();
 
         expect(mockOnClick).toHaveBeenCalledWith(mockActivity);
@@ -272,16 +279,55 @@ describe("Toolbar Class", () => {
         expect(global.saveButtonAdvanced.disabled).toBe(true);
         expect(global.saveButton.className).toBe("grey-text inactiveLink");
         expect(elements.record.className).toBe("grey-text inactiveLink");
-        expect(elements.stop.removeEventListener).toHaveBeenCalledWith(
-            "click",
-            expect.any(Function)
-        );
-        expect(elements.stop.addEventListener).toHaveBeenCalledWith("click", expect.any(Function));
 
-        const stopClickHandler = elements.stop.addEventListener.mock.calls[0][1];
+        const stopClickHandler = clickAddCalls[0][1];
         stopClickHandler();
 
         expect(mockActivity.hideMsgs).toHaveBeenCalled();
+
+        delete global.play_button_debounce_timeout;
+    });
+
+    test("renderPlayIcon binds stop listener once across many play clicks (fixes #5099)", () => {
+        global.play_button_debounce_timeout = null;
+
+        const elements = {
+            play: {
+                onclick: null,
+                addEventListener: jest.fn(),
+                setAttribute: jest.fn()
+            },
+            stop: {
+                style: { color: "" },
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn(),
+                setAttribute: jest.fn()
+            },
+            record: {
+                className: "",
+                setAttribute: jest.fn()
+            }
+        };
+
+        global.docById = jest.fn(
+            id => elements[id] || { addEventListener: jest.fn(), querySelectorAll: jest.fn() }
+        );
+
+        toolbar.activity = { hideMsgs: jest.fn(), beginnerMode: true };
+        toolbar.renderPlayIcon(jest.fn());
+
+        // Simulate 10 play clicks with the 2s debounce window in between, which
+        // is the worst-case interaction pattern from the bug report.
+        for (let i = 0; i < 10; i++) {
+            elements.play.onclick();
+            jest.advanceTimersByTime(2000);
+        }
+
+        const clickAddCalls = elements.stop.addEventListener.mock.calls.filter(
+            c => c[0] === "click"
+        );
+        expect(clickAddCalls).toHaveLength(1);
+        expect(elements.stop.removeEventListener).not.toHaveBeenCalled();
 
         delete global.play_button_debounce_timeout;
     });
