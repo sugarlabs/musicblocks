@@ -7848,8 +7848,9 @@ class Activity {
 
             img.onload = () => {
                 const bitmap = new createjs.Bitmap(img);
-                const bounds = bitmap.getBounds();
-                bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+                const width = img.naturalWidth || img.width || 320;
+                const height = img.naturalHeight || img.height || 240;
+                bitmap.cache(0, 0, width, height);
                 try {
                     that.storage["SESSIONIMAGE" + p] = bitmap.bitmapCache.getCacheDataURL();
                 } catch (e) {
