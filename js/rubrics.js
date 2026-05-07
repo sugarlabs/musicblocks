@@ -563,7 +563,7 @@ const analyzeProject = activity => {
             case "fill":
             case "hollowline":
             case "start":
-                if (activity.blocks.blockList[blk].connections[1] == null) {
+                if (activity.blocks.blockList[blk].connections[1] === null) {
                     continue;
                 }
                 break;
@@ -584,24 +584,24 @@ const analyzeProject = activity => {
             case "chorus":
             case "phaser":
             case "action":
-                if (activity.blocks.blockList[blk].connections[2] == null) {
+                if (activity.blocks.blockList[blk].connections[2] === null) {
                     continue;
                 }
                 break;
             case "tuplet2":
-                if (activity.blocks.blockList[blk].connections[3] == null) {
+                if (activity.blocks.blockList[blk].connections[3] === null) {
                     continue;
                 }
                 break;
             case "invert":
-                if (activity.blocks.blockList[blk].connections[4] == null) {
+                if (activity.blocks.blockList[blk].connections[4] === null) {
                     continue;
                 }
                 break;
             default:
                 if (
-                    activity.blocks.blockList[blk].connections[0] == null &&
-                    last(activity.blocks.blockList[blk].connections) == null
+                    activity.blocks.blockList[blk].connections[0] === null &&
+                    last(activity.blocks.blockList[blk].connections) === null
                 ) {
                     continue;
                 }
@@ -799,7 +799,7 @@ const getStatsFromNotation = activity => {
         for (const it in notation.notationStaging[tur]) {
             const item = notation.notationStaging[tur][it];
 
-            if (typeof item == "object" && item[0].length) {
+            if (typeof item === "object" && item[0].length) {
                 for (let note of item[0]) {
                     let freq;
                     if (isCustomTemperament(activity.logo.synth.inTemperament)) {
@@ -822,7 +822,7 @@ const getStatsFromNotation = activity => {
                         projectStats["pitchNames"].add(note.slice(0, note.length - 1));
                     }
                     projectStats["pitches"].push(freq);
-                    if (projectStats["lowestNote"] == undefined) {
+                    if (projectStats["lowestNote"] === undefined) {
                         if (!isNaN(freq)) {
                             projectStats["lowestNote"] = [note, noteId, freq];
                         }
@@ -831,7 +831,7 @@ const getStatsFromNotation = activity => {
                             projectStats["lowestNote"] = [note, noteId, freq];
                         }
                     }
-                    if (projectStats["highestNote"] == undefined) {
+                    if (projectStats["highestNote"] === undefined) {
                         if (!isNaN(freq)) {
                             projectStats["highestNote"] = [note, noteId, freq];
                         }
@@ -845,18 +845,18 @@ const getStatsFromNotation = activity => {
                 }
             }
 
-            if (item[1] == 2) {
+            if (item[1] === 2) {
                 projectStats["duples"]++;
-            } else if (item[1] == 3) {
+            } else if (item[1] === 3) {
                 projectStats["triplets"]++;
-            } else if (item[1] == 5) {
+            } else if (item[1] === 5) {
                 projectStats["quintuplets"]++;
             }
 
-            if (typeof item == "string") {
-                if (item == "begin articulation") {
+            if (typeof item === "string") {
+                if (item === "begin articulation") {
                     projectStats["articulation"].begin.push(it);
-                } else if (item == "end articulation") {
+                } else if (item === "end articulation") {
                     projectStats["articulation"].begin.push(it);
                 }
             }
