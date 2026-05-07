@@ -353,7 +353,9 @@ function MusicKeyboard(activity) {
             }
 
             if (ele !== null && ele !== undefined) {
-                ele.style.backgroundColor = platformColor.orange;
+                ele.style.backgroundColor = getComputedStyle(document.body)
+                    .getPropertyValue("--color-orange")
+                    .trim();
                 temp1[id] = ele.getAttribute("alt").split("__")[0];
                 if (temp1[id] === "hertz") {
                     temp2[id] = parseInt(ele.getAttribute("alt").split("__")[1]);
@@ -563,7 +565,9 @@ function MusicKeyboard(activity) {
         const __startNote = element => {
             startDate = new Date();
             startTime = startDate.getTime(); // Milliseconds();
-            element.style.backgroundColor = platformColor.orange;
+            element.style.backgroundColor = getComputedStyle(document.body)
+                .getPropertyValue("--color-orange")
+                .trim();
             this.activity.logo.synth.trigger(
                 0,
                 this.noteMapper[element.id],
@@ -814,7 +818,9 @@ function MusicKeyboard(activity) {
             } else {
                 // Turn on metronome
                 this.metronomeON = true;
-                this.tickButton.style.background = platformColor.orange;
+                this.tickButton.style.background = getComputedStyle(document.body)
+                    .getPropertyValue("--color-orange")
+                    .trim();
 
                 const winBody = document.getElementsByClassName("wfbWidget")[0];
                 const countdownContainer = document.createElement("div");
@@ -948,7 +954,9 @@ function MusicKeyboard(activity) {
 
             if (!this.keyboardShown) {
                 cell = docById("cells-0");
-                cell.style.backgroundColor = platformColor.selectorBackground;
+                cell.style.backgroundColor = getComputedStyle(document.body)
+                    .getPropertyValue("--color-selector-bg")
+                    .trim();
             }
 
             this._stopOrCloseClicked = false;
@@ -997,7 +1005,9 @@ function MusicKeyboard(activity) {
 
                 if (!this.keyboardShown) {
                     cell = docById("cells-" + counter);
-                    cell.style.backgroundColor = platformColor.selectorBackground;
+                    cell.style.backgroundColor = getComputedStyle(document.body)
+                        .getPropertyValue("--color-selector-bg")
+                        .trim();
                 }
 
                 if (this.keyboardShown && selectedNotes[counter - 1].objId[0] !== null) {
@@ -3411,7 +3421,9 @@ function MusicKeyboard(activity) {
         const __startNote = (event, element) => {
             if (!element) return;
             startTime = event.timeStamp; // Milliseconds();
-            element.style.backgroundColor = platformColor.orange;
+            element.style.backgroundColor = getComputedStyle(document.body)
+                .getPropertyValue("--color-orange")
+                .trim();
             this.activity.logo.synth.trigger(
                 0,
                 this.noteMapper[element.id],
