@@ -105,9 +105,7 @@ const retryWithBackoff = async ({
             onRetry(count);
         }
 
-        // Bitshift is faster than Math.pow for integer powers of 2.
-        // Cap the shift at 30 to prevent overflow (max retries is well below this).
-        await delay(initialDelay * (1 << Math.min(count, 30)));
+        await delay(initialDelay * Math.pow(2, count));
     }
 
     throw new Error(errorMessage);

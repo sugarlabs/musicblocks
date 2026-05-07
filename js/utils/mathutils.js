@@ -250,8 +250,11 @@ class MathUtility {
             typeof x2 === "number" &&
             typeof y2 === "number"
         ) {
-            // Math.hypot is numerically stable and avoids two Math.pow calls
-            return Math.hypot(x2 - x1, y2 - y1);
+            if (x1 === x2 && y1 === y2) {
+                return 0;
+            }
+
+            return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
         } else {
             throw new Error("NanError");
         }
@@ -268,9 +271,7 @@ class MathUtility {
      */
     static doPower(a, b) {
         if (typeof a === "number" && typeof b === "number") {
-            // ** is the ES2016 exponentiation operator; V8 treats it identically
-            // to Math.pow but avoids the function-call overhead on the hot path.
-            return a ** b;
+            return Math.pow(a, b);
         } else {
             throw new Error("NanError");
         }
@@ -302,11 +303,10 @@ class MathUtility {
      */
     static doNegate(a) {
         if (typeof a === "number") {
-            // Use (-a || 0) to normalise -0 → 0 (preserves backward-compat).
-            return -a || 0;
+            return MathUtility.doMinus(0, a);
         } else if (typeof a === "string") {
-            // Inline the reverse — avoids the intermediate named variable
-            return a.split("").reverse().join("");
+            const obj = a.split("");
+            return obj.reverse().join("");
         } else {
             throw new Error("NoNegError");
         }
