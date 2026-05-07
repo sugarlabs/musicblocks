@@ -91,33 +91,39 @@ if (typeof window !== "undefined") {
  * @returns {string} The translated text.
  */
 
+/**
+ * Characters to strip during translation key cleaning.
+ * Defined once at module level to avoid re-allocation on every `_()` call.
+ * @type {string[]}
+ */
+const _REMOVE_CHARS = [
+    ",",
+    "(",
+    ")",
+    "?",
+    "¿",
+    "<",
+    ">",
+    ".",
+    "\n",
+    '"',
+    ":",
+    "%s",
+    "%d",
+    "/",
+    "'",
+    ";",
+    "×",
+    "!",
+    "¡"
+];
+
 function _(text, options = {}) {
     if (!text) return "";
 
     try {
-        const removeChars = [
-            ",",
-            "(",
-            ")",
-            "?",
-            "¿",
-            "<",
-            ">",
-            ".",
-            "\n",
-            '"',
-            ":",
-            "%s",
-            "%d",
-            "/",
-            "'",
-            ";",
-            "×",
-            "!",
-            "¡"
-        ];
         let cleanedText = text;
-        for (let char of removeChars) cleanedText = cleanedText.split(char).join("");
+        for (let char of _REMOVE_CHARS) cleanedText = cleanedText.split(char).join("");
 
         let translated = "";
         const lang = i18next.language;
@@ -221,17 +227,19 @@ function canvasPixelRatio() {
 }
 
 /**
+ * Whether the user agent is Android. Cached once at module load time so
+ * windowHeight/windowWidth don't re-run the regex on every call.
+ * @type {boolean}
+ */
+const _isOnAndroid = /Android/i.test(navigator.userAgent);
+
+/**
  * Returns the height of the window, accounting for Android-specific behavior.
  * @function
  * @returns {number} The window height.
  */
 function windowHeight() {
-    const onAndroid = /Android/i.test(navigator.userAgent);
-    if (onAndroid) {
-        return window.outerHeight;
-    } else {
-        return window.innerHeight;
-    }
+    return _isOnAndroid ? window.outerHeight : window.innerHeight;
 }
 
 /**
@@ -240,12 +248,7 @@ function windowHeight() {
  * @returns {number} The window width.
  */
 function windowWidth() {
-    const onAndroid = /Android/i.test(navigator.userAgent);
-    if (onAndroid) {
-        return window.outerWidth;
-    } else {
-        return window.innerWidth;
-    }
+    return _isOnAndroid ? window.outerWidth : window.innerWidth;
 }
 
 /**
@@ -1177,22 +1180,13 @@ window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivi
  * @returns {Promise<object|null>} The processed plugin data object or null if parsing fails.
  */
 const processRawPluginData = async (activity, rawData, pluginSource) => {
-    const lineData = rawData.split("\n");
-    let cleanData = "";
-
-    // We need to remove blank lines and comments and then
-    // join the data back together for processing as JSON.
-    for (let i = 0; i < lineData.length; i++) {
-        if (lineData[i].length === 0) {
-            continue;
-        }
-
-        if (lineData[i][0] === "/") {
-            continue;
-        }
-
-        cleanData += lineData[i];
-    }
+    // Remove blank lines and comment lines (lines starting with '/') then
+    // join into a single string for JSON parsing. Using filter+join avoids
+    // repeated string concatenation (O(n²) allocation) on large plugin files.
+    const cleanData = rawData
+        .split("\n")
+        .filter(line => line.length > 0 && line[0] !== "/")
+        .join("");
 
     // Note to plugin developers: You may want to comment out this
     // try/catch while debugging your plugin.
