@@ -1728,7 +1728,7 @@ class Logo {
                 } else {
                     nextFlow = logo.blockList[blk].connections[0];
                     if (
-                        nextFlow != null &&
+                        nextFlow !== null &&
                         (logo.blockList[nextFlow].name === "action" ||
                             logo.blockList[nextFlow].name === "backward")
                     ) {
