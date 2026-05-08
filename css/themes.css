@@ -1,5 +1,7 @@
 /* Theme DropDown Styling */
 
+@import url('./tokens.css');
+
 #themedropdown {
     background-color: transparent;
     box-shadow: none;
@@ -49,14 +51,14 @@
 .highcontrast #themedropdown li a:hover,
 .highcontrast #themedropdown a:hover,
 .highcontrast #themedropdown li:hover,
-.highcontrast #themedropdown.dropdown-content li > a:hover,
-.highcontrast.dropdown-content li > a:hover {
+.highcontrast #themedropdown.dropdown-content li>a:hover,
+.highcontrast.dropdown-content li>a:hover {
     background-color: transparent !important;
     color: #00ffff !important;
 }
 
 /* Override Materialize CSS hover styles with maximum specificity */
-body.highcontrast #themedropdown.dropdown-content li > a:hover {
+body.highcontrast #themedropdown.dropdown-content li>a:hover {
     background-color: transparent !important;
     color: #00ffff !important;
 }
@@ -75,7 +77,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
     background-color: #01143b !important;
 }
 
-.dark #floatingWindows > .windowFrame {
+.dark #floatingWindows>.windowFrame {
     border: 2px solid var(--border);
     background-color: var(--bg);
 }
@@ -84,11 +86,11 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
     background-color: #225a91;
 }
 
-.dark #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
+.dark #floatingWindows>.windowFrame>.wfTopBar .wftTitle {
     color: #e8e8e8;
 }
 
-.dark #floatingWindows > .windowFrame > .wfWinBody .wfbWidget {
+.dark #floatingWindows>.windowFrame>.wfWinBody .wfbWidget {
     color: #ccc !important;
     background-color: #505050 !important;
 }
@@ -166,7 +168,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
     color: white;
 }
 
-.dark .dropdown-content li > a {
+.dark .dropdown-content li>a {
     background-color: #1c1c1c;
     color: #3fe0d1;
 }
@@ -178,12 +180,12 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
     background-color: #333;
 }
 
-.dark .dropdown-content li:hover > a,
-.dark .dropdown-content li.active > a,
-.dark .dropdown-content li.selected > a,
-.dark .dropdown-content li > a:hover,
-.dark .dropdown-content li > a:focus,
-.dark .dropdown-content li > a.dropdown-item-focused {
+.dark .dropdown-content li:hover>a,
+.dark .dropdown-content li.active>a,
+.dark .dropdown-content li.selected>a,
+.dark .dropdown-content li>a:hover,
+.dark .dropdown-content li>a:focus,
+.dark .dropdown-content li>a.dropdown-item-focused {
     background-color: #333;
     color: #3fe0d1;
 }
@@ -260,11 +262,11 @@ body.highcontrast {
     min-height: 0;
 }
 
-#helpdropdown.helpdropdown-menu li + li {
+#helpdropdown.helpdropdown-menu li+li {
     border-top: 1px solid rgba(102, 102, 102, 0.16);
 }
 
-#helpdropdown.helpdropdown-menu li > a {
+#helpdropdown.helpdropdown-menu li>a {
     display: block;
     padding: 12px 16px;
     color: #35546f;
@@ -274,12 +276,12 @@ body.highcontrast {
     font-family: "Fira Sans", sans-serif;
 }
 
-#helpdropdown.helpdropdown-menu li:hover > a,
-#helpdropdown.helpdropdown-menu li.active > a,
-#helpdropdown.helpdropdown-menu li.selected > a,
-#helpdropdown.helpdropdown-menu li > a:hover,
-#helpdropdown.helpdropdown-menu li > a:focus,
-#helpdropdown.helpdropdown-menu li > a.dropdown-item-focused {
+#helpdropdown.helpdropdown-menu li:hover>a,
+#helpdropdown.helpdropdown-menu li.active>a,
+#helpdropdown.helpdropdown-menu li.selected>a,
+#helpdropdown.helpdropdown-menu li>a:hover,
+#helpdropdown.helpdropdown-menu li>a:focus,
+#helpdropdown.helpdropdown-menu li>a.dropdown-item-focused {
     background: rgba(33, 150, 243, 0.1);
     color: #24435e;
 }
@@ -345,7 +347,7 @@ body.highcontrast {
     border-top: 1px solid #e6f0f8;
 }
 
-.keyboard-shortcuts-section > .keyboard-shortcuts-row:first-of-type {
+.keyboard-shortcuts-section>.keyboard-shortcuts-row:first-of-type {
     border-top: none;
 }
 
@@ -383,11 +385,11 @@ body.highcontrast {
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
 }
 
-.dark #helpdropdown.helpdropdown-menu li + li {
+.dark #helpdropdown.helpdropdown-menu li+li {
     border-top-color: rgba(255, 255, 255, 0.08);
 }
 
-.dark #helpdropdown.helpdropdown-menu li > a {
+.dark #helpdropdown.helpdropdown-menu li>a {
     color: #e8e8e8;
 }
 
@@ -398,12 +400,12 @@ body.highcontrast {
     background: rgba(74, 163, 239, 0.16);
 }
 
-.dark #helpdropdown.helpdropdown-menu li:hover > a,
-.dark #helpdropdown.helpdropdown-menu li.active > a,
-.dark #helpdropdown.helpdropdown-menu li.selected > a,
-.dark #helpdropdown.helpdropdown-menu li > a:hover,
-.dark #helpdropdown.helpdropdown-menu li > a:focus,
-.dark #helpdropdown.helpdropdown-menu li > a.dropdown-item-focused {
+.dark #helpdropdown.helpdropdown-menu li:hover>a,
+.dark #helpdropdown.helpdropdown-menu li.active>a,
+.dark #helpdropdown.helpdropdown-menu li.selected>a,
+.dark #helpdropdown.helpdropdown-menu li>a:hover,
+.dark #helpdropdown.helpdropdown-menu li>a:focus,
+.dark #helpdropdown.helpdropdown-menu li>a.dropdown-item-focused {
     background: rgba(74, 163, 239, 0.16);
     color: #ffffff;
 }
@@ -447,14 +449,14 @@ body.highcontrast {
 }
 
 .highcontrast #helpdropdown.helpdropdown-menu,
-.highcontrast #helpdropdown.helpdropdown-menu li > a {
+.highcontrast #helpdropdown.helpdropdown-menu li>a {
     background: #000000;
     color: #ffffff;
     border-color: #ffffff;
     box-shadow: none;
 }
 
-.highcontrast #helpdropdown.helpdropdown-menu li + li {
+.highcontrast #helpdropdown.helpdropdown-menu li+li {
     border-top-color: #ffffff;
 }
 
@@ -465,12 +467,12 @@ body.highcontrast {
     background: #00ffff;
 }
 
-.highcontrast #helpdropdown.helpdropdown-menu li:hover > a,
-.highcontrast #helpdropdown.helpdropdown-menu li.active > a,
-.highcontrast #helpdropdown.helpdropdown-menu li.selected > a,
-.highcontrast #helpdropdown.helpdropdown-menu li > a:hover,
-.highcontrast #helpdropdown.helpdropdown-menu li > a:focus,
-.highcontrast #helpdropdown.helpdropdown-menu li > a.dropdown-item-focused {
+.highcontrast #helpdropdown.helpdropdown-menu li:hover>a,
+.highcontrast #helpdropdown.helpdropdown-menu li.active>a,
+.highcontrast #helpdropdown.helpdropdown-menu li.selected>a,
+.highcontrast #helpdropdown.helpdropdown-menu li>a:hover,
+.highcontrast #helpdropdown.helpdropdown-menu li>a:focus,
+.highcontrast #helpdropdown.helpdropdown-menu li>a.dropdown-item-focused {
     background: #00ffff;
     color: #000000;
 }
@@ -519,7 +521,7 @@ body.highcontrast {
     background-color: #0000ff !important;
 }
 
-.highcontrast #floatingWindows > .windowFrame {
+.highcontrast #floatingWindows>.windowFrame {
     border: 2px solid var(--border);
     background-color: var(--bg);
 }
@@ -528,11 +530,11 @@ body.highcontrast {
     background-color: #00ffff;
 }
 
-.highcontrast #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
+.highcontrast #floatingWindows>.windowFrame>.wfTopBar .wftTitle {
     color: #ffffff;
 }
 
-.highcontrast #floatingWindows > .windowFrame > .wfWinBody .wfbWidget {
+.highcontrast #floatingWindows>.windowFrame>.wfWinBody .wfbWidget {
     color: #ffffff !important;
     background-color: #000000 !important;
 }
@@ -600,7 +602,7 @@ body.highcontrast {
     color: #ffffff;
 }
 
-.highcontrast .dropdown-content li > a {
+.highcontrast .dropdown-content li>a {
     background-color: #000000;
     color: #00ffff;
 }
@@ -651,12 +653,12 @@ body.highcontrast {
     background-color: #00ffff;
 }
 
-.highcontrast .dropdown-content li:hover > a,
-.highcontrast .dropdown-content li.active > a,
-.highcontrast .dropdown-content li.selected > a,
-.highcontrast .dropdown-content li > a:hover,
-.highcontrast .dropdown-content li > a:focus,
-.highcontrast .dropdown-content li > a.dropdown-item-focused {
+.highcontrast .dropdown-content li:hover>a,
+.highcontrast .dropdown-content li.active>a,
+.highcontrast .dropdown-content li.selected>a,
+.highcontrast .dropdown-content li>a:hover,
+.highcontrast .dropdown-content li>a:focus,
+.highcontrast .dropdown-content li>a.dropdown-item-focused {
     background-color: #00ffff;
     color: #000000;
 }
