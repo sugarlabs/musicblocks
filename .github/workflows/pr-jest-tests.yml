@@ -41,6 +41,21 @@ jobs:
           COVERAGE=$(node -e "const s=require('./coverage/coverage-summary.json').total;console.log('Statements: '+s.statements.pct+'% | Branches: '+s.branches.pct+'% | Functions: '+s.functions.pct+'% | Lines: '+s.lines.pct+'%');" 2>/dev/null || echo "Coverage summary unavailable")
           echo "COVERAGE_SUMMARY=$COVERAGE" >> $GITHUB_ENV
 
+      - name: Checkout Master for Base Coverage
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          path: master-branch
+
+      - name: Get Master Coverage
+        run: |
+          cd master-branch
+          npm ci
+          npm test -- --coverage --json --outputFile=master-jest-results.json || true
+          MASTER_COVERAGE=$(node -e "try { const s=require('./coverage/coverage-summary.json').total; console.log('Statements: '+s.statements.pct+'% | Branches: '+s.branches.pct+'% | Functions: '+s.functions.pct+'% | Lines: '+s.lines.pct+'%'); } catch(e) { console.log('Unavailable'); }" 2>/dev/null)
+          echo "MASTER_COVERAGE_SUMMARY=$MASTER_COVERAGE" >> $GITHUB_ENV
+          cd ..
+
       - name: Read Jest Results
         id: results
         run: |
@@ -82,6 +97,9 @@ jobs:
               echo "✅ All Jest tests passed! This PR is ready to merge."
               echo ""
               echo "**Coverage:** $COVERAGE_SUMMARY"
+              if [ -n "$MASTER_COVERAGE_SUMMARY" ]; then
+                echo "**Master Coverage:** $MASTER_COVERAGE_SUMMARY"
+              fi
             else
               # Sort failed tests for readability
               SORTED_FAILED_TESTS=$(echo "$FAILED_TESTS" | sed '/^$/d' | sort -f)
@@ -89,6 +107,9 @@ jobs:
               echo "❌ Some Jest tests failed. Please check the logs and fix the issues before merging."
               echo ""
               echo "**Coverage:** $COVERAGE_SUMMARY"
+              if [ -n "$MASTER_COVERAGE_SUMMARY" ]; then
+                echo "**Master Coverage:** $MASTER_COVERAGE_SUMMARY"
+              fi
               echo ""
               echo "_Note: These failures may be introduced by this PR or may already exist in the master branch._"
               echo "_Tip: Update your branch with the latest master and rerun tests._"
