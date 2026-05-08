@@ -108,3 +108,7 @@ jobs:
           file-path: ${{ steps.results.outputs.COMMENT_FILE }}
           pr-number: ${{ steps.results.outputs.PR_NUMBER }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fail if tests failed
+        if: env.TESTS_PASSED == 'false'
+        run: exit 1
