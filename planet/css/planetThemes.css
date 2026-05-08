@@ -1,117 +1,117 @@
 /* Base Colors */
 .planet-page-title {
-    color: #8bc34a; /* Materialize light-green fallback */
+    color: var(--planet-title); /* Materialize light-green fallback */
 }
 
 /* Dark Mode */
 .dark {
-    background-color: #303030;
-    color: #e0e0e0;
+    background-color: var(--color-background);
+    color: var(--color-text);
 }
 
 .dark .nav-extended {
-    background-color: #2f6b2f !important;
-    border-bottom: 1px solid #444444;
+    background-color: var(--color-surface) !important;
+    border-bottom: 1px solid var(--color-border);
 }
 
 .dark .nav-wrapper .brand-logo,
 .dark .nav-wrapper a,
 .dark .tabs .tab a {
-    color: #ffffff !important;
+    color: var(--color-palette-text) !important;
 }
 
 .dark .tabs .tab a.active {
-    color: #a8d5a8 !important;
-    border-bottom: 2px solid #a8d5a8;
+    color: var(--color-selector-background) !important;
+    border-bottom: 2px solid var(--color-selector-background);
 }
 
 .dark #backToTopBtn {
-    background-color: #2f6b2f !important;
-    color: #ffffff !important;
+    background-color: var(--color-primary) !important;
+    color: var(--color-palette-text) !important;
 }
 
 .dark .modal {
-    background-color: #424242;
-    color: #e0e0e0;
+    background-color: var(--color-widget-background);
+    color: var(--color-text-muted);
 }
 
 .dark .modal-footer {
-    background-color: #383838;
+    background-color: var(--color-surface);
 }
 
 .dark .dropdown-content {
-    background-color: #424242 !important;
-    color: #ffffff !important;
-    border: 1px solid #444444;
+    background-color: var(--color-widget-background) !important;
+    color: var(--color-palette-text) !important;
+    border: 1px solid var(--color-border);
 }
 
 .dark .dropdown-content li > a:hover {
-    background-color: #383838 !important;
-    color: #ffffff !important;
+    background-color: var(--color-surface) !important;
+    color: var(--color-palette-text) !important;
 }
 
 .dark #view-more-chips {
-    color: #e0e0e0 !important;
+    color: var(--color-text-muted) !important;
 }
 .dark #local-projects .card {
-    background-color: #2a2a2a;
-    color: #e0e0e0;
-    border: 1px solid #252525;
+    background-color: var(--color-surface-muted);
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .dark #local-projects .card .card-title {
-    color: #e0e0e0 !important;
+    color: var(--color-palette-text) !important;
 }
 
 .dark #local-projects .card .card-content {
-    color: #bdbdbd;
+    color: var(--color-text-muted);
 }
 .dark #local-projects .card:hover {
-    background-color: #242424;
+    background-color: var(--color-surface);
     box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.5);
 }
 
 .dark #local-projects .card .btn {
-    background-color: #2f6b2f;
-    color: #ffffff;
+    background-color: var(--color-primary);
+    color: var(--color-palette-text);
 }
 
 .dark #local-projects .card .btn:hover {
-    background-color: #388e3c;
+    background-color: var(--color-primary-hover);
 }
 
 .dark #global-projects .card {
-    background-color: #2a2a2a;
-    color: #e0e0e0;
-    border: 1px solid #252525;
+    background-color: var(--color-surface-muted);
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .dark #global-projects .card .card-title {
-    color: #e0e0e0 !important;
+    color: var(--color-palette-text) !important;
 }
 
 .dark #global-projects .card .card-content {
-    color: #bdbdbd;
+    color: var(--color-text-muted);
 }
 
 .dark #global-projects .card:hover {
-    background-color: #242424;
+    background-color: var(--color-surface);
     box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.5);
 }
 
 .dark #global-projects .card .btn {
-    background-color: #2f6b2f;
-    color: #ffffff;
+    background-color: var(--color-primary);
+    color: var(--color-palette-text);
 }
 
 .dark #global-projects .card .btn:hover {
-    background-color: #388e3c;
+    background-color: var(--color-primary-hover);
 }
 
 .dark .modal-footer .btn-flat {
-    color: #ffffff !important;
+    color: var(--color-palette-text) !important;
     background-color: transparent !important;
     transition:
         background-color 0.3s ease,
@@ -120,17 +120,17 @@
 }
 
 .dark .modal-footer .btn-flat:hover {
-    background-color: #a8d5a8 !important;
-    color: #303030 !important;
+    background-color: var(--color-selector-background) !important;
+    color: var(--color-background) !important;
 }
 .dark .close-button {
-    color: #e0e0e0;
+    color: var(--color-text-muted);
     font-size: 1.5rem;
     transition: color 0.3s ease;
 }
 
 .dark .close-button:hover {
-    color: #a8d5a8;
+    color: var(--color-selector-background);
 }
 
 .dark .select-wrapper {
@@ -141,14 +141,14 @@
 }
 
 .dark .select-wrapper input.select-dropdown {
-    color: #ffffff !important;
+    color: var(--color-palette-text) !important;
     font-size: 1rem;
     line-height: normal;
     padding-left: 10px;
     height: 3rem;
     box-sizing: border-box;
-    background-color: #424242 !important;
-    border: 1px solid #444444 !important;
+    background-color: var(--color-widget-background) !important;
+    border: 1px solid var(--color-border) !important;
 }
 
 .dark .select-wrapper:after {
@@ -157,305 +157,307 @@
     top: 50%;
     right: 10px;
     transform: translateY(-50%);
-    color: #ffffff !important;
+    color: var(--color-palette-text) !important;
     font-size: 0.8rem;
     pointer-events: none;
 }
 
 .dark .dropdown-content {
-    background-color: #424242 !important;
-    border: 1px solid #444444;
-    color: #ffffff !important;
+    background-color: var(--color-widget-background) !important;
+    border: 1px solid var(--color-border);
+    color: var(--color-palette-text) !important;
 }
 
 .dark .dropdown-content li > a {
-    color: #ffffff !important;
+    color: var(--color-palette-text) !important;
     padding: 0.5rem 1rem;
 }
 
 .dark .dropdown-content li > a:hover {
-    background-color: #383838 !important;
-    color: #a8d5a8 !important;
+    background-color: var(--color-surface) !important;
+    color: var(--color-selector-background) !important;
 }
 
 /* High Contrast Mode */
 
 .highcontrast {
-    background-color: #000080;
-    color: #ffff00;
+    background-color: var(--color-background);
+    color: var(--color-primary);
 }
 
 .highcontrast .planet-page-title {
-    color: #ffffff !important;
+    color: var(--color-palette-text) !important;
 }
 
 .highcontrast .nav-extended {
-    background-color: #000000 !important;
-    border-bottom: 2px solid #ffff00;
+    background-color: var(--color-widget-background) !important;
+    border-bottom: 2px solid var(--color-primary);
 }
 
 .highcontrast .nav-wrapper .brand-logo,
 .highcontrast .nav-wrapper a,
 .highcontrast .tabs .tab a {
-    color: #ffff00 !important;
+    color: var(--color-primary) !important;
 }
 
 .highcontrast .tabs .tab a.active {
-    color: #ffffff !important;
-    border-bottom: 2px solid #ffff00;
+    color: var(--color-palette-text) !important;
+    border-bottom: 2px solid var(--color-primary);
 }
 
 .highcontrast #backToTopBtn {
-    background-color: #000000 !important;
-    color: #ffff00 !important;
-    border: 2px solid #ffff00;
+    background-color: var(--color-surface) !important;
+    color: var(--color-primary) !important;
+    border: 2px solid var(--color-primary);
 }
 
 .highcontrast .modal {
-    background-color: #000000;
-    color: #ffff00;
-    border: 2px solid #ffff00;
+    background-color: var(--color-surface);
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
 }
 
 .highcontrast .modal-footer {
-    background-color: #000000;
+    background-color: var(--color-surface);
 }
 
 .highcontrast .dropdown-content {
-    background-color: #000000 !important;
-    color: #ffff00 !important;
-    border: 2px solid #ffff00;
+    background-color: var(--color-surface) !important;
+    color: var(--color-primary) !important;
+    border: 2px solid var(--color-primary);
 }
 
 .highcontrast .dropdown-content li > a:hover {
-    background-color: #000080 !important;
-    color: #ffff00 !important;
+    background-color: var(--color-background) !important;
+    color: var(--color-primary) !important;
 }
 
 /* High contrast icon styles */
 .highcontrast .material-icons {
-    color: #ffffff !important;
+    color: var(--color-palette-text) !important;
     text-shadow: none !important;
 }
 
 /* High contrast hover box outlines */
 .highcontrast .tooltip,
 .highcontrast .hover-box {
-    border: 2px solid #ffff00 !important;
-    box-shadow: 0 0 10px #ffff00 !important;
+    border: 2px solid var(--color-primary) !important;
+    box-shadow: 0 0 10px var(--color-primary) !important;
 }
 
 /* Report Project card readability */
 
 .dark #projectviewer-report-card {
-    background-color: #2f2f2f;
-    border: 1px solid #555555;
-    color: #f1f1f1;
+    background-color: var(--color-surface-muted);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
 }
 
 .dark #projectviewer-report-card .card-content,
 .dark #projectviewer-report-card .card-action {
-    background-color: #2f2f2f;
-    color: #f1f1f1;
+    background-color: var(--color-surface-muted);
+    color: var(--color-text);
 }
 
 .dark #projectviewer-report-title,
 .dark #projectviewer-reportsubmit-title {
-    color: #f1f1f1;
+    color: var(--color-text);
 }
 
 .dark #projectviewer-report-conduct,
 .dark #submittext,
 .dark #projectviewer-report-reason {
-    color: #c7c7c7 !important;
+    color: var(--color-text-muted) !important;
 }
 
 .dark #projectviewer-report-card a {
-    color: #a8d5a8 !important;
+    color: var(--color-selector-background) !important;
 }
 
 .dark #projectviewer-report-card a:hover {
-    color: #c6e7c6 !important;
+    color: var(--color-selector-background) !important;
 }
 
 .dark #reportdescription {
-    color: #ffffff;
-    border-bottom: 1px solid #7a7a7a;
+    color: var(--color-palette-text);
+    border-bottom: 1px solid var(--color-border);
 }
 
 .dark #reportdescription:focus {
-    border-bottom: 1px solid #a8d5a8;
-    box-shadow: 0 1px 0 0 #a8d5a8;
+    border-bottom: 1px solid var(--color-selector-background);
+    box-shadow: 0 1px 0 0 var(--color-selector-background);
 }
 
 .dark #report-error {
-    color: #ff8a80;
+    color: var(--color-trash-active);
 }
 
 .highcontrast #projectviewer-report-card {
-    background-color: #001133;
-    border: 2px solid #ffff00;
-    outline: 1px solid #ffffff;
+    background-color: var(--color-background);
+    border: 2px solid var(--color-primary);
+    outline: 1px solid var(--color-palette-text);
     outline-offset: -2px;
-    box-shadow: 0 0 0 3px #000000, 0 10px 24px rgba(0, 0, 0, 0.9);
-    color: #ffff00;
+    box-shadow:
+        0 0 0 3px var(--color-surface),
+        0 10px 24px rgba(0, 0, 0, 0.9);
+    color: var(--color-primary);
     bottom: -5px;
 }
 
 .highcontrast #projectviewer-report-card .card-content,
 .highcontrast #projectviewer-report-card .card-action {
-    background-color: #001133;
-    color: #ffff00;
+    background-color: var(--color-background);
+    color: var(--color-primary);
 }
 
 .highcontrast #projectviewer-report-card .card-action {
-    background-color: #000a26;
-    border-top: 1px solid #ffff00;
+    background-color: var(--color-surface);
+    border-top: 1px solid var(--color-primary);
 }
 
 .highcontrast #projectviewer-report-title,
 .highcontrast #projectviewer-reportsubmit-title {
-    color: #ffff00;
+    color: var(--color-primary);
 }
 
 .highcontrast #projectviewer-report-conduct,
 .highcontrast #submittext,
 .highcontrast #projectviewer-report-reason {
-    color: #ffffff !important;
+    color: var(--color-palette-text) !important;
 }
 
 .highcontrast #projectviewer-report-card a {
-    color: #ffff00 !important;
+    color: var(--color-primary) !important;
 }
 
 .highcontrast #projectviewer-report-card a:hover {
-    background-color: #000080 !important;
-    color: #ffff00 !important;
+    background-color: var(--color-background) !important;
+    color: var(--color-primary) !important;
 }
 
 .highcontrast #reportdescription {
-    color: #ffff00;
-    border-bottom: 2px solid #ffff00;
+    color: var(--color-primary);
+    border-bottom: 2px solid var(--color-primary);
 }
 
 .highcontrast #reportdescription:focus {
-    border-bottom: 2px solid #ffffff;
-    box-shadow: 0 0 0 1px #ffffff;
+    border-bottom: 2px solid var(--color-palette-text);
+    box-shadow: 0 0 0 1px var(--color-palette-text);
 }
 
 .highcontrast #report-error {
-    color: #ff4d4d;
+    color: var(--color-trash-active);
 }
 
 .highcontrast #view-more-chips {
-    color: #ffff00 !important;
+    color: var(--color-primary) !important;
 }
 
 .highcontrast .chipselect {
-    background-color: #000000;
-    color: #ffff00;
-    border: 2px solid #ffff00;
+    background-color: var(--color-surface);
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
 }
 
 .highcontrast .chipselect.selected,
 .highcontrast .chipselect.selected-special {
-    background-color: #ffff00;
-    color: #000000;
-    border: 2px solid #ffff00;
+    background-color: var(--color-primary);
+    color: var(--color-surface);
+    border: 2px solid var(--color-primary);
 }
 
 .highcontrast .chipselect.cursor:hover:not(.selected-special) {
-    background-color: #000080;
-    color: #ffff00;
+    background-color: var(--color-background);
+    color: var(--color-primary);
 }
 
 .highcontrast .chipselect:focus,
 .highcontrast .chipselect:focus-visible {
-    outline: 2px solid #ffffff;
+    outline: 2px solid var(--color-palette-text);
     outline-offset: 2px;
 }
 
 .highcontrast #local-projects .card {
-    background-color: #000000;
-    color: #ffff00;
-    border: 2px solid #ffff00;
+    background-color: var(--color-surface);
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
     box-shadow: 0px 4px 6px rgba(255, 255, 0, 0.3);
 }
 
 .highcontrast #local-projects .card .card-title {
-    color: #ffff00 !important;
+    color: var(--color-primary) !important;
 }
 
 .highcontrast #local-projects .card .card-content {
-    color: #ffff00;
+    color: var(--color-primary);
 }
 .highcontrast #local-projects .card:hover {
-    background-color: #000080;
+    background-color: var(--color-background);
     box-shadow: 0px 6px 8px rgba(255, 255, 0, 0.5);
 }
 
 .highcontrast #local-projects .card .btn {
-    background-color: #000000;
-    color: #ffff00;
-    border: 2px solid #ffff00;
+    background-color: var(--color-surface);
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
 }
 
 .highcontrast #local-projects .card .btn:hover {
-    background-color: #000080;
+    background-color: var(--color-background);
 }
 
 .highcontrast #global-projects .card {
-    background-color: #000000;
-    color: #ffff00;
-    border: 2px solid #ffff00;
+    background-color: var(--color-surface);
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
     box-shadow: 0px 4px 6px rgba(255, 255, 0, 0.3);
 }
 
 .highcontrast #global-projects .card .card-title {
-    color: #ffff00 !important;
+    color: var(--color-primary) !important;
 }
 
 .highcontrast #global-projects .card .card-content {
-    color: #ffff00;
+    color: var(--color-primary);
 }
 
 .highcontrast #global-projects .card:hover {
-    background-color: #000080;
+    background-color: var(--color-background);
     box-shadow: 0px 6px 8px rgba(255, 255, 0, 0.5);
 }
 
 .highcontrast #global-projects .card .btn {
-    background-color: #000000;
-    color: #ffff00;
-    border: 2px solid #ffff00;
+    background-color: var(--color-surface);
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
 }
 
 .highcontrast #global-projects .card .btn:hover {
-    background-color: #000080;
+    background-color: var(--color-background);
 }
 
 .highcontrast .modal-footer .btn-flat {
-    color: #ffff00 !important;
+    color: var(--color-primary) !important;
     background-color: transparent !important;
     transition:
         background-color 0.3s ease,
         color 0.3s ease;
     font-weight: bold;
-    border: 2px solid #ffff00;
+    border: 2px solid var(--color-primary);
 }
 
 .highcontrast .modal-footer .btn-flat:hover {
-    background-color: #000080 !important;
-    color: #ffff00 !important;
+    background-color: var(--color-background) !important;
+    color: var(--color-primary) !important;
 }
 .highcontrast .close-button {
-    color: #ffff00;
+    color: var(--color-primary);
     font-size: 1.5rem;
     transition: color 0.3s ease;
 }
 
 .highcontrast .close-button:hover {
-    color: #ffffff;
+    color: var(--color-palette-text);
 }
 
 .highcontrast .select-wrapper {
@@ -466,14 +468,14 @@
 }
 
 .highcontrast .select-wrapper input.select-dropdown {
-    color: #ffff00 !important;
+    color: var(--color-primary) !important;
     font-size: 1rem;
     line-height: normal;
     padding-left: 10px;
     height: 3rem;
     box-sizing: border-box;
-    background-color: #000000 !important;
-    border: 2px solid #ffff00 !important;
+    background-color: var(--color-surface) !important;
+    border: 2px solid var(--color-primary) !important;
 }
 
 .highcontrast .select-wrapper:after {
@@ -482,50 +484,50 @@
     top: 50%;
     right: 10px;
     transform: translateY(-50%);
-    color: #ffff00 !important;
+    color: var(--color-primary) !important;
     font-size: 0.8rem;
     pointer-events: none;
 }
 
 .highcontrast .dropdown-content {
-    background-color: #000000 !important;
-    border: 2px solid #ffff00;
-    color: #00ffff !important;
+    background-color: var(--color-surface) !important;
+    border: 2px solid var(--color-primary);
+    color: var(--color-primary) !important;
 }
 
 .highcontrast .dropdown-content li > a {
-    color: #00ffff !important;
+    color: var(--color-primary) !important;
     padding: 0.5rem 1rem;
 }
 
 .highcontrast .select-dropdown.dropdown-content li > span {
-    color: #00ffff !important;
+    color: var(--color-primary) !important;
 }
 
 .highcontrast .select-dropdown.dropdown-content li.selected > span,
 .highcontrast .select-dropdown.dropdown-content li.active > span {
-    color: #ffff00 !important;
+    color: var(--color-primary) !important;
 }
 
 .highcontrast .select-dropdown.dropdown-content li:hover > span {
-    background-color: #000080 !important;
-    color: #ffff00 !important;
+    background-color: var(--color-background) !important;
+    color: var(--color-primary) !important;
 }
 
 .highcontrast .dropdown-content li > a:hover {
-    background-color: #000080 !important;
-    color: #ffff00 !important;
+    background-color: var(--color-background) !important;
+    color: var(--color-primary) !important;
 }
 
 /* High contrast icon styles */
 .highcontrast .material-icons {
-    color: #ffffff !important;
+    color: var(--color-palette-text) !important;
     text-shadow: none !important;
 }
 
 /* High contrast hover box outlines */
 .highcontrast .tooltip,
 .highcontrast .hover-box {
-    border: 2px solid #ffff00 !important;
-    box-shadow: 0 0 10px #ffff00 !important;
+    border: 2px solid var(--color-primary) !important;
+    box-shadow: 0 0 10px var(--color-primary) !important;
 }

@@ -400,7 +400,18 @@ function LegoWidget() {
             labelCell.style.fontSize = "13px";
             labelCell.style.fontWeight = "bold";
             labelCell.style.border = "none"; // Remove default borders
-            labelCell.style.backgroundColor = rowData.type === "pitch" ? "#77C428" : "#87ceeb";
+
+            if (labelCell.classList && typeof labelCell.classList.add === "function") {
+                if (rowData.type === "pitch") {
+                    labelCell.classList.add("phrasemaker-row-label--pitch");
+                } else {
+                    labelCell.classList.add("phrasemaker-row-label--drum");
+                }
+            }
+            if (labelCell.style) {
+                labelCell.style.backgroundColor = rowData.type === "pitch" ? "#77C428" : "#87ceeb";
+            }
+
             labelCell.style.gap = "8px";
             labelCell.style.height = "40px"; // ROW_HEIGHT + "px";
             labelCell.style.lineHeight = "40px"; // ROW_HEIGHT + "px";

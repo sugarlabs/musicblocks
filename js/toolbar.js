@@ -63,12 +63,12 @@ class Toolbar {
      * @constructor
      */
     constructor() {
-        this.stopIconColorWhenPlaying = window.platformColor.stopIconcolor;
         this.language = safeStorageGet("languagePreference");
         if (this.language === undefined) {
             this.language = navigator.language;
         }
         this.tooltipsDisabled = false;
+        this.stopIconColorWhenPlaying = "var(--color-trash-active)";
         this._recordDropdownArrowElement = null;
         this._recordDropdownArrowClickHandler = null;
         this._recordDropdownOutsideClickHandler = null;
@@ -475,6 +475,22 @@ class Toolbar {
      */
     renderLogoIcon(onclick) {
         const logoIcon = docById("mb-logo");
+        const label = _THIS_IS_MUSIC_BLOCKS_ ? _("About Music Blocks") : _("About Turtle Blocks");
+        if (logoIcon && typeof logoIcon.setAttribute === "function") {
+            logoIcon.setAttribute("role", "button");
+            logoIcon.setAttribute("tabindex", "0");
+            logoIcon.setAttribute("aria-label", label);
+        } else if (logoIcon) {
+            logoIcon.role = "button";
+            logoIcon.tabIndex = 0;
+            logoIcon["aria-label"] = label;
+        }
+        logoIcon.onkeydown = event => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                logoIcon.click();
+            }
+        };
         if (this.language === "ja") {
             logoIcon.innerHTML =
                 '<img style="width: 100%; transform: scale(0.85);" src="images/logo-ja.svg">';
@@ -539,7 +555,11 @@ class Toolbar {
             isPlayIconRunning = false;
             onclick(this.activity);
             handleClick();
-            stopIcon.style.color = this.stopIconColorWhenPlaying;
+            if (stopIcon.classList && typeof stopIcon.classList.add === "function") {
+                stopIcon.classList.add("toolbar-stop-active");
+            } else {
+                stopIcon.style.color = this.stopIconColorWhenPlaying;
+            }
             saveButton.disabled = true;
             saveButtonAdvanced.disabled = true;
             saveButton.className = "grey-text inactiveLink";
@@ -577,7 +597,11 @@ class Toolbar {
         });
         stopIcon.onclick = () => {
             onclick(this.activity);
-            stopIcon.style.color = "white";
+            if (stopIcon.classList && typeof stopIcon.classList.remove === "function") {
+                stopIcon.classList.remove("toolbar-stop-active");
+            } else {
+                stopIcon.style.color = "white";
+            }
             saveButton.disabled = false;
             saveButtonAdvanced.disabled = false;
             saveButton.className = "";
@@ -618,13 +642,17 @@ class Toolbar {
         const confirmationButton = document.createElement("div");
         confirmationButton.classList.add("confirm-button");
         confirmationButton.id = "new-project";
+        confirmationButton.setAttribute("role", "button");
         confirmationButton.setAttribute("tabindex", "0"); // Make focusable
+        confirmationButton.setAttribute("aria-label", _("Confirm new project"));
         confirmationButton.textContent = _("Confirm");
 
         const cancelButton = document.createElement("div");
         cancelButton.classList.add("cancel-button");
         cancelButton.id = "cancel-project";
+        cancelButton.setAttribute("role", "button");
         cancelButton.textContent = _("Cancel");
+        cancelButton.setAttribute("aria-label", _("Cancel new project"));
 
         buttonRowLi.appendChild(confirmationButton);
         buttonRowLi.appendChild(cancelButton);
@@ -1233,10 +1261,14 @@ class Toolbar {
         if (this.activity.beginnerMode && this.language === "ja") {
             runSlowlyIcon.style.display = "none";
         }
-
         runSlowlyIcon.onclick = () => {
             onclick(this.activity);
-            docById("stop").style.color = this.stopIconColorWhenPlaying;
+            const stopIcon = docById("stop");
+            if (stopIcon.classList && typeof stopIcon.classList.add === "function") {
+                stopIcon.classList.add("toolbar-stop-active");
+            } else {
+                stopIcon.style.color = this.stopIconColorWhenPlaying;
+            }
         };
     }
 

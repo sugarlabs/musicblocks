@@ -2,6 +2,13 @@
  * Copyright (c) 2025 Anvita Prasad DMP'25
  * TunerDisplay class for visualizing pitch detection
  */
+function getCssColor(token) {
+    const styles = getComputedStyle(document.body);
+    return styles && typeof styles.getPropertyValue === "function"
+        ? styles.getPropertyValue(token).trim()
+        : "";
+}
+
 function TunerDisplay(canvas, width, height) {
     this.canvas = canvas;
     this.width = width;
@@ -38,6 +45,8 @@ function TunerDisplay(canvas, width, height) {
 
     // Create chromatic mode button
     this.chromaticButton = document.createElement("div");
+    this.chromaticButton.setAttribute("role", "button");
+    this.chromaticButton.setAttribute("aria-label", "Chromatic mode");
     Object.assign(this.chromaticButton.style, {
         width: "40px",
         height: "32px",
@@ -60,6 +69,8 @@ function TunerDisplay(canvas, width, height) {
 
     // Create target pitch mode button
     this.targetPitchButton = document.createElement("div");
+    this.targetPitchButton.setAttribute("role", "button");
+    this.targetPitchButton.setAttribute("aria-label", "Target pitch mode");
     Object.assign(this.targetPitchButton.style, {
         width: "40px",
         height: "32px",
@@ -100,15 +111,11 @@ function TunerDisplay(canvas, width, height) {
  */
 TunerDisplay.prototype.updateButtonStyles = function () {
     if (this.chromaticMode) {
-        this.chromaticButton.style.backgroundColor = platformColor.selectorBackground;
-        this.chromaticButton.querySelector("img").style.filter = "brightness(0) invert(1)";
-        this.targetPitchButton.style.backgroundColor = "transparent";
-        this.targetPitchButton.querySelector("img").style.filter = "none";
+        this.chromaticButton.classList.add("tuner-mode-selected");
+        this.targetPitchButton.classList.remove("tuner-mode-selected");
     } else {
-        this.targetPitchButton.style.backgroundColor = platformColor.selectorBackground;
-        this.targetPitchButton.querySelector("img").style.filter = "brightness(0) invert(1)";
-        this.chromaticButton.style.backgroundColor = "transparent";
-        this.chromaticButton.querySelector("img").style.filter = "none";
+        this.targetPitchButton.classList.add("tuner-mode-selected");
+        this.chromaticButton.classList.remove("tuner-mode-selected");
     }
 };
 
@@ -143,11 +150,11 @@ TunerDisplay.prototype.draw = function () {
     const meterY = height - 80; // Base position of meter
 
     // Draw the tuning meter background
-    ctx.fillStyle = platformColor.selectorBackground || "#e0e0e0";
+    ctx.fillStyle = getCssColor("--color-selector-background") || "#e0e0e0";
     ctx.fillRect(meterX, meterY, meterWidth, meterHeight);
 
     // Draw the center line
-    ctx.fillStyle = platformColor.textColor || "#000000";
+    ctx.fillStyle = getCssColor("--color-text") || "#000000";
     ctx.fillRect(meterX + meterWidth / 2 - 1, meterY, 2, meterHeight);
 
     // Draw the indicator
@@ -159,7 +166,7 @@ TunerDisplay.prototype.draw = function () {
     // Draw the note
     ctx.font = "bold 48px Arial";
     ctx.textAlign = "center";
-    ctx.fillStyle = platformColor.textColor || "#000000";
+    ctx.fillStyle = getCssColor("--color-text") || "#000000";
     ctx.fillText(this.note, width / 2, height - 200); // Much lower position
 
     // Draw the cents deviation

@@ -89,17 +89,25 @@ const PhraseMakerAudio = {
             let row = pm._noteValueRow;
 
             // Highlight first note.
-            const cell = row.cells[pm._colIndex];
-            cell.style.backgroundColor = pm.platformColor.selectorBackground;
+            const cell = row && row.cells ? row.cells[pm._colIndex] : null;
+            if (cell && cell.style) {
+                cell.style.backgroundColor = pm.platformColor
+                    ? pm.platformColor.selectorBackground
+                    : "gray";
+            }
 
             let tupletCell;
             // If we are in a tuplet, we don't update the column until
             // we've played all of the notes in the column span.
-            if (cell.colSpan > 1) {
+            if (cell && cell.colSpan > 1) {
                 pm._spanCounter = 1;
                 row = pm._tupletNoteValueRow;
-                tupletCell = row.cells[pm._colIndex];
-                tupletCell.style.backgroundColor = pm.platformColor.selectorBackground;
+                tupletCell = row && row.cells ? row.cells[pm._colIndex] : null;
+                if (tupletCell && tupletCell.style) {
+                    tupletCell.style.backgroundColor = pm.platformColor
+                        ? pm.platformColor.selectorBackground
+                        : "gray";
+                }
             } else {
                 pm._spanCounter = 0;
                 pm._colIndex += 1;
@@ -262,7 +270,7 @@ const PhraseMakerAudio = {
             for (let j = 0; j < pm.rowLabels.length; j++) {
                 row = pm._rows[j];
                 cell = row.cells[i];
-                if (cell.style.backgroundColor === "black") {
+                if (pm._isSelectedCell(cell)) {
                     if (pm.rowLabels[j] === "hertz") {
                         // if pitch specified in hertz
                         note.push(pm.rowArgs[j]);
@@ -369,14 +377,22 @@ const PhraseMakerAudio = {
                 >&nbsp;&nbsp;`;
                 } else {
                     row = pm._noteValueRow;
-                    cell = row.cells[pm._colIndex];
+                    cell = row && row.cells ? row.cells[pm._colIndex] : null;
 
                     if (cell !== undefined) {
-                        cell.style.backgroundColor = pm.platformColor.selectorBackground;
-                        if (cell.colSpan > 1) {
+                        if (cell && cell.style) {
+                            cell.style.backgroundColor = pm.platformColor
+                                ? pm.platformColor.selectorBackground
+                                : "gray";
+                        }
+                        if (cell && cell.colSpan > 1) {
                             row = pm._tupletNoteValueRow;
-                            tupletCell = row.cells[pm._notesCounter];
-                            tupletCell.style.backgroundColor = pm.platformColor.selectorBackground;
+                            tupletCell = row && row.cells ? row.cells[pm._notesCounter] : null;
+                            if (tupletCell && tupletCell.style) {
+                                tupletCell.style.backgroundColor = pm.platformColor
+                                    ? pm.platformColor.selectorBackground
+                                    : "gray";
+                            }
                         }
                     }
 
@@ -457,11 +473,11 @@ const PhraseMakerAudio = {
                 }
 
                 row = pm._noteValueRow;
-                cell = row.cells[pm._colIndex];
+                cell = row && row.cells ? row.cells[pm._colIndex] : null;
                 if (cell !== undefined) {
-                    if (cell.colSpan > 1) {
+                    if (cell && cell.colSpan > 1) {
                         pm._spanCounter += 1;
-                        if (pm._spanCounter === cell.colSpan) {
+                        if (pm._spanCounter === (cell.colSpan || 1)) {
                             pm._colIndex += 1;
                             pm._spanCounter = 0;
                         }

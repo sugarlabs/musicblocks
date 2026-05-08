@@ -538,7 +538,128 @@ if (platformThemes[activeTheme]) {
     window.platformColor = platformThemes["light"];
 }
 
+const getTokenValue = token => {
+    if (typeof window === "undefined" || !window.document || !document.body) {
+        return "";
+    }
+    return getComputedStyle(document.body).getPropertyValue(token).trim();
+};
+
+window.platformColor = Object.assign({}, window.platformColor, {
+    get header() {
+        return getTokenValue("--color-primary") || this._header || "#1E88E5";
+    },
+    get paletteBackground() {
+        return getTokenValue("--color-surface") || this._paletteBackground || "#ffffff";
+    },
+    get paletteSelected() {
+        return getTokenValue("--color-palette-selected") || this._paletteSelected || "#1E1E1E";
+    },
+    get paletteText() {
+        return getTokenValue("--color-text-muted") || this._paletteText || "#666666";
+    },
+    get selectorBackground() {
+        return (
+            getTokenValue("--color-selector-background") || this._selectorBackground || "#64B5F6"
+        );
+    },
+    get selectorBackgroundHOVER() {
+        return (
+            getTokenValue("--color-selector-background-hover") ||
+            this._selectorBackgroundHOVER ||
+            "#1E88E5"
+        );
+    },
+    get selectorSelected() {
+        return getTokenValue("--color-selector-selected") || this._selectorSelected || "#1E88E5";
+    },
+    get labelColor() {
+        return getTokenValue("--color-label") || this._labelColor || "#cccccc";
+    },
+    get lyricsLabelBackground() {
+        return getTokenValue("--color-lyrics-label-bg") || this._lyricsLabelBackground || "#C7225D";
+    },
+    get lyricsInputBackground() {
+        return getTokenValue("--color-lyrics-input-bg") || this._lyricsInputBackground || "#D15A84";
+    },
+    get tupletBackground() {
+        return getTokenValue("--color-tuplet-bg") || this._tupletBackground || "#f5f5f5";
+    },
+    get rhythmcellcolor() {
+        return getTokenValue("--color-rhythm-cell-bg") || this._rhythmcellcolor || "#f0f0f0";
+    },
+    get textColor() {
+        return getTokenValue("--color-text") || this._textColor || "#000000";
+    },
+    get strokeColor() {
+        return getTokenValue("--color-text") || this._strokeColor || "#000000";
+    },
+    get fillColor() {
+        return getTokenValue("--color-background") || this._fillColor || "#f9f9f9";
+    }
+});
+
 document.querySelector("meta[name=theme-color]").content = platformColor.header;
+
+// Parse comma-separated CSS token lists into JS arrays for legacy code
+const parseTokenList = (token, fallback) => {
+    const v = getTokenValue(token);
+    if (v)
+        return v
+            .split(",")
+            .map(s => s.trim())
+            .filter(Boolean);
+    return Array.isArray(fallback) ? fallback.slice() : fallback ? [fallback] : [];
+};
+
+try {
+    // Ensure paletteColors object exists
+    platformColor.paletteColors = platformColor.paletteColors || {};
+    platformColor.paletteColors.widgets = parseTokenList(
+        "--palette-widgets",
+        platformColor.paletteColors.widgets || platformColor.paletteColors["widgets"]
+    );
+    platformColor.paletteColors.pitch = parseTokenList(
+        "--palette-pitch",
+        platformColor.paletteColors.pitch || platformColor.paletteColors["pitch"]
+    );
+    platformColor.paletteColors.drum = parseTokenList(
+        "--palette-drum",
+        platformColor.paletteColors.drum || platformColor.paletteColors["drum"]
+    );
+    platformColor.paletteColors.turtle = parseTokenList(
+        "--palette-turtle",
+        platformColor.paletteColors.turtle || platformColor.paletteColors["turtle"]
+    );
+
+    // Wheels and other lists
+    platformColor.exitWheelcolors = parseTokenList(
+        "--wheel-exit",
+        platformColor.exitWheelcolors || platformColor.exitWheelcolors || []
+    );
+    platformColor.exitWheelcolors2 = parseTokenList(
+        "--wheel-exit-2",
+        platformColor.exitWheelcolors2 || platformColor.exitWheelcolors2 || []
+    );
+    platformColor.blockLabelsWheelcolors = parseTokenList(
+        "--wheel-block-labels",
+        platformColor.blockLabelsWheelcolors || platformColor.blockLabelsWheelcolors || []
+    );
+    platformColor.graphicWheelcolors = parseTokenList(
+        "--wheel-graphic",
+        platformColor.graphicWheelcolors || platformColor.graphicWheelcolors || []
+    );
+    platformColor.pitchWheelcolors = parseTokenList(
+        "--wheel-pitch",
+        platformColor.pitchWheelcolors || platformColor.pitchWheelcolors || []
+    );
+    platformColor.piemenuVoicesColors = parseTokenList(
+        "--wheel-piemenu-voices",
+        platformColor.piemenuVoicesColors || platformColor.piemenuVoicesColors || []
+    );
+} catch (e) {
+    // In non-browser environments (tests), getTokenValue may be a no-op — ignore
+}
 
 /**
  * @public

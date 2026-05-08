@@ -121,8 +121,8 @@ describe("platformstyle", () => {
     it("initializes platformColor with light theme by default", () => {
         loadModuleWithUA("Chrome/123");
         expect(global.window.platformColor).toBeDefined();
-        expect(global.window.platformColor.header).toBe("#4DA6FF");
-        expect(document.querySelector("meta[name=theme-color]").content).toBe("#4DA6FF");
+        expect(global.window.platformColor.header).toBe("#1E88E5");
+        expect(document.querySelector("meta[name=theme-color]").content).toBe("#1E88E5");
     });
 
     it("honors dark theme preference", () => {

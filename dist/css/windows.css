@@ -18,6 +18,11 @@
   left: 0;
 }
 
+#floatingWindows > .windowFrame.overlay-active {
+  border: 0.25vw solid black;
+  background-color: var(--overlay-bg);
+}
+
 #floatingWindows > .windowFrame > .wfTopBar {
   height: 29px;
   border-bottom: 1px solid #666;

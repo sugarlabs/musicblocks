@@ -880,15 +880,15 @@ class RhythmRuler {
                 rulerSubCell.style.lineHeight = "60%";
                 if (i % 2 === 0) {
                     if (j % 2 === 0) {
-                        rulerSubCell.style.backgroundColor = platformColor.selectorBackground;
+                        rulerSubCell.classList.add("rhythm-ruler-cell-bg");
                     } else {
-                        rulerSubCell.style.backgroundColor = platformColor.selectorSelected;
+                        rulerSubCell.classList.add("rhythm-ruler-cell-selected");
                     }
                 } else {
                     if (j % 2 === 0) {
-                        rulerSubCell.style.backgroundColor = platformColor.selectorSelected;
+                        rulerSubCell.classList.add("rhythm-ruler-cell-selected");
                     } else {
-                        rulerSubCell.style.backgroundColor = platformColor.selectorBackground;
+                        rulerSubCell.classList.add("rhythm-ruler-cell-bg");
                     }
                 }
 
@@ -1068,28 +1068,41 @@ class RhythmRuler {
         const ruler = this._rulers[rulerno];
         let evenColor;
         if (this._rulerSelected % 2 === 0) {
-            evenColor = platformColor.selectorBackground;
+            evenColor = "rhythm-ruler-cell-bg";
         } else {
-            evenColor = platformColor.selectorSelected;
+            evenColor = "rhythm-ruler-cell-selected";
         }
 
         for (let i = 0; i < ruler.cells.length; i++) {
             const newCell = ruler.cells[i];
+            if (!newCell) continue;
             newCell.style.border = "2px solid lightgrey";
             newCell.style.borderRadius = "10px";
-            if (evenColor === platformColor.selectorBackground) {
+            if (evenColor === "rhythm-ruler-cell-bg") {
                 if (i % 2 === 0) {
-                    newCell.style.backgroundColor = platformColor.selectorBackground;
+                    if (newCell.classList) {
+                        newCell.classList.remove("rhythm-ruler-cell-selected");
+                        newCell.classList.add("rhythm-ruler-cell-bg");
+                    }
                 } else {
-                    newCell.style.backgroundColor = platformColor.selectorSelected;
+                    if (newCell.classList) {
+                        newCell.classList.remove("rhythm-ruler-cell-bg");
+                        newCell.classList.add("rhythm-ruler-cell-selected");
+                    }
                 }
             }
 
-            if (evenColor === platformColor.selectorSelected) {
+            if (evenColor === "rhythm-ruler-cell-selected") {
                 if (i % 2 === 0) {
-                    newCell.style.backgroundColor = platformColor.selectorSelected;
+                    if (newCell.classList) {
+                        newCell.classList.remove("rhythm-ruler-cell-bg");
+                        newCell.classList.add("rhythm-ruler-cell-selected");
+                    }
                 } else {
-                    newCell.style.backgroundColor = platformColor.selectorBackground;
+                    if (newCell.classList) {
+                        newCell.classList.remove("rhythm-ruler-cell-selected");
+                        newCell.classList.add("rhythm-ruler-cell-bg");
+                    }
                 }
             }
         }
@@ -1410,7 +1423,7 @@ class RhythmRuler {
                 if (cell !== null && cell.parentNode !== null) {
                     this._rulerSelected = cell.parentNode.getAttribute("data-row");
                     // const noteValues = this.Rulers[this._rulerSelected][0];
-                    cell.style.backgroundColor = platformColor.selectorBackground;
+                    cell.classList.add("rhythm-ruler-cell-bg");
                 }
             }, 1500);
         };
@@ -1862,7 +1875,7 @@ class RhythmRuler {
             newCell.style.minHeight = newCell.style.height;
             newCell.style.maxHeight = newCell.style.height;
 
-            newCell.style.backgroundColor = platformColor.selectorBackground;
+            newCell.classList.add("rhythm-ruler-cell-bg");
             this.__setNoteValueDisplay(newCell, oldCellNoteValue / inputNum, 1);
 
             noteValues[newCellIndex] = oldCellNoteValue / inputNum;
@@ -1894,7 +1907,7 @@ class RhythmRuler {
             newCell.style.minHeight = newCell.style.height;
             newCell.style.maxHeight = newCell.style.height;
 
-            newCell.style.backgroundColor = platformColor.selectorBackground;
+            newCell.classList.add("rhythm-ruler-cell-bg");
 
             const obj = rationalToFraction(newNoteValue);
             this.__setNoteValueDisplay(newCell, obj[1], obj[0]);
@@ -2211,7 +2224,9 @@ class RhythmRuler {
             }
 
             // And highlight its cell.
-            cell.style.backgroundColor = platformColor.rulerHighlight; // selectorBackground;
+            cell.style.backgroundColor = getComputedStyle(document.body)
+                .getPropertyValue("--color-selector-background-hover")
+                .trim();
 
             // Update circular view highlight if active.
             if (this._circularView && this._circularCanvas) {
@@ -3095,6 +3110,13 @@ class RhythmRuler {
         const canvas = this._circularCanvas;
         if (!canvas) return;
 
+        const getThemeColor = token => {
+            const styles = getComputedStyle(document.body);
+            return styles && typeof styles.getPropertyValue === "function"
+                ? styles.getPropertyValue(token).trim()
+                : "";
+        };
+
         const body = this.widgetWindow.getWidgetBody();
         const bodyW = body.clientWidth || 400;
         const bodyH = body.clientHeight || 400;
@@ -3125,7 +3147,10 @@ class RhythmRuler {
                 ? (totalRingSpace - ringGap * (rulerCount - 1)) / rulerCount
                 : totalRingSpace;
 
-        const colors = [platformColor.selectorBackground, platformColor.selectorSelected];
+        const colors = [
+            getThemeColor("--color-selector-background"),
+            getThemeColor("--color-selector-background-hover")
+        ];
 
         for (let i = 0; i < rulerCount; i++) {
             const noteValues = this.Rulers[i][0];
@@ -3160,13 +3185,13 @@ class RhythmRuler {
                     j <= Math.max(this._circularDownHit.cellIndex, this._circularDragTo.cellIndex);
                 let fillColor;
                 if (isHighlighted) {
-                    fillColor = platformColor.rulerHighlight;
+                    fillColor = getThemeColor("--color-selector-background-hover");
                 } else if (isInDragRange) {
                     // Slices currently being dragged across: show as pending merge.
-                    fillColor = platformColor.rulerHighlight || "#FFEB3B";
+                    fillColor = getThemeColor("--color-selector-background-hover");
                 } else if (nv < 0) {
                     // Rest: muted color
-                    fillColor = platformColor.selectorBackgroundHOFF || "#888888";
+                    fillColor = getThemeColor("--color-selector-background");
                 } else {
                     fillColor = i % 2 === 0 ? colors[j % 2] : colors[(j + 1) % 2];
                 }
@@ -3178,7 +3203,7 @@ class RhythmRuler {
                 ctx.closePath();
                 ctx.fillStyle = fillColor;
                 ctx.fill();
-                ctx.strokeStyle = platformColor.strokeColor || "#666666";
+                ctx.strokeStyle = getThemeColor("--color-text") || "#000000";
                 ctx.lineWidth = 1;
                 ctx.stroke();
 
@@ -3193,8 +3218,8 @@ class RhythmRuler {
                     const text = obj[0] + "/" + obj[1];
                     ctx.fillStyle =
                         isHighlighted || isInDragRange
-                            ? platformColor.background || "#000000"
-                            : platformColor.textColor || "#FFFFFF";
+                            ? getThemeColor("--color-background")
+                            : getThemeColor("--color-text");
                     ctx.font = Math.min(Math.floor(ringThickness * 0.35), 14) + "px sans-serif";
                     ctx.textAlign = "center";
                     ctx.textBaseline = "middle";
@@ -3210,7 +3235,7 @@ class RhythmRuler {
         ctx.arc(centerX, centerY, innerHoleRadius - 1, 0, 2 * Math.PI);
         ctx.fillStyle =
             getComputedStyle(canvas.parentNode).backgroundColor ||
-            platformColor.background ||
+            getThemeColor("--color-background") ||
             "#303030";
         ctx.fill();
 
@@ -3224,9 +3249,9 @@ class RhythmRuler {
         ctx.lineTo(centerX + arrowSize, indicatorY);
         ctx.lineTo(centerX - arrowSize, indicatorY + arrowSize);
         ctx.closePath();
-        ctx.fillStyle = platformColor.rulerHighlight || "#FFEB3B";
+        ctx.fillStyle = getThemeColor("--color-selector-background-hover");
         ctx.fill();
-        ctx.strokeStyle = platformColor.textColor || "#000000";
+        ctx.strokeStyle = getThemeColor("--color-text") || "#000000";
         ctx.lineWidth = 1;
         ctx.stroke();
     }

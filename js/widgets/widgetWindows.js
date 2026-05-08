@@ -366,13 +366,11 @@ class WidgetWindow {
             this._overlayframe.style.top = "64px";
             this._overlayframe.style.width = "100vw";
             this._overlayframe.style.height = "calc(100vh - 64px)";
-            this._overlayframe.style.border = "0.25vw solid black";
-            this._overlayframe.style.backgroundColor = "var(--overlay-bg)";
+            this._overlayframe.classList.add("overlay-active");
         } else {
             this._frame.style.zIndex = "10000";
-            this._overlayframe.style.border = "0px";
             this._overlayframe.style.zIndex = "-1";
-            this._overlayframe.style.backgroundColor = "transparent";
+            this._overlayframe.classList.remove("overlay-active");
         }
     }
 
@@ -539,6 +537,15 @@ class WidgetWindow {
      */
     addButton(icon, iconSize, label, parent) {
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
+        el.setAttribute("role", "button");
+        el.setAttribute("tabindex", "0");
+        el.setAttribute("aria-label", label);
+        el.onkeydown = event => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                el.click();
+            }
+        };
         const img = document.createElement("img");
         img.src = `header-icons/${icon}`;
         img.title = label;

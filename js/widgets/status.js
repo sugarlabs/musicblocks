@@ -175,11 +175,21 @@ class StatusMatrix {
             b.textContent = str;
             cell.appendChild(b);
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
-            cell.style.backgroundColor = platformColor.selectorBackground;
+            if (cell.classList && typeof cell.classList.add === "function") {
+                cell.classList.add("status-matrix-cell");
+            } else if (typeof cell.className !== "undefined") {
+                cell.className =
+                    (cell.className ? cell.className + " " : "") + "status-matrix-cell";
+            }
             cell.style.paddingLeft = "10px";
             this.activity.turtles.turtleList.forEach(() => {
                 cell = row.insertCell();
-                cell.style.backgroundColor = platformColor.selectorBackground;
+                if (cell.classList && typeof cell.classList.add === "function") {
+                    cell.classList.add("status-matrix-cell");
+                } else if (typeof cell.className !== "undefined") {
+                    cell.className =
+                        (cell.className ? cell.className + " " : "") + "status-matrix-cell";
+                }
                 cell.style.fontSize =
                     Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
                 cell.textContent = "";
@@ -200,11 +210,21 @@ class StatusMatrix {
             b.textContent = label;
             cell.appendChild(b);
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
-            cell.style.backgroundColor = platformColor.selectorBackground;
+            if (cell.classList && typeof cell.classList.add === "function") {
+                cell.classList.add("status-matrix-cell");
+            } else if (typeof cell.className !== "undefined") {
+                cell.className =
+                    (cell.className ? cell.className + " " : "") + "status-matrix-cell";
+            }
             cell.style.paddingLeft = "10px";
             this.activity.turtles.turtleList.forEach(() => {
                 cell = row.insertCell();
-                cell.style.backgroundColor = platformColor.selectorBackground;
+                if (cell.classList && typeof cell.classList.add === "function") {
+                    cell.classList.add("status-matrix-cell");
+                } else if (typeof cell.className !== "undefined") {
+                    cell.className =
+                        (cell.className ? cell.className + " " : "") + "status-matrix-cell";
+                }
                 cell.style.fontSize =
                     Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
                 cell.textContent = "";

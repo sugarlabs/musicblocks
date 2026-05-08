@@ -426,8 +426,9 @@ describe("Tuner Widget", () => {
                 display.chromaticMode = true;
 
                 display.updateButtonStyles();
-                // Color may be set as hex or converted to rgb by browser
-                expect(display.chromaticButton.style.backgroundColor).toBeTruthy();
+                expect(display.chromaticButton.classList.contains("tuner-mode-selected")).toBe(
+                    true
+                );
             });
 
             test("removes highlight from target button when in chromatic mode", () => {
@@ -436,7 +437,9 @@ describe("Tuner Widget", () => {
 
                 display.updateButtonStyles();
 
-                expect(display.targetPitchButton.style.backgroundColor).toBe("transparent");
+                expect(display.targetPitchButton.classList.contains("tuner-mode-selected")).toBe(
+                    false
+                );
             });
 
             test("highlights target button when not in chromatic mode", () => {
@@ -444,8 +447,9 @@ describe("Tuner Widget", () => {
                 display.chromaticMode = false;
 
                 display.updateButtonStyles();
-                // Color may be set as hex or converted to rgb by browser
-                expect(display.targetPitchButton.style.backgroundColor).toBeTruthy();
+                expect(display.targetPitchButton.classList.contains("tuner-mode-selected")).toBe(
+                    true
+                );
             });
 
             test("removes highlight from chromatic button when not in chromatic mode", () => {
@@ -454,7 +458,9 @@ describe("Tuner Widget", () => {
 
                 display.updateButtonStyles();
 
-                expect(display.chromaticButton.style.backgroundColor).toBe("transparent");
+                expect(display.chromaticButton.classList.contains("tuner-mode-selected")).toBe(
+                    false
+                );
             });
         });
 

@@ -22,7 +22,7 @@
    _, addTemperamentToDictionary, buildScale,
    deleteTemperamentFromList, docById, FLAT, getNoteFromInterval,
    getOctaveRatio, getTemperament, getTemperamentKeys,
-   isCustomTemperament, normalizeNoteAccidentals, pitchToFrequency, platformColor,
+     isCustomTemperament, normalizeNoteAccidentals, pitchToFrequency,
    rationalToFraction, setOctaveRatio, setOctaveRatio, SHARP, Singer,
    slicePath, updateTemperaments, wheelnav, frequencyToPitch
  */
@@ -34,6 +34,14 @@
  * @constructor
  */
 function TemperamentWidget() {
+    const getCssToken = (token, fallback = "") => {
+        const styles = getComputedStyle(document.body);
+        if (styles && typeof styles.getPropertyValue === "function") {
+            return styles.getPropertyValue(token).trim() || fallback;
+        }
+        return fallback;
+    };
+
     // Constants for button and icon sizes
     const BUTTONDIVWIDTH = 430;
 
@@ -146,6 +154,15 @@ function TemperamentWidget() {
     this._addButton = function (row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
         cell.textContent = "\u00A0\u00A0";
+        cell.setAttribute("role", "button");
+        cell.setAttribute("tabindex", "0");
+        cell.setAttribute("aria-label", label);
+        cell.onkeydown = event => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                cell.click();
+            }
+        };
         const img = document.createElement("img");
         img.src = `header-icons/${icon}`;
         img.title = label;
@@ -162,14 +179,25 @@ function TemperamentWidget() {
         cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
+        if (cell.classList && typeof cell.classList.add === "function") {
+            cell.classList.add("temperament-action-cell");
+        } else if (typeof cell.className !== "undefined") {
+            cell.className =
+                (cell.className ? cell.className + " " : "") + "temperament-action-cell";
+        }
 
         cell.onmouseover = function () {
-            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
+            if (this && this.classList && typeof this.classList.add === "function") {
+                this.classList.add("is-hovered");
+            } else if (this && typeof this.className !== "undefined") {
+                this.className = (this.className ? this.className + " " : "") + "is-hovered";
+            }
         };
 
         cell.onmouseout = function () {
-            this.style.backgroundColor = platformColor.selectorBackground;
+            if (this && this.classList && typeof this.classList.remove === "function") {
+                this.classList.remove("is-hovered");
+            }
         };
 
         return cell;
@@ -228,7 +256,7 @@ function TemperamentWidget() {
         ctx.fillStyle = "rgba(204, 0, 102, 0)";
         ctx.fill();
         ctx.lineWidth = 1;
-        ctx.strokeStyle = platformColor.strokeColor || "#003300";
+        ctx.strokeStyle = getCssToken("--color-text", "#003300");
         ctx.stroke();
 
         let angle = [];
@@ -270,8 +298,10 @@ function TemperamentWidget() {
             const sliceAngle = [];
             const angleDiff = [];
             for (let i = 0; i < this.notesCircle.navItemCount; i++) {
-                this.notesCircle.navItems[i].fillAttr =
-                    platformColor.selectorBackground || "#c8C8C8";
+                this.notesCircle.navItems[i].fillAttr = getCssToken(
+                    "--color-selector-background",
+                    "#c8C8C8"
+                );
                 this.notesCircle.navItems[i].titleAttr.font =
                     "20 20px Impact, Charcoal, sans-serif";
                 this.notesCircle.navItems[i].titleSelectedAttr.font =
@@ -344,13 +374,25 @@ function TemperamentWidget() {
             divAppend1 = docById("clearNotes");
             divAppend1.style.height = "30px";
             divAppend1.style.marginLeft = "3px";
-            divAppend1.style.backgroundColor = platformColor.selectorBackground;
+            if (divAppend1.classList && typeof divAppend1.classList.add === "function") {
+                divAppend1.classList.add("temperament-action-cell");
+            } else if (typeof divAppend1.className !== "undefined") {
+                divAppend1.className =
+                    (divAppend1.className ? divAppend1.className + " " : "") +
+                    "temperament-action-cell";
+            }
             divAppend1.style.width = "212px";
 
             divAppend2 = docById("standardOctave");
             divAppend2.style.height = "30px";
             divAppend2.style.marginRight = "3px";
-            divAppend2.style.backgroundColor = platformColor.selectorBackground;
+            if (divAppend2.classList && typeof divAppend2.classList.add === "function") {
+                divAppend2.classList.add("temperament-action-cell");
+            } else if (typeof divAppend2.className !== "undefined") {
+                divAppend2.className =
+                    (divAppend2.className ? divAppend2.className + " " : "") +
+                    "temperament-action-cell";
+            }
             divAppend2.style.width = BUTTONDIVWIDTH / 2 - 8 + "px";
         } else {
             divAppend1 = document.createElement("div");
@@ -360,7 +402,13 @@ function TemperamentWidget() {
             divAppend1.style.position = "absolute";
             divAppend1.style.zIndex = 2;
             divAppend1.style.paddingTop = "5px";
-            divAppend1.style.backgroundColor = platformColor.selectorBackground;
+            if (divAppend1.classList && typeof divAppend1.classList.add === "function") {
+                divAppend1.classList.add("temperament-action-cell");
+            } else if (typeof divAppend1.className !== "undefined") {
+                divAppend1.className =
+                    (divAppend1.className ? divAppend1.className + " " : "") +
+                    "temperament-action-cell";
+            }
             divAppend1.style.height = "25px";
             divAppend1.style.width = docById("wheelDiv2").style.width;
             divAppend1.style.marginTop = docById("wheelDiv2").style.height;
@@ -559,7 +607,7 @@ function TemperamentWidget() {
         slider.className = "sliders";
         slider.id = "frequencySlider1";
         slider.style.width = "170px";
-        slider.style.background = "white";
+        slider.style.background = getCssToken("--color-surface", "#ffffff");
         slider.style.border = "0";
         slider.setAttribute("min", this.frequencies[i - 1]);
         slider.setAttribute("max", this.frequencies[i + 1]);
@@ -595,7 +643,7 @@ function TemperamentWidget() {
         noteInfo.appendChild(document.createElement("br"));
         const doneDiv = document.createElement("div");
         doneDiv.id = "done";
-        doneDiv.style.background = "#64B5F6";
+        doneDiv.style.background = getCssToken("--color-selector-background", "#64B5F6");
         doneDiv.style.padding = "6px";
         doneDiv.style.marginTop = "8px";
         doneDiv.style.borderRadius = "4px";
@@ -744,24 +792,32 @@ function TemperamentWidget() {
 
         const menuItems = document.querySelectorAll("#menuLabels");
         for (let i = 0; i < menuLabels.length; i++) {
-            menuItems[i].style.background = platformColor.labelColor;
-            menuItems[i].style.height = 30 + "px";
-            menuItems[i].style.textAlign = "center";
-            menuItems[i].style.fontWeight = "bold";
-            if (isCustomTemperament(this.inTemperament)) {
-                menuItems[0].style.width = 40 + "px";
-                menuItems[1].style.width = 120 + "px";
-                menuItems[2].style.width = 120 + "px";
-                menuItems[3].style.width = 140 + "px";
-            } else {
-                menuItems[0].style.width = 40 + "px";
-                menuItems[1].style.width = 40 + "px";
-                menuItems[2].style.width = 60 + "px";
-                menuItems[3].style.width = 120 + "px";
-                menuItems[4].style.width = 50 + "px";
-                menuItems[5].style.width = 100 + "px";
-                menuItems[6].style.width = 95 + "px";
+            const item = menuItems[i];
+            if (!item) continue;
+            if (item.classList && typeof item.classList.add === "function") {
+                item.classList.add("temperament-menu-label");
+            } else if (typeof item.className !== "undefined") {
+                item.className =
+                    (item.className ? item.className + " " : "") + "temperament-menu-label";
             }
+            item.style.height = "30px";
+            item.style.textAlign = "center";
+            item.style.fontWeight = "bold";
+        }
+
+        if (isCustomTemperament(this.inTemperament)) {
+            if (menuItems[0]) menuItems[0].style.width = "40px";
+            if (menuItems[1]) menuItems[1].style.width = "120px";
+            if (menuItems[2]) menuItems[2].style.width = "120px";
+            if (menuItems[3]) menuItems[3].style.width = "140px";
+        } else {
+            if (menuItems[0]) menuItems[0].style.width = "40px";
+            if (menuItems[1]) menuItems[1].style.width = "40px";
+            if (menuItems[2]) menuItems[2].style.width = "60px";
+            if (menuItems[3]) menuItems[3].style.width = "120px";
+            if (menuItems[4]) menuItems[4].style.width = "50px";
+            if (menuItems[5]) menuItems[5].style.width = "100px";
+            if (menuItems[6]) menuItems[6].style.width = "95px";
         }
         const trGraph = document.createElement("tr");
         const tdGraph = document.createElement("td");
@@ -803,16 +859,28 @@ function TemperamentWidget() {
             playImg.setAttribute("data-id", i);
             notesCell[i][0].appendChild(playImg);
             notesCell[i][0].appendChild(document.createTextNode("\u00A0\u00A0"));
-            notesCell[i][0].style.width = 40 + "px";
-            notesCell[i][0].style.backgroundColor = platformColor.selectorBackground;
+            notesCell[i][0].style.width = "40px";
+            if (notesCell[i][0].classList && typeof notesCell[i][0].classList.add === "function") {
+                notesCell[i][0].classList.add("temperament-selector-cell");
+            } else if (typeof notesCell[i][0].className !== "undefined") {
+                notesCell[i][0].className =
+                    (notesCell[i][0].className ? notesCell[i][0].className + " " : "") +
+                    "temperament-selector-cell";
+            }
             notesCell[i][0].style.textAlign = "center";
 
             notesCell[i][0].onmouseover = function () {
-                this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
+                if (this && this.classList && typeof this.classList.add === "function") {
+                    this.classList.add("is-hovered");
+                } else if (this && typeof this.className !== "undefined") {
+                    this.className = (this.className ? this.className + " " : "") + "is-hovered";
+                }
             };
 
             notesCell[i][0].onmouseout = function () {
-                this.style.backgroundColor = platformColor.selectorBackground;
+                if (this && this.classList && typeof this.classList.remove === "function") {
+                    this.classList.remove("is-hovered");
+                }
             };
 
             const playImage = docById("play_" + i);
@@ -829,7 +897,13 @@ function TemperamentWidget() {
             notesCell[i][1] = notesRow[i].insertCell(-1);
             notesCell[i][1].id = "pitchNumber_" + i;
             notesCell[i][1].textContent = i;
-            notesCell[i][1].style.backgroundColor = platformColor.selectorBackground;
+            if (notesCell[i][1].classList && typeof notesCell[i][1].classList.add === "function") {
+                notesCell[i][1].classList.add("temperament-selector-cell");
+            } else if (typeof notesCell[i][1].className !== "undefined") {
+                notesCell[i][1].className =
+                    (notesCell[i][1].className ? notesCell[i][1].className + " " : "") +
+                    "temperament-selector-cell";
+            }
             notesCell[i][1].style.textAlign = "center";
 
             ratios[i] = this.ratios[i];
@@ -838,7 +912,13 @@ function TemperamentWidget() {
             //Ratio
             notesCell[i][2] = notesRow[i].insertCell(-1);
             notesCell[i][2].textContent = ratios[i];
-            notesCell[i][2].style.backgroundColor = platformColor.selectorBackground;
+            if (notesCell[i][2].classList && typeof notesCell[i][2].classList.add === "function") {
+                notesCell[i][2].classList.add("temperament-selector-cell");
+            } else if (typeof notesCell[i][2].className !== "undefined") {
+                notesCell[i][2].className =
+                    (notesCell[i][2].className ? notesCell[i][2].className + " " : "") +
+                    "temperament-selector-cell";
+            }
             notesCell[i][2].style.textAlign = "center";
 
             if (!isCustomTemperament(this.inTemperament)) {
@@ -846,14 +926,32 @@ function TemperamentWidget() {
                 notesCell[i][3] = notesRow[i].insertCell(-1);
                 notesCell[i][3].textContent = this.intervals[i];
                 notesCell[i][3].style.width = 120 + "px";
-                notesCell[i][3].style.backgroundColor = platformColor.selectorBackground;
+                if (
+                    notesCell[i][3].classList &&
+                    typeof notesCell[i][3].classList.add === "function"
+                ) {
+                    notesCell[i][3].classList.add("temperament-selector-cell");
+                } else if (typeof notesCell[i][3].className !== "undefined") {
+                    notesCell[i][3].className =
+                        (notesCell[i][3].className ? notesCell[i][3].className + " " : "") +
+                        "temperament-selector-cell";
+                }
                 notesCell[i][3].style.textAlign = "center";
 
                 //Notes
                 notesCell[i][4] = notesRow[i].insertCell(-1);
                 notesCell[i][4].textContent = this.notes[i];
                 notesCell[i][4].style.width = 50 + "px";
-                notesCell[i][4].style.backgroundColor = platformColor.selectorBackground;
+                if (
+                    notesCell[i][4].classList &&
+                    typeof notesCell[i][4].classList.add === "function"
+                ) {
+                    notesCell[i][4].classList.add("temperament-selector-cell");
+                } else if (typeof notesCell[i][4].className !== "undefined") {
+                    notesCell[i][4].className =
+                        (notesCell[i][4].className ? notesCell[i][4].className + " " : "") +
+                        "temperament-selector-cell";
+                }
                 notesCell[i][4].style.textAlign = "center";
 
                 //Mode
@@ -868,14 +966,29 @@ function TemperamentWidget() {
                     notesCell[i][5].textContent = _("non scalar");
                 }
                 notesCell[i][5].style.width = 100 + "px";
-                notesCell[i][5].style.backgroundColor = platformColor.selectorBackground;
+                if (
+                    notesCell[i][5].classList &&
+                    typeof notesCell[i][5].classList.add === "function"
+                ) {
+                    notesCell[i][5].classList.add("temperament-selector-cell");
+                } else if (typeof notesCell[i][5].className !== "undefined") {
+                    notesCell[i][5].className =
+                        (notesCell[i][5].className ? notesCell[i][5].className + " " : "") +
+                        "temperament-selector-cell";
+                }
                 notesCell[i][5].style.textAlign = "center";
             }
 
             //Frequency
             notesCell[i][6] = notesRow[i].insertCell(-1);
             notesCell[i][6].textContent = this.frequencies[i];
-            notesCell[i][6].style.backgroundColor = platformColor.selectorBackground;
+            if (notesCell[i][6].classList && typeof notesCell[i][6].classList.add === "function") {
+                notesCell[i][6].classList.add("temperament-selector-cell");
+            } else if (typeof notesCell[i][6].className !== "undefined") {
+                notesCell[i][6].className =
+                    (notesCell[i][6].className ? notesCell[i][6].className + " " : "") +
+                    "temperament-selector-cell";
+            }
             notesCell[i][6].style.textAlign = "center";
 
             if (isCustomTemperament(this.inTemperament)) {
@@ -930,45 +1043,50 @@ function TemperamentWidget() {
         userEditTr.appendChild(userEditTd);
         editOctaveTbody.appendChild(userEditTr);
         const menuItems = document.querySelectorAll("#editMenus");
+        const setSelectedEditMenu = selectedIndex => {
+            menuItems.forEach((item, index) => {
+                if (item.classList && typeof item.classList.toggle === "function") {
+                    item.classList.toggle("is-selected", index === selectedIndex);
+                }
+            });
+        };
+
         for (let i = 0; i < editMenus.length; i++) {
-            menuItems[i].style.background = platformColor.selectorBackground;
-            menuItems[i].style.height = 30 + "px";
-            menuItems[i].style.textAlign = "center";
-            menuItems[i].style.fontWeight = "bold";
+            const item = menuItems[i];
+            if (!item) continue;
+            if (item.classList && typeof item.classList.add === "function") {
+                item.classList.add("temperament-menu-label");
+            }
+            if (typeof item.setAttribute === "function") {
+                item.setAttribute("role", "button");
+                item.setAttribute("tabindex", "0");
+                item.setAttribute("aria-label", editMenus[i]);
+            }
+            item.style.height = "30px";
+            item.style.textAlign = "center";
+            item.style.fontWeight = "bold";
         }
 
-        menuItems[0].style.background = platformColor.selectorBackground || "#c8C8C8";
+        setSelectedEditMenu(0);
         that.equalEdit();
 
         menuItems[0].onclick = function () {
-            menuItems[1].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = platformColor.selectorBackground;
-            menuItems[0].style.background = platformColor.selectorBackground || "#c8C8C8";
+            setSelectedEditMenu(0);
             that.equalEdit();
         };
 
         menuItems[1].onclick = function () {
-            menuItems[0].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = platformColor.selectorBackground;
-            menuItems[1].style.background = platformColor.selectorBackground || "#c8C8C8";
+            setSelectedEditMenu(1);
             that.ratioEdit();
         };
 
         menuItems[2].onclick = function () {
-            menuItems[0].style.background = platformColor.selectorBackground;
-            menuItems[1].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = platformColor.selectorBackground || "#c8C8C8";
+            setSelectedEditMenu(2);
             that.arbitraryEdit();
         };
 
         menuItems[3].onclick = function () {
-            menuItems[0].style.background = platformColor.selectorBackground;
-            menuItems[1].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = platformColor.selectorBackground || "#c8C8C8";
+            setSelectedEditMenu(3);
             that.octaveSpaceEdit();
         };
     };
@@ -981,7 +1099,10 @@ function TemperamentWidget() {
         this.editMode = "equal";
         docById("userEdit").textContent = "";
         const equalEdit = docById("userEdit");
-        equalEdit.style.backgroundColor = platformColor.selectorBackground || "#c8C8C8";
+        if (equalEdit.classList && typeof equalEdit.classList.add === "function") {
+            equalEdit.classList.add("temperament-selector-cell");
+        }
+        equalEdit.setAttribute("role", "group");
         equalEdit.appendChild(document.createElement("br"));
         equalEdit.appendChild(
             document.createTextNode(_("pitch number") + "\u00A0\u00A0\u00A0\u00A0 ")
@@ -1038,13 +1159,23 @@ function TemperamentWidget() {
             const divAppend1 = docById("preview");
             divAppend1.style.height = "30px";
             divAppend1.style.marginLeft = "3px";
-            divAppend1.style.backgroundColor = platformColor.selectorBackground;
+            if (divAppend1.classList && typeof divAppend1.classList.add === "function") {
+                divAppend1.classList.add("temperament-action-cell");
+            }
+            divAppend1.setAttribute("role", "button");
+            divAppend1.setAttribute("tabindex", "0");
+            divAppend1.setAttribute("aria-label", preview ? _("back") : _("preview"));
             divAppend1.style.width = "215px";
 
             const divAppend2 = docById("done_");
             divAppend2.style.height = "30px";
             divAppend2.style.marginRight = "3px";
-            divAppend2.style.backgroundColor = platformColor.selectorBackground;
+            if (divAppend2.classList && typeof divAppend2.classList.add === "function") {
+                divAppend2.classList.add("temperament-action-cell");
+            }
+            divAppend2.setAttribute("role", "button");
+            divAppend2.setAttribute("tabindex", "0");
+            divAppend2.setAttribute("aria-label", _("done"));
             divAppend2.style.width = "205px";
         }
 
@@ -1147,14 +1278,22 @@ function TemperamentWidget() {
                 docById("userEdit").appendChild(wheelDiv2);
                 this.createMainWheel(this.tempRatios, pitchNumber);
                 for (let i = 0; i < pitchNumber; i++) {
-                    this.notesCircle.navItems[i].fillAttr =
-                        platformColor.selectorBackground || "#e0e0e0";
-                    this.notesCircle.navItems[i].sliceHoverAttr.fill =
-                        platformColor.selectorBackground || "#e0e0e0";
-                    this.notesCircle.navItems[i].slicePathAttr.fill =
-                        platformColor.selectorBackground || "#e0e0e0";
-                    this.notesCircle.navItems[i].sliceSelectedAttr.fill =
-                        platformColor.selectorBackground || "#e0e0e0";
+                    this.notesCircle.navItems[i].fillAttr = getCssToken(
+                        "--color-selector-background",
+                        "#e0e0e0"
+                    );
+                    this.notesCircle.navItems[i].sliceHoverAttr.fill = getCssToken(
+                        "--color-selector-background",
+                        "#e0e0e0"
+                    );
+                    this.notesCircle.navItems[i].slicePathAttr.fill = getCssToken(
+                        "--color-selector-background",
+                        "#e0e0e0"
+                    );
+                    this.notesCircle.navItems[i].sliceSelectedAttr.fill = getCssToken(
+                        "--color-selector-background",
+                        "#e0e0e0"
+                    );
                 }
                 this.notesCircle.refreshWheel();
                 docById("userEdit").style.paddingLeft = "0px";
@@ -1207,7 +1346,10 @@ function TemperamentWidget() {
         this.editMode = "ratio";
         docById("userEdit").textContent = "";
         const ratioEdit = docById("userEdit");
-        ratioEdit.style.backgroundColor = platformColor.selectorBackground || "#c8C8C8";
+        if (ratioEdit.classList && typeof ratioEdit.classList.add === "function") {
+            ratioEdit.classList.add("temperament-selector-cell");
+        }
+        ratioEdit.setAttribute("role", "group");
         ratioEdit.appendChild(document.createElement("br"));
         ratioEdit.appendChild(document.createTextNode(_("ratio") + " \u00A0\u00A0\u00A0\u00A0 "));
         const ratioIn = document.createElement("input");
@@ -1259,13 +1401,23 @@ function TemperamentWidget() {
             const divAppend1 = docById("preview");
             divAppend1.style.height = "30px";
             divAppend1.style.marginLeft = "3px";
-            divAppend1.style.backgroundColor = platformColor.selectorBackground;
+            if (divAppend1.classList && typeof divAppend1.classList.add === "function") {
+                divAppend1.classList.add("temperament-action-cell");
+            }
+            divAppend1.setAttribute("role", "button");
+            divAppend1.setAttribute("tabindex", "0");
+            divAppend1.setAttribute("aria-label", preview ? _("back") : _("preview"));
             divAppend1.style.width = "215px";
 
             const divAppend2 = docById("done_");
             divAppend2.style.height = "30px";
             divAppend2.style.marginRight = "3px";
-            divAppend2.style.backgroundColor = platformColor.selectorBackground;
+            if (divAppend2.classList && typeof divAppend2.classList.add === "function") {
+                divAppend2.classList.add("temperament-action-cell");
+            }
+            divAppend2.setAttribute("role", "button");
+            divAppend2.setAttribute("tabindex", "0");
+            divAppend2.setAttribute("aria-label", _("done"));
             divAppend2.style.width = "205px";
         }
 
@@ -1346,14 +1498,22 @@ function TemperamentWidget() {
                 docById("userEdit").appendChild(wheelDiv2);
                 that.createMainWheel(that.tempRatios, pitchNumber);
                 for (let i = 0; i < pitchNumber; i++) {
-                    that.notesCircle.navItems[i].fillAttr =
-                        platformColor.selectorBackground || "#e0e0e0";
-                    that.notesCircle.navItems[i].sliceHoverAttr.fill =
-                        platformColor.selectorBackground || "#e0e0e0";
-                    that.notesCircle.navItems[i].slicePathAttr.fill =
-                        platformColor.selectorBackground || "#e0e0e0";
-                    that.notesCircle.navItems[i].sliceSelectedAttr.fill =
-                        platformColor.selectorBackground || "#e0e0e0";
+                    that.notesCircle.navItems[i].fillAttr = getCssToken(
+                        "--color-selector-background",
+                        "#e0e0e0"
+                    );
+                    that.notesCircle.navItems[i].sliceHoverAttr.fill = getCssToken(
+                        "--color-selector-background",
+                        "#e0e0e0"
+                    );
+                    that.notesCircle.navItems[i].slicePathAttr.fill = getCssToken(
+                        "--color-selector-background",
+                        "#e0e0e0"
+                    );
+                    that.notesCircle.navItems[i].sliceSelectedAttr.fill = getCssToken(
+                        "--color-selector-background",
+                        "#e0e0e0"
+                    );
                 }
                 that.notesCircle.refreshWheel();
                 docById("userEdit").style.paddingLeft = "0px";
@@ -1467,7 +1627,10 @@ function TemperamentWidget() {
             const angle = [];
             const angleDiff = [];
             for (let i = 0; i < this.wheel1.navItemCount; i++) {
-                this.wheel1.navItems[i].fillAttr = platformColor.selectorBackground || "#e0e0e0";
+                this.wheel1.navItems[i].fillAttr = getCssToken(
+                    "--color-selector-background",
+                    "#e0e0e0"
+                );
                 this.wheel1.navItems[i].titleAttr.font = "20 20px Impact, Charcoal, sans-serif";
                 this.wheel1.navItems[i].titleSelectedAttr.font =
                     "20 20px Impact, Charcoal, sans-serif";
@@ -1531,7 +1694,7 @@ function TemperamentWidget() {
         ctx.fillStyle = "rgba(204, 0, 102, 0)";
         ctx.fill();
         ctx.lineWidth = 1;
-        ctx.strokeStyle = platformColor.strokeColor || "#003300";
+        ctx.strokeStyle = getCssToken("--color-text", "#003300");
         ctx.stroke();
 
         this._createOuterWheel = function (ratios, pitchNumber) {
@@ -1556,8 +1719,8 @@ function TemperamentWidget() {
             this.wheel.sliceSelectedPathCustom = this.wheel.slicePathCustom;
             this.wheel.sliceInitPathCustom = this.wheel.slicePathCustom;
             this.wheel.colors = [
-                platformColor.selectorBackground || "#c0c0c0",
-                platformColor.selectorBackground || "#e0e0e0"
+                getCssToken("--color-selector-background", "#c0c0c0"),
+                getCssToken("--color-selector-background", "#e0e0e0")
             ];
             this.wheel.titleRotateAngle = 90;
             this.wheel.navItemsEnabled = false;
@@ -1612,7 +1775,7 @@ function TemperamentWidget() {
         divAppend.textContent = _("done");
         divAppend.style.textAlign = "center";
         divAppend.style.paddingTop = "5px";
-        divAppend.style.backgroundColor = platformColor.selectorBackground;
+        divAppend.style.backgroundColor = getCssToken("--color-selector-background", "#c8C8C8");
         divAppend.style.height = "25px";
         divAppend.style.marginTop = "40px";
         divAppend.style.overflow = "auto";
@@ -1693,7 +1856,7 @@ function TemperamentWidget() {
                 slider.className = "sliders";
                 slider.id = "frequencySlider";
                 slider.style.width = "170px";
-                slider.style.background = "white";
+                slider.style.background = getCssToken("--color-surface", "#ffffff");
                 slider.style.border = "0";
                 slider.setAttribute("min", frequencies[i]);
                 slider.setAttribute("max", frequencies[i + 1]);
@@ -1712,7 +1875,7 @@ function TemperamentWidget() {
                 noteInfo1.appendChild(document.createElement("br"));
                 const doneDiv = document.createElement("div");
                 doneDiv.id = "done";
-                doneDiv.style.background = "rgb(196, 196, 196)";
+                doneDiv.style.background = getCssToken("--color-widget-button", "#c4c4c4");
                 const doneCenter = document.createElement("center");
                 doneCenter.textContent = _("done");
                 doneDiv.appendChild(doneCenter);
@@ -1788,7 +1951,10 @@ function TemperamentWidget() {
         const len = this.ratios.length;
         const octaveRatio = this.ratios[len - 1];
         const octaveSpaceEdit = docById("userEdit");
-        octaveSpaceEdit.style.backgroundColor = platformColor.selectorBackground || "#c8C8C8";
+        if (octaveSpaceEdit.classList && typeof octaveSpaceEdit.classList.add === "function") {
+            octaveSpaceEdit.classList.add("temperament-selector-cell");
+        }
+        octaveSpaceEdit.setAttribute("role", "group");
         octaveSpaceEdit.appendChild(document.createElement("br"));
         octaveSpaceEdit.appendChild(document.createElement("br"));
         octaveSpaceEdit.appendChild(
@@ -1818,10 +1984,13 @@ function TemperamentWidget() {
         divAppend.style.textAlign = "center";
         divAppend.style.paddingTop = "5px";
         divAppend.style.marginLeft = "-70px";
-        divAppend.style.backgroundColor = platformColor.selectorBackground;
+        divAppend.style.backgroundColor = getCssToken("--color-selector-background", "#c8C8C8");
         divAppend.style.height = "25px";
         divAppend.style.marginTop = "40px";
         divAppend.style.overflow = "auto";
+        divAppend.setAttribute("role", "button");
+        divAppend.setAttribute("tabindex", "0");
+        divAppend.setAttribute("aria-label", _("done"));
         octaveSpaceEdit.append(divAppend);
 
         divAppend.onmouseover = function () {
@@ -2338,122 +2507,210 @@ function TemperamentWidget() {
 
             if (that.circleIsVisible === false && docById("wheelDiv4") === null) {
                 if (i === pitchNumber && that._playing) {
-                    that.notesCircle.navItems[0].fillAttr =
-                        platformColor.selectorBackgroundHOFF || "#808080";
-                    that.notesCircle.navItems[0].sliceHoverAttr.fill =
-                        platformColor.selectorBackgroundHOFF || "#808080";
-                    that.notesCircle.navItems[0].slicePathAttr.fill =
-                        platformColor.selectorBackgroundHOFF || "#808080";
-                    that.notesCircle.navItems[0].sliceSelectedAttr.fill =
-                        platformColor.selectorBackgroundHOFF || "#808080";
+                    that.notesCircle.navItems[0].fillAttr = getCssToken(
+                        "--color-selector-background-hover",
+                        "#808080"
+                    );
+                    that.notesCircle.navItems[0].sliceHoverAttr.fill = getCssToken(
+                        "--color-selector-background-hover",
+                        "#808080"
+                    );
+                    that.notesCircle.navItems[0].slicePathAttr.fill = getCssToken(
+                        "--color-selector-background-hover",
+                        "#808080"
+                    );
+                    that.notesCircle.navItems[0].sliceSelectedAttr.fill = getCssToken(
+                        "--color-selector-background-hover",
+                        "#808080"
+                    );
                 } else if (that._playing) {
-                    that.notesCircle.navItems[i].fillAttr =
-                        platformColor.selectorBackgroundHOFF || "#808080";
-                    that.notesCircle.navItems[i].sliceHoverAttr.fill =
-                        platformColor.selectorBackgroundHOFF || "#808080";
-                    that.notesCircle.navItems[i].slicePathAttr.fill =
-                        platformColor.selectorBackgroundHOFF || "#808080";
-                    that.notesCircle.navItems[i].sliceSelectedAttr.fill =
-                        platformColor.selectorBackgroundHOFF || "#808080";
+                    that.notesCircle.navItems[i].fillAttr = getCssToken(
+                        "--color-selector-background-hover",
+                        "#808080"
+                    );
+                    that.notesCircle.navItems[i].sliceHoverAttr.fill = getCssToken(
+                        "--color-selector-background-hover",
+                        "#808080"
+                    );
+                    that.notesCircle.navItems[i].slicePathAttr.fill = getCssToken(
+                        "--color-selector-background-hover",
+                        "#808080"
+                    );
+                    that.notesCircle.navItems[i].sliceSelectedAttr.fill = getCssToken(
+                        "--color-selector-background-hover",
+                        "#808080"
+                    );
                 }
 
                 if (that.playbackForward === false && i < pitchNumber) {
                     if (i === pitchNumber - 1) {
-                        that.notesCircle.navItems[0].fillAttr =
-                            platformColor.selectorBackground || "#c8C8C8";
-                        that.notesCircle.navItems[0].sliceHoverAttr.fill =
-                            platformColor.selectorBackground || "#c8C8C8";
-                        that.notesCircle.navItems[0].slicePathAttr.fill =
-                            platformColor.selectorBackground || "#c8C8C8";
-                        that.notesCircle.navItems[0].sliceSelectedAttr.fill =
-                            platformColor.selectorBackground || "#c8C8C8";
+                        that.notesCircle.navItems[0].fillAttr = getCssToken(
+                            "--color-selector-background",
+                            "#c8C8C8"
+                        );
+                        that.notesCircle.navItems[0].sliceHoverAttr.fill = getCssToken(
+                            "--color-selector-background",
+                            "#c8C8C8"
+                        );
+                        that.notesCircle.navItems[0].slicePathAttr.fill = getCssToken(
+                            "--color-selector-background",
+                            "#c8C8C8"
+                        );
+                        that.notesCircle.navItems[0].sliceSelectedAttr.fill = getCssToken(
+                            "--color-selector-background",
+                            "#c8C8C8"
+                        );
                     } else {
-                        that.notesCircle.navItems[i + 1].fillAttr =
-                            platformColor.selectorBackground || "#c8C8C8";
-                        that.notesCircle.navItems[i + 1].sliceHoverAttr.fill =
-                            platformColor.selectorBackground || "#c8C8C8";
-                        that.notesCircle.navItems[i + 1].slicePathAttr.fill =
-                            platformColor.selectorBackground || "#c8C8C8";
-                        that.notesCircle.navItems[i + 1].sliceSelectedAttr.fill =
-                            platformColor.selectorBackground || "#c8C8C8";
+                        that.notesCircle.navItems[i + 1].fillAttr = getCssToken(
+                            "--color-selector-background",
+                            "#c8C8C8"
+                        );
+                        that.notesCircle.navItems[i + 1].sliceHoverAttr.fill = getCssToken(
+                            "--color-selector-background",
+                            "#c8C8C8"
+                        );
+                        that.notesCircle.navItems[i + 1].slicePathAttr.fill = getCssToken(
+                            "--color-selector-background",
+                            "#c8C8C8"
+                        );
+                        that.notesCircle.navItems[i + 1].sliceSelectedAttr.fill = getCssToken(
+                            "--color-selector-background",
+                            "#c8C8C8"
+                        );
                     }
                 } else {
                     if (i !== 0) {
-                        that.notesCircle.navItems[i - 1].fillAttr =
-                            platformColor.selectorBackground || "#c8C8C8";
-                        that.notesCircle.navItems[i - 1].sliceHoverAttr.fill =
-                            platformColor.selectorBackground || "#c8C8C8";
-                        that.notesCircle.navItems[i - 1].slicePathAttr.fill =
-                            platformColor.selectorBackground || "#c8C8C8";
-                        that.notesCircle.navItems[i - 1].sliceSelectedAttr.fill =
-                            platformColor.selectorBackground || "#c8C8C8";
+                        that.notesCircle.navItems[i - 1].fillAttr = getCssToken(
+                            "--color-selector-background",
+                            "#c8C8C8"
+                        );
+                        that.notesCircle.navItems[i - 1].sliceHoverAttr.fill = getCssToken(
+                            "--color-selector-background",
+                            "#c8C8C8"
+                        );
+                        that.notesCircle.navItems[i - 1].slicePathAttr.fill = getCssToken(
+                            "--color-selector-background",
+                            "#c8C8C8"
+                        );
+                        that.notesCircle.navItems[i - 1].sliceSelectedAttr.fill = getCssToken(
+                            "--color-selector-background",
+                            "#c8C8C8"
+                        );
                     }
                 }
 
                 that.notesCircle.refreshWheel();
             } else if (that.circleIsVisible === true && docById("wheelDiv4") === null) {
-                docById("pitchNumber_" + i).style.background = platformColor.labelColor;
+                docById("pitchNumber_" + i).style.background = getCssToken(
+                    "--color-label",
+                    "#cccccc"
+                );
                 if (that.playbackForward === false && i < pitchNumber) {
                     const j = i + 1;
-                    docById("pitchNumber_" + j).style.background = platformColor.selectorBackground;
+                    docById("pitchNumber_" + j).style.background = getCssToken(
+                        "--color-selector-background",
+                        "#c8C8C8"
+                    );
                 } else {
                     if (i !== 0) {
                         const j = i - 1;
-                        docById("pitchNumber_" + j).style.background =
-                            platformColor.selectorBackground;
+                        docById("pitchNumber_" + j).style.background = getCssToken(
+                            "--color-selector-background",
+                            "#c8C8C8"
+                        );
                     }
                 }
             } else if (docById("wheelDiv4") !== null) {
                 if (i === pitchNumber) {
-                    that.wheel1.navItems[0].fillAttr =
-                        platformColor.selectorBackgroundHOFF || "#808080";
-                    that.wheel1.navItems[0].sliceHoverAttr.fill =
-                        platformColor.selectorBackgroundHOFF || "#808080";
-                    that.wheel1.navItems[0].slicePathAttr.fill =
-                        platformColor.selectorBackgroundHOFF || "#808080";
-                    that.wheel1.navItems[0].sliceSelectedAttr.fill =
-                        platformColor.selectorBackgroundHOFF || "#808080";
+                    that.wheel1.navItems[0].fillAttr = getCssToken(
+                        "--color-selector-background-hover",
+                        "#808080"
+                    );
+                    that.wheel1.navItems[0].sliceHoverAttr.fill = getCssToken(
+                        "--color-selector-background-hover",
+                        "#808080"
+                    );
+                    that.wheel1.navItems[0].slicePathAttr.fill = getCssToken(
+                        "--color-selector-background-hover",
+                        "#808080"
+                    );
+                    that.wheel1.navItems[0].sliceSelectedAttr.fill = getCssToken(
+                        "--color-selector-background-hover",
+                        "#808080"
+                    );
                 } else {
-                    that.wheel1.navItems[i].fillAttr =
-                        platformColor.selectorBackgroundHOFF || "#808080";
-                    that.wheel1.navItems[i].sliceHoverAttr.fill =
-                        platformColor.selectorBackgroundHOFF || "#808080";
-                    that.wheel1.navItems[i].slicePathAttr.fill =
-                        platformColor.selectorBackgroundHOFF || "#808080";
-                    that.wheel1.navItems[i].sliceSelectedAttr.fill =
-                        platformColor.selectorBackgroundHOFF || "#808080";
+                    that.wheel1.navItems[i].fillAttr = getCssToken(
+                        "--color-selector-background-hover",
+                        "#808080"
+                    );
+                    that.wheel1.navItems[i].sliceHoverAttr.fill = getCssToken(
+                        "--color-selector-background-hover",
+                        "#808080"
+                    );
+                    that.wheel1.navItems[i].slicePathAttr.fill = getCssToken(
+                        "--color-selector-background-hover",
+                        "#808080"
+                    );
+                    that.wheel1.navItems[i].sliceSelectedAttr.fill = getCssToken(
+                        "--color-selector-background-hover",
+                        "#808080"
+                    );
                 }
 
                 if (that.playbackForward === false && i < pitchNumber) {
                     if (i === pitchNumber - 1) {
-                        that.wheel1.navItems[0].fillAttr =
-                            platformColor.selectorBackground || "#e0e0e0";
-                        that.wheel1.navItems[0].sliceHoverAttr.fill =
-                            platformColor.selectorBackground || "#e0e0e0";
-                        that.wheel1.navItems[0].slicePathAttr.fill =
-                            platformColor.selectorBackground || "#e0e0e0";
-                        that.wheel1.navItems[0].sliceSelectedAttr.fill =
-                            platformColor.selectorBackground || "#e0e0e0";
+                        that.wheel1.navItems[0].fillAttr = getCssToken(
+                            "--color-selector-background",
+                            "#e0e0e0"
+                        );
+                        that.wheel1.navItems[0].sliceHoverAttr.fill = getCssToken(
+                            "--color-selector-background",
+                            "#e0e0e0"
+                        );
+                        that.wheel1.navItems[0].slicePathAttr.fill = getCssToken(
+                            "--color-selector-background",
+                            "#e0e0e0"
+                        );
+                        that.wheel1.navItems[0].sliceSelectedAttr.fill = getCssToken(
+                            "--color-selector-background",
+                            "#e0e0e0"
+                        );
                     } else {
-                        that.wheel1.navItems[i + 1].fillAttr =
-                            platformColor.selectorBackground || "#e0e0e0";
-                        that.wheel1.navItems[i + 1].sliceHoverAttr.fill =
-                            platformColor.selectorBackground || "#e0e0e0";
-                        that.wheel1.navItems[i + 1].slicePathAttr.fill =
-                            platformColor.selectorBackground || "#e0e0e0";
-                        that.wheel1.navItems[i + 1].sliceSelectedAttr.fill =
-                            platformColor.selectorBackground || "#e0e0e0";
+                        that.wheel1.navItems[i + 1].fillAttr = getCssToken(
+                            "--color-selector-background",
+                            "#e0e0e0"
+                        );
+                        that.wheel1.navItems[i + 1].sliceHoverAttr.fill = getCssToken(
+                            "--color-selector-background",
+                            "#e0e0e0"
+                        );
+                        that.wheel1.navItems[i + 1].slicePathAttr.fill = getCssToken(
+                            "--color-selector-background",
+                            "#e0e0e0"
+                        );
+                        that.wheel1.navItems[i + 1].sliceSelectedAttr.fill = getCssToken(
+                            "--color-selector-background",
+                            "#e0e0e0"
+                        );
                     }
                 } else {
                     if (i !== 0) {
-                        that.wheel1.navItems[i - 1].fillAttr =
-                            platformColor.selectorBackground || "#e0e0e0";
-                        that.wheel1.navItems[i - 1].sliceHoverAttr.fill =
-                            platformColor.selectorBackground || "#e0e0e0";
-                        that.wheel1.navItems[i - 1].slicePathAttr.fill =
-                            platformColor.selectorBackground || "#e0e0e0";
-                        that.wheel1.navItems[i - 1].sliceSelectedAttr.fill =
-                            platformColor.selectorBackground || "#e0e0e0";
+                        that.wheel1.navItems[i - 1].fillAttr = getCssToken(
+                            "--color-selector-background",
+                            "#e0e0e0"
+                        );
+                        that.wheel1.navItems[i - 1].sliceHoverAttr.fill = getCssToken(
+                            "--color-selector-background",
+                            "#e0e0e0"
+                        );
+                        that.wheel1.navItems[i - 1].slicePathAttr.fill = getCssToken(
+                            "--color-selector-background",
+                            "#e0e0e0"
+                        );
+                        that.wheel1.navItems[i - 1].sliceSelectedAttr.fill = getCssToken(
+                            "--color-selector-background",
+                            "#e0e0e0"
+                        );
                     }
                 }
 
@@ -2493,14 +2750,22 @@ function TemperamentWidget() {
                 this.inbetween = false;
                 setTimeout(
                     function () {
-                        that.notesCircle.navItems[0].fillAttr =
-                            platformColor.selectorBackground || "#c8C8C8";
-                        that.notesCircle.navItems[0].sliceHoverAttr.fill =
-                            platformColor.selectorBackground || "#c8C8C8";
-                        that.notesCircle.navItems[0].slicePathAttr.fill =
-                            platformColor.selectorBackground || "#c8C8C8";
-                        that.notesCircle.navItems[0].sliceSelectedAttr.fill =
-                            platformColor.selectorBackground || "#c8C8C8";
+                        that.notesCircle.navItems[0].fillAttr = getCssToken(
+                            "--color-selector-background",
+                            "#c8C8C8"
+                        );
+                        that.notesCircle.navItems[0].sliceHoverAttr.fill = getCssToken(
+                            "--color-selector-background",
+                            "#c8C8C8"
+                        );
+                        that.notesCircle.navItems[0].slicePathAttr.fill = getCssToken(
+                            "--color-selector-background",
+                            "#c8C8C8"
+                        );
+                        that.notesCircle.navItems[0].sliceSelectedAttr.fill = getCssToken(
+                            "--color-selector-background",
+                            "#c8C8C8"
+                        );
                         that.notesCircle.refreshWheel();
                     },
                     Singer.defaultBPMFactor * 1000 * duration
@@ -2517,7 +2782,10 @@ function TemperamentWidget() {
             if (this.circleIsVisible) {
                 for (let i = 0; i <= this.pitchNumber; i++) {
                     const pitchElement = docById("pitchNumber_" + i);
-                    pitchElement.style.background = platformColor.selectorBackground;
+                    pitchElement.style.background = getCssToken(
+                        "--color-selector-background",
+                        "#c8C8C8"
+                    );
                 }
             }
 
@@ -2586,7 +2854,9 @@ function TemperamentWidget() {
         temperamentCell.style.minHeight = temperamentCell.style.height;
         temperamentCell.style.maxHeight = temperamentCell.style.height;
         temperamentCell.style.textAlign = "center";
-        temperamentCell.style.backgroundColor = platformColor.selectorBackground;
+        if (temperamentCell.classList && typeof temperamentCell.classList.add === "function") {
+            temperamentCell.classList.add("temperament-selector-cell");
+        }
 
         this.playButton = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play all"));
         this.lastClickTime = 0;

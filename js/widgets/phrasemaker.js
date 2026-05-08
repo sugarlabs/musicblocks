@@ -541,24 +541,25 @@ class PhraseMaker {
 
             drumName = this._deps.getDrumName(this.rowLabels[i]);
 
-            // Depending on the row, we choose a different background color.
+            // Depending on the row, choose a semantic class for the label background.
             if (this.rowLabels[i] === "print") break;
-            else if (
+            let labelBgClass = "";
+            if (
                 PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1 ||
                 PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1
             ) {
-                cellColor = this.platformColor.graphicsLabelBackground;
+                labelBgClass = "phrasemaker-row-label--graphics";
             } else {
                 if (drumName === null) {
-                    cellColor = this.platformColor.pitchLabelBackground;
+                    labelBgClass = "phrasemaker-row-label--pitch";
                 } else {
-                    cellColor = this.platformColor.drumLabelBackground;
+                    labelBgClass = "phrasemaker-row-label--drum";
                 }
             }
 
             // A cell for the row label graphic
             cell = ptmTableRow.insertCell();
-            cell.style.backgroundColor = cellColor;
+            cell.classList.add(labelBgClass);
             cell.style.fontSize = this._cellScale * 100 + "%";
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + "px";
@@ -656,7 +657,7 @@ class PhraseMaker {
 
             // A cell for the row label
             cell = ptmTableRow.insertCell();
-            cell.style.backgroundColor = cellColor;
+            cell.classList.add(labelBgClass);
             cell.style.fontSize = this._cellScale * 100 + "%";
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + "px";
@@ -858,7 +859,7 @@ class PhraseMaker {
             cell.style.position = "sticky";
             cell.style.left = "1.2px";
             cell.style.zIndex = "1";
-            cell.style.backgroundColor = this.platformColor.lyricsLabelBackground;
+            cell.classList.add("phrasemaker-lyrics-label");
             cell.style.textAlign = "center";
             cell.textContent = "";
             const penImg = document.createElement("img");
@@ -875,7 +876,7 @@ class PhraseMaker {
             cell.style.position = "sticky";
             cell.style.left = "1.2px";
             cell.style.zIndex = "1";
-            cell.style.backgroundColor = this.platformColor.lyricsLabelBackground;
+            cell.classList.add("phrasemaker-lyrics-label");
             cell.style.textAlign = "center";
             cell.textContent = "Lyrics";
 
@@ -899,7 +900,7 @@ class PhraseMaker {
                 inputCell.style.width = this._noteWidth(noteValue) + "px";
                 inputCell.style.minWidth = inputCell.style.width;
                 inputCell.style.maxWidth = inputCell.style.width;
-                inputCell.style.backgroundColor = this.platformColor.lyricsInputBackground;
+                inputCell.classList.add("phrasemaker-lyrics-input-cell");
                 inputCell.style.fontFamily = "sans-serif";
                 inputCell.style.cursor = "default";
                 inputCell.style.borderSpacing = "1px 1px";
@@ -925,15 +926,15 @@ class PhraseMaker {
                 lyricsInput.style.padding = "0";
                 lyricsInput.style.border = "none";
                 lyricsInput.style.borderRadius = "6px";
-                lyricsInput.style.backgroundColor = this.platformColor.lyricsInputBackground;
+                lyricsInput.classList.add("phrasemaker-lyrics-input");
 
                 inputCell.appendChild(lyricsInput);
-                inputCell.addEventListener("mouseover", event => {
-                    event.target.style.backgroundColor = this.platformColor.selectorSelected;
+                inputCell.addEventListener("mouseover", () => {
+                    inputCell.classList.add("is-hovered");
                 });
 
-                inputCell.addEventListener("mouseout", event => {
-                    event.target.style.backgroundColor = this.platformColor.lyricsInputBackground;
+                inputCell.addEventListener("mouseout", () => {
+                    inputCell.classList.remove("is-hovered");
                 });
                 lyricsInput.addEventListener("focus", () => (this.activity.isInputON = true));
                 lyricsInput.addEventListener("blur", () => (this.activity.isInputON = false));
@@ -978,7 +979,7 @@ class PhraseMaker {
             Math.floor(2 * MATRIXSOLFEWIDTH * this._cellScale) + "px";
         this._noteValueLabel.style.minWidth = this._noteValueLabel.style.width;
         this._noteValueLabel.style.maxWidth = this._noteValueLabel.style.width;
-        this._noteValueLabel.style.backgroundColor = this.platformColor.labelColor;
+        this._noteValueLabel.classList.add("phrasemaker-note-value-label");
 
         // Create tables to store individual note values.
         tempTable = document.createElement("table");
@@ -2449,7 +2450,7 @@ class PhraseMaker {
             n = row.cells.length;
             for (let i = 0; i < n; i++) {
                 cell = row.cells[i];
-                if (cell.style.backgroundColor === "black") {
+                if (cell.classList.contains("phrasemaker-cell-selected")) {
                     thisRow.push(i);
                 }
             }
@@ -2908,7 +2909,7 @@ class PhraseMaker {
             labelCell.style.width = Math.floor(2 * MATRIXSOLFEWIDTH * this._cellScale) + "px";
             labelCell.style.minWidth = labelCell.style.width;
             labelCell.style.maxWidth = labelCell.style.width;
-            labelCell.style.backgroundColor = this.platformColor.labelColor;
+            labelCell.style.backgroundColor = platformColor.labelColor;
 
             labelCell = this._tupletValueLabel;
             labelCell.textContent = this._("tuplet value");
@@ -2917,7 +2918,7 @@ class PhraseMaker {
             labelCell.style.width = Math.floor(2 * MATRIXSOLFEWIDTH * this._cellScale) + "px";
             labelCell.style.minWidth = labelCell.style.width;
             labelCell.style.maxWidth = labelCell.style.width;
-            labelCell.style.backgroundColor = this.platformColor.labelColor;
+            labelCell.style.backgroundColor = platformColor.labelColor;
 
             // Fill in the columns in the tuplet note value row up to
             // where the tuplet begins.
@@ -2925,14 +2926,14 @@ class PhraseMaker {
             valueRow = this._tupletValueRow;
             for (let i = 0; i < firstRow.cells.length; i++) {
                 cell = noteRow.insertCell();
-                cell.style.backgroundColor = this.platformColor.tupletBackground;
+                cell.style.backgroundColor = platformColor.tupletBackground;
                 cell.style.width = firstRow.cells[i].style.width;
                 cell.style.minWidth = firstRow.cells[i].style.minWidth;
                 cell.style.maxWidth = firstRow.cells[i].style.maxWidth;
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
 
                 cell = valueRow.insertCell();
-                cell.style.backgroundColor = this.platformColor.tupletBackground;
+                cell.style.backgroundColor = platformColor.tupletBackground;
                 cell.style.width = firstRow.cells[i].style.width;
                 cell.style.minWidth = firstRow.cells[i].style.minWidth;
                 cell.style.maxWidth = firstRow.cells[i].style.maxWidth;
@@ -2943,7 +2944,7 @@ class PhraseMaker {
         // Now add the tuplet to the matrix.
         const tupletNoteValue = noteValue * tupletValue;
         let numerator, thisNoteValue, obj;
-        let cellWidth, cellColor;
+        let cellWidth;
         let ptmRow, drumName;
         // Add the tuplet notes
         for (let i = 0; i < numberOfNotes; i++) {
@@ -2953,7 +2954,7 @@ class PhraseMaker {
             cell = noteRow.insertCell(-1);
             numerator = 32 / param[1][i];
             thisNoteValue = 1 / (numerator / (totalNoteInterval / tupletTimeFactor));
-            cell.style.backgroundColor = this.platformColor.tupletBackground;
+            cell.style.backgroundColor = platformColor.tupletBackground;
             cell.style.width = this._noteWidth(thisNoteValue) + "px";
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
@@ -2996,22 +2997,28 @@ class PhraseMaker {
 
             // Add the notes to the matrix a la addNote.
             for (let j = 0; j < this.rowLabels.length; j++) {
-                // Depending on the row, we choose a different background color.
-                if (PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[j]) !== -1) {
-                    cellColor = this.platformColor.graphicsBackground;
+                let rowClass;
+                if (
+                    PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[j]) !== -1 ||
+                    PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(this.rowLabels[j]) !== -1
+                ) {
+                    rowClass = "phrasemaker-cell-graphics";
                 } else {
                     drumName = this._deps.getDrumName(this.rowLabels[j]);
                     if (drumName === null) {
-                        cellColor = this.platformColor.pitchBackground;
+                        rowClass = "phrasemaker-cell-pitch";
                     } else {
-                        cellColor = this.platformColor.drumBackground;
+                        rowClass = "phrasemaker-cell-drum";
                     }
                 }
 
                 ptmRow = this._rows[j];
                 cell = ptmRow.insertCell();
-
-                cell.setAttribute("cellColor", cellColor);
+                if (cell.classList && typeof cell.classList.add === "function") {
+                    cell.classList.add(rowClass);
+                } else if (typeof cell.className !== "undefined") {
+                    cell.className = (cell.className ? cell.className + " " : "") + rowClass;
+                }
 
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 // Using the alt attribute to store the note value
@@ -3019,18 +3026,17 @@ class PhraseMaker {
                 cell.style.width = cellWidth;
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
-                cell.style.backgroundColor = cellColor;
                 cell.style.borderLeft = i === 0 ? barStyle : "1px solid #ccc";
 
                 cell.onmouseover = event => {
-                    if (event.target.style.backgroundColor !== "black") {
-                        event.target.style.backgroundColor = this.platformColor.selectorSelected;
+                    if (!this._isSelectedCell(event.target) && event.target.classList) {
+                        event.target.classList.add("phrasemaker-cell-hover");
                     }
                 };
 
                 cell.onmouseout = event => {
-                    if (event.target.style.backgroundColor !== "black") {
-                        event.target.style.backgroundColor = event.target.getAttribute("cellColor");
+                    if (event.target.classList) {
+                        event.target.classList.remove("phrasemaker-cell-hover");
                     }
                 };
             }
@@ -3048,7 +3054,7 @@ class PhraseMaker {
         cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
         cell.style.textAlign = "center";
         cell.textContent = tupletValue;
-        cell.style.backgroundColor = this.platformColor.tupletBackground;
+        cell.style.backgroundColor = platformColor.tupletBackground;
         cell.style.borderLeft = barStyle;
 
         // And a span in the note value column too.
@@ -3078,7 +3084,7 @@ class PhraseMaker {
                 if (k < parts.length - 1) cell.appendChild(document.createElement("br"));
             }
         }
-        cell.style.backgroundColor = this.platformColor.rhythmcellcolor;
+        cell.style.backgroundColor = platformColor.rhythmcellcolor;
         cell.style.borderLeft = barStyle;
         this._matrixHasTuplets = true;
 
@@ -3120,7 +3126,7 @@ class PhraseMaker {
         }
 
         const rowCount = this.rowLabels.length - this._rests;
-        let drumName, row, cell, cellColor;
+        let drumName, row, cell;
         for (let j = 0; j < numBeats; j++) {
             const noteDuration = 1 / noteValue;
 
@@ -3132,46 +3138,42 @@ class PhraseMaker {
             const barStyle = isBarLine ? "3px solid #555" : "1px solid #ccc";
 
             for (let i = 0; i < rowCount; i++) {
-                // Depending on the row, we choose a different background color.
+                let rowClass;
                 if (
                     PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1 ||
                     PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1
                 ) {
-                    cellColor = this.platformColor.graphicsBackground;
+                    rowClass = "phrasemaker-cell-graphics";
                 } else {
                     drumName = this._deps.getDrumName(this.rowLabels[i]);
                     if (drumName === null) {
-                        cellColor = this.platformColor.pitchBackground;
+                        rowClass = "phrasemaker-cell-pitch";
                     } else {
-                        cellColor = this.platformColor.drumBackground;
+                        rowClass = "phrasemaker-cell-drum";
                     }
                 }
 
                 // the buttons get add to the embedded table
                 row = this._rows[i];
                 cell = row.insertCell();
-
-                cell.setAttribute("cellColor", cellColor);
+                cell.classList.add(rowClass);
                 cell.style.borderRadius = "6px";
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.width = this._noteWidth(noteValue) + "px";
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
-                cell.style.backgroundColor = cellColor;
                 cell.style.borderLeft = barStyle;
                 // Using the alt attribute to store the note value
                 cell.setAttribute("alt", 1 / noteValue);
 
                 cell.addEventListener("mouseover", event => {
-                    if (event.target.style.backgroundColor !== "black") {
-                        event.target.style.backgroundColor = this.platformColor.selectorSelected;
+                    if (!this._isSelectedCell(event.target)) {
+                        event.target.classList.add("phrasemaker-cell-hover");
                     }
                 });
 
                 cell.addEventListener("mouseout", event => {
-                    if (event.target.style.backgroundColor !== "black") {
-                        event.target.style.backgroundColor = event.target.getAttribute("cellColor");
-                    }
+                    event.target.classList.remove("phrasemaker-cell-hover");
                 });
             }
 
@@ -3201,8 +3203,8 @@ class PhraseMaker {
                     if (k < parts.length - 1) cell.appendChild(document.createElement("br"));
                 }
             }
-            cell.style.backgroundColor = this.platformColor.rhythmcellcolor;
-            cell.style.color = this.platformColor.textColor;
+            cell.style.backgroundColor = platformColor.rhythmcellcolor;
+            cell.style.color = "var(--color-text)";
             cell.setAttribute("alt", noteValue);
             cell.style.borderLeft = barStyle;
 
@@ -3216,7 +3218,7 @@ class PhraseMaker {
                 cell.style.maxWidth = cell.style.width;
                 cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
-                cell.style.backgroundColor = this.platformColor.tupletBackground;
+                cell.style.backgroundColor = platformColor.tupletBackground;
                 cell.style.borderLeft = barStyle;
 
                 row = this._tupletValueRow;
@@ -3226,7 +3228,7 @@ class PhraseMaker {
                 cell.style.maxWidth = cell.style.width;
                 cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
-                cell.style.backgroundColor = this.platformColor.tupletBackground;
+                cell.style.backgroundColor = platformColor.tupletBackground;
                 cell.style.borderLeft = barStyle;
             }
 
@@ -4100,8 +4102,8 @@ class PhraseMaker {
             row = this._rows[i];
             for (let j = 0; j < row.cells.length; j++) {
                 cell = row.cells[j];
-                if (cell.style.backgroundColor === "black") {
-                    cell.style.backgroundColor = cell.getAttribute("cellColor");
+                if (this._isSelectedCell(cell)) {
+                    this._setSelectedCell(cell, false);
                     this._setNotes(j, i, false);
                 }
             }
@@ -4123,12 +4125,12 @@ class PhraseMaker {
                     isMouseDown = true;
                     const i = Number(evt.target.getAttribute("data-i"));
                     const j = Number(evt.target.getAttribute("data-j"));
-                    if (evt.target.style.backgroundColor === "black") {
-                        evt.target.style.backgroundColor = evt.target.getAttribute("cellColor");
+                    if (this._isSelectedCell(evt.target)) {
+                        this._setSelectedCell(evt.target, false);
                         this._notesToPlay[j][0] = ["R"];
                         if (!this._noteBlocks) this._setNotes(j, i, false);
                     } else {
-                        evt.target.style.backgroundColor = "black";
+                        this._setSelectedCell(evt.target, true);
                         if (!this._noteBlocks) this._setNotes(j, i, true);
                     }
                 };
@@ -4137,12 +4139,12 @@ class PhraseMaker {
                     const i = Number(evt.target.getAttribute("data-i"));
                     const j = Number(evt.target.getAttribute("data-j"));
                     if (isMouseDown) {
-                        if (evt.target.style.backgroundColor === "black") {
-                            evt.target.style.backgroundColor = evt.target.getAttribute("cellColor");
+                        if (this._isSelectedCell(evt.target)) {
+                            this._setSelectedCell(evt.target, false);
                             this._notesToPlay[j][0] = ["R"];
                             if (!this._noteBlocks) this._setNotes(j, i, false);
                         } else {
-                            evt.target.style.backgroundColor = "black";
+                            this._setSelectedCell(evt.target, true);
                             if (!this._noteBlocks) this._setNotes(j, i, true);
                         }
                     }
@@ -4168,7 +4170,7 @@ class PhraseMaker {
                 for (let j = 0; j < this._markedColsInRow[ii].length; j++) {
                     c = this._markedColsInRow[ii][j];
                     cell = row.cells[c];
-                    cell.style.backgroundColor = "black";
+                    this._setSelectedCell(cell, true);
                     this._setNoteCell(r, c, cell, false, null);
                 }
             }
@@ -4234,7 +4236,7 @@ class PhraseMaker {
                     if (row !== null && typeof row !== "undefined") {
                         cell = row.cells[c];
                         if (cell !== undefined) {
-                            cell.style.backgroundColor = "black";
+                            this._setSelectedCell(cell, true);
                             this._setNoteCell(r, c, cell, false, null);
                         }
                     }
@@ -4322,7 +4324,7 @@ class PhraseMaker {
         for (let j = 0; j < this.rowLabels.length; j++) {
             row = this._rows[j];
             cell = row.cells[colIndex];
-            if (cell.style.backgroundColor === "black") {
+            if (this._isSelectedCell(cell)) {
                 this._setNoteCell(j, colIndex, cell, playNote);
             }
         }
@@ -4425,12 +4427,36 @@ class PhraseMaker {
             row = this._rows[i];
             for (let j = 0; j < row.cells.length; j++) {
                 cell = row.cells[j];
-                if (cell.style.backgroundColor === "black") {
-                    cell.style.backgroundColor = cell.getAttribute("cellColor");
+                if (this._isSelectedCell(cell)) {
+                    this._setSelectedCell(cell, false);
                     this._notesToPlay[j][0] = ["R"];
                     this._setNotes(j, i, false);
                 }
             }
+        }
+    }
+
+    _isSelectedCell(cell) {
+        if (cell && cell.classList && typeof cell.classList.contains === "function") {
+            return (
+                cell.classList.contains("phrasemaker-cell-selected") ||
+                cell.style.backgroundColor === "black"
+            );
+        }
+
+        return !!(cell && cell.style && cell.style.backgroundColor === "black");
+    }
+
+    _setSelectedCell(cell, selected) {
+        if (cell && cell.classList && typeof cell.classList.add === "function") {
+            if (selected) {
+                cell.classList.add("phrasemaker-cell-selected");
+            } else {
+                cell.classList.remove("phrasemaker-cell-selected");
+            }
+        }
+        if (cell && cell.style) {
+            cell.style.backgroundColor = selected ? "black" : "white";
         }
     }
 

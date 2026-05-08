@@ -574,7 +574,8 @@ class ThemeBox {
      */
     reload() {
         // Keep for backward compatibility, but prefer instant switching
-        window.location.reload();
+        // Use applyThemeInstantly() instead of reload to enable live theme switching
+        this.applyThemeInstantly();
     }
 
     /**

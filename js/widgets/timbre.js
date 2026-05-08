@@ -540,7 +540,7 @@ class TimbreWidget {
                 blockValue = this.env.length - 1;
             }
 
-            docById("envelopeButtonCell").style.backgroundColor = platformColor.selectorBackground;
+            docById("envelopeButtonCell").classList.add("timbre-cell");
             for (let i = 0; i < 4; i++) {
                 this.synthVals["envelope"][this.adsrMap[i]] = parseFloat(this.ENVs[i]) / 100;
                 docById("myRange" + i).value = parseFloat(this.ENVs[i]);
@@ -555,7 +555,7 @@ class TimbreWidget {
                 this.synthVals
             );
         } else if (this.isActive["amsynth"] === true) {
-            docById("synthButtonCell").style.backgroundColor = platformColor.selectorBackground;
+            docById("synthButtonCell").classList.add("timbre-cell");
             if (this.AMSynthesizer.length > 1) {
                 blockValue = this.AMSynthesizer.length - 1;
             }
@@ -571,7 +571,7 @@ class TimbreWidget {
                 this.amSynthParamvals
             );
         } else if (this.isActive["fmsynth"] === true) {
-            docById("synthButtonCell").style.backgroundColor = platformColor.selectorBackground;
+            docById("synthButtonCell").classList.add("timbre-cell");
             if (this.FMSynthesizer.length > 1) {
                 blockValue = this.FMSynthesizer.length - 1;
             }
@@ -587,7 +587,7 @@ class TimbreWidget {
                 this.fmSynthParamvals
             );
         } else if (this.isActive["noisesynth"] === true) {
-            docById("synthButtonCell").style.backgroundColor = platformColor.selectorBackground;
+            docById("synthButtonCell").classList.add("timbre-cell");
             if (this.NoiseSynthesizer.length > 1) {
                 blockValue = this.NoiseSynthesizer.length - 1;
             }
@@ -603,7 +603,7 @@ class TimbreWidget {
                 this.noiseSynthParamvals
             );
         } else if (this.isActive["duosynth"] === true) {
-            docById("synthButtonCell").style.backgroundColor = platformColor.selectorBackground;
+            docById("synthButtonCell").classList.add("timbre-cell");
             if (this.duoSynthesizer.length > 1) {
                 blockValue = this.duoSynthesizer.length - 1;
             }
@@ -622,8 +622,7 @@ class TimbreWidget {
                 this.duoSynthParamVals
             );
         } else if (this.isActive["oscillator"]) {
-            docById("oscillatorButtonCell").style.backgroundColor =
-                platformColor.selectorBackground;
+            docById("oscillatorButtonCell").classList.add("timbre-cell");
             if (this.osc.length > 1) {
                 blockValue = this.osc.length - 1;
             }
@@ -643,8 +642,7 @@ class TimbreWidget {
             );
         } else if (this.isActive["filter"]) {
             for (let i = 0; i < this.fil.length; i++) {
-                docById("filterButtonCell").style.backgroundColor =
-                    platformColor.selectorBackground;
+                docById("filterButtonCell").classList.add("timbre-cell");
                 docById("sel" + i).value = this.filterParams[i * 3];
                 this._update(i, this.filterParams[i * 3], 0);
                 instrumentsFilters[0][this.instrumentName][i]["filterType"] =
@@ -687,7 +685,7 @@ class TimbreWidget {
                 );
             }
         } else if (this.isActive["tremolo"] === true) {
-            docById("effectsButtonCell").style.backgroundColor = platformColor.selectorBackground;
+            docById("effectsButtonCell").classList.add("timbre-cell");
             if (this.tremoloEffect.length !== 1) {
                 blockValue = this.tremoloEffect.length - 1;
             }
@@ -698,7 +696,7 @@ class TimbreWidget {
                 this._update(blockValue, this.tremoloParams[i], i);
             }
         } else if (this.isActive["vibrato"] === true) {
-            docById("effectsButtonCell").style.backgroundColor = platformColor.selectorBackground;
+            docById("effectsButtonCell").classList.add("timbre-cell");
             if (this.vibratoEffect.length !== 1) {
                 blockValue = this.vibratoEffect.length - 1;
             }
@@ -709,7 +707,7 @@ class TimbreWidget {
                 this._update(blockValue, this.vibratoParams[i], i);
             }
         } else if (this.isActive["phaser"] === true) {
-            docById("effectsButtonCell").style.backgroundColor = platformColor.selectorBackground;
+            docById("effectsButtonCell").classList.add("timbre-cell");
             if (this.phaserEffect.length !== 1) {
                 blockValue = this.phaserEffect.length - 1;
             }
@@ -720,7 +718,7 @@ class TimbreWidget {
                 this._update(blockValue, this.phaserParams[i], i);
             }
         } else if (this.isActive["chorus"] === true) {
-            docById("effectsButtonCell").style.backgroundColor = platformColor.selectorBackground;
+            docById("effectsButtonCell").classList.add("timbre-cell");
             if (this.chorusEffect.length !== 1) {
                 blockValue = this.chorusEffect.length - 1;
             }
@@ -731,7 +729,7 @@ class TimbreWidget {
                 this._update(blockValue, this.chorusParams[i], i);
             }
         } else if (this.isActive["distortion"] === true) {
-            docById("effectsButtonCell").style.backgroundColor = platformColor.selectorBackground;
+            docById("effectsButtonCell").classList.add("timbre-cell");
             if (this.distortionEffect.length !== 1) {
                 blockValue = this.distortionEffect.length - 1;
             }
@@ -1004,13 +1002,13 @@ class TimbreWidget {
         // };
 
         _unhighlightButtons = button => {
-            addFilterButtonCell.style.backgroundColor = platformColor.widgetButton;
-            synthButtonCell.style.backgroundColor = platformColor.widgetButton;
-            oscillatorButtonCell.style.backgroundColor = platformColor.widgetButton;
-            envelopeButtonCell.style.backgroundColor = platformColor.widgetButton;
-            effectsButtonCell.style.backgroundColor = platformColor.widgetButton;
-            filterButtonCell.style.backgroundColor = platformColor.widgetButton;
-            button.style.backgroundColor = platformColor.widgetButtonSelect;
+            addFilterButtonCell.classList.add("widget-button");
+            synthButtonCell.classList.add("widget-button");
+            oscillatorButtonCell.classList.add("widget-button");
+            envelopeButtonCell.classList.add("widget-button");
+            effectsButtonCell.classList.add("widget-button");
+            filterButtonCell.classList.add("widget-button");
+            button.classList.add("widget-button");
         };
 
         activity.textMsg(_("Click on buttons to open the timbre design tools."), 3000);
@@ -1279,7 +1277,7 @@ class TimbreWidget {
         }
         const envAppend = document.createElement("div");
         envAppend.id = "envAppend";
-        envAppend.style.backgroundColor = platformColor.widgetBackground;
+        envAppend.classList.add("timbre-cell");
         envAppend.style.height = "30px";
         envAppend.style.marginTop = "40px";
         envAppend.style.overflow = "auto";
@@ -1766,7 +1764,7 @@ class TimbreWidget {
         env.appendChild(wrapperOsc1);
         const envAppend = document.createElement("div");
         envAppend.id = "envAppend";
-        envAppend.style.backgroundColor = platformColor.widgetBackground;
+        envAppend.classList.add("timbre-cell");
         envAppend.style.height = "30px";
         envAppend.style.marginTop = "40px";
         envAppend.style.overflow = "auto";
@@ -1901,7 +1899,7 @@ class TimbreWidget {
         }
         const envAppend = document.createElement("div");
         envAppend.id = "envAppend";
-        envAppend.style.backgroundColor = platformColor.widgetBackground;
+        envAppend.classList.add("timbre-cell");
         envAppend.style.height = "30px";
         envAppend.style.marginTop = "40px";
         envAppend.style.overflow = "auto";
@@ -2363,7 +2361,7 @@ class TimbreWidget {
         }
         const envAppend = document.createElement("div");
         envAppend.id = "envAppend";
-        envAppend.style.backgroundColor = platformColor.widgetBackground;
+        envAppend.classList.add("timbre-cell");
         envAppend.style.height = "30px";
         envAppend.style.marginTop = "40px";
         envAppend.style.overflow = "auto";

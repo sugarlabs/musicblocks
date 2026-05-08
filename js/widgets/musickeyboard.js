@@ -14,7 +14,7 @@
 /*
    global
 
-   docById, platformColor, FIXEDSOLFEGE, FIXEDSOLFEGE1, SHARP, FLAT,
+    docById, FIXEDSOLFEGE, FIXEDSOLFEGE1, SHARP, FLAT,
    last, Singer, noteToFrequency, EIGHTHNOTEWIDTH,
    MATRIXSOLFEHEIGHT, i18nSolfege, MATRIXSOLFEWIDTH, toFraction,
    wheelnav, slicePath, getNote, PREVIEWVOLUME, DEFAULTVOICE,
@@ -34,7 +34,6 @@
         toFraction, DEFAULTVOICE, PITCHES, PITCHES2, PITCHES3, SOLFEGENAMES,
         SOLFEGECONVERSIONTABLE, NOTESSHARP, NOTESFLAT, convertFromSolfege
     - js/utils/platformstyle.js
-        platformColor
     - js/logo.js
         PREVIEWVOLUME
 */
@@ -56,6 +55,74 @@ function MusicKeyboard(activity) {
     const HERTZKEYS = [49, 50, 51, 52, 53, 54, 55, 56, 57, 48];
     const WHITEKEYS = [65, 83, 68, 70, 71, 72, 74, 75, 76];
     const SPACE = 32;
+    const getTokenList = (token, fallback) => {
+        const styles = getComputedStyle(document.body);
+        if (styles && typeof styles.getPropertyValue === "function") {
+            const value = styles.getPropertyValue(token).trim();
+            if (value) {
+                return value
+                    .split(",")
+                    .map(color => color.trim())
+                    .filter(Boolean);
+            }
+        }
+        return fallback.slice();
+    };
+
+    const getTokenColor = (token, fallback) => {
+        const styles = getComputedStyle(document.body);
+        if (styles && typeof styles.getPropertyValue === "function") {
+            return styles.getPropertyValue(token).trim() || fallback;
+        }
+        return fallback;
+    };
+
+    const keyStateClasses = [
+        "music-keyboard-key-black",
+        "music-keyboard-key-white",
+        "music-keyboard-key-muted",
+        "music-keyboard-key-playing"
+    ];
+
+    const applyKeyboardKeyState = (element, stateClass) => {
+        if (!element) return;
+        if (element.classList && typeof element.classList.remove === "function") {
+            keyStateClasses.forEach(cls => element.classList.remove(cls));
+            if (stateClass) {
+                element.classList.add(stateClass);
+            }
+        }
+        if (element.style) {
+            if (stateClass === "music-keyboard-key-black") element.style.backgroundColor = "black";
+            else if (stateClass === "music-keyboard-key-white")
+                element.style.backgroundColor = "white";
+            else if (stateClass === "music-keyboard-key-playing")
+                element.style.backgroundColor = "gray";
+            else if (stateClass === "music-keyboard-key-muted")
+                element.style.backgroundColor = "lightgray";
+            else if (!stateClass) element.style.backgroundColor = "";
+        }
+    };
+
+    this._isSelectedCell = cell => {
+        if (cell && cell.classList && typeof cell.classList.contains === "function") {
+            return (
+                cell.classList.contains("music-keyboard-key-selected") ||
+                cell.style.backgroundColor === "black"
+            );
+        }
+        return !!(cell && cell.style && cell.style.backgroundColor === "black");
+    };
+
+    this._setSelectedCell = (cell, selected) => {
+        if (cell && cell.classList && typeof cell.classList.add === "function") {
+            if (selected) cell.classList.add("music-keyboard-key-selected");
+            else cell.classList.remove("music-keyboard-key-selected");
+        }
+        if (cell && cell.style) {
+            cell.style.backgroundColor = selected ? "black" : "";
+        }
+    };
 
     const setKeyboardCellLabel = (cell, label, octave, prefix = null) => {
         cell.replaceChildren();
@@ -353,7 +420,7 @@ function MusicKeyboard(activity) {
             }
 
             if (ele !== null && ele !== undefined) {
-                ele.style.backgroundColor = platformColor.orange;
+                ele.classList.add("music-keyboard-key-playing");
                 temp1[id] = ele.getAttribute("alt").split("__")[0];
                 if (temp1[id] === "hertz") {
                     temp2[id] = parseInt(ele.getAttribute("alt").split("__")[1]);
@@ -439,9 +506,9 @@ function MusicKeyboard(activity) {
 
             if (ele !== null && ele !== undefined) {
                 if (id.includes("blackRow")) {
-                    ele.style.backgroundColor = "black";
+                    applyKeyboardKeyState(ele, "music-keyboard-key-black");
                 } else {
-                    ele.style.backgroundColor = "white";
+                    applyKeyboardKeyState(ele, "music-keyboard-key-white");
                 }
 
                 // no = ele.getAttribute("alt").split("__")[2];
@@ -563,7 +630,7 @@ function MusicKeyboard(activity) {
         const __startNote = element => {
             startDate = new Date();
             startTime = startDate.getTime(); // Milliseconds();
-            element.style.backgroundColor = platformColor.orange;
+            element.classList.add("music-keyboard-key-playing");
             this.activity.logo.synth.trigger(
                 0,
                 this.noteMapper[element.id],
@@ -590,9 +657,9 @@ function MusicKeyboard(activity) {
         const __endNote = element => {
             const id = element.id;
             if (id.includes("blackRow")) {
-                element.style.backgroundColor = "black";
+                applyKeyboardKeyState(element, "music-keyboard-key-black");
             } else {
-                element.style.backgroundColor = "white";
+                applyKeyboardKeyState(element, "music-keyboard-key-white");
             }
 
             const now = new Date();
@@ -634,9 +701,9 @@ function MusicKeyboard(activity) {
             } else if (activeKey !== null) {
                 const id = activeKey.id;
                 if (id.includes("blackRow")) {
-                    activeKey.style.backgroundColor = "black";
+                    applyKeyboardKeyState(activeKey, "music-keyboard-key-black");
                 } else {
-                    activeKey.style.backgroundColor = "white";
+                    applyKeyboardKeyState(activeKey, "music-keyboard-key-white");
                 }
                 activeKey = null;
             }
@@ -788,10 +855,12 @@ function MusicKeyboard(activity) {
          * @type {HTMLElement}
          */
         this.tickButton = widgetWindow.addButton("metronome.svg", ICONSIZE, _("Metronome"));
+        this.tickButton.setAttribute("aria-label", _("Metronome"));
+        this.tickButton.setAttribute("role", "button");
 
         // Turn off metronome
         this.stopMetronome = () => {
-            this.tickButton.style.removeProperty("background");
+            this.tickButton.classList.remove("music-keyboard-tick-active");
             if (this.tick && this.loopTick) {
                 this.loopTick.stop();
             }
@@ -814,7 +883,7 @@ function MusicKeyboard(activity) {
             } else {
                 // Turn on metronome
                 this.metronomeON = true;
-                this.tickButton.style.background = platformColor.orange;
+                this.tickButton.classList.add("music-keyboard-tick-active");
 
                 const winBody = document.getElementsByClassName("wfbWidget")[0];
                 const countdownContainer = document.createElement("div");
@@ -933,7 +1002,7 @@ function MusicKeyboard(activity) {
                 if (this.keyboardShown && selectedNotes[0].objId[0] !== null) {
                     ele = docById(selectedNotes[0].objId[i]);
                     if (ele !== null) {
-                        ele.style.backgroundColor = "lightgrey";
+                        applyKeyboardKeyState(ele, "music-keyboard-key-muted");
                     }
                 }
 
@@ -948,7 +1017,7 @@ function MusicKeyboard(activity) {
 
             if (!this.keyboardShown) {
                 cell = docById("cells-0");
-                cell.style.backgroundColor = platformColor.selectorBackground;
+                this._setSelectedCell(cell, true);
             }
 
             this._stopOrCloseClicked = false;
@@ -997,7 +1066,7 @@ function MusicKeyboard(activity) {
 
                 if (!this.keyboardShown) {
                     cell = docById("cells-" + counter);
-                    cell.style.backgroundColor = platformColor.selectorBackground;
+                    this._setSelectedCell(cell, true);
                 }
 
                 if (this.keyboardShown && selectedNotes[counter - 1].objId[0] !== null) {
@@ -1005,9 +1074,9 @@ function MusicKeyboard(activity) {
                         eleid = selectedNotes[counter - 1].objId[i];
                         ele = docById(eleid);
                         if (eleid.includes("blackRow")) {
-                            ele.style.backgroundColor = "black";
+                            applyKeyboardKeyState(ele, "music-keyboard-key-black");
                         } else {
-                            ele.style.backgroundColor = "white";
+                            applyKeyboardKeyState(ele, "music-keyboard-key-white");
                         }
                     }
                 }
@@ -1023,7 +1092,7 @@ function MusicKeyboard(activity) {
 
                         ele = docById(selectedNotes[counter].objId[i]);
                         if (ele !== null) {
-                            ele.style.backgroundColor = "lightgrey";
+                            applyKeyboardKeyState(ele, "music-keyboard-key-muted");
                         }
                     }
 
@@ -1392,7 +1461,7 @@ function MusicKeyboard(activity) {
         for (let j = 0; j < this.layout.length; j++) {
             row = docById("mkb" + j);
             cell = row.cells[colIndex];
-            if (cell.style.backgroundColor === "black") {
+            if (cell.classList.contains("music-keyboard-key-selected")) {
                 this._setNoteCell(j, colIndex, start, playNote);
                 silence = false;
             }
@@ -1503,11 +1572,12 @@ function MusicKeyboard(activity) {
                     const obj = cell.id.split(":");
                     // i = Number(obj[0]);
                     const j = Number(obj[1]);
-                    if (cell.style.backgroundColor === "black") {
-                        cell.style.backgroundColor = cell.getAttribute("cellColor");
+                    if (this._isSelectedCell(cell)) {
+                        this._setSelectedCell(cell, false);
                         this._setNotes(j, false);
                     } else {
-                        cell.style.backgroundColor = "black";
+                        this._setSelectedCell(cell, true);
+                        applyKeyboardKeyState(cell, "music-keyboard-key-black");
                         this._setNotes(j, true);
                     }
                 };
@@ -1518,11 +1588,12 @@ function MusicKeyboard(activity) {
                     // i = Number(obj[0]);
                     // j = Number(obj[1]);
                     if (isMouseDown) {
-                        if (cell.style.backgroundColor === "black") {
-                            cell.style.backgroundColor = cell.getAttribute("cellColor");
+                        if (this._isSelectedCell(cell)) {
+                            this._setSelectedCell(cell, false);
                             this._setNotes(j, false);
                         } else {
-                            cell.style.backgroundColor = "black";
+                            this._setSelectedCell(cell, true);
+                            applyKeyboardKeyState(cell, "music-keyboard-key-black");
                             this._setNotes(j, true);
                         }
                     }
@@ -1619,7 +1690,7 @@ function MusicKeyboard(activity) {
         for (let i = this.displayLayout.length - 1; i >= 0; i--) {
             mkbTableRow = mkbTable.insertRow();
             cell = mkbTableRow.insertCell();
-            cell.style.backgroundColor = platformColor.graphicsLabelBackground;
+            cell.classList.add("music-keyboard-graphics-label");
             cell.style.fontSize = this._cellScale * 100 + "%";
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) * 1.5 + "px";
@@ -1672,7 +1743,7 @@ function MusicKeyboard(activity) {
         mkbTableRow.style.position = "sticky";
         mkbTableRow.style.bottom = "0px";
         cell = mkbTableRow.insertCell();
-        cell.style.backgroundColor = platformColor.graphicsLabelBackground;
+        cell.classList.add("music-keyboard-graphics-label");
         cell.style.fontSize = this._cellScale * 100 + "%";
         cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
         cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) * 1.5 + "px";
@@ -1709,12 +1780,14 @@ function MusicKeyboard(activity) {
                         this.displayLayout[n - i - 1].blockNumber
                     );
                     cell.setAttribute("alt", selectedNotes[j].duration[ind]);
-                    cell.style.backgroundColor = "black";
+                    this._setSelectedCell(cell, true);
+                    applyKeyboardKeyState(cell, "music-keyboard-key-black");
                     cell.style.border = "2px solid white";
                     cell.style.borderRadius = "10px";
                 } else {
                     cell.setAttribute("alt", maxWidth);
-                    cell.style.backgroundColor = cellColor;
+                    this._setSelectedCell(cell, false);
+                    applyKeyboardKeyState(cell, null);
                     cell.style.border = "2px solid white";
                     cell.style.borderRadius = "10px";
                 }
@@ -1735,8 +1808,7 @@ function MusicKeyboard(activity) {
             cell.setAttribute("id", "cells-" + j);
             cell.setAttribute("start", selectedNotes[j].startTime);
             cell.setAttribute("dur", maxWidth);
-            cell.style.backgroundColor = platformColor.rhythmcellcolor;
-            cell.style.color = platformColor.textColor;
+            cell.classList.add("music-keyboard-rhythm-cell");
         }
 
         const innerDiv = docById("mkbInnerDiv");
@@ -1765,7 +1837,15 @@ function MusicKeyboard(activity) {
         wheelnav.cssMode = true;
         this._menuWheel.keynavigateEnabled = false;
         this._menuWheel.clickModeRotate = false;
-        this._menuWheel.colors = platformColor.pitchWheelcolors;
+        this._menuWheel.colors = getTokenList("--wheel-pitch", [
+            "#77c428",
+            "#93e042",
+            "#77c428",
+            "#5ba900",
+            "#77c428",
+            "#93e042",
+            "#adfd55"
+        ]);
         this._menuWheel.slicePathFunction = slicePath().DonutSlice;
         this._menuWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._menuWheel.sliceSelectedPathCustom = this._menuWheel.slicePathCustom;
@@ -1773,7 +1853,7 @@ function MusicKeyboard(activity) {
         this._menuWheel.titleRotateAngle = 90;
         this._menuWheel.animatetime = 0; // 300;
 
-        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.colors = getTokenList("--wheel-exit", ["#808080", "#c0c0c0"]);
         this._exitWheel.keynavigateEnabled = false;
         this._exitWheel.clickModeRotate = false;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
@@ -1809,7 +1889,15 @@ function MusicKeyboard(activity) {
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
         this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
 
-        this._tabsWheel.colors = platformColor.pitchWheelcolors;
+        this._tabsWheel.colors = getTokenList("--wheel-pitch", [
+            "#77c428",
+            "#93e042",
+            "#77c428",
+            "#5ba900",
+            "#77c428",
+            "#93e042",
+            "#adfd55"
+        ]);
         this._tabsWheel.slicePathFunction = slicePath().DonutSlice;
         this._tabsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._tabsWheel.slicePathCustom.minRadiusPercent = 0.5;
@@ -1819,7 +1907,15 @@ function MusicKeyboard(activity) {
         this._tabsWheel.clickModeRotate = false;
         this._tabsWheel.createWheel(tabsLabels);
 
-        this._durationWheel.colors = platformColor.pitchWheelcolors;
+        this._durationWheel.colors = getTokenList("--wheel-pitch", [
+            "#77c428",
+            "#93e042",
+            "#77c428",
+            "#5ba900",
+            "#77c428",
+            "#93e042",
+            "#adfd55"
+        ]);
         this._durationWheel.keynavigateEnabled = false;
         this._durationWheel.slicePathFunction = slicePath().DonutSlice;
         this._durationWheel.slicePathCustom = slicePath().DonutSliceCustomization();
@@ -2065,10 +2161,10 @@ function MusicKeyboard(activity) {
         this._menuWheel.keynavigateEnabled = false;
         this._menuWheel.slicePathFunction = slicePath().DonutSlice;
         this._menuWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._menuWheel.colors = [
-            platformColor.paletteColors["pitch"][0],
-            platformColor.paletteColors["pitch"][1]
-        ];
+        this._menuWheel.colors = getTokenList("--palette-pitch", ["#7CD622", "#57AD02"]).slice(
+            0,
+            2
+        );
         this._menuWheel.slicePathCustom.minRadiusPercent = 0.3;
         this._menuWheel.slicePathCustom.maxRadiusPercent = 1.0;
 
@@ -2081,7 +2177,7 @@ function MusicKeyboard(activity) {
         this._menuWheel.navItems[0].setTooltip(_("pitch"));
         this._menuWheel.navItems[1].setTooltip(_("hertz"));
 
-        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.colors = getTokenList("--wheel-exit", ["#808080", "#c0c0c0"]);
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
@@ -2430,12 +2526,33 @@ function MusicKeyboard(activity) {
         this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
         this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         if (condition === "pitchblocks") {
-            this._pitchWheel.colors = platformColor.pitchWheelcolors;
+            this._pitchWheel.colors = getTokenList("--wheel-pitch", [
+                "#77c428",
+                "#93e042",
+                "#77c428",
+                "#5ba900",
+                "#77c428",
+                "#93e042",
+                "#adfd55"
+            ]);
             this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
             this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.5;
         } else if (condition === "synthsblocks") {
             this._pitchWheel.titleRotateAngle = 0;
-            this._pitchWheel.colors = platformColor.blockLabelsWheelcolors;
+            this._pitchWheel.colors = getTokenList("--wheel-block-labels", [
+                "#ffb2bc",
+                "#ffccd6",
+                "#ffb2bc",
+                "#ffccd6",
+                "#ffb2bc",
+                "#ffccd6",
+                "#ffb2bc",
+                "#ffccd6",
+                "#ffb2bc",
+                "#ffccd6",
+                "#ffb2bc",
+                "#ffccd6"
+            ]);
             this._pitchWheel.slicePathCustom.minRadiusPercent = 0.6;
             this._pitchWheel.slicePathCustom.maxRadiusPercent = 1;
             this._pitchWheel.titleRotateAngle = 90;
@@ -2452,7 +2569,7 @@ function MusicKeyboard(activity) {
             this._pitchWheel.createWheel(noteLabelsI18n);
         }
 
-        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.colors = getTokenList("--wheel-exit", ["#808080", "#c0c0c0"]);
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
@@ -2480,7 +2597,13 @@ function MusicKeyboard(activity) {
         ];
 
         if (condition === "pitchblocks") {
-            this._accidentalsWheel.colors = platformColor.accidentalsWheelcolors;
+            this._accidentalsWheel.colors = getTokenList("--wheel-accidentals", [
+                "#77c428",
+                "#93e042",
+                "#77c428",
+                "#5ba900",
+                "#77c428"
+            ]);
             this._accidentalsWheel.slicePathFunction = slicePath().DonutSlice;
             this._accidentalsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
             this._accidentalsWheel.slicePathCustom.minRadiusPercent = 0.5;
@@ -2495,7 +2618,9 @@ function MusicKeyboard(activity) {
 
             for (let i = 0; i < 9; i++) {
                 accidentalLabels.push(null);
-                this._accidentalsWheel.colors.push(platformColor.accidentalsWheelcolorspush);
+                this._accidentalsWheel.colors.push(
+                    getTokenColor("--wheel-accidentals-muted", "#c0c0c0")
+                );
             }
 
             this._accidentalsWheel.animatetime = 0; // 300;
@@ -2508,7 +2633,22 @@ function MusicKeyboard(activity) {
                 _("double flat")
             ]);
 
-            this._octavesWheel.colors = platformColor.octavesWheelcolors;
+            this._octavesWheel.colors = getTokenList("--wheel-octaves", [
+                "#ffb2bc",
+                "#ffccd6",
+                "#ffb2bc",
+                "#ffccd6",
+                "#ffb2bc",
+                "#ffccd6",
+                "#ffb2bc",
+                "#ffccd6",
+                "#c0c0c0",
+                "#c0c0c0",
+                "#c0c0c0",
+                "#c0c0c0",
+                "#c0c0c0",
+                "#c0c0c0"
+            ]);
             this._octavesWheel.slicePathFunction = slicePath().DonutSlice;
             this._octavesWheel.slicePathCustom = slicePath().DonutSliceCustomization();
             this._octavesWheel.slicePathCustom.minRadiusPercent = 0.75;
@@ -3411,7 +3551,7 @@ function MusicKeyboard(activity) {
         const __startNote = (event, element) => {
             if (!element) return;
             startTime = event.timeStamp; // Milliseconds();
-            element.style.backgroundColor = platformColor.orange;
+            element.classList.add("music-keyboard-key-playing");
             this.activity.logo.synth.trigger(
                 0,
                 this.noteMapper[element.id],
@@ -3432,9 +3572,9 @@ function MusicKeyboard(activity) {
 
             const id = element.id;
             if (id.includes("blackRow")) {
-                element.style.backgroundColor = "black";
+                applyKeyboardKeyState(element, "music-keyboard-key-black");
             } else {
-                element.style.backgroundColor = "white";
+                applyKeyboardKeyState(element, "music-keyboard-key-white");
             }
 
             const now = event.timeStamp;

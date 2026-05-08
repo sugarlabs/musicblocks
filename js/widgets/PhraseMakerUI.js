@@ -60,18 +60,29 @@ const PhraseMakerUI = {
      * @param {Object} pm - The PhraseMaker instance.
      */
     resetMatrix(pm) {
+        if (!pm) return;
         let row = pm._noteValueRow;
         let cell;
-        for (let i = 0; i < row.cells.length; i++) {
-            cell = row.cells[i];
-            cell.style.backgroundColor = pm.platformColor.rhythmcellcolor;
+        if (row && row.cells) {
+            for (let i = 0; i < row.cells.length; i++) {
+                cell = row.cells[i];
+                if (cell && cell.style)
+                    cell.style.backgroundColor = pm.platformColor
+                        ? pm.platformColor.rhythmcellcolor
+                        : "white";
+            }
         }
 
         if (pm._matrixHasTuplets) {
             row = pm._tupletNoteValueRow;
-            for (let i = 0; i < row.cells.length; i++) {
-                cell = row.cells[i];
-                cell.style.backgroundColor = pm.platformColor.tupletBackground;
+            if (row && row.cells) {
+                for (let i = 0; i < row.cells.length; i++) {
+                    cell = row.cells[i];
+                    if (cell && cell.style)
+                        cell.style.backgroundColor = pm.platformColor
+                            ? pm.platformColor.tupletBackground
+                            : "white";
+                }
             }
         }
     },
@@ -106,6 +117,37 @@ const PhraseMakerUI = {
     },
 
     /**
+     * Applies selected state for matrix cells using classes when available.
+     * Falls back to inline background in test environments that mock plain objects.
+     * @param {Object} pm - The PhraseMaker instance.
+     * @param {HTMLElement} cell - Cell element.
+     * @param {boolean} isSelected - Whether the cell should be selected.
+     * @param {boolean} forceReset - Whether deselection should always reset background.
+     */
+    setCellSelectedState(pm, cell, isSelected, forceReset = false) {
+        if (!cell) return;
+
+        if (cell.classList && typeof cell.classList.toggle === "function") {
+            cell.classList.toggle("phrasemaker-cell-selected", isSelected);
+        }
+        if (cell.style) {
+            if (isSelected) {
+                cell.style.backgroundColor =
+                    pm && pm.platformColor ? pm.platformColor.selectorBackground : "black";
+            } else if (
+                forceReset ||
+                (pm &&
+                    pm.platformColor &&
+                    cell.style.backgroundColor === pm.platformColor.selectorBackground) ||
+                cell.style.backgroundColor === "black"
+            ) {
+                cell.style.backgroundColor =
+                    pm && pm.platformColor ? pm.platformColor.rhythmcellcolor : "white";
+            }
+        }
+    },
+
+    /**
      * Highlights a cell in the matrix during playback.
      * @param {Object} pm - The PhraseMaker instance.
      * @param {number} colIndex - Column index of the cell.
@@ -115,9 +157,7 @@ const PhraseMakerUI = {
         if (!pm._rows[rowIndex]) return;
 
         const cell = pm._rows[rowIndex].cells[colIndex];
-        if (cell) {
-            cell.style.backgroundColor = pm.platformColor.selectorBackground;
-        }
+        this.setCellSelectedState(pm, cell, true);
     },
 
     /**
@@ -130,9 +170,7 @@ const PhraseMakerUI = {
         if (!pm._rows[rowIndex]) return;
 
         const cell = pm._rows[rowIndex].cells[colIndex];
-        if (cell && cell.style.backgroundColor === pm.platformColor.selectorBackground) {
-            cell.style.backgroundColor = pm.platformColor.rhythmcellcolor;
-        }
+        this.setCellSelectedState(pm, cell, false);
     },
 
     /**
@@ -144,11 +182,11 @@ const PhraseMakerUI = {
     updateNoteCellVisual(pm, cell, isActive) {
         if (!cell) return;
 
+        this.setCellSelectedState(pm, cell, isActive, true);
+
         if (isActive) {
-            cell.style.backgroundColor = pm.platformColor.selectorBackground;
             cell.innerHTML = "&#x2713;"; // checkmark
         } else {
-            cell.style.backgroundColor = pm.platformColor.rhythmcellcolor;
             cell.innerHTML = "";
         }
     },

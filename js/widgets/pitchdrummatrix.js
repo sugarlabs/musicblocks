@@ -105,6 +105,31 @@ class PitchDrumMatrix {
         this._blockMap = [];
     }
 
+    _isSelectedCell(cell) {
+        if (cell && cell.classList && typeof cell.classList.contains === "function") {
+            return (
+                cell.classList.contains("matrix-cell-selected") ||
+                cell.style.backgroundColor === "black"
+            );
+        }
+        return !!(cell && cell.style && cell.style.backgroundColor === "black");
+    }
+
+    _setSelectedCell(cell, selected) {
+        if (cell && cell.classList && typeof cell.classList.add === "function") {
+            if (selected) cell.classList.add("matrix-cell-selected");
+            else cell.classList.remove("matrix-cell-selected");
+        }
+        if (cell && cell.style) {
+            let bg = "white";
+            if (typeof platformColor !== "undefined" && platformColor)
+                bg = platformColor.selectorBackground;
+            else if (typeof window !== "undefined" && window.platformColor)
+                bg = window.platformColor.selectorBackground;
+            cell.style.backgroundColor = selected ? "black" : bg;
+        }
+    }
+
     /**
      * Initializes the pitch/drum matrix.
      *
@@ -477,13 +502,13 @@ class PitchDrumMatrix {
             cell.style.borderRadius = "10px";
 
             cell.onmouseover = () => {
-                if (cell.style.backgroundColor !== "black") {
-                    cell.style.backgroundColor = platformColor.selectorSelected;
+                if (cell.classList) {
+                    cell.classList.add("matrix-cell-hover");
                 }
             };
             cell.onmouseout = () => {
-                if (cell.style.backgroundColor !== "black") {
-                    cell.style.backgroundColor = platformColor.selectorBackground;
+                if (cell.classList) {
+                    cell.classList.remove("matrix-cell-hover");
                 }
             };
 
@@ -550,11 +575,11 @@ class PitchDrumMatrix {
                 cell.onclick = e => {
                     const currCell = e.target;
                     const rowcol = currCell.id.split(",");
-                    if (currCell.style.backgroundColor === "black") {
-                        currCell.style.backgroundColor = platformColor.selectorBackground;
+                    if (this._isSelectedCell(currCell)) {
+                        this._setSelectedCell(currCell, false);
                         this._setCellPitchDrum(rowcol[1], rowcol[0], false);
                     } else {
-                        currCell.style.backgroundColor = "black";
+                        this._setSelectedCell(currCell, true);
                         this._setCellPitchDrum(rowcol[1], rowcol[0], true);
                     }
                 };
@@ -591,7 +616,7 @@ class PitchDrumMatrix {
                 cell = cellRow.cells[col];
 
                 if (cell !== undefined) {
-                    cell.style.backgroundColor = "black";
+                    this._setSelectedCell(cell, true);
                     this._setPairCell(row, col, cell, false);
                 }
             }
@@ -676,7 +701,7 @@ class PitchDrumMatrix {
             let j;
             for (j = 0; j < row.cells.length; j++) {
                 cell = row.cells[j];
-                if (cell.style.backgroundColor === "black") {
+                if (this._isSelectedCell(cell)) {
                     pairs.push([i, j]);
                     break;
                 }
@@ -823,11 +848,11 @@ class PitchDrumMatrix {
                 }
 
                 cell = row.cells[i];
-                if (cell.style.backgroundColor === "black") {
+                if (this._isSelectedCell(cell)) {
                     pitchBlock = this._rowBlocks[rowi];
                     drumBlock = this._colBlocks[i];
                     this.removeNode(pitchBlock, drumBlock);
-                    cell.style.backgroundColor = platformColor.selectorBackground;
+                    this._setSelectedCell(cell, false);
                     obj = cell.id.split(","); // row,column
                     this._setCellPitchDrum(Number(obj[0]), Number(obj[1]), false);
                 }
@@ -847,7 +872,7 @@ class PitchDrumMatrix {
         row = table.rows[0];
         for (let i = 0; i < row.cells.length; i++) {
             cell = row.cells[i];
-            if (cell.style.backgroundColor === "black") {
+            if (this._isSelectedCell(cell)) {
                 this._setPairCell(rowi, i, cell, playNote);
             }
         }
@@ -919,8 +944,8 @@ class PitchDrumMatrix {
             row = table.rows[0];
             for (let j = 0; j < row.cells.length; j++) {
                 cell = row.cells[j];
-                if (cell.style.backgroundColor === "black") {
-                    cell.style.backgroundColor = platformColor.selectorBackground;
+                if (this._isSelectedCell(cell)) {
+                    this._setSelectedCell(cell, false);
                     this._setCellPitchDrum(j, i, false);
                 }
             }
@@ -957,7 +982,7 @@ class PitchDrumMatrix {
             row = table.rows[0];
             for (let j = 0; j < row.cells.length; j++) {
                 cell = row.cells[j];
-                if (cell.style.backgroundColor === "black") {
+                if (this._isSelectedCell(cell)) {
                     pairs.push([i, j]);
                     continue;
                 }

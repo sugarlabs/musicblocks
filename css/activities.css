@@ -19,22 +19,153 @@
 }
 
 *:focus-visible {
-    outline: 2px solid #0066ff !important;
+    outline: 2px solid var(--color-primary) !important;
     outline-offset: 2px;
 }
 
 body:not(.dark):not(.highcontrast) #helpfulSearch,
 body:not(.dark):not(.highcontrast) .ui-autocomplete {
-    background-color: #fff !important;
-    color: #000 !important;
+    background-color: var(--color-surface) !important;
+    color: var(--color-text) !important;
 }
 
 body:not(.dark):not(.highcontrast) .ui-autocomplete li:hover {
-    background-color: #ddd !important;
+    background-color: var(--color-widget-button-select) !important;
 }
 
 body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
-    background-color: #f9f9f9 !important;
+    background-color: var(--color-background) !important;
+}
+
+.pitch-staircase-cell {
+    background-color: var(--color-selector-background);
+}
+
+.pitch-staircase-cell:hover {
+    background-color: var(--color-selector-background-hover);
+}
+
+.pitch-staircase-cell-playing {
+    background-color: var(--color-selector-background-hover);
+    box-shadow: inset 0 0 0 2px var(--color-primary);
+}
+
+.status-matrix-cell {
+    background-color: var(--color-selector-background);
+}
+
+.tuner-mode-selected {
+    background-color: var(--color-selector-background);
+}
+
+.tuner-mode-selected img {
+    filter: brightness(0) invert(1);
+}
+
+/* Rhythm Ruler Widget - Checkerboard pattern cells */
+.rhythm-ruler-cell-bg {
+    background-color: var(--color-selector-background);
+}
+
+.rhythm-ruler-cell-selected {
+    background-color: var(--color-selector-selected);
+}
+
+/* Music Keyboard Widget */
+.music-keyboard-key {
+    background-color: var(--color-selector-background);
+}
+
+.music-keyboard-key-selected {
+    background-color: var(--color-selector-selected) !important;
+}
+
+.music-keyboard-key-black {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+.music-keyboard-key-white {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+.music-keyboard-key-muted {
+    background-color: var(--color-widget-button-select) !important;
+}
+
+.music-keyboard-key-playing {
+    background-color: var(--color-selector-background-hover) !important;
+    box-shadow: inset 0 0 0 2px var(--color-primary) !important;
+}
+
+.music-keyboard-key-selected {
+    background-color: var(--color-selector-background) !important;
+}
+
+.music-keyboard-graphics-label {
+    background-color: var(--color-graphics-label-bg);
+}
+
+.music-keyboard-rhythm-cell {
+    background-color: var(--color-rhythm-cell-bg);
+    color: var(--color-text);
+}
+
+.matrix-cell-hover {
+    background-color: var(--color-selector-background-hover) !important;
+}
+
+.matrix-cell-selected {
+    background-color: var(--color-selector-selected) !important;
+    color: white !important;
+}
+
+.music-keyboard-tick-active {
+    background-color: var(--color-primary);
+}
+
+.toolbar-stop-active {
+    color: var(--color-trash-active) !important;
+}
+
+/* Timbre Widget */
+.timbre-cell {
+    background-color: var(--color-selector-background);
+}
+
+.timbre-cell-selected {
+    background-color: var(--color-selector-selected);
+}
+
+.timbre-cell-playing {
+    background-color: var(--color-selector-background-hover);
+}
+
+/* Widget Windows Overlay */
+.overlay-active {
+    border: 2px solid var(--color-border);
+    background-color: var(--color-surface);
+}
+
+/* Generic widget button styling */
+.widget-button {
+    background-color: var(--color-widget-button);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.widget-button:hover {
+    background-color: var(--color-widget-button-select);
+}
+
+.widget-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /* High Contrast Mode Search Suggestions */
@@ -55,9 +186,9 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 
 #newdropdown {
     font-size: 16px;
-    background-color: #fff;
-    border: 1px solid #cccccc;
-    color: #000000;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
     padding: 24px;
     width: 400px;
     border-radius: 8px;
@@ -88,7 +219,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     line-height: normal;
     font-size: 24px;
     text-align: left;
-    color: #0066ff;
+    color: var(--color-primary);
 }
 
 #confirmation-message {
@@ -104,7 +235,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     transform: translate(-50%, -50%);
     width: 400px;
     padding: 24px;
-    background-color: #fff;
+    background-color: var(--color-surface);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border-radius: 8px;
     z-index: 10000;
@@ -112,7 +243,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 }
 
 .modal-title {
-    color: #0066ff;
+    color: var(--color-primary);
     font-size: 24px;
     margin: 0 0 16px 0;
 }
@@ -134,29 +265,29 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     padding: 8px 16px;
     font-weight: bold;
     cursor: pointer;
-    background-color: #0066ff;
+    background-color: var(--color-primary);
     color: white;
     margin-right: 16px;
     transition: background-color 0.2s ease;
 }
 
 .confirm-button:hover {
-    background-color: #023a76;
+    background-color: var(--color-primary-hover);
 }
 
 .cancel-button {
-  border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  background-color: #e0e0e0;
-  color: black;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    background-color: var(--color-widget-button);
+    color: black;
 }
 
 .cancel-button:hover {
-    background-color: #afafaf;
+    background-color: var(--color-widget-button-select);
 }
 
 .modal {
@@ -178,7 +309,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     transform: translate(-50%, -50%);
     width: 400px;
     padding: 24px;
-    background-color: #fefefe;
+    background-color: var(--color-surface);
     box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px;
     border-radius: 8px;
     z-index: 10000;
@@ -188,7 +319,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 .block-count-dropdown {
     padding: 4px !important;
     font-size: 16px;
-    border: 2px solid #ccc;
+    border: 2px solid var(--color-border);
     border-radius: 8px;
     background: #dedededd;
     cursor: pointer;
@@ -227,7 +358,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     width: 300px;
     height: 48px;
     padding: 0 16px;
-    background-color: #ffffff;
+    background-color: var(--color-surface);
     border: 2px solid #03a9f4;
     border-radius: 24px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -237,7 +368,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 }
 
 #search:focus {
-    border-color: #4da6ff;
+    border-color: var(--color-focus-border);
     box-shadow: 0 4px 12px rgba(77, 166, 255, 0.2);
     outline: none;
 }
@@ -249,11 +380,61 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 #helpfulSearchDiv {
     display: block !important;
     position: absolute;
-    background-color: #f0f0f0;
+    background-color: var(--color-surface-muted);
     padding: 2px;
     border: 1px solid #ccc;
     width: 230px;
     z-index: 1;
+}
+
+/* Phrase maker and temperament tokenized widget surfaces */
+.phrasemaker-lyrics-label {
+    background-color: var(--color-lyrics-label-bg);
+}
+
+.phrasemaker-lyrics-input,
+.phrasemaker-lyrics-input-cell {
+    background-color: var(--color-lyrics-input-bg);
+}
+
+/* PhraseMaker row label semantic backgrounds */
+.phrasemaker-row-label--graphics {
+    background-color: var(--color-graphics-label-bg) !important;
+}
+.phrasemaker-row-label--pitch {
+    background-color: var(--color-pitch-label-bg) !important;
+}
+.phrasemaker-row-label--drum {
+    background-color: var(--color-drum-label-bg) !important;
+}
+
+.phrasemaker-lyrics-input-cell.is-hovered {
+    background-color: var(--color-selector-selected);
+}
+
+.phrasemaker-cell-selected {
+    background-color: var(--color-selector-background) !important;
+}
+
+.phrasemaker-note-value-label,
+.temperament-menu-label {
+    background-color: var(--color-label);
+}
+
+.temperament-menu-label.is-selected,
+.temperament-selector-cell.is-selected,
+.temperament-action-cell.is-selected {
+    background-color: var(--color-selector-background);
+}
+
+.temperament-selector-cell,
+.temperament-action-cell {
+    background-color: var(--color-selector-background);
+}
+
+.temperament-selector-cell.is-hovered,
+.temperament-action-cell.is-hovered {
+    background-color: var(--color-selector-background-hover);
 }
 
 #helpfulSearch {
@@ -547,7 +728,9 @@ nav {
     background-color: #8bc34a;
     height: 64px;
     width: 100%;
-    box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.16), 0px 2px 10px 0px rgba(0, 0, 0, 0.12);
+    box-shadow:
+        0px 2px 5px 0px rgba(0, 0, 0, 0.16),
+        0px 2px 10px 0px rgba(0, 0, 0, 0.12);
     font: 32px sans;
     vertical-align: middle;
     line-height: 64px;
@@ -1225,7 +1408,7 @@ table {
     overflow: visible;
     width: calc(100% - 130px) !important;
     max-width: 350px;
-    padding-top: 2.5rem; 
+    padding-top: 2.5rem;
     padding-bottom: 2.5rem;
     display: flex;
     flex-direction: column;
@@ -1246,11 +1429,11 @@ table {
 }
 
 #helpBodyDiv p {
-    margin: 0.5rem 0; 
+    margin: 0.5rem 0;
 }
 
 #helpBodyDiv a {
-    color: #2196F3;
+    color: #2196f3;
     text-decoration: underline;
     font-weight: 600;
     transition: color 0.2s ease;
@@ -1281,7 +1464,7 @@ table {
 }
 
 #helpBodyDiv figure {
-    margin-left: 0.5rem; 
+    margin-left: 0.5rem;
     margin-bottom: 1rem;
 }
 
@@ -2026,7 +2209,9 @@ table {
     width: 28px;
     height: 28px;
     filter: invert(100%);
-    transition: background-color 0.3s, filter 0.3s;
+    transition:
+        background-color 0.3s,
+        filter 0.3s;
 }
 
 .msgCloseIcon:hover {
@@ -2211,25 +2396,25 @@ table {
    FIX: Center the Welcome Modal on Mobile
    ====================================================== */
 @media screen and (max-width: 600px) {
-  #helpDiv {
-    /* 1. Fit the screen width */
-    width: 90% !important;
+    #helpDiv {
+        /* 1. Fit the screen width */
+        width: 90% !important;
 
-    /* 2. Center Horizontally */
-    left: 50% !important;
-    transform: translateX(-50%);
-    /* Moves it back by half its width to center it */
+        /* 2. Center Horizontally */
+        left: 50% !important;
+        transform: translateX(-50%);
+        /* Moves it back by half its width to center it */
 
-    /* 3. Reset Top position if needed */
-    top: 15% !important;
-  }
+        /* 3. Reset Top position if needed */
+        top: 15% !important;
+    }
 
-  /* Fix the inner text box width so it doesn't overflow */
-  #helpBodyDiv {
-    width: calc(100% - 110px) !important;
-    margin: 0 auto !important;
-    left: 0 !important;
-    padding: 0 10px;
-    box-sizing: border-box;
-  }
+    /* Fix the inner text box width so it doesn't overflow */
+    #helpBodyDiv {
+        width: calc(100% - 110px) !important;
+        margin: 0 auto !important;
+        left: 0 !important;
+        padding: 0 10px;
+        box-sizing: border-box;
+    }
 }

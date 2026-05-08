@@ -47,6 +47,26 @@ class Arpeggio {
         this.defaultCols = Arpeggio.DEFAULTCOLS;
     }
 
+    _isSelectedCell(cell) {
+        if (cell && cell.classList && typeof cell.classList.contains === "function") {
+            return (
+                cell.classList.contains("matrix-cell-selected") ||
+                cell.style.backgroundColor === "black"
+            );
+        }
+        return !!(cell && cell.style && cell.style.backgroundColor === "black");
+    }
+
+    _setSelectedCell(cell, selected, rowIndex) {
+        if (cell && cell.classList && typeof cell.classList.add === "function") {
+            if (selected) cell.classList.add("matrix-cell-selected");
+            else cell.classList.remove("matrix-cell-selected");
+        }
+        if (cell && cell.style) {
+            cell.style.backgroundColor = selected ? "black" : this._getBackgroundColor(rowIndex);
+        }
+    }
+
     /**
      * Removes the previous matrix and them make another
      * one in DOM (Document Object Model).
@@ -302,6 +322,7 @@ class Arpeggio {
      * @returns {string} color, e.g. "#ffffff"
      */
     _getBackgroundColor(i) {
+        if (typeof platformColor === "undefined" || !platformColor) return "white";
         if (this._rowInMode(i)) {
             return platformColor.selectorSelected;
         }
@@ -335,13 +356,13 @@ class Arpeggio {
             cell.setAttribute("id", i + "," + arpeggioIdx); // row,column
 
             cell.onmouseover = () => {
-                if (cell.style.backgroundColor !== "black") {
-                    cell.style.backgroundColor = platformColor.selectorSelected;
+                if (cell.classList) {
+                    cell.classList.add("matrix-cell-hover");
                 }
             };
             cell.onmouseout = () => {
-                if (cell.style.backgroundColor !== "black") {
-                    cell.style.backgroundColor = platformColor.selectorBackground;
+                if (cell.classList) {
+                    cell.classList.remove("matrix-cell-hover");
                 }
             };
         }
@@ -390,15 +411,13 @@ class Arpeggio {
                 cell.onclick = e => {
                     const currCell = e.target;
                     const rowcol = currCell.id.split(",");
-                    if (currCell.style.backgroundColor === "black") {
-                        currCell.style.backgroundColor = this._getBackgroundColor(
-                            Number(rowcol[0])
-                        );
+                    if (this._isSelectedCell(currCell)) {
+                        this._setSelectedCell(currCell, false, Number(rowcol[0]));
                         this._setCell(rowcol[1], rowcol[0], false);
                     } else {
                         // Only one cell per column can be set.
                         this._clearColumn(rowcol[1], rowcol[0]);
-                        currCell.style.backgroundColor = "black";
+                        this._setSelectedCell(currCell, true, Number(rowcol[0]));
                         this._setCell(rowcol[1], rowcol[0], true);
                     }
                 };
@@ -438,7 +457,7 @@ class Arpeggio {
                 cell = cellRow.cells[col];
 
                 if (cell !== undefined) {
-                    cell.style.backgroundColor = "black";
+                    this._setSelectedCell(cell, true, row);
                     this.__playCell(row, col, cell, false);
                 }
             }
@@ -550,7 +569,7 @@ class Arpeggio {
                 table = docById("arpeggioCellTable" + i);
                 row = table.rows[0];
                 cell = row.cells[j];
-                if (cell.style.backgroundColor === "black") {
+                if (this._isSelectedCell(cell)) {
                     thisPair = [i, j];
                     //pairs.push([i, j]);
                     break;
@@ -626,7 +645,7 @@ class Arpeggio {
         let cell;
         for (let i = 0; i < row.cells.length; i++) {
             cell = row.cells[i];
-            if (cell.style.backgroundColor === "black") {
+            if (this._isSelectedCell(cell)) {
                 this.__playCell(rowi, i, cell, playNote);
             }
         }
@@ -691,8 +710,8 @@ class Arpeggio {
             table = docById("arpeggioCellTable" + i);
             row = table.rows[0];
             cell = row.cells[colIndex];
-            if (cell.style.backgroundColor === "black") {
-                cell.style.backgroundColor = this._getBackgroundColor(i);
+            if (this._isSelectedCell(cell)) {
+                this._setSelectedCell(cell, false, i);
                 this._setCell(colIndex, i, false);
             }
         }
@@ -713,8 +732,8 @@ class Arpeggio {
             row = table.rows[0];
             for (let j = 0; j < row.cells.length; j++) {
                 cell = row.cells[j];
-                if (cell.style.backgroundColor === "black") {
-                    cell.style.backgroundColor = this._getBackgroundColor(i);
+                if (this._isSelectedCell(cell)) {
+                    this._setSelectedCell(cell, false, i);
                     this._setCell(j, i, false);
                 }
             }
