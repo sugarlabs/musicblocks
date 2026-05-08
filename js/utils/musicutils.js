@@ -2360,8 +2360,11 @@ const getTemperamentKeys = () => {
  * @returns {void}
  */
 const addTemperamentToList = newEntry => {
+    if (newEntry[1] in PreDefinedTemperaments) {
+        return;
+    }
     for (let i = 0; i < TEMPERAMENTS.length; i++) {
-        if (PreDefinedTemperaments[i] === newEntry) {
+        if (TEMPERAMENTS[i][1] === newEntry[1]) {
             return;
         }
     }
@@ -2376,6 +2379,10 @@ const addTemperamentToList = newEntry => {
  */
 const deleteTemperamentFromList = oldEntry => {
     delete TEMPERAMENT[oldEntry];
+    const idx = TEMPERAMENTS.findIndex(t => t[1] === oldEntry);
+    if (idx !== -1) {
+        TEMPERAMENTS.splice(idx, 1);
+    }
 };
 
 /**
