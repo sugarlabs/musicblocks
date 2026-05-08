@@ -1384,10 +1384,10 @@ class Activity {
 
                 svgParts.push(
                     '<g transform="translate(' +
-                        this.blocks.blockList[i].container.x +
-                        ", " +
-                        this.blocks.blockList[i].container.y +
-                        ')">'
+                    this.blocks.blockList[i].container.x +
+                    ", " +
+                    this.blocks.blockList[i].container.y +
+                    ')">'
                 );
 
                 if (!SPECIALINPUTS.includes(this.blocks.blockList[i].name)) {
@@ -1448,10 +1448,10 @@ class Activity {
 
                     svgParts.push(
                         '<g transform="translate(' +
-                            this.blocks.blockList[i].container.x +
-                            ", " +
-                            y +
-                            ') scale(0.5 0.5)">'
+                        this.blocks.blockList[i].container.x +
+                        ", " +
+                        y +
+                        ') scale(0.5 0.5)">'
                     );
                     if (this.blocks.blockList[i].collapsed) {
                         parts = EXPANDBUTTON.split("><");
@@ -2422,7 +2422,7 @@ class Activity {
             const changeText = () => {
                 const randomLoadMessage =
                     messages.load_messages[
-                        Math.floor(Math.random() * messages.load_messages.length)
+                    Math.floor(Math.random() * messages.load_messages.length)
                     ];
                 document.getElementById("messageText").textContent = randomLoadMessage + "...";
                 counter++;
@@ -3625,9 +3625,9 @@ class Activity {
                                         that.blocks.moveBlock(
                                             newBlock,
                                             (x || that.blocksContainer.x + 100) -
-                                                that.blocksContainer.x,
+                                            that.blocksContainer.x,
                                             (y || that.blocksContainer.y + 100) -
-                                                that.blocksContainer.y
+                                            that.blocksContainer.y
                                         );
                                     }
                                 );
@@ -3785,12 +3785,9 @@ class Activity {
                 }
             }
             // const BACKSPACE = 8;
-            const TAB = 9;
-            if (event.keyCode === TAB) {
-                // Prevent browser from grabbing TAB key
-                event.preventDefault();
-                return false;
-            }
+            // TAB key (keyCode 9) is no longer suppressed globally.
+            // WCAG 2.1 SC 2.1.2: Keyboard navigation must not be trapped.
+            // Individual widgets manage focus internally via roving tabindex.
             const ESC = 27;
             // const ALT = 18;
             // const CTRL = 17;
@@ -5169,8 +5166,8 @@ class Activity {
                         console.log(
                             "%cMusic Blocks",
                             "font-size: 24px; font-weight: bold; font-family: sans-serif; padding:20px 0 0 110px; background: url(" +
-                                imgUrl +
-                                ") no-repeat;"
+                            imgUrl +
+                            ") no-repeat;"
                         );
 
                         console.log(
@@ -5246,10 +5243,10 @@ class Activity {
                 typeof flags !== "undefined"
                     ? flags
                     : {
-                          run: false,
-                          show: false,
-                          collapse: false
-                      };
+                        run: false,
+                        show: false,
+                        collapse: false
+                    };
             this.loading = true;
             document.body.style.cursor = "wait";
             this.doLoadAnimation();
@@ -5635,9 +5632,8 @@ class Activity {
                                 [
                                     "nameddo",
                                     {
-                                        value: `V: ${parseInt(lineId) + 1} Line ${
-                                            staffBlocksMap[lineId]?.baseBlocks?.length + 1
-                                        }`
+                                        value: `V: ${parseInt(lineId) + 1} Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1
+                                            }`
                                     }
                                 ],
                                 0,
@@ -5646,12 +5642,12 @@ class Activity {
                                     staffBlocksMap[lineId].baseBlocks.length === 0
                                         ? null
                                         : staffBlocksMap[lineId].baseBlocks[
-                                              staffBlocksMap[lineId].baseBlocks.length - 1
-                                          ][0][
-                                              staffBlocksMap[lineId].baseBlocks[
-                                                  staffBlocksMap[lineId].baseBlocks.length - 1
-                                              ][0].length - 4
-                                          ][0],
+                                        staffBlocksMap[lineId].baseBlocks.length - 1
+                                        ][0][
+                                        staffBlocksMap[lineId].baseBlocks[
+                                            staffBlocksMap[lineId].baseBlocks.length - 1
+                                        ][0].length - 4
+                                        ][0],
                                     null
                                 ]
                             ],
@@ -5667,9 +5663,8 @@ class Activity {
                                 [
                                     "text",
                                     {
-                                        value: `V: ${parseInt(lineId) + 1} Line ${
-                                            staffBlocksMap[lineId]?.baseBlocks?.length + 1
-                                        }`
+                                        value: `V: ${parseInt(lineId) + 1} Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1
+                                            }`
                                     }
                                 ],
                                 0,
@@ -5721,14 +5716,14 @@ class Activity {
                     staffBlocksMap[staffIndex].startBlock.length - 3
                 ][4][2] =
                     staffBlocksMap[staffIndex].baseBlocks[0][0][
-                        staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4
+                    staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4
                     ][0];
                 // Update the first namedo block with settimbre
                 staffBlocksMap[staffIndex].baseBlocks[0][0][
                     staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4
                 ][4][0] =
                     staffBlocksMap[staffIndex].startBlock[
-                        staffBlocksMap[staffIndex].startBlock.length - 3
+                    staffBlocksMap[staffIndex].startBlock.length - 3
                     ][0];
                 const repeatblockids = staffBlocksMap[staffIndex].repeatArray;
                 for (const repeatId of repeatblockids) {
@@ -5750,7 +5745,7 @@ class Activity {
                             0,
                             [
                                 staffBlocksMap[staffIndex].startBlock[
-                                    staffBlocksMap[staffIndex].startBlock.length - 3
+                                staffBlocksMap[staffIndex].startBlock.length - 3
                                 ][0] /*setribmre*/,
                                 blockId + 1,
                                 staffBlocksMap[staffIndex].nameddoArray[staffIndex][0],
@@ -5759,8 +5754,8 @@ class Activity {
                                 ] === null
                                     ? null
                                     : staffBlocksMap[staffIndex].nameddoArray[staffIndex][
-                                          repeatId.end + 1
-                                      ]
+                                    repeatId.end + 1
+                                    ]
                             ]
                         ]);
                         staffBlocksMap[staffIndex].repeatBlock.push([
@@ -5794,7 +5789,7 @@ class Activity {
                             const secondnammedo = _searchIndexForMusicBlock(
                                 staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0],
                                 staffBlocksMap[staffIndex].nameddoArray[staffIndex][
-                                    repeatId.end + 1
+                                repeatId.end + 1
                                 ]
                             );
 
@@ -5817,13 +5812,13 @@ class Activity {
                         const prevnameddo = _searchIndexForMusicBlock(
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.start - 1][0],
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                currentnammeddo
+                            currentnammeddo
                             ][4][0]
                         );
                         const afternamedo = _searchIndexForMusicBlock(
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0],
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                currentnammeddo
+                            currentnammeddo
                             ][4][1]
                         );
                         let prevrepeatnameddo = -1;
@@ -5831,17 +5826,17 @@ class Activity {
                             prevrepeatnameddo = _searchIndexForMusicBlock(
                                 staffBlocksMap[staffIndex].repeatBlock,
                                 staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                    currentnammeddo
+                                currentnammeddo
                                 ][4][0]
                             );
                         }
                         const prevBlockId =
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                currentnammeddo
+                            currentnammeddo
                             ][4][0];
                         const currentBlockId =
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                currentnammeddo
+                            currentnammeddo
                             ][0];
 
                         // Needs null checking optmizie
@@ -5855,7 +5850,7 @@ class Activity {
                             0,
                             [
                                 staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                    currentnammeddo
+                                currentnammeddo
                                 ][4][0],
                                 blockId + 1,
                                 currentBlockId,
@@ -9187,14 +9182,14 @@ class Activity {
             get() {
                 console.warn(
                     "[Deprecated] window.activity is removed. " +
-                        "Use ActivityContext.getActivity() instead."
+                    "Use ActivityContext.getActivity() instead."
                 );
                 return undefined;
             },
             set() {
                 console.error(
                     "[Deprecated] window.activity is removed and cannot be set. " +
-                        "Use ActivityContext.setActivity() via activity-context.js."
+                    "Use ActivityContext.setActivity() via activity-context.js."
                 );
             }
         });
