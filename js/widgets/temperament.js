@@ -24,7 +24,7 @@
    getOctaveRatio, getTemperament, getTemperamentKeys,
    isCustomTemperament, normalizeNoteAccidentals, pitchToFrequency, platformColor,
    rationalToFraction, setOctaveRatio, setOctaveRatio, SHARP, Singer,
-   slicePath, updateTemperaments, wheelnav, frequencyToPitch
+   slicePath, updateTemperaments, wheelnav, frequencyToPitch, _lazyRequire, ScaleModeBuilder
  */
 
 /* exported TemperamentWidget */
@@ -2728,9 +2728,231 @@ function TemperamentWidget() {
             that.edit();
         };
 
+        const hardcodedButton = document.createElement("button");
+        hardcodedButton.textContent = _("Scale & Mode Builder");
+        hardcodedButton.style.padding = "8px 12px";
+        hardcodedButton.style.margin = "10px";
+        hardcodedButton.style.backgroundColor = platformColor.selectorBackground || "#c8C8C8";
+        hardcodedButton.style.border = "1px solid black";
+        hardcodedButton.style.cursor = "pointer";
+        hardcodedButton.onclick = function () {
+            if (typeof _lazyRequire !== "undefined") {
+                _lazyRequire(["widgets/scalemodebuilder"], function () {
+                    if (
+                        that._logo.scaleModeBuilder === undefined ||
+                        that._logo.scaleModeBuilder === null
+                    ) {
+                        that._logo.scaleModeBuilder = new ScaleModeBuilder();
+                    }
+                    that._logo.scaleModeBuilder.init(that.activity);
+                });
+            } else if (typeof ScaleModeBuilder !== "undefined") {
+                if (
+                    that._logo.scaleModeBuilder === undefined ||
+                    that._logo.scaleModeBuilder === null
+                ) {
+                    that._logo.scaleModeBuilder = new ScaleModeBuilder();
+                }
+                that._logo.scaleModeBuilder.init(that.activity);
+            }
+        };
+        widgetWindow.getWidgetBody().append(hardcodedButton);
+
         widgetWindow.sendToCenter();
     };
 }
+
+/**
+ * Gets color scheme for temperament visualization based on temperament type.
+ * @returns {string[]} Array of colors for the wheel slices.
+ */
+this._getTemperamentColors = function () {
+    // Enhanced color scheme for different temperament types
+    if (isCustomTemperament(this.inTemperament)) {
+        // Custom temperaments: gradient from blue to purple
+        return [
+            "#4a90e2",
+            "#5ba0f2",
+            "#6bb0ff",
+            "#7cc0ff",
+            "#8dd0ff",
+            "#9ee0ff",
+            "#afe0ff",
+            "#c0f0ff",
+            "#d1f0ff",
+            "#e2f0ff",
+            "#a855f7",
+            "#9f46f7",
+            "#9637f7",
+            "#8d28f7",
+            "#8419f7"
+        ];
+    } else if (this.inTemperament === "equal") {
+        // Equal temperament: greens
+        return ["#4ade80", "#22c55e", "#16a34a", "#15803d", "#166534", "#14532d", "#052e16"];
+    } else if (this.inTemperament.includes("meantone")) {
+        // Meantone temperaments: oranges
+        return ["#fb923c", "#f97316", "#ea580c", "#c2410c", "#9a3412", "#7c2d12", "#431407"];
+    } else {
+        // Other historical temperaments: purples and teals
+        return [
+            "#8b5cf6",
+            "#7c3aed",
+            "#6d28d9",
+            "#5b21b6",
+            "#4c1d95",
+            "#14b8a6",
+            "#0f766e",
+            "#0d9488",
+            "#0f766e",
+            "#134e4a"
+        ];
+    }
+};
+
+/**
+ * Adds center information circle with temperament details.
+ * @param {HTMLElement} container - The container element.
+ * @param {number} centerX - X coordinate of center.
+ * @param {number} centerY - Y coordinate of center.
+ * @param {number} radius - Radius of the center circle.
+ * @returns {void}
+ */
+this._addCenterInfo = function (container, centerX, centerY, radius) {
+    const centerDiv = document.createElement("div");
+    centerDiv.style.position = "absolute";
+    centerDiv.style.left = centerX - radius + "px";
+    centerDiv.style.top = centerY - radius + "px";
+    centerDiv.style.width = radius * 2 + "px";
+    centerDiv.style.height = radius * 2 + "px";
+    centerDiv.style.borderRadius = "50%";
+    centerDiv.style.backgroundColor = platformColor.selectorBackground || "#c8C8C8";
+    centerDiv.style.border = "2px solid " + (platformColor.strokeColor || "#003300");
+    centerDiv.style.display = "flex";
+    centerDiv.style.flexDirection = "column";
+    centerDiv.style.justifyContent = "center";
+    centerDiv.style.alignItems = "center";
+    centerDiv.style.textAlign = "center";
+    centerDiv.style.fontSize = "12px";
+    centerDiv.style.fontWeight = "bold";
+    centerDiv.style.zIndex = "10";
+    centerDiv.style.cursor = "pointer";
+
+    const temperamentName = document.createElement("div");
+    temperamentName.textContent = this.inTemperament;
+    temperamentName.style.fontSize = "14px";
+    temperamentName.style.marginBottom = "4px";
+
+    const edoInfo = document.createElement("div");
+    const t = getTemperament(this.inTemperament);
+    if (t && t.edo !== null && t.edo !== undefined) {
+        edoInfo.textContent = `${t.edo} EDO`;
+    } else {
+        edoInfo.textContent = "Non-EDO";
+    }
+    edoInfo.style.fontSize = "10px";
+    edoInfo.style.color = "#666";
+
+    const pitchCount = document.createElement("div");
+    pitchCount.textContent = `${this.pitchNumber + 1} notes`;
+    pitchCount.style.fontSize = "10px";
+    pitchCount.style.color = "#666";
+
+    centerDiv.appendChild(temperamentName);
+    centerDiv.appendChild(edoInfo);
+    centerDiv.appendChild(pitchCount);
+
+    // Add click handler to show detailed temperament info
+    const that = this;
+    centerDiv.onclick = function () {
+        that._showTemperamentDetails();
+    };
+
+    container.appendChild(centerDiv);
+};
+
+/**
+ * Shows detailed temperament information in a popup.
+ * @returns {void}
+ */
+this._showTemperamentDetails = function () {
+    const t = getTemperament(this.inTemperament);
+    if (!t) return;
+
+    const detailsDiv = document.createElement("div");
+    detailsDiv.id = "temperamentDetails";
+    detailsDiv.style.position = "absolute";
+    detailsDiv.style.left = "50%";
+    detailsDiv.style.top = "50%";
+    detailsDiv.style.transform = "translate(-50%, -50%)";
+    detailsDiv.style.backgroundColor = "white";
+    detailsDiv.style.border = "2px solid " + (platformColor.strokeColor || "#003300");
+    detailsDiv.style.borderRadius = "8px";
+    detailsDiv.style.padding = "20px";
+    detailsDiv.style.zIndex = "1000";
+    detailsDiv.style.maxWidth = "400px";
+    detailsDiv.style.maxHeight = "300px";
+    detailsDiv.style.overflow = "auto";
+
+    const title = document.createElement("h3");
+    title.textContent = t.name || this.inTemperament;
+    title.style.marginTop = "0";
+    title.style.textAlign = "center";
+
+    const description = document.createElement("p");
+    description.textContent = t.description || _("No description available.");
+    description.style.fontSize = "14px";
+    description.style.marginBottom = "15px";
+
+    const infoTable = document.createElement("table");
+    infoTable.style.width = "100%";
+    infoTable.style.borderCollapse = "collapse";
+
+    // Add table rows for key information
+    const rows = [
+        [_("EDO"), t.edo !== null && t.edo !== undefined ? t.edo : _("Non-EDO")],
+        [_("Pitch Number"), this.pitchNumber],
+        [_("Octave Ratio"), this.powerBase.toFixed(3) + ":1"],
+        [_("Generator"), t.generator ? t.generator.toFixed(3) : _("N/A")]
+    ];
+
+    for (const [label, value] of rows) {
+        const row = infoTable.insertRow();
+        const labelCell = row.insertCell();
+        const valueCell = row.insertCell();
+
+        labelCell.textContent = label + ":";
+        labelCell.style.fontWeight = "bold";
+        labelCell.style.padding = "5px";
+        labelCell.style.borderBottom = "1px solid #ddd";
+
+        valueCell.textContent = value;
+        valueCell.style.padding = "5px";
+        valueCell.style.borderBottom = "1px solid #ddd";
+        valueCell.style.textAlign = "right";
+    }
+
+    const closeButton = document.createElement("button");
+    closeButton.textContent = _("Close");
+    closeButton.style.marginTop = "15px";
+    closeButton.style.padding = "8px 16px";
+    closeButton.style.backgroundColor = platformColor.selectorBackground || "#c8C8C8";
+    closeButton.style.border = "none";
+    closeButton.style.borderRadius = "4px";
+    closeButton.style.cursor = "pointer";
+    closeButton.style.width = "100%";
+
+    closeButton.onclick = function () {
+        detailsDiv.remove();
+    };
+
+    detailsDiv.appendChild(title);
+    detailsDiv.appendChild(description);
+    detailsDiv.appendChild(infoTable);
+    detailsDiv.appendChild(closeButton);
+
+    document.body.appendChild(detailsDiv);
+};
 
 if (typeof module !== "undefined") {
     module.exports = TemperamentWidget;
