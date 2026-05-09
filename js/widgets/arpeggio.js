@@ -16,7 +16,7 @@
    global
 
    platformColor, _, docById, getNote, setCustomChord, keySignatureToMode,
-   getModeNumbers, getTemperament, normalizeNoteAccidentals
+   getModeNumbers, getTemperament, normalizeNoteAccidentals, DEFAULTVOICE
 */
 /*
    Global locations
@@ -574,7 +574,7 @@ class Arpeggio {
                     0,
                     normalizeNoteAccidentals(this._playList[i][0][0]) + this._playList[i][0][1],
                     this._playList[i][1],
-                    "default",
+                    DEFAULTVOICE,
                     null,
                     null,
                     null
@@ -606,6 +606,7 @@ class Arpeggio {
      * @returns {void}
      */
     _setCell(colIndex, rowIndex, playNote) {
+	console.log("SETCELL", colIndex, rowIndex, playNote);
         // Sets corresponding pitch/arpeggio when user clicks on any cell and
         // plays them.
         const coli = Number(colIndex);
@@ -665,7 +666,7 @@ class Arpeggio {
                 0,
                 normalizeNoteAccidentals(note),
                 this.notesToPlay[0][1],
-                "default",
+                DEFAULTVOICE,
                 null,
                 null,
                 null
