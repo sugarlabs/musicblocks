@@ -1878,8 +1878,8 @@ function TemperamentWidget() {
                 if (!t || !t.interval || !Array.isArray(t.interval)) {
                     this.activity.errorMsg(
                         _("Invalid temperament: ") +
-                            temperament +
-                            _(". Skipping to next temperament."),
+                        temperament +
+                        _(". Skipping to next temperament."),
                         3000
                     );
                     continue;
@@ -2600,6 +2600,14 @@ function TemperamentWidget() {
             that._save();
         };
 
+        widgetWindow.addButton("export-chunk.svg", ICONSIZE, _("Export Temperament")).onclick = function () {
+            that._exportTemperament();
+        };
+
+        widgetWindow.addButton("import-music.svg", ICONSIZE, _("Import Temperament")).onclick = function () {
+            that._importTemperament();
+        };
+
         const noteCell = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Table"));
 
         let t = getTemperament(this.inTemperament);
@@ -2730,6 +2738,60 @@ function TemperamentWidget() {
 
         widgetWindow.sendToCenter();
     };
+    this._exportTemperament = function () {
+        const data = {
+            type: isCustomTemperament(this.inTemperament) ? "custom" : "EDO",
+            name: this.inTemperament,
+            powerBase: this.powerBase,
+            pitchNumber: this.pitchNumber,
+            ratios: this.ratios,
+            notes: this.notes,
+            frequencies: this.frequencies
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], {
+            type: "application/json"
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = (this.inTemperament || "temperament") + ".json";
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    this._importTemperament = function () {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".json";
+        const that = this;
+        input.onchange = function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (ev) {
+                try {
+                    const data = JSON.parse(ev.target.result);
+                    if (!data.ratios || !data.pitchNumber) {
+                        that.activity.errorMsg(_("Invalid temperament file."), 3000);
+                        return;
+                    }
+                    that.inTemperament = data.name || "custom";
+                    that.powerBase = data.powerBase || 2;
+                    that.pitchNumber = data.pitchNumber;
+                    that.ratios = data.ratios;
+                    that.notes = data.notes || [];
+                    that.frequencies = data.frequencies || [];
+                    that._circleOfNotes();
+                    that.activity.textMsg(_("Temperament imported successfully."), 3000);
+                } catch (err) {
+                    that.activity.errorMsg(_("Failed to parse temperament file."), 3000);
+                }
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    };
+
 }
 
 if (typeof module !== "undefined") {
