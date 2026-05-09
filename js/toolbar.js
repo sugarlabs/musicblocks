@@ -132,7 +132,8 @@ class Toolbar {
                 ["toggleAuxBtn", _("Auxiliary menu")],
                 ["helpIcon", _("Help and shortcuts")],
                 ["helpGuideItem", _("Help"), "innerHTML"],
-                ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],["uiMapGuideItem", _("UI map"), "innerHTML"],
+                ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
+                ["uiMapGuideItem", _("UI map"), "innerHTML"],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -280,7 +281,8 @@ class Toolbar {
                 ["toggleAuxBtn", _("Auxiliary menu")],
                 ["helpIcon", _("Help and shortcuts")],
                 ["helpGuideItem", _("Help"), "innerHTML"],
-                ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],["uiMapGuideItem", _("UI map"), "innerHTML"],
+                ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
+                ["uiMapGuideItem", _("UI map"), "innerHTML"],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -1292,8 +1294,8 @@ class Toolbar {
             helpIcon.onclick = hasDropdownMenu
                 ? null
                 : () => {
-                    onclick(this.activity);
-                };
+                      onclick(this.activity);
+                  };
         }
     }
 

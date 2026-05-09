@@ -7695,9 +7695,7 @@ class Activity {
                         },
                         {
                             area: _("Save"),
-                            desc: _(
-                                "Saves the project as HTML, MIDI, WAV, ABC, Lilypond, or SVG."
-                            )
+                            desc: _("Saves the project as HTML, MIDI, WAV, ABC, Lilypond, or SVG.")
                         },
                         {
                             area: _("Planet"),
@@ -7771,9 +7769,7 @@ class Activity {
                         },
                         {
                             area: _("Right-click the canvas"),
-                            desc: _(
-                                "Opens a menu to paste blocks, undo, or zoom the workspace."
-                            )
+                            desc: _("Opens a menu to paste blocks, undo, or zoom the workspace.")
                         },
                         {
                             area: _("Mouse (turtle)"),
@@ -7824,12 +7820,7 @@ class Activity {
                 }
             ];
 
-            const widgetWindow = window.widgetWindows.windowFor(
-                this,
-                _("UI map"),
-                "ui-map",
-                true
-            );
+            const widgetWindow = window.widgetWindows.windowFor(this, _("UI map"), "ui-map", true);
             widgetWindow.clear();
             widgetWindow.show();
 
