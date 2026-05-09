@@ -129,9 +129,10 @@ class PitchStaircase {
                     this._cellScale) /
                     3 +
                 "px";
-            stepCell.innerHTML = `${frequency.toFixed(2)}<br>${this.Stairs[i][0]}${
-                this.Stairs[i][1]
-            }`;
+            stepCell.textContent = "";
+            stepCell.appendChild(document.createTextNode(frequency.toFixed(2)));
+            stepCell.appendChild(document.createElement("br"));
+            stepCell.appendChild(document.createTextNode(this.Stairs[i][0] + this.Stairs[i][1]));
             stepCell.style.minWidth = stepCell.style.width;
             stepCell.style.maxWidth = stepCell.style.width;
             stepCell.style.height = PitchStaircase.BUTTONSIZE + "px";
