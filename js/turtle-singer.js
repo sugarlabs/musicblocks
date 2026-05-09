@@ -2002,7 +2002,8 @@ class Singer {
 
                 // Use the beatValue of the first note in the group
                 // since there can only be one.
-                const portamento = tur.singer.glide.length > 0 ? last(tur.singer.glide) : 0;
+                const portamento =
+                    tur.singer.glide.length > 0 ? bpmFactor * last(tur.singer.glide) : 0;
 
                 let beatValue = bpmFactor / noteBeatValue;
                 if (tur.singer.staccato.length > 0) {
