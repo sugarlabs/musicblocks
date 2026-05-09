@@ -1390,35 +1390,19 @@
                 }
 
                 function togglePlayOnlyMode() {
-                    const isSmallScreen = window.innerWidth < 768 || window.innerHeight < 600;
                     const body = document.body;
-                    const homeButton = document.getElementById("Home [HOME]");
-                    const buttonContainer = document.getElementById("buttoncontainerBOTTOM");
 
-                    if (isSmallScreen) {
-                        // Enable play-only mode
-                        body.classList.add("play-only");
-                        showPersistentNotification();
+                    // Mobile editing is now fully supported via pinch-to-zoom and
+                    // touch-friendly controls — remove the hard screen-size restriction.
+                    body.classList.remove("play-only");
+                    removePersistentNotification();
 
-                        // Hide certain elements
-                        hideElementById("Show/hide blocks");
-                        hideElementById("Expand/collapse blocks");
-                        hideElementById("Decrease block size");
-                        hideElementById("Increase block size");
-                        hideElementById("grid");
-                        hideElementById("palette");
-                    } else {
-                        // Disable play-only mode
-                        body.classList.remove("play-only");
-                        removePersistentNotification();
-
-                        showElementById("Show/hide blocks");
-                        showElementById("Expand/collapse blocks");
-                        showElementById("Decrease block size");
-                        showElementById("Increase block size");
-                        showElementById("grid");
-                        showElementById("palette");
-                    }
+                    showElementById("Show/hide blocks");
+                    showElementById("Expand/collapse blocks");
+                    showElementById("Decrease block size");
+                    showElementById("Increase block size");
+                    showElementById("grid");
+                    showElementById("palette");
                 }
 
                 togglePlayOnlyMode();

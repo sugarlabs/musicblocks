@@ -2809,11 +2809,15 @@ class Activity {
                 [null, null],
                 [null, null]
             ]; // Array to track two fingers (Y and X coordinates)
+            let initialPinchDistance = null;
+            let initialPinchScale = 1;
 
-            /**
-             * Handles touch start event on the canvas.
-             * @param {TouchEvent} event - The touch event object.
-             */
+            const getTouchDistance = touches =>
+                Math.hypot(
+                    touches[1].clientX - touches[0].clientX,
+                    touches[1].clientY - touches[0].clientY
+                );
+
             myCanvas.addEventListener(
                 "touchstart",
                 event => {
@@ -2822,19 +2826,29 @@ class Activity {
                             initialTouches[i][0] = event.touches[i].clientY;
                             initialTouches[i][1] = event.touches[i].clientX;
                         }
+                        initialPinchDistance = getTouchDistance(event.touches);
+                        initialPinchScale = that.turtleBlocksScale;
                     }
                 },
                 { passive: true }
             );
 
-            /**
-             * Handles touch move event on the canvas.
-             * @param {TouchEvent} event - The touch event object.
-             */
             myCanvas.addEventListener(
                 "touchmove",
                 event => {
                     if (event.touches.length === 2) {
+                        // Pinch-to-zoom: scale blocks based on finger spread ratio
+                        const currentDistance = getTouchDistance(event.touches);
+                        if (initialPinchDistance && initialPinchDistance > 0) {
+                            const ratio = currentDistance / initialPinchDistance;
+                            const newScale = Math.min(Math.max(initialPinchScale * ratio, 0.25), 4);
+                            if (newScale !== that.turtleBlocksScale) {
+                                that.turtleBlocksScale = newScale;
+                                closeAnyOpenMenusAndLabels();
+                            }
+                        }
+
+                        // Two-finger pan
                         for (let i = 0; i < 2; i++) {
                             const touchY = event.touches[i].clientY;
                             const touchX = event.touches[i].clientX;
@@ -2864,14 +2878,12 @@ class Activity {
                 { passive: true }
             );
 
-            /**
-             * Handles touch end event on the canvas.
-             */
             myCanvas.addEventListener("touchend", () => {
                 for (let i = 0; i < 2; i++) {
                     initialTouches[i][0] = null;
                     initialTouches[i][1] = null;
                 }
+                initialPinchDistance = null;
             });
 
             /**
@@ -4185,14 +4197,12 @@ class Activity {
             const smallSide = Math.min(w, h);
             let mobileSize;
             if (smallSide < this.cellSize * 9) {
-                mobileSize = false;
-                /*
-                   if (w < this.cellSize * 10) {
-                       this.turtleBlocksScale = smallSide / (this.cellSize * 11);
-                   } else {
-                       this.turtleBlocksScale = Math.max(smallSide / (this.cellSize * 11), 0.75);
-                   }
-                   */
+                mobileSize = true;
+                if (w < this.cellSize * 10) {
+                    this.turtleBlocksScale = smallSide / (this.cellSize * 11);
+                } else {
+                    this.turtleBlocksScale = Math.max(smallSide / (this.cellSize * 11), 0.75);
+                }
             } else {
                 mobileSize = false;
                 /*
