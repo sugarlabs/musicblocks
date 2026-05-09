@@ -100,8 +100,13 @@ class Planet {
         const existing = document.getElementById("new-project-confirmation");
         if (existing) existing.remove();
 
-        // Use platformColor from the parent window for theme-aware colors
-        const colors = window.parent.platformColor;
+        // Request platformColor from the parent window via postMessage
+        // instead of directly accessing window.parent.platformColor.
+        const colors = window._mbPlatformColor || {
+            header: "#8bc34a",
+            aux: "#f0f4c3",
+            background: "#ffffff"
+        };
 
         // Overlay to block interaction behind the modal
         const overlay = document.createElement("div");
