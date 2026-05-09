@@ -1378,6 +1378,14 @@ class Activity {
                     ? this.blocks.blockCollapseArt[i]
                     : this.blocks.blockArt[i];
 
+                // Defensive guard: blockArt may be undefined if a block was restored
+                // from trash and regenerateArtwork() has not yet completed (it is
+                // asynchronous). Skip this block rather than injecting <parsererror>
+                // into the SVG output.
+                if (!rawSVG) {
+                    continue;
+                }
+
                 if (this.blocks.blockList[i].isCollapsible()) {
                     svgParts.push("<g>");
                 }
@@ -4512,9 +4520,20 @@ class Activity {
                 this.blocks.blockList[blk].trash = false;
                 this.blocks.moveBlockRelative(blk, dx, dy);
 
+                const block = this.blocks.blockList[blk];
+
+                // Re-populate blocks.blockArt[blk] if it was deleted on trash.
+                // sendStackToTrash() and sendAllToTrash() both delete blockArt[blk]
+                // to free memory. Without regeneration, printBlockSVG() receives
+                // undefined here, passes it to DOMParser.parseFromString(undefined),
+                // and injects a <parsererror> node into every Save Block Artwork
+                // export (activity.js ~line 1394).
+                if (!this.blocks.blockArt[blk]) {
+                    block.regenerateArtwork(block.isCollapsible());
+                }
+
                 // Re-cache the container if it was uncached to save
                 // memory in sendStackToTrash().
-                const block = this.blocks.blockList[blk];
                 if (block.container && !block.container.bitmapCache) {
                     block.container.cache(
                         0,
@@ -4526,7 +4545,6 @@ class Activity {
 
                 this.blocks.blockList[blk].show();
             }
-
             this.blocks.raiseStackToTop(blockId);
             const restoredBlock = this.blocks.blockList[blockId];
 
