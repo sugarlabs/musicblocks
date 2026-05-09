@@ -858,7 +858,9 @@ class PhraseMaker {
             cell.style.position = "sticky";
             cell.style.left = "1.2px";
             cell.style.zIndex = "1";
-            cell.style.backgroundColor = this.platformColor.lyricsLabelBackground;
+            cell.style.backgroundColor = getComputedStyle(document.body)
+                .getPropertyValue("--color-lyrics-label-bg")
+                .trim();
             cell.style.textAlign = "center";
             cell.textContent = "";
             const penImg = document.createElement("img");
@@ -875,7 +877,9 @@ class PhraseMaker {
             cell.style.position = "sticky";
             cell.style.left = "1.2px";
             cell.style.zIndex = "1";
-            cell.style.backgroundColor = this.platformColor.lyricsLabelBackground;
+            cell.style.backgroundColor = getComputedStyle(document.body)
+                .getPropertyValue("--color-lyrics-label-bg")
+                .trim();
             cell.style.textAlign = "center";
             cell.textContent = "Lyrics";
 
@@ -899,7 +903,9 @@ class PhraseMaker {
                 inputCell.style.width = this._noteWidth(noteValue) + "px";
                 inputCell.style.minWidth = inputCell.style.width;
                 inputCell.style.maxWidth = inputCell.style.width;
-                inputCell.style.backgroundColor = this.platformColor.lyricsInputBackground;
+                inputCell.style.backgroundColor = getComputedStyle(document.body)
+                    .getPropertyValue("--color-lyrics-input-bg")
+                    .trim();
                 inputCell.style.fontFamily = "sans-serif";
                 inputCell.style.cursor = "default";
                 inputCell.style.borderSpacing = "1px 1px";
@@ -925,15 +931,21 @@ class PhraseMaker {
                 lyricsInput.style.padding = "0";
                 lyricsInput.style.border = "none";
                 lyricsInput.style.borderRadius = "6px";
-                lyricsInput.style.backgroundColor = this.platformColor.lyricsInputBackground;
+                lyricsInput.style.backgroundColor = getComputedStyle(document.body)
+                    .getPropertyValue("--color-lyrics-input-bg")
+                    .trim();
 
                 inputCell.appendChild(lyricsInput);
                 inputCell.addEventListener("mouseover", event => {
-                    event.target.style.backgroundColor = this.platformColor.selectorSelected;
+                    event.target.style.backgroundColor = getComputedStyle(document.body)
+                        .getPropertyValue("--color-selector-sel")
+                        .trim();
                 });
 
                 inputCell.addEventListener("mouseout", event => {
-                    event.target.style.backgroundColor = this.platformColor.lyricsInputBackground;
+                    event.target.style.backgroundColor = getComputedStyle(document.body)
+                        .getPropertyValue("--color-lyrics-input-bg")
+                        .trim();
                 });
                 lyricsInput.addEventListener("focus", () => (this.activity.isInputON = true));
                 lyricsInput.addEventListener("blur", () => (this.activity.isInputON = false));
@@ -978,7 +990,9 @@ class PhraseMaker {
             Math.floor(2 * MATRIXSOLFEWIDTH * this._cellScale) + "px";
         this._noteValueLabel.style.minWidth = this._noteValueLabel.style.width;
         this._noteValueLabel.style.maxWidth = this._noteValueLabel.style.width;
-        this._noteValueLabel.style.backgroundColor = this.platformColor.labelColor;
+        this._noteValueLabel.style.backgroundColor = getComputedStyle(document.body)
+            .getPropertyValue("--color-label")
+            .trim();
 
         // Create tables to store individual note values.
         tempTable = document.createElement("table");
@@ -2908,7 +2922,9 @@ class PhraseMaker {
             labelCell.style.width = Math.floor(2 * MATRIXSOLFEWIDTH * this._cellScale) + "px";
             labelCell.style.minWidth = labelCell.style.width;
             labelCell.style.maxWidth = labelCell.style.width;
-            labelCell.style.backgroundColor = this.platformColor.labelColor;
+            labelCell.style.backgroundColor = getComputedStyle(document.body)
+                .getPropertyValue("--color-label")
+                .trim();
 
             labelCell = this._tupletValueLabel;
             labelCell.textContent = this._("tuplet value");
@@ -2917,7 +2933,9 @@ class PhraseMaker {
             labelCell.style.width = Math.floor(2 * MATRIXSOLFEWIDTH * this._cellScale) + "px";
             labelCell.style.minWidth = labelCell.style.width;
             labelCell.style.maxWidth = labelCell.style.width;
-            labelCell.style.backgroundColor = this.platformColor.labelColor;
+            labelCell.style.backgroundColor = getComputedStyle(document.body)
+                .getPropertyValue("--color-label")
+                .trim();
 
             // Fill in the columns in the tuplet note value row up to
             // where the tuplet begins.
@@ -2925,14 +2943,18 @@ class PhraseMaker {
             valueRow = this._tupletValueRow;
             for (let i = 0; i < firstRow.cells.length; i++) {
                 cell = noteRow.insertCell();
-                cell.style.backgroundColor = this.platformColor.tupletBackground;
+                cell.style.backgroundColor = getComputedStyle(document.body)
+                    .getPropertyValue("--color-tuplet-bg")
+                    .trim();
                 cell.style.width = firstRow.cells[i].style.width;
                 cell.style.minWidth = firstRow.cells[i].style.minWidth;
                 cell.style.maxWidth = firstRow.cells[i].style.maxWidth;
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
 
                 cell = valueRow.insertCell();
-                cell.style.backgroundColor = this.platformColor.tupletBackground;
+                cell.style.backgroundColor = getComputedStyle(document.body)
+                    .getPropertyValue("--color-tuplet-bg")
+                    .trim();
                 cell.style.width = firstRow.cells[i].style.width;
                 cell.style.minWidth = firstRow.cells[i].style.minWidth;
                 cell.style.maxWidth = firstRow.cells[i].style.maxWidth;
@@ -2953,7 +2975,9 @@ class PhraseMaker {
             cell = noteRow.insertCell(-1);
             numerator = 32 / param[1][i];
             thisNoteValue = 1 / (numerator / (totalNoteInterval / tupletTimeFactor));
-            cell.style.backgroundColor = this.platformColor.tupletBackground;
+            cell.style.backgroundColor = getComputedStyle(document.body)
+                .getPropertyValue("--color-tuplet-bg")
+                .trim();
             cell.style.width = this._noteWidth(thisNoteValue) + "px";
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
@@ -3024,7 +3048,9 @@ class PhraseMaker {
 
                 cell.onmouseover = event => {
                     if (event.target.style.backgroundColor !== "black") {
-                        event.target.style.backgroundColor = this.platformColor.selectorSelected;
+                        event.target.style.backgroundColor = getComputedStyle(document.body)
+                            .getPropertyValue("--color-selector-sel")
+                            .trim();
                     }
                 };
 
@@ -3048,7 +3074,9 @@ class PhraseMaker {
         cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
         cell.style.textAlign = "center";
         cell.textContent = tupletValue;
-        cell.style.backgroundColor = this.platformColor.tupletBackground;
+        cell.style.backgroundColor = getComputedStyle(document.body)
+            .getPropertyValue("--color-tuplet-bg")
+            .trim();
         cell.style.borderLeft = barStyle;
 
         // And a span in the note value column too.
@@ -3078,7 +3106,9 @@ class PhraseMaker {
                 if (k < parts.length - 1) cell.appendChild(document.createElement("br"));
             }
         }
-        cell.style.backgroundColor = this.platformColor.rhythmcellcolor;
+        cell.style.backgroundColor = getComputedStyle(document.body)
+            .getPropertyValue("--color-rhythm-cell")
+            .trim();
         cell.style.borderLeft = barStyle;
         this._matrixHasTuplets = true;
 
@@ -3164,7 +3194,9 @@ class PhraseMaker {
 
                 cell.addEventListener("mouseover", event => {
                     if (event.target.style.backgroundColor !== "black") {
-                        event.target.style.backgroundColor = this.platformColor.selectorSelected;
+                        event.target.style.backgroundColor = getComputedStyle(document.body)
+                            .getPropertyValue("--color-selector-sel")
+                            .trim();
                     }
                 });
 
@@ -3201,8 +3233,12 @@ class PhraseMaker {
                     if (k < parts.length - 1) cell.appendChild(document.createElement("br"));
                 }
             }
-            cell.style.backgroundColor = this.platformColor.rhythmcellcolor;
-            cell.style.color = this.platformColor.textColor;
+            cell.style.backgroundColor = getComputedStyle(document.body)
+                .getPropertyValue("--color-rhythm-cell")
+                .trim();
+            cell.style.color = getComputedStyle(document.body)
+                .getPropertyValue("--color-text")
+                .trim();
             cell.setAttribute("alt", noteValue);
             cell.style.borderLeft = barStyle;
 
@@ -3216,7 +3252,9 @@ class PhraseMaker {
                 cell.style.maxWidth = cell.style.width;
                 cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
-                cell.style.backgroundColor = this.platformColor.tupletBackground;
+                cell.style.backgroundColor = getComputedStyle(document.body)
+                    .getPropertyValue("--color-tuplet-bg")
+                    .trim();
                 cell.style.borderLeft = barStyle;
 
                 row = this._tupletValueRow;
@@ -3226,7 +3264,9 @@ class PhraseMaker {
                 cell.style.maxWidth = cell.style.width;
                 cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
-                cell.style.backgroundColor = this.platformColor.tupletBackground;
+                cell.style.backgroundColor = getComputedStyle(document.body)
+                    .getPropertyValue("--color-tuplet-bg")
+                    .trim();
                 cell.style.borderLeft = barStyle;
             }
 
