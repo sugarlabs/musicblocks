@@ -7661,6 +7661,240 @@ class Activity {
             requestAnimationFrame(() => widgetWindow.sendToCenter());
         };
 
+        const showUIMap = activity => {
+            if (window.widgetWindows?.isOpen("help")) {
+                window.widgetWindows.clear("help");
+            }
+            activity._showUIMap();
+        };
+
+        this._showUIMap = () => {
+            const uiSections = [
+                {
+                    title: _("Toolbar"),
+                    items: [
+                        {
+                            area: _("Run (▶)"),
+                            desc: _("Runs the project at full speed.")
+                        },
+                        {
+                            area: _("Run slowly (▶▶)"),
+                            desc: _("Runs the project step by step at a slow pace.")
+                        },
+                        {
+                            area: _("Stop (■)"),
+                            desc: _("Stops all turtles and music playback.")
+                        },
+                        {
+                            area: _("New project"),
+                            desc: _("Clears the workspace and starts a new project.")
+                        },
+                        {
+                            area: _("Open"),
+                            desc: _("Loads a saved project file from your computer.")
+                        },
+                        {
+                            area: _("Save"),
+                            desc: _(
+                                "Saves the project as HTML, MIDI, WAV, ABC, Lilypond, or SVG."
+                            )
+                        },
+                        {
+                            area: _("Planet"),
+                            desc: _("Browse and load example projects from the community server.")
+                        },
+                        {
+                            area: _("Help (?)"),
+                            desc: _("Opens this tour, the UI map, and keyboard shortcuts.")
+                        },
+                        {
+                            area: _("Auxiliary menu (≡)"),
+                            desc: _(
+                                "Expands a secondary toolbar with advanced tools like scrolling, plugins, and statistics."
+                            )
+                        }
+                    ]
+                },
+                {
+                    title: _("Block palettes (left panel)"),
+                    items: [
+                        {
+                            area: _("Music palette"),
+                            desc: _(
+                                "Contains Rhythm, Meter, Pitch, Intervals, Tone, Ornament, Volume, Drum, and Widget blocks for composing music."
+                            )
+                        },
+                        {
+                            area: _("Flow palette"),
+                            desc: _(
+                                "Contains control-flow blocks: Repeat, If/Else, While, Until, Action, and more."
+                            )
+                        },
+                        {
+                            area: _("Graphics palette"),
+                            desc: _(
+                                "Contains Pen, Media, Sensors, and Ensemble blocks for drawing and interaction."
+                            )
+                        },
+                        {
+                            area: _("Search (🔍)"),
+                            desc: _("Type to search for any block by name across all palettes.")
+                        },
+                        {
+                            area: _("Beginner / Advanced toggle"),
+                            desc: _(
+                                "Switches between a simplified block set for beginners and the full set for advanced users."
+                            )
+                        }
+                    ]
+                },
+                {
+                    title: _("Canvas (workspace)"),
+                    items: [
+                        {
+                            area: _("Start block"),
+                            desc: _(
+                                "The entry point for every program. Drag blocks inside it to define what the turtle does."
+                            )
+                        },
+                        {
+                            area: _("Drag & connect blocks"),
+                            desc: _(
+                                "Drag blocks from the palette and snap them together. Blocks connect top-to-bottom or as arguments."
+                            )
+                        },
+                        {
+                            area: _("Right-click a block"),
+                            desc: _(
+                                "Opens a context menu with options to copy, delete, extract, or get help for that block."
+                            )
+                        },
+                        {
+                            area: _("Right-click the canvas"),
+                            desc: _(
+                                "Opens a menu to paste blocks, undo, or zoom the workspace."
+                            )
+                        },
+                        {
+                            area: _("Mouse (turtle)"),
+                            desc: _(
+                                "The animated cursor that draws graphics and plays music as your program runs."
+                            )
+                        }
+                    ]
+                },
+                {
+                    title: _("Widgets (popup tools)"),
+                    items: [
+                        {
+                            area: _("Phrase Maker"),
+                            desc: _(
+                                "A grid-based tool for visually composing note sequences by clicking pitch and rhythm cells."
+                            )
+                        },
+                        {
+                            area: _("Rhythm Ruler"),
+                            desc: _(
+                                "Lets you define rhythmic patterns by dividing a measure into beats."
+                            )
+                        },
+                        {
+                            area: _("Music Keyboard"),
+                            desc: _(
+                                "An on-screen piano keyboard for playing and recording notes interactively."
+                            )
+                        },
+                        {
+                            area: _("Timbre"),
+                            desc: _(
+                                "Design custom instruments by combining synth oscillators and effects."
+                            )
+                        },
+                        {
+                            area: _("Status"),
+                            desc: _(
+                                "Shows a live readout of turtle parameters (pitch, volume, BPM, etc.) as the program runs."
+                            )
+                        },
+                        {
+                            area: _("Tempo"),
+                            desc: _("Adjust the beats-per-minute of the project in real time.")
+                        }
+                    ]
+                }
+            ];
+
+            const widgetWindow = window.widgetWindows.windowFor(
+                this,
+                _("UI map"),
+                "ui-map",
+                true
+            );
+            widgetWindow.clear();
+            widgetWindow.show();
+
+            const widgetBody = widgetWindow.getWidgetBody();
+            widgetBody.className = "wfbWidget ui-map-widget";
+            widgetBody.style.padding = "0";
+            widgetBody.style.display = "block";
+            widgetBody.style.height = "min(72vh, 680px)";
+            widgetBody.style.width = "min(68vw, 760px)";
+            widgetBody.style.maxWidth = "100%";
+            widgetBody.style.overflow = "hidden";
+
+            const wrapper = document.createElement("div");
+            wrapper.className = "ui-map-panel";
+
+            const intro = document.createElement("div");
+            intro.className = "ui-map-hero";
+            const titleDiv = document.createElement("div");
+            titleDiv.className = "ui-map-hero-title";
+            titleDiv.textContent = _("UI map");
+
+            const copyDiv = document.createElement("div");
+            copyDiv.className = "ui-map-hero-copy";
+            copyDiv.textContent = _(
+                "A visual guide to every part of the Music Blocks interface. Click any area name to learn more."
+            );
+
+            intro.appendChild(titleDiv);
+            intro.appendChild(copyDiv);
+            wrapper.appendChild(intro);
+
+            uiSections.forEach(section => {
+                const sectionCard = document.createElement("section");
+                sectionCard.className = "ui-map-section";
+
+                const heading = document.createElement("div");
+                heading.textContent = section.title;
+                heading.className = "ui-map-section-title";
+                sectionCard.appendChild(heading);
+
+                section.items.forEach(item => {
+                    const row = document.createElement("div");
+                    row.className = "ui-map-row";
+
+                    const area = document.createElement("div");
+                    area.textContent = item.area;
+                    area.className = "ui-map-area";
+
+                    const desc = document.createElement("div");
+                    desc.textContent = item.desc;
+                    desc.className = "ui-map-desc";
+
+                    row.appendChild(area);
+                    row.appendChild(desc);
+                    sectionCard.appendChild(row);
+                });
+
+                wrapper.appendChild(sectionCard);
+            });
+
+            widgetBody.appendChild(wrapper);
+            widgetWindow.sendToCenter();
+            requestAnimationFrame(() => widgetWindow.sendToCenter());
+        };
+
         /*
          * Shows about page
          */
@@ -8330,7 +8564,7 @@ class Activity {
             );
             this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
             this.toolbar.renderMenuIcon(showHideAuxMenu);
-            this.toolbar.renderHelpIcon(showHelp, showKeyboardShortcuts);
+            this.toolbar.renderHelpIcon(showHelp, showKeyboardShortcuts, showUIMap);
             this.toolbar.renderModeSelectIcon(
                 doSwitchMode,
                 () => doRecordButton(this),

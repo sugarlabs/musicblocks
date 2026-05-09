@@ -132,7 +132,7 @@ class Toolbar {
                 ["toggleAuxBtn", _("Auxiliary menu")],
                 ["helpIcon", _("Help and shortcuts")],
                 ["helpGuideItem", _("Help"), "innerHTML"],
-                ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
+                ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],["uiMapGuideItem", _("UI map"), "innerHTML"],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -280,7 +280,7 @@ class Toolbar {
                 ["toggleAuxBtn", _("Auxiliary menu")],
                 ["helpIcon", _("Help and shortcuts")],
                 ["helpGuideItem", _("Help"), "innerHTML"],
-                ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
+                ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],["uiMapGuideItem", _("UI map"), "innerHTML"],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -1247,11 +1247,12 @@ class Toolbar {
      * @param {Function} onclick - The onclick handler for the help icon.
      * @returns {void}
      */
-    renderHelpIcon(onclick, shortcutsOnclick) {
+    renderHelpIcon(onclick, shortcutsOnclick, uiMapOnclick) {
         const helpIcon = docById("helpIcon");
         const helpGuideItem = docById("helpGuideItem");
         const shortcutsGuideItem = docById("shortcutsGuideItem");
-        const hasDropdownMenu = !!helpGuideItem || !!shortcutsGuideItem;
+        const uiMapGuideItem = docById("uiMapGuideItem");
+        const hasDropdownMenu = !!helpGuideItem || !!shortcutsGuideItem || !!uiMapGuideItem;
 
         if (helpGuideItem) {
             helpGuideItem.onclick = event => {
@@ -1275,12 +1276,24 @@ class Toolbar {
             };
         }
 
+        if (uiMapGuideItem) {
+            uiMapGuideItem.onclick = event => {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                if (uiMapOnclick) {
+                    uiMapOnclick(this.activity);
+                }
+            };
+        }
+
         if (helpIcon) {
             helpIcon.onclick = hasDropdownMenu
                 ? null
                 : () => {
-                      onclick(this.activity);
-                  };
+                    onclick(this.activity);
+                };
         }
     }
 
