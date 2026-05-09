@@ -606,7 +606,7 @@ class Arpeggio {
      * @returns {void}
      */
     _setCell(colIndex, rowIndex, playNote) {
-	console.log("SETCELL", colIndex, rowIndex, playNote);
+        console.log("SETCELL", colIndex, rowIndex, playNote);
         // Sets corresponding pitch/arpeggio when user clicks on any cell and
         // plays them.
         const coli = Number(colIndex);
