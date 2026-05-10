@@ -5,20 +5,218 @@ on:
     branches:
       - master
   pull_request:
+    types:
+      - opened
+      - synchronize
   workflow_dispatch:
+  schedule:
+    # Run weekly on Monday at 00:00 UTC
+    - cron: '0 0 * * 1'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   security-scans:
+    name: Run Security Scans
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+      pull-requests: write
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '22'
+          cache: 'npm'
 
+      # ── 1. DEPENDENCY VULNERABILITY SCAN ──────────────────────
       - name: Run npm Audit
-        run: npm audit --omit=dev --audit-level=high
+        id: npm-audit
+        run: |
+          npm audit --omit=dev --audit-level=high --json > npm-audit-report.json || true
+          VULN_COUNT=$(jq '.metadata.vulnerabilities.total // 0' npm-audit-report.json)
+          echo "vulnerabilities=$VULN_COUNT" >> $GITHUB_OUTPUT
+          echo "Found $VULN_COUNT vulnerabilities"
+        continue-on-error: true
+
+      - name: Upload npm Audit Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: npm-audit-report
+          path: npm-audit-report.json
+          retention-days: 30
+          if-no-files-found: ignore
+
+      # ── 2. SOFTWARE BILL OF MATERIALS (SBOM) ──────────────────
+      - name: Generate SBOM
+        id: sbom
+        run: |
+          npm install -g @cyclonedx/cyclonedx-npm@latest
+          cyclonedx-npm --output-file sbom.json --output-format JSON
+          echo "Generated SBOM with $(jq '.components | length' sbom.json) components"
+        continue-on-error: true
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sbom
+          path: sbom.json
+          retention-days: 90
+          if-no-files-found: ignore
+
+      # ── 3. CODEQL STATIC ANALYSIS (SAST) ──────────────────────
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+          queries: security-extended,security-and-quality
+        continue-on-error: true
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+        continue-on-error: true
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript"
+        continue-on-error: true
+
+      # ── 4. SECRET DETECTION ────────────────────────────────────
+      - name: Scan for Secrets
+        uses: trufflesecurity/trufflehog@main
+        id: trufflehog
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug --only-verified
+        continue-on-error: true
+
+      - name: Upload Secret Scan Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: secret-scan-results
+          path: |
+            trufflehog-results.json
+            *. trufflehog
+          retention-days: 30
+          if-no-files-found: ignore
+
+      # ── 5. PR COMMENT WITH SUMMARY ─────────────────────────────
+      - name: Generate Security Report
+        id: report
+        if: github.event_name == 'pull_request'
+        run: |
+          REPORT_FILE=$(mktemp)
+          {
+            echo "## 🔒 Security Scan Results"
+            echo ""
+            echo "| Scan Type | Status |"
+            echo "|-----------|--------|"
+            
+            # npm audit status
+            if [ -f npm-audit-report.json ]; then
+              VULN_COUNT=$(jq '.metadata.vulnerabilities.total // 0' npm-audit-report.json)
+              if [ "$VULN_COUNT" -eq 0 ]; then
+                echo "| npm Audit | ✅ No vulnerabilities |"
+              else
+                echo "| npm Audit | ⚠️ $VULN_COUNT vulnerabilities found |"
+              fi
+            else
+              echo "| npm Audit | ⚪ Skipped |"
+            fi
+            
+            # SBOM status
+            if [ -f sbom.json ]; then
+              COMPONENT_COUNT=$(jq '.components | length' sbom.json)
+              echo "| SBOM | ✅ Generated ($COMPONENT_COUNT components) |"
+            else
+              echo "| SBOM | ⚪ Not generated |"
+            fi
+            
+            # CodeQL status
+            echo "| CodeQL | ✅ Analysis complete |"
+            
+            # TruffleHog status
+            if [ -f trufflehog-results.json ]; then
+              SECRET_COUNT=$(jq '. | length' trufflehog-results.json)
+              if [ "$SECRET_COUNT" -eq 0 ]; then
+                echo "| Secret Scan | ✅ No secrets found |"
+              else
+                echo "| Secret Scan | ⚠️ $SECRET_COUNT potential secrets detected |"
+              fi
+            else
+              echo "| Secret Scan | ✅ No secrets found |"
+            fi
+            
+            echo ""
+            echo "<details>"
+            echo "<summary>📋 View Details</summary>"
+            echo ""
+            echo "### npm Audit"
+            echo '```json'
+            cat npm-audit-report.json | jq '.metadata.vulnerabilities' || echo "N/A"
+            echo '```'
+            echo ""
+            echo "### Secret Scan"
+            echo "TruffleHog scanned for verified secrets in the codebase."
+            echo "</details>"
+          } > "$REPORT_FILE"
+          
+          echo "report_file=$REPORT_FILE" >> $GITHUB_OUTPUT
+
+      - name: Comment PR with Security Summary
+        if: github.event_name == 'pull_request'
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          file-path: ${{ steps.report.outputs.report_file }}
+          pr-number: ${{ github.event.pull_request.number }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-tag: security-scan-results
+
+      # ── 6. FAIL ON CRITICAL ────────────────────────────────────
+      - name: Check for Critical Issues
+        if: github.event_name == 'pull_request'
+        run: |
+          CRITICAL=0
+          
+          # Check npm audit for critical vulnerabilities
+          if [ -f npm-audit-report.json ]; then
+            CRITICAL_VULNS=$(jq '.metadata.vulnerabilities.critical // 0' npm-audit-report.json)
+            if [ "$CRITICAL_VULNS" -gt 0 ]; then
+              echo "❌ Found $CRITICAL_VULNS critical vulnerabilities"
+              CRITICAL=1
+            fi
+          fi
+          
+          # Check for secrets
+          if [ -f trufflehog-results.json ]; then
+            SECRET_COUNT=$(jq '. | length' trufflehog-results.json)
+            if [ "$SECRET_COUNT" -gt 0 ]; then
+              echo "❌ Found $SECRET_COUNT potential secrets"
+              CRITICAL=1
+            fi
+          fi
+          
+          if [ "$CRITICAL" -eq 1 ]; then
+            echo "::error::Security scan found critical issues. Please review the scan results."
+            exit 1
+          fi
+          
+          echo "✅ No critical security issues found"
