@@ -659,6 +659,7 @@ canvas {
     overflow: clip !important;
     width: 100%;
     height: 100%;
+    touch-action: none;
 }
 
 .projectname {
@@ -781,6 +782,7 @@ table {
 
 #canvas {
     overflow-y: visible;
+    touch-action: none;
 }
 
 #statusDiv {
@@ -2232,4 +2234,11 @@ table {
     padding: 0 10px;
     box-sizing: border-box;
   }
+}
+
+/* Mobile touch fix: prevent browser scroll interference during block drag */
+.blocklyDiv,
+.canvasDiv,
+#svgDiv {
+    touch-action: none;
 }
