@@ -4554,8 +4554,25 @@ class Activity {
 
             if (restoredBlock.name === "start" || restoredBlock.name === "drum") {
                 const turtle = restoredBlock.value;
-                this.turtles.getTurtle(turtle).inTrash = false;
-                this.turtles.getTurtle(turtle).container.visible = true;
+                const primaryTurtle = this.turtles.getTurtle(turtle);
+                primaryTurtle.inTrash = false;
+                primaryTurtle.container.visible = true;
+
+                // FIX: Restore the companion turtle if one exists.
+                // sendStackToTrash() in blocks.js (~line 7257) sets BOTH the primary
+                // and companion turtle to inTrash=true / visible=false when trashing a
+                // start/drum block. Without this mirror restore, the companion stays
+                // inTrash=true permanently, and logo.js (~line 1519) silently skips it:
+                //   if (!tur.inTrash) { tur.running = true; ... }
+                // This means onEveryBeatDo callbacks are dead after any trash+restore.
+                const comp = primaryTurtle.companionTurtle;
+                if (comp !== null && comp !== undefined) {
+                    const companionTurtle = this.turtles.getTurtle(comp);
+                    if (companionTurtle) {
+                        companionTurtle.inTrash = false;
+                        companionTurtle.container.visible = true;
+                    }
+                }
             } else if (restoredBlock.name === "action") {
                 const actionArg = this.blocks.blockList[restoredBlock.connections[1]];
                 if (actionArg !== null) {
