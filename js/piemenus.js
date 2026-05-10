@@ -3518,7 +3518,7 @@ const piemenuModes = (block, selectedMode) => {
                 that._modeNameWheel.navItems[i].sliceSelectedAttr.fill = colors[i];
             }
 
-        that._modeNameWheel.refreshWheel();
+            that._modeNameWheel.refreshWheel();
         }
 
         // Special case for Japanese
