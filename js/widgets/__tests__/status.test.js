@@ -562,6 +562,76 @@ describe("StatusMatrix Widget", () => {
             ];
         });
 
+        test("updates note row cells for active turtles when a middle turtle is inTrash", () => {
+            mockActivity.turtles.turtleList = [
+                { name: "Mouse1", inTrash: false },
+                { name: "Mouse2", inTrash: true },
+                { name: "Mouse3", inTrash: false }
+            ];
+
+            const noteCellMouse1 = createMockElement("TD");
+            const noteCellMouse3 = createMockElement("TD");
+            statusMatrix._statusTable.rows = [
+                {
+                    cells: [
+                        createMockElement("TD"),
+                        createMockElement("TD"),
+                        createMockElement("TD")
+                    ]
+                },
+                {
+                    cells: [
+                        createMockElement("TD"),
+                        createMockElement("TD"), // x value for Mouse1
+                        createMockElement("TD") // x value for Mouse3
+                    ]
+                },
+                {
+                    cells: [createMockElement("TD"), noteCellMouse1, noteCellMouse3]
+                }
+            ];
+
+            mockActivity.turtles.ithTurtle.mockImplementation(turtleIndex => {
+                switch (turtleIndex) {
+                    case 0:
+                        return {
+                            singer: {
+                                currentBeat: 1,
+                                currentMeasure: 1,
+                                noteStatus: [["C4"], 0.25]
+                            }
+                        };
+                    case 1:
+                        return {
+                            singer: {
+                                currentBeat: 1,
+                                currentMeasure: 1,
+                                noteStatus: [["X4"], 0.25]
+                            }
+                        };
+                    case 2:
+                        return {
+                            singer: {
+                                currentBeat: 1,
+                                currentMeasure: 1,
+                                noteStatus: [["E4"], 0.5]
+                            }
+                        };
+                    default:
+                        return {
+                            singer: { currentBeat: 1, currentMeasure: 1, noteStatus: null }
+                        };
+                }
+            });
+
+            rationalToFraction.mockReturnValueOnce([4, 1]).mockReturnValueOnce([2, 1]);
+
+            statusMatrix.updateAll();
+
+            expect(noteCellMouse1.textContent).toBe("C4 1/4");
+            expect(noteCellMouse3.textContent).toBe("E4 1/2");
+        });
+
         test("displays note names from noteStatus", () => {
             mockActivity.turtles.ithTurtle.mockReturnValue({
                 singer: {
@@ -573,6 +643,25 @@ describe("StatusMatrix Widget", () => {
 
             statusMatrix.updateAll();
             expect(rationalToFraction).toHaveBeenCalledWith(0.25);
+        });
+
+        test("collapses duplicate note names in the note row display", () => {
+            const mockCell = createMockElement("TD");
+            statusMatrix._statusTable.rows[2] = { cells: [createMockElement("TD"), mockCell] };
+
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: {
+                    currentBeat: 1,
+                    currentMeasure: 1,
+                    noteStatus: [["G4", "G4"], 0.125]
+                }
+            });
+
+            rationalToFraction.mockReturnValueOnce([8, 1]);
+
+            statusMatrix.updateAll();
+
+            expect(mockCell.textContent).toBe("G4 1/8");
         });
 
         test("formats numeric frequencies with Hz suffix", () => {
