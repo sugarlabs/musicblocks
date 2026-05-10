@@ -65,6 +65,20 @@ describe("DrumBlocksAPI", () => {
         expect(result).toBe(drumBlocksAPI.ENDFLOWCOMMAND);
     });
 
+    test("playPitchDrum calls runCommand with correct arguments", () => {
+        JSInterface.validateArgs.mockReturnValue(["snare", 7]);
+
+        drumBlocksAPI.playPitchDrum("snare", 7);
+
+        expect(JSInterface.validateArgs).toHaveBeenCalledWith("playPitchDrum", ["snare", 7]);
+        expect(drumBlocksAPI.runCommand).toHaveBeenCalledWith("playPitchDrum", [
+            "snare",
+            7,
+            0,
+            global.MusicBlocks.BLK
+        ]);
+    });
+
     test("mapPitchToDrum calls runCommand and executes flow function", async () => {
         const mockFlow = jest.fn();
         JSInterface.validateArgs.mockReturnValue(["tom", mockFlow]);

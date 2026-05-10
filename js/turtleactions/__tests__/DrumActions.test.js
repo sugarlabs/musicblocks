@@ -67,6 +67,7 @@ describe("setupDrumActions", () => {
                 drumStyle: [],
                 inNoteBlock: [],
                 noteDrums: {},
+                noteDrumTranspositions: {},
                 synthVolume: {},
                 crescendoInitialVolume: {},
                 noteBeatValues: {},
@@ -126,24 +127,29 @@ describe("setupDrumActions", () => {
         it("should add a drum to an existing note block", () => {
             targetTurtle.singer.inNoteBlock.push(2);
             targetTurtle.singer.noteDrums[2] = [];
+            targetTurtle.singer.noteDrumTranspositions[2] = [];
             Singer.DrumActions.playDrum("d1", 0, 1);
             expect(targetTurtle.singer.noteDrums[2]).toContain("drum1");
+            expect(targetTurtle.singer.noteDrumTranspositions[2]).toContain(0);
         });
 
         it("should use the drum style if one is set", () => {
             targetTurtle.singer.inNoteBlock.push(2);
             targetTurtle.singer.noteDrums[2] = [];
+            targetTurtle.singer.noteDrumTranspositions[2] = [];
             targetTurtle.singer.drumStyle.push("drum2");
 
             Singer.DrumActions.playDrum("d1", 0, 1);
 
             expect(targetTurtle.singer.noteDrums[2]).toContain("drum2");
             expect(targetTurtle.singer.noteDrums[2]).not.toContain("drum1");
+            expect(targetTurtle.singer.noteDrumTranspositions[2]).toContain(0);
         });
 
         it("should initialize synthVolume if not defined", () => {
             targetTurtle.singer.inNoteBlock.push(2);
             targetTurtle.singer.noteDrums[2] = [];
+            targetTurtle.singer.noteDrumTranspositions[2] = [];
             targetTurtle.singer.synthVolume = {};
 
             Singer.DrumActions.playDrum("d1", 0, 1);
@@ -164,11 +170,36 @@ describe("setupDrumActions", () => {
 
         it("should remove the block from inNoteBlock when the callback is invoked", () => {
             if (!targetTurtle.singer.noteDrums[2]) targetTurtle.singer.noteDrums[2] = [];
+            if (!targetTurtle.singer.noteDrumTranspositions[2])
+                targetTurtle.singer.noteDrumTranspositions[2] = [];
             Singer.DrumActions.playDrum("d1", 0, 2);
             expect(targetTurtle.singer.inNoteBlock).toContain(2);
             const callback = Singer.processNote.mock.calls[0][5];
             callback();
             expect(targetTurtle.singer.inNoteBlock).not.toContain(2);
+        });
+
+        it("should store semitone shift for pitch-shifted drum hits", () => {
+            targetTurtle.singer.inNoteBlock.push(7);
+            targetTurtle.singer.noteDrums[7] = [];
+            targetTurtle.singer.noteDrumTranspositions[7] = [];
+
+            Singer.DrumActions.playPitchDrum("d1", 7, 0, 1);
+
+            expect(targetTurtle.singer.noteDrums[7]).toContain("drum1");
+            expect(targetTurtle.singer.noteDrumTranspositions[7]).toContain(7);
+        });
+
+        it("should play a standalone pitch-shifted drum sound", () => {
+            if (!targetTurtle.singer.noteDrums[9]) targetTurtle.singer.noteDrums[9] = [];
+            if (!targetTurtle.singer.noteDrumTranspositions[9])
+                targetTurtle.singer.noteDrumTranspositions[9] = [];
+
+            Singer.DrumActions.playPitchDrum("d1", -5, 0, 9);
+
+            expect(activity.logo.clearNoteParams).toHaveBeenCalledWith(targetTurtle, 9, []);
+            expect(targetTurtle.singer.noteDrums[9]).toContain("drum1");
+            expect(targetTurtle.singer.noteDrumTranspositions[9]).toContain(-5);
         });
     });
 
@@ -263,9 +294,11 @@ describe("setupDrumActions", () => {
         it("should play noise in a note block", () => {
             targetTurtle.singer.inNoteBlock.push(2);
             targetTurtle.singer.noteDrums[2] = [];
+            targetTurtle.singer.noteDrumTranspositions[2] = [];
             targetTurtle.singer.noteBeatValues[2] = [];
             Singer.DrumActions.playNoise("n1", 0, 1);
             expect(targetTurtle.singer.noteDrums[2]).toContain("noise1");
+            expect(targetTurtle.singer.noteDrumTranspositions[2]).toContain(0);
             expect(targetTurtle.singer.noteBeatValues[2]).toContain(1);
             expect(targetTurtle.singer.pushedNote).toBe(true);
         });
@@ -281,6 +314,7 @@ describe("setupDrumActions", () => {
         it("should handle direct noise name input", () => {
             targetTurtle.singer.inNoteBlock.push(2);
             targetTurtle.singer.noteDrums[2] = [];
+            targetTurtle.singer.noteDrumTranspositions[2] = [];
             targetTurtle.singer.noteBeatValues[2] = [];
 
             Singer.DrumActions.playNoise("noise2", 0, 1);
@@ -291,6 +325,7 @@ describe("setupDrumActions", () => {
         it("should initialize synthVolume if not defined", () => {
             targetTurtle.singer.inNoteBlock.push(2);
             targetTurtle.singer.noteDrums[2] = [];
+            targetTurtle.singer.noteDrumTranspositions[2] = [];
             targetTurtle.singer.noteBeatValues[2] = [];
             targetTurtle.singer.synthVolume = {};
 
@@ -303,14 +338,17 @@ describe("setupDrumActions", () => {
         it("should push unknown noise names directly", () => {
             targetTurtle.singer.inNoteBlock.push(3);
             targetTurtle.singer.noteDrums[3] = [];
+            targetTurtle.singer.noteDrumTranspositions[3] = [];
             targetTurtle.singer.noteBeatValues[3] = [];
             Singer.DrumActions.playNoise("foo", 0, 3);
             expect(targetTurtle.singer.noteDrums[3]).toContain("foo");
+            expect(targetTurtle.singer.noteDrumTranspositions[3]).toContain(0);
         });
 
         it("should not reinitialize synthVolume if already defined", () => {
             targetTurtle.singer.inNoteBlock.push(4);
             targetTurtle.singer.noteDrums[4] = [];
+            targetTurtle.singer.noteDrumTranspositions[4] = [];
             targetTurtle.singer.noteBeatValues[4] = [];
             targetTurtle.singer.synthVolume = { noise1: [50] };
             targetTurtle.singer.crescendoInitialVolume = { noise1: [60] };

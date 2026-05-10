@@ -247,6 +247,12 @@ describe("JSInterface._methodArgConstraints", () => {
         expect(() => validateConstraints("playDrum", [123])).toThrow();
     });
 
+    it("should validate playPitchDrum arguments", () => {
+        expect(() => validateConstraints("playPitchDrum", ["drum", 7])).not.toThrow();
+        expect(() => validateConstraints("playPitchDrum", [123, 7])).toThrow();
+        expect(() => validateConstraints("playPitchDrum", ["drum", "up"])).toThrow();
+    });
+
     it("should validate playNoise arguments", () => {
         expect(() => validateConstraints("playNoise", ["noise"])).not.toThrow();
         expect(() => validateConstraints("playNoise", [123])).toThrow();

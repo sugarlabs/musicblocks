@@ -127,6 +127,7 @@ class Singer {
         this.noteHertz = {};
         this.noteBeatValues = {};
         this.embeddedGraphics = {};
+        this.noteDrumTranspositions = {};
         this.delayedNotes = [];
         this.lastNotePlayed = null;
         this.lastPitchPlayed = {}; // for a stand-alone pitch block
@@ -182,6 +183,7 @@ class Singer {
         this.tieNoteExtras = [];
         this.tieCarryOver = 0;
         this.tieFirstDrums = [];
+        this.tieFirstDrumTranspositions = [];
         this.synthVolume = {};
         this.drift = 0;
         // Maximum fraction of note duration that can be used for lag correction per note.
@@ -491,11 +493,16 @@ class Singer {
         const saveSuppressStatus = tur.singer.suppressOutput;
 
         // We need to save the state of the boxes and heap although there is a potential of a boxes collision with other turtles
-        const saveBoxes = logo.boxes != null ? deepClone(logo.boxes) : undefined;
+        const saveBoxes =
+            logo.boxes !== null && logo.boxes !== undefined ? deepClone(logo.boxes) : undefined;
         const saveTurtleHeaps =
-            logo.turtleHeaps[turtle] != null ? deepClone(logo.turtleHeaps[turtle]) : undefined;
+            logo.turtleHeaps[turtle] !== null && logo.turtleHeaps[turtle] !== undefined
+                ? deepClone(logo.turtleHeaps[turtle])
+                : undefined;
         const saveTurtleDicts =
-            logo.turtleDicts[turtle] != null ? deepClone(logo.turtleDicts[turtle]) : undefined;
+            logo.turtleDicts[turtle] !== null && logo.turtleDicts[turtle] !== undefined
+                ? deepClone(logo.turtleDicts[turtle])
+                : undefined;
         // .. and the turtle state
         const saveX = tur.x;
         const saveY = tur.y;
@@ -546,17 +553,17 @@ class Singer {
         tur.singer.tallyNotes = saveTallyNotes;
 
         // Restore previous state
-        if (saveBoxes == undefined) {
+        if (saveBoxes === undefined) {
             logo.boxes = {};
         } else {
             logo.boxes = saveBoxes;
         }
-        if (saveTurtleHeaps == undefined) {
+        if (saveTurtleHeaps === undefined) {
             logo.turtleHeaps = {};
         } else {
             logo.turtleHeaps[turtle] = saveTurtleHeaps;
         }
-        if (saveTurtleDicts == undefined) {
+        if (saveTurtleDicts === undefined) {
             logo.turtleDicts = {};
         } else {
             logo.turtleDicts[turtle] = saveTurtleDicts;
@@ -605,11 +612,16 @@ class Singer {
 
         const saveState = {
             suppressOutput: tur.singer.suppressOutput,
-            boxes: logo.boxes != null ? deepClone(logo.boxes) : undefined,
+            boxes:
+                logo.boxes !== null && logo.boxes !== undefined ? deepClone(logo.boxes) : undefined,
             turtleHeaps:
-                logo.turtleHeaps[turtle] != null ? deepClone(logo.turtleHeaps[turtle]) : undefined,
+                logo.turtleHeaps[turtle] !== null && logo.turtleHeaps[turtle] !== undefined
+                    ? deepClone(logo.turtleHeaps[turtle])
+                    : undefined,
             turtleDicts:
-                logo.turtleDicts[turtle] != null ? deepClone(logo.turtleDicts[turtle]) : undefined,
+                logo.turtleDicts[turtle] !== null && logo.turtleDicts[turtle] !== undefined
+                    ? deepClone(logo.turtleDicts[turtle])
+                    : undefined,
             x: tur.x,
             y: tur.y,
             color: tur.painter.color,
@@ -666,11 +678,16 @@ class Singer {
             penState: saveState.penState
         });
 
-        activity.logo.boxes = saveState.boxes != null ? saveState.boxes : {};
+        activity.logo.boxes =
+            saveState.boxes !== null && saveState.boxes !== undefined ? saveState.boxes : {};
         activity.logo.turtleHeaps[turtle] =
-            saveState.turtleHeaps != null ? saveState.turtleHeaps : {};
+            saveState.turtleHeaps !== null && saveState.turtleHeaps !== undefined
+                ? saveState.turtleHeaps
+                : {};
         activity.logo.turtleDicts[turtle] =
-            saveState.turtleDicts != null ? saveState.turtleDicts : {};
+            saveState.turtleDicts !== null && saveState.turtleDicts !== undefined
+                ? saveState.turtleDicts
+                : {};
 
         tur.painter.doPenUp();
         tur.painter.doSetXY(saveState.x, saveState.y);
@@ -1070,7 +1087,7 @@ class Singer {
                 for (let i = 0, len = transpositionRatios.length; i < len; i++) {
                     ratio *= transpositionRatios[i];
                 }
-                if (ratio != 1) {
+                if (ratio !== 1) {
                     const hertz = getCachedPitchToFrequency(
                         noteObj[0],
                         noteObj[1],
@@ -1739,6 +1756,7 @@ class Singer {
                             tur.singer.noteBeat[saveBlk],
                             tur.singer.noteBeatValues[saveBlk],
                             tur.singer.noteDrums[saveBlk],
+                            tur.singer.noteDrumTranspositions[saveBlk],
                             tur.singer.embeddedGraphics[saveBlk]
                         ];
 
@@ -1761,7 +1779,8 @@ class Singer {
                         tur.singer.noteBeat[saveBlk] = tur.singer.tieNoteExtras[2];
                         tur.singer.noteBeatValues[saveBlk] = tur.singer.tieNoteExtras[3];
                         tur.singer.noteDrums[saveBlk] = tur.singer.tieNoteExtras[4];
-                        tur.singer.embeddedGraphics[saveBlk] = tur.singer.tieNoteExtras[5];
+                        tur.singer.noteDrumTranspositions[saveBlk] = tur.singer.tieNoteExtras[5];
+                        tur.singer.embeddedGraphics[saveBlk] = tur.singer.tieNoteExtras[6];
 
                         if (tur.singer.justCounting.length === 0) {
                             // Remove the note from the Lilypond list
@@ -1774,11 +1793,11 @@ class Singer {
                         tur.singer.tie = false;
                         tieDelay = 0;
 
-                        // tieNoteExtras: [blk, oscList, noteBeat, noteBeatValues, noteDrums, graphics, isOsc, rawDurationValue]
+                        // tieNoteExtras: [blk, oscList, noteBeat, noteBeatValues, noteDrums, noteDrumTranspositions, graphics, isOsc, rawDurationValue]
                         Singer.processNote(
                             activity,
-                            tur.singer.tieNoteExtras[7], // rawDurationValue
-                            tur.singer.tieNoteExtras[6], // isOsc
+                            tur.singer.tieNoteExtras[8], // rawDurationValue
+                            tur.singer.tieNoteExtras[7], // isOsc
                             saveBlk,
                             turtle
                         );
@@ -1786,8 +1805,8 @@ class Singer {
                         tur.singer.inNoteBlock.pop();
 
                         if (!tur.singer.suppressOutput) {
-                            const rawDuration = tur.singer.tieNoteExtras[7];
-                            const wasOsc = tur.singer.tieNoteExtras[6];
+                            const rawDuration = tur.singer.tieNoteExtras[8];
+                            const wasOsc = tur.singer.tieNoteExtras[7];
 
                             const waitSeconds = wasOsc
                                 ? rawDuration / 1000
@@ -1818,7 +1837,8 @@ class Singer {
                         tur.singer.noteBeat[saveBlk] = saveCurrentExtras[2];
                         tur.singer.noteBeatValues[saveBlk] = saveCurrentExtras[3];
                         tur.singer.noteDrums[saveBlk] = saveCurrentExtras[4];
-                        tur.singer.embeddedGraphics[saveBlk] = saveCurrentExtras[5];
+                        tur.singer.noteDrumTranspositions[saveBlk] = saveCurrentExtras[5];
+                        tur.singer.embeddedGraphics[saveBlk] = saveCurrentExtras[6];
                     }
                 }
 
@@ -1842,13 +1862,17 @@ class Singer {
                         tur.singer.noteBeat[saveBlk],
                         tur.singer.noteBeatValues[saveBlk],
                         tur.singer.noteDrums[saveBlk],
+                        tur.singer.noteDrumTranspositions[saveBlk],
                         [],
                         isOsc,
                         noteValue // rawDurationValue
                     ];
 
                     // We play any drums in the first tied note along with the drums in the second tied note
-                    tur.singer.tieFirstDrums = tur.singer.noteDrums[saveBlk];
+                    tur.singer.tieFirstDrums = [...tur.singer.noteDrums[saveBlk]];
+                    tur.singer.tieFirstDrumTranspositions = [
+                        ...(tur.singer.noteDrumTranspositions[saveBlk] || [])
+                    ];
                     noteBeatValue = 0;
                 } else {
                     carry = tur.singer.tieCarryOver;
@@ -1867,7 +1891,10 @@ class Singer {
             if (tur.singer.swing.length > 0) {
                 /** @deprecated */
                 // newswing2 takes the target as an argument
-                if (last(tur.singer.swingTarget) == null) {
+                if (
+                    last(tur.singer.swingTarget) === null ||
+                    last(tur.singer.swingTarget) === undefined
+                ) {
                     // When we start a swing we need to keep track of the initial beat value
                     tur.singer.swingTarget[tur.singer.swingTarget.length - 1] = noteBeatValue;
                 }
@@ -2424,14 +2451,32 @@ class Singer {
 
                 // Process drums
                 if (tur.singer.noteDrums[thisBlk].length > 0) {
+                    const drumTranspositions = [];
+                    const addDrumHit = (drumName, transposition) => {
+                        for (let i = 0; i < drums.length; i++) {
+                            if (
+                                drums[i] === drumName &&
+                                drumTranspositions[i] === (transposition || 0)
+                            ) {
+                                return;
+                            }
+                        }
+
+                        drums.push(drumName);
+                        drumTranspositions.push(transposition || 0);
+                    };
+
+                    const currentDrumTranspositions =
+                        tur.singer.noteDrumTranspositions[thisBlk] || [];
                     for (let i = 0; i < tur.singer.noteDrums[thisBlk].length; i++) {
-                        drums.push(tur.singer.noteDrums[thisBlk][i]);
+                        addDrumHit(tur.singer.noteDrums[thisBlk][i], currentDrumTranspositions[i]);
                     }
 
                     for (let i = 0; i < tur.singer.tieFirstDrums.length; i++) {
-                        if (!drums.includes(tur.singer.tieFirstDrums[i])) {
-                            drums.push(tur.singer.tieFirstDrums[i]);
-                        }
+                        addDrumHit(
+                            tur.singer.tieFirstDrums[i],
+                            tur.singer.tieFirstDrumTranspositions[i]
+                        );
                     }
 
                     // If it is > 0, we already counted this note (e.g. pitch & drum combination)
@@ -2466,7 +2511,8 @@ class Singer {
                                                 null,
                                                 null,
                                                 false,
-                                                future
+                                                future,
+                                                0
                                             );
                                         }
                                     } else {
@@ -2479,7 +2525,8 @@ class Singer {
                                                 null,
                                                 null,
                                                 false,
-                                                future
+                                                future,
+                                                drumTranspositions[i]
                                             );
                                         }
                                     }

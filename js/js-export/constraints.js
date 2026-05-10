@@ -835,6 +835,17 @@ var __MB_methodArgConstraints = {
             }
         }
     ],
+    playPitchDrum: [
+        {
+            type: "string",
+            constraints: {
+                type: "drum"
+            }
+        },
+        {
+            type: "number"
+        }
+    ],
     setDrum: [
         {
             type: "string",

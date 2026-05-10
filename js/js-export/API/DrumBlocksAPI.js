@@ -32,6 +32,11 @@ class DrumBlocksAPI {
         return this.runCommand("playDrum", [args[0], this.turIndex, MusicBlocks.BLK]);
     }
 
+    playPitchDrum(drum, shift) {
+        const args = JSInterface.validateArgs("playPitchDrum", [drum, shift]);
+        return this.runCommand("playPitchDrum", [args[0], args[1], this.turIndex, MusicBlocks.BLK]);
+    }
+
     async setDrum(drum, flow) {
         const args = JSInterface.validateArgs("setDrum", [drum, flow]);
         await this.runCommand("setDrum", [args[0], this.turIndex]);
