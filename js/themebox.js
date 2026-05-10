@@ -564,6 +564,22 @@ class ThemeBox {
                 applyPlanetTheme();
             } else {
                 planetIframe.addEventListener("load", applyPlanetTheme, { once: true });
+        // Update planet iframe theme via postMessage instead of directly
+        // accessing iframe.contentDocument (which breaks under sandboxing
+        // or cross-origin isolation).
+        const planetIframe = document.getElementById("planet-iframe");
+        if (planetIframe && planetIframe.contentWindow) {
+            try {
+                const remove = this._themes.filter(t => t !== this._theme);
+                planetIframe.contentWindow.postMessage(
+                    {
+                        type: "MB_APPLY_THEME",
+                        payload: { add: [this._theme], remove }
+                    },
+                    "*"
+                );
+            } catch (e) {
+                console.debug("Could not update planet iframe theme:", e);
             }
         }
     }
