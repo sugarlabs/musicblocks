@@ -56,8 +56,11 @@ requirejs.config({
         "p5-sound-adapter": {
             deps: ["p5.sound.min"]
         },
+        "utils/utils-logic": {
+            exports: "UtilsLogic"
+        },
         "utils/utils": {
-            deps: ["utils/platformstyle"],
+            deps: ["utils/platformstyle", "utils/utils-logic"],
             exports: "_"
         },
         "utils/retryWithBackoff": {
@@ -405,6 +408,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                 "tweenjs.min",
                 "preloadjs.min",
                 "utils/platformstyle",
+                "utils/utils-logic",
                 "utils/utils",
                 "activity/turtledefs",
                 "activity/block",

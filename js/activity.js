@@ -90,6 +90,7 @@ let MYDEFINES = [
     // Chart.js is only used by the statistics widget and will be loaded
     // on demand when the widget is opened, saving ~3-5 MB of heap memory.
     // "Chart",
+    "utils/utils-logic",
     "utils/utils",
     "utils/retryWithBackoff",
     "utils/debugLog",
