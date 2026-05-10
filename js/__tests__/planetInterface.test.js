@@ -22,6 +22,7 @@ global.platformColor = {
     header: "#8bc34a"
 };
 global._THIS_IS_MUSIC_BLOCKS_ = {};
+global._ = jest.fn(str => str);
 global.doSVG = jest.fn();
 
 const mockActivity = {
@@ -222,7 +223,7 @@ describe("PlanetInterface", () => {
         planetInterface.planet = { ProjectStorage: { saveLocally: jest.fn() } };
 
         return planetInterface.saveLocally().then(() => {
-            expect(mockActivity.stage.update).toHaveBeenCalledWith(undefined);
+            expect(mockActivity.stage.update).toHaveBeenCalledWith();
             expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenCalledWith(D, null);
         });
     });
@@ -332,6 +333,7 @@ describe("PlanetInterface", () => {
         planetInterface.showPlanet();
 
         expect(console.error).toHaveBeenCalled();
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith("Planet view is not ready yet.");
     });
     test("saveLocally: non-empty SVG triggers image‑onload path", done => {
         doSVG.mockReturnValue("<svg/>");
