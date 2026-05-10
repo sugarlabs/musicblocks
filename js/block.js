@@ -281,6 +281,7 @@ class Block {
         this.collapsed = false; // Is this collapsible block collapsed?
         this.inCollapsed = false; // Is this block in a collapsed stack?
         this.trash = false; // Is this block in the trash?
+        this.disabled = false; // Is this block disabled (skipped during execution)?
         this.loadComplete = false; // Has the block finished loading?
         this.label = null; // Editable textview in DOM.
         this.labelattr = null; // Editable textview in DOM.
@@ -2514,6 +2515,26 @@ class Block {
         this.updateCache();
         this.unhighlight();
         this.activity.refreshCanvas();
+    }
+
+    /**
+     * Toggles the disabled state of the block.
+     * When disabled, the block is skipped during execution.
+     */
+    toggleDisabled() {
+        this.disabled = !this.disabled;
+        // Reduce opacity when disabled to give visual feedback
+        this.container.alpha = this.disabled ? 0.5 : 1;
+        this.updateCache();
+        this.activity.refreshCanvas();
+    }
+
+    /**
+     * Checks if the block is disabled.
+     * @returns {boolean} true if the block is disabled
+     */
+    isDisabled() {
+        return this.disabled;
     }
 
     /**

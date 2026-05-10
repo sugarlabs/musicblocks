@@ -3761,6 +3761,7 @@ const piemenuBlockContext = block => {
         "imgsrc:header-icons/copy-button.svg",
         "imgsrc:header-icons/extract-button.svg",
         "imgsrc:header-icons/empty-trash-button.svg",
+        "imgsrc:header-icons/stop-button.svg",
         "imgsrc:header-icons/cancel-button.svg"
     ];
 
@@ -3798,13 +3799,14 @@ const piemenuBlockContext = block => {
     wheel.navItems[0].setTooltip(_("Duplicate"));
     wheel.navItems[1].setTooltip(_("Extract"));
     wheel.navItems[2].setTooltip(_("Move to trash"));
-    wheel.navItems[3].setTooltip(_("Close"));
+    wheel.navItems[3].setTooltip(block.disabled ? _("Enable") : _("Disable"));
+    wheel.navItems[4].setTooltip(_("Close"));
     if (
         ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].includes(
             block.blocks.blockList[topBlock].name
         )
     ) {
-        wheel.navItems[4].setTooltip(_("Save stack"));
+        wheel.navItems[5].setTooltip(_("Save stack"));
     }
 
     if (helpButton !== null) {
@@ -3861,6 +3863,12 @@ const piemenuBlockContext = block => {
     };
 
     wheel.navItems[3].navigateFunction = () => {
+        that.blocks.activeBlock = blockBlock;
+        that.blocks.blockList[blockBlock].toggleDisabled();
+        docById("contextWheelDiv").style.display = "none";
+    };
+
+    wheel.navItems[4].navigateFunction = () => {
         docById("contextWheelDiv").style.display = "none";
     };
 
@@ -3886,7 +3894,7 @@ const piemenuBlockContext = block => {
             block.name
         )
     ) {
-        wheel.navItems[4].navigateFunction = () => {
+        wheel.navItems[5].navigateFunction = () => {
             that.blocks.activeBlock = blockBlock;
             that.blocks.prepareStackForCopy();
             that.blocks.saveStack();
