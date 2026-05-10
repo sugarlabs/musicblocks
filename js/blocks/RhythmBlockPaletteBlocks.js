@@ -145,7 +145,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 // polyphonic rhythms.
                 if (logo.rhythmRulerMeasure === null) {
                     logo.rhythmRulerMeasure = arg0 * arg1;
-                } else if (logo.rhythmRulerMeasure != arg0 * arg1) {
+                } else if (logo.rhythmRulerMeasure !== arg0 * arg1) {
                     activity.textMsg(_("polyphonic rhythm"));
                 }
 
@@ -187,7 +187,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 const bpmFactor =
                     TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
 
-                const beatValue = bpmFactor == null ? 1 : bpmFactor / noteBeatValue;
+                const beatValue = bpmFactor === null ? 1 : bpmFactor / noteBeatValue;
 
                 let __callback;
 
