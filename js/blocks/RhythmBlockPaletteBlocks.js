@@ -140,7 +140,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 // polyphonic rhythms.
                 if (logo.rhythmRulerMeasure === null) {
                     logo.rhythmRulerMeasure = arg0 * arg1;
-                } else if (logo.rhythmRulerMeasure != arg0 * arg1) {
+                } else if (logo.rhythmRulerMeasure !== arg0 * arg1) {
                     activity.textMsg(_("polyphonic rhythm"));
                 }
 
@@ -182,7 +182,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 const bpmFactor =
                     TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
 
-                const beatValue = bpmFactor == null ? 1 : bpmFactor / noteBeatValue;
+                const beatValue = bpmFactor === null ? 1 : bpmFactor / noteBeatValue;
 
                 let __callback;
 
@@ -1024,7 +1024,8 @@ function isAppleBrowser() {
     const userAgent = navigator.userAgent;
     const isMac = userAgent.includes("Macintosh");
     const isIPad =
-        userAgent.includes("iPad") || (userAgent.includes("Macintosh") && "ontouchend" in document); // Detects iPad in desktop mode
+        (navigator.maxTouchPoints > 0 && userAgent.includes("Macintosh")) ||
+        userAgent.includes("iPad");
     const isSafari = userAgent.includes("Safari") && !userAgent.includes("Chrome");
     const isChrome = userAgent.includes("Chrome");
     return (isMac || isIPad) && (isSafari || isChrome);
