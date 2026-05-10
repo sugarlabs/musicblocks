@@ -1772,6 +1772,26 @@ describe("noteToPitchOctave", () => {
         const result = noteToPitchOctave("B#");
         expect(result).toEqual(["B", NaN]); // No octave, returns NaN for octave
     });
+
+    it("should correctly extract pitch and octave from a note string with multi-digit octave", () => {
+        const result = noteToPitchOctave("C10");
+        expect(result).toEqual(["C", 10]); // Pitch is 'C' and octave is 10
+    });
+
+    it("should correctly extract pitch and octave from a sharp note with multi-digit octave", () => {
+        const result = noteToPitchOctave("C#11");
+        expect(result).toEqual(["C#", 11]); // Pitch is 'C#' and octave is 11
+    });
+
+    it("should correctly extract pitch and octave from a flat note with multi-digit octave", () => {
+        const result = noteToPitchOctave("Db12");
+        expect(result).toEqual(["Db", 12]); // Pitch is 'Db' and octave is 12
+    });
+
+    it("should correctly handle a note string with lowercase pitch and multi-digit octave", () => {
+        const result = noteToPitchOctave("g20");
+        expect(result).toEqual(["g", 20]); // Pitch is 'g' and octave is 20
+    });
 });
 
 describe("pitchToFrequency", () => {

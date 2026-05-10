@@ -19,7 +19,7 @@
    noteIsSolfege, isCustomTemperament, i18nSolfege, getNote, DEFAULTDRUM, last,
    DRUMS, SHARP, FLAT, PREVIEWVOLUME, DEFAULTVOLUME, noteToFrequency,
    LCD, calcNoteValueToDisplay, NOTESYMBOLS,
-   EIGHTHNOTEWIDTH, docBySelector, getTemperament, normalizeNoteAccidentals
+   EIGHTHNOTEWIDTH, docBySelector, getTemperament, normalizeNoteAccidentals, parseNoteString
 */
 
 /*
@@ -4741,7 +4741,7 @@ class PhraseMaker {
                                 ]);
                                 newStack.push([
                                     thisBlock + 2,
-                                    ["number", { value: note[0][j].slice(-1) }],
+                                    ["number", { value: parseNoteString(note[0][j])[1] }],
                                     0,
                                     0,
                                     [thisBlock]
@@ -4807,7 +4807,7 @@ class PhraseMaker {
                                 ]);
                                 newStack.push([
                                     thisBlock + 2,
-                                    ["number", { value: note[0][j].slice(-1) }],
+                                    ["number", { value: parseNoteString(note[0][j])[1] }],
                                     0,
                                     0,
                                     [thisBlock]
@@ -4869,7 +4869,7 @@ class PhraseMaker {
                                 ]);
                                 newStack.push([
                                     thisBlock + 2,
-                                    ["number", { value: note[0][j].slice(-1) }],
+                                    ["number", { value: parseNoteString(note[0][j])[1] }],
                                     0,
                                     0,
                                     [thisBlock]
