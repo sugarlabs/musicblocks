@@ -435,7 +435,7 @@ describe("setupPitchBlocks", () => {
     describe("Transposition Blocks", () => {
         it("SetRatioTranspositionBlock", () => {
             const block = createdBlocks["setratio"];
-            const spy = jest.spyOn(console, "log").mockImplementation(() => {});
+            const spy = jest.spyOn(console, "warn").mockImplementation(() => {});
 
             activity.blocks.blockList[10].connections[1] = 20;
 
