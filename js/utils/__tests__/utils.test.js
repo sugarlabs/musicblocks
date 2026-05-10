@@ -92,7 +92,13 @@ const {
     closeWidgets,
     closeBlkWidgets,
     resolveObject,
-    importMembers
+    importMembers,
+    getTextWidth,
+    doSVG,
+    unescapeHTML,
+    isSafeUrl,
+    processMacroData,
+    prepareMacroExports
 } = require("../utils.js");
 
 describe("Utility Functions (logic-only)", () => {
@@ -795,6 +801,198 @@ describe("Utility Functions (logic-only)", () => {
         it("should return original string if no placeholders exist", () => {
             const result = format("Hello world", { name: "User" });
             expect(result).toBe("Hello world");
+        });
+    });
+    describe("getTextWidth()", () => {
+        let originalCreateElement;
+        beforeAll(() => {
+            originalCreateElement = document.createElement;
+        });
+        afterAll(() => {
+            document.createElement = originalCreateElement;
+            delete getTextWidth.canvas;
+        });
+        beforeEach(() => {
+            delete getTextWidth.canvas;
+        });
+
+        it("creates canvas only once and reuses cached canvas", () => {
+            const mockMeasureText = jest.fn(() => ({ width: 100 }));
+            const mockCanvas = {
+                getContext: jest.fn(() => ({
+                    font: "",
+                    measureText: mockMeasureText
+                }))
+            };
+            document.createElement = jest.fn(() => mockCanvas);
+            const width1 = getTextWidth("hello", "16px Arial");
+            const width2 = getTextWidth("world", "16px Arial");
+            expect(width1).toBe(100);
+            expect(width2).toBe(100);
+            expect(document.createElement).toHaveBeenCalledTimes(1);
+            expect(mockMeasureText).toHaveBeenCalledTimes(2);
+        });
+    });
+
+    describe("doSVG()", () => {
+        it("returns empty string when turtles produce no SVG output", () => {
+            const mockPainter = {
+                closeSVG: jest.fn(),
+                svgOutput: ""
+            };
+            const turtles = {
+                turtleList: { a: {} },
+                getTurtle: jest.fn(() => ({
+                    painter: mockPainter
+                }))
+            };
+            const logo = {
+                svgOutput: "<logo />"
+            };
+            const result = doSVG({}, logo, turtles, 100, 100, 1);
+            expect(result).toBe("");
+            expect(mockPainter.closeSVG).toHaveBeenCalled();
+        });
+        it("aggregates turtle SVG output into final SVG", () => {
+            const mockPainter = {
+                closeSVG: jest.fn(),
+                svgOutput: "<path />"
+            };
+            const turtles = {
+                turtleList: { a: {}, b: {} },
+                getTurtle: jest.fn(() => ({
+                    painter: mockPainter
+                }))
+            };
+            const logo = {
+                svgOutput: "<logo />"
+            };
+            const result = doSVG({}, logo, turtles, 200, 300, 2);
+            expect(result).toContain("<svg");
+            expect(result).toContain("<logo />");
+            expect(result).toContain("<path />");
+            expect(result).toContain('transform="scale(2,2)"');
+            expect(mockPainter.closeSVG).toHaveBeenCalledTimes(2);
+        });
+    });
+
+    describe("unescapeHTML()", () => {
+        it("unescapes multiple HTML entities correctly", () => {
+            const input = "&lt;div&gt;Hello &amp; Welcome&lt;/div&gt;";
+            const result = unescapeHTML(input);
+            expect(result).toBe("<div>Hello & Welcome</div>");
+        });
+        it("unescapes quotes and apostrophes", () => {
+            const input = "&quot;Music Blocks&#039;&quot;";
+            const result = unescapeHTML(input);
+            expect(result).toBe('"Music Blocks\'"');
+        });
+        it("returns original string when no entities exist", () => {
+            const input = "plain text";
+            const result = unescapeHTML(input);
+            expect(result).toBe("plain text");
+        });
+        it("handles mixed escaped and unescaped content", () => {
+            const input = "Tom &amp; Jerry &lt;3";
+            const result = unescapeHTML(input);
+            expect(result).toBe("Tom & Jerry <3");
+        });
+    });
+
+    describe("isSafeUrl()", () => {
+        it("returns true for http URLs", () => {
+            expect(isSafeUrl("http://example.com")).toBe(true);
+        });
+        it("returns true for https URLs", () => {
+            expect(isSafeUrl("https://example.com")).toBe(true);
+        });
+        it("returns false for javascript protocol", () => {
+            expect(isSafeUrl("javascript:alert(1)")).toBe(false);
+        });
+        it("returns false for data URLs", () => {
+            expect(isSafeUrl("data:text/html;base64,abc")).toBe(false);
+        });
+        it("returns false for malformed URLs", () => {
+            expect(isSafeUrl("not a valid url")).toBe(false);
+        });
+    });
+
+    describe("processMacroData()", () => {
+        let palettes;
+        let blocks;
+        let macroDict;
+        beforeEach(() => {
+            palettes = {
+                add: jest.fn(),
+                makePalettes: jest.fn()
+            };
+            blocks = {
+                addToMyPalette: jest.fn()
+            };
+            macroDict = {};
+        });
+        it("does not mutate state for undefined macro data", () => {
+            processMacroData(undefined, palettes, blocks, macroDict);
+            expect(macroDict).toEqual({});
+            expect(palettes.add).not.toHaveBeenCalled();
+            expect(blocks.addToMyPalette).not.toHaveBeenCalled();
+        });
+        it('does not mutate state for empty "{}" macro data', () => {
+            processMacroData("{}", palettes, blocks, macroDict);
+            expect(macroDict).toEqual({});
+            expect(palettes.add).not.toHaveBeenCalled();
+            expect(blocks.addToMyPalette).not.toHaveBeenCalled();
+        });
+        it("processes valid macro data and updates palettes + macro dictionary", () => {
+            const data = JSON.stringify({
+                testMacro: ["note", "pitch"]
+            });
+            processMacroData(data, palettes, blocks, macroDict);
+            expect(macroDict).toEqual({
+                testMacro: ["note", "pitch"]
+            });
+            expect(palettes.add).toHaveBeenCalledWith("myblocks", "black", "#a0a0a0");
+            expect(blocks.addToMyPalette).toHaveBeenCalledWith("testMacro", ["note", "pitch"]);
+            expect(palettes.makePalettes).toHaveBeenCalledWith(1);
+        });
+        it("handles malformed JSON without mutating state", () => {
+            const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+            const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+            processMacroData("{invalid-json", palettes, blocks, macroDict);
+            expect(macroDict).toEqual({});
+            expect(palettes.add).not.toHaveBeenCalled();
+            expect(blocks.addToMyPalette).not.toHaveBeenCalled();
+            debugSpy.mockRestore();
+            logSpy.mockRestore();
+        });
+    });
+
+    describe("prepareMacroExports()", () => {
+        it("adds macro stack when name is provided", () => {
+            const macroDict = {};
+            const result = prepareMacroExports("testMacro", ["note", "pitch"], macroDict);
+            expect(macroDict).toEqual({
+                testMacro: ["note", "pitch"]
+            });
+            expect(result).toBe(
+                JSON.stringify({
+                    testMacro: ["note", "pitch"]
+                })
+            );
+        });
+        it("does not mutate macro dictionary when name is null", () => {
+            const macroDict = {
+                existing: ["old"]
+            };
+            const result = prepareMacroExports(null, ["new"], macroDict);
+            expect(macroDict).toEqual({
+                existing: ["old"]
+            });
+            expect(result).toBe(
+                JSON.stringify({
+                    existing: ["old"]
+                })
+            );
         });
     });
 });

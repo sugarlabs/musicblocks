@@ -2099,6 +2099,12 @@ if (typeof module !== "undefined" && module.exports) {
         closeBlkWidgets,
         resolveObject,
         importMembers,
-        escapeHTML
+        escapeHTML,
+        getTextWidth,
+        doSVG,
+        unescapeHTML,
+        isSafeUrl,
+        processMacroData,
+        prepareMacroExports
     };
 }
