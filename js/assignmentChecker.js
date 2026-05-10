@@ -37,6 +37,8 @@ function extractNotes(tune) {
 
 /**
  * Compares a student's ABC output against a target ABC string.
+ * Only the first tune in each file is compared; multi-tune ABC files are
+ * not fully supported (saveAbcOutput always produces a single tune).
  * Scores based on how many notes match in sequence (pitch only).
  *
  * @param {string} targetABC - The assignment target

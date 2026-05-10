@@ -129,3 +129,18 @@ describe("compareAssignment", () => {
         expect(compareAssignment("target", "student")).toEqual({ score: 0, matched: 0, total: 0 });
     });
 });
+
+describe("multi-tune behaviour", () => {
+    beforeEach(() => {
+        global.ABCJS.parseOnly.mockReset();
+    });
+
+    it("compares only the first tune when multiple tunes are present", () => {
+        global.ABCJS.parseOnly
+            .mockReturnValueOnce([makeTune([0, 1, 2]), makeTune([5, 6, 7])])
+            .mockReturnValueOnce([makeTune([0, 1, 2])]);
+        const result = compareAssignment("target", "student");
+        expect(result.score).toBe(100);
+        expect(result.total).toBe(3);
+    });
+});
