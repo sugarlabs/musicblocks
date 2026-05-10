@@ -248,14 +248,26 @@ class HelpWidget {
                         // We need to add a case here whenever we add
                         // help artwort support for a new language.
                         // e.g., documentation-es
-                        let language = localStorage.languagePreference;
+                        let language;
+                        try {
+                            language = localStorage.languagePreference;
+                        } catch (e) {
+                            language = undefined;
+                        }
                         if (language === undefined) {
                             language = navigator.language;
                         }
 
+                        let kanaPreference;
+                        try {
+                            kanaPreference = localStorage.kanaPreference;
+                        } catch (e) {
+                            kanaPreference = undefined;
+                        }
+
                         switch (language) {
                             case "ja":
-                                if (localStorage.kanaPreference === "kana") {
+                                if (kanaPreference === "kana") {
                                     path = path + "-kana";
                                 } else {
                                     path = path + "-ja";
@@ -747,14 +759,26 @@ class HelpWidget {
                     // We need to add a case here whenever we add
                     // help artwort support for a new language.
                     // e.g., documentation-es
-                    let language = localStorage.languagePreference;
+                    let language;
+                    try {
+                        language = localStorage.languagePreference;
+                    } catch (e) {
+                        language = undefined;
+                    }
                     if (language === undefined) {
                         language = navigator.language;
                     }
 
+                    let kanaPreference;
+                    try {
+                        kanaPreference = localStorage.kanaPreference;
+                    } catch (e) {
+                        kanaPreference = undefined;
+                    }
+
                     switch (language) {
                         case "ja":
-                            if (localStorage.kanaPreference === "kana") {
+                            if (kanaPreference === "kana") {
                                 path = path + "-kana";
                             } else {
                                 path = path + "-ja";
