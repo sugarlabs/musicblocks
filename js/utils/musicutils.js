@@ -6069,15 +6069,26 @@ const splitScaleDegree = value => {
  * @param {number} delta - The delta to adjust the value.
  * @returns {Array} An array containing the note and octave.
  */
-const getNumNote = (value, delta) => {
-    // Converts from number to note
+const getNumNote = (value, delta, temperament) => {
+    // Converts from number to note.
+    // Respects the active temperament octave size so that non-12-EDO
+    // tuning systems wrap correctly instead of always assuming 12 semitones.
     let num = value + delta;
-    let octave = Math.floor(num / 12);
-    num = num % 12;
 
-    const note = NOTESTABLE[num];
+    const octaveSize =
+        temperament &&
+        TEMPERAMENT[temperament] &&
+        TEMPERAMENT[temperament]["pitchNumber"]
+            ? TEMPERAMENT[temperament]["pitchNumber"]
+            : 12;
 
-    if (note[num] === "ti") {
+    let octave = Math.floor(num / octaveSize);
+    num = ((num % octaveSize) + octaveSize) % octaveSize;
+
+    const tableIndex = Math.round((num / octaveSize) * 12) % 12;
+    const note = NOTESTABLE[tableIndex];
+
+    if (note === "ti") {
         octave -= 1;
     }
 
