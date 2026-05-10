@@ -9,8 +9,6 @@
  * (at your option) any later version.
  */
 
-"use strict";
-
 const { extractNotes, compareAssignment } = require("../assignmentChecker");
 
 // ABCJS is a browser library — mock parseOnly for Node/Jest
