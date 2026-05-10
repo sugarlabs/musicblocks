@@ -404,6 +404,9 @@ class WidgetWindow {
         if (language === undefined) {
             language = navigator.language;
         }
+        if (language === undefined) {
+            language = navigator.language;
+        }
 
         // For Japanese, put the toolbar on the top.
         if (language === "ja") {

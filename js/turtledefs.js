@@ -329,6 +329,9 @@ const createDefaultStack = () => {
         if (language === undefined) {
             language = navigator.language;
         }
+        if (language === undefined) {
+            language = navigator.language;
+        }
 
         if (language === "ja") {
             DATAOBJS = [
@@ -417,6 +420,9 @@ const createHelpContent = activity => {
         language = localStorage.languagePreference;
     } catch (e) {
         language = undefined;
+    }
+    if (language === undefined) {
+        language = navigator.language;
     }
     if (language === undefined) {
         language = navigator.language;
