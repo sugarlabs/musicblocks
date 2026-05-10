@@ -21,6 +21,8 @@
  */
 
 const PhraseMaker = require("../phrasemaker.js");
+const PhraseMakerAudio = require("../PhraseMakerAudio.js");
+const ManagedTimer = require("../../utils/ManagedTimer.js");
 
 // --- Global Mocks ---
 
@@ -54,6 +56,8 @@ global.PhraseMakerUtils = {
 global.PhraseMakerUI = {
     calculateNoteWidth: jest.fn(() => 100)
 };
+global.PhraseMakerAudio = PhraseMakerAudio;
+global.ManagedTimer = ManagedTimer;
 global.DEFAULTVOICE = "electronic synth";
 global.DEFAULTDRUM = "kick drum";
 global.DEFAULTVOLUME = 50;
@@ -187,6 +191,7 @@ describe("PhraseMaker Widget", () => {
 
     beforeEach(() => {
         jest.useFakeTimers();
+        global.PhraseMakerAudio = PhraseMakerAudio;
 
         mockDeps = {
             platformColor: global.platformColor,
@@ -214,6 +219,9 @@ describe("PhraseMaker Widget", () => {
     });
 
     afterEach(() => {
+        if (phraseMaker && typeof phraseMaker._clearWidgetTimers === "function") {
+            phraseMaker._clearWidgetTimers();
+        }
         jest.useRealTimers();
         jest.clearAllMocks();
     });
@@ -369,6 +377,81 @@ describe("PhraseMaker Widget", () => {
             expect(phraseMaker._matrixHasTuplets).toBe(false);
             phraseMaker._matrixHasTuplets = true;
             expect(phraseMaker._matrixHasTuplets).toBe(true);
+        });
+    });
+
+    describe("timer lifecycle", () => {
+        test("tracks and clears widget-owned timeouts", () => {
+            const callback = jest.fn();
+
+            phraseMaker._setWidgetTimeout(callback, 500);
+
+            expect(phraseMaker._timerManager.activeTimeoutCount).toBe(1);
+            expect(phraseMaker._clearWidgetTimers()).toBe(1);
+
+            jest.advanceTimersByTime(500);
+
+            expect(callback).not.toHaveBeenCalled();
+            expect(phraseMaker._timerManager.activeTimeoutCount).toBe(0);
+        });
+
+        test("schedules chord preview playback through widget timers", () => {
+            const trigger = jest.fn();
+            phraseMaker.activity = {
+                logo: {
+                    synth: {
+                        trigger
+                    }
+                }
+            };
+            phraseMaker._instrumentName = "electronic synth";
+
+            PhraseMakerAudio._playChord(phraseMaker, ["C4", "E4"], 0.25);
+
+            expect(phraseMaker._timerManager.activeTimeoutCount).toBe(2);
+
+            jest.advanceTimersByTime(1);
+
+            expect(trigger).toHaveBeenCalledTimes(2);
+            expect(trigger).toHaveBeenNthCalledWith(
+                1,
+                0,
+                "C4",
+                0.25,
+                "electronic synth",
+                null,
+                null
+            );
+            expect(trigger).toHaveBeenNthCalledWith(
+                2,
+                0,
+                "E4",
+                0.25,
+                "electronic synth",
+                null,
+                null
+            );
+            expect(phraseMaker._timerManager.activeTimeoutCount).toBe(0);
+        });
+
+        test("cancels pending chord preview playback when widget timers are cleared", () => {
+            const trigger = jest.fn();
+            phraseMaker.activity = {
+                logo: {
+                    synth: {
+                        trigger
+                    }
+                }
+            };
+            phraseMaker._instrumentName = "electronic synth";
+
+            PhraseMakerAudio._playChord(phraseMaker, ["C4", "E4"], 0.25);
+            expect(phraseMaker._clearWidgetTimers()).toBe(2);
+
+            jest.advanceTimersByTime(1);
+
+            expect(trigger).not.toHaveBeenCalled();
+            expect(phraseMaker._timerManager.activeTimeoutCount).toBe(0);
         });
     });
 

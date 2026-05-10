@@ -18,6 +18,22 @@
 
 const PhraseMakerAudio = {
     /**
+     * Schedules a timeout through the owning PhraseMaker instance when available.
+     * @private
+     * @param {Object} pm - The PhraseMaker instance.
+     * @param {Function} callback - Callback to run after the delay.
+     * @param {number} delay - Delay in milliseconds.
+     * @returns {number} Timer ID.
+     */
+    _setTimeout(pm, callback, delay) {
+        if (typeof pm._setWidgetTimeout === "function") {
+            return pm._setWidgetTimeout(callback, delay);
+        }
+
+        return setTimeout(callback, delay);
+    },
+
+    /**
      * Plays all notes in the matrix.
      * Toggles between playing and stopping notes based on the current state.
      * @param {Object} pm - The PhraseMaker instance.
@@ -134,6 +150,9 @@ const PhraseMakerAudio = {
             this.__playNote(pm, 0, 0);
         } else {
             pm._stopOrCloseClicked = true;
+            if (typeof pm._clearWidgetTimers === "function") {
+                pm._clearWidgetTimers();
+            }
             pm.widgetWindow.modifyButton(
                 0,
                 "play-button.svg",
@@ -345,7 +364,8 @@ const PhraseMakerAudio = {
         let noteValue = pm._notesToPlay[noteCounter][1];
         time = 1 / noteValue;
 
-        setTimeout(
+        this._setTimeout(
+            pm,
             () => {
                 let row, cell, tupletCell;
                 // Did we just play the last note?
@@ -494,47 +514,70 @@ const PhraseMakerAudio = {
      * @param {number} noteValue - The duration value of the chord notes.
      */
     _playChord(pm, notes, noteValue) {
-        setTimeout(() => {
-            pm.activity.logo.synth.trigger(0, notes[0], noteValue, pm._instrumentName, null, null);
-        }, 1);
-
-        if (notes.length > 1) {
-            setTimeout(() => {
+        this._setTimeout(
+            pm,
+            () => {
                 pm.activity.logo.synth.trigger(
                     0,
-                    notes[1],
+                    notes[0],
                     noteValue,
                     pm._instrumentName,
                     null,
                     null
                 );
-            }, 1);
+            },
+            1
+        );
+
+        if (notes.length > 1) {
+            this._setTimeout(
+                pm,
+                () => {
+                    pm.activity.logo.synth.trigger(
+                        0,
+                        notes[1],
+                        noteValue,
+                        pm._instrumentName,
+                        null,
+                        null
+                    );
+                },
+                1
+            );
         }
 
         if (notes.length > 2) {
-            setTimeout(() => {
-                pm.activity.logo.synth.trigger(
-                    0,
-                    notes[2],
-                    noteValue,
-                    pm._instrumentName,
-                    null,
-                    null
-                );
-            }, 1);
+            this._setTimeout(
+                pm,
+                () => {
+                    pm.activity.logo.synth.trigger(
+                        0,
+                        notes[2],
+                        noteValue,
+                        pm._instrumentName,
+                        null,
+                        null
+                    );
+                },
+                1
+            );
         }
 
         if (notes.length > 3) {
-            setTimeout(() => {
-                pm.activity.logo.synth.trigger(
-                    0,
-                    notes[3],
-                    noteValue,
-                    pm._instrumentName,
-                    null,
-                    null
-                );
-            }, 1);
+            this._setTimeout(
+                pm,
+                () => {
+                    pm.activity.logo.synth.trigger(
+                        0,
+                        notes[3],
+                        noteValue,
+                        pm._instrumentName,
+                        null,
+                        null
+                    );
+                },
+                1
+            );
         }
     },
 
