@@ -82,6 +82,7 @@ global.noteIsSolfege = jest.fn(() => false);
 global.isCustomTemperament = jest.fn(() => false);
 global.i18nSolfege = jest.fn(s => s);
 global.getNote = jest.fn(() => ["C", "", 4]);
+global.parseNoteString = jest.fn(note => [note.slice(0, -1), Number(note.slice(-1))]);
 global.noteToFrequency = jest.fn(() => 440);
 global.calcNoteValueToDisplay = jest.fn(() => "1/4");
 global.delayExecution = jest.fn(ms => new Promise(r => setTimeout(r, ms)));
@@ -206,6 +207,7 @@ describe("PhraseMaker Widget", () => {
             isCustomTemperament: jest.fn(() => false),
             i18nSolfege: jest.fn(s => s),
             getNote: jest.fn(() => ["C", "", 4]),
+            parseNoteString: jest.fn(note => [note.slice(0, -1), Number(note.slice(-1))]),
             noteToFrequency: jest.fn(() => 440),
             toFraction: jest.fn(v => v)
         };
