@@ -198,6 +198,8 @@ Once Music Blocks is running, you'll want suggestions on how to use
 it. Follow [Using Music Blocks](./Docs/documentation/README.md) and [Music
 Blocks Guide](./Docs/guide/README.md).
 
+- [Lesson Plans](lesson-plans/) — Educator-ready lesson plans for classroom use.
+
 For Scratch and Snap users, you may want to look at [Music Blocks for
 Snap Users](./Music_Blocks_for_Snap_Users.md).
 
