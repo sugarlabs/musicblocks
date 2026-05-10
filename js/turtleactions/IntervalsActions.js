@@ -508,5 +508,5 @@ function setupIntervalsActions(activity) {
     };
 }
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { setupIntervalsActions };
+    module.exports = setupIntervalsActions;
 }

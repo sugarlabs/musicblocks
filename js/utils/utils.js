@@ -39,7 +39,8 @@
    oneHundredToFraction, prepareMacroExports, preparePluginExports,
    processMacroData, processRawPluginData, rationalSum, rgbToHex,
    safeSVG, safeJSONParse, toFixed2, toTitleCase, windowHeight, windowWidth,
-    fnBrowserDetect, waitForReadiness, isSafeUrl, unescapeHTML
+   fnBrowserDetect, waitForReadiness, isSafeUrl, unescapeHTML, GCD, LCD,
+   CameraManager, processPluginData, updatePluginObj, resolveObject
 */
 
 /**
@@ -2080,10 +2081,12 @@ if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         _,
         last,
+        deepClone,
         fileExt,
         fileBasename,
         toTitleCase,
         safeSVG,
+        safeJSONParse,
         toFixed2,
         mixedNumber,
         nearestBeat,
@@ -2099,6 +2102,39 @@ if (typeof module !== "undefined" && module.exports) {
         closeBlkWidgets,
         resolveObject,
         importMembers,
-        escapeHTML
+        escapeHTML,
+        unescapeHTML,
+        isSafeUrl,
+        changeImage,
+        fnBrowserDetect,
+        canvasPixelRatio,
+        windowHeight,
+        windowWidth,
+        httpGet,
+        httpPost,
+        HttpRequest,
+        doBrowserCheck,
+        waitForReadiness,
+        docByClass,
+        docByTagName,
+        docById,
+        docByName,
+        docBySelector,
+        getTextWidth,
+        doSVG,
+        isSVGEmpty,
+        processPluginData,
+        processRawPluginData,
+        updatePluginObj,
+        preparePluginExports,
+        processMacroData,
+        prepareMacroExports,
+        CameraManager,
+        doUseCamera,
+        doStopVideoCam,
+        hideDOMLabel,
+        displayMsg,
+        GCD,
+        LCD
     };
 }

@@ -3759,3 +3759,27 @@ function Synth() {
 
     return this;
 }
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        POLYCOUNT,
+        NOISENAMES,
+        VOICENAMES,
+        DRUMNAMES,
+        EFFECTSNAMES,
+        SAMPLE_INFO,
+        SOUNDSAMPLESDEFINES,
+        DEFAULTSYNTHVOLUME,
+        SAMPLECENTERNO,
+        MULTIPITCH,
+        CUSTOMSAMPLES,
+        percussionInstruments,
+        stringInstruments,
+        validateAndSetParams,
+        instruments,
+        instrumentsSource,
+        instrumentsEffects,
+        instrumentsFilters,
+        Synth
+    };
+}
