@@ -36,6 +36,14 @@ global.platformColor = {
 };
 global.DEFAULTVOICE = "piano";
 global.last = arr => arr[arr.length - 1];
+global.safeJSONParse = (data, fallback = null) => {
+    if (typeof data !== "string" || !data) return fallback;
+    try {
+        return JSON.parse(data);
+    } catch (e) {
+        return fallback;
+    }
+};
 
 // Mock utils
 global.docById = jest.fn().mockImplementation(id => ({

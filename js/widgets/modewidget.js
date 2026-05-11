@@ -14,7 +14,7 @@
 
    docById, _, platformColor, keySignatureToMode, MUSICALMODES,
    getNote, DEFAULTVOICE, last, NOTESTABLE, slicePath, wheelnav,
-   normalizeNoteAccidentals,
+   normalizeNoteAccidentals, safeJSONParse,
  */
 
 /*
@@ -785,7 +785,10 @@ class ModeWidget {
      */
     _undo() {
         if (this._undoStack.length > 0) {
-            const prevState = JSON.parse(this._undoStack.pop());
+            const prevState = safeJSONParse(this._undoStack.pop(), null);
+            if (prevState === null) {
+                return;
+            }
             for (let i = 0; i < 12; i++) {
                 this._selectedNotes[i] = prevState[i];
             }

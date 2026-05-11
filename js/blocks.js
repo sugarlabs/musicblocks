@@ -1470,21 +1470,18 @@ class Blocks {
             let c = this.blockList[thisBlock].connections[0];
             if (c === null) {
                 console.debug("Silence block was not inside a note block");
+                return;
             }
 
             let counter = 0;
 
-            while (true) {
+            while (c !== null) {
                 if (NOTEBLOCKS.includes(this.blockList[c].name)) {
                     break;
                 }
 
                 thisBlock = c;
                 c = this.blockList[c].connections[0];
-                if (c === null) {
-                    console.debug("Silence block was not inside a note block");
-                    break;
-                }
 
                 counter += 1;
                 if (counter > this.blockList.length) {
