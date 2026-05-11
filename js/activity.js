@@ -544,11 +544,15 @@ class Activity {
                 if (this.stage) {
                     const hasActiveTweens = createjs.Tween.hasActiveTweens();
                     const hasActiveGifs = this.gifAnimator && this.gifAnimator.getActiveCount() > 0;
+                    const isInteracting =
+                        this.isDragging ||
+                        this.isSelecting ||
+                        (this.blocks && this.blocks.dragGroup !== null);
 
-                    if (this.stageDirty || hasActiveTweens || hasActiveGifs) {
+                    if (this.stageDirty || hasActiveTweens || hasActiveGifs || isInteracting) {
                         this.stage.update();
                         this.stageDirty = false;
-                        // Continue the loop only if there's work to do
+                        // Continue the loop if there's work or ongoing interaction
                         this._renderLoopRafId = requestAnimationFrame(renderLoop);
                     } else {
                         // Nothing to render — let the loop go idle
@@ -5030,6 +5034,7 @@ class Activity {
         this.refreshCanvas = () => {
             this.stageDirty = true;
             this.update = true;
+            this._startRenderLoop();
         };
 
         /*
