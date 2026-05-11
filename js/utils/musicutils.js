@@ -28,36 +28,37 @@ const _b64Cache = new Map();
  */
 
 /*
-  exported
+   exported
 
-  SYNTHSVG, RSYMBOLS, NOTENAMES, ALLNOTENAMES, NOTENAMES1,
-  WESTERN2EISOLFEGENAMES, PITCHES1, PITCHES3, SCALENOTES,
-  EASTINDIANSOLFNOTES, DRUMS, GRAPHICS, SOLFATTRS, DEGREES,
-  RHYTHMRULERHEIGHT, SLIDERHEIGHT, SLIDERWIDTH, MATRIXLABELCOLOR,
-  MATRIXNOTECELLCOLOR, MATRIXTUPLETCELLCOLOR, MATRIXRHYTHMCELLCOLOR,
-  MATRIXBUTTONCOLORHOVER, MATRIXNOTECELLCOLORHOVER, MATRIXSOLFEWIDTH,
-  EIGHTHNOTEWIDTH, MATRIXBUTTONHEIGHT, MATRIXBUTTONHEIGHT2,
-  MATRIXSOLFEHEIGHT, NOTESYMBOLS, SELECTORSTRINGS, ACCIDENTALLABELS,
-  ACCIDENTALNAMES, ACCIDENTALVALUES, INTERVALS, MODE_PIE_MENUS,
-  DEFAULTINVERT, DEFAULTINTERVAL, DEFAULTEFFECT,
-  DEFAULTMODE, DEFAULTOSCILLATORTYPE, DEFAULTACCIDENTAL,
-  getInvertMode, getIntervalNumber, getIntervalDirection,
-  getModeNumbers, getDrumIndex, getDrumName, getDrumSymbol,
-  getFilterTypes, getOscillatorTypes, getDrumIcon, getDrumSynthName,
-  getNoiseName, getNoiseIcon, getNoiseSynthName, getVoiceName,
-  getVoiceIcon, getVoiceSynthName, getTemperamentKeys,
-  getTemperamentName, getStepSizeUp, getStepSizeDown, getModeLength,
-  nthDegreeToPitch, getInterval, calcNoteValueToDisplay,
-  durationToNoteValue, noteToFrequency, getSolfege, splitScaleDegree,
-  getNumNote, calcOctave, calcOctaveInterval, isInt,
-  convertFromSolfege, getPitchInfo, MATRIXBUTTONCOLOR, i18nSolfege,
-  convertFactor, getReverseDrumMidi, getOctaveRatio, setOctaveRatio, getTemperamentsList,
-  addTemperamentToList, getTemperament, deleteTemperamentFromList,
-  addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
-  DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
-  INTERVALVALUES, getIntervalRatio, frequencyToPitch, NOTESTEP,
-  GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
-  SEMITONES, CHROMATIC_SOLFEGE
+   SYNTHSVG, RSYMBOLS, NOTENAMES, ALLNOTENAMES, NOTENAMES1,
+   WESTERN2EISOLFEGENAMES, PITCHES1, PITCHES3, SCALENOTES,
+   EASTINDIANSOLFNOTES, DRUMS, GRAPHICS, SOLFATTRS, DEGREES,
+   RHYTHMRULERHEIGHT, SLIDERHEIGHT, SLIDERWIDTH, MATRIXLABELCOLOR,
+   MATRIXNOTECELLCOLOR, MATRIXTUPLETCELLCOLOR, MATRIXRHYTHMCELLCOLOR,
+   MATRIXBUTTONCOLORHOVER, MATRIXNOTECELLCOLORHOVER, MATRIXSOLFEWIDTH,
+   EIGHTHNOTEWIDTH, MATRIXBUTTONHEIGHT, MATRIXBUTTONHEIGHT2,
+   MATRIXSOLFEHEIGHT, NOTESYMBOLS, SELECTORSTRINGS, ACCIDENTALLABELS,
+   ACCIDENTALNAMES, ACCIDENTALVALUES, INTERVALS, MODE_PIE_MENUS,
+   DEFAULTINVERT, DEFAULTINTERVAL, DEFAULTEFFECT,
+   DEFAULTMODE, DEFAULTOSCILLATORTYPE, DEFAULTACCIDENTAL,
+   getInvertMode, getIntervalNumber, getIntervalDirection,
+   getModeNumbers, getDrumIndex, getDrumName, getDrumSymbol,
+   getFilterTypes, getOscillatorTypes, getDrumIcon, getDrumSynthName,
+   getNoiseName, getNoiseIcon, getNoiseSynthName, getVoiceName,
+   getVoiceIcon, getVoiceSynthName, getTemperamentKeys,
+   getTemperamentName, getStepSizeUp, getStepSizeDown, getModeLength,
+   nthDegreeToPitch, getInterval, calcNoteValueToDisplay,
+   durationToNoteValue, noteToFrequency, getSolfege, splitScaleDegree,
+   getNumNote, calcOctave, calcOctaveInterval, isInt,
+   convertFromSolfege, getPitchInfo, MATRIXBUTTONCOLOR, i18nSolfege,
+   convertFactor, getReverseDrumMidi, getOctaveRatio, setOctaveRatio, getTemperamentsList,
+   addTemperamentToList, getTemperament, deleteTemperamentFromList,
+   addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
+   DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
+   INTERVALVALUES, getIntervalRatio, frequencyToPitch, NOTESTEP,
+   GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
+   SEMITONES, CHROMATIC_SOLFEGE, INTERVAL_CENTS, TEMPERAMENT_INTERVALS,
+   INTERVAL_ORDER
 */
 
 /**
@@ -1762,6 +1763,191 @@ const PreDefinedTemperaments = {
 };
 
 /**
+ * Precise cents values for exact interval ratios.
+ * Used to calculate temperament-dependent frequencies without approximation.
+ * @constant {Object}
+ */
+const INTERVAL_CENTS = {
+    "1/1": 0,
+    "2/1": 1200,
+    "3/2": 701.9550008653874,
+    "4/3": 498.0449991346126,
+    "5/4": 386.3139908641587,
+    "5/3": 884.3586595369983,
+    "6/5": 315.64134046300163,
+    "8/5": 813.6869709743349,
+    "9/8": 203.91000173097933,
+    "9/5": 1017.5962691899997,
+    "15/8": 1088.2686509169993,
+    "15/16": 111.71326908300068,
+    "16/15": 117.10767408499931,
+    "16/9": 996.0899982690207,
+    "24/25": 70.67259566700143,
+    "25/24": 70.67259566700143,
+    "25/18": 568.7189065899993,
+    "25/16": 772.8929728199988,
+    "32/25": 427.10702718000125,
+    "36/25": 631.2820409100001,
+    "45/32": 590.2256401639994,
+    "72/125": 956.2584132599999,
+    "75/64": 275.5157301899997,
+    "81/64": 407.82000146000027,
+    "96/125": 377.35740433299857,
+    "125/72": 952.9435867400002,
+    "125/96": 463.68602908000123,
+    "125/64": 1156.980999182999,
+    "128/81": 792.1799985399998,
+    "128/125": 36.86397090899993,
+    "144/125": 243.4463515699999,
+    "243/128": 1109.7766285699997,
+    "256/243": 90.22499913461259,
+    "729/512": 612.6984382899998,
+    "1024/729": 587.3015617100003,
+    "7/5": 582.5081936499999,
+    "7/4": 968.6890068600001,
+    "21/16": 470.7813478699997
+};
+
+/**
+ * Centralized interval definitions with exact ratios and cents.
+ * This object provides mathematically accurate interval data for all temperaments.
+ * @constant {Object}
+ */
+const TEMPERAMENT_INTERVALS = {
+    "perfect 1": {
+        ratio: 1 / 1,
+        cents: 0,
+        semitones: 0
+    },
+    "minor 2": {
+        ratio: 16 / 15,
+        cents: 111.71326908300068,
+        semitones: 1
+    },
+    "augmented 1": {
+        ratio: 25 / 24,
+        cents: 70.67259566700143,
+        semitones: 1
+    },
+    "major 2": {
+        ratio: 9 / 8,
+        cents: 203.91000173097933,
+        semitones: 2
+    },
+    "augmented 2": {
+        ratio: 75 / 64,
+        cents: 275.5157301899997,
+        semitones: 3
+    },
+    "minor 3": {
+        ratio: 6 / 5,
+        cents: 315.64134046300163,
+        semitones: 3
+    },
+    "major 3": {
+        ratio: 5 / 4,
+        cents: 386.3139908641587,
+        semitones: 4
+    },
+    "augmented 3": {
+        ratio: 125 / 96,
+        cents: 463.68602908000123,
+        semitones: 5
+    },
+    "diminished 4": {
+        ratio: 32 / 25,
+        cents: 427.10702718000125,
+        semitones: 4
+    },
+    "perfect 4": {
+        ratio: 4 / 3,
+        cents: 498.0449991346126,
+        semitones: 5
+    },
+    "augmented 4": {
+        ratio: 25 / 18,
+        cents: 568.7189065899993,
+        semitones: 6
+    },
+    "diminished 5": {
+        ratio: 36 / 25,
+        cents: 631.2820409100001,
+        semitones: 6
+    },
+    "perfect 5": {
+        ratio: 3 / 2,
+        cents: 701.9550008653874,
+        semitones: 7
+    },
+    "augmented 5": {
+        ratio: 25 / 16,
+        cents: 772.8929728199988,
+        semitones: 8
+    },
+    "minor 6": {
+        ratio: 8 / 5,
+        cents: 813.6869709743349,
+        semitones: 8
+    },
+    "major 6": {
+        ratio: 5 / 3,
+        cents: 884.3586595369983,
+        semitones: 9
+    },
+    "augmented 6": {
+        ratio: 125 / 72,
+        cents: 952.9435867400002,
+        semitones: 10
+    },
+    "minor 7": {
+        ratio: 16 / 9,
+        cents: 996.0899982690207,
+        semitones: 10
+    },
+    "major 7": {
+        ratio: 15 / 8,
+        cents: 1088.2686509169993,
+        semitones: 11
+    },
+    "augmented 7": {
+        ratio: 125 / 64,
+        cents: 1156.980999182999,
+        semitones: 12
+    },
+    "diminished 8": {
+        ratio: 48 / 25,
+        cents: 1127.9774043329986,
+        semitones: 11
+    },
+    "perfect 8": {
+        ratio: 2 / 1,
+        cents: 1200,
+        semitones: 12
+    }
+};
+
+/**
+ * Canonical interval ordering for consistent lookup and synthesis.
+ * All temperament objects should reference this ordering for stability.
+ * @constant {string[]}
+ */
+const INTERVAL_ORDER = [
+    "perfect 1",
+    "minor 2",
+    "major 2",
+    "minor 3",
+    "major 3",
+    "perfect 4",
+    "diminished 5",
+    "perfect 5",
+    "minor 6",
+    "major 6",
+    "minor 7",
+    "major 7",
+    "perfect 8"
+];
+
+/**
  * Temperament settings and interval ratios.
  * @constant {Object}
  */
@@ -1790,25 +1976,22 @@ const TEMPERAMENT = {
         "diminished 8": Math.pow(2, 11 / 12),
         "perfect 8": Math.pow(2, 12 / 12),
         "pitchNumber": 12,
-        "interval": [
-            "perfect 1",
-            "minor 2",
-            "major 2",
-            "minor 3",
-            "major 3",
-            "perfect 4",
-            "diminished 5",
-            "perfect 5",
-            "minor 6",
-            "major 6",
-            "minor 7",
-            "major 7",
-            "perfect 8"
-        ]
+        "isEDO": true,
+        "noteLabels": ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
+        "ratios": [1, Math.pow(2, 1 / 12), Math.pow(2, 2 / 12), Math.pow(2, 3 / 12), Math.pow(2, 4 / 12), Math.pow(2, 5 / 12), Math.pow(2, 6 / 12), Math.pow(2, 7 / 12), Math.pow(2, 8 / 12), Math.pow(2, 9 / 12), Math.pow(2, 10 / 12), Math.pow(2, 11 / 12)],
+        "octaveRatio": 2,
+        "interval": INTERVAL_ORDER
     },
     "equal5": {
-        // Equal 5EDO temperament: 5 Equal Divisions of the Octave
-        "perfect 1": Math.pow(2, 0 / 5), //Unison
+        "isEDO": true,
+        "edo": 5,
+        "name": "Equal (5EDO)",
+        "description": "5 Equal Divisions of the Octave",
+        "ratios": [1, Math.pow(2, 1 / 5), Math.pow(2, 2 / 5), Math.pow(2, 3 / 5), Math.pow(2, 4 / 5)],
+        "octaveRatio": 2,
+        "generator": null,
+        "pitchNumber": 5,
+        "perfect 1": Math.pow(2, 0 / 5),
         "minor 2": Math.pow(2, 1 / 5),
         "augmented 1": Math.pow(2, 1 / 5),
         "major 2": Math.pow(2, 2 / 5),
@@ -1830,12 +2013,25 @@ const TEMPERAMENT = {
         "augmented 7": Math.pow(2, 5 / 5),
         "diminished 8": Math.pow(2, 5 / 5),
         "perfect 8": Math.pow(2, 5 / 5),
-        "pitchNumber": 5,
-        "interval": ["perfect 1", "minor 2", "major 2", "major 3", "augmented 4", "perfect 5"]
+        "interval": [
+            "perfect 1",
+            "minor 2",
+            "major 2",
+            "major 3",
+            "augmented 4",
+            "perfect 5"
+        ]
     },
     "equal7": {
-        // Equal 7EDO Temperament: 7 Equal Divisions of the Octave
-        "perfect 1": Math.pow(2, 0 / 7), //Unison
+        "isEDO": true,
+        "edo": 7,
+        "name": "Equal (7EDO)",
+        "description": "7 Equal Divisions of the Octave",
+        "ratios": [1, Math.pow(2, 1 / 7), Math.pow(2, 2 / 7), Math.pow(2, 3 / 7), Math.pow(2, 4 / 7), Math.pow(2, 5 / 7), Math.pow(2, 6 / 7)],
+        "octaveRatio": 2,
+        "generator": null,
+        "pitchNumber": 7,
+        "perfect 1": Math.pow(2, 0 / 7),
         "minor 2": Math.pow(2, 1 / 7),
         "augmented 1": Math.pow(2, 1 / 7),
         "major 2": Math.pow(2, 2 / 7),
@@ -1854,10 +2050,9 @@ const TEMPERAMENT = {
         "augmented 6": Math.pow(2, 7 / 7),
         "minor 7": Math.pow(2, 6 / 7),
         "major 7": Math.pow(2, 6 / 7),
-        "augmented 7": Math.pow(2, 7 / 7), // wraps around
+        "augmented 7": Math.pow(2, 7 / 7),
         "diminished 8": Math.pow(2, 7 / 7),
         "perfect 8": Math.pow(2, 7 / 7),
-        "pitchNumber": 7,
         "interval": [
             "perfect 1",
             "minor 2",
@@ -1870,7 +2065,14 @@ const TEMPERAMENT = {
         ]
     },
     "equal19": {
-        // Equal 19EDO Temperament: 19 Equal Divisions of the Octave
+        "isEDO": true,
+        "edo": 19,
+        "name": "Equal (19EDO)",
+        "description": "19 Equal Divisions of the Octave",
+        "ratios": [1, Math.pow(2, 2 / 19), Math.pow(2, 3 / 19), Math.pow(2, 5 / 19), Math.pow(2, 6 / 19), Math.pow(2, 8 / 19), Math.pow(2, 9 / 19), Math.pow(2, 10 / 19), Math.pow(2, 11 / 19), Math.pow(2, 12 / 19), Math.pow(2, 13 / 19), Math.pow(2, 14 / 19), Math.pow(2, 15 / 19), Math.pow(2, 16 / 19), Math.pow(2, 18 / 19)],
+        "octaveRatio": 2,
+        "generator": null,
+        "pitchNumber": 19,
         "perfect 1": Math.pow(2, 0 / 19),
         "minor 2": Math.pow(2, 2 / 19),
         "augmented 1": Math.pow(2, 1 / 19),
@@ -1893,7 +2095,6 @@ const TEMPERAMENT = {
         "augmented 7": Math.pow(2, 17 / 19),
         "diminished 8": Math.pow(2, 18 / 19),
         "perfect 8": Math.pow(2, 19 / 19),
-        "pitchNumber": 19,
         "interval": [
             "perfect 1",
             "augmented 1",
@@ -1918,7 +2119,14 @@ const TEMPERAMENT = {
         ]
     },
     "equal31": {
-        // Equal 31EDO Temperament: 31 Equal Divisions of the Octave
+        "isEDO": true,
+        "edo": 31,
+        "name": "Equal (31EDO)",
+        "description": "31 Equal Divisions of the Octave",
+        "ratios": [1, Math.pow(2, 1 / 31), Math.pow(2, 2 / 31), Math.pow(2, 3 / 31), Math.pow(2, 4 / 31), Math.pow(2, 5 / 31), Math.pow(2, 6 / 31), Math.pow(2, 7 / 31), Math.pow(2, 8 / 31), Math.pow(2, 9 / 31), Math.pow(2, 10 / 31), Math.pow(2, 11 / 31), Math.pow(2, 12 / 31), Math.pow(2, 13 / 31), Math.pow(2, 14 / 31), Math.pow(2, 15 / 31), Math.pow(2, 16 / 31), Math.pow(2, 17 / 31), Math.pow(2, 18 / 31), Math.pow(2, 19 / 31), Math.pow(2, 20 / 31), Math.pow(2, 21 / 31), Math.pow(2, 22 / 31), Math.pow(2, 23 / 31), Math.pow(2, 24 / 31), Math.pow(2, 25 / 31), Math.pow(2, 26 / 31), Math.pow(2, 27 / 31), Math.pow(2, 28 / 31), Math.pow(2, 29 / 31), Math.pow(2, 30 / 31)],
+        "octaveRatio": 2,
+        "generator": null,
+        "pitchNumber": 31,
         "perfect 1": Math.pow(2, 0 / 31),
         "diminished 2": Math.pow(2, 1 / 31),
         "augmented 1": Math.pow(2, 2 / 31),
@@ -1952,7 +2160,6 @@ const TEMPERAMENT = {
         "down 8": Math.pow(2, 30 / 31),
         "perfect 8": Math.pow(2, 31 / 31),
         "octave": Math.pow(2, 31 / 31),
-        "pitchNumber": 31,
         "interval": [
             "perfect 1",
             "diminished 2",
@@ -1989,87 +2196,82 @@ const TEMPERAMENT = {
         ]
     },
     "just intonation": {
-        "perfect 1": 1 / 1,
-        "minor 2": 16 / 15,
-        "augmented 1": 16 / 15,
-        "major 2": 9 / 8,
-        "augmented 2": 6 / 5,
-        "minor 3": 6 / 5,
-        "major 3": 5 / 4,
-        "augmented 3": 4 / 3,
-        "diminished 4": 5 / 4,
-        "perfect 4": 4 / 3,
-        "augmented 4": 7 / 5,
-        "diminished 5": 7 / 5,
-        "perfect 5": 3 / 2,
-        "augmented 5": 8 / 5,
-        "minor 6": 8 / 5,
-        "major 6": 5 / 3,
-        "augmented 6": 16 / 9,
-        "minor 7": 16 / 9,
-        "major 7": 15 / 8,
-        "augmented 7": 2 / 1,
-        "diminished 8": 15 / 8,
-        "perfect 8": 2 / 1,
+        "isEDO": false,
+        "edo": 12,
+        "name": "5-limit Just Intonation",
+        "description": "Pure integer ratios based on the 5-limit prime limit system",
+        "noteLabels": ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
+        "ratios": [1 / 1, 16 / 15, 9 / 8, 6 / 5, 5 / 4, 4 / 3, 45 / 32, 3 / 2, 8 / 5, 5 / 3, 9 / 5, 15 / 8],
+        "octaveRatio": 2,
+        "generator": null,
+        "perfect 1": { ratio: 1 / 1, cents: 0 },
+        "minor 2": { ratio: 16 / 15, cents: 111.71326908300068 },
+        "augmented 1": { ratio: 16 / 15, cents: 111.71326908300068 },
+        "major 2": { ratio: 9 / 8, cents: 203.91000173097933 },
+        "augmented 2": { ratio: 6 / 5, cents: 315.64134046300163 },
+        "minor 3": { ratio: 6 / 5, cents: 315.64134046300163 },
+        "major 3": { ratio: 5 / 4, cents: 386.3139908641587 },
+        "augmented 3": { ratio: 4 / 3, cents: 498.0449991346126 },
+        "diminished 4": { ratio: 5 / 4, cents: 386.3139908641587 },
+        "perfect 4": { ratio: 4 / 3, cents: 498.0449991346126 },
+        "augmented 4": { ratio: 45 / 32, cents: 590.2256401639994 },
+        "diminished 5": { ratio: 45 / 32, cents: 590.2256401639994 },
+        "perfect 5": { ratio: 3 / 2, cents: 701.9550008653874 },
+        "augmented 5": { ratio: 8 / 5, cents: 813.6869709743349 },
+        "minor 6": { ratio: 8 / 5, cents: 813.6869709743349 },
+        "major 6": { ratio: 5 / 3, cents: 884.3586595369983 },
+        "augmented 6": { ratio: 16 / 9, cents: 996.0899982690207 },
+        "minor 7": { ratio: 16 / 9, cents: 996.0899982690207 },
+        "major 7": { ratio: 15 / 8, cents: 1088.2686509169993 },
+        "augmented 7": { ratio: 2 / 1, cents: 1200 },
+        "diminished 8": { ratio: 15 / 8, cents: 1088.2686509169993 },
+        "perfect 8": { ratio: 2 / 1, cents: 1200 },
         "pitchNumber": 12,
-        "interval": [
-            "perfect 1",
-            "minor 2",
-            "major 2",
-            "minor 3",
-            "major 3",
-            "perfect 4",
-            "diminished 5",
-            "perfect 5",
-            "minor 6",
-            "major 6",
-            "minor 7",
-            "major 7",
-            "perfect 8"
-        ]
+        "interval": INTERVAL_ORDER
     },
     "Pythagorean": {
-        "perfect 1": 1 / 1,
-        "minor 2": 256 / 243,
-        "augmented 1": 256 / 243,
-        "major 2": 9 / 8,
-        "augmented 2": 32 / 27,
-        "minor 3": 32 / 27,
-        "major 3": 81 / 64,
-        "augmented 3": 4 / 3,
-        "diminished 4": 81 / 64,
-        "perfect 4": 4 / 3,
-        "augmented 4": 729 / 512,
-        "diminished 5": 729 / 512,
-        "perfect 5": 3 / 2,
-        "augmented 5": 128 / 81,
-        "minor 6": 128 / 81,
-        "major 6": 27 / 16,
-        "augmented 6": 16 / 9,
-        "minor 7": 16 / 9,
-        "major 7": 243 / 128,
-        "augmented 7": 2 / 1,
-        "diminished 8": 243 / 128,
-        "perfect 8": 2 / 1,
+        "isEDO": false,
+        "edo": 12,
+        "name": "Pythagorean Tuning",
+        "description": "Tuning system based on pure perfect fifths (3/2 ratio) from ancient Greek theory",
+        "noteLabels": ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
+        "ratios": [1 / 1, 256 / 243, 9 / 8, 32 / 27, 81 / 64, 4 / 3, 729 / 512, 3 / 2, 128 / 81, 27 / 16, 16 / 9, 243 / 128],
+        "octaveRatio": 2,
+        "generator": 3 / 2,
+        "perfect 1": { ratio: 1 / 1, cents: 0 },
+        "minor 2": { ratio: 256 / 243, cents: 90.22499913461259 },
+        "augmented 1": { ratio: 256 / 243, cents: 90.22499913461259 },
+        "major 2": { ratio: 9 / 8, cents: 203.91000173097933 },
+        "augmented 2": { ratio: 32 / 27, cents: 294.1349972653874 },
+        "minor 3": { ratio: 32 / 27, cents: 294.1349972653874 },
+        "major 3": { ratio: 81 / 64, cents: 407.82000146000027 },
+        "augmented 3": { ratio: 4 / 3, cents: 498.0449991346126 },
+        "diminished 4": { ratio: 81 / 64, cents: 407.82000146000027 },
+        "perfect 4": { ratio: 4 / 3, cents: 498.0449991346126 },
+        "augmented 4": { ratio: 729 / 512, cents: 612.6984382899998 },
+        "diminished 5": { ratio: 729 / 512, cents: 612.6984382899998 },
+        "perfect 5": { ratio: 3 / 2, cents: 701.9550008653874 },
+        "augmented 5": { ratio: 128 / 81, cents: 792.1799985399998 },
+        "minor 6": { ratio: 128 / 81, cents: 792.1799985399998 },
+        "major 6": { ratio: 27 / 16, cents: 905.8650014649996 },
+        "augmented 6": { ratio: 16 / 9, cents: 996.0899982690207 },
+        "minor 7": { ratio: 16 / 9, cents: 996.0899982690207 },
+        "major 7": { ratio: 243 / 128, cents: 1109.7766285699997 },
+        "augmented 7": { ratio: 2 / 1, cents: 1200 },
+        "diminished 8": { ratio: 243 / 128, cents: 1109.7766285699997 },
+        "perfect 8": { ratio: 2 / 1, cents: 1200 },
         "pitchNumber": 12,
-        "interval": [
-            "perfect 1",
-            "minor 2",
-            "major 2",
-            "minor 3",
-            "major 3",
-            "perfect 4",
-            "diminished 5",
-            "perfect 5",
-            "minor 6",
-            "major 6",
-            "minor 7",
-            "major 7",
-            "perfect 8"
-        ]
+        "interval": INTERVAL_ORDER
     },
     "1/3 comma meantone": {
-        // 19-EDO
+        "isEDO": false,
+        "edo": 19,
+        "name": "1/3 Comma Meantone",
+        "description": "Meantone temperament with 1/3 syntonic comma (quarter-comma meantone)",
+        "ratios": [1, 1.075693, 1.115656, 1.200103, 1.244694, 1.290943, 1.338902, 1.38865, 1.440247, 1.493762, 1.549255, 1.60682, 1.666524, 1.728445, 1.792668, 1.859266, 1.92835],
+        "octaveRatio": 2,
+        "generator": 5 / 4,
+        "pitchNumber": 19,
         "perfect 1": 1 / 1,
         "minor 2": 1.075693,
         "augmented 1": 1.037156,
@@ -2092,7 +2294,6 @@ const TEMPERAMENT = {
         "augmented 7": 1.92835,
         "diminished 8": 1.92835,
         "perfect 8": 2 / 1,
-        "pitchNumber": 19,
         "interval": [
             "perfect 1",
             "augmented 1",
@@ -2117,7 +2318,14 @@ const TEMPERAMENT = {
         ]
     },
     "1/4 comma meantone": {
-        // 21 notes per octave
+        "isEDO": false,
+        "edo": 21,
+        "name": "1/4 Comma Meantone",
+        "description": "Meantone temperament with 1/4 syntonic comma",
+        "ratios": [1, 16 / 15, 25 / 24, 9 / 8, 75 / 64, 6 / 5, 5 / 4, 32 / 25, 125 / 96, 4 / 3, 25 / 18, 36 / 25, 3 / 2, 25 / 16, 8 / 5, 5 / 3, 125 / 72, 9 / 5, 15 / 8, 48 / 25, 125 / 64],
+        "octaveRatio": 2,
+        "generator": 5 / 4,
+        "pitchNumber": 21,
         "perfect 1": 1 / 1,
         "minor 2": 16 / 15,
         "augmented 1": 25 / 24,
@@ -2140,7 +2348,6 @@ const TEMPERAMENT = {
         "diminished 8": 48 / 25,
         "augmented 7": 125 / 64,
         "perfect 8": 2 / 1,
-        "pitchNumber": 21,
         "interval": [
             "perfect 1",
             "augmented 1",
@@ -2179,6 +2386,19 @@ const TEMPERAMENT = {
         9: Math.pow(2, 9 / 12),
         10: Math.pow(2, 10 / 12),
         11: Math.pow(2, 11 / 12),
+        "perfect 1": Math.pow(2, 0 / 12),
+        "minor 2": Math.pow(2, 1 / 12),
+        "major 2": Math.pow(2, 2 / 12),
+        "minor 3": Math.pow(2, 3 / 12),
+        "major 3": Math.pow(2, 4 / 12),
+        "perfect 4": Math.pow(2, 5 / 12),
+        "diminished 5": Math.pow(2, 6 / 12),
+        "perfect 5": Math.pow(2, 7 / 12),
+        "minor 6": Math.pow(2, 8 / 12),
+        "major 6": Math.pow(2, 9 / 12),
+        "minor 7": Math.pow(2, 10 / 12),
+        "major 7": Math.pow(2, 11 / 12),
+        "perfect 8": Math.pow(2, 12 / 12),
         pitchNumber: 12,
         interval: [
             "perfect 1",
@@ -2880,6 +3100,38 @@ const isCustomTemperament = temperament => {
         return true;
     }
     return !(temperament in PreDefinedTemperaments);
+};
+
+/**
+ * Extract ratio from a temperament interval value.
+ * Handles both legacy numeric format and new {ratio, cents} object format.
+ * @function
+ * @param {number|Object} value - The interval value (ratio number or object with ratio property).
+ * @returns {number} The ratio value.
+ */
+const getTemperamentRatio = value => {
+    if (typeof value === "number") {
+        return value;
+    } else if (value && typeof value === "object" && typeof value.ratio === "number") {
+        return value.ratio;
+    }
+    return 1;
+};
+
+/**
+ * Extract cents from a temperament interval value.
+ * Handles both legacy numeric format and new {ratio, cents} object format.
+ * @function
+ * @param {number|Object} value - The interval value (ratio number or object with cents property).
+ * @returns {number} The cents value.
+ */
+const getTemperamentCents = value => {
+    if (typeof value === "number") {
+        return 1200 * Math.log2(value);
+    } else if (value && typeof value === "object" && typeof value.cents === "number") {
+        return value.cents;
+    }
+    return 0;
 };
 
 /**
@@ -4352,10 +4604,10 @@ function getNote(
                 if (offset === -1) {
                     console.debug(
                         "WARNING: Key " +
-                            myKeySignature +
-                            " not found in " +
-                            thisScale +
-                            ". Using default of C"
+                        myKeySignature +
+                        " not found in " +
+                        thisScale +
+                        ". Using default of C"
                     );
                     offset = 0;
                     thisScale = NOTESSHARP;
@@ -6479,6 +6731,9 @@ if (typeof module !== "undefined" && module.exports) {
         noteToFrequency,
         normalizeNoteAccidentals,
         TEMPERAMENT,
+        INTERVAL_CENTS,
+        TEMPERAMENT_INTERVALS,
+        INTERVAL_ORDER,
         setOctaveRatio,
         getOctaveRatio,
         TEMPERAMENTS,
@@ -6513,6 +6768,8 @@ if (typeof module !== "undefined" && module.exports) {
         getVoiceIcon,
         getVoiceSynthName,
         isCustomTemperament,
+        getTemperamentRatio,
+        getTemperamentCents,
         getTemperamentName,
         noteToObj,
         frequencyToPitch,
