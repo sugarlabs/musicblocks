@@ -770,6 +770,8 @@ class Toolbar {
      */
     renderLoadIcon(onclick) {
         const loadIcon = docById("load");
+        loadIcon.setAttribute("role", "button");
+        loadIcon.setAttribute("aria-label", _("Load project"));
 
         loadIcon.onclick = () => {
             onclick(this.activity);
@@ -779,6 +781,8 @@ class Toolbar {
     renderThemeSelectIcon(themeBox, themes) {
         const icon = docById("themeSelectIcon");
         if (!icon) return;
+        icon.setAttribute("role", "button");
+        icon.setAttribute("aria-label", _("Select theme"));
 
         themes.forEach(theme => {
             if (safeStorageGet("themePreference") === theme) {
@@ -802,6 +806,8 @@ class Toolbar {
     renderWrapIcon() {
         const wrapIcon = docById("wrapTurtle");
         let wrapButtonTooltipData = _("Turtle Wrap Off");
+        wrapIcon.setAttribute("role", "button");
+        wrapIcon.setAttribute("aria-label", _("Toggle turtle wrap"));
 
         wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
         $j(".tooltipped").tooltip({
@@ -1056,6 +1062,9 @@ class Toolbar {
             return;
         }
 
+        Record.setAttribute("role", "button");
+        Record.setAttribute("aria-label", _("Record"));
+
         // Check beginner mode before showing buttons
         if (!this.activity.beginnerMode) {
             Record.classList.remove("hide");
@@ -1183,6 +1192,8 @@ class Toolbar {
     renderPlanetIcon(planet, onclick) {
         const planetIcon = docById("planetIcon");
         const planetIconDisabled = docById("planetIconDisabled");
+        planetIcon.setAttribute("role", "button");
+        planetIcon.setAttribute("aria-label", _("Share project"));
         if (planet) {
             planetIcon.onclick = () => {
                 docById("toolbars").style.display = "none";
@@ -1204,6 +1215,8 @@ class Toolbar {
     renderMenuIcon(onclick) {
         const menuIcon = docById("menu");
         const auxToolbar = docById("aux-toolbar");
+        menuIcon.setAttribute("role", "button");
+        menuIcon.setAttribute("aria-label", _("Menu"));
         menuIcon.onclick = () => {
             const searchBar = docById("search");
             searchBar.classList.toggle("open");
@@ -1230,6 +1243,8 @@ class Toolbar {
      */
     renderRunSlowlyIcon(onclick) {
         const runSlowlyIcon = docById("runSlowlyIcon");
+        runSlowlyIcon.setAttribute("role", "button");
+        runSlowlyIcon.setAttribute("aria-label", _("Run slowly"));
         if (this.activity.beginnerMode && this.language === "ja") {
             runSlowlyIcon.style.display = "none";
         }
@@ -1252,6 +1267,8 @@ class Toolbar {
         const helpGuideItem = docById("helpGuideItem");
         const shortcutsGuideItem = docById("shortcutsGuideItem");
         const hasDropdownMenu = !!helpGuideItem || !!shortcutsGuideItem;
+        helpIcon.setAttribute("role", "button");
+        helpIcon.setAttribute("aria-label", _("Help"));
 
         if (helpGuideItem) {
             helpGuideItem.onclick = event => {
@@ -1534,6 +1551,8 @@ class Toolbar {
      */
     renderRunStepIcon(onclick) {
         const runStepByStepIcon = docById("runStepByStepIcon");
+        runStepByStepIcon.setAttribute("role", "button");
+        runStepByStepIcon.setAttribute("aria-label", _("Run step by step"));
         if (this.activity.beginnerMode && this.language === "ja") {
             runStepByStepIcon.style.display = "none";
         }
@@ -1552,6 +1571,8 @@ class Toolbar {
      */
     renderMergeIcon(onclick) {
         const mergeWithCurrentIcon = docById("mergeWithCurrentIcon");
+        mergeWithCurrentIcon.setAttribute("role", "button");
+        mergeWithCurrentIcon.setAttribute("aria-label", _("Merge project"));
 
         mergeWithCurrentIcon.onclick = () => {
             onclick(this.activity);
@@ -1567,6 +1588,8 @@ class Toolbar {
      */
     renderRestoreIcon(onclick) {
         const restoreIcon = docById("restoreIcon");
+        restoreIcon.setAttribute("role", "button");
+        restoreIcon.setAttribute("aria-label", _("Restore project"));
 
         restoreIcon.onclick = () => {
             onclick(this.activity);
@@ -1586,6 +1609,8 @@ class Toolbar {
         if (!keyboardShortcutsIcon) {
             return;
         }
+        keyboardShortcutsIcon.setAttribute("role", "button");
+        keyboardShortcutsIcon.setAttribute("aria-label", _("Keyboard shortcuts"));
 
         keyboardShortcutsIcon.onclick = () => {
             onclick(this.activity);
@@ -1602,6 +1627,8 @@ class Toolbar {
     renderChooseKeyIcon(onclick) {
         if (_THIS_IS_MUSIC_BLOCKS_) {
             const chooseKeyIcon = docById("chooseKeyIcon");
+            chooseKeyIcon.setAttribute("role", "button");
+            chooseKeyIcon.setAttribute("aria-label", _("Choose key"));
             docById("chooseKeyDiv").style.display = "none";
             chooseKeyIcon.onclick = () => {
                 onclick(this.activity);
@@ -1617,7 +1644,10 @@ class Toolbar {
      * @returns {void}
      */
     renderJavaScriptIcon(onclick) {
-        docById("toggleJavaScriptIcon").onclick = () => onclick(this.activity);
+        const toggleJavaScriptIcon = docById("toggleJavaScriptIcon");
+        toggleJavaScriptIcon.setAttribute("role", "button");
+        toggleJavaScriptIcon.setAttribute("aria-label", _("Toggle JavaScript"));
+        toggleJavaScriptIcon.onclick = () => onclick(this.activity);
     }
 
     /**
@@ -1629,6 +1659,8 @@ class Toolbar {
      */
     renderLanguageSelectIcon(languageBox) {
         const languageSelectIcon = docById("languageSelectIcon");
+        languageSelectIcon.setAttribute("role", "button");
+        languageSelectIcon.setAttribute("aria-label", _("Select language"));
         const languages = [
             "enUS",
             "enUK",
