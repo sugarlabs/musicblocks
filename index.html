@@ -163,6 +163,7 @@
         <script src="lib/astring.min.js" defer></script>
         <script src="js/utils/mb-dialog.js" defer></script>
         <script src="js/svgAssetSelector.js" defer></script>
+        <script src="js/assignmentChecker.js" defer></script>
         <script src="lib/acorn.min.js" defer></script>
         <script src="env.js" defer></script>
 
@@ -412,6 +413,7 @@
                             accept=".mp3, .wav"
                             tabindex="-1"
                         />
+                        <input class="file" type="file" id="myOpenAssignment" accept=".abc" tabindex="-1" />
                         <input class="file" type="file" id="myOpenAll" tabindex="-1" />
                     </div>
                 </div>
@@ -809,6 +811,31 @@
                                             role="button"
                                             tabindex="0"
                                             ><i class="material-icons md-48">merge_type</i></a
+                                        >
+                                    </li>
+                                    <li>
+                                        <a
+                                            id="loadAssignmentIcon"
+                                            class="tooltipped"
+                                            data-position="bottom"
+                                            data-delay="10"
+                                            data-tooltip="Load Assignment"
+                                            role="button"
+                                            tabindex="0"
+                                            ><i class="material-icons md-48">assignment</i></a
+                                        >
+                                    </li>
+                                    <li>
+                                        <a
+                                            id="checkAssignmentIcon"
+                                            class="tooltipped"
+                                            data-position="bottom"
+                                            data-delay="10"
+                                            data-tooltip="Check Assignment"
+                                            role="button"
+                                            tabindex="0"
+                                            style="display: none"
+                                            ><i class="material-icons md-48">assignment_turned_in</i></a
                                         >
                                     </li>
                                     <li>
