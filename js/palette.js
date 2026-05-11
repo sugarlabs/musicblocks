@@ -804,7 +804,6 @@ class Palettes {
 
     getPluginMacroExpansion(blkname, x, y) {
         const obj = this.pluginMacros[blkname];
-        // eslint-disable-next-line eqeqeq
         if (obj != null) {
             obj[0][2] = x;
             obj[0][3] = y;
@@ -992,7 +991,6 @@ class Palettes {
     }
 
     updatePalettes(showPalette) {
-        // eslint-disable-next-line eqeqeq
         if (showPalette != null) {
             // Show the action palette after adding/deleting new
             // nameddo blocks.
@@ -1340,7 +1338,6 @@ class PaletteModel {
                 "nameddoArg",
                 "namedcalcArg"
             ].indexOf(protoBlock.name) !== -1 &&
-            // eslint-disable-next-line eqeqeq
             label != null
         ) {
             if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {

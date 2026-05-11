@@ -655,7 +655,6 @@ function setupPitchActions(activity) {
         static deltaPitch(outType, turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            // eslint-disable-next-line eqeqeq
             if (tur.singer.previousNotePlayed == null) {
                 return 0;
             } else {

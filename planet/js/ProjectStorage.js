@@ -181,7 +181,6 @@ class ProjectStorage {
         //  prevent unnecessary crashing
 
         // == null covers both null and undefined
-        if (savedjsonobj == null) throw new Error("Failed to save project data"); // eslint-disable-line eqeqeq
     }
 
     async get(key) {
