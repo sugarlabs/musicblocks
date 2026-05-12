@@ -378,6 +378,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
             const PRELOADED_SCRIPTS = [
                 { name: "easeljs.min", export: () => window.createjs },
                 { name: "tweenjs.min", export: () => window.createjs },
+                { name: "preloadjs.min", export: () => window.createjs },
                 { name: "jquery", export: () => window.jQuery },
                 { name: "jquery-ui", export: () => window.jQuery.ui },
                 { name: "materialize", export: () => window.Materialize || window.M },
@@ -425,10 +426,8 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                         "loader.core_modules.ready"
                     );
                     if (typeof window.createjs === "undefined") {
-                        console.error(
-                            "FATAL: createjs (EaselJS/TweenJS) not found. Cannot proceed."
-                        );
-                        alert(t_("Failed to load EaselJS. Please refresh the page."));
+                        console.error("FATAL: createjs (Konva adapter) not found. Cannot proceed.");
+                        alert(t_("Failed to load Konva. Please refresh the page."));
                         return;
                     }
 

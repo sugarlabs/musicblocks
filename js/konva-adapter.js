@@ -144,9 +144,32 @@
     };
 
     Container.prototype.getBounds = function () {
-        const r = this._node.getClientRect();
-        return r;
+        return this._node.getClientRect();
     };
+
+    Container.prototype.cache = function (x, y, w, h) {
+        if (w > 0 && h > 0) this._node.cache(x, y, w, h);
+    };
+
+    Container.prototype.updateCache = function () {
+        this._node.clearCache();
+        const r = this._node.getClientRect({ skipTransform: true });
+        if (r.width > 0 && r.height > 0) this._node.cache(r.x, r.y, r.width, r.height);
+    };
+
+    Container.prototype.uncache = function () {
+        this._node.clearCache();
+    };
+
+    Object.defineProperty(Container.prototype, "hitArea", {
+        set(v) {
+            /* no-op — Konva handles hit detection natively */
+        },
+        get() {
+            return null;
+        },
+        configurable: true
+    });
 
     Container.prototype.on = function (evt, fn) {
         this._node.on(evt, fn);
@@ -199,7 +222,40 @@
             enumerable: true,
             configurable: true
         });
+        // filters: EaselJS assigns an array of filter objects; apply them via Konva filters
+        Object.defineProperty(this, "filters", {
+            get() {
+                return this._filters || [];
+            },
+            set(arr) {
+                this._filters = arr;
+                if (!arr || !arr.length) {
+                    this._node.filters([]);
+                    this._node.clearCache();
+                    return;
+                }
+                this._node.filters(arr.map(f => f._konvaFilter || (d => d)));
+            },
+            enumerable: true,
+            configurable: true
+        });
     }
+
+    Bitmap.prototype.cache = function (x, y, w, h) {
+        if (w > 0 && h > 0) this._node.cache(x, y, w, h);
+    };
+
+    Bitmap.prototype.updateCache = function () {
+        const r = this._node.getClientRect({ skipTransform: true });
+        if (r.width > 0 && r.height > 0) {
+            this._node.clearCache();
+            this._node.cache(r.x, r.y, r.width, r.height);
+        }
+    };
+
+    Bitmap.prototype.uncache = function () {
+        this._node.clearCache();
+    };
 
     Bitmap.prototype.getBounds = function () {
         return this._node.getClientRect();
@@ -344,9 +400,45 @@
                 });
                 return this;
             },
+            moveTo(x, y) {
+                this._pathCmds = this._pathCmds || [];
+                this._pathCmds.push({ cmd: "moveTo", x, y });
+                this._buildPath();
+                return this;
+            },
+            lineTo(x, y) {
+                this._pathCmds = this._pathCmds || [];
+                this._pathCmds.push({ cmd: "lineTo", x, y });
+                this._buildPath();
+                return this;
+            },
+            _buildPath() {
+                const cmds = this._pathCmds || [];
+                const fill = this._fillColor;
+                const stroke = this._strokeColor;
+                const sw = this._strokeWidth;
+                this._node.sceneFunc(function (ctx, shape) {
+                    ctx.beginPath();
+                    cmds.forEach(c => {
+                        if (c.cmd === "moveTo") ctx.moveTo(c.x, c.y);
+                        else if (c.cmd === "lineTo") ctx.lineTo(c.x, c.y);
+                    });
+                    if (fill) {
+                        ctx.setAttr("fillStyle", fill);
+                        ctx.fill();
+                    }
+                    if (stroke) {
+                        ctx.setAttr("strokeStyle", stroke);
+                        ctx.setAttr("lineWidth", sw);
+                        ctx.stroke();
+                    }
+                    shape.fillStrokeShape(shape);
+                });
+            },
             clear() {
                 this._fillColor = null;
                 this._strokeColor = null;
+                this._pathCmds = [];
                 this._node.sceneFunc(null);
                 return this;
             }
@@ -494,6 +586,18 @@
     Stage.prototype.getObjectsUnderPoint = function (x, y) {
         return this._stage.getAllIntersections({ x, y });
     };
+
+    Stage.prototype.setChildIndex = function (node, index) {
+        const k = node._node || node;
+        k.zIndex(index);
+    };
+
+    Object.defineProperty(Stage.prototype, "children", {
+        get() {
+            return this._layer.children || [];
+        },
+        configurable: true
+    });
 
     Stage.prototype.on = function (evt, fn) {
         this._stage.on(evt, fn);
