@@ -554,15 +554,6 @@ class ThemeBox {
      * @public
      * @returns {void}
      */
-    reload() {
-        // Keep for backward compatibility, but prefer instant switching
-        window.location.reload();
-    }
-
-    /**
-     * @public
-     * @returns {void}
-     */
     setPreference() {
         if (localStorage.getItem("themePreference") === this._theme) {
             this.activity.textMsg(_("Music Blocks is already set to this theme."));
