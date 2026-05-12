@@ -9,8 +9,9 @@ input[type="range"] {
   width: 250px;
 }
 
-input[type="range"]:focus {
-  outline: none;
+input[type="range"]:focus-visible {
+  outline: 2px solid var(--color-brand-primary, #4da6ff);
+  outline-offset: 2px;
 }
 
 input[type="range"]:not(.pitchSlider)::-webkit-slider-runnable-track {
