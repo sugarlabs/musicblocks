@@ -512,11 +512,11 @@ body.highcontrast {
 }
 
 .highcontrast .blue {
-    background-color: var(--color-text-inverse)080 !important;
+    background-color: #000080 !important;
 }
 
 .highcontrast .blue.darken-1 {
-    background-color: var(--color-text-inverse)0ff !important;
+    background-color: #0000ff !important;
 }
 
 .highcontrast #floatingWindows > .windowFrame {
