@@ -480,6 +480,10 @@
                 this._fillColor = color;
                 return this;
             },
+            // .f() is EaselJS shorthand for beginFill()
+            f(color) {
+                return this.beginFill(color);
+            },
             beginStroke(color) {
                 this._strokeColor = color;
                 return this;
@@ -840,26 +844,48 @@
         this._next();
     };
 
+    // Properties that Konva.Tween cannot animate (not numeric) — applied immediately
+    const _immediateProps = new Set(["visible"]);
+
     TweenChain.prototype._next = function () {
         if (!this._queue.length) {
             this._running = false;
             return;
         }
         const step = this._queue.shift();
-        if (step.type === "set") {
-            const kNode = this._node._node || this._node;
-            Object.entries(step.props).forEach(([k, v]) => {
+        const kNode = this._node._node || this._node;
+
+        const _applyImmediate = props => {
+            Object.entries(props).forEach(([k, v]) => {
                 const mapped = _propMap[k] || k;
                 if (typeof kNode[mapped] === "function") kNode[mapped](v);
             });
+        };
+
+        if (step.type === "set") {
+            _applyImmediate(step.props);
             this._next();
         } else {
-            const kNode = this._node._node || this._node;
+            // Split props: non-numeric ones (e.g. visible) applied immediately
             const konvaProps = {};
+            const immediateApply = {};
             Object.entries(step.props).forEach(([k, v]) => {
                 const mapped = _propMap[k] || k;
-                konvaProps[mapped] = v;
+                if (_immediateProps.has(k) || typeof v !== "number") {
+                    immediateApply[k] = v;
+                } else {
+                    konvaProps[mapped] = v;
+                }
             });
+            _applyImmediate(immediateApply);
+
+            // Duration=0 or no numeric props → skip Konva.Tween and advance immediately
+            if (step.durationSec === 0 || !Object.keys(konvaProps).length) {
+                _applyImmediate(step.props);
+                this._next();
+                return;
+            }
+
             _activeTweens++;
             const tw = new Konva.Tween({
                 node: kNode,
