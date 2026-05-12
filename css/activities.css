@@ -145,14 +145,14 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 }
 
 .cancel-button {
-  border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  background-color: var(--color-bg-tertiary);
-  color: black;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    background-color: var(--color-bg-tertiary);
+    color: black;
 }
 
 .cancel-button:hover {
@@ -547,7 +547,9 @@ nav {
     background-color: #8bc34a;
     height: 64px;
     width: 100%;
-    box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.16), 0px 2px 10px 0px rgba(0, 0, 0, 0.12);
+    box-shadow:
+        0px 2px 5px 0px rgba(0, 0, 0, 0.16),
+        0px 2px 10px 0px rgba(0, 0, 0, 0.12);
     font: 32px sans;
     vertical-align: middle;
     line-height: 64px;
@@ -1225,7 +1227,7 @@ table {
     overflow: visible;
     width: calc(100% - 130px) !important;
     max-width: 350px;
-    padding-top: 2.5rem; 
+    padding-top: 2.5rem;
     padding-bottom: 2.5rem;
     display: flex;
     flex-direction: column;
@@ -1246,7 +1248,7 @@ table {
 }
 
 #helpBodyDiv p {
-    margin: 0.5rem 0; 
+    margin: 0.5rem 0;
 }
 
 #helpBodyDiv a {
@@ -1281,7 +1283,7 @@ table {
 }
 
 #helpBodyDiv figure {
-    margin-left: 0.5rem; 
+    margin-left: 0.5rem;
     margin-bottom: 1rem;
 }
 
@@ -2026,7 +2028,9 @@ table {
     width: 28px;
     height: 28px;
     filter: invert(100%);
-    transition: background-color 0.3s, filter 0.3s;
+    transition:
+        background-color 0.3s,
+        filter 0.3s;
 }
 
 .msgCloseIcon:hover {
@@ -2211,25 +2215,83 @@ table {
    FIX: Center the Welcome Modal on Mobile
    ====================================================== */
 @media screen and (max-width: 600px) {
-  #helpDiv {
-    /* 1. Fit the screen width */
-    width: 90% !important;
+    #helpDiv {
+        /* 1. Fit the screen width */
+        width: 90% !important;
 
-    /* 2. Center Horizontally */
-    left: 50% !important;
-    transform: translateX(-50%);
-    /* Moves it back by half its width to center it */
+        /* 2. Center Horizontally */
+        left: 50% !important;
+        transform: translateX(-50%);
+        /* Moves it back by half its width to center it */
 
-    /* 3. Reset Top position if needed */
-    top: 15% !important;
-  }
+        /* 3. Reset Top position if needed */
+        top: 15% !important;
+    }
 
-  /* Fix the inner text box width so it doesn't overflow */
-  #helpBodyDiv {
-    width: calc(100% - 110px) !important;
-    margin: 0 auto !important;
-    left: 0 !important;
-    padding: 0 10px;
-    box-sizing: border-box;
-  }
+    /* Fix the inner text box width so it doesn't overflow */
+    #helpBodyDiv {
+        width: calc(100% - 110px) !important;
+        margin: 0 auto !important;
+        left: 0 !important;
+        padding: 0 10px;
+        box-sizing: border-box;
+    }
+}
+
+/* Phrase Maker Overrides */
+.pm-label-cell {
+    background-color: var(--color-text-primary) !important;
+    color: var(--color-text-inverse) !important;
+}
+
+.pm-lyrics-label {
+    background-color: var(--color-brand-secondary) !important;
+}
+
+.pm-lyrics-input {
+    background-color: var(--color-brand-primary-hover) !important;
+}
+
+.pm-selector-selected {
+    background-color: var(--color-brand-primary) !important;
+}
+
+.pm-tuplet-bg {
+    background-color: var(--color-bg-tertiary) !important;
+}
+
+.pm-rhythm-cell {
+    background-color: var(--color-bg-tertiary) !important;
+}
+
+.pm-pitch-bg {
+    background-color: var(--color-success) !important;
+}
+
+.pm-graphics-bg {
+    background-color: var(--color-brand-secondary) !important;
+}
+
+.pm-drum-bg {
+    background-color: var(--color-brand-secondary) !important;
+}
+
+.pm-pitch-label {
+    background-color: var(--color-success) !important;
+}
+
+.pm-graphics-label {
+    background-color: var(--color-brand-primary) !important;
+}
+
+.pm-drum-label {
+    background-color: var(--color-brand-primary) !important;
+}
+
+.pm-black-cell {
+    background-color: #000000 !important;
+}
+
+.pm-selector-bg {
+    background-color: var(--color-bg-secondary) !important;
 }
