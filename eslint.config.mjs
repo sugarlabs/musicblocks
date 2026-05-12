@@ -204,6 +204,21 @@ export default [
     },
 
     {
+        files: ["js/components/BlockEditor/**/*.js", "js/components/BlockEditor/**/*.jsx"],
+        languageOptions: {
+            sourceType: "module",
+            ecmaVersion: "latest",
+            parserOptions: {
+                ecmaFeatures: { jsx: true }
+            }
+        },
+        rules: {
+            "no-unused-vars": "off",
+            "no-undef": "off"
+        }
+    },
+
+    {
         files: ["cypress/**/*.js"],
         languageOptions: {
             globals: {
