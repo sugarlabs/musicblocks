@@ -434,6 +434,15 @@ class Blocks {
          * @returns {number[]} Array of block indices near (x, y)
          */
         this._getNearbyBlocks = (x, y) => {
+            // Fall back to full scan when the grid has not been populated yet.
+            if (this._spatialGrid.size === 0) {
+                const all = [];
+                for (let i = 0; i < this.blockList.length; i++) {
+                    all.push(i);
+                }
+                return all;
+            }
+
             const cx = Math.floor(x / SPATIAL_GRID_CELL_SIZE);
             const cy = Math.floor(y / SPATIAL_GRID_CELL_SIZE);
             const result = [];
@@ -974,6 +983,7 @@ class Blocks {
                     vspaceBlock.container.x = thisBlock.container.x + dx;
                     /** Math.floor(thisBlock.container.y + dy + 0.5); */
                     vspaceBlock.container.y = thisBlock.container.y + dy;
+                    that._updateSpatialGrid(vspace);
                     vspaceBlock.connections[0] = thisBlock.blockIndex;
                     vspaceBlock.connections[1] = nextBlock;
                     thisBlock.connections[thisBlock.connections.length - 1] = vspace;
@@ -3487,6 +3497,7 @@ class Blocks {
             myBlock.container.snapToPixelEnabled = true;
             myBlock.container.x = 0;
             myBlock.container.y = 0;
+            this._updateSpatialGrid(this.blockList.length - 1);
 
             /** and we need to load the images into the container. */
             myBlock.imageLoad();
@@ -7021,6 +7032,7 @@ class Blocks {
                     if (this.blockList[thisBlock].connections[0] == null) {
                         this.blockList[thisBlock].container.x = blkData[2];
                         this.blockList[thisBlock].container.y = blkData[3];
+                        this._updateSpatialGrid(thisBlock);
                         this._adjustTheseDocks.push(thisBlock);
                         if (blkData[4][0] == null) {
                             this._adjustTheseStacks.push(thisBlock);
