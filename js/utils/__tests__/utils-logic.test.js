@@ -199,6 +199,21 @@ describe("Utility Logic Functions", () => {
         it("handles invalid input", () => {
             expect(rationalSum(null, [1, 2])).toEqual([0, 1]);
         });
+
+        it("handles zero values", () => {
+            expect(rationalSum([0, 1], [1, 2])).toEqual([1, 2]);
+            expect(rationalSum([1, 2], [0, 1])).toEqual([1, 2]);
+        });
+
+        it("handles negative values", () => {
+            expect(rationalSum([-1, 2], [1, 2])).toEqual([0, 2]);
+            expect(rationalSum([1, 2], [-1, 2])).toEqual([0, 2]);
+        });
+
+        it("handles zero denominator", () => {
+            expect(rationalSum([1, 0], [1, 2])).toEqual([0, 1]);
+            expect(rationalSum([1, 2], [1, 0])).toEqual([0, 1]);
+        });
     });
 
     describe("rgbToHex()", () => {
@@ -229,6 +244,10 @@ describe("Utility Logic Functions", () => {
     describe("resolveObject()", () => {
         beforeAll(() => {
             global.TestNamespace = { Sub: { value: 42 } };
+        });
+
+        afterAll(() => {
+            delete global.TestNamespace;
         });
 
         it("resolves nested path", () => {
@@ -266,6 +285,18 @@ describe("Utility Logic Functions", () => {
             expect(cloned).not.toBe(obj);
             expect(cloned.b).not.toBe(obj.b);
         });
+
+        it("clones nested arrays and objects", () => {
+            const obj = {
+                a: [1, 2, { b: 3 }],
+                c: { d: [4, 5], e: 6 }
+            };
+            const cloned = deepClone(obj);
+            expect(cloned).toEqual(obj);
+            expect(cloned.a).not.toBe(obj.a);
+            expect(cloned.a[2]).not.toBe(obj.a[2]);
+            expect(cloned.c.d).not.toBe(obj.c.d);
+        });
     });
 
     describe("isSafeUrl()", () => {
@@ -277,6 +308,14 @@ describe("Utility Logic Functions", () => {
         it("identifies unsafe urls", () => {
             expect(isSafeUrl("javascript:alert(1)")).toBe(false);
             expect(isSafeUrl("data:text/html,Hello")).toBe(false);
+            expect(isSafeUrl("vbscript:alert(1)")).toBe(false);
+            expect(isSafeUrl("file:///etc/passwd")).toBe(false);
+            expect(isSafeUrl("mailto:test@example.com")).toBe(false);
+            expect(isSafeUrl("blob:https://example.com/uuid")).toBe(false);
+            expect(isSafeUrl("tel:123456789")).toBe(false);
+            expect(isSafeUrl("sms:123456789")).toBe(false);
+            expect(isSafeUrl("chrome://settings")).toBe(false);
+            expect(isSafeUrl("about:blank")).toBe(false);
             expect(isSafeUrl("invalid-url")).toBe(false);
         });
     });
