@@ -1223,3 +1223,7 @@ function AIDebuggerWidget() {
         }
     };
 }
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { AIDebuggerWidget };
+}

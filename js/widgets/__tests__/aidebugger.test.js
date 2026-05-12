@@ -20,16 +20,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const fs = require("fs");
-const path = require("path");
+const { AIDebuggerWidget } = require("../aidebugger.js");
 
-// Load the AIDebuggerWidget class by reading the source and evaluating it
-const source = fs.readFileSync(path.resolve(__dirname, "../aidebugger.js"), "utf-8");
-new Function(
-    source + "\nif (typeof global !== 'undefined') { global.AIDebuggerWidget = AIDebuggerWidget; }"
-)();
-
-// Mock globals
 global._ = str => str;
 global._THIS_IS_MUSIC_BLOCKS_ = true;
 
