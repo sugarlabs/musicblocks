@@ -80,6 +80,7 @@
 
     function Container() {
         this._node = new Konva.Group();
+        this._wrappers = new Map(); // konva node → adapter wrapper, for children iteration
         proxy(this, "x", this._node);
         proxy(this, "y", this._node);
         proxy(this, "scaleX", this._node);
@@ -96,10 +97,21 @@
             enumerable: true,
             configurable: true
         });
-        // EaselJS exposes children array
+        Object.defineProperty(this, "name", {
+            get() {
+                return this._name || "";
+            },
+            set(v) {
+                this._name = v;
+                this._node.name(v);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        // children: returns adapter wrappers (not raw Konva nodes) so .name etc. work
         Object.defineProperty(this, "children", {
             get() {
-                return this._node.children || [];
+                return (this._node.children || []).map(k => this._wrappers.get(k) || k);
             },
             enumerable: true,
             configurable: true
@@ -111,10 +123,25 @@
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(this, "scale", {
+            get() {
+                return this._node.scaleX();
+            },
+            set(v) {
+                this._node.scaleX(v);
+                this._node.scaleY(v);
+            },
+            enumerable: true,
+            configurable: true
+        });
     }
 
     Container.prototype.addChild = function (...nodes) {
-        nodes.forEach(n => this._node.add(n._node || n));
+        nodes.forEach(n => {
+            const kNode = n._node || n;
+            this._node.add(kNode);
+            if (n._node) this._wrappers.set(kNode, n);
+        });
         return nodes[nodes.length - 1];
     };
 
@@ -122,11 +149,13 @@
         nodes.forEach(n => {
             const k = n._node || n;
             k.remove();
+            this._wrappers.delete(k);
         });
     };
 
     Container.prototype.removeAllChildren = function () {
         this._node.destroyChildren();
+        this._wrappers.clear();
     };
 
     Container.prototype.getChildAt = function (i) {
@@ -149,6 +178,7 @@
 
     Container.prototype.cache = function (x, y, w, h) {
         if (w > 0 && h > 0) this._node.cache(x, y, w, h);
+        this._cached = true;
     };
 
     Container.prototype.updateCache = function () {
@@ -159,7 +189,15 @@
 
     Container.prototype.uncache = function () {
         this._node.clearCache();
+        this._cached = false;
     };
+
+    Object.defineProperty(Container.prototype, "bitmapCache", {
+        get() {
+            return this._cached ? this._node : null;
+        },
+        configurable: true
+    });
 
     Object.defineProperty(Container.prototype, "hitArea", {
         set(v) {
@@ -222,6 +260,61 @@
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(this, "name", {
+            get() {
+                return this._name || "";
+            },
+            set(v) {
+                this._name = v;
+                this._node.name(v);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        // scale: EaselJS shorthand that sets both scaleX and scaleY
+        Object.defineProperty(this, "scale", {
+            get() {
+                return this._node.scaleX();
+            },
+            set(v) {
+                this._node.scaleX(v);
+                this._node.scaleY(v);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        // regX / regY = EaselJS registration point (pivot) → Konva offsetX / offsetY
+        Object.defineProperty(this, "regX", {
+            get() {
+                return this._node.offsetX();
+            },
+            set(v) {
+                this._node.offsetX(v);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(this, "regY", {
+            get() {
+                return this._node.offsetY();
+            },
+            set(v) {
+                this._node.offsetY(v);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        // cursor — stored as a data attribute; no-op visually (handled by stage CSS)
+        Object.defineProperty(this, "cursor", {
+            get() {
+                return this._cursor || "default";
+            },
+            set(v) {
+                this._cursor = v;
+            },
+            enumerable: true,
+            configurable: true
+        });
         // filters: EaselJS assigns an array of filter objects; apply them via Konva filters
         Object.defineProperty(this, "filters", {
             get() {
@@ -255,6 +348,19 @@
 
     Bitmap.prototype.uncache = function () {
         this._node.clearCache();
+    };
+
+    Bitmap.prototype.clone = function () {
+        const c = new Bitmap(this._node.image());
+        c.x = this.x;
+        c.y = this.y;
+        c.scaleX = this.scaleX;
+        c.scaleY = this.scaleY;
+        c.regX = this.regX;
+        c.regY = this.regY;
+        c.rotation = this.rotation;
+        c.alpha = this.alpha;
+        return c;
     };
 
     Bitmap.prototype.getBounds = function () {
@@ -317,10 +423,34 @@
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(this, "textAlign", {
+            get() {
+                return this._node.align();
+            },
+            set(v) {
+                this._node.align(v);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(this, "textBaseline", {
+            get() {
+                return this._textBaseline || "alphabetic";
+            },
+            set(v) {
+                this._textBaseline = v;
+            },
+            enumerable: true,
+            configurable: true
+        });
     }
 
     Text.prototype.getMeasuredWidth = function () {
         return this._node.getTextWidth();
+    };
+
+    Text.prototype.getMeasuredHeight = function () {
+        return this._node.getTextHeight();
     };
 
     Text.prototype.on = function (evt, fn) {
