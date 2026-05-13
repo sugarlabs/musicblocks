@@ -162,14 +162,15 @@ function TemperamentWidget() {
         cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
+        cell.classList.add("tm-selector-bg");
 
         cell.onmouseover = function () {
-            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
+            this.classList.add("tm-selector-hover");
+            this.classList.remove("tm-selector-bg");
         };
 
         cell.onmouseout = function () {
-            this.style.backgroundColor = platformColor.selectorBackground;
+            this.classList.add("tm-selector-bg");
         };
 
         return cell;
@@ -187,7 +188,7 @@ function TemperamentWidget() {
         temperamentTableDiv.style.visibility = "visible";
         temperamentTableDiv.style.border = "0px";
         temperamentTableDiv.style.overflow = "auto";
-        temperamentTableDiv.style.backgroundColor = "white";
+        temperamentTableDiv.classList.add("tm-selector-bg");
         temperamentTableDiv.style.height = "300px";
         temperamentTableDiv.textContent = "";
         const temperamentTable = document.createElement("div");
@@ -344,13 +345,13 @@ function TemperamentWidget() {
             divAppend1 = docById("clearNotes");
             divAppend1.style.height = "30px";
             divAppend1.style.marginLeft = "3px";
-            divAppend1.style.backgroundColor = platformColor.selectorBackground;
+            divAppend1.classList.add("tm-selector-bg");
             divAppend1.style.width = "212px";
 
             divAppend2 = docById("standardOctave");
             divAppend2.style.height = "30px";
             divAppend2.style.marginRight = "3px";
-            divAppend2.style.backgroundColor = platformColor.selectorBackground;
+            divAppend2.classList.add("tm-selector-bg");
             divAppend2.style.width = BUTTONDIVWIDTH / 2 - 8 + "px";
         } else {
             divAppend1 = document.createElement("div");
@@ -360,7 +361,7 @@ function TemperamentWidget() {
             divAppend1.style.position = "absolute";
             divAppend1.style.zIndex = 2;
             divAppend1.style.paddingTop = "5px";
-            divAppend1.style.backgroundColor = platformColor.selectorBackground;
+            divAppend1.classList.add("tm-selector-bg");
             divAppend1.style.height = "25px";
             divAppend1.style.width = docById("wheelDiv2").style.width;
             divAppend1.style.marginTop = docById("wheelDiv2").style.height;
@@ -808,11 +809,12 @@ function TemperamentWidget() {
             notesCell[i][0].style.textAlign = "center";
 
             notesCell[i][0].onmouseover = function () {
-                this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
+                this.classList.add("tm-selector-hover");
+                this.classList.remove("tm-selector-bg");
             };
 
             notesCell[i][0].onmouseout = function () {
-                this.style.backgroundColor = platformColor.selectorBackground;
+                this.classList.add("tm-selector-bg");
             };
 
             const playImage = docById("play_" + i);
@@ -981,7 +983,7 @@ function TemperamentWidget() {
         this.editMode = "equal";
         docById("userEdit").textContent = "";
         const equalEdit = docById("userEdit");
-        equalEdit.style.backgroundColor = platformColor.selectorBackground || "#c8C8C8";
+        equalEdit.classList.add("tm-selector-bg");
         equalEdit.appendChild(document.createElement("br"));
         equalEdit.appendChild(
             document.createTextNode(_("pitch number") + "\u00A0\u00A0\u00A0\u00A0 ")
@@ -1038,13 +1040,13 @@ function TemperamentWidget() {
             const divAppend1 = docById("preview");
             divAppend1.style.height = "30px";
             divAppend1.style.marginLeft = "3px";
-            divAppend1.style.backgroundColor = platformColor.selectorBackground;
+            divAppend1.classList.add("tm-selector-bg");
             divAppend1.style.width = "215px";
 
             const divAppend2 = docById("done_");
             divAppend2.style.height = "30px";
             divAppend2.style.marginRight = "3px";
-            divAppend2.style.backgroundColor = platformColor.selectorBackground;
+            divAppend2.classList.add("tm-selector-bg");
             divAppend2.style.width = "205px";
         }
 
@@ -1207,7 +1209,7 @@ function TemperamentWidget() {
         this.editMode = "ratio";
         docById("userEdit").textContent = "";
         const ratioEdit = docById("userEdit");
-        ratioEdit.style.backgroundColor = platformColor.selectorBackground || "#c8C8C8";
+        ratioEdit.classList.add("tm-selector-bg");
         ratioEdit.appendChild(document.createElement("br"));
         ratioEdit.appendChild(document.createTextNode(_("ratio") + " \u00A0\u00A0\u00A0\u00A0 "));
         const ratioIn = document.createElement("input");
@@ -1259,13 +1261,13 @@ function TemperamentWidget() {
             const divAppend1 = docById("preview");
             divAppend1.style.height = "30px";
             divAppend1.style.marginLeft = "3px";
-            divAppend1.style.backgroundColor = platformColor.selectorBackground;
+            divAppend1.classList.add("tm-selector-bg");
             divAppend1.style.width = "215px";
 
             const divAppend2 = docById("done_");
             divAppend2.style.height = "30px";
             divAppend2.style.marginRight = "3px";
-            divAppend2.style.backgroundColor = platformColor.selectorBackground;
+            divAppend2.classList.add("tm-selector-bg");
             divAppend2.style.width = "205px";
         }
 
@@ -1612,7 +1614,7 @@ function TemperamentWidget() {
         divAppend.textContent = _("done");
         divAppend.style.textAlign = "center";
         divAppend.style.paddingTop = "5px";
-        divAppend.style.backgroundColor = platformColor.selectorBackground;
+        divAppend.classList.add("tm-selector-bg");
         divAppend.style.height = "25px";
         divAppend.style.marginTop = "40px";
         divAppend.style.overflow = "auto";
@@ -1788,7 +1790,7 @@ function TemperamentWidget() {
         const len = this.ratios.length;
         const octaveRatio = this.ratios[len - 1];
         const octaveSpaceEdit = docById("userEdit");
-        octaveSpaceEdit.style.backgroundColor = platformColor.selectorBackground || "#c8C8C8";
+        octaveSpaceEdit.classList.add("tm-selector-bg");
         octaveSpaceEdit.appendChild(document.createElement("br"));
         octaveSpaceEdit.appendChild(document.createElement("br"));
         octaveSpaceEdit.appendChild(
@@ -1818,7 +1820,7 @@ function TemperamentWidget() {
         divAppend.style.textAlign = "center";
         divAppend.style.paddingTop = "5px";
         divAppend.style.marginLeft = "-70px";
-        divAppend.style.backgroundColor = platformColor.selectorBackground;
+        divAppend.classList.add("tm-selector-bg");
         divAppend.style.height = "25px";
         divAppend.style.marginTop = "40px";
         divAppend.style.overflow = "auto";
@@ -2578,7 +2580,7 @@ function TemperamentWidget() {
         temperamentCell.style.minHeight = temperamentCell.style.height;
         temperamentCell.style.maxHeight = temperamentCell.style.height;
         temperamentCell.style.textAlign = "center";
-        temperamentCell.style.backgroundColor = platformColor.selectorBackground;
+        temperamentCell.classList.add("tm-selector-bg");
 
         this.playButton = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play all"));
         this.lastClickTime = 0;
