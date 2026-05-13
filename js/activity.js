@@ -7026,16 +7026,12 @@ class Activity {
             ButtonHolder.style.display = "block";
             document.body.appendChild(ButtonHolder);
 
-            this.homeButtonContainer = createButton(
-                GOHOMEFADEDBUTTON,
-                _("Home") + " [" + _("Home").toUpperCase() + "]",
-                findBlocks
-            );
+            this.homeButtonContainer = createButton(GOHOMEFADEDBUTTON, _("Home"), findBlocks);
             this.boundary.hide();
 
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Home [HOME]"))
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Home"))
                 this.helpfulWheelItems.push({
-                    label: "Home [HOME]",
+                    label: "Home",
                     icon:
                         "imgsrc:data:image/svg+xml;base64," +
                         window.btoa(base64Encode(GOHOMEFADEDBUTTON)),

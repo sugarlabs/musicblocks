@@ -58,8 +58,7 @@
 }
 
 /* Ensure Home button is always visible in this container */
-.play-only #Home\ \[HOME\],
-.play-only [id="Home [HOME]"] {
+.play-only #Home {
     display: flex !important;
 }
 
