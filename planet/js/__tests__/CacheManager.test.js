@@ -551,6 +551,41 @@ describe("IndexedDB CacheManager integration", () => {
         });
     });
 
+    describe("invalidateProject", () => {
+        test("removes project data, metadata, and thumbnail for a given id", async () => {
+            await cacheManager.cacheMetadata("inv-1", { name: "Doomed" });
+            await cacheManager.cacheProject("inv-1", { data: "gone" });
+            await cacheManager.cacheThumbnail("inv-1", "data:image/png;base64,abc");
+
+            const removed = await cacheManager.invalidateProject("inv-1");
+
+            expect(removed).toBe(true);
+            expect(await cacheManager.getMetadata("inv-1")).toBeNull();
+            expect(await cacheManager.getProject("inv-1")).toBeNull();
+            expect(await cacheManager.getThumbnail("inv-1")).toBeNull();
+        });
+
+        test("returns false for a non-existent id", async () => {
+            const removed = await cacheManager.invalidateProject("no-such-id");
+            expect(removed).toBe(false);
+        });
+
+        test("does not affect other projects", async () => {
+            await cacheManager.cacheProject("keep", { data: "safe" });
+            await cacheManager.cacheProject("remove", { data: "bye" });
+
+            await cacheManager.invalidateProject("remove");
+
+            expect(await cacheManager.getProject("keep")).toEqual({ data: "safe" });
+            expect(await cacheManager.getProject("remove")).toBeNull();
+        });
+
+        test("returns false when not initialized", async () => {
+            const uninit = new CacheManager();
+            expect(await uninit.invalidateProject("x")).toBe(false);
+        });
+    });
+
     describe("updateLastAccessed", () => {
         test("getMetadata updates lastAccessed", async () => {
             const BASE = 1000;

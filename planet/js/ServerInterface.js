@@ -199,29 +199,42 @@ class ServerInterface {
     }
 
     /**
-     * Downloads full project data with caching support
+     * Downloads full project data with stale-while-revalidate caching.
+     * Returns cached data immediately if available, then revalidates
+     * from the server in the background to keep the cache fresh and
+     * respect any server-side moderation or deletion.
      */
     async downloadProject(ProjectID, callback) {
+        let servedFromCache = false;
+
         if (!this.disablePlanetCache) {
-            // Try cache first
             await this.initCache();
             const cached = await this.cacheManager.getProject(ProjectID);
 
             if (cached) {
                 console.debug("[ServerInterface] Returning cached project:", ProjectID);
                 callback({ success: true, data: cached });
-                return;
+                servedFromCache = true;
             }
         }
-        // Fetch from server
+
+        // Always revalidate from server (even on cache hit)
         const obj = { action: "downloadProject", ProjectID: ProjectID };
 
         this.throttledRequest(obj, async result => {
-            // Cache successful responses
-            if (!this.disablePlanetCache && result && result.success && result.data) {
-                await this.cacheManager.cacheProject(ProjectID, result.data);
+            if (!this.disablePlanetCache) {
+                if (result && result.success && result.data) {
+                    await this.cacheManager.cacheProject(ProjectID, result.data);
+                } else if (result && !result.success) {
+                    // Server says the project is gone or inaccessible — evict stale cache
+                    await this.cacheManager.invalidateProject(ProjectID);
+                }
             }
-            callback(result);
+
+            // Only call back if we didn't already serve from cache
+            if (!servedFromCache) {
+                callback(result);
+            }
         });
     }
 
@@ -234,9 +247,15 @@ class ServerInterface {
     }
 
     /**
-     * Reports a project (uses raw request - no caching for write operations)
+     * Reports a project and invalidates its local cache so a stale
+     * copy cannot be served after moderation.
      */
-    reportProject(ProjectID, Description, callback) {
+    async reportProject(ProjectID, Description, callback) {
+        if (!this.disablePlanetCache) {
+            await this.initCache();
+            await this.cacheManager.invalidateProject(ProjectID);
+        }
+
         const obj = { action: "reportProject", ProjectID: ProjectID, Description: Description };
         this.request(obj, callback);
     }

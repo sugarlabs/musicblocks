@@ -50,6 +50,7 @@ describe("ServerInterface", () => {
             cacheMetadata: jest.fn().mockResolvedValue(true),
             getProject: jest.fn().mockResolvedValue(null),
             cacheProject: jest.fn().mockResolvedValue(true),
+            invalidateProject: jest.fn().mockResolvedValue(true),
             clearAll: jest.fn().mockResolvedValue(true),
             clearExpired: jest.fn().mockResolvedValue(0),
             getStats: jest.fn().mockResolvedValue({
@@ -207,16 +208,18 @@ describe("ServerInterface", () => {
     });
 
     describe("downloadProject (project data caching)", () => {
-        it("should return cached project when available", async () => {
+        it("should return cached project immediately and still revalidate", async () => {
             const cachedProject = { blocks: [] };
             mockCacheManager.getProject.mockResolvedValueOnce(cachedProject);
             const callback = jest.fn();
 
             await server.downloadProject("p1", callback);
+            await new Promise(process.nextTick);
 
             expect(mockCacheManager.getProject).toHaveBeenCalledWith("p1");
             expect(callback).toHaveBeenCalledWith({ success: true, data: cachedProject });
-            expect(jQuery.ajax).not.toHaveBeenCalled();
+            // Stale-while-revalidate: server request is still made
+            expect(jQuery.ajax).toHaveBeenCalled();
         });
 
         it("should fetch from network and cache project when not cached", async () => {
@@ -237,6 +240,62 @@ describe("ServerInterface", () => {
         });
     });
 
+    describe("downloadProject stale-while-revalidate", () => {
+        it("should revalidate from server even on cache hit", async () => {
+            const cachedProject = { blocks: [1, 2] };
+            mockCacheManager.getProject.mockResolvedValueOnce(cachedProject);
+            const callback = jest.fn();
+
+            await server.downloadProject("p1", callback);
+            await new Promise(process.nextTick);
+
+            // Should have called back with cached data
+            expect(callback).toHaveBeenCalledWith({ success: true, data: cachedProject });
+
+            // Should still make a server request to revalidate
+            expect(jQuery.ajax).toHaveBeenCalled();
+        });
+
+        it("should invalidate cache when server says project is gone", async () => {
+            mockCacheManager.getProject.mockResolvedValueOnce({ blocks: [] });
+            const callback = jest.fn();
+
+            server.downloadProject("p-gone", callback);
+            await new Promise(process.nextTick);
+
+            // Simulate server returning failure (deleted/moderated)
+            const ajaxInstance = jQuery.ajax.mock.results[0].value;
+            ajaxInstance._done({ success: false, error: "PROJECT_NOT_FOUND" });
+            await new Promise(process.nextTick);
+
+            expect(mockCacheManager.invalidateProject).toHaveBeenCalledWith("p-gone");
+        });
+
+        it("should update cache when server returns fresh data", async () => {
+            mockCacheManager.getProject.mockResolvedValueOnce({ blocks: [1] });
+            const callback = jest.fn();
+
+            server.downloadProject("p-update", callback);
+            await new Promise(process.nextTick);
+
+            const freshData = { success: true, data: { blocks: [1, 2, 3] } };
+            const ajaxInstance = jQuery.ajax.mock.results[0].value;
+            ajaxInstance._done(freshData);
+            await new Promise(process.nextTick);
+
+            expect(mockCacheManager.cacheProject).toHaveBeenCalledWith("p-update", freshData.data);
+        });
+    });
+
+    describe("reportProject cache invalidation", () => {
+        it("should invalidate cache for the reported project", async () => {
+            const callback = jest.fn();
+            await server.reportProject("p-bad", "spam", callback);
+
+            expect(mockCacheManager.invalidateProject).toHaveBeenCalledWith("p-bad");
+        });
+    });
+
     describe("endpoint methods", () => {
         it("should call addProject using a direct request", () => {
             const callback = jest.fn();
@@ -248,9 +307,9 @@ describe("ServerInterface", () => {
             expect(sentData["api-key"]).toBe(server.APIKey);
         });
 
-        it("should call reportProject using a direct request", () => {
+        it("should call reportProject using a direct request", async () => {
             const callback = jest.fn();
-            server.reportProject("p1", "spam", callback);
+            await server.reportProject("p1", "spam", callback);
 
             const sentData = jQuery.ajax.mock.calls[0][0].data;
             expect(sentData.action).toBe("reportProject");

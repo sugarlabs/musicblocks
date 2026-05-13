@@ -279,6 +279,52 @@ class CacheManager {
     }
 
     /**
+     * Invalidates all cached data for a specific project (metadata, data, thumbnail).
+     * Used when a project is reported, deleted, or known to be stale.
+     * @param {string} id - Project ID
+     * @returns {Promise<boolean>} - True if at least one entry was removed
+     */
+    async invalidateProject(id) {
+        if (!this.isInitialized) return false;
+
+        let removed = false;
+
+        for (const storeName of Object.values(this.STORES)) {
+            try {
+                const existing = await this._getFromStore(storeName, id);
+
+                if (existing) {
+                    await this._deleteFromStore(storeName, id);
+                    removed = true;
+                }
+            } catch (error) {
+                cacheDebugLog(`[CacheManager] Error invalidating ${id} from ${storeName}:`, error);
+            }
+        }
+
+        if (removed) {
+            cacheDebugLog(`[CacheManager] Invalidated project: ${id}`);
+        }
+
+        return removed;
+    }
+
+    /**
+     * Deletes a single entry from a store
+     * @private
+     */
+    _deleteFromStore(storeName, key) {
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction([storeName], "readwrite");
+            const store = transaction.objectStore(storeName);
+            const request = store.delete(key);
+
+            request.onsuccess = () => resolve();
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    /**
      * Clears all expired entries from all stores
      * @returns {Promise<number>} - Number of entries cleared
      */
