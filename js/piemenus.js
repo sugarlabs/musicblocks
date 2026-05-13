@@ -4530,5 +4530,5 @@ const piemenuDissectNumber = widget => {
 };
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { piemenuPitches };
+    module.exports = { piemenuPitches, piemenuVoices };
 }

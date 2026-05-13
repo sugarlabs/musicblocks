@@ -12,7 +12,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const { piemenuPitches } = require("../piemenus");
+const { piemenuPitches, piemenuVoices } = require("../piemenus");
 
 const piemenusPath = path.join(__dirname, "..", "piemenus.js");
 let piemenusContent;
@@ -41,7 +41,9 @@ global.wheelnav = jest.fn().mockImplementation(function (div) {
         sliceSelectedAttr: {},
         sliceHoverAttr: {},
         titleSelectedAttr: {},
-        titleHoverAttr: {}
+        titleHoverAttr: {},
+        titleAttr: {},
+        navigateFunction: jest.fn()
     }));
     this.selectedNavItemIndex = 0;
     this.colors = [];
@@ -74,7 +76,8 @@ global.platformColor = {
     exitWheelcolors: ["#00ff00"],
     accidentalsWheelcolors: ["#0000ff"],
     octavesWheelcolors: ["#ffff00"],
-    accidentalsWheelcolorspush: "#cccccc"
+    accidentalsWheelcolorspush: "#cccccc",
+    piemenuVoicesColors: ["#ff0000", "#00ff00", "#0000ff"]
 };
 global._ = jest.fn(s => s);
 global.NOTENAMES = ["C", "D", "E", "F", "G", "A", "B"];
@@ -104,6 +107,9 @@ global.DEFAULTVOICE = "sine";
 global.PREVIEWVOLUME = 0.5;
 global.getNote = jest.fn().mockReturnValue(["C", 4]);
 global.buildScale = jest.fn(() => [["C", "D", "E", "F", "G", "A", "B", "C"], []]);
+global.getDrumName = jest.fn().mockReturnValue(null);
+global.getVoiceSynthName = jest.fn(v => v);
+global.getDrumSynthName = jest.fn(d => d);
 
 describe("piemenus behavioral tests", () => {
     let mockBlock;
@@ -205,6 +211,100 @@ describe("piemenus behavioral tests", () => {
             expect(piemenusContent).toMatch(
                 /if \(typeof HelpWidget === "undefined"\)\s*\{\s*if \(typeof require !== "undefined"\)\s*\{\s*require\(\["widgets\/help"\], function \(\) \{\s*new HelpWidget\(that, true\);/
             );
+        });
+    });
+
+    describe("piemenuVoices", () => {
+        beforeEach(() => {
+            mockBlock = {
+                container: { x: 100, y: 100, setChildIndex: jest.fn(), children: [] },
+                blocks: {
+                    stageClick: false,
+                    blockScale: 1,
+                    turtles: { _canvas: { width: 1000, height: 1000 } }
+                },
+                activity: {
+                    canvas: { offsetLeft: 0, offsetTop: 0 },
+                    blocksContainer: { x: 0, y: 0 },
+                    getStageScale: jest.fn().mockReturnValue(1),
+                    turtles: {
+                        ithTurtle: jest.fn().mockReturnValue({
+                            singer: { instrumentNames: [] }
+                        })
+                    },
+                    logo: { synth: new global.Synth() }
+                },
+                text: { text: "" },
+                value: "",
+                updateCache: jest.fn()
+            };
+            jest.clearAllMocks();
+        });
+
+        test("piemenuVoices sets up voice wheel correctly", () => {
+            const voiceLabels = ["piano", "violin", "flute"];
+            const voiceValues = ["piano", "violin", "flute"];
+            const categories = [0, 1, 2];
+
+            piemenuVoices(mockBlock, voiceLabels, voiceValues, categories, "piano");
+
+            expect(global.wheelnav).toHaveBeenCalled();
+            expect(mockBlock._voiceWheel).toBeDefined();
+            expect(mockBlock._exitWheel).toBeDefined();
+            expect(mockBlock._voiceWheel.createWheel).toHaveBeenCalledWith(voiceLabels);
+        });
+
+        test("piemenuVoices selects correct voice on navigate", () => {
+            const voiceLabels = ["piano", "violin", "flute"];
+            const voiceValues = ["piano", "violin", "flute"];
+            const categories = [0, 1, 2];
+
+            piemenuVoices(mockBlock, voiceLabels, voiceValues, categories, "piano");
+
+            // Simulate selecting violin (index 1)
+            mockBlock._voiceWheel.selectedNavItemIndex = 1;
+            mockBlock._voiceWheel.navItems[1].title = "violin";
+
+            // Trigger selection changed
+            const navigateFunc = mockBlock._voiceWheel.navItems[1].navigateFunction;
+            if (navigateFunc) navigateFunc();
+
+            expect(mockBlock.value).toBe("violin");
+            expect(mockBlock.text.text).toBe("violin");
+        });
+
+        test("piemenuVoices returns early on stage click", () => {
+            mockBlock.blocks.stageClick = true;
+            const voiceLabels = ["piano", "violin"];
+            const voiceValues = ["piano", "violin"];
+            const categories = [0, 1];
+
+            piemenuVoices(mockBlock, voiceLabels, voiceValues, categories, "piano");
+
+            expect(global.wheelnav).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("piemenuPitches edge cases", () => {
+        test("piemenuPitches handles custom temperament", () => {
+            const noteLabels = ["N0", "N1", "N2", "N3", "N4"];
+            const noteValues = ["N0", "N1", "N2", "N3", "N4"];
+
+            piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "N0", "custom");
+
+            expect(global.wheelnav).toHaveBeenCalled();
+            expect(mockBlock._pitchWheel).toBeDefined();
+        });
+
+        test("piemenuPitches opens pitch selector wheel", () => {
+            const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+            const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+
+            piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
+
+            expect(global.wheelnav).toHaveBeenCalled();
+            expect(mockBlock._pitchWheel).toBeDefined();
+            expect(mockBlock._pitchWheel.createWheel).toHaveBeenCalledWith(noteLabels);
         });
     });
 });
