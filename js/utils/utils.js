@@ -2099,6 +2099,7 @@ if (typeof module !== "undefined" && module.exports) {
         closeBlkWidgets,
         resolveObject,
         importMembers,
-        escapeHTML
+        escapeHTML,
+        unescapeHTML
     };
 }

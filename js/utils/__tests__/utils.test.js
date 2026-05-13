@@ -92,7 +92,9 @@ const {
     closeWidgets,
     closeBlkWidgets,
     resolveObject,
-    importMembers
+    importMembers,
+    escapeHTML,
+    unescapeHTML
 } = require("../utils.js");
 
 describe("Utility Functions (logic-only)", () => {
@@ -795,6 +797,84 @@ describe("Utility Functions (logic-only)", () => {
         it("should return original string if no placeholders exist", () => {
             const result = format("Hello world", { name: "User" });
             expect(result).toBe("Hello world");
+        });
+    });
+
+    describe("escapeHTML()", () => {
+        it("escapes < to &lt;", () => {
+            expect(escapeHTML("<")).toBe("&lt;");
+        });
+
+        it("escapes > to &gt;", () => {
+            expect(escapeHTML(">")).toBe("&gt;");
+        });
+
+        it("escapes & to &amp;", () => {
+            expect(escapeHTML("&")).toBe("&amp;");
+        });
+
+        it("escapes double quotes to &quot;", () => {
+            expect(escapeHTML('"')).toBe("&quot;");
+        });
+
+        it("escapes single quotes to &#039;", () => {
+            expect(escapeHTML("'")).toBe("&#039;");
+        });
+
+        it("escapes multiple characters in one string", () => {
+            expect(escapeHTML('<script>alert("xss")</script>')).toBe(
+                "&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;"
+            );
+        });
+
+        it("handles non-string input by converting to string", () => {
+            expect(escapeHTML(123)).toBe("123");
+            expect(escapeHTML(null)).toBe("null");
+            expect(escapeHTML(undefined)).toBe("undefined");
+        });
+
+        it("returns empty string for empty input", () => {
+            expect(escapeHTML("")).toBe("");
+        });
+
+        it("returns string unchanged if no special characters", () => {
+            expect(escapeHTML("Hello World")).toBe("Hello World");
+            expect(escapeHTML("abc123")).toBe("abc123");
+        });
+    });
+
+    describe("unescapeHTML()", () => {
+        it("reverses escapeHTML for all entities", () => {
+            const original = '<div class="test">it\'s</div>';
+            expect(unescapeHTML(escapeHTML(original))).toBe(original);
+        });
+
+        it("unescapes &lt; to <", () => {
+            expect(unescapeHTML("&lt;")).toBe("<");
+        });
+
+        it("unescapes &gt; to >", () => {
+            expect(unescapeHTML("&gt;")).toBe(">");
+        });
+
+        it("unescapes &amp; to &", () => {
+            expect(unescapeHTML("&amp;")).toBe("&");
+        });
+
+        it("unescapes &quot; to double quote", () => {
+            expect(unescapeHTML("&quot;")).toBe('"');
+        });
+
+        it("unescapes &#039; to single quote", () => {
+            expect(unescapeHTML("&#039;")).toBe("'");
+        });
+
+        it("passes through plain text unchanged", () => {
+            expect(unescapeHTML("Hello World")).toBe("Hello World");
+        });
+
+        it("returns empty string for empty input", () => {
+            expect(unescapeHTML("")).toBe("");
         });
     });
 });
