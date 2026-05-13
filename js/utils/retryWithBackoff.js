@@ -94,7 +94,7 @@ const retryWithBackoff = async ({
             }));
 
     for (let count = 0; count <= maxRetries; count++) {
-        const result = check();
+        const result = await check();
 
         if (result) {
             await onSuccess(result);
