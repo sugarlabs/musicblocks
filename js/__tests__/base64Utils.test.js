@@ -48,4 +48,30 @@ describe("base64Utils", () => {
     test("base64Decode should handle empty strings", () => {
         expect(base64Utils.base64Decode("")).toBe("");
     });
+
+    test("base64Encode should handle Unicode characters", () => {
+        const unicode = "Hello 世界 🎵";
+        const encoded = base64Utils.base64Encode(unicode);
+        expect(encoded).toBeDefined();
+        expect(typeof encoded).toBe("string");
+        expect(encoded.length).toBeGreaterThan(0);
+    });
+
+    test("base64Encode and base64Decode should handle long strings", () => {
+        const longString = "a".repeat(10000);
+        const encoded = base64Utils.base64Encode(longString);
+        const decoded = base64Utils.base64Decode(encoded);
+        expect(decoded).toBe(longString);
+    });
+
+    test("base64Encode and base64Decode should be reversible for Unicode", () => {
+        const original = "Hello 世界 🎵 こんにちは नमस्ते";
+        const encoded = base64Utils.base64Encode(original);
+        const decoded = base64Utils.base64Decode(encoded);
+        expect(decoded).toBe(original);
+    });
+
+    test("base64Decode should throw on invalid base64 input", () => {
+        expect(() => base64Utils.base64Decode("!!!invalid!!!")).toThrow();
+    });
 });
