@@ -38,9 +38,10 @@
    importMembers, isSVGEmpty, last, mixedNumber, nearestBeat,
    oneHundredToFraction, prepareMacroExports, preparePluginExports,
    processMacroData, processRawPluginData, rationalSum, rgbToHex,
-   safeSVG, safeJSONParse, toFixed2, toTitleCase, windowHeight, windowWidth,
-    fnBrowserDetect, waitForReadiness, isSafeUrl, unescapeHTML
-*/
+   safeSVG, safeJSONParse, safeStorageGet, safeStorageSet, toFixed2, toTitleCase,
+   windowHeight, windowWidth, fnBrowserDetect, waitForReadiness, isSafeUrl,
+   unescapeHTML
+ */
 
 /**
  * Changes the source of an image element from one SVG data URI to another.
@@ -81,6 +82,66 @@ if (typeof module !== "undefined" && module.exports) {
 }
 if (typeof window !== "undefined") {
     window.safeJSONParse = safeJSONParse;
+}
+
+/**
+ * Safely reads a value from localStorage, returning a fallback if access fails.
+ * Handles both getItem() API and direct property access.
+ *
+ * @function
+ * @param {string} key - The localStorage key to read.
+ * @param {*} fallback - The fallback value if read fails or key is missing. Defaults to undefined.
+ * @returns {*} The stored value, or the fallback.
+ */
+const safeStorageGet = (key, fallback = undefined) => {
+    try {
+        if (typeof localStorage === "undefined" || localStorage === null) {
+            return fallback;
+        }
+        if (typeof localStorage.getItem === "function") {
+            const value = localStorage.getItem(key);
+            if (value !== null) {
+                return value;
+            }
+        }
+        const prop = localStorage[key];
+        return prop !== undefined ? prop : fallback;
+    } catch (e) {
+        return fallback;
+    }
+};
+
+/**
+ * Safely writes a value to localStorage, silently skipping if access fails.
+ * Handles both setItem() API and direct property assignment.
+ *
+ * @function
+ * @param {string} key - The localStorage key to write.
+ * @param {string} value - The value to store.
+ * @returns {void}
+ */
+const safeStorageSet = (key, value) => {
+    try {
+        if (typeof localStorage === "undefined" || localStorage === null) {
+            return;
+        }
+        if (typeof localStorage.setItem === "function") {
+            localStorage.setItem(key, value);
+            return;
+        }
+        localStorage[key] = value;
+    } catch (e) {
+        console.debug(`Storage write skipped for ${key}:`, e);
+    }
+};
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports.safeStorageGet = safeStorageGet;
+    module.exports.safeStorageSet = safeStorageSet;
+}
+if (typeof window !== "undefined") {
+    window.safeStorageGet = safeStorageGet;
+    window.safeStorageSet = safeStorageSet;
 }
 
 /**
@@ -2099,6 +2160,9 @@ if (typeof module !== "undefined" && module.exports) {
         closeBlkWidgets,
         resolveObject,
         importMembers,
-        escapeHTML
+        escapeHTML,
+        unescapeHTML,
+        safeStorageGet,
+        safeStorageSet
     };
 }

@@ -124,12 +124,7 @@ class StatusMatrix {
 
         // One row per field, one column per mouse (plus the labels)
         let label;
-        let languagePreference;
-        try {
-            languagePreference = localStorage.languagePreference;
-        } catch (e) {
-            languagePreference = undefined;
-        }
+        const languagePreference = safeStorageGet("languagePreference");
         for (const statusField of this.activity.logo.statusFields) {
             const row = header.insertRow();
 

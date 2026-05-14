@@ -33,3 +33,21 @@ Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
         return mockContext;
     }),
 });
+
+// Global mocks for safe localStorage helpers defined in js/utils/utils.js
+global.safeStorageGet = jest.fn((key, fallback) => {
+    if (typeof global.localStorage !== "undefined" && global.localStorage !== null) {
+        const val = global.localStorage.getItem ? global.localStorage.getItem(key) : global.localStorage[key];
+        if (val !== undefined && val !== null) return val;
+    }
+    return fallback;
+});
+global.safeStorageSet = jest.fn((key, value) => {
+    if (typeof global.localStorage !== "undefined" && global.localStorage !== null) {
+        if (global.localStorage.setItem) {
+            global.localStorage.setItem(key, value);
+        } else {
+            global.localStorage[key] = value;
+        }
+    }
+});

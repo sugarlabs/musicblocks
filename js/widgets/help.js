@@ -248,22 +248,12 @@ class HelpWidget {
                         // We need to add a case here whenever we add
                         // help artwort support for a new language.
                         // e.g., documentation-es
-                        let language;
-                        try {
-                            language = localStorage.languagePreference;
-                        } catch (e) {
-                            language = undefined;
-                        }
+                        let language = safeStorageGet("languagePreference");
                         if (language === undefined) {
                             language = navigator.language;
                         }
 
-                        let kanaPreference;
-                        try {
-                            kanaPreference = localStorage.kanaPreference;
-                        } catch (e) {
-                            kanaPreference = undefined;
-                        }
+                        const kanaPreference = safeStorageGet("kanaPreference");
 
                         switch (language) {
                             case "ja":
@@ -759,22 +749,12 @@ class HelpWidget {
                     // We need to add a case here whenever we add
                     // help artwort support for a new language.
                     // e.g., documentation-es
-                    let language;
-                    try {
-                        language = localStorage.languagePreference;
-                    } catch (e) {
-                        language = undefined;
-                    }
+                    let language = safeStorageGet("languagePreference");
                     if (language === undefined) {
                         language = navigator.language;
                     }
 
-                    let kanaPreference;
-                    try {
-                        kanaPreference = localStorage.kanaPreference;
-                    } catch (e) {
-                        kanaPreference = undefined;
-                    }
+                    const kanaPreference = safeStorageGet("kanaPreference");
 
                     switch (language) {
                         case "ja":

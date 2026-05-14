@@ -890,12 +890,7 @@ class Palettes {
         label.textContent = toTitleCase(_(name));
         label.style.color = platformColor.paletteText;
         row.style.borderBottom = "1px solid #0CAFFF";
-        let kanaPreference;
-        try {
-            kanaPreference = localStorage.kanaPreference;
-        } catch (e) {
-            kanaPreference = undefined;
-        }
+        const kanaPreference = safeStorageGet("kanaPreference");
         label.style.fontSize = kanaPreference === "kana" ? "12px" : "16px";
         label.style.padding = "4px";
         row.style.display = "flex";
@@ -936,12 +931,7 @@ class Palettes {
         img.style.height = `${this.cellSize}px`;
         label.textContent = toTitleCase(_(name));
         label.style.color = platformColor.paletteText;
-        let kanaPreference;
-        try {
-            kanaPreference = localStorage.kanaPreference;
-        } catch (e) {
-            kanaPreference = undefined;
-        }
+        const kanaPreference = safeStorageGet("kanaPreference");
         label.style.fontSize = kanaPreference === "kana" ? "12px" : "16px";
         label.style.padding = "4px";
         row.style.display = "flex";

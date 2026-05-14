@@ -92,7 +92,9 @@ const {
     closeWidgets,
     closeBlkWidgets,
     resolveObject,
-    importMembers
+    importMembers,
+    safeStorageGet,
+    safeStorageSet
 } = require("../utils.js");
 
 describe("Utility Functions (logic-only)", () => {
@@ -795,6 +797,137 @@ describe("Utility Functions (logic-only)", () => {
         it("should return original string if no placeholders exist", () => {
             const result = format("Hello world", { name: "User" });
             expect(result).toBe("Hello world");
+        });
+    });
+
+    describe("safeStorageGet()", () => {
+        const originalLocalStorage = global.localStorage;
+
+        afterEach(() => {
+            Object.defineProperty(global, "localStorage", {
+                value: originalLocalStorage,
+                writable: true,
+                configurable: true
+            });
+        });
+
+        it("returns value from localStorage.getItem when available", () => {
+            Object.defineProperty(global, "localStorage", {
+                value: { getItem: jest.fn(() => "stored-value") },
+                writable: true,
+                configurable: true
+            });
+            const result = safeStorageGet("myKey");
+            expect(result).toBe("stored-value");
+        });
+
+        it("falls back to property access when getItem returns null", () => {
+            Object.defineProperty(global, "localStorage", {
+                value: { getItem: jest.fn(() => null), myKey: "prop-value" },
+                writable: true,
+                configurable: true
+            });
+            const result = safeStorageGet("myKey");
+            expect(result).toBe("prop-value");
+        });
+
+        it("returns fallback when key is missing", () => {
+            Object.defineProperty(global, "localStorage", {
+                value: { getItem: jest.fn(() => null) },
+                writable: true,
+                configurable: true
+            });
+            const result = safeStorageGet("missingKey", "fallback");
+            expect(result).toBe("fallback");
+        });
+
+        it("returns undefined fallback by default when key is missing", () => {
+            Object.defineProperty(global, "localStorage", {
+                value: { getItem: jest.fn(() => null) },
+                writable: true,
+                configurable: true
+            });
+            const result = safeStorageGet("missingKey");
+            expect(result).toBeUndefined();
+        });
+
+        it("returns fallback when localStorage is undefined", () => {
+            Object.defineProperty(global, "localStorage", {
+                value: undefined,
+                writable: true,
+                configurable: true
+            });
+            const result = safeStorageGet("myKey", "fallback");
+            expect(result).toBe("fallback");
+        });
+
+        it("returns fallback when localStorage access throws", () => {
+            Object.defineProperty(global, "localStorage", {
+                value: {
+                    get getItem() {
+                        throw new Error("SecurityError");
+                    }
+                },
+                writable: true,
+                configurable: true
+            });
+            const result = safeStorageGet("myKey", "fallback");
+            expect(result).toBe("fallback");
+        });
+    });
+
+    describe("safeStorageSet()", () => {
+        const originalLocalStorage = global.localStorage;
+
+        afterEach(() => {
+            Object.defineProperty(global, "localStorage", {
+                value: originalLocalStorage,
+                writable: true,
+                configurable: true
+            });
+        });
+
+        it("sets value via localStorage.setItem when available", () => {
+            const setItem = jest.fn();
+            Object.defineProperty(global, "localStorage", {
+                value: { setItem },
+                writable: true,
+                configurable: true
+            });
+            safeStorageSet("myKey", "myValue");
+            expect(setItem).toHaveBeenCalledWith("myKey", "myValue");
+        });
+
+        it("falls back to property assignment when setItem is missing", () => {
+            Object.defineProperty(global, "localStorage", {
+                value: {},
+                writable: true,
+                configurable: true
+            });
+            safeStorageSet("myKey", "myValue");
+            expect(global.localStorage.myKey).toBe("myValue");
+        });
+
+        it("silently skips when localStorage is undefined", () => {
+            Object.defineProperty(global, "localStorage", {
+                value: undefined,
+                writable: true,
+                configurable: true
+            });
+            expect(() => safeStorageSet("myKey", "myValue")).not.toThrow();
+        });
+
+        it("silently skips when localStorage access throws", () => {
+            Object.defineProperty(global, "localStorage", {
+                value: {
+                    get setItem() {
+                        throw new Error("SecurityError");
+                    }
+                },
+                writable: true,
+                configurable: true
+            });
+            expect(() => safeStorageSet("myKey", "myValue")).not.toThrow();
         });
     });
 });

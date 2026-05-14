@@ -19,12 +19,7 @@
 
 /* exported setupRhythmBlockPaletteBlocks */
 
-let language;
-try {
-    language = localStorage.languagePreference || navigator.language;
-} catch (e) {
-    language = navigator.language;
-}
+const language = safeStorageGet("languagePreference") || navigator.language;
 let rhythmBlockPalette = language === "ja" ? "rhythm" : "widgets";
 if (_THIS_IS_TURTLE_BLOCKS_) {
     rhythmBlockPalette = "rhythm";
@@ -145,8 +140,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 // polyphonic rhythms.
                 if (logo.rhythmRulerMeasure === null) {
                     logo.rhythmRulerMeasure = arg0 * arg1;
-                } else if (logo.rhythmRulerMeasure != arg0 * arg1) {
-                    // eslint-disable-line eqeqeq
+                } else if (logo.rhythmRulerMeasure != arg0 * arg1) { // eslint-disable-line eqeqeq
                     activity.textMsg(_("polyphonic rhythm"));
                 }
 

@@ -487,12 +487,7 @@ class PhraseMaker {
         widgetWindow.addButton("erase-button.svg", PhraseMaker.ICONSIZE, this._("Clear")).onclick =
             this._clear.bind(this);
 
-        let beginnerMode;
-        try {
-            beginnerMode = localStorage.beginnerMode;
-        } catch (e) {
-            beginnerMode = undefined;
-        }
+        const beginnerMode = safeStorageGet("beginnerMode");
         if (!beginnerMode) {
             widgetWindow.addButton(
                 "export-button.svg",
