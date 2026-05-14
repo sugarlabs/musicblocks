@@ -1070,6 +1070,10 @@ function setupActionBlocks(activity) {
                 const tur = activity.turtles.ithTurtle(turtle);
 
                 const __listener = event => {
+                    if (logo.stopTurtle) {
+                        return;
+                    }
+
                     if (tur.running) {
                         const queueBlock = new Queue(logo.actions[args[1]], 1, blk);
                         tur.parentFlowQueue.push(blk);
@@ -1081,7 +1085,9 @@ function setupActionBlocks(activity) {
                         // First, we need to reset the turtle's
                         // elapsed time since it has been falling behind.
                         const elapsedTime =
-                            (new Date().getTime() - activity.logo.firstNoteTime) / 1000;
+                            activity.logo.firstNoteTime === null
+                                ? 0
+                                : (new Date().getTime() - activity.logo.firstNoteTime) / 1000;
                         tur.singer.turtleTime = elapsedTime;
 
                         logo.runFromBlockNow(

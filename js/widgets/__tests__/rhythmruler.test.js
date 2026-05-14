@@ -21,6 +21,7 @@
  */
 
 const RhythmRuler = require("../rhythmruler.js");
+const ManagedTimer = require("../../utils/ManagedTimer.js");
 
 // --- Global Mocks (Fake the Browser Environment) ---
 
@@ -43,6 +44,7 @@ global.docById = jest.fn().mockReturnValue({
     classList: { add: jest.fn(), remove: jest.fn() },
     innerHTML: ""
 });
+global.deepClone = value => JSON.parse(JSON.stringify(value));
 global.delayExecution = jest.fn().mockResolvedValue(undefined);
 global.last = arr => (arr && arr.length > 0 ? arr[arr.length - 1] : undefined);
 global.nearestBeat = jest.fn(val => val);
@@ -58,6 +60,7 @@ global.DRUMNAMES = [];
 global.VOICENAMES = [];
 global.EFFECTSNAMES = [];
 global.getComputedStyle = jest.fn().mockReturnValue({ backgroundColor: "#303030" });
+global.ManagedTimer = ManagedTimer;
 
 // Mock Window Manager
 
@@ -89,6 +92,7 @@ const mockWindow = {
                         appendChild: jest.fn(),
                         setAttribute: jest.fn(),
                         style: {},
+                        textContent: "",
                         innerHTML: "",
                         addEventListener: jest.fn()
                     })
@@ -116,6 +120,8 @@ global.document = {
             setAttribute: jest.fn(),
             insertCell: jest.fn().mockReturnValue({
                 style: {},
+                appendChild: jest.fn(),
+                textContent: "",
                 innerHTML: "",
                 setAttribute: jest.fn(),
                 addEventListener: jest.fn()
@@ -124,6 +130,8 @@ global.document = {
         cells: [],
         insertCell: jest.fn().mockReturnValue({
             style: {},
+            appendChild: jest.fn(),
+            textContent: "",
             innerHTML: ""
         }),
         deleteCell: jest.fn(),
@@ -145,6 +153,7 @@ global.document = {
             fillText: jest.fn()
         })
     })),
+    createTextNode: jest.fn().mockImplementation(text => ({ nodeType: 3, textContent: text })),
     getElementById: jest.fn().mockReturnValue({
         style: {},
         classList: { add: jest.fn(), remove: jest.fn() }
@@ -198,6 +207,10 @@ describe("RhythmRuler Widget", () => {
     });
 
     afterEach(() => {
+        if (rhythmRuler && typeof rhythmRuler._clearWidgetTimers === "function") {
+            rhythmRuler._clearWidgetTimers();
+        }
+        jest.useRealTimers();
         jest.clearAllMocks();
     });
 
@@ -238,6 +251,105 @@ describe("RhythmRuler Widget", () => {
             expect(rhythmRuler._offsets).toEqual([]);
             expect(rhythmRuler._startingTime).toBeNull();
             expect(rhythmRuler._tapTimes).toEqual([]);
+        });
+    });
+
+    // =========================================================================
+    // NOTE VALUE DISPLAY TESTS
+    // =========================================================================
+    describe("Note Value Display", () => {
+        test("should render note value markup as DOM nodes", () => {
+            const cell = {
+                appendChild: jest.fn(),
+                textContent: "old"
+            };
+
+            global.calcNoteValueToDisplay.mockReturnValueOnce("1<br>&mdash;<br>4<br>note");
+
+            rhythmRuler.__setNoteValueDisplay(cell, 4, 1);
+
+            const appendedNodes = cell.appendChild.mock.calls.map(call => call[0]);
+            expect(cell.textContent).toBe("");
+            expect(appendedNodes.map(node => node.textContent)).toEqual([
+                "1",
+                "",
+                "\u2014",
+                "",
+                "4",
+                "",
+                "note"
+            ]);
+            expect(cell.appendChild).toHaveBeenCalledTimes(7);
+        });
+
+        test("should append silence label as text", () => {
+            const cell = {
+                appendChild: jest.fn(),
+                textContent: ""
+            };
+
+            global.calcNoteValueToDisplay.mockReturnValueOnce("1<br>&mdash;<br>4<br>note");
+
+            rhythmRuler.__setNoteValueDisplay(cell, 4, 1, "silence");
+
+            const appendedNodes = cell.appendChild.mock.calls.map(call => call[0]);
+            expect(appendedNodes[appendedNodes.length - 1].textContent).toBe(" silence");
+        });
+    });
+
+    // =========================================================================
+    // TIMER LIFECYCLE TESTS
+    // =========================================================================
+    describe("Timer Lifecycle", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+        });
+
+        test("should track and clear widget timeouts", () => {
+            const callback = jest.fn();
+
+            const timerId = rhythmRuler._setWidgetTimeout(callback, 1000);
+
+            expect(rhythmRuler._timerManager.activeTimeoutCount).toBe(1);
+            expect(rhythmRuler._clearWidgetTimeout(timerId)).toBe(true);
+
+            jest.advanceTimersByTime(1000);
+
+            expect(callback).not.toHaveBeenCalled();
+            expect(rhythmRuler._timerManager.activeTimeoutCount).toBe(0);
+        });
+
+        test("should clear all widget timeouts and intervals", () => {
+            const timeoutCallback = jest.fn();
+            const intervalCallback = jest.fn();
+
+            rhythmRuler._setWidgetTimeout(timeoutCallback, 1000);
+            rhythmRuler._setWidgetInterval(intervalCallback, 100);
+
+            expect(rhythmRuler._timerManager.activeCount).toBe(2);
+            expect(rhythmRuler._clearWidgetTimers()).toBe(2);
+
+            jest.advanceTimersByTime(1000);
+
+            expect(timeoutCallback).not.toHaveBeenCalled();
+            expect(intervalCallback).not.toHaveBeenCalled();
+            expect(rhythmRuler._timerManager.activeCount).toBe(0);
+        });
+
+        test("__pause should clear pending playback timers", () => {
+            const callback = jest.fn();
+            rhythmRuler._playAllCell = { innerHTML: "" };
+            rhythmRuler.Rulers = [[[4], []]];
+            rhythmRuler._playing = true;
+            jest.spyOn(rhythmRuler, "_calculateZebraStripes").mockImplementation();
+            jest.spyOn(rhythmRuler, "_refreshCircularView").mockImplementation();
+
+            rhythmRuler._setWidgetTimeout(callback, 1000);
+            rhythmRuler.__pause();
+            jest.advanceTimersByTime(1000);
+
+            expect(callback).not.toHaveBeenCalled();
+            expect(rhythmRuler._timerManager.activeCount).toBe(0);
         });
     });
 
@@ -373,11 +485,14 @@ describe("RhythmRuler Widget", () => {
         test("should preserve old history entries for unused drums", () => {
             rhythmRuler.Drums = ["snare drum"];
             rhythmRuler.Rulers = [[[], [[0, 2]]]];
-            rhythmRuler._dissectHistory = [[[[0, 4]], "old drum"]];
+            const oldHistory = [[0, 4]];
+            rhythmRuler._dissectHistory = [[oldHistory, "old drum"]];
 
             rhythmRuler.saveDissectHistory();
+            oldHistory[0][1] = 8;
 
             expect(rhythmRuler._dissectHistory).toHaveLength(2);
+            expect(rhythmRuler._dissectHistory[1][0][0][1]).toBe(4);
         });
 
         test("should add hasKeyboard class to dissect number", () => {

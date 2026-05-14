@@ -76,7 +76,7 @@ class ProjectViewer {
         let img = proj.ProjectImage;
         if (img === "" || img === null)
             img =
-                proj.ProjectIsMusicBlocks == 1 ? this.PlaceholderMBImage : this.PlaceholderTBImage;
+                proj.ProjectIsMusicBlocks === 1 ? this.PlaceholderMBImage : this.PlaceholderTBImage;
 
         document.getElementById("projectviewer-image").src = img;
         document.getElementById("projectviewer-description").textContent = proj.ProjectDescription;
@@ -110,7 +110,7 @@ class ProjectViewer {
 
         const proj = this.ProjectCache[this.id];
         let image = Planet.ProjectStorage.ImageDataURL;
-        if (proj.ProjectImage !== "") image = proj.ProjectImage;
+        if (proj.ProjectImage !== "" && proj.ProjectImage !== null) image = proj.ProjectImage;
 
         Planet.SaveInterface.saveHTML(
             proj.ProjectName,
@@ -163,7 +163,7 @@ class ProjectViewer {
             document.getElementById("report-error").style.display = "block";
             return;
         } else {
-            document.getElementById("projectviewer-report-progress").style.visibility = "hidden";
+            document.getElementById("projectviewer-report-progress").style.visibility = "visible";
             this.Planet.ServerInterface.reportProject(this.id, text, this.afterReport.bind(this));
         }
     }
@@ -211,4 +211,8 @@ class ProjectViewer {
             this.closeReporter();
         });
     }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = ProjectViewer;
 }

@@ -1466,7 +1466,7 @@ function setupProgramBlocks(activity) {
             const win = window.open(url, "_blank", "noopener,noreferrer");
             if (win === null) {
                 // Browser has blocked it.
-                alert(_("Please allow popups for this site"));
+                activity.errorMsg(_("Please allow popups for this site"), 3000);
             }
         }
     }

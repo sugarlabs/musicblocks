@@ -227,39 +227,6 @@ class ModeWidget {
     }
 
     /**
-     * @deprecated
-     */
-    _addButton(row, icon, iconSize, label) {
-        const cell = row.insertCell(-1);
-        cell.innerHTML = `&nbsp;&nbsp;<img 
-                src="header-icons/${icon}" 
-                title="${label}" 
-                alt="${label}" 
-                height="${iconSize}" 
-                width="${iconSize}" 
-                vertical-align="middle" 
-                align-content="center"
-            >&nbsp;&nbsp;`;
-        cell.style.width = ModeWidget.BUTTONSIZE + "px";
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = cell.style.width;
-        cell.style.minHeight = cell.style.height;
-        cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
-
-        cell.onmouseover = () => {
-            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        };
-
-        cell.onmouseout = () => {
-            this.style.backgroundColor = platformColor.selectorBackground;
-        };
-
-        return cell;
-    }
-
-    /**
      * @private
      * @returns {void}
      */
@@ -299,7 +266,7 @@ class ModeWidget {
 
         // console.debug(_(currentModeName[1]));
         const name = currentModeName[0] + " " + _(currentModeName[1]);
-        table.rows[n].cells[0].innerHTML = name;
+        table.rows[n].cells[0].textContent = name;
         this.widgetWindow.updateTitle(name);
 
         // Set the notes for this mode.
@@ -904,7 +871,7 @@ class ModeWidget {
                 }
 
                 const name = currentKey + " " + _(mode);
-                table.rows[n].cells[0].innerHTML = name;
+                table.rows[n].cells[0].textContent = name;
                 this.widgetWindow.updateTitle(name);
                 return;
             }

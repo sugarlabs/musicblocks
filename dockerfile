@@ -1,14 +1,16 @@
 # First stage: Build stage
-FROM python:3.9-slim AS build
+FROM node:20-slim AS build
 
 WORKDIR /app
 
-RUN useradd -m appuser
+COPY package*.json ./
+
+RUN npm install
 
 COPY . .
 
 # Second stage: Final stage
-FROM python:3.9-slim
+FROM node:20-slim
 
 RUN useradd -m appuser
 
@@ -20,4 +22,6 @@ USER appuser
 
 EXPOSE 3000
 
-CMD ["python", "-m", "http.server", "3000", "--bind", "0.0.0.0"]
+ENV HOST=0.0.0.0
+
+CMD ["node", "index.js"]

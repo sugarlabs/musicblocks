@@ -33,6 +33,8 @@ describe("ServerInterface", () => {
         originalConsoleError = console.error;
         originalConsoleDebug = console.debug;
 
+        window.MB_PLANET_API_KEY = "3f2d3a4c-c7a4-4c3c-892e-ac43784f7381";
+
         mockRequestManager = {
             throttledRequest: jest.fn((data, logic) => {
                 return new Promise(resolve => logic(resolve));
@@ -90,6 +92,7 @@ describe("ServerInterface", () => {
         delete global.jQuery;
         delete global.RequestManager;
         delete global.CacheManager;
+        delete window.MB_PLANET_API_KEY;
 
         jest.clearAllMocks();
     });
@@ -131,7 +134,7 @@ describe("ServerInterface", () => {
             server.getTagManifest(callback);
 
             const sentData = jQuery.ajax.mock.calls[0][0].data;
-            expect(sentData["api-key"]).toBe("3f2d3a4c-c7a4-4c3c-892e-ac43784f7381");
+            expect(sentData["api-key"]).toBe(window.MB_PLANET_API_KEY);
             expect(sentData.action).toBe("getTagManifest");
         });
 

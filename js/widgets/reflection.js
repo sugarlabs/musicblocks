@@ -346,7 +346,12 @@ class ReflectionMatrix {
             const safeText = escapeHTML(reply.response);
             let html = this.mdToHTML(safeText);
             html = this.sanitizeLinks(html);
-            botReply.innerHTML = html;
+            botReply.textContent = "";
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, "text/html");
+            while (doc.body.firstChild) {
+                botReply.appendChild(doc.body.firstChild);
+            }
         } else {
             botReply.innerText = reply.response;
         }
@@ -737,7 +742,6 @@ class ReflectionMatrix {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     }
-
     /**
      * Sanitizes HTML content using DOMParser to prevent XSS.
      * Removes unsafe attributes and ensures links are safe.

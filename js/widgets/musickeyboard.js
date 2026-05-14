@@ -522,7 +522,9 @@ function MusicKeyboard(activity) {
     };
 
     /**
-     * Handles the loading of musical keyboard elements and defines behavior for mouse events.
+     * Handles the loading of musical keyboard elements and defines pointer event
+     * handlers for each key. Uses the Pointer Events API (pointerdown/pointerup/
+     * pointercancel) to support mouse, touch, and stylus input uniformly.
      * @param {HTMLElement} element - The HTML element representing a musical key.
      * @param {number} i - The index of the musical key in the layout.
      * @param {number} blockNumber - The block number associated with the musical key.
@@ -548,8 +550,15 @@ function MusicKeyboard(activity) {
         let startDate = new Date();
         let startTime = 0;
 
+        // Prevent the browser from scrolling or showing a context menu when the
+        // user presses a key on a touch device.
+        // Use pan-x instead of none so that the 700 px-wide keyboard can
+        // still be scrolled horizontally on narrow mobile viewports by
+        // dragging on a key; pinch-zoom is still suppressed.
+        element.style.touchAction = "pan-x";
+
         /**
-         * Start a musical note when the element is clicked.
+         * Start a musical note when the element is pressed (mouse or touch).
          */
         const __startNote = element => {
             startDate = new Date();
@@ -565,10 +574,15 @@ function MusicKeyboard(activity) {
             );
         };
 
-        element.onmousedown = function () {
+        // Use Pointer Events so that mouse clicks, touchscreen taps, and stylus
+        // presses all trigger the same note-start behaviour.  The legacy
+        // onmousedown handler was silently ignored on touch devices.
+        element.addEventListener("pointerdown", function (e) {
+            e.preventDefault(); // prevent ghost mouse events on touch screens
+            element.setPointerCapture(e.pointerId); // keep events even if finger slides off
             activeKey = element;
-            __startNote(this);
-        };
+            __startNote(element);
+        });
 
         /**
          * End a musical note when the element is released.
@@ -613,11 +627,11 @@ function MusicKeyboard(activity) {
             this._updateWidgetWindowSize();
         };
 
-        element.onmouseup = function () {
+        element.addEventListener("pointerup", function () {
             if (activeKey === element) {
-                __endNote(this);
+                __endNote(element);
                 activeKey = null;
-            } else {
+            } else if (activeKey !== null) {
                 const id = activeKey.id;
                 if (id.includes("blackRow")) {
                     activeKey.style.backgroundColor = "black";
@@ -626,7 +640,16 @@ function MusicKeyboard(activity) {
                 }
                 activeKey = null;
             }
-        };
+        });
+
+        // Clean up note state if the pointer is cancelled mid-press
+        // (e.g., an incoming phone call dismisses the touch).
+        element.addEventListener("pointercancel", function () {
+            if (activeKey === element) {
+                __endNote(element);
+                activeKey = null;
+            }
+        });
     };
 
     /**
@@ -2119,7 +2142,10 @@ function MusicKeyboard(activity) {
                         lastNote = null;
                     }
 
-                    if (pitchLabels[i].includes(lastNote) || lastNote.includes(pitchLabels[i])) {
+                    if (
+                        lastNote !== null &&
+                        (pitchLabels[i].includes(lastNote) || lastNote.includes(pitchLabels[i]))
+                    ) {
                         break;
                     }
                 }
@@ -3358,46 +3384,6 @@ function MusicKeyboard(activity) {
     this.clearBlocks = function () {
         this.noteNames = [];
         this.octaves = [];
-    };
-
-    /**
-     * @deprecated This method is deprecated and should no longer be used.
-     * Adds a button to the specified row with the given icon, icon size, and label.
-     * @memberof ClassName
-     * @param {HTMLTableRowElement} row - The table row element to which the button will be added.
-     * @param {string} icon - The filename of the icon image.
-     * @param {number} iconSize - The size of the icon image (height and width).
-     * @param {string} label - The label or tooltip text for the button.
-     * @returns {HTMLTableCellElement} The cell element containing the button.
-     */
-    this._addButton = function (row, icon, iconSize, label) {
-        const cell = row.insertCell(-1);
-        cell.innerHTML = `&nbsp;&nbsp;<img 
-                src="header-icons/${icon}" 
-                title="${label}" 
-                alt="${label}" 
-                height="${iconSize}" 
-                width="${iconSize}" 
-                vertical-align="middle" 
-                align-content="center"
-            >&nbsp;&nbsp;`;
-        cell.style.width = BUTTONSIZE + "px";
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = cell.style.width;
-        cell.style.minHeight = cell.style.height;
-        cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
-
-        cell.onmouseover = function () {
-            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        };
-
-        cell.onmouseout = function () {
-            this.style.backgroundColor = platformColor.selectorBackground;
-        };
-
-        return cell;
     };
 
     /**

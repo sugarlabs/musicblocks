@@ -1,8 +1,13 @@
 name: Label Conflicting PRs
 
 on:
-    push:
-        branches: [master]
+    # Run AFTER auto-rebase finishes, not in parallel with it.
+    # This ensures we only label PRs that auto-rebase could NOT fix
+    # (real conflicts), avoiding false-alarm notifications.
+    workflow_run:
+        workflows: ["Auto Rebase PRs"]
+        types: [completed]
+    # Also run when a contributor pushes to their PR branch
     pull_request_target:
         types: [synchronize]
 
@@ -39,5 +44,4 @@ jobs:
                       ```
 
                       > **Tip:** Enable "Allow edits from maintainers" on this PR so we can auto-rebase for you next time. This only grants access to your PR branch. Your fork's other branches are not affected.
-                  commentOnClean: |
-                      Merge conflicts resolved. Ready for review.
+                  commentOnClean: ""

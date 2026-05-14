@@ -18,7 +18,7 @@
    getOctaveRatio, isCustomTemperament, Singer, DOUBLEFLAT, DOUBLESHARP,
    DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
    getArticulation, piemenuPitches, docById, slicePath, wheelnav, platformColor,
-   DEFAULTVOICE, normalizeNoteAccidentals
+   DEFAULTVOICE, normalizeNoteAccidentals, parseNoteString
 */
 
 /*
@@ -28,7 +28,7 @@
     - js/utils/musicutils.js
         pitchToNumber, getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
         isCustomTemperament, DOUBLEFLAT, DOUBLESHARP, DEFAULTDRUM, getOscillatorTypes, numberToPitch,
-        getArticulation, getOctaveRatio, getTemperament, DEFAULTVOICE
+        getArticulation, getOctaveRatio, getTemperament, DEFAULTVOICE, parseNoteString
     - js/turtle-singer.js
         Singer
     - js/utils/platformstyle.js
@@ -446,6 +446,11 @@ const instruments = { 0: {} };
  */
 const instrumentsSource = {};
 
+// Tracks how many _performNotes graph-rewire calls are in-flight per synth instance.
+// Used to prevent the cleanup callback from restoring the dry path while another
+// effects chain is still active on the same synth.
+const _effectsInFlight = new WeakMap();
+
 /**
  * Object containing effects associated with instruments in the timbre widget.
  * @type {Object.<number, Object>}
@@ -596,29 +601,29 @@ function Synth() {
             console.error("Temperament not found: " + temperament);
             return;
         }
-        const len = startPitch.length;
-        const number = pitchToNumber(
-            startPitch.substring(0, len - 1),
-            startPitch.slice(-1),
-            "C major"
-        );
+        const parsed = parseNoteString(startPitch);
+        const number = pitchToNumber(parsed[0], parsed[1], "C major");
         const startPitchObj = numberToPitch(number);
         startPitch = (startPitchObj[0] + startPitchObj[1]).toString();
 
-        if (startPitch.substring(1, len - 1) === FLAT || startPitch.substring(1, len - 1) === "b") {
+        if (
+            startPitch.substring(1, startPitch.length - 1) === FLAT ||
+            startPitch.substring(1, startPitch.length - 1) === "b"
+        ) {
             startPitch = startPitch.replace(FLAT, "b");
         } else if (
-            startPitch.substring(1, len - 1) === SHARP ||
-            startPitch.substring(1, len - 1) === "#"
+            startPitch.substring(1, startPitch.length - 1) === SHARP ||
+            startPitch.substring(1, startPitch.length - 1) === "#"
         ) {
             startPitch = startPitch.replace(SHARP, "#");
         }
 
         const frequency = Tone.Frequency(startPitch).toFrequency();
 
+        const startParsed = parseNoteString(startingPitch);
         this.noteFrequencies = {
             // note: [octave, Frequency]
-            [startingPitch.substring(0, len - 1)]: [Number(startingPitch.slice(-1)), frequency]
+            [startParsed[0]]: [startParsed[1], frequency]
         };
 
         for (const interval in t) {
@@ -683,22 +688,17 @@ function Synth() {
         }
 
         if (this.inTemperament === "equal") {
-            let len, note, octave;
             if (typeof notes === "string") {
-                len = notes.length;
-                note = notes.substring(0, len - 1);
-                octave = Number(notes.slice(-1));
-                return pitchToFrequency(note, octave, 0, "c major");
+                const parsed = parseNoteString(notes);
+                return pitchToFrequency(parsed[0], parsed[1], 0, "c major");
             } else if (typeof notes === "number") {
                 return notes;
             } else {
                 const results = [];
                 for (let i = 0; i < notes.length; i++) {
                     if (typeof notes[i] === "string") {
-                        len = notes[i].length;
-                        note = notes[i].substring(0, len - 1);
-                        octave = Number(notes[i].slice(-1));
-                        results.push(pitchToFrequency(note, octave, 0, "c major"));
+                        const parsed = parseNoteString(notes[i]);
+                        results.push(pitchToFrequency(parsed[0], parsed[1], 0, "c major"));
                     } else {
                         results.push(notes[i]);
                     }
@@ -708,16 +708,18 @@ function Synth() {
         }
 
         const __getFrequency = oneNote => {
-            const len = oneNote.length;
+            const parsed = parseNoteString(oneNote);
+            const noteName = parsed[0];
+            const octave = parsed[1];
 
             for (const note in this.noteFrequencies) {
-                if (note === oneNote.substring(0, len - 1)) {
-                    if (this.noteFrequencies[note][0] === Number(oneNote.slice(-1))) {
+                if (note === noteName) {
+                    if (this.noteFrequencies[note][0] === octave) {
                         //Note to be played is in the same octave.
                         return this.noteFrequencies[note][1];
                     } else {
                         //Note to be played is not in the same octave.
-                        const power = Number(oneNote.slice(-1)) - this.noteFrequencies[note][0];
+                        const power = octave - this.noteFrequencies[note][0];
                         return this.noteFrequencies[note][1] * Math.pow(2, power);
                     }
                 }
@@ -752,12 +754,14 @@ function Synth() {
      */
     this.getCustomFrequency = (notes, customID) => {
         const __getCustomFrequency = (oneNote, startingPitch) => {
-            const octave = oneNote.slice(-1);
-            oneNote = getCustomNote(oneNote.substring(0, oneNote.length - 1));
+            const parsed = parseNoteString(oneNote);
+            const octave = parsed[1];
+            oneNote = getCustomNote(parsed[0]);
             const pitch = startingPitch;
+            const pitchParsed = parseNoteString(pitch);
             const startPitchFrequency = pitchToFrequency(
-                pitch.substring(0, pitch.length - 1),
-                pitch.slice(-1),
+                pitchParsed[0],
+                pitchParsed[1],
                 0,
                 "C Major"
             );
@@ -1305,7 +1309,6 @@ function Synth() {
                 for (let i = 0; i < MULTIPITCH[sourceName].length; i++) {
                     noteDict[MULTIPITCH[sourceName][i]] = this.samples.voice[sourceName][i];
                 }
-                tempSynth = new Tone.Sampler(noteDict);
             } else {
                 noteDict["C4"] = this.samples.voice[sourceName];
             }
@@ -1806,7 +1809,12 @@ function Synth() {
                 // ─────────────────────────────────────────────────────────────────────
 
                 // Remove the dry path so effects are routed serially, not in parallel
-                synth.disconnect(Tone.Destination);
+                _effectsInFlight.set(synth, (_effectsInFlight.get(synth) || 0) + 1);
+                try {
+                    synth.disconnect();
+                } catch (e) {
+                    /* already disconnected */
+                }
                 const chainNodes = [];
 
                 if (paramsFilters !== null && paramsFilters !== undefined) {
@@ -1932,6 +1940,7 @@ function Synth() {
 
                 if (!paramsEffects.doNeighbor) {
                     if (setNote !== undefined && setNote) {
+                        if (this._instrumentEpoch !== epoch) return;
                         if (synth.oscillator !== undefined) {
                             synth.setNote(notes);
                         } else if (synth.voices !== undefined) {
@@ -1974,9 +1983,16 @@ function Synth() {
                                 });
                             }
 
-                            // Re-establish the dry path so subsequent notes
-                            // that do not use effects still reach the speakers.
-                            if (synth && typeof synth.toDestination === "function") {
+                            // Re-establish the dry path only when no other effects chain
+                            // is still active on this synth; otherwise the direct
+                            // connection would bypass the in-flight chain.
+                            const remaining = (_effectsInFlight.get(synth) || 1) - 1;
+                            _effectsInFlight.set(synth, remaining);
+                            if (
+                                remaining === 0 &&
+                                synth &&
+                                typeof synth.toDestination === "function"
+                            ) {
                                 synth.toDestination();
                             }
                         } catch (e) {
@@ -2000,8 +2016,9 @@ function Synth() {
                 }
             });
 
-            // Re-establish the dry path on error as well.
-            if (synth && typeof synth.toDestination === "function") {
+            const remaining = (_effectsInFlight.get(synth) || 1) - 1;
+            _effectsInFlight.set(synth, remaining);
+            if (remaining === 0 && synth && typeof synth.toDestination === "function") {
                 synth.toDestination();
             }
         }

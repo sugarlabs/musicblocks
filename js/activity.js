@@ -250,6 +250,7 @@ class Activity {
 
         this.cellSize = 55;
         this.searchSuggestions = [];
+        this._searchCache = {}; // Cache for search results to improve performance
         this._searchCloseListener = null;
         this.homeButtonContainer;
 
@@ -323,7 +324,12 @@ class Activity {
         this.keyboardEnableFlag;
         this.inTempoWidget = false;
         this.projectID = null;
-        this.storage = localStorage;
+        try {
+            this.storage = localStorage;
+        } catch (e) {
+            // Fall back to in-memory storage when browser storage is restricted.
+            this.storage = {};
+        }
 
         // Flag to indicate whether the user is performing a 2D drag operation.
         this.isDragging = false;
@@ -538,13 +544,24 @@ class Activity {
                 if (this.stage) {
                     const hasActiveTweens = createjs.Tween.hasActiveTweens();
                     const hasActiveGifs = this.gifAnimator && this.gifAnimator.getActiveCount() > 0;
+                    const isInteracting =
+                        this.isDragging ||
+                        this.isSelecting ||
+                        (this.blocks && this.blocks.dragGroup !== null);
 
-                    if (this.stageDirty || hasActiveTweens || hasActiveGifs) {
+                    if (this.stageDirty || hasActiveTweens || hasActiveGifs || isInteracting) {
                         this.stage.update();
                         this.stageDirty = false;
+                        // Continue the loop if there's work or ongoing interaction
+                        this._renderLoopRafId = requestAnimationFrame(renderLoop);
+                    } else {
+                        // Nothing to render — let the loop go idle
+                        this._renderLoopRunning = false;
+                        this._renderLoopRafId = null;
                     }
+                } else {
+                    this._renderLoopRafId = requestAnimationFrame(renderLoop);
                 }
-                this._renderLoopRafId = requestAnimationFrame(renderLoop);
             };
 
             this._renderLoopRafId = requestAnimationFrame(renderLoop);
@@ -974,7 +991,7 @@ class Activity {
             const columnYPositions = Array(numColumns).fill(y);
 
             for (const blk in this.blocks.blockList) {
-                if (!this.blocks.blockList[blk].trash) {
+                if (this.blocks.blockList[blk] && !this.blocks.blockList[blk].trash) {
                     const myBlock = this.blocks.blockList[blk];
 
                     // Store original position only once
@@ -1071,9 +1088,14 @@ class Activity {
                 let y = Math.floor(toppos * this.turtleBlocksScale);
                 let even = true;
 
+                // Defer checkBounds during bulk block moves to avoid O(N²)
+                // overhead: each moveBlockRelative call triggers checkBounds()
+                // which scans all blocks, so N moves × N blocks = O(N²).
+                this.blocks._beginDeferCheckBounds();
+
                 // Position "start" blocks first
                 for (const blk in this.blocks.blockList) {
-                    if (!this.blocks.blockList[blk].trash) {
+                    if (this.blocks.blockList[blk] && !this.blocks.blockList[blk].trash) {
                         const myBlock = this.blocks.blockList[blk];
                         if (myBlock.name !== "start") {
                             continue;
@@ -1109,7 +1131,7 @@ class Activity {
 
                 // Position other blocks
                 for (const blk in this.blocks.blockList) {
-                    if (!this.blocks.blockList[blk].trash) {
+                    if (this.blocks.blockList[blk] && !this.blocks.blockList[blk].trash) {
                         const myBlock = this.blocks.blockList[blk];
                         if (myBlock.name === "start") {
                             continue;
@@ -1142,6 +1164,8 @@ class Activity {
                         }
                     }
                 }
+
+                this.blocks._endDeferCheckBounds();
             } else {
                 // Second click logic (arrange blocks in columns this avoid overlapping of blocks)
                 let toppos;
@@ -1176,8 +1200,11 @@ class Activity {
                 );
                 const columnYPositions = Array(numColumns).fill(initialY);
 
+                // Defer checkBounds during bulk block moves (see first-click path).
+                this.blocks._beginDeferCheckBounds();
+
                 for (const blk in this.blocks.blockList) {
-                    if (!this.blocks.blockList[blk].trash) {
+                    if (this.blocks.blockList[blk] && !this.blocks.blockList[blk].trash) {
                         const myBlock = this.blocks.blockList[blk];
                         if (myBlock.connections[0] === null) {
                             let minYIndex = 0;
@@ -1204,6 +1231,8 @@ class Activity {
                         }
                     }
                 }
+
+                this.blocks._endDeferCheckBounds();
             }
 
             // Reset go-home button
@@ -1344,7 +1373,7 @@ class Activity {
             let yMax = 0;
             let parts;
             for (let i = 0; i < this.blocks.blockList.length; i++) {
-                if (this.blocks.blockList[i].ignore()) {
+                if (!this.blocks.blockList[i] || this.blocks.blockList[i].ignore()) {
                     continue;
                 }
 
@@ -1837,7 +1866,12 @@ class Activity {
              */
 
             async function recordScreen() {
-                const mode = localStorage.getItem("musicBlocksRecordMode");
+                let mode = null;
+                try {
+                    mode = localStorage.getItem("musicBlocksRecordMode");
+                } catch (e) {
+                    mode = null;
+                }
 
                 if (mode === "canvas") {
                     return await recordCanvasOnly();
@@ -2401,7 +2435,7 @@ class Activity {
                     messages.load_messages[
                         Math.floor(Math.random() * messages.load_messages.length)
                     ];
-                document.getElementById("messageText").innerHTML = randomLoadMessage + "...";
+                document.getElementById("messageText").textContent = randomLoadMessage + "...";
                 counter++;
                 if (counter >= messages.load_messages.length) {
                     counter = 0;
@@ -3135,26 +3169,9 @@ class Activity {
             const IDLE_THRESHOLD = 5000; // 5 seconds
             const ACTIVE_FPS = 60;
             const IDLE_FPS = 1;
-            const idleEvents = ["mousemove", "mousedown", "keydown", "touchstart", "wheel"];
-
-            if (this._idleWatcherResetHandler) {
-                idleEvents.forEach(eventType => {
-                    window.removeEventListener(eventType, this._idleWatcherResetHandler);
-                });
-            }
-
-            if (this._idleWatcherIntervalId) {
-                clearInterval(this._idleWatcherIntervalId);
-                this._idleWatcherIntervalId = null;
-            }
 
             let lastActivity = Date.now();
             this.isAppIdle = false;
-
-            // Prevent duplicate intervals
-            if (this._idleWatcherIntervalId) {
-                clearInterval(this._idleWatcherIntervalId);
-            }
 
             // Wake up function - restores full framerate
             // Stored as instance property for cleanup
@@ -3270,6 +3287,7 @@ class Activity {
             this.searchBlockPosition = [100, 100];
 
             this.searchSuggestions = [];
+            this._searchCache = {}; // Reset cache to prevent memory leaks
             this.deprecatedBlockNames = [];
 
             // Guard: blocks may not be initialized yet during early loading
@@ -3494,7 +3512,14 @@ class Activity {
                 $search.autocomplete({
                     // Custom source so we can match on extraSearchTerms but show each block only once.
                     source: (request, response) => {
-                        const term = (request.term || "").toLowerCase();
+                        const term = (request.term || "").toLowerCase().trim();
+
+                        // Check cache first for performance
+                        if (that._searchCache[term] !== undefined) {
+                            response(that._searchCache[term]);
+                            return;
+                        }
+
                         const results = that.searchSuggestions.filter(item => {
                             // If there is no active term, show all items.
                             if (!term || term.length === 0) {
@@ -3513,6 +3538,9 @@ class Activity {
                                 item.label.toLowerCase().indexOf(term) !== -1
                             );
                         });
+
+                        // Cache the results for future use
+                        that._searchCache[term] = results;
                         response(results);
                     },
                     appendTo: "body",
@@ -4367,7 +4395,10 @@ class Activity {
                 canvasHolder.width = canvas.width;
                 canvasHolder.height = canvas.height;
             }
-            document.getElementById("hideContents").click();
+            const hideContents = document.getElementById("hideContents");
+            if (hideContents) {
+                hideContents.click();
+            }
             that.refreshCanvas();
         }
 
@@ -4398,6 +4429,8 @@ class Activity {
                 ) {
                     this.saveLocally();
                 }
+                // Pause render loop while tab is hidden
+                this._stopRenderLoop();
                 return;
             }
 
@@ -4409,6 +4442,9 @@ class Activity {
                     this._onResize(false);
                 }, 250);
             }
+            // Resume render loop when tab becomes visible again
+            this.stageDirty = true;
+            this._startRenderLoop();
         };
         this.addEventListener(document, "visibilitychange", this._handleVisibilityChange);
 
@@ -4416,7 +4452,10 @@ class Activity {
         const resizeCanvas_ = () => {
             try {
                 that._onResize(false);
-                document.getElementById("hideContents").click();
+                const hideContents = document.getElementById("hideContents");
+                if (hideContents) {
+                    hideContents.click();
+                }
             } catch (error) {
                 console.error("An error occurred in resizeCanvas_:", error);
             }
@@ -4790,24 +4829,30 @@ class Activity {
             let actionBlockCounter = 0;
             const dx = 0;
             const dy = this.cellSize * 3;
+
+            // Defer checkBounds during bulk block moves to avoid O(N²)
+            // overhead: each moveBlockRelative call triggers checkBounds()
+            // which scans all blocks, so N moves × N blocks = O(N²).
+            this.blocks._beginDeferCheckBounds();
+
             for (const blk in this.blocks.blockList) {
+                const myBlock = this.blocks.blockList[blk];
+                if (!myBlock) continue;
+
                 // If this block is at the top of a stack, push it
                 // onto the trashStacks list.
-                if (this.blocks.blockList[blk].connections[0] === null) {
+                if (myBlock.connections[0] === null) {
                     this.blocks.trashStacks.push(blk);
                 }
 
-                if (
-                    this.blocks.blockList[blk].name === "start" ||
-                    this.blocks.blockList[blk].name === "drum"
-                ) {
-                    const turtle = this.blocks.blockList[blk].value;
-                    if (!this.blocks.blockList[blk].trash && turtle !== null) {
+                if (myBlock.name === "start" || myBlock.name === "drum") {
+                    const turtle = myBlock.value;
+                    if (!myBlock.trash && turtle !== null) {
                         this.turtles.getTurtle(turtle).inTrash = true;
                         this.turtles.getTurtle(turtle).container.visible = false;
                     }
-                } else if (this.blocks.blockList[blk].name === "action") {
-                    if (!this.blocks.blockList[blk].trash) {
+                } else if (myBlock.name === "action") {
+                    if (!myBlock.trash) {
                         this.blocks.deleteActionBlock(this.blocks.blockList[blk]);
                         actionBlockCounter += 1;
                     }
@@ -4832,6 +4877,8 @@ class Activity {
                     delete this.blocks.blockCollapseArt[blk];
                 }
             }
+
+            this.blocks._endDeferCheckBounds();
 
             if (addStartBlock) {
                 this.blocks.loadNewBlocks(DATAOBJS);
@@ -4919,12 +4966,31 @@ class Activity {
         this.onStopTurtle = () => {
             if (this.showBlocksAfterRun) {
                 this.blocks.showBlocks();
-                const stopIcon = document.getElementById("stop");
-                if (stopIcon) {
-                    stopIcon.style.color = "white";
-                }
                 this.showBlocksAfterRun = false;
             }
+
+            const stopIcon = document.getElementById("stop");
+            if (stopIcon) {
+                stopIcon.style.color = "white";
+                stopIcon.style.display = "none";
+            }
+
+            const saveBtn = document.getElementById("saveButton");
+            const saveBtnAdv = document.getElementById("saveButtonAdvanced");
+            const recordBtn = document.getElementById("record");
+
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.classList.remove("grey-text", "inactiveLink");
+            }
+            if (saveBtnAdv) {
+                saveBtnAdv.disabled = false;
+                saveBtnAdv.classList.remove("grey-text", "inactiveLink");
+            }
+            if (recordBtn) {
+                recordBtn.classList.remove("grey-text", "inactiveLink");
+            }
+
             // TODO: plugin support
         };
 
@@ -4966,42 +5032,9 @@ class Activity {
         let lastRefreshReport = performance.now();
 
         this.refreshCanvas = () => {
-            if (this.blockRefreshCanvas) {
-                return;
-            }
-
-            const start = window.__ENABLE_REFRESH_PROFILING__ ? performance.now() : 0;
-
-            this.blockRefreshCanvas = true;
             this.stageDirty = true;
             this.update = true;
-
-            const that = this;
-            setTimeout(() => {
-                that.blockRefreshCanvas = false;
-                that.stageDirty = true;
-
-                if (window.__ENABLE_REFRESH_PROFILING__) {
-                    const duration = performance.now() - start;
-                    refreshCount++;
-                    totalRefreshTime += duration;
-                    maxRefreshTime = Math.max(maxRefreshTime, duration);
-
-                    if (refreshCount % 25 === 0) {
-                        const now = performance.now();
-                        const cps = (25 / (now - lastRefreshReport)) * 1000;
-                        console.log(
-                            `refreshCanvas | Avg: ${(totalRefreshTime / refreshCount).toFixed(
-                                2
-                            )}ms | Max: ${maxRefreshTime.toFixed(2)}ms | Rate: ${cps.toFixed(
-                                1
-                            )} calls/sec`
-                        );
-                        maxRefreshTime = 0;
-                        lastRefreshReport = now;
-                    }
-                }
-            }, 5);
+            this._startRenderLoop();
         };
 
         /*
@@ -5239,25 +5272,49 @@ class Activity {
             this.doLoadAnimation();
 
             // palettes.updatePalettes();
-            this.textMsg(this.planet.getCurrentProjectName());
+            try {
+                const projectName =
+                    this.planet && typeof this.planet.getCurrentProjectName === "function"
+                        ? this.planet.getCurrentProjectName()
+                        : _("My Project");
+                this.textMsg(projectName);
+            } catch (e) {
+                console.error(e);
+                this.textMsg(_("My Project"));
+            }
 
             const that = this;
             setTimeout(() => {
+                const finishLoading = () => {
+                    that.loading = false;
+                    document.body.style.cursor = "default";
+                    that.update = true;
+                };
+
                 try {
-                    that.planet.openProjectFromPlanet(projectID, () => {
-                        that.loadStartWrapper(loadStart);
-                    });
+                    if (that.planet && typeof that.planet.openProjectFromPlanet === "function") {
+                        that.planet.openProjectFromPlanet(projectID, () => {
+                            that.loadStartWrapper(loadStart);
+                        });
+                    } else {
+                        throw new Error("Planet openProjectFromPlanet is unavailable.");
+                    }
                 } catch (e) {
                     console.error(e);
                     that.loadStartWrapper(loadStart);
                 }
 
-                that.planet.initialiseNewProject();
-                // Restore default cursor
-                that.loading = false;
+                if (that.planet && typeof that.planet.initialiseNewProject === "function") {
+                    try {
+                        that.planet.initialiseNewProject();
+                    } catch (e) {
+                        console.error(e);
+                    }
+                } else {
+                    console.error("Planet initialiseNewProject is unavailable.");
+                }
 
-                document.body.style.cursor = "default";
-                that.update = true;
+                finishLoading();
             }, 2500);
 
             const run = flags.run;
@@ -6688,8 +6745,10 @@ class Activity {
             this.hasMatrixDataBlock = false;
             for (let blk = 0; blk < this.blocks.blockList.length; blk++) {
                 const myBlock = this.blocks.blockList[blk];
-                if (myBlock.trash) {
+                if (myBlock && myBlock.trash) {
                     // Don't save blocks in the trash.
+                    continue;
+                } else if (!myBlock) {
                     continue;
                 }
 
@@ -6700,12 +6759,12 @@ class Activity {
             const data = [];
             for (let blk = 0; blk < this.blocks.blockList.length; blk++) {
                 const myBlock = this.blocks.blockList[blk];
-                let args = null;
-
-                if (myBlock.trash) {
+                if (!myBlock || myBlock.trash) {
                     // Don't save blocks in the trash.
                     continue;
                 }
+
+                let args = null;
 
                 if (
                     myBlock.isValueBlock() ||
@@ -6730,12 +6789,10 @@ class Activity {
                         case "start":
                         case "drum": {
                             // Find the turtle associated with this block.
-                            const turtleIdx = parseInt(myBlock.value);
+
                             const turtle =
-                                !isNaN(turtleIdx) &&
-                                turtleIdx >= 0 &&
-                                turtleIdx < this.turtles.getTurtleCount()
-                                    ? this.turtles.getTurtle(turtleIdx)
+                                myBlock.value !== null && myBlock.value !== undefined
+                                    ? this.turtles.getTurtle(myBlock.value)
                                     : null;
                             if (turtle === null || turtle === undefined) {
                                 args = {
@@ -7222,7 +7279,14 @@ class Activity {
             if (!$helpfulSearch.data("autocomplete-init")) {
                 $helpfulSearch.autocomplete({
                     source: (request, response) => {
-                        const term = (request.term || "").toLowerCase();
+                        const term = (request.term || "").toLowerCase().trim();
+
+                        // Check cache first for performance
+                        if (that._searchCache[term] !== undefined) {
+                            response(that._searchCache[term]);
+                            return;
+                        }
+
                         const results = that.searchSuggestions.filter(item => {
                             if (!term || term.length === 0) {
                                 return true;
@@ -7238,6 +7302,9 @@ class Activity {
                                 item.label.toLowerCase().indexOf(term) !== -1
                             );
                         });
+
+                        // Cache the results for future use
+                        that._searchCache[term] = results;
                         response(results);
                     },
                     appendTo: "body",
@@ -7563,11 +7630,18 @@ class Activity {
 
             const intro = document.createElement("div");
             intro.className = "keyboard-shortcuts-hero";
-            intro.innerHTML =
-                `<div class="keyboard-shortcuts-hero-title">${_("Keyboard shortcuts")}</div>` +
-                `<div class="keyboard-shortcuts-hero-copy">${_(
-                    "Shortcuts are context-sensitive. Some only work when a related panel, widget, or mode is active. Windows/Linux and Mac equivalents are shown together."
-                )}</div>`;
+            const titleDiv = document.createElement("div");
+            titleDiv.className = "keyboard-shortcuts-hero-title";
+            titleDiv.textContent = _("Keyboard shortcuts");
+
+            const copyDiv = document.createElement("div");
+            copyDiv.className = "keyboard-shortcuts-hero-copy";
+            copyDiv.textContent = _(
+                "Shortcuts are context-sensitive. Some only work when a related panel, widget, or mode is active. Windows/Linux and Mac equivalents are shown together."
+            );
+
+            intro.appendChild(titleDiv);
+            intro.appendChild(copyDiv);
             wrapper.appendChild(intro);
 
             shortcutSections.forEach(section => {
@@ -7790,13 +7864,26 @@ class Activity {
             );
 
             img.onload = () => {
-                const bitmap = new createjs.Bitmap(img);
-                const bounds = bitmap.getBounds();
-                bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+                // FIX: createjs.Bitmap.getBounds() returns null for any Bitmap
+                // not added to a live EaselJS stage → TypeError: null.x crash.
+                // doSVG() returns "" on blank canvas → naturalWidth = 0 → guaranteed crash.
+                // Fix: use img.naturalWidth directly + plain offscreen canvas (no EaselJS needed).
                 try {
-                    that.storage["SESSIONIMAGE" + p] = bitmap.bitmapCache.getCacheDataURL();
+                    if (!img.naturalWidth || !img.naturalHeight) {
+                        // Blank canvas — doSVG() returned empty string, nothing to thumbnail.
+                        // SESSION<p> JSON was already saved above, so this is safe to skip.
+                        return;
+                    }
+
+                    const w = img.naturalWidth;
+                    const h = img.naturalHeight;
+                    const offscreen = document.createElement("canvas");
+                    offscreen.width = w;
+                    offscreen.height = h;
+                    offscreen.getContext("2d").drawImage(img, 0, 0);
+                    this.storage["SESSIONIMAGE" + p] = offscreen.toDataURL("image/png");
                 } catch (e) {
-                    console.error(e);
+                    console.error("[saveLocally] Thumbnail save failed:", e);
                 }
             };
 
@@ -8354,8 +8441,8 @@ class Activity {
                 }
             }
 
-            this.fileChooser.addEventListener("click", () => {
-                that.value = null;
+            this.fileChooser.addEventListener("click", event => {
+                event.currentTarget.value = "";
             });
 
             this.fileChooser.addEventListener(
@@ -8629,13 +8716,13 @@ class Activity {
             dropZone.addEventListener("dragover", __handleDragOver, false);
             dropZone.addEventListener("drop", __handleFileSelect, false);
 
-            this.allFilesChooser.addEventListener("click", () => {
-                this.value = null;
+            this.allFilesChooser.addEventListener("click", event => {
+                event.currentTarget.value = "";
             });
 
-            this.pluginChooser.addEventListener("click", () => {
+            this.pluginChooser.addEventListener("click", event => {
                 window.scroll(0, 0);
-                this.value = null;
+                event.currentTarget.value = "";
             });
 
             this.pluginChooser.addEventListener(
@@ -9010,16 +9097,9 @@ class Activity {
             }
         }
 
-        if (this._idleWatcherResetHandler) {
-            ["mousemove", "mousedown", "keydown", "touchstart", "wheel"].forEach(eventType => {
-                window.removeEventListener(eventType, this._idleWatcherResetHandler);
-            });
-            this._idleWatcherResetHandler = null;
-        }
-
-        if (this._idleWatcherIntervalId) {
-            clearInterval(this._idleWatcherIntervalId);
-            this._idleWatcherIntervalId = null;
+        // Keep idle watcher cleanup centralized to avoid stale field mismatches.
+        if (typeof this._stopIdleWatcher === "function") {
+            this._stopIdleWatcher();
         }
     }
 

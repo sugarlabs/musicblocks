@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global _, docById */
+/* global _, docById, ManagedTimer */
 
 /*
 Globals location
@@ -141,6 +141,7 @@ class WidgetWindow {
         this._savedPos = null;
         this._maximized = false;
         this._fullscreenEnabled = fullscreen;
+        this.timerManager = typeof ManagedTimer !== "undefined" ? new ManagedTimer() : null;
 
         // Drag offset for correct positioning
         this._dx = this._dy = 0;
@@ -658,6 +659,9 @@ class WidgetWindow {
         }
         if (window.widgetWindows.focused === this) {
             window.widgetWindows.focused = null;
+        }
+        if (this.timerManager) {
+            this.timerManager.clearAll();
         }
         window.widgetWindows.openWindows[this._key] = undefined;
     }

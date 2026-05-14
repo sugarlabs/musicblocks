@@ -94,6 +94,7 @@ Object.defineProperty(window, "localStorage", {
 beforeEach(() => {
     // Reset DOM
     document.body.innerHTML = "";
+    document.body.className = "";
 
     mockWidgetWindow = createMockWidgetWindow();
     window.widgetWindows = {
@@ -220,15 +221,19 @@ describe("HelpWidget", () => {
             expect(mockWidgetWindow.destroy).toHaveBeenCalled();
         });
 
-        test("onclose restores document.onkeydown to the handler active before Help opened", () => {
+        test("onclose removes the keydown listener added by Help", () => {
             const activity = createMockActivity();
-            const prevHandler = jest.fn();
-            document.onkeydown = prevHandler;
+            const removeSpy = jest.spyOn(document, "removeEventListener");
 
-            new HelpWidget(activity, false);
+            const hw = new HelpWidget(activity, false);
+            // Trigger _blockHelp so _keydownHandler is set
+            jest.runAllTimers();
+
             mockWidgetWindow.onclose();
 
-            expect(document.onkeydown).toBe(prevHandler);
+            expect(removeSpy).toHaveBeenCalledWith("keydown", expect.any(Function));
+            expect(hw._keydownHandler).toBeNull();
+            removeSpy.mockRestore();
         });
 
         test("calls windowFor with correct arguments", () => {
@@ -508,6 +513,114 @@ describe("HelpWidget", () => {
             expect(img).not.toBeNull();
             // For known pages, the img should NOT have width/height attributes
             expect(img.getAttribute("width")).toBeNull();
+            expect(img.classList.contains("help-tour-image")).toBe(true);
+            expect(img.classList.contains("help-tour-icon")).toBe(false);
+        });
+
+        test("_showPage treats Music Blocks congratulations page as a large image", () => {
+            HELPCONTENT.push(["Congratulations!", "You did it!", "images/congrats-mb.svg"]);
+
+            try {
+                const activity = createMockActivity();
+                const hw = new HelpWidget(activity, false);
+                jest.runAllTimers();
+
+                hw._showPage(HELPCONTENT.length - 1);
+
+                const helpBody = document.getElementById("helpBodyDiv");
+                const img = helpBody.querySelector("img");
+                expect(img).not.toBeNull();
+                expect(img.getAttribute("width")).toBeNull();
+                expect(img.classList.contains("help-tour-image")).toBe(true);
+                expect(img.classList.contains("help-tour-icon")).toBe(false);
+            } finally {
+                HELPCONTENT.pop();
+            }
+        });
+
+        test("_showPage preserves detailed tour icons in high contrast mode", () => {
+            const svg =
+                '<svg xmlns="http://www.w3.org/2000/svg"><rect fill="#f0f0f0"/><text fill="#333333">Tab</text></svg>';
+            const src = "data:image/svg+xml;base64," + window.btoa(svg);
+            HELPCONTENT.push(["Tab Navigation", "Use tab", src]);
+            document.body.classList.add("highcontrast");
+
+            try {
+                const activity = createMockActivity();
+                const hw = new HelpWidget(activity, false);
+                jest.runAllTimers();
+
+                hw._showPage(HELPCONTENT.length - 1);
+
+                const helpBody = document.getElementById("helpBodyDiv");
+                const img = helpBody.querySelector("img");
+                expect(img).not.toBeNull();
+                expect(img.getAttribute("src")).toBe(src);
+                expect(img.classList.contains("help-tour-detailed-icon")).toBe(true);
+                expect(img.classList.contains("help-tour-icon")).toBe(false);
+            } finally {
+                HELPCONTENT.pop();
+            }
+        });
+
+        test("_showPage makes regular semi-transparent SVG icons full strength in high contrast mode", () => {
+            const svg =
+                '<svg xmlns="http://www.w3.org/2000/svg"><path style="fill:#292929;fill-opacity:0.4;stroke:#292929;stroke-opacity:0.4;opacity:0.4"/><rect style="fill:#ffffff;opacity:0"/></svg>';
+            const src = "data:image/svg+xml;base64," + window.btoa(svg);
+            HELPCONTENT.push(["High Contrast Icon", "Icon description", src]);
+            document.body.classList.add("highcontrast");
+
+            try {
+                const activity = createMockActivity();
+                const hw = new HelpWidget(activity, false);
+                jest.runAllTimers();
+
+                hw._showPage(HELPCONTENT.length - 1);
+
+                const helpBody = document.getElementById("helpBodyDiv");
+                const img = helpBody.querySelector("img");
+                const highContrastSvg = window.atob(
+                    img.getAttribute("src").replace("data:image/svg+xml;base64,", "")
+                );
+
+                expect(img.classList.contains("help-tour-icon")).toBe(true);
+                expect(img.classList.contains("help-tour-white-icon")).toBe(true);
+                expect(highContrastSvg).toContain("fill-opacity:1");
+                expect(highContrastSvg).toContain("stroke-opacity:1");
+                expect(highContrastSvg).toContain("opacity:1");
+                expect(highContrastSvg).toContain("opacity:0");
+            } finally {
+                HELPCONTENT.pop();
+            }
+        });
+
+        test("_showPage preserves regular black-and-white SVG icon details in high contrast mode", () => {
+            const svg =
+                '<svg xmlns="http://www.w3.org/2000/svg"><rect style="fill:#292929;opacity:0.4"/><path style="fill:#ffffff"/></svg>';
+            const src = "data:image/svg+xml;base64," + window.btoa(svg);
+            HELPCONTENT.push(["Black White Icon", "Icon description", src]);
+            document.body.classList.add("highcontrast");
+
+            try {
+                const activity = createMockActivity();
+                const hw = new HelpWidget(activity, false);
+                jest.runAllTimers();
+
+                hw._showPage(HELPCONTENT.length - 1);
+
+                const helpBody = document.getElementById("helpBodyDiv");
+                const img = helpBody.querySelector("img");
+                const highContrastSvg = window.atob(
+                    img.getAttribute("src").replace("data:image/svg+xml;base64,", "")
+                );
+
+                expect(img.classList.contains("help-tour-icon")).toBe(true);
+                expect(img.classList.contains("help-tour-white-icon")).toBe(false);
+                expect(highContrastSvg).toContain("opacity:1");
+                expect(highContrastSvg).toContain("fill:#ffffff");
+            } finally {
+                HELPCONTENT.pop();
+            }
         });
 
         test("_showPage renders image with dimensions for unknown pages", () => {
@@ -523,6 +636,7 @@ describe("HelpWidget", () => {
             expect(img).not.toBeNull();
             expect(img.getAttribute("width")).toBe("64px");
             expect(img.getAttribute("height")).toBe("64px");
+            expect(img.classList.contains("help-tour-icon")).toBe(true);
         });
 
         test("_showPage renders link when page has more than 3 entries", () => {
@@ -791,7 +905,7 @@ describe("HelpWidget", () => {
             const clickSpy = jest.spyOn(rightArrow, "click");
 
             const event = new KeyboardEvent("keydown", { key: "ArrowRight" });
-            document.onkeydown(event);
+            document.dispatchEvent(event);
 
             expect(clickSpy).toHaveBeenCalled();
         });

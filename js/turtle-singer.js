@@ -24,7 +24,7 @@
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
    noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction,
-   SEMITONES, normalizeNoteAccidentals
+   SEMITONES, normalizeNoteAccidentals, parseNoteString
  */
 
 /*
@@ -1354,7 +1354,12 @@ class Singer {
             tur.singer.pushedNote = true;
 
             Singer.processNote(activity, tur.singer.defaultNoteValue, false, blk, turtle, () => {
-                tur.singer.inNoteBlock.splice(tur.singer.inNoteBlock.indexOf(blk), 1);
+                const idx = tur.singer.inNoteBlock.indexOf(blk);
+                if (idx !== -1) {
+                    tur.singer.inNoteBlock.splice(idx, 1);
+                } else {
+                    console.warn("Singer: block", blk, "not found in inNoteBlock");
+                }
             });
         }
     }
@@ -2163,9 +2168,10 @@ class Singer {
                               activity.logo.synth.changeInTemperament
                           );
                     const startingPitch = activity.logo.synth.startingPitch;
+                    const startPitchParsed = parseNoteString(startingPitch);
                     const frequency = getCachedPitchToFrequency(
-                        startingPitch.substring(0, startingPitch.length - 1),
-                        Number(startingPitch.slice(-1)),
+                        startPitchParsed[0],
+                        startPitchParsed[1],
                         0,
                         null
                     );

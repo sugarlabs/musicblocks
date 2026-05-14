@@ -1300,7 +1300,13 @@ class Logo {
         this.turtleDicts = {};
         this.notationNotes = {};
         this._midiData = {};
-        this.statusFields = [];
+        const statusWidgetOpen =
+            this.deps.widgetWindows &&
+            typeof this.deps.widgetWindows.isOpen === "function" &&
+            this.deps.widgetWindows.isOpen("status");
+        if (!statusWidgetOpen) {
+            this.statusFields = [];
+        }
         this.specialArgs = [];
         this.connectionStore = {};
         if (this.recordingBuffer && !this.recording) {
@@ -1593,6 +1599,52 @@ class Logo {
             performanceTracker.enterBlock();
         }
 
+        const profilingEnabled =
+            typeof performanceTracker !== "undefined" &&
+            typeof performanceTracker.isEnabled === "function" &&
+            performanceTracker.isEnabled();
+        let profilingStart = null;
+        if (profilingEnabled) {
+            profilingStart =
+                typeof performance !== "undefined" && typeof performance.now === "function"
+                    ? performance.now()
+                    : Date.now();
+            if (!logo.blockTimings) {
+                logo.blockTimings = {};
+            }
+        }
+
+        const recordBlockTiming = () => {
+            if (!profilingEnabled || profilingStart === null) return;
+            try {
+                const endTime =
+                    typeof performance !== "undefined" && typeof performance.now === "function"
+                        ? performance.now()
+                        : Date.now();
+                const elapsed = endTime - profilingStart;
+                const blockRef = logo.blockList && logo.blockList[blk];
+                const blockName = blockRef && blockRef.name ? blockRef.name : "unknown";
+
+                if (!logo.blockTimings[blockName]) {
+                    logo.blockTimings[blockName] = { calls: 0, total: 0, max: 0 };
+                }
+
+                const entry = logo.blockTimings[blockName];
+                entry.calls += 1;
+                entry.total += elapsed;
+                if (elapsed > entry.max) {
+                    entry.max = elapsed;
+                }
+            } catch (e) {
+                if (
+                    typeof performanceTracker !== "undefined" &&
+                    typeof performanceTracker.disable === "function"
+                ) {
+                    performanceTracker.disable();
+                }
+            }
+        };
+
         this._alreadyRunning = true;
 
         this.receivedArg = receivedArg;
@@ -1607,6 +1659,7 @@ class Logo {
             logo._alreadyRunning = false;
             logo._syncCounter = 0;
             logo._totalIterations = 0;
+            recordBlockTiming();
             return;
         }
 
@@ -1681,7 +1734,7 @@ class Logo {
                 } else {
                     nextFlow = logo.blockList[blk].connections[0];
                     if (
-                        nextFlow != null &&
+                        nextFlow !== null &&
                         (logo.blockList[nextFlow].name === "action" ||
                             logo.blockList[nextFlow].name === "backward")
                     ) {
@@ -1776,6 +1829,7 @@ class Logo {
                 if (cf !== undefined) childFlow = cf;
                 if (cfc !== undefined) childFlowCount = cfc;
                 if (ret) {
+                    recordBlockTiming();
                     if (typeof performanceTracker !== "undefined") {
                         performanceTracker.exitBlock();
                     }
@@ -2150,6 +2204,7 @@ class Logo {
             logo._timerManager.setTimeout(__checkCompletionState, 100);
         }
 
+        recordBlockTiming();
         if (typeof performanceTracker !== "undefined") {
             performanceTracker.exitBlock();
         }
