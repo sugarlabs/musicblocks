@@ -115,7 +115,10 @@
             rel="preload"
             href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"
             as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
         />
         <noscript
             ><link
@@ -136,7 +139,10 @@
             as="style"
             integrity="sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07"
             crossorigin="anonymous"
-            onload="this.onload=null;this.rel='stylesheet'"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
         />
         <noscript
             ><link
@@ -178,7 +184,10 @@
             rel="preload"
             href="css/themes.css?v=fixed"
             as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
         />
         <noscript><link rel="stylesheet" href="css/themes.css?v=fixed" /></noscript>
         <script>
@@ -260,13 +269,7 @@
             ></canvas>
 
             <!--hidden at the beginning whilst everything loads-->
-            <div
-                class="popupMsg"
-                id="printText"
-                tabindex="-1"
-                aria-live="polite"
-                role="status"
-            >
+            <div class="popupMsg" id="printText" tabindex="-1" aria-live="polite" role="status">
                 <div class="contentWrapper">
                     <span id="printTextContent"></span>
                     <img
@@ -277,13 +280,7 @@
                     />
                 </div>
             </div>
-            <div
-                class="popupMsg"
-                id="errorText"
-                tabindex="-1"
-                aria-live="assertive"
-                role="alert"
-            >
+            <div class="popupMsg" id="errorText" tabindex="-1" aria-live="assertive" role="alert">
                 <div class="contentWrapper">
                     <span id="errorTextContent"></span>
                     <img
@@ -500,7 +497,13 @@
                         <div id="guitarText"></div>
                         <input type="checkbox" id="guitarCheck" tabindex="-1" />
                         <p></p>
-                        <p><button class="confirm-button" id="submitLilypond" aria-label="Submit LilyPond code"></button></p>
+                        <p>
+                            <button
+                                class="confirm-button"
+                                id="submitLilypond"
+                                aria-label="Submit LilyPond code"
+                            ></button>
+                        </p>
                         <!-- <button id="submitPDF"></button></p> -->
                     </div>
                 </dialog>
@@ -524,12 +527,22 @@
                             </div>
                             <ul class="main left">
                                 <li>
-                                    <a id="play" class="left tooltipped" role="button" tabindex="0"
+                                    <a
+                                        id="play"
+                                        class="left tooltipped"
+                                        role="button"
+                                        tabindex="0"
+                                        aria-label="Play (Enter)"
                                         ><i class="material-icons main">play_circle_filled</i></a
                                     >
                                 </li>
                                 <li>
-                                    <a id="stop" class="left tooltipped" role="button" tabindex="0"
+                                    <a
+                                        id="stop"
+                                        class="left tooltipped"
+                                        role="button"
+                                        tabindex="0"
+                                        aria-label="Stop"
                                         ><i class="material-icons main">stop</i></a
                                     >
                                 </li>
@@ -541,6 +554,7 @@
                                         data-tooltip="Record"
                                         role="button"
                                         tabindex="0"
+                                        aria-label="Record"
                                     ></a>
                                     <a
                                         id="recordDropdownArrow"
@@ -549,6 +563,9 @@
                                         style="margin-left: -5px; padding: 0; font-size: 28px"
                                         role="button"
                                         tabindex="0"
+                                        aria-label="Record options"
+                                        aria-haspopup="menu"
+                                        aria-expanded="false"
                                     ></a>
                                 </li>
                             </ul>
@@ -562,6 +579,7 @@
                                         role="button"
                                         tabindex="0"
                                         onclick="setIcon()"
+                                        aria-label="Fullscreen"
                                     >
                                         <i class="material-icons" id="FullScrIcon">fullscreen</i>
                                     </a>
@@ -574,6 +592,9 @@
                                         role="button"
                                         tabindex="0"
                                         data-activates="newdropdown"
+                                        aria-label="New file"
+                                        aria-haspopup="menu"
+                                        aria-expanded="false"
                                     >
                                         <i class="material-icons md-48">note_add</i>
                                     </a>
@@ -585,6 +606,7 @@
                                         data-position="bottom"
                                         role="button"
                                         tabindex="0"
+                                        aria-label="Load project"
                                     >
                                         <i class="material-icons md-48">folder</i>
                                     </a>
@@ -597,6 +619,9 @@
                                         role="button"
                                         tabindex="0"
                                         data-activates="saveddropdownbeg"
+                                        aria-label="Save project"
+                                        aria-haspopup="menu"
+                                        aria-expanded="false"
                                     >
                                         <i id="save1" class="material-icons md-48">save_alt</i>
                                     </a>
@@ -607,9 +632,12 @@
                                         style="display: none"
                                         class="tooltipped dropdown-trigger"
                                         role="button"
-                                        tabindex="0"
+                                        tabindex="-1"
                                         data-position="bottom"
                                         data-activates="saveddropdown"
+                                        aria-label="Save project"
+                                        aria-haspopup="menu"
+                                        aria-expanded="false"
                                     >
                                         <i id="save2" class="material-icons md-48">save_alt</i>
                                     </a>
@@ -621,6 +649,7 @@
                                         data-position="bottom"
                                         role="button"
                                         tabindex="0"
+                                        aria-label="Planet (Cloud sharing)"
                                     >
                                         <i class="material-icons md-48">public</i>
                                     </a>
@@ -631,8 +660,10 @@
                                         id="planetIconDisabled"
                                         class="tooltipped"
                                         role="button"
-                                        tabindex="0"
+                                        tabindex="-1"
                                         data-position="bottom"
+                                        aria-label="Planet (Cloud sharing, disabled)"
+                                        aria-disabled="true"
                                     >
                                         <i style="color: #a5acba" class="material-icons md-48"
                                             >public</i
@@ -646,6 +677,8 @@
                                         data-position="bottom"
                                         role="button"
                                         tabindex="0"
+                                        aria-label="Show advanced tools"
+                                        aria-expanded="false"
                                     >
                                         <i id="menu" class="animated-icon material-icons md-48"
                                             >menu</i
@@ -660,6 +693,9 @@
                                         role="button"
                                         tabindex="0"
                                         data-activates="helpdropdown"
+                                        aria-label="Help and guides"
+                                        aria-haspopup="menu"
+                                        aria-expanded="false"
                                     >
                                         <i class="material-icons md-48">help</i>
                                     </a>
@@ -670,9 +706,9 @@
                                         class="tooltipped hidden"
                                         data-position="bottom"
                                         role="button"
-                                        tabindex="0"
+                                        tabindex="-1"
                                         data-tooltip="Install App"
-                                        aria-label="Install App"
+                                        aria-label="Install as App"
                                     >
                                         <i class="material-icons md-48">file_download</i>
                                     </a>
@@ -695,6 +731,7 @@
                                             data-delay="10"
                                             role="button"
                                             tabindex="0"
+                                            aria-label="Run slowly"
                                         >
                                             <i class="material-icons md-48">play_circle_outline</i>
                                         </a>
@@ -707,6 +744,7 @@
                                             data-delay="10"
                                             role="button"
                                             tabindex="0"
+                                            aria-label="Run step by step"
                                         >
                                             <i class="material-icons md-48">video_library</i>
                                         </a>
@@ -721,6 +759,7 @@
                                             role="button"
                                             tabindex="0"
                                             data-delay="10"
+                                            aria-label="Display statistics"
                                             ><i class="material-icons md-48">poll</i></a
                                         >
                                     </li>
@@ -732,6 +771,7 @@
                                             data-delay="10"
                                             role="button"
                                             tabindex="0"
+                                            aria-label="Load plugin"
                                             ><i class="material-icons md-48">add_circle</i></a
                                         >
                                     </li>
@@ -743,6 +783,7 @@
                                             data-delay="10"
                                             role="button"
                                             tabindex="0"
+                                            aria-label="Delete plugin"
                                             ><i class="material-icons md-48">remove_circle</i></a
                                         >
                                     </li>
@@ -753,6 +794,7 @@
                                             data-position="bottom"
                                             role="button"
                                             tabindex="0"
+                                            aria-label="Enable horizontal scroll"
                                             ><i class="material-icons md-48">compare_arrows</i></a
                                         >
                                     </li>
@@ -764,6 +806,7 @@
                                             role="button"
                                             tabindex="0"
                                             data-position="bottom"
+                                            aria-label="Disable horizontal scroll"
                                             ><i class="material-icons md-48">lock</i></a
                                         >
                                     </li>
@@ -776,6 +819,9 @@
                                             tabindex="0"
                                             data-activates="themedropdown"
                                             data-tooltip="Select Theme"
+                                            aria-label="Select theme (Light, Dark, High Contrast)"
+                                            aria-haspopup="menu"
+                                            aria-expanded="false"
                                             ><i class="material-icons md-48">brightness_7</i></a
                                         >
                                     </li>
@@ -786,6 +832,7 @@
                                             data-position="bottom"
                                             role="button"
                                             tabindex="0"
+                                            aria-label="Merge with current"
                                             ><i class="material-icons md-48">merge_type</i></a
                                         >
                                     </li>
@@ -796,6 +843,7 @@
                                             data-position="bottom"
                                             role="button"
                                             tabindex="0"
+                                            aria-label="Wrap turtle"
                                             ><i class="material-icons md-48">wrap_text</i></a
                                         >
                                     </li>
@@ -1169,7 +1217,10 @@
                             e.preventDefault(); // prevent default <a> behavior
                             const selectedLang = this.id; // ID corresponds to language code
                             const currentLang = readStorage("languagePreference");
-                            if (currentLang !== selectedLang && writeStorage("languagePreference", selectedLang)) {
+                            if (
+                                currentLang !== selectedLang &&
+                                writeStorage("languagePreference", selectedLang)
+                            ) {
                                 location.reload(); // automatically reload
                             }
                         });
@@ -1306,7 +1357,7 @@
 
                 iconCode.textContent = isFullscreen ? "\ue5d1" : "\ue5d0";
 
-                if (fullScreenBtn && typeof _ === 'function') {
+                if (fullScreenBtn && typeof _ === "function") {
                     var tooltipText = isFullscreen ? _("Exit Fullscreen") : _("Enter Fullscreen");
                     fullScreenBtn.setAttribute("data-tooltip", tooltipText);
                     if (window.jQuery) {

@@ -46,6 +46,31 @@ window.widgetWindows = {
             return;
         }
 
+        // Handle Tab key for focus management in widget windows
+        if (e.key === "Tab" && focused._windowDiv) {
+            // Get all focusable elements in the window
+            const focusableElements = focused._windowDiv.querySelectorAll(
+                "a, button, input, select, textarea, [tabindex]"
+            );
+
+            if (focusableElements.length > 0) {
+                const firstElement = focusableElements[0];
+                const lastElement = focusableElements[focusableElements.length - 1];
+
+                if (e.shiftKey) {
+                    if (activeElement === firstElement) {
+                        e.preventDefault();
+                        lastElement.focus();
+                    }
+                } else {
+                    if (activeElement === lastElement) {
+                        e.preventDefault();
+                        firstElement.focus();
+                    }
+                }
+            }
+        }
+
         // Handle Maximize (Cmd/Ctrl + Shift + M)
         const isModifierActive = e.metaKey || e.ctrlKey;
         if (isModifierActive && e.shiftKey && e.code === "KeyM") {

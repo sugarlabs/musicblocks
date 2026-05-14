@@ -14,9 +14,120 @@
 
 @import url("play-only-mode.css");
 
+/* Keyboard navigation indicator */
+body.keyboard-nav-active *:focus-visible {
+    box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.3) !important;
+}
+
+body.keyboard-nav-active.dark *:focus-visible {
+    box-shadow: 0 0 0 4px rgba(144, 202, 249, 0.3) !important;
+}
+
+body.keyboard-nav-active.highcontrast *:focus-visible {
+    box-shadow: 0 0 0 4px rgba(255, 255, 0, 0.4) !important;
+}
+
+/* Universal focus-visible styles for keyboard navigation */
 *:focus-visible {
-    outline: 2px solid var(--color-brand-primary) !important;
+    outline: 2px solid #1976d2 !important;
     outline-offset: 2px;
+    transition:
+        outline-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+/* Enhanced focus styles for light theme (default) */
+body:not(.dark):not(.highcontrast) *:focus-visible {
+    outline-color: #1976d2 !important;
+}
+
+/* Enhanced focus styles for dark theme */
+body.dark *:focus-visible {
+    outline-color: #90caf9 !important;
+}
+
+/* Enhanced focus styles for high contrast theme */
+body.highcontrast *:focus-visible {
+    outline-color: #ffff00 !important;
+    outline-width: 3px !important;
+}
+
+/* Ensure focus is visible on buttons */
+button:focus-visible,
+a[role="button"]:focus-visible,
+input[type="button"]:focus-visible,
+input[type="submit"]:focus-visible,
+input[type="checkbox"]:focus-visible,
+input[type="radio"]:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+input:focus-visible {
+    outline: 2px solid #1976d2 !important;
+    outline-offset: 2px !important;
+}
+
+/* Focus styles for palette and sidebar elements */
+#palette:focus-visible,
+#paletteToggle:focus-visible,
+.palette-category:focus-visible,
+.palette-item:focus-visible {
+    outline: 2px solid #1976d2 !important;
+    outline-offset: 2px !important;
+}
+
+/* Focus styles for toolbar buttons - ENHANCED */
+#toolbars a[role="button"]:focus-visible,
+#aux-toolbar a[role="button"]:focus-visible,
+#toolbars a[role="button"]:focus,
+#aux-toolbar a[role="button"]:focus {
+    outline: 2px solid #1976d2 !important;
+    outline-offset: 2px !important;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+/* Light theme toolbar button focus */
+body:not(.dark):not(.highcontrast) #toolbars a[role="button"]:focus-visible,
+body:not(.dark):not(.highcontrast) #aux-toolbar a[role="button"]:focus-visible,
+body:not(.dark):not(.highcontrast) #toolbars a[role="button"]:focus,
+body:not(.dark):not(.highcontrast) #aux-toolbar a[role="button"]:focus {
+    outline-color: #1976d2 !important;
+    background-color: rgba(25, 118, 210, 0.1) !important;
+}
+
+/* Dark theme toolbar button focus */
+body.dark #toolbars a[role="button"]:focus-visible,
+body.dark #aux-toolbar a[role="button"]:focus-visible {
+    outline-color: #90caf9 !important;
+    background-color: rgba(144, 202, 249, 0.1) !important;
+}
+
+/* High contrast theme toolbar button focus */
+body.highcontrast #toolbars a[role="button"]:focus-visible,
+body.highcontrast #aux-toolbar a[role="button"]:focus-visible {
+    outline-color: #ffff00 !important;
+    outline-width: 3px !important;
+    background-color: rgba(255, 255, 0, 0.15) !important;
+}
+
+/* Remove default browser outline to prevent double outlines (but keep for interactive elements) */
+*:not(a):not(button):not(input):not(select):not(textarea):focus {
+    outline: none;
+}
+
+/* OVERRIDE: Ensure focus ring is visible on interactive elements */
+a[role="button"]:focus,
+a[role="button"]:focus-visible,
+button:focus,
+button:focus-visible,
+input:focus,
+input:focus-visible,
+select:focus,
+select:focus-visible,
+textarea:focus,
+textarea:focus-visible {
+    outline: 2px solid #1976d2 !important;
+    outline-offset: 2px !important;
 }
 
 body:not(.dark):not(.highcontrast) #helpfulSearch,

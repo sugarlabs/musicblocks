@@ -406,6 +406,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                 "preloadjs.min",
                 "utils/platformstyle",
                 "utils/utils",
+                "utils/accessibility",
                 "activity/turtledefs",
                 "activity/block",
                 "activity/blocks",

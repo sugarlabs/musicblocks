@@ -8340,6 +8340,11 @@ class Activity {
             this.toolbar = new Toolbar();
             this.toolbar.init(this);
 
+            // Initialize accessibility features
+            if (typeof window.AccessibilityHelper !== "undefined") {
+                window.AccessibilityHelper.init();
+            }
+
             this.toolbar.renderLogoIcon(showAboutPage);
             this.toolbar.renderPlayIcon(doFastButton);
             this.toolbar.renderStopIcon(doHardStopButton);

@@ -128,6 +128,11 @@ class ThemeBox {
         this.updateThemeIcon();
         this.refreshUIComponents();
 
+        // Update focus ring colors for accessibility
+        if (typeof window.AccessibilityHelper !== "undefined") {
+            window.AccessibilityHelper.updateFocusRingForTheme(this._theme);
+        }
+
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 const topRightButtons = document.querySelectorAll(
