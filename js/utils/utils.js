@@ -779,15 +779,20 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
     };
 
     // Use the vetted check to determine initial trust
-    let userConfirmed = isVettedPlugin(pluginSource);
+    const vetted = isVettedPlugin(pluginSource);
+    let userConfirmed = vetted;
 
     if (!userConfirmed) {
-        userConfirmed = confirm(
-            _("Security Warning") +
-                "\n\n" +
-                _(
-                    "This plugin contains code that will be executed in your browser. It has not been loaded from the built-in plugins directory and may contain unsafe code."
-                ) +
+        // Use MBDialog.confirm if available (non-blocking), fall back to native confirm
+        const showDialog =
+            typeof window !== "undefined" && window.MBDialog && window.MBDialog.confirm
+                ? msg => window.MBDialog.confirm(msg, _("Security Warning"))
+                : msg => Promise.resolve(confirm(msg));
+
+        userConfirmed = await showDialog(
+            _(
+                "This plugin contains code that will be executed in your browser. It has not been loaded from the built-in plugins directory and may contain unsafe code."
+            ) +
                 "\n\n" +
                 _("Do you want to allow this plugin to run?") +
                 "\n\n" +
@@ -801,24 +806,6 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
         }
     }
 
-    // We accumulate scripts that need to be executed in a Blob URL to avoid unsafe-eval.
-    let blobScriptContent = "";
-    const pendingSafeEvals = [];
-
-    const safeEval = (code, label = "plugin") => {
-        if (typeof code !== "string" || !userConfirmed) return;
-
-        // Basic sanity limit
-        if (code.length > 500000) {
-            console.warn("Plugin code too large:", label);
-            return;
-        }
-
-        // We wrap the code in a closure that provides activity and globalActivity.
-        // We'll execute these after the Blob script is loaded and populates the registry.
-        pendingSafeEvals.push({ code, label });
-    };
-
     let obj;
     try {
         obj = JSON.parse(pluginData);
@@ -830,6 +817,75 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
         console.debug("Malformed plugin data:", pluginData);
         return null;
     }
+
+    // Granular Permissions Model
+    const requestedPermissions = obj.PERMISSIONS || [];
+    if (!vetted && requestedPermissions.length > 0) {
+        const permissionList = requestedPermissions.join(", ");
+        // Use MBDialog.confirm if available, fall back to native confirm
+        const showDialog =
+            typeof window !== "undefined" && window.MBDialog && window.MBDialog.confirm
+                ? msg => window.MBDialog.confirm(msg, _("Permission Request"))
+                : msg => Promise.resolve(confirm(msg));
+
+        const grant = await showDialog(
+            _("This plugin is requesting the following sensitive permissions:") +
+                "\n" +
+                permissionList +
+                "\n\n" +
+                _("Do you want to grant these permissions?")
+        );
+        if (!grant) {
+            console.warn("User denied permissions for plugin:", pluginSource);
+            // Plugin continues running in sandbox, but without granted permissions
+        }
+    }
+
+    // If unvetted, we use the PluginSandbox
+    let sandbox = null;
+    if (!vetted && typeof PluginSandbox !== "undefined") {
+        sandbox = new PluginSandbox({
+            permissions: vetted ? [] : requestedPermissions,
+            callbacks: {
+                playSound: id => {
+                    // Logic to play sound through activity/logo
+                    console.log("Sandbox requested playSound:", id);
+                },
+                saveData: (key, value) => {
+                    // Logic to save data securely
+                    console.log("Sandbox requested saveData:", key, value);
+                }
+            }
+        });
+        await sandbox.init();
+    }
+
+    // We accumulate scripts that need to be executed in a Blob URL to avoid unsafe-eval.
+    let blobScriptContent = "";
+    const pendingSafeEvals = [];
+
+    const safeEval = async (code, label = "plugin") => {
+        if (typeof code !== "string" || !userConfirmed) return;
+
+        // Basic sanity limit
+        if (code.length > 500000) {
+            console.warn("Plugin code too large:", label);
+            return;
+        }
+
+        if (sandbox) {
+            // Load into sandbox instead of main thread
+            await sandbox.loadFunction(label, code);
+            // We store the reference to the sandbox for execution later
+            activity.__mb_plugin_sandboxes = activity.__mb_plugin_sandboxes || {};
+            activity.__mb_plugin_sandboxes[label] = sandbox;
+            return label;
+        } else {
+            // Vetted: use Blob script
+            pendingSafeEvals.push({ code, label });
+            return null;
+        }
+    };
     // Create a palette entry.
     let newPalette = false,
         paletteName = null;
@@ -914,7 +970,7 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
             // Pre-compile trusted plugins for performance.
             // UNTRUSTED plugins (if any made it past confirmation) are stored as strings
             // and handled via whitelist in safePluginExecute.
-            if (isVettedPlugin(pluginSource)) {
+            if (vetted) {
                 const flowCode = obj["FLOWPLUGINS"][flow];
                 const registryName = `flow_${flow}_${Math.random().toString(36).substr(2, 9)}`;
                 blobScriptContent += `
@@ -923,6 +979,10 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, rec
 };
 `;
                 activity.logo.evalFlowDict[flow] = registryName; // Will be replaced by function after load
+            } else if (sandbox) {
+                const label = `FLOWPLUGINS:${flow}`;
+                await safeEval(obj["FLOWPLUGINS"][flow], label);
+                activity.logo.evalFlowDict[flow] = label;
             } else {
                 activity.logo.evalFlowDict[flow] = obj["FLOWPLUGINS"][flow];
             }
@@ -932,7 +992,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, rec
     // Populate the arg-block dictionary
     if ("ARGPLUGINS" in obj) {
         for (const arg in obj["ARGPLUGINS"]) {
-            if (isVettedPlugin(pluginSource)) {
+            if (vetted) {
                 const argCode = obj["ARGPLUGINS"][arg];
                 const registryName = `arg_${arg}_${Math.random().toString(36).substr(2, 9)}`;
                 blobScriptContent += `
@@ -941,6 +1001,10 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, par
 };
 `;
                 activity.logo.evalArgDict[arg] = registryName;
+            } else if (sandbox) {
+                const label = `ARGPLUGINS:${arg}`;
+                await safeEval(obj["ARGPLUGINS"][arg], label);
+                activity.logo.evalArgDict[arg] = label;
             } else {
                 activity.logo.evalArgDict[arg] = obj["ARGPLUGINS"][arg];
             }
@@ -964,7 +1028,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, par
     // Populate the setter dictionary
     if ("SETTERPLUGINS" in obj) {
         for (const setter in obj["SETTERPLUGINS"]) {
-            if (isVettedPlugin(pluginSource)) {
+            if (vetted) {
                 const setterCode = obj["SETTERPLUGINS"][setter];
                 const registryName = `setter_${setter}_${Math.random().toString(36).substr(2, 9)}`;
                 blobScriptContent += `
@@ -973,6 +1037,10 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, blk, value, turt
 };
 `;
                 activity.logo.evalSetterDict[setter] = registryName;
+            } else if (sandbox) {
+                const label = `SETTERPLUGINS:${setter}`;
+                await safeEval(obj["SETTERPLUGINS"][setter], label);
+                activity.logo.evalSetterDict[setter] = label;
             } else {
                 activity.logo.evalSetterDict[setter] = obj["SETTERPLUGINS"][setter];
             }
@@ -988,18 +1056,18 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, blk, value, turt
     if ("BLOCKPLUGINS" in obj) {
         for (const block in obj["BLOCKPLUGINS"]) {
             console.debug("adding plugin block " + block);
-            safeEval(obj["BLOCKPLUGINS"][block], "BLOCKPLUGINS:" + block);
+            await safeEval(obj["BLOCKPLUGINS"][block], "BLOCKPLUGINS:" + block);
         }
     }
 
     // Create the globals.
     if ("GLOBALS" in obj) {
-        safeEval(obj["GLOBALS"], "GLOBALS");
+        await safeEval(obj["GLOBALS"], "GLOBALS");
     }
 
     if ("PARAMETERPLUGINS" in obj) {
         for (const parameter in obj["PARAMETERPLUGINS"]) {
-            if (isVettedPlugin(pluginSource)) {
+            if (vetted) {
                 const paramCode = obj["PARAMETERPLUGINS"][parameter];
                 const registryName = `param_${parameter}_${Math.random().toString(36).substr(2, 9)}`;
                 blobScriptContent += `
@@ -1008,6 +1076,10 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk) {
 };
 `;
                 activity.logo.evalParameterDict[parameter] = registryName;
+            } else if (sandbox) {
+                const label = `PARAMETERPLUGINS:${parameter}`;
+                await safeEval(obj["PARAMETERPLUGINS"][parameter], label);
+                activity.logo.evalParameterDict[parameter] = label;
             } else {
                 activity.logo.evalParameterDict[parameter] = obj["PARAMETERPLUGINS"][parameter];
             }
@@ -1017,14 +1089,14 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk) {
     // Code to execute when plugin is loaded
     if ("ONLOAD" in obj) {
         for (const arg in obj["ONLOAD"]) {
-            safeEval(obj["ONLOAD"][arg], "ONLOAD:" + arg);
+            await safeEval(obj["ONLOAD"][arg], "ONLOAD:" + arg);
         }
     }
 
     // Code to execute when turtle code is started
     if ("ONSTART" in obj) {
         for (const arg in obj["ONSTART"]) {
-            if (isVettedPlugin(pluginSource)) {
+            if (vetted) {
                 const onStartCode = obj["ONSTART"][arg];
                 const registryName = `onstart_${arg}_${Math.random().toString(36).substr(2, 9)}`;
                 blobScriptContent += `
@@ -1033,6 +1105,10 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
 };
 `;
                 activity.logo.evalOnStartList[arg] = registryName;
+            } else if (sandbox) {
+                const label = `ONSTART:${arg}`;
+                await safeEval(obj["ONSTART"][arg], label);
+                activity.logo.evalOnStartList[arg] = label;
             } else {
                 activity.logo.evalOnStartList[arg] = obj["ONSTART"][arg];
             }
@@ -1042,7 +1118,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
     // Code to execute when turtle code is stopped
     if ("ONSTOP" in obj) {
         for (const arg in obj["ONSTOP"]) {
-            if (isVettedPlugin(pluginSource)) {
+            if (vetted) {
                 const onStopCode = obj["ONSTOP"][arg];
                 const registryName = `onstop_${arg}_${Math.random().toString(36).substr(2, 9)}`;
                 blobScriptContent += `
@@ -1051,6 +1127,10 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
 };
 `;
                 activity.logo.evalOnStopList[arg] = registryName;
+            } else if (sandbox) {
+                const label = `ONSTOP:${arg}`;
+                await safeEval(obj["ONSTOP"][arg], label);
+                activity.logo.evalOnStopList[arg] = label;
             } else {
                 activity.logo.evalOnStopList[arg] = obj["ONSTOP"][arg];
             }

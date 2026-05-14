@@ -11,6 +11,10 @@
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta id="theme-color" name="theme-color" content="#2196F3" />
+        <meta
+            http-equiv="Content-Security-Policy"
+            content="default-src 'self'; script-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; worker-src 'self' blob:; frame-src 'self' blob:;"
+        />
 
         <!-- Icons & PWA -->
         <link rel="icon" sizes="192x192" href="favicon.ico" />
@@ -104,11 +108,16 @@
         <link rel="prefetch" as="video" href="loading-animation.webm" type="video/webm" />
         <link rel="prefetch" as="video" href="loading-animation.mp4" type="video/mp4" />
 
+        <!-- Unused loading-animation-ja image prefetch during MB initialization #5490 -->
+        <!-- <link rel="prefetch" as="image" href="loading-animation-ja.svg"> -->
+        <script src="js/init/prefetch-ja-lang.js"></script>
         <!-- <script src="js/utils/detectIE.js"></script> -->
 
         <!-- <script src="sounds/samples/manifest.js"></script> -->
 
         <!-- <script src="lib/mespeak.js"></script> -->
+
+        <script src="lib/reqwest.js" defer></script>
 
         <script src="dist/vendor.min.js"></script>
         <link
@@ -155,11 +164,7 @@
      decoding and drawing GIF frames onto the turtle's overlay canvas.
      Canvas refreshing is handled separately by CreateJS Ticker. -->
         <script src="js/gif-animator.js" defer></script>
-        <script defer>
-            document.addEventListener("DOMContentLoaded", function () {
-                if (window.hljs) hljs.highlightAll();
-            });
-        </script>
+        <script src="js/init/hljs-init.js" defer></script>
         <script src="lib/astring.min.js" defer></script>
         <script src="js/utils/mb-dialog.js" defer></script>
         <script src="js/svgAssetSelector.js" defer></script>
@@ -181,25 +186,7 @@
             onload="this.onload=null;this.rel='stylesheet'"
         />
         <noscript><link rel="stylesheet" href="css/themes.css?v=fixed" /></noscript>
-        <script>
-            let ast2blocklist_config;
-            window.ast2blocklist_config_failed = false;
-            window.ast2blocklist_config_ready = fetch("js/js-export/ast2blocks.min.json")
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`Failed to load AST block config: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    ast2blocklist_config = data;
-                    return data;
-                })
-                .catch(() => {
-                    window.ast2blocklist_config_failed = true;
-                    return null;
-                });
-        </script>
+        <script src="js/init/ast-config.js"></script>
     </head>
 
     <body id="body" data-title="index" style="background: #f9f9f9">
@@ -994,335 +981,17 @@
         </main>
 
         <!-- Initialize Scripts -->
-        <script>
-            let canvas, stage;
-            function init() {
-                // Defensive check: ensure createjs is loaded before using it
-                if (typeof createjs === "undefined") {
-                    // Retry after a short delay if createjs isn't ready yet
-                    setTimeout(init, 50);
-                    return;
-                }
+        <script src="js/init/createjs-init.js" defer></script>
 
-                canvas = document.getElementById("canvas");
-                stage = new createjs.Stage(canvas);
-
-                createjs.Ticker.framerate = 60;
-                // createjs.Ticker.addEventListener("tick", stage); // Managed by Activity class
-            }
-            document.addEventListener("DOMContentLoaded", init);
-        </script>
-
-        <script>
-            // Register service worker only in production (not on localhost)
-            if ("serviceWorker" in navigator) {
-                const readStorage = key => {
-                    try {
-                        return localStorage.getItem(key);
-                    } catch (e) {
-                        return null;
-                    }
-                };
-                // Localhost SW is disabled to avoid caching; set allowLocalPwa to test installs.
-                const allowLocalPwa = readStorage("allowLocalPwa") === "true";
-
-                // Detect if running on localhost for development
-                const runtimeEnv = window.MB_ENV;
-                const isDevMode = runtimeEnv !== "production";
-
-                if (!isDevMode || allowLocalPwa) {
-                    // Production: Register service worker for offline mode
-                    if (navigator.serviceWorker.controller) {
-                        console.debug(
-                            "[PWA Builder] Active service worker found, no need to register"
-                        );
-                    } else {
-                        // Register the service worker
-                        navigator.serviceWorker
-                            .register("/sw.js")
-                            .then(function (reg) {
-                                console.debug(
-                                    "[PWA Builder] Service worker registered for scope: " +
-                                        reg.scope
-                                );
-                            })
-                            .catch(function (err) {
-                                console.error(
-                                    "[PWA Builder] Service worker registration failed:",
-                                    err
-                                );
-                            });
-                    }
-                } else {
-                    // Development: Skip service worker for instant updates
-                    console.log("🔥 [DEV MODE] Service worker disabled for instant code updates");
-                    console.log(
-                        "Set localStorage.allowLocalPwa = 'true' to enable PWA install testing on localhost."
-                    );
-                }
-            }
-        </script>
-        <script>
-            let deferredPrompt;
-
-            window.addEventListener("beforeinstallprompt", event => {
-                event.preventDefault(); // Prevent automatic browser prompt
-                deferredPrompt = event;
-
-                // Show the install button
-                const installButton = document.getElementById("installButton");
-                if (installButton) {
-                    installButton.classList.remove("hidden");
-                }
-            });
-
-            // Handle install button click
-            document.addEventListener("DOMContentLoaded", function () {
-                const installButton = document.getElementById("installButton");
-                if (installButton) {
-                    installButton.addEventListener("click", async function () {
-                        if (deferredPrompt) {
-                            // Show the install prompt
-                            deferredPrompt.prompt();
-
-                            // Wait for user choice
-                            const { outcome } = await deferredPrompt.userChoice;
-                            console.log(`User response to the install prompt: ${outcome}`);
-
-                            // Clear the deferredPrompt
-                            deferredPrompt = null;
-
-                            // Hide the button
-                            installButton.classList.add("hidden");
-                        }
-                    });
-                }
-            });
-        </script>
+        <script src="js/init/service-worker.js" defer></script>
+        <script src="js/init/pwa-install.js" defer></script>
 
         <!-- Loading Dialog Script -->
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                window._ = window._ || (x => x);
-                const readStorage = key => {
-                    try {
-                        return localStorage.getItem(key);
-                    } catch (e) {
-                        return null;
-                    }
-                };
-                const writeStorage = (key, value) => {
-                    try {
-                        localStorage.setItem(key, value);
-                        return true;
-                    } catch (e) {
-                        return false;
-                    }
-                };
-                let loadL10nSplashScreen = function () {
-                    console.debug("The browser is set to " + navigator.language);
-                    let lang = navigator.language;
-                    const savedLanguage = readStorage("languagePreference");
-                    if (savedLanguage) {
-                        console.debug("Music Blocks is set to " + savedLanguage);
-                        lang = savedLanguage;
-                    }
+        <script src="js/init/splash-screen.js" defer></script>
 
-                    console.debug("Using " + lang);
-                    if (lang === undefined) {
-                        lang = "enUS";
-                        console.debug("Reverting to " + lang);
-                    }
+        <script src="js/init/jquery-table-fix.js" defer></script>
 
-                    const container = document.getElementById("loading-media");
-                    const content = lang.startsWith("ja")
-                        ? `<img src="loading-animation-ja.png" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
-                        : `<video loop autoplay muted playsinline fetchpriority="high" style="width: 90%; height: 100%; object-fit: contain;">
-                        <source src="loading-animation.webm" type="video/webm">
-                        <source src="loading-animation.mp4" type="video/mp4">
-                       </video>`;
-                    container.innerHTML = `<div class="media-wrapper" style="width: 100%; aspect-ratio: 16/9; max-height: 500px; display: flex; justify-content: center; align-items: center;">${content}</div>`;
-                };
-
-                loadL10nSplashScreen();
-
-                setTimeout(function () {
-                    const loadingText = document.getElementById("loadingText");
-                    const texts = [
-                        _("Do, Re, Mi, Fa, Sol, La, Ti, Do"),
-                        _("Loading Music Blocks..."),
-                        _("Reading Music...")
-                    ];
-                    let index = 0;
-
-                    window.intervalId = setInterval(function () {
-                        loadingText.textContent = texts[index];
-                        index = (index + 1) % texts.length;
-                    }, 1500);
-                }, 3000);
-
-                const languageDropdown = document.getElementById("languagedropdown");
-                if (languageDropdown) {
-                    const langLinks = languageDropdown.querySelectorAll("a");
-                    langLinks.forEach(link => {
-                        link.addEventListener("click", function (e) {
-                            e.preventDefault(); // prevent default <a> behavior
-                            const selectedLang = this.id; // ID corresponds to language code
-                            const currentLang = readStorage("languagePreference");
-                            if (currentLang !== selectedLang && writeStorage("languagePreference", selectedLang)) {
-                                location.reload(); // automatically reload
-                            }
-                        });
-                    });
-                }
-            });
-        </script>
-
-        <script>
-            (function ($) {
-                $.fn.fixMe = function () {
-                    return this.each(function () {
-                        let $this = $(this),
-                            $t_fixed;
-
-                        function init() {
-                            $this.wrap('<div class="container" />');
-                            $t_fixed = $this.clone();
-                            $t_fixed
-                                .find("tbody")
-                                .remove()
-                                .end()
-                                .addClass("fixed")
-                                .insertBefore($this);
-                            resizeFixed();
-                        }
-
-                        function resizeFixed() {
-                            setTimeout(function () {
-                                $t_fixed.find("th").each(function (index) {
-                                    $(this).css(
-                                        "width",
-                                        $this.find("th").eq(index).outerWidth() + "px"
-                                    );
-                                });
-                            }, 100);
-                        }
-
-                        function scrollFixed() {
-                            let offset = $(this).scrollTop(),
-                                tableOffsetTop = $this.offset().top,
-                                tableOffsetBottom =
-                                    tableOffsetTop + $this.height() - $this.find("thead").height();
-
-                            if (offset < tableOffsetTop || offset > tableOffsetBottom) {
-                                $t_fixed.hide();
-                            } else if (
-                                offset >= tableOffsetTop &&
-                                offset <= tableOffsetBottom &&
-                                $t_fixed.is(":hidden")
-                            ) {
-                                $t_fixed.show();
-                            }
-                        }
-
-                        $(window).resize(resizeFixed);
-                        $(window).scroll(scrollFixed);
-                        init();
-                    });
-                };
-                jQuery;
-
-                $(document).ready(function () {
-                    $("solfa").fixMe();
-                    $(".up").click(function () {
-                        $("html, body").animate(
-                            {
-                                scrollTop: 0
-                            },
-                            2000
-                        );
-                    });
-                });
-            });
-
-            let isDragging = false;
-        </script>
-
-        <script>
-            var elem = document.documentElement;
-
-            function openFullscreen() {
-                if (elem.requestFullscreen) {
-                    elem.requestFullscreen();
-                } else if (elem.webkitRequestFullscreen) {
-                    elem.webkitRequestFullscreen();
-                } else if (elem.msRequestFullscreen) {
-                    elem.msRequestFullscreen();
-                } else if (elem.mozRequestFullscreen) {
-                    elem.mozRequestFullscreen();
-                }
-            }
-
-            function closeFullscreen() {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) {
-                    document.webkitExitFullscreen();
-                } else if (document.msExitFullscreen) {
-                    document.msExitFullscreen();
-                } else if (document.mozExitFullscreen) {
-                    document.mozExitFullscreen();
-                }
-            }
-
-            function setIcon() {
-                var iconCode = document.querySelector("#FullScrIcon");
-                // Determine fullscreen state using the browser fullscreen API
-                // instead of relying on a manual counter. This keeps the icon
-                // in sync when fullscreen is exited via ESC or browser controls.
-                var isFullscreen =
-                    document.fullscreenElement ||
-                    document.webkitFullscreenElement ||
-                    document.mozFullScreenElement ||
-                    document.msFullscreenElement;
-
-                if (!isFullscreen) {
-                    openFullscreen();
-                    iconCode.textContent = "\ue5d1"; // fullscreen_exit icon
-                } else {
-                    closeFullscreen();
-                    iconCode.textContent = "\ue5d0"; // fullscreen icon
-                }
-            }
-
-            function handleFullscreenChange() {
-                var iconCode = document.querySelector("#FullScrIcon");
-                var fullScreenBtn = document.querySelector("#FullScreen");
-                var isFullscreen =
-                    document.fullscreenElement ||
-                    document.webkitFullscreenElement ||
-                    document.mozFullScreenElement ||
-                    document.msFullscreenElement;
-
-                iconCode.textContent = isFullscreen ? "\ue5d1" : "\ue5d0";
-
-                if (fullScreenBtn && typeof _ === 'function') {
-                    var tooltipText = isFullscreen ? _("Exit Fullscreen") : _("Enter Fullscreen");
-                    fullScreenBtn.setAttribute("data-tooltip", tooltipText);
-                    if (window.jQuery) {
-                        window.jQuery(fullScreenBtn).tooltip({
-                            html: true,
-                            delay: 100
-                        });
-                    }
-                }
-            }
-
-            document.addEventListener("fullscreenchange", handleFullscreenChange);
-            document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
-            document.addEventListener("mozfullscreenchange", handleFullscreenChange);
-            document.addEventListener("MSFullscreenChange", handleFullscreenChange);
-        </script>
+        <script src="js/init/fullscreen.js" defer></script>
 
         <style>
             #installButton.hidden {
@@ -1332,107 +1001,6 @@
 
         <script src="js/utils/zoomOverlay.js"></script>
 
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                let persistentNotification = null;
-
-                function showPersistentNotification() {
-                    if (!persistentNotification) {
-                        persistentNotification = document.createElement("div");
-                        persistentNotification.id = "persistentNotification";
-                        persistentNotification.innerHTML =
-                            "Play only mode enabled. For full Music Blocks experience, use a larger display.";
-                        document.body.appendChild(persistentNotification);
-                    }
-                }
-
-                function removePersistentNotification() {
-                    if (persistentNotification) {
-                        persistentNotification.remove();
-                        persistentNotification = null;
-                    }
-                }
-
-                function hideElementById(elementId) {
-                    const elem = document.getElementById(elementId);
-                    if (elem) {
-                        elem.style.display = "none";
-                    }
-                }
-
-                function showElementById(elementId) {
-                    const elem = document.getElementById(elementId);
-                    if (elem) {
-                        elem.style.display = "";
-                    }
-                }
-
-                function togglePlayOnlyMode() {
-                    const isSmallScreen = window.innerWidth < 768 || window.innerHeight < 600;
-                    const body = document.body;
-                    const homeButton = document.getElementById("Home [HOME]");
-                    const buttonContainer = document.getElementById("buttoncontainerBOTTOM");
-
-                    if (isSmallScreen) {
-                        // Enable play-only mode
-                        body.classList.add("play-only");
-                        showPersistentNotification();
-
-                        // Hide certain elements
-                        hideElementById("Show/hide blocks");
-                        hideElementById("Expand/collapse blocks");
-                        hideElementById("Decrease block size");
-                        hideElementById("Increase block size");
-                        hideElementById("grid");
-                        hideElementById("palette");
-                    } else {
-                        // Disable play-only mode
-                        body.classList.remove("play-only");
-                        removePersistentNotification();
-
-                        showElementById("Show/hide blocks");
-                        showElementById("Expand/collapse blocks");
-                        showElementById("Decrease block size");
-                        showElementById("Increase block size");
-                        showElementById("grid");
-                        showElementById("palette");
-                    }
-                }
-
-                togglePlayOnlyMode();
-
-                window.addEventListener("resize", togglePlayOnlyMode);
-            });
-
-            (function () {
-                function setAppHeight() {
-                    const vh = window.innerHeight * 0.01;
-                    document.documentElement.style.setProperty("--vh", `${vh}px`);
-                }
-
-                window.addEventListener("resize", setAppHeight);
-                document.addEventListener("fullscreenchange", setAppHeight);
-                setAppHeight();
-            })();
-
-            (function () {
-                function resizeCanvasesToScreen() {
-                    const canvases = document.querySelectorAll("canvas");
-                    const width = window.innerWidth;
-                    const height = window.innerHeight;
-
-                    canvases.forEach(c => {
-                        c.width = width;
-                        c.height = height;
-                        c.style.width = "100%";
-                        c.style.height = "100%";
-                    });
-                }
-                window.addEventListener("resize", resizeCanvasesToScreen);
-                document.addEventListener("fullscreenchange", resizeCanvasesToScreen);
-
-                setTimeout(resizeCanvasesToScreen, 150);
-            })();
-        </script>
+        <script src="js/init/play-only-mode.js" defer></script>
     </body>
 </html>

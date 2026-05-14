@@ -484,7 +484,7 @@ describe("Logo Class", () => {
             expect(logo.stepQueue).toEqual({});
         });
 
-        test("executes ONSTOP plugin hooks", () => {
+        test("executes ONSTOP plugin hooks", async () => {
             logo.sounds = [];
             logo.synth = {
                 stop: jest.fn(),
@@ -498,7 +498,7 @@ describe("Logo Class", () => {
             };
             logo.safePluginExecute = jest.fn();
 
-            logo.doStopTurtles();
+            await logo.doStopTurtles();
 
             expect(logo.safePluginExecute).toHaveBeenCalledTimes(2);
             expect(logo.safePluginExecute).toHaveBeenNthCalledWith(1, "code-first", logo);
@@ -588,14 +588,14 @@ describe("Logo parseArg", () => {
         logo = new Logo(mockActivity);
     });
 
-    test("returns null for null block", () => {
-        const result = logo.parseArg(logo, 0, null, 0, null);
+    test("returns null for null block", async () => {
+        const result = await logo.parseArg(logo, 0, null, 0, null);
 
         expect(result).toBeNull();
         expect(mockActivity.errorMsg).toHaveBeenCalled();
     });
 
-    test("handles value blocks", () => {
+    test("handles value blocks", async () => {
         logo.blockList = [
             {
                 name: "number",
@@ -605,12 +605,12 @@ describe("Logo parseArg", () => {
             }
         ];
 
-        const result = logo.parseArg(logo, 0, 0, null, null);
+        const result = await logo.parseArg(logo, 0, 0, null, null);
 
         expect(result).toBe(42);
     });
 
-    test("handles interval name blocks", () => {
+    test("handles interval name blocks", async () => {
         mockActivity.turtles.ithTurtle = jest.fn(() => ({
             parameterQueue: [],
             singer: { noteDirection: 0 }
@@ -624,7 +624,7 @@ describe("Logo parseArg", () => {
             }
         ];
 
-        const result = logo.parseArg(logo, 0, 0, null, null);
+        const result = await logo.parseArg(logo, 0, 0, null, null);
 
         expect(getIntervalNumber).toHaveBeenCalledWith("fifth");
     });
@@ -1108,7 +1108,7 @@ describe("Logo comprehensive method coverage", () => {
         clearTimeoutSpy.mockRestore();
     });
 
-    test("runLogoCommands builds actions dictionary from action stack", () => {
+    test("runLogoCommands builds actions dictionary from action stack", async () => {
         logo.prepSynths = jest.fn();
         logo.initTurtle = jest.fn();
         mockActivity.blocks.stackList = [0];
@@ -1123,12 +1123,12 @@ describe("Logo comprehensive method coverage", () => {
             { name: "print", connections: [null] }
         ];
 
-        logo.runLogoCommands(null, null);
+        await logo.runLogoCommands(null, null);
 
         expect(logo.actions["my-action"]).toBe(2);
     });
 
-    test("parseArg covers dectofrac, hue status mode, and returnValue branches", () => {
+    test("parseArg covers dectofrac, hue status mode, and returnValue branches", async () => {
         logo.statusFields = [];
         logo.inStatusMatrix = false;
         logo.returns[0] = [1234];
@@ -1163,11 +1163,11 @@ describe("Logo comprehensive method coverage", () => {
             }
         ];
 
-        expect(logo.parseArg(logo, 0, 0, null, null)).toBe("0.5");
+        expect(await logo.parseArg(logo, 0, 0, null, null)).toBe("0.5");
         logo.inStatusMatrix = true;
-        logo.parseArg(logo, 0, 2, null, null);
+        await logo.parseArg(logo, 0, 2, null, null);
         expect(logo.statusFields).toContainEqual([2, "color"]);
-        expect(logo.parseArg(logo, 0, 4, null, null)).toBe(1234);
+        expect(await logo.parseArg(logo, 0, 4, null, null)).toBe(1234);
     });
 
     test("doStopTurtles covers companion/camera/recorder/showBlocks branches", () => {
@@ -1200,12 +1200,12 @@ describe("Logo comprehensive method coverage", () => {
         clearIntervalSpy.mockRestore();
     });
 
-    test("runFromBlockNow arg-block path prints and stops turtle", () => {
+    test("runFromBlockNow arg-block path prints and stops turtle", async () => {
         timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
             fn();
             return 6;
         });
-        logo.parseArg = jest.fn(() => 77);
+        logo.parseArg = jest.fn(() => Promise.resolve(77));
         logo.blockList = [
             {
                 name: "width",
@@ -1217,13 +1217,13 @@ describe("Logo comprehensive method coverage", () => {
             }
         ];
 
-        logo.runFromBlockNow(logo, 0, 0, 0, null);
+        await logo.runFromBlockNow(logo, 0, 0, 0, null);
 
         expect(mockActivity.textMsg).toHaveBeenCalledWith("width: 77");
         expect(logo.stopTurtle).toBe(true);
     });
 
-    test("runFromBlockNow completion branch handles runningMIDI save", () => {
+    test("runFromBlockNow completion branch handles runningMIDI save", async () => {
         timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
             fn();
             return 11;
@@ -1239,7 +1239,7 @@ describe("Logo comprehensive method coverage", () => {
             }
         ];
 
-        logo.runFromBlockNow(logo, 0, 0, 0, null);
+        await logo.runFromBlockNow(logo, 0, 0, 0, null);
 
         expect(mockActivity.save.afterSaveMIDI).toHaveBeenCalled();
         expect(logo.runningMIDI).toBe(false);
@@ -1389,7 +1389,7 @@ describe("Logo comprehensive method coverage", () => {
         expect(tur.queue[0].blk).toBe(3);
     });
 
-    test("parseArg covers arg-function, non-string interval, and fallback id branches", () => {
+    test("parseArg covers arg-function, non-string interval, and fallback id branches", async () => {
         logo.blockList = [
             {
                 name: "dynamic",
@@ -1411,10 +1411,10 @@ describe("Logo comprehensive method coverage", () => {
             }
         ];
 
-        expect(logo.parseArg(logo, 0, 0, null, null)).toBe(88);
+        expect(await logo.parseArg(logo, 0, 0, null, null)).toBe(88);
         expect(turtle0.parameterQueue).toContain(0);
-        expect(logo.parseArg(logo, 0, 1, null, null)).toBe(0);
-        expect(logo.parseArg(logo, 0, 2, null, null)).toBe(2);
+        expect(await logo.parseArg(logo, 0, 1, null, null)).toBe(0);
+        expect(await logo.parseArg(logo, 0, 2, null, null)).toBe(2);
     });
 
     test("runFromBlockNow completion handles lilypond stats and notation buffering", () => {

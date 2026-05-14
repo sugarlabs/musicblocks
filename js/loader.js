@@ -57,7 +57,7 @@ requirejs.config({
             deps: ["p5.sound.min"]
         },
         "utils/utils": {
-            deps: ["utils/platformstyle"],
+            deps: ["utils/platformstyle", "utils/pluginSandbox"],
             exports: "_"
         },
         "utils/retryWithBackoff": {
@@ -415,6 +415,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                 "activity/turtles",
                 "utils/synthutils",
                 "activity/notation",
+                "utils/pluginSandbox",
                 "activity/logo"
             ];
 

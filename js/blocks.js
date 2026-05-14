@@ -7381,7 +7381,7 @@ class Blocks {
          * @param blk
          * @returns {void}
          */
-        this.updateParameterBlock = (logo, turtle, blk) => {
+        this.updateParameterBlock = async (logo, turtle, blk) => {
             const name = this.blockList[blk].name;
 
             if (this.blockList[blk].protoblock.parameter && this.blockList[blk].text !== null) {
@@ -7391,7 +7391,7 @@ class Blocks {
                     value = this.blockList[blk].protoblock.updateParameter(logo, turtle, blk);
                 } else {
                     if (name in logo.evalParameterDict) {
-                        value = logo.safePluginExecute(
+                        value = await logo.safePluginExecute(
                             logo.evalParameterDict[name],
                             logo,
                             turtle,
@@ -7436,12 +7436,12 @@ class Blocks {
          * @param turtle
          * @returns {void}
          */
-        this.blockSetter = (logo, blk, value, turtle) => {
+        this.blockSetter = async (logo, blk, value, turtle) => {
             if (typeof this.blockList[blk].protoblock.setter === "function") {
                 this.blockList[blk].protoblock.setter(logo, value, turtle, blk);
             } else {
                 if (this.blockList[blk].name in logo.evalSetterDict) {
-                    logo.safePluginExecute(
+                    await logo.safePluginExecute(
                         logo.evalSetterDict[this.blockList[blk].name],
                         logo,
                         turtle,

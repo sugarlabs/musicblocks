@@ -301,6 +301,32 @@
                 onClose: options.onClose
             });
         },
+        /**
+         * Shows a modal confirm dialog (replaces browser confirm()).
+         * @param {string} message - The message to display.
+         * @param {string} [title] - The dialog title.
+         * @param {Object} [options] - Optional: { okText, cancelText }
+         * @returns {Promise<boolean>} Resolves to true (OK) or false (Cancel/Escape/Close).
+         */
+        confirm(message, title, options = {}) {
+            return new Promise(resolve => {
+                let resolved = false;
+                const finish = result => {
+                    if (resolved) return;
+                    resolved = true;
+                    resolve(result);
+                };
+                createDialog({
+                    message,
+                    title: title || DEFAULT_TITLE,
+                    okText: options.okText || t("OK"),
+                    cancelText: options.cancelText || t("Cancel"),
+                    showCancel: true,
+                    onConfirm: () => finish(true),
+                    onCancel: () => finish(false)
+                });
+            });
+        },
         prompt(options = {}) {
             const title = options.title || DEFAULT_TITLE;
             const message = options.message || "";
