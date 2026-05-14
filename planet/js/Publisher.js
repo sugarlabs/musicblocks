@@ -332,20 +332,12 @@ class Publisher {
 
             if (name === null) continue;
 
-            // Best-effort resolution: if running inside the iframe and the parent
-            // window exposes the Activity palette API, map proto name to the
-            // human-friendly display name. This ensures Publisher sends meaningful
-            // keywords for search when integrated with Music Blocks.
+            // Resolve proto name to display name using the lookup map provided
+            // by the parent via postMessage, instead of directly accessing
+            // window.parent.activity.blocks.palettes.
             try {
-                if (
-                    typeof window !== "undefined" &&
-                    window.parent &&
-                    window.parent.activity &&
-                    window.parent.activity.blocks &&
-                    window.parent.activity.blocks.palettes
-                ) {
-                    const p = window.parent.activity.blocks.palettes.getProtoNameAndPalette(name);
-                    if (p && p[2]) name = p[2];
+                if (window._mbBlockDisplayNames && window._mbBlockDisplayNames[name]) {
+                    name = window._mbBlockDisplayNames[name];
                 }
             } catch (e) {
                 // ignore and use raw name
