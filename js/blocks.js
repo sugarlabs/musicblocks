@@ -6083,7 +6083,7 @@ class Blocks {
                 }
                 bIndex = chunkEnd;
                 if (bIndex < totalBlocks) {
-                    setTimeout(processChunk, 0);
+                    window.requestAnimationFrame(processChunk);
                 }
             };
 

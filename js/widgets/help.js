@@ -73,7 +73,7 @@ class HelpWidget {
         this._helpDiv = document.createElement("div");
 
         // Give the DOM time to create the div.
-        setTimeout(() => this._setup(useActiveBlock, 0), 0);
+        window.requestAnimationFrame(() => this._setup(useActiveBlock, 0));
 
         // Position center
         setTimeout(this.widgetWindow.sendToCenter, 50);
