@@ -351,18 +351,21 @@ class SaveInterface {
      * @instance
      */
     saveHTMLNoPrompt(activity) {
-        setTimeout(() => {
-            const html =
-                "data:text/plain;charset=utf-8," + encodeURIComponent(activity.save.prepareHTML());
-            if (activity.PlanetInterface !== undefined) {
-                activity.save.downloadURL(
-                    activity.PlanetInterface.getCurrentProjectName() + ".html",
-                    html
-                );
-            } else {
-                activity.save.downloadURL(STR_MY_PROJECT.replace(" ", "_") + ".html", html);
-            }
-        }, 500);
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                const html =
+                    "data:text/plain;charset=utf-8," +
+                    encodeURIComponent(activity.save.prepareHTML());
+                if (activity.PlanetInterface !== undefined) {
+                    activity.save.downloadURL(
+                        activity.PlanetInterface.getCurrentProjectName() + ".html",
+                        html
+                    );
+                } else {
+                    activity.save.downloadURL(STR_MY_PROJECT.replace(" ", "_") + ".html", html);
+                }
+            }, 0);
+        });
     }
 
     /**
@@ -471,11 +474,13 @@ class SaveInterface {
             this.activity.save.download("midi", url, null);
         };
         const data = this.activity.logo._midiData;
-        setTimeout(() => {
-            generateMidi(data);
-            this.activity.logo._midiData = {};
-            document.body.style.cursor = "default";
-        }, 500);
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                generateMidi(data);
+                this.activity.logo._midiData = {};
+                document.body.style.cursor = "default";
+            }, 0);
+        });
     }
 
     /**

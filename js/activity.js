@@ -222,8 +222,8 @@ let globalActivity;
  * Performs analysis on the project using the global activity.
  * @returns {object} - The analysis result.
  */
-const doAnalyzeProject = function () {
-    return analyzeProject(globalActivity);
+const doAnalyzeProject = async function () {
+    return await analyzeProject(globalActivity);
 };
 
 /**

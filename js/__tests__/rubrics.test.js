@@ -25,6 +25,7 @@ const {
     PALS,
     PALLABELS,
     analyzeProject,
+    analyzeProjectSync,
     scoreToChartData,
     getChartOptions,
     runAnalytics,
@@ -47,7 +48,7 @@ jest.mock("../utils/utils.js", () => ({
 
 describe("rubrics.js test suite", () => {
     describe("analyzeProject", () => {
-        it("should return an array of scores", () => {
+        it("should return an array of scores", async () => {
             const activity = {
                 blocks: {
                     blockList: [
@@ -57,12 +58,12 @@ describe("rubrics.js test suite", () => {
                     ]
                 }
             };
-            const result = analyzeProject(activity);
+            const result = await analyzeProject(activity);
             expect(Array.isArray(result)).toBe(true);
             expect(result.length).toBe(PALS.length);
         });
 
-        it("should ignore blocks in trash", () => {
+        it("should ignore blocks in trash", async () => {
             const activity = {
                 blocks: {
                     blockList: [
@@ -71,7 +72,7 @@ describe("rubrics.js test suite", () => {
                     ]
                 }
             };
-            const result = analyzeProject(activity);
+            const result = await analyzeProject(activity);
             expect(result).toBeInstanceOf(Array);
         });
     });
