@@ -140,7 +140,8 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 // polyphonic rhythms.
                 if (logo.rhythmRulerMeasure === null) {
                     logo.rhythmRulerMeasure = arg0 * arg1;
-                } else if (logo.rhythmRulerMeasure != arg0 * arg1) { // eslint-disable-line eqeqeq
+                } else if (logo.rhythmRulerMeasure != arg0 * arg1) {
+                    // eslint-disable-line eqeqeq
                     activity.textMsg(_("polyphonic rhythm"));
                 }
 
