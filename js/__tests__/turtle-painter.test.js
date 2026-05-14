@@ -352,19 +352,29 @@ describe("Drawing - doForward", () => {
     test("doForward with wrap ON and out of bounds should wrap around", () => {
         painter.wrap = true;
         mockTurtle.container.x = 795; // Near right edge
+        mockTurtle.orientation = 90; // Facing right so x changes
         mockTurtle.turtleX2screenX = jest.fn(x => x);
         mockTurtle.turtleY2screenY = jest.fn(y => y);
+        const startX = mockTurtle.container.x;
         painter.doForward(20); // Would go past 800
         expect(mockTurtle.activity.refreshCanvas).toHaveBeenCalled();
+        // When wrapping, position resets to within canvas bounds
+        expect(mockTurtle.container.x).not.toBe(startX + 20);
+        expect(mockTurtle.container.x).toBeGreaterThanOrEqual(0);
+        expect(mockTurtle.container.x).toBeLessThanOrEqual(800);
     });
 
     test("doForward with wrap OFF and out of bounds should stop at edge", () => {
         painter.wrap = false;
         mockTurtle.container.x = 795; // Near right edge
+        mockTurtle.orientation = 90; // Facing right so x changes
         mockTurtle.turtleX2screenX = jest.fn(x => x);
         mockTurtle.turtleY2screenY = jest.fn(y => y);
+        const startX = mockTurtle.container.x;
         painter.doForward(20); // Would go past 800
         expect(mockTurtle.activity.refreshCanvas).toHaveBeenCalled();
+        // Without wrapping, turtle moves normally (may exceed canvas)
+        expect(mockTurtle.container.x).toBe(startX + 20);
     });
 });
 
