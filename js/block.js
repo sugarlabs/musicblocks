@@ -3404,8 +3404,6 @@ class Block {
                 }
             }
 
-            that._setDragGroupTrashHoverScale(overTrash, dx, dy);
-
             // Single deferred checkBounds + single canvas refresh per frame
             that.blocks.scheduleCheckBounds();
             that._setDragGroupTrashHoverScale(overTrash, dx, dy);
