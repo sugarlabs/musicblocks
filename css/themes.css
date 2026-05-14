@@ -34,7 +34,7 @@
 /* High Contrast Mode Theme Dropdown - Override ALL styles */
 .highcontrast #themedropdown {
     background-color: var(--color-text-inverse) !important;
-    border: 1px solid #ffffff !important;
+    border: 1px solid var(--color-text-inverse) !important;
 }
 
 .highcontrast #themedropdown li {
@@ -64,7 +64,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 /* Dark Mode */
 
 .dark .blue {
-    background-color: #022363 !important;
+    background-color: var(--color-brand-primary) !important;
 }
 
 .dark #canvas {
@@ -72,7 +72,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .dark .blue.darken-1 {
-    background-color: #01143b !important;
+    background-color: var(--color-brand-primary-hover) !important;
 }
 
 .dark #floatingWindows > .windowFrame {
@@ -227,18 +227,18 @@ body {
 }
 
 body.dark {
-    --border: #000000;
-    --bg: #1d1d20;
+    --border: var(--color-border-primary);
+    --bg: var(--color-bg-primary);
     --fg: var(--color-text-secondary);
-    --panel-bg: var(--color-bg-primary);
+    --panel-bg: var(--color-bg-secondary);
     --accent: var(--color-brand-secondary);
 }
 
 body.highcontrast {
-    --border: #ffffff;
-    --bg: #000000;
-    --fg: #ffffff;
-    --panel-bg: #000000;
+    --border: var(--color-text-inverse);
+    --bg: var(--color-bg-primary);
+    --fg: var(--color-text-inverse);
+    --panel-bg: var(--color-bg-primary);
     --accent: var(--color-brand-secondary);
 }
 
@@ -677,12 +677,12 @@ body.highcontrast {
 
 /* Dark Mode Tooltip Styling - Slightly lighter background for better contrast */
 .dark .material-tooltip {
-    background-color: #3a3a3a !important;
+    background-color: var(--color-bg-secondary) !important;
     color: var(--color-text-inverse) !important;
 }
 
 .dark .material-tooltip .backdrop {
-    background-color: #3a3a3a !important;
+    background-color: var(--color-bg-secondary) !important;
 }
 
 .dark .material-tooltip span {

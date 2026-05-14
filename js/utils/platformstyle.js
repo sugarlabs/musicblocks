@@ -531,14 +531,20 @@ const getSystemThemePreference = () => {
 // Use stored preference, or fallback to system preference
 const activeTheme = themePreference || getSystemThemePreference();
 
-// Set platformColor based on active theme
-if (platformThemes[activeTheme]) {
-    window.platformColor = platformThemes[activeTheme];
-} else {
-    window.platformColor = platformThemes["light"];
-}
+const syncPlatformColor = theme => {
+    const nextTheme = platformThemes[theme] ? theme : "light";
+    window.platformColor = platformThemes[nextTheme];
 
-document.querySelector("meta[name=theme-color]").content = platformColor.header;
+    const themeColorMeta = document.querySelector("meta[name=theme-color]");
+    if (themeColorMeta && window.platformColor) {
+        themeColorMeta.content = window.platformColor.header;
+    }
+
+    return window.platformColor;
+};
+
+window.syncPlatformColor = syncPlatformColor;
+syncPlatformColor(activeTheme);
 
 /**
  * @public
