@@ -150,6 +150,7 @@ class GlobalCard {
             tagcontainer.appendChild(chip);
         }
 
+        // set project title text and tooltip
         const titleEl = frag.getElementById(`global-project-title-${this.id}`);
         titleEl.textContent = this.ProjectData.ProjectName;
         titleEl.title = this.ProjectData.ProjectName;
