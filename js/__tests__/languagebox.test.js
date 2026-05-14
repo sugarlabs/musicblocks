@@ -36,6 +36,11 @@ Object.defineProperty(global, "localStorage", {
     writable: true
 });
 
+// Mock safe storage functions
+global.safeGetItem = jest.fn();
+global.safeSetItem = jest.fn();
+global.safeRemoveItem = jest.fn();
+
 document.querySelectorAll = jest.fn(() => []);
 
 global._ = jest.fn(str => str);
@@ -49,6 +54,12 @@ describe("LanguageBox Class", () => {
         mockActivity.storage.languagePreference = "enUS";
         mockActivity.storage.kanaPreference = null;
         mockActivity.saveLocally = jest.fn();
+
+        // Configure safe storage mocks
+        safeGetItem.mockReturnValue(null); // Default return value
+        safeSetItem.mockImplementation(() => {}); // No-op
+        safeRemoveItem.mockImplementation(() => {}); // No-op
+
         languageBox = new LanguageBox(mockActivity);
     });
 
@@ -98,7 +109,7 @@ describe("LanguageBox Class", () => {
     // ===== HIDE METHOD - BASIC TESTS =====
     describe("hide method", () => {
         it("should display 'already set' message when the selected language is the same", () => {
-            localStorage.getItem.mockReturnValue("enUS");
+            safeGetItem.mockReturnValue("enUS");
             mockActivity.textMsg.mockImplementation();
 
             languageBox._language = "enUS";
@@ -110,7 +121,7 @@ describe("LanguageBox Class", () => {
         });
 
         it("should display the refresh message when a new language is selected", () => {
-            localStorage.getItem.mockReturnValue("ja");
+            safeGetItem.mockReturnValue("ja");
             mockActivity.textMsg.mockImplementation();
 
             languageBox._language = "enUS";
@@ -122,7 +133,7 @@ describe("LanguageBox Class", () => {
         });
 
         it("should display the correct message when hide is called for 'ja'", () => {
-            localStorage.getItem.mockReturnValue("enUS");
+            safeGetItem.mockReturnValue("enUS");
             mockActivity.textMsg.mockImplementation();
 
             languageBox._language = "ja";
@@ -160,7 +171,7 @@ describe("LanguageBox Class", () => {
         });
 
         it("should handle when localStorage.getItem returns null", () => {
-            localStorage.getItem.mockReturnValue(null);
+            safeGetItem.mockReturnValue(null);
             mockActivity.textMsg.mockImplementation();
 
             languageBox._language = "enUS";
@@ -170,7 +181,7 @@ describe("LanguageBox Class", () => {
         });
 
         it("should handle French (fr) language correctly", () => {
-            localStorage.getItem.mockReturnValue("enUS");
+            safeGetItem.mockReturnValue("enUS");
             mockActivity.textMsg.mockImplementation();
 
             languageBox._language = "fr";
@@ -180,7 +191,7 @@ describe("LanguageBox Class", () => {
         });
 
         it("should handle German (de) language correctly", () => {
-            localStorage.getItem.mockReturnValue("enUS");
+            safeGetItem.mockReturnValue("enUS");
             mockActivity.textMsg.mockImplementation();
 
             languageBox._language = "de";
@@ -190,7 +201,7 @@ describe("LanguageBox Class", () => {
         });
 
         it("should call activity.textMsg exactly once per hide() call", () => {
-            localStorage.getItem.mockReturnValue("enUS");
+            safeGetItem.mockReturnValue("enUS");
             mockActivity.textMsg.mockImplementation();
 
             languageBox._language = "enUS";
