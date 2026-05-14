@@ -92,7 +92,9 @@ const {
     closeWidgets,
     closeBlkWidgets,
     resolveObject,
-    importMembers
+    importMembers,
+    isVettedPluginSource,
+    processPluginData
 } = require("../utils.js");
 
 describe("Utility Functions (logic-only)", () => {
@@ -124,6 +126,133 @@ describe("Utility Functions (logic-only)", () => {
 
         it("returns undefined if not a string", () => {
             expect(toTitleCase(123)).toBeUndefined();
+        });
+    });
+
+    describe("plugin source vetting", () => {
+        it("trusts built-in plugin sources", () => {
+            expect(isVettedPluginSource("plugins/weather.json")).toBe(true);
+            expect(isVettedPluginSource("./plugins/weather.json")).toBe(true);
+            expect(isVettedPluginSource("localStorage:plugins")).toBe(true);
+        });
+
+        it("does not trust uploaded or unknown plugin sources", () => {
+            expect(isVettedPluginSource("file:custom.json")).toBe(false);
+            expect(isVettedPluginSource("https://example.com/plugin.json")).toBe(false);
+            expect(isVettedPluginSource("")).toBe(false);
+            expect(isVettedPluginSource(undefined)).toBe(false);
+        });
+    });
+
+    describe("processPluginData()", () => {
+        let originalConfirm;
+        let originalBlob;
+        let originalUrl;
+        let originalSetTimeout;
+        let appendChildSpy;
+        let warnSpy;
+
+        const makeActivity = () => ({
+            palettes: {
+                buttons: {},
+                pluginMacros: {},
+                add: jest.fn(),
+                makePalettes: jest.fn(),
+                updatePalettes: jest.fn(),
+                show: jest.fn()
+            },
+            pluginsImages: {},
+            logo: {
+                evalFlowDict: {},
+                evalArgDict: {},
+                evalSetterDict: {},
+                evalParameterDict: {},
+                evalOnStartList: {},
+                evalOnStopList: {}
+            },
+            blocks: {
+                protoBlockDict: {}
+            }
+        });
+
+        beforeEach(() => {
+            originalConfirm = global.confirm;
+            originalBlob = global.Blob;
+            originalUrl = global.URL;
+            originalSetTimeout = global.setTimeout;
+
+            global._ = value => value;
+            global.confirm = jest.fn(() => true);
+            global.Blob = jest.fn();
+            global.URL = {
+                createObjectURL: jest.fn(() => "blob:plugin"),
+                revokeObjectURL: jest.fn()
+            };
+            appendChildSpy = jest
+                .spyOn(global.document.head, "appendChild")
+                .mockImplementation(() => {});
+            global.setTimeout = callback => {
+                callback();
+                return 1;
+            };
+
+            warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+        });
+
+        afterEach(() => {
+            global.confirm = originalConfirm;
+            global.Blob = originalBlob;
+            global.URL = originalUrl;
+            global.setTimeout = originalSetTimeout;
+            appendChildSpy.mockRestore();
+            warnSpy.mockRestore();
+        });
+
+        it("blocks uploaded plugin setup code from Blob script injection", async () => {
+            const activity = makeActivity();
+            const pluginData = JSON.stringify({
+                FLOWPLUGINS: {
+                    uploadedFlow: "window.localStorage.clear();"
+                },
+                BLOCKPLUGINS: {
+                    uploadedBlock: "window.parent.document.body.innerHTML = '';"
+                },
+                GLOBALS: "window.secret = localStorage.getItem('token');",
+                ONLOAD: {
+                    uploadedOnload: "document.body.remove();"
+                }
+            });
+
+            const result = await processPluginData(
+                activity,
+                pluginData,
+                "file:uploaded-plugin.json"
+            );
+
+            expect(result).not.toBeNull();
+            expect(global.confirm).toHaveBeenCalled();
+            expect(activity.logo.evalFlowDict.uploadedFlow).toBe("window.localStorage.clear();");
+            expect(global.Blob).not.toHaveBeenCalled();
+            expect(global.URL.createObjectURL).not.toHaveBeenCalled();
+            expect(appendChildSpy).not.toHaveBeenCalled();
+            expect(warnSpy).toHaveBeenCalledWith(
+                "Blocked unvetted plugin setup code:",
+                "BLOCKPLUGINS:uploadedBlock",
+                "from",
+                "file:uploaded-plugin.json"
+            );
+            expect(warnSpy).toHaveBeenCalledWith(
+                "Blocked unvetted plugin setup code:",
+                "GLOBALS",
+                "from",
+                "file:uploaded-plugin.json"
+            );
+            expect(warnSpy).toHaveBeenCalledWith(
+                "Blocked unvetted plugin setup code:",
+                "ONLOAD:uploadedOnload",
+                "from",
+                "file:uploaded-plugin.json"
+            );
         });
     });
 

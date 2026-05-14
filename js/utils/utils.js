@@ -754,6 +754,42 @@ if (typeof window !== "undefined") {
 }
 
 /**
+ * Determines whether plugin code comes from a source that ships with Music Blocks
+ * or has already been accepted into the local plugin store.
+ * @param {string} source - The plugin source identifier.
+ * @returns {boolean} True when the plugin source is trusted for direct execution.
+ */
+const isVettedPluginSource = source => {
+    if (!source) return false;
+
+    if (source.startsWith("plugins/") || source.startsWith("./plugins/")) {
+        return true;
+    }
+
+    return source === "localStorage:plugins";
+};
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports.isVettedPluginSource = isVettedPluginSource;
+}
+
+/**
+ * Reports and blocks setup code from plugins that are not trusted for direct
+ * execution in the main application context.
+ * @param {string} label - Human-readable plugin section label.
+ * @param {string} pluginSource - The plugin source identifier.
+ * @returns {void}
+ */
+const blockUnvettedPluginSetupCode = (label, pluginSource) => {
+    console.warn(
+        "Blocked unvetted plugin setup code:",
+        label,
+        "from",
+        pluginSource || "unknown source"
+    );
+};
+
+/**
  * Processes plugin data and updates the activity based on the provided JSON-encoded dictionary.
  * @param {object} activity - The activity object to update.
  * @param {string} pluginData - The JSON-encoded plugin data.
@@ -765,21 +801,9 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
         return null;
     }
 
-    const isVettedPlugin = source => {
-        if (!source) return false;
-        // Plugins from the local plugins folder are considered vetted (provenance)
-        if (source.startsWith("plugins/") || source.startsWith("./plugins/")) {
-            return true;
-        }
-        // Known plugins from local storage are also trusted as they were approved previously
-        if (source === "localStorage:plugins") {
-            return true;
-        }
-        return false;
-    };
-
     // Use the vetted check to determine initial trust
-    let userConfirmed = isVettedPlugin(pluginSource);
+    const isVettedPlugin = isVettedPluginSource(pluginSource);
+    let userConfirmed = isVettedPlugin;
 
     if (!userConfirmed) {
         userConfirmed = confirm(
@@ -807,6 +831,11 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
 
     const safeEval = (code, label = "plugin") => {
         if (typeof code !== "string" || !userConfirmed) return;
+
+        if (!isVettedPlugin) {
+            blockUnvettedPluginSetupCode(label, pluginSource);
+            return;
+        }
 
         // Basic sanity limit
         if (code.length > 500000) {
@@ -914,7 +943,7 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
             // Pre-compile trusted plugins for performance.
             // UNTRUSTED plugins (if any made it past confirmation) are stored as strings
             // and handled via whitelist in safePluginExecute.
-            if (isVettedPlugin(pluginSource)) {
+            if (isVettedPlugin) {
                 const flowCode = obj["FLOWPLUGINS"][flow];
                 const registryName = `flow_${flow}_${Math.random().toString(36).substr(2, 9)}`;
                 blobScriptContent += `
@@ -932,7 +961,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, rec
     // Populate the arg-block dictionary
     if ("ARGPLUGINS" in obj) {
         for (const arg in obj["ARGPLUGINS"]) {
-            if (isVettedPlugin(pluginSource)) {
+            if (isVettedPlugin) {
                 const argCode = obj["ARGPLUGINS"][arg];
                 const registryName = `arg_${arg}_${Math.random().toString(36).substr(2, 9)}`;
                 blobScriptContent += `
@@ -964,7 +993,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, par
     // Populate the setter dictionary
     if ("SETTERPLUGINS" in obj) {
         for (const setter in obj["SETTERPLUGINS"]) {
-            if (isVettedPlugin(pluginSource)) {
+            if (isVettedPlugin) {
                 const setterCode = obj["SETTERPLUGINS"][setter];
                 const registryName = `setter_${setter}_${Math.random().toString(36).substr(2, 9)}`;
                 blobScriptContent += `
@@ -999,7 +1028,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, blk, value, turt
 
     if ("PARAMETERPLUGINS" in obj) {
         for (const parameter in obj["PARAMETERPLUGINS"]) {
-            if (isVettedPlugin(pluginSource)) {
+            if (isVettedPlugin) {
                 const paramCode = obj["PARAMETERPLUGINS"][parameter];
                 const registryName = `param_${parameter}_${Math.random().toString(36).substr(2, 9)}`;
                 blobScriptContent += `
@@ -1024,7 +1053,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk) {
     // Code to execute when turtle code is started
     if ("ONSTART" in obj) {
         for (const arg in obj["ONSTART"]) {
-            if (isVettedPlugin(pluginSource)) {
+            if (isVettedPlugin) {
                 const onStartCode = obj["ONSTART"][arg];
                 const registryName = `onstart_${arg}_${Math.random().toString(36).substr(2, 9)}`;
                 blobScriptContent += `
@@ -1042,7 +1071,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
     // Code to execute when turtle code is stopped
     if ("ONSTOP" in obj) {
         for (const arg in obj["ONSTOP"]) {
-            if (isVettedPlugin(pluginSource)) {
+            if (isVettedPlugin) {
                 const onStopCode = obj["ONSTOP"][arg];
                 const registryName = `onstop_${arg}_${Math.random().toString(36).substr(2, 9)}`;
                 blobScriptContent += `
@@ -2099,6 +2128,8 @@ if (typeof module !== "undefined" && module.exports) {
         closeBlkWidgets,
         resolveObject,
         importMembers,
-        escapeHTML
+        escapeHTML,
+        isVettedPluginSource,
+        processPluginData
     };
 }
