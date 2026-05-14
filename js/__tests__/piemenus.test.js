@@ -254,23 +254,24 @@ describe("piemenus behavioral tests", () => {
             expect(mockBlock._voiceWheel.createWheel).toHaveBeenCalledWith(voiceLabels);
         });
 
-        test("piemenuVoices selects correct voice on navigate", () => {
-            const voiceLabels = ["piano", "violin", "flute"];
-            const voiceValues = ["piano", "violin", "flute"];
+        test("piemenuVoices maps label to value on navigate", () => {
+            const voiceLabels = ["Piano", "Violin", "Flute"];
+            const voiceValues = ["sine", "sawtooth", "triangle"];
             const categories = [0, 1, 2];
 
-            piemenuVoices(mockBlock, voiceLabels, voiceValues, categories, "piano");
+            piemenuVoices(mockBlock, voiceLabels, voiceValues, categories, "sine");
 
-            // Simulate selecting violin (index 1)
+            // Simulate selecting Violin (label index 1)
             mockBlock._voiceWheel.selectedNavItemIndex = 1;
-            mockBlock._voiceWheel.navItems[1].title = "violin";
+            mockBlock._voiceWheel.navItems[1].title = "Violin";
 
             // Trigger selection changed
             const navigateFunc = mockBlock._voiceWheel.navItems[1].navigateFunction;
             if (navigateFunc) navigateFunc();
 
-            expect(mockBlock.value).toBe("violin");
-            expect(mockBlock.text.text).toBe("violin");
+            // value should come from voiceValues, not voiceLabels
+            expect(mockBlock.value).toBe("sawtooth");
+            expect(mockBlock.text.text).toBe("Violin");
         });
 
         test("piemenuVoices returns early on stage click", () => {
