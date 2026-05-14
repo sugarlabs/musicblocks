@@ -21,13 +21,6 @@ requirejs.config({
     urlArgs: ASSET_VERSION,
     waitSeconds: 60,
     shim: {
-        "easeljs.min": {
-            exports: "createjs"
-        },
-        "tweenjs.min": {
-            deps: ["easeljs.min"],
-            exports: "createjs"
-        },
         "Tone": {
             exports: "Tone"
         },
@@ -154,8 +147,6 @@ requirejs.config({
         "utils": "js/utils",
         "widgets": "js/widgets",
         "activity": "js",
-        "easeljs.min": "lib/easeljs.min",
-        "tweenjs.min": "lib/tweenjs.min",
         "prefixfree.min": "lib/prefixfree.min",
         "howler": "lib/howler",
         "Chart": "lib/Chart",
@@ -376,9 +367,6 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
             // Only pre-define modules that are loaded via script tags in index.html
             // These modules are already available as globals before RequireJS loads them
             const PRELOADED_SCRIPTS = [
-                { name: "easeljs.min", export: () => window.createjs },
-                { name: "tweenjs.min", export: () => window.createjs },
-                { name: "preloadjs.min", export: () => window.createjs },
                 { name: "jquery", export: () => window.jQuery },
                 { name: "jquery-ui", export: () => window.jQuery.ui },
                 { name: "materialize", export: () => window.Materialize || window.M },
@@ -400,8 +388,6 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
             // Do NOT pre-define them here as that prevents RequireJS from loading the actual files.
 
             const CORE_BOOTSTRAP_MODULES = [
-                "easeljs.min",
-                "tweenjs.min",
                 "utils/platformstyle",
                 "utils/utils",
                 "activity/turtledefs",

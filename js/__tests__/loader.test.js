@@ -71,7 +71,7 @@ describe("loader.js coverage", () => {
                 if (callback) {
                     callback(mockI18next, mockI18nextHttpBackend);
                 }
-            } else if (deps.includes("easeljs.min")) {
+            } else if (deps.includes("utils/platformstyle")) {
                 // Phase 1 bootstrap
                 // Mock globals expected by verification
                 window.createDefaultStack = jest.fn();
@@ -98,8 +98,11 @@ describe("loader.js coverage", () => {
                 baseUrl: "./",
                 paths: expect.any(Object),
                 shim: expect.objectContaining({
-                    "tweenjs.min": expect.objectContaining({
-                        deps: ["easeljs.min"]
+                    "utils/utils": expect.objectContaining({
+                        deps: ["utils/platformstyle"]
+                    }),
+                    "materialize": expect.objectContaining({
+                        deps: ["jquery"]
                     })
                 })
             })

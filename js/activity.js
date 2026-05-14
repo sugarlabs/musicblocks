@@ -76,8 +76,6 @@ const RESPONSIVE_BREAKPOINT_MOBILE = 600;
 
 let MYDEFINES = [
     "utils/platformstyle",
-    "easeljs.min",
-    "tweenjs.min",
     "howler",
     // p5.min, p5-sound-adapter, and p5.dom.min are NOT loaded eagerly.
     // They are only needed by the JS-export feature and will be loaded
