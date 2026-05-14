@@ -396,10 +396,6 @@ function setupOrnamentBlocks(activity) {
          * @returns {number[]} - The result of the block execution.
          */
         flow(args, logo, turtle, blk) {
-            // TODO: Duration should be the sum of all the notes (like
-            // in a tie). If we set the synth portamento and use
-            // setNote for all but the first note, it should produce a
-            // glissando.
             if (args[1] === undefined) {
                 // Nothing to do.
                 return;
