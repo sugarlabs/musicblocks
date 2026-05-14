@@ -688,3 +688,11 @@ body.highcontrast {
 .dark .material-tooltip span {
     color: var(--color-text-inverse) !important;
 }
+
+/* Temperament Overrides */
+.tm-selector-bg {
+    background-color: var(--color-bg-secondary) !important;
+}
+.tm-selector-hover {
+    background-color: var(--color-brand-primary-hover) !important;
+}
