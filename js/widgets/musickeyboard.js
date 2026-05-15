@@ -1539,29 +1539,42 @@ function MusicKeyboard(activity) {
      * Update the widget window size based on whether it is maximized or not.
      */
     this._updateWidgetWindowSize = function () {
+        const outerDiv = docById("mkbOuterDiv");
+        if (!outerDiv) return;
+
         if (this.widgetWindow._maximized) {
             this.widgetWindow.getWidgetBody().style.position = "absolute";
             this.widgetWindow.getWidgetBody().style.height = "calc(100vh - 64px)";
             this.widgetWindow.getWidgetBody().style.width = "200vh";
-            const outerDiv = docById("mkbOuterDiv");
             outerDiv.style.maxHeight = "725px";
-            docById("mkbOuterDiv").style.height = "calc(100vh - 64px)";
-            docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
-            docById("keyboardHolder2").style.width = "calc(200vh - 64px)";
-            docById("mkbInnerDiv").style.width = "95.5vw";
-            docById("mkbInnerDiv").style.height = "75%";
+            outerDiv.style.height = "calc(100vh - 64px)";
+            outerDiv.style.width = "calc(200vh - 64px)";
+
+            const keyboardHolder = docById("keyboardHolder2");
+            if (keyboardHolder) {
+                keyboardHolder.style.width = "calc(200vh - 64px)";
+            }
+
             const innerDiv = docById("mkbInnerDiv");
-            innerDiv.scrollLeft = innerDiv.scrollWidth;
+            if (innerDiv) {
+                innerDiv.style.width = "95.5vw";
+                innerDiv.style.height = "75%";
+                innerDiv.scrollLeft = innerDiv.scrollWidth;
+            }
+
             this.widgetWindow.getWidgetBody().style.left = "60px";
         } else {
-            const outerDiv = docById("mkbOuterDiv");
             outerDiv.style.maxHeight = "400px";
             this.widgetWindow.getWidgetBody().style.position = "relative";
             this.widgetWindow.getWidgetBody().style.left = "0px";
             this.widgetWindow.getWidgetBody().style.height = "550px";
             this.widgetWindow.getWidgetBody().style.width = "1000px";
-            docById("mkbOuterDiv").style.width = w + "px";
-            docById("mkbInnerDiv").style.height = "100%";
+            outerDiv.style.width = w + "px";
+
+            const innerDiv = docById("mkbInnerDiv");
+            if (innerDiv) {
+                innerDiv.style.height = "100%";
+            }
         }
     };
 
