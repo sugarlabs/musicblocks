@@ -1,4 +1,6 @@
 // Mock HTMLCanvasElement.getContext to suppress jsdom warnings
+global.docById = id => document.getElementById(id);
+global._ = text => text; // Simple mock for translation helper
 
 const mockContext = {
     clearRect: jest.fn(),
@@ -15,21 +17,21 @@ const mockContext = {
     measureText: jest.fn(() => ({
         width: 0,
         actualBoundingBoxAscent: 0,
-        actualBoundingBoxDescent: 0,
+        actualBoundingBoxDescent: 0
     })),
     scale: jest.fn(),
     setTransform: jest.fn(),
     save: jest.fn(),
-    restore: jest.fn(),
+    restore: jest.fn()
 };
 
-Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
+Object.defineProperty(HTMLCanvasElement.prototype, "getContext", {
     configurable: true,
     writable: true,
-    value: jest.fn((type) => {
+    value: jest.fn(type => {
         // Return null for non-2d contexts
-        if (type !== '2d') return null;
+        if (type !== "2d") return null;
 
         return mockContext;
-    }),
+    })
 });

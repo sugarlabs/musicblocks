@@ -12,7 +12,7 @@
 /*
    global
 
-   jQuery, LocalCard, Publisher
+   docById, jQuery, LocalCard, Publisher
 */
 /*
    exported
@@ -69,7 +69,7 @@ class LocalPlanet {
     }
 
     renderAllProjects() {
-        document.getElementById("local-projects").innerHTML = "";
+        docById("local-projects").textContent = "";
 
         let index = -1;
         for (let i = 0; i < this.projects.length; i++) {
@@ -80,7 +80,7 @@ class LocalPlanet {
         if (index !== -1) {
             const id = `local-project-image-${this.projects[index][0]}`;
 
-            const cardimg = document.getElementById(id);
+            const cardimg = docById(id);
             cardimg.src = this.currentProjectImage;
         }
 
@@ -90,7 +90,7 @@ class LocalPlanet {
     initDeleteModal() {
         const t = this;
 
-        document.getElementById("deleter-button").addEventListener(
+        docById("deleter-button").addEventListener(
             "click",
 
             function (evt) {
@@ -104,8 +104,8 @@ class LocalPlanet {
     openDeleteModal(id) {
         this.DeleteModalID = id;
         const name = this.ProjectTable[id].ProjectName;
-        document.getElementById("deleter-title").textContent = name;
-        document.getElementById("deleter-name").textContent = name;
+        docById("deleter-title").textContent = name;
+        docById("deleter-name").textContent = name;
         jQuery("#deleter").modal("open");
     }
 

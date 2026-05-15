@@ -116,13 +116,13 @@ class HelpWidget {
             } else {
                 this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
             }
-            rightArrow = document.getElementById("right-arrow");
+            rightArrow = docById("right-arrow");
             rightArrow.style.display = "block";
             rightArrow.classList.add("hover");
             rightArrow.setAttribute("title", _("Next"));
             rightArrow.setAttribute("aria-label", _("Next"));
 
-            leftArrow = document.getElementById("left-arrow");
+            leftArrow = docById("left-arrow");
             leftArrow.style.display = "block";
             leftArrow.classList.add("hover");
             leftArrow.setAttribute("title", _("Previous"));
@@ -185,13 +185,13 @@ class HelpWidget {
                 }
             }
 
-            rightArrow = document.getElementById("right-arrow");
+            rightArrow = docById("right-arrow");
             rightArrow.style.display = "none";
             rightArrow.classList.remove("hover");
             rightArrow.setAttribute("title", _("Next"));
             rightArrow.setAttribute("aria-label", _("Next"));
 
-            leftArrow = document.getElementById("left-arrow");
+            leftArrow = docById("left-arrow");
             leftArrow.style.display = "none";
             leftArrow.classList.remove("hover");
             leftArrow.setAttribute("title", _("Previous"));

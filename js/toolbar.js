@@ -411,7 +411,7 @@ class Toolbar {
             const elem = docById(obj[0]);
             if (strings[i].length === 3) {
                 if (elem !== undefined && elem !== null) {
-                    elem.innerHTML = obj[1];
+                    elem.textContent = obj[1];
                 }
             } else {
                 if (elem !== undefined && elem !== null) {
@@ -2348,7 +2348,7 @@ class FocusCycleManager {
         document.addEventListener("focusin", this._onFocusIn, true);
 
         // Visually-hidden ARIA live region for screen readers.
-        if (!document.getElementById("fcm-announcer")) {
+        if (!docById("fcm-announcer")) {
             const r = document.createElement("div");
             r.id = "fcm-announcer";
             r.setAttribute("aria-live", "polite");
@@ -2398,10 +2398,10 @@ class FocusCycleManager {
 
     _workspaceElements() {
         return {
-            holder: document.getElementById("canvasHolder"),
-            container: document.getElementById("canvasContainer"),
-            overlay: document.getElementById("canvas"),
-            canvas: document.getElementById("myCanvas")
+            holder: docById("canvasHolder"),
+            container: docById("canvasContainer"),
+            overlay: docById("canvas"),
+            canvas: docById("myCanvas")
         };
     }
 
@@ -2443,7 +2443,7 @@ class FocusCycleManager {
         });
 
         const active = document.activeElement;
-        const toolbars = document.getElementById("toolbars");
+        const toolbars = docById("toolbars");
         if (this._isWithin(toolbars, active) && typeof active.blur === "function") {
             active.blur();
         }
@@ -2477,8 +2477,8 @@ class FocusCycleManager {
         // Always exit keyboard mode on any mouse interaction.
         this._keyboardMode = false;
 
-        const toolbars = document.getElementById("toolbars");
-        const paletteEl = document.getElementById("palette");
+        const toolbars = docById("toolbars");
+        const paletteEl = docById("palette");
         const clickedToolbar = this._isWithin(toolbars, e.target);
         const clickedPalette = this._isWithin(paletteEl, e.target);
         const clickedWorkspace = this._isWorkspaceTarget(e.target);
@@ -2524,7 +2524,7 @@ class FocusCycleManager {
     // we can restore it when re-entering via Tab.
     // ------------------------------------------------------------------
     _onFocusIn(e) {
-        const toolbars = document.getElementById("toolbars");
+        const toolbars = docById("toolbars");
         if (toolbars && toolbars.contains(e.target)) {
             // Only record if it's an interactive element (button / link)
             const tag = e.target.tagName.toLowerCase();
@@ -2533,7 +2533,7 @@ class FocusCycleManager {
             }
             if (this._keyboardMode) this._currentZone = "toolbar";
         } else if (this._keyboardMode) {
-            const palette = document.getElementById("palette");
+            const palette = docById("palette");
             if (palette && palette.contains(e.target)) {
                 this._currentZone = "palette";
             } else if (["canvasHolder", "canvas", "canvasContainer"].includes(e.target.id)) {
@@ -2600,8 +2600,8 @@ class FocusCycleManager {
 
     _zoneOf(el) {
         if (!el) return null;
-        const toolbars = document.getElementById("toolbars");
-        const palette = document.getElementById("palette");
+        const toolbars = docById("toolbars");
+        const palette = docById("palette");
         if (toolbars && toolbars.contains(el)) return "toolbar";
         if (palette && palette.contains(el)) return "palette";
         if (["canvasHolder", "canvas", "canvasContainer"].includes(el.id)) return "workspace";
@@ -2644,8 +2644,8 @@ class FocusCycleManager {
         const container = this._containerEl(zone);
 
         if (zone === "workspace") {
-            const ws = document.getElementById("canvasHolder");
-            const cv = document.getElementById("canvas");
+            const ws = docById("canvasHolder");
+            const cv = docById("canvas");
             if (ws) {
                 if (typeof ws.hasAttribute !== "function" || !ws.hasAttribute("tabindex")) {
                     ws.setAttribute("tabindex", "-1");
@@ -2668,7 +2668,7 @@ class FocusCycleManager {
         }
 
         if (zone === "toolbar") {
-            const toolbars = document.getElementById("toolbars");
+            const toolbars = docById("toolbars");
             if (!toolbars) return;
             // Prefer the last button the user was on; fallback to first visible.
             let target = this._lastFocusedButton;
@@ -2685,7 +2685,7 @@ class FocusCycleManager {
         }
 
         if (zone === "palette") {
-            const palette = document.getElementById("palette");
+            const palette = docById("palette");
             if (!palette) return;
             if (container) container.classList.add("focus-zone-active");
 
@@ -2731,9 +2731,9 @@ class FocusCycleManager {
     // Helpers
     // ------------------------------------------------------------------
     _containerEl(zone) {
-        if (zone === "workspace") return document.getElementById("canvasHolder");
-        if (zone === "toolbar") return document.getElementById("toolbars");
-        if (zone === "palette") return document.getElementById("palette");
+        if (zone === "workspace") return docById("canvasHolder");
+        if (zone === "toolbar") return docById("toolbars");
+        if (zone === "palette") return docById("palette");
         return null;
     }
 

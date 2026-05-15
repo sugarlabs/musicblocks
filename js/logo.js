@@ -1164,7 +1164,7 @@ class Logo {
         document.body.style.cursor = "default";
         if (this.activity.showBlocksAfterRun) {
             this.activity.blocks.showBlocks();
-            document.getElementById("stop").style.color = "white";
+            docById("stop").style.color = "white";
         }
 
         this.activity.showBlocksAfterRun = false;

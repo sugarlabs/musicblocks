@@ -76,7 +76,7 @@ class JSEditor {
      * @returns {void}
      */
     _addErrorStyles() {
-        if (document.getElementById("js-error-styles")) {
+        if (docById("js-error-styles")) {
             return;
         }
 
@@ -1040,7 +1040,7 @@ class JSEditor {
         for (let i = 1; i < linesCount; i++) {
             text += `${i}\n`;
         }
-        docById("editorLines").innerText = text;
+        docById("editorLines").textContent = text;
 
         // Update debug buttons
         this._updateDebugButtons(code);

@@ -64,8 +64,8 @@ class PlanetInterface {
          */
         this.showMusicBlocks = () => {
             document.title = this.activity.planet.getCurrentProjectName();
-            document.getElementById("toolbars").style.display = "block";
-            document.getElementById("palette").style.display = "block";
+            docById("toolbars").style.display = "block";
+            docById("palette").style.display = "block";
 
             this.activity.prepSearchWidget();
             window.widgetWindows.showWindows();
@@ -390,7 +390,7 @@ class PlanetInterface {
          * Sets up event handlers and initializes Converter.
          */
         this.init = async () => {
-            this.iframe = document.getElementById("planet-iframe");
+            this.iframe = docById("planet-iframe");
             try {
                 await this.iframe.contentWindow.makePlanet(
                     _THIS_IS_MUSIC_BLOCKS_,

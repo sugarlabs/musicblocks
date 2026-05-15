@@ -12,7 +12,7 @@
 /*
    global
 
-   _
+   docById, _
 */
 /*
    exported
@@ -174,15 +174,15 @@ class LocalCard {
         if (this.ProjectData.PublishedData !== null) {
             frag.getElementById(`local-project-cloud-${this.id}`).style.display = "initial";
 
-            frag.getElementById(`local-project-cloud-${this.id}`).addEventListener("click", evt => {
-                document.getElementById("global-tab").click();
+            frag.getElementById(`local-project-cloud-${this.id}`).addEventListener("click", () => {
+                docById("global-tab").click();
                 Planet.GlobalPlanet.forceAddToCache(this.id, () => {
                     Planet.GlobalPlanet.ProjectViewer.open(this.id);
                 });
             });
         }
 
-        document.getElementById("local-projects").appendChild(frag);
+        docById("local-projects").appendChild(frag);
     }
 
     init(id) {

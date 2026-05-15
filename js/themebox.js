@@ -318,7 +318,7 @@ class ThemeBox {
         }
 
         // Update canvas background using theme config
-        const canvas = document.getElementById("canvas");
+        const canvas = docById("canvas");
         if (canvas) {
             canvas.style.backgroundColor = window.platformColor.background;
         }
@@ -381,9 +381,9 @@ class ThemeBox {
      * @returns {void}
      */
     updateThemeIcon() {
-        const themeSelectIcon = document.getElementById("themeSelectIcon");
+        const themeSelectIcon = docById("themeSelectIcon");
         if (themeSelectIcon) {
-            const currentThemeElement = document.getElementById(this._theme);
+            const currentThemeElement = docById(this._theme);
             if (currentThemeElement) {
                 themeSelectIcon.innerHTML = currentThemeElement.innerHTML;
             }
@@ -400,7 +400,7 @@ class ThemeBox {
         if (this.activity.palettes) {
             try {
                 // Update palette selector border color
-                const paletteElement = document.getElementById("palette");
+                const paletteElement = docById("palette");
                 if (paletteElement && paletteElement.childNodes[0]) {
                     paletteElement.childNodes[0].style.border = `1px solid ${window.platformColor.selectorSelected}`;
                 }
@@ -530,6 +530,40 @@ class ThemeBox {
             });
         }
 
+        // Update planet iframe theme if it exists
+        const planetIframe = docById("planet-iframe");
+        if (planetIframe) {
+            const applyPlanetTheme = () => {
+                if (
+                    planetIframe.contentDocument &&
+                    planetIframe.contentDocument.readyState === "complete"
+                ) {
+                    try {
+                        const planetBody = planetIframe.contentDocument.body;
+                        if (planetBody) {
+                            this._themes.forEach(theme => {
+                                if (theme === this._theme) {
+                                    planetBody.classList.add(theme);
+                                } else {
+                                    planetBody.classList.remove(theme);
+                                }
+                            });
+                        }
+                    } catch (e) {
+                        // Cross-origin restriction may prevent this
+                        console.debug("Could not update planet iframe theme:", e);
+                    }
+                }
+            };
+
+            // Apply immediately if already loaded, otherwise wait for load event
+            if (
+                planetIframe.contentDocument &&
+                planetIframe.contentDocument.readyState === "complete"
+            ) {
+                applyPlanetTheme();
+            } else {
+                planetIframe.addEventListener("load", applyPlanetTheme, { once: true });
         // Update planet iframe theme via postMessage instead of directly
         // accessing iframe.contentDocument (which breaks under sandboxing
         // or cross-origin isolation).
