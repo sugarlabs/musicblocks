@@ -64,6 +64,13 @@ jobs:
                 displayName: 'Documentation',
                 pattern: /-\s*\[x\]\s*Documentation/i,
               },
+              {
+                label: 'chore',
+                color: 'A0AEC0',
+                description: 'Maintenance, refactoring, or tooling with no behavior change',
+                displayName: 'Chore / Refactor',
+                pattern: /-\s*\[x\]\s*Chore/i,
+              },
             ];
 
             const checkedCategories = categories.filter(cat => cat.pattern.test(prBody));
