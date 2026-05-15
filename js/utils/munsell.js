@@ -14,12 +14,6 @@
 // which is a vast improvement over the Munsell Perl module
 // written by Walter Bender and Jon Orwant back in the day.
 
-/*
-   Note: This file previously referenced createjs.Graphics.getRGB().
-   That dependency has been removed. interpColor() now returns a native
-   rgba() CSS string.
- */
-
 /* exported getMunsellColor, getcolor, searchColors, COLORS40 */
 
 /**
