@@ -4739,10 +4739,9 @@ class Activity {
 
             const existingView = document.getElementById("trashView");
             if (existingView) {
-                trashList.replaceChild(trashView, existingView);
-            } else {
-                trashList.appendChild(trashView);
+                existingView.remove(); // remove from DOM; GC can now collect listeners
             }
+            trashList.appendChild(trashView);
         };
 
         /*
