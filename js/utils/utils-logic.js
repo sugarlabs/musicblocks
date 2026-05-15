@@ -112,40 +112,37 @@ var toTitleCase = str => {
 /**
  * Escapes special characters in a string for use in HTML.
  */
-var escapeHTML = text => {
-    if (typeof text !== "string") return text;
-    const map = {
+var escapeHTML = str => {
+    const escapeMap = {
         "&": "&amp;",
         "<": "&lt;",
         ">": "&gt;",
         '"': "&quot;",
         "'": "&#039;"
     };
-    return text.replace(/[&<>"']/g, m => map[m]);
+    return String(str).replace(/[&<>"']/g, char => escapeMap[char]);
 };
 
 /**
  * Unescapes HTML entities in a string.
  */
-var unescapeHTML = text => {
-    if (typeof text !== "string") return text;
-    const map = {
+var unescapeHTML = str => {
+    const unescapeMap = {
         "&amp;": "&",
         "&lt;": "<",
         "&gt;": ">",
         "&quot;": '"',
         "&#039;": "'"
     };
-    return text.replace(/&amp;|&lt;|&gt;|&quot;|&#039;/g, m => map[m]);
+    return String(str).replace(/&amp;|&lt;|&gt;|&quot;|&#039;/g, match => unescapeMap[match]);
 };
 
 /**
  * Checks if a URL is considered safe.
  */
-var isSafeUrl = url => {
-    if (typeof url !== "string") return false;
+var isSafeUrl = urlString => {
     try {
-        const parsed = new URL(url);
+        const parsed = new URL(urlString);
         return parsed.protocol === "http:" || parsed.protocol === "https:";
     } catch (e) {
         return false;
