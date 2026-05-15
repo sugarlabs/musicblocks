@@ -380,7 +380,7 @@ function LegoWidget() {
      * @returns {void}
      */
     this._initializeRowHeaders = function () {
-        this.rowHeaderTable.innerHTML = "";
+        this.rowHeaderTable.replaceChildren();
         this.rowHeaderTable.style.margin = "0";
         this.rowHeaderTable.style.padding = "0";
         this.rowHeaderTable.style.borderSpacing = "0";
@@ -729,7 +729,7 @@ function LegoWidget() {
      * @returns {void}
      */
     this._initializeMatrix = function () {
-        this.matrixTable.innerHTML = "";
+        this.matrixTable.replaceChildren();
 
         this.matrixData.rows.forEach((rowData, rowIndex) => {
             const row = this.matrixTable.insertRow();
@@ -1163,7 +1163,7 @@ function LegoWidget() {
         if (file && file.type.startsWith("image/")) {
             const reader = new FileReader();
             reader.onload = e => {
-                this.imageDisplayArea.innerHTML = "";
+                this.imageDisplayArea.replaceChildren();
 
                 this.imageWrapper = document.createElement("div");
                 this.imageWrapper.style.position = "absolute";
@@ -1199,7 +1199,7 @@ function LegoWidget() {
      * @returns {void}
      */
     this._startWebcam = function () {
-        this.imageDisplayArea.innerHTML = "";
+        this.imageDisplayArea.replaceChildren();
 
         this.imageWrapper = document.createElement("div");
         this.imageWrapper.style.position = "absolute";
@@ -2116,7 +2116,7 @@ function LegoWidget() {
     this._drawGridLines = function () {
         if (!this.rowHeaderTable.rows.length || !this.gridOverlay) return;
 
-        this.gridOverlay.innerHTML = "";
+        this.gridOverlay.replaceChildren();
 
         const numRows = this.matrixData.rows.length;
 
