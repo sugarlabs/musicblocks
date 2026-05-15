@@ -8398,6 +8398,7 @@ class Activity {
             this.toolbar.renderJavaScriptIcon(toggleJSWindow);
             this.toolbar.renderLanguageSelectIcon(this.languageBox);
             this.toolbar.renderWrapIcon();
+            this.setupConnectivityMonitoring();
             this._perfMark("activity.init.ui_ready");
 
             initPalettes(this.palettes);
@@ -9119,6 +9120,52 @@ class Activity {
         if (typeof this._stopIdleWatcher === "function") {
             this._stopIdleWatcher();
         }
+    }
+
+    /**
+     * Reads the browser connectivity state using standard browser APIs.
+     *
+     * @returns {boolean}
+     */
+    getConnectivityStatus() {
+        if (
+            typeof window !== "undefined" &&
+            window.navigator &&
+            typeof window.navigator.onLine === "boolean"
+        ) {
+            return window.navigator.onLine;
+        }
+
+        return true;
+    }
+
+    /**
+     * Synchronizes connectivity UI state without requiring a reload.
+     *
+     * @returns {void}
+     */
+    updateConnectivityStatus() {
+        this.isOnline = this.getConnectivityStatus();
+
+        if (this.toolbar && typeof this.toolbar.setNetworkStatus === "function") {
+            this.toolbar.setNetworkStatus(this.isOnline);
+        }
+    }
+
+    /**
+     * Registers online/offline listeners for the toolbar indicator.
+     *
+     * @returns {void}
+     */
+    setupConnectivityMonitoring() {
+        this.updateConnectivityStatus();
+
+        this._handleConnectivityChange = () => {
+            this.updateConnectivityStatus();
+        };
+
+        this.addEventListener(window, "online", this._handleConnectivityChange);
+        this.addEventListener(window, "offline", this._handleConnectivityChange);
     }
 
     /**

@@ -51,6 +51,8 @@ const createMockElement = id => ({
     setAttribute: jest.fn(),
     getAttribute: jest.fn(),
     innerHTML: "",
+    textContent: "",
+    className: "",
     classList: {
         add: jest.fn(),
         remove: jest.fn(),
@@ -103,15 +105,42 @@ describe("Toolbar Class", () => {
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ true", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = true;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(141);
+        expect(global._).toHaveBeenCalledTimes(142);
         expect(global._).toHaveBeenNthCalledWith(1, "About Music Blocks");
     });
 
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ false", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = false;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(123);
+        expect(global._).toHaveBeenCalledTimes(124);
         expect(global._).toHaveBeenNthCalledWith(1, "About Turtle Blocks");
+    });
+
+    test("setNetworkStatus updates the toolbar badge text and state class", () => {
+        const networkStatus = createMockElement("networkStatus");
+
+        global.docById.mockImplementation(id => {
+            if (id === "networkStatus") return networkStatus;
+
+            return {
+                setAttribute: jest.fn(),
+                style: {},
+                classList: { add: jest.fn() },
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn(),
+                querySelectorAll: jest.fn(() => [])
+            };
+        });
+
+        toolbar.setNetworkStatus(false);
+        expect(networkStatus.textContent).toBe("Offline");
+        expect(networkStatus.className).toContain("offline");
+        expect(networkStatus.setAttribute).toHaveBeenCalledWith("aria-label", "Offline");
+
+        toolbar.setNetworkStatus(true);
+        expect(networkStatus.textContent).toBe("Online");
+        expect(networkStatus.className).toContain("online");
+        expect(networkStatus.setAttribute).toHaveBeenCalledWith("aria-label", "Online");
     });
 
     test("handles language fallback when localStorage is empty", () => {

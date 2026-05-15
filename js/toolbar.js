@@ -72,6 +72,12 @@ class Toolbar {
         this._recordDropdownArrowElement = null;
         this._recordDropdownArrowClickHandler = null;
         this._recordDropdownOutsideClickHandler = null;
+        this._isOnline =
+            typeof window !== "undefined" &&
+            window.navigator &&
+            typeof window.navigator.onLine === "boolean"
+                ? window.navigator.onLine
+                : true;
     }
 
     /**
@@ -427,6 +433,8 @@ class Toolbar {
             });
         }
 
+        this.setNetworkStatus(this._isOnline);
+
         $j(".tooltipped").on("click", function () {
             $j(this).tooltip("close");
         });
@@ -466,6 +474,29 @@ class Toolbar {
             window._focusCycleManager = new FocusCycleManager();
             window._focusCycleManager.init();
         }
+    }
+
+    /**
+     * Updates the toolbar connectivity badge.
+     *
+     * @param {boolean} isOnline
+     * @returns {void}
+     */
+    setNetworkStatus(isOnline) {
+        this._isOnline = isOnline !== false;
+
+        const networkStatus = docById("networkStatus");
+        if (networkStatus === undefined || networkStatus === null) {
+            return;
+        }
+
+        const label = this._isOnline ? _("Online") : _("Offline");
+        networkStatus.textContent = label;
+        networkStatus.setAttribute("data-tooltip", label);
+        networkStatus.setAttribute("aria-label", label);
+        networkStatus.className = `network-status-badge tooltipped ${
+            this._isOnline ? "online" : "offline"
+        }`;
     }
 
     /**

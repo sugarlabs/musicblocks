@@ -28,8 +28,12 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
           cache: 'npm'
+
+      - name: Set CI env
+        run: |
+          echo "ELECTRON_SKIP_DOWNLOAD=true" >> $GITHUB_ENV
 
       - name: Install Dependencies
         run: npm ci
