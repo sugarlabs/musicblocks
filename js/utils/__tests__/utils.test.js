@@ -678,6 +678,10 @@ describe("Utility Functions (logic-only)", () => {
             };
         });
 
+        afterAll(() => {
+            delete global.TestNamespace;
+        });
+
         it("resolves nested path", () => {
             expect(resolveObject("TestNamespace.Sub.value")).toBe(42);
         });
@@ -776,6 +780,10 @@ describe("Utility Functions (logic-only)", () => {
                 TestControllerModel: DummyModel,
                 TestControllerView: DummyView
             };
+        });
+
+        afterAll(() => {
+            delete global.TestController;
         });
 
         it("imports model and view members into object", () => {

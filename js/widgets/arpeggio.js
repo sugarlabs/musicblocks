@@ -16,7 +16,7 @@
    global
 
    platformColor, _, docById, getNote, setCustomChord, keySignatureToMode,
-   getModeNumbers, getTemperament, normalizeNoteAccidentals
+   getModeNumbers, getTemperament, normalizeNoteAccidentals, DEFAULTVOICE
 */
 /*
    Global locations
@@ -359,7 +359,7 @@ class Arpeggio {
         cell.style.lineHeight = 100 + "%";
         cell.setAttribute("id", arpeggioIdx);
         cell.className = "headcol";
-        cell.innerHTML = arpeggioName;
+        cell.textContent = arpeggioName;
         cell.style.backgroundColor = platformColor.selectorBackground;
     }
 
@@ -574,7 +574,7 @@ class Arpeggio {
                     0,
                     normalizeNoteAccidentals(this._playList[i][0][0]) + this._playList[i][0][1],
                     this._playList[i][1],
-                    "default",
+                    DEFAULTVOICE,
                     null,
                     null,
                     null
@@ -665,7 +665,7 @@ class Arpeggio {
                 0,
                 normalizeNoteAccidentals(note),
                 this.notesToPlay[0][1],
-                "default",
+                DEFAULTVOICE,
                 null,
                 null,
                 null

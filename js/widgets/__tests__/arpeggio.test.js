@@ -36,6 +36,7 @@ global.keySignatureToMode = jest.fn(() => ["C", "major"]);
 global.getModeNumbers = jest.fn(() => "0 2 4 5 7 9 11");
 global.getTemperament = jest.fn(() => ({ pitchNumber: 12 }));
 global.normalizeNoteAccidentals = jest.fn(note => note);
+global.DEFAULTVOICE = "electronic synth";
 
 describe("Arpeggio Widget", () => {
     let arpeggio;

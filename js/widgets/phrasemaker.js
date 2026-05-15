@@ -19,7 +19,7 @@
    noteIsSolfege, isCustomTemperament, i18nSolfege, getNote, DEFAULTDRUM, last,
    DRUMS, SHARP, FLAT, PREVIEWVOLUME, DEFAULTVOLUME, noteToFrequency,
    LCD, calcNoteValueToDisplay, NOTESYMBOLS,
-   EIGHTHNOTEWIDTH, docBySelector, getTemperament, normalizeNoteAccidentals
+   EIGHTHNOTEWIDTH, docBySelector, getTemperament, normalizeNoteAccidentals, parseNoteString
 */
 
 /*
@@ -1011,11 +1011,12 @@ class PhraseMaker {
     }
 
     _setupWheelDiv(size, left, top) {
-        this.docById("wheelDivptm").style.position = "absolute";
-        this.docById("wheelDivptm").style.height = size + "px";
-        this.docById("wheelDivptm").style.width = size + "px";
-        this.docById("wheelDivptm").style.left = left + "px";
-        this.docById("wheelDivptm").style.top = top + "px";
+        const wheelDiv = this.docById("wheelDivptm");
+        wheelDiv.style.position = "absolute";
+        wheelDiv.style.height = size + "px";
+        wheelDiv.style.width = size + "px";
+        wheelDiv.style.left = left + "px";
+        wheelDiv.style.top = top + "px";
     }
 
     /**
@@ -1089,8 +1090,9 @@ class PhraseMaker {
         this._exitWheel.clickModeRotate = false;
         this._exitWheel.createWheel(["×", " "]);
 
-        const x = this.docById("addnotes").getBoundingClientRect().x;
-        const y = this.docById("addnotes").getBoundingClientRect().y;
+        const addnotesRect = this.docById("addnotes").getBoundingClientRect();
+        const x = addnotesRect.x;
+        const y = addnotesRect.y;
 
         this._setupWheelDiv(
             300,
@@ -1357,8 +1359,9 @@ class PhraseMaker {
         this._blockLabelsWheel.animatetime = 0;
         this._blockLabelsWheel.createWheel(_blockLabels);
 
-        const x = this._labelcols[blockIndex].getBoundingClientRect().x;
-        const y = this._labelcols[blockIndex].getBoundingClientRect().y;
+        const labelRect = this._labelcols[blockIndex].getBoundingClientRect();
+        const x = labelRect.x;
+        const y = labelRect.y;
 
         this._setupWheelDiv(
             300,
@@ -1638,8 +1641,9 @@ class PhraseMaker {
             this._blockLabelsWheel.animatetime = 0;
         }
 
-        const x = this._labelcols[blockIndex].getBoundingClientRect().x;
-        const y = this._labelcols[blockIndex].getBoundingClientRect().y;
+        const labelRect = this._labelcols[blockIndex].getBoundingClientRect();
+        const x = labelRect.x;
+        const y = labelRect.y;
 
         this._setupWheelDiv(
             300,
@@ -1993,8 +1997,9 @@ class PhraseMaker {
             this._octavesWheel.createWheel(octaveLabels);
         }
 
-        const x = this._labelcols[index].getBoundingClientRect().x;
-        const y = this._labelcols[index].getBoundingClientRect().y;
+        const labelRect = this._labelcols[index].getBoundingClientRect();
+        const x = labelRect.x;
+        const y = labelRect.y;
 
         this._setupWheelDiv(
             300,
@@ -3867,8 +3872,9 @@ class PhraseMaker {
             y = 0;
         if (noteToDivide !== null) {
             const ntd = this._noteValueRow.cells[noteToDivide];
-            x = ntd.getBoundingClientRect().x;
-            y = ntd.getBoundingClientRect().y;
+            const ntdRect = ntd.getBoundingClientRect();
+            x = ntdRect.x;
+            y = ntdRect.y;
         }
 
         this._setupWheelDiv(
@@ -4742,7 +4748,7 @@ class PhraseMaker {
                                 ]);
                                 newStack.push([
                                     thisBlock + 2,
-                                    ["number", { value: note[0][j].slice(-1) }],
+                                    ["number", { value: parseNoteString(note[0][j])[1] }],
                                     0,
                                     0,
                                     [thisBlock]
@@ -4808,7 +4814,7 @@ class PhraseMaker {
                                 ]);
                                 newStack.push([
                                     thisBlock + 2,
-                                    ["number", { value: note[0][j].slice(-1) }],
+                                    ["number", { value: parseNoteString(note[0][j])[1] }],
                                     0,
                                     0,
                                     [thisBlock]
@@ -4870,7 +4876,7 @@ class PhraseMaker {
                                 ]);
                                 newStack.push([
                                     thisBlock + 2,
-                                    ["number", { value: note[0][j].slice(-1) }],
+                                    ["number", { value: parseNoteString(note[0][j])[1] }],
                                     0,
                                     0,
                                     [thisBlock]

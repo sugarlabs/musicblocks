@@ -191,7 +191,7 @@ class PitchSlider {
 
         activity.textMsg(_("Use the up/down buttons or arrow keys to change pitch."), 3000);
         activity.textMsg(_("Click on the slider to create a note block."), 3000);
-        setTimeout(this.widgetWindow.sendToCenter, 0);
+        window.requestAnimationFrame(() => this.widgetWindow.sendToCenter());
     }
 
     /**

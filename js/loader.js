@@ -56,8 +56,11 @@ requirejs.config({
         "p5-sound-adapter": {
             deps: ["p5.sound.min"]
         },
+        "utils/utils-logic": {
+            exports: "UtilsLogic"
+        },
         "utils/utils": {
-            deps: ["utils/platformstyle"],
+            deps: ["utils/platformstyle", "utils/utils-logic"],
             exports: "_"
         },
         "utils/retryWithBackoff": {
