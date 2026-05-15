@@ -124,5 +124,5 @@ class GlobalTag {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { GlobalTag };
+    module.exports = GlobalTag;
 }

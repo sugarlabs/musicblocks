@@ -1090,6 +1090,7 @@ describe("Logo comprehensive method coverage", () => {
         logo._alreadyRunning = true;
         logo._runningBlock = 7;
         logo._lastNoteTimeout = 99;
+        logo.statusFields = [[2, "currentpitch"]];
         logo.prepSynths = jest.fn();
         logo.initTurtle = jest.fn();
         logo.blockList = [];
@@ -1103,6 +1104,7 @@ describe("Logo comprehensive method coverage", () => {
         expect(clearTimeoutSpy).toHaveBeenCalledWith(99);
         expect(logo._ignoringBlock).toBe(7);
         expect(statusInit).toHaveBeenCalledWith(mockActivity);
+        expect(logo.statusFields).toEqual([[2, "currentpitch"]]);
         clearTimeoutSpy.mockRestore();
     });
 

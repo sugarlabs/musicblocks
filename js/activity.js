@@ -90,6 +90,7 @@ let MYDEFINES = [
     // Chart.js is only used by the statistics widget and will be loaded
     // on demand when the widget is opened, saving ~3-5 MB of heap memory.
     // "Chart",
+    "utils/utils-logic",
     "utils/utils",
     "utils/retryWithBackoff",
     "utils/debugLog",
@@ -544,13 +545,24 @@ class Activity {
                 if (this.stage) {
                     const hasActiveTweens = createjs.Tween.hasActiveTweens();
                     const hasActiveGifs = this.gifAnimator && this.gifAnimator.getActiveCount() > 0;
+                    const isInteracting =
+                        this.isDragging ||
+                        this.isSelecting ||
+                        (this.blocks && this.blocks.dragGroup !== null);
 
-                    if (this.stageDirty || hasActiveTweens || hasActiveGifs) {
+                    if (this.stageDirty || hasActiveTweens || hasActiveGifs || isInteracting) {
                         this.stage.update();
                         this.stageDirty = false;
+                        // Continue the loop if there's work or ongoing interaction
+                        this._renderLoopRafId = requestAnimationFrame(renderLoop);
+                    } else {
+                        // Nothing to render — let the loop go idle
+                        this._renderLoopRunning = false;
+                        this._renderLoopRafId = null;
                     }
+                } else {
+                    this._renderLoopRafId = requestAnimationFrame(renderLoop);
                 }
-                this._renderLoopRafId = requestAnimationFrame(renderLoop);
             };
 
             this._renderLoopRafId = requestAnimationFrame(renderLoop);
@@ -4418,6 +4430,8 @@ class Activity {
                 ) {
                     this.saveLocally();
                 }
+                // Pause render loop while tab is hidden
+                this._stopRenderLoop();
                 return;
             }
 
@@ -4429,6 +4443,9 @@ class Activity {
                     this._onResize(false);
                 }, 250);
             }
+            // Resume render loop when tab becomes visible again
+            this.stageDirty = true;
+            this._startRenderLoop();
         };
         this.addEventListener(document, "visibilitychange", this._handleVisibilityChange);
 
@@ -4538,8 +4555,25 @@ class Activity {
 
             if (restoredBlock.name === "start" || restoredBlock.name === "drum") {
                 const turtle = restoredBlock.value;
-                this.turtles.getTurtle(turtle).inTrash = false;
-                this.turtles.getTurtle(turtle).container.visible = true;
+                const primaryTurtle = this.turtles.getTurtle(turtle);
+                primaryTurtle.inTrash = false;
+                primaryTurtle.container.visible = true;
+
+                // FIX: Restore the companion turtle if one exists.
+                // sendStackToTrash() in blocks.js (~line 7257) sets BOTH the primary
+                // and companion turtle to inTrash=true / visible=false when trashing a
+                // start/drum block. Without this mirror restore, the companion stays
+                // inTrash=true permanently, and logo.js (~line 1519) silently skips it:
+                //   if (!tur.inTrash) { tur.running = true; ... }
+                // This means onEveryBeatDo callbacks are dead after any trash+restore.
+                const comp = primaryTurtle.companionTurtle;
+                if (comp !== null && comp !== undefined) {
+                    const companionTurtle = this.turtles.getTurtle(comp);
+                    if (companionTurtle) {
+                        companionTurtle.inTrash = false;
+                        companionTurtle.container.visible = true;
+                    }
+                }
             } else if (restoredBlock.name === "action") {
                 const actionArg = this.blocks.blockList[restoredBlock.connections[1]];
                 if (actionArg !== null) {
@@ -5018,6 +5052,7 @@ class Activity {
         this.refreshCanvas = () => {
             this.stageDirty = true;
             this.update = true;
+            this._startRenderLoop();
         };
 
         /*
@@ -7847,13 +7882,26 @@ class Activity {
             );
 
             img.onload = () => {
-                const bitmap = new createjs.Bitmap(img);
-                const bounds = bitmap.getBounds();
-                bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+                // FIX: createjs.Bitmap.getBounds() returns null for any Bitmap
+                // not added to a live EaselJS stage → TypeError: null.x crash.
+                // doSVG() returns "" on blank canvas → naturalWidth = 0 → guaranteed crash.
+                // Fix: use img.naturalWidth directly + plain offscreen canvas (no EaselJS needed).
                 try {
-                    that.storage["SESSIONIMAGE" + p] = bitmap.bitmapCache.getCacheDataURL();
+                    if (!img.naturalWidth || !img.naturalHeight) {
+                        // Blank canvas — doSVG() returned empty string, nothing to thumbnail.
+                        // SESSION<p> JSON was already saved above, so this is safe to skip.
+                        return;
+                    }
+
+                    const w = img.naturalWidth;
+                    const h = img.naturalHeight;
+                    const offscreen = document.createElement("canvas");
+                    offscreen.width = w;
+                    offscreen.height = h;
+                    offscreen.getContext("2d").drawImage(img, 0, 0);
+                    this.storage["SESSIONIMAGE" + p] = offscreen.toDataURL("image/png");
                 } catch (e) {
-                    console.error(e);
+                    console.error("[saveLocally] Thumbnail save failed:", e);
                 }
             };
 
