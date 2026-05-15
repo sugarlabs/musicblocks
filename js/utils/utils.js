@@ -1611,7 +1611,7 @@ function rationalToFraction(d) {
 
     This code was translated to JavaScript from the answers at
     http://stackoverflow.com/questions/95727/how-to-convert-floats-to-human-\
-readable-fractions/681534#681534
+    readable-fractions/681534#681534
 
     For example:
     >>> 3./5
