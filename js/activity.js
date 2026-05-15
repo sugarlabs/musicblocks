@@ -733,7 +733,14 @@ class Activity {
             wheel.sliceInitPathCustom = wheel.slicePathCustom;
             wheel.clickModeRotate = false;
             const wheelItems = this.helpfulWheelItems.filter(ele => ele.display);
-            wheel.initWheel(wheelItems.map(ele => ele.icon));
+            wheel.initWheel(wheelItems.map(ele => _(ele.label)));
+
+            wheelItems.forEach((ele, i) => {
+                if (ele.icon) {
+                    wheel.navItems[i].setTitle(ele.icon);
+                }
+            });
+
             wheel.createWheel();
 
             wheel.navItems[0].selected = false;
@@ -7025,6 +7032,7 @@ class Activity {
          * These menu items are on the canvas, not the toolbar.
          */
         this._setupPaletteMenu = () => {
+            this.helpfulWheelItems = [];
             const btnSize = this.cellSize;
             const createButton = (icon, label, action) => {
                 const button = this._makeButton(icon, label, x, y, btnSize, 0);
