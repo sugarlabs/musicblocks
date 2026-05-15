@@ -6010,10 +6010,13 @@ class Activity {
                 that._doHardStopButton();
             }
 
-            // Use the planet New Project mechanism if it is available,
-            // but only if the current project has a name.
+            // Use the planet New Project mechanism if it is available
+            // and Planet storage is actually initialized (planet.planet
+            // is null when running from file:///index.html), but only
+            // if the current project has a name.
             if (
                 that.planet !== undefined &&
+                that.planet.planet !== null &&
                 that.planet.getCurrentProjectName() !== _("My Project")
             ) {
                 that.planet.saveLocally();
