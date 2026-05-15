@@ -143,11 +143,7 @@ var unescapeHTML = str => {
 var isSafeUrl = urlString => {
     try {
         const parsed = new URL(urlString);
-        return (
-            parsed.protocol === "http:" ||
-            parsed.protocol === "https:" ||
-            parsed.protocol === "mailto:"
-        );
+        return parsed.protocol === "http:" || parsed.protocol === "https:";
     } catch (e) {
         return false;
     }

@@ -310,7 +310,7 @@ describe("Utility Logic Functions", () => {
             expect(isSafeUrl("data:text/html,Hello")).toBe(false);
             expect(isSafeUrl("vbscript:alert(1)")).toBe(false);
             expect(isSafeUrl("file:///etc/passwd")).toBe(false);
-            expect(isSafeUrl("mailto:test@example.com")).toBe(true);
+            expect(isSafeUrl("mailto:test@example.com")).toBe(false);
             expect(isSafeUrl("blob:https://example.com/uuid")).toBe(false);
             expect(isSafeUrl("tel:123456789")).toBe(false);
             expect(isSafeUrl("sms:123456789")).toBe(false);
