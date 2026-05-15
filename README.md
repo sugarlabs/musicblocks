@@ -165,7 +165,7 @@ Before you begin, ensure you have Docker installed on your machine. You can down
 To stop the Docker container, use `Ctrl + C` in your terminal. This
 will stop the container and free up the port it was using.
 
-## Troubleshooting
+#### Troubleshooting
 When running Music Blocks locally using `npm run dev`, the UI may load successfully even if some interactions appear unresponsive.
 
 New contributors may observe console errors such as:
@@ -179,7 +179,7 @@ If the UI loads and assets render correctly, the setup is generally considered s
 
 Future improvements may address these issues as part of ongoing refactoring efforts.
 
-## Additional Notes
+#### Additional Notes
 
 - Make sure to replace `musicblocks` with the appropriate image name
   if you have tagged the Docker image differently.
