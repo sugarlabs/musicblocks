@@ -78,7 +78,7 @@ your browser — _Google Chrome_ (or _Chromium_), _Microsoft Edge_
 To run from the most recent master branch (experimental), visit
 [_sugarlabs.github.io/musicblocks_](https://sugarlabs.github.io/musicblocks).
 
-## <a name="HOW_TO_SET_UP_A_LOCAL_SERVER"></a>How to set up a _local server_
+### <a name="HOW_TO_SET_UP_A_LOCAL_SERVER"></a>How to set up a _local server_
 
 Music Blocks is written using native browser technologies. The bulk of
 the functionality is in vanilla _JavaScript_. Therefore, most of
@@ -121,13 +121,13 @@ listening on port 3000.
 **NOTE:** _Use `ctrl + c` or `cmd + c` to quit the HTTP Server to avoid
 `socket.error:[Errno 48]`_.
 
-## Local Setup with Docker
+### Local Setup with Docker
 
-## Prerequisites
+#### Prerequisites
 
 Before you begin, ensure you have Docker installed on your machine. You can download and install Docker from the [official Docker website](https://www.docker.com/get-started).
 
-## Installation
+#### Installation
 
 1. Clone the Music Blocks repository to your local machine:
 
@@ -146,7 +146,7 @@ Before you begin, ensure you have Docker installed on your machine. You can down
    ```bash
    docker build -t musicblocks .
    ```
-## Running Music Blocks
+#### Running Music Blocks
 
 1. Run the Docker container using the built image:
 
@@ -160,7 +160,7 @@ Before you begin, ensure you have Docker installed on your machine. You can down
 2. Access Music Blocks in your web browser by navigating to
 `http://localhost:3000`.
 
-## Stopping the Docker container
+#### Stopping the Docker container
 
 To stop the Docker container, use `Ctrl + C` in your terminal. This
 will stop the container and free up the port it was using.
@@ -234,6 +234,11 @@ Code](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md)
 provides a general overview of Sugar Lab's guidelines. See
 [Contributing](#CONTRIBUTING) section for specific details about this
 repository.
+
+### Containerized Development Environment
+
+You may find it convenient to use a containerized environment for your development.
+See [DevContainer README.md](./.devcontainer/README.md) for details.
 
 ### Developer Quick Start
 
