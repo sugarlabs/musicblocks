@@ -188,6 +188,14 @@ describe("PlanetInterface", () => {
         expect(mockActivity.refreshCanvas).not.toHaveBeenCalled();
     });
 
+    // Regression test for #7350: when running from file:///index.html,
+    // planet.planet is null so getCurrentProjectName() must return ""
+    // to prevent _afterDelete from entering the Planet branch.
+    test("getCurrentProjectName returns empty string when inner Planet is null (#7350)", () => {
+        planetInterface.planet = null;
+        expect(planetInterface.getCurrentProjectName()).toBe("");
+    });
+
     test("loadProjectFromData: default merge=false", () => {
         planetInterface.iframe = { style: { display: "block" } };
         mockActivity.blocks.loadNewBlocks.mockClear();
