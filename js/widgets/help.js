@@ -419,7 +419,10 @@ class HelpWidget {
 
         const description = document.createElement("p");
         description.classList.add("description");
-        description.textContent = HELPCONTENT[page][1];
+        HELPCONTENT[page][1].split(/<br\s*\/?>/i).forEach((part, i) => {
+            if (i > 0) description.append(document.createElement("br"));
+            description.append(document.createTextNode(part));
+        });
         bodyFragment.append(description);
 
         const count = document.createElement("p");
