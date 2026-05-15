@@ -225,7 +225,12 @@ class WidgetWindow {
             e.preventDefault();
             e.stopPropagation();
         };
-
+        closeButton.addEventListener("keydown", e => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                closeButton.click();
+            }
+        });
         this._nonclose = this._create("div", "nonclose", this._drag);
         this._nonclose.style.display = "flex";
         this._nonclose.justifyContent = "space-between";
@@ -282,7 +287,12 @@ class WidgetWindow {
             e.preventDefault();
             e.stopPropagation();
         };
-
+        rollButton.addEventListener("keydown", e => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                rollButton.click();
+            }
+        });
         if (this._fullscreenEnabled) {
             const maxminButton = this._create("div", "wftButton wftMaxmin", this._nonclosebuttons);
             maxminButton.setAttribute("role", "button");
@@ -300,6 +310,12 @@ class WidgetWindow {
                 e.preventDefault();
                 e.stopImmediatePropagation();
             };
+            maxminButton.addEventListener("keydown", e => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    maxminButton.click();
+                }
+            });
             this._maxminIcon = this._create("img", undefined, maxminButton);
             this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
         }
