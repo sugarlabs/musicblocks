@@ -220,14 +220,17 @@ describe("LocalCard", () => {
         });
 
         it("should call renameProject when the name input changes", () => {
+            jest.useFakeTimers();
             const card = prepareCard("p11");
             card.render();
 
             const input = document.getElementById("local-project-input-p11");
             input.value = "New Name";
             input.dispatchEvent(new Event("input"));
+            jest.advanceTimersByTime(400);
 
             expect(planet.ProjectStorage.renameProject).toHaveBeenCalledWith("p11", "New Name");
+            jest.useRealTimers();
         });
 
         it("should show the cloud icon and call forceAddToCache when PublishedData exists", () => {
