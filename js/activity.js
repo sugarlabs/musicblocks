@@ -78,7 +78,6 @@ let MYDEFINES = [
     "utils/platformstyle",
     "easeljs.min",
     "tweenjs.min",
-    "preloadjs.min",
     "howler",
     // p5.min, p5-sound-adapter, and p5.dom.min are NOT loaded eagerly.
     // They are only needed by the JS-export feature and will be loaded
@@ -8796,9 +8795,6 @@ class Activity {
                 },
                 false
             );
-
-            // Workaround to chrome security issues
-            // createjs.LoadQueue(true, null, true);
 
             // Enable touch interactions if supported on the current device.
             createjs.Touch.enable(this.stage, false, true);

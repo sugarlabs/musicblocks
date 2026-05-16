@@ -28,10 +28,6 @@ requirejs.config({
             deps: ["easeljs.min"],
             exports: "createjs"
         },
-        "preloadjs.min": {
-            deps: ["easeljs.min", "tweenjs.min"],
-            exports: "createjs"
-        },
         "Tone": {
             exports: "Tone"
         },
@@ -160,7 +156,6 @@ requirejs.config({
         "activity": "js",
         "easeljs.min": "lib/easeljs.min",
         "tweenjs.min": "lib/tweenjs.min",
-        "preloadjs.min": "lib/preloadjs.min",
         "prefixfree.min": "lib/prefixfree.min",
         "howler": "lib/howler",
         "Chart": "lib/Chart",
@@ -406,7 +401,6 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
             const CORE_BOOTSTRAP_MODULES = [
                 "easeljs.min",
                 "tweenjs.min",
-                "preloadjs.min",
                 "utils/platformstyle",
                 "utils/utils",
                 "activity/turtledefs",
