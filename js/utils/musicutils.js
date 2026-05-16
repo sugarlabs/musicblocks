@@ -3709,10 +3709,10 @@ const getNumber = (notename, octave) => {
  * @returns {Array} An array containing the note and octave.
  */
 const getNoteFromInterval = (pitch, interval) => {
-    const len = pitch.length;
     const pitch1 = pitch.substring(0, 1);
-    const note1 = pitch.substring(0, len - 1);
-    const octave1 = Number(pitch.slice(-1));
+    const parsed = parseNoteString(pitch);
+    const note1 = parsed[0];
+    const octave1 = parsed[1];
     const number = pitchToNumber(note1, octave1, "C major");
     const pitches = ["C", "D", "E", "F", "G", "A", "B"];
     const priorAttrs = [DOUBLEFLAT, FLAT, "", SHARP, DOUBLESHARP];
@@ -5863,14 +5863,32 @@ const durationToNoteValue = duration => {
 };
 
 /**
+ * Parse a note string into note name and octave.
+ * This function correctly handles multi-digit octaves by using regex.
+ * @function
+ * @param {string} note - The note string (e.g., "C4", "C#10", "Db-1").
+ * @returns {Array} An array containing [noteName, octave].
+ */
+const parseNoteString = note => {
+    // Regex to match note name (letter + optional accidental) and octave (one or more digits, optional negative sign)
+    // Pattern: [A-Ga-g] for note letter, [#b♯♭]? for optional accidental, (-?\d+) for octave (multi-digit, can be negative)
+    const match = note.match(/^([A-Ga-g][#b♯♭]?)(-?\d+)$/);
+    if (match) {
+        return [match[1], Number(match[2])];
+    }
+    // Fallback to original behavior if regex doesn't match (for edge cases)
+    const len = note.length;
+    return [note.substring(0, len - 1), Number(last(note))];
+};
+
+/**
  * Convert a note string to pitch and octave.
  * @function
  * @param {string} note - The note string.
  * @returns {Array} An array containing pitch and octave.
  */
 const noteToPitchOctave = note => {
-    const len = note.length;
-    return [note.substring(0, len - 1), Number(last(note))];
+    return parseNoteString(note);
 };
 
 /**
@@ -6510,6 +6528,7 @@ if (typeof module !== "undefined" && module.exports) {
         getNoteFromInterval,
         numberToPitch,
         GetNotesForInterval,
+        parseNoteString,
         base64Encode,
         getStepSizeUp,
         getStepSizeDown,

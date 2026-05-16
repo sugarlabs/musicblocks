@@ -237,7 +237,6 @@ function setupDictActions(activity) {
                 activity.logo.turtleDicts[turtle][dict] = {};
             }
             activity.logo.turtleDicts[turtle][dict][key] = value;
-            console.log(activity.logo.turtleDicts[turtle]);
         }
 
         /**
@@ -251,6 +250,9 @@ function setupDictActions(activity) {
          * @returns {String|Number}
          */
         static getValue(dict, key, turtle, blk) {
+            if (!(turtle in activity.logo.turtleDicts)) {
+                activity.logo.turtleDicts[turtle] = {};
+            }
             if (!(dict in activity.logo.turtleDicts[turtle])) {
                 const msg = _("Dictionary with this name does not exist");
                 return msg;

@@ -1300,7 +1300,13 @@ class Logo {
         this.turtleDicts = {};
         this.notationNotes = {};
         this._midiData = {};
-        this.statusFields = [];
+        const statusWidgetOpen =
+            this.deps.widgetWindows &&
+            typeof this.deps.widgetWindows.isOpen === "function" &&
+            this.deps.widgetWindows.isOpen("status");
+        if (!statusWidgetOpen) {
+            this.statusFields = [];
+        }
         this.specialArgs = [];
         this.connectionStore = {};
         if (this.recordingBuffer && !this.recording) {

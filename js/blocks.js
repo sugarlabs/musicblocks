@@ -2084,8 +2084,17 @@ class Blocks {
                     } else if (myBlock.isArgBlock()) {
                         this.blockList[connection].connections[0] = null;
 
-                        /** If we are replacing a number block, put it in the trash */
-                        if (this.blockList[connection].name === "number") {
+                        /** If we are replacing an arg block, put certain default blocks in the trash */
+                        if (
+                            [
+                                "number",
+                                "solfege",
+                                "eastindiansolfege",
+                                "scaledegree2",
+                                "notename",
+                                "text"
+                            ].includes(this.blockList[connection].name)
+                        ) {
                             this.sendStackToTrash(this.blockList[connection]);
                         } else {
                             this.findDragGroup(connection);
@@ -6075,7 +6084,7 @@ class Blocks {
                 }
                 bIndex = chunkEnd;
                 if (bIndex < totalBlocks) {
-                    setTimeout(processChunk, 0);
+                    window.requestAnimationFrame(processChunk);
                 }
             };
 

@@ -22,7 +22,7 @@
    _, addTemperamentToDictionary, buildScale,
    deleteTemperamentFromList, docById, FLAT, getNoteFromInterval,
    getOctaveRatio, getTemperament, getTemperamentKeys,
-   isCustomTemperament, normalizeNoteAccidentals, pitchToFrequency, platformColor,
+   isCustomTemperament, normalizeNoteAccidentals, parseNoteString, pitchToFrequency, platformColor,
    rationalToFraction, setOctaveRatio, setOctaveRatio, SHARP, Singer,
    slicePath, updateTemperaments, wheelnav, frequencyToPitch
  */
@@ -1920,10 +1920,10 @@ function TemperamentWidget() {
 
         if (isCustomTemperament(this.inTemperament)) {
             const startingPitch = this._logo.synth.startingPitch;
-            const startingPitchOcatve = Number(startingPitch.slice(-1));
+            const startPitchParsed = parseNoteString(startingPitch);
             const startPitch = pitchToFrequency(
-                startingPitch.substring(0, startingPitch.length - 1),
-                startingPitchOcatve,
+                startPitchParsed[0],
+                startPitchParsed[1],
                 0,
                 "C Major"
             );
@@ -1973,9 +1973,9 @@ function TemperamentWidget() {
 
         setOctaveRatio(this.powerBase);
 
-        const len = this._logo.synth.startingPitch.length;
-        const note = this._logo.synth.startingPitch.substring(0, len - 1);
-        const octave = this._logo.synth.startingPitch.slice(-1);
+        const startPitchParsed = parseNoteString(this._logo.synth.startingPitch);
+        const note = startPitchParsed[0];
+        const octave = startPitchParsed[1];
         const newStack1 = [
             [0, "settemperament", 150, 150, [null, 1, 2, 3, null]],
             [1, ["temperamentname", { value: this.inTemperament }], 0, 0, [0]],
@@ -2077,7 +2077,7 @@ function TemperamentWidget() {
                     ]);
                     newStack.push([
                         idx + 11,
-                        ["number", { value: this.notes[i].slice(-1) }],
+                        ["number", { value: parseNoteString(this.notes[i])[1] }],
                         0,
                         0,
                         [idx + 9]
@@ -2144,7 +2144,7 @@ function TemperamentWidget() {
                     ]);
                     newStack.push([
                         idx + 9,
-                        ["number", { value: this.notes[i].slice(-1) }],
+                        ["number", { value: parseNoteString(this.notes[i])[1] }],
                         0,
                         0,
                         [idx + 7]
@@ -2171,11 +2171,8 @@ function TemperamentWidget() {
             const newTemperament = { pitchNumber: this.pitchNumber };
             for (let i = 0; i < this.pitchNumber; i++) {
                 const number = "" + i;
-                newTemperament[number] = [
-                    this.ratios[i],
-                    this.notes[i].substring(0, this.notes[i].length - 1),
-                    this.notes[i].slice(-1)
-                ];
+                const noteParsed = parseNoteString(this.notes[i]);
+                newTemperament[number] = [this.ratios[i], noteParsed[0], noteParsed[1]];
             }
             addTemperamentToDictionary(this.inTemperament, newTemperament);
             updateTemperaments();
@@ -2295,14 +2292,9 @@ function TemperamentWidget() {
 
         const duration = 1 / 2;
         const startingPitch = this._logo.synth.startingPitch;
-        const startingPitchOcatve = Number(startingPitch.slice(-1));
-        const octave = startingPitchOcatve - 1;
-        const startPitch = pitchToFrequency(
-            startingPitch.substring(0, startingPitch.length - 1),
-            octave,
-            0,
-            "C Major"
-        );
+        const startPitchParsed = parseNoteString(startingPitch);
+        const octave = startPitchParsed[1] - 1;
+        const startPitch = pitchToFrequency(startPitchParsed[0], octave, 0, "C Major");
 
         const that = this;
         let pitchNumber = this.pitchNumber;
