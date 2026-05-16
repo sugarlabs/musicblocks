@@ -644,7 +644,11 @@ function Synth() {
                 let ratio;
                 if (typeof t[interval] === "number") {
                     ratio = t[interval];
-                } else if (t[interval] && typeof t[interval] === "object" && typeof t[interval].ratio === "number") {
+                } else if (
+                    t[interval] &&
+                    typeof t[interval] === "object" &&
+                    typeof t[interval].ratio === "number"
+                ) {
                     ratio = t[interval].ratio;
                 } else {
                     continue;
