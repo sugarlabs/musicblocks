@@ -168,9 +168,9 @@ describe("MusicBlocks Application", () => {
 
             cy.get('[width="126"] tbody tr').eq(1).find("img").click();
 
-            cy.get("#palette", { timeout: 15000 }).should("be.visible");
+            cy.get("#palette", { timeout: 10000 }).should("be.visible");
 
-            cy.get("#palette img", { timeout: 15000 }).should("have.length.greaterThan", 0);
+            cy.get("#palette img", { timeout: 10000 }).should("have.length.greaterThan", 0);
         });
 
         it("should keep the palette visible after blocks load", () => {
