@@ -36,6 +36,7 @@
                 this.rel = 'stylesheet';
             "
         />
+        <link rel="stylesheet" href="css/tokens.css" />
         <!-- NOTE: The exact query-string URL here must be listed in sw.js `precacheFiles`.
          If you change `?v=fixed` (or remove/add a query param), update sw.js so offline still works. -->
         <link
@@ -115,7 +116,10 @@
             rel="preload"
             href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"
             as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
         />
         <noscript
             ><link
@@ -136,7 +140,10 @@
             as="style"
             integrity="sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07"
             crossorigin="anonymous"
-            onload="this.onload=null;this.rel='stylesheet'"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
         />
         <noscript
             ><link
@@ -178,7 +185,10 @@
             rel="preload"
             href="css/themes.css?v=fixed"
             as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
         />
         <noscript><link rel="stylesheet" href="css/themes.css?v=fixed" /></noscript>
         <script>
@@ -260,13 +270,7 @@
             ></canvas>
 
             <!--hidden at the beginning whilst everything loads-->
-            <div
-                class="popupMsg"
-                id="printText"
-                tabindex="-1"
-                aria-live="polite"
-                role="status"
-            >
+            <div class="popupMsg" id="printText" tabindex="-1" aria-live="polite" role="status">
                 <div class="contentWrapper">
                     <span id="printTextContent"></span>
                     <img
@@ -277,13 +281,7 @@
                     />
                 </div>
             </div>
-            <div
-                class="popupMsg"
-                id="errorText"
-                tabindex="-1"
-                aria-live="assertive"
-                role="alert"
-            >
+            <div class="popupMsg" id="errorText" tabindex="-1" aria-live="assertive" role="alert">
                 <div class="contentWrapper">
                     <span id="errorTextContent"></span>
                     <img
@@ -1169,7 +1167,10 @@
                             e.preventDefault(); // prevent default <a> behavior
                             const selectedLang = this.id; // ID corresponds to language code
                             const currentLang = readStorage("languagePreference");
-                            if (currentLang !== selectedLang && writeStorage("languagePreference", selectedLang)) {
+                            if (
+                                currentLang !== selectedLang &&
+                                writeStorage("languagePreference", selectedLang)
+                            ) {
                                 location.reload(); // automatically reload
                             }
                         });
@@ -1306,7 +1307,7 @@
 
                 iconCode.textContent = isFullscreen ? "\ue5d1" : "\ue5d0";
 
-                if (fullScreenBtn && typeof _ === 'function') {
+                if (fullScreenBtn && typeof _ === "function") {
                     var tooltipText = isFullscreen ? _("Exit Fullscreen") : _("Enter Fullscreen");
                     fullScreenBtn.setAttribute("data-tooltip", tooltipText);
                     if (window.jQuery) {

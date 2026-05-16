@@ -1,0 +1,188 @@
+/* ============================================
+   css/tokens.css
+   
+   Single source of truth for all theme colors.
+   
+   Usage:
+     color: var(--color-text);
+     background: var(--color-background);
+   
+   To add a new token:
+     1. Add it under :root for the light value
+     2. Add the dark override under body.dark
+     3. Add the highcontrast override under body.highcontrast
+   ============================================ */
+
+/* ── LIGHT THEME (default) ── */
+:root,
+body.light {
+    /* Text */
+    --color-text: black;
+    --color-block-text: #282828;
+    --color-label: #a0a0a0;
+
+    /* Backgrounds */
+    --color-background: #f9f9f9;
+    --color-dialogue-box: #ffffff;
+    --color-hover: #e0e0e0;
+
+    /* Buttons */
+    --color-blue-btn: #0066ff;
+    --color-blue-btn-hover: #023a76;
+    --color-cancel-btn: #e0e0e0;
+    --color-cancel-btn-hover: #afafaf;
+
+    /* Borders / Rules */
+    --color-rule: #e2e2e2;
+
+    /* Header / Nav */
+    --color-header: #2196f3;
+    --color-aux: #1a8cff;
+    --color-sub: #8cc6ff;
+
+    /* Palette */
+    --color-palette-bg: #ffffff;
+    --color-palette-selected: #f3f3f3;
+    --color-palette-label-bg: #8cc6ff;
+    --color-palette-label-selected: #1a8cff;
+    --color-palette-text: #666666;
+
+    /* Widget */
+    --color-widget-bg: #cccccc;
+    --color-widget-btn: #8cc6ff;
+    --color-widget-btn-select: #c8c8c8;
+
+    /* Selector */
+    --color-selector-bg: #8cc6ff;
+    --color-selector-selected: #1a8cff;
+
+    /* Trash */
+    --color-trash: #c0c0c0;
+    --color-trash-border: #808080;
+    --color-trash-active: #ff0000;
+
+    /* Misc */
+    --color-ruler-highlight: #ffbf00;
+    --color-rhythm-cell: #c8c8c8;
+    --color-stop-icon: #ea174c;
+    --color-hit-area: #ffffff;
+    --color-orange: #e37a00;
+    --color-disconnected: #c4c4c4;
+
+    /* Block input types */
+    --color-input-text: #ff5942;
+    --color-input-boolean: #c96df3;
+    --color-input-number: #ff5293;
+
+    /* Misc UI */
+    --color-highlight: #96d3f3;
+    --color-active-indicator: #88e20a;
+    --color-shadow: #000031;
+    --color-chat-user: #dcf8c6;
+}
+
+/* ── DARK THEME ── */
+body.dark {
+    /* Text */
+    --color-text: #e2e2e2;
+    --color-block-text: #ffffff;
+    --color-label: #bdbdbd;
+
+    /* Backgrounds */
+    --color-background: #303030;
+    --color-dialogue-box: #1c1c1c;
+    --color-hover: #808080;
+
+    /* Header / Nav */
+    --color-header: #1e88e5;
+    --color-aux: #1976d2;
+    --color-sub: #64b5f6;
+
+    /* Borders */
+    --color-rule: #303030;
+
+    /* Palette */
+    --color-palette-bg: #1c1c1c;
+    --color-palette-selected: #1e1e1e;
+    --color-palette-label-bg: #022363;
+    --color-palette-label-selected: #01143b;
+    --color-palette-text: #bdbdbd;
+
+    /* Widget */
+    --color-widget-bg: #454545;
+    --color-widget-btn: #225a91;
+    --color-widget-btn-select: #979797;
+
+    /* Selector */
+    --color-selector-bg: #64b5f6;
+    --color-selector-selected: #1e88e5;
+
+    /* Trash */
+    --color-trash: #757575;
+    --color-trash-border: #424242;
+    --color-trash-active: #e53935;
+
+    /* Misc */
+    --color-ruler-highlight: #ffeb3b;
+    --color-rhythm-cell: #303030;
+    --color-stop-icon: #d50000;
+    --color-hit-area: #121212;
+    --color-orange: #fb8c00;
+    --color-disconnected: #5c5c5c;
+}
+
+/* ── HIGH CONTRAST THEME ── */
+body.highcontrast {
+    /* Text */
+    --color-text: #ffffff;
+    --color-block-text: #000000;
+    --color-label: #ffffff;
+
+    /* Backgrounds */
+    --color-background: #000000;
+    --color-dialogue-box: #000000;
+    --color-hover: #666666;
+
+    /* Buttons */
+    --color-blue-btn: #00ffff;
+    --color-blue-btn-hover: #00cccc;
+    --color-cancel-btn: #ffffff;
+    --color-cancel-btn-hover: #cccccc;
+
+    /* Header */
+    --color-header: #00ffff;
+    --color-aux: #00cccc;
+    --color-sub: #00ffff;
+
+    /* Borders */
+    --color-rule: #ffffff;
+
+    /* Palette */
+    --color-palette-bg: #000000;
+    --color-palette-selected: #111111;
+    --color-palette-label-bg: #000080;
+    --color-palette-label-selected: #0000ff;
+    --color-palette-text: #ffffff;
+
+    /* Widget */
+    --color-widget-bg: #000000;
+    --color-widget-btn: #00ffff;
+    --color-widget-btn-select: #ffffff;
+
+    /* Selector */
+    --color-selector-bg: #00ffff;
+    --color-selector-selected: #00cccc;
+
+    /* Trash */
+    --color-trash: #ffffff;
+    --color-trash-border: #ffffff;
+    --color-trash-active: #ff0000;
+
+    /* Misc */
+    --color-ruler-highlight: #ffff00;
+    --color-rhythm-cell: #333333;
+    --color-stop-icon: #ff0000;
+    --color-hit-area: #000000;
+    --color-orange: #ff8800;
+    --color-disconnected: #666666;
+}
