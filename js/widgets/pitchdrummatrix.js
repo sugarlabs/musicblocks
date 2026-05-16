@@ -998,7 +998,7 @@ class PitchDrumMatrix {
 
             cellRow = pdmTable.rows[row];
             const noteArg = cellRow.cells[0].dataset.noteArg;
-            const octave = parseInt(cellRow.cells[0].dataset.octave, 10);
+            octave = parseInt(cellRow.cells[0].dataset.octave, 10);
 
             drumRow = drumTable.rows[0];
             const drumImg = drumRow.cells[col].querySelector("img");
