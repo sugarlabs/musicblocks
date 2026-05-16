@@ -491,17 +491,14 @@ class Singer {
         const saveSuppressStatus = tur.singer.suppressOutput;
 
         // We need to save the state of the boxes and heap although there is a potential of a boxes collision with other turtles
-	// eslint-disable-next-line eqeqeq
-        const saveBoxes =
-            logo.boxes != null ? deepClone(logo.boxes) : undefined;
-	// eslint-disable-next-line eqeqeq
+        // eslint-disable-next-line eqeqeq
+        const saveBoxes = logo.boxes != null ? deepClone(logo.boxes) : undefined;
+        // eslint-disable-next-line eqeqeq
         const saveTurtleHeaps =
-            logo.turtleHeaps[turtle] != null ? deepClone(logo.turtleHeaps[turtle])
-                : undefined;
-	// eslint-disable-next-line eqeqeq
+            logo.turtleHeaps[turtle] != null ? deepClone(logo.turtleHeaps[turtle]) : undefined;
+        // eslint-disable-next-line eqeqeq
         const saveTurtleDicts =
-            logo.turtleDicts[turtle] != null ? deepClone(logo.turtleDicts[turtle])
-                : undefined;
+            logo.turtleDicts[turtle] != null ? deepClone(logo.turtleDicts[turtle]) : undefined;
         // .. and the turtle state
         const saveX = tur.x;
         const saveY = tur.y;
@@ -552,19 +549,19 @@ class Singer {
         tur.singer.tallyNotes = saveTallyNotes;
 
         // Restore previous state
-	// eslint-disable-next-line eqeqeq
+        // eslint-disable-next-line eqeqeq
         if (saveBoxes == null) {
             logo.boxes = {};
         } else {
             logo.boxes = saveBoxes;
         }
-	// eslint-disable-next-line eqeqeq
+        // eslint-disable-next-line eqeqeq
         if (saveTurtleHeaps == null) {
             logo.turtleHeaps = {};
         } else {
             logo.turtleHeaps[turtle] = saveTurtleHeaps;
         }
-	// eslint-disable-next-line eqeqeq
+        // eslint-disable-next-line eqeqeq
         if (saveTurtleDicts == null) {
             logo.turtleDicts = {};
         } else {
@@ -614,19 +611,14 @@ class Singer {
 
         const saveState = {
             suppressOutput: tur.singer.suppressOutput,
-	    // eslint-disable-next-line eqeqeq
-            boxes:
-                logo.boxes != null ? deepClone(logo.boxes) : undefined,
-	    // eslint-disable-next-line eqeqeq
+            // eslint-disable-next-line eqeqeq
+            boxes: logo.boxes != null ? deepClone(logo.boxes) : undefined,
+            // eslint-disable-next-line eqeqeq
             turtleHeaps:
-                logo.turtleHeaps[turtle] != null
-                    ? deepClone(logo.turtleHeaps[turtle])
-                    : undefined,
-	    // eslint-disable-next-line eqeqeq
+                logo.turtleHeaps[turtle] != null ? deepClone(logo.turtleHeaps[turtle]) : undefined,
+            // eslint-disable-next-line eqeqeq
             turtleDicts:
-                logo.turtleDicts[turtle] != null
-                    ? deepClone(logo.turtleDicts[turtle])
-                    : undefined,
+                logo.turtleDicts[turtle] != null ? deepClone(logo.turtleDicts[turtle]) : undefined,
             x: tur.x,
             y: tur.y,
             color: tur.painter.color,
@@ -683,19 +675,14 @@ class Singer {
             penState: saveState.penState
         });
 
-	// eslint-disable-next-line eqeqeq
-        activity.logo.boxes =
-            saveState.boxes != null ? saveState.boxes : {};
-	// eslint-disable-next-line eqeqeq
+        // eslint-disable-next-line eqeqeq
+        activity.logo.boxes = saveState.boxes != null ? saveState.boxes : {};
+        // eslint-disable-next-line eqeqeq
         activity.logo.turtleHeaps[turtle] =
-            saveState.turtleHeaps != null
-                ? saveState.turtleHeaps
-                : {};
-	// eslint-disable-next-line eqeqeq
+            saveState.turtleHeaps != null ? saveState.turtleHeaps : {};
+        // eslint-disable-next-line eqeqeq
         activity.logo.turtleDicts[turtle] =
-            saveState.turtleDicts != null
-                ? saveState.turtleDicts
-                : {};
+            saveState.turtleDicts != null ? saveState.turtleDicts : {};
 
         tur.painter.doPenUp();
         tur.painter.doSetXY(saveState.x, saveState.y);
@@ -1892,7 +1879,7 @@ class Singer {
             if (tur.singer.swing.length > 0) {
                 // Deprecated swing path; newswing2 takes the target as an argument.
                 const swingTargetLast = last(tur.singer.swingTarget);
-		// eslint-disable-next-line eqeqeq
+                // eslint-disable-next-line eqeqeq
                 if (swingTargetLast == null) {
                     // When we start a swing we need to keep track of the initial beat value
                     tur.singer.swingTarget[tur.singer.swingTarget.length - 1] = noteBeatValue;
@@ -2632,7 +2619,7 @@ class Singer {
 
         tur.singer.pushedNote = false;
 
-	// eslint-disable-next-line eqeqeq
+        // eslint-disable-next-line eqeqeq
         if (callback != null) {
             callback();
         }
