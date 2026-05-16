@@ -33,6 +33,7 @@ class StatusMatrix {
         this.isOpen = true;
         this.isMaximized = false;
         this._cellScale = window.innerWidth / 1200;
+        const selectorBg = "var(--mb-selector-bg)";
         let iconSize = StatusMatrix.ICONSIZE * this._cellScale;
 
         this.widgetWindow = window.widgetWindows.windowFor(this, "status", "status");
@@ -178,14 +179,14 @@ class StatusMatrix {
             b.textContent = str;
             cell.appendChild(b);
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
-            cell.style.backgroundColor = platformColor.selectorBackground;
+            cell.style.backgroundColor = selectorBg;
             cell.style.paddingLeft = "10px";
             for (const turtle of this.activity.turtles.turtleList) {
                 if (turtle.inTrash) {
                     continue;
                 }
                 cell = row.insertCell();
-                cell.style.backgroundColor = platformColor.selectorBackground;
+                cell.style.backgroundColor = selectorBg;
                 cell.style.fontSize =
                     Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
                 cell.textContent = "";
@@ -206,14 +207,14 @@ class StatusMatrix {
             b.textContent = label;
             cell.appendChild(b);
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
-            cell.style.backgroundColor = platformColor.selectorBackground;
+            cell.style.backgroundColor = selectorBg;
             cell.style.paddingLeft = "10px";
             for (const turtle of this.activity.turtles.turtleList) {
                 if (turtle.inTrash) {
                     continue;
                 }
                 cell = row.insertCell();
-                cell.style.backgroundColor = platformColor.selectorBackground;
+                cell.style.backgroundColor = selectorBg;
                 cell.style.fontSize =
                     Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
                 cell.textContent = "";

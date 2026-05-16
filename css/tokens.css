@@ -1,0 +1,52 @@
+/**
+ * MusicBlocks v3.4.1
+ *
+ * @author Walter Bender
+ *
+ * @copyright 2026 Walter Bender
+ *
+ * @license
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/*
+ * MusicBlocks Design Tokens
+ *
+ * Single source of truth for theme-aware CSS custom properties.
+ * Light-theme values are set on :root; dark and high-contrast
+ * values are overridden via body class.
+ *
+ * Usage in JS:
+ *   element.style.backgroundColor = "var(--mb-selector-bg)"
+ *
+ * Refs: js/utils/platformstyle.js (platformThemes)
+ */
+
+/* Light theme (default) */
+:root {
+    --mb-selector-bg: #8cc6ff;
+    --mb-selector-selected: #1a8cff;
+}
+
+/* Dark theme */
+body.dark {
+    --mb-selector-bg: #64b5f6;
+    --mb-selector-selected: #1e88e5;
+}
+
+/* High contrast theme */
+body.highcontrast {
+    --mb-selector-bg: #00ffff;
+    --mb-selector-selected: #00cccc;
+}
