@@ -1,0 +1,282 @@
+/* =======================================================
+   MusicBlocks Design Tokens — css/tokens.css
+   Single source of truth for all design decisions.
+   
+   Usage:
+     Light theme values are set on :root
+     Dark theme overrides on body.dark
+     High-contrast overrides on body.highcontrast
+   
+   Consuming a token in JS (after migration):
+     getComputedStyle(document.body).getPropertyValue('--color-primary').trim()
+   ======================================================= */
+
+:root {
+    --color-primary:             #0066ff;
+    --color-primary-hover:       #023a76;
+    --color-primary-text:        #ffffff;
+
+    --color-background:          #f9f9f9;
+    --color-surface:             #ffffff;
+    --color-surface-raised:      #f0f0f0;
+    --color-surface-widget:      #cccccc;
+    --color-canvas:              #92b5c8;
+
+    --color-text-primary:        #000000;
+    --color-text-secondary:      #555555;
+    --color-text-muted:          #a0a0a0;
+    --color-text-on-primary:     #ffffff;
+    --color-text-block:          #282828;
+    --color-heading:             #0066ff;
+
+    --color-btn-primary:         #0066ff;
+    --color-btn-primary-hover:   #023a76;
+    --color-btn-primary-text:    #ffffff;
+    --color-btn-cancel:          #e0e0e0;
+    --color-btn-cancel-hover:    #afafaf;
+    --color-btn-cancel-text:     #000000;
+
+    --color-border:              #cccccc;
+    --color-border-focus:        #0066ff;
+
+    --color-focus:               #0066ff;
+
+    --color-nav-bg:              #8bc34a;
+    --color-nav-text:            #ffffff;
+    --color-header-bar:          #2196f3;
+    --color-header-bg:           #4da6ff;
+    --color-header-aux:          #1a8cff;
+    --color-header-sub:          #8cc6ff;
+
+    --color-palette-bg:          #ffffff;
+    --color-palette-selected:    #f3f3f3;
+    --color-palette-label-bg:    #8cc6ff;
+    --color-palette-label-sel:   #1a8cff;
+    --color-palette-text:        #666666;
+
+    --color-input-default:       #ffffff;
+    --color-input-text-block:    #ff5942;
+    --color-input-boolean:       #c96df3;
+    --color-input-number:        #ff5293;
+    --color-input-music:         #8cc6ff;
+    --color-input-select:        #88e20a;
+
+    --color-widget-bg:           rgba(255, 255, 255, 0.85);
+    --color-widget-surface:      #cccccc;
+    --color-widget-button:       #8cc6ff;
+    --color-widget-button-sel:   #c8c8c8;
+    --color-widget-button-dark:  #225a91;
+
+    --color-block-pitch:         #7cd622;
+    --color-block-rhythm:        #ff8700;
+    --color-block-tone:          #3edcdd;
+    --color-block-graphics:      #92a9ff;
+    --color-block-boxes:         #ffb900;
+    --color-block-action:        #f3c800;
+    --color-block-media:         #ff664b;
+    --color-block-number:        #ff6ea1;
+    --color-block-boolean:       #d97df5;
+    --color-block-flow:          #d98a43;
+    --color-block-sensors:       #aabb00;
+    --color-block-extras:        #c4c4c4;
+    --color-block-widgets-cat:   #7cd622;
+
+    --color-trash:               #c0c0c0;
+    --color-trash-border:        #808080;
+    --color-trash-active:        #ff0000;
+    --color-stop-icon:           #ea174c;
+
+    --color-ruler-highlight:     #ffbf00;
+    --color-rhythm-cell:         #c8c8c8;
+    --color-progress-bar:        #4caf50;
+
+    --color-selector-bg:         #8cc6ff;
+    --color-selector-selected:   #1a8cff;
+
+    --color-search-border:       #03a9f4;
+    --color-search-border-focus: #4da6ff;
+    --color-search-bg:           #ffffff;
+    --color-search-shadow-focus: rgba(77, 166, 255, 0.2);
+
+    --color-pie-bg:              #f2f2f2;
+    --color-rule:                #e2e2e2;
+
+    --color-notification-bg:     #1e88e5;
+    --color-notification-text:   #ffffff;
+
+    --color-popdown-bg:          rgba(255, 255, 255, 0.85);
+    --color-back-bar:            #4682b4;
+    --color-popup-msg-bg:        #8cc6ff;
+
+    --color-orange:              #e37a00;
+
+    --space-1:   4px;
+    --space-2:   8px;
+    --space-3:  12px;
+    --space-4:  16px;
+    --space-5:  20px;
+    --space-6:  24px;
+    --space-8:  32px;
+    --space-10: 40px;
+
+    /* for border radius */
+    --radius-sm:   4px;
+    --radius-md:   8px;
+    --radius-lg:  16px;
+    --radius-pill: 24px;
+
+   
+    --shadow-sm:  0 1px 3px rgba(0, 0, 0, 0.12);
+    --shadow-md:  0 4px 10px rgba(0, 0, 0, 0.2);
+    --shadow-lg:  0 4px 12px rgba(0, 0, 0, 0.15);
+
+   
+    --font-family-base:   sans-serif;
+    --font-size-sm:       12px;
+    --font-size-md:       14px;
+    --font-size-lg:       16px;
+    --font-size-xl:       18px;
+    --font-size-2xl:      24px;
+    --font-size-3xl:      30px;
+    --font-size-nav:      32px;
+    --font-weight-normal: 400;
+    --font-weight-bold:   700;
+
+    --z-nav:      100;
+    --z-palette:  9999;
+    --z-modal:    10000;
+    --z-search:   2000;
+    --z-loading:  99;
+}
+
+
+body.dark {
+    --color-primary:             #0066ff;
+    --color-primary-hover:       #023a76;
+
+    --color-background:          #303030;
+    --color-surface:             #1c1c1c;
+    --color-surface-raised:      #454545;
+    --color-surface-widget:      #454545;
+    --color-canvas:              #303030;
+
+    --color-text-primary:        #e2e2e2;
+    --color-text-secondary:      #bdbdbd;
+    --color-text-muted:          #bdbdbd;
+    --color-text-block:          #ffffff;
+    --color-heading:             #0066ff;
+
+    --color-btn-cancel:          #f1f1f1;
+    --color-btn-cancel-hover:    #afafaf;
+    --color-btn-cancel-text:     #000000;
+
+    --color-border:              #444444;
+    --color-border-focus:        #66aaff;
+    --color-focus:               #66aaff;
+
+    --color-nav-bg:              #1e88e5;
+    --color-header-bg:           #1e88e5;
+    --color-header-aux:          #1976d2;
+    --color-header-sub:          #64b5f6;
+
+    --color-palette-bg:          #1c1c1c;
+    --color-palette-selected:    #1e1e1e;
+    --color-palette-label-bg:    #022363;
+    --color-palette-label-sel:   #01143b;
+    --color-palette-text:        #bdbdbd;
+
+    --color-input-music:         #8cc6ff;
+
+    --color-widget-bg:           rgba(69, 69, 69, 0.92);
+    --color-widget-surface:      #454545;
+    --color-widget-button:       #225a91;
+    --color-widget-button-sel:   #979797;
+
+    --color-block-pitch:         #2e7d32;
+    --color-block-rhythm:        #bf360c;
+    --color-block-tone:          #00838f;
+    --color-block-graphics:      #3949ab;
+    --color-block-boxes:         #e65100;
+    --color-block-action:        #ff8f00;
+    --color-block-media:         #c62828;
+    --color-block-number:        #ad1457;
+    --color-block-boolean:       #7b1fa2;
+    --color-block-flow:          #5d4037;
+    --color-block-sensors:       #827717;
+    --color-block-extras:        #424242;
+    --color-block-widgets-cat:   #2e7d32;
+
+    --color-trash:               #757575;
+    --color-trash-border:        #424242;
+    --color-trash-active:        #e53935;
+    --color-stop-icon:           #d50000;
+
+    --color-ruler-highlight:     #ffeb3b;
+    --color-rhythm-cell:         #303030;
+    --color-selector-bg:         #64b5f6;
+    --color-selector-selected:   #1e88e5;
+
+    --color-popdown-bg:          rgba(69, 69, 69, 0.92);
+    --color-pie-bg:              #1c1c1c;
+    --color-rule:                #303030;
+
+    --color-orange:              #fb8c00;
+}
+
+
+body.highcontrast {
+    --color-primary:             #00ffff;
+    --color-primary-hover:       #00cccc;
+    --color-primary-text:        #000000;
+
+    --color-background:          #000000;
+    --color-surface:             #000000;
+    --color-surface-raised:      #111111;
+    --color-canvas:              #000000;
+
+    --color-text-primary:        #ffffff;
+    --color-text-secondary:      #ffffff;
+    --color-text-muted:          #ffffff;
+    --color-text-block:          #000000;
+    --color-heading:             #ffff00;
+
+    --color-btn-primary:         #00ffff;
+    --color-btn-primary-hover:   #00cccc;
+    --color-btn-primary-text:    #000000;
+    --color-btn-cancel:          #ffffff;
+    --color-btn-cancel-hover:    #cccccc;
+    --color-btn-cancel-text:     #000000;
+
+    --color-border:              #ffffff;
+    --color-border-focus:        #ffff00;
+    --color-focus:               #ffff00;
+
+    --color-nav-bg:              #00ffff;
+    --color-nav-text:            #000000;
+    --color-header-bg:           #00ffff;
+    --color-header-aux:          #00cccc;
+    --color-header-sub:          #00ffff;
+
+    --color-palette-bg:          #000000;
+    --color-palette-selected:    #111111;
+    --color-palette-label-bg:    #000080;
+    --color-palette-label-sel:   #0000ff;
+    --color-palette-text:        #ffffff;
+
+    --color-widget-bg:           rgba(0, 0, 0, 0.95);
+    --color-widget-surface:      #000000;
+    --color-widget-button:       #00ffff;
+    --color-widget-button-sel:   #ffffff;
+
+    --color-trash:               #ffffff;
+    --color-trash-border:        #ffffff;
+    --color-ruler-highlight:     #ffff00;
+
+    --color-selector-bg:         #00ffff;
+    --color-selector-selected:   #00cccc;
+
+    --color-orange:              #ff8800;
+    --color-stop-icon:           #ff0000;
+    --color-rule:                #ffffff;
+    --color-pie-bg:              #000000;
+}

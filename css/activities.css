@@ -11,7 +11,7 @@
     url(https://example.com/MaterialIcons-Regular.ttf) format('truetype');
 }
 */
-
+@import url("tokens.css");
 @import url("play-only-mode.css");
 
 *:focus:not(:focus-visible) {
@@ -54,14 +54,14 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 }
 
 #newdropdown {
-    font-size: 16px;
-    background-color: #fff;
-    border: 1px solid #cccccc;
-    color: #000000;
-    padding: 24px;
+    font-size: var(--font-size-lg);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+    padding: var(--space-6);
     width: 400px;
-    border-radius: 8px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
 }
 
 #newdropdown li {
@@ -86,9 +86,9 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 
 .new-project-title {
     line-height: normal;
-    font-size: 24px;
+    font-size: var(--font-size-2xl);
     text-align: left;
-    color: #0066ff;
+    color: var(--color-heading);
 }
 
 #confirmation-message {
@@ -103,24 +103,24 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 400px;
-    padding: 24px;
-    background-color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
-    z-index: 10000;
+    padding: var(--space-6);
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-md);
+    border-radius: var(--radius-md);
+    z-index: var(--z-modal);
     text-align: left;
 }
 
 .modal-title {
-    color: #0066ff;
-    font-size: 24px;
-    margin: 0 0 16px 0;
+    color: var(--color-heading);
+    font-size: var(--font-size-2xl);
+    margin: 0 0 var(--space-4) 0;
 }
 
 .modal-message {
-    color: black;
-    font-size: 16px;
-    margin-bottom: 24px;
+    color: var(--color-text-primary);
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--space-6);
 }
 
 .clear-button-container {
@@ -130,33 +130,33 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 
 .confirm-button {
     border: none;
-    border-radius: 4px;
-    padding: 8px 16px;
-    font-weight: bold;
+    border-radius: var(--radius-sm);
+    padding: var(--space-2) var(--space-4);
+    font-weight: var(--font-weight-bold);
     cursor: pointer;
-    background-color: #0066ff;
-    color: white;
-    margin-right: 16px;
+    background-color: var(--color-btn-primary);
+    color: var(--color-btn-primary-text);
+    margin-right: var(--space-4);
     transition: background-color 0.2s ease;
 }
 
 .confirm-button:hover {
-    background-color: #023a76;
+    background-color: var(--color-btn-primary-hover);
 }
 
 .cancel-button {
-  border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  background-color: #e0e0e0;
-  color: black;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: var(--space-2) var(--space-4);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    background-color: var(--color-btn-cancel);
+    color: var(--color-btn-cancel-text);
 }
 
 .cancel-button:hover {
-    background-color: #afafaf;
+    background-color: var(--color-btn-cancel-hover);
 }
 
 .modal {
@@ -543,15 +543,15 @@ nav {
     position: fixed;
     top: 0px;
     left: 0px;
-    z-index: 100;
-    background-color: #8bc34a;
+    z-index: var(--z-nav);
+    background-color: var(--color-nav-bg);
     height: 64px;
     width: 100%;
     box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.16), 0px 2px 10px 0px rgba(0, 0, 0, 0.12);
-    font: 32px sans;
+    font: var(--font-size-nav) sans;
     vertical-align: middle;
     line-height: 64px;
-    color: white;
+    color: var(--color-nav-text);
 }
 
 nav .nav-container {
@@ -679,8 +679,7 @@ img.icon:hover {
 }
 
 body {
-    background-color: #92b5c8 !important;
-    /*  2.5B 7/4 */
+    background-color: var(--color-canvas) !important;
     padding: 0;
     margin: 0;
     font-family: sans-serif;
@@ -1160,12 +1159,12 @@ table {
     width: 100%;
     position: absolute;
     top: 0;
-    background: #2196f3;
-    font-family: sans-serif;
+    background: var(--color-header-bar);
+    font-family: var(--font-family-base);
     display: flex;
     flex-direction: column;
     justify-content: center;
-    color: #fff;
+    color: var(--color-text-on-primary);
     font-size: 1.1em;
     text-align: center;
     height: 55px;
@@ -2086,8 +2085,8 @@ table {
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: #1e88e5;
-    color: white;
+    background-color: var(--color-notification-bg);
+    color: var(--color-notification-text);
     padding: 15px 20px;
     border-radius: 8px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
