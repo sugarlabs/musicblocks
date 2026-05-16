@@ -1003,7 +1003,10 @@ describe("PhraseMaker Widget", () => {
                         removeEventListener: jest.fn(),
                         getAttribute: jest.fn(() => 1)
                     }
-                ]
+                ],
+                parentElement: {
+                    addEventListener: jest.fn()
+                }
             }
         ];
 

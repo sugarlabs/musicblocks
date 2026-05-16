@@ -164,13 +164,14 @@ function TemperamentWidget() {
         cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = platformColor.selectorBackground;
 
-        cell.onmouseover = function () {
+        // Use Pointer Events so hover feedback works on touch and stylus too.
+        cell.style.touchAction = "manipulation";
+        cell.addEventListener("pointerenter", function () {
             this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        };
-
-        cell.onmouseout = function () {
+        });
+        cell.addEventListener("pointerleave", function () {
             this.style.backgroundColor = platformColor.selectorBackground;
-        };
+        });
 
         return cell;
     };
@@ -807,20 +808,17 @@ function TemperamentWidget() {
             notesCell[i][0].style.backgroundColor = platformColor.selectorBackground;
             notesCell[i][0].style.textAlign = "center";
 
-            notesCell[i][0].onmouseover = function () {
+            notesCell[i][0].style.touchAction = "manipulation";
+            notesCell[i][0].addEventListener("pointerenter", function () {
                 this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-            };
-
-            notesCell[i][0].onmouseout = function () {
+            });
+            notesCell[i][0].addEventListener("pointerleave", function () {
                 this.style.backgroundColor = platformColor.selectorBackground;
-            };
+            });
 
             const playImage = docById("play_" + i);
 
-            playImage.onmouseover = function () {
-                this.style.cursor = "pointer";
-            };
-
+            playImage.style.cursor = "pointer";
             playImage.onclick = function (event) {
                 that.playNote(event.target.dataset.id);
             };
@@ -1050,9 +1048,7 @@ function TemperamentWidget() {
 
         addDivision(false);
 
-        divAppend.onmouseover = function () {
-            this.style.cursor = "pointer";
-        };
+        divAppend.style.cursor = "pointer";
 
         let pitchNumber = this.pitchNumber;
         let pitchNumber1 = Number(docById("octaveIn").value);
@@ -1271,9 +1267,7 @@ function TemperamentWidget() {
 
         addButtons(false);
 
-        divAppend.onmouseover = function () {
-            this.style.cursor = "pointer";
-        };
+        divAppend.style.cursor = "pointer";
 
         divAppend.onclick = function (event) {
             const input1 = docById("ratioIn").value;
@@ -1618,9 +1612,7 @@ function TemperamentWidget() {
         divAppend.style.overflow = "auto";
         arbitraryEdit.append(divAppend);
 
-        divAppend.onmouseover = function () {
-            this.style.cursor = "pointer";
-        };
+        divAppend.style.cursor = "pointer";
 
         divAppend.onclick = function () {
             that.ratios = that.tempRatios1.slice();
@@ -1824,9 +1816,7 @@ function TemperamentWidget() {
         divAppend.style.overflow = "auto";
         octaveSpaceEdit.append(divAppend);
 
-        divAppend.onmouseover = function () {
-            this.style.cursor = "pointer";
-        };
+        divAppend.style.cursor = "pointer";
 
         divAppend.onclick = function () {
             const startRatio = docById("startNote").value;

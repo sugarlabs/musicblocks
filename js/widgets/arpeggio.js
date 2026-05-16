@@ -347,16 +347,18 @@ class Arpeggio {
 
             cell.setAttribute("id", i + "," + arpeggioIdx); // row,column
 
-            cell.onmouseover = () => {
+            // Use Pointer Events so hover feedback works on touch and stylus too.
+            cell.style.touchAction = "manipulation";
+            cell.addEventListener("pointerenter", () => {
                 if (cell.style.backgroundColor !== "black") {
                     cell.style.backgroundColor = platformColor.selectorSelected;
                 }
-            };
-            cell.onmouseout = () => {
+            });
+            cell.addEventListener("pointerleave", () => {
                 if (cell.style.backgroundColor !== "black") {
                     cell.style.backgroundColor = platformColor.selectorBackground;
                 }
-            };
+            });
         }
 
         const arpeggioNoteTable = docById("arpeggioNoteTable");

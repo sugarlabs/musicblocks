@@ -1501,53 +1501,56 @@ function MusicKeyboard(activity) {
             };
         }
 
-        let row, isMouseDown;
+        let row;
         for (let i = 0; i < this.layout.length; i++) {
-            // The buttons get added to the embedded table.
             row = docById("mkb" + i);
             for (let j = 0; j < row.cells.length; j++) {
                 cell = row.cells[j];
-                // Give each clickable cell a unique id
                 cell.setAttribute("id", i + ":" + j);
-
-                isMouseDown = false;
-
-                cell.onmousedown = e => {
-                    cell = e.target;
-                    isMouseDown = true;
-                    const obj = cell.id.split(":");
-                    // i = Number(obj[0]);
-                    const j = Number(obj[1]);
-                    if (cell.style.backgroundColor === "black") {
-                        cell.style.backgroundColor = cell.getAttribute("cellColor");
-                        this._setNotes(j, false);
-                    } else {
-                        cell.style.backgroundColor = "black";
-                        this._setNotes(j, true);
-                    }
-                };
-
-                cell.onmouseover = () => {
-                    // let obj, i, j;
-                    // obj = cell.id.split(":");
-                    // i = Number(obj[0]);
-                    // j = Number(obj[1]);
-                    if (isMouseDown) {
-                        if (cell.style.backgroundColor === "black") {
-                            cell.style.backgroundColor = cell.getAttribute("cellColor");
-                            this._setNotes(j, false);
-                        } else {
-                            cell.style.backgroundColor = "black";
-                            this._setNotes(j, true);
-                        }
-                    }
-                };
-
-                cell.onmouseup = function () {
-                    isMouseDown = false;
-                };
+                // Prevent scroll during drag so touch drag-paint works.
+                cell.style.touchAction = "none";
             }
         }
+
+        // Pointer Events on the shared table handle both mouse drag-paint and
+        // touch drag-paint (elementFromPoint resolves the cell under the finger).
+        const mkbTable = docById("mkbTable");
+        let isPointerDown = false;
+        let lastDragCell = null;
+
+        const __toggleDragCell = target => {
+            const targetCell = target.closest("td");
+            if (!targetCell || !targetCell.id || !targetCell.id.includes(":")) return;
+            if (targetCell === lastDragCell) return;
+            lastDragCell = targetCell;
+            const j = Number(targetCell.id.split(":")[1]);
+            if (targetCell.style.backgroundColor === "black") {
+                targetCell.style.backgroundColor = targetCell.getAttribute("cellColor");
+                this._setNotes(j, false);
+            } else {
+                targetCell.style.backgroundColor = "black";
+                this._setNotes(j, true);
+            }
+        };
+
+        mkbTable.addEventListener("pointerdown", e => {
+            isPointerDown = true;
+            lastDragCell = null;
+            __toggleDragCell(e.target);
+        });
+
+        mkbTable.addEventListener("pointermove", e => {
+            if (!isPointerDown) return;
+            const el = document.elementFromPoint(e.clientX, e.clientY);
+            if (el) __toggleDragCell(el);
+        });
+
+        const __endDrag = () => {
+            isPointerDown = false;
+            lastDragCell = null;
+        };
+        mkbTable.addEventListener("pointerup", __endDrag);
+        mkbTable.addEventListener("pointercancel", __endDrag);
     };
 
     /**
