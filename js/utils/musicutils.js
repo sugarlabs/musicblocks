@@ -1816,112 +1816,112 @@ const INTERVAL_CENTS = {
 const TEMPERAMENT_INTERVALS = {
     "perfect 1": {
         ratio: 1 / 1,
-        cents: 0,
+        cents: 1200 * Math.log2(1 / 1),
         semitones: 0
     },
     "minor 2": {
         ratio: 16 / 15,
-        cents: 111.71326908300068,
+        cents: 1200 * Math.log2(16 / 15),
         semitones: 1
     },
     "augmented 1": {
         ratio: 25 / 24,
-        cents: 70.67259566700143,
+        cents: 1200 * Math.log2(25 / 24),
         semitones: 1
     },
     "major 2": {
         ratio: 9 / 8,
-        cents: 203.91000173097933,
+        cents: 1200 * Math.log2(9 / 8),
         semitones: 2
     },
     "augmented 2": {
         ratio: 75 / 64,
-        cents: 275.5157301899997,
+        cents: 1200 * Math.log2(75 / 64),
         semitones: 3
     },
     "minor 3": {
         ratio: 6 / 5,
-        cents: 315.64134046300163,
+        cents: 1200 * Math.log2(6 / 5),
         semitones: 3
     },
     "major 3": {
         ratio: 5 / 4,
-        cents: 386.3139908641587,
+        cents: 1200 * Math.log2(5 / 4),
         semitones: 4
     },
     "augmented 3": {
         ratio: 125 / 96,
-        cents: 463.68602908000123,
+        cents: 1200 * Math.log2(125 / 96),
         semitones: 5
     },
     "diminished 4": {
         ratio: 32 / 25,
-        cents: 427.10702718000125,
+        cents: 1200 * Math.log2(32 / 25),
         semitones: 4
     },
     "perfect 4": {
         ratio: 4 / 3,
-        cents: 498.0449991346126,
+        cents: 1200 * Math.log2(4 / 3),
         semitones: 5
     },
     "augmented 4": {
         ratio: 25 / 18,
-        cents: 568.7189065899993,
+        cents: 1200 * Math.log2(25 / 18),
         semitones: 6
     },
     "diminished 5": {
         ratio: 36 / 25,
-        cents: 631.2820409100001,
+        cents: 1200 * Math.log2(36 / 25),
         semitones: 6
     },
     "perfect 5": {
         ratio: 3 / 2,
-        cents: 701.9550008653874,
+        cents: 1200 * Math.log2(3 / 2),
         semitones: 7
     },
     "augmented 5": {
         ratio: 25 / 16,
-        cents: 772.8929728199988,
+        cents: 1200 * Math.log2(25 / 16),
         semitones: 8
     },
     "minor 6": {
         ratio: 8 / 5,
-        cents: 813.6869709743349,
+        cents: 1200 * Math.log2(8 / 5),
         semitones: 8
     },
     "major 6": {
         ratio: 5 / 3,
-        cents: 884.3586595369983,
+        cents: 1200 * Math.log2(5 / 3),
         semitones: 9
     },
     "augmented 6": {
         ratio: 125 / 72,
-        cents: 952.9435867400002,
+        cents: 1200 * Math.log2(125 / 72),
         semitones: 10
     },
     "minor 7": {
         ratio: 16 / 9,
-        cents: 996.0899982690207,
+        cents: 1200 * Math.log2(16 / 9),
         semitones: 10
     },
     "major 7": {
         ratio: 15 / 8,
-        cents: 1088.2686509169993,
+        cents: 1200 * Math.log2(15 / 8),
         semitones: 11
     },
     "augmented 7": {
         ratio: 125 / 64,
-        cents: 1156.980999182999,
+        cents: 1200 * Math.log2(125 / 64),
         semitones: 12
     },
     "diminished 8": {
         ratio: 48 / 25,
-        cents: 1127.9774043329986,
+        cents: 1200 * Math.log2(48 / 25),
         semitones: 11
     },
     "perfect 8": {
         ratio: 2 / 1,
-        cents: 1200,
+        cents: 1200 * Math.log2(2 / 1),
         semitones: 12
     }
 };
@@ -2285,28 +2285,28 @@ const TEMPERAMENT = {
         ],
         "octaveRatio": 2,
         "generator": null,
-        "perfect 1": { ratio: 1 / 1, cents: 0 },
-        "minor 2": { ratio: 16 / 15, cents: 111.71326908300068 },
-        "augmented 1": { ratio: 16 / 15, cents: 111.71326908300068 },
-        "major 2": { ratio: 9 / 8, cents: 203.91000173097933 },
-        "augmented 2": { ratio: 6 / 5, cents: 315.64134046300163 },
-        "minor 3": { ratio: 6 / 5, cents: 315.64134046300163 },
-        "major 3": { ratio: 5 / 4, cents: 386.3139908641587 },
-        "augmented 3": { ratio: 4 / 3, cents: 498.0449991346126 },
-        "diminished 4": { ratio: 5 / 4, cents: 386.3139908641587 },
-        "perfect 4": { ratio: 4 / 3, cents: 498.0449991346126 },
-        "augmented 4": { ratio: 45 / 32, cents: 590.2256401639994 },
-        "diminished 5": { ratio: 45 / 32, cents: 590.2256401639994 },
-        "perfect 5": { ratio: 3 / 2, cents: 701.9550008653874 },
-        "augmented 5": { ratio: 8 / 5, cents: 813.6869709743349 },
-        "minor 6": { ratio: 8 / 5, cents: 813.6869709743349 },
-        "major 6": { ratio: 5 / 3, cents: 884.3586595369983 },
-        "augmented 6": { ratio: 16 / 9, cents: 996.0899982690207 },
-        "minor 7": { ratio: 16 / 9, cents: 996.0899982690207 },
-        "major 7": { ratio: 15 / 8, cents: 1088.2686509169993 },
-        "augmented 7": { ratio: 2 / 1, cents: 1200 },
-        "diminished 8": { ratio: 15 / 8, cents: 1088.2686509169993 },
-        "perfect 8": { ratio: 2 / 1, cents: 1200 },
+        "perfect 1": { ratio: 1 / 1, cents: 1200 * Math.log2(1 / 1) },
+        "minor 2": { ratio: 16 / 15, cents: 1200 * Math.log2(16 / 15) },
+        "augmented 1": { ratio: 16 / 15, cents: 1200 * Math.log2(16 / 15) },
+        "major 2": { ratio: 9 / 8, cents: 1200 * Math.log2(9 / 8) },
+        "augmented 2": { ratio: 6 / 5, cents: 1200 * Math.log2(6 / 5) },
+        "minor 3": { ratio: 6 / 5, cents: 1200 * Math.log2(6 / 5) },
+        "major 3": { ratio: 5 / 4, cents: 1200 * Math.log2(5 / 4) },
+        "augmented 3": { ratio: 4 / 3, cents: 1200 * Math.log2(4 / 3) },
+        "diminished 4": { ratio: 5 / 4, cents: 1200 * Math.log2(5 / 4) },
+        "perfect 4": { ratio: 4 / 3, cents: 1200 * Math.log2(4 / 3) },
+        "augmented 4": { ratio: 45 / 32, cents: 1200 * Math.log2(45 / 32) },
+        "diminished 5": { ratio: 45 / 32, cents: 1200 * Math.log2(45 / 32) },
+        "perfect 5": { ratio: 3 / 2, cents: 1200 * Math.log2(3 / 2) },
+        "augmented 5": { ratio: 8 / 5, cents: 1200 * Math.log2(8 / 5) },
+        "minor 6": { ratio: 8 / 5, cents: 1200 * Math.log2(8 / 5) },
+        "major 6": { ratio: 5 / 3, cents: 1200 * Math.log2(5 / 3) },
+        "augmented 6": { ratio: 16 / 9, cents: 1200 * Math.log2(16 / 9) },
+        "minor 7": { ratio: 16 / 9, cents: 1200 * Math.log2(16 / 9) },
+        "major 7": { ratio: 15 / 8, cents: 1200 * Math.log2(15 / 8) },
+        "augmented 7": { ratio: 2 / 1, cents: 1200 * Math.log2(2 / 1) },
+        "diminished 8": { ratio: 15 / 8, cents: 1200 * Math.log2(15 / 8) },
+        "perfect 8": { ratio: 2 / 1, cents: 1200 * Math.log2(2 / 1) },
         "pitchNumber": 12,
         "interval": INTERVAL_ORDER
     },
@@ -2333,28 +2333,28 @@ const TEMPERAMENT = {
         ],
         "octaveRatio": 2,
         "generator": 3 / 2,
-        "perfect 1": { ratio: 1 / 1, cents: 0 },
-        "minor 2": { ratio: 256 / 243, cents: 90.22499913461259 },
-        "augmented 1": { ratio: 256 / 243, cents: 90.22499913461259 },
-        "major 2": { ratio: 9 / 8, cents: 203.91000173097933 },
-        "augmented 2": { ratio: 32 / 27, cents: 294.1349972653874 },
-        "minor 3": { ratio: 32 / 27, cents: 294.1349972653874 },
-        "major 3": { ratio: 81 / 64, cents: 407.82000146000027 },
-        "augmented 3": { ratio: 4 / 3, cents: 498.0449991346126 },
-        "diminished 4": { ratio: 81 / 64, cents: 407.82000146000027 },
-        "perfect 4": { ratio: 4 / 3, cents: 498.0449991346126 },
-        "augmented 4": { ratio: 729 / 512, cents: 612.6984382899998 },
-        "diminished 5": { ratio: 729 / 512, cents: 612.6984382899998 },
-        "perfect 5": { ratio: 3 / 2, cents: 701.9550008653874 },
-        "augmented 5": { ratio: 128 / 81, cents: 792.1799985399998 },
-        "minor 6": { ratio: 128 / 81, cents: 792.1799985399998 },
-        "major 6": { ratio: 27 / 16, cents: 905.8650014649996 },
-        "augmented 6": { ratio: 16 / 9, cents: 996.0899982690207 },
-        "minor 7": { ratio: 16 / 9, cents: 996.0899982690207 },
-        "major 7": { ratio: 243 / 128, cents: 1109.7766285699997 },
-        "augmented 7": { ratio: 2 / 1, cents: 1200 },
-        "diminished 8": { ratio: 243 / 128, cents: 1109.7766285699997 },
-        "perfect 8": { ratio: 2 / 1, cents: 1200 },
+        "perfect 1": { ratio: 1 / 1, cents: 1200 * Math.log2(1 / 1) },
+        "minor 2": { ratio: 256 / 243, cents: 1200 * Math.log2(256 / 243) },
+        "augmented 1": { ratio: 256 / 243, cents: 1200 * Math.log2(256 / 243) },
+        "major 2": { ratio: 9 / 8, cents: 1200 * Math.log2(9 / 8) },
+        "augmented 2": { ratio: 32 / 27, cents: 1200 * Math.log2(32 / 27) },
+        "minor 3": { ratio: 32 / 27, cents: 1200 * Math.log2(32 / 27) },
+        "major 3": { ratio: 81 / 64, cents: 1200 * Math.log2(81 / 64) },
+        "augmented 3": { ratio: 4 / 3, cents: 1200 * Math.log2(4 / 3) },
+        "diminished 4": { ratio: 81 / 64, cents: 1200 * Math.log2(81 / 64) },
+        "perfect 4": { ratio: 4 / 3, cents: 1200 * Math.log2(4 / 3) },
+        "augmented 4": { ratio: 729 / 512, cents: 1200 * Math.log2(729 / 512) },
+        "diminished 5": { ratio: 729 / 512, cents: 1200 * Math.log2(729 / 512) },
+        "perfect 5": { ratio: 3 / 2, cents: 1200 * Math.log2(3 / 2) },
+        "augmented 5": { ratio: 128 / 81, cents: 1200 * Math.log2(128 / 81) },
+        "minor 6": { ratio: 128 / 81, cents: 1200 * Math.log2(128 / 81) },
+        "major 6": { ratio: 27 / 16, cents: 1200 * Math.log2(27 / 16) },
+        "augmented 6": { ratio: 16 / 9, cents: 1200 * Math.log2(16 / 9) },
+        "minor 7": { ratio: 16 / 9, cents: 1200 * Math.log2(16 / 9) },
+        "major 7": { ratio: 243 / 128, cents: 1200 * Math.log2(243 / 128) },
+        "augmented 7": { ratio: 2 / 1, cents: 1200 * Math.log2(2 / 1) },
+        "diminished 8": { ratio: 243 / 128, cents: 1200 * Math.log2(243 / 128) },
+        "perfect 8": { ratio: 2 / 1, cents: 1200 * Math.log2(2 / 1) },
         "pitchNumber": 12,
         "interval": INTERVAL_ORDER
     },
