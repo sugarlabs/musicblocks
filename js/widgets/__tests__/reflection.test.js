@@ -622,7 +622,12 @@ describe("ReflectionMatrix", () => {
             expect(reflection.isUnsafeUrl("http://google.com")).toBe(false);
             expect(reflection.isUnsafeUrl("https://example.com")).toBe(false);
             expect(reflection.isUnsafeUrl("mailto:test@test.com")).toBe(true);
-            expect(reflection.isUnsafeUrl("javascript&#58;alert(1)")).toBe(true);
+
+            // Bypass attempts
+            expect(reflection.isUnsafeUrl("&#106;avascript:alert(1)")).toBe(true);
+            expect(reflection.isUnsafeUrl("javascript&colon;alert(1)")).toBe(true);
+            expect(reflection.isUnsafeUrl("java\tscript:alert(1)")).toBe(true);
+            expect(reflection.isUnsafeUrl("jav\rascript:alert(1)")).toBe(true);
         });
 
         test("sanitizeHTML removes unsafe hrefs and adds target blank", () => {

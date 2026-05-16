@@ -333,8 +333,7 @@ class ReflectionMatrix {
         const botReply = document.createElement("div");
 
         if (md) {
-            const safeText = escapeHTML(reply.response);
-            let html = this.mdToHTML(safeText);
+            let html = this.mdToHTML(reply.response);
             botReply.innerHTML = html;
         } else {
             botReply.innerText = reply.response;
