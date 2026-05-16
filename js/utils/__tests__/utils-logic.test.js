@@ -303,9 +303,9 @@ describe("Utility Logic Functions", () => {
         it("identifies safe urls", () => {
             expect(isSafeUrl("http://example.com")).toBe(true);
             expect(isSafeUrl("https://example.com")).toBe(true);
-            expect(isSafeUrl("mailto:test@example.com")).toBe(true);
         });
         it("identifies unsafe urls", () => {
+            expect(isSafeUrl("mailto:test@example.com")).toBe(false);
             expect(isSafeUrl("javascript:alert(1)")).toBe(false);
             expect(isSafeUrl("data:text/html,Hello")).toBe(false);
             expect(isSafeUrl("vbscript:alert(1)")).toBe(false);

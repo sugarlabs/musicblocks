@@ -173,7 +173,7 @@ var isSafeUrl = urlString => {
         const parsed = new URL(decodedUrl);
 
         // Step 5: Allow only specific safe protocols
-        const safeProtocols = ["http:", "https:", "mailto:"];
+        const safeProtocols = ["http:", "https:"];
         return safeProtocols.includes(parsed.protocol);
     } catch (e) {
         return false;

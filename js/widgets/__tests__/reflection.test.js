@@ -621,7 +621,7 @@ describe("ReflectionMatrix", () => {
 
             expect(reflection.isUnsafeUrl("http://google.com")).toBe(false);
             expect(reflection.isUnsafeUrl("https://example.com")).toBe(false);
-            expect(reflection.isUnsafeUrl("mailto:test@test.com")).toBe(false);
+            expect(reflection.isUnsafeUrl("mailto:test@test.com")).toBe(true);
 
             // Bypass attempts
             expect(reflection.isUnsafeUrl("&#106;avascript:alert(1)")).toBe(true);
