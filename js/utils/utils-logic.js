@@ -139,11 +139,42 @@ var unescapeHTML = str => {
 
 /**
  * Checks if a URL is considered safe.
+ * Decodes HTML entities and handles common bypass attempts.
  */
 var isSafeUrl = urlString => {
+    if (!urlString || typeof urlString !== "string") return false;
+
     try {
-        const parsed = new URL(urlString);
-        return parsed.protocol === "http:" || parsed.protocol === "https:";
+        // Step 1: Normalize and trim
+        let decodedUrl = urlString.trim();
+
+        // Step 2: Decode HTML entities if in a browser environment
+        // This catches bypasses like &#106;avascript:
+        if (typeof document !== "undefined" && typeof DOMParser !== "undefined") {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(decodedUrl, "text/html");
+            decodedUrl = (doc.body.textContent || "").trim();
+        } else {
+            // Basic fallback for non-browser environments (like Jest without full DOM)
+            // if unescapeHTML is available in the same scope
+            if (typeof unescapeHTML === "function") {
+                decodedUrl = unescapeHTML(decodedUrl).trim();
+            }
+        }
+
+        // Step 3: Remove non-printable characters and whitespace that might be used for bypasses
+        // e.g., "java\tscript:"
+        // eslint-disable-next-line no-control-regex
+        decodedUrl = decodedUrl.replace(/[\u0000-\u0020\u007F]/g, "");
+
+        // Step 4: Parse the URL
+        // We do NOT use a base URL here to ensure we only allow absolute URLs.
+        // Relative URLs will throw and return false, which is the safer default.
+        const parsed = new URL(decodedUrl);
+
+        // Step 5: Allow only specific safe protocols
+        const safeProtocols = ["http:", "https:"];
+        return safeProtocols.includes(parsed.protocol);
     } catch (e) {
         return false;
     }
