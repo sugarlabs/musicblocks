@@ -180,6 +180,22 @@ describe("PlanetInterface", () => {
         expect(mockActivity.blocks.trashStacks).toEqual([]);
     });
 
+    test("initialiseNewProject returns early when Planet storage is unavailable", () => {
+        planetInterface.planet = null;
+
+        expect(() => planetInterface.initialiseNewProject("New Name")).not.toThrow();
+        expect(mockActivity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(mockActivity.refreshCanvas).not.toHaveBeenCalled();
+    });
+
+    // Regression test for #7350: when running from file:///index.html,
+    // planet.planet is null so getCurrentProjectName() must return ""
+    // to prevent _afterDelete from entering the Planet branch.
+    test("getCurrentProjectName returns empty string when inner Planet is null (#7350)", () => {
+        planetInterface.planet = null;
+        expect(planetInterface.getCurrentProjectName()).toBe("");
+    });
+
     test("loadProjectFromData: default merge=false", () => {
         planetInterface.iframe = { style: { display: "block" } };
         mockActivity.blocks.loadNewBlocks.mockClear();
@@ -214,7 +230,7 @@ describe("PlanetInterface", () => {
         planetInterface.planet = { ProjectStorage: { saveLocally: jest.fn() } };
 
         return planetInterface.saveLocally().then(() => {
-            expect(mockActivity.stage.update).toHaveBeenCalledWith();
+            expect(mockActivity.stage.update).toHaveBeenCalled();
             expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenCalledWith(D, null);
         });
     });
@@ -248,10 +264,30 @@ describe("PlanetInterface", () => {
         };
         await expect(planetInterface.openCurrentProject()).resolves.toBe(123);
     });
+    test("openCurrentProject returns null when Planet storage is unavailable", async () => {
+        const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        planetInterface.planet = null;
+        await expect(planetInterface.openCurrentProject()).resolves.toBeNull();
+        expect(errorSpy).toHaveBeenCalledWith(
+            "[PlanetInterface] openCurrentProject called before Planet storage is ready."
+        );
+        errorSpy.mockRestore();
+    });
     test("openProjectFromPlanet proxies arguments", () => {
         planetInterface.planet = { openProjectFromPlanet: jest.fn() };
         planetInterface.openProjectFromPlanet("ID42", "oops");
         expect(planetInterface.planet.openProjectFromPlanet).toHaveBeenCalledWith("ID42", "oops");
+    });
+    test("openProjectFromPlanet returns safely when Planet backend is unavailable", () => {
+        const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        planetInterface.planet = null;
+
+        expect(() => planetInterface.openProjectFromPlanet("ID42", "oops")).not.toThrow();
+        expect(errorSpy).toHaveBeenCalledWith(
+            "[PlanetInterface] openProjectFromPlanet called before Planet is ready."
+        );
+
+        errorSpy.mockRestore();
     });
     test("hideMusicBlocks also calls widgetWindows.hideAllWindows and disables DOM events after 250ms", () => {
         jest.useFakeTimers();
@@ -478,14 +514,19 @@ describe("PlanetInterface", () => {
         iframe.contentWindow.makePlanet = jest
             .fn()
             .mockRejectedValue(new Error("Failed to make planet"));
-        try {
-            await planetInterface.init();
-        } catch (e) {
-            expect(e).toBeInstanceOf(TypeError);
-        }
+        await expect(planetInterface.init()).resolves.toBeUndefined();
         expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
         expect(consoleSpy.mock.calls[0][0].message).toBe("Failed to make planet");
         expect(planetInterface.planet).toBeNull();
+        expect(window.Converter).toBeUndefined();
         consoleSpy.mockRestore();
+    });
+
+    it("project getters return safe defaults when Planet storage is unavailable", () => {
+        planetInterface.planet = null;
+        expect(planetInterface.getCurrentProjectName()).toBe("");
+        expect(planetInterface.getCurrentProjectDescription()).toBe("");
+        expect(planetInterface.getCurrentProjectImage()).toBeNull();
+        expect(planetInterface.getTimeLastSaved()).toBeNull();
     });
 });

@@ -76,3 +76,80 @@ describe("MusicKeyboard document key handler lifecycle", () => {
         expect(keyboard._savedDocumentOnKeyUp).toBeUndefined();
     });
 });
+
+describe("MusicKeyboard add-row submenu", () => {
+    let originalDocById;
+    let originalPlatformColor;
+    let originalSlicePath;
+    let originalWheelnav;
+    let originalTranslate;
+
+    beforeEach(() => {
+        document.body.innerHTML = '<div id="wheelDivptm"></div><div id="addnotes"></div>';
+        document.getElementById("addnotes").getBoundingClientRect = () => ({ x: 0, y: 0 });
+
+        originalDocById = global.docById;
+        originalPlatformColor = global.platformColor;
+        originalSlicePath = global.slicePath;
+        originalWheelnav = global.wheelnav;
+        originalTranslate = global._;
+
+        global.docById = id => document.getElementById(id);
+        global.platformColor = {
+            paletteColors: { pitch: ["#000", "#fff"] },
+            exitWheelcolors: ["#000", "#fff"]
+        };
+        global.slicePath = () => ({
+            DonutSlice: jest.fn(),
+            DonutSliceCustomization: () => ({})
+        });
+        global._ = value => value;
+        global.wheelnav = function () {
+            this.raphael = {};
+            this.navItems = [];
+            this.selectedNavItemIndex = 0;
+            this.createWheel = labels => {
+                this.navItems = labels.map(() => ({
+                    navigateFunction: null,
+                    setTooltip: jest.fn()
+                }));
+            };
+            this.removeWheel = jest.fn();
+        };
+    });
+
+    afterEach(() => {
+        global.docById = originalDocById;
+        global.platformColor = originalPlatformColor;
+        global.slicePath = originalSlicePath;
+        global.wheelnav = originalWheelnav;
+        global._ = originalTranslate;
+        document.body.innerHTML = "";
+    });
+
+    test("adds a pitch without throwing when the layout only contains hertz rows", () => {
+        const loadNewBlocks = jest.fn();
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            blocks: {
+                blockList: [],
+                loadNewBlocks
+            }
+        });
+
+        keyboard.layout = [
+            { noteName: "hertz", noteOctave: 392, blockNumber: 100001 },
+            { noteName: "hertz", noteOctave: 436, blockNumber: 100002 }
+        ];
+
+        keyboard._createAddRowPieSubmenu();
+
+        expect(() => keyboard._menuWheel.navItems[0].navigateFunction()).not.toThrow();
+        expect(loadNewBlocks).toHaveBeenCalledWith([
+            [0, ["pitch", {}], 0, 0, [null, 1, 2, null]],
+            [1, ["solfege", { value: "do♯" }], 0, 0, [0]],
+            [2, ["number", { value: 392 }], 0, 0, [0]]
+        ]);
+    });
+});

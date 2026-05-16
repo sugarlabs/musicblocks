@@ -11,6 +11,8 @@
 
 /* This widget provides a chat interface for users to interact with AI mentors for project reflection and analysis.*/
 
+/* global _, escapeHTML, isSafeUrl */
+
 /**
  * Represents Reflection Widget.
  * @constructor
@@ -723,7 +725,6 @@ class ReflectionMatrix {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     }
-
     /**
      * Sanitizes HTML content using DOMParser to prevent XSS.
      * Removes unsafe attributes and ensures links are safe.
@@ -734,19 +735,57 @@ class ReflectionMatrix {
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlString, "text/html");
 
-        // Sanitize links
-        const links = doc.getElementsByTagName("a");
-        for (let i = 0; i < links.length; i++) {
-            const link = links[i];
-            const href = link.getAttribute("href");
+        // Sanitize all elements
+        const elements = doc.body.querySelectorAll("*");
+        for (const el of elements) {
+            const tagName = el.tagName.toLowerCase();
 
-            // If no href, or it's unsafe, remove the attribute
-            if (!href || this.isUnsafeUrl(href)) {
-                link.removeAttribute("href");
-            } else {
-                // Enforce security attributes for external links
-                link.setAttribute("target", "_blank");
-                link.setAttribute("rel", "noopener noreferrer");
+            // Remove forbidden tags that can execute code or change page behavior
+            const forbiddenTags = ["script", "iframe", "object", "embed", "base", "form"];
+            if (forbiddenTags.includes(tagName)) {
+                el.remove();
+                continue;
+            }
+
+            const attrs = el.attributes;
+
+            for (let i = attrs.length - 1; i >= 0; i--) {
+                const attrName = attrs[i].name.toLowerCase();
+                const attrValue = attrs[i].value;
+
+                // Remove all event handlers
+                if (attrName.startsWith("on")) {
+                    el.removeAttribute(attrName);
+                    continue;
+                }
+
+                // Sanitize URL attributes (href, src)
+                if (attrName === "href" || attrName === "src") {
+                    if (!isSafeUrl(attrValue)) {
+                        el.removeAttribute(attrName);
+                    } else if (tagName === "a" && attrName === "href") {
+                        // Enforce security attributes for external links
+                        el.setAttribute("target", "_blank");
+                        el.setAttribute("rel", "noopener noreferrer");
+                    }
+                    continue;
+                }
+
+                // Sanitize style attribute
+                if (attrName === "style") {
+                    // Check for dangerous keywords in style properties
+                    const dangerousStyleKeywords = ["javascript:", "url(", "expression", "eval"];
+                    if (dangerousStyleKeywords.some(kw => attrValue.toLowerCase().includes(kw))) {
+                        el.removeAttribute(attrName);
+                    }
+                    continue;
+                }
+
+                // Remove other potentially dangerous attributes (like action, formaction, etc.)
+                const sensitiveAttrs = ["action", "formaction", "data", "codebase"];
+                if (sensitiveAttrs.includes(attrName)) {
+                    el.removeAttribute(attrName);
+                }
             }
         }
 
@@ -754,31 +793,12 @@ class ReflectionMatrix {
     }
 
     /**
-     * Checks if a URL is unsafe (javascript:, data:, vbscript:).
+     * Checks if a URL is unsafe.
      * @param {string} url - The URL to check.
      * @returns {boolean} - True if unsafe, false otherwise.
      */
     isUnsafeUrl(url) {
-        if (!url) return true;
-        try {
-            // Step 1: Decode HTML entities to catch bypass attempts like &#106;avascript:
-            // We use DOMParser as a safe way to decode without executing anything.
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(url, "text/html");
-            const decodedUrl = (doc.body.textContent || "").trim();
-
-            // Step 2: Use the URL API to parse the decoded URL.
-            // This handles normalization and protocol extraction.
-            const parsed = new URL(decodedUrl, window.location.href);
-
-            // Step 3: Allow only specific safe protocols.
-            const safeProtocols = ["http:", "https:", "mailto:"];
-            return !safeProtocols.includes(parsed.protocol);
-        } catch (e) {
-            // If URL parsing fails, it might be a relative path or truly invalid.
-            // For safety in this context, we only allow http/https/mailto.
-            return true;
-        }
+        return !isSafeUrl(url);
     }
 
     /**

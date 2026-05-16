@@ -20,9 +20,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const ReflectionMatrix = require("../reflection");
-const { escapeHTML } = require("../../utils/utils");
+const { escapeHTML, isSafeUrl } = require("../../utils/utils");
 global.escapeHTML = escapeHTML;
+global.isSafeUrl = isSafeUrl;
+
+const ReflectionMatrix = require("../reflection");
 
 // Mock globals
 global._ = str => str;
@@ -639,6 +641,43 @@ describe("ReflectionMatrix", () => {
             expect(output).toContain('href="http://good.com"');
             expect(output).toContain('target="_blank"');
             expect(output).toContain('rel="noopener noreferrer"');
+
+            const input2 = '<a href="javascript&#58;alert(1)">Bypass Link</a>';
+            const output2 = reflection.sanitizeHTML(input2);
+            expect(output2).not.toContain('href="javascript&#58;alert(1)"');
+            expect(output2).not.toContain('href="javascript:alert(1)"');
+        });
+
+        test("sanitizeHTML removes unsafe src and style attributes", () => {
+            const input = `<div>
+                <img src="javascript:alert(1)" alt="bad">
+                <img src="http://good.com/img.png" alt="good">
+                <div style="color: red; background-image: url('javascript:alert(1)')">Bad Style</div>
+                <div style="color: blue;">Good Style</div>
+            </div>`;
+            const output = reflection.sanitizeHTML(input);
+
+            expect(output).not.toContain('src="javascript:alert(1)"');
+            expect(output).toContain('src="http://good.com/img.png"');
+            expect(output).not.toContain(
+                "style=\"color: red; background-image: url('javascript:alert(1)')\""
+            );
+            expect(output).toContain('style="color: blue;"');
+        });
+
+        test("sanitizeHTML removes forbidden tags", () => {
+            const input = `<div>
+                <p>Safe</p>
+                <script>alert(1)</script>
+                <iframe src="http://example.com"></iframe>
+                <object data="bad.swf"></object>
+            </div>`;
+            const output = reflection.sanitizeHTML(input);
+
+            expect(output).toContain("<p>Safe</p>");
+            expect(output).not.toContain("<script>");
+            expect(output).not.toContain("<iframe>");
+            expect(output).not.toContain("<object>");
         });
 
         test("mdToHTML converts markdown to safe HTML", () => {

@@ -193,4 +193,41 @@ describe("Blocks Foundation", () => {
             expect(Array.isArray(blocks.trashStacks)).toBe(true);
         });
     });
+
+    describe("Sparse Array Safety", () => {
+        it("should not throw TypeError in findStacks when blockList is sparse", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.blockList[1] = { trash: false, connections: [null] }; // Index 0 is undefined
+
+            expect(() => blocks.findStacks()).not.toThrow();
+            expect(blocks.stackList).toEqual([1]);
+        });
+
+        it("should not throw TypeError in moveAllBlocksExcept when blockList is sparse", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.blockList[1] = {
+                trash: false,
+                connections: [null],
+                findTopBlock: jest.fn().mockReturnValue(1),
+                moveBlockRelativeBatched: jest.fn()
+            };
+
+            expect(() => blocks.moveAllBlocksExcept(null, 10, 10)).not.toThrow();
+        });
+
+        it("should not throw TypeError in _findTwoArgs when blockList is sparse", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.blockList[1] = {
+                trash: false,
+                isArgBlock: jest.fn().mockReturnValue(true),
+                isExpandableBlock: jest.fn().mockReturnValue(true)
+            };
+
+            expect(() => blocks._findTwoArgs()).not.toThrow();
+            expect(blocks._expandablesList).toEqual([1]);
+        });
+    });
 });
