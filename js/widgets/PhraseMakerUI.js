@@ -85,29 +85,35 @@ const PhraseMakerUI = {
         if (!pm._playButton) return;
 
         if (isPlaying) {
-            pm._playButton.replaceChildren();
-            pm._playButton.appendChild(document.createTextNode("\u00A0\u00A0"));
-            const stopImg = document.createElement("img");
-            stopImg.src = "header-icons/stop-button.svg";
-            stopImg.title = pm._("Stop");
-            stopImg.alt = pm._("Stop");
-            stopImg.height = pm.constructor.ICONSIZE;
-            stopImg.width = pm.constructor.ICONSIZE;
-            stopImg.style.verticalAlign = "middle";
-            pm._playButton.appendChild(stopImg);
-            pm._playButton.appendChild(document.createTextNode("\u00A0\u00A0"));
+            pm._playButton.replaceChildren(
+                document.createTextNode("\u00a0\u00a0"),
+                (() => {
+                    const img = document.createElement("img");
+                    img.src = "header-icons/stop-button.svg";
+                    img.title = pm._("Stop");
+                    img.alt = pm._("Stop");
+                    img.height = pm.constructor.ICONSIZE;
+                    img.width = pm.constructor.ICONSIZE;
+                    img.style.verticalAlign = "middle";
+                    return img;
+                })(),
+                document.createTextNode("\u00a0\u00a0")
+            );
         } else {
-            pm._playButton.replaceChildren();
-            pm._playButton.appendChild(document.createTextNode("\u00A0\u00A0"));
-            const playImg = document.createElement("img");
-            playImg.src = "header-icons/play-button.svg";
-            playImg.title = pm._("Play");
-            playImg.alt = pm._("Play");
-            playImg.height = pm.constructor.ICONSIZE;
-            playImg.width = pm.constructor.ICONSIZE;
-            playImg.style.verticalAlign = "middle";
-            pm._playButton.appendChild(playImg);
-            pm._playButton.appendChild(document.createTextNode("\u00A0\u00A0"));
+            pm._playButton.replaceChildren(
+                document.createTextNode("\u00a0\u00a0"),
+                (() => {
+                    const img = document.createElement("img");
+                    img.src = "header-icons/play-button.svg";
+                    img.title = pm._("Play");
+                    img.alt = pm._("Play");
+                    img.height = pm.constructor.ICONSIZE;
+                    img.width = pm.constructor.ICONSIZE;
+                    img.style.verticalAlign = "middle";
+                    return img;
+                })(),
+                document.createTextNode("\u00a0\u00a0")
+            );
         }
     },
 
@@ -152,10 +158,12 @@ const PhraseMakerUI = {
 
         if (isActive) {
             cell.style.backgroundColor = pm.platformColor.selectorBackground;
-            cell.textContent = "\u2713"; // checkmark
+            cell.textContent = "\u00a0\u2713"; // checkmark
+            cell.className = "active";
         } else {
             cell.style.backgroundColor = pm.platformColor.rhythmcellcolor;
             cell.textContent = "";
+            cell.className = "";
         }
     },
 

@@ -171,8 +171,21 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
     color: #3fe0d1;
 }
 
-.dark .dropdown-content li > a:hover {
+.dark .dropdown-content li:hover,
+.dark .dropdown-content li.active,
+.dark .dropdown-content li.selected,
+.dark .dropdown-content li.active.selected {
     background-color: #333;
+}
+
+.dark .dropdown-content li:hover > a,
+.dark .dropdown-content li.active > a,
+.dark .dropdown-content li.selected > a,
+.dark .dropdown-content li > a:hover,
+.dark .dropdown-content li > a:focus,
+.dark .dropdown-content li > a.dropdown-item-focused {
+    background-color: #333;
+    color: #3fe0d1;
 }
 
 .dark .dropdown-content {
@@ -261,8 +274,14 @@ body.highcontrast {
     font-family: "Fira Sans", sans-serif;
 }
 
-#helpdropdown.helpdropdown-menu li > a:hover {
+#helpdropdown.helpdropdown-menu li:hover > a,
+#helpdropdown.helpdropdown-menu li.active > a,
+#helpdropdown.helpdropdown-menu li.selected > a,
+#helpdropdown.helpdropdown-menu li > a:hover,
+#helpdropdown.helpdropdown-menu li > a:focus,
+#helpdropdown.helpdropdown-menu li > a.dropdown-item-focused {
     background: rgba(33, 150, 243, 0.1);
+    color: #24435e;
 }
 
 .keyboard-shortcuts-panel {
@@ -372,8 +391,21 @@ body.highcontrast {
     color: #e8e8e8;
 }
 
-.dark #helpdropdown.helpdropdown-menu li > a:hover {
+.dark #helpdropdown.helpdropdown-menu li:hover,
+.dark #helpdropdown.helpdropdown-menu li.active,
+.dark #helpdropdown.helpdropdown-menu li.selected,
+.dark #helpdropdown.helpdropdown-menu li.active.selected {
     background: rgba(74, 163, 239, 0.16);
+}
+
+.dark #helpdropdown.helpdropdown-menu li:hover > a,
+.dark #helpdropdown.helpdropdown-menu li.active > a,
+.dark #helpdropdown.helpdropdown-menu li.selected > a,
+.dark #helpdropdown.helpdropdown-menu li > a:hover,
+.dark #helpdropdown.helpdropdown-menu li > a:focus,
+.dark #helpdropdown.helpdropdown-menu li > a.dropdown-item-focused {
+    background: rgba(74, 163, 239, 0.16);
+    color: #ffffff;
 }
 
 .dark .keyboard-shortcuts-hero {
@@ -424,6 +456,23 @@ body.highcontrast {
 
 .highcontrast #helpdropdown.helpdropdown-menu li + li {
     border-top-color: #ffffff;
+}
+
+.highcontrast #helpdropdown.helpdropdown-menu li:hover,
+.highcontrast #helpdropdown.helpdropdown-menu li.active,
+.highcontrast #helpdropdown.helpdropdown-menu li.selected,
+.highcontrast #helpdropdown.helpdropdown-menu li.active.selected {
+    background: #00ffff;
+}
+
+.highcontrast #helpdropdown.helpdropdown-menu li:hover > a,
+.highcontrast #helpdropdown.helpdropdown-menu li.active > a,
+.highcontrast #helpdropdown.helpdropdown-menu li.selected > a,
+.highcontrast #helpdropdown.helpdropdown-menu li > a:hover,
+.highcontrast #helpdropdown.helpdropdown-menu li > a:focus,
+.highcontrast #helpdropdown.helpdropdown-menu li > a.dropdown-item-focused {
+    background: #00ffff;
+    color: #000000;
 }
 
 .highcontrast .keyboard-shortcuts-hero,
@@ -593,6 +642,23 @@ body.highcontrast {
 .highcontrast #languagedropdown li a.selected-language {
     background-color: rgba(0, 255, 255, 0.25);
     border-left: 3px solid #00ffff;
+}
+
+.highcontrast .dropdown-content li:hover,
+.highcontrast .dropdown-content li.active,
+.highcontrast .dropdown-content li.selected,
+.highcontrast .dropdown-content li.active.selected {
+    background-color: #00ffff;
+}
+
+.highcontrast .dropdown-content li:hover > a,
+.highcontrast .dropdown-content li.active > a,
+.highcontrast .dropdown-content li.selected > a,
+.highcontrast .dropdown-content li > a:hover,
+.highcontrast .dropdown-content li > a:focus,
+.highcontrast .dropdown-content li > a.dropdown-item-focused {
+    background-color: #00ffff;
+    color: #000000;
 }
 
 /* Your Custom Theme can go here if you don't want to modify the existing dark mode */

@@ -770,34 +770,26 @@ describe("ProgramBlocks", () => {
 
     describe("OpenProjectBlock", () => {
         let originalOpen;
-        let originalAlert;
 
         beforeAll(() => {
             originalOpen = window.open;
-            originalAlert = window.alert;
         });
 
         afterAll(() => {
             window.open = originalOpen;
-            window.alert = originalAlert;
         });
 
         beforeEach(() => {
             delete window.open;
             window.open = jest.fn(() => ({}));
-            delete window.alert;
-            window.alert = jest.fn();
         });
 
-        test("opens valid http URL", () => {
+        test("opens URL on current host", () => {
             const block = getBlock("openProject");
-            block.flow(["http://example.com"], logo, 0, 5);
+            const url = `${window.location.origin}/index.html?id=123&run=true`;
+            block.flow([url], logo, 0, 5);
 
-            expect(window.open).toHaveBeenCalledWith(
-                "http://example.com",
-                "_blank",
-                "noopener,noreferrer"
-            );
+            expect(window.open).toHaveBeenCalledWith(url, "_blank", "noopener,noreferrer");
         });
 
         test("opens valid https URL", () => {
@@ -811,12 +803,26 @@ describe("ProgramBlocks", () => {
             );
         });
 
+        test("blocks external http(s) URL on other hosts", () => {
+            const block = getBlock("openProject");
+            block.flow(["https://example.com"], logo, 0, 5);
+
+            expect(window.open).not.toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Only Music Blocks project links are allowed (same site, musicblocks.sugarlabs.org, musicblocks.net).",
+                5
+            );
+        });
+
         test("blocks javascript: protocol (CVE-11 open redirect)", () => {
             const block = getBlock("openProject");
             block.flow(["javascript:alert(document.cookie)"], logo, 0, 5);
 
             expect(window.open).not.toHaveBeenCalled();
-            expect(activity.errorMsg).toHaveBeenCalledWith("Please enter a valid URL.", 5);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Please enter a valid project URL (for example: /index.html?id=123&run=true).",
+                5
+            );
         });
 
         test("blocks data: URI scheme", () => {
@@ -824,7 +830,10 @@ describe("ProgramBlocks", () => {
             block.flow(["data:text/html,<script>alert(1)</script>"], logo, 0, 5);
 
             expect(window.open).not.toHaveBeenCalled();
-            expect(activity.errorMsg).toHaveBeenCalledWith("Please enter a valid URL.", 5);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Please enter a valid project URL (for example: /index.html?id=123&run=true).",
+                5
+            );
         });
 
         test("blocks vbscript: protocol", () => {
@@ -832,7 +841,10 @@ describe("ProgramBlocks", () => {
             block.flow(["vbscript:MsgBox('xss')"], logo, 0, 5);
 
             expect(window.open).not.toHaveBeenCalled();
-            expect(activity.errorMsg).toHaveBeenCalledWith("Please enter a valid URL.", 5);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Please enter a valid project URL (for example: /index.html?id=123&run=true).",
+                5
+            );
         });
 
         test("rejects bare domain without protocol", () => {
@@ -840,7 +852,10 @@ describe("ProgramBlocks", () => {
             block.flow(["evil.com"], logo, 0, 5);
 
             expect(window.open).not.toHaveBeenCalled();
-            expect(activity.errorMsg).toHaveBeenCalledWith("Please enter a valid URL.", 5);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Please enter a valid project URL (for example: /index.html?id=123&run=true).",
+                5
+            );
         });
 
         test("rejects null input", () => {
@@ -855,10 +870,13 @@ describe("ProgramBlocks", () => {
             const block = getBlock("openProject");
             window.open = jest.fn(() => null);
 
-            block.flow(["https://example.com"], logo, 0, 5);
+            block.flow([`${window.location.origin}/index.html?id=123&run=true`], logo, 0, 5);
 
             expect(window.open).toHaveBeenCalled();
-            expect(window.alert).toHaveBeenCalledWith("Please allow popups for this site");
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Please allow popups for this site",
+                3000
+            );
         });
     });
 

@@ -90,6 +90,7 @@ let MYDEFINES = [
     // Chart.js is only used by the statistics widget and will be loaded
     // on demand when the widget is opened, saving ~3-5 MB of heap memory.
     // "Chart",
+    "utils/utils-logic",
     "utils/utils",
     "utils/retryWithBackoff",
     "utils/debugLog",
@@ -544,13 +545,24 @@ class Activity {
                 if (this.stage) {
                     const hasActiveTweens = createjs.Tween.hasActiveTweens();
                     const hasActiveGifs = this.gifAnimator && this.gifAnimator.getActiveCount() > 0;
+                    const isInteracting =
+                        this.isDragging ||
+                        this.isSelecting ||
+                        (this.blocks && this.blocks.dragGroup !== null);
 
-                    if (this.stageDirty || hasActiveTweens || hasActiveGifs) {
+                    if (this.stageDirty || hasActiveTweens || hasActiveGifs || isInteracting) {
                         this.stage.update();
                         this.stageDirty = false;
+                        // Continue the loop if there's work or ongoing interaction
+                        this._renderLoopRafId = requestAnimationFrame(renderLoop);
+                    } else {
+                        // Nothing to render — let the loop go idle
+                        this._renderLoopRunning = false;
+                        this._renderLoopRafId = null;
                     }
+                } else {
+                    this._renderLoopRafId = requestAnimationFrame(renderLoop);
                 }
-                this._renderLoopRafId = requestAnimationFrame(renderLoop);
             };
 
             this._renderLoopRafId = requestAnimationFrame(renderLoop);
@@ -721,7 +733,14 @@ class Activity {
             wheel.sliceInitPathCustom = wheel.slicePathCustom;
             wheel.clickModeRotate = false;
             const wheelItems = this.helpfulWheelItems.filter(ele => ele.display);
-            wheel.initWheel(wheelItems.map(ele => ele.icon));
+            wheel.initWheel(wheelItems.map(ele => _(ele.label)));
+
+            wheelItems.forEach((ele, i) => {
+                if (ele.icon) {
+                    wheel.navItems[i].setTitle(ele.icon);
+                }
+            });
+
             wheel.createWheel();
 
             wheel.navItems[0].selected = false;
@@ -980,7 +999,7 @@ class Activity {
             const columnYPositions = Array(numColumns).fill(y);
 
             for (const blk in this.blocks.blockList) {
-                if (!this.blocks.blockList[blk].trash) {
+                if (this.blocks.blockList[blk] && !this.blocks.blockList[blk].trash) {
                     const myBlock = this.blocks.blockList[blk];
 
                     // Store original position only once
@@ -1084,7 +1103,7 @@ class Activity {
 
                 // Position "start" blocks first
                 for (const blk in this.blocks.blockList) {
-                    if (!this.blocks.blockList[blk].trash) {
+                    if (this.blocks.blockList[blk] && !this.blocks.blockList[blk].trash) {
                         const myBlock = this.blocks.blockList[blk];
                         if (myBlock.name !== "start") {
                             continue;
@@ -1120,7 +1139,7 @@ class Activity {
 
                 // Position other blocks
                 for (const blk in this.blocks.blockList) {
-                    if (!this.blocks.blockList[blk].trash) {
+                    if (this.blocks.blockList[blk] && !this.blocks.blockList[blk].trash) {
                         const myBlock = this.blocks.blockList[blk];
                         if (myBlock.name === "start") {
                             continue;
@@ -1193,7 +1212,7 @@ class Activity {
                 this.blocks._beginDeferCheckBounds();
 
                 for (const blk in this.blocks.blockList) {
-                    if (!this.blocks.blockList[blk].trash) {
+                    if (this.blocks.blockList[blk] && !this.blocks.blockList[blk].trash) {
                         const myBlock = this.blocks.blockList[blk];
                         if (myBlock.connections[0] === null) {
                             let minYIndex = 0;
@@ -1362,7 +1381,7 @@ class Activity {
             let yMax = 0;
             let parts;
             for (let i = 0; i < this.blocks.blockList.length; i++) {
-                if (this.blocks.blockList[i].ignore()) {
+                if (!this.blocks.blockList[i] || this.blocks.blockList[i].ignore()) {
                     continue;
                 }
 
@@ -4384,7 +4403,10 @@ class Activity {
                 canvasHolder.width = canvas.width;
                 canvasHolder.height = canvas.height;
             }
-            document.getElementById("hideContents").click();
+            const hideContents = document.getElementById("hideContents");
+            if (hideContents) {
+                hideContents.click();
+            }
             that.refreshCanvas();
         }
 
@@ -4415,6 +4437,8 @@ class Activity {
                 ) {
                     this.saveLocally();
                 }
+                // Pause render loop while tab is hidden
+                this._stopRenderLoop();
                 return;
             }
 
@@ -4426,6 +4450,9 @@ class Activity {
                     this._onResize(false);
                 }, 250);
             }
+            // Resume render loop when tab becomes visible again
+            this.stageDirty = true;
+            this._startRenderLoop();
         };
         this.addEventListener(document, "visibilitychange", this._handleVisibilityChange);
 
@@ -4433,7 +4460,10 @@ class Activity {
         const resizeCanvas_ = () => {
             try {
                 that._onResize(false);
-                document.getElementById("hideContents").click();
+                const hideContents = document.getElementById("hideContents");
+                if (hideContents) {
+                    hideContents.click();
+                }
             } catch (error) {
                 console.error("An error occurred in resizeCanvas_:", error);
             }
@@ -4532,8 +4562,25 @@ class Activity {
 
             if (restoredBlock.name === "start" || restoredBlock.name === "drum") {
                 const turtle = restoredBlock.value;
-                this.turtles.getTurtle(turtle).inTrash = false;
-                this.turtles.getTurtle(turtle).container.visible = true;
+                const primaryTurtle = this.turtles.getTurtle(turtle);
+                primaryTurtle.inTrash = false;
+                primaryTurtle.container.visible = true;
+
+                // FIX: Restore the companion turtle if one exists.
+                // sendStackToTrash() in blocks.js (~line 7257) sets BOTH the primary
+                // and companion turtle to inTrash=true / visible=false when trashing a
+                // start/drum block. Without this mirror restore, the companion stays
+                // inTrash=true permanently, and logo.js (~line 1519) silently skips it:
+                //   if (!tur.inTrash) { tur.running = true; ... }
+                // This means onEveryBeatDo callbacks are dead after any trash+restore.
+                const comp = primaryTurtle.companionTurtle;
+                if (comp !== null && comp !== undefined) {
+                    const companionTurtle = this.turtles.getTurtle(comp);
+                    if (companionTurtle) {
+                        companionTurtle.inTrash = false;
+                        companionTurtle.container.visible = true;
+                    }
+                }
             } else if (restoredBlock.name === "action") {
                 const actionArg = this.blocks.blockList[restoredBlock.connections[1]];
                 if (actionArg !== null) {
@@ -4699,10 +4746,9 @@ class Activity {
 
             const existingView = document.getElementById("trashView");
             if (existingView) {
-                trashList.replaceChild(trashView, existingView);
-            } else {
-                trashList.appendChild(trashView);
+                existingView.remove(); // remove from DOM; GC can now collect listeners
             }
+            trashList.appendChild(trashView);
         };
 
         /*
@@ -4814,23 +4860,23 @@ class Activity {
             this.blocks._beginDeferCheckBounds();
 
             for (const blk in this.blocks.blockList) {
+                const myBlock = this.blocks.blockList[blk];
+                if (!myBlock) continue;
+
                 // If this block is at the top of a stack, push it
                 // onto the trashStacks list.
-                if (this.blocks.blockList[blk].connections[0] === null) {
+                if (myBlock.connections[0] === null) {
                     this.blocks.trashStacks.push(blk);
                 }
 
-                if (
-                    this.blocks.blockList[blk].name === "start" ||
-                    this.blocks.blockList[blk].name === "drum"
-                ) {
-                    const turtle = this.blocks.blockList[blk].value;
-                    if (!this.blocks.blockList[blk].trash && turtle !== null) {
+                if (myBlock.name === "start" || myBlock.name === "drum") {
+                    const turtle = myBlock.value;
+                    if (!myBlock.trash && turtle !== null) {
                         this.turtles.getTurtle(turtle).inTrash = true;
                         this.turtles.getTurtle(turtle).container.visible = false;
                     }
-                } else if (this.blocks.blockList[blk].name === "action") {
-                    if (!this.blocks.blockList[blk].trash) {
+                } else if (myBlock.name === "action") {
+                    if (!myBlock.trash) {
                         this.blocks.deleteActionBlock(this.blocks.blockList[blk]);
                         actionBlockCounter += 1;
                     }
@@ -5010,42 +5056,9 @@ class Activity {
         let lastRefreshReport = performance.now();
 
         this.refreshCanvas = () => {
-            if (this.blockRefreshCanvas) {
-                return;
-            }
-
-            const start = window.__ENABLE_REFRESH_PROFILING__ ? performance.now() : 0;
-
-            this.blockRefreshCanvas = true;
             this.stageDirty = true;
             this.update = true;
-
-            const that = this;
-            setTimeout(() => {
-                that.blockRefreshCanvas = false;
-                that.stageDirty = true;
-
-                if (window.__ENABLE_REFRESH_PROFILING__) {
-                    const duration = performance.now() - start;
-                    refreshCount++;
-                    totalRefreshTime += duration;
-                    maxRefreshTime = Math.max(maxRefreshTime, duration);
-
-                    if (refreshCount % 25 === 0) {
-                        const now = performance.now();
-                        const cps = (25 / (now - lastRefreshReport)) * 1000;
-                        console.log(
-                            `refreshCanvas | Avg: ${(totalRefreshTime / refreshCount).toFixed(
-                                2
-                            )}ms | Max: ${maxRefreshTime.toFixed(2)}ms | Rate: ${cps.toFixed(
-                                1
-                            )} calls/sec`
-                        );
-                        maxRefreshTime = 0;
-                        lastRefreshReport = now;
-                    }
-                }
-            }, 5);
+            this._startRenderLoop();
         };
 
         /*
@@ -6003,10 +6016,13 @@ class Activity {
                 that._doHardStopButton();
             }
 
-            // Use the planet New Project mechanism if it is available,
-            // but only if the current project has a name.
+            // Use the planet New Project mechanism if it is available
+            // and Planet storage is actually initialized (planet.planet
+            // is null when running from file:///index.html), but only
+            // if the current project has a name.
             if (
                 that.planet !== undefined &&
+                that.planet.planet !== null &&
                 that.planet.getCurrentProjectName() !== _("My Project")
             ) {
                 that.planet.saveLocally();
@@ -6756,8 +6772,10 @@ class Activity {
             this.hasMatrixDataBlock = false;
             for (let blk = 0; blk < this.blocks.blockList.length; blk++) {
                 const myBlock = this.blocks.blockList[blk];
-                if (myBlock.trash) {
+                if (myBlock && myBlock.trash) {
                     // Don't save blocks in the trash.
+                    continue;
+                } else if (!myBlock) {
                     continue;
                 }
 
@@ -6768,12 +6786,12 @@ class Activity {
             const data = [];
             for (let blk = 0; blk < this.blocks.blockList.length; blk++) {
                 const myBlock = this.blocks.blockList[blk];
-                let args = null;
-
-                if (myBlock.trash) {
+                if (!myBlock || myBlock.trash) {
                     // Don't save blocks in the trash.
                     continue;
                 }
+
+                let args = null;
 
                 if (
                     myBlock.isValueBlock() ||
@@ -7014,6 +7032,7 @@ class Activity {
          * These menu items are on the canvas, not the toolbar.
          */
         this._setupPaletteMenu = () => {
+            this.helpfulWheelItems = [];
             const btnSize = this.cellSize;
             const createButton = (icon, label, action) => {
                 const button = this._makeButton(icon, label, x, y, btnSize, 0);
@@ -7639,11 +7658,18 @@ class Activity {
 
             const intro = document.createElement("div");
             intro.className = "keyboard-shortcuts-hero";
-            intro.innerHTML =
-                `<div class="keyboard-shortcuts-hero-title">${_("Keyboard shortcuts")}</div>` +
-                `<div class="keyboard-shortcuts-hero-copy">${_(
-                    "Shortcuts are context-sensitive. Some only work when a related panel, widget, or mode is active. Windows/Linux and Mac equivalents are shown together."
-                )}</div>`;
+            const titleDiv = document.createElement("div");
+            titleDiv.className = "keyboard-shortcuts-hero-title";
+            titleDiv.textContent = _("Keyboard shortcuts");
+
+            const copyDiv = document.createElement("div");
+            copyDiv.className = "keyboard-shortcuts-hero-copy";
+            copyDiv.textContent = _(
+                "Shortcuts are context-sensitive. Some only work when a related panel, widget, or mode is active. Windows/Linux and Mac equivalents are shown together."
+            );
+
+            intro.appendChild(titleDiv);
+            intro.appendChild(copyDiv);
             wrapper.appendChild(intro);
 
             shortcutSections.forEach(section => {
@@ -7866,13 +7892,26 @@ class Activity {
             );
 
             img.onload = () => {
-                const bitmap = new createjs.Bitmap(img);
-                const bounds = bitmap.getBounds();
-                bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+                // FIX: createjs.Bitmap.getBounds() returns null for any Bitmap
+                // not added to a live EaselJS stage → TypeError: null.x crash.
+                // doSVG() returns "" on blank canvas → naturalWidth = 0 → guaranteed crash.
+                // Fix: use img.naturalWidth directly + plain offscreen canvas (no EaselJS needed).
                 try {
-                    that.storage["SESSIONIMAGE" + p] = bitmap.bitmapCache.getCacheDataURL();
+                    if (!img.naturalWidth || !img.naturalHeight) {
+                        // Blank canvas — doSVG() returned empty string, nothing to thumbnail.
+                        // SESSION<p> JSON was already saved above, so this is safe to skip.
+                        return;
+                    }
+
+                    const w = img.naturalWidth;
+                    const h = img.naturalHeight;
+                    const offscreen = document.createElement("canvas");
+                    offscreen.width = w;
+                    offscreen.height = h;
+                    offscreen.getContext("2d").drawImage(img, 0, 0);
+                    this.storage["SESSIONIMAGE" + p] = offscreen.toDataURL("image/png");
                 } catch (e) {
-                    console.error(e);
+                    console.error("[saveLocally] Thumbnail save failed:", e);
                 }
             };
 

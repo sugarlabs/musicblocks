@@ -20,6 +20,3 @@ coverage/
 .eslintrc*
 .prettierrc*
 .editorconfig
-
-dist/
-build/

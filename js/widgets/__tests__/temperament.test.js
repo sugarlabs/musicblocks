@@ -50,6 +50,7 @@ describe("TemperamentWidget basic tests", () => {
         }));
         global.pitchToFrequency = jest.fn(() => 440);
         global.frequencyToPitch = jest.fn(() => ["C", 4, 0]);
+        global.parseNoteString = jest.fn(note => [note.slice(0, -1), Number(note.slice(-1))]);
         global.slicePath = jest.fn(() => ({
             MenuSliceWithoutLine: {},
             MenuSliceCustomization: () => ({}),

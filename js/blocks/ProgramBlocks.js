@@ -679,6 +679,14 @@ function setupProgramBlocks(activity) {
          * @param {number} blk - The block identifier.
          */
         flow(args, logo, turtle, blk) {
+            const showOpenProjectError = message => {
+                activity.errorMsg(message, blk);
+                // Show a visible banner message in addition to the arrow highlight.
+                if (typeof activity.textMsg === "function") {
+                    activity.textMsg(message, 5000);
+                }
+            };
+
             if (args[0] === null) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
@@ -1448,6 +1456,14 @@ function setupProgramBlocks(activity) {
          * @param {number} blk - The block identifier.
          */
         flow(args, logo, turtle, blk) {
+            const showOpenProjectError = message => {
+                activity.errorMsg(message, blk);
+                // Keep the block arrow indicator and also show a visible text banner.
+                if (typeof activity.textMsg === "function") {
+                    activity.textMsg(message, 5000);
+                }
+            };
+
             if (args[0] === null) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
@@ -1455,18 +1471,64 @@ function setupProgramBlocks(activity) {
 
             const url = args[0];
 
-            // Use the centralized isSafeUrl utility (from utils.js) to enforce
-            // only http: and https: protocols, preventing open redirect attacks
-            // via javascript:, data:, vbscript:, or other dangerous URI schemes.
-            if (!isSafeUrl(url)) {
-                activity.errorMsg(_("Please enter a valid URL."), blk);
+            // We only allow opening Music Blocks project hosts (and the current host).
+            // This prevents untrusted projects from opening arbitrary external sites.
+            const trimmedUrl = String(url).trim();
+            // Disallow bare domains like "evil.com" (treated as a relative path by URL()).
+            // Accept either absolute http(s) URLs or explicit relative paths (starting with '/').
+            if (!/^https?:\/\//i.test(trimmedUrl) && !/^\//.test(trimmedUrl)) {
+                showOpenProjectError(
+                    _(
+                        "Please enter a valid project URL (for example: /index.html?id=123&run=true)."
+                    )
+                );
                 return;
             }
 
-            const win = window.open(url, "_blank", "noopener,noreferrer");
+            let parsedUrl;
+            try {
+                // Allow relative URLs by resolving against the current page.
+                parsedUrl = new URL(trimmedUrl, window.location.href);
+            } catch (e) {
+                showOpenProjectError(
+                    _(
+                        "Please enter a valid project URL (for example: /index.html?id=123&run=true)."
+                    )
+                );
+                return;
+            }
+
+            // Use the centralized isSafeUrl utility (from utils.js) to enforce
+            // only http: and https: protocols, preventing open redirect attacks
+            // via javascript:, data:, vbscript:, or other dangerous URI schemes.
+            if (!isSafeUrl(parsedUrl.href)) {
+                showOpenProjectError(
+                    _(
+                        "Please enter a valid project URL (for example: /index.html?id=123&run=true)."
+                    )
+                );
+                return;
+            }
+
+            const allowedHosts = new Set([
+                window.location.hostname,
+                "musicblocks.sugarlabs.org",
+                "musicblocks.net",
+                "www.musicblocks.net"
+            ]);
+            if (!allowedHosts.has(parsedUrl.hostname)) {
+                showOpenProjectError(
+                    _(
+                        "Only Music Blocks project links are allowed (same site, musicblocks.sugarlabs.org, musicblocks.net)."
+                    )
+                );
+                return;
+            }
+
+            const win = window.open(parsedUrl.href, "_blank", "noopener,noreferrer");
             if (win === null) {
                 // Browser has blocked it.
-                alert(_("Please allow popups for this site"));
+                activity.errorMsg(_("Please allow popups for this site"), 3000);
             }
         }
     }

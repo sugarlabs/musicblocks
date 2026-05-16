@@ -1682,6 +1682,10 @@ input.timbreName {
     margin-left: 200px;
 }
 
+.insideDivSynth input[type="range"] + .thumb {
+    display: none !important;
+}
+
 .btn {
     background-color: #90c100;
     margin-top: 6px;

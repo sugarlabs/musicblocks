@@ -34,9 +34,9 @@ const PhraseMakerUI = require("../PhraseMakerUI.js");
 function createMockPM() {
     return {
         platformColor: {
-            selectorBackground: "#8bc34a",
-            rhythmcellcolor: "#ffffff",
-            tupletBackground: "#e0e0e0"
+            selectorBackground: "rgb(139, 195, 74)",
+            rhythmcellcolor: "rgb(255, 255, 255)",
+            tupletBackground: "rgb(224, 224, 224)"
         },
         _cellScale: 1,
         _rows: [],
@@ -54,13 +54,11 @@ function createMockPM() {
  * @returns {Object} A mock cell.
  */
 function createMockCell(bgColor) {
-    return {
-        style: { backgroundColor: bgColor || "" },
-        innerHTML: "",
-        textContent: "",
-        replaceChildren: jest.fn(),
-        appendChild: jest.fn()
-    };
+    const cell = document.createElement("div");
+    cell.style.backgroundColor = bgColor || "";
+    cell.replaceChildren = jest.fn();
+    cell.appendChild = jest.fn();
+    return cell;
 }
 
 describe("PhraseMakerUI", () => {
@@ -194,7 +192,7 @@ describe("PhraseMakerUI", () => {
 
             PhraseMakerUI.highlightCell(pm, 0, 0);
 
-            expect(cell.style.backgroundColor).toBe("#8bc34a");
+            expect(cell.style.backgroundColor).toBe("rgb(139, 195, 74)");
         });
 
         test("does nothing when row does not exist", () => {
@@ -223,7 +221,7 @@ describe("PhraseMakerUI", () => {
             PhraseMakerUI.highlightCell(pm, 1, 0);
 
             expect(cell0.style.backgroundColor).toBe("");
-            expect(cell1.style.backgroundColor).toBe("#8bc34a");
+            expect(cell1.style.backgroundColor).toBe("rgb(139, 195, 74)");
             expect(cell2.style.backgroundColor).toBe("");
         });
 
@@ -236,7 +234,7 @@ describe("PhraseMakerUI", () => {
             PhraseMakerUI.highlightCell(pm, 0, 1);
 
             expect(cell0.style.backgroundColor).toBe("");
-            expect(cell1.style.backgroundColor).toBe("#8bc34a");
+            expect(cell1.style.backgroundColor).toBe("rgb(139, 195, 74)");
         });
     });
 
@@ -248,7 +246,7 @@ describe("PhraseMakerUI", () => {
 
             PhraseMakerUI.unhighlightCell(pm, 0, 0);
 
-            expect(cell.style.backgroundColor).toBe("#ffffff");
+            expect(cell.style.backgroundColor).toBe("rgb(255, 255, 255)");
         });
 
         test("does not change cell if not highlighted with selectorBackground", () => {
@@ -258,7 +256,7 @@ describe("PhraseMakerUI", () => {
 
             PhraseMakerUI.unhighlightCell(pm, 0, 0);
 
-            expect(cell.style.backgroundColor).toBe("#ff0000");
+            expect(cell.style.backgroundColor).toBe("rgb(255, 0, 0)");
         });
 
         test("does nothing when row does not exist", () => {
@@ -283,8 +281,8 @@ describe("PhraseMakerUI", () => {
 
             PhraseMakerUI.unhighlightCell(pm, 0, 0);
 
-            expect(cell0.style.backgroundColor).toBe("#ffffff");
-            expect(cell1.style.backgroundColor).toBe("#8bc34a");
+            expect(cell0.style.backgroundColor).toBe("rgb(255, 255, 255)");
+            expect(cell1.style.backgroundColor).toBe("rgb(139, 195, 74)");
         });
     });
 
@@ -295,7 +293,7 @@ describe("PhraseMakerUI", () => {
 
             PhraseMakerUI.updateNoteCellVisual(pm, cell, true);
 
-            expect(cell.style.backgroundColor).toBe("#8bc34a");
+            expect(cell.style.backgroundColor).toBe("rgb(139, 195, 74)");
         });
 
         test("sets active cell innerHTML to checkmark", () => {
@@ -304,7 +302,7 @@ describe("PhraseMakerUI", () => {
 
             PhraseMakerUI.updateNoteCellVisual(pm, cell, true);
 
-            expect(cell.textContent).toBe("\u2713");
+            expect(cell.textContent).toBe("\u00a0\u2713");
         });
 
         test("sets inactive cell background to rhythmcellcolor", () => {
@@ -313,7 +311,7 @@ describe("PhraseMakerUI", () => {
 
             PhraseMakerUI.updateNoteCellVisual(pm, cell, false);
 
-            expect(cell.style.backgroundColor).toBe("#ffffff");
+            expect(cell.style.backgroundColor).toBe("rgb(255, 255, 255)");
         });
 
         test("clears inactive cell innerHTML", () => {
@@ -344,11 +342,11 @@ describe("PhraseMakerUI", () => {
             cell.innerHTML = "";
 
             PhraseMakerUI.updateNoteCellVisual(pm, cell, true);
-            expect(cell.style.backgroundColor).toBe("#8bc34a");
-            expect(cell.textContent).toBe("\u2713");
+            expect(cell.style.backgroundColor).toBe("rgb(139, 195, 74)");
+            expect(cell.textContent).toBe("\u00a0\u2713");
 
             PhraseMakerUI.updateNoteCellVisual(pm, cell, false);
-            expect(cell.style.backgroundColor).toBe("#ffffff");
+            expect(cell.style.backgroundColor).toBe("rgb(255, 255, 255)");
             expect(cell.textContent).toBe("");
         });
     });
@@ -370,58 +368,64 @@ describe("PhraseMakerUI", () => {
 
         test("sets stop button when isPlaying is true", () => {
             const pm = createMockPM();
-            pm._playButton = { innerHTML: "", replaceChildren: jest.fn(), appendChild: jest.fn() };
+            pm._playButton = document.createElement("div");
+            pm._playButton.replaceChildren = jest.fn();
 
             PhraseMakerUI.updatePlayButton(pm, true);
 
-            expect(pm._playButton.appendChild).toHaveBeenCalled();
+            expect(pm._playButton.replaceChildren).toHaveBeenCalled();
         });
 
         test("sets play button when isPlaying is false", () => {
             const pm = createMockPM();
-            pm._playButton = { innerHTML: "", replaceChildren: jest.fn(), appendChild: jest.fn() };
+            pm._playButton = document.createElement("div");
+            pm._playButton.replaceChildren = jest.fn();
 
             PhraseMakerUI.updatePlayButton(pm, false);
 
-            expect(pm._playButton.appendChild).toHaveBeenCalled();
+            expect(pm._playButton.replaceChildren).toHaveBeenCalled();
         });
 
         test("stop button contains Stop title", () => {
             const pm = createMockPM();
-            pm._playButton = { innerHTML: "", replaceChildren: jest.fn(), appendChild: jest.fn() };
+            pm._playButton = document.createElement("div");
+            pm._playButton.replaceChildren = jest.fn();
 
             PhraseMakerUI.updatePlayButton(pm, true);
 
-            expect(pm._playButton.appendChild).toHaveBeenCalled();
+            expect(pm._playButton.replaceChildren).toHaveBeenCalled();
         });
 
         test("play button contains Play title", () => {
             const pm = createMockPM();
-            pm._playButton = { innerHTML: "", replaceChildren: jest.fn(), appendChild: jest.fn() };
+            pm._playButton = document.createElement("div");
+            pm._playButton.replaceChildren = jest.fn();
 
             PhraseMakerUI.updatePlayButton(pm, false);
 
-            expect(pm._playButton.appendChild).toHaveBeenCalled();
+            expect(pm._playButton.replaceChildren).toHaveBeenCalled();
         });
 
         test("button contains ICONSIZE dimensions", () => {
             const pm = createMockPM();
-            pm._playButton = { innerHTML: "", replaceChildren: jest.fn(), appendChild: jest.fn() };
+            pm._playButton = document.createElement("div");
+            pm._playButton.replaceChildren = jest.fn();
 
             PhraseMakerUI.updatePlayButton(pm, true);
 
-            expect(pm._playButton.appendChild).toHaveBeenCalled();
+            expect(pm._playButton.replaceChildren).toHaveBeenCalled();
         });
 
         test("switching from playing to stopped changes button", () => {
             const pm = createMockPM();
-            pm._playButton = { innerHTML: "", replaceChildren: jest.fn(), appendChild: jest.fn() };
+            pm._playButton = document.createElement("div");
+            pm._playButton.replaceChildren = jest.fn();
 
             PhraseMakerUI.updatePlayButton(pm, true);
-            expect(pm._playButton.appendChild).toHaveBeenCalled();
+            expect(pm._playButton.replaceChildren).toHaveBeenCalled();
 
             PhraseMakerUI.updatePlayButton(pm, false);
-            expect(pm._playButton.appendChild).toHaveBeenCalled();
+            expect(pm._playButton.replaceChildren).toHaveBeenCalled();
         });
     });
 
@@ -434,8 +438,8 @@ describe("PhraseMakerUI", () => {
 
             PhraseMakerUI.resetMatrix(pm);
 
-            expect(cell0.style.backgroundColor).toBe("#ffffff");
-            expect(cell1.style.backgroundColor).toBe("#ffffff");
+            expect(cell0.style.backgroundColor).toBe("rgb(255, 255, 255)");
+            expect(cell1.style.backgroundColor).toBe("rgb(255, 255, 255)");
         });
 
         test("does not touch tuplet row when _matrixHasTuplets is false", () => {
@@ -447,7 +451,7 @@ describe("PhraseMakerUI", () => {
 
             PhraseMakerUI.resetMatrix(pm);
 
-            expect(tupletCell.style.backgroundColor).toBe("#8bc34a");
+            expect(tupletCell.style.backgroundColor).toBe("rgb(139, 195, 74)");
         });
 
         test("resets tuplet row cells when _matrixHasTuplets is true", () => {
@@ -460,8 +464,8 @@ describe("PhraseMakerUI", () => {
 
             PhraseMakerUI.resetMatrix(pm);
 
-            expect(tupletCell0.style.backgroundColor).toBe("#e0e0e0");
-            expect(tupletCell1.style.backgroundColor).toBe("#e0e0e0");
+            expect(tupletCell0.style.backgroundColor).toBe("rgb(224, 224, 224)");
+            expect(tupletCell1.style.backgroundColor).toBe("rgb(224, 224, 224)");
         });
 
         test("handles empty noteValueRow cells", () => {
@@ -490,8 +494,8 @@ describe("PhraseMakerUI", () => {
 
             PhraseMakerUI.resetMatrix(pm);
 
-            expect(noteCell.style.backgroundColor).toBe("#ffffff");
-            expect(tupletCell.style.backgroundColor).toBe("#e0e0e0");
+            expect(noteCell.style.backgroundColor).toBe("rgb(255, 255, 255)");
+            expect(tupletCell.style.backgroundColor).toBe("rgb(224, 224, 224)");
         });
     });
 });

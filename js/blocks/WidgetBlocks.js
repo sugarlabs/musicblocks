@@ -1741,6 +1741,21 @@ function setupWidgetBlocks(activity) {
             ]);
 
             this.formBlock({ name: _("status"), canCollapse: true });
+            this.makeMacro((x, y) => [
+                [0, "status", x, y, [null, 2, 1]],
+                [1, "hiddennoflow", 0, 0, [0, null]],
+                [2, "print", 0, 0, [0, 3, 5]],
+                [3, ["outputtools", { value: "letter class" }], 0, 0, [2, 4]],
+                [4, "currentpitch", 0, 0, [3]],
+                [5, "print", 0, 0, [2, 6, 7]],
+                [6, "beatvalue", 0, 0, [5]],
+                [7, "print", 0, 0, [5, 8, 9]],
+                [8, "measurevalue", 0, 0, [7]],
+                [9, "print", 0, 0, [7, 10, 11]],
+                [10, "elapsednotes", 0, 0, [9]],
+                [11, "print", 0, 0, [9, 12, null]],
+                [12, "bpmfactor", 0, 0, [11]]
+            ]);
         }
 
         /**
@@ -1749,14 +1764,102 @@ function setupWidgetBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {object} blk - The block object.
+         * @returns {Array} The result of the flow.
          */
         flow(args, logo, turtle, blk) {
-            if (logo.statusMatrix === null) {
+            if (!logo.statusMatrix) {
                 logo.statusMatrix = new StatusMatrix();
             }
 
+            const collectStatusFields = () => {
+                const structuralFields = [];
+                const seen = new Set();
+
+                const registerStatusField = field => {
+                    if (!Array.isArray(field)) {
+                        return;
+                    }
+
+                    const key = field[0] + ":" + field[1];
+                    if (seen.has(key)) {
+                        return;
+                    }
+
+                    seen.add(key);
+                    structuralFields.push(field);
+                };
+
+                const saveStatus = logo.inStatusMatrix;
+                logo.inStatusMatrix = true;
+
+                const registerMonitors = b => {
+                    if (b === null || !(b in activity.blocks.blockList)) return;
+                    const block = activity.blocks.blockList[b];
+
+                    if (block.name === "print") {
+                        const arg = block.connections[1];
+                        if (arg !== null && arg in activity.blocks.blockList) {
+                            const beforeCount = logo.statusFields.length;
+                            logo.parseArg(logo, turtle, arg);
+                            const newFields = logo.statusFields.slice(beforeCount);
+                            for (const field of newFields) {
+                                registerStatusField(field);
+                            }
+                            logo.statusFields.length = beforeCount;
+                        }
+                    }
+
+                    if (block.name === "status") {
+                        for (let i = 1; i < block.connections.length; i++) {
+                            const child = block.connections[i];
+                            if (child === null || !(child in activity.blocks.blockList)) {
+                                continue;
+                            }
+
+                            const childBlock = activity.blocks.blockList[child];
+                            if (childBlock.name === "hidden") {
+                                registerMonitors(childBlock.connections[1]);
+                            } else if (childBlock.name !== "hiddennoflow") {
+                                registerMonitors(child);
+                            }
+                        }
+                    } else if (block.connections.length > 2) {
+                        registerMonitors(block.connections[block.connections.length - 1]);
+                    }
+                };
+
+                registerMonitors(blk);
+                logo.inStatusMatrix = saveStatus;
+
+                return structuralFields;
+            };
+
+            const dedupeStatusFields = () => {
+                if (!Array.isArray(logo.statusFields)) {
+                    logo.statusFields = [];
+                    return;
+                }
+
+                const seen = new Set();
+                logo.statusFields = logo.statusFields.filter(([fieldBlk, fieldName]) => {
+                    const key = fieldBlk + ":" + fieldName;
+                    if (seen.has(key)) {
+                        return false;
+                    }
+
+                    seen.add(key);
+                    return true;
+                });
+            };
+
+            const structuralFields = collectStatusFields();
+            if (!logo.statusMatrix.isOpen || logo.statusFields.length === 0) {
+                logo.statusFields = structuralFields.slice();
+            }
+
+            dedupeStatusFields();
             logo.statusMatrix.init(activity);
-            logo.statusFields = [];
+            logo.statusFields = []; // Clear for the actual interpreter run
 
             logo.inStatusMatrix = true;
 
@@ -1764,6 +1867,10 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
+                if (logo.statusFields.length === 0) {
+                    logo.statusFields = structuralFields.slice();
+                }
+                dedupeStatusFields();
                 logo.statusMatrix.init(activity);
                 logo.inStatusMatrix = false;
             };
