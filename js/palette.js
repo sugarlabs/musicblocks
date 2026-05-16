@@ -452,14 +452,14 @@ class Palettes {
         } else if (this._navSection === "search" && blockRows.length > 0) {
             const searchRow = blockRows[0];
             if (searchRow) {
-                searchRow.style.backgroundColor = platformColor.hoverColor;
+                searchRow.classList.add("palette-keyboard-hover");
                 searchRow.dataset.keyboardFocus = "true";
                 searchRow.tabIndex = 0;
                 searchRow.focus({ preventScroll: true });
             }
         } else if (this._navSection === "blocks" && blockRows[this._navBlockIndex]) {
             const row = blockRows[this._navBlockIndex];
-            row.style.backgroundColor = platformColor.hoverColor;
+            row.classList.add("palette-keyboard-hover");
             row.dataset.keyboardFocus = "true";
             row.tabIndex = 0;
             row.focus({ preventScroll: true });
@@ -468,7 +468,7 @@ class Palettes {
             const paletteBlocks = this._getPaletteBlocks();
             if (paletteBlocks[this._navPaletteBlockIndex]) {
                 const blockRow = paletteBlocks[this._navPaletteBlockIndex];
-                blockRow.style.backgroundColor = platformColor.hoverColor;
+                blockRow.classList.add("palette-keyboard-hover");
                 blockRow.dataset.keyboardFocus = "true";
                 blockRow.tabIndex = 0;
                 blockRow.focus({ preventScroll: true });
@@ -484,7 +484,7 @@ class Palettes {
     _clearKeyboardFocus() {
         const focused = document.querySelectorAll('[data-keyboard-focus="true"]');
         focused.forEach(el => {
-            el.style.backgroundColor = platformColor.paletteBackground;
+            el.classList.remove("palette-keyboard-hover");
             delete el.dataset.keyboardFocus;
             if (typeof el.hasAttribute === "function" && el.hasAttribute("tabindex")) {
                 el.tabIndex = -1;
