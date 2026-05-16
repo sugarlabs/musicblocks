@@ -7737,12 +7737,6 @@ class Activity {
                         {
                             area: _("Search (🔍)"),
                             desc: _("Type to search for any block by name across all palettes.")
-                        },
-                        {
-                            area: _("Beginner / Advanced toggle"),
-                            desc: _(
-                                "Switches between a simplified block set for beginners and the full set for advanced users."
-                            )
                         }
                     ]
                 },
@@ -7801,20 +7795,10 @@ class Activity {
                             )
                         },
                         {
-                            area: _("Timbre"),
+                            area: _("Pitch Staircase"),
                             desc: _(
-                                "Design custom instruments by combining synth oscillators and effects."
+                                "Visualise and set pitch ratios by stacking notes in a staircase layout."
                             )
-                        },
-                        {
-                            area: _("Status"),
-                            desc: _(
-                                "Shows a live readout of turtle parameters (pitch, volume, BPM, etc.) as the program runs."
-                            )
-                        },
-                        {
-                            area: _("Tempo"),
-                            desc: _("Adjust the beats-per-minute of the project in real time.")
                         }
                     ]
                 }
