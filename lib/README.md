@@ -29,14 +29,13 @@ If you need to view or modify the original source code, it's best to refer to th
 | 17  | `p5.min.js`                           | [p5.js](https://github.com/processing/p5.js) <!-- Used in MB: v1.11.3, Latest: v1.11.4 -->           |
 | 18  | `p5.sound.min.js`                     | [p5.js-sound](https://github.com/processing/p5.js-sound) <!-- Used in MB: v1.0.1, Latest: v1.0.2 --> |
 | 19  | `prefixfree.min.js`                   | [prefixfree](https://github.com/LeaVerou/prefixfree) (No longer maintained)                          |
-| 20  | `preloadjs.min.js`                    | [PreloadJS](https://github.com/CreateJS/PreloadJS)                                                   |
-| 21  | `raphael.min.js`                      | [raphael](https://github.com/DmitryBaranovskiy/raphael)                                              |
-| 22  | `require.js`                          | [requirejs](https://github.com/requirejs/requirejs) <!-- Used in MB: v2.1.4, Latest: v2.3.7 -->      |
-| 23  | `sw.js`                               | [sw.js]() (Upstream link TBD)                                                                        |
-| 24  | `text.js`                             | [text](https://github.com/requirejs/text) <!-- Used in MB: v2.0.10, Latest: v2.0.16 -->              |
-| 25  | `Tone.js`                             | [Tone.js](https://github.com/Tonejs/Tone.js) <!-- Used in MB: Not specified; Latest: v14.7.39 -->    |
-| 26  | `tweenjs.min.js`                      | [TweenJS](https://github.com/CreateJS/TweenJS)                                                       |
-| 27  | `webL10n.js` & `webL10n.sugarizer.js` | [webL10n](https://github.com/fabi1cazenave/webL10n)                                                  |
-| 28  | `wheelnav.js`                         | [wheelnav](https://github.com/softwaretailoring/wheelnav)                                            |
+| 20  | `raphael.min.js`                      | [raphael](https://github.com/DmitryBaranovskiy/raphael)                                              |
+| 21  | `require.js`                          | [requirejs](https://github.com/requirejs/requirejs) <!-- Used in MB: v2.1.4, Latest: v2.3.7 -->      |
+| 22  | `sw.js`                               | [sw.js]() (Upstream link TBD)                                                                        |
+| 23  | `text.js`                             | [text](https://github.com/requirejs/text) <!-- Used in MB: v2.0.10, Latest: v2.0.16 -->              |
+| 24  | `Tone.js`                             | [Tone.js](https://github.com/Tonejs/Tone.js) <!-- Used in MB: Not specified; Latest: v14.7.39 -->    |
+| 25  | `tweenjs.min.js`                      | [TweenJS](https://github.com/CreateJS/TweenJS)                                                       |
+| 26  | `webL10n.js` & `webL10n.sugarizer.js` | [webL10n](https://github.com/fabi1cazenave/webL10n)                                                  |
+| 27  | `wheelnav.js`                         | [wheelnav](https://github.com/softwaretailoring/wheelnav)                                            |
 
 <!-- TODO: Add a separate column for description for libs -->
