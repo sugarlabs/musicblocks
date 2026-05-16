@@ -1362,6 +1362,11 @@ class RhythmRuler {
      * @returns {void}
      */
     __addCellEventHandlers(cell, cellWidth, noteValue) {
+        // Allow horizontal panning (pan-x) on cells so wide ruler patterns
+        // can still be scrolled on mobile when they overflow the viewport,
+        // while still suppressing pinch-zoom on individual cells.
+        cell.style.touchAction = "pan-x";
+
         const __mouseOverHandler = event => {
             const cell = event.currentTarget;
             if (cell === null || cell.parentNode === null) {
@@ -1419,7 +1424,12 @@ class RhythmRuler {
         const __mouseUpHandler = event => {
             this._clearWidgetTimeout(this._longPressBeep);
             this._longPressBeep = null;
-            const cell = event.currentTarget;
+            // On touch with Pointer Events, the browser implicitly captures the
+            // pointer to the pointerdown target, so event.target is always the
+            // cell that received pointerdown — meaning drag-across-cells-to-tie
+            // would never fire on mobile. elementFromPoint resolves the actual
+            // element under the finger at release time for both mouse and touch.
+            const cell = document.elementFromPoint(event.clientX, event.clientY) || event.target;
             this._mouseUpCell = cell;
             if (this._mouseDownCell !== this._mouseUpCell) {
                 this._tieRuler(event, cell.parentNode.getAttribute("data-row"));
@@ -1471,11 +1481,15 @@ class RhythmRuler {
             cell.addEventListener("mouseout", __mouseOutHandler);
         }
 
-        cell.removeEventListener("mousedown", __mouseDownHandler);
-        cell.addEventListener("mousedown", __mouseDownHandler);
+        // Use Pointer Events API instead of legacy mouse events so that rhythm
+        // cells respond to touchscreen taps and stylus input as well as mouse
+        // clicks.  The Pointer Events spec guarantees these fire for all input
+        // device types on modern browsers.
+        cell.removeEventListener("pointerdown", __mouseDownHandler);
+        cell.addEventListener("pointerdown", __mouseDownHandler);
 
-        cell.removeEventListener("mouseup", __mouseUpHandler);
-        cell.addEventListener("mouseup", __mouseUpHandler);
+        cell.removeEventListener("pointerup", __mouseUpHandler);
+        cell.addEventListener("pointerup", __mouseUpHandler);
 
         cell.removeEventListener("click", __clickHandler);
         cell.addEventListener("click", __clickHandler);
@@ -3030,21 +3044,31 @@ class RhythmRuler {
                 this._circularCanvas = document.createElement("canvas");
                 this._circularCanvas.style.display = "block";
                 this._circularCanvas.style.margin = "auto";
-                this._circularCanvas.addEventListener("mousedown", event => {
+                // touch-action: none lets us handle all pointer movement
+                // ourselves without the browser intercepting pinch/pan gestures.
+                this._circularCanvas.style.touchAction = "none";
+                // Use Pointer Events so the circular drag-to-edit works on
+                // touchscreens and stylus devices, not just mouse.
+                this._circularCanvas.addEventListener("pointerdown", event => {
                     this._onCircularMouseDown(event);
                 });
-                this._circularCanvas.addEventListener("mousemove", event => {
+                this._circularCanvas.addEventListener("pointermove", event => {
                     this._onCircularMouseMove(event);
                 });
-                this._circularCanvas.addEventListener("mouseup", event => {
+                this._circularCanvas.addEventListener("pointerup", event => {
                     this._onCircularMouseUp(event);
                 });
-                this._circularCanvas.addEventListener("mouseleave", () => {
+                // Both pointercancel and pointerleave perform the same
+                // cleanup — extract to a named handler to avoid duplication
+                // and match the __mouseDownHandler/__mouseUpHandler convention.
+                const __onCircularDragEnd = () => {
                     if (this._circularDragTo !== null) {
                         this._circularDragTo = null;
                         this._drawCircularView();
                     }
-                });
+                };
+                this._circularCanvas.addEventListener("pointercancel", __onCircularDragEnd);
+                this._circularCanvas.addEventListener("pointerleave", __onCircularDragEnd);
                 this.widgetWindow.getWidgetBody().append(this._circularCanvas);
             }
             this._circularCanvas.style.display = "block";

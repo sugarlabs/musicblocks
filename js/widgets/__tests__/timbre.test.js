@@ -21,6 +21,8 @@
  */
 
 // --- Global Mocks (must be set before require) ---
+const jsdomDocument = global.document;
+
 global._ = msg => msg;
 global.DEFAULTOSCILLATORTYPE = "sine";
 global.DEFAULTFILTERTYPE = "lowpass";
@@ -375,6 +377,164 @@ describe("TimbreWidget", () => {
             timbre.notesToPlay.push(["C4", 4]);
             timbre.notesToPlay = [];
             expect(timbre.notesToPlay).toHaveLength(0);
+        });
+    });
+
+    describe("DuoSynth selector", () => {
+        let mockDocument;
+        let mockDocById;
+        let mockDocByName;
+        let mockDelayExecution;
+
+        const createBlock = (name, connections, value) => ({
+            name,
+            connections,
+            value,
+            text: { text: value === undefined ? "" : value.toString() },
+            updateCache: jest.fn(),
+            isClampBlock: jest.fn(() => false)
+        });
+
+        const setupDuoSynthWidget = () => {
+            const blocks = {
+                blockList: [createBlock("settimbre", [null, null, null])],
+                clampBlocksToCheck: [],
+                findBottomBlock: jest.fn(() => null),
+                adjustDocks: jest.fn(),
+                adjustExpandableClampBlock: jest.fn(),
+                sendStackToTrash: jest.fn(),
+                loadNewBlocks: jest.fn(blockObjs => {
+                    const blockOffset = blocks.blockList.length;
+
+                    for (const blockObj of blockObjs) {
+                        const blockName = Array.isArray(blockObj[1]) ? blockObj[1][0] : blockObj[1];
+                        const value = Array.isArray(blockObj[1]) ? blockObj[1][1].value : undefined;
+                        const connections = blockObj[4].map(connection =>
+                            connection === null ? null : connection + blockOffset
+                        );
+
+                        blocks.blockList.push(createBlock(blockName, connections, value));
+                    }
+                })
+            };
+
+            timbre = new TimbreWidget();
+            timbre.blockNo = 0;
+            timbre._playNote = jest.fn();
+            timbre.activity = {
+                blocks,
+                logo: {
+                    synth: {
+                        createSynth: jest.fn()
+                    }
+                },
+                refreshCanvas: jest.fn(),
+                saveLocally: jest.fn()
+            };
+            timbre.timbreTableDiv = jsdomDocument.createElement("div");
+            jsdomDocument.body.appendChild(timbre.timbreTableDiv);
+        };
+
+        beforeEach(() => {
+            mockDocument = global.document;
+            mockDocById = global.docById;
+            mockDocByName = global.docByName;
+            mockDelayExecution = global.delayExecution;
+
+            global.document = jsdomDocument;
+            global.docById = id => jsdomDocument.getElementById(id);
+            global.docByName = name => jsdomDocument.getElementsByName(name);
+            global.delayExecution = jest.fn(() => new Promise(() => {}));
+            jsdomDocument.body.textContent = "";
+
+            setupDuoSynthWidget();
+        });
+
+        afterEach(() => {
+            jsdomDocument.body.textContent = "";
+            global.document = mockDocument;
+            global.docById = mockDocById;
+            global.docByName = mockDocByName;
+            global.delayExecution = mockDelayExecution;
+        });
+
+        test("renders controls on the first DuoSynth click without waiting", () => {
+            timbre._synth();
+
+            const duoRadio = jsdomDocument.querySelector('input[value="DuoSynth"]');
+            duoRadio.onclick({ target: duoRadio });
+
+            expect(global.delayExecution).not.toHaveBeenCalled();
+            expect(jsdomDocument.getElementById("wrapperS0")).not.toBeNull();
+            expect(jsdomDocument.getElementById("wrapperS1")).not.toBeNull();
+            expect(timbre.duoSynthesizer).toEqual([1]);
+            expect(timbre.duoSynthParamVals.vibratoAmount).toBe(0.06);
+            expect(timbre.activity.logo.synth.createSynth).toHaveBeenCalledWith(
+                0,
+                "custom",
+                "duosynth",
+                timbre.duoSynthParamVals
+            );
+        });
+
+        test.each(["AMSynth", "FMSynth"])(
+            "renders DuoSynth controls on the first click after %s",
+            synthName => {
+                timbre._synth();
+
+                const firstRadio = jsdomDocument.querySelector(`input[value="${synthName}"]`);
+                firstRadio.onclick({ target: firstRadio });
+                expect(jsdomDocument.getElementById("wrapperS0")).not.toBeNull();
+
+                const duoRadio = jsdomDocument.querySelector('input[value="DuoSynth"]');
+                duoRadio.onclick({ target: duoRadio });
+
+                expect(global.delayExecution).not.toHaveBeenCalled();
+                expect(jsdomDocument.getElementById("chosen").textContent).toBe("DuoSynth");
+                expect(jsdomDocument.getElementById("wrapperS0")).not.toBeNull();
+                expect(jsdomDocument.getElementById("wrapperS1")).not.toBeNull();
+                expect(timbre.duoSynthParamVals.vibratoRate).toBe(10);
+                expect(timbre.duoSynthParamVals.vibratoAmount).toBe(0.06);
+            }
+        );
+
+        test("reuses existing DuoSynth block values without double-normalizing amount", () => {
+            timbre.duoSynthesizer.push(1);
+            timbre.duoSynthParams.push(10);
+            timbre.duoSynthParams.push(20);
+            timbre._synth();
+
+            const duoRadio = jsdomDocument.querySelector('input[value="DuoSynth"]');
+            duoRadio.onclick({ target: duoRadio });
+
+            expect(jsdomDocument.getElementById("myRangeS0").value).toBe("10");
+            expect(jsdomDocument.getElementById("myRangeS1").value).toBe("20");
+            expect(timbre.duoSynthParamVals.vibratoRate).toBe(10);
+            expect(timbre.duoSynthParamVals.vibratoAmount).toBe(0.2);
+        });
+
+        test("updates the matching DuoSynth parameter from each slider", () => {
+            timbre._synth();
+
+            const duoRadio = jsdomDocument.querySelector('input[value="DuoSynth"]');
+            duoRadio.onclick({ target: duoRadio });
+
+            const changeEvent = new jsdomDocument.defaultView.Event("change", { bubbles: true });
+            const rateSlider = jsdomDocument.getElementById("myRangeS0");
+            rateSlider.value = "12";
+            rateSlider.dispatchEvent(changeEvent);
+
+            const amountSlider = jsdomDocument.getElementById("myRangeS1");
+            amountSlider.value = "7";
+            amountSlider.dispatchEvent(
+                new jsdomDocument.defaultView.Event("change", { bubbles: true })
+            );
+
+            expect(timbre.duoSynthParamVals.vibratoRate).toBe(12);
+            expect(timbre.duoSynthParamVals.vibratoAmount).toBe(0.07);
+            expect(timbre.duoSynthParams).toEqual(["12", "7"]);
+            expect(timbre.activity.blocks.blockList[2].value).toBe("12");
+            expect(timbre.activity.blocks.blockList[3].value).toBe("7");
         });
     });
 });

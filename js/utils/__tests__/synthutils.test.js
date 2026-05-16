@@ -74,6 +74,7 @@ describe("Utility Functions (logic-only)", () => {
         global.Tone = require("./tonemock.js");
 
         const codeFiles = [
+            "../utils-logic.js",
             "../utils.js",
             "../../logoconstants.js",
             "../platformstyle.js",

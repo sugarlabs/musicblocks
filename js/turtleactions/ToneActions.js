@@ -470,11 +470,11 @@ function setupToneActions(activity) {
             }
 
             synthVibratoRate = Math.abs(synthVibratoRate);
-            synthVibratoAmount = Math.abs(synthVibratoAmount) / 100;
+            synthVibratoAmount = Math.abs(synthVibratoAmount);
 
             if (activity.logo.inTimbre) {
                 activity.logo.timbre.duoSynthParamVals["vibratoRate"] = synthVibratoRate;
-                activity.logo.timbre.duoSynthParamVals["vibratoAmount"] = synthVibratoAmount;
+                activity.logo.timbre.duoSynthParamVals["vibratoAmount"] = synthVibratoAmount / 100;
                 activity.logo.synth.createSynth(
                     turtle,
                     activity.logo.timbre.instrumentName,
