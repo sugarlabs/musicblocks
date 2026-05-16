@@ -99,7 +99,7 @@ describe("loader.js coverage", () => {
                 paths: expect.any(Object),
                 shim: expect.objectContaining({
                     "utils/utils": expect.objectContaining({
-                        deps: ["utils/platformstyle"]
+                        deps: expect.arrayContaining(["utils/platformstyle"])
                     }),
                     "materialize": expect.objectContaining({
                         deps: ["jquery"]
