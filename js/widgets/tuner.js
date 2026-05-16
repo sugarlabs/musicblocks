@@ -99,13 +99,15 @@ function TunerDisplay(canvas, width, height) {
  * Updates the styles of mode toggle buttons based on current mode
  */
 TunerDisplay.prototype.updateButtonStyles = function () {
+    const selectorBg = getComputedStyle(document.body).getPropertyValue("--mb-selector-bg").trim();
+
     if (this.chromaticMode) {
-        this.chromaticButton.style.backgroundColor = platformColor.selectorBackground;
+        this.chromaticButton.style.backgroundColor = selectorBg;
         this.chromaticButton.querySelector("img").style.filter = "brightness(0) invert(1)";
         this.targetPitchButton.style.backgroundColor = "transparent";
         this.targetPitchButton.querySelector("img").style.filter = "none";
     } else {
-        this.targetPitchButton.style.backgroundColor = platformColor.selectorBackground;
+        this.targetPitchButton.style.backgroundColor = selectorBg;
         this.targetPitchButton.querySelector("img").style.filter = "brightness(0) invert(1)";
         this.chromaticButton.style.backgroundColor = "transparent";
         this.chromaticButton.querySelector("img").style.filter = "none";
@@ -132,6 +134,10 @@ TunerDisplay.prototype.draw = function () {
     const ctx = this.ctx;
     const width = this.width;
     const height = this.height;
+    const selectorBg =
+        getComputedStyle(document.body).getPropertyValue("--mb-selector-bg").trim() || "#e0e0e0";
+    const textColor =
+        getComputedStyle(document.body).getPropertyValue("--mb-text-color").trim() || "#000000";
 
     // Clear the canvas
     ctx.clearRect(0, 0, width, height);
@@ -143,11 +149,11 @@ TunerDisplay.prototype.draw = function () {
     const meterY = height - 80; // Base position of meter
 
     // Draw the tuning meter background
-    ctx.fillStyle = platformColor.selectorBackground || "#e0e0e0";
+    ctx.fillStyle = selectorBg;
     ctx.fillRect(meterX, meterY, meterWidth, meterHeight);
 
     // Draw the center line
-    ctx.fillStyle = platformColor.textColor || "#000000";
+    ctx.fillStyle = textColor;
     ctx.fillRect(meterX + meterWidth / 2 - 1, meterY, 2, meterHeight);
 
     // Draw the indicator
@@ -159,7 +165,7 @@ TunerDisplay.prototype.draw = function () {
     // Draw the note
     ctx.font = "bold 48px Arial";
     ctx.textAlign = "center";
-    ctx.fillStyle = platformColor.textColor || "#000000";
+    ctx.fillStyle = textColor;
     ctx.fillText(this.note, width / 2, height - 200); // Much lower position
 
     // Draw the cents deviation

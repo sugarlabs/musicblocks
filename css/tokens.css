@@ -37,16 +37,19 @@
 :root {
     --mb-selector-bg: #8cc6ff;
     --mb-selector-selected: #1a8cff;
+    --mb-text-color: black;
 }
 
 /* Dark theme */
 body.dark {
     --mb-selector-bg: #64b5f6;
     --mb-selector-selected: #1e88e5;
+    --mb-text-color: #e2e2e2;
 }
 
 /* High contrast theme */
 body.highcontrast {
     --mb-selector-bg: #00ffff;
     --mb-selector-selected: #00cccc;
+    --mb-text-color: #ffffff;
 }
