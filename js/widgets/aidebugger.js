@@ -614,7 +614,7 @@ function AIDebuggerWidget() {
         this.promptCount = 0; // Reset prompt count
         this.conversationId = this._generateConversationId();
         this._hideTypingIndicator();
-        this.chatLog.innerHTML = "";
+        this.chatLog.replaceChildren();
 
         this._loadProjectAndInitialize();
         this._updateMessageCount();
@@ -722,7 +722,7 @@ function AIDebuggerWidget() {
      * @private
      */
     this._clearChat = function () {
-        this.chatLog.innerHTML = "";
+        this.chatLog.replaceChildren();
         this.activity.textMsg(_("Chat cleared."));
     };
 
