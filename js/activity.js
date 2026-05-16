@@ -2250,6 +2250,7 @@ class Activity {
                 [null, null],
                 [null, null]
             ]; // Array to track two fingers (Y and X coordinates)
+            let initialPinchDistance = null;
 
             /**
              * Handles touch start event on the canvas.
@@ -2263,10 +2264,15 @@ class Activity {
                             initialTouches[i][0] = event.touches[i].clientY;
                             initialTouches[i][1] = event.touches[i].clientX;
                         }
+                        const dx = event.touches[0].clientX - event.touches[1].clientX;
+                        const dy = event.touches[0].clientY - event.touches[1].clientY;
+                        initialPinchDistance = Math.hypot(dx, dy);
                     }
                 },
                 { passive: true }
             );
+
+            myCanvas.style.touchAction = "none";
 
             /**
              * Handles touch move event on the canvas.
@@ -2276,6 +2282,23 @@ class Activity {
                 "touchmove",
                 event => {
                     if (event.touches.length === 2) {
+                        event.preventDefault();
+                        const dx = event.touches[0].clientX - event.touches[1].clientX;
+                        const dy = event.touches[0].clientY - event.touches[1].clientY;
+                        const currentPinchDistance = Math.hypot(dx, dy);
+
+                        if (initialPinchDistance !== null && !that.resizeDebounce) {
+                            const pinchDelta = currentPinchDistance - initialPinchDistance;
+                            if (Math.abs(pinchDelta) > 20) {
+                                if (pinchDelta > 0) {
+                                    doLargerBlocks(that);
+                                } else {
+                                    doSmallerBlocks(that);
+                                }
+                                initialPinchDistance = currentPinchDistance;
+                            }
+                        }
+
                         let totalDeltaY = 0;
                         let totalDeltaX = 0;
                         let count = 0;
@@ -2312,7 +2335,7 @@ class Activity {
                         that.refreshCanvas();
                     }
                 },
-                { passive: true }
+                { passive: false }
             );
 
             /**
@@ -2323,6 +2346,7 @@ class Activity {
                     initialTouches[i][0] = null;
                     initialTouches[i][1] = null;
                 }
+                initialPinchDistance = null;
             });
 
             /**
