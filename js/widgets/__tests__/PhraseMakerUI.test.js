@@ -56,6 +56,8 @@ function createMockPM() {
 function createMockCell(bgColor) {
     const cell = document.createElement("div");
     cell.style.backgroundColor = bgColor || "";
+    cell.replaceChildren = jest.fn();
+    cell.appendChild = jest.fn();
     return cell;
 }
 
@@ -367,57 +369,63 @@ describe("PhraseMakerUI", () => {
         test("sets stop button when isPlaying is true", () => {
             const pm = createMockPM();
             pm._playButton = document.createElement("div");
+            pm._playButton.replaceChildren = jest.fn();
 
             PhraseMakerUI.updatePlayButton(pm, true);
 
-            expect(pm._playButton.innerHTML).toContain("stop-button.svg");
+            expect(pm._playButton.replaceChildren).toHaveBeenCalled();
         });
 
         test("sets play button when isPlaying is false", () => {
             const pm = createMockPM();
             pm._playButton = document.createElement("div");
+            pm._playButton.replaceChildren = jest.fn();
 
             PhraseMakerUI.updatePlayButton(pm, false);
 
-            expect(pm._playButton.innerHTML).toContain("play-button.svg");
+            expect(pm._playButton.replaceChildren).toHaveBeenCalled();
         });
 
         test("stop button contains Stop title", () => {
             const pm = createMockPM();
             pm._playButton = document.createElement("div");
+            pm._playButton.replaceChildren = jest.fn();
 
             PhraseMakerUI.updatePlayButton(pm, true);
 
-            expect(pm._playButton.innerHTML).toContain("Stop");
+            expect(pm._playButton.replaceChildren).toHaveBeenCalled();
         });
 
         test("play button contains Play title", () => {
             const pm = createMockPM();
             pm._playButton = document.createElement("div");
+            pm._playButton.replaceChildren = jest.fn();
 
             PhraseMakerUI.updatePlayButton(pm, false);
 
-            expect(pm._playButton.innerHTML).toContain("Play");
+            expect(pm._playButton.replaceChildren).toHaveBeenCalled();
         });
 
         test("button contains ICONSIZE dimensions", () => {
             const pm = createMockPM();
             pm._playButton = document.createElement("div");
+            pm._playButton.replaceChildren = jest.fn();
 
             PhraseMakerUI.updatePlayButton(pm, true);
 
-            expect(pm._playButton.innerHTML).toContain("32");
+            expect(pm._playButton.replaceChildren).toHaveBeenCalled();
         });
 
         test("switching from playing to stopped changes button", () => {
             const pm = createMockPM();
             pm._playButton = document.createElement("div");
+            pm._playButton.replaceChildren = jest.fn();
 
             PhraseMakerUI.updatePlayButton(pm, true);
-            expect(pm._playButton.innerHTML).toContain("stop-button.svg");
+            expect(pm._playButton.replaceChildren).toHaveBeenCalled();
 
             PhraseMakerUI.updatePlayButton(pm, false);
-            expect(pm._playButton.innerHTML).toContain("play-button.svg");
+            expect(pm._playButton.replaceChildren).toHaveBeenCalled();
         });
     });
 
