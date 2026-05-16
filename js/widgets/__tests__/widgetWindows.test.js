@@ -242,6 +242,56 @@ describe("widgetWindows", () => {
         });
     });
 
+    describe("window control keyboard handling", () => {
+        test("Enter activates the close button", () => {
+            const win = createTestWindow();
+            const closeButton = win._drag.querySelector(".close");
+            const spy = jest.fn();
+            win.onclose = spy;
+
+            closeButton.dispatchEvent(
+                new KeyboardEvent("keydown", {
+                    key: "Enter",
+                    bubbles: true,
+                    cancelable: true
+                })
+            );
+
+            expect(spy).toHaveBeenCalledTimes(1);
+        });
+
+        test("Space activates the roll-up button", () => {
+            const win = createTestWindow();
+
+            win._rollButton.dispatchEvent(
+                new KeyboardEvent("keydown", {
+                    key: " ",
+                    bubbles: true,
+                    cancelable: true
+                })
+            );
+
+            expect(win._rolled).toBe(true);
+            expect(win._rollButton.classList.contains("plus")).toBe(true);
+        });
+
+        test("Enter activates the maximize button", () => {
+            const win = createTestWindow();
+            const maxminButton = win._nonclosebuttons.querySelector(".wftMaxmin");
+
+            maxminButton.dispatchEvent(
+                new KeyboardEvent("keydown", {
+                    key: "Enter",
+                    bubbles: true,
+                    cancelable: true
+                })
+            );
+
+            expect(win._maximized).toBe(true);
+            expect(win._maxminIcon.getAttribute("src")).toBe("header-icons/icon-contract.svg");
+        });
+    });
+
     describe("addButton", () => {
         test("returns a div element with wfbtItem class", () => {
             const win = createTestWindow();

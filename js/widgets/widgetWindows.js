@@ -196,6 +196,16 @@ class WidgetWindow {
 
     /**
      * @private
+     * @param {KeyboardEvent} e
+     * @param {Function} handler
+     */
+    _handleButtonKeydown(e, handler) {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        handler(e);
+    }
+
+    /**
+     * @private
      * @returns {void}
      */
     _createUIelements() {
@@ -220,11 +230,13 @@ class WidgetWindow {
         closeButton.setAttribute("role", "button");
         closeButton.setAttribute("aria-label", _("Close window"));
         closeButton.setAttribute("tabindex", "0");
-        closeButton.onclick = e => {
+        const closeWindow = e => {
             this.onclose();
             e.preventDefault();
             e.stopPropagation();
         };
+        closeButton.onclick = closeWindow;
+        closeButton.onkeydown = e => this._handleButtonKeydown(e, closeWindow);
 
         this._nonclose = this._create("div", "nonclose", this._drag);
         this._nonclose.style.display = "flex";
@@ -268,7 +280,7 @@ class WidgetWindow {
         rollButton.setAttribute("role", "button");
         rollButton.setAttribute("aria-label", _("Roll up window"));
         rollButton.setAttribute("tabindex", "0");
-        rollButton.onclick = e => {
+        const toggleRollup = e => {
             if (this._rolled) {
                 this.unroll();
             } else {
@@ -282,13 +294,15 @@ class WidgetWindow {
             e.preventDefault();
             e.stopPropagation();
         };
+        rollButton.onclick = toggleRollup;
+        rollButton.onkeydown = e => this._handleButtonKeydown(e, toggleRollup);
 
         if (this._fullscreenEnabled) {
             const maxminButton = this._create("div", "wftButton wftMaxmin", this._nonclosebuttons);
             maxminButton.setAttribute("role", "button");
             maxminButton.setAttribute("aria-label", _("Maximize window"));
             maxminButton.setAttribute("tabindex", "0");
-            maxminButton.onclick = e => {
+            const toggleMaximize = e => {
                 if (this._maximized) {
                     this._restore();
                     this.sendToCenter();
@@ -300,6 +314,8 @@ class WidgetWindow {
                 e.preventDefault();
                 e.stopImmediatePropagation();
             };
+            maxminButton.onclick = toggleMaximize;
+            maxminButton.onkeydown = e => this._handleButtonKeydown(e, toggleMaximize);
             this._maxminIcon = this._create("img", undefined, maxminButton);
             this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
         }
