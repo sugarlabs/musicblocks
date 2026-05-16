@@ -7669,6 +7669,50 @@ class Activity {
         };
 
         this._showUIMap = () => {
+            let stop_desc = _("Stops all mice and music playback.");
+            let avatar_area = _("Mouse");
+            let avatar_desc = _(
+                "The animated cursor that plays music and draws graphics as your program runs."
+            );
+            let widgets_list = [
+                {
+                    area: _("Status"),
+                    desc: _("Lets you monitor program status.")
+                },
+                {
+                    area: _("Phrase Maker"),
+                    desc: _(
+                        "A grid-based tool for visually composing note sequences by clicking pitch and rhythm cells."
+                    )
+                },
+                {
+                    area: _("Rhythm Ruler"),
+                    desc: _("Lets you define rhythmic patterns by dividing a measure into beats.")
+                },
+                {
+                    area: _("Music Keyboard"),
+                    desc: _(
+                        "An on-screen piano keyboard for playing and recording notes interactively."
+                    )
+                },
+                {
+                    area: _("Pitch Staircase"),
+                    desc: _(
+                        "Visualise and set pitch ratios by stacking notes in a staircase layout."
+                    )
+                }
+            ];
+            if (_THIS_IS_TURTLE_BLOCKS_) {
+                stop_desc = _("Stops all turtles.");
+                avatar_area = _("Turtle");
+                avatar_desc = _("The animated cursor that draws graphics as your program runs.");
+                widgets_list = [
+                    {
+                        area: _("Status"),
+                        desc: _("Lets you monitor program status.")
+                    }
+                ];
+            }
             const uiSections = [
                 {
                     title: _("Toolbar"),
@@ -7683,7 +7727,7 @@ class Activity {
                         },
                         {
                             area: _("Stop (■)"),
-                            desc: _("Stops all turtles and music playback.")
+                            desc: stop_desc
                         },
                         {
                             area: _("New project"),
@@ -7703,7 +7747,7 @@ class Activity {
                         },
                         {
                             area: _("Help (?)"),
-                            desc: _("Opens this tour, the UI map, and keyboard shortcuts.")
+                            desc: _("Opens the tour, keyboard shortcuts, or this UI map.")
                         },
                         {
                             area: _("Auxiliary menu (≡)"),
@@ -7766,41 +7810,14 @@ class Activity {
                             desc: _("Opens a menu to paste blocks, undo, or zoom the workspace.")
                         },
                         {
-                            area: _("Mouse (turtle)"),
-                            desc: _(
-                                "The animated cursor that draws graphics and plays music as your program runs."
-                            )
+                            area: avatar_area,
+                            desc: avatar_desc
                         }
                     ]
                 },
                 {
                     title: _("Widgets (popup tools)"),
-                    items: [
-                        {
-                            area: _("Phrase Maker"),
-                            desc: _(
-                                "A grid-based tool for visually composing note sequences by clicking pitch and rhythm cells."
-                            )
-                        },
-                        {
-                            area: _("Rhythm Ruler"),
-                            desc: _(
-                                "Lets you define rhythmic patterns by dividing a measure into beats."
-                            )
-                        },
-                        {
-                            area: _("Music Keyboard"),
-                            desc: _(
-                                "An on-screen piano keyboard for playing and recording notes interactively."
-                            )
-                        },
-                        {
-                            area: _("Pitch Staircase"),
-                            desc: _(
-                                "Visualise and set pitch ratios by stacking notes in a staircase layout."
-                            )
-                        }
-                    ]
+                    items: widgets_list
                 }
             ];
 
@@ -8575,22 +8592,19 @@ class Activity {
             // data loss from browser crashes (see issue #2994).
             // Deferred while the project is actively running to avoid
             // interrupting playback.
-            this._autoSaveInterval = setInterval(
-                () => {
-                    try {
-                        if (this.logo && this.logo._alreadyRunning) {
-                            return;
-                        }
-
-                        if (this.saveLocally !== null && this.saveLocally !== undefined) {
-                            this.saveLocally();
-                        }
-                    } catch (e) {
-                        console.error("[AutoSave] Failed:", e);
+            this._autoSaveInterval = setInterval(() => {
+                try {
+                    if (this.logo && this.logo._alreadyRunning) {
+                        return;
                     }
-                },
-                5 * 60 * 1000
-            );
+
+                    if (this.saveLocally !== null && this.saveLocally !== undefined) {
+                        this.saveLocally();
+                    }
+                } catch (e) {
+                    console.error("[AutoSave] Failed:", e);
+                }
+            }, 5 * 60 * 1000);
 
             initBasicProtoBlocks(this);
 
