@@ -63,6 +63,9 @@ requirejs.config({
             deps: ["utils/utils"],
             exports: "retryWithBackoff"
         },
+        "utils/error-handler": {
+            exports: "ErrorHandler"
+        },
         "activity/turtledefs": {
             deps: ["utils/utils"],
             exports: "createDefaultStack"
