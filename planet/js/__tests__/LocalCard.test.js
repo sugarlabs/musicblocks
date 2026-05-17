@@ -219,7 +219,7 @@ describe("LocalCard", () => {
             expect(planet.LocalPlanet.Publisher.open).toHaveBeenCalledWith("p10");
         });
 
-        it("should call renameProject when the name input changes", () => {
+        it("should call renameProject when the name input changes (after debounce)", () => {
             jest.useFakeTimers();
             const card = prepareCard("p11");
             card.render();
@@ -227,6 +227,9 @@ describe("LocalCard", () => {
             const input = document.getElementById("local-project-input-p11");
             input.value = "New Name";
             input.dispatchEvent(new Event("input"));
+
+            expect(planet.ProjectStorage.renameProject).not.toHaveBeenCalled();
+
             jest.advanceTimersByTime(400);
 
             expect(planet.ProjectStorage.renameProject).toHaveBeenCalledWith("p11", "New Name");
