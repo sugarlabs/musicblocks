@@ -195,4 +195,65 @@ describe("PitchStaircase Widget", () => {
             expect(psc.Stairs[1][2]).toBe(261.63);
         });
     });
+
+    // --- Ratio input sanitisation ---
+    describe("_dissectStair input sanitisation", () => {
+        const setupStairsForFrequency = (instance, frequency) => {
+            instance.Stairs = [["A", "", frequency, 1, 1, frequency, null]];
+            instance._history = [];
+            instance._makeStairs = jest.fn();
+        };
+
+        const fakeEvent = frequency => ({
+            target: { getAttribute: () => String(frequency) }
+        });
+
+        test("falls back to default 3 when ratio numerator (musicRatio1) is 0", () => {
+            const frequency = 440;
+            setupStairsForFrequency(psc, frequency);
+            psc._musicRatio1 = { value: "0" };
+            psc._musicRatio2 = { value: "2" };
+
+            psc._dissectStair(fakeEvent(frequency));
+
+            expect(psc._musicRatio1.value).toBe(3);
+            expect(psc._musicRatio2.value).toBe(2);
+            for (const stair of psc.Stairs) {
+                expect(Number.isFinite(stair[2])).toBe(true);
+                expect(stair[2]).not.toBe(0);
+            }
+        });
+
+        test("falls back to default 2 when ratio denominator (musicRatio2) is 0", () => {
+            const frequency = 440;
+            setupStairsForFrequency(psc, frequency);
+            psc._musicRatio1 = { value: "3" };
+            psc._musicRatio2 = { value: "0" };
+
+            psc._dissectStair(fakeEvent(frequency));
+
+            expect(psc._musicRatio1.value).toBe(3);
+            expect(psc._musicRatio2.value).toBe(2);
+            for (const stair of psc.Stairs) {
+                expect(Number.isFinite(stair[2])).toBe(true);
+                expect(stair[2]).not.toBe(0);
+            }
+        });
+
+        test("treats empty ratio inputs as defaults (Number('') === 0 edge)", () => {
+            const frequency = 440;
+            setupStairsForFrequency(psc, frequency);
+            psc._musicRatio1 = { value: "" };
+            psc._musicRatio2 = { value: "" };
+
+            psc._dissectStair(fakeEvent(frequency));
+
+            expect(psc._musicRatio1.value).toBe(3);
+            expect(psc._musicRatio2.value).toBe(2);
+            for (const stair of psc.Stairs) {
+                expect(Number.isFinite(stair[2])).toBe(true);
+                expect(stair[2]).not.toBe(0);
+            }
+        });
+    });
 });
