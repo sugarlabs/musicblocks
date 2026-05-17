@@ -2477,7 +2477,7 @@ const getInvertMode = name => {
             INVERTMODES[interval][0] === name ||
             INVERTMODES[interval][1].toLowerCase() === name.toLowerCase()
         ) {
-            if (INVERTMODES[interval][0] != "") {
+            if (INVERTMODES[interval][0] !== "") {
                 return INVERTMODES[interval][0];
             } else {
                 return INVERTMODES[interval][1];
@@ -2731,7 +2731,7 @@ const getNoiseName = name => {
 
     for (let i = 0; i < NOISENAMES.length; i++) {
         if (NOISENAMES[i][1] === name) {
-            if (NOISENAMES[i][0] != "") {
+            if (NOISENAMES[i][0] !== "") {
                 return NOISENAMES[i][0];
             } else {
                 return NOISENAMES[i][1];
@@ -2803,7 +2803,7 @@ const getVoiceName = name => {
 
     for (let i = 0; i < VOICENAMES.length; i++) {
         if (VOICENAMES[i][0] === name) {
-            if (VOICENAMES[i][0] != "") {
+            if (VOICENAMES[i][0] !== "") {
                 return VOICENAMES[i][0];
             } else if (VOICENAMES[i][1] === name) {
                 return VOICENAMES[i][1];
@@ -2993,7 +2993,7 @@ const getArticulation = note => {
  */
 const keySignatureToMode = keySignature => {
     // Convert from "A Minor" to "A" and "MINOR"
-    if (keySignature === "" || keySignature == null) {
+    if (keySignature === "" || keySignature === null) {
         return ["C", "major"];
     }
 
@@ -3023,10 +3023,10 @@ const keySignatureToMode = keySignature => {
     if (key === "C" + FLAT) {
         parts = keySignature.split(" ");
         key = "C" + FLAT;
-    } else if (key == "B" + SHARP) {
+    } else if (key === "B" + SHARP) {
         parts = keySignature.split(" ");
         key = "B" + SHARP;
-    } else if (key == "F" + FLAT) {
+    } else if (key === "F" + FLAT) {
         parts = keySignature.split(" ");
         key = "F" + FLAT;
     } else if (SOLFEGENAMES1.includes(key)) {
@@ -4140,7 +4140,12 @@ function base64Encode(str) {
     }
     const encoder = new TextEncoder();
     const uint8Array = encoder.encode(str);
-    const binaryString = String.fromCharCode(...uint8Array);
+    // String.fromCharCode(...uint8Array) throws RangeError for inputs > ~128KB.
+    // Use a loop instead — identical output, no argument-count limit.
+    let binaryString = "";
+    for (let i = 0; i < uint8Array.length; i++) {
+        binaryString += String.fromCharCode(uint8Array[i]);
+    }
     if (_b64Cache.size > 1000) {
         _b64Cache.clear();
     }
@@ -4515,7 +4520,7 @@ function getNote(
                 console.debug(
                     "WARNING: Note [" + noteArg + "] not found in " + halfSteps + ". Returning REST"
                 );
-                if (errorMsg != undefined) {
+                if (errorMsg !== undefined) {
                     errorMsg(INVALIDPITCH, null);
                 }
 
@@ -4621,7 +4626,7 @@ function getNote(
         }
 
         // Consider the note direction (in the case of intervals)
-        if (direction != undefined) {
+        if (direction !== undefined) {
             switch (direction) {
                 case -1:
                     if (note in EQUIVALENTFLATS) {
@@ -4653,7 +4658,7 @@ function getNote(
         // Ensure the temperament exists before accessing it
         if (TEMPERAMENT[temperament]) {
             for (const number in TEMPERAMENT[temperament]) {
-                if (number !== "pitchNumber" && number != "interval") {
+                if (number !== "pitchNumber" && number !== "interval") {
                     if (note === TEMPERAMENT[temperament][number][3]) {
                         if (typeof number === "string") {
                             pitchNumber = Number(number);
@@ -4923,7 +4928,7 @@ function _calculate_pitch_number(noteName, octave, applyOffset = 0) {
  */
 const buildScale = keySignature => {
     // FIX ME: temporary hard-coded fix to avoid errors in pitch preview
-    if (keySignature == "C♭ major") {
+    if (keySignature === "C♭ major") {
         const scale = [
             "C" + FLAT,
             "D" + FLAT,
@@ -4935,7 +4940,7 @@ const buildScale = keySignature => {
             "C" + FLAT
         ];
         return [scale, [2, 2, 1, 2, 2, 2, 1]];
-    } else if (keySignature == "F♭ major") {
+    } else if (keySignature === "F♭ major") {
         const scale = [
             "F" + FLAT,
             "G" + FLAT,
@@ -4951,7 +4956,7 @@ const buildScale = keySignature => {
 
     let obj = keySignatureToMode(keySignature);
     let myKeySignature = obj[0];
-    if (myKeySignature == "C" + FLAT) {
+    if (myKeySignature === "C" + FLAT) {
         obj = keySignatureToMode("B " + obj[1]);
         myKeySignature = obj[0];
     }
@@ -5083,27 +5088,27 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
      * @returns {boolean} True if the pitches are logically equivalent, otherwise false.
      */
     const logicalEquals = (s1, s2) => {
-        if (s1 == s2) {
+        if (s1 === s2) {
             return true;
-        } else if (s1 == "E" + SHARP && s2 == "F") {
+        } else if (s1 === "E" + SHARP && s2 === "F") {
             return true;
-        } else if (s1 == "E" && s2 == "F" + FLAT) {
+        } else if (s1 === "E" && s2 === "F" + FLAT) {
             return true;
-        } else if (s1 == "F" && s2 == "E♯") {
+        } else if (s1 === "F" && s2 === "E♯") {
             return true;
-        } else if (s1 == "F" + FLAT && s2 == "E") {
+        } else if (s1 === "F" + FLAT && s2 === "E") {
             return true;
-        } else if (s1 == "B" + SHARP && s2 == "C") {
+        } else if (s1 === "B" + SHARP && s2 === "C") {
             return true;
-        } else if (s1 == "B" && s2 == "C" + FLAT) {
+        } else if (s1 === "B" && s2 === "C" + FLAT) {
             return true;
-        } else if (s1 == "C" && s2 == "B♯") {
+        } else if (s1 === "C" && s2 === "B♯") {
             return true;
-        } else if (s1 == "C" + FLAT && s2 == "B") {
+        } else if (s1 === "C" + FLAT && s2 === "B") {
             return true;
-        } else if (s1 == "B" + DOUBLEFLAT && s2 == "A") {
+        } else if (s1 === "B" + DOUBLEFLAT && s2 === "A") {
             return true;
-        } else if (s1 == "F" + DOUBLESHARP && s2 == "G") {
+        } else if (s1 === "F" + DOUBLESHARP && s2 === "G") {
             return true;
         }
         return false;
@@ -5288,11 +5293,11 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch) =>
         if (pitch === null) {
             return finalScale[scaleDegree];
         }
-        if (scaleDegree == null) {
+        if (scaleDegree === null) {
             for (const i in finalScale) {
-                if (finalScale[i][0] == pitch[0]) {
+                if (finalScale[i][0] === pitch[0]) {
                     sd.push(String(Number(i) + 1));
-                    if (finalScale[i] == pitch) {
+                    if (finalScale[i] === pitch) {
                         sd.push(NATURAL);
                     } else {
                         if (finalScale[i].includes(SHARP)) {
@@ -5311,15 +5316,15 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch) =>
         }
     } else {
         // For 7 note systems scale degrees have a one-one relation
-        if (chosenModePattern.length == 7) {
+        if (chosenModePattern.length === 7) {
             if (pitch === null) {
                 return chosenModeScale[scaleDegree];
             }
-            if (scaleDegree == null) {
+            if (scaleDegree === null) {
                 for (const i in chosenModeScale) {
-                    if (chosenModeScale[i][0] == pitch[0]) {
+                    if (chosenModeScale[i][0] === pitch[0]) {
                         sd.push(String(Number(i) + 1));
-                        if (chosenModeScale[i] == pitch) {
+                        if (chosenModeScale[i] === pitch) {
                             sd.push(NATURAL);
                         } else {
                             if (chosenModeScale[i].includes(SHARP)) {
@@ -5360,7 +5365,7 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch) =>
                     case 6:
                         if (definedScaleDegree[definedScaleDegree.length - 1] !== 4) {
                             definedScaleDegree.push(4);
-                        } else if (semitones[i] + chosenModeScale[i] != 7) {
+                        } else if (semitones[i] + chosenModeScale[i] !== 7) {
                             definedScaleDegree.push(5);
                         }
                         break;
@@ -5397,11 +5402,11 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch) =>
             if (pitch === null) {
                 return finalScale[scaleDegree];
             }
-            if (scaleDegree == null) {
+            if (scaleDegree === null) {
                 for (const i in finalScale) {
-                    if (finalScale[i][0] == pitch[0]) {
+                    if (finalScale[i][0] === pitch[0]) {
                         sd.push(String(Number(i) + 1));
-                        if (finalScale[i] == pitch) {
+                        if (finalScale[i] === pitch) {
                             sd.push(NATURAL);
                         } else {
                             if (finalScale[i].includes(SHARP)) {
@@ -5432,28 +5437,28 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch) =>
                         finalScale.push(chosenModeScale[i]);
                         break;
                     case 1:
-                        if (semitones[i + 1] == 2) {
+                        if (semitones[i + 1] === 2) {
                             finalScale.push(chosenModeScale[i + 1]);
                         } else {
                             finalScale.push(chosenModeScale[i]);
                         }
                         break;
                     case 2:
-                        if (semitones[i - 1] == 1) {
+                        if (semitones[i - 1] === 1) {
                             continue;
                         } else {
                             finalScale.push(chosenModeScale[i]);
                         }
                         break;
                     case 3:
-                        if (semitones[i + 1] == 4) {
+                        if (semitones[i + 1] === 4) {
                             finalScale.push(chosenModeScale[i + 1]);
                         } else {
                             finalScale.push(chosenModeScale[i]);
                         }
                         break;
                     case 4:
-                        if (semitones[i - 1] == 3) {
+                        if (semitones[i - 1] === 3) {
                             continue;
                         } else {
                             finalScale.push(chosenModeScale[i]);
@@ -5464,8 +5469,8 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch) =>
                         break;
                     case 6:
                         if (
-                            (semitones[i - 1] == 5 && semitones[i + 1] != 7) ||
-                            (semitones[i - 1] != 5 && semitones[i + 1] == 7)
+                            (semitones[i - 1] === 5 && semitones[i + 1] !== 7) ||
+                            (semitones[i - 1] !== 5 && semitones[i + 1] === 7)
                         ) {
                             finalScale.push(chosenModeScale[i]);
                         }
@@ -5474,28 +5479,28 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch) =>
                         finalScale.push(chosenModeScale[i]);
                         break;
                     case 8:
-                        if (semitones[i + 1] == 9) {
+                        if (semitones[i + 1] === 9) {
                             finalScale.push(chosenModeScale[i + 1]);
                         } else {
                             finalScale.push(chosenModeScale[i]);
                         }
                         break;
                     case 9:
-                        if (semitones[i - 1] == 8) {
+                        if (semitones[i - 1] === 8) {
                             continue;
                         } else {
                             finalScale.push(chosenModeScale[i]);
                         }
                         break;
                     case 10:
-                        if (semitones[i + 1] == 11) {
+                        if (semitones[i + 1] === 11) {
                             finalScale.push(chosenModeScale[i + 1]);
                         } else {
                             finalScale.push(chosenModeScale[i]);
                         }
                         break;
                     case 11:
-                        if (semitones[i - 1] == 10) {
+                        if (semitones[i - 1] === 10) {
                             continue;
                         } else {
                             finalScale.push(chosenModeScale[i]);
@@ -5510,11 +5515,11 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch) =>
             if (pitch === null) {
                 return finalScale[scaleDegree];
             }
-            if (scaleDegree == null) {
+            if (scaleDegree === null) {
                 for (const i in finalScale) {
-                    if (finalScale[i][0] == pitch[0]) {
+                    if (finalScale[i][0] === pitch[0]) {
                         sd.push(String(Number(i) + 1));
-                        if (finalScale[i] == pitch) {
+                        if (finalScale[i] === pitch) {
                             sd.push(NATURAL);
                         } else {
                             if (finalScale[i].includes(SHARP)) {
@@ -6012,7 +6017,7 @@ const getSolfege = (note, keySignature, movable) => {
  */
 const splitSolfege = value => {
     // Separate the pitch from any attributes, e.g., # or b
-    if (value != null && typeof value === "string") {
+    if (value !== null && typeof value === "string") {
         let note, attr;
         if (SOLFNOTES.includes(value)) {
             note = value;
@@ -6135,7 +6140,7 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote) => {
     const stepUpCurrentNote = getNumber(note, currentOctave + 1);
     const stepDownCurrentNote = getNumber(note, currentOctave - 1);
 
-    if (lastNotePlayed != null) {
+    if (lastNotePlayed !== null) {
         lastNotePlayed = lastNotePlayed[0];
         // strip off octave from end of note
         lastNotePlayed = lastNotePlayed.substring(0, lastNotePlayed.length - 1);

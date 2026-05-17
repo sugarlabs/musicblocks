@@ -30,10 +30,17 @@
 function base64Encode(str) {
     const encoder = new TextEncoder();
     const uint8Array = encoder.encode(str);
-    const binaryString = String.fromCharCode(...uint8Array);
-    return btoa(binaryString); // Proper Base64 encoding
+    // String.fromCharCode(...uint8Array) throws RangeError: Maximum call stack
+    // size exceeded for inputs larger than ~128KB because V8 limits function
+    // argument count to ~125K. A Music Blocks composition with 44+ blocks
+    // produces an SVG larger than this threshold. Use a loop instead —
+    // produces byte-for-byte identical output with no size limit.
+    let binaryString = "";
+    for (let i = 0; i < uint8Array.length; i++) {
+        binaryString += String.fromCharCode(uint8Array[i]);
+    }
+    return btoa(binaryString);
 }
-
 /**
  * Decodes a Base64 encoded string.
  * @param {string} str - The Base64 encoded string.
