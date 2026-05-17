@@ -1063,7 +1063,9 @@ function setupIntervalsBlocks(activity) {
                 if (intervalName in INTERVALVALUES) {
                     r = INTERVALVALUES[intervalName][2];
                 } else {
-                    console.warn(`[IntervalsBlocks] Interval name not found in INTERVALVALUES: "${intervalName}"`);
+                    console.warn(
+                        `[IntervalsBlocks] Interval name not found in INTERVALVALUES: "${intervalName}"`
+                    );
                     r = 1;
                 }
             }
