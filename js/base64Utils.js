@@ -36,6 +36,12 @@ function base64Encode(str) {
 
 /**
  * Decodes a Base64 encoded string.
+ *
+ * @remarks
+ * This function delegates decoding to `window.atob()` and does not perform
+ * its own input validation. Behavior with malformed input is
+ * runtime-dependent.
+ *
  * @param {string} str - The Base64 encoded string.
  * @returns {string} - The decoded string.
  */
