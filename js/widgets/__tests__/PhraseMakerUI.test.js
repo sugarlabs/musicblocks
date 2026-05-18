@@ -192,7 +192,7 @@ describe("PhraseMakerUI", () => {
 
             PhraseMakerUI.highlightCell(pm, 0, 0);
 
-            expect(cell.style.backgroundColor).toBe("rgb(139, 195, 74)");
+            expect(cell.classList.contains("pm-bg-selector")).toBe(true);
         });
 
         test("does nothing when row does not exist", () => {
@@ -220,9 +220,9 @@ describe("PhraseMakerUI", () => {
 
             PhraseMakerUI.highlightCell(pm, 1, 0);
 
-            expect(cell0.style.backgroundColor).toBe("");
-            expect(cell1.style.backgroundColor).toBe("rgb(139, 195, 74)");
-            expect(cell2.style.backgroundColor).toBe("");
+            expect(cell0.classList.contains("pm-bg-selector")).toBe(false);
+            expect(cell1.classList.contains("pm-bg-selector")).toBe(true);
+            expect(cell2.classList.contains("pm-bg-selector")).toBe(false);
         });
 
         test("highlights correct row in multi-row matrix", () => {
@@ -233,30 +233,33 @@ describe("PhraseMakerUI", () => {
 
             PhraseMakerUI.highlightCell(pm, 0, 1);
 
-            expect(cell0.style.backgroundColor).toBe("");
-            expect(cell1.style.backgroundColor).toBe("rgb(139, 195, 74)");
+            expect(cell0.classList.contains("pm-bg-selector")).toBe(false);
+            expect(cell1.classList.contains("pm-bg-selector")).toBe(true);
         });
     });
 
     describe("unhighlightCell", () => {
-        test("resets highlighted cell to rhythmcellcolor", () => {
+        test("resets highlighted cell to rhythmcellcolor class", () => {
             const pm = createMockPM();
             const cell = createMockCell("#8bc34a");
+            cell.classList.add("pm-bg-selector");
             pm._rows = [{ cells: [cell] }];
 
             PhraseMakerUI.unhighlightCell(pm, 0, 0);
 
-            expect(cell.style.backgroundColor).toBe("rgb(255, 255, 255)");
+            expect(cell.classList.contains("pm-bg-selector")).toBe(false);
+            expect(cell.classList.contains("pm-bg-rhythm-cell")).toBe(true);
         });
 
-        test("does not change cell if not highlighted with selectorBackground", () => {
+        test("does not change cell if not highlighted with selector class", () => {
             const pm = createMockPM();
             const cell = createMockCell("#ff0000");
+            // cell does NOT have pm-bg-selector class
             pm._rows = [{ cells: [cell] }];
 
             PhraseMakerUI.unhighlightCell(pm, 0, 0);
 
-            expect(cell.style.backgroundColor).toBe("rgb(255, 0, 0)");
+            expect(cell.classList.contains("pm-bg-rhythm-cell")).toBe(false);
         });
 
         test("does nothing when row does not exist", () => {
@@ -277,12 +280,15 @@ describe("PhraseMakerUI", () => {
             const pm = createMockPM();
             const cell0 = createMockCell("#8bc34a");
             const cell1 = createMockCell("#8bc34a");
+            cell0.classList.add("pm-bg-selector");
+            cell1.classList.add("pm-bg-selector");
             pm._rows = [{ cells: [cell0, cell1] }];
 
             PhraseMakerUI.unhighlightCell(pm, 0, 0);
 
-            expect(cell0.style.backgroundColor).toBe("rgb(255, 255, 255)");
-            expect(cell1.style.backgroundColor).toBe("rgb(139, 195, 74)");
+            expect(cell0.classList.contains("pm-bg-selector")).toBe(false);
+            expect(cell0.classList.contains("pm-bg-rhythm-cell")).toBe(true);
+            expect(cell1.classList.contains("pm-bg-selector")).toBe(true);
         });
     });
 
@@ -293,7 +299,7 @@ describe("PhraseMakerUI", () => {
 
             PhraseMakerUI.updateNoteCellVisual(pm, cell, true);
 
-            expect(cell.style.backgroundColor).toBe("rgb(139, 195, 74)");
+            expect(cell.classList.contains("pm-bg-selector")).toBe(true);
         });
 
         test("sets active cell innerHTML to checkmark", () => {
@@ -305,13 +311,15 @@ describe("PhraseMakerUI", () => {
             expect(cell.textContent).toBe("\u00a0\u2713");
         });
 
-        test("sets inactive cell background to rhythmcellcolor", () => {
+        test("sets inactive cell to rhythmcellcolor class", () => {
             const pm = createMockPM();
             const cell = createMockCell("#8bc34a");
+            cell.classList.add("pm-bg-selector");
 
             PhraseMakerUI.updateNoteCellVisual(pm, cell, false);
 
-            expect(cell.style.backgroundColor).toBe("rgb(255, 255, 255)");
+            expect(cell.classList.contains("pm-bg-selector")).toBe(false);
+            expect(cell.classList.contains("pm-bg-rhythm-cell")).toBe(true);
         });
 
         test("clears inactive cell innerHTML", () => {
@@ -342,11 +350,12 @@ describe("PhraseMakerUI", () => {
             cell.innerHTML = "";
 
             PhraseMakerUI.updateNoteCellVisual(pm, cell, true);
-            expect(cell.style.backgroundColor).toBe("rgb(139, 195, 74)");
+            expect(cell.classList.contains("pm-bg-selector")).toBe(true);
             expect(cell.textContent).toBe("\u00a0\u2713");
 
             PhraseMakerUI.updateNoteCellVisual(pm, cell, false);
-            expect(cell.style.backgroundColor).toBe("rgb(255, 255, 255)");
+            expect(cell.classList.contains("pm-bg-selector")).toBe(false);
+            expect(cell.classList.contains("pm-bg-rhythm-cell")).toBe(true);
             expect(cell.textContent).toBe("");
         });
     });
@@ -438,8 +447,8 @@ describe("PhraseMakerUI", () => {
 
             PhraseMakerUI.resetMatrix(pm);
 
-            expect(cell0.style.backgroundColor).toBe("rgb(255, 255, 255)");
-            expect(cell1.style.backgroundColor).toBe("rgb(255, 255, 255)");
+            expect(cell0.classList.contains("pm-bg-rhythm-cell")).toBe(true);
+            expect(cell1.classList.contains("pm-bg-rhythm-cell")).toBe(true);
         });
 
         test("does not touch tuplet row when _matrixHasTuplets is false", () => {
@@ -451,7 +460,7 @@ describe("PhraseMakerUI", () => {
 
             PhraseMakerUI.resetMatrix(pm);
 
-            expect(tupletCell.style.backgroundColor).toBe("rgb(139, 195, 74)");
+            expect(tupletCell.classList.contains("pm-bg-tuplet")).toBe(false);
         });
 
         test("resets tuplet row cells when _matrixHasTuplets is true", () => {
@@ -464,8 +473,8 @@ describe("PhraseMakerUI", () => {
 
             PhraseMakerUI.resetMatrix(pm);
 
-            expect(tupletCell0.style.backgroundColor).toBe("rgb(224, 224, 224)");
-            expect(tupletCell1.style.backgroundColor).toBe("rgb(224, 224, 224)");
+            expect(tupletCell0.classList.contains("pm-bg-tuplet")).toBe(true);
+            expect(tupletCell1.classList.contains("pm-bg-tuplet")).toBe(true);
         });
 
         test("handles empty noteValueRow cells", () => {
@@ -494,8 +503,11 @@ describe("PhraseMakerUI", () => {
 
             PhraseMakerUI.resetMatrix(pm);
 
-            expect(noteCell.style.backgroundColor).toBe("rgb(255, 255, 255)");
-            expect(tupletCell.style.backgroundColor).toBe("rgb(224, 224, 224)");
+            expect(noteCell.classList.contains("pm-bg-rhythm-cell")).toBe(true);
+            expect(tupletCell.classList.contains("pm-bg-tuplet")).toBe(true);
+            // They should have different classes
+            expect(noteCell.classList.contains("pm-bg-tuplet")).toBe(false);
+            expect(tupletCell.classList.contains("pm-bg-rhythm-cell")).toBe(false);
         });
     });
 });
