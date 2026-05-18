@@ -2231,9 +2231,15 @@ describe("Palettes Class", () => {
             jest.useFakeTimers();
 
             const row = {};
+            const focusedClasses = new Set(["palette-keyboard-hover"]);
             const focused = {
-                style: { backgroundColor: platformColor.hoverColor },
-                dataset: { keyboardFocus: "true" }
+                classList: {
+                    add: (...args) => args.forEach(c => focusedClasses.add(c)),
+                    remove: (...args) => args.forEach(c => focusedClasses.delete(c)),
+                    contains: c => focusedClasses.has(c)
+                },
+                dataset: { keyboardFocus: "true" },
+                hasAttribute: jest.fn(() => false)
             };
             const paletteElement = { blur: jest.fn() };
             const hideMenu = jest.fn();
@@ -2265,7 +2271,7 @@ describe("Palettes Class", () => {
             expect(hideMenu).toHaveBeenCalled();
             expect(hideMenusSpy).toHaveBeenCalled();
             expect(showSpy).not.toHaveBeenCalled();
-            expect(focused.style.backgroundColor).toBe(platformColor.paletteBackground);
+            expect(focused.classList.contains("palette-keyboard-hover")).toBe(false);
             expect(focused.dataset.keyboardFocus).toBeUndefined();
             expect(palettes._keyboardNavActive).toBe(false);
             expect(palettes._navSection).toBe("type");
