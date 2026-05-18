@@ -393,37 +393,66 @@ class Blocks {
 
         /**
          * Updates the spatial grid position for a given block index.
-         * Called after any block position change to keep the grid current.
+         * Registers the block in every cell that any of its dock
+         * positions falls into, so that nearby-dock searches always
+         * find it regardless of block height.
          * @param {number} blkIdx - Index into blockList
          */
         this._updateSpatialGrid = blkIdx => {
             const block = this.blockList[blkIdx];
             if (!block || !block.container) return;
 
-            const cx = Math.floor(block.container.x / SPATIAL_GRID_CELL_SIZE);
-            const cy = Math.floor(block.container.y / SPATIAL_GRID_CELL_SIZE);
-            const newKey = cx + "," + cy;
+            // Compute the set of cells this block should occupy
+            const newKeys = new Set();
+            if (block.docks && block.docks.length > 0) {
+                for (let i = 0; i < block.docks.length; i++) {
+                    const dx = block.container.x + block.docks[i][0];
+                    const dy = block.container.y + block.docks[i][1];
+                    const cx = Math.floor(dx / SPATIAL_GRID_CELL_SIZE);
+                    const cy = Math.floor(dy / SPATIAL_GRID_CELL_SIZE);
+                    newKeys.add(cx + "," + cy);
+                }
+            } else {
+                // Docks not yet populated — use container position
+                const cx = Math.floor(block.container.x / SPATIAL_GRID_CELL_SIZE);
+                const cy = Math.floor(block.container.y / SPATIAL_GRID_CELL_SIZE);
+                newKeys.add(cx + "," + cy);
+            }
 
-            const oldKey = this._blockGridCell.get(blkIdx);
-            if (oldKey === newKey) return;
+            // Check if cells changed; skip update if identical
+            const oldKeys = this._blockGridCell.get(blkIdx);
+            if (oldKeys && oldKeys.size === newKeys.size) {
+                let same = true;
+                for (const k of newKeys) {
+                    if (!oldKeys.has(k)) {
+                        same = false;
+                        break;
+                    }
+                }
+                if (same) return;
+            }
 
-            // Remove from old cell
-            if (oldKey !== undefined) {
-                const oldSet = this._spatialGrid.get(oldKey);
-                if (oldSet) {
-                    oldSet.delete(blkIdx);
-                    if (oldSet.size === 0) this._spatialGrid.delete(oldKey);
+            // Remove from all old cells
+            if (oldKeys) {
+                for (const oldKey of oldKeys) {
+                    const oldSet = this._spatialGrid.get(oldKey);
+                    if (oldSet) {
+                        oldSet.delete(blkIdx);
+                        if (oldSet.size === 0) this._spatialGrid.delete(oldKey);
+                    }
                 }
             }
 
-            // Add to new cell
-            let cellSet = this._spatialGrid.get(newKey);
-            if (!cellSet) {
-                cellSet = new Set();
-                this._spatialGrid.set(newKey, cellSet);
+            // Add to all new cells
+            for (const key of newKeys) {
+                let cellSet = this._spatialGrid.get(key);
+                if (!cellSet) {
+                    cellSet = new Set();
+                    this._spatialGrid.set(key, cellSet);
+                }
+                cellSet.add(blkIdx);
             }
-            cellSet.add(blkIdx);
-            this._blockGridCell.set(blkIdx, newKey);
+            this._blockGridCell.set(blkIdx, newKeys);
         };
 
         /**
@@ -445,6 +474,7 @@ class Blocks {
 
             const cx = Math.floor(x / SPATIAL_GRID_CELL_SIZE);
             const cy = Math.floor(y / SPATIAL_GRID_CELL_SIZE);
+            const seen = new Set();
             const result = [];
 
             for (let dx = -1; dx <= 1; dx++) {
@@ -453,7 +483,10 @@ class Blocks {
                     const cellSet = this._spatialGrid.get(key);
                     if (cellSet) {
                         for (const idx of cellSet) {
-                            result.push(idx);
+                            if (!seen.has(idx)) {
+                                seen.add(idx);
+                                result.push(idx);
+                            }
                         }
                     }
                 }
