@@ -6125,7 +6125,45 @@ class Activity {
             }
 
             this.printText.classList.add("show");
-            this.printTextContent.textContent = msg;
+
+            // Clean container to avoid appending duplicate messages
+            this.printTextContent.replaceChildren();
+
+            if (typeof msg === "string") {
+                if (msg.includes("<a") && msg.includes("</a>")) {
+                    // Safe parser for reload link
+                    try {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(msg, "text/html");
+                        const link = doc.querySelector("a");
+                        if (link) {
+                            const safeLink = document.createElement("a");
+                            safeLink.href = "#";
+                            safeLink.className = link.className || "language-link";
+                            safeLink.textContent = link.textContent;
+                            safeLink.style.cursor = "pointer";
+
+                            // Copy hover styles programmatically to avoid inline scripts
+                            safeLink.addEventListener("mouseover", () => {
+                                safeLink.style.opacity = 0.5;
+                            });
+                            safeLink.addEventListener("mouseout", () => {
+                                safeLink.style.opacity = 1;
+                            });
+
+                            this.printTextContent.appendChild(safeLink);
+                        } else {
+                            this.printTextContent.textContent = msg;
+                        }
+                    } catch (e) {
+                        this.printTextContent.textContent = msg;
+                    }
+                } else {
+                    this.printTextContent.textContent = msg;
+                }
+            } else if (msg instanceof HTMLElement || msg instanceof DocumentFragment) {
+                this.printTextContent.appendChild(msg);
+            }
 
             const that = this;
             this.msgTimeoutID = setTimeout(() => {

@@ -250,10 +250,7 @@ class LanguageBox {
     }
 
     hide() {
-        const MSGPrefix =
-            "<a href='#' class='language-link' " +
-            "onMouseOver='this.style.opacity = 0.5'" +
-            "onMouseOut='this.style.opacity = 1'>";
+        const MSGPrefix = "<a href='#' class='language-link'>";
         const MSGSuffix = "</a>";
         const MSG = {
             default: _("Refresh your browser to change your language preference."),
