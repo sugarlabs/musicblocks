@@ -151,6 +151,8 @@ class Toolbar {
                 ["beginnerMode", _("Switch to beginner mode")],
                 ["advancedMode", _("Switch to advanced mode")],
                 ["languageSelectIcon", _("Select language")],
+                ["share-project-beg", _("Share project file"), "innerHTML"],
+                ["share-project", _("Share project file"), "innerHTML"],
                 ["save-html-beg", _("Save project as HTML"), "innerHTML"],
                 ["save-png-beg", _("Save mouse artwork as PNG"), "innerHTML"],
                 ["save-html", _("Save project as HTML"), "innerHTML"],
@@ -223,6 +225,7 @@ class Toolbar {
                 _("Switch to beginner mode"),
                 _("Switch to advanced mode"),
                 _("Select language"),
+                _("Share project file"),
                 _("Save project as HTML"),
                 _("Save project as MIDI"),
                 _("Save mouse artwork as SVG"),
@@ -298,6 +301,8 @@ class Toolbar {
                 ["beginnerMode", _("Switch to beginner mode")],
                 ["advancedMode", _("Switch to advanced mode")],
                 ["languageSelectIcon", _("Select language")],
+                ["share-project-beg", _("Share project file"), "innerHTML"],
+                ["share-project", _("Share project file"), "innerHTML"],
                 ["save-html-beg", _("Save project as HTML"), "innerHTML"],
                 ["save-png-beg", _("Save turtle artwork as PNG"), "innerHTML"],
                 ["save-html", _("Save project as HTML"), "innerHTML"],
@@ -364,6 +369,7 @@ class Toolbar {
                 _("Switch to beginner mode"),
                 _("Switch to advanced mode"),
                 _("Select language"),
+                _("Share project file"),
                 _("Save project as HTML"),
                 _("Save turtle artwork as PNG"),
                 _("Save project as HTML"),
@@ -913,7 +919,8 @@ class Toolbar {
         abc_onclick,
         mxml_onclick,
         blockartworksvg_onclick,
-        blockartworkpng_onclick
+        blockartworkpng_onclick,
+        share_onclick
     ) {
         const saveButton = docById("saveButton");
         const saveButtonAdvanced = docById("saveButtonAdvanced");
@@ -930,6 +937,15 @@ class Toolbar {
                     saveHTML.onclick = () => {
                         html_onclick(this.activity);
                     };
+
+                    const shareProjectBeg = docById("share-project-beg");
+                    if (navigator.share) {
+                        shareProjectBeg.onclick = () => {
+                            share_onclick(this.activity);
+                        };
+                    } else {
+                        shareProjectBeg.style.display = "none";
+                    }
 
                     const savePNG = docById("save-png-beg");
                     const svgData = doSVG_onclick(
@@ -963,6 +979,16 @@ class Toolbar {
                 saveHTML.onclick = () => {
                     html_onclick(this.activity);
                 };
+
+                const shareProject = docById("share-project");
+                if (navigator.share) {
+                    shareProject.onclick = () => {
+                        share_onclick(this.activity);
+                    };
+                } else {
+                    shareProject.style.display = "none";
+                }
+
                 const saveSVG = docById("save-svg");
                 const savePNG = docById("save-png");
                 const svgData = doSVG_onclick(
@@ -1447,7 +1473,8 @@ class Toolbar {
                 this.activity.save.saveAbc.bind(this.activity.save),
                 this.activity.save.saveMxml.bind(this.activity.save),
                 this.activity.save.saveBlockArtwork.bind(this.activity.save),
-                this.activity.save.saveBlockArtworkPNG.bind(this.activity.save)
+                this.activity.save.saveBlockArtworkPNG.bind(this.activity.save),
+                this.activity.save.shareProject.bind(this.activity.save)
             );
         };
 

@@ -103,14 +103,14 @@ describe("Toolbar Class", () => {
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ true", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = true;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(141);
+        expect(global._).toHaveBeenCalledTimes(144);
         expect(global._).toHaveBeenNthCalledWith(1, "About Music Blocks");
     });
 
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ false", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = false;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(123);
+        expect(global._).toHaveBeenCalledTimes(126);
         expect(global._).toHaveBeenNthCalledWith(1, "About Turtle Blocks");
     });
 
@@ -476,8 +476,10 @@ describe("Toolbar Class", () => {
         const elements = {
             "saveButton": { onclick: null, style: { display: "" } },
             "saveButtonAdvanced": { onclick: null, style: { display: "" } },
+            "share-project-beg": { onclick: null, style: { display: "" } },
             "save-html-beg": { onclick: null },
             "save-png-beg": { onclick: null, disabled: false, className: "" },
+            "share-project": { onclick: null, style: { display: "" } },
             "save-html": { onclick: null },
             "save-svg": { onclick: null, disabled: false, className: "" },
             "save-png": { onclick: null, disabled: false, className: "" },
@@ -512,7 +514,8 @@ describe("Toolbar Class", () => {
             abc_onclick: jest.fn(),
             mxml_onclick: jest.fn(),
             blockartworksvg_onclick: jest.fn(),
-            blockartworkpng_onclick: jest.fn()
+            blockartworkpng_onclick: jest.fn(),
+            share_onclick: jest.fn()
         };
 
         const toolbar = new Toolbar();
@@ -859,7 +862,8 @@ describe("Toolbar Class", () => {
                 saveAbc: jest.fn(),
                 saveMxml: jest.fn(),
                 saveBlockArtwork: jest.fn(),
-                saveBlockArtworkPNG: jest.fn()
+                saveBlockArtworkPNG: jest.fn(),
+                shareProject: jest.fn()
             },
             toolbar: {
                 renderSaveIcons: jest.fn(),
@@ -938,6 +942,9 @@ describe("Toolbar Class", () => {
 
         renderSaveIconsArgs[10]();
         expect(mockActivity.save.saveBlockArtworkPNG).toHaveBeenCalled();
+
+        renderSaveIconsArgs[11]();
+        expect(mockActivity.save.shareProject).toHaveBeenCalled();
     });
 
     test("renderRunStepIcon sets onclick and handles Japanese beginner mode", () => {
@@ -1264,7 +1271,8 @@ describe("Toolbar Class", () => {
                 saveBlockArtwork: jest.fn(),
                 saveThumbnail: jest.fn(),
                 saveBlockArtworkSVG: jest.fn(),
-                saveBlockArtworkPNG: jest.fn()
+                saveBlockArtworkPNG: jest.fn(),
+                shareProject: jest.fn()
             }
         };
         global.setScroller = jest.fn();

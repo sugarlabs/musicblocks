@@ -1041,6 +1041,56 @@ class SaveInterface {
             this.activity.logo.runningMxml = false;
         });
     }
+
+    /**
+     * Share the project file using Native Web Share API.
+     *
+     * @param {SaveInterface} activity - The activity object to share.
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
+    shareProject(activity) {
+        if (!navigator.share || !navigator.canShare) {
+            activity.errorMsg(_("Your browser does not support the Web Share API."));
+            return;
+        }
+
+        let filename = STR_MY_PROJECT;
+        if (activity.PlanetInterface !== undefined) {
+            filename = activity.PlanetInterface.getCurrentProjectName();
+        }
+
+        if (fileExt(filename) !== "html") {
+            filename += ".html";
+        }
+
+        try {
+            const htmlContent = activity.save.prepareHTML();
+            const file = new File([htmlContent], filename, { type: "text/html" });
+
+            if (navigator.canShare({ files: [file] })) {
+                navigator
+                    .share({
+                        files: [file],
+                        title: filename,
+                        text: _("Check out my Music Blocks project!")
+                    })
+                    .catch(error => {
+                        console.debug("Error sharing:", error);
+                        if (error.name !== "AbortError") {
+                            activity.errorMsg(_("Failed to share the project."));
+                        }
+                    });
+            } else {
+                activity.errorMsg(_("Your system does not support sharing files."));
+            }
+        } catch (err) {
+            console.error("Share error:", err);
+            activity.errorMsg(_("An error occurred while preparing the project to share."));
+        }
+    }
 }
 
 if (typeof module !== "undefined" && module.exports) {
