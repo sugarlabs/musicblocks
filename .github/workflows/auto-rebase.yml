@@ -18,6 +18,7 @@ jobs:
     rebase:
         name: Auto-rebase all open PRs onto latest master
         runs-on: ubuntu-latest
+        timeout-minutes: 30
         steps:
             - uses: actions/checkout@v4
               with:
