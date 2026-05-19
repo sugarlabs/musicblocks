@@ -111,6 +111,9 @@
         <!-- <script src="lib/mespeak.js"></script> -->
 
         <script src="dist/vendor.min.js"></script>
+        <!-- Konva.js replaces CreateJS (EaselJS/TweenJS/PreloadJS) -->
+        <script src="node_modules/konva/konva.min.js"></script>
+        <script src="js/konva-adapter.js"></script>
         <link
             rel="preload"
             href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"
@@ -153,7 +156,7 @@
 
         <!-- gif-animator.js integrates SuperGif with Music Blocks. It manages
      decoding and drawing GIF frames onto the turtle's overlay canvas.
-     Canvas refreshing is handled separately by CreateJS Ticker. -->
+     Canvas refreshing is handled separately by Konva. -->
         <script src="js/gif-animator.js" defer></script>
         <script defer>
             document.addEventListener("DOMContentLoaded", function () {
