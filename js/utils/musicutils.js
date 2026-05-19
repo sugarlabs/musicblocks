@@ -4174,7 +4174,9 @@ function getNote(
     if (temperament === undefined) {
         temperament = "equal";
     }
-
+    if (typeof noteArg === "number") {
+        noteArg = noteArg.toString();
+    }
     const octaveLength =
         TEMPERAMENT[temperament] && typeof TEMPERAMENT[temperament].pitchNumber === "number"
             ? TEMPERAMENT[temperament].pitchNumber
