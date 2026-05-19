@@ -253,20 +253,33 @@ function setupMeterActions(activity) {
             // Always null tur.interval after cancellation to prevent
             // stale ID no-op on the next Play.
             if (tur.interval !== undefined) {
-                if (!activity.logo._timerManager.clearInterval(tur.interval)) {
+                if (
+                    activity.logo._timerManager !== undefined &&
+                    activity.logo._timerManager.clearInterval(tur.interval)
+                ) {
+                    // cleared by ManagedTimer
+                } else {
                     clearInterval(tur.interval);
                 }
+
                 tur.interval = undefined;
             }
             activity.stage.dispatchEvent(eventName);
             // Use ManagedTimer.setGuardedInterval instead of raw setInterval
             // so doStopTurtles clearAll() cancels this interval in one sweep.
             // The aborted() predicate auto-destructs the interval on Stop.
-            tur.interval = activity.logo._timerManager.setGuardedInterval(
-                () => activity.stage.dispatchEvent(eventName),
-                duration * 1000,
-                () => activity.logo.stopTurtle
-            );
+            if (activity.logo._timerManager !== undefined) {
+                tur.interval = activity.logo._timerManager.setGuardedInterval(
+                    () => activity.stage.dispatchEvent(eventName),
+                    duration * 1000,
+                    () => activity.logo.stopTurtle
+                );
+            } else {
+                tur.interval = setInterval(
+                    () => activity.stage.dispatchEvent(eventName),
+                    duration * 1000
+                );
+            }
         }
 
         static onStrongBeatDo(beat, action, isflow, receivedArg, turtle, blk) {
