@@ -8571,15 +8571,27 @@ class Activity {
                                 try {
                                     if (cleanData.includes("html")) {
                                         let extracted;
+                                        let matchResult;
+
                                         if (cleanData.includes('id="codeBlock"')) {
-                                            extracted = cleanData.match(
+                                            matchResult = cleanData.match(
                                                 '<div class="code" id="codeBlock">(.+?)</div>'
-                                            )[1];
+                                            );
                                         } else {
-                                            extracted = cleanData.match(
+                                            matchResult = cleanData.match(
                                                 '<div class="code">(.+?)</div>'
-                                            )[1];
+                                            );
                                         }
+
+                                        if (!matchResult || !matchResult[1]) {
+                                            that.errorMsg(
+                                                _("Cannot find project data in this HTML file.")
+                                            );
+                                            finishLoading();
+                                            return;
+                                        }
+
+                                        extracted = matchResult[1];
                                         obj = JSON.parse(unescapeHTML(extracted));
                                     } else {
                                         obj = JSON.parse(cleanData);
@@ -8696,15 +8708,27 @@ class Activity {
                             try {
                                 if (cleanData.includes("html")) {
                                     let extracted;
+                                    let matchResult;
+
                                     if (cleanData.includes('id="codeBlock"')) {
-                                        extracted = cleanData.match(
+                                        matchResult = cleanData.match(
                                             '<div class="code" id="codeBlock">(.+?)</div>'
-                                        )[1];
+                                        );
                                     } else {
-                                        extracted = cleanData.match(
+                                        matchResult = cleanData.match(
                                             '<div class="code">(.+?)</div>'
-                                        )[1];
+                                        );
                                     }
+
+                                    if (!matchResult || !matchResult[1]) {
+                                        that.errorMsg(
+                                            _("Cannot find project data in this HTML file.")
+                                        );
+                                        finishLoading();
+                                        return;
+                                    }
+
+                                    extracted = matchResult[1];
                                     obj = JSON.parse(unescapeHTML(extracted));
                                 } else {
                                     obj = JSON.parse(cleanData);
