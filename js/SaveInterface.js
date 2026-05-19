@@ -292,6 +292,23 @@ class SaveInterface {
      * @instance
      */
     prepareHTML() {
+        const sanitizeImageURL = value => {
+            if (value === null || value === undefined) return "";
+
+            const raw = String(value).trim();
+            if (raw === "") return "";
+
+            const lower = raw.toLowerCase();
+            if (lower.startsWith("data:")) {
+                return /^data:image\/[a-z0-9.+-]+;base64,[a-z0-9+/=\s]+$/i.test(raw) ? raw : "";
+            }
+
+            if (lower.startsWith("http://") || lower.startsWith("https://")) return raw;
+
+            if (/^[a-z][a-z0-9+.-]*:/i.test(raw)) return "";
+            return raw;
+        };
+
         let file = this.htmlSaveTemplate;
         let description = _("No description provided");
         if (
@@ -316,7 +333,7 @@ class SaveInterface {
             .replace(/{{ project_description }}/g, escapeHTML(description))
             .replace(/{{ project_name }}/g, escapeHTML(name))
             .replace(/{{ data }}/g, escapeHTML(data))
-            .replace(/{{ project_image }}/g, escapeHTML(image));
+            .replace(/{{ project_image }}/g, escapeHTML(sanitizeImageURL(image)));
 
         return file;
     }
