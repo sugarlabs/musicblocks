@@ -251,7 +251,11 @@ class ReflectionMatrix {
         // Start animation
         let dotCount = 0;
         const maxDots = 3;
-        this.dotsInterval = setInterval(() => {
+        const timer =
+            this.widgetWindow && this.widgetWindow.timerManager
+                ? this.widgetWindow.timerManager
+                : window;
+        this.dotsInterval = timer.setInterval(() => {
             dotCount = (dotCount + 1) % (maxDots + 1);
             this.dotsContainer.textContent = ".".repeat(dotCount);
         }, 500);
@@ -262,13 +266,17 @@ class ReflectionMatrix {
      * @returns {void}
      */
     hideTypingIndicator() {
+        const timer =
+            this.widgetWindow && this.widgetWindow.timerManager
+                ? this.widgetWindow.timerManager
+                : window;
         if (this.startChatTypingTimeout) {
-            clearTimeout(this.startChatTypingTimeout);
+            timer.clearTimeout(this.startChatTypingTimeout);
             this.startChatTypingTimeout = null;
         }
 
         if (this.typingDiv) {
-            clearInterval(this.dotsInterval);
+            timer.clearInterval(this.dotsInterval);
             this.typingDiv.remove();
             this.typingDiv = null;
         }
@@ -420,7 +428,11 @@ class ReflectionMatrix {
         // Reset summarization state for a fresh session
         this.conversationSummary = "";
         this.summarizedUpTo = 0;
-        this.startChatTypingTimeout = setTimeout(() => {
+        const timer =
+            this.widgetWindow && this.widgetWindow.timerManager
+                ? this.widgetWindow.timerManager
+                : window;
+        this.startChatTypingTimeout = timer.setTimeout(() => {
             this.startChatTypingTimeout = null;
             if (this.isOpen) {
                 this.showTypingIndicator("Reading code");

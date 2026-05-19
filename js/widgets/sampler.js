@@ -307,7 +307,11 @@ function SampleWidget() {
      */
     this.__save = function () {
         const that = this;
-        setTimeout(function () {
+        const timer =
+            this.widgetWindow && this.widgetWindow.timerManager
+                ? this.widgetWindow.timerManager
+                : window;
+        timer.setTimeout(function () {
             that._addSample();
 
             // Include the cent adjustment value in the sample block
@@ -597,7 +601,11 @@ function SampleWidget() {
                 if (!that._get_save_lock()) {
                     that._save_lock = true;
                     that._saveSample();
-                    setTimeout(function () {
+                    const timer =
+                        that.widgetWindow && that.widgetWindow.timerManager
+                            ? that.widgetWindow.timerManager
+                            : window;
+                    timer.setTimeout(function () {
                         that._save_lock = false;
                     }, 1000);
                 }
@@ -712,14 +720,18 @@ function SampleWidget() {
                     generating = true;
                     activity.textMsg(_("Generating Audio... (It may take up to 1 minute)"), 2500);
 
-                    blinkInterval = setInterval(() => {
+                    const timer =
+                        that.widgetWindow && that.widgetWindow.timerManager
+                            ? that.widgetWindow.timerManager
+                            : window;
+                    blinkInterval = timer.setInterval(() => {
                         activity.textMsg(_("Generating Audio..."), 1000);
                     }, 5000);
 
                     const response = await fetch(url);
                     const result = await response.json();
 
-                    clearInterval(blinkInterval);
+                    timer.clearInterval(blinkInterval);
 
                     if (result.status === "success") {
                         generating = false;
@@ -732,7 +744,11 @@ function SampleWidget() {
                     }
                 } catch (error) {
                     generating = false;
-                    clearInterval(blinkInterval);
+                    const timer =
+                        that.widgetWindow && that.widgetWindow.timerManager
+                            ? that.widgetWindow.timerManager
+                            : window;
+                    timer.clearInterval(blinkInterval);
                     activity.textMsg(_("Error occurred"), 3000);
                     submit.disabled = false;
                 }

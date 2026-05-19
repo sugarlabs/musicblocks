@@ -450,7 +450,11 @@ function AIDebuggerWidget() {
 
         // Add animation
         let dots = 0;
-        const animateTyping = setInterval(() => {
+        const timer =
+            this.widgetWindow && this.widgetWindow.timerManager
+                ? this.widgetWindow.timerManager
+                : window;
+        const animateTyping = timer.setInterval(() => {
             dots = (dots + 1) % 4;
             typingDiv.textContent = "Debugger is typing" + ".".repeat(dots);
         }, 500);
@@ -467,10 +471,14 @@ function AIDebuggerWidget() {
      */
     this._hideTypingIndicator = function () {
         const typingIndicators = this.chatLog.querySelectorAll(".typing-indicator");
+        const timer =
+            this.widgetWindow && this.widgetWindow.timerManager
+                ? this.widgetWindow.timerManager
+                : window;
         typingIndicators.forEach(indicator => {
             const animationId = indicator.getAttribute("data-animation-id");
             if (animationId) {
-                clearInterval(parseInt(animationId));
+                timer.clearInterval(parseInt(animationId));
             }
             indicator.remove();
         });

@@ -182,6 +182,13 @@ describe("Sampler Widget", () => {
                 show: jest.fn(),
                 sendToCenter: jest.fn(),
                 destroy: jest.fn(),
+                timerManager: {
+                    setInterval: jest.fn().mockImplementation((cb, t) => setInterval(cb, t)),
+                    clearInterval: jest.fn().mockImplementation(id => clearInterval(id)),
+                    setTimeout: jest.fn().mockImplementation((cb, t) => setTimeout(cb, t)),
+                    clearTimeout: jest.fn().mockImplementation(id => clearTimeout(id)),
+                    clearAll: jest.fn()
+                },
                 _buttons: buttons
             };
             window.widgetWindows = {
