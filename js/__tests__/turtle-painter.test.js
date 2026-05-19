@@ -19,6 +19,7 @@
 
 const Painter = require("../turtle-painter");
 global.WRAP = true;
+global.NANERRORMSG = "Not a number";
 
 // Mock external color functions
 global.getcolor = jest.fn(() => [50, 100, "rgba(255,0,49,1)"]);
@@ -31,7 +32,8 @@ const createMockTurtle = () => ({
         screenY2turtleY: jest.fn(y => y),
         turtleX2screenX: jest.fn(x => x),
         turtleY2screenY: jest.fn(y => y),
-        scale: 1
+        scale: 1,
+        activity: { refreshCanvas: jest.fn(), errorMsg: jest.fn() }
     },
     activity: { refreshCanvas: jest.fn() },
     container: { x: 0, y: 0, rotation: 0 },
@@ -324,6 +326,56 @@ describe("Drawing - doForward", () => {
         // Should still process the movement (refreshCanvas called)
         expect(mockTurtle.activity.refreshCanvas).toHaveBeenCalled();
     });
+
+    test("doForward with NaN should show error and return early", () => {
+        painter.doForward(NaN);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalled();
+        expect(mockTurtle.ctx.beginPath).not.toHaveBeenCalled();
+    });
+
+    test("doForward with Infinity should show error and return early", () => {
+        painter.doForward(Infinity);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalled();
+        expect(mockTurtle.ctx.beginPath).not.toHaveBeenCalled();
+    });
+
+    test("doForward with negative steps should move backward", () => {
+        painter.doForward(-10);
+        expect(mockTurtle.activity.refreshCanvas).toHaveBeenCalled();
+    });
+
+    test("doForward with linePart parameter should still work", () => {
+        painter.doForward(10, true);
+        expect(mockTurtle.activity.refreshCanvas).toHaveBeenCalled();
+    });
+
+    test("doForward with wrap ON and out of bounds should wrap around", () => {
+        painter.wrap = true;
+        mockTurtle.container.x = 795; // Near right edge
+        mockTurtle.orientation = 90; // Facing right so x changes
+        mockTurtle.turtleX2screenX = jest.fn(x => x);
+        mockTurtle.turtleY2screenY = jest.fn(y => y);
+        const startX = mockTurtle.container.x;
+        painter.doForward(20); // Would go past 800
+        expect(mockTurtle.activity.refreshCanvas).toHaveBeenCalled();
+        // When wrapping, position resets to within canvas bounds
+        expect(mockTurtle.container.x).not.toBe(startX + 20);
+        expect(mockTurtle.container.x).toBeGreaterThanOrEqual(0);
+        expect(mockTurtle.container.x).toBeLessThanOrEqual(800);
+    });
+
+    test("doForward with wrap OFF and out of bounds should stop at edge", () => {
+        painter.wrap = false;
+        mockTurtle.container.x = 795; // Near right edge
+        mockTurtle.orientation = 90; // Facing right so x changes
+        mockTurtle.turtleX2screenX = jest.fn(x => x);
+        mockTurtle.turtleY2screenY = jest.fn(y => y);
+        const startX = mockTurtle.container.x;
+        painter.doForward(20); // Would go past 800
+        expect(mockTurtle.activity.refreshCanvas).toHaveBeenCalled();
+        // Without wrapping, turtle moves normally (may exceed canvas)
+        expect(mockTurtle.container.x).toBe(startX + 20);
+    });
 });
 
 describe("Drawing - doArc", () => {
@@ -564,5 +616,49 @@ describe("Font setting", () => {
     test("font getter should return current font", () => {
         painter.doSetFont("serif");
         expect(painter.font).toBe("serif");
+    });
+});
+
+describe("Painter._outOfBounds()", () => {
+    let painter;
+    let mockTurtle;
+
+    beforeEach(() => {
+        jest.spyOn(window, "requestAnimationFrame").mockImplementation(cb => cb());
+        mockTurtle = createMockTurtle();
+        painter = new Painter(mockTurtle);
+    });
+
+    afterEach(() => {
+        window.requestAnimationFrame.mockRestore();
+        jest.clearAllMocks();
+    });
+
+    test("returns true when x > width", () => {
+        expect(painter._outOfBounds(101, 50, 100, 100)).toBe(true);
+    });
+
+    test("returns true when x < 0", () => {
+        expect(painter._outOfBounds(-1, 50, 100, 100)).toBe(true);
+    });
+
+    test("returns true when y > height", () => {
+        expect(painter._outOfBounds(50, 101, 100, 100)).toBe(true);
+    });
+
+    test("returns true when y < 0", () => {
+        expect(painter._outOfBounds(50, -1, 100, 100)).toBe(true);
+    });
+
+    test("returns false when in bounds", () => {
+        expect(painter._outOfBounds(50, 50, 100, 100)).toBe(false);
+    });
+
+    test("returns false at edge x=0, y=0", () => {
+        expect(painter._outOfBounds(0, 0, 100, 100)).toBe(false);
+    });
+
+    test("returns false at edge x=width, y=height", () => {
+        expect(painter._outOfBounds(100, 100, 100, 100)).toBe(false);
     });
 });
