@@ -1878,8 +1878,8 @@ function TemperamentWidget() {
                 if (!t || !t.interval || !Array.isArray(t.interval)) {
                     this.activity.errorMsg(
                         _("Invalid temperament: ") +
-                            temperament +
-                            _(". Skipping to next temperament."),
+                        temperament +
+                        _(". Skipping to next temperament."),
                         3000
                     );
                     continue;
@@ -2592,6 +2592,16 @@ function TemperamentWidget() {
             that._save();
         };
 
+        widgetWindow.addButton("export-chunk.svg", ICONSIZE, _("Export Temperament")).onclick = function () {
+            that._exportTemperament();
+        };
+
+        widgetWindow.addButton("import-music.svg", ICONSIZE, _("Import Temperament")).onclick = function () {
+            that._importTemperament();
+        };
+        widgetWindow.addButton("visualize.svg", ICONSIZE, _("Visualizer")).onclick = function () {
+            that._visualizerOfNotes();
+        };
         const noteCell = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Table"));
 
         let t = getTemperament(this.inTemperament);
@@ -2722,7 +2732,131 @@ function TemperamentWidget() {
 
         widgetWindow.sendToCenter();
     };
+    this._exportTemperament = function () {
+        const data = {
+            type: isCustomTemperament(this.inTemperament) ? "custom" : "EDO",
+            name: this.inTemperament,
+            powerBase: this.powerBase,
+            pitchNumber: this.pitchNumber,
+            ratios: this.ratios,
+            notes: this.notes,
+            frequencies: this.frequencies
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], {
+            type: "application/json"
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = (this.inTemperament || "temperament") + ".json";
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    this._importTemperament = function () {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".json";
+        const that = this;
+        input.onchange = function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (ev) {
+                try {
+                    const data = JSON.parse(ev.target.result);
+                    if (!data.ratios || !data.pitchNumber) {
+                        that.activity.errorMsg(_("Invalid temperament file."), 3000);
+                        return;
+                    }
+                    that.inTemperament = data.name || "custom";
+                    that.powerBase = data.powerBase || 2;
+                    that.pitchNumber = data.pitchNumber;
+                    that.ratios = data.ratios;
+                    that.notes = data.notes || [];
+                    that.frequencies = data.frequencies || [];
+                    that._circleOfNotes();
+                    that.activity.textMsg(_("Temperament imported successfully."), 3000);
+                } catch (err) {
+                    that.activity.errorMsg(_("Failed to parse temperament file."), 3000);
+                }
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    };
+    this._visualizerOfNotes = function () {
+        temperamentTableDiv.style.display = "inline";
+        temperamentTableDiv.style.visibility = "visible";
+        temperamentTableDiv.style.backgroundColor = "white";
+        temperamentTableDiv.style.height = "350px";
+        temperamentTableDiv.textContent = "";
+
+        const container = document.createElement("div");
+        container.style.position = "relative";
+        container.style.textAlign = "center";
+        temperamentTableDiv.appendChild(container);
+
+        const canvas = document.createElement("canvas");
+        canvas.width = 400;
+        canvas.height = 400;
+        container.appendChild(canvas);
+
+        const ctx = canvas.getContext("2d");
+        const cx = 200, cy = 200, radius = 160;
+
+        // Draw outer circle
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, 2 * Math.PI);
+        ctx.strokeStyle = "#003300";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        const totalCents = 1200 * Math.log2(this.powerBase);
+        const that = this;
+
+        for (let i = 0; i < this.ratios.length; i++) {
+            const cents = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
+            const angle = (cents / totalCents) * 2 * Math.PI - Math.PI / 2;
+
+            const x = cx + radius * Math.cos(angle);
+            const y = cy + radius * Math.sin(angle);
+
+            // Draw note dot
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, 2 * Math.PI);
+            ctx.fillStyle = "#cc0066";
+            ctx.fill();
+
+            // Draw line from center
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(x, y);
+            ctx.strokeStyle = "rgba(204, 0, 102, 0.3)";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Label
+            const labelX = cx + (radius + 18) * Math.cos(angle);
+            const labelY = cy + (radius + 18) * Math.sin(angle);
+            ctx.fillStyle = "#000";
+            ctx.font = "11px sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            const label = that.notes[i] ?
+                (Array.isArray(that.notes[i]) ? that.notes[i][0] : that.notes[i]) : i;
+            ctx.fillText(label, labelX, labelY);
+        }
+
+        // Center label
+        ctx.fillStyle = "#333";
+        ctx.font = "13px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(this.inTemperament, cx, cy);
+    };
 }
+
 
 if (typeof module !== "undefined") {
     module.exports = TemperamentWidget;
