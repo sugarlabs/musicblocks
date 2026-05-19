@@ -4726,9 +4726,8 @@ class Activity {
                     // encodeURIComponent(null) producing a broken "data:...null" URL.
                     img.src = "data:image/svg+xml;utf8," + encodeURIComponent(block.artwork);
                 } else {
-                    // Fallback: use a generic block placeholder so the Trash panel
-                    // always shows a recognizable icon rather than a broken image.
-                    img.classList.add("trash-item-icon--placeholder");
+                    // Fallback image when block artwork is unavailable.
+                    img.src = "images/mouse.svg";
                 }
 
                 const textNode = document.createTextNode(block.name);
