@@ -131,3 +131,50 @@ body.dark .toolbar-btn-focused,
 }
 
 html, body { overscroll-behavior-x: none; }
+
+.network-status-item {
+  display: flex;
+  align-items: center;
+}
+
+.network-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  cursor: default;
+  user-select: none;
+}
+
+.network-status-badge::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.9;
+}
+
+.network-status-badge.online {
+  background: rgba(255, 255, 255, 0.18);
+  color: #e8f5e9;
+}
+
+.network-status-badge.offline {
+  background: rgba(255, 235, 59, 0.2);
+  color: #fff8cf;
+}
+
+@media screen and (max-width: 900px) {
+  .network-status-badge {
+    min-width: 0;
+    padding: 0 10px;
+    font-size: 0.72rem;
+  }
+}
