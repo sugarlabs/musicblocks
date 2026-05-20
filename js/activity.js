@@ -78,7 +78,6 @@ let MYDEFINES = [
     "utils/platformstyle",
     "easeljs.min",
     "tweenjs.min",
-    "preloadjs.min",
     "howler",
     // p5.min, p5-sound-adapter, and p5.dom.min are NOT loaded eagerly.
     // They are only needed by the JS-export feature and will be loaded
@@ -90,6 +89,7 @@ let MYDEFINES = [
     // Chart.js is only used by the statistics widget and will be loaded
     // on demand when the widget is opened, saving ~3-5 MB of heap memory.
     // "Chart",
+    "utils/utils-logic",
     "utils/utils",
     "utils/retryWithBackoff",
     "utils/debugLog",
@@ -544,13 +544,24 @@ class Activity {
                 if (this.stage) {
                     const hasActiveTweens = createjs.Tween.hasActiveTweens();
                     const hasActiveGifs = this.gifAnimator && this.gifAnimator.getActiveCount() > 0;
+                    const isInteracting =
+                        this.isDragging ||
+                        this.isSelecting ||
+                        (this.blocks && this.blocks.dragGroup !== null);
 
-                    if (this.stageDirty || hasActiveTweens || hasActiveGifs) {
+                    if (this.stageDirty || hasActiveTweens || hasActiveGifs || isInteracting) {
                         this.stage.update();
                         this.stageDirty = false;
+                        // Continue the loop if there's work or ongoing interaction
+                        this._renderLoopRafId = requestAnimationFrame(renderLoop);
+                    } else {
+                        // Nothing to render — let the loop go idle
+                        this._renderLoopRunning = false;
+                        this._renderLoopRafId = null;
                     }
+                } else {
+                    this._renderLoopRafId = requestAnimationFrame(renderLoop);
                 }
-                this._renderLoopRafId = requestAnimationFrame(renderLoop);
             };
 
             this._renderLoopRafId = requestAnimationFrame(renderLoop);
@@ -721,7 +732,14 @@ class Activity {
             wheel.sliceInitPathCustom = wheel.slicePathCustom;
             wheel.clickModeRotate = false;
             const wheelItems = this.helpfulWheelItems.filter(ele => ele.display);
-            wheel.initWheel(wheelItems.map(ele => ele.icon));
+            wheel.initWheel(wheelItems.map(ele => _(ele.label)));
+
+            wheelItems.forEach((ele, i) => {
+                if (ele.icon) {
+                    wheel.navItems[i].setTitle(ele.icon);
+                }
+            });
+
             wheel.createWheel();
 
             wheel.navItems[0].selected = false;
@@ -1377,6 +1395,14 @@ class Activity {
                 const rawSVG = this.blocks.blockList[i].collapsed
                     ? this.blocks.blockCollapseArt[i]
                     : this.blocks.blockArt[i];
+
+                // Defensive guard: blockArt may be undefined if a block was restored
+                // from trash and regenerateArtwork() has not yet completed (it is
+                // asynchronous). Skip this block rather than injecting <parsererror>
+                // into the SVG output.
+                if (!rawSVG) {
+                    continue;
+                }
 
                 if (this.blocks.blockList[i].isCollapsible()) {
                     svgParts.push("<g>");
@@ -4418,6 +4444,8 @@ class Activity {
                 ) {
                     this.saveLocally();
                 }
+                // Pause render loop while tab is hidden
+                this._stopRenderLoop();
                 return;
             }
 
@@ -4429,6 +4457,9 @@ class Activity {
                     this._onResize(false);
                 }, 250);
             }
+            // Resume render loop when tab becomes visible again
+            this.stageDirty = true;
+            this._startRenderLoop();
         };
         this.addEventListener(document, "visibilitychange", this._handleVisibilityChange);
 
@@ -4518,9 +4549,20 @@ class Activity {
                 this.blocks.blockList[blk].trash = false;
                 this.blocks.moveBlockRelative(blk, dx, dy);
 
+                const block = this.blocks.blockList[blk];
+
+                // Re-populate blocks.blockArt[blk] if it was deleted on trash.
+                // sendStackToTrash() and sendAllToTrash() both delete blockArt[blk]
+                // to free memory. Without regeneration, printBlockSVG() receives
+                // undefined here, passes it to DOMParser.parseFromString(undefined),
+                // and injects a <parsererror> node into every Save Block Artwork
+                // export (activity.js ~line 1394).
+                if (!this.blocks.blockArt[blk]) {
+                    block.regenerateArtwork(block.isCollapsible());
+                }
+
                 // Re-cache the container if it was uncached to save
                 // memory in sendStackToTrash().
-                const block = this.blocks.blockList[blk];
                 if (block.container && !block.container.bitmapCache) {
                     block.container.cache(
                         0,
@@ -4532,14 +4574,30 @@ class Activity {
 
                 this.blocks.blockList[blk].show();
             }
-
             this.blocks.raiseStackToTop(blockId);
             const restoredBlock = this.blocks.blockList[blockId];
 
             if (restoredBlock.name === "start" || restoredBlock.name === "drum") {
                 const turtle = restoredBlock.value;
-                this.turtles.getTurtle(turtle).inTrash = false;
-                this.turtles.getTurtle(turtle).container.visible = true;
+                const primaryTurtle = this.turtles.getTurtle(turtle);
+                primaryTurtle.inTrash = false;
+                primaryTurtle.container.visible = true;
+
+                // FIX: Restore the companion turtle if one exists.
+                // sendStackToTrash() in blocks.js (~line 7257) sets BOTH the primary
+                // and companion turtle to inTrash=true / visible=false when trashing a
+                // start/drum block. Without this mirror restore, the companion stays
+                // inTrash=true permanently, and logo.js (~line 1519) silently skips it:
+                //   if (!tur.inTrash) { tur.running = true; ... }
+                // This means onEveryBeatDo callbacks are dead after any trash+restore.
+                const comp = primaryTurtle.companionTurtle;
+                if (comp !== null && comp !== undefined) {
+                    const companionTurtle = this.turtles.getTurtle(comp);
+                    if (companionTurtle) {
+                        companionTurtle.inTrash = false;
+                        companionTurtle.container.visible = true;
+                    }
+                }
             } else if (restoredBlock.name === "action") {
                 const actionArg = this.blocks.blockList[restoredBlock.connections[1]];
                 if (actionArg !== null) {
@@ -4705,10 +4763,9 @@ class Activity {
 
             const existingView = document.getElementById("trashView");
             if (existingView) {
-                trashList.replaceChild(trashView, existingView);
-            } else {
-                trashList.appendChild(trashView);
+                existingView.remove(); // remove from DOM; GC can now collect listeners
             }
+            trashList.appendChild(trashView);
         };
 
         /*
@@ -4829,11 +4886,28 @@ class Activity {
                     this.blocks.trashStacks.push(blk);
                 }
 
-                if (myBlock.name === "start" || myBlock.name === "drum") {
-                    const turtle = myBlock.value;
-                    if (!myBlock.trash && turtle !== null) {
-                        this.turtles.getTurtle(turtle).inTrash = true;
-                        this.turtles.getTurtle(turtle).container.visible = false;
+                if (
+                    this.blocks.blockList[blk].name === "start" ||
+                    this.blocks.blockList[blk].name === "drum"
+                ) {
+                    const turtle = this.blocks.blockList[blk].value;
+
+                    if (!this.blocks.blockList[blk].trash && turtle !== null) {
+                        const primaryTurtle = this.turtles.getTurtle(turtle);
+
+                        primaryTurtle.inTrash = true;
+                        primaryTurtle.container.visible = false;
+
+                        const comp = primaryTurtle.companionTurtle;
+
+                        if (comp !== null && comp !== undefined) {
+                            const companionTurtle = this.turtles.getTurtle(comp);
+
+                            if (companionTurtle) {
+                                companionTurtle.inTrash = true;
+                                companionTurtle.container.visible = false;
+                            }
+                        }
                     }
                 } else if (myBlock.name === "action") {
                     if (!myBlock.trash) {
@@ -5018,6 +5092,7 @@ class Activity {
         this.refreshCanvas = () => {
             this.stageDirty = true;
             this.update = true;
+            this._startRenderLoop();
         };
 
         /*
@@ -5975,10 +6050,13 @@ class Activity {
                 that._doHardStopButton();
             }
 
-            // Use the planet New Project mechanism if it is available,
-            // but only if the current project has a name.
+            // Use the planet New Project mechanism if it is available
+            // and Planet storage is actually initialized (planet.planet
+            // is null when running from file:///index.html), but only
+            // if the current project has a name.
             if (
                 that.planet !== undefined &&
+                that.planet.planet !== null &&
                 that.planet.getCurrentProjectName() !== _("My Project")
             ) {
                 that.planet.saveLocally();
@@ -6047,7 +6125,45 @@ class Activity {
             }
 
             this.printText.classList.add("show");
-            this.printTextContent.textContent = msg;
+
+            // Clean container to avoid appending duplicate messages
+            this.printTextContent.replaceChildren();
+
+            if (typeof msg === "string") {
+                if (msg.includes("<a") && msg.includes("</a>")) {
+                    // Safe parser for reload link
+                    try {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(msg, "text/html");
+                        const link = doc.querySelector("a");
+                        if (link) {
+                            const safeLink = document.createElement("a");
+                            safeLink.href = "#";
+                            safeLink.className = link.className || "language-link";
+                            safeLink.textContent = link.textContent;
+                            safeLink.style.cursor = "pointer";
+
+                            // Copy hover styles programmatically to avoid inline scripts
+                            safeLink.addEventListener("mouseover", () => {
+                                safeLink.style.opacity = 0.5;
+                            });
+                            safeLink.addEventListener("mouseout", () => {
+                                safeLink.style.opacity = 1;
+                            });
+
+                            this.printTextContent.appendChild(safeLink);
+                        } else {
+                            this.printTextContent.textContent = msg;
+                        }
+                    } catch (e) {
+                        this.printTextContent.textContent = msg;
+                    }
+                } else {
+                    this.printTextContent.textContent = msg;
+                }
+            } else if (msg instanceof HTMLElement || msg instanceof DocumentFragment) {
+                this.printTextContent.appendChild(msg);
+            }
 
             const that = this;
             this.msgTimeoutID = setTimeout(() => {
@@ -6988,6 +7104,7 @@ class Activity {
          * These menu items are on the canvas, not the toolbar.
          */
         this._setupPaletteMenu = () => {
+            this.helpfulWheelItems = [];
             const btnSize = this.cellSize;
             const createButton = (icon, label, action) => {
                 const button = this._makeButton(icon, label, x, y, btnSize, 0);
@@ -7847,13 +7964,26 @@ class Activity {
             );
 
             img.onload = () => {
-                const bitmap = new createjs.Bitmap(img);
-                const bounds = bitmap.getBounds();
-                bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+                // FIX: createjs.Bitmap.getBounds() returns null for any Bitmap
+                // not added to a live EaselJS stage → TypeError: null.x crash.
+                // doSVG() returns "" on blank canvas → naturalWidth = 0 → guaranteed crash.
+                // Fix: use img.naturalWidth directly + plain offscreen canvas (no EaselJS needed).
                 try {
-                    that.storage["SESSIONIMAGE" + p] = bitmap.bitmapCache.getCacheDataURL();
+                    if (!img.naturalWidth || !img.naturalHeight) {
+                        // Blank canvas — doSVG() returned empty string, nothing to thumbnail.
+                        // SESSION<p> JSON was already saved above, so this is safe to skip.
+                        return;
+                    }
+
+                    const w = img.naturalWidth;
+                    const h = img.naturalHeight;
+                    const offscreen = document.createElement("canvas");
+                    offscreen.width = w;
+                    offscreen.height = h;
+                    offscreen.getContext("2d").drawImage(img, 0, 0);
+                    this.storage["SESSIONIMAGE" + p] = offscreen.toDataURL("image/png");
                 } catch (e) {
-                    console.error(e);
+                    console.error("[saveLocally] Thumbnail save failed:", e);
                 }
             };
 
@@ -8738,9 +8868,6 @@ class Activity {
                 },
                 false
             );
-
-            // Workaround to chrome security issues
-            // createjs.LoadQueue(true, null, true);
 
             // Enable touch interactions if supported on the current device.
             createjs.Touch.enable(this.stage, false, true);

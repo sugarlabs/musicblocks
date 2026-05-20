@@ -1053,28 +1053,56 @@ class JSEditor {
      * @returns {void}
      */
     _updateDebugButtons(code) {
-        if (!docById("debugButtons")) return;
+        const debugContainer = docById("debugButtons");
+        if (!debugContainer) return;
+
         const lines = code.replace(/\n+$/, "\n").split("\n");
-        let buttonsHTML = "";
+        const fragment = document.createDocumentFragment();
+
         for (let i = 0; i < lines.length; i++) {
             const lineNumber = i;
             const lineContent = lines[i].trim();
             const hasDebugger = lineContent === "debugger;" || lineContent.includes("debugger;");
+
+            const btnDiv = document.createElement("div");
+            btnDiv.style.height = "20px";
+            btnDiv.style.lineHeight = "20px";
+
             if (lineContent === "") {
-                buttonsHTML += "<div style='height: 20px; line-height: 20px;'>&nbsp;</div>";
+                btnDiv.innerHTML = "&nbsp;";
             } else if (hasDebugger) {
-                buttonsHTML += `<div style="height: 20px; line-height: 20px; cursor: pointer; opacity: 1; pointer-events: auto; border-radius: 4px;" \
-                    onclick="window.jsEditor._removeDebuggerFromLine(${lineNumber})" \
-                    title="Remove debugger from line ${lineNumber + 1}">🔴</div>`;
+                btnDiv.style.cursor = "pointer";
+                btnDiv.style.opacity = "1";
+                btnDiv.style.pointerEvents = "auto";
+                btnDiv.style.borderRadius = "4px";
+                btnDiv.title = `Remove debugger from line ${lineNumber + 1}`;
+                btnDiv.textContent = "🔴";
+                btnDiv.addEventListener("click", () => {
+                    if (window.jsEditor) window.jsEditor._removeDebuggerFromLine(lineNumber);
+                });
             } else {
-                buttonsHTML += `<div style="height: 20px; line-height: 20px; cursor: pointer; opacity: 0; transition: opacity 0.2s ease-in-out; pointer-events: auto;" \
-                    onmouseenter="this.style.opacity='1'" \
-                    onmouseleave="this.style.opacity='0'"\
-                    onclick="window.jsEditor._addDebuggerToLine(${lineNumber})" \
-                    title="Add breakpoint to line ${lineNumber + 1}">🔴</div>`;
+                btnDiv.style.cursor = "pointer";
+                btnDiv.style.opacity = "0";
+                btnDiv.style.transition = "opacity 0.2s ease-in-out";
+                btnDiv.style.pointerEvents = "auto";
+                btnDiv.title = `Add breakpoint to line ${lineNumber + 1}`;
+                btnDiv.textContent = "🔴";
+
+                btnDiv.addEventListener("mouseenter", () => {
+                    btnDiv.style.opacity = "1";
+                });
+                btnDiv.addEventListener("mouseleave", () => {
+                    btnDiv.style.opacity = "0";
+                });
+                btnDiv.addEventListener("click", () => {
+                    if (window.jsEditor) window.jsEditor._addDebuggerToLine(lineNumber);
+                });
             }
+            fragment.appendChild(btnDiv);
         }
-        docById("debugButtons").innerHTML = buttonsHTML;
+
+        debugContainer.innerHTML = "";
+        debugContainer.appendChild(fragment);
     }
 
     /**

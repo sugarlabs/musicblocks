@@ -23,18 +23,34 @@ function AIDebuggerWidget() {
     const CHATWIDTH = 900;
     const CHATHEIGHT = 600;
 
+    /**
+     * Allowed backend origins. On unrecognized hosts the debugger
+     * will refuse to send data rather than guessing a backend URL.
+     */
+    const ALLOWED_BACKENDS = {
+        "localhost": "http://localhost:8000",
+        "127.0.0.1": "http://127.0.0.1:8000",
+        "musicblocks.sugarlabs.org": "https://api.musicblocks.sugarlabs.org"
+    };
+
     const BACKEND_CONFIG = {
         BASE_URL: (() => {
-            if (
-                window.location.hostname === "localhost" ||
-                window.location.hostname === "127.0.0.1"
-            ) {
-                return "http://localhost:8000";
-            } else if (window.location.hostname.includes("musicblocks.sugarlabs.org")) {
-                return `${window.location.protocol}//api.musicblocks.sugarlabs.org`;
-            } else {
-                return `${window.location.protocol}//${window.location.hostname}:8000`;
+            const host = window.location.hostname;
+            if (ALLOWED_BACKENDS[host]) {
+                return ALLOWED_BACKENDS[host];
             }
+            // Check subdomain match for *.musicblocks.sugarlabs.org
+            if (host.endsWith(".musicblocks.sugarlabs.org")) {
+                return "https://api.musicblocks.sugarlabs.org";
+            }
+            // Unknown host: no automatic backend derivation
+            console.warn(
+                "AI Debugger: unrecognized host '" +
+                    host +
+                    "'. " +
+                    "Backend URL must be added to ALLOWED_BACKENDS."
+            );
+            return null;
         })(),
         ENDPOINTS: {
             ANALYZE: "/analyze"
@@ -97,6 +113,13 @@ function AIDebuggerWidget() {
     this._isProcessing = false;
 
     /**
+     * Whether the user has consented to send project data to the backend.
+     * No data leaves the browser until this is true.
+     * @type {boolean}
+     */
+    this._consentGiven = false;
+
+    /**
      * Generates a unique conversation ID
      * @returns {string} Unique conversation identifier
      * @private
@@ -147,7 +170,7 @@ function AIDebuggerWidget() {
         };
 
         this._createLayout();
-        this._loadProjectAndInitialize();
+        this._showConsentBanner();
         widgetWindow.sendToCenter();
         this.activity.textMsg(_("Debugger initialized"));
     };
@@ -281,6 +304,12 @@ function AIDebuggerWidget() {
         const messageText = this.messageInput.value.trim();
         if (messageText === "") return;
         if (this._isProcessing) return;
+
+        if (!this._consentGiven) {
+            this._showConsentBanner();
+            return;
+        }
+
         this._isProcessing = true;
 
         const userMessage = {
@@ -349,6 +378,16 @@ function AIDebuggerWidget() {
      * @private
      */
     this._sendToBackend = function (message) {
+        if (!BACKEND_CONFIG.BASE_URL) {
+            this._isProcessing = false;
+            this._addMessageToUI({
+                type: "system",
+                content: _("AI Debugger backend is not configured for this host."),
+                timestamp: new Date().toISOString()
+            });
+            return;
+        }
+
         this._showTypingIndicator();
         this.promptCount++;
         let projectData;
@@ -486,7 +525,93 @@ function AIDebuggerWidget() {
     };
 
     /**
-     * Loads current project data and initializes conversation with backend
+     * Shows a consent banner explaining what data will be sent and where.
+     * No project data leaves the browser until the user explicitly agrees.
+     * @private
+     */
+    this._showConsentBanner = function () {
+        const banner = document.createElement("div");
+        banner.style.padding = "16px 20px";
+        banner.style.margin = "12px";
+        banner.style.borderRadius = "12px";
+        banner.style.backgroundColor = "#fff3cd";
+        banner.style.border = "1px solid #ffc107";
+        banner.style.color = "#664d03";
+        banner.style.fontSize = "13px";
+        banner.style.lineHeight = "1.5";
+
+        const title = document.createElement("div");
+        title.style.fontWeight = "bold";
+        title.style.marginBottom = "8px";
+        title.style.fontSize = "14px";
+        title.textContent = _("Before we start");
+
+        const body = document.createElement("div");
+        body.style.marginBottom = "12px";
+        body.textContent = _(
+            "The AI Debugger will send your current project data to an external server for analysis. " +
+                "Your project blocks and structure will be shared with: "
+        );
+
+        const urlSpan = document.createElement("strong");
+        urlSpan.textContent = BACKEND_CONFIG.BASE_URL;
+        body.appendChild(urlSpan);
+
+        const btnRow = document.createElement("div");
+        btnRow.style.display = "flex";
+        btnRow.style.gap = "8px";
+        btnRow.style.marginTop = "4px";
+
+        const acceptBtn = document.createElement("button");
+        acceptBtn.textContent = _("Analyze my project");
+        acceptBtn.style.padding = "8px 16px";
+        acceptBtn.style.border = "none";
+        acceptBtn.style.borderRadius = "6px";
+        acceptBtn.style.backgroundColor = "#198754";
+        acceptBtn.style.color = "white";
+        acceptBtn.style.cursor = "pointer";
+        acceptBtn.style.fontSize = "13px";
+        acceptBtn.style.fontWeight = "600";
+
+        const declineBtn = document.createElement("button");
+        declineBtn.textContent = _("Cancel");
+        declineBtn.style.padding = "8px 16px";
+        declineBtn.style.border = "1px solid #ccc";
+        declineBtn.style.borderRadius = "6px";
+        declineBtn.style.backgroundColor = "white";
+        declineBtn.style.cursor = "pointer";
+        declineBtn.style.fontSize = "13px";
+
+        acceptBtn.onclick = () => {
+            this._consentGiven = true;
+            banner.remove();
+            this._loadProjectAndInitialize();
+        };
+
+        declineBtn.onclick = () => {
+            banner.remove();
+            const msg = {
+                type: "system",
+                content: _(
+                    "AI analysis was not started. You can type a question below, " +
+                        "but project data will not be sent until you agree."
+                ),
+                timestamp: new Date().toISOString()
+            };
+            this._addMessageToUI(msg);
+        };
+
+        btnRow.appendChild(acceptBtn);
+        btnRow.appendChild(declineBtn);
+        banner.appendChild(title);
+        banner.appendChild(body);
+        banner.appendChild(btnRow);
+        this.chatLog.appendChild(banner);
+    };
+
+    /**
+     * Loads current project data and initializes conversation with backend.
+     * Only called after the user gives explicit consent.
      * @private
      */
     this._loadProjectAndInitialize = function () {
@@ -536,6 +661,18 @@ function AIDebuggerWidget() {
      * @private
      */
     this._initializeBackendWithProject = function (projectData) {
+        if (!BACKEND_CONFIG.BASE_URL) {
+            this._addMessageToUI({
+                type: "system",
+                content: _(
+                    "AI Debugger is not available on this host. " +
+                        "The backend URL could not be determined."
+                ),
+                timestamp: new Date().toISOString()
+            });
+            return;
+        }
+
         // convert chat history to the format expected by the backend
         const history = this.chatHistory.map(msg => ({
             role: msg.type === "user" ? "user" : "assistant",
@@ -614,7 +751,7 @@ function AIDebuggerWidget() {
         this.promptCount = 0; // Reset prompt count
         this.conversationId = this._generateConversationId();
         this._hideTypingIndicator();
-        this.chatLog.innerHTML = "";
+        this.chatLog.replaceChildren();
 
         this._loadProjectAndInitialize();
         this._updateMessageCount();
@@ -722,7 +859,7 @@ function AIDebuggerWidget() {
      * @private
      */
     this._clearChat = function () {
-        this.chatLog.innerHTML = "";
+        this.chatLog.replaceChildren();
         this.activity.textMsg(_("Chat cleared."));
     };
 
@@ -1222,4 +1359,8 @@ function AIDebuggerWidget() {
             body.style.height = CHATHEIGHT + "px";
         }
     };
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = AIDebuggerWidget;
 }
