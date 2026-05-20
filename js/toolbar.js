@@ -63,7 +63,9 @@ class Toolbar {
      * @constructor
      */
     constructor() {
-        this.stopIconColorWhenPlaying = window.platformColor.stopIconcolor;
+        this.stopIconColorWhenPlaying = getComputedStyle(document.body)
+            .getPropertyValue("--mb-stop-icon-color")
+            .trim();
         this.language = safeStorageGet("languagePreference");
         if (this.language === undefined) {
             this.language = navigator.language;
@@ -2689,7 +2691,9 @@ class FocusCycleManager {
                         const targetRow = rows.length > 1 ? rows[1] : rows[0];
                         targetRow.dataset.keyboardFocus = "true";
                         targetRow.style.backgroundColor =
-                            window.platformColor?.hoverColor || "#0CAFFF";
+                            getComputedStyle(document.body)
+                                .getPropertyValue("--mb-hover-color")
+                                .trim() || "#0cafff";
                         p._navSection = "blocks";
                         p._navBlockIndex = rows.length > 1 ? 1 : 0;
                     }
