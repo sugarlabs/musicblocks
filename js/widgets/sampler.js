@@ -1976,7 +1976,8 @@ function SampleWidget() {
                 (this.pitchAnalysers[turtleIdx] && (this.running || resized))
             ) {
                 this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
-                canvasCtx.fillStyle = platformColor.background || "#FFFFFF";
+                canvasCtx.fillStyle =
+                    getComputedStyle(document.body).getPropertyValue("--bg").trim() || "#ffffff";
                 canvasCtx.font = "10px Verdana";
                 this.verticalOffset = -canvas.height / 4;
                 this.zoomFactor = 40.0;
@@ -1987,7 +1988,8 @@ function SampleWidget() {
                     //.TRANS: The sound sample that the user uploads.
                     oscText = this.sampleName !== "" ? this.sampleName : _("sample");
                 }
-                canvasCtx.fillStyle = platformColor.textColor || "#000000";
+                canvasCtx.fillStyle =
+                    getComputedStyle(document.body).getPropertyValue("--fg").trim() || "#000000";
                 //.TRANS: The reference tone is a sound used for comparison.
                 canvasCtx.fillText(_("reference tone"), 10, 10);
                 canvasCtx.fillText(oscText, 10, canvas.height / 2 + 10);
