@@ -1,7 +1,3 @@
-// Scope variables outside the function so they aren't recreated on every call
-let zoomOverlayElement = null;
-let zoomHideTimeout = null;
-
 /**
  * Displays a temporary overlay showing the current zoom percentage.
  * The overlay appears in the center of the screen and automatically
@@ -10,13 +6,19 @@ let zoomHideTimeout = null;
  * @param {number} scale - Current block scale value (e.g., 1, 1.5, 2).
  */
 function showZoomOverlay(scale) {
-    if (!zoomOverlayElement) {
-        zoomOverlayElement = document.createElement("div");
-        zoomOverlayElement.id = "zoomOverlay";
-        zoomOverlayElement.setAttribute("aria-live", "polite");
+    let overlay = document.getElementById("zoomOverlay");
 
-        // --- CROSS-BROWSER CSS ---
-        const style = zoomOverlayElement.style;
+    if (!overlay) {
+        overlay = document.createElement("div");
+        overlay.id = "zoomOverlay";
+        overlay.setAttribute("aria-live", "polite");
+        document.body.appendChild(overlay);
+    }
+
+    overlay.textContent = Math.round(scale * 100) + "%";
+
+    // --- CROSS-BROWSER CSS ---
+    const style = overlay.style;
 
     style.position = "fixed";
     style.top = "50%";
@@ -48,19 +50,11 @@ function showZoomOverlay(scale) {
     style.pointerEvents = "none"; // Ensures user can click "through" it if it's visible
     style.transition = "opacity 0.3s ease-in-out";
     style.webkitTransition = "opacity 0.3s ease-in-out";
-    }
-
-    if (!document.body.contains(zoomOverlayElement)) {
-        document.body.appendChild(zoomOverlayElement);
-    }
-
-    zoomOverlayElement.textContent = Math.round(scale * 100) + "%";
-    zoomOverlayElement.style.opacity = "1";
 
     // Reset and trigger auto-hide
-    if (zoomHideTimeout) clearTimeout(zoomHideTimeout);
-    zoomHideTimeout = setTimeout(() => {
-        zoomOverlayElement.style.opacity = "0";
+    clearTimeout(overlay.hideTimeout);
+    overlay.hideTimeout = setTimeout(() => {
+        style.opacity = "0";
     }, 1200);
 }
 
