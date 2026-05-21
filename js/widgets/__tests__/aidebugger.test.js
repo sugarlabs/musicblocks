@@ -715,6 +715,7 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget.messageInput = document.createElement("input");
             debuggerWidget._sendToBackend = jest.fn();
             debuggerWidget._updateMessageCount = jest.fn();
+            debuggerWidget._consentGiven = true;
         });
 
         test("does nothing with empty input", () => {
@@ -739,6 +740,15 @@ describe("AIDebuggerWidget", () => {
             expect(debuggerWidget.messageInput.value).toBe("");
             expect(debuggerWidget._isProcessing).toBe(true);
             expect(debuggerWidget._sendToBackend).toHaveBeenCalledWith("Hello AI");
+        });
+
+        test("does not send message and shows consent banner if consent not given", () => {
+            debuggerWidget._consentGiven = false;
+            debuggerWidget._showConsentBanner = jest.fn();
+            debuggerWidget.messageInput.value = "Hello AI";
+            debuggerWidget._sendMessage();
+            expect(debuggerWidget.chatHistory).toHaveLength(0);
+            expect(debuggerWidget._showConsentBanner).toHaveBeenCalled();
         });
     });
 
