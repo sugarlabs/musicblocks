@@ -120,6 +120,7 @@ requirejs.config({
         "activity/activity": {
             deps: [
                 "utils/utils",
+                "utils/error-handler",
                 "activity/activity-context",
                 "activity/logo",
                 "activity/blocks",
