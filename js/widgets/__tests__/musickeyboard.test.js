@@ -7,10 +7,12 @@ const MusicKeyboard = require("../musickeyboard.js");
 describe("MusicKeyboard document key handler lifecycle", () => {
     let originalOnKeyDown;
     let originalOnKeyUp;
+    let originalLocalStorage;
 
     beforeEach(() => {
         originalOnKeyDown = document.onkeydown;
         originalOnKeyUp = document.onkeyup;
+        originalLocalStorage = Object.getOwnPropertyDescriptor(global, "localStorage");
         document.onkeydown = null;
         document.onkeyup = null;
     });
@@ -18,6 +20,18 @@ describe("MusicKeyboard document key handler lifecycle", () => {
     afterEach(() => {
         document.onkeydown = originalOnKeyDown;
         document.onkeyup = originalOnKeyUp;
+        Object.defineProperty(global, "localStorage", originalLocalStorage);
+    });
+
+    test("opens when localStorage is blocked", () => {
+        Object.defineProperty(global, "localStorage", {
+            configurable: true,
+            get() {
+                throw new DOMException("Access denied", "SecurityError");
+            }
+        });
+
+        expect(() => new MusicKeyboard({})).not.toThrow();
     });
 
     test("captures the handlers active when the keyboard is opened", () => {

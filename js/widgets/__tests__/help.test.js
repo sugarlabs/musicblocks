@@ -87,6 +87,7 @@ window.widgetWindows = {
 };
 
 Object.defineProperty(window, "localStorage", {
+    configurable: true,
     writable: true,
     value: { languagePreference: "en" }
 });
@@ -515,6 +516,26 @@ describe("HelpWidget", () => {
             expect(img.getAttribute("width")).toBeNull();
             expect(img.classList.contains("help-tour-image")).toBe(true);
             expect(img.classList.contains("help-tour-icon")).toBe(false);
+        });
+
+        test("_showPage falls back when localStorage is blocked", () => {
+            const originalLocalStorage = Object.getOwnPropertyDescriptor(window, "localStorage");
+            const activity = createMockActivity();
+            const hw = new HelpWidget(activity, false);
+            jest.runAllTimers();
+
+            Object.defineProperty(window, "localStorage", {
+                configurable: true,
+                get() {
+                    throw new DOMException("Access denied", "SecurityError");
+                }
+            });
+
+            try {
+                expect(() => hw._showPage(0)).not.toThrow();
+            } finally {
+                Object.defineProperty(window, "localStorage", originalLocalStorage);
+            }
         });
 
         test("_showPage treats Music Blocks congratulations page as a large image", () => {

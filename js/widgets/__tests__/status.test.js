@@ -261,6 +261,29 @@ describe("StatusMatrix Widget", () => {
                 configurable: true
             });
         });
+
+        test("falls back when localStorage is blocked for bpm labels", () => {
+            const originalLocalStorage = Object.getOwnPropertyDescriptor(global, "localStorage");
+
+            Object.defineProperty(global, "localStorage", {
+                configurable: true,
+                get() {
+                    throw new DOMException("Access denied", "SecurityError");
+                }
+            });
+
+            mockActivity.blocks.blockList = {
+                0: { name: "bpm", protoblock: { staticLabels: ["beats per minute"] }, value: 120 }
+            };
+            mockActivity.logo.statusFields = [[0, "bpm"]];
+
+            try {
+                expect(() => statusMatrix.init(mockActivity)).not.toThrow();
+            } finally {
+                Object.defineProperty(global, "localStorage", originalLocalStorage);
+            }
+        });
+
         it("uses privateData for outputtools block", () => {
             mockActivity.blocks.blockList = {
                 0: { name: "outputtools", privateData: "someData", value: null }
