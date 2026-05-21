@@ -101,6 +101,15 @@
                 this.rel = 'stylesheet';
             "
         />
+        <link
+            rel="preload"
+            href="css/widgets/phrasemaker.css"
+            as="style"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
+        />
         <link rel="prefetch" as="video" href="loading-animation.webm" type="video/webm" />
         <link rel="prefetch" as="video" href="loading-animation.mp4" type="video/mp4" />
 
@@ -115,7 +124,10 @@
             rel="preload"
             href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"
             as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
         />
         <noscript
             ><link
@@ -136,7 +148,10 @@
             as="style"
             integrity="sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07"
             crossorigin="anonymous"
-            onload="this.onload=null;this.rel='stylesheet'"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
         />
         <noscript
             ><link
@@ -178,7 +193,10 @@
             rel="preload"
             href="css/themes.css?v=fixed"
             as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
         />
         <noscript><link rel="stylesheet" href="css/themes.css?v=fixed" /></noscript>
         <script>
@@ -1293,7 +1311,7 @@
 
                 iconCode.textContent = isFullscreen ? "\ue5d1" : "\ue5d0";
 
-                if (fullScreenBtn && typeof _ === 'function') {
+                if (fullScreenBtn && typeof _ === "function") {
                     var tooltipText = isFullscreen ? _("Exit Fullscreen") : _("Enter Fullscreen");
                     fullScreenBtn.setAttribute("data-tooltip", tooltipText);
                     if (window.jQuery) {

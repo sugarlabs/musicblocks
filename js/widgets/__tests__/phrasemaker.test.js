@@ -544,20 +544,36 @@ describe("PhraseMaker Widget", () => {
         phraseMaker.rowLabels = ["C"];
         phraseMaker._rows = [
             {
-                insertCell: jest.fn(() => ({
-                    style: {},
-                    setAttribute: jest.fn(),
-                    addEventListener: jest.fn(),
-                    appendChild: jest.fn()
-                }))
+                insertCell: jest.fn(() => {
+                    const classes = new Set();
+                    return {
+                        style: {},
+                        setAttribute: jest.fn(),
+                        addEventListener: jest.fn(),
+                        appendChild: jest.fn(),
+                        classList: {
+                            add: (...args) => args.forEach(c => classes.add(c)),
+                            remove: (...args) => args.forEach(c => classes.delete(c)),
+                            contains: c => classes.has(c)
+                        }
+                    };
+                })
             }
         ];
         phraseMaker._noteValueRow = {
-            insertCell: jest.fn(() => ({
-                style: {},
-                setAttribute: jest.fn(),
-                appendChild: jest.fn()
-            }))
+            insertCell: jest.fn(() => {
+                const classes = new Set();
+                return {
+                    style: {},
+                    setAttribute: jest.fn(),
+                    appendChild: jest.fn(),
+                    classList: {
+                        add: (...args) => args.forEach(c => classes.add(c)),
+                        remove: (...args) => args.forEach(c => classes.delete(c)),
+                        contains: c => classes.has(c)
+                    }
+                };
+            })
         };
 
         phraseMaker.addNotes(2, 4);
@@ -565,13 +581,21 @@ describe("PhraseMaker Widget", () => {
         expect(phraseMaker._notesToPlay.length).toBe(2);
     });
     test("addTuplet pushes notes to _notesToPlay", () => {
-        const createMockCell = () => ({
-            style: {},
-            innerHTML: "",
-            setAttribute: jest.fn(),
-            addEventListener: jest.fn(),
-            appendChild: jest.fn()
-        });
+        const createMockCell = () => {
+            const classes = new Set();
+            return {
+                style: {},
+                innerHTML: "",
+                setAttribute: jest.fn(),
+                addEventListener: jest.fn(),
+                appendChild: jest.fn(),
+                classList: {
+                    add: (...args) => args.forEach(c => classes.add(c)),
+                    remove: (...args) => args.forEach(c => classes.delete(c)),
+                    contains: c => classes.has(c)
+                }
+            };
+        };
 
         phraseMaker._rows = [
             {
@@ -756,16 +780,19 @@ describe("PhraseMaker Widget", () => {
     test("_clear resets matrix cells", () => {
         phraseMaker.rowLabels = ["C"];
 
-        phraseMaker._rows = [
-            {
-                cells: [
-                    {
-                        style: { backgroundColor: "black" },
-                        getAttribute: jest.fn(() => "white")
-                    }
-                ]
+        const classes = new Set(["pm-cell-active"]);
+        const cell = {
+            getAttribute: jest.fn(attr => {
+                if (attr === "data-color-class") return "pm-bg-pitch-cell";
+                return "white";
+            }),
+            classList: {
+                add: (...args) => args.forEach(c => classes.add(c)),
+                remove: (...args) => args.forEach(c => classes.delete(c)),
+                contains: c => classes.has(c)
             }
-        ];
+        };
+        phraseMaker._rows = [{ cells: [cell] }];
 
         phraseMaker._notesToPlay = [[[1], 4]];
         phraseMaker._setNotes = jest.fn();
@@ -773,6 +800,8 @@ describe("PhraseMaker Widget", () => {
         phraseMaker._clear();
 
         expect(phraseMaker._setNotes).toHaveBeenCalled();
+        expect(cell.classList.contains("pm-cell-active")).toBe(false);
+        expect(cell.classList.contains("pm-bg-pitch-cell")).toBe(true);
     });
     test("_divideNotes modifies tupletRhythms", () => {
         phraseMaker._readjustNotesBlocks = jest.fn();
@@ -972,16 +1001,20 @@ describe("PhraseMaker Widget", () => {
     });
     test("_clear resets matrix safely", () => {
         phraseMaker.rowLabels = ["C"];
-        phraseMaker._rows = [
-            {
-                cells: [
-                    {
-                        style: { backgroundColor: "black" },
-                        getAttribute: jest.fn(() => "white")
-                    }
-                ]
+
+        const classes = new Set(["pm-cell-active"]);
+        const cell = {
+            getAttribute: jest.fn(attr => {
+                if (attr === "data-color-class") return "pm-bg-pitch-cell";
+                return "white";
+            }),
+            classList: {
+                add: (...args) => args.forEach(c => classes.add(c)),
+                remove: (...args) => args.forEach(c => classes.delete(c)),
+                contains: c => classes.has(c)
             }
-        ];
+        };
+        phraseMaker._rows = [{ cells: [cell] }];
 
         phraseMaker._notesToPlay = [[["C"], 4]];
         phraseMaker._lyrics = ["text"];
@@ -990,6 +1023,8 @@ describe("PhraseMaker Widget", () => {
         phraseMaker._clear();
 
         expect(phraseMaker._setNotes).toHaveBeenCalled();
+        expect(cell.classList.contains("pm-cell-active")).toBe(false);
+        expect(cell.classList.contains("pm-bg-pitch-cell")).toBe(true);
     });
     test("makeClickable executes without crash", () => {
         phraseMaker.rowLabels = ["C"];
@@ -1001,7 +1036,15 @@ describe("PhraseMaker Widget", () => {
                         setAttribute: jest.fn(),
                         addEventListener: jest.fn(),
                         removeEventListener: jest.fn(),
-                        getAttribute: jest.fn(() => 1)
+                        getAttribute: jest.fn(attr => {
+                            if (attr === "data-color-class") return "pm-bg-pitch-cell";
+                            return 1;
+                        }),
+                        classList: {
+                            add: jest.fn(),
+                            remove: jest.fn(),
+                            contains: jest.fn(() => false)
+                        }
                     }
                 ]
             }
