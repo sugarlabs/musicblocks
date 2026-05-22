@@ -393,8 +393,6 @@ describe("save HTML methods", () => {
 
     it("should use the active Planet project metadata in prepareHTML", () => {
         const activity = {
-            htmlSaveTemplate:
-                "<html><body><h1>{{ project_name }}</h1><p>{{ project_description }}</p><img src='{{ project_image }}'/><div>{{ data }}</div></body></html>",
             prepareExport: jest.fn(() => "Mock Exported Data"),
             planet: {
                 getCurrentProjectName: jest.fn(() => "Planet Project"),
