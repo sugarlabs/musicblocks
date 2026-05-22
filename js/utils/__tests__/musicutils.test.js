@@ -33,6 +33,7 @@ const {
     nthDegreeToPitch,
     getInterval,
     _calculate_pitch_number,
+    _parse_pitch_string,
     _getStepSize,
     reducedFraction,
     toFraction,
@@ -2875,6 +2876,87 @@ describe("normalization and pitch parsing extras", () => {
         });
         expect(getPitchInfo({})).toBe(global.INVALIDPITCH);
         expect(_calculate_pitch_number("C", 4, 2)).toBe(58);
+    });
+});
+
+describe("_parse_pitch_string", () => {
+    describe("plain notes without accidentals", () => {
+        it("parses a simple natural note", () => {
+            expect(_parse_pitch_string("C4")).toEqual(["C", 4]);
+        });
+
+        it("parses uppercase note letters", () => {
+            expect(_parse_pitch_string("G5")).toEqual(["G", 5]);
+        });
+
+        it("parses lowercase note letters (normalizes to uppercase)", () => {
+            expect(_parse_pitch_string("a4")).toEqual(["A", 4]);
+        });
+
+        it("handles octave 0", () => {
+            expect(_parse_pitch_string("C0")).toEqual(["C", 0]);
+        });
+
+        it("handles a high octave", () => {
+            expect(_parse_pitch_string("B9")).toEqual(["B", 9]);
+        });
+
+        it("handles negative octave", () => {
+            expect(_parse_pitch_string("C-1")).toEqual(["C", -1]);
+        });
+    });
+
+    describe("single accidentals", () => {
+        it("parses ASCII sharp (#)", () => {
+            expect(_parse_pitch_string("C#4")).toEqual(["C♯", 4]);
+        });
+
+        it("parses ASCII flat (b)", () => {
+            expect(_parse_pitch_string("Ab4")).toEqual(["A♭", 4]);
+        });
+
+        it("parses Unicode sharp (♯)", () => {
+            expect(_parse_pitch_string("F♯3")).toEqual(["F♯", 3]);
+        });
+
+        it("parses Unicode flat (♭)", () => {
+            expect(_parse_pitch_string("B♭2")).toEqual(["B♭", 2]);
+        });
+    });
+
+    describe("double accidentals", () => {
+        it("parses double-sharp textual (x)", () => {
+            expect(_parse_pitch_string("Cx4")).toEqual(["C𝄪", 4]);
+        });
+
+        it("parses double-sharp Unicode (𝄪)", () => {
+            expect(_parse_pitch_string("D𝄪4")).toEqual(["D𝄪", 4]);
+        });
+
+        it("parses double-flat Unicode (𝄫)", () => {
+            expect(_parse_pitch_string("E𝄫3")).toEqual(["E𝄫", 3]);
+        });
+
+        it("parses two ASCII sharps summing to double-sharp", () => {
+            expect(_parse_pitch_string("C##4")).toEqual(["C𝄪", 4]);
+        });
+
+        it("parses two ASCII flats summing to double-flat", () => {
+            expect(_parse_pitch_string("Abb4")).toEqual(["A𝄫", 4]);
+        });
+    });
+
+    describe("cancelling accidentals", () => {
+        it("sharp and flat cancel out to a natural note", () => {
+            expect(_parse_pitch_string("C#b4")).toEqual(["C", 4]);
+        });
+    });
+
+    describe("fallback path — no octave digit", () => {
+        it("falls back to octave 4 for a bare note name", () => {
+            const result = _parse_pitch_string("C#");
+            expect(result[1]).toBe(4);
+        });
     });
 });
 
