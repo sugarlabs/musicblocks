@@ -155,9 +155,11 @@ class SaveInterface {
                 saveButton = "#saveButton";
             }
 
+            const planet = this.getPlanetInterface();
             if (
-                typeof this.PlanetInterface !== "undefined" &&
-                this.PlanetInterface.getTimeLastSaved() !== this.timeLastSaved
+                planet &&
+                typeof planet.getTimeLastSaved === "function" &&
+                planet.getTimeLastSaved() !== this.timeLastSaved
             ) {
                 event.preventDefault();
                 // Will trigger when exit/reload cancelled.
@@ -165,6 +167,14 @@ class SaveInterface {
                 return "";
             }
         });
+    }
+
+    getPlanetInterface(activity = this.activity) {
+        if (!activity) {
+            return this.PlanetInterface;
+        }
+
+        return activity.planet || activity.PlanetInterface || this.PlanetInterface;
     }
 
     showToast(message) {
@@ -224,11 +234,11 @@ class SaveInterface {
             this.showToast(message);
         };
         if (defaultfilename === undefined || defaultfilename === null) {
-            if (this.activity.PlanetInterface === undefined) {
-                defaultfilename = STR_MY_PROJECT;
-            } else {
-                defaultfilename = this.activity.PlanetInterface.getCurrentProjectName();
-            }
+            const planet = this.getPlanetInterface();
+            defaultfilename =
+                planet && typeof planet.getCurrentProjectName === "function"
+                    ? planet.getCurrentProjectName()
+                    : STR_MY_PROJECT;
 
             if (fileExt(defaultfilename) !== extension) {
                 defaultfilename += "." + extension;
@@ -311,22 +321,20 @@ class SaveInterface {
 
         let file = this.htmlSaveTemplate;
         let description = _("No description provided");
-        if (
-            this.activity.PlanetInterface &&
-            this.activity.PlanetInterface.getCurrentProjectDescription
-        ) {
-            description = this.activity.PlanetInterface.getCurrentProjectDescription();
+        const planet = this.getPlanetInterface();
+        if (planet && typeof planet.getCurrentProjectDescription === "function") {
+            description = planet.getCurrentProjectDescription();
         }
         // let author = '';
         // Currently we're using anonymous for authors - not storing names.
         let name = STR_MY_PROJECT;
-        if (this.activity.PlanetInterface && this.activity.PlanetInterface.getCurrentProjectName) {
-            name = this.activity.PlanetInterface.getCurrentProjectName();
+        if (planet && typeof planet.getCurrentProjectName === "function") {
+            name = planet.getCurrentProjectName();
         }
         const data = this.activity.prepareExport();
         let image = "";
-        if (this.activity.PlanetInterface && this.activity.PlanetInterface.getCurrentProjectImage) {
-            image = this.activity.PlanetInterface.getCurrentProjectImage();
+        if (planet && typeof planet.getCurrentProjectImage === "function") {
+            image = planet.getCurrentProjectImage();
         }
 
         file = file
@@ -371,11 +379,9 @@ class SaveInterface {
         setTimeout(() => {
             const html =
                 "data:text/plain;charset=utf-8," + encodeURIComponent(activity.save.prepareHTML());
-            if (activity.PlanetInterface !== undefined) {
-                activity.save.downloadURL(
-                    activity.PlanetInterface.getCurrentProjectName() + ".html",
-                    html
-                );
+            const planet = this.getPlanetInterface(activity);
+            if (planet && typeof planet.getCurrentProjectName === "function") {
+                activity.save.downloadURL(planet.getCurrentProjectName() + ".html", html);
             } else {
                 activity.save.downloadURL(STR_MY_PROJECT.replace(" ", "_") + ".html", html);
             }
@@ -719,8 +725,9 @@ class SaveInterface {
 
         const lyext = "ly";
         let filename = STR_MY_PROJECT;
-        if (activity.PlanetInterface !== undefined) {
-            filename = activity.PlanetInterface.getCurrentProjectName();
+        const planet = this.getPlanetInterface(activity);
+        if (planet && typeof planet.getCurrentProjectName === "function") {
+            filename = planet.getCurrentProjectName();
         }
 
         if (fileExt(filename) !== lyext) {
@@ -742,8 +749,8 @@ class SaveInterface {
         //.TRANS: Lilypond is a scripting language for generating sheet music
         docById("submitLilypond").textContent = _("Save as Lilypond");
         docById("fileName").value = filename;
-        if (activity.PlanetInterface !== undefined) {
-            docById("title").value = activity.PlanetInterface.getCurrentProjectName();
+        if (planet && typeof planet.getCurrentProjectName === "function") {
+            docById("title").value = planet.getCurrentProjectName();
         } else {
             //.TRANS: default project title when saving as Lilypond
             docById("title").value = STR_MY_PROJECT;
