@@ -53,7 +53,7 @@ try {
    MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
    SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS,
-   unescapeHTML
+   extractProjectDataFromHTML,unescapeHTML
  */
 
 /*
@@ -8571,27 +8571,14 @@ class Activity {
                                 try {
                                     if (cleanData.includes("html")) {
                                         let extracted;
-                                        let matchResult;
-
-                                        if (cleanData.includes('id="codeBlock"')) {
-                                            matchResult = cleanData.match(
-                                                '<div class="code" id="codeBlock">(.+?)</div>'
-                                            );
-                                        } else {
-                                            matchResult = cleanData.match(
-                                                '<div class="code">(.+?)</div>'
-                                            );
-                                        }
-
-                                        if (!matchResult || !matchResult[1]) {
+                                        extracted = extractProjectDataFromHTML(cleanData);
+                                        if (!extracted) {
                                             that.errorMsg(
                                                 _("Cannot find project data in this HTML file.")
                                             );
                                             finishLoading();
                                             return;
                                         }
-
-                                        extracted = matchResult[1];
                                         obj = JSON.parse(unescapeHTML(extracted));
                                     } else {
                                         obj = JSON.parse(cleanData);
@@ -8708,27 +8695,14 @@ class Activity {
                             try {
                                 if (cleanData.includes("html")) {
                                     let extracted;
-                                    let matchResult;
-
-                                    if (cleanData.includes('id="codeBlock"')) {
-                                        matchResult = cleanData.match(
-                                            '<div class="code" id="codeBlock">(.+?)</div>'
-                                        );
-                                    } else {
-                                        matchResult = cleanData.match(
-                                            '<div class="code">(.+?)</div>'
-                                        );
-                                    }
-
-                                    if (!matchResult || !matchResult[1]) {
+                                    extracted = extractProjectDataFromHTML(cleanData);
+                                    if (!extracted) {
                                         that.errorMsg(
                                             _("Cannot find project data in this HTML file.")
                                         );
                                         finishLoading();
                                         return;
                                     }
-
-                                    extracted = matchResult[1];
                                     obj = JSON.parse(unescapeHTML(extracted));
                                 } else {
                                     obj = JSON.parse(cleanData);
