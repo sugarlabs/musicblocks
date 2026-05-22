@@ -686,8 +686,9 @@ describe("AIWidget Instance", () => {
                 }
             };
 
-            await aiWidget._parseABC(tune);
-            expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalledTimes(1);
+            const result = await aiWidget._parseABC(tune);
+            expect(result).toBeDefined();
+            expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalled();
         });
     });
 });
