@@ -224,7 +224,12 @@ function setupNumberBlocks(activity) {
             try {
                 return MathUtility.doMod(a, b);
             } catch (e) {
-                handleMathError(logo, e, blk);
+                logo.stopTurtle = true;
+                if (e.message === "NanError") {
+                    activity.errorMsg(NANERRORMSG, blk);
+                } else if (e.message === "DivByZeroError") {
+                    activity.errorMsg(ZERODIVIDEERRORMSG, blk);
+                }
                 return 0;
             }
         }
