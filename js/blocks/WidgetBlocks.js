@@ -2115,7 +2115,7 @@ function setupWidgetBlocks(activity) {
                 "aidebugger"
             ]);
 
-            this.formBlock({ name: _("Debugger"), canCollapse: true });
+            this.formBlock({ name: _("debugger"), canCollapse: true });
             this.makeMacro((x, y) => [
                 [0, "aidebugger", x, y, [null, 1]],
                 [1, "print", 0, 0, [0, 2, null]],

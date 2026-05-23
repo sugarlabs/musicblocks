@@ -624,7 +624,7 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
                 "\n\n" +
                 _("Do you want to allow this plugin to run?") +
                 "\n\n" +
-                _("Source: ") +
+                _("Source:") + " " +
                 (pluginSource || _("unknown"))
         );
 

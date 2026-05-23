@@ -1383,7 +1383,7 @@ function setupProgramBlocks(activity) {
                                 newBlock[0][4].push(i);
                             } else {
                                 activity.errorMsg(
-                                    _("Warning: block argument type unhandled: ") + typeof arg,
+                                    _("Warning: block argument type unhandled:") + " " + typeof arg,
                                     blk
                                 );
 

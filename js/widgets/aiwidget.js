@@ -865,7 +865,7 @@ function AIWidget() {
                 this.midiBuffer.start();
             } catch (error) {
                 console.warn("synth error", error);
-                this.activity.errorMsg(_("Synth error: ") + error.message);
+                this.activity.errorMsg(_("Synth error:") + " " + error.message);
             }
         } else {
             this.activity.errorMsg(_("Audio not supported in this browser."));

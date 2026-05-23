@@ -644,17 +644,17 @@ const createHelpContent = activity => {
     ]);
     HELPCONTENT.push([
         _("Delete"),
-        _("To delete a block, right-click on it. Then you will see the delete option"),
+        _("To delete a block, right-click on it. Then you will see the delete option."),
         "data:image/svg+xml;base64," + window.btoa(base64Encode(EMPTYTRASHCONFIRMBUTTON))
     ]);
     HELPCONTENT.push([
         _("Copy"),
-        _("To copy a block, right-click on it. Then you will see the copy option"),
+        _("To copy a block, right-click on it. Then you will see the copy option."),
         "data:image/svg+xml;base64," + window.btoa(base64Encode(COPYBUTTON))
     ]);
     HELPCONTENT.push([
         _("Extract"),
-        _("To extract a block, right-click on it. Then you will see the extract option"),
+        _("To extract a block, right-click on it. Then you will see the extract option."),
         "data:image/svg+xml;base64," + window.btoa(base64Encode(EXTRACTBUTTON))
     ]);
     if (_THIS_IS_MUSIC_BLOCKS_) {

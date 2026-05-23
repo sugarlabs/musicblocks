@@ -335,12 +335,7 @@ function LegoWidget() {
                 " " +
                 this.rowLabels.length +
                 " " +
-                _(
-                    "pitch rows (sorted by frequency, Instrument:" +
-                        " " +
-                        this.selectedInstrument +
-                        ")"
-                )
+                _("pitch rows (sorted by frequency, Instrument)")
         );
     };
 
@@ -903,7 +898,7 @@ function LegoWidget() {
         // Load the new blocks
         this.activity.blocks.loadNewBlocks(newStack);
         this.activity.textMsg(
-            _("LEGO phrase saved as action blocks with ") + this._notesToPlay.length + _(" notes")
+            _("LEGO phrase saved as action blocks with") + " " + this._notesToPlay.length + " " + _("notes")
         );
     };
 
@@ -1124,7 +1119,7 @@ function LegoWidget() {
             rows: this.matrixData.rows.map(row => ({ type: row.type, label: row.label }))
         };
 
-        this.activity.textMsg(_("Exporting phrase data: ") + JSON.stringify(phraseData));
+        this.activity.textMsg(_("Exporting phrase data:") + " " + JSON.stringify(phraseData));
     };
 
     /**
@@ -1227,7 +1222,7 @@ function LegoWidget() {
                 this.activity.textMsg(_("Webcam started"));
             })
             .catch(err => {
-                this.activity.textMsg(_("Webcam access denied: ") + err.message);
+                this.activity.textMsg(_("Webcam access denied:") + " " + err.message);
             });
     };
 
@@ -1342,7 +1337,7 @@ function LegoWidget() {
             // Update UI to show selected color
             this._updateBackgroundColorDisplay();
 
-            this.activity.textMsg(_("Background color selected: ") + clickedColor.name);
+            this.activity.textMsg(_("Background color selected:") + " " + clickedColor.name);
         } else {
             this.activity.textMsg(_("Could not sample color - please try clicking on the image"));
         }
@@ -1908,7 +1903,7 @@ function LegoWidget() {
         }
 
         // Show a message indicating the instrument change
-        this.activity.textMsg(_("Instrument changed to: ") + this.selectedInstrument);
+        this.activity.textMsg(_("Instrument changed to:") + " " + this.selectedInstrument);
     };
 
     /**
@@ -1919,27 +1914,27 @@ function LegoWidget() {
     this._createInstrumentPieMenu = function () {
         // Define instrument options
         const voiceLabels = [
-            _("Electronic Synth"),
-            _("Piano"),
-            _("Guitar"),
-            _("Acoustic Guitar"),
-            _("Electric Guitar"),
-            _("Violin"),
-            _("Viola"),
-            _("Cello"),
-            _("Bass"),
-            _("Flute"),
-            _("Clarinet"),
-            _("Saxophone"),
-            _("Trumpet"),
-            _("Trombone"),
-            _("Oboe"),
-            _("Tuba"),
-            _("Banjo"),
-            _("Sine"),
-            _("Square"),
-            _("Sawtooth"),
-            _("Triangle")
+            _("electronic synth"),
+            _("piano"),
+            _("guitar"),
+            _("acoustic guitar"),
+            _("electric guitar"),
+            _("violin"),
+            _("viola"),
+            _("cello"),
+            _("bass"),
+            _("flute"),
+            _("clarinet"),
+            _("saxophone"),
+            _("trumpet"),
+            _("trombone"),
+            _("oboe"),
+            _("tuba"),
+            _("banjo"),
+            _("sine"),
+            _("square"),
+            _("sawtooth"),
+            _("triangle")
         ];
 
         const voiceValues = [
@@ -2049,7 +2044,7 @@ function LegoWidget() {
                 }
 
                 // Show a message indicating the instrument change
-                this.activity.textMsg(_("Instrument changed to: ") + this.selectedInstrument);
+                this.activity.textMsg(_("Instrument changed to:") + " " + this.selectedInstrument);
 
                 // Update the mock block's value and text
                 mockBlock.value = newValue;
@@ -2075,7 +2070,7 @@ function LegoWidget() {
             }
 
             // Show a message indicating the instrument change
-            this.activity.textMsg(_("Instrument changed to: ") + this.selectedInstrument);
+            this.activity.textMsg(_("Instrument changed to:") + " " + this.selectedInstrument);
         };
 
         // Call the pie menu function

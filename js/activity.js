@@ -1585,7 +1585,7 @@ class Activity {
             const container = document.createElement("div");
             container.classList.add("message-container");
             const message = document.createElement("p");
-            message.textContent = _("Set the max blocks to generate :");
+            message.textContent = _("Set the max blocks to generate:");
             message.classList.add("modal-message");
             container.appendChild(message);
 
@@ -1644,7 +1644,7 @@ class Activity {
             modal.classList.add("modalBox");
             modal.id = "clear-confirm";
             const title = document.createElement("h2");
-            title.textContent = _("Clear Workspace");
+            title.textContent = _("Clear workspace");
             title.classList.add("modal-title");
             title.style.color = platformColor.headingColor;
 
@@ -2207,8 +2207,8 @@ class Activity {
                         }
                         recInside.setAttribute("fill", "red");
                     } catch (error) {
-                        console.error("Recording failed:", error);
-                        that.textMsg(_("Recording failed: ") + error.message);
+                        console.error("Recording failed: ", error);
+                        that.textMsg(_("Recording failed:") + " " + error.message);
                         flag = 0;
                         // Re-enable recording button
                         recording();
@@ -2409,7 +2409,7 @@ class Activity {
                     if (ele.label === "Enable horizontal scrolling") ele.display = false;
                     else if (ele.label === "Disable horizontal scrolling") ele.display = true;
                 });
-                activity.textMsg("Horizontal scrolling enabled.", 3000);
+                activity.textMsg(_("Horizontal scrolling enabled."), 3000);
             } else {
                 enableHorizScrollIcon.style.display = "block";
                 disableHorizScrollIcon.style.display = "none";
@@ -2418,7 +2418,7 @@ class Activity {
                     if (ele.label === "Enable horizontal scrolling") ele.display = true;
                     else if (ele.label === "Disable horizontal scrolling") ele.display = false;
                 });
-                activity.textMsg("Horizontal scrolling disabled.", 3000);
+                activity.textMsg(_("Horizontal scrolling disabled."), 3000);
             }
         };
 

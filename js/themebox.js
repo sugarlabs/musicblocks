@@ -372,7 +372,8 @@ class ThemeBox {
         });
 
         // Notify user
-        this.activity.textMsg(_("Theme switched to " + this._theme + " mode."), 2000);
+        // this.activity.textMsg(_("Theme switched to") + " " + this._theme, 2000);
+	this.activity.textMsg(this._theme, 2000);
     }
 
     /**
