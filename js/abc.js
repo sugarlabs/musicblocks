@@ -144,7 +144,7 @@ const processABCNotes = function (logo, turtle) {
                     parts.push("!>(!");
                     break;
                 case "end decrescendo":
-                    parts.push("!<(!");
+                    parts.push("!>)!");
                     break;
                 case "begin slur":
                     queueSlur = true;

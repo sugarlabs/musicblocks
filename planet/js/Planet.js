@@ -263,3 +263,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 });
+
+/* istanbul ignore next */
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { Planet };
+}
