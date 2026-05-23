@@ -20,12 +20,20 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global NOACTIONERRORMSG, NOINPUTERRORMSG */
+/* global NOACTIONERRORMSG, NOINPUTERRORMSG, isSafeUrl */
 const { setupActionBlocks } = jest.requireActual("../ActionBlocks");
 
 global._ = s => s;
 global.NOACTIONERRORMSG = "NO ACTION";
 global.NOINPUTERRORMSG = "NO_INPUT";
+global.isSafeUrl = function (urlString) {
+    try {
+        const parsed = new URL(urlString);
+        return parsed.protocol === "http:" || parsed.protocol === "https:";
+    } catch (e) {
+        return false;
+    }
+};
 global.Queue = class Queue {
     constructor(child, factor, parentBlk, receivedArg) {
         this.child = child;
