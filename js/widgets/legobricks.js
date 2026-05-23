@@ -898,7 +898,11 @@ function LegoWidget() {
         // Load the new blocks
         this.activity.blocks.loadNewBlocks(newStack);
         this.activity.textMsg(
-            _("LEGO phrase saved as action blocks with") + " " + this._notesToPlay.length + " " + _("notes")
+            _("LEGO phrase saved as action blocks with") +
+                " " +
+                this._notesToPlay.length +
+                " " +
+                _("notes")
         );
     };
 

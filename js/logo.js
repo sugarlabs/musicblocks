@@ -2139,7 +2139,9 @@ class Logo {
                             logo.activity.save.afterSaveAbc();
                         } catch (e) {
                             console.error("Error generating ABC output: ", e);
-                            logo.activity.errorMsg(_("Error generating ABC output.") + " " + e.message);
+                            logo.activity.errorMsg(
+                                _("Error generating ABC output.") + " " + e.message
+                            );
                         } finally {
                             logo.runningAbc = false;
                             document.body.style.cursor = "default";

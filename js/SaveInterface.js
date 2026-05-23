@@ -841,7 +841,9 @@ class SaveInterface {
                         this.afterSaveLilypond();
                     } catch (e) {
                         console.error("Error generating Lilypond output: ", e);
-                        this.activity.errorMsg(_("Error generating Lilypond output.") + " " + e.message);
+                        this.activity.errorMsg(
+                            _("Error generating Lilypond output.") + " " + e.message
+                        );
                     } finally {
                         document.body.style.cursor = "default";
                     }

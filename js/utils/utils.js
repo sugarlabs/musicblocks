@@ -624,7 +624,8 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
                 "\n\n" +
                 _("Do you want to allow this plugin to run?") +
                 "\n\n" +
-                _("Source:") + " " +
+                _("Source:") +
+                " " +
                 (pluginSource || _("unknown"))
         );
 
@@ -834,7 +835,9 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, blk, value, turt
         for (const parameter in obj["PARAMETERPLUGINS"]) {
             if (isVettedPlugin(pluginSource)) {
                 const paramCode = obj["PARAMETERPLUGINS"][parameter];
-                const registryName = `param_${parameter}_${Math.random().toString(36).substr(2, 9)}`;
+                const registryName = `param_${parameter}_${Math.random()
+                    .toString(36)
+                    .substr(2, 9)}`;
                 blobScriptContent += `
 window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk) {
     ${paramCode}
@@ -941,7 +944,9 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
     // Finally, execute safeEvals by creating new Blob scripts for each setup logic block.
     // This is because even setup logic can be blocked by CSP if it contains unsafe-eval.
     for (const item of pendingSafeEvals) {
-        const registryName = `setup_${item.label.replace(/[^a-zA-Z0-9]/g, "_")}_${Math.random().toString(36).substr(2, 9)}`;
+        const registryName = `setup_${item.label.replace(/[^a-zA-Z0-9]/g, "_")}_${Math.random()
+            .toString(36)
+            .substr(2, 9)}`;
         const setupScript = `
 window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivity) {
     ${item.code}

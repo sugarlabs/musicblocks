@@ -352,7 +352,7 @@ class Toolbar {
                 _("Save turtle artwork as PNG"),
                 _("Save block artwork as SVG"),
                 _("Save block artwork as PNG"),
-                _("Confirm"),
+                _("Confirm")
             ];
         }
 
@@ -2549,8 +2549,8 @@ class FocusCycleManager {
             idx === -1
                 ? 1 // safety fallback → toolbar
                 : reverse
-                  ? (idx - 1 + this._zones.length) % this._zones.length
-                  : (idx + 1) % this._zones.length;
+                ? (idx - 1 + this._zones.length) % this._zones.length
+                : (idx + 1) % this._zones.length;
 
         // Clean up the zone we are leaving.
         this._leaveZone(this._currentZone);

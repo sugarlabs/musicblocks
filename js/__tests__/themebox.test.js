@@ -94,7 +94,7 @@ describe("ThemeBox", () => {
         expect(reloadSpy).not.toHaveBeenCalled();
         // Should show theme switched message
         // expect(mockActivity.textMsg).toHaveBeenCalledWith("Theme switched to dark mode.", 2000);
-	expect(mockActivity.textMsg).toHaveBeenCalledWith("dark", 2000);
+        expect(mockActivity.textMsg).toHaveBeenCalledWith("dark", 2000);
         reloadSpy.mockRestore();
     });
 

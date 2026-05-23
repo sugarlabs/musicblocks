@@ -487,7 +487,9 @@ function TemperamentWidget() {
                         noteDefined = true;
                         const noteDiv = document.createElement("div");
                         noteDiv.id = "note";
-                        noteDiv.textContent = `\u00A0${_("note")}\u00A0${this.ratiosNotesPair[j][1]}`;
+                        noteDiv.textContent = `\u00A0${_("note")}\u00A0${
+                            this.ratiosNotesPair[j][1]
+                        }`;
                         noteInfoDiv.appendChild(noteDiv);
                         break;
                     }
@@ -507,9 +509,13 @@ function TemperamentWidget() {
                     const noteDiv = document.createElement("div");
                     noteDiv.id = "note";
                     if (centsDiff[index] < 0) {
-                        noteDiv.textContent = `\u00A0${_("note")}\u00A0${this.ratiosNotesPair[index][1]}(-${centsDiff1[index].toFixed(2)}¢)`;
+                        noteDiv.textContent = `\u00A0${_("note")}\u00A0${
+                            this.ratiosNotesPair[index][1]
+                        }(-${centsDiff1[index].toFixed(2)}¢)`;
                     } else {
-                        noteDiv.textContent = `\u00A0${_("note")}\u00A0${this.ratiosNotesPair[index][1]}(+${centsDiff1[index].toFixed(2)}¢)`;
+                        noteDiv.textContent = `\u00A0${_("note")}\u00A0${
+                            this.ratiosNotesPair[index][1]
+                        }(+${centsDiff1[index].toFixed(2)}¢)`;
                     }
                     noteInfoDiv.appendChild(noteDiv);
                 }
@@ -1878,9 +1884,9 @@ function TemperamentWidget() {
                 if (!t || !t.interval || !Array.isArray(t.interval)) {
                     this.activity.errorMsg(
                         _("Invalid temperament:") +
-			    " " +
+                            " " +
                             temperament +
-			    ". " +
+                            ". " +
                             _("Skipping to next temperament."),
                         3000
                     );
@@ -2461,12 +2467,9 @@ function TemperamentWidget() {
             }
 
             if (i <= pitchNumber && i >= 0 && that._playing && p < 2) {
-                setTimeout(
-                    function () {
-                        __playLoop(i);
-                    },
-                    Singer.defaultBPMFactor * 1000 * duration
-                );
+                setTimeout(function () {
+                    __playLoop(i);
+                }, Singer.defaultBPMFactor * 1000 * duration);
             } else {
                 that.inbetween = true;
             }
@@ -2485,20 +2488,17 @@ function TemperamentWidget() {
                 that._playing = false;
                 that.playbackForward = true;
                 this.inbetween = false;
-                setTimeout(
-                    function () {
-                        that.notesCircle.navItems[0].fillAttr =
-                            platformColor.selectorBackground || "#c8C8C8";
-                        that.notesCircle.navItems[0].sliceHoverAttr.fill =
-                            platformColor.selectorBackground || "#c8C8C8";
-                        that.notesCircle.navItems[0].slicePathAttr.fill =
-                            platformColor.selectorBackground || "#c8C8C8";
-                        that.notesCircle.navItems[0].sliceSelectedAttr.fill =
-                            platformColor.selectorBackground || "#c8C8C8";
-                        that.notesCircle.refreshWheel();
-                    },
-                    Singer.defaultBPMFactor * 1000 * duration
-                );
+                setTimeout(function () {
+                    that.notesCircle.navItems[0].fillAttr =
+                        platformColor.selectorBackground || "#c8C8C8";
+                    that.notesCircle.navItems[0].sliceHoverAttr.fill =
+                        platformColor.selectorBackground || "#c8C8C8";
+                    that.notesCircle.navItems[0].slicePathAttr.fill =
+                        platformColor.selectorBackground || "#c8C8C8";
+                    that.notesCircle.navItems[0].sliceSelectedAttr.fill =
+                        platformColor.selectorBackground || "#c8C8C8";
+                    that.notesCircle.refreshWheel();
+                }, Singer.defaultBPMFactor * 1000 * duration);
             }
         };
         if (
