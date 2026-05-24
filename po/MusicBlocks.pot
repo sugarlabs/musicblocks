@@ -6172,7 +6172,7 @@ msgstr ""
 #: js/blocks/MeterBlocks.js:1183
 #: js/blocks/MeterBlocks.js:1260
 #.TRANS: sets tempo by defining a beat and beats per minute
-msgid "beats per minute"
+msgid "beats per minute %s"
 msgstr ""
 
 #: js/blocks/MeterBlocks.js:204

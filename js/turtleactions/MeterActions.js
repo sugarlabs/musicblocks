@@ -145,7 +145,7 @@ function setupMeterActions(activity) {
                 obj = rationalToFraction(beatValue);
                 target = (1000 * 0.25) / beatValue;
                 activity.errorMsg(
-                    `${_("maximum")} ${obj[0]}/${obj[1]} ${_("beats per minute is").replace(/%s/g, target)}`,
+                    `${_("maximum")} ${obj[0]}/${obj[1]} ${_("beats per minute is %s").replace(/%s/g, target)}`,
                     blk
                 );
                 Singer.masterBPM = 1000;

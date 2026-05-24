@@ -569,7 +569,7 @@ describe("setupToneActions", () => {
             activity.logo.timbre.osc = [{}];
             Singer.ToneActions.defFMSynth(10, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith(
-                "Unable to use synth due to existing oscillator"
+                "Unable to use synth due to existing oscillator."
             );
         });
 
@@ -614,7 +614,7 @@ describe("setupToneActions", () => {
             activity.logo.timbre.osc = [{}];
             Singer.ToneActions.defAMSynth(5, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith(
-                "Unable to use synth due to existing oscillator"
+                "Unable to use synth due to existing oscillator."
             );
         });
 
@@ -672,7 +672,7 @@ describe("setupToneActions", () => {
             activity.logo.timbre.osc = [{}];
             Singer.ToneActions.defDuoSynth(10, 20, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith(
-                "Unable to use synth due to existing oscillator"
+                "Unable to use synth due to existing oscillator."
             );
         });
 
