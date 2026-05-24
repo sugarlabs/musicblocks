@@ -742,7 +742,6 @@ describe("AIDebuggerWidget", () => {
         });
 
         test("sends message and clears input", () => {
-            debuggerWidget._consentGiven = true;
             debuggerWidget.messageInput.value = "Hello AI";
             debuggerWidget._consentGiven = true;
             debuggerWidget._sendMessage();
