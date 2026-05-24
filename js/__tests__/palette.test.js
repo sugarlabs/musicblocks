@@ -57,6 +57,18 @@ global.platformColor = {
 };
 global.base64Encode = str => str;
 global.localStorage = { kanaPreference: "default" };
+
+// Mock safe storage functions
+global.safeGetItem = jest.fn((key, defaultValue) => {
+    if (key === "kanaPreference") {
+        // Return the value set on global.localStorage for compatibility with existing tests
+        return global.localStorage.kanaPreference || defaultValue;
+    }
+    return defaultValue;
+});
+global.safeSetItem = jest.fn();
+global.safeRemoveItem = jest.fn();
+
 global.i18nSolfege = jest.fn(() => "sol");
 global.NUMBERBLOCKDEFAULT = 1;
 global.TEXTWIDTH = 100;

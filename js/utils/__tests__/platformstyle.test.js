@@ -35,6 +35,17 @@ describe("platformstyle", () => {
         global.localStorage = ls;
         global.window.localStorage = ls;
         global.showMaterialHighlight = jest.fn(() => ({ highlight: true }));
+
+        // Mock safe storage functions
+        global.safeGetItem = jest.fn((key, defaultValue) => {
+            if (key === "themePreference") {
+                return global.localStorage.themePreference || defaultValue;
+            }
+            return defaultValue;
+        });
+        global.safeSetItem = jest.fn();
+        global.safeRemoveItem = jest.fn();
+
         buildDom();
 
         jest.isolateModules(() => {
