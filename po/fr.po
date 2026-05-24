@@ -102,11 +102,19 @@ msgstr ""
 #: planet/js/GlobalPlanet.js:465
 #: planet/js/GlobalPlanet.js:467
 #: planet/js/GlobalPlanet.js:495
+#: js/SaveInterface.js:25
+#: js/activity.js:5337
+#: js/activity.js:5341
+#: js/activity.js:6060
+#: planet/js/ProjectStorage.js:26
+#: planet/js/GlobalPlanet.js:465
+#: planet/js/GlobalPlanet.js:467
+#: planet/js/GlobalPlanet.js:495
 msgid "My Project"
 msgstr "Mon projet"
 
 #: js/SaveInterface.js:26
-#: js/blocks.js:5403
+#: js/blocks.js:5402
 #: js/blocks/MediaBlocks.js:971
 msgid "Show"
 msgstr "Montrer"
@@ -194,17 +202,17 @@ msgstr ""
 #: js/turtledefs.js:508
 #: js/activity.js:2095
 #: js/widgets/meterwidget.js:226
-#: js/widgets/timbre.js:789
+#: js/widgets/timbre.js:786
 #: js/widgets/arpeggio.js:94
 #: js/widgets/legobricks.js:291
 #: js/widgets/modewidget.js:164
 #: js/widgets/musickeyboard.js:750
 #: js/widgets/phrasemaker.js:473
 #: js/widgets/pitchdrummatrix.js:163
-#: js/widgets/pitchslider.js:181
+#: js/widgets/pitchslider.js:183
 #: js/widgets/pitchstaircase.js:643
 #: js/widgets/reflection.js:151
-#: js/widgets/temperament.js:2589
+#: js/widgets/temperament.js:2592
 msgid "Save"
 msgstr "Enregistrer"
 
@@ -414,17 +422,17 @@ msgstr "Ce n'est pas un nom de pitch valide"
 #: js/blocks.js:3955
 #: js/blocks.js:4369
 #: js/blocks.js:4554
-#: js/blocks.js:5752
-#: js/blocks.js:6965
+#: js/blocks.js:5754
+#: js/blocks.js:6967
 #: js/palette.js:1196
 #: js/palette.js:1205
 #: js/palette.js:1214
 #: js/palette.js:1223
-#: js/palette.js:1842
-#: js/palette.js:1853
-#: js/palette.js:1864
-#: js/palette.js:1875
-#: js/palette.js:1894
+#: js/palette.js:1843
+#: js/palette.js:1854
+#: js/palette.js:1865
+#: js/palette.js:1876
+#: js/palette.js:1895
 #: js/blocks/ActionBlocks.js:259
 #: js/blocks/ActionBlocks.js:312
 #: js/blocks/ActionBlocks.js:621
@@ -441,10 +449,10 @@ msgstr "Ce n'est pas un nom de pitch valide"
 #: js/blocks/MeterBlocks.js:927
 #: js/widgets/musickeyboard.js:3222
 #: js/widgets/phrasemaker.js:4459
-#: js/widgets/rhythmruler.js:2543
-#: js/widgets/rhythmruler.js:2550
-#: js/widgets/rhythmruler.js:2735
-#: js/widgets/rhythmruler.js:2742
+#: js/widgets/rhythmruler.js:2537
+#: js/widgets/rhythmruler.js:2544
+#: js/widgets/rhythmruler.js:2729
+#: js/widgets/rhythmruler.js:2736
 msgid "action"
 msgstr "action"
 
@@ -551,21 +559,21 @@ msgstr "mineur"
 msgid "aeolian"
 msgstr "éolien"
 
-#: js/piemenus.js:3798
+#: js/piemenus.js:3795
 #: js/blocks/FlowBlocks.js:136
 msgid "Duplicate"
 msgstr "Dupliquer"
 
-#: js/piemenus.js:3799
+#: js/piemenus.js:3796
 #: js/turtledefs.js:649
 msgid "Extract"
 msgstr "Extraire"
 
-#: js/piemenus.js:3800
+#: js/piemenus.js:3797
 msgid "Move to trash"
 msgstr "Déplacer dans la corbeille"
 
-#: js/piemenus.js:3801
+#: js/piemenus.js:3798
 #: js/widgets/temperament.js:475
 #: js/widgets/temperament.js:476
 #: js/widgets/temperament.js:1688
@@ -575,11 +583,11 @@ msgstr "Déplacer dans la corbeille"
 msgid "Close"
 msgstr "Fermer"
 
-#: js/piemenus.js:3807
+#: js/piemenus.js:3804
 msgid "Save stack"
 msgstr "Enregistrer la pile"
 
-#: js/piemenus.js:3811
+#: js/piemenus.js:3808
 #: js/turtledefs.js:553
 #: js/toolbar.js:134
 #: js/toolbar.js:206
@@ -589,16 +597,16 @@ msgstr "Enregistrer la pile"
 msgid "Help"
 msgstr "Aide"
 
-#: js/piemenus.js:3836
+#: js/piemenus.js:3833
 msgid "In order to copy a sample, you must reload the widget, import the sample again, and export it."
 msgstr "Pour copier un échantillon, vous devez recharger le widget, importer à nouveau l'échantillon et l'exporter."
 
-#: js/piemenus.js:3858
+#: js/piemenus.js:3855
 #: js/block.js:3526
 msgid "You can restore deleted blocks from the trash with the Restore From Trash button."
 msgstr "Vous pouvez restaurer les blocs supprimés depuis la corbeille avec le bouton Restaurer depuis la corbeille."
 
-#: js/piemenus.js:4231
+#: js/piemenus.js:4228
 msgid "You have chosen key for your pitch preview."
 msgstr "Vous avez choisi la clé pour votre aperçu de hauteur."
 
@@ -622,11 +630,11 @@ msgstr "recherche"
 #: js/blocks/RhythmBlockPaletteBlocks.js:65
 #: js/blocks/RhythmBlockPaletteBlocks.js:243
 #: js/blocks/ProgramBlocks.js:759
-#: js/widgets/rhythmruler.js:2281
-#: js/widgets/rhythmruler.js:2288
-#: js/widgets/rhythmruler.js:2357
-#: js/widgets/rhythmruler.js:2364
-#: js/widgets/rhythmruler.js:2443
+#: js/widgets/rhythmruler.js:2275
+#: js/widgets/rhythmruler.js:2282
+#: js/widgets/rhythmruler.js:2351
+#: js/widgets/rhythmruler.js:2358
+#: js/widgets/rhythmruler.js:2437
 #.TRANS: an arrangement of notes based on duration
 msgid "rhythm"
 msgstr "rythme"
@@ -674,7 +682,7 @@ msgstr "ornement"
 #: js/turtledefs.js:226
 #: js/blocks/VolumeBlocks.js:362
 #: js/blocks/VolumeBlocks.js:503
-#: js/blocks/VolumeBlocks.js:544
+#: js/blocks/VolumeBlocks.js:546
 #: js/blocks/ProgramBlocks.js:1304
 msgid "volume"
 msgstr "volume"
@@ -818,9 +826,9 @@ msgstr "La version actuelle est"
 #: js/toolbar.js:315
 #: js/activity.js:3880
 #: js/widgets/PhraseMakerAudio.js:141
-#: js/widgets/PhraseMakerAudio.js:359
+#: js/widgets/PhraseMakerAudio.js:358
+#: js/widgets/PhraseMakerAudio.js:363
 #: js/widgets/PhraseMakerAudio.js:364
-#: js/widgets/PhraseMakerAudio.js:365
 #: js/widgets/aiwidget.js:765
 #: js/widgets/aiwidget.js:771
 #: js/widgets/aiwidget.js:772
@@ -832,9 +840,9 @@ msgstr "La version actuelle est"
 #: js/widgets/tempo.js:97
 #: js/widgets/timbre.js:463
 #: js/widgets/timbre.js:464
-#: js/widgets/timbre.js:499
-#: js/widgets/timbre.js:500
-#: js/widgets/timbre.js:782
+#: js/widgets/timbre.js:496
+#: js/widgets/timbre.js:497
+#: js/widgets/timbre.js:779
 #: js/widgets/PhraseMakerUI.js:108
 #: js/widgets/PhraseMakerUI.js:109
 #: js/widgets/arpeggio.js:85
@@ -871,10 +879,10 @@ msgstr "La version actuelle est"
 #: js/widgets/temperament.js:724
 #: js/widgets/temperament.js:804
 #: js/widgets/temperament.js:805
-#: js/widgets/temperament.js:2287
-#: js/widgets/temperament.js:2288
-#: js/widgets/temperament.js:2476
-#: js/widgets/temperament.js:2477
+#: js/widgets/temperament.js:2290
+#: js/widgets/temperament.js:2291
+#: js/widgets/temperament.js:2479
+#: js/widgets/temperament.js:2480
 #: plugins/rodi.rtp:191
 msgid "Play"
 msgstr "Jouer"
@@ -909,8 +917,8 @@ msgstr "Cliquez sur le bouton d'exécution pour lancer le projet en mode rapide.
 #: js/widgets/phrasemaker.js:462
 #: js/widgets/pitchdrummatrix.js:643
 #: js/widgets/pitchdrummatrix.js:644
-#: js/widgets/temperament.js:2273
-#: js/widgets/temperament.js:2274
+#: js/widgets/temperament.js:2276
+#: js/widgets/temperament.js:2277
 #: plugins/rodi.rtp:29
 #: plugins/rodi.rtp:73
 #: plugins/rodi.rtp:413
@@ -2192,24 +2200,24 @@ msgstr "La sélection est activée."
 msgid "Select is disabled."
 msgstr "La sélection est désactivée."
 
-#: js/activity.js:8564
-#: js/activity.js:8629
-#: js/activity.js:8651
-#: js/activity.js:8691
-#: js/activity.js:8747
-#: js/activity.js:8766
+#: js/activity.js:8561
+#: js/activity.js:8626
+#: js/activity.js:8648
+#: js/activity.js:8688
+#: js/activity.js:8744
+#: js/activity.js:8763
 msgid "Cannot load project from the file. Please check the file type."
 msgstr "Impossible de charger le projet depuis le fichier. Veuillez vérifier le type de fichier."
 
-#: js/activity.js:8990
+#: js/activity.js:8987
 msgid "Something went wrong reading JSON-encoded project data."
 msgstr ""
 
-#: js/activity.js:9001
+#: js/activity.js:8998
 msgid "Invalid parameters"
 msgstr "Paramètres invalides"
 
-#: js/activity.js:9294
+#: js/activity.js:9291
 msgid "Error regenerating palettes. Please refresh the page."
 msgstr "Erreur lors de la régénération des palettes. Veuillez rafraîchir la page."
 
@@ -2327,8 +2335,8 @@ msgstr ""
 #: js/block.js:2844
 #: js/blocks/RhythmBlocks.js:714
 #: js/blocks/ProgramBlocks.js:1274
-#: js/widgets/rhythmruler.js:1392
-#: js/widgets/rhythmruler.js:1548
+#: js/widgets/rhythmruler.js:1389
+#: js/widgets/rhythmruler.js:1545
 msgid "silence"
 msgstr "silence"
 
@@ -2445,7 +2453,7 @@ msgstr "ténor"
 #: js/utils/musicutils.js:1168
 #: js/utils/synthutils.js:88
 #: js/blocks/ExtrasBlocks.js:651
-#: js/widgets/legobricks.js:1921
+#: js/widgets/legobricks.js:1932
 #.TRANS: musical instrument
 msgid "bass"
 msgstr "basse"
@@ -2480,10 +2488,10 @@ msgstr "Les nombres peuvent comporter au maximum 10 chiffres."
 #: js/blocks.js:4123
 #: js/blocks.js:4178
 #: js/blocks.js:4224
-#: js/blocks.js:6989
+#: js/blocks.js:6991
 #: js/palette.js:1178
 #: js/palette.js:1307
-#: js/palette.js:1820
+#: js/palette.js:1821
 #: js/blocks/BoxesBlocks.js:282
 #: js/blocks/BoxesBlocks.js:285
 #: js/blocks/BoxesBlocks.js:405
@@ -2519,8 +2527,8 @@ msgstr "stocker dans la boite"
 #: js/blocks.js:4144
 #: js/blocks.js:4190
 #: js/blocks.js:4236
-#: js/blocks.js:6222
-#: js/blocks.js:6246
+#: js/blocks.js:6224
+#: js/blocks.js:6248
 #: js/blocks/BoxesBlocks.js:775
 msgid "box1"
 msgstr "boite1"
@@ -2529,8 +2537,8 @@ msgstr "boite1"
 #: js/blocks.js:4146
 #: js/blocks.js:4192
 #: js/blocks.js:4238
-#: js/blocks.js:6224
-#: js/blocks.js:6248
+#: js/blocks.js:6226
+#: js/blocks.js:6250
 #: js/blocks/BoxesBlocks.js:666
 msgid "box2"
 msgstr "boite2"
@@ -2538,7 +2546,7 @@ msgstr "boite2"
 #: js/blocks.js:4411
 #: js/palette.js:1308
 #: js/palette.js:1313
-#: js/palette.js:1761
+#: js/palette.js:1762
 #: js/blocks/BoxesBlocks.js:594
 msgid "store in"
 msgstr "range dans"
@@ -2550,7 +2558,7 @@ msgstr "range dans"
 #: js/blocks/EnsembleBlocks.js:408
 #: js/blocks/EnsembleBlocks.js:419
 #: js/blocks/MediaBlocks.js:829
-#: js/blocks/ToneBlocks.js:1047
+#: js/blocks/ToneBlocks.js:1051
 #: js/blocks/PitchBlocks.js:690
 #: js/blocks/PitchBlocks.js:974
 #: js/blocks/PitchBlocks.js:1919
@@ -2578,15 +2586,15 @@ msgstr "Boucle infinie détectée dans un bloc de valeur de note. Des choses ina
 msgid "There is no block selected."
 msgstr "Aucun bloc n'est sélectionné."
 
-#: js/blocks.js:5406
+#: js/blocks.js:5408
 #: js/blocks/MediaBlocks.js:886
 #.TRANS: Avatar is the image used to determine the appearance of the mouse.
 msgid "avatar"
 msgstr "avatar"
 
-#: js/blocks.js:5409
+#: js/blocks.js:5411
 #: js/utils/synthutils.js:3615
-#: js/blocks/ToneBlocks.js:1032
+#: js/blocks/ToneBlocks.js:1036
 #: js/widgets/sampler.js:1988
 #.TRANS: The sound sample that the user uploads.
 msgid "sample"
@@ -3111,7 +3119,7 @@ msgstr "fibonacci"
 #: js/utils/musicutils.js:1255
 #: js/utils/musicutils.js:1745
 #: js/utils/synthutils.js:148
-#: js/blocks/ToneBlocks.js:968
+#: js/blocks/ToneBlocks.js:972
 #: js/blocks/VolumeBlocks.js:411
 #: js/blocks/IntervalsBlocks.js:1161
 #: js/blocks/WidgetBlocks.js:459
@@ -3175,7 +3183,7 @@ msgstr "crête"
 #: js/utils/musicutils.js:1709
 #: js/utils/synthutils.js:140
 #: js/blocks/PitchBlocks.js:85
-#: js/widgets/legobricks.js:1930
+#: js/widgets/legobricks.js:1941
 #.TRANS: sine wave
 msgid "sine"
 msgstr "sinusoïde"
@@ -3184,7 +3192,7 @@ msgstr "sinusoïde"
 #: js/utils/musicutils.js:1710
 #: js/utils/synthutils.js:142
 #: js/blocks/PitchBlocks.js:39
-#: js/widgets/legobricks.js:1931
+#: js/widgets/legobricks.js:1942
 #.TRANS: square wave
 msgid "square"
 msgstr "carré"
@@ -3194,7 +3202,7 @@ msgstr "carré"
 #: js/utils/synthutils.js:146
 #: js/blocks/ToneBlocks.js:39
 #: js/blocks/PitchBlocks.js:62
-#: js/widgets/legobricks.js:1933
+#: js/widgets/legobricks.js:1944
 #.TRANS: triangle wave
 msgid "triangle"
 msgstr "triangle"
@@ -3203,7 +3211,7 @@ msgstr "triangle"
 #: js/utils/musicutils.js:1712
 #: js/utils/synthutils.js:144
 #: js/blocks/PitchBlocks.js:108
-#: js/widgets/legobricks.js:1932
+#: js/widgets/legobricks.js:1943
 #.TRANS: sawtooth wave
 msgid "sawtooth"
 msgstr "dent de scie"
@@ -3236,21 +3244,21 @@ msgstr "scalair"
 #: js/utils/musicutils.js:1162
 #: js/utils/synthutils.js:80
 #: js/blocks/VolumeBlocks.js:47
-#: js/widgets/legobricks.js:1914
+#: js/widgets/legobricks.js:1925
 #.TRANS: musical instrument
 msgid "piano"
 msgstr "piano"
 
 #: js/utils/musicutils.js:1163
 #: js/utils/synthutils.js:82
-#: js/widgets/legobricks.js:1918
+#: js/widgets/legobricks.js:1929
 #.TRANS: musical instrument
 msgid "violin"
 msgstr "violon"
 
 #: js/utils/musicutils.js:1164
 #: js/utils/synthutils.js:84
-#: js/widgets/legobricks.js:1919
+#: js/widgets/legobricks.js:1930
 #.TRANS: viola musical instrument
 msgid "viola"
 msgstr "alto"
@@ -3269,7 +3277,7 @@ msgstr "vibraphone"
 
 #: js/utils/musicutils.js:1167
 #: js/utils/synthutils.js:86
-#: js/widgets/legobricks.js:1920
+#: js/widgets/legobricks.js:1931
 #.TRANS: musical instrument
 msgid "cello"
 msgstr "violoncelle"
@@ -3282,8 +3290,8 @@ msgstr "contrebasse"
 
 #: js/utils/musicutils.js:1170
 #: js/utils/synthutils.js:98
-#: js/widgets/legobricks.js:1915
-#: js/widgets/rhythmruler.js:2735
+#: js/widgets/legobricks.js:1926
+#: js/widgets/rhythmruler.js:2729
 #.TRANS: musical instrument
 msgid "guitar"
 msgstr "guitare"
@@ -3308,63 +3316,63 @@ msgstr ""
 
 #: js/utils/musicutils.js:1174
 #: js/utils/synthutils.js:100
-#: js/widgets/legobricks.js:1916
+#: js/widgets/legobricks.js:1927
 #.TRANS: musical instrument
 msgid "acoustic guitar"
 msgstr "guitare acoustique"
 
 #: js/utils/musicutils.js:1175
 #: js/utils/synthutils.js:102
-#: js/widgets/legobricks.js:1922
+#: js/widgets/legobricks.js:1933
 #.TRANS: musical instrument
 msgid "flute"
 msgstr "flûte"
 
 #: js/utils/musicutils.js:1176
 #: js/utils/synthutils.js:104
-#: js/widgets/legobricks.js:1923
+#: js/widgets/legobricks.js:1934
 #.TRANS: musical instrument
 msgid "clarinet"
 msgstr "clarinette"
 
 #: js/utils/musicutils.js:1177
 #: js/utils/synthutils.js:106
-#: js/widgets/legobricks.js:1924
+#: js/widgets/legobricks.js:1935
 #.TRANS: musical instrument
 msgid "saxophone"
 msgstr "saxophone"
 
 #: js/utils/musicutils.js:1178
 #: js/utils/synthutils.js:108
-#: js/widgets/legobricks.js:1928
+#: js/widgets/legobricks.js:1939
 #.TRANS: musical instrument
 msgid "tuba"
 msgstr "tuba"
 
 #: js/utils/musicutils.js:1179
 #: js/utils/synthutils.js:110
-#: js/widgets/legobricks.js:1925
+#: js/widgets/legobricks.js:1936
 #.TRANS: musical instrument
 msgid "trumpet"
 msgstr "trompette"
 
 #: js/utils/musicutils.js:1180
 #: js/utils/synthutils.js:112
-#: js/widgets/legobricks.js:1927
+#: js/widgets/legobricks.js:1938
 #.TRANS: musical instrument
 msgid "oboe"
 msgstr "hautbois"
 
 #: js/utils/musicutils.js:1181
 #: js/utils/synthutils.js:114
-#: js/widgets/legobricks.js:1926
+#: js/widgets/legobricks.js:1937
 #.TRANS: musical instrument
 msgid "trombone"
 msgstr "trombone"
 
 #: js/utils/musicutils.js:1182
 #: js/utils/synthutils.js:130
-#: js/widgets/legobricks.js:1913
+#: js/widgets/legobricks.js:1924
 #.TRANS: polytone synthesizer
 msgid "electronic synth"
 msgstr "synthétiseur électronique"
@@ -3408,8 +3416,8 @@ msgstr "bruit rose"
 
 #: js/utils/musicutils.js:1191
 #: js/utils/synthutils.js:162
-#: js/widgets/rhythmruler.js:2281
-#: js/widgets/rhythmruler.js:2543
+#: js/widgets/rhythmruler.js:2275
+#: js/widgets/rhythmruler.js:2537
 #.TRANS: musical instrument
 msgid "snare drum"
 msgstr "caisse claire"
@@ -3570,7 +3578,7 @@ msgstr "chien"
 
 #: js/utils/musicutils.js:1219
 #: js/utils/synthutils.js:116
-#: js/widgets/legobricks.js:1929
+#: js/widgets/legobricks.js:1940
 #.TRANS: musical instrument
 msgid "banjo"
 msgstr "banjo"
@@ -3589,7 +3597,7 @@ msgstr "dulcimer"
 
 #: js/utils/musicutils.js:1222
 #: js/utils/synthutils.js:122
-#: js/widgets/legobricks.js:1917
+#: js/widgets/legobricks.js:1928
 #.TRANS: musical instrument
 msgid "electric guitar"
 msgstr "guitare électrique"
@@ -3691,7 +3699,7 @@ msgid "Pythagorean (3-limit JI)"
 msgstr "Pythagoricien (JI à 3-Limites)"
 
 #: js/utils/musicutils.js:4051
-#: js/widgets/temperament.js:2599
+#: js/widgets/temperament.js:2602
 msgid "Invalid temperament. Falling back to equal temperament."
 msgstr ""
 
@@ -5239,7 +5247,7 @@ msgstr "hertz"
 
 #: js/blocks/MediaBlocks.js:775
 #: js/blocks/WidgetBlocks.js:228
-#: js/widgets/timbre.js:2068
+#: js/widgets/timbre.js:2065
 #: js/widgets/temperament.js:525
 #: js/widgets/temperament.js:576
 #: js/widgets/temperament.js:721
@@ -5271,7 +5279,7 @@ msgid "name2"
 msgstr "nom2"
 
 #: js/blocks/MediaBlocks.js:829
-#: js/blocks/ToneBlocks.js:1047
+#: js/blocks/ToneBlocks.js:1051
 #: js/blocks/IntervalsBlocks.js:63
 #: js/blocks/PitchBlocks.js:691
 #: js/blocks/PitchBlocks.js:975
@@ -5851,21 +5859,21 @@ msgid "octave space"
 msgstr "espace d'octave"
 
 #: js/blocks/ToneBlocks.js:34
-#: js/widgets/timbre.js:822
+#: js/widgets/timbre.js:819
 msgid "Oscillator"
 msgstr "Oscillateur"
 
 #: js/blocks/ToneBlocks.js:42
 #: js/blocks/WidgetBlocks.js:225
-#: js/widgets/timbre.js:1731
-#: js/widgets/timbre.js:2006
+#: js/widgets/timbre.js:1728
+#: js/widgets/timbre.js:2003
 #.TRANS: there are different types (sine, triangle, square...) of oscillators.
 #.TRANS: type of filter, e.g., lowpass, highpass, etc.
 msgid "type"
 msgstr "type"
 
 #: js/blocks/ToneBlocks.js:44
-#: js/widgets/timbre.js:1745
+#: js/widgets/timbre.js:1742
 #.TRANS: Partials refers to the number of sine waves combined into the sound.
 msgid "partials"
 msgstr "partiels"
@@ -5875,7 +5883,7 @@ msgid "You are adding multiple oscillator blocks."
 msgstr "Vous ajoutez plusieurs blocs d'oscillateur."
 
 #: js/blocks/ToneBlocks.js:144
-#: js/widgets/timbre.js:1313
+#: js/widgets/timbre.js:1310
 #.TRANS: a duo synthesizer combines a synth with a sequencer
 msgid "duo synth"
 msgstr "synthé duo"
@@ -5885,7 +5893,7 @@ msgid "The Duo synth block is a duo-frequency modulator used to define a timbre.
 msgstr "Le bloc Synthé duo est un modulateur de fréquence duo utilisé pour définir un timbre."
 
 #: js/blocks/ToneBlocks.js:157
-#: js/widgets/timbre.js:1608
+#: js/widgets/timbre.js:1605
 msgid "vibrato rate"
 msgstr "taux de vibrato"
 
@@ -5894,7 +5902,7 @@ msgid "vibrato intensity"
 msgstr "intensité du vibrato"
 
 #: js/blocks/ToneBlocks.js:185
-#: js/widgets/timbre.js:1297
+#: js/widgets/timbre.js:1294
 #.TRANS: AM (amplitude modulation) synthesizer
 msgid "AM synth"
 msgstr "synthé AM"
@@ -5904,7 +5912,7 @@ msgid "The AM synth block is an amplitude modulator used to define a timbre."
 msgstr "Le bloc Synthé AM est un modulateur d'amplitude utilisé pour définir un timbre."
 
 #: js/blocks/ToneBlocks.js:224
-#: js/widgets/timbre.js:1305
+#: js/widgets/timbre.js:1302
 #.TRANS: FM (frequency modulation) synthesizer
 msgid "FM synth"
 msgstr "synthé FM"
@@ -5983,18 +5991,18 @@ msgstr "tremolo"
 #: js/blocks/ToneBlocks.js:578
 #: js/blocks/ToneBlocks.js:649
 #: js/blocks/ToneBlocks.js:716
-#: js/widgets/timbre.js:2438
-#: js/widgets/timbre.js:2510
-#: js/widgets/timbre.js:2590
-#: js/widgets/timbre.js:2683
+#: js/widgets/timbre.js:2435
+#: js/widgets/timbre.js:2507
+#: js/widgets/timbre.js:2587
+#: js/widgets/timbre.js:2680
 #.TRANS: rate at which tremolo wavers
 msgid "rate"
 msgstr "taux"
 
 #: js/blocks/ToneBlocks.js:511
 #: js/blocks/ToneBlocks.js:649
-#: js/widgets/timbre.js:2441
-#: js/widgets/timbre.js:2600
+#: js/widgets/timbre.js:2438
+#: js/widgets/timbre.js:2597
 #.TRANS: amplitude of tremolo waver
 msgid "depth"
 msgstr "profondeur"
@@ -6010,12 +6018,12 @@ msgstr "phaser"
 
 #: js/blocks/ToneBlocks.js:578
 #: js/turtleactions/IntervalsActions.js:154
-#: js/widgets/timbre.js:2686
+#: js/widgets/timbre.js:2683
 msgid "octaves"
 msgstr "octaves"
 
 #: js/blocks/ToneBlocks.js:578
-#: js/widgets/timbre.js:2689
+#: js/widgets/timbre.js:2686
 msgid "base frequency"
 msgstr "fréquence de base"
 
@@ -6041,7 +6049,7 @@ msgid "chorus"
 msgstr "chœur"
 
 #: js/blocks/ToneBlocks.js:649
-#: js/widgets/timbre.js:2595
+#: js/widgets/timbre.js:2592
 msgid "delay (MS)"
 msgstr "délai (MS)"
 
@@ -6063,7 +6071,7 @@ msgid "vibrato"
 msgstr "vibrato"
 
 #: js/blocks/ToneBlocks.js:716
-#: js/widgets/timbre.js:2509
+#: js/widgets/timbre.js:2506
 msgid "intensity"
 msgstr "intensité"
 
@@ -6085,31 +6093,31 @@ msgid "The set default instrument block changes the default instrument from elec
 msgstr ""
 
 #: js/blocks/ToneBlocks.js:921
-#: js/blocks/ToneBlocks.js:965
+#: js/blocks/ToneBlocks.js:969
 #.TRANS: set the characteristics of a custom instrument
 msgid "set instrument"
 msgstr "définir l'instrument"
 
 #: js/blocks/ToneBlocks.js:924
-#: js/blocks/ToneBlocks.js:956
+#: js/blocks/ToneBlocks.js:958
 msgid "The Set instrument block selects a voice for the synthesizer, eg guitar piano violin or cello."
 msgstr ""
 
-#: js/blocks/ToneBlocks.js:950
+#: js/blocks/ToneBlocks.js:952
 msgid "The Set instrument block selects a voice for the synthesizer,"
 msgstr "Le bloc Définir l'instrument sélectionne une voix pour le synthétiseur,"
 
-#: js/blocks/ToneBlocks.js:1037
+#: js/blocks/ToneBlocks.js:1041
 msgid "Import a sound file to use as an instrument and set its pitch center."
 msgstr "Importer un fichier audio à utiliser comme instrument et définir son centre de hauteur."
 
-#: js/blocks/ToneBlocks.js:1047
+#: js/blocks/ToneBlocks.js:1051
 #: js/blocks/ProgramBlocks.js:394
 #: js/blocks/ProgramBlocks.js:664
 msgid "file"
 msgstr "fichier"
 
-#: js/blocks/ToneBlocks.js:1132
+#: js/blocks/ToneBlocks.js:1136
 msgid "Upload a sound file to connect with the sample block."
 msgstr "Télécharger un fichier audio pour le connecter au bloc d'échantillon."
 
@@ -6135,13 +6143,13 @@ msgid "set synth volume"
 msgstr "régler le volume du synthé"
 
 #: js/blocks/VolumeBlocks.js:362
-#: js/blocks/VolumeBlocks.js:544
+#: js/blocks/VolumeBlocks.js:546
 msgid "synth"
 msgstr "synthé"
 
 #: js/blocks/VolumeBlocks.js:403
-#: js/blocks/VolumeBlocks.js:576
-#: js/blocks/VolumeBlocks.js:739
+#: js/blocks/VolumeBlocks.js:578
+#: js/blocks/VolumeBlocks.js:741
 #: js/turtleactions/VolumeActions.js:174
 msgid "Setting volume to 0."
 msgstr "Régler le volume à 0."
@@ -6158,64 +6166,64 @@ msgstr "régler le volume du tambour"
 msgid "The Set synth volume block will change the volume of a particular synth, eg guitar violin snare drum etc."
 msgstr ""
 
-#: js/blocks/VolumeBlocks.js:533
+#: js/blocks/VolumeBlocks.js:535
 msgid "The default volume is 50."
 msgstr "Le volume par défaut est de 50."
 
-#: js/blocks/VolumeBlocks.js:535
+#: js/blocks/VolumeBlocks.js:537
 msgid "The range is 0 for silence to 100 for full volume."
 msgstr "La plage va de 0 pour le silence à 100 pour le volume maximal."
 
-#: js/blocks/VolumeBlocks.js:596
+#: js/blocks/VolumeBlocks.js:598
 msgid "set panning"
 msgstr "régler la panoramique"
 
-#: js/blocks/VolumeBlocks.js:602
+#: js/blocks/VolumeBlocks.js:604
 msgid "The Set Panning block sets the panning for all synthesizers."
 msgstr "Le bloc Régler la panoramique règle la panoramique pour tous les synthétiseurs."
 
-#: js/blocks/VolumeBlocks.js:624
+#: js/blocks/VolumeBlocks.js:626
 msgid "Warning: Sound is coming out from only the left or right side."
 msgstr "Attention : Le son ne sort que du côté gauche ou droit."
 
-#: js/blocks/VolumeBlocks.js:646
-#: js/blocks/VolumeBlocks.js:694
+#: js/blocks/VolumeBlocks.js:648
+#: js/blocks/VolumeBlocks.js:696
 msgid "set master volume"
 msgstr "régler le volume principal"
 
-#: js/blocks/VolumeBlocks.js:652
+#: js/blocks/VolumeBlocks.js:654
 msgid "The Set master volume block sets the volume for all synthesizers."
 msgstr "Le bloc Régler le volume principal règle le volume pour tous les synthétiseurs."
 
-#: js/blocks/VolumeBlocks.js:782
+#: js/blocks/VolumeBlocks.js:784
 msgid "The Set relative volume block changes the volume of the contained notes."
 msgstr "Le bloc Régler le volume relatif change le volume des notes contenues."
 
-#: js/blocks/VolumeBlocks.js:789
+#: js/blocks/VolumeBlocks.js:791
 msgid "set relative volume"
 msgstr "régler le volume relatif"
 
-#: js/blocks/VolumeBlocks.js:841
+#: js/blocks/VolumeBlocks.js:843
 msgid "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
 msgstr ""
 
-#: js/blocks/VolumeBlocks.js:845
+#: js/blocks/VolumeBlocks.js:847
 msgid "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
 msgstr ""
 
-#: js/blocks/VolumeBlocks.js:855
+#: js/blocks/VolumeBlocks.js:857
 msgid "decrescendo"
 msgstr "décrescendo"
 
-#: js/blocks/VolumeBlocks.js:905
+#: js/blocks/VolumeBlocks.js:907
 msgid "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
 msgstr ""
 
-#: js/blocks/VolumeBlocks.js:909
+#: js/blocks/VolumeBlocks.js:911
 msgid "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
 msgstr ""
 
-#: js/blocks/VolumeBlocks.js:919
+#: js/blocks/VolumeBlocks.js:921
 msgid "crescendo"
 msgstr "crescendo"
 
@@ -6553,6 +6561,10 @@ msgstr "définir un mode"
 #: js/blocks/IntervalsBlocks.js:1210
 msgid "movable Do"
 msgstr "Do mobile"
+
+#: js/blocks/IntervalsBlocks.js:1214
+msgid "When Movable do is false, the solfege note names are always tied to specific pitches, eg \"do\" is always \"C-natural\" when Movable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
+msgstr ""
 
 #: js/blocks/IntervalsBlocks.js:1257
 #.TRANS: mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
@@ -7388,7 +7400,7 @@ msgid "The Get blue block returns the blue component of the pixel under the turt
 msgstr ""
 
 #: js/blocks/WidgetBlocks.js:127
-#: js/widgets/timbre.js:873
+#: js/widgets/timbre.js:870
 #.TRANS: sound envelope (ADSR)
 msgid "Envelope"
 msgstr "Enveloppe"
@@ -7434,13 +7446,13 @@ msgid "You are adding multiple envelope blocks."
 msgstr "Vous ajoutez plusieurs blocs d'enveloppe."
 
 #: js/blocks/WidgetBlocks.js:217
-#: js/widgets/timbre.js:937
+#: js/widgets/timbre.js:934
 #.TRANS: a filter removes some unwanted components from a signal
 msgid "Filter"
 msgstr "Filtre"
 
 #: js/blocks/WidgetBlocks.js:227
-#: js/widgets/timbre.js:2030
+#: js/widgets/timbre.js:2027
 #.TRANS: rolloff is the steepness of a change in frequency.
 msgid "rolloff"
 msgstr "décroissance"
@@ -7574,7 +7586,7 @@ msgid "The Status block opens a tool for inspecting the status of Music Blocks a
 msgstr "Le bloc Statut ouvre un outil pour inspecter le statut de Music Blocks en cours d'exécution."
 
 #: js/blocks/WidgetBlocks.js:1905
-#: js/widgets/aiwidget.js:814
+#: js/widgets/aiwidget.js:817
 #.TRANS: AI-generated music
 msgid "AI Music"
 msgstr "Musique IA"
@@ -7676,12 +7688,9 @@ msgid "maximum"
 msgstr "maximum"
 
 #: js/turtleactions/MeterActions.js:124
+#: js/turtleactions/MeterActions.js:148
 msgid "beats per minute is %s"
 msgstr ""
-
-#: js/turtleactions/MeterActions.js:148
-msgid "beats per minute is"
-msgstr "les battements par minute sont"
 
 #: js/turtleactions/OrnamentActions.js:49
 msgid "Staccato value must be non-zero."
@@ -7721,7 +7730,7 @@ msgstr "La composante partielle doit être supérieure ou égale à 0."
 #: js/turtleactions/ToneActions.js:379
 #: js/turtleactions/ToneActions.js:418
 #: js/turtleactions/ToneActions.js:457
-#: js/widgets/timbre.js:815
+#: js/widgets/timbre.js:812
 msgid "Unable to use synth due to existing oscillator."
 msgstr ""
 
@@ -7757,8 +7766,8 @@ msgstr ""
 #: js/widgets/tempo.js:108
 #: js/widgets/rhythmruler.js:842
 #: js/widgets/rhythmruler.js:843
-#: js/widgets/rhythmruler.js:2081
-#: js/widgets/rhythmruler.js:2082
+#: js/widgets/rhythmruler.js:2078
+#: js/widgets/rhythmruler.js:2079
 msgid "Pause"
 msgstr "Pause"
 
@@ -7792,15 +7801,15 @@ msgstr ""
 msgid "Enter your Groq API Key: %s"
 msgstr ""
 
-#: js/widgets/aiwidget.js:867
+#: js/widgets/aiwidget.js:870
 msgid "Synth error: %s"
 msgstr ""
 
-#: js/widgets/aiwidget.js:870
+#: js/widgets/aiwidget.js:873
 msgid "Audio not supported in this browser."
 msgstr ""
 
-#: js/widgets/aiwidget.js:1100
+#: js/widgets/aiwidget.js:1103
 msgid "Please set your Groq API Key using the settings button (wrench icon) first."
 msgstr ""
 
@@ -7813,11 +7822,11 @@ msgstr ""
 #: js/widgets/modewidget.js:710
 #: js/widgets/modewidget.js:711
 #: js/widgets/rhythmruler.js:633
-#: js/widgets/rhythmruler.js:2003
-#: js/widgets/rhythmruler.js:2004
-#: js/widgets/rhythmruler.js:2028
-#: js/widgets/rhythmruler.js:2029
-#: js/widgets/temperament.js:2581
+#: js/widgets/rhythmruler.js:2000
+#: js/widgets/rhythmruler.js:2001
+#: js/widgets/rhythmruler.js:2025
+#: js/widgets/rhythmruler.js:2026
+#: js/widgets/temperament.js:2584
 msgid "Play all"
 msgstr "Tout jouer"
 
@@ -7965,55 +7974,55 @@ msgstr "Les battements par minute doivent être supérieurs à 30"
 #: js/widgets/musickeyboard.js:3426
 #: js/widgets/phrasemaker.js:4936
 #: js/widgets/pitchstaircase.js:586
-#: js/widgets/rhythmruler.js:2478
-#: js/widgets/rhythmruler.js:2696
-#: js/widgets/temperament.js:2170
+#: js/widgets/rhythmruler.js:2472
+#: js/widgets/rhythmruler.js:2690
+#: js/widgets/temperament.js:2173
 msgid "New action block generated."
 msgstr "Nouveau bloc d'action généré."
 
-#: js/widgets/timbre.js:799
+#: js/widgets/timbre.js:796
 msgid "Synthesizer"
 msgstr "Synthétiseur"
 
-#: js/widgets/timbre.js:919
+#: js/widgets/timbre.js:916
 #: planet/js/GlobalTag.js:48
 #.TRANS: On the Planet, we use labels to tag projects.
 msgid "Effects"
 msgstr "Effets"
 
-#: js/widgets/timbre.js:979
+#: js/widgets/timbre.js:976
 msgid "Add filter"
 msgstr "Ajouter un filtre"
 
-#: js/widgets/timbre.js:993
+#: js/widgets/timbre.js:990
 #: js/widgets/modewidget.js:185
 #: js/widgets/pitchstaircase.js:661
 #: js/widgets/rhythmruler.js:732
 msgid "Undo"
 msgstr "Annuler"
 
-#: js/widgets/timbre.js:1016
+#: js/widgets/timbre.js:1013
 msgid "Click on buttons to open the timbre design tools."
 msgstr "Cliquez sur les boutons pour ouvrir les outils de conception de timbre."
 
-#: js/widgets/timbre.js:1370
+#: js/widgets/timbre.js:1367
 msgid "harmonicity"
 msgstr "harmonicité"
 
-#: js/widgets/timbre.js:1456
-#: js/widgets/timbre.js:1541
+#: js/widgets/timbre.js:1453
+#: js/widgets/timbre.js:1538
 msgid "modulation index"
 msgstr "indice de modulation"
 
-#: js/widgets/timbre.js:1639
+#: js/widgets/timbre.js:1636
 msgid "vibrato amount"
 msgstr "quantité de vibrato"
 
-#: js/widgets/timbre.js:2172
+#: js/widgets/timbre.js:2169
 msgid "Filter already present."
 msgstr "Filtre déjà présent."
 
-#: js/widgets/timbre.js:2765
+#: js/widgets/timbre.js:2762
 msgid "distortion amount"
 msgstr "quantité de distorsion"
 
@@ -8105,61 +8114,61 @@ msgstr ""
 msgid "LEGO Bricks - Phrase Maker with %s pitch rows (sorted by frequency, Instrument)"
 msgstr ""
 
-#: js/widgets/legobricks.js:764
+#: js/widgets/legobricks.js:766
 msgid "No color data to save. Please scan an image first."
 msgstr ""
 
-#: js/widgets/legobricks.js:772
+#: js/widgets/legobricks.js:774
 msgid "No notes detected from color scanning."
 msgstr ""
 
-#: js/widgets/legobricks.js:785
+#: js/widgets/legobricks.js:787
 msgid "LEGO phrase"
 msgstr ""
 
-#: js/widgets/legobricks.js:897
+#: js/widgets/legobricks.js:899
 msgid "LEGO phrase saved as action blocks with %s notes."
 msgstr ""
 
-#: js/widgets/legobricks.js:1118
+#: js/widgets/legobricks.js:1124
 msgid "Exporting phrase data: %s"
 msgstr ""
 
-#: js/widgets/legobricks.js:1134
+#: js/widgets/legobricks.js:1141
 msgid "Phrase cleared"
 msgstr ""
 
-#: js/widgets/legobricks.js:1181
+#: js/widgets/legobricks.js:1188
 msgid "Image uploaded successfully"
 msgstr ""
 
-#: js/widgets/legobricks.js:1218
+#: js/widgets/legobricks.js:1225
 msgid "Webcam started"
 msgstr ""
 
-#: js/widgets/legobricks.js:1221
+#: js/widgets/legobricks.js:1228
 msgid "Webcam access denied: %s"
 msgstr ""
 
-#: js/widgets/legobricks.js:1278
+#: js/widgets/legobricks.js:1285
 msgid "Eye dropper active - hover over image to preview colors, click to select background color."
 msgstr ""
 
-#: js/widgets/legobricks.js:1336
+#: js/widgets/legobricks.js:1344
 msgid "Background color selected: %s"
 msgstr ""
 
-#: js/widgets/legobricks.js:1338
+#: js/widgets/legobricks.js:1347
 msgid "Could not sample color - please try clicking on the image."
 msgstr ""
 
-#: js/widgets/legobricks.js:1902
-#: js/widgets/legobricks.js:2043
-#: js/widgets/legobricks.js:2069
+#: js/widgets/legobricks.js:1912
+#: js/widgets/legobricks.js:2055
+#: js/widgets/legobricks.js:2083
 msgid "Instrument changed to: %s"
 msgstr ""
 
-#: js/widgets/legobricks.js:2196
+#: js/widgets/legobricks.js:2211
 msgid "Scanning image with vertical lines..."
 msgstr ""
 
@@ -8228,19 +8237,19 @@ msgstr "valeur de tuple"
 msgid "Click in the grid to map notes to drums."
 msgstr "Cliquez dans la grille pour mapper les notes aux tambours."
 
-#: js/widgets/pitchslider.js:159
+#: js/widgets/pitchslider.js:161
 msgid "Move up"
 msgstr "Déplacer vers le haut"
 
-#: js/widgets/pitchslider.js:170
+#: js/widgets/pitchslider.js:172
 msgid "Move down"
 msgstr "Déplacer vers le bas"
 
-#: js/widgets/pitchslider.js:192
+#: js/widgets/pitchslider.js:194
 msgid "Use the up/down buttons or arrow keys to change pitch."
 msgstr ""
 
-#: js/widgets/pitchslider.js:193
+#: js/widgets/pitchslider.js:195
 msgid "Click on the slider to create a note block."
 msgstr "Cliquez sur le curseur pour créer un bloc de notes."
 
@@ -8316,14 +8325,14 @@ msgstr "Cliquez sur la règle pour la diviser."
 
 #: js/widgets/rhythmruler.js:1149
 #: js/widgets/rhythmruler.js:1150
-#: js/widgets/rhythmruler.js:1358
-#: js/widgets/rhythmruler.js:1359
-#: js/widgets/rhythmruler.js:1979
-#: js/widgets/rhythmruler.js:1980
+#: js/widgets/rhythmruler.js:1355
+#: js/widgets/rhythmruler.js:1356
+#: js/widgets/rhythmruler.js:1976
+#: js/widgets/rhythmruler.js:1977
 msgid "tap a rhythm"
 msgstr "tapoter un rythme"
 
-#: js/widgets/rhythmruler.js:1676
+#: js/widgets/rhythmruler.js:1673
 msgid "Maximum value of 256 has been exceeded."
 msgstr "La valeur maximale de 256 a été dépassée."
 
@@ -8399,15 +8408,15 @@ msgstr "Le ratio d'octave a changé. Cela change considérablement le tempérame
 msgid "Invalid temperament: %s. Skipping to next temperament."
 msgstr ""
 
-#: js/widgets/temperament.js:2593
+#: js/widgets/temperament.js:2596
 msgid "Table"
 msgstr "Table"
 
-#: js/widgets/temperament.js:2653
+#: js/widgets/temperament.js:2656
 msgid "Invalid temperament interval data. Skipping note %s."
 msgstr ""
 
-#: js/widgets/temperament.js:2717
+#: js/widgets/temperament.js:2723
 msgid "Add pitches"
 msgstr "Ajouter des hauteurs"
 
@@ -9043,6 +9052,11 @@ msgstr "maximum"
 #: plugins/weather.rtp:149
 msgid "low"
 msgstr "minimum"
+
+#: js/turtleactions/MeterActions.js:148
+
+#~msgid "beats per minute is"
+#~msgstr "les battements par minute sont"
 
 #: js/themebox.js:375
 
