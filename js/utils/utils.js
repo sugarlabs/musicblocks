@@ -624,7 +624,7 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
                 "\n\n" +
                 _("Do you want to allow this plugin to run?") +
                 "\n\n" +
-                _("Source: %").replace(/%s/g, pluginSource || _("unknown"))
+                _("Source: %s").replace(/%s/g, pluginSource || _("unknown"))
         );
 
         if (!userConfirmed) {

@@ -7594,35 +7594,35 @@ class Activity {
                     items: [
                         {
                             keys: platformKeys("Alt + C", "Option + C"),
-                            action: _("Copy selected stack")
+                            action: _("Copy selected stack.")
                         },
                         {
                             keys: platformKeys("Alt + V", "Option + V"),
-                            action: _("Paste previous stack")
+                            action: _("Paste previous stack.")
                         },
                         {
                             keys: platformKeys("Ctrl + V", "Control + V"),
-                            action: _("Open the JSON paste box")
+                            action: _("Open the JSON paste box.")
                         },
                         {
                             keys: platformKeys("Enter", "Enter"),
-                            action: _("Paste JSON when the paste box is focused")
+                            action: _("Paste JSON when the paste box is focused.")
                         },
                         {
                             keys: platformKeys("Delete", "Delete"),
-                            action: _("Extract the active block")
+                            action: _("Extract the active block.")
                         },
                         {
                             keys: platformKeys("Alt + E", "Option + E"),
-                            action: _("Clear workspace")
+                            action: _("Clear workspace.")
                         },
                         {
                             keys: platformKeys("Alt + B", "Option + B"),
-                            action: _("Save block artwork")
+                            action: _("Save block artwork.")
                         },
                         {
                             keys: platformKeys("Alt + H", "Option + H"),
-                            action: _("Save block help")
+                            action: _("Save block help.")
                         }
                     ]
                 },
@@ -7631,21 +7631,21 @@ class Activity {
                     items: [
                         {
                             keys: platformKeys("Tab / Shift + Tab", "Tab / Shift + Tab"),
-                            action: _("Move focus between the toolbar, palettes, and workspace")
+                            action: _("Move focus between the toolbar, palettes, and workspace.")
                         },
                         {
                             keys: platformKeys(_("Arrow keys"), _("Arrow keys")),
                             action: _(
-                                "Move the active block, scroll palettes, adjust the tempo widget, or pan the workspace depending on context"
+                                "Move the active block, scroll palettes, adjust the tempo widget, or pan the workspace depending on context."
                             )
                         },
                         {
                             keys: platformKeys("/", "/"),
-                            action: _("Pan workspace right when horizontal scrolling is enabled")
+                            action: _("Pan workspace right when horizontal scrolling is enabled.")
                         },
                         {
                             keys: platformKeys("\\", "\\"),
-                            action: _("Pan workspace left when horizontal scrolling is enabled")
+                            action: _("Pan workspace left when horizontal scrolling is enabled.")
                         }
                     ]
                 },
@@ -7657,22 +7657,22 @@ class Activity {
                                 _("Arrow Left / Arrow Right"),
                                 _("Arrow Left / Arrow Right")
                             ),
-                            action: _("Move focus within the current toolbar")
+                            action: _("Move focus within the current toolbar.")
                         },
                         {
                             keys: platformKeys(
                                 _("Arrow Up / Arrow Down"),
                                 _("Arrow Up / Arrow Down")
                             ),
-                            action: _("Move focus between main and auxiliary toolbars")
+                            action: _("Move focus between main and auxiliary toolbars.")
                         },
                         {
                             keys: platformKeys("Enter", "Enter"),
-                            action: _("Activate the focused toolbar button")
+                            action: _("Activate the focused toolbar button.")
                         },
                         {
                             keys: platformKeys("Esc", "Esc"),
-                            action: _("Exit toolbar keyboard navigation")
+                            action: _("Exit toolbar keyboard navigation.")
                         }
                     ]
                 },
@@ -7681,11 +7681,11 @@ class Activity {
                     items: [
                         {
                             keys: platformKeys("Esc", "Esc"),
-                            action: _("Close the focused widget window")
+                            action: _("Close the focused widget window.")
                         },
                         {
                             keys: platformKeys("Ctrl + Shift + M", "Command + Shift + M"),
-                            action: _("Maximize or restore the focused widget window")
+                            action: _("Maximize or restore the focused widget window.")
                         }
                     ]
                 },
@@ -7697,11 +7697,11 @@ class Activity {
                                 _("Arrow Left / Arrow Right"),
                                 _("Arrow Left / Arrow Right")
                             ),
-                            action: _("Move between help pages when Help is open")
+                            action: _("Move between help pages when Help is open.")
                         },
                         {
                             keys: platformKeys(_("Arrow keys"), _("Arrow keys")),
-                            action: _("Adjust pitch by semitone when Pitch Slider is open")
+                            action: _("Adjust pitch by semitone when Pitch Slider is open.")
                         }
                     ]
                 }

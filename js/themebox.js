@@ -372,7 +372,7 @@ class ThemeBox {
         });
 
         // Notify user
-        this.activity.textMsg(`${_("Theme switched to")} ${this._theme}`, 2000);
+        this.activity.textMsg(_("Theme switched to %s mode.").replace(/%s/g, this._theme), 2000);
     }
 
     /**
