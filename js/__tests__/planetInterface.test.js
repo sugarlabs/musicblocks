@@ -156,7 +156,7 @@ describe("PlanetInterface", () => {
         expect(planetInterface.saveLocally).toHaveBeenCalled();
     });
     test("newProject does not throw when _loadStart is not a function", () => {
-        const activityWithout = { ...mockActivity, _loadStart: undefined };
+        const activityWithout = { ...mockActivity, _loadStart: "not a function" };
         const pi = new PlanetInterface(activityWithout);
         jest.spyOn(pi, "closePlanet").mockImplementation(() => {});
         jest.spyOn(pi, "initialiseNewProject").mockImplementation(() => {});
