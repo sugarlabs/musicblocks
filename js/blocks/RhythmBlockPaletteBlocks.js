@@ -292,7 +292,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("sixtyfourthNote", _("1/64 note") + " 𝅘𝅥𝅱");
+                super("sixtyfourthNote", `${_("1/64 note")} 𝅘𝅥𝅱`);
             }
 
             this.setPalette(rhythmBlockPalette, activity);
@@ -323,7 +323,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("thirtysecondNote", _("1/32 note") + " 𝅘𝅥𝅰");
+                super("thirtysecondNote", `${_("1/32 note")} 𝅘𝅥𝅰`);
             }
 
             // Set the palette and activity for the block
@@ -357,7 +357,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("sixteenthNote", _("1/16 note") + " 𝅘𝅥𝅯");
+                super("sixteenthNote", `${_("1/16 note")} 𝅘𝅥𝅯`);
             }
 
             // Set the palette and activity for the block
@@ -386,7 +386,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
          */
         constructor() {
             // TRANS: Do not modify the following line
-            super("eighthNote", _("eighth note") + " ♪");
+            super("eighthNote", `${_("eighth note")} ♪`);
 
             // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
@@ -414,7 +414,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
          */
         constructor() {
             // TRANS: Do not modify the following line
-            super("quarterNote", _("quarter note") + " ♩");
+            super("quarterNote", `${_("quarter note")} ♩`);
 
             // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
@@ -447,7 +447,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("halfNote", _("half note") + " 𝅗𝅥");
+                super("halfNote", `${_("half note")} 𝅗𝅥`);
             }
 
             // Set the palette and activity for the block
@@ -481,7 +481,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("wholeNote", _("whole note") + " 𝅝");
+                super("wholeNote", `${_("whole note")} 𝅝`);
             }
 
             // Set the palette and activity for the block

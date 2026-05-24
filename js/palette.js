@@ -1310,7 +1310,7 @@ class PaletteModel {
                         if (block.staticLabels[0] === _("store in box")) {
                             label = _("store in box");
                         } else {
-                            label = _("store in") + " " + block.staticLabels[0];
+                            label = `${_("store in")} ${block.staticLabels[0]}`;
                         }
                     } else {
                         label = block.defaults[0];
@@ -1758,7 +1758,7 @@ class Palette {
                 break;
             } else if (
                 ["storein"].includes(this.model.blocks[i].blkname) &&
-                this.model.blocks[i].modname === _("store in") + " " + name
+                    this.model.blocks[i].modname === `${_("store in")} ${name}`
             ) {
                 this.model.blocks.splice(i, 1);
                 break;

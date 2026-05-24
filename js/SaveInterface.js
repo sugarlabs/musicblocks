@@ -611,7 +611,7 @@ class SaveInterface {
                         activity.save.afterSaveAbc();
                     } catch (e) {
                         console.error("Error generating ABC output: ", e);
-                        activity.errorMsg(_("Error generating ABC output.") + " " + e.message);
+                        activity.errorMsg(`${_("Error generating ABC output.")} ${e.message}`);
                     } finally {
                         document.body.style.cursor = "default";
                     }
@@ -651,7 +651,7 @@ class SaveInterface {
                 this.activity.save.download("abc", "data:text;utf8," + abc, null);
             } catch (e) {
                 console.error("Error in ABC output generation: ", e);
-                this.activity.errorMsg(_("Error generating ABC output.") + " " + e.message);
+                this.activity.errorMsg(`${_("Error generating ABC output.")} ${e.message}`);
             } finally {
                 document.body.style.cursor = "default";
             }
@@ -842,7 +842,7 @@ class SaveInterface {
                     } catch (e) {
                         console.error("Error generating Lilypond output: ", e);
                         this.activity.errorMsg(
-                            _("Error generating Lilypond output.") + " " + e.message
+                            `${_("Error generating Lilypond output.")} ${e.message}`
                         );
                     } finally {
                         document.body.style.cursor = "default";
@@ -901,7 +901,7 @@ class SaveInterface {
                 }
             } catch (e) {
                 console.error("Error in Lilypond output generation: ", e);
-                this.activity.errorMsg(_("Error generating Lilypond output.") + " " + e.message);
+                this.activity.errorMsg(`${_("Error generating Lilypond output.")} ${e.message}`);
             } finally {
                 this.notationConvert = "";
                 document.body.style.cursor = "default";

@@ -812,7 +812,7 @@ class TimbreWidget {
             if (this.osc.length === 0) {
                 this._synth();
             } else {
-                activity.errorMsg(_("Unable to use synth due to existing oscillator"), 3000);
+                activity.errorMsg(_("Unable to use synth due to existing oscillator."), 3000);
             }
         };
 

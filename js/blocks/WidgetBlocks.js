@@ -631,7 +631,7 @@ function setupWidgetBlocks(activity) {
      * Represents a block for setting up Oscilloscope Widget in the workspace.
      * @extends StackClampBlock
      */
-    class oscilloscopeWidgetBlock extends StackClampBlock {
+    class OscilloscopeWidgetBlock extends StackClampBlock {
         /**
          * Creates an OscilloscopeWidgetBlock instance.
          */
@@ -2155,6 +2155,8 @@ function setupWidgetBlocks(activity) {
             return [args[0], 1];
         }
     }
+    // Set up AIDebugger for both Music Blocks and Turtle Blocks
+    new AIDebugger().setup(activity);
     // Set up blocks if this is Music Blocks environment
     if (_THIS_IS_MUSIC_BLOCKS_) {
         new EnvelopeBlock().setup(activity);
@@ -2167,12 +2169,12 @@ function setupWidgetBlocks(activity) {
         new SamplerBlock().setup(activity);
         new ArpeggioMatrixBlock().setup(activity);
         new PitchDrumMatrixBlock().setup(activity);
-        new oscilloscopeWidgetBlock().setup(activity);
+        new OscilloscopeWidgetBlock().setup(activity);
         new PitchSliderBlock().setup(activity);
         new ChromaticBlock().setup(activity);
         new LegoBricksBlock().setup(activity);
-        new ReflectionBlock().setup(activity);
         new AIMusicBlocks().setup(activity);
+        new ReflectionBlock().setup(activity);
         new MusicKeyboard2Block().setup(activity);
         new MusicKeyboardBlock().setup(activity);
         new PitchStaircaseBlock().setup(activity);
@@ -2182,8 +2184,6 @@ function setupWidgetBlocks(activity) {
         new MatrixCMajorBlock().setup(activity);
         new MatrixBlock().setup(activity);
     }
-    // Set up AIDebugger for both Music Blocks and Turtle Blocks
-    new AIDebugger().setup(activity);
     // Instantiate and set up the StatusBlock
     new StatusBlock().setup(activity);
 }

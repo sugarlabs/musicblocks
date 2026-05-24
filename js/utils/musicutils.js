@@ -1740,8 +1740,8 @@ let TEMPERAMENTS = [
     [_("Equal (31EDO)"), "equal31", "equal31"],
     [_("5-limit Just Intonation"), "just intonation", "just intonation"],
     [_("Pythagorean (3-limit JI)"), "Pythagorean", "Pythagorean"],
-    [_("Meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
-    [_("Meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"],
+    [`${_("Meantone")} (1/3)`, "1/3 comma meantone", "meantone (1/3)"],
+    [`${_("Meantone")} (1/4)`, "1/4 comma meantone", "meantone (1/4)"],
     [_("custom"), "custom", "custom"]
 ];
 

@@ -157,18 +157,18 @@ function setupIntervalsActions(activity) {
             if (totalIntervals % 12 === 0 && letterGap === 0) {
                 if (octave < 0) {
                     if (octave === -1) os = "";
-                    const a = os + " " + _("perfect") + " " + plural + " " + _("below");
+                    const a = `${os} ${_("perfect")} ${plural} ${_("below")}`;
                     return a.charAt(0).toUpperCase() + a.slice(1);
                 }
                 if (octave > 1) {
-                    const a = os + " " + _("perfect") + " " + plural + " " + _("above");
+                    const a = `${os} ${_("perfect")} ${plural} ${_("above")}`;
                     return a.charAt(0).toUpperCase() + a.slice(1);
                 }
             }
 
             if (totalIntervals > 21) {
                 if (octave >= 1) {
-                    lastWord = ", " + _("plus") + " " + os + " " + plural;
+                    lastWord = `, ${_("plus")} ${os} ${plural}`;
                 }
                 while (totalIntervals > temperamentLength) totalIntervals -= temperamentLength;
             }
@@ -176,8 +176,7 @@ function setupIntervalsActions(activity) {
             if (octave < 0) {
                 letterGap = letterGap !== 0 ? NOTENAMES.length - letterGap : letterGap;
                 if (octave < -1) lastWord = `,  ${os} ${plural}`;
-                lastWord += " ";
-                lastWord += _("below");
+                lastWord += ` ${_("below")}`;
             }
 
             const interval =

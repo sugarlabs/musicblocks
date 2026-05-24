@@ -7270,13 +7270,8 @@ msgstr "fijar clave"
 
 #: js/blocks/IntervalsBlocks.js:1489
 #: js/blocks/IntervalsBlocks.js:1495
-msgid "The Set key block is used to set the key and mode,"
-msgstr "El bloque Fijar tecla se usa para configurar la tecla y el modo,"
-
-
-#: js/blocks/IntervalsBlocks.js:1495
-msgid "eg C Major"
-msgstr "por ejemplo, C Mayor"
+msgid "The Set key block is used to set the key and mode, eg C Major"
+msgstr "El bloque Fijar tecla se usa para configurar la tecla y el modo, por ejemplo, C Mayor"
 
 
 #: js/blocks/IntervalsBlocks.js:1555

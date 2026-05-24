@@ -2208,7 +2208,7 @@ class Activity {
                         recInside.setAttribute("fill", "red");
                     } catch (error) {
                         console.error("Recording failed: ", error);
-                        that.textMsg(_("Recording failed:") + " " + error.message);
+                        that.textMsg(_("Recording failed: %s").replace(/%s/g, error.message));
                         flag = 0;
                         // Re-enable recording button
                         recording();
@@ -4037,7 +4037,7 @@ class Activity {
                                 this.logo.tempo.slowDown(0);
                             } else {
                                 if (this.blocks.activeBlock !== null) {
-                                    this.textMsg("DOWN ARROW " + _("Moving block down."));
+                                    this.textMsg(`DOWN ARROW ${_("Moving block down.")}`);
                                     this.blocks.moveStackRelative(
                                         this.blocks.activeBlock,
                                         0,
@@ -4059,7 +4059,7 @@ class Activity {
                         case KEYCODE_LEFT:
                             if (!this.inTempoWidget) {
                                 if (this.blocks.activeBlock !== null) {
-                                    this.textMsg("LEFT ARROW " + _("Moving block left."));
+                                    this.textMsg(`LEFT ARROW ${_("Moving block left.")}`);
                                     this.blocks.moveStackRelative(
                                         this.blocks.activeBlock,
                                         -STANDARDBLOCKHEIGHT / 2,
@@ -4076,7 +4076,7 @@ class Activity {
                         case KEYCODE_RIGHT:
                             if (!this.inTempoWidget) {
                                 if (this.blocks.activeBlock !== null) {
-                                    this.textMsg("RIGHT ARROW " + _("Moving block right."));
+                                    this.textMsg(`RIGHT ARROW ${_("Moving block right.")}`);
                                     this.blocks.moveStackRelative(
                                         this.blocks.activeBlock,
                                         STANDARDBLOCKHEIGHT / 2,
@@ -4091,7 +4091,7 @@ class Activity {
                             }
                             break;
                         case HOME:
-                            this.textMsg("HOME " + _("Jump to home position."));
+                        this.textMsg(`HOME ${_("Jump to home position.")}`);
                             if (this.palettes.mouseOver) {
                                 const dy = Math.max(55 - this.palettes.buttons["rhythm"].y, 0);
                                 this.palettes.menuScrollEvent(1, dy);
@@ -4111,7 +4111,7 @@ class Activity {
                             break;
                         case ESC:
                             if (this.searchWidget.style.visibility === "visible") {
-                                this.textMsg("ESC " + _("Hide blocks"));
+                                this.textMsg(`ESC ${_("Hide blocks")}`);
                                 this.searchWidget.style.visibility = "hidden";
                             }
                             break;
@@ -7128,7 +7128,7 @@ class Activity {
 
             this.homeButtonContainer = createButton(
                 GOHOMEFADEDBUTTON,
-                _("Home") + " [" + _("Home").toUpperCase() + "]",
+                `${_("Home")} [${_("Home").toUpperCase()}]`,
                 findBlocks
             );
             this.boundary.hide();

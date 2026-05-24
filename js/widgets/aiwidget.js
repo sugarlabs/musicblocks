@@ -642,7 +642,7 @@ function AIWidget() {
 
         this.activity.blocks.loadNewBlocks(finalBlock);
 
-        this.activity.textMsg(_("New start block generated"));
+        this.activity.textMsg(_("New start block generated."));
 
         // // logo.textMsg(_("MIDI loading. This may take some time depending upon the number of notes in the track"));
         // this.blocks.loadNewBlocks(combined_array);
@@ -799,8 +799,7 @@ function AIWidget() {
         widgetWindow.addButton("utility-button.svg", ICONSIZE, _("Set API Key"), "").onclick =
             function () {
                 const key = prompt(
-                    _("Enter your Groq API Key:"),
-                    that.activity.storage.groq_api_key || ""
+                    _("Enter your Groq API Key: %s").replace(/%s/g, that.activity.storage.groq_api_key || "")
                 );
                 if (key !== null) {
                     that.activity.storage.groq_api_key = key.trim();
@@ -865,7 +864,7 @@ function AIWidget() {
                 this.midiBuffer.start();
             } catch (error) {
                 console.warn("synth error", error);
-                this.activity.errorMsg(_("Synth error:") + " " + error.message);
+                this.activity.errorMsg(_("Synth error: %s").replace(/%s/g, error.message));
             }
         } else {
             this.activity.errorMsg(_("Audio not supported in this browser."));

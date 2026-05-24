@@ -103,7 +103,7 @@ function setupProgramBlocks(activity) {
                         logo.turtleHeaps[name] = data;
                     } catch (e) {
                         console.debug(e);
-                        activity.errorMsg(_("Error parsing JSON data:") + e, blk);
+                        activity.errorMsg(`${_("Error parsing JSON data:")} ${e}`, blk);
                         logo.turtleHeaps[name] = oldHeap;
                     }
                 })
@@ -187,7 +187,7 @@ function setupProgramBlocks(activity) {
                 xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
                 xmlHttp.send(data);
             } else {
-                activity.errorMsg(_("Cannot find a valid heap for") + " " + name, blk);
+                activity.errorMsg(`${_("Cannot find a valid heap for")} ${name}`, blk);
             }
         }
     }
@@ -1338,7 +1338,7 @@ function setupProgramBlocks(activity) {
                 const protoblk = obj[0];
                 const protoName = obj[2];
                 if (protoblk === null) {
-                    activity.errorMsg(_("Cannot find block") + " " + name, blk);
+                    activity.errorMsg(`${_("Cannot find block")} ${name}`, blk);
 
                     console.debug("Cannot find block " + name);
                     return 0;

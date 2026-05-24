@@ -2295,9 +2295,7 @@ class Singer {
                                 if (tur.singer.oscList[thisBlk].length > 0) {
                                     if (notes.length > 1) {
                                         activity.errorMsg(
-                                            last(tur.singer.oscList[thisBlk]) +
-                                                ": " +
-                                                _("synth cannot play chords."),
+                                            `${last(tur.singer.oscList[thisBlk])}: ${_("synth cannot play chords.")}`,
                                             blk
                                         );
                                     }

@@ -2127,7 +2127,7 @@ class Logo {
                         } catch (e) {
                             console.error("Error generating Lilypond output: ", e);
                             logo.activity.errorMsg(
-                                _("Error generating Lilypond output.") + " " + e.message
+                                `${_("Error generating Lilypond output.")} ${e.message}`
                             );
                         } finally {
                             logo.collectingStats = false;
@@ -2140,7 +2140,7 @@ class Logo {
                         } catch (e) {
                             console.error("Error generating ABC output: ", e);
                             logo.activity.errorMsg(
-                                _("Error generating ABC output.") + " " + e.message
+                                `${_("Error generating ABC output.")} ${e.message}`
                             );
                         } finally {
                             logo.runningAbc = false;

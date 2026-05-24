@@ -921,9 +921,7 @@ function setupToneBlocks(activity) {
             super("voicename", _("set instrument"));
             this.setPalette("tone", activity);
             this.setHelpString([
-                _("The Set instrument block selects a voice for the synthesizer,") +
-                    " " +
-                    _("eg guitar piano violin or cello."),
+                _("The Set instrument block selects a voice for the synthesizer, eg guitar piano violin or cello."),
                 "documentation",
                 ""
             ]);
@@ -955,9 +953,7 @@ function setupToneBlocks(activity) {
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Set instrument block selects a voice for the synthesizer,") +
-                        " " +
-                        _("eg guitar piano violin or cello."),
+                    _("The Set instrument block selects a voice for the synthesizer, eg guitar piano violin or cello."),
                     "documentation",
                     null,
                     "settimbrehelp"
