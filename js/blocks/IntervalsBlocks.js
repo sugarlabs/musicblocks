@@ -1212,8 +1212,8 @@ function setupIntervalsBlocks(activity) {
             this.beginnerBlock(true);
             this.setHelpString([
                 _(
-                    "When Movable do is false, the solfege note names are always tied to specific pitches, eg \"do\" is always \"C-natural\" when Movable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
-                    ),
+                    'When Movable do is false, the solfege note names are always tied to specific pitches, eg "do" is always "C-natural" when Movable do is true, the solfege note names are assigned to scale degrees "do" is always the first degree of the major scale.'
+                ),
                 "documentation",
                 null,
                 "moveablehelp"

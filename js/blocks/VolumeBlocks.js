@@ -528,7 +528,9 @@ function setupVolumeBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Set synth volume block will change the volume of a particular synth, eg guitar violin snare drum etc.") +
+                _(
+                    "The Set synth volume block will change the volume of a particular synth, eg guitar violin snare drum etc."
+                ) +
                     " " +
                     _("The default volume is 50.") +
                     " " +
