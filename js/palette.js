@@ -1471,8 +1471,9 @@ class Palette {
     }
 
     hideMenu() {
-        docById("palette").childNodes[0].style.borderRight =
-            `1px solid ${platformColor.selectorSelected}`;
+        docById(
+            "palette"
+        ).childNodes[0].style.borderRight = `1px solid ${platformColor.selectorSelected}`;
         if (this._outsideClickListener) {
             document.removeEventListener("click", this._outsideClickListener);
             this._outsideClickListener = null;
@@ -1758,7 +1759,7 @@ class Palette {
                 break;
             } else if (
                 ["storein"].includes(this.model.blocks[i].blkname) &&
-                    this.model.blocks[i].modname === `${_("store in")} ${name}`
+                this.model.blocks[i].modname === `${_("store in")} ${name}`
             ) {
                 this.model.blocks.splice(i, 1);
                 break;

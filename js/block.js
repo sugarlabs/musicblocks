@@ -2830,7 +2830,7 @@ class Block {
                 ) {
                     //.TRANS: scalar step
                     return `${_("down")} ${Math.abs(this.blocks.blockList[c1].value)}`;
-		} else return `${_("up")} ${this.blocks.blockList[c1].value}`;
+                } else return `${_("up")} ${this.blocks.blockList[c1].value}`;
             case "pitchnumber":
                 c1 = this.blocks.blockList[c].connections[1];
                 if (this.blocks.blockList[c1].name === "number") {

@@ -4091,7 +4091,7 @@ class Activity {
                             }
                             break;
                         case HOME:
-                        this.textMsg(`HOME ${_("Jump to home position.")}`);
+                            this.textMsg(`HOME ${_("Jump to home position.")}`);
                             if (this.palettes.mouseOver) {
                                 const dy = Math.max(55 - this.palettes.buttons["rhythm"].y, 0);
                                 this.palettes.menuScrollEvent(1, dy);
@@ -8496,22 +8496,19 @@ class Activity {
             // data loss from browser crashes (see issue #2994).
             // Deferred while the project is actively running to avoid
             // interrupting playback.
-            this._autoSaveInterval = setInterval(
-                () => {
-                    try {
-                        if (this.logo && this.logo._alreadyRunning) {
-                            return;
-                        }
-
-                        if (this.saveLocally !== null && this.saveLocally !== undefined) {
-                            this.saveLocally();
-                        }
-                    } catch (e) {
-                        console.error("[AutoSave] Failed:", e);
+            this._autoSaveInterval = setInterval(() => {
+                try {
+                    if (this.logo && this.logo._alreadyRunning) {
+                        return;
                     }
-                },
-                5 * 60 * 1000
-            );
+
+                    if (this.saveLocally !== null && this.saveLocally !== undefined) {
+                        this.saveLocally();
+                    }
+                } catch (e) {
+                    console.error("[AutoSave] Failed:", e);
+                }
+            }, 5 * 60 * 1000);
 
             initBasicProtoBlocks(this);
 
