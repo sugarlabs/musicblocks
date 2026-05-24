@@ -485,13 +485,10 @@ class TimbreWidget {
 
             i += 1;
             if (i < this.notesToPlay.length && this._playing) {
-                this._previewTimerId = this._setWidgetTimeout(
-                    () => {
-                        this._previewTimerId = null;
-                        __playLoop(i);
-                    },
-                    Singer.defaultBPMFactor * 1000 * this.notesToPlay[i - 1][1]
-                );
+                this._previewTimerId = this._setWidgetTimeout(() => {
+                    this._previewTimerId = null;
+                    __playLoop(i);
+                }, Singer.defaultBPMFactor * 1000 * this.notesToPlay[i - 1][1]);
             } else {
                 cell.textContent = "\u00A0\u00A0";
                 const playImg2 = document.createElement("img");

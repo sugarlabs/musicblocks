@@ -1883,7 +1883,10 @@ function TemperamentWidget() {
                 // Ensure we have a valid temperament object with intervals
                 if (!t || !t.interval || !Array.isArray(t.interval)) {
                     this.activity.errorMsg(
-                        _("Invalid temperament: %s. Skipping to next temperament.").replace(/%s/g, temperament),
+                        _("Invalid temperament: %s. Skipping to next temperament.").replace(
+                            /%s/g,
+                            temperament
+                        ),
                         3000
                     );
                     continue;
@@ -2650,7 +2653,10 @@ function TemperamentWidget() {
                 // Ensure t has a valid interval array before accessing it
                 if (!t || !t.interval || i >= t.interval.length) {
                     that.activity.errorMsg(
-                        _("Invalid temperament interval data. Skipping note %s.").replace(/%s/g, i.toString()),
+                        _("Invalid temperament interval data. Skipping note %s.").replace(
+                            /%s/g,
+                            i.toString()
+                        ),
                         3000
                     );
                     continue;

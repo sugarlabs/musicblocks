@@ -799,7 +799,10 @@ function AIWidget() {
         widgetWindow.addButton("utility-button.svg", ICONSIZE, _("Set API Key"), "").onclick =
             function () {
                 const key = prompt(
-                    _("Enter your Groq API Key: %s").replace(/%s/g, that.activity.storage.groq_api_key || "")
+                    _("Enter your Groq API Key: %s").replace(
+                        /%s/g,
+                        that.activity.storage.groq_api_key || ""
+                    )
                 );
                 if (key !== null) {
                     that.activity.storage.groq_api_key = key.trim();

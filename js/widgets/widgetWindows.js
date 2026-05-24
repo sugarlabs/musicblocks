@@ -313,8 +313,8 @@ class WidgetWindow {
                 typeof event.deltaY === "number"
                     ? event.deltaY
                     : typeof event.detail === "number"
-                      ? event.detail * 16
-                      : 0;
+                    ? event.detail * 16
+                    : 0;
             const deltaX = typeof event.deltaX === "number" ? event.deltaX : 0;
 
             this._widget.scrollTop += deltaY;
