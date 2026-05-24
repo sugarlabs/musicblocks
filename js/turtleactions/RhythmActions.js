@@ -195,12 +195,26 @@ function setupRhythmActions(activity) {
             const tur = activity.turtles.ithTurtle(turtle);
 
             if (tur.singer.inNoteBlock.length > 0) {
-                tur.singer.notePitches[last(tur.singer.inNoteBlock)].push("rest");
-                tur.singer.noteOctaves[last(tur.singer.inNoteBlock)].push(4);
-                tur.singer.noteCents[last(tur.singer.inNoteBlock)].push(0);
-                tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(0);
-                tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(tur.singer.beatFactor);
-                tur.singer.pushedNote = true;
+                if (tur.singer.notePitches !== null && tur.singer.notePitches !== undefined) {
+                    tur.singer.notePitches[last(tur.singer.inNoteBlock)].push("rest");
+                }
+                if (tur.singer.noteOctaves !== null && tur.singer.noteOctaves !== undefined) {
+                    tur.singer.noteOctaves[last(tur.singer.inNoteBlock)].push(4);
+                }
+                if (tur.singer.noteCents !== null && tur.singer.noteCents !== undefined) {
+                    tur.singer.noteCents[last(tur.singer.inNoteBlock)].push(0);
+                }
+                if (tur.singer.noteHertz !== null && tur.singer.noteHertz !== undefined) {
+                    tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(0);
+                }
+                if (tur.singer.noteBeatValues !== null && tur.singer.noteBeatValues !== undefined) {
+                    tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(
+                        tur.singer.beatFactor
+                    );
+                }
+                if (tur.singer.pushedNote !== null && tur.singer.pushedNote !== undefined) {
+                    tur.singer.pushedNote = true;
+                }
             }
         }
 
