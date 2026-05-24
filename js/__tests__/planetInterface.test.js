@@ -155,6 +155,15 @@ describe("PlanetInterface", () => {
         expect(mockActivity._loadStart).toHaveBeenCalled();
         expect(planetInterface.saveLocally).toHaveBeenCalled();
     });
+    test("newProject does not throw when _loadStart is not a function", () => {
+        const activityWithout = { ...mockActivity, _loadStart: undefined };
+        const pi = new PlanetInterface(activityWithout);
+        jest.spyOn(pi, "closePlanet").mockImplementation(() => {});
+        jest.spyOn(pi, "initialiseNewProject").mockImplementation(() => {});
+        jest.spyOn(pi, "saveLocally").mockImplementation(() => {});
+        expect(() => pi.newProject()).not.toThrow();
+        expect(pi.saveLocally).toHaveBeenCalled();
+    });
     test("onConverterLoad sets window.Converter", () => {
         planetInterface.planet = { Converter: "mockConverter" };
         planetInterface.onConverterLoad();
