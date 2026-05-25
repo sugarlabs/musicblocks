@@ -141,7 +141,9 @@ class PitchSlider {
                     this.frequencies[id],
                     Tone.now() + 0.05
                 );
-                freqLabel.innerHTML = `<label>${parseFloat(this.frequencies[id].toFixed(2))}</label>`;
+                freqLabel.innerHTML = `<label>${parseFloat(
+                    this.frequencies[id].toFixed(2)
+                )}</label>`;
             };
 
             slider.oninput = () => {

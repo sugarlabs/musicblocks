@@ -113,13 +113,7 @@ function setupMeterActions(activity) {
                 obj = rationalToFraction(beatValue);
                 target = (30 * 0.25) / beatValue;
                 activity.errorMsg(
-                    obj[0] +
-                        "/" +
-                        obj[1] +
-                        " " +
-                        _("beats per minute must be greater than") +
-                        " " +
-                        target,
+                    `${obj[0]}/${obj[1]} ${_("beats per minute must be greater than %s").replace(/%s/g, target)}`,
                     blk
                 );
                 _bpm = 30;
@@ -127,15 +121,7 @@ function setupMeterActions(activity) {
                 obj = rationalToFraction(beatValue);
                 target = (1000 * 0.25) / beatValue;
                 activity.errorMsg(
-                    _("maximum") +
-                        " " +
-                        obj[0] +
-                        "/" +
-                        obj[1] +
-                        " " +
-                        _("beats per minute is") +
-                        " " +
-                        target,
+                    `${_("maximum")} ${obj[0]}/${obj[1]} ${_("beats per minute is %s").replace(/%s/g, target)}`,
                     blk
                 );
                 _bpm = 1000;
@@ -151,13 +137,7 @@ function setupMeterActions(activity) {
                 obj = rationalToFraction(beatValue);
                 target = (30 * 0.25) / beatValue;
                 activity.errorMsg(
-                    obj[0] +
-                        "/" +
-                        obj[1] +
-                        " " +
-                        _("beats per minute must be greater than") +
-                        " " +
-                        target,
+                    `${obj[0]}/${obj[1]} ${_("beats per minute must be greater than %s").replace(/%s/g, target)}`,
                     blk
                 );
                 Singer.masterBPM = 30;
@@ -165,15 +145,7 @@ function setupMeterActions(activity) {
                 obj = rationalToFraction(beatValue);
                 target = (1000 * 0.25) / beatValue;
                 activity.errorMsg(
-                    _("maximum") +
-                        " " +
-                        obj[0] +
-                        "/" +
-                        obj[1] +
-                        " " +
-                        _("beats per minute is") +
-                        " " +
-                        target,
+                    `${_("maximum")} ${obj[0]}/${obj[1]} ${_("beats per minute is %s").replace(/%s/g, target)}`,
                     blk
                 );
                 Singer.masterBPM = 1000;

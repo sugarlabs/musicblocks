@@ -1585,7 +1585,7 @@ class Activity {
             const container = document.createElement("div");
             container.classList.add("message-container");
             const message = document.createElement("p");
-            message.textContent = _("Set the max blocks to generate :");
+            message.textContent = _("Set the max blocks to generate:");
             message.classList.add("modal-message");
             container.appendChild(message);
 
@@ -1644,7 +1644,7 @@ class Activity {
             modal.classList.add("modalBox");
             modal.id = "clear-confirm";
             const title = document.createElement("h2");
-            title.textContent = _("Clear Workspace");
+            title.textContent = _("Clear workspace");
             title.classList.add("modal-title");
             title.style.color = platformColor.headingColor;
 
@@ -2207,8 +2207,8 @@ class Activity {
                         }
                         recInside.setAttribute("fill", "red");
                     } catch (error) {
-                        console.error("Recording failed:", error);
-                        that.textMsg(_("Recording failed: ") + error.message);
+                        console.error("Recording failed: ", error);
+                        that.textMsg(_("Recording failed: %s").replace(/%s/g, error.message));
                         flag = 0;
                         // Re-enable recording button
                         recording();
@@ -2409,7 +2409,7 @@ class Activity {
                     if (ele.label === "Enable horizontal scrolling") ele.display = false;
                     else if (ele.label === "Disable horizontal scrolling") ele.display = true;
                 });
-                activity.textMsg("Horizontal scrolling enabled.", 3000);
+                activity.textMsg(_("Horizontal scrolling enabled."), 3000);
             } else {
                 enableHorizScrollIcon.style.display = "block";
                 disableHorizScrollIcon.style.display = "none";
@@ -2418,7 +2418,7 @@ class Activity {
                     if (ele.label === "Enable horizontal scrolling") ele.display = true;
                     else if (ele.label === "Disable horizontal scrolling") ele.display = false;
                 });
-                activity.textMsg("Horizontal scrolling disabled.", 3000);
+                activity.textMsg(_("Horizontal scrolling disabled."), 3000);
             }
         };
 
@@ -4037,7 +4037,7 @@ class Activity {
                                 this.logo.tempo.slowDown(0);
                             } else {
                                 if (this.blocks.activeBlock !== null) {
-                                    this.textMsg("DOWN ARROW " + _("Moving block down."));
+                                    this.textMsg(`DOWN ARROW ${_("Moving block down.")}`);
                                     this.blocks.moveStackRelative(
                                         this.blocks.activeBlock,
                                         0,
@@ -4059,7 +4059,7 @@ class Activity {
                         case KEYCODE_LEFT:
                             if (!this.inTempoWidget) {
                                 if (this.blocks.activeBlock !== null) {
-                                    this.textMsg("LEFT ARROW " + _("Moving block left."));
+                                    this.textMsg(`LEFT ARROW ${_("Moving block left.")}`);
                                     this.blocks.moveStackRelative(
                                         this.blocks.activeBlock,
                                         -STANDARDBLOCKHEIGHT / 2,
@@ -4076,7 +4076,7 @@ class Activity {
                         case KEYCODE_RIGHT:
                             if (!this.inTempoWidget) {
                                 if (this.blocks.activeBlock !== null) {
-                                    this.textMsg("RIGHT ARROW " + _("Moving block right."));
+                                    this.textMsg(`RIGHT ARROW ${_("Moving block right.")}`);
                                     this.blocks.moveStackRelative(
                                         this.blocks.activeBlock,
                                         STANDARDBLOCKHEIGHT / 2,
@@ -4091,7 +4091,7 @@ class Activity {
                             }
                             break;
                         case HOME:
-                            this.textMsg("HOME " + _("Jump to home position."));
+                            this.textMsg(`HOME ${_("Jump to home position.")}`);
                             if (this.palettes.mouseOver) {
                                 const dy = Math.max(55 - this.palettes.buttons["rhythm"].y, 0);
                                 this.palettes.menuScrollEvent(1, dy);
@@ -4111,7 +4111,7 @@ class Activity {
                             break;
                         case ESC:
                             if (this.searchWidget.style.visibility === "visible") {
-                                this.textMsg("ESC " + _("Hide blocks"));
+                                this.textMsg(`ESC ${_("Hide blocks")}`);
                                 this.searchWidget.style.visibility = "hidden";
                             }
                             break;
@@ -7128,7 +7128,7 @@ class Activity {
 
             this.homeButtonContainer = createButton(
                 GOHOMEFADEDBUTTON,
-                _("Home") + " [" + _("Home").toUpperCase() + "]",
+                `${_("Home")} [${_("Home").toUpperCase()}]`,
                 findBlocks
             );
             this.boundary.hide();
@@ -7594,35 +7594,35 @@ class Activity {
                     items: [
                         {
                             keys: platformKeys("Alt + C", "Option + C"),
-                            action: _("Copy selected stack")
+                            action: _("Copy selected stack.")
                         },
                         {
                             keys: platformKeys("Alt + V", "Option + V"),
-                            action: _("Paste previous stack")
+                            action: _("Paste previous stack.")
                         },
                         {
                             keys: platformKeys("Ctrl + V", "Control + V"),
-                            action: _("Open the JSON paste box")
+                            action: _("Open the JSON paste box.")
                         },
                         {
                             keys: platformKeys("Enter", "Enter"),
-                            action: _("Paste JSON when the paste box is focused")
+                            action: _("Paste JSON when the paste box is focused.")
                         },
                         {
                             keys: platformKeys("Delete", "Delete"),
-                            action: _("Extract the active block")
+                            action: _("Extract the active block.")
                         },
                         {
                             keys: platformKeys("Alt + E", "Option + E"),
-                            action: _("Clear workspace")
+                            action: _("Clear workspace.")
                         },
                         {
                             keys: platformKeys("Alt + B", "Option + B"),
-                            action: _("Save block artwork")
+                            action: _("Save block artwork.")
                         },
                         {
                             keys: platformKeys("Alt + H", "Option + H"),
-                            action: _("Save block help")
+                            action: _("Save block help.")
                         }
                     ]
                 },
@@ -7631,21 +7631,21 @@ class Activity {
                     items: [
                         {
                             keys: platformKeys("Tab / Shift + Tab", "Tab / Shift + Tab"),
-                            action: _("Move focus between the toolbar, palettes, and workspace")
+                            action: _("Move focus between the toolbar, palettes, and workspace.")
                         },
                         {
                             keys: platformKeys(_("Arrow keys"), _("Arrow keys")),
                             action: _(
-                                "Move the active block, scroll palettes, adjust the tempo widget, or pan the workspace depending on context"
+                                "Move the active block, scroll palettes, adjust the tempo widget, or pan the workspace depending on context."
                             )
                         },
                         {
                             keys: platformKeys("/", "/"),
-                            action: _("Pan workspace right when horizontal scrolling is enabled")
+                            action: _("Pan workspace right when horizontal scrolling is enabled.")
                         },
                         {
                             keys: platformKeys("\\", "\\"),
-                            action: _("Pan workspace left when horizontal scrolling is enabled")
+                            action: _("Pan workspace left when horizontal scrolling is enabled.")
                         }
                     ]
                 },
@@ -7657,22 +7657,22 @@ class Activity {
                                 _("Arrow Left / Arrow Right"),
                                 _("Arrow Left / Arrow Right")
                             ),
-                            action: _("Move focus within the current toolbar")
+                            action: _("Move focus within the current toolbar.")
                         },
                         {
                             keys: platformKeys(
                                 _("Arrow Up / Arrow Down"),
                                 _("Arrow Up / Arrow Down")
                             ),
-                            action: _("Move focus between main and auxiliary toolbars")
+                            action: _("Move focus between main and auxiliary toolbars.")
                         },
                         {
                             keys: platformKeys("Enter", "Enter"),
-                            action: _("Activate the focused toolbar button")
+                            action: _("Activate the focused toolbar button.")
                         },
                         {
                             keys: platformKeys("Esc", "Esc"),
-                            action: _("Exit toolbar keyboard navigation")
+                            action: _("Exit toolbar keyboard navigation.")
                         }
                     ]
                 },
@@ -7681,11 +7681,11 @@ class Activity {
                     items: [
                         {
                             keys: platformKeys("Esc", "Esc"),
-                            action: _("Close the focused widget window")
+                            action: _("Close the focused widget window.")
                         },
                         {
                             keys: platformKeys("Ctrl + Shift + M", "Command + Shift + M"),
-                            action: _("Maximize or restore the focused widget window")
+                            action: _("Maximize or restore the focused widget window.")
                         }
                     ]
                 },
@@ -7697,11 +7697,11 @@ class Activity {
                                 _("Arrow Left / Arrow Right"),
                                 _("Arrow Left / Arrow Right")
                             ),
-                            action: _("Move between help pages when Help is open")
+                            action: _("Move between help pages when Help is open.")
                         },
                         {
                             keys: platformKeys(_("Arrow keys"), _("Arrow keys")),
-                            action: _("Adjust pitch by semitone when Pitch Slider is open")
+                            action: _("Adjust pitch by semitone when Pitch Slider is open.")
                         }
                     ]
                 }

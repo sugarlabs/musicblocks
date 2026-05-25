@@ -3398,9 +3398,9 @@ const piemenuModes = (block, selectedMode) => {
             that.text.text =
                 that._modeNameWheel.navItems[that._modeNameWheel.selectedNavItemIndex].title;
 
-            if (that.text.text === _("major") + " / " + _("ionian")) {
+            if (that.text.text === `${_("major")} / ${_("ionian")}`) {
                 that.value = "major";
-            } else if (that.text.text === _("minor") + " / " + _("aeolian")) {
+            } else if (that.text.text === `${_("minor")} / ${_("aeolian")}`) {
                 that.value = "aeolian";
             } else {
                 for (let i = 0; i < MODE_PIE_MENUS[modeGroup].length; i++) {
@@ -3471,11 +3471,11 @@ const piemenuModes = (block, selectedMode) => {
             switch (modename) {
                 case "ionian":
                 case "major":
-                    labels.push(_("major") + " / " + _("ionian"));
+                    labels.push(`${_("major")} / ${_("ionian")}`);
                     break;
                 case "aeolian":
                 case "minor":
-                    labels.push(_("minor") + " / " + _("aeolian"));
+                    labels.push(`${_("minor")} / ${_("aeolian")}`);
                     break;
                 default:
                     if (modename === " ") {
@@ -4228,10 +4228,9 @@ const piemenuKey = activity => {
                     activity.blocks.blockList[activity.blocks.blockList.length - 1].value =
                         activity.KeySignatureEnv[1];
                     activity.textMsg(
-                        _("You have chosen key for your pitch preview.") +
-                            activity.KeySignatureEnv[0] +
-                            " " +
-                            activity.KeySignatureEnv[1]
+                        `${_("You have chosen key for your pitch preview.")} ${
+                            activity.KeySignatureEnv[0]
+                        } ${activity.KeySignatureEnv[1]}`
                     );
                 }
             }
