@@ -727,7 +727,7 @@ const saveLilypondOutput = function (activity) {
             let shortInstrumentName = "";
 
             if (tNumber > startDrums - 1) {
-                instrumentName = _("drum") + NUMBERNAMES[tNumber - startDrums];
+                instrumentName = `${_("drum")} ${NUMBERNAMES[tNumber - startDrums]}`;
                 instrumentName = instrumentName.replace(/ /g, "").replace(".", "");
                 activity.logo.notationOutput += instrumentName + " = {\n";
                 activity.logo.notationOutput += "\\drummode {\n";

@@ -488,7 +488,9 @@ function TemperamentWidget() {
                         noteDefined = true;
                         const noteDiv = document.createElement("div");
                         noteDiv.id = "note";
-                        noteDiv.textContent = `\u00A0${_("note")}\u00A0${this.ratiosNotesPair[j][1]}`;
+                        noteDiv.textContent = `\u00A0${_("note")}\u00A0${
+                            this.ratiosNotesPair[j][1]
+                        }`;
                         noteInfoDiv.appendChild(noteDiv);
                         break;
                     }
@@ -508,9 +510,13 @@ function TemperamentWidget() {
                     const noteDiv = document.createElement("div");
                     noteDiv.id = "note";
                     if (centsDiff[index] < 0) {
-                        noteDiv.textContent = `\u00A0${_("note")}\u00A0${this.ratiosNotesPair[index][1]}(-${centsDiff1[index].toFixed(2)}¢)`;
+                        noteDiv.textContent = `\u00A0${_("note")}\u00A0${
+                            this.ratiosNotesPair[index][1]
+                        }(-${centsDiff1[index].toFixed(2)}¢)`;
                     } else {
-                        noteDiv.textContent = `\u00A0${_("note")}\u00A0${this.ratiosNotesPair[index][1]}(+${centsDiff1[index].toFixed(2)}¢)`;
+                        noteDiv.textContent = `\u00A0${_("note")}\u00A0${
+                            this.ratiosNotesPair[index][1]
+                        }(+${centsDiff1[index].toFixed(2)}¢)`;
                     }
                     noteInfoDiv.appendChild(noteDiv);
                 }
@@ -1879,9 +1885,10 @@ function TemperamentWidget() {
                 // Ensure we have a valid temperament object with intervals
                 if (!t || !t.interval || !Array.isArray(t.interval)) {
                     this.activity.errorMsg(
-                        _("Invalid temperament: ") +
-                            temperament +
-                            _(". Skipping to next temperament."),
+                        _("Invalid temperament: %s. Skipping to next temperament.").replace(
+                            /%s/g,
+                            temperament
+                        ),
                         3000
                     );
                     continue;
@@ -2654,7 +2661,10 @@ function TemperamentWidget() {
                 // Ensure t has a valid interval array before accessing it
                 if (!t || !t.interval || i >= t.interval.length) {
                     that.activity.errorMsg(
-                        _("Invalid temperament interval data. Skipping note ") + i,
+                        _("Invalid temperament interval data. Skipping note %s.").replace(
+                            /%s/g,
+                            i.toString()
+                        ),
                         3000
                     );
                     continue;

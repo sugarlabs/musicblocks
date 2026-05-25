@@ -292,6 +292,23 @@ class SaveInterface {
      * @instance
      */
     prepareHTML() {
+        const sanitizeImageURL = value => {
+            if (value === null || value === undefined) return "";
+
+            const raw = String(value).trim();
+            if (raw === "") return "";
+
+            const lower = raw.toLowerCase();
+            if (lower.startsWith("data:")) {
+                return /^data:image\/[a-z0-9.+-]+;base64,[a-z0-9+/=\s]+$/i.test(raw) ? raw : "";
+            }
+
+            if (lower.startsWith("http://") || lower.startsWith("https://")) return raw;
+
+            if (/^[a-z][a-z0-9+.-]*:/i.test(raw)) return "";
+            return raw;
+        };
+
         let file = this.htmlSaveTemplate;
         let description = _("No description provided");
         if (
@@ -316,7 +333,7 @@ class SaveInterface {
             .replace(/{{ project_description }}/g, escapeHTML(description))
             .replace(/{{ project_name }}/g, escapeHTML(name))
             .replace(/{{ data }}/g, escapeHTML(data))
-            .replace(/{{ project_image }}/g, escapeHTML(image));
+            .replace(/{{ project_image }}/g, escapeHTML(sanitizeImageURL(image)));
 
         return file;
     }
@@ -610,8 +627,8 @@ class SaveInterface {
                     try {
                         activity.save.afterSaveAbc();
                     } catch (e) {
-                        console.error("Error generating ABC output:", e);
-                        activity.errorMsg(_("Error generating ABC output. ") + e.message);
+                        console.error("Error generating ABC output: ", e);
+                        activity.errorMsg(`${_("Error generating ABC output.")} ${e.message}`);
                     } finally {
                         document.body.style.cursor = "default";
                     }
@@ -650,8 +667,8 @@ class SaveInterface {
                 const abc = encodeURIComponent(saveAbcOutput(this.activity));
                 this.activity.save.download("abc", "data:text;utf8," + abc, null);
             } catch (e) {
-                console.error("Error in ABC output generation:", e);
-                this.activity.errorMsg(_("Error generating ABC output. ") + e.message);
+                console.error("Error in ABC output generation: ", e);
+                this.activity.errorMsg(`${_("Error generating ABC output.")} ${e.message}`);
             } finally {
                 document.body.style.cursor = "default";
             }
@@ -840,8 +857,10 @@ class SaveInterface {
                     try {
                         this.afterSaveLilypond();
                     } catch (e) {
-                        console.error("Error generating Lilypond output:", e);
-                        this.activity.errorMsg(_("Error generating Lilypond output. ") + e.message);
+                        console.error("Error generating Lilypond output: ", e);
+                        this.activity.errorMsg(
+                            `${_("Error generating Lilypond output.")} ${e.message}`
+                        );
                     } finally {
                         document.body.style.cursor = "default";
                     }
@@ -898,8 +917,8 @@ class SaveInterface {
                         break;
                 }
             } catch (e) {
-                console.error("Error in Lilypond output generation:", e);
-                this.activity.errorMsg(_("Error generating Lilypond output. ") + e.message);
+                console.error("Error in Lilypond output generation: ", e);
+                this.activity.errorMsg(`${_("Error generating Lilypond output.")} ${e.message}`);
             } finally {
                 this.notationConvert = "";
                 document.body.style.cursor = "default";
@@ -924,8 +943,8 @@ class SaveInterface {
         filename = docById("fileName").value;
         const showCopiedMessage = () => {
             this.activity.textMsg(
-                _("The Lilypond code is copied to clipboard. You can paste it here: ") +
-                    "<a href='http://hacklily.org' target='_blank' rel='noopener noreferrer'>http://hacklily.org</a> "
+                _("The Lilypond code is copied to clipboard. You can paste it here:") +
+                    " <a href='http://hacklily.org' target='_blank' rel='noopener noreferrer'>http://hacklily.org</a> "
             );
         };
 

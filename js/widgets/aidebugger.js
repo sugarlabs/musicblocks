@@ -549,8 +549,7 @@ function AIDebuggerWidget() {
         const body = document.createElement("div");
         body.style.marginBottom = "12px";
         body.textContent = _(
-            "The AI Debugger will send your current project data to an external server for analysis. " +
-                "Your project blocks and structure will be shared with: "
+            "The AI Debugger will send your current project data to an external server for analysis. Your project blocks and structure will be shared with: "
         );
 
         const urlSpan = document.createElement("strong");
@@ -593,8 +592,7 @@ function AIDebuggerWidget() {
             const msg = {
                 type: "system",
                 content: _(
-                    "AI analysis was not started. You can type a question below, " +
-                        "but project data will not be sent until you agree."
+                    "AI analysis was not started. You can type a question below, but project data will not be sent until you agree."
                 ),
                 timestamp: new Date().toISOString()
             };
@@ -665,8 +663,7 @@ function AIDebuggerWidget() {
             this._addMessageToUI({
                 type: "system",
                 content: _(
-                    "AI Debugger is not available on this host. " +
-                        "The backend URL could not be determined."
+                    "AI Debugger is not available on this host. The backend URL could not be determined."
                 ),
                 timestamp: new Date().toISOString()
             });

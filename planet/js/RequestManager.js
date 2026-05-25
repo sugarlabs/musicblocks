@@ -179,8 +179,8 @@ class RequestManager {
                 this.timeoutMs
             );
 
-            // Check if the result indicates a failure that should be retried
-            if (result && result.success === false && result.error === "ERROR_CONNECTION_FAILURE") {
+            // Check if the result indicates a transient failure that should be retried
+            if (this._isRetryableFailure(result)) {
                 if (attempt < this.maxRetries) {
                     this.stats.retries++;
 
@@ -228,24 +228,30 @@ class RequestManager {
     }
 
     /**
-     * Converts callback-based request to Promise
+     * Checks whether a failed response represents a transient error worth retrying.
+     * @private
+     * @param {Object} result - The response object
+     * @returns {boolean}
+     */
+    _isRetryableFailure(result) {
+        if (!result || result.success !== false) return false;
+        const retryableErrors = ["ERROR_CONNECTION_FAILURE", "REQUEST_TIMEOUT"];
+        return retryableErrors.includes(result.error);
+    }
+
+    /**
+     * Converts callback-based request to Promise.
+     * Timeout is handled exclusively by _withTimeout to avoid duplicate
+     * timers racing against each other.
      * @private
      */
-    // Add 30s timeout inside _promisifyRequest
-
     _promisifyRequest(requestFn) {
         return new Promise((resolve, reject) => {
-            const timeout = setTimeout(() => {
-                resolve({ success: false, error: "REQUEST_TIMEOUT" });
-            }, this.timeoutMs);
-
             try {
                 requestFn(result => {
-                    clearTimeout(timeout);
                     resolve(result);
                 });
             } catch (error) {
-                clearTimeout(timeout);
                 reject(error);
             }
         });
@@ -260,11 +266,9 @@ class RequestManager {
     _withTimeout(promise, timeoutMs) {
         let timeoutId;
 
-        const timeoutPromise = new Promise((_, reject) => {
+        const timeoutPromise = new Promise(resolve => {
             timeoutId = setTimeout(() => {
-                const error = new Error(`Request timeout after ${timeoutMs}ms`);
-                error.name = "TimeoutError";
-                reject(error);
+                resolve({ success: false, error: "REQUEST_TIMEOUT" });
             }, timeoutMs);
         });
 

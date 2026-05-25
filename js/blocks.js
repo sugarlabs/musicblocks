@@ -2748,7 +2748,7 @@ class Blocks {
                         }
                     }
                     obj = myBlock.value.split(" ");
-                    label = _(obj[0]) + " " + obj[1];
+                    label = `${_(obj[0])} ${obj[1]}`;
                     break;
                 case "grid":
                     label = _(myBlock.value);
@@ -3521,7 +3521,7 @@ class Blocks {
                     const v = args[1];
                     that.blockList[b].value = v;
                     const o = v.split(" ");
-                    that.blockList[b].text.text = _(o[0]) + " " + o[1];
+                    that.blockList[b].text.text = `${_(o[0])} ${o[1]}`;
                     that.blockList[b].container.updateCache();
                 };
 
@@ -3532,7 +3532,7 @@ class Blocks {
                     const v = args[1];
                     that.blockList[b].value = v;
                     const o = v.split(" ");
-                    that.blockList[b].text.text = _(o[0]) + " " + o[1];
+                    that.blockList[b].text.text = `${_(o[0])} ${o[1]}`;
                     that.blockList[b].container.updateCache();
                 };
 
@@ -5399,17 +5399,19 @@ class Blocks {
                     if (["show", "turtleshell", "customsample"].includes(blockObjs[i][1])) {
                         switch (blockObjs[i][1]) {
                             case "show":
-                                name =
-                                    _("Show").toLowerCase() + "-" + MathUtility.doRandom(0, 1000);
+                                name = `${_("Show").toLowerCase()}-${MathUtility.doRandom(
+                                    0,
+                                    1000
+                                )}`;
                                 break;
                             case "turtleshell":
-                                name = _("avatar") + "-" + MathUtility.doRandom(0, 1000);
+                                name = `${_("avatar")}-${MathUtility.doRandom(0, 1000)}`;
                                 break;
                             case "sample":
-                                name = _("sample") + "-" + MathUtility.doRandom(0, 1000);
+                                name = `${_("sample")}-${MathUtility.doRandom(0, 1000)}`;
                                 break;
                             default:
-                                name = blockObjs[i][1] + "-" + MathUtility.doRandom(0, 1000);
+                                name = `${blockObjs[i][1]}-${MathUtility.doRandom(0, 1000)}`;
                                 break;
                         }
                         break;

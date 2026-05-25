@@ -731,8 +731,18 @@ describe("AIDebuggerWidget", () => {
             expect(debuggerWidget.chatHistory).toHaveLength(0);
         });
 
+        test("shows consent banner and does not send message if consent not given", () => {
+            debuggerWidget.messageInput.value = "Hello AI";
+            debuggerWidget._showConsentBanner = jest.fn();
+            debuggerWidget._sendMessage();
+            expect(debuggerWidget.chatHistory).toHaveLength(0);
+            expect(debuggerWidget._showConsentBanner).toHaveBeenCalled();
+            expect(debuggerWidget._sendToBackend).not.toHaveBeenCalled();
+        });
+
         test("sends message and clears input", () => {
             debuggerWidget.messageInput.value = "Hello AI";
+            debuggerWidget._consentGiven = true;
             debuggerWidget._sendMessage();
             expect(debuggerWidget.chatHistory).toHaveLength(1);
             expect(debuggerWidget.chatHistory[0].type).toBe("user");

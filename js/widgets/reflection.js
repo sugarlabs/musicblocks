@@ -372,7 +372,7 @@ class ReflectionMatrix {
 
             if (reply.error) {
                 this.hideTypingIndicator();
-                this.activity.errorMsg(_("Failed to send message"), 3000);
+                this.activity.errorMsg(_("Failed to send message."), 3000);
                 continue;
             }
 
@@ -615,7 +615,7 @@ class ReflectionMatrix {
 
         if (reply.error) {
             this.hideTypingIndicator();
-            this.activity.errorMsg(_("Failed to send message"), 3000);
+            this.activity.errorMsg(_("Failed to send message."), 3000);
             return;
         }
 
