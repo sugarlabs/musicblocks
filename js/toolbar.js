@@ -169,9 +169,9 @@ class Toolbar {
                 ["ja", "日本語", "innerHTML"],
                 ["ko", "한국인", "innerHTML"],
                 ["es", "español", "innerHTML"],
-		["fr", "français", "innerHTML"],
-		["de", "Deutsch", "innerHTML"],
-		["it", "italiana", "innerHTML"],
+                ["fr", "français", "innerHTML"],
+                ["de", "Deutsch", "innerHTML"],
+                ["it", "italiana", "innerHTML"],
                 ["pt", "português", "innerHTML"],
                 ["kana", "にほんご", "innerHTML"],
                 ["zhCN", "中文", "innerHTML"],
@@ -295,9 +295,9 @@ class Toolbar {
                 ["ja", "日本語", "innerHTML"],
                 ["ko", "한국인", "innerHTML"],
                 ["es", "español", "innerHTML"],
-		["fr", "français", "innerHTML"],
-		["de", "Deutsch", "innerHTML"],
-		["it", "italiana", "innerHTML"],
+                ["fr", "français", "innerHTML"],
+                ["de", "Deutsch", "innerHTML"],
+                ["it", "italiana", "innerHTML"],
                 ["pt", "português", "innerHTML"],
                 ["kana", "にほんご", "innerHTML"],
                 ["zhCN", "中文", "innerHTML"],
@@ -1602,9 +1602,9 @@ class Toolbar {
             "enUK",
             "es",
             "pt",
-	    "fr",
-	    "it",
-	    "de",
+            "fr",
+            "it",
+            "de",
             "ko",
             "ja",
             "kana",
@@ -2558,8 +2558,8 @@ class FocusCycleManager {
             idx === -1
                 ? 1 // safety fallback → toolbar
                 : reverse
-                ? (idx - 1 + this._zones.length) % this._zones.length
-                : (idx + 1) % this._zones.length;
+                  ? (idx - 1 + this._zones.length) % this._zones.length
+                  : (idx + 1) % this._zones.length;
 
         // Clean up the zone we are leaving.
         this._leaveZone(this._currentZone);

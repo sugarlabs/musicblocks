@@ -2466,9 +2466,12 @@ function TemperamentWidget() {
             }
 
             if (i <= pitchNumber && i >= 0 && that._playing && p < 2) {
-                setTimeout(function () {
-                    __playLoop(i);
-                }, Singer.defaultBPMFactor * 1000 * duration);
+                setTimeout(
+                    function () {
+                        __playLoop(i);
+                    },
+                    Singer.defaultBPMFactor * 1000 * duration
+                );
             } else {
                 that.inbetween = true;
             }
@@ -2487,17 +2490,20 @@ function TemperamentWidget() {
                 that._playing = false;
                 that.playbackForward = true;
                 this.inbetween = false;
-                setTimeout(function () {
-                    that.notesCircle.navItems[0].fillAttr =
-                        platformColor.selectorBackground || "#c8C8C8";
-                    that.notesCircle.navItems[0].sliceHoverAttr.fill =
-                        platformColor.selectorBackground || "#c8C8C8";
-                    that.notesCircle.navItems[0].slicePathAttr.fill =
-                        platformColor.selectorBackground || "#c8C8C8";
-                    that.notesCircle.navItems[0].sliceSelectedAttr.fill =
-                        platformColor.selectorBackground || "#c8C8C8";
-                    that.notesCircle.refreshWheel();
-                }, Singer.defaultBPMFactor * 1000 * duration);
+                setTimeout(
+                    function () {
+                        that.notesCircle.navItems[0].fillAttr =
+                            platformColor.selectorBackground || "#c8C8C8";
+                        that.notesCircle.navItems[0].sliceHoverAttr.fill =
+                            platformColor.selectorBackground || "#c8C8C8";
+                        that.notesCircle.navItems[0].slicePathAttr.fill =
+                            platformColor.selectorBackground || "#c8C8C8";
+                        that.notesCircle.navItems[0].sliceSelectedAttr.fill =
+                            platformColor.selectorBackground || "#c8C8C8";
+                        that.notesCircle.refreshWheel();
+                    },
+                    Singer.defaultBPMFactor * 1000 * duration
+                );
             }
         };
         if (

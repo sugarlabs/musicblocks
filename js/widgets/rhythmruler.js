@@ -1176,16 +1176,19 @@ class RhythmRuler {
 
                 // Play count-off based on meter (e.g., 4 beats for 4/4, 3 beats for 3/4)
                 for (let i = 0; i < beatsPerMeasure; i++) {
-                    this._setWidgetTimeout(() => {
-                        this.activity.logo.synth.trigger(
-                            0,
-                            "C4",
-                            Singer.defaultBPMFactor / 16,
-                            drum,
-                            null,
-                            null
-                        );
-                    }, (interval * i) / beatsPerMeasure);
+                    this._setWidgetTimeout(
+                        () => {
+                            this.activity.logo.synth.trigger(
+                                0,
+                                "C4",
+                                Singer.defaultBPMFactor / 16,
+                                drum,
+                                null,
+                                null
+                            );
+                        },
+                        (interval * i) / beatsPerMeasure
+                    );
                 }
 
                 this._setWidgetTimeout(() => {
@@ -2235,16 +2238,19 @@ class RhythmRuler {
             this._offsets[rulerNo] = d.getTime() - this._startingTime - this._elapsedTimes[rulerNo];
         }
 
-        this._setWidgetTimeout(() => {
-            colIndex += 1;
-            if (colIndex === noteValues.length) {
-                colIndex = 0;
-            }
+        this._setWidgetTimeout(
+            () => {
+                colIndex += 1;
+                if (colIndex === noteValues.length) {
+                    colIndex = 0;
+                }
 
-            if (this._playing) {
-                this.__loop(noteTime, rulerNo, colIndex);
-            }
-        }, Singer.defaultBPMFactor * 1000 * noteTime - this._offsets[rulerNo]);
+                if (this._playing) {
+                    this.__loop(noteTime, rulerNo, colIndex);
+                }
+            },
+            Singer.defaultBPMFactor * 1000 * noteTime - this._offsets[rulerNo]
+        );
 
         this._elapsedTimes[rulerNo] += Singer.defaultBPMFactor * 1000 * noteTime;
     }
