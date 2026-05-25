@@ -2283,7 +2283,7 @@ msgstr "กำลังสร้างบล็อกเพิ่มเติม
 #: js/activity.js:2438
 #. AUTOTRANSLATED: Google Translate
 msgid "Do Re Mi Fa Sol La Ti Do"
-msgstr "โดเรมีฟาซอลลาติโด"
+msgstr ""
 
 
 #: js/activity.js:2439
