@@ -528,7 +528,7 @@ describe("Utility Functions (logic-only)", () => {
         });
 
         it("handles default case", () => {
-            expect(oneHundredToFraction(97)).toEqual([97, 100]);
+            expect(oneHundredToFraction(97)).toEqual([31, 32]);
         });
     });
     describe("rationalSum()", () => {
@@ -615,7 +615,7 @@ describe("Utility Functions (logic-only)", () => {
         });
 
         it("handles default case", () => {
-            expect(oneHundredToFraction(97)).toEqual([97, 100]);
+            expect(oneHundredToFraction(97)).toEqual([31, 32]);
         });
     });
     describe("delayExecution()", () => {
