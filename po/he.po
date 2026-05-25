@@ -4259,7 +4259,7 @@ msgstr "פשוט 1"
 #: js/utils/musicutils.js:1184
 #. AUTOTRANSLATED: Google Translate
 msgid "simple 2"
-msgstr "Error 500 (Server Error)!!1500.That’s an error.There was an error. Please try again later.That’s all we know."
+msgstr "פשוט 2"
 
 
 #: js/utils/musicutils.js:1185
@@ -6473,7 +6473,7 @@ msgstr "הבלוק השמאלי מסובב את העכבר שמאלה."
 #: js/blocks/GraphicsBlocks.js:920
 #. AUTOTRANSLATED: Google Translate
 msgid "The Left block turns the turtle to the left."
-msgstr "Error 500 (Server Error)!!1500.That’s an error.There was an error. Please try again later.That’s all we know."
+msgstr "הבלוק השמאלי מסובב את הצב שמאלה."
 
 
 #: js/blocks/GraphicsBlocks.js:929

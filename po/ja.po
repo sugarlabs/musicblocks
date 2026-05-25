@@ -2439,7 +2439,7 @@ msgstr "ブロック検索が開いているときに非表示にする"
 
 #: js/activity.js:7586
 msgid "You can type d to create a do block and r to create a re block etc."
-msgstr "キーボードを使うと、パレットボタンからブロックをドラッグして配置するだけでなく、ボタンをおすだけでちょくせつブロックを置くことができる。<br><br>★ショートカットキー<br><em> d</em> …… 「ド」（４分音符、４オクターヴ）<br><em> r</em> …… 「レ」（４分音符、４オクターヴ）<br><em> m</em> …… 「ミ」（４分音符、４オクターヴ）<br><em> f</em> …… 「ファ」（４分音符、４オクターヴ）<br><em> s</em> …… 「ソ」（４分音符、４オクターヴ）<br><em> l</em> …… 「ラ」（４分音符、４オクターヴ）<br><em> t</em> …… 「シ」（４分音符、４オクターヴ）<br>"
+msgstr "キーボードを使うと、パレットボタンからブロックをドラッグして配置するだけでなく、ボタンをおすだけでちょくせつブロックを置くことができる。★ショートカットキー d …… 「ド」（４分音符、４オクターヴ） r …… 「レ」（４分音符、４オクターヴ） m …… 「ミ」（４分音符、４オクターヴ） f</em> …… 「ファ」（４分音符、４オクターヴ s …… 「ソ」（４分音符、４オクターヴ） l …… 「ラ」（４分音符、４オクターヴ） t …… 「シ」（４分音符、４オクターヴ）"
 
 
 #: js/activity.js:7593
@@ -10149,7 +10149,7 @@ msgstr "アランと話す"
 #: js/widgets/reflection.js:171
 #. AUTOTRANSLATED: Google Translate
 msgid "Talk with Beethoven"
-msgstr "Error 500 (Server Error)!!1500.That’s an error.There was an error. Please try again later.That’s all we know."
+msgstr "ベートーヴェンとの話す"
 
 
 #: js/widgets/reflection.js:178

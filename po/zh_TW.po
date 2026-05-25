@@ -1746,7 +1746,7 @@ msgstr "清除"
 #: js/turtledefs.js:682
 #. AUTOTRANSLATED: Google Translate
 msgid "Clear the screen and return the mice to their initial positions."
-msgstr "Error 500 (Server Error)!!1500.That’s an error.There was an error. Please try again later.That’s all we know."
+msgstr ""
 
 
 #: js/turtledefs.js:686
@@ -1911,7 +1911,7 @@ msgstr "恭喜。"
 #: js/turtledefs.js:764
 #. AUTOTRANSLATED: Google Translate
 msgid "You have finished the tour. Please enjoy Turtle Blocks!"
-msgstr "Error 500 (Server Error)!!1500.That’s an error.There was an error. Please try again later.That’s all we know."
+msgstr ""
 
 
 #: js/turtledefs.js:770
@@ -1923,7 +1923,7 @@ msgstr "Music Blocks 是用來探索音樂概念的開源工具集合。"
 #: js/turtledefs.js:774
 #. AUTOTRANSLATED: Google Translate
 msgid "A full list of contributors can be found in the Music Blocks GitHub repository."
-msgstr "Error 500 (Server Error)!!1500.That’s an error.There was an error. Please try again later.That’s all we know."
+msgstr ""
 
 
 #: js/turtledefs.js:778
@@ -1935,7 +1935,7 @@ msgstr "Music Blocks 根據 AGPL 獲得許可。"
 #: js/turtledefs.js:783
 #. AUTOTRANSLATED: Google Translate
 msgid "Music Blocks GitHub repository"
-msgstr "Error 500 (Server Error)!!1500.That’s an error.There was an error. Please try again later.That’s all we know."
+msgstr ""
 
 
 #: js/turtledefs.js:786
@@ -2090,7 +2090,7 @@ msgstr "切換到初學者模式"
 #: js/toolbar.js:346
 #. AUTOTRANSLATED: Google Translate
 msgid "Switch to advanced mode"
-msgstr "Error 500 (Server Error)!!1500.That’s an error.There was an error. Please try again later.That’s all we know."
+msgstr ""
 
 
 #: js/toolbar.js:158
@@ -5348,7 +5348,7 @@ msgstr "值1"
 #: js/blocks/BoxesBlocks.js:118
 #. AUTOTRANSLATED: Google Translate
 msgid "Block does not support incrementing."
-msgstr "Error 500 (Server Error)!!1500.That’s an error.There was an error. Please try again later.That’s all we know."
+msgstr ""
 
 
 #: js/blocks/BoxesBlocks.js:152
@@ -6298,7 +6298,7 @@ msgstr "列印區塊在螢幕頂部顯示文字。"
 #: js/blocks/ExtrasBlocks.js:585
 #. AUTOTRANSLATED: Google Translate
 msgid "display grid"
-msgstr "Error 500 (Server Error)!!1500.That’s an error.There was an error. Please try again later.That’s all we know."
+msgstr ""
 
 
 #: js/blocks/ExtrasBlocks.js:590
@@ -8502,7 +8502,7 @@ msgstr "節拍因子區塊傳回音符值與節拍音符值的比率。"
 #: js/blocks/MeterBlocks.js:167
 #. AUTOTRANSLATED: Google Translate
 msgid "The Beats per minute block returns the current beats per minute."
-msgstr "Error 500 (Server Error)!!1500.That’s an error.There was an error. Please try again later.That’s all we know."
+msgstr ""
 
 
 #: js/blocks/MeterBlocks.js:176
@@ -10009,7 +10009,7 @@ msgstr "遊標移出"
 #.TRANS: hover
 #. AUTOTRANSLATED: Google Translate
 msgid "The Cursor out block triggers an event when the cursor is moved off of a mouse."
-msgstr "Error 500 (Server Error)!!1500.That’s an error.There was an error. Please try again later.That’s all we know."
+msgstr ""
 
 
 #: js/blocks/SensorsBlocks.js:411
@@ -10082,7 +10082,7 @@ msgstr "時間"
 #: js/blocks/SensorsBlocks.js:707
 #. AUTOTRANSLATED: Google Translate
 msgid "The Time block returns the number of seconds that the program has been running."
-msgstr "Error 500 (Server Error)!!1500.That’s an error.There was an error. Please try again later.That’s all we know."
+msgstr ""
 
 
 #: js/blocks/SensorsBlocks.js:746
@@ -10294,7 +10294,7 @@ msgstr "儀表塊打開一個工具來為儀表選擇強節拍。"
 #: js/blocks/WidgetBlocks.js:642
 #. AUTOTRANSLATED: Google Translate
 msgid "The oscilloscope block opens a tool to visualize waveforms."
-msgstr "Error 500 (Server Error)!!1500.That’s an error.There was an error. Please try again later.That’s all we know."
+msgstr ""
 
 
 #: js/blocks/WidgetBlocks.js:647

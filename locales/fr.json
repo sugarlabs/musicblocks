@@ -335,7 +335,7 @@
   "You can type d to create a do block and r to create a re block etc.": "Vous pouvez taper d pour créer un bloc do et r pour créer un bloc re, etc.",
   "Editing": "Édition",
   "Copy selected stack.": "Copie la pile sélectionnée.",
-  "Paste previous stack.": "Error 500 (Server Error)!!1500.That’s an error.There was an error. Please try again later.That’s all we know.",
+  "Paste previous stack.": "Coller la pile précédente",
   "Open the JSON paste box.": "Ouvrez la boîte de collage JSON.",
   "Paste JSON when the paste box is focused.": "Collez JSON lorsque la zone de collage est ciblée.",
   "Extract the active block.": "Extrayez le bloc actif.",
