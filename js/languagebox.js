@@ -86,6 +86,33 @@ class LanguageBox {
      * @public
      * @returns {void}
      */
+    de_onclick() {
+        this._language = "de";
+        this.hide();
+    }
+
+    /**
+     * @public
+     * @returns {void}
+     */
+    fr_onclick() {
+        this._language = "fr";
+        this.hide();
+    }
+
+    /**
+     * @public
+     * @returns {void}
+     */
+    it_onclick() {
+        this._language = "it";
+        this.hide();
+    }
+
+    /**
+     * @public
+     * @returns {void}
+     */
     pt_onclick() {
         this._language = "pt";
         this.hide();
@@ -256,6 +283,9 @@ class LanguageBox {
             default: _("Refresh your browser to change your language preference."),
             enUS: "Refresh your browser to change your language preference.",
             enUK: "Refresh your browser to change your language preference.",
+	    de: "Aktualisieren Sie Ihren Browser, um Ihre Spracheinstellung zu ändern.",
+	    fr: "Actualisez votre navigateur pour modifier votre préférence linguistique.",
+	    it: "Aggiorna il browser per modificare la tua preferenza linguistica.",
             ja: "言語を変えるには、ブラウザをこうしんしてください。",
             kana: "げんごを かえるには、ブラウザを こうしんしてください。",
             ko: "언어 기본 설정을 변경하려면 브라우저를 새로 고치십시오.",
