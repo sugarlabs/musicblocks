@@ -313,10 +313,10 @@ class SaveInterface {
         }
 
         file = file
-            .replace(/{{ project_description }}/g, escapeHTML(description))
-            .replace(/{{ project_name }}/g, escapeHTML(name))
-            .replace(/{{ data }}/g, escapeHTML(data))
-            .replace(/{{ project_image }}/g, escapeHTML(image));
+            .replace(/{{ project_description }}/g, () => escapeHTML(description))
+            .replace(/{{ project_name }}/g, () => escapeHTML(name))
+            .replace(/{{ data }}/g, () => escapeHTML(data))
+            .replace(/{{ project_image }}/g, () => escapeHTML(image));
 
         return file;
     }
