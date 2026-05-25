@@ -1607,22 +1607,23 @@ class Toolbar {
             "fr",
             "it",
             "de",
-            "ko",
             "ja",
             "kana",
+            "ko",
             "zhCN",
             "th",
-            "tr",
             "ayc",
             "quz",
             "gug",
             "hi",
-            "ibo",
-            "ar",
+	    "ta",
             "te",
+            "ibo",
+            "tr",
+            "ar",
             "bn",
-            "he",
-            "ur"
+            "ur",
+            "he"
         ];
 
         /**
