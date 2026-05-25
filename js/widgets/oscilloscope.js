@@ -73,6 +73,13 @@ class Oscilloscope {
         // UI state
         this.zoomFactor = 40.0;
         this.verticalOffset = 0;
+        this._bgColor =
+            getComputedStyle(document.body).getPropertyValue("--bg").trim() || "#ffffff";
+        this._onThemeChange = () => {
+            this._bgColor =
+                getComputedStyle(document.body).getPropertyValue("--bg").trim() || "#ffffff";
+        };
+        document.body.addEventListener("themechange", this._onThemeChange);
 
         // Zoom buttons
         const zoomInButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, _("Zoom In"));
@@ -182,6 +189,7 @@ class Oscilloscope {
         this._stopAnimation();
 
         document.removeEventListener("visibilitychange", this._handleVisibilityChange);
+        document.body.removeEventListener("themechange", this._onThemeChange);
 
         this.drawVisualIDs = {};
         this._canvasState = {};
@@ -248,8 +256,7 @@ class Oscilloscope {
             const dataArray = analyser.getValue();
             const bufferLength = dataArray.length;
 
-            ctx.fillStyle =
-                getComputedStyle(document.body).getPropertyValue("--bg").trim() || "#ffffff";
+            ctx.fillStyle = this._bgColor;
             ctx.fillRect(0, 0, state.width, state.height);
             ctx.lineWidth = 2;
             ctx.strokeStyle = state.turtle.painter._canvasColor;
