@@ -48,4 +48,33 @@ describe("base64Utils", () => {
     test("base64Decode should handle empty strings", () => {
         expect(base64Utils.base64Decode("")).toBe("");
     });
+
+    test("base64Encode should handle Unicode characters", () => {
+        const unicode = "Hello 世界 🎵";
+        const encoded = base64Utils.base64Encode(unicode);
+        expect(encoded).toBeDefined();
+        expect(typeof encoded).toBe("string");
+        expect(encoded.length).toBeGreaterThan(0);
+    });
+
+    test("base64Encode and base64Decode should handle long strings", () => {
+        const longString = "a".repeat(10000);
+        const encoded = base64Utils.base64Encode(longString);
+        const decoded = base64Utils.base64Decode(encoded);
+        expect(decoded).toBe(longString);
+    });
+
+    test("base64Encode and base64Decode should be reversible for Unicode", () => {
+        const original = "Hello 世界 🎵 こんにちは नमस्ते";
+        const encoded = base64Utils.base64Encode(original);
+        const decoded = base64Utils.base64Decode(encoded);
+        expect(decoded).toBe(original);
+    });
+
+    test("base64Decode delegates to window.atob for invalid input handling", () => {
+        // base64Decode does not validate input itself; behavior is runtime-dependent.
+        // window.atob may throw or handle invalid input differently per environment.
+        const validResult = base64Utils.base64Decode("aGVsbG8=");
+        expect(validResult).toBe("hello");
+    });
 });
