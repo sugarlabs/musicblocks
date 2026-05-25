@@ -610,8 +610,8 @@ class SaveInterface {
                     try {
                         activity.save.afterSaveAbc();
                     } catch (e) {
-                        console.error("Error generating ABC output:", e);
-                        activity.errorMsg(_("Error generating ABC output. ") + e.message);
+                        console.error("Error generating ABC output: ", e);
+                        activity.errorMsg(`${_("Error generating ABC output.")} ${e.message}`);
                     } finally {
                         document.body.style.cursor = "default";
                     }
@@ -650,8 +650,8 @@ class SaveInterface {
                 const abc = encodeURIComponent(saveAbcOutput(this.activity));
                 this.activity.save.download("abc", "data:text;utf8," + abc, null);
             } catch (e) {
-                console.error("Error in ABC output generation:", e);
-                this.activity.errorMsg(_("Error generating ABC output. ") + e.message);
+                console.error("Error in ABC output generation: ", e);
+                this.activity.errorMsg(`${_("Error generating ABC output.")} ${e.message}`);
             } finally {
                 document.body.style.cursor = "default";
             }
@@ -840,8 +840,10 @@ class SaveInterface {
                     try {
                         this.afterSaveLilypond();
                     } catch (e) {
-                        console.error("Error generating Lilypond output:", e);
-                        this.activity.errorMsg(_("Error generating Lilypond output. ") + e.message);
+                        console.error("Error generating Lilypond output: ", e);
+                        this.activity.errorMsg(
+                            `${_("Error generating Lilypond output.")} ${e.message}`
+                        );
                     } finally {
                         document.body.style.cursor = "default";
                     }
@@ -898,8 +900,8 @@ class SaveInterface {
                         break;
                 }
             } catch (e) {
-                console.error("Error in Lilypond output generation:", e);
-                this.activity.errorMsg(_("Error generating Lilypond output. ") + e.message);
+                console.error("Error in Lilypond output generation: ", e);
+                this.activity.errorMsg(`${_("Error generating Lilypond output.")} ${e.message}`);
             } finally {
                 this.notationConvert = "";
                 document.body.style.cursor = "default";
@@ -924,8 +926,8 @@ class SaveInterface {
         filename = docById("fileName").value;
         const showCopiedMessage = () => {
             this.activity.textMsg(
-                _("The Lilypond code is copied to clipboard. You can paste it here: ") +
-                    "<a href='http://hacklily.org' target='_blank' rel='noopener noreferrer'>http://hacklily.org</a> "
+                _("The Lilypond code is copied to clipboard. You can paste it here:") +
+                    " <a href='http://hacklily.org' target='_blank' rel='noopener noreferrer'>http://hacklily.org</a> "
             );
         };
 

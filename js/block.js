@@ -2572,7 +2572,7 @@ class Block {
         let v = "";
         const nblk = this.blocks.findNoteBlock(lastIntervalBlock);
         if (nblk === null) {
-            this.collapseText.text = _("scalar interval") + itext;
+            this.collapseText.text = _("scalar interval %s").replace(/%s/g, itext);
         } else {
             c = this.blocks.blockList[nblk].connections[1];
             if (c !== null) {
@@ -2595,7 +2595,7 @@ class Block {
             c = this.blocks.findFirstPitchBlock(this.blocks.blockList[nblk].connections[2]);
             const p = this._getPitch(c);
             if (c === null || p === "") {
-                this.collapseText.text = _("scalar interval") + itext;
+                this.collapseText.text = _("scalar interval %s").replace(/%s/g, itext);
             } else {
                 // Are there more pitch blocks in this note?
                 c = this.blocks.findFirstPitchBlock(last(this.blocks.blockList[c].connections));
@@ -2645,7 +2645,7 @@ class Block {
                     v = v.replace(NSYMBOLS[vi], RSYMBOLS[vi]);
                 }
             }
-            this.collapseText.text = _("silence") + " | " + v;
+            this.collapseText.text = `${_("silence")} | ${v}`;
         } else if (p === "" && v === "") {
             this.collapseText.text = _("note value");
         } else {
@@ -2702,7 +2702,7 @@ class Block {
         c = this.blocks.findFirstPitchBlock(c);
         const p = this._getPitch(c);
         if (c === null) {
-            this.collapseText.text = _("silence") + " | " + v;
+            this.collapseText.text = `${_("silence")} | ${v}`;
         } else if (p === "" && v === "") {
             this.collapseText.text = _("note value");
         } else {
@@ -2829,13 +2829,13 @@ class Block {
                     this.blocks.blockList[c1].value < 0
                 ) {
                     //.TRANS: scalar step
-                    return _("down") + " " + Math.abs(this.blocks.blockList[c1].value);
-                } else return _("up") + " " + this.blocks.blockList[c1].value;
+                    return `${_("down")} ${Math.abs(this.blocks.blockList[c1].value)}`;
+                } else return `${_("up")} ${this.blocks.blockList[c1].value}`;
             case "pitchnumber":
                 c1 = this.blocks.blockList[c].connections[1];
                 if (this.blocks.blockList[c1].name === "number") {
                     //.TRANS: pitch number
-                    return _("pitch") + " " + this.blocks.blockList[c1].value;
+                    return `${_("pitch")} ${this.blocks.blockList[c1].value}`;
                 }
                 break;
             case "playdrum":
@@ -4728,7 +4728,7 @@ class Block {
 
             if (isNaN(this.value)) {
                 const thisBlock = this.blockIndex;
-                this.activity.errorMsg(newValue + ": " + _("Not a number"), thisBlock);
+                this.activity.errorMsg(`${newValue}: ${_("Not a number")}`, thisBlock);
                 this.activity.refreshCanvas();
                 this.value = oldValue;
             }

@@ -33,7 +33,7 @@ function setupExtrasBlocks(activity) {
             super("float2string", _("fraction"));
             this.setPalette("extras", activity);
             this.setHelpString([
-                _("Convert a float to a fraction") + " 0.5 -> 1/2",
+                `${_("Convert a float to a fraction")}: 0.5 -> 1/2`,
                 "documentation",
                 null,
                 "float2string"
@@ -93,7 +93,7 @@ function setupExtrasBlocks(activity) {
                 name: _("save as ABC"),
                 args: 1,
                 argTypes: ["textin"],
-                defaults: [_("title") + ".abc"]
+                defaults: [`${_("title")}.abc`]
             });
             this.hidden = true;
             this.deprecated = true;
@@ -129,7 +129,7 @@ function setupExtrasBlocks(activity) {
                 name: _("save as Lilypond"),
                 args: 1,
                 argTypes: ["textin"],
-                defaults: [_("title") + ".ly"]
+                defaults: [`${_("title")}.ly`]
             });
             this.hidden = true;
             this.deprecated = true;
@@ -165,7 +165,7 @@ function setupExtrasBlocks(activity) {
                 name: _("save as SVG"),
                 args: 1,
                 argTypes: ["textin"],
-                defaults: [_("title") + ".svg"]
+                defaults: [`${_("title")}.svg`]
             });
             this.hidden = true;
             this.deprecated = true;

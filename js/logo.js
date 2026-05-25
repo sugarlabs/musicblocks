@@ -2125,9 +2125,9 @@ class Logo {
                                 logo.activity.save.afterSaveLilypond();
                             }
                         } catch (e) {
-                            console.error("Error generating Lilypond output:", e);
+                            console.error("Error generating Lilypond output: ", e);
                             logo.activity.errorMsg(
-                                _("Error generating Lilypond output. ") + e.message
+                                `${_("Error generating Lilypond output.")} ${e.message}`
                             );
                         } finally {
                             logo.collectingStats = false;
@@ -2138,8 +2138,10 @@ class Logo {
                         try {
                             logo.activity.save.afterSaveAbc();
                         } catch (e) {
-                            console.error("Error generating ABC output:", e);
-                            logo.activity.errorMsg(_("Error generating ABC output. ") + e.message);
+                            console.error("Error generating ABC output: ", e);
+                            logo.activity.errorMsg(
+                                `${_("Error generating ABC output.")} ${e.message}`
+                            );
                         } finally {
                             logo.runningAbc = false;
                             document.body.style.cursor = "default";
