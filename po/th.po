@@ -3053,7 +3053,7 @@ msgstr "พัก"
 #.TRANS: the note names must be separated by single spaces
 #. AUTOTRANSLATED: Google Translate
 msgid "ti la sol fa mi re do"
-msgstr "ฉันจะให้คุณคนเดียว"
+msgstr ""
 
 
 #: js/block.js:2832
