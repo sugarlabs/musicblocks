@@ -59,6 +59,13 @@ describe("setupMeterActions", () => {
                 notation: {
                     notationMeter: jest.fn(),
                     notationPickup: jest.fn()
+                },
+                _timerManager: {
+                    setInterval: jest.fn(() => 12345),
+                    clearInterval: jest.fn(),
+                    setTimeout: jest.fn(() => 1),
+                    clearTimeout: jest.fn(),
+                    clearAll: jest.fn()
                 }
             },
             errorMsg: jest.fn(),
@@ -198,8 +205,6 @@ describe("setupMeterActions", () => {
             return id === 0 ? targetTurtle : companionTurtle;
         });
 
-        global.setInterval = jest.fn(() => 12345);
-
         Singer.MeterActions.onEveryBeatDo("testAction", false, null, 0, 1);
 
         const listenerFunc = activity.logo.setTurtleListener.mock.calls[0][2];
@@ -226,8 +231,6 @@ describe("setupMeterActions", () => {
         activity.turtles.ithTurtle.mockImplementation(id => {
             return id === 0 ? targetTurtle : companionTurtle;
         });
-
-        global.setInterval = jest.fn(() => 12345);
 
         Singer.MeterActions.onEveryBeatDo("testAction", false, null, 0, 1);
 
@@ -260,13 +263,13 @@ describe("setupMeterActions", () => {
             return id === 0 ? targetTurtle : companionTurtle;
         });
 
-        global.clearInterval = jest.fn();
-        global.setInterval = jest.fn(() => 54321);
+        activity.logo._timerManager.setInterval.mockReturnValueOnce(54321);
 
         Singer.MeterActions.onEveryBeatDo("testAction", false, null, 0, 1);
 
-        expect(clearInterval).toHaveBeenCalledWith(12345);
-        expect(setInterval).toHaveBeenCalled();
+        expect(activity.logo._timerManager.clearInterval).toHaveBeenCalledWith(12345);
+        expect(activity.logo._timerManager.setInterval).toHaveBeenCalled();
+        expect(companionTurtle.interval).toBe(54321);
     });
 
     it("should set a listener for every note", () => {
@@ -504,7 +507,7 @@ describe("setupMeterActions", () => {
 
     it("should dispatch event on every‑beat interval callback", () => {
         let intervalCallback;
-        global.setInterval = jest.fn((cb, ms) => {
+        activity.logo._timerManager.setInterval.mockImplementationOnce(cb => {
             intervalCallback = cb;
             return 555;
         });
@@ -513,7 +516,7 @@ describe("setupMeterActions", () => {
         delete activity.turtles.getTurtle(0).companionTurtle;
         Singer.MeterActions.onEveryBeatDo("testAction", false, null, 0, 1);
         expect(activity.stage.dispatchEvent).toHaveBeenCalledTimes(1);
-        expect(setInterval).toHaveBeenCalled();
+        expect(activity.logo._timerManager.setInterval).toHaveBeenCalled();
         activity.stage.dispatchEvent.mockClear();
         intervalCallback();
         const turbo = activity.turtles.getTurtle(0).companionTurtle;
@@ -523,7 +526,7 @@ describe("setupMeterActions", () => {
 
     it("should use turtle-specific BPM for interval timer", () => {
         let intervalMs;
-        global.setInterval = jest.fn((cb, ms) => {
+        activity.logo._timerManager.setInterval.mockImplementationOnce((cb, ms) => {
             intervalMs = ms;
             return 999;
         });
@@ -533,6 +536,15 @@ describe("setupMeterActions", () => {
         Singer.MeterActions.onEveryBeatDo("testAction", false, null, 0, 1);
         expect(last).toHaveBeenCalledWith([30, 120]);
         expect(intervalMs).toBe(2000);
+    });
+
+    it("routes onEveryBeatDo through _timerManager so Stop cancels it (fixes #7222)", () => {
+        targetTurtle.id = 0;
+        delete activity.turtles.getTurtle(0).companionTurtle;
+        Singer.MeterActions.onEveryBeatDo("testAction", false, null, 0, 1);
+        // The interval must go through the managed timer, not the raw global,
+        // so that doStopTurtles -> _timerManager.clearAll() cancels it on Stop.
+        expect(activity.logo._timerManager.setInterval).toHaveBeenCalled();
     });
 
     it("should set listener when Mouse.getMouseFromTurtle returns null", () => {

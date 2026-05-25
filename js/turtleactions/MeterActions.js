@@ -221,12 +221,15 @@ function setupMeterActions(activity) {
             // Consider meter when calculating duration.
             duration = (duration * 4) / turOrg.singer.noteValuePerBeat;
 
-            // Clear any existing interval and set a new one
+            // Clear any existing interval and set a new one. Route through
+            // _timerManager so that doStopTurtles -> _timerManager.clearAll()
+            // cancels the beat callback when the user presses Stop.
             if (tur.interval !== undefined) {
-                clearInterval(tur.interval);
+                activity.logo._timerManager.clearInterval(tur.interval);
+                tur.interval = undefined;
             }
             activity.stage.dispatchEvent(eventName);
-            tur.interval = setInterval(
+            tur.interval = activity.logo._timerManager.setInterval(
                 () => activity.stage.dispatchEvent(eventName),
                 duration * 1000
             );
