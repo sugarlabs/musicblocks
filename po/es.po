@@ -120,7 +120,7 @@ msgstr "Guía de Bloques de Música"
 
 #: js/SaveInterface.js:96
 msgid "To run this project, open Music Blocks in a web browser and drag and drop this file into the browser window."
-msgstr "Para ejecutar este proyecto, abre Music Blocks en un navegador web y arrastra y suelta este archivo en la ventana del navegador."
+msgstr "Para ejecutar este proyecto, abre Bloques de Música en un navegador web y arrastra y suelta este archivo en la ventana del navegador."
 
 #: js/SaveInterface.js:100
 msgid "Alternatively, open the file in Music Blocks using the Load project button."
@@ -1239,7 +1239,7 @@ msgstr "Editor de Javascript"
 
 #: js/turtledefs.js:614
 msgid "Converts Music Block programs to JavaScript."
-msgstr "Convierte programas Music Blocks a JavaScript."
+msgstr "Convierte programas Bloques de Música a JavaScript."
 
 #: js/turtledefs.js:619
 #: js/toolbar.js:150
@@ -2039,7 +2039,7 @@ msgstr "Ocultar la búsqueda de bloques cuando esté abierta."
 
 #: js/activity.js:7586
 msgid "You can type d to create a do block and r to create a re block etc."
-msgstr "Puede escribir \"d\" para crear un bloque \"do\", \"r\" para crear un bloque \"re\", etc."
+msgstr "Puede escribir 'd' para crear un bloque 'do', 'r' para crear un bloque 're', etc."
 
 #: js/activity.js:7593
 msgid "Editing"
@@ -2164,7 +2164,7 @@ msgstr "Los atajos son sensibles al contexto. Algunos solo funcionan cuando un p
 
 #: js/activity.js:7873
 msgid "Invalid clipboard data. To paste blocks, first copy them from the Music Blocks canvas. To paste text, click inside an input field."
-msgstr "Datos del portapapeles no válidos. Para pegar bloques, cópielos primero desde el lienzo de Music Blocks. Para pegar texto, haga clic dentro de un campo de entrada."
+msgstr "Datos del portapapeles no válidos. Para pegar bloques, cópielos primero desde el lienzo de Bloques de Música. Para pegar texto, haga clic dentro de un campo de entrada."
 
 #: js/activity.js:8099
 msgid "Select is enabled."
@@ -2580,7 +2580,7 @@ msgstr "Actualice su navegador para cambiar su preferencia de idioma."
 
 #: js/languagebox.js:288
 msgid "Music Blocks is already set to this language."
-msgstr "Music Blocks ya está configurado en este idioma."
+msgstr "Bloques de Música ya está configurado en este idioma."
 
 #: js/loader.js:431
 msgid "Failed to load EaselJS. Please refresh the page."
@@ -2588,11 +2588,11 @@ msgstr "No se pudo cargar EaselJS. Por favor, actualice la página."
 
 #: js/loader.js:453
 msgid "Failed to load Music Blocks. Please refresh the page."
-msgstr "No se pudo cargar Music Blocks. Por favor, actualice la página."
+msgstr "No se pudo cargar Bloques de Música. Por favor, actualice la página."
 
 #: js/loader.js:460
 msgid "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: %s"
-msgstr "No se pudo inicializar el núcleo de Music Blocks. Por favor, actualice la página.\n\nError: %s"
+msgstr "No se pudo inicializar el núcleo de Bloques de Música. Por favor, actualice la página.\n\nError: %s"
 
 #: js/logo.js:663
 #: js/blocks/ProgramBlocks.js:259
@@ -2688,7 +2688,7 @@ msgstr "El tema ha cambiado al modo %s."
 
 #: js/themebox.js:568
 msgid "Music Blocks is already set to this theme."
-msgstr "Music Blocks ya está configurado con este tema."
+msgstr "Bloques de Música ya está configurado con este tema."
 
 #: js/turtle-singer.js:1509
 #.TRANS: partials are weighted components in a harmonic series
@@ -6415,7 +6415,7 @@ msgstr "fijar temperamento"
 
 #: js/blocks/IntervalsBlocks.js:53
 msgid "The Set temperament block is used to choose the tuning system used by Music Blocks."
-msgstr "El bloque \"Fijar temperamento\" se utiliza para elegir el sistema de afinación utilizado por Music Blocks."
+msgstr "El bloque \"Fijar temperamento\" se utiliza para elegir el sistema de afinación utilizado por Bloques de Música."
 
 #: js/blocks/IntervalsBlocks.js:99
 msgid "The Temperament name block is used to select a tuning method."
@@ -7194,7 +7194,7 @@ msgstr "Por favor, introduzca una URL de proyecto válida (por ejemplo: /index.h
 
 #: js/blocks/ProgramBlocks.js:1521
 msgid "Only Music Blocks project links are allowed (same site, musicblocks.sugarlabs.org, musicblocks.net)."
-msgstr "Solo se permiten enlaces a proyectos de Music Blocks (del mismo sitio: musicblocks.sugarlabs.org, musicblocks.net)."
+msgstr "Solo se permiten enlaces a proyectos de Bloques de Música (del mismo sitio: musicblocks.sugarlabs.org, musicblocks.net)."
 
 #: js/blocks/ProgramBlocks.js:1531
 msgid "Please allow popups for this site"
