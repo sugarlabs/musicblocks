@@ -158,6 +158,12 @@ describe("setupEnsembleBlocks", () => {
         global.getMunsellColor = jest.fn((hue, chroma, value) => `#${hue}${chroma}${value}`);
         global.TURTLESVG = "<svg>fill_color stroke_color</svg>";
         global.base64Encode = jest.fn(str => str);
+        global.parseNoteString = jest.fn(note => {
+            const match = note.match(/^([A-Ga-g][#b♯♭]?)(-?\d+)$/);
+            if (match) return [match[1], Number(match[2])];
+            const len = note.length;
+            return [note.substring(0, len - 1), Number(note[note.length - 1])];
+        });
 
         const mockTurtles = [0, 1, 2].map(index => ({
             name: index === 0 ? "Yertle" : index === 1 ? "Turtle1" : "Turtle2",
