@@ -704,4 +704,179 @@ describe("AIWidget Instance", () => {
             expect(labels).toContain("V: 1 Line 2");
         });
     });
+
+    it("should pause playback when play button is clicked while already moving", () => {
+        let playButton;
+        global.window.widgetWindows.windowFor = jest.fn(() => ({
+            clear: jest.fn(),
+            show: jest.fn(),
+            destroy: jest.fn(),
+            sendToCenter: jest.fn(),
+            isMaximized: jest.fn(() => false),
+            getWidgetFrame: jest.fn(() => ({
+                getBoundingClientRect: jest.fn(() => ({
+                    width: 800,
+                    height: 600
+                }))
+            })),
+            getWidgetBody: jest.fn(() => {
+                const div = document.createElement("div");
+                div.getBoundingClientRect = jest.fn(() => ({
+                    width: 800,
+                    height: 600
+                }));
+                return div;
+            }),
+            addButton: jest.fn(iconName => {
+                const button = {
+                    onclick: null,
+                    innerHTML: ""
+                };
+                if (iconName === "play-button.svg") {
+                    playButton = button;
+                }
+                return button;
+            })
+        }));
+        aiWidget = new AIWidget();
+        aiWidget.pause = jest.fn();
+        aiWidget.isMoving = true;
+        aiWidget.init(mockActivity);
+        playButton.onclick();
+        expect(aiWidget.pause).toHaveBeenCalled();
+        expect(aiWidget.isMoving).toBe(false);
+    });
+
+    it("should not add duplicate custom samples", () => {
+        aiWidget = new AIWidget();
+        global.CUSTOMSAMPLES = [["Piano", "existing-data"]];
+        aiWidget.sampleName = "Piano";
+        aiWidget.sampleData = "new-data";
+        aiWidget._addSample();
+        expect(CUSTOMSAMPLES.length).toBe(1);
+        expect(CUSTOMSAMPLES[0][1]).toBe("existing-data");
+    });
+
+    it("should add new custom samples when sample name is unique", () => {
+        aiWidget = new AIWidget();
+        global.CUSTOMSAMPLES = [];
+        aiWidget.sampleName = "Flute";
+        aiWidget.sampleData = "flute-data";
+        aiWidget._addSample();
+        expect(CUSTOMSAMPLES).toContainEqual(["Flute", "flute-data"]);
+    });
+
+    it("should trigger sample playback when sample name exists", () => {
+        const triggerMock = jest.fn();
+        aiWidget = new AIWidget();
+        aiWidget.activity = mockActivity;
+        aiWidget.activity.logo.synth = {
+            trigger: triggerMock
+        };
+        aiWidget.reconnectSynthsToAnalyser = jest.fn();
+        aiWidget.sampleName = "Piano";
+        aiWidget.originalSampleName = "Piano";
+        aiWidget.sampleLength = 2000;
+        aiWidget._playSample();
+        expect(aiWidget.reconnectSynthsToAnalyser).toHaveBeenCalled();
+        expect(triggerMock).toHaveBeenCalled();
+    });
+
+    it("should not trigger playback when sample name is empty", () => {
+        const triggerMock = jest.fn();
+        aiWidget = new AIWidget();
+        aiWidget.activity = mockActivity;
+        aiWidget.activity.logo.synth = {
+            trigger: triggerMock
+        };
+        aiWidget.sampleName = "";
+        aiWidget._playSample();
+        expect(triggerMock).not.toHaveBeenCalled();
+    });
+
+    it("should play and end sample playback after wait time", async () => {
+        jest.useFakeTimers();
+        aiWidget = new AIWidget();
+        aiWidget._playSample = jest.fn();
+        aiWidget._endPlaying = jest.fn();
+        const promise = aiWidget._waitAndPlaySample();
+        jest.runAllTimers();
+        const result = await promise;
+        expect(aiWidget._playSample).toHaveBeenCalled();
+        expect(aiWidget._endPlaying).toHaveBeenCalled();
+        expect(result).toBe("played");
+        jest.useRealTimers();
+    });
+
+    it("should pause playback after sample duration ends", async () => {
+        jest.useFakeTimers();
+        aiWidget = new AIWidget();
+        aiWidget.pause = jest.fn();
+        aiWidget.sampleLength = 1500;
+        const promise = aiWidget._waitAndEndPlaying();
+        jest.runAllTimers();
+        const result = await promise;
+        expect(aiWidget.pause).toHaveBeenCalled();
+        expect(result).toBe("ended");
+        jest.useRealTimers();
+    });
+
+    it("should delegate delayed playback to waitAndPlaySample", async () => {
+        aiWidget = new AIWidget();
+        aiWidget._waitAndPlaySample = jest.fn(() => Promise.resolve("played"));
+        await aiWidget._playDelayedSample();
+        expect(aiWidget._waitAndPlaySample).toHaveBeenCalled();
+    });
+
+    it("should delegate ending playback to waitAndEndPlaying", async () => {
+        aiWidget = new AIWidget();
+        aiWidget._waitAndEndPlaying = jest.fn(() => Promise.resolve("ended"));
+        await aiWidget._endPlaying();
+        expect(aiWidget._waitAndEndPlaying).toHaveBeenCalled();
+    });
+
+    it("should reconnect reference sample synth to analyser 0", () => {
+        const disconnectMock = jest.fn();
+        const connectMock = jest.fn();
+        global.instruments = [
+            {
+                [REFERENCESAMPLE]: {
+                    disconnect: disconnectMock,
+                    connect: connectMock
+                }
+            }
+        ];
+        global.Tone.Analyser = jest.fn(() => ({}));
+        aiWidget = new AIWidget();
+        aiWidget.pitchAnalysers = {
+            0: {},
+            1: {}
+        };
+        aiWidget.reconnectSynthsToAnalyser();
+        expect(disconnectMock).toHaveBeenCalled();
+        expect(connectMock).toHaveBeenCalledWith(aiWidget.pitchAnalysers[0]);
+    });
+
+    it("should reconnect custom sample synth to analyser 1", () => {
+        const disconnectMock = jest.fn();
+        const connectMock = jest.fn();
+        global.instruments = [
+            {
+                customsample_Piano: {
+                    disconnect: disconnectMock,
+                    connect: connectMock
+                }
+            }
+        ];
+        global.Tone.Analyser = jest.fn(() => ({}));
+        aiWidget = new AIWidget();
+        aiWidget.originalSampleName = "Piano";
+        aiWidget.pitchAnalysers = {
+            0: {},
+            1: {}
+        };
+        aiWidget.reconnectSynthsToAnalyser();
+        expect(disconnectMock).toHaveBeenCalled();
+        expect(connectMock).toHaveBeenCalledWith(aiWidget.pitchAnalysers[1]);
+    });
 });
