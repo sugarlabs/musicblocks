@@ -490,6 +490,16 @@ class Blocks {
 
                 this.moveStackRelative(blk, 4 * STANDARDBLOCKHEIGHT, 0);
                 this.blockMoved(blk);
+
+                // Refresh the parent's dock geometry after extracting a
+                // special input (accidentalname, notename, solfege, …).
+                // Without this, the now-empty slot keeps the dock position
+                // it had while occupied, so a subsequent re-attach attempt
+                // compares against stale coordinates and the block fails to
+                // snap (fixes #3772).
+                if (adjustDock && firstConnection != null) {
+                    this.adjustDocks(firstConnection, true);
+                }
             }
         };
 
