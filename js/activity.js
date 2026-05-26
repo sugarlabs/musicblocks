@@ -5269,19 +5269,21 @@ class Activity {
             that.keyboardEnableFlag = 0;
 
             that.sessionData = null;
+            const currentProject = that.storage.currentProject;
+            const sessionKey = currentProject !== undefined ? "SESSION" + currentProject : null;
 
             // Try restarting where we were when we hit save.
             if (that.planet) {
                 that.sessionData = await that.planet.openCurrentProject();
                 if (!that.sessionData) {
-                    const currentProject = that.storage.currentProject;
                     if (currentProject !== undefined) {
-                        that.sessionData = that.storage["SESSION" + currentProject];
+                        that.sessionData = that.storage[sessionKey];
                     }
                 }
             } else {
-                const currentProject = that.storage.currentProject;
-                that.sessionData = that.storage["SESSION" + currentProject];
+                if (sessionKey !== null) {
+                    that.sessionData = that.storage[sessionKey];
+                }
             }
 
             // After we have finished loading the project, clear all
@@ -5303,6 +5305,18 @@ class Activity {
                     }
                 } catch (e) {
                     console.error(e);
+                    if (sessionKey !== null) {
+                        try {
+                            if (typeof that.storage.removeItem === "function") {
+                                that.storage.removeItem(sessionKey);
+                            } else {
+                                delete that.storage[sessionKey];
+                            }
+                        } catch (storageError) {
+                            console.error(storageError);
+                        }
+                    }
+                    that.justLoadStart();
                 }
             } else {
                 that.justLoadStart();
