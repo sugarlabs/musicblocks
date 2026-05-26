@@ -214,6 +214,13 @@ describe("setupPitchBlocks", () => {
             }
         };
 
+        global.parseNoteString = jest.fn(note => {
+            const match = note.match(/^([A-Ga-g][#b♯♭]?)(-?\d+)$/);
+            if (match) return [match[1], Number(match[2])];
+            const len = note.length;
+            return [note.substring(0, len - 1), Number(note[note.length - 1])];
+        });
+
         const mockTurtles = [0, 1].map(index => ({
             name: index === 0 ? "Yertle" : "Turtle1",
             singer: {
