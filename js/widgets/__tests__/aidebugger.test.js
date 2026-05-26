@@ -20,11 +20,29 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+// Note: window.location.hostname is "localhost" because jest.config.js sets
+// testEnvironmentOptions: { url: "http://localhost/" }
+// This means BACKEND_CONFIG.BASE_URL resolves to "http://localhost:8000"
+// and no console.warn fires on module load.
+
 const AIDebuggerWidget = require("../aidebugger.js");
 
 // Mock globals
 global._ = str => str;
 global._THIS_IS_MUSIC_BLOCKS_ = true;
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/** Creates a minimal activity mock suitable for most tests. */
+function makeActivity(projectData = "[]") {
+    return {
+        textMsg: jest.fn(),
+        prepareExport: jest.fn(() => projectData),
+        isInputON: false
+    };
+}
 
 describe("AIDebuggerWidget", () => {
     describe("Constructor", () => {
@@ -55,6 +73,11 @@ describe("AIDebuggerWidget", () => {
         test("_isProcessing starts as false", () => {
             const debuggerWidget = new AIDebuggerWidget();
             expect(debuggerWidget._isProcessing).toBe(false);
+        });
+
+        test("_consentGiven starts as false", () => {
+            const debuggerWidget = new AIDebuggerWidget();
+            expect(debuggerWidget._consentGiven).toBe(false);
         });
     });
 
@@ -706,6 +729,30 @@ describe("AIDebuggerWidget", () => {
         });
     });
 
+    describe("_addWelcomeMessage", () => {
+        let debuggerWidget;
+
+        beforeEach(() => {
+            debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget.chatLog = document.createElement("div");
+        });
+
+        test("adds a system message to the chat log", () => {
+            debuggerWidget._addWelcomeMessage();
+            expect(debuggerWidget.chatLog.children.length).toBe(1);
+            // Welcome messages use system styling (italic, centered)
+            const added = debuggerWidget.chatLog.children[0];
+            expect(added.style.alignSelf).toBe("center");
+        });
+
+        test("includes Music Blocks text when _THIS_IS_MUSIC_BLOCKS_ is true", () => {
+            global._THIS_IS_MUSIC_BLOCKS_ = true;
+            debuggerWidget._addWelcomeMessage();
+            const added = debuggerWidget.chatLog.children[0];
+            expect(added.textContent).toMatch(/Music Blocks Debugger/);
+        });
+    });
+
     describe("_sendMessage", () => {
         let debuggerWidget;
 
@@ -758,7 +805,7 @@ describe("AIDebuggerWidget", () => {
         beforeEach(() => {
             debuggerWidget = new AIDebuggerWidget();
             debuggerWidget.chatLog = document.createElement("div");
-            debuggerWidget.activity = { textMsg: jest.fn(), prepareExport: jest.fn(() => "[]") };
+            debuggerWidget.activity = makeActivity();
             debuggerWidget._loadProjectAndInitialize = jest.fn();
             debuggerWidget._updateMessageCount = jest.fn();
         });
@@ -792,6 +839,13 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget._hideTypingIndicator();
             expect(debuggerWidget.chatLog.querySelectorAll(".typing-indicator").length).toBe(0);
         });
+
+        test("_hideTypingIndicator does not throw when chatLog is null", () => {
+            // Regression guard: widget.onclose calls _hideTypingIndicator before
+            // _createLayout has run, so chatLog may still be null.
+            debuggerWidget.chatLog = null;
+            expect(() => debuggerWidget._hideTypingIndicator()).not.toThrow();
+        });
     });
 
     describe("_clearChat", () => {
@@ -800,7 +854,7 @@ describe("AIDebuggerWidget", () => {
         beforeEach(() => {
             debuggerWidget = new AIDebuggerWidget();
             debuggerWidget.chatLog = document.createElement("div");
-            debuggerWidget.activity = { textMsg: jest.fn() };
+            debuggerWidget.activity = makeActivity();
         });
 
         test("clears the chat log", () => {
@@ -819,10 +873,7 @@ describe("AIDebuggerWidget", () => {
 
         beforeEach(() => {
             debuggerWidget = new AIDebuggerWidget();
-            debuggerWidget.activity = {
-                textMsg: jest.fn(),
-                prepareExport: jest.fn(() => "[]")
-            };
+            debuggerWidget.activity = makeActivity();
         });
 
         test("shows message when no conversation to export", () => {
@@ -831,6 +882,271 @@ describe("AIDebuggerWidget", () => {
             expect(debuggerWidget.activity.textMsg).toHaveBeenCalledWith(
                 "No conversation to export."
             );
+        });
+
+        test("exports chat and triggers download when history is non-empty", () => {
+            // Stub the DOM/URL APIs used during file download
+            const mockAnchor = { href: "", download: "", click: jest.fn() };
+            const originalCreateElement = document.createElement.bind(document);
+            jest.spyOn(document, "createElement").mockImplementation(tag =>
+                tag === "a" ? mockAnchor : originalCreateElement(tag)
+            );
+            jest.spyOn(document.body, "appendChild").mockImplementation(() => {});
+            jest.spyOn(document.body, "removeChild").mockImplementation(() => {});
+            global.URL.createObjectURL = jest.fn(() => "blob:mock");
+            global.URL.revokeObjectURL = jest.fn();
+            global.Blob = jest.fn((parts, opts) => ({ size: parts[0].length, type: opts.type }));
+
+            debuggerWidget.chatHistory = [
+                { type: "user", content: "Hello", timestamp: new Date().toISOString() }
+            ];
+
+            expect(() => debuggerWidget._exportChat()).not.toThrow();
+            expect(mockAnchor.click).toHaveBeenCalled();
+            expect(debuggerWidget.activity.textMsg).toHaveBeenCalledWith(
+                "Chat exported successfully."
+            );
+
+            jest.restoreAllMocks();
+        });
+
+        test("handles prepareExport throwing gracefully", () => {
+            debuggerWidget.activity = {
+                textMsg: jest.fn(),
+                prepareExport: jest.fn(() => {
+                    throw new Error("export failed");
+                })
+            };
+            debuggerWidget.chatHistory = [
+                { type: "user", content: "Hi", timestamp: new Date().toISOString() }
+            ];
+
+            // Set up minimal stubs to allow download to proceed
+            const mockAnchor = { href: "", download: "", click: jest.fn() };
+            jest.spyOn(document, "createElement").mockImplementation(tag =>
+                tag === "a" ? mockAnchor : document.createElement.bind(document)(tag)
+            );
+            jest.spyOn(document.body, "appendChild").mockImplementation(() => {});
+            jest.spyOn(document.body, "removeChild").mockImplementation(() => {});
+            global.URL.createObjectURL = jest.fn(() => "blob:mock");
+            global.URL.revokeObjectURL = jest.fn();
+            global.Blob = jest.fn((parts, opts) => ({ size: parts[0].length, type: opts.type }));
+
+            expect(() => debuggerWidget._exportChat()).not.toThrow();
+            jest.restoreAllMocks();
+        });
+    });
+
+    describe("_showConsentBanner", () => {
+        let debuggerWidget;
+
+        beforeEach(() => {
+            debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget.chatLog = document.createElement("div");
+        });
+
+        test("appends a banner to chatLog", () => {
+            debuggerWidget._showConsentBanner();
+            expect(debuggerWidget.chatLog.children.length).toBe(1);
+        });
+
+        test("sets _consentGiven on accept and removes banner", () => {
+            debuggerWidget._loadProjectAndInitialize = jest.fn();
+            debuggerWidget._showConsentBanner();
+
+            const banner = debuggerWidget.chatLog.children[0];
+            const buttons = banner.querySelectorAll("button");
+            expect(buttons.length).toBeGreaterThanOrEqual(2);
+
+            buttons[0].click(); // Accept button
+            expect(debuggerWidget._consentGiven).toBe(true);
+            expect(debuggerWidget.chatLog.children.length).toBe(0); // banner removed
+            expect(debuggerWidget._loadProjectAndInitialize).toHaveBeenCalled();
+        });
+
+        test("decline removes banner and adds a system message", () => {
+            debuggerWidget._showConsentBanner();
+
+            const banner = debuggerWidget.chatLog.children[0];
+            const buttons = banner.querySelectorAll("button");
+            buttons[1].click(); // Decline / Cancel button
+
+            // Banner is gone; a system message (italic) is shown in its place
+            expect(debuggerWidget.chatLog.children.length).toBe(1);
+            const msg = debuggerWidget.chatLog.children[0];
+            expect(msg.style.fontStyle).toBe("italic");
+        });
+    });
+
+    describe("_loadProjectAndInitialize", () => {
+        let debuggerWidget;
+
+        beforeEach(() => {
+            debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget.chatLog = document.createElement("div");
+        });
+
+        test("calls _initializeBackendWithProject with the raw project data string", () => {
+            debuggerWidget.activity = makeActivity('["some","project"]');
+            debuggerWidget._initializeBackendWithProject = jest.fn();
+
+            debuggerWidget._loadProjectAndInitialize();
+
+            expect(debuggerWidget._initializeBackendWithProject).toHaveBeenCalledWith(
+                '["some","project"]'
+            );
+        });
+
+        test("falls back to welcome message when prepareExport throws", () => {
+            debuggerWidget.activity = {
+                textMsg: jest.fn(),
+                prepareExport: jest.fn(() => {
+                    throw new Error("export failed");
+                })
+            };
+            debuggerWidget._addWelcomeMessage = jest.fn();
+
+            debuggerWidget._loadProjectAndInitialize();
+
+            expect(debuggerWidget.activity.textMsg).toHaveBeenCalled();
+            expect(debuggerWidget._addWelcomeMessage).toHaveBeenCalled();
+        });
+
+        test("proceeds even when project JSON is malformed (parse error is non-fatal)", () => {
+            debuggerWidget.activity = makeActivity("NOT_VALID_JSON");
+            debuggerWidget._initializeBackendWithProject = jest.fn();
+
+            expect(() => debuggerWidget._loadProjectAndInitialize()).not.toThrow();
+            // Still calls through to backend initialization
+            expect(debuggerWidget._initializeBackendWithProject).toHaveBeenCalled();
+        });
+    });
+
+    describe("_initializeBackendWithProject", () => {
+        let debuggerWidget;
+
+        beforeEach(() => {
+            debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget.chatLog = document.createElement("div");
+            debuggerWidget.activity = makeActivity();
+            // Suppress the typing indicator DOM side-effects for these tests
+            debuggerWidget._showTypingIndicator = jest.fn();
+            debuggerWidget._hideTypingIndicator = jest.fn();
+            debuggerWidget._updateMessageCount = jest.fn();
+        });
+
+        test("calls fetch with the /analyze endpoint", () => {
+            global.fetch = jest.fn().mockResolvedValue({
+                ok: true,
+                json: () => Promise.resolve({ response: "Hello from AI" })
+            });
+
+            debuggerWidget._initializeBackendWithProject('["block"]');
+
+            expect(global.fetch).toHaveBeenCalledWith(
+                expect.stringContaining("/analyze"),
+                expect.objectContaining({
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" }
+                })
+            );
+        });
+
+        test("adds bot response to chatHistory on successful fetch", async () => {
+            global.fetch = jest.fn().mockResolvedValue({
+                ok: true,
+                json: () => Promise.resolve({ response: "Project looks good!" })
+            });
+
+            debuggerWidget._initializeBackendWithProject("[]");
+
+            // Flush all chained .then() microtasks (fetch → .then(response) → .then(data))
+            await new Promise(resolve => setTimeout(resolve, 0));
+
+            expect(debuggerWidget.chatHistory).toHaveLength(1);
+            expect(debuggerWidget.chatHistory[0].type).toBe("bot");
+            expect(debuggerWidget.chatHistory[0].content).toBe("Project looks good!");
+        });
+
+        test("shows error message in chat when fetch fails", async () => {
+            global.fetch = jest.fn().mockRejectedValue(new Error("Network Error"));
+
+            debuggerWidget._initializeBackendWithProject("[]");
+
+            await new Promise(resolve => setTimeout(resolve, 0));
+
+            const msgs = Array.from(debuggerWidget.chatLog.children);
+            expect(msgs.length).toBeGreaterThan(0);
+        });
+
+        test("shows error message when response has no .response field", async () => {
+            global.fetch = jest.fn().mockResolvedValue({
+                ok: true,
+                json: () => Promise.resolve({}) // missing .response
+            });
+
+            debuggerWidget._initializeBackendWithProject("[]");
+
+            await new Promise(resolve => setTimeout(resolve, 0));
+
+            expect(debuggerWidget.activity.textMsg).toHaveBeenCalled();
+        });
+    });
+
+    describe("_sendToBackend", () => {
+        let debuggerWidget;
+
+        beforeEach(() => {
+            debuggerWidget = new AIDebuggerWidget();
+            debuggerWidget.chatLog = document.createElement("div");
+            debuggerWidget.activity = makeActivity();
+            debuggerWidget._showTypingIndicator = jest.fn();
+            debuggerWidget._hideTypingIndicator = jest.fn();
+            debuggerWidget._updateMessageCount = jest.fn();
+        });
+
+        test("adds bot message to chatHistory on successful response", async () => {
+            global.fetch = jest.fn().mockResolvedValue({
+                ok: true,
+                json: () => Promise.resolve({ response: "Debugger answer" })
+            });
+            debuggerWidget._isProcessing = true;
+
+            debuggerWidget._sendToBackend("what is wrong?");
+
+            await new Promise(resolve => setTimeout(resolve, 0));
+
+            expect(debuggerWidget._isProcessing).toBe(false);
+            expect(debuggerWidget.chatHistory).toHaveLength(1);
+            expect(debuggerWidget.chatHistory[0].content).toBe("Debugger answer");
+        });
+
+        test("adds fallback bot message on fetch error", async () => {
+            global.fetch = jest.fn().mockRejectedValue(new Error("Connection refused"));
+            debuggerWidget._isProcessing = true;
+
+            debuggerWidget._sendToBackend("hello");
+
+            await new Promise(resolve => setTimeout(resolve, 0));
+
+            expect(debuggerWidget._isProcessing).toBe(false);
+            expect(debuggerWidget.chatHistory).toHaveLength(1);
+            expect(debuggerWidget.chatHistory[0].type).toBe("bot");
+            expect(debuggerWidget.chatHistory[0].content).toContain("Connection refused");
+        });
+
+        test("shows error when HTTP response is not ok", async () => {
+            global.fetch = jest.fn().mockResolvedValue({
+                ok: false,
+                status: 500,
+                statusText: "Internal Server Error"
+            });
+
+            debuggerWidget._sendToBackend("test");
+
+            await new Promise(resolve => setTimeout(resolve, 0));
+
+            expect(debuggerWidget.activity.textMsg).toHaveBeenCalled();
         });
     });
 });

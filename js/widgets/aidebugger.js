@@ -505,6 +505,7 @@ function AIDebuggerWidget() {
      * @private
      */
     this._hideTypingIndicator = function () {
+        if (!this.chatLog) return;
         const typingIndicators = this.chatLog.querySelectorAll(".typing-indicator");
         typingIndicators.forEach(indicator => {
             const animationId = indicator.getAttribute("data-animation-id");

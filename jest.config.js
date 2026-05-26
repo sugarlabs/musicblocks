@@ -3,6 +3,7 @@ module.exports = {
     clearMocks: true,
     moduleFileExtensions: ["js", "json", "node"],
     testEnvironment: "jsdom",
+    testEnvironmentOptions: { url: "http://localhost/" },
     collectCoverage: true,
     collectCoverageFrom: [
         "js/**/*.js",
