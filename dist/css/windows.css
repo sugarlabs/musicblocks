@@ -419,3 +419,16 @@
     padding: 1px 3px;
   }
 }
+
+/* PitchDrumMatrix widget tokens */
+.pdm-label-cell {
+  background-color: var(--color-text-muted);
+}
+
+.pdm-selector-cell {
+  background-color: var(--color-selector-bg);
+}
+
+.pdm-selector-cell-active {
+  background-color: var(--color-selector-selected);
+}
