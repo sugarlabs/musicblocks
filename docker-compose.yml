@@ -1,0 +1,17 @@
+services:
+    musicblocks:
+        container_name: musicblocks
+        build:
+            context: .
+            dockerfile: dockerfile
+        ports:
+            - "3000:3000"
+        volumes:
+            - .:/app
+            - musicblocks-node-modules:/app/node_modules
+        environment:
+            - NODE_ENV=development
+            - HOST=0.0.0.0
+
+volumes:
+    musicblocks-node-modules:
