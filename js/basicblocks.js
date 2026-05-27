@@ -113,8 +113,8 @@ const initBasicProtoBlocks = activity => {
         activity.blocks.protoBlockDict[protoblock].palette?.add(
             activity.blocks.protoBlockDict[protoblock]
         );
-        }
-    };
+    }
+};
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         initBasicProtoBlocks,
