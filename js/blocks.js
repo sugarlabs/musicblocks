@@ -1548,9 +1548,9 @@ class Blocks {
             // Do not remove the silence block if only vspace blocks are added before the silence block.
 
             let block = thisBlockobj;
-            while (block?.name == "vspace") {
+            while (block?.name === "vspace") {
                 block = this.blockList[block.connections[0]];
-                if (block?.name == "newnote") {
+                if (block?.name === "newnote") {
                     return;
                 }
             }

@@ -110,13 +110,11 @@ const initBasicProtoBlocks = activity => {
 
     // Push protoblocks onto their palettes.
     for (const protoblock in activity.blocks.protoBlockDict) {
-        if (activity.blocks.protoBlockDict[protoblock].palette != null) {
-            activity.blocks.protoBlockDict[protoblock].palette.add(
-                activity.blocks.protoBlockDict[protoblock]
-            );
+        activity.blocks.protoBlockDict[protoblock].palette?.add(
+            activity.blocks.protoBlockDict[protoblock]
+        );
         }
-    }
-};
+    };
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         initBasicProtoBlocks,
