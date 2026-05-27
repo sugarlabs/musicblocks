@@ -411,7 +411,7 @@ class Blocks {
          * @returns {void}
          */
         this.extract = () => {
-            if (this.activeBlock != null) {
+            if (this.activeBlock !== null) {
                 /** Don't extract silence blocks. */
                 if (this.blockList[this.activeBlock].name !== "rest2") {
                     this._extractBlock(this.activeBlock, true);
@@ -439,7 +439,7 @@ class Blocks {
 
                 let lastConnection = last(blkObj.connections);
 
-                if (firstConnection != null) {
+                if (firstConnection !== null) {
                     connectionIdx = this.blockList[firstConnection].connections.indexOf(blk);
                 } else {
                     connectionIdx = null;
@@ -447,7 +447,7 @@ class Blocks {
 
                 blkObj.connections[0] = null;
 
-                if (lastConnection != null) {
+                if (lastConnection !== null) {
                     /** Is it a hidden block? Keep it attached. */
                     if (
                         this.blockList[lastConnection].name === "hidden" ||
@@ -462,19 +462,19 @@ class Blocks {
                         blkObj.connections[blkObj.connections.length - 1] = null;
                     }
 
-                    if (lastConnection != null) {
+                    if (lastConnection !== null) {
                         this.blockList[lastConnection].connections[0] = firstConnection;
                     }
                 }
 
-                if (firstConnection != null) {
+                if (firstConnection !== null) {
                     this.blockList[firstConnection].connections[connectionIdx] = lastConnection;
                 }
 
                 this.moveStackRelative(blk, 4 * STANDARDBLOCKHEIGHT, 0);
                 this.blockMoved(blk);
 
-                if (adjustDock && firstConnection != null) {
+                if (adjustDock && firstConnection !== null) {
                     this.adjustDocks(firstConnection, true);
                     if (clampList.length > 0) {
                         this.clampBlocksToCheck = clampList;
@@ -482,7 +482,7 @@ class Blocks {
                     }
                 }
             } else {
-                if (firstConnection != null) {
+                if (firstConnection !== null) {
                     connectionIdx = this.blockList[firstConnection].connections.indexOf(blk);
                     this.blockList[firstConnection].connections[connectionIdx] = null;
                     blkObj.connections[0] = null;
@@ -664,7 +664,7 @@ class Blocks {
 
                 that._sizeCounter = 0;
                 let childFlowSize = 1;
-                if (c > 0 && myBlock.connections[c] != null) {
+                if (c > 0 && myBlock.connections[c] !== null) {
                     this._sizeCounter = 0;
                     childFlowSize = Math.max(that._getStackSize(myBlock.connections[c]), 1);
                 }
@@ -747,7 +747,7 @@ class Blocks {
             for (let i = 0; i < slotList.length; i++) {
                 const c = myBlock.connections[ci + i];
                 let size = 1; /** Minimum size */
-                if (c != null) {
+                if (c !== null) {
                     size = Math.max(this._getBlockSize(c), 1);
                 }
 
@@ -781,7 +781,7 @@ class Blocks {
             /** Determine the size of the first argument. */
             const c = myBlock.connections[1];
             let firstArgumentSize = 1; /** Minimum size */
-            if (c != null) {
+            if (c !== null) {
                 firstArgumentSize = Math.max(this._getBlockSize(c), 1);
             }
 
