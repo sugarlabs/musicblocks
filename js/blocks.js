@@ -805,7 +805,7 @@ class Blocks {
 
             const c = myBlock.connections[myBlock.connections.length - 2];
             let secondArgumentSize = 1;
-            if (c != null) {
+            if (c !== null) {
                 secondArgumentSize = Math.max(this._getBlockSize(c), 1);
             }
 
@@ -835,7 +835,7 @@ class Blocks {
                     const vspaceBlock = this.blockList[myBlock.connections[lastConnection]];
                     const nextBlockIndex = vspaceBlock.connections[1];
                     myBlock.connections[lastConnection] = nextBlockIndex;
-                    if (nextBlockIndex != null) {
+                    if (nextBlockIndex !== null) {
                         this.blockList[nextBlockIndex].connections[0] = blk;
                     }
                     vspaceBlock.connections = [null, null];
@@ -921,12 +921,12 @@ class Blocks {
                 return size;
             }
 
-            if (blk == null) {
+            if (blk === null) {
                 return size;
             }
 
             const myBlock = this.blockList[blk];
-            if (myBlock == null) {
+            if (myBlock === null) {
                 console.debug("Something very broken in _getStackSize.");
                 return size;
             }
@@ -940,7 +940,7 @@ class Blocks {
                 csize = 0;
                 if (c > 0) {
                     cblk = myBlock.connections[c];
-                    if (cblk != null) {
+                    if (cblk !== null) {
                         csize = this._getStackSize(cblk);
                     }
 
@@ -956,7 +956,7 @@ class Blocks {
                     csize = 0;
                     if (c > 0) {
                         cblk = myBlock.connections[c];
-                        if (cblk != null) {
+                        if (cblk !== null) {
                             csize = this._getStackSize(cblk);
                         }
 
@@ -975,7 +975,7 @@ class Blocks {
             }
 
             /** If the note value block is collapsed, spoof size. */
-            if (this.blocksToCollapse.indexOf(blk) != -1) {
+            if (this.blocksToCollapse.indexOf(blk) !== -1) {
                 size = 1;
             } else if (
                 ["newnote", "interval", "osctime"].includes(myBlock.name) &&
@@ -987,7 +987,7 @@ class Blocks {
             /** check on any connected block */
             if (myBlock.connections.length > 1) {
                 cblk = last(myBlock.connections);
-                if (cblk != null) {
+                if (cblk !== null) {
                     size += this._getStackSize(cblk);
                 }
             }
@@ -1040,7 +1040,7 @@ class Blocks {
             const myBlock = this.blockList[blk];
 
             /** For when we come in from makeBlock */
-            if (resetLoopCounter != null) {
+            if (resetLoopCounter !== null) {
                 this._loopCounter = 0;
             }
 
@@ -1048,7 +1048,7 @@ class Blocks {
              * These checks are to test for malformed data. All blocks
              * should have connections.
              */
-            if (myBlock == null) {
+            if (myBlock === null) {
                 console.debug("Saw a null block: " + blk);
                 if (isOuterCall) this._endDeferCheckBounds();
                 return;
