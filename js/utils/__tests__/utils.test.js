@@ -216,6 +216,30 @@ describe("Utility Functions (logic-only)", () => {
             expect(oneHundredToFraction(1)).toEqual([1, 64]);
             expect(oneHundredToFraction(100)).toEqual([1, 1]);
         });
+
+        it("handles boundary values", () => {
+            expect(oneHundredToFraction(0)).toEqual([1, 64]);
+            expect(oneHundredToFraction(150)).toEqual([1, 1]);
+        });
+
+        it("handles mid range values", () => {
+            expect(oneHundredToFraction(75)).toEqual([3, 4]);
+            expect(oneHundredToFraction(30)).toEqual([5, 16]);
+        });
+
+        it("handles exhaustive branch coverage", () => {
+            expect(oneHundredToFraction(2)).toEqual([1, 48]);
+            expect(oneHundredToFraction(7)).toEqual([1, 16]);
+            expect(oneHundredToFraction(18)).toEqual([3, 16]);
+            expect(oneHundredToFraction(40)).toEqual([2, 5]);
+            expect(oneHundredToFraction(53)).toEqual([17, 32]);
+            expect(oneHundredToFraction(66)).toEqual([2, 3]);
+            expect(oneHundredToFraction(81)).toEqual([13, 16]);
+            expect(oneHundredToFraction(91)).toEqual([11, 12]);
+            expect(oneHundredToFraction(96)).toEqual([31, 32]);
+            expect(oneHundredToFraction(99)).toEqual([63, 64]);
+            expect(oneHundredToFraction(97)).toEqual([97, 100]);
+        });
     });
 
     describe("rationalToFraction()", () => {
@@ -404,14 +428,6 @@ describe("Utility Functions (logic-only)", () => {
             });
         });
 
-        describe("oneHundredToFraction()", () => {
-            it("returns fraction for given number", () => {
-                expect(oneHundredToFraction(50)).toEqual([1, 2]);
-                expect(oneHundredToFraction(1)).toEqual([1, 64]);
-                expect(oneHundredToFraction(100)).toEqual([1, 1]);
-            });
-        });
-
         describe("rationalToFraction()", () => {
             it("converts float to fraction", () => {
                 expect(rationalToFraction(0.5)).toEqual([1, 2]);
@@ -521,16 +537,6 @@ describe("Utility Functions (logic-only)", () => {
             expect(nearestBeat(1, 8)).toEqual([0, 8]);
         });
     });
-    describe("oneHundredToFraction() more cases", () => {
-        it("handles mid range values", () => {
-            expect(oneHundredToFraction(75)).toEqual([3, 4]);
-            expect(oneHundredToFraction(30)).toEqual([5, 16]);
-        });
-
-        it("handles default case", () => {
-            expect(oneHundredToFraction(97)).toEqual([97, 100]);
-        });
-    });
     describe("rationalSum()", () => {
         it("adds simple fractions", () => {
             expect(rationalSum([1, 2], [1, 2])).toEqual([2, 2]);
@@ -563,59 +569,6 @@ describe("Utility Functions (logic-only)", () => {
     describe("hexToRGB() without hash", () => {
         it("parses hex without #", () => {
             expect(hexToRGB("ff0000")).toEqual({ r: 255, g: 0, b: 0 });
-        });
-    });
-    describe("oneHundredToFraction() exhaustive branch coverage", () => {
-        it("handles <1", () => {
-            expect(oneHundredToFraction(0)).toEqual([1, 64]);
-        });
-
-        it("handles >99", () => {
-            expect(oneHundredToFraction(150)).toEqual([1, 1]);
-        });
-
-        it("handles 2", () => {
-            expect(oneHundredToFraction(2)).toEqual([1, 48]);
-        });
-
-        it("handles 6-8 range", () => {
-            expect(oneHundredToFraction(7)).toEqual([1, 16]);
-        });
-
-        it("handles 18-19", () => {
-            expect(oneHundredToFraction(18)).toEqual([3, 16]);
-        });
-
-        it("handles 40-41", () => {
-            expect(oneHundredToFraction(40)).toEqual([2, 5]);
-        });
-
-        it("handles 53-54", () => {
-            expect(oneHundredToFraction(53)).toEqual([17, 32]);
-        });
-
-        it("handles 66-67", () => {
-            expect(oneHundredToFraction(66)).toEqual([2, 3]);
-        });
-
-        it("handles 81-82", () => {
-            expect(oneHundredToFraction(81)).toEqual([13, 16]);
-        });
-
-        it("handles 91-92", () => {
-            expect(oneHundredToFraction(91)).toEqual([11, 12]);
-        });
-
-        it("handles 96", () => {
-            expect(oneHundredToFraction(96)).toEqual([31, 32]);
-        });
-
-        it("handles 99", () => {
-            expect(oneHundredToFraction(99)).toEqual([63, 64]);
-        });
-
-        it("handles default case", () => {
-            expect(oneHundredToFraction(97)).toEqual([97, 100]);
         });
     });
     describe("delayExecution()", () => {
