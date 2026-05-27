@@ -74,9 +74,6 @@ class Arpeggio {
 
         const w = window.innerWidth;
         this._cellScale = w / 1200;
-        const labelColor = getComputedStyle(document.body)
-            .getPropertyValue("--mb-label-color")
-            .trim();
 
         const widgetWindow = window.widgetWindows.windowFor(this, "arpeggio");
         this.widgetWindow = widgetWindow;
@@ -154,7 +151,7 @@ class Arpeggio {
 
             // A cell for the row label
             labelCell = arpeggioTableRow.insertCell();
-            labelCell.style.backgroundColor = labelColor;
+            labelCell.style.backgroundColor = "var(--mb-label-color)";
             labelCell.style.fontSize = this._cellScale * 50 + "%";
             labelCell.style.height = Arpeggio.CELLSIZE + "px";
             labelCell.style.width = Arpeggio.CELLSIZE + "px";
@@ -182,7 +179,7 @@ class Arpeggio {
         // An extra row for the time values
         arpeggioTableRow = arpeggioTable.insertRow();
         labelCell = arpeggioTableRow.insertCell();
-        labelCell.style.backgroundColor = labelColor;
+        labelCell.style.backgroundColor = "var(--mb-label-color)";
         labelCell.style.fontSize = this._cellScale * 50 + "%";
         labelCell.style.height = Arpeggio.CELLSIZE + "px";
         labelCell.style.width = Arpeggio.CELLSIZE + "px";
@@ -316,17 +313,10 @@ class Arpeggio {
      * @returns {string} color, e.g. "#ffffff"
      */
     _getBackgroundColor(i) {
-        const selectorSelected = getComputedStyle(document.body)
-            .getPropertyValue("--mb-selector-selected")
-            .trim();
-        const selectorBg = getComputedStyle(document.body)
-            .getPropertyValue("--mb-selector-bg")
-            .trim();
-
         if (this._rowInMode(i)) {
-            return selectorSelected;
+            return "var(--mb-selector-selected)";
         }
-        return selectorBg;
+        return "var(--mb-selector-bg)";
     }
 
     /**
@@ -335,12 +325,6 @@ class Arpeggio {
      * @returns {void}
      */
     _addNote(arpeggioIdx) {
-        const selectorSelected = getComputedStyle(document.body)
-            .getPropertyValue("--mb-selector-selected")
-            .trim();
-        const selectorBg = getComputedStyle(document.body)
-            .getPropertyValue("--mb-selector-bg")
-            .trim();
         const arpeggioName = (arpeggioIdx + 1).toString();
         const arpeggioTable = docById("arpeggioTable");
         let table;
@@ -363,12 +347,12 @@ class Arpeggio {
 
             cell.onmouseover = () => {
                 if (cell.style.backgroundColor !== "black") {
-                    cell.style.backgroundColor = selectorSelected;
+                    cell.style.backgroundColor = "var(--mb-selector-selected)";
                 }
             };
             cell.onmouseout = () => {
                 if (cell.style.backgroundColor !== "black") {
-                    cell.style.backgroundColor = selectorBg;
+                    cell.style.backgroundColor = "var(--mb-selector-bg)";
                 }
             };
         }
@@ -387,7 +371,7 @@ class Arpeggio {
         cell.setAttribute("id", arpeggioIdx);
         cell.className = "headcol";
         cell.textContent = arpeggioName;
-        cell.style.backgroundColor = selectorBg;
+        cell.style.backgroundColor = "var(--mb-selector-bg)";
     }
 
     /**

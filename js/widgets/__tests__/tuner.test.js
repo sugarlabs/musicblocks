@@ -42,7 +42,9 @@ const createMockElement = tagName => ({
 });
 
 global.document = {
-    body: {},
+    body: {
+        addEventListener: jest.fn()
+    },
     createElement: jest.fn().mockImplementation(tagName => {
         const element = createMockElement(tagName);
         if (tagName === "canvas") {

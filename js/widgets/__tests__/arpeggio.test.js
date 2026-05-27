@@ -391,14 +391,14 @@ describe("Arpeggio Widget", () => {
         test("_getBackgroundColor returns selectorSelected for a mode row", () => {
             // row 0 maps to ii = (13 - 0 - 1) % 12 = 0, which is in mode
             const color = arpeggio._getBackgroundColor(0);
-            expect(color).toBe(platformColor.selectorSelected);
+            expect(color).toBe("var(--mb-selector-selected)");
         });
 
         test("_getBackgroundColor returns selectorBackground for a non-mode row", () => {
             // row 1 maps to ii = (13 - 1 - 1) % 12 = 11, which is in mode
             // row 2 maps to ii = (13 - 2 - 1) % 12 = 10, which is NOT in mode
             const color = arpeggio._getBackgroundColor(2);
-            expect(color).toBe(platformColor.selectorBackground);
+            expect(color).toBe("var(--mb-selector-bg)");
         });
     });
 

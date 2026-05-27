@@ -11,6 +11,18 @@ function TunerDisplay(canvas, width, height) {
     this.cents = 0;
     this.frequency = 440;
     this.chromaticMode = true; // Default to chromatic mode
+    this._selectorBg =
+        getComputedStyle(document.body).getPropertyValue("--mb-selector-bg").trim() || "#e0e0e0";
+    this._textColor =
+        getComputedStyle(document.body).getPropertyValue("--mb-text-color").trim() || "#000000";
+    this._onThemeChange = () => {
+        this._selectorBg =
+            getComputedStyle(document.body).getPropertyValue("--mb-selector-bg").trim() ||
+            "#e0e0e0";
+        this._textColor =
+            getComputedStyle(document.body).getPropertyValue("--mb-text-color").trim() || "#000000";
+    };
+    document.body.addEventListener("themechange", this._onThemeChange);
 
     // Create mode toggle container
     this.modeContainer = document.createElement("div");
@@ -99,15 +111,13 @@ function TunerDisplay(canvas, width, height) {
  * Updates the styles of mode toggle buttons based on current mode
  */
 TunerDisplay.prototype.updateButtonStyles = function () {
-    const selectorBg = getComputedStyle(document.body).getPropertyValue("--mb-selector-bg").trim();
-
     if (this.chromaticMode) {
-        this.chromaticButton.style.backgroundColor = selectorBg;
+        this.chromaticButton.style.backgroundColor = "var(--mb-selector-bg)";
         this.chromaticButton.querySelector("img").style.filter = "brightness(0) invert(1)";
         this.targetPitchButton.style.backgroundColor = "transparent";
         this.targetPitchButton.querySelector("img").style.filter = "none";
     } else {
-        this.targetPitchButton.style.backgroundColor = selectorBg;
+        this.targetPitchButton.style.backgroundColor = "var(--mb-selector-bg)";
         this.targetPitchButton.querySelector("img").style.filter = "brightness(0) invert(1)";
         this.chromaticButton.style.backgroundColor = "transparent";
         this.chromaticButton.querySelector("img").style.filter = "none";
@@ -134,10 +144,8 @@ TunerDisplay.prototype.draw = function () {
     const ctx = this.ctx;
     const width = this.width;
     const height = this.height;
-    const selectorBg =
-        getComputedStyle(document.body).getPropertyValue("--mb-selector-bg").trim() || "#e0e0e0";
-    const textColor =
-        getComputedStyle(document.body).getPropertyValue("--mb-text-color").trim() || "#000000";
+    const selectorBg = this._selectorBg;
+    const textColor = this._textColor;
 
     // Clear the canvas
     ctx.clearRect(0, 0, width, height);
