@@ -411,7 +411,7 @@ class Blocks {
          * @returns {void}
          */
         this.extract = () => {
-            if (this.activeBlock !== null) {
+            if (this.activeBlock != null) {
                 /** Don't extract silence blocks. */
                 if (this.blockList[this.activeBlock].name !== "rest2") {
                     this._extractBlock(this.activeBlock, true);
@@ -439,7 +439,7 @@ class Blocks {
 
                 let lastConnection = last(blkObj.connections);
 
-                if (firstConnection !== null) {
+                if (firstConnection != null) {
                     connectionIdx = this.blockList[firstConnection].connections.indexOf(blk);
                 } else {
                     connectionIdx = null;
@@ -447,7 +447,7 @@ class Blocks {
 
                 blkObj.connections[0] = null;
 
-                if (lastConnection !== null) {
+                if (lastConnection != null) {
                     /** Is it a hidden block? Keep it attached. */
                     if (
                         this.blockList[lastConnection].name === "hidden" ||
@@ -462,19 +462,19 @@ class Blocks {
                         blkObj.connections[blkObj.connections.length - 1] = null;
                     }
 
-                    if (lastConnection !== null) {
+                    if (lastConnection != null) {
                         this.blockList[lastConnection].connections[0] = firstConnection;
                     }
                 }
 
-                if (firstConnection !== null) {
+                if (firstConnection != null) {
                     this.blockList[firstConnection].connections[connectionIdx] = lastConnection;
                 }
 
                 this.moveStackRelative(blk, 4 * STANDARDBLOCKHEIGHT, 0);
                 this.blockMoved(blk);
 
-                if (adjustDock && firstConnection !== null) {
+                if (adjustDock && firstConnection != null) {
                     this.adjustDocks(firstConnection, true);
                     if (clampList.length > 0) {
                         this.clampBlocksToCheck = clampList;
@@ -482,7 +482,7 @@ class Blocks {
                     }
                 }
             } else {
-                if (firstConnection !== null) {
+                if (firstConnection != null) {
                     connectionIdx = this.blockList[firstConnection].connections.indexOf(blk);
                     this.blockList[firstConnection].connections[connectionIdx] = null;
                     blkObj.connections[0] = null;
@@ -747,7 +747,7 @@ class Blocks {
             for (let i = 0; i < slotList.length; i++) {
                 const c = myBlock.connections[ci + i];
                 let size = 1; /** Minimum size */
-                if (c !== null) {
+                if (c != null) {
                     size = Math.max(this._getBlockSize(c), 1);
                 }
 
@@ -835,7 +835,7 @@ class Blocks {
                     const vspaceBlock = this.blockList[myBlock.connections[lastConnection]];
                     const nextBlockIndex = vspaceBlock.connections[1];
                     myBlock.connections[lastConnection] = nextBlockIndex;
-                    if (nextBlockIndex !== null) {
+                    if (nextBlockIndex != null) {
                         this.blockList[nextBlockIndex].connections[0] = blk;
                     }
                     vspaceBlock.connections = [null, null];
@@ -921,12 +921,12 @@ class Blocks {
                 return size;
             }
 
-            if (blk === null) {
+            if (blk == null) {
                 return size;
             }
 
             const myBlock = this.blockList[blk];
-            if (myBlock === null) {
+            if (myBlock == null) {
                 console.debug("Something very broken in _getStackSize.");
                 return size;
             }
@@ -940,7 +940,7 @@ class Blocks {
                 csize = 0;
                 if (c > 0) {
                     cblk = myBlock.connections[c];
-                    if (cblk !== null) {
+                    if (cblk != null) {
                         csize = this._getStackSize(cblk);
                     }
 
@@ -987,7 +987,7 @@ class Blocks {
             /** check on any connected block */
             if (myBlock.connections.length > 1) {
                 cblk = last(myBlock.connections);
-                if (cblk !== null) {
+                if (cblk != null) {
                     size += this._getStackSize(cblk);
                 }
             }
@@ -1048,7 +1048,7 @@ class Blocks {
              * These checks are to test for malformed data. All blocks
              * should have connections.
              */
-            if (myBlock === null) {
+            if (myBlock == null) {
                 console.debug("Saw a null block: " + blk);
                 if (isOuterCall) this._endDeferCheckBounds();
                 return;
