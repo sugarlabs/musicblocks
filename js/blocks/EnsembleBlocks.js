@@ -43,20 +43,34 @@ function getTargetTurtle(turtles, targetTurtle) {
 }
 
 function _blockFindTurtle(activity, turtle, blk, receivedArg) {
-    const cblk = activity.blocks.blockList[blk].connections[1];
-    if (cblk === null) {
-        //Debug: connecting block not found, returning null
+    const block = activity.blocks.blockList[blk];
+
+    // Prevent crash if block is missing
+    if (!block || !block.connections) {
         return null;
     }
+
+    const cblk = block.connections[1];
+
+    // No connected turtle block
+    if (cblk === null || cblk === undefined) {
+        return null;
+    }
+
     const targetTurtle = activity.logo.parseArg(activity.logo, turtle, cblk, blk, receivedArg);
+
+    // Invalid turtle name
     if (targetTurtle === null) {
-        //Debug: target turtleName from arg not found, returning null
         return null;
     }
+
     const targetTurtleId = getTargetTurtle(activity.turtles, targetTurtle);
+
+    // Turtle not found
     if (targetTurtleId === null) {
         return null;
     }
+
     return activity.turtles.getTurtle(targetTurtleId);
 }
 
@@ -1070,7 +1084,7 @@ function setupEnsembleBlocks(activity) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
             const heading = tur.orientation;
             // Heading needs to be set to 0 when we update the graphic.
-            if (heading != 0) {
+            if (heading !== 0) {
                 tur.painter.doSetHeading(0);
             }
 
@@ -1094,7 +1108,7 @@ function setupEnsembleBlocks(activity) {
             );
 
             // Restore the heading.
-            if (heading != 0) {
+            if (heading !== 0) {
                 tur.painter.doSetHeading(heading);
             }
         }
