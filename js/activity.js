@@ -53,7 +53,7 @@ try {
    MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
    SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS,
-   unescapeHTML
+   unescapeHTML, safeStorage
  */
 
 /*
@@ -93,6 +93,7 @@ let MYDEFINES = [
     "utils/utils",
     "utils/retryWithBackoff",
     "utils/debugLog",
+    "utils/safeStorage",
     "activity/artwork",
     "widgets/status",
     "utils/munsell",
@@ -9220,8 +9221,8 @@ class Activity {
      */
     saveLocally() {
         try {
-            localStorage.setItem("beginnerMode", this.beginnerMode.toString());
-            localStorage.setItem("themePreference", this.themePreference.toString());
+            safeStorage.setItem("beginnerMode", this.beginnerMode.toString());
+            safeStorage.setItem("themePreference", this.themePreference.toString());
         } catch (e) {
             console.error("Error saving to localStorage:", e);
         }
