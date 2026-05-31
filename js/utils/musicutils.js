@@ -1814,116 +1814,116 @@ const INTERVAL_CENTS = {
  * @constant {Object}
  */
 const TEMPERAMENT_INTERVALS = {
-        "perfect 1": {
-            ratio: 1 / 1,
-            cents: INTERVAL_CENTS["1/1"],
-            semitones: 0
-        },
-        "minor 2": {
-            ratio: 16 / 15,
-            cents: INTERVAL_CENTS["16/15"],
-            semitones: 1
-        },
-        "augmented 1": {
-            ratio: 25 / 24,
-            cents: INTERVAL_CENTS["25/24"],
-            semitones: 1
-        },
-        "major 2": {
-            ratio: 9 / 8,
-            cents: INTERVAL_CENTS["9/8"],
-            semitones: 2
-        },
-        "augmented 2": {
-            ratio: 75 / 64,
-            cents: INTERVAL_CENTS["75/64"],
-            semitones: 3
-        },
-        "minor 3": {
-            ratio: 6 / 5,
-            cents: INTERVAL_CENTS["6/5"],
-            semitones: 3
-        },
-        "major 3": {
-            ratio: 5 / 4,
-            cents: INTERVAL_CENTS["5/4"],
-            semitones: 4
-        },
-        "augmented 3": {
-            ratio: 125 / 96,
-            cents: INTERVAL_CENTS["125/96"],
-            semitones: 5
-        },
-        "diminished 4": {
-            ratio: 32 / 25,
-            cents: INTERVAL_CENTS["32/25"],
-            semitones: 4
-        },
-        "perfect 4": {
-            ratio: 4 / 3,
-            cents: INTERVAL_CENTS["4/3"],
-            semitones: 5
-        },
-        "augmented 4": {
-            ratio: 25 / 18,
-            cents: INTERVAL_CENTS["25/18"],
-            semitones: 6
-        },
-        "diminished 5": {
-            ratio: 36 / 25,
-            cents: INTERVAL_CENTS["36/25"],
-            semitones: 6
-        },
-        "perfect 5": {
-            ratio: 3 / 2,
-            cents: INTERVAL_CENTS["3/2"],
-            semitones: 7
-        },
-        "augmented 5": {
-            ratio: 25 / 16,
-            cents: INTERVAL_CENTS["25/16"],
-            semitones: 8
-        },
-        "minor 6": {
-            ratio: 8 / 5,
-            cents: INTERVAL_CENTS["8/5"],
-            semitones: 8
-        },
-        "major 6": {
-            ratio: 5 / 3,
-            cents: INTERVAL_CENTS["5/3"],
-            semitones: 9
-        },
-        "augmented 6": {
-            ratio: 125 / 72,
-            cents: INTERVAL_CENTS["125/72"],
-            semitones: 10
-        },
-        "minor 7": {
-            ratio: 16 / 9,
-            cents: INTERVAL_CENTS["16/9"],
-            semitones: 10
-        },
-        "major 7": {
-            ratio: 15 / 8,
-            cents: INTERVAL_CENTS["15/8"],
-            semitones: 11
-        },
-        "augmented 7": {
-            ratio: 125 / 64,
-            cents: INTERVAL_CENTS["125/64"],
-            semitones: 12
-        },
-        "diminished 8": {
-            ratio: 48 / 25,
-            cents: INTERVAL_CENTS["48/25"],
-            semitones: 11
-        },
-        "perfect 8": {
-            ratio: 2 / 1,
-            cents: INTERVAL_CENTS["2/1"],
-            semitones: 12
-        }
+    "perfect 1": {
+        ratio: 1 / 1,
+        cents: INTERVAL_CENTS["1/1"],
+        semitones: 0
+    },
+    "minor 2": {
+        ratio: 16 / 15,
+        cents: INTERVAL_CENTS["16/15"],
+        semitones: 1
+    },
+    "augmented 1": {
+        ratio: 25 / 24,
+        cents: INTERVAL_CENTS["25/24"],
+        semitones: 1
+    },
+    "major 2": {
+        ratio: 9 / 8,
+        cents: INTERVAL_CENTS["9/8"],
+        semitones: 2
+    },
+    "augmented 2": {
+        ratio: 75 / 64,
+        cents: INTERVAL_CENTS["75/64"],
+        semitones: 3
+    },
+    "minor 3": {
+        ratio: 6 / 5,
+        cents: INTERVAL_CENTS["6/5"],
+        semitones: 3
+    },
+    "major 3": {
+        ratio: 5 / 4,
+        cents: INTERVAL_CENTS["5/4"],
+        semitones: 4
+    },
+    "augmented 3": {
+        ratio: 125 / 96,
+        cents: INTERVAL_CENTS["125/96"],
+        semitones: 5
+    },
+    "diminished 4": {
+        ratio: 32 / 25,
+        cents: INTERVAL_CENTS["32/25"],
+        semitones: 4
+    },
+    "perfect 4": {
+        ratio: 4 / 3,
+        cents: INTERVAL_CENTS["4/3"],
+        semitones: 5
+    },
+    "augmented 4": {
+        ratio: 25 / 18,
+        cents: INTERVAL_CENTS["25/18"],
+        semitones: 6
+    },
+    "diminished 5": {
+        ratio: 36 / 25,
+        cents: INTERVAL_CENTS["36/25"],
+        semitones: 6
+    },
+    "perfect 5": {
+        ratio: 3 / 2,
+        cents: INTERVAL_CENTS["3/2"],
+        semitones: 7
+    },
+    "augmented 5": {
+        ratio: 25 / 16,
+        cents: INTERVAL_CENTS["25/16"],
+        semitones: 8
+    },
+    "minor 6": {
+        ratio: 8 / 5,
+        cents: INTERVAL_CENTS["8/5"],
+        semitones: 8
+    },
+    "major 6": {
+        ratio: 5 / 3,
+        cents: INTERVAL_CENTS["5/3"],
+        semitones: 9
+    },
+    "augmented 6": {
+        ratio: 125 / 72,
+        cents: INTERVAL_CENTS["125/72"],
+        semitones: 10
+    },
+    "minor 7": {
+        ratio: 16 / 9,
+        cents: INTERVAL_CENTS["16/9"],
+        semitones: 10
+    },
+    "major 7": {
+        ratio: 15 / 8,
+        cents: INTERVAL_CENTS["15/8"],
+        semitones: 11
+    },
+    "augmented 7": {
+        ratio: 125 / 64,
+        cents: INTERVAL_CENTS["125/64"],
+        semitones: 12
+    },
+    "diminished 8": {
+        ratio: 48 / 25,
+        cents: INTERVAL_CENTS["48/25"],
+        semitones: 11
+    },
+    "perfect 8": {
+        ratio: 2 / 1,
+        cents: INTERVAL_CENTS["2/1"],
+        semitones: 12
+    }
 };
 
 /**
