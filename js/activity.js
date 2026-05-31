@@ -52,7 +52,7 @@ try {
    SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
    MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
-   SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS,
+   SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS, compareAssignment, saveAbcOutput,
    unescapeHTML
  */
 
@@ -456,6 +456,20 @@ class Activity {
             this.pluginChooser = document.getElementById("myOpenPlugin");
             // The file chooser for all files
             this.allFilesChooser = document.getElementById("myOpenAll");
+            this.assignmentChooser = document.getElementById("myOpenAssignment");
+            this._assignmentTarget = null;
+            this.assignmentChooser.onchange = event => {
+                const file = event.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = e => {
+                    this._assignmentTarget = e.target.result;
+                    document.getElementById("checkAssignmentIcon").style.display = "block";
+                    this.textMsg(_("Assignment loaded."));
+                };
+                reader.readAsText(file);
+                this.assignmentChooser.value = "";
+            };
             this.auxToolbar = document.getElementById("aux-toolbar");
             // Error message containers
             this.errorText = document.getElementById("errorText");
@@ -2226,8 +2240,30 @@ class Activity {
         };
 
         /*
+         * Loads an ABC file as an assignment target without converting to blocks.
+         */
+        const doLoadAssignment = () => {
+            this.assignmentChooser.click();
+        };
+
+        /*
+         * Compares the student's current project against the loaded assignment.
+         */
+        const doCheckAssignment = async () => {
+            const activity = globalActivity;
+            if (!activity._assignmentTarget) return;
+            await lazyLoad(["activity/abc"]);
+            const studentABC = window.saveAbcOutput(activity);
+            const result = window.compareAssignment(activity._assignmentTarget, studentABC);
+            activity.textMsg(
+                result.score + "% — " + result.matched + "/" + result.total + " notes matched"
+            );
+        };
+
+        /*
          * Runs Music Blocks at a slower rate
          */
+
         const doSlowButton = activity => {
             activity.runMode = "slow";
             activity._doSlowButton();
@@ -8487,6 +8523,8 @@ class Activity {
             this.toolbar.renderRunStepIcon(doStepButton);
             this.toolbar.renderThemeSelectIcon(this.themeBox, this.themes);
             this.toolbar.renderMergeIcon(_doMergeLoad);
+            document.getElementById("loadAssignmentIcon").onclick = doLoadAssignment;
+            document.getElementById("checkAssignmentIcon").onclick = doCheckAssignment;
             this.toolbar.renderRestoreIcon(restoreTrash);
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.toolbar.renderChooseKeyIcon(chooseKeyMenu);
