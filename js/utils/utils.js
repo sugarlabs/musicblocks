@@ -585,6 +585,33 @@ let isSVGEmpty = turtles => {
 
 // fileExt(), fileBasename(), toTitleCase(), escapeHTML(), unescapeHTML(),
 // isSafeUrl() moved to js/utils/utils-logic.js
+/**
+ * Extracts Music Blocks project JSON string from an HTML file's
+ * <div class="code"> element.
+ *
+ * Returns null if the expected structure is not found or if the
+ * captured group is empty.
+ *
+ * @param {string} cleanData - HTML file content (newlines already cleaned).
+ * @returns {string|null} Extracted project JSON string, or null.
+ */
+function extractProjectDataFromHTML(cleanData) {
+    let matchResult;
+
+    if (cleanData.includes('id="codeBlock"')) {
+        matchResult = cleanData.match('<div class="code" id="codeBlock">([\\s\\S]*?)</div>');
+    } else {
+        matchResult = cleanData.match('<div class="code">([\\s\\S]*?)</div>');
+    }
+
+    // matchResult[1] checked for truthiness (not just null)
+    // to also catch empty project-data divs.
+    if (!matchResult || !matchResult[1]) {
+        return null;
+    }
+
+    return matchResult[1];
+}
 
 /**
  * Processes plugin data and updates the activity based on the provided JSON-encoded dictionary.
@@ -1460,6 +1487,7 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         ...UtilsLogic,
+        extractProjectDataFromHTML,
         _,
         format,
         delayExecution,

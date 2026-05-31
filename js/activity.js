@@ -53,7 +53,7 @@ try {
    MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
    SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS,
-   unescapeHTML
+   extractProjectDataFromHTML,unescapeHTML
  */
 
 /*
@@ -8585,14 +8585,13 @@ class Activity {
                                 try {
                                     if (cleanData.includes("html")) {
                                         let extracted;
-                                        if (cleanData.includes('id="codeBlock"')) {
-                                            extracted = cleanData.match(
-                                                '<div class="code" id="codeBlock">(.+?)</div>'
-                                            )[1];
-                                        } else {
-                                            extracted = cleanData.match(
-                                                '<div class="code">(.+?)</div>'
-                                            )[1];
+                                        extracted = extractProjectDataFromHTML(cleanData);
+                                        if (!extracted) {
+                                            that.errorMsg(
+                                                _("Cannot find project data in this HTML file.")
+                                            );
+                                            finishLoading();
+                                            return;
                                         }
                                         obj = JSON.parse(unescapeHTML(extracted));
                                     } else {
@@ -8710,14 +8709,13 @@ class Activity {
                             try {
                                 if (cleanData.includes("html")) {
                                     let extracted;
-                                    if (cleanData.includes('id="codeBlock"')) {
-                                        extracted = cleanData.match(
-                                            '<div class="code" id="codeBlock">(.+?)</div>'
-                                        )[1];
-                                    } else {
-                                        extracted = cleanData.match(
-                                            '<div class="code">(.+?)</div>'
-                                        )[1];
+                                    extracted = extractProjectDataFromHTML(cleanData);
+                                    if (!extracted) {
+                                        that.errorMsg(
+                                            _("Cannot find project data in this HTML file.")
+                                        );
+                                        finishLoading();
+                                        return;
                                     }
                                     obj = JSON.parse(unescapeHTML(extracted));
                                 } else {

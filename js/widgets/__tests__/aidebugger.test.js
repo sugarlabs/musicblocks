@@ -715,6 +715,7 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget.messageInput = document.createElement("input");
             debuggerWidget._sendToBackend = jest.fn();
             debuggerWidget._updateMessageCount = jest.fn();
+            debuggerWidget._consentGiven = true;
         });
 
         test("does nothing with empty input", () => {
