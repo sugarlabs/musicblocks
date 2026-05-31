@@ -43,36 +43,37 @@ function getTargetTurtle(turtles, targetTurtle) {
 }
 
 function _blockFindTurtle(activity, turtle, blk, receivedArg) {
-    const block = activity.blocks.blockList[blk];
-
-    // Prevent crash if block is missing
-    if (!block || !block.connections) {
+    if (!activity.blocks.blockList[blk]) {
         return null;
     }
 
-    const cblk = block.connections[1];
+    const cblk = activity.blocks.blockList[blk].connections[1];
 
-    // No connected turtle block
-    if (cblk === null || cblk === undefined) {
+    if (cblk === null) {
         return null;
     }
 
-    const targetTurtle = activity.logo.parseArg(activity.logo, turtle, cblk, blk, receivedArg);
+    const targetTurtle = activity.logo.parseArg(
+        activity.logo,
+        turtle,
+        cblk,
+        blk,
+        receivedArg
+    );
 
-    // Invalid turtle name
     if (targetTurtle === null) {
         return null;
     }
 
     const targetTurtleId = getTargetTurtle(activity.turtles, targetTurtle);
 
-    // Turtle not found
     if (targetTurtleId === null) {
         return null;
     }
 
     return activity.turtles.getTurtle(targetTurtleId);
 }
+
 
 function setupEnsembleBlocks(activity) {
     // Extract common block setup logic
@@ -496,7 +497,7 @@ function setupEnsembleBlocks(activity) {
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
             const targetTurtle = getTargetTurtle(activity.turtles, args[0]);
-            if (targetTurtle !== null) {
+            if (targetTurtle != null) {
                 logo.runFromBlock(logo, targetTurtle, args[1], isflow, receivedArg);
             } else {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -1084,7 +1085,7 @@ function setupEnsembleBlocks(activity) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
             const heading = tur.orientation;
             // Heading needs to be set to 0 when we update the graphic.
-            if (heading !== 0) {
+            if (heading != 0) {
                 tur.painter.doSetHeading(0);
             }
 
@@ -1108,7 +1109,7 @@ function setupEnsembleBlocks(activity) {
             );
 
             // Restore the heading.
-            if (heading !== 0) {
+            if (heading != 0) {
                 tur.painter.doSetHeading(heading);
             }
         }
