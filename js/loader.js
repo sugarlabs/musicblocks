@@ -59,6 +59,10 @@ requirejs.config({
             deps: ["utils/platformstyle", "utils/utils-logic"],
             exports: "_"
         },
+        "utils/keyboardShortcuts": {
+            deps: ["utils/utils"],
+            exports: "KeyboardShortcuts"
+        },
         "utils/retryWithBackoff": {
             deps: ["utils/utils"],
             exports: "retryWithBackoff"
