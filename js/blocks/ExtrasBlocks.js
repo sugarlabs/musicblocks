@@ -399,7 +399,7 @@ function setupExtrasBlocks(activity) {
 
             if (args.length === 1) {
                 const bpmFactor =
-                    TONEBPM / tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
+                    TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
 
                 const noteBeatValue = bpmFactor / (1 / args[0]);
                 tur.singer.previousTurtleTime = tur.singer.turtleTime;
