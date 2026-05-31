@@ -2894,7 +2894,8 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
     showWheelDiv();
 
     // the voice selector
-    if (localStorage.kanaPreference === "kana") {
+    const kanaPreference = safeStorageGet("kanaPreference");
+    if (kanaPreference === "kana") {
         block._voiceWheel = new wheelnav("wheelDiv", null, 1200, 1200);
     } else {
         block._voiceWheel = new wheelnav("wheelDiv", null, 800, 800);
@@ -3072,7 +3073,7 @@ const piemenuIntervals = (block, selectedInterval) => {
     showWheelDiv();
 
     // Use advanced constructor for more wheelnav on same div
-    const language = localStorage.languagePreference;
+    const language = safeStorageGet("languagePreference");
     if (language === "ja") {
         block._intervalNameWheel = new wheelnav("wheelDiv", null, 1500, 1500);
     } else {
@@ -3511,7 +3512,7 @@ const piemenuModes = (block, selectedMode) => {
         }
 
         // Special case for Japanese
-        const language = localStorage.languagePreference;
+        const language = safeStorageGet("languagePreference");
         if (language === "ja") {
             for (let i = 0; i < that._modeNameWheel.navItems.length; i++) {
                 that._modeNameWheel.navItems[i].titleAttr.font = "30 30px sans-serif";

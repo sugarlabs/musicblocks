@@ -84,7 +84,7 @@ function MusicKeyboard(activity) {
      * Indicates whether the keyboard is in beginner mode.
      * @type {boolean}
      */
-    const beginnerMode = localStorage.beginnerMode;
+    const beginnerMode = safeStorageGet("beginnerMode");
 
     /**
      * Number of units in beginner mode.

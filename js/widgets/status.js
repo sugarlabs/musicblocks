@@ -124,6 +124,7 @@ class StatusMatrix {
 
         // One row per field, one column per mouse (plus the labels)
         let label;
+        const languagePreference = safeStorageGet("languagePreference");
         for (const statusField of this.activity.logo.statusFields) {
             const row = header.insertRow();
 
@@ -151,7 +152,7 @@ class StatusMatrix {
                     break;
                 case "bpm":
                 case "bpmfactor":
-                    if (localStorage.languagePreference === "ja") {
+                    if (languagePreference === "ja") {
                         label = _("beats per minute2");
                     } else {
                         label =

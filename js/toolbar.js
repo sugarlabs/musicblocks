@@ -11,7 +11,8 @@
 
 /*
   global _THIS_IS_MUSIC_BLOCKS_, docById, doSVG, fnBrowserDetect,
-  RECORDBUTTON, saveButton, saveButtonAdvanced, ActivityContext
+  RECORDBUTTON, saveButton, saveButtonAdvanced, ActivityContext,
+  safeStorageGet, safeStorageSet
 */
 
 /* exported Toolbar */
@@ -19,42 +20,6 @@
 let WRAP = true;
 const $j = window.jQuery;
 let play_button_debounce_timeout = null;
-
-const safeStorageGet = key => {
-    try {
-        if (typeof localStorage === "undefined" || localStorage === null) {
-            return undefined;
-        }
-
-        if (typeof localStorage.getItem === "function") {
-            const value = localStorage.getItem(key);
-            if (value !== null) {
-                return value;
-            }
-        }
-
-        return localStorage[key];
-    } catch (e) {
-        return undefined;
-    }
-};
-
-const safeStorageSet = (key, value) => {
-    try {
-        if (typeof localStorage === "undefined" || localStorage === null) {
-            return;
-        }
-
-        if (typeof localStorage.setItem === "function") {
-            localStorage.setItem(key, value);
-            return;
-        }
-
-        localStorage[key] = value;
-    } catch (e) {
-        console.debug(`Storage write skipped for ${key}:`, e);
-    }
-};
 
 class Toolbar {
     /**

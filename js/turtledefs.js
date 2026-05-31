@@ -320,7 +320,10 @@ const createDefaultStack = () => {
             [7, ["number", { value: 90 }], 0, 0, [6]]
         ];
     } else {
-        let language = localStorage.languagePreference;
+        let language = safeStorageGet("languagePreference");
+        if (language === undefined) {
+            language = navigator.language;
+        }
         if (language === undefined) {
             language = navigator.language;
         }
@@ -407,7 +410,10 @@ const createDefaultStack = () => {
 };
 
 const createHelpContent = activity => {
-    let language = localStorage.languagePreference;
+    let language = safeStorageGet("languagePreference");
+    if (language === undefined) {
+        language = navigator.language;
+    }
     if (language === undefined) {
         language = navigator.language;
     }

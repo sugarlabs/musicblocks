@@ -282,14 +282,16 @@ class HelpWidget {
                         // We need to add a case here whenever we add
                         // help artwort support for a new language.
                         // e.g., documentation-es
-                        let language = localStorage.languagePreference;
+                        let language = safeStorageGet("languagePreference");
                         if (language === undefined) {
                             language = navigator.language;
                         }
 
+                        const kanaPreference = safeStorageGet("kanaPreference");
+
                         switch (language) {
                             case "ja":
-                                if (localStorage.kanaPreference === "kana") {
+                                if (kanaPreference === "kana") {
                                     path = path + "-kana";
                                 } else {
                                     path = path + "-ja";
@@ -818,14 +820,16 @@ class HelpWidget {
                     // We need to add a case here whenever we add
                     // help artwort support for a new language.
                     // e.g., documentation-es
-                    let language = localStorage.languagePreference;
+                    let language = safeStorageGet("languagePreference");
                     if (language === undefined) {
                         language = navigator.language;
                     }
 
+                    const kanaPreference = safeStorageGet("kanaPreference");
+
                     switch (language) {
                         case "ja":
-                            if (localStorage.kanaPreference === "kana") {
+                            if (kanaPreference === "kana") {
                                 path = path + "-kana";
                             } else {
                                 path = path + "-ja";

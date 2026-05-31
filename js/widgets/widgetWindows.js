@@ -395,7 +395,7 @@ class WidgetWindow {
      * @returns {void}
      */
     _setupLanguage() {
-        let language = localStorage.languagePreference;
+        let language = safeStorageGet("languagePreference");
         if (language === undefined) {
             language = navigator.language;
         }
