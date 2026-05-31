@@ -3302,7 +3302,15 @@ class Block {
             }
 
             if (window.hasMouse) {
-                moved = true;
+                const movedDx = Math.abs(
+                    event.stageX / that.activity.getStageScale() - that.original.x
+                );
+                const movedDy = Math.abs(
+                    event.stageY / that.activity.getStageScale() - that.original.y
+                );
+                if (movedDx + movedDy > 5) {
+                    moved = true;
+                }
             } else {
                 // Make it easier to select text on mobile.
                 setTimeout(() => {
