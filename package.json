@@ -28,7 +28,7 @@
     "cypress:run": "cypress run",
     "electron": "electron .",
     "dist": "electron-builder",
-    "generate-test": "node scripts/generate-tests.js"
+    "generate-test": "node --env-file=.env scripts/generate-tests.js"
   },
   "devDependencies": {
     "@babel/core": "^7.28.5",
