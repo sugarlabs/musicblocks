@@ -51,6 +51,7 @@ const createMockElement = id => ({
     setAttribute: jest.fn(),
     getAttribute: jest.fn(),
     innerHTML: "",
+    textContent: "",
     classList: {
         add: jest.fn(),
         remove: jest.fn(),
@@ -105,6 +106,24 @@ describe("Toolbar Class", () => {
         toolbar.init({});
         expect(global._).toHaveBeenCalledTimes(102);
         expect(global._).toHaveBeenNthCalledWith(1, "About Music Blocks");
+    });
+
+    test("uses textContent for translated menu labels instead of innerHTML", () => {
+        global._THIS_IS_MUSIC_BLOCKS_ = true;
+        const saveHtmlElement = createMockElement("save-html");
+        const beginnerModeElem = createMockElement("beginnerMode");
+        const advancedModeElem = createMockElement("advancedMode");
+        global.docById.mockImplementation(id => {
+            if (id === "save-html") return saveHtmlElement;
+            if (id === "beginnerMode") return beginnerModeElem;
+            if (id === "advancedMode") return advancedModeElem;
+            return createMockElement(id);
+        });
+
+        toolbar.init({ beginnerMode: true });
+
+        expect(saveHtmlElement.textContent).toBe("Save project as HTML");
+        expect(saveHtmlElement.innerHTML).toBe("");
     });
 
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ false", () => {

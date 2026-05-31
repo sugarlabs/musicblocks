@@ -51,14 +51,14 @@ describe("StringHelper", () => {
             expect(lastStringTurtle[1]).toBe("Open in Turtle Blocks");
         });
 
-        it("should init and append innerHTML to elements matching id", () => {
+        it("should init and replace visible text safely for matching elements", () => {
             document.body.innerHTML = '<div id="logo-container">Initial</div>';
             const helperObj = new StringHelper({ IsMusicBlocks: true });
 
             helperObj.init();
 
             const elem = document.getElementById("logo-container");
-            expect(elem.innerHTML).toBe("InitialPlanet");
+            expect(elem.textContent).toBe("Planet");
         });
 
         it("should init and set attribute if property is provided", () => {
@@ -138,18 +138,18 @@ describe("StringHelper", () => {
         });
 
         describe("init() improvements", () => {
-            it("should set innerHTML for elements without a third property", () => {
+            it("should set text content for elements without a third property", () => {
                 document.body.innerHTML = '<div id="logo-container"></div>';
                 helper.init();
                 const elem = document.getElementById("logo-container");
-                expect(elem.innerHTML).toBe("Planet");
+                expect(elem.textContent).toBe("Planet");
             });
 
-            it("should append to existing innerHTML", () => {
+            it("should replace existing visible text instead of appending HTML", () => {
                 document.body.innerHTML = '<div id="logo-container">Prefix</div>';
                 helper.init();
                 const elem = document.getElementById("logo-container");
-                expect(elem.innerHTML).toBe("PrefixPlanet");
+                expect(elem.textContent).toBe("Planet");
             });
 
             it("should set placeholder attribute for search input", () => {
@@ -163,8 +163,8 @@ describe("StringHelper", () => {
                 document.body.innerHTML =
                     '<div id="logo-container"></div><div id="localtitle"></div>';
                 helper.init();
-                expect(document.getElementById("logo-container").innerHTML).toBe("Planet");
-                expect(document.getElementById("localtitle").innerHTML).toBe("My Projects");
+                expect(document.getElementById("logo-container").textContent).toBe("Planet");
+                expect(document.getElementById("localtitle").textContent).toBe("My Projects");
             });
 
             it("should process all strings entries when all elements exist", () => {
@@ -181,8 +181,17 @@ describe("StringHelper", () => {
                     const elem = document.getElementById(entry[0]);
                     if (entry.length === 3) {
                         expect(elem.getAttribute(entry[2])).toBe(entry[1]);
+                    } else if (entry[0] === "deleter-confirm") {
+                        expect(elem.textContent).toBe('Delete ""?');
+                        expect(elem.querySelector("#deleter-title")).not.toBeNull();
+                    } else if (entry[0] === "deleter-paragraph") {
+                        expect(elem.textContent).toBe('Permanently delete project ""?');
+                        expect(elem.querySelector("#deleter-name")).not.toBeNull();
+                    } else if (entry[0] === "projectviewer-report-conduct") {
+                        expect(elem.textContent).toContain("Report projects which violate the");
+                        expect(elem.querySelector("a")).not.toBeNull();
                     } else {
-                        expect(elem.innerHTML).toContain(entry[1]);
+                        expect(elem.textContent).toContain(entry[1]);
                     }
                 }
             });
@@ -199,8 +208,7 @@ describe("StringHelper", () => {
                 helper.init();
                 helper.init();
                 const elem = document.getElementById("local-tab");
-                // innerHTML is appended, so calling init twice doubles the text
-                expect(elem.innerHTML).toBe("LocalLocal");
+                expect(elem.textContent).toBe("Local");
             });
 
             it("should set data-tooltip for report-project and download-file entries", () => {
@@ -220,19 +228,59 @@ describe("StringHelper", () => {
                 ).toBe("Download as File");
             });
 
-            it("should inject sort option labels via innerHTML", () => {
+            it("should inject sort option labels via text content", () => {
                 document.body.innerHTML =
                     '<div id="option-recent"></div>' +
                     '<div id="option-liked"></div>' +
                     '<div id="option-downloaded"></div>' +
                     '<div id="option-alphabetical"></div>';
                 helper.init();
-                expect(document.getElementById("option-recent").innerHTML).toBe("Most recent");
-                expect(document.getElementById("option-liked").innerHTML).toBe("Most liked");
-                expect(document.getElementById("option-downloaded").innerHTML).toBe(
+                expect(document.getElementById("option-recent").textContent).toBe("Most recent");
+                expect(document.getElementById("option-liked").textContent).toBe("Most liked");
+                expect(document.getElementById("option-downloaded").textContent).toBe(
                     "Most downloaded"
                 );
-                expect(document.getElementById("option-alphabetical").innerHTML).toBe("A-Z");
+                expect(document.getElementById("option-alphabetical").textContent).toBe("A-Z");
+            });
+
+            it("should preserve existing child elements while setting safe text", () => {
+                document.body.innerHTML =
+                    '<a id="logo-container"><i class="material-icons" id="planeticon">public</i>Old</a>';
+
+                helper.init();
+
+                const elem = document.getElementById("logo-container");
+                expect(elem.querySelector("#planeticon")).not.toBeNull();
+                expect(elem.textContent).toBe("publicPlanet");
+            });
+
+            it("should rebuild deleter placeholders without injecting HTML strings", () => {
+                document.body.innerHTML =
+                    '<h4 id="deleter-confirm"></h4><p id="deleter-paragraph"></p>';
+
+                helper.init();
+
+                expect(
+                    document.getElementById("deleter-confirm").querySelector("#deleter-title")
+                ).not.toBeNull();
+                expect(
+                    document.getElementById("deleter-paragraph").querySelector("#deleter-name")
+                ).not.toBeNull();
+            });
+
+            it("should rebuild the report conduct link with safe DOM nodes", () => {
+                document.body.innerHTML = '<p id="projectviewer-report-conduct"></p>';
+
+                helper.init();
+
+                const anchor = document
+                    .getElementById("projectviewer-report-conduct")
+                    .querySelector("a");
+                expect(anchor).not.toBeNull();
+                expect(anchor.href).toContain(
+                    "github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md"
+                );
+                expect(anchor.textContent).toBe("Sugar Labs Code of Conduct");
             });
         });
     });

@@ -85,6 +85,61 @@ class StringHelper {
         ]);
     }
 
+    _setSafeText(elem, text) {
+        if (elem.children.length === 0) {
+            elem.textContent = text;
+            return;
+        }
+
+        Array.from(elem.childNodes)
+            .filter(node => node.nodeType === Node.TEXT_NODE)
+            .forEach(node => node.remove());
+
+        elem.appendChild(document.createTextNode(text));
+    }
+
+    _setTemplateWithPlaceholder(elem, template) {
+        const match = template.match(/<span id="([^"]+)"><\/span>/);
+        if (!match) {
+            this._setSafeText(elem, template);
+            return;
+        }
+
+        const before = template.slice(0, match.index);
+        const after = template.slice(match.index + match[0].length);
+        const spanId = match[1];
+        const placeholder = document.createElement("span");
+        placeholder.id = spanId;
+
+        elem.replaceChildren(
+            document.createTextNode(before),
+            placeholder,
+            document.createTextNode(after)
+        );
+    }
+
+    _setSafeAnchorTemplate(elem, template) {
+        const match = template.match(/<a\b[^>]*>(.*?)<\/a>/);
+        if (!match) {
+            this._setSafeText(elem, template);
+            return;
+        }
+
+        const before = template.slice(0, match.index);
+        const after = template.slice(match.index + match[0].length);
+        const anchor = document.createElement("a");
+        anchor.href = "https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md";
+        anchor.target = "_blank";
+        anchor.rel = "noopener noreferrer";
+        anchor.textContent = match[1];
+
+        elem.replaceChildren(
+            document.createTextNode(before),
+            anchor,
+            document.createTextNode(after)
+        );
+    }
+
     init() {
         for (let i = 0; i < this.strings.length; i++) {
             const obj = this.strings[i];
@@ -92,7 +147,13 @@ class StringHelper {
 
             if (elem) {
                 if (this.strings[i].length === 3) elem.setAttribute(obj[2], obj[1]);
-                else elem.innerHTML += obj[1];
+                else if (obj[0] === "deleter-confirm" || obj[0] === "deleter-paragraph") {
+                    this._setTemplateWithPlaceholder(elem, obj[1]);
+                } else if (obj[0] === "projectviewer-report-conduct") {
+                    this._setSafeAnchorTemplate(elem, obj[1]);
+                } else {
+                    this._setSafeText(elem, obj[1]);
+                }
             }
         }
     }
