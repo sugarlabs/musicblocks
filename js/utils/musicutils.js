@@ -4548,6 +4548,9 @@ function getNote(
     errorMsg,
     temperament
 ) {
+    if (typeof noteArg === "number") {
+    noteArg = noteArg.toString();
+}
     if (temperament === undefined) {
         temperament = "equal";
     }
