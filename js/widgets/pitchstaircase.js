@@ -162,7 +162,12 @@ class PitchStaircase {
             playCell.onclick = () => {
                 const i = playCell.getAttribute("id");
                 const stepCell = this._stepTables[i].rows[0].cells[1];
+                playCell.innerHTML = `&nbsp;&nbsp;<img src="header-icons/pause-button.svg" title="pause" alt="pause" height="${PitchStaircase.BUTTONSIZE}" width="${PitchStaircase.BUTTONSIZE}">`;
                 this._playOne(stepCell);
+                setTimeout(() => {
+                    playCell.innerHTML = `&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="play" alt="play" height="${PitchStaircase.BUTTONSIZE}" width="${PitchStaircase.BUTTONSIZE}">`;
+                }, 1000);
+                
             };
         }
     }
