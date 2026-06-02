@@ -358,12 +358,18 @@
 | --- | --- |
 | Minuet-in-Reverse | From Haydn's Symphony 47 |
 | In-C.html | In C is a musical piece composed by Terry Riley in 1964 for an indefinite number of performers. |
+| zelda.html | The theme music from Zelda |
+
+| Example | Description |
+| --- | --- |
 | One-of-This-That-Total-Freestyle.html | How many different ways can we utilize "One of This, One of That" for Music? This project explores many possibilities |
 | 5-Limit-Lattice.html | An initial attempt to make an interactive version of https://en.wikipedia.org/wiki/Five-limit_tuning -- It demonstrates how certain chords are tuned to different versions of the (nearly) same pitch. |
 | harmonics-single-string.html | A fun demo of the different harmonics of a stringed instrument. |
 | tonality-square.html | An interactive recreation of https://en.wikipedia.org/wiki/Tonality_diamond |
 | virtual-whiteboard.html | An interactive musical staff "whiteboard" that shows pitch names. With a few tweaks it can show solfege or even frets on the guitar. |
 | harmonic-series.html | A demonstration of the harmonic series that uses the entire screen and maps the nodes to their proper places on a physical instrument (i.e. half, third, forth, fifth, etc.) |
+
+
 
 # Games
 
