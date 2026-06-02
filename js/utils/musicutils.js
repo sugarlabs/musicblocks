@@ -6674,7 +6674,7 @@ const convertFactor = factor => {
             return "2";
         case 0.5625: // 9/16
             return "2 16";
-        case 0.675: // 5/8
+        case 0.625: // 5/8
             return "2 8";
         case 0.6875: // 11/16
             return "2 8 16";

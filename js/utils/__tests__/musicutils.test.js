@@ -2257,7 +2257,7 @@ describe("convertFactor", () => {
         { input: 0.4375, expected: "4.." },
         { input: 0.5, expected: "2" },
         { input: 0.5625, expected: "2 16" },
-        { input: 0.675, expected: "2 8" },
+        { input: 0.625, expected: "2 8" },
         { input: 0.6875, expected: "2 8 16" },
         { input: 0.75, expected: "2." },
         { input: 0.8125, expected: "2 4 16" },
@@ -2274,6 +2274,7 @@ describe("convertFactor", () => {
 
     it("should return null for unknown factors", () => {
         expect(convertFactor(0)).toBeNull();
+        expect(convertFactor(0.675)).toBeNull();
         expect(convertFactor("string")).toBeNull(); // Non-numeric input
     });
 });
