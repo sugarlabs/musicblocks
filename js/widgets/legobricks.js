@@ -285,7 +285,14 @@ function LegoWidget() {
         // Add control buttons in left sidebar
         this.playButton = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
         this.playButton.onclick = () => {
+            this.playButton.innerHTML =
+                '<img src="header-icons/stop-button.svg" title="Stop" alt="Stop">';
             this._playPhrase();
+
+            setTimeout(() => {
+                this.playButton.innerHTML =
+                    '<img src="header-icons/play-button.svg" title="Play" alt="Play">';
+            }, 3000);
         };
 
         this.saveButton = widgetWindow.addButton("save-button.svg", ICONSIZE, _("Save"));
