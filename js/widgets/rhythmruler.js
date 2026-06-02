@@ -615,6 +615,8 @@ class RhythmRuler {
             this._playingOne = false;
             this._playingAll = false;
             this.activity.hideMsgs();
+            this._circularCanvas = null;
+            this._circularView = false;
 
             this.widgetWindow.destroy();
         };
