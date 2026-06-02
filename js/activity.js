@@ -6878,6 +6878,7 @@ class Activity {
                 }
 
                 let args = null;
+                let exportName = myBlock.name;
 
                 if (
                     myBlock.isValueBlock() ||
@@ -6989,8 +6990,7 @@ class Activity {
                         case "nopOneArgBlock":
                         case "nopTwoArgBlock":
                         case "nopThreeArgBlock":
-                            // restore original block name
-                            myBlock.name = myBlock.privateData;
+                            exportName = myBlock.privateData;
                             break;
                         case "matrixData":
                             // deprecated
@@ -7025,7 +7025,7 @@ class Activity {
                 if (args === null) {
                     data.push([
                         blockIndex,
-                        myBlock.name,
+                        exportName,
                         myBlock.container.x,
                         myBlock.container.y,
                         connections
@@ -7033,7 +7033,7 @@ class Activity {
                 } else {
                     data.push([
                         blockIndex,
-                        [myBlock.name, args],
+                        [exportName, args],
                         myBlock.container.x,
                         myBlock.container.y,
                         connections
