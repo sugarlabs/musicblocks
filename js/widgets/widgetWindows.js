@@ -119,6 +119,18 @@ window.widgetWindows = {
         }
 
         if (!focusedAny) {
+            const previouslyFocused = this.focused;
+
+            if (previouslyFocused && !previouslyFocused._rolled) {
+                previouslyFocused._rollup();
+                if (previouslyFocused._rollButton) {
+                    previouslyFocused._rollButton.classList.add("plus");
+                }
+                previouslyFocused._frame.style.width = "auto";
+                previouslyFocused._frame.style.height = "auto";
+                previouslyFocused._frame.style.minHeight = "0px";
+            }
+
             this.focused = null;
         }
     }
