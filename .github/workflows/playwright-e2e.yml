@@ -1,0 +1,195 @@
+name: Playwright E2E Tests
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+  push:
+    branches:
+      - master
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  playwright:
+    name: Run Playwright E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1/4, 2/4, 3/4, 4/4]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright Tests (Sharded)
+        run: npx playwright test --shard=${{ matrix.shard }}
+        env:
+          CI: true
+
+      - name: Upload Playwright Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-${{ matrix.shard }}
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-results-${{ matrix.shard }}
+          path: test-results/
+          retention-days: 30
+
+  mobile-tests:
+    name: Run Mobile E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Mobile Tests
+        run: npx playwright test --project=Mobile-Chrome --project=Mobile-Safari
+        env:
+          CI: true
+
+      - name: Upload Mobile Test Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-mobile-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload Mobile Test Results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-mobile-results
+          path: test-results/
+          retention-days: 30
+
+  visual-regression:
+    name: Visual Regression Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Download Base Branch Screenshots
+        uses: dawidd6/action-download-artifact@v3
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        with:
+          workflow: playwright-e2e.yml
+          branch: ${{ github.base_ref }}
+          name: playwright-visual-baseline
+          path: test-results/
+
+      - name: Run Visual Regression Tests
+        run: npx playwright test --project=chromium --update-snapshots
+        env:
+          CI: true
+
+      - name: Upload Visual Diff Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-visual-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload Visual Baseline
+        uses: actions/upload-artifact@v4
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        with:
+          name: playwright-visual-baseline
+          path: test-results/
+          retention-days: 30
+          overwrite: true
+
+  merge-reports:
+    name: Merge Test Reports
+    runs-on: ubuntu-latest
+    needs: [playwright, mobile-tests, visual-regression]
+    if: always()
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Download All Shard Reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: playwright-report-*
+          path: all-reports/
+
+      - name: Merge Reports
+        run: npx playwright merge-reports --reporter html ./all-reports
+
+      - name: Upload Merged Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-merged-report
+          path: playwright-report/
+          retention-days: 30
