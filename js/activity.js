@@ -549,11 +549,10 @@ class Activity {
                 if (!this._renderLoopRunning) return;
 
                 if (this.stage) {
-                    const hasActiveTweens = createjs.Tween.hasActiveTweens();
                     const hasActiveGifs = this.gifAnimator && this.gifAnimator.getActiveCount() > 0;
                     const isInteracting = this.isDragging || this.isSelecting;
 
-                    if (this.stageDirty || hasActiveTweens || hasActiveGifs || isInteracting) {
+                    if (this.stageDirty || hasActiveGifs || isInteracting) {
                         this.stage.update();
                         this.stageDirty = false;
                         // Continue the loop if there's work or ongoing interaction
@@ -4483,7 +4482,7 @@ class Activity {
          * animation frame when an event handler indicates a change has happened.
          */
         this.__tick = event => {
-            if (this.update || createjs.Tween.hasActiveTweens()) {
+            if (this.update) {
                 this.update = false;
                 this.stageDirty = true;
             }
