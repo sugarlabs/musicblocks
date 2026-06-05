@@ -63,6 +63,9 @@ requirejs.config({
             deps: ["utils/utils"],
             exports: "retryWithBackoff"
         },
+        "utils/error-handler": {
+            exports: "ErrorHandler"
+        },
         "activity/turtledefs": {
             deps: ["utils/utils"],
             exports: "createDefaultStack"
@@ -117,6 +120,7 @@ requirejs.config({
         "activity/activity": {
             deps: [
                 "utils/utils",
+                "utils/error-handler",
                 "activity/activity-context",
                 "activity/logo",
                 "activity/blocks",
