@@ -806,44 +806,12 @@ function setupIntervalsBlocks(activity) {
 
             tur.singer.inDuplicate = true;
 
-            /**
-             * Acquires the connectionStoreLock with proper waiting.
-             * Uses a polling mechanism to wait for the lock to be released.
-             * @param {number} maxRetries - Maximum number of retry attempts
-             * @param {number} retryInterval - Milliseconds between retries
-             * @returns {Promise<boolean>} - Resolves to true when lock is acquired
-             */
-            const __acquireLock = (maxRetries = 100, retryInterval = 10) => {
-                return new Promise(resolve => {
-                    let retries = 0;
-                    const tryAcquire = () => {
-                        if (!logo.connectionStoreLock) {
-                            logo.connectionStoreLock = true;
-                            resolve(true);
-                        } else if (retries < maxRetries) {
-                            retries++;
-                            setTimeout(tryAcquire, retryInterval);
-                        } else {
-                            // Force acquire after max retries to prevent deadlock
-                            console.warn(
-                                "connectionStoreLock: Max retries reached, forcing lock acquisition"
-                            );
-                            logo.connectionStoreLock = true;
-                            resolve(true);
-                        }
-                    };
-                    tryAcquire();
-                });
-            };
-
-            const __listener = async event => {
+            const __listener = event => {
                 tur.singer.inDuplicate = false;
                 tur.singer.duplicateFactor /= factor;
                 tur.singer.arpeggio = [];
 
-                // Acquire lock with proper waiting
-                await __acquireLock();
-
+                logo.connectionStoreLock = true;
                 try {
                     // The last turtle should restore the broken connections.
                     if (__lookForOtherTurtles(blk, turtle) === null) {
@@ -865,15 +833,6 @@ function setupIntervalsBlocks(activity) {
 
             logo.setTurtleListener(turtle, listenerName, __listener);
 
-            // Acquire lock for the main flow
-            // JavaScript is single-threaded, so if the lock is held here it means
-            // a previous critical section did not release it (likely due to an error).
-            // We warn and force-acquire since no spin-wait can help in a single thread.
-            if (logo.connectionStoreLock) {
-                console.warn(
-                    "connectionStoreLock: Lock already held in ArpeggioBlock flow, forcing acquisition"
-                );
-            }
             logo.connectionStoreLock = true;
 
             try {
