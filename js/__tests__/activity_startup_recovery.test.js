@@ -14,7 +14,14 @@ const loadLoadStart = () => {
     code = code.slice(startPoint, endPoint);
     code += "\nthis.loadStart = loadStart;";
 
+    const recoverable = jest.fn();
     const sandbox = {
+        ErrorHandler: {
+            recoverable,
+            capture: jest.fn(),
+            warn: jest.fn(),
+            userFacing: jest.fn()
+        },
         window: global.window,
         document: global.document,
         console,
@@ -43,14 +50,15 @@ const loadLoadStart = () => {
     vm.createContext(sandbox);
     vm.runInContext(code, sandbox);
 
-    return sandbox.loadStart;
+    return { loadStart: sandbox.loadStart, recoverable };
 };
 
 describe("Activity startup recovery", () => {
     let loadStart;
+    let recoverable;
 
     beforeAll(() => {
-        loadStart = loadLoadStart();
+        ({ loadStart, recoverable } = loadLoadStart());
     });
 
     afterEach(() => {
@@ -58,7 +66,6 @@ describe("Activity startup recovery", () => {
     });
 
     test("clears malformed session data and falls back to a clean start", async () => {
-        const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
         const removeItem = jest.fn();
         const activity = {
             storage: {
@@ -93,16 +100,18 @@ describe("Activity startup recovery", () => {
 
         await loadStart(activity);
 
-        expect(consoleSpy).toHaveBeenCalledTimes(1);
-        expect(consoleSpy.mock.calls[0][0]).toHaveProperty("name", "SyntaxError");
-        expect(consoleSpy.mock.calls[0][0].message).toMatch(/Unexpected end of JSON input/);
+        expect(recoverable).toHaveBeenCalledTimes(1);
+        const [errorArg, contextArg] = recoverable.mock.calls[0];
+        expect(errorArg).toBeDefined();
+        expect(errorArg.name).toBe("SyntaxError");
+        expect(errorArg.message).toMatch(/Unexpected end of JSON input/);
+        expect(contextArg).toEqual({ operation: "loadSessionData" });
+        expect(recoverable).toHaveBeenCalledWith(errorArg, contextArg);
         expect(removeItem).toHaveBeenCalledWith("SESSIONCorrupt Project");
         expect(activity.justLoadStart).toHaveBeenCalledTimes(1);
         expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
         expect(activity.update).toBe(true);
 
         document.dispatchEvent(new Event("finishedLoading"));
-
-        consoleSpy.mockRestore();
     });
 });
