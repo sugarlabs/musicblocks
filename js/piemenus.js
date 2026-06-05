@@ -3195,7 +3195,7 @@ const piemenuIntervals = (block, selectedInterval) => {
                     }
                 }
             }
-            if (isInitialized) {
+            if (isInitialized && activeTabs.length > 0) {
                 that._intervalWheel.navigateWheel(i * 8 + activeTabs[0] - 1);
                 __selectionChanged();
             }
