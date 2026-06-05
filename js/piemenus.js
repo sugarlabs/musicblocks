@@ -3179,6 +3179,7 @@ const piemenuIntervals = (block, selectedInterval) => {
             )
         ) + "px";
 
+    let isInitialized = false;
     // Add function to each main menu for show/hide sub menus
     // TODO: Add all tabs to each interval
     const __setupAction = (i, activeTabs) => {
@@ -3193,6 +3194,10 @@ const piemenuIntervals = (block, selectedInterval) => {
                         that._intervalWheel.navItems[l * 8 + j].navItem.show();
                     }
                 }
+            }
+            if (isInitialized && activeTabs.length > 0) {
+                that._intervalWheel.navigateWheel(i * 8 + activeTabs[0] - 1);
+                __selectionChanged();
             }
         };
     };
@@ -3227,6 +3232,7 @@ const piemenuIntervals = (block, selectedInterval) => {
     } else {
         block._intervalWheel.navigateWheel(INTERVALS[i][2][0] - 1);
     }
+    isInitialized = true;
 
     const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
