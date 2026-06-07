@@ -26,6 +26,7 @@ This PR fixes #
 -   [ ] Tests — Adds or updates test coverage
 -   [ ] Documentation — Updates to docs, comments, or README
 -   [ ] Chore / Refactor — Maintenance, cleanup, or refactoring with no behavior change
+-   [ ] CI/CD — Changes to CI/CD workflows and automation
 
 ## Changes Made
 
