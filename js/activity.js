@@ -545,10 +545,7 @@ class Activity {
                 if (this.stage) {
                     const hasActiveTweens = createjs.Tween.hasActiveTweens();
                     const hasActiveGifs = this.gifAnimator && this.gifAnimator.getActiveCount() > 0;
-                    const isInteracting =
-                        this.isDragging ||
-                        this.isSelecting ||
-                        (this.blocks && this.blocks.dragGroup !== null);
+                    const isInteracting = this.isDragging || this.isSelecting;
 
                     if (this.stageDirty || hasActiveTweens || hasActiveGifs || isInteracting) {
                         this.stage.update();
