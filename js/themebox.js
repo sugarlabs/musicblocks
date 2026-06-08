@@ -275,9 +275,19 @@ class ThemeBox {
 
         // Update theme icon immediately if DOM is ready
         this.updateThemeIcon();
-
         // Refresh UI components (including planet iframe) if they exist
         this.refreshUIComponents();
+
+        // Watch for OS-level theme changes at runtime.
+        // Auto-switch only when user has no manually saved preference.
+        if (window.matchMedia) {
+            window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", e => {
+                if (!localStorage.getItem("themePreference")) {
+                    this._theme = e.matches ? "dark" : "light";
+                    this.applyThemeInstantly();
+                }
+            });
+        }
     }
 
     /**
