@@ -3208,7 +3208,7 @@ class Activity {
             // Periodic check for idle state - store interval ID for cleanup
             this._idleWatcherInterval = setInterval(() => {
                 // Check if music/code is playing
-                const isMusicPlaying = this.logo?._alreadyRunning || false;
+                const isMusicPlaying = this.turtles?.running() || false;
 
                 if (!isMusicPlaying && Date.now() - lastActivity > IDLE_THRESHOLD) {
                     if (!this.isAppIdle) {
