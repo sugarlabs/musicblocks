@@ -61,14 +61,26 @@ Project Maintainer.
 | Changed files | Requested review |
 | --- | --- |
 | `js/blocks/NumberBlocks.js` | Blocks & Runtime |
+| `js/blocks/__tests__/NumberBlocks.test.js` | Blocks & Runtime |
 | `js/widgets/tempo.js` | UI/UX & Accessibility |
+| `js/widgets/__tests__/tempo.test.js` | Tests & CI |
 | `planet/js/Publisher.js` | Planet & Project Sharing |
 | `.github/workflows/...` | Tests & CI |
 | `README.md` | Project Maintainer |
+| `js/widgets/tempo.js` and `js/widgets/__tests__/tempo.test.js` | UI/UX & Accessibility and Tests & CI |
 | `js/widgets/tempo.js` and `planet/js/Publisher.js` | UI/UX & Accessibility and Planet & Project Sharing |
 | `js/widgets/tempo.js` and `README.md` | UI/UX & Accessibility and Project Maintainer |
 
-Feature tests stay with the same area as the feature. Shared test setup and CI
+Feature tests stay with the same technical area when that area already has a
+clear code owner, such as Blocks & Runtime or Planet. This keeps source-and-test
+changes in those areas from needing an extra approval only because a matching
+test changed.
+
+Music and UI code paths request both code review and feedback on classroom
+use, music behavior, and child-facing UX.
+Tests in those paths go to Tests & CI, so test review is handled by people
+maintaining the project's test practice. Tests that would otherwise fall back
+to a Project Maintainer also go to Tests & CI. Shared test setup and CI
 infrastructure go to Tests & CI.
 
 | Situation | Approval needed for merge |

@@ -1,57 +1,47 @@
 # Default owner for paths that do not have an area approver yet.
 * @walterbender
 
+# General JavaScript fallback. More specific JavaScript rules below override
+# this for owned areas.
+/js/ @walterbender
+
 # Blocks and runtime
 /js/blocks/ @ssz2605
 /js/js-export/ @ssz2605
 
-# Music and pedagogy
-/js/widgets/ @pikurasa
-/css/ @pikurasa
-/header-icons/ @pikurasa
-/js/turtleactions/ @pikurasa
-/lilypond/ @pikurasa
-/examples/ @pikurasa
-/lessonPlan/ @pikurasa
-/js/abc.js @pikurasa
-/js/lilypond.js @pikurasa
-/js/notation.js @pikurasa
-/js/turtle-singer.js @pikurasa
-/js/utils/musicutils.js @pikurasa
-/js/__tests__/abc.test.js @pikurasa
-/js/__tests__/lilypond.test.js @pikurasa
-/js/__tests__/notation.test.js @pikurasa
-/js/__tests__/turtle-singer.test.js @pikurasa
-/js/utils/__tests__/musicutils.test.js @pikurasa
+# Music, pedagogy, and user-facing interface
+/js/widgets/ @walterbender @pikurasa
+/css/ @walterbender @pikurasa
+/header-icons/ @walterbender @pikurasa
+/js/turtleactions/ @walterbender @pikurasa
+/lilypond/ @walterbender @pikurasa
+/examples/ @walterbender @pikurasa
+/lessonPlan/ @walterbender @pikurasa
+/js/abc.js @walterbender @pikurasa
+/js/lilypond.js @walterbender @pikurasa
+/js/notation.js @walterbender @pikurasa
+/js/turtle-singer.js @walterbender @pikurasa
+/js/utils/musicutils.js @walterbender @pikurasa
 
 # Music block overrides. These rules come after the broader runtime rule.
-/js/blocks/DrumBlocks.js @pikurasa
-/js/blocks/EnsembleBlocks.js @pikurasa
-/js/blocks/IntervalsBlocks.js @pikurasa
-/js/blocks/MeterBlocks.js @pikurasa
-/js/blocks/OrnamentBlocks.js @pikurasa
-/js/blocks/PitchBlocks.js @pikurasa
-/js/blocks/RhythmBlockPaletteBlocks.js @pikurasa
-/js/blocks/RhythmBlocks.js @pikurasa
-/js/blocks/ToneBlocks.js @pikurasa
-/js/blocks/VolumeBlocks.js @pikurasa
-/js/blocks/__tests__/DrumBlocks*.test.js @pikurasa
-/js/blocks/__tests__/EnsembleBlocks*.test.js @pikurasa
-/js/blocks/__tests__/IntervalsBlocks*.test.js @pikurasa
-/js/blocks/__tests__/MeterBlocks*.test.js @pikurasa
-/js/blocks/__tests__/OrnamentBlocks*.test.js @pikurasa
-/js/blocks/__tests__/PitchBlocks*.test.js @pikurasa
-/js/blocks/__tests__/RhythmBlockPaletteBlocks*.test.js @pikurasa
-/js/blocks/__tests__/RhythmBlocks*.test.js @pikurasa
-/js/blocks/__tests__/ToneBlocks*.test.js @pikurasa
-/js/blocks/__tests__/VolumeBlocks*.test.js @pikurasa
+/js/blocks/DrumBlocks.js @walterbender @pikurasa
+/js/blocks/EnsembleBlocks.js @walterbender @pikurasa
+/js/blocks/IntervalsBlocks.js @walterbender @pikurasa
+/js/blocks/MeterBlocks.js @walterbender @pikurasa
+/js/blocks/OrnamentBlocks.js @walterbender @pikurasa
+/js/blocks/PitchBlocks.js @walterbender @pikurasa
+/js/blocks/RhythmBlockPaletteBlocks.js @walterbender @pikurasa
+/js/blocks/RhythmBlocks.js @walterbender @pikurasa
+/js/blocks/ToneBlocks.js @walterbender @pikurasa
+/js/blocks/VolumeBlocks.js @walterbender @pikurasa
 
 # Planet and project sharing
 /planet/ @zealot-zew
 /js/planetInterface.js @zealot-zew
 /js/SaveInterface.js @zealot-zew
 
-# Tests and CI infrastructure
+# Tests and CI infrastructure. These rules come after source rules so test
+# files do not fall back to Walter or Devin.
 /.github/workflows/ @omsuneri @Ashutoshx7
 /.husky/ @omsuneri @Ashutoshx7
 /cypress/ @omsuneri @Ashutoshx7
@@ -59,6 +49,20 @@
 /jest.config.js @omsuneri @Ashutoshx7
 /jest.setup.js @omsuneri @Ashutoshx7
 /eslint.config.mjs @omsuneri @Ashutoshx7
+/js/__tests__/ @omsuneri @Ashutoshx7
+/js/utils/__tests__/ @omsuneri @Ashutoshx7
+/js/widgets/__tests__/ @omsuneri @Ashutoshx7
+/js/turtleactions/__tests__/ @omsuneri @Ashutoshx7
+/js/blocks/__tests__/DrumBlocks*.test.js @omsuneri @Ashutoshx7
+/js/blocks/__tests__/EnsembleBlocks*.test.js @omsuneri @Ashutoshx7
+/js/blocks/__tests__/IntervalsBlocks*.test.js @omsuneri @Ashutoshx7
+/js/blocks/__tests__/MeterBlocks*.test.js @omsuneri @Ashutoshx7
+/js/blocks/__tests__/OrnamentBlocks*.test.js @omsuneri @Ashutoshx7
+/js/blocks/__tests__/PitchBlocks*.test.js @omsuneri @Ashutoshx7
+/js/blocks/__tests__/RhythmBlockPaletteBlocks*.test.js @omsuneri @Ashutoshx7
+/js/blocks/__tests__/RhythmBlocks*.test.js @omsuneri @Ashutoshx7
+/js/blocks/__tests__/ToneBlocks*.test.js @omsuneri @Ashutoshx7
+/js/blocks/__tests__/VolumeBlocks*.test.js @omsuneri @Ashutoshx7
 
 # Ownership and governance
 /.github/CODEOWNERS @walterbender @pikurasa
