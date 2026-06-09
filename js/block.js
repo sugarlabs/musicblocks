@@ -3485,6 +3485,31 @@ class Block {
             _dragHasRest2 = false;
             moved = false;
         });
+        // Touch long-press to open context menu
+        this.container.on("touchstart", () => {
+            that.blocks.mouseDownTime = new Date().getTime();
+            that.blocks.longPressTimeout = setTimeout(() => {
+                that.blocks.activeBlock = thisBlock;
+                that._triggerLongPress = true;
+                that.blocks.triggerLongPress();
+            }, LONGPRESSTIME);
+        });
+
+        this.container.on("touchmove", () => {
+            if (that.blocks.longPressTimeout !== null) {
+                clearTimeout(that.blocks.longPressTimeout);
+                that.blocks.longPressTimeout = null;
+                that.blocks.clearLongPress();
+            }
+        });
+
+        this.container.on("touchend", () => {
+            if (that.blocks.longPressTimeout !== null) {
+                clearTimeout(that.blocks.longPressTimeout);
+                that.blocks.longPressTimeout = null;
+                that.blocks.clearLongPress();
+            }
+        });
     }
 
     /**
