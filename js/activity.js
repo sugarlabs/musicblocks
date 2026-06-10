@@ -14,6 +14,8 @@
 // (https://github.com/walterbender/turtleart), but implemented from
 // scratch. -- Walter Bender, October 2014.
 
+// CODEOWNERS routing test: general JS fallback.
+
 try {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has("layoutProfiling")) {
