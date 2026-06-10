@@ -1,3 +1,5 @@
+// CODEOWNERS enforcement check.
+
 // Copyright (c) 2019 Bottersnike
 //
 // This program is free software; you can redistribute it and/or

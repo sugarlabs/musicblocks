@@ -1,3 +1,5 @@
+// CODEOWNERS enforcement check.
+
 module.exports = {
     testMatch: ["**/__tests__/**/*.test.js", "**/?(*.)+(spec|test).[jt]s?(x)"],
     clearMocks: true,
