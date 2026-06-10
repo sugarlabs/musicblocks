@@ -660,7 +660,7 @@ function SampleWidget() {
             container.style.gap = "20px";
 
             const h1 = document.createElement("h1");
-            h1.innerHTML = "AI Sample Generation";
+            h1.textContent = "AI Sample Generation";
             h1.style.fontSize = "40px";
             h1.style.marginTop = "0";
             h1.style.marginBottom = "0px";
@@ -699,7 +699,7 @@ function SampleWidget() {
             submit.style.borderRadius = "10px";
             submit.style.border = "none";
             submit.style.cursor = "pointer";
-            submit.innerHTML = "Submit";
+            submit.textContent = "Submit";
             submit.onclick = async function () {
                 submit.disabled = true;
                 const prompt = textArea.value;
@@ -745,7 +745,7 @@ function SampleWidget() {
             preview.style.borderRadius = "10px";
             preview.style.border = "none";
             preview.style.cursor = "pointer";
-            preview.innerHTML = "Preview";
+            preview.textContent = "Preview";
             preview.disabled = true;
             preview.onclick = () => {
                 if (that.audioPreview) {
@@ -773,7 +773,7 @@ function SampleWidget() {
             save.style.borderRadius = "10px";
             save.style.border = "none";
             save.style.cursor = "pointer";
-            save.innerHTML = "Save";
+            save.textContent = "Save";
             save.disabled = true;
             save.onclick = function () {
                 const audioURL = `http://13.61.94.100:8000/save`;
