@@ -1,3 +1,5 @@
+// CODEOWNERS routing check.
+
 /**
  * MusicBlocks v3.6.2
  *
