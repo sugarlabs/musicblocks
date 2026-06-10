@@ -1,3 +1,5 @@
+// CODEOWNERS routing check.
+
 /**
  * @license
  * MusicBlocks v3.4.1
