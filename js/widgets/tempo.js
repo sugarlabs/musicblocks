@@ -1,3 +1,5 @@
+// CODEOWNERS routing check.
+
 // Copyright (c) 2016-21 Walter Bender
 // Copyright (c) 2016 Hemant Kasat
 // This program is free software; you can redistribute it and/or
