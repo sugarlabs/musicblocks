@@ -1084,6 +1084,7 @@ class Palettes {
                 this._hideMenus();
                 this.activity.showSearchWidget();
             } else {
+                this._clearPendingMenuOpen();
                 this.showPalette(name);
             }
         };
