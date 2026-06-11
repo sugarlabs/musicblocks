@@ -41,6 +41,21 @@ document.body.innerHTML = `
     <div id="palette"><div></div></div>
 `;
 
+// Mock window.matchMedia
+Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: jest.fn().mockImplementation(query => ({
+        matches: query === "(prefers-color-scheme: dark)",
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        dispatchEvent: jest.fn()
+    }))
+});
+
 const ThemeBox = require("../themebox");
 
 describe("ThemeBox", () => {
