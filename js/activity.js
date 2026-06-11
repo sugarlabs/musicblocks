@@ -2859,26 +2859,36 @@ class Activity {
                 "touchmove",
                 event => {
                     if (event.touches.length === 2) {
+                        let totalDeltaY = 0;
+                        let totalDeltaX = 0;
+                        let count = 0;
+
                         for (let i = 0; i < 2; i++) {
                             const touchY = event.touches[i].clientY;
                             const touchX = event.touches[i].clientX;
 
                             if (initialTouches[i][0] !== null && initialTouches[i][1] !== null) {
-                                const deltaY = touchY - initialTouches[i][0];
-                                const deltaX = touchX - initialTouches[i][1];
+                                totalDeltaY += touchY - initialTouches[i][0];
+                                totalDeltaX += touchX - initialTouches[i][1];
+                                count++;
+                            }
 
-                                if (deltaY !== 0) {
-                                    closeAnyOpenMenusAndLabels();
-                                    that.blocksContainer.y -= deltaY;
-                                }
+                            initialTouches[i][0] = touchY;
+                            initialTouches[i][1] = touchX;
+                        }
 
-                                if (that.scrollBlockContainer && deltaX !== 0) {
-                                    closeAnyOpenMenusAndLabels();
-                                    that.blocksContainer.x -= deltaX;
-                                }
+                        if (count > 0) {
+                            const avgDeltaY = totalDeltaY / count;
+                            const avgDeltaX = totalDeltaX / count;
 
-                                initialTouches[i][0] = touchY;
-                                initialTouches[i][1] = touchX;
+                            if (avgDeltaY !== 0) {
+                                closeAnyOpenMenusAndLabels();
+                                that.blocksContainer.y -= avgDeltaY;
+                            }
+
+                            if (that.scrollBlockContainer && avgDeltaX !== 0) {
+                                closeAnyOpenMenusAndLabels();
+                                that.blocksContainer.x -= avgDeltaX;
                             }
                         }
 
