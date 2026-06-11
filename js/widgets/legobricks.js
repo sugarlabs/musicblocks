@@ -285,9 +285,13 @@ function LegoWidget() {
         // Add control buttons in left sidebar
         this.playButton = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
         this.playButton.onclick = () => {
-            this._playPhrase();
-            const img = this.playButton.querySelector("img");
-            if (img) img.src = "header-icons/stop-button.svg";
+            if (this.isPlaying) {
+                this._stopPlayback();
+            } else {
+                this._playPhrase();
+                const img = this.playButton.querySelector("img");
+                if (img) img.src = "header-icons/stop-button.svg";
+            }
         };
 
         this.saveButton = widgetWindow.addButton("save-button.svg", ICONSIZE, _("Save"));
