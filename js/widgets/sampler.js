@@ -390,11 +390,7 @@ function SampleWidget() {
             }
         };
 
-        reader.onloadend = () => {
-            if (reader.result) {
-                const value = [sampleFile.name, reader.result];
-            }
-        };
+
     };
 
     //Drag-and-Drop sample files
