@@ -150,10 +150,10 @@ class GlobalCard {
             tagcontainer.appendChild(chip);
         }
 
-        // set title text
-        frag.getElementById(`global-project-title-${this.id}`).textContent =
-            this.ProjectData.ProjectName;
-
+        // set project title text and tooltip
+        const titleEl = frag.getElementById(`global-project-title-${this.id}`);
+        titleEl.textContent = this.ProjectData.ProjectName;
+        titleEl.title = this.ProjectData.ProjectName;
         // set number of likes
         frag.getElementById(`global-project-likes-${this.id}`).textContent =
             this.ProjectData.ProjectLikes.toString();
