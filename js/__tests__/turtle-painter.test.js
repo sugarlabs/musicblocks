@@ -190,6 +190,29 @@ describe("Painter Class", () => {
             const refreshSpy = jest.spyOn(painter.activity, "refreshCanvas");
             painter._scheduleCanvasUpdate();
             expect(refreshSpy).not.toHaveBeenCalled();
+            expect(window.requestAnimationFrame).not.toHaveBeenCalled();
+        });
+
+        test("should schedule canvas update and transition state correctly", () => {
+            let callback;
+            window.requestAnimationFrame.mockImplementation(cb => {
+                callback = cb;
+                return 123;
+            });
+            const refreshSpy = jest.spyOn(painter.activity, "refreshCanvas");
+
+            painter._scheduleCanvasUpdate();
+
+            expect(window.requestAnimationFrame).toHaveBeenCalled();
+            expect(painter._pendingCanvasUpdate).toBe(true);
+            expect(painter._rafId).toBe(123);
+            expect(refreshSpy).not.toHaveBeenCalled();
+
+            callback();
+
+            expect(painter._pendingCanvasUpdate).toBe(false);
+            expect(painter._rafId).toBeNull();
+            expect(refreshSpy).toHaveBeenCalled();
         });
     });
 });
