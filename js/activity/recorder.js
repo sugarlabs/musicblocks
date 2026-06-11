@@ -363,7 +363,7 @@ const setupActivityRecorder = activityInstance => {
 // The window assignments are kept so activity.js /* global */ references
 // resolve without requiring activity.js to accept an AMD return value.
 if (typeof define === "function" && define.amd) {
-    define(["utils/utils", "utils/error-handler"], function () {
+    define(function () {
         window.doRecordButton = doRecordButton;
         window.setupActivityRecorder = setupActivityRecorder;
         return { doRecordButton, setupActivityRecorder };
