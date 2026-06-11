@@ -331,7 +331,8 @@ const setupActivityRecorder = activityInstance => {
                                 cleanupStreams();
                             }
                             start.removeEventListener("click", stopHandler);
-                            recording();
+                            // Do NOT call recording() here — onstop fires saveFile
+                            // which always calls recording() as its final step.
                         };
                         start.addEventListener("click", stopHandler);
                     }
@@ -356,13 +357,18 @@ const setupActivityRecorder = activityInstance => {
     };
 };
 
-// Expose as browser globals so RequireJS shim and other scripts can
-// reference them without ES module syntax.
-if (typeof window !== "undefined") {
-    window.doRecordButton = doRecordButton;
-    window.setupActivityRecorder = setupActivityRecorder;
-}
-
-if (typeof module !== "undefined" && module.exports) {
+// Proper AMD module definition. RequireJS will call this factory after
+// loading the listed dependencies, receive the returned object as the
+// module value, and make both symbols available to requiring modules.
+// The window assignments are kept so activity.js /* global */ references
+// resolve without requiring activity.js to accept an AMD return value.
+if (typeof define === "function" && define.amd) {
+    define(["utils/utils", "utils/error-handler"], function () {
+        window.doRecordButton = doRecordButton;
+        window.setupActivityRecorder = setupActivityRecorder;
+        return { doRecordButton, setupActivityRecorder };
+    });
+} else if (typeof module !== "undefined" && module.exports) {
+    // Jest / Node environment
     module.exports = { doRecordButton, setupActivityRecorder };
 }

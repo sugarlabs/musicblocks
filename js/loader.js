@@ -117,10 +117,6 @@ requirejs.config({
             ],
             exports: "Logo"
         },
-        "activity/recorder": {
-            deps: ["utils/utils", "utils/error-handler"],
-            exports: "setupActivityRecorder"
-        },
         "activity/activity": {
             deps: [
                 "utils/utils",
