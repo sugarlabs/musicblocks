@@ -27,63 +27,6 @@ const AccessibilityHelper = {
         this.setupToolbarKeyboardNavigation();
         this.setupFocusManagement();
         this.setupAriaUpdates();
-        this.setupTabFocusTracking();
-        this.ensureProperTabOrder();
-    },
-
-    /**
-     * Ensure all visible interactive elements are in proper tab order
-     */
-    ensureProperTabOrder() {
-        // Find ALL interactive elements with role="button" or type="button"
-        const allButtons = document.querySelectorAll("[role='button'], button, a[role='button']");
-
-        allButtons.forEach(btn => {
-            // Get computed style to detect hidden elements (CSS or inline)
-            const computedStyle = window.getComputedStyle(btn);
-            const isHidden =
-                computedStyle.display === "none" ||
-                computedStyle.visibility === "hidden" ||
-                btn.hidden ||
-                btn.getAttribute("aria-hidden") === "true";
-
-            if (isHidden) {
-                // Hidden elements should not be in tab order
-                btn.setAttribute("tabindex", "-1");
-            } else {
-                // Visible interactive elements should be in tab order
-                if (btn.getAttribute("tabindex") !== "-1") {
-                    btn.setAttribute("tabindex", "0");
-                }
-            }
-        });
-    },
-
-    /**
-     * Track Tab key presses for visual feedback
-     */
-    setupTabFocusTracking() {
-        document.addEventListener("keydown", e => {
-            if (e.key === "Tab") {
-                document.body.classList.add("keyboard-nav-active");
-            }
-        });
-
-        document.addEventListener("keyup", e => {
-            if (e.key === "Tab") {
-                // Keep the indicator on during keyboard navigation
-                setTimeout(() => {
-                    if (document.activeElement && document.activeElement !== document.body) {
-                        document.body.classList.add("keyboard-nav-active");
-                    }
-                }, 100);
-            }
-        });
-
-        // Remove indicator when mouse is used
-        document.addEventListener("mousedown", () => {
-            document.body.classList.remove("keyboard-nav-active");
-        });
     },
 
     /**
