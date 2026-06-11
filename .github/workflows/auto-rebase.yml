@@ -34,6 +34,7 @@ jobs:
                       const excludeLabels = ['no-rebase', 'wip', 'do-not-merge'];
                       const RECENT_PUSH_WINDOW_MS = 5 * 60 * 1000;        // 5 minutes
                       const FAILURE_COMMENT_DEDUPE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+                      // Covers ~99% of forks; unshallow fallback handles longer divergence
                       const FORK_FETCH_DEPTH = 100;
                       // Hidden marker so we can identify our own past comments
                       const COMMENT_MARKER = '<!-- auto-rebase-bot:failure -->';
@@ -92,6 +93,7 @@ jobs:
                       const skips = [];
                       const failures = [];
 
+                      // Outputs for downstream CI: rebase counts and totals for observability
                       const emitOutputs = () => {
                           core.setOutput('rebased-count', rebased);
                           core.setOutput('skipped-count', skipped);
@@ -219,6 +221,7 @@ jobs:
                               // Passed via -c flags so we don't pollute repo config between PRs.
                               const committerName = git('log', '-1', '--format=%cn').trim();
                               const committerEmail = git('log', '-1', '--format=%ce').trim();
+                              core.info(`  Committer: ${committerName} <${committerEmail}>`);
 
                               // Attempt rebase onto latest master
                               git(
@@ -250,20 +253,26 @@ jobs:
                               cleanupIteration(remoteName, tempBranch);
 
                               // Notify the PR author — but dedupe so the same stuck PR
-                              // doesn't get a fresh comment on every master push. Bounding
-                              // by `since` keeps this to a single small API call rather
-                              // than paginating an entire comment history.
+                              // doesn't get a fresh comment on every master push. We bound
+                              // the scan by `since` (the dedupe window) and paginate within
+                              // it: listComments is oldest-first and accepts no sort param,
+                              // so on a noisy PR our marker can fall outside the first page
+                              // and we'd double-post. Paginating over the window is correct
+                              // and stays cheap because `since` caps how much we fetch.
                               try {
                                   const since = new Date(
                                       Date.now() - FAILURE_COMMENT_DEDUPE_MS
                                   ).toISOString();
-                                  const { data: recentComments } = await github.rest.issues.listComments({
-                                      owner: context.repo.owner,
-                                      repo: context.repo.repo,
-                                      issue_number: prNumber,
-                                      since,
-                                      per_page: 100
-                                  });
+                                  const recentComments = await github.paginate(
+                                      github.rest.issues.listComments,
+                                      {
+                                          owner: context.repo.owner,
+                                          repo: context.repo.repo,
+                                          issue_number: prNumber,
+                                          since,
+                                          per_page: 100
+                                      }
+                                  );
                                   const alreadyNotified = recentComments.some(c =>
                                       (c.body || '').includes(COMMENT_MARKER)
                                   );
