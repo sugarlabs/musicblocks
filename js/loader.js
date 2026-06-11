@@ -117,9 +117,9 @@ requirejs.config({
             ],
             exports: "Logo"
         },
-        "activity/activity/recorder": {
+        "activity/recorder": {
             deps: ["utils/utils", "utils/error-handler"],
-            exports: "doRecordButton"
+            exports: "setupActivityRecorder"
         },
         "activity/activity": {
             deps: [
@@ -129,7 +129,7 @@ requirejs.config({
                 "activity/logo",
                 "activity/blocks",
                 "activity/turtles",
-                "activity/activity/recorder"
+                "activity/recorder"
             ],
             exports: "Activity"
         },
@@ -163,6 +163,7 @@ requirejs.config({
         "utils": "js/utils",
         "widgets": "js/widgets",
         "activity": "js",
+        "activity/recorder": "js/activity/recorder",
         "easeljs.min": "lib/easeljs.min",
         "tweenjs.min": "lib/tweenjs.min",
         "prefixfree.min": "lib/prefixfree.min",

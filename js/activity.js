@@ -120,7 +120,7 @@ let MYDEFINES = [
     "activity/rubrics",
     "activity/macros",
     "activity/SaveInterface",
-    "activity/activity/recorder",
+    "activity/recorder",
     "utils/musicutils",
     "utils/synthutils",
     "utils/mathutils",

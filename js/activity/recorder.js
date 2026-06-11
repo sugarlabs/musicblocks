@@ -9,41 +9,35 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/*
-   global ErrorHandler, debugLog, _
-*/
+/* global ErrorHandler, debugLog, _ */
 
-/*
-   exported doRecordButton, setupActivityRecorder
-*/
+/* exported doRecordButton, setupActivityRecorder */
 
-let isExecuting = false; // Flag variable to track execution status
+let isExecuting = false; // Guard against re-entrant button clicks
 
 /**
- * Sets up a record button functionality for the given activity.
+ * Calls _doRecordButton on the activity instance, guarded against
+ * re-entrant invocations. isExecuting is reset by the recording flow
+ * itself (inside saveFile / error paths) so subsequent recordings work.
  * @param {object} activity - The activity context.
  */
 const doRecordButton = activity => {
-    /**
-     * Executes the record button functionality if execution is not already in progress.
-     */
     if (isExecuting) {
-        return; // Exit the function if execution is already in progress
+        return;
     }
 
     if (!activity || typeof activity._doRecordButton !== "function") {
         console.warn("doRecordButton called without valid activity context");
-        isExecuting = false;
         return;
     }
 
-    isExecuting = true; // Set the flag to indicate execution has started
+    isExecuting = true;
     activity._doRecordButton();
 };
 
 /**
- * Initializes the _doRecordButton method on the activity instance.
- * @param {object} activityInstance - The activity instance to attach the recorder API to.
+ * Attaches _doRecordButton to the activity instance.
+ * @param {object} activityInstance - The activity instance.
  */
 const setupActivityRecorder = activityInstance => {
     activityInstance._doRecordButton = () => {
@@ -57,8 +51,9 @@ const setupActivityRecorder = activityInstance => {
         let audioDestination = null;
 
         /**
-         * Records the screen using the browser's media devices API.
-         * @returns {Promise<MediaStream>} A promise resolving to the recorded media stream.
+         * Dispatches to canvas-only or full-screen recording based on
+         * the stored user preference.
+         * @returns {Promise<MediaStream>}
          */
         async function recordScreen() {
             let mode = null;
@@ -82,58 +77,43 @@ const setupActivityRecorder = activityInstance => {
                 throw new Error("Canvas element not found");
             }
 
-            // Get the toolbar height to exclude from recording
             const toolbar = document.getElementById("toolbars");
             const toolbarHeight = toolbar ? toolbar.offsetHeight : 0;
-
-            // Get canvas dimensions
             const canvasWidth = canvas.width;
             const canvasHeight = canvas.height;
-
-            // Calculate the visible area (excluding toolbar)
             const visibleHeight = canvasHeight - toolbarHeight;
 
-            // Create a clean recording canvas
             const recordCanvas = document.createElement("canvas");
             recordCanvas.width = canvasWidth;
             recordCanvas.height = canvasHeight;
             const recordCtx = recordCanvas.getContext("2d");
 
-            // Set background to match the canvas (white/light gray)
-            recordCtx.fillStyle = "#f5f5f5"; // Adjust this color to match your canvas background
+            recordCtx.fillStyle = "#f5f5f5";
             let animationFrameId;
 
-            // Function to continuously copy canvas content
             const copyFrame = () => {
-                // Fill background
                 recordCtx.fillRect(0, 0, canvasWidth, canvasHeight);
-
-                // Draw only the visible portion of the canvas (skip the toolbar area)
                 recordCtx.drawImage(
                     canvas,
                     0,
-                    toolbarHeight, // Source x, y (skip toolbar)
+                    toolbarHeight,
                     canvasWidth,
-                    visibleHeight, // Source width, height
+                    visibleHeight,
                     0,
-                    0, // Destination x, y
+                    0,
                     canvasWidth,
-                    visibleHeight // Destination width, height
+                    visibleHeight
                 );
 
-                // Continue if still recording
                 if (flag === 1) {
                     animationFrameId = requestAnimationFrame(copyFrame);
                 }
             };
 
-            // Start copying frames
             copyFrame();
 
-            // Capture the canvas stream directly at 30fps
             const canvasStream = recordCanvas.captureStream(30);
 
-            // Add audio track if available
             const Tone = that.logo.synth.tone;
             if (Tone && Tone.context) {
                 const dest = Tone.context.createMediaStreamDestination();
@@ -146,7 +126,6 @@ const setupActivityRecorder = activityInstance => {
             }
             currentStream = canvasStream;
 
-            // Clean up animation frame when recording stops
             canvasStream.getTracks()[0].addEventListener("ended", () => {
                 if (animationFrameId) {
                     cancelAnimationFrame(animationFrameId);
@@ -181,59 +160,9 @@ const setupActivityRecorder = activityInstance => {
         }
 
         /**
-         * Saves the recorded chunks as a video file.
-         * @param {Blob[]} recordedChunks - The recorded video chunks.
+         * Cleans up all active media tracks and recorder state.
          */
-        function saveFile(recordedChunks) {
-            flag = 1;
-            recInside.classList.remove("blink");
-            const showDialog = message => {
-                if (window.MBDialog && typeof window.MBDialog.alert === "function") {
-                    window.MBDialog.alert(message, _("Save recording"));
-                } else {
-                    alert(message);
-                }
-            };
-            const finalizeSave = filename => {
-                if (filename === null || filename.trim() === "") {
-                    showDialog(_("File save canceled"));
-                    flag = 0;
-                    recording();
-                    doRecordButton();
-                    return;
-                }
-
-                const blob = new Blob(recordedChunks, { type: "video/webm" });
-                const url = URL.createObjectURL(blob);
-
-                that.save.download("webm", url, filename);
-
-                recordedChunks = [];
-                flag = 0;
-
-                // Allow multiple recordings
-                recording();
-                doRecordButton();
-            };
-            // Prevent zero-byte files
-            if (!recordedChunks || recordedChunks.length === 0) {
-                showDialog(_("Recorded file is empty. File not saved."));
-                flag = 0;
-                recording();
-                doRecordButton();
-                return;
-            }
-            const blob = new Blob(recordedChunks, {
-                type: "video/webm"
-            });
-            if (blob.size === 0) {
-                showDialog(_("Recorded file is empty. File not saved."));
-                flag = 0;
-                recording();
-                doRecordButton();
-                return;
-            }
-            // Clean up stream after recording
+        function cleanupStreams() {
             if (currentStream) {
                 currentStream.getTracks().forEach(track => track.stop());
                 currentStream = null;
@@ -243,28 +172,72 @@ const setupActivityRecorder = activityInstance => {
                 audioDestination = null;
             }
             mediaRecorder = null;
-            // Prompt to save file
-            const filename = window.prompt(_("Enter file name"));
-            if (filename === null || filename.trim() === "") {
-                alert(_("File save canceled"));
+        }
+
+        /**
+         * Saves the recorded chunks as a .webm file using a single
+         * prompt/download flow (MBDialog when available, native prompt
+         * otherwise). isExecuting is reset here so subsequent recordings
+         * are allowed.
+         * @param {Blob[]} recordedChunks - The accumulated recorded chunks.
+         */
+        function saveFile(recordedChunks) {
+            recInside.classList.remove("blink");
+
+            const showAlert = message => {
+                if (window.MBDialog && typeof window.MBDialog.alert === "function") {
+                    window.MBDialog.alert(message, _("Save recording"));
+                } else {
+                    alert(message);
+                }
+            };
+
+            if (!recordedChunks || recordedChunks.length === 0) {
+                showAlert(_("Recorded file is empty. File not saved."));
                 flag = 0;
+                isExecuting = false;
                 recording();
-                doRecordButton();
-                return; // Exit without saving the file
+                return;
             }
-            const downloadLink = document.createElement("a");
-            downloadLink.href = URL.createObjectURL(blob);
-            downloadLink.download = `${filename}.webm`;
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            that.textMsg(_("Saved! Check your Downloads folder."));
-            URL.revokeObjectURL(blob);
-            document.body.removeChild(downloadLink);
-            flag = 0;
-            // Allow multiple recordings
-            recording();
-            doRecordButton();
-            that.textMsg(_("Recording stopped. File saved."));
+
+            // Create blob once and reuse throughout this function
+            const blob = new Blob(recordedChunks, { type: "video/webm" });
+
+            if (blob.size === 0) {
+                showAlert(_("Recorded file is empty. File not saved."));
+                flag = 0;
+                isExecuting = false;
+                recording();
+                return;
+            }
+
+            cleanupStreams();
+
+            const finalizeSave = filename => {
+                if (filename === null || filename === undefined || filename.trim() === "") {
+                    showAlert(_("File save canceled"));
+                    flag = 0;
+                    isExecuting = false;
+                    recording();
+                    return;
+                }
+
+                const url = URL.createObjectURL(blob);
+                const downloadLink = document.createElement("a");
+                downloadLink.href = url;
+                downloadLink.download = `${filename}.webm`;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                URL.revokeObjectURL(url);
+                document.body.removeChild(downloadLink);
+
+                that.textMsg(_("Recording stopped. File saved."));
+                flag = 0;
+                isExecuting = false;
+                recording();
+            };
+
+            // Single save flow: prefer MBDialog, fall back to native prompt
             if (window.MBDialog && typeof window.MBDialog.prompt === "function") {
                 window.MBDialog.prompt({
                     title: _("Save recording"),
@@ -280,7 +253,7 @@ const setupActivityRecorder = activityInstance => {
         }
 
         /**
-         * Stops the recording process.
+         * Stops the media recorder and cleans up the canvas stream.
          */
         function stopRec() {
             flag = 0;
@@ -289,22 +262,19 @@ const setupActivityRecorder = activityInstance => {
                 mediaRecorder.stop();
             }
 
-            // Clean up the recording canvas stream
             if (currentStream) {
                 currentStream.getTracks().forEach(track => track.stop());
             }
-            const node = document.createElement("p");
-            node.textContent = "Stopped recording";
-            document.body.appendChild(node);
+
+            debugLog("Stopped recording");
         }
 
         /**
-         * Creates a media recorder instance.
-         * @param {MediaStream} stream - The media stream to be recorded.
-         * @param {string} mimeType - The MIME type of the recording.
-         * @returns {MediaRecorder} The created media recorder instance.
+         * Creates and starts a MediaRecorder for the given stream.
+         * @param {MediaStream} stream - The stream to record.
+         * @returns {MediaRecorder}
          */
-        function createRecorder(stream, mimeType) {
+        function createRecorder(stream) {
             flag = 1;
             recInside.classList.add("blink");
             that.textMsg(_("Recording started. Click stop to finish."));
@@ -312,23 +282,14 @@ const setupActivityRecorder = activityInstance => {
             let recordedChunks = [];
             mediaRecorder = new MediaRecorder(stream);
             stream.oninactive = function () {
-                debugLog("Recording is ready to save");
+                debugLog("Recording stream ended; saving.");
                 stopRec();
                 flag = 0;
             };
 
             mediaRecorder.onstop = function () {
-                //saveFile(recordedChunks);
-                //recordedChunks = [];
-                //flag = 0;
-                //recInside.setAttribute("fill", "#ffffff");
-                const blob = new Blob(recordedChunks, { type: "video/webm" });
-                const url = URL.createObjectURL(blob);
-
-                that.save.download("webm", url, null);
-
+                saveFile(recordedChunks);
                 recordedChunks = [];
-                flag = 0;
                 recInside.setAttribute("fill", "#ffffff");
             };
 
@@ -347,39 +308,29 @@ const setupActivityRecorder = activityInstance => {
         }
 
         /**
-         * Handles the recording process.
+         * Arms the record button for the next click. Cleans up any
+         * previously attached handler first to prevent duplicate listeners.
          */
         function recording() {
-            // Remove any previous handler to avoid multiple triggers
             if (start._recordHandler) {
                 start.removeEventListener("click", start._recordHandler);
             }
+
             const handler = async function handler() {
                 try {
                     const stream = await recordScreen();
-                    const mimeType = "video/webm";
-                    mediaRecorder = createRecorder(stream, mimeType);
+                    mediaRecorder = createRecorder(stream);
                     if (flag === 1) {
                         start.removeEventListener("click", handler);
-                        // Add stop handler
+
                         const stopHandler = function stopHandler() {
                             if (mediaRecorder && mediaRecorder.state === "recording") {
                                 mediaRecorder.stop();
-                                mediaRecorder = new MediaRecorder(stream);
                                 recInside.classList.remove("blink");
                                 flag = 0;
-                                // Clean up stream
-                                if (currentStream) {
-                                    currentStream.getTracks().forEach(track => track.stop());
-                                }
-                                if (audioDestination && audioDestination.stream) {
-                                    audioDestination.stream
-                                        .getTracks()
-                                        .forEach(track => track.stop());
-                                }
+                                cleanupStreams();
                             }
                             start.removeEventListener("click", stopHandler);
-                            // Re-enable recording for next time
                             recording();
                         };
                         start.addEventListener("click", stopHandler);
@@ -389,21 +340,28 @@ const setupActivityRecorder = activityInstance => {
                     ErrorHandler.recoverable(error, { operation: "recording" });
                     that.textMsg(_("Recording failed: %s").replace(/%s/g, error.message));
                     flag = 0;
-                    // Re-enable recording button
+                    isExecuting = false;
                     recording();
                 }
             };
+
             start.addEventListener("click", handler);
             start._recordHandler = handler;
         }
 
-        // Start recording process if not already executing
         if (flag === 0 && isExecuting) {
             recording();
             start.dispatchEvent(clickEvent);
         }
     };
 };
+
+// Expose as browser globals so RequireJS shim and other scripts can
+// reference them without ES module syntax.
+if (typeof window !== "undefined") {
+    window.doRecordButton = doRecordButton;
+    window.setupActivityRecorder = setupActivityRecorder;
+}
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = { doRecordButton, setupActivityRecorder };
