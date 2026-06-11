@@ -117,6 +117,10 @@ requirejs.config({
             ],
             exports: "Logo"
         },
+        "activity/activity/recorder": {
+            deps: ["utils/utils", "utils/error-handler"],
+            exports: "doRecordButton"
+        },
         "activity/activity": {
             deps: [
                 "utils/utils",
@@ -124,7 +128,8 @@ requirejs.config({
                 "activity/activity-context",
                 "activity/logo",
                 "activity/blocks",
-                "activity/turtles"
+                "activity/turtles",
+                "activity/activity/recorder"
             ],
             exports: "Activity"
         },
