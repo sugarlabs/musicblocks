@@ -389,8 +389,6 @@ function SampleWidget() {
                 this.showSampleTypeError();
             }
         };
-
-
     };
 
     //Drag-and-Drop sample files
