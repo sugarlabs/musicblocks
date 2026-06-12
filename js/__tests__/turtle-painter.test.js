@@ -72,18 +72,44 @@ const createMockTurtle = () => ({
     imageContainer: { removeChild: jest.fn() }
 });
 
+/**
+ * Set up a mock for requestAnimationFrame that either runs callbacks synchronously
+ * (default, safe for most tests) or stores them for deferred invocation (async=true).
+ * When async, returns a flush() function that fires the stored callback.
+ */
+function setupRafMock(async = false) {
+    if (async) {
+        let _rafCb;
+        jest.spyOn(window, "requestAnimationFrame").mockImplementation(cb => {
+            _rafCb = cb;
+            return 123;
+        });
+        return {
+            flush() {
+                if (_rafCb) _rafCb();
+                _rafCb = null;
+            }
+        };
+    }
+    jest.spyOn(window, "requestAnimationFrame").mockImplementation(cb => cb());
+}
+
+function teardownRafMock() {
+    window.requestAnimationFrame.mockRestore();
+}
+
 describe("Painter Class", () => {
     let painter;
     let mockTurtle;
 
     beforeEach(() => {
-        jest.spyOn(window, "requestAnimationFrame").mockImplementation(cb => cb());
+        setupRafMock();
         mockTurtle = createMockTurtle();
         painter = new Painter(mockTurtle);
     });
 
     afterEach(() => {
-        window.requestAnimationFrame.mockRestore();
+        teardownRafMock();
         jest.clearAllMocks();
     });
 
@@ -194,11 +220,7 @@ describe("Painter Class", () => {
         });
 
         test("should schedule canvas update and transition state correctly", () => {
-            let callback;
-            window.requestAnimationFrame.mockImplementation(cb => {
-                callback = cb;
-                return 123;
-            });
+            const raf = setupRafMock(true);
             const refreshSpy = jest.spyOn(painter.activity, "refreshCanvas");
 
             painter._scheduleCanvasUpdate();
@@ -208,7 +230,7 @@ describe("Painter Class", () => {
             expect(painter._rafId).toBe(123);
             expect(refreshSpy).not.toHaveBeenCalled();
 
-            callback();
+            raf.flush();
 
             expect(painter._pendingCanvasUpdate).toBe(false);
             expect(painter._rafId).toBeNull();
@@ -222,13 +244,13 @@ describe("Pen operations", () => {
     let mockTurtle;
 
     beforeEach(() => {
-        jest.spyOn(window, "requestAnimationFrame").mockImplementation(cb => cb());
+        setupRafMock();
         mockTurtle = createMockTurtle();
         painter = new Painter(mockTurtle);
     });
 
     afterEach(() => {
-        window.requestAnimationFrame.mockRestore();
+        teardownRafMock();
         jest.clearAllMocks();
     });
 
@@ -324,13 +346,13 @@ describe("Drawing - doForward", () => {
     let mockTurtle;
 
     beforeEach(() => {
-        jest.spyOn(window, "requestAnimationFrame").mockImplementation(cb => cb());
+        setupRafMock();
         mockTurtle = createMockTurtle();
         painter = new Painter(mockTurtle);
     });
 
     afterEach(() => {
-        window.requestAnimationFrame.mockRestore();
+        teardownRafMock();
         jest.clearAllMocks();
     });
 
@@ -471,13 +493,13 @@ describe("Drawing - doArc", () => {
     let mockTurtle;
 
     beforeEach(() => {
-        jest.spyOn(window, "requestAnimationFrame").mockImplementation(cb => cb());
+        setupRafMock();
         mockTurtle = createMockTurtle();
         painter = new Painter(mockTurtle);
     });
 
     afterEach(() => {
-        window.requestAnimationFrame.mockRestore();
+        teardownRafMock();
         jest.clearAllMocks();
     });
 
@@ -548,13 +570,13 @@ describe("Heading and orientation", () => {
     let mockTurtle;
 
     beforeEach(() => {
-        jest.spyOn(window, "requestAnimationFrame").mockImplementation(cb => cb());
+        setupRafMock();
         mockTurtle = createMockTurtle();
         painter = new Painter(mockTurtle);
     });
 
     afterEach(() => {
-        window.requestAnimationFrame.mockRestore();
+        teardownRafMock();
         jest.clearAllMocks();
     });
 
@@ -641,13 +663,13 @@ describe("Fill and hollow state", () => {
     let mockTurtle;
 
     beforeEach(() => {
-        jest.spyOn(window, "requestAnimationFrame").mockImplementation(cb => cb());
+        setupRafMock();
         mockTurtle = createMockTurtle();
         painter = new Painter(mockTurtle);
     });
 
     afterEach(() => {
-        window.requestAnimationFrame.mockRestore();
+        teardownRafMock();
         jest.clearAllMocks();
     });
 
@@ -682,13 +704,13 @@ describe("Bezier control points", () => {
     let mockTurtle;
 
     beforeEach(() => {
-        jest.spyOn(window, "requestAnimationFrame").mockImplementation(cb => cb());
+        setupRafMock();
         mockTurtle = createMockTurtle();
         painter = new Painter(mockTurtle);
     });
 
     afterEach(() => {
-        window.requestAnimationFrame.mockRestore();
+        teardownRafMock();
         jest.clearAllMocks();
     });
 
@@ -710,13 +732,13 @@ describe("Font setting", () => {
     let mockTurtle;
 
     beforeEach(() => {
-        jest.spyOn(window, "requestAnimationFrame").mockImplementation(cb => cb());
+        setupRafMock();
         mockTurtle = createMockTurtle();
         painter = new Painter(mockTurtle);
     });
 
     afterEach(() => {
-        window.requestAnimationFrame.mockRestore();
+        teardownRafMock();
         jest.clearAllMocks();
     });
 
@@ -736,13 +758,13 @@ describe("Painter._outOfBounds()", () => {
     let mockTurtle;
 
     beforeEach(() => {
-        jest.spyOn(window, "requestAnimationFrame").mockImplementation(cb => cb());
+        setupRafMock();
         mockTurtle = createMockTurtle();
         painter = new Painter(mockTurtle);
     });
 
     afterEach(() => {
-        window.requestAnimationFrame.mockRestore();
+        teardownRafMock();
         jest.clearAllMocks();
     });
 
@@ -780,13 +802,13 @@ describe("Internal Drawing Helpers and Hollow Lines", () => {
     let mockTurtle;
 
     beforeEach(() => {
-        jest.spyOn(window, "requestAnimationFrame").mockImplementation(cb => cb());
+        setupRafMock();
         mockTurtle = createMockTurtle();
         painter = new Painter(mockTurtle);
     });
 
     afterEach(() => {
-        window.requestAnimationFrame.mockRestore();
+        teardownRafMock();
         jest.clearAllMocks();
     });
 
@@ -884,13 +906,13 @@ describe("doSetXY operations", () => {
     let mockTurtle;
 
     beforeEach(() => {
-        jest.spyOn(window, "requestAnimationFrame").mockImplementation(cb => cb());
+        setupRafMock();
         mockTurtle = createMockTurtle();
         painter = new Painter(mockTurtle);
     });
 
     afterEach(() => {
-        window.requestAnimationFrame.mockRestore();
+        teardownRafMock();
         jest.clearAllMocks();
     });
 
@@ -929,13 +951,13 @@ describe("doBezier, doClearMedia, doClear and doScrollXY", () => {
     let mockTurtle;
 
     beforeEach(() => {
-        jest.spyOn(window, "requestAnimationFrame").mockImplementation(cb => cb());
+        setupRafMock();
         mockTurtle = createMockTurtle();
         painter = new Painter(mockTurtle);
     });
 
     afterEach(() => {
-        window.requestAnimationFrame.mockRestore();
+        teardownRafMock();
         jest.clearAllMocks();
     });
 
