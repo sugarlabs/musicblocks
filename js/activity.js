@@ -120,6 +120,7 @@ let MYDEFINES = [
     "activity/rubrics",
     "activity/macros",
     "activity/SaveInterface",
+    "activity/activity/exporters",
     "activity/recorder",
     "utils/musicutils",
     "utils/synthutils",
@@ -1354,219 +1355,15 @@ class Activity {
             this.sendAllToTrash(true, true);
         };
 
-        const extractSVGInner = svgString => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(svgString, "image/svg+xml");
-            const svgEl = doc.querySelector("svg");
-            if (!svgEl) return "";
-
-            // Remove drop shadow filters safely
-            svgEl.querySelectorAll("[filter]").forEach(el => {
-                el.removeAttribute("filter");
-            });
-
-            return svgEl.innerHTML;
-        };
-
-        /**
-         * @returns {SVG} returns SVG of blocks
-         */
         this.printBlockSVG = () => {
-            this.blocks.activeBlock = null;
-            let startCounter = 0;
-            const svgParts = [];
-            let xMax = 0;
-            let yMax = 0;
-            let parts;
-            for (let i = 0; i < this.blocks.blockList.length; i++) {
-                if (!this.blocks.blockList[i] || this.blocks.blockList[i].ignore()) {
-                    continue;
-                }
-
-                if (this.blocks.blockList[i].container.x + this.blocks.blockList[i].width > xMax) {
-                    xMax = this.blocks.blockList[i].container.x + this.blocks.blockList[i].width;
-                }
-
-                if (this.blocks.blockList[i].container.y + this.blocks.blockList[i].height > yMax) {
-                    yMax = this.blocks.blockList[i].container.y + this.blocks.blockList[i].height;
-                }
-
-                const rawSVG = this.blocks.blockList[i].collapsed
-                    ? this.blocks.blockCollapseArt[i]
-                    : this.blocks.blockArt[i];
-
-                // Defensive guard: blockArt may be undefined if a block was restored
-                // from trash and regenerateArtwork() has not yet completed (it is
-                // asynchronous). Skip this block rather than injecting <parsererror>
-                // into the SVG output.
-                if (!rawSVG) {
-                    continue;
-                }
-
-                if (this.blocks.blockList[i].isCollapsible()) {
-                    svgParts.push("<g>");
-                }
-
-                svgParts.push(
-                    '<g transform="translate(' +
-                        this.blocks.blockList[i].container.x +
-                        ", " +
-                        this.blocks.blockList[i].container.y +
-                        ')">'
-                );
-
-                if (!SPECIALINPUTS.includes(this.blocks.blockList[i].name)) {
-                    svgParts.push(extractSVGInner(rawSVG));
-                } else {
-                    // Safer SVG manipulation using DOM instead of string splitting
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(rawSVG, "image/svg+xml");
-
-                    // remove dropshadow filter if present
-                    const filtered = doc.querySelector('[style*="filter:url(#dropshadow)"]');
-                    if (filtered) {
-                        filtered.style.filter = "";
-                    }
-
-                    // Find correct tspan to inject value (matches previous behaviour)
-                    let target = null;
-
-                    // 1) Prefer empty tspan (most block SVGs reserve this for value)
-                    target = Array.from(doc.querySelectorAll("text tspan")).find(
-                        t => !t.textContent || t.textContent.trim() === ""
-                    );
-
-                    // 2) Otherwise fallback to last tspan
-                    if (!target) {
-                        const tspans = doc.querySelectorAll("text tspan");
-                        if (tspans.length) target = tspans[tspans.length - 1];
-                    }
-
-                    // 3) Final fallback to text node
-                    if (!target) {
-                        target = doc.querySelector("text");
-                    }
-
-                    if (target) {
-                        const val = this.blocks.blockList[i].value;
-                        target.textContent = typeof val === "string" ? _(val) : val;
-                    }
-
-                    // serialize without outer <svg> wrapper (matches previous behavior)
-                    let serialized = new XMLSerializer().serializeToString(doc.documentElement);
-
-                    // remove outer svg tags because original code skipped them
-                    serialized = serialized.replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, "");
-
-                    svgParts.push(serialized);
-                }
-
-                svgParts.push("</g>");
-
-                if (this.blocks.blockList[i].isCollapsible()) {
-                    let y;
-                    if (INLINECOLLAPSIBLES.includes(this.blocks.blockList[i].name)) {
-                        y = this.blocks.blockList[i].container.y + 4;
-                    } else {
-                        y = this.blocks.blockList[i].container.y + 12;
-                    }
-
-                    svgParts.push(
-                        '<g transform="translate(' +
-                            this.blocks.blockList[i].container.x +
-                            ", " +
-                            y +
-                            ') scale(0.5 0.5)">'
-                    );
-                    if (this.blocks.blockList[i].collapsed) {
-                        parts = EXPANDBUTTON.split("><");
-                    } else {
-                        parts = COLLAPSEBUTTON.split("><");
-                    }
-
-                    for (let p = 2; p < parts.length - 1; p++) {
-                        svgParts.push("<" + parts[p] + ">");
-                    }
-
-                    svgParts.push("</g>");
-                }
-
-                if (this.blocks.blockList[i].name === "start") {
-                    const x = this.blocks.blockList[i].container.x + 110;
-                    const y = this.blocks.blockList[i].container.y + 12;
-                    svgParts.push('<g transform="translate(' + x + ", " + y + ') scale(0.4 0.4)">');
-
-                    parts = TURTLESVG.replace(/fill_color/g, FILLCOLORS[startCounter])
-                        .replace(/stroke_color/g, STROKECOLORS[startCounter])
-                        .split("><");
-
-                    startCounter += 1;
-                    if (startCounter > 9) {
-                        startCounter = 0;
-                    }
-
-                    for (let p = 2; p < parts.length - 1; p++) {
-                        svgParts.push("<" + parts[p] + ">");
-                    }
-
-                    svgParts.push("</g>");
-                }
-
-                if (this.blocks.blockList[i].isCollapsible()) {
-                    svgParts.push("</g>");
-                }
-            }
-
-            svgParts.push("</svg>");
-
-            return (
-                '<svg xmlns="http://www.w3.org/2000/svg" width="' +
-                xMax +
-                '" height="' +
-                yMax +
-                '">' +
-                encodeURIComponent(svgParts.join(""))
-            );
+            return window.printBlockSVG(this);
         };
 
         /**
          * @returns {PNG} returns PNG of block artwork
          */
         this.printBlockPNG = async () => {
-            // Setps to convert the SVG to PNG of BlockArtwork
-            // Step 1: Generate the SVG content
-            // Step 2: Create a Canvas element
-            // Step 3: Convert SVG to an Image object
-            // Step 4: Draw SVG on the Canvas and export as PNG
-
-            const svgContent = this.printBlockSVG();
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            const parser = new DOMParser();
-            const svgDoc = parser.parseFromString(decodeURIComponent(svgContent), "image/svg+xml");
-            const svgElement = svgDoc.documentElement;
-            const width = parseInt(svgElement.getAttribute("width"), 10);
-            const height = parseInt(svgElement.getAttribute("height"), 10);
-            canvas.width = width;
-            canvas.height = height;
-            const img = new Image();
-            const svgBlob = new Blob([decodeURIComponent(svgContent)], {
-                type: "image/svg+xml;charset=utf-8"
-            });
-            const url = URL.createObjectURL(svgBlob);
-            return new Promise((resolve, reject) => {
-                img.onload = () => {
-                    ctx.drawImage(img, 0, 0);
-                    URL.revokeObjectURL(url);
-                    const pngDataUrl = canvas.toDataURL("image/png");
-                    resolve(pngDataUrl);
-                };
-                img.onerror = err => {
-                    URL.revokeObjectURL(url);
-                    reject(err);
-                };
-                img.src = url;
-            });
+            return window.printBlockPNG(this);
         };
 
         const midiImportBlocks = midi => {
