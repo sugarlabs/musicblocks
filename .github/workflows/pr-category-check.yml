@@ -65,6 +65,20 @@ jobs:
                 displayName: 'Documentation',
                 pattern: /-\s*\[x\]\s*Documentation/i,
               },
+              {
+                label: 'ci',
+                color: '6B7280',
+                description: 'Changes to CI/CD workflows and automation',
+                displayName: 'CI/CD',
+                pattern: /-\s*\[x\]\s*CI\s*\/\s*CD/i,
+              },
+              {
+                label: 'chore',
+                color: 'A0AEC0',
+                description: 'Maintenance, refactoring, or tooling with no behavior change',
+                displayName: 'Chore / Refactor',
+                pattern: /-\s*\[x\]\s*Chore/i,
+              },
             ];
 
             const checkedCategories = categories.filter(cat => cat.pattern.test(prBody));
@@ -90,6 +104,7 @@ jobs:
                 '| Performance | Improves performance |',
                 '| Tests | Adds or updates test coverage |',
                 '| Documentation | Updates to docs, comments, or README |',
+                '| CI/CD | Changes to CI/CD workflows and automation |',
                 '',
                 'Example: Change `- [ ] Bug Fix` to `- [x] Bug Fix`',
                 '',

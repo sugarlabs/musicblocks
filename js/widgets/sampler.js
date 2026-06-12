@@ -710,10 +710,10 @@ function SampleWidget() {
 
                 try {
                     generating = true;
-                    activity.textMsg(_("Generating Audio... (It may take up to 1 minute)"), 2500);
+                    activity.textMsg(_("Generating audio... (It may take up to 1 minute)"), 2500);
 
                     blinkInterval = setInterval(() => {
-                        activity.textMsg(_("Generating Audio..."), 1000);
+                        activity.textMsg(_("Generating audio..."), 1000);
                     }, 5000);
 
                     const response = await fetch(url);
@@ -728,12 +728,12 @@ function SampleWidget() {
                         save.disabled = false;
                     } else {
                         generating = false;
-                        activity.textMsg(_("Failed to generate audio"), 3000);
+                        activity.textMsg(_("Failed to generate audio."), 3000);
                     }
                 } catch (error) {
                     generating = false;
                     clearInterval(blinkInterval);
-                    activity.textMsg(_("Error occurred"), 3000);
+                    activity.textMsg(_("An error occurred."), 3000);
                     submit.disabled = false;
                 }
             };
@@ -994,7 +994,7 @@ function SampleWidget() {
         // Helper function to stop tuner
         const stopTuner = () => {
             if (tunerOn) {
-                activity.textMsg(_("Tuner stopped"), 3000);
+                activity.textMsg(_("Tuner stopped."), 3000);
                 this.activity.logo.synth.stopTuner();
                 tunerOn = false;
                 const tunerContainer = docById("tunerContainer");
@@ -1039,13 +1039,13 @@ function SampleWidget() {
                     tunerContainer.style.marginTop = "100px";
                 }
 
-                const accidetalFlat = document.createElement("img");
-                accidetalFlat.setAttribute("src", "header-icons/accidental-flat.svg");
-                accidetalFlat.style.height = 40 + "px";
-                accidetalFlat.style.width = 40 + "px";
-                accidetalFlat.style.marginTop = "auto";
+                const accidentalFlat = document.createElement("img");
+                accidentalFlat.setAttribute("src", "header-icons/accidental-flat.svg");
+                accidentalFlat.style.height = 40 + "px";
+                accidentalFlat.style.width = 40 + "px";
+                accidentalFlat.style.marginTop = "auto";
 
-                tunerContainer.appendChild(accidetalFlat);
+                tunerContainer.appendChild(accidentalFlat);
 
                 const tunerSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
                 tunerSvg.style.width = 350 + "px";
@@ -1185,9 +1185,9 @@ function SampleWidget() {
                 this.widgetWindow.getWidgetBody().appendChild(tunerContainer);
 
                 await this.activity.logo.synth.startTuner();
-                activity.textMsg(_("Tuner started"), 3000);
+                activity.textMsg(_("Tuner started."), 3000);
             } else {
-                activity.textMsg(_("Tuner stopped"), 3000);
+                activity.textMsg(_("Tuner stopped."), 3000);
                 this.activity.logo.synth.stopTuner();
                 tunerOn = false;
             }
@@ -1196,7 +1196,7 @@ function SampleWidget() {
         this.centsSliderBtn = widgetWindow.addButton(
             "slider.svg",
             ICONSIZE,
-            _("Cents Adjustment"),
+            _("Cents adjustment"),
             ""
         );
 

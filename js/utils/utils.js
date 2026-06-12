@@ -585,6 +585,33 @@ let isSVGEmpty = turtles => {
 
 // fileExt(), fileBasename(), toTitleCase(), escapeHTML(), unescapeHTML(),
 // isSafeUrl() moved to js/utils/utils-logic.js
+/**
+ * Extracts Music Blocks project JSON string from an HTML file's
+ * <div class="code"> element.
+ *
+ * Returns null if the expected structure is not found or if the
+ * captured group is empty.
+ *
+ * @param {string} cleanData - HTML file content (newlines already cleaned).
+ * @returns {string|null} Extracted project JSON string, or null.
+ */
+function extractProjectDataFromHTML(cleanData) {
+    let matchResult;
+
+    if (cleanData.includes('id="codeBlock"')) {
+        matchResult = cleanData.match('<div class="code" id="codeBlock">([\\s\\S]*?)</div>');
+    } else {
+        matchResult = cleanData.match('<div class="code">([\\s\\S]*?)</div>');
+    }
+
+    // matchResult[1] checked for truthiness (not just null)
+    // to also catch empty project-data divs.
+    if (!matchResult || !matchResult[1]) {
+        return null;
+    }
+
+    return matchResult[1];
+}
 
 /**
  * Processes plugin data and updates the activity based on the provided JSON-encoded dictionary.
@@ -624,8 +651,7 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
                 "\n\n" +
                 _("Do you want to allow this plugin to run?") +
                 "\n\n" +
-                _("Source: ") +
-                (pluginSource || _("unknown"))
+                _("Source: %s").replace(/%s/g, pluginSource || _("unknown"))
         );
 
         if (!userConfirmed) {
@@ -834,7 +860,9 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, blk, value, turt
         for (const parameter in obj["PARAMETERPLUGINS"]) {
             if (isVettedPlugin(pluginSource)) {
                 const paramCode = obj["PARAMETERPLUGINS"][parameter];
-                const registryName = `param_${parameter}_${Math.random().toString(36).substr(2, 9)}`;
+                const registryName = `param_${parameter}_${Math.random()
+                    .toString(36)
+                    .substr(2, 9)}`;
                 blobScriptContent += `
 window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk) {
     ${paramCode}
@@ -941,7 +969,9 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
     // Finally, execute safeEvals by creating new Blob scripts for each setup logic block.
     // This is because even setup logic can be blocked by CSP if it contains unsafe-eval.
     for (const item of pendingSafeEvals) {
-        const registryName = `setup_${item.label.replace(/[^a-zA-Z0-9]/g, "_")}_${Math.random().toString(36).substr(2, 9)}`;
+        const registryName = `setup_${item.label.replace(/[^a-zA-Z0-9]/g, "_")}_${Math.random()
+            .toString(36)
+            .substr(2, 9)}`;
         const setupScript = `
 window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivity) {
     ${item.code}
@@ -1457,6 +1487,7 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         ...UtilsLogic,
+        extractProjectDataFromHTML,
         _,
         format,
         delayExecution,

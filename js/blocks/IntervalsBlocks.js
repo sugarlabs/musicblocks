@@ -12,7 +12,7 @@
 /*
    global
 
-   deepClone, last, _, ValueBlock, FlowClampBlock, FlowBlock, NOINPUTERRORMSG,
+   deepClone, last, _, ErrorHandler, ValueBlock, FlowClampBlock, FlowBlock, NOINPUTERRORMSG,
    LeftBlock, Singer, CHORDNAMES, CHORDVALUES, DEFAULTCHORD,
    Queue, INTERVALVALUES
  */
@@ -624,7 +624,7 @@ function setupIntervalsBlocks(activity) {
             constructor(type, value, isDown) {
                 super(
                     (isDown ? "down" : "") + type + value,
-                    _((isDown ? "down " : "") + type) + " " + value
+                    `${isDown ? _("down") : ""} ${type} ${value}`
                 );
                 this.setPalette("intervals", activity);
                 this.setHelpString();
@@ -693,7 +693,7 @@ function setupIntervalsBlocks(activity) {
             ]);
             this.formBlock({
                 //.TRANS: calculate a relative step between notes based on semi-tones
-                name: _("semi-tone interval") + " (+/–)",
+                name: `${_("semi-tone interval")} (+/–)`,
                 args: 1,
                 defaults: [5]
             });
@@ -825,8 +825,9 @@ function setupIntervalsBlocks(activity) {
                             setTimeout(tryAcquire, retryInterval);
                         } else {
                             // Force acquire after max retries to prevent deadlock
-                            console.warn(
-                                "connectionStoreLock: Max retries reached, forcing lock acquisition"
+                            ErrorHandler.warn(
+                                "connectionStoreLock: Max retries reached, forcing lock acquisition",
+                                { operation: "acquireLock" }
                             );
                             logo.connectionStoreLock = true;
                             resolve(true);
@@ -870,8 +871,9 @@ function setupIntervalsBlocks(activity) {
             // a previous critical section did not release it (likely due to an error).
             // We warn and force-acquire since no spin-wait can help in a single thread.
             if (logo.connectionStoreLock) {
-                console.warn(
-                    "connectionStoreLock: Lock already held in ArpeggioBlock flow, forcing acquisition"
+                ErrorHandler.warn(
+                    "connectionStoreLock: Lock already held in ArpeggioBlock flow, forcing acquisition",
+                    { operation: "arpeggioLock" }
                 );
             }
             logo.connectionStoreLock = true;
@@ -1063,9 +1065,10 @@ function setupIntervalsBlocks(activity) {
                 if (intervalName in INTERVALVALUES) {
                     r = INTERVALVALUES[intervalName][2];
                 } else {
-                    console.warn(
-                        `[IntervalsBlocks] Interval name not found in INTERVALVALUES: "${intervalName}"`
-                    );
+                    ErrorHandler.warn("could not find " + intervalName + " in INTERVALVALUES", {
+                        operation: "ratioInterval",
+                        intervalName: intervalName
+                    });
                     r = 1;
                 }
             }
@@ -1073,7 +1076,9 @@ function setupIntervalsBlocks(activity) {
             if (isNaN(r) || r < 0) {
                 r = 1;
 
-                console.debug("ratio " + r + " must be a number > 0");
+                ErrorHandler.warn("ratio " + r + " must be a number > 0", {
+                    operation: "ratioInterval"
+                });
             }
             Singer.IntervalsActions.setRatioInterval(r, turtle, blk);
             return [args[1], 1];
@@ -1105,7 +1110,7 @@ function setupIntervalsBlocks(activity) {
             ]);
             this.formBlock({
                 //.TRANS: calculate a relative step between notes based on semi-tones
-                name: _("scalar interval") + " (+/–)",
+                name: `${_("scalar interval")} (+/–)`,
                 args: 1,
                 defaults: [5]
             });
@@ -1212,12 +1217,8 @@ function setupIntervalsBlocks(activity) {
             this.beginnerBlock(true);
             this.setHelpString([
                 _(
-                    "When Movable do is false, the solfege note names are always tied to specific pitches,"
-                ) +
-                    " " +
-                    _(
-                        'eg "do" is always "C-natural" when Movable do is true, the solfege note names are assigned to scale degrees "do" is always the first degree of the major scale.'
-                    ),
+                    'When Movable do is false, the solfege note names are always tied to specific pitches, eg "do" is always "C-natural" when Movable do is true, the solfege note names are assigned to scale degrees "do" is always the first degree of the major scale.'
+                ),
                 "documentation",
                 null,
                 "moveablehelp"
@@ -1492,7 +1493,7 @@ function setupIntervalsBlocks(activity) {
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Set key block is used to set the key and mode,") + " " + _("eg C Major"),
+                    _("The Set key block is used to set the key and mode, eg C Major"),
                     "documentation",
                     null,
                     "movablehelp"

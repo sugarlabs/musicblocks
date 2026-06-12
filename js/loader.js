@@ -63,6 +63,9 @@ requirejs.config({
             deps: ["utils/utils"],
             exports: "retryWithBackoff"
         },
+        "utils/error-handler": {
+            exports: "ErrorHandler"
+        },
         "activity/turtledefs": {
             deps: ["utils/utils"],
             exports: "createDefaultStack"
@@ -117,10 +120,12 @@ requirejs.config({
         "activity/activity": {
             deps: [
                 "utils/utils",
+                "utils/error-handler",
                 "activity/activity-context",
                 "activity/logo",
                 "activity/blocks",
-                "activity/turtles"
+                "activity/turtles",
+                "activity/recorder"
             ],
             exports: "Activity"
         },
@@ -154,6 +159,7 @@ requirejs.config({
         "utils": "js/utils",
         "widgets": "js/widgets",
         "activity": "js",
+        "activity/recorder": "js/activity/recorder",
         "easeljs.min": "lib/easeljs.min",
         "tweenjs.min": "lib/tweenjs.min",
         "prefixfree.min": "lib/prefixfree.min",

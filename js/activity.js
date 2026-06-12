@@ -29,8 +29,8 @@ try {
    global
 
    ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON, debugLog,
-   ActivityContext,
-   Boundary, CARTESIAN, changeImage, closeWidgets,
+   ErrorHandler, ActivityContext,
+   Boundary, CARTESIAN, changeImage, closeWidgets, doRecordButton, setupActivityRecorder,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
    DEFAULTDELAY, define, doBrowserCheck, doBrowserCheck, docByClass,
@@ -53,7 +53,7 @@ try {
    MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
    SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS,
-   unescapeHTML
+   extractProjectDataFromHTML,unescapeHTML
  */
 
 /*
@@ -92,6 +92,7 @@ let MYDEFINES = [
     "utils/utils-logic",
     "utils/utils",
     "utils/retryWithBackoff",
+    "utils/error-handler",
     "utils/debugLog",
     "activity/artwork",
     "widgets/status",
@@ -119,6 +120,7 @@ let MYDEFINES = [
     "activity/rubrics",
     "activity/macros",
     "activity/SaveInterface",
+    "activity/recorder",
     "utils/musicutils",
     "utils/synthutils",
     "utils/mathutils",
@@ -387,7 +389,7 @@ class Activity {
                 }
             }
         } catch (e) {
-            console.error("Error accessing themePreference storage:", e);
+            ErrorHandler.capture(e, { operation: "loadThemePreference" });
         }
 
         this.beginnerMode = true;
@@ -403,7 +405,7 @@ class Activity {
                 }
             }
         } catch (e) {
-            console.error(e);
+            ErrorHandler.recoverable(e, { operation: "loadBeginnerMode" });
         }
 
         try {
@@ -420,7 +422,7 @@ class Activity {
                 i18next.changeLanguage(lang);
             }
         } catch (e) {
-            console.error(e);
+            ErrorHandler.recoverable(e, { operation: "loadLanguagePreference" });
         }
 
         this.KeySignatureEnv = ["C", "major", false];
@@ -430,7 +432,7 @@ class Activity {
                 this.KeySignatureEnv[2] = this.KeySignatureEnv[2] === "true";
             }
         } catch (e) {
-            console.error(e);
+            ErrorHandler.recoverable(e, { operation: "loadKeySignatureEnv" });
         }
 
         /**
@@ -544,10 +546,7 @@ class Activity {
                 if (this.stage) {
                     const hasActiveTweens = createjs.Tween.hasActiveTweens();
                     const hasActiveGifs = this.gifAnimator && this.gifAnimator.getActiveCount() > 0;
-                    const isInteracting =
-                        this.isDragging ||
-                        this.isSelecting ||
-                        (this.blocks && this.blocks.dragGroup !== null);
+                    const isInteracting = this.isDragging || this.isSelecting;
 
                     if (this.stageDirty || hasActiveTweens || hasActiveGifs || isInteracting) {
                         this.stage.update();
@@ -1585,7 +1584,7 @@ class Activity {
             const container = document.createElement("div");
             container.classList.add("message-container");
             const message = document.createElement("p");
-            message.textContent = _("Set the max blocks to generate :");
+            message.textContent = _("Set the max blocks to generate:");
             message.classList.add("modal-message");
             container.appendChild(message);
 
@@ -1644,7 +1643,7 @@ class Activity {
             modal.classList.add("modalBox");
             modal.id = "clear-confirm";
             const title = document.createElement("h2");
-            title.textContent = _("Clear Workspace");
+            title.textContent = _("Clear workspace");
             title.classList.add("modal-title");
             title.style.color = platformColor.headingColor;
 
@@ -1837,393 +1836,7 @@ class Activity {
             }
         };
 
-        let isExecuting = false; // Flag variable to track execution status
-
-        /**
-         * Sets up a record button functionality for the given activity.
-         * @param {object} activity - The activity context.
-         */
-        const doRecordButton = activity => {
-            /**
-             * Executes the record button functionality if execution is not already in progress.
-             */
-            if (isExecuting) {
-                return; // Exit the function if execution is already in progress
-            }
-
-            if (!activity || typeof activity._doRecordButton !== "function") {
-                console.warn("doRecordButton called without valid activity context");
-                isExecuting = false;
-                return;
-            }
-
-            isExecuting = true; // Set the flag to indicate execution has started
-            activity._doRecordButton();
-        };
-
-        /**
-         * Functionality for the record button.
-         * @private
-         */
-        this._doRecordButton = () => {
-            const that = this;
-            const start = document.getElementById("record"),
-                recInside = document.getElementById("rec_inside");
-            let mediaRecorder;
-            const clickEvent = new Event("click");
-            let flag = 0;
-            let currentStream = null;
-            let audioDestination = null;
-
-            /**
-             * Records the screen using the browser's media devices API.
-             * @returns {Promise<MediaStream>} A promise resolving to the recorded media stream.
-             */
-
-            async function recordScreen() {
-                let mode = null;
-                try {
-                    mode = localStorage.getItem("musicBlocksRecordMode");
-                } catch (e) {
-                    mode = null;
-                }
-
-                if (mode === "canvas") {
-                    return await recordCanvasOnly();
-                } else {
-                    return await recordScreenWithTools();
-                }
-            }
-
-            async function recordCanvasOnly() {
-                flag = 1;
-                const canvas = document.getElementById("myCanvas");
-                if (!canvas) {
-                    throw new Error("Canvas element not found");
-                }
-
-                // Get the toolbar height to exclude from recording
-                const toolbar = document.getElementById("toolbars");
-                const toolbarHeight = toolbar ? toolbar.offsetHeight : 0;
-
-                // Get canvas dimensions
-                const canvasRect = canvas.getBoundingClientRect();
-
-                // Get the actual canvas dimensions
-                const canvasWidth = canvas.width;
-                const canvasHeight = canvas.height;
-
-                // Calculate the visible area (excluding toolbar)
-                const visibleHeight = canvasHeight - toolbarHeight;
-
-                // Create a clean recording canvas
-                const recordCanvas = document.createElement("canvas");
-                recordCanvas.width = canvasWidth;
-                recordCanvas.height = canvasHeight;
-                const recordCtx = recordCanvas.getContext("2d");
-
-                // Set background to match the canvas (white/light gray)
-                recordCtx.fillStyle = "#f5f5f5"; // Adjust this color to match your canvas background
-                let animationFrameId;
-
-                // Function to continuously copy canvas content
-                const copyFrame = () => {
-                    // Fill background
-                    recordCtx.fillRect(0, 0, canvasWidth, canvasHeight);
-
-                    // Draw only the visible portion of the canvas (skip the toolbar area)
-                    recordCtx.drawImage(
-                        canvas,
-                        0,
-                        toolbarHeight, // Source x, y (skip toolbar)
-                        canvasWidth,
-                        visibleHeight, // Source width, height
-                        0,
-                        0, // Destination x, y
-                        canvasWidth,
-                        visibleHeight // Destination width, height
-                    );
-
-                    // Continue if still recording
-                    if (flag === 1) {
-                        animationFrameId = requestAnimationFrame(copyFrame);
-                    }
-                };
-
-                // Start copying frames
-                copyFrame();
-
-                // Capture the canvas stream directly at 30fps
-                const canvasStream = recordCanvas.captureStream(30);
-
-                // Add audio track if available
-                const Tone = that.logo.synth.tone;
-                if (Tone && Tone.context) {
-                    const dest = Tone.context.createMediaStreamDestination();
-                    Tone.Destination.connect(dest);
-                    audioDestination = dest;
-                    const audioTrack = dest.stream.getAudioTracks()[0];
-                    if (audioTrack) {
-                        canvasStream.addTrack(audioTrack);
-                    }
-                }
-                currentStream = canvasStream;
-
-                // Clean up animation frame when recording stops
-                canvasStream.getTracks()[0].addEventListener("ended", () => {
-                    if (animationFrameId) {
-                        cancelAnimationFrame(animationFrameId);
-                    }
-                });
-
-                return canvasStream;
-            }
-            async function recordScreenWithTools() {
-                flag = 1;
-
-                try {
-                    return await navigator.mediaDevices.getDisplayMedia({
-                        preferCurrentTab: "True",
-                        systemAudio: "include",
-                        audio: "True",
-                        video: { mediaSource: "tab" },
-                        bandwidthProfile: {
-                            video: {
-                                clientTrackSwitchOffControl: "auto",
-                                contentPreferencesMode: "auto"
-                            }
-                        },
-                        preferredVideoCodecs: "auto"
-                    });
-                } catch (error) {
-                    console.error("Screen capture failed:", error);
-                    flag = 0;
-                    throw error;
-                }
-            }
-
-            /**
-             * Saves the recorded chunks as a video file.
-             * @param {Blob[]} recordedChunks - The recorded video chunks.
-             */
-            function saveFile(recordedChunks) {
-                flag = 1;
-                recInside.classList.remove("blink");
-                const showDialog = message => {
-                    if (window.MBDialog && typeof window.MBDialog.alert === "function") {
-                        window.MBDialog.alert(message, _("Save recording"));
-                    } else {
-                        alert(message);
-                    }
-                };
-                const finalizeSave = filename => {
-                    if (filename === null || filename.trim() === "") {
-                        showDialog(_("File save canceled"));
-                        flag = 0;
-                        recording();
-                        doRecordButton();
-                        return;
-                    }
-
-                    const blob = new Blob(recordedChunks, { type: "video/webm" });
-                    const url = URL.createObjectURL(blob);
-
-                    activity.save.download("webm", url, filename);
-
-                    recordedChunks = [];
-                    flag = 0;
-
-                    // Allow multiple recordings
-                    recording();
-                    doRecordButton();
-                };
-                // Prevent zero-byte files
-                if (!recordedChunks || recordedChunks.length === 0) {
-                    showDialog(_("Recorded file is empty. File not saved."));
-                    flag = 0;
-                    recording();
-                    doRecordButton();
-                    return;
-                }
-                const blob = new Blob(recordedChunks, {
-                    type: "video/webm"
-                });
-                if (blob.size === 0) {
-                    showDialog(_("Recorded file is empty. File not saved."));
-                    flag = 0;
-                    recording();
-                    doRecordButton();
-                    return;
-                }
-                // Clean up stream after recording
-                if (currentStream) {
-                    currentStream.getTracks().forEach(track => track.stop());
-                    currentStream = null;
-                }
-                if (audioDestination && audioDestination.stream) {
-                    audioDestination.stream.getTracks().forEach(track => track.stop());
-                    audioDestination = null;
-                }
-                mediaRecorder = null;
-                // Prompt to save file
-                const filename = window.prompt(_("Enter file name"));
-                if (filename === null || filename.trim() === "") {
-                    alert(_("File save canceled"));
-                    flag = 0;
-                    recording();
-                    doRecordButton();
-                    return; // Exit without saving the file
-                }
-                const downloadLink = document.createElement("a");
-                downloadLink.href = URL.createObjectURL(blob);
-                downloadLink.download = `${filename}.webm`;
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                that.textMsg(_("Saved! Check your Downloads folder."));
-                URL.revokeObjectURL(blob);
-                document.body.removeChild(downloadLink);
-                flag = 0;
-                // Allow multiple recordings
-                recording();
-                doRecordButton();
-                that.textMsg(_("Recording stopped. File saved."));
-                if (window.MBDialog && typeof window.MBDialog.prompt === "function") {
-                    window.MBDialog.prompt({
-                        title: _("Save recording"),
-                        message: _("Filename:"),
-                        defaultValue: _("recording"),
-                        okText: _("Save"),
-                        cancelText: _("Cancel")
-                    }).then(result => finalizeSave(result));
-                } else {
-                    const filename = window.prompt(_("Enter file name"));
-                    finalizeSave(filename);
-                }
-            }
-            /**
-             * Stops the recording process.
-             */
-            function stopRec() {
-                flag = 0;
-
-                if (mediaRecorder && typeof mediaRecorder.stop === "function") {
-                    mediaRecorder.stop();
-                }
-
-                // Clean up the recording canvas stream
-                if (currentStream) {
-                    currentStream.getTracks().forEach(track => track.stop());
-                }
-                const node = document.createElement("p");
-                node.textContent = "Stopped recording";
-                document.body.appendChild(node);
-            }
-
-            /**
-             * Creates a media recorder instance.
-             * @param {MediaStream} stream - The media stream to be recorded.
-             * @param {string} mimeType - The MIME type of the recording.
-             * @returns {MediaRecorder} The created media recorder instance.
-             */
-            function createRecorder(stream, mimeType) {
-                flag = 1;
-                recInside.classList.add("blink");
-                that.textMsg(_("Recording started. Click stop to finish."));
-                start.removeEventListener("click", createRecorder, true);
-                let recordedChunks = [];
-                mediaRecorder = new MediaRecorder(stream);
-                stream.oninactive = function () {
-                    debugLog("Recording is ready to save");
-                    stopRec();
-                    flag = 0;
-                };
-
-                mediaRecorder.onstop = function () {
-                    //saveFile(recordedChunks);
-                    //recordedChunks = [];
-                    //flag = 0;
-                    //recInside.setAttribute("fill", "#ffffff");
-                    const blob = new Blob(recordedChunks, { type: "video/webm" });
-                    const url = URL.createObjectURL(blob);
-
-                    activity.save.download("webm", url, null);
-
-                    recordedChunks = [];
-                    flag = 0;
-                    recInside.setAttribute("fill", "#ffffff");
-                };
-
-                mediaRecorder.ondataavailable = function (e) {
-                    if (e.data.size > 0) {
-                        recordedChunks.push(e.data);
-                    }
-                };
-
-                mediaRecorder.start(200);
-                setTimeout(() => {
-                    debugLog("Resizing for Record", that.canvas.height);
-                    that._onResize();
-                }, 500);
-                return mediaRecorder;
-            }
-
-            /**
-             * Handles the recording process.
-             */
-            function recording() {
-                // Remove any previous handler to avoid multiple triggers
-                if (start._recordHandler) {
-                    start.removeEventListener("click", start._recordHandler);
-                }
-                const handler = async function handler() {
-                    try {
-                        const stream = await recordScreen();
-                        const mimeType = "video/webm";
-                        mediaRecorder = createRecorder(stream, mimeType);
-                        if (flag === 1) {
-                            start.removeEventListener("click", handler);
-                            // Add stop handler
-                            const stopHandler = function stopHandler() {
-                                if (mediaRecorder && mediaRecorder.state === "recording") {
-                                    mediaRecorder.stop();
-                                    mediaRecorder = new MediaRecorder(stream);
-                                    recInside.classList.remove("blink");
-                                    flag = 0;
-                                    // Clean up stream
-                                    if (currentStream) {
-                                        currentStream.getTracks().forEach(track => track.stop());
-                                    }
-                                    if (audioDestination && audioDestination.stream) {
-                                        audioDestination.stream
-                                            .getTracks()
-                                            .forEach(track => track.stop());
-                                    }
-                                }
-                                start.removeEventListener("click", stopHandler);
-                                // Re-enable recording for next time
-                                recording();
-                            };
-                            start.addEventListener("click", stopHandler);
-                        }
-                        recInside.setAttribute("fill", "red");
-                    } catch (error) {
-                        console.error("Recording failed:", error);
-                        that.textMsg(_("Recording failed: ") + error.message);
-                        flag = 0;
-                        // Re-enable recording button
-                        recording();
-                    }
-                };
-                start.addEventListener("click", handler);
-                start._recordHandler = handler;
-            }
-
-            // Start recording process if not already executing
-            if (flag === 0 && isExecuting) {
-                recording();
-                start.dispatchEvent(clickEvent);
-            }
-        };
+        setupActivityRecorder(this);
 
         /*
          * Runs Music Blocks at a slower rate
@@ -2409,7 +2022,7 @@ class Activity {
                     if (ele.label === "Enable horizontal scrolling") ele.display = false;
                     else if (ele.label === "Disable horizontal scrolling") ele.display = true;
                 });
-                activity.textMsg("Horizontal scrolling enabled.", 3000);
+                activity.textMsg(_("Horizontal scrolling enabled."), 3000);
             } else {
                 enableHorizScrollIcon.style.display = "block";
                 disableHorizScrollIcon.style.display = "none";
@@ -2418,7 +2031,7 @@ class Activity {
                     if (ele.label === "Enable horizontal scrolling") ele.display = true;
                     else if (ele.label === "Disable horizontal scrolling") ele.display = false;
                 });
-                activity.textMsg("Horizontal scrolling disabled.", 3000);
+                activity.textMsg(_("Horizontal scrolling disabled."), 3000);
             }
         };
 
@@ -2861,26 +2474,36 @@ class Activity {
                 "touchmove",
                 event => {
                     if (event.touches.length === 2) {
+                        let totalDeltaY = 0;
+                        let totalDeltaX = 0;
+                        let count = 0;
+
                         for (let i = 0; i < 2; i++) {
                             const touchY = event.touches[i].clientY;
                             const touchX = event.touches[i].clientX;
 
                             if (initialTouches[i][0] !== null && initialTouches[i][1] !== null) {
-                                const deltaY = touchY - initialTouches[i][0];
-                                const deltaX = touchX - initialTouches[i][1];
+                                totalDeltaY += touchY - initialTouches[i][0];
+                                totalDeltaX += touchX - initialTouches[i][1];
+                                count++;
+                            }
 
-                                if (deltaY !== 0) {
-                                    closeAnyOpenMenusAndLabels();
-                                    that.blocksContainer.y -= deltaY;
-                                }
+                            initialTouches[i][0] = touchY;
+                            initialTouches[i][1] = touchX;
+                        }
 
-                                if (that.scrollBlockContainer && deltaX !== 0) {
-                                    closeAnyOpenMenusAndLabels();
-                                    that.blocksContainer.x -= deltaX;
-                                }
+                        if (count > 0) {
+                            const avgDeltaY = totalDeltaY / count;
+                            const avgDeltaX = totalDeltaX / count;
 
-                                initialTouches[i][0] = touchY;
-                                initialTouches[i][1] = touchX;
+                            if (avgDeltaY !== 0) {
+                                closeAnyOpenMenusAndLabels();
+                                that.blocksContainer.y -= avgDeltaY;
+                            }
+
+                            if (that.scrollBlockContainer && avgDeltaX !== 0) {
+                                closeAnyOpenMenusAndLabels();
+                                that.blocksContainer.x -= avgDeltaX;
                             }
                         }
 
@@ -3210,7 +2833,7 @@ class Activity {
             // Periodic check for idle state - store interval ID for cleanup
             this._idleWatcherInterval = setInterval(() => {
                 // Check if music/code is playing
-                const isMusicPlaying = this.logo?._alreadyRunning || false;
+                const isMusicPlaying = this.turtles?.running() || false;
 
                 if (!isMusicPlaying && Date.now() - lastActivity > IDLE_THRESHOLD) {
                     if (!this.isAppIdle) {
@@ -4037,7 +3660,7 @@ class Activity {
                                 this.logo.tempo.slowDown(0);
                             } else {
                                 if (this.blocks.activeBlock !== null) {
-                                    this.textMsg("DOWN ARROW " + _("Moving block down."));
+                                    this.textMsg(`DOWN ARROW ${_("Moving block down.")}`);
                                     this.blocks.moveStackRelative(
                                         this.blocks.activeBlock,
                                         0,
@@ -4059,7 +3682,7 @@ class Activity {
                         case KEYCODE_LEFT:
                             if (!this.inTempoWidget) {
                                 if (this.blocks.activeBlock !== null) {
-                                    this.textMsg("LEFT ARROW " + _("Moving block left."));
+                                    this.textMsg(`LEFT ARROW ${_("Moving block left.")}`);
                                     this.blocks.moveStackRelative(
                                         this.blocks.activeBlock,
                                         -STANDARDBLOCKHEIGHT / 2,
@@ -4076,7 +3699,7 @@ class Activity {
                         case KEYCODE_RIGHT:
                             if (!this.inTempoWidget) {
                                 if (this.blocks.activeBlock !== null) {
-                                    this.textMsg("RIGHT ARROW " + _("Moving block right."));
+                                    this.textMsg(`RIGHT ARROW ${_("Moving block right.")}`);
                                     this.blocks.moveStackRelative(
                                         this.blocks.activeBlock,
                                         STANDARDBLOCKHEIGHT / 2,
@@ -4091,7 +3714,7 @@ class Activity {
                             }
                             break;
                         case HOME:
-                            this.textMsg("HOME " + _("Jump to home position."));
+                            this.textMsg(`HOME ${_("Jump to home position.")}`);
                             if (this.palettes.mouseOver) {
                                 const dy = Math.max(55 - this.palettes.buttons["rhythm"].y, 0);
                                 this.palettes.menuScrollEvent(1, dy);
@@ -4111,7 +3734,7 @@ class Activity {
                             break;
                         case ESC:
                             if (this.searchWidget.style.visibility === "visible") {
-                                this.textMsg("ESC " + _("Hide blocks"));
+                                this.textMsg(`ESC ${_("Hide blocks")}`);
                                 this.searchWidget.style.visibility = "hidden";
                             }
                             break;
@@ -4472,7 +4095,7 @@ class Activity {
                     hideContents.click();
                 }
             } catch (error) {
-                console.error("An error occurred in resizeCanvas_:", error);
+                ErrorHandler.recoverable(error, { operation: "resizeCanvas" });
             }
         };
 
@@ -5269,19 +4892,21 @@ class Activity {
             that.keyboardEnableFlag = 0;
 
             that.sessionData = null;
+            const currentProject = that.storage.currentProject;
+            const sessionKey = currentProject !== undefined ? "SESSION" + currentProject : null;
 
             // Try restarting where we were when we hit save.
             if (that.planet) {
                 that.sessionData = await that.planet.openCurrentProject();
                 if (!that.sessionData) {
-                    const currentProject = that.storage.currentProject;
                     if (currentProject !== undefined) {
-                        that.sessionData = that.storage["SESSION" + currentProject];
+                        that.sessionData = that.storage[sessionKey];
                     }
                 }
             } else {
-                const currentProject = that.storage.currentProject;
-                that.sessionData = that.storage["SESSION" + currentProject];
+                if (sessionKey !== null) {
+                    that.sessionData = that.storage[sessionKey];
+                }
             }
 
             // After we have finished loading the project, clear all
@@ -5302,7 +4927,21 @@ class Activity {
                         that.blocks.loadNewBlocks(JSON.parse(that.sessionData));
                     }
                 } catch (e) {
-                    console.error(e);
+                    ErrorHandler.recoverable(e, { operation: "loadSessionData" });
+                    if (sessionKey !== null) {
+                        try {
+                            if (typeof that.storage.removeItem === "function") {
+                                that.storage.removeItem(sessionKey);
+                            } else {
+                                delete that.storage[sessionKey];
+                            }
+                        } catch (storageError) {
+                            ErrorHandler.recoverable(storageError, {
+                                operation: "removeBadSessionKey"
+                            });
+                        }
+                    }
+                    that.justLoadStart();
                 }
             } else {
                 that.justLoadStart();
@@ -5337,7 +4976,7 @@ class Activity {
                         : _("My Project");
                 this.textMsg(projectName);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.recoverable(e, { operation: "loadProjectName" });
                 this.textMsg(_("My Project"));
             }
 
@@ -5358,7 +4997,7 @@ class Activity {
                         throw new Error("Planet openProjectFromPlanet is unavailable.");
                     }
                 } catch (e) {
-                    console.error(e);
+                    ErrorHandler.recoverable(e, { operation: "openProjectFromPlanet" });
                     that.loadStartWrapper(loadStart);
                 }
 
@@ -5366,10 +5005,12 @@ class Activity {
                     try {
                         that.planet.initialiseNewProject();
                     } catch (e) {
-                        console.error(e);
+                        ErrorHandler.recoverable(e, { operation: "planetInitialiseNewProject" });
                     }
                 } else {
-                    console.error("Planet initialiseNewProject is unavailable.");
+                    ErrorHandler.warn("Planet initialiseNewProject is unavailable.", {
+                        operation: "loadFromPlanet"
+                    });
                 }
 
                 finishLoading();
@@ -6864,6 +6505,7 @@ class Activity {
                 }
 
                 let args = null;
+                let exportName = myBlock.name;
 
                 if (
                     myBlock.isValueBlock() ||
@@ -6975,8 +6617,7 @@ class Activity {
                         case "nopOneArgBlock":
                         case "nopTwoArgBlock":
                         case "nopThreeArgBlock":
-                            // restore original block name
-                            myBlock.name = myBlock.privateData;
+                            exportName = myBlock.privateData;
                             break;
                         case "matrixData":
                             // deprecated
@@ -7011,7 +6652,7 @@ class Activity {
                 if (args === null) {
                     data.push([
                         blockIndex,
-                        myBlock.name,
+                        exportName,
                         myBlock.container.x,
                         myBlock.container.y,
                         connections
@@ -7019,7 +6660,7 @@ class Activity {
                 } else {
                     data.push([
                         blockIndex,
-                        [myBlock.name, args],
+                        [exportName, args],
                         myBlock.container.x,
                         myBlock.container.y,
                         connections
@@ -7056,7 +6697,9 @@ class Activity {
                         }
                     }, 1000);
                 } else {
-                    console.error("Could not load built-in plugin: " + name);
+                    ErrorHandler.warn("Could not load built-in plugin: " + name, {
+                        operation: "loadPlugin"
+                    });
                 }
             };
             xhr.send();
@@ -7128,7 +6771,7 @@ class Activity {
 
             this.homeButtonContainer = createButton(
                 GOHOMEFADEDBUTTON,
-                _("Home") + " [" + _("Home").toUpperCase() + "]",
+                `${_("Home")} [${_("Home").toUpperCase()}]`,
                 findBlocks
             );
             this.boundary.hide();
@@ -7594,35 +7237,35 @@ class Activity {
                     items: [
                         {
                             keys: platformKeys("Alt + C", "Option + C"),
-                            action: _("Copy selected stack")
+                            action: _("Copy selected stack.")
                         },
                         {
                             keys: platformKeys("Alt + V", "Option + V"),
-                            action: _("Paste previous stack")
+                            action: _("Paste previous stack.")
                         },
                         {
                             keys: platformKeys("Ctrl + V", "Control + V"),
-                            action: _("Open the JSON paste box")
+                            action: _("Open the JSON paste box.")
                         },
                         {
                             keys: platformKeys("Enter", "Enter"),
-                            action: _("Paste JSON when the paste box is focused")
+                            action: _("Paste JSON when the paste box is focused.")
                         },
                         {
                             keys: platformKeys("Delete", "Delete"),
-                            action: _("Extract the active block")
+                            action: _("Extract the active block.")
                         },
                         {
                             keys: platformKeys("Alt + E", "Option + E"),
-                            action: _("Clear workspace")
+                            action: _("Clear workspace.")
                         },
                         {
                             keys: platformKeys("Alt + B", "Option + B"),
-                            action: _("Save block artwork")
+                            action: _("Save block artwork.")
                         },
                         {
                             keys: platformKeys("Alt + H", "Option + H"),
-                            action: _("Save block help")
+                            action: _("Save block help.")
                         }
                     ]
                 },
@@ -7631,21 +7274,21 @@ class Activity {
                     items: [
                         {
                             keys: platformKeys("Tab / Shift + Tab", "Tab / Shift + Tab"),
-                            action: _("Move focus between the toolbar, palettes, and workspace")
+                            action: _("Move focus between the toolbar, palettes, and workspace.")
                         },
                         {
                             keys: platformKeys(_("Arrow keys"), _("Arrow keys")),
                             action: _(
-                                "Move the active block, scroll palettes, adjust the tempo widget, or pan the workspace depending on context"
+                                "Move the active block, scroll palettes, adjust the tempo widget, or pan the workspace depending on context."
                             )
                         },
                         {
                             keys: platformKeys("/", "/"),
-                            action: _("Pan workspace right when horizontal scrolling is enabled")
+                            action: _("Pan workspace right when horizontal scrolling is enabled.")
                         },
                         {
                             keys: platformKeys("\\", "\\"),
-                            action: _("Pan workspace left when horizontal scrolling is enabled")
+                            action: _("Pan workspace left when horizontal scrolling is enabled.")
                         }
                     ]
                 },
@@ -7657,22 +7300,22 @@ class Activity {
                                 _("Arrow Left / Arrow Right"),
                                 _("Arrow Left / Arrow Right")
                             ),
-                            action: _("Move focus within the current toolbar")
+                            action: _("Move focus within the current toolbar.")
                         },
                         {
                             keys: platformKeys(
                                 _("Arrow Up / Arrow Down"),
                                 _("Arrow Up / Arrow Down")
                             ),
-                            action: _("Move focus between main and auxiliary toolbars")
+                            action: _("Move focus between main and auxiliary toolbars.")
                         },
                         {
                             keys: platformKeys("Enter", "Enter"),
-                            action: _("Activate the focused toolbar button")
+                            action: _("Activate the focused toolbar button.")
                         },
                         {
                             keys: platformKeys("Esc", "Esc"),
-                            action: _("Exit toolbar keyboard navigation")
+                            action: _("Exit toolbar keyboard navigation.")
                         }
                     ]
                 },
@@ -7681,11 +7324,11 @@ class Activity {
                     items: [
                         {
                             keys: platformKeys("Esc", "Esc"),
-                            action: _("Close the focused widget window")
+                            action: _("Close the focused widget window.")
                         },
                         {
                             keys: platformKeys("Ctrl + Shift + M", "Command + Shift + M"),
-                            action: _("Maximize or restore the focused widget window")
+                            action: _("Maximize or restore the focused widget window.")
                         }
                     ]
                 },
@@ -7697,11 +7340,11 @@ class Activity {
                                 _("Arrow Left / Arrow Right"),
                                 _("Arrow Left / Arrow Right")
                             ),
-                            action: _("Move between help pages when Help is open")
+                            action: _("Move between help pages when Help is open.")
                         },
                         {
                             keys: platformKeys(_("Arrow keys"), _("Arrow keys")),
-                            action: _("Adjust pitch by semitone when Pitch Slider is open")
+                            action: _("Adjust pitch by semitone when Pitch Slider is open.")
                         }
                     ]
                 }
@@ -7940,8 +7583,7 @@ class Activity {
                     this.storage.allProjects = JSON.stringify(["My Project"]);
                 } catch (e) {
                     // Edge case, eg. Firefox localSorage DB corrupted
-
-                    console.error(e);
+                    ErrorHandler.recoverable(e, { operation: "saveLocally_setCurrentProject" });
                 }
             }
 
@@ -7950,7 +7592,7 @@ class Activity {
                 p = this.storage.currentProject;
                 this.storage["SESSION" + p] = data;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.recoverable(e, { operation: "saveLocally_saveSession" });
             }
 
             const img = new Image();
@@ -7983,7 +7625,7 @@ class Activity {
                     offscreen.getContext("2d").drawImage(img, 0, 0);
                     this.storage["SESSIONIMAGE" + p] = offscreen.toDataURL("image/png");
                 } catch (e) {
-                    console.error("[saveLocally] Thumbnail save failed:", e);
+                    ErrorHandler.recoverable(e, { operation: "saveLocally_thumbnail" });
                 }
             };
 
@@ -8507,7 +8149,7 @@ class Activity {
                             this.saveLocally();
                         }
                     } catch (e) {
-                        console.error("[AutoSave] Failed:", e);
+                        ErrorHandler.recoverable(e, { operation: "autoSave" });
                     }
                 },
                 5 * 60 * 1000
@@ -8537,7 +8179,7 @@ class Activity {
                     const customModeDataObj = JSON.parse(custommodeData);
                     Object.assign(MUSICALMODES["custom"], customModeDataObj);
                 } catch (e) {
-                    console.error("Error parsing custommode data:", e);
+                    ErrorHandler.recoverable(e, { operation: "parseCustomMode" });
                 }
             }
 
@@ -8571,14 +8213,13 @@ class Activity {
                                 try {
                                     if (cleanData.includes("html")) {
                                         let extracted;
-                                        if (cleanData.includes('id="codeBlock"')) {
-                                            extracted = cleanData.match(
-                                                '<div class="code" id="codeBlock">(.+?)</div>'
-                                            )[1];
-                                        } else {
-                                            extracted = cleanData.match(
-                                                '<div class="code">(.+?)</div>'
-                                            )[1];
+                                        extracted = extractProjectDataFromHTML(cleanData);
+                                        if (!extracted) {
+                                            that.errorMsg(
+                                                _("Cannot find project data in this HTML file.")
+                                            );
+                                            finishLoading();
+                                            return;
                                         }
                                         obj = JSON.parse(unescapeHTML(extracted));
                                     } else {
@@ -8631,7 +8272,7 @@ class Activity {
                                         )
                                     );
 
-                                    console.error(e);
+                                    ErrorHandler.capture(e, { operation: "loadProjectFromFile" });
                                     document.body.style.cursor = "default";
                                     that.loading = false;
                                 }
@@ -8645,7 +8286,7 @@ class Activity {
                             console.debug(midi);
                             midiImportBlocks(midi);
                         } catch (err) {
-                            console.error("MIDI import failed:", err);
+                            ErrorHandler.capture(err, { operation: "midiImport" });
                             if (that && typeof that.errorMsg === "function") {
                                 that.errorMsg(
                                     _(
@@ -8696,14 +8337,13 @@ class Activity {
                             try {
                                 if (cleanData.includes("html")) {
                                     let extracted;
-                                    if (cleanData.includes('id="codeBlock"')) {
-                                        extracted = cleanData.match(
-                                            '<div class="code" id="codeBlock">(.+?)</div>'
-                                        )[1];
-                                    } else {
-                                        extracted = cleanData.match(
-                                            '<div class="code">(.+?)</div>'
-                                        )[1];
+                                    extracted = extractProjectDataFromHTML(cleanData);
+                                    if (!extracted) {
+                                        that.errorMsg(
+                                            _("Cannot find project data in this HTML file.")
+                                        );
+                                        finishLoading();
+                                        return;
                                     }
                                     obj = JSON.parse(unescapeHTML(extracted));
                                 } else {
@@ -8742,7 +8382,7 @@ class Activity {
                                 that.loading = false;
                                 that.refreshCanvas();
                             } catch (e) {
-                                console.error(e);
+                                ErrorHandler.capture(e, { operation: "loadFromFile" });
                                 that.errorMsg(
                                     _(
                                         "Cannot load project from the file. Please check the file type."
@@ -8760,7 +8400,7 @@ class Activity {
                         console.debug(midi);
                         midiImportBlocks(midi);
                     } catch (err) {
-                        console.error("MIDI import failed:", err);
+                        ErrorHandler.capture(err, { operation: "midiImportBlocks" });
                         if (that && typeof that.errorMsg === "function") {
                             that.errorMsg(
                                 _("Cannot load project from the file. Please check the file type.")
@@ -9209,7 +8849,7 @@ class Activity {
             localStorage.setItem("beginnerMode", this.beginnerMode.toString());
             localStorage.setItem("themePreference", this.themePreference.toString());
         } catch (e) {
-            console.error("Error saving to localStorage:", e);
+            ErrorHandler.recoverable(e, { operation: "saveLocalStorage" });
         }
     }
 
@@ -9290,7 +8930,7 @@ class Activity {
 
             this.refreshCanvas();
         } catch (e) {
-            console.error("Error regenerating palettes:", e);
+            ErrorHandler.capture(e, { operation: "regeneratePalettes" });
             this.errorMsg(_("Error regenerating palettes. Please refresh the page."));
         }
     }

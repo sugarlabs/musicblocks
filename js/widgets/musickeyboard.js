@@ -1666,9 +1666,9 @@ function MusicKeyboard(activity) {
             } else if (this.displayLayout[i].noteName === "hertz") {
                 cell.textContent = this.displayLayout[i].noteOctave.toString() + "HZ";
             } else {
-                cell.textContent = `${i18nSolfege(this.displayLayout[i].noteName)}${this.displayLayout[
-                    i
-                ].noteOctave.toString()}`;
+                cell.textContent = `${i18nSolfege(
+                    this.displayLayout[i].noteName
+                )}${this.displayLayout[i].noteOctave.toString()}`;
             }
 
             cell.setAttribute("id", "labelcol" + (n - i - 1));

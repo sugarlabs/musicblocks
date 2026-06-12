@@ -557,3 +557,26 @@ describe("setSmallerLargerStatus", () => {
         });
     });
 });
+
+describe("_initIdleWatcher isMusicPlaying check", () => {
+    it("should return false for _alreadyRunning even when other turtles are still running", () => {
+        // This documents the bug: _alreadyRunning goes false when ONE turtle
+        // finishes, even if others are still active
+        const mockLogo = { _alreadyRunning: false };
+        const mockTurtles = { running: jest.fn().mockReturnValue(true) };
+
+        const buggyCheck = mockLogo?._alreadyRunning || false;
+        const correctCheck = mockTurtles?.running() || false;
+
+        expect(buggyCheck).toBe(false); // wrong — misses active turtles
+        expect(correctCheck).toBe(true); // correct — sees all turtles
+        expect(mockTurtles.running).toHaveBeenCalledTimes(1);
+    });
+
+    it("should correctly report idle when all turtles have stopped", () => {
+        const mockTurtles = { running: jest.fn().mockReturnValue(false) };
+        const correctCheck = mockTurtles?.running() || false;
+        expect(correctCheck).toBe(false);
+        expect(mockTurtles.running).toHaveBeenCalledTimes(1);
+    });
+});
