@@ -734,7 +734,6 @@ describe("AIDebuggerWidget", () => {
         test("shows consent banner and does not send message if consent not given", () => {
             debuggerWidget._consentGiven = false;
             debuggerWidget.messageInput.value = "Hello AI";
-            debuggerWidget._consentGiven = false;
             debuggerWidget._showConsentBanner = jest.fn();
             debuggerWidget._sendMessage();
             expect(debuggerWidget.chatHistory).toHaveLength(0);
