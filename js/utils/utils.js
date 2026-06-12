@@ -55,9 +55,11 @@ if (typeof module !== "undefined" && module.exports) {
  * @param {string} to - The new base64-encoded SVG data URI.
  */
 const changeImage = (imgElement, from, to) => {
-    const oldSrc = "data:image/svg+xml;base64," + window.btoa(base64Encode(from));
+    if (!to) return;
+
     const newSrc = "data:image/svg+xml;base64," + window.btoa(base64Encode(to));
-    if (imgElement.src === oldSrc) {
+
+    if (imgElement.src !== newSrc) {
         imgElement.src = newSrc;
     }
 };
