@@ -1039,13 +1039,13 @@ function SampleWidget() {
                     tunerContainer.style.marginTop = "100px";
                 }
 
-                const accidetalFlat = document.createElement("img");
-                accidetalFlat.setAttribute("src", "header-icons/accidental-flat.svg");
-                accidetalFlat.style.height = 40 + "px";
-                accidetalFlat.style.width = 40 + "px";
-                accidetalFlat.style.marginTop = "auto";
+                const accidentalFlat = document.createElement("img");
+                accidentalFlat.setAttribute("src", "header-icons/accidental-flat.svg");
+                accidentalFlat.style.height = 40 + "px";
+                accidentalFlat.style.width = 40 + "px";
+                accidentalFlat.style.marginTop = "auto";
 
-                tunerContainer.appendChild(accidetalFlat);
+                tunerContainer.appendChild(accidentalFlat);
 
                 const tunerSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
                 tunerSvg.style.width = 350 + "px";
