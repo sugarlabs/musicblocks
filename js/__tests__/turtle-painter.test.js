@@ -72,11 +72,6 @@ const createMockTurtle = () => ({
     imageContainer: { removeChild: jest.fn() }
 });
 
-/**
- * Set up a mock for requestAnimationFrame that either runs callbacks synchronously
- * (default, safe for most tests) or stores them for deferred invocation (async=true).
- * When async, returns a flush() function that fires the stored callback.
- */
 function setupRafMock(async = false) {
     if (async) {
         let _rafCb;
@@ -824,14 +819,18 @@ describe("Internal Drawing Helpers and Hollow Lines", () => {
         painter.doStartHollowLine();
         painter.stroke = 2;
         painter.doForward(10);
+        // Smaller stroke produces tighter offset from the center line
         expect(painter.svgOutput).toContain('<path d="M');
+        expect(painter.svgOutput).toMatch(/M -0\.5,/);
     });
 
     test("hollow state drawing in _move with stroke >= 3", () => {
         painter.doStartHollowLine();
         painter.stroke = 5;
         painter.doForward(10);
+        // Larger stroke produces wider offset from the center line
         expect(painter.svgOutput).toContain('<path d="M');
+        expect(painter.svgOutput).toMatch(/M -1\.5,/);
     });
 
     test("_arc should support invert = false", () => {
@@ -860,20 +859,20 @@ describe("Internal Drawing Helpers and Hollow Lines", () => {
 
     test("_svgArc wrapping triggers correctly", () => {
         painter.svgOutput = "";
-        // !anticlockwise and diff < 0
         painter._svgArc(2, 0, 0, 10, Math.PI, 0, false, false);
-        expect(painter.svgOutput).not.toBe("");
+        // Output should be near "0,-10 10,0" with tiny floating point drift
+        expect(painter.svgOutput).toMatch(/^-?\d.*,-10 10,/);
 
         painter.svgOutput = "";
-        // anticlockwise and diff > 0
         painter._svgArc(2, 0, 0, 10, 0, Math.PI, true, false);
-        expect(painter.svgOutput).not.toBe("");
+        expect(painter.svgOutput).toMatch(/^-?\d.*,-10 -10,/);
     });
 
     test("_svgBezier should append coordinate output and option to drawOnCanvas", () => {
         painter.svgOutput = "";
         painter._svgBezier(2, 0, 0, 10, 10, 20, 20, 30, 30, true);
-        expect(painter.svgOutput).not.toBe("");
+        // _svgBezier outputs scaled screen space coordinates for each step
+        expect(painter.svgOutput).toBe("15,15 30,30 ");
         expect(mockTurtle.ctx.lineTo).toHaveBeenCalled();
     });
 
@@ -938,11 +937,17 @@ describe("doSetXY operations", () => {
     });
 
     test("doSetXY should handle NaN or Infinity gracefully", () => {
+        const moveSpy = jest.spyOn(painter, "_move");
+
         painter.doSetXY(NaN, 200);
         expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalled();
+        expect(moveSpy).not.toHaveBeenCalled();
+        moveSpy.mockClear();
         mockTurtle.turtles.activity.errorMsg.mockClear();
+
         painter.doSetXY(100, Infinity);
         expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalled();
+        expect(moveSpy).not.toHaveBeenCalled();
     });
 });
 
