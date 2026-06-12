@@ -169,3 +169,10 @@ You can check the latest coverage numbers directly in the PR comment without dow
 - Adhere to the **import/export conventions** stated above.
 - **Do not merge** without proper test coverage.
 - **Always update or refactor test cases when adding or modifying functions to ensure the test suite remains accurate and reliable.**
+
+## 🤖 AI-Assisted Test Generation
+Use the AI test generator to scaffold tests for new modules:
+```sh
+npm run generate-test js/utils/myfile.js
+```
+Confirm the generated test suite correctly interacts with the codebase logic and passes natively by running `npm test`. Fix any inaccuracies iteratively before contributing.
