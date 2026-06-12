@@ -120,7 +120,7 @@ let MYDEFINES = [
     "activity/rubrics",
     "activity/macros",
     "activity/SaveInterface",
-    "activity/activity/exporters",
+
     "activity/recorder",
     "utils/musicutils",
     "utils/synthutils",
@@ -232,6 +232,8 @@ const doAnalyzeProject = function () {
 /**
  * Represents an activity in the application.
  */
+
+let exporters;
 
 class Activity {
     /**
@@ -1355,15 +1357,18 @@ class Activity {
             this.sendAllToTrash(true, true);
         };
 
+        /**
+         * @returns {SVG} returns SVG of blocks
+         */
         this.printBlockSVG = () => {
-            return window.printBlockSVG(this);
+            return exporters.printBlockSVG(this);
         };
 
         /**
          * @returns {PNG} returns PNG of block artwork
          */
         this.printBlockPNG = async () => {
-            return window.printBlockPNG(this);
+            return exporters.printBlockPNG(this);
         };
 
         const midiImportBlocks = midi => {
@@ -8772,7 +8777,8 @@ class Activity {
 const activity = new Activity();
 
 // Execute initialization once all RequireJS modules are loaded AND DOM is ready
-define(["domReady!"].concat(MYDEFINES), doc => {
+define(["domReady!", "activity/exporters"].concat(MYDEFINES), (doc, exportersModule) => {
+    exporters = exportersModule;
     const initialize = () => {
         // Defensive check for multiple critical globals that may be delayed
         // due to 'defer' execution timing variances.

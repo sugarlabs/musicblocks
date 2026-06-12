@@ -11,9 +11,8 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 /* global DOMParser, XMLSerializer, SPECIALINPUTS, _, INLINECOLLAPSIBLES, EXPANDBUTTON, COLLAPSEBUTTON, TURTLESVG, FILLCOLORS, STROKECOLORS */
-/* exported extractSVGInner, printBlockSVG, printBlockPNG */
 
-window.extractSVGInner = svgString => {
+const extractSVGInner = svgString => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(svgString, "image/svg+xml");
     const svgEl = doc.querySelector("svg");
@@ -27,8 +26,11 @@ window.extractSVGInner = svgString => {
     return svgEl.innerHTML;
 };
 
-window.printBlockSVG = activity => {
-    activity.blocks.activeBlock = null;
+/**
+ * @param {object} activity - The Activity instance.
+ * @returns {string} encoded SVG string of all visible blocks
+ */
+const printBlockSVG = activity => {
     let startCounter = 0;
     const svgParts = [];
     let xMax = 0;
@@ -68,7 +70,7 @@ window.printBlockSVG = activity => {
         );
 
         if (!SPECIALINPUTS.includes(activity.blocks.blockList[i].name)) {
-            svgParts.push(window.extractSVGInner(rawSVG));
+            svgParts.push(extractSVGInner(rawSVG));
         } else {
             // Safer SVG manipulation using DOM instead of string splitting
             const parser = new DOMParser();
@@ -181,8 +183,12 @@ window.printBlockSVG = activity => {
     );
 };
 
-window.printBlockPNG = async activity => {
-    const svgContent = window.printBlockSVG(activity);
+/**
+ * @param {object} activity - The Activity instance.
+ * @returns {Promise<string>} PNG data URL of the block artwork
+ */
+const printBlockPNG = async activity => {
+    const svgContent = printBlockSVG(activity);
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
     const parser = new DOMParser();
@@ -212,10 +218,11 @@ window.printBlockPNG = async activity => {
     });
 };
 
-if (typeof module !== "undefined" && module.exports) {
-    module.exports = {
-        extractSVGInner: window.extractSVGInner,
-        printBlockSVG: window.printBlockSVG,
-        printBlockPNG: window.printBlockPNG
-    };
+if (typeof define === "function" && define.amd) {
+    define(function () {
+        return { extractSVGInner, printBlockSVG, printBlockPNG };
+    });
+} else if (typeof module !== "undefined" && module.exports) {
+    // Jest / Node environment
+    module.exports = { extractSVGInner, printBlockSVG, printBlockPNG };
 }
