@@ -287,35 +287,6 @@ class LanguageBox {
     }
 
     hide() {
-        const MSGPrefix = "<a href='#' class='language-link'>";
-        const MSGSuffix = "</a>";
-        const MSG = {
-            default: _("Refresh your browser to change your language preference."),
-            enUS: "Refresh your browser to change your language preference.",
-            enUK: "Refresh your browser to change your language preference.",
-            de: "Aktualisieren Sie Ihren Browser, um Ihre Spracheinstellung zu ändern.",
-            fr: "Actualisez votre navigateur pour modifier votre préférence linguistique.",
-            it: "Aggiorna il browser per modificare la tua preferenza linguistica.",
-            ja: "言語を変えるには、ブラウザをこうしんしてください。",
-            kana: "げんごを かえるには、ブラウザを こうしんしてください。",
-            ko: "언어 기본 설정을 변경하려면 브라우저를 새로 고치십시오.",
-            es: "Actualice su navegador para cambiar su preferencia de idioma.",
-            pt: "Atualize seu navegador para alterar sua preferência de idioma.",
-            zh_CN: "刷新浏览器以更改您的语言偏好",
-            th: "รีเฟรชเบราเซอร์เพื่อเปลี่ยนการตั้งค่าภาษาของคุณ",
-            hi: "अपनी भाषा की वरीयता बदलने के लिए अपना ब्राउज़र ताज़ा करें",
-            ta: "உங்கள் மொழி விருப்பத்தை மாற்ற உலாவியை புதுப்பிக்கவும்.",
-            te: "మీ భాష ప్రాధాన్యతను మార్చడానికి మీ బ్రౌజర్‌ని రిఫ్రెష్ చేయండి.",
-            tr: "dil tercihinizi değiştirmek için tarayıcınızı yenileyin",
-            ibo: "Mee ka nchọgharị gị gbanwee mmasị asụsụ gị.",
-            ar: "حدث المتصفح لتغيير تفضيلات اللغة.",
-            he: "רענן את הדפדפן כדי לשנות את העדפת השפה שלך.",
-            ayc: "Actualice su navegador para cambiar su preferencia de idioma.",
-            quz: "Actualice su navegador para cambiar su preferencia de idioma.",
-            bn: "ভাষা পরিবর্তন করতে আপনার ব্রাউজার রিফ্রেশ করুন।",
-            gug: "Actualice su navegador para cambiar su preferencia de idioma.",
-            ur: "اپنی زبان کی ترجیح کو تبدیل کرنے کے لئے اپنے براؤزر کو تازہ دم کریں۔"
-        };
         if (localStorage.getItem("languagePreference") === this._language) {
             if (this._language.includes("ja")) {
                 this._language = this._language.split("-")[0];
@@ -330,27 +301,12 @@ class LanguageBox {
         } else {
             this.activity.storage.languagePreference = this._language;
 
-            if (this._language === "ja" && this.activity.storage.kanaPreference === "kana") {
-                this.activity.textMsg(MSGPrefix + MSG["kana"] + MSGSuffix);
-            } else {
-                if (this._language.includes("ja")) {
-                    this._language = this._language.split("-")[0];
-                }
-
-                this.activity.textMsg(MSGPrefix + MSG[this._language] + MSGSuffix);
+            if (this._language.includes("ja")) {
+                this._language = this._language.split("-")[0];
             }
+
+            this.reload();
         }
-
-        const languageLinks = document.querySelectorAll(".language-link");
-
-        languageLinks.forEach(link => {
-            if (link && (!link.dataset || !link.dataset.listenerAttached)) {
-                link.addEventListener("click", () => this.OnClick());
-                if (link.dataset) {
-                    link.dataset.listenerAttached = "true";
-                }
-            }
-        });
     }
 }
 if (typeof module !== "undefined" && module.exports) {
