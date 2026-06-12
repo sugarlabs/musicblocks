@@ -120,7 +120,7 @@ let MYDEFINES = [
     "activity/rubrics",
     "activity/macros",
     "activity/SaveInterface",
-    "activity/activity/exporters",
+    "activity/exporters",
     "activity/recorder",
     "utils/musicutils",
     "utils/synthutils",
@@ -1355,15 +1355,18 @@ class Activity {
             this.sendAllToTrash(true, true);
         };
 
+        /**
+         * @returns {SVG} returns SVG of blocks
+         */
         this.printBlockSVG = () => {
-            return window.printBlockSVG(this);
+            return require("activity/exporters").printBlockSVG(this);
         };
 
         /**
          * @returns {PNG} returns PNG of block artwork
          */
         this.printBlockPNG = async () => {
-            return window.printBlockPNG(this);
+            return require("activity/exporters").printBlockPNG(this);
         };
 
         const midiImportBlocks = midi => {
