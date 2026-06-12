@@ -2415,6 +2415,8 @@ function LegoWidget() {
     this._stopPlayback = function () {
         this.isPlaying = false;
 
+        this.activity.hideMsgs();
+
         // Save final color segments for all lines
         if (this.scanningLines) {
             const now = performance.now();
