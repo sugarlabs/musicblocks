@@ -4548,6 +4548,9 @@ function getNote(
     errorMsg,
     temperament
 ) {
+    if (typeof noteArg === "number") {
+        noteArg = noteArg.toString();
+    }
     if (temperament === undefined) {
         temperament = "equal";
     }
@@ -6471,9 +6474,7 @@ const getNumNote = (value, delta, temperament) => {
     let num = value + delta;
 
     const octaveSize =
-        temperament &&
-        TEMPERAMENT[temperament] &&
-        TEMPERAMENT[temperament]["pitchNumber"]
+        temperament && TEMPERAMENT[temperament] && TEMPERAMENT[temperament]["pitchNumber"]
             ? TEMPERAMENT[temperament]["pitchNumber"]
             : 12;
 
