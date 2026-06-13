@@ -236,7 +236,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     margin-left: 8px;
 }
 
-#search:focus {
+#search:focus:not(:focus-visible) {
     border-color: #4da6ff;
     box-shadow: 0 4px 12px rgba(77, 166, 255, 0.2);
     outline: none;
