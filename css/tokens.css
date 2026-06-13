@@ -1,0 +1,131 @@
+/*
+ * MusicBlocks Design Tokens
+ * Single source of truth for theme colours used across CSS files.
+ *
+ * Canvas/block colours (paletteColors, wheel colours, pie-menu colours)
+ * are intentionally excluded — they are drawn by CreateJS on <canvas>
+ * and must remain in js/utils/platformstyle.js.
+ *
+ * Usage in CSS:  background-color: var(--color-bg);
+ * Usage in JS:   getComputedStyle(document.body).getPropertyValue('--color-bg').trim()
+ */
+
+/* Light theme — values from platformThemes.light */
+:root {
+    --color-bg:                  #f9f9f9;
+    --color-panel-bg:            #f5f5f5;
+    --color-palette-bg:          #ffffff;
+    --color-palette-selected:    #f3f3f3;
+    --color-fg:                  #666666;
+    --color-text:                #000000;
+    --color-palette-text:        #666666;
+    --color-border:              #cccccc;
+    --color-rule:                #e2e2e2;
+    --color-accent:              #2196f3;
+    --color-heading:             #0066ff;
+    --color-blue-button:         #0066ff;
+    --color-blue-button-hover:   #023a76;
+    --color-blue-button-text:    #ffffff;
+    --color-hover:               #e0e0e0;
+    --color-header:              #4da6ff;
+    --color-header-aux:          #1a8cff;
+    --color-header-sub:          #8cc6ff;
+    --color-palette-label-bg:    #8cc6ff;
+    --color-palette-label-sel:   #1a8cff;
+    --color-widget-bg:           #cccccc;
+    --color-widget-button:       #8cc6ff;
+    --color-selector-bg:         #8cc6ff;
+    --color-selector-sel:        #1a8cff;
+    --color-orange:              #e37a00;
+    --color-disconnected:        #c4c4c4;
+    --color-trash:               #c0c0c0;
+    --color-trash-border:        #808080;
+    --color-trash-active:        #ff0000;
+    --color-ruler-highlight:     #ffbf00;
+    --color-stop-icon:           #ea174c;
+    --color-rhythm-cell:         #c8c8c8;
+    --color-label:               #a0a0a0;
+    --color-lyrics-label-bg:     #ff2b77;
+    --color-lyrics-input-bg:     #ff6ea1;
+    --color-tuplet-bg:           #c0c0c0;
+}
+
+/* Dark theme — values from platformThemes.dark */
+body.dark {
+    --color-bg:                  #303030;
+    --color-panel-bg:            #1c1c1c;
+    --color-palette-bg:          #1c1c1c;
+    --color-palette-selected:    #1e1e1e;
+    --color-fg:                  #e8e8e8;
+    --color-text:                #e2e2e2;
+    --color-palette-text:        #bdbdbd;
+    --color-border:              #000000;
+    --color-rule:                #303030;
+    --color-accent:              #3fe0d1;
+    --color-heading:             #0066ff;
+    --color-blue-button:         #0066ff;
+    --color-blue-button-hover:   #023a76;
+    --color-blue-button-text:    #ffffff;
+    --color-hover:               #808080;
+    --color-header:              #1e88e5;
+    --color-header-aux:          #1976d2;
+    --color-header-sub:          #64b5f6;
+    --color-palette-label-bg:    #022363;
+    --color-palette-label-sel:   #01143b;
+    --color-widget-bg:           #454545;
+    --color-widget-button:       #225a91;
+    --color-selector-bg:         #64b5f6;
+    --color-selector-sel:        #1e88e5;
+    --color-orange:              #fb8c00;
+    --color-disconnected:        #5c5c5c;
+    --color-trash:               #757575;
+    --color-trash-border:        #424242;
+    --color-trash-active:        #e53935;
+    --color-ruler-highlight:     #ffeb3b;
+    --color-stop-icon:           #d50000;
+    --color-rhythm-cell:         #303030;
+    --color-label:               #bdbdbd;
+    --color-lyrics-label-bg:     #c7225d;
+    --color-lyrics-input-bg:     #d15a84;
+    --color-tuplet-bg:           #424242;
+}
+
+/* High contrast theme — values from platformThemes.highcontrast */
+body.highcontrast {
+    --color-bg:                  #000000;
+    --color-panel-bg:            #000000;
+    --color-palette-bg:          #000000;
+    --color-palette-selected:    #111111;
+    --color-fg:                  #ffffff;
+    --color-text:                #ffffff;
+    --color-palette-text:        #ffffff;
+    --color-border:              #ffffff;
+    --color-rule:                #ffffff;
+    --color-accent:              #00ffff;
+    --color-heading:             #ffff00;
+    --color-blue-button:         #00ffff;
+    --color-blue-button-hover:   #00cccc;
+    --color-blue-button-text:    #000000;
+    --color-hover:               #666666;
+    --color-header:              #00ffff;
+    --color-header-aux:          #00cccc;
+    --color-header-sub:          #00ffff;
+    --color-palette-label-bg:    #000080;
+    --color-palette-label-sel:   #0000ff;
+    --color-widget-bg:           #000000;
+    --color-widget-button:       #00ffff;
+    --color-selector-bg:         #00ffff;
+    --color-selector-sel:        #00cccc;
+    --color-orange:              #ff8800;
+    --color-disconnected:        #666666;
+    --color-trash:               #ffffff;
+    --color-trash-border:        #ffffff;
+    --color-trash-active:        #ff0000;
+    --color-ruler-highlight:     #ffff00;
+    --color-stop-icon:           #ff0000;
+    --color-rhythm-cell:         #333333;
+    --color-label:               #ffffff;
+    --color-lyrics-label-bg:     #ff00ff;
+    --color-lyrics-input-bg:     #ff66ff;
+    --color-tuplet-bg:           #333333;
+}
