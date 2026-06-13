@@ -17,7 +17,7 @@
  */
 
 /*
-   global createjs, platformColor, last, importMembers, setupRhythmActions, setupMeterActions,
+   global createjs, last, importMembers, setupRhythmActions, setupMeterActions,
    setupPitchActions, setupIntervalsActions, setupToneActions, setupOrnamentActions,
    setupVolumeActions, setupDrumActions, setupDictActions, _, Turtle, TURTLESVG, METRONOMESVG,
    FILLCOLORS, STROKECOLORS, getMunsellColor, DEFAULTVALUE, DEFAULTCHROMA,
@@ -29,6 +29,11 @@
 
 // What is the scale factor when stage is shrunk?
 const CONTAINERSCALEFACTOR = 4;
+const DEFAULTBACKGROUND = "#ffffff";
+const DEFAULTRULECOLOR = "#e2e2e2";
+
+const getThemeColor = (token, fallback) =>
+    getComputedStyle(document.body).getPropertyValue(token).trim() || fallback;
 
 /**
  * Class for managing all the turtles.
@@ -649,7 +654,7 @@ Turtles.TurtlesView = class {
         this.expand = null; // Function to expand the canvas
 
         // canvas background color
-        this._backgroundColor = platformColor.background;
+        this._backgroundColor = getThemeColor("--bg", DEFAULTBACKGROUND);
 
         this._locked = false; // whether the canvas is locked
         this._queue = []; // temporarily stores [w, h, scale]
@@ -758,7 +763,9 @@ Turtles.TurtlesView = class {
      */
     setBackgroundColor(index) {
         const color =
-            index === -1 ? platformColor.background : this.getTurtle(index).painter.canvasColor;
+            index === -1
+                ? getThemeColor("--bg", DEFAULTBACKGROUND)
+                : this.getTurtle(index).painter.canvasColor;
         this._backgroundColor = color;
         this.makeBackground();
         this.activity.refreshCanvas();
@@ -1241,7 +1248,10 @@ Turtles.TurtlesView = class {
                             .replace("X", 10)
                             .replace("DY", dy)
                             .replace("DX", dx)
-                            .replace("stroke_color", platformColor.ruleColor)
+                            .replace(
+                                "stroke_color",
+                                getThemeColor("--mb-rule-color", DEFAULTRULECOLOR)
+                            )
                             .replace("fill_color", this._backgroundColor)
                             .replace("STROKE", 20)
                     )
@@ -1280,7 +1290,10 @@ Turtles.TurtlesView = class {
                             .replace("X", 10 / CONTAINERSCALEFACTOR)
                             .replace("DY", dy)
                             .replace("DX", dx)
-                            .replace("stroke_color", platformColor.ruleColor)
+                            .replace(
+                                "stroke_color",
+                                getThemeColor("--mb-rule-color", DEFAULTRULECOLOR)
+                            )
                             .replace("fill_color", this._backgroundColor)
                             .replace("STROKE", 20 / CONTAINERSCALEFACTOR)
                     )
