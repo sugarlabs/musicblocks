@@ -194,7 +194,10 @@ function setupRhythmActions(activity) {
         static playRest(turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            if (tur.singer.inNoteBlock.length > 0) {
+            if (
+                tur.singer.inNoteBlock.length > 0 &&
+                tur.singer.notePitches[last(tur.singer.inNoteBlock)] !== undefined
+            ) {
                 tur.singer.notePitches[last(tur.singer.inNoteBlock)].push("rest");
                 tur.singer.noteOctaves[last(tur.singer.inNoteBlock)].push(4);
                 tur.singer.noteCents[last(tur.singer.inNoteBlock)].push(0);

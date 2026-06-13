@@ -214,7 +214,7 @@ function setupOrnamentBlocks(activity) {
              */
             this.formBlock({
                 //.TRANS: the neighbor refers to a neighboring note, e.g., D is a neighbor of C
-                name: _("neighbor") + " (+/–)",
+                name: `${_("neighbor")} (+/–)`,
                 args: 2,
                 defaults: [1, 1 / 16],
                 argLabels: [_("semi-tone interval"), _("note value")]
@@ -306,7 +306,7 @@ function setupOrnamentBlocks(activity) {
              * } - The block formation parameters.
              */
             this.formBlock({
-                name: _("neighbor") + " (+/–)",
+                name: `${_("neighbor")} (+/–)`,
                 args: 2,
                 defaults: [1, 1 / 16],
                 argLabels: [_("scalar interval"), _("note value")]
@@ -396,10 +396,6 @@ function setupOrnamentBlocks(activity) {
          * @returns {number[]} - The result of the block execution.
          */
         flow(args, logo, turtle, blk) {
-            // TODO: Duration should be the sum of all the notes (like
-            // in a tie). If we set the synth portamento and use
-            // setNote for all but the first note, it should produce a
-            // glissando.
             if (args[1] === undefined) {
                 // Nothing to do.
                 return;

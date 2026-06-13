@@ -725,9 +725,9 @@ function setupEnsembleBlocks(activity) {
 
             if (value === null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
-                    activity.errorMsg(_("Cannot find mouse") + " " + targetTurtle, blk);
+                    activity.errorMsg(`${_("Cannot find mouse")} ${targetTurtle}`, blk);
                 } else {
-                    activity.errorMsg(_("Cannot find turtle") + " " + targetTurtle, blk);
+                    activity.errorMsg(`${_("Cannot find turtle")} ${targetTurtle}`, blk);
                 }
 
                 let obj;
@@ -826,9 +826,9 @@ function setupEnsembleBlocks(activity) {
 
             if (value === null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
-                    activity.errorMsg(_("Cannot find mouse") + " " + targetTurtle, blk);
+                    activity.errorMsg(`${_("Cannot find mouse")} ${targetTurtle}`, blk);
                 } else {
-                    activity.errorMsg(_("Cannot find turtle") + " " + targetTurtle, blk);
+                    activity.errorMsg(`${_("Cannot find turtle")} ${targetTurtle}`, blk);
                 }
                 activity.blocks.blockList[blk].value = -1;
             }
@@ -888,9 +888,9 @@ function setupEnsembleBlocks(activity) {
             const targetTurtle = getTargetTurtle(activity.turtles, args[0]);
             if (targetTurtle === null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
-                    activity.errorMsg(_("Cannot find mouse") + " " + args[0], blk);
+                    activity.errorMsg(`${_("Cannot find mouse")} ${args[0]}`, blk);
                 } else {
-                    activity.errorMsg(_("Cannot find turtle") + " " + args[0], blk);
+                    activity.errorMsg(`${_("Cannot find turtle")} ${args[0]}`, blk);
                 }
             } else {
                 activity.turtles.ithTurtle(turtle).singer.turtleTime =
@@ -1276,9 +1276,9 @@ function setupEnsembleBlocks(activity) {
 
             if (!foundTargetTurtle) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
-                    activity.errorMsg(_("Cannot find mouse") + " " + args[0], blk);
+                    activity.errorMsg(`${_("Cannot find mouse")} ${args[0]}`, blk);
                 } else {
-                    activity.errorMsg(_("Cannot find turtle") + " " + args[0], blk);
+                    activity.errorMsg(`${_("Cannot find turtle")} ${args[0]}`, blk);
                 }
             } else {
                 activity.turtles.getTurtle(turtle).rename(args[1]);

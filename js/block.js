@@ -2572,7 +2572,7 @@ class Block {
         let v = "";
         const nblk = this.blocks.findNoteBlock(lastIntervalBlock);
         if (nblk === null) {
-            this.collapseText.text = _("scalar interval") + itext;
+            this.collapseText.text = _("scalar interval %s").replace(/%s/g, itext);
         } else {
             c = this.blocks.blockList[nblk].connections[1];
             if (c !== null) {
@@ -2595,7 +2595,7 @@ class Block {
             c = this.blocks.findFirstPitchBlock(this.blocks.blockList[nblk].connections[2]);
             const p = this._getPitch(c);
             if (c === null || p === "") {
-                this.collapseText.text = _("scalar interval") + itext;
+                this.collapseText.text = _("scalar interval %s").replace(/%s/g, itext);
             } else {
                 // Are there more pitch blocks in this note?
                 c = this.blocks.findFirstPitchBlock(last(this.blocks.blockList[c].connections));
@@ -2645,7 +2645,7 @@ class Block {
                     v = v.replace(NSYMBOLS[vi], RSYMBOLS[vi]);
                 }
             }
-            this.collapseText.text = _("silence") + " | " + v;
+            this.collapseText.text = `${_("silence")} | ${v}`;
         } else if (p === "" && v === "") {
             this.collapseText.text = _("note value");
         } else {
@@ -2702,7 +2702,7 @@ class Block {
         c = this.blocks.findFirstPitchBlock(c);
         const p = this._getPitch(c);
         if (c === null) {
-            this.collapseText.text = _("silence") + " | " + v;
+            this.collapseText.text = `${_("silence")} | ${v}`;
         } else if (p === "" && v === "") {
             this.collapseText.text = _("note value");
         } else {
@@ -2829,13 +2829,13 @@ class Block {
                     this.blocks.blockList[c1].value < 0
                 ) {
                     //.TRANS: scalar step
-                    return _("down") + " " + Math.abs(this.blocks.blockList[c1].value);
-                } else return _("up") + " " + this.blocks.blockList[c1].value;
+                    return `${_("down")} ${Math.abs(this.blocks.blockList[c1].value)}`;
+                } else return `${_("up")} ${this.blocks.blockList[c1].value}`;
             case "pitchnumber":
                 c1 = this.blocks.blockList[c].connections[1];
                 if (this.blocks.blockList[c1].name === "number") {
                     //.TRANS: pitch number
-                    return _("pitch") + " " + this.blocks.blockList[c1].value;
+                    return `${_("pitch")} ${this.blocks.blockList[c1].value}`;
                 }
                 break;
             case "playdrum":
@@ -3302,7 +3302,15 @@ class Block {
             }
 
             if (window.hasMouse) {
-                moved = true;
+                const movedDx = Math.abs(
+                    event.stageX / that.activity.getStageScale() - that.original.x
+                );
+                const movedDy = Math.abs(
+                    event.stageY / that.activity.getStageScale() - that.original.y
+                );
+                if (movedDx + movedDy > 5) {
+                    moved = true;
+                }
             } else {
                 // Make it easier to select text on mobile.
                 setTimeout(() => {
@@ -3404,8 +3412,6 @@ class Block {
                 }
             }
 
-            that._setDragGroupTrashHoverScale(overTrash, dx, dy);
-
             // Single deferred checkBounds + single canvas refresh per frame
             that.blocks.scheduleCheckBounds();
             that._setDragGroupTrashHoverScale(overTrash, dx, dy);
@@ -3478,6 +3484,31 @@ class Block {
             // Clear cached drag state.
             _dragHasRest2 = false;
             moved = false;
+        });
+        // Touch long-press to open context menu
+        this.container.on("touchstart", () => {
+            that.blocks.mouseDownTime = new Date().getTime();
+            that.blocks.longPressTimeout = setTimeout(() => {
+                that.blocks.activeBlock = thisBlock;
+                that._triggerLongPress = true;
+                that.blocks.triggerLongPress();
+            }, LONGPRESSTIME);
+        });
+
+        this.container.on("touchmove", () => {
+            if (that.blocks.longPressTimeout !== null) {
+                clearTimeout(that.blocks.longPressTimeout);
+                that.blocks.longPressTimeout = null;
+                that.blocks.clearLongPress();
+            }
+        });
+
+        this.container.on("touchend", () => {
+            if (that.blocks.longPressTimeout !== null) {
+                clearTimeout(that.blocks.longPressTimeout);
+                that.blocks.longPressTimeout = null;
+                that.blocks.clearLongPress();
+            }
         });
     }
 
@@ -4730,7 +4761,7 @@ class Block {
 
             if (isNaN(this.value)) {
                 const thisBlock = this.blockIndex;
-                this.activity.errorMsg(newValue + ": " + _("Not a number"), thisBlock);
+                this.activity.errorMsg(`${newValue}: ${_("Not a number")}`, thisBlock);
                 this.activity.refreshCanvas();
                 this.value = oldValue;
             }
@@ -4907,9 +4938,13 @@ class Block {
 // Track mouse presence
 window.hasMouse = false;
 // Mousemove is not emulated for touch
-document.addEventListener("mousemove", () => {
-    window.hasMouse = true;
-});
+document.addEventListener(
+    "mousemove",
+    () => {
+        window.hasMouse = true;
+    },
+    { once: true }
+);
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = Block;

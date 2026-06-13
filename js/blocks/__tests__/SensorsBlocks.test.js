@@ -75,7 +75,15 @@ const documentElements = {
         innerHTML: "",
         classList: { add: jest.fn(), remove: jest.fn() },
         style: {},
-        addEventListener: jest.fn()
+        addEventListener: jest.fn(),
+        replaceChildren: jest.fn(function (node) {
+            this.children = [node];
+            // Mock innerHTML update for tests that expect it
+            if (node && node.id === "textLabel") {
+                this.innerHTML = '<input id="textLabel"';
+            }
+        }),
+        children: []
     },
     textLabel: {
         value: "",
@@ -362,6 +370,7 @@ describe("setupSensorsBlocks", () => {
             activity.blocks.blockList["cblk1"] = { value: "Enter text" };
             inputBlock.flow([], logo, turtleIndex, "blkInput");
             const labelDiv = docById("labelDiv");
+            expect(labelDiv.replaceChildren).toHaveBeenCalled();
             expect(labelDiv.innerHTML).toContain('input id="textLabel"');
             expect(activity.turtles.ithTurtle(turtleIndex).doWait).toHaveBeenCalledWith(120);
             // Note: we are not simulating the keypress event.

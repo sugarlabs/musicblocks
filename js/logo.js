@@ -1122,9 +1122,16 @@ class Logo {
             }
             const comp = this.activity.turtles.getTurtle(turtle).companionTurtle;
             if (comp) {
-                this.activity.turtles.getTurtle(comp).running = false;
-                const interval = this.activity.turtles.getTurtle(comp).interval;
-                if (interval) clearInterval(interval);
+                const compTurtle = this.activity.turtles.getTurtle(comp);
+                compTurtle.running = false;
+                // Null tur.interval after cancel to prevent stale-ID no-op
+                // on next onEveryBeatDo registration (MeterActions.js ~253).
+                if (compTurtle.interval !== undefined) {
+                    if (!this._timerManager.clearInterval(compTurtle.interval)) {
+                        clearInterval(compTurtle.interval);
+                    }
+                    compTurtle.interval = undefined;
+                }
             }
         }
 
@@ -2095,9 +2102,16 @@ class Logo {
 
             const comp = logo.activity.turtles.getTurtle(turtle).companionTurtle;
             if (comp) {
-                logo.activity.turtles.getTurtle(comp).running = false;
-                const interval = logo.activity.turtles.getTurtle(comp).interval;
-                if (interval) clearInterval(interval);
+                const compTurtle = logo.activity.turtles.getTurtle(comp);
+                compTurtle.running = false;
+                // Null tur.interval after cancel — mirrors fix at doStopTurtles
+                // (~line 1123) to prevent stale-ID no-op on next Play.
+                if (compTurtle.interval !== undefined) {
+                    if (!logo._timerManager.clearInterval(compTurtle.interval)) {
+                        clearInterval(compTurtle.interval);
+                    }
+                    compTurtle.interval = undefined;
+                }
             }
             // Because flow can come from calc blocks, we are not
             // ensured that the turtle is really finished running
@@ -2125,9 +2139,9 @@ class Logo {
                                 logo.activity.save.afterSaveLilypond();
                             }
                         } catch (e) {
-                            console.error("Error generating Lilypond output:", e);
+                            console.error("Error generating Lilypond output: ", e);
                             logo.activity.errorMsg(
-                                _("Error generating Lilypond output. ") + e.message
+                                `${_("Error generating Lilypond output.")} ${e.message}`
                             );
                         } finally {
                             logo.collectingStats = false;
@@ -2138,8 +2152,10 @@ class Logo {
                         try {
                             logo.activity.save.afterSaveAbc();
                         } catch (e) {
-                            console.error("Error generating ABC output:", e);
-                            logo.activity.errorMsg(_("Error generating ABC output. ") + e.message);
+                            console.error("Error generating ABC output: ", e);
+                            logo.activity.errorMsg(
+                                `${_("Error generating ABC output.")} ${e.message}`
+                            );
                         } finally {
                             logo.runningAbc = false;
                             document.body.style.cursor = "default";
