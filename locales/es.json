@@ -1801,5 +1801,7 @@
   "city": "ciudad",
   "day": "día",
   "high": "alta",
-  "low": "baja"
+  "low": "baja",
+  "Record canvas and toolbars": "Grabar lienzo y barras de herramientas",
+  "Record canvas only": "Grabar solo el lienzo"
 }

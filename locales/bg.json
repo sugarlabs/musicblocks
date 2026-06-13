@@ -1801,5 +1801,7 @@
   "city": "city",
   "day": "day",
   "high": "high",
-  "low": "low"
+  "low": "low",
+  "Record canvas and toolbars": "Запис на платното и лентите с инструменти",
+  "Record canvas only": "Запис само на платното"
 }

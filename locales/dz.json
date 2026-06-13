@@ -1801,5 +1801,7 @@
   "city": "city",
   "day": "day",
   "high": "high",
-  "low": "low"
+  "low": "low",
+  "Record canvas and toolbars": "པར་སྒྲོམ་དང་ལག་ཆ་སྒྲོམ་སྒྲ་བཟུང་བྱ་",
+  "Record canvas only": "པར་སྒྲོམ་རྐྱང་པ་སྒྲ་བཟུང་བྱ་"
 }
