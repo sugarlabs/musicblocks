@@ -6471,9 +6471,7 @@ const getNumNote = (value, delta, temperament) => {
     let num = value + delta;
 
     const octaveSize =
-        temperament &&
-        TEMPERAMENT[temperament] &&
-        TEMPERAMENT[temperament]["pitchNumber"]
+        temperament && TEMPERAMENT[temperament] && TEMPERAMENT[temperament]["pitchNumber"]
             ? TEMPERAMENT[temperament]["pitchNumber"]
             : 12;
 
