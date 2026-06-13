@@ -37,40 +37,52 @@ if (typeof window !== "undefined") {
     global.window = { btoa: jest.fn(str => str) };
 }
 
-// Enhance the global canvas mock context for missing features
-const mockCtx = document.createElement("canvas").getContext("2d");
-mockCtx.rect = jest.fn();
-mockCtx.getImageData = jest.fn(() => ({ data: [] }));
-mockCtx.putImageData = jest.fn();
-mockCtx.canvas = { width: 800, height: 600 };
+const createMockTurtle = () => {
+    const ctx = document.createElement("canvas").getContext("2d");
+    ctx.rect = jest.fn();
+    ctx.getImageData = jest.fn(() => ({ data: [] }));
+    ctx.putImageData = jest.fn();
+    ctx.beginPath = jest.fn();
+    ctx.moveTo = jest.fn();
+    ctx.lineTo = jest.fn();
+    ctx.stroke = jest.fn();
+    ctx.closePath = jest.fn();
+    ctx.arc = jest.fn();
+    ctx.fill = jest.fn();
+    ctx.clearRect = jest.fn();
+    ctx.canvas = { width: 800, height: 600 };
 
-const createMockTurtle = () => ({
-    turtles: {
-        screenX2turtleX: jest.fn(x => x),
-        screenY2turtleY: jest.fn(y => y),
-        turtleX2screenX: jest.fn(x => x),
-        turtleY2screenY: jest.fn(y => y),
-        scale: 1,
-        activity: { refreshCanvas: jest.fn(), errorMsg: jest.fn() },
-        getIndexOfTurtle: jest.fn(() => 2),
-        getTurtleCount: jest.fn(() => 0),
-        getTurtle: jest.fn()
-    },
-    activity: { refreshCanvas: jest.fn(), errorMsg: jest.fn(), gifAnimator: {} },
-    canvas: { width: 800, height: 600 },
-    container: { x: 0, y: 0, rotation: 0 },
-    ctx: mockCtx,
-    penstrokes: { image: null },
-    orientation: 0,
-    updateCache: jest.fn(),
-    blinking: jest.fn().mockReturnValue(false),
-    rename: jest.fn(),
-    doTurtleShell: jest.fn(),
-    skinChanged: false,
-    name: "start",
-    media: [],
-    imageContainer: { removeChild: jest.fn() }
-});
+    return {
+        turtles: {
+            screenX2turtleX: jest.fn(x => x),
+            screenY2turtleY: jest.fn(y => y),
+            turtleX2screenX: jest.fn(x => x),
+            turtleY2screenY: jest.fn(y => y),
+            scale: 1,
+            activity: { refreshCanvas: jest.fn(), errorMsg: jest.fn() },
+            getIndexOfTurtle: jest.fn(() => 2),
+            getTurtleCount: jest.fn(() => 0),
+            getTurtle: jest.fn()
+        },
+        activity: { refreshCanvas: jest.fn(), errorMsg: jest.fn(), gifAnimator: {} },
+        canvas: { width: 800, height: 600 },
+        container: { x: 0, y: 0, rotation: 0 },
+        x: 0,
+        y: 0,
+        ctx: ctx,
+        _bitmap: null,
+        penstrokes: { image: null },
+        orientation: 0,
+        updateCache: jest.fn(),
+        blinking: jest.fn().mockReturnValue(false),
+        rename: jest.fn(),
+        doTurtleShell: jest.fn(),
+        skinChanged: false,
+        name: "start",
+        media: [],
+        imageContainer: { removeChild: jest.fn() }
+    };
+};
 
 function setupRafMock(async = false) {
     if (async) {
@@ -197,6 +209,11 @@ describe("Painter Class", () => {
         test("should move forward", () => {
             painter.doForward(10);
             expect(mockTurtle.activity.refreshCanvas).toHaveBeenCalled();
+            expect(mockTurtle.x).toBe(0);
+            expect(mockTurtle.y).toBe(10);
+            expect(mockTurtle.container.x).toBe(0);
+            expect(mockTurtle.container.y).toBe(10);
+            expect(mockTurtle.ctx.lineTo).toHaveBeenCalledWith(0, 10);
         });
 
         test("should turn right", () => {
@@ -377,14 +394,25 @@ describe("Drawing - doForward", () => {
     });
 
     test("forward with negative steps should work", () => {
+        painter.wrap = false;
         painter.doForward(-10);
         expect(mockTurtle.activity.refreshCanvas).toHaveBeenCalled();
+        expect(mockTurtle.x).toBe(0);
+        expect(mockTurtle.y).toBe(-10);
+        expect(mockTurtle.container.x).toBe(0);
+        expect(mockTurtle.container.y).toBe(-10);
+        expect(mockTurtle.ctx.lineTo).toHaveBeenCalledWith(0, -10);
     });
 
     test("pen up should still move turtle position", () => {
         painter.doPenUp();
         painter.doForward(10);
         expect(mockTurtle.activity.refreshCanvas).toHaveBeenCalled();
+        expect(mockTurtle.x).toBe(0);
+        expect(mockTurtle.y).toBe(10);
+        expect(mockTurtle.container.x).toBe(0);
+        expect(mockTurtle.container.y).toBe(10);
+        expect(mockTurtle.ctx.lineTo).not.toHaveBeenCalled();
     });
 
     test("doForward with NaN should show error and return early", () => {
@@ -399,14 +427,11 @@ describe("Drawing - doForward", () => {
         expect(mockTurtle.ctx.beginPath).not.toHaveBeenCalled();
     });
 
-    test("doForward with negative steps should move backward", () => {
-        painter.doForward(-10);
-        expect(mockTurtle.activity.refreshCanvas).toHaveBeenCalled();
-    });
-
     test("doForward with linePart parameter should still work", () => {
         painter.doForward(10, true);
         expect(mockTurtle.activity.refreshCanvas).toHaveBeenCalled();
+        expect(mockTurtle.x).toBe(0);
+        expect(mockTurtle.y).toBe(10);
     });
 
     test("doForward with linePart first and last should call arc and beginPath", () => {
@@ -425,12 +450,9 @@ describe("Drawing - doForward", () => {
         mockTurtle.orientation = 90;
         mockTurtle.turtleX2screenX = jest.fn(x => x);
         mockTurtle.turtleY2screenY = jest.fn(y => y);
-        const startX = mockTurtle.container.x;
         painter.doForward(20);
         expect(mockTurtle.activity.refreshCanvas).toHaveBeenCalled();
-        expect(mockTurtle.container.x).not.toBe(startX + 20);
-        expect(mockTurtle.container.x).toBeGreaterThanOrEqual(0);
-        expect(mockTurtle.container.x).toBeLessThanOrEqual(800);
+        expect(mockTurtle.container.x).toBe(15);
     });
 
     test("doForward with wrap ON and out of bounds should wrap around left", () => {
@@ -871,8 +893,17 @@ describe("Internal Drawing Helpers and Hollow Lines", () => {
     test("_svgBezier should append coordinate output and option to drawOnCanvas", () => {
         painter.svgOutput = "";
         painter._svgBezier(2, 0, 0, 10, 10, 20, 20, 30, 30, true);
-        // _svgBezier outputs scaled screen space coordinates for each step
-        expect(painter.svgOutput).toBe("15,15 30,30 ");
+        // Verify formatted output dynamically scaled to the turtles scale
+        const scale = mockTurtle.turtles.scale;
+        const expectedCoords = [
+            [15 * scale, 15 * scale],
+            [30 * scale, 30 * scale]
+        ];
+        const actualCoords = painter.svgOutput
+            .trim()
+            .split(" ")
+            .map(pair => pair.split(",").map(Number));
+        expect(actualCoords).toEqual(expectedCoords);
         expect(mockTurtle.ctx.lineTo).toHaveBeenCalled();
     });
 
@@ -977,6 +1008,12 @@ describe("doBezier, doClearMedia, doClear and doScrollXY", () => {
         painter.doBezier(100, 100);
         expect(painter.turtle.x).toBe(100);
         expect(painter.turtle.y).toBe(100);
+        expect(mockTurtle.ctx.beginPath).toHaveBeenCalled();
+        expect(mockTurtle.ctx.moveTo).toHaveBeenCalled();
+        expect(mockTurtle.ctx.lineTo).toHaveBeenCalled();
+        expect(mockTurtle.ctx.stroke).toHaveBeenCalled();
+        expect(painter.svgOutput).toContain('<path d="M');
+        expect(painter.svgOutput).toContain("stroke-width:");
     });
 
     test("doBezier with penDown and standard line", () => {
@@ -990,6 +1027,10 @@ describe("doBezier, doClearMedia, doClear and doScrollXY", () => {
         painter.doBezier(100, 100);
         expect(painter.turtle.x).toBe(100);
         expect(painter.turtle.y).toBe(100);
+        expect(mockTurtle.orientation).toBe(45);
+        expect(mockTurtle.ctx.lineTo).toHaveBeenCalled();
+        expect(mockTurtle.ctx.stroke).toHaveBeenCalled();
+        expect(painter.svgOutput).toContain('<path d="M');
     });
 
     test("doBezier with penUp", () => {
@@ -997,6 +1038,9 @@ describe("doBezier, doClearMedia, doClear and doScrollXY", () => {
         painter.doBezier(100, 100);
         expect(painter.turtle.x).toBe(100);
         expect(painter.turtle.y).toBe(100);
+        expect(mockTurtle.ctx.lineTo).not.toHaveBeenCalled();
+        expect(mockTurtle.ctx.stroke).not.toHaveBeenCalled();
+        expect(painter.svgOutput).toBe("");
     });
 
     test("doClearMedia should return early if no media", () => {
@@ -1065,5 +1109,105 @@ describe("doBezier, doClearMedia, doClear and doScrollXY", () => {
 
         expect(painter.turtles.canvas1).toBeDefined();
         expect(turtle1.painter._processColor).toHaveBeenCalled();
+        expect(painter.turtles.gx).toBe(790); // 800 - 10
+        expect(painter.turtles.gy).toBe(580); // 600 - 20
+        expect(mockTurtle.ctx.beginPath).toHaveBeenCalled();
+        expect(mockTurtle.ctx.moveTo).toHaveBeenCalledWith(20, 40); // 10+10, 20+20
+        expect(mockTurtle.ctx.lineTo).toHaveBeenCalledWith(10, 20);
+        expect(mockTurtle.ctx.stroke).toHaveBeenCalled();
+
+        // Test scroll coordinates clamping to boundary bounds
+        painter.doScrollXY(1000, 1000);
+        expect(painter.turtles.gx).toBe(0);
+        expect(painter.turtles.gy).toBe(0);
+    });
+});
+
+describe("Additional Robustness & Missing Coverage Tests", () => {
+    let painter;
+    let mockTurtle;
+
+    beforeEach(() => {
+        setupRafMock();
+        mockTurtle = createMockTurtle();
+        painter = new Painter(mockTurtle);
+    });
+
+    afterEach(() => {
+        teardownRafMock();
+        jest.clearAllMocks();
+    });
+
+    test("_doArcPart trajectory math updates coordinates and orientation correctly", () => {
+        mockTurtle.container = { x: 100, y: 100 };
+        mockTurtle.orientation = 90;
+        mockTurtle.turtles.screenX2turtleX = jest.fn(x => x);
+        mockTurtle.turtles.screenY2turtleY = jest.fn(y => y);
+        mockTurtle.turtles.turtleX2screenX = jest.fn(x => x);
+        mockTurtle.turtles.turtleY2screenY = jest.fn(y => y);
+
+        painter._doArcPart(90, 50);
+
+        expect(mockTurtle.container.x).toBeCloseTo(150);
+        expect(mockTurtle.container.y).toBeCloseTo(50);
+        expect(mockTurtle.orientation).toBe(180);
+    });
+
+    test("_doArcPart anticlockwise trajectory updates coordinates and orientation correctly", () => {
+        mockTurtle.container = { x: 100, y: 100 };
+        mockTurtle.orientation = 90;
+        mockTurtle.turtles.screenX2turtleX = jest.fn(x => x);
+        mockTurtle.turtles.screenY2turtleY = jest.fn(y => y);
+        mockTurtle.turtles.turtleX2screenX = jest.fn(x => x);
+        mockTurtle.turtles.turtleY2screenY = jest.fn(y => y);
+
+        painter._doArcPart(-90, 50);
+
+        expect(mockTurtle.container.x).toBeCloseTo(150);
+        expect(mockTurtle.container.y).toBeCloseTo(150);
+        expect(mockTurtle.orientation).toBe(0);
+    });
+
+    test("_getCanvasDimensions caching and invalidation behavior", () => {
+        const initialCanvas = mockTurtle.ctx.canvas;
+
+        const dims1 = painter._getCanvasDimensions();
+        expect(dims1).toEqual({ width: 800, height: 600 });
+        expect(painter._cachedCanvas).toBe(initialCanvas);
+        expect(painter._cachedCanvasWidth).toBe(800);
+        expect(painter._cachedCanvasHeight).toBe(600);
+
+        painter._cachedCanvasWidth = 999;
+        painter._cachedCanvasHeight = 999;
+        const dims2 = painter._getCanvasDimensions();
+        expect(dims2).toEqual({ width: 999, height: 999 });
+
+        const newCanvas = { width: 1200, height: 1000 };
+        mockTurtle.ctx.canvas = newCanvas;
+        const dims3 = painter._getCanvasDimensions();
+        expect(dims3).toEqual({ width: 1200, height: 1000 });
+        expect(painter._cachedCanvas).toBe(newCanvas);
+    });
+
+    test("doForward with wrap ON and negative steps wrapping backwards out of bounds", () => {
+        painter.wrap = true;
+        mockTurtle.container.x = 5;
+        mockTurtle.orientation = 90;
+        mockTurtle.turtleX2screenX = jest.fn(x => x);
+        mockTurtle.turtleY2screenY = jest.fn(y => y);
+
+        painter.doForward(-15);
+        expect(mockTurtle.container.x).toBe(790);
+    });
+
+    test("doClear calls clearRect with correct canvas bounds for main canvas and scroll canvas", () => {
+        const clearRectSpy = jest.spyOn(mockTurtle.ctx, "clearRect");
+        painter.turtles.c1ctx = { beginPath: jest.fn(), clearRect: jest.fn() };
+        painter.turtles.getIndexOfTurtle = jest.fn(() => 0);
+
+        painter.doClear(true, false, false);
+
+        expect(clearRectSpy).toHaveBeenCalledWith(0, 0, 800, 600);
+        expect(painter.turtles.c1ctx.clearRect).toHaveBeenCalledWith(0, 0, 2400, 1800);
     });
 });
