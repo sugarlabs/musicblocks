@@ -1801,5 +1801,7 @@
   "city": "city",
   "day": "day",
   "high": "high",
-  "low": "low"
+  "low": "low",
+  "Record canvas and toolbars": "Գրանցել կտավը և գործիքների վահանակները",
+  "Record canvas only": "Գրանցել միայն կտավը"
 }

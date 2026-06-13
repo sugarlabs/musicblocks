@@ -12294,3 +12294,12 @@ msgstr "کم"
 #~msgid "Report projects which violate the <a href=\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\" target=\\\"_blank\\\" rel=\\\"noopener noreferrer\\\">Sugar Labs Code of Conduct</a>."
 #~msgstr "ان منصوبوں کی اطلاع دیں جو <a href=\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\" target=\\\"_blank\\\" rel=\\\"noopener noreferrer\\\">شوگر لیبز کے ضابطہ اخلاق</a> کی خلاف ورزی کرتے ہیں."
 
+
+#: index.html (record dropdown)
+msgid "Record canvas and toolbars"
+msgstr "کینوس اور ٹول بارز کو ریکارڈ کریں"
+
+#: index.html (record dropdown)
+msgid "Record canvas only"
+msgstr "صرف کینوس ریکارڈ کریں"
+

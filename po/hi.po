@@ -11982,3 +11982,12 @@ msgstr "नीचा"
 #~msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">Sugar Labs Code of Conduct</a>."
 #~msgstr ""
 
+
+
+#: index.html (record dropdown)
+msgid "Record canvas and toolbars"
+msgstr "कैनवास और टूलबार रिकॉर्ड करें"
+
+#: index.html (record dropdown)
+msgid "Record canvas only"
+msgstr "केवल कैनवास रिकॉर्ड करें"

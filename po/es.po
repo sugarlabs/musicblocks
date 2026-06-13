@@ -9026,3 +9026,14 @@ msgstr "alta"
 #: plugins/weather.rtp:149
 msgid "low"
 msgstr "baja"
+
+#: index.html (record dropdown)
+#. AUTOTRANSLATED: AI
+msgid "Record canvas and toolbars"
+msgstr "Grabar lienzo y barras de herramientas"
+
+#: index.html (record dropdown)
+#. AUTOTRANSLATED: AI
+msgid "Record canvas only"
+msgstr "Grabar solo el lienzo"
+

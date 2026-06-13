@@ -1801,5 +1801,7 @@
   "city": "Stadt",
   "day": "Tag",
   "high": "Hoch",
-  "low": "Tief"
+  "low": "Tief",
+  "Record canvas and toolbars": "Leinwand und Werkzeugleisten aufnehmen",
+  "Record canvas only": "Nur Leinwand aufnehmen"
 }

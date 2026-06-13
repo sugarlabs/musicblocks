@@ -1801,5 +1801,7 @@
   "city": "city",
   "day": "day",
   "high": "high",
-  "low": "low"
+  "low": "low",
+  "Record canvas and toolbars": "Regjistro kanavacën dhe shiritat e veglave",
+  "Record canvas only": "Regjistro vetëm kanavacën"
 }
