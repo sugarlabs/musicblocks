@@ -64,11 +64,11 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 /* Dark Mode */
 
 .dark .blue {
-    background-color: #022363 !important;
+    background-color: var(--color-palette-label-bg) !important;
 }
 
 .dark #canvas {
-    background-color: #1c1c1c !important;
+    background-color: var(--color-panel-bg) !important;
 }
 
 .dark .blue.darken-1 {
@@ -81,7 +81,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .dark .wfbtItem {
-    background-color: #225a91;
+    background-color: var(--color-widget-button);
 }
 
 .dark #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
@@ -126,7 +126,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 .dark #search,
 .dark #helpfulSearch,
 .dark .ui-autocomplete {
-    background-color: #1c1c1c !important;
+    background-color: var(--color-panel-bg) !important;
     color: #fff !important;
     border-color: #444 !important;
 }
@@ -167,7 +167,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .dark .dropdown-content li > a {
-    background-color: #1c1c1c;
+    background-color: var(--color-panel-bg);
     color: #3fe0d1;
 }
 
@@ -189,25 +189,25 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .dark .dropdown-content {
-    background-color: #1c1c1c;
+    background-color: var(--color-panel-bg);
 }
 
 .dark .modalBox {
-    background-color: #1c1c1c;
+    background-color: var(--color-panel-bg);
 }
 
 .dark .modal-message {
     color: #e2e2e2;
-    background-color: #1c1c1c;
+    background-color: var(--color-panel-bg);
 }
 
 .dark #newdropdown {
     border: #000000;
-    background-color: #1c1c1c;
+    background-color: var(--color-panel-bg);
 }
 
 .dark #newdropdown li {
-    background-color: #1c1c1c;
+    background-color: var(--color-panel-bg);
 }
 
 .dark #newdropdown li:hover {
@@ -219,7 +219,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 body {
-    --border: #cccccc;
+    --border: var(--color-border);
     --bg: #ffffff;
     --fg: #666666;
     --panel-bg: #f5f5f5;

@@ -12,6 +12,7 @@
 }
 */
 
+@import url("tokens.css");
 @import url("play-only-mode.css");
 
 *:focus:not(:focus-visible) {
