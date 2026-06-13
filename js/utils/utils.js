@@ -1411,7 +1411,7 @@ let closeBlkWidgets = name => {
     const widgetTitle = document.getElementsByClassName("wftTitle");
     for (let i = 0; i < widgetTitle.length; i++) {
         if (widgetTitle[i].innerHTML === name) {
-            window.widgetWindows.hideWindow(widgetTitle[i].innerHTML);
+            window.widgetWindows.closeWindow(widgetTitle[i].innerHTML);
             break;
         }
     }
