@@ -4034,12 +4034,15 @@ class Activity {
 
                     if (uniqueName !== actionArg) {
                         actionArg.value = uniqueName;
+                        const translatedName = _(uniqueName);
                         label =
-                            uniqueName.length > 8 ? uniqueName.substr(0, 7) + "..." : uniqueName;
+                            translatedName.length > 8
+                                ? translatedName.substr(0, 7) + "..."
+                                : translatedName;
                         actionArg.text.text = label;
 
                         if (actionArg.label !== null) {
-                            actionArg.label.value = uniqueName;
+                            actionArg.label.value = translatedName;
                         }
                         actionArg.container.updateCache();
                         for (let b = 0; b < this.blocks.dragGroup.length; b++) {
@@ -4052,10 +4055,11 @@ class Activity {
                             ) {
                                 me.privateData = uniqueName;
                                 me.value = uniqueName;
+                                const translatedMeName = _(uniqueName);
                                 label =
-                                    uniqueName.length > 8
-                                        ? uniqueName.substr(0, 7) + "..."
-                                        : uniqueName;
+                                    translatedMeName.length > 8
+                                        ? translatedMeName.substr(0, 7) + "..."
+                                        : translatedMeName;
                                 me.text.text = label;
                                 me.overrideName = label;
                                 me.regenerateArtwork();
