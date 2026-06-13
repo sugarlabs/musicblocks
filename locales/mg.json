@@ -1801,5 +1801,7 @@
   "city": "city",
   "day": "day",
   "high": "high",
-  "low": "low"
+  "low": "low",
+  "Record canvas and toolbars": "Raketo ny canvas sy ny toolbar",
+  "Record canvas only": "Raketo ny canvas ihany"
 }

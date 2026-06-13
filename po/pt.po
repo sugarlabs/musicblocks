@@ -12115,3 +12115,14 @@ msgstr "baixo"
 #~msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">Sugar Labs Code of Conduct</a>."
 #~msgstr "Avisar sobre projetos que violam o <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">Código de Conduta do Sugar Labs</a>."
 
+
+#: index.html (record dropdown)
+#. AUTOTRANSLATED: AI
+msgid "Record canvas and toolbars"
+msgstr "Gravar tela e barras de ferramentas"
+
+#: index.html (record dropdown)
+#. AUTOTRANSLATED: AI
+msgid "Record canvas only"
+msgstr "Gravar apenas a tela"
+

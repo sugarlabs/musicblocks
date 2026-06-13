@@ -7210,5 +7210,13 @@
   "low": {
     "kanji": "低",
     "kana": "低"
+  },
+  "Record canvas and toolbars": {
+    "kanji": "キャンバスとツールバーを録画",
+    "kana": "キャンバスとツールバーをろくが"
+  },
+  "Record canvas only": {
+    "kanji": "キャンバスのみ録画",
+    "kana": "キャンバスのみろくが"
   }
 }

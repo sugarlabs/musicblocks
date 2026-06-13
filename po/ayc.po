@@ -14585,3 +14585,14 @@ msgstr "jisk’a"
 #~msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">Sugar Labs Code of Conduct</a>."
 #~msgstr "Reportar proyectos que violen <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">el código de conducta de Sugar Labs</a>."
 
+
+#: index.html (record dropdown)
+#. AUTOTRANSLATED: AI
+msgid "Record canvas and toolbars"
+msgstr "Lona ukat barra de herramientas grabaña"
+
+#: index.html (record dropdown)
+#. AUTOTRANSLATED: AI
+msgid "Record canvas only"
+msgstr "Lona saparuki grabaña"
+

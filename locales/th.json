@@ -1801,5 +1801,7 @@
   "city": "เมือง",
   "day": "วัน",
   "high": "สูง",
-  "low": "ต่ำ"
+  "low": "ต่ำ",
+  "Record canvas and toolbars": "บันทึกผ้าใบและแถบเครื่องมือ",
+  "Record canvas only": "บันทึกเฉพาะผ้าใบ"
 }

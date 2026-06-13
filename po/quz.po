@@ -15009,3 +15009,14 @@ msgstr "baja"
 #~msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">Sugar Labs Code of Conduct</a>."
 #~msgstr " hatun llamk’aymanta willakuy may llik'iy"
 
+
+#: index.html (record dropdown)
+#. AUTOTRANSLATED: AI
+msgid "Record canvas and toolbars"
+msgstr "Lonata llamk'anakunatawan hapichiy"
+
+#: index.html (record dropdown)
+#. AUTOTRANSLATED: AI
+msgid "Record canvas only"
+msgstr "Lonallata hapichiy"
+
