@@ -4449,7 +4449,7 @@ msgstr ""
 #.TRANS: the note names must be separated by single spaces
 #.TRANS: the note names must be separated by single spaces
 msgid "ti la sol fa mi re do"
-msgstr ""
+msgstr "սի լա սոլ ֆա մի ռե դո"
 
 #: js/block.js:2832
 #: js/blocks/IntervalsBlocks.js:627

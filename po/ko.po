@@ -3103,7 +3103,7 @@ msgstr "고요"
 #.TRANS: the note names must be separated by single spaces
 #. AUTOTRANSLATED: Google Translate
 msgid "ti la sol fa mi re do"
-msgstr "하나만 줄게"
+msgstr "시 라 솔 파 미 레 도"
 
 
 #: js/block.js:2832
