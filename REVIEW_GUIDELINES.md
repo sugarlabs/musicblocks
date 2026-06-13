@@ -14,12 +14,25 @@
   unrelated fixes together
 - Check license headers are present at the top of every new file
 - PR description should match the actual code changes
-- Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening your first PR
+- Read [CONTRIBUTING.md] before opening your first PR
 - For UI/UX or feature changes, include before-and-after screenshots 
   or a short GIF demonstrating the change
 - For performance-related changes, provide before-and-after benchmark 
   results or screenshots of relevant metrics with a brief explanation 
   of the measurable impact
+  - **Run regression tests** before submitting to ensure no unintended
+  side effects are introduced:
+  - Run the full test suite (`npm test`), not just tests related 
+    to your change
+  - If you modified a shared utility function, test each 
+    affected module manually
+  - For UI changes, verify both light and dark theme still 
+    work correctly
+  - For block behavior changes, run the browser smoke test 
+    and interact with affected blocks manually
+  - Document edge cases you tested in your PR description 
+    so reviewers know what scenarios were covered
+    
 
 ## For Reviewers
 - **Run the browser smoke test** (when applicable) — critical for UI changes
