@@ -2821,7 +2821,7 @@ class Blocks {
                     } else if (typeof myBlock.value !== "string") {
                         label = myBlock.value.toString();
                     } else {
-                        label = myBlock.value;
+                        label = _(myBlock.value);
                     }
                     break;
             }
@@ -3435,7 +3435,8 @@ class Blocks {
                         }
                         break;
                     default:
-                        that.blockList[thisBlock].text.text = value;
+                        that.blockList[thisBlock].text.text =
+                            value !== null && value !== undefined ? _(value.toString()) : value;
                         break;
                 }
 
@@ -3701,7 +3702,7 @@ class Blocks {
                 if (myBlock.name === "action") {
                     /** Make sure we don't make two actions with the same name. */
                     value = this.findUniqueActionName(_("action"));
-                    if (value !== _("action")) {
+                    if (value !== _("action") && value !== "action") {
                         const metadata = this.actionMetadata(blk);
                         this.newNameddoBlock(value, metadata.hasReturn, metadata.hasArgs);
                         /** this.activity.palettes.hide(); */
@@ -3719,7 +3720,7 @@ class Blocks {
                             const b = args[0];
                             const v = args[1];
                             that.blockList[b].value = v;
-                            let l = value.toString();
+                            let l = _(value.toString());
                             if (
                                 !WIDENAMES.includes(that.blockList[b].name) &&
                                 getTextWidth(l, "bold 20pt Sans") > TEXTWIDTH
@@ -3746,7 +3747,7 @@ class Blocks {
                         const b = args[0];
                         const v = args[1];
                         that.blockList[b].value = v;
-                        let l = v.toString();
+                        let l = _(v.toString());
                         if (
                             !WIDENAMES.includes(that.blockList[b].name) &&
                             getTextWidth(l, "bold 20pt Sans") > TEXTWIDTH
@@ -3952,7 +3953,7 @@ class Blocks {
          */
         this.findUniqueActionName = (name, actionBlk) => {
             /** If we have a stack named 'action', make the protoblock visible. */
-            if (name === _("action")) {
+            if (name === _("action") || name === "action") {
                 this.setActionProtoVisibility(true);
             }
 
@@ -4551,7 +4552,7 @@ class Blocks {
          * @returns boolean
          */
         this.newNameddoBlock = (name, hasReturn, hasArgs) => {
-            if (name === _("action")) {
+            if (name === _("action") || name === "action") {
                 /** 'action' already has its associated palette entries. */
                 return false;
             }
@@ -5751,7 +5752,7 @@ class Blocks {
                 }
 
                 /** If we have a stack named 'action', make the protoblock visible. */
-                if (name === _("action")) {
+                if (name === _("action") || name === "action") {
                     this.setActionProtoVisibility(true);
                 }
 
@@ -6964,7 +6965,11 @@ class Blocks {
                 if (!this.blockList[blk].trash && this.blockList[blk].name === "action") {
                     const myBlock = this.blockList[blk];
                     const c = myBlock.connections[1];
-                    if (c != null && this.blockList[c].value !== _("action")) {
+                    if (
+                        c != null &&
+                        this.blockList[c].value !== _("action") &&
+                        this.blockList[c].value !== "action"
+                    ) {
                         const metadata = this.actionMetadata(blk);
                         if (
                             this.newNameddoBlock(
