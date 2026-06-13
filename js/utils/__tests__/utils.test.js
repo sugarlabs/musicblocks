@@ -25,7 +25,8 @@ global.window = {
     devicePixelRatio: 2,
     widgetWindows: {
         hideAllWindows: jest.fn(),
-        hideWindow: jest.fn()
+        hideWindow: jest.fn(),
+        closeWindow: jest.fn()
     },
     server: "http://localhost/",
     onload: null,
@@ -607,7 +608,8 @@ describe("Utility Functions (logic-only)", () => {
         beforeEach(() => {
             window.widgetWindows = {
                 hideAllWindows: jest.fn(),
-                hideWindow: jest.fn()
+                hideWindow: jest.fn(),
+                closeWindow: jest.fn()
             };
         });
         it("calls window.widgetWindows.hideAllWindows", () => {
@@ -619,18 +621,19 @@ describe("Utility Functions (logic-only)", () => {
         beforeEach(() => {
             window.widgetWindows = {
                 hideAllWindows: jest.fn(),
-                hideWindow: jest.fn()
+                hideWindow: jest.fn(),
+                closeWindow: jest.fn()
             };
         });
 
-        it("hides matching widget by name", () => {
+        it("closes matching widget by name", () => {
             const mockElement = { innerHTML: "TestWidget" };
 
             document.getElementsByClassName = jest.fn(() => [mockElement]);
 
             closeBlkWidgets("TestWidget");
 
-            expect(window.widgetWindows.hideWindow).toHaveBeenCalledWith("TestWidget");
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("TestWidget");
         });
 
         it("does nothing if no match found", () => {
@@ -638,7 +641,7 @@ describe("Utility Functions (logic-only)", () => {
 
             closeBlkWidgets("TestWidget");
 
-            expect(window.widgetWindows.hideWindow).not.toHaveBeenCalled();
+            expect(window.widgetWindows.closeWindow).not.toHaveBeenCalled();
         });
     });
     describe("resolveObject()", () => {
