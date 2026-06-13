@@ -1549,7 +1549,7 @@ class Block {
                 label = _(this.value);
             } else {
                 if (this.value !== null) {
-                    label = this.value.toString();
+                    label = _(this.value.toString());
                 } else {
                     label = "???";
                 }
@@ -4812,7 +4812,7 @@ class Block {
         } else if (this.name === "modename") {
             label = this.value + " " + getModeNumbers(this.value);
         } else {
-            label = this.value.toString();
+            label = _(this.value.toString());
         }
 
         if (!WIDENAMES.includes(this.name) && getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
@@ -4853,7 +4853,7 @@ class Block {
 
                     // eslint-disable-next-line no-case-declarations
                     const metadata = this.blocks.actionMetadata(c);
-                    if (oldValue === _("action")) {
+                    if (oldValue === _("action") || oldValue === "action") {
                         this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
                         this.blocks.setActionProtoVisibility(false);
                     }
@@ -4863,7 +4863,7 @@ class Block {
                     const blockPalette = this.blocks.palettes.dict["action"];
                     for (let blk = 0; blk < blockPalette.protoList.length; blk++) {
                         const block = blockPalette.protoList[blk];
-                        if (oldValue === _("action")) {
+                        if (oldValue === _("action") || oldValue === "action") {
                             if (block.name === "nameddo" && block.defaults.length === 0) {
                                 block.hidden = true;
                             }
@@ -4874,7 +4874,7 @@ class Block {
                         }
                     }
 
-                    if (oldValue === _("action")) {
+                    if (oldValue === _("action") || oldValue === "action") {
                         this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
                         this.blocks.setActionProtoVisibility(false);
                     }
