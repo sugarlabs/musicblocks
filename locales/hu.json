@@ -1801,5 +1801,7 @@
   "city": "city",
   "day": "day",
   "high": "high",
-  "low": "low"
+  "low": "low",
+  "Record canvas and toolbars": "Vászon és eszköztárak felvétele",
+  "Record canvas only": "Csak vászon felvétele"
 }

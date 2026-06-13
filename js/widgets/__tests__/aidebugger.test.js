@@ -715,6 +715,7 @@ describe("AIDebuggerWidget", () => {
             debuggerWidget.messageInput = document.createElement("input");
             debuggerWidget._sendToBackend = jest.fn();
             debuggerWidget._updateMessageCount = jest.fn();
+            debuggerWidget._consentGiven = true;
         });
 
         test("does nothing with empty input", () => {
@@ -731,6 +732,7 @@ describe("AIDebuggerWidget", () => {
         });
 
         test("shows consent banner and does not send message if consent not given", () => {
+            debuggerWidget._consentGiven = false;
             debuggerWidget.messageInput.value = "Hello AI";
             debuggerWidget._showConsentBanner = jest.fn();
             debuggerWidget._sendMessage();

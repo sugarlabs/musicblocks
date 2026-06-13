@@ -79,11 +79,12 @@ function toggleSearch(on) {
 function toggleText(id, a, b) {
     const el = document.getElementById(id);
 
-    const prevHTML = el.innerHTML;
-    const updatedHTML = prevHTML.includes(a) ? prevHTML.replace(a, b) : prevHTML.replace(b, a);
+    const currentText = el.textContent || "";
+    const updatedText = currentText.includes(a)
+        ? currentText.replace(a, b)
+        : currentText.replace(b, a);
 
-    el.innerHTML = "";
-    el.insertAdjacentHTML("afterbegin", updatedHTML);
+    el.textContent = updatedText;
 }
 
 function toggleExpandable(id, c) {
@@ -157,6 +158,7 @@ if (typeof module !== "undefined" && module.exports) {
         debounce,
         getCookie,
         setCookie,
+        toggleText,
         toggleExpandable,
         hideOnClickOutside,
         updateCheckboxes

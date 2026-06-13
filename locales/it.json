@@ -1801,5 +1801,7 @@
   "city": "città",
   "day": "giorno",
   "high": "alto",
-  "low": "basso"
+  "low": "basso",
+  "Record canvas and toolbars": "Registra area di lavoro e barre degli strumenti",
+  "Record canvas only": "Registra solo l'area di lavoro"
 }

@@ -1801,5 +1801,7 @@
   "city": "city",
   "day": "day",
   "high": "high",
-  "low": "low"
+  "low": "low",
+  "Record canvas and toolbars": "കാന്‍വസും ടൂൾബാറുകളും റെക്കോർഡ് ചെയ്യുക",
+  "Record canvas only": "കാന്‍വസ് മാത്രം റെക്കോർഡ് ചെയ്യുക"
 }

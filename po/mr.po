@@ -9866,3 +9866,14 @@ msgstr "कमी"
 #~msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">Sugar Labs Code of Conduct</a>."
 #~msgstr "जे प्रकल्प <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">शुगर लॅब्स आचारसंहिता</a> चे उल्लंघन करतात त्यांचा अहवाल द्या."
 
+
+#: index.html (record dropdown)
+#. AUTOTRANSLATED: AI
+msgid "Record canvas and toolbars"
+msgstr "कॅनव्हास आणि टूलबार रेकॉर्ड करा"
+
+#: index.html (record dropdown)
+#. AUTOTRANSLATED: AI
+msgid "Record canvas only"
+msgstr "केवळ कॅनव्हास रेकॉर्ड करा"
+

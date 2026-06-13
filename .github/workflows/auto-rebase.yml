@@ -30,7 +30,21 @@ jobs:
               with:
                   script: |
                       const { execFileSync } = require('child_process');
+
                       const excludeLabels = ['no-rebase', 'wip', 'do-not-merge'];
+                      const RECENT_PUSH_WINDOW_MS = 5 * 60 * 1000;        // 5 minutes
+                      const FAILURE_COMMENT_DEDUPE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+                      // Covers ~99% of forks; unshallow fallback handles longer divergence
+                      const FORK_FETCH_DEPTH = 100;
+                      // Hidden marker so we can identify our own past comments
+                      const COMMENT_MARKER = '<!-- auto-rebase-bot:failure -->';
+
+                      // Future-proof: don't hardcode 'master' for cleanup checkouts.
+                      // The PR list filter and rebase target are still 'master' on purpose —
+                      // that's user configuration — but the cleanup just needs *some* branch
+                      // to switch to before deleting the temp branch.
+                      const defaultBranch =
+                          context.payload.repository?.default_branch || 'master';
 
                       // Safe git helper — no shell, prevents injection via branch names
                       // or committer fields
@@ -41,10 +55,10 @@ jobs:
                       const tryGit = (...args) => {
                           try { git(...args); } catch {}
                       };
-                      const cleanupIteration = (remoteName) => {
+                      const cleanupIteration = (remoteName, tempBranch) => {
                           tryGit('rebase', '--abort');
-                          tryGit('checkout', 'master');
-                          tryGit('branch', '-D', '__rebase_tmp');
+                          tryGit('checkout', defaultBranch);
+                          if (tempBranch) tryGit('branch', '-D', tempBranch);
                           if (remoteName) tryGit('remote', 'remove', remoteName);
                       };
 
@@ -67,22 +81,40 @@ jobs:
                           return !excludeLabels.some(ex => labels.includes(ex));
                       });
 
+                      // Sort oldest → newest to reduce churn when PRs touch the same code
+                      eligible.sort(
+                          (a, b) => new Date(a.created_at) - new Date(b.created_at)
+                      );
+
+                      // Counters: skipped (intentional non-attempt) vs failed (attempted, errored)
+                      let rebased = 0;
+                      let skipped = 0;
+                      let failed = 0;
+                      const skips = [];
+                      const failures = [];
+
+                      // Outputs for downstream CI: rebase counts and totals for observability
+                      const emitOutputs = () => {
+                          core.setOutput('rebased-count', rebased);
+                          core.setOutput('skipped-count', skipped);
+                          core.setOutput('failed-count', failed);
+                          core.setOutput('total-count', eligible.length);
+                      };
+
                       if (eligible.length === 0) {
                           core.info('No eligible pull requests found.');
+                          emitOutputs();
                           return;
                       }
 
                       core.info(`Found ${eligible.length} eligible PR(s) to rebase.`);
-
-                      let rebased = 0;
-                      let skipped = 0;
-                      const failures = [];
 
                       for (const pr of eligible) {
                           const headRef = pr.head.ref;
                           const headRepo = pr.head.repo;
                           const prNumber = pr.number;
                           const remoteName = `__pr${prNumber}`;
+                          const tempBranch = `__rebase_tmp_${prNumber}`;
 
                           core.info(`\n--- PR #${prNumber}: ${pr.title} (${headRef}) ---`);
 
@@ -92,7 +124,7 @@ jobs:
                                   `PR #${prNumber}: skipped — source repository was deleted.`
                               );
                               skipped++;
-                              failures.push(`#${prNumber} (repo deleted)`);
+                              skips.push({ pr: prNumber, reason: 'source repository deleted' });
                               continue;
                           }
 
@@ -103,43 +135,100 @@ jobs:
                                       `PR #${prNumber}: skipped — fork does not allow maintainer edits.`
                                   );
                                   skipped++;
-                                  failures.push(`#${prNumber} (no maintainer access)`);
+                                  skips.push({ pr: prNumber, reason: 'fork does not allow maintainer edits' });
                                   continue;
                               }
                           }
 
+                          // Skip PRs with very recent *commits* to avoid racing the contributor.
+                          // Using head-commit time rather than pr.updated_at, since updated_at
+                          // also fires for comments, labels, reviews, and title edits.
+                          let headCommitTime;
+                          try {
+                              const { data: headCommit } = await github.rest.repos.getCommit({
+                                  owner: headRepo.owner.login,
+                                  repo: headRepo.name,
+                                  ref: pr.head.sha
+                              });
+                              headCommitTime = new Date(
+                                  headCommit.commit.committer.date
+                              ).getTime();
+                          } catch (e) {
+                              core.warning(
+                                  `PR #${prNumber}: could not read head commit time ` +
+                                  `(${e.message}); falling back to pr.updated_at.`
+                              );
+                              headCommitTime = new Date(pr.updated_at).getTime();
+                          }
+                          if (Date.now() - headCommitTime < RECENT_PUSH_WINDOW_MS) {
+                              core.info(
+                                  `PR #${prNumber}: skipped — head commit is less than ` +
+                                  `5 minutes old.`
+                              );
+                              skipped++;
+                              skips.push({ pr: prNumber, reason: 'head commit too recent' });
+                              continue;
+                          }
+
                           try {
                               // Clean up any leftover state from a previous iteration
-                              cleanupIteration(null);
+                              cleanupIteration(null, tempBranch);
+
+                              // Refresh master before each rebase — master may have moved
+                              // since the workflow started, especially on long runs. The
+                              // explicit refspec guarantees refs/remotes/origin/master is
+                              // updated regardless of the remote's configured fetch refspec.
+                              git('fetch', 'origin', 'master:refs/remotes/origin/master');
 
                               const remoteUrl = headRepo.clone_url;
 
-                              // Add remote for this PR (remove first if exists from a prior run)
+                              // Add remote for this PR (remove first if it exists from a prior run)
                               tryGit('remote', 'remove', remoteName);
                               git('remote', 'add', remoteName, remoteUrl);
-                              git('fetch', remoteName, headRef);
+                              // Shallow-fetch the PR branch for speed. Long-lived branches whose
+                              // merge-base falls outside this depth are handled below by
+                              // unshallowing on demand — no false failures for valid rebases.
+                              git('fetch', `--depth=${FORK_FETCH_DEPTH}`, remoteName, headRef);
 
-                              // Checkout the PR branch locally
-                              git('checkout', '-b', '__rebase_tmp', `${remoteName}/${headRef}`);
+                              // Checkout the PR branch locally. -B creates or resets, so a
+                              // leftover branch from a failed cleanup won't block us. The
+                              // branch name is also unique per PR to eliminate collisions.
+                              git('checkout', '-B', tempBranch, `${remoteName}/${headRef}`);
 
-                              // Check if already up-to-date with master
-                              const mergeBase = git('merge-base', 'HEAD', 'origin/master').trim();
+                              // Verify we have enough fork history to compute the merge-base.
+                              // If the shallow fetch missed the divergence point, deepen the
+                              // fork branch to full history and retry once.
+                              let mergeBase;
+                              try {
+                                  mergeBase = git('merge-base', 'HEAD', 'origin/master').trim();
+                              } catch {
+                                  core.info(
+                                      `PR #${prNumber}: shallow history insufficient for ` +
+                                      `merge-base, refetching with full history.`
+                                  );
+                                  git('fetch', '--unshallow', remoteName, headRef);
+                                  mergeBase = git('merge-base', 'HEAD', 'origin/master').trim();
+                              }
                               const masterHead = git('rev-parse', 'origin/master').trim();
 
                               if (mergeBase === masterHead) {
                                   core.info(`PR #${prNumber}: already up to date.`);
-                                  cleanupIteration(remoteName);
+                                  cleanupIteration(remoteName, tempBranch);
                                   continue;
                               }
 
-                              // Preserve the committer identity from the PR's last commit
+                              // Preserve the committer identity from the PR's last commit.
+                              // Passed via -c flags so we don't pollute repo config between PRs.
                               const committerName = git('log', '-1', '--format=%cn').trim();
                               const committerEmail = git('log', '-1', '--format=%ce').trim();
-                              git('config', 'user.name', committerName);
-                              git('config', 'user.email', committerEmail);
+                              core.info(`  Committer: ${committerName} <${committerEmail}>`);
 
                               // Attempt rebase onto latest master
-                              git('rebase', 'origin/master');
+                              git(
+                                  '-c', `user.name=${committerName}`,
+                                  '-c', `user.email=${committerEmail}`,
+                                  'rebase', 'origin/master'
+                              );
 
                               // Push rebased branch back (force-with-lease for safety)
                               git('push', '--force-with-lease', remoteName, `HEAD:${headRef}`);
@@ -148,26 +237,88 @@ jobs:
                               rebased++;
 
                               // Clean up this iteration's remote and branch
-                              cleanupIteration(remoteName);
+                              cleanupIteration(remoteName, tempBranch);
                           } catch (err) {
                               // Rebase failed (conflicts, permissions, etc.) — skip and continue
+                              const reason = (err.message || 'unknown error')
+                                  .split('\n')[0]
+                                  .slice(0, 200);
                               core.warning(
-                                  `PR #${prNumber}: rebase failed, skipping. Error: ${err.message}`
+                                  `PR #${prNumber}: rebase failed, skipping. Error: ${reason}`
                               );
-                              skipped++;
-                              failures.push(`#${prNumber}`);
+                              failed++;
+                              failures.push({ pr: prNumber, reason });
 
                               // Best-effort cleanup so the next iteration starts clean
-                              cleanupIteration(remoteName);
+                              cleanupIteration(remoteName, tempBranch);
+
+                              // Notify the PR author — but dedupe so the same stuck PR
+                              // doesn't get a fresh comment on every master push. We bound
+                              // the scan by `since` (the dedupe window) and paginate within
+                              // it: listComments is oldest-first and accepts no sort param,
+                              // so on a noisy PR our marker can fall outside the first page
+                              // and we'd double-post. Paginating over the window is correct
+                              // and stays cheap because `since` caps how much we fetch.
+                              try {
+                                  const since = new Date(
+                                      Date.now() - FAILURE_COMMENT_DEDUPE_MS
+                                  ).toISOString();
+                                  const recentComments = await github.paginate(
+                                      github.rest.issues.listComments,
+                                      {
+                                          owner: context.repo.owner,
+                                          repo: context.repo.repo,
+                                          issue_number: prNumber,
+                                          since,
+                                          per_page: 100
+                                      }
+                                  );
+                                  const alreadyNotified = recentComments.some(c =>
+                                      (c.body || '').includes(COMMENT_MARKER)
+                                  );
+                                  if (alreadyNotified) {
+                                      core.info(
+                                          `PR #${prNumber}: recent failure comment already ` +
+                                          `exists, not posting another.`
+                                      );
+                                  } else {
+                                      await github.rest.issues.createComment({
+                                          owner: context.repo.owner,
+                                          repo: context.repo.repo,
+                                          issue_number: prNumber,
+                                          body:
+                                              COMMENT_MARKER + '\n\n' +
+                                              'Automatic rebase onto `master` failed ' +
+                                              '(likely due to merge conflicts). Please rebase ' +
+                                              'this branch manually.\n\n' +
+                                              '<details><summary>Details</summary>\n\n' +
+                                              '```\n' + reason + '\n```\n\n</details>'
+                                      });
+                                  }
+                              } catch (commentErr) {
+                                  core.warning(
+                                      `PR #${prNumber}: could not post failure comment: ${commentErr.message}`
+                                  );
+                              }
                           }
                       }
 
                       core.info(`\n=== Summary ===`);
                       core.info(`Rebased: ${rebased}`);
-                      core.info(`Skipped/failed: ${skipped}`);
+                      core.info(`Skipped: ${skipped}`);
+                      core.info(`Failed:  ${failed}`);
+                      if (skips.length > 0) {
+                          core.info('Skipped PRs:');
+                          for (const s of skips) {
+                              core.info(`  #${s.pr} — ${s.reason}`);
+                          }
+                      }
                       if (failures.length > 0) {
-                          core.info(`Failed PRs: ${failures.join(', ')}`);
+                          core.info('Failed PRs:');
+                          for (const f of failures) {
+                              core.info(`  #${f.pr} — ${f.reason}`);
+                          }
                       }
                       core.info(`Total eligible: ${eligible.length}`);
 
-                      core.setOutput('rebased-count', rebased);
+                      emitOutputs();

@@ -29,8 +29,8 @@ try {
    global
 
    ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON, debugLog,
-   ActivityContext,
-   Boundary, CARTESIAN, changeImage, closeWidgets,
+   ErrorHandler, ActivityContext,
+   Boundary, CARTESIAN, changeImage, closeWidgets, doRecordButton, setupActivityRecorder,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
    DEFAULTDELAY, define, doBrowserCheck, doBrowserCheck, docByClass,
@@ -53,7 +53,7 @@ try {
    MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
    SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS,
-   unescapeHTML
+   extractProjectDataFromHTML,unescapeHTML
  */
 
 /*
@@ -92,6 +92,7 @@ let MYDEFINES = [
     "utils/utils-logic",
     "utils/utils",
     "utils/retryWithBackoff",
+    "utils/error-handler",
     "utils/debugLog",
     "activity/artwork",
     "widgets/status",
@@ -119,6 +120,8 @@ let MYDEFINES = [
     "activity/rubrics",
     "activity/macros",
     "activity/SaveInterface",
+
+    "activity/recorder",
     "utils/musicutils",
     "utils/synthutils",
     "utils/mathutils",
@@ -229,6 +232,8 @@ const doAnalyzeProject = function () {
 /**
  * Represents an activity in the application.
  */
+
+let exporters;
 
 class Activity {
     /**
@@ -387,7 +392,7 @@ class Activity {
                 }
             }
         } catch (e) {
-            console.error("Error accessing themePreference storage:", e);
+            ErrorHandler.capture(e, { operation: "loadThemePreference" });
         }
 
         this.beginnerMode = true;
@@ -403,7 +408,7 @@ class Activity {
                 }
             }
         } catch (e) {
-            console.error(e);
+            ErrorHandler.recoverable(e, { operation: "loadBeginnerMode" });
         }
 
         try {
@@ -420,7 +425,7 @@ class Activity {
                 i18next.changeLanguage(lang);
             }
         } catch (e) {
-            console.error(e);
+            ErrorHandler.recoverable(e, { operation: "loadLanguagePreference" });
         }
 
         this.KeySignatureEnv = ["C", "major", false];
@@ -430,7 +435,7 @@ class Activity {
                 this.KeySignatureEnv[2] = this.KeySignatureEnv[2] === "true";
             }
         } catch (e) {
-            console.error(e);
+            ErrorHandler.recoverable(e, { operation: "loadKeySignatureEnv" });
         }
 
         /**
@@ -544,10 +549,7 @@ class Activity {
                 if (this.stage) {
                     const hasActiveTweens = createjs.Tween.hasActiveTweens();
                     const hasActiveGifs = this.gifAnimator && this.gifAnimator.getActiveCount() > 0;
-                    const isInteracting =
-                        this.isDragging ||
-                        this.isSelecting ||
-                        (this.blocks && this.blocks.dragGroup !== null);
+                    const isInteracting = this.isDragging || this.isSelecting;
 
                     if (this.stageDirty || hasActiveTweens || hasActiveGifs || isInteracting) {
                         this.stage.update();
@@ -1355,219 +1357,18 @@ class Activity {
             this.sendAllToTrash(true, true);
         };
 
-        const extractSVGInner = svgString => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(svgString, "image/svg+xml");
-            const svgEl = doc.querySelector("svg");
-            if (!svgEl) return "";
-
-            // Remove drop shadow filters safely
-            svgEl.querySelectorAll("[filter]").forEach(el => {
-                el.removeAttribute("filter");
-            });
-
-            return svgEl.innerHTML;
-        };
-
         /**
          * @returns {SVG} returns SVG of blocks
          */
         this.printBlockSVG = () => {
-            this.blocks.activeBlock = null;
-            let startCounter = 0;
-            const svgParts = [];
-            let xMax = 0;
-            let yMax = 0;
-            let parts;
-            for (let i = 0; i < this.blocks.blockList.length; i++) {
-                if (!this.blocks.blockList[i] || this.blocks.blockList[i].ignore()) {
-                    continue;
-                }
-
-                if (this.blocks.blockList[i].container.x + this.blocks.blockList[i].width > xMax) {
-                    xMax = this.blocks.blockList[i].container.x + this.blocks.blockList[i].width;
-                }
-
-                if (this.blocks.blockList[i].container.y + this.blocks.blockList[i].height > yMax) {
-                    yMax = this.blocks.blockList[i].container.y + this.blocks.blockList[i].height;
-                }
-
-                const rawSVG = this.blocks.blockList[i].collapsed
-                    ? this.blocks.blockCollapseArt[i]
-                    : this.blocks.blockArt[i];
-
-                // Defensive guard: blockArt may be undefined if a block was restored
-                // from trash and regenerateArtwork() has not yet completed (it is
-                // asynchronous). Skip this block rather than injecting <parsererror>
-                // into the SVG output.
-                if (!rawSVG) {
-                    continue;
-                }
-
-                if (this.blocks.blockList[i].isCollapsible()) {
-                    svgParts.push("<g>");
-                }
-
-                svgParts.push(
-                    '<g transform="translate(' +
-                        this.blocks.blockList[i].container.x +
-                        ", " +
-                        this.blocks.blockList[i].container.y +
-                        ')">'
-                );
-
-                if (!SPECIALINPUTS.includes(this.blocks.blockList[i].name)) {
-                    svgParts.push(extractSVGInner(rawSVG));
-                } else {
-                    // Safer SVG manipulation using DOM instead of string splitting
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(rawSVG, "image/svg+xml");
-
-                    // remove dropshadow filter if present
-                    const filtered = doc.querySelector('[style*="filter:url(#dropshadow)"]');
-                    if (filtered) {
-                        filtered.style.filter = "";
-                    }
-
-                    // Find correct tspan to inject value (matches previous behaviour)
-                    let target = null;
-
-                    // 1) Prefer empty tspan (most block SVGs reserve this for value)
-                    target = Array.from(doc.querySelectorAll("text tspan")).find(
-                        t => !t.textContent || t.textContent.trim() === ""
-                    );
-
-                    // 2) Otherwise fallback to last tspan
-                    if (!target) {
-                        const tspans = doc.querySelectorAll("text tspan");
-                        if (tspans.length) target = tspans[tspans.length - 1];
-                    }
-
-                    // 3) Final fallback to text node
-                    if (!target) {
-                        target = doc.querySelector("text");
-                    }
-
-                    if (target) {
-                        const val = this.blocks.blockList[i].value;
-                        target.textContent = typeof val === "string" ? _(val) : val;
-                    }
-
-                    // serialize without outer <svg> wrapper (matches previous behavior)
-                    let serialized = new XMLSerializer().serializeToString(doc.documentElement);
-
-                    // remove outer svg tags because original code skipped them
-                    serialized = serialized.replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, "");
-
-                    svgParts.push(serialized);
-                }
-
-                svgParts.push("</g>");
-
-                if (this.blocks.blockList[i].isCollapsible()) {
-                    let y;
-                    if (INLINECOLLAPSIBLES.includes(this.blocks.blockList[i].name)) {
-                        y = this.blocks.blockList[i].container.y + 4;
-                    } else {
-                        y = this.blocks.blockList[i].container.y + 12;
-                    }
-
-                    svgParts.push(
-                        '<g transform="translate(' +
-                            this.blocks.blockList[i].container.x +
-                            ", " +
-                            y +
-                            ') scale(0.5 0.5)">'
-                    );
-                    if (this.blocks.blockList[i].collapsed) {
-                        parts = EXPANDBUTTON.split("><");
-                    } else {
-                        parts = COLLAPSEBUTTON.split("><");
-                    }
-
-                    for (let p = 2; p < parts.length - 1; p++) {
-                        svgParts.push("<" + parts[p] + ">");
-                    }
-
-                    svgParts.push("</g>");
-                }
-
-                if (this.blocks.blockList[i].name === "start") {
-                    const x = this.blocks.blockList[i].container.x + 110;
-                    const y = this.blocks.blockList[i].container.y + 12;
-                    svgParts.push('<g transform="translate(' + x + ", " + y + ') scale(0.4 0.4)">');
-
-                    parts = TURTLESVG.replace(/fill_color/g, FILLCOLORS[startCounter])
-                        .replace(/stroke_color/g, STROKECOLORS[startCounter])
-                        .split("><");
-
-                    startCounter += 1;
-                    if (startCounter > 9) {
-                        startCounter = 0;
-                    }
-
-                    for (let p = 2; p < parts.length - 1; p++) {
-                        svgParts.push("<" + parts[p] + ">");
-                    }
-
-                    svgParts.push("</g>");
-                }
-
-                if (this.blocks.blockList[i].isCollapsible()) {
-                    svgParts.push("</g>");
-                }
-            }
-
-            svgParts.push("</svg>");
-
-            return (
-                '<svg xmlns="http://www.w3.org/2000/svg" width="' +
-                xMax +
-                '" height="' +
-                yMax +
-                '">' +
-                encodeURIComponent(svgParts.join(""))
-            );
+            return exporters.printBlockSVG(this);
         };
 
         /**
          * @returns {PNG} returns PNG of block artwork
          */
         this.printBlockPNG = async () => {
-            // Setps to convert the SVG to PNG of BlockArtwork
-            // Step 1: Generate the SVG content
-            // Step 2: Create a Canvas element
-            // Step 3: Convert SVG to an Image object
-            // Step 4: Draw SVG on the Canvas and export as PNG
-
-            const svgContent = this.printBlockSVG();
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            const parser = new DOMParser();
-            const svgDoc = parser.parseFromString(decodeURIComponent(svgContent), "image/svg+xml");
-            const svgElement = svgDoc.documentElement;
-            const width = parseInt(svgElement.getAttribute("width"), 10);
-            const height = parseInt(svgElement.getAttribute("height"), 10);
-            canvas.width = width;
-            canvas.height = height;
-            const img = new Image();
-            const svgBlob = new Blob([decodeURIComponent(svgContent)], {
-                type: "image/svg+xml;charset=utf-8"
-            });
-            const url = URL.createObjectURL(svgBlob);
-            return new Promise((resolve, reject) => {
-                img.onload = () => {
-                    ctx.drawImage(img, 0, 0);
-                    URL.revokeObjectURL(url);
-                    const pngDataUrl = canvas.toDataURL("image/png");
-                    resolve(pngDataUrl);
-                };
-                img.onerror = err => {
-                    URL.revokeObjectURL(url);
-                    reject(err);
-                };
-                img.src = url;
-            });
+            return exporters.printBlockPNG(this);
         };
 
         const midiImportBlocks = midi => {
@@ -1837,393 +1638,7 @@ class Activity {
             }
         };
 
-        let isExecuting = false; // Flag variable to track execution status
-
-        /**
-         * Sets up a record button functionality for the given activity.
-         * @param {object} activity - The activity context.
-         */
-        const doRecordButton = activity => {
-            /**
-             * Executes the record button functionality if execution is not already in progress.
-             */
-            if (isExecuting) {
-                return; // Exit the function if execution is already in progress
-            }
-
-            if (!activity || typeof activity._doRecordButton !== "function") {
-                console.warn("doRecordButton called without valid activity context");
-                isExecuting = false;
-                return;
-            }
-
-            isExecuting = true; // Set the flag to indicate execution has started
-            activity._doRecordButton();
-        };
-
-        /**
-         * Functionality for the record button.
-         * @private
-         */
-        this._doRecordButton = () => {
-            const that = this;
-            const start = document.getElementById("record"),
-                recInside = document.getElementById("rec_inside");
-            let mediaRecorder;
-            const clickEvent = new Event("click");
-            let flag = 0;
-            let currentStream = null;
-            let audioDestination = null;
-
-            /**
-             * Records the screen using the browser's media devices API.
-             * @returns {Promise<MediaStream>} A promise resolving to the recorded media stream.
-             */
-
-            async function recordScreen() {
-                let mode = null;
-                try {
-                    mode = localStorage.getItem("musicBlocksRecordMode");
-                } catch (e) {
-                    mode = null;
-                }
-
-                if (mode === "canvas") {
-                    return await recordCanvasOnly();
-                } else {
-                    return await recordScreenWithTools();
-                }
-            }
-
-            async function recordCanvasOnly() {
-                flag = 1;
-                const canvas = document.getElementById("myCanvas");
-                if (!canvas) {
-                    throw new Error("Canvas element not found");
-                }
-
-                // Get the toolbar height to exclude from recording
-                const toolbar = document.getElementById("toolbars");
-                const toolbarHeight = toolbar ? toolbar.offsetHeight : 0;
-
-                // Get canvas dimensions
-                const canvasRect = canvas.getBoundingClientRect();
-
-                // Get the actual canvas dimensions
-                const canvasWidth = canvas.width;
-                const canvasHeight = canvas.height;
-
-                // Calculate the visible area (excluding toolbar)
-                const visibleHeight = canvasHeight - toolbarHeight;
-
-                // Create a clean recording canvas
-                const recordCanvas = document.createElement("canvas");
-                recordCanvas.width = canvasWidth;
-                recordCanvas.height = canvasHeight;
-                const recordCtx = recordCanvas.getContext("2d");
-
-                // Set background to match the canvas (white/light gray)
-                recordCtx.fillStyle = "#f5f5f5"; // Adjust this color to match your canvas background
-                let animationFrameId;
-
-                // Function to continuously copy canvas content
-                const copyFrame = () => {
-                    // Fill background
-                    recordCtx.fillRect(0, 0, canvasWidth, canvasHeight);
-
-                    // Draw only the visible portion of the canvas (skip the toolbar area)
-                    recordCtx.drawImage(
-                        canvas,
-                        0,
-                        toolbarHeight, // Source x, y (skip toolbar)
-                        canvasWidth,
-                        visibleHeight, // Source width, height
-                        0,
-                        0, // Destination x, y
-                        canvasWidth,
-                        visibleHeight // Destination width, height
-                    );
-
-                    // Continue if still recording
-                    if (flag === 1) {
-                        animationFrameId = requestAnimationFrame(copyFrame);
-                    }
-                };
-
-                // Start copying frames
-                copyFrame();
-
-                // Capture the canvas stream directly at 30fps
-                const canvasStream = recordCanvas.captureStream(30);
-
-                // Add audio track if available
-                const Tone = that.logo.synth.tone;
-                if (Tone && Tone.context) {
-                    const dest = Tone.context.createMediaStreamDestination();
-                    Tone.Destination.connect(dest);
-                    audioDestination = dest;
-                    const audioTrack = dest.stream.getAudioTracks()[0];
-                    if (audioTrack) {
-                        canvasStream.addTrack(audioTrack);
-                    }
-                }
-                currentStream = canvasStream;
-
-                // Clean up animation frame when recording stops
-                canvasStream.getTracks()[0].addEventListener("ended", () => {
-                    if (animationFrameId) {
-                        cancelAnimationFrame(animationFrameId);
-                    }
-                });
-
-                return canvasStream;
-            }
-            async function recordScreenWithTools() {
-                flag = 1;
-
-                try {
-                    return await navigator.mediaDevices.getDisplayMedia({
-                        preferCurrentTab: "True",
-                        systemAudio: "include",
-                        audio: "True",
-                        video: { mediaSource: "tab" },
-                        bandwidthProfile: {
-                            video: {
-                                clientTrackSwitchOffControl: "auto",
-                                contentPreferencesMode: "auto"
-                            }
-                        },
-                        preferredVideoCodecs: "auto"
-                    });
-                } catch (error) {
-                    console.error("Screen capture failed:", error);
-                    flag = 0;
-                    throw error;
-                }
-            }
-
-            /**
-             * Saves the recorded chunks as a video file.
-             * @param {Blob[]} recordedChunks - The recorded video chunks.
-             */
-            function saveFile(recordedChunks) {
-                flag = 1;
-                recInside.classList.remove("blink");
-                const showDialog = message => {
-                    if (window.MBDialog && typeof window.MBDialog.alert === "function") {
-                        window.MBDialog.alert(message, _("Save recording"));
-                    } else {
-                        alert(message);
-                    }
-                };
-                const finalizeSave = filename => {
-                    if (filename === null || filename.trim() === "") {
-                        showDialog(_("File save canceled"));
-                        flag = 0;
-                        recording();
-                        doRecordButton();
-                        return;
-                    }
-
-                    const blob = new Blob(recordedChunks, { type: "video/webm" });
-                    const url = URL.createObjectURL(blob);
-
-                    activity.save.download("webm", url, filename);
-
-                    recordedChunks = [];
-                    flag = 0;
-
-                    // Allow multiple recordings
-                    recording();
-                    doRecordButton();
-                };
-                // Prevent zero-byte files
-                if (!recordedChunks || recordedChunks.length === 0) {
-                    showDialog(_("Recorded file is empty. File not saved."));
-                    flag = 0;
-                    recording();
-                    doRecordButton();
-                    return;
-                }
-                const blob = new Blob(recordedChunks, {
-                    type: "video/webm"
-                });
-                if (blob.size === 0) {
-                    showDialog(_("Recorded file is empty. File not saved."));
-                    flag = 0;
-                    recording();
-                    doRecordButton();
-                    return;
-                }
-                // Clean up stream after recording
-                if (currentStream) {
-                    currentStream.getTracks().forEach(track => track.stop());
-                    currentStream = null;
-                }
-                if (audioDestination && audioDestination.stream) {
-                    audioDestination.stream.getTracks().forEach(track => track.stop());
-                    audioDestination = null;
-                }
-                mediaRecorder = null;
-                // Prompt to save file
-                const filename = window.prompt(_("Enter file name"));
-                if (filename === null || filename.trim() === "") {
-                    alert(_("File save canceled"));
-                    flag = 0;
-                    recording();
-                    doRecordButton();
-                    return; // Exit without saving the file
-                }
-                const downloadLink = document.createElement("a");
-                downloadLink.href = URL.createObjectURL(blob);
-                downloadLink.download = `${filename}.webm`;
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                that.textMsg(_("Saved! Check your Downloads folder."));
-                URL.revokeObjectURL(blob);
-                document.body.removeChild(downloadLink);
-                flag = 0;
-                // Allow multiple recordings
-                recording();
-                doRecordButton();
-                that.textMsg(_("Recording stopped. File saved."));
-                if (window.MBDialog && typeof window.MBDialog.prompt === "function") {
-                    window.MBDialog.prompt({
-                        title: _("Save recording"),
-                        message: _("Filename:"),
-                        defaultValue: _("recording"),
-                        okText: _("Save"),
-                        cancelText: _("Cancel")
-                    }).then(result => finalizeSave(result));
-                } else {
-                    const filename = window.prompt(_("Enter file name"));
-                    finalizeSave(filename);
-                }
-            }
-            /**
-             * Stops the recording process.
-             */
-            function stopRec() {
-                flag = 0;
-
-                if (mediaRecorder && typeof mediaRecorder.stop === "function") {
-                    mediaRecorder.stop();
-                }
-
-                // Clean up the recording canvas stream
-                if (currentStream) {
-                    currentStream.getTracks().forEach(track => track.stop());
-                }
-                const node = document.createElement("p");
-                node.textContent = "Stopped recording";
-                document.body.appendChild(node);
-            }
-
-            /**
-             * Creates a media recorder instance.
-             * @param {MediaStream} stream - The media stream to be recorded.
-             * @param {string} mimeType - The MIME type of the recording.
-             * @returns {MediaRecorder} The created media recorder instance.
-             */
-            function createRecorder(stream, mimeType) {
-                flag = 1;
-                recInside.classList.add("blink");
-                that.textMsg(_("Recording started. Click stop to finish."));
-                start.removeEventListener("click", createRecorder, true);
-                let recordedChunks = [];
-                mediaRecorder = new MediaRecorder(stream);
-                stream.oninactive = function () {
-                    debugLog("Recording is ready to save");
-                    stopRec();
-                    flag = 0;
-                };
-
-                mediaRecorder.onstop = function () {
-                    //saveFile(recordedChunks);
-                    //recordedChunks = [];
-                    //flag = 0;
-                    //recInside.setAttribute("fill", "#ffffff");
-                    const blob = new Blob(recordedChunks, { type: "video/webm" });
-                    const url = URL.createObjectURL(blob);
-
-                    activity.save.download("webm", url, null);
-
-                    recordedChunks = [];
-                    flag = 0;
-                    recInside.setAttribute("fill", "#ffffff");
-                };
-
-                mediaRecorder.ondataavailable = function (e) {
-                    if (e.data.size > 0) {
-                        recordedChunks.push(e.data);
-                    }
-                };
-
-                mediaRecorder.start(200);
-                setTimeout(() => {
-                    debugLog("Resizing for Record", that.canvas.height);
-                    that._onResize();
-                }, 500);
-                return mediaRecorder;
-            }
-
-            /**
-             * Handles the recording process.
-             */
-            function recording() {
-                // Remove any previous handler to avoid multiple triggers
-                if (start._recordHandler) {
-                    start.removeEventListener("click", start._recordHandler);
-                }
-                const handler = async function handler() {
-                    try {
-                        const stream = await recordScreen();
-                        const mimeType = "video/webm";
-                        mediaRecorder = createRecorder(stream, mimeType);
-                        if (flag === 1) {
-                            start.removeEventListener("click", handler);
-                            // Add stop handler
-                            const stopHandler = function stopHandler() {
-                                if (mediaRecorder && mediaRecorder.state === "recording") {
-                                    mediaRecorder.stop();
-                                    mediaRecorder = new MediaRecorder(stream);
-                                    recInside.classList.remove("blink");
-                                    flag = 0;
-                                    // Clean up stream
-                                    if (currentStream) {
-                                        currentStream.getTracks().forEach(track => track.stop());
-                                    }
-                                    if (audioDestination && audioDestination.stream) {
-                                        audioDestination.stream
-                                            .getTracks()
-                                            .forEach(track => track.stop());
-                                    }
-                                }
-                                start.removeEventListener("click", stopHandler);
-                                // Re-enable recording for next time
-                                recording();
-                            };
-                            start.addEventListener("click", stopHandler);
-                        }
-                        recInside.setAttribute("fill", "red");
-                    } catch (error) {
-                        console.error("Recording failed: ", error);
-                        that.textMsg(_("Recording failed: %s").replace(/%s/g, error.message));
-                        flag = 0;
-                        // Re-enable recording button
-                        recording();
-                    }
-                };
-                start.addEventListener("click", handler);
-                start._recordHandler = handler;
-            }
-
-            // Start recording process if not already executing
-            if (flag === 0 && isExecuting) {
-                recording();
-                start.dispatchEvent(clickEvent);
-            }
-        };
+        setupActivityRecorder(this);
 
         /*
          * Runs Music Blocks at a slower rate
@@ -2861,26 +2276,36 @@ class Activity {
                 "touchmove",
                 event => {
                     if (event.touches.length === 2) {
+                        let totalDeltaY = 0;
+                        let totalDeltaX = 0;
+                        let count = 0;
+
                         for (let i = 0; i < 2; i++) {
                             const touchY = event.touches[i].clientY;
                             const touchX = event.touches[i].clientX;
 
                             if (initialTouches[i][0] !== null && initialTouches[i][1] !== null) {
-                                const deltaY = touchY - initialTouches[i][0];
-                                const deltaX = touchX - initialTouches[i][1];
+                                totalDeltaY += touchY - initialTouches[i][0];
+                                totalDeltaX += touchX - initialTouches[i][1];
+                                count++;
+                            }
 
-                                if (deltaY !== 0) {
-                                    closeAnyOpenMenusAndLabels();
-                                    that.blocksContainer.y -= deltaY;
-                                }
+                            initialTouches[i][0] = touchY;
+                            initialTouches[i][1] = touchX;
+                        }
 
-                                if (that.scrollBlockContainer && deltaX !== 0) {
-                                    closeAnyOpenMenusAndLabels();
-                                    that.blocksContainer.x -= deltaX;
-                                }
+                        if (count > 0) {
+                            const avgDeltaY = totalDeltaY / count;
+                            const avgDeltaX = totalDeltaX / count;
 
-                                initialTouches[i][0] = touchY;
-                                initialTouches[i][1] = touchX;
+                            if (avgDeltaY !== 0) {
+                                closeAnyOpenMenusAndLabels();
+                                that.blocksContainer.y -= avgDeltaY;
+                            }
+
+                            if (that.scrollBlockContainer && avgDeltaX !== 0) {
+                                closeAnyOpenMenusAndLabels();
+                                that.blocksContainer.x -= avgDeltaX;
                             }
                         }
 
@@ -3210,7 +2635,7 @@ class Activity {
             // Periodic check for idle state - store interval ID for cleanup
             this._idleWatcherInterval = setInterval(() => {
                 // Check if music/code is playing
-                const isMusicPlaying = this.logo?._alreadyRunning || false;
+                const isMusicPlaying = this.turtles?.running() || false;
 
                 if (!isMusicPlaying && Date.now() - lastActivity > IDLE_THRESHOLD) {
                     if (!this.isAppIdle) {
@@ -4472,7 +3897,7 @@ class Activity {
                     hideContents.click();
                 }
             } catch (error) {
-                console.error("An error occurred in resizeCanvas_:", error);
+                ErrorHandler.recoverable(error, { operation: "resizeCanvas" });
             }
         };
 
@@ -5304,7 +4729,7 @@ class Activity {
                         that.blocks.loadNewBlocks(JSON.parse(that.sessionData));
                     }
                 } catch (e) {
-                    console.error(e);
+                    ErrorHandler.recoverable(e, { operation: "loadSessionData" });
                     if (sessionKey !== null) {
                         try {
                             if (typeof that.storage.removeItem === "function") {
@@ -5313,7 +4738,9 @@ class Activity {
                                 delete that.storage[sessionKey];
                             }
                         } catch (storageError) {
-                            console.error(storageError);
+                            ErrorHandler.recoverable(storageError, {
+                                operation: "removeBadSessionKey"
+                            });
                         }
                     }
                     that.justLoadStart();
@@ -5351,7 +4778,7 @@ class Activity {
                         : _("My Project");
                 this.textMsg(projectName);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.recoverable(e, { operation: "loadProjectName" });
                 this.textMsg(_("My Project"));
             }
 
@@ -5372,7 +4799,7 @@ class Activity {
                         throw new Error("Planet openProjectFromPlanet is unavailable.");
                     }
                 } catch (e) {
-                    console.error(e);
+                    ErrorHandler.recoverable(e, { operation: "openProjectFromPlanet" });
                     that.loadStartWrapper(loadStart);
                 }
 
@@ -5380,10 +4807,12 @@ class Activity {
                     try {
                         that.planet.initialiseNewProject();
                     } catch (e) {
-                        console.error(e);
+                        ErrorHandler.recoverable(e, { operation: "planetInitialiseNewProject" });
                     }
                 } else {
-                    console.error("Planet initialiseNewProject is unavailable.");
+                    ErrorHandler.warn("Planet initialiseNewProject is unavailable.", {
+                        operation: "loadFromPlanet"
+                    });
                 }
 
                 finishLoading();
@@ -6878,6 +6307,7 @@ class Activity {
                 }
 
                 let args = null;
+                let exportName = myBlock.name;
 
                 if (
                     myBlock.isValueBlock() ||
@@ -6989,8 +6419,7 @@ class Activity {
                         case "nopOneArgBlock":
                         case "nopTwoArgBlock":
                         case "nopThreeArgBlock":
-                            // restore original block name
-                            myBlock.name = myBlock.privateData;
+                            exportName = myBlock.privateData;
                             break;
                         case "matrixData":
                             // deprecated
@@ -7025,7 +6454,7 @@ class Activity {
                 if (args === null) {
                     data.push([
                         blockIndex,
-                        myBlock.name,
+                        exportName,
                         myBlock.container.x,
                         myBlock.container.y,
                         connections
@@ -7033,7 +6462,7 @@ class Activity {
                 } else {
                     data.push([
                         blockIndex,
-                        [myBlock.name, args],
+                        [exportName, args],
                         myBlock.container.x,
                         myBlock.container.y,
                         connections
@@ -7070,7 +6499,9 @@ class Activity {
                         }
                     }, 1000);
                 } else {
-                    console.error("Could not load built-in plugin: " + name);
+                    ErrorHandler.warn("Could not load built-in plugin: " + name, {
+                        operation: "loadPlugin"
+                    });
                 }
             };
             xhr.send();
@@ -7954,8 +7385,7 @@ class Activity {
                     this.storage.allProjects = JSON.stringify(["My Project"]);
                 } catch (e) {
                     // Edge case, eg. Firefox localSorage DB corrupted
-
-                    console.error(e);
+                    ErrorHandler.recoverable(e, { operation: "saveLocally_setCurrentProject" });
                 }
             }
 
@@ -7964,7 +7394,7 @@ class Activity {
                 p = this.storage.currentProject;
                 this.storage["SESSION" + p] = data;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.recoverable(e, { operation: "saveLocally_saveSession" });
             }
 
             const img = new Image();
@@ -7997,7 +7427,7 @@ class Activity {
                     offscreen.getContext("2d").drawImage(img, 0, 0);
                     this.storage["SESSIONIMAGE" + p] = offscreen.toDataURL("image/png");
                 } catch (e) {
-                    console.error("[saveLocally] Thumbnail save failed:", e);
+                    ErrorHandler.recoverable(e, { operation: "saveLocally_thumbnail" });
                 }
             };
 
@@ -8521,7 +7951,7 @@ class Activity {
                             this.saveLocally();
                         }
                     } catch (e) {
-                        console.error("[AutoSave] Failed:", e);
+                        ErrorHandler.recoverable(e, { operation: "autoSave" });
                     }
                 },
                 5 * 60 * 1000
@@ -8551,7 +7981,7 @@ class Activity {
                     const customModeDataObj = JSON.parse(custommodeData);
                     Object.assign(MUSICALMODES["custom"], customModeDataObj);
                 } catch (e) {
-                    console.error("Error parsing custommode data:", e);
+                    ErrorHandler.recoverable(e, { operation: "parseCustomMode" });
                 }
             }
 
@@ -8585,14 +8015,13 @@ class Activity {
                                 try {
                                     if (cleanData.includes("html")) {
                                         let extracted;
-                                        if (cleanData.includes('id="codeBlock"')) {
-                                            extracted = cleanData.match(
-                                                '<div class="code" id="codeBlock">(.+?)</div>'
-                                            )[1];
-                                        } else {
-                                            extracted = cleanData.match(
-                                                '<div class="code">(.+?)</div>'
-                                            )[1];
+                                        extracted = extractProjectDataFromHTML(cleanData);
+                                        if (!extracted) {
+                                            that.errorMsg(
+                                                _("Cannot find project data in this HTML file.")
+                                            );
+                                            finishLoading();
+                                            return;
                                         }
                                         obj = JSON.parse(unescapeHTML(extracted));
                                     } else {
@@ -8645,7 +8074,7 @@ class Activity {
                                         )
                                     );
 
-                                    console.error(e);
+                                    ErrorHandler.capture(e, { operation: "loadProjectFromFile" });
                                     document.body.style.cursor = "default";
                                     that.loading = false;
                                 }
@@ -8659,7 +8088,7 @@ class Activity {
                             console.debug(midi);
                             midiImportBlocks(midi);
                         } catch (err) {
-                            console.error("MIDI import failed:", err);
+                            ErrorHandler.capture(err, { operation: "midiImport" });
                             if (that && typeof that.errorMsg === "function") {
                                 that.errorMsg(
                                     _(
@@ -8710,14 +8139,13 @@ class Activity {
                             try {
                                 if (cleanData.includes("html")) {
                                     let extracted;
-                                    if (cleanData.includes('id="codeBlock"')) {
-                                        extracted = cleanData.match(
-                                            '<div class="code" id="codeBlock">(.+?)</div>'
-                                        )[1];
-                                    } else {
-                                        extracted = cleanData.match(
-                                            '<div class="code">(.+?)</div>'
-                                        )[1];
+                                    extracted = extractProjectDataFromHTML(cleanData);
+                                    if (!extracted) {
+                                        that.errorMsg(
+                                            _("Cannot find project data in this HTML file.")
+                                        );
+                                        finishLoading();
+                                        return;
                                     }
                                     obj = JSON.parse(unescapeHTML(extracted));
                                 } else {
@@ -8756,7 +8184,7 @@ class Activity {
                                 that.loading = false;
                                 that.refreshCanvas();
                             } catch (e) {
-                                console.error(e);
+                                ErrorHandler.capture(e, { operation: "loadFromFile" });
                                 that.errorMsg(
                                     _(
                                         "Cannot load project from the file. Please check the file type."
@@ -8774,7 +8202,7 @@ class Activity {
                         console.debug(midi);
                         midiImportBlocks(midi);
                     } catch (err) {
-                        console.error("MIDI import failed:", err);
+                        ErrorHandler.capture(err, { operation: "midiImportBlocks" });
                         if (that && typeof that.errorMsg === "function") {
                             that.errorMsg(
                                 _("Cannot load project from the file. Please check the file type.")
@@ -9223,7 +8651,7 @@ class Activity {
             localStorage.setItem("beginnerMode", this.beginnerMode.toString());
             localStorage.setItem("themePreference", this.themePreference.toString());
         } catch (e) {
-            console.error("Error saving to localStorage:", e);
+            ErrorHandler.recoverable(e, { operation: "saveLocalStorage" });
         }
     }
 
@@ -9304,7 +8732,7 @@ class Activity {
 
             this.refreshCanvas();
         } catch (e) {
-            console.error("Error regenerating palettes:", e);
+            ErrorHandler.capture(e, { operation: "regeneratePalettes" });
             this.errorMsg(_("Error regenerating palettes. Please refresh the page."));
         }
     }
@@ -9349,7 +8777,8 @@ class Activity {
 const activity = new Activity();
 
 // Execute initialization once all RequireJS modules are loaded AND DOM is ready
-define(["domReady!"].concat(MYDEFINES), doc => {
+define(["domReady!", "activity/exporters"].concat(MYDEFINES), (doc, exportersModule) => {
+    exporters = exportersModule;
     const initialize = () => {
         // Defensive check for multiple critical globals that may be delayed
         // due to 'defer' execution timing variances.

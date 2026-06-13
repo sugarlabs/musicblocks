@@ -374,7 +374,7 @@ class JSEditor {
         helpBtn.style.fontSize = "2rem";
         helpBtn.style.background = "#2196f3";
         helpBtn.style.cursor = "pointer";
-        helpBtn.innerHTML = "help_outline";
+        helpBtn.textContent = "help_outline";
         helpBtn.onclick = this._toggleHelp.bind(this);
         menuLeft.appendChild(helpBtn);
         generateTooltip(helpBtn, _("Help"));
@@ -387,7 +387,7 @@ class JSEditor {
         generateBtn.style.fontSize = "2rem";
         generateBtn.style.background = "#2196f3";
         generateBtn.style.cursor = "pointer";
-        generateBtn.innerHTML = "autorenew";
+        generateBtn.textContent = "autorenew";
         generateBtn.onclick = this._generateCode.bind(this);
         menuLeft.appendChild(generateBtn);
         generateTooltip(generateBtn, _("Reset Code"));
@@ -400,7 +400,7 @@ class JSEditor {
         runBtn.style.fontSize = "2rem";
         runBtn.style.background = "#2196f3";
         runBtn.style.cursor = "pointer";
-        runBtn.innerHTML = "play_arrow";
+        runBtn.textContent = "play_arrow";
         runBtn.onclick = this._runCode.bind(this);
         menuLeft.appendChild(runBtn);
         menubar.appendChild(menuLeft);
@@ -414,7 +414,7 @@ class JSEditor {
         convertBtn.style.fontSize = "2rem";
         convertBtn.style.background = "#2196f3";
         convertBtn.style.cursor = "pointer";
-        convertBtn.innerHTML = "transform";
+        convertBtn.textContent = "transform";
         convertBtn.onclick = this._codeToBlocks.bind(this);
         menuLeft.appendChild(convertBtn);
         menubar.appendChild(menuLeft);
@@ -435,7 +435,7 @@ class JSEditor {
         styleBtn.style.fontSize = "2rem";
         styleBtn.style.background = "#2196f3";
         styleBtn.style.cursor = "pointer";
-        styleBtn.innerHTML = "invert_colors";
+        styleBtn.textContent = "invert_colors";
         styleBtn.onclick = this._changeStyle.bind(this);
         menuRight.appendChild(styleBtn);
         menubar.appendChild(menuRight);
@@ -549,7 +549,7 @@ class JSEditor {
         arrowBtn.style.cursor = "pointer";
         arrowBtn.style.lineHeight = "0.75rem";
         arrowBtn.style.marginLeft = "0";
-        arrowBtn.innerHTML = "keyboard_arrow_down";
+        arrowBtn.textContent = "keyboard_arrow_down";
         arrowBtn.onclick = this._toggleConsole.bind(this);
         consolelabel.appendChild(arrowBtn);
         generateTooltip(arrowBtn, _("Toggle Console"), "left");

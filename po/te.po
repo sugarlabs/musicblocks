@@ -12106,3 +12106,14 @@ msgstr "కనిష్ఠ"
 #~msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">Sugar Labs Code of Conduct</a>."
 #~msgstr "ప్రోజెక్టులను అనుసరించిన <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">షుగార్ లాబ్స్ కోడ్ ఆఫ్ కండక్ట్</a> ను ఉల్లంఘించండి."
 
+
+#: index.html (record dropdown)
+#. AUTOTRANSLATED: AI
+msgid "Record canvas and toolbars"
+msgstr "క్యాన్వాస్ మరియు టూల్‌బార్‌లను రెకార్డ్ చేయండి"
+
+#: index.html (record dropdown)
+#. AUTOTRANSLATED: AI
+msgid "Record canvas only"
+msgstr "క్యాన్వాస్ మాత్రమే రెకార్డ్ చేయండి"
+

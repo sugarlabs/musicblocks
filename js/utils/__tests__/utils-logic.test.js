@@ -45,6 +45,10 @@ describe("Utility Logic Functions", () => {
         it("returns fallback for non-string input", () => {
             expect(safeJSONParse(null, "fallback")).toBe("fallback");
         });
+
+        it("returns null fallback by default for invalid JSON", () => {
+            expect(safeJSONParse("invalid")).toBeNull();
+        });
     });
 
     describe("toTitleCase()", () => {
