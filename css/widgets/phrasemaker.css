@@ -1,0 +1,264 @@
+﻿/*
+ * PhraseMaker Widget ΓÇö Design Token Stylesheet
+ *
+ * Copyright (c) 2026 Music Blocks contributors
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the The GNU Affero General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+ *
+ * This file replaces inline style assignments previously driven by
+ * the platformColor JavaScript object with semantic CSS classes that
+ * reference CSS Custom Properties (design tokens).
+ *
+ * Layout-only properties that depend on dynamic JS calculations
+ * (widths, heights based on _cellScale) remain in JavaScript.
+ */
+
+/* ===================================================================
+ * 1. Design Tokens (Light / Default Theme)
+ * =================================================================== */
+:root {
+    /* --- Row label backgrounds --- */
+    --pm-pitch-label-bg: #77c428;
+    --pm-drum-label-bg: #25c3c0;
+    --pm-graphics-label-bg: #728ff9;
+    --pm-lyrics-label-bg: #ff2b77;
+    --pm-lyrics-input-bg: #ff6ea1;
+
+    /* --- Grid cell backgrounds --- */
+    --pm-pitch-cell-bg: #7cd622;
+    --pm-drum-cell-bg: #3edcdd;
+    --pm-graphics-cell-bg: #92a9ff;
+
+    /* --- Bottom row / value cells --- */
+    --pm-rhythm-cell-bg: #c8c8c8;
+    --pm-tuplet-bg: #c0c0c0;
+    --pm-label-color: #a0a0a0;
+
+    /* --- Interactive states --- */
+    --pm-selector-selected: #1a8cff;
+    --pm-selector-bg: #8cc6ff;
+    --pm-cell-active: black;
+
+    /* --- Text --- */
+    --pm-text-color: black;
+
+    /* --- Borders --- */
+    --pm-border-bar: 3px solid #555;
+    --pm-border-cell: 1px solid #ccc;
+
+    /* --- Window body --- */
+    --pm-window-body-bg: #cccccc;
+}
+
+/* --- Dark Theme --- */
+body.dark {
+    --pm-pitch-label-bg: #2e7d32;
+    --pm-drum-label-bg: #00796b;
+    --pm-graphics-label-bg: #283593;
+    --pm-lyrics-label-bg: #c7225d;
+    --pm-lyrics-input-bg: #d15a84;
+
+    --pm-pitch-cell-bg: #4caf50;
+    --pm-drum-cell-bg: #00acc1;
+    --pm-graphics-cell-bg: #7986cb;
+
+    --pm-rhythm-cell-bg: #303030;
+    --pm-tuplet-bg: #424242;
+    --pm-label-color: #bdbdbd;
+
+    --pm-selector-selected: #1e88e5;
+    --pm-selector-bg: #64b5f6;
+    --pm-cell-active: black;
+
+    --pm-text-color: #e2e2e2;
+
+    --pm-border-bar: 3px solid #888;
+    --pm-border-cell: 1px solid #555;
+
+    --pm-window-body-bg: #454545;
+}
+
+/* --- High Contrast Theme --- */
+body.highcontrast {
+    --pm-pitch-label-bg: #00cc00;
+    --pm-drum-label-bg: #00cccc;
+    --pm-graphics-label-bg: #cc00cc;
+    --pm-lyrics-label-bg: #ff00ff;
+    --pm-lyrics-input-bg: #ff66ff;
+
+    --pm-pitch-cell-bg: #00ff00;
+    --pm-drum-cell-bg: #00ffff;
+    --pm-graphics-cell-bg: #ff00ff;
+
+    --pm-rhythm-cell-bg: #333333;
+    --pm-tuplet-bg: #333333;
+    --pm-label-color: #ffffff;
+
+    --pm-selector-selected: #00cccc;
+    --pm-selector-bg: #00ffff;
+    --pm-cell-active: black;
+
+    --pm-text-color: #ffffff;
+
+    --pm-border-bar: 3px solid #ffffff;
+    --pm-border-cell: 1px solid #666;
+
+    --pm-window-body-bg: #000000;
+}
+
+/* ===================================================================
+ * 2. Structural / Layout Classes
+ * =================================================================== */
+
+/* Sticky column cells (row labels on the left) */
+.pm-headcol {
+    position: sticky;
+    left: 1.2px;
+}
+
+.pm-labelcol {
+    position: sticky;
+}
+
+/* Bottom row (note value / tuplet labels) ΓÇö sticky at bottom */
+.pm-bottom-row {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+}
+
+.pm-bottom-cell {
+    position: sticky;
+    left: 1.2px;
+    z-index: 1;
+}
+
+/* Lyrics row */
+.pm-lyrics-row {
+    position: sticky;
+}
+
+/* ===================================================================
+ * 3. Color Classes ΓÇö Row Label Backgrounds
+ * =================================================================== */
+
+.pm-bg-pitch-label {
+    background-color: var(--pm-pitch-label-bg);
+}
+
+.pm-bg-drum-label {
+    background-color: var(--pm-drum-label-bg);
+}
+
+.pm-bg-graphics-label {
+    background-color: var(--pm-graphics-label-bg);
+}
+
+.pm-bg-lyrics-label {
+    background-color: var(--pm-lyrics-label-bg);
+    text-align: center;
+}
+
+/* ===================================================================
+ * 4. Color Classes ΓÇö Grid Cell Backgrounds
+ * =================================================================== */
+
+.pm-bg-pitch-cell {
+    background-color: var(--pm-pitch-cell-bg);
+}
+
+.pm-bg-drum-cell {
+    background-color: var(--pm-drum-cell-bg);
+}
+
+.pm-bg-graphics-cell {
+    background-color: var(--pm-graphics-cell-bg);
+}
+
+/* Note-value / bottom-row cells */
+.pm-bg-rhythm-cell {
+    background-color: var(--pm-rhythm-cell-bg);
+    color: var(--pm-text-color);
+}
+
+.pm-bg-tuplet {
+    background-color: var(--pm-tuplet-bg);
+}
+
+.pm-bg-label {
+    background-color: var(--pm-label-color);
+}
+
+/* Active / selected cell */
+.pm-cell-active {
+    background-color: var(--pm-cell-active);
+}
+
+/* ===================================================================
+ * 5. Color Classes ΓÇö Interactive States
+ * =================================================================== */
+
+.pm-bg-selector-selected {
+    background-color: var(--pm-selector-selected);
+}
+
+.pm-bg-selector {
+    background-color: var(--pm-selector-bg);
+}
+
+/* ===================================================================
+ * 6. Lyrics Input Styling
+ * =================================================================== */
+
+.pm-lyrics-input-cell {
+    background-color: var(--pm-lyrics-input-bg);
+    font-family: sans-serif;
+    cursor: default;
+    border-spacing: 1px 1px;
+    border-collapse: collapse;
+    box-sizing: border-box;
+    padding: 0;
+    border-radius: 6px;
+    border: none;
+}
+
+.pm-lyrics-input {
+    width: 100%;
+    font-size: inherit;
+    font-family: sans-serif;
+    cursor: default;
+    box-sizing: border-box;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background-color: var(--pm-lyrics-input-bg);
+}
+
+/* ===================================================================
+ * 7. Value Row Cell Styling
+ * =================================================================== */
+
+.pm-value-cell {
+    line-height: 60%;
+    text-align: center;
+}
+
+/* Grid note cells */
+.pm-note-cell {
+    border-radius: 6px;
+}
+
+/* ===================================================================
+ * 8. Window Body Background (used by PhraseMakerUI.js)
+ * =================================================================== */
+
+.pm-window-body-bg {
+    background: var(--pm-window-body-bg);
+}
