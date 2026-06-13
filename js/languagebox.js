@@ -299,11 +299,11 @@ class LanguageBox {
             }
             this.activity.textMsg(_("Music Blocks is already set to this language."));
         } else {
-            this.activity.storage.languagePreference = this._language;
-
             if (this._language.includes("ja")) {
                 this._language = this._language.split("-")[0];
             }
+
+            this.activity.storage.languagePreference = this._language;
 
             this.reload();
         }
