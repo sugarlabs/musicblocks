@@ -9,6 +9,7 @@
 - Run `npx prettier --write <changed files>` before pushing
 - Always rebase on master before requesting review
   (`git fetch upstream && git rebase upstream/master`)
+- DCO sign-off is required on every commit (`git commit -s`) 
 - Keep PRs focused — **one concern per PR**, don't bundle 
   unrelated fixes together
 - Check license headers are present at the top of every new file
@@ -44,9 +45,3 @@
 - No lint or Jest errors
 - Don't forget to rebase before requesting review
 - Don't create a new test file if an existing one covers that module
-
-## Contributor Journey
-1. Start with small fixes and suggest changes
-2. After 8-10 merged PRs, request approval rights
-3. With experience, propose performance improvements
-   and new features — discuss with mentors first
