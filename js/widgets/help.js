@@ -59,13 +59,23 @@ class HelpWidget {
                 this._keydownHandler = null;
             }
             widgetWindow.destroy();
-            // Trigger the hint only if they were on the first page of the tour
+            // Trigger the hint only if they were on the first page of the tour and haven't seen it yet
             if (this.index === 0 && typeof this.activity.textMsg === "function") {
-                this.activity.textMsg(
-                    _(
-                        "Start by dragging a block from the left panel and connect it to the Start block."
-                    )
-                );
+                const hintKey = "helpHintShown";
+                try {
+                    if (!window.localStorage || !window.localStorage.getItem(hintKey)) {
+                        this.activity.textMsg(
+                            _(
+                                "Start by dragging a block from the left panel and connect it to the Start block."
+                            )
+                        );
+                        if (window.localStorage) {
+                            window.localStorage.setItem(hintKey, "true");
+                        }
+                    }
+                } catch (e) {
+                    console.warn("Could not access localStorage for helpHintShown", e);
+                }
             }
         };
 
