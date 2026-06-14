@@ -76,6 +76,13 @@ describe("AIWidget Utilities", () => {
             };
             expect(adjustPitch("F", keySignature)).toBe("F♯");
         });
+
+        it("should return note unchanged for unsupported accidental types", () => {
+            const keySignature = {
+                accidentals: [{ note: "C", acc: "natural" }]
+            };
+            expect(adjustPitch("C", keySignature)).toBe("C");
+        });
     });
 
     describe("abcToStandardValue", () => {
@@ -148,6 +155,7 @@ describe("AIWidget Utilities", () => {
 describe("AIWidget Instance", () => {
     let aiWidget;
     let mockActivity;
+    let originalFetch;
 
     beforeEach(() => {
         mockActivity = {
@@ -199,6 +207,13 @@ describe("AIWidget Instance", () => {
         aiWidget = new AIWidget();
         // Since aiwidget.js uses wheelnav as a global if present
         global.wheelnav = jest.fn();
+        originalFetch = global.fetch;
+    });
+
+    afterEach(() => {
+        global.fetch = originalFetch;
+        jest.restoreAllMocks();
+        jest.useRealTimers();
     });
 
     it("should initialize correctly", () => {
@@ -495,5 +510,198 @@ describe("AIWidget Instance", () => {
         expect(widgetBody.getElementsByClassName("ai-interface-container").length).toBe(0);
         expect(makeCanvasSpy).toHaveBeenCalled();
         expect(aiWidget.reconnectSynthsToAnalyser).toHaveBeenCalled();
+    });
+
+    it("should normalize markdown-wrapped AI responses before displaying ABC notation", async () => {
+        global.fetch = jest.fn(() =>
+            Promise.resolve({
+                json: () =>
+                    Promise.resolve({
+                        choices: [
+                            {
+                                message: {
+                                    content: "```abc\nX:1\nT:Test\nK:C\nC D E F\n```"
+                                }
+                            }
+                        ]
+                    })
+            })
+        );
+        aiWidget = new AIWidget();
+        mockActivity.storage = {
+            groq_api_key: "test-key"
+        };
+        const widgetBody = document.createElement("div");
+        aiWidget.widgetWindow = {
+            getWidgetBody: jest.fn(() => widgetBody)
+        };
+
+        aiWidget.activity = mockActivity;
+        aiWidget.makeCanvas(800, 400);
+        const input = widgetBody.querySelector(".inputField");
+        const submitButton = widgetBody.querySelector(".submitButton");
+        const textarea = widgetBody.querySelector(".samplerTextarea");
+
+        input.value = "generate melody";
+        submitButton.onclick();
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(fetch).toHaveBeenCalledTimes(1);
+        expect(textarea.value).toContain("X:1");
+        expect(textarea.value).not.toContain("```");
+        expect(submitButton.disabled).toBe(false);
+    });
+
+    it("should extract ABC notation from mixed AI responses", async () => {
+        global.fetch = jest.fn(() =>
+            Promise.resolve({
+                json: () =>
+                    Promise.resolve({
+                        choices: [
+                            {
+                                message: {
+                                    content: "Here is your melody:\n\nX:1\nT:Demo\nK:C\nC D E F"
+                                }
+                            }
+                        ]
+                    })
+            })
+        );
+        aiWidget = new AIWidget();
+        mockActivity.storage = {
+            groq_api_key: "test-key"
+        };
+        const widgetBody = document.createElement("div");
+        aiWidget.widgetWindow = {
+            getWidgetBody: jest.fn(() => widgetBody)
+        };
+        aiWidget.activity = mockActivity;
+        aiWidget.makeCanvas(800, 400);
+        const input = widgetBody.querySelector(".inputField");
+        const submitButton = widgetBody.querySelector(".submitButton");
+        const textarea = widgetBody.querySelector(".samplerTextarea");
+        input.value = "generate melody";
+        submitButton.onclick();
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(fetch).toHaveBeenCalledTimes(1);
+        expect(textarea.value.startsWith("X:1")).toBe(true);
+        expect(textarea.value).not.toContain("Here is your melody");
+        expect(submitButton.disabled).toBe(false);
+    });
+
+    it("should use maximized dimensions during scale recalculation", () => {
+        aiWidget = new AIWidget();
+        const widgetBody = document.createElement("div");
+        widgetBody.getBoundingClientRect = jest.fn(() => ({
+            width: 1200
+        }));
+        const makeCanvasSpy = jest.spyOn(aiWidget, "makeCanvas").mockImplementation(() => {});
+        aiWidget.widgetWindow = {
+            getWidgetBody: jest.fn(() => widgetBody),
+            getWidgetFrame: jest.fn(() => ({
+                getBoundingClientRect: jest.fn(() => ({
+                    height: 900
+                }))
+            })),
+            isMaximized: jest.fn(() => true)
+        };
+        const originalWidth = global.window.innerWidth;
+        const originalHeight = global.window.innerHeight;
+
+        global.window.innerWidth = 1600;
+        global.window.innerHeight = 1000;
+        aiWidget.reconnectSynthsToAnalyser = jest.fn();
+        aiWidget._scale();
+        expect(makeCanvasSpy).toHaveBeenCalledWith(1200, 830, 0, true);
+        global.window.innerWidth = originalWidth;
+        global.window.innerHeight = originalHeight;
+    });
+
+    describe("_parseABC", () => {
+        it("should organize staffs by staff index across multiple lines", async () => {
+            aiWidget = new AIWidget();
+            aiWidget.activity = mockActivity;
+            const tune = {
+                lines: [
+                    {
+                        staff: [
+                            {
+                                voices: [
+                                    [
+                                        {
+                                            el_type: "note",
+                                            pitches: [
+                                                {
+                                                    name: "C",
+                                                    pitch: 0
+                                                }
+                                            ],
+                                            duration: 0.25
+                                        }
+                                    ]
+                                ],
+                                key: {
+                                    accidentals: []
+                                },
+                                meter: {
+                                    value: [
+                                        {
+                                            num: 4,
+                                            den: 4
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        staff: [
+                            {
+                                voices: [
+                                    [
+                                        {
+                                            el_type: "note",
+                                            pitches: [
+                                                {
+                                                    name: "C",
+                                                    pitch: 0
+                                                }
+                                            ],
+                                            duration: 0.25
+                                        }
+                                    ]
+                                ],
+                                key: {
+                                    accidentals: []
+                                },
+                                meter: {
+                                    value: [
+                                        {
+                                            num: 4,
+                                            den: 4
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ],
+                metaText: {
+                    title: "Test Tune"
+                }
+            };
+
+            await aiWidget._parseABC(tune);
+            expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalledTimes(1);
+            const generatedBlocks = mockActivity.blocks.loadNewBlocks.mock.calls[0][0];
+            const labels = generatedBlocks
+                .filter(
+                    block =>
+                        Array.isArray(block) && Array.isArray(block[1]) && block[1][0] === "text"
+                )
+                .map(block => block[1][1]?.value);
+
+            expect(labels).toContain("V: 1 Line 1");
+            expect(labels).toContain("V: 1 Line 2");
+        });
     });
 });
