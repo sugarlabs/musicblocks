@@ -182,6 +182,16 @@
         />
         <link
             rel="preload"
+            href="css/tokens.css?v=fixed"
+            as="style"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
+        />
+        <noscript><link rel="stylesheet" href="css/tokens.css?v=fixed" /></noscript>
+        <link
+            rel="preload"
             href="css/themes.css?v=fixed"
             as="style"
             onload="
@@ -497,13 +507,7 @@
                         <div id="guitarText"></div>
                         <input type="checkbox" id="guitarCheck" tabindex="-1" />
                         <p></p>
-                        <p>
-                            <button
-                                class="confirm-button"
-                                id="submitLilypond"
-                                aria-label="Submit LilyPond code"
-                            ></button>
-                        </p>
+                        <p><button class="confirm-button" id="submitLilypond"></button></p>
                         <!-- <button id="submitPDF"></button></p> -->
                     </div>
                 </dialog>
@@ -527,22 +531,12 @@
                             </div>
                             <ul class="main left">
                                 <li>
-                                    <a
-                                        id="play"
-                                        class="left tooltipped"
-                                        role="button"
-                                        tabindex="0"
-                                        aria-label="Play (Enter)"
+                                    <a id="play" class="left tooltipped" role="button" tabindex="0"
                                         ><i class="material-icons main">play_circle_filled</i></a
                                     >
                                 </li>
                                 <li>
-                                    <a
-                                        id="stop"
-                                        class="left tooltipped"
-                                        role="button"
-                                        tabindex="0"
-                                        aria-label="Stop"
+                                    <a id="stop" class="left tooltipped" role="button" tabindex="0"
                                         ><i class="material-icons main">stop</i></a
                                     >
                                 </li>
@@ -554,7 +548,6 @@
                                         data-tooltip="Record"
                                         role="button"
                                         tabindex="0"
-                                        aria-label="Record"
                                     ></a>
                                     <a
                                         id="recordDropdownArrow"
@@ -563,9 +556,6 @@
                                         style="margin-left: -5px; padding: 0; font-size: 28px"
                                         role="button"
                                         tabindex="0"
-                                        aria-label="Record options"
-                                        aria-haspopup="menu"
-                                        aria-expanded="false"
                                     ></a>
                                 </li>
                             </ul>
@@ -579,7 +569,6 @@
                                         role="button"
                                         tabindex="0"
                                         onclick="setIcon()"
-                                        aria-label="Fullscreen"
                                     >
                                         <i class="material-icons" id="FullScrIcon">fullscreen</i>
                                     </a>
@@ -592,9 +581,6 @@
                                         role="button"
                                         tabindex="0"
                                         data-activates="newdropdown"
-                                        aria-label="New file"
-                                        aria-haspopup="menu"
-                                        aria-expanded="false"
                                     >
                                         <i class="material-icons md-48">note_add</i>
                                     </a>
@@ -606,7 +592,6 @@
                                         data-position="bottom"
                                         role="button"
                                         tabindex="0"
-                                        aria-label="Load project"
                                     >
                                         <i class="material-icons md-48">folder</i>
                                     </a>
@@ -619,9 +604,6 @@
                                         role="button"
                                         tabindex="0"
                                         data-activates="saveddropdownbeg"
-                                        aria-label="Save project"
-                                        aria-haspopup="menu"
-                                        aria-expanded="false"
                                     >
                                         <i id="save1" class="material-icons md-48">save_alt</i>
                                     </a>
@@ -632,12 +614,9 @@
                                         style="display: none"
                                         class="tooltipped dropdown-trigger"
                                         role="button"
-                                        tabindex="-1"
+                                        tabindex="0"
                                         data-position="bottom"
                                         data-activates="saveddropdown"
-                                        aria-label="Save project"
-                                        aria-haspopup="menu"
-                                        aria-expanded="false"
                                     >
                                         <i id="save2" class="material-icons md-48">save_alt</i>
                                     </a>
@@ -649,7 +628,6 @@
                                         data-position="bottom"
                                         role="button"
                                         tabindex="0"
-                                        aria-label="Planet (Cloud sharing)"
                                     >
                                         <i class="material-icons md-48">public</i>
                                     </a>
@@ -660,10 +638,8 @@
                                         id="planetIconDisabled"
                                         class="tooltipped"
                                         role="button"
-                                        tabindex="-1"
+                                        tabindex="0"
                                         data-position="bottom"
-                                        aria-label="Planet (Cloud sharing, disabled)"
-                                        aria-disabled="true"
                                     >
                                         <i style="color: #a5acba" class="material-icons md-48"
                                             >public</i
@@ -677,8 +653,6 @@
                                         data-position="bottom"
                                         role="button"
                                         tabindex="0"
-                                        aria-label="Show advanced tools"
-                                        aria-expanded="false"
                                     >
                                         <i id="menu" class="animated-icon material-icons md-48"
                                             >menu</i
@@ -693,9 +667,6 @@
                                         role="button"
                                         tabindex="0"
                                         data-activates="helpdropdown"
-                                        aria-label="Help and guides"
-                                        aria-haspopup="menu"
-                                        aria-expanded="false"
                                     >
                                         <i class="material-icons md-48">help</i>
                                     </a>
@@ -706,9 +677,9 @@
                                         class="tooltipped hidden"
                                         data-position="bottom"
                                         role="button"
-                                        tabindex="-1"
+                                        tabindex="0"
                                         data-tooltip="Install App"
-                                        aria-label="Install as App"
+                                        aria-label="Install App"
                                     >
                                         <i class="material-icons md-48">file_download</i>
                                     </a>
@@ -731,7 +702,6 @@
                                             data-delay="10"
                                             role="button"
                                             tabindex="0"
-                                            aria-label="Run slowly"
                                         >
                                             <i class="material-icons md-48">play_circle_outline</i>
                                         </a>
@@ -744,7 +714,6 @@
                                             data-delay="10"
                                             role="button"
                                             tabindex="0"
-                                            aria-label="Run step by step"
                                         >
                                             <i class="material-icons md-48">video_library</i>
                                         </a>
@@ -759,7 +728,6 @@
                                             role="button"
                                             tabindex="0"
                                             data-delay="10"
-                                            aria-label="Display statistics"
                                             ><i class="material-icons md-48">poll</i></a
                                         >
                                     </li>
@@ -771,7 +739,6 @@
                                             data-delay="10"
                                             role="button"
                                             tabindex="0"
-                                            aria-label="Load plugin"
                                             ><i class="material-icons md-48">add_circle</i></a
                                         >
                                     </li>
@@ -783,7 +750,6 @@
                                             data-delay="10"
                                             role="button"
                                             tabindex="0"
-                                            aria-label="Delete plugin"
                                             ><i class="material-icons md-48">remove_circle</i></a
                                         >
                                     </li>
@@ -794,7 +760,6 @@
                                             data-position="bottom"
                                             role="button"
                                             tabindex="0"
-                                            aria-label="Enable horizontal scroll"
                                             ><i class="material-icons md-48">compare_arrows</i></a
                                         >
                                     </li>
@@ -806,7 +771,6 @@
                                             role="button"
                                             tabindex="0"
                                             data-position="bottom"
-                                            aria-label="Disable horizontal scroll"
                                             ><i class="material-icons md-48">lock</i></a
                                         >
                                     </li>
@@ -819,9 +783,6 @@
                                             tabindex="0"
                                             data-activates="themedropdown"
                                             data-tooltip="Select Theme"
-                                            aria-label="Select theme (Light, Dark, High Contrast)"
-                                            aria-haspopup="menu"
-                                            aria-expanded="false"
                                             ><i class="material-icons md-48">brightness_7</i></a
                                         >
                                     </li>
@@ -832,7 +793,6 @@
                                             data-position="bottom"
                                             role="button"
                                             tabindex="0"
-                                            aria-label="Merge with current"
                                             ><i class="material-icons md-48">merge_type</i></a
                                         >
                                     </li>
@@ -843,7 +803,6 @@
                                             data-position="bottom"
                                             role="button"
                                             tabindex="0"
-                                            aria-label="Wrap turtle"
                                             ><i class="material-icons md-48">wrap_text</i></a
                                         >
                                     </li>
@@ -971,26 +930,22 @@
                         <li><a id="enUK" role="button" tabindex="0"></a></li>
                         <li><a id="es" role="button" tabindex="0"></a></li>
                         <li><a id="pt" role="button" tabindex="0"></a></li>
-                        <li><a id="fr" role="button" tabindex="0"></a></li>
-			<li><a id="it" role="button" tabindex="0"></a></li>
-			<li><a id="de" role="button" tabindex="0"></a></li>
                         <li><a id="ja" role="button" tabindex="0"></a></li>
                         <li><a id="kana" role="button" tabindex="0"></a></li>
                         <li><a id="ko" role="button" tabindex="0"></a></li>
                         <li><a id="zhCN" role="button" tabindex="0"></a></li>
                         <li><a id="th" role="button" tabindex="0"></a></li>
+                        <li><a id="tr" role="button" tabindex="0"></a></li>
                         <li><a id="ayc" role="button" tabindex="0"></a></li>
                         <li><a id="quz" role="button" tabindex="0"></a></li>
                         <li><a id="gug" role="button" tabindex="0"></a></li>
                         <li><a id="hi" role="button" tabindex="0"></a></li>
-			<li><a id="ta" role="button" tabindex="0"></a></li>
                         <li><a id="te" role="button" tabindex="0"></a></li>
-                        <li><a id="bn" role="button" tabindex="0"></a></li>
                         <li><a id="ibo" role="button" tabindex="0"></a></li>
-                        <li><a id="tr" role="button" tabindex="0"></a></li>
                         <li><a id="ar" role="button" tabindex="0"></a></li>
-                        <li><a id="ur" role="button" tabindex="0"></a></li>
+                        <li><a id="bn" role="button" tabindex="0"></a></li>
                         <li><a id="he" role="button" tabindex="0"></a></li>
+                        <li><a id="ur" role="button" tabindex="0"></a></li>
                     </ul>
 
                     <ul style="display: none" id="themedropdown" class="dropdown-content">
