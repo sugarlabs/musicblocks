@@ -538,7 +538,7 @@ class JSEditor {
         consolelabel.style.background = "white";
         consolelabel.style.display = "flex";
         consolelabel.style.justifyContent = "space-between";
-        consolelabel.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;CONSOLE";
+        consolelabel.textContent = "\u00a0\u00a0\u00a0\u00a0CONSOLE";
         this._editor.appendChild(consolelabel);
 
         const arrowBtn = document.createElement("span");
