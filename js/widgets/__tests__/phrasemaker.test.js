@@ -95,7 +95,8 @@ global.docById = jest.fn(() => ({
     innerHTML: "",
     insertRow: jest.fn(() => ({
         insertCell: jest.fn(() => ({
-            classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn(() => false) }, style: {},
+            classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn(() => false) },
+            style: {},
             appendChild: jest.fn(),
             setAttribute: jest.fn(),
             addEventListener: jest.fn(),
@@ -134,7 +135,12 @@ global.window = {
                 style: {},
                 insertRow: jest.fn(() => ({
                     insertCell: jest.fn(() => ({
-                        classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn(() => false) }, appendChild: jest.fn(),
+                        classList: {
+                            add: jest.fn(),
+                            remove: jest.fn(),
+                            contains: jest.fn(() => false)
+                        },
+                        appendChild: jest.fn(),
                         setAttribute: jest.fn(),
                         style: {},
                         innerHTML: ""
@@ -171,7 +177,11 @@ global.document = {
         })),
         querySelectorAll: jest.fn(() => []),
         insertRow: jest.fn(() => ({
-            insertCell: jest.fn(() => ({ classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn(() => false) }, style: {}, innerHTML: "" }))
+            insertCell: jest.fn(() => ({
+                classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn(() => false) },
+                style: {},
+                innerHTML: ""
+            }))
         }))
     })),
     getElementById: jest.fn(() => ({
@@ -545,7 +555,12 @@ describe("PhraseMaker Widget", () => {
         phraseMaker._rows = [
             {
                 insertCell: jest.fn(() => ({
-                    classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn(() => false) }, style: {},
+                    classList: {
+                        add: jest.fn(),
+                        remove: jest.fn(),
+                        contains: jest.fn(() => false)
+                    },
+                    style: {},
                     setAttribute: jest.fn(),
                     addEventListener: jest.fn(),
                     appendChild: jest.fn()
@@ -554,7 +569,8 @@ describe("PhraseMaker Widget", () => {
         ];
         phraseMaker._noteValueRow = {
             insertCell: jest.fn(() => ({
-                classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn(() => false) }, style: {},
+                classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn(() => false) },
+                style: {},
                 setAttribute: jest.fn(),
                 appendChild: jest.fn()
             }))
@@ -761,7 +777,11 @@ describe("PhraseMaker Widget", () => {
             {
                 cells: [
                     {
-                        classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn(cls => cls === "pm-black-cell") },
+                        classList: {
+                            add: jest.fn(),
+                            remove: jest.fn(),
+                            contains: jest.fn(cls => cls === "pm-black-cell")
+                        },
                         style: { backgroundColor: "black" },
                         getAttribute: jest.fn(() => "white")
                     }
@@ -978,7 +998,11 @@ describe("PhraseMaker Widget", () => {
             {
                 cells: [
                     {
-                        classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn(cls => cls === "pm-black-cell") },
+                        classList: {
+                            add: jest.fn(),
+                            remove: jest.fn(),
+                            contains: jest.fn(cls => cls === "pm-black-cell")
+                        },
                         style: { backgroundColor: "black" },
                         getAttribute: jest.fn(() => "white")
                     }
@@ -1000,7 +1024,11 @@ describe("PhraseMaker Widget", () => {
             {
                 cells: [
                     {
-                        classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn(() => false) },
+                        classList: {
+                            add: jest.fn(),
+                            remove: jest.fn(),
+                            contains: jest.fn(() => false)
+                        },
                         style: {},
                         setAttribute: jest.fn(),
                         addEventListener: jest.fn(),

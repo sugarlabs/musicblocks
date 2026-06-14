@@ -91,7 +91,7 @@ describe("ThemeBox", () => {
         expect(mockActivity.storage.themePreference).toBe("dark");
         // Should show theme switched message
         expect(mockActivity.textMsg).toHaveBeenCalledWith("Theme switched to dark mode.", 2000);
-        });
+    });
 
     test("setPreference() applies theme instantly without reload", () => {
         localStorage.getItem.mockReturnValue("light");
@@ -101,14 +101,14 @@ describe("ThemeBox", () => {
         // Body should have dark class
         expect(document.body.classList.contains("dark")).toBe(true);
         expect(document.body.classList.contains("light")).toBe(false);
-        });
+    });
 
     test("setPreference() does not change if theme is unchanged", () => {
         themeBox.light_onclick();
         expect(mockActivity.textMsg).toHaveBeenCalledWith(
             "Music Blocks is already set to this theme."
         );
-        });
+    });
 
     test("applyThemeInstantly() updates body classes correctly", () => {
         themeBox._theme = "dark";
