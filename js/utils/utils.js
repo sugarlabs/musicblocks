@@ -300,17 +300,26 @@ function HttpRequest(url, loadCallback, userCallback) {
         req.onload = () => {
             if ((req.status >= 200 && req.status < 300) || this.localmode) {
                 if (typeof this.handler === "function") this.handler();
-                if (typeof this.userCallback === "function")
+                if (typeof this.userCallback === "function") {
                     this.userCallback(true, req.responseText);
+                }
             } else {
-                if (typeof this.userCallback === "function")
+                if (typeof this.handler === "function") this.handler();
+                if (typeof this.userCallback === "function") {
                     this.userCallback(false, `Error: ${req.status}`);
+                }
             }
         };
 
         req.onerror = () => {
-            if (typeof this.userCallback === "function") this.userCallback(false, "network error");
+            if (typeof this.handler === "function") this.handler();
+            if (typeof this.userCallback === "function") {
+                this.userCallback(false, "network error");
+            }
         };
+
+        req.onabort = req.onerror;
+        req.ontimeout = req.onerror;
 
         req.send("");
     } catch (e) {
