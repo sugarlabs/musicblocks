@@ -553,8 +553,7 @@ describe("TemperamentWidget basic tests", () => {
                 appendChild: jest.fn(),
                 setAttribute: jest.fn(),
                 style: {},
-                onmouseover: jest.fn(),
-                onmouseout: jest.fn()
+                addEventListener: jest.fn()
             })),
             append: jest.fn()
         }));

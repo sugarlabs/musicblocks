@@ -81,14 +81,14 @@ class PitchStaircase {
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = platformColor.selectorBackground;
-
-        cell.onmouseover = () => {
+        // Use Pointer Events so hover feedback works on touch and stylus too.
+        cell.style.touchAction = "manipulation";
+        cell.addEventListener("pointerenter", () => {
             cell.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        };
-
-        cell.onmouseout = () => {
+        });
+        cell.addEventListener("pointerleave", () => {
             cell.style.backgroundColor = platformColor.selectorBackground;
-        };
+        });
 
         return cell;
     }
@@ -162,15 +162,16 @@ class PitchStaircase {
             stepCell.style.backgroundRepeat = "no-repeat";
             stepCell.style.backgroundPosition = "center center";
 
+            stepCell.style.touchAction = "manipulation";
             stepCell.addEventListener("click", event => {
                 this._dissectStair(event);
             });
 
-            playCell.onclick = () => {
+            playCell.addEventListener("pointerdown", () => {
                 const i = playCell.getAttribute("id");
                 const stepCell = this._stepTables[i].rows[0].cells[1];
                 this._playOne(stepCell);
-            };
+            });
         }
     }
 

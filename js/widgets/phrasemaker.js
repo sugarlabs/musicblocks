@@ -3027,17 +3027,18 @@ class PhraseMaker {
                 cell.style.backgroundColor = cellColor;
                 cell.style.borderLeft = i === 0 ? barStyle : "1px solid #ccc";
 
-                cell.onmouseover = event => {
+                // Use Pointer Events so hover feedback works on touch and stylus too.
+                cell.style.touchAction = "manipulation";
+                cell.addEventListener("pointerenter", event => {
                     if (event.target.style.backgroundColor !== "black") {
                         event.target.style.backgroundColor = this.platformColor.selectorSelected;
                     }
-                };
-
-                cell.onmouseout = event => {
+                });
+                cell.addEventListener("pointerleave", event => {
                     if (event.target.style.backgroundColor !== "black") {
                         event.target.style.backgroundColor = event.target.getAttribute("cellColor");
                     }
-                };
+                });
             }
         }
 
@@ -4113,51 +4114,58 @@ class PhraseMaker {
             }
         }
 
-        let isMouseDown;
+        // Tag all cells with row/column indices; Pointer Events on the inner table
+        // enable touch drag-paint via elementFromPoint.
         for (let i = 0; i < rowCount; i++) {
-            // The buttons get added to the embedded table.
             row = this._rows[i];
             for (let j = 0; j < row.cells.length; j++) {
                 cell = row.cells[j];
-                // Give each clickable cell a unique id
                 cell.setAttribute("data-i", i);
                 cell.setAttribute("data-j", j);
-
-                isMouseDown = false;
-
-                cell.onmousedown = evt => {
-                    isMouseDown = true;
-                    const i = Number(evt.target.getAttribute("data-i"));
-                    const j = Number(evt.target.getAttribute("data-j"));
-                    if (evt.target.style.backgroundColor === "black") {
-                        evt.target.style.backgroundColor = evt.target.getAttribute("cellColor");
-                        this._notesToPlay[j][0] = ["R"];
-                        if (!this._noteBlocks) this._setNotes(j, i, false);
-                    } else {
-                        evt.target.style.backgroundColor = "black";
-                        if (!this._noteBlocks) this._setNotes(j, i, true);
-                    }
-                };
-
-                cell.onmouseover = evt => {
-                    const i = Number(evt.target.getAttribute("data-i"));
-                    const j = Number(evt.target.getAttribute("data-j"));
-                    if (isMouseDown) {
-                        if (evt.target.style.backgroundColor === "black") {
-                            evt.target.style.backgroundColor = evt.target.getAttribute("cellColor");
-                            this._notesToPlay[j][0] = ["R"];
-                            if (!this._noteBlocks) this._setNotes(j, i, false);
-                        } else {
-                            evt.target.style.backgroundColor = "black";
-                            if (!this._noteBlocks) this._setNotes(j, i, true);
-                        }
-                    }
-                };
-
-                cell.onmouseup = () => {
-                    isMouseDown = false;
-                };
+                cell.style.touchAction = "none";
             }
+        }
+
+        let isPointerDown = false;
+        let lastDragCell = null;
+
+        const __togglePMCell = target => {
+            const targetCell = target.closest("td[data-i]");
+            if (!targetCell || targetCell === lastDragCell) return;
+            lastDragCell = targetCell;
+            const i = Number(targetCell.getAttribute("data-i"));
+            const j = Number(targetCell.getAttribute("data-j"));
+            if (targetCell.style.backgroundColor === "black") {
+                targetCell.style.backgroundColor = targetCell.getAttribute("cellColor");
+                this._notesToPlay[j][0] = ["R"];
+                if (!this._noteBlocks) this._setNotes(j, i, false);
+            } else {
+                targetCell.style.backgroundColor = "black";
+                if (!this._noteBlocks) this._setNotes(j, i, true);
+            }
+        };
+
+        const __endPMDrag = () => {
+            isPointerDown = false;
+            lastDragCell = null;
+        };
+
+        for (let i = 0; i < rowCount; i++) {
+            // Attach listeners to the inner table (parent of the row) so that
+            // pointermove has a container to fire on during touch drag.
+            const innerTable = this._rows[i].parentElement;
+            innerTable.addEventListener("pointerdown", e => {
+                isPointerDown = true;
+                lastDragCell = null;
+                __togglePMCell(e.target);
+            });
+            innerTable.addEventListener("pointermove", e => {
+                if (!isPointerDown) return;
+                const el = document.elementFromPoint(e.clientX, e.clientY);
+                if (el) __togglePMCell(el);
+            });
+            innerTable.addEventListener("pointerup", __endPMDrag);
+            innerTable.addEventListener("pointercancel", __endPMDrag);
         }
 
         // Mark any cells found in the blockMap from previous

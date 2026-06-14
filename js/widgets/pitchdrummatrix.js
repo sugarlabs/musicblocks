@@ -478,16 +478,18 @@ class PitchDrumMatrix {
             cell.style.border = "2px solid white";
             cell.style.borderRadius = "10px";
 
-            cell.onmouseover = () => {
+            // Use Pointer Events so hover feedback works on touch and stylus too.
+            cell.style.touchAction = "manipulation";
+            cell.addEventListener("pointerenter", () => {
                 if (cell.style.backgroundColor !== "black") {
                     cell.style.backgroundColor = platformColor.selectorSelected;
                 }
-            };
-            cell.onmouseout = () => {
+            });
+            cell.addEventListener("pointerleave", () => {
                 if (cell.style.backgroundColor !== "black") {
                     cell.style.backgroundColor = platformColor.selectorBackground;
                 }
-            };
+            });
 
             cell.setAttribute("id", i + "," + drumIdx); // row,column
         }
@@ -549,7 +551,8 @@ class PitchDrumMatrix {
 
                 drumCell = drumRow.cells[j];
 
-                cell.onclick = e => {
+                cell.style.touchAction = "manipulation";
+                cell.addEventListener("click", e => {
                     const currCell = e.target;
                     const rowcol = currCell.id.split(",");
                     if (currCell.style.backgroundColor === "black") {
@@ -559,7 +562,7 @@ class PitchDrumMatrix {
                         currCell.style.backgroundColor = "black";
                         this._setCellPitchDrum(rowcol[1], rowcol[0], true);
                     }
-                };
+                });
             }
         }
 
