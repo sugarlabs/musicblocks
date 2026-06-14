@@ -827,7 +827,13 @@ describe("AIWidget Instance", () => {
         expect(aiWidget._playSample).not.toHaveBeenCalled();
         expect(aiWidget._endPlaying).not.toHaveBeenCalled();
 
-        jest.runOnlyPendingTimers();
+        jest.advanceTimersByTime(499);
+
+        expect(aiWidget._playSample).not.toHaveBeenCalled();
+        expect(aiWidget._endPlaying).not.toHaveBeenCalled();
+
+        jest.advanceTimersByTime(1);
+
         const result = await promise;
         expect(aiWidget._playSample).toHaveBeenCalledTimes(1);
         expect(aiWidget._endPlaying).toHaveBeenCalledTimes(1);
