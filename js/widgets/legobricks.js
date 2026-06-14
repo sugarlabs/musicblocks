@@ -2423,6 +2423,9 @@ function LegoWidget() {
 
         this.activity.hideMsgs();
 
+        const img = this.playButton.querySelector("img");
+        if (img) img.src = "header-icons/play-button.svg";
+
         // Save final color segments for all lines
         if (this.scanningLines) {
             const now = performance.now();
