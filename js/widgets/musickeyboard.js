@@ -1615,21 +1615,19 @@ function MusicKeyboard(activity) {
         mkbTableDiv.style.width = "700px";
 
         mkbTableDiv.replaceChildren();
-
-        const mkbOuterDiv = document.createElement("div");
-        mkbOuterDiv.id = "mkbOuterDiv";
-        const mkbInnerDiv = document.createElement("div");
-        mkbInnerDiv.id = "mkbInnerDiv";
-        const mkbTableElement = document.createElement("table");
-        mkbTableElement.id = "mkbTable";
-        mkbTableElement.setAttribute("cellpadding", "0px");
-        mkbInnerDiv.append(mkbTableElement);
-        mkbOuterDiv.append(mkbInnerDiv);
-        mkbTableDiv.append(mkbOuterDiv);
+        const outerDiv = document.createElement("div");
+        outerDiv.id = "mkbOuterDiv";
+        const innerDiv = document.createElement("div");
+        innerDiv.id = "mkbInnerDiv";
+        const mkbTable = document.createElement("table");
+        mkbTable.id = "mkbTable";
+        mkbTable.setAttribute("cellpadding", "0px");
+        innerDiv.append(mkbTable);
+        outerDiv.append(innerDiv);
+        mkbTableDiv.append(outerDiv);
 
         let n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 8);
 
-        const outerDiv = docById("mkbOuterDiv");
         outerDiv.style.overflowY = "hidden";
         if (this.displayLayout.length > n) {
             outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (n + 5) + "px";
@@ -1643,7 +1641,6 @@ function MusicKeyboard(activity) {
 
         docById("mkbInnerDiv").style.marginLeft = 0;
 
-        const mkbTable = docById("mkbTable");
         if (selectedNotes.length < 1) {
             outerDiv.replaceChildren();
             return;
@@ -1669,9 +1666,9 @@ function MusicKeyboard(activity) {
             } else if (this.displayLayout[i].noteName === "hertz") {
                 cell.textContent = this.displayLayout[i].noteOctave.toString() + "HZ";
             } else {
-                cell.textContent = `${i18nSolfege(this.displayLayout[i].noteName)}${this.displayLayout[
-                    i
-                ].noteOctave.toString()}`;
+                cell.textContent = `${i18nSolfege(
+                    this.displayLayout[i].noteName
+                )}${this.displayLayout[i].noteOctave.toString()}`;
             }
 
             cell.setAttribute("id", "labelcol" + (n - i - 1));
@@ -1783,7 +1780,6 @@ function MusicKeyboard(activity) {
             cell.style.color = platformColor.textColor;
         }
 
-        const innerDiv = docById("mkbInnerDiv");
         innerDiv.scrollLeft = innerDiv.scrollWidth; // Force to the right.
         this.makeClickable();
         this._updateWidgetWindowSize();
@@ -2805,10 +2801,10 @@ function MusicKeyboard(activity) {
         keyboardHolder2.style.left = "0px";
         keyboardHolder2.style.height = "145px";
         keyboardHolder2.style.backgroundColor = "white";
-        const blackRow = document.getElementsByClassName("black");
-        blackRow[0].style.top = "1px";
-        blackRow[0].style.borderSpacing = "0px 0px 20px";
-        blackRow[0].style.borderCollapse = "separate";
+        const blackTables = document.getElementsByClassName("black");
+        blackTables[0].style.top = "1px";
+        blackTables[0].style.borderSpacing = "0px 0px 20px";
+        blackTables[0].style.borderCollapse = "separate";
 
         whiteRow.replaceChildren();
         blackRowElement.replaceChildren();

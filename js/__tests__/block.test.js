@@ -259,5 +259,80 @@ describe("Block Foundation", () => {
                 expect(block.highlightBitmap.visible).toBe(false);
             });
         });
+
+        describe("regenerateArtwork()", () => {
+            it("should remove old bitmaps and call generateArtwork", () => {
+                block.bitmap = new global.createjs.Bitmap();
+                block.highlightBitmap = new global.createjs.Bitmap();
+                const generateSpy = jest
+                    .spyOn(block, "generateArtwork")
+                    .mockImplementation(() => {});
+
+                block.regenerateArtwork(false);
+
+                expect(block.container.removeChild).toHaveBeenCalledWith(block.bitmap);
+                expect(block.container.removeChild).toHaveBeenCalledWith(block.highlightBitmap);
+                expect(generateSpy).toHaveBeenCalledWith(false);
+                generateSpy.mockRestore();
+            });
+
+            it("should handle collapse artwork when collapse is true", () => {
+                block.bitmap = new global.createjs.Bitmap();
+                block.highlightBitmap = new global.createjs.Bitmap();
+                block.collapseBlockBitmap = new global.createjs.Bitmap();
+                block.collapseButtonBitmap = new global.createjs.Bitmap();
+                block.expandButtonBitmap = new global.createjs.Bitmap();
+                block.highlightCollapseBlockBitmap = new global.createjs.Bitmap();
+                const generateSpy = jest
+                    .spyOn(block, "generateArtwork")
+                    .mockImplementation(() => {});
+
+                block.regenerateArtwork(true);
+
+                expect(block.container.removeChild).toHaveBeenCalledWith(
+                    block.collapseButtonBitmap
+                );
+                expect(block.container.removeChild).toHaveBeenCalledWith(block.expandButtonBitmap);
+                expect(block.container.removeChild).toHaveBeenCalledWith(block.collapseBlockBitmap);
+                expect(block.container.removeChild).toHaveBeenCalledWith(
+                    block.highlightCollapseBlockBitmap
+                );
+                generateSpy.mockRestore();
+            });
+
+            it("should handle null bitmaps gracefully", () => {
+                block.bitmap = null;
+                block.highlightBitmap = null;
+                const generateSpy = jest
+                    .spyOn(block, "generateArtwork")
+                    .mockImplementation(() => {});
+
+                expect(() => block.regenerateArtwork(false)).not.toThrow();
+                expect(generateSpy).toHaveBeenCalledWith(false);
+                generateSpy.mockRestore();
+            });
+
+            it("should restore imageBitmap after regeneration", () => {
+                block.bitmap = new global.createjs.Bitmap();
+                block.highlightBitmap = new global.createjs.Bitmap();
+                const mockImage = { width: 50, height: 50 };
+                block.imageBitmap = { image: mockImage };
+                const generateSpy = jest
+                    .spyOn(block, "generateArtwork")
+                    .mockImplementation(() => {});
+                block._positionMedia = jest.fn();
+
+                block.regenerateArtwork(false);
+
+                expect(block.container.addChild).toHaveBeenCalledWith(block.imageBitmap);
+                expect(block._positionMedia).toHaveBeenCalledWith(
+                    block.imageBitmap,
+                    50,
+                    50,
+                    block.protoblock.scale
+                );
+                generateSpy.mockRestore();
+            });
+        });
     });
 });

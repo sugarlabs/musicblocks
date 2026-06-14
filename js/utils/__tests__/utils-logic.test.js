@@ -45,6 +45,10 @@ describe("Utility Logic Functions", () => {
         it("returns fallback for non-string input", () => {
             expect(safeJSONParse(null, "fallback")).toBe("fallback");
         });
+
+        it("returns null fallback by default for invalid JSON", () => {
+            expect(safeJSONParse("invalid")).toBeNull();
+        });
     });
 
     describe("toTitleCase()", () => {
@@ -304,19 +308,28 @@ describe("Utility Logic Functions", () => {
             expect(isSafeUrl("http://example.com")).toBe(true);
             expect(isSafeUrl("https://example.com")).toBe(true);
         });
-
         it("identifies unsafe urls", () => {
+            expect(isSafeUrl("mailto:test@example.com")).toBe(false);
             expect(isSafeUrl("javascript:alert(1)")).toBe(false);
             expect(isSafeUrl("data:text/html,Hello")).toBe(false);
             expect(isSafeUrl("vbscript:alert(1)")).toBe(false);
             expect(isSafeUrl("file:///etc/passwd")).toBe(false);
-            expect(isSafeUrl("mailto:test@example.com")).toBe(false);
             expect(isSafeUrl("blob:https://example.com/uuid")).toBe(false);
             expect(isSafeUrl("tel:123456789")).toBe(false);
             expect(isSafeUrl("sms:123456789")).toBe(false);
             expect(isSafeUrl("chrome://settings")).toBe(false);
             expect(isSafeUrl("about:blank")).toBe(false);
             expect(isSafeUrl("invalid-url")).toBe(false);
+            expect(isSafeUrl(null)).toBe(false);
+            expect(isSafeUrl(undefined)).toBe(false);
+            expect(isSafeUrl(123)).toBe(false);
+        });
+        it("identifies bypass attempts", () => {
+            expect(isSafeUrl("&#106;avascript:alert(1)")).toBe(false);
+            expect(isSafeUrl("javascript&colon;alert(1)")).toBe(false);
+            expect(isSafeUrl("java\tscript:alert(1)")).toBe(false);
+            expect(isSafeUrl("jav\rascript:alert(1)")).toBe(false);
+            expect(isSafeUrl(" javascript:alert(1)")).toBe(false);
         });
     });
 });

@@ -256,6 +256,8 @@ class PitchDrumMatrix {
             const sub = document.createElement("sub");
             sub.textContent = this.rowArgs[j].toString();
             labelCell.appendChild(sub);
+            labelCell.dataset.noteArg = this.rowLabels[j];
+            labelCell.dataset.octave = this.rowArgs[j].toString();
             labelCell.style.position = "sticky";
             labelCell.style.left = "0";
             labelCell.style.top = "0";
@@ -866,17 +868,17 @@ class PitchDrumMatrix {
     _setPairCell(rowIndex, colIndex, cell, playNote) {
         const pdmTable = docById("pdmTable");
         let row = pdmTable.rows[rowIndex];
-        const solfegeHTML = row.cells[0].innerHTML;
+        const noteArg = row.cells[0].dataset.noteArg;
+        const octave = parseInt(row.cells[0].dataset.octave, 10);
 
         const drumTable = docById("pdmDrumTable");
         row = drumTable.rows[0];
         const drumImg = row.cells[colIndex].querySelector("img");
         const drumName = getDrumSynthName(drumImg ? drumImg.title : "");
 
-        // Both solfege and octave are extracted from HTML by getNote.
         const noteObj = getNote(
-            solfegeHTML,
-            -1,
+            noteArg,
+            octave,
             0,
             this.activity.turtles.ithTurtle(0).singer.keySignature,
             false,
@@ -995,15 +997,16 @@ class PitchDrumMatrix {
             col = pairs[i][1];
 
             cellRow = pdmTable.rows[row];
-            solfegeHTML = cellRow.cells[0].innerHTML;
+            const noteArg = cellRow.cells[0].dataset.noteArg;
+            octave = parseInt(cellRow.cells[0].dataset.octave, 10);
 
             drumRow = drumTable.rows[0];
             const drumImg = drumRow.cells[col].querySelector("img");
             drumName = getDrumSynthName(drumImg ? drumImg.title : "");
-            // Both solfege and octave are extracted from HTML by getNote.
+
             noteObj = getNote(
-                solfegeHTML,
-                -1,
+                noteArg,
+                octave,
                 0,
                 this.activity.turtles.ithTurtle(0).singer.keySignature,
                 false,

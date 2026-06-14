@@ -333,8 +333,7 @@ class ReflectionMatrix {
         const botReply = document.createElement("div");
 
         if (md) {
-            const safeText = escapeHTML(reply.response);
-            let html = this.mdToHTML(safeText);
+            let html = this.mdToHTML(reply.response);
             botReply.innerHTML = html;
         } else {
             botReply.innerText = reply.response;
@@ -373,7 +372,7 @@ class ReflectionMatrix {
 
             if (reply.error) {
                 this.hideTypingIndicator();
-                this.activity.errorMsg(_("Failed to send message"), 3000);
+                this.activity.errorMsg(_("Failed to send message."), 3000);
                 continue;
             }
 
@@ -616,7 +615,7 @@ class ReflectionMatrix {
 
         if (reply.error) {
             this.hideTypingIndicator();
-            this.activity.errorMsg(_("Failed to send message"), 3000);
+            this.activity.errorMsg(_("Failed to send message."), 3000);
             return;
         }
 

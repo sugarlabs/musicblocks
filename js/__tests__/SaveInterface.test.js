@@ -316,6 +316,61 @@ describe("save HTML methods", () => {
         expect(html).toContain("&lt;/script&gt;");
     });
 
+    it("should block unsafe project image URLs in prepareHTML", () => {
+        const unsafeImageActivity = {
+            beginnerMode: false,
+            PlanetInterface: {
+                getCurrentProjectName: jest.fn(() => "Mock Project"),
+                getCurrentProjectDescription: jest.fn(() => "Mock Description"),
+                getCurrentProjectImage: jest.fn(() => "javascript:alert(1)")
+            },
+            prepareExport: jest.fn(() => "Mock Exported Data")
+        };
+
+        const si = new SaveInterface(unsafeImageActivity);
+        const html = si.prepareHTML();
+
+        expect(html).toContain('src=""');
+        expect(html).not.toContain("javascript:alert(1)");
+    });
+
+    it("should reject non-image data URLs in prepareHTML", () => {
+        const dataUrlActivity = {
+            beginnerMode: false,
+            PlanetInterface: {
+                getCurrentProjectName: jest.fn(() => "Mock Project"),
+                getCurrentProjectDescription: jest.fn(() => "Mock Description"),
+                getCurrentProjectImage: jest.fn(() => "data:text/html;base64,PHNjcmlwdD4=")
+            },
+            prepareExport: jest.fn(() => "Mock Exported Data")
+        };
+
+        const si = new SaveInterface(dataUrlActivity);
+        const html = si.prepareHTML();
+
+        expect(html).toContain('src=""');
+        expect(html).not.toContain("data:text/html;base64,PHNjcmlwdD4=");
+    });
+
+    it("should allow valid image data URLs in prepareHTML", () => {
+        const validImageActivity = {
+            beginnerMode: false,
+            PlanetInterface: {
+                getCurrentProjectName: jest.fn(() => "Mock Project"),
+                getCurrentProjectDescription: jest.fn(() => "Mock Description"),
+                getCurrentProjectImage: jest.fn(
+                    () => "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA"
+                )
+            },
+            prepareExport: jest.fn(() => "Mock Exported Data")
+        };
+
+        const si = new SaveInterface(validImageActivity);
+        const html = si.prepareHTML();
+
+        expect(html).toContain("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA");
+    });
+
     it("should compose exported page initialization with other load handlers", () => {
         const si = new SaveInterface({
             PlanetInterface: {

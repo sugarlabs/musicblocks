@@ -160,6 +160,17 @@ Follow these steps when contributing:
 
 7.  Respond to review feedback and update your branch as needed.
 
+### Reviews and Area Ownership
+
+All reviews are welcome. Reviewing pull requests is a good way to help the
+project and learn from other contributors.
+
+Some parts of the project have Area Approvers. Their approval, or approval from
+a Project Maintainer, is required before a pull request can be merged.
+
+See [GOVERNANCE.md](GOVERNANCE.md) for the review flow and
+[MAINTAINERS.md](MAINTAINERS.md) for the current areas and maintainers.
+
 ### Keeping Your PR Up-to-Date
 
 Our CI automatically rebases your PR onto the latest `master` whenever

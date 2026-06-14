@@ -79,9 +79,17 @@ function setupSensorsBlocks(activity) {
             tur.doWait(120);
 
             // Display the input form.
-            docById("labelDiv").innerHTML =
-                '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="input" type="text" value="" />';
-            const inputElem = docById("textLabel");
+            const inputElem = document.createElement("input");
+            inputElem.id = "textLabel";
+            inputElem.className = "input";
+            inputElem.type = "text";
+            inputElem.value = "";
+            inputElem.style.position = "absolute";
+            inputElem.style.webkitUserSelect = "text";
+            inputElem.style.mozUserSelect = "text";
+            inputElem.style.msUserSelect = "text";
+
+            docById("labelDiv").replaceChildren(inputElem);
             const cblk = activity.blocks.blockList[blk].connections[1];
             if (cblk !== null) {
                 inputElem.placeholder = activity.blocks.blockList[cblk].value;

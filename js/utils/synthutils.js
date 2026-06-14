@@ -631,10 +631,29 @@ function Synth() {
                 interval !== "pitchNumber" &&
                 interval !== "interval" &&
                 interval !== "octave" &&
-                typeof t[interval] === "number"
+                interval !== "isEDO" &&
+                interval !== "edo" &&
+                interval !== "name" &&
+                interval !== "description" &&
+                interval !== "noteLabels" &&
+                interval !== "ratios" &&
+                interval !== "octaveRatio" &&
+                interval !== "generator"
             ) {
                 const noteInfo = getNoteFromInterval(startingPitch, interval);
-                this.noteFrequencies[noteInfo[0]] = [noteInfo[1], t[interval] * frequency];
+                let ratio;
+                if (typeof t[interval] === "number") {
+                    ratio = t[interval];
+                } else if (
+                    t[interval] &&
+                    typeof t[interval] === "object" &&
+                    typeof t[interval].ratio === "number"
+                ) {
+                    ratio = t[interval].ratio;
+                } else {
+                    continue;
+                }
+                this.noteFrequencies[noteInfo[0]] = [noteInfo[1], ratio * frequency];
             }
         }
 

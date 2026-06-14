@@ -159,6 +159,7 @@ describe("processABCNotes - Control Strings", () => {
         expect(out).toContain("!<(!");
         expect(out).toContain("!<)!");
         expect(out).toContain("!>(!");
+        expect(out).toContain("!>)!");
         expect(out).toContain("V:1");
         expect(out).toContain("V:2");
         expect(out).toContain("V:3");
