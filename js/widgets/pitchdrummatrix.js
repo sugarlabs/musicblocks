@@ -245,7 +245,7 @@ class PitchDrumMatrix {
 
             // A cell for the row label
             labelCell = pdmTableRow.insertCell();
-            labelCell.style.backgroundColor = platformColor.labelColor;
+            labelCell.classList.add("pdm-label-cell");
             labelCell.style.fontSize = this._cellScale * 100 + "%";
             labelCell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
             labelCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + "px";
@@ -283,7 +283,7 @@ class PitchDrumMatrix {
         // An extra row for the note and tuplet values
         pdmTableRow = pdmTable.insertRow();
         labelCell = pdmTableRow.insertCell();
-        labelCell.style.backgroundColor = platformColor.labelColor;
+        labelCell.classList.add("pdm-label-cell");
         labelCell.style.fontSize = this._cellScale * 100 + "%";
         labelCell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
         labelCell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + "px";
@@ -474,18 +474,18 @@ class PitchDrumMatrix {
             cell.style.width = cell.width;
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
-            cell.style.backgroundColor = platformColor.selectorBackground;
+            cell.classList.add("pdm-selector-cell");
             cell.style.border = "2px solid white";
             cell.style.borderRadius = "10px";
 
             cell.onmouseover = () => {
                 if (cell.style.backgroundColor !== "black") {
-                    cell.style.backgroundColor = platformColor.selectorSelected;
+                    cell.classList.add("pdm-selector-cell-active");
                 }
             };
             cell.onmouseout = () => {
                 if (cell.style.backgroundColor !== "black") {
-                    cell.style.backgroundColor = platformColor.selectorBackground;
+                    cell.classList.remove("pdm-selector-cell-active");
                 }
             };
 
@@ -521,7 +521,7 @@ class PitchDrumMatrix {
         img.setAttribute("vertical-align", "middle");
         cell.appendChild(img);
         cell.appendChild(document.createTextNode("\u00A0\u00A0"));
-        cell.style.backgroundColor = platformColor.selectorBackground;
+        cell.classList.add("pdm-selector-cell");
     }
 
     /**
@@ -553,7 +553,7 @@ class PitchDrumMatrix {
                     const currCell = e.target;
                     const rowcol = currCell.id.split(",");
                     if (currCell.style.backgroundColor === "black") {
-                        currCell.style.backgroundColor = platformColor.selectorBackground;
+                        currCell.classList.add("pdm-selector-cell");
                         this._setCellPitchDrum(rowcol[1], rowcol[0], false);
                     } else {
                         currCell.style.backgroundColor = "black";
@@ -745,7 +745,7 @@ class PitchDrumMatrix {
         let pdmTable = docById("pdmTable");
         if (!this._playing) {
             for (let j = 0; j < i; j++) {
-                pdmTable.rows[j].cells[0].style.backgroundColor = platformColor.labelColor;
+                pdmTable.rows[j].cells[0].classList.add("pdm-label-cell");
             }
             const icon = this.playButton;
             icon.textContent = "\u00A0\u00A0";
@@ -785,7 +785,7 @@ class PitchDrumMatrix {
         } else {
             setTimeout(() => {
                 for (let ii = 0; ii < pdmTable.rows.length - 1; ii++) {
-                    pdmTable.rows[ii].cells[0].style.backgroundColor = platformColor.labelColor;
+                    pdmTable.rows[ii].cells[0].classList.add("pdm-label-cell");
                 }
             }, 1000);
         }
@@ -829,7 +829,7 @@ class PitchDrumMatrix {
                     pitchBlock = this._rowBlocks[rowi];
                     drumBlock = this._colBlocks[i];
                     this.removeNode(pitchBlock, drumBlock);
-                    cell.style.backgroundColor = platformColor.selectorBackground;
+                    cell.classList.add("pdm-selector-cell");
                     obj = cell.id.split(","); // row,column
                     this._setCellPitchDrum(Number(obj[0]), Number(obj[1]), false);
                 }
@@ -922,7 +922,7 @@ class PitchDrumMatrix {
             for (let j = 0; j < row.cells.length; j++) {
                 cell = row.cells[j];
                 if (cell.style.backgroundColor === "black") {
-                    cell.style.backgroundColor = platformColor.selectorBackground;
+                    cell.classList.add("pdm-selector-cell");
                     this._setCellPitchDrum(j, i, false);
                 }
             }
