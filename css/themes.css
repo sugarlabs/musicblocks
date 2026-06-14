@@ -34,7 +34,7 @@
 /* High Contrast Mode Theme Dropdown - Override ALL styles */
 .highcontrast #themedropdown {
     background-color: var(--color-text-inverse) !important;
-    border: 1px solid var(--color-text-inverse) !important;
+    border: 1px solid #ffffff !important;
 }
 
 .highcontrast #themedropdown li {
@@ -64,7 +64,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 /* Dark Mode */
 
 .dark .blue {
-    background-color: var(--color-brand-primary) !important;
+    background-color: #022363 !important;
 }
 
 .dark #canvas {
@@ -72,7 +72,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .dark .blue.darken-1 {
-    background-color: var(--color-brand-primary-hover) !important;
+    background-color: #01143b !important;
 }
 
 .dark #floatingWindows > .windowFrame {
@@ -227,18 +227,18 @@ body {
 }
 
 body.dark {
-    --border: var(--color-border-primary);
-    --bg: var(--color-bg-primary);
+    --border: #000000;
+    --bg: #1d1d20;
     --fg: var(--color-text-secondary);
-    --panel-bg: var(--color-bg-secondary);
+    --panel-bg: var(--color-bg-primary);
     --accent: var(--color-brand-secondary);
 }
 
 body.highcontrast {
-    --border: var(--color-text-inverse);
-    --bg: var(--color-bg-primary);
-    --fg: var(--color-text-inverse);
-    --panel-bg: var(--color-bg-primary);
+    --border: #ffffff;
+    --bg: #000000;
+    --fg: #ffffff;
+    --panel-bg: #000000;
     --accent: var(--color-brand-secondary);
 }
 
@@ -512,11 +512,11 @@ body.highcontrast {
 }
 
 .highcontrast .blue {
-    background-color: #000080 !important;
+    background-color: var(--color-text-inverse)080 !important;
 }
 
 .highcontrast .blue.darken-1 {
-    background-color: #0000ff !important;
+    background-color: var(--color-text-inverse)0ff !important;
 }
 
 .highcontrast #floatingWindows > .windowFrame {
@@ -677,22 +677,14 @@ body.highcontrast {
 
 /* Dark Mode Tooltip Styling - Slightly lighter background for better contrast */
 .dark .material-tooltip {
-    background-color: var(--color-bg-secondary) !important;
+    background-color: #3a3a3a !important;
     color: var(--color-text-inverse) !important;
 }
 
 .dark .material-tooltip .backdrop {
-    background-color: var(--color-bg-secondary) !important;
+    background-color: #3a3a3a !important;
 }
 
 .dark .material-tooltip span {
     color: var(--color-text-inverse) !important;
-}
-
-/* Temperament Overrides */
-.tm-selector-bg {
-    background-color: var(--color-bg-secondary) !important;
-}
-.tm-selector-hover {
-    background-color: var(--color-brand-primary-hover) !important;
 }
