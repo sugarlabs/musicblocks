@@ -419,3 +419,14 @@
     padding: 1px 3px;
   }
 }
+
+/* Temperament widget tokens */
+.temperament-selector-cell {
+  background-color: var(--color-selector-bg);
+}
+
+.temperament-selector-cell:hover,
+.temperament-selector-hover {
+  background-color: var(--color-selector-selected);
+}
+
