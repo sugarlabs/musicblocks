@@ -693,8 +693,15 @@ describe("AIWidget Instance", () => {
             await aiWidget._parseABC(tune);
             expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalledTimes(1);
             const generatedBlocks = mockActivity.blocks.loadNewBlocks.mock.calls[0][0];
-            expect(Array.isArray(generatedBlocks)).toBe(true);
-            expect(generatedBlocks.length).toBeGreaterThan(0);
+            const labels = generatedBlocks
+                .filter(
+                    block =>
+                        Array.isArray(block) && Array.isArray(block[1]) && block[1][0] === "text"
+                )
+                .map(block => block[1][1]?.value);
+
+            expect(labels).toContain("V: 1 Line 1");
+            expect(labels).toContain("V: 1 Line 2");
         });
     });
 });
