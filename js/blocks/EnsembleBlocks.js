@@ -43,6 +43,7 @@ function getTargetTurtle(turtles, targetTurtle) {
 }
 
 function _blockFindTurtle(activity, turtle, blk, receivedArg) {
+    if (!activity.blocks.blockList[blk]) return null;
     const cblk = activity.blocks.blockList[blk].connections[1];
     if (cblk === null) {
         //Debug: connecting block not found, returning null
@@ -1070,7 +1071,7 @@ function setupEnsembleBlocks(activity) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
             const heading = tur.orientation;
             // Heading needs to be set to 0 when we update the graphic.
-            if (heading != 0) {
+            if (heading !== 0) {
                 tur.painter.doSetHeading(0);
             }
 
@@ -1094,7 +1095,7 @@ function setupEnsembleBlocks(activity) {
             );
 
             // Restore the heading.
-            if (heading != 0) {
+            if (heading !== 0) {
                 tur.painter.doSetHeading(heading);
             }
         }
