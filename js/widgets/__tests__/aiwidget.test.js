@@ -213,6 +213,7 @@ describe("AIWidget Instance", () => {
     afterEach(() => {
         global.fetch = originalFetch;
         jest.restoreAllMocks();
+        jest.useRealTimers();
     });
 
     it("should initialize correctly", () => {
@@ -590,6 +591,9 @@ describe("AIWidget Instance", () => {
     it("should use maximized dimensions during scale recalculation", () => {
         aiWidget = new AIWidget();
         const widgetBody = document.createElement("div");
+        widgetBody.getBoundingClientRect = jest.fn(() => ({
+            width: 1200
+        }));
         const makeCanvasSpy = jest.spyOn(aiWidget, "makeCanvas").mockImplementation(() => {});
         aiWidget.widgetWindow = {
             getWidgetBody: jest.fn(() => widgetBody),
@@ -607,7 +611,7 @@ describe("AIWidget Instance", () => {
         global.window.innerHeight = 1000;
         aiWidget.reconnectSynthsToAnalyser = jest.fn();
         aiWidget._scale();
-        expect(makeCanvasSpy).toHaveBeenCalledWith(0, 830, 0, true);
+        expect(makeCanvasSpy).toHaveBeenCalledWith(1200, 830, 0, true);
         global.window.innerWidth = originalWidth;
         global.window.innerHeight = originalHeight;
     });
@@ -686,9 +690,11 @@ describe("AIWidget Instance", () => {
                 }
             };
 
-            const result = await aiWidget._parseABC(tune);
-            expect(result).toBeDefined();
-            expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalled();
+            await aiWidget._parseABC(tune);
+            expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalledTimes(1);
+            const generatedBlocks = mockActivity.blocks.loadNewBlocks.mock.calls[0][0];
+            expect(Array.isArray(generatedBlocks)).toBe(true);
+            expect(generatedBlocks.length).toBeGreaterThan(0);
         });
     });
 });
