@@ -1313,7 +1313,7 @@ class PaletteModel {
                             label = `${_("store in")} ${block.staticLabels[0]}`;
                         }
                     } else {
-                        label = block.defaults[0];
+                        label = _(block.defaults[0]);
                     }
                 } else if (protoBlock.staticLabels.length > 0) {
                     label = protoBlock.staticLabels[0];

@@ -290,31 +290,47 @@ let httpPost = async (projectName, data) => {
  * @param {function} [userCallback] - An optional user-defined callback function.
  */
 function HttpRequest(url, loadCallback, userCallback) {
-    // userCallback is an optional callback-handler.
     const req = (this.request = new XMLHttpRequest());
     this.handler = loadCallback;
     this.url = url;
     this.localmode = Boolean(self.location.href.search(/^file:/i) === 0);
     this.userCallback = userCallback;
 
-    const objref = this;
     try {
         req.open("GET", url);
 
-        req.onreadystatechange = () => {
-            objref.handler();
+        req.onload = () => {
+            if ((req.status >= 200 && req.status < 300) || this.localmode) {
+                if (typeof this.handler === "function") this.handler();
+                if (typeof this.userCallback === "function") {
+                    this.userCallback(true, req.responseText);
+                }
+            } else {
+                if (typeof this.handler === "function") this.handler();
+                if (typeof this.userCallback === "function") {
+                    this.userCallback(false, `Error: ${req.status}`);
+                }
+            }
         };
+
+        req.onerror = () => {
+            if (typeof this.handler === "function") this.handler();
+            if (typeof this.userCallback === "function") {
+                this.userCallback(false, "network error");
+            }
+        };
+
+        req.onabort = req.onerror;
+        req.ontimeout = req.onerror;
 
         req.send("");
     } catch (e) {
         if (self.console) {
-            console.debug("Failed to load resource from " + url + ": Network error.");
-
-            console.debug(e);
+            console.debug("Failed to load resource from " + url + ": Network error.", e);
         }
 
-        if (typeof userCallback === "function") {
-            userCallback(false, "network error");
+        if (typeof this.userCallback === "function") {
+            this.userCallback(false, "network error");
         }
 
         this.request = this.handler = this.userCallback = null;
@@ -1411,7 +1427,7 @@ let closeBlkWidgets = name => {
     const widgetTitle = document.getElementsByClassName("wftTitle");
     for (let i = 0; i < widgetTitle.length; i++) {
         if (widgetTitle[i].innerHTML === name) {
-            window.widgetWindows.hideWindow(widgetTitle[i].innerHTML);
+            window.widgetWindows.closeWindow(widgetTitle[i].innerHTML);
             break;
         }
     }

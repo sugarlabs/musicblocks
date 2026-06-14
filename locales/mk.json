@@ -1801,5 +1801,7 @@
   "city": "city",
   "day": "day",
   "high": "high",
-  "low": "low"
+  "low": "low",
+  "Record canvas and toolbars": "Снимај платно и ленти со алатки",
+  "Record canvas only": "Снимај само платно"
 }

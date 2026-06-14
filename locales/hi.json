@@ -1801,5 +1801,7 @@
   "city": "शहर",
   "day": "दिन",
   "high": "ऊंचा",
-  "low": "नीचा"
+  "low": "नीचा",
+  "Record canvas and toolbars": "कैनवास और टूलबार रिकॉर्ड करें",
+  "Record canvas only": "केवल कैनवास रिकॉर्ड करें"
 }

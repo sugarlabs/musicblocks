@@ -1801,5 +1801,7 @@
   "city": "city",
   "day": "day",
   "high": "high",
-  "low": "low"
+  "low": "low",
+  "Record canvas and toolbars": "Зургийн самбар болон хэрэгслийн мөрийг бичлэх",
+  "Record canvas only": "Зургийн самбарыг л бичлэх"
 }

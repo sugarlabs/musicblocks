@@ -13535,3 +13535,14 @@ msgstr "குறைந்த"
 #~msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">Sugar Labs Code of Conduct</a>."
 #~msgstr ""
 
+
+#: index.html (record dropdown)
+#. AUTOTRANSLATED: AI
+msgid "Record canvas and toolbars"
+msgstr "கருவிப்பலகை மற்றும் கருவிப்பட்டைகளை பதிவு செய்"
+
+#: index.html (record dropdown)
+#. AUTOTRANSLATED: AI
+msgid "Record canvas only"
+msgstr "கருவிப்பலகை மட்டும் பதிவு செய்"
+

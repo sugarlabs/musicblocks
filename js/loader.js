@@ -125,7 +125,8 @@ requirejs.config({
                 "activity/logo",
                 "activity/blocks",
                 "activity/turtles",
-                "activity/recorder"
+                "activity/recorder",
+                "activity/abc-parser"
             ],
             exports: "Activity"
         },
@@ -161,6 +162,7 @@ requirejs.config({
         "activity": "js",
         "activity/recorder": "js/activity/recorder",
         "activity/exporters": "js/activity/exporters",
+        "activity/abc-parser": "js/activity/abc-parser",
         "easeljs.min": "lib/easeljs.min",
         "tweenjs.min": "lib/tweenjs.min",
         "prefixfree.min": "lib/prefixfree.min",
@@ -295,10 +297,24 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
 
     function updateContent() {
         if (!i18next.isInitialized) return;
+        const lang = i18next.language;
         const elements = document.querySelectorAll("[data-i18n]");
         elements.forEach(element => {
             const key = element.getAttribute("data-i18n");
-            element.textContent = i18next.t(key);
+            if (lang && lang.startsWith("ja")) {
+                const kanaPref =
+                    (window.localStorage && window.localStorage.getItem("kanaPreference")) ||
+                    "kanji";
+                const script = kanaPref === "kana" ? "kana" : "kanji";
+                const result = i18next.t(key, { returnObjects: true });
+                if (result && typeof result === "object") {
+                    element.textContent = result[script] || key;
+                } else {
+                    element.textContent = typeof result === "string" ? result : key;
+                }
+            } else {
+                element.textContent = i18next.t(key);
+            }
         });
     }
 

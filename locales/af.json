@@ -1801,5 +1801,7 @@
   "city": "city",
   "day": "day",
   "high": "high",
-  "low": "low"
+  "low": "low",
+  "Record canvas and toolbars": "Neem kanvas en nutsbalkies op",
+  "Record canvas only": "Neem slegs kanvas op"
 }

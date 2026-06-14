@@ -1801,5 +1801,7 @@
   "city": "cidade",
   "day": "dia",
   "high": "alto",
-  "low": "baixo"
+  "low": "baixo",
+  "Record canvas and toolbars": "Gravar tela e barras de ferramentas",
+  "Record canvas only": "Gravar apenas a tela"
 }

@@ -1,7 +1,7 @@
 {
   "": {
     "kanji": "",
-    "kana": ""
+    "kana": "エラー：サーバに せつぞく できません。ブラウザを さいきどう して、さいど ためしてください。"
   },
   "My Project": {
     "kanji": "自分のプロジェクト",
@@ -36,12 +36,12 @@
     "kana": "ミュージック・ブロックスガイド"
   },
   "To run this project, open Music Blocks in a web browser and drag and drop this file into the browser window.": {
-    "kanji": "このプロジェクトを実行するには、Web ブラウザで Music Blocks を開き、このファイルをブラウザ ウィンドウにドラッグ アンド ドロップします。",
+    "kanji": "このプロジェクトを実行するには、ブラウザでミュージック・ブロックスを開き、このファイルをブラウザ・ウィンドウにドラッグ・アンド・ドロップします。",
     "kana": "To run this project, open Music Blocks in a web browser and drag and drop this file into the browser window."
   },
   "Alternatively, open the file in Music Blocks using the Load project button.": {
     "kanji": "「ファイルからプロジェクトを読みこむ」ボタンをおして、ファイルをひらいてください。",
-    "kana": "「ファイルから プロジェクトを よみこむ」 ボタンを おして、 ファイルを ひらいて ください。"
+    "kana": "Alternatively, open the file in Music Blocks using the Load project button."
   },
   "Project Code": {
     "kanji": "プロジェクトのコード",
@@ -49,43 +49,43 @@
   },
   "This code stores data about the blocks in a project.": {
     "kanji": "このコードは、がいとうする場合、へんしゅうされたバージョンのプロジェクトといっしょに、プロジェクトの中のブロックに関するデータをほぞんします。",
-    "kana": "この コードは、 がいとう する ばあい、 へんしゅう された バージョンの プロジェクトと いっしょに、 プロジェクトの なかの ブロックに かんする データを ほぞん します。"
+    "kana": "This code stores data about the blocks in a project."
   },
   "Copy to Clipboard": {
     "kanji": "クリップボードにコピー",
-    "kana": "Copy to Clipboard"
+    "kana": "くりっぷぼーどにこぴー"
   },
   "Project code copied to clipboard!": {
-    "kanji": "プロジェクト コードがクリップボードにコピーされました。",
-    "kana": "Project code copied to clipboard!"
+    "kanji": "プロジェクトのコードがクリップボードにコピーされました。",
+    "kana": "ぷろじぇくとのこーどがくりっぷぼーどにこぴーされました。"
   },
   "Failed to copy.": {
-    "kanji": "コピーに失敗しました。",
-    "kana": "Failed to copy."
+    "kanji": "コピーのエラーが発生しました。",
+    "kana": "こぴーのえらーがはっせいしました。"
   },
   "Enter a filename to save your project:": {
     "kanji": "ファイル名を入力してプロジェクトを保存します。",
-    "kana": "Enter a filename to save your project:"
+    "kana": "ふぁいるめいをにゅうりょくしてぷろじぇくとをほぞんします。"
   },
   "Recording saved! Check Downloads.": {
-    "kanji": "録画が保存されました!ダウンロードを確認します。",
-    "kana": "Recording saved! Check Downloads."
+    "kanji": "録音が保存されました!ダウンロードを確認します。",
+    "kana": "ろくおんがほぞんされました!だうんろーどをかくにんします。"
   },
   "Project saved! Check Downloads.": {
     "kanji": "プロジェクトが保存されました!ダウンロードを確認します。",
-    "kana": "Project saved! Check Downloads."
+    "kana": "ぷろじぇくとがほぞんされました!だうんろーどをかくにんします。"
   },
   "File saved! Check Downloads.": {
     "kanji": "ファイルが保存されました!ダウンロードを確認します。",
-    "kana": "File saved! Check Downloads."
+    "kana": "ふぁいるがほぞんされました!だうんろーどをかくにんします。"
   },
   "Save file": {
-    "kanji": "ファイルの保存",
-    "kana": "Save file"
+    "kanji": "ファイルを保存",
+    "kana": "ふぁいるをほぞん"
   },
   "Filename:": {
     "kanji": "ファイル名：",
-    "kana": "Filename:"
+    "kana": "ふぁいるめい："
   },
   "Save": {
     "kanji": "保存する",
@@ -105,7 +105,7 @@
   },
   "Error generating ABC output.": {
     "kanji": "ABC 出力の生成中にエラーが発生しました。",
-    "kana": "Error generating ABC output."
+    "kana": "ABC しゅつりょくのせいせいなかにえらーがはっせいしました。"
   },
   "File name": {
     "kanji": "ファイル名",
@@ -137,11 +137,11 @@
   },
   "Error generating Lilypond output.": {
     "kanji": "Lilypond 出力の生成中にエラーが発生しました。",
-    "kana": "Error generating Lilypond output."
+    "kana": "Lilypond しゅつりょくのせいせいなかにえらーがはっせいしました。"
   },
   "The Lilypond code is copied to clipboard. You can paste it here:": {
     "kanji": "Lilypond コードがクリップボードにコピーされます。ここに貼り付けることができます:",
-    "kana": "The Lilypond code is copied to clipboard. You can paste it here:"
+    "kana": "Lilypond こーどがくりっぷぼーどにこぴーされます。ここにはりつけることができます:"
   },
   "Failed to convert Lilypond to PDF. Please try saving as .ly file instead.": {
     "kanji": "Lilypond を PDF に変換できませんでした。代わりに .ly ファイルとして保存してみてください。",
@@ -285,7 +285,7 @@
   },
   "In order to copy a sample, you must reload the widget, import the sample again, and export it.": {
     "kanji": "サンプルをコピーするため、ツールを再度試して、またサンプルをロード読み込で、保存することが必要です。",
-    "kana": "サンプルを コピーするため、 ツールを さいどしして、 またサンプルを ロードよみこんで、 ほぞんする ことが ひつようです。"
+    "kana": "In order to copy a sample, you must reload the widget, import the sample again, and export it."
   },
   "You can restore deleted blocks from the trash with the Restore From Trash button.": {
     "kanji": "削除されたブロックは「ゴミ箱から復元」ボタンで復元できます。",
@@ -293,11 +293,11 @@
   },
   "You have chosen key for your pitch preview.": {
     "kanji": "ピッチプレビューのキーを選択しました。",
-    "kana": "You have chosen key for your pitch preview."
+    "kana": "ぴっちぷれびゅーのきーをせんたくしました。"
   },
   "guide url": {
     "kanji": "https://github.com/sugarlabs/musicblocks/tree/master/guide-ja/music_blocks_operation_manual.pdf",
-    "kana": "https://github.com/sugarlabs/musicblocks/tree/master/guide-ja/music_blocks_operation_manual.pdf"
+    "kana": "guide url"
   },
   "Turtle Blocks": {
     "kanji": "タートル・ブロックス",
@@ -417,7 +417,7 @@
   },
   "Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks.": {
     "kanji": "タートル・ブロックスはアートと数学を求めるビジュアル・プログラミング言語だ。",
-    "kana": "タートル・ブロックスは アートと すうがくを もとめる ビジュアル・プログラミング げんごだ。"
+    "kana": "Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks."
   },
   "The current version is": {
     "kanji": "ミュージック・ブロックスの最新バージョンは",
@@ -441,7 +441,7 @@
   },
   "You can also type Alt-S to stop.": {
     "kanji": "プログラムは、このボタンをおすかわりに、キーボードで「Altキーと Sキーの同時おし」でも止めることができる。",
-    "kana": "じっこう している プログラムを とめる。 プログラムは、 このボタンを おすかわりに、 キーボードで 「Altキーと  Sキーの どうじおし」でも とめることが できる。"
+    "kana": "You can also type Alt-S to stop."
   },
   "Welcome to Music Blocks": {
     "kanji": "ミュージック・ブロックスへようこそ",
@@ -449,7 +449,7 @@
   },
   "Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way.": {
     "kanji": "音楽と算数とプログラミングをむすびつけ、深く楽しむことができるツール。それが、ミュージック・ブロックスだ。",
-    "kana": "おんがくと さんすうと プログラミングを むすびつけ、 ふかく たのしむことができる ツール。 それが、 ミュージック・ブロックスだ。"
+    "kana": "Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way."
   },
   "Meet Mr. Mouse!": {
     "kanji": "ミスター・マウスに会おう！",
@@ -473,7 +473,7 @@
   },
   "A detailed guide to Music Blocks is available.": {
     "kanji": "インターネットから、ミュージック・ブロックスのさらにくわしいガイドページを見ることができる。次のリンク先を開いてみよう。",
-    "kana": "インターネットから、 ミュージック・ブロックスの さらに くわしい ガイドページを みることが できる。 つぎの リンクさきを ひらいて みよう。"
+    "kana": "A detailed guide to Music Blocks is available."
   },
   "Stop the music (and the mice).": {
     "kanji": "実行しているプログラムを止める。",
@@ -553,7 +553,7 @@
   },
   "Save project as MIDI": {
     "kanji": "プロジェクトをMIDIとして保存",
-    "kana": "Save project as MIDI"
+    "kana": "ぷろじぇくとをMIDIとしてほぞん"
   },
   "Save music as WAV": {
     "kanji": "WAVでほぞん",
@@ -561,11 +561,11 @@
   },
   "Save sheet music as ABC, Lilypond or MusicXML": {
     "kanji": "楽譜をABC、Lilypond、またはMusicXMLとして保存する。",
-    "kana": "Save sheet music as ABC, Lilypond or MusicXML"
+    "kana": "がくふをABC、Lilypond、またはMusicXMLとしてほぞんする。"
   },
   "Save block artwork as SVG or PNG": {
     "kanji": "ブロックのアートワークをSVGまたはPNGとして保存する。",
-    "kana": "Save block artwork as SVG or PNG"
+    "kana": "ぶろっくのあーとわーくをSVGまたはPNGとしてほぞんする。"
   },
   "Load samples from server": {
     "kanji": "みんなの作品",
@@ -601,7 +601,7 @@
   },
   "Click to run the project step by step.": {
     "kanji": "クリックをすると、とてもゆっくり、ブロックを１つずつ実行する。プログラムがうまくはたらかず、どのブロックが原因なのかを調べたいときなどに便利だ。",
-    "kana": "クリックをすると、 とてもゆっくり、 ブロックを １つずつ じっこうする。 プログラムが うまく はたらかず、 どのブロックが げんいん なのかを しらべたいとき などに べんりだ。"
+    "kana": "Click to run the project step by step."
   },
   "Display statistics": {
     "kanji": "とうけいを表示する",
@@ -617,7 +617,7 @@
   },
   "Load a selected plugin.": {
     "kanji": "選択したプラグインを読み込みます。",
-    "kana": "Load a selected plugin."
+    "kana": "せんたくしたぷらぐいんをよみこみます。"
   },
   "Delete plugin": {
     "kanji": "プラグインを消す",
@@ -633,15 +633,15 @@
   },
   "You can scroll the blocks on the canvas.": {
     "kanji": "カンバス上をドラッグそうさしたときに、画面をスクロールさせることができる方向を上下だけと上下左右に変える。",
-    "kana": "カンバスじょうを ドラッグそうさ したときに、 がめんを スクロール させることができる ほうこうを じょうげ だけ と じょうげさゆう に かえる。"
+    "kana": "You can scroll the blocks on the canvas."
   },
   "Change theme": {
     "kanji": "テーマを変更",
-    "kana": "Change theme"
+    "kana": "てーまをへんこう"
   },
   "Switch between dark and light mode.": {
     "kanji": "ダークモードとライトモードを切り替えます。",
-    "kana": "Switch between dark and light mode."
+    "kana": "だーくもーどとらいともーどをきりかえます。"
   },
   "Merge with current project": {
     "kanji": "プロジェクトを組みあわせる",
@@ -649,7 +649,7 @@
   },
   "Click to add another project into the current one.": {
     "kanji": "クリックして別のプロジェクトを現在のプロジェクトに追加します。",
-    "kana": "Click to add another project into the current one."
+    "kana": "くりっくしてべつのぷろじぇくとをげんざいのぷろじぇくとについかします。"
   },
   "Wrap Turtle": {
     "kanji": "アートを包む",
@@ -665,7 +665,7 @@
   },
   "Click to set the current pitch.": {
     "kanji": "クリックして現在の音高を設定します。",
-    "kana": "Click to set the current pitch."
+    "kana": "くりっくしてげんざいのおんこうをせっていします。"
   },
   "JavaScript Editor": {
     "kanji": "JavaScript エディタ",
@@ -673,7 +673,7 @@
   },
   "Converts Music Block programs to JavaScript.": {
     "kanji": "Music BlocksのプログラムをJavaScriptに変換します。",
-    "kana": "Converts Music Block programs to JavaScript."
+    "kana": "Music BlocksのぷろぐらむをJavaScriptにへんかんします。"
   },
   "Restore": {
     "kanji": "すてたブロックをもどす",
@@ -681,7 +681,7 @@
   },
   "Restore blocks from the trash.": {
     "kanji": "ゴミ箱にすててしまったブロックを取り出してもどす。ふくすうのブロックをすててあるときは新しい順に、ゴミ箱が空になるまでブロックを拾いもどすことができる。",
-    "kana": "ごみばこに すててしまった ブロックを とりだして もどす。 ふくすうの ブロックを すててある ときは あたらしい じゅんに、 ごみばこが からに なるまで ブロックを ひろいもどすことが できる。"
+    "kana": "Restore blocks from the trash."
   },
   "Switch mode": {
     "kanji": "はってんモード／かんたんモードにする",
@@ -689,7 +689,7 @@
   },
   "Switch between beginner and advance modes.": {
     "kanji": "ミュージック・ブロックスをかんたんモード／はってんモードに切りかえる。モードによって使えるきのうやブロックの種類が変わる。",
-    "kana": "ミュージック・ブロックスを かんたんモード／はってんモード に きりかえる。 モードによって つかえる きのうや ブロックの しゅるいが かわる。"
+    "kana": "Switch between beginner and advance modes."
   },
   "Select language": {
     "kanji": "言語をえらぶ",
@@ -701,11 +701,11 @@
   },
   "Contextual Menu for Blocks": {
     "kanji": "ブロックのコンテキストメニュー",
-    "kana": "Contextual Menu for Blocks"
+    "kana": "ぶろっくのこんてきすとめにゅー"
   },
   "Right-click on a block to access common actions.": {
     "kanji": "ブロックを右クリックして共通操作にアクセスします。",
-    "kana": "Right-click on a block to access common actions."
+    "kana": "ぶろっくをみぎくりっくしてきょうつうそうさにあくせすします。"
   },
   "Delete": {
     "kanji": "消す",
@@ -721,7 +721,7 @@
   },
   "To copy a block, right-click on it. Then you will see the copy option.": {
     "kanji": "ブロックをコピーするには、ブロックを右クリックします。次に、コピーオプションが表示されます。",
-    "kana": "To copy a block, right-click on it. Then you will see the copy option."
+    "kana": "ぶろっくをこぴーするには、ぶろっくをみぎくりっくします。つぎに、こぴーおぷしょんがひょうじされます。"
   },
   "To extract a block, right-click on it. Then you will see the extract option.": {
     "kanji": "ブロックを抽出するには、ブロックを右クリックします。次に、抽出オプションが表示されます。",
@@ -729,31 +729,31 @@
   },
   "Tab Navigation": {
     "kanji": "タブのナビゲーション",
-    "kana": "Tab Navigation"
+    "kana": "たぶのなびげーしょん"
   },
   "Press the Tab key on your keyboard to magically jump between the workspace, toolbar, and palette!": {
-    "kanji": "キーボードの Tab キーを押すと、ワークスペース、ツールバー、パレットの間を魔法のようにジャンプできます。",
+    "kanji": "キーボードの Tab キーを押すと、ワークスペース、ツールバー、パレットからを魔法のようにジャンプできます。",
     "kana": "Press the Tab key on your keyboard to magically jump between the workspace, toolbar, and palette!"
   },
   "Contextual Menu for Canvas": {
     "kanji": "キャンバスのコンテキストメニュー",
-    "kana": "Contextual Menu for Canvas"
+    "kana": "きゃんばすのこんてきすとめにゅー"
   },
   "Right-click on the canvas to perform additional canvas-related tasks.": {
     "kanji": "キャンバスを右クリックして追加のキャンバス関連タスクを実行します。",
-    "kana": "Right-click on the canvas to perform additional canvas-related tasks."
+    "kana": "きゃんばすをみぎくりっくしてついかのきゃんばすかんれんたすくをじっこうします。"
   },
   "Grid": {
     "kanji": "グリッド",
-    "kana": "Grid"
+    "kana": "ぐりっど"
   },
   "Turn on/off lines for cartesian or polar grids.": {
     "kanji": "デカルト座標または極座標グリッドの線をオン/オフにします。",
-    "kana": "Turn on/off lines for cartesian or polar grids."
+    "kana": "でかるとざひょうまたはきょくざひょうぐりっどのせんをおん/おふにします。"
   },
   "Turn on/off music staffs.": {
     "kanji": "五線譜の表示/非表示を切り替えます。",
-    "kana": "Turn on/off music staffs."
+    "kana": "ごせんふのひょうじ/ひひょうじをきりかえます。"
   },
   "Clear": {
     "kanji": "もとにもどす",
@@ -769,7 +769,7 @@
   },
   "Collapse the graphics window.": {
     "kanji": "ネズミがいどうしたり、ペンで線をえがいたりできる「カンバス」の表示サイズを しゅくしょうしたり、かくだいしたりする。カンバスをしゅくしょうした場合は、プログラムをふつうのそくどで実行しても、ブロックがかくれない。ふつうの実行そくどでプログラムの動作かくにんをしたいときなどに便利だ。",
-    "kana": "ネズミが いどうしたり、 ペンで せんを えがいたり できる 「カンバス」の ひょうじサイズを しゅくしょう／かくだいする。<br>カンバスを しゅくしょう したばあいは、 プログラムを  ふつうの そくどで じっこう しても、 ブロックが かくれない。 ふつうの じっこうそくどで プログラムの どうさ かくにんを したいときなどに べんりだ。"
+    "kana": "Collapse the graphics window."
   },
   "Home": {
     "kanji": "ホーム",
@@ -793,7 +793,7 @@
   },
   "Expand or collapse start and action stacks.": {
     "kanji": "クリックすると、「スタート」と「アクション」に使われているブロックを、広げて表示したり、折りたたんでかくしたりすることができる。",
-    "kana": "クリックすると、 「スタート」と「アクション」に つかわれている ブロックを、ひろげて ひょうじしたり、おりたたんで かくしたりすることができる。"
+    "kana": "Expand or collapse start and action stacks."
   },
   "Decrease block size": {
     "kanji": "ブロックの表示を小さくする",
@@ -813,11 +813,11 @@
   },
   "Select": {
     "kanji": "選択",
-    "kana": "Select"
+    "kana": "せんたく"
   },
   "Left-click and drag on workspace to select multiple blocks.": {
     "kanji": "ワークスペースを左クリックしてドラッグすると複数のブロックを選択できます。",
-    "kana": "Left-click and drag on workspace to select multiple blocks."
+    "kana": "わーくすぺーすをひだりくりっくしてどらっぐするとふくすうのぶろっくをせんたくできます。"
   },
   "Palette buttons": {
     "kanji": "パレットボタン",
@@ -825,15 +825,15 @@
   },
   "This toolbar contains the palette buttons including Rhythm Pitch Tone Action and more.": {
     "kanji": "ミュージック・ブロックスの左側には、プログラミングに使うさまざまなブロックをグループ分けした「パレットボタン」がある。",
-    "kana": "ミュージック・ブロックスのひだりがわには、 プログラミングにつかう さまざまな ブロックを グループわけした 「パレットボタン」がある。"
+    "kana": "This toolbar contains the palette buttons including Rhythm Pitch Tone Action and more."
   },
   "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them.": {
     "kanji": "それぞれのパレットボタンをクリックし、「音符（おんぷ）」「アクション」「ペン」などから好きなブロックを選んで、カンバス上にドラッグして置いてみよう。",
-    "kana": " それぞれの パレットボタンを クリックし、 「おんぷ」「アクション」「ペン」などから すきな ブロックをえらんで、 カンバスじょうに ドラッグして おいてみよう。"
+    "kana": "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
   },
   "A detailed guide to Turtle Blocks is available.": {
     "kanji": "インターネットから、ミュージック・ブロックスのさらにくわしいガイドページを見ることができる。次のリンク先を開いてみよう。",
-    "kana": "インターネットから、 タートル・ブロックスの さらに くわしい ガイドページを みることが できる。 つぎの リンクさきを ひらいて みよう。"
+    "kana": "A detailed guide to Turtle Blocks is available."
   },
   "Turtle Blocks Guide": {
     "kanji": "ミュージック・ブロックスガイド",
@@ -845,11 +845,11 @@
   },
   "Turtle Blocks is an open source collection of tools for exploring musical concepts.": {
     "kanji": "ミュージック・ブロックスは、音楽のコンセプトをたんきゅうするためにつくられた、オープンソースのツールだ。",
-    "kana": "タートル・ブロックスは、 おんがくの コンセプトを たんきゅうするために つくられた、 オープンソースの ツールだ。"
+    "kana": "Turtle Blocks is an open source collection of tools for exploring musical concepts."
   },
   "A full list of contributors can be found in the Turtle Blocks GitHub repository.": {
     "kanji": "ミュージック・ブロックスにかかわってきた人のいちらんは、GitHub（ギットハブ）のリポジトリで見ることができる。",
-    "kana": "タートル・ブロックスに かかわってきた ひとの いちらんは、 GitHub（ギットハブ） の リポジトリで みることができる。"
+    "kana": "A full list of contributors can be found in the Turtle Blocks GitHub repository."
   },
   "Turtle Blocks is licensed under the AGPL.": {
     "kanji": "ミュージック・ブロックスのプログラムは、だれでも自由にみることができる。",
@@ -869,11 +869,11 @@
   },
   "Music Blocks is an open source collection of tools for exploring musical concepts.": {
     "kanji": "ミュージック・ブロックスは、音楽のコンセプトをたんきゅうするためにつくられた、オープンソースのツールだ。",
-    "kana": "ミュージック・ブロックスは、 おんがくの コンセプトを たんきゅうするために つくられた、 オープンソースの ツールだ。"
+    "kana": "Music Blocks is an open source collection of tools for exploring musical concepts."
   },
   "A full list of contributors can be found in the Music Blocks GitHub repository.": {
     "kanji": "ミュージック・ブロックスにかかわってきた人のいちらんは、GitHub（ギットハブ）のリポジトリで見ることができる。",
-    "kana": "ミュージック・ブロックスに かかわってきた ひとの いちらんは、 GitHub（ギットハブ） の リポジトリで みることができる。"
+    "kana": "A full list of contributors can be found in the Music Blocks GitHub repository."
   },
   "Music Blocks is licensed under the AGPL.": {
     "kanji": "ミュージック・ブロックスのプログラムは、だれでも自由にみることができる。",
@@ -885,7 +885,7 @@
   },
   "Congratulations!": {
     "kanji": "おめでとうございます！",
-    "kana": "Congratulations!"
+    "kana": "おめでとうございます！"
   },
   "You have finished the tour. Please enjoy Music Blocks!": {
     "kanji": "ミスター・マウスのツアーはここで終わり。ミュージック・ブロックスを自由に楽しもう。",
@@ -905,7 +905,7 @@
   },
   "Enter Fullscreen": {
     "kanji": "全画面表示に入る",
-    "kana": "Enter Fullscreen"
+    "kana": "ぜんがめんひょうじにいる"
   },
   "Find and share projects": {
     "kanji": "みんなの作品",
@@ -921,7 +921,7 @@
   },
   "Help and shortcuts": {
     "kanji": "ヘルプとショートカット",
-    "kana": "Help and shortcuts"
+    "kana": "へるぷとしょーとかっと"
   },
   "Keyboard shortcuts": {
     "kanji": "キーボードのショートカット",
@@ -937,15 +937,15 @@
   },
   "Light Mode": {
     "kanji": "ライトモード",
-    "kana": "Light Mode"
+    "kana": "らいともーど"
   },
   "Dark Mode": {
     "kanji": "ダークモード",
-    "kana": "Dark Mode"
+    "kana": "だーくもーど"
   },
   "High-contrast Mode": {
     "kanji": "ハイコントラストモード",
-    "kana": "High-contrast Mode"
+    "kana": "はいこんとらすともーど"
   },
   "Switch to beginner mode": {
     "kanji": "かんたんモードにする",
@@ -973,7 +973,7 @@
   },
   "Save block artwork as PNG": {
     "kanji": "ブロックのアートワークをPNGで保存",
-    "kana": "Save block artwork as PNG"
+    "kana": "ぶろっくのあーとわーくをPNGでほぞん"
   },
   "Confirm": {
     "kanji": "作成する",
@@ -984,16 +984,16 @@
     "kana": "タートル・ブロックスについて"
   },
   "Play project": {
-    "kanji": "プロジェクトをプレイする",
-    "kana": "Play project"
+    "kanji": "プロジェクトを再生",
+    "kana": "ぷろじぇくとをさいせい"
   },
   "Stop project": {
     "kanji": "プロジェクトを停止する",
-    "kana": "Stop project"
+    "kana": "ぷろじぇくとをていしする"
   },
   "Are you sure you want to create a new project?": {
     "kanji": "新しいプロジェクトを作成してもよろしいですか？",
-    "kana": "Are you sure you want to create a new project?"
+    "kana": "あたらしいぷろじぇくとをさくせいしてもよろしいですか？"
   },
   "Turtle Wrap Off": {
     "kanji": "画面の境界を無視しない",
@@ -1009,63 +1009,63 @@
   },
   "Import MIDI": {
     "kanji": "MIDIをインポートする",
-    "kana": "Import MIDI"
+    "kana": "MIDIをいんぽーとする"
   },
   "Set the max blocks to generate:": {
     "kanji": "生成する最大ブロックを設定します。",
-    "kana": "Set the max blocks to generate:"
+    "kana": "せいせいするさいだいぶろっくをせっていします。"
   },
   "Clear workspace": {
     "kanji": "すっきりとしたワークスペース",
-    "kana": "Clear workspace"
+    "kana": "すっきりとしたわーくすぺーす"
   },
   "Are you sure you want to clear the workspace?": {
     "kanji": "ワークスペースを本当にクリアしますか？",
-    "kana": "Are you sure you want to clear the workspace?"
+    "kana": "わーくすぺーすをほんとうにくりあしますか？"
   },
   "Save recording": {
     "kanji": "録音を保存する",
-    "kana": "Save recording"
+    "kana": "ろくおんをほぞんする"
   },
   "File save canceled": {
     "kanji": "ファイルの保存がキャンセルされました",
-    "kana": "File save canceled"
+    "kana": "ふぁいるのほぞんがきゃんせるされました"
   },
   "Recorded file is empty. File not saved.": {
     "kanji": "録音されたファイルは空です。ファイルが保存されていません。",
-    "kana": "Recorded file is empty. File not saved."
+    "kana": "ろくおんされたふぁいるはそらです。ふぁいるがほぞんされていません。"
   },
   "Enter file name": {
     "kanji": "ファイル名を入力してください",
-    "kana": "Enter file name"
+    "kana": "ふぁいるめいをにゅうりょくしてください"
   },
   "Saved! Check your Downloads folder.": {
     "kanji": "保存しました！ダウンロードフォルダーを確認してください。",
-    "kana": "Saved! Check your Downloads folder."
+    "kana": "ほぞんしました！だうんろーどふぉるだーをかくにんしてください。"
   },
   "Recording stopped. File saved.": {
     "kanji": "録音が停止されました。ファイルが保存されました。",
-    "kana": "Recording stopped. File saved."
+    "kana": "ろくおんがていしされました。ふぁいるがほぞんされました。"
   },
   "recording": {
-    "kanji": "録音",
-    "kana": "recording"
+    "kanji": "録音中",
+    "kana": "ろくおんちゅう"
   },
   "Recording started. Click stop to finish.": {
     "kanji": "録音が開始されました。終了するには「停止」をクリックします。",
-    "kana": "Recording started. Click stop to finish."
+    "kana": "ろくおんがかいしされました。しゅうりょうするには「ていし」をくりっくします。"
   },
   "Recording failed: %s": {
-    "kanji": "記録に失敗しました: %s",
-    "kana": "Recording failed: %s"
+    "kanji": "録音に失敗しました: %s",
+    "kana": "ろくおんにしっぱいしました: %s"
   },
   "Horizontal scrolling enabled.": {
     "kanji": "水平スクロールが有効になりました。",
-    "kana": "Horizontal scrolling enabled."
+    "kana": "すいへいすくろーるがゆうこうになりました。"
   },
   "Horizontal scrolling disabled.": {
     "kanji": "水平スクロールが無効になっています。",
-    "kana": "Horizontal scrolling disabled."
+    "kana": "すいへいすくろーるがむこうになっています。"
   },
   "Catching mice": {
     "kanji": "ネズミをつかまえているよ",
@@ -1125,27 +1125,27 @@
   },
   "output tools": {
     "kanji": "出力ツール",
-    "kana": "output tools"
+    "kana": "しゅつりょくつーる"
   },
   "custom note": {
     "kanji": "カスタムノート",
-    "kana": "custom note"
+    "kana": "かすたむのーと"
   },
   "accidental name": {
     "kanji": "偶然の名前",
-    "kana": "accidental name"
+    "kana": "ぐうぜんのなまえ"
   },
   "east indian solfege": {
     "kanji": "東インドのソルフェージュ",
-    "kana": "east indian solfege"
+    "kana": "ひがしいんどのそるふぇーじゅ"
   },
   "note name": {
     "kanji": "音名",
-    "kana": "note name"
+    "kana": "おんめい"
   },
   "temperament name": {
     "kanji": "気質名",
-    "kana": "temperament name"
+    "kana": "きしつめい"
   },
   "mode name": {
     "kanji": "モード名",
@@ -1161,11 +1161,11 @@
   },
   "filter type": {
     "kanji": "フィルターの種類",
-    "kana": "filter type"
+    "kana": "ふぃるたーのしゅるい"
   },
   "oscillator type": {
     "kanji": "発振器の種類",
-    "kana": "oscillator type"
+    "kana": "はっしんきのしゅるい"
   },
   "audio file": {
     "kanji": "オーディオファイル",
@@ -1173,23 +1173,23 @@
   },
   "noise name": {
     "kanji": "ノイズ名",
-    "kana": "noise name"
+    "kana": "のいずめい"
   },
   "drum name": {
     "kanji": "ドラム名",
-    "kana": "drum name"
+    "kana": "どらむめい"
   },
   "effects name": {
     "kanji": "エフェクト名",
-    "kana": "effects name"
+    "kana": "えふぇくとめい"
   },
   "wrap mode": {
     "kanji": "ラップモード",
-    "kana": "wrap mode"
+    "kana": "らっぷもーど"
   },
   "load file": {
     "kanji": "ロード ファイル ",
-    "kana": "load file"
+    "kana": "ろーど ふぁいる "
   },
   "This block is deprecated.": {
     "kanji": "このブロックはもうありません。",
@@ -1257,19 +1257,19 @@
   },
   "Trash can is empty.": {
     "kanji": "ゴミ箱は空です。",
-    "kana": "Trash can is empty."
+    "kana": "ごみはこはそらです。"
   },
   "Item restored from the trash.": {
     "kanji": "ゴミ箱からアイテムを復元しました。",
-    "kana": "Item restored from the trash."
+    "kana": "ごみはこからあいてむをふくげんしました。"
   },
   "Restore last item": {
     "kanji": "最後のアイテムを復元",
-    "kana": "Restore last item"
+    "kana": "さいごのあいてむをふくげん"
   },
   "Restore all items": {
     "kanji": "すべてのアイテムを復元",
-    "kana": "Restore all items"
+    "kana": "すべてのあいてむをふくげん"
   },
   "Click the run button to run the project.": {
     "kanji": "プロジェクトを再生するため、再生のボタンをクリックしてください。",
@@ -1277,7 +1277,7 @@
   },
   "Loading Complete!": {
     "kanji": "読み込み完了！",
-    "kana": "Loading Complete!"
+    "kana": "よみこみかんりょう！"
   },
   "Enter the name of a built-in plugin, or leave blank to upload a plugin file:": {
     "kanji": "組み込みプラグインの名前を入力するか、空白のままにしてプラグイン ファイルをアップロードします。",
@@ -1293,95 +1293,95 @@
   },
   "Mac": {
     "kanji": "マック",
-    "kana": "Mac"
+    "kana": "まっく"
   },
   "Workspace": {
     "kanji": "ワークスペース",
-    "kana": "Workspace"
+    "kana": "わーくすぺーす"
   },
   "Play or stop depending on the current state": {
     "kanji": "現在の状態に応じて再生または停止します",
-    "kana": "Play or stop depending on the current state"
+    "kana": "げんざいのじょうたいにおうじてさいせいまたはていしします"
   },
   "Play or stop when no text input or widget is active": {
     "kanji": "アクティブなテキスト入力またはウィジェットがない場合は再生または停止します",
-    "kana": "Play or stop when no text input or widget is active"
+    "kana": "あくてぃぶなてきすとにゅうりょくまたはうぃじぇっとがないばあいはさいせいまたはていしします"
   },
   "Toggle stage scale": {
     "kanji": "ステージスケールの切り替え",
-    "kana": "Toggle stage scale"
+    "kana": "すてーじすけーるのきりかえ"
   },
   "Jump to home position": {
-    "kanji": "ホームポジションへジャンプ",
-    "kana": "Jump to home position"
+    "kanji": "ホームポジションに戻る",
+    "kana": "ほーむぽじしょんにもどる"
   },
   "Jump to the bottom of the workspace": {
     "kanji": "ワークスペースの一番下にジャンプします",
-    "kana": "Jump to the bottom of the workspace"
+    "kana": "わーくすぺーすのいちばんしたにじゃんぷします"
   },
   "Scroll workspace up": {
     "kanji": "ワークスペースを上にスクロールする",
-    "kana": "Scroll workspace up"
+    "kana": "わーくすぺーすをうえにすくろーるする"
   },
   "Scroll workspace down": {
     "kanji": "ワークスペースを下にスクロールします",
-    "kana": "Scroll workspace down"
+    "kana": "わーくすぺーすをしたにすくろーるします"
   },
   "Hide block search when it is open": {
     "kanji": "ブロック検索が開いているときに非表示にする",
-    "kana": "Hide block search when it is open"
+    "kana": "ぶろっくけんさくがひらいているときにひひょうじにする"
   },
   "You can type d to create a do block and r to create a re block etc.": {
     "kanji": "キーボードを使うと、パレットボタンからブロックをドラッグして配置するだけでなく、ボタンをおすだけでちょくせつブロックを置くことができる。★ショートカットキー d …… 「ド」（４分音符、４オクターヴ） r …… 「レ」（４分音符、４オクターヴ） m …… 「ミ」（４分音符、４オクターヴ） f</em> …… 「ファ」（４分音符、４オクターヴ s …… 「ソ」（４分音符、４オクターヴ） l …… 「ラ」（４分音符、４オクターヴ） t …… 「シ」（４分音符、４オクターヴ）",
-    "kana": "キーボードの ショートカット<br><br>キーボードを つかうと、 パレットボタンから ブロックを ドラッグして はいち するだけでなく、 ボタンを おすだけで ちょくせつ ブロックを おくことが できる。<br><br>★ショートカットキー<br> d …… 「ド」（４ぶおんぷ、４オクターヴ）<br> r …… 「レ」（４ぶおんぷ、４オクターヴ）<br> m …… 「ミ」（４ぶおんぷ、４オクターヴ）<br> f …… 「ファ」（４ぶおんぷ、４オクターヴ）<br> s …… 「ソ」（４ぶおんぷ、４オクターヴ）<br> l …… 「ラ」（４ぶおんぷ、４オクターヴ）<br> t …… 「シ」（４ぶおんぷ、４オクターヴ）"
+    "kana": "You can type d to create a do block and r to create a re block etc."
   },
   "Editing": {
     "kanji": "編集",
-    "kana": "Editing"
+    "kana": "へんしゅう"
   },
   "Copy selected stack.": {
     "kanji": "選択したスタックをコピーします。",
-    "kana": "Copy selected stack."
+    "kana": "せんたくしたすたっくをこぴーします。"
   },
   "Paste previous stack.": {
-    "kanji": "前のスタックを貼り付けます。",
-    "kana": "Paste previous stack."
+    "kanji": "この前のスタックを貼り付けます。",
+    "kana": "このまえのすたっくをはりつけます。"
   },
   "Open the JSON paste box.": {
     "kanji": "JSON 貼り付けボックスを開きます。",
-    "kana": "Open the JSON paste box."
+    "kana": "JSON はりつけぼっくすをひらきます。"
   },
   "Paste JSON when the paste box is focused.": {
     "kanji": "貼り付けボックスにフォーカスがあるときに JSON を貼り付けます。",
-    "kana": "Paste JSON when the paste box is focused."
+    "kana": "はりつけぼっくすにふぉーかすがあるときに JSON をはりつけます。"
   },
   "Extract the active block.": {
     "kanji": "アクティブなブロックを抽出します。",
-    "kana": "Extract the active block."
+    "kana": "あくてぃぶなぶろっくをちゅうしゅつします。"
   },
   "Clear workspace.": {
     "kanji": "すっきりとしたワークスペース。",
-    "kana": "Clear workspace."
+    "kana": "すっきりとしたわーくすぺーす。"
   },
   "Save block artwork.": {
     "kanji": "ブロックアートワークを保存します。",
-    "kana": "Save block artwork."
+    "kana": "ぶろっくあーとわーくをほぞんします。"
   },
   "Save block help.": {
     "kanji": "ブロックのヘルプを保存します。",
-    "kana": "Save block help."
+    "kana": "ぶろっくのへるぷをほぞんします。"
   },
   "Navigation": {
     "kanji": "ナビゲーション",
-    "kana": "Navigation"
+    "kana": "なびげーしょん"
   },
   "Move focus between the toolbar, palettes, and workspace.": {
-    "kanji": "ツールバー、パレット、ワークスペースの間でフォーカスを移動します。",
-    "kana": "Move focus between the toolbar, palettes, and workspace."
+    "kanji": "ツールバー、パレット、ワークスペースの中からフォーカスを移動します。",
+    "kana": "つーるばー、ぱれっと、わーくすぺーすのなかからふぉーかすをいどうします。"
   },
   "Arrow keys": {
     "kanji": "矢印キー",
-    "kana": "Arrow keys"
+    "kana": "やじるしきー"
   },
   "Move the active block, scroll palettes, adjust the tempo widget, or pan the workspace depending on context.": {
     "kanji": "コンテキストに応じて、アクティブなブロックの移動、パレットのスクロール、テンポ ウィジェットの調整、またはワークスペースのパンを行います。",
@@ -1389,79 +1389,79 @@
   },
   "Pan workspace right when horizontal scrolling is enabled.": {
     "kanji": "水平スクロールが有効な場合、ワークスペースを右に移動します。",
-    "kana": "Pan workspace right when horizontal scrolling is enabled."
+    "kana": "すいへいすくろーるがゆうこうなばあい、わーくすぺーすをみぎにいどうします。"
   },
   "Pan workspace left when horizontal scrolling is enabled.": {
     "kanji": "水平スクロールが有効な場合、ワークスペースを左に移動します。",
-    "kana": "Pan workspace left when horizontal scrolling is enabled."
+    "kana": "すいへいすくろーるがゆうこうなばあい、わーくすぺーすをひだりにいどうします。"
   },
   "Toolbar": {
     "kanji": "ツールバー",
-    "kana": "Toolbar"
+    "kana": "つーるばー"
   },
   "Arrow Left / Arrow Right": {
     "kanji": "左矢印 / 右矢印",
-    "kana": "Arrow Left / Arrow Right"
+    "kana": "ひだりやじるし / みぎやじるし"
   },
   "Move focus within the current toolbar.": {
     "kanji": "現在のツールバー内でフォーカスを移動します。",
-    "kana": "Move focus within the current toolbar."
+    "kana": "げんざいのつーるばーないでふぉーかすをいどうします。"
   },
   "Arrow Up / Arrow Down": {
     "kanji": "上矢印 / 下矢印",
-    "kana": "Arrow Up / Arrow Down"
+    "kana": "うえやじるし / したやじるし"
   },
   "Move focus between main and auxiliary toolbars.": {
     "kanji": "メイン ツールバーと補助ツールバーの間でフォーカスを移動します。",
-    "kana": "Move focus between main and auxiliary toolbars."
+    "kana": "めいん つーるばーとほじょつーるばーのかんでふぉーかすをいどうします。"
   },
   "Activate the focused toolbar button.": {
-    "kanji": "フォーカスされたツールバー ボタンをアクティブにします。",
-    "kana": "Activate the focused toolbar button."
+    "kanji": "フォーカスされたツールバーからのボタンをアクティブにします。",
+    "kana": "ふぉーかすされたつーるばーからのぼたんをあくてぃぶにします。"
   },
   "Exit toolbar keyboard navigation.": {
     "kanji": "ツールバーのキーボードナビゲーションを終了します。",
-    "kana": "Exit toolbar keyboard navigation."
+    "kana": "つーるばーのきーぼーどなびげーしょんをしゅうりょうします。"
   },
   "Widget Windows": {
-    "kanji": "ウィジェットウィンドウ",
-    "kana": "Widget Windows"
+    "kanji": "ウィジェット・ウィンドウ",
+    "kana": "うぃじぇっと・うぃんどう"
   },
   "Close the focused widget window.": {
-    "kanji": "フォーカスされたウィジェット ウィンドウを閉じます。",
-    "kana": "Close the focused widget window."
+    "kanji": "フォーカスされたウィジェット・ウィンドウを閉じます。",
+    "kana": "ふぉーかすされたうぃじぇっと・うぃんどうをとじます。"
   },
   "Maximize or restore the focused widget window.": {
-    "kanji": "フォーカスされたウィジェット ウィンドウを最大化または復元します。",
-    "kana": "Maximize or restore the focused widget window."
+    "kanji": "フォーカスされたウィジェット・ウィンドウを最大化または復元します。",
+    "kana": "ふぉーかすされたうぃじぇっと・うぃんどうをさいだいかまたはふくげんします。"
   },
   "Help and Pitch Slider": {
-    "kanji": "ヘルプとピッチスライダー",
-    "kana": "Help and Pitch Slider"
+    "kanji": "ヘルプとピッチ・スライダー",
+    "kana": "へるぷとぴっち・すらいだー"
   },
   "Move between help pages when Help is open.": {
-    "kanji": "ヘルプが開いているときにヘルプ ページ間を移動します。",
-    "kana": "Move between help pages when Help is open."
+    "kanji": "ヘルプが開いているときにヘルプ・ページの中から移動します。",
+    "kana": "へるぷがひらいているときにへるぷ・ぺーじのなかからいどうします。"
   },
   "Adjust pitch by semitone when Pitch Slider is open.": {
-    "kanji": "ピッチスライダーが開いているときに半音単位でピッチを調整します。",
-    "kana": "Adjust pitch by semitone when Pitch Slider is open."
+    "kanji": "ピッチ・スライダーが開いているときに半音単位でピッチを調整します。",
+    "kana": "ぴっち・すらいだーがひらいているときにはんおんたんいでぴっちをちょうせいします。"
   },
   "Shortcuts are context-sensitive. Some only work when a related panel, widget, or mode is active. Windows/Linux and Mac equivalents are shown together.": {
     "kanji": "ショートカットは状況に依存します。一部の機能は、関連するパネル、ウィジェット、またはモードがアクティブな場合にのみ機能します。 Windows/Linux および Mac の同等のものを一緒に示します。",
     "kana": "Shortcuts are context-sensitive. Some only work when a related panel, widget, or mode is active. Windows/Linux and Mac equivalents are shown together."
   },
   "Invalid clipboard data. To paste blocks, first copy them from the Music Blocks canvas. To paste text, click inside an input field.": {
-    "kanji": "クリップボードデータが無効です。ブロックを貼り付けるには、まずミュージック ブロック キャンバスからブロックをコピーします。テキストを貼り付けるには、入力フィールド内をクリックします。",
+    "kanji": "クリップボードデータが無効です。ブロックを貼り付けるには、まずミュージック・ブロックスのキャンバスからブロックをコピーします。テキストを貼り付けるには、入力フィールド内をクリックします。",
     "kana": "Invalid clipboard data. To paste blocks, first copy them from the Music Blocks canvas. To paste text, click inside an input field."
   },
   "Select is enabled.": {
     "kanji": "選択モードが有効です。",
-    "kana": "Select is enabled."
+    "kana": "せんたくもーどがゆうこうです。"
   },
   "Select is disabled.": {
     "kanji": "選択モードが無効です。",
-    "kana": "Select is disabled."
+    "kana": "せんたくもーどがむこうです。"
   },
   "Cannot load project from the file. Please check the file type.": {
     "kanji": "プロジェクトを読みこめません。ファイルの種類をかくにんしてください。",
@@ -1469,7 +1469,7 @@
   },
   "Something went wrong reading JSON-encoded project data.": {
     "kanji": "JSON エンコードされたプロジェクト データの読み取り中に問題が発生しました。",
-    "kana": "Something went wrong reading JSON-encoded project data."
+    "kana": "JSON えんこーどされたぷろじぇくと でーたのよみとりなかにもんだいがはっせいしました。"
   },
   "Invalid parameters": {
     "kanji": "無効なパラメータ",
@@ -1477,7 +1477,7 @@
   },
   "Error regenerating palettes. Please refresh the page.": {
     "kanji": "パレットの再生成に失敗しました。ページを更新してください。",
-    "kana": "Error regenerating palettes. Please refresh the page."
+    "kana": "ぱれっとのさいせいせいにしっぱいしました。ぺーじをこうしんしてください。"
   },
   "temperament": {
     "kanji": "音律",
@@ -1540,8 +1540,8 @@
     "kana": "ミリびょう"
   },
   "scalar interval %s": {
-    "kanji": "スカラー間隔 %s",
-    "kana": "scalar interval %s"
+    "kanji": "音階の上下 %s",
+    "kana": "おんかいのじょうげ %s"
   },
   "silence": {
     "kanji": "休符",
@@ -1673,7 +1673,7 @@
   },
   "Forever loop detected inside a note value block. Unexpected things may happen.": {
     "kanji": "「ずっとくり返す」状態が「音符」の中にある。",
-    "kana": "「ずっとくりかえす」じょうたいが「おんぷ」のなかに ある。"
+    "kana": "Forever loop detected inside a note value block. Unexpected things may happen."
   },
   "There is no block selected.": {
     "kanji": "ブロックが選ばれていません",
@@ -1693,18 +1693,18 @@
   },
   "Music Blocks is already set to this language.": {
     "kanji": " Music Blocksは既にこの言語に設定されています。",
-    "kana": "Music Blocks is already set to this language."
+    "kana": " Music Blocksはすでにこのげんごにせっていされています。"
   },
   "Failed to load EaselJS. Please refresh the page.": {
     "kanji": "EaselJS のロードに失敗しました。ページを更新してください。",
-    "kana": "Failed to load EaselJS. Please refresh the page."
+    "kana": "EaselJS のろーどにしっぱいしました。ぺーじをこうしんしてください。"
   },
   "Failed to load Music Blocks. Please refresh the page.": {
-    "kanji": "ミュージックブロックの読み込みに失敗しました。ページを更新してください。",
-    "kana": "Failed to load Music Blocks. Please refresh the page."
+    "kanji": "ミュージック・ブロックスの読み込みに失敗しました。ページを更新してください。",
+    "kana": "みゅーじっく・ぶろっくすのよみこみにしっぱいしました。ぺーじをこうしんしてください。"
   },
   "Failed to initialize Music Blocks core. Please refresh the page.\\n\\nError: %s": {
-    "kanji": "ミュージック ブロック コアの初期化に失敗しました。ページを更新してください。\\n\\nエラー: %s",
+    "kanji": "ミュージック・ブロックス コアの初期化に失敗しました。ページを更新してください。\\n\\nエラー: %s",
     "kana": "Failed to initialize Music Blocks core. Please refresh the page.\\n\\nError: %s"
   },
   "You must select a file.": {
@@ -1713,7 +1713,7 @@
   },
   "Infinite loop detected. Execution stopped to prevent browser freeze.": {
     "kanji": "無限ループが検出されました。ブラウザのフリーズを防ぐために実行が停止されました。",
-    "kana": "Infinite loop detected. Execution stopped to prevent browser freeze."
+    "kana": "むげんるーぷがけんしゅつされました。ぶらうざのふりーずをふせぐためにじっこうがていしされました。"
   },
   "width": {
     "kanji": "カンバスのよこはば",
@@ -1745,15 +1745,15 @@
   },
   "Block Palettes": {
     "kanji": "ブロックパレット",
-    "kana": "Block Palettes"
+    "kana": "ぶろっくぱれっと"
   },
   "Palette Categories": {
     "kanji": "パレットのカテゴリ",
-    "kana": "Palette Categories"
+    "kana": "ぱれっとのかてごり"
   },
   "Toggle Palette": {
     "kanji": "パレットの切り替え",
-    "kana": "Toggle Palette"
+    "kana": "ぱれっとのきりかえ"
   },
   "effect": {
     "kanji": "こうかおん",
@@ -1785,19 +1785,19 @@
   },
   "Theme switched to %s mode.": {
     "kanji": "テーマが %s モードに切り替わりました。",
-    "kana": "Theme switched to %s mode."
+    "kana": "てーまが %s もーどにきりかわりました。"
   },
   "Music Blocks is already set to this theme.": {
     "kanji": "Music Blocksはすでにこのテーマに設定されています。",
-    "kana": "Music Blocks is already set to this theme."
+    "kana": "Music Blocksはすでにこのてーまにせっていされています。"
   },
   "You must have at least one Partial block inside of a Weighted-partial block": {
     "kanji": "「倍音ウェート」ブロックの中に一つ以上の倍音ブロックが入っている必要があります。",
-    "kana": "「ばいおん ウェート」ブロックの なかに ひとつ いじょうの ばいおん ブロックが はいっている ひつようが あります。"
+    "kana": "You must have at least one Partial block inside of a Weighted-partial block"
   },
   "You can only tie notes of the same pitch. Did you mean to use slur?": {
     "kanji": "同じピッチの音符のみを結ぶことができます。スラーを使うつもりでしたか？",
-    "kana": "You can only tie notes of the same pitch. Did you mean to use slur?"
+    "kana": "おなじぴっちのおんぷのみをむすぶことができます。すらーをつかうつもりでしたか？"
   },
   "synth cannot play chords.": {
     "kanji": "このシンセでは和音ができません",
@@ -2245,15 +2245,15 @@
   },
   "sitar": {
     "kanji": "シタール",
-    "kana": "sitar"
+    "kana": "したーる"
   },
   "harmonium": {
     "kanji": "ハルモニウム",
-    "kana": "harmonium"
+    "kana": "はるもにうむ"
   },
   "mandolin": {
     "kanji": "マンドリン",
-    "kana": "mandolin"
+    "kana": "まんどりん"
   },
   "acoustic guitar": {
     "kanji": "アコースティック",
@@ -2465,7 +2465,7 @@
   },
   "Meantone": {
     "kanji": "中全音律",
-    "kana": "Meantone"
+    "kana": "ちゅうぜんおんりつ"
   },
   "major 7th": {
     "kanji": "長七の和音（メイジャー・セブンス)",
@@ -2521,7 +2521,7 @@
   },
   "Invalid temperament. Falling back to equal temperament.": {
     "kanji": "無効な気質。平均律に戻ります。",
-    "kana": "Invalid temperament. Falling back to equal temperament."
+    "kana": "むこうなきしつ。へいきんりつにもどります。"
   },
   "current": {
     "kanji": "現在の",
@@ -2552,12 +2552,12 @@
     "kana": "たいこ"
   },
   "⚠️ Sound is disabled!\\n\\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks.": {
-    "kanji": "⚠️サウンドは無効になっています。\\n\\nブラウザの設定 (サイト設定 > サウンド) を確認して、ミュージック ブロックの音声を許可してください。",
+    "kanji": "⚠️ サウンドは無効になっています。\\n\\nブラウザの設定 (サイト設定 > サウンド) を確認して、ミュージック・ブロックスの音声を許可してください。",
     "kana": "⚠️ Sound is disabled!\\n\\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
   },
   "Cents Adjustment": {
     "kanji": "セント調整",
-    "kana": "Cents Adjustment"
+    "kana": "せんとちょうせい"
   },
   "reference tone": {
     "kanji": "参照ピッチ",
@@ -2565,7 +2565,7 @@
   },
   "Security Warning": {
     "kanji": "セキュリティ警告",
-    "kana": "Security Warning"
+    "kana": "せきゅりてぃけいこく"
   },
   "This plugin contains code that will be executed in your browser. It has not been loaded from the built-in plugins directory and may contain unsafe code.": {
     "kanji": "このプラグインには、ブラウザで実行されるコードが含まれています。組み込みのプラグイン ディレクトリからロードされていないため、安全でないコードが含まれている可能性があります。",
@@ -2573,11 +2573,11 @@
   },
   "Do you want to allow this plugin to run?": {
     "kanji": "このプラグインの実行を許可しますか?",
-    "kana": "Do you want to allow this plugin to run?"
+    "kana": "このぷらぐいんのじっこうをきょかしますか?"
   },
   "Source: %s": {
     "kanji": "ソース: %s",
-    "kana": "Source: %s"
+    "kana": "そーす: %s"
   },
   "unknown": {
     "kanji": "不明",
@@ -2585,7 +2585,7 @@
   },
   "The Return block will return a value from an action.": {
     "kanji": "Returnブロックはアクションから値を返します。",
-    "kana": "The Return block will return a value from an action."
+    "kana": "Returnぶろっくはあくしょんからあたいをかえします。"
   },
   "return": {
     "kanji": "リターン",
@@ -2593,7 +2593,7 @@
   },
   "The Return to URL block will return a value to a webpage.": {
     "kanji": "Return to URLブロックは値をウェブページに返します。",
-    "kana": "The Return to URL block will return a value to a webpage."
+    "kana": "Return to URLぶろっくはあたいをうぇぶぺーじにかえします。"
   },
   "return to URL": {
     "kanji": "URLに戻ります",
@@ -2601,11 +2601,11 @@
   },
   "Invalid URL": {
     "kanji": "無効な URL",
-    "kana": "Invalid URL"
+    "kana": "むこうな URL"
   },
   "The Calculate block returns a value calculated by an action.": {
     "kanji": "Calculateブロックはアクションで計算された値を返します。",
-    "kana": "The Calculate block returns a value calculated by an action."
+    "kana": "Calculateぶろっくはあくしょんでけいさんされたあたいをかえします。"
   },
   "calculate": {
     "kanji": "計算する",
@@ -2625,11 +2625,11 @@
   },
   "The Arg block contains the value of an argument passed to an action.": {
     "kanji": "Argブロックはアクションに渡された引数の値を含みます。",
-    "kana": "The Arg block contains the value of an argument passed to an action."
+    "kana": "Argぶろっくはあくしょんにわたされたひきすうのあたいをふくみます。"
   },
   "arg": {
     "kanji": "引数",
-    "kana": "arg"
+    "kana": "ひきすう"
   },
   "Invalid argument": {
     "kanji": "無効な議論",
@@ -2637,11 +2637,11 @@
   },
   "In the example, it is used with the One of block to choose a random phase.": {
     "kanji": "<br><br>図の例は、決まったアクションではなく、２つのうちどちらか１つのアクションをランダムに実行させる。",
-    "kana": "<br><br>ずのれいは、 きまったアクション ではなく、 ２つの うち どちらか １つの アクションを ランダムに じっこうさせる。"
+    "kana": "In the example, it is used with the One of block to choose a random phase."
   },
   "The Listen block is used to listen for an event such as a mouse click.": {
     "kanji": "<h2>イベントブロック（受け取り）</h2><br>特定のイベントに対して、その発生を受け取るたびに実行するアクションを１つ決めておくことができる。",
-    "kana": "<h2>イベントブロック（うけとり）</h2><br>とくていの イベント にたいして、 その はっせい をうけとるたびに じっこうする アクションを １つ きめて おくことが できる。"
+    "kana": "The Listen block is used to listen for an event such as a mouse click."
   },
   "When the event happens, an action is taken.": {
     "kanji": "<br><br>イベントの発生は、各スクリプトが【イベントのたびにアクション】で指定したアクションの引きがねとしてはたらく。",
@@ -2657,7 +2657,7 @@
   },
   "The Broadcast block is used to trigger an event.": {
     "kanji": "<h2>イベントブロック（発生）</h2><br>指定した名前のイベントをすべてのネズミに送る。イベントの発生は、各スクリプトが【イベントのたびにアクション】で指定したアクションの引きがねとしてはたらく。",
-    "kana": "<h2>イベントブロック（はっせい）</h2><br>していした なまえの イベントを すべての ネズミに おくる。 イベントの はっせいは、 かくスクリプトが 【イベントのたびにアクション】で してい した アクションの ひきがね として はたらく。"
+    "kana": "The Broadcast block is used to trigger an event."
   },
   "broadcast": {
     "kanji": "イベント発生",
@@ -2685,7 +2685,7 @@
   },
   "The Not block is the logical not operator.": {
     "kanji": "Notブロックは論理的なNOT演算子です。",
-    "kana": "The Not block is the logical not operator."
+    "kana": "NotぶろっくはろんりてきなNOTえんざんしです。"
   },
   "not": {
     "kanji": "ではない",
@@ -2693,7 +2693,7 @@
   },
   "The And block is the logical and operator.": {
     "kanji": "Andブロックは論理積（AND）演算子です。",
-    "kana": "The And block is the logical and operator."
+    "kana": "Andぶろっくはろんりせき（AND）えんざんしです。"
   },
   "and": {
     "kanji": "かつ",
@@ -2701,7 +2701,7 @@
   },
   "The Or block is the logical or operator.": {
     "kanji": "Orブロックは論理和（OR）演算子です。",
-    "kana": "The Or block is the logical or operator."
+    "kana": "Orぶろっくはろんりわ（OR）えんざんしです。"
   },
   "or": {
     "kanji": "または",
@@ -2709,39 +2709,39 @@
   },
   "The XOR block is the logical XOR operator.": {
     "kanji": "XORブロックは排他的論理和（XOR）演算子です。",
-    "kana": "The XOR block is the logical XOR operator."
+    "kana": "XORぶろっくははいたてきろんりわ（XOR）えんざんしです。"
   },
   "xor": {
     "kanji": "XOR（エクスクルーシブ・オア）",
-    "kana": "xor"
+    "kana": "XOR（えくすくるーしぶ・おあ）"
   },
   "The Greater-than block returns True if the top number is greater than the bottom number.": {
-    "kanji": "Greater-than ブロックは、上の数値が下の数値より大きい場合に True を返します。",
+    "kanji": "「＞」ブロックは、上の数値が下の数値より大きい場合に True を返します。",
     "kana": "The Greater-than block returns True if the top number is greater than the bottom number."
   },
   "The Less-than block returns True if the top number is less than the bottom number.": {
-    "kanji": "Less-than ブロックは、上の数値が下の数値より小さい場合に True を返します。",
+    "kanji": "「＜」ブロックは、上の数値が下の数値より小さい場合に True を返します。",
     "kana": "The Less-than block returns True if the top number is less than the bottom number."
   },
   "The Less-than-or-equal-to block returns True if the top number is less than or equal to the bottom number.": {
-    "kanji": "Less-than-or-equal-to ブロックは、上の数値が下の数値以下の場合に True を返します。",
+    "kanji": "「≦」ブロックは、上の数値が下の数値以下の場合に True を返します。",
     "kana": "The Less-than-or-equal-to block returns True if the top number is less than or equal to the bottom number."
   },
   "The Greater-than-or-equal-to block returns True if the top number is greater than or equal to the bottom number.": {
-    "kanji": "Greater-than-or-equal-to ブロックは、上の数値が下の数値以上である場合に True を返します。",
+    "kanji": "「≥」ブロックは、上の数値が下の数値以上である場合に True を返します。",
     "kana": "The Greater-than-or-equal-to block returns True if the top number is greater than or equal to the bottom number."
   },
   "The Equal block returns True if the two numbers are equal.": {
     "kanji": "<h2>しんぎブロック（等しい）</h2><br>２つのすうちをくらべて、同じすうちであるかどうかはんていする。「＝」は、２つのすうちが同じであれば「真（しん）」、同じでなければ「偽（ぎ）」という結果になる。<br><br>★しんぎブロックとは<br>「もし～ならば」などのじょうけんブロックを動かすために必要なブロック。<br>「もし～ならば」は、せいかくに表現すると、「もし～というじょうけんが正しいならば、次のブロックを実行する」という意味である。しんぎブロックは不等式などによるひかくが「正しい（真）」か、「正しくない（偽）」かの結果を表し、「もし～ならば」に続くブロックを実行するかどうか決める。",
-    "kana": "<h2>しんぎブロック（ひとしい）</h2><br>２つの すうちを くらべて、 おなじ すうちで あるかどうか はんてい する。 「＝」は、 ２つの すうちが おなじ であれば 「しん（しん）」、 おなじ でなければ 「にせ（ぎ）」 という けっかになる。<br><br>★しんぎブロックとは<br>「もし～ならば」などの じょうけんブロックを うごかすために ひつような ブロック。<br>「もし～ならば」は、 せいかくに ひょうげんすると、 「もし～という じょうけんが ただしい ならば、 つぎの ブロックを じっこうする」という いみ である。 しんぎブロックは ふとうしき などによる ひかくが 「ただしい（しん）」か、 「ただしくない（にせ）」かの けっかを あらわし、 「もし～ならば」に つづく ブロックを じっこうするか どうか きめる。"
+    "kana": "The Equal block returns True if the two numbers are equal."
   },
   "The Not-equal-to block returns True if the two numbers are not equal to each other.": {
-    "kanji": "Not-equal-toブロックは2つの数字が等しくない場合にTrueを返します。",
+    "kanji": "「≠」ブロックは2つの数字が等しくない場合にTrueを返します。",
     "kana": "The Not-equal-to block returns True if the two numbers are not equal to each other."
   },
   "The Boolean block is used to specify true or false.": {
     "kanji": "Booleanブロックはtrueまたはfalseを指定するために使われます。",
-    "kana": "The Boolean block is used to specify true or false."
+    "kana": "Booleanぶろっくはtrueまたはfalseをしていするためにつかわれます。"
   },
   "The Add-to block is used to add to the value stored in a box.": {
     "kanji": "<h2>数の箱（あたいを変える）</h2><br>指定した箱に、好きなすうちを足す。マイナスのすうちを使うと引き算になる。",
@@ -2797,11 +2797,11 @@
   },
   "The Box2 block returns the value stored in Box2.": {
     "kanji": "Box2ブロックはBox2に保存された値を返します。",
-    "kana": "The Box2 block returns the value stored in Box2."
+    "kana": "Box2ぶろっくはBox2にほぞんされたあたいをかえします。"
   },
   "The Store in Box2 block is used to store a value in Box2.": {
     "kanji": "Store in Box2ブロックは値をBox2に保存するために使われます。",
-    "kana": "The Store in Box2 block is used to store a value in Box2."
+    "kana": "Store in Box2ぶろっくはあたいをBox2にほぞんするためにつかわれます。"
   },
   "store in box2": {
     "kanji": "箱２にすうちを入れる",
@@ -2809,18 +2809,18 @@
   },
   "The Box1 block returns the value stored in Box1.": {
     "kanji": "Box1ブロックはBox1に保存された値を返します。",
-    "kana": "The Box1 block returns the value stored in Box1."
+    "kana": "Box1ぶろっくはBox1にほぞんされたあたいをかえします。"
   },
   "The Store in Box1 block is used to store a value in Box1.": {
     "kanji": "Store in Box1ブロックは値をBox1に保存するために使われます。",
-    "kana": "The Store in Box1 block is used to store a value in Box1."
+    "kana": "Store in Box1ぶろっくはあたいをBox1にほぞんするためにつかわれます。"
   },
   "store in box1": {
     "kanji": "箱１にすうちを入れる",
     "kana": "はこ１に すうちを いれる"
   },
   "The Show-dictionary block displays the contents of the dictionary at the top of the screen.": {
-    "kanji": "Show-dictionary ブロックは、画面の上部に辞書の内容を表示します。",
+    "kanji": "「辞書を表す」ブロックは、画面の上部に辞書の内容を表示します。",
     "kana": "The Show-dictionary block displays the contents of the dictionary at the top of the screen."
   },
   "show dictionary": {
@@ -2833,7 +2833,7 @@
   },
   "The Dictionary block returns a dictionary.": {
     "kanji": "Dictionaryブロックは辞書を返します。",
-    "kana": "The Dictionary block returns a dictionary."
+    "kana": "Dictionaryぶろっくはじしょをかえします。"
   },
   "The Get-dict block returns a value in the dictionary for a specified key.": {
     "kanji": "Get-dictブロックは指定されたキーの辞書の値を返します。",
@@ -2853,7 +2853,7 @@
   },
   "The Set-dict block sets a value in the dictionary for a specified key.": {
     "kanji": "Set-dictブロックは指定されたキーに辞書の値を設定します。",
-    "kana": "The Set-dict block sets a value in the dictionary for a specified key."
+    "kana": "Set-dictぶろっくはしていされたきーにじしょのあたいをせっていします。"
   },
   "set value": {
     "kanji": "値を設定",
@@ -2861,15 +2861,15 @@
   },
   "The Noise name block is used to select a noise synthesizer.": {
     "kanji": "Noise nameブロックはノイズシンセサイザーを選択するために使われます。",
-    "kana": "The Noise name block is used to select a noise synthesizer."
+    "kana": "Noise nameぶろっくはのいずしんせさいざーをせんたくするためにつかわれます。"
   },
   "The Drum name block is used to select a drum.": {
     "kanji": "<h2>ドラムブロック</h2><br>ドラムの種類を変えるときに使う。クリックで、いろいろなドラムの音を選ぶことができる。",
-    "kana": "<h2>ドラムブロック</h2><br>ドラムの しゅるいを かえるときに つかう。 クリックで、 いろいろな ドラムの おとを えらぶことが できる。"
+    "kana": "The Drum name block is used to select a drum."
   },
   "The Effects name block is used to select a sound effect.": {
     "kanji": "<h2>こうかおんブロック</h2><br>こうかおんの種類を変えるときに使う。クリックで、いろいろなおもしろい音を選ぶことができる。",
-    "kana": "<h2>こうかおんブロック</h2><br>こうかおんの しゅるいを かえるときに つかう。 クリックで、 いろいろな おもしろい おとを えらぶことが できる。"
+    "kana": "The Effects name block is used to select a sound effect."
   },
   "noise": {
     "kanji": "ノイズ",
@@ -2877,18 +2877,18 @@
   },
   "The Play noise block will generate white, pink, or brown noise.": {
     "kanji": "Play noiseブロックはホワイトノイズ、ピンクノイズ、またはブラウンノイズを生成します。",
-    "kana": "The Play noise block will generate white, pink, or brown noise."
+    "kana": "Play noiseぶろっくはほわいとのいず、ぴんくのいず、またはぶらうんのいずをせいせいします。"
   },
   "Replace every instance of a pitch with a drum sound.": {
     "kanji": "すべてのピッチをドラム音に置き換えます。",
-    "kana": "Replace every instance of a pitch with a drum sound."
+    "kana": "すべてのぴっちをどらむおとにおきかえます。"
   },
   "map pitch to drum": {
     "kanji": "音符をドラムに変える",
     "kana": "ドラムを おんぷに かえる"
   },
   "The Set drum block will select a drum sound to replace the pitch of any contained notes.": {
-    "kanji": "Set drum ブロックは、含まれているノートのピッチを置き換えるドラム サウンドを選択します。",
+    "kanji": "「ドラムをせってい」ブロックは、含まれているノートのピッチを置き換えるドラム サウンドを選択します。",
     "kana": "The Set drum block will select a drum sound to replace the pitch of any contained notes."
   },
   "In the example above, a kick drum sound will be played instead of sol.": {
@@ -2905,7 +2905,7 @@
   },
   "You can use multiple Drum blocks within a Note block.": {
     "kanji": "<h2>ドラムブロック</h2><br>「音符（おんぷ）ブロック」のなかに入れて使う。色々なドラムの音色を選ぶことができる。１つの「音符（おんぷ）ブロック」の中でふくすうの音色のドラムを組み合わせて使うことができる。",
-    "kana": "<h2>ドラム ブロック</h2><br>「おんぷブロック」 の なかに いれて つかう。 いろいろな  ドラムの ねいろを えらぶことが できる。 １つの 「おんぷブロック」 の なかで、 ふくすうの ねいろの ドラムを  くみあわせて つかうことが できる。"
+    "kana": "You can use multiple Drum blocks within a Note block."
   },
   "mouse index heap": {
     "kanji": "ネズミヒープに番号をふる",
@@ -2953,7 +2953,7 @@
   },
   "The Stop mouse block stops the specified mouse.": {
     "kanji": "指定されたマウスを停止します。",
-    "kana": "The Stop mouse block stops the specified mouse."
+    "kana": "していされたまうすをていしします。"
   },
   "stop turtle": {
     "kanji": "ネズミを止める",
@@ -2961,7 +2961,7 @@
   },
   "The Stop turtle block stops the specified turtle.": {
     "kanji": "指定されたタートルを停止します。",
-    "kana": "The Stop turtle block stops the specified turtle."
+    "kana": "していされたたーとるをていしします。"
   },
   "Cannot find mouse": {
     "kanji": "ネズミが見つかりません。",
@@ -2977,7 +2977,7 @@
   },
   "The Start mouse block starts the specified mouse.": {
     "kanji": "指定されたマウスを開始します。",
-    "kana": "The Start mouse block starts the specified mouse."
+    "kana": "していされたまうすをかいしします。"
   },
   "start turtle": {
     "kanji": "ネズミをスタートする",
@@ -2985,7 +2985,7 @@
   },
   "The Start turtle block starts the specified turtle.": {
     "kanji": "指定されたタートルを開始します。",
-    "kana": "The Start turtle block starts the specified turtle."
+    "kana": "していされたたーとるをかいしします。"
   },
   "Mouse is already running.": {
     "kanji": "ネズミはすでに動いています。",
@@ -3005,15 +3005,15 @@
   },
   "The Mouse color block returns the pen color of the specified mouse.": {
     "kanji": "指定されたマウスのペンの色を返します。",
-    "kana": "The Mouse color block returns the pen color of the specified mouse."
+    "kana": "していされたまうすのぺんのいろをかえします。"
   },
   "turtle color": {
     "kanji": "タートルの色",
-    "kana": "turtle color"
+    "kana": "たーとるのいろ"
   },
   "The Turtle color block returns the pen color of the specified turtle.": {
     "kanji": "指定されたタートルのペンの色を返します。",
-    "kana": "The Turtle color block returns the pen color of the specified turtle."
+    "kana": "していされたたーとるのぺんのいろをかえします。"
   },
   "mouse heading": {
     "kanji": "ネズミの進む角度",
@@ -3021,15 +3021,15 @@
   },
   "The Mouse heading block returns the heading of the specified mouse.": {
     "kanji": "指定されたマウスの向きを返します。",
-    "kana": "The Mouse heading block returns the heading of the specified mouse."
+    "kana": "していされたまうすのむきをかえします。"
   },
   "turtle heading": {
     "kanji": "タートルの進む角度",
-    "kana": "turtle heading"
+    "kana": "たーとるのすすむかくど"
   },
   "The Turtle heading block returns the heading of the specified turtle.": {
     "kanji": "指定されたタートルの向きを返します。",
-    "kana": "The Turtle heading block returns the heading of the specified turtle."
+    "kana": "していされたたーとるのむきをかえします。"
   },
   "set mouse": {
     "kanji": "ネズミを設定",
@@ -3045,7 +3045,7 @@
   },
   "set turtle": {
     "kanji": "タートルを設定",
-    "kana": "set turtle"
+    "kana": "たーとるをせってい"
   },
   "The Set mouse block sends a stack of blocks to be run by the specified mouse.": {
     "kanji": "指定されたマウスに実行するブロックのスタックを送ります。",
@@ -3061,7 +3061,7 @@
   },
   "The Y mouse block returns the Y position of the specified mouse.": {
     "kanji": "指定されたマウスのY座標を返します。",
-    "kana": "The Y mouse block returns the Y position of the specified mouse."
+    "kana": "していされたまうすのYざひょうをかえします。"
   },
   "turtle y": {
     "kanji": "タートルのy座標",
@@ -3069,7 +3069,7 @@
   },
   "The Y turtle block returns the Y position of the specified turtle.": {
     "kanji": "指定されたタートルのY座標を返します。",
-    "kana": "The Y turtle block returns the Y position of the specified turtle."
+    "kana": "していされたたーとるのYざひょうをかえします。"
   },
   "mouse x": {
     "kanji": "ネズミのx座標",
@@ -3077,7 +3077,7 @@
   },
   "The X mouse block returns the X position of the specified mouse.": {
     "kanji": "指定されたマウスのX座標を返します。",
-    "kana": "The X mouse block returns the X position of the specified mouse."
+    "kana": "していされたまうすのXざひょうをかえします。"
   },
   "turtle x": {
     "kanji": "タートルのx座標",
@@ -3085,7 +3085,7 @@
   },
   "The X turtle block returns the X position of the specified turtle.": {
     "kanji": "指定されたタートルのX座標を返します。",
-    "kana": "The X turtle block returns the X position of the specified turtle."
+    "kana": "していされたたーとるのXざひょうをかえします。"
   },
   "mouse notes played": {
     "kanji": "ネズミの演奏した音符の数",
@@ -3097,7 +3097,7 @@
   },
   "turtle notes played": {
     "kanji": "タートルの演奏した音符の数",
-    "kana": "turtle notes played"
+    "kana": "たーとるのえんそうしたおんぷのかず"
   },
   "The Turtle elapse notes block returns the number of notes played by the specified turtle.": {
     "kanji": "指定されたタートルが演奏したノート数を返します。",
@@ -3113,7 +3113,7 @@
   },
   "turtle pitch number": {
     "kanji": "タートルの音高数字",
-    "kana": "turtle pitch number"
+    "kana": "たーとるのおんこうすうじ"
   },
   "The Turtle pitch block returns the current pitch number being played by the specified turtle.": {
     "kanji": "指定されたタートルが現在演奏しているピッチ番号を返します。",
@@ -3125,7 +3125,7 @@
   },
   "turtle note value": {
     "kanji": "タートルの音価",
-    "kana": "turtle note value"
+    "kana": "たーとるのおんか"
   },
   "mouse sync": {
     "kanji": "ネズミを同期させる",
@@ -3133,15 +3133,15 @@
   },
   "The Mouse sync block aligns the beat count between mice.": {
     "kanji": "マウス間のビート数を同期させるブロックです。",
-    "kana": "The Mouse sync block aligns the beat count between mice."
+    "kana": "まうすまのびーとかずをどうきさせるぶろっくです。"
   },
   "turtle sync": {
     "kanji": "タートルを同期させる",
-    "kana": "turtle sync"
+    "kana": "たーとるをどうきさせる"
   },
   "The Turtle sync block aligns the beat count between turtles.": {
     "kanji": "タートル間のビート数を同期させるブロックです。",
-    "kana": "The Turtle sync block aligns the beat count between turtles."
+    "kana": "たーとるまのびーとかずをどうきさせるぶろっくです。"
   },
   "The Found mouse block will return true if the specified mouse can be found.": {
     "kanji": "指定されたマウスが見つかった場合にtrueを返します。",
@@ -3165,7 +3165,7 @@
   },
   "The New mouse block will create a new mouse.": {
     "kanji": "新しいマウスを作成するブロックです。",
-    "kana": "The New mouse block will create a new mouse."
+    "kana": "あたらしいまうすをさくせいするぶろっくです。"
   },
   "new turtle": {
     "kanji": "新しいタートル",
@@ -3173,7 +3173,7 @@
   },
   "The New turtle block will create a new turtle.": {
     "kanji": "新しいタートルを作成するブロックです。",
-    "kana": "The New turtle block will create a new turtle."
+    "kana": "あたらしいたーとるをさくせいするぶろっくです。"
   },
   "set mouse color": {
     "kanji": "ネズミ色を設定",
@@ -3185,11 +3185,11 @@
   },
   "set turtle color": {
     "kanji": "タートル色を設定",
-    "kana": "set turtle color"
+    "kana": "たーとるいろをせってい"
   },
   "The Set-turtle-color block is used to set the color of a turtle.": {
     "kanji": "タートルの色を設定するためのブロックです。",
-    "kana": "The Set-turtle-color block is used to set the color of a turtle."
+    "kana": "たーとるのいろをせっていするためのぶろっくです。"
   },
   "The Mouse-name block returns the name of a mouse.": {
     "kanji": "<h2>文字ブロック</h2><br>このプログラムを実行しているネズミの名前（文字列）を表す。",
@@ -3197,7 +3197,7 @@
   },
   "The Turtle-name block returns the name of a turtle.": {
     "kanji": "タートルの名前を返すブロックです。",
-    "kana": "The Turtle-name block returns the name of a turtle."
+    "kana": "たーとるのなまえをかえすぶろっくです。"
   },
   "mouse count": {
     "kanji": "何匹のネズミ",
@@ -3209,11 +3209,11 @@
   },
   "turtle count": {
     "kanji": "何匹のタートル",
-    "kana": "turtle count"
+    "kana": "なんびきのたーとる"
   },
   "The Turtle-count block returns the number of turtles.": {
     "kanji": "タートルカウントブロックはタートルの数を返します。",
-    "kana": "The Turtle-count block returns the number of turtles."
+    "kana": "たーとるかうんとぶろっくはたーとるのかずをかえします。"
   },
   "nth mouse name": {
     "kanji": "何匹目のネズミの名前",
@@ -3221,15 +3221,15 @@
   },
   "The Nth-Mouse name block returns the name of the nth mouse.": {
     "kanji": "エヌス・マウス・ネームブロックはエヌ番目のマウスの名前を返します。",
-    "kana": "The Nth-Mouse name block returns the name of the nth mouse."
+    "kana": "えぬす・まうす・ねーむぶろっくはえぬばんめのまうすのなまえをかえします。"
   },
   "nth turtle name": {
     "kanji": "何匹目のタートルの名前",
-    "kana": "nth turtle name"
+    "kana": "なんびきめのたーとるのなまえ"
   },
   "The Nth-Turtle name block returns the name of the nth turtle.": {
     "kanji": "エヌス・タートル・ネームブロックはエヌ番目のタートルの名前を返します。",
-    "kana": "The Nth-Turtle name block returns the name of the nth turtle."
+    "kana": "えぬす・たーとる・ねーむぶろっくはえぬばんめのたーとるのなまえをかえします。"
   },
   "set name": {
     "kanji": "ネズミに名前をつける",
@@ -3249,7 +3249,7 @@
   },
   "The Set-name block is used to name a turtle.": {
     "kanji": "<h2>文字ブロック</h2><br>タートルに指定した名前をつけることができる。",
-    "kana": "The Set-name block is used to name a turtle."
+    "kana": "<h2>もじぶろっく</h2><br>たーとるにしていしたなまえをつけることができる。"
   },
   "fraction": {
     "kanji": "分数",
@@ -3289,11 +3289,11 @@
   },
   "The Show blocks block shows the blocks.": {
     "kanji": "ショウ・ブロックスブロックはブロックを表示します。",
-    "kana": "The Show blocks block shows the blocks."
+    "kana": "しょう・ぶろっくすぶろっくはぶろっくをひょうじします。"
   },
   "The Hide blocks block hides the blocks.": {
     "kanji": "ハイド・ブロックスブロックはブロックを非表示にします。",
-    "kana": "The Hide blocks block hides the blocks."
+    "kana": "はいど・ぶろっくすぶろっくはぶろっくをひひょうじにします。"
   },
   "The Space block is used to add space between blocks.": {
     "kanji": "<h2>スペースブロック</h2><br>ブロックとブロックの間にスペースを入れたいときに使う。",
@@ -3305,10 +3305,10 @@
   },
   "The Wait block pauses the program for a specified number of seconds.": {
     "kanji": "ウェイトブロックは指定された秒数だけプログラムを一時停止します。",
-    "kana": "The Wait block pauses the program for a specified number of seconds."
+    "kana": "うぇいとぶろっくはしていされたびょうすうだけぷろぐらむをいちじていしします。"
   },
   "The Comment block prints a comment at the top of the screen when the program is running in slow mode.": {
-    "kanji": "Comment ブロックは、プログラムが低速モードで実行されているときに、画面の上部にコメントを出力します。",
+    "kanji": "「コメント」ブロックは、プログラムが低速モードで実行されているときに、画面の上部にコメントを出力します。",
     "kana": "The Comment block prints a comment at the top of the screen when the program is running in slow mode."
   },
   "comment": {
@@ -3321,7 +3321,7 @@
   },
   "The Print block displays text at the top of the screen.": {
     "kanji": "<h2>表示ブロック（結果）</h2><br>画面の上部に、指定した実行結果のすうちや文字を表示する。表示したテキストはクリックすると消すことができる。どこでプログラムがまちがっているかをかくにんする際（デバグ）などによく用いられる。",
-    "kana": "<h2>ひょうじ ブロック（けっか）</h2><br>がめんの じょうぶに、 してい した じっこうけっかの すうちや もじを ひょうじする。 ひょうじした テキストは クリックすると けすことが できる。 どこで プログラムが まちがっているかを かくにんするさい（デバグ）などに よく もちいられる。"
+    "kana": "The Print block displays text at the top of the screen."
   },
   "display grid": {
     "kanji": "グリッドを表示",
@@ -3329,19 +3329,19 @@
   },
   "The Display Grid Block changes the grid type": {
     "kanji": "表示グリッド ブロックのグリッド タイプの変更",
-    "kana": "The Display Grid Block changes the grid type"
+    "kana": "ひょうじぐりっど ぶろっくのぐりっど たいぷのへんこう"
   },
   "debugger": {
     "kanji": "デバッガ",
-    "kana": "debugger"
+    "kana": "でばっが"
   },
   "The Debug block adds a debug point in your code. When reached, execution will pause and you can inspect variables.": {
-    "kanji": "Debug ブロックは、コードにデバッグ ポイントを追加します。到達すると、実行が一時停止され、変数を検査できるようになります。",
+    "kanji": "「デバッガ」ブロックは、コードにデバッグ ポイントを追加します。到達すると、実行が一時停止され、変数を検査できるようになります。",
     "kana": "The Debug block adds a debug point in your code. When reached, execution will pause and you can inspect variables."
   },
   "The Backward block runs code in reverse order (Musical retrograde).": {
     "kanji": "<h2>実行ブロック（ぎゃく実行）</h2><br>はさまれているブロックを、つうじょうとはぎゃくの順じょで、下から上に向かって実行する。",
-    "kana": "<h2>じっこうブロック（ぎゃくじっこう）</h2><br>はさまれている ブロックを、 つうじょうとは ぎゃくの じゅんじょで、 したから うえにむかって じっこうする。"
+    "kana": "The Backward block runs code in reverse order (Musical retrograde)."
   },
   "backward": {
     "kanji": "ぎゃく向きに実行",
@@ -3349,10 +3349,10 @@
   },
   "The Duplicate block will run each block multiple times.": {
     "kanji": "Duplicateブロックは各ブロックを複数回実行します。",
-    "kana": "The Duplicate block will run each block multiple times."
+    "kana": "Duplicateぶろっくはかくぶろっくをふくすうかいじっこうします。"
   },
   "The output of the example is: Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol.": {
-    "kanji": "この例の出力は、Sol、Sol、Sol、Sol、Re、Re、Re、Re、Sol、Sol、Sol、Sol です。",
+    "kanji": "この例の出力は、ソ、ソ、ソ、ソ、レ、レ、レ、レ、ソ、ソ、ソ、ソ です。",
     "kana": "The output of the example is: Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol."
   },
   "The Default block is used inside of a Switch to define the default action.": {
@@ -3369,7 +3369,7 @@
   },
   "The Case block is used inside of a Switch to define matches.": {
     "kanji": "CaseブロックはSwitch内で一致条件を定義するために使われます。",
-    "kana": "The Case block is used inside of a Switch to define matches."
+    "kana": "CaseぶろっくはSwitchないでいっちじょうけんをていぎするためにつかわれます。"
   },
   "case": {
     "kanji": "ケース",
@@ -3377,7 +3377,7 @@
   },
   "The Switch block will run the code in the matching Case.": {
     "kanji": "Switchブロックは一致するCase内のコードを実行します。",
-    "kana": "The Switch block will run the code in the matching Case."
+    "kana": "SwitchぶろっくはいっちするCaseないのこーどをじっこうします。"
   },
   "switch": {
     "kanji": "スイッチ",
@@ -3385,15 +3385,15 @@
   },
   "The Stop block will stop a loop": {
     "kanji": "Stopブロックはループを停止します。",
-    "kana": "The Stop block will stop a loop"
+    "kana": "Stopぶろっくはるーぷをていしします。"
   },
   "Forever, Repeat, While, or Until.": {
     "kanji": "Forever、Repeat、While、またはUntil。",
-    "kana": "Forever, Repeat, While, or Until."
+    "kana": "Forever、Repeat、While、またはUntil。"
   },
   "The Waitfor block will wait until the condition is true.": {
     "kanji": "Waitforブロックは条件が真になるまで待ちます。",
-    "kana": "The Waitfor block will wait until the condition is true."
+    "kana": "Waitforぶろっくはじょうけんがまことになるまでまちます。"
   },
   "wait for": {
     "kanji": "を待つ",
@@ -3401,7 +3401,7 @@
   },
   "The Until block will repeat until the condition is true.": {
     "kanji": "Untilブロックは条件が真になるまで繰り返します。",
-    "kana": "The Until block will repeat until the condition is true."
+    "kana": "Untilぶろっくはじょうけんがまことになるまでくりかえします。"
   },
   "until": {
     "kanji": "までに",
@@ -3413,7 +3413,7 @@
   },
   "The While block will repeat while the condition is true.": {
     "kanji": "Whileブロックは条件が真である間繰り返します。",
-    "kana": "The While block will repeat while the condition is true."
+    "kana": "Whileぶろっくはじょうけんがまことであるかんくりかえします。"
   },
   "while": {
     "kanji": "の間に",
@@ -3428,7 +3428,7 @@
     "kana": "<br><br>ずのれい では、 もし、 パソコンのマウスを ながおし していれば 「スネアドラム」ブロックを えんそうする。"
   },
   "In this example if the mouse button is pressed a snare drum will play, else a kick drum will play.": {
-    "kanji": "この例では、マウス ボタンが押されるとスネア ドラムが再生され、そうでない場合はキック ドラムが再生されます。",
+    "kanji": "この例では、マウス ボタンが押されるとスネア ドラムが再生され、そうではない場合はキック ドラムが再生されます。",
     "kana": "In this example if the mouse button is pressed a snare drum will play, else a kick drum will play."
   },
   "if": {
@@ -3445,10 +3445,10 @@
   },
   "The Forever block will repeat the contained blocks forever.": {
     "kanji": "<h2>実行ブロック（くり返し）</h2><br>「ずっとくり返す」のブロックは、実行を停止しないかぎり、はさまれているブロックをくり返し実行する。",
-    "kana": "<h2>じっこうブロック（くりかえし）</h2><br>ずっとくりかえす」の ブロックは、 じっこうを ていし しないかぎり、 はさまれている ブロックを くりかえし じっこうする。"
+    "kana": "The Forever block will repeat the contained blocks forever."
   },
   "In this example of a simple drum machine a kick drum will play 1/4 notes forever.": {
-    "kanji": "この単純なドラムマシンの例では、キックドラムは 4 分の 1 音を永遠に演奏します。",
+    "kanji": "この単純なドラムマシンの例では、キックドラムは 四分音符を永遠に演奏します。",
     "kana": "In this example of a simple drum machine a kick drum will play 1/4 notes forever."
   },
   "forever": {
@@ -3457,7 +3457,7 @@
   },
   "The Repeat block will repeat the contained blocks.": {
     "kanji": "<h2>実行ブロック（くり返し）</h2><br>はさまれているブロックのプログラムを、入力した回数だけくり返す。",
-    "kana": "<h2>じっこうブロック（くりかえし）</h2><br>はさまれている ブロックの プログラムを、 にゅうりょくした かいすう だけ くりかえす。"
+    "kana": "The Repeat block will repeat the contained blocks."
   },
   "In this example the note will be played 4 times.": {
     "kanji": "<br><br>図の例では、「ソ」の音が４回えんそうされる。",
@@ -3477,19 +3477,19 @@
   },
   "The Heading block returns the orientation of the mouse.": {
     "kanji": "<h2>すうちブロック</h2><br>ネズミの向いている角度を表すすうちブロック。向きの値は、０以上で、３６０より小さい値になり、プラスだと右回り、マイナスだと左回りに変化する。",
-    "kana": "<h2>すうち ブロック</h2><br>ネズミの むいている かくどを あらわす すうちブロック。 むきの あたいは、 ０いじょうで、 ３６０より ちいさい あたい になり、 プラスだと みぎまわり、 マイナスだと ひだりまわりに へんかする。"
+    "kana": "The Heading block returns the orientation of the mouse."
   },
   "The Heading block returns the orientation of the turtle.": {
     "kanji": "ヘディングブロックはタートルの向きを返します。",
-    "kana": "The Heading block returns the orientation of the turtle."
+    "kana": "へでぃんぐぶろっくはたーとるのむきをかえします。"
   },
   "The Y block returns the vertical position of the mouse.": {
     "kanji": "<h2>すうちブロック</h2><br>ネズミのｙざひょう（たて方向の位置）を表すすうちブロック。<br><br>★ざひょうとは<br>物の位置を表すためのすうちのこと。ミュージック・ブロックスでは、２つ１組みのすうち（ざひょう）を使う。画面上のネズミの位置は、ほうがん用紙のマス目のように、よこ方向の目もり（xざひょう）とたて方向の目もり（ｙざひょう）を使って表す。",
-    "kana": "<h2>すうち ブロック</h2><br>ネズミの ｙざひょう（たて ほうこうの いち）を あらわす すうちブロック。<br><br>★ざひょう とは<br>もの の いちを あらわす ための すうちのこと。 ミュージック・ブロックスでは、 ２つ１くみの すうち（ざひょう）を つかう。 がめんじょうの ネズミの いちは、 ほうがん ようし の ますめ の ように、 よこ ほうこうの めもり（xざひょう）と たて ほうこうの めもり（ｙざひょう）を つかって あらわす。"
+    "kana": "The Y block returns the vertical position of the mouse."
   },
   "The Y block returns the vertical position of the turtle.": {
     "kanji": "Yブロックはタートルの垂直位置を返します。",
-    "kana": "The Y block returns the vertical position of the turtle."
+    "kana": "Yぶろっくはたーとるのすいちょくいちをかえします。"
   },
   "y3": {
     "kanji": "yざひょうち（ネズミ）",
@@ -3497,11 +3497,11 @@
   },
   "The X block returns the horizontal position of the mouse.": {
     "kanji": "<h2>すうちブロック</h2><br>ネズミのｘざひょう（よこ方向の位置）を表すすうちブロック。<br><br>★ざひょうとは<br>物の位置を表すためのすうちのこと。ミュージック・ブロックスでは、２つ１組みのすうち（ざひょう）を使う。画面上のネズミの位置は、ほうがん用紙のマス目のように、よこ方向の目もり（xざひょう）とたて方向の目もり（ｙざひょう）を使って表す。",
-    "kana": "<h2>すうち ブロック</h2><br>ネズミの ｘざひょう（よこ ほうこうの いち）を あらわす すうちブロック。<br><br>★ざひょう とは<br>もの の いちを あらわす ための すうちのこと。 ミュージック・ブロックスでは、 ２つ１くみの すうち（ざひょう）を つかう。 がめんじょうの ネズミの いちは、 ほうがん ようし の ますめ の ように、 よこ ほうこうの めもり（xざひょう）と たて ほうこうの めもり（ｙざひょう）を つかって あらわす。"
+    "kana": "The X block returns the horizontal position of the mouse."
   },
   "The X block returns the horizontal position of the turtle.": {
     "kanji": "Xブロックはタートルの水平方向の位置を返します。",
-    "kana": "The X block returns the horizontal position of the turtle."
+    "kana": "Xぶろっくはたーとるのすいへいほうこうのいちをかえします。"
   },
   "x3": {
     "kanji": "xざひょうち（ネズミ）",
@@ -3513,7 +3513,7 @@
   },
   "The Scroll XY block moves the canvas.": {
     "kanji": "<h2>いどうブロック（カンバス）</h2><br>カンバスを上下左右にいどうさせる。カンバスだけがいどうするので結果的に、画面上のすべてのネズミが同時にいどうするように見える。カンバスを右（プラス）にいどうするとネズミは左へ、左（マイナス）にいどうするとネズミは右に動いて見える。同じく、カンバスを上（プラス）にいどうするとネズミは下へ、下（マイナス）にいどうするとネズミは上に動いて見える。",
-    "kana": "<h2>いどう ブロック（カンバス）</h2><br>カンバスを じょうげ さゆうに いどう させる。 カンバスだけが いどう するので けっかてきに、 がめんじょうの すべての ネズミが どうじに いどう するように みえる。 カンバスを みぎ（プラス）に いどう すると ネズミは ひだりへ、 ひだり（マイナス）に いどう すると ネズミは みぎに うごいて みえる。 おなじく、 カンバスを うえ（プラス）に いどう すると ネズミは したへ、 した（マイナス）に いどうすると ネズミは うえに うごいて みえる。"
+    "kana": "The Scroll XY block moves the canvas."
   },
   "x2": {
     "kanji": "よこいどう",
@@ -3549,7 +3549,7 @@
   },
   "The Bezier block draws a Bezier curve.": {
     "kanji": "ベジエブロックはベジエ曲線を描きます。",
-    "kana": "The Bezier block draws a Bezier curve."
+    "kana": "べじえぶろっくはべじえきょくせんをえがきます。"
   },
   "bezier": {
     "kanji": "ベジェ曲線",
@@ -3557,7 +3557,7 @@
   },
   "The Arc block moves the turtle in an arc.": {
     "kanji": "アークブロックはタートルを弧を描いて動かします。",
-    "kana": "The Arc block moves the turtle in an arc."
+    "kana": "あーくぶろっくはたーとるをこをえがいてうごかします。"
   },
   "arc": {
     "kanji": "円をえがいていどう",
@@ -3573,11 +3573,11 @@
   },
   "Value must be within -5000 to 5000 when Wrap Mode is off.": {
     "kanji": "ラップモードがオフのとき、値は -5000 から 5000 の範囲でなければなりません。",
-    "kana": "Value must be within -5000 to 5000 when Wrap Mode is off."
+    "kana": "らっぷもーどがおふのとき、あたいは -5000 から 5000 のはんいでなければなりません。"
   },
   "Value must be within -20000 to 20000 when Wrap Mode is on.": {
     "kanji": "ラップモードがオンのとき、値は -20000 から 20000 の範囲でなければなりません。",
-    "kana": "Value must be within -20000 to 20000 when Wrap Mode is on."
+    "kana": "らっぷもーどがおんのとき、あたいは -20000 から 20000 のはんいでなければなりません。"
   },
   "set heading": {
     "kanji": "向きを変える",
@@ -3585,11 +3585,11 @@
   },
   "The Set heading block sets the heading of the turtle.": {
     "kanji": "<h2>いどうブロック</h2><br>タートルの向きを、指定したすうちの角度に変える。",
-    "kana": "The Set heading block sets the heading of the turtle."
+    "kana": "<h2>いどうぶろっく</h2><br>たーとるのむきを、していしたすうちのかくどにかえる。"
   },
   "The Set XY block moves the mouse to a specific position on the screen.": {
     "kanji": "<h2>いどうブロック</h2><br>ネズミの位置を、指定したざひょうにいどうさせる。<br><br>★ざひょうとは<br>物の位置を表すためのすうちのこと。ミュージック・ブロックスでは、２つ１組みのすうち（ざひょう）を使う。画面上のネズミの位置は、ほうがん用紙のマス目のように、よこ方向の目もり（xざひょう）とたて方向の目もり（ｙざひょう）を使って表す。",
-    "kana": "<h2>いどう ブロック</h2><br>ネズミの いちを、 してい した ざひょう に いどう させる。<br><br>★ざひょうとは<br>もの の いち を あらわす ための すうちのこと。 ミュージック・ブロックスでは、 ２つ １くみの すうち（ざひょう）を つかう。 がめんじょうの ネズミの いちは、 ほうがん ようし の ますめのように、 よこほうこうの めもり（xざひょう）と たてほうこうの めもり（ｙざひょう）を つかって あらわす。"
+    "kana": "The Set XY block moves the mouse to a specific position on the screen."
   },
   "The Set XY block moves the turtle to a specific position on the screen.": {
     "kanji": "<h2>いどうブロック</h2><br>タートルの位置を、指定したざひょうにいどうさせる。<br><br>★ざひょうとは<br>物の位置を表すためのすうちのこと。ミュージック・ブロックスでは、２つ１組みのすうち（ざひょう）を使う。画面上のタートルの位置は、ほうがん用紙のマス目のように、よこ方向の目もり（xざひょう）とたて方向の目もり（ｙざひょう）を使って表す。",
@@ -3605,7 +3605,7 @@
   },
   "The Right block turns the turtle to the right.": {
     "kanji": "<h2>いどうブロック</h2><br>タートルの向きを、指定したすうちの角度で右回りに回転させる。",
-    "kana": "The Right block turns the turtle to the right."
+    "kana": "<h2>いどうぶろっく</h2><br>たーとるのむきを、していしたすうちのかくどでみぎまわりにかいてんさせる。"
   },
   "right1": {
     "kanji": "右を向く",
@@ -3621,7 +3621,7 @@
   },
   "The Left block turns the turtle to the left.": {
     "kanji": "<h2>いどうブロック</h2><br>タートルの向きを、指定したすうちの角度で左回りに回転させる。",
-    "kana": "The Left block turns the turtle to the left."
+    "kana": "<h2>いどうぶろっく</h2><br>たーとるのむきを、していしたすうちのかくどでひだりまわりにかいてんさせる。"
   },
   "left1": {
     "kanji": "左を向く",
@@ -3641,7 +3641,7 @@
   },
   "The Back block moves the turtle backward.": {
     "kanji": "<h2>いどうブロック</h2><br>指定したすうち分、タートルを後ろにもどす。体の向きは変えない。",
-    "kana": "The Back block moves the turtle backward."
+    "kana": "<h2>いどうぶろっく</h2><br>していしたすうちふん、たーとるをうしろにもどす。からだのむきはかえない。"
   },
   "forward": {
     "kanji": "前へ進む",
@@ -3653,22 +3653,22 @@
   },
   "The Forward block moves the turtle forward.": {
     "kanji": "<h2>いどうブロック</h2><br>指定したすうち分、タートルを前に進める。",
-    "kana": "The Forward block moves the turtle forward."
+    "kana": "<h2>いどうぶろっく</h2><br>していしたすうちふん、たーとるをまえにすすめる。"
   },
   "wrap": {
     "kanji": "巻きつける",
     "kana": "まきつける"
   },
   "The Wrap block enables or disables screen wrapping for the graphics actions within it.": {
-    "kanji": "Wrap ブロックは、その中のグラフィックス アクションの画面ラッピングを有効または無効にします。",
+    "kanji": "「巻きつける」ブロックは、その中のグラフィックス アクションの画面ラッピングを有効または無効にします。",
     "kana": "The Wrap block enables or disables screen wrapping for the graphics actions within it."
   },
   "The Heap block returns the heap.": {
     "kanji": "Heapブロックはヒープを返します。",
-    "kana": "The Heap block returns the heap."
+    "kana": "Heapぶろっくはひーぷをかえします。"
   },
   "The Show-heap block displays the contents of the heap at the top of the screen.": {
-    "kanji": "Show-heap ブロックは、ヒープの内容を画面の上部に表示します。",
+    "kanji": "「ヒープを表示する」ブロックは、ヒープの内容を画面の上部に表示します。",
     "kana": "The Show-heap block displays the contents of the heap at the top of the screen."
   },
   "show heap": {
@@ -3677,7 +3677,7 @@
   },
   "The Heap-length block returns the length of the heap.": {
     "kanji": "Heap-lengthブロックはヒープの長さを返します。",
-    "kana": "The Heap-length block returns the length of the heap."
+    "kana": "Heap-lengthぶろっくはひーぷのながさをかえします。"
   },
   "heap length": {
     "kanji": "ヒープの長さ",
@@ -3685,7 +3685,7 @@
   },
   "The Heap-empty? block returns true if the heap is empty.": {
     "kanji": "Heap-empty?ブロックはヒープが空の場合にtrueを返します。",
-    "kana": "The Heap-empty? block returns true if the heap is empty."
+    "kana": "Heap-empty?ぶろっくはひーぷがそらのばあいにtrueをかえします。"
   },
   "heap empty?": {
     "kanji": "ヒープは空ですか？",
@@ -3693,7 +3693,7 @@
   },
   "The Empty-heap block empties the heap.": {
     "kanji": "Empty-heapブロックはヒープを空にします。",
-    "kana": "The Empty-heap block empties the heap."
+    "kana": "Empty-heapぶろっくはひーぷをそらにします。"
   },
   "empty heap": {
     "kanji": "空のヒープ",
@@ -3701,7 +3701,7 @@
   },
   "The Reverse-heap block reverses the order of the heap.": {
     "kanji": "Reverse-heapブロックはヒープの順序を逆にします。",
-    "kana": "The Reverse-heap block reverses the order of the heap."
+    "kana": "Reverse-heapぶろっくはひーぷのじゅんじょをぎゃくにします。"
   },
   "reverse heap": {
     "kanji": "ヒープを逆にする",
@@ -3725,7 +3725,7 @@
   },
   "The Pop block removes the value at the top of the heap.": {
     "kanji": "Popブロックはヒープの先頭の値を削除します。",
-    "kana": "The Pop block removes the value at the top of the heap."
+    "kana": "Popぶろっくはひーぷのせんとうのあたいをさくじょします。"
   },
   "pop": {
     "kanji": "ポップ",
@@ -3733,7 +3733,7 @@
   },
   "The Push block adds a value to the top of the heap.": {
     "kanji": "Pushブロックは値をヒープの先頭に追加します。",
-    "kana": "The Push block adds a value to the top of the heap."
+    "kana": "Pushぶろっくはあたいをひーぷのせんとうについかします。"
   },
   "push": {
     "kanji": "プッシュ",
@@ -3741,7 +3741,7 @@
   },
   "The Right block returns the position of the right of the canvas.": {
     "kanji": "<h2>すうちブロック（カンバス）</h2><br>カンバスの右のｘざひょうち。プラスのすうち。カンバスのじょうほうを持つすうちブロックは、カンバスのたてはば、よこはば、ざひょうち（上）、ざひょうち（下）、ざひょうち（左）、ざひょうち（右）などの６種類がある。",
-    "kana": "<h2>すうちブロック（カンバス）</h2><br>カンバスの みぎはし の ｘざひょうち。 プラスの すうち。カンバスの たてはば、 よこはば、 ざひょうち（うえ）、 ざひょうち（した）、 ざひょうち（ひだり）、 ざひょうち（みぎ） などの ６しゅるいが ある。"
+    "kana": "The Right block returns the position of the right of the canvas."
   },
   "In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas.": {
     "kanji": "この例では、マウスはキャンバスの右端に到達するまで右に移動します。その後、キャンバスの左側に再び表示されます。",
@@ -3753,14 +3753,14 @@
   },
   "The Left block returns the position of the left of the canvas.": {
     "kanji": "<h2>すうちブロック（カンバス）</h2><br>カンバスの左のｘざひょうち。マイナスのすうち。カンバスのじょうほうを持つすうちブロックは、カンバスのたてはば、よこはば、ざひょうち（上））、ざひょうち（下）、ざひょうち（左）、ざひょうち（右）などの６種類がある。",
-    "kana": "<h2>すうちブロック（カンバス）</h2><br>カンバスの ひだりはし の ｘざひょうち。 マイナスの すうち。 カンバスの たてはば、 よこはば、 ざひょうち（うえ）、 ざひょうち（した）、 ざひょうち（ひだり）、 ざひょうち（みぎ） などの ６しゅるいが ある。"
+    "kana": "The Left block returns the position of the left of the canvas."
   },
   "The Top block returns the position of the top of the canvas.": {
     "kanji": "<h2>すうちブロック（カンバス）</h2><br>カンバスの上のｙざひょうち。プラスのすうち。カンバスのじょうほうを持つすうちブロックは、カンバスのたてはば、よこはば、上（y座標）、ざひょうち（下）、ざひょうち（左）、ざひょうち（右）などの６種類がある。",
-    "kana": "<h2>すうちブロック（カンバス）</h2><br>カンバスの じょうたん の ｙざひょうち。 プラスの すうち。  カンバスの じょうほうを もつ すうちブロックは、 カンバスの たてはば、 よこはば、 ざひょうち（うえ）、 ざひょうち（した）、 ざひょうち（ひだり）、 ざひょうち（みぎ） などの ６しゅるいが ある。"
+    "kana": "The Top block returns the position of the top of the canvas."
   },
   "In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas.": {
-    "kanji": "この例では、マウスはキャンバスの上端に到達するまで上に移動します。その後、キャンバスの下部に再び表示されます。",
+    "kanji": "この例では、マウスはキャンバスの上端に到達するまで上向きに移動します。その後、キャンバスの下部に再び表示されます。",
     "kana": "In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
   },
   "In this example, the turtle moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas.": {
@@ -3769,15 +3769,15 @@
   },
   "The Bottom block returns the position of the bottom of the canvas.": {
     "kanji": "<h2>すうちブロック（カンバス）</h2><br>カンバスの下のｙざひょうち。マイナスのすうち。カンバスのじょうほうを持つすうちブロックは、カンバスのたてはば、よこはば、ざひょうち（上）、ざひょうち（下）、ざひょうち（左）、ざひょうち（右）などの６種類がある。",
-    "kana": "<h2>すうちブロック（カンバス）</h2><br>カンバスの かたん の ｙざひょうち。 マイナスの すうち。 カンバスの じょうほうを もつ すうちブロックは、 カンバスの たてはば、 よこはば、 ざひょうち（うえ）、 ざひょうち（した）、 ざひょうち（ひだり）、 ざひょうち（みぎ） などの ６しゅるいが ある。"
+    "kana": "The Bottom block returns the position of the bottom of the canvas."
   },
   "The Width block returns the width of the canvas.": {
     "kanji": "<h2>すうちブロック（カンバス）</h2><br>カンバスのたてはばのすうちを表す。カンバスのじょうほうを持つすうちブロックは、カンバスのたてはば、よこはば、ざひょうち（上）、ざひょうち（下）、ざひょうち（左）、ざひょうち（右）などの６種類がある。",
-    "kana": "<h2>すうちブロック（カンバス）</h2><br>カンバスの たてはば の すうちを あらわす。 カンバスの じょうほうを もつ すうちブロックは、 カンバスの たてはば、 よこはば、 ざひょうち（うえ）、 ざひょうち（した）、 ざひょうち（ひだり）、 ざひょうち（みぎ） などの ６しゅるいが ある。"
+    "kana": "The Width block returns the width of the canvas."
   },
   "The Height block returns the height of the canvas.": {
     "kanji": "<h2>すうちブロック（カンバス）</h2><br>カンバスのたてはばのすうちを表す。カンバスのじょうほうを持つすうちブロックは、カンバスのたてはば、よこはば、ざひょうち（上）、ざひょうち（下）、ざひょうち（左）、ざひょうち（右）などの６種類がある。",
-    "kana": "<h2>すうちブロック（カンバス）</h2><br>カンバスの たてはば の すうちを あらわす。 カンバスの じょうほうを もつ すうちブロックは、 カンバスの たてはば、 よこはば、 ざひょうち（うえ）、 ざひょうち（した）、 ざひょうち（ひだり）、 ざひょうち（みぎ） などの ６しゅるいが ある。"
+    "kana": "The Height block returns the height of the canvas."
   },
   "stop play": {
     "kanji": "再生を停止",
@@ -3805,23 +3805,23 @@
   },
   "camera": {
     "kanji": "カメラ",
-    "kana": "camera"
+    "kana": "かめら"
   },
   "The Camera block connects a webcam to the Show block.": {
     "kanji": "カメラブロックはウェブカメラをショウブロックに接続します。",
-    "kana": "The Camera block connects a webcam to the Show block."
+    "kana": "かめらぶろっくはうぇぶかめらをしょうぶろっくにせつぞくします。"
   },
   "video": {
     "kanji": "ビデオ",
-    "kana": "video"
+    "kana": "びでお"
   },
   "The Video block selects video for use with the Show block.": {
     "kanji": "ビデオブロックはショウブロックで使用するビデオを選択します。",
-    "kana": "The Video block selects video for use with the Show block."
+    "kana": "びでおぶろっくはしょうぶろっくでしようするびでおをせんたくします。"
   },
   "The Open file block opens a file for use with the Show block.": {
     "kanji": "オープンファイルブロックはショウブロックで使用するファイルを開きます。",
-    "kana": "The Open file block opens a file for use with the Show block."
+    "kana": "おーぷんふぁいるぶろっくはしょうぶろっくでしようするふぁいるをひらきます。"
   },
   "stop media": {
     "kanji": "メデイアを停止",
@@ -3829,7 +3829,7 @@
   },
   "The Stop media block stops audio or video playback.": {
     "kanji": "ストップメディアブロックは音声または動画の再生を停止します。",
-    "kana": "The Stop media block stops audio or video playback."
+    "kana": "すとっぷめでぃあぶろっくはおんせいまたはどうがのさいせいをていしします。"
   },
   "hertz": {
     "kanji": "ヘルツ",
@@ -3841,7 +3841,7 @@
   },
   "duration (MS)": {
     "kanji": "継続時間（ミリ秒）",
-    "kana": "duration (MS)"
+    "kana": "けいぞくじかん（みりびょう）"
   },
   "note to frequency": {
     "kanji": "音符の高さを周波数表示へ",
@@ -3849,7 +3849,7 @@
   },
   "The To frequency block converts a pitch name and octave to Hertz.": {
     "kanji": "トゥーフリクエンシーブロックは音名とオクターブをヘルツに変換します。",
-    "kana": "The To frequency block converts a pitch name and octave to Hertz."
+    "kana": "とぅーふりくえんしーぶろっくはおんめいとおくたーぶをへるつにへんかんします。"
   },
   "name2": {
     "kanji": "名前",
@@ -3861,11 +3861,11 @@
   },
   "The Avatar block is used to change the appearance of the mouse.": {
     "kanji": "アバターブロックはマウスの外見を変更するために使われます。",
-    "kana": "The Avatar block is used to change the appearance of the mouse."
+    "kana": "あばたーぶろっくはまうすのがいけんをへんこうするためにつかわれます。"
   },
   "The Avatar block is used to change the appearance of the turtle.": {
     "kanji": "アバターブロックはタートルの外見を変更するために使われます。",
-    "kana": "The Avatar block is used to change the appearance of the turtle."
+    "kana": "あばたーぶろっくはたーとるのがいけんをへんこうするためにつかわれます。"
   },
   "size": {
     "kanji": "大きさ",
@@ -3877,7 +3877,7 @@
   },
   "The Show block is used to display text or images on the canvas.": {
     "kanji": "<h2>表示ブロック（スタンプ）</h2><br>スタンプは、実行するとネズミの位置に指定した文字またはがぞうを表示する。ネズミの体の下に表れるので、小さい文字やがぞうだとネズミが移動しないと見えない場合がある。",
-    "kana": "<h2>ひょうじブロック（スタンプ）</h2><br>スタンプは、 じっこうすると ネズミの いちに してい した もじ または がぞう を ひょうじする。 ネズミの からだの したに あらわれるので、 ちいさいもじ や がぞう だと ネズミがいどうしないと みえない ばあいがある。"
+    "kana": "The Show block is used to display text or images on the canvas."
   },
   "show1": {
     "kanji": "スタンプ",
@@ -3889,7 +3889,7 @@
   },
   "The Media block is used to import an image.": {
     "kanji": "<h2>がぞうブロック</h2><br>がぞうのブロック。ブロックのマークをおすと、コンピューター上からがぞうファイルを読み込むことができる。",
-    "kana": "<h2>がぞう ブロック</h2><br>がぞうのブロック。 ブロックの マークを おすと、 コンピューターじょうから がぞうファイルを よみこむことが できる。"
+    "kana": "The Media block is used to import an image."
   },
   "The Text block holds a text string.": {
     "kanji": "<h2>文字ブロック</h2><br>文字を指定するブロック。",
@@ -3897,7 +3897,7 @@
   },
   "The Int block returns an integer.": {
     "kanji": "Intブロックは整数を返します。",
-    "kana": "The Int block returns an integer."
+    "kana": "Intぶろっくはせいすうをかえします。"
   },
   "int": {
     "kanji": "整数に",
@@ -3905,7 +3905,7 @@
   },
   "The Mod block returns the remainder from a division.": {
     "kanji": "Modブロックは割り算の余りを返します。",
-    "kana": "The Mod block returns the remainder from a division."
+    "kana": "Modぶろっくはわりざんのあまりをかえします。"
   },
   "mod": {
     "kanji": "～で割った余り（mod）",
@@ -3913,11 +3913,11 @@
   },
   "The Power block calculates a power function.": {
     "kanji": "Powerブロックはべき乗を計算します。",
-    "kana": "The Power block calculates a power function."
+    "kana": "Powerぶろっくはべきじょうをけいさんします。"
   },
   "The Sqrt block returns the square root.": {
     "kanji": "Sqrtブロックは平方根を返します。",
-    "kana": "The Sqrt block returns the square root."
+    "kana": "Sqrtぶろっくはへいほうこんをかえします。"
   },
   "sqrt": {
     "kanji": "平方根",
@@ -3925,7 +3925,7 @@
   },
   "The Abs block returns the absolute value.": {
     "kanji": "Absブロックは絶対値を返します。",
-    "kana": "The Abs block returns the absolute value."
+    "kana": "Absぶろっくはぜったいちをかえします。"
   },
   "abs": {
     "kanji": "絶対値",
@@ -3941,7 +3941,7 @@
   },
   "The Divide block is used to divide.": {
     "kanji": "<h2>すうちブロック（計算）</h2><br>２つのすうちの割り算した計算結果を表すすうちブロック。上につないだすうちを、下につないだすうちで割る。",
-    "kana": "<h2>すうちブロック（けいさん）</h2><br>２つの すうちの わりざんした けいさんけっかを あらわす すうちブロック。 うえに つないだ すうちを、 したに つないだ すうちで わる。"
+    "kana": "The Divide block is used to divide."
   },
   "The Multiply block is used to multiply.": {
     "kanji": "<h2>すうちブロック（計算）</h2><br>２つのすうちを掛け合わせた計算結果を表すすうちブロック。",
@@ -3949,7 +3949,7 @@
   },
   "The Minus block is used to subtract.": {
     "kanji": "<h2>すうちブロック（計算）</h2><br>２つのすうちの引き算した計算結果を表すすうちブロック。上につないだすうちから、下につないだすうちを引く。",
-    "kana": "<h2>すうちブロック（けいさん）</h2><br>２つのすうちの ひきざんした けいさんけっかを あらわす すうちブロック。 うえに つないだ すうちから、 したに つないだ すうちを ひく。"
+    "kana": "The Minus block is used to subtract."
   },
   "The Plus block is used to add.": {
     "kanji": "<h2>すうちブロック（計算）</h2><br>２つのすうちを足し合わせた計算結果を表すすうちブロック。",
@@ -3957,7 +3957,7 @@
   },
   "The One-of block returns one of two choices.": {
     "kanji": "<h2>特殊ブロック（ランダム）</h2><br>つないだ２つのブロックのうち、1つだけをランダムに選ぶ。「すうち」「アクション名」など、さまざまなブロックをつなぐことができる。<br><br>★ランダムとは<br>サイコロの目のように、何が出るか分からないすうちのこと。ランダム（random）は日本語で「らんすう」「でたらめな」という意味。ランダムを使うと、実行のたびにえんそう順じょが変わる曲などを作ることができる。",
-    "kana": "<h2>特殊ブロック（ランダム）</h2><br>つないだ ２つの ブロックのうち、 1つだけを ランダムに えらぶ。 「すうち」「アクションめい」など、 さまざまな ブロックを つなぐことが できる。<br><br>★ランダムとは<br>サイコロの め のように、 なにが でるか わからない すうちのこと。ランダム（random）は にほんごで 「らんすう」「でたらめな」という いみ。 ランダムを つかうと、 じっこうの たびに えんそうじゅんじょが かわる きょくなどを つくることが できる。"
+    "kana": "The One-of block returns one of two choices."
   },
   "one of": {
     "kanji": "どちらかランダム",
@@ -3973,7 +3973,7 @@
   },
   "The Random block returns a random number.": {
     "kanji": "<h2>すうちブロック（ランダム）</h2><br>指定したさいしょうちからさいだいちまでのはんいで、ランダムなすうちになる。<br><br>★ランダムとは<br>サイコロの目のように、何が出るか分からないすうちのこと。ランダム（random）は日本語で「らんすう」「でたらめな」という意味。ランダムを使うと、実行のたびにえんそう順じょが変わる曲などを作ることができる。",
-    "kana": "<h2>すうちブロック（ランダム）</h2><br>してい した さいしょうち から さいだいち までの はんいで、 ランダムな すうちに なる。<br><br>★ランダムとは<br>サイコロの め のように、 なにが でるか わからない すうちのこと。ランダム（random）は にほんごで 「らんすう」「でたらめな」という いみ。 ランダムを つかうと、 じっこうの たびに えんそうじゅんじょが かわる きょくなどを つくることが できる。"
+    "kana": "The Random block returns a random number."
   },
   "random": {
     "kanji": "ランダム",
@@ -4041,7 +4041,7 @@
   },
   "The Grey block returns the current pen grey value.": {
     "kanji": "グレーブロックは現在のペンのグレー値を返します。",
-    "kana": "The Grey block returns the current pen grey value."
+    "kana": "ぐれーぶろっくはげんざいのぺんのぐれーあたいをかえします。"
   },
   "shade": {
     "kanji": "シェード",
@@ -4049,7 +4049,7 @@
   },
   "The Shade block returns the current pen shade value.": {
     "kanji": "シェードブロックは現在のペンのシェード値を返します。",
-    "kana": "The Shade block returns the current pen shade value."
+    "kana": "しぇーどぶろっくはげんざいのぺんのしぇーどあたいをかえします。"
   },
   "color": {
     "kanji": "いろ",
@@ -4065,7 +4065,7 @@
   },
   "The Pen size block returns the current pen size value.": {
     "kanji": "ペンサイズブロックは現在のペンのサイズ値を返します。",
-    "kana": "The Pen size block returns the current pen size value."
+    "kana": "ぺんさいずぶろっくはげんざいのぺんのさいずあたいをかえします。"
   },
   "set font": {
     "kanji": "フォントの設定",
@@ -4073,7 +4073,7 @@
   },
   "The Set font block sets the font used by the Show block.": {
     "kanji": "フォント設定ブロックはショウブロックで使われるフォントを設定します。",
-    "kana": "The Set font block sets the font used by the Show block."
+    "kana": "ふぉんとせっていぶろっくはしょうぶろっくでつかわれるふぉんとをせっていします。"
   },
   "The Background block sets the window background color.": {
     "kanji": "背景ブロックは、カンバスの色をせっていする。",
@@ -4081,7 +4081,7 @@
   },
   "The Hollow line block creates a line with a hollow center.": {
     "kanji": "ホローラインブロックは中空の線を作成します。",
-    "kana": "The Hollow line block creates a line with a hollow center."
+    "kana": "ほろーらいんぶろっくはちゅうくうのせんをさくせいします。"
   },
   "hollow line": {
     "kanji": "（中空の）線",
@@ -4125,7 +4125,7 @@
   },
   "The Set translucency block changes the opacity of the pen.": {
     "kanji": "<h2>ペンブロック</h2><br>ネズミがえがく線がどのくらいすきとおるかをせっていする。すうちが大きいほど、線がすきとおる。",
-    "kana": "<h2>ペンブロック</h2><br>ネズミが えがく せんが どのくらい すきとおるかを せっていする。 すうちが おおきい ほど、 せんが すきとおる。"
+    "kana": "The Set translucency block changes the opacity of the pen."
   },
   "set hue": {
     "kanji": "色相を設定",
@@ -4133,7 +4133,7 @@
   },
   "The Set hue block changes the color of the pen.": {
     "kanji": "色相設定ブロックはペンの色を変更します。",
-    "kana": "The Set hue block changes the color of the pen."
+    "kana": "しきそうせっていぶろっくはぺんのいろをへんこうします。"
   },
   "set shade": {
     "kanji": "色のこさをせってい",
@@ -4149,7 +4149,7 @@
   },
   "The Set grey block changes the vividness of the pen color.": {
     "kanji": "グレー設定ブロックはペンの色の鮮やかさを変更します。",
-    "kana": "The Set grey block changes the vividness of the pen color."
+    "kana": "ぐれーせっていぶろっくはぺんのいろのせんやかさをへんこうします。"
   },
   "set color": {
     "kanji": "色をせってい",
@@ -4157,7 +4157,7 @@
   },
   "The Set-color block changes the pen color.": {
     "kanji": "<h2>ペンブロック</h2><br>ネズミがえがく線の色をせっていする。色は画面上で選ぶほか、それぞれすうちで決めることもできる。色は、0以上で、100より小さいあたいになる。",
-    "kana": "<h2>ペンブロック</h2><br>ネズミが えがく せんのいろを かえる。 いろは がめんじょうで えらぶ ほか、 それぞれ すうちで きめることも できる。 いろは、 0いじょうで、 100より ちいさい あたいになる。"
+    "kana": "The Set-color block changes the pen color."
   },
   "rhythm1": {
     "kanji": "連符（かけ算）",
@@ -4173,7 +4173,7 @@
   },
   "The Rhythm block is used to generate rhythm patterns.": {
     "kanji": "<h2>連符（れんぷ）ブロック（かけ算）</h2><br>まとまったいくつかの音符（おんぷ）。一定の長さの音を３つや５つなどくり返して使う。３連符（れんぷ）や５連符（れんぷ）など、２の倍数ではない音符（おんぷ）の数でグループを作りやすくなる。",
-    "kana": "<h2>れんぷブロック（かけざん）</h2><br>まとまった いくつかの おんぷ。 いっていの ながさの おとを  ３つや ５つなど くりかえして つかう。３れんぷ や ５れんぷ など、 ２のばいすう ではない おんぷの かずで グループを つくりやすくなる。"
+    "kana": "The Rhythm block is used to generate rhythm patterns."
   },
   "1/64 note": {
     "kanji": "６４分音符",
@@ -4208,7 +4208,7 @@
     "kana": "～れんぷ（タプル）"
   },
   "The Tuplet block is used to generate a group of notes played in a condensed amount of time.": {
-    "kanji": "連符ブロックは、凝縮された時間で演奏される音符のグループを生成するために使用されます。",
+    "kanji": "「～連符」連符ブロックは、凝縮された時間で演奏される音符のグループを生成するために使用されます。",
     "kana": "The Tuplet block is used to generate a group of notes played in a condensed amount of time."
   },
   "septuplet": {
@@ -4229,18 +4229,18 @@
   },
   "Tuplets are a collection of notes that get scaled to a specific duration.": {
     "kanji": "<h2>連符（れんぷ）ブロック（わり算）</h2><br>まとまったいくつかの音符（おんぷ）。一定の長さの音を３つや５つに等分して使う。",
-    "kana": "<h2>れんぷブロック（わりざん）</h2><br>まとまった いくつかの おんぷ。いっていの ながさの おとを  ３つや ５つに とうぶんして つかう。３れんぷ や ５れんぷ など、 ２のばいすう ではない おんぷの かずで グループを つくりやすくなる。"
+    "kana": "Tuplets are a collection of notes that get scaled to a specific duration."
   },
   "Using tuplets makes it easy to create groups of notes that are not based on a power of 2.": {
     "kanji": "連符を使用すると、2 の累乗に基づいていない音符のグループを簡単に作成できます。",
     "kana": "Using tuplets makes it easy to create groups of notes that are not based on a power of 2."
   },
   "The Note value block is the value of the duration of the note currently being played.": {
-    "kanji": "音価ブロックは、現在演奏されている音符の長さの値です。",
+    "kanji": "「音の長さ」ブロックは、現在演奏されている音符の長さの値です。",
     "kana": "The Note value block is the value of the duration of the note currently being played."
   },
   "The Milliseconds block is similar to a Note block except that it uses time (in MS) to specify the note duration.": {
-    "kanji": "Milliseconds ブロックは、音符の長さを指定するために時間 (MS 単位) を使用することを除いて、Note ブロックに似ています。",
+    "kanji": "「Milliseconds」ブロックは、音符の長さを指定するために時間 (MS 単位) を使用することを除いて、「音符」ブロックに似ています。",
     "kana": "The Milliseconds block is similar to a Note block except that it uses time (in MS) to specify the note duration."
   },
   "Note value must be greater than 0.": {
@@ -4252,7 +4252,7 @@
     "kana": "スイング"
   },
   "The Swing block works on pairs of notes (specified by note value), adding some duration (specified by swing value) to the first note and taking the same amount from the second note.": {
-    "kanji": "Swing ブロックは、音符のペア (音符の値で指定) に作用し、最初の音符に一定の長さ (スイング値で指定) を追加し、2 番目の音符から同じ量を取得します。",
+    "kanji": "「スイング」ブロックは、音符のペア (音符の値で指定) に作用し、最初の音符に一定の長さ (スイング値で指定) を追加し、2 番目の音符から同じ量を取得します。",
     "kana": "The Swing block works on pairs of notes (specified by note value), adding some duration (specified by swing value) to the first note and taking the same amount from the second note."
   },
   "swing value": {
@@ -4261,14 +4261,14 @@
   },
   "The Skip notes block will cause notes to be skipped.": {
     "kanji": "Skip notesブロックは音符をスキップさせます。",
-    "kana": "The Skip notes block will cause notes to be skipped."
+    "kana": "Skip notesぶろっくはおんぷをすきっぷさせます。"
   },
   "skip notes": {
     "kanji": "音符の省略",
     "kana": "おんぷの省略"
   },
   "The Multiply note value block changes the duration of notes by changing their note values.": {
-    "kanji": "[音価乗算] ブロックは、音価を変更することで音符の長さを変更します。",
+    "kanji": "[音価を～倍にするファクター] ブロックは、音価を変更することで音符の長さを変更します。",
     "kana": "The Multiply note value block changes the duration of notes by changing their note values."
   },
   "multiply note value": {
@@ -4277,7 +4277,7 @@
   },
   "The Tie block works on pairs of notes, combining them into one note.": {
     "kanji": "<h2>タイブロック</h2><br>２つの音をつなげて１つの音にする。「音の高さブロック」を入れて使う。同じ高さの音だけ、つなぐことができる。",
-    "kana": "<h2>タイブロック</h2><br>２つの おとを つなげて １つの おとに する。 「おとのたかさブロック」 を いれて つかう。 おなじ たかさの おとだけ、 つなぐことが できる。"
+    "kana": "The Tie block works on pairs of notes, combining them into one note."
   },
   "tie": {
     "kanji": "タイ",
@@ -4293,14 +4293,14 @@
   },
   "The Dot block extends the duration of a note by 50%.": {
     "kanji": "Dotブロックは音符の長さを50%延長します。",
-    "kana": "The Dot block extends the duration of a note by 50%."
+    "kana": "Dotぶろっくはおんぷのながさを50%えんちょうします。"
   },
   "Eg a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat.": {
     "kanji": "例：付点四分音符は1拍の3/8（1/4 + 1/8）演奏されます。",
-    "kana": "Eg a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat."
+    "kana": "れい：ふてんよんぶんおんぷは1はくの3/8（1/4 + 1/8）えんそうされます。"
   },
   "A rest of the specified note value duration can be constructed using a Silence block.": {
-    "kanji": "指定した音符の長さの残りの部分は、Silence ブロックを使用して構築できます。",
+    "kanji": "指定した音符の長さの休符は、「休符」ブロックを使用して構築できます。",
     "kana": "A rest of the specified note value duration can be constructed using a Silence block."
   },
   "note value drum": {
@@ -4313,7 +4313,7 @@
   },
   "The Note block is a container for one or more Pitch blocks.": {
     "kanji": "<h2>音符（おんぷ）ブロック</h2><br>音の長さと高さをせっていする。長さを決め、「音の高さブロック」を入れて使う。",
-    "kana": "<h2>おんぷブロック</h2><br>おとの ながさと たかさを せってい する。ながさを きめ、「おとのたかさブロック」 を いれて つかう。"
+    "kana": "The Note block is a container for one or more Pitch blocks."
   },
   "The Note block specifies the duration (note value) of its contents.": {
     "kanji": "<br><br>「音の高さブロック」を２つ以上入れると、音を同時に出すことができる。",
@@ -4373,7 +4373,7 @@
   },
   "The AM synth block is an amplitude modulator used to define a timbre.": {
     "kanji": "AMシンセブロックは音色を定義するための振幅変調装置です。",
-    "kana": "The AM synth block is an amplitude modulator used to define a timbre."
+    "kana": "AMしんせぶろっくはねいろをていぎするためのしんぷくへんちょうそうちです。"
   },
   "FM synth": {
     "kanji": "FM シンセ",
@@ -4381,7 +4381,7 @@
   },
   "The FM synth block is a frequency modulator used to define a timbre.": {
     "kanji": "FMシンセブロックは音色を定義するための周波数変調装置です。",
-    "kana": "The FM synth block is a frequency modulator used to define a timbre."
+    "kana": "FMしんせぶろっくはねいろをていぎするためのしゅうはすうへんちょうそうちです。"
   },
   "partial": {
     "kanji": "倍音",
@@ -4400,7 +4400,7 @@
     "kana": "ばいおん ブロック が「ばいおん ウェート ブロック」の なかに ある ひつようが あります。"
   },
   "The Weighted partials block is used to specify the partials associated with a timbre.": {
-    "kanji": "Weighted Partials ブロックは、ティンバーに関連付けられた部分音を指定するために使用されます。",
+    "kanji": "「ウェート倍音」ブロックは、ティンバーに関連付けられた部分音を指定するために使用されます。",
     "kana": "The Weighted partials block is used to specify the partials associated with a timbre."
   },
   "weighted partials": {
@@ -4409,7 +4409,7 @@
   },
   "The Harmonic block will add harmonics to the contained notes.": {
     "kanji": "Harmonicブロックは含まれる音符に倍音を追加します。",
-    "kana": "The Harmonic block will add harmonics to the contained notes."
+    "kana": "Harmonicぶろっくはふくまれるおんぷにばいおんをついかします。"
   },
   "harmonic": {
     "kanji": "ハーモニックス",
@@ -4417,7 +4417,7 @@
   },
   "The Distortion block adds distortion to the pitch.": {
     "kanji": "Distortionブロックは音程に歪みを加えます。",
-    "kana": "The Distortion block adds distortion to the pitch."
+    "kana": "Distortionぶろっくはおんていにひずみをくわえます。"
   },
   "distortion": {
     "kanji": "ディストーション",
@@ -4428,8 +4428,8 @@
     "kana": "<h2>トレモロ ブロック</h2><br>ゆれるような おとの ひびきに する。 はやさ で、 ゆれの はやさを ちょうせつ できる。"
   },
   "Tremolo makes the sound pulse louder and quieter.": {
-    "kanji": "トレモロを使用すると、音のパルスが大きくなったり、小さくなったりします。",
-    "kana": "Tremolo makes the sound pulse louder and quieter."
+    "kanji": "トレモロを使用すると、音がパルスのように大きくなったり、小さくなったりします。",
+    "kana": "とれもろをしようすると、おとがぱるすのようにおおきくなったり、ちーさくなったりします。"
   },
   "The rate (first argument) controls how fast the sound pulses (cycles per second).": {
     "kanji": "レート (最初の引数) は、サウンドのパルス速度 (1 秒あたりのサイクル数) を制御します。",
@@ -4453,7 +4453,7 @@
   },
   "The Phaser block adds a sweeping sound.": {
     "kanji": "Phaserブロックはスウィープ音を加えます。",
-    "kana": "The Phaser block adds a sweeping sound."
+    "kana": "Phaserぶろっくはすうぃーぷおとをくわえます。"
   },
   "phaser": {
     "kanji": "フェーザー",
@@ -4469,18 +4469,18 @@
   },
   "The Chorus block adds a chorus effect.": {
     "kanji": "<h2>コーラスブロック</h2><br>広がりのある音のひびきにする。はやさとずれで、ひびきが残る感じを調節できる。<br>",
-    "kana": "<h2>コーラス ブロック</h2><br>ひろがりの ある おとの ひびきに する。 はやさ と ずれ で、 ひびきが のこる かんじを ちょうせつ できる。"
+    "kana": "The Chorus block adds a chorus effect."
   },
   "The rate (first argument) controls the speed of the chorus modulation (cycles per second).": {
-    "kanji": "rate (最初の引数) は、コーラス変調の速度 (1 秒あたりのサイクル数) を制御します。",
+    "kanji": "レート (最初の引数) は、コーラス変調の速度 (1 秒あたりのサイクル数) を制御します。",
     "kana": "The rate (first argument) controls the speed of the chorus modulation (cycles per second)."
   },
   "The delay (second argument) sets the time delay between chorus voices (milliseconds).": {
-    "kanji": "遅延 (第 2 引数) は、コーラスボイス間の遅延時間 (ミリ秒) を設定します。",
+    "kanji": "ディレイ(第 2 引数) は、コーラスボイス間の遅延時間 (ミリ秒) を設定します。",
     "kana": "The delay (second argument) sets the time delay between chorus voices (milliseconds)."
   },
   "The depth (third argument) controls the amount of chorus effect (0-100%).": {
-    "kanji": "深さ (3 番目の引数) は、コーラス エフェクトの量 (0 ～ 100%) を制御します。",
+    "kanji": "深さ (3 番目の引数) は、コーラス・エフェクターの量 (0 ～ 100%) を制御します。",
     "kana": "The depth (third argument) controls the amount of chorus effect (0-100%)."
   },
   "chorus": {
@@ -4496,7 +4496,7 @@
     "kana": "<h2>ビブラートブロック</h2><br>おとの たかさに こきざみな へんかを つける。"
   },
   "The intensity (first argument) controls how much the pitch varies (semitones).": {
-    "kanji": "強度 (最初の引数) は、ピッチの変化量 (半音) を制御します。",
+    "kanji": "大きさ (最初の引数) は、ピッチの変化量 (半音) を制御します。",
     "kana": "The intensity (first argument) controls how much the pitch varies (semitones)."
   },
   "The rate (second argument) controls the speed of the pitch variation (cycles per second).": {
@@ -4524,7 +4524,7 @@
     "kana": "ねいろひょうじゅんを せってい"
   },
   "The set default instrument block changes the default instrument from electronic synth to the instrument of your choice.": {
-    "kanji": "デフォルトのインストゥルメントを設定すると、デフォルトのインストゥルメントが電子シンセから選択したインストゥルメントに変更されます。",
+    "kanji": "音色標準を設定すると、デフォルトの音色が電子シンセから選択した音色に変更されます。",
     "kana": "The set default instrument block changes the default instrument from electronic synth to the instrument of your choice."
   },
   "set instrument": {
@@ -4532,7 +4532,7 @@
     "kana": "ねいろを せってい"
   },
   "The Set instrument block selects a voice for the synthesizer, eg guitar piano violin or cello.": {
-    "kanji": "楽器の設定ブロックは、シンセサイザーの音声 (ギター、ピアノ、バイオリン、チェロなど) を選択します。",
+    "kanji": "「音色をせってい」ブロックは、シンセサイザーの音声 (ギター、ピアノ、バイオリン、チェロなど) を選択します。",
     "kana": "The Set instrument block selects a voice for the synthesizer, eg guitar piano violin or cello."
   },
   "The Set instrument block selects a voice for the synthesizer,": {
@@ -4565,7 +4565,7 @@
   },
   "The Master volume block returns the master volume.": {
     "kanji": "Master volumeブロックはマスターボリュームを返します。",
-    "kana": "The Master volume block returns the master volume."
+    "kana": "Master volumeぶろっくはますたーぼりゅーむをかえします。"
   },
   "set synth volume": {
     "kanji": "楽器の音量をせってい",
@@ -4588,7 +4588,7 @@
     "kana": "ドラムの おんりょうを せってい"
   },
   "The Set synth volume block will change the volume of a particular synth, eg guitar violin snare drum etc.": {
-    "kanji": "Set synth volume ブロックは、ギター、バイオリン、スネアドラムなどの特定のシンセサイザーの音量を変更します。",
+    "kanji": "「楽器の音量をせってい」ブロックは、ギター、バイオリン、スネアドラムなどの特定のシンセサイザーの音量を変更します。",
     "kana": "The Set synth volume block will change the volume of a particular synth, eg guitar violin snare drum etc."
   },
   "The default volume is 50.": {
@@ -4605,7 +4605,7 @@
   },
   "The Set Panning block sets the panning for all synthesizers.": {
     "kanji": "Set Panningブロックはすべてのシンセのパンを設定します。",
-    "kana": "The Set Panning block sets the panning for all synthesizers."
+    "kana": "Set Panningぶろっくはすべてのしんせのぱんをせっていします。"
   },
   "Warning: Sound is coming out from only the left or right side.": {
     "kanji": "ワーニング：音は右か左だけのスピーカーから出ている",
@@ -4628,11 +4628,11 @@
     "kana": "あいたいおんりょうを せってい"
   },
   "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played.": {
-    "kanji": "デクレッシェンド ブロックは、再生されるノートごとに、含まれるノートの音量を指定された量だけ減少させます。",
+    "kanji": "「デクレッシェンド」ブロックは、再生される音符ごとに、含まれる音符の音量を指定された量だけ減少させます。",
     "kana": "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
   },
   "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume.": {
-    "kanji": "たとえば、値が 5 の Decrescendo ブロックに 7 つのノートが連続して含まれている場合、最後のノートは開始音量より 35% 低くなります。",
+    "kanji": "たとえば、値が「5」の「デクレシェンド」ブロックに 7つの音符が連続して含まれている場合、最後の音符は開始音量より 35% 低くなります。",
     "kana": "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
   },
   "decrescendo": {
@@ -4640,11 +4640,11 @@
     "kana": "デクレシェンド"
   },
   "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played.": {
-    "kanji": "Crescendo ブロックは、再生されるノートごとに、含まれるノートの音量を指定された量だけ増加させます。",
+    "kanji": "「クレシェンド」ブロックは、再生される音符ごとに、含まれる音符の音量を指定された量だけ増加させます。",
     "kana": "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
   },
   "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume.": {
-    "kanji": "たとえば、値が 5 の Crescendo ブロックに 7 つのノートが連続して含まれている場合、最後のノートは開始音量より 35% 大きくなります。",
+    "kanji": "たとえば、値が「5」の「クレシェンド」ブロックに 7つの音符が連続して含まれている場合、最後の音符は開始音量より 35% 大きくなります。",
     "kana": "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
   },
   "crescendo": {
@@ -4660,12 +4660,12 @@
     "kana": "はくを ～ばいにする ファクター"
   },
   "The Beat factor block returns the ratio of the note value to the meter note value.": {
-    "kanji": "Beat Factor ブロックは、拍子音符値に対する音符値の比率を返します。",
+    "kanji": "「拍を～倍にするファクター」ブロックは、拍子音符値に対する音符値の比率を返します。",
     "kana": "The Beat factor block returns the ratio of the note value to the meter note value."
   },
   "The Beats per minute block returns the current beats per minute.": {
-    "kanji": "Beats per minuteブロックは現在の1分あたりのビート数を返します。",
-    "kana": "The Beats per minute block returns the current beats per minute."
+    "kanji": "「スピードを決める」ブロックは現在の1分あたりのビート数を返します。",
+    "kana": "「すぴーどをきめる」ぶろっくはげんざいの1ふんあたりのびーとかずをかえします。"
   },
   "beats per minute2": {
     "kanji": "１分当たりの拍の数",
@@ -4677,15 +4677,15 @@
   },
   "BPM must be a number, defaulting to 60.": {
     "kanji": "BPM は数値である必要があり、デフォルトは 60 です。",
-    "kana": "BPM must be a number, defaulting to 60."
+    "kana": "BPM はすうちであるひつようがあり、でふぉるとは 60 です。"
   },
   "BPM must be at least 30, clamping to 30.": {
-    "kanji": "BPM は少なくとも 30 である必要があり、30 にクランプされます。",
-    "kana": "BPM must be at least 30, clamping to 30."
+    "kanji": "BPM は少なくとも 30 である必要があり、30 に固定されます。",
+    "kana": "BPM はすくなくとも 30 であるひつようがあり、30 にこていされます。"
   },
   "BPM must be at most 1000, clamping to 1000.": {
     "kanji": "BPM は最大 1000 にする必要があり、1000 に固定されます。",
-    "kana": "BPM must be at most 1000, clamping to 1000."
+    "kana": "BPM はさいだい 1000 にするひつようがあり、1000 にこていされます。"
   },
   "measure count": {
     "kanji": "小節の数",
@@ -4693,7 +4693,7 @@
   },
   "The Measure count block returns the current measure.": {
     "kanji": "Measure countブロックは現在の小節数を返します。",
-    "kana": "The Measure count block returns the current measure."
+    "kana": "Measure countぶろっくはげんざいのしょうせつかずをかえします。"
   },
   "beat count": {
     "kanji": "拍の位置",
@@ -4784,7 +4784,7 @@
     "kana": "ぜんたいの スピードを きめる"
   },
   "The Master beats per minute block sets the number of 1/4 notes per minute for every voice.": {
-    "kanji": "マスター ビート/分ブロックは、各ボイスの 1 分あたりの 1/4 音符の数を設定します。",
+    "kanji": "「全体のスピードを決める」ブロックは、各ボイスの 1 分あたりの 1/4 音符の数を設定します。",
     "kana": "The Master beats per minute block sets the number of 1/4 notes per minute for every voice."
   },
   "bpm": {
@@ -4805,18 +4805,18 @@
   },
   "The Beats per minute block sets the number of 1/4 notes per minute.": {
     "kanji": "<h2>スピードを決めるブロック</h2><br>１分あたりの拍（はく）の数をせっていすることで、曲のスピードを決める。ひょうじゅんは４分音符（おんぷ）９０こ。<br><br>★拍（はく）とは<br>くり返されるリズムのこと。",
-    "kana": "<h2>スピードを きめるブロック</h2><br>１ぷんあたりの はくの かずを せってい することで、 きょくの スピードを きめる。 ひょうじゅんは ４ぶおんぷ ９０こ。<br><br>★はくとは<br>くりかえされる リズムのこと。"
+    "kana": "The Beats per minute block sets the number of 1/4 notes per minute."
   },
   "pickup": {
     "kanji": "ピックアップ",
     "kana": "ピックアップ"
   },
   "The Pickup block is used to accommodate any notes that come in before the beat.": {
-    "kanji": "ピックアップ ブロックは、ビートの前に入力されるノートを収容するために使用されます。",
+    "kanji": "「ピックアップ」ブロックは、ビートの前に入力されるノートを収容するために使用されます。",
     "kana": "The Pickup block is used to accommodate any notes that come in before the beat."
   },
   "The beat of the music is determined by the Meter block (by default, 4 1/4 notes per measure).": {
-    "kanji": "音楽のビートは Meter ブロックによって決定されます (デフォルトでは、1 小節あたり 4 1/4 音符)。",
+    "kanji": "音楽のビートは「拍子」ブロックによって決定されます (デフォルトでは、1 小節あたり ４つの1/4音符)。",
     "kana": "The beat of the music is determined by the Meter block (by default, 4 1/4 notes per measure)."
   },
   "number of beats": {
@@ -4828,12 +4828,12 @@
     "kana": "おんりつを せってい"
   },
   "The Set temperament block is used to choose the tuning system used by Music Blocks.": {
-    "kanji": "音律設定ブロックは、ミュージック ブロックで使用されるチューニング システムを選択するために使用されます。",
+    "kanji": "「音律をせってい」ブロックは、ミュージック・ブロックスで使用されるチューニング システムを選択するために使用されます。",
     "kana": "The Set temperament block is used to choose the tuning system used by Music Blocks."
   },
   "The Temperament name block is used to select a tuning method.": {
     "kanji": "<h2>音律（おんりつ）ブロック</h2><br>調律（ちょうりつ）のしかたをせっていする。<br>★音律（おんりつ）とは<br>音程（おんてい）（音どうしのへだたり）の決め方。同じ音階でも、音律（おんりつ）によって音の高さが変わる。<br>★調律（ちょうりつ）とは<br>楽器の音の高さを、音律（おんりつ）にしたがって整えること。",
-    "kana": "<hr>おんりつブロック</hr><br>ちょうりつの しかたを せっていする。<br>★おんりつとは<br>おんてい （おとどうしの へだたり） の きめかた。 おなじ おんかい でも、 おんりつに よって おとの たかさが かわる。<br>★ちょうりつとは<br>がっきの おとのたかさを、 おんりつに したがって ととのえること。"
+    "kana": "The Temperament name block is used to select a tuning method."
   },
   "doubly": {
     "kanji": "重",
@@ -4841,14 +4841,14 @@
   },
   "The Doubly block will double the size of an interval.": {
     "kanji": "Doublyブロックはインターバルのサイズを2倍にします。",
-    "kana": "The Doubly block will double the size of an interval."
+    "kana": "Doublyぶろっくはいんたーばるのさいずを2ばいにします。"
   },
   "interval number": {
     "kanji": "音程を数で表示",
     "kana": "おんていを かずで ひょうじ"
   },
   "The Interval number block returns the number of scalar steps in the current interval.": {
-    "kanji": "間隔番号ブロックは、現在の間隔のスカラー ステップ数を返します。",
+    "kanji": "「音程を数で表示」ブロックは、現在の音階の数値を返します。",
     "kana": "The Interval number block returns the number of scalar steps in the current interval."
   },
   "current interval": {
@@ -4856,11 +4856,11 @@
     "kana": "げんざいの おんかい"
   },
   "The Current interval block returns the name of scalar steps in the current interval.": {
-    "kanji": "現在の間隔ブロックは、現在の間隔内のスカラー ステップの名前を返します。",
+    "kanji": "「現在の音階」ブロックは、現在の音階の名前を返します。",
     "kana": "The Current interval block returns the name of scalar steps in the current interval."
   },
   "The Semi-tone interval block measures the distance between two notes in semi-tones.": {
-    "kanji": "半音間隔ブロックは、2 つの音符間の距離を半音単位で測定します。",
+    "kanji": "「半音階的音程」ブロックは、2つの音符間の距離を半音単位で測定します。",
     "kana": "The Semi-tone interval block measures the distance between two notes in semi-tones."
   },
   "semi-tone interval measure": {
@@ -4872,7 +4872,7 @@
     "kana": "音程を計る際は、２つの音符を使うひつようがあります。"
   },
   "The Scalar interval block measures the distance between two notes in the current key and mode.": {
-    "kanji": "Scalar intervalブロックは現在の調とモードで2つの音の距離を測定します。",
+    "kanji": "「音階的な音程」ブロックは現在の調とモードで2つの音の距離を測定します。",
     "kana": "The Scalar interval block measures the distance between two notes in the current key and mode."
   },
   "scalar interval measure": {
@@ -4880,11 +4880,11 @@
     "kana": "全おんかい的音程で計る"
   },
   "The Semi-tone interval block calculates a relative interval based on half steps.": {
-    "kanji": "半音間隔ブロックは、半音に基づいて相対間隔を計算します。",
+    "kanji": "「半音階的音程」ブロックは、半音に基づいて相対間隔を計算します。",
     "kana": "The Semi-tone interval block calculates a relative interval based on half steps."
   },
   "In the figure, we add sol# to sol.": {
-    "kanji": "例の画像には<em>ソル</em>が<em>ソル#</em>になります。",
+    "kanji": "例の画像には<em>ソ</em>が<em>ソ#</em>になります。",
     "kana": "例の画像には<em>ソル</em>が<em>ソル#</em>になります。"
   },
   "semi-tone interval": {
@@ -4892,7 +4892,7 @@
     "kana": "半おんかい的音程"
   },
   "The Arpeggio block will run each note block multiple times, adding a transposition based on the specified chord.": {
-    "kanji": "アルペジオ ブロックは各ノート ブロックを複数回実行し、指定されたコードに基づいて移調を追加します。",
+    "kanji": "「アルペジオ」ブロックは各「音符」ブロックを複数回実行し、指定されたコードに基づいて移調を追加します。",
     "kana": "The Arpeggio block will run each note block multiple times, adding a transposition based on the specified chord."
   },
   "The output of the example is: do, mi, sol, sol, ti, mi": {
@@ -4905,11 +4905,11 @@
   },
   "The Chord block calculates common chords.": {
     "kanji": "Chordブロックは一般的なコードを計算します。",
-    "kana": "The Chord block calculates common chords."
+    "kana": "Chordぶろっくはいっぱんてきなこーどをけいさんします。"
   },
   "In the figure, we generate a C-major chord.": {
     "kanji": "図では、Cメジャーコードを生成します。",
-    "kana": "In the figure, we generate a C-major chord."
+    "kana": "ずでは、Cめじゃーこーどをせいせいします。"
   },
   "chord": {
     "kanji": "の和音",
@@ -4924,15 +4924,15 @@
     "kana": "ひで おんてい"
   },
   "The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode.": {
-    "kanji": "スカラー インターバル ブロックは、現在のモードに基づいて相対的なインターバルを計算し、モード外のノートをすべてスキップします。",
+    "kanji": "「音階的な音程」ブロックは、現在のモードに基づいて相対的な音程を計算し、モード外のピッチをすべてスキップします。",
     "kana": "The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode."
   },
   "In the figure, we add la to sol.": {
     "kanji": "<br><br>上の図では、ソの「音符（おんぷ）ブロック」をきじゅんにして、「音階の上下ブロック」のすうちを２にせっていしているので、ソと、ソから２音あがったシの音が同時にえんそうされる。<br><br>★音階とは<br>順番に並んだ音のまとまり。たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。",
-    "kana": "<br><br>うえのず では、 ソの 「おんぷブロック」 を きじゅんに して、 「おんかいの じょうげブロック」の すうちを ２に せっていしている ので、 ソと、 ソから ２おん あがった シの おとが どうじに えんそうされる。<br><br>★おんかいとは<br>じゅんばんに ならんだ おとの まとまり。たとえば、「ド」 を はじまりのおと に したときの 「ドレミファソラシド」、 「ソ」 を はじまりのおと に したときの 「ソラシドレミ（♯ファ）ソ」 の こと。"
+    "kana": "In the figure, we add la to sol."
   },
   "The Define mode block allows you to define a custom mode by specifying pitch numbers.": {
-    "kanji": "モード定義ブロックを使用すると、ピッチ番号を指定してカスタム モードを定義できます。",
+    "kanji": "「モードを定義する」ブロックを使用すると、ピッチ番号を指定してカスタム モードを定義できます。",
     "kana": "The Define mode block allows you to define a custom mode by specifying pitch numbers."
   },
   "define mode": {
@@ -4944,7 +4944,7 @@
     "kana": "いどう ド"
   },
   "When Movable do is false, the solfege note names are always tied to specific pitches, eg \\\"do\\\" is always \\\"C-natural\\\" when Movable do is true, the solfege note names are assigned to scale degrees \\\"do\\\" is always the first degree of the major scale.": {
-    "kanji": "Movable do が false の場合、ソルフェージュ音名は常に特定のピッチに関連付けられます。たとえば、Movable do が true の場合、「do」は常に「C-natural」となり、ソルフェージュ音名はスケール度に割り当てられます。「do」は常に長音階の 1 度です。",
+    "kanji": "「移動ド」が「偽」の場合、ソルフェージュ音名は常に特定のピッチに関連付けられます。たとえば、「移動ド」が「真」の場合、「ド」は常に「ド・メジャー」となり、ソルフェージュ音名はスケール度に割り当てられます。「ド」は常に長音階の 1 度です。",
     "kana": "When Movable do is false, the solfege note names are always tied to specific pitches, eg \\\"do\\\" is always \\\"C-natural\\\" when Movable do is true, the solfege note names are assigned to scale degrees \\\"do\\\" is always the first degree of the major scale."
   },
   "mode length": {
@@ -4957,7 +4957,7 @@
   },
   "Most Western scales have 7 notes.": {
     "kanji": "西洋のほとんどの音階は、7つの音をもつ。<br><br>★音階とは<br>順番に並んだ音のまとまり。たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。",
-    "kana": "<br>せいようの ほとんどの おんかいは、 7つの おとを もつ。<br><br>★おんかいとは<br>じゅんばんに ならんだ おとの まとまり。<br><br>たとえば、「ド」 を はじまりのおと に したときの 「ドレミファソラシド」、 「ソ」 を はじまりのおと に したときの 「ソラシドレミ（♯ファ）ソ」 の こと。"
+    "kana": "Most Western scales have 7 notes."
   },
   "current mode": {
     "kanji": "現代の音階",
@@ -4973,18 +4973,18 @@
   },
   "The Set key block is used to set the key and mode,": {
     "kanji": "<h2>調をせっていブロック</h2><br>調の部分に音の高さ、音階の部分に音階の種類を選び、調をせっていする。<br><br>★調とは<br>中心的な役わりをはたす音と、音階の種類によって決まる、曲の感じ。中心的な役わりをはたす音だけを指すこともある。<br>★音階とは<br>順番に並んだ音のまとまり。",
-    "kana": "<h2>ちょうをせっていブロック</h2><br>ちょうの ぶぶんに おとのたかさ、おんかいの ぶぶんに おんかいのしゅるいを えらび、ちょうを せっていする。<br><br>★ちょうとは<br>ちゅうしんてきな やくわりを はたすおとと、 おんかいの しゅるいによって きまる、 きょくの かんじ。 ちゅうしんてきな やくわりを はたすおと だけを  さすこともある。<br>★おんかいとは<br>じゅんばんに ならんだ おとの まとまり。"
+    "kana": "The Set key block is used to set the key and mode,"
   },
   "The Set key block is used to set the key and mode, eg C Major": {
-    "kanji": "Set key ブロックは、キーとモード (C Major など) を設定するために使用されます。",
-    "kana": "The Set key block is used to set the key and mode, eg C Major"
+    "kanji": "「調をせってい」ブロックは、調と音階(どメジャーなど) を設定するために使用されます。",
+    "kana": "「ちょうをせってい」ぶろっくは、ちょうとおんかい(どめじゃーなど) をせっていするためにしようされます。"
   },
   "temperament length": {
     "kanji": "音律の長さ",
-    "kana": "temperament length"
+    "kana": "おんりつのながさ"
   },
   "The Temperament length block returns the number of pitches in the current temperament system. For example, 12 for standard equal temperament or 31 for a 31-tone temperament.": {
-    "kanji": "音律の長さブロックは、現在の音律システムにおけるピッチの数を返します。たとえば、標準平均律の場合は 12、31 音律の場合は 31 です。",
+    "kanji": "「音律の長さ」ブロックは、現在の音律システムにおけるピッチの数を返します。たとえば、標準平均律の場合は「12」、31音律の場合は「31」です。",
     "kana": "The Temperament length block returns the number of pitches in the current temperament system. For example, 12 for standard equal temperament or 31 for a 31-tone temperament."
   },
   "staccato factor": {
@@ -5001,7 +5001,7 @@
   },
   "The Neighbor block rapidly switches between neighboring pitches.": {
     "kanji": "<h2>音を加えるブロック</h2><br>２つの同じ高さの音のあいだに、音を１つ入れることができる。<br>図の例では、ソとソのあいだにラが入り、「ソラソ」とすばやくえんそうされる。<br><br>★音階とは<br>順番に並んだ音のまとまり。たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。",
-    "kana": "<h2>おとを くわえる ブロック</h2><br>２つの おなじたかさの おとの あいだに、 おとを １つ いれることが できる。<br>ずのれいでは、 ソとソの あいだに ラが はいり、 「ソラソ」 と すばやく えんそうされる。<br><br>★おんかいとは<br>じゅんばんに ならんだ おとの まとまり。たとえば、「ド」 を はじまりのおと に したときの 「ドレミファソラシド」、 「ソ」 を はじまりのおと に したときの 「ソラシドレミ（♯ファ）ソ」 の こと。"
+    "kana": "The Neighbor block rapidly switches between neighboring pitches."
   },
   "glide": {
     "kanji": "グリッサンド",
@@ -5016,11 +5016,11 @@
     "kana": "スタッカート"
   },
   "The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes.": {
-    "kanji": "スラー ブロックは、指定されたノートのリズミカルな値を維持しながら、ノートのサステインを長くします。",
+    "kanji": "「スラー」ブロックは、指定された音符の長さを全部組み合わせて長くします。",
     "kana": "The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes."
   },
   "The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes.": {
-    "kanji": "Staccato ブロックは、指定された音符のリズミカルな値を維持しながら、実際の音符の長さを短縮します。",
+    "kanji": "「スタッカート」ブロックは、指定された音符の長さを維持しながら、実際の音符の長さを短縮します。",
     "kana": "The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes."
   },
   "transposition": {
@@ -5049,7 +5049,7 @@
   },
   "The Change in pitch block is the difference (in half steps) between the current pitch being played and the previous pitch played.": {
     "kanji": "<em>音程の違い</em>ブロックは現在に鳴らされている音高と現在のちょうど前に鳴らされている音高（半音の値で）の違いです。",
-    "kana": "<em>音程の違い</em>ブロックは現在に鳴らされている音高と現在のちょうど前に鳴らされている音高（半おとの値で）の違いです。"
+    "kana": "The Change in pitch block is the difference (in half steps) between the current pitch being played and the previous pitch played."
   },
   "scalar change in pitch": {
     "kanji": "音階のよって音程の違い",
@@ -5061,7 +5061,7 @@
   },
   "The Pitch number block is the value of the pitch of the note currently being played.": {
     "kanji": "<h2>音の高さを数で表示ブロック</h2><br>音の高さを数で表示する。<br>",
-    "kana": "<h2>おとのたかさを かずでひょうじ ブロック</h2><br>おとの たかさを かずで ひょうじする。 たとえば、 「ド_４」 ならば １、 「ソ_４」 ならば ７ 、「シ_３」ならば-１、と ひょうじされる。"
+    "kana": "The Pitch number block is the value of the pitch of the note currently being played."
   },
   "pitch in hertz": {
     "kanji": "音の高さをヘルツで表示",
@@ -5069,7 +5069,7 @@
   },
   "The Pitch in Hertz block is the value in Hertz of the pitch of the note currently being played.": {
     "kanji": "<h2>音の高さをヘルツで表示ブロック</h2><br>音の高さをヘルツで表示する。<br>たとえば、オクターヴが４のラの音は、４４０ヘルツというすうちで表すことができる。<br><br>★ヘルツとは<br>音の高さを表す周波数。<br>★周波数とは<br>音が１秒間に何回しんどうするかを表すすうち。周波数が高い（すうちが大きい）ほど、音が高くなる。<br><br>",
-    "kana": "<h2>おとの たかさを ヘルツで ひょうじ ブロック</h2><br>おとの たかさを ヘルツで ひょうじ する。<br>たとえば、 オクターヴが４の ラのおとは、 ４４０ヘルツという すうちで あらわすことが できる。<br><br>★ヘルツとは<br>おとの たかさを あらわす しゅうはすう。<br>★しゅうはすうとは<br>おとが １びょうかん に なんかい しんどうするかを あらわす すうち。 しゅうはすうが たかい （すうちが おおきい） ほど、 おとが たかくなる。"
+    "kana": "The Pitch in Hertz block is the value in Hertz of the pitch of the note currently being played."
   },
   "current pitch": {
     "kanji": "現代の音の高さ",
@@ -5136,12 +5136,12 @@
     "kana": "The Set pitch number offset block is used to set the offset for mapping pitch numbers to pitch and octave."
   },
   "number to pitch": {
-    "kanji": "数字を音名へ",
+    "kanji": "数字をピッチに",
     "kana": "すうじを おんめいへ"
   },
   "The Number to pitch block will convert a pitch number to a pitch name.": {
-    "kanji": "Number toピッチブロックは、ピッチ番号をピッチ名に変換します。",
-    "kana": "The Number to pitch block will convert a pitch number to a pitch name."
+    "kanji": "「数字をピッチに」ブロックは、数字をピッチ名に変換します。",
+    "kana": "「すうじをぴっちに」ぶろっくは、すうじをぴっちめいにへんかんします。"
   },
   "number to octave": {
     "kanji": "数値をオクターヴ表記へ",
@@ -5149,7 +5149,7 @@
   },
   "The Number to octave block will convert a pitch number to an octave.": {
     "kanji": "Number to octaveブロックはピッチ番号をオクターブに変換します。",
-    "kana": "The Number to octave block will convert a pitch number to an octave."
+    "kana": "Number to octaveぶろっくはぴっちばんごうをおくたーぶにへんかんします。"
   },
   "y to pitch": {
     "kanji": "音の高さをy座に",
@@ -5161,11 +5161,11 @@
   },
   "accidental selector": {
     "kanji": "臨時記号セレクター",
-    "kana": "accidental selector"
+    "kana": "りんじきごうせれくたー"
   },
   "The Accidental selector block is used to choose between double-sharp, sharp, natural, flat, and double-flat.": {
     "kanji": "<em>変化記号セレクター</em>ブロックはダブルシャープ（重嬰）、シャープ(嬰)、ナチュラル(本位)、フラット(変)、ダブルフラット（重変）から選ぶことができます。",
-    "kana": "<em>変化記号セレクター</em>ブロックはダブルシャープ（重嬰）、シャープ(嬰)、ナチュラル(本位)、フラット(変)、ダブルフラット（重変）からえらぶことができます。"
+    "kana": "The Accidental selector block is used to choose between double-sharp, sharp, natural, flat, and double-flat."
   },
   "Pitch can be specified in terms of ni dha pa ma ga re sa.": {
     "kanji": "音の高さを、「sa、re、ga、ma、pa、dha、ni」の７つのインドのソルフェージュでせっていする。",
@@ -5173,7 +5173,7 @@
   },
   "Pitch can be specified in terms of C D E F G A B.": {
     "kanji": "<h2>音の高さブロック</h2><br>音の高さを、CDEFGABの７つのアルファベットでせっていする。たとえば、ドならばＣ、レならばＤであらわされる。",
-    "kana": "<h2>おとのたかさブロック</h2><br>おとのたかさを、 CDEFGABの ７つの アルファベットで せっていする。 たとえば、 ドならばＣ、 レならばＤ で あらわされる。"
+    "kana": "Pitch can be specified in terms of C D E F G A B."
   },
   "solfege": {
     "kanji": "ソルファ",
@@ -5181,15 +5181,15 @@
   },
   "Pitch can be specified in terms of do re mi fa sol la ti.": {
     "kanji": "<h2>音の高さブロック</h2><br>音の高さを、ド、レ、ミ、ファ、ソ、ラ、シの７つのソルフェージュでせっていする。",
-    "kana": "<h2>おとのたかさブロック</h2><br>おとのたかさを、 ド、レ、ミ、ファ、ソ、ラ、シの ７つの ソルフェージュで せっていする。 たとえば、 ドならばＣ、 レならばＤ で あらわされる。"
+    "kana": "Pitch can be specified in terms of do re mi fa sol la ti."
   },
   "The Invert block rotates any contained notes around a target note.": {
     "kanji": "Invertブロックは含まれる音符を対象の音符の周りで反転させます。",
-    "kana": "The Invert block rotates any contained notes around a target note."
+    "kana": "Invertぶろっくはふくまれるおんぷをたいしょうのおんぷのまわりではんてんさせます。"
   },
   "Invert": {
     "kanji": "転回を",
-    "kana": "Invert"
+    "kana": "てんかいを"
   },
   "invert (odd)": {
     "kanji": "転回を （奇数）",
@@ -5209,15 +5209,15 @@
   },
   "50 cents": {
     "kanji": "50セント",
-    "kana": "50 cents"
+    "kana": "50せんと"
   },
   "The Semi-tone transposition block will shift the pitches contained inside Note blocks up (or down) by half steps.": {
     "kanji": "<em>半音で移調</em>ブロックは<em>音符</em>の中に入っている音高を上（または下）に、特定されている<em>数字</em>の値によって、半音ずつ移動します。",
-    "kana": "<em>半音で移調</em>ブロックは<em>音符</em>の中に入っている音高を上（または下）に、特定されている<em>数字</em>の値によって、半音ずつ移動します。"
+    "kana": "The Semi-tone transposition block will shift the pitches contained inside Note blocks up (or down) by half steps."
   },
-  "In the example shown above, sol is shifted up to sol#.": {
+  "In the example shown above, sol is shifted up to sol#. ": {
     "kanji": "例の画像に<em>ソル</em>が<em>ソル#</em>に上に移動されています。",
-    "kana": "例の画像に<em>ソル</em>が<em>ソル#</em>に上に移動されています。"
+    "kana": "In the example shown above, sol is shifted up to sol#. "
   },
   "semi-tone transpose": {
     "kanji": "半音で移調",
@@ -5225,7 +5225,7 @@
   },
   "The Transpose by Ratio block will shift the pitches contained inside Note blocks up (or down) by a ratio": {
     "kanji": "「比で移動」ブロックは 音符の中のピッチを比で移動させる。",
-    "kana": "「ひで いどう」ブロックは おんぷの なかの ピッチを ひで いどうさせる。"
+    "kana": "The Transpose by Ratio block will shift the pitches contained inside Note blocks up (or down) by a ratio"
   },
   "transpose by ratio": {
     "kanji": "比で移動",
@@ -5265,11 +5265,11 @@
   },
   "The Scalar transposition block will shift the pitches contained inside Note blocks up (or down) the scale.": {
     "kanji": "<h2>調を変えるブロック</h2><br>「音符ブロック」内の音の高さを、すべて（音階内で、せっていしたすうち分だけ）上げる、または下げる。",
-    "kana": "<h2>ちょうを かえるブロック</h2><br>「おんぷブロック」 ないの おとのたかさを、 すべて （おんかいないで、 せっていした すうちぶんだけ） あげる、 または さげる。"
+    "kana": "The Scalar transposition block will shift the pitches contained inside Note blocks up (or down) the scale."
   },
   "In the example shown above, sol is shifted up to la.": {
     "kanji": "<br><br>図の例では、ソがラに、ラがシに、シがドに…と置きかえられている。<br><br>★音階とは<br>順番に並んだ音のまとまり。たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。<br>★調とは<br>中心的な役わりをはたす音と、音階の種類によって決まる、曲の感じ。中心的な役わりをはたす音だけを指すこともある。",
-    "kana": "<br><br>ずのれいでは、 ソがラに、 ラがシに、 シがドに… と おきかえられている。<br><br>★おんかいとは<br>じゅんばんに ならんだ おとの まとまり。たとえば、「ド」 を はじまりのおと に したときの 「ドレミファソラシド」、 「ソ」 を はじまりのおと に したときの 「ソラシドレミ（♯ファ）ソ」 の こと。<br>★ちょうとは<br>ちゅうしんてきな やくわりを はたすおとと、 おんかいの しゅるいによって きまる、 きょくの かんじ。 ちゅうしんてきな やくわりを はたすおと だけを  さすこともある。"
+    "kana": "In the example shown above, sol is shifted up to la."
   },
   "scalar transpose": {
     "kanji": "調を変える",
@@ -5285,7 +5285,7 @@
   },
   "The Hertz block (in combination with a Number block) will play a sound at the specified frequency.": {
     "kanji": "<h2>ヘルツブロック</h2><br>音の高さをヘルツ（周波数の単位）でせっていする。「すうちブロック」を組み合わせて使う。<br><br>★ヘルツとは<br>音の高さを表す周波数。<br>★周波数とは<br>音が１秒間に何回しんどうするかを表すすうち。周波数が高い（すうちが大きい）ほど、音が高くなる。<br><br>",
-    "kana": "<h2>ヘルツ ブロック</h2><br>おとのたかさを ヘルツ （しゅうはすうの たんい） で せっていする。 「すうちぶろっく」 を くみあわせて つかう。<br><br>★ヘルツとは<br>おとの たかさを あらわす しゅうはすう。<br>★しゅうはすうとは<br>おとが １びょうかん に なんかい しんどうするかを あらわす すうち。 しゅうはすうが たかい （すうちが おおきい） ほど、 おとが たかくなる。"
+    "kana": "The Hertz block (in combination with a Number block) will play a sound at the specified frequency."
   },
   "The Pitch Number block will play a pitch associated by its number, e.g. 0 for C and 7 for G.": {
     "kanji": "Pitch Numberブロックは番号に対応した音高を再生します。例：0はC、7はG。",
@@ -5325,19 +5325,19 @@
   },
   "The Scalar Step block (in combination with a Number block) will play the next pitch in a scale,": {
     "kanji": "<h2>音階内を上る／下りるブロック</h2><br>音階内を順番に（ある一定のかんかくで）上りながら、または下りながら音をえんそうする。すうちをせっていすることで、次の音は前の音といくつちがうかが決まる。<br>たとえば、すうちを１にせっていした場合、ソの次にはラ（ソの１音上）、ファの次にはソ（ファの１音上）がえんそうされる。<br><br>★音階とは<br>順番に並んだ音のまとまり。",
-    "kana": "<h2>おんかいないをのぼる／おりるブロック</h2><br>おんかいない を じゅんばんに （ある いっていの かんかくで） のぼりながら、 または おりながら おとを えんそう する。 すうちを せっていする ことで、 つぎの おとは まえの おとと いくつちがうか が きまる。"
+    "kana": "The Scalar Step block (in combination with a Number block) will play the next pitch in a scale,"
   },
   "eg if the last note played was sol, Scalar Step 1 will play la.": {
     "kanji": "<br><br>たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。<br>",
-    "kana": "<br><br>たとえば、 すうちを １に せっていした ばあい、 ソの つぎには ラ（ソの １おんうえ）、 ファの つぎには ソ（ファの １おんうえ） が えんそう される。<br><br>★おんかいとは<br>じゅんばんに ならんだ おとの まとまり。たとえば、「ド」 を はじまりのおと に したときの 「ドレミファソラシド」、 「ソ」 を はじまりのおと に したときの 「ソラシドレミ（♯ファ）ソ」 の こと。"
+    "kana": "eg if the last note played was sol, Scalar Step 1 will play la."
   },
   "The Pitch block specifies the pitch name and octave of a note that together determine the frequency of the note.": {
     "kanji": "<h2>音の高さブロック</h2><br>音の高さをせっていする。名前とオクターヴの高さを決めて使う。音の周波数も同時に決まる。<br><br>★周波数とは<br>音が１秒間に何回しんどうするかを表すすうち。周波数が高い（すうちが大きい）ほど、音が高くなる。<br>★オクターヴの高さとは<br>同じ名前でも高さがちがう音を表すすうち。<br><br>",
-    "kana": "<h2>おとのたかさ ブロック</h2><br>おとのたかさを せってい する。 なまえと オクターヴの たかさを きめて つかう。 おとの しゅうはすうも どうじに  きまる。<br><br>★しゅうはすうとは<br>おとが １びょうかんに なんかい しんどうするかを あらわす すうち。 しゅうはすうが たかい （すうちが おおきい） ほど、 おとが たかくなる。<br>★オクターヴの たかさとは<br>おなじ なまえでも たかさがちがう おとを あらわす すうち。"
+    "kana": "The Pitch block specifies the pitch name and octave of a note that together determine the frequency of the note."
   },
   "The Load-heap-from-app block loads the heap from a web page.": {
     "kanji": "Load-heap-from-appブロックはウェブページからヒープを読み込みます。",
-    "kana": "The Load-heap-from-app block loads the heap from a web page."
+    "kana": "Load-heap-from-appぶろっくはうぇぶぺーじからひーぷをよみこみます。"
   },
   "load heap from App": {
     "kanji": "アプリからヒープをロード",
@@ -5353,7 +5353,7 @@
   },
   "The Save-heap-to-app block saves the heap to a web page.": {
     "kanji": "Save-heap-to-appブロックはヒープをウェブページに保存します。",
-    "kana": "The Save-heap-to-app block saves the heap to a web page."
+    "kana": "Save-heap-to-appぶろっくはひーぷをうぇぶぺーじにほぞんします。"
   },
   "save heap to App": {
     "kanji": "アプリにヒープを保存",
@@ -5365,7 +5365,7 @@
   },
   "The Load-heap block loads the heap from a file.": {
     "kanji": "Load-heapブロックはファイルからヒープを読み込みます。",
-    "kana": "The Load-heap block loads the heap from a file."
+    "kana": "Load-heapぶろっくはふぁいるからひーぷをよみこみます。"
   },
   "load heap": {
     "kanji": "ヒープをロードする",
@@ -5381,19 +5381,19 @@
   },
   "The Set-heap block loads the heap.": {
     "kanji": "Set-heapブロックはヒープを読み込みます。",
-    "kana": "The Set-heap block loads the heap."
+    "kana": "Set-heapぶろっくはひーぷをよみこみます。"
   },
   "The block you selected does not contain a valid heap.": {
     "kanji": "選択したブロックには有効なヒープが含まれていません。",
-    "kana": "The block you selected does not contain a valid heap."
+    "kana": "せんたくしたぶろっくにはゆうこうなひーぷがふくまれていません。"
   },
   "The Set heap block needs a heap.": {
     "kanji": "Set heapブロックにはヒープが必要です。",
-    "kana": "The Set heap block needs a heap."
+    "kana": "Set heapぶろっくにはひーぷがひつようです。"
   },
   "The Load-dictionary block loads a dictionary from a file.": {
     "kanji": "Load-dictionaryブロックはファイルから辞書を読み込みます。",
-    "kana": "The Load-dictionary block loads a dictionary from a file."
+    "kana": "Load-dictionaryぶろっくはふぁいるからじしょをよみこみます。"
   },
   "load dictionary": {
     "kanji": "辞書をロード",
@@ -5401,15 +5401,15 @@
   },
   "The file you selected does not contain a valid dictionary.": {
     "kanji": "選択したファイルには有効な辞書が含まれていません。",
-    "kana": "The file you selected does not contain a valid dictionary."
+    "kana": "せんたくしたふぁいるにはゆうこうなじしょがふくまれていません。"
   },
   "The load dictionary block needs a load file block.": {
     "kanji": "load dictionaryブロックにはload fileブロックが必要です。",
-    "kana": "The load dictionary block needs a load file block."
+    "kana": "load dictionaryぶろっくにはload fileぶろっくがひつようです。"
   },
   "The Set-dictionary block loads a dictionary.": {
     "kanji": "Set-dictionaryブロックは辞書を読み込みます。",
-    "kana": "The Set-dictionary block loads a dictionary."
+    "kana": "Set-dictionaryぶろっくはじしょをよみこみます。"
   },
   "set dictionary": {
     "kanji": "辞書を設定",
@@ -5417,15 +5417,15 @@
   },
   "The block you selected does not contain a valid dictionary.": {
     "kanji": "選択したブロックには有効な辞書が含まれていません。",
-    "kana": "The block you selected does not contain a valid dictionary."
+    "kana": "せんたくしたぶろっくにはゆうこうなじしょがふくまれていません。"
   },
   "The set dictionary block needs a dictionary.": {
     "kanji": "set dictionaryブロックには辞書が必要です。",
-    "kana": "The set dictionary block needs a dictionary."
+    "kana": "set dictionaryぶろっくにはじしょがひつようです。"
   },
   "The Save-heap block saves the heap to a file.": {
     "kanji": "Save-heapブロックはヒープをファイルに保存します。",
-    "kana": "The Save-heap block saves the heap to a file."
+    "kana": "Save-heapぶろっくはひーぷをふぁいるにほぞんします。"
   },
   "save heap": {
     "kanji": "ヒープを保存する",
@@ -5433,7 +5433,7 @@
   },
   "The Save-dictionary block saves a dictionary to a file.": {
     "kanji": "Save-dictionaryブロックは辞書をファイルに保存します。",
-    "kana": "The Save-dictionary block saves a dictionary to a file."
+    "kana": "Save-dictionaryぶろっくはじしょをふぁいるにほぞんします。"
   },
   "save dictionary": {
     "kanji": "辞書を保存",
@@ -5441,7 +5441,7 @@
   },
   "The Open palette block opens a palette.": {
     "kanji": "Open paletteブロックはパレットを開きます。",
-    "kana": "The Open palette block opens a palette."
+    "kana": "Open paletteぶろっくはぱれっとをひらきます。"
   },
   "open palette": {
     "kanji": "パレットを開きます",
@@ -5449,7 +5449,7 @@
   },
   "The Delete block block removes a block.": {
     "kanji": "Delete blockブロックはブロックを削除します。",
-    "kana": "The Delete block block removes a block."
+    "kana": "Delete blockぶろっくはぶろっくをさくじょします。"
   },
   "delete block": {
     "kanji": "ブロックを消す",
@@ -5457,7 +5457,7 @@
   },
   "The Move block block moves a block.": {
     "kanji": "Move blockブロックはブロックを移動します。",
-    "kana": "The Move block block moves a block."
+    "kana": "Move blockぶろっくはぶろっくをいどうします。"
   },
   "move block": {
     "kanji": "ブロックを動かす",
@@ -5468,7 +5468,7 @@
     "kana": "ブロックの ばんごう"
   },
   "The Run block block runs a block. It accepts two types of arguments: block number or block name.": {
-    "kanji": "Run ブロック ブロックはブロックを実行します。ブロック番号またはブロック名の 2 種類の引数を受け入れます。",
+    "kanji": "「ブロックを再生」ブロックはブロックを実行します。ブロック番号またはブロック名の 2 種類の引数を受け入れます。",
     "kana": "The Run block block runs a block. It accepts two types of arguments: block number or block name."
   },
   "run block": {
@@ -5477,7 +5477,7 @@
   },
   "The Dock block connects two blocks.": {
     "kanji": "Dock blockブロックは2つのブロックを接続します。",
-    "kana": "The Dock block connects two blocks."
+    "kana": "Dock blockぶろっくは2つのぶろっくをせつぞくします。"
   },
   "connect blocks": {
     "kanji": "ブロックを繋ぐ",
@@ -5493,7 +5493,7 @@
   },
   "The Make block block creates a new block.": {
     "kanji": "Make blockブロックは新しいブロックを作成します。",
-    "kana": "The Make block block creates a new block."
+    "kana": "Make blockぶろっくはあたらしいぶろっくをさくせいします。"
   },
   "make block": {
     "kanji": "ブロックを作る",
@@ -5501,7 +5501,7 @@
   },
   "instrument": {
     "kanji": "楽器",
-    "kana": "instrument"
+    "kana": "がっき"
   },
   "Cannot find block": {
     "kanji": "ブロックが見つかりません",
@@ -5513,11 +5513,11 @@
   },
   "Warning: block argument type unhandled:": {
     "kanji": "警告: ブロック引数の型が処理されません:",
-    "kana": "Warning: block argument type unhandled:"
+    "kana": "けいこく: ぶろっくひきすうのかたがしょりされません:"
   },
   "The Open project block is used to open a project from a web page.": {
     "kanji": "Open projectブロックはウェブページからプロジェクトを開くために使われます。",
-    "kana": "The Open project block is used to open a project from a web page."
+    "kana": "Open projectぶろっくはうぇぶぺーじからぷろじぇくとをひらくためにつかわれます。"
   },
   "open project": {
     "kanji": "プロジェクトを開く",
@@ -5528,16 +5528,16 @@
     "kana": "Please enter a valid project URL (for example: /index.html?id=123&run=true)."
   },
   "Only Music Blocks project links are allowed (same site, musicblocks.sugarlabs.org, musicblocks.net).": {
-    "kanji": "Music Blocks プロジェクトのリンクのみが許可されます (同じサイト、musicblocks.sugarlabs.org、musicblocks.net)。",
+    "kanji": "ミュージック・ブロックス プロジェクトのリンクのみが許可されます (同じサイト、musicblocks.sugarlabs.org、musicblocks.net)。",
     "kana": "Only Music Blocks project links are allowed (same site, musicblocks.sugarlabs.org, musicblocks.net)."
   },
   "Please allow popups for this site": {
     "kanji": "このサイトのポップアップを許可してください",
-    "kana": "Please allow popups for this site"
+    "kana": "このさいとのぽっぷあっぷをきょかしてください"
   },
   "The Input block prompts for keyboard input.": {
     "kanji": "インプットブロックはキーボード入力を促します。",
-    "kana": "The Input block prompts for keyboard input."
+    "kana": "いんぷっとぶろっくはきーぼーどにゅうりょくをうながします。"
   },
   "input": {
     "kanji": "インプット",
@@ -5553,7 +5553,7 @@
   },
   "The Input-value block stores the input.": {
     "kanji": "インプット値ブロックは入力を保存します。",
-    "kana": "The Input-value block stores the input."
+    "kana": "いんぷっとあたいぶろっくはにゅうりょくをほぞんします。"
   },
   "loudness": {
     "kanji": "音量",
@@ -5561,7 +5561,7 @@
   },
   "The Loudness block returns the volume detected by the microphone.": {
     "kanji": "ラウドネスブロックはマイクで検出された音量を返します。",
-    "kana": "The Loudness block returns the volume detected by the microphone."
+    "kana": "らうどねすぶろっくはまいくでけんしゅつされたおんりょうをかえします。"
   },
   "click": {
     "kanji": "クリック",
@@ -5569,22 +5569,22 @@
   },
   "The Click block triggers an event if a mouse has been clicked.": {
     "kanji": "クリックブロックはマウスがクリックされた場合にイベントをトリガーします。",
-    "kana": "The Click block triggers an event if a mouse has been clicked."
+    "kana": "くりっくぶろっくはまうすがくりっくされたばあいにいべんとをとりがーします。"
   },
   "The Click block triggers an event if a turtle has been clicked.": {
     "kanji": "クリックブロックはカメがクリックされた場合にイベントをトリガーします。",
-    "kana": "The Click block triggers an event if a turtle has been clicked."
+    "kana": "くりっくぶろっくはかめがくりっくされたばあいにいべんとをとりがーします。"
   },
   "cursor over": {
     "kanji": "カーソル（上）",
     "kana": "カーソル（うえ）"
   },
   "The Cursor over block triggers an event when the cursor is moved over a mouse.": {
-    "kanji": "Cursor over ブロックは、カーソルがマウス上に移動するとイベントをトリガーします。",
+    "kanji": "「カーソル（上）」ブロックは、カーソルがマウス上に移動するとイベントをトリガーします。",
     "kana": "The Cursor over block triggers an event when the cursor is moved over a mouse."
   },
   "The Cursor over block triggers an event when the cursor is moved over a turtle.": {
-    "kanji": "Cursor over ブロックは、カーソルがタートル上に移動するとイベントをトリガーします。",
+    "kanji": "「カーソル（上）」ブロックは、カーソルがタートル上に移動するとイベントをトリガーします。",
     "kana": "The Cursor over block triggers an event when the cursor is moved over a turtle."
   },
   "cursor out": {
@@ -5592,11 +5592,11 @@
     "kana": "カーソル（外）"
   },
   "The Cursor out block triggers an event when the cursor is moved off of a mouse.": {
-    "kanji": "Cursor out ブロックは、カーソルがマウスから離れるとイベントをトリガーします。",
+    "kanji": "「カーソル（外）」ブロックは、カーソルがマウスから離れるとイベントをトリガーします。",
     "kana": "The Cursor out block triggers an event when the cursor is moved off of a mouse."
   },
   "The Cursor out block triggers an event when the cursor is moved off of a turtle.": {
-    "kanji": "Cursor out ブロックは、カーソルがタートルから離れるとイベントをトリガーします。",
+    "kanji": "「カーソル（外）」ブロックは、カーソルがタートルから離れるとイベントをトリガーします。",
     "kana": "The Cursor out block triggers an event when the cursor is moved off of a turtle."
   },
   "cursor button down": {
@@ -5604,11 +5604,11 @@
     "kana": "カーソルクリック（した）"
   },
   "The Cursor button down block triggers an event when the cursor button is pressed on a mouse.": {
-    "kanji": "Cursor button down ブロックは、マウスのカーソル ボタンが押されたときにイベントをトリガーします。",
+    "kanji": "「カーソルクリック（下）」ブロックは、マウスのカーソル ボタンが押されたときにイベントをトリガーします。",
     "kana": "The Cursor button down block triggers an event when the cursor button is pressed on a mouse."
   },
   "The Cursor button down block triggers an event when the cursor button is pressed on a turtle.": {
-    "kanji": "Cursor button down ブロックは、タートル上でカーソル ボタンが押されたときにイベントをトリガーします。",
+    "kanji": "「カーソルクリック（下）」ブロックは、タートル上でカーソル ボタンが押されたときにイベントをトリガーします。",
     "kana": "The Cursor button down block triggers an event when the cursor button is pressed on a turtle."
   },
   "cursor button up": {
@@ -5616,11 +5616,11 @@
     "kana": "カーソルクリック（うえ）"
   },
   "The Cursor button up block triggers an event when the cursor button is released while over a mouse.": {
-    "kanji": "Cursor button up ブロックは、マウスの上でカーソル ボタンが放されるとイベントをトリガーします。",
+    "kanji": "「カーソルクリック（上）」ブロックは、マウスの上でカーソル ボタンが放されるとイベントをトリガーします。",
     "kana": "The Cursor button up block triggers an event when the cursor button is released while over a mouse."
   },
   "The Cursor button up block triggers an event when the cursor button is released while over a turtle.": {
-    "kanji": "Cursor button up ブロックは、タートルの上でカーソル ボタンが放されるとイベントをトリガーします。",
+    "kanji": "「カーソルクリック（上）」ブロックは、タートルの上でカーソル ボタンが放されるとイベントをトリガーします。",
     "kana": "The Cursor button up block triggers an event when the cursor button is released while over a turtle."
   },
   "pixel color": {
@@ -5629,18 +5629,18 @@
   },
   "The Get pixel block returns the color of the pixel under the mouse.": {
     "kanji": "Get pixelブロックはマウス下のピクセルの色を返します。",
-    "kana": "The Get pixel block returns the color of the pixel under the mouse."
+    "kana": "Get pixelぶろっくはまうすしたのぴくせるのいろをかえします。"
   },
   "The Get pixel block returns the color of the pixel under the turtle.": {
     "kanji": "Get pixelブロックはカメの下のピクセルの色を返します。",
-    "kana": "The Get pixel block returns the color of the pixel under the turtle."
+    "kana": "Get pixelぶろっくはかめのしたのぴくせるのいろをかえします。"
   },
   "time": {
     "kanji": "時間",
     "kana": "じかん"
   },
   "The Time block returns the number of seconds that the program has been running.": {
-    "kanji": "Time ブロックは、プログラムが実行されている秒数を返します。",
+    "kanji": "「時間」ブロックは、プログラムが実行されている秒数を返します。",
     "kana": "The Time block returns the number of seconds that the program has been running."
   },
   "cursor y": {
@@ -5649,7 +5649,7 @@
   },
   "The Cursor Y block returns the vertical position of the mouse.": {
     "kanji": "<h2>すうちブロック（カーソル）</h2><br>マウスカーソルのたて位置を表すｙざひょうち。<br>図の例は、ネズミを使って画面上に自由に線をえがけるプログラム。ネズミがパソコンのマウスカーソルの位置にいどうし続けつつ、マウスをおしているときだけペンをおろし、線をえがく。",
-    "kana": "<h2>すうちブロック（カーソル）</h2><br>マウスカーソルの たていち を あらわす ｙざひょうち。<br>ずのれいは、 ネズミを つかって がめんじょうに じゆうに せんを えがける プログラム。 ネズミが パソコンの マウスカーソルの いち に いどうしつづけつつ、 マウスを おしているときだけ ペンをおろし、 せんをえがく。"
+    "kana": "The Cursor Y block returns the vertical position of the mouse."
   },
   "cursor x": {
     "kanji": "xざひょうち（カーソル）",
@@ -5657,7 +5657,7 @@
   },
   "The Cursor X block returns the horizontal position of the mouse.": {
     "kanji": "<h2>すうちブロック（カーソル）</h2><br>マウスカーソルの横位置を表すｘざひょうち。<br>図の例は、ネズミを使って画面上に自由に線をえがけるプログラム。ネズミがパソコンのマウスカーソルの位置にいどうし続けつつ、マウスをおしているときだけペンをおろし、線をえがく。",
-    "kana": "<h2>すうちブロック（カーソル）</h2><br>マウスカーソルの よこいち を あらわす ｘざひょうち。<br>ずのれいは、 ネズミを つかって がめんじょうに じゆうに せんを えがける プログラム。 ネズミが パソコンの マウスカーソルの いち に いどうしつづけつつ、 マウスを おしているときだけ ペンをおろし、 せんをえがく。"
+    "kana": "The Cursor X block returns the horizontal position of the mouse."
   },
   "mouse button": {
     "kanji": "マウスボタン",
@@ -5665,19 +5665,19 @@
   },
   "The Mouse-button block returns True if the mouse button is pressed.": {
     "kanji": "<h2>真偽ブロック（マウスボタン）</h2><br>マウスのボタンがおされているかどうかはんていする。マウスボタンがおされていれば「真（しん）」、おされていなければ「偽（ぎ）」という値になる。<br>図の例は、ネズミを使って画面上に自由に線をえがけるプログラム。ネズミがパソコンのマウスカーソルの位置にいどうし続けつつ、マウスをおしているときだけペンをおろし、線をえがく。<br><br>★しんぎブロックとは<br>「もし～ならば」などのじょうけんブロックを動かすために必要なブロック。<br>「もし～ならば」は、せいかくに表現すると、「もし～というじょうけんが正しいならば、次のブロックを実行する」という意味である。しんぎブロックは不等式などによるひかくが「正しい（真）」か、「正しくない（偽）」かの結果を表し、「もし～ならば」に続くブロックを実行するかどうか決める。",
-    "kana": "<h2>しんぎブロック（マウスボタン）</h2><br>マウスの ボタンが おされているか どうか はんてい する。 マウスボタンが おされていれば 「しん（しん）」、 おされていなければ「にせ（ぎ）」と いう あたいになる。<br>ずのれいは、 ネズミを つかって がめんじょうに じゆうに せんを えがける プログラム。 ネズミが パソコンの マウスカーソルの いち に いどうしつづけつつ、 マウスを おしているときだけ ペンをおろし、 せんをえがく。<br><br>★しんぎブロックとは<br>「もし～ならば」などの じょうけんブロックを うごかすために ひつような ブロック。<br>「もし～ならば」は、 せいかくに ひょうげんすると、 「もし～という じょうけんが ただしい ならば、 つぎの ブロックを じっこうする」という いみ である。 しんぎブロックは ふとうしき などによる ひかくが 「ただしい（しん）」か、 「ただしくない（にせ）」かの けっかを あらわし、 「もし～ならば」に つづく ブロックを じっこうするか どうか きめる。"
+    "kana": "The Mouse-button block returns True if the mouse button is pressed."
   },
   "to ASCII": {
     "kanji": "ASCIIに",
     "kana": "ASCIIに"
   },
   "The To ASCII block converts numbers to letters.": {
-    "kanji": "To ASCIIブロックは数字を文字に変換します。",
-    "kana": "The To ASCII block converts numbers to letters."
+    "kanji": "「ASCIIに」ブロックは数字を文字に変換します。",
+    "kana": "「ASCIIに」ぶろっくはすうじをもじにへんかんします。"
   },
   "The Keyboard block returns computer keyboard input.": {
-    "kanji": "Keyboardブロックはコンピュータのキーボード入力を返します。",
-    "kana": "The Keyboard block returns computer keyboard input."
+    "kanji": "「キーボード」ブロックはコンピュータのキーボード入力を返します。",
+    "kana": "「きーぼーど」ぶろっくはこんぴゅーたのきーぼーどにゅうりょくをかえします。"
   },
   "The Get red block returns the red component of the pixel under the mouse.": {
     "kanji": "Get redブロックはマウス下のピクセルの赤成分を返します。",
@@ -5757,7 +5757,7 @@
   },
   "The Temperament tool is used to define custom tuning.": {
     "kanji": "Temperamentツールはカスタムチューニングを定義するために使用されます。",
-    "kana": "The Temperament tool is used to define custom tuning."
+    "kana": "Temperamentつーるはかすたむちゅーにんぐをていぎするためにしようされます。"
   },
   "Upload a sample and adjust its pitch center.": {
     "kanji": "サンプルをアップロードしてピッチセンターを調整します。",
@@ -5769,11 +5769,11 @@
   },
   "The Meter block opens a tool to select strong beats for the meter.": {
     "kanji": "<h2>拍子ブロック</h2><br>テーブルの数字をクリックして、強い拍（はく）の位置を決める。<br>★拍子（ひょうし）とは<br>拍（はく）がいくつかまとまったもの。<br>★拍（はく）とは<br>くり返されるリズムのこと。",
-    "kana": "<h2>ひょうしブロック</h2><br>テーブルの すうじを クリックして、 つよい はくの いちを きめる。<br>★ひょうし とは<br>はくが いくつか まとまった もの。<br>★はく とは<br>くりかえされる リズムの こと。"
+    "kana": "The Meter block opens a tool to select strong beats for the meter."
   },
   "The oscilloscope block opens a tool to visualize waveforms.": {
     "kanji": "Oscilloscopeブロックは波形を可視化するツールを開きます。",
-    "kana": "The oscilloscope block opens a tool to visualize waveforms."
+    "kana": "Oscilloscopeぶろっくははけいをかしかするつーるをひらきます。"
   },
   "oscilloscope": {
     "kanji": "オシロスコープ",
@@ -5781,7 +5781,7 @@
   },
   "The Custom mode block opens a tool to explore musical mode (the spacing of the notes in a scale).": {
     "kanji": "<h2>モード（音階）ブロック</h2><br>いろいろな音階をさがすツールを表示する。音階は、音と音のかんかくを決めながらさがすことができる。<br><br>★音階とは<br>順番に並んだ音のまとまり。たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。",
-    "kana": "<h2>モード（おんかい）ブロック</h2><br>いろいろな ちょうを さがす ツールを ひょうじする。おんかいは、 おとと おとの かんかくを きめながら さがすことが できる。<br><br>★おんかいとは<br>じゅんばんに ならんだ おとの まとまり。たとえば、「ド」 を はじまりのおと に したときの 「ドレミファソラシド」、 「ソ」 を はじまりのおと に したときの 「ソラシドレミ（♯ファ）ソ」 の こと。"
+    "kana": "The Custom mode block opens a tool to explore musical mode (the spacing of the notes in a scale)."
   },
   "custom mode": {
     "kanji": "音階",
@@ -5789,7 +5789,7 @@
   },
   "The Tempo block opens a metronome to visualize the beat.": {
     "kanji": "<h2>メトロノームブロック</h2><br>メトロノームを表示する。ボタンをおすと、メトロノームのはやさを変えられる。テーブルには、１分あたりの拍（はく）の数が表示される。<br><br>★拍（はく）とは<br>くり返されるリズムのこと。",
-    "kana": "<h2>メトロノームブロック</h2><br>メトロノームを ひょうじする。 ボタンを おすと、 メトロノームの はやさを かえられる。 テーブルには、 １ぷんあたりの はくのかずが ひょうじされる。<br><br>★はくとは<br>くりかえされる リズムのこと。"
+    "kana": "The Tempo block opens a metronome to visualize the beat."
   },
   "The Arpeggio Widget is used to compose chord sequences.": {
     "kanji": "「アルペジオ」ウィジェットは コード進行 を作るためです。",
@@ -5797,7 +5797,7 @@
   },
   "The Pitch drum matrix is used to map pitches to drum sounds.": {
     "kanji": "Pitch drumマトリックスはピッチをドラム音にマッピングするために使われます。",
-    "kana": "The Pitch drum matrix is used to map pitches to drum sounds."
+    "kana": "Pitch drumまとりっくすはぴっちをどらむおとにまっぴんぐするためにつかわれます。"
   },
   "pitch-drum mapper": {
     "kanji": "音高-ドラム・マッパー",
@@ -5805,11 +5805,11 @@
   },
   "You must have at least one pitch block and one drum block in the matrix.": {
     "kanji": "フレーズメーカーブロックには、音の高さブロックとドラムブロックを最低1つずつ入れてください。",
-    "kana": "フレーズメーカーブロックには、 おとの たかさブロックと ドラムブロックを さいてい 1つずつ いれて ください。"
+    "kana": "You must have at least one pitch block and one drum block in the matrix."
   },
   "The Pitch slider tool to is used to generate pitches at selected frequencies.": {
     "kanji": "<h2>ヘルツスライダーブロック</h2><br>スライダーを上下にうごかすことで、違う周波数（ヘルツのすうち）の音を聞くことができる。作った音をデータ化することができる。また、ヘルツの初期せっていちは、自由に変えられる。<br><br>★ヘルツとは音の高さを表す周波数。<br>★周波数とは音が１秒間に何回しんどうするかを表すすうち。周波数が高い（すうちが大きい）ほど、音が高くなる。",
-    "kana": "<h2>ヘルツスライダーブロック</h2><br>スライダーを じょうげに うごかすことで、 ちがう しゅうはすう（ヘルツのすうち） の おとを きくことが できる。 つくった おとを データに することが できる。また、 ヘルツの しょきせっていち は じゆうに かえられる。<br>★ヘルツとは<br>おとの たかさを あらわす しゅうはすう。<br>★しゅうはすうとは<br>おとが １びょうかん に なんかい しんどうするかを あらわす すうち。 しゅうはすうが たかい （すうちが おおきい） ほど、 おとが たかくなる。"
+    "kana": "The Pitch slider tool to is used to generate pitches at selected frequencies."
   },
   "pitch slider": {
     "kanji": "ヘルツスライダー",
@@ -5825,7 +5825,7 @@
   },
   "The Music keyboard block opens a piano keyboard that can be used to create notes.": {
     "kanji": "<h2>キーボードブロック</h2><br>ピアノのキーボードを表示する。作った音をデータ化することができる。<br><br> ",
-    "kana": "<h2>キーボードブロック</h2><br>ピアノの キーボードを ひょうじする。 つくったおとを データに することが できる。"
+    "kana": "The Music keyboard block opens a piano keyboard that can be used to create notes."
   },
   "The Pitch staircase tool to is used to generate pitches from a given ratio.": {
     "kanji": "Pitch staircaseツールは指定された比率からピッチを生成するために使用されます。",
@@ -5837,7 +5837,7 @@
   },
   "The Rhythm Maker block opens a tool to create drum machines.": {
     "kanji": "<h2>リズムメーカーブロック</h2><br>音の長さでぶんかつしてリズムを作るテーブルを表示する。作ったリズムをデータ化することができる。<br><br>",
-    "kana": "<h2>リズムメーカー ブロック</h2><br>おとの ながさで ぶんかつして、 リズムを つくる テーブルを ひょうじする。 つくった リズムを データに することが できる。"
+    "kana": "The Rhythm Maker block opens a tool to create drum machines."
   },
   "G major scale": {
     "kanji": "Gメジャー",
@@ -5849,7 +5849,7 @@
   },
   "The Phrase Maker block opens a tool to create musical phrases.": {
     "kanji": "<h2>フレーズメーカーブロック</h2><br>フレーズを作るためのテーブルを表示する。作ったフレーズをデータ化することができる。<br><br>★フレーズとは<br>ひとまとまりの音楽。<br><br>",
-    "kana": "<h2>フレーズメーカーブロック</h2><br>フレーズを つくるための テーブルを  ひょうじする。 つくった フレーズを データに することが できる。<br><br>"
+    "kana": "The Phrase Maker block opens a tool to create musical phrases."
   },
   "phrase maker": {
     "kanji": "フレーズメーカー",
@@ -5857,42 +5857,42 @@
   },
   "lyrics": {
     "kanji": "歌詞",
-    "kana": "lyrics"
+    "kana": "かし"
   },
   "You must have at least one pitch block and one rhythm block in the matrix.": {
     "kanji": "フレーズメーカーには、音の高さブロックと音符ブロックを組み合わせてください。",
-    "kana": "フレーズメーカーには、 おとのたかさ ブロックと おんぷブロックを くみあわせて ください。"
+    "kana": "You must have at least one pitch block and one rhythm block in the matrix."
   },
   "The Status block opens a tool for inspecting the status of Music Blocks as it is running.": {
     "kanji": "<h2>実行じょうきょうブロック</h2><br>ブロックの実行じょうきょうをけんさくするテーブルを表示する。<br>",
-    "kana": "<h2>じっこうじょうきょうブロック</h2><br>ブロックのじっこうじょうきょうをけんさくするテーブルをひょうじする。<br>"
+    "kana": "The Status block opens a tool for inspecting the status of Music Blocks as it is running."
   },
   "AI Music": {
     "kanji": "AI音楽",
     "kana": "AIおんがく"
   },
   "The Reflection block opens a space for you to think about your learning.": {
-    "kanji": "振り返りブロックは、学習について考えるためのスペースを開きます。",
+    "kanji": "「振り返り」ブロックは、学習について考えるためのスペースを開きます。",
     "kana": "The Reflection block opens a space for you to think about your learning."
   },
   "reflection": {
-    "kanji": "反射",
-    "kana": "reflection"
+    "kanji": "「振り返り」",
+    "kana": "「ふりかえり」"
   },
   "The LEGO Bricks block opens a widget for designing virtual LEGO creations.": {
-    "kanji": "LEGO Bricks ブロックは、仮想 LEGO 作品をデザインするためのウィジェットを開きます。",
+    "kanji": "「レゴブロック」ブロックは、仮想 LEGO 作品をデザインするためのウィジェットを開きます。",
     "kana": "The LEGO Bricks block opens a widget for designing virtual LEGO creations."
   },
   "LEGO Bricks": {
     "kanji": "レゴブロック",
-    "kana": "LEGO Bricks"
+    "kana": "れごぶろっく"
   },
   "You must have at least one pitch block in the LEGO bricks widget.": {
-    "kanji": "レゴ ブロック ウィジェットには少なくとも 1 つのピッチ ブロックが必要です。",
-    "kana": "You must have at least one pitch block in the LEGO bricks widget."
+    "kanji": "「レゴブロック」ウィジェットには少なくとも 1つの「ピッチ」ブロックが必要です。",
+    "kana": "「れごぶろっく」うぃじぇっとにはすくなくとも 1つの「ぴっち」ぶろっくがひつようです。"
   },
   "Debug your music blocks project with new possibilities and more understanding.": {
-    "kanji": "新たな可能性と理解を深めて、ミュージック ブロック プロジェクトをデバッグします。",
+    "kanji": "新たな可能性と理解を深めて、ミュージック・ブロックス プロジェクトをデバッグします。",
     "kana": "Debug your music blocks project with new possibilities and more understanding."
   },
   "Noise Block: Did you mean to use a Note block?": {
@@ -5957,7 +5957,7 @@
   },
   "beats per minute must be greater than %s": {
     "kanji": "1 分あたりの拍数は %s より大きくなければなりません",
-    "kana": "beats per minute must be greater than %s"
+    "kana": "1 ふんあたりのはくすうは %s よりおおきくなければなりません"
   },
   "maximum": {
     "kanji": "最大限",
@@ -5965,18 +5965,18 @@
   },
   "beats per minute is %s": {
     "kanji": "1 分あたりの拍数は %s です",
-    "kana": "beats per minute is %s"
+    "kana": "1 ふんあたりのはくすうは %s です"
   },
   "Staccato value must be non-zero.": {
     "kanji": "スタッカート値はゼロ以外でなければなりません。",
-    "kana": "Staccato value must be non-zero."
+    "kana": "すたっかーとあたいはぜろいがいでなければなりません。"
   },
   "Slur value must be non-zero.": {
     "kanji": "スラー値はゼロ以外でなければなりません。",
-    "kana": "Slur value must be non-zero."
+    "kana": "すらーあたいはぜろいがいでなければなりません。"
   },
   "Scalar transpositions are equal to Semitone transpositions for custom temperament.": {
-    "kanji": "スカラー移調は、カスタム音律の半音移調と同じです。",
+    "kanji": "音階的な移調は、カスタム音律の半音移調と同じです。",
     "kana": "Scalar transpositions are equal to Semitone transpositions for custom temperament."
   },
   "Vibrato intensity must be between 1 and 100.": {
@@ -6001,7 +6001,7 @@
   },
   "Unable to use synth due to existing oscillator.": {
     "kanji": "既存のオシレーターがあるためシンセは使用できません。",
-    "kana": "Unable to use synth due to existing oscillator."
+    "kana": "きぞんのおしれーたーがあるためしんせはしようできません。"
   },
   "The input cannot be negative.": {
     "kanji": "マイナスの数値をいれることはできません。",
@@ -6009,7 +6009,7 @@
   },
   "Synth not found: %s": {
     "kanji": "シンセが見つかりません: %s",
-    "kana": "Synth not found: %s"
+    "kana": "しんせがみつかりません: %s"
   },
   "font": {
     "kanji": "フォント",
@@ -6020,8 +6020,8 @@
     "kana": "このなまえの じしょは ほぞんしません。"
   },
   "Key with this name does not exist in %s": {
-    "kanji": "この名前のキーは %s に存在しません",
-    "kana": "Key with this name does not exist in %s"
+    "kanji": "この名前のキー（調）は %s に存在しません",
+    "kana": "このなまえのきー（ちょう）は %s にそんざいしません"
   },
   "Pause": {
     "kanji": "止める",
@@ -6033,35 +6033,35 @@
   },
   "New start block generated.": {
     "kanji": "新しい開始ブロックが生成されました。",
-    "kana": "New start block generated."
+    "kana": "あたらしいかいしぶろっくがせいせいされました。"
   },
   "MIDI loading. This may take some time depending upon the number of notes in the track": {
     "kanji": "「MIDI]を読み込み中です。音符の数とトラックの数によって時間がかかるかもしれません。",
-    "kana": "「MIDI]を よみこみちゅうです。おんぷの かずと トラックの かずによって じかんが かかるかもしれません。"
+    "kana": "MIDI loading. This may take some time depending upon the number of notes in the track"
   },
   "Upload failed: Sample is not a .wav file.": {
     "kanji": "アップロードできませんでした： サンプルは .wavファイルでは ありません。",
-    "kana": "Upload failed: Sample is not a .wav file."
+    "kana": "あっぷろーどできませんでした： さんぷるは .wavふぁいるでは ありません。"
   },
   "Generate blocks": {
     "kanji": "ブロックを生成する",
-    "kana": "Generate blocks"
+    "kana": "ぶろっくをせいせいする"
   },
   "Set API Key": {
     "kanji": "APIキーの設定",
-    "kana": "Set API Key"
+    "kana": "APIきーのせってい"
   },
   "Enter your Groq API Key: %s": {
     "kanji": "Groq API キーを入力してください: %s",
-    "kana": "Enter your Groq API Key: %s"
+    "kana": "Groq API きーをにゅうりょくしてください: %s"
   },
   "Synth error: %s": {
-    "kanji": "合成エラー: %s",
-    "kana": "Synth error: %s"
+    "kanji": "シンセのエラー: %s",
+    "kana": "しんせのえらー: %s"
   },
   "Audio not supported in this browser.": {
     "kanji": "このブラウザでは音声がサポートされていません。",
-    "kana": "Audio not supported in this browser."
+    "kana": "このぶらうざではおんせいがさぽーとされていません。"
   },
   "Please set your Groq API Key using the settings button (wrench icon) first.": {
     "kanji": "まず設定ボタン (レンチアイコン) を使用して Groq API キーを設定してください。",
@@ -6069,7 +6069,7 @@
   },
   "Play all": {
     "kanji": "全てさいせい",
-    "kana": "Play all"
+    "kana": "すべてさいせい"
   },
   "Reset": {
     "kanji": "リセット",
@@ -6089,11 +6089,11 @@
   },
   "Recording started": {
     "kanji": "録音開始",
-    "kana": "Recording started"
+    "kana": "ろくおんかいし"
   },
   "Recording complete": {
     "kanji": "録音完了",
-    "kana": "Recording complete"
+    "kana": "ろくおんかんりょう"
   },
   "A new sample block was generated.": {
     "kanji": "新しい「音色サンプル」ブロックが作りました",
@@ -6121,59 +6121,59 @@
   },
   "Prompt": {
     "kanji": "プロンプト",
-    "kana": "Prompt"
+    "kana": "ぷろんぷと"
   },
   "Trim": {
     "kanji": "トリム",
-    "kana": "Trim"
+    "kana": "とりむ"
   },
   "Generating audio... (It may take up to 1 minute)": {
-    "kanji": "オーディオを生成しています... (最大 1 分かかる場合があります)",
-    "kana": "Generating audio... (It may take up to 1 minute)"
+    "kanji": "新しい音声を生成しています... (最大 1 分かかる場合があります)",
+    "kana": "あたらしいおんせいをせいせいしています... (さいだい 1 わかかるばあいがあります)"
   },
   "Generating audio...": {
-    "kanji": "オーディオを生成しています...",
-    "kana": "Generating audio..."
+    "kanji": "新しい音声を生成しています...",
+    "kana": "あたらしいおんせいをせいせいしています..."
   },
   "Audio ready!": {
-    "kanji": "オーディオの準備完了！",
-    "kana": "Audio ready!"
+    "kanji": "新しい音声の準備完了！",
+    "kana": "あたらしいおんせいのじゅんびかんりょう！"
   },
   "Failed to generate audio.": {
     "kanji": "音声の生成に失敗しました。",
-    "kana": "Failed to generate audio."
+    "kana": "おんせいのせいせいにしっぱいしました。"
   },
   "An error occurred.": {
     "kanji": "エラーが発生しました。",
-    "kana": "An error occurred."
+    "kana": "えらーがはっせいしました。"
   },
   "Tuner": {
     "kanji": "チューナー",
-    "kana": "Tuner"
+    "kana": "ちゅーなー"
   },
   "Tuner stopped.": {
     "kanji": "チューナーが停止しました。",
-    "kana": "Tuner stopped."
+    "kana": "ちゅーなーがていししました。"
   },
   "Chromatic": {
     "kanji": "クロマチック",
-    "kana": "Chromatic"
+    "kana": "くろまちっく"
   },
   "Target pitch": {
     "kanji": "目標ピッチ",
-    "kana": "Target pitch"
+    "kana": "もくひょうぴっち"
   },
   "Tuner started.": {
     "kanji": "チューナーが起動しました。",
-    "kana": "Tuner started."
+    "kana": "ちゅーなーがきどうしました。"
   },
   "Cents adjustment": {
     "kanji": "セント調整",
-    "kana": "Cents adjustment"
+    "kana": "せんとちょうせい"
   },
   "Microphone access failed: %s": {
     "kanji": "マイクアクセスに失敗しました: %s",
-    "kana": "Microphone access failed: %s"
+    "kana": "まいくあくせすにしっぱいしました: %s"
   },
   "Save tempo": {
     "kanji": "テンポを保存",
@@ -6256,16 +6256,16 @@
     "kana": "テーブルを クリックでアルペジオのピッチを加える。"
   },
   "Start by dragging a block from the left panel and connect it to the Start block.": {
-    "kanji": "左側のパネルからブロックをドラッグして開始し、それを開始ブロックに接続します。",
+    "kanji": "はじめに左側のパネルからブロックをドラッグして、それを「スタート」ブロックに接続します。",
     "kana": "Start by dragging a block from the left panel and connect it to the Start block."
   },
   "Next": {
     "kanji": "次",
-    "kana": "Next"
+    "kana": "つぎ"
   },
   "Previous": {
     "kanji": "前の",
-    "kana": "Previous"
+    "kana": "まえの"
   },
   "Take a tour": {
     "kanji": "ツアーを始めよう",
@@ -6273,31 +6273,31 @@
   },
   "Show Palette containing the block": {
     "kanji": "ブロックを含むパレットを表示",
-    "kana": "Show Palette containing the block"
+    "kana": "ぶろっくをふくむぱれっとをひょうじ"
   },
   "Load this block": {
     "kanji": "このブロックをロードします",
-    "kana": "Load this block"
+    "kana": "このぶろっくをろーどします"
   },
   "This block is only available in advance mode": {
     "kanji": "このブロックはアドバンスモードでのみ利用可能です",
-    "kana": "This block is only available in advance mode"
+    "kana": "このぶろっくはあどばんすもーどでのみりようかのうです"
   },
   "This block is only available in advance mode.": {
     "kanji": "このブロックはアドバンスモードでのみ使用できます。",
-    "kana": "This block is only available in advance mode."
+    "kana": "このぶろっくはあどばんすもーどでのみしようできます。"
   },
   "Reset Code": {
-    "kanji": "リセットコード",
-    "kana": "Reset Code"
+    "kanji": "コードをリセット",
+    "kana": "こーどをりせっと"
   },
   "Convert JavaScript to Blocks": {
     "kanji": "JavaScript をブロックに変換する",
-    "kana": "Convert JavaScript to Blocks"
+    "kana": "JavaScript をぶろっくにへんかんする"
   },
   "Toggle Console": {
     "kanji": "コンソールの切り替え",
-    "kana": "Toggle Console"
+    "kana": "こんそーるのきりかえ"
   },
   "JavaScript block conversion is unavailable because its configuration file failed to load.": {
     "kanji": "JavaScript ブロック変換は、構成ファイルのロードに失敗したため使用できません。",
@@ -6305,7 +6305,7 @@
   },
   "JavaScript block conversion is still loading. Please try again.": {
     "kanji": "JavaScript ブロック変換はまだ読み込み中です。もう一度試してください。",
-    "kana": "JavaScript block conversion is still loading. Please try again."
+    "kana": "JavaScript ぶろっくへんかんはまだよみこみなかです。もういちどためしてください。"
   },
   "Export": {
     "kanji": "テーブルをほぞん",
@@ -6313,51 +6313,51 @@
   },
   "Upload Image": {
     "kanji": "画像をアップロードする",
-    "kana": "Upload Image"
+    "kana": "がぞうをあっぷろーどする"
   },
   "Webcam": {
     "kanji": "ウェブカメラ",
-    "kana": "Webcam"
+    "kana": "うぇぶかめら"
   },
   "LEGO Bricks - Phrase Maker with %s pitch rows (sorted by frequency, Instrument)": {
-    "kanji": "LEGO Bricks - %s ピッチ行を含むフレーズ メーカー (周波数、楽器順に並べ替え)",
+    "kanji": "レゴブロック - %s ピッチ行を含むフレーズ・メーカー (周波数、音声順に並べ替え)",
     "kana": "LEGO Bricks - Phrase Maker with %s pitch rows (sorted by frequency, Instrument)"
   },
   "No color data to save. Please scan an image first.": {
-    "kanji": "保存するカラーデータがありません。まず画像をスキャンしてください。",
-    "kana": "No color data to save. Please scan an image first."
+    "kanji": "保存するカラー データがありません。まず画像をスキャンしてください。",
+    "kana": "ほぞんするからー でーたがありません。まずがぞうをすきゃんしてください。"
   },
   "No notes detected from color scanning.": {
     "kanji": "カラー スキャンではメモが検出されませんでした。",
-    "kana": "No notes detected from color scanning."
+    "kana": "からー すきゃんではめもがけんしゅつされませんでした。"
   },
   "LEGO phrase": {
-    "kanji": "レゴフレーズ",
-    "kana": "LEGO phrase"
+    "kanji": "レゴ のフレーズ",
+    "kana": "れご のふれーず"
   },
   "LEGO phrase saved as action blocks with %s notes.": {
-    "kanji": "LEGO フレーズは %s ノートを含むアクション ブロックとして保存されました。",
-    "kana": "LEGO phrase saved as action blocks with %s notes."
+    "kanji": "レゴ フレーズは %s 音符を含む「アクション」ブロックとして保存されました。",
+    "kana": "れご ふれーずは %s おんぷをふくむ「あくしょん」ぶろっくとしてほぞんされました。"
   },
   "Exporting phrase data: %s": {
     "kanji": "フレーズ データをエクスポートしています: %s",
-    "kana": "Exporting phrase data: %s"
+    "kana": "ふれーず でーたをえくすぽーとしています: %s"
   },
   "Phrase cleared": {
     "kanji": "フレーズをクリアしました",
-    "kana": "Phrase cleared"
+    "kana": "ふれーずをくりあしました"
   },
   "Image uploaded successfully": {
     "kanji": "画像が正常にアップロードされました",
-    "kana": "Image uploaded successfully"
+    "kana": "がぞうがせいじょうにあっぷろーどされました"
   },
   "Webcam started": {
     "kanji": "ウェブカメラが開始されました",
-    "kana": "Webcam started"
+    "kana": "うぇぶかめらがかいしされました"
   },
   "Webcam access denied: %s": {
-    "kanji": "Web カメラへのアクセスが拒否されました: %s",
-    "kana": "Webcam access denied: %s"
+    "kanji": "ウェブカメラへのアクセスが拒否されました: %s",
+    "kana": "うぇぶかめらへのあくせすがきょひされました: %s"
   },
   "Eye dropper active - hover over image to preview colors, click to select background color.": {
     "kanji": "スポイトがアクティブ - 画像の上にカーソルを置くと色がプレビューされ、クリックして背景色を選択できます。",
@@ -6365,27 +6365,27 @@
   },
   "Background color selected: %s": {
     "kanji": "選択された背景色: %s",
-    "kana": "Background color selected: %s"
+    "kana": "せんたくされたはいけいしょく: %s"
   },
   "Could not sample color - please try clicking on the image.": {
     "kanji": "カラーのサンプルができませんでした - 画像をクリックしてみてください。",
-    "kana": "Could not sample color - please try clicking on the image."
+    "kana": "からーのさんぷるができませんでした - がぞうをくりっくしてみてください。"
   },
   "Instrument changed to: %s": {
-    "kanji": "楽器は次のように変更されました: %s",
-    "kana": "Instrument changed to: %s"
+    "kanji": "音声は次のように変更されました: %s",
+    "kana": "おんせいはつぎのようにへんこうされました: %s"
   },
   "Scanning image with vertical lines...": {
     "kanji": "画像をスキャンすると縦線が入ります...",
-    "kana": "Scanning image with vertical lines..."
+    "kana": "がぞうをすきゃんするとたてせんがいります..."
   },
   "Rotate counter clockwise": {
     "kanji": "左回りにずれる",
-    "kana": "Rotate counter clockwise"
+    "kana": "ひだりまわりにずれる"
   },
   "Rotate clockwise": {
     "kanji": "右回りにずれる",
-    "kana": "Rotate clockwise"
+    "kana": "みぎまわりにずれる"
   },
   "Click in the circle to select notes for the mode.": {
     "kanji": "クリックで音の高さを選んで音階を設定できます。",
@@ -6401,11 +6401,11 @@
   },
   "Note value": {
     "kanji": "ノートの値",
-    "kana": "Note value"
+    "kana": "のーとのあたい"
   },
   "All 12 pitches are already in the keyboard. Adding duplicate.": {
-    "kanji": "12 音程すべてがすでにキーボードに組み込まれています。重複を追加します。",
-    "kana": "All 12 pitches are already in the keyboard. Adding duplicate."
+    "kanji": "12個のピッチ、すべてがすでにキーボードに組み込まれています。重複を追加します。",
+    "kana": "12このぴっち、すべてがすでにきーぼーどにくみこまれています。ちょうふくをついかします。"
   },
   "New action blocks generated.": {
     "kanji": "新しいアクションを作りました。",
@@ -6449,7 +6449,7 @@
   },
   "Use the up/down buttons or arrow keys to change pitch.": {
     "kanji": "ピッチを変更するには、上下ボタンまたは矢印キーを使用します。",
-    "kana": "Use the up/down buttons or arrow keys to change pitch."
+    "kana": "ぴっちをへんこうするには、じょうげぼたんまたはやじるしきーをしようします。"
   },
   "Click on the slider to create a note block.": {
     "kanji": "スライダーで音の高さを変えます。",
@@ -6469,39 +6469,39 @@
   },
   "Summary": {
     "kanji": "まとめ",
-    "kana": "Summary"
+    "kana": "まとめ"
   },
   "Talk with Rohan": {
-    "kanji": "ロハンと話す",
-    "kana": "Talk with Rohan"
+    "kanji": "ロハンさんと話す",
+    "kana": "ろはんさんとはなす"
   },
   "Talk with Alan": {
-    "kanji": "アランと話す",
-    "kana": "Talk with Alan"
+    "kanji": "アランさんと話す",
+    "kana": "あらんさんとはなす"
   },
   "Talk with Beethoven": {
-    "kanji": "ベートーヴェンとの話す",
-    "kana": "Talk with Beethoven"
+    "kanji": "ベートーヴェンさんとの話す",
+    "kana": "べーとーゔぇんさんとのはなす"
   },
   "Refresh": {
     "kanji": "リフレッシュ",
-    "kana": "Refresh"
+    "kana": "りふれっしゅ"
   },
   "Reflect on your project.": {
     "kanji": "自分のプロジェクトを振り返ってください。",
-    "kana": "Reflect on your project."
+    "kana": "じぶんのぷろじぇくとをふりかえってください。"
   },
   "Failed to send message.": {
     "kanji": "メッセージの送信に失敗しました。",
-    "kana": "Failed to send message."
+    "kana": "めっせーじのそうしんにしっぱいしました。"
   },
   "No changes were detected in your project.": {
     "kanji": "プロジェクト内で変更は検出されませんでした。",
-    "kana": "No changes were detected in your project."
+    "kana": "ぷろじぇくとないでへんこうはけんしゅつされませんでした。"
   },
   "No conversation to save.": {
     "kanji": "保存できる会話はありません。",
-    "kana": "No conversation to save."
+    "kana": "ほぞんできるかいわはありません。"
   },
   "Save rhythms": {
     "kanji": "リズムだけをほぞん",
@@ -6517,7 +6517,7 @@
   },
   "Circular view": {
     "kanji": "円形ビュー",
-    "kana": "Circular view"
+    "kana": "えんけいびゅー"
   },
   "Click on the ruler to divide it.": {
     "kanji": "クリックするとリズムをわけることができます。",
@@ -6541,7 +6541,7 @@
   },
   "cents": {
     "kanji": "セント",
-    "kana": "cents"
+    "kana": "せんと"
   },
   "done": {
     "kanji": "終った",
@@ -6553,7 +6553,7 @@
   },
   "interval": {
     "kanji": "音と音の間の間隔",
-    "kana": "interval"
+    "kana": "おととおとのまのかんかく"
   },
   "non scalar": {
     "kanji": "音階内ではない",
@@ -6577,7 +6577,7 @@
   },
   "The Number of divisions is too large.": {
     "kanji": "分割数が大きすぎます。",
-    "kana": "The Number of divisions is too large."
+    "kana": "ぶんかつすうがおおきすぎます。"
   },
   "recursion": {
     "kanji": "反復",
@@ -6585,71 +6585,71 @@
   },
   "The octave ratio has changed. This changes temperament significantly.": {
     "kanji": "オクターブ比が変わりました。これにより調律が大きく変わります。",
-    "kana": "The octave ratio has changed. This changes temperament significantly."
+    "kana": "おくたーぶひがかわりました。これによりちょうりつがおおきくかわります。"
   },
   "Invalid temperament: %s. Skipping to next temperament.": {
     "kanji": "無効な音律: %s。次の音律にスキップします。",
-    "kana": "Invalid temperament: %s. Skipping to next temperament."
+    "kana": "むこうなおんりつ: %s。つぎのおんりつにすきっぷします。"
   },
   "Table": {
     "kanji": "グリッド",
     "kana": "グリッド"
   },
   "Invalid temperament interval data. Skipping note %s.": {
-    "kanji": "無効な音律間隔データです。メモ %s をスキップします。",
-    "kana": "Invalid temperament interval data. Skipping note %s."
+    "kanji": "無効な音律間隔データです。%sのピッチ をスキップします。",
+    "kana": "むこうなおんりつかんかくでーたです。%sのぴっち をすきっぷします。"
   },
   "Add pitches": {
     "kanji": "音高を足す",
-    "kana": "Add pitches"
+    "kana": "おんこうをたす"
   },
   "Close window": {
     "kanji": "ウィンドウを閉じる",
-    "kana": "Close window"
+    "kana": "うぃんどうをとじる"
   },
   "Minimize": {
     "kanji": "最小化する",
-    "kana": "Minimize"
+    "kana": "さいしょうかする"
   },
   "Roll up window": {
-    "kanji": "ロールアップウィンドウ",
-    "kana": "Roll up window"
+    "kanji": "ウィンドウをロールアップする",
+    "kana": "うぃんどうをろーるあっぷする"
   },
   "Maximize window": {
     "kanji": "ウィンドウを最大化する",
-    "kana": "Maximize window"
+    "kana": "うぃんどうをさいだいかする"
   },
   "Reset conversation": {
     "kanji": "会話をリセット",
-    "kana": "Reset conversation"
+    "kana": "かいわをりせっと"
   },
   "Export chat": {
     "kanji": "チャットをエクスポートする",
-    "kana": "Export chat"
+    "kana": "ちゃっとをえくすぽーとする"
   },
   "Debugger initialized": {
     "kanji": "デバッガが初期化されました",
-    "kana": "Debugger initialized"
+    "kana": "でばっががしょきかされました"
   },
   "AI Debugger backend is not configured for this host.": {
     "kanji": "AI デバッガー バックエンドはこのホスト用に構成されていません。",
-    "kana": "AI Debugger backend is not configured for this host."
+    "kana": "AI でばっがー ばっくえんどはこのほすとようにこうせいされていません。"
   },
   "Debugger error: Could not prepare project data.": {
     "kanji": "デバッガー エラー: プロジェクト データを準備できませんでした。",
-    "kana": "Debugger error: Could not prepare project data."
+    "kana": "でばっがー えらー: ぷろじぇくと でーたをじゅんびできませんでした。"
   },
   "Server error: Invalid response from AI backend.": {
     "kanji": "サーバー エラー: AI バックエンドからの無効な応答。",
-    "kana": "Server error: Invalid response from AI backend."
+    "kana": "さーばー えらー: AI ばっくえんどからのむこうなおうとう。"
   },
   "Server error: Unable to connect to AI backend.": {
     "kanji": "サーバー エラー: AI バックエンドに接続できません。",
-    "kana": "Server error: Unable to connect to AI backend."
+    "kana": "さーばー えらー: AI ばっくえんどにせつぞくできません。"
   },
   "Before we start": {
     "kanji": "始める前に",
-    "kana": "Before we start"
+    "kana": "はじめるまえに"
   },
   "The AI Debugger will send your current project data to an external server for analysis. Your project blocks and structure will be shared with:": {
     "kanji": "AI デバッガーは、分析のために現在のプロジェクト データを外部サーバーに送信します。プロジェクトのブロックと構造は以下と共有されます。",
@@ -6657,7 +6657,7 @@
   },
   "Analyze my project": {
     "kanji": "私のプロジェクトを分析してください",
-    "kana": "Analyze my project"
+    "kana": "わたしのぷろじぇくとをぶんせきしてください"
   },
   "AI analysis was not started. You can type a question below, but project data will not be sent until you agree.": {
     "kanji": "AI解析は開始されていません。以下に質問を入力できますが、同意するまでプロジェクト データは送信されません。",
@@ -6665,11 +6665,11 @@
   },
   "Debugger error: Invalid project data format.": {
     "kanji": "デバッガー エラー: 無効なプロジェクト データ形式です。",
-    "kana": "Debugger error: Invalid project data format."
+    "kana": "でばっがー えらー: むこうなぷろじぇくと でーたけいしきです。"
   },
   "Debugger error: Could not load project data.": {
     "kanji": "デバッガ エラー: プロジェクト データをロードできませんでした。",
-    "kana": "Debugger error: Could not load project data."
+    "kana": "でばっが えらー: ぷろじぇくと でーたをろーどできませんでした。"
   },
   "AI Debugger is not available on this host. The backend URL could not be determined.": {
     "kanji": "AI デバッガーはこのホストでは使用できません。バックエンド URL を特定できませんでした。",
@@ -6677,43 +6677,43 @@
   },
   "Server error: No initial response from AI backend.": {
     "kanji": "サーバー エラー: AI バックエンドからの初期応答がありません。",
-    "kana": "Server error: No initial response from AI backend."
+    "kana": "さーばー えらー: AI ばっくえんどからのしょきおうとうがありません。"
   },
   "Server error: Failed to initialize AI debugger.": {
     "kanji": "サーバー エラー: AI デバッガーの初期化に失敗しました。",
-    "kana": "Server error: Failed to initialize AI debugger."
+    "kana": "さーばー えらー: AI でばっがーのしょきかにしっぱいしました。"
   },
   "Conversation reset.": {
     "kanji": "会話がリセットされました。",
-    "kana": "Conversation reset."
+    "kana": "かいわがりせっとされました。"
   },
   "No conversation to export.": {
     "kanji": "エクスポートする会話はありません。",
-    "kana": "No conversation to export."
+    "kana": "えくすぽーとするかいわはありません。"
   },
   "Debugger error: Could not retrieve project data for export.": {
     "kanji": "デバッガー エラー: エクスポートするプロジェクト データを取得できませんでした。",
-    "kana": "Debugger error: Could not retrieve project data for export."
+    "kana": "でばっがー えらー: えくすぽーとするぷろじぇくと でーたをしゅとくできませんでした。"
   },
   "Chat exported successfully.": {
     "kanji": "チャットは正常にエクスポートされました。",
-    "kana": "Chat exported successfully."
+    "kana": "ちゃっとはせいじょうにえくすぽーとされました。"
   },
   "Chat cleared.": {
     "kanji": "チャットがクリアされました。",
-    "kana": "Chat cleared."
+    "kana": "ちゃっとがくりあされました。"
   },
   "More Details": {
     "kanji": "さらに詳しく",
-    "kana": "More Details"
+    "kana": "さらにくわしく"
   },
   "Open in Music Blocks": {
     "kanji": "ミュージック・ブロックスで開きます",
     "kana": "ミュージック・ブロックスで ひらきます"
   },
   "Share project": {
-    "kanji": "プロジェクトを共有する",
-    "kana": "Share project"
+    "kanji": "プロジェクトをシェアする",
+    "kana": "ぷろじぇくとをしぇあする"
   },
   "Share": {
     "kanji": "シェア",
@@ -6721,7 +6721,7 @@
   },
   "Copy link to clipboard": {
     "kanji": "リンクをクリップボードにコピー",
-    "kana": "Copy link to clipboard"
+    "kana": "りんくをくりっぷぼーどにこぴー"
   },
   "Flags": {
     "kanji": "旗",
@@ -6729,27 +6729,27 @@
   },
   "Run project on startup.": {
     "kanji": "起動時にプロジェクトを実行します。",
-    "kana": "Run project on startup."
+    "kana": "きどうじにぷろじぇくとをじっこうします。"
   },
   "Show code blocks on startup.": {
-    "kanji": "起動時にコードブロックを表示します。",
-    "kana": "Show code blocks on startup."
+    "kanji": "起動時にコード ブロックを表示します。",
+    "kana": "きどうじにこーど ぶろっくをひょうじします。"
   },
   "Collapse code blocks on startup.": {
     "kanji": "起動時にコード ブロックを折りたたむ。",
-    "kana": "Collapse code blocks on startup."
+    "kana": "きどうじにこーど ぶろっくをおりたたむ。"
   },
   "Advanced Options": {
     "kanji": "詳細オプション",
-    "kana": "Advanced Options"
+    "kana": "しょうさいおぷしょん"
   },
   "Link copied to clipboard!": {
     "kanji": "リンクがクリップボードにコピーされました!",
-    "kana": "Link copied to clipboard!"
+    "kana": "りんくがくりっぷぼーどにこぴーされました!"
   },
   "Failed to copy link to clipboard": {
     "kanji": "リンクをクリップボードにコピーできませんでした",
-    "kana": "Failed to copy link to clipboard"
+    "kana": "りんくをくりっぷぼーどにこぴーできませんでした"
   },
   "anonymous": {
     "kanji": "匿名",
@@ -6761,7 +6761,7 @@
   },
   "Thank you for reporting this project. A moderator will review the project shortly, to verify violation of the Sugar Labs Code of Conduct.": {
     "kanji": "このプロジェクトを通報して下さってありがとうございます。モデレータが間もなく、プロジェクトを見ます。",
-    "kana": "このプロジェクトを つうほうして くださって ありがとう ございます。モデレータが まもなく、プロジェクトを みます。"
+    "kana": "Thank you for reporting this project. A moderator will review the project shortly, to verify violation of the Sugar Labs Code of Conduct."
   },
   "Report Project": {
     "kanji": "プロジェクトを通報する",
@@ -6829,11 +6829,11 @@
   },
   "Delete \\\"<span id=\\\"deleter-title\\\"></span>\\\"?": {
     "kanji": "「<span id=\\\"deleter-title\\\"></span>」を削除しますか?",
-    "kana": "Delete \\\"<span id=\\\"deleter-title\\\"></span>\\\"?"
+    "kana": "「<span id=\\\"deleter-title\\\"></span>」をさくじょしますか?"
   },
   "Permanently delete project \\\"<span id=\\\"deleter-name\\\"></span>\\\"?": {
     "kanji": "プロジェクト「<span id=\\\"deleter-name\\\"></span>」を完全に削除しますか?",
-    "kana": "Permanently delete project \\\"<span id=\\\"deleter-name\\\"></span>\\\"?"
+    "kana": "ぷろじぇくと「<span id=\\\"deleter-name\\\"></span>」をかんぜんにさくじょしますか?"
   },
   "Explore Projects": {
     "kanji": "プロジェクトを探す",
@@ -6888,7 +6888,7 @@
     "kana": "タッグ"
   },
   "Report projects which violate the <a href=\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\" target=\\\"_blank\\\" rel=\\\"noopener noreferrer\\\">Sugar Labs Code of Conduct</a>.": {
-    "kanji": "<a href=\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\" target=\\\"_blank\\\" rel=\\\"noopener noreferrer\\\">Sugar Labs 行動規範</a>に違反するプロジェクトを報告してください。",
+    "kanji": "<a href=\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\" target=\\\"_blank\\\" rel=\\\"noopener noreferrer\\\">Sugar Labs 行動規範</a>に違反するプロジェクトを報告します。",
     "kana": "Report projects which violate the <a href=\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\" target=\\\"_blank\\\" rel=\\\"noopener noreferrer\\\">Sugar Labs Code of Conduct</a>."
   },
   "Reason for reporting project": {
@@ -6965,15 +6965,15 @@
   },
   "New Project": {
     "kanji": "新しいプロジェクト",
-    "kana": "New Project"
+    "kana": "あたらしいぷろじぇくと"
   },
   "Unsaved changes will be lost. Are you sure?": {
     "kanji": "保存されていない変更は失われます。本気ですか？",
-    "kana": "Unsaved changes will be lost. Are you sure?"
+    "kana": "ほぞんされていないへんこうはうしなわれます。ほんきですか？"
   },
   "Feature unavailable - cannot connect to server. Reload Music Blocks to try again.": {
     "kanji": "エラー：サーバに接続できません。ミュージック・ブロックスをリロードし、再度試して下さい。",
-    "kana": "エラー：サーバに せつぞく できません。ブラウザを さいきどう して、さいど ためしてください。"
+    "kana": "Feature unavailable - cannot connect to server. Reload Music Blocks to try again."
   },
   "This field is required": {
     "kanji": "この項目は必須項目です",
@@ -7210,5 +7210,17 @@
   "low": {
     "kanji": "低",
     "kana": "低"
+  },
+  "Record canvas and toolbars": {
+    "kanji": "キャンバスとツールバーを録画",
+    "kana": "Record canvas and toolbars"
+  },
+  "Record canvas only": {
+    "kanji": "キャンバスのみ録画",
+    "kana": "Record canvas only"
+  },
+  "In the example shown above, sol is shifted up to sol#.": {
+    "kanji": "In the example shown above, sol is shifted up to sol#.",
+    "kana": "例の画像に<em>ソル</em>が<em>ソル#</em>に上に移動されています。"
   }
 }
