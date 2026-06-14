@@ -156,6 +156,10 @@ describe("AIWidget Instance", () => {
     let aiWidget;
     let mockActivity;
     let originalFetch;
+    let originalCustomSamples;
+    let originalInstruments;
+    let originalToneAnalyser;
+    let originalWindowFor;
 
     beforeEach(() => {
         mockActivity = {
@@ -208,10 +212,25 @@ describe("AIWidget Instance", () => {
         // Since aiwidget.js uses wheelnav as a global if present
         global.wheelnav = jest.fn();
         originalFetch = global.fetch;
+
+        originalCustomSamples = global.CUSTOMSAMPLES;
+        originalInstruments = global.instruments;
+        originalToneAnalyser = global.Tone?.Analyser;
+        originalWindowFor = global.window?.widgetWindows?.windowFor;
     });
 
     afterEach(() => {
         global.fetch = originalFetch;
+        global.CUSTOMSAMPLES = originalCustomSamples;
+        global.instruments = originalInstruments;
+
+        if (global.Tone) {
+            global.Tone.Analyser = originalToneAnalyser;
+        }
+
+        if (global.window?.widgetWindows) {
+            global.window.widgetWindows.windowFor = originalWindowFor;
+        }
         jest.restoreAllMocks();
         jest.useRealTimers();
     });
