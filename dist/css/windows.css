@@ -25,6 +25,7 @@
   display: flex;
   padding: 4px;
   position: relative;
+  touch-action: none !important;
 }
 
 #floatingWindows > .windowFrame > .wfTopBar .wftButton {
@@ -203,6 +204,7 @@
     flex-shrink: 0;
     box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.16), 0px 2px 10px 0px rgba(0, 0, 0, 0.12);
     min-width: auto;
+    touch-action: none !important;
   }
 
   #floatingWindows > .windowFrame > .wfTopBar .wftButton {
@@ -305,6 +307,7 @@
     flex-shrink: 0;
     box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.16), 0px 2px 10px 0px rgba(0, 0, 0, 0.12);
     min-width: auto;
+    touch-action: none !important;
   }
 
   #floatingWindows > .windowFrame > .wfTopBar .wftButton {
@@ -381,6 +384,7 @@
     flex-shrink: 0;
     box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.16), 0px 1px 7px 0px rgba(0, 0, 0, 0.12);
     min-width: auto;
+    touch-action: none !important;
   }
 
   #floatingWindows > .windowFrame > .wfTopBar .wftButton {
@@ -418,4 +422,10 @@
     width: 100%;
     padding: 1px 3px;
   }
+}
+
+/* Fix for touch dragging: ensure the entire top bar disables scrolling */
+#floatingWindows > .windowFrame > .wfTopBar,
+#floatingWindows > .windowFrame > .wfTopBar * {
+    touch-action: none !important;
 }

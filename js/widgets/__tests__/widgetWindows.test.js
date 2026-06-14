@@ -161,11 +161,12 @@ describe("widgetWindows", () => {
             createTestWindow("Window 2");
             createTestWindow("Window 3");
 
-            // mouseup, mousemove, mousedown (each once)
-            const globalMouseListeners = addSpy.mock.calls.filter(call =>
-                ["mouseup", "mousemove", "mousedown"].includes(call[0])
+            // pointerup, pointermove, pointerdown (each once) — migrated from mouse events
+            // to Pointer Events API for touch/stylus support
+            const globalPointerListeners = addSpy.mock.calls.filter(call =>
+                ["pointerup", "pointermove", "pointerdown"].includes(call[0])
             );
-            expect(globalMouseListeners).toHaveLength(3);
+            expect(globalPointerListeners).toHaveLength(3);
 
             addSpy.mockRestore();
         });
@@ -377,10 +378,10 @@ describe("widgetWindows", () => {
 
             win.close();
 
-            const globalMouseRemovals = removeSpy.mock.calls.filter(call =>
-                ["mouseup", "mousemove", "mousedown"].includes(call[0])
+            const globalPointerRemovals = removeSpy.mock.calls.filter(call =>
+                ["pointerup", "pointermove", "pointerdown"].includes(call[0])
             );
-            expect(globalMouseRemovals).toHaveLength(0);
+            expect(globalPointerRemovals).toHaveLength(0);
             removeSpy.mockRestore();
         });
     });
@@ -422,10 +423,10 @@ describe("widgetWindows", () => {
 
             win.destroy();
 
-            const globalMouseRemovals = removeSpy.mock.calls.filter(call =>
-                ["mouseup", "mousemove", "mousedown"].includes(call[0])
+            const globalPointerRemovals = removeSpy.mock.calls.filter(call =>
+                ["pointerup", "pointermove", "pointerdown"].includes(call[0])
             );
-            expect(globalMouseRemovals).toHaveLength(0);
+            expect(globalPointerRemovals).toHaveLength(0);
             removeSpy.mockRestore();
         });
 
