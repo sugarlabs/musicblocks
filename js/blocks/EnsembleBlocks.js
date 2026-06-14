@@ -43,22 +43,37 @@ function getTargetTurtle(turtles, targetTurtle) {
 }
 
 function _blockFindTurtle(activity, turtle, blk, receivedArg) {
+    if (!activity.blocks.blockList[blk]) {
+        return null;
+    }
+
     const cblk = activity.blocks.blockList[blk].connections[1];
+
     if (cblk === null) {
-        //Debug: connecting block not found, returning null
         return null;
     }
-    const targetTurtle = activity.logo.parseArg(activity.logo, turtle, cblk, blk, receivedArg);
+
+    const targetTurtle = activity.logo.parseArg(
+        activity.logo,
+        turtle,
+        cblk,
+        blk,
+        receivedArg
+    );
+
     if (targetTurtle === null) {
-        //Debug: target turtleName from arg not found, returning null
         return null;
     }
+
     const targetTurtleId = getTargetTurtle(activity.turtles, targetTurtle);
+
     if (targetTurtleId === null) {
         return null;
     }
+
     return activity.turtles.getTurtle(targetTurtleId);
 }
+
 
 function setupEnsembleBlocks(activity) {
     // Extract common block setup logic
@@ -482,7 +497,7 @@ function setupEnsembleBlocks(activity) {
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
             const targetTurtle = getTargetTurtle(activity.turtles, args[0]);
-            if (targetTurtle !== null) {
+            if (targetTurtle != null) {
                 logo.runFromBlock(logo, targetTurtle, args[1], isflow, receivedArg);
             } else {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
