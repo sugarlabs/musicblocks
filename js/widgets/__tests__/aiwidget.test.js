@@ -739,11 +739,15 @@ describe("AIWidget Instance", () => {
             })
         }));
         aiWidget = new AIWidget();
-        aiWidget.pause = jest.fn();
-        aiWidget.isMoving = true;
+        const pauseSpy = jest.fn();
+
+        aiWidget.pause = pauseSpy;
         aiWidget.init(mockActivity);
+        pauseSpy.mockClear();
+        aiWidget.isMoving = true;
         playButton.onclick();
-        expect(aiWidget.pause).toHaveBeenCalled();
+
+        expect(pauseSpy).toHaveBeenCalledTimes(1);
         expect(aiWidget.isMoving).toBe(false);
     });
 
@@ -800,12 +804,15 @@ describe("AIWidget Instance", () => {
         aiWidget._playSample = jest.fn();
         aiWidget._endPlaying = jest.fn();
         const promise = aiWidget._waitAndPlaySample();
-        jest.runAllTimers();
+
+        expect(aiWidget._playSample).not.toHaveBeenCalled();
+        expect(aiWidget._endPlaying).not.toHaveBeenCalled();
+
+        jest.runOnlyPendingTimers();
         const result = await promise;
-        expect(aiWidget._playSample).toHaveBeenCalled();
-        expect(aiWidget._endPlaying).toHaveBeenCalled();
+        expect(aiWidget._playSample).toHaveBeenCalledTimes(1);
+        expect(aiWidget._endPlaying).toHaveBeenCalledTimes(1);
         expect(result).toBe("played");
-        jest.useRealTimers();
     });
 
     it("should pause playback after sample duration ends", async () => {
@@ -814,11 +821,14 @@ describe("AIWidget Instance", () => {
         aiWidget.pause = jest.fn();
         aiWidget.sampleLength = 1500;
         const promise = aiWidget._waitAndEndPlaying();
-        jest.runAllTimers();
+
+        expect(aiWidget.pause).not.toHaveBeenCalled();
+        jest.advanceTimersByTime(1499);
+        expect(aiWidget.pause).not.toHaveBeenCalled();
+        jest.advanceTimersByTime(1);
         const result = await promise;
-        expect(aiWidget.pause).toHaveBeenCalled();
+        expect(aiWidget.pause).toHaveBeenCalledTimes(1);
         expect(result).toBe("ended");
-        jest.useRealTimers();
     });
 
     it("should delegate delayed playback to waitAndPlaySample", async () => {
