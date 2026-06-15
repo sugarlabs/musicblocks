@@ -6,25 +6,28 @@ This guide explains how you can add your own custom theme or customize an existi
 
 ### How themes work in Music Blocks
 
-1. On first load, the theme is chosen from `localStorage.themePreference` or the system color-scheme preference.
+1. When the page loads for the first time, the default theme of light mode is used.
 
-2. Theme styling now comes from `css/tokens.css`. The active theme is applied by toggling `body.dark` or `body.highcontrast`, which updates CSS custom properties immediately.
+2. When you choose a theme, an object stores inside the localStorage called themePreference.
 
-3. `js/utils/platformstyle.js` still exposes a compatibility `window.platformColor` object for legacy JS, but new styling should read CSS custom properties instead of hardcoded colors.
+3. As of now, all styling of Music Blocks happens at the time of loading. When we change themes, we reload the page.
 
-4. Most of the Music Blocks theme styles are defined in:
+4. Most of the Music Blocks theme styles are defined in two places:
 
-    1. css/tokens.css
-    2. css/themes.css
-    3. planet/css/planetThemes.css
+    1. css/themes.css
+    2. js/utils/platformstyle.js
 
-5. Theme switches are applied instantly. Prefer CSS classes and tokens over `element.style.*` assignments when adding or updating UI.
+5. The Plant theme styles are defined in:
+
+    1. planet/css/planetThemes.css
+
+6. The code to handle themes assignment (by looking at the themePreference object in localStorage) to their respective places is already done. You just have to follow the steps given below to add your theme.
 
 ---
 
 ### Steps on Theme Customization:
 
-Note: If you want to customise an existing theme, update the token values in `css/tokens.css` and the theme-specific overrides in `css/themes.css` or `planet/css/planetThemes.css`.
+Note: If you want to customise an existing theme, just put your changes in the dark mode and choose dark mode from the theme dropdown. You can skip to step no. 6 if that is your goal.
 
 1.  **Adding your theme's icon to the list in index.html**
 
