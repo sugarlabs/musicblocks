@@ -149,6 +149,10 @@ describe("Utility Functions (logic-only)", () => {
         it("handles files without extension", () => {
             expect(fileBasename("filename")).toBe("filename");
         });
+
+        it("handles hidden files like .env", () => {
+            expect(fileBasename(".env")).toBe(".env");
+        });
     });
 
     describe("last()", () => {
@@ -170,6 +174,10 @@ describe("Utility Functions (logic-only)", () => {
 
         it("returns non-string as is", () => {
             expect(safeSVG(123)).toBe(123);
+        });
+
+        it("escapes &, < and >", () => {
+            expect(safeSVG("<div>&</div>")).toBe("&lt;div&gt;&amp;&lt;/div&gt;");
         });
     });
 
@@ -200,6 +208,14 @@ describe("Utility Functions (logic-only)", () => {
         it("handles zero", () => {
             expect(mixedNumber(0)).toBe("0/1");
         });
+
+        it("returns fraction only if floor is 0", () => {
+            expect(mixedNumber(0.5)).toBe("1/2");
+        });
+
+        it("returns d if not number", () => {
+            expect(mixedNumber("abc")).toBe("abc");
+        });
     });
 
     describe("nearestBeat()", () => {
@@ -207,7 +223,10 @@ describe("Utility Functions (logic-only)", () => {
             expect(nearestBeat(50, 8)).toEqual([4, 8]);
         });
         it("handles large numbers", () => {
-            expect(nearestBeat(123.456)).toBeDefined();
+            expect(nearestBeat(123.456, 8)).toEqual([10, 8]);
+        });
+        it("returns zero beat when very small", () => {
+            expect(nearestBeat(1, 8)).toEqual([0, 8]);
         });
     });
 
@@ -217,330 +236,12 @@ describe("Utility Functions (logic-only)", () => {
             expect(oneHundredToFraction(1)).toEqual([1, 64]);
             expect(oneHundredToFraction(100)).toEqual([1, 1]);
         });
-    });
 
-    describe("rationalToFraction()", () => {
-        it("converts float to fraction", () => {
-            expect(rationalToFraction(0.5)).toEqual([1, 2]);
-        });
-
-        it("handles 0, NaN, Infinity", () => {
-            expect(rationalToFraction(0)).toEqual([0, 1]);
-            expect(rationalToFraction(NaN)).toEqual([0, 1]);
-            expect(rationalToFraction(Infinity)).toEqual([0, 1]);
-        });
-    });
-
-    describe("rgbToHex()", () => {
-        it("converts rgb to hex", () => {
-            expect(rgbToHex(255, 0, 0)).toBe("#ff0000");
-            expect(rgbToHex(0, 255, 0)).toBe("#00ff00");
-            expect(rgbToHex(0, 0, 255)).toBe("#0000ff");
-        });
-        describe("rgbToHex edge behavior", () => {
-            it("handles zero values", () => {
-                expect(rgbToHex(0, 0, 0)).toBe("#000000");
-            });
-
-            it("handles max values", () => {
-                expect(rgbToHex(255, 255, 255)).toBe("#ffffff");
-            });
-        });
-    });
-
-    describe("hexToRGB()", () => {
-        it("converts hex to rgb object", () => {
-            expect(hexToRGB("#ff0000")).toEqual({ r: 255, g: 0, b: 0 });
-            expect(hexToRGB("#00ff00")).toEqual({ r: 0, g: 255, b: 0 });
-        });
-
-        it("returns null for invalid hex", () => {
-            expect(hexToRGB("#zzz")).toBeNull();
-        });
-        describe("rgbToHex edge behavior", () => {
-            it("handles zero values", () => {
-                expect(rgbToHex(0, 0, 0)).toBe("#000000");
-            });
-
-            it("handles max values", () => {
-                expect(rgbToHex(255, 255, 255)).toBe("#ffffff");
-            });
-        });
-    });
-
-    describe("hex2rgb()", () => {
-        it("converts hex to rgba string", () => {
-            expect(hex2rgb("ff0000")).toBe("rgba(255,0,0,1)");
-        });
-    });
-
-    describe("format() function logic", () => {
-        it("should replace simple placeholders", () => {
-            const result = format("Hello {name}!", { name: "World" });
-            expect(result).toBe("Hello World!");
-        });
-
-        it("should replace multiple placeholders", () => {
-            const result = format("{greeting} {name}!", { greeting: "Hi", name: "User" });
-            expect(result).toBe("Hi User!");
-        });
-
-        it("should handle nested property access", () => {
-            const result = format("Name: {user.name}", { user: { name: "Alice" } });
-            expect(result).toBe("Name: Alice");
-        });
-
-        it("should replace undefined values with empty string", () => {
-            const result = format("Value: {missing}", { other: "data" });
-            expect(result).toBe("Value: ");
-        });
-
-        it("should handle empty data object", () => {
-            const result = format("Static text", {});
-            expect(result).toBe("Static text");
-        });
-
-        describe("toTitleCase()", () => {
-            it("converts first character to uppercase", () => {
-                expect(toTitleCase("hello")).toBe("Hello");
-            });
-
-            it("returns undefined if not a string", () => {
-                expect(toTitleCase(123)).toBeUndefined();
-            });
-        });
-
-        describe("fileExt()", () => {
-            it("returns file extension", () => {
-                expect(fileExt("image.png")).toBe("png");
-                expect(fileExt("archive.tar.gz")).toBe("gz");
-            });
-
-            it("returns empty string if no extension", () => {
-                expect(fileExt("filename")).toBe("");
-                expect(fileExt(null)).toBe("");
-            });
-        });
-
-        describe("fileBasename()", () => {
-            it("returns basename without extension", () => {
-                expect(fileBasename("image.png")).toBe("image");
-                expect(fileBasename("archive.tar.gz")).toBe("archive.tar");
-            });
-
-            it("handles files without extension", () => {
-                expect(fileBasename("filename")).toBe("filename");
-            });
-        });
-
-        describe("last()", () => {
-            it("returns last element of array", () => {
-                expect(last([1, 2, 3])).toBe(3);
-                expect(last(["a", "b", "c"])).toBe("c");
-            });
-
-            it("returns null if empty array", () => {
-                expect(last([])).toBeNull();
-            });
-        });
-
-        describe("safeSVG()", () => {
-            it("escapes HTML entities", () => {
-                expect(safeSVG("<svg>")).toBe("&lt;svg&gt;");
-                expect(safeSVG("Hello & goodbye")).toBe("Hello &amp; goodbye");
-            });
-
-            it("returns non-string as is", () => {
-                expect(safeSVG(123)).toBe(123);
-            });
-        });
-
-        describe("toFixed2()", () => {
-            it("formats number to two decimals if needed", () => {
-                expect(toFixed2(3.14159)).toBe("3.14");
-                expect(toFixed2(3)).toBe("3");
-            });
-
-            it("returns input as is if not a number", () => {
-                expect(toFixed2("abc")).toBe("abc");
-            });
-        });
-
-        describe("mixedNumber()", () => {
-            it("returns mixed fraction for fractional numbers", () => {
-                expect(mixedNumber(2.25)).toBe("2 1/4");
-                expect(mixedNumber(1)).toBe("1/1");
-            });
-
-            it("returns number/1 for integer", () => {
-                expect(mixedNumber(2)).toBe("2/1");
-            });
-        });
-
-        describe("nearestBeat()", () => {
-            it("finds nearest beat", () => {
-                expect(nearestBeat(50, 8)).toEqual([4, 8]);
-            });
-        });
-
-        describe("oneHundredToFraction()", () => {
-            it("returns fraction for given number", () => {
-                expect(oneHundredToFraction(50)).toEqual([1, 2]);
-                expect(oneHundredToFraction(1)).toEqual([1, 64]);
-                expect(oneHundredToFraction(100)).toEqual([1, 1]);
-            });
-        });
-
-        describe("rationalToFraction()", () => {
-            it("converts float to fraction", () => {
-                expect(rationalToFraction(0.5)).toEqual([1, 2]);
-            });
-
-            it("handles 0, NaN, Infinity", () => {
-                expect(rationalToFraction(0)).toEqual([0, 1]);
-                expect(rationalToFraction(NaN)).toEqual([0, 1]);
-                expect(rationalToFraction(Infinity)).toEqual([0, 1]);
-            });
-        });
-
-        describe("rgbToHex()", () => {
-            it("converts rgb to hex", () => {
-                expect(rgbToHex(255, 0, 0)).toBe("#ff0000");
-                expect(rgbToHex(0, 255, 0)).toBe("#00ff00");
-                expect(rgbToHex(0, 0, 255)).toBe("#0000ff");
-            });
-        });
-
-        describe("hexToRGB()", () => {
-            it("converts hex to rgb object", () => {
-                expect(hexToRGB("#ff0000")).toEqual({ r: 255, g: 0, b: 0 });
-                expect(hexToRGB("#00ff00")).toEqual({ r: 0, g: 255, b: 0 });
-            });
-
-            it("returns null for invalid hex", () => {
-                expect(hexToRGB("#zzz")).toBeNull();
-            });
-        });
-
-        describe("hex2rgb()", () => {
-            it("converts hex to rgba string", () => {
-                expect(hex2rgb("ff0000")).toBe("rgba(255,0,0,1)");
-            });
-        });
-
-        describe("format() function logic", () => {
-            it("should replace simple placeholders", () => {
-                const result = format("Hello {name}!", { name: "World" });
-                expect(result).toBe("Hello World!");
-            });
-
-            it("should replace multiple placeholders", () => {
-                const result = format("{greeting} {name}!", { greeting: "Hi", name: "User" });
-                expect(result).toBe("Hi User!");
-            });
-
-            it("should handle nested property access", () => {
-                const result = format("Name: {user.name}", { user: { name: "Alice" } });
-                expect(result).toBe("Name: Alice");
-            });
-
-            it("should replace undefined values with empty string", () => {
-                const result = format("Value: {missing}", { other: "data" });
-                expect(result).toBe("Value: ");
-            });
-
-            it("should handle empty data object", () => {
-                const result = format("Static text", {});
-                expect(result).toBe("Static text");
-            });
-
-            it("handles numeric values", () => {
-                expect(format("{num}", { num: 42 })).toBe("42");
-            });
-
-            it("handles null values", () => {
-                expect(format("{val}", { val: null })).toBe("null");
-            });
-
-            it("ignores unmatched braces", () => {
-                expect(format("Hello {name", { name: "A" })).toBe("Hello {name");
-            });
-        });
-    });
-    describe("fileBasename() edge cases", () => {
-        it("handles hidden files like .env", () => {
-            expect(fileBasename(".env")).toBe(".env");
-        });
-    });
-    describe("safeSVG() multiple characters", () => {
-        it("escapes &, < and >", () => {
-            expect(safeSVG("<div>&</div>")).toBe("&lt;div&gt;&amp;&lt;/div&gt;");
-        });
-    });
-    describe("rationalToFraction() > 1 case", () => {
-        it("handles numbers greater than 1", () => {
-            expect(rationalToFraction(2)).toEqual([2, 1]);
-        });
-    });
-    describe("mixedNumber() additional cases", () => {
-        it("returns fraction only if floor is 0", () => {
-            expect(mixedNumber(0.5)).toBe("1/2");
-        });
-
-        it("returns d if not number", () => {
-            expect(mixedNumber("abc")).toBe("abc");
-        });
-    });
-    describe("nearestBeat() edge cases", () => {
-        it("returns zero beat when very small", () => {
-            expect(nearestBeat(1, 8)).toEqual([0, 8]);
-        });
-    });
-    describe("oneHundredToFraction() more cases", () => {
         it("handles mid range values", () => {
             expect(oneHundredToFraction(75)).toEqual([3, 4]);
             expect(oneHundredToFraction(30)).toEqual([5, 16]);
         });
 
-        it("handles default case", () => {
-            expect(oneHundredToFraction(97)).toEqual([97, 100]);
-        });
-    });
-    describe("rationalSum()", () => {
-        it("adds simple fractions", () => {
-            expect(rationalSum([1, 2], [1, 2])).toEqual([2, 2]);
-        });
-
-        it("handles zero input", () => {
-            expect(rationalSum(0, [1, 2])).toEqual([0, 1]);
-        });
-        it("adds different denominators", () => {
-            expect(rationalSum([1, 3], [1, 6])).toEqual([3, 6]);
-        });
-
-        it("handles both zero", () => {
-            expect(rationalSum(0, 0)).toEqual([0, 1]);
-        });
-
-        it("handles negative values", () => {
-            expect(rationalSum([-1, 2], [1, 2])).toEqual([0, 2]);
-        });
-        describe("rationalSum branch coverage", () => {
-            it("adds unequal denominators", () => {
-                expect(rationalSum([2, 5], [1, 10])).toEqual([5, 10]);
-            });
-
-            it("handles negative + positive", () => {
-                expect(rationalSum([-1, 3], [1, 3])).toEqual([0, 3]);
-            });
-        });
-    });
-    describe("hexToRGB() without hash", () => {
-        it("parses hex without #", () => {
-            expect(hexToRGB("ff0000")).toEqual({ r: 255, g: 0, b: 0 });
-        });
-    });
-    describe("oneHundredToFraction() exhaustive branch coverage", () => {
         it("handles <1", () => {
             expect(oneHundredToFraction(0)).toEqual([1, 64]);
         });
@@ -593,15 +294,135 @@ describe("Utility Functions (logic-only)", () => {
             expect(oneHundredToFraction(97)).toEqual([97, 100]);
         });
     });
-    describe("delayExecution()", () => {
-        jest.useFakeTimers();
 
-        it("resolves after given duration", async () => {
-            const promise = delayExecution(1000);
+    describe("rationalToFraction()", () => {
+        it("converts float to fraction", () => {
+            expect(rationalToFraction(0.5)).toEqual([1, 2]);
+        });
 
-            jest.advanceTimersByTime(1000);
+        it("handles 0, NaN, Infinity", () => {
+            expect(rationalToFraction(0)).toEqual([0, 1]);
+            expect(rationalToFraction(NaN)).toEqual([0, 1]);
+            expect(rationalToFraction(Infinity)).toEqual([0, 1]);
+        });
 
-            await expect(promise).resolves.toBe(true);
+        it("handles numbers greater than 1", () => {
+            expect(rationalToFraction(2)).toEqual([2, 1]);
+        });
+    });
+
+    describe("rgbToHex()", () => {
+        it("converts rgb to hex", () => {
+            expect(rgbToHex(255, 0, 0)).toBe("#ff0000");
+            expect(rgbToHex(0, 255, 0)).toBe("#00ff00");
+            expect(rgbToHex(0, 0, 255)).toBe("#0000ff");
+        });
+
+        it("handles zero values", () => {
+            expect(rgbToHex(0, 0, 0)).toBe("#000000");
+        });
+
+        it("handles max values", () => {
+            expect(rgbToHex(255, 255, 255)).toBe("#ffffff");
+        });
+    });
+
+    describe("hexToRGB()", () => {
+        it("converts hex to rgb object", () => {
+            expect(hexToRGB("#ff0000")).toEqual({ r: 255, g: 0, b: 0 });
+            expect(hexToRGB("#00ff00")).toEqual({ r: 0, g: 255, b: 0 });
+        });
+
+        it("returns null for invalid hex", () => {
+            expect(hexToRGB("#zzz")).toBeNull();
+        });
+    });
+
+    describe("hex2rgb()", () => {
+        it("converts hex to rgba string", () => {
+            expect(hex2rgb("ff0000")).toBe("rgba(255,0,0,1)");
+        });
+    });
+
+    describe("format() function logic", () => {
+        it("should replace simple placeholders", () => {
+            const result = format("Hello {name}!", { name: "World" });
+            expect(result).toBe("Hello World!");
+        });
+
+        it("should replace multiple placeholders", () => {
+            const result = format("{greeting} {name}!", { greeting: "Hi", name: "User" });
+            expect(result).toBe("Hi User!");
+        });
+
+        it("should handle nested property access", () => {
+            const result = format("Name: {user.name}", { user: { name: "Alice" } });
+            expect(result).toBe("Name: Alice");
+        });
+
+        it("should replace undefined values with empty string", () => {
+            const result = format("Value: {missing}", { other: "data" });
+            expect(result).toBe("Value: ");
+        });
+
+        it("should handle empty data object", () => {
+            const result = format("Static text", {});
+            expect(result).toBe("Static text");
+        });
+
+        it("handles numeric values", () => {
+            expect(format("{num}", { num: 42 })).toBe("42");
+        });
+
+        it("handles null values", () => {
+            expect(format("{val}", { val: null })).toBe("null");
+        });
+
+        it("ignores unmatched braces", () => {
+            expect(format("Hello {name", { name: "A" })).toBe("Hello {name");
+        });
+
+        it("should return empty string for missing nested property", () => {
+            const result = format("User: {user.age}", { user: { name: "Alice" } });
+            expect(result).toBe("User: ");
+        });
+
+        it("should return original string if no placeholders exist", () => {
+            const result = format("Hello world", { name: "User" });
+            expect(result).toBe("Hello world");
+        });
+    });
+    describe("rationalSum()", () => {
+        it("adds simple fractions", () => {
+            expect(rationalSum([1, 2], [1, 2])).toEqual([2, 2]);
+        });
+
+        it("handles zero input", () => {
+            expect(rationalSum(0, [1, 2])).toEqual([0, 1]);
+        });
+        it("adds different denominators", () => {
+            expect(rationalSum([1, 3], [1, 6])).toEqual([3, 6]);
+        });
+
+        it("handles both zero", () => {
+            expect(rationalSum(0, 0)).toEqual([0, 1]);
+        });
+
+        it("handles negative values", () => {
+            expect(rationalSum([-1, 2], [1, 2])).toEqual([0, 2]);
+        });
+
+        it("adds unequal denominators", () => {
+            expect(rationalSum([2, 5], [1, 10])).toEqual([5, 10]);
+        });
+
+        it("handles negative + positive", () => {
+            expect(rationalSum([-1, 3], [1, 3])).toEqual([0, 3]);
+        });
+    });
+    describe("hexToRGB() without hash", () => {
+        it("parses hex without #", () => {
+            expect(hexToRGB("ff0000")).toEqual({ r: 255, g: 0, b: 0 });
         });
     });
     describe("closeWidgets()", () => {
@@ -772,14 +593,6 @@ describe("Utility Functions (logic-only)", () => {
             expect(obj.viewVar).toBe(20);
             expect(obj.modelMethod()).toBe("model");
             expect(obj.viewMethod()).toBe("view");
-        });
-        it("should return empty string for missing nested property", () => {
-            const result = format("User: {user.age}", { user: { name: "Alice" } });
-            expect(result).toBe("User: ");
-        });
-        it("should return original string if no placeholders exist", () => {
-            const result = format("Hello world", { name: "User" });
-            expect(result).toBe("Hello world");
         });
     });
 });

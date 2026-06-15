@@ -13,7 +13,7 @@
    global
    _, last, FlowBlock, ValueBlock, LeftBlock, NOINPUTERRORMSG,
    NANERRORMSG, mixedNumber, TONEBPM, DEFAULTDELAY, Singer,
-   StackClampBlock, platformColor, StatusMatrix
+   StackClampBlock, StatusMatrix
 */
 
 /* exported setupExtrasBlocks */
@@ -192,7 +192,8 @@ function setupExtrasBlocks(activity) {
                         '" width="' +
                         logo.canvas.width +
                         '" fill="' +
-                        platformColor.background +
+                        (getComputedStyle(document.body).getPropertyValue("--bg").trim() ||
+                            "#ffffff") +
                         '"/> ' +
                         logo.svgOutput;
                 }
