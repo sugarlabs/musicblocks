@@ -82,6 +82,7 @@ global.noteIsSolfege = jest.fn(() => false);
 global.isCustomTemperament = jest.fn(() => false);
 global.i18nSolfege = jest.fn(s => s);
 global.getNote = jest.fn(() => ["C", "", 4]);
+global.parseNoteString = jest.fn(note => [note.slice(0, -1), Number(note.slice(-1))]);
 global.noteToFrequency = jest.fn(() => 440);
 global.calcNoteValueToDisplay = jest.fn(() => "1/4");
 global.delayExecution = jest.fn(ms => new Promise(r => setTimeout(r, ms)));
@@ -94,6 +95,7 @@ global.docById = jest.fn(() => ({
     innerHTML: "",
     insertRow: jest.fn(() => ({
         insertCell: jest.fn(() => ({
+            classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn(() => false) },
             style: {},
             appendChild: jest.fn(),
             setAttribute: jest.fn(),
@@ -133,6 +135,11 @@ global.window = {
                 style: {},
                 insertRow: jest.fn(() => ({
                     insertCell: jest.fn(() => ({
+                        classList: {
+                            add: jest.fn(),
+                            remove: jest.fn(),
+                            contains: jest.fn(() => false)
+                        },
                         appendChild: jest.fn(),
                         setAttribute: jest.fn(),
                         style: {},
@@ -170,7 +177,11 @@ global.document = {
         })),
         querySelectorAll: jest.fn(() => []),
         insertRow: jest.fn(() => ({
-            insertCell: jest.fn(() => ({ style: {}, innerHTML: "" }))
+            insertCell: jest.fn(() => ({
+                classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn(() => false) },
+                style: {},
+                innerHTML: ""
+            }))
         }))
     })),
     getElementById: jest.fn(() => ({
@@ -206,6 +217,7 @@ describe("PhraseMaker Widget", () => {
             isCustomTemperament: jest.fn(() => false),
             i18nSolfege: jest.fn(s => s),
             getNote: jest.fn(() => ["C", "", 4]),
+            parseNoteString: jest.fn(note => [note.slice(0, -1), Number(note.slice(-1))]),
             noteToFrequency: jest.fn(() => 440),
             toFraction: jest.fn(v => v)
         };
@@ -543,6 +555,11 @@ describe("PhraseMaker Widget", () => {
         phraseMaker._rows = [
             {
                 insertCell: jest.fn(() => ({
+                    classList: {
+                        add: jest.fn(),
+                        remove: jest.fn(),
+                        contains: jest.fn(() => false)
+                    },
                     style: {},
                     setAttribute: jest.fn(),
                     addEventListener: jest.fn(),
@@ -552,6 +569,7 @@ describe("PhraseMaker Widget", () => {
         ];
         phraseMaker._noteValueRow = {
             insertCell: jest.fn(() => ({
+                classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn(() => false) },
                 style: {},
                 setAttribute: jest.fn(),
                 appendChild: jest.fn()
@@ -564,6 +582,7 @@ describe("PhraseMaker Widget", () => {
     });
     test("addTuplet pushes notes to _notesToPlay", () => {
         const createMockCell = () => ({
+            classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn(() => false) },
             style: {},
             innerHTML: "",
             setAttribute: jest.fn(),
@@ -758,6 +777,11 @@ describe("PhraseMaker Widget", () => {
             {
                 cells: [
                     {
+                        classList: {
+                            add: jest.fn(),
+                            remove: jest.fn(),
+                            contains: jest.fn(cls => cls === "pm-black-cell")
+                        },
                         style: { backgroundColor: "black" },
                         getAttribute: jest.fn(() => "white")
                     }
@@ -974,6 +998,11 @@ describe("PhraseMaker Widget", () => {
             {
                 cells: [
                     {
+                        classList: {
+                            add: jest.fn(),
+                            remove: jest.fn(),
+                            contains: jest.fn(cls => cls === "pm-black-cell")
+                        },
                         style: { backgroundColor: "black" },
                         getAttribute: jest.fn(() => "white")
                     }
@@ -995,6 +1024,11 @@ describe("PhraseMaker Widget", () => {
             {
                 cells: [
                     {
+                        classList: {
+                            add: jest.fn(),
+                            remove: jest.fn(),
+                            contains: jest.fn(() => false)
+                        },
                         style: {},
                         setAttribute: jest.fn(),
                         addEventListener: jest.fn(),
