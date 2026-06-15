@@ -1421,13 +1421,54 @@ function closeWidgets() {
  * Closes a specific widget by its name.
  *
  * @param {string} name - The name of the widget to be closed.
+ * @param {string} [key] - Optional key associated with the widget window.
  * @returns {void}
  */
-let closeBlkWidgets = name => {
+let closeBlkWidgets = (name, key) => {
+    let searchKey = key || name;
+
+    const KEY_MAPPING = {
+        "pitch-drum mapper": "pitch drum",
+        "custom mode": "custom mode",
+        "tempo": "tempo",
+        "arpeggio": "arpeggio",
+        "timbre": "timbre",
+        "sampler": "sampler",
+        "rhythm maker": "rhythm maker",
+        "oscilloscope": "oscilloscope",
+        "temperament": "temperament",
+        "meter": "meter"
+    };
+
+    if (KEY_MAPPING[searchKey]) {
+        searchKey = KEY_MAPPING[searchKey];
+    }
+
+    if (
+        window.widgetWindows &&
+        window.widgetWindows.openWindows &&
+        window.widgetWindows.openWindows[searchKey]
+    ) {
+        window.widgetWindows.closeWindow(searchKey);
+        return;
+    }
+
     const widgetTitle = document.getElementsByClassName("wftTitle");
     for (let i = 0; i < widgetTitle.length; i++) {
-        if (widgetTitle[i].innerHTML === name) {
-            window.widgetWindows.closeWindow(widgetTitle[i].innerHTML);
+        const titleEl = widgetTitle[i];
+        if (
+            titleEl.innerHTML === name ||
+            titleEl.id === `${searchKey}WidgetID` ||
+            (key && titleEl.id === `${key}WidgetID`) ||
+            (KEY_MAPPING[key] && titleEl.id === `${KEY_MAPPING[key]}WidgetID`)
+        ) {
+            const winKey =
+                titleEl.id && typeof titleEl.id === "string"
+                    ? titleEl.id.replace("WidgetID", "")
+                    : key || name;
+            if (window.widgetWindows && typeof window.widgetWindows.closeWindow === "function") {
+                window.widgetWindows.closeWindow(winKey);
+            }
             break;
         }
     }
