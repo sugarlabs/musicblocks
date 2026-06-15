@@ -103,6 +103,7 @@ const getPieMenuSize = block => {
 // Debounce resize handler for performance
 let wheelResizeTimeout;
 let wheelResizeListenerAttached = false;
+let activeExitWheel = null;
 const debouncedSetWheelSize = () => {
     clearTimeout(wheelResizeTimeout);
     wheelResizeTimeout = setTimeout(setWheelSize, 150);
@@ -122,19 +123,78 @@ const disableWheelResizeHandling = () => {
     clearTimeout(wheelResizeTimeout);
 };
 
+const isInteractive = target => {
+    // 1. Check if inside number/text input label container
+    const labelDiv = docById("labelDiv");
+    if (labelDiv && typeof labelDiv.contains === "function" && labelDiv.contains(target)) {
+        return true;
+    }
+
+    // 2. Check if the element inside wheelDiv is interactive (slices, titles have cursor: pointer)
+    const wheelDiv = docById("wheelDiv");
+    if (wheelDiv && typeof wheelDiv.contains === "function" && wheelDiv.contains(target)) {
+        // SVG paths or text elements that are clickable will have computed pointer style
+        if (target && target.style && target.style.cursor === "pointer") {
+            return true;
+        }
+        if (typeof window !== "undefined" && typeof window.getComputedStyle === "function") {
+            try {
+                if (window.getComputedStyle(target).cursor === "pointer") {
+                    return true;
+                }
+            } catch (e) {
+                // Ignore computed style failures (e.g. in tests)
+            }
+        }
+    }
+
+    return false;
+};
+
+const handleOutsideClick = event => {
+    const wheelDiv = docById("wheelDiv");
+    if (!wheelDiv || wheelDiv.style.display === "none") {
+        return;
+    }
+
+    if (!isInteractive(event.target)) {
+        if (
+            activeExitWheel &&
+            activeExitWheel.navItems &&
+            activeExitWheel.navItems[0] &&
+            typeof activeExitWheel.navItems[0].navigateFunction === "function"
+        ) {
+            activeExitWheel.navItems[0].navigateFunction();
+        } else {
+            hideWheelDiv();
+        }
+    }
+};
+
 const showWheelDiv = () => {
     const wheelDiv = docById("wheelDiv");
     if (!wheelDiv) return null;
     wheelDiv.style.display = "";
     enableWheelResizeHandling();
+
+    setTimeout(() => {
+        if (wheelDiv.style.display !== "none") {
+            document.addEventListener("mousedown", handleOutsideClick);
+        }
+    }, 50);
+
     return wheelDiv;
 };
 
 const hideWheelDiv = () => {
     const wheelDiv = docById("wheelDiv");
     if (!wheelDiv) return null;
-    docById("wheelDiv").style.display = "none";
+    wheelDiv.style.display = "none";
     disableWheelResizeHandling();
+
+    document.removeEventListener("mousedown", handleOutsideClick);
+    activeExitWheel = null;
+
     return wheelDiv;
 };
 
@@ -213,6 +273,7 @@ const configureExitWheel = exitWheel => {
     if (!exitWheel || !exitWheel.navItems) {
         return;
     }
+    activeExitWheel = exitWheel;
 
     const clearSelection = () => {
         exitWheel.selectedNavItemIndex = null;
