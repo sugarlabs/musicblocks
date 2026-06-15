@@ -7314,7 +7314,7 @@ class Blocks {
                 }
 
                 const title = this.blockList[blk].protoblock.staticLabels[0];
-                closeBlkWidgets(_(title), title);
+                closeBlkWidgets(_(title));
                 this.activity.refreshCanvas();
             }
 

@@ -642,7 +642,7 @@ describe("Utility Functions (logic-only)", () => {
                 "custom mode": { close: jest.fn() }
             };
 
-            closeBlkWidgets("custom mode", "custom mode");
+            closeBlkWidgets("custom mode");
 
             expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("custom mode");
         });
@@ -652,7 +652,7 @@ describe("Utility Functions (logic-only)", () => {
                 "pitch drum": { close: jest.fn() }
             };
 
-            closeBlkWidgets("pitch-drum mapper", "pitch-drum mapper");
+            closeBlkWidgets("pitch-drum mapper");
 
             expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("pitch drum");
         });
@@ -665,7 +665,7 @@ describe("Utility Functions (logic-only)", () => {
 
             document.getElementsByClassName = jest.fn(() => [mockElement]);
 
-            closeBlkWidgets("custom mode", "custom mode");
+            closeBlkWidgets("custom mode");
 
             expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("custom mode");
         });

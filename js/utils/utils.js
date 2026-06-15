@@ -1421,11 +1421,10 @@ function closeWidgets() {
  * Closes a specific widget by its name.
  *
  * @param {string} name - The name of the widget to be closed.
- * @param {string} [key] - Optional key associated with the widget window.
  * @returns {void}
  */
-let closeBlkWidgets = (name, key) => {
-    let searchKey = key || name;
+let closeBlkWidgets = name => {
+    let searchKey = name;
 
     const KEY_MAPPING = {
         "pitch-drum mapper": "pitch drum",
@@ -1440,8 +1439,12 @@ let closeBlkWidgets = (name, key) => {
         "meter": "meter"
     };
 
-    if (KEY_MAPPING[searchKey]) {
-        searchKey = KEY_MAPPING[searchKey];
+    for (const origKey in KEY_MAPPING) {
+        const translated = typeof _ === "function" ? _(origKey) : origKey;
+        if (name === translated) {
+            searchKey = KEY_MAPPING[origKey];
+            break;
+        }
     }
 
     if (
@@ -1456,16 +1459,11 @@ let closeBlkWidgets = (name, key) => {
     const widgetTitle = document.getElementsByClassName("wftTitle");
     for (let i = 0; i < widgetTitle.length; i++) {
         const titleEl = widgetTitle[i];
-        if (
-            titleEl.innerHTML === name ||
-            titleEl.id === `${searchKey}WidgetID` ||
-            (key && titleEl.id === `${key}WidgetID`) ||
-            (KEY_MAPPING[key] && titleEl.id === `${KEY_MAPPING[key]}WidgetID`)
-        ) {
+        if (titleEl.innerHTML === name || titleEl.id === `${searchKey}WidgetID`) {
             const winKey =
                 titleEl.id && typeof titleEl.id === "string"
                     ? titleEl.id.replace("WidgetID", "")
-                    : key || name;
+                    : searchKey;
             if (window.widgetWindows && typeof window.widgetWindows.closeWindow === "function") {
                 window.widgetWindows.closeWindow(winKey);
             }
