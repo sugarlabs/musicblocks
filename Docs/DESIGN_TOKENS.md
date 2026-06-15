@@ -16,6 +16,7 @@ The structure of token names generally follows:
 `--[property]-[category]-[variant]`
 
 **Common Properties:**
+
 - Colors: `--color-*`
 - Spacing: `--spacing-*`
 - Typography: `--font-family-*`, `--font-size-*`, `--font-weight-*`, `--line-height-*`
@@ -25,8 +26,8 @@ The structure of token names generally follows:
 ### 2. Best Practices
 
 - **Never hardcode hex colors or pixel values** for UI elements if a token exists for it.
-- **Use fallback values**: When using a token, it's recommended to provide a structural fallback to ensure the app doesn't break if a token is not loaded properly. 
-    `color: var(--color-brand-primary, #3b82f6);`
+- **Use fallback values**: When using a token, it's recommended to provide a structural fallback to ensure the app doesn't break if a token is not loaded properly.
+  `color: var(--color-brand-primary, #3b82f6);`
 - **Avoid tying tokens to specific components.** Prefer semantic tokens like `--color-bg-primary` over explicitly named component classes like `--color-navbar-bg`.
 
 ## Theme Switching

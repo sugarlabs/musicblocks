@@ -113,7 +113,9 @@
 .dark .modal-footer .btn-flat {
     color: var(--color-text-primary, #ffffff) !important;
     background-color: transparent !important;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease;
     font-weight: bold;
 }
 
@@ -295,7 +297,9 @@
     border: 2px solid var(--color-border-primary, #ffff00);
     outline: 1px solid var(--color-border-secondary, #ffffff);
     outline-offset: -2px;
-    box-shadow: 0 0 0 3px var(--color-bg-primary, #000000), 0 10px 24px rgba(0, 0, 0, 0.9);
+    box-shadow:
+        0 0 0 3px var(--color-bg-primary, #000000),
+        0 10px 24px rgba(0, 0, 0, 0.9);
     color: var(--color-text-primary, #ffff00);
     bottom: -5px;
 }

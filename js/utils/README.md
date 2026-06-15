@@ -13,7 +13,6 @@ This guide explains how you can add your own custom theme or customize an existi
 3. `js/utils/platformstyle.js` still exposes a compatibility `window.platformColor` object for legacy JS, but new styling should read CSS custom properties instead of hardcoded colors.
 
 4. Most of the Music Blocks theme styles are defined in:
-
     1. css/tokens.css
     2. css/themes.css
     3. planet/css/planetThemes.css
@@ -33,9 +32,15 @@ Note: If you want to customise an existing theme, update the token values in `cs
 
     ```javascript
     <ul style="display: none;" id="themedropdown" class="dropdown-content">
-        <a id="light" class="tooltipped" data-tooltip="Light Mode"><i class='material-icons'>brightness_7</i></a>
-        <a id="dark" class="tooltipped" data-tooltip="Dark Mode"><i class='material-icons'>brightness_4</i></a>
-        <a id="custom" class="tooltipped" data-tooltip="Custom Theme"><i class='material-icons'>choose_your_material_icon</i></a>
+        <a id="light" class="tooltipped" data-tooltip="Light Mode">
+            <i class="material-icons">brightness_7</i>
+        </a>
+        <a id="dark" class="tooltipped" data-tooltip="Dark Mode">
+            <i class="material-icons">brightness_4</i>
+        </a>
+        <a id="custom" class="tooltipped" data-tooltip="Custom Theme">
+            <i class="material-icons">choose_your_material_icon</i>
+        </a>
     </ul>
     ```
 
@@ -43,7 +48,6 @@ Note: If you want to customise an existing theme, update the token values in `cs
 
     There will be 4 arrays named string (two in an if statement, rest two in the else statement).
     Add your theme's name to the bottom of the pre-existing themes.
-
 
     ```javascript
     string = [[...],
@@ -173,7 +177,6 @@ Note: If you want to customise an existing theme, update the token values in `cs
     (If you skipped to here, these are the files responsible for styling, the CSS is easy to understand and modify, but to change the color of elements in javascript files, look at the entire code base and search for "platformColor". You will find all the places where JS is used to style. You don't have to add your own theme, you can just change styling in dark mode CSS and JS, and then choose dark mode in the toolbar.)
 
     You have to add styling to three places,
-
     1. css/themes.css (this is external styling used for floating windows, search bar, etc.)
        If you go here, you will find styling for dark mode, just write your css using them as a template below the last theme's CSS. There is no light mode here because it is the default.
 
