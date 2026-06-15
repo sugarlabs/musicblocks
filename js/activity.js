@@ -4189,7 +4189,9 @@ class Activity {
                 listItem.classList.add("trash-item");
 
                 const svgData = block.artwork;
-                const encodedData = "data:image/svg+xml;utf8," + encodeURIComponent(svgData);
+                const encodedData = svgData
+                    ? "data:image/svg+xml;utf8," + encodeURIComponent(svgData)
+                    : "";
 
                 const img = document.createElement("img");
                 img.src = encodedData;
