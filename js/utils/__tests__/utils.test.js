@@ -291,7 +291,8 @@ describe("Utility Functions (logic-only)", () => {
         });
 
         it("handles default case", () => {
-            expect(oneHundredToFraction(97)).toEqual([97, 100]);
+            expect(oneHundredToFraction(55)).toEqual([9, 16]);
+            expect(oneHundredToFraction(97)).toEqual([31, 32]);
         });
     });
 
