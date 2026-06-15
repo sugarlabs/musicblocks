@@ -455,6 +455,7 @@ var oneHundredToFraction = d => {
         case 53:
         case 54:
             return [17, 32];
+        case 55:
         case 56:
         case 57:
         case 58:
@@ -508,6 +509,7 @@ var oneHundredToFraction = d => {
         case 95:
             return [15, 16];
         case 96:
+        case 97:
         case 98:
             return [31, 32];
         case 99:
