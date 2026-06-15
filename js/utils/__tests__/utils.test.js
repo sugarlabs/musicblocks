@@ -223,7 +223,7 @@ describe("Utility Functions (logic-only)", () => {
             expect(nearestBeat(50, 8)).toEqual([4, 8]);
         });
         it("handles large numbers", () => {
-            expect(nearestBeat(123.456)).toBeDefined();
+            expect(nearestBeat(123.456, 8)).toEqual([10, 8]);
         });
         it("returns zero beat when very small", () => {
             expect(nearestBeat(1, 8)).toEqual([0, 8]);
