@@ -3263,9 +3263,16 @@ class Activity {
             // const BACKSPACE = 8;
             const TAB = 9;
             if (event.keyCode === TAB) {
-                // Prevent browser from grabbing TAB key
-                event.preventDefault();
-                return false;
+                const active = document.activeElement;
+                const isCanvasOrBody =
+                    active === document.body ||
+                    active === document.getElementById("canvas") ||
+                    active === document.getElementById("myCanvas");
+                if (isCanvasOrBody) {
+                    event.preventDefault();
+                    return false;
+                }
+                return;
             }
             const ESC = 27;
             // const ALT = 18;
