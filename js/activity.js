@@ -31,7 +31,7 @@ try {
    ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON, debugLog,
    ErrorHandler, ActivityContext,
    Boundary, CARTESIAN, changeImage, closeWidgets, doRecordButton, setupActivityRecorder,
-   setupActivityAbcParser,
+   setupActivityAbcParser, setupActivityIdleWatcher,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
    DEFAULTDELAY, define, doBrowserCheck, doBrowserCheck, docByClass,
@@ -123,6 +123,7 @@ let MYDEFINES = [
     "activity/SaveInterface",
 
     "activity/recorder",
+    "activity/idle-watcher",
     "utils/musicutils",
     "utils/synthutils",
     "utils/mathutils",
@@ -251,8 +252,6 @@ class Activity {
         }
 
         this._listeners = [];
-        this._idleWatcherIntervalId = null;
-        this._idleWatcherResetHandler = null;
 
         this.cellSize = 55;
         this.searchSuggestions = [];
@@ -438,6 +437,8 @@ class Activity {
         } catch (e) {
             ErrorHandler.recoverable(e, { operation: "loadKeySignatureEnv" });
         }
+
+        setupActivityIdleWatcher(this);
 
         /**
          * Initialises major variables and renders default stack.
@@ -2616,85 +2617,6 @@ class Activity {
             for (let i = 0; i < ERRORARTWORK.length; i++) {
                 const name = ERRORARTWORK[i];
                 this._makeErrorArtwork(name);
-            }
-        };
-
-        /**
-         * Initialize an idle watcher that throttles the application's framerate
-         * when the application is inactive and no music is playing.
-         * This significantly reduces CPU usage and improves battery life.
-         *
-         * Listeners and intervals are properly cleaned up via stopIdleWatcher()
-         * to prevent accumulation on re-initialization.
-         */
-        this._initIdleWatcher = () => {
-            // Ensure any prior idle watcher is cleaned up before reinitializing
-            this._stopIdleWatcher();
-
-            const IDLE_THRESHOLD = 5000; // 5 seconds
-            const ACTIVE_FPS = 60;
-            const IDLE_FPS = 1;
-
-            let lastActivity = Date.now();
-            this.isAppIdle = false;
-
-            // Wake up function - restores full framerate
-            // Stored as instance property for cleanup
-            this._resetIdleTimer = () => {
-                lastActivity = Date.now();
-                if (this.isAppIdle) {
-                    this.isAppIdle = false;
-                    createjs.Ticker.framerate = ACTIVE_FPS;
-                    // Force immediate redraw for responsiveness
-                    this.stageDirty = true;
-                }
-            };
-
-            // Track user activity using managed addEventListener for proper cleanup
-            this.addEventListener(window, "mousemove", this._resetIdleTimer);
-            this.addEventListener(window, "mousedown", this._resetIdleTimer);
-            this.addEventListener(window, "keydown", this._resetIdleTimer);
-            this.addEventListener(window, "touchstart", this._resetIdleTimer);
-            this.addEventListener(window, "wheel", this._resetIdleTimer, { passive: true });
-
-            // Periodic check for idle state - store interval ID for cleanup
-            this._idleWatcherInterval = setInterval(() => {
-                // Check if music/code is playing
-                const isMusicPlaying = this.turtles?.running() || false;
-
-                if (!isMusicPlaying && Date.now() - lastActivity > IDLE_THRESHOLD) {
-                    if (!this.isAppIdle) {
-                        this.isAppIdle = true;
-                        createjs.Ticker.framerate = IDLE_FPS;
-                        debugLog("⚡ Idle mode: Throttling to 1 FPS to save battery");
-                    }
-                } else if (this.isAppIdle && isMusicPlaying) {
-                    // Music started playing - wake up immediately
-                    this._resetIdleTimer();
-                }
-            }, 1000);
-        };
-
-        /**
-         * Stop the idle watcher and clean up its listeners and interval.
-         * Called during Activity lifecycle teardown to prevent listener/interval accumulation.
-         * It is safe to call this method even if the idle watcher was never started.
-         */
-        this._stopIdleWatcher = () => {
-            // Clear the periodic interval
-            if (typeof this._idleWatcherInterval !== "undefined") {
-                clearInterval(this._idleWatcherInterval);
-                this._idleWatcherInterval = undefined;
-            }
-
-            // Remove event listeners if they were registered
-            if (typeof this._resetIdleTimer === "function") {
-                this.removeEventListener(window, "mousemove", this._resetIdleTimer);
-                this.removeEventListener(window, "mousedown", this._resetIdleTimer);
-                this.removeEventListener(window, "keydown", this._resetIdleTimer);
-                this.removeEventListener(window, "touchstart", this._resetIdleTimer);
-                this.removeEventListener(window, "wheel", this._resetIdleTimer);
-                this._resetIdleTimer = undefined;
             }
         };
 
@@ -7262,9 +7184,8 @@ class Activity {
                     this.saveLocally();
                 }
                 this._stopRenderLoop();
-                if (this._autoSaveInterval !== null) {
-                    clearInterval(this._autoSaveInterval);
-                    this._autoSaveInterval = null;
+                if (typeof this._stopAutoSave === "function") {
+                    this._stopAutoSave();
                 }
             });
 
@@ -7393,22 +7314,9 @@ class Activity {
             // data loss from browser crashes (see issue #2994).
             // Deferred while the project is actively running to avoid
             // interrupting playback.
-            this._autoSaveInterval = setInterval(
-                () => {
-                    try {
-                        if (this.logo && this.logo._alreadyRunning) {
-                            return;
-                        }
-
-                        if (this.saveLocally !== null && this.saveLocally !== undefined) {
-                            this.saveLocally();
-                        }
-                    } catch (e) {
-                        ErrorHandler.recoverable(e, { operation: "autoSave" });
-                    }
-                },
-                5 * 60 * 1000
-            );
+            if (typeof this._initAutoSave === "function") {
+                this._initAutoSave();
+            }
 
             initBasicProtoBlocks(this);
 
