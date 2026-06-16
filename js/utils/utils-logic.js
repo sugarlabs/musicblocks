@@ -313,12 +313,17 @@ var rationalSum = (a, b) => {
         typeof a[0] !== "number" ||
         typeof a[1] !== "number" ||
         typeof b[0] !== "number" ||
-        typeof b[1] !== "number" ||
-        a[1] === 0 ||
-        b[1] === 0
+        typeof b[1] !== "number"
     ) {
         if (typeof console !== "undefined") {
             console.warn("Invalid input passed to rationalSum:", a, b);
+        }
+        return [0, 1];
+    }
+
+    if (a[1] === 0 || b[1] === 0) {
+        if (typeof console !== "undefined") {
+            console.error("rationalSum: zero denominator — corrupted rhythm state", { a, b });
         }
         return [0, 1];
     }
