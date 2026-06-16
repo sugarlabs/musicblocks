@@ -28,21 +28,21 @@
 - For performance-related changes, include before-and-after benchmark results with a brief explanation of the impact.
 
 ## For Reviewers
-- **Run the browser smoke test** (when applicable) — critical for UI changes
-- Run the test suite when block behavior changes are involved
+- **Run the browser smoke test** (when applicable) — critical for UI changes.
+- Run the test suite when block behavior changes are involved.
 - Check whether failures are pre-existing or introduced by this PR.
 - Verify that mock property names in tests match the source code.
-- Thoroughly check folder structure especially for tests —new test files are sometimes created when tests could have been added to existing files instead (e.g. `js/__tests__/` and `js/widgets/__tests__/` are different)
+- Thoroughly check folder structure especially for tests — new test files are sometimes created when tests could have been added to existing files instead (e.g. `js/__tests__/` and `js/widgets/__tests__/` are different).
 - If the PR description lists regression-testing steps, spot-check that they were actually followed.
 
   **Security and approval**
-- Check for XSS, unsafe URL handling, inline JS issues
-- Write `LGTM` when the code looks good
+- Check for XSS, unsafe URL handling, inline JS issues.
+- Write `LGTM` when the code looks good.
 
 ## Do's and Don'ts
 
 ### Do's ✅
-- Mark PRs as **DRAFT** if they are not yet ready to merge but open for early feedback, then convert to ready when complete
+- Mark PRs as **DRAFT** if they are not yet ready to merge but open for early feedback, then convert to ready when complete.
 - Keep commits atomic and well-described.
 - Reference related issues/discussions in PR description.
 - Respond to reviewer comments promptly.
