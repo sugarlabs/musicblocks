@@ -321,11 +321,11 @@ class MathUtility {
      * @throws {string} NAN error if the argument is not valid.
      */
     static doInt(a) {
-        try {
-            return Math.floor(Number(a) + 0.5);
-        } catch (e) {
+        const n = Number(a);
+        if (isNaN(n)) {
             throw new Error("NanError");
         }
+        return Math.floor(n + 0.5);
     }
 }
 // Ensure mathutils.js exports the MathUtility class
