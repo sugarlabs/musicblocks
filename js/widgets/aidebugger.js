@@ -460,7 +460,9 @@ function AIDebuggerWidget() {
 
                 const fallbackResponse = {
                     type: "bot",
-                    content: `I'm sorry, I'm having trouble connecting to the AI backend. Error: ${error.message}. Please check your connection and try again.`,
+                    content: _(
+                        "Could not reach the AI assistant. Please check your connection and try again."
+                    ),
                     timestamp: new Date().toISOString()
                 };
 
@@ -730,7 +732,9 @@ function AIDebuggerWidget() {
 
                 const errorMessage = {
                     type: "system",
-                    content: `Could not connect to AI backend: ${error.message}. Please check your connection and try again.`,
+                    content: _(
+                        "Could not reach the AI assistant. Please check your connection and try again."
+                    ),
                     timestamp: new Date().toISOString()
                 };
                 this._addMessageToUI(errorMessage);
