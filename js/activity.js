@@ -5283,31 +5283,18 @@ class Activity {
             that.sessionData = null;
             const currentProject = that.storage.currentProject;
             const sessionKey = currentProject !== undefined ? "SESSION" + currentProject : null;
-            let isRestoringLanguageBackup = false;
 
-            // Check for temporary backup from language change
-            try {
-                if (window.localStorage && window.localStorage.getItem("languageChangeBackup")) {
-                    that.sessionData = window.localStorage.getItem("languageChangeBackup");
-                    isRestoringLanguageBackup = true;
-                }
-            } catch (e) {
-                console.warn("Could not access languageChangeBackup", e);
-            }
-
-            // If no language backup, try restarting where we were when we hit save.
-            if (!that.sessionData) {
-                if (that.planet) {
-                    that.sessionData = await that.planet.openCurrentProject();
-                    if (!that.sessionData) {
-                        if (currentProject !== undefined) {
-                            that.sessionData = that.storage[sessionKey];
-                        }
-                    }
-                } else {
-                    if (sessionKey !== null) {
+            // Try restarting where we were when we hit save.
+            if (that.planet) {
+                that.sessionData = await that.planet.openCurrentProject();
+                if (!that.sessionData) {
+                    if (currentProject !== undefined) {
                         that.sessionData = that.storage[sessionKey];
                     }
+                }
+            } else {
+                if (sessionKey !== null) {
+                    that.sessionData = that.storage[sessionKey];
                 }
             }
 
@@ -5328,16 +5315,8 @@ class Activity {
                         window.loadedSession = that.sessionData;
                         that.blocks.loadNewBlocks(JSON.parse(that.sessionData));
                     }
-
-                    // Remove backup after successful restore to prevent stale data on future loads
-                    if (isRestoringLanguageBackup && window.localStorage) {
-                        window.localStorage.removeItem("languageChangeBackup");
-                    }
                 } catch (e) {
                     ErrorHandler.recoverable(e, { operation: "loadSessionData" });
-                    if (isRestoringLanguageBackup && window.localStorage) {
-                        window.localStorage.removeItem("languageChangeBackup");
-                    }
                     if (sessionKey !== null) {
                         try {
                             if (typeof that.storage.removeItem === "function") {

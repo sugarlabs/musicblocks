@@ -109,26 +109,28 @@ describe("LanguageBox Class", () => {
             );
         });
 
-        it("should call reload when a new language is selected", () => {
+        it("should prompt for manual refresh when a new language is selected", () => {
             localStorage.getItem.mockReturnValue("ja");
-            const reloadSpy = jest.spyOn(languageBox, "reload").mockImplementation(() => {});
+            mockActivity.textMsg.mockImplementation();
 
             languageBox._language = "enUS";
             languageBox.hide();
 
-            expect(reloadSpy).toHaveBeenCalled();
-            reloadSpy.mockRestore();
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                "Please manually refresh the browser to load the new language."
+            );
         });
 
-        it("should call reload when localStorage.getItem returns null", () => {
+        it("should prompt for manual refresh when localStorage.getItem returns null", () => {
             localStorage.getItem.mockReturnValue(null);
-            const reloadSpy = jest.spyOn(languageBox, "reload").mockImplementation(() => {});
+            mockActivity.textMsg.mockImplementation();
 
             languageBox._language = "enUS";
             languageBox.hide();
 
-            expect(reloadSpy).toHaveBeenCalled();
-            reloadSpy.mockRestore();
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                "Please manually refresh the browser to load the new language."
+            );
         });
 
         it("should call activity.textMsg exactly once per hide() call", () => {

@@ -311,20 +311,9 @@ class LanguageBox {
                 console.warn("Could not save language preference:", e);
             }
 
-            // Save the workspace temporarily before reloading
-            // so we don't lose the user's project state during the language change.
-            if (this.activity && typeof this.activity.prepareExport === "function") {
-                try {
-                    const workspaceData = this.activity.prepareExport();
-                    if (workspaceData && window.localStorage) {
-                        window.localStorage.setItem("languageChangeBackup", workspaceData);
-                    }
-                } catch (e) {
-                    console.warn("Failed to backup workspace before language change", e);
-                }
-            }
-
-            this.reload();
+            this.activity.textMsg(
+                _("Please manually refresh the browser to load the new language.")
+            );
         }
     }
 }
