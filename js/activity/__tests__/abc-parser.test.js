@@ -307,6 +307,85 @@ describe("Test 4: Triplets", () => {
         );
         expect(denomWith4.length).toBeGreaterThanOrEqual(1);
     });
+
+    test("tripletFinder does not bleed across voice boundaries", async () => {
+        // Voice 1: triplet C D E then normal F.
+        // Voice 2: plain quarter notes only — must NOT inherit the triplet state
+        // from voice 1 and must produce standard denominator (4), not 12.
+        const twoVoiceTune = makeTune({
+            title: "Triplet Bleed Test",
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "C", mode: "major", accidentals: [] },
+                    voices: [
+                        [
+                            makeNote("C", 0, 0.125, { startTriplet: 3 }),
+                            makeNote("D", 1, 0.125),
+                            makeNote("E", 2, 0.125, { endTriplet: 3 })
+                        ],
+                        [makeNote("G", 4, 0.25), makeNote("A", 5, 0.25)]
+                    ]
+                }
+            ]
+        });
+
+        const blocks = await parseAndCapture(twoVoiceTune);
+
+        // Voice 1 produces 3 triplet newnote blocks (denominator 12)
+        const denomWith12 = blocks.filter(
+            b => Array.isArray(b[1]) && b[1][0] === "number" && b[1][1]?.value === 12
+        );
+        expect(denomWith12).toHaveLength(3);
+
+        // Voice 2 produces 2 plain newnote blocks — denominator must be 4, not 12
+        // There should be exactly 2 divide blocks whose denominator child is 4
+        // (one per plain note in voice 2). The meter block also contributes a 4,
+        // so we check that there are at least 2 occurrences beyond the meter block.
+        const denomWith4 = blocks.filter(
+            b => Array.isArray(b[1]) && b[1][0] === "number" && b[1][1]?.value === 4
+        );
+        // meter num (4) + 2 plain note denominators = at least 3
+        expect(denomWith4.length).toBeGreaterThanOrEqual(3);
+    });
+
+    test("tripletFinder does not bleed across voice boundaries even if triplet is unclosed", async () => {
+        // Voice 1: triplet C D E (no endTriplet, i.e., unclosed triplet).
+        // Voice 2: plain quarter notes only — must NOT inherit the triplet state
+        // and must produce standard denominator (4).
+        const twoVoiceTune = makeTune({
+            title: "Unclosed Triplet Bleed Test",
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "C", mode: "major", accidentals: [] },
+                    voices: [
+                        [
+                            makeNote("C", 0, 0.125, { startTriplet: 3 }),
+                            makeNote("D", 1, 0.125),
+                            makeNote("E", 2, 0.125)
+                        ],
+                        [makeNote("G", 4, 0.25), makeNote("A", 5, 0.25)]
+                    ]
+                }
+            ]
+        });
+
+        const blocks = await parseAndCapture(twoVoiceTune);
+
+        // Voice 1 notes will all be processed under triplet state because it started and never closed,
+        // so all 3 notes get denominator 12.
+        const denomWith12 = blocks.filter(
+            b => Array.isArray(b[1]) && b[1][0] === "number" && b[1][1]?.value === 12
+        );
+        expect(denomWith12).toHaveLength(3);
+
+        // Voice 2 notes must not be affected. They must have standard denominator 4.
+        const denomWith4 = blocks.filter(
+            b => Array.isArray(b[1]) && b[1][0] === "number" && b[1][1]?.value === 4
+        );
+        expect(denomWith4.length).toBeGreaterThanOrEqual(3);
+    });
 });
 
 // ---------------------------------------------------------------------------
