@@ -9,9 +9,9 @@
 - Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening your first PR.
 
 **Required checks**
+- Rebase on master before requesting review (`git fetch upstream && git rebase upstream/master`).
 - Run `npm test` locally and confirm no new test failures are introduced.
 - Run `npx prettier --write <changed files>` before pushing.
-- Rebase on master before requesting review (`git fetch upstream && git rebase upstream/master`).
 - Sign off every commit with DCO (`git commit -s`).
 - Run regression tests before submitting to catch unintended side effects:
   - Run the full test suite (`npm test`), not just the tests related to your change.
@@ -23,7 +23,7 @@
 **PR hygiene**
 - Keep PRs focused on one concern — don't bundle unrelated fixes together.
 - Make sure the PR description matches the actual code changes.
-- Include license headers at the top of every new file.
+- Include FOSS-compatible license headers at the top of every new file.
 - For UI/UX or feature changes, include before-and-after screenshots or a short GIF.
 - For performance-related changes, include before-and-after benchmark results with a brief explanation of the impact.
 
@@ -46,7 +46,7 @@
 - Keep commits atomic and well-described.
 - Reference related issues/discussions in PR description.
 - Respond to reviewer comments promptly.
-- Add new tests to existing test files where possible.
+- Add new tests to existing test files where relevant.
 
 ### Don'ts ❌
 - Don't include unrelated file changes in a PR.
