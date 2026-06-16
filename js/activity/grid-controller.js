@@ -14,15 +14,26 @@
 /* exported setupGridController, GridController */
 
 class GridController {
-    constructor(activity) {
+    /**
+     * @param {object} activity - The Activity instance.
+     * @param {boolean} isMusicBlocks - Whether this is running as Music Blocks
+     *   (vs. Turtle Blocks). Injected rather than read from the global so that
+     *   the controller has no hidden global dependency.
+     */
+    constructor(activity, isMusicBlocks) {
         this.activity = activity;
+        this._isMusicBlocks = isMusicBlocks;
     }
 
+    // -------------------------------------------------------------------------
+    // State — single source of truth delegated to turtles.currentGrid
+    // -------------------------------------------------------------------------
+
     get currentGrid() {
-        if (this.activity.turtles) {
-            return this.activity.turtles.currentGrid;
+        if (!this.activity.turtles) {
+            return null;
         }
-        return null;
+        return this.activity.turtles.currentGrid;
     }
 
     set currentGrid(value) {
@@ -31,23 +42,15 @@ class GridController {
         }
     }
 
-    get isCartesianEnabled() {
-        const grid = this.currentGrid;
-        return grid === 1 || grid === 2;
-    }
-
-    get isPolarEnabled() {
-        const grid = this.currentGrid;
-        return grid === 2 || grid === 3;
-    }
-
-    get isGridVisible() {
-        const grid = this.currentGrid;
-        return grid !== null && grid !== 0;
-    }
+    // -------------------------------------------------------------------------
+    // Public API
+    // -------------------------------------------------------------------------
 
     /**
-     * Hides all grids (Cartesian/polar/treble/et al.)
+     * Hides all grid overlays and resets the label to "show Cartesian".
+     * Safe to call at any point after setupGridController(); if turtles is not
+     * yet initialized the visual reset calls are still issued (they are no-ops
+     * when no overlay is visible).
      */
     hideGrids() {
         if (this.activity.turtles) {
@@ -55,7 +58,7 @@ class GridController {
         }
         this.activity._hideCartesian();
         this.activity._hidePolar();
-        if (_THIS_IS_MUSIC_BLOCKS_) {
+        if (this._isMusicBlocks) {
             this.activity._hideTreble();
             this.activity._hideGrand();
             this.activity._hideSoprano();
@@ -66,7 +69,12 @@ class GridController {
     }
 
     /**
-     * Renders Cartesian/Polar/Treble/et al. grids
+     * Applies the grid selection from the pie-menu wheel:
+     *   1. Hides the previously active grid overlay (read from this.currentGrid).
+     *   2. Shows the newly selected overlay (read from gridWheel.selectedNavItemIndex).
+     *   3. Updates this.currentGrid to the new selection.
+     *
+     * Must only be called once turtles (and its gridWheel) are initialised.
      */
     doCartesianPolar() {
         const turtles = this.activity.turtles;
@@ -74,7 +82,9 @@ class GridController {
             return;
         }
 
-        switch (turtles.currentGrid) {
+        // Hide the previously active overlay using the controller getter so
+        // there is a single source of truth for the current grid value.
+        switch (this.currentGrid) {
             case 1:
                 this.activity._hideCartesian();
                 break;
@@ -103,9 +113,14 @@ class GridController {
             case 9:
                 this.activity._hideBass();
                 break;
+            default:
+                break;
         }
 
-        switch (turtles.gridWheel.selectedNavItemIndex) {
+        const next = turtles.gridWheel.selectedNavItemIndex;
+
+        // Show the newly selected overlay.
+        switch (next) {
             case 1:
                 this.activity._showCartesian();
                 break;
@@ -134,19 +149,40 @@ class GridController {
             case 9:
                 this.activity._showBass();
                 break;
+            default:
+                break;
         }
-        turtles.currentGrid = turtles.gridWheel.selectedNavItemIndex;
+
+        // Write back through the setter — keeps turtles.currentGrid in sync
+        // via the single delegated path.
+        this.currentGrid = next;
         this.activity.update = true;
     }
 }
 
 /**
- * Attaches the GridController setup methods to the activity instance.
- * @param {object} activity - The activity instance.
+ * Attaches a GridController instance and its public surface to the activity.
+ *
+ * Call this AFTER `activity.turtles` has been initialised so that
+ * doCartesianPolar() can be invoked without guards. hideGrids() is safe to
+ * call at any time because it guards the setGridLabel call internally.
+ *
+ * @param {object} activity - The Activity instance.
  */
 const setupGridController = activity => {
-    const controller = new GridController(activity);
+    // Prefer the mode flag from the activity object (testable, no hidden
+    // global dependency). Fall back to the RequireJS-loaded global for the
+    // real browser path where activity._THIS_IS_MUSIC_BLOCKS_ is not set.
+    const isMusicBlocks =
+        typeof activity._THIS_IS_MUSIC_BLOCKS_ !== "undefined"
+            ? activity._THIS_IS_MUSIC_BLOCKS_
+            : typeof _THIS_IS_MUSIC_BLOCKS_ !== "undefined"
+              ? _THIS_IS_MUSIC_BLOCKS_
+              : true;
+
+    const controller = new GridController(activity, isMusicBlocks);
     activity.gridController = controller;
+
     activity.hideGrids = () => {
         controller.hideGrids();
     };
@@ -155,6 +191,9 @@ const setupGridController = activity => {
     };
 };
 
+// All browser execution goes through RequireJS (AMD). The module.exports branch
+// is present solely for Jest/Node test environments and is never exercised at
+// runtime in the browser.
 if (typeof define === "function" && define.amd) {
     define(function () {
         window.setupGridController = setupGridController;

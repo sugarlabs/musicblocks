@@ -13,184 +13,226 @@
 
 const { setupGridController, GridController } = require("../grid-controller.js");
 
-// Mock globally used _ (gettext) function if not defined
+// Mock gettext helper used in hideGrids label
 if (typeof global._ !== "function") {
     global._ = s => s;
 }
-// Mock global variables used by grid controller
-global._THIS_IS_MUSIC_BLOCKS_ = true;
 
-describe("GridController Tests", () => {
-    let mockActivity;
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
-    beforeEach(() => {
-        mockActivity = {
-            turtles: {
-                currentGrid: 0,
-                setGridLabel: jest.fn(),
-                gridWheel: {
-                    selectedNavItemIndex: 0
-                }
-            },
-            _hideCartesian: jest.fn(),
-            _showCartesian: jest.fn(),
-            _hidePolar: jest.fn(),
-            _showPolar: jest.fn(),
-            _hideTreble: jest.fn(),
-            _showTreble: jest.fn(),
-            _hideGrand: jest.fn(),
-            _showGrand: jest.fn(),
-            _hideSoprano: jest.fn(),
-            _showSoprano: jest.fn(),
-            _hideAlto: jest.fn(),
-            _showAlto: jest.fn(),
-            _hideTenor: jest.fn(),
-            _showTenor: jest.fn(),
-            _hideBass: jest.fn(),
-            _showBass: jest.fn(),
-            update: false
-        };
-        setupGridController(mockActivity);
+/**
+ * Build a minimal activity mock with a fully-initialised turtles stub so that
+ * setupGridController() mirrors the real post-turtles call site.
+ */
+function makeActivity({ isMusicBlocks = true, currentGrid = 0, selectedNavItemIndex = 0 } = {}) {
+    return {
+        _THIS_IS_MUSIC_BLOCKS_: isMusicBlocks,
+        turtles: {
+            currentGrid,
+            setGridLabel: jest.fn(),
+            gridWheel: { selectedNavItemIndex }
+        },
+        _hideCartesian: jest.fn(),
+        _showCartesian: jest.fn(),
+        _hidePolar: jest.fn(),
+        _showPolar: jest.fn(),
+        _hideTreble: jest.fn(),
+        _showTreble: jest.fn(),
+        _hideGrand: jest.fn(),
+        _showGrand: jest.fn(),
+        _hideSoprano: jest.fn(),
+        _showSoprano: jest.fn(),
+        _hideAlto: jest.fn(),
+        _showAlto: jest.fn(),
+        _hideTenor: jest.fn(),
+        _showTenor: jest.fn(),
+        _hideBass: jest.fn(),
+        _showBass: jest.fn(),
+        update: false
+    };
+}
+
+// ---------------------------------------------------------------------------
+// Setup / wiring
+// ---------------------------------------------------------------------------
+
+describe("setupGridController", () => {
+    test("attaches gridController instance and public methods to activity", () => {
+        const activity = makeActivity();
+        setupGridController(activity);
+
+        expect(activity.gridController).toBeInstanceOf(GridController);
+        expect(typeof activity.hideGrids).toBe("function");
+        expect(typeof activity._doCartesianPolar).toBe("function");
     });
 
-    test("setupGridController attaches helper functions and instance to activity", () => {
-        expect(mockActivity.gridController).toBeInstanceOf(GridController);
-        expect(typeof mockActivity.hideGrids).toBe("function");
-        expect(typeof mockActivity._doCartesianPolar).toBe("function");
+    test("initialisation before turtles: hideGrids does not throw", () => {
+        // Simulate the edge-case where hideGrids is called before turtles
+        // is attached (e.g. during cleanup on an early error path).
+        const activity = makeActivity();
+        activity.turtles = null; // no turtles yet
+        setupGridController(activity);
+
+        // Must not throw; visual hide methods are still called
+        expect(() => activity.hideGrids()).not.toThrow();
+        expect(activity._hideCartesian).toHaveBeenCalledTimes(1);
+        expect(activity._hidePolar).toHaveBeenCalledTimes(1);
+        // setGridLabel is NOT called — turtles is null
+        // (no turtles stub to assert on, just verifying no crash)
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Observable behavior: grid transitions via doCartesianPolar
+// ---------------------------------------------------------------------------
+
+describe("doCartesianPolar — grid transitions", () => {
+    test("Cartesian (1) → Polar (3): hides Cartesian, shows Polar, updates currentGrid", () => {
+        const activity = makeActivity({ currentGrid: 1, selectedNavItemIndex: 3 });
+        setupGridController(activity);
+
+        activity._doCartesianPolar();
+
+        expect(activity._hideCartesian).toHaveBeenCalledTimes(1);
+        expect(activity._showPolar).toHaveBeenCalledTimes(1);
+        expect(activity._showCartesian).not.toHaveBeenCalled();
+        expect(activity.turtles.currentGrid).toBe(3);
+        expect(activity.update).toBe(true);
     });
 
-    test("currentGrid getter and setter works correctly", () => {
-        const controller = mockActivity.gridController;
-        expect(controller.currentGrid).toBe(0);
+    test("Polar (3) → None (0): hides Polar, shows nothing, updates currentGrid", () => {
+        const activity = makeActivity({ currentGrid: 3, selectedNavItemIndex: 0 });
+        setupGridController(activity);
 
-        controller.currentGrid = 2;
-        expect(mockActivity.turtles.currentGrid).toBe(2);
-        expect(controller.currentGrid).toBe(2);
+        activity._doCartesianPolar();
+
+        expect(activity._hidePolar).toHaveBeenCalledTimes(1);
+        expect(activity._showPolar).not.toHaveBeenCalled();
+        expect(activity._showCartesian).not.toHaveBeenCalled();
+        expect(activity.turtles.currentGrid).toBe(0);
     });
 
-    test("currentGrid returns null if turtles component is not loaded", () => {
-        const controller = mockActivity.gridController;
-        const oldTurtles = mockActivity.turtles;
-        mockActivity.turtles = null;
-        expect(controller.currentGrid).toBeNull();
+    test("Cartesian+Polar (2) → Cartesian (1): hides both, shows only Cartesian", () => {
+        const activity = makeActivity({ currentGrid: 2, selectedNavItemIndex: 1 });
+        setupGridController(activity);
 
-        // Setter does not throw when turtles is null
-        expect(() => {
-            controller.currentGrid = 3;
-        }).not.toThrow();
-        mockActivity.turtles = oldTurtles;
+        activity._doCartesianPolar();
+
+        expect(activity._hideCartesian).toHaveBeenCalledTimes(1);
+        expect(activity._hidePolar).toHaveBeenCalledTimes(1);
+        expect(activity._showCartesian).toHaveBeenCalledTimes(1);
+        expect(activity._showPolar).not.toHaveBeenCalled();
+        expect(activity.turtles.currentGrid).toBe(1);
     });
 
-    test("isCartesianEnabled getter behaves correctly", () => {
-        const controller = mockActivity.gridController;
+    test("None (0) → Cartesian+Polar (2): hides nothing, shows both", () => {
+        const activity = makeActivity({ currentGrid: 0, selectedNavItemIndex: 2 });
+        setupGridController(activity);
 
-        // 0 -> false
-        controller.currentGrid = 0;
-        expect(controller.isCartesianEnabled).toBe(false);
+        activity._doCartesianPolar();
 
-        // 1 (Cartesian) -> true
-        controller.currentGrid = 1;
-        expect(controller.isCartesianEnabled).toBe(true);
-
-        // 2 (Cartesian/Polar) -> true
-        controller.currentGrid = 2;
-        expect(controller.isCartesianEnabled).toBe(true);
-
-        // 3 (Polar) -> false
-        controller.currentGrid = 3;
-        expect(controller.isCartesianEnabled).toBe(false);
+        expect(activity._hideCartesian).not.toHaveBeenCalled();
+        expect(activity._hidePolar).not.toHaveBeenCalled();
+        expect(activity._showCartesian).toHaveBeenCalledTimes(1);
+        expect(activity._showPolar).toHaveBeenCalledTimes(1);
+        expect(activity.turtles.currentGrid).toBe(2);
     });
 
-    test("isPolarEnabled getter behaves correctly", () => {
-        const controller = mockActivity.gridController;
+    test("Cartesian+Polar (2) → Grand (5): hides both, shows Grand", () => {
+        const activity = makeActivity({ currentGrid: 2, selectedNavItemIndex: 5 });
+        setupGridController(activity);
 
-        // 0 -> false
-        controller.currentGrid = 0;
-        expect(controller.isPolarEnabled).toBe(false);
+        activity._doCartesianPolar();
 
-        // 1 (Cartesian) -> false
-        controller.currentGrid = 1;
-        expect(controller.isPolarEnabled).toBe(false);
-
-        // 2 (Cartesian/Polar) -> true
-        controller.currentGrid = 2;
-        expect(controller.isPolarEnabled).toBe(true);
-
-        // 3 (Polar) -> true
-        controller.currentGrid = 3;
-        expect(controller.isPolarEnabled).toBe(true);
+        expect(activity._hideCartesian).toHaveBeenCalledTimes(1);
+        expect(activity._hidePolar).toHaveBeenCalledTimes(1);
+        expect(activity._showGrand).toHaveBeenCalledTimes(1);
+        expect(activity.turtles.currentGrid).toBe(5);
     });
 
-    test("isGridVisible getter behaves correctly", () => {
-        const controller = mockActivity.gridController;
+    test("Treble (4) → Alto (7): hides Treble, shows Alto", () => {
+        const activity = makeActivity({ currentGrid: 4, selectedNavItemIndex: 7 });
+        setupGridController(activity);
 
-        controller.currentGrid = null;
-        expect(controller.isGridVisible).toBe(false);
+        activity._doCartesianPolar();
 
-        controller.currentGrid = 0;
-        expect(controller.isGridVisible).toBe(false);
-
-        controller.currentGrid = 1;
-        expect(controller.isGridVisible).toBe(true);
+        expect(activity._hideTreble).toHaveBeenCalledTimes(1);
+        expect(activity._showAlto).toHaveBeenCalledTimes(1);
+        expect(activity.turtles.currentGrid).toBe(7);
     });
 
-    test("hideGrids calls corresponding visual hide methods", () => {
-        mockActivity.hideGrids();
+    test("doCartesianPolar is a no-op when turtles is not yet initialised", () => {
+        const activity = makeActivity();
+        activity.turtles = null;
+        setupGridController(activity);
 
-        expect(mockActivity.turtles.setGridLabel).toHaveBeenCalledWith("show Cartesian");
-        expect(mockActivity._hideCartesian).toHaveBeenCalledTimes(1);
-        expect(mockActivity._hidePolar).toHaveBeenCalledTimes(1);
-        expect(mockActivity._hideTreble).toHaveBeenCalledTimes(1);
-        expect(mockActivity._hideGrand).toHaveBeenCalledTimes(1);
-        expect(mockActivity._hideSoprano).toHaveBeenCalledTimes(1);
-        expect(mockActivity._hideAlto).toHaveBeenCalledTimes(1);
-        expect(mockActivity._hideTenor).toHaveBeenCalledTimes(1);
-        expect(mockActivity._hideBass).toHaveBeenCalledTimes(1);
+        activity._doCartesianPolar();
+
+        expect(activity._hideCartesian).not.toHaveBeenCalled();
+        expect(activity._showCartesian).not.toHaveBeenCalled();
     });
 
-    test("hideGrids does not hide treble/musical staffs if not in music blocks context", () => {
-        global._THIS_IS_MUSIC_BLOCKS_ = false;
+    test("update flag is set to true after a successful transition", () => {
+        const activity = makeActivity({ currentGrid: 1, selectedNavItemIndex: 3 });
+        setupGridController(activity);
 
-        mockActivity.hideGrids();
+        expect(activity.update).toBe(false);
+        activity._doCartesianPolar();
+        expect(activity.update).toBe(true);
+    });
+});
 
-        expect(mockActivity._hideCartesian).toHaveBeenCalledTimes(1);
-        expect(mockActivity._hidePolar).toHaveBeenCalledTimes(1);
-        expect(mockActivity._hideTreble).not.toHaveBeenCalled();
-        expect(mockActivity._hideGrand).not.toHaveBeenCalled();
+// ---------------------------------------------------------------------------
+// Observable behavior: hideGrids
+// ---------------------------------------------------------------------------
 
-        global._THIS_IS_MUSIC_BLOCKS_ = true;
+describe("hideGrids", () => {
+    test("hides all overlays in Music Blocks mode and resets label", () => {
+        const activity = makeActivity({ isMusicBlocks: true });
+        setupGridController(activity);
+
+        activity.hideGrids();
+
+        expect(activity.turtles.setGridLabel).toHaveBeenCalledWith("show Cartesian");
+        expect(activity._hideCartesian).toHaveBeenCalledTimes(1);
+        expect(activity._hidePolar).toHaveBeenCalledTimes(1);
+        expect(activity._hideTreble).toHaveBeenCalledTimes(1);
+        expect(activity._hideGrand).toHaveBeenCalledTimes(1);
+        expect(activity._hideSoprano).toHaveBeenCalledTimes(1);
+        expect(activity._hideAlto).toHaveBeenCalledTimes(1);
+        expect(activity._hideTenor).toHaveBeenCalledTimes(1);
+        expect(activity._hideBass).toHaveBeenCalledTimes(1);
     });
 
-    test("doCartesianPolar handles transitions correctly", () => {
-        // Transition from active Cartesian (1) to Polar (3)
-        mockActivity.turtles.currentGrid = 1;
-        mockActivity.turtles.gridWheel.selectedNavItemIndex = 3;
+    test("skips musical staff overlays in Turtle Blocks mode", () => {
+        const activity = makeActivity({ isMusicBlocks: false });
+        setupGridController(activity);
 
-        mockActivity._doCartesianPolar();
+        activity.hideGrids();
 
-        expect(mockActivity._hideCartesian).toHaveBeenCalledTimes(1);
-        expect(mockActivity._showPolar).toHaveBeenCalledTimes(1);
-        expect(mockActivity.turtles.currentGrid).toBe(3);
-        expect(mockActivity.update).toBe(true);
+        expect(activity._hideCartesian).toHaveBeenCalledTimes(1);
+        expect(activity._hidePolar).toHaveBeenCalledTimes(1);
+        expect(activity._hideTreble).not.toHaveBeenCalled();
+        expect(activity._hideGrand).not.toHaveBeenCalled();
+        expect(activity._hideAlto).not.toHaveBeenCalled();
     });
+});
 
-    test("doCartesianPolar transitions from Cartesian/Polar (2) to Grand (5)", () => {
-        mockActivity.turtles.currentGrid = 2;
-        mockActivity.turtles.gridWheel.selectedNavItemIndex = 5;
+// ---------------------------------------------------------------------------
+// isMusicBlocks injection
+// ---------------------------------------------------------------------------
 
-        mockActivity._doCartesianPolar();
+describe("isMusicBlocks injection", () => {
+    test("reads mode from activity._THIS_IS_MUSIC_BLOCKS_ rather than the global", () => {
+        // The activity says Turtle Blocks even if the global says Music Blocks
+        const activity = makeActivity({ isMusicBlocks: false });
+        setupGridController(activity);
 
-        expect(mockActivity._hideCartesian).toHaveBeenCalledTimes(1);
-        expect(mockActivity._hidePolar).toHaveBeenCalledTimes(1);
-        expect(mockActivity._showGrand).toHaveBeenCalledTimes(1);
-        expect(mockActivity.turtles.currentGrid).toBe(5);
-    });
+        activity.hideGrids();
 
-    test("doCartesianPolar does nothing if turtles component is not loaded", () => {
-        mockActivity.turtles = null;
-        mockActivity._doCartesianPolar();
-
-        expect(mockActivity._hideCartesian).not.toHaveBeenCalled();
-        expect(mockActivity._showCartesian).not.toHaveBeenCalled();
+        // Musical staff overlays must NOT be hidden (Turtle Blocks mode)
+        expect(activity._hideTreble).not.toHaveBeenCalled();
     });
 });
