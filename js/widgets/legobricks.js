@@ -1225,10 +1225,41 @@ function LegoWidget() {
             .getUserMedia({ video: true })
             .then(stream => {
                 this.webcamVideo.srcObject = stream;
+
+                const captureBtn = document.createElement("button");
+                captureBtn.textContent = " Capture";
+                captureBtn.style.cssText =
+                    "position:absolute;bottom:10px;left:50%;transform:translateX(-50%);" +
+                    "padding:8px 16px;font-size:14px;cursor:pointer;z-index:30;" +
+                    "background:#fff;border:2px solid #333;border-radius:6px;";
+                captureBtn.onclick = () => {
+                    const canvas = document.createElement("canvas");
+                    canvas.width = this.webcamVideo.videoWidth;
+                    canvas.height = this.webcamVideo.videoHeight;
+                    canvas.getContext("2d").drawImage(this.webcamVideo, 0, 0);
+                    this._stopWebcam();
+
+                    const img = document.createElement("img");
+                    img.src = canvas.toDataURL("image/png");
+                    img.style.maxWidth = "100%";
+                    img.style.maxHeight = "100%";
+                    img.style.objectFit = "contain";
+                    img.style.borderRadius = "8px";
+                    img.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
+                    this.imageWrapper.replaceChildren(img);
+                    captureBtn.remove();
+
+                    this._makeImageDraggable(this.imageWrapper);
+                    this._showZoomControls();
+                    this._drawGridLines();
+                    this.activity.textMsg(_("Photo captured"));
+                };
+                this.imageWrapper.appendChild(captureBtn);
+
                 this._makeImageDraggable(this.imageWrapper);
                 this._showZoomControls();
                 this._drawGridLines();
-                this.activity.textMsg(_("Webcam started"));
+                this.activity.textMsg(_("Webcam started - click 📸 to capture"));
             })
             .catch(err => {
                 this.activity.textMsg(_("Webcam access denied: %s").replace(/%s/g, err.message));
