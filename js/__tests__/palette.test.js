@@ -169,6 +169,8 @@ describe("Palettes Class", () => {
                 this.height = 0;
                 this.style = {};
             }
+            setAttribute() {}
+            removeAttribute() {}
         };
 
         global.docById = jest.fn(id => {
@@ -2068,6 +2070,8 @@ describe("Palettes Class", () => {
                 constructor() {
                     this.src = "";
                 }
+                setAttribute() {}
+                removeAttribute() {}
             };
             const tr = {
                 children: MULTIPALETTES.map(() => ({
