@@ -127,7 +127,8 @@ requirejs.config({
                 "activity/turtles",
                 "activity/recorder",
                 "activity/abc-parser",
-                "activity/idle-watcher"
+                "activity/idle-watcher",
+                "activity/grid-controller"
             ],
             exports: "Activity"
         },
@@ -165,6 +166,7 @@ requirejs.config({
         "activity/exporters": "js/activity/exporters",
         "activity/abc-parser": "js/activity/abc-parser",
         "activity/idle-watcher": "js/activity/idle-watcher",
+        "activity/grid-controller": "js/activity/grid-controller",
         "easeljs.min": "lib/easeljs.min",
         "tweenjs.min": "lib/tweenjs.min",
         "prefixfree.min": "lib/prefixfree.min",

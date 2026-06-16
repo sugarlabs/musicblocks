@@ -31,6 +31,7 @@ try {
    ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON, debugLog,
    ErrorHandler, ActivityContext,
    Boundary, CARTESIAN, changeImage, closeWidgets, doRecordButton, setupActivityRecorder,
+   setupGridController,
    setupActivityAbcParser, setupActivityIdleWatcher,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
@@ -124,6 +125,7 @@ let MYDEFINES = [
 
     "activity/recorder",
     "activity/idle-watcher",
+    "activity/grid-controller",
     "utils/musicutils",
     "utils/synthutils",
     "utils/mathutils",
@@ -2079,92 +2081,6 @@ class Activity {
                     this.palettes.activePalette + " " + _("plugins will be removed upon restart.")
                 );
             }
-        };
-
-        /*
-         * Hides all grids (Cartesian/polar/treble/et al.)
-         */
-        this.hideGrids = () => {
-            this.turtles.setGridLabel(_("show Cartesian"));
-            this._hideCartesian();
-            this._hidePolar();
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                this._hideTreble();
-                this._hideGrand();
-                this._hideSoprano();
-                this._hideAlto();
-                this._hideTenor();
-                this._hideBass();
-            }
-        };
-
-        /*
-         * Renders Cartesian/Polar/Treble/et al. grids
-         */
-        this._doCartesianPolar = () => {
-            switch (this.turtles.currentGrid) {
-                case 1:
-                    this._hideCartesian();
-                    break;
-                case 2:
-                    this._hideCartesian();
-                    this._hidePolar();
-                    break;
-                case 3:
-                    this._hidePolar();
-                    break;
-                case 4:
-                    this._hideTreble();
-                    break;
-                case 5:
-                    this._hideGrand();
-                    break;
-                case 6:
-                    this._hideSoprano();
-                    break;
-                case 7:
-                    this._hideAlto();
-                    break;
-                case 8:
-                    this._hideTenor();
-                    break;
-                case 9:
-                    this._hideBass();
-                    break;
-            }
-
-            switch (this.turtles.gridWheel.selectedNavItemIndex) {
-                case 1:
-                    this._showCartesian();
-                    break;
-                case 2:
-                    this._showCartesian();
-                    this._showPolar();
-                    break;
-                case 3:
-                    this._showPolar();
-                    break;
-                case 4:
-                    this._showTreble();
-                    break;
-                case 5:
-                    this._showGrand();
-                    break;
-                case 6:
-                    this._showSoprano();
-                    break;
-                case 7:
-                    this._showAlto();
-                    break;
-                case 8:
-                    this._showTenor();
-                    break;
-                case 9:
-                    this._showBass();
-                    break;
-            }
-            this.turtles.currentGrid = this.turtles.gridWheel.selectedNavItemIndex;
-            this.update = true;
         };
 
         /*
@@ -7226,6 +7142,7 @@ class Activity {
             this._setupBlocksContainerEvents();
 
             this.trashcan = new Trashcan(this);
+            setupGridController(this);
             this.turtles = new Turtles(this);
             this.boundary = new Boundary(this.blocksContainer);
             this.blocks = new Blocks(this);
