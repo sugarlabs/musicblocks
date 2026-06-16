@@ -318,14 +318,10 @@ class MathUtility {
      * @static
      * @param {*} a
      * @returns {number} - Integer value of a.
-     * @throws {string} NAN error if the argument is not valid.
      */
     static doInt(a) {
         const n = Number(a);
-        if (isNaN(n)) {
-            throw new Error("NanError");
-        }
-        return Math.floor(n + 0.5);
+        return Number.isNaN(n) ? NaN : Math.floor(n + 0.5);
     }
 }
 // Ensure mathutils.js exports the MathUtility class

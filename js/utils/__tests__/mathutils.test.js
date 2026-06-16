@@ -549,8 +549,8 @@ describe("MathUtility", () => {
             expect(MathUtility.doInt("4.6")).toBe(5);
         });
 
-        test("throws NanError for non-numeric string", () => {
-            expect(() => MathUtility.doInt("abc")).toThrow("NanError");
+        test("returns NaN for non-numeric string", () => {
+            expect(MathUtility.doInt("abc")).toBeNaN();
         });
     });
 
