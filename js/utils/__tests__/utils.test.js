@@ -419,6 +419,22 @@ describe("Utility Functions (logic-only)", () => {
         it("handles negative + positive", () => {
             expect(rationalSum([-1, 3], [1, 3])).toEqual([0, 3]);
         });
+
+        describe("rationalSum zero denominator", () => {
+            it("logs error and returns [0,1] for zero first denominator", () => {
+                const spy = jest.spyOn(console, "error").mockImplementation(() => {});
+                expect(rationalSum([1, 0], [2, 3])).toEqual([0, 1]);
+                expect(spy).toHaveBeenCalled();
+                spy.mockRestore();
+            });
+
+            it("logs error and returns [0,1] for zero second denominator", () => {
+                const spy = jest.spyOn(console, "error").mockImplementation(() => {});
+                expect(rationalSum([2, 3], [1, 0])).toEqual([0, 1]);
+                expect(spy).toHaveBeenCalled();
+                spy.mockRestore();
+            });
+        });
     });
     describe("hexToRGB() without hash", () => {
         it("parses hex without #", () => {
