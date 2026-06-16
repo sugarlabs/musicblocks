@@ -4,26 +4,21 @@ import os
 import json
 import subprocess
 from pathlib import Path
+from collections import Counter
 
 def parse_header_comments(file_path):
     with open(file_path, 'r', encoding='utf-8') as f:
         content = f.read()
     
     # Extract exported
-    exported_match = re.search(r'/\*\s*exported\s*(.*?)\*/', content, re.DOTALL)
     exports = []
-    if exported_match:
-        exports = [e.strip() for e in re.split(r'[,\s]+', exported_match.group(1)) if e.strip()]
+    for match in re.findall(r'/\*\s*exported\s*(.*?)\*/', content, re.DOTALL):
+        exports.extend([e.strip() for e in re.split(r'[,\s]+', match) if e.strip()])
 
-    # Extract global
-    global_match = re.search(r'/\*\s*global\s*(.*?)\*/', content, re.DOTALL)
-    if not global_match:
-        # Some use 'globals' instead of 'global'
-        global_match = re.search(r'/\*\s*globals\s*(.*?)\*/', content, re.DOTALL)
-    
+    # Extract global/globals combined
     globals_used = []
-    if global_match:
-        globals_used = [g.strip() for g in re.split(r'[,\s]+', global_match.group(1)) if g.strip()]
+    for match in re.findall(r'/\*\s*globals?\s*(.*?)\*/', content, re.DOTALL):
+        globals_used.extend([g.strip() for g in re.split(r'[,\s]+', match) if g.strip()])
     
     return exports, globals_used
 
@@ -31,6 +26,7 @@ def main():
     js_dir = 'js'
     module_data = {}
     symbol_to_module = {}
+    symbol_usage = Counter()
     
     output_dir = Path("Docs/architecture")
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -63,6 +59,7 @@ def main():
                 target = symbol_to_module[g]
                 if target != path:
                     dependencies.append((path, target, g))
+                    symbol_usage[g] += 1
 
     # 3. Generate DOT file
     with open(dot_output, 'w') as f:
@@ -75,7 +72,6 @@ def main():
         f.write('  node [shape=box, style=filled, fillcolor=lightyellow, fontsize=10];\n')
         f.write('  edge [arrowsize=0.6, fontsize=8];\n')
         f.write('\n')
-        # Group by directory for clarity
         for path, data in module_data.items():
             node_id = f'"{path}"'
             label = data['file']
@@ -103,7 +99,7 @@ def main():
             "modules_total": len(module_data),
             "dependencies_total": len(dependencies),
             "symbol_mapping_total": len(symbol_to_module),
-            "top_exported_symbols": sorted(symbol_to_module.keys())[:20]
+            "top_exported_symbols": [sym for sym, count in symbol_usage.most_common(20)]
         }
         json.dump(summary, f, indent=2)
     print(f"Generated {report_output}")

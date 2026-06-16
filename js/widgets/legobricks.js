@@ -285,7 +285,13 @@ function LegoWidget() {
         // Add control buttons in left sidebar
         this.playButton = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
         this.playButton.onclick = () => {
-            this._playPhrase();
+            if (this.isPlaying) {
+                this._stopPlayback();
+            } else {
+                this._playPhrase();
+                const img = this.playButton.querySelector("img");
+                if (img) img.src = "header-icons/stop-button.svg";
+            }
         };
 
         this.saveButton = widgetWindow.addButton("save-button.svg", ICONSIZE, _("Save"));
@@ -331,16 +337,9 @@ function LegoWidget() {
 
         this._scale();
         this.activity.textMsg(
-            _("LEGO Bricks - Phrase Maker with") +
-                " " +
-                this.rowLabels.length +
-                " " +
-                _(
-                    "pitch rows (sorted by frequency, Instrument:" +
-                        " " +
-                        this.selectedInstrument +
-                        ")"
-                )
+            _(
+                "LEGO Bricks - Phrase Maker with %s pitch rows (sorted by frequency, Instrument)"
+            ).replace(/%s/g, this.rowLabels.length.toString())
         );
     };
 
@@ -380,7 +379,7 @@ function LegoWidget() {
      * @returns {void}
      */
     this._initializeRowHeaders = function () {
-        this.rowHeaderTable.innerHTML = "";
+        this.rowHeaderTable.replaceChildren();
         this.rowHeaderTable.style.margin = "0";
         this.rowHeaderTable.style.padding = "0";
         this.rowHeaderTable.style.borderSpacing = "0";
@@ -729,7 +728,7 @@ function LegoWidget() {
      * @returns {void}
      */
     this._initializeMatrix = function () {
-        this.matrixTable.innerHTML = "";
+        this.matrixTable.replaceChildren();
 
         this.matrixData.rows.forEach((rowData, rowIndex) => {
             const row = this.matrixTable.insertRow();
@@ -903,7 +902,10 @@ function LegoWidget() {
         // Load the new blocks
         this.activity.blocks.loadNewBlocks(newStack);
         this.activity.textMsg(
-            _("LEGO phrase saved as action blocks with ") + this._notesToPlay.length + _(" notes")
+            _("LEGO phrase saved as action blocks with %s notes.").replace(
+                /%s/g,
+                this._notesToPlay.length.toString()
+            )
         );
     };
 
@@ -1124,7 +1126,9 @@ function LegoWidget() {
             rows: this.matrixData.rows.map(row => ({ type: row.type, label: row.label }))
         };
 
-        this.activity.textMsg(_("Exporting phrase data: ") + JSON.stringify(phraseData));
+        this.activity.textMsg(
+            _("Exporting phrase data: %s").replace(/%s/g, JSON.stringify(phraseData))
+        );
     };
 
     /**
@@ -1163,7 +1167,7 @@ function LegoWidget() {
         if (file && file.type.startsWith("image/")) {
             const reader = new FileReader();
             reader.onload = e => {
-                this.imageDisplayArea.innerHTML = "";
+                this.imageDisplayArea.replaceChildren();
 
                 this.imageWrapper = document.createElement("div");
                 this.imageWrapper.style.position = "absolute";
@@ -1199,7 +1203,7 @@ function LegoWidget() {
      * @returns {void}
      */
     this._startWebcam = function () {
-        this.imageDisplayArea.innerHTML = "";
+        this.imageDisplayArea.replaceChildren();
 
         this.imageWrapper = document.createElement("div");
         this.imageWrapper.style.position = "absolute";
@@ -1227,7 +1231,7 @@ function LegoWidget() {
                 this.activity.textMsg(_("Webcam started"));
             })
             .catch(err => {
-                this.activity.textMsg(_("Webcam access denied: ") + err.message);
+                this.activity.textMsg(_("Webcam access denied: %s").replace(/%s/g, err.message));
             });
     };
 
@@ -1285,7 +1289,7 @@ function LegoWidget() {
 
         this.activity.textMsg(
             _(
-                "Eye dropper active - hover over image to preview colors, click to select background color"
+                "Eye dropper active - hover over image to preview colors, click to select background color."
             )
         );
     };
@@ -1342,9 +1346,11 @@ function LegoWidget() {
             // Update UI to show selected color
             this._updateBackgroundColorDisplay();
 
-            this.activity.textMsg(_("Background color selected: ") + clickedColor.name);
+            this.activity.textMsg(
+                _("Background color selected: %s").replace(/%s/g, clickedColor.name)
+            );
         } else {
-            this.activity.textMsg(_("Could not sample color - please try clicking on the image"));
+            this.activity.textMsg(_("Could not sample color - please try clicking on the image."));
         }
     }.bind(this);
 
@@ -1908,7 +1914,9 @@ function LegoWidget() {
         }
 
         // Show a message indicating the instrument change
-        this.activity.textMsg(_("Instrument changed to: ") + this.selectedInstrument);
+        this.activity.textMsg(
+            _("Instrument changed to: %s").replace(/%s/g, this.selectedInstrument)
+        );
     };
 
     /**
@@ -1919,27 +1927,27 @@ function LegoWidget() {
     this._createInstrumentPieMenu = function () {
         // Define instrument options
         const voiceLabels = [
-            _("Electronic Synth"),
-            _("Piano"),
-            _("Guitar"),
-            _("Acoustic Guitar"),
-            _("Electric Guitar"),
-            _("Violin"),
-            _("Viola"),
-            _("Cello"),
-            _("Bass"),
-            _("Flute"),
-            _("Clarinet"),
-            _("Saxophone"),
-            _("Trumpet"),
-            _("Trombone"),
-            _("Oboe"),
-            _("Tuba"),
-            _("Banjo"),
-            _("Sine"),
-            _("Square"),
-            _("Sawtooth"),
-            _("Triangle")
+            _("electronic synth"),
+            _("piano"),
+            _("guitar"),
+            _("acoustic guitar"),
+            _("electric guitar"),
+            _("violin"),
+            _("viola"),
+            _("cello"),
+            _("bass"),
+            _("flute"),
+            _("clarinet"),
+            _("saxophone"),
+            _("trumpet"),
+            _("trombone"),
+            _("oboe"),
+            _("tuba"),
+            _("banjo"),
+            _("sine"),
+            _("square"),
+            _("sawtooth"),
+            _("triangle")
         ];
 
         const voiceValues = [
@@ -2049,7 +2057,9 @@ function LegoWidget() {
                 }
 
                 // Show a message indicating the instrument change
-                this.activity.textMsg(_("Instrument changed to: ") + this.selectedInstrument);
+                this.activity.textMsg(
+                    _("Instrument changed to: %s").replace(/%s/g, this.selectedInstrument)
+                );
 
                 // Update the mock block's value and text
                 mockBlock.value = newValue;
@@ -2075,7 +2085,9 @@ function LegoWidget() {
             }
 
             // Show a message indicating the instrument change
-            this.activity.textMsg(_("Instrument changed to: ") + this.selectedInstrument);
+            this.activity.textMsg(
+                _("Instrument changed to: %s").replace(/%s/g, this.selectedInstrument)
+            );
         };
 
         // Call the pie menu function
@@ -2116,7 +2128,7 @@ function LegoWidget() {
     this._drawGridLines = function () {
         if (!this.rowHeaderTable.rows.length || !this.gridOverlay) return;
 
-        this.gridOverlay.innerHTML = "";
+        this.gridOverlay.replaceChildren();
 
         const numRows = this.matrixData.rows.length;
 
@@ -2408,6 +2420,11 @@ function LegoWidget() {
      */
     this._stopPlayback = function () {
         this.isPlaying = false;
+
+        this.activity.hideMsgs();
+
+        const img = this.playButton.querySelector("img");
+        if (img) img.src = "header-icons/play-button.svg";
 
         // Save final color segments for all lines
         if (this.scanningLines) {

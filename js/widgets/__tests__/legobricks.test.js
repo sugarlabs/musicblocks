@@ -26,17 +26,10 @@ describe("LegoWidget Core Logic", () => {
     let legoWidget;
 
     beforeEach(() => {
-        // Create a new LegoWidget instance for each test
         legoWidget = new LegoWidget();
     });
 
     describe("_calculateFallbackFrequency", () => {
-        /**
-         * Test the frequency calculation method with known pitch references.
-         * This method calculates frequency for pitch names and octaves as fallback
-         * when noteToFrequency is not available.
-         */
-
         it("should return 440 Hz for A4 (standard reference pitch)", () => {
             const frequency = legoWidget._calculateFallbackFrequency("A", 4);
             expect(frequency).toBeCloseTo(440.0, 1);
@@ -48,7 +41,6 @@ describe("LegoWidget Core Logic", () => {
         });
 
         it("should return correct frequencies for all letter names in octave 4", () => {
-            // Test all pitch names with their known frequencies in octave 4
             expect(legoWidget._calculateFallbackFrequency("C", 4)).toBeCloseTo(261.63, 1);
             expect(legoWidget._calculateFallbackFrequency("D", 4)).toBeCloseTo(293.66, 1);
             expect(legoWidget._calculateFallbackFrequency("E", 4)).toBeCloseTo(329.63, 1);
@@ -59,7 +51,6 @@ describe("LegoWidget Core Logic", () => {
         });
 
         it("should return correct frequencies for all solfege names in octave 4", () => {
-            // Test all solfege names with their known frequencies in octave 4
             expect(legoWidget._calculateFallbackFrequency("do", 4)).toBeCloseTo(261.63, 1);
             expect(legoWidget._calculateFallbackFrequency("re", 4)).toBeCloseTo(293.66, 1);
             expect(legoWidget._calculateFallbackFrequency("mi", 4)).toBeCloseTo(329.63, 1);
@@ -70,7 +61,6 @@ describe("LegoWidget Core Logic", () => {
         });
 
         it("should handle case insensitivity correctly", () => {
-            // Test that case doesn't matter for pitch names
             expect(legoWidget._calculateFallbackFrequency("c", 4)).toBeCloseTo(261.63, 1);
             expect(legoWidget._calculateFallbackFrequency("C", 4)).toBeCloseTo(261.63, 1);
             expect(legoWidget._calculateFallbackFrequency("DO", 4)).toBeCloseTo(261.63, 1);
@@ -78,33 +68,109 @@ describe("LegoWidget Core Logic", () => {
         });
 
         it("should calculate correct frequencies for different octaves", () => {
-            // Test octave calculation - each octave doubles/halves the frequency
             const c4 = legoWidget._calculateFallbackFrequency("C", 4);
             const c5 = legoWidget._calculateFallbackFrequency("C", 5);
             const c3 = legoWidget._calculateFallbackFrequency("C", 3);
-
-            expect(c5).toBeCloseTo(c4 * 2, 1); // One octave up = double frequency
-            expect(c3).toBeCloseTo(c4 / 2, 1); // One octave down = half frequency
+            expect(c5).toBeCloseTo(c4 * 2, 1);
+            expect(c3).toBeCloseTo(c4 / 2, 1);
         });
 
         it("should handle edge cases for octaves", () => {
-            // Test with very high and low octaves
-            expect(legoWidget._calculateFallbackFrequency("A", 0)).toBeCloseTo(27.5, 1); // Very low octave
-            expect(legoWidget._calculateFallbackFrequency("A", 8)).toBeCloseTo(7040.0, 1); // Very high octave
+            expect(legoWidget._calculateFallbackFrequency("A", 0)).toBeCloseTo(27.5, 1);
+            expect(legoWidget._calculateFallbackFrequency("A", 8)).toBeCloseTo(7040.0, 1);
         });
 
         it("should fallback to C frequency for invalid pitch names", () => {
-            // Test that invalid pitch names fallback to C frequency
             const invalidPitchFreq = legoWidget._calculateFallbackFrequency("X", 4);
             const c4Freq = legoWidget._calculateFallbackFrequency("C", 4);
             expect(invalidPitchFreq).toBeCloseTo(c4Freq, 1);
         });
 
         it("should handle empty and null pitch names", () => {
-            // Test edge cases with empty and null inputs
             const emptyFreq = legoWidget._calculateFallbackFrequency("", 4);
             const c4Freq = legoWidget._calculateFallbackFrequency("C", 4);
             expect(emptyFreq).toBeCloseTo(c4Freq, 1);
+        });
+    });
+
+    describe("_rgbToHsl", () => {
+        it("should convert red RGB to HSL", () => {
+            const [h, s, l] = legoWidget._rgbToHsl(255, 0, 0);
+            expect(h).toBe(0);
+            expect(s).toBe(100);
+            expect(l).toBe(50);
+        });
+
+        it("should convert white RGB to HSL", () => {
+            const [h, s, l] = legoWidget._rgbToHsl(255, 255, 255);
+            expect(l).toBe(100);
+        });
+
+        it("should convert black RGB to HSL", () => {
+            const [h, s, l] = legoWidget._rgbToHsl(0, 0, 0);
+            expect(l).toBe(0);
+        });
+    });
+
+    describe("_getColorFamily", () => {
+        it("should return red for hue 0", () => {
+            expect(legoWidget._getColorFamily(0, 80, 50).name).toBe("red");
+        });
+
+        it("should return green for hue 120", () => {
+            expect(legoWidget._getColorFamily(120, 80, 50).name).toBe("green");
+        });
+
+        it("should return blue for hue 240", () => {
+            expect(legoWidget._getColorFamily(240, 80, 50).name).toBe("blue");
+        });
+
+        it("should return white for low saturation high lightness", () => {
+            expect(legoWidget._getColorFamily(0, 5, 95).name).toBe("white");
+        });
+
+        it("should return black for low saturation low lightness", () => {
+            expect(legoWidget._getColorFamily(0, 5, 10).name).toBe("black");
+        });
+    });
+
+    describe("_getColorHex", () => {
+        it("should return correct hex for red", () => {
+            expect(legoWidget._getColorHex("red")).toBe("#FF0000");
+        });
+
+        it("should return correct hex for blue", () => {
+            expect(legoWidget._getColorHex("blue")).toBe("#0000FF");
+        });
+
+        it("should return gray hex for unknown color", () => {
+            expect(legoWidget._getColorHex("unknown")).toBe("#808080");
+        });
+    });
+
+    describe("_shouldMergeColors", () => {
+        it("should merge identical colors", () => {
+            expect(legoWidget._shouldMergeColors("red", "red")).toBe(true);
+        });
+
+        it("should merge gray variants", () => {
+            expect(legoWidget._shouldMergeColors("white", "gray")).toBe(true);
+        });
+
+        it("should not merge different colors", () => {
+            expect(legoWidget._shouldMergeColors("red", "blue")).toBe(false);
+        });
+    });
+
+    describe("_getContrastColor", () => {
+        it("should return black for light colors", () => {
+            expect(legoWidget._getContrastColor("white")).toBe("#000000");
+            expect(legoWidget._getContrastColor("yellow")).toBe("#000000");
+        });
+
+        it("should return white for dark colors", () => {
+            expect(legoWidget._getContrastColor("blue")).toBe("#FFFFFF");
+            expect(legoWidget._getContrastColor("red")).toBe("#FFFFFF");
         });
     });
 });

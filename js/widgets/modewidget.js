@@ -108,9 +108,10 @@ class ModeWidget {
         this.modeTableDiv.style.display = "inline";
         this.modeTableDiv.style.visibility = "visible";
         this.modeTableDiv.style.border = "0px";
-        this.modeTableDiv.innerHTML = '<div id="meterWheelDiv"></div>';
-        this.modeTableDiv.innerHTML += '<div id="modePianoDiv" class=""></div>';
-        this.modeTableDiv.innerHTML += '<table id="modeTable"></table>';
+        this.modeTableDiv.innerHTML =
+            '<div id="meterWheelDiv"></div>' +
+            '<div id="modePianoDiv" class=""></div>' +
+            '<table id="modeTable"></table>';
 
         this.widgetWindow.getWidgetBody().append(this.modeTableDiv);
 
@@ -200,7 +201,7 @@ class ModeWidget {
 
         //.TRANS: A circle of notes represents the musical mode.
         activity.textMsg(_("Click in the circle to select notes for the mode."), 3000);
-        this._setTimeout(() => this.widgetWindow.sendToCenter(), 0);
+        window.requestAnimationFrame(() => this.widgetWindow.sendToCenter());
     }
 
     /**

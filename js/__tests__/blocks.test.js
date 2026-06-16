@@ -230,4 +230,56 @@ describe("Blocks Foundation", () => {
             expect(blocks._expandablesList).toEqual([1]);
         });
     });
+
+    describe("Stack Cleanup And Dock Adjustment", () => {
+        it("should expand clamps once after adjusting all queued docks", () => {
+            const blocks = new Blocks(mockActivity);
+            const callOrder = [];
+
+            blocks._checkArgClampBlocks = [];
+            blocks._checkTwoArgBlocks = [];
+            blocks._adjustTheseDocks = [11, 17, 23];
+            blocks._adjustTheseStacks = [];
+            blocks.adjustDocks = jest.fn(blk => {
+                callOrder.push(`dock:${blk}`);
+            });
+            blocks._expandClamps = jest.fn(() => {
+                callOrder.push("expand");
+            });
+
+            blocks._cleanupStacks();
+
+            expect(blocks.adjustDocks).toHaveBeenCalledTimes(3);
+            expect(blocks._expandClamps).toHaveBeenCalledTimes(1);
+            expect(callOrder).toEqual(["dock:11", "dock:17", "dock:23", "expand"]);
+        });
+
+        it("should stop recursive adjustDocks cycles without overflowing the stack", () => {
+            const blocks = new Blocks(mockActivity);
+            const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+            const makeDockBlock = (connections, x, y) => ({
+                name: "flow",
+                connections,
+                docks: [
+                    [0, 0],
+                    [0, 20]
+                ],
+                container: { x, y },
+                isTwoArgBooleanBlock: jest.fn().mockReturnValue(false),
+                isInlineCollapsible: jest.fn().mockReturnValue(false),
+                collapsed: false
+            });
+
+            blocks.blockList = [makeDockBlock([null, 1], 0, 0), makeDockBlock([0, 0], 0, 20)];
+            blocks._moveBlock = jest.fn();
+
+            expect(() => blocks.adjustDocks(0, true)).not.toThrow();
+            expect(blocks._moveBlock).toHaveBeenCalled();
+            expect(debugSpy).toHaveBeenCalledWith(
+                expect.stringContaining("Infinite loop encountered while adjusting docks")
+            );
+
+            debugSpy.mockRestore();
+        });
+    });
 });

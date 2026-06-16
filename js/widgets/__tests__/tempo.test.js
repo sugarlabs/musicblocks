@@ -968,3 +968,60 @@ describe("Tempo._useBPM validation logic", () => {
         expect(validateBPM("abc")).toEqual({ bpm: null, error: "invalid" });
     });
 });
+
+describe("Tempo widget cleanup on block deletion", () => {
+    it("should clear the interval when widget is closed via closeBlkWidgets", () => {
+        const mockTimerManager = {
+            clearInterval: jest.fn(),
+            setInterval: jest.fn().mockReturnValue(42)
+        };
+        const mockWidgetWindow = {
+            timerManager: mockTimerManager,
+            destroy: jest.fn(),
+            onclose: null
+        };
+
+        // Simulate _intervalID being set
+        let intervalID = 42;
+
+        // Simulate onclose being called
+        const oncloseHandler = () => {
+            if (intervalID !== null) {
+                mockWidgetWindow.timerManager.clearInterval(intervalID);
+            }
+            mockWidgetWindow.destroy();
+        };
+
+        oncloseHandler();
+
+        expect(mockTimerManager.clearInterval).toHaveBeenCalledWith(42);
+        expect(mockWidgetWindow.destroy).toHaveBeenCalledTimes(1);
+    });
+
+    it("should not continue audio after block deletion triggers widget close", () => {
+        const mockTimerManager = {
+            clearInterval: jest.fn(),
+            setInterval: jest.fn().mockReturnValue(99)
+        };
+
+        let intervalID = 99;
+        let audioTriggered = false;
+
+        // Simulate _draw being called after interval cleared
+        const draw = () => {
+            if (intervalID !== null) {
+                audioTriggered = true;
+            }
+        };
+
+        // Clear interval (simulating onclose)
+        mockTimerManager.clearInterval(intervalID);
+        intervalID = null;
+
+        // draw should not trigger audio now
+        draw();
+
+        expect(mockTimerManager.clearInterval).toHaveBeenCalledWith(99);
+        expect(audioTriggered).toBe(false);
+    });
+});

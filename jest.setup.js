@@ -1,3 +1,11 @@
+// Provide ErrorHandler global for tests
+global.ErrorHandler = {
+    capture: jest.fn(),
+    warn: jest.fn(),
+    recoverable: jest.fn(),
+    userFacing: jest.fn()
+};
+
 // Mock HTMLCanvasElement.getContext to suppress jsdom warnings
 
 const mockContext = {

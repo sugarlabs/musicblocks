@@ -11,9 +11,8 @@
 
 /*
    global
-
-   _, GlobalTag, GlobalCard, jQuery, currentUserScrollPos:true,
-   maxScrollPos:true, ProjectViewer, debounce
+_, GlobalTag, GlobalCard, jQuery, currentUserScrollPos:true,
+   maxScrollPos:true, ProjectViewer
 */
 /*
    exported
@@ -571,30 +570,32 @@ class GlobalPlanet {
                 }
             });
 
-            const debouncedfunction = debounce(this.search.bind(this), 250);
-
-            document.getElementById("global-search").addEventListener("input", evt => {
-                this.searchString = document.getElementById("global-search").value;
-                debouncedfunction();
+            document.getElementById("global-search").addEventListener("keydown", evt => {
+                if (evt.key === "Enter") {
+                    this.searchString = document.getElementById("global-search").value;
+                    this.search();
+                }
             });
 
-            document.getElementById("global-search-2").addEventListener("input", evt => {
-                this.searchString = document.getElementById("global-search-2").value;
-                debouncedfunction();
+            document.getElementById("global-search-2").addEventListener("keydown", evt => {
+                if (evt.key === "Enter") {
+                    this.searchString = document.getElementById("global-search-2").value;
+                    this.search();
+                }
             });
 
             document.getElementById("search-close").addEventListener("click", evt => {
                 document.getElementById("global-search").value = "";
                 this.searchString = "";
                 document.getElementById("search-close").style.display = "none";
-                debouncedfunction();
+                this.search();
             });
 
             document.getElementById("search-close-2").addEventListener("click", evt => {
                 document.getElementById("global-search-2").value = "";
                 this.searchString = "";
                 document.getElementById("search-close-2").style.display = "none";
-                debouncedfunction();
+                this.search();
             });
 
             document.getElementById("global-tab").addEventListener("click", evt => {
@@ -606,24 +607,14 @@ class GlobalPlanet {
                 // document.getElementById("two_header").style.display = "none";
             });
 
-            document.body.onscroll = () => {
-                const currentUserScrollPos =
-                    window.pageYOffset || document.documentElement.scrollTop;
-
-                const maxScrollPos = Math.max(
-                    document.body.scrollHeight,
-                    document.body.offsetHeight,
-                    document.documentElement.clientHeight,
-                    document.documentElement.scrollHeight,
-                    document.documentElement.offsetHeight
-                );
-
-                if ((currentUserScrollPos / maxScrollPos) * 100 >= 75 && this.loadButtonShown)
-                    this.loadMoreProjects();
-            };
-
+            // Infinite scroll disabled - server overload prevention
+            document.body.onscroll = null;
             this.ProjectViewer = new ProjectViewer(Planet);
             this.ProjectViewer.init();
         }
     }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { GlobalPlanet };
 }

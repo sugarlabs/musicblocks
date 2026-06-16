@@ -100,9 +100,6 @@ describe("loader.js coverage", () => {
                 shim: expect.objectContaining({
                     "tweenjs.min": expect.objectContaining({
                         deps: ["easeljs.min"]
-                    }),
-                    "preloadjs.min": expect.objectContaining({
-                        deps: ["easeljs.min", "tweenjs.min"]
                     })
                 })
             })

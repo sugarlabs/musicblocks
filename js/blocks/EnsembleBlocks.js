@@ -43,6 +43,7 @@ function getTargetTurtle(turtles, targetTurtle) {
 }
 
 function _blockFindTurtle(activity, turtle, blk, receivedArg) {
+    if (!activity.blocks.blockList[blk]) return null;
     const cblk = activity.blocks.blockList[blk].connections[1];
     if (cblk === null) {
         //Debug: connecting block not found, returning null
@@ -725,9 +726,9 @@ function setupEnsembleBlocks(activity) {
 
             if (value === null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
-                    activity.errorMsg(_("Cannot find mouse") + " " + targetTurtle, blk);
+                    activity.errorMsg(`${_("Cannot find mouse")} ${targetTurtle}`, blk);
                 } else {
-                    activity.errorMsg(_("Cannot find turtle") + " " + targetTurtle, blk);
+                    activity.errorMsg(`${_("Cannot find turtle")} ${targetTurtle}`, blk);
                 }
 
                 let obj;
@@ -826,9 +827,9 @@ function setupEnsembleBlocks(activity) {
 
             if (value === null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
-                    activity.errorMsg(_("Cannot find mouse") + " " + targetTurtle, blk);
+                    activity.errorMsg(`${_("Cannot find mouse")} ${targetTurtle}`, blk);
                 } else {
-                    activity.errorMsg(_("Cannot find turtle") + " " + targetTurtle, blk);
+                    activity.errorMsg(`${_("Cannot find turtle")} ${targetTurtle}`, blk);
                 }
                 activity.blocks.blockList[blk].value = -1;
             }
@@ -888,9 +889,9 @@ function setupEnsembleBlocks(activity) {
             const targetTurtle = getTargetTurtle(activity.turtles, args[0]);
             if (targetTurtle === null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
-                    activity.errorMsg(_("Cannot find mouse") + " " + args[0], blk);
+                    activity.errorMsg(`${_("Cannot find mouse")} ${args[0]}`, blk);
                 } else {
-                    activity.errorMsg(_("Cannot find turtle") + " " + args[0], blk);
+                    activity.errorMsg(`${_("Cannot find turtle")} ${args[0]}`, blk);
                 }
             } else {
                 activity.turtles.ithTurtle(turtle).singer.turtleTime =
@@ -1070,7 +1071,7 @@ function setupEnsembleBlocks(activity) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
             const heading = tur.orientation;
             // Heading needs to be set to 0 when we update the graphic.
-            if (heading != 0) {
+            if (heading !== 0) {
                 tur.painter.doSetHeading(0);
             }
 
@@ -1094,7 +1095,7 @@ function setupEnsembleBlocks(activity) {
             );
 
             // Restore the heading.
-            if (heading != 0) {
+            if (heading !== 0) {
                 tur.painter.doSetHeading(heading);
             }
         }
@@ -1276,9 +1277,9 @@ function setupEnsembleBlocks(activity) {
 
             if (!foundTargetTurtle) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
-                    activity.errorMsg(_("Cannot find mouse") + " " + args[0], blk);
+                    activity.errorMsg(`${_("Cannot find mouse")} ${args[0]}`, blk);
                 } else {
-                    activity.errorMsg(_("Cannot find turtle") + " " + args[0], blk);
+                    activity.errorMsg(`${_("Cannot find turtle")} ${args[0]}`, blk);
                 }
             } else {
                 activity.turtles.getTurtle(turtle).rename(args[1]);

@@ -389,12 +389,6 @@ function SampleWidget() {
                 this.showSampleTypeError();
             }
         };
-
-        reader.onloadend = () => {
-            if (reader.result) {
-                const value = [sampleFile.name, reader.result];
-            }
-        };
     };
 
     //Drag-and-Drop sample files
@@ -660,7 +654,7 @@ function SampleWidget() {
             container.style.gap = "20px";
 
             const h1 = document.createElement("h1");
-            h1.innerHTML = "AI Sample Generation";
+            h1.textContent = "AI Sample Generation";
             h1.style.fontSize = "40px";
             h1.style.marginTop = "0";
             h1.style.marginBottom = "0px";
@@ -699,7 +693,7 @@ function SampleWidget() {
             submit.style.borderRadius = "10px";
             submit.style.border = "none";
             submit.style.cursor = "pointer";
-            submit.innerHTML = "Submit";
+            submit.textContent = "Submit";
             submit.onclick = async function () {
                 submit.disabled = true;
                 const prompt = textArea.value;
@@ -710,10 +704,10 @@ function SampleWidget() {
 
                 try {
                     generating = true;
-                    activity.textMsg(_("Generating Audio... (It may take up to 1 minute)"), 2500);
+                    activity.textMsg(_("Generating audio... (It may take up to 1 minute)"), 2500);
 
                     blinkInterval = setInterval(() => {
-                        activity.textMsg(_("Generating Audio..."), 1000);
+                        activity.textMsg(_("Generating audio..."), 1000);
                     }, 5000);
 
                     const response = await fetch(url);
@@ -728,12 +722,12 @@ function SampleWidget() {
                         save.disabled = false;
                     } else {
                         generating = false;
-                        activity.textMsg(_("Failed to generate audio"), 3000);
+                        activity.textMsg(_("Failed to generate audio."), 3000);
                     }
                 } catch (error) {
                     generating = false;
                     clearInterval(blinkInterval);
-                    activity.textMsg(_("Error occurred"), 3000);
+                    activity.textMsg(_("An error occurred."), 3000);
                     submit.disabled = false;
                 }
             };
@@ -745,7 +739,7 @@ function SampleWidget() {
             preview.style.borderRadius = "10px";
             preview.style.border = "none";
             preview.style.cursor = "pointer";
-            preview.innerHTML = "Preview";
+            preview.textContent = "Preview";
             preview.disabled = true;
             preview.onclick = () => {
                 if (that.audioPreview) {
@@ -773,7 +767,7 @@ function SampleWidget() {
             save.style.borderRadius = "10px";
             save.style.border = "none";
             save.style.cursor = "pointer";
-            save.innerHTML = "Save";
+            save.textContent = "Save";
             save.disabled = true;
             save.onclick = function () {
                 const audioURL = `http://13.61.94.100:8000/save`;
@@ -994,7 +988,7 @@ function SampleWidget() {
         // Helper function to stop tuner
         const stopTuner = () => {
             if (tunerOn) {
-                activity.textMsg(_("Tuner stopped"), 3000);
+                activity.textMsg(_("Tuner stopped."), 3000);
                 this.activity.logo.synth.stopTuner();
                 tunerOn = false;
                 const tunerContainer = docById("tunerContainer");
@@ -1039,13 +1033,13 @@ function SampleWidget() {
                     tunerContainer.style.marginTop = "100px";
                 }
 
-                const accidetalFlat = document.createElement("img");
-                accidetalFlat.setAttribute("src", "header-icons/accidental-flat.svg");
-                accidetalFlat.style.height = 40 + "px";
-                accidetalFlat.style.width = 40 + "px";
-                accidetalFlat.style.marginTop = "auto";
+                const accidentalFlat = document.createElement("img");
+                accidentalFlat.setAttribute("src", "header-icons/accidental-flat.svg");
+                accidentalFlat.style.height = 40 + "px";
+                accidentalFlat.style.width = 40 + "px";
+                accidentalFlat.style.marginTop = "auto";
 
-                tunerContainer.appendChild(accidetalFlat);
+                tunerContainer.appendChild(accidentalFlat);
 
                 const tunerSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
                 tunerSvg.style.width = 350 + "px";
@@ -1185,9 +1179,9 @@ function SampleWidget() {
                 this.widgetWindow.getWidgetBody().appendChild(tunerContainer);
 
                 await this.activity.logo.synth.startTuner();
-                activity.textMsg(_("Tuner started"), 3000);
+                activity.textMsg(_("Tuner started."), 3000);
             } else {
-                activity.textMsg(_("Tuner stopped"), 3000);
+                activity.textMsg(_("Tuner stopped."), 3000);
                 this.activity.logo.synth.stopTuner();
                 tunerOn = false;
             }
@@ -1196,7 +1190,7 @@ function SampleWidget() {
         this.centsSliderBtn = widgetWindow.addButton(
             "slider.svg",
             ICONSIZE,
-            _("Cents Adjustment"),
+            _("Cents adjustment"),
             ""
         );
 
