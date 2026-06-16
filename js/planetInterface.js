@@ -48,9 +48,24 @@ class PlanetInterface {
 
             this.activity.logo.doStopTurtles();
             docById("helpElem").style.visibility = "hidden";
-            document.querySelector(".canvasHolder").classList.add("hide");
-            document.querySelector("#canvas").style.display = "none";
-            document.querySelector("#theme-color").content = "#8bc34a";
+            const canvasHolder = document.querySelector(".canvasHolder");
+            if (canvasHolder) {
+                canvasHolder.classList.add("hide");
+            } else {
+                console.error("[PlanetInterface] .canvasHolder element missing from DOM");
+            }
+            const planetCanvas = document.querySelector("#canvas");
+            if (planetCanvas) {
+                planetCanvas.style.display = "none";
+            } else {
+                console.error("[PlanetInterface] #canvas element missing from DOM");
+            }
+            const planetThemeColor = document.querySelector("#theme-color");
+            if (planetThemeColor) {
+                planetThemeColor.content = "#8bc34a";
+            } else {
+                console.error("[PlanetInterface] #theme-color element missing from DOM");
+            }
             const that = this;
             setTimeout(() => {
                 // Time to release the mouse
@@ -70,9 +85,24 @@ class PlanetInterface {
             this.activity.prepSearchWidget();
             window.widgetWindows.showWindows();
 
-            document.querySelector(".canvasHolder").classList.remove("hide");
-            document.querySelector("#canvas").style.display = "";
-            document.querySelector("#theme-color").content = platformColor.header;
+            const canvasHolderEl = document.querySelector(".canvasHolder");
+            if (canvasHolderEl) {
+                canvasHolderEl.classList.remove("hide");
+            } else {
+                console.error("[PlanetInterface] .canvasHolder element missing from DOM");
+            }
+            const musicBlocksCanvas = document.querySelector("#canvas");
+            if (musicBlocksCanvas) {
+                musicBlocksCanvas.style.display = "";
+            } else {
+                console.error("[PlanetInterface] #canvas element missing from DOM");
+            }
+            const musicBlocksThemeColor = document.querySelector("#theme-color");
+            if (musicBlocksThemeColor) {
+                musicBlocksThemeColor.content = platformColor.header;
+            } else {
+                console.error("[PlanetInterface] #theme-color element missing from DOM");
+            }
             this.activity.stage.enableDOMEvents(true);
             window.scroll(0, 0);
             docById("buttoncontainerBOTTOM").style.display = "block";
