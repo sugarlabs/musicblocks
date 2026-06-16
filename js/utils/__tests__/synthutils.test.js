@@ -74,6 +74,7 @@ describe("Utility Functions (logic-only)", () => {
         global.Tone = require("./tonemock.js");
 
         const codeFiles = [
+            "../utils-logic.js",
             "../utils.js",
             "../../logoconstants.js",
             "../platformstyle.js",
@@ -628,6 +629,8 @@ describe("Utility Functions (logic-only)", () => {
             const instrumentName = "nonexistent";
             const note = "C4";
 
+            // Act & Assert
+            expect(() => startSound(turtle, instrumentName, note)).not.toThrow();
             // Act
             startSound(turtle, instrumentName, note);
 
@@ -706,6 +709,8 @@ describe("Utility Functions (logic-only)", () => {
             // Arrange
             const instrumentName = "nonexistent";
             const note = "C4";
+            // Act & Assert
+            expect(() => stopSound(turtle, instrumentName, note)).not.toThrow();
 
             // Act
             stopSound(turtle, instrumentName, note);

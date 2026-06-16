@@ -9,6 +9,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+const _paletteIconCache = new Map();
+
 /* global
    docById, LEADING, DEFAULTPALETTE, MULTIPALETTES, platformColor,
    PALETTEICONS, MULTIPALETTEICONS, SKIPPALETTES, toTitleCase,
@@ -45,8 +47,20 @@ const paletteBlockButtonPush = (blocks, name, arg) => {
 // loadPaletteMenuItemHandler is the event handler for the palette menu.
 
 const makePaletteIcons = (data, width, height) => {
+    const key = `${data}_${width}_${height}`;
+    let src;
+    if (_paletteIconCache.has(key)) {
+        src = _paletteIconCache.get(key);
+    } else {
+        src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data));
+        if (_paletteIconCache.size > 500) {
+            _paletteIconCache.clear();
+        }
+        _paletteIconCache.set(key, src);
+    }
+
     const img = new Image();
-    img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data));
+    img.src = src;
     if (width) img.width = width;
     if (height) img.height = height;
     return img;
@@ -432,17 +446,23 @@ class Palettes {
                 // Use the same selection color as mouse hover (dark blue)
                 td.style.backgroundColor = platformColor.paletteLabelSelected;
                 td.dataset.keyboardFocus = "true";
+                td.tabIndex = 0;
+                td.focus({ preventScroll: true });
             }
         } else if (this._navSection === "search" && blockRows.length > 0) {
             const searchRow = blockRows[0];
             if (searchRow) {
                 searchRow.style.backgroundColor = platformColor.hoverColor;
                 searchRow.dataset.keyboardFocus = "true";
+                searchRow.tabIndex = 0;
+                searchRow.focus({ preventScroll: true });
             }
         } else if (this._navSection === "blocks" && blockRows[this._navBlockIndex]) {
             const row = blockRows[this._navBlockIndex];
             row.style.backgroundColor = platformColor.hoverColor;
             row.dataset.keyboardFocus = "true";
+            row.tabIndex = 0;
+            row.focus({ preventScroll: true });
         } else if (this._navSection === "palette") {
             // Highlight the focused block in the palette panel
             const paletteBlocks = this._getPaletteBlocks();
@@ -450,6 +470,8 @@ class Palettes {
                 const blockRow = paletteBlocks[this._navPaletteBlockIndex];
                 blockRow.style.backgroundColor = platformColor.hoverColor;
                 blockRow.dataset.keyboardFocus = "true";
+                blockRow.tabIndex = 0;
+                blockRow.focus({ preventScroll: true });
                 // Scroll into view if needed
                 blockRow.scrollIntoView({ block: "nearest", behavior: "smooth" });
             }
@@ -464,6 +486,9 @@ class Palettes {
         focused.forEach(el => {
             el.style.backgroundColor = platformColor.paletteBackground;
             delete el.dataset.keyboardFocus;
+            if (typeof el.hasAttribute === "function" && el.hasAttribute("tabindex")) {
+                el.tabIndex = -1;
+            }
         });
     }
 
@@ -571,11 +596,13 @@ class Palettes {
         if (this.collapsed) {
             palette.style.transform = "translateX(-100%)";
             document.getElementById("paletteToggle").innerHTML = "▶";
+            document.getElementById("paletteToggle").setAttribute("aria-expanded", "false");
             palette.style.transition = "transform 0.3s ease";
             this.paletteWidth = 0;
         } else {
             palette.style.transform = "translateX(0)";
             document.getElementById("paletteToggle").innerHTML = "◀";
+            document.getElementById("paletteToggle").setAttribute("aria-expanded", "true");
             this.paletteWidth = 55 * PALETTE_WIDTH_FACTOR;
         }
     }
@@ -587,6 +614,9 @@ class Palettes {
             element.setAttribute("class", "disable_highlighting");
             element.classList.add("flex-palette");
 
+            element.setAttribute("role", "region");
+            element.setAttribute("aria-label", _("Block Palettes"));
+
             element.style.position = "absolute";
             element.style.zIndex = "1000";
             element.style.left = "0px";
@@ -596,7 +626,7 @@ class Palettes {
             element.innerHTML = `<div style="height:fit-content">
                     <table width="${1.5 * this.cellSize}" bgcolor="white">
                         <thead>
-                            <tr></tr>
+                            <tr role="tablist" aria-label="${_("Palette Categories")}"></tr>
                         </thead>
                     </table>
                     <table width ="${4.5 * this.cellSize}" bgcolor="white">
@@ -616,6 +646,10 @@ class Palettes {
             const toggleBtn = document.createElement("div");
             toggleBtn.innerHTML = "◀";
             toggleBtn.id = "paletteToggle";
+            toggleBtn.setAttribute("role", "button");
+            toggleBtn.setAttribute("aria-label", _("Toggle Palette"));
+            toggleBtn.setAttribute("aria-expanded", "true");
+            toggleBtn.tabIndex = 0;
 
             toggleBtn.style.position = "absolute";
             toggleBtn.style.top = "10px";
@@ -672,6 +706,9 @@ class Palettes {
         td.height = 1.5 * this.cellSize;
         td.style.position = "relative";
         td.style.backgroundColor = platformColor.paletteBackground;
+        td.setAttribute("role", "tab");
+        td.setAttribute("aria-label", _(MULTIPALETTES[i]));
+        td.tabIndex = i === 0 ? 0 : -1; // Make only the first tab focusable by default
 
         td.appendChild(
             makePaletteIcons(
@@ -1273,10 +1310,10 @@ class PaletteModel {
                         if (block.staticLabels[0] === _("store in box")) {
                             label = _("store in box");
                         } else {
-                            label = _("store in") + " " + block.staticLabels[0];
+                            label = `${_("store in")} ${block.staticLabels[0]}`;
                         }
                     } else {
-                        label = block.defaults[0];
+                        label = _(block.defaults[0]);
                     }
                 } else if (protoBlock.staticLabels.length > 0) {
                     label = protoBlock.staticLabels[0];
@@ -1557,6 +1594,10 @@ class Palette {
                 continue;
             }
             const itemRow = document.createElement("tr");
+            itemRow.setAttribute("role", "button");
+            itemRow.setAttribute("aria-label", _(b.name || b.blkname));
+            itemRow.tabIndex = -1;
+
             const itemCell = document.createElement("td");
             itemRow.appendChild(itemCell);
             let img = makePaletteIcons(b.artwork);
@@ -1717,7 +1758,7 @@ class Palette {
                 break;
             } else if (
                 ["storein"].includes(this.model.blocks[i].blkname) &&
-                this.model.blocks[i].modname === _("store in") + " " + name
+                this.model.blocks[i].modname === `${_("store in")} ${name}`
             ) {
                 this.model.blocks.splice(i, 1);
                 break;
@@ -1901,6 +1942,80 @@ class Palette {
             this.activity.blocks.blockMoved(newBlock);
             this.activity.blocks.checkBounds();
         };
+        const initializeStatusMatrix = topBlk => {
+            if (blkname !== "status") {
+                return;
+            }
+
+            if (this.activity.logo.statusMatrix === null) {
+                this.activity.logo.statusMatrix = new StatusMatrix();
+            }
+
+            this.activity.logo.statusFields = [];
+
+            const saveStatus = this.activity.logo.inStatusMatrix;
+            this.activity.logo.inStatusMatrix = true;
+
+            const registerMonitors = blk => {
+                if (blk === null || !(blk in this.activity.blocks.blockList)) {
+                    return;
+                }
+
+                const block = this.activity.blocks.blockList[blk];
+
+                if (block.name === "print") {
+                    const arg = block.connections[1];
+                    if (arg !== null && arg in this.activity.blocks.blockList) {
+                        this.activity.logo.parseArg(this.activity.logo, 0, arg);
+                    }
+                }
+
+                if (block.name === "status") {
+                    for (let i = 1; i < block.connections.length; i++) {
+                        const child = block.connections[i];
+                        if (child === null || !(child in this.activity.blocks.blockList)) {
+                            continue;
+                        }
+
+                        const childBlock = this.activity.blocks.blockList[child];
+                        if (childBlock.name === "hidden") {
+                            registerMonitors(childBlock.connections[1]);
+                        } else if (childBlock.name !== "hiddennoflow") {
+                            registerMonitors(child);
+                        }
+                    }
+
+                    return;
+                }
+
+                if (
+                    block.connections.length > 2 &&
+                    block.connections[block.connections.length - 1] !== null
+                ) {
+                    registerMonitors(block.connections[block.connections.length - 1]);
+                }
+            };
+
+            registerMonitors(topBlk);
+            this.activity.logo.inStatusMatrix = saveStatus;
+
+            const seen = new Set();
+            this.activity.logo.statusFields = this.activity.logo.statusFields.filter(
+                ([fieldBlk, fieldName]) => {
+                    const key = fieldBlk + ":" + fieldName;
+                    if (seen.has(key)) {
+                        return false;
+                    }
+
+                    seen.add(key);
+                    return true;
+                }
+            );
+
+            this.activity.logo.statusMatrix.init(this.activity);
+            this.activity.logo.inStatusMatrix = false;
+            this.activity.logo.statusMatrix.updateAll();
+        };
 
         if (moved) {
             moved = false;
@@ -1916,149 +2031,7 @@ class Palette {
                         return;
                     }
                 }
-
-                if (this.activity.logo.statusMatrix === null) {
-                    this.activity.logo.statusMatrix = new StatusMatrix();
-                }
-                // Clear existing status fields
-                if (this.activity.logo.statusFields) {
-                    this.activity.logo.statusFields = [];
-                }
-
-                // Find all status variables in blockList and add them to status fields
-                const statusVariables = [
-                    "modelength",
-                    "deltapitch2",
-                    "intervalnumber",
-                    "currentinterval",
-                    "currentmode",
-                    "key",
-                    "beatvalue",
-                    "measurevalue",
-                    "elapsednotes",
-                    "bpmfactor",
-                    "currentpitch"
-                ];
-
-                const foundVariables = [];
-                const foundTypes = new Set();
-                for (let blk = 0; blk < this.activity.blocks.blockList.length; blk++) {
-                    const block = this.activity.blocks.blockList[blk];
-                    if (!block.trash && statusVariables.includes(block.name)) {
-                        const blockType = block.name;
-                        if (!foundTypes.has(blockType)) {
-                            if (this.activity.logo.statusFields) {
-                                this.activity.logo.statusFields.push([blk, blockType]);
-                            }
-                            foundVariables.push([blk, blockType]);
-                            foundTypes.add(blockType);
-                        }
-                    }
-                }
-
-                // Find all box blocks and add them to status fields
-                const boxBlocks = [];
-                const boxNames = new Set();
-                for (let blk = 0; blk < this.activity.blocks.blockList.length; blk++) {
-                    const block = this.activity.blocks.blockList[blk];
-                    if (
-                        block.name === "namedbox" &&
-                        !block.trash &&
-                        block.overrideName &&
-                        !boxNames.has(block.overrideName)
-                    ) {
-                        if (this.activity.logo.statusFields) {
-                            this.activity.logo.statusFields.push([blk, "namedbox"]);
-                        }
-                        boxBlocks.push(blk);
-                        boxNames.add(block.overrideName);
-                    }
-                }
-
-                // Create base status block structure by calling the protoblock's macro function
-                const statusBlocks = protoblk.macroFunc(saveX, saveY);
-
-                // Add variables and boxes to status block
-                let lastBlockIndex = statusBlocks.length - 1;
-                let lastConnection = 8; // Index of the last 'print' block in the base macro
-
-                // Update the connection of the last monitoring block if we have variables to append
-                if (foundVariables.length > 0 || boxBlocks.length > 0) {
-                    statusBlocks[lastConnection][4][2] = lastBlockIndex + 1;
-                }
-
-                // Add variables first
-                for (let i = 0; i < foundVariables.length; i++) {
-                    const [blockId, blockType] = foundVariables[i];
-                    const block = this.activity.blocks.blockList[blockId];
-                    const isLastVar = i === foundVariables.length - 1;
-                    const hasBoxes = boxBlocks.length > 0;
-
-                    const varBlockId = ++lastBlockIndex;
-                    const valBlockId = ++lastBlockIndex;
-
-                    statusBlocks.push([
-                        varBlockId,
-                        "print",
-                        0,
-                        0,
-                        [lastConnection, valBlockId, !isLastVar || hasBoxes ? valBlockId + 1 : null]
-                    ]);
-
-                    // Add variable value block
-                    statusBlocks.push([
-                        valBlockId,
-                        [blockType, { value: block.value }],
-                        0,
-                        0,
-                        [varBlockId]
-                    ]);
-
-                    lastConnection = varBlockId;
-                }
-
-                // Then add box blocks
-                for (let i = 0; i < boxBlocks.length; i++) {
-                    const boxBlockId = boxBlocks[i];
-                    const boxBlock = this.activity.blocks.blockList[boxBlockId];
-
-                    const varBlockId = ++lastBlockIndex;
-                    const valBlockId = ++lastBlockIndex;
-
-                    statusBlocks.push([
-                        varBlockId,
-                        "print",
-                        0,
-                        0,
-                        [
-                            lastConnection,
-                            valBlockId,
-                            i < boxBlocks.length - 1 ? valBlockId + 1 : null
-                        ]
-                    ]);
-
-                    // Add box value block
-                    statusBlocks.push([
-                        valBlockId,
-                        ["namedbox", { value: boxBlock.overrideName }],
-                        0,
-                        0,
-                        [varBlockId]
-                    ]);
-
-                    lastConnection = varBlockId;
-                }
-
-                macroExpansion = statusBlocks;
-
-                // Initialize the status matrix
-                this.activity.logo.statusMatrix.init(this.activity);
-
-                // Set up the status matrix to update periodically
-                this.activity.logo.inStatusMatrix = false;
-
-                // Update the status display
-                this.activity.logo.statusMatrix.updateAll();
+                macroExpansion = getMacroExpansion(this.activity, blkname, saveX, saveY);
             } else if (
                 !["namedbox", "nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].includes(
                     protoblk.name
@@ -2093,6 +2066,8 @@ class Palette {
                         this.activity.blocks.blockList[topBlk].container.y
                     );
                 }
+
+                initializeStatusMatrix(topBlk);
             } else if (this.name === "myblocks") {
                 // If we are on the myblocks palette, it is a macro.
                 const macroName = blkname.replace("macro_", "");

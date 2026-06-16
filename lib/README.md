@@ -8,36 +8,34 @@ If you need to view or modify the original source code, it's best to refer to th
 
 ## Sources of Upstream Versions
 
-| S/N | Minified file                         | Upstream Source                                                                                      |
-| --- | ------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| 01  | `abc.min.js`                          | [abcjs](https://github.com/paulrosen/abcjs) <!-- Used in MB: v6.3.0, Latest: v6.6.4 -->              |
-| 02  | `astring.min.js`                      | [astring](https://github.com/davidbonnet/astring)                                                    |
-| 03  | `Chart.js`                            | [Chart.js](https://github.com/chartjs/Chart.js) <!-- Used in MB: v1.0.2, Latest: v4.4.9 -->          |
-| 04  | `domReady.js`                         | [domReady](https://github.com/requirejs/domReady)                                                    |
-| 05  | `easeljs.min.js`                      | [EaselJS](https://github.com/CreateJS/EaselJS)                                                       |
-| 06  | `howler.js`                           | [howler.js](https://github.com/goldfire/howler.js) <!-- Used in MB: v1.1.25, Latest: v2.2.4 -->      |
-| 07  | `jquery-3.7.1.js`                     | [jquery](https://github.com/jquery/jquery)                                                           |
-| 08  | `jquery-ui.js`                        | [jquery-ui](https://github.com/jquery/jquery-ui) <!-- Used in MB: v1.11.4, Latest: v1.14.1 -->       |
-| 09  | `jquery.cookie.js`                    | [jquery-cookie](https://github.com/carhartl/jquery-cookie) (No longer maintained)                    |
-| 10  | `jquery.joyride-2.1.js`               | [joyride](https://github.com/zurb/joyride)                                                           |
-| 11  | `jquery.ruler.js`                     | [Ruler](https://github.com/hilliuse/Ruler)                                                           |
-| 12  | `materialize.min.js`                  | [materialize](https://github.com/Dogfalo/materialize) <!-- Used in MB: v0.100.2, Latest: v1.0.0 -->  |
-| 13  | `mespeak.js`                          | [speak.js](https://github.com/kripken/speak.js)                                                      |
-| 14  | `midi.js`                             | [midi.js]() (Upstream link TBD)                                                                      |
-| 15  | `modernizr-2.6.2.min.js`              | [Modernizr](https://github.com/Modernizr/Modernizr) <!-- Used in MB: v2.6.2, Latest: v3.13.1 -->     |
-| 16  | `p5.dom.min.js`                       | [p5.dom.min.js]() (Upstream link TBD)                                                                |
-| 17  | `p5.min.js`                           | [p5.js](https://github.com/processing/p5.js) <!-- Used in MB: v1.11.3, Latest: v1.11.4 -->           |
-| 18  | `p5.sound.min.js`                     | [p5.js-sound](https://github.com/processing/p5.js-sound) <!-- Used in MB: v1.0.1, Latest: v1.0.2 --> |
-| 19  | `prefixfree.min.js`                   | [prefixfree](https://github.com/LeaVerou/prefixfree) (No longer maintained)                          |
-| 20  | `preloadjs.min.js`                    | [PreloadJS](https://github.com/CreateJS/PreloadJS)                                                   |
-| 21  | `raphael.min.js`                      | [raphael](https://github.com/DmitryBaranovskiy/raphael)                                              |
-| 22  | `require.js`                          | [requirejs](https://github.com/requirejs/requirejs) <!-- Used in MB: v2.1.4, Latest: v2.3.7 -->      |
-| 23  | `reqwest.js`                          | [reqwest](https://github.com/ded/reqwest)                                                            |
-| 24  | `sw.js`                               | [sw.js]() (Upstream link TBD)                                                                        |
-| 25  | `text.js`                             | [text](https://github.com/requirejs/text) <!-- Used in MB: v2.0.10, Latest: v2.0.16 -->              |
-| 26  | `Tone.js`                             | [Tone.js](https://github.com/Tonejs/Tone.js) <!-- Used in MB: Not specified; Latest: v14.7.39 -->    |
-| 27  | `tweenjs.min.js`                      | [TweenJS](https://github.com/CreateJS/TweenJS)                                                       |
-| 28  | `webL10n.js` & `webL10n.sugarizer.js` | [webL10n](https://github.com/fabi1cazenave/webL10n)                                                  |
-| 29  | `wheelnav.js`                         | [wheelnav](https://github.com/softwaretailoring/wheelnav)                                            |
-
-<!-- TODO: Add a separate column for description for libs -->
+| S/N | Minified file                         | Description                              | Upstream Source                                                                                      |
+| --- | ------------------------------------- | ---------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| 01  | `abc.min.js`                          | ABC notation rendering and playback      | [abcjs](https://github.com/paulrosen/abcjs) <!-- Used in MB: v6.3.0, Latest: v6.6.4 -->              |
+| 02  | `astring.min.js`                      | JavaScript AST code generator            | [astring](https://github.com/davidbonnet/astring)                                                    |
+| 03  | `Chart.js`                            | Canvas-based chart rendering             | [Chart.js](https://github.com/chartjs/Chart.js) <!-- Used in MB: v1.0.2, Latest: v4.4.9 -->          |
+| 04  | `domReady.js`                         | RequireJS DOM-ready plugin               | [domReady](https://github.com/requirejs/domReady)                                                    |
+| 05  | `easeljs.min.js`                      | CreateJS canvas scene graph              | [EaselJS](https://github.com/CreateJS/EaselJS)                                                       |
+| 06  | `howler.js`                           | Audio playback helper                    | [howler.js](https://github.com/goldfire/howler.js) <!-- Used in MB: v1.1.25, Latest: v2.2.4 -->      |
+| 07  | `jquery-3.7.1.js`                     | DOM, events, and AJAX utilities          | [jquery](https://github.com/jquery/jquery)                                                           |
+| 08  | `jquery-ui.js`                        | UI widgets and drag interactions         | [jquery-ui](https://github.com/jquery/jquery-ui) <!-- Used in MB: v1.11.4, Latest: v1.14.1 -->       |
+| 09  | `jquery.cookie.js`                    | Cookie read/write helper                 | [jquery-cookie](https://github.com/carhartl/jquery-cookie) (No longer maintained)                    |
+| 10  | `jquery.joyride-2.1.js`               | Guided tours and onboarding overlays     | [joyride](https://github.com/zurb/joyride)                                                           |
+| 11  | `jquery.ruler.js`                     | On-screen measurement ruler widget       | [Ruler](https://github.com/hilliuse/Ruler)                                                           |
+| 12  | `materialize.min.js`                  | Material Design UI components            | [materialize](https://github.com/Dogfalo/materialize) <!-- Used in MB: v0.100.2, Latest: v1.0.0 -->  |
+| 13  | `mespeak.js`                          | Text-to-speech synthesis                 | [speak.js](https://github.com/kripken/speak.js)                                                      |
+| 14  | `midi.js`                             | MIDI parsing and playback helpers        | [midi.js]() (Upstream link TBD)                                                                      |
+| 15  | `modernizr-2.6.2.min.js`              | Browser feature detection                | [Modernizr](https://github.com/Modernizr/Modernizr) <!-- Used in MB: v2.6.2, Latest: v3.13.1 -->     |
+| 16  | `p5.dom.min.js`                       | p5.js DOM integration helpers            | [p5.dom.min.js]() (Upstream link TBD)                                                                |
+| 17  | `p5.min.js`                           | Creative coding and drawing framework    | [p5.js](https://github.com/processing/p5.js) <!-- Used in MB: v1.11.3, Latest: v1.11.4 -->           |
+| 18  | `p5.sound.min.js`                     | p5.js sound extension                    | [p5.js-sound](https://github.com/processing/p5.js-sound) <!-- Used in MB: v1.0.1, Latest: v1.0.2 --> |
+| 19  | `prefixfree.min.js`                   | Runtime CSS vendor prefixing             | [prefixfree](https://github.com/LeaVerou/prefixfree) (No longer maintained)                          |
+| 20  | `preloadjs.min.js`                    | Asset preloading for CreateJS            | [PreloadJS](https://github.com/CreateJS/PreloadJS)                                                   |
+| 21  | `raphael.min.js`                      | Vector graphics drawing engine           | [raphael](https://github.com/DmitryBaranovskiy/raphael)                                              |
+| 22  | `require.js`                          | AMD module loader                        | [requirejs](https://github.com/requirejs/requirejs) <!-- Used in MB: v2.1.4, Latest: v2.3.7 -->      |
+| 23  | `reqwest.js`                          | Lightweight HTTP/AJAX client             | [reqwest](https://github.com/ded/reqwest)                                                            |
+| 24  | `sw.js`                               | Service worker support script            | [sw.js]() (Upstream link TBD)                                                                        |
+| 25  | `text.js`                             | RequireJS text resource loader           | [text](https://github.com/requirejs/text) <!-- Used in MB: v2.0.10, Latest: v2.0.16 -->              |
+| 26  | `Tone.js`                             | Web audio synthesis and scheduling       | [Tone.js](https://github.com/Tonejs/Tone.js) <!-- Used in MB: Not specified; Latest: v14.7.39 -->    |
+| 27  | `tweenjs.min.js`                      | CreateJS tweening and animation          | [TweenJS](https://github.com/CreateJS/TweenJS)                                                       |
+| 28  | `webL10n.js` & `webL10n.sugarizer.js` | Localization helper                      | [webL10n](https://github.com/fabi1cazenave/webL10n)                                                  |
+| 29  | `wheelnav.js`                         | Radial menu and wheel navigation UI      | [wheelnav](https://github.com/softwaretailoring/wheelnav)                                            |

@@ -20,6 +20,12 @@
 const { SVG } = require("../blockfactory");
 const { platformColor } = require("../utils/platformstyle");
 global.platformColor = platformColor;
+global.deepClone = value => {
+    if (typeof structuredClone === "function") {
+        return structuredClone(value);
+    }
+    return JSON.parse(JSON.stringify(value));
+};
 
 jest.mock("../utils/platformstyle", () => ({
     platformColor: { header: "#FFFFFF" }

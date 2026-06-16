@@ -372,7 +372,7 @@ class ThemeBox {
         });
 
         // Notify user
-        this.activity.textMsg(_("Theme switched to " + this._theme + " mode."), 2000);
+        this.activity.textMsg(_("Theme switched to %s mode.").replace(/%s/g, this._theme), 2000);
     }
 
     /**
@@ -403,6 +403,12 @@ class ThemeBox {
                 const paletteElement = document.getElementById("palette");
                 if (paletteElement && paletteElement.childNodes[0]) {
                     paletteElement.childNodes[0].style.border = `1px solid ${window.platformColor.selectorSelected}`;
+                }
+
+                const paletteToggle = document.getElementById("paletteToggle");
+                if (paletteToggle) {
+                    paletteToggle.style.backgroundColor = platformColor.paletteLabelBackground;
+                    paletteToggle.style.color = "white";
                 }
 
                 // Refresh palette selector icons with new theme colors
@@ -524,40 +530,22 @@ class ThemeBox {
             });
         }
 
-        // Update planet iframe theme if it exists
+        // Update planet iframe theme via postMessage instead of directly
+        // accessing iframe.contentDocument (which breaks under sandboxing
+        // or cross-origin isolation).
         const planetIframe = document.getElementById("planet-iframe");
-        if (planetIframe) {
-            const applyPlanetTheme = () => {
-                if (
-                    planetIframe.contentDocument &&
-                    planetIframe.contentDocument.readyState === "complete"
-                ) {
-                    try {
-                        const planetBody = planetIframe.contentDocument.body;
-                        if (planetBody) {
-                            this._themes.forEach(theme => {
-                                if (theme === this._theme) {
-                                    planetBody.classList.add(theme);
-                                } else {
-                                    planetBody.classList.remove(theme);
-                                }
-                            });
-                        }
-                    } catch (e) {
-                        // Cross-origin restriction may prevent this
-                        console.debug("Could not update planet iframe theme:", e);
-                    }
-                }
-            };
-
-            // Apply immediately if already loaded, otherwise wait for load event
-            if (
-                planetIframe.contentDocument &&
-                planetIframe.contentDocument.readyState === "complete"
-            ) {
-                applyPlanetTheme();
-            } else {
-                planetIframe.addEventListener("load", applyPlanetTheme, { once: true });
+        if (planetIframe && planetIframe.contentWindow) {
+            try {
+                const remove = this._themes.filter(t => t !== this._theme);
+                planetIframe.contentWindow.postMessage(
+                    {
+                        type: "MB_APPLY_THEME",
+                        payload: { add: [this._theme], remove }
+                    },
+                    "*"
+                );
+            } catch (e) {
+                console.debug("Could not update planet iframe theme:", e);
             }
         }
     }

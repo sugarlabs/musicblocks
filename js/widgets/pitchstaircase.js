@@ -59,15 +59,21 @@ class PitchStaircase {
      */
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
-        cell.innerHTML = `&nbsp;&nbsp;<img 
-                src="header-icons/play-button.svg" 
-                title="${label}" 
-                alt="${label}" 
-                height="${iconSize}" 
-                width="${iconSize}" 
-                vertical-align="middle" 
-                align-content="center"
-            >&nbsp;&nbsp;`;
+        cell.replaceChildren(
+            document.createTextNode("\u00a0\u00a0"),
+            (() => {
+                const img = document.createElement("img");
+                img.src = "header-icons/" + icon;
+                img.title = label;
+                img.alt = label;
+                img.height = iconSize;
+                img.width = iconSize;
+                img.style.verticalAlign = "middle";
+                img.style.alignContent = "center";
+                return img;
+            })(),
+            document.createTextNode("\u00a0\u00a0")
+        );
         cell.style.width = PitchStaircase.BUTTONSIZE + "px";
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
@@ -97,7 +103,7 @@ class PitchStaircase {
          * the first column and a table of buttons in the second column.
          */
         const pscTable = this._pscTable;
-        pscTable.innerHTML = "";
+        pscTable.replaceChildren();
         pscTable.style.textAlign = "center";
 
         for (let i = 0; i < this.Stairs.length; i++) {
@@ -129,9 +135,11 @@ class PitchStaircase {
                     this._cellScale) /
                     3 +
                 "px";
-            stepCell.innerHTML = `${frequency.toFixed(2)}<br>${this.Stairs[i][0]}${
-                this.Stairs[i][1]
-            }`;
+            stepCell.replaceChildren(
+                document.createTextNode(frequency.toFixed(2)),
+                document.createElement("br"),
+                document.createTextNode(this.Stairs[i][0] + this.Stairs[i][1])
+            );
             stepCell.style.minWidth = stepCell.style.width;
             stepCell.style.maxWidth = stepCell.style.width;
             stepCell.style.height = PitchStaircase.BUTTONSIZE + "px";
@@ -233,6 +241,13 @@ class PitchStaircase {
         let isStepDeleted = true;
         let i;
 
+        // Snapshot the source stair's metadata before any splice so that
+        // inserting at index i < n does not shift n and corrupt the values.
+        const srcNumerator = this.Stairs[n][3];
+        const srcDenominator = this.Stairs[n][4];
+        const srcFrequency = this.Stairs[n][2];
+        const srcOctave = this.Stairs[n][6];
+
         for (i = 0; i < this.Stairs.length; i++) {
             // Check if the frequency is effectively the same (within epsilon)
             if (Math.abs(this.Stairs[i][2] - newFrequency) < 0.001) {
@@ -240,10 +255,10 @@ class PitchStaircase {
                     obj[0],
                     obj[1],
                     newFrequency,
-                    this.Stairs[n][3] * parseFloat(inputNum2),
-                    this.Stairs[n][4] * parseFloat(inputNum1),
-                    this.Stairs[n][2],
-                    this.Stairs[n][6]
+                    srcNumerator * parseFloat(inputNum2),
+                    srcDenominator * parseFloat(inputNum1),
+                    srcFrequency,
+                    srcOctave
                 ]);
                 foundStep = true;
                 repeatStep = true;
@@ -256,10 +271,10 @@ class PitchStaircase {
                     obj[0],
                     obj[1],
                     newFrequency,
-                    this.Stairs[n][3] * parseFloat(inputNum2),
-                    this.Stairs[n][4] * parseFloat(inputNum1),
-                    this.Stairs[n][2],
-                    this.Stairs[n][6]
+                    srcNumerator * parseFloat(inputNum2),
+                    srcDenominator * parseFloat(inputNum1),
+                    srcFrequency,
+                    srcOctave
                 ]);
                 foundStep = true;
                 break;
@@ -271,10 +286,10 @@ class PitchStaircase {
                 obj[0],
                 obj[1],
                 newFrequency,
-                this.Stairs[n][3] * parseFloat(inputNum2),
-                this.Stairs[n][4] * parseFloat(inputNum1),
-                this.Stairs[n][2],
-                this.Stairs[n][6]
+                srcNumerator * parseFloat(inputNum2),
+                srcDenominator * parseFloat(inputNum1),
+                srcFrequency,
+                srcOctave
             ]);
             this._history.push(this.Stairs.length - 1);
         } else {
@@ -379,10 +394,12 @@ class PitchStaircase {
         const note = this.Stairs[index][0] + this.Stairs[index][1];
         pitchnotes.push(normalizeNoteAccidentals(note));
         const previousRowNumber = index - next;
-        const pscTableCell = this._stepTables[previousRowNumber];
+        // _stepTables is a dense array; a negative index yields undefined,
+        // not null, so use != null (loose) to catch both.
+        const pscTableCell = previousRowNumber >= 0 ? this._stepTables[previousRowNumber] : null;
 
         setTimeout(() => {
-            if (pscTableCell !== null) {
+            if (pscTableCell !== null && pscTableCell !== undefined) {
                 const stepCell = pscTableCell.rows[0].cells[1];
                 stepCell.style.backgroundColor = platformColor.selectorBackground;
             }
@@ -390,7 +407,10 @@ class PitchStaircase {
             const stepCell = this._stepTables[index].rows[0].cells[1];
             stepCell.style.backgroundColor = platformColor.selectorBackground;
             this.activity.logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
-            if (index < this.Stairs.length || index > -1) {
+            // Use && so playback terminates when index reaches either boundary;
+            // the boundary cases (=== -1 and === Stairs.length) are already
+            // handled by the early-return guards at the top of this function.
+            if (index > -1 && index < this.Stairs.length) {
                 this._playNext(index + next, next);
             }
         }, 1000);

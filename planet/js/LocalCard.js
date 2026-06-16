@@ -27,6 +27,7 @@ class LocalCard {
         this.PlaceholderTBImage = "images/tbgraphic.png";
         this.id = null;
         this.ProjectData = null;
+        this._renameTimers = {};
         this.CopySuffix = `(${_("Copy")})`;
 
         this.renderData = `
@@ -113,7 +114,7 @@ class LocalCard {
         if (this.ProjectData.ProjectImage !== null) imageSrc = this.ProjectData.ProjectImage;
         else {
             imageSrc =
-                Planet.IsMusicBlocks == 1 ? this.PlaceholderMBImage : this.PlaceholderTBImage;
+                Planet.IsMusicBlocks === 1 ? this.PlaceholderMBImage : this.PlaceholderTBImage;
         }
 
         const imageId = `local-project-image-${this.id}`;
@@ -136,14 +137,20 @@ class LocalCard {
 
         // set merge modify listener
 
-        frag.getElementById(`local-project-merge-${this.id}`).addEventListener("click", evt => {
-            Planet.LocalPlanet.openProject(this.id);
+        frag.getElementById(`local-project-merge-${this.id}`).addEventListener("click", () => {
+            Planet.LocalPlanet.mergeProject(this.id);
         });
 
         // set input modify listener
 
         frag.getElementById(`local-project-input-${this.id}`).addEventListener("input", evt => {
-            Planet.ProjectStorage.renameProject(this.id, evt.target.value);
+            const projectId = this.id;
+            const newName = evt.target.value;
+            clearTimeout(this._renameTimers[projectId]);
+            this._renameTimers[projectId] = setTimeout(() => {
+                Planet.ProjectStorage.renameProject(projectId, newName);
+                delete this._renameTimers[projectId];
+            }, 400);
         });
 
         // set delete button listener
@@ -190,4 +197,8 @@ class LocalCard {
         this.id = id;
         this.ProjectData = Planet.LocalPlanet.ProjectTable[this.id];
     }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { LocalCard };
 }

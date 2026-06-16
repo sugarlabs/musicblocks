@@ -116,6 +116,7 @@ function SampleWidget() {
     this.tunerCanvas = null;
     this.tunerContext = null;
     this.tunerAnimationFrame = null;
+    this.tunerSegments = [];
     this.centsValue = 0;
     this.sliderVisible = false;
     this.sliderDiv = null;
@@ -388,27 +389,25 @@ function SampleWidget() {
                 this.showSampleTypeError();
             }
         };
-
-        reader.onloadend = () => {
-            if (reader.result) {
-                const value = [sampleFile.name, reader.result];
-            }
-        };
     };
 
     //Drag-and-Drop sample files
+    this._dragOverHandler = e => {
+        e.preventDefault();
+    };
+
+    this._dropHandler = e => {
+        e.preventDefault();
+        const sampleFiles = e.dataTransfer.files[0];
+        this.handleFiles(sampleFiles);
+    };
+
     this.drag_and_drop = () => {
-        const dropZone = document.getElementsByClassName("samplerCanvas")[0];
-
-        dropZone.addEventListener("dragover", e => {
-            e.preventDefault();
-        });
-
-        dropZone.addEventListener("drop", e => {
-            e.preventDefault();
-            const sampleFiles = e.dataTransfer.files[0];
-            this.handleFiles(sampleFiles);
-        });
+        this._dropZone = document.getElementsByClassName("samplerCanvas")[0];
+        if (this._dropZone) {
+            this._dropZone.addEventListener("dragover", this._dragOverHandler);
+            this._dropZone.addEventListener("drop", this._dropHandler);
+        }
     };
 
     /**
@@ -513,6 +512,13 @@ function SampleWidget() {
                 this._octavesWheel.removeWheel();
             }
             this.pitchAnalysers = {};
+
+            if (this._dropZone) {
+                this._dropZone.removeEventListener("dragover", this._dragOverHandler);
+                this._dropZone.removeEventListener("drop", this._dropHandler);
+                this._dropZone = null;
+            }
+
             widgetWindow.destroy();
         };
 
@@ -648,7 +654,7 @@ function SampleWidget() {
             container.style.gap = "20px";
 
             const h1 = document.createElement("h1");
-            h1.innerHTML = "AI Sample Generation";
+            h1.textContent = "AI Sample Generation";
             h1.style.fontSize = "40px";
             h1.style.marginTop = "0";
             h1.style.marginBottom = "0px";
@@ -687,7 +693,7 @@ function SampleWidget() {
             submit.style.borderRadius = "10px";
             submit.style.border = "none";
             submit.style.cursor = "pointer";
-            submit.innerHTML = "Submit";
+            submit.textContent = "Submit";
             submit.onclick = async function () {
                 submit.disabled = true;
                 const prompt = textArea.value;
@@ -698,10 +704,10 @@ function SampleWidget() {
 
                 try {
                     generating = true;
-                    activity.textMsg(_("Generating Audio... (It may take up to 1 minute)"), 2500);
+                    activity.textMsg(_("Generating audio... (It may take up to 1 minute)"), 2500);
 
                     blinkInterval = setInterval(() => {
-                        activity.textMsg(_("Generating Audio..."), 1000);
+                        activity.textMsg(_("Generating audio..."), 1000);
                     }, 5000);
 
                     const response = await fetch(url);
@@ -716,12 +722,12 @@ function SampleWidget() {
                         save.disabled = false;
                     } else {
                         generating = false;
-                        activity.textMsg(_("Failed to generate audio"), 3000);
+                        activity.textMsg(_("Failed to generate audio."), 3000);
                     }
                 } catch (error) {
                     generating = false;
                     clearInterval(blinkInterval);
-                    activity.textMsg(_("Error occurred"), 3000);
+                    activity.textMsg(_("An error occurred."), 3000);
                     submit.disabled = false;
                 }
             };
@@ -733,7 +739,7 @@ function SampleWidget() {
             preview.style.borderRadius = "10px";
             preview.style.border = "none";
             preview.style.cursor = "pointer";
-            preview.innerHTML = "Preview";
+            preview.textContent = "Preview";
             preview.disabled = true;
             preview.onclick = () => {
                 if (that.audioPreview) {
@@ -761,7 +767,7 @@ function SampleWidget() {
             save.style.borderRadius = "10px";
             save.style.border = "none";
             save.style.cursor = "pointer";
-            save.innerHTML = "Save";
+            save.textContent = "Save";
             save.disabled = true;
             save.onclick = function () {
                 const audioURL = `http://13.61.94.100:8000/save`;
@@ -982,19 +988,21 @@ function SampleWidget() {
         // Helper function to stop tuner
         const stopTuner = () => {
             if (tunerOn) {
-                activity.textMsg(_("Tuner stopped"), 3000);
+                activity.textMsg(_("Tuner stopped."), 3000);
                 this.activity.logo.synth.stopTuner();
                 tunerOn = false;
                 const tunerContainer = docById("tunerContainer");
                 if (tunerContainer) {
                     tunerContainer.remove();
                 }
+                this.tunerSegments = [];
             }
         };
 
         this._tunerBtn.onclick = async () => {
             if (docById("tunerContainer") && !tunerOn) {
                 docById("tunerContainer").remove();
+                this.tunerSegments = [];
             }
 
             // Close the cent adjustment window if it's open
@@ -1025,13 +1033,13 @@ function SampleWidget() {
                     tunerContainer.style.marginTop = "100px";
                 }
 
-                const accidetalFlat = document.createElement("img");
-                accidetalFlat.setAttribute("src", "header-icons/accidental-flat.svg");
-                accidetalFlat.style.height = 40 + "px";
-                accidetalFlat.style.width = 40 + "px";
-                accidetalFlat.style.marginTop = "auto";
+                const accidentalFlat = document.createElement("img");
+                accidentalFlat.setAttribute("src", "header-icons/accidental-flat.svg");
+                accidentalFlat.style.height = 40 + "px";
+                accidentalFlat.style.width = 40 + "px";
+                accidentalFlat.style.marginTop = "auto";
 
-                tunerContainer.appendChild(accidetalFlat);
+                tunerContainer.appendChild(accidentalFlat);
 
                 const tunerSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
                 tunerSvg.style.width = 350 + "px";
@@ -1048,6 +1056,7 @@ function SampleWidget() {
                 tunerContainer.appendChild(sharpSymbol);
 
                 // Add tuner segments
+                this.tunerSegments = [];
                 const segments = [
                     "M5.0064 173.531C2.24508 173.507 0.0184649 171.249 0.121197 168.49C0.579513 156.179 2.33654 143.951 5.36299 132.009C6.04138 129.332 8.81378 127.792 11.4701 128.546L57.9638 141.754C60.6202 142.508 62.1508 145.271 61.5107 147.958C59.8652 154.863 58.8534 161.905 58.488 168.995C58.3459 171.752 56.0992 173.973 53.3379 173.949L5.0064 173.531Z",
                     "M12.3057 125.699C9.66293 124.899 8.16276 122.104 9.03876 119.486C12.9468 107.802 18.0776 96.5645 24.3458 85.959C25.7508 83.5817 28.8448 82.885 31.181 84.3574L72.0707 110.128C74.4068 111.601 75.0971 114.683 73.7261 117.08C70.2017 123.243 67.2471 129.714 64.8991 136.414C63.9858 139.02 61.2047 140.517 58.5619 139.716L12.3057 125.699Z",
@@ -1066,6 +1075,7 @@ function SampleWidget() {
                     const segment = document.createElementNS("http://www.w3.org/2000/svg", "path");
                     segment.setAttribute("d", d);
                     segment.setAttribute("fill", platformColor.selectorBackground || "#808080");
+                    this.tunerSegments.push(segment);
                     tunerSvg.appendChild(segment);
                 });
 
@@ -1169,9 +1179,9 @@ function SampleWidget() {
                 this.widgetWindow.getWidgetBody().appendChild(tunerContainer);
 
                 await this.activity.logo.synth.startTuner();
-                activity.textMsg(_("Tuner started"), 3000);
+                activity.textMsg(_("Tuner started."), 3000);
             } else {
-                activity.textMsg(_("Tuner stopped"), 3000);
+                activity.textMsg(_("Tuner stopped."), 3000);
                 this.activity.logo.synth.stopTuner();
                 tunerOn = false;
             }
@@ -1180,7 +1190,7 @@ function SampleWidget() {
         this.centsSliderBtn = widgetWindow.addButton(
             "slider.svg",
             ICONSIZE,
-            _("Cents Adjustment"),
+            _("Cents adjustment"),
             ""
         );
 
@@ -2022,10 +2032,7 @@ function SampleWidget() {
                                 this.tunerDisplay.update(note, cents, this.centsValue);
 
                                 // Update segments
-                                const tunerSegments = document.querySelectorAll(
-                                    "#tunerContainer svg path"
-                                );
-                                tunerSegments.forEach((segment, i) => {
+                                this.tunerSegments.forEach((segment, i) => {
                                     const segmentCents = (i - 5) * 10;
                                     if (Math.abs(cents - segmentCents) <= 5) {
                                         segment.setAttribute("fill", "#00ff00"); // In tune (green)

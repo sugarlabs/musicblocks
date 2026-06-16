@@ -195,4 +195,86 @@ describe("PitchStaircase Widget", () => {
             expect(psc.Stairs[1][2]).toBe(261.63);
         });
     });
+
+    // --- _get_save_lock Tests ---
+    describe("_get_save_lock", () => {
+        test("returns current save lock state", () => {
+            psc._save_lock = false;
+            expect(psc._get_save_lock()).toBe(false);
+            psc._save_lock = true;
+            expect(psc._get_save_lock()).toBe(true);
+        });
+
+        test("returns undefined when _save_lock is not set", () => {
+            expect(psc._get_save_lock()).toBeUndefined();
+        });
+    });
+
+    // --- _undo Tests ---
+    describe("_undo", () => {
+        test("returns false when history is empty", () => {
+            psc._history = [];
+            psc._makeStairs = jest.fn();
+            expect(psc._undo()).toBe(false);
+        });
+
+        test("removes the last added stair and returns true", () => {
+            psc.Stairs = [
+                ["A", "", 220.0],
+                ["B", "", 246.94],
+                ["C", "", 261.63]
+            ];
+            psc._history = [2]; // index 2 was last added
+            psc._makeStairs = jest.fn();
+            psc._refresh = function () {
+                this._makeStairs(true);
+            };
+
+            const result = psc._undo();
+            expect(result).toBe(true);
+            expect(psc.Stairs).toHaveLength(2);
+            expect(psc.Stairs[0][0]).toBe("A");
+            expect(psc.Stairs[1][0]).toBe("B");
+        });
+
+        test("handles multiple undos sequentially", () => {
+            psc.Stairs = [
+                ["A", "", 220.0],
+                ["B", "", 246.94],
+                ["C", "", 261.63]
+            ];
+            psc._history = [1, 2];
+            psc._makeStairs = jest.fn();
+            psc._refresh = function () {
+                this._makeStairs(true);
+            };
+
+            psc._undo();
+            expect(psc.Stairs).toHaveLength(2);
+            psc._undo();
+            expect(psc.Stairs).toHaveLength(1);
+            expect(psc.Stairs[0][0]).toBe("A");
+        });
+
+        test("returns false after all undos are exhausted", () => {
+            psc.Stairs = [["A", "", 220.0]];
+            psc._history = [0];
+            psc._makeStairs = jest.fn();
+            psc._refresh = function () {
+                this._makeStairs(true);
+            };
+
+            expect(psc._undo()).toBe(true);
+            expect(psc._undo()).toBe(false);
+        });
+    });
+
+    // --- _refresh Tests ---
+    describe("_refresh", () => {
+        test("calls _makeStairs with true", () => {
+            psc._makeStairs = jest.fn();
+            psc._refresh();
+            expect(psc._makeStairs).toHaveBeenCalledWith(true);
+        });
+    });
 });

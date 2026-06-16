@@ -256,6 +256,8 @@ class PitchDrumMatrix {
             const sub = document.createElement("sub");
             sub.textContent = this.rowArgs[j].toString();
             labelCell.appendChild(sub);
+            labelCell.dataset.noteArg = this.rowLabels[j];
+            labelCell.dataset.octave = this.rowArgs[j].toString();
             labelCell.style.position = "sticky";
             labelCell.style.left = "0";
             labelCell.style.top = "0";
@@ -448,49 +450,6 @@ class PitchDrumMatrix {
      */
     _get_save_lock() {
         return this._save_lock;
-    }
-
-    /**
-     * [DEPRECATED] Adds a button to the matrix.
-     *
-     * @private
-     * @deprecated This method is deprecated.
-     * @param {HTMLTableRowElement} row - The table row to which the button will be added.
-     * @param {string} icon - The icon image source.
-     * @param {number} iconSize - The size of the icon.
-     * @param {string} label - The label text for the button.
-     * @returns {HTMLTableCellElement} - The cell element containing the button.
-     */
-    _addButton(row, icon, iconSize, label) {
-        const cell = row.insertCell(-1);
-        cell.textContent = "\u00A0\u00A0";
-        const img = document.createElement("img");
-        img.src = `header-icons/${icon}`;
-        img.title = label;
-        img.alt = label;
-        img.setAttribute("height", iconSize);
-        img.setAttribute("width", iconSize);
-        img.setAttribute("vertical-align", "middle");
-        img.setAttribute("align-content", "center");
-        cell.appendChild(img);
-        cell.appendChild(document.createTextNode("\u00A0\u00A0"));
-        cell.style.width = PitchDrumMatrix.BUTTONSIZE + "px";
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = cell.style.width;
-        cell.style.minHeight = cell.style.height;
-        cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
-
-        cell.onmouseover = () => {
-            cell.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        };
-
-        cell.onmouseout = () => {
-            cell.style.backgroundColor = platformColor.selectorBackground;
-        };
-
-        return cell;
     }
 
     /**
@@ -909,17 +868,17 @@ class PitchDrumMatrix {
     _setPairCell(rowIndex, colIndex, cell, playNote) {
         const pdmTable = docById("pdmTable");
         let row = pdmTable.rows[rowIndex];
-        const solfegeHTML = row.cells[0].innerHTML;
+        const noteArg = row.cells[0].dataset.noteArg;
+        const octave = parseInt(row.cells[0].dataset.octave, 10);
 
         const drumTable = docById("pdmDrumTable");
         row = drumTable.rows[0];
         const drumImg = row.cells[colIndex].querySelector("img");
         const drumName = getDrumSynthName(drumImg ? drumImg.title : "");
 
-        // Both solfege and octave are extracted from HTML by getNote.
         const noteObj = getNote(
-            solfegeHTML,
-            -1,
+            noteArg,
+            octave,
             0,
             this.activity.turtles.ithTurtle(0).singer.keySignature,
             false,
@@ -1038,15 +997,16 @@ class PitchDrumMatrix {
             col = pairs[i][1];
 
             cellRow = pdmTable.rows[row];
-            solfegeHTML = cellRow.cells[0].innerHTML;
+            const noteArg = cellRow.cells[0].dataset.noteArg;
+            octave = parseInt(cellRow.cells[0].dataset.octave, 10);
 
             drumRow = drumTable.rows[0];
             const drumImg = drumRow.cells[col].querySelector("img");
             drumName = getDrumSynthName(drumImg ? drumImg.title : "");
-            // Both solfege and octave are extracted from HTML by getNote.
+
             noteObj = getNote(
-                solfegeHTML,
-                -1,
+                noteArg,
+                octave,
                 0,
                 this.activity.turtles.ithTurtle(0).singer.keySignature,
                 false,

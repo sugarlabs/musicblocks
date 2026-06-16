@@ -716,7 +716,7 @@ function setupPitchBlocks(activity) {
             super(name || "number2pitch", displayName || _("number to pitch"));
             this.setPalette("pitch", activity);
             this.setHelpString([
-                _("The Number to pitch block will convert a pitch number to a pich name."),
+                _("The Number to pitch block will convert a pitch number to a pitch name."),
                 "documentation",
                 ""
             ]);
@@ -1192,7 +1192,9 @@ function setupPitchBlocks(activity) {
                 if (intervalName in INTERVALVALUES) {
                     r = INTERVALVALUES[intervalName][2];
                 } else {
-                    console.log("could not find " + intervalName + " in INTERVALVALUES");
+                    console.warn(
+                        `[PitchBlocks] Interval name not found in INTERVALVALUES: "${intervalName}"`
+                    );
                     r = 1;
                 }
             }

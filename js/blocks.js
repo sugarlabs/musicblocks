@@ -25,7 +25,7 @@
    getVoiceSynthName, i18nSolfege, last, MathUtility, mixedNumber,
    piemenuBlockContext, prepareMacroExports, ProtoBlock,
     setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments,
-    docById, define, BlocksDependencies
+    docById, define, BlocksDependencies, deepClone
 */
 
 /* global showZoomOverlay */
@@ -44,7 +44,7 @@
         MathUtility
    - js/utils/utils.js
         _, last, closeBlkWidgets, mixedNumber, prepareMacroExports,
-        getTextWidth, delayExecution
+        getTextWidth, delayExecution, deepClone
    - js/utils/musicutils.js
         addTemperamentToDictionary,
         getDrumSynthName, getNoiseName, getNoiseSynthName,
@@ -373,7 +373,7 @@ class Blocks {
             let palette;
             /** Regenerate all of the artwork at the new scale. */
             for (const block of this.blockList) {
-                if (block.trash) continue;
+                if (!block || block.trash) continue;
                 block.resize(scale);
             }
 
@@ -384,7 +384,7 @@ class Blocks {
 
             /** Make sure trash is still hidden. */
             for (const block of this.blockList) {
-                if (block.trash) {
+                if (block && block.trash) {
                     block.hide();
                 }
             }
@@ -501,7 +501,7 @@ class Blocks {
         this.bottomMostBlock = () => {
             let maxy = -1000;
             for (const block of this.blockList) {
-                if (block.trash) continue;
+                if (!block || block.trash) continue;
                 if (block.container.y > maxy) {
                     maxy = block.container.y;
                 }
@@ -520,7 +520,7 @@ class Blocks {
             let allCollapsed = true;
             let someCollapsed = false;
             for (const myBlock of this.blockList) {
-                if (["newnote", "interval", "osctime"].includes(myBlock.name)) {
+                if (!myBlock || ["newnote", "interval", "osctime"].includes(myBlock.name)) {
                     continue;
                 }
 
@@ -539,7 +539,7 @@ class Blocks {
                  * If any blocks are collapsed, collapse them all.
                  */
                 for (const myBlock of this.blockList) {
-                    if (["newnote", "interval", "osctime"].includes(myBlock.name)) {
+                    if (!myBlock || ["newnote", "interval", "osctime"].includes(myBlock.name)) {
                         continue;
                     }
 
@@ -550,7 +550,7 @@ class Blocks {
             } else {
                 /** If no blocks are collapsed, collapse them all. */
                 for (const myBlock of this.blockList) {
-                    if (["newnote", "interval", "osctime"].includes(myBlock.name)) {
+                    if (!myBlock || ["newnote", "interval", "osctime"].includes(myBlock.name)) {
                         continue;
                     }
 
@@ -928,6 +928,7 @@ class Blocks {
             const myBlock = this.blockList[blk];
             if (myBlock == null) {
                 console.debug("Something very broken in _getStackSize.");
+                return size;
             }
 
             let c;
@@ -1017,7 +1018,7 @@ class Blocks {
 
             if (this._deferCheckBoundsCount === 0 && this._checkBoundsPending) {
                 this._checkBoundsPending = false;
-                this.checkBounds();
+                this.scheduleCheckBounds();
             }
         };
 
@@ -1104,7 +1105,7 @@ class Blocks {
                 }
 
                 /** Another database integrity check. */
-                if (this.blockList[cblk] === null) {
+                if (this.blockList[cblk] == null) {
                     console.debug("This is not good: we encountered a null block: " + cblk);
                     continue;
                 }
@@ -1177,7 +1178,7 @@ class Blocks {
 
                 if (c > 0) {
                     /** Recurse on connected blocks. */
-                    this.adjustDocks(cblk, true);
+                    this.adjustDocks(cblk);
                 }
             }
 
@@ -2083,8 +2084,17 @@ class Blocks {
                     } else if (myBlock.isArgBlock()) {
                         this.blockList[connection].connections[0] = null;
 
-                        /** If we are replacing a number block, put it in the trash */
-                        if (this.blockList[connection].name === "number") {
+                        /** If we are replacing an arg block, put certain default blocks in the trash */
+                        if (
+                            [
+                                "number",
+                                "solfege",
+                                "eastindiansolfege",
+                                "scaledegree2",
+                                "notename",
+                                "text"
+                            ].includes(this.blockList[connection].name)
+                        ) {
                             this.sendStackToTrash(this.blockList[connection]);
                         } else {
                             this.findDragGroup(connection);
@@ -2538,7 +2548,7 @@ class Blocks {
                 if (this._deferCheckBoundsCount > 0) {
                     this._checkBoundsPending = true;
                 } else {
-                    this.checkBounds();
+                    this.scheduleCheckBounds();
                 }
             } else {
                 console.debug("No container yet for block " + myBlock.name);
@@ -2564,7 +2574,7 @@ class Blocks {
                 if (this._deferCheckBoundsCount > 0) {
                     this._checkBoundsPending = true;
                 } else {
-                    this.checkBounds();
+                    this.scheduleCheckBounds();
                 }
             } else {
                 console.debug("No container yet for block " + myBlock.name);
@@ -2625,7 +2635,7 @@ class Blocks {
             if (this._topBlockCache == null) {
                 this._topBlockCache = new Map();
                 for (let i = 0; i < this.blockList.length; i++) {
-                    if (this.blockList[i].trash) continue;
+                    if (!this.blockList[i] || this.blockList[i].trash) continue;
                     this._topBlockCache.set(i, this.findTopBlock(i));
                 }
             }
@@ -2635,7 +2645,7 @@ class Blocks {
 
             this._beginDeferCheckBounds();
             for (let i = 0; i < this.blockList.length; i++) {
-                if (this.blockList[i].trash) continue;
+                if (!this.blockList[i] || this.blockList[i].trash) continue;
                 if (this._topBlockCache.get(i) !== excludeTop) {
                     this.moveBlockRelativeBatched(i, dx, dy);
                 }
@@ -2738,7 +2748,7 @@ class Blocks {
                         }
                     }
                     obj = myBlock.value.split(" ");
-                    label = _(obj[0]) + " " + obj[1];
+                    label = `${_(obj[0])} ${obj[1]}`;
                     break;
                 case "grid":
                     label = _(myBlock.value);
@@ -2811,7 +2821,7 @@ class Blocks {
                     } else if (typeof myBlock.value !== "string") {
                         label = myBlock.value.toString();
                     } else {
-                        label = myBlock.value;
+                        label = _(myBlock.value);
                     }
                     break;
             }
@@ -3034,7 +3044,7 @@ class Blocks {
         this.findStacks = () => {
             this.stackList = [];
             for (let i = 0; i < this.blockList.length; i++) {
-                if (this.blockList[i].trash) continue;
+                if (!this.blockList[i] || this.blockList[i].trash) continue;
                 if (this.blockList[i].connections[0] == null) {
                     this.stackList.push(i);
                 }
@@ -3065,7 +3075,7 @@ class Blocks {
         this._findTwoArgs = () => {
             this._expandablesList = [];
             for (let i = 0; i < this.blockList.length; i++) {
-                if (this.blockList[i].trash) continue;
+                if (!this.blockList[i] || this.blockList[i].trash) continue;
                 if (this.blockList[i].isArgBlock() && this.blockList[i].isExpandableBlock()) {
                     this._expandablesList.push(i);
                 } else if (this.blockList[i].isTwoArgBlock()) {
@@ -3081,7 +3091,7 @@ class Blocks {
          */
         this._searchForArgFlow = () => {
             for (const [blk, block] of this.blockList.entries()) {
-                if (block.trash) continue;
+                if (!block || block.trash) continue;
                 if (block.isArgFlowClampBlock()) {
                     this._searchCounter = 0;
                     this._searchForExpandables(blk);
@@ -3425,7 +3435,8 @@ class Blocks {
                         }
                         break;
                     default:
-                        that.blockList[thisBlock].text.text = value;
+                        that.blockList[thisBlock].text.text =
+                            value !== null && value !== undefined ? _(value.toString()) : value;
                         break;
                 }
 
@@ -3511,7 +3522,7 @@ class Blocks {
                     const v = args[1];
                     that.blockList[b].value = v;
                     const o = v.split(" ");
-                    that.blockList[b].text.text = _(o[0]) + " " + o[1];
+                    that.blockList[b].text.text = `${_(o[0])} ${o[1]}`;
                     that.blockList[b].container.updateCache();
                 };
 
@@ -3522,7 +3533,7 @@ class Blocks {
                     const v = args[1];
                     that.blockList[b].value = v;
                     const o = v.split(" ");
-                    that.blockList[b].text.text = _(o[0]) + " " + o[1];
+                    that.blockList[b].text.text = `${_(o[0])} ${o[1]}`;
                     that.blockList[b].container.updateCache();
                 };
 
@@ -3691,7 +3702,7 @@ class Blocks {
                 if (myBlock.name === "action") {
                     /** Make sure we don't make two actions with the same name. */
                     value = this.findUniqueActionName(_("action"));
-                    if (value !== _("action")) {
+                    if (value !== _("action") && value !== "action") {
                         const metadata = this.actionMetadata(blk);
                         this.newNameddoBlock(value, metadata.hasReturn, metadata.hasArgs);
                         /** this.activity.palettes.hide(); */
@@ -3709,7 +3720,7 @@ class Blocks {
                             const b = args[0];
                             const v = args[1];
                             that.blockList[b].value = v;
-                            let l = value.toString();
+                            let l = _(value.toString());
                             if (
                                 !WIDENAMES.includes(that.blockList[b].name) &&
                                 getTextWidth(l, "bold 20pt Sans") > TEXTWIDTH
@@ -3736,7 +3747,7 @@ class Blocks {
                         const b = args[0];
                         const v = args[1];
                         that.blockList[b].value = v;
-                        let l = v.toString();
+                        let l = _(v.toString());
                         if (
                             !WIDENAMES.includes(that.blockList[b].name) &&
                             getTextWidth(l, "bold 20pt Sans") > TEXTWIDTH
@@ -3942,7 +3953,7 @@ class Blocks {
          */
         this.findUniqueActionName = (name, actionBlk) => {
             /** If we have a stack named 'action', make the protoblock visible. */
-            if (name === _("action")) {
+            if (name === _("action") || name === "action") {
                 this.setActionProtoVisibility(true);
             }
 
@@ -4541,7 +4552,7 @@ class Blocks {
          * @returns boolean
          */
         this.newNameddoBlock = (name, hasReturn, hasArgs) => {
-            if (name === _("action")) {
+            if (name === _("action") || name === "action") {
                 /** 'action' already has its associated palette entries. */
                 return false;
             }
@@ -5292,7 +5303,7 @@ class Blocks {
             this.selectedStack = this.activeBlock;
 
             /** Copy the selectedStack. */
-            this.selectedBlocksObj = JSON.parse(JSON.stringify(this._copyBlocksToObj(false)));
+            this.selectedBlocksObj = deepClone(this._copyBlocksToObj(false));
 
             /** Reset paste offset. */
             this.pasteDx = 0;
@@ -5389,17 +5400,19 @@ class Blocks {
                     if (["show", "turtleshell", "customsample"].includes(blockObjs[i][1])) {
                         switch (blockObjs[i][1]) {
                             case "show":
-                                name =
-                                    _("Show").toLowerCase() + "-" + MathUtility.doRandom(0, 1000);
+                                name = `${_("Show").toLowerCase()}-${MathUtility.doRandom(
+                                    0,
+                                    1000
+                                )}`;
                                 break;
                             case "turtleshell":
-                                name = _("avatar") + "-" + MathUtility.doRandom(0, 1000);
+                                name = `${_("avatar")}-${MathUtility.doRandom(0, 1000)}`;
                                 break;
                             case "sample":
-                                name = _("sample") + "-" + MathUtility.doRandom(0, 1000);
+                                name = `${_("sample")}-${MathUtility.doRandom(0, 1000)}`;
                                 break;
                             default:
-                                name = blockObjs[i][1] + "-" + MathUtility.doRandom(0, 1000);
+                                name = `${blockObjs[i][1]}-${MathUtility.doRandom(0, 1000)}`;
                                 break;
                         }
                         break;
@@ -5739,7 +5752,7 @@ class Blocks {
                 }
 
                 /** If we have a stack named 'action', make the protoblock visible. */
-                if (name === _("action")) {
+                if (name === _("action") || name === "action") {
                     this.setActionProtoVisibility(true);
                 }
 
@@ -6073,7 +6086,7 @@ class Blocks {
                 }
                 bIndex = chunkEnd;
                 if (bIndex < totalBlocks) {
-                    setTimeout(processChunk, 0);
+                    window.requestAnimationFrame(processChunk);
                 }
             };
 
@@ -6952,7 +6965,11 @@ class Blocks {
                 if (!this.blockList[blk].trash && this.blockList[blk].name === "action") {
                     const myBlock = this.blockList[blk];
                     const c = myBlock.connections[1];
-                    if (c != null && this.blockList[c].value !== _("action")) {
+                    if (
+                        c != null &&
+                        this.blockList[c].value !== _("action") &&
+                        this.blockList[c].value !== "action"
+                    ) {
                         const metadata = this.actionMetadata(blk);
                         if (
                             this.newNameddoBlock(
@@ -7039,8 +7056,9 @@ class Blocks {
             for (let blk = 0; blk < this._adjustTheseDocks.length; blk++) {
                 this.adjustDocks(this._adjustTheseDocks[blk], true);
                 /** blockBlocks._expandTwoArgs(); */
-                this._expandClamps();
             }
+
+            this._expandClamps();
 
             for (let blk = 0; blk < this._adjustTheseStacks.length; blk++) {
                 this.raiseStackToTop(this._adjustTheseStacks[blk]);

@@ -19,6 +19,43 @@
 let WRAP = true;
 const $j = window.jQuery;
 let play_button_debounce_timeout = null;
+
+const safeStorageGet = key => {
+    try {
+        if (typeof localStorage === "undefined" || localStorage === null) {
+            return undefined;
+        }
+
+        if (typeof localStorage.getItem === "function") {
+            const value = localStorage.getItem(key);
+            if (value !== null) {
+                return value;
+            }
+        }
+
+        return localStorage[key];
+    } catch (e) {
+        return undefined;
+    }
+};
+
+const safeStorageSet = (key, value) => {
+    try {
+        if (typeof localStorage === "undefined" || localStorage === null) {
+            return;
+        }
+
+        if (typeof localStorage.setItem === "function") {
+            localStorage.setItem(key, value);
+            return;
+        }
+
+        localStorage[key] = value;
+    } catch (e) {
+        console.debug(`Storage write skipped for ${key}:`, e);
+    }
+};
+
 class Toolbar {
     /**
      * Constructs a new Toolbar instance.
@@ -27,7 +64,7 @@ class Toolbar {
      */
     constructor() {
         this.stopIconColorWhenPlaying = window.platformColor.stopIconcolor;
-        this.language = localStorage.languagePreference;
+        this.language = safeStorageGet("languagePreference");
         if (this.language === undefined) {
             this.language = navigator.language;
         }
@@ -106,7 +143,7 @@ class Toolbar {
                 ["themeSelectIcon", _("Change theme")],
                 ["light", _("Light Mode")],
                 ["dark", _("Dark Mode")],
-                ["highcontrast", _("High Contrast Mode")],
+                ["highcontrast", _("High-contrast Mode")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["chooseKeyIcon", _("Set Pitch Preview")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
@@ -127,26 +164,30 @@ class Toolbar {
                 ["save-blockartwork-svg", _("Save block artwork as SVG"), "innerHTML"],
                 ["save-blockartwork-png", _("Save block artwork as PNG"), "innerHTML"],
                 ["new-project", _("Confirm"), "innerHTML"],
-                ["enUS", _("English (United States)"), "innerHTML"],
-                ["enUK", _("English (United Kingdom)"), "innerHTML"],
-                ["ja", _("日本語"), "innerHTML"],
-                ["ko", _("한국어"), "innerHTML"],
-                ["es", _("español"), "innerHTML"],
-                ["pt", _("português"), "innerHTML"],
-                ["kana", _("にほんご"), "innerHTML"],
-                ["zhCN", _("中文"), "innerHTML"],
-                ["th", _("ภาษาไทย"), "innerHTML"],
-                ["tr", _("Turkish"), "innerHTML"],
-                ["ayc", _("aymara"), "innerHTML"],
-                ["quz", _("quechua"), "innerHTML"],
-                ["gug", _("guarani"), "innerHTML"],
-                ["hi", _("हिंदी"), "innerHTML"],
-                ["ibo", _("igbo"), "innerHTML"],
-                ["ar", _("عربى"), "innerHTML"],
-                ["te", _("తెలుగు"), "innerHTML"],
-                ["bn", _("বাংলা"), "innerHTML"],
-                ["he", _("עִברִית"), "innerHTML"],
-                ["ur", _("اردو"), "innerHTML"]
+                ["enUS", "English (United States)", "innerHTML"],
+                ["enUK", "English (United Kingdom)", "innerHTML"],
+                ["ja", "日本語", "innerHTML"],
+                ["ko", "한국인", "innerHTML"],
+                ["es", "español", "innerHTML"],
+                ["fr", "français", "innerHTML"],
+                ["de", "Deutsch", "innerHTML"],
+                ["it", "italiana", "innerHTML"],
+                ["pt", "português", "innerHTML"],
+                ["kana", "にほんご", "innerHTML"],
+                ["zhCN", "中文", "innerHTML"],
+                ["th", "ภาษาไทย", "innerHTML"],
+                ["tr", "Türkçe", "innerHTML"],
+                ["ayc", "aymara", "innerHTML"],
+                ["quz", "quechua", "innerHTML"],
+                ["gug", "guarani", "innerHTML"],
+                ["hi", "हिंदी", "innerHTML"],
+                ["ta", "தமிழ்", "innerHTML"],
+                ["ibo", "igbo", "innerHTML"],
+                ["ar", "عربى", "innerHTML"],
+                ["te", "తెలుగు", "innerHTML"],
+                ["bn", "বাংলা", "innerHTML"],
+                ["he", "עִברִית", "innerHTML"],
+                ["ur", "اردو", "innerHTML"]
             ];
 
             // Workaround for FF
@@ -178,7 +219,7 @@ class Toolbar {
                 _("Change theme"),
                 _("Light Mode"),
                 _("Dark Mode"),
-                _("High Contrast Mode"),
+                _("High-contrast Mode"),
                 _("Merge with current project"),
                 _("Set Pitch Preview"),
                 _("JavaScript Editor"),
@@ -204,26 +245,7 @@ class Toolbar {
                 _("Save turtle artwork as PNG"),
                 _("Save block artwork as SVG"),
                 _("Save block artwork as PNG"),
-                _("Confirm"),
-                _("English (United States)"),
-                _("English (United Kingdom)"),
-                _("日本語"),
-                _("한국인"),
-                _("español"),
-                _("português"),
-                _("にほんご"),
-                _("中文"),
-                _("ภาษาไทย"),
-                _("Turkish"),
-                _("aymara"),
-                _("quechua"),
-                _("guarani"),
-                _("हिंदी"),
-                _("తెలుగు"),
-                _("igbo"),
-                _("عربى"),
-                _("עִברִית"),
-                _("اردو")
+                _("Confirm")
             ];
         } else {
             strings = [
@@ -254,7 +276,7 @@ class Toolbar {
                 ["themeSelectIcon", _("Change theme")],
                 ["light", _("Light Mode")],
                 ["dark", _("Dark Mode")],
-                ["highcontrast", _("High Contrast Mode")],
+                ["highcontrast", _("High-contrast Mode")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
                 ["restoreIcon", _("Restore")],
@@ -269,26 +291,30 @@ class Toolbar {
                 ["save-blockartwork-svg", _("Save block artwork as SVG"), "innerHTML"],
                 ["save-blockartwork-png", _("Save block artwork as PNG"), "innerHTML"],
                 ["new-project", _("Confirm"), "innerHTML"],
-                ["enUS", _("English (United States)"), "innerHTML"],
-                ["enUK", _("English (United Kingdom)"), "innerHTML"],
-                ["ja", _("日本語"), "innerHTML"],
-                ["ko", _("한국인"), "innerHTML"],
-                ["es", _("español"), "innerHTML"],
-                ["pt", _("português"), "innerHTML"],
-                ["kana", _("にほんご"), "innerHTML"],
-                ["zhCN", _("中文"), "innerHTML"],
-                ["th", _("ภาษาไทย"), "innerHTML"],
-                ["tr", _("Turkish"), "innerHTML"],
-                ["ayc", _("aymara"), "innerHTML"],
-                ["quz", _("quechua"), "innerHTML"],
-                ["gug", _("guarani"), "innerHTML"],
-                ["hi", _("हिंदी"), "innerHTML"],
-                ["ibo", _("igbo"), "innerHTML"],
-                ["ar", _("عربى"), "innerHTML"],
-                ["te", _("తెలుగు"), "innerHTML"],
-                ["bn", _("বাংলা"), "innerHTML"],
-                ["he", _("עִברִית"), "innerHTML"],
-                ["ur", _("اردو"), "innerHTML"]
+                ["enUS", "English (United States)", "innerHTML"],
+                ["enUK", "English (United Kingdom)", "innerHTML"],
+                ["ja", "日本語", "innerHTML"],
+                ["ko", "한국인", "innerHTML"],
+                ["es", "español", "innerHTML"],
+                ["fr", "français", "innerHTML"],
+                ["de", "Deutsch", "innerHTML"],
+                ["it", "italiana", "innerHTML"],
+                ["pt", "português", "innerHTML"],
+                ["kana", "にほんご", "innerHTML"],
+                ["zhCN", "中文", "innerHTML"],
+                ["th", "ภาษาไทย", "innerHTML"],
+                ["tr", "Türkçe", "innerHTML"],
+                ["ayc", "aymara", "innerHTML"],
+                ["quz", "quechua", "innerHTML"],
+                ["gug", "guarani", "innerHTML"],
+                ["hi", "हिंदी", "innerHTML"],
+                ["ta", "தமிழ்", "innerHTML"],
+                ["ibo", "igbo", "innerHTML"],
+                ["ar", "عربى", "innerHTML"],
+                ["te", "తెలుగు", "innerHTML"],
+                ["bn", "বাংলা", "innerHTML"],
+                ["he", "עִברִית", "innerHTML"],
+                ["ur", "اردو", "innerHTML"]
             ];
 
             // Workaround for FF
@@ -320,7 +346,7 @@ class Toolbar {
                 _("Change theme"),
                 _("Light Mode"),
                 _("Dark Mode"),
-                _("High Contrast Mode"),
+                _("High-contrast Mode"),
                 _("Merge with current project"),
                 _("JavaScript Editor"),
                 _("Restore"),
@@ -334,26 +360,7 @@ class Toolbar {
                 _("Save turtle artwork as PNG"),
                 _("Save block artwork as SVG"),
                 _("Save block artwork as PNG"),
-                _("Confirm"),
-                _("English (United States)"),
-                _("English (United Kingdom)"),
-                _("日本語"),
-                _("한국인"),
-                _("español"),
-                _("português"),
-                _("にほんご"),
-                _("中文"),
-                _("ภาษาไทย"),
-                _("Turkish"),
-                _("aymara"),
-                _("quechua"),
-                _("guarani"),
-                _("हिंदी"),
-                _("తెలుగు"),
-                _("igbo"),
-                _("عربى"),
-                _("עִברִית"),
-                _("اردو")
+                _("Confirm")
             ];
         }
 
@@ -744,7 +751,7 @@ class Toolbar {
         if (!icon) return;
 
         themes.forEach(theme => {
-            if (localStorage.themePreference === theme) {
+            if (safeStorageGet("themePreference") === theme) {
                 icon.innerHTML = docById(theme).innerHTML;
             }
         });
@@ -1031,7 +1038,7 @@ class Toolbar {
 
         // Set the onclick handler
         Record.onclick = function () {
-            const savedMode = localStorage.getItem("musicBlocksRecordMode") || "screen";
+            const savedMode = safeStorageGet("musicBlocksRecordMode") || "screen";
             rec_onclick();
         };
 
@@ -1088,7 +1095,7 @@ class Toolbar {
 
         // Function to update highlighting based on current mode
         const updateModeHighlight = () => {
-            const currentMode = localStorage.getItem("musicBlocksRecordMode") || "screen";
+            const currentMode = safeStorageGet("musicBlocksRecordMode") || "screen";
 
             // Remove highlight from both
             if (recordWithMenus) {
@@ -1116,7 +1123,7 @@ class Toolbar {
         if (recordWithMenus) {
             recordWithMenus.onclick = e => {
                 e.preventDefault();
-                localStorage.setItem("musicBlocksRecordMode", "screen");
+                safeStorageSet("musicBlocksRecordMode", "screen");
                 updateModeHighlight();
                 // Reset arrow after selection
                 const arrowIcon = RecordDropdownArrow.querySelector("i");
@@ -1127,7 +1134,7 @@ class Toolbar {
         if (recordCanvasOnly) {
             recordCanvasOnly.onclick = e => {
                 e.preventDefault();
-                localStorage.setItem("musicBlocksRecordMode", "canvas");
+                safeStorageSet("musicBlocksRecordMode", "canvas");
                 updateModeHighlight();
 
                 // Reset arrow after selection
@@ -1419,7 +1426,7 @@ class Toolbar {
             this.activity.beginnerMode = !this.activity.beginnerMode;
 
             try {
-                localStorage.setItem("beginnerMode", this.activity.beginnerMode.toString());
+                safeStorageSet("beginnerMode", this.activity.beginnerMode.toString());
             } catch (e) {
                 console.error(e);
             }
@@ -1597,22 +1604,26 @@ class Toolbar {
             "enUK",
             "es",
             "pt",
-            "ko",
+            "fr",
+            "it",
+            "de",
             "ja",
             "kana",
+            "ko",
             "zhCN",
             "th",
-            "tr",
             "ayc",
             "quz",
             "gug",
             "hi",
-            "ibo",
-            "ar",
+            "ta",
             "te",
+            "ibo",
+            "tr",
+            "ar",
             "bn",
-            "he",
-            "ur"
+            "ur",
+            "he"
         ];
 
         /**
@@ -1647,7 +1658,7 @@ class Toolbar {
 
             // Handle Japanese variants (ja-kanji, ja-kana stored vs ja/kana displayed)
             if (selectedLang && selectedLang.startsWith("ja")) {
-                if (selectedLang === "ja-kana" || localStorage.kanaPreference === "kana") {
+                if (selectedLang === "ja-kana" || safeStorageGet("kanaPreference") === "kana") {
                     langToHighlight = "kana";
                 } else {
                     langToHighlight = "ja";
@@ -1676,7 +1687,7 @@ class Toolbar {
 
         languageSelectIcon.onclick = () => {
             // Get current language preference
-            const currentLang = localStorage.languagePreference || navigator.language;
+            const currentLang = safeStorageGet("languagePreference") || navigator.language;
 
             // Highlight the currently selected language
             updateSelectedLanguageHighlight(currentLang);

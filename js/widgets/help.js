@@ -10,6 +10,8 @@
 
 // This widget displays help about a block or a button.
 
+const HELP_SVG_DATA_PREFIX = "data:image/svg+xml;base64,";
+
 /* global
 
    _, docById, getMacroExpansion, HELPCONTENT,
@@ -41,7 +43,7 @@ class HelpWidget {
         this.appendedBlockList = [];
         this.index = 0;
         this.isOpen = true;
-        this._prevKeyHandler = document.onkeydown;
+        this._keydownHandler = null;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help", false);
         //widgetWindow.getWidgetBody().style.overflowY = "auto";
@@ -52,7 +54,10 @@ class HelpWidget {
         widgetWindow.show();
         widgetWindow.onclose = () => {
             this.isOpen = false;
-            document.onkeydown = this._prevKeyHandler;
+            if (this._keydownHandler) {
+                document.removeEventListener("keydown", this._keydownHandler);
+                this._keydownHandler = null;
+            }
             widgetWindow.destroy();
             // Trigger the hint only if they were on the first page of the tour
             if (this.index === 0 && typeof this.activity.textMsg === "function") {
@@ -68,7 +73,7 @@ class HelpWidget {
         this._helpDiv = document.createElement("div");
 
         // Give the DOM time to create the div.
-        setTimeout(() => this._setup(useActiveBlock, 0), 0);
+        window.requestAnimationFrame(() => this._setup(useActiveBlock, 0));
 
         // Position center
         setTimeout(this.widgetWindow.sendToCenter, 50);
@@ -88,20 +93,39 @@ class HelpWidget {
         // this._helpDiv.style.maxHeight = "100%";
         // this._helpDiv.style.overflowY = "auto";
 
-        const innerHTML = `
-                    <div id="right-arrow" class="hover" tabindex="0" role="button" aria-label="${_(
-                        "Next"
-                    )}"></div>
-                    <div id="left-arrow" class="hover" tabindex="0" role="button" aria-label="${_(
-                        "Previous"
-                    )}"></div>
-                    <div id="helpButtonsDiv" tabindex="-1"></div>
-                    <div id="helpScrollWrapper">
-                        <div id="helpBodyDiv" tabindex="-1"></div>
-                    </div>
-                          `;
+        this._helpDiv.replaceChildren(
+            (() => {
+                const fragment = document.createDocumentFragment();
+                const rightArrow = document.createElement("div");
+                rightArrow.id = "right-arrow";
+                rightArrow.className = "hover";
+                rightArrow.tabIndex = 0;
+                rightArrow.setAttribute("role", "button");
+                rightArrow.setAttribute("aria-label", _("Next"));
 
-        this._helpDiv.insertAdjacentHTML("afterbegin", innerHTML);
+                const leftArrow = document.createElement("div");
+                leftArrow.id = "left-arrow";
+                leftArrow.className = "hover";
+                leftArrow.tabIndex = 0;
+                leftArrow.setAttribute("role", "button");
+                leftArrow.setAttribute("aria-label", _("Previous"));
+
+                const helpButtonsDiv = document.createElement("div");
+                helpButtonsDiv.id = "helpButtonsDiv";
+                helpButtonsDiv.tabIndex = -1;
+
+                const helpScrollWrapper = document.createElement("div");
+                helpScrollWrapper.id = "helpScrollWrapper";
+
+                const helpBodyDiv = document.createElement("div");
+                helpBodyDiv.id = "helpBodyDiv";
+                helpBodyDiv.tabIndex = -1;
+
+                helpScrollWrapper.append(helpBodyDiv);
+                fragment.append(rightArrow, leftArrow, helpButtonsDiv, helpScrollWrapper);
+                return fragment;
+            })()
+        );
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
 
         let leftArrow, rightArrow;
@@ -123,13 +147,17 @@ class HelpWidget {
             leftArrow.setAttribute("title", _("Previous"));
             leftArrow.setAttribute("aria-label", _("Previous"));
 
-            document.onkeydown = function handleArrowKeys(event) {
+            if (this._keydownHandler) {
+                document.removeEventListener("keydown", this._keydownHandler);
+            }
+            this._keydownHandler = event => {
                 if (event.key === "ArrowLeft") {
                     leftArrow.click();
                 } else if (event.key === "ArrowRight") {
                     rightArrow.click();
                 }
             };
+            document.addEventListener("keydown", this._keydownHandler);
 
             let cell = docById("left-arrow");
             if (page === 0) {
@@ -218,7 +246,22 @@ class HelpWidget {
                 // Create a new container which conatains all the icons. IT will be appnded to the helpBodyDiv
                 const iconsContainer = document.createElement("div");
                 iconsContainer.classList.add("icon-container");
-                iconsContainer.insertAdjacentHTML("afterbegin", findIcon);
+                iconsContainer.replaceChildren(
+                    (() => {
+                        const findLink = document.createElement("a");
+                        findLink.className = "tooltipped";
+                        findLink.dataset.toggle = "tooltip";
+                        findLink.title = _("Show Palette containing the block");
+                        findLink.dataset.position = "bottom";
+                        const findIconEl = document.createElement("i");
+                        findIconEl.id = "findIcon";
+                        findIconEl.className = "material-icons md-48";
+                        findIconEl.style.marginRight = "10px";
+                        findIconEl.textContent = "search";
+                        findLink.append(findIconEl);
+                        return findLink;
+                    })()
+                );
 
                 // Each block's help entry contains a help string, the
                 // path of the help svg, an override name for the help
@@ -264,22 +307,35 @@ class HelpWidget {
 
                         // body = body + '<p><img src="' + path + "/" + name + '_block.svg"></p>';
                         const imageSrc = `Docs/${path}/${name}_block.svg`;
-                        const figure = document.createElement("figure");
-                        figure.style.width = "100%";
+                        const p = document.createElement("p");
+                        p.style.width = "100%";
                         const img = document.createElement("img");
                         img.style.maxWidth = "100%";
                         img.src = imageSrc;
-                        figure.append(img);
-                        bodyFragment.append(figure);
+                        p.append(img);
+                        bodyFragment.append(p);
                     }
 
                     const messageParagraph = document.createElement("p");
-                    messageParagraph.textContent = message[0];
+                    const messageParts = message[0].split(/<br\s*\/?>/i);
+                    messageParts.forEach((part, index) => {
+                        messageParagraph.append(document.createTextNode(part));
+                        if (index < messageParts.length - 1) {
+                            messageParagraph.append(document.createElement("br"));
+                        }
+                    });
                     bodyFragment.append(messageParagraph);
 
                     const loadButtonHTML =
                         '<i style="margin-right: 10px" id="loadButton" data-toggle="tooltip" title="Load this block" class="material-icons md-48">get_app</i>';
-                    iconsContainer.insertAdjacentHTML("afterbegin", loadButtonHTML);
+                    const loadButton = document.createElement("i");
+                    loadButton.id = "loadButton";
+                    loadButton.className = "material-icons md-48";
+                    loadButton.style.marginRight = "10px";
+                    loadButton.dataset.toggle = "tooltip";
+                    loadButton.title = _("Load this block");
+                    loadButton.textContent = "get_app";
+                    iconsContainer.prepend(loadButton);
 
                     helpBody.append(bodyFragment);
 
@@ -287,7 +343,21 @@ class HelpWidget {
                         !this.activity.blocks.blockList[this.activity.blocks.activeBlock].protoblock
                             .beginnerModeBlock
                     ) {
-                        iconsContainer.insertAdjacentHTML("beforeend", advIcon);
+                        iconsContainer.append(
+                            (() => {
+                                const advLink = document.createElement("a");
+                                advLink.className = "tooltipped";
+                                advLink.dataset.toggle = "tooltip";
+                                advLink.title = _("This block is only available in advance mode");
+                                advLink.dataset.position = "bottom";
+                                const advIconEl = document.createElement("i");
+                                advIconEl.id = "advIconText";
+                                advIconEl.className = "material-icons md-48";
+                                advIconEl.textContent = "star";
+                                advLink.append(advIconEl);
+                                return advLink;
+                            })()
+                        );
                     }
 
                     // append the icons container to the helpBodyDiv. It contains load, find and adv icons.
@@ -295,8 +365,7 @@ class HelpWidget {
 
                     const object = this.activity.blocks.palettes.getProtoNameAndPalette(name);
 
-                    const loadButton = docById("loadButton");
-                    if (loadButton !== null) {
+                    if (loadButton) {
                         loadButton.onclick = () => {
                             if (message.length < 4) {
                                 // If there is nothing specified, just load the block.
@@ -355,45 +424,40 @@ class HelpWidget {
      */
     _showPage(page) {
         const helpBody = docById("helpBodyDiv");
-        helpBody.innerHTML = "";
+        helpBody.replaceChildren();
         const totalPages = HELPCONTENT.length;
         const pageCount = `${page + 1}/${totalPages}`;
         const rightArrow = docById("right-arrow");
         const leftArrow = docById("left-arrow");
+        const title = HELPCONTENT[page][0];
+        const imageSrc = HELPCONTENT[page][2];
 
         rightArrow.classList.toggle("disabled", page === HELPCONTENT.length - 1);
         leftArrow.classList.toggle("disabled", page === 0);
 
         // Previous HTML content is removed, and new one is generated.
         const bodyFragment = document.createDocumentFragment();
-        if (
-            [
-                _("Welcome to Music Blocks"),
-                _("Meet Mr. Mouse!"),
-                _("Guide"),
-                _("About"),
-                _("Congratulations.")
-            ].includes(HELPCONTENT[page][0])
-        ) {
-            // body = body + '<p>&nbsp;<img src="' + HELPCONTENT[page][2] + '"></p>';
-            const figure = document.createElement("figure");
-            const img = document.createElement("img");
-            img.src = HELPCONTENT[page][2];
-            img.alt = `${HELPCONTENT[page][0]} icon`;
-            img.loading = "lazy";
-            figure.append(img);
-            bodyFragment.append(figure);
+        const imageP = document.createElement("p");
+        imageP.append(document.createTextNode("\u00a0"));
+        const img = document.createElement("img");
+        img.src = imageSrc;
+        img.alt = `${title} icon`;
+
+        if (this._isLargeTourImage(title)) {
+            img.classList.add("help-tour-image");
+        } else if (this._isDetailedTourIcon(title)) {
+            img.classList.add("help-tour-detailed-icon");
         } else {
-            const figure = document.createElement("figure");
-            const img = document.createElement("img");
-            img.src = HELPCONTENT[page][2];
-            img.alt = `${HELPCONTENT[page][0]} icon`;
-            img.loading = "lazy";
+            img.src = this._getHighContrastHelpIconSrc(imageSrc);
+            img.classList.add("help-tour-icon");
+            if (this._usesHighContrastWhiteFilter(imageSrc)) {
+                img.classList.add("help-tour-white-icon");
+            }
             img.setAttribute("width", "64px");
             img.setAttribute("height", "64px");
-            figure.append(img);
-            bodyFragment.append(figure);
         }
+        imageP.append(img);
+        bodyFragment.append(imageP);
 
         const heading = document.createElement("h1");
         heading.classList.add("heading");
@@ -402,7 +466,13 @@ class HelpWidget {
 
         const description = document.createElement("p");
         description.classList.add("description");
-        description.textContent = HELPCONTENT[page][1];
+        const descParts = HELPCONTENT[page][1].split(/<br\s*\/?>/i);
+        descParts.forEach((part, index) => {
+            description.append(document.createTextNode(part));
+            if (index < descParts.length - 1) {
+                description.append(document.createElement("br"));
+            }
+        });
         bodyFragment.append(description);
 
         const count = document.createElement("p");
@@ -468,6 +538,120 @@ class HelpWidget {
     }
 
     /**
+     * @private
+     * @param {string} title
+     * @returns {boolean}
+     */
+    _isLargeTourImage(title) {
+        return [
+            _("Welcome to Music Blocks"),
+            _("Meet Mr. Mouse!"),
+            _("Guide"),
+            _("About"),
+            _("Congratulations."),
+            _("Congratulations!")
+        ].includes(title);
+    }
+
+    /**
+     * @private
+     * @param {string} title
+     * @returns {boolean}
+     */
+    _isDetailedTourIcon(title) {
+        return [
+            _("Tab Navigation"),
+            _("Contextual Menu for Blocks"),
+            _("Contextual Menu for Canvas")
+        ].includes(title);
+    }
+
+    /**
+     * @private
+     * @param {string} src
+     * @returns {string}
+     */
+    _getHighContrastHelpIconSrc(src) {
+        if (
+            !document.body.classList.contains("highcontrast") ||
+            !src.startsWith(HELP_SVG_DATA_PREFIX)
+        ) {
+            return src;
+        }
+
+        try {
+            const svg = this._decodeSvgData(src.slice(HELP_SVG_DATA_PREFIX.length));
+            const highContrastSvg = svg
+                .replace(/fill-opacity\s*:\s*0\.[0-9]+/g, "fill-opacity:1")
+                .replace(/stroke-opacity\s*:\s*0\.[0-9]+/g, "stroke-opacity:1")
+                .replace(/opacity\s*:\s*0\.[0-9]+/g, "opacity:1")
+                .replace(/fill-opacity="0\.[0-9]+"/g, 'fill-opacity="1"')
+                .replace(/stroke-opacity="0\.[0-9]+"/g, 'stroke-opacity="1"')
+                .replace(/opacity="0\.[0-9]+"/g, 'opacity="1"');
+            return HELP_SVG_DATA_PREFIX + this._encodeSvgData(highContrastSvg);
+        } catch (e) {
+            return src;
+        }
+    }
+
+    /**
+     * @private
+     * @param {string} src
+     * @returns {boolean}
+     */
+    _usesHighContrastWhiteFilter(src) {
+        if (
+            !document.body.classList.contains("highcontrast") ||
+            !src.startsWith(HELP_SVG_DATA_PREFIX)
+        ) {
+            return false;
+        }
+
+        try {
+            return !this._hasVisibleWhiteSvgDetail(
+                this._decodeSvgData(src.slice(HELP_SVG_DATA_PREFIX.length))
+            );
+        } catch (e) {
+            return true;
+        }
+    }
+
+    /**
+     * @private
+     * @param {string} svg
+     * @returns {boolean}
+     */
+    _hasVisibleWhiteSvgDetail(svg) {
+        const whiteElements =
+            svg.match(/<[^>]*(?:fill|stroke)\s*[:=]\s*["']?#(?:fff|ffffff)\b[^>]*>/gi) || [];
+
+        return whiteElements.some(
+            element =>
+                !/(?:opacity|fill-opacity|stroke-opacity)\s*[:=]\s*["']?0(?:[;"'\s>]|$)/i.test(
+                    element
+                )
+        );
+    }
+
+    /**
+     * @private
+     * @param {string} encodedSvg
+     * @returns {string}
+     */
+    _decodeSvgData(encodedSvg) {
+        return window.atob(encodedSvg);
+    }
+
+    /**
+     * @private
+     * @param {string} svg
+     * @returns {string}
+     */
+    _encodeSvgData(svg) {
+        return window.btoa(svg);
+    }
+
+    /**
      * Prepare a list of beginner and advanced blocks and cycle through their help
      * @private
      * @returns {void}
@@ -509,6 +693,7 @@ class HelpWidget {
      * @returns {void}
      */
     _blockHelp(block) {
+        if (!block) return;
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
@@ -518,26 +703,56 @@ class HelpWidget {
         this._helpDiv.style.height = "70vh";
         // this._helpDiv.style.backgroundColor = "#e8e8e8";
 
-        const helpDivHTML =
-            '<div id="right-arrow" class="hover" tabindex="0" role="button" aria-label="' +
-            _("Next") +
-            '"></div><div id="left-arrow" class="hover" tabindex="0" role="button" aria-label="' +
-            _("Previous") +
-            '"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpScrollWrapper"><div id="helpBodyDiv" tabindex="-1"></div></div>';
-        this._helpDiv.insertAdjacentHTML("afterbegin", helpDivHTML);
+        this._helpDiv.replaceChildren(
+            (() => {
+                const fragment = document.createDocumentFragment();
+                const rightArrow = document.createElement("div");
+                rightArrow.id = "right-arrow";
+                rightArrow.className = "hover";
+                rightArrow.tabIndex = 0;
+                rightArrow.setAttribute("role", "button");
+                rightArrow.setAttribute("aria-label", _("Next"));
+
+                const leftArrow = document.createElement("div");
+                leftArrow.id = "left-arrow";
+                leftArrow.className = "hover";
+                leftArrow.tabIndex = 0;
+                leftArrow.setAttribute("role", "button");
+                leftArrow.setAttribute("aria-label", _("Previous"));
+
+                const helpButtonsDiv = document.createElement("div");
+                helpButtonsDiv.id = "helpButtonsDiv";
+                helpButtonsDiv.tabIndex = -1;
+
+                const helpScrollWrapper = document.createElement("div");
+                helpScrollWrapper.id = "helpScrollWrapper";
+
+                const helpBodyDiv = document.createElement("div");
+                helpBodyDiv.id = "helpBodyDiv";
+                helpBodyDiv.tabIndex = -1;
+
+                helpScrollWrapper.append(helpBodyDiv);
+                fragment.append(rightArrow, leftArrow, helpButtonsDiv, helpScrollWrapper);
+                return fragment;
+            })()
+        );
 
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
         let cell = docById("right-arrow");
         const rightArrow = docById("right-arrow");
         const leftArrow = docById("left-arrow");
 
-        document.onkeydown = function handleArrowKeys(event) {
+        if (this._keydownHandler) {
+            document.removeEventListener("keydown", this._keydownHandler);
+        }
+        this._keydownHandler = event => {
             if (event.key === "ArrowLeft") {
                 leftArrow.click();
             } else if (event.key === "ArrowRight") {
                 rightArrow.click();
             }
         };
+        document.addEventListener("keydown", this._keydownHandler);
 
         if (this.index === this.appendedBlockList.length - 1) {
             rightArrow.classList.add("disabled");
@@ -575,29 +790,21 @@ class HelpWidget {
         if (block.name !== null) {
             const name = block.name;
 
-            const advIcon = `<a class="tooltipped"
-                    data-toggle="tooltip"
-                    title="This block is only available in advance mode"
-                    data-position="bottom">
-                     <i id="advIconText"
-                        class="material-icons md-48">star
-                     </i>
-                 </a>
-                `;
-
-            const findIcon = `<a class="tooltipped"
-                    data-toggle="tooltip"
-                    title="Show Palette containing the block"
-                    data-position="bottom">
-                    <i style="margin-right: 10px"
-                        id="findIcon"
-                        class="material-icons md-48">search
-                    </i>
-                 </a>
-                `;
-
             const iconsContainer = document.createElement("div");
             iconsContainer.classList.add("icon-container");
+
+            const findLink = document.createElement("a");
+            findLink.className = "tooltipped";
+            findLink.dataset.toggle = "tooltip";
+            findLink.title = _("Show Palette containing the block");
+            findLink.dataset.position = "bottom";
+            const findIconEl = document.createElement("i");
+            findIconEl.id = "findIcon";
+            findIconEl.className = "material-icons md-48";
+            findIconEl.style.marginRight = "10px";
+            findIconEl.textContent = "search";
+            findLink.append(findIconEl);
+            iconsContainer.append(findLink);
 
             const message = block.helpString;
 
@@ -646,18 +853,37 @@ class HelpWidget {
 
                 const messageParagraph = document.createElement("p");
                 messageParagraph.classList.add("message");
-                messageParagraph.textContent = message[0];
+                const messageParts = message[0].split(/<br\s*\/?>/i);
+                messageParts.forEach((part, index) => {
+                    messageParagraph.append(document.createTextNode(part));
+                    if (index < messageParts.length - 1) {
+                        messageParagraph.append(document.createElement("br"));
+                    }
+                });
                 bodyFragment.append(messageParagraph);
                 helpBody.append(bodyFragment);
 
-                const loadIconHTML =
-                    '<i style="margin-right: 10px" id="loadButton" data-toggle="tooltip" title="Load this block" class="material-icons md-48">get_app</i>';
-
-                iconsContainer.insertAdjacentHTML("afterbegin", loadIconHTML);
-                iconsContainer.insertAdjacentHTML("beforeend", findIcon);
+                const loadButton = document.createElement("i");
+                loadButton.id = "loadButton";
+                loadButton.className = "material-icons md-48";
+                loadButton.style.marginRight = "10px";
+                loadButton.dataset.toggle = "tooltip";
+                loadButton.title = _("Load this block");
+                loadButton.textContent = "get_app";
+                iconsContainer.prepend(loadButton);
 
                 if (!block.beginnerModeBlock) {
-                    iconsContainer.insertAdjacentHTML("beforeend", advIcon);
+                    const advLink = document.createElement("a");
+                    advLink.className = "tooltipped";
+                    advLink.dataset.toggle = "tooltip";
+                    advLink.title = _("This block is only available in advance mode.");
+                    advLink.dataset.position = "bottom";
+                    const advIconEl = document.createElement("i");
+                    advIconEl.id = "advIconText";
+                    advIconEl.className = "material-icons md-48";
+                    advIconEl.textContent = "star";
+                    advLink.append(advIconEl);
+                    iconsContainer.append(advLink);
                 }
 
                 // append the iconsContainer to the helpBodyDiv
@@ -669,7 +895,6 @@ class HelpWidget {
                     block.palette.palettes.showPalette(block.palette.name);
                 };
 
-                const loadButton = docById("loadButton");
                 if (loadButton !== null) {
                     loadButton.onclick = () => {
                         if (message.length < 4) {

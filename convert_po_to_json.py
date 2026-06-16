@@ -16,6 +16,7 @@
 import os
 import json
 import re
+import sys
 
 def parse_po_file(po_file):
     """Parse a .po file and return a dict of {msgid: msgstr}."""
@@ -50,7 +51,8 @@ def convert_po_to_json(po_file, output_dir):
             kana_dict = parse_po_file(kana_file)
 
             combined = {}
-            all_keys = set(ja_dict.keys()) | set(kana_dict.keys())
+            all_keys = list(ja_dict.keys())
+            all_keys.extend(key for key in kana_dict.keys() if key not in ja_dict)
             for key in all_keys:
                 combined[key] = {
                     "kanji": ja_dict.get(key, key),
@@ -79,4 +81,8 @@ def convert_all_po_files(po_dir, output_dir):
             if file.endswith(".po"):
                 convert_po_to_json(os.path.join(root, file), output_dir)
 
-convert_all_po_files("./po", "./locales")
+if __name__ == "__main__":
+    if len(sys.argv) == 3:
+        convert_po_to_json(sys.argv[1], sys.argv[2])
+    else:
+        convert_all_po_files("./po", "./locales")

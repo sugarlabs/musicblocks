@@ -26,7 +26,7 @@ class ServerInterface {
         this.Planet = Planet;
         this.ServerURL = "https://musicblocks.sugarlabs.org/planet-server/index.php";
         this.ConnectionFailureData = { success: false, error: "ERROR_CONNECTION_FAILURE" };
-        this.APIKey = "3f2d3a4c-c7a4-4c3c-892e-ac43784f7381";
+        this.APIKey = window.MB_PLANET_API_KEY || "";
         this.disablePlanetCache = this.shouldDisablePlanetCache();
 
         // Initialize RequestManager for rate limiting and retry logic

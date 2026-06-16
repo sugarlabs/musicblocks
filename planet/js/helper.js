@@ -66,7 +66,9 @@ function setCookie(cname, cvalue, exdays) {
     const d = new Date();
     d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
     const expires = `expires=${d.toUTCString()}`;
-    document.cookie = `${cname}=${cvalue};${expires};path=/`;
+    const isSecure = location.protocol === "https:";
+    const flags = isSecure ? ";Secure;SameSite=Strict" : ";SameSite=Strict";
+    document.cookie = `${cname}=${cvalue};${expires};path=/${flags}`;
 }
 
 function toggleSearch(on) {
@@ -77,11 +79,12 @@ function toggleSearch(on) {
 function toggleText(id, a, b) {
     const el = document.getElementById(id);
 
-    const prevHTML = el.innerHTML;
-    const updatedHTML = prevHTML.includes(a) ? prevHTML.replace(a, b) : prevHTML.replace(b, a);
+    const currentText = el.textContent || "";
+    const updatedText = currentText.includes(a)
+        ? currentText.replace(a, b)
+        : currentText.replace(b, a);
 
-    el.innerHTML = "";
-    el.insertAdjacentHTML("afterbegin", updatedHTML);
+    el.textContent = updatedText;
 }
 
 function toggleExpandable(id, c) {
@@ -149,3 +152,15 @@ $(document).ready(() => {
         toggleText("view-more-chips", showMore, showLess);
     });
 });
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        debounce,
+        getCookie,
+        setCookie,
+        toggleText,
+        toggleExpandable,
+        hideOnClickOutside,
+        updateCheckboxes
+    };
+}

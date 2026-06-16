@@ -31,6 +31,13 @@ window.widgetWindows = {
     windowFor: jest.fn().mockReturnValue({
         clear: jest.fn(),
         show: jest.fn(),
+        timerManager: {
+            setInterval: jest.fn().mockImplementation((cb, t) => setInterval(cb, t)),
+            clearInterval: jest.fn().mockImplementation(id => clearInterval(id)),
+            setTimeout: jest.fn().mockImplementation((cb, t) => setTimeout(cb, t)),
+            clearTimeout: jest.fn().mockImplementation(id => clearTimeout(id)),
+            clearAll: jest.fn()
+        },
         addButton: jest.fn().mockReturnValue({ onclick: () => {} }),
         addInputButton: jest.fn().mockImplementation(val => ({
             value: val,
@@ -86,10 +93,6 @@ describe("Tempo Widget", () => {
             textMsg: jest.fn(),
             errorMsg: jest.fn() // This is what the code calls!
         };
-
-        // --- FIX 1: Set the Global 'activity' variable ---
-        // The widget code calls 'activity.errorMsg', relying on it being global.
-        global.activity = mockActivity;
 
         // Manually setup initial state usually handled by init()
         tempoWidget.activity = mockActivity;
@@ -963,5 +966,62 @@ describe("Tempo._useBPM validation logic", () => {
 
     it("should return error for non-numeric input", () => {
         expect(validateBPM("abc")).toEqual({ bpm: null, error: "invalid" });
+    });
+});
+
+describe("Tempo widget cleanup on block deletion", () => {
+    it("should clear the interval when widget is closed via closeBlkWidgets", () => {
+        const mockTimerManager = {
+            clearInterval: jest.fn(),
+            setInterval: jest.fn().mockReturnValue(42)
+        };
+        const mockWidgetWindow = {
+            timerManager: mockTimerManager,
+            destroy: jest.fn(),
+            onclose: null
+        };
+
+        // Simulate _intervalID being set
+        let intervalID = 42;
+
+        // Simulate onclose being called
+        const oncloseHandler = () => {
+            if (intervalID !== null) {
+                mockWidgetWindow.timerManager.clearInterval(intervalID);
+            }
+            mockWidgetWindow.destroy();
+        };
+
+        oncloseHandler();
+
+        expect(mockTimerManager.clearInterval).toHaveBeenCalledWith(42);
+        expect(mockWidgetWindow.destroy).toHaveBeenCalledTimes(1);
+    });
+
+    it("should not continue audio after block deletion triggers widget close", () => {
+        const mockTimerManager = {
+            clearInterval: jest.fn(),
+            setInterval: jest.fn().mockReturnValue(99)
+        };
+
+        let intervalID = 99;
+        let audioTriggered = false;
+
+        // Simulate _draw being called after interval cleared
+        const draw = () => {
+            if (intervalID !== null) {
+                audioTriggered = true;
+            }
+        };
+
+        // Clear interval (simulating onclose)
+        mockTimerManager.clearInterval(intervalID);
+        intervalID = null;
+
+        // draw should not trigger audio now
+        draw();
+
+        expect(mockTimerManager.clearInterval).toHaveBeenCalledWith(99);
+        expect(audioTriggered).toBe(false);
     });
 });

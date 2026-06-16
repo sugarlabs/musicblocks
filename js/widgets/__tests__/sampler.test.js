@@ -893,15 +893,16 @@ describe("Sampler Widget", () => {
             };
             global.TunerUtils.frequencyToPitch.mockReturnValue(["A4", 0]);
             global.detectPitch = jest.fn(() => 440);
-            document.querySelectorAll = jest.fn(() => [
-                { setAttribute: jest.fn() },
-                { setAttribute: jest.fn() }
-            ]);
+            widget.tunerSegments = [{ setAttribute: jest.fn() }, { setAttribute: jest.fn() }];
+            const querySelectorAll = jest.spyOn(document, "querySelectorAll");
 
             widget.makeCanvas(400, 300, 0, true);
 
             expect(widget.tunerDisplay).toBeTruthy();
             expect(widget.tunerDisplay.update).toHaveBeenCalled();
+            expect(widget.tunerSegments[0].setAttribute).toHaveBeenCalledWith("fill", "#0000ff");
+            expect(querySelectorAll).not.toHaveBeenCalled();
+            querySelectorAll.mockRestore();
         });
 
         test("makeCanvas removes tuner canvas when disabled", () => {
@@ -934,10 +935,14 @@ describe("Sampler Widget", () => {
             );
             global.TunerUtils.frequencyToPitch.mockReturnValue(["A4", 0]);
             global.detectPitch = jest.fn(() => 440);
-            document.querySelectorAll = jest.fn(() => [{ setAttribute: jest.fn() }]);
+            widget.tunerSegments = [{ setAttribute: jest.fn() }];
+            const querySelectorAll = jest.spyOn(document, "querySelectorAll");
 
             widget.makeCanvas(400, 300, 0, true);
             expect(widget.tunerDisplay.canvas).toBeTruthy();
+            expect(widget.tunerSegments[0].setAttribute).toHaveBeenCalledWith("fill", "#0000ff");
+            expect(querySelectorAll).not.toHaveBeenCalled();
+            querySelectorAll.mockRestore();
         });
 
         test("makeTuner builds UI and triggers pitch detection", async () => {

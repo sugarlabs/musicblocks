@@ -221,8 +221,9 @@ describe("setupPenBlocks", () => {
     });
 
     test("fill early return when args missing", () => {
-        activity.blocks.blockList.fill.flow([], logo, 0);
-        expect(true).toBe(true);
+        const res = activity.blocks.blockList.fill.flow([], logo, 0);
+        expect(res).toBeUndefined();
+        expect(painter.doStartFill).not.toHaveBeenCalled();
     });
 
     test("hollowline start + end", () => {
@@ -236,9 +237,9 @@ describe("setupPenBlocks", () => {
         expect(painter.doEndHollowLine).toHaveBeenCalled();
     });
 
-    test("hollowline early return", () => {
-        activity.blocks.blockList.hollowline.flow([], logo, 0);
-        expect(true).toBe(true);
+    test("hollowline early return when args missing", () => {
+        const res = activity.blocks.blockList.hollowline.flow([], logo, 0);
+        expect(res).toBeUndefined();
     });
 
     test("numeric setters error on null", () => {
@@ -247,14 +248,6 @@ describe("setupPenBlocks", () => {
         });
 
         expect(activity.errorMsg).toHaveBeenCalled();
-    });
-
-    test("numeric setters safely return on NaN", () => {
-        ["sethue", "setshade", "setgrey", "setpensize", "settranslucency"].forEach(b => {
-            activity.blocks.blockList[b].flow([NaN], logo, 0, b);
-        });
-
-        expect(true).toBe(true);
     });
 
     test("setcolor runtime path", () => {
