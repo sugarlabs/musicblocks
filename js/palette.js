@@ -61,6 +61,12 @@ const makePaletteIcons = (data, width, height) => {
 
     const img = new Image();
     img.src = src;
+    // Decorative icon: the parent element (palette tab, button, etc.)
+    // already carries an aria-label/role, so mark this image as
+    // presentational to avoid duplicate/empty announcements for
+    // screen reader users (WCAG 1.1.1 Non-text Content).
+    img.alt = "";
+    img.setAttribute("role", "presentation");
     if (width) img.width = width;
     if (height) img.height = height;
     return img;
@@ -1540,6 +1546,13 @@ class Palette {
                 this.palettes.cellSize,
                 this.palettes.cellSize
             );
+            // This icon is functional (closes the menu), not decorative,
+            // so override the default presentational/empty-alt markup
+            // applied in makePaletteIcons with a real accessible name.
+            closeImg.removeAttribute("role");
+            closeImg.alt = _("Close");
+            closeImg.setAttribute("role", "button");
+            closeImg.tabIndex = 0;
             closeImg.onclick = () => this.hideMenu();
             closeImg.onmouseover = () => (document.body.style.cursor = "pointer");
             closeImg.onmouseleave = () => (document.body.style.cursor = "default");
