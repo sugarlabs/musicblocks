@@ -17,18 +17,33 @@
 // and all musical staff types). It reads bitmap state from the activity
 // instance and mutates only visibility, filters, and cache — never
 // controller state such as currentGrid.
-//
-// Lifecycle:
-//   - Bitmaps are created by activity.js setupDependencies() via _createGrid.
-//   - setupGridRenderer() is called immediately after setupGridController(),
-//     once the bitmaps are allocated, and wires all _show/_hide properties
-//     on the activity to arrow-function delegations into this class.
 class GridRenderer {
     /**
      * @param {object} activity - The Activity instance.
      */
     constructor(activity) {
         this.activity = activity;
+    }
+
+    // -------------------------------------------------------------------------
+    // Private helpers
+    // -------------------------------------------------------------------------
+
+    /*
+     * Applies the invert color filter for dark / high-contrast themes, then
+     * caches the bitmap. Called by every show* method after setting visibility.
+     */
+    _applyThemeFilter(bitmap) {
+        const isDarkMode = document.body.classList.contains("dark");
+        const isHighContrastMode = document.body.classList.contains("highcontrast");
+        if (isDarkMode || isHighContrastMode) {
+            const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
+            bitmap.filters = [invertFilter];
+        } else {
+            bitmap.filters = [];
+        }
+        bitmap.cache(0, 0, 1200, 900);
+        bitmap.updateCache();
     }
 
     // -------------------------------------------------------------------------
@@ -49,17 +64,7 @@ class GridRenderer {
      */
     showCartesian() {
         this.activity.cartesianBitmap.visible = true;
-        // Apply color filter based on theme
-        const isDarkMode = document.body.classList.contains("dark");
-        const isHighContrastMode = document.body.classList.contains("highcontrast");
-        if (isDarkMode || isHighContrastMode) {
-            const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-            this.activity.cartesianBitmap.filters = [invertFilter];
-        } else {
-            this.activity.cartesianBitmap.filters = [];
-        }
-        this.activity.cartesianBitmap.cache(0, 0, 1200, 900);
-        this.activity.cartesianBitmap.updateCache();
+        this._applyThemeFilter(this.activity.cartesianBitmap);
         this.activity.update = true;
     }
 
@@ -81,17 +86,7 @@ class GridRenderer {
      */
     showPolar() {
         this.activity.polarBitmap.visible = true;
-        // Apply color filter based on theme
-        const isDarkMode = document.body.classList.contains("dark");
-        const isHighContrastMode = document.body.classList.contains("highcontrast");
-        if (isDarkMode || isHighContrastMode) {
-            const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-            this.activity.polarBitmap.filters = [invertFilter];
-        } else {
-            this.activity.polarBitmap.filters = [];
-        }
-        this.activity.polarBitmap.cache(0, 0, 1200, 900);
-        this.activity.polarBitmap.updateCache();
+        this._applyThemeFilter(this.activity.polarBitmap);
         this.activity.update = true;
     }
 
@@ -157,17 +152,7 @@ class GridRenderer {
      */
     showTreble() {
         this.activity.trebleBitmap.visible = true;
-        // Apply color filter based on theme
-        const isDarkMode = document.body.classList.contains("dark");
-        const isHighContrastMode = document.body.classList.contains("highcontrast");
-        if (isDarkMode || isHighContrastMode) {
-            const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-            this.activity.trebleBitmap.filters = [invertFilter];
-        } else {
-            this.activity.trebleBitmap.filters = [];
-        }
-        this.activity.trebleBitmap.cache(0, 0, 1200, 900);
-        this.activity.trebleBitmap.updateCache();
+        this._applyThemeFilter(this.activity.trebleBitmap);
         this.hideAccidentals();
 
         debugLog(this.activity.KeySignatureEnv[0] + " " + this.activity.KeySignatureEnv[1]);
@@ -230,17 +215,7 @@ class GridRenderer {
      */
     showGrand() {
         this.activity.grandBitmap.visible = true;
-        // Apply color filter based on theme
-        const isDarkMode = document.body.classList.contains("dark");
-        const isHighContrastMode = document.body.classList.contains("highcontrast");
-        if (isDarkMode || isHighContrastMode) {
-            const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-            this.activity.grandBitmap.filters = [invertFilter];
-        } else {
-            this.activity.grandBitmap.filters = [];
-        }
-        this.activity.grandBitmap.cache(0, 0, 1200, 900);
-        this.activity.grandBitmap.updateCache();
+        this._applyThemeFilter(this.activity.grandBitmap);
         this.hideAccidentals();
 
         debugLog(this.activity.KeySignatureEnv[0] + " " + this.activity.KeySignatureEnv[1]);
@@ -301,17 +276,7 @@ class GridRenderer {
      */
     showSoprano() {
         this.activity.sopranoBitmap.visible = true;
-        // Apply color filter based on theme
-        const isDarkMode = document.body.classList.contains("dark");
-        const isHighContrastMode = document.body.classList.contains("highcontrast");
-        if (isDarkMode || isHighContrastMode) {
-            const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-            this.activity.sopranoBitmap.filters = [invertFilter];
-        } else {
-            this.activity.sopranoBitmap.filters = [];
-        }
-        this.activity.sopranoBitmap.cache(0, 0, 1200, 900);
-        this.activity.sopranoBitmap.updateCache();
+        this._applyThemeFilter(this.activity.sopranoBitmap);
         this.hideAccidentals();
 
         debugLog(this.activity.KeySignatureEnv[0] + " " + this.activity.KeySignatureEnv[1]);
@@ -374,17 +339,7 @@ class GridRenderer {
      */
     showAlto() {
         this.activity.altoBitmap.visible = true;
-        // Apply color filter based on theme
-        const isDarkMode = document.body.classList.contains("dark");
-        const isHighContrastMode = document.body.classList.contains("highcontrast");
-        if (isDarkMode || isHighContrastMode) {
-            const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-            this.activity.altoBitmap.filters = [invertFilter];
-        } else {
-            this.activity.altoBitmap.filters = [];
-        }
-        this.activity.altoBitmap.cache(0, 0, 1200, 900);
-        this.activity.altoBitmap.updateCache();
+        this._applyThemeFilter(this.activity.altoBitmap);
         this.hideAccidentals();
 
         debugLog(this.activity.KeySignatureEnv[0] + " " + this.activity.KeySignatureEnv[1]);
@@ -446,17 +401,7 @@ class GridRenderer {
      */
     showTenor() {
         this.activity.tenorBitmap.visible = true;
-        // Apply color filter based on theme
-        const isDarkMode = document.body.classList.contains("dark");
-        const isHighContrastMode = document.body.classList.contains("highcontrast");
-        if (isDarkMode || isHighContrastMode) {
-            const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-            this.activity.tenorBitmap.filters = [invertFilter];
-        } else {
-            this.activity.tenorBitmap.filters = [];
-        }
-        this.activity.tenorBitmap.cache(0, 0, 1200, 900);
-        this.activity.tenorBitmap.updateCache();
+        this._applyThemeFilter(this.activity.tenorBitmap);
         this.hideAccidentals();
 
         debugLog(this.activity.KeySignatureEnv[0] + " " + this.activity.KeySignatureEnv[1]);
@@ -519,17 +464,7 @@ class GridRenderer {
      */
     showBass() {
         this.activity.bassBitmap.visible = true;
-        // Apply color filter based on theme
-        const isDarkMode = document.body.classList.contains("dark");
-        const isHighContrastMode = document.body.classList.contains("highcontrast");
-        if (isDarkMode || isHighContrastMode) {
-            const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-            this.activity.bassBitmap.filters = [invertFilter];
-        } else {
-            this.activity.bassBitmap.filters = [];
-        }
-        this.activity.bassBitmap.cache(0, 0, 1200, 900);
-        this.activity.bassBitmap.updateCache();
+        this._applyThemeFilter(this.activity.bassBitmap);
         this.hideAccidentals();
 
         debugLog(this.activity.KeySignatureEnv[0] + " " + this.activity.KeySignatureEnv[1]);
@@ -579,31 +514,30 @@ class GridRenderer {
 // into the renderer. Arrow wrappers preserve context regardless of how
 // the activity properties are invoked by callers.
 //
-// Must be called after activity._createGrid() has populated all bitmap
-// fields (i.e., after the bitmap-init block in setupDependencies()).
+// Must be called after grid bitmaps have been initialized.
 //
 // @param {object} activity - The Activity instance.
 const setupGridRenderer = activity => {
     const renderer = new GridRenderer(activity);
     activity.gridRenderer = renderer;
 
-    activity._hideCartesian = (...args) => renderer.hideCartesian(...args);
-    activity._showCartesian = (...args) => renderer.showCartesian(...args);
-    activity._hidePolar = (...args) => renderer.hidePolar(...args);
-    activity._showPolar = (...args) => renderer.showPolar(...args);
-    activity._hideAccidentals = (...args) => renderer.hideAccidentals(...args);
-    activity._hideTreble = (...args) => renderer.hideTreble(...args);
-    activity._showTreble = (...args) => renderer.showTreble(...args);
-    activity._hideGrand = (...args) => renderer.hideGrand(...args);
-    activity._showGrand = (...args) => renderer.showGrand(...args);
-    activity._hideSoprano = (...args) => renderer.hideSoprano(...args);
-    activity._showSoprano = (...args) => renderer.showSoprano(...args);
-    activity._hideAlto = (...args) => renderer.hideAlto(...args);
-    activity._showAlto = (...args) => renderer.showAlto(...args);
-    activity._hideTenor = (...args) => renderer.hideTenor(...args);
-    activity._showTenor = (...args) => renderer.showTenor(...args);
-    activity._hideBass = (...args) => renderer.hideBass(...args);
-    activity._showBass = (...args) => renderer.showBass(...args);
+    activity._hideCartesian = () => renderer.hideCartesian();
+    activity._showCartesian = () => renderer.showCartesian();
+    activity._hidePolar = () => renderer.hidePolar();
+    activity._showPolar = () => renderer.showPolar();
+    activity._hideAccidentals = () => renderer.hideAccidentals();
+    activity._hideTreble = () => renderer.hideTreble();
+    activity._showTreble = () => renderer.showTreble();
+    activity._hideGrand = () => renderer.hideGrand();
+    activity._showGrand = () => renderer.showGrand();
+    activity._hideSoprano = () => renderer.hideSoprano();
+    activity._showSoprano = () => renderer.showSoprano();
+    activity._hideAlto = () => renderer.hideAlto();
+    activity._showAlto = () => renderer.showAlto();
+    activity._hideTenor = () => renderer.hideTenor();
+    activity._showTenor = () => renderer.showTenor();
+    activity._hideBass = () => renderer.hideBass();
+    activity._showBass = () => renderer.showBass();
 };
 
 // All browser execution goes through RequireJS (AMD). The module.exports branch
@@ -611,11 +545,6 @@ const setupGridRenderer = activity => {
 // runtime in the browser.
 if (typeof define === "function" && define.amd) {
     define(function () {
-        // Expose setupGridRenderer as a browser global so that activity.js
-        // can reference it via its /* global setupGridRenderer */ comment.
-        // GridRenderer is not assigned to window because it is only
-        // instantiated internally by setupGridRenderer and is never accessed
-        // directly from other scripts.
         window.setupGridRenderer = setupGridRenderer;
         return { setupGridRenderer, GridRenderer };
     });
