@@ -106,6 +106,33 @@ If AI tools were used while preparing a pull request:
 AI tools should assist development, but they should not replace
 understanding of the codebase.
 
+### Developer Certificate of Origin (DCO)
+
+All commits must include a `Signed-off-by` line certifying that you
+wrote the contribution or have the right to submit it under the
+project's license.
+
+Add it automatically with the `-s` flag:
+
+```bash
+git commit -s -m "your commit message"
+```
+
+This appends the following line to your commit message:
+
+```
+Signed-off-by: Your Name <your@email.com>
+```
+
+To add a sign-off to your most recent commit:
+
+```bash
+git commit --amend -s --no-edit
+```
+
+A DCO status check runs on every pull request and will fail if any
+commit is missing the `Signed-off-by` line.
+
 ### Before You Push
 
 Run these commands locally before submitting a PR:
