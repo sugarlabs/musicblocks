@@ -2537,6 +2537,110 @@ class Activity {
         };
 
         /**
+         * Initialize an idle watcher that throttles the application's framerate
+         * when the application is inactive and no music is playing.
+         * This significantly reduces CPU usage and improves battery life.
+         *
+         * Listeners and intervals are properly cleaned up via stopIdleWatcher()
+         * to prevent accumulation on re-initialization.
+         */
+        this._initIdleWatcher = () => {
+            // Ensure any prior idle watcher is cleaned up before reinitializing
+            this._stopIdleWatcher();
+
+            const IDLE_THRESHOLD = 5000; // 5 seconds
+            const ACTIVE_RESET_INTERVAL = 500;
+            const ACTIVE_FPS = 60;
+            const IDLE_FPS = 1;
+            const idleEvents = ["mousemove", "mousedown", "keydown", "touchstart", "wheel"];
+
+            if (this._idleWatcherResetHandler) {
+                idleEvents.forEach(eventType => {
+                    window.removeEventListener(eventType, this._idleWatcherResetHandler);
+                });
+            }
+
+            if (this._idleWatcherIntervalId) {
+                clearInterval(this._idleWatcherIntervalId);
+                this._idleWatcherIntervalId = null;
+            }
+
+            let lastActivity = Date.now();
+            let lastIdleReset = lastActivity;
+            this.isAppIdle = false;
+
+            // Prevent duplicate intervals
+            if (this._idleWatcherIntervalId) {
+                clearInterval(this._idleWatcherIntervalId);
+            }
+
+            // Wake up function - restores full framerate
+            // Stored as instance property for cleanup
+            this._resetIdleTimer = () => {
+                const now = Date.now();
+                if (!this.isAppIdle && now - lastIdleReset < ACTIVE_RESET_INTERVAL) {
+                    return;
+                }
+
+                lastActivity = now;
+                lastIdleReset = now;
+                if (this.isAppIdle) {
+                    this.isAppIdle = false;
+                    createjs.Ticker.framerate = ACTIVE_FPS;
+                    // Force immediate redraw for responsiveness
+                    this.stageDirty = true;
+                }
+            };
+
+            // Track user activity using managed addEventListener for proper cleanup
+            this.addEventListener(window, "mousemove", this._resetIdleTimer);
+            this.addEventListener(window, "mousedown", this._resetIdleTimer);
+            this.addEventListener(window, "keydown", this._resetIdleTimer);
+            this.addEventListener(window, "touchstart", this._resetIdleTimer);
+            this.addEventListener(window, "wheel", this._resetIdleTimer, { passive: true });
+
+            // Periodic check for idle state - store interval ID for cleanup
+            this._idleWatcherInterval = setInterval(() => {
+                // Check if music/code is playing
+                const isMusicPlaying = this.logo?._alreadyRunning || false;
+
+                if (!isMusicPlaying && Date.now() - lastActivity > IDLE_THRESHOLD) {
+                    if (!this.isAppIdle) {
+                        this.isAppIdle = true;
+                        createjs.Ticker.framerate = IDLE_FPS;
+                        debugLog("⚡ Idle mode: Throttling to 1 FPS to save battery");
+                    }
+                } else if (this.isAppIdle && isMusicPlaying) {
+                    // Music started playing - wake up immediately
+                    this._resetIdleTimer();
+                }
+            }, 1000);
+        };
+
+        /**
+         * Stop the idle watcher and clean up its listeners and interval.
+         * Called during Activity lifecycle teardown to prevent listener/interval accumulation.
+         * It is safe to call this method even if the idle watcher was never started.
+         */
+        this._stopIdleWatcher = () => {
+            // Clear the periodic interval
+            if (typeof this._idleWatcherInterval !== "undefined") {
+                clearInterval(this._idleWatcherInterval);
+                this._idleWatcherInterval = undefined;
+            }
+
+            // Remove event listeners if they were registered
+            if (typeof this._resetIdleTimer === "function") {
+                this.removeEventListener(window, "mousemove", this._resetIdleTimer);
+                this.removeEventListener(window, "mousedown", this._resetIdleTimer);
+                this.removeEventListener(window, "keydown", this._resetIdleTimer);
+                this.removeEventListener(window, "touchstart", this._resetIdleTimer);
+                this.removeEventListener(window, "wheel", this._resetIdleTimer);
+                this._resetIdleTimer = undefined;
+            }
+        };
+
+        /**
          * Renders an error message with appropriate artwork.
          * @param {string} name - The name specifying the SVG to be rendered.
          */
