@@ -102,49 +102,48 @@ class SaveInterface {
             _("Project Code") +
             "</h4>" +
             _("This code stores data about the blocks in a project.") +
-            '<a href="#" onclick="toggle(); return false;" id="showhide">' +
+            '<a href="#" id="showhide">' +
             STR_SHOW +
             "</a>" +
-            '<button class="btn" onclick="copyCode()" style="margin-left: 10px;">' +
+            '<button class="btn" id="copyCodeBtn" style="margin-left: 10px;">' +
             _("Copy to Clipboard") +
             "</button>" +
             '</div> <div class="code" id="codeBlock">{{ data }}</div></div></div></div>' +
             '<script type="text/javascript">' +
-            "function toggle() {" +
-            '  var codeBlock = document.getElementsByClassName("code")[0];' +
-            '  var showHideButton = document.getElementById("showhide");' +
-            '  if (codeBlock.style.display === "none") {' +
-            '    codeBlock.style.display = "flex";' +
-            '    showHideButton.textContent = "' +
-            STR_HIDE +
-            '";' +
-            "  } else {" +
-            '    codeBlock.style.display = "none";' +
-            '    showHideButton.textContent = "' +
-            STR_SHOW +
-            '";' +
-            "  }" +
-            "}" +
             'window.addEventListener("load", function() {' +
             '  var codeBlock = document.getElementById("codeBlock");' +
             '  var showHideButton = document.getElementById("showhide");' +
+            '  showHideButton.addEventListener("click", function(e) {' +
+            '    e.preventDefault();' +
+            '    if (codeBlock.style.display === "none") {' +
+            '      codeBlock.style.display = "flex";' +
+            '      showHideButton.textContent = "' +
+            STR_HIDE +
+            '";' +
+            '    } else {' +
+            '      codeBlock.style.display = "none";' +
+            '      showHideButton.textContent = "' +
+            STR_SHOW +
+            '";' +
+            "    }" +
+            '  });' +
             '  codeBlock.style.display = "none";' +
             '  showHideButton.textContent = "' +
             STR_SHOW +
             '";' +
-            "});" +
-            "function copyCode() {" +
-            '  var text = document.getElementById("codeBlock").innerText;' +
-            "  navigator.clipboard.writeText(text).then(function() {" +
-            '    alert("' +
+            '  document.getElementById("copyCodeBtn").addEventListener("click", function() {' +
+            '    var text = document.getElementById("codeBlock").innerText;' +
+            "    navigator.clipboard.writeText(text).then(function() {" +
+            '      alert("' +
             _("Project code copied to clipboard!") +
             '");' +
-            "  }).catch(function() {" +
-            '    alert("' +
+            "    }).catch(function() {" +
+            '      alert("' +
             _("Failed to copy.") +
             '");' +
+            "    });" +
             "  });" +
-            "}" +
+            "});" +
             "</script>";
 
         this.timeLastSaved = -100;
