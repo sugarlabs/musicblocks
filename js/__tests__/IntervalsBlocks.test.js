@@ -103,6 +103,11 @@ global.Singer = {
     }
 };
 
+global.ErrorHandler = {
+    warn: jest.fn(),
+    error: jest.fn()
+};
+
 const { setupIntervalsBlocks } = require("../blocks/IntervalsBlocks.js");
 
 function makeTurSinger(overrides = {}) {
