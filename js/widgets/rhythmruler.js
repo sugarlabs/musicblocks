@@ -1270,7 +1270,8 @@ class RhythmRuler {
 
         this._rulerSelected = cell.parentNode.getAttribute("data-row");
         if (this._progressBar) this._progressBar.remove();
-        this._tapCell.innerHTML = "";
+        // Use textContent to safely clear content instead of innerHTML
+        this._tapCell.textContent = "";
 
         const d = new Date();
         this._tapTimes.push(d.getTime());

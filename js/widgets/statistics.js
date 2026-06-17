@@ -54,7 +54,8 @@ class StatsWindow {
         }
 
         this.widgetWindow.onmaximize = () => {
-            this.widgetWindow.getWidgetBody().innerHTML = "";
+            // Use textContent to safely clear content instead of innerHTML
+            this.widgetWindow.getWidgetBody().textContent = "";
             if (this.widgetWindow.isMaximized()) {
                 this.widgetWindow.getWidgetBody().style.display = "flex";
                 this.widgetWindow.getWidgetBody().style.justifyContent = "space-between";
