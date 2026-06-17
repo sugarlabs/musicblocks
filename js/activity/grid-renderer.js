@@ -13,6 +13,44 @@
 
 /* exported setupGridRenderer, GridRenderer */
 
+const GRID_WIDTH = 1200;
+const GRID_HEIGHT = 900;
+const ACCIDENTAL_X_OFFSET = 600;
+const ACCIDENTAL_SPACING = 15;
+
+let SHARPS = null;
+let FLATS = null;
+
+const getSharps = () => {
+    if (!SHARPS) {
+        SHARPS = [
+            "F" + SHARP,
+            "C" + SHARP,
+            "G" + SHARP,
+            "D" + SHARP,
+            "A" + SHARP,
+            "E" + SHARP,
+            "B" + SHARP
+        ];
+    }
+    return SHARPS;
+};
+
+const getFlats = () => {
+    if (!FLATS) {
+        FLATS = [
+            "B" + FLAT,
+            "E" + FLAT,
+            "A" + FLAT,
+            "D" + FLAT,
+            "G" + FLAT,
+            "C" + FLAT,
+            "F" + FLAT
+        ];
+    }
+    return FLATS;
+};
+
 // Owns the EaselJS drawing layer for every grid overlay (Cartesian, Polar,
 // and all musical staff types). It reads bitmap state from the activity
 // instance and mutates only visibility, filters, and cache — never
@@ -42,8 +80,58 @@ class GridRenderer {
         } else {
             bitmap.filters = [];
         }
-        bitmap.cache(0, 0, 1200, 900);
+        bitmap.cache(0, 0, GRID_WIDTH, GRID_HEIGHT);
         bitmap.updateCache();
+    }
+
+    /*
+     * Triggers the EaselJS stage update flag on the activity instance.
+     */
+    _requestUpdate() {
+        this.activity.update = true;
+    }
+
+    /*
+     * Common logic to display any musical staff grid.
+     */
+    _showStaff(staffBitmap, sharpBitmaps, flatBitmaps) {
+        staffBitmap.visible = true;
+        this._applyThemeFilter(staffBitmap);
+        this.hideAccidentals();
+
+        debugLog(this.activity.KeySignatureEnv[0] + " " + this.activity.KeySignatureEnv[1]);
+        const scale = buildScale(
+            this.activity.KeySignatureEnv[0] + " " + this.activity.KeySignatureEnv[1]
+        )[0];
+
+        debugLog(scale);
+
+        const sharps = getSharps();
+        const flats = getFlats();
+        let dx = 0;
+        for (let i = 0; i < 7; i++) {
+            if (scale.includes(sharps[i])) {
+                sharpBitmaps[i].x += dx;
+                sharpBitmaps[i].visible = true;
+                dx += ACCIDENTAL_SPACING;
+            }
+            if (scale.includes(flats[i])) {
+                flatBitmaps[i].x += dx;
+                flatBitmaps[i].visible = true;
+                dx += ACCIDENTAL_SPACING;
+            }
+        }
+        this._requestUpdate();
+    }
+
+    /*
+     * Common logic to hide any musical staff grid.
+     */
+    _hideStaff(staffBitmap) {
+        staffBitmap.visible = false;
+        staffBitmap.uncache();
+        this.hideAccidentals();
+        this._requestUpdate();
     }
 
     // -------------------------------------------------------------------------
@@ -56,7 +144,7 @@ class GridRenderer {
     hideCartesian() {
         this.activity.cartesianBitmap.visible = false;
         this.activity.cartesianBitmap.uncache();
-        this.activity.update = true;
+        this._requestUpdate();
     }
 
     /*
@@ -65,7 +153,7 @@ class GridRenderer {
     showCartesian() {
         this.activity.cartesianBitmap.visible = true;
         this._applyThemeFilter(this.activity.cartesianBitmap);
-        this.activity.update = true;
+        this._requestUpdate();
     }
 
     // -------------------------------------------------------------------------
@@ -78,7 +166,7 @@ class GridRenderer {
     hidePolar() {
         this.activity.polarBitmap.visible = false;
         this.activity.polarBitmap.uncache();
-        this.activity.update = true;
+        this._requestUpdate();
     }
 
     /*
@@ -87,7 +175,7 @@ class GridRenderer {
     showPolar() {
         this.activity.polarBitmap.visible = true;
         this._applyThemeFilter(this.activity.polarBitmap);
-        this.activity.update = true;
+        this._requestUpdate();
     }
 
     // -------------------------------------------------------------------------
@@ -98,7 +186,9 @@ class GridRenderer {
      * Hides accidentals
      */
     hideAccidentals() {
-        const newX = this.activity.canvas.width / (2 * this.activity.turtleBlocksScale) - 600;
+        const newX =
+            this.activity.canvas.width / (2 * this.activity.turtleBlocksScale) -
+            ACCIDENTAL_X_OFFSET;
         for (let i = 0; i < 7; i++) {
             this.activity.grandSharpBitmap[i].visible = false;
             this.activity.grandSharpBitmap[i].x = newX;
@@ -130,7 +220,7 @@ class GridRenderer {
             this.activity.bassFlatBitmap[i].visible = false;
             this.activity.bassFlatBitmap[i].x = newX;
         }
-        this.activity.update = true;
+        this._requestUpdate();
     }
 
     // -------------------------------------------------------------------------
@@ -141,59 +231,18 @@ class GridRenderer {
      * Hides musical treble staff
      */
     hideTreble() {
-        this.activity.trebleBitmap.visible = false;
-        this.activity.trebleBitmap.uncache();
-        this.hideAccidentals();
-        this.activity.update = true;
+        this._hideStaff(this.activity.trebleBitmap);
     }
 
     /*
      * Shows musical treble staff
      */
     showTreble() {
-        this.activity.trebleBitmap.visible = true;
-        this._applyThemeFilter(this.activity.trebleBitmap);
-        this.hideAccidentals();
-
-        debugLog(this.activity.KeySignatureEnv[0] + " " + this.activity.KeySignatureEnv[1]);
-        const scale = buildScale(
-            this.activity.KeySignatureEnv[0] + " " + this.activity.KeySignatureEnv[1]
-        )[0];
-
-        debugLog(scale);
-        const _sharps = [
-            "F" + SHARP,
-            "C" + SHARP,
-            "G" + SHARP,
-            "D" + SHARP,
-            "A" + SHARP,
-            "E" + SHARP,
-            "B" + SHARP
-        ];
-        const _flats = [
-            "B" + FLAT,
-            "E" + FLAT,
-            "A" + FLAT,
-            "D" + FLAT,
-            "G" + FLAT,
-            "C" + FLAT,
-            "F" + FLAT
-        ];
-        let dx = 0;
-        for (let i = 0; i < 7; i++) {
-            if (scale.includes(_sharps[i])) {
-                this.activity.trebleSharpBitmap[i].x += dx;
-                this.activity.trebleSharpBitmap[i].visible = true;
-                dx += 15;
-            }
-            if (scale.includes(_flats[i])) {
-                this.activity.trebleFlatBitmap[i].x += dx;
-                this.activity.trebleFlatBitmap[i].visible = true;
-                dx += 15;
-            }
-        }
-
-        this.activity.update = true;
+        this._showStaff(
+            this.activity.trebleBitmap,
+            this.activity.trebleSharpBitmap,
+            this.activity.trebleFlatBitmap
+        );
     }
 
     // -------------------------------------------------------------------------
@@ -204,58 +253,18 @@ class GridRenderer {
      * Hides musical grand staff
      */
     hideGrand() {
-        this.activity.grandBitmap.visible = false;
-        this.activity.grandBitmap.uncache();
-        this.hideAccidentals();
-        this.activity.update = true;
+        this._hideStaff(this.activity.grandBitmap);
     }
 
     /*
      * Shows musical grand staff
      */
     showGrand() {
-        this.activity.grandBitmap.visible = true;
-        this._applyThemeFilter(this.activity.grandBitmap);
-        this.hideAccidentals();
-
-        debugLog(this.activity.KeySignatureEnv[0] + " " + this.activity.KeySignatureEnv[1]);
-        const scale = buildScale(
-            this.activity.KeySignatureEnv[0] + " " + this.activity.KeySignatureEnv[1]
-        )[0];
-
-        debugLog(scale);
-        const _sharps = [
-            "F" + SHARP,
-            "C" + SHARP,
-            "G" + SHARP,
-            "D" + SHARP,
-            "A" + SHARP,
-            "E" + SHARP,
-            "B" + SHARP
-        ];
-        const _flats = [
-            "B" + FLAT,
-            "E" + FLAT,
-            "A" + FLAT,
-            "D" + FLAT,
-            "G" + FLAT,
-            "C" + FLAT,
-            "F" + FLAT
-        ];
-        let dx = 0;
-        for (let i = 0; i < 7; i++) {
-            if (scale.includes(_sharps[i])) {
-                this.activity.grandSharpBitmap[i].x += dx;
-                this.activity.grandSharpBitmap[i].visible = true;
-                dx += 15;
-            }
-            if (scale.includes(_flats[i])) {
-                this.activity.grandFlatBitmap[i].x += dx;
-                this.activity.grandFlatBitmap[i].visible = true;
-                dx += 15;
-            }
-        }
-        this.activity.update = true;
+        this._showStaff(
+            this.activity.grandBitmap,
+            this.activity.grandSharpBitmap,
+            this.activity.grandFlatBitmap
+        );
     }
 
     // -------------------------------------------------------------------------
@@ -266,58 +275,18 @@ class GridRenderer {
      * Hides musical soprano staff
      */
     hideSoprano() {
-        this.activity.sopranoBitmap.visible = false;
-        this.activity.sopranoBitmap.uncache();
-        this.activity.update = true;
+        this._hideStaff(this.activity.sopranoBitmap);
     }
 
     /*
      * Shows musical soprano staff
      */
     showSoprano() {
-        this.activity.sopranoBitmap.visible = true;
-        this._applyThemeFilter(this.activity.sopranoBitmap);
-        this.hideAccidentals();
-
-        debugLog(this.activity.KeySignatureEnv[0] + " " + this.activity.KeySignatureEnv[1]);
-        const scale = buildScale(
-            this.activity.KeySignatureEnv[0] + " " + this.activity.KeySignatureEnv[1]
-        )[0];
-
-        debugLog(scale);
-        const _sharps = [
-            "F" + SHARP,
-            "C" + SHARP,
-            "G" + SHARP,
-            "D" + SHARP,
-            "A" + SHARP,
-            "E" + SHARP,
-            "B" + SHARP
-        ];
-        const _flats = [
-            "B" + FLAT,
-            "E" + FLAT,
-            "A" + FLAT,
-            "D" + FLAT,
-            "G" + FLAT,
-            "C" + FLAT,
-            "F" + FLAT
-        ];
-        let dx = 0;
-        for (let i = 0; i < 7; i++) {
-            if (scale.includes(_sharps[i])) {
-                this.activity.sopranoSharpBitmap[i].x += dx;
-                this.activity.sopranoSharpBitmap[i].visible = true;
-                dx += 15;
-            }
-            if (scale.includes(_flats[i])) {
-                this.activity.sopranoFlatBitmap[i].x += dx;
-                this.activity.sopranoFlatBitmap[i].visible = true;
-                dx += 15;
-            }
-        }
-
-        this.activity.update = true;
+        this._showStaff(
+            this.activity.sopranoBitmap,
+            this.activity.sopranoSharpBitmap,
+            this.activity.sopranoFlatBitmap
+        );
     }
 
     // -------------------------------------------------------------------------
@@ -328,59 +297,18 @@ class GridRenderer {
      * Hides musical alto staff
      */
     hideAlto() {
-        this.activity.altoBitmap.visible = false;
-        this.activity.altoBitmap.uncache();
-        this.hideAccidentals();
-        this.activity.update = true;
+        this._hideStaff(this.activity.altoBitmap);
     }
 
     /*
      * Shows musical alto staff
      */
     showAlto() {
-        this.activity.altoBitmap.visible = true;
-        this._applyThemeFilter(this.activity.altoBitmap);
-        this.hideAccidentals();
-
-        debugLog(this.activity.KeySignatureEnv[0] + " " + this.activity.KeySignatureEnv[1]);
-        const scale = buildScale(
-            this.activity.KeySignatureEnv[0] + " " + this.activity.KeySignatureEnv[1]
-        )[0];
-
-        debugLog(scale);
-        const _sharps = [
-            "F" + SHARP,
-            "C" + SHARP,
-            "G" + SHARP,
-            "D" + SHARP,
-            "A" + SHARP,
-            "E" + SHARP,
-            "B" + SHARP
-        ];
-        const _flats = [
-            "B" + FLAT,
-            "E" + FLAT,
-            "A" + FLAT,
-            "D" + FLAT,
-            "G" + FLAT,
-            "C" + FLAT,
-            "F" + FLAT
-        ];
-        let dx = 0;
-        for (let i = 0; i < 7; i++) {
-            if (scale.includes(_sharps[i])) {
-                this.activity.altoSharpBitmap[i].x += dx;
-                this.activity.altoSharpBitmap[i].visible = true;
-                dx += 15;
-            }
-            if (scale.includes(_flats[i])) {
-                this.activity.altoFlatBitmap[i].x += dx;
-                this.activity.altoFlatBitmap[i].visible = true;
-                dx += 15;
-            }
-        }
-
-        this.activity.update = true;
+        this._showStaff(
+            this.activity.altoBitmap,
+            this.activity.altoSharpBitmap,
+            this.activity.altoFlatBitmap
+        );
     }
 
     // -------------------------------------------------------------------------
@@ -391,58 +319,18 @@ class GridRenderer {
      * Hides musical tenor staff
      */
     hideTenor() {
-        this.activity.tenorBitmap.visible = false;
-        this.activity.tenorBitmap.uncache();
-        this.activity.update = true;
+        this._hideStaff(this.activity.tenorBitmap);
     }
 
     /*
      * Shows musical tenor staff
      */
     showTenor() {
-        this.activity.tenorBitmap.visible = true;
-        this._applyThemeFilter(this.activity.tenorBitmap);
-        this.hideAccidentals();
-
-        debugLog(this.activity.KeySignatureEnv[0] + " " + this.activity.KeySignatureEnv[1]);
-        const scale = buildScale(
-            this.activity.KeySignatureEnv[0] + " " + this.activity.KeySignatureEnv[1]
-        )[0];
-
-        debugLog(scale);
-        const _sharps = [
-            "F" + SHARP,
-            "C" + SHARP,
-            "G" + SHARP,
-            "D" + SHARP,
-            "A" + SHARP,
-            "E" + SHARP,
-            "B" + SHARP
-        ];
-        const _flats = [
-            "B" + FLAT,
-            "E" + FLAT,
-            "A" + FLAT,
-            "D" + FLAT,
-            "G" + FLAT,
-            "C" + FLAT,
-            "F" + FLAT
-        ];
-        let dx = 0;
-        for (let i = 0; i < 7; i++) {
-            if (scale.includes(_sharps[i])) {
-                this.activity.tenorSharpBitmap[i].x += dx;
-                this.activity.tenorSharpBitmap[i].visible = true;
-                dx += 15;
-            }
-            if (scale.includes(_flats[i])) {
-                this.activity.tenorFlatBitmap[i].x += dx;
-                this.activity.tenorFlatBitmap[i].visible = true;
-                dx += 15;
-            }
-        }
-
-        this.activity.update = true;
+        this._showStaff(
+            this.activity.tenorBitmap,
+            this.activity.tenorSharpBitmap,
+            this.activity.tenorFlatBitmap
+        );
     }
 
     // -------------------------------------------------------------------------
@@ -453,59 +341,18 @@ class GridRenderer {
      * Hides musical bass staff
      */
     hideBass() {
-        this.activity.bassBitmap.visible = false;
-        this.activity.bassBitmap.uncache();
-        this.hideAccidentals();
-        this.activity.update = true;
+        this._hideStaff(this.activity.bassBitmap);
     }
 
     /*
      * Shows musical bass staff
      */
     showBass() {
-        this.activity.bassBitmap.visible = true;
-        this._applyThemeFilter(this.activity.bassBitmap);
-        this.hideAccidentals();
-
-        debugLog(this.activity.KeySignatureEnv[0] + " " + this.activity.KeySignatureEnv[1]);
-        const scale = buildScale(
-            this.activity.KeySignatureEnv[0] + " " + this.activity.KeySignatureEnv[1]
-        )[0];
-
-        debugLog(scale);
-        const _sharps = [
-            "F" + SHARP,
-            "C" + SHARP,
-            "G" + SHARP,
-            "D" + SHARP,
-            "A" + SHARP,
-            "E" + SHARP,
-            "B" + SHARP
-        ];
-        const _flats = [
-            "B" + FLAT,
-            "E" + FLAT,
-            "A" + FLAT,
-            "D" + FLAT,
-            "G" + FLAT,
-            "C" + FLAT,
-            "F" + FLAT
-        ];
-        let dx = 0;
-        for (let i = 0; i < 7; i++) {
-            if (scale.includes(_sharps[i])) {
-                this.activity.bassSharpBitmap[i].x += dx;
-                this.activity.bassSharpBitmap[i].visible = true;
-                dx += 15;
-            }
-            if (scale.includes(_flats[i])) {
-                this.activity.bassFlatBitmap[i].x += dx;
-                this.activity.bassFlatBitmap[i].visible = true;
-                dx += 15;
-            }
-        }
-
-        this.activity.update = true;
+        this._showStaff(
+            this.activity.bassBitmap,
+            this.activity.bassSharpBitmap,
+            this.activity.bassFlatBitmap
+        );
     }
 }
 
