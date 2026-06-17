@@ -22,6 +22,11 @@
 
 const { setupIntervalsBlocks } = require("../IntervalsBlocks");
 
+global.ErrorHandler = {
+    warn: jest.fn(),
+    error: jest.fn()
+};
+
 describe("setupIntervalsBlocks", () => {
     let activity;
     let logo;
