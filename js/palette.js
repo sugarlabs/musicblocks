@@ -1579,9 +1579,9 @@ class Palette {
             this._outsideClickListener = null;
         };
         // Delay attachment to avoid capturing the opening click
-        setTimeout(() => {
+        requestAnimationFrame(() => {
             document.addEventListener("click", this._outsideClickListener);
-        }, 0);
+        });
     }
 
     _hideMenuItems() {

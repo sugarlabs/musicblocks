@@ -76,7 +76,7 @@ class HelpWidget {
         window.requestAnimationFrame(() => this._setup(useActiveBlock, 0));
 
         // Position center
-        setTimeout(this.widgetWindow.sendToCenter, 50);
+        requestAnimationFrame(() => this.widgetWindow.sendToCenter());
     }
 
     /**
