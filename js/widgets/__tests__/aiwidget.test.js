@@ -769,7 +769,6 @@ describe("AIWidget Instance", () => {
 
         expect(pauseSpy).toHaveBeenCalledTimes(1);
         expect(aiWidget.isMoving).toBe(false);
-        // Verify button was updated using appendChild instead of innerHTML
         expect(playButton.textContent).toBe("");
         expect(playButton.appendChild).toHaveBeenCalled();
     });

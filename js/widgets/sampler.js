@@ -210,7 +210,6 @@ function SampleWidget() {
      * @returns {void}
      */
     this.pause = function () {
-        // Use createElement to safely update button icon
         const playImg = document.createElement("img");
         playImg.src = "header-icons/play-button.svg";
         playImg.title = _("Play");
@@ -228,7 +227,6 @@ function SampleWidget() {
      * @returns {void}
      */
     this.resume = function () {
-        // Use createElement to safely update button icon
         const pauseImg = document.createElement("img");
         pauseImg.src = "header-icons/pause-button.svg";
         pauseImg.title = _("Pause");
@@ -1883,8 +1881,6 @@ function SampleWidget() {
             width = this.widgetWindow.getWidgetBody().getBoundingClientRect().width;
             height = this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 70;
         }
-        // Note: Canvas elements don't have innerHTML - this line has no effect
-        // Keeping for compatibility, but canvas is cleared by makeCanvas() below
         // Cancel any existing RAF loop for this canvas before creating a new one
         // to prevent multiple concurrent draw loops accumulating on resize/maximize.
         if (this.drawVisualIDs[0]) {

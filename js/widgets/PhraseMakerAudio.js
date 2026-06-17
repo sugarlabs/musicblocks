@@ -359,7 +359,6 @@ const PhraseMakerAudio = {
                         pm._("Play")
                     );
                     pm.playingNow = false;
-                    // Use createElement to safely update button icon
                     const playImg = document.createElement("img");
                     playImg.src = "header-icons/play-button.svg";
                     playImg.title = pm._("Play");

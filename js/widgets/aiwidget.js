@@ -128,7 +128,6 @@ function AIWidget() {
      * @returns {void}
      */
     this.resume = function () {
-        // Use createElement to safely update button icon
         const pauseImg = document.createElement("img");
         pauseImg.src = "header-icons/pause-button.svg";
         pauseImg.title = _("Pause");
@@ -768,7 +767,6 @@ function AIWidget() {
         this.playBtn.onclick = () => {
             if (this.isMoving) {
                 this.pause();
-                // Use createElement to safely update button icon
                 const playImg = document.createElement("img");
                 playImg.src = "header-icons/play-button.svg";
                 playImg.title = _("Play");
