@@ -81,7 +81,6 @@ class GridRenderer {
             bitmap.filters = [];
         }
         bitmap.cache(0, 0, GRID_WIDTH, GRID_HEIGHT);
-        bitmap.updateCache();
     }
 
     /*
@@ -220,7 +219,6 @@ class GridRenderer {
             this.activity.bassFlatBitmap[i].visible = false;
             this.activity.bassFlatBitmap[i].x = newX;
         }
-        this._requestUpdate();
     }
 
     // -------------------------------------------------------------------------
@@ -372,7 +370,10 @@ const setupGridRenderer = activity => {
     activity._showCartesian = () => renderer.showCartesian();
     activity._hidePolar = () => renderer.hidePolar();
     activity._showPolar = () => renderer.showPolar();
-    activity._hideAccidentals = () => renderer.hideAccidentals();
+    activity._hideAccidentals = () => {
+        renderer.hideAccidentals();
+        renderer._requestUpdate();
+    };
     activity._hideTreble = () => renderer.hideTreble();
     activity._showTreble = () => renderer.showTreble();
     activity._hideGrand = () => renderer.hideGrand();
