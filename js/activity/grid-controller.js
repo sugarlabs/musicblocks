@@ -163,9 +163,12 @@ class GridController {
 /**
  * Attaches a GridController instance and its public surface to the activity.
  *
- * Call this AFTER `activity.turtles` has been initialised so that
- * doCartesianPolar() can be invoked without guards. hideGrids() is safe to
- * call at any time because it guards the setGridLabel call internally.
+ * Intended to be called after `activity.turtles` has been initialised so that
+ * doCartesianPolar() has access to the turtles state it needs. doCartesianPolar()
+ * still guards against a missing turtles reference as a safety net, but callers
+ * should not rely on that guard for normal startup flow.
+ * hideGrids() is safe to call at any time; it guards the setGridLabel call
+ * internally.
  *
  * @param {object} activity - The Activity instance.
  */
@@ -178,7 +181,12 @@ const setupGridController = activity => {
             ? activity._THIS_IS_MUSIC_BLOCKS_
             : typeof _THIS_IS_MUSIC_BLOCKS_ !== "undefined"
               ? _THIS_IS_MUSIC_BLOCKS_
-              : true;
+              : // Default to Music Blocks mode. This matches the expected production
+                // environment and avoids silently stripping music-specific grid
+                // overlays (Treble, Grand, etc.) if both sources are unexpectedly
+                // absent. A missing flag is far more likely to be a loader issue
+                // than an intentional Turtle Blocks run.
+                true;
 
     const controller = new GridController(activity, isMusicBlocks);
     activity.gridController = controller;
@@ -196,8 +204,12 @@ const setupGridController = activity => {
 // runtime in the browser.
 if (typeof define === "function" && define.amd) {
     define(function () {
+        // Expose setupGridController as a browser global so that activity.js
+        // can reference it via its /* global setupGridController */ comment.
+        // GridController is not assigned to window because it is only
+        // instantiated internally by setupGridController and is never accessed
+        // directly from other scripts.
         window.setupGridController = setupGridController;
-        window.GridController = GridController;
         return { setupGridController, GridController };
     });
 } else if (typeof module !== "undefined" && module.exports) {

@@ -16,7 +16,8 @@ export default [
             "**/*.min.js",
             "**/bower_components/**",
             "**/planet/libs/**",
-            "**/sounds/**"
+            "**/sounds/**",
+            "**/scratch/**"
         ]
     },
 
