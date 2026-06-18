@@ -450,7 +450,7 @@ function AIDebuggerWidget() {
             .catch(error => {
                 this._hideTypingIndicator();
                 this._isProcessing = false;
-                console.error("Backend connection error:", error.message);
+                console.error("Backend connection error:", error);
 
                 this.activity.textMsg(_("Server error: Unable to connect to AI backend."));
 
@@ -723,7 +723,7 @@ function AIDebuggerWidget() {
             })
             .catch(error => {
                 this._hideTypingIndicator();
-                console.error("Backend initialization error:", error.message);
+                console.error("Backend initialization error:", error);
                 this.activity.textMsg(_("Server error: Failed to initialize AI debugger."));
 
                 if (error instanceof TypeError && error.message.includes("fetch")) {
