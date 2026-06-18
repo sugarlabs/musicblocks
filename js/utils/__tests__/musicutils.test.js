@@ -117,7 +117,8 @@ const {
     NOTENAMES1,
     PITCHES1,
     PITCHES3,
-    normalizeNoteAccidentals
+    normalizeNoteAccidentals,
+    getCurrentEDO
 } = require("../musicutils");
 
 const DOUBLESHARP = "\ud834\udd2a";
@@ -173,6 +174,41 @@ describe("musicutils", () => {
         setOctaveRatio(4);
         const octaveR = getOctaveRatio();
         expect(octaveR).toBe(4);
+    });
+});
+
+describe("getCurrentEDO", () => {
+    beforeEach(() => {
+        global.TEMPERAMENT = {
+            "equal": { pitchNumber: 12 },
+            "equal19": { pitchNumber: 19 },
+            "just intonation": { pitchNumber: 12 },
+            "custom": []
+        };
+    });
+
+    it("should return 12 for 'equal' temperament", () => {
+        expect(getCurrentEDO("equal")).toBe(12);
+    });
+
+    it("should return 19 for 'equal19' temperament", () => {
+        expect(getCurrentEDO("equal19")).toBe(19);
+    });
+
+    it("should return 12 for undefined temperament", () => {
+        expect(getCurrentEDO(undefined)).toBe(12);
+    });
+
+    it("should return 12 for null temperament", () => {
+        expect(getCurrentEDO(null)).toBe(12);
+    });
+
+    it("should return 12 for empty string", () => {
+        expect(getCurrentEDO("")).toBe(12);
+    });
+
+    it("should return 12 for nonexistent temperament", () => {
+        expect(getCurrentEDO("nonexistent")).toBe(12);
     });
 });
 
@@ -853,6 +889,27 @@ describe("frequencyToPitch", () => {
         expect(result[0]).toBe("D♭");
         expect(result[1]).toBe(1);
     });
+
+    it("should work with equal19 temperament", () => {
+        global.TEMPERAMENT = { equal19: [] };
+        const result = frequencyToPitch(440, "equal19");
+        expect(result[0]).toBe("A");
+        expect(result[1]).toBe(4);
+    });
+
+    it("should fallback to 12-EDO for undefined temperament", () => {
+        global.TEMPERAMENT = {};
+        const result = frequencyToPitch(440, undefined);
+        expect(result[0]).toBe("A");
+        expect(result[1]).toBe(4);
+    });
+
+    it("should fallback to 12-EDO for unknown temperament", () => {
+        global.TEMPERAMENT = {};
+        const result = frequencyToPitch(440, "unknown");
+        expect(result[0]).toBe("A");
+        expect(result[1]).toBe(4);
+    });
 });
 
 describe("getArticulation", () => {
@@ -1085,6 +1142,25 @@ describe("pitchToNumber", () => {
             .mockReturnValue([["C", "D", "E", "F", "G", "A", "B"], []]);
         expect(pitchToNumber("xyz", 4, "C major")).toBe(39);
         expect(console.debug).toHaveBeenCalled();
+    });
+
+    it("should work with equal19 temperament", () => {
+        global.TEMPERAMENT = { equal19: [] };
+        const result = pitchToNumber("C", 4, "C major", "equal19");
+        // 4 * 19 + 0 (C index) - 9 (A index) = 67
+        expect(result).toBe(67);
+    });
+
+    it("should fallback to 12-EDO for undefined temperament", () => {
+        global.TEMPERAMENT = {};
+        const result = pitchToNumber("C", 4, "C major", undefined);
+        expect(result).toBe(39);
+    });
+
+    it("should fallback to 12-EDO for unknown temperament", () => {
+        global.TEMPERAMENT = {};
+        const result = pitchToNumber("C", 4, "C major", "unknown");
+        expect(result).toBe(39);
     });
 });
 
@@ -1816,6 +1892,26 @@ describe("pitchToFrequency", () => {
 
     it("throws error if pitchToNumber fails", () => {
         expect(pitchToFrequency("Z", 4, 0, "C")).toBe(A0 * Math.pow(TWELTHROOT2, 39));
+    });
+
+    it("should work with equal19 temperament", () => {
+        global.TEMPERAMENT = { equal19: [] };
+        const result = pitchToFrequency("C", 4, 0, "C", "equal19");
+        // C4 in 19-EDO: A0 * Math.pow(2, 67/19) ≈ 316.85
+        expect(result).toBeGreaterThan(310);
+        expect(result).toBeLessThan(320);
+    });
+
+    it("should fallback to 12-EDO for undefined temperament", () => {
+        global.TEMPERAMENT = {};
+        const result = pitchToFrequency("A", 4, 0, "C", undefined);
+        expect(result).toBe(A0 * Math.pow(TWELTHROOT2, 48));
+    });
+
+    it("should fallback to 12-EDO for unknown temperament", () => {
+        global.TEMPERAMENT = {};
+        const result = pitchToFrequency("A", 4, 0, "C", "unknown");
+        expect(result).toBe(A0 * Math.pow(TWELTHROOT2, 48));
     });
 });
 
