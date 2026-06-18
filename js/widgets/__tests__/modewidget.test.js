@@ -253,13 +253,12 @@ describe("ModeWidget", () => {
         expect(modeWidget._selectedNotes[1]).toBe(false);
     });
 
-    test("should clear all notes except root", () => {
+    test("should clear all notes", () => {
         modeWidget._selectedNotes = Array(12).fill(true);
 
         modeWidget._clear();
 
-        expect(modeWidget._selectedNotes[0]).toBe(true);
-        for (let i = 1; i < 12; i++) {
+        for (let i = 0; i < 12; i++) {
             expect(modeWidget._selectedNotes[i]).toBe(false);
         }
     });
