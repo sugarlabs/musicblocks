@@ -1,4 +1,4 @@
-/* global ActivityContext, PracticeManager, PracticeProblems, PracticeValidator */
+/* global ActivityContext, PracticeManager, PracticeProblems, PracticeTheme, PracticeValidator */
 /* exported PracticeUI */
 
 const PracticeUI = {
@@ -75,14 +75,23 @@ const PracticeUI = {
 
     renderLevelMenu() {
         const container = document.getElementById("practice-content");
+        const bigBadgeIds = PracticeManager.getBigBadges();
 
         container.innerHTML = `
+      <div class="quest-title">
+        <h3>${PracticeTheme.title}</h3>
+        <p>${PracticeTheme.subtitle}</p>
+      </div>
+      ${PracticeTheme.intro}
+      ${this.renderBigBadges(bigBadgeIds)}
       ${PracticeProblems.map(
           p => `
         <button
           class="level-btn ${PracticeManager.isLevelComplete(p.level) ? "done" : ""}"
           data-level="${p.level}">
-          Level ${p.level}
+          ${this.renderLevelBadgeStrip(p)}
+          <span>Level ${p.level}</span>
+          <small>${p.title}</small>
         </button>
       `
       ).join("")}
@@ -106,6 +115,8 @@ const PracticeUI = {
       <h2>Level ${problem.level}</h2>
       <h4>${problem.title}</h4>
       <div class="practice-description">${problem.description}</div>
+      ${this.renderRewards(problem)}
+      <div id="practice-badge-status">${this.renderBadgeStatus(problem)}</div>
 
       <button id="check-level">Check My Work</button>
     `;
@@ -118,13 +129,25 @@ const PracticeUI = {
 
         document.getElementById("check-level").onclick = () => {
             const result = PracticeValidator.validate(problem);
+            const badgeEvidence = PracticeValidator.assessBadges(problem);
+            const canAwardBadges = result || PracticeManager.isLevelComplete(problem.level);
+            const badgesToAward = canAwardBadges ? badgeEvidence : [];
 
             if (result) {
-                PracticeManager.completeLevel(problem);
-                alert("Level completed!");
+                const awards = PracticeManager.completeLevel(
+                    problem,
+                    badgesToAward,
+                    PracticeProblems
+                );
+                this.showSuccessMessage(problem, awards.newBadges, awards.newBigBadges);
+                this.updateBadgeStatus(problem);
 
                 const btn = document.querySelector(`.level-btn[data-level="${problem.level}"]`);
                 if (btn) btn.classList.add("done");
+            } else if (badgesToAward.length > 0) {
+                const newBadges = PracticeManager.awardLevelBadges(problem, badgesToAward);
+                this.showBadgeMessage(newBadges);
+                this.updateBadgeStatus(problem);
             } else {
                 if (problem.expected?.boxShapeAutomation) {
                     const debug = PracticeValidator.getBoxShapeAutomationDebug();
@@ -137,5 +160,105 @@ const PracticeUI = {
                 }
             }
         };
+    },
+
+    renderBigBadges(bigBadgeIds) {
+        if (!bigBadgeIds.length) return "";
+
+        const badges = Object.values(PracticeTheme.bigBadges).filter(badge =>
+            bigBadgeIds.includes(badge.id)
+        );
+
+        return `
+      <div class="big-badge-row">
+        ${badges.map(badge => `<span class="big-badge">${badge.label}</span>`).join("")}
+      </div>
+    `;
+    },
+
+    renderLevelBadgeStrip(problem) {
+        if (!Array.isArray(problem.badges)) return "";
+
+        const earnedBadgeIds = PracticeManager.getLevelBadges(problem.level);
+        if (!earnedBadgeIds.length) return "";
+
+        return `
+      <span class="level-badge-strip">
+        ${problem.badges
+            .filter(badge => earnedBadgeIds.includes(badge.id))
+            .map(
+                badge =>
+                    `<span class="level-badge" title="${badge.label}">${badge.shortLabel}</span>`
+            )
+            .join("")}
+      </span>
+    `;
+    },
+
+    renderRewards(problem) {
+        if (!Array.isArray(problem.rewards)) return "";
+
+        return `
+      <section class="reward-card">
+        <h4>Quest Rewards</h4>
+        <ul>
+          ${problem.rewards.map(reward => `<li>${reward}</li>`).join("")}
+        </ul>
+      </section>
+    `;
+    },
+
+    renderBadgeStatus(problem) {
+        if (!Array.isArray(problem.badges)) return "";
+
+        const earnedBadgeIds = PracticeManager.getLevelBadges(problem.level);
+
+        return `
+      <section class="badge-card">
+        <h4>Discoveries</h4>
+        <div class="badge-grid">
+          ${problem.badges
+              .map(
+                  badge => `
+            <span class="badge-chip ${earnedBadgeIds.includes(badge.id) ? "earned" : ""}">
+              ${badge.label}
+            </span>
+          `
+              )
+              .join("")}
+        </div>
+      </section>
+    `;
+    },
+
+    updateBadgeStatus(problem) {
+        const badgeStatus = document.getElementById("practice-badge-status");
+        if (badgeStatus) {
+            badgeStatus.innerHTML = this.renderBadgeStatus(problem);
+        }
+    },
+
+    showSuccessMessage(problem, newBadges, newBigBadges) {
+        const messages = [
+            "Melody Fragment restored.",
+            "Captain's Journal Page found.",
+            ...newBadges.map(badge => badge.message),
+            ...newBigBadges.map(badge => badge.message)
+        ];
+
+        if (!newBadges.length && !newBigBadges.length) {
+            messages.push("The bridge song is still shining.");
+        }
+
+        alert(messages.join("\n\n"));
+    },
+
+    showBadgeMessage(newBadges) {
+        if (!newBadges.length) {
+            alert("You already found this discovery. Keep exploring the island.");
+            return;
+        }
+
+        alert(newBadges.map(badge => badge.message).join("\n\n"));
     }
 };
