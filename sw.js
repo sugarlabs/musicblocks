@@ -206,6 +206,7 @@ self.addEventListener("refreshOffline", function () {
     }
 
     const offlinePageRequest = new Request(offlineFallbackPage);
+
     return fetch(offlineFallbackPage).then(function (response) {
         return caches.open(CACHE).then(function (cache) {
             console.log(
