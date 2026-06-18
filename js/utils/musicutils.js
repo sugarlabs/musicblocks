@@ -3315,6 +3315,7 @@ const noteToObj = note => {
  */
 const frequencyToPitch = (hz, temperament) => {
     const currentEDO = getCurrentEDO(temperament);
+    // 1200 cents = one octave (constant for all temperaments)
     const centsPerStep = 1200 / currentEDO;
 
     // Calculate the pitch and octave based on frequency, rounding to
