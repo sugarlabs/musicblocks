@@ -550,7 +550,7 @@ function setupFlowBlocks(activity) {
                     }
                 }
 
-                if (caseFlow != null) {
+                if (caseFlow !== null) {
                     const queueBlock = new Queue(caseFlow, 1, switchBlk, null);
                     tur.parentFlowQueue.push(switchBlk);
                     tur.queue.push(queueBlock);
