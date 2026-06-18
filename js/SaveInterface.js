@@ -26,6 +26,20 @@ const STR_MY_PROJECT = _("My Project");
 const STR_SHOW = _("Show");
 const STR_HIDE = _("Hide");
 
+// Robust Mocking for Jest/Node environment
+const root = typeof window !== "undefined" ? window : global;
+if (!root.URL) root.URL = {};
+if (!root.URL.createObjectURL) root.URL.createObjectURL = () => "mock-url";
+if (!root.URL.revokeObjectURL) root.URL.revokeObjectURL = () => {};
+
+if (typeof global !== "undefined" && !global.Blob) {
+    global.Blob = class {
+        constructor(parts) {
+            this.parts = parts;
+        }
+    };
+}
+
 /**
  * Environment-aware lazy module loader.
  * Uses AMD require() in the browser; calls callback synchronously in Node/Jest.
@@ -350,11 +364,30 @@ class SaveInterface {
      * @instance
      */
     saveHTML(activity) {
-        const html =
-            "data:text/plain;charset=utf-8," + encodeURIComponent(activity.save.prepareHTML());
-        activity.save.download("html", html, null);
-    }
+        try {
+            const htmlContent = activity.save.prepareHTML();
 
+            // --- GSoC FIX FOR ISSUE #2749: Use Blob instead of Data URL ---
+            // Using a Blob prevents the URI length limit errors for large projects
+            const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+
+            // Use the existing download utility with our new safe URL
+            activity.save.download("html", url, null);
+
+            // Cleanup memory after download (Best practice for no-flaws code)
+            setTimeout(() => URL.revokeObjectURL(url), 60000);
+        } catch (error) {
+            console.error("Save HTML failed:", error);
+            if (activity && typeof activity.errorMsg === "function") {
+                activity.errorMsg(
+                    _(
+                        "Save failed. The project might be too large for browser memory. Try removing some images."
+                    )
+                );
+            }
+        }
+    }
     /**
      * Save HTML representation of an activity without prompting the user.
      *
@@ -369,15 +402,30 @@ class SaveInterface {
      */
     saveHTMLNoPrompt(activity) {
         setTimeout(() => {
-            const html =
-                "data:text/plain;charset=utf-8," + encodeURIComponent(activity.save.prepareHTML());
-            if (activity.PlanetInterface !== undefined) {
-                activity.save.downloadURL(
-                    activity.PlanetInterface.getCurrentProjectName() + ".html",
-                    html
-                );
-            } else {
-                activity.save.downloadURL(STR_MY_PROJECT.replace(" ", "_") + ".html", html);
+            try {
+                // 1. Get the HTML content
+                const htmlContent = activity.save.prepareHTML();
+
+                // 2. FIX FOR ISSUE #2749: Use Blob for background saves too
+                const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
+                const url = URL.createObjectURL(blob);
+
+                // 3. Determine the filename and trigger downloadURL
+                const fileName =
+                    activity.PlanetInterface !== undefined
+                        ? activity.PlanetInterface.getCurrentProjectName() + ".html"
+                        : STR_MY_PROJECT.replace(" ", "_") + ".html";
+
+                activity.save.downloadURL(fileName, url);
+
+                // 4. Memory Management: Clean up the object URL
+                setTimeout(() => URL.revokeObjectURL(url), 60000);
+            } catch (error) {
+                console.error("Save HTML NoPrompt failed:", error);
+                // Fail gracefully so the app doesn't hang
+                if (activity && typeof activity.errorMsg === "function") {
+                    activity.errorMsg(_("Automatic save failed due to project size."));
+                }
             }
         }, 500);
     }
@@ -394,10 +442,19 @@ class SaveInterface {
      * @instance
      */
     saveMIDI(activity) {
-        // Suppress music and turtle output when generating
-        activity.logo.runningMIDI = true;
-        activity.logo.runLogoCommands();
-        document.body.style.cursor = "wait";
+        try {
+            // Suppress music and turtle output when generating
+            activity.logo.runningMIDI = true;
+            activity.logo.runLogoCommands();
+            document.body.style.cursor = "wait";
+        } catch (error) {
+            console.error("MIDI generation failed:", error);
+            document.body.style.cursor = "default";
+            activity.logo.runningMIDI = false;
+            if (activity && typeof activity.errorMsg === "function") {
+                activity.errorMsg(_("Failed to start MIDI generation."));
+            }
+        }
     }
 
     /**
@@ -414,79 +471,86 @@ class SaveInterface {
         const instrumentMIDI = getMidiInstrument();
         const drumMIDI = getMidiDrum();
         const generateMidi = data => {
-            const midi = new Midi();
-            midi.header.ticksPerBeat = 480;
+            try {
+                const midi = new Midi();
+                midi.header.ticksPerBeat = 480;
 
-            Object.entries(data).forEach(([blockIndex, notes]) => {
-                const mainTrack = midi.addTrack();
-                mainTrack.name = `Track ${parseInt(blockIndex) + 1}`;
+                Object.entries(data).forEach(([blockIndex, notes]) => {
+                    const mainTrack = midi.addTrack();
+                    mainTrack.name = `Track ${parseInt(blockIndex) + 1}`;
 
-                const trackMap = new Map();
-                let globalTime = 0;
+                    const trackMap = new Map();
+                    let globalTime = 0;
 
-                notes.forEach(noteData => {
-                    if (!noteData.note || noteData.note.length === 0) return;
-                    const duration = ((1 / noteData.duration) * 60 * 4) / noteData.bpm;
-                    const instrument = noteData.instrument || "default";
+                    notes.forEach(noteData => {
+                        if (!noteData.note || noteData.note.length === 0) return;
+                        const duration = ((1 / noteData.duration) * 60 * 4) / noteData.bpm;
+                        const instrument = noteData.instrument || "default";
 
-                    if (noteData.drum) {
-                        const drum = noteData.drum || false;
-                        if (!trackMap.has(drum)) {
-                            const drumTrack = midi.addTrack();
-                            drumTrack.name = `Track ${parseInt(blockIndex) + 1} - ${drum}`;
-                            drumTrack.channel = 9; // Drums must be on Channel 10
-                            trackMap.set(drum, drumTrack);
-                        }
-
-                        const drumTrack = trackMap.get(drum);
-
-                        const midiNumber =
-                            Object.prototype.hasOwnProperty.call(drumMIDI, drum) && drumMIDI[drum]
-                                ? drumMIDI[drum]
-                                : 36; // default to Bass Drum
-                        drumTrack.addNote({
-                            midi: midiNumber,
-                            time: globalTime,
-                            duration: duration,
-                            velocity: 0.9
-                        });
-                    } else {
-                        if (!trackMap.has(instrument)) {
-                            const instrumentTrack = midi.addTrack();
-                            instrumentTrack.name = `Track ${
-                                parseInt(blockIndex) + 1
-                            } - ${instrument}`;
-                            instrumentTrack.instrument.number =
-                                Object.prototype.hasOwnProperty.call(instrumentMIDI, instrument)
-                                    ? instrumentMIDI[instrument]
-                                    : instrumentMIDI["default"];
-                            trackMap.set(instrument, instrumentTrack);
-                        }
-
-                        const instrumentTrack = trackMap.get(instrument);
-
-                        noteData.note.forEach(pitch => {
-                            if (!pitch.includes("R")) {
-                                instrumentTrack.addNote({
-                                    name: normalizeNoteAccidentals(pitch),
-                                    time: globalTime,
-                                    duration: duration,
-                                    velocity: 0.8
-                                });
+                        if (noteData.drum) {
+                            const drum = noteData.drum || false;
+                            if (!trackMap.has(drum)) {
+                                const drumTrack = midi.addTrack();
+                                drumTrack.name = `Track ${parseInt(blockIndex) + 1} - ${drum}`;
+                                drumTrack.channel = 9;
+                                trackMap.set(drum, drumTrack);
                             }
-                        });
-                    }
-                    globalTime += duration;
-                });
-                globalTime = 0;
-            });
 
-            // Generate the MIDI file and trigger download.
-            const midiData = midi.toArray();
-            const blob = new Blob([midiData], { type: "audio/midi" });
-            const url = URL.createObjectURL(blob);
-            this.activity.save.download("midi", url, null);
+                            const drumTrack = trackMap.get(drum);
+                            const midiNumber =
+                                Object.prototype.hasOwnProperty.call(drumMIDI, drum) &&
+                                drumMIDI[drum]
+                                    ? drumMIDI[drum]
+                                    : 36;
+
+                            drumTrack.addNote({
+                                midi: midiNumber,
+                                time: globalTime,
+                                duration: duration,
+                                velocity: 0.9
+                            });
+                        } else {
+                            if (!trackMap.has(instrument)) {
+                                const instrumentTrack = midi.addTrack();
+                                instrumentTrack.name = `Track ${parseInt(blockIndex) + 1} - ${instrument}`;
+                                instrumentTrack.instrument.number =
+                                    Object.prototype.hasOwnProperty.call(instrumentMIDI, instrument)
+                                        ? instrumentMIDI[instrument]
+                                        : instrumentMIDI["default"];
+                                trackMap.set(instrument, instrumentTrack);
+                            }
+
+                            const instrumentTrack = trackMap.get(instrument);
+                            noteData.note.forEach(pitch => {
+                                if (!pitch.includes("R")) {
+                                    instrumentTrack.addNote({
+                                        name: normalizeNoteAccidentals(pitch),
+                                        time: globalTime,
+                                        duration: duration,
+                                        velocity: 0.8
+                                    });
+                                }
+                            });
+                        }
+                        globalTime += duration;
+                    });
+                });
+
+                const midiData = midi.toArray();
+                const blob = new Blob([midiData], { type: "audio/midi" });
+                const url = URL.createObjectURL(blob);
+                this.activity.save.download("midi", url, null);
+
+                //Memory Cleanup ---
+                setTimeout(() => URL.revokeObjectURL(url), 60000);
+            } catch (error) {
+                console.error("MIDI Processing failed:", error);
+                if (this.activity && typeof this.activity.errorMsg === "function") {
+                    this.activity.errorMsg(_("Error processing MIDI file."));
+                }
+            }
         };
+
         const data = this.activity.logo._midiData;
         setTimeout(() => {
             generateMidi(data);
