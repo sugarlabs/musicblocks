@@ -370,8 +370,23 @@ class Activity {
         this.stageDirty = false;
         this._renderLoopRafId = null;
         this._renderLoopRunning = false;
+        this.firefoxWarningShown = false;
 
         this.themes = ["light", "dark", "highcontrast"];
+
+        if (navigator.userAgent.includes("Firefox")) {
+            let lastPixelRatio = window.devicePixelRatio;
+
+            setInterval(() => {
+                if (window.devicePixelRatio !== lastPixelRatio) {
+                    lastPixelRatio = window.devicePixelRatio;
+
+                    if (typeof this._onResize === "function") {
+                        this._onResize(false);
+                    }
+                }
+            }, 1000);
+        }
         try {
             // Detect system theme preference (using same logic as ThemeBox)
             const getSystemTheme = () => {
@@ -3637,6 +3652,33 @@ class Activity {
 
             this.stage.canvas.width = w;
             this.stage.canvas.height = h;
+
+            // Firefox large canvas warning
+            const isFirefox = navigator.userAgent.includes("Firefox");
+            const canvasArea = w * h;
+            const FIREFOX_CANVAS_THRESHOLD = 4000000;
+            const warningMsg = _(
+                "Firefox performance may be affected because the canvas is unusually large. For the best experience, consider resetting the browser zoom to 100%."
+            );
+
+            if (isFirefox) {
+                if (canvasArea > FIREFOX_CANVAS_THRESHOLD) {
+                    const isShown = this.printText && this.printText.classList.contains("show");
+                    const hasMsg =
+                        this.printTextContent && this.printTextContent.textContent === warningMsg;
+
+                    // Re-show if not shown or if message was overwritten/hidden
+                    if (!this.firefoxWarningShown || !isShown || !hasMsg) {
+                        this.firefoxWarningShown = true;
+                        this.textMsg(warningMsg, 1000000);
+                    }
+                } else if (this.firefoxWarningShown) {
+                    if (this.printTextContent && this.printTextContent.textContent === warningMsg) {
+                        this.hidePrintText();
+                    }
+                    this.firefoxWarningShown = false;
+                }
+            }
 
             this.turtles.doScale(w, h, this.turtleBlocksScale);
 
