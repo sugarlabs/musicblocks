@@ -450,7 +450,7 @@ function AIDebuggerWidget() {
             .catch(error => {
                 this._hideTypingIndicator();
                 this._isProcessing = false;
-                console.error("Backend connection error:", error.message);
+                console.error("Backend connection error:", error);
 
                 this.activity.textMsg(_("Server error: Unable to connect to AI backend."));
 
@@ -460,7 +460,9 @@ function AIDebuggerWidget() {
 
                 const fallbackResponse = {
                     type: "bot",
-                    content: `I'm sorry, I'm having trouble connecting to the AI backend. Error: ${error.message}. Please check your connection and try again.`,
+                    content: _(
+                        "Could not reach the AI assistant. Please check your connection and try again."
+                    ),
                     timestamp: new Date().toISOString()
                 };
 
@@ -721,7 +723,7 @@ function AIDebuggerWidget() {
             })
             .catch(error => {
                 this._hideTypingIndicator();
-                console.error("Backend initialization error:", error.message);
+                console.error("Backend initialization error:", error);
                 this.activity.textMsg(_("Server error: Failed to initialize AI debugger."));
 
                 if (error instanceof TypeError && error.message.includes("fetch")) {
@@ -730,7 +732,9 @@ function AIDebuggerWidget() {
 
                 const errorMessage = {
                     type: "system",
-                    content: `Could not connect to AI backend: ${error.message}. Please check your connection and try again.`,
+                    content: _(
+                        "Could not reach the AI assistant. Please check your connection and try again."
+                    ),
                     timestamp: new Date().toISOString()
                 };
                 this._addMessageToUI(errorMessage);
