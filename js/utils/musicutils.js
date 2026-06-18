@@ -12,8 +12,9 @@
 /*
    global
 
-   _, last, DRUMNAMES, NOISENAMES, VOICENAMES, INVALIDPITCH, CUSTOMSAMPLES
-*/
+   _, last, DRUMNAMES, NOISENAMES, VOICENAMES, INVALIDPITCH, CUSTOMSAMPLES,
+   globalActivity
+ */
 
 const _b64Cache = new Map();
 
@@ -867,6 +868,18 @@ const SOLFATTRS = [DOUBLESHARP, SHARP, NATURAL, FLAT, DOUBLEFLAT];
  * @constant {string}
  */
 const DEGREES = _("1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th");
+
+/**
+ * Returns the number of pitches in the given temperament's octave.
+ * Falls back to 12-EDO if temperament is not found.
+ * @param {string} temperament - temperament key (e.g., "equal", "equal19")
+ * @returns {number} number of pitches per octave
+ */
+const getCurrentEDO = temperament => {
+    if (!temperament) return 12;
+    const t = TEMPERAMENT[temperament];
+    return t && t.pitchNumber ? t.pitchNumber : 12;
+};
 
 /**
  * Number of semitones in an octave.
@@ -3297,9 +3310,14 @@ const noteToObj = note => {
  * Convert a frequency to pitch, returning the note, octave, and cents.
  * @function
  * @param {number} hz - The frequency in hertz.
+ * @param {string} [temperament="equal"] - The temperament to use.
  * @returns {Array} An array containing the note, octave, and cents.
  */
-const frequencyToPitch = hz => {
+const frequencyToPitch = (hz, temperament) => {
+    const currentEDO = getCurrentEDO(temperament);
+    // 1200 cents = one octave (constant for all temperaments)
+    const centsPerStep = 1200 / currentEDO;
+
     // Calculate the pitch and octave based on frequency, rounding to
     // the nearest cent.
 
@@ -3316,15 +3334,16 @@ const frequencyToPitch = hz => {
     for (let i = 0; i < 10 * CENTS_PER_OCTAVE; i++) {
         const f = A0 * Math.pow(TWELVEHUNDRETHROOT2, i);
         if (hz < f * 1.0003 && hz > f * 0.9997) {
-            cents = i % CENTS_PER_SEMITONE;
-            let j = Math.floor(i / CENTS_PER_SEMITONE);
-            if (cents > 50) {
-                cents -= CENTS_PER_SEMITONE;
+            cents = i % centsPerStep;
+            let j = Math.floor(i / centsPerStep);
+            if (cents > centsPerStep / 2) {
+                cents -= centsPerStep;
                 j += 1;
             }
+            const aIndex = PITCHES.indexOf("A");
             return [
-                PITCHES[(j + PITCHES.indexOf("A")) % SEMITONES],
-                Math.floor((j + PITCHES.indexOf("A")) / SEMITONES),
+                PITCHES[(j + aIndex) % currentEDO],
+                Math.floor((j + aIndex) / currentEDO),
                 cents
             ];
         }
@@ -3936,9 +3955,11 @@ const getCustomNote = note => {
  * @param {string} pitch - The pitch name (e.g., C, D, E).
  * @param {number} octave - The octave number.
  * @param {string} keySignature - The key signature.
+ * @param {string} [temperament="equal"] - The temperament to use.
  * @returns {number} The numeric representation of the pitch.
  */
-const pitchToNumber = (pitch, octave, keySignature) => {
+const pitchToNumber = (pitch, octave, keySignature, temperament) => {
+    const currentEDO = getCurrentEDO(temperament);
     // Calculate the pitch index based on pitch and octave.
     if (pitch.toUpperCase() === "R") {
         return 0;
@@ -4004,7 +4025,7 @@ const pitchToNumber = (pitch, octave, keySignature) => {
         }
     }
     // We start at A0.
-    return octave * 12 + pitchNumber - PITCHES.indexOf("A") + transposition;
+    return octave * currentEDO + pitchNumber - PITCHES.indexOf("A") + transposition;
 };
 
 /**
@@ -6278,16 +6299,17 @@ const noteToPitchOctave = note => {
  * @param {number} octave - The octave of the note.
  * @param {number} cents - The cents to adjust the frequency.
  * @param {string} keySignature - The key signature.
+ * @param {string} [temperament="equal"] - The temperament to use.
  * @returns {number} The calculated frequency.
  */
-const pitchToFrequency = (pitch, octave, cents, keySignature) => {
-    // Calculate the frequency based on pitch and octave.
-    const pitchNumber = pitchToNumber(pitch, octave, keySignature);
+const pitchToFrequency = (pitch, octave, cents, keySignature, temperament) => {
+    const currentEDO = getCurrentEDO(temperament);
+    const pitchNumber = pitchToNumber(pitch, octave, keySignature, temperament);
 
     if (cents === 0) {
-        return A0 * Math.pow(TWELTHROOT2, pitchNumber);
+        return A0 * Math.pow(2, 1 / currentEDO) ** pitchNumber;
     } else {
-        return A0 * Math.pow(TWELVEHUNDRETHROOT2, pitchNumber * 100 + cents);
+        return A0 * Math.pow(2, 1 / (currentEDO * 100)) ** (pitchNumber * 100 + cents);
     }
 };
 
@@ -6908,6 +6930,7 @@ if (typeof module !== "undefined" && module.exports) {
         getTemperamentRatio,
         getTemperamentCents,
         getTemperamentName,
+        getCurrentEDO,
         noteToObj,
         frequencyToPitch,
         getArticulation,
