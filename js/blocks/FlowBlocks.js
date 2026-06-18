@@ -244,7 +244,7 @@ function setupFlowBlocks(activity) {
                             for (let i = 0; i < n; i++) {
                                 const obj = logo.connectionStore[turtle][blk].pop();
                                 activity.blocks.blockList[obj[0]].connections[obj[1]] = obj[2];
-                                if (obj[2] != null) {
+                                if (obj[2] !== null) {
                                     activity.blocks.blockList[obj[2]].connections[0] = obj[0];
                                 }
                             }
@@ -273,7 +273,7 @@ function setupFlowBlocks(activity) {
                 try {
                     // Check to see if another turtle has already disconnected these blocks
                     const otherTurtle = __lookForOtherTurtles(blk, turtle);
-                    if (otherTurtle != null) {
+                    if (otherTurtle !== null) {
                         // Copy the connections and queue the blocks
                         logo.connectionStore[turtle][blk] = [];
                         for (let i = logo.connectionStore[otherTurtle][blk].length; i > 0; i--) {
@@ -294,7 +294,7 @@ function setupFlowBlocks(activity) {
                         }
                     } else {
                         let child = activity.blocks.findBottomBlock(args[1]);
-                        while (child != blk) {
+                        while (child !== blk) {
                             if (activity.blocks.blockList[child].name !== "hidden") {
                                 const queueBlock = new Queue(child, factor, blk, receivedArg);
                                 tur.parentFlowQueue.push(blk);
@@ -309,14 +309,14 @@ function setupFlowBlocks(activity) {
                         // run
                         logo.connectionStore[turtle][blk] = [];
                         child = args[1];
-                        while (child != null) {
+                        while (child !== null) {
                             const lastConnection =
                                 activity.blocks.blockList[child].connections.length - 1;
                             const nextBlk =
                                 activity.blocks.blockList[child].connections[lastConnection];
                             // Don't disconnect a hidden block from its parent
                             if (
-                                nextBlk != null &&
+                                nextBlk !== null &&
                                 activity.blocks.blockList[nextBlk].name === "hidden"
                             ) {
                                 logo.connectionStore[turtle][blk].push([
@@ -336,7 +336,7 @@ function setupFlowBlocks(activity) {
                                 child = nextBlk;
                             }
 
-                            if (child != null) {
+                            if (child !== null) {
                                 activity.blocks.blockList[child].connections[0] = null;
                             }
                         }
@@ -534,7 +534,7 @@ function setupFlowBlocks(activity) {
                 // Run the cases here.
                 let switchCase;
                 const argBlk = activity.blocks.blockList[switchBlk].connections[1];
-                if (argBlk == null) {
+                if (argBlk === null) {
                     switchCase = "__default__";
                 } else {
                     switchCase = logo.parseArg(logo, turtle, argBlk, logo.receivedArg);
@@ -659,7 +659,7 @@ function setupFlowBlocks(activity) {
 
             // Since we pop the queue, we need to unhighlight our parent
             const parentBlk = activity.blocks.blockList[blk].connections[0];
-            if (parentBlk != null) {
+            if (parentBlk !== null) {
                 if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
                     tur.unhighlightQueue.push(parentBlk);
                 }
