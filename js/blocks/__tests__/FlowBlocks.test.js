@@ -116,6 +116,7 @@ describe("FlowBlocks integration", () => {
             backward: [],
             duplicateFactor: 1,
             inDuplicate: false,
+            duplicateStateStack: [],
             justCounting: [],
             suppressOutput: false,
             runningFromEvent: false,
@@ -277,6 +278,29 @@ describe("FlowBlocks integration", () => {
         logo.connectionStore = { 0: { [blk]: [] } };
         block.flow([null, 1], logo, 0, blk);
         expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, blk);
+    });
+
+    test("DuplicateBlock pushes duplicateStateStack on valid flow and listener pops it", async () => {
+        const block = getBlock("duplicatenotes");
+        const blk = 0;
+        activity.blocks.blockList = {
+            0: { name: "duplicatenotes", connections: [null, 1, null, 2] },
+            1: { name: "visibleA", connections: [0, 2] },
+            2: { name: "hidden", connections: [1, 3] },
+            3: { name: "visibleB", connections: [2, 0] }
+        };
+        logo.connectionStore[0][blk] = [];
+        logo.connectionStoreLock = false;
+
+        block.flow([2, 1], logo, 0, blk, []);
+        const tur = activity.turtles.ithTurtle(0);
+        expect(tur.singer.duplicateStateStack).toHaveLength(1);
+        expect(tur.singer.duplicateStateStack[0]).toHaveProperty("pitchCache");
+        expect(tur.singer.duplicateStateStack[0]).toHaveProperty("incrementedBlks");
+
+        const listener = logo.setTurtleListener.mock.calls.pop()[2];
+        await listener();
+        expect(tur.singer.duplicateStateStack).toHaveLength(0);
     });
 
     test("DuplicateBlock releases lock even when critical section throws", () => {

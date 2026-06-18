@@ -159,6 +159,7 @@ class Singer {
         this.arpeggio = [];
         this.arpeggioIndex = 0;
         this.inDuplicate = false;
+        this.duplicateStateStack = [];
         this.skipFactor = 1;
         this.skipIndex = 0;
         this.instrumentNames = [];

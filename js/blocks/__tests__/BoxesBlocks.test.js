@@ -137,7 +137,12 @@ describe("setupBoxesBlocks", () => {
                     activity.blocks.blockList[cblk].value;
                 logo.boxes[key] = value;
             }),
-            beginnerMode: false
+            beginnerMode: false,
+            turtles: {
+                ithTurtle: jest.fn(() => ({
+                    singer: { inDuplicate: false, duplicateStateStack: [] }
+                }))
+            }
         };
 
         logo = {
@@ -190,6 +195,41 @@ describe("setupBoxesBlocks", () => {
                 "Block does not support incrementing.",
                 200
             );
+        });
+
+        test("inside duplicate: first call mutates box, second call for same blk skips mutation", () => {
+            activity.blocks.blockList[200] = { name: "text", value: "counter" };
+            logo.boxes["counter"] = 0;
+            const dupState = { pitchCache: {}, incrementedBlks: new Set() };
+            activity.turtles.ithTurtle.mockReturnValue({
+                singer: { inDuplicate: true, duplicateStateStack: [dupState] }
+            });
+
+            incrementBlock.flow([0, 1], logo, "turtle0", blkId);
+            expect(logo.boxes["counter"]).toBe(1);
+
+            incrementBlock.flow([1, 1], logo, "turtle0", blkId);
+            expect(logo.boxes["counter"]).toBe(1);
+        });
+
+        test("inside duplicate: different blk ids each mutate independently", () => {
+            const blkA = 101;
+            const blkB = 102;
+            activity.blocks.blockList[blkA] = { connections: [null, 201] };
+            activity.blocks.blockList[blkB] = { connections: [null, 202] };
+            activity.blocks.blockList[201] = { name: "text", value: "boxA" };
+            activity.blocks.blockList[202] = { name: "text", value: "boxB" };
+            logo.boxes["boxA"] = 0;
+            logo.boxes["boxB"] = 0;
+            const dupState = { pitchCache: {}, incrementedBlks: new Set() };
+            activity.turtles.ithTurtle.mockReturnValue({
+                singer: { inDuplicate: true, duplicateStateStack: [dupState] }
+            });
+
+            incrementBlock.flow([0, 1], logo, "turtle0", blkA);
+            incrementBlock.flow([0, 1], logo, "turtle0", blkB);
+            expect(logo.boxes["boxA"]).toBe(1);
+            expect(logo.boxes["boxB"]).toBe(1);
         });
     });
 

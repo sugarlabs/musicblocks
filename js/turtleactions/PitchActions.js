@@ -151,6 +151,29 @@ function setupPitchActions(activity) {
                 octave = invertedNote[1];
             }
 
+            if (
+                tur.singer.inDuplicate &&
+                tur.singer.duplicateStateStack.length > 0
+            ) {
+                const dupState =
+                    tur.singer.duplicateStateStack[tur.singer.duplicateStateStack.length - 1];
+                if (dupState.pitchCache[blk] !== undefined) {
+                    const cached = dupState.pitchCache[blk];
+                    Singer.processPitch(activity, cached.note, cached.octave, cached.cents, turtle, blk);
+                    return;
+                }
+                const noteObj = Singer.addScalarTransposition(
+                    activity.logo,
+                    turtle,
+                    pitchName,
+                    octave,
+                    value
+                );
+                dupState.pitchCache[blk] = { note: noteObj[0], octave: noteObj[1], cents };
+                Singer.processPitch(activity, noteObj[0], noteObj[1], cents, turtle, blk);
+                return;
+            }
+
             const noteObj = Singer.addScalarTransposition(
                 activity.logo,
                 turtle,

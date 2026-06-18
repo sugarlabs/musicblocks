@@ -85,6 +85,19 @@ function setupBoxesBlocks(activity) {
          * @param {string} blk - The block identifier.
          */
         flow(args, logo, turtle, blk) {
+            const tur = activity.turtles.ithTurtle(turtle);
+            if (
+                tur.singer.inDuplicate &&
+                tur.singer.duplicateStateStack.length > 0
+            ) {
+                const dupState =
+                    tur.singer.duplicateStateStack[tur.singer.duplicateStateStack.length - 1];
+                if (dupState.incrementedBlks.has(blk)) {
+                    return;
+                }
+                dupState.incrementedBlks.add(blk);
+            }
+
             // If the 2nd arg is not set, default to 1.
             const i = args.length === 2 ? args[1] : 1;
 

@@ -85,7 +85,9 @@ describe("Tests for Singer.PitchActions setup", () => {
                 transpositionRatios: [],
                 invertList: [],
                 keySignature: "C",
-                currentOctave: 4
+                currentOctave: 4,
+                inDuplicate: false,
+                duplicateStateStack: []
             }
         };
         activity = {
@@ -200,6 +202,42 @@ describe("Tests for Singer.PitchActions setup", () => {
             Singer.PitchActions.stepPitch(2, 0, blkId);
             expect(spy).toHaveBeenCalledWith(440);
             spy.mockRestore();
+        });
+
+        test("inside duplicate: first call caches pitch, second call replays cache without recomputing", () => {
+            turtle.singer.lastNotePlayed = ["G4", 4];
+            turtle.singer.inDuplicate = true;
+            const dupState = { pitchCache: {}, incrementedBlks: new Set() };
+            turtle.singer.duplicateStateStack = [dupState];
+            Singer.addScalarTransposition.mockReturnValue(["D", 5]);
+
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+            expect(Singer.addScalarTransposition).toHaveBeenCalledTimes(1);
+            expect(dupState.pitchCache[blkId]).toEqual({ note: "D", octave: 5, cents: 0 });
+            expect(Singer.processPitch).toHaveBeenCalledWith(activity, "D", 5, 0, 0, blkId);
+
+            Singer.processPitch.mockClear();
+            Singer.addScalarTransposition.mockClear();
+            // Simulate lastNotePlayed having been mutated after first play
+            turtle.singer.lastNotePlayed = ["E5", 4];
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+            expect(Singer.addScalarTransposition).not.toHaveBeenCalled();
+            expect(Singer.processPitch).toHaveBeenCalledWith(activity, "D", 5, 0, 0, blkId);
+        });
+
+        test("inside duplicate: different blk id gets its own cache entry", () => {
+            turtle.singer.lastNotePlayed = ["G4", 4];
+            turtle.singer.inDuplicate = true;
+            const dupState = { pitchCache: {}, incrementedBlks: new Set() };
+            turtle.singer.duplicateStateStack = [dupState];
+            Singer.addScalarTransposition
+                .mockReturnValueOnce(["D", 5])
+                .mockReturnValueOnce(["E", 5]);
+
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+            Singer.PitchActions.stepPitch(1, 0, blkId + 1);
+            expect(dupState.pitchCache[blkId]).toEqual({ note: "D", octave: 5, cents: 0 });
+            expect(dupState.pitchCache[blkId + 1]).toEqual({ note: "E", octave: 5, cents: 0 });
         });
     });
 

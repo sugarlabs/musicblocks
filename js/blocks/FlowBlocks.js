@@ -196,6 +196,7 @@ function setupFlowBlocks(activity) {
                 };
 
                 tur.singer.inDuplicate = true;
+                tur.singer.duplicateStateStack.push({ pitchCache: {}, incrementedBlks: new Set() });
 
                 /**
                  * Acquires the connectionStoreLock with proper waiting.
@@ -230,6 +231,7 @@ function setupFlowBlocks(activity) {
                 // Listener function for handling the end of duplication
                 const __listener = async event => {
                     tur.singer.inDuplicate = false;
+                    tur.singer.duplicateStateStack.pop();
                     tur.singer.duplicateFactor /= factor;
 
                     // Acquire lock with proper waiting

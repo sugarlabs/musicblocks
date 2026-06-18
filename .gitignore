@@ -9,3 +9,4 @@ Docs/architecture/dev_architecture.html
 
 # Lighthouse CI
 .lighthouseci/
+.conductor/settings.toml

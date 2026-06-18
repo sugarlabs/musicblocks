@@ -263,6 +263,7 @@ class Turtle {
         this.singer.pushedNote = false;
         this.singer.duplicateFactor = 1;
         this.singer.inDuplicate = false;
+        this.singer.duplicateStateStack = [];
         this.singer.skipFactor = 1;
         this.singer.skipIndex = 0;
         this.singer.instrumentNames = [DEFAULTVOICE];
