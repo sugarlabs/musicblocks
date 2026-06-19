@@ -3873,50 +3873,30 @@ class Blocks {
          * @private
          * @returns {void}
          */
-        this._calculateDragGroup = blk => {
-            this.dragLoopCounter += 1;
-            if (this.dragLoopCounter > this.blockList.length) {
-                console.debug(
-                    "Maximum loop counter exceeded in calculateDragGroup... this is bad. " + blk
-                );
-                return;
-            }
-
-            if (blk == null) {
-                console.debug("null block passed to calculateDragGroup");
-                return;
-            }
-
-            const myBlock = this.blockList[blk];
-            /** If this happens, something is really broken. */
-            if (myBlock == null) {
-                console.debug("null block encountered... this is bad. " + blk);
-                return;
-            }
-
-            /** As before, does these ever happen? */
-            if (myBlock.connections == null) {
-                this.dragGroup = [blk];
-                return;
-            }
-
-            /** Some malformed blocks might have no connections. */
-            if (myBlock.connections.length === 0) {
-                this.dragGroup = [blk];
-                return;
-            }
-
-            this.dragGroup.push(blk);
-
-            for (let c = 1; c < myBlock.connections.length; c++) {
-                const cblk = myBlock.connections[c];
-                if (cblk != null) {
-                    /** Recurse */
-                    this._calculateDragGroup(cblk);
+        this._calculateDragGroup = startBlk => {
+            // Iterative BFS — eliminates recursive stack overflow risk
+            // for deeply chained or cyclic block structures.
+            const visited = new Set();
+            const queue = [startBlk];
+            while (queue.length > 0) {
+                const blk = queue.shift();
+                if (blk == null || visited.has(blk)) continue;
+                visited.add(blk);
+                const myBlock = this.blockList[blk];
+                if (myBlock == null) continue;
+                if (myBlock.connections == null || myBlock.connections.length === 0) {
+                    this.dragGroup.push(blk);
+                    continue;
+                }
+                this.dragGroup.push(blk);
+                for (let c = 1; c < myBlock.connections.length; c++) {
+                    const cblk = myBlock.connections[c];
+                    if (cblk != null && !visited.has(cblk)) {
+                        queue.push(cblk);
+                    }
                 }
             }
         };
-
         /**
          * Set protoblock visibility on the Action palette.
          * @param - state
@@ -5574,20 +5554,33 @@ class Blocks {
                 );
             }
 
-            /** Check for blocks connected to themselves, */
-            /** and for action blocks not connected to text blocks. */
-            for (let b = 0; b < blockObjs.length; b++) {
-                const blkData = blockObjs[b];
-
-                for (const c in blkData[4]) {
-                    if (blkData[4][c] === blkData[0]) {
-                        console.debug("Circular connection in block data: " + blkData);
-
-                        console.debug("Punting loading of new blocks!");
-
-                        console.debug(blockObjs);
-                        return;
-                    }
+            // Check for BOTH self-loops AND multi-block cycles using DFS
+            const adjacency = new Map();
+            for (const bd of blockObjs) {
+                if (Array.isArray(bd[4])) {
+                    adjacency.set(
+                        bd[0],
+                        bd[4].filter(c => c !== null && c !== undefined)
+                    );
+                }
+            }
+            const _visited = new Set();
+            const _recStack = new Set();
+            const _hasCycle = node => {
+                if (_recStack.has(node)) return true;
+                if (_visited.has(node)) return false;
+                _visited.add(node);
+                _recStack.add(node);
+                for (const neighbor of adjacency.get(node) || []) {
+                    if (_hasCycle(neighbor)) return true;
+                }
+                _recStack.delete(node);
+                return false;
+            };
+            for (const [node] of adjacency) {
+                if (_hasCycle(node)) {
+                    console.error("Cycle detected in block connection data — refusing to load.");
+                    return;
                 }
             }
 
