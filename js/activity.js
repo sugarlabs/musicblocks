@@ -982,6 +982,49 @@ class Activity {
             activity._findBlocks();
         }
 
+        /*
+         * Compute bounding box of all visible blocks and center them
+         * on the canvas by adjusting `blocksContainer.x` and `blocksContainer.y`.
+         * This respects `turtleBlocksScale` so the visual centering is correct.
+         */
+        this.centerAndFitBlocks = () => {
+            try {
+                if (!this.blocks || !this.blocks.blockList) return;
+
+                let minX = Infinity,
+                    minY = Infinity,
+                    maxX = -Infinity,
+                    maxY = -Infinity;
+
+                for (const blk of this.blocks.blockList) {
+                    if (!blk || blk.trash) continue;
+                    const bx = blk.container.x;
+                    const by = blk.container.y;
+                    const bw = blk.width || 0;
+                    const bh = blk.height || 0;
+                    minX = Math.min(minX, bx);
+                    minY = Math.min(minY, by);
+                    maxX = Math.max(maxX, bx + bw);
+                    maxY = Math.max(maxY, by + bh);
+                }
+
+                if (minX === Infinity) return; // no blocks
+
+                const contentCenterX = (minX + maxX) / 2;
+                const contentCenterY = (minY + maxY) / 2;
+
+                const canvasCenterX = this.canvas.width / (2 * this.turtleBlocksScale);
+                const canvasCenterY = this.canvas.height / (2 * this.turtleBlocksScale);
+
+                this.blocksContainer.x = canvasCenterX - contentCenterX;
+                this.blocksContainer.y = canvasCenterY - contentCenterY;
+                this.stageDirty = true;
+                this.update = true;
+            } catch (e) {
+                console.error("centerAndFitBlocks failed:", e);
+            }
+        };
+
         //if any window resize event occurs:
         this._handleRepositionBlocksOnResize = () => repositionBlocks(this);
         this.addEventListener(window, "resize", this._handleRepositionBlocksOnResize);
@@ -4706,6 +4749,15 @@ class Activity {
                     }
                     // Set flag to 1 to enable keyboard after MB finishes loading
                     that.keyboardEnableFlag = 1;
+                    // Auto-center blocks once after load to fit workspace
+                    if (!that._autoCenteredOnLoad) {
+                        try {
+                            that.centerAndFitBlocks();
+                            that._autoCenteredOnLoad = true;
+                        } catch (e) {
+                            console.error("Auto-centering failed:", e);
+                        }
+                    }
                 }
 
                 document.removeEventListener("finishedLoading", __afterLoad);
