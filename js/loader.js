@@ -130,7 +130,8 @@ requirejs.config({
                 "activity/idle-watcher",
                 "activity/grid-controller",
                 "activity/grid-renderer",
-                "activity/plugin-controller"
+                "activity/plugin-controller",
+                "widgets/plugin-dialog"
             ],
             exports: "Activity"
         },

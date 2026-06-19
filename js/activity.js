@@ -31,7 +31,7 @@ try {
    ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON, debugLog,
    ErrorHandler, ActivityContext,
    Boundary, CARTESIAN, changeImage, closeWidgets, doRecordButton, setupActivityRecorder,
-   setupGridController, setupGridRenderer, setupPluginController,
+   setupGridController, setupGridRenderer, setupPluginController, PluginDialog,
    setupActivityAbcParser, setupActivityIdleWatcher,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
@@ -128,6 +128,7 @@ let MYDEFINES = [
     "activity/grid-controller",
     "activity/grid-renderer",
     "activity/plugin-controller",
+    "widgets/plugin-dialog",
     "utils/musicutils",
     "utils/synthutils",
     "utils/mathutils",
@@ -459,6 +460,7 @@ class Activity {
 
         setupActivityIdleWatcher(this);
         setupPluginController(this);
+        this.pluginDialog = new PluginDialog(this);
 
         /**
          * Initialises major variables and renders default stack.
@@ -479,8 +481,6 @@ class Activity {
 
             // Set up a file chooser for the doOpen function.
             this.fileChooser = document.getElementById("myOpenFile");
-            // Set up a file chooser for the doOpenPlugin function.
-            this.pluginChooser = document.getElementById("myOpenPlugin");
             // The file chooser for all files
             this.allFilesChooser = document.getElementById("myOpenAll");
             this.auxToolbar = document.getElementById("aux-toolbar");
@@ -2010,12 +2010,8 @@ class Activity {
             }
         };
 
-        /**
-         * Deletes a plugin palette from local storage based on the active palette.
-         * @param {object} activity - The activity object.
-         */
         const deletePlugin = activity => {
-            activity._deletePlugin();
+            activity.pluginDialog.deletePlugin();
         };
 
         /**
@@ -5364,7 +5360,7 @@ class Activity {
          * Opens plugin by clicking on the plugin open chooser in the DOM (.json).
          */
         const doOpenPlugin = activity => {
-            activity._doOpenPlugin();
+            activity.pluginDialog.openPlugin();
         };
 
         this._loadBuiltInPlugin = name => {
@@ -5385,32 +5381,31 @@ class Activity {
             });
         };
 
-        this._doOpenPlugin = () => {
-            this.toolbar.closeAuxToolbar(showHideAuxMenu);
-            const rawName = prompt(
-                _("Enter the name of a built-in plugin, or leave blank to upload a plugin file:")
-            );
-            if (rawName === null) {
-                return; // User cancelled the operation
-            }
+        this.handlePluginFileSelected = file => {
+            const that = this;
+            const reader = new FileReader();
 
-            const name = rawName.trim().toLowerCase();
-            if (name !== "") {
-                // Validate: only allow safe characters (alphanumeric, hyphens, and underscores)
-                // This prevents path traversal attacks like "../../secrets"
-                if (!/^[a-z0-9\-_]+$/.test(name)) {
-                    alert(
-                        _(
-                            "Invalid plugin name. Only alphanumeric characters, hyphens, and underscores are allowed."
-                        )
-                    );
-                    return;
-                }
-                this._loadBuiltInPlugin(name);
-            } else {
-                this.pluginChooser.focus();
-                this.pluginChooser.click();
-            }
+            reader.onload = () => {
+                that.loading = true;
+                document.body.style.cursor = "wait";
+
+                setTimeout(async () => {
+                    const source = file.name ? "file:" + file.name : "file:local-file";
+                    await that.pluginController.loadPluginFromFileContent(reader.result, source);
+
+                    // Refresh the palettes.
+                    setTimeout(() => {
+                        if (that.palettes.visible) {
+                            that.palettes.hide();
+                        }
+                    }, 1000);
+
+                    document.body.style.cursor = "default";
+                    that.loading = false;
+                }, 200);
+            };
+
+            reader.readAsText(file);
         };
 
         /*
@@ -7124,51 +7119,6 @@ class Activity {
                 event.currentTarget.value = "";
             });
 
-            this.pluginChooser.addEventListener("click", event => {
-                window.scroll(0, 0);
-                event.currentTarget.value = "";
-            });
-
-            this.pluginChooser.addEventListener(
-                "change",
-                () => {
-                    window.scroll(0, 0);
-
-                    // Read file here.
-                    const reader = new FileReader();
-                    const pluginFile = that.pluginChooser.files[0];
-
-                    reader.onload = () => {
-                        that.loading = true;
-                        document.body.style.cursor = "wait";
-                        //doLoadAnimation();
-
-                        setTimeout(async () => {
-                            const source =
-                                pluginFile && pluginFile.name
-                                    ? "file:" + pluginFile.name
-                                    : "file:local-file";
-                            await that.pluginController.loadPluginFromFileContent(
-                                reader.result,
-                                source
-                            );
-
-                            // Refresh the palettes.
-                            setTimeout(() => {
-                                if (that.palettes.visible) {
-                                    that.palettes.hide();
-                                }
-                            }, 1000);
-
-                            document.body.style.cursor = "default";
-                            that.loading = false;
-                        }, 200);
-                    };
-
-                    reader.readAsText(pluginFile);
-                },
-                false
-            );
 
             // Enable touch interactions if supported on the current device.
             createjs.Touch.enable(this.stage, false, true);
