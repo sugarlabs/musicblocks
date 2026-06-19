@@ -1864,6 +1864,7 @@ function Synth() {
                         );
                         chainNodes.push(vibrato);
                         effectsToDispose.push(vibrato);
+                        this._trackPendingEffect(vibrato);
                     }
 
                     if (paramsEffects.doDistortion) {
@@ -1979,46 +1980,44 @@ function Synth() {
                     }
                 }
 
-                // Schedule cleanup after the note duration.
-                // A 500 ms safety buffer is added beyond the note duration to prevent
-                // premature disposal caused by audio-clock drift or scheduler jitter,
-                // which would otherwise produce crackling artefacts in long sessions.
-                setTimeout(
+                const capturedEpoch = this._instrumentEpoch;
+                this._timerManager.setGuardedTimeout(
                     () => {
-                        try {
-                            // Dispose of effects
+                        // Check epoch: if instruments were disposed, skip cleanup on dead synth
+                        if (this._instrumentEpoch !== capturedEpoch) {
+                            // Instruments disposed — still need to dispose the Tone effect nodes
                             effectsToDispose.forEach(effect => {
-                                if (effect && typeof effect.dispose === "function") {
-                                    effect.dispose();
-                                }
+                                try {
+                                    if (effect) effect.dispose();
+                                } catch (e) {}
                             });
-
-                            // Dispose of filters
-                            if (temp_filters.length > 0) {
-                                temp_filters.forEach(filter => {
-                                    if (filter && typeof filter.dispose === "function") {
-                                        filter.dispose();
-                                    }
-                                });
-                            }
-
-                            // Re-establish the dry path only when no other effects chain
-                            // is still active on this synth; otherwise the direct
-                            // connection would bypass the in-flight chain.
-                            const remaining = (_effectsInFlight.get(synth) || 1) - 1;
-                            _effectsInFlight.set(synth, remaining);
-                            if (
-                                remaining === 0 &&
-                                synth &&
-                                typeof synth.toDestination === "function"
-                            ) {
+                            temp_filters.forEach(filter => {
+                                try {
+                                    if (filter) filter.dispose();
+                                } catch (e) {}
+                            });
+                            return;
+                        }
+                        effectsToDispose.forEach(effect => {
+                            try {
+                                if (effect) effect.dispose();
+                            } catch (e) {}
+                        });
+                        temp_filters.forEach(filter => {
+                            try {
+                                if (filter) filter.dispose();
+                            } catch (e) {}
+                        });
+                        const remaining = (_effectsInFlight.get(synth) || 1) - 1;
+                        _effectsInFlight.set(synth, remaining);
+                        if (remaining === 0 && synth && typeof synth.toDestination === "function") {
+                            try {
                                 synth.toDestination();
-                            }
-                        } catch (e) {
-                            console.debug("Error disposing effects:", e);
+                            } catch (e) {}
                         }
                     },
-                    beatValue * 1000 + 500
+                    beatValue * 1000 + 500,
+                    () => false // never auto-abort: cleanup must always run eventually
                 );
             }
         } catch (e) {
