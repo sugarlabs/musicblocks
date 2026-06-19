@@ -193,7 +193,7 @@ class ModeWidget {
         const row = table.insertRow();
         const cell = row.insertCell();
         // cell.colSpan = 18;
-        cell.innerHTML = "&nbsp;";
+        cell.textContent = "\u00a0";
         cell.style.backgroundColor = platformColor.selectorBackground;
 
         // Set current mode in pie menu.
