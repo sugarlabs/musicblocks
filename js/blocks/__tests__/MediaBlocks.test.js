@@ -126,7 +126,7 @@ global.NANERRORMSG = "Not a number";
 
 global.toFixed2 = val => Number(val).toFixed(2);
 
-global.calcOctave = (currentOctave, val, lastNote, noteValue) => currentOctave + parseInt(val);
+global.calcOctave = (currentOctave, val, lastNote, noteValue) => currentOctave + parseInt(val, 10);
 global.pitchToFrequency = (note, octave, cents, keySig) => 440;
 global.doStopVideoCam = jest.fn();
 
