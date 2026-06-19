@@ -179,9 +179,9 @@ class ProjectStorage {
         const savedjsonobj = await this.LocalStorage.getItem(key);
 
         //  prevent unnecessary crashing
+        if (savedjsonobj == null) throw new Error("Failed to save project data");
 
         // == null covers both null and undefined
-        if (savedjsonobj == null) throw new Error("Failed to save project data"); // eslint-disable-line eqeqeq
     }
 
     async get(key) {

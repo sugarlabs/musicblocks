@@ -284,7 +284,6 @@ function setupRhythmActions(activity) {
                 if (tur.singer.tieCarryOver > 0) {
                     if (tur.singer.justCounting.length === 0) {
                         const lastNote = last(tur.singer.inNoteBlock);
-                        // eslint-disable-next-line eqeqeq
                         if (lastNote != null && lastNote in tur.singer.notePitches) {
                             // Remove the note from the Lilypond list
                             for (
