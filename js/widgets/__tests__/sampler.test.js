@@ -983,6 +983,48 @@ describe("Sampler Widget", () => {
             expect(window.navigator.mediaDevices.getUserMedia).toHaveBeenCalled();
         });
 
+        test("pitch detection reuses tuner element references during animation", async () => {
+            widget.widgetWindow = widgetWindow;
+            const audioContext = {
+                sampleRate: 44100,
+                createMediaStreamSource: jest.fn(() => ({ connect: jest.fn() })),
+                createAnalyser: jest.fn(() => ({
+                    fftSize: 0,
+                    getFloatTimeDomainData: jest.fn()
+                })),
+                close: jest.fn().mockResolvedValue()
+            };
+            global.AudioContext = jest.fn(() => audioContext);
+            const stream = { getTracks: jest.fn(() => [{ stop: jest.fn() }]) };
+            Object.defineProperty(window, "navigator", {
+                value: {
+                    mediaDevices: {
+                        getUserMedia: jest.fn().mockResolvedValue(stream)
+                    }
+                },
+                configurable: true
+            });
+
+            let rafCalls = 0;
+            global.requestAnimationFrame = jest.fn(cb => {
+                rafCalls += 1;
+                if (rafCalls === 1) cb();
+                return rafCalls;
+            });
+
+            widget.makeTuner(400, 300);
+            const startButton = document.getElementById("start");
+            const getElementByIdSpy = jest.spyOn(document, "getElementById");
+
+            startButton.click();
+
+            await Promise.resolve();
+            expect(getElementByIdSpy).not.toHaveBeenCalledWith("pitch");
+            expect(getElementByIdSpy).not.toHaveBeenCalledWith("note");
+
+            getElementByIdSpy.mockRestore();
+        });
+
         test("startPitchDetection handles getUserMedia failure", async () => {
             widget.widgetWindow = widgetWindow;
             const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});

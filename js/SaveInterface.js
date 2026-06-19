@@ -102,49 +102,67 @@ class SaveInterface {
             _("Project Code") +
             "</h4>" +
             _("This code stores data about the blocks in a project.") +
-            '<a href="#" onclick="toggle(); return false;" id="showhide">' +
+            '<a href="#" id="showhide" class="showhide-btn">' +
             STR_SHOW +
             "</a>" +
-            '<button class="btn" onclick="copyCode()" style="margin-left: 10px;">' +
+            '<button class="btn copy-code-btn" style="margin-left: 10px;">' +
             _("Copy to Clipboard") +
             "</button>" +
             '</div> <div class="code" id="codeBlock">{{ data }}</div></div></div></div>' +
             '<script type="text/javascript">' +
-            "function toggle() {" +
-            '  var codeBlock = document.getElementsByClassName("code")[0];' +
-            '  var showHideButton = document.getElementById("showhide");' +
-            '  if (codeBlock.style.display === "none") {' +
-            '    codeBlock.style.display = "flex";' +
-            '    showHideButton.textContent = "' +
+            "(function() {" +
+            "  function toggle() {" +
+            '    var codeBlock = document.getElementById("codeBlock");' +
+            '    var showHideButton = document.getElementById("showhide");' +
+            '    if (codeBlock.style.display === "none") {' +
+            '      codeBlock.style.display = "flex";' +
+            '      showHideButton.textContent = "' +
             STR_HIDE +
             '";' +
-            "  } else {" +
-            '    codeBlock.style.display = "none";' +
-            '    showHideButton.textContent = "' +
+            "    } else {" +
+            '      codeBlock.style.display = "none";' +
+            '      showHideButton.textContent = "' +
             STR_SHOW +
             '";' +
+            "    }" +
             "  }" +
-            "}" +
-            'window.addEventListener("load", function() {' +
-            '  var codeBlock = document.getElementById("codeBlock");' +
-            '  var showHideButton = document.getElementById("showhide");' +
-            '  codeBlock.style.display = "none";' +
-            '  showHideButton.textContent = "' +
-            STR_SHOW +
-            '";' +
-            "});" +
-            "function copyCode() {" +
-            '  var text = document.getElementById("codeBlock").innerText;' +
-            "  navigator.clipboard.writeText(text).then(function() {" +
-            '    alert("' +
+            "  function copyCode() {" +
+            '    var text = document.getElementById("codeBlock").innerText;' +
+            "    navigator.clipboard.writeText(text).then(function() {" +
+            '      alert("' +
             _("Project code copied to clipboard!") +
             '");' +
-            "  }).catch(function() {" +
-            '    alert("' +
+            "    }).catch(function() {" +
+            '      alert("' +
             _("Failed to copy.") +
             '");' +
-            "  });" +
-            "}" +
+            "    });" +
+            "  }" +
+            "  function initializeEventListeners() {" +
+            '    var codeBlock = document.getElementById("codeBlock");' +
+            '    var showHideButton = document.getElementById("showhide");' +
+            '    var copyButton = document.querySelector(".copy-code-btn");' +
+            "    if (codeBlock && showHideButton && copyButton) {" +
+            '      codeBlock.style.display = "none";' +
+            '      showHideButton.textContent = "' +
+            STR_SHOW +
+            '";' +
+            '      showHideButton.addEventListener("click", function(e) {' +
+            "        e.preventDefault();" +
+            "        toggle();" +
+            "      });" +
+            '      copyButton.addEventListener("click", function(e) {' +
+            "        e.preventDefault();" +
+            "        copyCode();" +
+            "      });" +
+            "    }" +
+            "  }" +
+            '  if (document.readyState === "loading") {' +
+            '    document.addEventListener("DOMContentLoaded", initializeEventListeners);' +
+            "  } else {" +
+            "    initializeEventListeners();" +
+            "  }" +
+            "})();" +
             "</script>";
 
         this.timeLastSaved = -100;
@@ -765,19 +783,29 @@ class SaveInterface {
             docById("author").value = _("Mr. Mouse");
         }
 
-        docById("submitLilypond").onclick = () => {
-            activity.save.saveLYFile(false);
-        };
+        const submitButton = docById("submitLilypond");
+        if (submitButton) {
+            submitButton.addEventListener("click", () => {
+                activity.save.saveLYFile(false);
+            });
+        }
         // if (this.planet){
-        //     docById('submitPDF').onclick = function(){this.saveLYFile(true);}.bind(this);
-        //     docById('submitPDF').disabled = false;
+        //     const pdfButton = docById('submitPDF');
+        //     if (pdfButton) {
+        //         pdfButton.addEventListener('click', function(){this.saveLYFile(true);}.bind(this));
+        //         pdfButton.disabled = false;
+        //     }
         // } else {
-        //     docById('submitPDF').disabled = true;
+        //     const pdfButton = docById('submitPDF');
+        //     if (pdfButton) pdfButton.disabled = true;
         // }
-        docByClass("close")[0].onclick = () => {
-            activity.logo.runningLilypond = false;
-            docById("lilypondModal").style.display = "none";
-        };
+        const closeButton = docByClass("close")[0];
+        if (closeButton) {
+            closeButton.addEventListener("click", () => {
+                activity.logo.runningLilypond = false;
+                docById("lilypondModal").style.display = "none";
+            });
+        }
     }
     /**
      * Save Lilypond file with optional PDF conversion.

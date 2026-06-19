@@ -217,53 +217,54 @@ describe("processABCNotes - Chords", () => {
 });
 
 describe("processABCNotes - Tuplet Handling", () => {
-    let logo;
-    beforeEach(() => {
-        logo = { notationNotes: { 0: "" }, notation: { notationStaging: { 0: [] } } };
+    const makeLogo = staging => ({
+        notationNotes: { 0: "" },
+        notation: { notationStaging: { 0: staging } }
     });
 
-    it("should process standard tuplets correctly", () => {
-        logo.notation.notationStaging["0"] = [
-            [["G♯4"], 4, 0, 3, 2, -1, false],
-            [["F4"], 4, 0, 3, 2, -1, false],
-            [["G♯4"], 4, 0, 3, 2, -1, false]
-        ];
+    const cases = [
+        {
+            name: "standard tuplets",
+            staging: [
+                [["G♯4"], 4, 0, 3, 2, -1, false],
+                [["F4"], 4, 0, 3, 2, -1, false],
+                [["G♯4"], 4, 0, 3, 2, -1, false]
+            ],
+            assertion: out => expect(out).toBe("(1:1G^ 2G^ 2G^ 2 ")
+        },
+        {
+            name: "tuplets with chords",
+            staging: [[["C4", "E4"], 4, 0, 1, 1, -1, false]],
+            assertion: out => expect(out).toContain("[C E ]")
+        },
+        {
+            name: "staccato inside tuplets",
+            staging: [[["C4", "E4"], 4, 0, 1, 1, -1, true]],
+            assertion: out => expect(out).toContain(".")
+        },
+        {
+            name: "incomplete/mixed tuplets",
+            staging: [
+                [["A4"], 4, 0, 3, 2, -1, false],
+                [["B4"], 4, 0, 3, 2, -1, false]
+            ],
+            assertion: out => expect(out).toContain("(")
+        },
+        {
+            name: "matching chord ID skip logic",
+            staging: [
+                [["A4"], 4, 0, 2, 2, 100, false],
+                [["B4"], 4, 0, 2, 2, 100, false],
+                [["C4"], 4, 0, 2, 2, -1, false]
+            ],
+            assertion: out => expect(out).not.toBe("")
+        }
+    ];
 
+    test.each(cases)("$name", ({ staging, assertion }) => {
+        const logo = makeLogo(staging);
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(1:1G^ 2G^ 2G^ 2 ");
-    });
-
-    it("should handle array of notes (chords) inside tuplets", () => {
-        logo.notation.notationStaging["0"] = [[["C4", "E4"], 4, 0, 1, 1, -1, false]];
-
-        processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toContain("[C E ]");
-    });
-
-    it("should handle staccato inside tuplets", () => {
-        logo.notation.notationStaging["0"] = [[["C4", "E4"], 4, 0, 1, 1, -1, true]];
-
-        processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toContain(".");
-    });
-
-    it("should handle incomplete/mixed tuplets logic", () => {
-        logo.notation.notationStaging["0"] = [
-            [["A4"], 4, 0, 3, 2, -1, false],
-            [["B4"], 4, 0, 3, 2, -1, false]
-        ];
-        processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toContain("(");
-    });
-
-    it("should handle tuplet with matching chord IDs (skip logic)", () => {
-        logo.notation.notationStaging["0"] = [
-            [["A4"], 4, 0, 2, 2, 100, false],
-            [["B4"], 4, 0, 2, 2, 100, false],
-            [["C4"], 4, 0, 2, 2, -1, false]
-        ];
-        processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).not.toBe("");
+        assertion(logo.notationNotes["0"]);
     });
 });
 
@@ -348,26 +349,6 @@ describe("saveAbcOutput", () => {
 
         expect(result).toContain("K:Bb MAJOR");
         expect(result).toContain("b");
-    });
-});
-
-describe("processABCNotes - Tuplet Handling", () => {
-    it("should process tuplets correctly", () => {
-        const logo = {
-            notationNotes: { 0: "" },
-            notation: {
-                notationStaging: {
-                    0: [
-                        [["G♯4"], 4, 0, 3, 2, -1, false],
-                        [["F4"], 4, 0, 3, 2, -1, false],
-                        [["G♯4"], 4, 0, 3, 2, -1, false]
-                    ]
-                }
-            }
-        };
-
-        processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(1:1G^ 2G^ 2G^ 2 ");
     });
 });
 
