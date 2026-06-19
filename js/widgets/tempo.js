@@ -185,7 +185,7 @@ class Tempo {
                 if (this._firstClickTime === null) {
                     this._firstClickTime = d.getTime();
                 } else {
-                    newBPM = parseInt((60 * 1000) / (d.getTime() - this._firstClickTime));
+                    newBPM = parseInt((60 * 1000) / (d.getTime() - this._firstClickTime), 10);
                     if (newBPM > 29 && newBPM < 1001) {
                         this.BPMs[id] = newBPM;
                         this._updateBPM(id);
