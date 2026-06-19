@@ -165,13 +165,20 @@ class StatusMatrix {
                         label = label.value;
                     }
                     break;
-                default:
-                    label =
-                        this.activity.blocks.blockList[statusField[0]].protoblock.staticLabels[0];
+                default: {
+                    const block = this.activity.blocks.blockList[statusField[0]];
+                    label = block?.protoblock?.staticLabels?.[0] || "";
                     break;
+                }
             }
-            let str = label;
-            str = label.charAt(0).toUpperCase() + label.slice(1);
+
+            let str = "";
+            if (typeof label === "string" && label.length > 0) {
+                str = label.charAt(0).toUpperCase() + label.slice(1);
+            } else {
+                str = "";
+            }
+
             // console.log(str);
             cell.textContent = "\u00A0";
             const b = document.createElement("b");
