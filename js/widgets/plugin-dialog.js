@@ -20,14 +20,19 @@
  * and user gesture handling (click/change) for loading and deleting plugins.
  *
  * Delegates: file reading, loading indicators, palette refreshes, and state/storage
- * management to the Activity and the PluginController.
+ * management to the Activity and the PluginController via callbacks.
  */
 class PluginDialog {
     /**
-     * @param {object} activity - The Activity instance.
+     * @param {object} options - Callbacks and option settings.
+     * @param {Function} options.onLoadBuiltIn - Called to load a built-in plugin by name.
+     * @param {Function} options.onDelete - Called to delete the active plugin.
+     * @param {Function} options.onFileSelected - Called when a plugin file is selected.
+     * @param {Function} options.closeAuxToolbar - Callback to close the auxiliary toolbar.
+     * @param {Function} options.showHideAuxMenu - Callback to resize/hide the auxiliary menu.
      */
-    constructor(activity) {
-        this.activity = activity;
+    constructor(options) {
+        this.options = options || {};
         this.pluginChooser = document.getElementById("myOpenPlugin");
         this.setupEventListeners();
     }
@@ -50,8 +55,8 @@ class PluginDialog {
             () => {
                 window.scroll(0, 0);
                 const file = this.pluginChooser.files[0];
-                if (file) {
-                    this.activity.handlePluginFileSelected(file);
+                if (file && typeof this.options.onFileSelected === "function") {
+                    this.options.onFileSelected(file);
                 }
             },
             false
@@ -63,9 +68,9 @@ class PluginDialog {
      * Shows a prompt asking for a built-in plugin name or triggers file upload if blank.
      */
     openPlugin() {
-        this.activity.toolbar.closeAuxToolbar((activity, resize) => {
-            activity._showHideAuxMenu(resize);
-        });
+        if (typeof this.options.closeAuxToolbar === "function") {
+            this.options.closeAuxToolbar(this.options.showHideAuxMenu);
+        }
 
         const rawName = prompt(
             _("Enter the name of a built-in plugin, or leave blank to upload a plugin file:")
@@ -86,10 +91,11 @@ class PluginDialog {
                 );
                 return;
             }
-            this.activity._loadBuiltInPlugin(name);
+            if (typeof this.options.onLoadBuiltIn === "function") {
+                this.options.onLoadBuiltIn(name);
+            }
         } else {
             if (this.pluginChooser) {
-                this.pluginChooser.focus();
                 this.pluginChooser.click();
             }
         }
@@ -99,7 +105,9 @@ class PluginDialog {
      * Triggers the user flow to delete a plugin.
      */
     deletePlugin() {
-        this.activity._deletePlugin();
+        if (typeof this.options.onDelete === "function") {
+            this.options.onDelete();
+        }
     }
 }
 
@@ -108,7 +116,6 @@ class PluginDialog {
 // runtime in the browser.
 if (typeof define === "function" && define.amd) {
     define(function () {
-        window.PluginDialog = PluginDialog;
         return { PluginDialog };
     });
 } else if (typeof module !== "undefined" && module.exports) {

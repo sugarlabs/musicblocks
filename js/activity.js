@@ -460,7 +460,13 @@ class Activity {
 
         setupActivityIdleWatcher(this);
         setupPluginController(this);
-        this.pluginDialog = new PluginDialog(this);
+        this.pluginDialog = new PluginDialog({
+            onLoadBuiltIn: name => this._loadBuiltInPlugin(name),
+            onDelete: () => this._deletePlugin(),
+            onFileSelected: file => this.handlePluginFileSelected(file),
+            closeAuxToolbar: callback => this.toolbar.closeAuxToolbar(callback),
+            showHideAuxMenu: (activity, resize) => activity._showHideAuxMenu(resize)
+        });
 
         /**
          * Initialises major variables and renders default stack.
