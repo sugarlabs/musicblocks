@@ -7125,7 +7125,6 @@ class Activity {
                 event.currentTarget.value = "";
             });
 
-
             // Enable touch interactions if supported on the current device.
             createjs.Touch.enable(this.stage, false, true);
 
