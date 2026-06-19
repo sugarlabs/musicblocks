@@ -80,14 +80,20 @@ class PitchStaircase {
         cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
+        cell.style.backgroundColor = getComputedStyle(document.body)
+            .getPropertyValue("--color-selector-bg")
+            .trim();
 
         cell.onmouseover = () => {
-            cell.style.backgroundColor = platformColor.selectorBackgroundHOVER;
+            cell.style.backgroundColor = getComputedStyle(document.body)
+                .getPropertyValue("--color-selector-sel")
+                .trim();
         };
 
         cell.onmouseout = () => {
-            cell.style.backgroundColor = platformColor.selectorBackground;
+            cell.style.backgroundColor = getComputedStyle(document.body)
+                .getPropertyValue("--color-selector-bg")
+                .trim();
         };
 
         return cell;
@@ -143,7 +149,9 @@ class PitchStaircase {
             stepCell.style.minWidth = stepCell.style.width;
             stepCell.style.maxWidth = stepCell.style.width;
             stepCell.style.height = PitchStaircase.BUTTONSIZE + "px";
-            stepCell.style.backgroundColor = platformColor.selectorBackground;
+            stepCell.style.backgroundColor = getComputedStyle(document.body)
+                .getPropertyValue("--color-selector-bg")
+                .trim();
 
             const cellWidth = Number(stepCell.style.width.replace(/px/, ""));
             const svgWidth = cellWidth.toString();
@@ -308,12 +316,16 @@ class PitchStaircase {
      */
     _playOne(stepCell) {
         // The frequency is stored in the stepCell.
-        stepCell.style.backgroundColor = platformColor.selectorBackground;
+        stepCell.style.backgroundColor = getComputedStyle(document.body)
+            .getPropertyValue("--color-selector-bg")
+            .trim();
         const frequency = Number(stepCell.getAttribute("id"));
         this.activity.logo.synth.trigger(0, frequency, 1, DEFAULTVOICE, null, null);
 
         setTimeout(() => {
-            stepCell.style.backgroundColor = platformColor.selectorBackground;
+            stepCell.style.backgroundColor = getComputedStyle(document.body)
+                .getPropertyValue("--color-selector-bg")
+                .trim();
         }, 1000);
     }
 
@@ -328,14 +340,18 @@ class PitchStaircase {
             const note = this.Stairs[i][0] + this.Stairs[i][1];
             pitchnotes.push(normalizeNoteAccidentals(note));
             const stepCell = this._stepTables[i].rows[0].cells[1];
-            stepCell.style.backgroundColor = platformColor.selectorBackground;
+            stepCell.style.backgroundColor = getComputedStyle(document.body)
+                .getPropertyValue("--color-selector-bg")
+                .trim();
             this.activity.logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
         }
 
         setTimeout(() => {
             for (let i = 0; i < this.Stairs.length; i++) {
                 const stepCell = this._stepTables[i].rows[0].cells[1];
-                stepCell.style.backgroundColor = platformColor.selectorBackground;
+                stepCell.style.backgroundColor = getComputedStyle(document.body)
+                    .getPropertyValue("--color-selector-bg")
+                    .trim();
             }
         }, 1000);
     }
@@ -351,7 +367,9 @@ class PitchStaircase {
         pitchnotes.push(normalizeNoteAccidentals(note));
         const last = this.Stairs.length - 1;
         const stepCell = this._stepTables[last].rows[0].cells[1];
-        stepCell.style.backgroundColor = platformColor.selectorBackground;
+        stepCell.style.backgroundColor = getComputedStyle(document.body)
+            .getPropertyValue("--color-selector-bg")
+            .trim();
         this.activity.logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
         this._playNext(this.Stairs.length - 2, -1);
     }
@@ -369,7 +387,9 @@ class PitchStaircase {
             setTimeout(() => {
                 for (let i = 0; i < this.Stairs.length; i++) {
                     const stepCell = this._stepTables[i].rows[0].cells[1];
-                    stepCell.style.backgroundColor = platformColor.selectorBackground;
+                    stepCell.style.backgroundColor = getComputedStyle(document.body)
+                        .getPropertyValue("--color-selector-bg")
+                        .trim();
                 }
             }, 1000);
             return;
@@ -379,7 +399,9 @@ class PitchStaircase {
             setTimeout(() => {
                 for (let i = 0; i < this.Stairs.length; i++) {
                     const stepCell = this._stepTables[i].rows[0].cells[1];
-                    stepCell.style.backgroundColor = platformColor.selectorBackground;
+                    stepCell.style.backgroundColor = getComputedStyle(document.body)
+                        .getPropertyValue("--color-selector-bg")
+                        .trim();
                 }
             }, 1000);
 
@@ -401,11 +423,15 @@ class PitchStaircase {
         setTimeout(() => {
             if (pscTableCell !== null && pscTableCell !== undefined) {
                 const stepCell = pscTableCell.rows[0].cells[1];
-                stepCell.style.backgroundColor = platformColor.selectorBackground;
+                stepCell.style.backgroundColor = getComputedStyle(document.body)
+                    .getPropertyValue("--color-selector-bg")
+                    .trim();
             }
 
             const stepCell = this._stepTables[index].rows[0].cells[1];
-            stepCell.style.backgroundColor = platformColor.selectorBackground;
+            stepCell.style.backgroundColor = getComputedStyle(document.body)
+                .getPropertyValue("--color-selector-bg")
+                .trim();
             this.activity.logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
             // Use && so playback terminates when index reaches either boundary;
             // the boundary cases (=== -1 and === Stairs.length) are already
