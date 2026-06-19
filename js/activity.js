@@ -5370,6 +5370,14 @@ class Activity {
         };
 
         this._loadBuiltInPlugin = name => {
+            // Validate: only allow safe characters (alphanumeric, hyphens, and underscores).
+            // This prevents path traversal attacks like "../../secrets" regardless of caller.
+            if (!/^[a-z0-9\-_]+$/.test(name)) {
+                ErrorHandler.warn("Invalid plugin name rejected: " + name, {
+                    operation: "loadPlugin"
+                });
+                return;
+            }
             const that = this;
             this.pluginController.loadBuiltInPluginFromXHR(name).then(success => {
                 if (success) {

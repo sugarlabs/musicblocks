@@ -81,16 +81,6 @@ class PluginDialog {
 
         const name = rawName.trim().toLowerCase();
         if (name !== "") {
-            // Validate: only allow safe characters (alphanumeric, hyphens, and underscores)
-            // This prevents path traversal attacks like "../../secrets"
-            if (!/^[a-z0-9\-_]+$/.test(name)) {
-                alert(
-                    _(
-                        "Invalid plugin name. Only alphanumeric characters, hyphens, and underscores are allowed."
-                    )
-                );
-                return;
-            }
             if (typeof this.options.onLoadBuiltIn === "function") {
                 this.options.onLoadBuiltIn(name);
             }
