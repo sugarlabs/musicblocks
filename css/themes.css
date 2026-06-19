@@ -689,7 +689,7 @@ body.highcontrast {
 /* Dark Mode Tooltip Styling - Slightly lighter background for better contrast */
 .dark .material-tooltip {
     background-color: #3a3a3a !important;
-    color: var(--color-text-inverse) !important;
+    color: var(--color-text-primary) !important;
 }
 
 .dark .material-tooltip .backdrop {
@@ -697,5 +697,5 @@ body.highcontrast {
 }
 
 .dark .material-tooltip span {
-    color: var(--color-text-inverse) !important;
+    color: var(--color-text-primary) !important;
 }
