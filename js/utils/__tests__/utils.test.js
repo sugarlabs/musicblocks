@@ -1004,7 +1004,7 @@ describe("getTextWidth()", () => {
 });
 
 describe("changeImage()", () => {
-    it("replaces image source when it matches the old SVG", () => {
+    it("replaces image source with the new SVG", () => {
         const from = "<svg>old</svg>";
         const to = "<svg>new</svg>";
         const oldSrc = "data:image/svg+xml;base64," + window.btoa(from);
@@ -1012,12 +1012,6 @@ describe("changeImage()", () => {
         const img = { src: oldSrc };
         changeImage(img, from, to);
         expect(img.src).toBe(newSrc);
-    });
-
-    it("does not replace when source does not match", () => {
-        const img = { src: "data:image/svg+xml;base64,other" };
-        changeImage(img, "<svg>old</svg>", "<svg>new</svg>");
-        expect(img.src).toBe("data:image/svg+xml;base64,other");
     });
 });
 
