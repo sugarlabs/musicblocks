@@ -13,4 +13,4 @@ jobs:
         uses: actions/checkout@v4
 
       - name: DCO Check
-        uses: tim-actions/dco@v1   
+        uses: tim-actions/dco@v1

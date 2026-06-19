@@ -170,8 +170,13 @@ class StatusMatrix {
                         this.activity.blocks.blockList[statusField[0]].protoblock.staticLabels[0];
                     break;
             }
-            let str = label;
-            str = label.charAt(0).toUpperCase() + label.slice(1);
+
+            let str = "";
+
+            if (typeof label === "string" && label.length > 0) {
+                str = label.charAt(0).toUpperCase() + label.slice(1);
+            }
+
             // console.log(str);
             cell.textContent = "\u00A0";
             const b = document.createElement("b");
