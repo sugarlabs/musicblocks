@@ -14,7 +14,7 @@
 
    _, last, FlowBlock, ValueBlock, FlowClampBlock, LeftBlock, BooleanBlock,
    NOINPUTERRORMSG, NANERRORMSG, INVALIDPITCH, getNote, pitchToNumber,
-   TURTLESVG, _THIS_IS_MUSIC_BLOCKS_, getMunsellColor
+   TURTLESVG, _THIS_IS_MUSIC_BLOCKS_, getMunsellColor, parseNoteString
 */
 
 /* exported setupEnsembleBlocks, getTargetTurtle */
@@ -694,9 +694,7 @@ function setupEnsembleBlocks(activity) {
                 if (targetTurtle === thisTurtle.name) {
                     let obj;
                     if (thisTurtle.singer.lastNotePlayed !== null) {
-                        const len = thisTurtle.singer.lastNotePlayed[0].length;
-                        const pitch = thisTurtle.singer.lastNotePlayed[0].slice(0, len - 1);
-                        const octave = parseInt(thisTurtle.singer.lastNotePlayed[0].slice(len - 1));
+                        const [pitch, octave] = parseNoteString(thisTurtle.singer.lastNotePlayed[0]);
 
                         obj = [pitch, octave];
                     } else if (thisTurtle.singer.notePitches.length > 0) {
@@ -733,9 +731,7 @@ function setupEnsembleBlocks(activity) {
 
                 let obj;
                 if (tur.singer.lastNotePlayed !== null) {
-                    const len = tur.singer.lastNotePlayed[0].length;
-                    const pitch = tur.singer.lastNotePlayed[0].slice(0, len - 1);
-                    const octave = parseInt(tur.singer.lastNotePlayed[0].slice(len - 1));
+                    const [pitch, octave] = parseNoteString(tur.singer.lastNotePlayed[0]);
                     obj = [pitch, octave];
                 } else if (tur.singer.notePitches.length > 0) {
                     obj = getNote(
