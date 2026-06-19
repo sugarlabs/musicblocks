@@ -31,7 +31,7 @@ try {
    ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON, debugLog,
    ErrorHandler, ActivityContext,
    Boundary, CARTESIAN, changeImage, closeWidgets, doRecordButton, setupActivityRecorder,
-   setupGridController, setupGridRenderer,
+   setupGridController, setupGridRenderer, setupPluginController,
    setupActivityAbcParser, setupActivityIdleWatcher,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
@@ -127,6 +127,7 @@ let MYDEFINES = [
     "activity/idle-watcher",
     "activity/grid-controller",
     "activity/grid-renderer",
+    "activity/plugin-controller",
     "utils/musicutils",
     "utils/synthutils",
     "utils/mathutils",
@@ -457,6 +458,7 @@ class Activity {
         }
 
         setupActivityIdleWatcher(this);
+        setupPluginController(this);
 
         /**
          * Initialises major variables and renders default stack.
@@ -795,19 +797,7 @@ class Activity {
                 HIGHLIGHTSTROKECOLORS[p] = platformColor.paletteColors[p][1];
             }
 
-            this.pluginObjs = {
-                PALETTEPLUGINS: {},
-                PALETTEFILLCOLORS: {},
-                PALETTESTROKECOLORS: {},
-                PALETTEHIGHLIGHTCOLORS: {},
-                FLOWPLUGINS: {},
-                ARGPLUGINS: {},
-                BLOCKPLUGINS: {},
-                MACROPLUGINS: {},
-                ONLOAD: {},
-                ONSTART: {},
-                ONSTOP: {}
-            };
+            this.pluginController.initializePluginState();
 
             // Stacks of blocks saved in local storage
             this.macroDict = {};
@@ -839,8 +829,6 @@ class Activity {
             this.onscreenMenu = [];
 
             this.firstRun = true;
-
-            this.pluginsImages = {};
         };
 
         /**
@@ -2035,67 +2023,15 @@ class Activity {
          */
         this._deletePlugin = () => {
             if (this.palettes.activePalette !== null) {
-                const obj = safeJSONParse(this.storage.plugins);
-                if (!obj) return;
-
-                if (obj["PALETTEPLUGINS"] && this.palettes.activePalette in obj["PALETTEPLUGINS"]) {
-                    delete obj["PALETTEPLUGINS"][this.palettes.activePalette];
-                }
-                if (
-                    obj["PALETTEFILLCOLORS"] &&
-                    this.palettes.activePalette in obj["PALETTEFILLCOLORS"]
-                ) {
-                    delete obj["PALETTEFILLCOLORS"][this.palettes.activePalette];
-                }
-                if (
-                    obj["PALETTESTROKECOLORS"] &&
-                    this.palettes.activePalette in obj["PALETTESTROKECOLORS"]
-                ) {
-                    delete obj["PALETTESTROKECOLORS"][this.palettes.activePalette];
-                }
-                if (
-                    obj["PALETTEHIGHLIGHTCOLORS"] &&
-                    this.palettes.activePalette in obj["PALETTEHIGHLIGHTCOLORS"]
-                ) {
-                    delete obj["PALETTEHIGHLIGHTCOLORS"][this.palettes.activePalette];
-                }
-                for (
-                    let i = 0;
-                    i < this.palettes.dict[this.palettes.activePalette].protoList.length;
-                    i++
-                ) {
-                    const name =
-                        this.palettes.dict[this.palettes.activePalette].protoList[i]["name"];
-                    if (obj["FLOWPLUGINS"] && name in obj["FLOWPLUGINS"]) {
-                        debugLog("deleting " + name);
-                        delete obj["FLOWPLUGINS"][name];
-                    }
-                    if (name in obj["BLOCKPLUGINS"]) {
-                        debugLog("deleting " + name);
-                        delete obj["BLOCKPLUGINS"][name];
-                    }
-                    if (name in obj["ARGPLUGINS"]) {
-                        debugLog("deleting " + name);
-                        delete obj["ARGPLUGINS"][name];
-                    }
-                }
-                if (this.palettes.activePalette in obj["MACROPLUGINS"]) {
-                    delete obj["MACROPLUGINS"][this.palettes.activePalette];
-                }
-                if (this.palettes.activePalette in obj["ONLOAD"]) {
-                    delete obj["ONLOAD"][this.palettes.activePalette];
-                }
-                if (this.palettes.activePalette in obj["ONSTART"]) {
-                    delete obj["ONSTART"][this.palettes.activePalette];
-                }
-                if (this.palettes.activePalette in obj["ONSTOP"]) {
-                    delete obj["ONSTOP"][this.palettes.activePalette];
-                }
-
-                this.storage.plugins = JSON.stringify(obj);
-                this.textMsg(
-                    this.palettes.activePalette + " " + _("plugins will be removed upon restart.")
+                const paletteName = this.palettes.activePalette;
+                const protoList = this.palettes.dict[paletteName].protoList;
+                const deleted = this.pluginController.deletePluginFromStorage(
+                    paletteName,
+                    protoList
                 );
+                if (deleted) {
+                    this.textMsg(paletteName + " " + _("plugins will be removed upon restart."));
+                }
             }
         };
 
@@ -5432,17 +5368,9 @@ class Activity {
         };
 
         this._loadBuiltInPlugin = name => {
-            const url = "plugins/" + name + ".json";
-            const xhr = new XMLHttpRequest();
-            xhr.open("GET", url, true);
             const that = this;
-            xhr.onload = async () => {
-                if (xhr.status === 200) {
-                    const obj = await processRawPluginData(that, xhr.responseText, url);
-                    // Save plugins to local storage.
-                    if (obj !== null) {
-                        that.storage.plugins = preparePluginExports(that, obj);
-                    }
+            this.pluginController.loadBuiltInPluginFromXHR(name).then(success => {
+                if (success) {
                     // Refresh the palettes.
                     setTimeout(() => {
                         if (that.palettes.visible) {
@@ -5454,8 +5382,7 @@ class Activity {
                         operation: "loadPlugin"
                     });
                 }
-            };
-            xhr.send();
+            });
         };
 
         this._doOpenPlugin = () => {
@@ -6906,11 +6833,7 @@ class Activity {
             }
 
             // Load any plugins saved in local storage.
-            this.pluginData = this.storage.plugins;
-            if (this.pluginData !== null && this.pluginData !== "null") {
-                const obj = await processPluginData(this, this.pluginData, "localStorage:plugins");
-                updatePluginObj(this, obj);
-            }
+            await this.pluginController.loadStoredPlugins();
 
             // Load custom mode saved in local storage.
             const custommodeData = this.storage.custommode;
@@ -7221,17 +7144,14 @@ class Activity {
                         //doLoadAnimation();
 
                         setTimeout(async () => {
-                            const obj = await processRawPluginData(
-                                that,
-                                reader.result,
+                            const source =
                                 pluginFile && pluginFile.name
                                     ? "file:" + pluginFile.name
-                                    : "file:local-file"
+                                    : "file:local-file";
+                            await that.pluginController.loadPluginFromFileContent(
+                                reader.result,
+                                source
                             );
-                            // Save plugins to local storage.
-                            if (obj !== null) {
-                                that.storage.plugins = preparePluginExports(that, obj);
-                            }
 
                             // Refresh the palettes.
                             setTimeout(() => {
