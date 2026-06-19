@@ -1672,37 +1672,37 @@ class Logo {
 
         // Sometimes we don't want to unwind the entire queue.
         if (queueStart === undefined) queueStart = 0;
+        const currentBlock = logo.blockList[blk];
+        const blockName = currentBlock.name;
+        const proto = currentBlock.protoblock;
+        const connections = currentBlock.connections;
+        const lastConnection = logo.deps.utils.last(connections);
 
         /*
-        ===========================================================================
-        (1) Evaluate any arguments (beginning with connection[1]).
-        ===========================================================================
-        */
+===========================================================================
+(1) Evaluate any arguments (beginning with connection[1]).
+===========================================================================
+*/
+        const tur = logo.activity.turtles.ithTurtle(turtle);
         const args = [];
-        if (logo.blockList[blk].protoblock.args > 0) {
-            for (let i = 1; i <= logo.blockList[blk].protoblock.args; i++) {
-                if (logo.blockList[blk].protoblock.dockTypes[i] === "in") {
-                    if (logo.blockList[blk].connections[i] === null) {
+
+        if (proto.args > 0) {
+            for (let i = 1; i <= proto.args; i++) {
+                if (proto.dockTypes[i] === "in") {
+                    if (connections[i] === null) {
                         // console.debug("skipping inflow args");
                     } else {
-                        args.push(logo.blockList[blk].connections[i]);
+                        args.push(connections[i]);
                     }
                 } else {
-                    args.push(
-                        logo.parseArg(
-                            logo,
-                            turtle,
-                            logo.blockList[blk].connections[i],
-                            blk,
-                            receivedArg
-                        )
-                    );
+                    args.push(logo.parseArg(logo, turtle, connections[i], blk, receivedArg));
                 }
+
                 if (
-                    logo.activity.turtles.ithTurtle(turtle).singer.inNoteBlock.length > 0 &&
-                    logo.blockList[blk].connections[i] !== undefined &&
-                    logo.blockList[logo.blockList[blk].connections[i]] !== undefined &&
-                    logo.blockList[logo.blockList[blk].connections[i]].name === "currentpitch"
+                    tur.singer.inNoteBlock.length > 0 &&
+                    connections[i] !== undefined &&
+                    logo.blockList[connections[i]] !== undefined &&
+                    logo.blockList[connections[i]].name === "currentpitch"
                 ) {
                     // Re-eval this arg after note block ends to
                     // ensure that the current pitch is uptodate.
@@ -1716,30 +1716,24 @@ class Logo {
         (2) Run function associated with the block.
         ===========================================================================
         */
-        const tur = logo.activity.turtles.ithTurtle(turtle);
 
         let nextFlow = null;
-        if (!logo.blockList[blk].isValueBlock()) {
+        if (!currentBlock.isValueBlock()) {
             // nextFlow remains null for value blocks.
 
             // All flow blocks have a last connection (nextFlow), but
             // it can be null (i.e., end of a flow).
             if (tur.singer.backward.length > 0) {
-                // We only run backwards in the "first generation" children.
-                const c =
-                    logo.blockList[logo.deps.utils.last(tur.singer.backward)].name === "backward"
-                        ? 1
-                        : 2;
+                const lastBackward = logo.deps.utils.last(tur.singer.backward);
+                const backwardBlock = logo.blockList[lastBackward];
+                const backwardConnections = backwardBlock.connections;
 
-                if (
-                    !logo.activity.blocks.sameGeneration(
-                        logo.blockList[logo.deps.utils.last(tur.singer.backward)].connections[c],
-                        blk
-                    )
-                ) {
-                    nextFlow = logo.deps.utils.last(logo.blockList[blk].connections);
+                const c = backwardBlock.name === "backward" ? 1 : 2;
+
+                if (!logo.activity.blocks.sameGeneration(backwardConnections[c], blk)) {
+                    nextFlow = lastConnection;
                 } else {
-                    nextFlow = logo.blockList[blk].connections[0];
+                    nextFlow = connections[0];
                     if (
                         nextFlow !== null &&
                         (logo.blockList[nextFlow].name === "action" ||
@@ -1748,31 +1742,24 @@ class Logo {
                         nextFlow = null;
                     } else {
                         if (
-                            !logo.activity.blocks.sameGeneration(
-                                logo.blockList[logo.deps.utils.last(tur.singer.backward)]
-                                    .connections[c],
-                                nextFlow
-                            )
+                            !logo.activity.blocks.sameGeneration(backwardConnections[c], nextFlow)
                         ) {
-                            nextFlow = logo.deps.utils.last(logo.blockList[blk].connections);
+                            nextFlow = lastConnection;
                         } else {
-                            nextFlow = logo.blockList[blk].connections[0];
+                            nextFlow = connections[0];
                         }
                     }
                 }
             } else {
-                nextFlow = logo.deps.utils.last(logo.blockList[blk].connections);
+                nextFlow = lastConnection;
             }
 
             if (nextFlow === -1) {
                 nextFlow = null;
             }
 
-            const queueBlock = new Queue(nextFlow, 1, blk, receivedArg);
-            // eslint-disable-next-line eqeqeq
-            if (nextFlow != null) {
-                // This could be the last block.
-                tur.queue.push(queueBlock);
+            if (nextFlow !== null && nextFlow !== undefined) {
+                tur.queue.push(new Queue(nextFlow, 1, blk, receivedArg));
             }
         }
 
@@ -1801,7 +1788,6 @@ class Logo {
             }
         }
 
-        const currentBlock = logo.blockList[blk];
         if (!currentBlock.isArgBlock()) {
             let res = null;
             // Is it a plugin?
@@ -1820,15 +1806,7 @@ class Logo {
                 // Clamp blocks will return the child flow.
                 res = logo.pluginReturnValue;
             } else {
-                res = currentBlock.protoblock.flow(
-                    args,
-                    logo,
-                    turtle,
-                    blk,
-                    receivedArg,
-                    actionArgs,
-                    isflow
-                );
+                res = proto.flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow);
             }
 
             if (res) {
@@ -1847,14 +1825,10 @@ class Logo {
             if (
                 // If it's an arg block, print its value.
                 currentBlock.isArgBlock() ||
-                ["anyout", "numberout", "textout", "booleanout"].includes(
-                    currentBlock.protoblock.dockTypes[0]
-                )
+                ["anyout", "numberout", "textout", "booleanout"].includes(proto.dockTypes[0])
             ) {
                 args.push(logo.parseArg(logo, turtle, blk, logo.receivedArg));
 
-                // Use label prefix for screen dimension blocks to clarify the display is informational
-                // Labels wrapped with _() for internationalization
                 const blockLabels = {
                     width: _("width"),
                     height: _("height"),
@@ -1863,19 +1837,19 @@ class Logo {
                     toppos: _("top (screen)"),
                     bottompos: _("bottom (screen)")
                 };
-                const blockName = currentBlock.name;
-                const label = blockLabels[blockName];
 
-                // eslint-disable-next-line eqeqeq
-                if (currentBlock.value == null) {
+                const label = blockLabels[blockName];
+                const blockValue = currentBlock.value;
+
+                if (blockValue === null || blockValue === undefined) {
                     logo.activity.textMsg("null block value");
                 } else {
-                    const value = currentBlock.value.toString();
+                    const value = blockValue.toString();
                     const displayText = label ? label + ": " + value : value;
                     logo.activity.textMsg(displayText);
                 }
             } else {
-                logo.activity.errorMsg("I do not know how to " + currentBlock.name + ".", blk);
+                logo.activity.errorMsg("I do not know how to " + blockName + ".", blk);
             }
 
             logo.stopTurtle = true;
@@ -1909,7 +1883,7 @@ class Logo {
         // eslint-disable-next-line eqeqeq
         if (childFlow != null) {
             let queueBlock;
-            if (logo.blockList[blk].name === "doArg" || logo.blockList[blk].name === "nameddoArg") {
+            if (blockName === "doArg" || blockName === "nameddoArg") {
                 queueBlock = new Queue(childFlow, childFlowCount, blk, actionArgs);
             } else {
                 queueBlock = new Queue(childFlow, childFlowCount, blk, receivedArg);
@@ -1932,17 +1906,16 @@ class Logo {
 
         // Run the last flow in the queue.
         if (tur.queue.length > queueStart) {
-            nextBlock = logo.deps.utils.last(tur.queue).blk;
-            parentBlk = logo.deps.utils.last(tur.queue).parentBlk;
-            passArg = logo.deps.utils.last(tur.queue).args;
+            const lastQueue = logo.deps.utils.last(tur.queue);
 
-            // Since the forever block starts at -1, it will never === 1.
-            if (logo.deps.utils.last(tur.queue).count === 1) {
-                // Finished child so pop it off the queue.
+            nextBlock = lastQueue.blk;
+            parentBlk = lastQueue.parentBlk;
+            passArg = lastQueue.args;
+
+            if (lastQueue.count === 1) {
                 tur.queue.pop();
             } else {
-                // Decrement the counter for repeating the flow.
-                logo.deps.utils.last(tur.queue).count -= 1;
+                lastQueue.count--;
             }
         }
 
@@ -1977,10 +1950,10 @@ class Logo {
 
             if (
                 // eslint-disable-next-line eqeqeq
-                (tur.singer.backward.length > 0 && logo.blockList[blk].connections[0] == null) ||
+                (tur.singer.backward.length > 0 && connections[0] == null) ||
                 (tur.singer.backward.length === 0 &&
                     // eslint-disable-next-line eqeqeq
-                    logo.deps.utils.last(logo.blockList[blk].connections) == null)
+                    lastConnection == null)
             ) {
                 if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
                     // If we are at the end of the child flow, queue
@@ -1988,13 +1961,13 @@ class Logo {
                     // flow.
                     if (tur.unhighlightQueue === undefined) {
                         // console.debug("cannot find highlight queue for turtle " + turtle);
-                    } else if (
-                        tur.parentFlowQueue.length > 0 &&
-                        tur.queue.length > 0 &&
-                        logo.deps.utils.last(tur.queue).parentBlk !==
-                            logo.deps.utils.last(tur.parentFlowQueue)
-                    ) {
-                        tur.unhighlightQueue.push(logo.deps.utils.last(tur.parentFlowQueue));
+                    } else if (tur.parentFlowQueue.length > 0 && tur.queue.length > 0) {
+                        const lastQueue = logo.deps.utils.last(tur.queue);
+                        const lastParentFlow = logo.deps.utils.last(tur.parentFlowQueue);
+
+                        if (lastQueue.parentBlk !== lastParentFlow) {
+                            tur.unhighlightQueue.push(lastParentFlow);
+                        }
                     } else if (tur.unhighlightQueue.length > 0) {
                         // The child flow is finally complete, so unhighlight.
                         logo._timerManager.setGuardedTimeout(
