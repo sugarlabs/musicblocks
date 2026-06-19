@@ -4180,13 +4180,19 @@ class Activity {
                 const listItem = document.createElement("div");
                 listItem.classList.add("trash-item");
 
-                const svgData = block.artwork;
-                const encodedData = "data:image/svg+xml;utf8," + encodeURIComponent(svgData);
-
                 const img = document.createElement("img");
-                img.src = encodedData;
-                img.alt = "Block Icon";
+                img.alt = block.name || "Block";
                 img.classList.add("trash-item-icon");
+
+                if (block.artwork) {
+                    // artwork is set asynchronously; it may be null if the block was
+                    // trashed before generateArtwork() completed. Guard to prevent
+                    // encodeURIComponent(null) producing a broken "data:...null" URL.
+                    img.src = "data:image/svg+xml;utf8," + encodeURIComponent(block.artwork);
+                } else {
+                    // Fallback image when block artwork is unavailable.
+                    img.src = "images/mouse.svg";
+                }
 
                 const textNode = document.createTextNode(block.name);
 
