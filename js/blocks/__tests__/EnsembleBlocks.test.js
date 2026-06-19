@@ -199,12 +199,12 @@ describe("setupEnsembleBlocks", () => {
             turtleList: [0, 1, 2],
             ithTurtle: jest.fn(i => {
                 if (i && typeof i === "object" && i.singer) return i;
-                const index = typeof i === "string" ? parseInt(i) : i;
+                const index = typeof i === "string" ? parseInt(i, 10) : i;
                 return mockTurtles[index];
             }),
             getTurtle: jest.fn(i => {
                 if (i && typeof i === "object" && i.singer) return i;
-                const index = typeof i === "string" ? parseInt(i) : i;
+                const index = typeof i === "string" ? parseInt(i, 10) : i;
                 return mockTurtles[index];
             }),
             getTurtleCount: jest.fn(() => 3),

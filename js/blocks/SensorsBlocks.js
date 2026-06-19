@@ -558,7 +558,7 @@ function setupSensorsBlocks(activity) {
 
             const obj = colorString.split("(")[1].split(",");
             const component = Number(obj[this.colorIndex]);
-            return parseInt(component / 2.55);
+            return parseInt(component / 2.55, 10);
         }
     }
 
