@@ -4702,30 +4702,30 @@ class Blocks {
          * @returns expandable block
          */
         this.insideExpandableBlock = blk => {
-            if (this.blockList[blk] == null) {
-                /** race condition? */
+            const block = this.blockList[blk];
+            if (!block || !Array.isArray(block.connections)) return null;
 
-                console.debug("null block in blockList? " + blk);
-                return null;
-            } else if (this.blockList[blk].connections[0] == null) {
-                return null;
-            } else {
-                const cblk = this.blockList[blk].connections[0];
-                if (this.blockList[cblk].isExpandableBlock()) {
-                    /** If it is the last connection, keep searching. */
-                    if (
-                        this.blockList[cblk].isArgFlowClampBlock() ||
-                        this.blockList[cblk].isLeftClampBlock()
-                    ) {
-                        return cblk;
-                    } else if (blk === last(this.blockList[cblk].connections)) {
-                        return this.insideExpandableBlock(cblk);
-                    } else {
-                        return cblk;
-                    }
-                } else {
+            const cblk = block.connections[0];
+            if (cblk == null) return null;
+
+            const connectedBlock = this.blockList[cblk];
+            if (!connectedBlock || typeof connectedBlock.isExpandableBlock !== "function") return null;
+            if (!Array.isArray(connectedBlock.connections)) return null;
+
+            if (connectedBlock.isExpandableBlock()) {
+                /** If it is the last connection, keep searching. */
+                if (
+                    connectedBlock.isArgFlowClampBlock() ||
+                    connectedBlock.isLeftClampBlock()
+                ) {
+                    return cblk;
+                } else if (blk === last(connectedBlock.connections)) {
                     return this.insideExpandableBlock(cblk);
+                } else {
+                    return cblk;
                 }
+            } else {
+                return this.insideExpandableBlock(cblk);
             }
         };
 
@@ -4736,40 +4736,42 @@ class Blocks {
          * @returns note block
          */
         this._insideNoteBlock = blk => {
-            if (this.blockList[blk] == null) {
-                console.debug("null block in blockList? " + blk);
-                return null;
-            } else if (this.blockList[blk].connections[0] == null) {
-                return null;
-            } else {
-                const cblk = this.blockList[blk].connections[0];
-                if (this.blockList[cblk].isExpandableBlock()) {
-                    if (this.blockList[blk].name === "forever") {
-                        if (this._isConnectedToNoteValue(cblk)) {
-                            this.activity.errorMsg(
-                                _(
-                                    "Forever loop detected inside a note value block. Unexpected things may happen."
-                                )
-                            );
-                            return null;
-                        }
-                    }
-                    /** If it is the last connection, keep searching. */
-                    if (blk === last(this.blockList[cblk].connections)) {
-                        return this._insideNoteBlock(cblk);
-                    } else if (blk === this.blockList[cblk].connections[1]) {
-                        /** Connection 1 of a note block is not inside the clamp. */
+            const block = this.blockList[blk];
+            if (!block || !Array.isArray(block.connections)) return null;
+
+            const cblk = block.connections[0];
+            if (cblk == null) return null;
+
+            const connectedBlock = this.blockList[cblk];
+            if (!connectedBlock || typeof connectedBlock.isExpandableBlock !== "function") return null;
+            if (!Array.isArray(connectedBlock.connections)) return null;
+
+            if (connectedBlock.isExpandableBlock()) {
+                if (block.name === "forever") {
+                    if (this._isConnectedToNoteValue(cblk)) {
+                        this.activity.errorMsg(
+                            _(
+                                "Forever loop detected inside a note value block. Unexpected things may happen."
+                            )
+                        );
                         return null;
-                    } else {
-                        if (NOTEBLOCKS.includes(this.blockList[cblk].name)) {
-                            return cblk;
-                        } else {
-                            return null;
-                        }
                     }
-                } else {
-                    return this._insideNoteBlock(cblk);
                 }
+                /** If it is the last connection, keep searching. */
+                if (blk === last(connectedBlock.connections)) {
+                    return this._insideNoteBlock(cblk);
+                } else if (blk === connectedBlock.connections[1]) {
+                    /** Connection 1 of a note block is not inside the clamp. */
+                    return null;
+                } else {
+                    if (NOTEBLOCKS.includes(connectedBlock.name)) {
+                        return cblk;
+                    } else {
+                        return null;
+                    }
+                }
+            } else {
+                return this._insideNoteBlock(cblk);
             }
         };
 
