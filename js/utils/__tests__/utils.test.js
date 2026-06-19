@@ -73,6 +73,15 @@ global.self = {
     console: console
 };
 
+global.i18next = {
+    language: "en",
+    t: jest.fn(key => key)
+};
+
+global.base64Encode = jest.fn(str => str);
+
+global.fetch = jest.fn();
+
 const {
     toTitleCase,
     fileExt,
@@ -93,7 +102,28 @@ const {
     closeWidgets,
     closeBlkWidgets,
     resolveObject,
-    importMembers
+    importMembers,
+    changeImage,
+    fnBrowserDetect,
+    canvasPixelRatio,
+    windowHeight,
+    windowWidth,
+    httpGet,
+    httpPost,
+    HttpRequest,
+    docByClass,
+    docByTagName,
+    docById,
+    docByName,
+    docBySelector,
+    getTextWidth,
+    doSVG,
+    isSVGEmpty,
+    prepareMacroExports,
+    processMacroData,
+    hideDOMLabel,
+    displayMsg,
+    _
 } = require("../utils.js");
 
 describe("Utility Functions (logic-only)", () => {
@@ -595,5 +625,593 @@ describe("Utility Functions (logic-only)", () => {
             expect(obj.modelMethod()).toBe("model");
             expect(obj.viewMethod()).toBe("view");
         });
+    });
+});
+
+describe("_() i18n translation", () => {
+    let getItemSpy;
+
+    beforeEach(() => {
+        i18next.language = "en";
+        i18next.t.mockReset();
+        i18next.t.mockImplementation(key => key);
+        getItemSpy = jest.spyOn(Storage.prototype, "getItem").mockReturnValue(null);
+    });
+
+    afterEach(() => {
+        getItemSpy.mockRestore();
+    });
+
+    it("returns empty string for falsy input", () => {
+        expect(_("")).toBe("");
+        expect(_(null)).toBe("");
+        expect(_(undefined)).toBe("");
+    });
+
+    it("returns translated text for non-Japanese language", () => {
+        i18next.t.mockImplementation(() => "translated");
+        expect(_("hello")).toBe("translated");
+    });
+
+    it("returns original text when translation returns empty string", () => {
+        i18next.t.mockImplementation(() => "");
+        expect(_("hello")).toBe("hello");
+    });
+
+    it("returns original text when i18next throws", () => {
+        i18next.t.mockImplementation(() => {
+            throw new Error("i18next failure");
+        });
+        expect(_("hello")).toBe("hello");
+    });
+
+    it("resolves Japanese kanji translation when lang is ja", () => {
+        i18next.language = "ja";
+        getItemSpy.mockReturnValue("kanji");
+        i18next.t.mockReturnValue({ kanji: "漢字テキスト", kana: "かなテキスト" });
+        expect(_("test")).toBe("漢字テキスト");
+    });
+
+    it("resolves Japanese kana translation when preference is kana", () => {
+        i18next.language = "ja";
+        getItemSpy.mockReturnValue("kana");
+        i18next.t.mockReturnValue({ kanji: "漢字テキスト", kana: "かなテキスト" });
+        expect(_("test")).toBe("かなテキスト");
+    });
+
+    it("defaults to kanji when kanaPreference is not set", () => {
+        i18next.language = "ja-JP";
+        getItemSpy.mockReturnValue(null);
+        i18next.t.mockReturnValue({ kanji: "漢字", kana: "かな" });
+        expect(_("test")).toBe("漢字");
+    });
+
+    it("returns key when Japanese translation object lacks the script key", () => {
+        i18next.language = "ja";
+        getItemSpy.mockReturnValue("kanji");
+        i18next.t.mockReturnValue({ other: "value" });
+        expect(_("test")).toBe("test");
+    });
+
+    it("returns string translation directly for Japanese when result is a string", () => {
+        i18next.language = "ja";
+        getItemSpy.mockReturnValue("kanji");
+        i18next.t.mockReturnValue("simple string");
+        expect(_("test")).toBe("simple string");
+    });
+
+    it("returns key when Japanese translation returns non-object non-string", () => {
+        i18next.language = "ja";
+        getItemSpy.mockReturnValue("kanji");
+        i18next.t.mockReturnValue(null);
+        expect(_("test")).toBe("test");
+    });
+
+    it("passes options to i18next.t for non-Japanese", () => {
+        i18next.language = "fr";
+        i18next.t.mockReturnValue("bonjour");
+        _("hello", { ns: "custom" });
+        expect(i18next.t).toHaveBeenCalledWith("hello", { ns: "custom" });
+    });
+});
+
+describe("format() additional branches", () => {
+    it("resolves {_item} placeholders using the _ translation function", () => {
+        i18next.language = "en";
+        i18next.t.mockImplementation(key => key.toUpperCase());
+        const result = format("Label: {_greeting}", {});
+        expect(result).toBe("Label: GREETING");
+    });
+});
+
+describe("fnBrowserDetect()", () => {
+    const originalUserAgent = navigator.userAgent;
+
+    afterEach(() => {
+        Object.defineProperty(navigator, "userAgent", {
+            value: originalUserAgent,
+            configurable: true
+        });
+    });
+
+    it("detects Chrome", () => {
+        Object.defineProperty(navigator, "userAgent", {
+            value: "Mozilla/5.0 Chrome/120.0",
+            configurable: true
+        });
+        expect(fnBrowserDetect()).toBe("chrome");
+    });
+
+    it("detects Firefox", () => {
+        Object.defineProperty(navigator, "userAgent", {
+            value: "Mozilla/5.0 Firefox/121.0",
+            configurable: true
+        });
+        expect(fnBrowserDetect()).toBe("firefox");
+    });
+
+    it("detects Safari", () => {
+        Object.defineProperty(navigator, "userAgent", {
+            value: "Mozilla/5.0 Safari/605.1.15",
+            configurable: true
+        });
+        expect(fnBrowserDetect()).toBe("safari");
+    });
+
+    it("detects Opera", () => {
+        Object.defineProperty(navigator, "userAgent", {
+            value: "Mozilla/5.0 OPR/106.0",
+            configurable: true
+        });
+        expect(fnBrowserDetect()).toBe("opera");
+    });
+
+    it("detects Edge", () => {
+        Object.defineProperty(navigator, "userAgent", {
+            value: "Mozilla/5.0 Edg/120.0",
+            configurable: true
+        });
+        expect(fnBrowserDetect()).toBe("edge");
+    });
+
+    it("returns fallback for unknown browsers", () => {
+        Object.defineProperty(navigator, "userAgent", {
+            value: "CustomBot/1.0",
+            configurable: true
+        });
+        expect(fnBrowserDetect()).toBe("No browser detection");
+    });
+});
+
+describe("canvasPixelRatio()", () => {
+    it("returns the ratio of device pixel ratio to backing store ratio", () => {
+        window.devicePixelRatio = 2;
+        document.querySelector = jest.fn(() => ({
+            getContext: jest.fn(() => ({
+                backingStorePixelRatio: 1
+            }))
+        }));
+        expect(canvasPixelRatio()).toBe(2);
+    });
+
+    it("falls back to 1 when devicePixelRatio is undefined", () => {
+        const saved = window.devicePixelRatio;
+        window.devicePixelRatio = undefined;
+        document.querySelector = jest.fn(() => ({
+            getContext: jest.fn(() => ({}))
+        }));
+        expect(canvasPixelRatio()).toBe(1);
+        window.devicePixelRatio = saved;
+    });
+});
+
+describe("windowHeight()", () => {
+    const originalUserAgent = navigator.userAgent;
+
+    afterEach(() => {
+        Object.defineProperty(navigator, "userAgent", {
+            value: originalUserAgent,
+            configurable: true
+        });
+    });
+
+    it("returns outerHeight on Android", () => {
+        Object.defineProperty(navigator, "userAgent", {
+            value: "Android 13; Pixel 7",
+            configurable: true
+        });
+        expect(windowHeight()).toBe(window.outerHeight);
+    });
+
+    it("returns innerHeight on non-Android", () => {
+        Object.defineProperty(navigator, "userAgent", {
+            value: "NodeTest",
+            configurable: true
+        });
+        expect(windowHeight()).toBe(window.innerHeight);
+    });
+});
+
+describe("windowWidth()", () => {
+    const originalUserAgent = navigator.userAgent;
+
+    afterEach(() => {
+        Object.defineProperty(navigator, "userAgent", {
+            value: originalUserAgent,
+            configurable: true
+        });
+    });
+
+    it("returns outerWidth on Android", () => {
+        Object.defineProperty(navigator, "userAgent", {
+            value: "Android 13; Pixel 7",
+            configurable: true
+        });
+        expect(windowWidth()).toBe(window.outerWidth);
+    });
+
+    it("returns innerWidth on non-Android", () => {
+        Object.defineProperty(navigator, "userAgent", {
+            value: "NodeTest",
+            configurable: true
+        });
+        expect(windowWidth()).toBe(window.innerWidth);
+    });
+});
+
+describe("httpGet()", () => {
+    const savedServer = window.server;
+
+    beforeEach(() => {
+        fetch.mockReset();
+        window.server = "http://localhost/";
+    });
+
+    afterEach(() => {
+        window.server = savedServer;
+    });
+
+    it("fetches from server with project name", async () => {
+        fetch.mockResolvedValue({ ok: true, text: () => Promise.resolve("data") });
+        const result = await httpGet("myproject");
+        expect(fetch).toHaveBeenCalledWith("http://localhost/myproject", expect.any(Object));
+        expect(result).toBe("data");
+    });
+
+    it("fetches from base server URL when project is null", async () => {
+        fetch.mockResolvedValue({ ok: true, text: () => Promise.resolve("root") });
+        await httpGet(null);
+        expect(fetch).toHaveBeenCalledWith("http://localhost/", expect.any(Object));
+    });
+
+    it("throws on non-ok response", async () => {
+        fetch.mockResolvedValue({ ok: false, status: 500 });
+        await expect(httpGet("bad")).rejects.toThrow("Error from server");
+    });
+});
+
+describe("httpPost()", () => {
+    const savedServer = window.server;
+
+    beforeEach(() => {
+        fetch.mockReset();
+        window.server = "http://localhost/";
+    });
+
+    afterEach(() => {
+        window.server = savedServer;
+    });
+
+    it("posts data to server", async () => {
+        fetch.mockResolvedValue({ ok: true, text: () => Promise.resolve("ok") });
+        const result = await httpPost("project", "payload");
+        expect(fetch).toHaveBeenCalledWith(
+            "http://localhost/project",
+            expect.objectContaining({ method: "POST", body: "payload" })
+        );
+        expect(result).toBe("ok");
+    });
+
+    it("throws on non-ok response", async () => {
+        fetch.mockResolvedValue({ ok: false, status: 403 });
+        await expect(httpPost("project", "data")).rejects.toThrow("Error from server");
+    });
+});
+
+describe("HttpRequest()", () => {
+    it("creates a request with handler and url", () => {
+        const handler = jest.fn();
+        const req = new HttpRequest("http://example.com", handler);
+        expect(req.url).toBe("http://example.com");
+        expect(req.handler).toBe(handler);
+    });
+
+    it("sets localmode for file protocol", () => {
+        global.self = { location: { href: "file:///index.html" }, console: console };
+        const req = new HttpRequest("http://example.com", jest.fn());
+        expect(req.localmode).toBe(true);
+    });
+
+    it("stores optional user callback", () => {
+        const cb = jest.fn();
+        const req = new HttpRequest("http://example.com", jest.fn(), cb);
+        expect(req.userCallback).toBe(cb);
+    });
+
+    it("calls userCallback on network error", () => {
+        const userCb = jest.fn();
+        global.XMLHttpRequest = class {
+            open() {
+                throw new Error("network");
+            }
+        };
+        const req = new HttpRequest("http://bad.com", jest.fn(), userCb);
+        expect(userCb).toHaveBeenCalledWith(false, "network error");
+        expect(req.request).toBeNull();
+
+        global.XMLHttpRequest = class {
+            open() {}
+            setRequestHeader() {}
+            send() {}
+        };
+    });
+});
+
+describe("DOM query helpers", () => {
+    beforeEach(() => {
+        document.getElementById = jest.fn(() => null);
+        document.getElementsByClassName = jest.fn(() => []);
+        document.getElementsByTagName = jest.fn(() => []);
+        document.getElementsByName = jest.fn(() => []);
+        document.querySelector = jest.fn(() => null);
+    });
+
+    it("docById delegates to getElementById", () => {
+        docById("test");
+        expect(document.getElementById).toHaveBeenCalledWith("test");
+    });
+
+    it("docByClass delegates to getElementsByClassName", () => {
+        docByClass("myClass");
+        expect(document.getElementsByClassName).toHaveBeenCalledWith("myClass");
+    });
+
+    it("docByTagName delegates to getElementsByTagName", () => {
+        docByTagName("div");
+        expect(document.getElementsByTagName).toHaveBeenCalledWith("div");
+    });
+
+    it("docByName delegates to getElementsByName", () => {
+        docByName("field");
+        expect(document.getElementsByName).toHaveBeenCalledWith("field");
+    });
+
+    it("docBySelector delegates to querySelector", () => {
+        docBySelector("#app > .main");
+        expect(document.querySelector).toHaveBeenCalledWith("#app > .main");
+    });
+});
+
+describe("getTextWidth()", () => {
+    it("measures text width using canvas context", () => {
+        document.createElement = jest.fn(() => ({
+            getContext: jest.fn(() => ({
+                font: "",
+                measureText: () => ({ width: 100 })
+            }))
+        }));
+        expect(getTextWidth("hello", "16px Arial")).toBe(100);
+    });
+});
+
+describe("changeImage()", () => {
+    it("replaces image source with the new SVG", () => {
+        const from = "<svg>old</svg>";
+        const to = "<svg>new</svg>";
+        const oldSrc = "data:image/svg+xml;base64," + window.btoa(from);
+        const newSrc = "data:image/svg+xml;base64," + window.btoa(to);
+        const img = { src: oldSrc };
+        changeImage(img, from, to);
+        expect(img.src).toBe(newSrc);
+    });
+});
+
+describe("doSVG()", () => {
+    it("returns SVG string when turtles have output", () => {
+        const turtles = {
+            turtleList: { 0: {} },
+            getTurtle: jest.fn(() => ({
+                painter: {
+                    closeSVG: jest.fn(),
+                    svgOutput: "<circle/>"
+                }
+            }))
+        };
+        const logo = { svgOutput: "<rect/>" };
+        const result = doSVG({}, logo, turtles, 800, 600, 1);
+        expect(result).toContain("<svg");
+        expect(result).toContain("<rect/>");
+        expect(result).toContain("<circle/>");
+        expect(result).toContain("</svg>");
+    });
+
+    it("returns empty string when turtle SVG is empty", () => {
+        const turtles = {
+            turtleList: { 0: {} },
+            getTurtle: jest.fn(() => ({
+                painter: {
+                    closeSVG: jest.fn(),
+                    svgOutput: ""
+                }
+            }))
+        };
+        const logo = { svgOutput: "<rect/>" };
+        expect(doSVG({}, logo, turtles, 800, 600, 1)).toBe("");
+    });
+});
+
+describe("isSVGEmpty()", () => {
+    it("returns true when all turtles have empty SVG output", () => {
+        const turtles = {
+            turtleList: { 0: {}, 1: {} },
+            getTurtle: jest.fn(() => ({
+                painter: { closeSVG: jest.fn(), svgOutput: "" }
+            }))
+        };
+        expect(isSVGEmpty(turtles)).toBe(true);
+    });
+
+    it("returns false when any turtle has SVG output", () => {
+        const outputs = ["<line/>", ""];
+        let callCount = 0;
+        const turtles = {
+            turtleList: { 0: {}, 1: {} },
+            getTurtle: jest.fn(() => ({
+                painter: {
+                    closeSVG: jest.fn(),
+                    svgOutput: outputs[callCount++]
+                }
+            }))
+        };
+        expect(isSVGEmpty(turtles)).toBe(false);
+    });
+});
+
+describe("processMacroData()", () => {
+    it("parses macro JSON and adds entries to the dictionary", () => {
+        const macroDict = {};
+        const palettes = {
+            add: jest.fn(),
+            makePalettes: jest.fn()
+        };
+        const blocks = { addToMyPalette: jest.fn() };
+        const data = JSON.stringify({ myMacro: [[0, "start", 100, 100, [null, 1]]] });
+        processMacroData(data, palettes, blocks, macroDict);
+        expect(macroDict.myMacro).toBeDefined();
+        expect(palettes.add).toHaveBeenCalledWith("myblocks", "black", "#a0a0a0");
+        expect(blocks.addToMyPalette).toHaveBeenCalled();
+        expect(palettes.makePalettes).toHaveBeenCalledWith(1);
+    });
+
+    it("does nothing when macroData is undefined", () => {
+        const macroDict = {};
+        const palettes = { add: jest.fn(), makePalettes: jest.fn() };
+        const blocks = { addToMyPalette: jest.fn() };
+        processMacroData(undefined, palettes, blocks, macroDict);
+        expect(palettes.add).not.toHaveBeenCalled();
+    });
+
+    it("does nothing when macroData is an empty object string", () => {
+        const macroDict = {};
+        const palettes = { add: jest.fn(), makePalettes: jest.fn() };
+        const blocks = { addToMyPalette: jest.fn() };
+        processMacroData("{}", palettes, blocks, macroDict);
+        expect(palettes.add).not.toHaveBeenCalled();
+    });
+
+    it("handles invalid JSON gracefully", () => {
+        const macroDict = {};
+        const palettes = { add: jest.fn(), makePalettes: jest.fn() };
+        const blocks = { addToMyPalette: jest.fn() };
+        const spy = jest.spyOn(console, "debug").mockImplementation(() => {});
+        processMacroData("{invalid", palettes, blocks, macroDict);
+        expect(palettes.makePalettes).not.toHaveBeenCalled();
+        spy.mockRestore();
+    });
+});
+
+describe("prepareMacroExports()", () => {
+    it("adds stack to macroDict under given name and returns JSON", () => {
+        const macroDict = {};
+        const stack = [[0, "start", 100, 100, [null, 1]]];
+        const result = prepareMacroExports("testMacro", stack, macroDict);
+        expect(macroDict.testMacro).toEqual(stack);
+        expect(JSON.parse(result)).toEqual({ testMacro: stack });
+    });
+
+    it("returns existing dict as JSON when name is null", () => {
+        const macroDict = { existing: [1, 2, 3] };
+        const result = prepareMacroExports(null, [], macroDict);
+        expect(JSON.parse(result)).toEqual({ existing: [1, 2, 3] });
+    });
+});
+
+describe("hideDOMLabel()", () => {
+    it("hides textLabel, numberLabel, and wheelDiv when they exist", () => {
+        const textLabel = { style: { display: "block" } };
+        const numberLabel = { style: { display: "block" } };
+        const piemenu = { style: { display: "block" } };
+        document.getElementById = jest.fn(id => {
+            if (id === "textLabel") return textLabel;
+            if (id === "numberLabel") return numberLabel;
+            if (id === "wheelDiv") return piemenu;
+            return null;
+        });
+        hideDOMLabel();
+        expect(textLabel.style.display).toBe("none");
+        expect(numberLabel.style.display).toBe("none");
+        expect(piemenu.style.display).toBe("none");
+    });
+
+    it("does not throw when elements are missing", () => {
+        document.getElementById = jest.fn(() => null);
+        expect(() => hideDOMLabel()).not.toThrow();
+    });
+});
+
+describe("displayMsg()", () => {
+    it("returns undefined", () => {
+        expect(displayMsg()).toBeUndefined();
+    });
+});
+
+describe("importMembers() additional branches", () => {
+    it("imports members using explicit className", () => {
+        class ExplicitModel {
+            constructor() {
+                this.val = 99;
+            }
+            method() {
+                return "explicit";
+            }
+        }
+        global.ExplicitModel = ExplicitModel;
+        class Ctrl {}
+        const obj = new Ctrl();
+        importMembers(obj, "ExplicitModel");
+        expect(obj.val).toBe(99);
+        expect(obj.method()).toBe("explicit");
+        delete global.ExplicitModel;
+    });
+
+    it("passes constructor arguments to model and view", () => {
+        class ArgModel {
+            constructor(x) {
+                this.x = x;
+            }
+        }
+        class ArgView {
+            constructor(y) {
+                this.y = y;
+            }
+        }
+        global.ArgCtrl = {
+            ArgCtrlModel: ArgModel,
+            ArgCtrlView: ArgView
+        };
+        class ArgCtrl {}
+        const obj = new ArgCtrl();
+        importMembers(obj, "", [10], [20]);
+        expect(obj.x).toBe(10);
+        expect(obj.y).toBe(20);
+        delete global.ArgCtrl;
+    });
+
+    it("handles missing model or view class gracefully", () => {
+        global.Lonely = {};
+        class Lonely {}
+        const obj = new Lonely();
+        expect(() => importMembers(obj)).not.toThrow();
+        delete global.Lonely;
     });
 });

@@ -1511,6 +1511,26 @@ if (typeof module !== "undefined" && module.exports) {
         delayExecution,
         closeWidgets,
         closeBlkWidgets,
-        importMembers
+        importMembers,
+        changeImage,
+        fnBrowserDetect,
+        canvasPixelRatio,
+        windowHeight,
+        windowWidth,
+        httpGet,
+        httpPost,
+        HttpRequest,
+        docByClass,
+        docByTagName,
+        docById,
+        docByName,
+        docBySelector,
+        getTextWidth,
+        doSVG,
+        isSVGEmpty,
+        prepareMacroExports,
+        processMacroData,
+        hideDOMLabel,
+        displayMsg
     };
 }
