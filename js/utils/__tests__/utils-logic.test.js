@@ -174,7 +174,8 @@ describe("Utility Logic Functions", () => {
             expect(oneHundredToFraction(91)).toEqual([11, 12]);
             expect(oneHundredToFraction(96)).toEqual([31, 32]);
             expect(oneHundredToFraction(99)).toEqual([63, 64]);
-            expect(oneHundredToFraction(97)).toEqual([97, 100]);
+            expect(oneHundredToFraction(55)).toEqual([9, 16]);
+            expect(oneHundredToFraction(97)).toEqual([31, 32]);
         });
     });
 
