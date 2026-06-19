@@ -696,7 +696,10 @@ function setupEnsembleBlocks(activity) {
                     if (thisTurtle.singer.lastNotePlayed !== null) {
                         const len = thisTurtle.singer.lastNotePlayed[0].length;
                         const pitch = thisTurtle.singer.lastNotePlayed[0].slice(0, len - 1);
-                        const octave = parseInt(thisTurtle.singer.lastNotePlayed[0].slice(len - 1), 10);
+                        const octave = parseInt(
+                            thisTurtle.singer.lastNotePlayed[0].slice(len - 1),
+                            10
+                        );
 
                         obj = [pitch, octave];
                     } else if (thisTurtle.singer.notePitches.length > 0) {
