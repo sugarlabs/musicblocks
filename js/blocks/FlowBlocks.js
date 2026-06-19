@@ -242,7 +242,7 @@ function setupFlowBlocks(activity) {
                             for (let i = 0; i < n; i++) {
                                 const obj = logo.connectionStore[turtle][blk].pop();
                                 activity.blocks.blockList[obj[0]].connections[obj[1]] = obj[2];
-                                if (obj[2] != null) {
+                                if (obj[2] !== null && obj[2] !== undefined) {
                                     activity.blocks.blockList[obj[2]].connections[0] = obj[0];
                                 }
                             }
@@ -271,19 +271,20 @@ function setupFlowBlocks(activity) {
                 try {
                     // Check to see if another turtle has already disconnected these blocks
                     const otherTurtle = __lookForOtherTurtles(blk, turtle);
-                    if (otherTurtle != null) {
+                    if (otherTurtle !== null && otherTurtle !== undefined) {
                         // Copy the connections and queue the blocks
                         logo.connectionStore[turtle][blk] = [];
-                        for (let i = logo.connectionStore[otherTurtle][blk].length; i > 0; i--) {
-                            const obj = [
-                                logo.connectionStore[otherTurtle][blk][i - 1][0],
-                                logo.connectionStore[otherTurtle][blk][i - 1][1],
-                                logo.connectionStore[otherTurtle][blk][i - 1][2]
-                            ];
+                        const otherStore = logo.connectionStore[otherTurtle][blk];
+                        const otherLength = otherStore.length;
+                        const blockList = activity.blocks.blockList;
+                        for (let i = otherLength; i > 0; i--) {
+                            const otherItem = otherStore[i - 1];
+                            const obj = [otherItem[0], otherItem[1], otherItem[2]];
                             logo.connectionStore[turtle][blk].push(obj);
                             let child = obj[0];
-                            if (activity.blocks.blockList[child].name === "hidden") {
-                                child = activity.blocks.blockList[child].connections[0];
+                            const childBlk = blockList[child];
+                            if (childBlk.name === "hidden") {
+                                child = childBlk.connections[0];
                             }
 
                             const queueBlock = new Queue(child, factor, blk, receivedArg);
@@ -291,15 +292,18 @@ function setupFlowBlocks(activity) {
                             tur.queue.push(queueBlock);
                         }
                     } else {
+                        const blockList = activity.blocks.blockList;
                         let child = activity.blocks.findBottomBlock(args[1]);
+                        // eslint-disable-next-line eqeqeq
                         while (child != blk) {
-                            if (activity.blocks.blockList[child].name !== "hidden") {
+                            const childBlk = blockList[child];
+                            if (childBlk.name !== "hidden") {
                                 const queueBlock = new Queue(child, factor, blk, receivedArg);
                                 tur.parentFlowQueue.push(blk);
                                 tur.queue.push(queueBlock);
                             }
 
-                            child = activity.blocks.blockList[child].connections[0];
+                            child = childBlk.connections[0];
                         }
 
                         // Break the connections between blocks in the clamp so
@@ -307,35 +311,37 @@ function setupFlowBlocks(activity) {
                         // run
                         logo.connectionStore[turtle][blk] = [];
                         child = args[1];
-                        while (child != null) {
-                            const lastConnection =
-                                activity.blocks.blockList[child].connections.length - 1;
-                            const nextBlk =
-                                activity.blocks.blockList[child].connections[lastConnection];
+                        while (child !== null && child !== undefined) {
+                            const childBlk = blockList[child];
+                            const childConnections = childBlk.connections;
+                            const lastConnection = childConnections.length - 1;
+                            const nextBlk = childConnections[lastConnection];
                             // Don't disconnect a hidden block from its parent
                             if (
-                                nextBlk != null &&
-                                activity.blocks.blockList[nextBlk].name === "hidden"
+                                nextBlk !== null &&
+                                nextBlk !== undefined &&
+                                blockList[nextBlk].name === "hidden"
                             ) {
+                                const nextBlkObj = blockList[nextBlk];
                                 logo.connectionStore[turtle][blk].push([
                                     nextBlk,
                                     1,
-                                    activity.blocks.blockList[nextBlk].connections[1]
+                                    nextBlkObj.connections[1]
                                 ]);
-                                child = activity.blocks.blockList[nextBlk].connections[1];
-                                activity.blocks.blockList[nextBlk].connections[1] = null;
+                                child = nextBlkObj.connections[1];
+                                nextBlkObj.connections[1] = null;
                             } else {
                                 logo.connectionStore[turtle][blk].push([
                                     child,
                                     lastConnection,
                                     nextBlk
                                 ]);
-                                activity.blocks.blockList[child].connections[lastConnection] = null;
+                                childConnections[lastConnection] = null;
                                 child = nextBlk;
                             }
 
-                            if (child != null) {
-                                activity.blocks.blockList[child].connections[0] = null;
+                            if (child !== null && child !== undefined) {
+                                blockList[child].connections[0] = null;
                             }
                         }
                     }
@@ -395,9 +401,9 @@ function setupFlowBlocks(activity) {
                 return;
             }
 
-            const i = logo.switchCases[turtle][switchBlk].length;
-            // logo.switchCases[turtle][switchBlk].push(["__default__", args[0]]);
-            logo.switchCases[turtle][switchBlk][i - 1].push(["__default__", args[0]]);
+            const cases = logo.switchCases[turtle][switchBlk];
+            const i = cases.length;
+            cases[i - 1].push(["__default__", args[0]]);
         }
     }
 
@@ -452,9 +458,9 @@ function setupFlowBlocks(activity) {
                 return;
             }
 
-            const i = logo.switchCases[turtle][switchBlk].length;
-            // logo.switchCases[turtle][switchBlk].push([args[0], args[1]]);
-            logo.switchCases[turtle][switchBlk][i - 1].push([args[0], args[1]]);
+            const cases = logo.switchCases[turtle][switchBlk];
+            const i = cases.length;
+            cases[i - 1].push([args[0], args[1]]);
         }
     }
 
@@ -514,11 +520,12 @@ function setupFlowBlocks(activity) {
             const tur = activity.turtles.ithTurtle(turtle);
 
             // Push the current switch block and create an empty case for it
+            const casesForTurtle = logo.switchCases[turtle];
             logo.switchBlocks[turtle].push(blk);
-            if (blk in logo.switchCases[turtle]) {
-                logo.switchCases[turtle][blk].push([]);
+            if (blk in casesForTurtle) {
+                casesForTurtle[blk].push([]);
             } else {
-                logo.switchCases[turtle][blk] = [[]];
+                casesForTurtle[blk] = [[]];
             }
 
             // Set up the listener for the switch block
@@ -532,30 +539,34 @@ function setupFlowBlocks(activity) {
                 // Run the cases here.
                 let switchCase;
                 const argBlk = activity.blocks.blockList[switchBlk].connections[1];
-                if (argBlk == null) {
+                if (argBlk === null || argBlk === undefined) {
                     switchCase = "__default__";
                 } else {
                     switchCase = logo.parseArg(logo, turtle, argBlk, logo.receivedArg);
                 }
 
                 let caseFlow = null;
-                for (let i = 0; i < last(logo.switchCases[turtle][switchBlk]).length; i++) {
-                    if (last(logo.switchCases[turtle][switchBlk])[i][0] === switchCase) {
-                        caseFlow = last(logo.switchCases[turtle][switchBlk])[i][1];
+                const switchCases = logo.switchCases[turtle][switchBlk];
+                const activeCases = last(switchCases);
+                const activeCasesLength = activeCases.length;
+                for (let i = 0; i < activeCasesLength; i++) {
+                    const currentCase = activeCases[i];
+                    if (currentCase[0] === switchCase) {
+                        caseFlow = currentCase[1];
                         break;
-                    } else if (last(logo.switchCases[turtle][switchBlk])[i][0] === "__default__") {
-                        caseFlow = last(logo.switchCases[turtle][switchBlk])[i][1];
+                    } else if (currentCase[0] === "__default__") {
+                        caseFlow = currentCase[1];
                     }
                 }
 
-                if (caseFlow != null) {
+                if (caseFlow !== null && caseFlow !== undefined) {
                     const queueBlock = new Queue(caseFlow, 1, switchBlk, null);
                     tur.parentFlowQueue.push(switchBlk);
                     tur.queue.push(queueBlock);
                 }
 
                 // Clean up afterward.
-                logo.switchCases[turtle][switchBlk].pop();
+                switchCases.pop();
                 logo.switchBlocks[turtle].pop();
             };
 
@@ -656,8 +667,9 @@ function setupFlowBlocks(activity) {
             logo.doBreak(tur);
 
             // Since we pop the queue, we need to unhighlight our parent
-            const parentBlk = activity.blocks.blockList[blk].connections[0];
-            if (parentBlk != null) {
+            const connections = activity.blocks.blockList[blk].connections;
+            const parentBlk = connections[0];
+            if (parentBlk !== null && parentBlk !== undefined) {
                 if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
                     tur.unhighlightQueue.push(parentBlk);
                 }
@@ -707,25 +719,28 @@ function setupFlowBlocks(activity) {
             if (args.length !== 1) return;
 
             const tur = activity.turtles.ithTurtle(turtle);
+            const queue = tur.queue;
+            const parentFlowQueue = tur.parentFlowQueue;
 
             if (!args[0]) {
                 // Requeue.
-                const parentBlk = activity.blocks.blockList[blk].connections[0];
+                const connections = activity.blocks.blockList[blk].connections;
+                const parentBlk = connections[0];
                 const queueBlock = new Queue(blk, 1, parentBlk);
-                tur.parentFlowQueue.push(parentBlk);
-                tur.queue.push(queueBlock);
+                parentFlowQueue.push(parentBlk);
+                queue.push(queueBlock);
                 tur.doWait(0.05);
             } else {
                 // Since a wait-for block was requeued each
                 // time, we need to flush the queue of all but
                 // the last one, otherwise the child of the
                 // while block is executed multiple times.
-                const queueLength = tur.queue.length;
+                const queueLength = queue.length;
                 let kept_one = false;
                 for (let i = queueLength - 1; i > 0; i--) {
-                    if (tur.queue[i].parentBlk === blk) {
+                    if (queue[i].parentBlk === blk) {
                         if (kept_one) {
-                            tur.queue.pop();
+                            queue.pop();
                         } else {
                             kept_one = true;
                         }
@@ -733,11 +748,12 @@ function setupFlowBlocks(activity) {
                 }
 
                 // We need to reset the turtle time
+                const currentTime = Date.now();
                 if (logo.firstNoteTime === null) {
-                    logo.firstNoteTime = new Date().getTime();
+                    logo.firstNoteTime = currentTime;
                 }
 
-                const elapsedTime = (new Date().getTime() - this.firstNoteTime) / 1000;
+                const elapsedTime = (currentTime - this.firstNoteTime) / 1000;
                 tur.singer.turtleTime = elapsedTime;
                 tur.singer.previousTurtleTime = elapsedTime;
             }
@@ -790,31 +806,34 @@ function setupFlowBlocks(activity) {
             if (args.length !== 2) return;
 
             const tur = activity.turtles.ithTurtle(turtle);
+            const queue = tur.queue;
+            const parentFlowQueue = tur.parentFlowQueue;
 
             if (!args[0]) {
                 // We will add the outflow of the until block
                 // each time through, so we pop it off so as
                 // to not accumulate multiple copies.
-                const queueLength = tur.queue.length;
+                const queueLength = queue.length;
                 if (queueLength > 0) {
-                    if (tur.queue[queueLength - 1].parentBlk === blk) {
-                        tur.queue.pop();
+                    if (queue[queueLength - 1].parentBlk === blk) {
+                        queue.pop();
                     }
                 }
                 // Requeue
-                const parentBlk = activity.blocks.blockList[blk].connections[0];
+                const connections = activity.blocks.blockList[blk].connections;
+                const parentBlk = connections[0];
                 const queueBlock = new Queue(blk, 1, parentBlk);
-                tur.parentFlowQueue.push(parentBlk);
-                tur.queue.push(queueBlock);
+                parentFlowQueue.push(parentBlk);
+                queue.push(queueBlock);
             } else {
                 // Since an until block was requeued each
                 // time, we need to flush the queue of all but
                 // the last one, otherwise the child of the
                 // until block is executed multiple times.
-                const queueLength = tur.queue.length;
+                const queueLength = queue.length;
                 for (let i = queueLength - 1; i > 0; i--) {
-                    if (tur.queue[i].parentBlk === blk) {
-                        tur.queue.pop();
+                    if (queue[i].parentBlk === blk) {
+                        queue.pop();
                     }
                 }
             }
@@ -873,22 +892,25 @@ function setupFlowBlocks(activity) {
             if (args.length !== 2) return;
 
             const tur = activity.turtles.ithTurtle(turtle);
+            const queue = tur.queue;
+            const parentFlowQueue = tur.parentFlowQueue;
 
             if (args[0]) {
                 // We will add the outflow of the while block
                 // each time through, so we pop it off so as
                 // to not accumulate multiple copies.
-                const queueLength = tur.queue.length;
+                const queueLength = queue.length;
                 if (queueLength > 0) {
-                    if (tur.queue[queueLength - 1].parentBlk === blk) {
-                        tur.queue.pop();
+                    if (queue[queueLength - 1].parentBlk === blk) {
+                        queue.pop();
                     }
                 }
 
-                const parentBlk = activity.blocks.blockList[blk].connections[0];
+                const connections = activity.blocks.blockList[blk].connections;
+                const parentBlk = connections[0];
                 const queueBlock = new Queue(blk, 1, parentBlk);
-                tur.parentFlowQueue.push(parentBlk);
-                tur.queue.push(queueBlock);
+                parentFlowQueue.push(parentBlk);
+                queue.push(queueBlock);
 
                 // and queue the interior child flow.
                 return [args[1], 1];
@@ -897,10 +919,10 @@ function setupFlowBlocks(activity) {
                 // we need to flush the queue of all but the
                 // last one, otherwise the child of the while
                 // block is executed multiple times.
-                const queueLength = tur.queue.length;
+                const queueLength = queue.length;
                 for (let i = queueLength - 1; i > 0; i--) {
-                    if (tur.queue[i].parentBlk === blk) {
-                        tur.queue.pop();
+                    if (queue[i].parentBlk === blk) {
+                        queue.pop();
                     }
                 }
             }
@@ -1169,15 +1191,11 @@ function setupFlowBlocks(activity) {
          * @param {number} blk - The block number.
          */
         arg(logo, turtle, blk) {
-            if (
-                logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
-            ) {
+            const blockList = activity.blocks.blockList;
+            if (logo.inStatusMatrix && blockList[blockList[blk].connections[0]].name === "print") {
                 logo.statusFields.push([blk, "duplicate"]);
             } else {
-                activity.blocks.blockList[blk].value =
-                    activity.turtles.ithTurtle(turtle).singer.duplicateFactor;
+                blockList[blk].value = activity.turtles.ithTurtle(turtle).singer.duplicateFactor;
             }
         }
     }
