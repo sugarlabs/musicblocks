@@ -20,9 +20,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-global.platformColor = {
-    selectorBackground: "#8bc34a"
+const cssTokens = {
+    "--mb-selector-bg": "#8bc34a",
+    "--mb-text-color": "#111111"
 };
+
+global.getComputedStyle = jest.fn().mockReturnValue({
+    getPropertyValue: property => cssTokens[property] || ""
+});
 
 const createMockElement = tagName => ({
     style: {},
@@ -37,6 +42,9 @@ const createMockElement = tagName => ({
 });
 
 global.document = {
+    body: {
+        addEventListener: jest.fn()
+    },
     createElement: jest.fn().mockImplementation(tagName => {
         const element = createMockElement(tagName);
         if (tagName === "canvas") {
