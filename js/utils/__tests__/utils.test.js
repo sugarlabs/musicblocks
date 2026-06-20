@@ -16,6 +16,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+global._ = msg => msg;
+
 global.window = {
     btoa: str => Buffer.from(str, "utf8").toString("base64"),
     outerHeight: 600,
@@ -425,30 +427,52 @@ describe("Utility Functions (logic-only)", () => {
     });
     describe("rationalSum()", () => {
         it("adds simple fractions", () => {
-            expect(rationalSum([1, 2], [1, 2])).toEqual([2, 2]);
+            expect(rationalSum([1, 2], [1, 2])).toEqual([[2, 2], null]);
         });
 
         it("handles zero input", () => {
-            expect(rationalSum(0, [1, 2])).toEqual([0, 1]);
+            const [result] = rationalSum(0, [1, 2]);
+            expect(result).toEqual([0, 1]);
         });
         it("adds different denominators", () => {
-            expect(rationalSum([1, 3], [1, 6])).toEqual([3, 6]);
+            expect(rationalSum([1, 3], [1, 6])).toEqual([[3, 6], null]);
         });
 
         it("handles both zero", () => {
-            expect(rationalSum(0, 0)).toEqual([0, 1]);
+            const [result] = rationalSum(0, 0);
+            expect(result).toEqual([0, 1]);
         });
 
         it("handles negative values", () => {
-            expect(rationalSum([-1, 2], [1, 2])).toEqual([0, 2]);
+            expect(rationalSum([-1, 2], [1, 2])).toEqual([[0, 2], null]);
         });
 
         it("adds unequal denominators", () => {
-            expect(rationalSum([2, 5], [1, 10])).toEqual([5, 10]);
+            expect(rationalSum([2, 5], [1, 10])).toEqual([[5, 10], null]);
         });
 
         it("handles negative + positive", () => {
-            expect(rationalSum([-1, 3], [1, 3])).toEqual([0, 3]);
+            expect(rationalSum([-1, 3], [1, 3])).toEqual([[0, 3], null]);
+        });
+
+        describe("rationalSum zero denominator", () => {
+            it("logs error and returns [0,1] for zero first denominator", () => {
+                const spy = jest.spyOn(console, "error").mockImplementation(() => {});
+                const [result, err] = rationalSum([1, 0], [2, 3]);
+                expect(result).toEqual([0, 1]);
+                expect(err).not.toBeNull();
+                expect(spy).toHaveBeenCalled();
+                spy.mockRestore();
+            });
+
+            it("logs error and returns [0,1] for zero second denominator", () => {
+                const spy = jest.spyOn(console, "error").mockImplementation(() => {});
+                const [result, err] = rationalSum([2, 3], [1, 0]);
+                expect(result).toEqual([0, 1]);
+                expect(err).not.toBeNull();
+                expect(spy).toHaveBeenCalled();
+                spy.mockRestore();
+            });
         });
     });
     describe("hexToRGB() without hash", () => {
