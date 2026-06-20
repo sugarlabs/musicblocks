@@ -803,7 +803,7 @@ function setupPitchBlocks(activity) {
                 }
                 const note = NOTENAMES[noteIdx];
                 return note + o2;
-            } else if (activity.blocks.blockList[cblk0].name == "pitchnumber") {
+            } else if (activity.blocks.blockList[cblk0].name === "pitchnumber") {
                 if (cblk1 === null) {
                     return 7;
                 }
@@ -827,7 +827,7 @@ function setupPitchBlocks(activity) {
                 // Since we are using the staff, it is OK to assume 12
                 // half-steps per octave.
                 return lc + 12 * o;
-            } else if (activity.blocks.blockList[cblk0].name == "nthmodalpitch") {
+            } else if (activity.blocks.blockList[cblk0].name === "nthmodalpitch") {
                 if (cblk1 === null) {
                     return 5;
                 }
@@ -838,7 +838,7 @@ function setupPitchBlocks(activity) {
                     lc += modeLength;
                 }
                 return lc + o * modeLength;
-            } else if (activity.blocks.blockList[cblk0].name == "print") {
+            } else if (activity.blocks.blockList[cblk0].name === "print") {
                 if (logo.inStatusMatrix) {
                     logo.statusFields.push([blk, "ytopitch"]);
                 }
@@ -850,7 +850,7 @@ function setupPitchBlocks(activity) {
                 }
                 const note = NOTENAMES[noteIdx];
                 return note + o2;
-            } else if (activity.blocks.blockList[cblk0].name == "pitch") {
+            } else if (activity.blocks.blockList[cblk0].name === "pitch") {
                 if (cblk1 === null) {
                     return ["sol", 4];
                 }
