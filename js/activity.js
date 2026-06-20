@@ -553,6 +553,9 @@ class Activity {
 
             this.setHelpfulSearchDiv();
 
+            // Setup mobile help toggle functionality
+            this._setupMobileHelpToggle();
+
             // Late initialization of GIF animator if it was missed in constructor
             if (!this.gifAnimator && typeof GIFAnimator !== "undefined") {
                 this.gifAnimator = new GIFAnimator();
@@ -685,6 +688,80 @@ class Activity {
                 this.helpfulSearchDiv.parentNode.removeChild(this.helpfulSearchDiv);
             }
             that.__tick();
+        };
+
+        /*
+         * Setup mobile help toggle functionality
+         * Adds event listener to mobile help toggle button with proper cleanup
+         */
+        this._setupMobileHelpToggle = () => {
+            const mobileHelpToggle = document.getElementById("mobileHelpToggle");
+            if (!mobileHelpToggle) return;
+
+            // Clean up existing listeners to prevent duplicates
+            if (this._mobileHelpClickHandler) {
+                mobileHelpToggle.removeEventListener("click", this._mobileHelpClickHandler);
+            }
+            if (this._mobileHelpOutsideClickHandler) {
+                document.removeEventListener("click", this._mobileHelpOutsideClickHandler);
+            }
+
+            // Store handler references for cleanup
+            this._mobileHelpClickHandler = () => {
+                this._toggleMobileHelp();
+            };
+
+            this._mobileHelpOutsideClickHandler = e => {
+                // Only handle click-outside on mobile screens
+                if (window.innerWidth > 768) return;
+
+                const helpWin = window.widgetWindows.openWindows["help"];
+                if (
+                    helpWin &&
+                    helpWin._frame.style.display !== "none" &&
+                    !helpWin._frame.contains(e.target) &&
+                    e.target !== mobileHelpToggle &&
+                    !mobileHelpToggle.contains(e.target)
+                ) {
+                    helpWin._frame.style.display = "none";
+                }
+            };
+
+            // Add click handler to toggle button
+            mobileHelpToggle.addEventListener("click", this._mobileHelpClickHandler);
+
+            // Add click-outside handler (checks screen size inside handler)
+            document.addEventListener("click", this._mobileHelpOutsideClickHandler);
+        };
+
+        /*
+         * Toggle mobile help visibility
+         * Shows or hides help on mobile devices
+         */
+        this._toggleMobileHelp = async () => {
+            // Check if help widget exists using the widgetWindows API
+            const isHelpOpen = window.widgetWindows.isOpen("help");
+            let helpWin = window.widgetWindows.openWindows["help"];
+
+            // If help widget doesn't exist, create it
+            if (!isHelpOpen || !helpWin) {
+                await this._showHelp();
+                helpWin = window.widgetWindows.openWindows["help"];
+            }
+
+            if (!helpWin) {
+                return;
+            }
+
+            // Check if widget is currently visible by checking display style
+            const isCurrentlyVisible = helpWin._frame.style.display !== "none";
+
+            if (isCurrentlyVisible) {
+                helpWin._frame.style.display = "none";
+            } else {
+                helpWin._frame.style.display = "block";
+                helpWin.takeFocus();
+            }
         };
 
         /*
@@ -1322,8 +1399,12 @@ class Activity {
                         const protoblk = obj[0];
                         const paletteName = obj[1];
                         const protoName = obj[2];
-
-                        if (that.blocks.protoBlockDict.hasOwnProperty(protoName)) {
+                        if (
+                            Object.prototype.hasOwnProperty.call(
+                                that.blocks.protoBlockDict,
+                                protoName
+                            )
+                        ) {
                             that.palettes.dict[paletteName].makeBlockFromSearch(
                                 protoblk,
                                 protoName,
