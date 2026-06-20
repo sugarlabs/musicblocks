@@ -104,7 +104,10 @@ describe("PhraseMakerAudio", () => {
             platformColor: { selectorBackground: "blue" },
             _noteValueRow: { cells: [] },
             _tupletNoteValueRow: { cells: [] },
-            _playButton: { innerHTML: "" },
+            _playButton: {
+                textContent: "",
+                appendChild: jest.fn()
+            },
             _: str => str,
             constructor: { ICONSIZE: 32 }
         };
