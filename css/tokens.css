@@ -24,6 +24,10 @@
     --color-brand-primary-hover: #2563eb;
     --color-brand-secondary: #8b5cf6;
 
+    /* Selector / Widget Colors */
+    --color-selector-bg: #8cc6ff;
+    --color-selector-selected: #1a8cff;
+
     --color-success: #10b981;
     --color-success-bg: #d1fae5;
     --color-warning: #f59e0b;
@@ -107,6 +111,9 @@ body.dark {
     --color-brand-primary-hover: #3b82f6;
     --color-brand-secondary: #a78bfa;
 
+    --color-selector-bg: #64b5f6;
+    --color-selector-selected: #1e88e5;
+
     /* Adjusted state backgrounds for dark mode */
     --color-success-bg: rgba(16, 185, 129, 0.2);
     --color-warning-bg: rgba(245, 158, 11, 0.2);
@@ -138,6 +145,9 @@ body.highcontrast {
     --color-brand-primary: #ffff00;
     --color-brand-primary-hover: #ffffff;
     --color-brand-secondary: #00ffff;
+
+    --color-selector-bg: #00ffff;
+    --color-selector-selected: #00cccc;
 
     --color-success: #00ff00;
     --color-success-bg: #000000;
