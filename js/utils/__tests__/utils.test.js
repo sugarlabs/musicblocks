@@ -16,6 +16,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+global._ = msg => msg;
+
 global.window = {
     btoa: str => Buffer.from(str, "utf8").toString("base64"),
     outerHeight: 600,

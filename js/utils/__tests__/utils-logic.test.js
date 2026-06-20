@@ -9,6 +9,8 @@
  * (at your option) any later version.
  */
 
+global._ = msg => msg;
+
 const {
     toTitleCase,
     fileExt,

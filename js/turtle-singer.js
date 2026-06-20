@@ -545,7 +545,7 @@ class Singer {
             saveNoteCount[1]
         ]);
         if (noteCountErr) {
-            activity.errorMsg(_(noteCountErr));
+            activity.errorMsg(noteCountErr);
         }
         tur.singer.notesPlayed = saveNoteCount;
         tur.singer.tallyNotes = saveTallyNotes;
@@ -1958,7 +1958,7 @@ class Singer {
                         noteValue
                     ]);
                     if (notesPlayedErr) {
-                        activity.errorMsg(_(notesPlayedErr));
+                        activity.errorMsg(notesPlayedErr);
                     } else {
                         tur.singer.notesPlayed = notesPlayed;
                     }
