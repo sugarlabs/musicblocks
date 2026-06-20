@@ -1982,8 +1982,7 @@ class Palette {
                         try {
                             this.activity.logo.parseArg(this.activity.logo, 0, arg);
                         } catch (e) {
-                            const argBlock = this.activity.blocks.blockList[arg];
-                            this.activity.logo.statusFields.push([arg, argBlock.name]);
+                            // turtle not yet initialized; skip field registration
                         }
                     }
                 }

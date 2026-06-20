@@ -333,7 +333,7 @@ class StatusMatrix {
 
                 cell = this._statusTable.rows[i + 1].cells[activeTurtles + 1];
                 if (cell !== null) {
-                    cell.textContent = value;
+                    cell.textContent = value === "__INVALID_INPUT__" ? "" : value;
                 }
                 i++;
             }
