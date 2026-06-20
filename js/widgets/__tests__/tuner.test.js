@@ -317,6 +317,34 @@ describe("Tuner Widget", () => {
         });
     });
 
+    describe("Additional Edge Cases - PR #6", () => {
+        describe("TunerUtils.frequencyToPitch", () => {
+            test("returns A with 0 cents for A4 (440Hz)", () => {
+                const [note, cents, freq] = TunerUtils.frequencyToPitch(440);
+                expect(note).toBe("A");
+                expect(cents).toBe(0);
+                expect(freq).toBe(440);
+            });
+            test("returns C with 0 cents for frequency below C0", () => {
+                const [note, cents] = TunerUtils.frequencyToPitch(1);
+                expect(note).toBe("C");
+                expect(cents).toBe(0);
+            });
+            test("returns correct note for C4 (261.63Hz)", () => {
+                const [note] = TunerUtils.frequencyToPitch(261.63);
+                expect(note).toBe("C");
+            });
+        });
+        describe("TunerUtils.calculatePlaybackRate", () => {
+            test("returns 1 for zero adjustment", () => {
+                expect(TunerUtils.calculatePlaybackRate(0, 0)).toBeCloseTo(1);
+            });
+            test("doubles for 1200 cents", () => {
+                expect(TunerUtils.calculatePlaybackRate(0, 1200)).toBeCloseTo(2);
+            });
+        });
+    });
+
     describe("TunerDisplay", () => {
         let mockCanvas;
         let mockCtx;
