@@ -2716,6 +2716,7 @@ class TimbreWidget {
                         this.phaserEffect.push(n);
                         this.phaserParams.push(5);
                         this.phaserParams.push(3);
+                        // Keep base frequency aligned with UI/default block value to avoid state drift.
                         this.phaserParams.push(100);
 
                         await delayExecution(500);
