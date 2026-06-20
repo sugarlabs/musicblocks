@@ -490,7 +490,11 @@ class Palettes {
     _clearKeyboardFocus() {
         const focused = document.querySelectorAll('[data-keyboard-focus="true"]');
         focused.forEach(el => {
-            el.style.backgroundColor = platformColor.paletteBackground;
+            if (el.classList.contains("ui-menu-item")) {
+                el.style.backgroundColor = "";
+            } else {
+                el.style.backgroundColor = platformColor.paletteBackground;
+            }
             delete el.dataset.keyboardFocus;
             if (typeof el.hasAttribute === "function" && el.hasAttribute("tabindex")) {
                 el.tabIndex = -1;
