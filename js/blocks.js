@@ -3890,8 +3890,8 @@ class Blocks {
 
             const myBlock = this.blockList[blk];
             /** If this happens, something is really broken. */
-            if (myBlock === null) {
-                console.debug("null block encountered... this is bad. " + blk);
+            if (!myBlock) {
+                console.debug("null or undefined block encountered... this is bad. " + blk);
                 return;
             }
 
