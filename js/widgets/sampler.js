@@ -135,6 +135,52 @@ function SampleWidget() {
     this.pitchDetectionStream = null;
     this.pitchDetectionAnimationId = null;
     this.isPitchDetectionRunning = false;
+    this._drawCallbacks = {};
+    this._canvasNeedsRedraw = {};
+
+    /**
+     * Returns whether the sampler waveform should keep animating.
+     * @returns {boolean}
+     */
+    this._shouldAnimateCanvas = function () {
+        return this.running && (this.is_recording || this.isMoving || this.playback);
+    };
+
+    /**
+     * Cancels the waveform animation loop for a canvas.
+     * @param {number|string} turtleIdx - The index of the canvas to stop.
+     * @returns {void}
+     */
+    this._stopCanvasAnimation = function (turtleIdx) {
+        if (this.drawVisualIDs[turtleIdx] !== null && this.drawVisualIDs[turtleIdx] !== undefined) {
+            cancelAnimationFrame(this.drawVisualIDs[turtleIdx]);
+            this.drawVisualIDs[turtleIdx] = null;
+        }
+    };
+
+    /**
+     * Starts or refreshes the waveform animation loop when work is active.
+     * @param {number} turtleIdx - The index of the canvas to refresh.
+     * @returns {void}
+     */
+    this._refreshCanvasAnimation = function (turtleIdx) {
+        const draw = this._drawCallbacks[turtleIdx];
+        if (!draw) return;
+
+        this._canvasNeedsRedraw[turtleIdx] = true;
+
+        if (this._shouldAnimateCanvas()) {
+            if (
+                this.drawVisualIDs[turtleIdx] === null ||
+                this.drawVisualIDs[turtleIdx] === undefined
+            ) {
+                draw();
+            }
+        } else {
+            this._stopCanvasAnimation(turtleIdx);
+            draw();
+        }
+    };
 
     /**
      * Updates the blocks related to the sample.
@@ -219,6 +265,7 @@ function SampleWidget() {
                 vertical-align="middle"
             >`;
         this.isMoving = false;
+        this._stopCanvasAnimation(0);
     };
 
     /**
@@ -235,6 +282,7 @@ function SampleWidget() {
                 vertical-align="middle"
             >`;
         this.isMoving = true;
+        this._refreshCanvasAnimation(0);
     };
 
     /**
@@ -472,7 +520,7 @@ function SampleWidget() {
         widgetWindow.onclose = () => {
             if (this.drawVisualIDs) {
                 for (const id of Object.keys(this.drawVisualIDs)) {
-                    cancelAnimationFrame(this.drawVisualIDs[id]);
+                    this._stopCanvasAnimation(id);
                 }
             }
 
@@ -958,12 +1006,14 @@ function SampleWidget() {
                 this._recordBtn.getElementsByTagName("img")[0].src = "header-icons/record.svg";
                 this.displayRecordingStartMessage();
                 this.activity.logo.synth.LiveWaveForm();
+                this._refreshCanvasAnimation(0);
             } else {
                 this.recordingURL = await this.activity.logo.synth.stopRecording();
                 this.is_recording = false;
                 this._recordBtn.getElementsByTagName("img")[0].src = "header-icons/mic.svg";
                 this.displayRecordingStopMessage();
                 this._playbackBtn.classList.remove("disabled");
+                this._stopCanvasAnimation(0);
             }
         };
 
@@ -975,9 +1025,11 @@ function SampleWidget() {
                 this._addSample();
                 this.activity.logo.synth.playRecording();
                 this.playback = true;
+                this._refreshCanvasAnimation(0);
             } else {
                 this.activity.logo.synth.stopPlayBackRecording();
                 this.playback = false;
+                this._stopCanvasAnimation(0);
             }
         };
 
@@ -1880,12 +1932,7 @@ function SampleWidget() {
             height = this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 70;
         }
         document.getElementsByTagName("canvas")[0].innerHTML = "";
-        // Cancel any existing RAF loop for this canvas before creating a new one
-        // to prevent multiple concurrent draw loops accumulating on resize/maximize.
-        if (this.drawVisualIDs[0]) {
-            cancelAnimationFrame(this.drawVisualIDs[0]);
-            this.drawVisualIDs[0] = null;
-        }
+        this._stopCanvasAnimation(0);
         this.makeCanvas(width, height, 0, true);
         this.reconnectSynthsToAnalyser();
     };
@@ -1899,6 +1946,7 @@ function SampleWidget() {
      * @returns {void}
      */
     this.makeCanvas = function (width, height, turtleIdx, resized) {
+        this._stopCanvasAnimation(turtleIdx);
         const canvas = document.createElement("canvas");
         canvas.height = height;
         canvas.width = width;
@@ -1960,97 +2008,122 @@ function SampleWidget() {
             this.tunerDisplay = null;
         }
 
+        this._canvasNeedsRedraw[turtleIdx] = true;
+
         const draw = () => {
             // Only continue the RAF loop when there is active work to render.
             // Scheduling inside the condition stops the loop naturally when idle
             // (not recording and no active analyser) instead of spinning at ~60fps
             // unconditionally — matching the lifecycle pattern of the Oscilloscope widget.
-            if (
-                this.is_recording ||
-                (this.pitchAnalysers[turtleIdx] && (this.running || resized))
-            ) {
-                this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
-                canvasCtx.fillStyle = platformColor.background || "#FFFFFF";
-                canvasCtx.font = "10px Verdana";
-                this.verticalOffset = -canvas.height / 4;
-                this.zoomFactor = 40.0;
-                canvasCtx.fillRect(0, 0, width, height);
+            const shouldAnimate = this._shouldAnimateCanvas();
+            const shouldDraw = shouldAnimate || this._canvasNeedsRedraw[turtleIdx];
 
-                let oscText;
-                if (turtleIdx >= 0) {
-                    //.TRANS: The sound sample that the user uploads.
-                    oscText = this.sampleName !== "" ? this.sampleName : _("sample");
+            if (!shouldDraw) {
+                this.drawVisualIDs[turtleIdx] = null;
+                return;
+            }
+
+            canvasCtx.fillStyle = platformColor.background || "#FFFFFF";
+            canvasCtx.font = "10px Verdana";
+            this.verticalOffset = -canvas.height / 4;
+            this.zoomFactor = 40.0;
+            canvasCtx.fillRect(0, 0, width, height);
+
+            let oscText;
+            if (turtleIdx >= 0) {
+                //.TRANS: The sound sample that the user uploads.
+                oscText = this.sampleName !== "" ? this.sampleName : _("sample");
+            }
+            canvasCtx.fillStyle = platformColor.textColor || "#000000";
+            //.TRANS: The reference tone is a sound used for comparison.
+            canvasCtx.fillText(_("reference tone"), 10, 10);
+            canvasCtx.fillText(oscText, 10, canvas.height / 2 + 10);
+
+            for (let turtleIdx = 0; turtleIdx < 2; turtleIdx += 1) {
+                let dataArray;
+                if (this.is_recording) {
+                    if (
+                        turtleIdx === 0 &&
+                        (!this.pitchAnalysers[0] ||
+                            typeof this.pitchAnalysers[0].getValue !== "function")
+                    ) {
+                        continue;
+                    }
+                    dataArray =
+                        turtleIdx === 0
+                            ? this.pitchAnalysers[0].getValue()
+                            : this.activity.logo.synth.getWaveFormValues();
+                } else {
+                    if (
+                        !this.pitchAnalysers[turtleIdx] ||
+                        typeof this.pitchAnalysers[turtleIdx].getValue !== "function"
+                    ) {
+                        continue;
+                    }
+                    dataArray = this.pitchAnalysers[turtleIdx].getValue();
                 }
-                canvasCtx.fillStyle = platformColor.textColor || "#000000";
-                //.TRANS: The reference tone is a sound used for comparison.
-                canvasCtx.fillText(_("reference tone"), 10, 10);
-                canvasCtx.fillText(oscText, 10, canvas.height / 2 + 10);
 
-                for (let turtleIdx = 0; turtleIdx < 2; turtleIdx += 1) {
-                    let dataArray;
-                    if (this.is_recording) {
-                        dataArray =
-                            turtleIdx === 0
-                                ? this.pitchAnalysers[0].getValue()
-                                : this.activity.logo.synth.getWaveFormValues();
+                const bufferLength = dataArray.length;
+                if (bufferLength === 0) {
+                    continue;
+                }
+                const rbga = SAMPLEOSCCOLORS[turtleIdx];
+                const sliceWidth = (width * this.zoomFactor) / bufferLength;
+                canvasCtx.lineWidth = 2;
+                canvasCtx.strokeStyle = rbga;
+                canvasCtx.beginPath();
+
+                let x = 0;
+
+                for (let i = 0; i < bufferLength; i++) {
+                    const y = (height / 2) * (1 - dataArray[i]) + this.verticalOffset;
+                    if (i === 0) {
+                        canvasCtx.moveTo(x, y);
                     } else {
-                        dataArray = this.pitchAnalysers[turtleIdx].getValue();
+                        canvasCtx.lineTo(x, y);
                     }
-
-                    const bufferLength = dataArray.length;
-                    const rbga = SAMPLEOSCCOLORS[turtleIdx];
-                    const sliceWidth = (width * this.zoomFactor) / bufferLength;
-                    canvasCtx.lineWidth = 2;
-                    canvasCtx.strokeStyle = rbga;
-                    canvasCtx.beginPath();
-
-                    let x = 0;
-
-                    for (let i = 0; i < bufferLength; i++) {
-                        const y = (height / 2) * (1 - dataArray[i]) + this.verticalOffset;
-                        if (i === 0) {
-                            canvasCtx.moveTo(x, y);
-                        } else {
-                            canvasCtx.lineTo(x, y);
-                        }
-                        x += sliceWidth;
-                    }
-                    canvasCtx.lineTo(canvas.width, canvas.height / 2);
-                    canvasCtx.stroke();
-                    this.verticalOffset = canvas.height / 4;
+                    x += sliceWidth;
                 }
+                canvasCtx.lineTo(canvas.width, canvas.height / 2);
+                canvasCtx.stroke();
+                this.verticalOffset = canvas.height / 4;
+            }
 
-                // Update the tuner display if enabled
-                if (this.tunerEnabled && this.tunerDisplay) {
-                    // Get pitch data from analyzer if available
-                    if (this.pitchAnalysers[1] && this.sampleName) {
-                        const dataArray = this.pitchAnalysers[1].getValue();
-                        if (dataArray && dataArray.length > 0) {
-                            const pitch = detectPitch(dataArray);
-                            if (pitch > 0) {
-                                const { note, cents } = frequencyToNote(pitch);
-                                this.tunerDisplay.update(note, cents, this.centsValue);
+            // Update the tuner display if enabled
+            if (this.tunerEnabled && this.tunerDisplay) {
+                // Get pitch data from analyzer if available
+                if (this.pitchAnalysers[1] && this.sampleName) {
+                    const dataArray = this.pitchAnalysers[1].getValue();
+                    if (dataArray && dataArray.length > 0) {
+                        const pitch = detectPitch(dataArray);
+                        if (pitch > 0) {
+                            const { note, cents } = frequencyToNote(pitch);
+                            this.tunerDisplay.update(note, cents, this.centsValue);
 
-                                // Update segments
-                                this.tunerSegments.forEach((segment, i) => {
-                                    const segmentCents = (i - 5) * 10;
-                                    if (Math.abs(cents - segmentCents) <= 5) {
-                                        segment.setAttribute("fill", "#00ff00"); // In tune (green)
-                                    } else if (cents < segmentCents) {
-                                        segment.setAttribute("fill", "#ff0000"); // Flat (red)
-                                    } else {
-                                        segment.setAttribute("fill", "#0000ff"); // Sharp (blue)
-                                    }
-                                });
-                            }
+                            // Update segments
+                            this.tunerSegments.forEach((segment, i) => {
+                                const segmentCents = (i - 5) * 10;
+                                if (Math.abs(cents - segmentCents) <= 5) {
+                                    segment.setAttribute("fill", "#00ff00"); // In tune (green)
+                                } else if (cents < segmentCents) {
+                                    segment.setAttribute("fill", "#ff0000"); // Flat (red)
+                                } else {
+                                    segment.setAttribute("fill", "#0000ff"); // Sharp (blue)
+                                }
+                            });
                         }
                     }
                 }
+            }
+            this._canvasNeedsRedraw[turtleIdx] = false;
+
+            if (shouldAnimate) {
+                this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
             } else {
-                // No active work — clear the stored RAF id so the loop is fully stopped.
                 this.drawVisualIDs[turtleIdx] = null;
             }
         };
+        this._drawCallbacks[turtleIdx] = draw;
         draw();
     };
 
