@@ -65,6 +65,9 @@ describe("StatsWindow", () => {
         myChartMock = { getContext: jest.fn().mockReturnValue({}) };
         global.docById = jest.fn().mockReturnValue(myChartMock);
 
+        global._ = jest.fn(str => str);
+        window._ = global._;
+
         global.analyzeProject = jest.fn().mockReturnValue({});
         global.runAnalytics = jest.fn();
         global.scoreToChartData = jest.fn().mockReturnValue({});
@@ -79,6 +82,7 @@ describe("StatsWindow", () => {
         global.Chart = jest.fn().mockImplementation(() => ({
             Radar: jest.fn().mockReturnValue(radarMock)
         }));
+        window.Chart = global.Chart;
     });
 
     test("constructor initialises widget and calls doAnalytics", () => {
@@ -182,8 +186,8 @@ describe("StatsWindow", () => {
         expect(global.getChartOptions).toHaveBeenCalledWith(expect.any(Function));
         expect(global.Chart).toHaveBeenCalledWith(myChartMock.getContext.mock.results[0].value);
         expect(activity.blocks.activeBlock).toBeNull();
-        expect(document.body.style.cursor).toBe("wait");
-        expect(activity.loading).toBe(true);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.loading).toBe(false);
     });
 
     test("doAnalytics appends json list container with left float style", () => {

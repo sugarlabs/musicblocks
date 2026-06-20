@@ -779,9 +779,12 @@ class Painter {
             this._canvasColor = hex2rgb(this._canvasColor.split("#")[1]);
         }
 
-        const subrgb = this._canvasColor.substr(0, this._canvasColor.length - 2);
-        this.turtle.ctx.strokeStyle = subrgb + this._canvasAlpha + ")";
-        this.turtle.ctx.fillStyle = subrgb + this._canvasAlpha + ")";
+        const rgbMatch = this._canvasColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+        if (rgbMatch) {
+            const rgba = `rgba(${rgbMatch[1]},${rgbMatch[2]},${rgbMatch[3]},${this._canvasAlpha})`;
+            this.turtle.ctx.strokeStyle = rgba;
+            this.turtle.ctx.fillStyle = rgba;
+        }
     }
 
     /**
