@@ -347,5 +347,46 @@ describe("retryWithBackoff", () => {
             expect(callCount).toBe(2);
             expect(onSuccess).toHaveBeenCalled();
         });
+
+        it("should await an async check function and retry until it resolves truthy", async () => {
+            let callCount = 0;
+            const onSuccess = jest.fn();
+
+            await retryWithBackoff({
+                check: async () => {
+                    callCount++;
+                    return callCount >= 3 ? "ready" : false;
+                },
+                onSuccess,
+                delayFn: instantDelay,
+                maxRetries: 5
+            });
+
+            expect(callCount).toBe(3);
+            expect(onSuccess).toHaveBeenCalledWith("ready");
+        });
+
+        it("should not defer sync checks to microtask queue", async () => {
+            const order = [];
+
+            const promise = retryWithBackoff({
+                check: () => {
+                    order.push("check");
+                    return true;
+                },
+                onSuccess: () => {
+                    order.push("onSuccess");
+                },
+                delayFn: instantDelay
+            });
+
+            // Sync check + onSuccess should run before any awaited microtask
+            order.push("after-call");
+            await promise;
+
+            expect(order[0]).toBe("check");
+            expect(order[1]).toBe("onSuccess");
+            expect(order[2]).toBe("after-call");
+        });
     });
 });
