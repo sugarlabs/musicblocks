@@ -1426,6 +1426,16 @@ function closeWidgets() {
 let closeBlkWidgets = name => {
     let searchKey = name;
 
+    // NOTE: This mapping only works for widgets that never set their own
+    // `blockNo` property (e.g. ModeWidget). window.widgetWindows.windowFor()
+    // keys a widget's window by `widget.blockNo` if that property is set to
+    // anything other than undefined (including null) — otherwise it falls
+    // back to the `saveAs` or `title` argument. Widgets like PhraseMaker set
+    // `this.blockNo` in their constructor, so they are keyed by blockNo, not
+    // by name, and will NOT be found via this KEY_MAPPING lookup. Adding such
+    // widgets here would silently do nothing. Before adding a new entry,
+    // verify the target widget's windowFor() call and confirm it does not
+    // rely on blockNo for its window key.
     const KEY_MAPPING = {
         "pitch-drum mapper": "pitch drum",
         "custom mode": "custom mode",
