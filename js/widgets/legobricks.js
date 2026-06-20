@@ -1259,7 +1259,7 @@ function LegoWidget() {
                 this._makeImageDraggable(this.imageWrapper);
                 this._showZoomControls();
                 this._drawGridLines();
-                this.activity.textMsg(_("Webcam started - click 📸 to capture"));
+                this.activity.textMsg(_("Webcam started"));
             })
             .catch(err => {
                 this.activity.textMsg(_("Webcam access denied: %s").replace(/%s/g, err.message));
