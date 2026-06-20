@@ -459,6 +459,7 @@ describe("Utility Functions (logic-only)", () => {
     describe("closeWidgets()", () => {
         beforeEach(() => {
             window.widgetWindows = {
+                openWindows: { RhythmRuler: {}, PhraseMarker: {} },
                 hideAllWindows: jest.fn(),
                 hideWindow: jest.fn(),
                 closeWindow: jest.fn()
@@ -466,7 +467,13 @@ describe("Utility Functions (logic-only)", () => {
         });
         it("calls window.widgetWindows.hideAllWindows", () => {
             closeWidgets();
-            expect(window.widgetWindows.hideAllWindows).toHaveBeenCalled();
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("RhythmRuler");
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("PhraseMarker");
+            expect(window.widgetWindows.hideAllWindows).not.toHaveBeenCalled();
+        });
+        it("does not throw when openWindows is empty", () => {
+            window.widgetWindows.openWindows = {};
+            expect(() => closeWidgets()).not.toThrow();
         });
     });
     describe("closeBlkWidgets()", () => {

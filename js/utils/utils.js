@@ -1414,7 +1414,8 @@ let delayExecution = duration => {
  * @returns {void}
  */
 function closeWidgets() {
-    window.widgetWindows.hideAllWindows();
+    const names = Object.keys(window.widgetWindows.openWindows);
+    names.forEach(name => window.widgetWindows.closeWindow(name));
 }
 
 /**
