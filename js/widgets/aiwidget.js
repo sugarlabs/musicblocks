@@ -128,14 +128,15 @@ function AIWidget() {
      * @returns {void}
      */
     this.resume = function () {
-        this.playBtn.innerHTML = `<img
-                src="header-icons/pause-button.svg" 
-                title="${_("Pause")}" 
-                alt="${_("Pause")}" 
-                height="${ICONSIZE}" 
-                width="${ICONSIZE}" 
-                vertical-align="middle"
-            >`;
+        const pauseImg = document.createElement("img");
+        pauseImg.src = "header-icons/pause-button.svg";
+        pauseImg.title = _("Pause");
+        pauseImg.alt = _("Pause");
+        pauseImg.height = ICONSIZE;
+        pauseImg.width = ICONSIZE;
+        pauseImg.style.verticalAlign = "middle";
+        this.playBtn.textContent = "";
+        this.playBtn.appendChild(pauseImg);
         this.isMoving = true;
     };
 
@@ -766,14 +767,15 @@ function AIWidget() {
         this.playBtn.onclick = () => {
             if (this.isMoving) {
                 this.pause();
-                this.playBtn.innerHTML = `<img 
-                        src="header-icons/play-button.svg" 
-                        title="${_("Play")}" 
-                        alt="${_("Play")}" 
-                        height="${ICONSIZE}" 
-                        width="${ICONSIZE}"
-                        vertical-align="middle"
-                    >`;
+                const playImg = document.createElement("img");
+                playImg.src = "header-icons/play-button.svg";
+                playImg.title = _("Play");
+                playImg.alt = _("Play");
+                playImg.height = ICONSIZE;
+                playImg.width = ICONSIZE;
+                playImg.style.verticalAlign = "middle";
+                this.playBtn.textContent = "";
+                this.playBtn.appendChild(playImg);
                 this.isMoving = false;
             } else {
                 if (!(abcNotationSong === "")) {
