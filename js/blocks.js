@@ -6080,6 +6080,25 @@ class Blocks {
             const totalBlocks = this._loadCounter;
             let bIndex = 0;
 
+            // Check once before chunking instead of on every block.
+            // Look in existing blocks and in the incoming batch.
+            if (!this.customTemperamentDefined) {
+                if (this.findBlockInstance("temperament1")) {
+                    this.customTemperamentDefined = true;
+                } else {
+                    for (let b = 0; b < blockObjs.length; b++) {
+                        const name =
+                            typeof blockObjs[b][1] === "object"
+                                ? blockObjs[b][1][0]
+                                : blockObjs[b][1];
+                        if (name === "temperament1") {
+                            this.customTemperamentDefined = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
             const processChunk = () => {
                 const chunkEnd = Math.min(bIndex + CHUNK_SIZE, totalBlocks);
                 for (let b = bIndex; b < chunkEnd; b++) {
@@ -6143,10 +6162,6 @@ class Blocks {
                 }
 
                 const that = this;
-
-                if (this.findBlockInstance("temperament1")) {
-                    this.customTemperamentDefined = true;
-                }
 
                 let postProcess;
                 /** A few special cases. */
