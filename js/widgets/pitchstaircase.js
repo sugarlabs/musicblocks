@@ -301,11 +301,13 @@ class PitchStaircase {
     _playOne(stepCell) {
         // The frequency is stored in the stepCell.
         stepCell.classList.add("active");
+        stepCell.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         const frequency = Number(stepCell.getAttribute("id"));
         this.activity.logo.synth.trigger(0, frequency, 1, DEFAULTVOICE, null, null);
 
         setTimeout(() => {
             stepCell.classList.remove("active");
+            stepCell.style.backgroundColor = platformColor.selectorBackground;
         }, 1000);
     }
 
