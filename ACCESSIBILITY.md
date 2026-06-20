@@ -9,6 +9,7 @@ This document describes the comprehensive accessibility enhancements implemented
 ### 1. **HTML Structure (index.html)**
 
 All toolbar buttons now include:
+
 - `role="button"` - Semantic role declaration
 - `tabindex="0"` - Keyboard focusability
 - `aria-label` - Clear, descriptive labels for screen readers
@@ -16,6 +17,7 @@ All toolbar buttons now include:
 - `aria-expanded="false/true"` - Dynamic state tracking for menus
 
 **Key Toolbar Buttons Enhanced:**
+
 - Play (Enter)
 - Stop
 - Record (with dropdown options)
@@ -31,6 +33,7 @@ All toolbar buttons now include:
 ### 2. **CSS Focus Styling (css/activities.css)**
 
 **Universal Focus Ring:**
+
 ```css
 *:focus-visible {
     outline: 2px solid var(--color-brand-primary) !important;
@@ -39,11 +42,13 @@ All toolbar buttons now include:
 ```
 
 **Theme-Aware Focus Colors:**
+
 - **Light Theme:** #1976d2 (Blue)
 - **Dark Theme:** #90caf9 (Light Blue)
 - **High Contrast:** #ffff00 (Yellow, 3px outline)
 
 **Features:**
+
 - Consistent 2px focus ring with 2px offset
 - Theme-specific color contrast for visibility
 - Outline never hidden or disabled
@@ -53,36 +58,43 @@ All toolbar buttons now include:
 A comprehensive JavaScript module providing:
 
 #### `AccessibilityHelper.setupDropdownKeyboardNavigation()`
+
 - Enable Enter/Space to open dropdowns
 - Escape key closes menus and returns focus
 - Arrow key navigation within menus
 - Auto-focus first menu item
 
 #### `AccessibilityHelper.setupToolbarKeyboardNavigation()`
+
 - Arrow Left/Right to navigate between toolbar buttons
 - Sequential focus management
 - Works in both primary and auxiliary toolbars
 
 #### `AccessibilityHelper.setupFocusManagement()`
+
 - Prevents focus loss when elements are hidden
 - Restores focus after modal dialogs close
 - Intercepts Element.setAttribute to catch display:none changes
 
 #### `AccessibilityHelper.trapFocus(container)`
+
 - Implements focus trap in modals
 - Loops focus within container (Tab at end wraps to start, Shift+Tab at start wraps to end)
 
 #### `AccessibilityHelper.setupAriaUpdates()`
+
 - Dynamically updates `aria-expanded` attributes
 - Automatically closes dropdowns when clicking outside
 - Maintains aria-label consistency
 
 #### `AccessibilityHelper.announceToScreenReader(message, priority)`
+
 - Creates screen reader live region
 - Supports polite/assertive announcements
 - Cleans up after message delivery
 
 #### `AccessibilityHelper.updateFocusRingForTheme(theme)`
+
 - Updates focus ring colors when theme changes
 - Maintains contrast across light/dark/high-contrast themes
 - Called automatically during theme switching
@@ -90,6 +102,7 @@ A comprehensive JavaScript module providing:
 ### 4. **Theme Integration (js/themebox.js)**
 
 When theme changes:
+
 1. Body classes toggle (light/dark/highcontrast)
 2. CSS tokens update via `syncPlatformColor(theme)`
 3. UI components refresh
@@ -98,6 +111,7 @@ When theme changes:
 ### 5. **Widget Window Focus Management (js/widgets/widgetWindows.js)**
 
 Enhanced keyboard navigation for widget windows:
+
 - Tab key management within focused window
 - Focus trap implementation (Tab loops to first element, Shift+Tab loops to last)
 - Escape key closes window
@@ -110,6 +124,7 @@ Added `"utils/accessibility"` to CORE_BOOTSTRAP_MODULES for early initialization
 ### 7. **Activity Initialization (js/activity.js)**
 
 AccessibilityHelper.init() called after toolbar setup to ensure:
+
 - All toolbar buttons are keyboard accessible
 - Focus management is active
 - Dropdown navigation is working
@@ -117,6 +132,7 @@ AccessibilityHelper.init() called after toolbar setup to ensure:
 ## Keyboard Navigation
 
 ### Toolbar Navigation
+
 - **Tab:** Move focus to next toolbar button
 - **Shift+Tab:** Move focus to previous toolbar button
 - **Arrow Right:** Next button in same toolbar
@@ -125,12 +141,14 @@ AccessibilityHelper.init() called after toolbar setup to ensure:
 - **Escape:** Close dropdown and return focus to trigger
 
 ### Palette Navigation
+
 - **Tab:** Focus palette container
 - **Arrow Keys:** Navigate block categories and blocks
 - **Enter:** Select block
 - **Escape:** Exit palette navigation
 
 ### Widget Window Navigation
+
 - **Tab:** Move focus to next element in window
 - **Shift+Tab:** Move focus to previous element
 - **Tab (at last element):** Wrap to first element
@@ -138,12 +156,14 @@ AccessibilityHelper.init() called after toolbar setup to ensure:
 - **Cmd/Ctrl+Shift+M:** Maximize/restore window
 
 ### Canvas
+
 - **Enter:** Run/Play (default)
 - **Escape:** Stop
 
 ## Screen Reader Support
 
 All interactive elements now have:
+
 - **aria-label:** Clear, actionable descriptions
 - **role:** Semantic role (button, menu, etc.)
 - **aria-expanded:** Dynamic state for menus
@@ -153,6 +173,7 @@ All interactive elements now have:
 ## Focus Ring Visibility
 
 ### Contrast Ratios
+
 - **Light Theme:** 2px blue (#1976d2) on light background = 8.5:1 contrast
 - **Dark Theme:** 2px light blue (#90caf9) on dark background = 7.2:1 contrast
 - **High Contrast:** 3px yellow (#ffff00) on any background = 19:1 contrast
@@ -191,17 +212,20 @@ All meet or exceed WCAG AA requirements (4.5:1 minimum)
 
 ## Implementation Notes
 
-### Why No outline: none on *:focus
+### Why No outline: none on \*:focus
+
 - Removed outline suppression to ensure focus is always visible
 - Instead, use :focus-visible which only shows when appropriate
 - Provides keyboard accessibility without affecting mouse users
 
 ### Why Theme-Aware Colors
+
 - Different color for each theme ensures sufficient contrast
 - Yellow in high-contrast mode provides maximum visibility
 - Automatic updates via AccessibilityHelper.updateFocusRingForTheme()
 
 ### Why Accessibility Helper Module
+
 - Centralized accessibility management
 - Reusable functions for future enhancements
 - Easier testing and maintenance
