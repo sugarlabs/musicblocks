@@ -6562,17 +6562,11 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote) => {
 
     if (halfSteps <= 5 || isNaN(halfSteps)) {
         changedCurrent = currentOctave;
-    }
-
-    if (halfSteps > 5 && halfStepsUp > 5 && halfStepsDown < 5) {
+    } else if (halfStepsDown <= halfStepsUp) {
         changedCurrent = Math.max(currentOctave - 1, 1);
-    }
-
-    if (halfSteps > 5 && halfStepsUp < 5 && halfStepsDown > 5) {
+    } else if (halfStepsUp < halfStepsDown) {
         changedCurrent = Math.min(currentOctave + 1, 9);
-    }
-
-    if (halfSteps > 5 && halfStepsUp > 5 && halfStepsDown > 5) {
+    } else {
         changedCurrent = currentOctave;
     }
 
