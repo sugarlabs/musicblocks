@@ -204,7 +204,7 @@ class PitchStaircase {
         if (isNaN(inputNum1) || Number(inputNum1) <= 0) {
             inputNum1 = 3;
         } else {
-            inputNum1 = Math.abs(Math.floor(inputNum1));
+            inputNum1 = Math.floor(inputNum1);
         }
 
         this._musicRatio1.value = inputNum1;
@@ -213,7 +213,7 @@ class PitchStaircase {
         if (isNaN(inputNum2) || Number(inputNum2) <= 0) {
             inputNum2 = 2;
         } else {
-            inputNum2 = Math.abs(Math.floor(inputNum2));
+            inputNum2 = Math.floor(inputNum2);
         }
 
         this._musicRatio2.value = inputNum2;
