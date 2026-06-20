@@ -370,4 +370,16 @@ describe("ModeWidget", () => {
         expect(modeWidget._locked).toBe(false);
         jest.useRealTimers();
     });
+
+    test("onclose handler should stop synth and reset lock state", () => {
+        const widgetWindow = window.widgetWindows.windowFor();
+
+        modeWidget._locked = true;
+
+        // Trigger onclose
+        widgetWindow.onclose();
+
+        expect(mockActivity.logo.synth.stop).toHaveBeenCalled();
+        expect(modeWidget._locked).toBe(false);
+    });
 });

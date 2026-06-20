@@ -481,7 +481,8 @@ describe("Utility Functions (logic-only)", () => {
             window.widgetWindows = {
                 hideAllWindows: jest.fn(),
                 hideWindow: jest.fn(),
-                closeWindow: jest.fn()
+                closeWindow: jest.fn(),
+                openWindows: {}
             };
         });
 
@@ -493,6 +494,39 @@ describe("Utility Functions (logic-only)", () => {
             closeBlkWidgets("TestWidget");
 
             expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("TestWidget");
+        });
+
+        it("closes widget directly using key lookup from openWindows", () => {
+            window.widgetWindows.openWindows = {
+                "custom mode": { close: jest.fn() }
+            };
+
+            closeBlkWidgets("custom mode");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("custom mode");
+        });
+
+        it("closes widget using mapped key", () => {
+            window.widgetWindows.openWindows = {
+                "pitch drum": { close: jest.fn() }
+            };
+
+            closeBlkWidgets("pitch-drum mapper");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("pitch drum");
+        });
+
+        it("closes widget by matching element ID when display title changes", () => {
+            const mockElement = {
+                innerHTML: "C MAJOR",
+                id: "custom modeWidgetID"
+            };
+
+            document.getElementsByClassName = jest.fn(() => [mockElement]);
+
+            closeBlkWidgets("custom mode");
+
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("custom mode");
         });
 
         it("does nothing if no match found", () => {
