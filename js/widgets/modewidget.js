@@ -121,6 +121,10 @@ class ModeWidget {
                 this._timeouts = [];
             }
             this._playing = false;
+            if (this.logo && this.logo.synth) {
+                this.logo.synth.stop();
+            }
+            this._locked = false;
             this.hideMsgs();
             this.widgetWindow.destroy();
         };
