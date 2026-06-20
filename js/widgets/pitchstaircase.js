@@ -80,7 +80,7 @@ class PitchStaircase {
         cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.classList.add("pitch-staircase-cell");
+        cell.classList.add("pitch-staircase-btn");
 
         return cell;
     }
@@ -135,7 +135,7 @@ class PitchStaircase {
             stepCell.style.minWidth = stepCell.style.width;
             stepCell.style.maxWidth = stepCell.style.width;
             stepCell.style.height = PitchStaircase.BUTTONSIZE + "px";
-            stepCell.classList.add("pitch-staircase-cell");
+            stepCell.classList.add("pitch-staircase-step");
 
             const cellWidth = Number(stepCell.style.width.replace(/px/, ""));
             const svgWidth = cellWidth.toString();
@@ -300,8 +300,13 @@ class PitchStaircase {
      */
     _playOne(stepCell) {
         // The frequency is stored in the stepCell.
+        stepCell.classList.add("active");
         const frequency = Number(stepCell.getAttribute("id"));
         this.activity.logo.synth.trigger(0, frequency, 1, DEFAULTVOICE, null, null);
+
+        setTimeout(() => {
+            stepCell.classList.remove("active");
+        }, 1000);
     }
 
     /**
@@ -315,8 +320,16 @@ class PitchStaircase {
             const note = this.Stairs[i][0] + this.Stairs[i][1];
             pitchnotes.push(normalizeNoteAccidentals(note));
             const stepCell = this._stepTables[i].rows[0].cells[1];
+            stepCell.classList.add("active");
             this.activity.logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
         }
+
+        setTimeout(() => {
+            for (let i = 0; i < this.Stairs.length; i++) {
+                const stepCell = this._stepTables[i].rows[0].cells[1];
+                stepCell.classList.remove("active");
+            }
+        }, 1000);
     }
 
     /**
@@ -330,6 +343,7 @@ class PitchStaircase {
         pitchnotes.push(normalizeNoteAccidentals(note));
         const last = this.Stairs.length - 1;
         const stepCell = this._stepTables[last].rows[0].cells[1];
+        stepCell.classList.add("active");
         this.activity.logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
         this._playNext(this.Stairs.length - 2, -1);
     }
@@ -344,10 +358,23 @@ class PitchStaircase {
         if (this.closed) return;
 
         if (index === this.Stairs.length) {
+            setTimeout(() => {
+                for (let i = 0; i < this.Stairs.length; i++) {
+                    const stepCell = this._stepTables[i].rows[0].cells[1];
+                    stepCell.classList.remove("active");
+                }
+            }, 1000);
             return;
         }
 
         if (index === -1) {
+            setTimeout(() => {
+                for (let i = 0; i < this.Stairs.length; i++) {
+                    const stepCell = this._stepTables[i].rows[0].cells[1];
+                    stepCell.classList.remove("active");
+                }
+            }, 1000);
+
             setTimeout(() => {
                 this._playNext(0, 1);
             }, 200);
@@ -366,9 +393,11 @@ class PitchStaircase {
         setTimeout(() => {
             if (pscTableCell !== null && pscTableCell !== undefined) {
                 const stepCell = pscTableCell.rows[0].cells[1];
+                stepCell.classList.remove("active");
             }
 
             const stepCell = this._stepTables[index].rows[0].cells[1];
+            stepCell.classList.add("active");
             this.activity.logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
             // Use && so playback terminates when index reaches either boundary;
             // the boundary cases (=== -1 and === Stairs.length) are already
