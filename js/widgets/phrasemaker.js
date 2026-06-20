@@ -427,6 +427,10 @@ class PhraseMaker {
 
             this.activity.logo.synth.stopSound(0, this._instrumentName);
             this.activity.logo.synth.stop();
+            if (this._playbackTimer) {
+                clearTimeout(this._playbackTimer);
+                this._playbackTimer = null;
+            }
             this._stopOrCloseClicked = true;
             this.activity.hideMsgs();
             this.docById("wheelDivptm").style.display = "none";
