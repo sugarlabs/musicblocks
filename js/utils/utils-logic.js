@@ -305,6 +305,9 @@ var mixedNumber = d => {
  * This preserves original musical division context where explicit denominators matter.
  */
 var rationalSum = (a, b) => {
+    // Rejects non-array, wrong-length, or non-number inputs.
+    // A zero numerator ([0, n]) is valid and passes through — only the
+    // denominator (index 1) must be non-zero.
     if (
         !Array.isArray(a) ||
         a.length < 2 ||
