@@ -321,14 +321,14 @@ var rationalSum = (a, b) => {
         if (typeof console !== "undefined") {
             console.warn("Invalid input passed to rationalSum:", a, b);
         }
-        return [0, 1];
+        return [[0, 1], "Invalid input passed to rationalSum"];
     }
 
     if (a[1] === 0 || b[1] === 0) {
         if (typeof console !== "undefined") {
             console.error("rationalSum: zero denominator — corrupted rhythm state", { a, b });
         }
-        return [0, 1];
+        return [[0, 1], "Note calculation failed: zero denominator"];
     }
 
     let obja0, objb0, obja1, objb1;
@@ -361,7 +361,7 @@ var rationalSum = (a, b) => {
     const b1 = objb0[1] * objb1[0];
 
     const lcd = LCD(a1, b1);
-    return [(a0 * lcd) / a1 + (b0 * lcd) / b1, lcd];
+    return [[(a0 * lcd) / a1 + (b0 * lcd) / b1, lcd], null];
 };
 
 /**

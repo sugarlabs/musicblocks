@@ -540,15 +540,12 @@ class Singer {
             activity.turtles.getTurtle(turtle).queue.length
         );
 
-        let returnValue;
-        if (saveNoteCount[1] === 0) {
-            activity.errorMsg(_("Invalid note count: zero denominator."));
-            returnValue = [0, 1];
-        } else {
-            returnValue = rationalSum(tur.singer.notesPlayed, [
-                -saveNoteCount[0],
-                saveNoteCount[1]
-            ]);
+        const [returnValue, noteCountErr] = rationalSum(tur.singer.notesPlayed, [
+            -saveNoteCount[0],
+            saveNoteCount[1]
+        ]);
+        if (noteCountErr) {
+            activity.errorMsg(_(noteCountErr));
         }
         tur.singer.notesPlayed = saveNoteCount;
         tur.singer.tallyNotes = saveTallyNotes;
@@ -1956,13 +1953,14 @@ class Singer {
                 if (activity.logo.stopTurtle) return;
 
                 if (tur.singer.inNoteBlock.length === tur.singer.whichNoteToCount) {
-                    if (noteValue === 0) {
-                        activity.errorMsg(_("Invalid note value: cannot be zero."));
+                    const [notesPlayed, notesPlayedErr] = rationalSum(tur.singer.notesPlayed, [
+                        1,
+                        noteValue
+                    ]);
+                    if (notesPlayedErr) {
+                        activity.errorMsg(_(notesPlayedErr));
                     } else {
-                        tur.singer.notesPlayed = rationalSum(tur.singer.notesPlayed, [
-                            1,
-                            noteValue
-                        ]);
+                        tur.singer.notesPlayed = notesPlayed;
                     }
                     tur.singer.tallyNotes++;
                 }
