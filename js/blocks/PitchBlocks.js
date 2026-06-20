@@ -487,7 +487,7 @@ function setupPitchBlocks(activity) {
                 const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
                 let arg1;
                 let notePlayed;
-                if (cblk1 != null) {
+                if (cblk1 !== null) {
                     arg1 = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                 }
                 if (activity.blocks.blockList[cblk1].name === "notename") {
@@ -498,22 +498,22 @@ function setupPitchBlocks(activity) {
                 ) {
                     let sol = arg1;
                     let attr;
-                    if (sol.indexOf(SHARP) != -1) {
+                    if (sol.indexOf(SHARP) !== -1) {
                         attr = SHARP;
-                    } else if (sol.indexOf(FLAT) != -1) {
+                    } else if (sol.indexOf(FLAT) !== -1) {
                         attr = FLAT;
-                    } else if (sol.indexOf(DOUBLEFLAT) != -1) {
+                    } else if (sol.indexOf(DOUBLEFLAT) !== -1) {
                         attr = DOUBLEFLAT;
-                    } else if (sol.indexOf(DOUBLESHARP) != -1) {
+                    } else if (sol.indexOf(DOUBLESHARP) !== -1) {
                         attr = DOUBLESHARP;
                     } else {
                         attr = NATURAL;
                     }
-                    if (attr != NATURAL) {
+                    if (attr !== NATURAL) {
                         sol = sol.replace(attr, "");
                     }
                     notePlayed = FIXEDSOLFEGE[sol];
-                    if (attr != NATURAL) {
+                    if (attr !== NATURAL) {
                         notePlayed += attr;
                     }
                     notePlayed += tur.singer.currentOctave ? tur.singer.currentOctave : 4;
@@ -565,11 +565,11 @@ function setupPitchBlocks(activity) {
                                 } else {
                                     attr = NATURAL;
                                 }
-                                if (attr != NATURAL) {
+                                if (attr !== NATURAL) {
                                     sol = sol.replace(attr, "");
                                 }
                                 notePlayed = FIXEDSOLFEGE[sol];
-                                if (attr != NATURAL) {
+                                if (attr !== NATURAL) {
                                     notePlayed += attr;
                                 }
                                 if (foundOctave.length === 0) {
@@ -1963,7 +1963,7 @@ function setupPitchBlocks(activity) {
                     }
 
                     scaledegree = Number(scaledegree.replace(attr, ""));
-                    if (attr != NATURAL) {
+                    if (attr !== NATURAL) {
                         note += attr;
                     }
 
@@ -1976,7 +1976,7 @@ function setupPitchBlocks(activity) {
                         sd = scaledegree + (multiplier + 1) * 7;
                     } else {
                         sd = Math.floor(scaledegree) % 7;
-                        if (sd == 0) sd = 7;
+                        if (sd === 0) sd = 7;
                     }
                     scaledegree = Math.abs(scaledegree);
 
