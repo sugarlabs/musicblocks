@@ -347,5 +347,61 @@ describe("retryWithBackoff", () => {
             expect(callCount).toBe(2);
             expect(onSuccess).toHaveBeenCalled();
         });
+    describe("async check functions", () => {
+        it("should await async check functions and retry when they resolve to falsy", async () => {
+            let callCount = 0;
+            const check = jest.fn(async () => {
+                callCount++;
+                // Simulate async operation that fails first 2 times
+                await Promise.resolve();
+                return callCount >= 3 ? { asyncResult: true } : null;
+            });
+            const onSuccess = jest.fn();
+
+            const result = await retryWithBackoff({
+                check,
+                onSuccess,
+                delayFn: instantDelay,
+                maxRetries: 10
+            });
+
+            expect(check).toHaveBeenCalledTimes(3);
+            expect(onSuccess).toHaveBeenCalledWith({ asyncResult: true });
+            expect(result).toEqual({ asyncResult: true });
+        });
+
+        it("should handle async check functions that resolve immediately to truthy", async () => {
+            const check = jest.fn(async () => {
+                await Promise.resolve();
+                return { immediate: true };
+            });
+            const onSuccess = jest.fn();
+
+            const result = await retryWithBackoff({
+                check,
+                onSuccess,
+                delayFn: instantDelay
+            });
+
+            expect(check).toHaveBeenCalledTimes(1);
+            expect(onSuccess).toHaveBeenCalledWith({ immediate: true });
+            expect(result).toEqual({ immediate: true });
+        });
+
+        it("should properly await async check functions that throw errors", async () => {
+            const check = jest.fn(async () => {
+                await Promise.resolve();
+                throw new Error("async check failed");
+            });
+
+            await expect(
+                retryWithBackoff({
+                    check,
+                    onSuccess: jest.fn(),
+                    delayFn: instantDelay
+                })
+            ).rejects.toThrow("async check failed");
+
+            expect(check).toHaveBeenCalledTimes(1);
+        });
     });
-});
