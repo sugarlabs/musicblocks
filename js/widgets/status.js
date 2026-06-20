@@ -172,12 +172,10 @@ class StatusMatrix {
                 }
             }
 
-            let str = "";
-            if (typeof label === "string" && label.length > 0) {
-                str = label.charAt(0).toUpperCase() + label.slice(1);
-            } else {
-                str = "";
-            }
+            const str =
+                typeof label === "string" && label.length > 0
+                    ? label.charAt(0).toUpperCase() + label.slice(1)
+                    : "";
 
             // console.log(str);
             cell.textContent = "\u00A0";
@@ -335,7 +333,7 @@ class StatusMatrix {
 
                 cell = this._statusTable.rows[i + 1].cells[activeTurtles + 1];
                 if (cell !== null) {
-                    cell.textContent = value;
+                    cell.textContent = value === "__INVALID_INPUT__" ? "" : value;
                 }
                 i++;
             }

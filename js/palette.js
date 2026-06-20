@@ -1983,7 +1983,11 @@ class Palette {
                 if (block.name === "print") {
                     const arg = block.connections[1];
                     if (arg !== null && arg in this.activity.blocks.blockList) {
-                        this.activity.logo.parseArg(this.activity.logo, 0, arg);
+                        try {
+                            this.activity.logo.parseArg(this.activity.logo, 0, arg);
+                        } catch (e) {
+                            // turtle not yet initialized; skip field registration
+                        }
                     }
                 }
 
