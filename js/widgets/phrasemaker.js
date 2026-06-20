@@ -1063,7 +1063,6 @@ class PhraseMaker {
      * This method initializes a wheel menu with options for adding different types of rows (e.g., pitch, drum, graphics).
      */
     _createAddRowPieSubmenu() {
-        console.log("PhraseMaker: Opening Add Row Pie Submenu");
         // This menu is used to add new rows to the matrix.
         this.docById("wheelDivptm").innerHTML = "";
         this.docById("wheelDivptm").style.display = "";
@@ -1149,7 +1148,6 @@ class PhraseMaker {
         );
 
         this._exitWheel.navItems[0].navigateFunction = () => {
-            console.log("PhraseMaker:_createAddRowPieSubmenu exitWheel close triggered!");
             this.docById("wheelDivptm").style.display = "none";
             this._menuWheel.removeWheel();
             this._exitWheel.removeWheel();
@@ -1331,24 +1329,11 @@ class PhraseMaker {
             let i;
             for (i = 0; i < this.columnBlocksMap.length; i++) {
                 if (this.columnBlocksMap[i] && this.columnBlocksMap[i][0] === blockN) {
-                    console.log(
-                        "PhraseMaker: pitchBlockAdded found blockN:",
-                        blockN,
-                        "at index:",
-                        i
-                    );
                     break;
                 }
             }
             if (i === this.columnBlocksMap.length) {
-                console.log(
-                    "PhraseMaker: pitchBlockAdded DID NOT find blockN:",
-                    blockN,
-                    "in columnBlocksMap:",
-                    this.columnBlocksMap
-                );
                 if (retryCount < 5) {
-                    console.log("PhraseMaker: Retrying pitchBlockAdded...");
                     this.pitchBlockAdded(blockN, retryCount + 1);
                     return;
                 }
@@ -1473,7 +1458,6 @@ class PhraseMaker {
         this._configureExitWheel(this._exitWheel);
 
         this._exitWheel.navItems[0].navigateFunction = () => {
-            console.log("PhraseMaker:_createMatrixGraphics2PieSubmenu exitWheel close triggered!");
             this.docById("wheelDivptm").style.display = "none";
             this._pitchWheel.removeWheel();
             this._exitWheel.removeWheel();
@@ -1769,7 +1753,6 @@ class PhraseMaker {
         this._configureExitWheel(this._exitWheel);
 
         this._exitWheel.navItems[0].navigateFunction = () => {
-            console.log("PhraseMaker:_createMatrixGraphicsPieSubmenu exitWheel close triggered!");
             this.docById("wheelDivptm").style.display = "none";
             this._pitchWheel.removeWheel();
             this._exitWheel.removeWheel();
@@ -1946,7 +1929,6 @@ class PhraseMaker {
      * @param {boolean} sortedClose - Determines if the menu is sorted and closed.
      */
     _createColumnPieSubmenu(index, condition, sortedClose) {
-        console.log("PhraseMaker: Opening Column Pie Submenu (condition:", condition, ")");
         index = parseInt(index);
         this.docById("wheelDivptm").innerHTML = "";
         this.docById("wheelDivptm").style.display = "";
@@ -2167,7 +2149,6 @@ class PhraseMaker {
         }
 
         this._exitWheel.navItems[0].navigateFunction = () => {
-            console.log("PhraseMaker:_createColumnPieSubmenu exitWheel close triggered!");
             this.docById("wheelDivptm").style.display = "none";
             this._pitchWheel.removeWheel();
             this._exitWheel.removeWheel();
@@ -3908,7 +3889,6 @@ class PhraseMaker {
      * @private
      */
     _createpiesubmenu(noteToDivide, tupletValue, condition) {
-        console.log("PhraseMaker: Opening Pie Submenu (condition:", condition, ")");
         this.docById("wheelDivptm").innerHTML = "";
         this.docById("wheelDivptm").style.display = "";
 
@@ -4033,7 +4013,6 @@ class PhraseMaker {
         );
 
         this._exitWheel.navItems[0].navigateFunction = () => {
-            console.log("PhraseMaker:_createpiesubmenu exitWheel close triggered!");
             this.docById("wheelDivptm").style.display = "none";
             this._menuWheel.removeWheel();
             this._exitWheel.removeWheel();
