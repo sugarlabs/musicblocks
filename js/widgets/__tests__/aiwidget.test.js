@@ -749,7 +749,8 @@ describe("AIWidget Instance", () => {
             addButton: jest.fn(iconName => {
                 const button = {
                     onclick: null,
-                    innerHTML: ""
+                    textContent: "",
+                    appendChild: jest.fn()
                 };
                 if (iconName === "play-button.svg") {
                     playButton = button;
@@ -768,6 +769,8 @@ describe("AIWidget Instance", () => {
 
         expect(pauseSpy).toHaveBeenCalledTimes(1);
         expect(aiWidget.isMoving).toBe(false);
+        expect(playButton.textContent).toBe("");
+        expect(playButton.appendChild).toHaveBeenCalled();
     });
 
     it("should not add duplicate custom samples", () => {
