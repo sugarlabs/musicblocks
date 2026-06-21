@@ -31,7 +31,7 @@ try {
    ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON, debugLog,
    ErrorHandler, ActivityContext,
    Boundary, CARTESIAN, changeImage, closeWidgets, doRecordButton, setupActivityRecorder,
-   setupGridController, setupGridRenderer, setupPluginController, PluginDialog,
+   setupGridController, setupGridRenderer, setupPluginController, setupToolbarController, PluginDialog,
    setupActivityAbcParser, setupActivityIdleWatcher,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
@@ -128,6 +128,7 @@ let MYDEFINES = [
     "activity/grid-controller",
     "activity/grid-renderer",
     "activity/plugin-controller",
+    "activity/toolbar-controller",
     "widgets/plugin-dialog",
     "utils/musicutils",
     "utils/synthutils",
@@ -328,7 +329,16 @@ class Activity {
 
         this.firstTimeUser = false;
         this.beginnerMode = false;
-        this.runMode = "normal";
+        Object.defineProperty(this, "runMode", {
+            get: () => (this.toolbarController ? this.toolbarController.runMode : "normal"),
+            set: val => {
+                if (this.toolbarController) {
+                    this.toolbarController.runMode = val;
+                }
+            },
+            configurable: true,
+            enumerable: true
+        });
 
         // Flag to disable keyboard during loading of MB
         this.keyboardEnableFlag;
@@ -460,6 +470,7 @@ class Activity {
 
         setupActivityIdleWatcher(this);
         setupPluginController(this);
+        setupToolbarController(this);
         this.pluginDialog = new PluginDialog({
             onLoadBuiltIn: name => this._loadBuiltInPlugin(name),
             onDelete: () => this._deletePlugin(),
@@ -1599,11 +1610,11 @@ class Activity {
             }
 
             const currentDelay = this.logo.turtleDelay;
-            this.logo.turtleDelay = 0;
-            if (this.logo?.synth?.resume) {
-                this.logo.synth.resume();
-            }
 
+            // Delegate logic / execution control to the ToolbarController
+            this.toolbarController.runFast(env, currentDelay);
+
+            // Keep DOM queries, colors, and block visibilities in activity.js
             const widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
                 if (widgetTitle[i].innerHTML === "tempo") {
@@ -1622,31 +1633,23 @@ class Activity {
                     this.showBlocksAfterRun = true;
                 }
 
-                this.logo.runLogoCommands(null, env);
                 const stopBtn = document.getElementById("stop");
                 if (stopBtn) {
                     stopBtn.style.display = "inline-block";
                     stopBtn.style.color = window.platformColor.stopIconcolor;
                 }
             } else {
-                if (currentDelay !== 0) {
-                    // Keep playing at full speed.
-                    this.logo.step();
-                } else {
-                    // Stop and restart.
+                if (currentDelay === 0) {
                     const stopBtn = document.getElementById("stop");
                     if (stopBtn) {
                         stopBtn.style.color = "white";
                     }
-                    this.logo.doStopTurtles();
 
-                    const that = this;
                     setTimeout(() => {
                         const stopBtnDelay = document.getElementById("stop");
                         if (stopBtnDelay) {
                             stopBtnDelay.style.color = window.platformColor.stopIconcolor;
                         }
-                        that.logo.runLogoCommands(null, env);
                     }, 500);
                 }
             }
@@ -1671,16 +1674,7 @@ class Activity {
             this.blocks.activeBlock = null;
             hideDOMLabel();
 
-            this.logo.turtleDelay = DEFAULTDELAY;
-            if (this.logo?.synth?.resume) {
-                this.logo.synth.resume();
-            }
-
-            if (!this.turtles.running()) {
-                this.logo.runLogoCommands();
-            } else {
-                this.logo.step();
-            }
+            this.toolbarController.runSlow();
         };
 
         /*
@@ -1700,33 +1694,18 @@ class Activity {
             this.blocks.activeBlock = null;
             hideDOMLabel();
 
-            const turtleCount = Object.keys(this.logo.stepQueue).length;
-            if (this.logo?.synth?.resume) {
-                this.logo.synth.resume();
-            }
+            const didRunStart = this.toolbarController.runStep();
 
-            if (turtleCount === 0 || this.logo.turtleDelay !== this.TURTLESTEP) {
-                // Either we haven't set up a queue or we are
-                // switching modes.
-                this.logo.turtleDelay = this.TURTLESTEP;
-                // Queue and take first step.
-                if (!this.turtles.running()) {
-                    this.logo.runLogoCommands();
-                    document.getElementById("stop").style.color =
-                        this.toolbar.stopIconColorWhenPlaying;
+            if (didRunStart === "started") {
+                const stopBtn = document.getElementById("stop");
+                if (stopBtn) {
+                    stopBtn.style.color = this.toolbar.stopIconColorWhenPlaying;
                 }
-                this.logo.step();
-            } else {
-                const noBlocks = Object.keys(this.logo.stepQueue).every(
-                    key => this.logo.stepQueue[key].length === 0
-                );
-                if (noBlocks) {
-                    this.logo.doStopTurtles();
-                    document.getElementById("stop").style.color = "white";
-                    return;
+            } else if (didRunStart === "stopped") {
+                const stopBtn = document.getElementById("stop");
+                if (stopBtn) {
+                    stopBtn.style.color = "white";
                 }
-                this.logo.turtleDelay = this.TURTLESTEP;
-                this.logo.step();
             }
         };
 
@@ -1747,15 +1726,11 @@ class Activity {
             this.blocks.activeBlock = null;
             hideDOMLabel();
 
-            if (onblur === undefined) {
-                onblur = false;
-            }
-
-            if (onblur && _THIS_IS_MUSIC_BLOCKS_) {
+            const stopped = this.toolbarController.hardStop(onblur);
+            if (!stopped) {
                 return;
             }
 
-            this.logo.doStopTurtles();
             document.getElementById("stop").style.display = "none";
 
             const widgetTitle = document.getElementsByClassName("wftTitle");
@@ -1766,10 +1741,6 @@ class Activity {
                     }
                     break;
                 }
-            }
-
-            if (this.cleanupIdleWatcher) {
-                this.cleanupIdleWatcher();
             }
         };
 
