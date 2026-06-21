@@ -498,22 +498,22 @@ function setupPitchBlocks(activity) {
                 ) {
                     let sol = arg1;
                     let attr;
-                    if (sol.indexOf(SHARP) != -1) {
+                    if (sol.indexOf(SHARP) !== -1) {
                         attr = SHARP;
-                    } else if (sol.indexOf(FLAT) != -1) {
+                    } else if (sol.indexOf(FLAT) !== -1) {
                         attr = FLAT;
-                    } else if (sol.indexOf(DOUBLEFLAT) != -1) {
+                    } else if (sol.indexOf(DOUBLEFLAT) !== -1) {
                         attr = DOUBLEFLAT;
-                    } else if (sol.indexOf(DOUBLESHARP) != -1) {
+                    } else if (sol.indexOf(DOUBLESHARP) !== -1) {
                         attr = DOUBLESHARP;
                     } else {
                         attr = NATURAL;
                     }
-                    if (attr != NATURAL) {
+                    if (attr !== NATURAL) {
                         sol = sol.replace(attr, "");
                     }
                     notePlayed = FIXEDSOLFEGE[sol];
-                    if (attr != NATURAL) {
+                    if (attr !== NATURAL) {
                         notePlayed += attr;
                     }
                     notePlayed += tur.singer.currentOctave ? tur.singer.currentOctave : 4;
@@ -565,11 +565,11 @@ function setupPitchBlocks(activity) {
                                 } else {
                                     attr = NATURAL;
                                 }
-                                if (attr != NATURAL) {
+                                if (attr !== NATURAL) {
                                     sol = sol.replace(attr, "");
                                 }
                                 notePlayed = FIXEDSOLFEGE[sol];
-                                if (attr != NATURAL) {
+                                if (attr !== NATURAL) {
                                     notePlayed += attr;
                                 }
                                 if (foundOctave.length === 0) {
@@ -803,7 +803,7 @@ function setupPitchBlocks(activity) {
                 }
                 const note = NOTENAMES[noteIdx];
                 return note + o2;
-            } else if (activity.blocks.blockList[cblk0].name == "pitchnumber") {
+            } else if (activity.blocks.blockList[cblk0].name === "pitchnumber") {
                 if (cblk1 === null) {
                     return 7;
                 }
@@ -827,7 +827,7 @@ function setupPitchBlocks(activity) {
                 // Since we are using the staff, it is OK to assume 12
                 // half-steps per octave.
                 return lc + 12 * o;
-            } else if (activity.blocks.blockList[cblk0].name == "nthmodalpitch") {
+            } else if (activity.blocks.blockList[cblk0].name === "nthmodalpitch") {
                 if (cblk1 === null) {
                     return 5;
                 }
@@ -838,7 +838,7 @@ function setupPitchBlocks(activity) {
                     lc += modeLength;
                 }
                 return lc + o * modeLength;
-            } else if (activity.blocks.blockList[cblk0].name == "print") {
+            } else if (activity.blocks.blockList[cblk0].name === "print") {
                 if (logo.inStatusMatrix) {
                     logo.statusFields.push([blk, "ytopitch"]);
                 }
@@ -850,7 +850,7 @@ function setupPitchBlocks(activity) {
                 }
                 const note = NOTENAMES[noteIdx];
                 return note + o2;
-            } else if (activity.blocks.blockList[cblk0].name == "pitch") {
+            } else if (activity.blocks.blockList[cblk0].name === "pitch") {
                 if (cblk1 === null) {
                     return ["sol", 4];
                 }
@@ -1963,7 +1963,7 @@ function setupPitchBlocks(activity) {
                     }
 
                     scaledegree = Number(scaledegree.replace(attr, ""));
-                    if (attr != NATURAL) {
+                    if (attr !== NATURAL) {
                         note += attr;
                     }
 
@@ -1976,7 +1976,7 @@ function setupPitchBlocks(activity) {
                         sd = scaledegree + (multiplier + 1) * 7;
                     } else {
                         sd = Math.floor(scaledegree) % 7;
-                        if (sd == 0) sd = 7;
+                        if (sd === 0) sd = 7;
                     }
                     scaledegree = Math.abs(scaledegree);
 

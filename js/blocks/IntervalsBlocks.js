@@ -902,7 +902,7 @@ function setupIntervalsBlocks(activity) {
                     }
                 } else {
                     let child = activity.blocks.findBottomBlock(args[1]);
-                    while (child != blk) {
+                    while (child !== blk) {
                         if (activity.blocks.blockList[child].name !== "hidden") {
                             const queueBlock = new Queue(child, factor, blk, receivedArg);
                             tur.parentFlowQueue.push(blk);
@@ -997,7 +997,7 @@ function setupIntervalsBlocks(activity) {
             if (args[1] === undefined) return;
 
             let i = CHORDNAMES.indexOf(args[0]);
-            if (i == -1) {
+            if (i === -1) {
                 i = CHORDNAMES.indexOf(DEFAULTCHORD);
             }
             for (let ii = 0; ii < CHORDVALUES[i].length; ii++) {
