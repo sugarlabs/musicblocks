@@ -4753,10 +4753,10 @@ function getNote(
                 if (offset === -1) {
                     console.debug(
                         "WARNING: Key " +
-                            myKeySignature +
-                            " not found in " +
-                            thisScale +
-                            ". Using default of C"
+                        myKeySignature +
+                        " not found in " +
+                        thisScale +
+                        ". Using default of C"
                     );
                     offset = 0;
                     thisScale = NOTESSHARP;
@@ -4787,6 +4787,7 @@ function getNote(
             }
 
             let solfegePart;
+            noteArg = String(noteArg);
             if (halfSteps.includes(noteArg.substr(0, 1).toLowerCase())) {
                 solfegePart = noteArg.substr(0, 1).toLowerCase();
             } else if (halfSteps.includes(noteArg.substr(0, 2).toLowerCase())) {
@@ -4799,6 +4800,7 @@ function getNote(
                 // solfnotes_ is used in the interface for i18n
                 //.TRANS: the note names must be separated by single spaces
                 const solfnotes_ = _("ti la sol fa mi re do").split(" ");
+
                 if (solfnotes_.includes(noteArg.substr(0, 1).toLowerCase())) {
                     solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase())];
                 } else if (solfnotes_.includes(noteArg.substr(0, 2).toLowerCase())) {
