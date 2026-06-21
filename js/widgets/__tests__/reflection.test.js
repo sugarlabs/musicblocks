@@ -450,6 +450,14 @@ describe("ReflectionMatrix", () => {
             expect(reflection.saveReport).toHaveBeenCalledWith({ response: "Analysis body" });
         });
 
+        test("generateAnalysis catches errors", async () => {
+            global.fetch.mockRejectedValue(new Error("Net Error"));
+
+            const data = await reflection.generateAnalysis();
+
+            expect(data).toEqual({ error: "Failed to send message" });
+        });
+
         test("sendMessage skips if input is empty", () => {
             reflection.input.value = "   ";
             reflection.sendMessage();
