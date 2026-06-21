@@ -1,0 +1,250 @@
+name: CI
+
+# Unified CI pipeline.
+# Consolidates: Smoke Test (build), ESLint & Prettier (lint),
+# Jest Tests, Cypress E2E, and Security Scans into a single workflow,
+# plus commit-message linting (commitlint).
+#
+# Trigger note: uses `pull_request` (NOT pull_request_target) so untrusted
+# fork code is never executed with repository secrets or a write-scoped token.
+# See the Codecov note in ci.yml's `test` job re: fork PRs.
+
+on:
+    push:
+        branches: [master]
+    pull_request:
+        branches: [master]
+
+# One in-flight run per PR / ref; newer pushes cancel older runs.
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
+
+# Least privilege by default; individual jobs do not need more.
+permissions:
+    contents: read
+
+jobs:
+    # ----------------------------------------------------------------------
+    # Commit message linting (conventional commits)
+    # ----------------------------------------------------------------------
+    commitlint:
+        name: Lint commit messages
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v5
+              with:
+                  node-version: '22'
+                  cache: 'npm'
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Lint PR commits
+              if: github.event_name == 'pull_request'
+              run: >-
+                  npx commitlint
+                  --from ${{ github.event.pull_request.base.sha }}
+                  --to ${{ github.event.pull_request.head.sha }}
+                  --verbose
+
+    # ----------------------------------------------------------------------
+    # ESLint + Prettier on changed JS files only
+    # ----------------------------------------------------------------------
+    lint:
+        name: Lint & format-check changed JS files
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v5
+              with:
+                  node-version: '22.x'
+                  cache: 'npm'
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Get changed JavaScript files
+              id: get_files
+              run: |
+                  if [ "${{ github.event_name }}" = "pull_request" ]; then
+                    BASE="${{ github.event.pull_request.base.sha }}"
+                    HEAD="${{ github.event.pull_request.head.sha }}"
+                  else
+                    BASE="${{ github.event.before }}"
+                    HEAD="${{ github.sha }}"
+                  fi
+
+                  # Guard against the all-zero SHA on first push of a new branch.
+                  if ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+                    BASE="$(git rev-parse "$HEAD^" 2>/dev/null || echo "$HEAD")"
+                  fi
+
+                  git diff --diff-filter=ACMRT --name-only "$BASE" "$HEAD" \
+                    -- '*.js' '*.mjs' ':!node_modules/**' > changed-js-files.txt || true
+
+                  if [ -s changed-js-files.txt ]; then
+                    echo "has_files=true" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "has_files=false" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Run ESLint on changed files
+              if: steps.get_files.outputs.has_files == 'true'
+              run: |
+                  echo "Linting the following files:"
+                  cat changed-js-files.txt
+                  xargs -r npx eslint < changed-js-files.txt
+
+            - name: Run Prettier check on changed files
+              if: steps.get_files.outputs.has_files == 'true'
+              run: |
+                  echo "Checking formatting for the following files:"
+                  cat changed-js-files.txt
+                  xargs -r npx prettier --check < changed-js-files.txt
+
+    # ----------------------------------------------------------------------
+    # Build / smoke test across Node versions
+    # ----------------------------------------------------------------------
+    build:
+        name: Build (Node ${{ matrix.node-version }})
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        strategy:
+            fail-fast: false
+            matrix:
+                node-version: [20.x, 22.x]
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v5
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: 'npm'
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Build project
+              run: npm run build --if-present
+
+    # ----------------------------------------------------------------------
+    # Jest unit tests + coverage threshold + Codecov upload
+    # ----------------------------------------------------------------------
+    test:
+        name: Jest tests & coverage
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v5
+              with:
+                  node-version: '22'
+                  cache: 'npm'
+
+            - name: Install dependencies
+              run: npm ci
+
+            # Coverage thresholds are enforced inside Jest (coverageThreshold in
+            # your Jest config), so this step fails the job if coverage drops
+            # below the configured minimums.
+            - name: Run Jest with coverage
+              run: npm test -- --coverage --ci
+
+            # Upload to Codecov for the PR-vs-base coverage diff + status check.
+            # NOTE: secrets (CODECOV_TOKEN) are NOT available to pull_request runs
+            # originating from forks. The threshold enforcement above still runs
+            # on every PR; only the upload is skipped on forks. fail_ci_if_error
+            # is false so a flaky/absent upload never blocks the PR.
+            - name: Upload coverage to Codecov
+              uses: codecov/codecov-action@v5
+              with:
+                  token: ${{ secrets.CODECOV_TOKEN }}
+                  files: ./coverage/lcov.info
+                  fail_ci_if_error: false
+                  verbose: true
+
+    # ----------------------------------------------------------------------
+    # Cypress end-to-end tests
+    # ----------------------------------------------------------------------
+    e2e:
+        name: Cypress E2E
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v5
+              with:
+                  node-version: '22'
+                  cache: 'npm'
+
+            - name: Run Cypress E2E tests
+              uses: cypress-io/github-action@v6
+              with:
+                  install-command: npm ci
+                  start: npm start
+                  wait-on: 'http://127.0.0.1:3000'
+                  wait-on-timeout: 120
+                  browser: chrome
+                  config: video=false
+
+            - name: Upload Cypress screenshots on failure
+              if: failure()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: cypress-screenshots
+                  path: cypress/screenshots
+                  if-no-files-found: ignore
+
+    # ----------------------------------------------------------------------
+    # Dependency security audit
+    # (Branch trigger fixed to `master` here — the standalone file's `main`
+    #  trigger no longer applies once this job replaces it.)
+    # ----------------------------------------------------------------------
+    security:
+        name: Security audit
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v5
+              with:
+                  node-version: '22'
+
+            - name: Run npm audit
+              run: npm audit --omit=dev --audit-level=high

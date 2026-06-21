@@ -30,6 +30,8 @@
         "dist": "electron-builder"
     },
     "devDependencies": {
+        "@commitlint/cli": "^19.0.0",
+        "@commitlint/config-conventional": "^19.0.0",
         "@babel/core": "^7.28.5",
         "@babel/eslint-parser": "^7.28.5",
         "@babel/preset-env": "^7.29.5",
@@ -102,6 +104,9 @@
         "systeminformation": "^5.31.6",
         "ip-address": "^10.2.0",
         "ajv": "^6.14.0",
+        "@commitlint/config-validator": {
+            "ajv": "^8.0.0"
+        },
         "@isaacs/brace-expansion": "^5.0.1",
         "immutable": "^5.1.5",
         "svgo": "^4.0.1",
