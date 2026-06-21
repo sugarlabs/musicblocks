@@ -3060,7 +3060,7 @@ msgstr "الصمت"
 #.TRANS: the note names must be separated by single spaces
 #. AUTOTRANSLATED: Google Translate
 msgid "ti la sol fa mi re do"
-msgstr "سأعطيك الوحيد"
+msgstr "سي لا صول فا مي ري دو"
 
 
 #: js/block.js:2832

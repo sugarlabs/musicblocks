@@ -3102,7 +3102,7 @@ msgstr "沉默"
 #.TRANS: the note names must be separated by single spaces
 #. AUTOTRANSLATED: Google Translate
 msgid "ti la sol fa mi re do"
-msgstr "我給你唯一的一個"
+msgstr "西 拉 梭 發 咪 來 多"
 
 
 #: js/block.js:2832

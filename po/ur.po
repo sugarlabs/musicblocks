@@ -3011,7 +3011,7 @@ msgstr "خاموشی"
 #.TRANS: the note names must be separated by single spaces
 #.TRANS: the note names must be separated by single spaces
 msgid "ti la sol fa mi re do"
-msgstr "ti la sol fa mi re do"
+msgstr "سی لا سول فا می رے دو"
 
 
 #: js/block.js:2832

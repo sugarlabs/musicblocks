@@ -18,6 +18,13 @@ import json
 import re
 import sys
 
+SOLFEGE_KEY = "ti la sol fa mi re do"
+SOLFEGE_TOKEN_COUNT = 7
+
+def is_valid_solfege_translation(value):
+    """Return True when a solfege translation has seven note labels."""
+    return len(value.split()) == SOLFEGE_TOKEN_COUNT
+
 def parse_po_file(po_file):
     """Parse a .po file and return a dict of {msgid: msgstr}."""
     data = {}
@@ -32,7 +39,20 @@ def parse_po_file(po_file):
             elif line.startswith("msgstr"):
                 current_msgstr = re.findall(r'"(.*)"', line)[0]
                 if current_msgid is not None:
-                    data[current_msgid] = current_msgstr or current_msgid
+                    if (
+                        current_msgid == SOLFEGE_KEY
+                        and not is_valid_solfege_translation(current_msgstr)
+                    ):
+                        print(
+                            f"Warning: invalid solfege translation in "
+                            f"{po_file}: expected {SOLFEGE_TOKEN_COUNT} "
+                            f"tokens, got {len(current_msgstr.split())}. "
+                            f"Falling back to English.",
+                            file=sys.stderr,
+                        )
+                        data[current_msgid] = current_msgid
+                    else:
+                        data[current_msgid] = current_msgstr or current_msgid
                     current_msgid = None
     return data
 
@@ -63,7 +83,7 @@ def convert_po_to_json(po_file, output_dir):
             os.makedirs(output_dir, exist_ok=True)
             with open(output_path, "w", encoding="utf-8") as f:
                 json.dump(combined, f, indent=2, ensure_ascii=False)
-            print(f"✅ Combined ja.po + ja-kana.po → {output_path}")
+            print(f"Combined ja.po + ja-kana.po -> {output_path}")
             return  # Don’t fall through to default case
 
     # Default for all other langs
@@ -72,7 +92,7 @@ def convert_po_to_json(po_file, output_dir):
     os.makedirs(output_dir, exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(json_data, f, indent=2, ensure_ascii=False)
-    print(f"✅ Converted {po_file} → {output_path}")
+    print(f"Converted {po_file} -> {output_path}")
 
 def convert_all_po_files(po_dir, output_dir):
     """Convert all .po files in the given directory to .json format."""

@@ -2058,6 +2058,10 @@ describe("splitSolfege", () => {
 describe("i18nSolfege", () => {
     global.SOLFNOTES = ["ti", "la", "sol", "fa", "mi", "re", "do"];
 
+    afterEach(() => {
+        global._.mockImplementation(str => str);
+    });
+
     it("should return the internationalized version of a solfege note", () => {
         expect(i18nSolfege("do")).toEqual("do");
         expect(i18nSolfege("ti")).toEqual("ti");
@@ -2077,6 +2081,33 @@ describe("i18nSolfege", () => {
 
     it("should handle null or undefined values gracefully", () => {
         expect(i18nSolfege(null)).toEqual("sol"); //default
+    });
+
+    it("should use a complete localized solfege sequence", () => {
+        global._.mockImplementation(str =>
+            str === "ti la sol fa mi re do" ? "ती ला सोल फा मी रे दो" : str
+        );
+
+        expect(i18nSolfege("sol")).toEqual("सोल");
+        expect(i18nSolfege("do♯")).toEqual("दो♯");
+    });
+
+    it("should map localized solfege labels back to canonical notes", () => {
+        global._.mockImplementation(str =>
+            str === "ti la sol fa mi re do" ? "ती ला सोल फा मी रे दो" : str
+        );
+
+        expect(i18nSolfege("सोल")).toEqual("sol");
+        expect(i18nSolfege("दो♯")).toEqual("do♯");
+    });
+
+    it("should ignore malformed solfege translations", () => {
+        global._.mockImplementation(str =>
+            str === "ti la sol fa mi re do" ? "not a note sequence" : str
+        );
+
+        expect(i18nSolfege("sol")).toEqual("sol");
+        expect(i18nSolfege("do♯")).toEqual("do♯");
     });
 });
 
