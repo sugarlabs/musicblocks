@@ -236,6 +236,7 @@ class Blocks {
 
         /** We keep a list of stacks in the trash. */
         this.trashStacks = [];
+        this.redoStacks = [];
 
         /** When true, checkBounds() calls are suppressed until
          *  _endDeferCheckBounds() runs one final check. */
@@ -7247,6 +7248,9 @@ class Blocks {
 
             /** Add this block to the list of blocks in the trash so we can undo this action. */
             this.trashStacks.push(thisBlock);
+            if (!this.isRedoing) {
+                this.redoStacks = [];
+            }
 
             // Cap the undo history to prevent unbounded memory growth.
             // Keep the 100 most recent trashed stacks.

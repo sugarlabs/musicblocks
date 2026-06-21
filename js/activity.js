@@ -3310,6 +3310,37 @@ class Activity {
                         pasteEl.style.visibility = "visible";
                         this.update = true;
                         break;
+                    case 90: // 'Z'
+                        if (disableKeys) return;
+                        if (
+                            this.blocks &&
+                            this.blocks.trashStacks &&
+                            this.blocks.trashStacks.length > 0
+                        ) {
+                            this._restoreTrashById(
+                                this.blocks.trashStacks[this.blocks.trashStacks.length - 1]
+                            );
+                            this.textMsg(_("Undo successful."), 3000);
+                        } else {
+                            this.textMsg(_("Nothing to undo."), 3000);
+                        }
+                        break;
+                    case 89: // 'Y'
+                        if (disableKeys) return;
+                        if (
+                            this.blocks &&
+                            this.blocks.redoStacks &&
+                            this.blocks.redoStacks.length > 0
+                        ) {
+                            const blockId = this.blocks.redoStacks.pop();
+                            this.blocks.isRedoing = true;
+                            this.blocks.sendStackToTrash(this.blocks.blockList[blockId]);
+                            this.blocks.isRedoing = false;
+                            this.textMsg(_("Redo successful."), 3000);
+                        } else {
+                            this.textMsg(_("Nothing to redo."), 3000);
+                        }
+                        break;
                 }
             } else if (event.shiftKey && !disableKeys) {
                 switch (event.keyCode) {
@@ -3912,6 +3943,9 @@ class Activity {
             if (blockIndex === -1) return; // Block not found in trash
 
             this.blocks.trashStacks.splice(blockIndex, 1); // Remove from trash
+            if (this.blocks.redoStacks) {
+                this.blocks.redoStacks.push(blockId);
+            }
 
             for (const name in this.palettes.dict) {
                 this.palettes.dict[name].hideMenu(true);

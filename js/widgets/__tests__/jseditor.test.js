@@ -642,6 +642,25 @@ describe("JSEditor", () => {
             expect(editor._codeToBlocks).not.toHaveBeenCalled();
         });
 
+        test("_runCode logs Sandbox Error when block conversion fails", async () => {
+            const editor = createEditor();
+            const consoleEl = document.getElementById("editorConsole");
+
+            editor._code = "class A {}";
+
+            // Mock _codeToBlocks to throw an error independently of the AST bug
+            editor._codeToBlocks = jest.fn().mockImplementation(() => {
+                const error = new Error("Unsupported AST node");
+                error.stack = "Mock stack trace";
+                return Promise.reject(error);
+            });
+
+            await editor._runCode();
+
+            expect(consoleEl.textContent).toContain("Sandbox Error: Unsupported AST node");
+            expect(consoleEl.textContent).toContain("Mock stack trace");
+        });
+
         test("logConsole appends message to console element", () => {
             const consoleEl = document.createElement("div");
             consoleEl.id = "editorConsole";
