@@ -112,13 +112,13 @@ body.highcontrast {
 /* Fix search autocomplete dropdown text in dark mode */
 body.dark #ui-id-1 .ui-menu-item-wrapper,
 body.dark #ui-id-1 a {
-    color: #e8e8e8 !important;
+    color: var(--color-text-primary) !important;
 }
 
 body.dark #ui-id-1 {
-    background-color: #1d1d20 !important;
+    background-color: var(--color-bg-primary) !important;
 }
 
 body.dark #ui-id-1 .ui-menu-item {
-    background-color: #1d1d20 !important;
+    background-color: var(--color-bg-primary) !important;
 }
