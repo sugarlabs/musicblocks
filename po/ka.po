@@ -3027,7 +3027,7 @@ msgstr "დუმილი"
 #.TRANS: the note names must be separated by single spaces
 #. AUTOTRANSLATED: Google Translate
 msgid "ti la sol fa mi re do"
-msgstr "მე მოგცემ ერთადერთს"
+msgstr "სი ლა სოლ ფა მი რე დო"
 
 
 #: js/block.js:2832

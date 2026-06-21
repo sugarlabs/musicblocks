@@ -5136,7 +5136,7 @@ msgstr "Stille"
 #.TRANS: the note names must be separated by single spaces
 #. AUTOTRANSLATED: Google Translate
 msgid "ti la sol fa mi re do"
-msgstr "Ich gebe dir das Einzige"
+msgstr "ti la sol fa mi re do"
 
 
 #: js/block.js:2832

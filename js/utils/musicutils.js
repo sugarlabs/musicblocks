@@ -4797,14 +4797,9 @@ function getNote(
                 // The note should already be translated, but just in case...
                 // Reverse any i18n
                 // solfnotes_ is used in the interface for i18n
-                //.TRANS: the note names must be separated by single spaces
-                const solfnotes_ = _("ti la sol fa mi re do").split(" ");
-                if (solfnotes_.includes(noteArg.substr(0, 1).toLowerCase())) {
-                    solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase())];
-                } else if (solfnotes_.includes(noteArg.substr(0, 2).toLowerCase())) {
-                    solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase())];
-                } else if (solfnotes_.includes(noteArg.substr(0, 3).toLowerCase())) {
-                    solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 3).toLowerCase())];
+                const obj = splitI18nSolfege(noteArg);
+                if (SOLFNOTES.includes(obj[0])) {
+                    solfegePart = obj[0];
                 } else {
                     solfegePart = noteArg.substr(0, 2).toLowerCase();
                 }
@@ -6441,6 +6436,40 @@ const splitSolfege = value => {
     return ["sol", ""];
 };
 
+const getI18nSolfNotes = () => {
+    //.TRANS: the note names must be separated by single spaces
+    const solfnotes = _("ti la sol fa mi re do");
+    if (typeof solfnotes !== "string") {
+        return SOLFNOTES;
+    }
+
+    const translated = solfnotes.trim().split(/\s+/);
+    if (translated.length !== SOLFNOTES.length || translated.some(note => note.length === 0)) {
+        return SOLFNOTES;
+    }
+
+    return translated;
+};
+
+const splitI18nSolfege = value => {
+    if (value !== null && typeof value === "string") {
+        const solfnotes = getI18nSolfNotes();
+        const lowerValue = value.toLowerCase();
+        const matches = solfnotes
+            .map((note, i) => ({ note, i }))
+            .sort((a, b) => b.note.length - a.note.length);
+
+        for (const match of matches) {
+            const lowerNote = match.note.toLowerCase();
+            if (lowerValue === lowerNote || lowerValue.startsWith(lowerNote)) {
+                return [SOLFNOTES[match.i], value.slice(match.note.length)];
+            }
+        }
+    }
+
+    return splitSolfege(value);
+};
+
 /**
  * Internationalize a solfege note using i18n.
  * @function
@@ -6449,8 +6478,13 @@ const splitSolfege = value => {
  */
 const i18nSolfege = note => {
     // solfnotes_ is used in the interface for i18n
-    const solfnotes_ = _("ti la sol fa mi re do").split(" ");
-    const obj = splitSolfege(note);
+    const solfnotes_ = getI18nSolfNotes();
+    const sourceObj = splitSolfege(note);
+    const obj = splitI18nSolfege(note);
+
+    if (!SOLFNOTES.includes(sourceObj[0]) && SOLFNOTES.includes(obj[0])) {
+        return obj[0] + obj[1];
+    }
 
     const i = SOLFNOTES.indexOf(obj[0]);
     if (i !== -1) {
