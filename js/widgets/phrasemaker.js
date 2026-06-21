@@ -79,7 +79,7 @@ class PhraseMaker {
 
         // Bind commonly-used dependencies locally for readability
         // This reduces verbosity while maintaining explicit dependency injection
-        this.platformColor = this._deps.platformColor;
+
         this.docById = this._deps.docById;
         this._ = this._deps._;
         this.wheelnav = this._deps.wheelnav;
@@ -674,6 +674,14 @@ class PhraseMaker {
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
                 cell.setAttribute("alt", i + "__" + "drumblocks");
 
+                cell.setAttribute("role", "button");
+                cell.setAttribute("tabindex", "0");
+                cell.onkeydown = e => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        cell.click();
+                    }
+                };
                 cell.onclick = event => {
                     let eCell = event.target;
                     if (eCell.getAttribute("alt") === null) {
@@ -694,6 +702,14 @@ class PhraseMaker {
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
                 cell.setAttribute("alt", i + "__" + "synthsblocks");
 
+                cell.setAttribute("role", "button");
+                cell.setAttribute("tabindex", "0");
+                cell.onkeydown = e => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        cell.click();
+                    }
+                };
                 cell.onclick = event => {
                     let eCell = event.target;
                     if (eCell.getAttribute("alt") === null) {
@@ -715,6 +731,14 @@ class PhraseMaker {
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + "px";
                 cell.setAttribute("alt", i + "__" + "graphicsblocks");
 
+                cell.setAttribute("role", "button");
+                cell.setAttribute("tabindex", "0");
+                cell.onkeydown = e => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        cell.click();
+                    }
+                };
                 cell.onclick = event => {
                     let eCell = event.target;
                     if (eCell.getAttribute("alt") === null) {
@@ -738,6 +762,14 @@ class PhraseMaker {
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + "px";
                 cell.setAttribute("alt", i + "__" + "graphicsblocks2");
 
+                cell.setAttribute("role", "button");
+                cell.setAttribute("tabindex", "0");
+                cell.onkeydown = e => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        cell.click();
+                    }
+                };
                 cell.onclick = event => {
                     let eCell = event.target;
                     if (eCell.getAttribute("alt") === null) {
@@ -819,6 +851,14 @@ class PhraseMaker {
                 }
                 cell.setAttribute("alt", i + "__" + "pitchblocks");
 
+                cell.setAttribute("role", "button");
+                cell.setAttribute("tabindex", "0");
+                cell.onkeydown = e => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        cell.click();
+                    }
+                };
                 cell.onclick = event => {
                     let eCell = event.target;
                     if (eCell.getAttribute("alt") === null) {
@@ -1058,11 +1098,11 @@ class PhraseMaker {
         this._menuWheel.slicePathFunction = this.slicePath().DonutSlice;
         this._menuWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
         this._menuWheel.colors = [
-            this.platformColor.paletteColors["pitch"][0],
-            this.platformColor.paletteColors["pitch"][1],
-            this.platformColor.paletteColors["drum"][0],
-            this.platformColor.paletteColors["turtle"][0],
-            this.platformColor.paletteColors["turtle"][1]
+            "var(--color-pitch-primary, #90c100)",
+            "var(--color-pitch-secondary, #90c100)",
+            "var(--color-drum-primary, #ff9800)",
+            "var(--color-turtle-primary, #00bcd4)",
+            "var(--color-turtle-secondary, #00bcd4)"
         ];
         this._menuWheel.slicePathCustom.minRadiusPercent = 0.3;
         this._menuWheel.slicePathCustom.maxRadiusPercent = 1.0;
@@ -1079,7 +1119,10 @@ class PhraseMaker {
         this._menuWheel.navItems[3].setTooltip(this._("graphics"));
         this._menuWheel.navItems[4].setTooltip(this._("pen"));
 
-        this._exitWheel.colors = this.platformColor.exitWheelcolors;
+        this._exitWheel.colors = [
+            "var(--color-exit-primary, #e57373)",
+            "var(--color-exit-secondary, #ef5350)"
+        ];
         this._exitWheel.slicePathFunction = this.slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
@@ -1317,7 +1360,10 @@ class PhraseMaker {
         this._pitchWheel.keynavigateEnabled = false;
         this._pitchWheel.slicePathFunction = this.slicePath().DonutSlice;
         this._pitchWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
-        this._pitchWheel.colors = this.platformColor.blockLabelsWheelcolors;
+        this._pitchWheel.colors = [
+            "var(--color-block-primary, #64b5f6)",
+            "var(--color-block-secondary, #4fc3f7)"
+        ];
         this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
         this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.475;
 
@@ -1327,7 +1373,10 @@ class PhraseMaker {
 
         this._pitchWheel.animatetime = 0;
 
-        this._blockLabelsWheel2.colors = this.platformColor.blockLabelsWheelcolors;
+        this._blockLabelsWheel2.colors = [
+            "var(--color-block-primary, #64b5f6)",
+            "var(--color-block-secondary, #4fc3f7)"
+        ];
         this._blockLabelsWheel2.slicePathFunction = this.slicePath().DonutSlice;
         this._blockLabelsWheel2.slicePathCustom = this.slicePath().DonutSliceCustomization();
         this._blockLabelsWheel2.slicePathCustom.minRadiusPercent = 0.525;
@@ -1337,7 +1386,10 @@ class PhraseMaker {
         this._blockLabelsWheel2.clickModeRotate = false;
         this._blockLabelsWheel2.animatetime = 0;
 
-        this._exitWheel.colors = this.platformColor.exitWheelcolors;
+        this._exitWheel.colors = [
+            "var(--color-exit-primary, #e57373)",
+            "var(--color-exit-secondary, #ef5350)"
+        ];
         this._exitWheel.slicePathFunction = this.slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
@@ -1346,7 +1398,10 @@ class PhraseMaker {
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
 
-        this._blockLabelsWheel.colors = this.platformColor.graphicWheelcolors;
+        this._blockLabelsWheel.colors = [
+            "var(--color-graphic-primary, #ffb74d)",
+            "var(--color-graphic-secondary, #ffcc80)"
+        ];
         this._blockLabelsWheel.slicePathFunction = this.slicePath().DonutSlice;
         this._blockLabelsWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
         this._blockLabelsWheel.slicePathCustom.minRadiusPercent = 0.8;
@@ -1606,7 +1661,10 @@ class PhraseMaker {
         this._pitchWheel.keynavigateEnabled = false;
         this._pitchWheel.slicePathFunction = this.slicePath().DonutSlice;
         this._pitchWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
-        this._pitchWheel.colors = this.platformColor.blockLabelsWheelcolors;
+        this._pitchWheel.colors = [
+            "var(--color-block-primary, #64b5f6)",
+            "var(--color-block-secondary, #4fc3f7)"
+        ];
         this._pitchWheel.slicePathCustom.minRadiusPercent = 0.525;
         this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.8;
 
@@ -1616,7 +1674,10 @@ class PhraseMaker {
 
         this._pitchWheel.animatetime = 0; // 300;
 
-        this._exitWheel.colors = this.platformColor.exitWheelcolors;
+        this._exitWheel.colors = [
+            "var(--color-exit-primary, #e57373)",
+            "var(--color-exit-secondary, #ef5350)"
+        ];
         this._exitWheel.slicePathFunction = this.slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
@@ -1626,7 +1687,10 @@ class PhraseMaker {
         this._exitWheel.clickModeRotate = false;
 
         if (condition === "graphicsblocks") {
-            this._blockLabelsWheel.colors = this.platformColor.graphicWheelcolors;
+            this._blockLabelsWheel.colors = [
+                "var(--color-graphic-primary, #ffb74d)",
+                "var(--color-graphic-secondary, #ffcc80)"
+            ];
             this._blockLabelsWheel.slicePathFunction = this.slicePath().DonutSlice;
             this._blockLabelsWheel.slicePathCustom = this._deps
                 .slicePath()
@@ -1881,7 +1945,13 @@ class PhraseMaker {
             noteLabels = drumLabels;
             categories = [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2];
 
-            const COLORS = this.platformColor.piemenuVoicesColors;
+            const COLORS = [
+                "var(--color-voice-1, #ba68c8)",
+                "var(--color-voice-2, #ce93d8)",
+                "var(--color-voice-3, #ab47bc)",
+                "var(--color-voice-4, #9c27b0)",
+                "var(--color-voice-5, #8e24aa)"
+            ];
             for (let i = 0; i < drumLabels.length; i++) {
                 colors.push(COLORS[categories[i] % COLORS.length]);
             }
@@ -1909,7 +1979,10 @@ class PhraseMaker {
         this._pitchWheel.slicePathFunction = this.slicePath().DonutSlice;
         this._pitchWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
         if (condition === "pitchblocks") {
-            this._pitchWheel.colors = this.platformColor.pitchWheelcolors;
+            this._pitchWheel.colors = [
+                "var(--color-pitch-wheel-1, #81c784)",
+                "var(--color-pitch-wheel-2, #aed581)"
+            ];
             this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
             this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.5;
         } else if (condition === "drumblocks") {
@@ -1925,7 +1998,10 @@ class PhraseMaker {
         this._pitchWheel.animatetime = 0; // 300;
         this._pitchWheel.createWheel(noteLabels);
 
-        this._exitWheel.colors = this.platformColor.exitWheelcolors;
+        this._exitWheel.colors = [
+            "var(--color-exit-primary, #e57373)",
+            "var(--color-exit-secondary, #ef5350)"
+        ];
         this._exitWheel.slicePathFunction = this.slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
@@ -1940,7 +2016,10 @@ class PhraseMaker {
         let block, noteValue, octaveValue, accidentalsValue;
 
         if (condition === "pitchblocks") {
-            this._accidentalsWheel.colors = this.platformColor.accidentalsWheelcolors;
+            this._accidentalsWheel.colors = [
+                "var(--color-acc-1, #fff176)",
+                "var(--color-acc-2, #ffd54f)"
+            ];
             this._accidentalsWheel.slicePathFunction = this.slicePath().DonutSlice;
             this._accidentalsWheel.slicePathCustom = this._deps
                 .slicePath()
@@ -1956,7 +2035,7 @@ class PhraseMaker {
 
             for (let i = 0; i < 9; i++) {
                 accidentalLabels.push(null);
-                this._accidentalsWheel.colors.push(this.platformColor.accidentalsWheelcolorspush);
+                this._accidentalsWheel.colors.push("var(--color-acc-push, #ffb74d)");
             }
 
             this._accidentalsWheel.animatetime = 0; // 300;
@@ -1969,7 +2048,10 @@ class PhraseMaker {
                 this._("double flat")
             ]);
 
-            this._octavesWheel.colors = this.platformColor.octavesWheelcolors;
+            this._octavesWheel.colors = [
+                "var(--color-oct-1, #4dd0e1)",
+                "var(--color-oct-2, #80deea)"
+            ];
             this._octavesWheel.slicePathFunction = this.slicePath().DonutSlice;
             this._octavesWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
             this._octavesWheel.slicePathCustom.minRadiusPercent = 0.75;
@@ -2814,8 +2896,9 @@ class PhraseMaker {
         exportDocument.body.appendChild(exportDocument.createElement("br"));
         const downloadLink = exportDocument.createElement("a");
         downloadLink.id = "downloadb1";
+        downloadLink.classList.add("pm-download-btn");
         downloadLink.style.cssText =
-            "background: #C374E9; border-radius: 5%; padding: 0.3em; text-decoration: none; margin: 0.5em; color: white;";
+            "background: var(--pm-download-bg, #C374E9); border-radius: 5%; padding: 0.3em; text-decoration: none; margin: 0.5em; color: var(--pm-download-text, white);";
         downloadLink.setAttribute("download", "");
         downloadLink.textContent = "Download Matrix";
         exportDocument.body.appendChild(downloadLink);
@@ -2860,7 +2943,9 @@ class PhraseMaker {
         const numberOfNotes = param[1].length;
         // Check if current bar position is at 0 (start of a measure)
         const isBarLine = this._currentMusicalTime < 0.001 && this._notesToPlay.length > 0;
-        const barStyle = isBarLine ? "3px solid #555" : "1px solid #ccc";
+        const barStyle = isBarLine
+            ? "3px solid var(--bar-line, #555)"
+            : "1px solid var(--border, #ccc)";
 
         let totalNoteInterval = 0;
         // const ptmTable = this.docById("ptmTable");
@@ -2967,7 +3052,7 @@ class PhraseMaker {
             cell.style.lineHeight = 60 + "%";
             cell.style.fontSize = this._cellScale * 75 + "%";
             cell.style.textAlign = "center";
-            cell.style.borderLeft = i === 0 ? barStyle : "1px solid #ccc";
+            cell.style.borderLeft = i === 0 ? barStyle : "1px solid var(--border, #ccc)";
             obj = this._deps.toFraction(numerator / (totalNoteInterval / tupletTimeFactor));
 
             if (obj[1] < 13) {
@@ -3025,7 +3110,7 @@ class PhraseMaker {
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
                 cell.classList.add(cellColor);
-                cell.style.borderLeft = i === 0 ? barStyle : "1px solid #ccc";
+                cell.style.borderLeft = i === 0 ? barStyle : "1px solid var(--border, #ccc)";
 
                 cell.onmouseover = event => {
                     if (!event.target.classList.contains("pm-black-cell")) {
@@ -3134,7 +3219,9 @@ class PhraseMaker {
             const isBarLine =
                 this._currentMusicalTime < 0.001 && (j > 0 || this._notesToPlay.length > numBeats);
 
-            const barStyle = isBarLine ? "3px solid #555" : "1px solid #ccc";
+            const barStyle = isBarLine
+                ? "3px solid var(--bar-line, #555)"
+                : "1px solid var(--border, #ccc)";
 
             for (let i = 0; i < rowCount; i++) {
                 // Depending on the row, we choose a different background color.
@@ -3788,14 +3875,20 @@ class PhraseMaker {
         this.wheelnav.cssMode = true;
         this._menuWheel.keynavigateEnabled = false;
         this._menuWheel.clickModeRotate = false;
-        this._menuWheel.colors = this.platformColor.pitchWheelcolors;
+        this._menuWheel.colors = [
+            "var(--color-pitch-wheel-1, #81c784)",
+            "var(--color-pitch-wheel-2, #aed581)"
+        ];
         this._menuWheel.slicePathFunction = this.slicePath().DonutSlice;
         this._menuWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
         this._menuWheel.sliceSelectedPathCustom = this._menuWheel.slicePathCustom;
         this._menuWheel.sliceInitPathCustom = this._menuWheel.slicePathCustom;
         this._menuWheel.animatetime = 0; // 300;
 
-        this._exitWheel.colors = this.platformColor.exitWheelcolors;
+        this._exitWheel.colors = [
+            "var(--color-exit-primary, #e57373)",
+            "var(--color-exit-secondary, #ef5350)"
+        ];
         this._exitWheel.keynavigateEnabled = false;
         this._exitWheel.clickModeRotate = false;
         this._exitWheel.slicePathFunction = this.slicePath().DonutSlice;
@@ -3849,7 +3942,10 @@ class PhraseMaker {
             this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
             this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
 
-            this._tabsWheel.colors = this.platformColor.pitchWheelcolors;
+            this._tabsWheel.colors = [
+                "var(--color-pitch-wheel-1, #81c784)",
+                "var(--color-pitch-wheel-2, #aed581)"
+            ];
             this._tabsWheel.slicePathFunction = this.slicePath().DonutSlice;
             this._tabsWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
             this._tabsWheel.slicePathCustom.minRadiusPercent = 0.7;
@@ -4064,10 +4160,26 @@ class PhraseMaker {
 
             if (cellTuplet !== undefined) {
                 if (this.activity.logo.tupletRhythms[0][0] === "notes") {
+                    cell.setAttribute("role", "button");
+                    cell.setAttribute("tabindex", "0");
+                    cell.onkeydown = e => {
+                        if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            cell.click();
+                        }
+                    };
                     cell.onclick = event => {
                         this._createpiesubmenu(event.target.getAttribute("id"), null, "tupletnote");
                     };
                 } else {
+                    cell.setAttribute("role", "button");
+                    cell.setAttribute("tabindex", "0");
+                    cell.onkeydown = e => {
+                        if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            cell.click();
+                        }
+                    };
                     cell.onclick = event => {
                         this._createpiesubmenu(
                             event.target.getAttribute("id"),
@@ -4076,6 +4188,14 @@ class PhraseMaker {
                         );
                     };
 
+                    cellTuplet.setAttribute("role", "button");
+                    cellTuplet.setAttribute("tabindex", "0");
+                    cellTuplet.onkeydown = e => {
+                        if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            cellTuplet.click();
+                        }
+                    };
                     cellTuplet.onclick = event => {
                         this._createpiesubmenu(
                             event.target.getAttribute("id"),

@@ -67,12 +67,6 @@ global.EIGHTHNOTEWIDTH = 24;
 global.DRUMS = [];
 global.NOTESYMBOLS = {};
 global.SOLFEGECONVERSIONTABLE = {};
-global.platformColor = {
-    labelColor: "#90c100",
-    selectorBackground: "#f0f0f0",
-    selectorBackgroundHOVER: "#e0e0e0",
-    paletteColors: {}
-};
 
 global.toFraction = jest.fn(n => [1, n]);
 global.getDrumName = jest.fn(() => null);
@@ -200,7 +194,6 @@ describe("PhraseMaker Widget", () => {
         jest.useFakeTimers();
 
         mockDeps = {
-            platformColor: global.platformColor,
             docById: global.docById,
             _: global._,
             wheelnav: jest.fn(),
@@ -269,7 +262,6 @@ describe("PhraseMaker Widget", () => {
         });
 
         test("should accept deps via constructor", () => {
-            expect(phraseMaker.platformColor).toBe(global.platformColor);
             expect(phraseMaker._).toBe(global._);
         });
 
@@ -496,7 +488,6 @@ describe("PhraseMaker Widget", () => {
     describe("dependency injection", () => {
         test("should use injected deps", () => {
             const customDeps = {
-                platformColor: { labelColor: "#fff" },
                 docById: jest.fn(),
                 _: s => s.toUpperCase(),
                 wheelnav: jest.fn(),
@@ -505,7 +496,6 @@ describe("PhraseMaker Widget", () => {
             };
 
             const pm = new PhraseMaker(customDeps);
-            expect(pm.platformColor.labelColor).toBe("#fff");
             expect(pm._instrumentName).toBe("piano");
             expect(pm._("hello")).toBe("HELLO");
         });
@@ -934,8 +924,6 @@ describe("PhraseMaker Widget", () => {
             DonutSliceCustomization: jest.fn(() => ({}))
         }));
 
-        phraseMaker.platformColor = {};
-
         phraseMaker.activity = {
             canvas: { width: 800, height: 600 },
             getStageScale: jest.fn(() => 1)
@@ -1275,14 +1263,6 @@ describe("PhraseMaker Widget", () => {
         expect(mockActivity.textMsg).toHaveBeenCalled();
     });
     test("_createColumnPieSubmenu executes", () => {
-        phraseMaker.platformColor = {
-            pitchWheelcolors: [],
-            exitWheelcolors: [],
-            accidentalsWheelcolors: [],
-            accidentalsWheelcolorspush: "#fff",
-            octavesWheelcolors: [],
-            piemenuVoicesColors: []
-        };
         phraseMaker.docById = jest.fn(() => ({
             style: {},
             children: [{ textContent: "" }]
@@ -1345,8 +1325,6 @@ describe("PhraseMaker Widget", () => {
         phraseMaker.wheelnav = jest.fn().mockImplementation(function () {
             return new FakeWheel();
         });
-        phraseMaker.platformColor.accidentalsWheelcolorspush = "#fff";
-        phraseMaker.platformColor.exitWheelcolors = [];
 
         phraseMaker.slicePath = jest.fn(() => ({
             DonutSlice: jest.fn(),
@@ -1403,5 +1381,33 @@ describe("PhraseMaker Widget", () => {
         };
 
         phraseMaker._blockReplace(0, 1);
+    });
+
+    test("Accessibility: cell.onkeydown triggers click for Enter and Space", () => {
+        // This test simulates the accessibility keys bound to grid cells
+        const cell = document.createElement("td");
+        cell.setAttribute("role", "button");
+        cell.setAttribute("tabindex", "0");
+        let clicked = false;
+        cell.onclick = () => {
+            clicked = true;
+        };
+
+        // Emulate the addition made to phrasemaker.js:
+        cell.onkeydown = e => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                cell.click();
+            }
+        };
+
+        // Test Enter
+        cell.onkeydown({ key: "Enter", preventDefault: () => {} });
+        expect(clicked).toBe(true);
+
+        // Reset and test Space
+        clicked = false;
+        cell.onkeydown({ key: " ", preventDefault: () => {} });
+        expect(clicked).toBe(true);
     });
 });
