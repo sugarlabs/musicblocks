@@ -312,6 +312,7 @@ class Logo {
         this.synth = new this.deps.classes.Synth();
         this.synth.activity = this.activity; // Reference for voice tracking
         this.synth.changeInTemperament = false;
+        this._synthsInitialized = false;
 
         // Mode widget
         this.modeBlock = null;
@@ -483,6 +484,10 @@ class Logo {
      * @returns {void}
      */
     prepSynths() {
+        // Guard: Skip if synths already initialized
+        if (this._synthsInitialized) {
+            return;
+        }
         this.synth.newTone();
 
         for (const turtle in this.activity.turtles.turtleList) {
@@ -534,6 +539,7 @@ class Logo {
                 this.deps.Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
             }
         }
+        this._synthsInitialized = true;
     }
 
     /**
@@ -1143,6 +1149,7 @@ class Logo {
         // and Web Audio nodes. They will be re-created by prepSynths()
         // on the next run.
         this.synth.disposeAllInstruments();
+        this._synthsInitialized = false; // Reset so synths are recreated on next run
 
         // eslint-disable-next-line eqeqeq
         if (this.cameraID != null) {
