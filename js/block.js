@@ -2273,12 +2273,20 @@ class Block {
             // CRITICAL FIX: PRESERVE GIF
             const src = image.src || "";
 
-            if (src.startsWith("data:image/gif")) {
-                //DO NOT cache GIF , keeps animation
+            if (src.startsWith("data:image/gif") || src.toLowerCase().endsWith(".gif")) {
+                // DO NOT cache GIF , keeps animation
                 that.value = src;
                 that.imageBitmap = bitmap;
             } else {
-                const bounds = myContainer.getBounds();
+                let bounds = myContainer.getBounds();
+                if (!bounds) {
+                    bounds = {
+                        x: 0,
+                        y: 0,
+                        width: (image.naturalWidth || image.width) * bitmap.scaleX,
+                        height: (image.naturalHeight || image.height) * bitmap.scaleY
+                    };
+                }
                 myContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
                 that.value = myContainer.bitmapCache.getCacheDataURL();
                 that.imageBitmap = bitmap;
