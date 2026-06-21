@@ -64,6 +64,12 @@ describe("TemperamentWidget basic tests", () => {
         const createMockElement = id => ({
             id: id,
             innerHTML: "",
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn(),
+                contains: jest.fn(),
+                toggle: jest.fn()
+            },
             textContent: "",
             appendChild: jest.fn(),
             setAttribute: jest.fn(),
@@ -202,7 +208,7 @@ describe("TemperamentWidget basic tests", () => {
 
         global.docById = jest.fn(id => {
             if (id === "wheelDiv4") return null;
-            return { style: {} };
+            return { style: {}, classList: { add: jest.fn(), remove: jest.fn() } };
         });
 
         widget.playNote(0);
@@ -223,6 +229,12 @@ describe("TemperamentWidget basic tests", () => {
 
         widget.playButton = {
             innerHTML: "",
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn(),
+                contains: jest.fn(),
+                toggle: jest.fn()
+            },
             textContent: "",
             appendChild: jest.fn(),
             setAttribute: jest.fn(),
@@ -235,7 +247,8 @@ describe("TemperamentWidget basic tests", () => {
         widget.circleIsVisible = true;
 
         global.docById = jest.fn(() => ({
-            style: {}
+            style: {},
+            classList: { add: jest.fn(), remove: jest.fn() }
         }));
 
         widget.playAll();
@@ -256,6 +269,12 @@ describe("TemperamentWidget basic tests", () => {
 
         global.docById = jest.fn(() => ({
             innerHTML: "",
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn(),
+                contains: jest.fn(),
+                toggle: jest.fn()
+            },
             textContent: "",
             appendChild: jest.fn(),
             setAttribute: jest.fn(),
@@ -263,10 +282,10 @@ describe("TemperamentWidget basic tests", () => {
             append: jest.fn()
         }));
         document.querySelectorAll = jest.fn(() => [
-            { style: {} },
-            { style: {} },
-            { style: {} },
-            { style: {} }
+            { style: {}, classList: { add: jest.fn(), remove: jest.fn() } },
+            { style: {}, classList: { add: jest.fn(), remove: jest.fn() } },
+            { style: {}, classList: { add: jest.fn(), remove: jest.fn() } },
+            { style: {}, classList: { add: jest.fn(), remove: jest.fn() } }
         ]);
 
         widget.edit();
@@ -277,6 +296,12 @@ describe("TemperamentWidget basic tests", () => {
     test("equalEdit sets editMode to equal", () => {
         global.docById = jest.fn(() => ({
             innerHTML: "",
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn(),
+                contains: jest.fn(),
+                toggle: jest.fn()
+            },
             textContent: "",
             appendChild: jest.fn(),
             setAttribute: jest.fn(),
@@ -292,6 +317,12 @@ describe("TemperamentWidget basic tests", () => {
     test("ratioEdit sets editMode to ratio", () => {
         global.docById = jest.fn(() => ({
             innerHTML: "",
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn(),
+                contains: jest.fn(),
+                toggle: jest.fn()
+            },
             textContent: "",
             appendChild: jest.fn(),
             setAttribute: jest.fn(),
@@ -325,6 +356,12 @@ describe("TemperamentWidget basic tests", () => {
 
             return {
                 innerHTML: "",
+                classList: {
+                    add: jest.fn(),
+                    remove: jest.fn(),
+                    contains: jest.fn(),
+                    toggle: jest.fn()
+                },
                 textContent: "",
                 appendChild: jest.fn(),
                 setAttribute: jest.fn(),
@@ -344,6 +381,12 @@ describe("TemperamentWidget basic tests", () => {
 
         global.docById = jest.fn(() => ({
             innerHTML: "",
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn(),
+                contains: jest.fn(),
+                toggle: jest.fn()
+            },
             textContent: "",
             appendChild: jest.fn(),
             setAttribute: jest.fn(),
@@ -543,12 +586,24 @@ describe("TemperamentWidget basic tests", () => {
 
         global.docById = jest.fn(() => ({
             innerHTML: "",
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn(),
+                contains: jest.fn(),
+                toggle: jest.fn()
+            },
             textContent: "",
             appendChild: jest.fn(),
             setAttribute: jest.fn(),
             style: {},
             insertCell: jest.fn(() => ({
                 innerHTML: "",
+                classList: {
+                    add: jest.fn(),
+                    remove: jest.fn(),
+                    contains: jest.fn(),
+                    toggle: jest.fn()
+                },
                 textContent: "",
                 appendChild: jest.fn(),
                 setAttribute: jest.fn(),
@@ -559,13 +614,13 @@ describe("TemperamentWidget basic tests", () => {
             append: jest.fn()
         }));
         document.querySelectorAll = jest.fn(() => [
-            { style: {} },
-            { style: {} },
-            { style: {} },
-            { style: {} },
-            { style: {} },
-            { style: {} },
-            { style: {} }
+            { style: {}, classList: { add: jest.fn(), remove: jest.fn() } },
+            { style: {}, classList: { add: jest.fn(), remove: jest.fn() } },
+            { style: {}, classList: { add: jest.fn(), remove: jest.fn() } },
+            { style: {}, classList: { add: jest.fn(), remove: jest.fn() } },
+            { style: {}, classList: { add: jest.fn(), remove: jest.fn() } },
+            { style: {}, classList: { add: jest.fn(), remove: jest.fn() } },
+            { style: {}, classList: { add: jest.fn(), remove: jest.fn() } }
         ]);
 
         widget._graphOfNotes();
@@ -585,6 +640,12 @@ describe("TemperamentWidget basic tests", () => {
             if (id === "frequencydiv") {
                 return {
                     innerHTML: "",
+                    classList: {
+                        add: jest.fn(),
+                        remove: jest.fn(),
+                        contains: jest.fn(),
+                        toggle: jest.fn()
+                    },
                     textContent: "",
                     appendChild: jest.fn(),
                     setAttribute: jest.fn()
@@ -593,6 +654,12 @@ describe("TemperamentWidget basic tests", () => {
             return {
                 style: {},
                 innerHTML: "",
+                classList: {
+                    add: jest.fn(),
+                    remove: jest.fn(),
+                    contains: jest.fn(),
+                    toggle: jest.fn()
+                },
                 textContent: "",
                 appendChild: jest.fn(),
                 setAttribute: jest.fn()
@@ -626,6 +693,12 @@ describe("TemperamentWidget basic tests", () => {
             if (id === "endNote") return { value: 1 };
             return {
                 innerHTML: "",
+                classList: {
+                    add: jest.fn(),
+                    remove: jest.fn(),
+                    contains: jest.fn(),
+                    toggle: jest.fn()
+                },
                 textContent: "",
                 appendChild: jest.fn(),
                 setAttribute: jest.fn(),
@@ -655,6 +728,12 @@ describe("TemperamentWidget basic tests", () => {
 
         widget.playButton = {
             innerHTML: "",
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn(),
+                contains: jest.fn(),
+                toggle: jest.fn()
+            },
             textContent: "",
             appendChild: jest.fn(),
             setAttribute: jest.fn(),
@@ -691,6 +770,12 @@ describe("TemperamentWidget basic tests", () => {
 
         widget.playButton = {
             innerHTML: "",
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn(),
+                contains: jest.fn(),
+                toggle: jest.fn()
+            },
             textContent: "",
             appendChild: jest.fn(),
             setAttribute: jest.fn(),
