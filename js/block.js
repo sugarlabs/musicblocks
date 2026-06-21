@@ -3859,7 +3859,7 @@ class Block {
             el.type = "text";
 
             // Ensure it is the child of labelElem
-            labelElem.innerHTML = "";
+            labelElem.textContent = "";
             labelElem.appendChild(el);
 
             this.label = el;
@@ -4433,7 +4433,7 @@ class Block {
                 el.step = "any";
 
                 // Ensure it is the child of labelElem
-                labelElem.innerHTML = "";
+                labelElem.textContent = "";
                 labelElem.appendChild(el);
 
                 this.label = el;

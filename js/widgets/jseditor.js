@@ -1101,7 +1101,7 @@ class JSEditor {
             fragment.appendChild(btnDiv);
         }
 
-        debugContainer.innerHTML = "";
+        debugContainer.textContent = "";
         debugContainer.appendChild(fragment);
     }
 
