@@ -41,9 +41,15 @@ def parse_po_file(po_file):
                 if current_msgid is not None:
                     if (
                         current_msgid == SOLFEGE_KEY
-                        and current_msgstr
                         and not is_valid_solfege_translation(current_msgstr)
                     ):
+                        print(
+                            f"Warning: invalid solfege translation in "
+                            f"{po_file}: expected {SOLFEGE_TOKEN_COUNT} "
+                            f"tokens, got {len(current_msgstr.split())}. "
+                            f"Falling back to English.",
+                            file=sys.stderr,
+                        )
                         data[current_msgid] = current_msgid
                     else:
                         data[current_msgid] = current_msgstr or current_msgid
