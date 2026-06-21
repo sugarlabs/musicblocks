@@ -556,7 +556,7 @@ describe("JSEditor", () => {
             global.ast2blocklist_config = undefined;
             window.ast2blocklist_config_ready = Promise.reject(new Error("network failed"));
 
-            await editor._codeToBlocks();
+            await expect(editor._codeToBlocks()).rejects.toThrow();
 
             expect(consoleEl.textContent).toContain(
                 "JavaScript block conversion is unavailable because its configuration file failed to load."
