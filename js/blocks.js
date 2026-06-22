@@ -12,20 +12,21 @@
 /*
    global docById, define,
 
-   BACKWARDCOMPATIBILITYDICT, COLLAPSIBLES, DEFAULTACCIDENTAL,
-   DEFAULTBLOCKSCALE, DEFAULTDRUM, DEFAULTEFFECT, DEFAULTFILTER,
-   DEFAULTFILTERTYPE, DEFAULTINTERVAL, DEFAULTINVERT, DEFAULTMODE,
-   DEFAULTNOISE, DEFAULTOSCILLATORTYPE, DEFAULTTEMPERAMENT,
-   DEFAULTVOICE, INLINECOLLAPSIBLES, NATURAL, NUMBERBLOCKDEFAULT,
-    SPECIALINPUTS, STANDARDBLOCKHEIGHT, STRINGLEN, TEXTWIDTH,
-    WESTERN2EISOLFEGENAMES, WIDENAMES, addTemperamentToDictionary,
-   Block, closeBlkWidgets, createjs, delayExecution, DEFAULTCHORD,
-   deleteTemperamentFromList, getDrumSynthName, getNoiseName,
-   getNoiseSynthName, getTemperamentsList, getTextWidth,
+   BACKWARDCOMPATIBILITYDICT, CAMERAVALUE, COLLAPSIBLES,
+   DEFAULTACCIDENTAL, DEFAULTBLOCKSCALE, DEFAULTCHORD, DEFAULTDRUM,
+   DEFAULTEFFECT, DEFAULTFILTER, DEFAULTFILTERTYPE, DEFAULTINTERVAL,
+   DEFAULTINVERT, DEFAULTMODE, DEFAULTNOISE, DEFAULTOSCILLATORTYPE,
+   DEFAULTTEMPERAMENT, DEFAULTVOICE, INLINECOLLAPSIBLES, LONGSTACK,
+   MINIMUMDOCKDISTANCE, NATURAL, NOTEBLOCKS, NUMBERBLOCKDEFAULT,
+   PITCHBLOCKS, SPECIALINPUTS, STANDARDBLOCKHEIGHT, STRINGLEN,
+   TEXTWIDTH, VIDEOVALUE, WESTERN2EISOLFEGENAMES, WIDENAMES,
+   addTemperamentToDictionary, Block, closeBlkWidgets, createjs,
+   delayExecution, deleteTemperamentFromList, getDrumSynthName,
+   getNoiseName, getNoiseSynthName, getTemperamentsList, getTextWidth,
    getVoiceSynthName, i18nSolfege, last, MathUtility, mixedNumber,
-   piemenuBlockContext, prepareMacroExports, ProtoBlock,
-    setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments,
-    docById, define, BlocksDependencies, deepClone
+   piemenuBlockContext, prepareMacroExports, ProtoBlock, setOctaveRatio,
+   splitScaleDegree, splitSolfege, updateTemperaments, BlocksDependencies,
+   deepClone
 */
 
 /* global showZoomOverlay */
@@ -52,93 +53,6 @@
         setOctaveRatio, splitScaleDegree, splitSolfege,
         updateTemperaments
 */
-/**
- * Minimum distance (squared) between two docks required before
- * connecting them.
- */
-const MINIMUMDOCKDISTANCE = 400;
-
-/** Soft limit on the number of blocks in a single stack. */
-const LONGSTACK = 300;
-
-/** Special value flags to uniquely identify these media blocks. */
-const CAMERAVALUE = "##__CAMERA__##";
-const VIDEOVALUE = "##__VIDEO__##";
-
-const NOTEBLOCKS = ["newnote", "osctime"];
-const PITCHBLOCKS = ["pitch", "steppitch", "hertz", "pitchnumber", "nthmodalpitch", "playdrum"];
-
-const ALLOWED_CONNECTIONS = new Set([
-    "vspaceout:vspacein",
-    "vspacein:vspaceout",
-    "in:out",
-    "out:in",
-    "in:vspaceout",
-    "vspaceout:in",
-    "out:vspacein",
-    "vspacein:out",
-    "numberin:numberout",
-    "numberin:anyout",
-    "numberout:numberin",
-    "anyout:numberin",
-    "textin:textout",
-    "textin:anyout",
-    "textout:textin",
-    "anyout:textin",
-    "booleanout:booleanin",
-    "booleanin:booleanout",
-    "mediain:mediaout",
-    "mediaout:mediain",
-    "mediain:textout",
-    "textout:mediain",
-    "filein:fileout",
-    "fileout:filein",
-    "casein:caseout",
-    "caseout:casein",
-    "vspaceout:casein",
-    "casein:vspaceout",
-    "vspacein:caseout",
-    "caseout:vspacein",
-    "solfegein:anyout",
-    "solfegein:solfegeout",
-    "solfegein:textout",
-    "solfegein:noteout",
-    "solfegein:scaledegreeout",
-    "solfegein:numberout",
-    "anyout:solfegein",
-    "solfegeout:solfegein",
-    "textout:solfegein",
-    "noteout:solfegein",
-    "scaledegreeout:solfegein",
-    "numberout:solfegein",
-    "notein:solfegeout",
-    "notein:scaledegreeout",
-    "notein:textout",
-    "notein:noteout",
-    "solfegeout:notein",
-    "scaledegreeout:notein",
-    "textout:notein",
-    "noteout:notein",
-    "pitchout:anyin",
-    "gridout:anyin",
-    "anyin:textout",
-    "anyin:mediaout",
-    "anyin:numberout",
-    "anyin:anyout",
-    "anyin:fileout",
-    "anyin:solfegeout",
-    "anyin:scaledegreeout",
-    "anyin:noteout",
-    "textout:anyin",
-    "mediaout:anyin",
-    "numberout:anyin",
-    "anyout:anyin",
-    "fileout:anyin",
-    "solfegeout:anyin",
-    "scaledegreeout:anyin",
-    "noteout:anyin"
-]);
-
 /**
  * Blocks holds the list of blocks and most of the block-associated
  * methods, since most block manipulations are inter-block.
@@ -2398,18 +2312,6 @@ class Blocks {
                 const stopBtn = document.getElementById("stop");
                 if (stopBtn) stopBtn.style.color = "white";
             }
-        };
-
-        /**
-         * Test for a valid connection between two dock types.
-         * @param - type1 - dock type 1
-         * @param - type2 - dock type 2
-         * @private
-         * @returns boolean
-         */
-        this._testConnectionType = (type1, type2) => {
-            /** Can these two blocks dock? */
-            return ALLOWED_CONNECTIONS.has(type1 + ":" + type2);
         };
 
         /**
