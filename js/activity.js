@@ -1633,24 +1633,10 @@ class Activity {
                     this.showBlocksAfterRun = true;
                 }
 
-                const stopBtn = document.getElementById("stop");
-                if (stopBtn) {
-                    stopBtn.style.display = "inline-block";
-                    stopBtn.style.color = window.platformColor.stopIconcolor;
-                }
+                this.toolbar.highlightStop(window.platformColor.stopIconcolor);
             } else {
                 if (currentDelay === 0) {
-                    const stopBtn = document.getElementById("stop");
-                    if (stopBtn) {
-                        stopBtn.style.color = "white";
-                    }
-
-                    setTimeout(() => {
-                        const stopBtnDelay = document.getElementById("stop");
-                        if (stopBtnDelay) {
-                            stopBtnDelay.style.color = window.platformColor.stopIconcolor;
-                        }
-                    }, 500);
+                    this.toolbar.dimThenRestoreStop(window.platformColor.stopIconcolor);
                 }
             }
         };
@@ -1697,15 +1683,9 @@ class Activity {
             const didRunStart = this.toolbarController.runStep();
 
             if (didRunStart === "started") {
-                const stopBtn = document.getElementById("stop");
-                if (stopBtn) {
-                    stopBtn.style.color = this.toolbar.stopIconColorWhenPlaying;
-                }
+                this.toolbar.highlightStop(this.toolbar.stopIconColorWhenPlaying);
             } else if (didRunStart === "stopped") {
-                const stopBtn = document.getElementById("stop");
-                if (stopBtn) {
-                    stopBtn.style.color = "white";
-                }
+                this.toolbar.resetStop();
             }
         };
 
@@ -1735,7 +1715,7 @@ class Activity {
                 this.cleanupIdleWatcher();
             }
 
-            document.getElementById("stop").style.display = "none";
+            this.toolbar.resetStop();
 
             const widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
@@ -3166,7 +3146,6 @@ class Activity {
             const planetIframe = document.getElementById("planet-iframe");
             const pasteEl = this.paste;
             const wheelDiv = document.getElementById("wheelDiv");
-            const stopbtn = document.getElementById("stop");
             const disableKeys =
                 lilypondModal.style.display === "block" ||
                 this.searchWidget.style.visibility === "visible" ||
@@ -3206,9 +3185,7 @@ class Activity {
                     case 82: {
                         // 'R or ENTER'
                         this.textMsg("Alt-R " + _("Play"));
-                        if (stopbtn) {
-                            stopbtn.style.color = platformColor.stopIconcolor;
-                        }
+                        this.toolbar.highlightStop(platformColor.stopIconcolor);
                         this._doFastButton();
                         break;
                     }
@@ -3232,9 +3209,7 @@ class Activity {
                         if (this.turtles.running()) {
                             this._doHardStopButton();
                         } else if (!hasOpenWidget) {
-                            if (stopbtn) {
-                                stopbtn.style.color = platformColor.stopIconcolor;
-                            }
+                            this.toolbar.highlightStop(platformColor.stopIconcolor);
                             this._doFastButton();
                         }
                         break;
@@ -3312,9 +3287,7 @@ class Activity {
                         this._doHardStopButton();
                     } else if (!disableKeys && !hasOpenWidget) {
                         event.preventDefault();
-                        if (stopbtn) {
-                            stopbtn.style.color = platformColor.stopIconcolor;
-                        }
+                        this.toolbar.highlightStop(platformColor.stopIconcolor);
                         this._doFastButton();
                     }
                 } else if (!disableKeys) {
@@ -3453,10 +3426,7 @@ class Activity {
                                 this._doHardStopButton();
                             } else if (!disableKeys && !hasOpenWidget) {
                                 event.preventDefault();
-                                const stopbtn = document.getElementById("stop");
-                                if (stopbtn) {
-                                    stopbtn.style.color = platformColor.stopIconcolor;
-                                }
+                                this.toolbar.highlightStop(platformColor.stopIconcolor);
                                 this._doFastButton();
                             }
                             break;
@@ -4388,11 +4358,7 @@ class Activity {
                 this.showBlocksAfterRun = false;
             }
 
-            const stopIcon = document.getElementById("stop");
-            if (stopIcon) {
-                stopIcon.style.color = "white";
-                stopIcon.style.display = "none";
-            }
+            this.toolbar.resetStop();
 
             const saveBtn = document.getElementById("saveButton");
             const saveBtnAdv = document.getElementById("saveButtonAdvanced");
@@ -6594,12 +6560,6 @@ class Activity {
             // Guard against double initialization
             if (this._initialized) return;
             this._initialized = true;
-
-            // Hide stop button on startup
-            const stopBtn = document.getElementById("stop");
-            if (stopBtn) {
-                stopBtn.style.display = "none";
-            }
 
             // Batch DOM reads before any writes to avoid forced synchronous layout
             this._perfMark("activity.init.start");

@@ -43,7 +43,7 @@ global.window = {
 
 global.localStorage = window.localStorage;
 
-const Toolbar = require("../toolbar");
+const Toolbar = require("../widgets/toolbar-ui");
 
 const createMockElement = id => ({
     id,
