@@ -135,7 +135,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 .dark .ui-autocomplete .ui-menu-item,
 .dark .ui-autocomplete .ui-menu-item a,
 .dark .ui-autocomplete .ui-menu-item .ui-menu-item-wrapper {
-    color: var(--color-text-inverse) !important;
+    color: #ffffff !important;
     background-color: transparent !important;
 }
 
@@ -146,7 +146,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 .dark .ui-autocomplete .ui-state-focus,
 .dark .ui-autocomplete .ui-state-active {
     background-color: var(--color-bg-tertiary) !important;
-    color: var(--color-text-inverse) !important;
+    color: #ffffff !important;
 }
 
 .dark #helpfulSearchDiv {
@@ -572,7 +572,7 @@ body.highcontrast {
 }
 
 .highcontrast .ui-autocomplete .ui-menu-item a {
-    color: var(--color-text-inverse) !important;
+    color: #ffffff !important;
     background-color: var(--color-text-inverse) !important;
 }
 
