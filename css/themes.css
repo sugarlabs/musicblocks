@@ -127,7 +127,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 .dark #helpfulSearch,
 .dark .ui-autocomplete {
     background-color: var(--color-bg-primary) !important;
-    color: var(--color-text-inverse) !important;
+    color: #ffffff !important;
     border-color: var(--color-border-primary) !important;
 }
 
@@ -567,7 +567,7 @@ body.highcontrast {
 .highcontrast #helpfulSearch,
 .highcontrast .ui-autocomplete {
     background-color: var(--color-text-inverse) !important;
-    color: var(--color-text-inverse) !important;
+    color: #ffffff !important;
     border: 1px solid #ffffff;
 }
 
