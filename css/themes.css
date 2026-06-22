@@ -456,7 +456,7 @@ body.highcontrast {
 .highcontrast #helpdropdown.helpdropdown-menu,
 .highcontrast #helpdropdown.helpdropdown-menu li > a {
     background: #000000;
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
     border-color: var(--color-text-inverse);
     box-shadow: none;
 }
@@ -545,8 +545,8 @@ body.highcontrast {
 }
 
 .highcontrast .popupMsg {
-    background-color: var(--color-text-inverse);
-    color: var(--color-text-inverse);
+    background-color: #000000;
+    color: #ffffff;
 }
 
 .highcontrast #printText {
@@ -573,14 +573,14 @@ body.highcontrast {
 .highcontrast #search,
 .highcontrast #helpfulSearch,
 .highcontrast .ui-autocomplete {
-    background-color: var(--color-text-inverse) !important;
+    background-color: var(--color-bg-primary) !important;
     color: var(--color-text-primary) !important;
     border: 1px solid #ffffff;
 }
 
 .highcontrast .ui-autocomplete .ui-menu-item a {
     color: var(--color-text-primary) !important;
-    background-color: var(--color-text-inverse) !important;
+    background-color: var(--color-bg-primary) !important;
 }
 
 .highcontrast .ui-autocomplete .ui-menu-item a:hover {
