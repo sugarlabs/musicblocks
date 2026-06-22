@@ -16,7 +16,7 @@
    global
 
    platformColor, _, SYNTHSVG, frequencyToPitch, DEFAULTVOICE,
-   normalizeNoteAccidentals
+   normalizeNoteAccidentals, PREVIEWVOLUME
  */
 
 /*
@@ -27,6 +27,8 @@
         _
     - js/utils/platformstyle.js
         platformColor
+    - js/logoconstants.js
+        PREVIEWVOLUME
 */
 /* exported PitchStaircase */
 
@@ -391,6 +393,7 @@ class PitchStaircase {
         const pscTableCell = previousRowNumber >= 0 ? this._stepTables[previousRowNumber] : null;
 
         setTimeout(() => {
+            if (this.closed) return;
             if (pscTableCell !== null && pscTableCell !== undefined) {
                 const stepCell = pscTableCell.rows[0].cells[1];
                 stepCell.classList.remove("active");
@@ -626,12 +629,14 @@ class PitchStaircase {
         widgetWindow.clear();
         widgetWindow.show();
         widgetWindow.onclose = () => {
-            this.activity.logo.synth.setMasterVolume(0);
             this.closed = true;
+            this.activity.logo.synth.stop();
+            this.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
             widgetWindow.destroy();
         };
 
         this.closed = false;
+        this.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
 
         widgetWindow.addButton("play-chord.svg", PitchStaircase.ICONSIZE, _("Play chord")).onclick =
             () => {
