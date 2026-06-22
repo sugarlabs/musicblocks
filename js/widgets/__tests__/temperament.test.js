@@ -1092,19 +1092,48 @@ describe("TemperamentWidget basic tests", () => {
         });
         test("playAll UI branch 1 (circleIsVisible=false, no wheelDiv4)", () => {
             jest.useFakeTimers();
-            widget._logo = { resetSynth: jest.fn(), synth: { trigger: jest.fn(), inTemperament: "equal", changeInTemperament: false, startingPitch: "C4", setMasterVolume: jest.fn(), stop: jest.fn() } };
+            widget._logo = {
+                resetSynth: jest.fn(),
+                synth: {
+                    trigger: jest.fn(),
+                    inTemperament: "equal",
+                    changeInTemperament: false,
+                    startingPitch: "C4",
+                    setMasterVolume: jest.fn(),
+                    stop: jest.fn()
+                }
+            };
             widget.frequencies = [440, 880];
             widget.editMode = null;
             widget.circleIsVisible = false;
             widget.notesCircle = {
                 navItems: [
-                    { fillAttr: "", sliceHoverAttr: { fill: "" }, slicePathAttr: { fill: "" }, sliceSelectedAttr: { fill: "" } },
-                    { fillAttr: "", sliceHoverAttr: { fill: "" }, slicePathAttr: { fill: "" }, sliceSelectedAttr: { fill: "" } },
-                    { fillAttr: "", sliceHoverAttr: { fill: "" }, slicePathAttr: { fill: "" }, sliceSelectedAttr: { fill: "" } }
+                    {
+                        fillAttr: "",
+                        sliceHoverAttr: { fill: "" },
+                        slicePathAttr: { fill: "" },
+                        sliceSelectedAttr: { fill: "" }
+                    },
+                    {
+                        fillAttr: "",
+                        sliceHoverAttr: { fill: "" },
+                        slicePathAttr: { fill: "" },
+                        sliceSelectedAttr: { fill: "" }
+                    },
+                    {
+                        fillAttr: "",
+                        sliceHoverAttr: { fill: "" },
+                        slicePathAttr: { fill: "" },
+                        sliceSelectedAttr: { fill: "" }
+                    }
                 ],
                 refreshWheel: jest.fn()
             };
-            global.docById = jest.fn(id => id === "wheelDiv4" ? null : ({ style: {}, classList: { add: jest.fn(), remove: jest.fn() } }));
+            global.docById = jest.fn(id =>
+                id === "wheelDiv4"
+                    ? null
+                    : { style: {}, classList: { add: jest.fn(), remove: jest.fn() } }
+            );
             global.isCustomTemperament = jest.fn(() => false);
             widget.notes = [["C", 4]];
             widget.playButton = document.createElement("div");
@@ -1113,22 +1142,47 @@ describe("TemperamentWidget basic tests", () => {
 
             widget.playAll();
             jest.runAllTimers();
-            
+
             expect(widget.notesCircle.refreshWheel).toHaveBeenCalled();
             jest.useRealTimers();
         });
 
         test("playAll UI branch 2 (circleIsVisible=true, no wheelDiv4)", () => {
             jest.useFakeTimers();
-            widget._logo = { resetSynth: jest.fn(), synth: { trigger: jest.fn(), inTemperament: "equal", changeInTemperament: false, startingPitch: "C4", setMasterVolume: jest.fn(), stop: jest.fn() } };
+            widget._logo = {
+                resetSynth: jest.fn(),
+                synth: {
+                    trigger: jest.fn(),
+                    inTemperament: "equal",
+                    changeInTemperament: false,
+                    startingPitch: "C4",
+                    setMasterVolume: jest.fn(),
+                    stop: jest.fn()
+                }
+            };
             widget.frequencies = [440, 880];
             widget.editMode = null;
             widget.circleIsVisible = true;
             widget.notesCircle = {
                 navItems: [
-                    { fillAttr: "", sliceHoverAttr: { fill: "" }, slicePathAttr: { fill: "" }, sliceSelectedAttr: { fill: "" } },
-                    { fillAttr: "", sliceHoverAttr: { fill: "" }, slicePathAttr: { fill: "" }, sliceSelectedAttr: { fill: "" } },
-                    { fillAttr: "", sliceHoverAttr: { fill: "" }, slicePathAttr: { fill: "" }, sliceSelectedAttr: { fill: "" } }
+                    {
+                        fillAttr: "",
+                        sliceHoverAttr: { fill: "" },
+                        slicePathAttr: { fill: "" },
+                        sliceSelectedAttr: { fill: "" }
+                    },
+                    {
+                        fillAttr: "",
+                        sliceHoverAttr: { fill: "" },
+                        slicePathAttr: { fill: "" },
+                        sliceSelectedAttr: { fill: "" }
+                    },
+                    {
+                        fillAttr: "",
+                        sliceHoverAttr: { fill: "" },
+                        slicePathAttr: { fill: "" },
+                        sliceSelectedAttr: { fill: "" }
+                    }
                 ],
                 refreshWheel: jest.fn()
             };
@@ -1150,28 +1204,71 @@ describe("TemperamentWidget basic tests", () => {
 
         test("playAll UI branch 3 (wheelDiv4 exists)", () => {
             jest.useFakeTimers();
-            widget._logo = { resetSynth: jest.fn(), synth: { trigger: jest.fn(), inTemperament: "equal", changeInTemperament: false, startingPitch: "C4", setMasterVolume: jest.fn(), stop: jest.fn() } };
+            widget._logo = {
+                resetSynth: jest.fn(),
+                synth: {
+                    trigger: jest.fn(),
+                    inTemperament: "equal",
+                    changeInTemperament: false,
+                    startingPitch: "C4",
+                    setMasterVolume: jest.fn(),
+                    stop: jest.fn()
+                }
+            };
             widget.frequencies = [440, 880];
             widget.pitchNumber = 1;
             widget.editMode = null;
             widget.tempRatios1 = [1, 2];
             widget.notesCircle = {
                 navItems: [
-                    { fillAttr: "", sliceHoverAttr: { fill: "" }, slicePathAttr: { fill: "" }, sliceSelectedAttr: { fill: "" } },
-                    { fillAttr: "", sliceHoverAttr: { fill: "" }, slicePathAttr: { fill: "" }, sliceSelectedAttr: { fill: "" } },
-                    { fillAttr: "", sliceHoverAttr: { fill: "" }, slicePathAttr: { fill: "" }, sliceSelectedAttr: { fill: "" } }
+                    {
+                        fillAttr: "",
+                        sliceHoverAttr: { fill: "" },
+                        slicePathAttr: { fill: "" },
+                        sliceSelectedAttr: { fill: "" }
+                    },
+                    {
+                        fillAttr: "",
+                        sliceHoverAttr: { fill: "" },
+                        slicePathAttr: { fill: "" },
+                        sliceSelectedAttr: { fill: "" }
+                    },
+                    {
+                        fillAttr: "",
+                        sliceHoverAttr: { fill: "" },
+                        slicePathAttr: { fill: "" },
+                        sliceSelectedAttr: { fill: "" }
+                    }
                 ],
                 refreshWheel: jest.fn()
             };
             widget.wheel1 = {
                 navItems: [
-                    { fillAttr: "", sliceHoverAttr: { fill: "" }, slicePathAttr: { fill: "" }, sliceSelectedAttr: { fill: "" } },
-                    { fillAttr: "", sliceHoverAttr: { fill: "" }, slicePathAttr: { fill: "" }, sliceSelectedAttr: { fill: "" } },
-                    { fillAttr: "", sliceHoverAttr: { fill: "" }, slicePathAttr: { fill: "" }, sliceSelectedAttr: { fill: "" } }
+                    {
+                        fillAttr: "",
+                        sliceHoverAttr: { fill: "" },
+                        slicePathAttr: { fill: "" },
+                        sliceSelectedAttr: { fill: "" }
+                    },
+                    {
+                        fillAttr: "",
+                        sliceHoverAttr: { fill: "" },
+                        slicePathAttr: { fill: "" },
+                        sliceSelectedAttr: { fill: "" }
+                    },
+                    {
+                        fillAttr: "",
+                        sliceHoverAttr: { fill: "" },
+                        slicePathAttr: { fill: "" },
+                        sliceSelectedAttr: { fill: "" }
+                    }
                 ],
                 refreshWheel: jest.fn()
             };
-            global.docById = jest.fn(id => ({ style: {}, classList: { add: jest.fn(), remove: jest.fn() } }));
+            global.docById = jest.fn(id => ({
+                style: {},
+                classList: { add: jest.fn(), remove: jest.fn() }
+            }));
             global.isCustomTemperament = jest.fn(() => false);
             widget.notes = [["C", 4]];
             widget.playButton = document.createElement("div");
@@ -1179,7 +1276,7 @@ describe("TemperamentWidget basic tests", () => {
 
             widget.playAll();
             jest.runAllTimers();
-            
+
             expect(widget.wheel1.refreshWheel).toHaveBeenCalled();
             jest.useRealTimers();
         });
