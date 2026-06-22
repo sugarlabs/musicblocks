@@ -108,6 +108,10 @@ class ToolbarUI {
             clearTimeout(this._dimTimeout);
             this._dimTimeout = null;
         }
+        if (window._focusCycleManager && typeof window._focusCycleManager.dispose === "function") {
+            window._focusCycleManager.dispose();
+            window._focusCycleManager = null;
+        }
     }
 
     /**
@@ -2306,8 +2310,14 @@ class ToolbarUI {
 
     /**
      * Resets the stop button after execution ends.
+     * Also cancels any pending dimThenRestoreStop timer so a stale color
+     * restore cannot overwrite the hidden state.
      */
     resetStop() {
+        if (this._dimTimeout) {
+            clearTimeout(this._dimTimeout);
+            this._dimTimeout = null;
+        }
         const stopBtn = document.getElementById("stop");
         if (stopBtn) {
             stopBtn.style.display = "none";
@@ -2778,12 +2788,29 @@ class FocusCycleManager {
     _announce(msg) {
         if (this._liveRegion) this._liveRegion.textContent = msg;
     }
+
+    /**
+     * Removes all document-level event listeners attached by init().
+     * Must be called when the FocusCycleManager is no longer needed.
+     *
+     * @returns {void}
+     */
+    dispose() {
+        document.removeEventListener("keydown", this._onKeyDown, true);
+        document.removeEventListener("mousedown", this._onMouseDown, false);
+        document.removeEventListener("focusin", this._onFocusIn, true);
+        this._liveRegion = null;
+    }
 }
 
 ToolbarUI.FocusCycleManager = FocusCycleManager;
 
 if (typeof define === "function" && define.amd) {
     define(function () {
+        // Expose under the legacy Toolbar name so that
+        // instance.constructor.name === "Toolbar" continues to work for
+        // any downstream plugin that checks it.
+        window.Toolbar = ToolbarUI;
         window.ToolbarUI = ToolbarUI;
         window.FocusCycleManager = FocusCycleManager;
         return ToolbarUI;

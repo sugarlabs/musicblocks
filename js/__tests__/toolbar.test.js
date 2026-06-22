@@ -43,7 +43,7 @@ global.window = {
 
 global.localStorage = window.localStorage;
 
-const Toolbar = require("../widgets/toolbar-ui");
+const Toolbar = require("../toolbar");
 
 const createMockElement = id => ({
     id,
@@ -1393,5 +1393,28 @@ describe("FocusCycleManager", () => {
         });
         expect(blocks.activeBlock).toBeNull();
         expect(manager._currentZone).toBe("workspace");
+    });
+});
+
+describe("toolbar.js compatibility shim", () => {
+    test("shim re-exports the same class as widgets/toolbar-ui", () => {
+        const shim = require("../toolbar");
+        const direct = require("../widgets/toolbar-ui");
+        expect(shim).toBe(direct);
+    });
+
+    test("shim preserves FocusCycleManager on the export", () => {
+        const shim = require("../toolbar");
+        expect(typeof shim.FocusCycleManager).toBe("function");
+    });
+
+    test("instances created via shim are ToolbarUI instances", () => {
+        const shim = require("../toolbar");
+        const instance = new shim();
+        expect(instance).toBeInstanceOf(shim);
+        expect(typeof instance.init).toBe("function");
+        expect(typeof instance.highlightStop).toBe("function");
+        expect(typeof instance.resetStop).toBe("function");
+        expect(typeof instance.dimThenRestoreStop).toBe("function");
     });
 });

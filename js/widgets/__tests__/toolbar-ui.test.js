@@ -57,15 +57,10 @@ const createMockElement = id => ({
     focus: jest.fn()
 });
 
-global.document = {
-    getElementById: jest.fn(createMockElement),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    body: {
-        style: {}
-    }
-};
-global.docById = id => global.document.getElementById(id);
+document.getElementById = jest.fn(createMockElement);
+jest.spyOn(document, "addEventListener").mockImplementation(() => {});
+jest.spyOn(document, "removeEventListener").mockImplementation(() => {});
+global.docById = id => document.getElementById(id);
 
 describe("ToolbarUI - Visual Helpers", () => {
     let toolbar;
@@ -157,5 +152,36 @@ describe("ToolbarUI - Visual Helpers", () => {
         expect(mockBeginnerModeBtn.style.display).toBe("none");
         expect(mockAdvancedModeBtn.style.display).toBe("block");
         expect(mockStopBtn.style.display).toBe("none"); // resetStop is called
+    });
+
+    test("resetStop cancels any pending dimThenRestoreStop timer", () => {
+        jest.useFakeTimers();
+        toolbar.dimThenRestoreStop("green");
+        // dim timer is now queued
+        toolbar.resetStop();
+        // advance past the 500ms; the stale restore must NOT run
+        jest.advanceTimersByTime(500);
+        // stop button should remain hidden and white, not restored to green
+        expect(mockStopBtn.style.display).toBe("none");
+        expect(mockStopBtn.style.color).toBe("white");
+        jest.useRealTimers();
+    });
+});
+
+describe("FocusCycleManager - dispose", () => {
+    test("dispose removes all document-level event listeners", () => {
+        const { FocusCycleManager } = require("../toolbar-ui");
+        const manager = new FocusCycleManager();
+        manager.init();
+
+        const removeCount = global.document.removeEventListener.mock.calls.length;
+        manager.dispose();
+
+        const calls = global.document.removeEventListener.mock.calls;
+        const newCalls = calls.slice(removeCount);
+        const events = newCalls.map(c => c[0]);
+        expect(events).toContain("keydown");
+        expect(events).toContain("mousedown");
+        expect(events).toContain("focusin");
     });
 });
