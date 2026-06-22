@@ -149,7 +149,9 @@ describe("processPluginData - script cleanup", () => {
             });
 
             const data = makePluginData({ FLOWPLUGINS: { testflow: "return 42;" } });
-            await expect(processPluginData(activity, data, "plugins/test")).rejects.toThrow("Load failed");
+            await expect(processPluginData(activity, data, "plugins/test")).rejects.toThrow(
+                "Load failed"
+            );
 
             expect(rmSpy).toHaveBeenCalled();
         });
