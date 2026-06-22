@@ -185,11 +185,10 @@ describe("ToolbarController.hardStop", () => {
         controller = activity.toolbarController;
     });
 
-    test("stops turtles and cleans up idle watcher", () => {
+    test("stops logo turtles and returns true", () => {
         const result = controller.hardStop(false);
 
         expect(activity.logo.doStopTurtles).toHaveBeenCalled();
-        expect(activity.cleanupIdleWatcher).toHaveBeenCalled();
         expect(result).toBe(true);
     });
 

@@ -1731,6 +1731,10 @@ class Activity {
                 return;
             }
 
+            if (this.cleanupIdleWatcher) {
+                this.cleanupIdleWatcher();
+            }
+
             document.getElementById("stop").style.display = "none";
 
             const widgetTitle = document.getElementsByClassName("wftTitle");

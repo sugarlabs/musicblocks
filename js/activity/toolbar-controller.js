@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global window */
+/* global _THIS_IS_MUSIC_BLOCKS_ */
 
 /* exported setupToolbarController, ToolbarController */
 
@@ -126,16 +126,14 @@ class ToolbarController {
             onblur = false;
         }
 
-        if (onblur && window._THIS_IS_MUSIC_BLOCKS_) {
+        // Use bare global: set by loader.js as window._THIS_IS_MUSIC_BLOCKS_ = true.
+        // All other files in this repo (toolbar.js, status.js, turtledefs.js) access
+        // it the same way via /* global _THIS_IS_MUSIC_BLOCKS_ */.
+        if (onblur && _THIS_IS_MUSIC_BLOCKS_) {
             return false;
         }
 
         this.activity.logo.doStopTurtles();
-
-        if (this.activity.cleanupIdleWatcher) {
-            this.activity.cleanupIdleWatcher();
-        }
-
         return true;
     }
 }
