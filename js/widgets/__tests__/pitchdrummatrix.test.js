@@ -423,5 +423,30 @@ describe("PitchDrumMatrix Widget", () => {
             expect(pdm.playButton.appendChild).toHaveBeenCalled();
             jest.useRealTimers();
         });
+
+        test("should display a message when playing all with an empty grid", () => {
+            const mockActivity = {
+                logo: {
+                    synth: {
+                        stop: jest.fn()
+                    },
+                    turtleDelay: 0
+                },
+                hideMsgs: jest.fn(),
+                textMsg: jest.fn()
+            };
+            pdm.init(mockActivity);
+
+            const mockTable = { rows: [] };
+            docById.mockReturnValue(mockTable);
+
+            pdm._playing = true;
+            pdm._playAll();
+
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                "Click in the grid to map notes to drums.",
+                3000
+            );
+        });
     });
 });
