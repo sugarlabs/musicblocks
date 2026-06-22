@@ -16,7 +16,9 @@
 
 /* global jest, describe, it, expect, beforeEach */
 
+Object.assign(global, require("../block-constants"));
 const Blocks = require("../blocks");
+const { testConnectionType } = require("../connection-validator");
 
 // --- MOCK SETUP ---
 
@@ -191,6 +193,29 @@ describe("Blocks Foundation", () => {
             expect(Array.isArray(blocks.stackList)).toBe(true);
             expect(blocks.stackList.length).toBe(0);
             expect(Array.isArray(blocks.trashStacks)).toBe(true);
+        });
+    });
+
+    describe("Connection Type Validation", () => {
+        it("should keep _testConnectionType available on Blocks instances", () => {
+            const blocks = new Blocks(mockActivity);
+
+            expect(typeof blocks._testConnectionType).toBe("function");
+            expect(blocks._testConnectionType).toBe(testConnectionType);
+        });
+
+        it("should accept valid connection types", () => {
+            const blocks = new Blocks(mockActivity);
+
+            expect(blocks._testConnectionType("numberin", "numberout")).toBe(true);
+            expect(blocks._testConnectionType("booleanin", "booleanout")).toBe(true);
+        });
+
+        it("should reject invalid connection types", () => {
+            const blocks = new Blocks(mockActivity);
+
+            expect(blocks._testConnectionType("booleanout", "numberout")).toBe(false);
+            expect(blocks._testConnectionType("textin", "booleanout")).toBe(false);
         });
     });
 
