@@ -1584,6 +1584,7 @@ if (typeof module !== "undefined" && module.exports) {
         isSVGEmpty,
         prepareMacroExports,
         processMacroData,
+        processPluginData,
         hideDOMLabel,
         displayMsg
     };
