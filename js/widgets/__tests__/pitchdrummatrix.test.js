@@ -351,8 +351,18 @@ describe("PitchDrumMatrix Widget", () => {
 
             const mockCell = { style: { backgroundColor: "black" } };
             const mockRow = { cells: [mockCell] };
-            const mockTable = { rows: [mockRow] };
-            docById.mockReturnValue(mockTable);
+            const mockTable = { rows: [mockRow, mockRow] };
+
+            docById.mockImplementation(id => {
+                if (id === "pdmTable" || id === "pdmDrumTable") {
+                    return mockTable;
+                }
+                if (id === "pdmCellTable0") {
+                    return { rows: [mockRow] };
+                }
+                return { style: {} };
+            });
+
             pdm._setPairCell = jest.fn();
             pdm._playing = true;
 
@@ -366,6 +376,51 @@ describe("PitchDrumMatrix Widget", () => {
             jest.runAllTimers();
 
             expect(pdm.playButton.appendChild).not.toHaveBeenCalled();
+            jest.useRealTimers();
+        });
+
+        test("should update icon and set _playing to false when playback finishes successfully", () => {
+            jest.useFakeTimers();
+
+            const mockActivity = {
+                logo: {
+                    synth: {
+                        stop: jest.fn()
+                    },
+                    turtleDelay: 0
+                },
+                hideMsgs: jest.fn(),
+                textMsg: jest.fn()
+            };
+            pdm.init(mockActivity);
+
+            const mockCell = { style: { backgroundColor: "black" } };
+            const mockRow = { cells: [mockCell] };
+            const mockTable = { rows: [mockRow, mockRow] };
+
+            docById.mockImplementation(id => {
+                if (id === "pdmTable" || id === "pdmDrumTable") {
+                    return mockTable;
+                }
+                if (id === "pdmCellTable0") {
+                    return { rows: [mockRow] };
+                }
+                return { style: {} };
+            });
+
+            pdm._setPairCell = jest.fn();
+            pdm._playing = true;
+
+            pdm.playButton.appendChild = jest.fn();
+
+            pdm._playAll();
+
+            pdm.playButton.appendChild.mockClear();
+
+            jest.runAllTimers();
+
+            expect(pdm._playing).toBe(false);
+            expect(pdm.playButton.appendChild).toHaveBeenCalled();
             jest.useRealTimers();
         });
     });
