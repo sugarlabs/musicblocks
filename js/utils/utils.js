@@ -953,10 +953,12 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
         await new Promise((resolve, reject) => {
             script.onload = () => {
                 URL.revokeObjectURL(url);
+                document.head.removeChild(script);
                 resolve();
             };
             script.onerror = e => {
                 URL.revokeObjectURL(url);
+                document.head.removeChild(script);
                 console.error("Failed to load CSP Blob script for plugins", e);
                 reject(e);
             };
@@ -1010,10 +1012,12 @@ window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivi
                     delete window.__mb_plugin_registry[registryName];
                 }
                 URL.revokeObjectURL(sUrl);
+                document.head.removeChild(sScript);
                 resolve();
             };
             sScript.onerror = () => {
                 URL.revokeObjectURL(sUrl);
+                document.head.removeChild(sScript);
                 resolve(); // Still resolve to let others run
             };
             document.head.appendChild(sScript);
