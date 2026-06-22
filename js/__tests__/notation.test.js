@@ -22,7 +22,7 @@ const { durationToNoteValue, convertFactor, getDrumSymbol } = require("../utils/
 global.convertFactor = convertFactor;
 global.durationToNoteValue = durationToNoteValue;
 global.getDrumSymbol = getDrumSymbol;
-global._ = require("lodash");
+global._ = {};
 global.last = arr => arr[arr.length - 1];
 global.toFixed2 = n => parseFloat(n.toFixed(2));
 global.rationalToFraction = jest.fn().mockReturnValue([1, 2]);
