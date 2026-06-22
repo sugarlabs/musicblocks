@@ -755,7 +755,7 @@ function TemperamentWidget() {
 
         const menuItems = document.querySelectorAll("#menuLabels");
         for (let i = 0; i < menuLabels.length; i++) {
-            menuItems[i].classList.add("tm-label-bg");
+            menuItems[i].classList.add("tm-selector-bg");
             menuItems[i].style.background = "";
             menuItems[i].style.height = 30 + "px";
             menuItems[i].style.textAlign = "center";
@@ -816,9 +816,7 @@ function TemperamentWidget() {
             notesCell[i][0].appendChild(playImg);
             notesCell[i][0].appendChild(document.createTextNode("\u00A0\u00A0"));
             notesCell[i][0].style.width = 40 + "px";
-            notesCell[i][0].style.backgroundColor = getComputedStyle(document.body)
-                .getPropertyValue("--color-selector-bg")
-                .trim();
+            notesCell[i][0].classList.add("tm-selector-bg");
             notesCell[i][0].style.textAlign = "center";
 
             notesCell[i][0].onmouseover = function () {
@@ -845,9 +843,7 @@ function TemperamentWidget() {
             notesCell[i][1] = notesRow[i].insertCell(-1);
             notesCell[i][1].id = "pitchNumber_" + i;
             notesCell[i][1].textContent = i;
-            notesCell[i][1].style.backgroundColor = getComputedStyle(document.body)
-                .getPropertyValue("--color-selector-bg")
-                .trim();
+            notesCell[i][1].classList.add("tm-selector-bg");
             notesCell[i][1].style.textAlign = "center";
 
             ratios[i] = this.ratios[i];
@@ -856,9 +852,7 @@ function TemperamentWidget() {
             //Ratio
             notesCell[i][2] = notesRow[i].insertCell(-1);
             notesCell[i][2].textContent = ratios[i];
-            notesCell[i][2].style.backgroundColor = getComputedStyle(document.body)
-                .getPropertyValue("--color-selector-bg")
-                .trim();
+            notesCell[i][2].classList.add("tm-selector-bg");
             notesCell[i][2].style.textAlign = "center";
 
             if (!isCustomTemperament(this.inTemperament)) {
@@ -866,18 +860,14 @@ function TemperamentWidget() {
                 notesCell[i][3] = notesRow[i].insertCell(-1);
                 notesCell[i][3].textContent = this.intervals[i];
                 notesCell[i][3].style.width = 120 + "px";
-                notesCell[i][3].style.backgroundColor = getComputedStyle(document.body)
-                    .getPropertyValue("--color-selector-bg")
-                    .trim();
+                notesCell[i][3].classList.add("tm-selector-bg");
                 notesCell[i][3].style.textAlign = "center";
 
                 //Notes
                 notesCell[i][4] = notesRow[i].insertCell(-1);
                 notesCell[i][4].textContent = this.notes[i];
                 notesCell[i][4].style.width = 50 + "px";
-                notesCell[i][4].style.backgroundColor = getComputedStyle(document.body)
-                    .getPropertyValue("--color-selector-bg")
-                    .trim();
+                notesCell[i][4].classList.add("tm-selector-bg");
                 notesCell[i][4].style.textAlign = "center";
 
                 //Mode
@@ -892,18 +882,14 @@ function TemperamentWidget() {
                     notesCell[i][5].textContent = _("non scalar");
                 }
                 notesCell[i][5].style.width = 100 + "px";
-                notesCell[i][5].style.backgroundColor = getComputedStyle(document.body)
-                    .getPropertyValue("--color-selector-bg")
-                    .trim();
+                notesCell[i][5].classList.add("tm-selector-bg");
                 notesCell[i][5].style.textAlign = "center";
             }
 
             //Frequency
             notesCell[i][6] = notesRow[i].insertCell(-1);
             notesCell[i][6].textContent = this.frequencies[i];
-            notesCell[i][6].style.backgroundColor = getComputedStyle(document.body)
-                .getPropertyValue("--color-selector-bg")
-                .trim();
+            notesCell[i][6].classList.add("tm-selector-bg");
             notesCell[i][6].style.textAlign = "center";
 
             if (isCustomTemperament(this.inTemperament)) {
