@@ -640,7 +640,7 @@ const FIXEDSOLFEGE = {
  * @constant {Object.<string, string>}
  */
 const FIXEDSOLFEGE1 = {
-    "do𝄫": "B",
+    "do𝄫": "B" + FLAT,
     "do♭": "C" + FLAT,
     "do": "C",
     "do♯": "C" + SHARP,
@@ -654,13 +654,13 @@ const FIXEDSOLFEGE1 = {
     "mi♭": "E" + FLAT,
     "mi": "E",
     "mi♯": "E" + SHARP,
-    "mi𝄪": "G",
+    "mi𝄪": "F" + SHARP,
     "fa𝄫": "E" + FLAT,
     "fa♭": "F" + FLAT,
     "fa": "F",
     "fa♯": "F" + SHARP,
-    "fa𝄪": "G" + SHARP,
-    "sol𝄫": "E",
+    "fa𝄪": "G",
+    "sol𝄫": "F",
     "sol♭": "G" + FLAT,
     "sol": "G",
     "sol♯": "G" + SHARP,
@@ -674,7 +674,7 @@ const FIXEDSOLFEGE1 = {
     "ti♭": "B" + FLAT,
     "ti": "B",
     "ti♯": "B" + SHARP,
-    "ti𝄪": "C",
+    "ti𝄪": "C" + SHARP,
     "R": _("rest")
 };
 

@@ -2195,7 +2195,7 @@ describe("calcOctave", () => {
         "ti"
     ];
     global.FIXEDSOLFEGE1 = {
-        "do𝄫": "B",
+        "do𝄫": "B" + FLAT,
         "do♭": "C" + FLAT,
         "do": "C",
         "do♯": "C" + SHARP,
@@ -2209,13 +2209,13 @@ describe("calcOctave", () => {
         "mi♭": "E" + FLAT,
         "mi": "E",
         "mi♯": "E" + SHARP,
-        "mi𝄪": "G",
+        "mi𝄪": "F" + SHARP,
         "fa𝄫": "E" + FLAT,
         "fa♭": "F" + FLAT,
         "fa": "F",
         "fa♯": "F" + SHARP,
-        "fa𝄪": "G" + SHARP,
-        "sol𝄫": "E",
+        "fa𝄪": "G",
+        "sol𝄫": "F",
         "sol♭": "G" + FLAT,
         "sol": "G",
         "sol♯": "G" + SHARP,
@@ -2229,7 +2229,7 @@ describe("calcOctave", () => {
         "ti♭": "B" + FLAT,
         "ti": "B",
         "ti♯": "B" + SHARP,
-        "ti𝄪": "C",
+        "ti𝄪": "C" + SHARP,
         "R": _("rest")
     };
 
@@ -2312,7 +2312,7 @@ describe("convertFromSolfege", () => {
     const SHARP = "♯";
     const FLAT = "♭";
     global.FIXEDSOLFEGE1 = {
-        "do𝄫": "B",
+        "do𝄫": "B" + FLAT,
         "do♭": "C" + FLAT,
         "do": "C",
         "do♯": "C" + SHARP,
@@ -2326,13 +2326,13 @@ describe("convertFromSolfege", () => {
         "mi♭": "E" + FLAT,
         "mi": "E",
         "mi♯": "E" + SHARP,
-        "mi𝄪": "G",
+        "mi𝄪": "F" + SHARP,
         "fa𝄫": "E" + FLAT,
         "fa♭": "F" + FLAT,
         "fa": "F",
         "fa♯": "F" + SHARP,
-        "fa𝄪": "G" + SHARP,
-        "sol𝄫": "E",
+        "fa𝄪": "G",
+        "sol𝄫": "F",
         "sol♭": "G" + FLAT,
         "sol": "G",
         "sol♯": "G" + SHARP,
@@ -2346,12 +2346,12 @@ describe("convertFromSolfege", () => {
         "ti♭": "B" + FLAT,
         "ti": "B",
         "ti♯": "B" + SHARP,
-        "ti𝄪": "C",
+        "ti𝄪": "C" + SHARP,
         "R": _("rest")
     };
     global.EQUIVALENTNATURALS = { "E♯": "F", "B♯": "C", "C♭": "B", "F♭": "E" };
     const testCases = [
-        { input: "do𝄫", expected: "B" },
+        { input: "do𝄫", expected: "B" + FLAT },
         { input: "do♭", expected: "B" },
         { input: "do♯", expected: "C♯" },
         { input: "re♯", expected: "D♯" },
