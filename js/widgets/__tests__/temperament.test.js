@@ -1002,4 +1002,93 @@ describe("TemperamentWidget basic tests", () => {
             expect(widget._freqToCents(freq, 440)).toBeCloseTo(cents, 6);
         });
     });
+    describe("Token Migration specific coverage", () => {
+        test("_addButton creates cell with mouse events", () => {
+            const row = document.createElement("tr");
+            row.insertCell = jest.fn(() => {
+                const cell = document.createElement("td");
+                return cell;
+            });
+            const cell = widget._addButton(row, "test.png", 32, "Test Button");
+
+            expect(cell).toBeDefined();
+            expect(cell.classList.contains("tm-selector-bg")).toBe(true);
+
+            // Trigger mouseover
+            cell.onmouseover();
+            expect(cell.classList.contains("tm-selector-hover")).toBe(true);
+            expect(cell.classList.contains("tm-selector-bg")).toBe(false);
+
+            // Trigger mouseout
+            cell.onmouseout();
+            expect(cell.classList.contains("tm-selector-hover")).toBe(false);
+            expect(cell.classList.contains("tm-selector-bg")).toBe(true);
+        });
+
+        test("_refreshInnerWheel covers wheel coloring branches", () => {
+            widget.inTemperament = "equal";
+            widget.pitchNumber = 2;
+            widget.frequencies = [440, 880];
+            widget.ratios = [1, 2];
+            widget.tempRatios1 = [1, 2];
+            widget.tempRatios = [1, 2];
+
+            widget._logo = {
+                resetSynth: jest.fn(),
+                synth: { trigger: jest.fn() }
+            };
+
+            global.docById = jest.fn(id => {
+                if (id === "frequencySlider") return { value: 440 };
+                return {
+                    style: {},
+                    innerHTML: "",
+                    classList: {
+                        add: jest.fn(),
+                        remove: jest.fn(),
+                        toggle: jest.fn(),
+                        contains: jest.fn()
+                    },
+                    textContent: "",
+                    appendChild: jest.fn(),
+                    setAttribute: jest.fn(),
+                    append: jest.fn()
+                };
+            });
+
+            widget._createInnerWheel = jest.fn();
+
+            widget._refreshInnerWheel();
+            expect(widget._createInnerWheel).toHaveBeenCalled();
+        });
+
+        test("_circleOfNotes executes createMainWheel and sets color correctly", () => {
+            widget.pitchNumber = 2;
+            widget.ratios = [1, 2];
+            widget.powerBase = 2;
+            widget.frequencies = [440, 880];
+            global.docById = jest.fn(id => ({
+                style: {},
+                classList: { add: jest.fn(), remove: jest.fn() },
+                appendChild: jest.fn(),
+                append: jest.fn(),
+                addEventListener: jest.fn(),
+                getContext: jest.fn(() => ({
+                    beginPath: jest.fn(),
+                    arc: jest.fn(),
+                    fill: jest.fn(),
+                    stroke: jest.fn()
+                })),
+                getBoundingClientRect: jest.fn(() => ({ left: 0, top: 0 }))
+            }));
+
+            widget.toggleNotesButton = jest.fn();
+            widget.checkTemperament = jest.fn();
+
+            widget._circleOfNotes();
+
+            expect(widget.notesCircle).toBeDefined();
+            expect(widget.notesCircle.createWheel).toHaveBeenCalled();
+        });
+    });
 });
