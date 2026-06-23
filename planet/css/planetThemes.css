@@ -306,158 +306,158 @@
 
 .highcontrast #projectviewer-report-card .card-content,
 .highcontrast #projectviewer-report-card .card-action {
-    background-color: #001133;
-    color: #ffff00;
+    background-color: var(--color-bg-secondary, #001133);
+    color: var(--color-text-primary, #ffff00);
 }
 
 .highcontrast #projectviewer-report-card .card-action {
-    background-color: #000a26;
-    border-top: 1px solid #ffff00;
+    background-color: var(--color-bg-tertiary, #000a26);
+    border-top: 1px solid var(--color-border-primary, #ffff00);
 }
 
 .highcontrast #projectviewer-report-title,
 .highcontrast #projectviewer-reportsubmit-title {
-    color: #ffff00;
+    color: var(--color-text-primary, #ffff00);
 }
 
 .highcontrast #projectviewer-report-conduct,
 .highcontrast #submittext,
 .highcontrast #projectviewer-report-reason {
-    color: #ffffff !important;
+    color: var(--color-text-primary, #ffffff) !important;
 }
 
 .highcontrast #projectviewer-report-card a {
-    color: #ffff00 !important;
+    color: var(--color-text-primary, #ffff00) !important;
 }
 
 .highcontrast #projectviewer-report-card a:hover {
-    background-color: #000080 !important;
-    color: #ffff00 !important;
+    background-color: var(--color-bg-secondary, #000080) !important;
+    color: var(--color-text-primary, #ffff00) !important;
 }
 
 .highcontrast #reportdescription {
-    color: #ffff00;
-    border-bottom: 2px solid #ffff00;
+    color: var(--color-text-primary, #ffff00);
+    border-bottom: 2px solid var(--color-border-primary, #ffff00);
 }
 
 .highcontrast #reportdescription:focus {
-    border-bottom: 2px solid #ffffff;
-    box-shadow: 0 0 0 1px #ffffff;
+    border-bottom: 2px solid var(--color-border-secondary, #ffffff);
+    box-shadow: var(--shadow-focus, 0 0 0 1px #ffffff);
 }
 
 .highcontrast #report-error {
-    color: #ff4d4d;
+    color: var(--color-error, #ff4d4d);
 }
 
 .highcontrast #view-more-chips {
-    color: #ffff00 !important;
+    color: var(--color-text-primary, #ffff00) !important;
 }
 
 .highcontrast .chipselect {
-    background-color: #000000;
-    color: #ffff00;
-    border: 2px solid #ffff00;
+    background-color: var(--color-bg-primary, #000000);
+    color: var(--color-text-primary, #ffff00);
+    border: 2px solid var(--color-border-primary, #ffff00);
 }
 
 .highcontrast .chipselect.selected,
 .highcontrast .chipselect.selected-special {
-    background-color: #ffff00;
-    color: #000000;
-    border: 2px solid #ffff00;
+    background-color: var(--color-brand-primary, #ffff00);
+    color: var(--color-text-inverse, #000000);
+    border: 2px solid var(--color-border-primary, #ffff00);
 }
 
 .highcontrast .chipselect.cursor:hover:not(.selected-special) {
-    background-color: #000080;
-    color: #ffff00;
+    background-color: var(--color-bg-secondary, #000080);
+    color: var(--color-text-primary, #ffff00);
 }
 
 .highcontrast .chipselect:focus,
 .highcontrast .chipselect:focus-visible {
-    outline: 2px solid #ffffff;
+    outline: 2px solid var(--color-border-secondary, #ffffff);
     outline-offset: 2px;
 }
 
 .highcontrast #local-projects .card {
-    background-color: #000000;
-    color: #ffff00;
-    border: 2px solid #ffff00;
-    box-shadow: 0px 4px 6px rgba(255, 255, 0, 0.3);
+    background-color: var(--color-bg-primary, #000000);
+    color: var(--color-text-primary, #ffff00);
+    border: 2px solid var(--color-border-primary, #ffff00);
+    box-shadow: var(--shadow-md, 0px 4px 6px rgba(255, 255, 0, 0.3));
 }
 
 .highcontrast #local-projects .card .card-title {
-    color: #ffff00 !important;
+    color: var(--color-text-primary, #ffff00) !important;
 }
 
 .highcontrast #local-projects .card .card-content {
-    color: #ffff00;
+    color: var(--color-text-primary, #ffff00);
 }
 .highcontrast #local-projects .card:hover {
-    background-color: #000080;
-    box-shadow: 0px 6px 8px rgba(255, 255, 0, 0.5);
+    background-color: var(--color-bg-secondary, #000080);
+    box-shadow: var(--shadow-lg, 0px 6px 8px rgba(255, 255, 0, 0.5));
 }
 
 .highcontrast #local-projects .card .btn {
-    background-color: #000000;
-    color: #ffff00;
-    border: 2px solid #ffff00;
+    background-color: var(--color-bg-primary, #000000);
+    color: var(--color-text-primary, #ffff00);
+    border: 2px solid var(--color-border-primary, #ffff00);
 }
 
 .highcontrast #local-projects .card .btn:hover {
-    background-color: #000080;
+    background-color: var(--color-bg-secondary, #000080);
 }
 
 .highcontrast #global-projects .card {
-    background-color: #000000;
-    color: #ffff00;
-    border: 2px solid #ffff00;
-    box-shadow: 0px 4px 6px rgba(255, 255, 0, 0.3);
+    background-color: var(--color-bg-primary, #000000);
+    color: var(--color-text-primary, #ffff00);
+    border: 2px solid var(--color-border-primary, #ffff00);
+    box-shadow: var(--shadow-md, 0px 4px 6px rgba(255, 255, 0, 0.3));
 }
 
 .highcontrast #global-projects .card .card-title {
-    color: #ffff00 !important;
+    color: var(--color-text-primary, #ffff00) !important;
 }
 
 .highcontrast #global-projects .card .card-content {
-    color: #ffff00;
+    color: var(--color-text-primary, #ffff00);
 }
 
 .highcontrast #global-projects .card:hover {
-    background-color: #000080;
-    box-shadow: 0px 6px 8px rgba(255, 255, 0, 0.5);
+    background-color: var(--color-bg-secondary, #000080);
+    box-shadow: var(--shadow-lg, 0px 6px 8px rgba(255, 255, 0, 0.5));
 }
 
 .highcontrast #global-projects .card .btn {
-    background-color: #000000;
-    color: #ffff00;
-    border: 2px solid #ffff00;
+    background-color: var(--color-bg-primary, #000000);
+    color: var(--color-text-primary, #ffff00);
+    border: 2px solid var(--color-border-primary, #ffff00);
 }
 
 .highcontrast #global-projects .card .btn:hover {
-    background-color: #000080;
+    background-color: var(--color-bg-secondary, #000080);
 }
 
 .highcontrast .modal-footer .btn-flat {
-    color: #ffff00 !important;
+    color: var(--color-text-primary, #ffff00) !important;
     background-color: transparent !important;
     transition:
         background-color 0.3s ease,
         color 0.3s ease;
     font-weight: bold;
-    border: 2px solid #ffff00;
+    border: 2px solid var(--color-border-primary, #ffff00);
 }
 
 .highcontrast .modal-footer .btn-flat:hover {
-    background-color: #000080 !important;
-    color: #ffff00 !important;
+    background-color: var(--color-bg-secondary, #000080) !important;
+    color: var(--color-text-primary, #ffff00) !important;
 }
 .highcontrast .close-button {
-    color: #ffff00;
+    color: var(--color-text-primary, #ffff00);
     font-size: 1.5rem;
     transition: color 0.3s ease;
 }
 
 .highcontrast .close-button:hover {
-    color: #ffffff;
+    color: var(--color-text-primary, #ffffff);
 }
 
 .highcontrast .select-wrapper {
@@ -468,14 +468,14 @@
 }
 
 .highcontrast .select-wrapper input.select-dropdown {
-    color: #ffff00 !important;
+    color: var(--color-text-primary, #ffff00) !important;
     font-size: 1rem;
     line-height: normal;
     padding-left: 10px;
     height: 3rem;
     box-sizing: border-box;
-    background-color: #000000 !important;
-    border: 2px solid #ffff00 !important;
+    background-color: var(--color-bg-primary, #000000) !important;
+    border: 2px solid var(--color-border-primary, #ffff00) !important;
 }
 
 .highcontrast .select-wrapper:after {
@@ -484,50 +484,50 @@
     top: 50%;
     right: 10px;
     transform: translateY(-50%);
-    color: #ffff00 !important;
+    color: var(--color-text-primary, #ffff00) !important;
     font-size: 0.8rem;
     pointer-events: none;
 }
 
 .highcontrast .dropdown-content {
-    background-color: #000000 !important;
-    border: 2px solid #ffff00;
-    color: #00ffff !important;
+    background-color: var(--color-bg-primary, #000000) !important;
+    border: 2px solid var(--color-border-primary, #ffff00);
+    color: var(--color-brand-secondary, #00ffff) !important;
 }
 
 .highcontrast .dropdown-content li > a {
-    color: #00ffff !important;
+    color: var(--color-brand-secondary, #00ffff) !important;
     padding: 0.5rem 1rem;
 }
 
 .highcontrast .select-dropdown.dropdown-content li > span {
-    color: #00ffff !important;
+    color: var(--color-brand-secondary, #00ffff) !important;
 }
 
 .highcontrast .select-dropdown.dropdown-content li.selected > span,
 .highcontrast .select-dropdown.dropdown-content li.active > span {
-    color: #ffff00 !important;
+    color: var(--color-text-primary, #ffff00) !important;
 }
 
 .highcontrast .select-dropdown.dropdown-content li:hover > span {
-    background-color: #000080 !important;
-    color: #ffff00 !important;
+    background-color: var(--color-bg-secondary, #000080) !important;
+    color: var(--color-text-primary, #ffff00) !important;
 }
 
 .highcontrast .dropdown-content li > a:hover {
-    background-color: #000080 !important;
-    color: #ffff00 !important;
+    background-color: var(--color-bg-secondary, #000080) !important;
+    color: var(--color-text-primary, #ffff00) !important;
 }
 
 /* High contrast icon styles */
 .highcontrast .material-icons {
-    color: #ffffff !important;
+    color: var(--color-text-primary, #ffffff) !important;
     text-shadow: none !important;
 }
 
 /* High contrast hover box outlines */
 .highcontrast .tooltip,
 .highcontrast .hover-box {
-    border: 2px solid #ffff00 !important;
-    box-shadow: 0 0 10px #ffff00 !important;
+    border: 2px solid var(--color-border-primary, #ffff00) !important;
+    box-shadow: 0 0 10px var(--color-border-primary, #ffff00) !important;
 }
