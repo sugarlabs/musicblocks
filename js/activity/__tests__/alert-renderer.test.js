@@ -447,24 +447,31 @@ describe("AlertController and AlertRenderer architectural boundary integration",
         controller = activity.alertController;
         renderer = activity.alertRenderer;
 
-        // Mock the renderer presentation-only methods to avoid triggering unmocked createjs/Image logic
-        renderer.showTextMsg = jest.fn();
-        renderer.hideTextMsg = jest.fn();
-        renderer.showErrorMsg = jest.fn();
-        renderer.hideErrorMsg = jest.fn();
-        renderer.hideAlertUI = jest.fn();
-        renderer.hideArrows = jest.fn();
+        // Spy on prototype methods so own-property keys on the instance remain unchanged
+        jest.spyOn(AlertRenderer.prototype, "showTextMsg").mockImplementation(() => {});
+        jest.spyOn(AlertRenderer.prototype, "hideTextMsg").mockImplementation(() => {});
+        jest.spyOn(AlertRenderer.prototype, "showErrorMsg").mockImplementation(() => {});
+        jest.spyOn(AlertRenderer.prototype, "hideErrorMsg").mockImplementation(() => {});
+        jest.spyOn(AlertRenderer.prototype, "hideAlertUI").mockImplementation(() => {});
+        jest.spyOn(AlertRenderer.prototype, "hideArrows").mockImplementation(() => {});
     });
 
     afterEach(() => {
         jest.useRealTimers();
+        jest.restoreAllMocks();
     });
 
     test("AlertRenderer contains no internal state and does not manage timeouts/visibility flags", () => {
-        // Assert that the renderer instance is stateless (only holds the activity reference)
+        // Own-property keys must be only "activity" — spies live on the prototype, not the instance
         const rendererKeys = Object.keys(renderer);
         expect(rendererKeys).toEqual(["activity"]);
         expect(renderer.activity).toBe(activity);
+
+        // Renderer must not have any own timeout or visibility state
+        expect(renderer.msgTimeoutID).toBeUndefined();
+        expect(renderer.errorMsgTimeoutID).toBeUndefined();
+        expect(renderer._isAlertVisible).toBeUndefined();
+        expect(renderer.currentError).toBeUndefined();
     });
 
     test("Showing a text alert updates controller timer state, invokes renderer via callbacks, and does not mutate controller state during rendering", () => {
