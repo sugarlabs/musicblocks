@@ -1394,6 +1394,153 @@ describe("FocusCycleManager", () => {
         expect(blocks.activeBlock).toBeNull();
         expect(manager._currentZone).toBe("workspace");
     });
+
+    test("tab keydown cycles forward workspace -> toolbar -> palette", () => {
+        const manager = new Toolbar.FocusCycleManager();
+        manager._keyboardMode = false;
+        manager._currentZone = "workspace";
+
+        manager._leaveZone = jest.fn();
+        manager._enterZone = jest.fn();
+
+        const event = {
+            key: "Tab",
+            shiftKey: false,
+            preventDefault: jest.fn(),
+            stopPropagation: jest.fn()
+        };
+
+        manager._onKeyDown(event);
+
+        expect(manager._keyboardMode).toBe(true);
+        expect(manager._currentZone).toBe("toolbar");
+        expect(manager._leaveZone).toHaveBeenCalledWith("workspace");
+        expect(manager._enterZone).toHaveBeenCalledWith("toolbar");
+    });
+
+    test("shift+tab keydown cycles backward workspace -> palette -> toolbar", () => {
+        const manager = new Toolbar.FocusCycleManager();
+        manager._keyboardMode = false;
+        manager._currentZone = "workspace";
+
+        manager._leaveZone = jest.fn();
+        manager._enterZone = jest.fn();
+
+        const event = {
+            key: "Tab",
+            shiftKey: true,
+            preventDefault: jest.fn(),
+            stopPropagation: jest.fn()
+        };
+
+        manager._onKeyDown(event);
+
+        expect(manager._keyboardMode).toBe(true);
+        expect(manager._currentZone).toBe("palette");
+        expect(manager._leaveZone).toHaveBeenCalledWith("workspace");
+        expect(manager._enterZone).toHaveBeenCalledWith("palette");
+    });
+
+    test("bypasses focus cycling when target is an input or text box", () => {
+        const manager = new Toolbar.FocusCycleManager();
+        const activeInput = document.createElement("input");
+        activeInput.type = "text";
+        document.body.appendChild(activeInput);
+        activeInput.focus();
+
+        const event = {
+            key: "Tab",
+            shiftKey: false,
+            preventDefault: jest.fn(),
+            stopPropagation: jest.fn()
+        };
+
+        manager._onKeyDown(event);
+
+        expect(manager._keyboardMode).toBe(false);
+        expect(event.preventDefault).not.toHaveBeenCalled();
+
+        document.body.removeChild(activeInput);
+    });
+
+    test("dispose removes all document-level event listeners", () => {
+        const addSpy = jest.spyOn(document, "addEventListener").mockImplementation(() => {});
+        const removeSpy = jest.spyOn(document, "removeEventListener").mockImplementation(() => {});
+
+        const manager = new Toolbar.FocusCycleManager();
+        manager.init();
+        manager.dispose();
+
+        expect(removeSpy).toHaveBeenCalledWith("keydown", expect.any(Function), true);
+        expect(removeSpy).toHaveBeenCalledWith("mousedown", expect.any(Function), false);
+        expect(removeSpy).toHaveBeenCalledWith("focusin", expect.any(Function), true);
+
+        addSpy.mockRestore();
+        removeSpy.mockRestore();
+    });
+
+    test("entering toolbar zone focuses first visible button if no last focused button is present", () => {
+        const manager = new Toolbar.FocusCycleManager();
+        const toolbars = document.createElement("div");
+        toolbars.id = "toolbars";
+        const firstBtn = document.createElement("button");
+        firstBtn.setAttribute("tabindex", "0");
+        toolbars.appendChild(firstBtn);
+        document.body.appendChild(toolbars);
+
+        const getElementSpy = jest.spyOn(document, "getElementById").mockImplementation(id => {
+            if (id === "toolbars") return toolbars;
+            return null;
+        });
+
+        const styleSpy = jest.spyOn(window, "getComputedStyle").mockImplementation(() => ({
+            display: "block",
+            visibility: "visible"
+        }));
+
+        Object.defineProperty(firstBtn, "offsetWidth", { value: 100, configurable: true });
+        firstBtn.focus = jest.fn();
+
+        manager._enterZone("toolbar");
+
+        expect(firstBtn.focus).toHaveBeenCalled();
+
+        getElementSpy.mockRestore();
+        styleSpy.mockRestore();
+        document.body.removeChild(toolbars);
+    });
+
+    test("entering toolbar zone focuses last focused button if present", () => {
+        const manager = new Toolbar.FocusCycleManager();
+        const toolbars = document.createElement("div");
+        toolbars.id = "toolbars";
+        const lastBtn = document.createElement("button");
+        lastBtn.setAttribute("tabindex", "0");
+        toolbars.appendChild(lastBtn);
+        document.body.appendChild(toolbars);
+
+        const getElementSpy = jest.spyOn(document, "getElementById").mockImplementation(id => {
+            if (id === "toolbars") return toolbars;
+            return null;
+        });
+
+        const styleSpy = jest.spyOn(window, "getComputedStyle").mockImplementation(() => ({
+            display: "block",
+            visibility: "visible"
+        }));
+
+        Object.defineProperty(lastBtn, "offsetWidth", { value: 100, configurable: true });
+        lastBtn.focus = jest.fn();
+
+        manager._lastFocusedButton = lastBtn;
+        manager._enterZone("toolbar");
+
+        expect(lastBtn.focus).toHaveBeenCalled();
+
+        getElementSpy.mockRestore();
+        styleSpy.mockRestore();
+        document.body.removeChild(toolbars);
+    });
 });
 
 describe("toolbar.js compatibility shim", () => {
