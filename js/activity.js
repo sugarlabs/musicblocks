@@ -2432,7 +2432,105 @@ class Activity {
         /*
          * Shows search widget
          */
-        this.showSearchWidget = () => this.searchController.showSearchWidget();
+        this.showSearchWidget = () => {
+            // Bring widget to top.
+            this.searchWidget.style.zIndex = 1001;
+            this.searchWidget.style.border = "2px solid lightblue";
+            if (this.helpfulSearchDiv) {
+                this._hideHelpfulSearchWidget();
+            }
+            if (this.searchWidget.style.visibility === "visible") {
+                this.hideSearchWidget();
+            } else {
+                const obj = docByClass("ui-menu");
+                if (obj.length > 0) {
+                    obj[0].style.visibility = "visible";
+                }
+
+                if (this.searchWidget) {
+                    this.searchWidget.value = null;
+                    this.searchWidget.style.visibility = "visible";
+                    const searchPos = this.palettes.getSearchPos();
+                    this.searchWidget.style.left = searchPos.x + "px";
+                    this.searchWidget.style.top = searchPos.y + "px";
+                    this._makeSearchWidgetDraggable();
+                }
+
+                this.searchBlockPosition = [100, 100];
+                this.prepSearchWidget();
+
+                const that = this;
+                const closeListener = e => {
+                    if (
+                        document.getElementById("search").style.visibility === "visible" &&
+                        (e.target === document.getElementById("search") ||
+                            document.getElementById("search").contains(e.target))
+                    ) {
+                        //do nothing when clicked in the input field
+                    } else if (
+                        document.getElementById("ui-id-1") &&
+                        document.getElementById("ui-id-1").style.display === "block" &&
+                        (e.target === document.getElementById("ui-id-1") ||
+                            document.getElementById("ui-id-1").contains(e.target))
+                    ) {
+                        //do nothing when clicked on the menu
+                    } else if (
+                        document.querySelector("#palette tbody tr") &&
+                        document.querySelector("#palette tbody tr").contains(e.target)
+                    ) {
+                        //do nothing when clicked on the search row
+                    } else {
+                        // this will hide the search bar if someone clicks on menu items
+                        that.hideSearchWidget();
+                    }
+                };
+                this._searchCloseListener = closeListener;
+                this.addEventListener(document, "mousedown", closeListener);
+
+                // Give the browser time to update before selecting
+                // focus.
+                setTimeout(() => {
+                    that.searchWidget.focus();
+                    that.doSearch();
+                }, 500);
+            }
+        };
+
+
+        /*
+         * Makes the search widget draggable like Spotlight
+         */
+        this._makeSearchWidgetDraggable = () => {
+            const el = this.searchWidget;
+            // Avoid attaching multiple listeners
+            if (el._dragInitialized) return;
+            el._dragInitialized = true;
+
+            let isDragging = false;
+            let startX, startY, origLeft, origTop;
+
+            el.style.position = "fixed";
+            el.style.cursor = "move";
+
+            el.addEventListener("mousedown", e => {
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                origLeft = parseInt(el.style.left) || 0;
+                origTop = parseInt(el.style.top) || 0;
+                e.stopPropagation();
+            });
+
+            document.addEventListener("mousemove", e => {
+                if (!isDragging) return;
+                el.style.left = origLeft + (e.clientX - startX) + "px";
+                el.style.top = origTop + (e.clientY - startY) + "px";
+            });
+
+            document.addEventListener("mouseup", () => {
+                isDragging = false;
+            });
+        };
 
         /*
          * Uses JQuery to add autocompleted search suggestions
@@ -2674,6 +2772,12 @@ class Activity {
                         pasteEl.focus();
                         pasteEl.style.visibility = "visible";
                         this.update = true;
+                        break;
+                    case 32: // Ctrl+Space — Spotlight search shortcut
+                        event.preventDefault();
+                        if (!disableKeys) {
+                            this.showSearchWidget();
+                        }
                         break;
                 }
             } else if (event.shiftKey && !disableKeys) {
@@ -4950,6 +5054,10 @@ class Activity {
                         {
                             keys: platformKeys("Page Down", "Page Down"),
                             action: _("Scroll workspace down")
+                        },
+                        {
+                            keys: platformKeys("Ctrl + Space", "Ctrl + Space"),
+                            action: _("Open block search.")
                         },
                         {
                             keys: platformKeys("Esc", "Esc"),
