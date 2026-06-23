@@ -124,7 +124,11 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .dark #search,
-.dark #helpfulSearch,
+.dark #helpfulSearch {
+    color: var(--color-text-primary) !important;
+    -webkit-text-fill-color: var(--color-text-primary) !important;
+    caret-color: var(--color-text-primary) !important;
+}
 .dark .ui-autocomplete {
     background-color: var(--color-bg-primary) !important;
     color: var(--color-text-primary) !important;
@@ -134,7 +138,10 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 /* Ensure all text inside autocomplete items is white */
 .dark .ui-autocomplete .ui-menu-item,
 .dark .ui-autocomplete .ui-menu-item a,
-.dark .ui-autocomplete .ui-menu-item .ui-menu-item-wrapper {
+.dark .ui-autocomplete .ui-menu-item .ui-menu-item-wrapper,
+.dark .ui-autocomplete .ui-menu-item span,
+.dark .ui-autocomplete .ui-menu-item b,
+.dark .ui-autocomplete .ui-menu-item strong {
     color: var(--color-text-primary) !important;
     background-color: transparent !important;
 }
@@ -143,8 +150,8 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 .dark .ui-autocomplete .ui-menu-item:hover,
 .dark .ui-autocomplete .ui-menu-item:hover a,
 .dark .ui-autocomplete .ui-menu-item:hover .ui-menu-item-wrapper,
-.dark .ui-autocomplete .ui-state-focus,
-.dark .ui-autocomplete .ui-state-active {
+.dark .ui-menu-item-wrapper.ui-state-active,
+.dark .ui-menu-item-wrapper.ui-state-focus {
     background-color: var(--color-bg-tertiary) !important;
     color: var(--color-text-primary) !important;
 }

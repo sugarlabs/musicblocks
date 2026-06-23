@@ -821,4 +821,51 @@ describe("setupIntervalsBlocks", () => {
             expect(logo.connectionStoreLock).toBe(false);
         });
     });
+
+    describe("Pattern D Save/Restore Logic (Heap/Dict)", () => {
+        beforeEach(() => {
+            activity.blocks.blockList.blkMeasure = { connections: [null, "child"] };
+            logo.runFromBlockNow = jest.fn();
+        });
+
+        it("Heap absent before measurement: logo.turtleHeaps[turtle] is not set (key absent) and should be {} after cycle", () => {
+            logo.turtleHeaps = {};
+            logo.turtleDicts = { [turtleIndex]: {} };
+
+            createdBlocks.measureintervalsemitones.arg(logo, turtleIndex, "blkMeasure");
+
+            expect(logo.turtleHeaps[turtleIndex]).toEqual({});
+        });
+
+        it("Heap present before measurement: logo.turtleHeaps[turtle] is [1, 2, 3] and should be deep cloned", () => {
+            const originalHeap = [1, 2, 3];
+            logo.turtleHeaps = { [turtleIndex]: originalHeap };
+            logo.turtleDicts = { [turtleIndex]: {} };
+
+            createdBlocks.measureintervalsemitones.arg(logo, turtleIndex, "blkMeasure");
+
+            expect(logo.turtleHeaps[turtleIndex]).toEqual(originalHeap);
+            expect(logo.turtleHeaps[turtleIndex]).not.toBe(originalHeap);
+        });
+
+        it("Dict absent before measurement: logo.turtleDicts[turtle] is not set (key absent) and should be {} after cycle", () => {
+            logo.turtleHeaps = { [turtleIndex]: [] };
+            logo.turtleDicts = {};
+
+            createdBlocks.measureintervalsemitones.arg(logo, turtleIndex, "blkMeasure");
+
+            expect(logo.turtleDicts[turtleIndex]).toEqual({});
+        });
+
+        it("Dict present before measurement: logo.turtleDicts[turtle] is {a: 1} and should be deep cloned", () => {
+            logo.turtleHeaps = { [turtleIndex]: [] };
+            const originalDict = { a: 1 };
+            logo.turtleDicts = { [turtleIndex]: originalDict };
+
+            createdBlocks.measureintervalsemitones.arg(logo, turtleIndex, "blkMeasure");
+
+            expect(logo.turtleDicts[turtleIndex]).toEqual(originalDict);
+            expect(logo.turtleDicts[turtleIndex]).not.toBe(originalDict);
+        });
+    });
 });
