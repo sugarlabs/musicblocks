@@ -31,7 +31,7 @@ try {
    ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON, debugLog,
    ErrorHandler, ActivityContext,
    Boundary, CARTESIAN, changeImage, closeWidgets, doRecordButton, setupActivityRecorder,
-   setupGridController, setupGridRenderer, setupPluginController, setupToolbarController, setupAlertController, PluginDialog,
+   setupGridController, setupGridRenderer, setupPluginController, setupToolbarController, setupAlertController, setupAlertRenderer, PluginDialog,
    setupActivityAbcParser, setupActivityIdleWatcher,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
@@ -127,6 +127,7 @@ let MYDEFINES = [
     "activity/plugin-controller",
     "activity/toolbar-controller",
     "activity/alert-controller",
+    "activity/alert-renderer",
     "widgets/plugin-dialog",
     "utils/musicutils",
     "utils/synthutils",
@@ -468,6 +469,7 @@ class Activity {
         setupPluginController(this);
         setupToolbarController(this);
         setupAlertController(this);
+        setupAlertRenderer(this);
         this.pluginDialog = new PluginDialog({
             onLoadBuiltIn: name => this._loadBuiltInPlugin(name),
             onDelete: () => this._deletePlugin(),
@@ -2398,69 +2400,7 @@ class Activity {
          * @param {string} strokeColor - The stroke color of the message container.
          * @param {function} callback - The callback function assigned to the message container.
          * @param {number} y - The position on the canvas.
-         */
-        this._createMsgContainer = (fillColor, strokeColor, callback, y) => {
-            const container = new createjs.Container();
-            this.stage.addChild(container);
-            container.x = this.canvas.width / 2;
-            container.y = y;
-            container.visible = false;
 
-            const img = new Image();
-            const svgData = MSGBLOCK.replace("fill_color", fillColor).replace(
-                "stroke_color",
-                strokeColor
-            );
-
-            const that = this;
-
-            img.onload = () => {
-                const msgBlock = new createjs.Bitmap(img);
-                container.addChild(msgBlock);
-                const text = new createjs.Text("your message here", "20px Arial", "#000000");
-                container.addChild(text);
-                text.textAlign = "center";
-                text.textBaseline = "alphabetic";
-                text.x = 500;
-                text.y = 30;
-
-                const bounds = container.getBounds();
-                container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-
-                const hitArea = new createjs.Shape();
-                hitArea.graphics.beginFill("#FFF").drawRect(0, 0, 1000, 42);
-                hitArea.x = 0;
-                hitArea.y = 0;
-                container.hitArea = hitArea;
-
-                container.on("click", () => {
-                    container.visible = false;
-                    // On the possibility that there was an error
-                    // arrow associated with this container
-                    if (that.errorMsgArrow !== null) {
-                        that.errorMsgArrow.removeAllChildren(); // Hide the error arrow.
-                    }
-
-                    that.update = true;
-                });
-
-                callback(text);
-                that.msgText = text;
-            };
-
-            img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svgData));
-        };
-
-        /*
-         * Creates and renders error message containers with appropriate artwork.
-         * Some error messages have special artwork.
-         */
-        this._createErrorContainers = () => {
-            for (let i = 0; i < ERRORARTWORK.length; i++) {
-                const name = ERRORARTWORK[i];
-                this._makeErrorArtwork(name);
-            }
-        };
 
         /**
          * Initialize an idle watcher that throttles the application's framerate
@@ -2567,50 +2507,7 @@ class Activity {
         };
 
         /**
-         * Renders an error message with appropriate artwork.
-         * @param {string} name - The name specifying the SVG to be rendered.
-         */
-        this._makeErrorArtwork = name => {
-            const container = new createjs.Container();
-            this.stage.addChild(container);
-            container.x = this.canvas.width / 2;
-            container.y = 80;
-            this.errorArtwork[name] = container;
-            this.errorArtwork[name].name = name;
-            this.errorArtwork[name].visible = false;
 
-            const img = new Image();
-            img.onload = () => {
-                const artwork = new createjs.Bitmap(img);
-                container.addChild(artwork);
-                const text = new createjs.Text("", "20px Sans", "#000000");
-                container.addChild(text);
-                text.x = 70;
-                text.y = 10;
-
-                const bounds = container.getBounds();
-                container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-
-                const hitArea = new createjs.Shape();
-                hitArea.graphics.beginFill("#FFF").drawRect(0, 0, bounds.width, bounds.height);
-                hitArea.x = 0;
-                hitArea.y = 0;
-                container.hitArea = hitArea;
-
-                const that = this;
-                container.on("click", () => {
-                    container.visible = false;
-                    // On the possibility that there was an error
-                    // arrow associated with this container
-                    if (that.errorMsgArrow !== null && that.errorMsgArrow !== undefined) {
-                        that.errorMsgArrow.removeAllChildren(); // Hide the error arrow.
-                    }
-                    that.update = true;
-                });
-            };
-
-            img.src = "images/" + name + ".svg";
-        };
 
         /*
              Prepare a list of blocks for the search bar autocompletion.
@@ -4877,31 +4774,7 @@ class Activity {
         };
 
         /**
-         * Private helper to hide alert-related UI elements (DOM & canvas nodes).
-         * Avoids code duplication between timer-driven callbacks and manual hiding.
-         */
-        this._hideAlertUI = () => {
-            if (
-                this.errorMsgText === null ||
-                this.msgText === null ||
-                this.errorText === undefined ||
-                this.printText === undefined
-            ) {
-                return;
-            }
 
-            this.errorMsgText.parent.visible = false;
-            this.errorText.classList.remove("show");
-            this._hideArrows();
-
-            this.msgText.parent.visible = false;
-            this.printText.classList.remove("show");
-            for (const i in this.errorArtwork) {
-                this.errorArtwork[i].visible = false;
-            }
-
-            this.refreshCanvas();
-        };
 
         /*
          * Hides all message containers
@@ -4917,13 +4790,6 @@ class Activity {
             globalActivity._hideArrows();
         };
 
-        this._hideArrows = () => {
-            if (this.errorMsgArrow !== null) {
-                this.errorMsgArrow.removeAllChildren();
-                this.refreshCanvas();
-            }
-        };
-
         /**
          * Displays a text message on the screen.
          * @param {string|HTMLElement|DocumentFragment} msg - The message to display.
@@ -4936,50 +4802,11 @@ class Activity {
             }
 
             const showMsg = () => {
-                this.printText.classList.add("show");
-
-                // Clean container to avoid appending duplicate messages
-                this.printTextContent.replaceChildren();
-
-                if (typeof msg === "string") {
-                    if (msg.includes("<a") && msg.includes("</a>")) {
-                        // Safe parser for reload link
-                        try {
-                            const parser = new DOMParser();
-                            const doc = parser.parseFromString(msg, "text/html");
-                            const link = doc.querySelector("a");
-                            if (link) {
-                                const safeLink = document.createElement("a");
-                                safeLink.href = "#";
-                                safeLink.className = link.className || "language-link";
-                                safeLink.textContent = link.textContent;
-                                safeLink.style.cursor = "pointer";
-
-                                // Copy hover styles programmatically to avoid inline scripts
-                                safeLink.addEventListener("mouseover", () => {
-                                    safeLink.style.opacity = 0.5;
-                                });
-                                safeLink.addEventListener("mouseout", () => {
-                                    safeLink.style.opacity = 1;
-                                });
-
-                                this.printTextContent.appendChild(safeLink);
-                            } else {
-                                this.printTextContent.textContent = msg;
-                            }
-                        } catch (e) {
-                            this.printTextContent.textContent = msg;
-                        }
-                    } else {
-                        this.printTextContent.textContent = msg;
-                    }
-                } else if (msg instanceof HTMLElement || msg instanceof DocumentFragment) {
-                    this.printTextContent.appendChild(msg);
-                }
+                this.alertRenderer.showTextMsg(msg);
             };
 
             const hideMsg = () => {
-                this.printText.classList.remove("show");
+                this.alertRenderer.hideTextMsg();
             };
 
             if (this.alertController) {
@@ -5003,133 +4830,11 @@ class Activity {
             }
 
             const showMsg = () => {
-                this.errorMsgText.parent.visible = true;
-                if (
-                    blk !== undefined &&
-                    blk !== null &&
-                    blk in this.blocks.blockList &&
-                    !this.blocks.blockList[blk].collapsed
-                ) {
-                    const fromX = this.canvas.width / 2;
-                    const fromY = 128;
-                    const toX = this.blocks.blockList[blk].container.x + this.blocksContainer.x;
-                    const toY = this.blocks.blockList[blk].container.y + this.blocksContainer.y;
-
-                    if (this.errorMsgArrow === null) {
-                        this.errorMsgArrow = new createjs.Container();
-                        this.stage.addChild(this.errorMsgArrow);
-                    }
-
-                    const line = new createjs.Shape();
-                    this.errorMsgArrow.addChild(line);
-                    line.graphics
-                        .setStrokeStyle(4)
-                        .beginStroke("#ff0031")
-                        .moveTo(fromX, fromY)
-                        .lineTo(toX, toY);
-                    this.stage.setChildIndex(this.errorMsgArrow, this.stage.children.length - 1);
-
-                    const angle = (Math.atan2(toX - fromX, fromY - toY) / Math.PI) * 180;
-                    const head = new createjs.Shape();
-                    this.errorMsgArrow.addChild(head);
-                    head.graphics
-                        .setStrokeStyle(4)
-                        .beginStroke("#ff0031")
-                        .moveTo(-10, 18)
-                        .lineTo(0, 0)
-                        .lineTo(10, 18);
-                    head.x = toX;
-                    head.y = toY;
-                    head.rotation = angle;
-                }
-
-                switch (msg) {
-                    case NOMICERRORMSG:
-                        this.errorArtwork["nomicrophone"].visible = true;
-                        this.stage.setChildIndex(
-                            this.errorArtwork["nomicrophone"],
-                            this.stage.children.length - 1
-                        );
-                        break;
-                    case NOSTRINGERRORMSG:
-                        this.errorArtwork["notastring"].visible = true;
-                        this.stage.setChildIndex(
-                            this.errorArtwork["notastring"],
-                            this.stage.children.length - 1
-                        );
-                        break;
-                    case EMPTYHEAPERRORMSG:
-                        this.errorArtwork["emptyheap"].visible = true;
-                        this.stage.setChildIndex(
-                            this.errorArtwork["emptyheap"],
-                            this.stage.children.length - 1
-                        );
-                        break;
-                    case NOSQRTERRORMSG:
-                        this.errorArtwork["negroot"].visible = true;
-                        this.stage.setChildIndex(
-                            this.errorArtwork["negroot"],
-                            this.stage.children.length - 1
-                        );
-                        break;
-                    case NOACTIONERRORMSG:
-                        if (text === null) {
-                            text = "foo";
-                        }
-
-                        this.errorArtwork["nostack"].children[1].text = text;
-                        this.errorArtwork["nostack"].visible = true;
-                        this.errorArtwork["nostack"].updateCache();
-                        this.stage.setChildIndex(
-                            this.errorArtwork["nostack"],
-                            this.stage.children.length - 1
-                        );
-                        break;
-                    case NOBOXERRORMSG:
-                        if (text === null) {
-                            text = "foo";
-                        }
-
-                        this.errorArtwork["emptybox"].children[1].text = text;
-                        this.errorArtwork["emptybox"].visible = true;
-                        this.errorArtwork["emptybox"].updateCache();
-                        this.stage.setChildIndex(
-                            this.errorArtwork["emptybox"],
-                            this.stage.children.length - 1
-                        );
-                        break;
-                    case ZERODIVIDEERRORMSG:
-                        this.errorArtwork["zerodivide"].visible = true;
-                        this.stage.setChildIndex(
-                            this.errorArtwork["zerodivide"],
-                            this.stage.children.length - 1
-                        );
-                        break;
-                    case NANERRORMSG:
-                        this.errorArtwork["notanumber"].visible = true;
-                        this.stage.setChildIndex(
-                            this.errorArtwork["notanumber"],
-                            this.stage.children.length - 1
-                        );
-                        break;
-                    case NOINPUTERRORMSG:
-                        this.errorArtwork["noinput"].visible = true;
-                        this.stage.setChildIndex(
-                            this.errorArtwork["noinput"],
-                            this.stage.children.length - 1
-                        );
-                        break;
-                    default:
-                        // Show and populate errorText div
-                        this.errorText.classList.add("show");
-                        this.errorTextContent.textContent = msg;
-                        break;
-                }
-                this.refreshCanvas();
+                this.alertRenderer.showErrorMsg(msg, blk, text);
             };
 
             const hideMsg = () => {
-                this._hideAlertUI();
+                this.alertRenderer.hideErrorMsg();
             };
 
             if (this.alertController) {
