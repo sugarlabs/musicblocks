@@ -25,24 +25,24 @@ The structure of token names generally follows:
 
 **Key tokens (light-theme defaults):**
 
-| Token | Default | Purpose |
-|-------|---------|--------|
-| `--color-bg-primary` | `#ffffff` | Main background |
-| `--color-bg-secondary` | `#f3f4f6` | Secondary / elevated surfaces |
-| `--color-bg-tertiary` | `#e5e7eb` | Tertiary background |
-| `--color-text-primary` | `#1f2937` | Primary text |
-| `--color-text-secondary` | `#4b5563` | Secondary text |
-| `--color-text-inverse` | `#ffffff` | Text on dark backgrounds |
-| `--color-border-primary` | `#d1d5db` | Primary borders |
-| `--color-brand-primary` | `#3b82f6` | Brand accent colour |
-| `--color-brand-secondary` | `#8b5cf6` | Secondary accent colour |
-| `--color-success` | `#10b981` | Success state |
-| `--color-error` | `#ef4444` | Error state |
-| `--color-warning` | `#f59e0b` | Warning state |
-| `--spacing-md` | `1rem` | Standard spacing (16 px) |
-| `--radius-md` | `0.375rem` | Standard border radius |
-| `--shadow-md` | *(see file)* | Medium elevation shadow |
-| `--shadow-focus` | *(see file)* | Focus ring shadow |
+| Token                     | Default      | Purpose                       |
+| ------------------------- | ------------ | ----------------------------- |
+| `--color-bg-primary`      | `#ffffff`    | Main background               |
+| `--color-bg-secondary`    | `#f3f4f6`    | Secondary / elevated surfaces |
+| `--color-bg-tertiary`     | `#e5e7eb`    | Tertiary background           |
+| `--color-text-primary`    | `#1f2937`    | Primary text                  |
+| `--color-text-secondary`  | `#4b5563`    | Secondary text                |
+| `--color-text-inverse`    | `#ffffff`    | Text on dark backgrounds      |
+| `--color-border-primary`  | `#d1d5db`    | Primary borders               |
+| `--color-brand-primary`   | `#3b82f6`    | Brand accent colour           |
+| `--color-brand-secondary` | `#8b5cf6`    | Secondary accent colour       |
+| `--color-success`         | `#10b981`    | Success state                 |
+| `--color-error`           | `#ef4444`    | Error state                   |
+| `--color-warning`         | `#f59e0b`    | Warning state                 |
+| `--spacing-md`            | `1rem`       | Standard spacing (16 px)      |
+| `--radius-md`             | `0.375rem`   | Standard border radius        |
+| `--shadow-md`             | _(see file)_ | Medium elevation shadow       |
+| `--shadow-focus`          | _(see file)_ | Focus ring shadow             |
 
 > See `css/tokens.css` for the complete list, including `body.dark` and `body.highcontrast` overrides.
 

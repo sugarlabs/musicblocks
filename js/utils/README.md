@@ -177,7 +177,6 @@ Note: If you want to customise an existing theme, update the token values in `cs
     The design token system in `css/tokens.css` is the primary place for defining colour, spacing, and typography values. Component-level CSS files (`css/themes.css`, `planet/css/planetThemes.css`) reference these tokens using `var(--token-name)`.
 
     You have to add styling in the following places:
-
     1. css/tokens.css (central design token file)
        Add your theme's token overrides using a body class selector (e.g. `body.custom { --color-bg-primary: ...; }`). Use the existing `body.dark` and `body.highcontrast` blocks as templates.
 
