@@ -132,7 +132,8 @@ requirejs.config({
                 "activity/grid-renderer",
                 "activity/plugin-controller",
                 "widgets/plugin-dialog",
-                "activity/toolbar-controller"
+                "activity/toolbar-controller",
+                "activity/alert-controller"
             ],
             exports: "Activity"
         },
@@ -174,6 +175,7 @@ requirejs.config({
         "activity/grid-renderer": "js/activity/grid-renderer",
         "activity/plugin-controller": "js/activity/plugin-controller",
         "activity/toolbar-controller": "js/activity/toolbar-controller",
+        "activity/alert-controller": "js/activity/alert-controller",
         "easeljs.min": "lib/easeljs.min",
         "tweenjs.min": "lib/tweenjs.min",
         "prefixfree.min": "lib/prefixfree.min",
