@@ -408,10 +408,10 @@ const platformThemes = {
         aux: "#00CCCC",
         sub: "#00FFFF",
         doHeaderShadow: !platform.FF,
-        rule: "#FFFFFF",
-        ruleColor: "#FFFFFF",
+        rule: "#000000",
+        ruleColor: "#000000",
         trashColor: "#FFFFFF",
-        trashBorder: "#FFFFFF",
+        trashBorder: "#000000",
         trashActive: "#FF0000",
         background: "#000000",
         paletteSelected: "#111111",
@@ -531,15 +531,20 @@ const getSystemThemePreference = () => {
 // Use stored preference, or fallback to system preference
 const activeTheme = themePreference || getSystemThemePreference();
 
-// Set platformColor based on active theme
-if (platformThemes[activeTheme]) {
-    window.platformColor = platformThemes[activeTheme];
-} else {
-    window.platformColor = platformThemes["light"];
-}
+const syncPlatformColor = theme => {
+    const nextTheme = platformThemes[theme] ? theme : "light";
+    window.platformColor = platformThemes[nextTheme];
 
-const _themeMeta = document.querySelector("meta[name=theme-color]");
-if (_themeMeta) _themeMeta.content = platformColor.header;
+    const themeColorMeta = document.querySelector("meta[name=theme-color]");
+    if (themeColorMeta && window.platformColor) {
+        themeColorMeta.content = window.platformColor.header;
+    }
+
+    return window.platformColor;
+};
+
+window.syncPlatformColor = syncPlatformColor;
+syncPlatformColor(activeTheme);
 
 /**
  * @public
