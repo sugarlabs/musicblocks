@@ -279,14 +279,19 @@ class ThemeBox {
         this.refreshUIComponents();
 
         // Watch for OS-level theme changes at runtime.
-        // Auto-switch only when user has no manually saved preference.
+        // Auto-switch to match OS theme change at runtime.
         if (window.matchMedia) {
-            window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", e => {
-                if (!localStorage.getItem("themePreference")) {
-                    this._theme = e.matches ? "dark" : "light";
-                    this.applyThemeInstantly();
-                }
-            });
+            const mq = window.matchMedia("(prefers-color-scheme: dark)");
+
+            const handler = e => {
+                this._theme = e.matches ? "dark" : "light";
+                this.applyThemeInstantly();
+            };
+            if (typeof mq.addEventListener === "function") {
+                mq.addEventListener("change", handler);
+            } else if (typeof mq.addListener === "function") {
+                mq.addListener(handler);
+            }
         }
     }
 
@@ -297,6 +302,7 @@ class ThemeBox {
      */
     applyThemeInstantly() {
         const body = document.body;
+        body.style.background = "";
         // Update body classes
         this._themes.forEach(theme => {
             if (theme === this._theme) {
@@ -328,7 +334,7 @@ class ThemeBox {
         }
 
         // Update canvas background using theme config
-        const canvas = document.getElementById("canvas");
+        const canvas = document.getElementById("myCanvas") || document.getElementById("canvas");
         if (canvas) {
             canvas.style.backgroundColor = window.platformColor.background;
         }
