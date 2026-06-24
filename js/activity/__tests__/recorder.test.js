@@ -8,7 +8,7 @@ describe("recorder", () => {
 
         global.debugLog = jest.fn();
         global.ErrorHandler = { recoverable: jest.fn(), capture: jest.fn() };
-        global._ = jest.fn((s) => s);
+        global._ = jest.fn(s => s);
         global.console.warn = jest.fn();
 
         mockStart = {
@@ -23,20 +23,20 @@ describe("recorder", () => {
             setAttribute: jest.fn()
         };
 
-        jest.spyOn(document, 'getElementById').mockImplementation((id) => {
+        jest.spyOn(document, "getElementById").mockImplementation(id => {
             if (id === "record") return mockStart;
             if (id === "rec_inside") return mockRecInside;
             return null;
         });
 
-        jest.spyOn(document, 'createElement').mockImplementation(() => ({
+        jest.spyOn(document, "createElement").mockImplementation(() => ({
             href: "",
             download: "",
             click: jest.fn()
         }));
 
-        jest.spyOn(document.body, 'appendChild').mockImplementation(jest.fn());
-        jest.spyOn(document.body, 'removeChild').mockImplementation(jest.fn());
+        jest.spyOn(document.body, "appendChild").mockImplementation(jest.fn());
+        jest.spyOn(document.body, "removeChild").mockImplementation(jest.fn());
 
         global.window = { MBDialog: null, prompt: jest.fn(() => "my-recording") };
         global.URL = {
@@ -52,10 +52,7 @@ describe("recorder", () => {
             constructor(parts, options) {
                 this._parts = parts || [];
                 this.type = options?.type || "";
-                this.size = this._parts.reduce(
-                    (acc, p) => acc + (p.size || p.length || 1),
-                    0
-                );
+                this.size = this._parts.reduce((acc, p) => acc + (p.size || p.length || 1), 0);
             }
         };
         global.MediaRecorder = class MockMediaRecorder {
@@ -147,9 +144,7 @@ describe("recorder", () => {
             doRecordButton(instance);
 
             // recording() adds a click handler to the start element
-            const clickCalls = mockStart.addEventListener.mock.calls.filter(
-                (c) => c[0] === "click"
-            );
+            const clickCalls = mockStart.addEventListener.mock.calls.filter(c => c[0] === "click");
             expect(clickCalls.length).toBeGreaterThan(0);
             expect(typeof clickCalls[0][1]).toBe("function");
 
@@ -206,9 +201,7 @@ describe("recorder", () => {
             doRecordButton(instance);
 
             // Grab the click handler that recording() registered
-            const clickCalls = mockStart.addEventListener.mock.calls.filter(
-                (c) => c[0] === "click"
-            );
+            const clickCalls = mockStart.addEventListener.mock.calls.filter(c => c[0] === "click");
             expect(clickCalls.length).toBeGreaterThan(0);
         });
 
@@ -230,7 +223,7 @@ describe("recorder", () => {
 
             // Verify track.stop is callable (cleanupStreams calls track.stop on each track)
             const tracks = [mockTrack1, mockTrack2];
-            tracks.forEach((t) => t.stop());
+            tracks.forEach(t => t.stop());
             expect(mockTrack1.stop).toHaveBeenCalled();
             expect(mockTrack2.stop).toHaveBeenCalled();
         });
@@ -251,7 +244,7 @@ describe("recorder", () => {
         it("stops stream tracks when stream exists", () => {
             const mockTrack = { stop: jest.fn() };
             const mockStream = { getTracks: () => [mockTrack] };
-            mockStream.getTracks().forEach((t) => t.stop());
+            mockStream.getTracks().forEach(t => t.stop());
             expect(mockTrack.stop).toHaveBeenCalled();
         });
     });
