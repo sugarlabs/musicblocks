@@ -286,6 +286,145 @@ describe("TimbreWidget", () => {
         });
     });
 
+    describe("timer fallback without ManagedTimer", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+            timbre._timerManager = null;
+        });
+
+        test("_setWidgetTimeout tracks the timeout and runs the callback, then stops tracking it", () => {
+            const callback = jest.fn();
+
+            const id = timbre._setWidgetTimeout(callback, 500);
+            expect(timbre._activeTimeouts.has(id)).toBe(true);
+
+            jest.advanceTimersByTime(500);
+
+            expect(callback).toHaveBeenCalledTimes(1);
+            expect(timbre._activeTimeouts.has(id)).toBe(false);
+        });
+
+        test("_clearWidgetTimeout returns false for null or undefined ids", () => {
+            expect(timbre._clearWidgetTimeout(null)).toBe(false);
+            expect(timbre._clearWidgetTimeout(undefined)).toBe(false);
+        });
+
+        test("_clearWidgetTimeout cancels a tracked timeout before it fires", () => {
+            const callback = jest.fn();
+            const id = timbre._setWidgetTimeout(callback, 500);
+
+            expect(timbre._clearWidgetTimeout(id)).toBe(true);
+            expect(timbre._activeTimeouts.has(id)).toBe(false);
+
+            jest.advanceTimersByTime(500);
+            expect(callback).not.toHaveBeenCalled();
+        });
+
+        test("_clearWidgetTimeout returns false for an untracked id", () => {
+            expect(timbre._clearWidgetTimeout(999999)).toBe(false);
+        });
+
+        test("_clearWidgetTimers cancels tracked timeouts, resets the preview id, and returns the count", () => {
+            timbre._setWidgetTimeout(jest.fn(), 500);
+            timbre._setWidgetTimeout(jest.fn(), 700);
+            timbre._previewTimerId = 123;
+
+            const count = timbre._clearWidgetTimers();
+
+            expect(count).toBe(2);
+            expect(timbre._activeTimeouts.size).toBe(0);
+            expect(timbre._previewTimerId).toBeNull();
+        });
+    });
+
+    describe("timer delegation to ManagedTimer", () => {
+        test("_setWidgetTimeout delegates to the timer manager", () => {
+            const callback = jest.fn();
+            timbre._timerManager = {
+                setTimeout: jest.fn().mockReturnValue(42),
+                clearAll: jest.fn().mockReturnValue(0)
+            };
+
+            expect(timbre._setWidgetTimeout(callback, 500)).toBe(42);
+            expect(timbre._timerManager.setTimeout).toHaveBeenCalledWith(callback, 500);
+        });
+
+        test("_clearWidgetTimeout returns true when the manager clears the timeout", () => {
+            timbre._timerManager = {
+                clearTimeout: jest.fn().mockReturnValue(true),
+                clearAll: jest.fn().mockReturnValue(0)
+            };
+
+            expect(timbre._clearWidgetTimeout(5)).toBe(true);
+            expect(timbre._timerManager.clearTimeout).toHaveBeenCalledWith(5);
+        });
+    });
+
+    describe("_changeBlock synth-swap branches", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+            timbre.AMSynthesizer = [];
+            timbre.FMSynthesizer = [];
+            timbre.duoSynthesizer = [];
+        });
+
+        test("replaces the most recent FM block when switching away from FMSynth", () => {
+            timbre.FMSynthesizer = [9];
+            jest.spyOn(timbre, "_blockReplace").mockImplementation();
+
+            timbre._changeBlock(8, "AMSynth", null);
+            jest.advanceTimersByTime(500);
+
+            expect(timbre._blockReplace).toHaveBeenCalledWith(9, 8);
+            expect(timbre.FMSynthesizer).toEqual([]);
+        });
+
+        test("replaces the most recent DuoSynth block when switching away from DuoSynth", () => {
+            timbre.duoSynthesizer = [7];
+            jest.spyOn(timbre, "_blockReplace").mockImplementation();
+
+            timbre._changeBlock(8, "AMSynth", null);
+            jest.advanceTimersByTime(500);
+
+            expect(timbre._blockReplace).toHaveBeenCalledWith(7, 8);
+            expect(timbre.duoSynthesizer).toEqual([]);
+        });
+
+        test("connects two children when choosing FMSynth with no existing synths", () => {
+            jest.spyOn(timbre, "blockConnection").mockImplementation();
+
+            timbre._changeBlock(8, "FMSynth", 99);
+            jest.advanceTimersByTime(500);
+
+            expect(timbre.blockConnection).toHaveBeenCalledWith(2, 99);
+        });
+
+        test("connects three children for any other synth with no existing synths", () => {
+            jest.spyOn(timbre, "blockConnection").mockImplementation();
+
+            timbre._changeBlock(8, "DuoSynth", 99);
+            jest.advanceTimersByTime(500);
+
+            expect(timbre.blockConnection).toHaveBeenCalledWith(3, 99);
+        });
+    });
+
+    describe("_setDuoSynthParamVals", () => {
+        test("stores the absolute vibrato rate and the amount as a fraction", () => {
+            timbre._setDuoSynthParamVals(5, 50);
+
+            expect(timbre.duoSynthParamVals.vibratoRate).toBe(5);
+            expect(timbre.duoSynthParamVals.vibratoAmount).toBe(0.5);
+        });
+
+        test("normalizes negative inputs to their absolute values", () => {
+            timbre._setDuoSynthParamVals(-5, -50);
+
+            expect(timbre.duoSynthParamVals.vibratoRate).toBe(5);
+            expect(timbre.duoSynthParamVals.vibratoAmount).toBe(0.5);
+        });
+    });
+
     describe("synth parameters", () => {
         test("should allow updating synthVals envelope", () => {
             timbre.synthVals.envelope.attack = 0.1;
