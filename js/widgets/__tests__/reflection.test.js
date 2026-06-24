@@ -451,11 +451,15 @@ describe("ReflectionMatrix", () => {
         });
 
         test("generateAnalysis catches errors", async () => {
+            const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
             global.fetch.mockRejectedValue(new Error("Net Error"));
 
             const data = await reflection.generateAnalysis();
 
             expect(data).toEqual({ error: "Failed to send message" });
+            expect(consoleSpy).toHaveBeenCalled();
+
+            consoleSpy.mockRestore();
         });
 
         test("sendMessage skips if input is empty", () => {
