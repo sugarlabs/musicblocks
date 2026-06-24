@@ -1656,62 +1656,6 @@ function LegoWidget() {
     };
 
     /**
-     * Converts RGB values to a named color category with improved accuracy.
-     * @private
-     */
-    this._getColorFamily = function (r, g, b) {
-        const hsl = this._rgbToHsl(r, g, b);
-        const [hue, saturation, lightness] = hsl;
-
-        // Simple and accurate color detection
-
-        // Handle very dark colors first
-        if (lightness < 15) {
-            return { name: "black", hue: hue, saturation: saturation, lightness: lightness };
-        }
-
-        // Handle grayscale colors (low saturation) - keep it simple
-        if (saturation < 20) {
-            if (lightness > 85)
-                return { name: "white", hue: hue, saturation: saturation, lightness: lightness };
-            if (lightness < 25)
-                return { name: "black", hue: hue, saturation: saturation, lightness: lightness };
-            return { name: "gray", hue: hue, saturation: saturation, lightness: lightness };
-        }
-
-        // Improved hue-based detection with clear boundaries to prevent orange/purple confusion
-        let colorName = "unknown";
-
-        if (hue >= 345 || hue < 15) {
-            colorName = "red";
-        } else if (hue >= 15 && hue < 45) {
-            // Orange range - key fix for orange/purple confusion
-            colorName = "orange";
-        } else if (hue >= 45 && hue < 75) {
-            colorName = "yellow";
-        } else if (hue >= 75 && hue < 165) {
-            colorName = "green";
-        } else if (hue >= 165 && hue < 195) {
-            colorName = "cyan";
-        } else if (hue >= 195 && hue < 255) {
-            colorName = "blue";
-        } else if (hue >= 255 && hue < 285) {
-            // Purple range - separated clearly from orange
-            colorName = "purple";
-        } else if (hue >= 285 && hue < 315) {
-            colorName = "magenta";
-        } else if (hue >= 315 && hue < 345) {
-            colorName = "pink";
-        }
-
-        return {
-            name: colorName,
-            hue: hue,
-            saturation: saturation,
-            lightness: lightness
-        };
-    };
-    /**
      * Gets color family from HSL values
      * @private
      * @param {number} h - Hue (0-360)
@@ -1740,30 +1684,6 @@ function LegoWidget() {
         if (h >= 315 && h < 345) return { name: "pink", hue: 330 };
 
         return { name: "unknown", hue: h };
-    };
-
-    /**
-     * Gets color family by name with simple mapping.
-     * @private
-     * @param {string} colorName - The color name
-     * @returns {object} Color family object
-     */
-    this._getColorFamilyByName = function (colorName) {
-        const colorFamilies = {
-            red: { name: "red", hue: 0, saturation: 80, lightness: 50 },
-            orange: { name: "orange", hue: 30, saturation: 80, lightness: 50 },
-            yellow: { name: "yellow", hue: 60, saturation: 80, lightness: 50 },
-            green: { name: "green", hue: 120, saturation: 80, lightness: 50 },
-            cyan: { name: "cyan", hue: 180, saturation: 80, lightness: 50 },
-            blue: { name: "blue", hue: 240, saturation: 80, lightness: 50 },
-            purple: { name: "purple", hue: 270, saturation: 80, lightness: 50 },
-            magenta: { name: "magenta", hue: 300, saturation: 80, lightness: 50 },
-            pink: { name: "pink", hue: 330, saturation: 70, lightness: 75 },
-            white: { name: "white", hue: 0, saturation: 0, lightness: 95 },
-            gray: { name: "gray", hue: 0, saturation: 5, lightness: 50 },
-            black: { name: "black", hue: 0, saturation: 0, lightness: 5 }
-        };
-        return colorFamilies[colorName] || null;
     };
 
     /**
