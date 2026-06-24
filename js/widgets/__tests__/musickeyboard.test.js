@@ -362,13 +362,14 @@ describe("MusicKeyboard core logic", () => {
                 20: { connections: [10, null] }
             };
             const sendStackToTrash = jest.fn();
+            const adjustDocks = jest.fn();
             const refreshCanvas = jest.fn();
-            keyboard.blockNo = 10;
+            keyboard.blockNo = 2;
             keyboard.activity = {
                 blocks: {
                     blockList,
                     sendStackToTrash,
-                    adjustDocks: jest.fn(),
+                    adjustDocks,
                     clampBlocksToCheck: []
                 },
                 refreshCanvas
@@ -380,7 +381,8 @@ describe("MusicKeyboard core logic", () => {
             expect(blockList[20].connections[0]).toBe(2);
             expect(blockList[10].connections[2]).toBeNull();
             expect(sendStackToTrash).toHaveBeenCalledWith(blockList[10]);
-            expect(keyboard.activity.blocks.clampBlocksToCheck).toEqual([[10, 0]]);
+            expect(adjustDocks).toHaveBeenCalledWith(2, true);
+            expect(keyboard.activity.blocks.clampBlocksToCheck).toEqual([[2, 0]]);
             expect(refreshCanvas).toHaveBeenCalled();
         });
     });
