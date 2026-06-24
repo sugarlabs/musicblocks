@@ -162,6 +162,7 @@ describe("setupActivityIdleWatcher", () => {
 
             expect(mockActivity.isAppIdle).toBe(false);
             expect(global.createjs.Ticker.framerate).toBe(60);
+            expect(mockActivity.stageDirty).toBe(true);
         });
     });
 
@@ -239,6 +240,17 @@ describe("setupActivityIdleWatcher", () => {
             expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(testError, {
                 operation: "autoSave"
             });
+        });
+
+        it("does not throw when saveLocally is null", () => {
+            setupActivityIdleWatcher(mockActivity);
+            mockActivity.saveLocally = null;
+            mockActivity._initAutoSave();
+
+            jest.advanceTimersByTime(5 * 60 * 1000);
+
+            // Should not crash and ErrorHandler should not be called
+            expect(global.ErrorHandler.recoverable).not.toHaveBeenCalled();
         });
     });
 
