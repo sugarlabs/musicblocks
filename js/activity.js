@@ -2590,6 +2590,10 @@ class Activity {
                 container.addChild(text);
                 text.x = 70;
                 text.y = 10;
+                container.messageText = text;
+                const detailText = new createjs.Text("", "bold 16px Sans", "#ff0000");
+                container.addChild(detailText);
+                container.detailText = detailText;
 
                 const bounds = container.getBounds();
                 container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
@@ -5094,7 +5098,39 @@ class Activity {
                     );
                     break;
                 case NOINPUTERRORMSG:
+                    if (
+                        !this.errorArtwork["noinput"].messageText ||
+                        !this.errorArtwork["noinput"].detailText
+                    ) {
+                        break;
+                    }
+
+                    this.errorArtwork["noinput"].messageText.text = _(NOINPUTERRORMSG);
+                    this.errorArtwork["noinput"].detailText.text = "";
+                    if (
+                        blk !== undefined &&
+                        blk !== null &&
+                        blk in this.blocks.blockList &&
+                        this.blocks.blockList[blk].protoblock.staticLabels.length > 0
+                    ) {
+                        const blockLabel = this.blocks.blockList[blk].protoblock.staticLabels[0];
+                        const shortLabel =
+                            blockLabel.length > 8 ? blockLabel.substr(0, 8) + "..." : blockLabel;
+                        this.errorArtwork["noinput"].detailText.text = shortLabel;
+                    }
+                    this.errorArtwork["noinput"].messageText.font = "16px Sans";
+                    this.errorArtwork["noinput"].messageText.color = "#ff0000";
+                    this.errorArtwork["noinput"].messageText.x = 170;
+                    this.errorArtwork["noinput"].messageText.y = 13;
+                    this.errorArtwork["noinput"].detailText.font = "bold 16px Sans";
+                    this.errorArtwork["noinput"].detailText.color = "#ff0000";
+                    this.errorArtwork["noinput"].detailText.x =
+                        this.errorArtwork["noinput"].messageText.x +
+                        this.errorArtwork["noinput"].messageText.getMeasuredWidth() +
+                        5;
+                    this.errorArtwork["noinput"].detailText.y = 13;
                     this.errorArtwork["noinput"].visible = true;
+                    this.errorArtwork["noinput"].updateCache();
                     this.stage.setChildIndex(
                         this.errorArtwork["noinput"],
                         this.stage.children.length - 1
