@@ -6902,6 +6902,7 @@ if (typeof module !== "undefined" && module.exports) {
         nthDegreeToPitch,
         getInterval,
         _calculate_pitch_number,
+        _parse_pitch_string,
         _getStepSize,
         reducedFraction,
         toFraction,
