@@ -567,8 +567,10 @@ class ReflectionMatrix {
         this.hideTypingIndicator();
         if (data) {
             this.botReplyDiv(data, false, true);
+            if (!data.error) {
+                await this.saveReport(data);
+            }
         }
-        await this.saveReport(data);
     }
 
     /**
