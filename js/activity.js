@@ -3165,6 +3165,11 @@ class Activity {
                             this.stageDirty = true;
                         }
                 }
+            } else if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.code === "KeyF") {
+                if (!disableKeys) {
+                    event.preventDefault();
+                    this.showSearchWidget();
+                }
             } else if (event.ctrlKey) {
                 switch (event.keyCode) {
                     case V:
