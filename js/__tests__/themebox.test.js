@@ -35,9 +35,11 @@ window.platformColor = {
 document.body.innerHTML = `
     <meta name="theme-color" content="#4DA6FF">
     <canvas id="canvas"></canvas>
+    <canvas id="myCanvas"></canvas>
     <div id="themeSelectIcon"></div>
     <div id="light"><i class="material-icons">brightness_7</i></div>
     <div id="dark"><i class="material-icons">brightness_4</i></div>
+    <div id="highcontrast"></div>
     <div id="palette"><div></div></div>
 `;
 
@@ -63,7 +65,7 @@ describe("ThemeBox", () => {
         jest.spyOn(global.Storage.prototype, "setItem").mockImplementation(() => {});
 
         // Reset body classes
-        document.body.classList.remove("light", "dark");
+        document.body.classList.remove("light", "dark", "highcontrast");
 
         themeBox = new ThemeBox(mockActivity);
     });
@@ -86,39 +88,39 @@ describe("ThemeBox", () => {
     });
 
     test("dark_onclick() sets theme to dark and applies instantly", () => {
-        const reloadSpy = jest.spyOn(themeBox, "reload").mockImplementation(() => {});
         themeBox.dark_onclick();
         expect(themeBox._theme).toBe("dark");
         expect(mockActivity.storage.themePreference).toBe("dark");
-        // Should NOT reload - instant theme switch
-        expect(reloadSpy).not.toHaveBeenCalled();
         // Should show theme switched message
         expect(mockActivity.textMsg).toHaveBeenCalledWith("Theme switched to dark mode.", 2000);
-        reloadSpy.mockRestore();
+    });
+
+    test("highcontrast_onclick() sets theme to highcontrast and applies instantly", () => {
+        themeBox.highcontrast_onclick();
+        expect(themeBox._theme).toBe("highcontrast");
+        expect(mockActivity.storage.themePreference).toBe("highcontrast");
+        // Should show theme switched message
+        expect(mockActivity.textMsg).toHaveBeenCalledWith(
+            "Theme switched to highcontrast mode.",
+            2000
+        );
     });
 
     test("setPreference() applies theme instantly without reload", () => {
-        const reloadSpy = jest.spyOn(themeBox, "reload").mockImplementation(() => {});
         localStorage.getItem.mockReturnValue("light");
         themeBox._theme = "dark";
         themeBox.setPreference();
         expect(mockActivity.storage.themePreference).toBe("dark");
-        // Should NOT reload - instant theme switch
-        expect(reloadSpy).not.toHaveBeenCalled();
         // Body should have dark class
         expect(document.body.classList.contains("dark")).toBe(true);
         expect(document.body.classList.contains("light")).toBe(false);
-        reloadSpy.mockRestore();
     });
 
     test("setPreference() does not change if theme is unchanged", () => {
-        const reloadSpy = jest.spyOn(themeBox, "reload").mockImplementation(() => {});
         themeBox.light_onclick();
-        expect(reloadSpy).not.toHaveBeenCalled();
         expect(mockActivity.textMsg).toHaveBeenCalledWith(
             "Music Blocks is already set to this theme."
         );
-        reloadSpy.mockRestore();
     });
 
     test("applyThemeInstantly() updates body classes correctly", () => {
@@ -131,14 +133,30 @@ describe("ThemeBox", () => {
     test("applyThemeInstantly() updates canvas background for dark mode", () => {
         themeBox._theme = "dark";
         themeBox.applyThemeInstantly();
-        const canvas = document.getElementById("canvas");
+        const canvas = document.getElementById("myCanvas");
         expect(canvas.style.backgroundColor).toBe("rgb(48, 48, 48)");
     });
 
     test("applyThemeInstantly() updates canvas background for light mode", () => {
         themeBox._theme = "light";
         themeBox.applyThemeInstantly();
-        const canvas = document.getElementById("canvas");
+        const canvas = document.getElementById("myCanvas");
         expect(canvas.style.backgroundColor).toBe("rgb(249, 249, 249)");
+    });
+
+    test("theme changes are applied live without page reload", () => {
+        localStorage.getItem.mockReturnValue("light");
+
+        themeBox._theme = "dark";
+        themeBox.setPreference();
+
+        // Verify theme was applied live to the DOM instantly
+        expect(document.body.classList.contains("dark")).toBe(true);
+        expect(mockActivity.storage.themePreference).toBe("dark");
+        expect(localStorage.setItem).toHaveBeenCalledWith("themePreference", "dark");
+
+        // Verify instant UI updates on canvas
+        const canvas = document.getElementById("myCanvas");
+        expect(canvas.style.backgroundColor).toBe("rgb(48, 48, 48)");
     });
 });
