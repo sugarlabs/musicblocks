@@ -49,6 +49,7 @@ class PitchStaircase {
         this._stepTables = [];
         this._musicRatio1 = null;
         this._musicRatio2 = null;
+        this._currentPlayingIndex = -1;
     }
 
     /**
@@ -118,6 +119,10 @@ class PitchStaircase {
                 PitchStaircase.ICONSIZE,
                 _("Play")
             );
+
+            const playImg = playCell.querySelector("img");
+            playCell.icon = playImg;
+
             playCell.className = "headcol"; // This cell is fixed horizontally.
             playCell.setAttribute("id", i);
             playCell.style.cursor = "pointer";
@@ -301,14 +306,40 @@ class PitchStaircase {
      * @returns {void}
      */
     _playOne(stepCell) {
-        // The frequency is stored in the stepCell.
         stepCell.classList.add("active");
+    
+        const index = Number(stepCell.parentElement.querySelector("td").id);
+    
+        if (this._currentPlayingIndex !== -1) {
+            const prevCell = this._stepTables[this._currentPlayingIndex].rows[0].cells[0];
+            const prevImg = prevCell.querySelector("img");
+            if (prevImg) {
+                prevImg.src = "header-icons/play-button.svg";
+            }
+        }
+    
+        this._currentPlayingIndex = index;
+    
+        const playCell = stepCell.parentElement.querySelector("td");
+        const img = playCell.querySelector("img");
+    
+        if (img) {
+            img.src = "header-icons/stop-button.svg";
+        }
+    
         const frequency = Number(stepCell.getAttribute("id"));
+    
         this.activity.logo.synth.trigger(0, frequency, 1, DEFAULTVOICE, null, null);
-
+    
         setTimeout(() => {
             stepCell.classList.remove("active");
-        }, 1000);
+    
+            if (img) {
+                img.src = "header-icons/play-button.svg";
+            }
+    
+            this._currentPlayingIndex = -1;
+        }, 1200);
     }
 
     /**
