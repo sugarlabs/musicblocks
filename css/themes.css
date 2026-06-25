@@ -127,7 +127,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 .dark #helpfulSearch,
 .dark .ui-autocomplete {
     background-color: var(--color-bg-primary) !important;
-    color: var(--color-text-inverse) !important;
+    color: var(--color-text-primary) !important;
     border-color: var(--color-border-primary) !important;
 }
 
@@ -135,7 +135,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 .dark .ui-autocomplete .ui-menu-item,
 .dark .ui-autocomplete .ui-menu-item a,
 .dark .ui-autocomplete .ui-menu-item .ui-menu-item-wrapper {
-    color: var(--color-text-inverse) !important;
+    color: var(--color-text-primary) !important;
     background-color: transparent !important;
 }
 
@@ -146,7 +146,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 .dark .ui-autocomplete .ui-state-focus,
 .dark .ui-autocomplete .ui-state-active {
     background-color: var(--color-bg-tertiary) !important;
-    color: var(--color-text-inverse) !important;
+    color: var(--color-text-primary) !important;
 }
 
 .dark #helpfulSearchDiv {
@@ -154,7 +154,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .dark #crossButton {
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .dark #chooseKeyDiv {
@@ -512,11 +512,11 @@ body.highcontrast {
 }
 
 .highcontrast .blue {
-    background-color: var(--color-text-inverse)080 !important;
+    background-color: var(--color-text-inverse) 080 !important;
 }
 
 .highcontrast .blue.darken-1 {
-    background-color: var(--color-text-inverse)0ff !important;
+    background-color: var(--color-text-inverse) 0ff !important;
 }
 
 .highcontrast #floatingWindows > .windowFrame {
@@ -566,28 +566,34 @@ body.highcontrast {
 .highcontrast #search,
 .highcontrast #helpfulSearch,
 .highcontrast .ui-autocomplete {
-    background-color: var(--color-text-inverse) !important;
-    color: var(--color-text-inverse) !important;
+    background-color: var(--color-bg-primary) !important;
+    color: var(--color-text-primary) !important;
     border: 1px solid #ffffff;
 }
 
-.highcontrast .ui-autocomplete .ui-menu-item a {
-    color: var(--color-text-inverse) !important;
-    background-color: var(--color-text-inverse) !important;
+.highcontrast .ui-autocomplete .ui-menu-item,
+.highcontrast .ui-autocomplete .ui-menu-item a,
+.highcontrast .ui-autocomplete .ui-menu-item .ui-menu-item-wrapper {
+    color: var(--color-text-primary) !important;
+    background-color: transparent !important;
 }
 
-.highcontrast .ui-autocomplete .ui-menu-item a:hover {
+.highcontrast .ui-autocomplete .ui-menu-item:hover,
+.highcontrast .ui-autocomplete .ui-menu-item:hover a,
+.highcontrast .ui-autocomplete .ui-menu-item:hover .ui-menu-item-wrapper,
+.highcontrast .ui-autocomplete .ui-state-focus,
+.highcontrast .ui-autocomplete .ui-state-active {
     color: var(--color-text-primary) !important;
     background-color: var(--color-brand-secondary) !important;
 }
 
 .highcontrast #helpfulSearchDiv {
-    color: var(--color-text-inverse) !important;
+    color: var(--color-text-primary) !important;
     background-color: transparent !important;
 }
 
 .highcontrast #crossButton {
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast #chooseKeyDiv {
