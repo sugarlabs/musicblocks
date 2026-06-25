@@ -494,18 +494,17 @@ class Toolbar {
             }
         }
 
-        // Named handler to prevent memory leak from duplicate listeners
+        // Named handler attached once outside tempClick so repeated play
+        // clicks do not accumulate stop-button listeners (fixes #5099).
         const stopClickHandler = () => {
             clearTimeout(play_button_debounce_timeout);
             isPlayIconRunning = true;
             this.activity.hideMsgs();
             handleClick();
         };
+        stopIcon.addEventListener("click", stopClickHandler);
 
         var tempClick = (playIcon.onclick = () => {
-            const hideMsgs = () => {
-                this.activity.hideMsgs();
-            };
             isPlayIconRunning = false;
             onclick(this.activity);
             handleClick();
@@ -519,10 +518,6 @@ class Toolbar {
             play_button_debounce_timeout = setTimeout(function () {
                 handleClick();
             }, 2000);
-
-            // Remove existing listener before adding to prevent accumulation
-            stopIcon.removeEventListener("click", stopClickHandler);
-            stopIcon.addEventListener("click", stopClickHandler);
         });
     }
 
