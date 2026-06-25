@@ -1635,7 +1635,9 @@ class Activity {
                 const stopBtn = document.getElementById("stop");
                 if (stopBtn) {
                     stopBtn.style.display = "inline-block";
-                    stopBtn.style.color = window.platformColor.stopIconcolor;
+                    stopBtn.style.color = getComputedStyle(document.body)
+                        .getPropertyValue("--mb-stop-icon-color")
+                        .trim();
                 }
             } else {
                 if (currentDelay === 0) {
@@ -1647,7 +1649,9 @@ class Activity {
                     setTimeout(() => {
                         const stopBtnDelay = document.getElementById("stop");
                         if (stopBtnDelay) {
-                            stopBtnDelay.style.color = window.platformColor.stopIconcolor;
+                            stopBtnDelay.style.color = getComputedStyle(document.body)
+                                .getPropertyValue("--mb-stop-icon-color")
+                                .trim();
                         }
                     }, 500);
                 }
@@ -3101,7 +3105,9 @@ class Activity {
                         // 'R or ENTER'
                         this.textMsg("Alt-R " + _("Play"));
                         if (stopbtn) {
-                            stopbtn.style.color = platformColor.stopIconcolor;
+                            stopbtn.style.color = getComputedStyle(document.body)
+                                .getPropertyValue("--mb-stop-icon-color")
+                                .trim();
                         }
                         this._doFastButton();
                         break;
@@ -3127,7 +3133,9 @@ class Activity {
                             this._doHardStopButton();
                         } else if (!hasOpenWidget) {
                             if (stopbtn) {
-                                stopbtn.style.color = platformColor.stopIconcolor;
+                                stopbtn.style.color = getComputedStyle(document.body)
+                                    .getPropertyValue("--mb-stop-icon-color")
+                                    .trim();
                             }
                             this._doFastButton();
                         }
@@ -3207,7 +3215,9 @@ class Activity {
                     } else if (!disableKeys && !hasOpenWidget) {
                         event.preventDefault();
                         if (stopbtn) {
-                            stopbtn.style.color = platformColor.stopIconcolor;
+                            stopbtn.style.color = getComputedStyle(document.body)
+                                .getPropertyValue("--mb-stop-icon-color")
+                                .trim();
                         }
                         this._doFastButton();
                     }
@@ -3349,7 +3359,9 @@ class Activity {
                                 event.preventDefault();
                                 const stopbtn = document.getElementById("stop");
                                 if (stopbtn) {
-                                    stopbtn.style.color = platformColor.stopIconcolor;
+                                    stopbtn.style.color = getComputedStyle(document.body)
+                                        .getPropertyValue("--mb-stop-icon-color")
+                                        .trim();
                                 }
                                 this._doFastButton();
                             }
