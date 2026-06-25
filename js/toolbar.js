@@ -484,6 +484,20 @@ class Toolbar {
             }
         });
         let isPlayIconRunning = false;
+        const speakToolbarLabel = label => {
+            if (!label) return;
+            if (!("speechSynthesis" in window)) return;
+            if (window.__wheelnavA11ySpeakEnabled === false) return;
+            try {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(label);
+                utterance.rate = 1;
+                utterance.pitch = 1;
+                window.speechSynthesis.speak(utterance);
+            } catch {
+                // Ignore speech synthesis errors
+            }
+        };
 
         function handleClick() {
             if (!isPlayIconRunning) {
@@ -507,6 +521,7 @@ class Toolbar {
                 this.activity.hideMsgs();
             };
             isPlayIconRunning = false;
+            speakToolbarLabel(_("Play"));
             onclick(this.activity);
             handleClick();
             stopIcon.style.color = this.stopIconColorWhenPlaying;
@@ -546,6 +561,17 @@ class Toolbar {
             }
         });
         stopIcon.onclick = () => {
+            if ("speechSynthesis" in window && window.__wheelnavA11ySpeakEnabled !== false) {
+                try {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(_("Stop"));
+                    utterance.rate = 1;
+                    utterance.pitch = 1;
+                    window.speechSynthesis.speak(utterance);
+                } catch {
+                    // Ignore speech synthesis errors
+                }
+            }
             onclick(this.activity);
             stopIcon.style.color = "white";
             saveButton.disabled = false;
