@@ -67,9 +67,15 @@ const loadActivityClass = () => {
         setupActivityIdleWatcher: jest.fn(),
         setupPluginController: jest.fn(),
         setupToolbarController: jest.fn(),
+        setupAlertController: jest.fn(),
+        setupAlertRenderer: jest.fn(),
         hideDOMLabel: jest.fn(),
         setupActivityRecorder: jest.fn(),
         setupActivityAbcParser: jest.fn(),
+        AlertController: {
+            MSG_TIMEOUT: 60000,
+            ERROR_MSG_TIMEOUT: 15000
+        },
         performance: global.performance || { now: () => Date.now() },
         platformColor: { stopIconcolor: "red" },
         globalActivity: null,

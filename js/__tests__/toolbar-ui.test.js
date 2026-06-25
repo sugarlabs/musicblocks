@@ -11,10 +11,10 @@
 
 "use strict";
 
-const { platformColor } = require("../../utils/platformstyle");
+const { platformColor } = require("../utils/platformstyle");
 global.platformColor = platformColor;
 
-jest.mock("../../utils/platformstyle", () => ({
+jest.mock("../utils/platformstyle", () => ({
     platformColor: { stopIconColor: "#ea174c" }
 }));
 
