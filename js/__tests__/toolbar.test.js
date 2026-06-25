@@ -1544,9 +1544,9 @@ describe("FocusCycleManager", () => {
 });
 
 describe("toolbar.js compatibility shim", () => {
-    test("shim re-exports the same class as widgets/toolbar-ui", () => {
+    test("shim re-exports the same class as toolbar-ui", () => {
         const shim = require("../toolbar");
-        const direct = require("../widgets/toolbar-ui");
+        const direct = require("../toolbar-ui");
         expect(shim).toBe(direct);
     });
 

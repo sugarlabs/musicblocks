@@ -484,8 +484,51 @@ class Logo {
      * @returns {void}
      */
     prepSynths() {
-        // Guard: Skip if synths already initialized
         if (this._synthsInitialized) {
+            // Ensure any newly added turtles (e.g., companion turtles) are
+            // initialized without disrupting existing turtles' runtime state.
+            for (const turtle in this.activity.turtles.turtleList) {
+                if (turtle in this.deps.instruments) {
+                    continue;
+                }
+
+                const tur = this.activity.turtles.ithTurtle(turtle);
+                this.deps.instruments[turtle] = {};
+                this.deps.instrumentsFilters[turtle] = {};
+                this.deps.instrumentsEffects[turtle] = {};
+
+                if (!(DEFAULTVOICE in this.deps.instruments[turtle])) {
+                    this.synth.createDefaultSynth(turtle);
+                }
+
+                for (const instrumentName in this.deps.instruments[0]) {
+                    if (!(instrumentName in this.deps.instruments[turtle])) {
+                        this.synth.loadSynth(turtle, instrumentName);
+
+                        if (instrumentName in this.deps.instrumentsFilters[0]) {
+                            this.deps.instrumentsFilters[turtle][instrumentName] =
+                                this.deps.instrumentsFilters[0][instrumentName];
+                        }
+
+                        if (instrumentName in this.deps.instrumentsEffects[0]) {
+                            this.deps.instrumentsEffects[turtle][instrumentName] =
+                                this.deps.instrumentsEffects[0][instrumentName];
+                        }
+                    }
+                }
+
+                tur.singer.synthVolume = {
+                    "electronic synth": [DEFAULTVOLUME],
+                    "noise1": [DEFAULTVOLUME],
+                    "noise2": [DEFAULTVOLUME],
+                    "noise3": [DEFAULTVOLUME]
+                };
+                tur.singer.synthVolume[DEFAULTVOICE] = [DEFAULTVOLUME];
+
+                for (const synth in tur.singer.synthVolume) {
+                    this.deps.Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
+                }
+            }
             return;
         }
         this.synth.newTone();
@@ -1149,7 +1192,7 @@ class Logo {
         // and Web Audio nodes. They will be re-created by prepSynths()
         // on the next run.
         this.synth.disposeAllInstruments();
-        this._synthsInitialized = false; // Reset so synths are recreated on next run
+        this._synthsInitialized = false;
 
         // eslint-disable-next-line eqeqeq
         if (this.cameraID != null) {

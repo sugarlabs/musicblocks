@@ -12,14 +12,14 @@
 /* exported Toolbar */
 
 // Thin compatibility shim to keep the "activity/toolbar" module path working.
-// Explicitly depends on widgets/toolbar-ui to ensure correct load ordering via RequireJS.
+// Explicitly depends on activity/toolbar-ui to ensure correct load ordering via RequireJS.
 if (typeof define === "function" && define.amd) {
-    define(["widgets/toolbar-ui"], function (ToolbarUI) {
+    define(["activity/toolbar-ui"], function (ToolbarUI) {
         window.Toolbar = ToolbarUI;
         return ToolbarUI;
     });
 } else if (typeof module !== "undefined" && module.exports) {
-    const ToolbarUI = require("./widgets/toolbar-ui");
+    const ToolbarUI = require("./toolbar-ui");
     module.exports = ToolbarUI;
     module.exports.FocusCycleManager = ToolbarUI.FocusCycleManager;
 }
