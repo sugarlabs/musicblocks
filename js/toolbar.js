@@ -1425,6 +1425,14 @@ class Toolbar {
         const handleModeSwitch = event => {
             this.activity.beginnerMode = !this.activity.beginnerMode;
 
+            if (this.activity.themeBox) {
+                if (this.activity.beginnerMode) {
+                    this.activity.themeBox.light_onclick();
+                } else {
+                    this.activity.themeBox.highcontrast_onclick();
+                }
+            }
+
             try {
                 safeStorageSet("beginnerMode", this.activity.beginnerMode.toString());
             } catch (e) {

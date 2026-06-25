@@ -25,6 +25,10 @@ global.PALETTESTROKECOLORS = {};
 global.PALETTEHIGHLIGHTCOLORS = {};
 global.HIGHLIGHTSTROKECOLORS = {};
 
+global.createjs = {
+    ColorFilter: jest.fn()
+};
+
 // Mock window.platformColor
 window.platformColor = {
     header: "#4DA6FF",
@@ -35,10 +39,40 @@ window.platformColor = {
 document.body.innerHTML = `
     <meta name="theme-color" content="#4DA6FF">
     <canvas id="canvas"></canvas>
+    <canvas id="myCanvas"></canvas>
     <div id="themeSelectIcon"></div>
     <div id="light"><i class="material-icons">brightness_7</i></div>
     <div id="dark"><i class="material-icons">brightness_4</i></div>
-    <div id="palette"><div></div></div>
+    <div id="highcontrast"></div>
+    <div id="palette">
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <td><img/><div></div></td>
+                        <td><img/><div></div></td>
+                    </tr>
+                </thead>
+            </table>
+            <table>
+                <tbody>
+                    <tr><td><img/></td><td></td></tr>
+                    <tr><td><img/></td><td>label</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div id="paletteToggle"></div>
+    <div id="buttoncontainerTOP">
+        <div class="tooltipped"></div>
+        <div class="tooltipped"></div>
+    </div>
+    <nav></nav>
+    <div id="floatingWindows">
+        <div class="windowFrame"><div class="wftTitle"></div></div>
+    </div>
+    <input id="search">
+    <iframe id="planet-iframe"></iframe>
 `;
 
 const ThemeBox = require("../themebox");
@@ -54,8 +88,57 @@ describe("ThemeBox", () => {
             },
             textMsg: jest.fn(),
             refreshCanvas: jest.fn(),
-            palettes: {}
+            palettes: {
+                cellSize: 50,
+                activePalette: "test",
+                dict: {
+                    test: { hideMenu: jest.fn() }
+                },
+                showPalette: jest.fn()
+            },
+            turtles: {
+                _locked: true,
+                makeBackground: jest.fn()
+            },
+            blocks: {
+                blockList: {
+                    1: {
+                        protoblock: { palette: "test" },
+                        regenerateArtwork: jest.fn(),
+                        text: {},
+                        collapseText: {}
+                    }
+                }
+            },
+            cartesianBitmap: {
+                visible: true,
+                filters: [],
+                uncache: jest.fn(),
+                cache: jest.fn(),
+                updateCache: jest.fn()
+            },
+            polarBitmap: {
+                visible: false,
+                filters: [],
+                uncache: jest.fn(),
+                cache: jest.fn(),
+                updateCache: jest.fn()
+            },
+            toolbarHeight: 50
         };
+
+        window.syncPlatformColor = jest.fn();
+        window.AccessibilityHelper = {
+            updateFocusRingForTheme: jest.fn()
+        };
+
+        window.platformColor.paletteColors = {
+            test: ["#ff0000", "#00ff00", "#0000ff"]
+        };
+
+        global.MULTIPALETTEICONS = [0, 1];
+        global.PALETTEICONS = { search: "search_icon", label: "label_icon" };
+        global.makePaletteIcons = jest.fn(() => ({ src: "mock.png" }));
 
         jest.spyOn(global.Storage.prototype, "getItem").mockImplementation(key => {
             return key === "themePreference" ? "light" : null;
@@ -63,7 +146,7 @@ describe("ThemeBox", () => {
         jest.spyOn(global.Storage.prototype, "setItem").mockImplementation(() => {});
 
         // Reset body classes
-        document.body.classList.remove("light", "dark");
+        document.body.classList.remove("light", "dark", "highcontrast");
 
         themeBox = new ThemeBox(mockActivity);
     });
@@ -86,39 +169,39 @@ describe("ThemeBox", () => {
     });
 
     test("dark_onclick() sets theme to dark and applies instantly", () => {
-        const reloadSpy = jest.spyOn(themeBox, "reload").mockImplementation(() => {});
         themeBox.dark_onclick();
         expect(themeBox._theme).toBe("dark");
         expect(mockActivity.storage.themePreference).toBe("dark");
-        // Should NOT reload - instant theme switch
-        expect(reloadSpy).not.toHaveBeenCalled();
         // Should show theme switched message
         expect(mockActivity.textMsg).toHaveBeenCalledWith("Theme switched to dark mode.", 2000);
-        reloadSpy.mockRestore();
+    });
+
+    test("highcontrast_onclick() sets theme to highcontrast and applies instantly", () => {
+        themeBox.highcontrast_onclick();
+        expect(themeBox._theme).toBe("highcontrast");
+        expect(mockActivity.storage.themePreference).toBe("highcontrast");
+        // Should show theme switched message
+        expect(mockActivity.textMsg).toHaveBeenCalledWith(
+            "Theme switched to highcontrast mode.",
+            2000
+        );
     });
 
     test("setPreference() applies theme instantly without reload", () => {
-        const reloadSpy = jest.spyOn(themeBox, "reload").mockImplementation(() => {});
         localStorage.getItem.mockReturnValue("light");
         themeBox._theme = "dark";
         themeBox.setPreference();
         expect(mockActivity.storage.themePreference).toBe("dark");
-        // Should NOT reload - instant theme switch
-        expect(reloadSpy).not.toHaveBeenCalled();
         // Body should have dark class
         expect(document.body.classList.contains("dark")).toBe(true);
         expect(document.body.classList.contains("light")).toBe(false);
-        reloadSpy.mockRestore();
     });
 
     test("setPreference() does not change if theme is unchanged", () => {
-        const reloadSpy = jest.spyOn(themeBox, "reload").mockImplementation(() => {});
         themeBox.light_onclick();
-        expect(reloadSpy).not.toHaveBeenCalled();
         expect(mockActivity.textMsg).toHaveBeenCalledWith(
             "Music Blocks is already set to this theme."
         );
-        reloadSpy.mockRestore();
     });
 
     test("applyThemeInstantly() updates body classes correctly", () => {
@@ -131,14 +214,100 @@ describe("ThemeBox", () => {
     test("applyThemeInstantly() updates canvas background for dark mode", () => {
         themeBox._theme = "dark";
         themeBox.applyThemeInstantly();
-        const canvas = document.getElementById("canvas");
+        const canvas = document.getElementById("myCanvas");
         expect(canvas.style.backgroundColor).toBe("rgb(48, 48, 48)");
     });
 
     test("applyThemeInstantly() updates canvas background for light mode", () => {
         themeBox._theme = "light";
         themeBox.applyThemeInstantly();
-        const canvas = document.getElementById("canvas");
+        const canvas = document.getElementById("myCanvas");
         expect(canvas.style.backgroundColor).toBe("rgb(249, 249, 249)");
+    });
+
+    test("theme changes are applied live without page reload", () => {
+        localStorage.getItem.mockReturnValue("light");
+
+        themeBox._theme = "dark";
+        themeBox.setPreference();
+
+        // Verify theme was applied live to the DOM instantly
+        expect(document.body.classList.contains("dark")).toBe(true);
+        expect(mockActivity.storage.themePreference).toBe("dark");
+        expect(localStorage.setItem).toHaveBeenCalledWith("themePreference", "dark");
+
+        // Verify instant UI updates on canvas
+        const canvas = document.getElementById("myCanvas");
+        expect(canvas.style.backgroundColor).toBe("rgb(48, 48, 48)");
+    });
+    test("applyThemeInstantly() calls refreshUIComponents and sets styles correctly in dark mode", () => {
+        themeBox._theme = "dark";
+        themeBox.applyThemeInstantly();
+
+        const floatingWindow = document.querySelector("#floatingWindows > .windowFrame");
+        expect(floatingWindow.style.backgroundColor).toBe("rgb(69, 69, 69)"); // #454545
+        expect(floatingWindow.style.borderColor).toBe("rgb(0, 0, 0)"); // #000000
+
+        const searchInput = document.getElementById("search");
+        expect(searchInput.style.backgroundColor).toBe("rgb(48, 48, 48)");
+
+        expect(mockActivity.turtles.makeBackground).toHaveBeenCalled();
+        expect(mockActivity.blocks.blockList["1"].regenerateArtwork).toHaveBeenCalled();
+        expect(window.syncPlatformColor).toHaveBeenCalledWith("dark");
+        expect(window.AccessibilityHelper.updateFocusRingForTheme).toHaveBeenCalledWith("dark");
+    });
+
+    test("applyThemeInstantly() sets styles correctly in highcontrast mode", () => {
+        themeBox._theme = "highcontrast";
+        themeBox.applyThemeInstantly();
+
+        const floatingWindow = document.querySelector("#floatingWindows > .windowFrame");
+        expect(floatingWindow.style.backgroundColor).toBe("rgb(0, 0, 0)");
+        expect(floatingWindow.style.borderColor).toBe("rgb(255, 255, 255)"); // Mock strokeColor
+
+        const searchInput = document.getElementById("search");
+        expect(searchInput.style.backgroundColor).toBe("rgb(0, 0, 0)");
+
+        const nav = document.querySelector("nav");
+        expect(nav.style.boxShadow).toBe("none");
+
+        expect(mockActivity.cartesianBitmap.filters.length).toBe(1);
+    });
+
+    test("initializeTheme() calls required setup functions", () => {
+        const applySpy = jest.spyOn(themeBox, "_applyBodyTheme");
+        const updateIconSpy = jest.spyOn(themeBox, "updateThemeIcon");
+        const refreshUISpy = jest.spyOn(themeBox, "refreshUIComponents");
+        themeBox.initializeTheme();
+        expect(applySpy).toHaveBeenCalled();
+        expect(updateIconSpy).toHaveBeenCalled();
+        expect(refreshUISpy).toHaveBeenCalled();
+    });
+
+    test("planet iframe receives message on theme change", () => {
+        const iframe = document.getElementById("planet-iframe");
+        iframe.contentWindow.postMessage = jest.fn();
+        themeBox._theme = "dark";
+        themeBox.refreshUIComponents();
+        expect(iframe.contentWindow.postMessage).toHaveBeenCalledWith(
+            {
+                type: "MB_APPLY_THEME",
+                payload: { add: ["dark"], remove: ["light", "highcontrast"] }
+            },
+            "*"
+        );
+    });
+
+    test("setPreference logs warning if localStorage throws error", () => {
+        jest.spyOn(global.Storage.prototype, "setItem").mockImplementation(() => {
+            throw new Error("Quota exceeded");
+        });
+        const consoleSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+        themeBox.dark_onclick();
+        expect(consoleSpy).toHaveBeenCalledWith(
+            "Could not save theme preference:",
+            expect.any(Error)
+        );
+        consoleSpy.mockRestore();
     });
 });
