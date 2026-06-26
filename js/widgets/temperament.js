@@ -1895,6 +1895,7 @@ function TemperamentWidget() {
                 for (let j = 0; j < t.interval.length; j++) {
                     intervals[j] = t.interval[j];
                     temperamentRatios[j] = t[intervals[j]];
+                    if (typeof temperamentRatios[j] !== "number") continue;
                     temperamentRatios[j] = temperamentRatios[j].toFixed(2);
                 }
                 const ratiosEqual =
