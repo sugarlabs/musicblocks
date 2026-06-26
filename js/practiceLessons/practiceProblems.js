@@ -77,8 +77,8 @@ const PracticeProblems = [
           bridge. Try changing the music to discover paths he never wrote down.
         </p>
         <ul>
-          <li>Change an octave to make the bridge climb higher.</li>
-          <li>Try a transpose block to change the bridge color.</li>
+          <li>Change the octave number on a pitch block to make the bridge climb higher.</li>
+          <li>Use the transpose helper block on the screen to change the bridge color.</li>
           <li>Make your own longer bridge song.</li>
           <li>Rename the music chunks if you want to mark your discovery.</li>
         </ul>
@@ -86,7 +86,8 @@ const PracticeProblems = [
     `,
         expected: {
             pattern: ["A", "A", "B", "A"],
-            chunkNames: ["A", "B"]
+            chunkNames: ["A", "B"],
+            octaves: [4, 4, 4, 4, 4]
         },
         rewards: [
             "Melody Fragment #1",
@@ -195,8 +196,8 @@ const PracticeProblems = [
         </p>
       <ul>
           <li>Rename the chunks to make your own explorer map.</li>
-          <li>Change an octave to lift petals into the air.</li>
-          <li>Try a transpose block to make the grove shine differently.</li>
+          <li>Change the octave number on a pitch block to lift petals into the air.</li>
+          <li>Use the transpose helper block on the screen to make the grove shine differently.</li>
           <li>Create a longer Sakura path of your own.</li>
       </ul>
       </section>
@@ -232,7 +233,8 @@ const PracticeProblems = [
                 "Sakura",
                 "miniyukan"
             ],
-            chunkNames: ["Sakura", "yayoi", "miwatasu", "miniyukan"]
+            chunkNames: ["Sakura", "yayoi", "miwatasu", "miniyukan"],
+            octaves: [3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5]
         },
         rewards: [
             "Melody Fragment #2",

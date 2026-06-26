@@ -81,9 +81,9 @@ const PracticeValidator = {
             case "renamedChunks":
                 return this.hasRenamedChunks(problem.expected?.chunkNames);
             case "changedOctave":
-                return this.hasChangedPitchOctave();
+                return this.hasChangedPitchOctave(problem.expected?.octaves);
             case "usedTranspose":
-                return this.hasBlockNamed([
+                return this.hasConnectedBlockNamed([
                     "settransposition",
                     "setscalartransposition",
                     "setratio",
@@ -148,17 +148,32 @@ const PracticeValidator = {
         return labelBlock?.value || labelBlock?.privateData || labelBlock?.overrideName || "";
     },
 
-    hasChangedPitchOctave() {
-        const blockList = this.getBlockList();
+    hasChangedPitchOctave(expectedOctaves) {
+        if (Array.isArray(expectedOctaves)) {
+            const currentOctaves = this.getPitchOctaves();
+            const baselineOctaves = [...expectedOctaves].sort((a, b) => a - b);
+            return JSON.stringify(currentOctaves) !== JSON.stringify(baselineOctaves);
+        }
 
-        return Object.values(blockList).some(block => {
-            if (!block || block.trash || block.name !== "pitch") return false;
+        return this.getPitchOctaves().some(octave => octave !== 4);
+    },
+
+    getPitchOctaves() {
+        const blockList = this.getBlockList();
+        const octaves = [];
+
+        Object.values(blockList).forEach(block => {
+            if (!block || block.trash || block.name !== "pitch") return;
 
             const octaveId = block.connections?.[2];
             const octaveBlock = blockList[octaveId];
 
-            return octaveBlock?.name === "number" && Number(octaveBlock.value) !== 4;
+            if (octaveBlock?.name === "number") {
+                octaves.push(Number(octaveBlock.value));
+            }
         });
+
+        return octaves.sort((a, b) => a - b);
     },
 
     hasBlockNamed(names) {
@@ -167,6 +182,20 @@ const PracticeValidator = {
 
         return Object.values(blockList).some(
             block => block && !block.trash && blockNames.has(block.name)
+        );
+    },
+
+    hasConnectedBlockNamed(names) {
+        const blockNames = new Set(names);
+        const blockList = this.getBlockList();
+
+        return Object.values(blockList).some(
+            block =>
+                block &&
+                !block.trash &&
+                blockNames.has(block.name) &&
+                block.connections?.[0] !== null &&
+                block.connections?.[0] !== undefined
         );
     },
 
