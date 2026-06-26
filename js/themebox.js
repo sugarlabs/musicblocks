@@ -239,55 +239,6 @@ class ThemeBox {
             }
         }
 
-        const floatingWindows = document.querySelectorAll("#floatingWindows > .windowFrame");
-        floatingWindows.forEach(win => {
-            if (this._theme === "dark") {
-                win.style.backgroundColor = "#454545";
-                win.style.borderColor = "#000000";
-            } else if (this._theme === "highcontrast") {
-                win.style.backgroundColor = window.platformColor.widgetBackground || "#000000";
-                win.style.borderColor = window.platformColor.strokeColor || "#FFFFFF";
-            } else {
-                win.style.backgroundColor = "";
-                win.style.borderColor = "";
-            }
-            const title = win.querySelector(".wftTitle");
-            if (title) {
-                if (this._theme === "highcontrast") {
-                    title.style.color = window.platformColor.textColor || "#FFFFFF";
-                } else {
-                    title.style.color = "";
-                }
-            }
-        });
-
-        // Remove toolbar box shadow/border in High Contrast mode to avoid white line
-        const toolbars = document.querySelectorAll("nav, .nav-wrapper, .button-container");
-        toolbars.forEach(el => {
-            if (this._theme === "highcontrast") {
-                el.style.boxShadow = "none";
-                el.style.borderBottom = "none";
-                el.style.borderColor = "transparent";
-            } else {
-                el.style.boxShadow = "";
-                el.style.borderBottom = "";
-                el.style.borderColor = "";
-            }
-        });
-
-        const searchInput = document.getElementById("search");
-        if (searchInput && window.platformColor) {
-            if (this._theme === "dark" || this._theme === "highcontrast") {
-                searchInput.style.backgroundColor = window.platformColor.background || "";
-                searchInput.style.color = window.platformColor.textColor || "";
-                searchInput.style.borderColor = window.platformColor.strokeColor || "";
-            } else {
-                searchInput.style.backgroundColor = "";
-                searchInput.style.color = "";
-                searchInput.style.borderColor = "";
-            }
-        }
-
         if (this.activity.refreshCanvas) {
             this.activity.refreshCanvas();
         }

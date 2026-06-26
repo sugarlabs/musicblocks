@@ -244,13 +244,6 @@ describe("ThemeBox", () => {
         themeBox._theme = "dark";
         themeBox.applyThemeInstantly();
 
-        const floatingWindow = document.querySelector("#floatingWindows > .windowFrame");
-        expect(floatingWindow.style.backgroundColor).toBe("rgb(69, 69, 69)"); // #454545
-        expect(floatingWindow.style.borderColor).toBe("rgb(0, 0, 0)"); // #000000
-
-        const searchInput = document.getElementById("search");
-        expect(searchInput.style.backgroundColor).toBe("rgb(48, 48, 48)");
-
         expect(mockActivity.turtles.makeBackground).toHaveBeenCalled();
         expect(mockActivity.blocks.blockList["1"].regenerateArtwork).toHaveBeenCalled();
         expect(window.syncPlatformColor).toHaveBeenCalledWith("dark");
@@ -260,16 +253,6 @@ describe("ThemeBox", () => {
     test("applyThemeInstantly() sets styles correctly in highcontrast mode", () => {
         themeBox._theme = "highcontrast";
         themeBox.applyThemeInstantly();
-
-        const floatingWindow = document.querySelector("#floatingWindows > .windowFrame");
-        expect(floatingWindow.style.backgroundColor).toBe("rgb(0, 0, 0)");
-        expect(floatingWindow.style.borderColor).toBe("rgb(255, 255, 255)"); // Mock strokeColor
-
-        const searchInput = document.getElementById("search");
-        expect(searchInput.style.backgroundColor).toBe("rgb(0, 0, 0)");
-
-        const nav = document.querySelector("nav");
-        expect(nav.style.boxShadow).toBe("none");
 
         expect(mockActivity.cartesianBitmap.filters.length).toBe(1);
     });

@@ -125,6 +125,8 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 
 .dark #search,
 .dark #helpfulSearch {
+    background-color: var(--pc-background) !important;
+    border-color: var(--pc-strokeColor) !important;
     color: var(--color-text-primary) !important;
     -webkit-text-fill-color: var(--color-text-primary) !important;
     caret-color: var(--color-text-primary) !important;
@@ -640,6 +642,12 @@ body.highcontrast {
     background-color: var(--color-tooltip-bg) !important;
     border: 1px solid #ffffff;
     color: #ffffff !important;
+}
+
+.highcontrast nav, .highcontrast .nav-wrapper, .highcontrast .button-container {
+    box-shadow: none !important;
+    border-bottom: none !important;
+    border-color: transparent !important;
 }
 
 .highcontrast .material-tooltip .backdrop {
