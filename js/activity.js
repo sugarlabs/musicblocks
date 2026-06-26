@@ -2674,10 +2674,10 @@ class Activity {
                         this.update = true;
                         break;
                 }
-                 if (event.code === "Space" && !disableKeys) {
-                        event.preventDefault();
-                        this.showSearchWidget();
-                 }
+                if (event.code === "Space" && !disableKeys) {
+                    event.preventDefault();
+                    this.showSearchWidget();
+                }
             } else if (event.shiftKey && !disableKeys) {
                 switch (event.keyCode) {
                     case SPACE:
@@ -2689,7 +2689,7 @@ class Activity {
                         }
                         break;
                 }
-           } else {
+            } else {
                 if (pasteEl.style.visibility === "visible" && event.keyCode === RETURN) {
                     if (pasteEl.value.length > 0) {
                         this.pasted();
