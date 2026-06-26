@@ -1,12 +1,16 @@
 /* Theme DropDown Styling */
-
+/* 
 #themedropdown {
     background-color: transparent;
     box-shadow: none;
     display: flex;
     transform: translateX(-25%) !important;
-}
+} */
+/* Theme DropDown Styling */
 
+#themedropdown {
+    display: none !important;
+}
 #themedropdown a {
     color: var(--color-brand-primary);
     transition: all 0.3s ease;
@@ -518,11 +522,11 @@ body.highcontrast {
 }
 
 .highcontrast .blue {
-    background-color: var(--color-text-inverse)080 !important;
+    background-color: var(--color-text-inverse) 080 !important;
 }
 
 .highcontrast .blue.darken-1 {
-    background-color: var(--color-text-inverse)0ff !important;
+    background-color: var(--color-text-inverse) 0ff !important;
 }
 
 .highcontrast #floatingWindows > .windowFrame {
