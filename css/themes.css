@@ -484,17 +484,17 @@ body.highcontrast {
 .highcontrast .keyboard-shortcuts-hero,
 .highcontrast .keyboard-shortcuts-section,
 .highcontrast .keyboard-shortcuts-key {
-    border: 1px solid #ffffff;
-    background: #000000;
+    border: 1px solid var(--color-border-primary);
+    background: var(--color-bg-primary);
     box-shadow: none;
-    color: var(--color-text-inverse);
+     color: var(--color-text-primary) !important;
 }
 
 .highcontrast .keyboard-shortcuts-section-title,
 .highcontrast .keyboard-shortcuts-action,
 .highcontrast .keyboard-shortcuts-hero-copy,
 .highcontrast .keyboard-shortcuts-hero-title {
-    color: var(--color-text-inverse);
+     color: var(--color-text-primary) !important;
 }
 
 .highcontrast .keyboard-shortcuts-row,
@@ -535,7 +535,7 @@ body.highcontrast {
 }
 
 .highcontrast #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary) !important;
 }
 
 .highcontrast #floatingWindows > .windowFrame > .wfWinBody .wfbWidget {
