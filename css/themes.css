@@ -403,7 +403,7 @@ body.highcontrast {
 .dark #helpdropdown.helpdropdown-menu li.active,
 .dark #helpdropdown.helpdropdown-menu li.selected,
 .dark #helpdropdown.helpdropdown-menu li.active.selected {
-    background: #1976d2;
+    background: var(--color-brand-primary);
 }
 
 .dark #helpdropdown.helpdropdown-menu li:hover > a,
@@ -412,8 +412,8 @@ body.highcontrast {
 .dark #helpdropdown.helpdropdown-menu li > a:hover,
 .dark #helpdropdown.helpdropdown-menu li > a:focus,
 .dark #helpdropdown.helpdropdown-menu li > a.dropdown-item-focused {
-    background: #1976d2;
-    color: #ffffff;
+    background: var(--color-brand-primary);
+    color: var(--color-text-inverse);
 }
 
 .dark .keyboard-shortcuts-hero {
@@ -470,7 +470,7 @@ body.highcontrast {
 .highcontrast #helpdropdown.helpdropdown-menu li.active,
 .highcontrast #helpdropdown.helpdropdown-menu li.selected,
 .highcontrast #helpdropdown.helpdropdown-menu li.active.selected {
-    background: #1976d2;
+    background: var(--color-brand-primary);
 }
 
 .highcontrast #helpdropdown.helpdropdown-menu li:hover > a,
@@ -479,7 +479,7 @@ body.highcontrast {
 .highcontrast #helpdropdown.helpdropdown-menu li > a:hover,
 .highcontrast #helpdropdown.helpdropdown-menu li > a:focus,
 .highcontrast #helpdropdown.helpdropdown-menu li > a.dropdown-item-focused {
-    background: #1976d2;
+    background: var(--color-brand-primary);
     color: var(--color-text-primary);
 }
 
@@ -640,11 +640,13 @@ body.highcontrast {
 
 .highcontrast .material-tooltip {
     background-color: var(--color-tooltip-bg) !important;
-    border: 1px solid #ffffff;
-    color: #ffffff !important;
+    border: 1px solid var(--color-text-inverse);
+    color: var(--color-text-inverse) !important;
 }
 
-.highcontrast nav, .highcontrast .nav-wrapper, .highcontrast .button-container {
+.highcontrast nav,
+.highcontrast .nav-wrapper,
+.highcontrast .button-container {
     box-shadow: none !important;
     border-bottom: none !important;
     border-color: transparent !important;
@@ -655,7 +657,7 @@ body.highcontrast {
 }
 
 .highcontrast .material-tooltip span {
-    color: #ffffff !important;
+    color: var(--color-text-inverse) !important;
 }
 
 .highcontrast #languagedropdown li a.selected-language {
