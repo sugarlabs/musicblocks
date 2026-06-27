@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Arjun Jayan
 //
 // This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Affero General Public
+// modify it under the terms of the The GNU Affero General Public
 // License as published by the Free Software Foundation; either
 // version 3 of the License, or (at your option) any later version.
 //
@@ -9,57 +9,41 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-// A dropdown for selecting theme
+//A dropdown for selecting theme
 
 /*
-   global getSystemThemePreference,
+   global platformColor, getSystemThemePreference,
    PALETTEFILLCOLORS, PALETTESTROKECOLORS,
    PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
    MULTIPALETTEICONS, PALETTEICONS, makePaletteIcons,
-   globalActivity, createjs, platformColor, _
+   globalActivity, createjs
 */
 
 /* exported ThemeBox */
 
 class ThemeBox {
+    /**
+     * @constructor
+     */
     constructor(activity) {
         this.activity = activity;
         this._theme = activity.storage.themePreference || getSystemThemePreference();
         this._themes = ["light", "dark", "highcontrast"];
     }
 
-    _ensureThemeColorFallbacks() {
-        if (!window.platformColor) {
-            window.platformColor = {};
-        }
-
-        const themeBackgrounds = {
-            light: "#F9F9F9",
-            dark: "#303030",
-            highcontrast: "#000000"
-        };
-
-        window.platformColor.background = themeBackgrounds[this._theme];
-        window.platformColor.header = window.platformColor.header || "#4DA6FF";
-        window.platformColor.selectorSelected = window.platformColor.selectorSelected || "#1A8CFF";
-    }
-
-    _applyBodyTheme() {
-        const body = document.body;
-        this._themes.forEach(theme => body.classList.toggle(theme, theme === this._theme));
-
-        if (typeof window.syncPlatformColor === "function") {
-            window.syncPlatformColor(this._theme);
-        }
-
-        this._ensureThemeColorFallbacks();
-    }
-
+    /**
+     * @public
+     * @returns {void}
+     */
     light_onclick() {
         this._theme = "light";
         this.setPreference();
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     dark_onclick() {
         this._theme = "dark";
         this.setPreference();
@@ -70,56 +54,96 @@ class ThemeBox {
         this.setPreference();
     }
 
+    /**
+     * Initialize theme on page load - apply theme state without notification
+     * @public
+     * @returns {void}
+     */
     initializeTheme() {
-        this._applyBodyTheme();
+        const body = document.body;
+        // Update body classes
+        this._themes.forEach(theme => {
+            if (theme === this._theme) {
+                body.classList.add(theme);
+            } else {
+                body.classList.remove(theme);
+            }
+        });
+
+        // Sync platformColor with the active theme config on startup
+        if (typeof window.syncPlatformColor === "function") {
+            window.syncPlatformColor(this._theme);
+        }
+
+        // Update theme icon immediately if DOM is ready
         this.updateThemeIcon();
+
+        // Refresh UI components (including planet iframe) if they exist
         this.refreshUIComponents();
     }
 
+    /**
+     * Apply theme instantly without page reload
+     * @private
+     * @returns {void}
+     */
     applyThemeInstantly() {
-        this._applyBodyTheme();
+        const body = document.body;
+        // Update body classes
+        this._themes.forEach(theme => {
+            if (theme === this._theme) {
+                body.classList.add(theme);
+            } else {
+                body.classList.remove(theme);
+            }
+        });
 
-        if (window.platformColor && window.platformColor.paletteColors) {
-            for (const paletteName in window.platformColor.paletteColors) {
-                PALETTEFILLCOLORS[paletteName] = window.platformColor.paletteColors[paletteName][0];
-                PALETTESTROKECOLORS[paletteName] =
-                    window.platformColor.paletteColors[paletteName][1];
-                PALETTEHIGHLIGHTCOLORS[paletteName] =
-                    window.platformColor.paletteColors[paletteName][2];
-                HIGHLIGHTSTROKECOLORS[paletteName] =
-                    window.platformColor.paletteColors[paletteName][1];
+        // Update platformColor globally
+        if (typeof window.syncPlatformColor === "function") {
+            window.syncPlatformColor(this._theme);
+        }
+
+        // Update palette colors in global variables used by blocks
+        if (window.platformColor.paletteColors) {
+            for (const p in window.platformColor.paletteColors) {
+                PALETTEFILLCOLORS[p] = window.platformColor.paletteColors[p][0];
+                PALETTESTROKECOLORS[p] = window.platformColor.paletteColors[p][1];
+                PALETTEHIGHLIGHTCOLORS[p] = window.platformColor.paletteColors[p][2];
+                HIGHLIGHTSTROKECOLORS[p] = window.platformColor.paletteColors[p][1];
             }
         }
 
+        // Update theme-color meta tag
         const themeColorMeta = document.querySelector("meta[name=theme-color]");
         if (themeColorMeta && window.platformColor) {
             themeColorMeta.content = window.platformColor.header;
         }
 
-        const myCanvas = document.getElementById("myCanvas");
-        if (myCanvas && window.platformColor) {
-            myCanvas.style.backgroundColor = window.platformColor.background;
-        }
-
+        // Update canvas background using theme config
         const canvas = document.getElementById("canvas");
         if (canvas) {
-            canvas.style.backgroundColor = "transparent";
+            canvas.style.backgroundColor = window.platformColor.background;
         }
 
-        if (this.activity.turtles && window.platformColor) {
+        // Update the turtles background color (this redraws the canvas background)
+        if (this.activity.turtles) {
+            // Unlock to allow makeBackground to redraw
             this.activity.turtles._locked = false;
             this.activity.turtles._backgroundColor = window.platformColor.background;
             this.activity.turtles.makeBackground();
             this.activity.refreshCanvas();
         }
 
+        // Refresh all blocks to update their colors
         if (this.activity.blocks) {
             for (const blockId in this.activity.blocks.blockList) {
                 const block = this.activity.blocks.blockList[blockId];
                 if (block && block.protoblock && block.protoblock.palette) {
+                    // Redraw block to update other colors
                     if (typeof block.regenerateArtwork === "function") {
                         block.regenerateArtwork(false);
                     }
+                    // Update text color
                     if (block.text) {
                         block.text.color = window.platformColor.blockText;
                     }
@@ -130,13 +154,11 @@ class ThemeBox {
             }
         }
 
+        // Update toolbar icon for current theme
         this.updateThemeIcon();
-        this.refreshUIComponents();
 
-        // Update focus ring colors for accessibility
-        if (typeof window.AccessibilityHelper !== "undefined") {
-            window.AccessibilityHelper.updateFocusRingForTheme(this._theme);
-        }
+        // Refresh UI components that depend on platformColor
+        this.refreshUIComponents();
 
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
@@ -151,9 +173,15 @@ class ThemeBox {
             });
         });
 
+        // Notify user
         this.activity.textMsg(_("Theme switched to " + this._theme + " mode."), 2000);
     }
 
+    /**
+     * Update theme selector icon to reflect current theme
+     * @private
+     * @returns {void}
+     */
     updateThemeIcon() {
         const themeSelectIcon = document.getElementById("themeSelectIcon");
         if (themeSelectIcon) {
@@ -164,9 +192,16 @@ class ThemeBox {
         }
     }
 
+    /**
+     * Refresh UI components that depend on theme colors
+     * @private
+     * @returns {void}
+     */
     refreshUIComponents() {
+        // Refresh palette if it exists
         if (this.activity.palettes) {
             try {
+                // Update palette selector border color
                 const paletteElement = document.getElementById("palette");
                 if (paletteElement && paletteElement.childNodes[0]) {
                     paletteElement.childNodes[0].style.border = `1px solid ${window.platformColor.selectorSelected}`;
@@ -174,11 +209,11 @@ class ThemeBox {
 
                 const paletteToggle = document.getElementById("paletteToggle");
                 if (paletteToggle) {
-                    paletteToggle.style.backgroundColor =
-                        window.platformColor.paletteLabelBackground;
+                    paletteToggle.style.backgroundColor = platformColor.paletteLabelBackground;
                     paletteToggle.style.color = "white";
                 }
 
+                // Refresh palette selector icons with new theme colors
                 const tr = document.querySelector("#palette > div > table > thead > tr");
                 if (tr) {
                     for (let j = 0; j < MULTIPALETTEICONS.length; j++) {
@@ -186,21 +221,23 @@ class ThemeBox {
                             PALETTEICONS[MULTIPALETTEICONS[j]]
                                 .replace(
                                     "background_fill_color",
-                                    window.platformColor.paletteLabelBackground
+                                    platformColor.paletteLabelBackground
                                 )
-                                .replace(/stroke_color/g, window.platformColor.strokeColor)
-                                .replace(/fill_color/g, window.platformColor.fillColor),
+                                .replace(/stroke_color/g, platformColor.strokeColor)
+                                .replace(/fill_color/g, platformColor.fillColor),
                             this.activity.palettes.cellSize,
                             this.activity.palettes.cellSize
                         );
                         tr.children[j].children[0].src = img.src;
                         tr.children[j].children[1].style.background =
-                            window.platformColor.paletteLabelBackground;
+                            platformColor.paletteLabelBackground;
                     }
                 }
 
+                // Refresh palette buttons and labels
                 const tbody = document.querySelector("#palette > div > table:nth-child(2) > tbody");
                 if (tbody) {
+                    // Update search button and label
                     const searchRow = tbody.rows[0];
                     if (searchRow) {
                         const searchIcon = makePaletteIcons(
@@ -209,10 +246,11 @@ class ThemeBox {
                             this.activity.palettes.cellSize
                         );
                         searchRow.cells[0].firstChild.src = searchIcon.src;
-                        searchRow.cells[1].style.color = window.platformColor.paletteText;
-                        searchRow.style.backgroundColor = window.platformColor.paletteBackground;
+                        searchRow.cells[1].style.color = platformColor.paletteText;
+                        searchRow.style.backgroundColor = platformColor.paletteBackground;
                     }
 
+                    // Update other palette buttons
                     for (let i = 1; i < tbody.rows.length; i++) {
                         const row = tbody.rows[i];
                         const label = row.cells[1].textContent.trim().toLowerCase();
@@ -223,12 +261,14 @@ class ThemeBox {
                                 this.activity.palettes.cellSize
                             );
                             row.cells[0].firstChild.src = icon.src;
-                            row.cells[1].style.color = window.platformColor.paletteText;
-                            row.style.backgroundColor = window.platformColor.paletteBackground;
+                            row.cells[1].style.color = platformColor.paletteText;
+                            row.style.backgroundColor = platformColor.paletteBackground;
                         }
                     }
                 }
 
+                // Refresh the currently open palette menu so block artwork
+                // SVGs are regenerated with the updated blockText color.
                 const activeName = this.activity.palettes.activePalette;
                 if (activeName && this.activity.palettes.dict[activeName]) {
                     this.activity.palettes.dict[activeName].hideMenu();
@@ -239,10 +279,12 @@ class ThemeBox {
             }
         }
 
+        // Refresh the activity canvas if available
         if (this.activity.refreshCanvas) {
             this.activity.refreshCanvas();
         }
 
+        // Update grid colors for new theme
         if (this.activity.turtles) {
             const grids = [
                 this.activity.cartesianBitmap,
@@ -261,11 +303,14 @@ class ThemeBox {
             grids.forEach(grid => {
                 if (grid) {
                     if (isDarkMode || isHighContrastMode) {
+                        // Apply invert filter for dark/high contrast mode (white grids)
                         const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
                         grid.filters = [invertFilter];
                     } else {
+                        // Remove filter for light mode (black grids)
                         grid.filters = [];
                     }
+                    // Re-cache the bitmap to apply the new filter
                     if (grid.visible) {
                         grid.uncache();
                         grid.cache(0, 0, 1200, 900);
@@ -275,6 +320,7 @@ class ThemeBox {
             });
         }
 
+        // Update planet iframe theme if it exists
         const planetIframe = document.getElementById("planet-iframe");
         if (planetIframe && planetIframe.contentWindow) {
             try {
@@ -292,10 +338,24 @@ class ThemeBox {
         }
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
+    reload() {
+        // Keep for backward compatibility, but prefer instant switching
+        window.location.reload();
+    }
+
+    /**
+     * @public
+     * @returns {void}
+     */
     setPreference() {
         if (localStorage.getItem("themePreference") === this._theme) {
             this.activity.textMsg(_("Music Blocks is already set to this theme."));
         } else {
+            // Save preference to localStorage
             this.activity.storage.themePreference = this._theme;
             try {
                 localStorage.setItem("themePreference", this._theme);
@@ -303,6 +363,7 @@ class ThemeBox {
                 console.warn("Could not save theme preference:", e);
             }
 
+            // Apply theme instantly instead of reloading
             this.applyThemeInstantly();
         }
     }
