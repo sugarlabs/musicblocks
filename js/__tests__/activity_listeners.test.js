@@ -26,6 +26,11 @@ describe("Activity Event Listener Management", () => {
             "constructor() { this._listeners = []; return;"
         );
 
+        // Extract the helpful wheel logic so we can test it isolated from the constructor
+        const helpfulWheelMatch = code.match(
+            /this\._closeHelpfulWheelHandler = .*?return wasOpen;\s*\};/s
+        );
+
         // Mock global environment required by activity.js
         const sandbox = {
             window: global.window,
@@ -70,6 +75,10 @@ describe("Activity Event Listener Management", () => {
 
         // Expose Activity class to sandbox
         code += "\n this.Activity = Activity;";
+
+        if (helpfulWheelMatch) {
+            code += `\n Activity.prototype._injectHelpfulWheel = function() { \n${helpfulWheelMatch[0]}\n };`;
+        }
 
         vm.createContext(sandbox);
         try {
@@ -165,5 +174,42 @@ describe("Activity Event Listener Management", () => {
         activity.removeEventListener(target, "click", listener, { capture: true });
 
         expect(activity._listeners).toHaveLength(0);
+    });
+
+    test("should remove document click listener when helpful wheel is closed via internal path", () => {
+        // Inject the methods from activity.js dynamically into this instance
+        activity._injectHelpfulWheel();
+
+        // Set up the DOM
+        const helpfulWheelDiv = document.createElement("div");
+        helpfulWheelDiv.id = "helpfulWheelDiv";
+        helpfulWheelDiv.style.display = "block"; // Simulate wheel being open
+        document.body.appendChild(helpfulWheelDiv);
+
+        // Simulate the wheel opening which attaches the listener
+        activity.addEventListener(document, "click", activity._closeHelpfulWheelHandler);
+
+        // Assert listener is present
+        let hasCloseHandler = activity._listeners.some(
+            l => l.listener === activity._closeHelpfulWheelHandler
+        );
+        expect(hasCloseHandler).toBe(true);
+
+        // Close it via internal path
+        const wasOpen = activity.closeHelpfulWheel();
+
+        // Assert it returned true (was open)
+        expect(wasOpen).toBe(true);
+        // Assert it is now hidden
+        expect(helpfulWheelDiv.style.display).toBe("none");
+
+        // Assert the listener is actually removed
+        hasCloseHandler = activity._listeners.some(
+            l => l.listener === activity._closeHelpfulWheelHandler
+        );
+        expect(hasCloseHandler).toBe(false);
+
+        // Cleanup DOM
+        document.body.removeChild(helpfulWheelDiv);
     });
 });

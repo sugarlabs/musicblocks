@@ -688,11 +688,7 @@ class Activity {
         // hides helpfulSearchDiv on canvas
 
         this._hideHelpfulSearchWidget = e => {
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-            }
+            this.closeHelpfulWheel();
             if (this.helpfulSearchDiv && this.helpfulSearchDiv.parentNode) {
                 this.helpfulSearchDiv.parentNode.removeChild(this.helpfulSearchDiv);
             }
@@ -723,6 +719,30 @@ class Activity {
                 },
                 false
             );
+        };
+
+        /*
+         * Helpful wheel unified close helpers to avoid memory leaks
+         */
+        this._closeHelpfulWheelHandler = e => {
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv) {
+                const isClickInside = helpfulWheelDiv.contains(e.target);
+                if (!isClickInside) {
+                    this.closeHelpfulWheel();
+                }
+            }
+        };
+
+        this.closeHelpfulWheel = () => {
+            let wasOpen = false;
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv && helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
+                wasOpen = true;
+            }
+            this.removeEventListener(document, "click", this._closeHelpfulWheelHandler);
+            return wasOpen;
         };
 
         /*
@@ -790,15 +810,8 @@ class Activity {
                 wheel.navItems[i].setTooltip(_(ele.label));
                 wheel.navItems[i].navigateFunction = () => ele.fn(this);
             });
-            const closeHelpfulWheel = e => {
-                const isClickInside = helpfulWheelDiv.contains(e.target);
-                if (!isClickInside) {
-                    helpfulWheelDiv.style.display = "none";
-                    this.removeEventListener(document, "click", closeHelpfulWheel);
-                }
-            };
-
-            this.addEventListener(document, "click", closeHelpfulWheel);
+            this.removeEventListener(document, "click", this._closeHelpfulWheelHandler);
+            this.addEventListener(document, "click", this._closeHelpfulWheelHandler);
         };
 
         /**
@@ -855,10 +868,7 @@ class Activity {
          */
         const findBlocks = activity => {
             activity._findBlocks();
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
+            if (activity.closeHelpfulWheel()) {
                 activity.__tick();
             }
         };
@@ -1562,10 +1572,7 @@ class Activity {
                     table.remove();
                 }
 
-                // Cache DOM element reference for performance
-                const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-                if (helpfulWheelDiv.style.display !== "none") {
-                    helpfulWheelDiv.style.display = "none";
+                if (this.closeHelpfulWheel()) {
                     this.__tick();
                 }
 
@@ -1763,11 +1770,7 @@ class Activity {
         const setScroller = activity => {
             activity._setScroller();
             activity._setupBlocksContainerEvents();
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-            }
+            activity.closeHelpfulWheel();
         };
 
         /**
@@ -1860,10 +1863,7 @@ class Activity {
          */
         const doLargerBlocks = async activity => {
             await activity._doLargerBlocks();
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
+            if (activity.closeHelpfulWheel()) {
                 activity.__tick();
             }
         };
@@ -1897,10 +1897,7 @@ class Activity {
          */
         const doSmallerBlocks = async activity => {
             await activity._doSmallerBlocks();
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
+            if (activity.closeHelpfulWheel()) {
                 activity.__tick();
             }
         };
@@ -3714,10 +3711,7 @@ class Activity {
                 return;
             }
 
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
+            if (activity.closeHelpfulWheel()) {
                 activity.__tick();
             }
         };
@@ -3734,10 +3728,7 @@ class Activity {
             this._restoreTrashById(this.blocks.trashStacks[this.blocks.trashStacks.length - 1]);
             activity.textMsg(_("Item restored from the trash."), 3000);
 
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
+            if (activity.closeHelpfulWheel()) {
                 activity.__tick();
             }
         };
@@ -4187,10 +4178,7 @@ class Activity {
          */
         const changeBlockVisibility = activity => {
             activity._changeBlockVisibility();
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
+            if (activity.closeHelpfulWheel()) {
                 activity.__tick();
             }
         };
@@ -4223,10 +4211,7 @@ class Activity {
          */
         const toggleCollapsibleStacks = activity => {
             activity._toggleCollapsibleStacks();
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
+            if (activity.closeHelpfulWheel()) {
                 activity.__tick();
             }
         };
@@ -4361,11 +4346,7 @@ class Activity {
          */
         const chooseKeyMenu = that => {
             piemenuKey(that);
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-            }
+            that.closeHelpfulWheel();
         };
 
         /*
@@ -5353,7 +5334,7 @@ class Activity {
                     that.doHelpfulSearch();
                 }, 500);
 
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+                this.closeHelpfulWheel();
             }
         };
 
@@ -6039,7 +6020,7 @@ class Activity {
                 this.blocks.setSelectionToActivity(false);
                 this.refreshCanvas();
                 // Cache DOM element reference for performance
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+                this.closeHelpfulWheel();
             }
         };
 
@@ -6080,7 +6061,7 @@ class Activity {
                 this.blocks.setSelectedBlocks(this.selectedBlocks);
                 this.refreshCanvas();
                 // Cache DOM element reference for performance
-                document.getElementById("helpfulWheelDiv").style.display = "none";
+                this.closeHelpfulWheel();
             }
         };
 
@@ -6090,7 +6071,7 @@ class Activity {
             this.isSelecting
                 ? this.textMsg(_("Select is enabled."))
                 : this.textMsg(_("Select is disabled."));
-            document.getElementById("helpfulWheelDiv").style.display = "none";
+            this.closeHelpfulWheel();
         };
 
         this._create2Ddrag = () => {
