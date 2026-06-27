@@ -28,6 +28,8 @@ class PubSub {
         if (!list) return;
         const idx = list.indexOf(listener);
         if (idx !== -1) {
+            // Only the first matching reference is removed; duplicates registered
+            // via multiple on() calls each require a separate off() call.
             list.splice(idx, 1);
         }
     }
@@ -48,6 +50,7 @@ class PubSub {
             listener(payload);
         };
         this.on(eventName, wrapper);
+        return wrapper;
     }
 
     clear(eventName) {
@@ -63,7 +66,9 @@ const pubsub = new PubSub();
 
 if (typeof define === "function" && define.amd) {
     define(function () {
-        window.PubSub = PubSub;
+        // pubsub (the singleton) is exposed as a browser global for future callers.
+        // PubSub (the class) is not assigned to window because external scripts
+        // consume the shared singleton rather than constructing their own instances.
         window.pubsub = pubsub;
         return { PubSub, pubsub };
     });

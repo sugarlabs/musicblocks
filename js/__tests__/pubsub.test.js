@@ -194,13 +194,11 @@ describe("PubSub – once()", () => {
         expect(single).toHaveBeenCalledTimes(1);
     });
 
-    test("once() listener can be removed via off() before it fires", () => {
+    test("once() listener can be cancelled via the returned wrapper before it fires", () => {
         const bus = makeBus();
         const fn = jest.fn();
-        bus.once("ev", fn);
-        const wrappers = bus._listeners["ev"];
-        expect(wrappers).toHaveLength(1);
-        bus.off("ev", wrappers[0]);
+        const cancel = bus.once("ev", fn);
+        bus.off("ev", cancel);
         bus.emit("ev");
         expect(fn).not.toHaveBeenCalled();
     });
