@@ -216,6 +216,12 @@ describe("PaletteLoader.regeneratePalettes", () => {
         expect(el.style.top).toBe("100px");
     });
 
+    test("does not throw when palette element is missing from DOM", () => {
+        global.docById.mockReturnValue(null);
+
+        expect(() => loader.regeneratePalettes()).not.toThrow();
+    });
+
     test("calls initBasicProtoBlocks when blocks exist", () => {
         loader.regeneratePalettes();
 

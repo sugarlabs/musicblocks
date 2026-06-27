@@ -85,7 +85,9 @@ class PaletteLoader {
             activity.palettes.reinitialize(activity.palettes);
 
             const element = docById("palette");
-            element.style.top = `${60 + activity.palettes.top}px`;
+            if (element) {
+                element.style.top = `${60 + activity.palettes.top}px`;
+            }
 
             if (activity.blocks) {
                 initBasicProtoBlocks(activity);
