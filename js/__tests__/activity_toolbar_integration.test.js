@@ -70,6 +70,7 @@ const loadActivityClass = () => {
         setupAlertController: jest.fn(),
         setupAlertRenderer: jest.fn(),
         setupPaletteLoader: jest.fn(),
+        setupSearchController: jest.fn(),
         hideDOMLabel: jest.fn(),
         setupActivityRecorder: jest.fn(),
         setupActivityAbcParser: jest.fn(),
