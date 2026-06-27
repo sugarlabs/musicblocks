@@ -180,7 +180,9 @@ describe("ThemeBox", () => {
         let capturedHandler;
         const mockMq = {
             matches: false,
-            addEventListener: jest.fn((_, handler) => { capturedHandler = handler; }),
+            addEventListener: jest.fn((_, handler) => {
+                capturedHandler = handler;
+            }),
             addListener: jest.fn()
         };
         window.matchMedia = jest.fn().mockReturnValue(mockMq);
