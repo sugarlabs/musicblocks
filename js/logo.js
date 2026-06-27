@@ -331,7 +331,7 @@ class Logo {
 
         this._syncCounter = 0;
         this._YIELD_AFTER_SYNC_RUNS = 1000;
-        this._totalIterations = 0;
+        this._iterationBudget = this._MAX_ITERATIONS + 1;
         this._MAX_ITERATIONS = 1000000;
 
         // When running in step-by-step mode, the next command to run
@@ -1321,7 +1321,7 @@ class Logo {
         this.stopTurtle = false;
 
         this._syncCounter = 0;
-        this._totalIterations = 0;
+        this._iterationBudget = this._MAX_ITERATIONS + 1;
 
         this.activity.blocks.unhighlightAll();
         this.activity.blocks.bringToTop(); // Draw under the blocks.
@@ -1652,10 +1652,6 @@ class Logo {
      * @returns {void}
      */
     runFromBlockNow(logo, turtle, blk, isflow, receivedArg, queueStart) {
-        if (typeof performanceTracker !== "undefined") {
-            performanceTracker.enterBlock();
-        }
-
         const profilingEnabled =
             typeof performanceTracker !== "undefined" &&
             typeof performanceTracker.isEnabled === "function" &&
@@ -1669,45 +1665,14 @@ class Logo {
             if (!logo.blockTimings) {
                 logo.blockTimings = {};
             }
+            performanceTracker.enterBlock();
         }
-
-        const recordBlockTiming = () => {
-            if (!profilingEnabled || profilingStart === null) return;
-            try {
-                const endTime =
-                    typeof performance !== "undefined" && typeof performance.now === "function"
-                        ? performance.now()
-                        : Date.now();
-                const elapsed = endTime - profilingStart;
-                const blockRef = logo.blockList && logo.blockList[blk];
-                const blockName = blockRef && blockRef.name ? blockRef.name : "unknown";
-
-                if (!logo.blockTimings[blockName]) {
-                    logo.blockTimings[blockName] = { calls: 0, total: 0, max: 0 };
-                }
-
-                const entry = logo.blockTimings[blockName];
-                entry.calls += 1;
-                entry.total += elapsed;
-                if (elapsed > entry.max) {
-                    entry.max = elapsed;
-                }
-            } catch (e) {
-                if (
-                    typeof performanceTracker !== "undefined" &&
-                    typeof performanceTracker.disable === "function"
-                ) {
-                    performanceTracker.disable();
-                }
-            }
-        };
 
         this._alreadyRunning = true;
 
         this.receivedArg = receivedArg;
 
-        logo._totalIterations++;
-        if (logo._totalIterations > logo._MAX_ITERATIONS) {
+        if (--logo._iterationBudget <= 0) {
             logo.activity.errorMsg(
                 _("Infinite loop detected. Execution stopped to prevent browser freeze."),
                 blk
@@ -1715,8 +1680,10 @@ class Logo {
             logo.stopTurtle = true;
             logo._alreadyRunning = false;
             logo._syncCounter = 0;
-            logo._totalIterations = 0;
-            recordBlockTiming();
+            logo._iterationBudget = logo._MAX_ITERATIONS + 1;
+            if (profilingEnabled) {
+                Logo._recordBlockTiming(logo, blk, profilingStart);
+            }
             return;
         }
 
@@ -1864,8 +1831,8 @@ class Logo {
                 if (cf !== undefined) childFlow = cf;
                 if (cfc !== undefined) childFlowCount = cfc;
                 if (ret) {
-                    recordBlockTiming();
-                    if (typeof performanceTracker !== "undefined") {
+                    if (profilingEnabled) {
+                        Logo._recordBlockTiming(logo, blk, profilingStart);
                         performanceTracker.exitBlock();
                     }
                     return ret;
@@ -2243,8 +2210,8 @@ class Logo {
             logo._timerManager.setTimeout(__checkCompletionState, 100);
         }
 
-        recordBlockTiming();
-        if (typeof performanceTracker !== "undefined") {
+        if (profilingEnabled) {
+            Logo._recordBlockTiming(logo, blk, profilingStart);
             performanceTracker.exitBlock();
         }
     }
@@ -3045,6 +3012,37 @@ class Logo {
         );
     }
 }
+
+Logo._recordBlockTiming = function _recordBlockTiming(logo, blk, profilingStart) {
+    if (profilingStart === null) return;
+    try {
+        const endTime =
+            typeof performance !== "undefined" && typeof performance.now === "function"
+                ? performance.now()
+                : Date.now();
+        const elapsed = endTime - profilingStart;
+        const blockRef = logo.blockList && logo.blockList[blk];
+        const blockName = blockRef && blockRef.name ? blockRef.name : "unknown";
+
+        if (!logo.blockTimings[blockName]) {
+            logo.blockTimings[blockName] = { calls: 0, total: 0, max: 0 };
+        }
+
+        const entry = logo.blockTimings[blockName];
+        entry.calls += 1;
+        entry.total += elapsed;
+        if (elapsed > entry.max) {
+            entry.max = elapsed;
+        }
+    } catch (e) {
+        if (
+            typeof performanceTracker !== "undefined" &&
+            typeof performanceTracker.disable === "function"
+        ) {
+            performanceTracker.disable();
+        }
+    }
+};
 
 // Export Logo
 if (typeof define === "function" && define.amd) {
