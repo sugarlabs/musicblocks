@@ -31,7 +31,7 @@ try {
    ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON, debugLog,
    ErrorHandler, ActivityContext,
    Boundary, CARTESIAN, changeImage, closeWidgets, doRecordButton, setupActivityRecorder,
-   setupGridController, setupGridRenderer, setupPluginController, setupToolbarController, setupAlertController, setupAlertRenderer, PluginDialog,
+   setupGridController, setupGridRenderer, setupPluginController, setupToolbarController, setupAlertController, setupAlertRenderer, setupPaletteLoader, PluginDialog,
    setupActivityAbcParser, setupActivityIdleWatcher,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
@@ -128,6 +128,7 @@ let MYDEFINES = [
     "activity/toolbar-controller",
     "activity/alert-controller",
     "activity/alert-renderer",
+    "palette/palette-loader",
     "widgets/plugin-dialog",
     "utils/musicutils",
     "utils/synthutils",
@@ -470,6 +471,7 @@ class Activity {
         setupToolbarController(this);
         setupAlertController(this);
         setupAlertRenderer(this);
+        setupPaletteLoader(this);
         this.pluginDialog = new PluginDialog({
             onLoadBuiltIn: name => this._loadBuiltInPlugin(name),
             onDelete: () => this._deletePlugin(),
@@ -805,13 +807,7 @@ class Activity {
          * palette colors, and other settings used throughout the application.
          */
         this.doPluginsAndPaletteCols = () => {
-            // Calculate the palette colors.
-            for (const p in platformColor.paletteColors) {
-                PALETTEFILLCOLORS[p] = platformColor.paletteColors[p][0];
-                PALETTESTROKECOLORS[p] = platformColor.paletteColors[p][1];
-                PALETTEHIGHLIGHTCOLORS[p] = platformColor.paletteColors[p][2];
-                HIGHLIGHTSTROKECOLORS[p] = platformColor.paletteColors[p][1];
-            }
+            this.paletteLoader.initializePaletteColors();
 
             this.pluginController.initializePluginState();
 
@@ -7141,81 +7137,7 @@ class Activity {
      * @returns {void}
      */
     regeneratePalettes() {
-        try {
-            // Store current palette positions
-            const palettePositions = {};
-            if (this.palettes && this.palettes.dict) {
-                for (const name in this.palettes.dict) {
-                    const palette = this.palettes.dict[name];
-                    if (
-                        palette &&
-                        palette.container &&
-                        typeof palette.container.x !== "undefined"
-                    ) {
-                        palettePositions[name] = {
-                            x: palette.container.x,
-                            y: palette.container.y,
-                            visible: !!palette.visible
-                        };
-                    }
-                }
-            }
-
-            // Safely hide and clear existing palettes
-            if (!this.palettes) {
-                console.warn("Palettes object not initialized");
-                return;
-            }
-
-            if (typeof this.palettes.hide !== "function") {
-                console.warn("Palettes hide method not available");
-            } else {
-                this.palettes.hide();
-            }
-
-            this.palettes.reinitialize(this.palettes);
-
-            // Increase palette element style.top value for correct alignment
-            const element = docById("palette");
-            element.style.top = `${60 + this.palettes.top}px`;
-
-            // Reinitialize blocks
-            if (this.blocks) {
-                initBasicProtoBlocks(this);
-            }
-
-            // Restore palette positions
-            if (this.palettes && this.palettes.dict) {
-                for (const name in palettePositions) {
-                    const palette = this.palettes.dict[name];
-                    const pos = palettePositions[name];
-
-                    if (palette && palette.container && pos) {
-                        palette.container.x = pos.x;
-                        palette.container.y = pos.y;
-
-                        if (pos.visible) {
-                            palette.showMenu(true);
-                        }
-                    }
-                }
-            }
-
-            // Update the palette display
-            if (this.palettes && typeof this.palettes.updatePalettes === "function") {
-                this.palettes.updatePalettes();
-            }
-
-            // Update blocks
-            if (this.blocks && typeof this.blocks.updateBlockPositions === "function") {
-                this.blocks.updateBlockPositions();
-            }
-
-            this.refreshCanvas();
-        } catch (e) {
-            ErrorHandler.capture(e, { operation: "regeneratePalettes" });
-            this.errorMsg(_("Error regenerating palettes. Please refresh the page."));
-        }
+        this.paletteLoader.regeneratePalettes();
     }
 }
 
