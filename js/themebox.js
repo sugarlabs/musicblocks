@@ -284,7 +284,7 @@ class ThemeBox {
             const mq = window.matchMedia("(prefers-color-scheme: dark)");
 
             const handler = e => {
-                this._theme = e.matches ? "dark" : "light";
+                this._theme = e.matches ? "dark" : "light"; 
                 this.applyThemeInstantly();
             };
             if (typeof mq.addEventListener === "function") {
