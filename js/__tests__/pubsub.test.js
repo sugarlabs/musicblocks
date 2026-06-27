@@ -325,3 +325,37 @@ describe("PubSub – module exports", () => {
         expect(fn).not.toHaveBeenCalled();
     });
 });
+
+// ---------------------------------------------------------------------------
+// AMD export
+// ---------------------------------------------------------------------------
+
+describe("PubSub – AMD export", () => {
+    test("define() is called, factory assigns pubsub singleton to window, and returns both exports", () => {
+        jest.resetModules();
+
+        let capturedFactory;
+        const mockDefine = jest.fn(factory => {
+            capturedFactory = factory;
+        });
+        mockDefine.amd = true;
+
+        const savedDefine = global.define;
+        global.define = mockDefine;
+
+        try {
+            require("../pubsub.js");
+        } finally {
+            global.define = savedDefine;
+        }
+
+        expect(mockDefine).toHaveBeenCalledTimes(1);
+
+        const result = capturedFactory();
+        expect(window.pubsub).toBeDefined();
+        expect(typeof result.PubSub).toBe("function");
+        expect(result.pubsub).toBe(window.pubsub);
+
+        delete window.pubsub;
+    });
+});
