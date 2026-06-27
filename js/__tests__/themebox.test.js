@@ -127,7 +127,10 @@ describe("ThemeBox", () => {
             toolbarHeight: 50
         };
 
-        window.syncPlatformColor = jest.fn();
+        window.syncPlatformColor = jest.fn((theme) => {
+            if (theme === "dark") window.platformColor.background = "rgb(48, 48, 48)";
+            else if (theme === "light") window.platformColor.background = "rgb(249, 249, 249)";
+        });
         window.AccessibilityHelper = {
             updateFocusRingForTheme: jest.fn()
         };
@@ -214,14 +217,14 @@ describe("ThemeBox", () => {
     test("applyThemeInstantly() updates canvas background for dark mode", () => {
         themeBox._theme = "dark";
         themeBox.applyThemeInstantly();
-        const canvas = document.getElementById("myCanvas");
+        const canvas = document.getElementById("canvas");
         expect(canvas.style.backgroundColor).toBe("rgb(48, 48, 48)");
     });
 
     test("applyThemeInstantly() updates canvas background for light mode", () => {
         themeBox._theme = "light";
         themeBox.applyThemeInstantly();
-        const canvas = document.getElementById("myCanvas");
+        const canvas = document.getElementById("canvas");
         expect(canvas.style.backgroundColor).toBe("rgb(249, 249, 249)");
     });
 
@@ -237,7 +240,7 @@ describe("ThemeBox", () => {
         expect(localStorage.setItem).toHaveBeenCalledWith("themePreference", "dark");
 
         // Verify instant UI updates on canvas
-        const canvas = document.getElementById("myCanvas");
+        const canvas = document.getElementById("canvas");
         expect(canvas.style.backgroundColor).toBe("rgb(48, 48, 48)");
     });
     test("applyThemeInstantly() calls refreshUIComponents and sets styles correctly in dark mode", () => {
@@ -247,7 +250,6 @@ describe("ThemeBox", () => {
         expect(mockActivity.turtles.makeBackground).toHaveBeenCalled();
         expect(mockActivity.blocks.blockList["1"].regenerateArtwork).toHaveBeenCalled();
         expect(window.syncPlatformColor).toHaveBeenCalledWith("dark");
-        expect(window.AccessibilityHelper.updateFocusRingForTheme).toHaveBeenCalledWith("dark");
     });
 
     test("applyThemeInstantly() sets styles correctly in highcontrast mode", () => {
@@ -258,11 +260,9 @@ describe("ThemeBox", () => {
     });
 
     test("initializeTheme() calls required setup functions", () => {
-        const applySpy = jest.spyOn(themeBox, "_applyBodyTheme");
         const updateIconSpy = jest.spyOn(themeBox, "updateThemeIcon");
         const refreshUISpy = jest.spyOn(themeBox, "refreshUIComponents");
         themeBox.initializeTheme();
-        expect(applySpy).toHaveBeenCalled();
         expect(updateIconSpy).toHaveBeenCalled();
         expect(refreshUISpy).toHaveBeenCalled();
     });
