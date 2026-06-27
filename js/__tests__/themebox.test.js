@@ -127,7 +127,7 @@ describe("ThemeBox", () => {
             toolbarHeight: 50
         };
 
-        window.syncPlatformColor = jest.fn((theme) => {
+        window.syncPlatformColor = jest.fn(theme => {
             if (theme === "dark") window.platformColor.background = "rgb(48, 48, 48)";
             else if (theme === "light") window.platformColor.background = "rgb(249, 249, 249)";
         });
