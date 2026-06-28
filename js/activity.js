@@ -2685,7 +2685,7 @@ class Activity {
                         }
                         break;
                 }
-            } else if ((event.ctrlKey || event.metaKey) && event.code === 'Space' && !disableKeys) {
+            } else if ((event.ctrlKey || event.metaKey) && event.code === "Space" && !disableKeys) {
                 event.preventDefault();
                 this._displayHelpfulSearchDiv();
             } else {
