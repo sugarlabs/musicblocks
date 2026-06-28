@@ -18,7 +18,7 @@
    getOctaveRatio, isCustomTemperament, Singer, DOUBLEFLAT, DOUBLESHARP,
    DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
    getArticulation, piemenuPitches, docById, slicePath, wheelnav, platformColor,
-   DEFAULTVOICE, normalizeNoteAccidentals
+   DEFAULTVOICE, normalizeNoteAccidentals, parseNoteString
 */
 
 /*
@@ -28,7 +28,7 @@
     - js/utils/musicutils.js
         pitchToNumber, getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
         isCustomTemperament, DOUBLEFLAT, DOUBLESHARP, DEFAULTDRUM, getOscillatorTypes, numberToPitch,
-        getArticulation, getOctaveRatio, getTemperament, DEFAULTVOICE
+        getArticulation, getOctaveRatio, getTemperament, DEFAULTVOICE, parseNoteString
     - js/turtle-singer.js
         Singer
     - js/utils/platformstyle.js
@@ -601,29 +601,29 @@ function Synth() {
             console.error("Temperament not found: " + temperament);
             return;
         }
-        const len = startPitch.length;
-        const number = pitchToNumber(
-            startPitch.substring(0, len - 1),
-            startPitch.slice(-1),
-            "C major"
-        );
+        const parsed = parseNoteString(startPitch);
+        const number = pitchToNumber(parsed[0], parsed[1], "C major");
         const startPitchObj = numberToPitch(number);
         startPitch = (startPitchObj[0] + startPitchObj[1]).toString();
 
-        if (startPitch.substring(1, len - 1) === FLAT || startPitch.substring(1, len - 1) === "b") {
+        if (
+            startPitch.substring(1, startPitch.length - 1) === FLAT ||
+            startPitch.substring(1, startPitch.length - 1) === "b"
+        ) {
             startPitch = startPitch.replace(FLAT, "b");
         } else if (
-            startPitch.substring(1, len - 1) === SHARP ||
-            startPitch.substring(1, len - 1) === "#"
+            startPitch.substring(1, startPitch.length - 1) === SHARP ||
+            startPitch.substring(1, startPitch.length - 1) === "#"
         ) {
             startPitch = startPitch.replace(SHARP, "#");
         }
 
         const frequency = Tone.Frequency(startPitch).toFrequency();
 
+        const startParsed = parseNoteString(startingPitch);
         this.noteFrequencies = {
             // note: [octave, Frequency]
-            [startingPitch.substring(0, len - 1)]: [Number(startingPitch.slice(-1)), frequency]
+            [startParsed[0]]: [startParsed[1], frequency]
         };
 
         for (const interval in t) {
@@ -631,10 +631,29 @@ function Synth() {
                 interval !== "pitchNumber" &&
                 interval !== "interval" &&
                 interval !== "octave" &&
-                typeof t[interval] === "number"
+                interval !== "isEDO" &&
+                interval !== "edo" &&
+                interval !== "name" &&
+                interval !== "description" &&
+                interval !== "noteLabels" &&
+                interval !== "ratios" &&
+                interval !== "octaveRatio" &&
+                interval !== "generator"
             ) {
                 const noteInfo = getNoteFromInterval(startingPitch, interval);
-                this.noteFrequencies[noteInfo[0]] = [noteInfo[1], t[interval] * frequency];
+                let ratio;
+                if (typeof t[interval] === "number") {
+                    ratio = t[interval];
+                } else if (
+                    t[interval] &&
+                    typeof t[interval] === "object" &&
+                    typeof t[interval].ratio === "number"
+                ) {
+                    ratio = t[interval].ratio;
+                } else {
+                    continue;
+                }
+                this.noteFrequencies[noteInfo[0]] = [noteInfo[1], ratio * frequency];
             }
         }
 
@@ -688,22 +707,17 @@ function Synth() {
         }
 
         if (this.inTemperament === "equal") {
-            let len, note, octave;
             if (typeof notes === "string") {
-                len = notes.length;
-                note = notes.substring(0, len - 1);
-                octave = Number(notes.slice(-1));
-                return pitchToFrequency(note, octave, 0, "c major");
+                const parsed = parseNoteString(notes);
+                return pitchToFrequency(parsed[0], parsed[1], 0, "c major");
             } else if (typeof notes === "number") {
                 return notes;
             } else {
                 const results = [];
                 for (let i = 0; i < notes.length; i++) {
                     if (typeof notes[i] === "string") {
-                        len = notes[i].length;
-                        note = notes[i].substring(0, len - 1);
-                        octave = Number(notes[i].slice(-1));
-                        results.push(pitchToFrequency(note, octave, 0, "c major"));
+                        const parsed = parseNoteString(notes[i]);
+                        results.push(pitchToFrequency(parsed[0], parsed[1], 0, "c major"));
                     } else {
                         results.push(notes[i]);
                     }
@@ -713,16 +727,18 @@ function Synth() {
         }
 
         const __getFrequency = oneNote => {
-            const len = oneNote.length;
+            const parsed = parseNoteString(oneNote);
+            const noteName = parsed[0];
+            const octave = parsed[1];
 
             for (const note in this.noteFrequencies) {
-                if (note === oneNote.substring(0, len - 1)) {
-                    if (this.noteFrequencies[note][0] === Number(oneNote.slice(-1))) {
+                if (note === noteName) {
+                    if (this.noteFrequencies[note][0] === octave) {
                         //Note to be played is in the same octave.
                         return this.noteFrequencies[note][1];
                     } else {
                         //Note to be played is not in the same octave.
-                        const power = Number(oneNote.slice(-1)) - this.noteFrequencies[note][0];
+                        const power = octave - this.noteFrequencies[note][0];
                         return this.noteFrequencies[note][1] * Math.pow(2, power);
                     }
                 }
@@ -757,12 +773,14 @@ function Synth() {
      */
     this.getCustomFrequency = (notes, customID) => {
         const __getCustomFrequency = (oneNote, startingPitch) => {
-            const octave = oneNote.slice(-1);
-            oneNote = getCustomNote(oneNote.substring(0, oneNote.length - 1));
+            const parsed = parseNoteString(oneNote);
+            const octave = parsed[1];
+            oneNote = getCustomNote(parsed[0]);
             const pitch = startingPitch;
+            const pitchParsed = parseNoteString(pitch);
             const startPitchFrequency = pitchToFrequency(
-                pitch.substring(0, pitch.length - 1),
-                pitch.slice(-1),
+                pitchParsed[0],
+                pitchParsed[1],
                 0,
                 "C Major"
             );
@@ -1994,6 +2012,11 @@ function Synth() {
                                 synth &&
                                 typeof synth.toDestination === "function"
                             ) {
+                                try {
+                                    synth.disconnect();
+                                } catch (_) {
+                                    // Already disconnected — safe to ignore.
+                                }
                                 synth.toDestination();
                             }
                         } catch (e) {

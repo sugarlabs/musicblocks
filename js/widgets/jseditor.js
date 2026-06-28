@@ -374,7 +374,7 @@ class JSEditor {
         helpBtn.style.fontSize = "2rem";
         helpBtn.style.background = "#2196f3";
         helpBtn.style.cursor = "pointer";
-        helpBtn.innerHTML = "help_outline";
+        helpBtn.textContent = "help_outline";
         helpBtn.onclick = this._toggleHelp.bind(this);
         menuLeft.appendChild(helpBtn);
         generateTooltip(helpBtn, _("Help"));
@@ -387,7 +387,7 @@ class JSEditor {
         generateBtn.style.fontSize = "2rem";
         generateBtn.style.background = "#2196f3";
         generateBtn.style.cursor = "pointer";
-        generateBtn.innerHTML = "autorenew";
+        generateBtn.textContent = "autorenew";
         generateBtn.onclick = this._generateCode.bind(this);
         menuLeft.appendChild(generateBtn);
         generateTooltip(generateBtn, _("Reset Code"));
@@ -400,7 +400,7 @@ class JSEditor {
         runBtn.style.fontSize = "2rem";
         runBtn.style.background = "#2196f3";
         runBtn.style.cursor = "pointer";
-        runBtn.innerHTML = "play_arrow";
+        runBtn.textContent = "play_arrow";
         runBtn.onclick = this._runCode.bind(this);
         menuLeft.appendChild(runBtn);
         menubar.appendChild(menuLeft);
@@ -414,7 +414,7 @@ class JSEditor {
         convertBtn.style.fontSize = "2rem";
         convertBtn.style.background = "#2196f3";
         convertBtn.style.cursor = "pointer";
-        convertBtn.innerHTML = "transform";
+        convertBtn.textContent = "transform";
         convertBtn.onclick = this._codeToBlocks.bind(this);
         menuLeft.appendChild(convertBtn);
         menubar.appendChild(menuLeft);
@@ -435,7 +435,7 @@ class JSEditor {
         styleBtn.style.fontSize = "2rem";
         styleBtn.style.background = "#2196f3";
         styleBtn.style.cursor = "pointer";
-        styleBtn.innerHTML = "invert_colors";
+        styleBtn.textContent = "invert_colors";
         styleBtn.onclick = this._changeStyle.bind(this);
         menuRight.appendChild(styleBtn);
         menubar.appendChild(menuRight);
@@ -538,7 +538,7 @@ class JSEditor {
         consolelabel.style.background = "white";
         consolelabel.style.display = "flex";
         consolelabel.style.justifyContent = "space-between";
-        consolelabel.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;CONSOLE";
+        consolelabel.textContent = "\u00a0\u00a0\u00a0\u00a0CONSOLE";
         this._editor.appendChild(consolelabel);
 
         const arrowBtn = document.createElement("span");
@@ -549,7 +549,7 @@ class JSEditor {
         arrowBtn.style.cursor = "pointer";
         arrowBtn.style.lineHeight = "0.75rem";
         arrowBtn.style.marginLeft = "0";
-        arrowBtn.innerHTML = "keyboard_arrow_down";
+        arrowBtn.textContent = "keyboard_arrow_down";
         arrowBtn.onclick = this._toggleConsole.bind(this);
         consolelabel.appendChild(arrowBtn);
         generateTooltip(arrowBtn, _("Toggle Console"), "left");
@@ -1053,28 +1053,56 @@ class JSEditor {
      * @returns {void}
      */
     _updateDebugButtons(code) {
-        if (!docById("debugButtons")) return;
+        const debugContainer = docById("debugButtons");
+        if (!debugContainer) return;
+
         const lines = code.replace(/\n+$/, "\n").split("\n");
-        let buttonsHTML = "";
+        const fragment = document.createDocumentFragment();
+
         for (let i = 0; i < lines.length; i++) {
             const lineNumber = i;
             const lineContent = lines[i].trim();
             const hasDebugger = lineContent === "debugger;" || lineContent.includes("debugger;");
+
+            const btnDiv = document.createElement("div");
+            btnDiv.style.height = "20px";
+            btnDiv.style.lineHeight = "20px";
+
             if (lineContent === "") {
-                buttonsHTML += "<div style='height: 20px; line-height: 20px;'>&nbsp;</div>";
+                btnDiv.innerHTML = "&nbsp;";
             } else if (hasDebugger) {
-                buttonsHTML += `<div style="height: 20px; line-height: 20px; cursor: pointer; opacity: 1; pointer-events: auto; border-radius: 4px;" \
-                    onclick="window.jsEditor._removeDebuggerFromLine(${lineNumber})" \
-                    title="Remove debugger from line ${lineNumber + 1}">🔴</div>`;
+                btnDiv.style.cursor = "pointer";
+                btnDiv.style.opacity = "1";
+                btnDiv.style.pointerEvents = "auto";
+                btnDiv.style.borderRadius = "4px";
+                btnDiv.title = `Remove debugger from line ${lineNumber + 1}`;
+                btnDiv.textContent = "🔴";
+                btnDiv.addEventListener("click", () => {
+                    if (window.jsEditor) window.jsEditor._removeDebuggerFromLine(lineNumber);
+                });
             } else {
-                buttonsHTML += `<div style="height: 20px; line-height: 20px; cursor: pointer; opacity: 0; transition: opacity 0.2s ease-in-out; pointer-events: auto;" \
-                    onmouseenter="this.style.opacity='1'" \
-                    onmouseleave="this.style.opacity='0'"\
-                    onclick="window.jsEditor._addDebuggerToLine(${lineNumber})" \
-                    title="Add breakpoint to line ${lineNumber + 1}">🔴</div>`;
+                btnDiv.style.cursor = "pointer";
+                btnDiv.style.opacity = "0";
+                btnDiv.style.transition = "opacity 0.2s ease-in-out";
+                btnDiv.style.pointerEvents = "auto";
+                btnDiv.title = `Add breakpoint to line ${lineNumber + 1}`;
+                btnDiv.textContent = "🔴";
+
+                btnDiv.addEventListener("mouseenter", () => {
+                    btnDiv.style.opacity = "1";
+                });
+                btnDiv.addEventListener("mouseleave", () => {
+                    btnDiv.style.opacity = "0";
+                });
+                btnDiv.addEventListener("click", () => {
+                    if (window.jsEditor) window.jsEditor._addDebuggerToLine(lineNumber);
+                });
             }
+            fragment.appendChild(btnDiv);
         }
-        docById("debugButtons").innerHTML = buttonsHTML;
+
+        debugContainer.innerHTML = "";
+        debugContainer.appendChild(fragment);
     }
 
     /**

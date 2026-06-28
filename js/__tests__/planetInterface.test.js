@@ -188,6 +188,14 @@ describe("PlanetInterface", () => {
         expect(mockActivity.refreshCanvas).not.toHaveBeenCalled();
     });
 
+    // Regression test for #7350: when running from file:///index.html,
+    // planet.planet is null so getCurrentProjectName() must return ""
+    // to prevent _afterDelete from entering the Planet branch.
+    test("getCurrentProjectName returns empty string when inner Planet is null (#7350)", () => {
+        planetInterface.planet = null;
+        expect(planetInterface.getCurrentProjectName()).toBe("");
+    });
+
     test("loadProjectFromData: default merge=false", () => {
         planetInterface.iframe = { style: { display: "block" } };
         mockActivity.blocks.loadNewBlocks.mockClear();
@@ -270,10 +278,16 @@ describe("PlanetInterface", () => {
         planetInterface.openProjectFromPlanet("ID42", "oops");
         expect(planetInterface.planet.openProjectFromPlanet).toHaveBeenCalledWith("ID42", "oops");
     });
-    test("openProjectFromPlanet returns early when Planet is unavailable", () => {
+    test("openProjectFromPlanet returns safely when Planet backend is unavailable", () => {
+        const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
         planetInterface.planet = null;
 
         expect(() => planetInterface.openProjectFromPlanet("ID42", "oops")).not.toThrow();
+        expect(errorSpy).toHaveBeenCalledWith(
+            "[PlanetInterface] openProjectFromPlanet called before Planet is ready."
+        );
+
+        errorSpy.mockRestore();
     });
     test("hideMusicBlocks also calls widgetWindows.hideAllWindows and disables DOM events after 250ms", () => {
         jest.useFakeTimers();

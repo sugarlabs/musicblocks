@@ -8,12 +8,12 @@
 }
 
 #themedropdown a {
-    color: #2196f3;
+    color: var(--color-brand-primary);
     transition: all 0.3s ease;
 }
 
 #themedropdown a:hover {
-    color: #1e88e5;
+    color: var(--color-brand-primary-hover);
     background-color: transparent;
     transition: all 0.3s ease;
 }
@@ -33,7 +33,7 @@
 
 /* High Contrast Mode Theme Dropdown - Override ALL styles */
 .highcontrast #themedropdown {
-    background-color: #000000 !important;
+    background-color: var(--color-text-inverse) !important;
     border: 1px solid #ffffff !important;
 }
 
@@ -43,7 +43,7 @@
 
 .highcontrast #themedropdown li a {
     background-color: transparent !important;
-    color: #00ffff !important;
+    color: var(--color-brand-secondary) !important;
 }
 
 .highcontrast #themedropdown li a:hover,
@@ -52,13 +52,13 @@
 .highcontrast #themedropdown.dropdown-content li > a:hover,
 .highcontrast.dropdown-content li > a:hover {
     background-color: transparent !important;
-    color: #00ffff !important;
+    color: var(--color-brand-secondary) !important;
 }
 
 /* Override Materialize CSS hover styles with maximum specificity */
 body.highcontrast #themedropdown.dropdown-content li > a:hover {
     background-color: transparent !important;
-    color: #00ffff !important;
+    color: var(--color-brand-secondary) !important;
 }
 
 /* Dark Mode */
@@ -68,7 +68,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .dark #canvas {
-    background-color: #1c1c1c !important;
+    background-color: var(--color-bg-primary) !important;
 }
 
 .dark .blue.darken-1 {
@@ -81,25 +81,25 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .dark .wfbtItem {
-    background-color: #225a91;
+    background-color: var(--color-brand-primary);
 }
 
 .dark #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
-    color: #e8e8e8;
+    color: var(--color-text-secondary);
 }
 
 .dark #floatingWindows > .windowFrame > .wfWinBody .wfbWidget {
-    color: #ccc !important;
-    background-color: #505050 !important;
+    color: var(--color-border-primary) !important;
+    background-color: var(--color-bg-secondary) !important;
 }
 
 .dark .popupMsg {
-    background-color: #084e86;
-    color: #e8e8e8;
+    background-color: var(--color-brand-primary-hover);
+    color: var(--color-text-secondary);
 }
 
 .dark #printText {
-    border-color: #000000;
+    border-color: var(--color-text-primary);
 }
 
 .dark #loading-image-container {
@@ -111,7 +111,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .dark .language-link {
-    color: #fff;
+    color: var(--color-text-inverse);
 }
 
 .modal-content {
@@ -124,18 +124,25 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .dark #search,
-.dark #helpfulSearch,
+.dark #helpfulSearch {
+    color: var(--color-text-primary) !important;
+    -webkit-text-fill-color: var(--color-text-primary) !important;
+    caret-color: var(--color-text-primary) !important;
+}
 .dark .ui-autocomplete {
-    background-color: #1c1c1c !important;
-    color: #fff !important;
-    border-color: #444 !important;
+    background-color: var(--color-bg-primary) !important;
+    color: var(--color-text-inverse) !important;
+    border-color: var(--color-border-primary) !important;
 }
 
 /* Ensure all text inside autocomplete items is white */
 .dark .ui-autocomplete .ui-menu-item,
 .dark .ui-autocomplete .ui-menu-item a,
-.dark .ui-autocomplete .ui-menu-item .ui-menu-item-wrapper {
-    color: #fff !important;
+.dark .ui-autocomplete .ui-menu-item .ui-menu-item-wrapper,
+.dark .ui-autocomplete .ui-menu-item span,
+.dark .ui-autocomplete .ui-menu-item b,
+.dark .ui-autocomplete .ui-menu-item strong {
+    color: var(--color-text-inverse) !important;
     background-color: transparent !important;
 }
 
@@ -143,10 +150,9 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 .dark .ui-autocomplete .ui-menu-item:hover,
 .dark .ui-autocomplete .ui-menu-item:hover a,
 .dark .ui-autocomplete .ui-menu-item:hover .ui-menu-item-wrapper,
-.dark .ui-autocomplete .ui-state-focus,
-.dark .ui-autocomplete .ui-state-active {
-    background-color: #808080 !important;
-    color: #fff !important;
+.dark .ui-menu-item-wrapper.ui-state-active,
+.dark .ui-menu-item-wrapper.ui-state-focus {
+    color: var(--color-text-primary) !important;
 }
 
 .dark #helpfulSearchDiv {
@@ -154,28 +160,28 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .dark #crossButton {
-    color: #fff;
+    color: var(--color-text-inverse);
 }
 
 .dark #chooseKeyDiv {
-    background: #333;
+    background: var(--color-bg-tertiary);
 }
 
 .dark #movable {
-    background: #333;
+    background: var(--color-bg-tertiary);
     color: white;
 }
 
 .dark .dropdown-content li > a {
-    background-color: #1c1c1c;
-    color: #3fe0d1;
+    background-color: var(--color-bg-primary);
+    color: var(--color-brand-secondary);
 }
 
 .dark .dropdown-content li:hover,
 .dark .dropdown-content li.active,
 .dark .dropdown-content li.selected,
 .dark .dropdown-content li.active.selected {
-    background-color: #333;
+    background-color: var(--color-bg-tertiary);
 }
 
 .dark .dropdown-content li:hover > a,
@@ -184,30 +190,30 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 .dark .dropdown-content li > a:hover,
 .dark .dropdown-content li > a:focus,
 .dark .dropdown-content li > a.dropdown-item-focused {
-    background-color: #333;
-    color: #3fe0d1;
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-brand-secondary);
 }
 
 .dark .dropdown-content {
-    background-color: #1c1c1c;
+    background-color: var(--color-bg-primary);
 }
 
 .dark .modalBox {
-    background-color: #1c1c1c;
+    background-color: var(--color-bg-primary);
 }
 
 .dark .modal-message {
     color: #e2e2e2;
-    background-color: #1c1c1c;
+    background-color: var(--color-bg-primary);
 }
 
 .dark #newdropdown {
     border: #000000;
-    background-color: #1c1c1c;
+    background-color: var(--color-bg-primary);
 }
 
 .dark #newdropdown li {
-    background-color: #1c1c1c;
+    background-color: var(--color-bg-primary);
 }
 
 .dark #newdropdown li:hover {
@@ -219,19 +225,19 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 body {
-    --border: #cccccc;
+    --border: var(--color-border-primary);
     --bg: #ffffff;
     --fg: #666666;
     --panel-bg: #f5f5f5;
-    --accent: #2196f3;
+    --accent: var(--color-brand-primary);
 }
 
 body.dark {
     --border: #000000;
     --bg: #1d1d20;
-    --fg: #e8e8e8;
-    --panel-bg: #1c1c1c;
-    --accent: #3fe0d1;
+    --fg: var(--color-text-secondary);
+    --panel-bg: var(--color-bg-primary);
+    --accent: var(--color-brand-secondary);
 }
 
 body.highcontrast {
@@ -239,7 +245,7 @@ body.highcontrast {
     --bg: #000000;
     --fg: #ffffff;
     --panel-bg: #000000;
-    --accent: #00ffff;
+    --accent: var(--color-brand-secondary);
 }
 
 .keyboard-shortcuts-widget {
@@ -302,7 +308,7 @@ body.highcontrast {
     border-radius: 10px;
     background: linear-gradient(180deg, #4aa3ef 0%, #2287de 100%);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    color: #ffffff;
+    color: var(--color-text-inverse);
 }
 
 .keyboard-shortcuts-hero-title {
@@ -379,7 +385,7 @@ body.highcontrast {
 
 .dark #helpdropdown.helpdropdown-menu {
     background: #1d1d20;
-    border-color: #000000;
+    border-color: var(--color-text-primary);
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
 }
 
@@ -388,7 +394,7 @@ body.highcontrast {
 }
 
 .dark #helpdropdown.helpdropdown-menu li > a {
-    color: #e8e8e8;
+    color: var(--color-text-secondary);
 }
 
 .dark #helpdropdown.helpdropdown-menu li:hover,
@@ -405,7 +411,7 @@ body.highcontrast {
 .dark #helpdropdown.helpdropdown-menu li > a:focus,
 .dark #helpdropdown.helpdropdown-menu li > a.dropdown-item-focused {
     background: rgba(74, 163, 239, 0.16);
-    color: #ffffff;
+    color: var(--color-text-inverse);
 }
 
 .dark .keyboard-shortcuts-hero {
@@ -443,26 +449,26 @@ body.highcontrast {
 
 .highcontrast .keyboard-shortcuts-panel {
     background: #000000;
-    color: #ffffff;
+    color: var(--color-text-inverse);
 }
 
 .highcontrast #helpdropdown.helpdropdown-menu,
 .highcontrast #helpdropdown.helpdropdown-menu li > a {
     background: #000000;
-    color: #ffffff;
-    border-color: #ffffff;
+    color: var(--color-text-inverse);
+    border-color: var(--color-text-inverse);
     box-shadow: none;
 }
 
 .highcontrast #helpdropdown.helpdropdown-menu li + li {
-    border-top-color: #ffffff;
+    border-top-color: var(--color-text-inverse);
 }
 
 .highcontrast #helpdropdown.helpdropdown-menu li:hover,
 .highcontrast #helpdropdown.helpdropdown-menu li.active,
 .highcontrast #helpdropdown.helpdropdown-menu li.selected,
 .highcontrast #helpdropdown.helpdropdown-menu li.active.selected {
-    background: #00ffff;
+    background: var(--color-brand-secondary);
 }
 
 .highcontrast #helpdropdown.helpdropdown-menu li:hover > a,
@@ -471,29 +477,29 @@ body.highcontrast {
 .highcontrast #helpdropdown.helpdropdown-menu li > a:hover,
 .highcontrast #helpdropdown.helpdropdown-menu li > a:focus,
 .highcontrast #helpdropdown.helpdropdown-menu li > a.dropdown-item-focused {
-    background: #00ffff;
-    color: #000000;
+    background: var(--color-brand-secondary);
+    color: var(--color-text-primary);
 }
 
 .highcontrast .keyboard-shortcuts-hero,
 .highcontrast .keyboard-shortcuts-section,
 .highcontrast .keyboard-shortcuts-key {
-    border: 1px solid #ffffff;
-    background: #000000;
+    border: 1px solid var(--color-border-primary);
+    background: var(--color-bg-primary);
     box-shadow: none;
-    color: #ffffff;
+     color: var(--color-text-primary) !important;
 }
 
 .highcontrast .keyboard-shortcuts-section-title,
 .highcontrast .keyboard-shortcuts-action,
 .highcontrast .keyboard-shortcuts-hero-copy,
 .highcontrast .keyboard-shortcuts-hero-title {
-    color: #ffffff;
+     color: var(--color-text-primary) !important;
 }
 
 .highcontrast .keyboard-shortcuts-row,
 .highcontrast .keyboard-shortcuts-section-title {
-    border-color: #ffffff;
+    border-color: var(--color-text-inverse);
 }
 
 @media (max-width: 900px) {
@@ -508,15 +514,15 @@ body.highcontrast {
 }
 
 .highcontrast #canvas {
-    background-color: #000000 !important;
+    background-color: var(--color-text-inverse) !important;
 }
 
 .highcontrast .blue {
-    background-color: #000080 !important;
+    background-color: var(--color-text-inverse)080 !important;
 }
 
 .highcontrast .blue.darken-1 {
-    background-color: #0000ff !important;
+    background-color: var(--color-text-inverse)0ff !important;
 }
 
 .highcontrast #floatingWindows > .windowFrame {
@@ -525,25 +531,25 @@ body.highcontrast {
 }
 
 .highcontrast .wfbtItem {
-    background-color: #00ffff;
+    background-color: var(--color-brand-secondary);
 }
 
 .highcontrast #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
-    color: #ffffff;
+    color: var(--color-text-primary) !important;
 }
 
 .highcontrast #floatingWindows > .windowFrame > .wfWinBody .wfbWidget {
-    color: #ffffff !important;
-    background-color: #000000 !important;
+    color: var(--color-text-inverse) !important;
+    background-color: var(--color-text-inverse) !important;
 }
 
 .highcontrast .popupMsg {
-    background-color: #000000;
-    color: #ffffff;
+    background-color: var(--color-text-inverse);
+    color: var(--color-text-inverse);
 }
 
 .highcontrast #printText {
-    border-color: #ffffff;
+    border-color: var(--color-text-inverse);
 }
 
 .highcontrast #loading-image-container {
@@ -555,100 +561,100 @@ body.highcontrast {
 }
 
 .highcontrast .language-link {
-    color: #ffffff;
+    color: var(--color-text-inverse);
 }
 
 .highcontrast #submitLilypond {
-    background-color: #00ffff;
-    color: #000000;
+    background-color: var(--color-brand-secondary);
+    color: var(--color-text-primary);
 }
 
 .highcontrast #search,
 .highcontrast #helpfulSearch,
 .highcontrast .ui-autocomplete {
-    background-color: #000000 !important;
-    color: #ffffff !important;
+    background-color: var(--color-text-inverse) !important;
+    color: var(--color-text-inverse) !important;
     border: 1px solid #ffffff;
 }
 
 .highcontrast .ui-autocomplete .ui-menu-item a {
-    color: #ffffff !important;
-    background-color: #000000 !important;
+    color: var(--color-text-inverse) !important;
+    background-color: var(--color-text-inverse) !important;
 }
 
 .highcontrast .ui-autocomplete .ui-menu-item a:hover {
-    color: #000000 !important;
-    background-color: #00ffff !important;
+    color: var(--color-text-primary) !important;
+    background-color: var(--color-brand-secondary) !important;
 }
 
 .highcontrast #helpfulSearchDiv {
-    color: #ffffff !important;
+    color: var(--color-text-inverse) !important;
     background-color: transparent !important;
 }
 
 .highcontrast #crossButton {
-    color: #ffffff;
+    color: var(--color-text-inverse);
 }
 
 .highcontrast #chooseKeyDiv {
     background: #000000;
-    color: #ffffff;
+    color: var(--color-text-inverse);
 }
 
 .highcontrast #movable {
     background: #000000;
-    color: #ffffff;
+    color: var(--color-text-inverse);
 }
 
 .highcontrast .dropdown-content li > a {
-    background-color: #000000;
-    color: #00ffff;
+    background-color: var(--color-text-inverse);
+    color: var(--color-brand-secondary);
 }
 
 .highcontrast .dropdown-content {
-    background-color: #000000;
+    background-color: var(--color-text-inverse);
     border: 1px solid #ffffff;
 }
 
 .highcontrast .modalBox {
-    background-color: #000000;
-    border: 2px solid #cccccc;
+    background-color: var(--color-text-inverse);
+    border: 2px solid var(--color-border-primary);
     box-shadow: 0 0 8px rgba(255, 255, 0, 0.45);
 }
 
 .highcontrast .modal-message {
-    color: #ffffff;
-    background-color: #000000;
+    color: var(--color-text-inverse);
+    background-color: var(--color-text-inverse);
 }
 
 .highcontrast #newdropdown {
     border: #ffffff;
-    background-color: #000000;
+    background-color: var(--color-text-inverse);
 }
 
 .highcontrast #confirmation-message {
-    color: #ffffff;
+    color: var(--color-text-inverse);
 }
 
 .highcontrast .material-tooltip {
-    background-color: #000000 !important;
+    background-color: var(--color-text-inverse) !important;
     border: 1px solid #ffffff;
 }
 
 .highcontrast .material-tooltip .backdrop {
-    background-color: #000000 !important;
+    background-color: var(--color-text-inverse) !important;
 }
 
 .highcontrast #languagedropdown li a.selected-language {
     background-color: rgba(0, 255, 255, 0.25);
-    border-left: 3px solid #00ffff;
+    border-left: 3px solid var(--color-brand-secondary);
 }
 
 .highcontrast .dropdown-content li:hover,
 .highcontrast .dropdown-content li.active,
 .highcontrast .dropdown-content li.selected,
 .highcontrast .dropdown-content li.active.selected {
-    background-color: #00ffff;
+    background-color: var(--color-brand-secondary);
 }
 
 .highcontrast .dropdown-content li:hover > a,
@@ -657,8 +663,8 @@ body.highcontrast {
 .highcontrast .dropdown-content li > a:hover,
 .highcontrast .dropdown-content li > a:focus,
 .highcontrast .dropdown-content li > a.dropdown-item-focused {
-    background-color: #00ffff;
-    color: #000000;
+    background-color: var(--color-brand-secondary);
+    color: var(--color-text-primary);
 }
 
 /* Your Custom Theme can go here if you don't want to modify the existing dark mode */
@@ -666,7 +672,7 @@ body.highcontrast {
 /* Selected language highlight in language dropdown */
 #languagedropdown li a.selected-language {
     background-color: rgba(33, 150, 243, 0.15);
-    border-left: 3px solid #2196f3;
+    border-left: 3px solid var(--color-brand-primary);
     font-weight: 600;
 }
 
@@ -678,7 +684,7 @@ body.highcontrast {
 /* Dark Mode Tooltip Styling - Slightly lighter background for better contrast */
 .dark .material-tooltip {
     background-color: #3a3a3a !important;
-    color: #ffffff !important;
+    color: var(--color-text-primary) !important;
 }
 
 .dark .material-tooltip .backdrop {
@@ -686,5 +692,5 @@ body.highcontrast {
 }
 
 .dark .material-tooltip span {
-    color: #ffffff !important;
+    color: var(--color-text-primary) !important;
 }

@@ -312,7 +312,12 @@ class PlanetInterface {
          * @param {string} [error] - Error message if project opening fails.
          */
         this.openProjectFromPlanet = (id, error) => {
-            if (!this.planet || typeof this.planet.openProjectFromPlanet !== "function") return;
+            if (!this.planet || typeof this.planet.openProjectFromPlanet !== "function") {
+                console.error(
+                    "[PlanetInterface] openProjectFromPlanet called before Planet is ready."
+                );
+                return;
+            }
 
             this.planet.openProjectFromPlanet(id, error);
         };
@@ -405,6 +410,56 @@ class PlanetInterface {
 
             window.Converter = this.planet ? this.planet.Converter : undefined;
             this.mainCanvas = this.activity.canvas;
+
+            // Push theme colors and block display-name map to the iframe
+            // via postMessage so it never needs window.parent access.
+            this._pushPlatformColor();
+            this._pushBlockDisplayNames();
+        };
+
+        /**
+         * Sends platformColor to the Planet iframe via postMessage.
+         */
+        this._pushPlatformColor = () => {
+            if (!this.iframe || !this.iframe.contentWindow) return;
+            try {
+                this.iframe.contentWindow.postMessage(
+                    {
+                        type: "MB_PLATFORM_COLOR",
+                        payload: typeof platformColor !== "undefined" ? platformColor : null
+                    },
+                    "*"
+                );
+            } catch (e) {
+                console.debug("Could not push platformColor to Planet iframe:", e);
+            }
+        };
+
+        /**
+         * Builds a proto-name → display-name map from the palettes and
+         * sends it to the Planet iframe so Publisher.parseProject() can
+         * resolve human-friendly names without reaching into the parent.
+         */
+        this._pushBlockDisplayNames = () => {
+            if (!this.iframe || !this.iframe.contentWindow) return;
+            try {
+                const palettes = this.activity.blocks.palettes;
+                const nameMap = {};
+                for (const palette in palettes.dict) {
+                    for (const blk in palettes.dict[palette].protoList) {
+                        const proto = palettes.dict[palette].protoList[blk];
+                        if (proto.name && proto.staticLabels && proto.staticLabels[0]) {
+                            nameMap[proto.name] = proto.staticLabels[0];
+                        }
+                    }
+                }
+                this.iframe.contentWindow.postMessage(
+                    { type: "MB_BLOCK_NAMES", payload: nameMap },
+                    "*"
+                );
+            } catch (e) {
+                console.debug("Could not push block names to Planet iframe:", e);
+            }
         };
     }
 }

@@ -13,7 +13,7 @@
 global
 
 FlowBlock, LeftBlock, FlowClampBlock, StackClampBlock, ValueBlock,
-Queue, NOACTIONERRORMSG, NOINPUTERRORMSG
+Queue, NOACTIONERRORMSG, NOINPUTERRORMSG, isSafeUrl
 */
 
 /* exported setupActionBlocks */
@@ -100,14 +100,6 @@ function setupActionBlocks(activity) {
      * @class
      * @extends FlowBlock
      */
-    function isSafeUrl(urlString) {
-        try {
-            const parsed = new URL(urlString);
-            return parsed.protocol === "http:" || parsed.protocol === "https:";
-        } catch (e) {
-            return false;
-        }
-    }
     class ReturnToURLBlock extends FlowBlock {
         /**
          * Constructor for the ReturnToURLBlock class.

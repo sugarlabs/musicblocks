@@ -28,10 +28,6 @@ requirejs.config({
             deps: ["easeljs.min"],
             exports: "createjs"
         },
-        "preloadjs.min": {
-            deps: ["easeljs.min", "tweenjs.min"],
-            exports: "createjs"
-        },
         "Tone": {
             exports: "Tone"
         },
@@ -56,13 +52,19 @@ requirejs.config({
         "p5-sound-adapter": {
             deps: ["p5.sound.min"]
         },
+        "utils/utils-logic": {
+            exports: "UtilsLogic"
+        },
         "utils/utils": {
-            deps: ["utils/platformstyle"],
+            deps: ["utils/platformstyle", "utils/utils-logic"],
             exports: "_"
         },
         "utils/retryWithBackoff": {
             deps: ["utils/utils"],
             exports: "retryWithBackoff"
+        },
+        "utils/error-handler": {
+            exports: "ErrorHandler"
         },
         "activity/turtledefs": {
             deps: ["utils/utils"],
@@ -118,10 +120,24 @@ requirejs.config({
         "activity/activity": {
             deps: [
                 "utils/utils",
+                "utils/error-handler",
                 "activity/activity-context",
                 "activity/logo",
                 "activity/blocks",
-                "activity/turtles"
+                "activity/turtles",
+                "activity/recorder",
+                "activity/abc-parser",
+                "activity/idle-watcher",
+                "activity/grid-controller",
+                "activity/grid-renderer",
+                "activity/plugin-controller",
+                "widgets/plugin-dialog",
+                "activity/toolbar-controller",
+                "activity/toolbar-ui",
+                "activity/alert-controller",
+                "activity/alert-renderer",
+                "palette/palette-loader",
+                "activity/search-controller"
             ],
             exports: "Activity"
         },
@@ -155,9 +171,20 @@ requirejs.config({
         "utils": "js/utils",
         "widgets": "js/widgets",
         "activity": "js",
+        "activity/recorder": "js/activity/recorder",
+        "activity/exporters": "js/activity/exporters",
+        "activity/abc-parser": "js/activity/abc-parser",
+        "activity/idle-watcher": "js/activity/idle-watcher",
+        "activity/grid-controller": "js/activity/grid-controller",
+        "activity/grid-renderer": "js/activity/grid-renderer",
+        "activity/plugin-controller": "js/activity/plugin-controller",
+        "activity/toolbar-controller": "js/activity/toolbar-controller",
+        "activity/alert-controller": "js/activity/alert-controller",
+        "activity/alert-renderer": "js/activity/alert-renderer",
+        "palette/palette-loader": "js/palette/palette-loader",
+        "activity/search-controller": "js/activity/search-controller",
         "easeljs.min": "lib/easeljs.min",
         "tweenjs.min": "lib/tweenjs.min",
-        "preloadjs.min": "lib/preloadjs.min",
         "prefixfree.min": "lib/prefixfree.min",
         "howler": "lib/howler",
         "Chart": "lib/Chart",
@@ -290,10 +317,24 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
 
     function updateContent() {
         if (!i18next.isInitialized) return;
+        const lang = i18next.language;
         const elements = document.querySelectorAll("[data-i18n]");
         elements.forEach(element => {
             const key = element.getAttribute("data-i18n");
-            element.textContent = i18next.t(key);
+            if (lang && lang.startsWith("ja")) {
+                const kanaPref =
+                    (window.localStorage && window.localStorage.getItem("kanaPreference")) ||
+                    "kanji";
+                const script = kanaPref === "kana" ? "kana" : "kanji";
+                const result = i18next.t(key, { returnObjects: true });
+                if (result && typeof result === "object") {
+                    element.textContent = result[script] || key;
+                } else {
+                    element.textContent = typeof result === "string" ? result : key;
+                }
+            } else {
+                element.textContent = i18next.t(key);
+            }
         });
     }
 
@@ -403,7 +444,6 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
             const CORE_BOOTSTRAP_MODULES = [
                 "easeljs.min",
                 "tweenjs.min",
-                "preloadjs.min",
                 "utils/platformstyle",
                 "utils/utils",
                 "activity/turtledefs",

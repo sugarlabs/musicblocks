@@ -41,7 +41,7 @@ function setupNumberBlocks(activity) {
     const toInteger = (logo, value, blk) => {
         if (typeof value === "string") {
             try {
-                return parseInt(value);
+                return parseInt(value, 10);
             } catch (e) {
                 logo.stopTurtle = true;
                 activity.errorMsg(NANERRORMSG, blk);

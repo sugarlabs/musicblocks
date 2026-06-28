@@ -76,6 +76,13 @@ describe("AIWidget Utilities", () => {
             };
             expect(adjustPitch("F", keySignature)).toBe("F♯");
         });
+
+        it("should return note unchanged for unsupported accidental types", () => {
+            const keySignature = {
+                accidentals: [{ note: "C", acc: "natural" }]
+            };
+            expect(adjustPitch("C", keySignature)).toBe("C");
+        });
     });
 
     describe("abcToStandardValue", () => {
@@ -148,6 +155,11 @@ describe("AIWidget Utilities", () => {
 describe("AIWidget Instance", () => {
     let aiWidget;
     let mockActivity;
+    let originalFetch;
+    let originalCustomSamples;
+    let originalInstruments;
+    let originalToneAnalyser;
+    let originalWindowFor;
 
     beforeEach(() => {
         mockActivity = {
@@ -199,6 +211,28 @@ describe("AIWidget Instance", () => {
         aiWidget = new AIWidget();
         // Since aiwidget.js uses wheelnav as a global if present
         global.wheelnav = jest.fn();
+        originalFetch = global.fetch;
+
+        originalCustomSamples = global.CUSTOMSAMPLES;
+        originalInstruments = global.instruments;
+        originalToneAnalyser = global.Tone?.Analyser;
+        originalWindowFor = global.window?.widgetWindows?.windowFor;
+    });
+
+    afterEach(() => {
+        global.fetch = originalFetch;
+        global.CUSTOMSAMPLES = originalCustomSamples;
+        global.instruments = originalInstruments;
+
+        if (global.Tone) {
+            global.Tone.Analyser = originalToneAnalyser;
+        }
+
+        if (global.window?.widgetWindows) {
+            global.window.widgetWindows.windowFor = originalWindowFor;
+        }
+        jest.restoreAllMocks();
+        jest.useRealTimers();
     });
 
     it("should initialize correctly", () => {
@@ -215,5 +249,672 @@ describe("AIWidget Instance", () => {
             "Warning: Sample is bigger than 1MB.",
             undefined
         );
+    });
+
+    it("should debounce generate blocks action and prevent duplicate saves", () => {
+        jest.useFakeTimers();
+        let generateButtonHandler;
+        mockActivity.storage = {
+            groq_api_key: "test-key"
+        };
+        global.window.widgetWindows.windowFor = jest.fn(() => ({
+            clear: jest.fn(),
+            show: jest.fn(),
+            destroy: jest.fn(),
+            sendToCenter: jest.fn(),
+            isMaximized: jest.fn(() => false),
+            getWidgetFrame: jest.fn(() => ({
+                getBoundingClientRect: jest.fn(() => ({ width: 800, height: 600 }))
+            })),
+            getWidgetBody: jest.fn(() => {
+                const div = document.createElement("div");
+                div.getBoundingClientRect = jest.fn(() => ({
+                    width: 800,
+                    height: 600
+                }));
+                return div;
+            }),
+            addButton: jest.fn(iconName => {
+                const button = { onclick: null };
+                if (iconName === "export-chunk.svg") {
+                    generateButtonHandler = button;
+                }
+                return button;
+            })
+        }));
+        aiWidget = new AIWidget();
+        aiWidget._saveSample = jest.fn();
+        aiWidget.init(mockActivity);
+        generateButtonHandler.onclick();
+        generateButtonHandler.onclick();
+        generateButtonHandler.onclick();
+        expect(aiWidget._saveSample).toHaveBeenCalledTimes(1);
+        jest.advanceTimersByTime(1000);
+        generateButtonHandler.onclick();
+        expect(aiWidget._saveSample).toHaveBeenCalledTimes(2);
+        jest.useRealTimers();
+    });
+
+    it("should clean up analysers and animation frames on widget close", () => {
+        const cancelAnimationFrameMock = jest.fn();
+        global.cancelAnimationFrame = cancelAnimationFrameMock;
+        const disposeMock = jest.fn();
+        global.Tone.Analyser = jest.fn(() => ({
+            dispose: disposeMock
+        }));
+        global.instruments = [
+            {
+                piano: {
+                    disconnect: jest.fn(),
+                    connect: jest.fn()
+                }
+            }
+        ];
+        let widgetInstance;
+        global.window.widgetWindows.windowFor = jest.fn(() => {
+            widgetInstance = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                destroy: jest.fn(),
+                sendToCenter: jest.fn(),
+                isMaximized: jest.fn(() => false),
+                getWidgetFrame: jest.fn(() => ({
+                    getBoundingClientRect: jest.fn(() => ({
+                        width: 800,
+                        height: 600
+                    }))
+                })),
+                getWidgetBody: jest.fn(() => {
+                    const div = document.createElement("div");
+                    div.getBoundingClientRect = jest.fn(() => ({
+                        width: 800,
+                        height: 600
+                    }));
+                    return div;
+                }),
+                addButton: jest.fn(() => ({ onclick: null })),
+                onclose: null
+            };
+            return widgetInstance;
+        });
+        aiWidget = new AIWidget();
+        aiWidget.drawVisualIDs = {
+            one: 11,
+            two: 22
+        };
+        aiWidget.pitchAnalysers = {
+            0: {
+                dispose: disposeMock
+            }
+        };
+        aiWidget.init(mockActivity);
+        aiWidget.drawVisualIDs = {
+            one: 11,
+            two: 22
+        };
+        aiWidget.pitchAnalysers = {
+            0: {
+                dispose: disposeMock
+            }
+        };
+        widgetInstance.onclose();
+        expect(cancelAnimationFrameMock).toHaveBeenCalledWith(11);
+        expect(cancelAnimationFrameMock).toHaveBeenCalledWith(22);
+        expect(disposeMock).toHaveBeenCalled();
+        expect(widgetInstance.destroy).toHaveBeenCalled();
+        expect(aiWidget.pitchAnalysers).toEqual({});
+    });
+
+    it("should handle synth initialization failures gracefully", async () => {
+        const resumeMock = jest.fn(() => Promise.resolve());
+        const initMock = jest.fn(() => Promise.reject(new Error("init failed")));
+        global.ABCJS = {
+            renderAbc: jest.fn(() => [
+                {
+                    millisecondsPerMeasure: jest.fn(() => 1000)
+                }
+            ]),
+            synth: {
+                supportsAudio: jest.fn(() => true),
+                CreateSynth: jest.fn(() => ({
+                    init: initMock,
+                    prime: jest.fn(),
+                    start: jest.fn(),
+                    stop: jest.fn()
+                }))
+            }
+        };
+        aiWidget = new AIWidget();
+        mockActivity.logo.synth = {
+            tone: {
+                context: {
+                    resume: resumeMock
+                }
+            }
+        };
+        aiWidget.activity = mockActivity;
+        await aiWidget._playABCSong();
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+            expect.stringContaining("Synth error: init failed")
+        );
+    });
+
+    it("should prevent submission when API key is missing", () => {
+        global.alert = jest.fn();
+        aiWidget = new AIWidget();
+        mockActivity.storage = {};
+        const widgetBody = document.createElement("div");
+        const widgetWindowMock = {
+            clear: jest.fn(),
+            show: jest.fn(),
+            destroy: jest.fn(),
+            sendToCenter: jest.fn(),
+            isMaximized: jest.fn(() => false),
+            getWidgetFrame: jest.fn(() => ({
+                getBoundingClientRect: jest.fn(() => ({
+                    width: 800,
+                    height: 600
+                }))
+            })),
+            getWidgetBody: jest.fn(() => widgetBody),
+            addButton: jest.fn(() => ({ onclick: null }))
+        };
+        aiWidget.widgetWindow = widgetWindowMock;
+        aiWidget.activity = mockActivity;
+        aiWidget.makeCanvas(800, 400);
+        const input = widgetBody.querySelector(".inputField");
+        const submitButton = widgetBody.querySelector(".submitButton");
+        input.value = "generate melody";
+        global.fetch = jest.fn();
+        submitButton.onclick();
+        expect(global.alert).toHaveBeenCalled();
+        expect(global.fetch).not.toHaveBeenCalled();
+    });
+
+    it("should display API error messages from Groq responses", async () => {
+        global.fetch = jest.fn(() =>
+            Promise.resolve({
+                json: () =>
+                    Promise.resolve({
+                        error: {
+                            message: "invalid api key"
+                        }
+                    })
+            })
+        );
+        aiWidget = new AIWidget();
+        mockActivity.storage = {
+            groq_api_key: "test-key"
+        };
+        const widgetBody = document.createElement("div");
+        aiWidget.widgetWindow = {
+            getWidgetBody: jest.fn(() => widgetBody)
+        };
+        aiWidget.activity = mockActivity;
+        aiWidget.makeCanvas(800, 400);
+        const input = widgetBody.querySelector(".inputField");
+        const submitButton = widgetBody.querySelector(".submitButton");
+        const textarea = widgetBody.querySelector(".samplerTextarea");
+        input.value = "generate melody";
+        submitButton.onclick();
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(textarea.value).toContain("Groq API Error: invalid api key");
+        expect(submitButton.disabled).toBe(false);
+    });
+
+    it("should handle malformed AI responses without choices", async () => {
+        global.fetch = jest.fn(() =>
+            Promise.resolve({
+                json: () => Promise.resolve({})
+            })
+        );
+        aiWidget = new AIWidget();
+        mockActivity.storage = {
+            groq_api_key: "test-key"
+        };
+        const widgetBody = document.createElement("div");
+        aiWidget.widgetWindow = {
+            getWidgetBody: jest.fn(() => widgetBody)
+        };
+        aiWidget.activity = mockActivity;
+        aiWidget.makeCanvas(800, 400);
+        const input = widgetBody.querySelector(".inputField");
+        const submitButton = widgetBody.querySelector(".submitButton");
+        const textarea = widgetBody.querySelector(".samplerTextarea");
+        input.value = "generate melody";
+        submitButton.onclick();
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(textarea.value).toContain("Error: Unexpected response format from AI.");
+        expect(submitButton.disabled).toBe(false);
+    });
+
+    it("should show an error when audio is not supported", async () => {
+        global.ABCJS = {
+            renderAbc: jest.fn(() => [
+                {
+                    millisecondsPerMeasure: jest.fn(() => 1000)
+                }
+            ]),
+            synth: {
+                supportsAudio: jest.fn(() => false)
+            }
+        };
+        aiWidget = new AIWidget();
+        aiWidget.activity = mockActivity;
+        await aiWidget._playABCSong();
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith("Audio not supported in this browser.");
+    });
+
+    it("should remove old interface containers before rerendering", () => {
+        aiWidget = new AIWidget();
+        const widgetBody = document.createElement("div");
+        const oldContainer1 = document.createElement("div");
+        oldContainer1.className = "ai-interface-container";
+        const oldContainer2 = document.createElement("div");
+        oldContainer2.className = "ai-interface-container";
+        widgetBody.appendChild(oldContainer1);
+        widgetBody.appendChild(oldContainer2);
+        const makeCanvasSpy = jest.spyOn(aiWidget, "makeCanvas").mockImplementation(() => {});
+        aiWidget.widgetWindow = {
+            getWidgetBody: jest.fn(() => widgetBody),
+            getWidgetFrame: jest.fn(() => ({
+                getBoundingClientRect: jest.fn(() => ({
+                    height: 600
+                }))
+            })),
+            isMaximized: jest.fn(() => false)
+        };
+        aiWidget.reconnectSynthsToAnalyser = jest.fn();
+        aiWidget._scale();
+        expect(widgetBody.getElementsByClassName("ai-interface-container").length).toBe(0);
+        expect(makeCanvasSpy).toHaveBeenCalled();
+        expect(aiWidget.reconnectSynthsToAnalyser).toHaveBeenCalled();
+    });
+
+    it("should normalize markdown-wrapped AI responses before displaying ABC notation", async () => {
+        global.fetch = jest.fn(() =>
+            Promise.resolve({
+                json: () =>
+                    Promise.resolve({
+                        choices: [
+                            {
+                                message: {
+                                    content: "```abc\nX:1\nT:Test\nK:C\nC D E F\n```"
+                                }
+                            }
+                        ]
+                    })
+            })
+        );
+        aiWidget = new AIWidget();
+        mockActivity.storage = {
+            groq_api_key: "test-key"
+        };
+        const widgetBody = document.createElement("div");
+        aiWidget.widgetWindow = {
+            getWidgetBody: jest.fn(() => widgetBody)
+        };
+
+        aiWidget.activity = mockActivity;
+        aiWidget.makeCanvas(800, 400);
+        const input = widgetBody.querySelector(".inputField");
+        const submitButton = widgetBody.querySelector(".submitButton");
+        const textarea = widgetBody.querySelector(".samplerTextarea");
+
+        input.value = "generate melody";
+        submitButton.onclick();
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(fetch).toHaveBeenCalledTimes(1);
+        expect(textarea.value).toContain("X:1");
+        expect(textarea.value).not.toContain("```");
+        expect(submitButton.disabled).toBe(false);
+    });
+
+    it("should extract ABC notation from mixed AI responses", async () => {
+        global.fetch = jest.fn(() =>
+            Promise.resolve({
+                json: () =>
+                    Promise.resolve({
+                        choices: [
+                            {
+                                message: {
+                                    content: "Here is your melody:\n\nX:1\nT:Demo\nK:C\nC D E F"
+                                }
+                            }
+                        ]
+                    })
+            })
+        );
+        aiWidget = new AIWidget();
+        mockActivity.storage = {
+            groq_api_key: "test-key"
+        };
+        const widgetBody = document.createElement("div");
+        aiWidget.widgetWindow = {
+            getWidgetBody: jest.fn(() => widgetBody)
+        };
+        aiWidget.activity = mockActivity;
+        aiWidget.makeCanvas(800, 400);
+        const input = widgetBody.querySelector(".inputField");
+        const submitButton = widgetBody.querySelector(".submitButton");
+        const textarea = widgetBody.querySelector(".samplerTextarea");
+        input.value = "generate melody";
+        submitButton.onclick();
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(fetch).toHaveBeenCalledTimes(1);
+        expect(textarea.value.startsWith("X:1")).toBe(true);
+        expect(textarea.value).not.toContain("Here is your melody");
+        expect(submitButton.disabled).toBe(false);
+    });
+
+    it("should use maximized dimensions during scale recalculation", () => {
+        aiWidget = new AIWidget();
+        const widgetBody = document.createElement("div");
+        widgetBody.getBoundingClientRect = jest.fn(() => ({
+            width: 1200
+        }));
+        const makeCanvasSpy = jest.spyOn(aiWidget, "makeCanvas").mockImplementation(() => {});
+        aiWidget.widgetWindow = {
+            getWidgetBody: jest.fn(() => widgetBody),
+            getWidgetFrame: jest.fn(() => ({
+                getBoundingClientRect: jest.fn(() => ({
+                    height: 900
+                }))
+            })),
+            isMaximized: jest.fn(() => true)
+        };
+        const originalWidth = global.window.innerWidth;
+        const originalHeight = global.window.innerHeight;
+
+        global.window.innerWidth = 1600;
+        global.window.innerHeight = 1000;
+        aiWidget.reconnectSynthsToAnalyser = jest.fn();
+        aiWidget._scale();
+        expect(makeCanvasSpy).toHaveBeenCalledWith(1200, 830, 0, true);
+        global.window.innerWidth = originalWidth;
+        global.window.innerHeight = originalHeight;
+    });
+
+    describe("_parseABC", () => {
+        it("should organize staffs by staff index across multiple lines", async () => {
+            aiWidget = new AIWidget();
+            aiWidget.activity = mockActivity;
+            const tune = {
+                lines: [
+                    {
+                        staff: [
+                            {
+                                voices: [
+                                    [
+                                        {
+                                            el_type: "note",
+                                            pitches: [
+                                                {
+                                                    name: "C",
+                                                    pitch: 0
+                                                }
+                                            ],
+                                            duration: 0.25
+                                        }
+                                    ]
+                                ],
+                                key: {
+                                    accidentals: []
+                                },
+                                meter: {
+                                    value: [
+                                        {
+                                            num: 4,
+                                            den: 4
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        staff: [
+                            {
+                                voices: [
+                                    [
+                                        {
+                                            el_type: "note",
+                                            pitches: [
+                                                {
+                                                    name: "C",
+                                                    pitch: 0
+                                                }
+                                            ],
+                                            duration: 0.25
+                                        }
+                                    ]
+                                ],
+                                key: {
+                                    accidentals: []
+                                },
+                                meter: {
+                                    value: [
+                                        {
+                                            num: 4,
+                                            den: 4
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ],
+                metaText: {
+                    title: "Test Tune"
+                }
+            };
+
+            await aiWidget._parseABC(tune);
+            expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalledTimes(1);
+            const generatedBlocks = mockActivity.blocks.loadNewBlocks.mock.calls[0][0];
+            const labels = generatedBlocks
+                .filter(
+                    block =>
+                        Array.isArray(block) && Array.isArray(block[1]) && block[1][0] === "text"
+                )
+                .map(block => block[1][1]?.value);
+
+            expect(labels).toContain("V: 1 Line 1");
+            expect(labels).toContain("V: 1 Line 2");
+        });
+    });
+
+    it("should pause playback when play button is clicked while already moving", () => {
+        let playButton;
+        global.window.widgetWindows.windowFor = jest.fn(() => ({
+            clear: jest.fn(),
+            show: jest.fn(),
+            destroy: jest.fn(),
+            sendToCenter: jest.fn(),
+            isMaximized: jest.fn(() => false),
+            getWidgetFrame: jest.fn(() => ({
+                getBoundingClientRect: jest.fn(() => ({
+                    width: 800,
+                    height: 600
+                }))
+            })),
+            getWidgetBody: jest.fn(() => {
+                const div = document.createElement("div");
+                div.getBoundingClientRect = jest.fn(() => ({
+                    width: 800,
+                    height: 600
+                }));
+                return div;
+            }),
+            addButton: jest.fn(iconName => {
+                const button = {
+                    onclick: null,
+                    textContent: "",
+                    appendChild: jest.fn()
+                };
+                if (iconName === "play-button.svg") {
+                    playButton = button;
+                }
+                return button;
+            })
+        }));
+        aiWidget = new AIWidget();
+        const pauseSpy = jest.fn();
+
+        aiWidget.pause = pauseSpy;
+        aiWidget.init(mockActivity);
+        pauseSpy.mockClear();
+        aiWidget.isMoving = true;
+        playButton.onclick();
+
+        expect(pauseSpy).toHaveBeenCalledTimes(1);
+        expect(aiWidget.isMoving).toBe(false);
+        expect(playButton.textContent).toBe("");
+        expect(playButton.appendChild).toHaveBeenCalled();
+    });
+
+    it("should not add duplicate custom samples", () => {
+        aiWidget = new AIWidget();
+        global.CUSTOMSAMPLES = [["Piano", "existing-data"]];
+        aiWidget.sampleName = "Piano";
+        aiWidget.sampleData = "new-data";
+        aiWidget._addSample();
+        expect(CUSTOMSAMPLES.length).toBe(1);
+        expect(CUSTOMSAMPLES[0][1]).toBe("existing-data");
+    });
+
+    it("should add new custom samples when sample name is unique", () => {
+        aiWidget = new AIWidget();
+        global.CUSTOMSAMPLES = [];
+        aiWidget.sampleName = "Flute";
+        aiWidget.sampleData = "flute-data";
+        aiWidget._addSample();
+        expect(CUSTOMSAMPLES).toContainEqual(["Flute", "flute-data"]);
+    });
+
+    it("should trigger sample playback when sample name exists", () => {
+        const triggerMock = jest.fn();
+        aiWidget = new AIWidget();
+        aiWidget.activity = mockActivity;
+        aiWidget.activity.logo.synth = {
+            trigger: triggerMock
+        };
+        aiWidget.reconnectSynthsToAnalyser = jest.fn();
+        aiWidget.sampleName = "Piano";
+        aiWidget.originalSampleName = "Piano";
+        aiWidget.sampleLength = 2000;
+        aiWidget._playSample();
+        expect(aiWidget.reconnectSynthsToAnalyser).toHaveBeenCalled();
+        expect(triggerMock).toHaveBeenCalled();
+    });
+
+    it("should not trigger playback when sample name is empty", () => {
+        const triggerMock = jest.fn();
+        aiWidget = new AIWidget();
+        aiWidget.activity = mockActivity;
+        aiWidget.activity.logo.synth = {
+            trigger: triggerMock
+        };
+        aiWidget.sampleName = "";
+        aiWidget._playSample();
+        expect(triggerMock).not.toHaveBeenCalled();
+    });
+
+    it("should play and end sample playback after wait time", async () => {
+        jest.useFakeTimers();
+        aiWidget = new AIWidget();
+        aiWidget._playSample = jest.fn();
+        aiWidget._endPlaying = jest.fn();
+        const promise = aiWidget._waitAndPlaySample();
+
+        expect(aiWidget._playSample).not.toHaveBeenCalled();
+        expect(aiWidget._endPlaying).not.toHaveBeenCalled();
+
+        jest.advanceTimersByTime(499);
+
+        expect(aiWidget._playSample).not.toHaveBeenCalled();
+        expect(aiWidget._endPlaying).not.toHaveBeenCalled();
+
+        jest.advanceTimersByTime(1);
+
+        const result = await promise;
+        expect(aiWidget._playSample).toHaveBeenCalledTimes(1);
+        expect(aiWidget._endPlaying).toHaveBeenCalledTimes(1);
+        expect(result).toBe("played");
+    });
+
+    it("should pause playback after sample duration ends", async () => {
+        jest.useFakeTimers();
+        aiWidget = new AIWidget();
+        aiWidget.pause = jest.fn();
+        aiWidget.sampleLength = 1500;
+        const promise = aiWidget._waitAndEndPlaying();
+
+        expect(aiWidget.pause).not.toHaveBeenCalled();
+        jest.advanceTimersByTime(1499);
+        expect(aiWidget.pause).not.toHaveBeenCalled();
+        jest.advanceTimersByTime(1);
+        const result = await promise;
+        expect(aiWidget.pause).toHaveBeenCalledTimes(1);
+        expect(result).toBe("ended");
+    });
+
+    it("should delegate delayed playback to waitAndPlaySample", async () => {
+        aiWidget = new AIWidget();
+        aiWidget._waitAndPlaySample = jest.fn(() => Promise.resolve("played"));
+        await aiWidget._playDelayedSample();
+        expect(aiWidget._waitAndPlaySample).toHaveBeenCalled();
+    });
+
+    it("should delegate ending playback to waitAndEndPlaying", async () => {
+        aiWidget = new AIWidget();
+        aiWidget._waitAndEndPlaying = jest.fn(() => Promise.resolve("ended"));
+        await aiWidget._endPlaying();
+        expect(aiWidget._waitAndEndPlaying).toHaveBeenCalled();
+    });
+
+    it("should reconnect reference sample synth to analyser 0", () => {
+        const disconnectMock = jest.fn();
+        const connectMock = jest.fn();
+        global.instruments = [
+            {
+                [REFERENCESAMPLE]: {
+                    disconnect: disconnectMock,
+                    connect: connectMock
+                }
+            }
+        ];
+        global.Tone.Analyser = jest.fn(() => ({}));
+        aiWidget = new AIWidget();
+        aiWidget.pitchAnalysers = {
+            0: {},
+            1: {}
+        };
+        aiWidget.reconnectSynthsToAnalyser();
+        expect(disconnectMock).toHaveBeenCalled();
+        expect(connectMock).toHaveBeenCalledWith(aiWidget.pitchAnalysers[0]);
+    });
+
+    it("should reconnect custom sample synth to analyser 1", () => {
+        const disconnectMock = jest.fn();
+        const connectMock = jest.fn();
+        global.instruments = [
+            {
+                customsample_Piano: {
+                    disconnect: disconnectMock,
+                    connect: connectMock
+                }
+            }
+        ];
+        global.Tone.Analyser = jest.fn(() => ({}));
+        aiWidget = new AIWidget();
+        aiWidget.originalSampleName = "Piano";
+        aiWidget.pitchAnalysers = {
+            0: {},
+            1: {}
+        };
+        aiWidget.reconnectSynthsToAnalyser();
+        expect(disconnectMock).toHaveBeenCalled();
+        expect(connectMock).toHaveBeenCalledWith(aiWidget.pitchAnalysers[1]);
     });
 });

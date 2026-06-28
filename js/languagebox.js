@@ -86,6 +86,33 @@ class LanguageBox {
      * @public
      * @returns {void}
      */
+    de_onclick() {
+        this._language = "de";
+        this.hide();
+    }
+
+    /**
+     * @public
+     * @returns {void}
+     */
+    fr_onclick() {
+        this._language = "fr";
+        this.hide();
+    }
+
+    /**
+     * @public
+     * @returns {void}
+     */
+    it_onclick() {
+        this._language = "it";
+        this.hide();
+    }
+
+    /**
+     * @public
+     * @returns {void}
+     */
     pt_onclick() {
         this._language = "pt";
         this.hide();
@@ -122,6 +149,15 @@ class LanguageBox {
      * @public
      * @returns {void}
      */
+    ta_onclick() {
+        this._language = "ta";
+        this.hide();
+    }
+
+    /**
+     * @public
+     * @returns {void}
+     */
     ibo_onclick() {
         this._language = "ibo";
         this.hide();
@@ -144,6 +180,7 @@ class LanguageBox {
         this._language = "he";
         this.hide();
     }
+
     /**
      * @public
      * @returns {void}
@@ -250,15 +287,15 @@ class LanguageBox {
     }
 
     hide() {
-        const MSGPrefix =
-            "<a href='#' class='language-link' " +
-            "onMouseOver='this.style.opacity = 0.5'" +
-            "onMouseOut='this.style.opacity = 1'>";
+        const MSGPrefix = "<a href='#' class='language-link'>";
         const MSGSuffix = "</a>";
         const MSG = {
             default: _("Refresh your browser to change your language preference."),
             enUS: "Refresh your browser to change your language preference.",
             enUK: "Refresh your browser to change your language preference.",
+            de: "Aktualisieren Sie Ihren Browser, um Ihre Spracheinstellung zu ändern.",
+            fr: "Actualisez votre navigateur pour modifier votre préférence linguistique.",
+            it: "Aggiorna il browser per modificare la tua preferenza linguistica.",
             ja: "言語を変えるには、ブラウザをこうしんしてください。",
             kana: "げんごを かえるには、ブラウザを こうしんしてください。",
             ko: "언어 기본 설정을 변경하려면 브라우저를 새로 고치십시오.",
@@ -267,6 +304,7 @@ class LanguageBox {
             zh_CN: "刷新浏览器以更改您的语言偏好",
             th: "รีเฟรชเบราเซอร์เพื่อเปลี่ยนการตั้งค่าภาษาของคุณ",
             hi: "अपनी भाषा की वरीयता बदलने के लिए अपना ब्राउज़र ताज़ा करें",
+            ta: "உங்கள் மொழி விருப்பத்தை மாற்ற உலாவியை புதுப்பிக்கவும்.",
             te: "మీ భాష ప్రాధాన్యతను మార్చడానికి మీ బ్రౌజర్‌ని రిఫ్రెష్ చేయండి.",
             tr: "dil tercihinizi değiştirmek için tarayıcınızı yenileyin",
             ibo: "Mee ka nchọgharị gị gbanwee mmasị asụsụ gị.",

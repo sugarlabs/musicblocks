@@ -1041,7 +1041,10 @@ describe("Logo comprehensive method coverage", () => {
             }))
         };
         logo.initMediaDevices();
-        expect(mockActivity.errorMsg).toHaveBeenCalledWith("The microphone is not available.");
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+            "The microphone is not available.",
+            undefined
+        );
         expect(logo.mic).toBeNull();
     });
 
@@ -1090,6 +1093,7 @@ describe("Logo comprehensive method coverage", () => {
         logo._alreadyRunning = true;
         logo._runningBlock = 7;
         logo._lastNoteTimeout = 99;
+        logo.statusFields = [[2, "currentpitch"]];
         logo.prepSynths = jest.fn();
         logo.initTurtle = jest.fn();
         logo.blockList = [];
@@ -1103,6 +1107,7 @@ describe("Logo comprehensive method coverage", () => {
         expect(clearTimeoutSpy).toHaveBeenCalledWith(99);
         expect(logo._ignoringBlock).toBe(7);
         expect(statusInit).toHaveBeenCalledWith(mockActivity);
+        expect(logo.statusFields).toEqual([[2, "currentpitch"]]);
         clearTimeoutSpy.mockRestore();
     });
 
@@ -1483,7 +1488,7 @@ describe("Logo comprehensive method coverage", () => {
         turtle0.singer.suppressOutput = true;
         logo.recording = false;
         logo.runFromBlockNow(logo, 0, 0, 0, null);
-        expect(mockActivity.errorMsg).toHaveBeenCalledWith("Playback is ready.");
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith("Playback is ready.", undefined);
     });
 
     test("runFromBlockNow dispatches end-of-clamp signals and updates status matrix", () => {
@@ -1581,7 +1586,7 @@ describe("Logo comprehensive method coverage", () => {
 
         logo.blockList = [{ connections: [null, null, 1] }, { name: "loadFile" }];
         logo.processShow(0, 0, 12, null);
-        expect(mockActivity.errorMsg).toHaveBeenCalledWith("You must select a file.");
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith("You must select a file.", undefined);
 
         global.CAMERAVALUE = originalCameraValue;
         global.VIDEOVALUE = originalVideoValue;

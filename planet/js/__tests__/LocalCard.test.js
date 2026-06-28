@@ -42,6 +42,7 @@ function makeMockPlanet(overrides = {}) {
         LocalPlanet: {
             ProjectTable: {},
             openProject: jest.fn(),
+            mergeProject: jest.fn(),
             openDeleteModal: jest.fn(),
             Publisher: { open: jest.fn() },
             updateProjects: jest.fn()
@@ -194,12 +195,12 @@ describe("LocalCard", () => {
             expect(planet.LocalPlanet.openProject).toHaveBeenCalledWith("p7");
         });
 
-        it("should call openProject when the merge button is clicked", () => {
+        it("should call mergeProject when the merge button is clicked", () => {
             const card = prepareCard("p8");
             card.render();
 
             document.getElementById("local-project-merge-p8").click();
-            expect(planet.LocalPlanet.openProject).toHaveBeenCalledWith("p8");
+            expect(planet.LocalPlanet.mergeProject).toHaveBeenCalledWith("p8");
         });
 
         it("should call openDeleteModal when the delete button is clicked", () => {
@@ -218,7 +219,8 @@ describe("LocalCard", () => {
             expect(planet.LocalPlanet.Publisher.open).toHaveBeenCalledWith("p10");
         });
 
-        it("should call renameProject when the name input changes", () => {
+        it("should call renameProject when the name input changes (after debounce)", () => {
+            jest.useFakeTimers();
             const card = prepareCard("p11");
             card.render();
 
@@ -226,7 +228,12 @@ describe("LocalCard", () => {
             input.value = "New Name";
             input.dispatchEvent(new Event("input"));
 
+            expect(planet.ProjectStorage.renameProject).not.toHaveBeenCalled();
+
+            jest.advanceTimersByTime(400);
+
             expect(planet.ProjectStorage.renameProject).toHaveBeenCalledWith("p11", "New Name");
+            jest.useRealTimers();
         });
 
         it("should show the cloud icon and call forceAddToCache when PublishedData exists", () => {

@@ -169,6 +169,8 @@ describe("Palettes Class", () => {
                 this.height = 0;
                 this.style = {};
             }
+            setAttribute() {}
+            removeAttribute() {}
         };
 
         global.docById = jest.fn(id => {
@@ -1823,6 +1825,21 @@ describe("Palettes Class", () => {
                 ])
             };
 
+            global.getMacroExpansion = jest.fn(() => [
+                [0, "status", 10, 20, [null, 2, 1]],
+                [1, "hiddennoflow", 0, 0, [0, null]],
+                [2, "print", 0, 0, [0, 3, 5]],
+                [3, ["outputtools", { value: "letter class" }], 0, 0, [2, 4]],
+                [4, "currentpitch", 0, 0, [3]],
+                [5, "print", 0, 0, [2, 6, 7]],
+                [6, "beatvalue", 0, 0, [5]],
+                [7, "print", 0, 0, [5, 8, 9]],
+                [8, "measurevalue", 0, 0, [7]],
+                [9, "print", 0, 0, [7, 10, 11]],
+                [10, "elapsednotes", 0, 0, [9]],
+                [11, "print", 0, 0, [9, 12, null]],
+                [12, "bpmfactor", 0, 0, [11]]
+            ]);
             mockActivity.palettes = palettes;
             mockActivity.blocks = {
                 blockList: [],
@@ -1832,10 +1849,19 @@ describe("Palettes Class", () => {
                 blockMoved: jest.fn(),
                 checkBounds: jest.fn(),
                 loadNewBlocks: jest.fn(blocks => {
-                    mockActivity.blocks.blockList = blocks.map(() => ({
-                        container: { x: 0, y: 0 },
-                        collapseToggle: jest.fn()
-                    }));
+                    mockActivity.blocks.blockList = blocks.map(block => {
+                        const blockName = Array.isArray(block[1]) ? block[1][0] : block[1];
+                        const value = Array.isArray(block[1]) ? block[1][1] : null;
+
+                        return {
+                            name: blockName,
+                            value,
+                            privateData: value && value.value ? value.value : undefined,
+                            connections: block[4],
+                            container: { x: 0, y: 0 },
+                            collapseToggle: jest.fn()
+                        };
+                    });
                 }),
                 findTopBlock: jest.fn(() => 0),
                 moveBlock: jest.fn()
@@ -1844,14 +1870,33 @@ describe("Palettes Class", () => {
                 init: jest.fn(),
                 updateAll: jest.fn()
             }));
-            mockActivity.logo = { statusMatrix: null, statusFields: [] };
+            mockActivity.logo = {
+                statusMatrix: null,
+                statusFields: [],
+                inStatusMatrix: false,
+                parseArg: jest.fn((logo, turtle, blk) => {
+                    const block = mockActivity.blocks.blockList[blk];
+                    logo.statusFields.push([
+                        blk,
+                        block.name === "outputtools" ? "outputtools" : block.name
+                    ]);
+                })
+            };
 
             palette._makeBlockFromProtoblock(protoblk, true, "status", null, 10, 20);
 
+            expect(global.getMacroExpansion).toHaveBeenCalledWith(mockActivity, "status", 10, 20);
             expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalled();
             expect(mockActivity.blocks.moveBlock).toHaveBeenCalled();
             expect(mockActivity.logo.statusMatrix.init).toHaveBeenCalledWith(mockActivity);
             expect(mockActivity.logo.statusMatrix.updateAll).toHaveBeenCalled();
+            expect(mockActivity.logo.statusFields).toEqual([
+                [3, "outputtools"],
+                [6, "beatvalue"],
+                [8, "measurevalue"],
+                [10, "elapsednotes"],
+                [12, "bpmfactor"]
+            ]);
         });
 
         test("_makeBlockFromProtoblock skips duplicate status", () => {
@@ -1875,54 +1920,7 @@ describe("Palettes Class", () => {
             palette._makeBlockFromProtoblock(protoblk, true, "status", null, 10, 20);
 
             expect(global.StatusMatrix).not.toHaveBeenCalled();
-        });
-
-        test("_makeBlockFromProtoblock builds status fields from variables and boxes", () => {
-            palettes.add("test");
-            const palette = palettes.dict.test;
-            const protoblk = {
-                name: "status",
-                macroFunc: jest.fn(() => [
-                    [0, "status", 100, 100, [null, 1, 2]],
-                    [1, "hidden", 0, 0, [0, 3]],
-                    [2, "hiddennoflow", 0, 0, [0, null]],
-                    [3, "print", 0, 0, [1, 4, 5]],
-                    [4, "elapsednotes", 0, 0, [3]],
-                    [5, "print", 0, 0, [3, 6, 7]],
-                    [6, "beatvalue", 0, 0, [5]],
-                    [7, "print", 0, 0, [5, 8, null]],
-                    [8, "measurevalue", 0, 0, [7]]
-                ])
-            };
-
-            global.activity = mockActivity;
-
-            mockActivity.blocks = {
-                blockList: [
-                    { name: "x", trash: false, value: 1 },
-                    { name: "namedbox", trash: false, overrideName: "myBox" }
-                ],
-                dragGroup: [],
-                findDragGroup: jest.fn(),
-                moveBlockRelative: jest.fn(),
-                blockMoved: jest.fn(),
-                checkBounds: jest.fn(),
-                loadNewBlocks: jest.fn(blocks => {
-                    mockActivity.blocks.blockList = blocks.map(() => ({
-                        container: { x: 0, y: 0 },
-                        collapseToggle: jest.fn()
-                    }));
-                }),
-                findTopBlock: jest.fn(() => 0),
-                moveBlock: jest.fn()
-            };
-            mockActivity.palettes = palettes;
-            global.StatusMatrix = jest.fn(() => ({ init: jest.fn(), updateAll: jest.fn() }));
-            mockActivity.logo = { statusMatrix: null, statusFields: [] };
-
-            palette._makeBlockFromProtoblock(protoblk, true, "status", null, 10, 20);
-
-            expect(mockActivity.logo.statusFields.length).toBeGreaterThan(0);
+            expect(global.getMacroExpansion).not.toHaveBeenCalled();
         });
 
         test("_makeBlockFromProtoblock loads macro expansion", () => {
@@ -2072,6 +2070,8 @@ describe("Palettes Class", () => {
                 constructor() {
                     this.src = "";
                 }
+                setAttribute() {}
+                removeAttribute() {}
             };
             const tr = {
                 children: MULTIPALETTES.map(() => ({

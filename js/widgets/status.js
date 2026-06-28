@@ -161,14 +161,22 @@ class StatusMatrix {
                     break;
                 case "outputtools":
                     label = this.activity.blocks.blockList[statusField[0]].privateData;
+                    if (typeof label === "object" && label !== null && label.value) {
+                        label = label.value;
+                    }
                     break;
-                default:
-                    label =
-                        this.activity.blocks.blockList[statusField[0]].protoblock.staticLabels[0];
+                default: {
+                    const block = this.activity.blocks.blockList[statusField[0]];
+                    label = block?.protoblock?.staticLabels?.[0] || "";
                     break;
+                }
             }
-            let str = label;
-            str = label.charAt(0).toUpperCase() + label.slice(1);
+
+            const str =
+                typeof label === "string" && label.length > 0
+                    ? label.charAt(0).toUpperCase() + label.slice(1)
+                    : "";
+
             // console.log(str);
             cell.textContent = "\u00A0";
             const b = document.createElement("b");
@@ -177,7 +185,10 @@ class StatusMatrix {
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
             cell.style.backgroundColor = platformColor.selectorBackground;
             cell.style.paddingLeft = "10px";
-            this.activity.turtles.turtleList.forEach(() => {
+            for (const turtle of this.activity.turtles.turtleList) {
+                if (turtle.inTrash) {
+                    continue;
+                }
                 cell = row.insertCell();
                 cell.style.backgroundColor = platformColor.selectorBackground;
                 cell.style.fontSize =
@@ -185,7 +196,7 @@ class StatusMatrix {
                 cell.textContent = "";
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.textAlign = "center";
-            });
+            }
         }
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -202,7 +213,10 @@ class StatusMatrix {
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
             cell.style.backgroundColor = platformColor.selectorBackground;
             cell.style.paddingLeft = "10px";
-            this.activity.turtles.turtleList.forEach(() => {
+            for (const turtle of this.activity.turtles.turtleList) {
+                if (turtle.inTrash) {
+                    continue;
+                }
                 cell = row.insertCell();
                 cell.style.backgroundColor = platformColor.selectorBackground;
                 cell.style.fontSize =
@@ -210,7 +224,7 @@ class StatusMatrix {
                 cell.textContent = "";
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.textAlign = "center";
-            });
+            }
         }
         this.widgetWindow.sendToCenter();
     }
@@ -225,10 +239,10 @@ class StatusMatrix {
 
         let activeTurtles = 0;
         let cell;
-        let t = 0;
-        for (const turtle of this.activity.turtles.turtleList) {
+        const turtleList = this.activity.turtles.turtleList;
+        for (let t = 0; t < turtleList.length; t++) {
+            const turtle = turtleList[t];
             const tur = this.activity.turtles.ithTurtle(t);
-
             if (turtle.inTrash) {
                 continue;
             }
@@ -319,7 +333,7 @@ class StatusMatrix {
 
                 cell = this._statusTable.rows[i + 1].cells[activeTurtles + 1];
                 if (cell !== null) {
-                    cell.textContent = value;
+                    cell.textContent = value === "__INVALID_INPUT__" ? "" : value;
                 }
                 i++;
             }
@@ -331,12 +345,27 @@ class StatusMatrix {
                 value = "";
                 if (tur.singer.noteStatus !== null) {
                     notes = tur.singer.noteStatus[0];
+                    const displayedNotes = [];
+                    const seenNotes = new Set();
                     for (let j = 0; j < notes.length; j++) {
-                        if (typeof notes[j] === "number") {
-                            note += toFixed2(notes[j]);
+                        const noteKey =
+                            typeof notes[j] === "number"
+                                ? "number:" + notes[j]
+                                : "note:" + notes[j];
+                        if (seenNotes.has(noteKey)) {
+                            continue;
+                        }
+
+                        seenNotes.add(noteKey);
+                        displayedNotes.push(notes[j]);
+                    }
+
+                    for (let j = 0; j < displayedNotes.length; j++) {
+                        if (typeof displayedNotes[j] === "number") {
+                            note += toFixed2(displayedNotes[j]);
                             note += "Hz ";
                         } else {
-                            note += notes[j];
+                            note += displayedNotes[j];
                             note += " ";
                         }
                     }
@@ -353,7 +382,6 @@ class StatusMatrix {
             }
 
             activeTurtles += 1;
-            t++;
         }
 
         this.activity.logo.updatingStatusMatrix = false;

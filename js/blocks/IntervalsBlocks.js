@@ -12,7 +12,7 @@
 /*
    global
 
-   deepClone, last, _, ValueBlock, FlowClampBlock, FlowBlock, NOINPUTERRORMSG,
+   deepClone, last, _, ErrorHandler, ValueBlock, FlowClampBlock, FlowBlock, NOINPUTERRORMSG,
    LeftBlock, Singer, CHORDNAMES, CHORDVALUES, DEFAULTCHORD,
    Queue, INTERVALVALUES
  */
@@ -296,7 +296,7 @@ function setupIntervalsBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -354,7 +354,7 @@ function setupIntervalsBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -414,9 +414,9 @@ function setupIntervalsBlocks(activity) {
             // Save the state of the boxes, dicts, and heap
             const saveBoxes = deepClone(logo.boxes);
             const saveTurtleHeaps =
-                logo.turtleHeaps[turtle] != null ? deepClone(logo.turtleHeaps[turtle]) : undefined;
+                turtle in logo.turtleHeaps ? deepClone(logo.turtleHeaps[turtle]) : undefined;
             const saveTurtleDicts =
-                logo.turtleDicts[turtle] != null ? deepClone(logo.turtleDicts[turtle]) : undefined;
+                turtle in logo.turtleDicts ? deepClone(logo.turtleDicts[turtle]) : undefined;
 
             // Save the turtle state
             const saveX = tur.x;
@@ -466,8 +466,8 @@ function setupIntervalsBlocks(activity) {
 
             // Restore previous state
             logo.boxes = saveBoxes;
-            logo.turtleHeaps[turtle] = saveTurtleHeaps != null ? saveTurtleHeaps : {};
-            logo.turtleDicts[turtle] = saveTurtleDicts != null ? saveTurtleDicts : {};
+            logo.turtleHeaps[turtle] = saveTurtleHeaps ?? {};
+            logo.turtleDicts[turtle] = saveTurtleDicts ?? {};
 
             tur.painter.doPenUp();
             tur.painter.doSetXY(saveX, saveY);
@@ -535,9 +535,9 @@ function setupIntervalsBlocks(activity) {
             // collision with other turtles.
             const saveBoxes = deepClone(logo.boxes);
             const saveTurtleHeaps =
-                logo.turtleHeaps[turtle] != null ? deepClone(logo.turtleHeaps[turtle]) : undefined;
+                turtle in logo.turtleHeaps ? deepClone(logo.turtleHeaps[turtle]) : undefined;
             const saveTurtleDicts =
-                logo.turtleDicts[turtle] != null ? deepClone(logo.turtleDicts[turtle]) : undefined;
+                turtle in logo.turtleDicts ? deepClone(logo.turtleDicts[turtle]) : undefined;
             // And the turtle state
             const saveX = tur.x;
             const saveY = tur.y;
@@ -587,8 +587,8 @@ function setupIntervalsBlocks(activity) {
 
             // Restore previous state
             logo.boxes = saveBoxes;
-            logo.turtleHeaps[turtle] = saveTurtleHeaps != null ? saveTurtleHeaps : {};
-            logo.turtleDicts[turtle] = saveTurtleDicts != null ? saveTurtleDicts : {};
+            logo.turtleHeaps[turtle] = saveTurtleHeaps ?? {};
+            logo.turtleDicts[turtle] = saveTurtleDicts ?? {};
 
             tur.painter.doPenUp();
             tur.painter.doSetXY(saveX, saveY);
@@ -624,7 +624,7 @@ function setupIntervalsBlocks(activity) {
             constructor(type, value, isDown) {
                 super(
                     (isDown ? "down" : "") + type + value,
-                    _((isDown ? "down " : "") + type) + " " + value
+                    `${isDown ? _("down") : ""} ${type} ${value}`
                 );
                 this.setPalette("intervals", activity);
                 this.setHelpString();
@@ -693,7 +693,7 @@ function setupIntervalsBlocks(activity) {
             ]);
             this.formBlock({
                 //.TRANS: calculate a relative step between notes based on semi-tones
-                name: _("semi-tone interval") + " (+/–)",
+                name: `${_("semi-tone interval")} (+/–)`,
                 args: 1,
                 defaults: [5]
             });
@@ -825,8 +825,9 @@ function setupIntervalsBlocks(activity) {
                             setTimeout(tryAcquire, retryInterval);
                         } else {
                             // Force acquire after max retries to prevent deadlock
-                            console.warn(
-                                "connectionStoreLock: Max retries reached, forcing lock acquisition"
+                            ErrorHandler.warn(
+                                "connectionStoreLock: Max retries reached, forcing lock acquisition",
+                                { operation: "acquireLock" }
                             );
                             logo.connectionStoreLock = true;
                             resolve(true);
@@ -851,7 +852,7 @@ function setupIntervalsBlocks(activity) {
                         for (let i = 0; i < n; i++) {
                             const obj = logo.connectionStore[turtle][blk].pop();
                             activity.blocks.blockList[obj[0]].connections[obj[1]] = obj[2];
-                            if (obj[2] != null) {
+                            if (obj[2] !== null) {
                                 activity.blocks.blockList[obj[2]].connections[0] = obj[0];
                             }
                         }
@@ -870,8 +871,9 @@ function setupIntervalsBlocks(activity) {
             // a previous critical section did not release it (likely due to an error).
             // We warn and force-acquire since no spin-wait can help in a single thread.
             if (logo.connectionStoreLock) {
-                console.warn(
-                    "connectionStoreLock: Lock already held in ArpeggioBlock flow, forcing acquisition"
+                ErrorHandler.warn(
+                    "connectionStoreLock: Lock already held in ArpeggioBlock flow, forcing acquisition",
+                    { operation: "arpeggioLock" }
                 );
             }
             logo.connectionStoreLock = true;
@@ -879,7 +881,7 @@ function setupIntervalsBlocks(activity) {
             try {
                 // Check to see if another turtle has already disconnected these blocks
                 const otherTurtle = __lookForOtherTurtles(blk, turtle);
-                if (otherTurtle != null) {
+                if (otherTurtle !== null) {
                     // Copy the connections and queue the blocks.
                     logo.connectionStore[turtle][blk] = [];
                     for (let i = logo.connectionStore[otherTurtle][blk].length; i > 0; i--) {
@@ -900,7 +902,7 @@ function setupIntervalsBlocks(activity) {
                     }
                 } else {
                     let child = activity.blocks.findBottomBlock(args[1]);
-                    while (child != blk) {
+                    while (child !== blk) {
                         if (activity.blocks.blockList[child].name !== "hidden") {
                             const queueBlock = new Queue(child, factor, blk, receivedArg);
                             tur.parentFlowQueue.push(blk);
@@ -914,14 +916,14 @@ function setupIntervalsBlocks(activity) {
                     // each inserted into a semitoneinterval block, run.
                     logo.connectionStore[turtle][blk] = [];
                     child = args[1];
-                    while (child != null) {
+                    while (child !== null) {
                         const lastConnection =
                             activity.blocks.blockList[child].connections.length - 1;
                         const nextBlk =
                             activity.blocks.blockList[child].connections[lastConnection];
                         // Don't disconnect a hidden block from its parent.
                         if (
-                            nextBlk != null &&
+                            nextBlk !== null &&
                             activity.blocks.blockList[nextBlk].name === "hidden"
                         ) {
                             logo.connectionStore[turtle][blk].push([
@@ -941,7 +943,7 @@ function setupIntervalsBlocks(activity) {
                             child = nextBlk;
                         }
 
-                        if (child != null) {
+                        if (child !== null) {
                             activity.blocks.blockList[child].connections[0] = null;
                         }
                     }
@@ -995,7 +997,7 @@ function setupIntervalsBlocks(activity) {
             if (args[1] === undefined) return;
 
             let i = CHORDNAMES.indexOf(args[0]);
-            if (i == -1) {
+            if (i === -1) {
                 i = CHORDNAMES.indexOf(DEFAULTCHORD);
             }
             for (let ii = 0; ii < CHORDVALUES[i].length; ii++) {
@@ -1063,7 +1065,10 @@ function setupIntervalsBlocks(activity) {
                 if (intervalName in INTERVALVALUES) {
                     r = INTERVALVALUES[intervalName][2];
                 } else {
-                    console.log("could not find " + intervalName + " in INTERVALVALUES");
+                    ErrorHandler.warn("could not find " + intervalName + " in INTERVALVALUES", {
+                        operation: "ratioInterval",
+                        intervalName: intervalName
+                    });
                     r = 1;
                 }
             }
@@ -1071,7 +1076,9 @@ function setupIntervalsBlocks(activity) {
             if (isNaN(r) || r < 0) {
                 r = 1;
 
-                console.debug("ratio " + r + " must be a number > 0");
+                ErrorHandler.warn("ratio " + r + " must be a number > 0", {
+                    operation: "ratioInterval"
+                });
             }
             Singer.IntervalsActions.setRatioInterval(r, turtle, blk);
             return [args[1], 1];
@@ -1103,7 +1110,7 @@ function setupIntervalsBlocks(activity) {
             ]);
             this.formBlock({
                 //.TRANS: calculate a relative step between notes based on semi-tones
-                name: _("scalar interval") + " (+/–)",
+                name: `${_("scalar interval")} (+/–)`,
                 args: 1,
                 defaults: [5]
             });
@@ -1210,12 +1217,8 @@ function setupIntervalsBlocks(activity) {
             this.beginnerBlock(true);
             this.setHelpString([
                 _(
-                    "When Movable do is false, the solfege note names are always tied to specific pitches,"
-                ) +
-                    " " +
-                    _(
-                        'eg "do" is always "C-natural" when Movable do is true, the solfege note names are assigned to scale degrees "do" is always the first degree of the major scale.'
-                    ),
+                    'When Movable do is false, the solfege note names are always tied to specific pitches, eg "do" is always "C-natural" when Movable do is true, the solfege note names are assigned to scale degrees "do" is always the first degree of the major scale.'
+                ),
                 "documentation",
                 null,
                 "moveablehelp"
@@ -1296,7 +1299,7 @@ function setupIntervalsBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -1352,7 +1355,7 @@ function setupIntervalsBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -1408,7 +1411,7 @@ function setupIntervalsBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -1490,7 +1493,7 @@ function setupIntervalsBlocks(activity) {
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Set key block is used to set the key and mode,") + " " + _("eg C Major"),
+                    _("The Set key block is used to set the key and mode, eg C Major"),
                     "documentation",
                     null,
                     "movablehelp"
@@ -1573,7 +1576,7 @@ function setupIntervalsBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {

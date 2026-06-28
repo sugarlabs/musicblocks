@@ -302,7 +302,7 @@ function setupPitchBlocks(activity) {
                     if (typeof tur.singer.lastNotePlayed[0] === "string") {
                         const len = tur.singer.lastNotePlayed[0].length;
                         const pitch = tur.singer.lastNotePlayed[0].slice(0, len - 1);
-                        const octave = parseInt(tur.singer.lastNotePlayed[0].slice(len - 1));
+                        const octave = parseInt(tur.singer.lastNotePlayed[0].slice(len - 1), 10);
                         obj = [pitch, octave];
                     } else {
                         // Hertz?
@@ -487,7 +487,7 @@ function setupPitchBlocks(activity) {
                 const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
                 let arg1;
                 let notePlayed;
-                if (cblk1 != null) {
+                if (cblk1 !== null) {
                     arg1 = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                 }
                 if (activity.blocks.blockList[cblk1].name === "notename") {
@@ -498,22 +498,22 @@ function setupPitchBlocks(activity) {
                 ) {
                     let sol = arg1;
                     let attr;
-                    if (sol.indexOf(SHARP) != -1) {
+                    if (sol.indexOf(SHARP) !== -1) {
                         attr = SHARP;
-                    } else if (sol.indexOf(FLAT) != -1) {
+                    } else if (sol.indexOf(FLAT) !== -1) {
                         attr = FLAT;
-                    } else if (sol.indexOf(DOUBLEFLAT) != -1) {
+                    } else if (sol.indexOf(DOUBLEFLAT) !== -1) {
                         attr = DOUBLEFLAT;
-                    } else if (sol.indexOf(DOUBLESHARP) != -1) {
+                    } else if (sol.indexOf(DOUBLESHARP) !== -1) {
                         attr = DOUBLESHARP;
                     } else {
                         attr = NATURAL;
                     }
-                    if (attr != NATURAL) {
+                    if (attr !== NATURAL) {
                         sol = sol.replace(attr, "");
                     }
                     notePlayed = FIXEDSOLFEGE[sol];
-                    if (attr != NATURAL) {
+                    if (attr !== NATURAL) {
                         notePlayed += attr;
                     }
                     notePlayed += tur.singer.currentOctave ? tur.singer.currentOctave : 4;
@@ -565,11 +565,11 @@ function setupPitchBlocks(activity) {
                                 } else {
                                     attr = NATURAL;
                                 }
-                                if (attr != NATURAL) {
+                                if (attr !== NATURAL) {
                                     sol = sol.replace(attr, "");
                                 }
                                 notePlayed = FIXEDSOLFEGE[sol];
-                                if (attr != NATURAL) {
+                                if (attr !== NATURAL) {
                                     notePlayed += attr;
                                 }
                                 if (foundOctave.length === 0) {
@@ -803,7 +803,7 @@ function setupPitchBlocks(activity) {
                 }
                 const note = NOTENAMES[noteIdx];
                 return note + o2;
-            } else if (activity.blocks.blockList[cblk0].name == "pitchnumber") {
+            } else if (activity.blocks.blockList[cblk0].name === "pitchnumber") {
                 if (cblk1 === null) {
                     return 7;
                 }
@@ -827,7 +827,7 @@ function setupPitchBlocks(activity) {
                 // Since we are using the staff, it is OK to assume 12
                 // half-steps per octave.
                 return lc + 12 * o;
-            } else if (activity.blocks.blockList[cblk0].name == "nthmodalpitch") {
+            } else if (activity.blocks.blockList[cblk0].name === "nthmodalpitch") {
                 if (cblk1 === null) {
                     return 5;
                 }
@@ -838,7 +838,7 @@ function setupPitchBlocks(activity) {
                     lc += modeLength;
                 }
                 return lc + o * modeLength;
-            } else if (activity.blocks.blockList[cblk0].name == "print") {
+            } else if (activity.blocks.blockList[cblk0].name === "print") {
                 if (logo.inStatusMatrix) {
                     logo.statusFields.push([blk, "ytopitch"]);
                 }
@@ -850,7 +850,7 @@ function setupPitchBlocks(activity) {
                 }
                 const note = NOTENAMES[noteIdx];
                 return note + o2;
-            } else if (activity.blocks.blockList[cblk0].name == "pitch") {
+            } else if (activity.blocks.blockList[cblk0].name === "pitch") {
                 if (cblk1 === null) {
                     return ["sol", 4];
                 }
@@ -1192,7 +1192,9 @@ function setupPitchBlocks(activity) {
                 if (intervalName in INTERVALVALUES) {
                     r = INTERVALVALUES[intervalName][2];
                 } else {
-                    console.log("could not find " + intervalName + " in INTERVALVALUES");
+                    console.warn(
+                        `[PitchBlocks] Interval name not found in INTERVALVALUES: "${intervalName}"`
+                    );
                     r = 1;
                 }
             }
@@ -1961,7 +1963,7 @@ function setupPitchBlocks(activity) {
                     }
 
                     scaledegree = Number(scaledegree.replace(attr, ""));
-                    if (attr != NATURAL) {
+                    if (attr !== NATURAL) {
                         note += attr;
                     }
 
@@ -1974,7 +1976,7 @@ function setupPitchBlocks(activity) {
                         sd = scaledegree + (multiplier + 1) * 7;
                     } else {
                         sd = Math.floor(scaledegree) % 7;
-                        if (sd == 0) sd = 7;
+                        if (sd === 0) sd = 7;
                     }
                     scaledegree = Math.abs(scaledegree);
 

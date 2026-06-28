@@ -24,7 +24,7 @@
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
    noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction,
-   SEMITONES, normalizeNoteAccidentals
+   SEMITONES, normalizeNoteAccidentals, parseNoteString
  */
 
 /*
@@ -491,11 +491,13 @@ class Singer {
         const saveSuppressStatus = tur.singer.suppressOutput;
 
         // We need to save the state of the boxes and heap although there is a potential of a boxes collision with other turtles
-        const saveBoxes = logo.boxes != null ? deepClone(logo.boxes) : undefined;
-        const saveTurtleHeaps =
-            logo.turtleHeaps[turtle] != null ? deepClone(logo.turtleHeaps[turtle]) : undefined;
-        const saveTurtleDicts =
-            logo.turtleDicts[turtle] != null ? deepClone(logo.turtleDicts[turtle]) : undefined;
+        const saveBoxes = logo.boxes ? deepClone(logo.boxes) : undefined;
+        const saveTurtleHeaps = logo.turtleHeaps[turtle]
+            ? deepClone(logo.turtleHeaps[turtle])
+            : undefined;
+        const saveTurtleDicts = logo.turtleDicts[turtle]
+            ? deepClone(logo.turtleDicts[turtle])
+            : undefined;
         // .. and the turtle state
         const saveX = tur.x;
         const saveY = tur.y;
@@ -538,29 +540,20 @@ class Singer {
             activity.turtles.getTurtle(turtle).queue.length
         );
 
-        const returnValue = rationalSum(tur.singer.notesPlayed, [
+        const [returnValue, noteCountErr] = rationalSum(tur.singer.notesPlayed, [
             -saveNoteCount[0],
             saveNoteCount[1]
         ]);
+        if (noteCountErr) {
+            activity.errorMsg(noteCountErr);
+        }
         tur.singer.notesPlayed = saveNoteCount;
         tur.singer.tallyNotes = saveTallyNotes;
 
         // Restore previous state
-        if (saveBoxes == undefined) {
-            logo.boxes = {};
-        } else {
-            logo.boxes = saveBoxes;
-        }
-        if (saveTurtleHeaps == undefined) {
-            logo.turtleHeaps = {};
-        } else {
-            logo.turtleHeaps[turtle] = saveTurtleHeaps;
-        }
-        if (saveTurtleDicts == undefined) {
-            logo.turtleDicts = {};
-        } else {
-            logo.turtleDicts[turtle] = saveTurtleDicts;
-        }
+        logo.boxes = saveBoxes ?? {};
+        logo.turtleHeaps[turtle] = saveTurtleHeaps ?? {};
+        logo.turtleDicts[turtle] = saveTurtleDicts ?? {};
 
         tur.painter.doPenUp();
         tur.painter.doSetXY(saveX, saveY);
@@ -605,11 +598,9 @@ class Singer {
 
         const saveState = {
             suppressOutput: tur.singer.suppressOutput,
-            boxes: logo.boxes != null ? deepClone(logo.boxes) : undefined,
-            turtleHeaps:
-                logo.turtleHeaps[turtle] != null ? deepClone(logo.turtleHeaps[turtle]) : undefined,
-            turtleDicts:
-                logo.turtleDicts[turtle] != null ? deepClone(logo.turtleDicts[turtle]) : undefined,
+            boxes: logo.boxes ? deepClone(logo.boxes) : undefined,
+            turtleHeaps: logo.turtleHeaps[turtle] ? deepClone(logo.turtleHeaps[turtle]) : undefined,
+            turtleDicts: logo.turtleDicts[turtle] ? deepClone(logo.turtleDicts[turtle]) : undefined,
             x: tur.x,
             y: tur.y,
             color: tur.painter.color,
@@ -666,11 +657,9 @@ class Singer {
             penState: saveState.penState
         });
 
-        activity.logo.boxes = saveState.boxes != null ? saveState.boxes : {};
-        activity.logo.turtleHeaps[turtle] =
-            saveState.turtleHeaps != null ? saveState.turtleHeaps : {};
-        activity.logo.turtleDicts[turtle] =
-            saveState.turtleDicts != null ? saveState.turtleDicts : {};
+        activity.logo.boxes = saveState.boxes ?? {};
+        activity.logo.turtleHeaps[turtle] = saveState.turtleHeaps ?? {};
+        activity.logo.turtleDicts[turtle] = saveState.turtleDicts ?? {};
 
         tur.painter.doPenUp();
         tur.painter.doSetXY(saveState.x, saveState.y);
@@ -1070,7 +1059,7 @@ class Singer {
                 for (let i = 0, len = transpositionRatios.length; i < len; i++) {
                     ratio *= transpositionRatios[i];
                 }
-                if (ratio != 1) {
+                if (ratio !== 1) {
                     const hertz = getCachedPitchToFrequency(
                         noteObj[0],
                         noteObj[1],
@@ -1865,9 +1854,10 @@ class Singer {
             // 8->4->4->4->8
             // TESTME: Could behave weirdly with tie.
             if (tur.singer.swing.length > 0) {
-                /** @deprecated */
-                // newswing2 takes the target as an argument
-                if (last(tur.singer.swingTarget) == null) {
+                // Deprecated swing path; newswing2 takes the target as an argument.
+                const swingTargetLast = last(tur.singer.swingTarget);
+                // eslint-disable-next-line eqeqeq
+                if (swingTargetLast == null) {
                     // When we start a swing we need to keep track of the initial beat value
                     tur.singer.swingTarget[tur.singer.swingTarget.length - 1] = noteBeatValue;
                 }
@@ -1963,7 +1953,15 @@ class Singer {
                 if (activity.logo.stopTurtle) return;
 
                 if (tur.singer.inNoteBlock.length === tur.singer.whichNoteToCount) {
-                    tur.singer.notesPlayed = rationalSum(tur.singer.notesPlayed, [1, noteValue]);
+                    const [notesPlayed, notesPlayedErr] = rationalSum(tur.singer.notesPlayed, [
+                        1,
+                        noteValue
+                    ]);
+                    if (notesPlayedErr) {
+                        activity.errorMsg(notesPlayedErr);
+                    } else {
+                        tur.singer.notesPlayed = notesPlayed;
+                    }
                     tur.singer.tallyNotes++;
                 }
 
@@ -2168,9 +2166,10 @@ class Singer {
                               activity.logo.synth.changeInTemperament
                           );
                     const startingPitch = activity.logo.synth.startingPitch;
+                    const startPitchParsed = parseNoteString(startingPitch);
                     const frequency = getCachedPitchToFrequency(
-                        startingPitch.substring(0, startingPitch.length - 1),
-                        Number(startingPitch.slice(-1)),
+                        startPitchParsed[0],
+                        startPitchParsed[1],
                         0,
                         null
                     );
@@ -2281,9 +2280,9 @@ class Singer {
                                 if (tur.singer.oscList[thisBlk].length > 0) {
                                     if (notes.length > 1) {
                                         activity.errorMsg(
-                                            last(tur.singer.oscList[thisBlk]) +
-                                                ": " +
-                                                _("synth cannot play chords."),
+                                            `${last(tur.singer.oscList[thisBlk])}: ${_(
+                                                "synth cannot play chords."
+                                            )}`,
                                             blk
                                         );
                                     }
@@ -2354,7 +2353,7 @@ class Singer {
                                                     } else {
                                                         // trigger first note for entire duration of the glissando
                                                         const beatValueOverride =
-                                                            bpmFactor / tur.singer.glideOverride;
+                                                            bpmFactor * tur.singer.glideOverride;
                                                         activity.logo.synth.trigger(
                                                             turtle,
                                                             notes[d],
@@ -2605,7 +2604,8 @@ class Singer {
 
         tur.singer.pushedNote = false;
 
-        if (callback !== undefined && callback !== null) {
+        // eslint-disable-next-line eqeqeq
+        if (callback != null) {
             callback();
         }
 

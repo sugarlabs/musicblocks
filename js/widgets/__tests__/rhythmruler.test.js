@@ -72,7 +72,9 @@ const mockWindow = {
             destroy: jest.fn(),
             addButton: jest.fn().mockReturnValue({
                 onclick: null,
-                innerHTML: ""
+                innerHTML: "",
+                replaceChildren: jest.fn(),
+                appendChild: jest.fn()
             }),
             addInputButton: jest.fn().mockImplementation(val => ({
                 value: val,
@@ -90,6 +92,7 @@ const mockWindow = {
                     setAttribute: jest.fn(),
                     insertCell: jest.fn().mockReturnValue({
                         appendChild: jest.fn(),
+                        replaceChildren: jest.fn(),
                         setAttribute: jest.fn(),
                         style: {},
                         textContent: "",
@@ -116,6 +119,7 @@ global.document = {
         getAttribute: jest.fn(),
         addEventListener: jest.fn(),
         appendChild: jest.fn(),
+        replaceChildren: jest.fn(),
         insertRow: jest.fn().mockReturnValue({
             setAttribute: jest.fn(),
             insertCell: jest.fn().mockReturnValue({
@@ -123,6 +127,7 @@ global.document = {
                 appendChild: jest.fn(),
                 textContent: "",
                 innerHTML: "",
+                replaceChildren: jest.fn(),
                 setAttribute: jest.fn(),
                 addEventListener: jest.fn()
             })
@@ -131,6 +136,7 @@ global.document = {
         insertCell: jest.fn().mockReturnValue({
             style: {},
             appendChild: jest.fn(),
+            replaceChildren: jest.fn(),
             textContent: "",
             innerHTML: ""
         }),
@@ -156,7 +162,8 @@ global.document = {
     createTextNode: jest.fn().mockImplementation(text => ({ nodeType: 3, textContent: text })),
     getElementById: jest.fn().mockReturnValue({
         style: {},
-        classList: { add: jest.fn(), remove: jest.fn() }
+        classList: { add: jest.fn(), remove: jest.fn() },
+        replaceChildren: jest.fn()
     })
 };
 
@@ -338,7 +345,11 @@ describe("RhythmRuler Widget", () => {
 
         test("__pause should clear pending playback timers", () => {
             const callback = jest.fn();
-            rhythmRuler._playAllCell = { innerHTML: "" };
+            rhythmRuler._playAllCell = {
+                innerHTML: "",
+                replaceChildren: jest.fn(),
+                appendChild: jest.fn()
+            };
             rhythmRuler.Rulers = [[[4], []]];
             rhythmRuler._playing = true;
             jest.spyOn(rhythmRuler, "_calculateZebraStripes").mockImplementation();
@@ -836,7 +847,11 @@ describe("RhythmRuler Widget", () => {
         test("__pause should clear circular highlights", () => {
             rhythmRuler._circularHighlight = { 0: 2, 1: 1 };
             rhythmRuler._playing = true;
-            rhythmRuler._playAllCell = { innerHTML: "" };
+            rhythmRuler._playAllCell = {
+                innerHTML: "",
+                replaceChildren: jest.fn(),
+                appendChild: jest.fn()
+            };
             rhythmRuler.Rulers = [[[4], []]];
             rhythmRuler._rulers = [
                 {
@@ -849,5 +864,165 @@ describe("RhythmRuler Widget", () => {
 
             expect(rhythmRuler._circularHighlight).toEqual({});
         });
+    });
+});
+
+describe("RhythmRuler widget timer fallback (no ManagedTimer)", () => {
+    let rhythmRuler;
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+        rhythmRuler = new RhythmRuler();
+        rhythmRuler._timerManager = null;
+    });
+
+    afterEach(() => {
+        jest.clearAllTimers();
+        jest.useRealTimers();
+    });
+
+    describe("_setWidgetTimeout", () => {
+        it("tracks the timeout and runs the callback, then stops tracking it", () => {
+            const callback = jest.fn();
+
+            const id = rhythmRuler._setWidgetTimeout(callback, 100);
+            expect(rhythmRuler._activeTimeouts.has(id)).toBe(true);
+
+            jest.advanceTimersByTime(100);
+
+            expect(callback).toHaveBeenCalledTimes(1);
+            expect(rhythmRuler._activeTimeouts.has(id)).toBe(false);
+        });
+    });
+
+    describe("_clearWidgetTimeout", () => {
+        it("returns false for null or undefined ids", () => {
+            expect(rhythmRuler._clearWidgetTimeout(null)).toBe(false);
+            expect(rhythmRuler._clearWidgetTimeout(undefined)).toBe(false);
+        });
+
+        it("cancels a tracked timeout before it fires", () => {
+            const callback = jest.fn();
+            const id = rhythmRuler._setWidgetTimeout(callback, 100);
+
+            expect(rhythmRuler._clearWidgetTimeout(id)).toBe(true);
+            expect(rhythmRuler._activeTimeouts.has(id)).toBe(false);
+
+            jest.advanceTimersByTime(100);
+            expect(callback).not.toHaveBeenCalled();
+        });
+
+        it("returns false for an untracked id", () => {
+            expect(rhythmRuler._clearWidgetTimeout(999999)).toBe(false);
+        });
+    });
+
+    describe("_setWidgetInterval", () => {
+        it("tracks the interval and runs the callback repeatedly", () => {
+            const callback = jest.fn();
+
+            const id = rhythmRuler._setWidgetInterval(callback, 100);
+            expect(rhythmRuler._activeIntervals.has(id)).toBe(true);
+
+            jest.advanceTimersByTime(250);
+            expect(callback).toHaveBeenCalledTimes(2);
+
+            rhythmRuler._clearWidgetInterval(id);
+        });
+    });
+
+    describe("_clearWidgetInterval", () => {
+        it("returns false for null or undefined ids", () => {
+            expect(rhythmRuler._clearWidgetInterval(null)).toBe(false);
+            expect(rhythmRuler._clearWidgetInterval(undefined)).toBe(false);
+        });
+
+        it("cancels a tracked interval", () => {
+            const callback = jest.fn();
+            const id = rhythmRuler._setWidgetInterval(callback, 100);
+
+            expect(rhythmRuler._clearWidgetInterval(id)).toBe(true);
+            expect(rhythmRuler._activeIntervals.has(id)).toBe(false);
+
+            jest.advanceTimersByTime(300);
+            expect(callback).not.toHaveBeenCalled();
+        });
+
+        it("returns false for an untracked id", () => {
+            expect(rhythmRuler._clearWidgetInterval(999999)).toBe(false);
+        });
+    });
+
+    describe("_clearWidgetTimers", () => {
+        it("cancels every tracked timer and returns the count", () => {
+            rhythmRuler._setWidgetTimeout(jest.fn(), 100);
+            rhythmRuler._setWidgetTimeout(jest.fn(), 200);
+            rhythmRuler._setWidgetInterval(jest.fn(), 100);
+
+            const count = rhythmRuler._clearWidgetTimers();
+
+            expect(count).toBe(3);
+            expect(rhythmRuler._activeTimeouts.size).toBe(0);
+            expect(rhythmRuler._activeIntervals.size).toBe(0);
+            expect(rhythmRuler._longPressBeep).toBeNull();
+        });
+    });
+});
+
+describe("RhythmRuler widget timer delegation (with ManagedTimer)", () => {
+    let rhythmRuler;
+
+    beforeEach(() => {
+        rhythmRuler = new RhythmRuler();
+    });
+
+    it("_setWidgetTimeout delegates to the timer manager", () => {
+        const callback = jest.fn();
+        rhythmRuler._timerManager = { setTimeout: jest.fn().mockReturnValue(42) };
+
+        expect(rhythmRuler._setWidgetTimeout(callback, 100)).toBe(42);
+        expect(rhythmRuler._timerManager.setTimeout).toHaveBeenCalledWith(callback, 100);
+    });
+
+    it("_setWidgetInterval delegates to the timer manager", () => {
+        const callback = jest.fn();
+        rhythmRuler._timerManager = { setInterval: jest.fn().mockReturnValue(7) };
+
+        expect(rhythmRuler._setWidgetInterval(callback, 100)).toBe(7);
+        expect(rhythmRuler._timerManager.setInterval).toHaveBeenCalledWith(callback, 100);
+    });
+
+    it("_clearWidgetTimers adds the manager count to the tracked timer count", () => {
+        rhythmRuler._timerManager = { clearAll: jest.fn().mockReturnValue(5) };
+        rhythmRuler._activeTimeouts.add(1);
+        rhythmRuler._activeIntervals.add(2);
+
+        expect(rhythmRuler._clearWidgetTimers()).toBe(7);
+    });
+
+    it("_clearWidgetTimeout returns true when the manager clears the timeout", () => {
+        rhythmRuler._timerManager = { clearTimeout: jest.fn().mockReturnValue(true) };
+
+        expect(rhythmRuler._clearWidgetTimeout(5)).toBe(true);
+        expect(rhythmRuler._timerManager.clearTimeout).toHaveBeenCalledWith(5);
+    });
+
+    it("_clearWidgetInterval returns true when the manager clears the interval", () => {
+        rhythmRuler._timerManager = { clearInterval: jest.fn().mockReturnValue(true) };
+
+        expect(rhythmRuler._clearWidgetInterval(5)).toBe(true);
+        expect(rhythmRuler._timerManager.clearInterval).toHaveBeenCalledWith(5);
+    });
+});
+
+describe("RhythmRuler _get_save_lock", () => {
+    it("returns the current save lock state", () => {
+        const rhythmRuler = new RhythmRuler();
+
+        rhythmRuler._save_lock = false;
+        expect(rhythmRuler._get_save_lock()).toBe(false);
+
+        rhythmRuler._save_lock = true;
+        expect(rhythmRuler._get_save_lock()).toBe(true);
     });
 });

@@ -196,6 +196,8 @@ class PitchDrumMatrix {
 
         // For the button callbacks
         widgetWindow.onclose = () => {
+            this._playing = false;
+            this.activity.logo.synth.stop();
             pdmTableDiv.style.visibility = "hidden";
             this.activity.hideMsgs();
             widgetWindow.destroy();
@@ -256,6 +258,8 @@ class PitchDrumMatrix {
             const sub = document.createElement("sub");
             sub.textContent = this.rowArgs[j].toString();
             labelCell.appendChild(sub);
+            labelCell.dataset.noteArg = this.rowLabels[j];
+            labelCell.dataset.octave = this.rowArgs[j].toString();
             labelCell.style.position = "sticky";
             labelCell.style.left = "0";
             labelCell.style.top = "0";
@@ -699,6 +703,9 @@ class PitchDrumMatrix {
                 this._playPitchDrum(ii, pairs);
             }
             setTimeout(() => {
+                if (!this._playing) {
+                    return;
+                }
                 this._playing = false;
                 icon.textContent = "\u00A0\u00A0";
                 const img = document.createElement("img");
@@ -714,7 +721,7 @@ class PitchDrumMatrix {
             }, pairs.length * 1000);
         } else {
             if (!this.widgetWindow._maximized) {
-                activity.textMsg(_("Click in the grid to map notes to drums."), 3000);
+                this.activity.textMsg(_("Click in the grid to map notes to drums."), 3000);
             }
             icon.textContent = "\u00A0\u00A0";
             const img = document.createElement("img");
@@ -739,26 +746,12 @@ class PitchDrumMatrix {
      * @returns {void}
      */
     _playPitchDrum(i, pairs) {
-        // Find the drum cell
-        let pdmTable = docById("pdmTable");
         if (!this._playing) {
-            for (let j = 0; j < i; j++) {
-                pdmTable.rows[j].cells[0].style.backgroundColor = platformColor.labelColor;
-            }
-            const icon = this.playButton;
-            icon.textContent = "\u00A0\u00A0";
-            const img = document.createElement("img");
-            img.src = "header-icons/play-button.svg";
-            img.title = _("Play");
-            img.alt = _("Play");
-            img.setAttribute("height", PitchDrumMatrix.ICONSIZE);
-            img.setAttribute("width", PitchDrumMatrix.ICONSIZE);
-            img.setAttribute("vertical-align", "middle");
-            img.setAttribute("align-content", "center");
-            icon.appendChild(img);
-            icon.appendChild(document.createTextNode("\u00A0\u00A0"));
             return;
         }
+
+        // Find the drum cell
+        let pdmTable = docById("pdmTable");
         const drumTable = docById("pdmDrumTable");
         let row = drumTable.rows[0];
         // const drumCell = row.cells[i];
@@ -782,6 +775,9 @@ class PitchDrumMatrix {
             }, 1000);
         } else {
             setTimeout(() => {
+                if (!this._playing) {
+                    return;
+                }
                 for (let ii = 0; ii < pdmTable.rows.length - 1; ii++) {
                     pdmTable.rows[ii].cells[0].style.backgroundColor = platformColor.labelColor;
                 }
@@ -866,17 +862,17 @@ class PitchDrumMatrix {
     _setPairCell(rowIndex, colIndex, cell, playNote) {
         const pdmTable = docById("pdmTable");
         let row = pdmTable.rows[rowIndex];
-        const solfegeHTML = row.cells[0].innerHTML;
+        const noteArg = row.cells[0].dataset.noteArg;
+        const octave = parseInt(row.cells[0].dataset.octave, 10);
 
         const drumTable = docById("pdmDrumTable");
         row = drumTable.rows[0];
         const drumImg = row.cells[colIndex].querySelector("img");
         const drumName = getDrumSynthName(drumImg ? drumImg.title : "");
 
-        // Both solfege and octave are extracted from HTML by getNote.
         const noteObj = getNote(
-            solfegeHTML,
-            -1,
+            noteArg,
+            octave,
             0,
             this.activity.turtles.ithTurtle(0).singer.keySignature,
             false,
@@ -995,15 +991,16 @@ class PitchDrumMatrix {
             col = pairs[i][1];
 
             cellRow = pdmTable.rows[row];
-            solfegeHTML = cellRow.cells[0].innerHTML;
+            const noteArg = cellRow.cells[0].dataset.noteArg;
+            octave = parseInt(cellRow.cells[0].dataset.octave, 10);
 
             drumRow = drumTable.rows[0];
             const drumImg = drumRow.cells[col].querySelector("img");
             drumName = getDrumSynthName(drumImg ? drumImg.title : "");
-            // Both solfege and octave are extracted from HTML by getNote.
+
             noteObj = getNote(
-                solfegeHTML,
-                -1,
+                noteArg,
+                octave,
                 0,
                 this.activity.turtles.ithTurtle(0).singer.keySignature,
                 false,
