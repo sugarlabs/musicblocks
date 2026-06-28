@@ -1518,7 +1518,7 @@ const INTERVALVALUES = {
     "major 6": [9, 1, 5 / 3],
     "diminished 7": [9, -1, 9 / 5],
     "augmented 6": [10, 1, 125 / 72],
-    "minor 7": [10, -1, 9 / 5],
+    "minor 7": [10, -1, 16 / 9],
     "major 7": [11, 1, 15 / 8],
     "diminished 8": [11, -1, 48 / 25],
     "diminished octave": [11, -1, 48 / 25],
