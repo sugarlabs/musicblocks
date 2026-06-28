@@ -3874,6 +3874,7 @@ class Blocks {
                         /** this.activity.palettes.hide(); */
                         this.activity.palettes.updatePalettes("action");
                         /** this.activity.palettes.show(); */
+                        this.activity.palettes.showPalette("action");
                     }
                 }
 
