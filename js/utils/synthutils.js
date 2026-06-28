@@ -3063,7 +3063,7 @@ function Synth() {
                                                 const octave =
                                                     tempBlock._octavesWheel.navItems[i].title;
                                                 if (octave && !isNaN(octave)) {
-                                                    selectionState.octave = parseInt(octave);
+                                                    selectionState.octave = parseInt(octave, 10);
                                                     updateTargetNote();
                                                 }
                                             };
@@ -3128,7 +3128,7 @@ function Synth() {
                                         }
 
                                         // Adjust for octave (C4 is the reference octave)
-                                        const octaveDiff = parseInt(octave) - 4;
+                                        const octaveDiff = parseInt(octave, 10) - 4;
                                         freq *= Math.pow(2, octaveDiff);
 
                                         targetPitch.frequency = freq;
@@ -3672,7 +3672,7 @@ function Synth() {
 
         // Add event listener for slider changes
         slider.oninput = () => {
-            const value = parseInt(slider.value);
+            const value = parseInt(slider.value, 10);
             valueDisplay.textContent = (value >= 0 ? "+" : "") + value + "¢";
             this.centsValue = value;
             // Update tuner display if it exists

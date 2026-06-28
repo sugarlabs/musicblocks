@@ -1508,8 +1508,8 @@ class PhraseMaker {
                 const newBlock = this.activity.blocks.blockList.length;
                 this.activity.blocks.loadNewBlocks([
                     [0, thisBlockName, 0, 0, [null, 1, 2, null]],
-                    [1, ["number", { value: parseInt(this.xblockValue[0]) }], 0, 0, [0]],
-                    [2, ["number", { value: parseInt(this.yblockValue[0]) }], 0, 0, [0]]
+                    [1, ["number", { value: parseInt(this.xblockValue[0], 10) }], 0, 0, [0]],
+                    [2, ["number", { value: parseInt(this.yblockValue[0], 10) }], 0, 0, [0]]
                 ]);
 
                 await this._deps.delayExecution(500);
@@ -1521,7 +1521,7 @@ class PhraseMaker {
                 // Just updating a block arg value
                 argBlock = this.activity.blocks.blockList[thisBlock].connections[1];
                 this.activity.blocks.blockList[argBlock].text.text = this.xblockValue[0];
-                this.activity.blocks.blockList[argBlock].value = parseInt(this.xblockValue[0]);
+                this.activity.blocks.blockList[argBlock].value = parseInt(this.xblockValue[0], 10);
 
                 z = this.activity.blocks.blockList[argBlock].container.children.length - 1;
                 this.activity.blocks.blockList[argBlock].container.setChildIndex(
@@ -1532,7 +1532,7 @@ class PhraseMaker {
 
                 argBlock = this.activity.blocks.blockList[thisBlock].connections[2];
                 this.activity.blocks.blockList[argBlock].text.text = this.yblockValue[0];
-                this.activity.blocks.blockList[argBlock].value = parseInt(this.yblockValue[0]);
+                this.activity.blocks.blockList[argBlock].value = parseInt(this.yblockValue[0], 10);
 
                 z = this.activity.blocks.blockList[argBlock].container.children.length - 1;
                 this.activity.blocks.blockList[argBlock].container.setChildIndex(
@@ -1544,8 +1544,8 @@ class PhraseMaker {
 
             // Update the stored values for this node.
             this.rowLabels[blockIndex] = thisBlockName;
-            this.rowArgs[blockIndex][0] = parseInt(this.xblockValue);
-            this.rowArgs[blockIndex][1] = parseInt(this.yblockValue);
+            this.rowArgs[blockIndex][0] = parseInt(this.xblockValue, 10);
+            this.rowArgs[blockIndex][1] = parseInt(this.yblockValue, 10);
 
             // Update the cell label.
             let blockLabel;
@@ -1817,7 +1817,7 @@ class PhraseMaker {
                 newBlock = this.activity.blocks.blockList.length;
                 this.activity.blocks.loadNewBlocks([
                     [0, thisBlockName, 0, 0, [null, 1, null]],
-                    [1, ["number", { value: parseInt(this.blockValue) }], 0, 0, [0]]
+                    [1, ["number", { value: parseInt(this.blockValue, 10) }], 0, 0, [0]]
                 ]);
 
                 await this._deps.delayExecution(500);
@@ -1829,7 +1829,7 @@ class PhraseMaker {
                 // Just updating a block arg value
                 argBlock = this.activity.blocks.blockList[thisBlock].connections[1];
                 this.activity.blocks.blockList[argBlock].text.text = this.blockValue;
-                this.activity.blocks.blockList[argBlock].value = parseInt(this.blockValue);
+                this.activity.blocks.blockList[argBlock].value = parseInt(this.blockValue, 10);
 
                 z = this.activity.blocks.blockList[argBlock].container.children.length - 1;
                 this.activity.blocks.blockList[argBlock].container.setChildIndex(
@@ -1841,7 +1841,7 @@ class PhraseMaker {
 
             // Update the stored values for this node.
             this.rowLabels[blockIndex] = thisBlockName;
-            this.rowArgs[blockIndex] = parseInt(this.blockValue);
+            this.rowArgs[blockIndex] = parseInt(this.blockValue, 10);
 
             // Update the cell label.
             let cell = this._headcols[blockIndex];
@@ -1929,7 +1929,7 @@ class PhraseMaker {
      * @param {boolean} sortedClose - Determines if the menu is sorted and closed.
      */
     _createColumnPieSubmenu(index, condition, sortedClose) {
-        index = parseInt(index);
+        index = parseInt(index, 10);
         this.docById("wheelDivptm").textContent = "";
         this.docById("wheelDivptm").style.display = "";
 
@@ -3635,9 +3635,9 @@ class PhraseMaker {
             this._blockMapHelper.push([this._colBlocks[i], [i]]);
         }
         for (let i = noteToDivide + 1; i < this.activity.logo.tupletRhythms.length; i++) {
-            this._blockMapHelper.push([this._colBlocks[i], [i + parseInt(notesToAdd)]]);
+            this._blockMapHelper.push([this._colBlocks[i], [i + parseInt(notesToAdd, 10)]]);
         }
-        for (let i = 0; i < parseInt(notesToAdd); i++) {
+        for (let i = 0; i < parseInt(notesToAdd, 10); i++) {
             this.activity.logo.tupletRhythms = this.activity.logo.tupletRhythms
                 .slice(0, noteToDivide + i + 1)
                 .concat(this.activity.logo.tupletRhythms.slice(noteToDivide + i));
@@ -3656,7 +3656,7 @@ class PhraseMaker {
         if (this.activity.logo.tupletRhythms.length === 1) {
             return;
         }
-        noteToDivide = parseInt(noteToDivide);
+        noteToDivide = parseInt(noteToDivide, 10);
         this._blockMapHelper = [];
         for (let i = 0; i < noteToDivide; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [i]]);
@@ -3679,7 +3679,7 @@ class PhraseMaker {
      * @private
      */
     _divideNotes(noteToDivide, divideNoteBy) {
-        noteToDivide = parseInt(noteToDivide);
+        noteToDivide = parseInt(noteToDivide, 10);
         this._blockMapHelper = [];
         for (let i = 0; i < noteToDivide; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [i]]);
@@ -3742,7 +3742,7 @@ class PhraseMaker {
             this._blockMapHelper.push([this._colBlocks[i], [j]]);
         }
         j++;
-        for (let i = parseInt(upCellId) + 1; i < this.activity.logo.tupletRhythms.length; i++) {
+        for (let i = parseInt(upCellId, 10) + 1; i < this.activity.logo.tupletRhythms.length; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [j]]);
             j++;
         }
@@ -3761,7 +3761,7 @@ class PhraseMaker {
                     1 / newNote
                 ]
             ])
-            .concat(this.activity.logo.tupletRhythms.slice(parseInt(upCellId) + 1));
+            .concat(this.activity.logo.tupletRhythms.slice(parseInt(upCellId, 10) + 1));
 
         this._readjustNotesBlocks();
         this._syncMarkedBlocks();
@@ -3796,9 +3796,9 @@ class PhraseMaker {
      * @private
      */
     _updateTupletValue(noteToDivide, oldTupletValue, newTupletValue) {
-        noteToDivide = parseInt(noteToDivide);
-        oldTupletValue = parseInt(oldTupletValue);
-        newTupletValue = parseInt(newTupletValue);
+        noteToDivide = parseInt(noteToDivide, 10);
+        oldTupletValue = parseInt(oldTupletValue, 10);
+        newTupletValue = parseInt(newTupletValue, 10);
         this._blockMapHelper = [];
 
         let k = 0;
@@ -4038,7 +4038,7 @@ class PhraseMaker {
 
             this._menuWheel.navItems[3].navigateFunction = () => {
                 if (this.newNoteValue > 1) {
-                    this.newNoteValue = String(parseInt(this.newNoteValue) - 1);
+                    this.newNoteValue = String(parseInt(this.newNoteValue, 10) - 1);
                     this.docById("wheelnav-_exitWheel-title-1").children[0].textContent =
                         this.newNoteValue;
                     this._updateTupletValue(this, noteToDivide, tupletValue, this.newNoteValue);
@@ -4046,7 +4046,7 @@ class PhraseMaker {
             };
 
             this._menuWheel.navItems[9].navigateFunction = () => {
-                this.newNoteValue = String(parseInt(this.newNoteValue) + 1);
+                this.newNoteValue = String(parseInt(this.newNoteValue, 10) + 1);
                 this.docById("wheelnav-_exitWheel-title-1").children[0].textContent =
                     this.newNoteValue;
                 this._updateTupletValue(noteToDivide, tupletValue, this.newNoteValue);
@@ -4101,7 +4101,7 @@ class PhraseMaker {
                     const word = this.newNoteValue.split("/");
                     this._updateTuplet(
                         noteToDivide,
-                        parseInt(word[1]) / parseInt(word[0]),
+                        parseInt(word[1], 10) / parseInt(word[0], 10),
                         condition
                     );
                 }
@@ -4620,7 +4620,7 @@ class PhraseMaker {
             // which case we output 1 / (3 x 4) instead of 1 / 12.
             if (
                 this._outputAsTuplet[i][0] !== 1 &&
-                parseInt(this._outputAsTuplet[i][1]) === this._outputAsTuplet[i][1]
+                parseInt(this._outputAsTuplet[i][1], 10) === this._outputAsTuplet[i][1]
             ) {
                 // We don't reformat dotted tuplets since they are too complicated.
                 // We are adding 6 blocks: vspace, divide, number, multiply, number, number
@@ -4658,7 +4658,7 @@ class PhraseMaker {
                 // note value is saved as a fraction
                 newStack.push([idx + 2, "divide", 0, 0, [idx, idx + 3, idx + 4]]);
 
-                if (parseInt(note[1]) < note[1]) {
+                if (parseInt(note[1], 10) < note[1]) {
                     // dotted note
                     obj = this._deps.toFraction(note[1]);
                     newStack.push([idx + 3, ["number", { value: obj[1] }], 0, 0, [idx + 2]]);
@@ -4702,7 +4702,7 @@ class PhraseMaker {
                         }
                     }
 
-                    if (!isNaN(parseInt(note[0][j]))) {
+                    if (!isNaN(parseInt(note[0][j], 10))) {
                         obj = null;
                         drumName = null;
                     } else {
@@ -4728,7 +4728,7 @@ class PhraseMaker {
                         ]);
                         newStack.push([
                             thisBlock + 1,
-                            ["number", { value: parseInt(note[0][j]) }],
+                            ["number", { value: parseInt(note[0][j], 10) }],
                             0,
                             0,
                             [thisBlock]

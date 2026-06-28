@@ -588,7 +588,7 @@ class Palettes {
     deltaY(dy) {
         // Cache DOM element reference to avoid multiple lookups and forced reflow
         const palette = document.getElementById("palette");
-        const curr = parseInt(palette.style.top);
+        const curr = parseInt(palette.style.top, 10);
         palette.style.top = curr + dy + "px";
     }
 
@@ -1677,8 +1677,8 @@ class Palette {
                     img.onmouseup = null;
                     img.ontouchend = null;
 
-                    const x = parseInt(img.style.left);
-                    const y = parseInt(img.style.top);
+                    const x = parseInt(img.style.left, 10);
+                    const y = parseInt(img.style.top, 10);
 
                     img.style.position = posit;
                     img.style.zIndex = zInd;

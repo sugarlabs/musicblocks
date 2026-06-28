@@ -356,7 +356,7 @@ function MusicKeyboard(activity) {
                 ele.style.backgroundColor = platformColor.orange;
                 temp1[id] = ele.getAttribute("alt").split("__")[0];
                 if (temp1[id] === "hertz") {
-                    temp2[id] = parseInt(ele.getAttribute("alt").split("__")[1]);
+                    temp2[id] = parseInt(ele.getAttribute("alt").split("__")[1], 10);
                 } else if (temp1[id] in FIXEDSOLFEGE1) {
                     temp2[id] =
                         FIXEDSOLFEGE1[temp1[id]].replace(SHARP, "#").replace(FLAT, "b") +
@@ -1443,7 +1443,7 @@ function MusicKeyboard(activity) {
         const start = docById("cells-" + colIndex).getAttribute("start");
 
         this._notesPlayed = this._notesPlayed.filter(function (ele) {
-            return ele.startTime !== parseInt(start);
+            return ele.startTime !== parseInt(start, 10);
         });
 
         // Look for each cell that is marked in this column.
@@ -1462,7 +1462,7 @@ function MusicKeyboard(activity) {
             ele = docById("cells-" + colIndex);
             dur = ele.getAttribute("dur");
             this._notesPlayed.push({
-                startTime: parseInt(start),
+                startTime: parseInt(start, 10),
                 noteOctave: "R",
                 objId: null,
                 duration: parseFloat(dur)
@@ -1500,7 +1500,7 @@ function MusicKeyboard(activity) {
 
         const ele = docById(j + ":" + colIndex);
         this._notesPlayed.push({
-            startTime: parseInt(start),
+            startTime: parseInt(start, 10),
             noteOctave: temp2,
             blockNumber: this.layout[n - j - 1].blockNumber,
             duration: parseFloat(ele.getAttribute("alt")),
@@ -2015,8 +2015,8 @@ function MusicKeyboard(activity) {
      * @param {number[]} duration - The new duration expressed as a fraction [numerator, denominator].
      */
     this._updateDuration = function (start, duration) {
-        start = parseInt(start);
-        duration = parseInt(duration[0]) / parseInt(duration[1]);
+        start = parseInt(start, 10);
+        duration = parseInt(duration[0], 10) / parseInt(duration[1], 10);
         const newduration = parseFloat((Math.round(duration * 8) / 8).toFixed(3));
         this._notesPlayed = this._notesPlayed.map(function (item) {
             if (item.startTime === start) {
@@ -2035,13 +2035,13 @@ function MusicKeyboard(activity) {
      * @param {number} divideNoteBy - The number of divisions to create from the note.
      */
     this._addNotes = function (cellId, start, divideNoteBy) {
-        start = parseInt(start);
+        start = parseInt(start, 10);
         const cell = docById(cellId);
         const dur = cell.getAttribute("dur");
 
         this._notesPlayed = this._notesPlayed.reduce(function (prevValue, curValue) {
             let oldcurValue, newcurValue;
-            if (parseInt(curValue.startTime) === start) {
+            if (parseInt(curValue.startTime, 10) === start) {
                 prevValue = prevValue.concat([curValue]);
                 oldcurValue = Object.assign({}, curValue);
                 for (let i = 0; i < divideNoteBy; i++) {
@@ -2052,7 +2052,7 @@ function MusicKeyboard(activity) {
                 }
 
                 return prevValue;
-            } else if (parseInt(curValue.startTime) > start) {
+            } else if (parseInt(curValue.startTime, 10) > start) {
                 curValue.startTime = curValue.startTime + dur * 1000 * divideNoteBy;
                 return prevValue.concat([curValue]);
             }
@@ -2068,10 +2068,10 @@ function MusicKeyboard(activity) {
      * @param {string} start - The start time of the notes to delete.
      */
     this._deleteNotes = function (start) {
-        start = parseInt(start);
+        start = parseInt(start, 10);
 
         this._notesPlayed = this._notesPlayed.filter(function (ele) {
-            return parseInt(ele.startTime) !== start;
+            return parseInt(ele.startTime, 10) !== start;
         });
 
         this._createTable();
@@ -2083,11 +2083,11 @@ function MusicKeyboard(activity) {
      * @param {number} divideNoteBy - The number of divisions to create from the note.
      */
     this._divideNotes = function (start, divideNoteBy) {
-        start = parseInt(start);
+        start = parseInt(start, 10);
 
         this._notesPlayed = this._notesPlayed.reduce(function (prevValue, curValue) {
             let newcurValue, newcurValue2, oldcurValue;
-            if (parseInt(curValue.startTime) === start) {
+            if (parseInt(curValue.startTime, 10) === start) {
                 if (beginnerMode === "true") {
                     if (curValue.duration / divideNoteBy < 0.125) {
                         return prevValue.concat([curValue]);
@@ -2105,7 +2105,8 @@ function MusicKeyboard(activity) {
                 for (let i = 0; i < divideNoteBy - 1; i++) {
                     newcurValue2 = Object.assign({}, oldcurValue);
                     newcurValue2.startTime = parseInt(
-                        newcurValue2.startTime + newcurValue2.duration * 1000
+                        newcurValue2.startTime + newcurValue2.duration * 1000,
+                        10
                     );
                     prevValue = prevValue.concat([newcurValue2]);
                     oldcurValue = newcurValue2;
@@ -2535,7 +2536,7 @@ function MusicKeyboard(activity) {
      * @param {string} condition - The condition that determines the type of submenu to create ('synthsblocks' or 'pitchblocks').
      */
     this._createColumnPieSubmenu = function (index, condition) {
-        index = parseInt(index);
+        index = parseInt(index, 10);
         const displayLayout = this.displayLayout || this.layout;
         const layoutItem = displayLayout[displayLayout.length - index - 1];
 
@@ -2745,7 +2746,7 @@ function MusicKeyboard(activity) {
                 this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
             const argBlock = this.activity.blocks.blockList[block].connections[1];
             this.activity.blocks.blockList[argBlock].text.text = blockValue;
-            this.activity.blocks.blockList[argBlock].value = parseInt(blockValue);
+            this.activity.blocks.blockList[argBlock].value = parseInt(blockValue, 10);
 
             const z = this.activity.blocks.blockList[argBlock].container.children.length - 1;
             this.activity.blocks.blockList[argBlock].container.setChildIndex(
@@ -2755,15 +2756,15 @@ function MusicKeyboard(activity) {
             this.activity.blocks.blockList[argBlock].updateCache();
 
             const cell = docById("labelcol" + (displayLayout.length - index - 1));
-            displayLayout[index].noteOctave = parseInt(blockValue);
+            displayLayout[index].noteOctave = parseInt(blockValue, 10);
             if (this.layout[index]) {
-                this.layout[index].noteOctave = parseInt(blockValue);
+                this.layout[index].noteOctave = parseInt(blockValue, 10);
             }
             cell.textContent =
                 displayLayout[index].noteName + displayLayout[index].noteOctave.toString();
             this._notesPlayed.map(item => {
                 if (item.objId === displayLayout[index].blockNumber) {
-                    item.noteOctave = parseInt(blockValue);
+                    item.noteOctave = parseInt(blockValue, 10);
                 }
                 return item;
             });
@@ -3342,7 +3343,7 @@ function MusicKeyboard(activity) {
             return ans;
         };
         const actionGroupInterval = 50;
-        const actionGroups = parseInt(selectedNotes.length / actionGroupInterval) + 1;
+        const actionGroups = parseInt(selectedNotes.length / actionGroupInterval, 10) + 1;
 
         for (let actionGroup = 0; actionGroup < actionGroups; actionGroup++) {
             const currentSelectedNotes = selectedNotes.slice(
