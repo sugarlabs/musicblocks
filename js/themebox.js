@@ -432,35 +432,57 @@ class ThemeBox {
                     }
                 }
 
-                // Refresh palette buttons and labels
+                // Refresh palette buttons and labels. The colors must be
+                // refreshed for every row regardless of whether we can resolve
+                // the icon SVG — translated labels and plugin-supplied palettes
+                // do not always have a matching PALETTEICONS key, and gating
+                // the color update on that lookup leaves their inline
+                // backgroundColor pinned to the previous theme until the user
+                // hovers (fixes #5825).
                 const tbody = document.querySelector("#palette > div > table:nth-child(2) > tbody");
                 if (tbody) {
+                    const cellSize = this.activity.palettes.cellSize;
+
+                    const refreshRowColors = row => {
+                        if (!row || !row.cells || !row.cells[1]) return;
+                        row.cells[1].style.color = platformColor.paletteText;
+                        row.style.backgroundColor = platformColor.paletteBackground;
+                    };
+
+                    const refreshRowIcon = (row, iconKey) => {
+                        if (
+                            !iconKey ||
+                            !PALETTEICONS[iconKey] ||
+                            !row.cells[0] ||
+                            !row.cells[0].firstChild
+                        ) {
+                            return;
+                        }
+                        const icon = makePaletteIcons(PALETTEICONS[iconKey], cellSize, cellSize);
+                        row.cells[0].firstChild.src = icon.src;
+                    };
+
                     // Update search button and label
                     const searchRow = tbody.rows[0];
                     if (searchRow) {
-                        const searchIcon = makePaletteIcons(
-                            PALETTEICONS["search"],
-                            this.activity.palettes.cellSize,
-                            this.activity.palettes.cellSize
-                        );
-                        searchRow.cells[0].firstChild.src = searchIcon.src;
-                        searchRow.cells[1].style.color = platformColor.paletteText;
-                        searchRow.style.backgroundColor = platformColor.paletteBackground;
+                        refreshRowColors(searchRow);
+                        refreshRowIcon(searchRow, "search");
                     }
 
-                    // Update other palette buttons
+                    // Update other palette buttons. Each row's update is
+                    // isolated so that one malformed row (e.g., a custom
+                    // palette with a missing icon node) cannot abort the
+                    // refresh for the rest of the sidebar.
                     for (let i = 1; i < tbody.rows.length; i++) {
                         const row = tbody.rows[i];
-                        const label = row.cells[1].textContent.trim().toLowerCase();
-                        if (label && PALETTEICONS[label]) {
-                            const icon = makePaletteIcons(
-                                PALETTEICONS[label],
-                                this.activity.palettes.cellSize,
-                                this.activity.palettes.cellSize
-                            );
-                            row.cells[0].firstChild.src = icon.src;
-                            row.cells[1].style.color = platformColor.paletteText;
-                            row.style.backgroundColor = platformColor.paletteBackground;
+                        try {
+                            refreshRowColors(row);
+                            const label = row.cells[1]
+                                ? row.cells[1].textContent.trim().toLowerCase()
+                                : "";
+                            refreshRowIcon(row, label);
+                        } catch (rowErr) {
+                            console.debug("Could not refresh palette row:", rowErr);
                         }
                     }
                 }
