@@ -640,8 +640,8 @@ body.highcontrast {
 
 .highcontrast .material-tooltip {
     background-color: var(--color-tooltip-bg) !important;
-    border: 1px solid var(--color-text-inverse);
-    color: var(--color-text-inverse) !important;
+    border: 1px solid var(--color-text-primary);
+    color: var(--color-text-primary) !important;
 }
 
 .highcontrast nav,
@@ -657,7 +657,7 @@ body.highcontrast {
 }
 
 .highcontrast .material-tooltip span {
-    color: var(--color-text-inverse) !important;
+    color: var(--color-text-primary) !important;
 }
 
 .highcontrast #languagedropdown li a.selected-language {
@@ -759,6 +759,13 @@ body.highcontrast {
 }
 
 .highcontrast #buttoncontainerTOP .tooltipped:hover {
-    background-color: var(--color-brand-primary);
-    border-color: var(--color-text-primary);
+    background-color: transparent;
+    border-color: var(--color-brand-primary);
+    color: var(--color-text-primary);
+}
+
+.highcontrast #buttoncontainerTOP .tooltipped:hover .material-icons,
+.highcontrast #buttoncontainerTOP .tooltipped:hover img {
+    color: var(--color-text-primary) !important;
+    filter: none;
 }

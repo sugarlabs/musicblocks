@@ -38,9 +38,7 @@ platform.FFOS = platform.FF && (platform.mobile || platform.tablet) && !platform
 
 // Detect system theme preference
 const getSystemThemePreference = () => {
-    if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        return "dark";
-    }
+    // Defaulting to light theme as requested
     return "light";
 };
 
@@ -49,6 +47,11 @@ const activeTheme = themePreference || getSystemThemePreference();
 
 const syncPlatformColor = theme => {
     const el = document.body || document.documentElement;
+    if (el && theme) {
+        // Ensure the correct class is present before reading CSS variables
+        el.classList.remove("light", "dark", "highcontrast");
+        el.classList.add(theme);
+    }
     const style = getComputedStyle(el);
     const getC = token => {
         let val = style.getPropertyValue(token);
