@@ -257,6 +257,9 @@ class Activity {
         }
 
         this._listeners = [];
+        if (typeof SessionStorageManager !== "undefined") {
+            this.sessionStorageManager = new SessionStorageManager();
+        }
 
         this.cellSize = 55;
         this.searchSuggestions = [];
@@ -4496,14 +4499,26 @@ class Activity {
             // Try restarting where we were when we hit save.
             if (that.planet) {
                 that.sessionData = await that.planet.openCurrentProject();
-                if (!that.sessionData) {
-                    if (currentProject !== undefined) {
-                        that.sessionData = that.storage[sessionKey];
-                    }
+            }
+
+            if (!that.sessionData && sessionKey !== null) {
+                let lsData = that.storage[sessionKey];
+                let lsTimestampStr = that.storage["SESSION_TIMESTAMP" + currentProject];
+                let lsTimestamp = lsTimestampStr ? parseInt(lsTimestampStr, 10) : 0;
+
+                let idbPayload = null;
+                if (that.sessionStorageManager) {
+                    idbPayload = await that.sessionStorageManager.loadSession(sessionKey);
                 }
-            } else {
-                if (sessionKey !== null) {
-                    that.sessionData = that.storage[sessionKey];
+
+                if (idbPayload && idbPayload.data) {
+                    if (lsData && lsTimestamp > idbPayload.timestamp) {
+                        that.sessionData = lsData;
+                    } else {
+                        that.sessionData = idbPayload.data;
+                    }
+                } else if (lsData) {
+                    that.sessionData = lsData;
                 }
             }
 
@@ -5945,8 +5960,12 @@ class Activity {
             try {
                 p = this.storage.currentProject;
                 this.storage["SESSION" + p] = data;
+                this.storage["SESSION_TIMESTAMP" + p] = Date.now().toString();
             } catch (e) {
-                ErrorHandler.recoverable(e, { operation: "saveLocally_saveSession" });
+                // If it hits QuotaExceededError, it fails silently, which is fine
+                // because saveSessionAsync (IndexedDB) handles large payloads.
+                // We just log it as a warning so it doesn't crash the app.
+                console.warn("localStorage quota exceeded for SESSION. Relying on IndexedDB.", e);
             }
 
             const img = new Image();
@@ -5984,6 +6003,34 @@ class Activity {
             };
 
             img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svgData));
+        };
+
+        this.saveSessionAsync = async () => {
+            // First, trigger __saveLocally for the image thumb and fallback.
+            // If the payload is huge, it will quota exceed but fail silently, which is fine!
+            if (typeof this.__saveLocally === "function") {
+                this.__saveLocally();
+            }
+            // Second, save the massive payload safely to IndexedDB.
+            if (this.sessionStorageManager) {
+                const data = this.prepareExport();
+                let p = this.storage.currentProject;
+                if (!p) return;
+
+                // We use the same timestamp that __saveLocally just wrote,
+                // or generate a new one if it failed.
+                let timestampStr = this.storage["SESSION_TIMESTAMP" + p];
+                let timestamp = timestampStr ? parseInt(timestampStr, 10) : Date.now();
+
+                try {
+                    await this.sessionStorageManager.saveSession("SESSION" + p, data, timestamp);
+                    if (!timestampStr) {
+                        this.storage["SESSION_TIMESTAMP" + p] = timestamp.toString();
+                    }
+                } catch (e) {
+                    console.error("Failed to save session to IndexedDB:", e);
+                }
+            }
         };
 
         // Setup mouse events to start the drag

@@ -119,7 +119,12 @@ const setupActivityIdleWatcher = activityInstance => {
                         return;
                     }
 
-                    if (activity.saveLocally !== null && activity.saveLocally !== undefined) {
+                    if (typeof activity.saveSessionAsync === "function") {
+                        activity.saveSessionAsync();
+                    } else if (
+                        activity.saveLocally !== null &&
+                        activity.saveLocally !== undefined
+                    ) {
                         activity.saveLocally();
                     }
                 } catch (e) {
