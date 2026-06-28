@@ -470,7 +470,7 @@ body.highcontrast {
 .highcontrast #helpdropdown.helpdropdown-menu li.active,
 .highcontrast #helpdropdown.helpdropdown-menu li.selected,
 .highcontrast #helpdropdown.helpdropdown-menu li.active.selected {
-    background: var(--pc-aux);
+    background: var(--color-text-secondary);
 }
 
 .highcontrast #helpdropdown.helpdropdown-menu li:hover > a,
@@ -479,8 +479,8 @@ body.highcontrast {
 .highcontrast #helpdropdown.helpdropdown-menu li > a:hover,
 .highcontrast #helpdropdown.helpdropdown-menu li > a:focus,
 .highcontrast #helpdropdown.helpdropdown-menu li > a.dropdown-item-focused {
-    background: var(--pc-aux);
-    color: var(--color-text-primary);
+    background: var(--color-text-secondary);
+    color: var(--color-text-inverse);
 }
 
 .highcontrast .keyboard-shortcuts-hero,
@@ -726,7 +726,6 @@ body.highcontrast {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    margin-top: 64px;
 }
 
 .dark #buttoncontainerTOP .tooltipped img {
@@ -750,7 +749,6 @@ body.highcontrast {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    margin-top: 64px;
 }
 
 .highcontrast #buttoncontainerTOP .tooltipped img {
