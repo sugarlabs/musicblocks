@@ -160,13 +160,3 @@ body.highcontrast {
 
     --shadow-focus: 0 0 0 4px #ffff00;
 }
-
-/* ==========================================================================
-   Theme Selector Background Utilities
-   ========================================================================== */
-:root             { --color-selector-bg: #8CC6FF; --color-selector-hover: #1A8CFF; }
-body.dark         { --color-selector-bg: #64B5F6; --color-selector-hover: #1E88E5; }
-body.highcontrast { --color-selector-bg: #00FFFF; --color-selector-hover: #00CCCC; }
-
-.tm-selector-bg { background-color: var(--color-selector-bg); }
-.tm-selector-hover { background-color: var(--color-selector-hover); }
