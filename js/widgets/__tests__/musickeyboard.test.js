@@ -152,4 +152,38 @@ describe("MusicKeyboard add-row submenu", () => {
             [2, ["number", { value: 392 }], 0, 0, [0]]
         ]);
     });
+
+    test("creates keyboard without throwing and sets up idContainer", () => {
+        global.PITCHES3 = ["C", "D", "E", "F", "G", "A", "B"];
+        global.SHARP = "♯";
+        global.FLAT = "♭";
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1
+        });
+
+        keyboard.keyboardDiv = document.createElement("div");
+        document.body.appendChild(keyboard.keyboardDiv);
+
+        keyboard.displayLayout = [
+            { noteName: "hertz", noteOctave: 392, blockNumber: 100001 },
+            { noteName: "drum", noteOctave: 436, blockNumber: 100002 },
+            { noteName: "C", noteOctave: 4, blockNumber: 100003 },
+            { noteName: "C#", noteOctave: 4, blockNumber: 100004 },
+            { noteName: "Db", noteOctave: 4, blockNumber: 100005 }
+        ];
+        keyboard.layout = keyboard.displayLayout;
+        keyboard.noteNames = [];
+        keyboard.octaves = [];
+        keyboard.loadHandler = jest.fn();
+        keyboard.addKeyboardShortcuts = jest.fn();
+
+        expect(() => keyboard._createKeyboard()).not.toThrow();
+        expect(keyboard.idContainer.length).toBeGreaterThan(0);
+
+        document.body.removeChild(keyboard.keyboardDiv);
+        delete global.PITCHES3;
+        delete global.SHARP;
+        delete global.FLAT;
+    });
 });

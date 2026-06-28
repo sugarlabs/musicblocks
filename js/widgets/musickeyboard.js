@@ -2830,9 +2830,9 @@ function MusicKeyboard(activity) {
         let myrow2Id = 0;
         let myrow3Id = 0;
 
-        let parenttb1 = document.getElementById("myrow");
-        let parenttb2 = document.getElementById("myrow2");
-        let e1, newel, newel2, nnmae;
+        let parenttbl = document.getElementById("myrow");
+        let parenttbl2 = document.getElementById("myrow2");
+        let el, newel, newel2, nname;
 
         for (let p = 0; p < this.displayLayout.length; p++) {
             // If the blockNumber is null, don't add a label.
