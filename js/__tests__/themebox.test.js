@@ -41,6 +41,21 @@ document.body.innerHTML = `
     <div id="palette"><div></div></div>
 `;
 
+// Mock window.matchMedia
+Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: jest.fn().mockImplementation(query => ({
+        matches: query === "(prefers-color-scheme: dark)",
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        dispatchEvent: jest.fn()
+    }))
+});
+
 const ThemeBox = require("../themebox");
 
 describe("ThemeBox", () => {
@@ -140,5 +155,39 @@ describe("ThemeBox", () => {
         themeBox.applyThemeInstantly();
         const canvas = document.getElementById("canvas");
         expect(canvas.style.backgroundColor).toBe("rgb(249, 249, 249)");
+    });
+
+    test("initializeTheme() attaches matchMedia listener via addEventListener", () => {
+        const mockMq = {
+            matches: false,
+            addEventListener: jest.fn(),
+            addListener: jest.fn()
+        };
+        window.matchMedia = jest.fn().mockReturnValue(mockMq);
+        themeBox.initializeTheme();
+        expect(mockMq.addEventListener).toHaveBeenCalledWith("change", expect.any(Function));
+        expect(mockMq.addListener).not.toHaveBeenCalled();
+    });
+
+    test("initializeTheme() falls back to addListener when addEventListener unavailable", () => {
+        const mockMq = { matches: false, addListener: jest.fn() };
+        window.matchMedia = jest.fn().mockReturnValue(mockMq);
+        themeBox.initializeTheme();
+        expect(mockMq.addListener).toHaveBeenCalledWith(expect.any(Function));
+    });
+
+    test("OS theme change to dark updates theme correctly", () => {
+        let capturedHandler;
+        const mockMq = {
+            matches: false,
+            addEventListener: jest.fn((_, handler) => {
+                capturedHandler = handler;
+            }),
+            addListener: jest.fn()
+        };
+        window.matchMedia = jest.fn().mockReturnValue(mockMq);
+        themeBox.initializeTheme();
+        capturedHandler({ matches: true });
+        expect(themeBox._theme).toBe("dark");
     });
 });
