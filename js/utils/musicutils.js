@@ -1643,7 +1643,7 @@ const PITCH_COLLECTIONS = {
     },
     6: {
         "minor blues": [3, 2, 1, 1, 3, 2],
-        "major blues": [2, 1, 1, 3, 2, 2],
+        "major blues": [2, 1, 1, 3, 2, 3],
         "whole tone": [2, 2, 2, 2, 2, 2]
     },
     5: {
