@@ -3197,6 +3197,9 @@ class Activity {
         const resizeCanvas_ = () => {
             try {
                 that._onResize(false);
+                if (typeof that.updateFloatingButtonsPosition === "function") {
+                    that.updateFloatingButtonsPosition();
+                }
                 const hideContents = document.getElementById("hideContents");
                 if (hideContents) {
                     hideContents.click();
@@ -3513,6 +3516,27 @@ class Activity {
             }
         };
 
+        /**
+         * Updates the vertical position of the floating top-right buttons.
+         * Ensures that they maintain a fixed offset from the bottom of the navigation bar,
+         * pushing them down gracefully if the toolbar expands.
+         */
+        this.updateFloatingButtonsPosition = () => {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    const topRightButtons = document.querySelectorAll(
+                        "#buttoncontainerTOP .tooltipped"
+                    );
+                    if (topRightButtons.length === 0) return;
+                    const navHeight = document.querySelector("nav")?.offsetHeight || 64;
+                    const BASE_TOP = navHeight + 12;
+                    topRightButtons.forEach(btn => {
+                        btn.style.top = BASE_TOP + (this.toolbarHeight || 0) + "px";
+                    });
+                });
+            });
+        };
+
         /*
          * Toggles Aux menu visibility and positioning
          */
@@ -3541,6 +3565,7 @@ class Activity {
                 this.tenorBitmap.y += dy;
                 this.bassBitmap.y += dy;
                 this.blocks.checkBounds();
+                this.updateFloatingButtonsPosition();
             } else {
                 dy = this.toolbarHeight;
                 this.toolbarHeight = 0;
@@ -3557,6 +3582,7 @@ class Activity {
                 this.altoBitmap.y -= dy;
                 this.tenorBitmap.y -= dy;
                 this.bassBitmap.y -= dy;
+                this.updateFloatingButtonsPosition();
             }
 
             this.refreshCanvas();
@@ -5759,6 +5785,18 @@ class Activity {
 
             this.trashcan = new Trashcan(this);
             this.turtles = new Turtles(this);
+
+            // Wait for Turtles to asynchronously create the buttons, then position them correctly.
+            const buttonsObserver = new MutationObserver((mutations, obs) => {
+                if (document.getElementById("buttoncontainerTOP")) {
+                    if (typeof this.updateFloatingButtonsPosition === "function") {
+                        this.updateFloatingButtonsPosition();
+                    }
+                    obs.disconnect();
+                }
+            });
+            buttonsObserver.observe(document.body, { childList: true });
+
             setupGridController(this);
             setupGridRenderer(this);
             this.boundary = new Boundary(this.blocksContainer);
