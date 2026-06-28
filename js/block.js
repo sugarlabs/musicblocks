@@ -4882,6 +4882,11 @@ class Block {
                     this.blocks.palettes.hide();
                     this.blocks.palettes.updatePalettes("action");
                     this.blocks.palettes.show();
+                    // Force-open the action palette so the newly created
+                    // action block is immediately visible to the user.
+                    if (closeInput) {
+                        this.blocks.palettes.showPalette("action");
+                    }
                     break;
                 case "storein":
                     // Check to see which connection we are using in
