@@ -451,19 +451,19 @@ body.highcontrast {
 
 .highcontrast .keyboard-shortcuts-panel {
     background: #000000;
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast #helpdropdown.helpdropdown-menu,
 .highcontrast #helpdropdown.helpdropdown-menu li > a {
     background: #000000;
     color: var(--color-text-primary);
-    border-color: var(--color-text-inverse);
+    border-color: var(--color-text-primary);
     box-shadow: none;
 }
 
 .highcontrast #helpdropdown.helpdropdown-menu li + li {
-    border-top-color: var(--color-text-inverse);
+    border-top-color: var(--color-text-primary);
 }
 
 .highcontrast #helpdropdown.helpdropdown-menu li:hover,
@@ -489,19 +489,19 @@ body.highcontrast {
     border: 1px solid #ffffff;
     background: #000000;
     box-shadow: none;
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast .keyboard-shortcuts-section-title,
 .highcontrast .keyboard-shortcuts-action,
 .highcontrast .keyboard-shortcuts-hero-copy,
 .highcontrast .keyboard-shortcuts-hero-title {
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast .keyboard-shortcuts-row,
 .highcontrast .keyboard-shortcuts-section-title {
-    border-color: var(--color-text-inverse);
+    border-color: var(--color-text-primary);
 }
 
 @media (max-width: 900px) {
@@ -537,21 +537,21 @@ body.highcontrast {
 }
 
 .highcontrast #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast #floatingWindows > .windowFrame > .wfWinBody .wfbWidget {
-    color: var(--color-text-inverse) !important;
+    color: var(--color-text-primary) !important;
     background-color: var(--color-text-inverse) !important;
 }
 
 .highcontrast .popupMsg {
     background-color: var(--color-text-inverse);
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast #printText {
-    border-color: var(--color-text-inverse);
+    border-color: var(--color-text-primary);
 }
 
 .highcontrast #loading-image-container {
@@ -563,7 +563,7 @@ body.highcontrast {
 }
 
 .highcontrast .language-link {
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast #submitLilypond {
@@ -575,12 +575,12 @@ body.highcontrast {
 .highcontrast #helpfulSearch,
 .highcontrast .ui-autocomplete {
     background-color: var(--color-text-inverse) !important;
-    color: var(--color-text-inverse) !important;
+    color: var(--color-text-primary) !important;
     border: 1px solid #ffffff;
 }
 
 .highcontrast .ui-autocomplete .ui-menu-item a {
-    color: var(--color-text-inverse) !important;
+    color: var(--color-text-primary) !important;
     background-color: var(--color-text-inverse) !important;
 }
 
@@ -590,22 +590,22 @@ body.highcontrast {
 }
 
 .highcontrast #helpfulSearchDiv {
-    color: var(--color-text-inverse) !important;
+    color: var(--color-text-primary) !important;
     background-color: transparent !important;
 }
 
 .highcontrast #crossButton {
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast #chooseKeyDiv {
     background: #000000;
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast #movable {
     background: #000000;
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast .dropdown-content li > a {
@@ -625,7 +625,7 @@ body.highcontrast {
 }
 
 .highcontrast .modal-message {
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
     background-color: var(--color-text-inverse);
 }
 
@@ -635,7 +635,7 @@ body.highcontrast {
 }
 
 .highcontrast #confirmation-message {
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast .material-tooltip {
