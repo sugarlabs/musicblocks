@@ -3524,18 +3524,6 @@ class Activity {
             const cellsize = 55;
             let dy;
 
-            // function to increase or decrease the "top" property of the top-right corner buttons
-
-            const topRightButtons = document.querySelectorAll("#buttoncontainerTOP .tooltipped");
-            const gridElement = document.getElementById("Grid");
-            const btnY = gridElement ? gridElement.getBoundingClientRect().top : 70 + LEADING + 6;
-
-            this.changeTopButtonsPosition = value => {
-                topRightButtons.forEach(child => {
-                    child.style.top = `${btnY + value}px`;
-                });
-            };
-
             if (!resize && this.toolbarHeight === 0) {
                 dy = cellsize + LEADING + 5;
 
@@ -3543,7 +3531,6 @@ class Activity {
                 this.palettes.deltaY(dy);
                 this.turtles.deltaY(dy);
                 this.blocksContainer.y += dy;
-                this.changeTopButtonsPosition(dy);
 
                 this.cartesianBitmap.y += dy;
                 this.polarBitmap.y += dy;
@@ -3561,7 +3548,6 @@ class Activity {
                 this.turtles.deltaY(-dy);
                 this.palettes.deltaY(-dy);
                 this.blocksContainer.y -= dy;
-                this.changeTopButtonsPosition(-dy);
 
                 this.cartesianBitmap.y -= dy;
                 this.polarBitmap.y -= dy;
