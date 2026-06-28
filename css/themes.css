@@ -403,7 +403,7 @@ body.highcontrast {
 .dark #helpdropdown.helpdropdown-menu li.active,
 .dark #helpdropdown.helpdropdown-menu li.selected,
 .dark #helpdropdown.helpdropdown-menu li.active.selected {
-    background: var(--color-brand-primary);
+    background: var(--pc-aux);
 }
 
 .dark #helpdropdown.helpdropdown-menu li:hover > a,
@@ -412,7 +412,7 @@ body.highcontrast {
 .dark #helpdropdown.helpdropdown-menu li > a:hover,
 .dark #helpdropdown.helpdropdown-menu li > a:focus,
 .dark #helpdropdown.helpdropdown-menu li > a.dropdown-item-focused {
-    background: var(--color-brand-primary);
+    background: var(--pc-aux);
     color: var(--color-text-inverse);
 }
 
@@ -470,7 +470,7 @@ body.highcontrast {
 .highcontrast #helpdropdown.helpdropdown-menu li.active,
 .highcontrast #helpdropdown.helpdropdown-menu li.selected,
 .highcontrast #helpdropdown.helpdropdown-menu li.active.selected {
-    background: var(--color-brand-primary);
+    background: var(--pc-aux);
 }
 
 .highcontrast #helpdropdown.helpdropdown-menu li:hover > a,
@@ -479,7 +479,7 @@ body.highcontrast {
 .highcontrast #helpdropdown.helpdropdown-menu li > a:hover,
 .highcontrast #helpdropdown.helpdropdown-menu li > a:focus,
 .highcontrast #helpdropdown.helpdropdown-menu li > a.dropdown-item-focused {
-    background: var(--color-brand-primary);
+    background: var(--pc-aux);
     color: var(--color-text-primary);
 }
 
