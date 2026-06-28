@@ -3780,7 +3780,8 @@ class Activity {
             if (recordBtn) {
                 recordBtn.classList.remove("grey-text", "inactiveLink");
             }
-
+            // Announce program stop to screen readers
+            this.textMsg && this.textMsg(_("Program stopped."));
             // TODO: plugin support
         };
 
@@ -3789,6 +3790,8 @@ class Activity {
          */
         this.onRunTurtle = () => {
             // TODO: plugin support
+            // Announce program start to screen readers
+            this.textMsg && this.textMsg(_("Program running."));
         };
 
         /*
