@@ -1392,6 +1392,68 @@ describe("Utility Functions (logic-only)", () => {
             Synth._getFrequency = originalGetFrequency;
         });
     });
+
+    describe("_performNotes effects routing and cleanup", () => {
+        it("should reconnect synth to destination and disconnect old routing when effects complete", async () => {
+            jest.useFakeTimers();
+
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn(),
+                disconnect: jest.fn(),
+                connect: jest.fn(),
+                chain: jest.fn().mockReturnThis()
+            };
+            Synth.inTemperament = "equal";
+
+            const paramsEffects = {
+                doVibrato: true,
+                vibratoFrequency: 5,
+                vibratoIntensity: 1
+            };
+
+            await _performNotes.call(Synth, mockSynth, "C4", 0.25, paramsEffects, null, false, 0);
+
+            // Fast-forward time to trigger the effects cleanup setTimeout
+            jest.advanceTimersByTime(2000);
+
+            expect(mockSynth.disconnect).toHaveBeenCalled();
+            expect(mockSynth.toDestination).toHaveBeenCalled();
+
+            jest.useRealTimers();
+        });
+
+        it("should catch errors when disconnect throws an error during effects cleanup", async () => {
+            jest.useFakeTimers();
+
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn(),
+                disconnect: jest.fn().mockImplementation(() => {
+                    throw new Error("Already disconnected");
+                }),
+                connect: jest.fn(),
+                chain: jest.fn().mockReturnThis()
+            };
+            Synth.inTemperament = "equal";
+
+            const paramsEffects = {
+                doVibrato: true,
+                vibratoFrequency: 5,
+                vibratoIntensity: 1
+            };
+
+            await _performNotes.call(Synth, mockSynth, "C4", 0.25, paramsEffects, null, false, 0);
+
+            // Fast-forward time to trigger the effects cleanup setTimeout
+            jest.advanceTimersByTime(2000);
+
+            expect(mockSynth.disconnect).toHaveBeenCalled();
+            expect(mockSynth.toDestination).toHaveBeenCalled();
+
+            jest.useRealTimers();
+        });
+    });
 });
 
 describe("Tuner Utilities (Audio Test Functions)", () => {
