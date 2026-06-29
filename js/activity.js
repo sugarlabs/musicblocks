@@ -6329,11 +6329,6 @@ class Activity {
             // create functionality of 2D drag to select blocks in bulk
             this._create2Ddrag();
 
-            /*
-               document.addEventListener("mousewheel", scrollEvent, false);
-               document.addEventListener("DOMMouseScroll", scrollEvent, false);
-               */
-
             // Named event handler for proper cleanup
             const activity = this;
             this.handleKeyDown = event => {
