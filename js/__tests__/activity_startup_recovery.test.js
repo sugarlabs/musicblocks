@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
+const { PubSub } = require("../pubsub");
 
 const loadLoadStart = () => {
     const activityPath = path.resolve(__dirname, "../activity.js");
@@ -15,6 +16,7 @@ const loadLoadStart = () => {
     code += "\nthis.loadStart = loadStart;";
 
     const recoverable = jest.fn();
+    const pubsub = new PubSub();
     const sandbox = {
         ErrorHandler: {
             recoverable,
@@ -45,21 +47,23 @@ const loadLoadStart = () => {
         _THIS_IS_MUSIC_BLOCKS_: true,
         LEADING: 0,
         MYDEFINES: [],
-        setupActivityAbcParser: () => {}
+        setupActivityAbcParser: () => {},
+        pubsub
     };
 
     vm.createContext(sandbox);
     vm.runInContext(code, sandbox);
 
-    return { loadStart: sandbox.loadStart, recoverable };
+    return { loadStart: sandbox.loadStart, recoverable, pubsub };
 };
 
 describe("Activity startup recovery", () => {
     let loadStart;
     let recoverable;
+    let pubsub;
 
     beforeAll(() => {
-        ({ loadStart, recoverable } = loadLoadStart());
+        ({ loadStart, recoverable, pubsub } = loadLoadStart());
     });
 
     afterEach(() => {
@@ -113,6 +117,6 @@ describe("Activity startup recovery", () => {
         expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
         expect(activity.update).toBe(true);
 
-        document.dispatchEvent(new Event("finishedLoading"));
+        pubsub.emit("finishedLoading");
     });
 });
