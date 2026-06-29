@@ -25,7 +25,7 @@
    getVoiceSynthName, i18nSolfege, last, MathUtility, mixedNumber,
    piemenuBlockContext, prepareMacroExports, ProtoBlock,
     setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments,
-    docById, define, BlocksDependencies, deepClone
+    docById, define, BlocksDependencies, deepClone, pubsub
 */
 
 /* global showZoomOverlay */
@@ -7033,8 +7033,7 @@ class Blocks {
             if (this.activity.stopLoadAnimation) {
                 this.activity.stopLoadAnimation();
             }
-            const myCustomEvent = new Event("finishedLoading");
-            document.dispatchEvent(myCustomEvent);
+            pubsub.emit("finishedLoading");
         };
 
         /**

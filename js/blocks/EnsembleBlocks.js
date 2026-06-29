@@ -14,7 +14,7 @@
 
    _, last, FlowBlock, ValueBlock, FlowClampBlock, LeftBlock, BooleanBlock,
    NOINPUTERRORMSG, NANERRORMSG, INVALIDPITCH, getNote, pitchToNumber,
-   TURTLESVG, _THIS_IS_MUSIC_BLOCKS_, getMunsellColor
+   TURTLESVG, _THIS_IS_MUSIC_BLOCKS_, getMunsellColor, pubsub
 */
 
 /* exported setupEnsembleBlocks, getTargetTurtle */
@@ -1015,14 +1015,10 @@ function setupEnsembleBlocks(activity) {
                     logo.runFromBlock(logo, thisTurtle, blockNumber, 0, receivedArg);
                     // Dispatch an event to indicate logo this turtle is running
                     activity.stage.dispatchEvent(turtleName);
-                    document.removeEventListener("finishedLoading", __afterLoad);
+                    pubsub.off("finishedLoading", __afterLoad);
                 };
 
-                if (document.addEventListener) {
-                    document.addEventListener("finishedLoading", __afterLoad);
-                } else {
-                    document.attachEvent("finishedLoading", __afterLoad);
-                }
+                pubsub.on("finishedLoading", __afterLoad);
 
                 activity.blocks.loadNewBlocks(newBlock);
             } else {

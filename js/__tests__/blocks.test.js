@@ -282,4 +282,50 @@ describe("Blocks Foundation", () => {
             debugSpy.mockRestore();
         });
     });
+
+    describe("cleanupAfterLoad – finishedLoading emission", () => {
+        const { PubSub } = require("../pubsub");
+        let loadContainer;
+
+        beforeEach(() => {
+            global.pubsub = new PubSub();
+            loadContainer = document.createElement("div");
+            loadContainer.id = "load-container";
+            document.body.appendChild(loadContainer);
+        });
+
+        afterEach(() => {
+            loadContainer.remove();
+            delete global.pubsub;
+        });
+
+        it("emits finishedLoading when _loadCounter reaches zero", async () => {
+            const blocks = new Blocks(mockActivity);
+            blocks._loadCounter = 1;
+            blocks.blockList = [];
+            blocks.blocksToCollapse = [];
+            blocks._findDrumURLs = jest.fn();
+            blocks.updateBlockPositions = jest.fn();
+            blocks._cleanupStacks = jest.fn();
+
+            const listener = jest.fn();
+            global.pubsub.on("finishedLoading", listener);
+
+            await blocks.cleanupAfterLoad();
+
+            expect(listener).toHaveBeenCalledTimes(1);
+        });
+
+        it("does not emit finishedLoading when _loadCounter is still positive", async () => {
+            const blocks = new Blocks(mockActivity);
+            blocks._loadCounter = 2;
+
+            const listener = jest.fn();
+            global.pubsub.on("finishedLoading", listener);
+
+            await blocks.cleanupAfterLoad();
+
+            expect(listener).not.toHaveBeenCalled();
+        });
+    });
 });

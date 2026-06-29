@@ -75,7 +75,7 @@ requirejs.config({
             exports: "Block"
         },
         "activity/blocks": {
-            deps: ["activity/block"],
+            deps: ["activity/block", "activity/pubsub"],
             exports: "Blocks"
         },
         "activity/turtle-singer": {
@@ -457,6 +457,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                 "tweenjs.min",
                 "utils/platformstyle",
                 "utils/utils",
+                "activity/pubsub",
                 "activity/turtledefs",
                 "activity/block",
                 "activity/blocks",
