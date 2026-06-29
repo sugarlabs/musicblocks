@@ -1792,6 +1792,7 @@ function MusicKeyboard(activity) {
      */
     this._createpiesubmenu = function (cellId, start) {
         docById("wheelDivptm").style.display = "";
+        docById("wheelDivptm").style.zIndex = "10001";
 
         this._menuWheel = new wheelnav("wheelDivptm", null, 600, 600);
         this._exitWheel = new wheelnav("_exitWheel", this._menuWheel.raphael);
@@ -2071,7 +2072,7 @@ function MusicKeyboard(activity) {
      */
     this._createAddRowPieSubmenu = function () {
         docById("wheelDivptm").style.display = "";
-        // docById("wheelDivptm").style.zIndex = "300";
+        docById("wheelDivptm").style.zIndex = "10001";
         const pitchLabels = [
             "do",
             "do♯",
@@ -2152,7 +2153,7 @@ function MusicKeyboard(activity) {
             ) + "px";
         docById("wheelDivptm").style.top =
             Math.min(
-                this.activity.canvas.height - 250,
+                this.activity.canvas.height - 300,
                 Math.max(0, y * this.activity.getStageScale())
             ) + "px";
 
@@ -2451,7 +2452,7 @@ function MusicKeyboard(activity) {
         }
 
         docById("wheelDivptm").style.display = "";
-        docById("wheelDivptm").style.zIndex = "300";
+        docById("wheelDivptm").style.zIndex = "10001";
 
         const accidentals = ["𝄪", "♯", "♮", "♭", "𝄫"];
         let noteLabels = ["ti", "la", "sol", "fa", "mi", "re", "do"];
@@ -2580,7 +2581,7 @@ function MusicKeyboard(activity) {
             ) + "px";
         docById("wheelDivptm").style.top =
             Math.min(
-                this.activity.canvas.height - 250,
+                this.activity.canvas.height - 300,
                 Math.max(0, y * this.activity.getStageScale())
             ) + "px";
 
