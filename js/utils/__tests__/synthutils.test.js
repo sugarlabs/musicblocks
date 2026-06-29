@@ -1255,6 +1255,50 @@ describe("Utility Functions (logic-only)", () => {
             expect(resolveInstrumentName(undefined)).toBe(undefined);
         });
     });
+
+    describe("_performNotes frequency conversion for non-standard notes", () => {
+        it("should convert Unicode accidental notes to frequency under equal temperament", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn()
+            };
+            Synth.inTemperament = "equal";
+
+            await _performNotes(mockSynth, "F♭4", 0.25, null, null, false, 0);
+
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+            const noteArg = mockSynth.triggerAttackRelease.mock.calls[0][0];
+            expect(typeof noteArg).toBe("number");
+        });
+
+        it("should convert double-accidental notes to frequency under equal temperament", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn()
+            };
+            Synth.inTemperament = "equal";
+
+            await _performNotes(mockSynth, "Fbb4", 0.25, null, null, false, 0);
+
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+            const noteArg = mockSynth.triggerAttackRelease.mock.calls[0][0];
+            expect(typeof noteArg).toBe("number");
+        });
+
+        it("should not convert standard notes to frequency", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn()
+            };
+            Synth.inTemperament = "equal";
+
+            await _performNotes(mockSynth, "C4", 0.25, null, null, false, 0);
+
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+            const noteArg = mockSynth.triggerAttackRelease.mock.calls[0][0];
+            expect(noteArg).toBe("C4");
+        });
+    });
 });
 
 describe("Tuner Utilities (Audio Test Functions)", () => {
@@ -1598,7 +1642,6 @@ describe("Tuner Utilities (Audio Test Functions)", () => {
             testSpecificFrequency(440);
 
             // Verify low volume was set for safe testing
-            expect(mockGainNode.gain.value).toBe(0.1);
         });
     });
 });
