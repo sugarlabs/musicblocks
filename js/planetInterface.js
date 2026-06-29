@@ -14,7 +14,7 @@
 // scratch. -- Walter Bender, October 2014.
 
 /*
-   globals _, docById, platformColor, doSVG, createjs, _THIS_IS_MUSIC_BLOCKS_
+   globals _, docById, platformColor, doSVG, createjs, _THIS_IS_MUSIC_BLOCKS_, pubsub
  */
 
 /*
@@ -161,14 +161,10 @@ class PlanetInterface {
             this.activity.blocks.palettes._hideMenus(true);
 
             const __afterLoad = () => {
-                document.removeEventListener("finishedLoading", __afterLoad);
+                pubsub.off("finishedLoading", __afterLoad);
             };
 
-            if (document.addEventListener) {
-                document.addEventListener("finishedLoading", __afterLoad);
-            } else {
-                document.attachEvent("finishedLoading", __afterLoad);
-            }
+            pubsub.on("finishedLoading", __afterLoad);
 
             try {
                 const obj = JSON.parse(data);
