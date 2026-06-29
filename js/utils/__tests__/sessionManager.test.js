@@ -74,4 +74,47 @@ describe("SessionStorageManager", () => {
         expect(loaded.data).toBe(newData);
         expect(loaded.timestamp).toBe(newTimestamp);
     });
+
+    test("init handles indexedDB open errors", async () => {
+        const originalOpen = global.indexedDB.open;
+        global.indexedDB.open = () => {
+            const req = {};
+            setTimeout(() => {
+                if (req.onerror)
+                    req.onerror({ target: { error: new Error("Simulated Open Error") } });
+            }, 10);
+            return req;
+        };
+
+        await expect(sessionManager.init()).rejects.toThrow("Simulated Open Error");
+
+        global.indexedDB.open = originalOpen;
+    });
+
+    test("saveSession catches and rethrows errors", async () => {
+        jest.spyOn(sessionManager, "init").mockRejectedValue(new Error("Init failed"));
+        const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+        await expect(sessionManager.saveSession("key", "data")).rejects.toThrow("Init failed");
+
+        expect(consoleSpy).toHaveBeenCalledWith(
+            "[SessionStorageManager] Error saving session:",
+            expect.any(Error)
+        );
+        consoleSpy.mockRestore();
+    });
+
+    test("loadSession catches errors and returns null", async () => {
+        jest.spyOn(sessionManager, "init").mockRejectedValue(new Error("Init failed"));
+        const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+        const result = await sessionManager.loadSession("key");
+        expect(result).toBeNull();
+
+        expect(consoleSpy).toHaveBeenCalledWith(
+            "[SessionStorageManager] Error loading session:",
+            expect.any(Error)
+        );
+        consoleSpy.mockRestore();
+    });
 });
