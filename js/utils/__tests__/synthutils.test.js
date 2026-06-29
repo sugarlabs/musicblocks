@@ -998,6 +998,50 @@ describe("Utility Functions (logic-only)", () => {
             const result = _loadSample("piano");
             expect(result).toBeInstanceOf(Promise);
         });
+
+        it("should reject when requirejs fails to load the sample", async () => {
+            const originalRequirejs = global.requirejs;
+            Synth.samples.voice.piano = null;
+            try {
+                global.requirejs = (deps, cb, errback) => {
+                    if (typeof errback === "function") errback(new Error("Failed to load"));
+                };
+
+                await expect(_loadSample("piano")).rejects.toThrow("Failed to load");
+            } finally {
+                global.requirejs = originalRequirejs;
+            }
+        });
+
+        it("should reject when the global variable for the sample is not defined", async () => {
+            const originalPiano = window.PIANO_SAMPLE;
+            try {
+                delete window.PIANO_SAMPLE;
+
+                // Ensure samples placeholder is reset to null so it attempts loading
+                Synth.samples.voice.piano = null;
+
+                await expect(_loadSample("piano")).rejects.toBe("Sample global not found: piano");
+            } finally {
+                window.PIANO_SAMPLE = originalPiano;
+            }
+        });
+
+        it("should reject when the sample initializer throws an error", async () => {
+            const originalPiano = window.PIANO_SAMPLE;
+            try {
+                window.PIANO_SAMPLE = () => {
+                    throw new Error("Initialization failed");
+                };
+
+                // Ensure samples placeholder is reset to null so it attempts loading
+                Synth.samples.voice.piano = null;
+
+                await expect(_loadSample("piano")).rejects.toThrow("Initialization failed");
+            } finally {
+                window.PIANO_SAMPLE = originalPiano;
+            }
+        });
     });
 
     describe("getDefaultParamValues", () => {
