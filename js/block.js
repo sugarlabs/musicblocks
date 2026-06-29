@@ -1544,6 +1544,10 @@ class Block {
             } else if (this.name === "noisename") {
                 label = getNoiseName(this.value);
             } else if (this.name === "outputtools") {
+                label = this.overrideName;
+                if (label === null || label === undefined) {
+                    label = this.protoblock.staticLabels[0];
+                }
                 label = _(this.overrideName);
             } else if (this.name === "grid") {
                 label = _(this.value);
