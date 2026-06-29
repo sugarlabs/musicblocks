@@ -111,7 +111,11 @@ describe("MusicKeyboard add-row submenu", () => {
             this.createWheel = labels => {
                 this.navItems = labels.map(() => ({
                     navigateFunction: null,
-                    setTooltip: jest.fn()
+                    setTooltip: jest.fn(),
+                    sliceSelectedAttr: {},
+                    sliceHoverAttr: {},
+                    titleSelectedAttr: {},
+                    titleHoverAttr: {}
                 }));
             };
             this.removeWheel = jest.fn();

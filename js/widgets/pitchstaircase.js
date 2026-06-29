@@ -16,7 +16,7 @@
    global
 
    platformColor, _, SYNTHSVG, frequencyToPitch, DEFAULTVOICE,
-   normalizeNoteAccidentals
+   normalizeNoteAccidentals, PREVIEWVOLUME
  */
 
 /*
@@ -27,6 +27,8 @@
         _
     - js/utils/platformstyle.js
         platformColor
+    - js/logoconstants.js
+        PREVIEWVOLUME
 */
 /* exported PitchStaircase */
 
@@ -80,15 +82,7 @@ class PitchStaircase {
         cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
-
-        cell.onmouseover = () => {
-            cell.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        };
-
-        cell.onmouseout = () => {
-            cell.style.backgroundColor = platformColor.selectorBackground;
-        };
+        cell.classList.add("pitch-staircase-btn");
 
         return cell;
     }
@@ -143,7 +137,7 @@ class PitchStaircase {
             stepCell.style.minWidth = stepCell.style.width;
             stepCell.style.maxWidth = stepCell.style.width;
             stepCell.style.height = PitchStaircase.BUTTONSIZE + "px";
-            stepCell.style.backgroundColor = platformColor.selectorBackground;
+            stepCell.classList.add("pitch-staircase-step");
 
             const cellWidth = Number(stepCell.style.width.replace(/px/, ""));
             const svgWidth = cellWidth.toString();
@@ -201,19 +195,19 @@ class PitchStaircase {
     _dissectStair(event) {
         let inputNum1 = this._musicRatio1.value;
 
-        if (isNaN(inputNum1)) {
+        if (isNaN(inputNum1) || Number(inputNum1) <= 0) {
             inputNum1 = 3;
         } else {
-            inputNum1 = Math.abs(Math.floor(inputNum1));
+            inputNum1 = Math.floor(inputNum1);
         }
 
         this._musicRatio1.value = inputNum1;
         let inputNum2 = this._musicRatio2.value;
 
-        if (isNaN(inputNum2)) {
+        if (isNaN(inputNum2) || Number(inputNum2) <= 0) {
             inputNum2 = 2;
         } else {
-            inputNum2 = Math.abs(Math.floor(inputNum2));
+            inputNum2 = Math.floor(inputNum2);
         }
 
         this._musicRatio2.value = inputNum2;
@@ -308,11 +302,13 @@ class PitchStaircase {
      */
     _playOne(stepCell) {
         // The frequency is stored in the stepCell.
-        stepCell.style.backgroundColor = platformColor.selectorBackground;
+        stepCell.classList.add("active");
+        stepCell.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         const frequency = Number(stepCell.getAttribute("id"));
         this.activity.logo.synth.trigger(0, frequency, 1, DEFAULTVOICE, null, null);
 
         setTimeout(() => {
+            stepCell.classList.remove("active");
             stepCell.style.backgroundColor = platformColor.selectorBackground;
         }, 1000);
     }
@@ -328,14 +324,14 @@ class PitchStaircase {
             const note = this.Stairs[i][0] + this.Stairs[i][1];
             pitchnotes.push(normalizeNoteAccidentals(note));
             const stepCell = this._stepTables[i].rows[0].cells[1];
-            stepCell.style.backgroundColor = platformColor.selectorBackground;
+            stepCell.classList.add("active");
             this.activity.logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
         }
 
         setTimeout(() => {
             for (let i = 0; i < this.Stairs.length; i++) {
                 const stepCell = this._stepTables[i].rows[0].cells[1];
-                stepCell.style.backgroundColor = platformColor.selectorBackground;
+                stepCell.classList.remove("active");
             }
         }, 1000);
     }
@@ -351,7 +347,7 @@ class PitchStaircase {
         pitchnotes.push(normalizeNoteAccidentals(note));
         const last = this.Stairs.length - 1;
         const stepCell = this._stepTables[last].rows[0].cells[1];
-        stepCell.style.backgroundColor = platformColor.selectorBackground;
+        stepCell.classList.add("active");
         this.activity.logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
         this._playNext(this.Stairs.length - 2, -1);
     }
@@ -369,7 +365,7 @@ class PitchStaircase {
             setTimeout(() => {
                 for (let i = 0; i < this.Stairs.length; i++) {
                     const stepCell = this._stepTables[i].rows[0].cells[1];
-                    stepCell.style.backgroundColor = platformColor.selectorBackground;
+                    stepCell.classList.remove("active");
                 }
             }, 1000);
             return;
@@ -379,7 +375,7 @@ class PitchStaircase {
             setTimeout(() => {
                 for (let i = 0; i < this.Stairs.length; i++) {
                     const stepCell = this._stepTables[i].rows[0].cells[1];
-                    stepCell.style.backgroundColor = platformColor.selectorBackground;
+                    stepCell.classList.remove("active");
                 }
             }, 1000);
 
@@ -399,13 +395,14 @@ class PitchStaircase {
         const pscTableCell = previousRowNumber >= 0 ? this._stepTables[previousRowNumber] : null;
 
         setTimeout(() => {
+            if (this.closed) return;
             if (pscTableCell !== null && pscTableCell !== undefined) {
                 const stepCell = pscTableCell.rows[0].cells[1];
-                stepCell.style.backgroundColor = platformColor.selectorBackground;
+                stepCell.classList.remove("active");
             }
 
             const stepCell = this._stepTables[index].rows[0].cells[1];
-            stepCell.style.backgroundColor = platformColor.selectorBackground;
+            stepCell.classList.add("active");
             this.activity.logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
             // Use && so playback terminates when index reaches either boundary;
             // the boundary cases (=== -1 and === Stairs.length) are already
@@ -634,12 +631,14 @@ class PitchStaircase {
         widgetWindow.clear();
         widgetWindow.show();
         widgetWindow.onclose = () => {
-            this.activity.logo.synth.setMasterVolume(0);
             this.closed = true;
+            this.activity.logo.synth.stop();
+            this.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
             widgetWindow.destroy();
         };
 
         this.closed = false;
+        this.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
 
         widgetWindow.addButton("play-chord.svg", PitchStaircase.ICONSIZE, _("Play chord")).onclick =
             () => {

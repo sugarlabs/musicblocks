@@ -1548,6 +1548,7 @@ class Block {
                 if (label === null || label === undefined) {
                     label = this.protoblock.staticLabels[0];
                 }
+                label = _(this.overrideName);
             } else if (this.name === "grid") {
                 label = _(this.value);
             } else {
@@ -4270,7 +4271,7 @@ class Block {
             let labels;
             if (this.activity.beginnerMode) {
                 values = this.protoblock.extraSearchTerms.slice(0, 6);
-                labels = this.protoblock.iemenuLabels.slice(0, 6);
+                labels = this.protoblock.piemenuLabels.slice(0, 6);
             } else {
                 values = this.protoblock.extraSearchTerms;
                 labels = this.protoblock.piemenuLabels;

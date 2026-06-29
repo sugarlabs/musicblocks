@@ -2687,8 +2687,8 @@ class TimbreWidget {
                     docById("myRangeFx1").value = 3;
                     docById("myspanFx1").textContent = "3";
                     docById("sFx2").textContent = _("base frequency");
-                    docById("myRangeFx2").value = 1000;
-                    docById("myspanFx2").textContent = "1000";
+                    docById("myRangeFx2").value = 100;
+                    docById("myspanFx2").textContent = "100";
 
                     if (this.phaserEffect.length !== 0) {
                         blockValue = this.phaserEffect.length - 1;
@@ -2716,7 +2716,8 @@ class TimbreWidget {
                         this.phaserEffect.push(n);
                         this.phaserParams.push(5);
                         this.phaserParams.push(3);
-                        this.phaserParams.push(350);
+                        // Keep base frequency aligned with UI/default block value to avoid state drift.
+                        this.phaserParams.push(100);
 
                         await delayExecution(500);
                         this.clampConnection(n, 4, topOfClamp);

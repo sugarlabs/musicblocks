@@ -3060,7 +3060,7 @@ msgstr "juu"
 #.TRANS: the note names must be separated by single spaces
 #. AUTOTRANSLATED: Google Translate
 msgid "ti la sol fa mi re do"
-msgstr "Aga m enye gị naanị otu"
+msgstr "ti la sol fa mi re do"
 
 
 #: js/block.js:2832

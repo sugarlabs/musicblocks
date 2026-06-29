@@ -61,7 +61,18 @@ class LogoDependencies {
      * @param {Function} deps.callbacks.onStopTurtle - Called when turtle stops
      * @param {Function} deps.callbacks.onRunTurtle - Called when turtle runs
      *
-
+     * @param {Function} [deps.refreshCanvas] - Trigger a canvas repaint after parameter block updates
+     * @param {Function} [deps.textMsg] - Display a transient text message to the user
+     * @param {Function} [deps.markStageDirty] - Notify the stage that a visual update is pending
+     *
+     * @param {Object} [deps.save] - Save-completion callbacks for notation export
+     * @param {Function} [deps.save.afterSaveLilypond]
+     * @param {Function} [deps.save.afterSaveAbc]
+     * @param {Function} [deps.save.afterSaveMxml]
+     * @param {Function} [deps.save.afterSaveMIDI]
+     *
+     * @param {Object} [deps.statsWindow] - Stats display handler
+     * @param {Function} [deps.statsWindow.displayInfo]
      */
     constructor({
         blocks,
@@ -72,6 +83,12 @@ class LogoDependencies {
         storage,
         config,
         callbacks,
+
+        refreshCanvas = null,
+        textMsg = null,
+        markStageDirty = null,
+        save = null,
+        statsWindow = null,
 
         instruments = null,
         instrumentsFilters = null,
@@ -144,6 +161,41 @@ class LogoDependencies {
          */
         this.callbacks = callbacks || { onStopTurtle: null, onRunTurtle: null };
 
+        /**
+         * Trigger a canvas repaint after parameter block updates during stepped execution.
+         * @type {Function}
+         */
+        this.refreshCanvas = refreshCanvas || (() => {});
+
+        /**
+         * Display a transient text message to the user (used by print blocks and debug output).
+         * @type {Function}
+         */
+        this.textMsg = textMsg || (() => {});
+
+        /**
+         * Notify the rendering loop that the stage needs a visual update.
+         * @type {Function}
+         */
+        this.markStageDirty = markStageDirty || (() => {});
+
+        /**
+         * Save-completion callbacks for notation export (Lilypond, ABC, MusicXML, MIDI).
+         * @type {Object}
+         */
+        this.save = save || {
+            afterSaveLilypond: () => {},
+            afterSaveAbc: () => {},
+            afterSaveMxml: () => {},
+            afterSaveMIDI: () => {}
+        };
+
+        /**
+         * Stats window — displays project statistics after a collection run.
+         * @type {Object}
+         */
+        this.statsWindow = statsWindow || { displayInfo: () => {} };
+
         // Audio and utility dependencies
         this.instruments =
             instruments || (typeof window !== "undefined" ? window.instruments : null);
@@ -194,7 +246,7 @@ class LogoDependencies {
             blocks: activity.blocks,
             turtles: activity.turtles,
             stage: activity.stage,
-            errorHandler: msg => activity.errorMsg(msg),
+            errorHandler: (msg, blk) => activity.errorMsg(msg, blk),
             messageHandler: {
                 hide: () => activity.hideMsgs()
             },
@@ -212,6 +264,29 @@ class LogoDependencies {
             callbacks: {
                 onStopTurtle: activity.onStopTurtle,
                 onRunTurtle: activity.onRunTurtle
+            },
+            refreshCanvas: () => activity.refreshCanvas && activity.refreshCanvas(),
+            textMsg: msg => activity.textMsg && activity.textMsg(msg),
+            markStageDirty: () => {
+                activity.stageDirty = true;
+            },
+            save: {
+                afterSaveLilypond: () =>
+                    activity.save &&
+                    activity.save.afterSaveLilypond &&
+                    activity.save.afterSaveLilypond(),
+                afterSaveAbc: () =>
+                    activity.save && activity.save.afterSaveAbc && activity.save.afterSaveAbc(),
+                afterSaveMxml: () =>
+                    activity.save && activity.save.afterSaveMxml && activity.save.afterSaveMxml(),
+                afterSaveMIDI: () =>
+                    activity.save && activity.save.afterSaveMIDI && activity.save.afterSaveMIDI()
+            },
+            statsWindow: {
+                displayInfo: (...args) =>
+                    activity.statsWindow &&
+                    activity.statsWindow.displayInfo &&
+                    activity.statsWindow.displayInfo(...args)
             },
 
             // Pass globals for backward compatibility during migration

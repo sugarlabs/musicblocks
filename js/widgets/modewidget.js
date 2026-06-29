@@ -121,6 +121,10 @@ class ModeWidget {
                 this._timeouts = [];
             }
             this._playing = false;
+            if (this.logo && this.logo.synth) {
+                this.logo.synth.stop();
+            }
+            this._locked = false;
             this.hideMsgs();
             this.widgetWindow.destroy();
         };
@@ -193,7 +197,7 @@ class ModeWidget {
         const row = table.insertRow();
         const cell = row.insertCell();
         // cell.colSpan = 18;
-        cell.innerHTML = "&nbsp;";
+        cell.textContent = "\u00a0";
         cell.style.backgroundColor = platformColor.selectorBackground;
 
         // Set current mode in pie menu.

@@ -1414,7 +1414,8 @@ let delayExecution = duration => {
  * @returns {void}
  */
 function closeWidgets() {
-    window.widgetWindows.hideAllWindows();
+    const names = Object.keys(window.widgetWindows.openWindows);
+    names.forEach(name => window.widgetWindows.closeWindow(name));
 }
 
 /**
@@ -1424,10 +1425,59 @@ function closeWidgets() {
  * @returns {void}
  */
 let closeBlkWidgets = name => {
+    let searchKey = name;
+
+    // NOTE: This mapping only works for widgets that never set their own
+    // `blockNo` property (e.g. ModeWidget). window.widgetWindows.windowFor()
+    // keys a widget's window by `widget.blockNo` if that property is set to
+    // anything other than undefined (including null) — otherwise it falls
+    // back to the `saveAs` or `title` argument. Widgets like PhraseMaker set
+    // `this.blockNo` in their constructor, so they are keyed by blockNo, not
+    // by name, and will NOT be found via this KEY_MAPPING lookup. Adding such
+    // widgets here would silently do nothing. Before adding a new entry,
+    // verify the target widget's windowFor() call and confirm it does not
+    // rely on blockNo for its window key.
+    const KEY_MAPPING = {
+        "pitch-drum mapper": "pitch drum",
+        "custom mode": "custom mode",
+        "tempo": "tempo",
+        "arpeggio": "arpeggio",
+        "timbre": "timbre",
+        "sampler": "sampler",
+        "rhythm maker": "rhythm maker",
+        "oscilloscope": "oscilloscope",
+        "temperament": "temperament",
+        "meter": "meter"
+    };
+
+    for (const origKey in KEY_MAPPING) {
+        const translated = typeof _ === "function" ? _(origKey) : origKey;
+        if (name === translated) {
+            searchKey = KEY_MAPPING[origKey];
+            break;
+        }
+    }
+
+    if (
+        window.widgetWindows &&
+        window.widgetWindows.openWindows &&
+        window.widgetWindows.openWindows[searchKey]
+    ) {
+        window.widgetWindows.closeWindow(searchKey);
+        return;
+    }
+
     const widgetTitle = document.getElementsByClassName("wftTitle");
     for (let i = 0; i < widgetTitle.length; i++) {
-        if (widgetTitle[i].innerHTML === name) {
-            window.widgetWindows.closeWindow(widgetTitle[i].innerHTML);
+        const titleEl = widgetTitle[i];
+        if (titleEl.innerHTML === name || titleEl.id === `${searchKey}WidgetID`) {
+            const winKey =
+                titleEl.id && typeof titleEl.id === "string"
+                    ? titleEl.id.replace("WidgetID", "")
+                    : searchKey;
+            if (window.widgetWindows && typeof window.widgetWindows.closeWindow === "function") {
+                window.widgetWindows.closeWindow(winKey);
+            }
             break;
         }
     }
@@ -1511,6 +1561,26 @@ if (typeof module !== "undefined" && module.exports) {
         delayExecution,
         closeWidgets,
         closeBlkWidgets,
-        importMembers
+        importMembers,
+        changeImage,
+        fnBrowserDetect,
+        canvasPixelRatio,
+        windowHeight,
+        windowWidth,
+        httpGet,
+        httpPost,
+        HttpRequest,
+        docByClass,
+        docByTagName,
+        docById,
+        docByName,
+        docBySelector,
+        getTextWidth,
+        doSVG,
+        isSVGEmpty,
+        prepareMacroExports,
+        processMacroData,
+        hideDOMLabel,
+        displayMsg
     };
 }

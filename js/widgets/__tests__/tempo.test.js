@@ -879,8 +879,12 @@ describe("Tempo Widget", () => {
             clearIntervalSpy.mockRestore();
         });
 
-        test("pause button onclick should toggle isMoving, call pause/resume, and update innerHTML (lines 80-101)", () => {
-            const pauseBtnMock = { innerHTML: "" };
+        test("pause button onclick should toggle isMoving, call pause/resume, and update button content (lines 80-101)", () => {
+            const pauseBtnMock = {
+                textContent: "",
+                appendChild: jest.fn(),
+                childNodes: []
+            };
             const mockWindow = window.widgetWindows.windowFor();
             mockWindow.addButton.mockImplementation(icon => {
                 if (icon === "pause-button.svg") return pauseBtnMock;
@@ -893,11 +897,16 @@ describe("Tempo Widget", () => {
             pauseBtnMock.onclick();
             expect(pauseSpy).toHaveBeenCalled();
             expect(tempoWidget.isMoving).toBe(false);
-            expect(pauseBtnMock.innerHTML).toContain('src="header-icons/play-button.svg"');
+            expect(pauseBtnMock.textContent).toBe("");
+            expect(pauseBtnMock.appendChild).toHaveBeenCalled();
+            const playImgCall = pauseBtnMock.appendChild.mock.calls[0][0];
+            expect(playImgCall.src).toContain("play-button.svg");
             pauseBtnMock.onclick();
             expect(resumeSpy).toHaveBeenCalled();
             expect(tempoWidget.isMoving).toBe(true);
-            expect(pauseBtnMock.innerHTML).toContain('src="header-icons/pause-button.svg"');
+            expect(pauseBtnMock.appendChild).toHaveBeenCalledTimes(2);
+            const pauseImgCall = pauseBtnMock.appendChild.mock.calls[1][0];
+            expect(pauseImgCall.src).toContain("pause-button.svg");
             pauseSpy.mockRestore();
             resumeSpy.mockRestore();
         });

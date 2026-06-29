@@ -799,7 +799,7 @@ const getStatsFromNotation = activity => {
         for (const it in notation.notationStaging[tur]) {
             const item = notation.notationStaging[tur][it];
 
-            if (typeof item == "object" && item[0].length) {
+            if (typeof item === "object" && item[0].length) {
                 for (let note of item[0]) {
                     let freq;
                     if (isCustomTemperament(activity.logo.synth.inTemperament)) {
@@ -853,10 +853,10 @@ const getStatsFromNotation = activity => {
                 projectStats["quintuplets"]++;
             }
 
-            if (typeof item == "string") {
-                if (item == "begin articulation") {
+            if (typeof item === "string") {
+                if (item === "begin articulation") {
                     projectStats["articulation"].begin.push(it);
-                } else if (item == "end articulation") {
+                } else if (item === "end articulation") {
                     projectStats["articulation"].begin.push(it);
                 }
             }

@@ -75,7 +75,7 @@ requirejs.config({
             exports: "Block"
         },
         "activity/blocks": {
-            deps: ["activity/block"],
+            deps: ["activity/block", "activity/pubsub"],
             exports: "Blocks"
         },
         "activity/turtle-singer": {
@@ -129,7 +129,15 @@ requirejs.config({
                 "activity/abc-parser",
                 "activity/idle-watcher",
                 "activity/grid-controller",
-                "activity/grid-renderer"
+                "activity/grid-renderer",
+                "activity/plugin-controller",
+                "widgets/plugin-dialog",
+                "activity/toolbar-controller",
+                "activity/toolbar-ui",
+                "activity/alert-controller",
+                "activity/alert-renderer",
+                "palette/palette-loader",
+                "activity/search-controller"
             ],
             exports: "Activity"
         },
@@ -169,6 +177,13 @@ requirejs.config({
         "activity/idle-watcher": "js/activity/idle-watcher",
         "activity/grid-controller": "js/activity/grid-controller",
         "activity/grid-renderer": "js/activity/grid-renderer",
+        "activity/plugin-controller": "js/activity/plugin-controller",
+        "activity/toolbar-controller": "js/activity/toolbar-controller",
+        "activity/alert-controller": "js/activity/alert-controller",
+        "activity/alert-renderer": "js/activity/alert-renderer",
+        "palette/palette-loader": "js/palette/palette-loader",
+        "activity/search-controller": "js/activity/search-controller",
+        "activity/pubsub": "js/pubsub",
         "easeljs.min": "lib/easeljs.min",
         "tweenjs.min": "lib/tweenjs.min",
         "prefixfree.min": "lib/prefixfree.min",
@@ -328,6 +343,16 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
         try {
             const savedLanguage = window.localStorage && window.localStorage.languagePreference;
             if (savedLanguage) {
+                if (savedLanguage === "kana" || savedLanguage === "ja-kana") {
+                    window.localStorage.setItem("languagePreference", "ja");
+                    window.localStorage.setItem("kanaPreference", "kana");
+                    return "ja";
+                }
+                if (savedLanguage === "ja-kanji") {
+                    window.localStorage.setItem("languagePreference", "ja");
+                    window.localStorage.setItem("kanaPreference", "kanji");
+                    return "ja";
+                }
                 return savedLanguage.startsWith("ja") ? "ja" : savedLanguage;
             }
         } catch (e) {
@@ -432,6 +457,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                 "tweenjs.min",
                 "utils/platformstyle",
                 "utils/utils",
+                "activity/pubsub",
                 "activity/turtledefs",
                 "activity/block",
                 "activity/blocks",

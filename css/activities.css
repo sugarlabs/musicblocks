@@ -151,7 +151,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.2s ease;
-    background-color: #e0e0e0;
+    background-color: var(--color-bg-tertiary);
     color: black;
 }
 
@@ -239,6 +239,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 #search:focus {
     border-color: var(--color-brand-primary-hover);
     box-shadow: 0 4px 12px rgba(77, 166, 255, 0.2);
+    outline: none;
 }
 
 #search.open {
@@ -1251,7 +1252,7 @@ table {
 }
 
 #helpBodyDiv a {
-    color: #2196f3;
+    color: var(--color-brand-primary);
     text-decoration: underline;
     font-weight: 600;
     transition: color 0.2s ease;
@@ -2235,4 +2236,19 @@ table {
         padding: 0 10px;
         box-sizing: border-box;
     }
+}
+
+/* Pitch Staircase Widget CSS */
+.pitch-staircase-btn,
+.pitch-staircase-step {
+    background-color: var(--color-selector-bg);
+    transition: background-color 0.2s ease;
+}
+
+.pitch-staircase-btn:hover {
+    background-color: var(--color-selector-selected);
+}
+
+.pitch-staircase-step.active {
+    background-color: var(--color-selector-selected);
 }

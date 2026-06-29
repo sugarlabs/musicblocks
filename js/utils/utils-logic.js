@@ -305,6 +305,9 @@ var mixedNumber = d => {
  * This preserves original musical division context where explicit denominators matter.
  */
 var rationalSum = (a, b) => {
+    // Rejects non-array, wrong-length, or non-number inputs.
+    // A zero numerator ([0, n]) is valid and passes through — only the
+    // denominator (index 1) must be non-zero.
     if (
         !Array.isArray(a) ||
         a.length < 2 ||
@@ -313,14 +316,19 @@ var rationalSum = (a, b) => {
         typeof a[0] !== "number" ||
         typeof a[1] !== "number" ||
         typeof b[0] !== "number" ||
-        typeof b[1] !== "number" ||
-        a[1] === 0 ||
-        b[1] === 0
+        typeof b[1] !== "number"
     ) {
         if (typeof console !== "undefined") {
             console.warn("Invalid input passed to rationalSum:", a, b);
         }
-        return [0, 1];
+        return [[0, 1], _("Invalid input passed to rationalSum")];
+    }
+
+    if (a[1] === 0 || b[1] === 0) {
+        if (typeof console !== "undefined") {
+            console.error("rationalSum: zero denominator — corrupted rhythm state", { a, b });
+        }
+        return [[0, 1], _("Note calculation failed: zero denominator")];
     }
 
     let obja0, objb0, obja1, objb1;
@@ -353,7 +361,7 @@ var rationalSum = (a, b) => {
     const b1 = objb0[1] * objb1[0];
 
     const lcd = LCD(a1, b1);
-    return [(a0 * lcd) / a1 + (b0 * lcd) / b1, lcd];
+    return [[(a0 * lcd) / a1 + (b0 * lcd) / b1, lcd], null];
 };
 
 /**
@@ -455,6 +463,7 @@ var oneHundredToFraction = d => {
         case 53:
         case 54:
             return [17, 32];
+        case 55:
         case 56:
         case 57:
         case 58:
@@ -508,6 +517,7 @@ var oneHundredToFraction = d => {
         case 95:
             return [15, 16];
         case 96:
+        case 97:
         case 98:
             return [31, 32];
         case 99:

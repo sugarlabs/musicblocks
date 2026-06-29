@@ -2012,6 +2012,11 @@ function Synth() {
                                 synth &&
                                 typeof synth.toDestination === "function"
                             ) {
+                                try {
+                                    synth.disconnect();
+                                } catch (_) {
+                                    // Already disconnected — safe to ignore.
+                                }
                                 synth.toDestination();
                             }
                         } catch (e) {

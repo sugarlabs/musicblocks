@@ -3098,7 +3098,7 @@ msgstr "அமைதி"
 #: js/utils/musicutils.js:6055
 #.TRANS: the note names must be separated by single spaces
 msgid "ti la sol fa mi re do"
-msgstr ""
+msgstr "டி லா சோல் ஃபா மி ரே டோ"
 
 
 #: js/block.js:2832
