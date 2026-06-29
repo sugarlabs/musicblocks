@@ -6410,7 +6410,7 @@ class Activity {
             };
 
             // Use managed addEventListener instead of onkeydown assignment
-            this.addEventListener(document, "keydown", this.handleKeyDown, true);
+            this.addEventListener(document, "keydown", this.handleKeyDown);
             this.addEventListener(
                 document,
                 "keydown",

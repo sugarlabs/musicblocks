@@ -9,46 +9,22 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global _, STANDARDBLOCKHEIGHT */
+/* global _, $j, docByClass, STANDARDBLOCKHEIGHT */
 
 /* exported setupSearchController, SearchController */
 
-/**
- * Owns all search behaviour and state.
- *
- * Responsibilities:
- * - building / filtering the suggestion list from the block dictionary
- * - activating and deactivating the main search widget
- * - wiring the autocomplete source and select callbacks
- * - tracking cursor position for successive block placements
- * - coordinating the helpful-search overlay lifecycle
- *
- * Every DOM or jQuery operation is delegated to SearchUI
- * (js/search-ui.js).  No rendering code lives here.
- */
 class SearchController {
-    /**
-     * @param {object} activity  - The Activity instance.
-     * @param {object} searchUI  - A SearchUI instance that owns all DOM and
-     *   jQuery operations for the search feature.  SearchController calls
-     *   into searchUI for rendering and queries it (via isVisible(),
-     *   isHelpfulSearchVisible(), etc.) for current UI state, keeping DOM
-     *   knowledge out of this class.
-     */
-    constructor(activity, searchUI) {
+    constructor(activity) {
         this.activity = activity;
-        this.searchUI = searchUI;
 
         this.searchSuggestions = [];
         this._searchCache = {};
         this._searchCloseListener = null;
+        this.isHelpfulSearchWidgetOn = false;
         this.searchBlockPosition = [100, 100];
         this.deprecatedBlockNames = [];
+        this.helpfulSearchDiv = null;
     }
-
-    // -----------------------------------------------------------------------
-    // Data / logic layer
-    // -----------------------------------------------------------------------
 
     /**
      * Builds the block list used for search bar autocompletion.
@@ -56,6 +32,7 @@ class SearchController {
      * searchSuggestions and deprecatedBlockNames.
      */
     prepSearchWidget() {
+        this.searchBlockPosition = [100, 100];
         this.searchSuggestions = [];
         this._searchCache = {};
         this.deprecatedBlockNames = [];
@@ -171,7 +148,8 @@ class SearchController {
     }
 
     /**
-     * Filters searchSuggestions against a query term with caching.
+     * Filters searchSuggestions against a query term.
+     * Returns matching items, respecting the result cache.
      * @param {string} term - Lowercased, trimmed search term.
      * @returns {Array}
      */
@@ -198,43 +176,74 @@ class SearchController {
         return results;
     }
 
-    // -----------------------------------------------------------------------
-    // Main search coordination
-    // -----------------------------------------------------------------------
-
     /**
-     * Hides the main search widget and removes the mousedown close listener.
-     * Delegates DOM hide to SearchUI.hide().
+     * Hides the main search widget.
      */
     hideSearchWidget() {
+        const obj = docByClass("ui-menu");
+        if (obj.length > 0) {
+            obj[0].style.visibility = "hidden";
+        }
+
         if (this._searchCloseListener) {
             this.activity.removeEventListener(document, "mousedown", this._searchCloseListener);
             this._searchCloseListener = null;
         }
-        this.searchUI.hide();
+
+        this.activity.searchWidget.style.visibility = "hidden";
+        this.activity.searchWidget.idInput_custom = "";
     }
 
     /**
      * Shows or toggles the main search widget.
-     * Delegates DOM show to SearchUI.show(), then wires the autocomplete
-     * and installs a document mousedown listener to close on outside clicks.
      */
     showSearchWidget() {
         const activity = this.activity;
-        if (this.searchUI.isHelpfulSearchVisible()) {
+        activity.searchWidget.style.zIndex = 1001;
+        activity.searchWidget.style.border = "2px solid lightblue";
+        if (this.helpfulSearchDiv) {
             this._hideHelpfulSearchWidget();
         }
-        if (this.searchUI.isVisible()) {
+        if (activity.searchWidget.style.visibility === "visible") {
             this.hideSearchWidget();
         } else {
-            this.searchUI.show();
+            const obj = docByClass("ui-menu");
+            if (obj.length > 0) {
+                obj[0].style.visibility = "visible";
+            }
+
+            if (activity.searchWidget) {
+                activity.searchWidget.value = null;
+                activity.searchWidget.style.visibility = "visible";
+                const searchPos = activity.palettes.getSearchPos();
+                activity.searchWidget.style.left = searchPos.x + "px";
+                activity.searchWidget.style.top = searchPos.y + "px";
+            }
 
             this.searchBlockPosition = [100, 100];
             this.prepSearchWidget();
 
             const that = this;
             const closeListener = e => {
-                if (!that.searchUI.containsMainSearchTarget(e.target)) {
+                if (
+                    document.getElementById("search").style.visibility === "visible" &&
+                    (e.target === document.getElementById("search") ||
+                        document.getElementById("search").contains(e.target))
+                ) {
+                    //do nothing when clicked in the input field
+                } else if (
+                    document.getElementById("ui-id-1") &&
+                    document.getElementById("ui-id-1").style.display === "block" &&
+                    (e.target === document.getElementById("ui-id-1") ||
+                        document.getElementById("ui-id-1").contains(e.target))
+                ) {
+                    //do nothing when clicked on the menu
+                } else if (
+                    document.querySelector("#palette tbody tr") &&
+                    document.querySelector("#palette tbody tr").contains(e.target)
+                ) {
+                    //do nothing when clicked on the search row
+                } else {
                     that.hideSearchWidget();
                 }
             };
@@ -242,17 +251,14 @@ class SearchController {
             activity.addEventListener(document, "mousedown", closeListener);
 
             setTimeout(() => {
-                that.searchUI.focusInput();
+                activity.searchWidget.focus();
                 that.doSearch();
             }, 500);
         }
     }
 
     /**
-     * Wires the jQuery autocomplete on #search and, when idInput_custom is
-     * set, places the selected block on the canvas.
-     * Autocomplete UI is set up via SearchUI.setupMainAutocomplete();
-     * block placement logic runs entirely here.
+     * Sets up jQuery autocomplete on the main search input and executes a search.
      */
     doSearch() {
         const activity = this.activity;
@@ -261,47 +267,148 @@ class SearchController {
             return;
         }
 
+        const $j = window.jQuery;
         if (this.searchSuggestions.length === 0) {
             this.prepSearchWidget();
         }
 
         const that = this;
+        const $search = $j("#search");
 
-        this.searchUI.setupMainAutocomplete(
-            term => that.filterSuggestions(term),
-            (item, keyCode) => {
-                activity.searchWidget.value = item.label;
-                activity.searchWidget.idInput_custom = item.value;
-                activity.searchWidget.protoblk = item.specialDict;
-                that.doSearch();
-                if (keyCode === 13) activity.searchWidget.style.visibility = "visible";
-            },
-            (protoblk, x, y) => {
-                const paletteName = protoblk.palette.name;
-                const protoName = protoblk.name;
-                if (
-                    Object.prototype.hasOwnProperty.call(activity.blocks.protoBlockDict, protoName)
-                ) {
-                    activity.palettes.dict[paletteName].makeBlockFromSearch(
-                        protoblk,
-                        protoName,
-                        newBlock => {
-                            activity.blocks.moveBlock(
-                                newBlock,
-                                (x || activity.blocksContainer.x + 100) -
-                                    activity.blocksContainer.x,
-                                (y || activity.blocksContainer.y + 100) - activity.blocksContainer.y
-                            );
-                        }
-                    );
+        if (!$search.data("autocomplete-init")) {
+            $search.autocomplete({
+                source: (request, response) => {
+                    const term = (request.term || "").toLowerCase().trim();
+                    response(that.filterSuggestions(term));
+                },
+                appendTo: "body",
+                select: (event, ui) => {
+                    event.preventDefault();
+                    activity.searchWidget.value = ui.item.label;
+                    activity.searchWidget.idInput_custom = ui.item.value;
+                    activity.searchWidget.protoblk = ui.item.specialDict;
+                    that.doSearch();
+                    if (event.keyCode === 13) activity.searchWidget.style.visibility = "visible";
+                },
+                focus: event => {
+                    event.preventDefault();
                 }
+            });
+
+            const instance = $search.autocomplete("instance");
+            if (instance) {
+                instance._renderItem = (ul, item) => {
+                    const li = $j("<li></li>");
+
+                    const img = document.createElement("img");
+                    img.src = item.artwork || "";
+                    img.height = 20;
+                    img.style.cursor = "grab";
+
+                    // Drag-and-drop: mirrors the palette drag pattern in
+                    // palette.js _showMenuItems(). Keep both in sync.
+                    img.ondragstart = () => false;
+
+                    const down = event => {
+                        event.stopPropagation();
+                        event.stopImmediatePropagation();
+                        event.preventDefault();
+
+                        const posit = img.style.position;
+                        const zInd = img.style.zIndex;
+                        img.style.position = "absolute";
+                        img.style.zIndex = 10000;
+
+                        $j("#search").autocomplete("close");
+
+                        document.body.appendChild(img);
+
+                        const moveAt = (pageX, pageY) => {
+                            img.style.left = pageX - img.offsetWidth / 2 + "px";
+                            img.style.top = pageY - img.offsetHeight / 2 + "px";
+                        };
+
+                        const onMouseMove = e => {
+                            e.preventDefault();
+                            let x, y;
+                            if (e.type === "touchmove") {
+                                x = e.touches[0].clientX;
+                                y = e.touches[0].clientY;
+                            } else {
+                                x = e.pageX;
+                                y = e.pageY;
+                            }
+                            moveAt(x, y);
+                        };
+                        onMouseMove(event);
+
+                        document.addEventListener("touchmove", onMouseMove, { passive: false });
+                        document.addEventListener("mousemove", onMouseMove);
+
+                        const up = () => {
+                            document.body.style.cursor = "default";
+                            document.removeEventListener("mousemove", onMouseMove);
+                            document.removeEventListener("touchmove", onMouseMove);
+
+                            const x = parseInt(img.style.left);
+                            const y = parseInt(img.style.top);
+
+                            img.style.position = posit;
+                            img.style.zIndex = zInd;
+                            if (img.parentNode === document.body) {
+                                document.body.removeChild(img);
+                            }
+
+                            if (isNaN(x) && isNaN(y)) return;
+
+                            const protoblk = item.specialDict;
+                            const paletteName = protoblk.palette.name;
+                            const protoName = item.value;
+
+                            activity.palettes.dict[paletteName].makeBlockFromSearch(
+                                protoblk,
+                                protoName,
+                                newBlock => {
+                                    activity.blocks.moveBlock(
+                                        newBlock,
+                                        (x || activity.blocksContainer.x + 100) -
+                                            activity.blocksContainer.x,
+                                        (y || activity.blocksContainer.y + 100) -
+                                            activity.blocksContainer.y
+                                    );
+                                }
+                            );
+                        };
+
+                        document.addEventListener("mouseup", up, { once: true });
+                        document.addEventListener("touchend", up, { once: true });
+                    };
+
+                    li[0].addEventListener("mousedown", down, true);
+                    li[0].addEventListener("touchstart", down, {
+                        capture: true,
+                        passive: false
+                    });
+
+                    li.append(img);
+                    li.append($j("<a>").text(" " + item.label));
+
+                    return li.appendTo(
+                        ul.css({
+                            "z-index": 35000,
+                            "max-height": "200px",
+                            "overflow-y": "auto"
+                        })
+                    );
+                };
             }
-        );
+            $search.data("autocomplete-init", true);
+        }
 
         const searchInput = activity.searchWidget.idInput_custom;
         if (!searchInput || searchInput.length <= 0) {
             if (activity.searchWidget.value && activity.searchWidget.value.length > 0) {
-                this.searchUI.triggerMainSearch(activity.searchWidget.value);
+                $search.autocomplete("search", activity.searchWidget.value);
             }
             return;
         }
@@ -335,88 +442,189 @@ class SearchController {
         activity.update = true;
     }
 
-    // -----------------------------------------------------------------------
-    // Helpful-search coordination
-    // -----------------------------------------------------------------------
-
     /**
-     * Creates the #helpfulSearchDiv overlay via SearchUI.buildHelpfulSearchDiv()
-     * and wires the close and mode-button click handlers.
+     * Creates the helpfulSearchDiv container and appends it to the body.
      */
     setHelpfulSearchDiv() {
         const activity = this.activity;
-        const { closeButton, modeButton } = this.searchUI.buildHelpfulSearchDiv();
-        activity.addEventListener(closeButton, "click", this._hideHelpfulSearchWidget.bind(this));
-        if (modeButton) {
-            activity.addEventListener(
-                modeButton,
-                "click",
-                this._hideHelpfulSearchWidget.bind(this)
-            );
+        if (document.getElementById("helpfulSearchDiv")) {
+            document
+                .getElementById("helpfulSearchDiv")
+                .parentNode.removeChild(document.getElementById("helpfulSearchDiv"));
         }
+        this.helpfulSearchDiv = document.createElement("div");
+        this.helpfulSearchDiv.setAttribute("id", "helpfulSearchDiv");
+        this.helpfulSearchDiv.style.position = "fixed";
+
+        document.body.appendChild(this.helpfulSearchDiv);
+
+        const closeButtonDiv = document.createElement("div");
+        closeButtonDiv.style.cssText =
+            "position: absolute; top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer;";
+
+        const closeButton = document.createElement("button");
+        closeButton.textContent = "×";
+        closeButton.id = "crossButton";
+        closeButton.style.cssText =
+            "background:rgba(80,80,80,0.6);border:none;border-radius:50%;width:22px;height:22px;font-size:14px;cursor:pointer;color:white;line-height:22px;text-align:center;";
+
+        closeButtonDiv.appendChild(closeButton);
+
+        this.helpfulSearchDiv.appendChild(closeButtonDiv);
+
+        const dragHandle = document.createElement("div");
+        dragHandle.style.cssText =
+            "position:absolute;left:8px;top:50%;transform:translateY(-50%);width:16px;height:80%;cursor:grab;z-index:1002;display:flex;align-items:center;justify-content:center;color:rgba(150,150,150,0.8);font-size:18px;user-select:none;";
+        dragHandle.textContent = "⠿";
+        let dragStartX, dragStartY, dragStartLeft, dragStartTop;
+        dragHandle.addEventListener("pointerdown", e => {
+            dragStartX = e.clientX;
+            dragStartY = e.clientY;
+            dragStartLeft = parseInt(this.helpfulSearchDiv.style.left) || 0;
+            dragStartTop = parseInt(this.helpfulSearchDiv.style.top) || 0;
+            dragHandle.setPointerCapture(e.pointerId);
+            dragHandle.style.cursor = "grabbing";
+        });
+        dragHandle.addEventListener("pointermove", e => {
+            if (!dragHandle.hasPointerCapture(e.pointerId)) return;
+            this.helpfulSearchDiv.style.left = dragStartLeft + e.clientX - dragStartX + "px";
+            this.helpfulSearchDiv.style.top = dragStartTop + e.clientY - dragStartY + "px";
+        });
+        dragHandle.addEventListener("pointerup", e => {
+            dragHandle.releasePointerCapture(e.pointerId);
+            dragHandle.style.cursor = "grab";
+        });
+        this.helpfulSearchDiv.appendChild(dragHandle);
+
+        const modeButton = document.getElementById("begIconText");
+        activity.addEventListener(closeButton, "click", this._hideHelpfulSearchWidget.bind(this));
+        activity.addEventListener(modeButton, "click", this._hideHelpfulSearchWidget.bind(this));
+
+        this.helpfulSearchDiv.appendChild(activity.helpfulSearchWidget);
     }
 
     /**
-     * Positions the helpful-search overlay next to the wheel, then shows it.
-     * Creates the overlay first if it doesn't already exist.
+     * Positions and displays the helpfulSearchDiv on the canvas.
      */
     _displayHelpfulSearchDiv() {
-        if (!this.searchUI.isHelpfulSearchDivMounted()) {
-            this.setHelpfulSearchDiv();
+        const helpfulWheelDivReset = document.getElementById("helpfulWheelDiv");
+        if (helpfulWheelDivReset) helpfulWheelDivReset.style.display = "";
+        this.setHelpfulSearchDiv();
+        const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+        this.helpfulSearchDiv.style.left = Math.max(0, (window.innerWidth - 320) / 2) + "px";
+        this.helpfulSearchDiv.style.top = "80px";
+
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+        this.helpfulSearchDiv.style.display = "block";
+        const menuWidth = this.helpfulSearchDiv.offsetWidth;
+        const menuHeight = this.helpfulSearchDiv.offsetHeight;
+
+        if (this.helpfulSearchDiv.offsetLeft + menuWidth > windowWidth) {
+            this.helpfulSearchDiv.style.left = windowWidth - menuWidth + "px";
         }
-        this.searchUI.positionHelpfulSearchDiv();
+        if (this.helpfulSearchDiv.offsetTop + menuHeight > windowHeight) {
+            this.helpfulSearchDiv.style.top = windowHeight - menuHeight + "px";
+        }
+
         this.showHelpfulSearchWidget();
+        this.isHelpfulSearchWidgetOn = true;
     }
 
     /**
-     * Removes the helpful-search overlay and triggers a canvas redraw.
+     * Hides and removes the helpfulSearchDiv from the DOM.
      */
     _hideHelpfulSearchWidget() {
-        this.searchUI.removeHelpfulSearchDiv();
+        const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+        if (helpfulWheelDiv.style.display !== "none") {
+            helpfulWheelDiv.style.display = "none";
+        }
+        if (this.helpfulSearchDiv && this.helpfulSearchDiv.parentNode) {
+            this.helpfulSearchDiv.parentNode.removeChild(this.helpfulSearchDiv);
+        }
+        const hwd = document.getElementById("helpfulWheelDiv");
+        if (hwd) hwd.style.display = "";
+        this.isHelpfulSearchWidgetOn = false;
         this.activity.__tick();
     }
 
     /**
-     * Resets and focuses the helpful search input, then schedules
-     * doHelpfulSearch after a short delay (to allow layout to settle).
+     * Shows the helpfulSearchWidget input and triggers doHelpfulSearch.
      */
     showHelpfulSearchWidget() {
-        if (!this.searchUI.isHelpfulSearchVisible()) {
-            return;
+        const $j = window.jQuery;
+        if ($j("#helpfulSearch")) {
+            try {
+                $j("#helpfulSearch").autocomplete("destroy");
+                $j("#helpfulSearch").removeData("autocomplete-init");
+            } catch {
+                //
+            }
         }
-        this.searchUI.showHelpfulInput();
+        const activity = this.activity;
+        activity.helpfulSearchWidget.style.zIndex = 1001;
+        activity.helpfulSearchWidget.idInput_custom = "";
+        if (this.helpfulSearchDiv.style.display === "block") {
+            activity.helpfulSearchWidget.value = null;
+            activity.helpfulSearchWidget.style.visibility = "visible";
 
-        this.searchBlockPosition = [100, 100];
-        this.prepSearchWidget();
+            this.searchBlockPosition = [100, 100];
+            this.prepSearchWidget();
 
-        const that = this;
-        setTimeout(() => {
-            that.searchUI.focusHelpfulInput();
-            that.doHelpfulSearch();
-        }, 500);
+            const that = this;
+            setTimeout(() => {
+                activity.helpfulSearchWidget.focus();
+                that.doHelpfulSearch();
+            }, 500);
+        }
     }
 
     /**
-     * Wires the jQuery autocomplete on #helpfulSearch and, when
-     * idInput_custom is set, places the selected block on the canvas.
+     * Sets up jQuery autocomplete on the helpful search input and executes a search.
      */
     doHelpfulSearch() {
+        const $j = window.jQuery;
         if (this.searchSuggestions.length === 0) {
             this.prepSearchWidget();
         }
 
         const that = this;
         const activity = this.activity;
+        const $helpfulSearch = $j("#helpfulSearch");
 
-        this.searchUI.setupHelpfulAutocomplete(
-            term => that.filterSuggestions(term),
-            item => {
-                activity.helpfulSearchWidget.value = item.label;
-                activity.helpfulSearchWidget.idInput_custom = item.value;
-                activity.helpfulSearchWidget.protoblk = item.specialDict;
-                that.doHelpfulSearch();
+        if (!$helpfulSearch.data("autocomplete-init")) {
+            $helpfulSearch.autocomplete({
+                source: (request, response) => {
+                    const term = (request.term || "").toLowerCase().trim();
+                    response(that.filterSuggestions(term));
+                },
+                appendTo: "body",
+                select: (event, ui) => {
+                    event.preventDefault();
+                    activity.helpfulSearchWidget.value = ui.item.label;
+                    activity.helpfulSearchWidget.idInput_custom = ui.item.value;
+                    activity.helpfulSearchWidget.protoblk = ui.item.specialDict;
+                    that.doHelpfulSearch();
+                },
+                focus: event => {
+                    event.preventDefault();
+                }
+            });
+
+            const instance = $helpfulSearch.autocomplete("instance");
+            if (instance) {
+                instance._renderItem = (ul, item) => {
+                    const li = $j("<li></li>");
+                    const img = document.createElement("img");
+                    img.src = item.artwork || "";
+                    img.height = 20;
+                    li.append(img);
+                    li.append($j("<a>").text(" " + item.label));
+                    return li.appendTo(ul.css("z-index", 35000));
+                };
             }
-        );
+            $helpfulSearch.data("autocomplete-init", true);
+        }
 
         const searchInput = activity.helpfulSearchWidget.idInput_custom;
         if (!searchInput || searchInput.length <= 0) {
@@ -424,7 +632,7 @@ class SearchController {
                 activity.helpfulSearchWidget.value &&
                 activity.helpfulSearchWidget.value.length > 0
             ) {
-                this.searchUI.triggerHelpfulSearch(activity.helpfulSearchWidget.value);
+                $helpfulSearch.autocomplete("search", activity.helpfulSearchWidget.value);
             }
             return;
         }
@@ -455,21 +663,19 @@ class SearchController {
         }
 
         activity.helpfulSearchWidget.value = "";
-        this.searchUI.hideHelpfulSearchDisplay();
+        document.getElementById("helpfulSearchDiv").style.display = "none";
         activity.update = true;
     }
 }
 
 /**
- * Creates a SearchController, attaches it to activity, and wires
- * delegation methods so external callers (palette.js, planetInterface.js)
- * continue to work unchanged.
- *
- * @param {object} activity  - The Activity instance.
- * @param {object} searchUI  - The SearchUI instance (from setupSearchUI).
+ * Creates a SearchController and attaches it to the activity.
+ * Installs delegation methods on activity so external callers
+ * (palette.js, planetInterface.js) continue to work unchanged.
+ * @param {object} activity - The Activity instance.
  */
-const setupSearchController = (activity, searchUI) => {
-    activity.searchController = new SearchController(activity, searchUI);
+const setupSearchController = activity => {
+    activity.searchController = new SearchController(activity);
 };
 
 if (typeof define === "function" && define.amd) {
