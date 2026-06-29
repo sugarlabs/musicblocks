@@ -1721,7 +1721,26 @@ function Synth() {
         setNote,
         future
     ) => {
-        if (this.inTemperament !== "equal" && !isCustomTemperament(this.inTemperament)) {
+        const isStandardNote = note => {
+            if (typeof note !== "string") return true;
+            if (note.toUpperCase() === "R") return true;
+            return /^[A-Ga-g][#b]?-?\d+$/i.test(note);
+        };
+
+        const needsFreqConversion = () => {
+            if (this.inTemperament !== "equal" && !isCustomTemperament(this.inTemperament)) {
+                return true;
+            }
+            if (typeof notes === "string") {
+                return !isStandardNote(notes);
+            }
+            if (Array.isArray(notes)) {
+                return notes.some(n => !isStandardNote(n));
+            }
+            return false;
+        };
+
+        if (needsFreqConversion()) {
             if (typeof notes === "number") {
                 notes = notes;
             } else {
