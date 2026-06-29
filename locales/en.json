@@ -421,6 +421,8 @@
   "There is no block selected.": "There is no block selected.",
   "avatar": "avatar",
   "sample": "sample",
+  "Interactive Tutorial": "Interactive Tutorial",
+    "Learn Music Blocks by building your first project through a guided interactive walkthrough.": "Learn Music Blocks by building your first project through a guided interactive walkthrough.",
   "Refresh your browser to change your language preference.": "Refresh your browser to change your language preference.",
   "Music Blocks is already set to this language.": "Music Blocks is already set to this language.",
   "Failed to load EaselJS. Please refresh the page.": "Failed to load EaselJS. Please refresh the page.",

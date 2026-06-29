@@ -463,6 +463,19 @@ const createHelpContent = activity => {
                 _("Music Blocks Guide")
             ],
             [
+                _("Build Your First Project"),
+                _("Ready to explore Music Blocks by building something?") +
+                    " " +
+                    _(
+                        "This guided adventure challenges you to discover blocks, connect ideas, and compose your own melody — step by step."
+                    ) +
+                    " " +
+                    _("You'll reflect on what you build along the way.") +
+                    " " +
+                    _("Click the Start Tutorial button below to begin your journey!"),
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(MOUSEPALETTEICON))
+            ],
+            [
                 _("Play"),
                 _("Click the run button to run the project in fast mode."),
                 `data:image/svg+xml;base64,${window.btoa(base64Encode(RUNBUTTON))}`

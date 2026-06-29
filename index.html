@@ -161,6 +161,9 @@
      decoding and drawing GIF frames onto the turtle's overlay canvas.
      Canvas refreshing is handled separately by CreateJS Ticker. -->
         <script src="js/gif-animator.js" defer></script>
+        <!-- FirstProjectTutorial.js provides interactive step-by-step onboarding
+        tutorial that guides new users through creating their first project. -->
+        <script src="js/tutorial/FirstProjectTutorial.js" defer></script>
         <script defer>
             document.addEventListener("DOMContentLoaded", function () {
                 if (window.hljs) hljs.highlightAll();
@@ -924,6 +927,9 @@
                     <ul id="helpdropdown" class="dropdown-content helpdropdown-menu">
                         <li><a id="helpGuideItem" role="button" tabindex="0"></a></li>
                         <li><a id="shortcutsGuideItem" role="button" tabindex="0"></a></li>
+                        <li>
+                            <a id="interactiveTutorialGuideItem" role="button" tabindex="0"></a>
+                        </li>
                     </ul>
 
                     <ul id="languagedropdown" class="dropdown-content">
