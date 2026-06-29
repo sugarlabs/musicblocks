@@ -70,16 +70,6 @@ window.widgetWindows = {
     })
 };
 
-if (typeof document !== "undefined") {
-    jest.spyOn(document, "getElementsByClassName").mockImplementation(() => {
-        return [
-            {
-                style: {}
-            }
-        ];
-    });
-}
-
 describe("PitchStaircase Widget", () => {
     let psc;
 
@@ -295,6 +285,12 @@ describe("PitchStaircase Widget", () => {
                     dict: {}
                 }
             };
+
+            if (typeof document !== "undefined") {
+                jest.spyOn(document, "getElementsByClassName").mockImplementation(() => [
+                    { style: {} }
+                ]);
+            }
         });
 
         test("should set master volume to PREVIEWVOLUME and clear/show widget window on init", () => {
