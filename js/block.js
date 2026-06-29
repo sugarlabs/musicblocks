@@ -1544,7 +1544,7 @@ class Block {
             } else if (this.name === "noisename") {
                 label = getNoiseName(this.value);
             } else if (this.name === "outputtools") {
-                label = this.overrideName;
+                label = _(this.overrideName);
             } else if (this.name === "grid") {
                 label = _(this.value);
             } else {

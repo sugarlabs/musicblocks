@@ -439,7 +439,17 @@ class Activity {
             let lang = "en";
             if (this.storage.languagePreference !== undefined) {
                 lang = this.storage.languagePreference;
-                if (lang.startsWith("ja")) lang = "ja"; // normalize Japanese
+                if (lang === "kana" || lang === "ja-kana") {
+                    this.storage.languagePreference = "ja";
+                    this.storage.kanaPreference = "kana";
+                    lang = "ja";
+                } else if (lang === "ja-kanji") {
+                    this.storage.languagePreference = "ja";
+                    this.storage.kanaPreference = "kanji";
+                    lang = "ja";
+                } else if (lang.startsWith("ja")) {
+                    lang = "ja"; // normalize Japanese
+                }
                 i18next.changeLanguage(lang);
             } else {
                 lang = navigator.language;

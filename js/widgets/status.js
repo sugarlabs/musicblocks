@@ -164,6 +164,7 @@ class StatusMatrix {
                     if (typeof label === "object" && label !== null && label.value) {
                         label = label.value;
                     }
+                    label = _(label);
                     break;
                 default: {
                     const block = this.activity.blocks.blockList[statusField[0]];

@@ -343,6 +343,16 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
         try {
             const savedLanguage = window.localStorage && window.localStorage.languagePreference;
             if (savedLanguage) {
+                if (savedLanguage === "kana" || savedLanguage === "ja-kana") {
+                    window.localStorage.setItem("languagePreference", "ja");
+                    window.localStorage.setItem("kanaPreference", "kana");
+                    return "ja";
+                }
+                if (savedLanguage === "ja-kanji") {
+                    window.localStorage.setItem("languagePreference", "ja");
+                    window.localStorage.setItem("kanaPreference", "kanji");
+                    return "ja";
+                }
                 return savedLanguage.startsWith("ja") ? "ja" : savedLanguage;
             }
         } catch (e) {
