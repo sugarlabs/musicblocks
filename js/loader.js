@@ -74,9 +74,15 @@ requirejs.config({
             deps: ["activity/turtledefs", "utils/retryWithBackoff"],
             exports: "Block"
         },
+        "activity/block-constants": {
+            exports: "MINIMUMDOCKDISTANCE"
+        },
         "activity/blocks": {
-            deps: ["activity/block"],
+            deps: ["activity/block", "activity/block-constants"],
             exports: "Blocks"
+        },
+        "activity/connection-validator": {
+            deps: ["activity/blocks", "activity/block-constants"]
         },
         "activity/turtle-singer": {
             exports: "Singer"
@@ -124,6 +130,7 @@ requirejs.config({
                 "activity/activity-context",
                 "activity/logo",
                 "activity/blocks",
+                "activity/connection-validator",
                 "activity/turtles",
                 "activity/recorder",
                 "activity/abc-parser",
