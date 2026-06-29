@@ -1,0 +1,36 @@
+{
+  "app-id": "org.sugarlabs.MusicBlocks",
+  "runtime": "org.freedesktop.Platform",
+  "runtime-version": "24.08",
+  "sdk": "org.freedesktop.Sdk",
+  "base": "org.electronjs.Electron2.BaseApp",
+  "base-version": "24.08",
+  "command": "musicblocks",
+  "separate-locales": false,
+  "finish-args": [
+    "--share=ipc",
+    "--socket=x11",
+    "--socket=wayland",
+    "--socket=pulseaudio",
+    "--share=network",
+    "--device=dri",
+    "--filesystem=xdg-documents:rw",
+    "--filesystem=xdg-download:rw"
+  ],
+  "modules": [
+    {
+      "name": "musicblocks",
+      "buildsystem": "simple",
+      "build-commands": [
+        "npm install",
+        "npm run dist -- --linux flatpak"
+      ],
+      "sources": [
+        {
+          "type": "dir",
+          "path": "."
+        }
+      ]
+    }
+  ]
+}

@@ -3992,6 +3992,7 @@ class Activity {
                     }
                     // Set flag to 1 to enable keyboard after MB finishes loading
                     that.keyboardEnableFlag = 1;
+                    that._findBlocks();
                 }
 
                 document.removeEventListener("finishedLoading", __afterLoad);
@@ -6063,6 +6064,7 @@ class Activity {
                                 that.stage.removeAllEventListeners("trashsignal");
 
                                 const __afterLoad = () => {
+                                    that._findBlocks();
                                     document.removeEventListener("finishedLoading", __afterLoad);
                                 };
 

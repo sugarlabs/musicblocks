@@ -161,6 +161,7 @@ class PlanetInterface {
             this.activity.blocks.palettes._hideMenus(true);
 
             const __afterLoad = () => {
+                this.activity._findBlocks();
                 document.removeEventListener("finishedLoading", __afterLoad);
             };
 

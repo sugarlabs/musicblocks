@@ -78,7 +78,7 @@
         "tone": "^15.1.22"
     },
     "build": {
-        "appId": "com.musicblocks.app",
+        "appId": "org.sugarlabs.MusicBlocks",
         "productName": "Music Blocks",
         "mac": {
             "category": "public.app-category.music",
@@ -88,7 +88,14 @@
             "target": "nsis"
         },
         "linux": {
-            "target": "AppImage"
+            "target": [
+                "AppImage",
+                "flatpak"
+            ],
+            "flatpak": {
+                "runtime": "org.freedesktop.Platform",
+                "runtimeVersion": "24.08"
+            }
         }
     },
     "overrides": {
