@@ -72,6 +72,26 @@ describe("Utility Functions (logic-only)", () => {
         global.AudioBuffer = jest.fn();
         global.module = module;
         global.Tone = require("./tonemock.js");
+        global._ = jest.fn(str => str);
+        global.requirejs = (deps, cb) => {
+            if (typeof cb === "function") cb();
+        };
+        global.DOUBLESHARP = "\ud834\udd2a";
+        global.DOUBLEFLAT = "\ud834\udd2b";
+        global.DEFAULTDRUM = "kick drum";
+        const musicutils = require("../musicutils");
+        Object.assign(global, musicutils);
+
+        const utils = require("../utils");
+        Object.assign(global, utils);
+
+        global.platformColor = {
+            orange: "#ff5722"
+        };
+
+        const synthutils = require("../synthutils");
+        Object.assign(global, synthutils);
+        Object.assign(window, synthutils);
 
         const codeFiles = [
             "../utils-logic.js",
@@ -79,7 +99,6 @@ describe("Utility Functions (logic-only)", () => {
             "../../logoconstants.js",
             "../platformstyle.js",
             "../musicutils.js",
-            "../synthutils.js",
             "../../logo.js",
             "../../turtle-singer.js"
         ];
@@ -1264,7 +1283,7 @@ describe("Utility Functions (logic-only)", () => {
             };
             Synth.inTemperament = "equal";
 
-            await _performNotes(mockSynth, "F♭4", 0.25, null, null, false, 0);
+            await _performNotes.call(Synth, mockSynth, "F♭4", 0.25, null, null, false, 0);
 
             expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
             const noteArg = mockSynth.triggerAttackRelease.mock.calls[0][0];
@@ -1278,7 +1297,7 @@ describe("Utility Functions (logic-only)", () => {
             };
             Synth.inTemperament = "equal";
 
-            await _performNotes(mockSynth, "Fbb4", 0.25, null, null, false, 0);
+            await _performNotes.call(Synth, mockSynth, "Fbb4", 0.25, null, null, false, 0);
 
             expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
             const noteArg = mockSynth.triggerAttackRelease.mock.calls[0][0];
@@ -1292,11 +1311,85 @@ describe("Utility Functions (logic-only)", () => {
             };
             Synth.inTemperament = "equal";
 
-            await _performNotes(mockSynth, "C4", 0.25, null, null, false, 0);
+            await _performNotes.call(Synth, mockSynth, "C4", 0.25, null, null, false, 0);
 
             expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
             const noteArg = mockSynth.triggerAttackRelease.mock.calls[0][0];
             expect(noteArg).toBe("C4");
+        });
+
+        it("should convert array of notes containing Unicode accidentals", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn()
+            };
+            Synth.inTemperament = "equal";
+
+            await _performNotes.call(Synth, mockSynth, ["F♭4", "C4"], 0.25, null, null, false, 0);
+
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+            const noteArg = mockSynth.triggerAttackRelease.mock.calls[0][0];
+            expect(Array.isArray(noteArg)).toBe(true);
+            expect(typeof noteArg[0]).toBe("number");
+            expect(typeof noteArg[1]).toBe("number");
+        });
+
+        it("should not convert numerical notes", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn()
+            };
+            Synth.inTemperament = "equal";
+
+            await _performNotes.call(Synth, mockSynth, 440, 0.25, null, null, false, 0);
+
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+            const noteArg = mockSynth.triggerAttackRelease.mock.calls[0][0];
+            expect(noteArg).toBe(440);
+        });
+
+        it("should convert notes to frequency under non-equal temperament", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn()
+            };
+            Synth.inTemperament = "just intonation";
+            const originalGetFrequency = Synth._getFrequency;
+            Synth._getFrequency = jest.fn().mockReturnValue(300);
+
+            await _performNotes.call(Synth, mockSynth, "C4", 0.25, null, null, false, 0);
+
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+            const noteArg = mockSynth.triggerAttackRelease.mock.calls[0][0];
+            expect(noteArg).toBe(300);
+
+            Synth._getFrequency = originalGetFrequency;
+        });
+
+        it("should fall back to normalization when _getFrequency returns undefined for double flats/sharps", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn()
+            };
+            Synth.inTemperament = "equal";
+            const originalGetFrequency = Synth._getFrequency;
+            Synth._getFrequency = jest.fn().mockReturnValue(undefined);
+
+            await _performNotes.call(Synth, mockSynth, "C𝄫4", 0.25, null, null, false, 0);
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalledWith(
+                "Cbb4",
+                0.25,
+                expect.anything()
+            );
+
+            await _performNotes.call(Synth, mockSynth, "C𝄪4", 0.25, null, null, false, 0);
+            expect(mockSynth.triggerAttackRelease).toHaveBeenLastCalledWith(
+                "Cx4",
+                0.25,
+                expect.anything()
+            );
+
+            Synth._getFrequency = originalGetFrequency;
         });
     });
 });
