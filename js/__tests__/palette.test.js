@@ -23,11 +23,72 @@ const { mockDocById } = require("../../test/utils/domMocks");
 const { createMockActivity } = require("../../test/utils/activityFactory");
 const { createPaletteDOM } = require("../../test/utils/domFactory");
 const { setupImageMock } = require("../../test/utils/imageMock");
-const { setupPaletteGlobals } = require("../../test/utils/paletteGlobals");
 const { setupSVGMock } = require("../../test/utils/svgMock");
 const { setupGlobalEnvironment } = require("../../test/setup/globalSetup");
 
 const REAL_CREATE_ELEMENT = global.document.createElement;
+
+global.LEADING = 10;
+global.DEFAULTPALETTE = "default";
+
+global.MULTIPALETTES = [
+    ["rhythm", "pitch"],
+    ["flow", "action"],
+    ["graphics", "pen"]
+];
+
+global.PALETTEICONS = {
+    search: "<svg></svg>",
+    rhythm: "<svg></svg>",
+    pitch: "<svg></svg>",
+    flow: "<svg></svg>",
+    action: "<svg></svg>",
+    graphics: "<svg></svg>",
+    pen: "<svg></svg>",
+    myblocks: "<svg></svg>",
+    music: "<svg background_fill_color stroke_color fill_color></svg>",
+    logic: "<svg background_fill_color stroke_color fill_color></svg>",
+    artwork: "<svg background_fill_color stroke_color fill_color></svg>"
+};
+global.MULTIPALETTEICONS = ["music", "logic", "artwork"];
+global.SKIPPALETTES = ["heap", "dictionary"];
+
+global.platformColor = {
+    selectorSelected: "#000",
+    paletteBackground: "#fff",
+    strokeColor: "#333",
+    fillColor: "#666",
+    paletteLabelBackground: "#ccc",
+    paletteLabelSelected: "#aaa",
+    hoverColor: "#ddd",
+    paletteText: "#000",
+    textColor: "#111"
+};
+
+global.PALETTEFILLCOLORS = { test: "test_fill" };
+global.PALETTESTROKECOLORS = { test: "test_stroke" };
+
+global.DISABLEDFILLCOLOR = "disabled_fill";
+global.DISABLEDSTROKECOLOR = "disabled_stroke";
+
+global.NUMBERBLOCKDEFAULT = 1;
+global.TEXTWIDTH = 100;
+global.STRINGLEN = 10;
+global.DEFAULTBLOCKSCALE = 1;
+global.STANDARDBLOCKHEIGHT = 18;
+global.CLOSEICON = "<svg fill_color></svg>";
+
+global.toTitleCase = str => str.charAt(0).toUpperCase() + str.slice(1);
+global._ = str => str;
+global.base64Encode = str => str;
+global.last = arr => arr[arr.length - 1];
+global.safeSVG = str => str;
+
+global.getTextWidth = jest.fn(() => 10);
+global.i18nSolfege = jest.fn(() => "sol");
+
+global.blockIsMacro = jest.fn(() => false);
+global.getMacroExpansion = jest.fn();
 
 describe("Palettes Class", () => {
     let mockActivity;
@@ -37,7 +98,6 @@ describe("Palettes Class", () => {
         global.document.createElement = REAL_CREATE_ELEMENT;
         // setup shared globals
         setupGlobalEnvironment();
-        setupPaletteGlobals();
         setupSVGMock();
 
         // Real DOM instead of fake one
@@ -1834,18 +1894,6 @@ describe("Palettes Class", () => {
                     blockList: [{ container: { x: 0, y: 0 }, collapseToggle }],
 
                     loadNewBlocks: jest.fn(blocks => {
-                        if (!Array.isArray(blocks)) {
-                            blocks = [
-                                [0, "raw", 0, 0, [null]],
-                                [1, ["text", "hi"], 0, 0, [0]],
-                                [2, ["text", "5"], 0, 0, [1]],
-                                [3, ["number", 7], 0, 0, [2]],
-                                [4, ["number", 3], 0, 0, [3]],
-                                [5, ["number", 8], 0, 0, [4]],
-                                [6, ["text", { value: "bye" }], 0, 0, [5]]
-                            ];
-                        }
-
                         capturedBlocks = blocks;
 
                         mockActivity.blocks.blockList = blocks.map(() => ({
@@ -1860,9 +1908,21 @@ describe("Palettes Class", () => {
             };
 
             mockActivity.palettes = palettes;
+            mockActivity.macroDict = {
+                testmacro: [
+                    [0, "raw", 0, 0, [null]],
+                    [1, ["text", "hi"], 0, 0, [0]],
+                    [2, ["text", 5], 0, 0, [1]],
+                    [3, ["number", { value: "7" }], 0, 0, [2]],
+                    [4, ["number", "3"], 0, 0, [3]],
+                    [5, ["number", 8], 0, 0, [4]],
+                    [6, ["text", { value: "bye" }], 0, 0, [5]]
+                ]
+            };
 
             palettes.add("myblocks");
             const palette = palettes.dict.myblocks;
+            palette.name = "myblocks";
 
             palette.activity = mockActivity;
             palettes.activity = mockActivity;
