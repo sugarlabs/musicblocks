@@ -1,13 +1,13 @@
-function createPaletteDOM() {
-    const paletteElement = document.createElement("div");
-    paletteElement.style.visibility = "visible";
-    paletteElement.style.top = "100px";
+function createMockDOM() {
+    const container = document.createElement("div");
+    container.style.visibility = "visible";
+    container.style.top = "100px";
 
-    const paletteBody = document.createElement("div");
+    const body = document.createElement("div");
     const parent = document.createElement("div");
-    parent.appendChild(paletteBody);
+    parent.appendChild(body);
 
-    return { paletteElement, paletteBody };
+    return { container, body };
 }
 
-module.exports = { createPaletteDOM };
+module.exports = { createMockDOM };
