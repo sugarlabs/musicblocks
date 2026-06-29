@@ -21,7 +21,7 @@
 const { Palettes, initPalettes } = require("../palette");
 const { mockDocById } = require("../../test/utils/domMocks");
 const { createMockActivity } = require("../../test/utils/activityFactory");
-const { createPaletteDOM } = require("../../test/utils/domFactory");
+const { createMockDOM } = require("../../test/utils/domFactory");
 const { setupImageMock } = require("../../test/utils/imageMock");
 const { setupSVGMock } = require("../../test/utils/svgMock");
 const { setupGlobalEnvironment } = require("../../test/setup/globalSetup");
@@ -101,7 +101,7 @@ describe("Palettes Class", () => {
         setupSVGMock();
 
         // Real DOM instead of fake one
-        const { paletteElement, paletteBody } = createPaletteDOM();
+        const { container: paletteElement, body: paletteBody } = createMockDOM();
         mockDocById({
             palette: paletteElement,
             PaletteBody: paletteBody
