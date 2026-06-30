@@ -131,7 +131,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 .dark .ui-autocomplete {
     background-color: var(--color-bg-primary) !important;
-    color: var(--color-text-inverse) !important;
+    color: var(--color-text-primary) !important;
     border-color: var(--color-border-primary) !important;
 }
 
@@ -142,7 +142,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 .dark .ui-autocomplete .ui-menu-item span,
 .dark .ui-autocomplete .ui-menu-item b,
 .dark .ui-autocomplete .ui-menu-item strong {
-    color: var(--color-text-inverse) !important;
+    color: var(--color-text-primary) !important;
     background-color: transparent !important;
 }
 
@@ -152,6 +152,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 .dark .ui-autocomplete .ui-menu-item:hover .ui-menu-item-wrapper,
 .dark .ui-menu-item-wrapper.ui-state-active,
 .dark .ui-menu-item-wrapper.ui-state-focus {
+    background-color: var(--color-bg-tertiary) !important;
     color: var(--color-text-primary) !important;
 }
 
@@ -573,12 +574,12 @@ body.highcontrast {
 .highcontrast #helpfulSearch,
 .highcontrast .ui-autocomplete {
     background-color: var(--color-text-inverse) !important;
-    color: var(--color-text-inverse) !important;
+    color: var(--color-text-primary) !important;
     border: 1px solid #ffffff;
 }
 
 .highcontrast .ui-autocomplete .ui-menu-item a {
-    color: var(--color-text-inverse) !important;
+    color: var(--color-text-primary) !important;
     background-color: var(--color-text-inverse) !important;
 }
 
