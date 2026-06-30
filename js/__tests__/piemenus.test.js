@@ -320,7 +320,9 @@ describe("piemenus behavioral tests", () => {
         const mockNavigate = jest.fn();
         mockBlock._exitWheel.navItems[0].navigateFunction = mockNavigate;
 
-        global.window.getComputedStyle = jest.fn(() => { throw new Error("test"); });
+        global.window.getComputedStyle = jest.fn(() => {
+            throw new Error("test");
+        });
 
         const target = { closest: jest.fn(() => null) };
         mousedownHandler({ target });
