@@ -582,7 +582,7 @@ class ToolbarUI {
         // Prevents listener accumulation when renderNewProjectIcon is called multiple times
         this._cleanupModalListeners?.();
 
-        newDropdown.innerHTML = "";
+        newDropdown.textContent = "";
         const title = document.createElement("div");
         title.classList.add("new-project-title");
         title.textContent = _("New project");

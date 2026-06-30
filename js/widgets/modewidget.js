@@ -883,7 +883,7 @@ class ModeWidget {
         }
 
         // console.debug('setModeName:' + 'not found');
-        table.rows[n].cells[0].innerHTML = "";
+        table.rows[n].cells[0].textContent = "";
         this.widgetWindow.updateTitle("");
     }
 
