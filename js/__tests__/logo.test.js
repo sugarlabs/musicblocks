@@ -919,7 +919,12 @@ describe("Logo comprehensive method coverage", () => {
 
     test("runFromBlock uses Tone.Transport.schedule for non-zero delay when available", () => {
         const originalTone = global.Tone;
-        const scheduleSpy = jest.fn();
+        const getSecondsAtTimeMock = jest.fn(t => t + 1);
+        let scheduledCallback = null;
+        const scheduleSpy = jest.fn((fn, time) => {
+            scheduledCallback = fn;
+            return "evt-1";
+        });
         global.Tone = {
             ...originalTone,
             Transport: {
@@ -927,7 +932,7 @@ describe("Logo comprehensive method coverage", () => {
                 stop: jest.fn(),
                 schedule: scheduleSpy,
                 cancel: jest.fn(),
-                getSecondsAtTime: jest.fn(() => 0),
+                getSecondsAtTime: getSecondsAtTimeMock,
                 get seconds() {
                     return 0;
                 },
@@ -940,14 +945,27 @@ describe("Logo comprehensive method coverage", () => {
         logo.stopTurtle = false;
         turtle0.waitTime = 200;
         turtle0._transportTime = 10;
+        turtle0.delayParameters = null;
+        turtle0._transportEventId = null;
 
         logo.runFromBlock(logo, 0, 3, 1, "x");
 
         expect(scheduleSpy).toHaveBeenCalledWith(expect.any(Function), 10 + 200 / 1000);
         expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+        expect(turtle0._transportEventId).toBe("evt-1");
+
+        // Invoke the scheduled callback and verify state updates
+        scheduledCallback(5.5);
+        expect(getSecondsAtTimeMock).toHaveBeenCalledWith(5.5);
+        expect(turtle0._transportTime).toBe(6.5);
+        expect(turtle0._transportEventId).toBeNull();
+        expect(turtle0.delayParameters).toBeNull();
+        expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, 3, 1, "x");
 
         global.Tone = originalTone;
-        delete turtle0._transportTime;
+        turtle0._transportTime = null;
+        turtle0._transportEventId = null;
+        delete turtle0.delayParameters;
     });
 
     test("runFromBlock falls back to setTimeout when Transport is unavailable", () => {
