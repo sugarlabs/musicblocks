@@ -1723,8 +1723,7 @@ function Synth() {
         paramsEffects,
         paramsFilters,
         setNote,
-        future,
-        eventId
+        future
     ) => {
         const isStandardNote = note => {
             if (typeof note !== "string") return true;
@@ -1792,26 +1791,6 @@ function Synth() {
                 try {
                     await Tone.ToneAudioBuffer.loaded();
                     if (this._instrumentEpoch !== epoch) return;
-                    if (
-                        typeof eventId !== "undefined" &&
-                        typeof window !== "undefined" &&
-                        window.ActivityContext
-                    ) {
-                        try {
-                            var _perfLogo = window.ActivityContext.getActivity().logo;
-                            if (_perfLogo && _perfLogo._perfSyncData) {
-                                var _perfToneNow = Tone.now();
-                                _perfLogo._perfSyncData.triggers.push({
-                                    eventId: eventId,
-                                    perfNow: performance.now(),
-                                    toneNow: _perfToneNow,
-                                    scheduledTime: _perfToneNow + future,
-                                    future: future,
-                                    path: "simple"
-                                });
-                            }
-                        } catch (e) {}
-                    }
                     synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
                 } catch (e) {
                     console.debug("Error triggering note:", e);
@@ -1863,26 +1842,6 @@ function Synth() {
                     try {
                         await Tone.ToneAudioBuffer.loaded();
                         if (this._instrumentEpoch !== epoch) return;
-                        if (
-                            typeof eventId !== "undefined" &&
-                            typeof window !== "undefined" &&
-                            window.ActivityContext
-                        ) {
-                            try {
-                                var _perfLogo2 = window.ActivityContext.getActivity().logo;
-                                if (_perfLogo2 && _perfLogo2._perfSyncData) {
-                                    var _perfToneNow2 = Tone.now();
-                                    _perfLogo2._perfSyncData.triggers.push({
-                                        eventId: eventId,
-                                        perfNow: performance.now(),
-                                        toneNow: _perfToneNow2,
-                                        scheduledTime: _perfToneNow2 + future,
-                                        future: future,
-                                        path: "fast"
-                                    });
-                                }
-                            } catch (e) {}
-                        }
                         synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
                     } catch (e) {
                         console.debug("Error triggering note (no-graph-rewire fast path):", e);
@@ -2035,26 +1994,6 @@ function Synth() {
                         try {
                             await Tone.ToneAudioBuffer.loaded();
                             if (this._instrumentEpoch === epoch) {
-                                if (
-                                    typeof eventId !== "undefined" &&
-                                    typeof window !== "undefined" &&
-                                    window.ActivityContext
-                                ) {
-                                    try {
-                                        var _perfLogo3 = window.ActivityContext.getActivity().logo;
-                                        if (_perfLogo3 && _perfLogo3._perfSyncData) {
-                                            var _perfToneNow3 = Tone.now();
-                                            _perfLogo3._perfSyncData.triggers.push({
-                                                eventId: eventId,
-                                                perfNow: performance.now(),
-                                                toneNow: _perfToneNow3,
-                                                scheduledTime: _perfToneNow3 + future,
-                                                future: future,
-                                                path: "effects"
-                                            });
-                                        }
-                                    } catch (e) {}
-                                }
                                 synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
                             }
                         } catch (e) {
@@ -2288,14 +2227,6 @@ function Synth() {
                 return; // Exit gracefully - synth is no longer available
             }
 
-            var _perfTriggerEventId;
-            try {
-                var _perfTriggerLogo = window.ActivityContext.getActivity().logo;
-                if (_perfTriggerLogo && _perfTriggerLogo._perfSyncData) {
-                    _perfTriggerEventId = _perfTriggerLogo._perfSyncData._turtleEventIds[turtle];
-                }
-            } catch (e) {}
-
             switch (flag) {
                 case 1: // drum
                     if (
@@ -2325,8 +2256,7 @@ function Synth() {
                         paramsEffects,
                         paramsFilters,
                         setNote,
-                        future,
-                        _perfTriggerEventId
+                        future
                     );
                     break;
                 case 3: // builtin synth
@@ -2342,28 +2272,11 @@ function Synth() {
                         paramsEffects,
                         paramsFilters,
                         setNote,
-                        future,
-                        _perfTriggerEventId
+                        future
                     );
                     break;
                 case 4:
                     this._trackVoice(turtle, tempSynth);
-                    if (typeof _perfTriggerEventId !== "undefined") {
-                        try {
-                            var _perfTriggerLogo2 = window.ActivityContext.getActivity().logo;
-                            if (_perfTriggerLogo2 && _perfTriggerLogo2._perfSyncData) {
-                                var _perfToneNow4 = Tone.now();
-                                _perfTriggerLogo2._perfSyncData.triggers.push({
-                                    eventId: _perfTriggerEventId,
-                                    perfNow: performance.now(),
-                                    toneNow: _perfToneNow4,
-                                    scheduledTime: _perfToneNow4 + future,
-                                    future: future,
-                                    path: "noise"
-                                });
-                            }
-                        } catch (e) {}
-                    }
                     tempSynth.triggerAttackRelease("c2", beatValue, Tone.now() + future);
                     break;
                 case 0: // default synth
@@ -2376,8 +2289,7 @@ function Synth() {
                         paramsEffects,
                         paramsFilters,
                         setNote,
-                        future,
-                        _perfTriggerEventId
+                        future
                     );
                     break;
             }
