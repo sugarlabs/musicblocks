@@ -19,7 +19,7 @@
    MATRIXSOLFEHEIGHT, i18nSolfege, MATRIXSOLFEWIDTH, toFraction,
    wheelnav, slicePath, getNote, PREVIEWVOLUME, DEFAULTVOICE,
    PITCHES3, SOLFEGENAMES, SOLFEGECONVERSIONTABLE, NOTESSHARP,
-   NOTESFLAT, PITCHES, PITCHES2, convertFromSolfege, */
+   NOTESFLAT, PITCHES, PITCHES2, convertFromSolfege, normalizeNoteAccidentals, */
 /*
    Global Locations
     - lib/wheelnav
@@ -632,13 +632,7 @@ function MusicKeyboard(activity) {
                 __endNote(element);
                 activeKey = null;
             } else if (activeKey !== null) {
-                const id = activeKey.id;
-                if (id.includes("blackRow")) {
-                    activeKey.style.backgroundColor = "black";
-                } else {
-                    activeKey.style.backgroundColor = "white";
-                }
-                activeKey = null;
+                activeKey.dispatchEvent(new Event("pointerup"));
             }
         });
 
@@ -648,6 +642,8 @@ function MusicKeyboard(activity) {
             if (activeKey === element) {
                 __endNote(element);
                 activeKey = null;
+            } else if (activeKey !== null) {
+                activeKey.dispatchEvent(new Event("pointerup"));
             }
         });
     };
@@ -715,6 +711,27 @@ function MusicKeyboard(activity) {
                 this.metronomeON = false;
                 if (this.loopTick) this.loopTick.stop();
             }
+
+            // Stop any active pointer/keyboard notes
+            if (activeKey !== null) {
+                activeKey.dispatchEvent(new Event("pointerup"));
+            }
+
+            // Release any active synthesizer sounds when closing the widget
+            if (this.displayLayout) {
+                this.displayLayout.forEach(layoutItem => {
+                    if (layoutItem.voice) {
+                        this.activity.logo.synth.stopSound(0, layoutItem.voice);
+                    }
+                });
+            }
+            this.activity.logo.synth.stopSound(0, DEFAULTVOICE);
+
+            // Stop any in-progress note-sequence playback so the pending
+            // setTimeout chain in playOne() does not keep triggering notes
+            // after the widget has been destroyed.
+            this._stopOrCloseClicked = true;
+            this.playingNow = false;
 
             selectedNotes = [];
             docById("wheelDivptm").style.display = "none";
@@ -2752,7 +2769,14 @@ function MusicKeyboard(activity) {
             );
             this.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
             Singer.setSynthVolume(this.activity.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
-            this.activity.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, DEFAULTVOICE, null, null);
+            this.activity.logo.synth.trigger(
+                0,
+                [normalizeNoteAccidentals(obj[0] + obj[1])],
+                1 / 8,
+                DEFAULTVOICE,
+                null,
+                null
+            );
 
             __selectionChanged();
         };

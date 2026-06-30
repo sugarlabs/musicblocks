@@ -895,26 +895,30 @@ function Synth() {
             }
 
             // Load the sample module using require
-            require([sampleInfo.path], () => {
-                try {
-                    const sampleData = window[sampleInfo.global];
-                    if (sampleData) {
-                        this.samples[sampleType][sampleName] = sampleData();
-                        resolve();
-                    } else {
-                        console.error(
-                            `Global variable ${sampleInfo.global} not found for sample ${sampleName}`
-                        );
-                        reject(`Sample global not found: ${sampleName}`);
+            requirejs(
+                [sampleInfo.path],
+                () => {
+                    try {
+                        const sampleData = window[sampleInfo.global];
+                        if (sampleData) {
+                            this.samples[sampleType][sampleName] = sampleData();
+                            resolve();
+                        } else {
+                            console.error(
+                                `Global variable ${sampleInfo.global} not found for sample ${sampleName}`
+                            );
+                            reject(`Sample global not found: ${sampleName}`);
+                        }
+                    } catch (e) {
+                        console.error(`Error processing sample ${sampleName}:`, e);
+                        reject(e);
                     }
-                } catch (e) {
-                    console.error(`Error processing sample ${sampleName}:`, e);
-                    reject(e);
+                },
+                err => {
+                    console.error(`Failed to load sample module for ${sampleName}:`, err);
+                    reject(err);
                 }
-            }, err => {
-                console.error(`Failed to load sample module for ${sampleName}:`, err);
-                reject(err);
-            });
+            );
         });
     };
 
@@ -1721,7 +1725,26 @@ function Synth() {
         setNote,
         future
     ) => {
-        if (this.inTemperament !== "equal" && !isCustomTemperament(this.inTemperament)) {
+        const isStandardNote = note => {
+            if (typeof note !== "string") return true;
+            if (note.toUpperCase() === "R") return true;
+            return /^[A-Ga-g][#b]?-?\d+$/i.test(note);
+        };
+
+        const needsFreqConversion = () => {
+            if (this.inTemperament !== "equal" && !isCustomTemperament(this.inTemperament)) {
+                return true;
+            }
+            if (typeof notes === "string") {
+                return !isStandardNote(notes);
+            }
+            if (Array.isArray(notes)) {
+                return notes.some(n => !isStandardNote(n));
+            }
+            return false;
+        };
+
+        if (needsFreqConversion()) {
             if (typeof notes === "number") {
                 notes = notes;
             } else {
@@ -3782,4 +3805,20 @@ function Synth() {
     this.mic = null;
 
     return this;
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        Synth,
+        NOISENAMES,
+        VOICENAMES,
+        DRUMNAMES,
+        EFFECTSNAMES,
+        CUSTOMSAMPLES,
+        instrumentsEffects,
+        instrumentsFilters,
+        instruments,
+        instrumentsSource,
+        DEFAULTSYNTHVOLUME
+    };
 }
