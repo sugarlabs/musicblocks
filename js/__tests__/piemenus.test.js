@@ -268,6 +268,113 @@ describe("piemenus behavioral tests", () => {
         expect(mockNavigate).not.toHaveBeenCalled();
     });
 
+    test("click on element with cursor:pointer inside wheelDiv does not close menu", () => {
+        let mousedownHandler = null;
+        global.document.addEventListener = jest.fn().mockImplementation((event, handler) => {
+            if (event === "mousedown") mousedownHandler = handler;
+        });
+        global.document.removeEventListener = jest.fn();
+
+        global.docById = jest.fn().mockImplementation(id => {
+            if (id === "labelDiv") return null;
+            return mockWheelDiv;
+        });
+
+        mockWheelDiv.contains = jest.fn().mockReturnValue(true);
+        mockWheelDiv.style.display = "";
+
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+        piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
+
+        const mockNavigate = jest.fn();
+        mockBlock._exitWheel.navItems[0].navigateFunction = mockNavigate;
+
+        global.window.getComputedStyle = jest.fn(() => ({ cursor: "pointer" }));
+
+        const target = { closest: jest.fn(() => null) };
+        mousedownHandler({ target });
+
+        expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
+    test("getComputedStyle throw is handled gracefully and menu still closes", () => {
+        let mousedownHandler = null;
+        global.document.addEventListener = jest.fn().mockImplementation((event, handler) => {
+            if (event === "mousedown") mousedownHandler = handler;
+        });
+        global.document.removeEventListener = jest.fn();
+
+        global.docById = jest.fn().mockImplementation(id => {
+            if (id === "labelDiv") return null;
+            return mockWheelDiv;
+        });
+
+        mockWheelDiv.contains = jest.fn().mockReturnValue(true);
+        mockWheelDiv.style.display = "";
+
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+        piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
+
+        const mockNavigate = jest.fn();
+        mockBlock._exitWheel.navItems[0].navigateFunction = mockNavigate;
+
+        global.window.getComputedStyle = jest.fn(() => { throw new Error("test"); });
+
+        const target = { closest: jest.fn(() => null) };
+        mousedownHandler({ target });
+
+        expect(mockNavigate).toHaveBeenCalled();
+    });
+
+    test("outside click hides wheel via hideWheelDiv when exit wheel navigateFunction is missing", () => {
+        let mousedownHandler = null;
+        global.document.addEventListener = jest.fn().mockImplementation((event, handler) => {
+            if (event === "mousedown") mousedownHandler = handler;
+        });
+        global.document.removeEventListener = jest.fn();
+
+        mockWheelDiv.contains = jest.fn().mockReturnValue(false);
+        mockWheelDiv.style.display = "";
+
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+        piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
+
+        delete mockBlock._exitWheel.navItems[0].navigateFunction;
+
+        const target = { closest: jest.fn(() => null) };
+        mousedownHandler({ target });
+
+        expect(global.document.removeEventListener).toHaveBeenCalledWith(
+            "mousedown",
+            expect.any(Function)
+        );
+        expect(mockWheelDiv.style.display).toBe("none");
+    });
+
+    test("outside click when wheelDiv is hidden returns early", () => {
+        let mousedownHandler = null;
+        global.document.addEventListener = jest.fn().mockImplementation((event, handler) => {
+            if (event === "mousedown") mousedownHandler = handler;
+        });
+        global.document.removeEventListener = jest.fn();
+
+        mockWheelDiv.style.display = "none";
+
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+        piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
+
+        jest.clearAllMocks();
+
+        const target = { closest: jest.fn(() => null) };
+        mousedownHandler({ target });
+
+        expect(global.document.addEventListener).toHaveBeenCalledTimes(0);
+    });
+
     describe("Block Help Menu", () => {
         it("should load help before opening the aux pie menu help widget", () => {
             expect(piemenusContent).toMatch(

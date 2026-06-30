@@ -52,7 +52,8 @@
         "jest-environment-jsdom": "^30.4.1",
         "lint-staged": "^15.5.2",
         "nodemon": "^3.1.9",
-        "prettier": "^3.8.3"
+        "prettier": "^3.8.3",
+        "lodash": "4.18.1"
     },
     "dependencies": {
         "@tonejs/midi": "^2.0.28",
