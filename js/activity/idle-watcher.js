@@ -153,7 +153,7 @@ const setupActivityIdleWatcher = activityInstance => {
                     ErrorHandler.recoverable(e, { operation: "autoSave" });
                 }
             },
-            5 * 60 * 1000
+            15 * 1000 // 15 seconds
         );
     };
 

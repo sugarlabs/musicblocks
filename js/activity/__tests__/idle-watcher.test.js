@@ -72,8 +72,8 @@ describe("setupActivityIdleWatcher", () => {
             mockActivity._initIdleWatcher();
             mockActivity._initAutoSave();
 
-            // Fast forward 5 minutes
-            jest.advanceTimersByTime(5 * 60 * 1000);
+            // Fast forward 15 seconds
+            jest.advanceTimersByTime(15 * 1000);
 
             expect(mockActivity.saveSessionAsync).toHaveBeenCalled();
         });
@@ -84,8 +84,8 @@ describe("setupActivityIdleWatcher", () => {
             mockActivity._initIdleWatcher();
             mockActivity._initAutoSave();
 
-            // Fast forward 5 minutes
-            jest.advanceTimersByTime(5 * 60 * 1000);
+            // Fast forward 15 seconds
+            jest.advanceTimersByTime(15 * 1000);
 
             expect(mockActivity.saveLocally).toHaveBeenCalled();
         });
@@ -96,8 +96,8 @@ describe("setupActivityIdleWatcher", () => {
             mockActivity._initIdleWatcher();
             mockActivity._initAutoSave();
 
-            // Fast forward 5 minutes
-            jest.advanceTimersByTime(5 * 60 * 1000);
+            // Fast forward 15 seconds
+            jest.advanceTimersByTime(15 * 1000);
 
             expect(mockActivity.saveSessionAsync).not.toHaveBeenCalled();
         });
