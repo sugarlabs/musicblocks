@@ -304,17 +304,32 @@ class ModeWidget {
         modePianoDiv.style.border = "0px";
         modePianoDiv.style.top = "0px";
         modePianoDiv.style.left = "0px";
-        let pianoHTML =
-            '<img src="images/piano_keys.png"  id="modeKeyboard" style="top:0px; left:0px; position:relative;">';
-        for (let i = 0; i < 12; i++) {
-            pianoHTML += '<img id="pkey_' + i + '" style="top:0px; left:0px; position:absolute;">';
-        }
-        modePianoDiv.innerHTML = pianoHTML;
+        const elements = [];
 
-        // Cache piano key elements to avoid repeated getElementById calls
+        const baseImg = document.createElement("img");
+        baseImg.src = "images/piano_keys.png";
+        baseImg.id = "modeKeyboard";
+        baseImg.style.top = "0px";
+        baseImg.style.left = "0px";
+        baseImg.style.position = "relative";
+        elements.push(baseImg);
+
         this._pianoKeys = [];
         for (let i = 0; i < 12; i++) {
-            this._pianoKeys[i] = document.getElementById("pkey_" + i);
+            const keyImg = document.createElement("img");
+            keyImg.id = "pkey_" + i;
+            keyImg.style.top = "0px";
+            keyImg.style.left = "0px";
+            keyImg.style.position = "absolute";
+            elements.push(keyImg);
+            this._pianoKeys[i] = keyImg;
+        }
+
+        if (typeof modePianoDiv.replaceChildren === "function") {
+            modePianoDiv.replaceChildren(...elements);
+        } else {
+            modePianoDiv.innerHTML = "";
+            elements.forEach(el => modePianoDiv.appendChild(el));
         }
 
         const highlightImgs = [
