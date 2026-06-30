@@ -5890,7 +5890,7 @@ class Activity {
             // Use managed addEventListener for automatic cleanup
             this.addEventListener(document, "mousemove", this.handleMouseMove);
             this.addEventListener(document, "click", this.handleDocumentClick);
-            this.addEventListener(window, "beforeunload", () => this._handleBeforeUnload());
+            this.addEventListener(window, "beforeunload", this._handleBeforeUnload);
 
             this._createMsgContainer(
                 "#ffffff",

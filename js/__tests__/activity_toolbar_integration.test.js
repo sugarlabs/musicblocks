@@ -421,5 +421,27 @@ describe("Activity Toolbar Integration", () => {
 
             expect(activity.__saveLocally).not.toHaveBeenCalled();
         });
+
+        test("calls saveLocally when it differs from __saveLocally", () => {
+            activity.__saveLocally = jest.fn();
+            activity.saveLocally = jest.fn();
+            activity._stopRenderLoop = jest.fn();
+            activity._isHardReloading = false;
+
+            activity._handleBeforeUnload();
+
+            expect(activity.saveLocally).toHaveBeenCalled();
+        });
+
+        test("calls _stopAutoSave if it exists", () => {
+            activity.__saveLocally = jest.fn();
+            activity._stopRenderLoop = jest.fn();
+            activity._stopAutoSave = jest.fn();
+            activity._isHardReloading = false;
+
+            activity._handleBeforeUnload();
+
+            expect(activity._stopAutoSave).toHaveBeenCalled();
+        });
     });
 });
