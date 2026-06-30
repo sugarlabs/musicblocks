@@ -70,6 +70,14 @@ const loadActivityClass = () => {
         setupAlertController: jest.fn(),
         setupAlertRenderer: jest.fn(),
         setupPaletteLoader: jest.fn(),
+        setupSearchUI: jest.fn(() => ({
+            createSearchUI: jest.fn(),
+            show: jest.fn(),
+            hide: jest.fn(),
+            focusInput: jest.fn(),
+            updateQuery: jest.fn(),
+            helpfulSearchDiv: null
+        })),
         setupSearchController: jest.fn(),
         hideDOMLabel: jest.fn(),
         setupActivityRecorder: jest.fn(),
