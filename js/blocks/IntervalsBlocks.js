@@ -296,7 +296,7 @@ function setupIntervalsBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -354,7 +354,7 @@ function setupIntervalsBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -414,9 +414,9 @@ function setupIntervalsBlocks(activity) {
             // Save the state of the boxes, dicts, and heap
             const saveBoxes = deepClone(logo.boxes);
             const saveTurtleHeaps =
-                logo.turtleHeaps[turtle] != null ? deepClone(logo.turtleHeaps[turtle]) : undefined;
+                turtle in logo.turtleHeaps ? deepClone(logo.turtleHeaps[turtle]) : undefined;
             const saveTurtleDicts =
-                logo.turtleDicts[turtle] != null ? deepClone(logo.turtleDicts[turtle]) : undefined;
+                turtle in logo.turtleDicts ? deepClone(logo.turtleDicts[turtle]) : undefined;
 
             // Save the turtle state
             const saveX = tur.x;
@@ -466,8 +466,8 @@ function setupIntervalsBlocks(activity) {
 
             // Restore previous state
             logo.boxes = saveBoxes;
-            logo.turtleHeaps[turtle] = saveTurtleHeaps != null ? saveTurtleHeaps : {};
-            logo.turtleDicts[turtle] = saveTurtleDicts != null ? saveTurtleDicts : {};
+            logo.turtleHeaps[turtle] = saveTurtleHeaps ?? {};
+            logo.turtleDicts[turtle] = saveTurtleDicts ?? {};
 
             tur.painter.doPenUp();
             tur.painter.doSetXY(saveX, saveY);
@@ -535,9 +535,9 @@ function setupIntervalsBlocks(activity) {
             // collision with other turtles.
             const saveBoxes = deepClone(logo.boxes);
             const saveTurtleHeaps =
-                logo.turtleHeaps[turtle] != null ? deepClone(logo.turtleHeaps[turtle]) : undefined;
+                turtle in logo.turtleHeaps ? deepClone(logo.turtleHeaps[turtle]) : undefined;
             const saveTurtleDicts =
-                logo.turtleDicts[turtle] != null ? deepClone(logo.turtleDicts[turtle]) : undefined;
+                turtle in logo.turtleDicts ? deepClone(logo.turtleDicts[turtle]) : undefined;
             // And the turtle state
             const saveX = tur.x;
             const saveY = tur.y;
@@ -587,8 +587,8 @@ function setupIntervalsBlocks(activity) {
 
             // Restore previous state
             logo.boxes = saveBoxes;
-            logo.turtleHeaps[turtle] = saveTurtleHeaps != null ? saveTurtleHeaps : {};
-            logo.turtleDicts[turtle] = saveTurtleDicts != null ? saveTurtleDicts : {};
+            logo.turtleHeaps[turtle] = saveTurtleHeaps ?? {};
+            logo.turtleDicts[turtle] = saveTurtleDicts ?? {};
 
             tur.painter.doPenUp();
             tur.painter.doSetXY(saveX, saveY);
@@ -852,7 +852,7 @@ function setupIntervalsBlocks(activity) {
                         for (let i = 0; i < n; i++) {
                             const obj = logo.connectionStore[turtle][blk].pop();
                             activity.blocks.blockList[obj[0]].connections[obj[1]] = obj[2];
-                            if (obj[2] != null) {
+                            if (obj[2] !== null) {
                                 activity.blocks.blockList[obj[2]].connections[0] = obj[0];
                             }
                         }
@@ -881,7 +881,7 @@ function setupIntervalsBlocks(activity) {
             try {
                 // Check to see if another turtle has already disconnected these blocks
                 const otherTurtle = __lookForOtherTurtles(blk, turtle);
-                if (otherTurtle != null) {
+                if (otherTurtle !== null) {
                     // Copy the connections and queue the blocks.
                     logo.connectionStore[turtle][blk] = [];
                     for (let i = logo.connectionStore[otherTurtle][blk].length; i > 0; i--) {
@@ -902,7 +902,7 @@ function setupIntervalsBlocks(activity) {
                     }
                 } else {
                     let child = activity.blocks.findBottomBlock(args[1]);
-                    while (child != blk) {
+                    while (child !== blk) {
                         if (activity.blocks.blockList[child].name !== "hidden") {
                             const queueBlock = new Queue(child, factor, blk, receivedArg);
                             tur.parentFlowQueue.push(blk);
@@ -916,14 +916,14 @@ function setupIntervalsBlocks(activity) {
                     // each inserted into a semitoneinterval block, run.
                     logo.connectionStore[turtle][blk] = [];
                     child = args[1];
-                    while (child != null) {
+                    while (child !== null) {
                         const lastConnection =
                             activity.blocks.blockList[child].connections.length - 1;
                         const nextBlk =
                             activity.blocks.blockList[child].connections[lastConnection];
                         // Don't disconnect a hidden block from its parent.
                         if (
-                            nextBlk != null &&
+                            nextBlk !== null &&
                             activity.blocks.blockList[nextBlk].name === "hidden"
                         ) {
                             logo.connectionStore[turtle][blk].push([
@@ -943,7 +943,7 @@ function setupIntervalsBlocks(activity) {
                             child = nextBlk;
                         }
 
-                        if (child != null) {
+                        if (child !== null) {
                             activity.blocks.blockList[child].connections[0] = null;
                         }
                     }
@@ -997,7 +997,7 @@ function setupIntervalsBlocks(activity) {
             if (args[1] === undefined) return;
 
             let i = CHORDNAMES.indexOf(args[0]);
-            if (i == -1) {
+            if (i === -1) {
                 i = CHORDNAMES.indexOf(DEFAULTCHORD);
             }
             for (let ii = 0; ii < CHORDVALUES[i].length; ii++) {
@@ -1299,7 +1299,7 @@ function setupIntervalsBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -1355,7 +1355,7 @@ function setupIntervalsBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -1411,7 +1411,7 @@ function setupIntervalsBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -1576,7 +1576,7 @@ function setupIntervalsBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {

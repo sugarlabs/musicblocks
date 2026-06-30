@@ -29,9 +29,10 @@ global.platformColor = {
     selectorBackground: "#f0f0f0",
     selectorBackgroundHOVER: "#e0e0e0"
 };
-global.docById = jest.fn(() => ({
+const defaultDocByIdImpl = () => ({
     style: {},
     innerHTML: "",
+    rows: [],
     insertRow: jest.fn(() => ({
         insertCell: jest.fn(() => ({
             style: {},
@@ -45,7 +46,9 @@ global.docById = jest.fn(() => ({
     })),
     appendChild: jest.fn(),
     setAttribute: jest.fn()
-}));
+});
+
+global.docById = jest.fn(defaultDocByIdImpl);
 global.getNote = jest.fn(() => ["C", "", 4]);
 global.getDrumName = jest.fn(() => null);
 global.getDrumIcon = jest.fn(() => "icon.svg");
@@ -55,24 +58,23 @@ global.MATRIXSOLFEWIDTH = 80;
 global.SOLFEGECONVERSIONTABLE = {};
 global.Singer = { RhythmActions: { getNoteValue: jest.fn(() => 0.25) } };
 
-global.window = {
-    innerWidth: 1200,
-    widgetWindows: {
-        windowFor: jest.fn().mockReturnValue({
-            clear: jest.fn(),
-            show: jest.fn(),
-            addButton: jest.fn().mockReturnValue({ onclick: null }),
-            getWidgetBody: jest.fn().mockReturnValue({
-                append: jest.fn(),
-                appendChild: jest.fn(),
-                style: {}
-            }),
-            sendToCenter: jest.fn(),
-            onclose: null,
-            onmaximize: null,
-            destroy: jest.fn()
-        })
-    }
+window.innerWidth = 1200;
+window.innerHeight = 600;
+window.widgetWindows = {
+    windowFor: jest.fn().mockReturnValue({
+        clear: jest.fn(),
+        show: jest.fn(),
+        addButton: jest.fn().mockReturnValue({ onclick: null }),
+        getWidgetBody: jest.fn().mockReturnValue({
+            append: jest.fn(),
+            appendChild: jest.fn(),
+            style: {}
+        }),
+        sendToCenter: jest.fn(),
+        onclose: null,
+        onmaximize: null,
+        destroy: jest.fn()
+    })
 };
 
 global.document = {
@@ -95,6 +97,7 @@ describe("PitchDrumMatrix Widget", () => {
 
     afterEach(() => {
         jest.clearAllMocks();
+        docById.mockImplementation(defaultDocByIdImpl);
     });
 
     // --- Constructor Tests ---
@@ -224,6 +227,226 @@ describe("PitchDrumMatrix Widget", () => {
         test("should initialize _save_lock as undefined before init", () => {
             // _save_lock is set in init, not constructor
             expect(pdm._save_lock).toBeUndefined();
+        });
+    });
+
+    // --- Init & Close Cleanup Tests ---
+    describe("onclose cleanup", () => {
+        test("should set _playing to false and stop synth when closed", () => {
+            const mockStop = jest.fn();
+            const mockHideMsgs = jest.fn();
+            const mockActivity = {
+                logo: {
+                    synth: {
+                        stop: mockStop
+                    },
+                    turtleDelay: 0
+                },
+                hideMsgs: mockHideMsgs,
+                textMsg: jest.fn()
+            };
+
+            pdm.init(mockActivity);
+            pdm._playing = true;
+
+            expect(typeof pdm.widgetWindow.onclose).toBe("function");
+
+            // Trigger onclose
+            pdm.widgetWindow.onclose();
+
+            expect(pdm._playing).toBe(false);
+            expect(mockStop).toHaveBeenCalled();
+            expect(mockHideMsgs).toHaveBeenCalled();
+            expect(pdm.widgetWindow.destroy).toHaveBeenCalled();
+        });
+    });
+
+    // --- _playPitchDrum Tests ---
+    describe("_playPitchDrum", () => {
+        test("should return early without accessing DOM if not playing", () => {
+            pdm._playing = false;
+            docById.mockClear();
+
+            pdm._playPitchDrum(0, []);
+
+            expect(docById).not.toHaveBeenCalled();
+        });
+
+        test("should access DOM if playing", () => {
+            pdm._playing = true;
+            docById.mockClear();
+
+            // Mock simple cell structure for docById calls
+            const mockCell = { style: {} };
+            const mockRow = { cells: [mockCell] };
+            const mockTable = { rows: [mockRow] };
+            docById.mockReturnValue(mockTable);
+
+            // We mock _setPairCell because it's called internally
+            pdm._setPairCell = jest.fn();
+
+            pdm._playPitchDrum(0, [[0, 0]]);
+
+            expect(docById).toHaveBeenCalledWith("pdmTable");
+            expect(docById).toHaveBeenCalledWith("pdmDrumTable");
+            expect(docById).toHaveBeenCalledWith("pdmCellTable0");
+        });
+
+        test("should not attempt to modify style of rows when playing turns false during timeout", () => {
+            jest.useFakeTimers();
+            pdm._playing = true;
+
+            const mockCell = { style: {} };
+            const mockRow = { cells: [mockCell] };
+            const mockTable = {
+                rows: {
+                    length: 2,
+                    0: { cells: [mockCell] },
+                    1: { cells: [mockCell] }
+                }
+            };
+
+            const rowsAccessSpy = jest.fn();
+            Object.defineProperty(mockTable, "rows", {
+                get: () => {
+                    rowsAccessSpy();
+                    return {
+                        length: 2,
+                        0: { cells: [mockCell] }
+                    };
+                }
+            });
+
+            docById.mockReturnValue(mockTable);
+            pdm._setPairCell = jest.fn();
+
+            pdm._playPitchDrum(0, [[0, 0]]);
+
+            rowsAccessSpy.mockClear();
+            pdm._playing = false;
+
+            jest.runAllTimers();
+
+            expect(rowsAccessSpy).not.toHaveBeenCalled();
+            jest.useRealTimers();
+        });
+    });
+
+    // --- _playAll Timer Guard Tests ---
+    describe("_playAll timer guard", () => {
+        test("should not attempt to update icon when playing turns false during timeout", () => {
+            jest.useFakeTimers();
+
+            const mockActivity = {
+                logo: {
+                    synth: {
+                        stop: jest.fn()
+                    },
+                    turtleDelay: 0
+                },
+                hideMsgs: jest.fn(),
+                textMsg: jest.fn()
+            };
+            pdm.init(mockActivity);
+
+            const mockCell = { style: { backgroundColor: "black" } };
+            const mockRow = { cells: [mockCell] };
+            const mockTable = { rows: [mockRow, mockRow] };
+
+            docById.mockImplementation(id => {
+                if (id === "pdmTable" || id === "pdmDrumTable") {
+                    return mockTable;
+                }
+                if (id === "pdmCellTable0") {
+                    return { rows: [mockRow] };
+                }
+                return { style: {} };
+            });
+
+            pdm._setPairCell = jest.fn();
+            pdm._playing = true;
+
+            pdm.playButton.appendChild = jest.fn();
+
+            pdm._playAll();
+
+            pdm.playButton.appendChild.mockClear();
+            pdm._playing = false;
+
+            jest.runAllTimers();
+
+            expect(pdm.playButton.appendChild).not.toHaveBeenCalled();
+            jest.useRealTimers();
+        });
+
+        test("should update icon and set _playing to false when playback finishes successfully", () => {
+            jest.useFakeTimers();
+
+            const mockActivity = {
+                logo: {
+                    synth: {
+                        stop: jest.fn()
+                    },
+                    turtleDelay: 0
+                },
+                hideMsgs: jest.fn(),
+                textMsg: jest.fn()
+            };
+            pdm.init(mockActivity);
+
+            const mockCell = { style: { backgroundColor: "black" } };
+            const mockRow = { cells: [mockCell] };
+            const mockTable = { rows: [mockRow, mockRow] };
+
+            docById.mockImplementation(id => {
+                if (id === "pdmTable" || id === "pdmDrumTable") {
+                    return mockTable;
+                }
+                if (id === "pdmCellTable0") {
+                    return { rows: [mockRow] };
+                }
+                return { style: {} };
+            });
+
+            pdm._setPairCell = jest.fn();
+            pdm._playing = true;
+
+            pdm.playButton.appendChild = jest.fn();
+
+            pdm._playAll();
+
+            pdm.playButton.appendChild.mockClear();
+
+            jest.runAllTimers();
+
+            expect(pdm._playing).toBe(false);
+            expect(pdm.playButton.appendChild).toHaveBeenCalled();
+            jest.useRealTimers();
+        });
+
+        test("should display a message when playing all with an empty grid", () => {
+            const mockActivity = {
+                logo: {
+                    synth: {
+                        stop: jest.fn()
+                    },
+                    turtleDelay: 0
+                },
+                hideMsgs: jest.fn(),
+                textMsg: jest.fn()
+            };
+            pdm.init(mockActivity);
+
+            const mockTable = { rows: [] };
+            docById.mockReturnValue(mockTable);
+
+            pdm._playing = true;
+            pdm._playAll();
+
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                "Click in the grid to map notes to drums.",
+                3000
+            );
         });
     });
 });
