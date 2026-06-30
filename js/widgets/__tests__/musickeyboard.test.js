@@ -216,6 +216,11 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
     let originalPlatformColor;
     let originalTranslate;
     let originalWheelnav;
+    let originalNoteToFrequency;
+    let originalConvertFromSolfege;
+    let originalPitches;
+    let originalPitches2;
+    let originalSolfegeNames;
     let mockActivity;
 
     beforeEach(() => {
@@ -223,6 +228,11 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
         originalPlatformColor = global.platformColor;
         originalTranslate = global._;
         originalWheelnav = global.wheelnav;
+        originalNoteToFrequency = global.noteToFrequency;
+        originalConvertFromSolfege = global.convertFromSolfege;
+        originalPitches = global.PITCHES;
+        originalPitches2 = global.PITCHES2;
+        originalSolfegeNames = global.SOLFEGENAMES;
         mockActivity = {
             turtles: {
                 ithTurtle: jest.fn().mockReturnValue({
@@ -300,6 +310,20 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
             DonutSlice: jest.fn(),
             DonutSliceCustomization: () => ({})
         });
+        global.noteToFrequency = jest.fn().mockReturnValue(261.63);
+        global.convertFromSolfege = jest.fn(n => {
+            if (n === "do") return "C";
+            if (n === "re") return "D";
+            if (n === "mi") return "E";
+            if (n === "fa") return "F";
+            if (n === "sol") return "G";
+            if (n === "la") return "A";
+            if (n === "ti") return "B";
+            return n;
+        });
+        global.PITCHES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+        global.PITCHES2 = ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"];
+        global.SOLFEGENAMES = ["do", "re", "mi", "fa", "sol", "la", "ti"];
         global.wheelnav = function () {
             this.raphael = {};
             this.navItems = [];
@@ -327,6 +351,11 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
         global.platformColor = originalPlatformColor;
         global._ = originalTranslate;
         global.wheelnav = originalWheelnav;
+        global.noteToFrequency = originalNoteToFrequency;
+        global.convertFromSolfege = originalConvertFromSolfege;
+        global.PITCHES = originalPitches;
+        global.PITCHES2 = originalPitches2;
+        global.SOLFEGENAMES = originalSolfegeNames;
     });
 
     test("onclose stops sequence playback, releases active key, and stops all voices", () => {
@@ -494,5 +523,78 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
         // Verify normalization and trigger
         expect(global.normalizeNoteAccidentals).toHaveBeenCalledWith("F♭4");
         expect(mockActivity.logo.synth.trigger).toHaveBeenCalled();
+    });
+
+    test("synchronizes layout and displayLayout correctly, preserving real block numbers", () => {
+        const keyboard = new MusicKeyboard(mockActivity);
+        keyboard.noteNames = ["do", "sol"];
+        keyboard.octaves = [5, 4];
+        keyboard._rowBlocks = [44, 47];
+        keyboard.instruments = ["guitar", "guitar"];
+
+        mockActivity.blocks = {
+            blockList: {
+                44: { name: "pitch", connections: [null, 45, 46, null] },
+                45: { value: "do" },
+                46: { value: 5 },
+                47: { name: "pitch", connections: [null, 48, 49, null] },
+                48: { value: "sol" },
+                49: { value: 4 }
+            },
+            adjustDocks: jest.fn(),
+            clampBlocksToCheck: [],
+            adjustExpandableClampBlock: jest.fn(),
+            sendStackToTrash: jest.fn()
+        };
+
+        keyboard.init();
+
+        // Check if layout was synchronized correctly
+        expect(keyboard.displayLayout.length).toBeGreaterThan(2);
+
+        // Find C5 (do 5) in displayLayout
+        const c5Item = keyboard.displayLayout.find(
+            item => item.noteName === "C" && item.noteOctave === 5
+        );
+        expect(c5Item).toBeDefined();
+        expect(c5Item.blockNumber).toBe(44); // Real blockNumber should be preserved
+
+        const layoutC5Item = keyboard.layout.find(
+            item => item.noteName === "do" && item.noteOctave === 5
+        );
+        expect(layoutC5Item).toBeDefined();
+        expect(layoutC5Item.blockNumber).toBe(44);
+    });
+
+    test("handles sorting tie-breakers based on blockNumber", () => {
+        const keyboard = new MusicKeyboard(mockActivity);
+        // Add two notes with identical frequency (e.g. C4)
+        keyboard.noteNames = ["do", "do"];
+        keyboard.octaves = [4, 4];
+        keyboard._rowBlocks = [99, 44]; // 44 is smaller, so it should sort first
+        keyboard.instruments = ["guitar", "guitar"];
+
+        mockActivity.blocks = {
+            blockList: {
+                44: { name: "pitch", connections: [null, 45, 46, null] },
+                45: { value: "do" },
+                46: { value: 4 },
+                99: { name: "pitch", connections: [null, 100, 101, null] },
+                100: { value: "do" },
+                101: { value: 4 }
+            },
+            adjustDocks: jest.fn(),
+            clampBlocksToCheck: [],
+            adjustExpandableClampBlock: jest.fn(),
+            sendStackToTrash: jest.fn()
+        };
+
+        keyboard.init();
+
+        const c4Item = keyboard.displayLayout.find(
+            item => item.noteName === "C" && item.noteOctave === 4
+        );
+        expect(c4Item).toBeDefined();
+        expect(c4Item.blockNumber).toBe(44); // 44 should be kept as the blockNumber because it was sorted first
     });
 });
