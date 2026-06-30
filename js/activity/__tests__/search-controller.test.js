@@ -217,6 +217,43 @@ describe("SearchController.prepSearchWidget", () => {
         );
         expect(suggestion.label).toBe("scale degree");
     });
+
+    const noLabelCases = [
+        ["voicename", "voice name"],
+        ["notename", "note name"],
+        ["drumname", "drum name"],
+        ["loadFile", "load file"],
+        ["invertmode", "invert mode"],
+        ["modename", "mode name"],
+        ["filtertype", "filter type"],
+        ["audiofile", "audio file"],
+        ["outputtools", "output tools"],
+        ["customNote", "custom note"],
+        ["accidentalname", "accidental name"],
+        ["eastindiansolfege", "east indian solfege"],
+        ["temperamentname", "temperament name"],
+        ["chordname", "chord name"],
+        ["intervalname", "interval name"],
+        ["oscillatortype", "oscillator type"],
+        ["noisename", "noise name"],
+        ["effectsname", "effects name"],
+        ["wrapmode", "wrap mode"]
+    ];
+
+    test.each(noLabelCases)(
+        "uses fallback label for no-label block '%s' → '%s'",
+        (blockName, expectedLabel) => {
+            const block = makeProtoBlock(blockName, "", false, []);
+            const activity = makeActivity({ [blockName]: block });
+            setupSearchController(activity, makeSearchUI());
+            activity.searchController.prepSearchWidget();
+
+            const suggestion = activity.searchController.searchSuggestions.find(
+                s => s.value === blockName
+            );
+            expect(suggestion.label).toBe(expectedLabel);
+        }
+    );
 });
 
 // ---------------------------------------------------------------------------
@@ -263,6 +300,15 @@ describe("SearchController.filterSuggestions", () => {
         sc.searchSuggestions = [];
         const cached = sc.filterSuggestions("drum");
         expect(cached).toBe(sc._searchCache["drum"]);
+    });
+
+    test("falls back to label match when item has no searchTerms array", () => {
+        sc.searchSuggestions = [{ label: "drum beat", value: "drum" }];
+        const results = sc.filterSuggestions("drum");
+        expect(results.some(r => r.value === "drum")).toBe(true);
+
+        const noResults = sc.filterSuggestions("piano");
+        expect(noResults.length).toBe(0);
     });
 });
 
@@ -404,6 +450,23 @@ describe("SearchController.showSearchWidget", () => {
 
         expect(hideSpy).toHaveBeenCalled();
     });
+
+    test("setTimeout fires focusInput and doSearch", () => {
+        jest.useFakeTimers();
+        const activity = makeActivity();
+        const ui = makeSearchUI({ visible: false });
+        setupSearchController(activity, ui);
+        const doSpy = jest
+            .spyOn(activity.searchController, "doSearch")
+            .mockImplementation(() => {});
+
+        activity.searchController.showSearchWidget();
+        jest.runAllTimers();
+
+        expect(ui.focusInput).toHaveBeenCalled();
+        expect(doSpy).toHaveBeenCalled();
+        jest.useRealTimers();
+    });
 });
 
 // ---------------------------------------------------------------------------
@@ -526,6 +589,83 @@ describe("SearchController.doSearch", () => {
         expect(sc.searchBlockPosition[0]).toBe(100 + global.STANDARDBLOCKHEIGHT);
         expect(sc.searchBlockPosition[1]).toBe(100 + global.STANDARDBLOCKHEIGHT);
     });
+
+    test("select callback sets widget fields before triggering recursive doSearch", () => {
+        const block = makeProtoBlock("drum", "drum");
+        const activity = makeActivity({ drum: block });
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
+        const sc = activity.searchController;
+        sc.searchSuggestions = [{ label: "drum", value: "drum", searchTerms: ["drum"] }];
+
+        sc.doSearch();
+
+        // Prevent the recursive doSearch from resetting widget values
+        const recurseSpy = jest.spyOn(sc, "doSearch").mockImplementation(() => {});
+
+        const selectCb = ui.setupMainAutocomplete.mock.calls[0][1];
+        const item = { label: "drum", value: "drum", specialDict: block };
+        selectCb(item, 0);
+
+        expect(activity.searchWidget.value).toBe("drum");
+        expect(activity.searchWidget.idInput_custom).toBe("drum");
+        expect(activity.searchWidget.protoblk).toBe(block);
+        expect(recurseSpy).toHaveBeenCalled();
+    });
+
+    test("select callback with keyCode 13 sets searchWidget visibility to visible", () => {
+        const block = makeProtoBlock("drum", "drum");
+        const activity = makeActivity({ drum: block });
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
+        const sc = activity.searchController;
+        sc.searchSuggestions = [{ label: "drum", value: "drum", searchTerms: ["drum"] }];
+
+        sc.doSearch();
+
+        // Prevent the recursive doSearch from interfering
+        jest.spyOn(sc, "doSearch").mockImplementation(() => {});
+
+        const selectCb = ui.setupMainAutocomplete.mock.calls[0][1];
+        selectCb({ label: "drum", value: "drum", specialDict: block }, 13);
+
+        expect(activity.searchWidget.style.visibility).toBe("visible");
+    });
+
+    test("source function passed to setupMainAutocomplete delegates to filterSuggestions", () => {
+        const activity = makeActivity();
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
+        const sc = activity.searchController;
+        sc.searchSuggestions = [{ label: "drum", value: "drum", searchTerms: ["drum"] }];
+
+        sc.doSearch();
+
+        const sourceFn = ui.setupMainAutocomplete.mock.calls[0][0];
+        const results = sourceFn({ term: "drum" });
+        expect(Array.isArray(results)).toBe(true);
+    });
+
+    test("drop callback passed to setupMainAutocomplete calls makeBlockFromSearch", () => {
+        const block = makeProtoBlock("drum", "drum");
+        const activity = makeActivity({ drum: block });
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
+        const sc = activity.searchController;
+        sc.searchSuggestions = [{ label: "drum", value: "drum", searchTerms: ["drum"] }];
+
+        sc.doSearch();
+
+        const dropCb = ui.setupMainAutocomplete.mock.calls[0][2];
+        dropCb(block, 150, 250);
+
+        expect(activity.palettes.dict["test-palette"].makeBlockFromSearch).toHaveBeenCalled();
+        expect(activity.blocks.moveBlock).toHaveBeenCalledWith(
+            42,
+            expect.any(Number),
+            expect.any(Number)
+        );
+    });
 });
 
 // ---------------------------------------------------------------------------
@@ -554,6 +694,23 @@ describe("SearchController.setHelpfulSearchDiv", () => {
 
         expect(activity.addEventListener).toHaveBeenCalledWith(
             closeButton,
+            "click",
+            expect.any(Function)
+        );
+    });
+
+    test("wires click listener on modeButton when it is returned", () => {
+        const closeButton = { id: "crossButton" };
+        const modeButton = { id: "begIconText" };
+        const activity = makeActivity();
+        const ui = makeSearchUI();
+        ui.buildHelpfulSearchDiv = jest.fn(() => ({ closeButton, modeButton }));
+        setupSearchController(activity, ui);
+
+        activity.searchController.setHelpfulSearchDiv();
+
+        expect(activity.addEventListener).toHaveBeenCalledWith(
+            modeButton,
             "click",
             expect.any(Function)
         );
@@ -771,5 +928,54 @@ describe("SearchController.doHelpfulSearch", () => {
         sc.doHelpfulSearch();
 
         expect(activity.errorMsg).toHaveBeenCalledWith("Block cannot be found.");
+    });
+
+    test("calls prepSearchWidget when suggestions list is empty", () => {
+        const activity = makeActivity();
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
+        const sc = activity.searchController;
+        const prepSpy = jest.spyOn(sc, "prepSearchWidget");
+
+        sc.doHelpfulSearch();
+
+        expect(prepSpy).toHaveBeenCalled();
+    });
+
+    test("source function passed to setupHelpfulAutocomplete delegates to filterSuggestions", () => {
+        const activity = makeActivity();
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
+        const sc = activity.searchController;
+        sc.searchSuggestions = [{ label: "drum", value: "drum", searchTerms: ["drum"] }];
+
+        sc.doHelpfulSearch();
+
+        const sourceFn = ui.setupHelpfulAutocomplete.mock.calls[0][0];
+        const results = sourceFn({ term: "drum" });
+        expect(Array.isArray(results)).toBe(true);
+    });
+
+    test("select callback sets helpfulSearchWidget fields before recursive doHelpfulSearch", () => {
+        const block = makeProtoBlock("drum", "drum");
+        const activity = makeActivity({ drum: block });
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
+        const sc = activity.searchController;
+        sc.searchSuggestions = [{ label: "drum", value: "drum", searchTerms: ["drum"] }];
+
+        sc.doHelpfulSearch();
+
+        // Prevent recursive doHelpfulSearch from resetting widget values
+        const recurseSpy = jest.spyOn(sc, "doHelpfulSearch").mockImplementation(() => {});
+
+        const selectCb = ui.setupHelpfulAutocomplete.mock.calls[0][1];
+        const item = { label: "drum", value: "drum", specialDict: block };
+        selectCb(item);
+
+        expect(activity.helpfulSearchWidget.value).toBe("drum");
+        expect(activity.helpfulSearchWidget.idInput_custom).toBe("drum");
+        expect(activity.helpfulSearchWidget.protoblk).toBe(block);
+        expect(recurseSpy).toHaveBeenCalled();
     });
 });

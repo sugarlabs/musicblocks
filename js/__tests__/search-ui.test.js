@@ -713,3 +713,510 @@ describe("SearchUI.containsMainSearchTarget", () => {
         expect(ui.containsMainSearchTarget({})).toBe(false);
     });
 });
+
+// ---------------------------------------------------------------------------
+// setupMainAutocomplete — _renderItem assignment (instance branch)
+// ---------------------------------------------------------------------------
+
+describe("SearchUI.setupMainAutocomplete — instance renderItem", () => {
+    test("assigns _renderItem on the autocomplete instance when it exists", () => {
+        const instance = { _renderItem: null };
+        const $elem = {
+            _initFlag: false,
+            data: jest.fn(function (key, val) {
+                if (val !== undefined) this._initFlag = val;
+                return key === "autocomplete-init" ? this._initFlag : undefined;
+            }),
+            autocomplete: jest.fn(function (arg) {
+                if (arg === "instance") return instance;
+            })
+        };
+        global.window.jQuery = jest.fn(() => $elem);
+
+        const activity = makeActivity();
+        const ui = new SearchUI(activity);
+        ui.setupMainAutocomplete(() => [], jest.fn(), jest.fn());
+
+        expect(typeof instance._renderItem).toBe("function");
+        delete global.window.jQuery;
+    });
+});
+
+// ---------------------------------------------------------------------------
+// triggerMainSearch
+// ---------------------------------------------------------------------------
+
+describe("SearchUI.triggerMainSearch", () => {
+    test("calls jQuery autocomplete search with the given value", () => {
+        const autocomplete = jest.fn();
+        global.window.jQuery = jest.fn(() => ({ autocomplete }));
+        const ui = new SearchUI(makeActivity());
+        ui.triggerMainSearch("drum");
+        expect(autocomplete).toHaveBeenCalledWith("search", "drum");
+        delete global.window.jQuery;
+    });
+});
+
+// ---------------------------------------------------------------------------
+// setupHelpfulAutocomplete
+// ---------------------------------------------------------------------------
+
+describe("SearchUI.setupHelpfulAutocomplete", () => {
+    let $elem;
+
+    beforeEach(() => {
+        $elem = {
+            _initFlag: false,
+            _capturedOpts: null,
+            data: jest.fn(function (key, val) {
+                if (val !== undefined) this._initFlag = val;
+                return key === "autocomplete-init" ? this._initFlag : undefined;
+            }),
+            autocomplete: jest.fn(function (arg) {
+                if (typeof arg === "object") this._capturedOpts = arg;
+                if (arg === "instance") return null;
+            })
+        };
+        global.window.jQuery = jest.fn(() => $elem);
+    });
+
+    afterEach(() => {
+        delete global.window.jQuery;
+    });
+
+    test("calls jQuery autocomplete with source, appendTo, select, and focus", () => {
+        const ui = new SearchUI(makeActivity());
+        ui.setupHelpfulAutocomplete(() => [], jest.fn());
+        expect($elem.autocomplete).toHaveBeenCalledWith(
+            expect.objectContaining({
+                source: expect.any(Function),
+                appendTo: "body",
+                select: expect.any(Function),
+                focus: expect.any(Function)
+            })
+        );
+    });
+
+    test("marks autocomplete as initialised", () => {
+        const ui = new SearchUI(makeActivity());
+        ui.setupHelpfulAutocomplete(() => [], jest.fn());
+        expect($elem.data).toHaveBeenCalledWith("autocomplete-init", true);
+    });
+
+    test("skips setup when already initialised", () => {
+        $elem._initFlag = true;
+        const ui = new SearchUI(makeActivity());
+        ui.setupHelpfulAutocomplete(() => [], jest.fn());
+        expect($elem.autocomplete).not.toHaveBeenCalledWith(
+            expect.objectContaining({ source: expect.any(Function) })
+        );
+    });
+
+    test("source callback normalises and passes term through sourceFn", () => {
+        const sourceFn = jest.fn(() => [{ label: "drum" }]);
+        const ui = new SearchUI(makeActivity());
+        ui.setupHelpfulAutocomplete(sourceFn, jest.fn());
+
+        const response = jest.fn();
+        $elem._capturedOpts.source({ term: "  DRUM  " }, response);
+
+        expect(sourceFn).toHaveBeenCalledWith("drum");
+        expect(response).toHaveBeenCalledWith([{ label: "drum" }]);
+    });
+
+    test("select callback updates helpfulSearchWidget fields and calls selectCb", () => {
+        const selectCb = jest.fn();
+        const activity = makeActivity();
+        const ui = new SearchUI(activity);
+        ui.setupHelpfulAutocomplete(() => [], selectCb);
+
+        const item = { label: "drum", value: "drum-id", specialDict: { name: "drum" } };
+        const event = { preventDefault: jest.fn() };
+        $elem._capturedOpts.select(event, { item });
+
+        expect(event.preventDefault).toHaveBeenCalled();
+        expect(activity.helpfulSearchWidget.value).toBe("drum");
+        expect(activity.helpfulSearchWidget.idInput_custom).toBe("drum-id");
+        expect(activity.helpfulSearchWidget.protoblk).toBe(item.specialDict);
+        expect(selectCb).toHaveBeenCalledWith(item);
+    });
+
+    test("focus callback calls event.preventDefault", () => {
+        const ui = new SearchUI(makeActivity());
+        ui.setupHelpfulAutocomplete(() => [], jest.fn());
+        const event = { preventDefault: jest.fn() };
+        $elem._capturedOpts.focus(event);
+        expect(event.preventDefault).toHaveBeenCalled();
+    });
+
+    test("assigns _renderItem on the instance when it exists", () => {
+        const instance = { _renderItem: null };
+        $elem.autocomplete = jest.fn(function (arg) {
+            if (typeof arg === "object") this._capturedOpts = arg;
+            if (arg === "instance") return instance;
+        });
+        const li = {
+            append: jest.fn(),
+            appendTo: jest.fn(function () {
+                return this;
+            })
+        };
+        global.window.jQuery = jest.fn(selector => {
+            if (selector === "<li></li>") return li;
+            if (selector === "<a>")
+                return {
+                    text: jest.fn(function () {
+                        return this;
+                    })
+                };
+            return $elem;
+        });
+
+        const ui = new SearchUI(makeActivity());
+        ui.setupHelpfulAutocomplete(() => [], jest.fn());
+
+        expect(typeof instance._renderItem).toBe("function");
+
+        const ul = { css: jest.fn(() => ul) };
+        const item = { label: "drum", artwork: "" };
+        instance._renderItem(ul, item);
+        expect(li.append).toHaveBeenCalled();
+    });
+});
+
+// ---------------------------------------------------------------------------
+// triggerHelpfulSearch
+// ---------------------------------------------------------------------------
+
+describe("SearchUI.triggerHelpfulSearch", () => {
+    test("calls jQuery autocomplete search with the given value", () => {
+        const autocomplete = jest.fn();
+        global.window.jQuery = jest.fn(() => ({ autocomplete }));
+        const ui = new SearchUI(makeActivity());
+        ui.triggerHelpfulSearch("pitch");
+        expect(autocomplete).toHaveBeenCalledWith("search", "pitch");
+        delete global.window.jQuery;
+    });
+});
+
+// ---------------------------------------------------------------------------
+// buildHelpfulSearchDiv — existing-div removal branch
+// ---------------------------------------------------------------------------
+
+describe("SearchUI.buildHelpfulSearchDiv — existing div removal", () => {
+    test("removes a pre-existing #helpfulSearchDiv before creating a new one", () => {
+        const removeChild = jest.fn();
+        const existingDiv = { parentNode: { removeChild } };
+
+        const mockEl = {
+            style: { cssText: "" },
+            setAttribute: jest.fn(),
+            appendChild: jest.fn(),
+            textContent: "",
+            id: ""
+        };
+        document.createElement = jest.fn(() => mockEl);
+        document.getElementById = jest.fn(id => (id === "helpfulSearchDiv" ? existingDiv : null));
+        document.body.appendChild = jest.fn();
+
+        const activity = makeActivity();
+        const ui = new SearchUI(activity);
+        ui.buildHelpfulSearchDiv();
+
+        expect(removeChild).toHaveBeenCalledWith(existingDiv);
+        jest.restoreAllMocks();
+    });
+});
+
+// ---------------------------------------------------------------------------
+// positionHelpfulSearchDiv
+// ---------------------------------------------------------------------------
+
+describe("SearchUI.positionHelpfulSearchDiv", () => {
+    let helpfulWheelDiv, helpfulSearchDiv;
+
+    beforeEach(() => {
+        helpfulWheelDiv = { offsetLeft: 100, offsetTop: 200 };
+        helpfulSearchDiv = {
+            style: { left: "", top: "", display: "" },
+            offsetWidth: 80,
+            offsetHeight: 40,
+            offsetLeft: 180,
+            offsetTop: 310
+        };
+        document.getElementById = jest.fn(id =>
+            id === "helpfulWheelDiv" ? helpfulWheelDiv : null
+        );
+        global.window.innerWidth = 1280;
+        global.window.innerHeight = 800;
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    test("sets left and top from helpfulWheelDiv offsets and stage scale", () => {
+        const activity = makeActivity();
+        const ui = new SearchUI(activity);
+        ui.helpfulSearchDiv = helpfulSearchDiv;
+        ui.positionHelpfulSearchDiv();
+        // 100 + 80*1 = 180, 200 + 110*1 = 310
+        expect(helpfulSearchDiv.style.left).toBe("180px");
+        expect(helpfulSearchDiv.style.top).toBe("310px");
+        expect(helpfulSearchDiv.style.display).toBe("block");
+    });
+
+    test("clamps left when div would overflow viewport right edge", () => {
+        helpfulSearchDiv.offsetLeft = 1250;
+        helpfulSearchDiv.offsetWidth = 80;
+        global.window.innerWidth = 1280;
+        const activity = makeActivity();
+        const ui = new SearchUI(activity);
+        ui.helpfulSearchDiv = helpfulSearchDiv;
+        ui.positionHelpfulSearchDiv();
+        // 1250 + 80 > 1280, so clamp: 1280 - 80 = 1200
+        expect(helpfulSearchDiv.style.left).toBe("1200px");
+    });
+
+    test("clamps top when div would overflow viewport bottom edge", () => {
+        helpfulSearchDiv.offsetTop = 790;
+        helpfulSearchDiv.offsetHeight = 40;
+        global.window.innerHeight = 800;
+        const activity = makeActivity();
+        const ui = new SearchUI(activity);
+        ui.helpfulSearchDiv = helpfulSearchDiv;
+        ui.positionHelpfulSearchDiv();
+        // 790 + 40 > 800, so clamp: 800 - 40 = 760
+        expect(helpfulSearchDiv.style.top).toBe("760px");
+    });
+});
+
+// ---------------------------------------------------------------------------
+// _renderMainItem
+// ---------------------------------------------------------------------------
+
+describe("SearchUI._renderMainItem", () => {
+    let $j, ul, liEl, liProxy;
+
+    beforeEach(() => {
+        liEl = {
+            addEventListener: jest.fn()
+        };
+        liProxy = {
+            0: liEl,
+            append: jest.fn(),
+            appendTo: jest.fn(function () {
+                return this;
+            })
+        };
+        ul = { css: jest.fn(() => ul) };
+
+        const mockAnchor = {
+            text: jest.fn(function () {
+                return this;
+            })
+        };
+        $j = jest.fn(selector => {
+            if (selector === "<li></li>") return liProxy;
+            if (selector === "<a>") return mockAnchor;
+            if (selector === "#search") return { autocomplete: jest.fn() };
+            return {};
+        });
+
+        document.body.appendChild = jest.fn();
+        document.body.removeChild = jest.fn();
+        document.addEventListener = jest.fn();
+        document.removeEventListener = jest.fn();
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    test("creates an img element and appends it to the li", () => {
+        const mockImg = {
+            style: { cursor: "", position: "", zIndex: "", left: "", top: "" },
+            src: "",
+            height: 0,
+            offsetWidth: 20,
+            offsetHeight: 20,
+            parentNode: null,
+            ondragstart: null
+        };
+        document.createElement = jest.fn(() => mockImg);
+
+        const ui = new SearchUI(makeActivity());
+        const item = { label: "drum", artwork: "drum.png", specialDict: {} };
+        ui._renderMainItem($j, ul, item, jest.fn());
+
+        expect(document.createElement).toHaveBeenCalledWith("img");
+        expect(mockImg.src).toBe("drum.png");
+        expect(mockImg.height).toBe(20);
+        expect(mockImg.style.cursor).toBe("grab");
+    });
+
+    test("attaches mousedown and touchstart listeners to the li element", () => {
+        const mockImg = {
+            style: { cursor: "", position: "", zIndex: "", left: "", top: "" },
+            src: "",
+            height: 0,
+            offsetWidth: 20,
+            offsetHeight: 20,
+            parentNode: null,
+            ondragstart: null
+        };
+        document.createElement = jest.fn(() => mockImg);
+
+        const ui = new SearchUI(makeActivity());
+        const item = { label: "drum", artwork: "", specialDict: {} };
+        ui._renderMainItem($j, ul, item, jest.fn());
+
+        const events = liEl.addEventListener.mock.calls.map(c => c[0]);
+        expect(events).toContain("mousedown");
+        expect(events).toContain("touchstart");
+    });
+
+    test("mousedown handler appends img to body and registers move/up listeners", () => {
+        const mockImg = {
+            style: { cursor: "grab", position: "", zIndex: "", left: "", top: "" },
+            src: "",
+            height: 0,
+            offsetWidth: 20,
+            offsetHeight: 20,
+            parentNode: null,
+            ondragstart: null
+        };
+        document.createElement = jest.fn(() => mockImg);
+
+        const ui = new SearchUI(makeActivity());
+        const dropCb = jest.fn();
+        const item = { label: "drum", artwork: "", specialDict: { name: "drum" } };
+        ui._renderMainItem($j, ul, item, dropCb);
+
+        const downHandler = liEl.addEventListener.mock.calls.find(c => c[0] === "mousedown")[1];
+        downHandler({
+            stopPropagation: jest.fn(),
+            stopImmediatePropagation: jest.fn(),
+            preventDefault: jest.fn(),
+            pageX: 100,
+            pageY: 200,
+            type: "mousedown"
+        });
+
+        expect(document.body.appendChild).toHaveBeenCalledWith(mockImg);
+        const docEvents = document.addEventListener.mock.calls.map(c => c[0]);
+        expect(docEvents).toContain("mousemove");
+        expect(docEvents).toContain("mouseup");
+    });
+
+    test("mouseup handler calls dropCb and removes img from body", () => {
+        const mockImg = {
+            style: { cursor: "grab", position: "", zIndex: "", left: "90px", top: "190px" },
+            src: "",
+            height: 0,
+            offsetWidth: 20,
+            offsetHeight: 20,
+            parentNode: document.body,
+            ondragstart: null
+        };
+        document.createElement = jest.fn(() => mockImg);
+        document.body.removeChild = jest.fn();
+
+        const ui = new SearchUI(makeActivity());
+        const dropCb = jest.fn();
+        const specialDict = { name: "drum" };
+        const item = { label: "drum", artwork: "", specialDict };
+        ui._renderMainItem($j, ul, item, dropCb);
+
+        // Trigger mousedown
+        const downHandler = liEl.addEventListener.mock.calls.find(c => c[0] === "mousedown")[1];
+        downHandler({
+            stopPropagation: jest.fn(),
+            stopImmediatePropagation: jest.fn(),
+            preventDefault: jest.fn(),
+            pageX: 100,
+            pageY: 200,
+            type: "mousedown"
+        });
+
+        // Trigger mouseup
+        const upCall = document.addEventListener.mock.calls.find(c => c[0] === "mouseup");
+        upCall[1]();
+
+        expect(dropCb).toHaveBeenCalledWith(specialDict, 90, 190);
+        expect(document.body.removeChild).toHaveBeenCalledWith(mockImg);
+    });
+
+    test("mouseup skips dropCb when coordinates are NaN (pageX/pageY were NaN)", () => {
+        const mockImg = {
+            style: { cursor: "grab", position: "", zIndex: "", left: "", top: "" },
+            src: "",
+            height: 0,
+            offsetWidth: 20,
+            offsetHeight: 20,
+            parentNode: null,
+            ondragstart: null
+        };
+        document.createElement = jest.fn(() => mockImg);
+
+        const ui = new SearchUI(makeActivity());
+        const dropCb = jest.fn();
+        const item = { label: "drum", artwork: "", specialDict: {} };
+        ui._renderMainItem($j, ul, item, dropCb);
+
+        const downHandler = liEl.addEventListener.mock.calls.find(c => c[0] === "mousedown")[1];
+        // NaN pageX/pageY → moveAt sets img.style.left = "NaNpx"
+        // parseInt("NaNpx") = NaN, so dropCb should be skipped
+        downHandler({
+            stopPropagation: jest.fn(),
+            stopImmediatePropagation: jest.fn(),
+            preventDefault: jest.fn(),
+            pageX: NaN,
+            pageY: NaN,
+            type: "mousedown"
+        });
+
+        const upCall = document.addEventListener.mock.calls.find(c => c[0] === "mouseup");
+        upCall[1]();
+
+        expect(dropCb).not.toHaveBeenCalled();
+    });
+
+    test("onMouseMove with touchmove uses touch coordinates", () => {
+        const mockImg = {
+            style: { cursor: "grab", position: "", zIndex: "", left: "", top: "" },
+            src: "",
+            height: 0,
+            offsetWidth: 20,
+            offsetHeight: 20,
+            parentNode: null,
+            ondragstart: null
+        };
+        document.createElement = jest.fn(() => mockImg);
+
+        const ui = new SearchUI(makeActivity());
+        const item = { label: "drum", artwork: "", specialDict: {} };
+        ui._renderMainItem($j, ul, item, jest.fn());
+
+        const downHandler = liEl.addEventListener.mock.calls.find(c => c[0] === "mousedown")[1];
+        downHandler({
+            stopPropagation: jest.fn(),
+            stopImmediatePropagation: jest.fn(),
+            preventDefault: jest.fn(),
+            pageX: 0,
+            pageY: 0,
+            type: "mousedown"
+        });
+
+        const moveCall = document.addEventListener.mock.calls.find(c => c[0] === "touchmove");
+        expect(moveCall).toBeDefined();
+        moveCall[1]({
+            preventDefault: jest.fn(),
+            type: "touchmove",
+            touches: [{ clientX: 55, clientY: 66 }]
+        });
+        // 55 - 10 = 45
+        expect(mockImg.style.left).toBe("45px");
+        expect(mockImg.style.top).toBe("56px");
+    });
+});
