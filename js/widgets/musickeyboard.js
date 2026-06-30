@@ -2995,8 +2995,8 @@ function MusicKeyboard(activity) {
                     this.displayLayout[p].blockNumber
                 ]);
 
-                if (p < this.layout.length) {
-                    this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
+                this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
+                if (this.layout[p]) {
                     this.layout[p].objId = "blackRow" + myrow2Id.toString();
                 }
 
@@ -3112,8 +3112,8 @@ function MusicKeyboard(activity) {
                             : null
                     );
                 }
-                if (p < this.layout.length) {
-                    this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
+                this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
+                if (this.layout[p]) {
                     this.layout[p].objId = "blackRow" + myrow2Id.toString();
                 }
 
@@ -3181,8 +3181,8 @@ function MusicKeyboard(activity) {
                         );
                     }
                 }
-                if (p < this.layout.length) {
-                    this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
+                this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
+                if (this.layout[p]) {
                     this.layout[p].objId = "blackRow" + myrow2Id.toString();
                 }
 
@@ -3231,8 +3231,8 @@ function MusicKeyboard(activity) {
                         );
                     }
                 }
-                if (p < this.layout.length) {
-                    this.displayLayout[p].objId = "whiteRow" + myrowId.toString();
+                this.displayLayout[p].objId = "whiteRow" + myrowId.toString();
+                if (this.layout[p]) {
                     this.layout[p].objId = "whiteRow" + myrowId.toString();
                 }
 
