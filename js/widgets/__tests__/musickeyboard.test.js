@@ -83,6 +83,7 @@ describe("MusicKeyboard add-row submenu", () => {
     let originalSlicePath;
     let originalWheelnav;
     let originalTranslate;
+    let originalI18nSolfege;
 
     beforeEach(() => {
         document.body.innerHTML = '<div id="wheelDivptm"></div><div id="addnotes"></div>';
@@ -93,17 +94,21 @@ describe("MusicKeyboard add-row submenu", () => {
         originalSlicePath = global.slicePath;
         originalWheelnav = global.wheelnav;
         originalTranslate = global._;
+        originalI18nSolfege = global.i18nSolfege;
 
         global.docById = id => document.getElementById(id);
         global.platformColor = {
             paletteColors: { pitch: ["#000", "#fff"] },
-            exitWheelcolors: ["#000", "#fff"]
+            exitWheelcolors: ["#000", "#fff"],
+            pitchWheelcolors: ["#000", "#fff"],
+            blockLabelsWheelcolors: ["#000", "#fff"]
         };
         global.slicePath = () => ({
             DonutSlice: jest.fn(),
             DonutSliceCustomization: () => ({})
         });
         global._ = value => value;
+        global.i18nSolfege = val => val;
         global.wheelnav = function () {
             this.raphael = {};
             this.navItems = [];
@@ -115,7 +120,8 @@ describe("MusicKeyboard add-row submenu", () => {
                     sliceSelectedAttr: {},
                     sliceHoverAttr: {},
                     titleSelectedAttr: {},
-                    titleHoverAttr: {}
+                    titleHoverAttr: {},
+                    navItem: { hide: jest.fn(), show: jest.fn() }
                 }));
             };
             this.removeWheel = jest.fn();
@@ -128,6 +134,7 @@ describe("MusicKeyboard add-row submenu", () => {
         global.slicePath = originalSlicePath;
         global.wheelnav = originalWheelnav;
         global._ = originalTranslate;
+        global.i18nSolfege = originalI18nSolfege;
         document.body.innerHTML = "";
     });
 
@@ -155,5 +162,45 @@ describe("MusicKeyboard add-row submenu", () => {
             [1, ["solfege", { value: "do♯" }], 0, 0, [0]],
             [2, ["number", { value: 392 }], 0, 0, [0]]
         ]);
+    });
+
+    test("creates pie submenu and sets z-index and top position correctly", () => {
+        document.body.innerHTML =
+            '<div id="wheelDivptm"></div><div id="_exitWheel"></div><div id="_tabsWheel"></div><div id="_durationWheel"></div><div id="cell-0"></div>';
+        document.getElementById("cell-0").getBoundingClientRect = () => ({ x: 100, y: 400 });
+
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1
+        });
+
+        expect(() => {
+            keyboard._createpiesubmenu("cell-0", "0");
+        }).not.toThrow();
+
+        expect(docById("wheelDivptm").style.zIndex).toBe("10001");
+        expect(docById("wheelDivptm").style.top).toBe("350px"); // min(600 - 250, 400) = 350
+    });
+
+    test("creates column pie submenu and sets z-index and top position correctly", () => {
+        document.body.innerHTML =
+            '<div id="wheelDivptm"></div><div id="_exitWheel"></div><div id="labelcol0"></div>';
+        document.getElementById("labelcol0").getBoundingClientRect = () => ({ x: 100, y: 400 });
+
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            blocks: {
+                blockList: [{ connections: [null, 1, null] }, { value: 392 }]
+            }
+        });
+        keyboard.layout = [{ noteName: "hertz", noteOctave: 392, blockNumber: 0 }];
+
+        expect(() => {
+            keyboard._createColumnPieSubmenu(0, "synthsblocks");
+        }).not.toThrow();
+
+        expect(docById("wheelDivptm").style.zIndex).toBe("10001");
+        expect(docById("wheelDivptm").style.top).toBe("300px"); // min(600 - 300, 400) = 300
     });
 });
