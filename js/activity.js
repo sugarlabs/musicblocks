@@ -5424,6 +5424,26 @@ class Activity {
             );
         };
 
+        this._handleBeforeUnload = () => {
+            // Save synchronously to SESSION* keys so manual reload/F5
+            // still has recoverable data even if async saves are cut short.
+            if (!this._isHardReloading) {
+                if (typeof this.__saveLocally === "function") {
+                    this.__saveLocally();
+                }
+                if (
+                    typeof this.saveLocally === "function" &&
+                    this.saveLocally !== this.__saveLocally
+                ) {
+                    this.saveLocally();
+                }
+            }
+            this._stopRenderLoop();
+            if (typeof this._stopAutoSave === "function") {
+                this._stopAutoSave();
+            }
+        };
+
         this.__saveLocally = () => {
             const data = this.prepareExport();
 
@@ -5870,25 +5890,7 @@ class Activity {
             // Use managed addEventListener for automatic cleanup
             this.addEventListener(document, "mousemove", this.handleMouseMove);
             this.addEventListener(document, "click", this.handleDocumentClick);
-            this.addEventListener(window, "beforeunload", () => {
-                // Save synchronously to SESSION* keys so manual reload/F5
-                // still has recoverable data even if async saves are cut short.
-                if (!this._isHardReloading) {
-                    if (typeof this.__saveLocally === "function") {
-                        this.__saveLocally();
-                    }
-                    if (
-                        typeof this.saveLocally === "function" &&
-                        this.saveLocally !== this.__saveLocally
-                    ) {
-                        this.saveLocally();
-                    }
-                }
-                this._stopRenderLoop();
-                if (typeof this._stopAutoSave === "function") {
-                    this._stopAutoSave();
-                }
-            });
+            this.addEventListener(window, "beforeunload", () => this._handleBeforeUnload());
 
             this._createMsgContainer(
                 "#ffffff",

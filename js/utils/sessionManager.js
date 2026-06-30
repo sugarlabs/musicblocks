@@ -1,5 +1,5 @@
 /**
- * MusicBlocks v3.4.1
+ * MusicBlocks v3.6.2
  *
  * @author Lavjeet Kumar Rai
  *
