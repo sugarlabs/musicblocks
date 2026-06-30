@@ -252,12 +252,8 @@ describe("setupEnsembleBlocks", () => {
             40: { name: "number", value: 1 }
         };
 
-        // Mock document.addEventListener
-        global.document = {
-            addEventListener: jest.fn(),
-            attachEvent: jest.fn(),
-            removeEventListener: jest.fn()
-        };
+        const { PubSub } = require("../../pubsub");
+        global.pubsub = new PubSub();
 
         // Mock window.btoa
         global.window = {
@@ -1035,7 +1031,7 @@ describe("setupEnsembleBlocks", () => {
         });
     });
 
-    describe("NewTurtleBlock __afterLoad callback (lines 998-1010)", () => {
+    describe("NewTurtleBlock __afterLoad callback", () => {
         it("should init and run turtle after finishedLoading event", () => {
             const newTurtleBlock = createdBlocks["newturtle"];
 
@@ -1045,18 +1041,12 @@ describe("setupEnsembleBlocks", () => {
             activity.blocks.loadNewBlocks = jest.fn();
             activity.turtles.getTurtle = jest.fn(() => ({ x: 0, y: 0 }));
 
-            let capturedListener = null;
-            global.document.addEventListener = jest.fn((event, fn) => {
-                if (event === "finishedLoading") capturedListener = fn;
-            });
-
             logo.parseArg.mockReturnValue("BrandNewTurtle");
             newTurtleBlock.flow(["BrandNewTurtle"], logo, 0, 0, null);
 
             activity.blocks.blockList[2] = { value: 0 };
 
-            expect(capturedListener).not.toBeNull();
-            capturedListener();
+            global.pubsub.emit("finishedLoading");
 
             expect(logo.initTurtle).toHaveBeenCalled();
             expect(logo.runFromBlock).toHaveBeenCalled();
@@ -1071,30 +1061,6 @@ describe("setupEnsembleBlocks", () => {
             logo.parseArg.mockReturnValue(null);
             const result = turtleColorBlock.arg(logo, 0, blk, null);
             expect(result).toBe("#FF0000"); // falls back to current turtle
-        });
-    });
-
-    describe("NewTurtleBlock attachEvent fallback (line 1016)", () => {
-        it("should use attachEvent when addEventListener is not available", () => {
-            const newTurtleBlock = createdBlocks["newturtle"];
-            activity.blocks.blockList = [];
-            activity.blocks.blockList[0] = { connections: [null, 1] };
-            activity.blocks.blockList[1] = { name: "text", value: "BrandNewTurtle2" };
-            activity.blocks.loadNewBlocks = jest.fn();
-            activity.turtles.getTurtle = jest.fn(() => ({ x: 0, y: 0 }));
-
-            global.document.addEventListener = undefined;
-            global.document.attachEvent = jest.fn();
-
-            logo.parseArg.mockReturnValue("BrandNewTurtle2");
-            newTurtleBlock.flow(["BrandNewTurtle2"], logo, 0, 0, null);
-
-            expect(global.document.attachEvent).toHaveBeenCalledWith(
-                "finishedLoading",
-                expect.any(Function)
-            );
-
-            global.document.addEventListener = jest.fn();
         });
     });
 

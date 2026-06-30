@@ -19,7 +19,7 @@
    MATRIXSOLFEHEIGHT, i18nSolfege, MATRIXSOLFEWIDTH, toFraction,
    wheelnav, slicePath, getNote, PREVIEWVOLUME, DEFAULTVOICE,
    PITCHES3, SOLFEGENAMES, SOLFEGECONVERSIONTABLE, NOTESSHARP,
-   NOTESFLAT, PITCHES, PITCHES2, convertFromSolfege, */
+   NOTESFLAT, PITCHES, PITCHES2, convertFromSolfege, normalizeNoteAccidentals, */
 /*
    Global Locations
     - lib/wheelnav
@@ -632,13 +632,7 @@ function MusicKeyboard(activity) {
                 __endNote(element);
                 activeKey = null;
             } else if (activeKey !== null) {
-                const id = activeKey.id;
-                if (id.includes("blackRow")) {
-                    activeKey.style.backgroundColor = "black";
-                } else {
-                    activeKey.style.backgroundColor = "white";
-                }
-                activeKey = null;
+                activeKey.dispatchEvent(new Event("pointerup"));
             }
         });
 
@@ -648,6 +642,8 @@ function MusicKeyboard(activity) {
             if (activeKey === element) {
                 __endNote(element);
                 activeKey = null;
+            } else if (activeKey !== null) {
+                activeKey.dispatchEvent(new Event("pointerup"));
             }
         });
     };
@@ -715,6 +711,27 @@ function MusicKeyboard(activity) {
                 this.metronomeON = false;
                 if (this.loopTick) this.loopTick.stop();
             }
+
+            // Stop any active pointer/keyboard notes
+            if (activeKey !== null) {
+                activeKey.dispatchEvent(new Event("pointerup"));
+            }
+
+            // Release any active synthesizer sounds when closing the widget
+            if (this.displayLayout) {
+                this.displayLayout.forEach(layoutItem => {
+                    if (layoutItem.voice) {
+                        this.activity.logo.synth.stopSound(0, layoutItem.voice);
+                    }
+                });
+            }
+            this.activity.logo.synth.stopSound(0, DEFAULTVOICE);
+
+            // Stop any in-progress note-sequence playback so the pending
+            // setTimeout chain in playOne() does not keep triggering notes
+            // after the widget has been destroyed.
+            this._stopOrCloseClicked = true;
+            this.playingNow = false;
 
             selectedNotes = [];
             docById("wheelDivptm").style.display = "none";
@@ -1792,6 +1809,7 @@ function MusicKeyboard(activity) {
      */
     this._createpiesubmenu = function (cellId, start) {
         docById("wheelDivptm").style.display = "";
+        docById("wheelDivptm").style.zIndex = "10001";
 
         this._menuWheel = new wheelnav("wheelDivptm", null, 600, 600);
         this._exitWheel = new wheelnav("_exitWheel", this._menuWheel.raphael);
@@ -1820,6 +1838,7 @@ function MusicKeyboard(activity) {
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.selectedNavItemIndex = null;
 
         const tabsLabels = [
             "",
@@ -1876,6 +1895,13 @@ function MusicKeyboard(activity) {
 
         this._menuWheel.createWheel(mainTabsLabels);
         this._exitWheel.createWheel(["x", ""]);
+        this._exitWheel.navItems[1].enabled = false;
+        if (this._exitWheel.navItems[0].sliceSelectedAttr) {
+            this._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
+            this._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
+            this._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
+            this._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
+        }
 
         docById("wheelDivptm").style.position = "absolute";
         docById("wheelDivptm").style.height = "250px";
@@ -2071,7 +2097,7 @@ function MusicKeyboard(activity) {
      */
     this._createAddRowPieSubmenu = function () {
         docById("wheelDivptm").style.display = "";
-        // docById("wheelDivptm").style.zIndex = "300";
+        docById("wheelDivptm").style.zIndex = "10001";
         const pitchLabels = [
             "do",
             "do♯",
@@ -2152,7 +2178,7 @@ function MusicKeyboard(activity) {
             ) + "px";
         docById("wheelDivptm").style.top =
             Math.min(
-                this.activity.canvas.height - 250,
+                this.activity.canvas.height - 300,
                 Math.max(0, y * this.activity.getStageScale())
             ) + "px";
 
@@ -2451,7 +2477,7 @@ function MusicKeyboard(activity) {
         }
 
         docById("wheelDivptm").style.display = "";
-        docById("wheelDivptm").style.zIndex = "300";
+        docById("wheelDivptm").style.zIndex = "10001";
 
         const accidentals = ["𝄪", "♯", "♮", "♭", "𝄫"];
         let noteLabels = ["ti", "la", "sol", "fa", "mi", "re", "do"];
@@ -2508,7 +2534,15 @@ function MusicKeyboard(activity) {
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
+        this._exitWheel.selectedNavItemIndex = null;
         this._exitWheel.createWheel(["x", " "]);
+        this._exitWheel.navItems[1].enabled = false;
+        if (this._exitWheel.navItems[0].sliceSelectedAttr) {
+            this._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
+            this._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
+            this._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
+            this._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
+        }
 
         const octaveLabels = [
             "8",
@@ -2580,7 +2614,7 @@ function MusicKeyboard(activity) {
             ) + "px";
         docById("wheelDivptm").style.top =
             Math.min(
-                this.activity.canvas.height - 250,
+                this.activity.canvas.height - 300,
                 Math.max(0, y * this.activity.getStageScale())
             ) + "px";
 
@@ -2751,7 +2785,14 @@ function MusicKeyboard(activity) {
             );
             this.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
             Singer.setSynthVolume(this.activity.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
-            this.activity.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, DEFAULTVOICE, null, null);
+            this.activity.logo.synth.trigger(
+                0,
+                [normalizeNoteAccidentals(obj[0] + obj[1])],
+                1 / 8,
+                DEFAULTVOICE,
+                null,
+                null
+            );
 
             __selectionChanged();
         };

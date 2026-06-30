@@ -31,7 +31,8 @@ try {
    ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON, debugLog,
    ErrorHandler, ActivityContext,
    Boundary, CARTESIAN, changeImage, closeWidgets, doRecordButton, setupActivityRecorder,
-   setupGridController, setupGridRenderer, setupPluginController, setupToolbarController, setupAlertController, setupAlertRenderer, PluginDialog,
+   setupGridController, setupGridRenderer, setupPluginController, setupToolbarController, setupAlertController, setupAlertRenderer, setupPaletteLoader, PluginDialog,
+   setupSearchController, setupSearchUI,
    setupActivityAbcParser, setupActivityIdleWatcher, SessionStorageManager,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
@@ -55,7 +56,7 @@ try {
    MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
    SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS,
-   extractProjectDataFromHTML,unescapeHTML
+   extractProjectDataFromHTML,unescapeHTML, pubsub
  */
 
 /*
@@ -130,6 +131,7 @@ let MYDEFINES = [
     "activity/alert-renderer",
     "palette/palette-loader",
     "activity/search-controller",
+    "search-ui",
     "widgets/plugin-dialog",
     "utils/musicutils",
     "utils/synthutils",
@@ -441,7 +443,17 @@ class Activity {
             let lang = "en";
             if (this.storage.languagePreference !== undefined) {
                 lang = this.storage.languagePreference;
-                if (lang.startsWith("ja")) lang = "ja"; // normalize Japanese
+                if (lang === "kana" || lang === "ja-kana") {
+                    this.storage.languagePreference = "ja";
+                    this.storage.kanaPreference = "kana";
+                    lang = "ja";
+                } else if (lang === "ja-kanji") {
+                    this.storage.languagePreference = "ja";
+                    this.storage.kanaPreference = "kanji";
+                    lang = "ja";
+                } else if (lang.startsWith("ja")) {
+                    lang = "ja"; // normalize Japanese
+                }
                 i18next.changeLanguage(lang);
             } else {
                 lang = navigator.language;
@@ -470,7 +482,8 @@ class Activity {
         setupAlertController(this);
         setupAlertRenderer(this);
         setupPaletteLoader(this);
-        setupSearchController(this);
+        this.searchUI = setupSearchUI(this);
+        setupSearchController(this, this.searchUI);
         this.pluginDialog = new PluginDialog({
             onLoadBuiltIn: name => this._loadBuiltInPlugin(name),
             onDelete: () => this._deletePlugin(),
@@ -552,11 +565,7 @@ class Activity {
             this.searchWidget.style.visibility = "hidden";
             this.searchWidget.placeholder = _("Search for blocks");
 
-            this.helpfulSearchWidget = document.createElement("input");
-            this.helpfulSearchWidget.setAttribute("id", "helpfulSearch");
-            this.helpfulSearchWidget.style.visibility = "hidden";
-            this.helpfulSearchWidget.placeholder = _("Search for blocks");
-            this.helpfulSearchWidget.classList.add("ui-autocomplete");
+            this.searchUI.createSearchUI();
             this.progressBar.style.visibility = "hidden";
             this.paste.style.visibility = "hidden";
 
@@ -640,7 +649,7 @@ class Activity {
                     event.preventDefault();
                     event.stopPropagation();
                     if (this.beginnerMode) return;
-                    if (this.searchController.isHelpfulSearchWidgetOn) {
+                    if (this.searchUI.isHelpfulSearchWidgetOn) {
                         this._hideHelpfulSearchWidget();
                     }
                     if (
@@ -3455,11 +3464,7 @@ class Activity {
         }
 
         this._renderTrashView = () => {
-            if (
-                !activity.blocks ||
-                !activity.blocks.trashStacks ||
-                activity.blocks.trashStacks.length === 0
-            ) {
+            if (!this.blocks || !this.blocks.trashStacks || this.blocks.trashStacks.length === 0) {
                 return;
             }
             const trashList = document.getElementById("trashList");
@@ -3503,13 +3508,17 @@ class Activity {
                 const listItem = document.createElement("div");
                 listItem.classList.add("trash-item");
 
-                const svgData = block.artwork;
-                const encodedData = svgData
-                    ? "data:image/svg+xml;utf8," + encodeURIComponent(svgData)
-                    : "";
+                const preview = this.blocks.trashPreviews[blockId];
+                let imgSrc;
+                if (preview) {
+                    imgSrc = preview;
+                } else {
+                    const svgData = block.artwork;
+                    imgSrc = "data:image/svg+xml;utf8," + encodeURIComponent(svgData);
+                }
 
                 const img = document.createElement("img");
-                img.src = encodedData;
+                img.src = imgSrc;
                 img.alt = "Block Icon";
                 img.classList.add("trash-item-icon");
 
@@ -3519,10 +3528,26 @@ class Activity {
                 listItem.appendChild(textNode);
                 listItem.dataset.blockId = blockId;
 
-                listItem.addEventListener("mouseover", () => listItem.classList.add("hover"));
-                listItem.addEventListener("mouseout", () => listItem.classList.remove("hover"));
+                listItem.addEventListener("mouseover", () => {
+                    listItem.classList.add("hover");
+                });
+                listItem.addEventListener("mouseout", () => {
+                    listItem.classList.remove("hover");
+                });
+
+                img.addEventListener("mouseover", event => {
+                    this._showTrashPreviewPopup(imgSrc, event);
+                });
+                img.addEventListener("mousemove", event => {
+                    this._showTrashPreviewPopup(imgSrc, event);
+                });
+                img.addEventListener("mouseout", () => {
+                    this._hideTrashPreviewPopup();
+                });
+
                 listItem.addEventListener("click", () => {
                     this._restoreTrashById(blockId);
+                    this._hideTrashPreviewPopup();
                     trashView.classList.add("hidden");
                 });
 
@@ -3534,9 +3559,62 @@ class Activity {
 
             const existingView = document.getElementById("trashView");
             if (existingView) {
-                existingView.remove(); // remove from DOM; GC can now collect listeners
+                trashList.replaceChild(trashView, existingView);
+            } else {
+                trashList.appendChild(trashView);
             }
-            trashList.appendChild(trashView);
+        };
+
+        /**
+         * Shows a larger preview popup for trashed items.
+         * @param {string} imgSrc - The source of the image.
+         * @param {MouseEvent} event - The mouse event.
+         * @private
+         */
+        this._showTrashPreviewPopup = (imgSrc, event) => {
+            let popup = document.getElementById("trashPreviewPopup");
+            if (!popup) {
+                popup = document.createElement("div");
+                popup.id = "trashPreviewPopup";
+                popup.classList.add("trash-preview-popup");
+                const img = document.createElement("img");
+                popup.appendChild(img);
+                document.body.appendChild(popup);
+            }
+            const img = popup.firstChild;
+            if (img.src !== imgSrc) {
+                img.src = imgSrc;
+            }
+            popup.style.display = "block";
+
+            // Position next to cursor
+            const xOffset = 20;
+            const yOffset = 20;
+            let x = event.clientX + xOffset;
+            let y = event.clientY + yOffset;
+
+            // Flip if near right edge
+            if (x + 300 > window.innerWidth) {
+                x = event.clientX - 320;
+            }
+            // Flip if near bottom edge
+            if (y + 300 > window.innerHeight) {
+                y = event.clientY - 320;
+            }
+
+            popup.style.left = x + "px";
+            popup.style.top = y + "px";
+        };
+
+        /**
+         * Hides the trash preview popup.
+         * @private
+         */
+        this._hideTrashPreviewPopup = () => {
+            const popup = document.getElementById("trashPreviewPopup");
+            if (popup) {
+                popup.style.display = "none";
+            }
         };
 
         /*
@@ -3653,7 +3731,11 @@ class Activity {
 
                 // If this block is at the top of a stack, push it
                 // onto the trashStacks list.
-                if (myBlock.connections[0] === null) {
+                if (this.blocks.blockList[blk].connections[0] === null) {
+                    const preview = this.blocks.captureStackPreview(blk);
+                    if (preview) {
+                        this.blocks.trashPreviews[blk] = preview;
+                    }
                     this.blocks.trashStacks.push(blk);
                 }
 
@@ -3948,7 +4030,7 @@ class Activity {
          * @param env {specifies environment}
          */
         this.runProject = env => {
-            document.removeEventListener("finishedLoading", this.runProject);
+            pubsub.off("finishedLoading", this.runProject);
 
             const that = this;
             setTimeout(() => {
@@ -4029,7 +4111,7 @@ class Activity {
                     that.keyboardEnableFlag = 1;
                 }
 
-                document.removeEventListener("finishedLoading", __afterLoad);
+                pubsub.off("finishedLoading", __afterLoad);
             };
 
             // Set the flag to zero to disable keyboard
@@ -4067,11 +4149,7 @@ class Activity {
 
             // After we have finished loading the project, clear all
             // to ensure a clean start.
-            if (document.addEventListener) {
-                document.addEventListener("finishedLoading", __afterLoad);
-            } else {
-                document.attachEvent("finishedLoading", __afterLoad);
-            }
+            pubsub.on("finishedLoading", __afterLoad);
 
             if (that.sessionData) {
                 that.doLoadAnimation();
@@ -4200,16 +4278,12 @@ class Activity {
                         that._changeBlockVisibility();
                     }
 
-                    document.removeEventListener("finishedLoading", __functionload);
+                    pubsub.off("finishedLoading", __functionload);
                     that.firstRun = false;
                 }, 1000);
             };
 
-            if (document.addEventListener) {
-                document.addEventListener("finishedLoading", __functionload, false);
-            } else {
-                document.attachEvent("finishedLoading", __functionload);
-            }
+            pubsub.on("finishedLoading", __functionload);
         };
         setupActivityAbcParser(this);
 
@@ -6144,7 +6218,7 @@ class Activity {
                                 that.stage.removeAllEventListeners("trashsignal");
 
                                 const __afterLoad = () => {
-                                    document.removeEventListener("finishedLoading", __afterLoad);
+                                    pubsub.off("finishedLoading", __afterLoad);
                                 };
 
                                 // Wait for the old blocks to be removed.
@@ -6152,11 +6226,7 @@ class Activity {
                                     that.blocks.loadNewBlocks(obj);
                                     that.stage.removeAllEventListeners("trashsignal");
 
-                                    if (document.addEventListener) {
-                                        document.addEventListener("finishedLoading", __afterLoad);
-                                    } else {
-                                        document.attachEvent("finishedLoading", __afterLoad);
-                                    }
+                                    pubsub.on("finishedLoading", __afterLoad);
                                 };
 
                                 that.stage.addEventListener("trashsignal", __listener, false);
@@ -6411,11 +6481,6 @@ class Activity {
 
             // create functionality of 2D drag to select blocks in bulk
             this._create2Ddrag();
-
-            /*
-               document.addEventListener("mousewheel", scrollEvent, false);
-               document.addEventListener("DOMMouseScroll", scrollEvent, false);
-               */
 
             // Named event handler for proper cleanup
             const activity = this;

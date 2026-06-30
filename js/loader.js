@@ -75,7 +75,7 @@ requirejs.config({
             exports: "Block"
         },
         "activity/blocks": {
-            deps: ["activity/block"],
+            deps: ["activity/block", "activity/pubsub"],
             exports: "Blocks"
         },
         "activity/turtle-singer": {
@@ -137,7 +137,8 @@ requirejs.config({
                 "activity/alert-controller",
                 "activity/alert-renderer",
                 "palette/palette-loader",
-                "activity/search-controller"
+                "activity/search-controller",
+                "search-ui"
             ],
             exports: "Activity"
         },
@@ -183,6 +184,7 @@ requirejs.config({
         "activity/alert-renderer": "js/activity/alert-renderer",
         "palette/palette-loader": "js/palette/palette-loader",
         "activity/search-controller": "js/activity/search-controller",
+        "search-ui": "js/search-ui",
         "activity/pubsub": "js/pubsub",
         "easeljs.min": "lib/easeljs.min",
         "tweenjs.min": "lib/tweenjs.min",
@@ -343,6 +345,16 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
         try {
             const savedLanguage = window.localStorage && window.localStorage.languagePreference;
             if (savedLanguage) {
+                if (savedLanguage === "kana" || savedLanguage === "ja-kana") {
+                    window.localStorage.setItem("languagePreference", "ja");
+                    window.localStorage.setItem("kanaPreference", "kana");
+                    return "ja";
+                }
+                if (savedLanguage === "ja-kanji") {
+                    window.localStorage.setItem("languagePreference", "ja");
+                    window.localStorage.setItem("kanaPreference", "kanji");
+                    return "ja";
+                }
                 return savedLanguage.startsWith("ja") ? "ja" : savedLanguage;
             }
         } catch (e) {
@@ -447,6 +459,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                 "tweenjs.min",
                 "utils/platformstyle",
                 "utils/utils",
+                "activity/pubsub",
                 "activity/turtledefs",
                 "activity/block",
                 "activity/blocks",
