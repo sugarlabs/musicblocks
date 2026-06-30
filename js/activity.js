@@ -2466,6 +2466,7 @@ class Activity {
                 console.warn(
                     "Hard Refresh requested: Clearing session data from indexedDB and localStorage"
                 );
+                this._isHardReloading = true;
                 event.preventDefault();
                 event.stopPropagation();
 
@@ -5798,14 +5799,16 @@ class Activity {
             this.addEventListener(window, "beforeunload", () => {
                 // Save synchronously to SESSION* keys so manual reload/F5
                 // still has recoverable data even if async saves are cut short.
-                if (typeof this.__saveLocally === "function") {
-                    this.__saveLocally();
-                }
-                if (
-                    typeof this.saveLocally === "function" &&
-                    this.saveLocally !== this.__saveLocally
-                ) {
-                    this.saveLocally();
+                if (!this._isHardReloading) {
+                    if (typeof this.__saveLocally === "function") {
+                        this.__saveLocally();
+                    }
+                    if (
+                        typeof this.saveLocally === "function" &&
+                        this.saveLocally !== this.__saveLocally
+                    ) {
+                        this.saveLocally();
+                    }
                 }
                 this._stopRenderLoop();
                 if (typeof this._stopAutoSave === "function") {
