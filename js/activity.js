@@ -2685,9 +2685,6 @@ class Activity {
                         }
                         break;
                 }
-            } else if ((event.ctrlKey || event.metaKey) && event.code === "Space" && !disableKeys) {
-                event.preventDefault();
-                this._displayHelpfulSearchDiv();
             } else {
                 if (pasteEl.style.visibility === "visible" && event.keyCode === RETURN) {
                     if (pasteEl.value.length > 0) {
