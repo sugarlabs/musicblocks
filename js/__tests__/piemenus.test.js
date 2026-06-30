@@ -18,19 +18,25 @@ const piemenusPath = path.join(__dirname, "..", "piemenus.js");
 let piemenusContent;
 
 // Mock Globals
-global.docById = jest.fn().mockReturnValue({
+const mockWheelDiv = {
     style: { display: "", opacity: "" },
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
-    getBoundingClientRect: jest.fn().mockReturnValue({ x: 0, y: 0 })
-});
+    getBoundingClientRect: jest.fn().mockReturnValue({ x: 0, y: 0 }),
+    contains: jest.fn().mockReturnValue(false)
+};
+
+global.docById = jest.fn().mockReturnValue(mockWheelDiv);
 global.document = {
-    getElementById: global.docById
+    getElementById: global.docById,
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn()
 };
 global.window = {
     innerWidth: 1024,
     addEventListener: jest.fn(),
-    removeEventListener: jest.fn()
+    removeEventListener: jest.fn(),
+    getComputedStyle: jest.fn(() => ({ cursor: "default" }))
 };
 global.wheelnav = jest.fn().mockImplementation(function (div) {
     const mockWheel = this;
@@ -198,6 +204,68 @@ describe("piemenus behavioral tests", () => {
         // prevPitch+delta = 4+1 = 5. 5 > 4, so deltaOctave = -1.
         // Octave 4 -> 3.
         expect(mockBlock.blocks.setPitchOctave).toHaveBeenCalledWith("mock-id", 3);
+    });
+
+    test("outside click on canvas closes pie menu", () => {
+        // Track the registered mousedown handler
+        let mousedownHandler = null;
+        global.document.addEventListener = jest.fn().mockImplementation((event, handler) => {
+            if (event === "mousedown") {
+                mousedownHandler = handler;
+            }
+        });
+        global.document.removeEventListener = jest.fn();
+
+        // Reset mock state for this test
+        mockWheelDiv.style.display = "";
+        mockWheelDiv.contains = jest.fn().mockReturnValue(false);
+        mockWheelDiv.style.display = "";
+
+        // Open a pie menu to set up activeExitWheel
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+        piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
+
+        expect(global.document.addEventListener).toHaveBeenCalledWith(
+            "mousedown",
+            expect.any(Function)
+        );
+
+        // Simulate clicking outside the wheelDiv on the canvas
+        const mockNavigate = jest.fn();
+        mockBlock._exitWheel.navItems[0].navigateFunction = mockNavigate;
+        mousedownHandler({ target: { closest: jest.fn(() => null) } });
+
+        expect(mockNavigate).toHaveBeenCalled();
+    });
+
+    test("click on interactive wheelnav element does not close menu", () => {
+        let mousedownHandler = null;
+        global.document.addEventListener = jest.fn().mockImplementation((event, handler) => {
+            if (event === "mousedown") {
+                mousedownHandler = handler;
+            }
+        });
+        global.document.removeEventListener = jest.fn();
+
+        mockWheelDiv.style.display = "";
+        mockWheelDiv.contains = jest.fn().mockReturnValue(true);
+        mockWheelDiv.style.display = "";
+
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+        piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
+
+        const mockNavigate = jest.fn();
+        mockBlock._exitWheel.navItems[0].navigateFunction = mockNavigate;
+
+        // Click on a wheelnav slice element
+        const sliceTarget = { closest: jest.fn(() => document.createElement("div")) };
+        sliceTarget.closest.mockReturnValue({ id: "wheelnav-pitch-slice-0" });
+        mousedownHandler({ target: sliceTarget });
+
+        // Menu should NOT close — exit navigateFunction should not be called
+        expect(mockNavigate).not.toHaveBeenCalled();
     });
 
     describe("Block Help Menu", () => {
