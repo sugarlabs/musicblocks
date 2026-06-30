@@ -1287,6 +1287,21 @@ function TemperamentWidget() {
             const recursion = docById("recursion").value;
             const len = that.frequencies.length;
             const ratio1 = input1 / input2;
+            if (
+                !isFinite(input1) ||
+                !isFinite(input2) ||
+                input1 <= 0 ||
+                input2 <= 0 ||
+                !isFinite(ratio1) ||
+                ratio1 <= 0 ||
+                ratio1 >= that.powerBase
+            ) {
+                that.activity.errorMsg(
+                    _("Please enter a valid ratio (e.g. 3:2) within the octave space."),
+                    3000
+                );
+                return;
+            }
             const ratio = [];
             const frequency = [];
             const ratioDifference = [];
@@ -1895,7 +1910,6 @@ function TemperamentWidget() {
                 for (let j = 0; j < t.interval.length; j++) {
                     intervals[j] = t.interval[j];
                     temperamentRatios[j] = t[intervals[j]];
-                    if (typeof temperamentRatios[j] !== "number") continue;
                     temperamentRatios[j] = temperamentRatios[j].toFixed(2);
                 }
                 const ratiosEqual =
