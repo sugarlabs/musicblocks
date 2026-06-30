@@ -229,4 +229,24 @@ describe("EmbeddedGraphicsScheduler", () => {
 
         expect(turtle0.singer.dispatchFactor).toBe(NOTEDIV / 32);
     });
+
+    test("schedule adds 0.1s delay when previous graphics not yet finished", async () => {
+        mockLogo.deps.utils.delayExecution = jest.fn(() => Promise.resolve());
+        turtle0.singer.suppressOutput = false;
+        // Simulate prior note's graphics still in-flight.
+        turtle0.embeddedGraphicsFinished = false;
+        mockLogo.parseArg = jest.fn(() => 5);
+        mockLogo.blockList = [null, { name: "setcolor", connections: [null, 1] }];
+        turtle0.singer.embeddedGraphics = { 9: [1] };
+
+        // delay = 0 on entry; scheduler must add 0.1 → waitTime = 100ms.
+        await scheduler.schedule(0, 0.5, 9, 0);
+
+        expect(mockLogo._timerManager.setGuardedTimeout).toHaveBeenCalledWith(
+            expect.any(Function),
+            100,
+            expect.any(Function)
+        );
+        expect(turtle0.embeddedGraphicsFinished).toBe(true);
+    });
 });
