@@ -3430,11 +3430,7 @@ class Activity {
         }
 
         this._renderTrashView = () => {
-            if (
-                !activity.blocks ||
-                !activity.blocks.trashStacks ||
-                activity.blocks.trashStacks.length === 0
-            ) {
+            if (!this.blocks || !this.blocks.trashStacks || this.blocks.trashStacks.length === 0) {
                 return;
             }
             const trashList = document.getElementById("trashList");
@@ -3478,13 +3474,17 @@ class Activity {
                 const listItem = document.createElement("div");
                 listItem.classList.add("trash-item");
 
-                const svgData = block.artwork;
-                const encodedData = svgData
-                    ? "data:image/svg+xml;utf8," + encodeURIComponent(svgData)
-                    : "";
+                const preview = this.blocks.trashPreviews[blockId];
+                let imgSrc;
+                if (preview) {
+                    imgSrc = preview;
+                } else {
+                    const svgData = block.artwork;
+                    imgSrc = "data:image/svg+xml;utf8," + encodeURIComponent(svgData);
+                }
 
                 const img = document.createElement("img");
-                img.src = encodedData;
+                img.src = imgSrc;
                 img.alt = "Block Icon";
                 img.classList.add("trash-item-icon");
 
@@ -3494,10 +3494,26 @@ class Activity {
                 listItem.appendChild(textNode);
                 listItem.dataset.blockId = blockId;
 
-                listItem.addEventListener("mouseover", () => listItem.classList.add("hover"));
-                listItem.addEventListener("mouseout", () => listItem.classList.remove("hover"));
+                listItem.addEventListener("mouseover", () => {
+                    listItem.classList.add("hover");
+                });
+                listItem.addEventListener("mouseout", () => {
+                    listItem.classList.remove("hover");
+                });
+
+                img.addEventListener("mouseover", event => {
+                    this._showTrashPreviewPopup(imgSrc, event);
+                });
+                img.addEventListener("mousemove", event => {
+                    this._showTrashPreviewPopup(imgSrc, event);
+                });
+                img.addEventListener("mouseout", () => {
+                    this._hideTrashPreviewPopup();
+                });
+
                 listItem.addEventListener("click", () => {
                     this._restoreTrashById(blockId);
+                    this._hideTrashPreviewPopup();
                     trashView.classList.add("hidden");
                 });
 
@@ -3509,9 +3525,62 @@ class Activity {
 
             const existingView = document.getElementById("trashView");
             if (existingView) {
-                existingView.remove(); // remove from DOM; GC can now collect listeners
+                trashList.replaceChild(trashView, existingView);
+            } else {
+                trashList.appendChild(trashView);
             }
-            trashList.appendChild(trashView);
+        };
+
+        /**
+         * Shows a larger preview popup for trashed items.
+         * @param {string} imgSrc - The source of the image.
+         * @param {MouseEvent} event - The mouse event.
+         * @private
+         */
+        this._showTrashPreviewPopup = (imgSrc, event) => {
+            let popup = document.getElementById("trashPreviewPopup");
+            if (!popup) {
+                popup = document.createElement("div");
+                popup.id = "trashPreviewPopup";
+                popup.classList.add("trash-preview-popup");
+                const img = document.createElement("img");
+                popup.appendChild(img);
+                document.body.appendChild(popup);
+            }
+            const img = popup.firstChild;
+            if (img.src !== imgSrc) {
+                img.src = imgSrc;
+            }
+            popup.style.display = "block";
+
+            // Position next to cursor
+            const xOffset = 20;
+            const yOffset = 20;
+            let x = event.clientX + xOffset;
+            let y = event.clientY + yOffset;
+
+            // Flip if near right edge
+            if (x + 300 > window.innerWidth) {
+                x = event.clientX - 320;
+            }
+            // Flip if near bottom edge
+            if (y + 300 > window.innerHeight) {
+                y = event.clientY - 320;
+            }
+
+            popup.style.left = x + "px";
+            popup.style.top = y + "px";
+        };
+
+        /**
+         * Hides the trash preview popup.
+         * @private
+         */
+        this._hideTrashPreviewPopup = () => {
+            const popup = document.getElementById("trashPreviewPopup");
+            if (popup) {
+                popup.style.display = "none";
+            }
         };
 
         /*
@@ -3628,7 +3697,11 @@ class Activity {
 
                 // If this block is at the top of a stack, push it
                 // onto the trashStacks list.
-                if (myBlock.connections[0] === null) {
+                if (this.blocks.blockList[blk].connections[0] === null) {
+                    const preview = this.blocks.captureStackPreview(blk);
+                    if (preview) {
+                        this.blocks.trashPreviews[blk] = preview;
+                    }
                     this.blocks.trashStacks.push(blk);
                 }
 

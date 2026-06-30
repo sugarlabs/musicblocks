@@ -236,6 +236,8 @@ class Blocks {
 
         /** We keep a list of stacks in the trash. */
         this.trashStacks = [];
+        /** We keep a list of previews of stacks in the trash. */
+        this.trashPreviews = {};
 
         /** When true, checkBounds() calls are suppressed until
          *  _endDeferCheckBounds() runs one final check. */
@@ -7244,6 +7246,102 @@ class Blocks {
         };
 
         /**
+         * Capture a preview of the stack of blocks.
+         * @param {number} topBlockId - The ID of the top block of the stack.
+         * @returns {string|null} - Data URL of the stack preview or null.
+         */
+        this.captureStackPreview = topBlockId => {
+            this.findDragGroup(topBlockId);
+            const blocks = this.dragGroup.map(id => this.blockList[id]);
+            if (blocks.length === 0) return null;
+
+            // Find bounds of the entire stack
+            let minX = Infinity;
+            let minY = Infinity;
+            let maxX = -Infinity;
+            let maxY = -Infinity;
+
+            blocks.forEach(block => {
+                if (block.container) {
+                    // Use block.width/height if available, otherwise getBounds
+                    let b = { x: 0, y: 0, width: block.width || 0, height: block.height || 0 };
+                    if (b.width === 0 || b.height === 0) {
+                        const actualBounds = block.container.getBounds();
+                        if (actualBounds) {
+                            b = actualBounds;
+                        }
+                    }
+
+                    const x = block.container.x + b.x * (block.container.scaleX || 1);
+                    const y = block.container.y + b.y * (block.container.scaleY || 1);
+                    const w = b.width * (block.container.scaleX || 1);
+                    const h = b.height * (block.container.scaleY || 1);
+
+                    minX = Math.min(minX, x);
+                    minY = Math.min(minY, y);
+                    maxX = Math.max(maxX, x + w);
+                    maxY = Math.max(maxY, y + h);
+                }
+            });
+
+            if (minX === Infinity || maxX === -Infinity) return null;
+
+            // Add padding for better look
+            const padding = 20;
+            minX -= padding;
+            minY -= padding;
+            maxX += padding;
+            maxY += padding;
+
+            const width = maxX - minX;
+            const height = maxY - minY;
+
+            // Limit preview size to keep memory usage reasonable
+            const MAX_PREVIEW_WIDTH = 400;
+            const MAX_PREVIEW_HEIGHT = 400;
+            let scale = 1;
+            if (width > MAX_PREVIEW_WIDTH || height > MAX_PREVIEW_HEIGHT) {
+                scale = Math.min(MAX_PREVIEW_WIDTH / width, MAX_PREVIEW_HEIGHT / height);
+            }
+
+            const canvas = document.createElement("canvas");
+            canvas.width = Math.max(1, width * scale);
+            canvas.height = Math.max(1, height * scale);
+            const ctx = canvas.getContext("2d");
+
+            // Fill background to ensure visibility
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.scale(scale, scale);
+
+            blocks.forEach(block => {
+                if (block.container) {
+                    ctx.save();
+                    ctx.translate(block.container.x - minX, block.container.y - minY);
+                    ctx.scale(block.container.scaleX || 1, block.container.scaleY || 1);
+
+                    // Temporarily uncache to ensure all children (text, etc.) are drawn correctly
+                    const wasCached = !!block.container.bitmapCache;
+                    if (wasCached) {
+                        block.container.uncache();
+                    }
+
+                    block.container.draw(ctx);
+
+                    // Re-cache if it was cached (though sendStackToTrash will uncache it anyway)
+                    if (wasCached) {
+                        block.container.cache(0, 0, block.width, block.height);
+                    }
+
+                    ctx.restore();
+                }
+            });
+
+            return canvas.toDataURL("image/png");
+        };
+
+        /**
          * Send a stack of blocks to the trash.
          * @param - myBlock
          * @public
@@ -7259,6 +7357,12 @@ class Blocks {
 
             const thisBlock = myBlock.blockIndex;
 
+            /** Capture a preview of the stack before hiding/uncaching. */
+            const preview = this.captureStackPreview(thisBlock);
+            if (preview) {
+                this.trashPreviews[thisBlock] = preview;
+            }
+
             /** Add this block to the list of blocks in the trash so we can undo this action. */
             this.trashStacks.push(thisBlock);
 
@@ -7266,7 +7370,10 @@ class Blocks {
             // Keep the 100 most recent trashed stacks.
             const MAX_TRASH_UNDO = 100;
             if (this.trashStacks.length > MAX_TRASH_UNDO) {
-                this.trashStacks = this.trashStacks.slice(-MAX_TRASH_UNDO);
+                const removed = this.trashStacks.shift();
+                if (removed !== undefined && this.trashPreviews[removed]) {
+                    delete this.trashPreviews[removed];
+                }
             }
 
             /** Disconnect block. */
