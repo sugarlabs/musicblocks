@@ -1896,6 +1896,25 @@ class Singer {
                     ) {
                         const audioElapsed = Tone.now() - activity.logo.firstNoteAudioTime;
                         future = Math.max(tur.singer.previousTurtleTime - audioElapsed, 0);
+
+                        if (activity.logo._perfSyncData) {
+                            tur.singer._perfEventId = ++activity.logo._perfSyncData._eventCounter;
+                            activity.logo._perfSyncData._turtleEventIds[turtle] =
+                                tur.singer._perfEventId;
+                            activity.logo._perfSyncData.notes.push({
+                                eventId: tur.singer._perfEventId,
+                                turtle: turtle,
+                                noteIndex: tur.singer.tallyNotes,
+                                perfNow: performance.now(),
+                                toneNow: Tone.now(),
+                                turtleTime: tur.singer.turtleTime,
+                                previousTurtleTime: tur.singer.previousTurtleTime,
+                                future: future,
+                                duration: bpmFactor / duration,
+                                elapsedTime: elapsedTime,
+                                turtleLag: turtleLag
+                            });
+                        }
                     }
 
                     tur.singer.turtleTime += bpmFactor / duration;
@@ -2531,6 +2550,23 @@ class Singer {
                     } else {
                         activity.logo.dispatchTurtleSignals(turtle, beatValue, blk, 0);
                     }
+                }
+
+                if (activity.logo._perfSyncData) {
+                    var _perfGfxCount = tur.singer.embeddedGraphics[blk]
+                        ? tur.singer.embeddedGraphics[blk].length
+                        : 0;
+                    var _perfGfxStart = performance.now();
+                }
+
+                if (activity.logo._perfSyncData && typeof _perfGfxCount !== "undefined") {
+                    activity.logo._perfSyncData.graphics.push({
+                        eventId: tur.singer._perfEventId || 0,
+                        turtle: turtle,
+                        noteIndex: tur.singer.tallyNotes || 0,
+                        graphicsCommandCount: _perfGfxCount,
+                        dispatchTimeMs: performance.now() - _perfGfxStart
+                    });
                 }
 
                 // After the note plays, clear the embedded graphics and notes queue.
