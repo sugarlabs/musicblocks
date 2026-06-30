@@ -39,9 +39,8 @@ function makeProtoBlock(name, label, deprecated = false, extraSearchTerms = unde
     };
 }
 
-function makeSearchUI() {
+function makeSearchUI({ visible = false, helpfulVisible = false } = {}) {
     return {
-        helpfulSearchDiv: null,
         show: jest.fn(),
         hide: jest.fn(),
         focusInput: jest.fn(),
@@ -57,7 +56,14 @@ function makeSearchUI() {
         })),
         positionHelpfulSearchDiv: jest.fn(),
         removeHelpfulSearchDiv: jest.fn(),
-        hideHelpfulSearchDisplay: jest.fn()
+        hideHelpfulSearchDisplay: jest.fn(),
+        isVisible: jest.fn(() => visible),
+        isHelpfulSearchVisible: jest.fn(() => helpfulVisible),
+        get isHelpfulSearchWidgetOn() {
+            return this.isHelpfulSearchVisible();
+        },
+        isHelpfulSearchDivMounted: jest.fn(() => false),
+        containsMainSearchTarget: jest.fn(() => false)
     };
 }
 
@@ -125,7 +131,6 @@ describe("setupSearchController", () => {
         const sc = activity.searchController;
         expect(sc.searchSuggestions).toEqual([]);
         expect(sc._searchCache).toEqual({});
-        expect(sc.isHelpfulSearchWidgetOn).toBe(false);
         expect(sc.deprecatedBlockNames).toEqual([]);
     });
 
@@ -301,11 +306,10 @@ describe("SearchController.hideSearchWidget", () => {
 // ---------------------------------------------------------------------------
 
 describe("SearchController.showSearchWidget", () => {
-    test("calls hideSearchWidget when widget is already visible", () => {
+    test("calls hideSearchWidget when searchUI.isVisible() returns true", () => {
         const activity = makeActivity();
-        const ui = makeSearchUI();
+        const ui = makeSearchUI({ visible: true });
         setupSearchController(activity, ui);
-        activity.searchWidget.style.visibility = "visible";
 
         const hideSpy = jest.spyOn(activity.searchController, "hideSearchWidget");
         activity.searchController.showSearchWidget();
@@ -313,12 +317,11 @@ describe("SearchController.showSearchWidget", () => {
         expect(hideSpy).toHaveBeenCalled();
     });
 
-    test("calls searchUI.show() when widget is hidden", () => {
+    test("calls searchUI.show() when searchUI.isVisible() returns false", () => {
         jest.useFakeTimers();
         const activity = makeActivity();
-        const ui = makeSearchUI();
+        const ui = makeSearchUI({ visible: false });
         setupSearchController(activity, ui);
-        activity.searchWidget.style.visibility = "hidden";
 
         activity.searchController.showSearchWidget();
 
@@ -329,8 +332,7 @@ describe("SearchController.showSearchWidget", () => {
     test("calls prepSearchWidget when showing", () => {
         jest.useFakeTimers();
         const activity = makeActivity();
-        const ui = makeSearchUI();
-        setupSearchController(activity, ui);
+        setupSearchController(activity, makeSearchUI({ visible: false }));
         const prepSpy = jest.spyOn(activity.searchController, "prepSearchWidget");
 
         activity.searchController.showSearchWidget();
@@ -342,7 +344,7 @@ describe("SearchController.showSearchWidget", () => {
     test("registers a mousedown close listener on document", () => {
         jest.useFakeTimers();
         const activity = makeActivity();
-        setupSearchController(activity, makeSearchUI());
+        setupSearchController(activity, makeSearchUI({ visible: false }));
 
         activity.searchController.showSearchWidget();
 
@@ -354,10 +356,47 @@ describe("SearchController.showSearchWidget", () => {
         jest.useRealTimers();
     });
 
-    test("hides helpful search div first if it is open", () => {
+    test("close listener calls hideSearchWidget when containsMainSearchTarget returns false", () => {
+        jest.useFakeTimers();
         const activity = makeActivity();
-        const ui = makeSearchUI();
-        ui.helpfulSearchDiv = { style: { display: "block" } };
+        const ui = makeSearchUI({ visible: false });
+        ui.containsMainSearchTarget = jest.fn(() => false);
+        setupSearchController(activity, ui);
+
+        activity.searchController.showSearchWidget();
+
+        const closeListener = activity.addEventListener.mock.calls.find(
+            c => c[1] === "mousedown"
+        )[2];
+        const hideSpy = jest.spyOn(activity.searchController, "hideSearchWidget");
+        closeListener({ target: document.body });
+
+        expect(hideSpy).toHaveBeenCalled();
+        jest.useRealTimers();
+    });
+
+    test("close listener does NOT call hideSearchWidget when containsMainSearchTarget returns true", () => {
+        jest.useFakeTimers();
+        const activity = makeActivity();
+        const ui = makeSearchUI({ visible: false });
+        ui.containsMainSearchTarget = jest.fn(() => true);
+        setupSearchController(activity, ui);
+
+        activity.searchController.showSearchWidget();
+
+        const closeListener = activity.addEventListener.mock.calls.find(
+            c => c[1] === "mousedown"
+        )[2];
+        const hideSpy = jest.spyOn(activity.searchController, "hideSearchWidget");
+        closeListener({ target: document.body });
+
+        expect(hideSpy).not.toHaveBeenCalled();
+        jest.useRealTimers();
+    });
+
+    test("calls _hideHelpfulSearchWidget first when searchUI.isHelpfulSearchVisible() is true", () => {
+        const activity = makeActivity();
+        const ui = makeSearchUI({ helpfulVisible: true });
         setupSearchController(activity, ui);
 
         const hideSpy = jest.spyOn(activity.searchController, "_hideHelpfulSearchWidget");
@@ -526,21 +565,10 @@ describe("SearchController.setHelpfulSearchDiv", () => {
 // ---------------------------------------------------------------------------
 
 describe("SearchController._displayHelpfulSearchDiv", () => {
-    beforeEach(() => {
-        document.getElementById = jest.fn(id => {
-            if (id === "helpfulSearchDiv") return { style: {} };
-            return null;
-        });
-    });
-
-    afterEach(() => {
-        jest.restoreAllMocks();
-    });
-
     test("calls searchUI.positionHelpfulSearchDiv()", () => {
         const activity = makeActivity();
-        const ui = makeSearchUI();
-        ui.helpfulSearchDiv = { style: { display: "block" } };
+        const ui = makeSearchUI({ helpfulVisible: true });
+        ui.isHelpfulSearchDivMounted = jest.fn(() => true);
         setupSearchController(activity, ui);
 
         activity.searchController._displayHelpfulSearchDiv();
@@ -548,15 +576,28 @@ describe("SearchController._displayHelpfulSearchDiv", () => {
         expect(ui.positionHelpfulSearchDiv).toHaveBeenCalled();
     });
 
-    test("sets isHelpfulSearchWidgetOn to true", () => {
+    test("calls setHelpfulSearchDiv when overlay is not mounted", () => {
         const activity = makeActivity();
-        const ui = makeSearchUI();
-        ui.helpfulSearchDiv = { style: { display: "block" } };
+        const ui = makeSearchUI({ helpfulVisible: true });
+        ui.isHelpfulSearchDivMounted = jest.fn(() => false);
         setupSearchController(activity, ui);
 
+        const setSpy = jest.spyOn(activity.searchController, "setHelpfulSearchDiv");
         activity.searchController._displayHelpfulSearchDiv();
 
-        expect(activity.searchController.isHelpfulSearchWidgetOn).toBe(true);
+        expect(setSpy).toHaveBeenCalled();
+    });
+
+    test("does not call setHelpfulSearchDiv when overlay is already mounted", () => {
+        const activity = makeActivity();
+        const ui = makeSearchUI({ helpfulVisible: true });
+        ui.isHelpfulSearchDivMounted = jest.fn(() => true);
+        setupSearchController(activity, ui);
+
+        const setSpy = jest.spyOn(activity.searchController, "setHelpfulSearchDiv");
+        activity.searchController._displayHelpfulSearchDiv();
+
+        expect(setSpy).not.toHaveBeenCalled();
     });
 });
 
@@ -590,10 +631,9 @@ describe("SearchController._hideHelpfulSearchWidget", () => {
 // ---------------------------------------------------------------------------
 
 describe("SearchController.showHelpfulSearchWidget", () => {
-    test("does nothing when helpfulSearchDiv is null", () => {
+    test("does nothing when searchUI.isHelpfulSearchVisible() returns false", () => {
         const activity = makeActivity();
-        const ui = makeSearchUI();
-        ui.helpfulSearchDiv = null;
+        const ui = makeSearchUI({ helpfulVisible: false });
         setupSearchController(activity, ui);
 
         activity.searchController.showHelpfulSearchWidget();
@@ -601,22 +641,10 @@ describe("SearchController.showHelpfulSearchWidget", () => {
         expect(ui.showHelpfulInput).not.toHaveBeenCalled();
     });
 
-    test("does nothing when helpfulSearchDiv is not display:block", () => {
-        const activity = makeActivity();
-        const ui = makeSearchUI();
-        ui.helpfulSearchDiv = { style: { display: "none" } };
-        setupSearchController(activity, ui);
-
-        activity.searchController.showHelpfulSearchWidget();
-
-        expect(ui.showHelpfulInput).not.toHaveBeenCalled();
-    });
-
-    test("calls searchUI.showHelpfulInput() when div is visible", () => {
+    test("calls searchUI.showHelpfulInput() when isHelpfulSearchVisible() returns true", () => {
         jest.useFakeTimers();
         const activity = makeActivity();
-        const ui = makeSearchUI();
-        ui.helpfulSearchDiv = { style: { display: "block" } };
+        const ui = makeSearchUI({ helpfulVisible: true });
         setupSearchController(activity, ui);
 
         activity.searchController.showHelpfulSearchWidget();
@@ -628,8 +656,7 @@ describe("SearchController.showHelpfulSearchWidget", () => {
     test("schedules focusHelpfulInput and doHelpfulSearch", () => {
         jest.useFakeTimers();
         const activity = makeActivity();
-        const ui = makeSearchUI();
-        ui.helpfulSearchDiv = { style: { display: "block" } };
+        const ui = makeSearchUI({ helpfulVisible: true });
         setupSearchController(activity, ui);
 
         const doSpy = jest

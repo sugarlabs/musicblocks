@@ -646,7 +646,7 @@ class Activity {
                     event.preventDefault();
                     event.stopPropagation();
                     if (this.beginnerMode) return;
-                    if (this.searchController.isHelpfulSearchWidgetOn) {
+                    if (this.searchUI.isHelpfulSearchWidgetOn) {
                         this._hideHelpfulSearchWidget();
                     }
                     if (

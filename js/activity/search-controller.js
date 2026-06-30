@@ -29,7 +29,11 @@
 class SearchController {
     /**
      * @param {object} activity  - The Activity instance.
-     * @param {object} searchUI  - The SearchUI instance.
+     * @param {object} searchUI  - A SearchUI instance that owns all DOM and
+     *   jQuery operations for the search feature.  SearchController calls
+     *   into searchUI for rendering and queries it (via isVisible(),
+     *   isHelpfulSearchVisible(), etc.) for current UI state, keeping DOM
+     *   knowledge out of this class.
      */
     constructor(activity, searchUI) {
         this.activity = activity;
@@ -38,7 +42,6 @@ class SearchController {
         this.searchSuggestions = [];
         this._searchCache = {};
         this._searchCloseListener = null;
-        this.isHelpfulSearchWidgetOn = false;
         this.searchBlockPosition = [100, 100];
         this.deprecatedBlockNames = [];
     }
@@ -218,10 +221,10 @@ class SearchController {
      */
     showSearchWidget() {
         const activity = this.activity;
-        if (this.searchUI.helpfulSearchDiv) {
+        if (this.searchUI.isHelpfulSearchVisible()) {
             this._hideHelpfulSearchWidget();
         }
-        if (activity.searchWidget.style.visibility === "visible") {
+        if (this.searchUI.isVisible()) {
             this.hideSearchWidget();
         } else {
             this.searchUI.show();
@@ -231,25 +234,7 @@ class SearchController {
 
             const that = this;
             const closeListener = e => {
-                if (
-                    document.getElementById("search").style.visibility === "visible" &&
-                    (e.target === document.getElementById("search") ||
-                        document.getElementById("search").contains(e.target))
-                ) {
-                    //do nothing when clicked in the input field
-                } else if (
-                    document.getElementById("ui-id-1") &&
-                    document.getElementById("ui-id-1").style.display === "block" &&
-                    (e.target === document.getElementById("ui-id-1") ||
-                        document.getElementById("ui-id-1").contains(e.target))
-                ) {
-                    //do nothing when clicked on the menu
-                } else if (
-                    document.querySelector("#palette tbody tr") &&
-                    document.querySelector("#palette tbody tr").contains(e.target)
-                ) {
-                    //do nothing when clicked on the search row
-                } else {
+                if (!that.searchUI.containsMainSearchTarget(e.target)) {
                     that.hideSearchWidget();
                 }
             };
@@ -376,12 +361,11 @@ class SearchController {
      * Creates the overlay first if it doesn't already exist.
      */
     _displayHelpfulSearchDiv() {
-        if (!document.getElementById("helpfulSearchDiv")) {
+        if (!this.searchUI.isHelpfulSearchDivMounted()) {
             this.setHelpfulSearchDiv();
         }
         this.searchUI.positionHelpfulSearchDiv();
         this.showHelpfulSearchWidget();
-        this.isHelpfulSearchWidgetOn = true;
     }
 
     /**
@@ -397,10 +381,7 @@ class SearchController {
      * doHelpfulSearch after a short delay (to allow layout to settle).
      */
     showHelpfulSearchWidget() {
-        if (!this.searchUI.helpfulSearchDiv) {
-            return;
-        }
-        if (this.searchUI.helpfulSearchDiv.style.display !== "block") {
+        if (!this.searchUI.isHelpfulSearchVisible()) {
             return;
         }
         this.searchUI.showHelpfulInput();

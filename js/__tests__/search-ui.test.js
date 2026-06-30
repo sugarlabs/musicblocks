@@ -586,3 +586,130 @@ describe("SearchUI.destroy", () => {
         expect(() => ui.destroy()).not.toThrow();
     });
 });
+
+// ---------------------------------------------------------------------------
+// State queries
+// ---------------------------------------------------------------------------
+
+describe("SearchUI.isVisible", () => {
+    test("returns true when searchWidget visibility is 'visible'", () => {
+        const activity = makeActivity();
+        activity.searchWidget.style.visibility = "visible";
+        const ui = new SearchUI(activity);
+        expect(ui.isVisible()).toBe(true);
+    });
+
+    test("returns false when searchWidget visibility is 'hidden'", () => {
+        const activity = makeActivity();
+        activity.searchWidget.style.visibility = "hidden";
+        const ui = new SearchUI(activity);
+        expect(ui.isVisible()).toBe(false);
+    });
+
+    test("returns false when searchWidget is null", () => {
+        const activity = makeActivity();
+        activity.searchWidget = null;
+        const ui = new SearchUI(activity);
+        expect(ui.isVisible()).toBe(false);
+    });
+});
+
+describe("SearchUI.isHelpfulSearchVisible", () => {
+    test("returns true when helpfulSearchDiv is set and display is block", () => {
+        const ui = new SearchUI(makeActivity());
+        ui.helpfulSearchDiv = { style: { display: "block" } };
+        expect(ui.isHelpfulSearchVisible()).toBe(true);
+    });
+
+    test("returns false when helpfulSearchDiv is null", () => {
+        const ui = new SearchUI(makeActivity());
+        ui.helpfulSearchDiv = null;
+        expect(ui.isHelpfulSearchVisible()).toBe(false);
+    });
+
+    test("returns false when helpfulSearchDiv display is not block", () => {
+        const ui = new SearchUI(makeActivity());
+        ui.helpfulSearchDiv = { style: { display: "none" } };
+        expect(ui.isHelpfulSearchVisible()).toBe(false);
+    });
+});
+
+describe("SearchUI.isHelpfulSearchWidgetOn", () => {
+    test("returns the same value as isHelpfulSearchVisible()", () => {
+        const ui = new SearchUI(makeActivity());
+        ui.helpfulSearchDiv = { style: { display: "block" } };
+        expect(ui.isHelpfulSearchWidgetOn).toBe(ui.isHelpfulSearchVisible());
+    });
+});
+
+describe("SearchUI.isHelpfulSearchDivMounted", () => {
+    test("returns true when #helpfulSearchDiv exists in the DOM", () => {
+        document.getElementById = jest.fn(id =>
+            id === "helpfulSearchDiv" ? { id: "helpfulSearchDiv" } : null
+        );
+        const ui = new SearchUI(makeActivity());
+        expect(ui.isHelpfulSearchDivMounted()).toBe(true);
+        jest.restoreAllMocks();
+    });
+
+    test("returns false when #helpfulSearchDiv is absent", () => {
+        document.getElementById = jest.fn(() => null);
+        const ui = new SearchUI(makeActivity());
+        expect(ui.isHelpfulSearchDivMounted()).toBe(false);
+        jest.restoreAllMocks();
+    });
+});
+
+describe("SearchUI.containsMainSearchTarget", () => {
+    let searchEl, menuEl;
+
+    beforeEach(() => {
+        searchEl = {
+            style: { visibility: "visible" },
+            contains: jest.fn(() => false)
+        };
+        menuEl = {
+            style: { display: "block" },
+            contains: jest.fn(() => false)
+        };
+        document.getElementById = jest.fn(id => {
+            if (id === "search") return searchEl;
+            if (id === "ui-id-1") return menuEl;
+            return null;
+        });
+        document.querySelector = jest.fn(() => null);
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    test("returns true when target is the search input itself", () => {
+        const ui = new SearchUI(makeActivity());
+        expect(ui.containsMainSearchTarget(searchEl)).toBe(true);
+    });
+
+    test("returns true when target is inside the autocomplete menu", () => {
+        const target = {};
+        menuEl.contains = jest.fn(t => t === target);
+        const ui = new SearchUI(makeActivity());
+        expect(ui.containsMainSearchTarget(target)).toBe(true);
+    });
+
+    test("returns true when target is inside the palette search row", () => {
+        const target = {};
+        const paletteRow = { contains: jest.fn(t => t === target) };
+        document.querySelector = jest.fn(() => paletteRow);
+        searchEl.style.visibility = "hidden";
+        menuEl.style.display = "none";
+        const ui = new SearchUI(makeActivity());
+        expect(ui.containsMainSearchTarget(target)).toBe(true);
+    });
+
+    test("returns false for an unrelated target", () => {
+        searchEl.style.visibility = "hidden";
+        menuEl.style.display = "none";
+        const ui = new SearchUI(makeActivity());
+        expect(ui.containsMainSearchTarget({})).toBe(false);
+    });
+});

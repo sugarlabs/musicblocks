@@ -38,6 +38,79 @@ class SearchUI {
     }
 
     // -----------------------------------------------------------------------
+    // State queries — let the controller ask SearchUI about UI state
+    // instead of reading DOM properties directly
+    // -----------------------------------------------------------------------
+
+    /**
+     * Returns true when the main search input is currently visible.
+     * @returns {boolean}
+     */
+    isVisible() {
+        return !!(
+            this.activity.searchWidget && this.activity.searchWidget.style.visibility === "visible"
+        );
+    }
+
+    /**
+     * Returns true when helpfulSearchDiv exists and is shown (display:block).
+     * This is the canonical source of truth for the helpful-search open state;
+     * it replaces the `isHelpfulSearchWidgetOn` flag that previously lived in
+     * SearchController.
+     * @returns {boolean}
+     */
+    isHelpfulSearchVisible() {
+        return !!(this.helpfulSearchDiv && this.helpfulSearchDiv.style.display === "block");
+    }
+
+    /**
+     * Alias for isHelpfulSearchVisible() so callers that previously read
+     * `searchController.isHelpfulSearchWidgetOn` can switch to
+     * `searchUI.isHelpfulSearchWidgetOn` without a method-call change.
+     * @returns {boolean}
+     */
+    get isHelpfulSearchWidgetOn() {
+        return this.isHelpfulSearchVisible();
+    }
+
+    /**
+     * Returns true when #helpfulSearchDiv is present in the live DOM.
+     * @returns {boolean}
+     */
+    isHelpfulSearchDivMounted() {
+        return !!document.getElementById("helpfulSearchDiv");
+    }
+
+    /**
+     * Returns true when `target` is inside the main search input or its
+     * autocomplete dropdown, or on the palette search row.  Used by the
+     * document mousedown close-listener in SearchController to decide
+     * whether a click should close the widget.
+     *
+     * @param {EventTarget} target
+     * @returns {boolean}
+     */
+    containsMainSearchTarget(target) {
+        const search = document.getElementById("search");
+        if (
+            search &&
+            search.style.visibility === "visible" &&
+            (target === search || search.contains(target))
+        ) {
+            return true;
+        }
+        const menu = document.getElementById("ui-id-1");
+        if (menu && menu.style.display === "block" && (target === menu || menu.contains(target))) {
+            return true;
+        }
+        const paletteRow = document.querySelector("#palette tbody tr");
+        if (paletteRow && paletteRow.contains(target)) {
+            return true;
+        }
+        return false;
+    }
+
+    // -----------------------------------------------------------------------
     // Public API (as specified in the PR)
     // -----------------------------------------------------------------------
 
