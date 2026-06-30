@@ -112,6 +112,28 @@ class SessionStorageManager {
             return null;
         }
     }
+
+    /**
+     * Clears all session data from IndexedDB.
+     * @returns {Promise<void>}
+     */
+    async clearAllSessions() {
+        try {
+            const db = await this.init();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([this.storeName], "readwrite");
+                const store = transaction.objectStore(this.storeName);
+
+                const request = store.clear();
+
+                request.onsuccess = () => resolve();
+                request.onerror = event => reject(event.target.error);
+            });
+        } catch (error) {
+            console.error("[SessionStorageManager] Error clearing sessions:", error);
+            throw error;
+        }
+    }
 }
 
 if (typeof module !== "undefined" && module.exports) {

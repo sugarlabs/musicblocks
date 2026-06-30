@@ -2457,6 +2457,38 @@ class Activity {
          * Handles keyboard shortcuts in MB
          */
         this.__keyPressed = event => {
+            // Check for Ctrl+Shift+R (Hard Refresh) to clear session data
+            if (
+                event.ctrlKey &&
+                event.shiftKey &&
+                (event.key === "r" || event.key === "R" || event.keyCode === 82)
+            ) {
+                console.warn(
+                    "Hard Refresh requested: Clearing session data from indexedDB and localStorage"
+                );
+                event.preventDefault();
+                event.stopPropagation();
+
+                const clearAndReload = () => {
+                    let p = this.storage ? this.storage.currentProject : undefined;
+                    if (p && this.storage) {
+                        this.storage.removeItem("SESSION" + p);
+                        this.storage.removeItem("SESSION_TIMESTAMP" + p);
+                    }
+                    window.location.reload(true);
+                };
+
+                if (this.sessionStorageManager) {
+                    this.sessionStorageManager
+                        .clearAllSessions()
+                        .then(clearAndReload)
+                        .catch(clearAndReload);
+                } else {
+                    clearAndReload();
+                }
+                return false;
+            }
+
             // First, check if the pitch slider is open
             if (window.widgetWindows.isOpen("slider") === true) {
                 // If the event is an arrow key, let the PitchSlider handle it

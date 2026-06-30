@@ -139,4 +139,27 @@ describe("SessionStorageManager", () => {
         );
         consoleSpy.mockRestore();
     });
+
+    test("clearAllSessions successfully clears the database", async () => {
+        const key = "SESSIONToClear";
+        await sessionManager.saveSession(key, "data");
+
+        await sessionManager.clearAllSessions();
+
+        const loaded = await sessionManager.loadSession(key);
+        expect(loaded).toBeNull();
+    });
+
+    test("clearAllSessions catches and rethrows errors", async () => {
+        jest.spyOn(sessionManager, "init").mockRejectedValue(new Error("Init failed"));
+        const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+        await expect(sessionManager.clearAllSessions()).rejects.toThrow("Init failed");
+
+        expect(consoleSpy).toHaveBeenCalledWith(
+            "[SessionStorageManager] Error clearing sessions:",
+            expect.any(Error)
+        );
+        consoleSpy.mockRestore();
+    });
 });
