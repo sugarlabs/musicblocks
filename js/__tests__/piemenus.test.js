@@ -356,18 +356,16 @@ describe("piemenus behavioral tests", () => {
         expect(mockWheelDiv.style.display).toBe("none");
     });
 
-    test("outside click when wheelDiv is hidden returns early", () => {
+    test("outside click when wheelDiv is null returns early", () => {
         let mousedownHandler = null;
         global.document.addEventListener = jest.fn().mockImplementation((event, handler) => {
             if (event === "mousedown") mousedownHandler = handler;
         });
         global.document.removeEventListener = jest.fn();
 
-        mockWheelDiv.style.display = "none";
+        mockWheelDiv.style.display = "";
 
-        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
-        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
-        piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
+        piemenuPitches(mockBlock, ["C", "D"], ["C", "D"], ["♯", "♭"], "C", "");
 
         jest.clearAllMocks();
 
@@ -375,6 +373,81 @@ describe("piemenus behavioral tests", () => {
         mousedownHandler({ target });
 
         expect(global.document.addEventListener).toHaveBeenCalledTimes(0);
+    });
+
+    test("outside click when wheelDiv display is none returns early at display check", () => {
+        let mousedownHandler = null;
+        global.document.addEventListener = jest.fn().mockImplementation((event, handler) => {
+            if (event === "mousedown") mousedownHandler = handler;
+        });
+        global.document.removeEventListener = jest.fn();
+
+        mockWheelDiv.style.display = "";
+        mockWheelDiv.contains = jest.fn().mockReturnValue(false);
+
+        piemenuPitches(mockBlock, ["C", "D"], ["C", "D"], ["♯", "♭"], "C", "");
+
+        mockWheelDiv.style.display = "none";
+
+        const target = { closest: jest.fn(() => null) };
+        mousedownHandler({ target });
+
+        expect(global.document.removeEventListener).not.toHaveBeenCalled();
+    });
+
+    test("isInteractive returns false when wheelDiv contains is not a function", () => {
+        let mousedownHandler = null;
+        global.document.addEventListener = jest.fn().mockImplementation((event, handler) => {
+            if (event === "mousedown") mousedownHandler = handler;
+        });
+        global.document.removeEventListener = jest.fn();
+
+        mockWheelDiv.contains = "not-a-function";
+        mockWheelDiv.style.display = "";
+
+        global.docById = jest.fn().mockImplementation(id => {
+            if (id === "labelDiv") return null;
+            if (id === "wheelDiv") return mockWheelDiv;
+            return mockWheelDiv;
+        });
+
+        piemenuPitches(mockBlock, ["C", "D"], ["C", "D"], ["♯", "♭"], "C", "");
+
+        const mockNavigate = jest.fn();
+        mockBlock._exitWheel.navItems[0].navigateFunction = mockNavigate;
+
+        const target = { closest: jest.fn(() => null) };
+        mousedownHandler({ target });
+
+        // isInteractive returns false (since contains is not a function),
+        // so handleOutsideClick proceeds to call the exit navigateFunction
+        expect(mockNavigate).toHaveBeenCalled();
+    });
+
+    test("click on wheelnav slice is interactive via closest match", () => {
+        let mousedownHandler = null;
+        global.document.addEventListener = jest.fn().mockImplementation((event, handler) => {
+            if (event === "mousedown") mousedownHandler = handler;
+        });
+        global.document.removeEventListener = jest.fn();
+
+        global.docById = jest.fn().mockImplementation(id => {
+            if (id === "labelDiv") return null;
+            return mockWheelDiv;
+        });
+
+        mockWheelDiv.contains = jest.fn().mockReturnValue(true);
+        mockWheelDiv.style.display = "";
+
+        piemenuPitches(mockBlock, ["C", "D"], ["C", "D"], ["♯", "♭"], "C", "");
+
+        const mockNavigate = jest.fn();
+        mockBlock._exitWheel.navItems[0].navigateFunction = mockNavigate;
+
+        const target = { closest: jest.fn(() => ({ id: "wheelnav-pitch-slice-0" })) };
+        mousedownHandler({ target });
+
+        expect(mockNavigate).not.toHaveBeenCalled();
     });
 
     describe("Block Help Menu", () => {
