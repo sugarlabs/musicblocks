@@ -1716,7 +1716,7 @@ class Logo {
                 tur.delayParameters = { blk: blk, flow: isflow, arg: receivedArg };
                 tur.delayTimeout = logo._timerManager.setGuardedTimeout(
                     () => {
-                        if (typeof Tone !== "undefined" && Tone.Transport && delay === 0) {
+                        if (typeof Tone !== "undefined" && Tone.Transport) {
                             const tur2 = logo.activity.turtles.ithTurtle(turtle);
                             tur2._transportTime = Tone.Transport.seconds;
                         }
