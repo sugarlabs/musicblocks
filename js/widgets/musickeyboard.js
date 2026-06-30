@@ -1838,6 +1838,7 @@ function MusicKeyboard(activity) {
         this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.selectedNavItemIndex = null;
 
         const tabsLabels = [
             "",
@@ -1894,6 +1895,13 @@ function MusicKeyboard(activity) {
 
         this._menuWheel.createWheel(mainTabsLabels);
         this._exitWheel.createWheel(["x", ""]);
+        this._exitWheel.navItems[1].enabled = false;
+        if (this._exitWheel.navItems[0].sliceSelectedAttr) {
+            this._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
+            this._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
+            this._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
+            this._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
+        }
 
         docById("wheelDivptm").style.position = "absolute";
         docById("wheelDivptm").style.height = "250px";
@@ -2526,7 +2534,15 @@ function MusicKeyboard(activity) {
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
+        this._exitWheel.selectedNavItemIndex = null;
         this._exitWheel.createWheel(["x", " "]);
+        this._exitWheel.navItems[1].enabled = false;
+        if (this._exitWheel.navItems[0].sliceSelectedAttr) {
+            this._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
+            this._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
+            this._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
+            this._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
+        }
 
         const octaveLabels = [
             "8",
