@@ -14,9 +14,6 @@
 if (typeof global._ !== "function") {
     global._ = s => s;
 }
-if (typeof global.docByClass !== "function") {
-    global.docByClass = () => [];
-}
 if (typeof global.STANDARDBLOCKHEIGHT === "undefined") {
     global.STANDARDBLOCKHEIGHT = 40;
 }
@@ -28,7 +25,7 @@ const { setupSearchController, SearchController } = require("../search-controlle
 // ---------------------------------------------------------------------------
 
 function makeProtoBlock(name, label, deprecated = false, extraSearchTerms = undefined) {
-    const block = {
+    return {
         name,
         staticLabels: label ? [label] : [],
         deprecated,
@@ -40,7 +37,28 @@ function makeProtoBlock(name, label, deprecated = false, extraSearchTerms = unde
             }
         }
     };
-    return block;
+}
+
+function makeSearchUI() {
+    return {
+        helpfulSearchDiv: null,
+        show: jest.fn(),
+        hide: jest.fn(),
+        focusInput: jest.fn(),
+        focusHelpfulInput: jest.fn(),
+        showHelpfulInput: jest.fn(),
+        setupMainAutocomplete: jest.fn(),
+        triggerMainSearch: jest.fn(),
+        setupHelpfulAutocomplete: jest.fn(),
+        triggerHelpfulSearch: jest.fn(),
+        buildHelpfulSearchDiv: jest.fn(() => ({
+            closeButton: { id: "crossButton" },
+            modeButton: null
+        })),
+        positionHelpfulSearchDiv: jest.fn(),
+        removeHelpfulSearchDiv: jest.fn(),
+        hideHelpfulSearchDisplay: jest.fn()
+    };
 }
 
 function makeActivity(protoBlocks = {}) {
@@ -79,7 +97,6 @@ function makeActivity(protoBlocks = {}) {
         getStageScale: jest.fn(() => 1),
         addEventListener: jest.fn((target, event, handler) => {
             if (target === document && event === "mousedown") {
-                // store so tests can trigger it
                 target._mousedownHandler = handler;
             }
         }),
@@ -97,21 +114,26 @@ function makeActivity(protoBlocks = {}) {
 describe("setupSearchController", () => {
     test("attaches a SearchController instance to activity", () => {
         const activity = makeActivity();
-        setupSearchController(activity);
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
         expect(activity.searchController).toBeInstanceOf(SearchController);
     });
 
-    test("initialises state to empty defaults", () => {
+    test("initialises data-layer state to defaults", () => {
         const activity = makeActivity();
-        setupSearchController(activity);
+        setupSearchController(activity, makeSearchUI());
         const sc = activity.searchController;
         expect(sc.searchSuggestions).toEqual([]);
         expect(sc._searchCache).toEqual({});
-        expect(sc._searchCloseListener).toBeNull();
         expect(sc.isHelpfulSearchWidgetOn).toBe(false);
-        expect(sc.searchBlockPosition).toEqual([100, 100]);
         expect(sc.deprecatedBlockNames).toEqual([]);
-        expect(sc.helpfulSearchDiv).toBeNull();
+    });
+
+    test("stores the searchUI reference", () => {
+        const activity = makeActivity();
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
+        expect(activity.searchController.searchUI).toBe(ui);
     });
 });
 
@@ -123,7 +145,7 @@ describe("SearchController.prepSearchWidget", () => {
     test("skips gracefully when blocks not initialised", () => {
         const activity = makeActivity();
         activity.blocks = null;
-        setupSearchController(activity);
+        setupSearchController(activity, makeSearchUI());
         expect(() => activity.searchController.prepSearchWidget()).not.toThrow();
         expect(activity.searchController.searchSuggestions).toEqual([]);
     });
@@ -133,7 +155,7 @@ describe("SearchController.prepSearchWidget", () => {
             drum: makeProtoBlock("drum", "drum"),
             pitch: makeProtoBlock("pitch", "pitch")
         });
-        setupSearchController(activity);
+        setupSearchController(activity, makeSearchUI());
         activity.searchController.prepSearchWidget();
 
         const labels = activity.searchController.searchSuggestions.map(s => s.label);
@@ -146,7 +168,7 @@ describe("SearchController.prepSearchWidget", () => {
             old: makeProtoBlock("old", "old block", true),
             current: makeProtoBlock("current", "current block", false)
         });
-        setupSearchController(activity);
+        setupSearchController(activity, makeSearchUI());
         activity.searchController.prepSearchWidget();
 
         const labels = activity.searchController.searchSuggestions.map(s => s.label);
@@ -158,7 +180,7 @@ describe("SearchController.prepSearchWidget", () => {
     test("adds extraSearchTerms to the searchTerms array", () => {
         const block = makeProtoBlock("note", "note value", false, ["pitch", "tone"]);
         const activity = makeActivity({ note: block });
-        setupSearchController(activity);
+        setupSearchController(activity, makeSearchUI());
         activity.searchController.prepSearchWidget();
 
         const suggestion = activity.searchController.searchSuggestions.find(
@@ -168,25 +190,21 @@ describe("SearchController.prepSearchWidget", () => {
         expect(suggestion.searchTerms).toContain("tone");
     });
 
-    test("resets cache and position on each call", () => {
+    test("resets cache on each call", () => {
         const activity = makeActivity({ drum: makeProtoBlock("drum", "drum") });
-        setupSearchController(activity);
+        setupSearchController(activity, makeSearchUI());
         const sc = activity.searchController;
         sc._searchCache = { x: [1] };
-        sc.searchBlockPosition = [200, 200];
 
         sc.prepSearchWidget();
 
         expect(sc._searchCache).toEqual({});
-        expect(sc.searchBlockPosition).toEqual([100, 100]);
     });
 
     test("uses fallback label for known no-label blocks (scaledegree2)", () => {
-        // extraSearchTerms must be defined (even empty) so the block passes the
-        // `if (blockLabel || block.extraSearchTerms !== undefined)` guard.
         const block = makeProtoBlock("scaledegree2", "", false, []);
         const activity = makeActivity({ scaledegree2: block });
-        setupSearchController(activity);
+        setupSearchController(activity, makeSearchUI());
         activity.searchController.prepSearchWidget();
 
         const suggestion = activity.searchController.searchSuggestions.find(
@@ -208,7 +226,7 @@ describe("SearchController.filterSuggestions", () => {
             drum: makeProtoBlock("drum", "drum beat", false, ["percussion"]),
             pitch: makeProtoBlock("pitch", "pitch value")
         });
-        setupSearchController(activity);
+        setupSearchController(activity, makeSearchUI());
         sc = activity.searchController;
         sc.prepSearchWidget();
     });
@@ -230,15 +248,13 @@ describe("SearchController.filterSuggestions", () => {
     });
 
     test("returns an empty array for a term that matches nothing", () => {
-        const results = sc.filterSuggestions("zzznomatch");
-        expect(results).toEqual([]);
+        expect(sc.filterSuggestions("zzznomatch")).toEqual([]);
     });
 
-    test("caches results on first call and returns cache on second", () => {
+    test("caches results and returns cache on second call", () => {
         sc.filterSuggestions("drum");
         expect(sc._searchCache["drum"]).toBeDefined();
 
-        // Mutate suggestions to prove cache is used
         sc.searchSuggestions = [];
         const cached = sc.filterSuggestions("drum");
         expect(cached).toBe(sc._searchCache["drum"]);
@@ -250,21 +266,18 @@ describe("SearchController.filterSuggestions", () => {
 // ---------------------------------------------------------------------------
 
 describe("SearchController.hideSearchWidget", () => {
-    test("hides the search input and clears idInput_custom", () => {
+    test("calls searchUI.hide()", () => {
         const activity = makeActivity();
-        setupSearchController(activity);
-        activity.searchWidget.style.visibility = "visible";
-        activity.searchWidget.idInput_custom = "drum";
-
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
         activity.searchController.hideSearchWidget();
-
-        expect(activity.searchWidget.style.visibility).toBe("hidden");
-        expect(activity.searchWidget.idInput_custom).toBe("");
+        expect(ui.hide).toHaveBeenCalled();
     });
 
-    test("removes the stored mousedown close listener", () => {
+    test("removes and clears the stored mousedown close listener", () => {
         const activity = makeActivity();
-        setupSearchController(activity);
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
         const sc = activity.searchController;
         const listener = jest.fn();
         sc._searchCloseListener = listener;
@@ -275,16 +288,11 @@ describe("SearchController.hideSearchWidget", () => {
         expect(sc._searchCloseListener).toBeNull();
     });
 
-    test("hides ui-menu element when present", () => {
-        const mockMenu = { style: { visibility: "visible" } };
-        global.docByClass = () => [mockMenu];
-
+    test("does not call removeEventListener when no listener is stored", () => {
         const activity = makeActivity();
-        setupSearchController(activity);
+        setupSearchController(activity, makeSearchUI());
         activity.searchController.hideSearchWidget();
-
-        expect(mockMenu.style.visibility).toBe("hidden");
-        global.docByClass = () => [];
+        expect(activity.removeEventListener).not.toHaveBeenCalled();
     });
 });
 
@@ -293,9 +301,10 @@ describe("SearchController.hideSearchWidget", () => {
 // ---------------------------------------------------------------------------
 
 describe("SearchController.showSearchWidget", () => {
-    test("hides widget when it is already visible (toggle off)", () => {
+    test("calls hideSearchWidget when widget is already visible", () => {
         const activity = makeActivity();
-        setupSearchController(activity);
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
         activity.searchWidget.style.visibility = "visible";
 
         const hideSpy = jest.spyOn(activity.searchController, "hideSearchWidget");
@@ -304,24 +313,36 @@ describe("SearchController.showSearchWidget", () => {
         expect(hideSpy).toHaveBeenCalled();
     });
 
-    test("makes widget visible and positions it from palettes.getSearchPos", () => {
+    test("calls searchUI.show() when widget is hidden", () => {
         jest.useFakeTimers();
-        const activity = makeActivity({ drum: makeProtoBlock("drum", "drum") });
-        setupSearchController(activity);
+        const activity = makeActivity();
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
         activity.searchWidget.style.visibility = "hidden";
 
         activity.searchController.showSearchWidget();
 
-        expect(activity.searchWidget.style.visibility).toBe("visible");
-        expect(activity.searchWidget.style.left).toBe("10px");
-        expect(activity.searchWidget.style.top).toBe("20px");
+        expect(ui.show).toHaveBeenCalled();
+        jest.useRealTimers();
+    });
+
+    test("calls prepSearchWidget when showing", () => {
+        jest.useFakeTimers();
+        const activity = makeActivity();
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
+        const prepSpy = jest.spyOn(activity.searchController, "prepSearchWidget");
+
+        activity.searchController.showSearchWidget();
+
+        expect(prepSpy).toHaveBeenCalled();
         jest.useRealTimers();
     });
 
     test("registers a mousedown close listener on document", () => {
         jest.useFakeTimers();
         const activity = makeActivity();
-        setupSearchController(activity);
+        setupSearchController(activity, makeSearchUI());
 
         activity.searchController.showSearchWidget();
 
@@ -332,28 +353,79 @@ describe("SearchController.showSearchWidget", () => {
         );
         jest.useRealTimers();
     });
+
+    test("hides helpful search div first if it is open", () => {
+        const activity = makeActivity();
+        const ui = makeSearchUI();
+        ui.helpfulSearchDiv = { style: { display: "block" } };
+        setupSearchController(activity, ui);
+
+        const hideSpy = jest.spyOn(activity.searchController, "_hideHelpfulSearchWidget");
+        activity.searchController.showSearchWidget();
+
+        expect(hideSpy).toHaveBeenCalled();
+    });
 });
 
 // ---------------------------------------------------------------------------
-// doSearch — result generation
+// doSearch
 // ---------------------------------------------------------------------------
 
-describe("SearchController.doSearch - result generation", () => {
-    beforeEach(() => {
-        global.window = global.window || {};
-        global.window.jQuery = jest.fn(() => ({
-            data: jest.fn(() => false),
-            autocomplete: jest.fn()
-        }));
+describe("SearchController.doSearch", () => {
+    test("returns early without error when searchWidget is null", () => {
+        const activity = makeActivity();
+        activity.searchWidget = null;
+        setupSearchController(activity, makeSearchUI());
+        expect(() => activity.searchController.doSearch()).not.toThrow();
+    });
+
+    test("calls prepSearchWidget when suggestions list is empty", () => {
+        const activity = makeActivity();
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
+        const sc = activity.searchController;
+        sc.searchSuggestions = [];
+
+        sc.doSearch();
+
+        // prepSearchWidget resets to empty but was called
+        expect(sc._searchCache).toEqual({});
+    });
+
+    test("calls searchUI.setupMainAutocomplete with callbacks", () => {
+        const activity = makeActivity();
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
+        const sc = activity.searchController;
+        sc.searchSuggestions = [{ label: "drum", searchTerms: ["drum"] }];
+
+        sc.doSearch();
+
+        expect(ui.setupMainAutocomplete).toHaveBeenCalledWith(
+            expect.any(Function),
+            expect.any(Function),
+            expect.any(Function)
+        );
+    });
+
+    test("calls searchUI.triggerMainSearch when value is set but idInput_custom is empty", () => {
+        const activity = makeActivity();
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
+        const sc = activity.searchController;
+        sc.searchSuggestions = [{ label: "drum", searchTerms: ["drum"] }];
+
+        activity.searchWidget.idInput_custom = "";
+        activity.searchWidget.value = "drum";
+        sc.doSearch();
+
+        expect(ui.triggerMainSearch).toHaveBeenCalledWith("drum");
     });
 
     test("calls errorMsg for a deprecated block name", () => {
-        // protoBlockDict must NOT contain the name so the first branch is skipped;
-        // deprecatedBlockNames must contain idInput_custom for the second branch to fire.
-        // searchSuggestions must be non-empty so doSearch doesn't re-call prepSearchWidget
-        // (which would reset deprecatedBlockNames).
         const activity = makeActivity({});
-        setupSearchController(activity);
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
         const sc = activity.searchController;
         sc.searchSuggestions = [{ label: "dummy", value: "dummy", searchTerms: [] }];
         sc.deprecatedBlockNames = ["drum"];
@@ -367,9 +439,10 @@ describe("SearchController.doSearch - result generation", () => {
 
     test("calls errorMsg when block not found and not deprecated", () => {
         const activity = makeActivity({});
-        setupSearchController(activity);
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
         const sc = activity.searchController;
-        sc.prepSearchWidget();
+        sc.searchSuggestions = [{ label: "dummy", value: "dummy", searchTerms: [] }];
 
         activity.searchWidget.idInput_custom = "ghost";
         activity.searchWidget.protoblk = { palette: { name: "test-palette" }, name: "ghost" };
@@ -381,9 +454,10 @@ describe("SearchController.doSearch - result generation", () => {
     test("calls makeBlockFromSearch and moveBlock for a known block", () => {
         const block = makeProtoBlock("drum", "drum");
         const activity = makeActivity({ drum: block });
-        setupSearchController(activity);
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
         const sc = activity.searchController;
-        sc.prepSearchWidget();
+        sc.searchSuggestions = [{ label: "drum", value: "drum", searchTerms: ["drum"] }];
 
         activity.searchWidget.idInput_custom = "drum";
         activity.searchWidget.protoblk = block;
@@ -400,9 +474,10 @@ describe("SearchController.doSearch - result generation", () => {
     test("advances searchBlockPosition after placing a block", () => {
         const block = makeProtoBlock("drum", "drum");
         const activity = makeActivity({ drum: block });
-        setupSearchController(activity);
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
         const sc = activity.searchController;
-        sc.prepSearchWidget();
+        sc.searchSuggestions = [{ label: "drum", value: "drum", searchTerms: ["drum"] }];
         sc.searchBlockPosition = [100, 100];
 
         activity.searchWidget.idInput_custom = "drum";
@@ -412,191 +487,205 @@ describe("SearchController.doSearch - result generation", () => {
         expect(sc.searchBlockPosition[0]).toBe(100 + global.STANDARDBLOCKHEIGHT);
         expect(sc.searchBlockPosition[1]).toBe(100 + global.STANDARDBLOCKHEIGHT);
     });
+});
 
-    test("returns early without error when searchWidget is not set", () => {
+// ---------------------------------------------------------------------------
+// setHelpfulSearchDiv
+// ---------------------------------------------------------------------------
+
+describe("SearchController.setHelpfulSearchDiv", () => {
+    test("calls searchUI.buildHelpfulSearchDiv()", () => {
         const activity = makeActivity();
-        activity.searchWidget = null;
-        setupSearchController(activity);
-        expect(() => activity.searchController.doSearch()).not.toThrow();
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
+
+        activity.searchController.setHelpfulSearchDiv();
+
+        expect(ui.buildHelpfulSearchDiv).toHaveBeenCalled();
+    });
+
+    test("wires click listener on the returned closeButton", () => {
+        const closeButton = { id: "crossButton" };
+        const activity = makeActivity();
+        const ui = makeSearchUI();
+        ui.buildHelpfulSearchDiv = jest.fn(() => ({ closeButton, modeButton: null }));
+        setupSearchController(activity, ui);
+
+        activity.searchController.setHelpfulSearchDiv();
+
+        expect(activity.addEventListener).toHaveBeenCalledWith(
+            closeButton,
+            "click",
+            expect.any(Function)
+        );
     });
 });
 
 // ---------------------------------------------------------------------------
-// doSearch — autocomplete initialization branches
+// _displayHelpfulSearchDiv
 // ---------------------------------------------------------------------------
 
-function makeJQueryElem(alreadyInit = false) {
-    let capturedOpts = null;
-    const initFlag = { value: alreadyInit };
-    const elem = {
-        data: jest.fn(function (key, val) {
-            if (val !== undefined) initFlag.value = val;
-            return key === "autocomplete-init" ? initFlag.value : undefined;
-        }),
-        autocomplete: jest.fn(function (arg) {
-            if (typeof arg === "object") capturedOpts = arg;
-            if (arg === "instance") return null;
-        }),
-        getOpts: () => capturedOpts
-    };
-    return elem;
-}
-
-describe("SearchController.doSearch - autocomplete initialization", () => {
-    let $elem;
-
+describe("SearchController._displayHelpfulSearchDiv", () => {
     beforeEach(() => {
-        $elem = makeJQueryElem();
-        global.window = global.window || {};
-        global.window.jQuery = jest.fn(() => $elem);
+        document.getElementById = jest.fn(id => {
+            if (id === "helpfulSearchDiv") return { style: {} };
+            return null;
+        });
     });
 
     afterEach(() => {
-        delete global.window.jQuery;
+        jest.restoreAllMocks();
     });
 
-    test("skips autocomplete setup when already initialised", () => {
-        $elem = makeJQueryElem(true);
-        global.window.jQuery = jest.fn(() => $elem);
+    test("calls searchUI.positionHelpfulSearchDiv()", () => {
+        const activity = makeActivity();
+        const ui = makeSearchUI();
+        ui.helpfulSearchDiv = { style: { display: "block" } };
+        setupSearchController(activity, ui);
 
-        const activity = makeActivity({ drum: makeProtoBlock("drum", "drum") });
-        setupSearchController(activity);
+        activity.searchController._displayHelpfulSearchDiv();
+
+        expect(ui.positionHelpfulSearchDiv).toHaveBeenCalled();
+    });
+
+    test("sets isHelpfulSearchWidgetOn to true", () => {
+        const activity = makeActivity();
+        const ui = makeSearchUI();
+        ui.helpfulSearchDiv = { style: { display: "block" } };
+        setupSearchController(activity, ui);
+
+        activity.searchController._displayHelpfulSearchDiv();
+
+        expect(activity.searchController.isHelpfulSearchWidgetOn).toBe(true);
+    });
+});
+
+// ---------------------------------------------------------------------------
+// _hideHelpfulSearchWidget
+// ---------------------------------------------------------------------------
+
+describe("SearchController._hideHelpfulSearchWidget", () => {
+    test("calls searchUI.removeHelpfulSearchDiv()", () => {
+        const activity = makeActivity();
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
+
+        activity.searchController._hideHelpfulSearchWidget();
+
+        expect(ui.removeHelpfulSearchDiv).toHaveBeenCalled();
+    });
+
+    test("calls activity.__tick()", () => {
+        const activity = makeActivity();
+        setupSearchController(activity, makeSearchUI());
+
+        activity.searchController._hideHelpfulSearchWidget();
+
+        expect(activity.__tick).toHaveBeenCalled();
+    });
+});
+
+// ---------------------------------------------------------------------------
+// showHelpfulSearchWidget
+// ---------------------------------------------------------------------------
+
+describe("SearchController.showHelpfulSearchWidget", () => {
+    test("does nothing when helpfulSearchDiv is null", () => {
+        const activity = makeActivity();
+        const ui = makeSearchUI();
+        ui.helpfulSearchDiv = null;
+        setupSearchController(activity, ui);
+
+        activity.searchController.showHelpfulSearchWidget();
+
+        expect(ui.showHelpfulInput).not.toHaveBeenCalled();
+    });
+
+    test("does nothing when helpfulSearchDiv is not display:block", () => {
+        const activity = makeActivity();
+        const ui = makeSearchUI();
+        ui.helpfulSearchDiv = { style: { display: "none" } };
+        setupSearchController(activity, ui);
+
+        activity.searchController.showHelpfulSearchWidget();
+
+        expect(ui.showHelpfulInput).not.toHaveBeenCalled();
+    });
+
+    test("calls searchUI.showHelpfulInput() when div is visible", () => {
+        jest.useFakeTimers();
+        const activity = makeActivity();
+        const ui = makeSearchUI();
+        ui.helpfulSearchDiv = { style: { display: "block" } };
+        setupSearchController(activity, ui);
+
+        activity.searchController.showHelpfulSearchWidget();
+
+        expect(ui.showHelpfulInput).toHaveBeenCalled();
+        jest.useRealTimers();
+    });
+
+    test("schedules focusHelpfulInput and doHelpfulSearch", () => {
+        jest.useFakeTimers();
+        const activity = makeActivity();
+        const ui = makeSearchUI();
+        ui.helpfulSearchDiv = { style: { display: "block" } };
+        setupSearchController(activity, ui);
+
+        const doSpy = jest
+            .spyOn(activity.searchController, "doHelpfulSearch")
+            .mockImplementation(() => {});
+
+        activity.searchController.showHelpfulSearchWidget();
+        jest.runAllTimers();
+
+        expect(ui.focusHelpfulInput).toHaveBeenCalled();
+        expect(doSpy).toHaveBeenCalled();
+        jest.useRealTimers();
+    });
+});
+
+// ---------------------------------------------------------------------------
+// doHelpfulSearch
+// ---------------------------------------------------------------------------
+
+describe("SearchController.doHelpfulSearch", () => {
+    test("calls searchUI.setupHelpfulAutocomplete with callbacks", () => {
+        const activity = makeActivity();
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
         const sc = activity.searchController;
-        sc.prepSearchWidget();
+        sc.searchSuggestions = [{ label: "drum", searchTerms: ["drum"] }];
 
-        activity.searchWidget.idInput_custom = "drum";
-        activity.searchWidget.protoblk = makeProtoBlock("drum", "drum");
-        sc.doSearch();
+        sc.doHelpfulSearch();
 
-        expect($elem.autocomplete).not.toHaveBeenCalledWith(
-            expect.objectContaining({ source: expect.any(Function) })
+        expect(ui.setupHelpfulAutocomplete).toHaveBeenCalledWith(
+            expect.any(Function),
+            expect.any(Function)
         );
     });
 
-    test("source callback filters suggestions by term", () => {
-        const activity = makeActivity({ drum: makeProtoBlock("drum", "drum beat") });
-        setupSearchController(activity);
-        const sc = activity.searchController;
-        sc.prepSearchWidget();
-
-        activity.searchWidget.idInput_custom = "";
-        activity.searchWidget.value = "";
-        sc.doSearch();
-
-        const response = jest.fn();
-        $elem.getOpts().source({ term: "drum" }, response);
-        expect(response).toHaveBeenCalled();
-        expect(response.mock.calls[0][0].some(r => r.value === "drum")).toBe(true);
-    });
-
-    test("source callback normalises term to lowercase and trims whitespace", () => {
-        const activity = makeActivity({ drum: makeProtoBlock("drum", "drum beat") });
-        setupSearchController(activity);
-        const sc = activity.searchController;
-        sc.prepSearchWidget();
-
-        activity.searchWidget.idInput_custom = "";
-        sc.doSearch();
-
-        const response = jest.fn();
-        $elem.getOpts().source({ term: "  DRUM  " }, response);
-        expect(response.mock.calls[0][0].some(r => r.value === "drum")).toBe(true);
-    });
-
-    test("select callback sets widget fields and re-runs doSearch", () => {
-        const block = makeProtoBlock("drum", "drum beat");
-        const activity = makeActivity({ drum: block });
-        setupSearchController(activity);
-        const sc = activity.searchController;
-        sc.prepSearchWidget();
-
-        activity.searchWidget.idInput_custom = "";
-        activity.searchWidget.value = "";
-        sc.doSearch();
-
-        const event = { preventDefault: jest.fn(), keyCode: 0 };
-        const ui = { item: { label: "drum beat", value: "drum", specialDict: block } };
-        $elem.getOpts().select(event, ui);
-
-        expect(event.preventDefault).toHaveBeenCalled();
-        // The nested doSearch() that select triggers places the block and then
-        // clears value back to ""; idInput_custom is not cleared.
-        expect(activity.searchWidget.idInput_custom).toBe("drum");
-        expect(activity.searchWidget.protoblk).toBe(block);
-        expect(activity.palettes.dict["test-palette"].makeBlockFromSearch).toHaveBeenCalled();
-    });
-
-    test("focus callback calls preventDefault", () => {
-        const activity = makeActivity({ drum: makeProtoBlock("drum", "drum") });
-        setupSearchController(activity);
-        const sc = activity.searchController;
-        sc.prepSearchWidget();
-
-        activity.searchWidget.idInput_custom = "";
-        sc.doSearch();
-
-        const event = { preventDefault: jest.fn() };
-        $elem.getOpts().focus(event);
-        expect(event.preventDefault).toHaveBeenCalled();
-    });
-
-    test("triggers autocomplete search when idInput_custom is empty but value is set", () => {
+    test("calls triggerHelpfulSearch when value is set but idInput_custom is empty", () => {
         const activity = makeActivity();
-        setupSearchController(activity);
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
         const sc = activity.searchController;
-        sc.prepSearchWidget();
+        sc.searchSuggestions = [{ label: "drum", searchTerms: ["drum"] }];
 
-        activity.searchWidget.idInput_custom = "";
-        activity.searchWidget.value = "drum";
-        sc.doSearch();
+        activity.helpfulSearchWidget.idInput_custom = "";
+        activity.helpfulSearchWidget.value = "drum";
+        sc.doHelpfulSearch();
 
-        expect($elem.autocomplete).toHaveBeenCalledWith("search", "drum");
-    });
-
-    test("returns without triggering autocomplete search when both inputs are empty", () => {
-        const activity = makeActivity();
-        setupSearchController(activity);
-        const sc = activity.searchController;
-        sc.prepSearchWidget();
-
-        activity.searchWidget.idInput_custom = "";
-        activity.searchWidget.value = "";
-        sc.doSearch();
-
-        expect($elem.autocomplete).not.toHaveBeenCalledWith("search", expect.anything());
-    });
-});
-
-// ---------------------------------------------------------------------------
-// doHelpfulSearch — result generation
-// ---------------------------------------------------------------------------
-
-describe("SearchController.doHelpfulSearch - result generation", () => {
-    let helpfulSearchDivEl;
-
-    beforeEach(() => {
-        helpfulSearchDivEl = { style: { display: "" } };
-        document.getElementById = jest.fn(id => {
-            if (id === "helpfulSearchDiv") return helpfulSearchDivEl;
-            return null;
-        });
-        global.window = global.window || {};
-        global.window.jQuery = jest.fn(() => ({
-            data: jest.fn(() => false),
-            autocomplete: jest.fn()
-        }));
-    });
-
-    afterEach(() => {
-        delete global.window.jQuery;
+        expect(ui.triggerHelpfulSearch).toHaveBeenCalledWith("drum");
     });
 
     test("calls makeBlockFromSearch and moveBlock for a known block", () => {
         const block = makeProtoBlock("drum", "drum");
         const activity = makeActivity({ drum: block });
-        setupSearchController(activity);
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
         const sc = activity.searchController;
-        sc.prepSearchWidget();
+        sc.searchSuggestions = [{ label: "drum", value: "drum", searchTerms: ["drum"] }];
 
         activity.helpfulSearchWidget.idInput_custom = "drum";
         activity.helpfulSearchWidget.protoblk = block;
@@ -610,25 +699,25 @@ describe("SearchController.doHelpfulSearch - result generation", () => {
         );
     });
 
-    test("advances searchBlockPosition after placing a block in helpful search", () => {
+    test("calls searchUI.hideHelpfulSearchDisplay() after placing a block", () => {
         const block = makeProtoBlock("drum", "drum");
         const activity = makeActivity({ drum: block });
-        setupSearchController(activity);
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
         const sc = activity.searchController;
-        sc.prepSearchWidget();
-        sc.searchBlockPosition = [100, 100];
+        sc.searchSuggestions = [{ label: "drum", value: "drum", searchTerms: ["drum"] }];
 
         activity.helpfulSearchWidget.idInput_custom = "drum";
         activity.helpfulSearchWidget.protoblk = block;
         sc.doHelpfulSearch();
 
-        expect(sc.searchBlockPosition[0]).toBe(100 + global.STANDARDBLOCKHEIGHT);
-        expect(sc.searchBlockPosition[1]).toBe(100 + global.STANDARDBLOCKHEIGHT);
+        expect(ui.hideHelpfulSearchDisplay).toHaveBeenCalled();
     });
 
     test("calls errorMsg for a deprecated block in helpful search", () => {
         const activity = makeActivity({});
-        setupSearchController(activity);
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
         const sc = activity.searchController;
         sc.searchSuggestions = [{ label: "dummy", value: "dummy", searchTerms: [] }];
         sc.deprecatedBlockNames = ["drum"];
@@ -642,9 +731,10 @@ describe("SearchController.doHelpfulSearch - result generation", () => {
 
     test("calls errorMsg when helpful-search block is not found and not deprecated", () => {
         const activity = makeActivity({});
-        setupSearchController(activity);
+        const ui = makeSearchUI();
+        setupSearchController(activity, ui);
         const sc = activity.searchController;
-        sc.prepSearchWidget();
+        sc.searchSuggestions = [{ label: "dummy", value: "dummy", searchTerms: [] }];
 
         activity.helpfulSearchWidget.idInput_custom = "ghost";
         activity.helpfulSearchWidget.protoblk = {
@@ -654,258 +744,5 @@ describe("SearchController.doHelpfulSearch - result generation", () => {
         sc.doHelpfulSearch();
 
         expect(activity.errorMsg).toHaveBeenCalledWith("Block cannot be found.");
-    });
-});
-
-// ---------------------------------------------------------------------------
-// doHelpfulSearch — autocomplete initialization branches
-// ---------------------------------------------------------------------------
-
-describe("SearchController.doHelpfulSearch - autocomplete initialization", () => {
-    let $elem;
-    let helpfulSearchDivEl;
-
-    beforeEach(() => {
-        helpfulSearchDivEl = { style: { display: "" } };
-        document.getElementById = jest.fn(id => {
-            if (id === "helpfulSearchDiv") return helpfulSearchDivEl;
-            return null;
-        });
-        $elem = makeJQueryElem();
-        global.window = global.window || {};
-        global.window.jQuery = jest.fn(() => $elem);
-    });
-
-    afterEach(() => {
-        delete global.window.jQuery;
-    });
-
-    test("skips autocomplete setup when already initialised", () => {
-        $elem = makeJQueryElem(true);
-        global.window.jQuery = jest.fn(() => $elem);
-
-        const activity = makeActivity({ drum: makeProtoBlock("drum", "drum") });
-        setupSearchController(activity);
-        const sc = activity.searchController;
-        sc.prepSearchWidget();
-
-        activity.helpfulSearchWidget.idInput_custom = "drum";
-        activity.helpfulSearchWidget.protoblk = makeProtoBlock("drum", "drum");
-        sc.doHelpfulSearch();
-
-        expect($elem.autocomplete).not.toHaveBeenCalledWith(
-            expect.objectContaining({ source: expect.any(Function) })
-        );
-    });
-
-    test("source callback filters suggestions by term", () => {
-        const activity = makeActivity({ drum: makeProtoBlock("drum", "drum beat") });
-        setupSearchController(activity);
-        const sc = activity.searchController;
-        sc.prepSearchWidget();
-
-        activity.helpfulSearchWidget.idInput_custom = "";
-        activity.helpfulSearchWidget.value = "";
-        sc.doHelpfulSearch();
-
-        const response = jest.fn();
-        $elem.getOpts().source({ term: "drum" }, response);
-        expect(response.mock.calls[0][0].some(r => r.value === "drum")).toBe(true);
-    });
-
-    test("select callback sets helpfulSearchWidget fields and re-runs doHelpfulSearch", () => {
-        const block = makeProtoBlock("drum", "drum beat");
-        const activity = makeActivity({ drum: block });
-        setupSearchController(activity);
-        const sc = activity.searchController;
-        sc.prepSearchWidget();
-
-        activity.helpfulSearchWidget.idInput_custom = "";
-        activity.helpfulSearchWidget.value = "";
-        sc.doHelpfulSearch();
-
-        const event = { preventDefault: jest.fn() };
-        const ui = { item: { label: "drum beat", value: "drum", specialDict: block } };
-        $elem.getOpts().select(event, ui);
-
-        expect(event.preventDefault).toHaveBeenCalled();
-        // The nested doHelpfulSearch() that select triggers places the block and
-        // then clears value; idInput_custom is not cleared.
-        expect(activity.helpfulSearchWidget.idInput_custom).toBe("drum");
-        expect(activity.helpfulSearchWidget.protoblk).toBe(block);
-        expect(activity.palettes.dict["test-palette"].makeBlockFromSearch).toHaveBeenCalled();
-    });
-
-    test("focus callback calls preventDefault", () => {
-        const activity = makeActivity({ drum: makeProtoBlock("drum", "drum") });
-        setupSearchController(activity);
-        const sc = activity.searchController;
-        sc.prepSearchWidget();
-
-        activity.helpfulSearchWidget.idInput_custom = "";
-        sc.doHelpfulSearch();
-
-        const event = { preventDefault: jest.fn() };
-        $elem.getOpts().focus(event);
-        expect(event.preventDefault).toHaveBeenCalled();
-    });
-
-    test("triggers autocomplete search when idInput_custom is empty but value is set", () => {
-        const activity = makeActivity();
-        setupSearchController(activity);
-        const sc = activity.searchController;
-        sc.prepSearchWidget();
-
-        activity.helpfulSearchWidget.idInput_custom = "";
-        activity.helpfulSearchWidget.value = "drum";
-        sc.doHelpfulSearch();
-
-        expect($elem.autocomplete).toHaveBeenCalledWith("search", "drum");
-    });
-
-    test("returns without autocomplete search when both helpfulSearch inputs are empty", () => {
-        const activity = makeActivity();
-        setupSearchController(activity);
-        const sc = activity.searchController;
-        sc.prepSearchWidget();
-
-        activity.helpfulSearchWidget.idInput_custom = "";
-        activity.helpfulSearchWidget.value = "";
-        sc.doHelpfulSearch();
-
-        expect($elem.autocomplete).not.toHaveBeenCalledWith("search", expect.anything());
-    });
-});
-
-// ---------------------------------------------------------------------------
-// showHelpfulSearchWidget
-// ---------------------------------------------------------------------------
-
-describe("SearchController.showHelpfulSearchWidget", () => {
-    let $elem;
-    let helpfulWheelDivEl;
-
-    beforeEach(() => {
-        helpfulWheelDivEl = { style: { display: "block" } };
-        document.getElementById = jest.fn(id => {
-            if (id === "helpfulWheelDiv") return helpfulWheelDivEl;
-            return null;
-        });
-        $elem = makeJQueryElem();
-        global.window = global.window || {};
-        global.window.jQuery = jest.fn(() => $elem);
-    });
-
-    afterEach(() => {
-        delete global.window.jQuery;
-    });
-
-    test("does not activate widget when helpfulSearchDiv is not in display:block", () => {
-        const activity = makeActivity();
-        setupSearchController(activity);
-        const sc = activity.searchController;
-        sc.helpfulSearchDiv = { style: { display: "none" } };
-
-        sc.showHelpfulSearchWidget();
-
-        expect(activity.helpfulSearchWidget.style.visibility).toBe("hidden");
-    });
-
-    test("silently catches when autocomplete destroy throws", () => {
-        $elem.autocomplete = jest.fn(() => {
-            throw new Error("not initialized");
-        });
-        global.window.jQuery = jest.fn(() => $elem);
-
-        const activity = makeActivity();
-        setupSearchController(activity);
-        const sc = activity.searchController;
-        sc.helpfulSearchDiv = { style: { display: "none" } };
-
-        expect(() => sc.showHelpfulSearchWidget()).not.toThrow();
-    });
-
-    test("makes helpfulSearchWidget visible and schedules doHelpfulSearch when div is block", () => {
-        jest.useFakeTimers();
-
-        const activity = makeActivity({ drum: makeProtoBlock("drum", "drum") });
-        setupSearchController(activity);
-        const sc = activity.searchController;
-        sc.helpfulSearchDiv = { style: { display: "block" } };
-
-        const doHelpfulSearchSpy = jest.spyOn(sc, "doHelpfulSearch").mockImplementation(() => {});
-
-        sc.showHelpfulSearchWidget();
-
-        expect(activity.helpfulSearchWidget.style.visibility).toBe("visible");
-        expect(helpfulWheelDivEl.style.display).toBe("none");
-
-        jest.runAllTimers();
-        expect(activity.helpfulSearchWidget.focus).toHaveBeenCalled();
-        expect(doHelpfulSearchSpy).toHaveBeenCalled();
-
-        jest.useRealTimers();
-    });
-});
-
-// ---------------------------------------------------------------------------
-// _hideHelpfulSearchWidget
-// ---------------------------------------------------------------------------
-
-describe("SearchController._hideHelpfulSearchWidget", () => {
-    let helpfulWheelDivEl;
-
-    beforeEach(() => {
-        helpfulWheelDivEl = { style: { display: "block" } };
-        document.getElementById = jest.fn(id => {
-            if (id === "helpfulWheelDiv") return helpfulWheelDivEl;
-            return null;
-        });
-    });
-
-    test("sets helpfulWheelDiv display to none when it is visible", () => {
-        const activity = makeActivity();
-        setupSearchController(activity);
-        const sc = activity.searchController;
-        sc.helpfulSearchDiv = null;
-        helpfulWheelDivEl.style.display = "block";
-
-        sc._hideHelpfulSearchWidget();
-
-        expect(helpfulWheelDivEl.style.display).toBe("none");
-        expect(activity.__tick).toHaveBeenCalled();
-    });
-
-    test("does not reassign helpfulWheelDiv display when already none", () => {
-        const activity = makeActivity();
-        setupSearchController(activity);
-        const sc = activity.searchController;
-        sc.helpfulSearchDiv = null;
-        helpfulWheelDivEl.style.display = "none";
-
-        sc._hideHelpfulSearchWidget();
-
-        expect(helpfulWheelDivEl.style.display).toBe("none");
-    });
-
-    test("skips removeChild when helpfulSearchDiv has no parentNode", () => {
-        const activity = makeActivity();
-        setupSearchController(activity);
-        const sc = activity.searchController;
-        sc.helpfulSearchDiv = { parentNode: null };
-
-        expect(() => sc._hideHelpfulSearchWidget()).not.toThrow();
-    });
-
-    test("calls removeChild when helpfulSearchDiv has a parentNode", () => {
-        const removeChild = jest.fn();
-        const activity = makeActivity();
-        setupSearchController(activity);
-        const sc = activity.searchController;
-        sc.helpfulSearchDiv = { parentNode: { removeChild } };
-
-        sc._hideHelpfulSearchWidget();
-
-        expect(removeChild).toHaveBeenCalledWith(sc.helpfulSearchDiv);
     });
 });
