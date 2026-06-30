@@ -67,6 +67,7 @@ class Turtle {
         this._blinkFinished = true; // whether not blinking or blinking
 
         this._transportTime = null;
+        this._transportEventId = null;
     }
 
     /**
