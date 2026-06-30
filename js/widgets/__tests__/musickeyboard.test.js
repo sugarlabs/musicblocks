@@ -164,7 +164,7 @@ describe("MusicKeyboard add-row submenu", () => {
         ]);
     });
 
-    test("creates pie submenu and sets z-index and top position correctly", () => {
+    test("creates pie submenu and sets z-index, top position, and exit wheel correctly", () => {
         document.body.innerHTML =
             '<div id="wheelDivptm"></div><div id="_exitWheel"></div><div id="_tabsWheel"></div><div id="_durationWheel"></div><div id="cell-0"></div>';
         document.getElementById("cell-0").getBoundingClientRect = () => ({ x: 100, y: 400 });
@@ -180,9 +180,12 @@ describe("MusicKeyboard add-row submenu", () => {
 
         expect(docById("wheelDivptm").style.zIndex).toBe("10001");
         expect(docById("wheelDivptm").style.top).toBe("350px"); // min(600 - 250, 400) = 350
+        expect(keyboard._exitWheel.selectedNavItemIndex).toBeNull();
+        expect(keyboard._exitWheel.navItems[1].enabled).toBe(false);
+        expect(keyboard._exitWheel.navItems[0].sliceSelectedAttr.cursor).toBe("pointer");
     });
 
-    test("creates column pie submenu and sets z-index and top position correctly", () => {
+    test("creates column pie submenu and sets z-index, top position, and exit wheel correctly", () => {
         document.body.innerHTML =
             '<div id="wheelDivptm"></div><div id="_exitWheel"></div><div id="labelcol0"></div>';
         document.getElementById("labelcol0").getBoundingClientRect = () => ({ x: 100, y: 400 });
@@ -202,6 +205,9 @@ describe("MusicKeyboard add-row submenu", () => {
 
         expect(docById("wheelDivptm").style.zIndex).toBe("10001");
         expect(docById("wheelDivptm").style.top).toBe("300px"); // min(600 - 300, 400) = 300
+        expect(keyboard._exitWheel.selectedNavItemIndex).toBeNull();
+        expect(keyboard._exitWheel.navItems[1].enabled).toBe(false);
+        expect(keyboard._exitWheel.navItems[0].sliceSelectedAttr.cursor).toBe("pointer");
     });
 });
 
