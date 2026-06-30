@@ -152,6 +152,7 @@ class Transport {
     static stop() {}
     static schedule() {}
     static cancel() {}
+    static clear() {}
     static getSecondsAtTime() {
         return 0;
     }
