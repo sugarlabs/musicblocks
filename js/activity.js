@@ -32,7 +32,7 @@ try {
    ErrorHandler, ActivityContext,
    Boundary, CARTESIAN, changeImage, closeWidgets, doRecordButton, setupActivityRecorder,
    setupGridController, setupGridRenderer, setupPluginController, setupToolbarController, setupAlertController, setupAlertRenderer, setupPaletteLoader, PluginDialog,
-   setupSearchController,
+   setupSearchController, setupSearchUI,
    setupActivityAbcParser, setupActivityIdleWatcher,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
@@ -131,6 +131,7 @@ let MYDEFINES = [
     "activity/alert-renderer",
     "palette/palette-loader",
     "activity/search-controller",
+    "search-ui",
     "widgets/plugin-dialog",
     "utils/musicutils",
     "utils/synthutils",
@@ -478,7 +479,8 @@ class Activity {
         setupAlertController(this);
         setupAlertRenderer(this);
         setupPaletteLoader(this);
-        setupSearchController(this);
+        this.searchUI = setupSearchUI(this);
+        setupSearchController(this, this.searchUI);
         this.pluginDialog = new PluginDialog({
             onLoadBuiltIn: name => this._loadBuiltInPlugin(name),
             onDelete: () => this._deletePlugin(),
@@ -560,11 +562,7 @@ class Activity {
             this.searchWidget.style.visibility = "hidden";
             this.searchWidget.placeholder = _("Search for blocks");
 
-            this.helpfulSearchWidget = document.createElement("input");
-            this.helpfulSearchWidget.setAttribute("id", "helpfulSearch");
-            this.helpfulSearchWidget.style.visibility = "hidden";
-            this.helpfulSearchWidget.placeholder = _("Search for blocks");
-            this.helpfulSearchWidget.classList.add("ui-autocomplete");
+            this.searchUI.createSearchUI();
             this.progressBar.style.visibility = "hidden";
             this.paste.style.visibility = "hidden";
 
@@ -648,7 +646,7 @@ class Activity {
                     event.preventDefault();
                     event.stopPropagation();
                     if (this.beginnerMode) return;
-                    if (this.searchController.isHelpfulSearchWidgetOn) {
+                    if (this.searchUI.isHelpfulSearchWidgetOn) {
                         this._hideHelpfulSearchWidget();
                     }
                     if (
