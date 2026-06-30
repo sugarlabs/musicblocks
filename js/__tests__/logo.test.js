@@ -915,6 +915,62 @@ describe("Logo comprehensive method coverage", () => {
         expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, 3, 1, "x");
     });
 
+    test("runFromBlock uses Tone.Transport.schedule for non-zero delay when available", () => {
+        const originalTone = global.Tone;
+        const scheduleSpy = jest.fn();
+        global.Tone = {
+            ...originalTone,
+            Transport: {
+                start: jest.fn(),
+                stop: jest.fn(),
+                schedule: scheduleSpy,
+                cancel: jest.fn(),
+                getSecondsAtTime: jest.fn(() => 0),
+                get seconds() {
+                    return 0;
+                },
+                set seconds(v) {}
+            }
+        };
+
+        logo.runFromBlockNow = jest.fn();
+        logo.turtleDelay = 0;
+        logo.stopTurtle = false;
+        turtle0.waitTime = 200;
+        turtle0._transportTime = 10;
+
+        logo.runFromBlock(logo, 0, 3, 1, "x");
+
+        expect(scheduleSpy).toHaveBeenCalledWith(expect.any(Function), 10 + 200 / 1000);
+        expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+
+        global.Tone = originalTone;
+        delete turtle0._transportTime;
+    });
+
+    test("runFromBlock falls back to setTimeout when Transport is unavailable", () => {
+        const originalTone = global.Tone;
+        global.Tone = { ...originalTone, Transport: undefined };
+        timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
+            fn();
+            return 5;
+        });
+
+        logo.runFromBlockNow = jest.fn();
+        logo.turtleDelay = 0;
+        logo.stopTurtle = false;
+        turtle0.waitTime = 200;
+
+        logo.runFromBlock(logo, 0, 3, 1, "x");
+
+        expect(timeoutSpy).toHaveBeenCalled();
+        expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, 3, 1, "x");
+
+        global.Tone = originalTone;
+        timeoutSpy.mockRestore();
+        timeoutSpy = null;
+    });
+
     test("runFromBlockNow executes flow block and queues next block", () => {
         logo.runFromBlock = jest.fn();
         logo.blockList = [
@@ -1189,8 +1245,33 @@ describe("Logo comprehensive method coverage", () => {
         logo._restoreConnections = jest.fn();
         mockActivity.showBlocksAfterRun = true;
 
+        const originalTone = global.Tone;
+        const cancelSpy = jest.fn();
+        let transportSeconds = 42;
+        global.Tone = {
+            ...originalTone,
+            Transport: {
+                start: jest.fn(),
+                stop: jest.fn(),
+                cancel: cancelSpy,
+                getSecondsAtTime: jest.fn(() => 0),
+                get seconds() {
+                    return transportSeconds;
+                },
+                set seconds(v) {
+                    transportSeconds = v;
+                }
+            }
+        };
+        turtle0._transportTime = 15;
+        turtle1._transportTime = 25;
+
         logo.doStopTurtles();
 
+        expect(cancelSpy).toHaveBeenCalled();
+        expect(turtle0._transportTime).toBeNull();
+        expect(turtle1._transportTime).toBeNull();
+        expect(transportSeconds).toBe(0);
         expect(turtle0.singer.killAllVoices).toHaveBeenCalled();
         expect(logo.synth.stopSound).toHaveBeenCalledWith("0", "flute");
         expect(logo.synth.stopSound).toHaveBeenCalledWith("1", "piano");
@@ -1199,6 +1280,10 @@ describe("Logo comprehensive method coverage", () => {
         expect(doStopVideoCam).toHaveBeenCalledWith("cam-1", logo.setCameraID);
         expect(mockActivity.blocks.showBlocks).toHaveBeenCalled();
         expect(document.getElementById).toHaveBeenCalledWith("stop");
+
+        delete turtle0._transportTime;
+        delete turtle1._transportTime;
+        global.Tone = originalTone;
         clearIntervalSpy.mockRestore();
     });
 
