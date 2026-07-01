@@ -166,6 +166,9 @@ function setupIntervalsActions(activity) {
                 }
             }
 
+            // +9 is the original 12-EDO offset: intervals beyond
+            // temperamentLength + 9 get an explicit "plus N octave(s)"
+            // suffix. Same offset scales proportionally for all EDOs.
             if (totalIntervals > temperamentLength + 9) {
                 if (octave >= 1) {
                     lastWord = `, ${_("plus")} ${os} ${plural}`;
