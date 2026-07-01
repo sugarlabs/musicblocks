@@ -152,7 +152,7 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
             const actionBlockName = `track${trackCount}chunk${actionBlockCounter}`;
             actionBlockNames.push(actionBlockName);
             actionBlockPerTrack[trackCount]++;
-            if (k == 0) {
+            if (k === 0) {
                 jsONON.push(...currentActionBlock);
                 k = 1;
             } else {
@@ -200,13 +200,13 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
                 noteblockCount = 0;
                 noteSum = 0;
             }
-            const isLastNoteInSched = i == sched.length - 1;
+            const isLastNoteInSched = i === sched.length - 1;
             const last = isLastNoteInBlock || isLastNoteInSched;
-            const first = i == 0;
+            const first = i === 0;
             let val = jsONON.length + currentActionBlock.length;
             const getPitch = (x, notes, prev) => {
                 const ar = [];
-                if (notes[0] == "R") {
+                if (notes[0] === "R") {
                     ar.push([x, "rest2", 0, 0, [prev, null]]);
                 } else if (precurssionFlag) {
                     const drumname = drumMidi[track.notes[0].midi][0] || "kick drum";
@@ -218,8 +218,8 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
                 } else {
                     for (const na in notes) {
                         const name = notes[na];
-                        const first = na == 0;
-                        const last = na == notes.length - 1;
+                        const first = na === 0;
+                        const last = na === notes.length - 1;
                         ar.push(
                             [
                                 x,
@@ -262,7 +262,7 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
             obj = getClosestStandardNoteValue(obj[0] / obj[1]);
 
             // Since we are going to add action block in the front later
-            if (k != 0) val = val + 2;
+            if (k !== 0) val = val + 2;
             const pitches = getPitch(val + 5, notes, val);
             currentActionBlock.push(
                 [
@@ -282,7 +282,7 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
             currentActionBlock = currentActionBlock.concat(pitches);
 
             let newLen = jsONON.length + currentActionBlock.length;
-            if (k != 0) newLen = newLen + 2;
+            if (k !== 0) newLen = newLen + 2;
             currentActionBlock.push([newLen, "hidden", 0, 0, [val, last ? null : newLen + 1]]);
             if (isLastNoteInBlock || isLastNoteInSched) {
                 addNewActionBlock(isLastNoteInSched);
