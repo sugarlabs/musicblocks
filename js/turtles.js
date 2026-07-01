@@ -1030,7 +1030,7 @@ Turtles.TurtlesView = class {
                     const menuIcon = docById("menu");
                     auxToolbar.style.display = "none";
                     menuIcon.innerHTML = "menu";
-                    docById("toggleAuxBtn").className -= "blue darken-1";
+                    docById("toggleAuxBtn").classList.remove("blue", "darken-1");
                 }
                 this._expandButton.style.visibility = "visible";
                 this._collapseButton.style.visibility = "hidden";
@@ -1053,7 +1053,7 @@ Turtles.TurtlesView = class {
                 const menuIcon = docById("menu");
                 auxToolbar.style.display = "none";
                 menuIcon.innerHTML = "menu";
-                docById("toggleAuxBtn").className -= "blue darken-1";
+                docById("toggleAuxBtn").classList.remove("blue", "darken-1");
             }
 
             this._expandButton.style.visibility = "visible";
@@ -1106,7 +1106,7 @@ Turtles.TurtlesView = class {
                 const menuIcon = docById("menu");
                 auxToolbar.style.display = "none";
                 menuIcon.innerHTML = "menu";
-                docById("toggleAuxBtn").className -= "blue darken-1";
+                docById("toggleAuxBtn").classList.remove("blue", "darken-1");
             }
             this.hideMenu();
             this.setStageScale(1.0);
