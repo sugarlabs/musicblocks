@@ -1665,7 +1665,7 @@ function MusicKeyboard(activity) {
 
         let n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 8);
 
-        outerDiv.style.overflowY = "hidden";
+        outerDiv.style.overflowY = "auto";
         if (this.displayLayout.length > n) {
             outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (n + 5) + "px";
         } else {
