@@ -907,10 +907,12 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
         await new Promise((resolve, reject) => {
             script.onload = () => {
                 URL.revokeObjectURL(url);
+                document.head.removeChild(script);
                 resolve();
             };
             script.onerror = e => {
                 URL.revokeObjectURL(url);
+                document.head.removeChild(script);
                 console.error("Failed to load CSP Blob script for plugins", e);
                 reject(e);
             };
