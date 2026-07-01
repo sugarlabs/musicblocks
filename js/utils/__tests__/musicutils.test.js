@@ -86,6 +86,8 @@ const {
     getVoiceSynthName,
     isCustomTemperament,
     getTemperamentName,
+    getTemperamentCents,
+    getTemperamentRatio,
     noteToObj,
     frequencyToPitch,
     getArticulation,
@@ -913,6 +915,105 @@ describe("frequencyToPitch", () => {
         const result = frequencyToPitch(440, "unknown");
         expect(result[0]).toBe("A");
         expect(result[1]).toBe(4);
+    });
+});
+
+describe("cents calculations", () => {
+    global.TWELVEHUNDRETHROOT2 = Number("1.0005777895065549");
+    global.A0 = 27.5;
+
+    beforeEach(() => {
+        global.TEMPERAMENT = {
+            equal: { pitchNumber: 12 },
+            equal19: { pitchNumber: 19 },
+            equal31: { pitchNumber: 31 }
+        };
+    });
+
+    describe("getTemperamentCents", () => {
+        it("converts numeric ratio to cents", () => {
+            // 3/2 ratio = 701.96 cents
+            const cents = getTemperamentCents(3 / 2);
+            expect(cents).toBeCloseTo(701.955, 1);
+        });
+
+        it("returns cents from object format", () => {
+            const cents = getTemperamentCents({ ratio: 3 / 2, cents: 700 });
+            expect(cents).toBe(700);
+        });
+
+        it("returns 0 for invalid input", () => {
+            expect(getTemperamentCents(null)).toBe(0);
+            expect(getTemperamentCents(undefined)).toBe(0);
+            expect(getTemperamentCents("invalid")).toBe(0);
+        });
+    });
+
+    describe("getTemperamentRatio", () => {
+        it("returns numeric ratio as-is", () => {
+            expect(getTemperamentRatio(1.5)).toBe(1.5);
+        });
+
+        it("extracts ratio from object format", () => {
+            expect(getTemperamentRatio({ ratio: 3 / 2, cents: 700 })).toBe(3 / 2);
+        });
+
+        it("returns 1 for invalid input", () => {
+            expect(getTemperamentRatio(null)).toBe(1);
+            expect(getTemperamentRatio(undefined)).toBe(1);
+        });
+    });
+
+    describe("frequencyToPitch cents with non-12 EDO", () => {
+        it("computes cents deviation in 19-EDO", () => {
+            // ~0.05 steps above A4 in 19-EDO → stays on "A" with ~3 cents deviation
+            const freq = 440 * Math.pow(2, 0.05 / 19);
+            const result = frequencyToPitch(freq, "equal19");
+            expect(result[0]).toBe("A");
+            expect(result[1]).toBe(4);
+            expect(result[2]).toBeGreaterThan(2);
+            expect(result[2]).toBeLessThan(5);
+        });
+
+        it("computes cents deviation in 31-EDO", () => {
+            // ~0.3 steps above A4 in 31-EDO → stays on "A" with ~12 cents deviation
+            const freq = 440 * Math.pow(2, 0.3 / 31);
+            const result = frequencyToPitch(freq, "equal31");
+            expect(result[0]).toBe("A");
+            expect(result[1]).toBe(4);
+            expect(result[2]).toBeGreaterThan(10);
+            expect(result[2]).toBeLessThan(15);
+        });
+    });
+
+    describe("pitchToFrequency cents with non-12 EDO", () => {
+        it("handles non-zero cents with 19-EDO", () => {
+            // A4 in 19-EDO = pitchNumber 76 (4 * 19)
+            const result = pitchToFrequency("A", 4, 50, "C", "equal19");
+            const expected = A0 * Math.pow(2, 1 / (19 * 100)) ** (76 * 100 + 50);
+            expect(result).toBeCloseTo(expected, 4);
+        });
+
+        it("handles non-zero cents with 31-EDO", () => {
+            // A4 in 31-EDO = pitchNumber 124 (4 * 31)
+            const result = pitchToFrequency("A", 4, 50, "C", "equal31");
+            const expected = A0 * Math.pow(2, 1 / (31 * 100)) ** (124 * 100 + 50);
+            expect(result).toBeCloseTo(expected, 4);
+        });
+
+        it("handles negative cents", () => {
+            const result = pitchToFrequency("A", 4, -30, "C");
+            const expected = A0 * Math.pow(2, 1 / 1200) ** (48 * 100 - 30);
+            expect(result).toBeCloseTo(expected, 4);
+        });
+    });
+
+    describe("frequencyToPitch sub-cent rounding", () => {
+        it("rounds sub-0.5-cent deviation to 0", () => {
+            const freq = 440 * Math.pow(2, 0.003 / 12); // tiny deviation (~0.003 steps = ~0.25 cents)
+            const result = frequencyToPitch(freq);
+            expect(result[2]).toBe(0);
+        });
     });
 });
 
