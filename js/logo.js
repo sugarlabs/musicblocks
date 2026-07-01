@@ -75,18 +75,28 @@ class Logo {
      * const logo = new Logo(deps);
      */
     constructor(activityOrDeps) {
-        // `errorHandler` is the single property that distinguishes a LogoDependencies
-        // container from a legacy Activity object (which uses `errorMsg` instead).
-        // Do not change this check without updating LogoDependencies accordingly.
+        // `errorHandler` is the single property that distinguishes a
+        // LogoDependencies container from a legacy Activity object (which uses
+        // `errorMsg` instead). instanceof is checked first as the strongest
+        // signal; the typeof clause is a fallback for plain objects that satisfy
+        // the shape but are not formal instances (e.g. after jest.resetModules()
+        // clears module identity). When the project migrates to ES modules the
+        // require fallback and typeof clause can be removed.
+        const LD =
+            typeof LogoDependencies !== "undefined"
+                ? LogoDependencies
+                : require("./LogoDependencies");
         const isExplicitDeps =
-            activityOrDeps !== null &&
-            activityOrDeps !== undefined &&
-            typeof activityOrDeps.errorHandler === "function";
+            activityOrDeps instanceof LD ||
+            (activityOrDeps !== null &&
+                activityOrDeps !== undefined &&
+                typeof activityOrDeps.errorHandler === "function");
 
         if (isExplicitDeps) {
-            // Explicit dependency container: use directly and build a compatibility
-            // facade so callers that expect an activity object still work.
-            // (Notation constructor, plugins, getStatsFromNotation, etc.)
+            // Explicit dependency container: use directly and build a
+            // compatibility facade so callers that expect an activity object
+            // still work (Notation constructor, plugins, getStatsFromNotation).
+
             this.deps = activityOrDeps;
             const deps = this.deps;
             this.activity = {
