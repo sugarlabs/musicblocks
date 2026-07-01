@@ -75,18 +75,28 @@ class Logo {
      * const logo = new Logo(deps);
      */
     constructor(activityOrDeps) {
-        // `errorHandler` is the single property that distinguishes a LogoDependencies
-        // container from a legacy Activity object (which uses `errorMsg` instead).
-        // Do not change this check without updating LogoDependencies accordingly.
+        // `errorHandler` is the single property that distinguishes a
+        // LogoDependencies container from a legacy Activity object (which uses
+        // `errorMsg` instead). instanceof is checked first as the strongest
+        // signal; the typeof clause is a fallback for plain objects that satisfy
+        // the shape but are not formal instances (e.g. after jest.resetModules()
+        // clears module identity). When the project migrates to ES modules the
+        // require fallback and typeof clause can be removed.
+        const LD =
+            typeof LogoDependencies !== "undefined"
+                ? LogoDependencies
+                : require("./LogoDependencies");
         const isExplicitDeps =
-            activityOrDeps !== null &&
-            activityOrDeps !== undefined &&
-            typeof activityOrDeps.errorHandler === "function";
+            activityOrDeps instanceof LD ||
+            (activityOrDeps !== null &&
+                activityOrDeps !== undefined &&
+                typeof activityOrDeps.errorHandler === "function");
 
         if (isExplicitDeps) {
-            // Explicit dependency container: use directly and build a compatibility
-            // facade so callers that expect an activity object still work.
-            // (Notation constructor, plugins, getStatsFromNotation, etc.)
+            // Explicit dependency container: use directly and build a
+            // compatibility facade so callers that expect an activity object
+            // still work (Notation constructor, plugins, getStatsFromNotation).
+
             this.deps = activityOrDeps;
             const deps = this.deps;
             this.activity = {
@@ -740,14 +750,29 @@ class Logo {
     }
 
     /**
-     * Parses receivedArg.
+     * Evaluates a block connection and returns its resolved value for use by
+     * the calling block.
      *
-     * @param logo
-     * @param turtle
-     * @param blk
-     * @param parentBlk
-     * @param receivedArg
-     * @returns {*}
+     * Resolution order:
+     *   1. If `proto.arg` is a function, delegate directly (fastest path).
+     *   2. `intervalname` blocks: update direction state and return the interval
+     *      number as a special case.
+     *   3. Value blocks: return `currentBlock.value`.
+     *   4. Output blocks (`anyout`, `numberout`, `textout`, `booleanout`): evaluate
+     *      by name — built-in cases (`dectofrac`, `hue`, `returnValue`) or plugin
+     *      lookup via `evalArgDict`.
+     *   5. All other blocks: return the block index `blk` as a pass-through.
+     *
+     * @param {Logo} logo - The running Logo instance.
+     * @param {number} turtle - Index of the active turtle.
+     * @param {number|null} blk - Index of the block to evaluate. A null value
+     *     triggers a NOINPUT error on `parentBlk`.
+     * @param {number|null} parentBlk - Index of the calling block; used only
+     *     for error reporting when `blk` is null.
+     * @param {*} receivedArg - Argument forwarded from an enclosing `doArg` /
+     *     `namedDoArg` call; passed through to `proto.arg` when applicable.
+     * @returns {*} The resolved value, or the block index `blk` for non-output
+     *     blocks.
      */
     parseArg(logo, turtle, blk, parentBlk, receivedArg) {
         const tur = logo.turtles.ithTurtle(turtle);
@@ -865,14 +890,24 @@ class Logo {
     }
 
     /**
-     * Updates the music notation used for Lilypond output.
+     * Adds a note event to the Lilypond notation buffer, splitting it across
+     * measure boundaries when necessary.
      *
-     * @param note
-     * @param {number} duration
-     * @param turtle
-     * @param insideChord
-     * @param drum
-     * @param {boolean} [split]
+     * When the note's duration carries it past the end of the current measure,
+     * the note is split: the portion that fits within the current measure (and
+     * any fully-spanned intermediate measures) is written first with ties,
+     * followed by the overflow into the next measure.  Recursion stops when
+     * `split` is false, which all recursive calls pass explicitly.
+     *
+     * @param {string[]} note - Pitch names (e.g. `["G4"]`), or `["R"]` for a
+     *     rest.
+     * @param {number} duration - Reciprocal note duration (e.g. 4 for a
+     *     quarter note, 8 for an eighth note).
+     * @param {number} turtle - Index of the active turtle.
+     * @param {boolean} insideChord - Whether this note is part of a chord.
+     * @param {string[]} drum - Drum patch names (may be empty).
+     * @param {boolean} [split=true] - Allow measure-boundary splitting. Pass
+     *     `false` to write the note directly without further splitting.
      * @returns {void}
      */
     updateNotation(note, duration, turtle, insideChord, drum, split) {
@@ -898,21 +933,26 @@ class Logo {
             tur.singer.beatsPerMeasure / tur.singer.noteValuePerBeat - timeIntoMeasure;
 
         if (split && durationTime > timeLeftInMeasure) {
-            const d = durationTime - timeLeftInMeasure;
-            let d2 = timeLeftInMeasure;
-            const b = tur.singer.beatsPerMeasure / tur.singer.noteValuePerBeat;
-            // console.debug("splitting note across measure boundary.");
-            const obj = this.deps.utils.rationalToFraction(d);
+            // overflowTime: the portion of the note that extends past all
+            // measure boundaries.
+            const overflowTime = durationTime - timeLeftInMeasure;
+            // partialTime: starts as the time remaining in the current measure;
+            // the while-loop below strips any whole measures to find the residual.
+            let partialTime = timeLeftInMeasure;
+            // measureDuration: the total duration of one full measure.
+            const measureDuration = tur.singer.beatsPerMeasure / tur.singer.noteValuePerBeat;
+            const obj = this.deps.utils.rationalToFraction(overflowTime);
 
-            if (d2 > 0) {
-                // Check to see if the note straddles multiple measures
+            if (partialTime > 0) {
+                // Count how many full measures this note spans beyond the first.
                 let i = 0;
-                while (d2 > b) {
+                while (partialTime > measureDuration) {
                     ++i;
-                    d2 -= b;
+                    partialTime -= measureDuration;
                 }
 
-                let obj2 = this.deps.utils.rationalToFraction(d2);
+                // Write the portion that fits within the current partial measure.
+                let obj2 = this.deps.utils.rationalToFraction(partialTime);
                 if (obj2[0] !== 0) {
                     this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
                 }
@@ -922,10 +962,10 @@ class Logo {
                         this.notation.notationInsertTie(turtle);
                         this.notation.notationDrumStaging[turtle].push("tie");
                     }
-                    obj2 = this.deps.utils.rationalToFraction(1 / b);
+                    obj2 = this.deps.utils.rationalToFraction(1 / measureDuration);
                 }
 
-                // Add any measures we straddled
+                // Write one full measure's worth for each intermediate measure.
                 while (i > 0) {
                     i -= 1;
                     if (obj2[0] !== 0) {
@@ -948,10 +988,9 @@ class Logo {
                 }
             }
 
+            // Write the overflow portion that extends into the next measure.
             if (obj[0] > 0) {
-                if (obj[0] !== 0) {
-                    this.updateNotation(note, obj[1] / obj[0], turtle, insideChord, drum, false);
-                }
+                this.updateNotation(note, obj[1] / obj[0], turtle, insideChord, drum, false);
             }
         } else {
             // .. otherwise proceed as normal
@@ -959,6 +998,18 @@ class Logo {
         }
     }
 
+    /**
+     * Records a note event into the per-turtle MIDI buffer for later export.
+     *
+     * @param {string[]} note - Array of pitch names.
+     * @param {string[]|null} drum - Drum patch names; only the first element is
+     *     used. Pass a falsy value for non-drum notes.
+     * @param {number} duration - Note duration in beats.
+     * @param {number} turtle - Index of the active turtle.
+     * @param {number} bpm - Tempo in beats per minute at the time of the note.
+     * @param {string} instrument - Instrument name for the note.
+     * @returns {void}
+     */
     notationMIDI(note, drum, duration, turtle, bpm, instrument) {
         if (!this._midiData[turtle]) {
             this._midiData[turtle] = [];
@@ -1203,10 +1254,25 @@ class Logo {
     }
 
     /**
-     * Runs Logo commands.
+     * Initialises interpreter state and launches all turtle execution queues.
      *
-     * @param startHere - index of a block to start from
-     * @param env
+     * This is the main entry point for program execution. It proceeds in two
+     * phases:
+     *
+     *   Phase 1 — Setup: resets run-state flags, clears notation and MIDI
+     *     buffers, initialises every turtle, removes stale event listeners, and
+     *     builds the named-action table by scanning `blocks.stackList`.
+     *
+     *   Phase 2 — Dispatch: kicks off execution by calling `runFromBlock` for
+     *     each start/drum/status/oscilloscope block found on the canvas.
+     *     Status and oscilloscope blocks run first (with a 250 ms head-start so
+     *     they can display their widgets before music begins); all other start
+     *     blocks follow together in a single guarded timeout.
+     *
+     * @param {number|null} startHere - Block index to start from directly, or
+     *     null to discover all start blocks on the canvas automatically.
+     * @param {*} env - Initial argument value forwarded to the first block as
+     *     `receivedArg` (typically null for top-level runs).
      * @returns {void}
      */
     runLogoCommands(startHere, env) {
@@ -1248,7 +1314,7 @@ class Logo {
             this._ignoringBlock = null;
         }
 
-        // NOW reset the flags for the new run
+        // Reset run-state flags for the new execution.
         this._alreadyRunning = false;
         this._prematureRestart = false;
 
@@ -1540,13 +1606,22 @@ class Logo {
     }
 
     /**
-     * Runs from a single block.
+     * Schedules execution of block `blk` after the turtle's current delay.
      *
-     * @param {this} logo
-     * @param turtle
-     * @param blk
-     * @param isflow
-     * @param receivedArg
+     * In step mode (`turtleDelay === TURTLESTEP`), the block is pushed onto
+     * `stepQueue` and executed when the user advances manually.  Otherwise a
+     * guarded `setTimeout` is used, which respects `stopTurtle` and the
+     * turtle's accumulated `waitTime`.
+     *
+     * @param {Logo} logo - The running Logo instance (always `this`).
+     * @param {number} turtle - Index of the active turtle.
+     * @param {number|null} blk - Index of the block to execute; a null value
+     *     returns immediately without scheduling.
+     * @param {number} isflow - 1 when called from within a flow (enables the
+     *     sync-counter yield path in `runFromBlockNow`), 0 for argument
+     *     evaluation.
+     * @param {*} receivedArg - Argument passed down from an enclosing action
+     *     call; forwarded unchanged to `runFromBlockNow`.
      * @returns {void}
      */
     runFromBlock(logo, turtle, blk, isflow, receivedArg) {
@@ -1584,14 +1659,32 @@ class Logo {
     }
 
     /**
-     * Runs a stack of blocks, beginning with block blocklist[blk].
+     * Executes block `blk` synchronously, then continues the turtle's queue.
      *
-     * @param {this} logo
-     * @param turtle
-     * @param blk
-     * @param isflow
-     * @param receivedArg
-     * @param {number} [queueStart]
+     * This is the hot path of the interpreter and handles three phases per
+     * block invocation:
+     *
+     *   (1) Argument evaluation — calls `parseArg` for each non-flow input
+     *       connection, building the `args` array.
+     *
+     *   (2) Block execution — calls either a plugin handler from `evalFlowDict`
+     *       or the block's own `proto.flow` method. Value blocks and arg blocks
+     *       reached as flow blocks display their value instead.
+     *
+     *   (3) Queue continuation — pops the next block from `tur.queue` and
+     *       recurses (directly or via a guarded `setTimeout` to yield the event
+     *       loop periodically). Handles backward-mode traversal, block
+     *       highlighting, and post-run notation export on queue exhaustion.
+     *
+     * @param {Logo} logo - The running Logo instance (always `this`).
+     * @param {number} turtle - Index of the active turtle.
+     * @param {number} blk - Index of the block to execute.
+     * @param {number} isflow - 1 when executing within a flow; enables the
+     *     sync-counter yield path.
+     * @param {*} receivedArg - Argument forwarded from an enclosing action
+     *     call.
+     * @param {number} [queueStart=0] - Queue depth threshold; blocks above
+     *     this index are processed, allowing partial-queue execution.
      * @returns {void}
      */
     runFromBlockNow(logo, turtle, blk, isflow, receivedArg, queueStart) {
@@ -1649,9 +1742,7 @@ class Logo {
         if (proto.args > 0) {
             for (let i = 1; i <= proto.args; i++) {
                 if (proto.dockTypes[i] === "in") {
-                    if (connections[i] === null) {
-                        // console.debug("skipping inflow args");
-                    } else {
+                    if (connections[i] !== null) {
                         args.push(connections[i]);
                     }
                 } else {
@@ -1684,24 +1775,36 @@ class Logo {
             // All flow blocks have a last connection (nextFlow), but
             // it can be null (i.e., end of a flow).
             if (tur.singer.backward.length > 0) {
+                // Inside a "backward" (or "duplicatenotes") clamp: traverse
+                // the block chain in reverse using connections[0] (the
+                // "previous" link) instead of the normal lastConnection.
                 const lastBackward = logo.deps.utils.last(tur.singer.backward);
                 const backwardBlock = logo.blockList[lastBackward];
                 const backwardConnections = backwardBlock.connections;
 
+                // connection[1] for "backward", connection[2] for wrapper
+                // blocks like "duplicatenotes" — points to the first block
+                // inside the clamp.
                 const c = backwardBlock.name === "backward" ? 1 : 2;
 
                 if (!logo.blocks.sameGeneration(backwardConnections[c], blk)) {
+                    // Current block is outside the backward clamp; use normal
+                    // forward flow.
                     nextFlow = lastConnection;
                 } else {
+                    // Walk backward: step to the previous block in the chain.
                     nextFlow = connections[0];
                     if (
                         nextFlow !== null &&
                         (logo.blockList[nextFlow].name === "action" ||
                             logo.blockList[nextFlow].name === "backward")
                     ) {
+                        // Hit a clamp boundary block — stop traversal here.
                         nextFlow = null;
                     } else {
                         if (!logo.blocks.sameGeneration(backwardConnections[c], nextFlow)) {
+                            // nextFlow stepped outside the clamp scope; fall
+                            // back to forward flow.
                             nextFlow = lastConnection;
                         } else {
                             nextFlow = connections[0];
@@ -1829,8 +1932,6 @@ class Logo {
                     }
                 }
             }
-        } else {
-            // console.debug("Ignoring block on overlapped start.");
         }
 
         if (logo.statusMatrix && logo.statusMatrix.isOpen && !logo.inStatusMatrix) {
@@ -1853,8 +1954,6 @@ class Logo {
             if (tur.parentFlowQueue != undefined) {
                 tur.parentFlowQueue.push(blk);
                 tur.queue.push(queueBlock);
-            } else {
-                // console.debug("cannot find queue for turtle " + turtle);
             }
         }
 
@@ -1917,36 +2016,36 @@ class Logo {
                     // If we are at the end of the child flow, queue
                     // the unhighlighting of the parent block to the
                     // flow.
-                    if (tur.unhighlightQueue === undefined) {
-                        // console.debug("cannot find highlight queue for turtle " + turtle);
-                    } else if (tur.parentFlowQueue.length > 0 && tur.queue.length > 0) {
-                        const lastQueue = logo.deps.utils.last(tur.queue);
-                        const lastParentFlow = logo.deps.utils.last(tur.parentFlowQueue);
+                    if (tur.unhighlightQueue !== undefined) {
+                        if (tur.parentFlowQueue.length > 0 && tur.queue.length > 0) {
+                            const lastQueue = logo.deps.utils.last(tur.queue);
+                            const lastParentFlow = logo.deps.utils.last(tur.parentFlowQueue);
 
-                        if (lastQueue.parentBlk !== lastParentFlow) {
-                            tur.unhighlightQueue.push(lastParentFlow);
+                            if (lastQueue.parentBlk !== lastParentFlow) {
+                                tur.unhighlightQueue.push(lastParentFlow);
+                            }
+                        } else if (tur.unhighlightQueue.length > 0) {
+                            // The child flow is finally complete, so unhighlight.
+                            logo._timerManager.setGuardedTimeout(
+                                () => {
+                                    if (logo.blocks.visible) {
+                                        const unhighlightBlock = tur.unhighlightQueue.pop();
+                                        logo.blocks.unhighlight(unhighlightBlock);
+                                        // Clear the currently highlighted block if it was this one
+                                        if (logo._currentlyHighlightedBlock === unhighlightBlock) {
+                                            logo._currentlyHighlightedBlock = null;
+                                        }
+                                        if (logo.stage) {
+                                            logo.deps.markStageDirty();
+                                        }
+                                    } else {
+                                        tur.unhighlightQueue.pop();
+                                    }
+                                },
+                                Math.max(logo.turtleDelay, MIN_HIGHLIGHT_DURATION_MS),
+                                () => logo.stopTurtle
+                            );
                         }
-                    } else if (tur.unhighlightQueue.length > 0) {
-                        // The child flow is finally complete, so unhighlight.
-                        logo._timerManager.setGuardedTimeout(
-                            () => {
-                                if (logo.blocks.visible) {
-                                    const unhighlightBlock = tur.unhighlightQueue.pop();
-                                    logo.blocks.unhighlight(unhighlightBlock);
-                                    // Clear the currently highlighted block if it was this one
-                                    if (logo._currentlyHighlightedBlock === unhighlightBlock) {
-                                        logo._currentlyHighlightedBlock = null;
-                                    }
-                                    if (logo.stage) {
-                                        logo.deps.markStageDirty();
-                                    }
-                                } else {
-                                    tur.unhighlightQueue.pop();
-                                }
-                            },
-                            Math.max(logo.turtleDelay, MIN_HIGHLIGHT_DURATION_MS),
-                            () => logo.stopTurtle
-                        );
                     }
                 }
             }
@@ -2005,9 +2104,7 @@ class Logo {
                                 tur.butNotThese[b] == null ||
                                 tur.butNotThese[b].indexOf(i) === -1
                             ) {
-                                if (tur.singer.runningFromEvent) {
-                                    // console.log("RUNNING FROM EVENT");
-                                } else {
+                                if (!tur.singer.runningFromEvent) {
                                     logo.stage.dispatchEvent(tur.endOfClampSignals[b][i]);
                                 }
                             }
@@ -2088,14 +2185,12 @@ class Logo {
                             document.body.style.cursor = "default";
                         }
                     } else if (logo.runningMxml) {
-                        // console.log("saving mxml output");
                         logo.deps.save.afterSaveMxml();
                         logo.runningMxml = false;
                     } else if (logo.runningMIDI) {
                         logo.deps.save.afterSaveMIDI();
                         logo.runningMIDI = false;
                     } else if (tur.singer.suppressOutput) {
-                        // console.debug("finishing compiling");
                         if (!logo.recording) {
                             logo.deps.errorHandler(_("Playback is ready."));
                         }
@@ -2127,14 +2222,7 @@ class Logo {
                     }
 
                     // Give the last note time to play.
-                    // console.debug(
-                    //     "SETTING LAST NOTE TIMEOUT: " +
-                    //         logo.recording +
-                    //         " " +
-                    //         tur.singer.suppressOutput
-                    // );
                     logo._lastNoteTimeout = logo._timerManager.setTimeout(() => {
-                        // console.debug("LAST NOTE PLAYED");
                         logo._lastNoteTimeout = null;
                         tur.singer.runningFromEvent = false;
                         if (tur.singer.suppressOutput && logo.recording) {
@@ -2168,14 +2256,25 @@ class Logo {
     }
 
     /**
-     * Executes plugin code safely.
-     * @param code - The plugin code (function or string) to execute.
-     * @param logo - The logo object.
-     * @param turtle - The turtle index.
-     * @param blk - The block index.
-     * @param value - An optional value for setters or additional context.
-     * @param args - Additional arguments for different plugin types.
-     * @returns {*} - The result of the execution if applicable.
+     * Executes plugin-provided block code in a sandboxed manner.
+     *
+     * Plugins may supply either a pre-compiled function or a legacy string of
+     * JavaScript.  Functions are called directly inside a try/catch.  Strings
+     * are matched against an allowlist of known-safe math patterns (see
+     * `mathPatterns` below) and executed natively; all other string code is
+     * blocked to prevent arbitrary eval injection (security fix for #5449).
+     *
+     * @param {Function|string} code - Plugin code: a callable or a legacy JS
+     *     string from a plugin definition file (e.g. maths.json).
+     * @param {Logo} logo - The running Logo instance.
+     * @param {number} turtle - Index of the active turtle.
+     * @param {number} blk - Index of the block being evaluated.
+     * @param {*} value - Context value forwarded to the plugin (e.g. the
+     *     current block value for setter blocks).
+     * @param {...*} args - Additional arguments forwarded verbatim to function
+     *     plugins.
+     * @returns {*} The plugin's return value, or `undefined` for void or
+     *     blocked calls.
      */
     safePluginExecute(code, logo, turtle, blk, value, ...args) {
         if (typeof code === "function") {
