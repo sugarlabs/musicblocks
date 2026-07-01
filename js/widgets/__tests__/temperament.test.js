@@ -312,12 +312,19 @@ describe("TemperamentWidget basic tests", () => {
         widget.checkTemperament = jest.fn();
         widget._circleOfNotes = jest.fn();
 
+        const divAppends = [];
+        const realCreateElement = document.createElement.bind(document);
+        jest.spyOn(document, "createElement").mockImplementation(tag => {
+            const el = realCreateElement(tag);
+            if (tag === "div") divAppends.push(el);
+            return el;
+        });
+
         global.docById = jest.fn(id => {
             if (id === "ratioIn") return { value: "1" };
             if (id === "ratioOut") return { value: "54" };
             if (id === "recursion") return { value: "1" };
             return {
-                innerHTML: "",
                 textContent: "",
                 appendChild: jest.fn(),
                 setAttribute: jest.fn(),
@@ -328,30 +335,15 @@ describe("TemperamentWidget basic tests", () => {
             };
         });
 
-        // Call ratioEdit to set up the divAppend with its onclick
         widget.ratioEdit();
+        document.createElement.mockRestore();
 
-        // The validation runs inside divAppend.onclick which is set on
-        // a real DOM element. Test the guard logic directly.
-        const input1 = 1;
-        const input2 = 54;
-        const powerBase = 2;
-        const ratio1 = input1 / input2;
-        const isInvalid =
-            !isFinite(input1) ||
-            !isFinite(input2) ||
-            input1 <= 0 ||
-            input2 <= 0 ||
-            !isFinite(ratio1) ||
-            ratio1 <= 0 ||
-            ratio1 >= powerBase ||
-            input2 > input1 * powerBase;
+        const divWithOnclick = divAppends.find(el => typeof el.onclick === "function");
+        expect(divWithOnclick).toBeDefined();
+        divWithOnclick.onclick({ target: { textContent: "done" } });
 
-        expect(isInvalid).toBe(true);
-
-        // Confirm ratios are not corrupted  and ratioEdit itself does not touch them.
+        expect(widget.activity.errorMsg).toHaveBeenCalled();
         expect(widget.ratios).toEqual([1, 2]);
-        expect(widget.editMode).toBe("ratio");
     });
 
     test("arbitraryEdit sets editMode to arbitrary", () => {
