@@ -1104,7 +1104,7 @@ class PhraseMaker {
      */
     _createAddRowPieSubmenu() {
         // This menu is used to add new rows to the matrix.
-        this.docById("wheelDivptm").innerHTML = "";
+        this.docById("wheelDivptm").textContent = "";
         this.docById("wheelDivptm").style.display = "";
         const VALUESLABEL = ["pitch", "hertz", "drum", "graphics", "pen"];
         const VALUES = [
@@ -1392,7 +1392,7 @@ class PhraseMaker {
      */
     _createMatrixGraphics2PieSubmenu(blockIndex, blk) {
         // A wheel for modifying 2-arg graphics blocks
-        this.docById("wheelDivptm").innerHTML = "";
+        this.docById("wheelDivptm").textContent = "";
         this.docById("wheelDivptm").style.display = "";
         const arcRadiusLabel = ["10", "20", "30", "40", "50", "60", "70", "80", "90", "100"];
         const arcAngleLabel = ["0", "30", "45", "60", "90", "180"];
@@ -1657,7 +1657,7 @@ class PhraseMaker {
      */
     _createMatrixGraphicsPieSubmenu(blockIndex, condition, blk) {
         // A wheel for modifying 1-arg blocks (graphics and hertz)
-        this.docById("wheelDivptm").innerHTML = "";
+        this.docById("wheelDivptm").textContent = "";
         this.docById("wheelDivptm").style.display = "";
         let valueLabel,
             forwardBackLabel,
@@ -1994,7 +1994,7 @@ class PhraseMaker {
      */
     _createColumnPieSubmenu(index, condition, sortedClose) {
         index = parseInt(index);
-        this.docById("wheelDivptm").innerHTML = "";
+        this.docById("wheelDivptm").textContent = "";
         this.docById("wheelDivptm").style.display = "";
 
         const accidentals = ["𝄪", "♯", "♮", "♭", "𝄫"];
@@ -3976,7 +3976,7 @@ class PhraseMaker {
      * @private
      */
     _createpiesubmenu(noteToDivide, tupletValue, condition) {
-        this.docById("wheelDivptm").innerHTML = "";
+        this.docById("wheelDivptm").textContent = "";
         this.docById("wheelDivptm").style.display = "";
 
         this._menuWheel = new this.wheelnav("wheelDivptm", null, 800, 800);
