@@ -304,6 +304,48 @@ describe("TemperamentWidget basic tests", () => {
         expect(widget.editMode).toBe("ratio");
     });
 
+    test("ratioEdit rejects an invalid ratio like 1:54 without corrupting state", () => {
+        widget.activity = { errorMsg: jest.fn() };
+        widget.ratios = [1, 2];
+        widget.frequencies = [440, 880];
+        widget.powerBase = 2;
+        widget.checkTemperament = jest.fn();
+        widget._circleOfNotes = jest.fn();
+
+        const divAppends = [];
+        const realCreateElement = document.createElement.bind(document);
+        jest.spyOn(document, "createElement").mockImplementation(tag => {
+            const el = realCreateElement(tag);
+            if (tag === "div") divAppends.push(el);
+            return el;
+        });
+
+        global.docById = jest.fn(id => {
+            if (id === "ratioIn") return { value: "1" };
+            if (id === "ratioOut") return { value: "54" };
+            if (id === "recursion") return { value: "1" };
+            return {
+                textContent: "",
+                appendChild: jest.fn(),
+                setAttribute: jest.fn(),
+                style: {},
+                append: jest.fn(),
+                onmouseover: null,
+                onclick: null
+            };
+        });
+
+        widget.ratioEdit();
+        document.createElement.mockRestore();
+
+        const divWithOnclick = divAppends.find(el => typeof el.onclick === "function");
+        expect(divWithOnclick).toBeDefined();
+        divWithOnclick.onclick({ target: { textContent: "done" } });
+
+        expect(widget.activity.errorMsg).toHaveBeenCalled();
+        expect(widget.ratios).toEqual([1, 2]);
+    });
+
     test("arbitraryEdit sets editMode to arbitrary", () => {
         global.docById = jest.fn(id => {
             if (id === "circ1") {

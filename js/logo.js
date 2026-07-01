@@ -26,7 +26,8 @@
    NOACTIONERRORMSG, NOINPUTERRORMSG, NOSQRTERRORMSG, ZERODIVIDEERRORMSG,
    EMPTYHEAPERRORMSG, INVALIDPITCH, POSNUMBER, NOTATIONNOTE, NOTATIONDURATION,
    NOTATIONDOTCOUNT, NOTATIONTUPLETVALUE, NOTATIONROUNDDOWN,
-   NOTATIONINSIDECHORD, NOTATIONSTACCATO, ManagedTimer
+   NOTATIONINSIDECHORD, NOTATIONSTACCATO, ManagedTimer,
+   EmbeddedGraphicsScheduler
  */
 
 /*
@@ -60,36 +61,43 @@ class Queue {
 class Logo {
     /**
      * @constructor
-     * @param {Object|LogoDependencies} activityOrDeps - Either an Activity object (old pattern)
-     *                                                    or a LogoDependencies object (new pattern)
+     * @param {Object|LogoDependencies} activityOrDeps - Either a LogoDependencies object
+     *     (preferred) or a legacy Activity object. When an Activity is passed it is
+     *     converted automatically via {@link LogoDependencies.fromActivity}.
      *
      * @example
-     * // Old pattern (still supported)
+     * // Activity pattern (backward-compatible)
      * const logo = new Logo(activity);
      *
      * @example
-     * // New pattern (explicit dependencies)
-     * const deps = new LogoDependencies({
-     *     blocks: activity.blocks,
-     *     turtles: activity.turtles,
-     *     // ... other dependencies
-     * });
+     * // Explicit dependency pattern
+     * const deps = LogoDependencies.fromActivity(activity);
      * const logo = new Logo(deps);
      */
     constructor(activityOrDeps) {
-        // Check if this is a LogoDependencies instance
+        // `errorHandler` is the single property that distinguishes a
+        // LogoDependencies container from a legacy Activity object (which uses
+        // `errorMsg` instead). instanceof is checked first as the strongest
+        // signal; the typeof clause is a fallback for plain objects that satisfy
+        // the shape but are not formal instances (e.g. after jest.resetModules()
+        // clears module identity). When the project migrates to ES modules the
+        // require fallback and typeof clause can be removed.
+        const LD =
+            typeof LogoDependencies !== "undefined"
+                ? LogoDependencies
+                : require("./LogoDependencies");
         const isExplicitDeps =
-            activityOrDeps &&
-            activityOrDeps.blocks &&
-            activityOrDeps.turtles &&
-            activityOrDeps.stage &&
-            activityOrDeps.errorHandler;
+            activityOrDeps instanceof LD ||
+            (activityOrDeps !== null &&
+                activityOrDeps !== undefined &&
+                typeof activityOrDeps.errorHandler === "function");
 
         if (isExplicitDeps) {
-            // New pattern: explicit dependencies
+            // Explicit dependency container: use directly and build a
+            // compatibility facade so callers that expect an activity object
+            // still work (Notation constructor, plugins, getStatsFromNotation).
+
             this.deps = activityOrDeps;
-            // Expose activity facade for backward compatibility with external callers
-            // (Notation constructor, plugins, getStatsFromNotation, etc.)
             const deps = this.deps;
             this.activity = {
                 blocks: deps.blocks,
@@ -110,91 +118,17 @@ class Logo {
                 textMsg: msg => deps.textMsg(msg),
                 save: deps.save,
                 statsWindow: deps.statsWindow,
-                logo: this // Self-reference for compatibility
+                logo: this
             };
         } else {
-            // Old pattern: Activity object passed directly
+            // Activity pattern: preserve the original reference for backward
+            // compatibility and derive deps through the factory.
             this.activity = activityOrDeps;
-            // Build a deps view over activity so method bodies use deps throughout
-            const _act = activityOrDeps;
-            this.deps = {
-                blocks: _act.blocks,
-                turtles: _act.turtles,
-                stage: _act.stage,
-                errorHandler: (msg, blk) => _act.errorMsg(msg, blk),
-                messageHandler: {
-                    hide: () => _act.hideMsgs()
-                },
-                storage: {
-                    saveLocally: () => _act.saveLocally()
-                },
-                config: {
-                    get showBlocksAfterRun() {
-                        return _act.showBlocksAfterRun;
-                    },
-                    set showBlocksAfterRun(value) {
-                        _act.showBlocksAfterRun = value;
-                    }
-                },
-                callbacks: {
-                    get onStopTurtle() {
-                        return _act.onStopTurtle;
-                    },
-                    get onRunTurtle() {
-                        return _act.onRunTurtle;
-                    }
-                },
-                refreshCanvas: () => _act.refreshCanvas && _act.refreshCanvas(),
-                textMsg: msg => _act.textMsg && _act.textMsg(msg),
-                markStageDirty: () => {
-                    _act.stageDirty = true;
-                },
-                save: {
-                    afterSaveLilypond: () =>
-                        _act.save && _act.save.afterSaveLilypond && _act.save.afterSaveLilypond(),
-                    afterSaveAbc: () =>
-                        _act.save && _act.save.afterSaveAbc && _act.save.afterSaveAbc(),
-                    afterSaveMxml: () =>
-                        _act.save && _act.save.afterSaveMxml && _act.save.afterSaveMxml(),
-                    afterSaveMIDI: () =>
-                        _act.save && _act.save.afterSaveMIDI && _act.save.afterSaveMIDI()
-                },
-                statsWindow: {
-                    displayInfo: (...args) =>
-                        _act.statsWindow &&
-                        _act.statsWindow.displayInfo &&
-                        _act.statsWindow.displayInfo(...args)
-                },
-                // Audio and utility dependencies
-                instruments: typeof instruments !== "undefined" ? instruments : null,
-                instrumentsFilters:
-                    typeof instrumentsFilters !== "undefined" ? instrumentsFilters : null,
-                instrumentsEffects:
-                    typeof instrumentsEffects !== "undefined" ? instrumentsEffects : null,
-                widgetWindows: typeof window !== "undefined" ? window.widgetWindows : null,
-                Singer: typeof Singer !== "undefined" ? Singer : null,
-                Tone: typeof Tone !== "undefined" ? Tone : null,
-                utils: {
-                    doUseCamera: typeof doUseCamera !== "undefined" ? doUseCamera : null,
-                    doStopVideoCam: typeof doStopVideoCam !== "undefined" ? doStopVideoCam : null,
-                    getIntervalDirection:
-                        typeof getIntervalDirection !== "undefined" ? getIntervalDirection : null,
-                    getIntervalNumber:
-                        typeof getIntervalNumber !== "undefined" ? getIntervalNumber : null,
-                    mixedNumber: typeof mixedNumber !== "undefined" ? mixedNumber : null,
-                    rationalToFraction:
-                        typeof rationalToFraction !== "undefined" ? rationalToFraction : null,
-                    getStatsFromNotation:
-                        typeof getStatsFromNotation !== "undefined" ? getStatsFromNotation : null,
-                    delayExecution: typeof delayExecution !== "undefined" ? delayExecution : null,
-                    last: typeof last !== "undefined" ? last : null
-                },
-                classes: {
-                    Notation: typeof Notation !== "undefined" ? Notation : null,
-                    Synth: typeof Synth !== "undefined" ? Synth : null,
-                    StatusMatrix: typeof StatusMatrix !== "undefined" ? StatusMatrix : null
-                }
-            };
+            const LD =
+                typeof LogoDependencies !== "undefined"
+                    ? LogoDependencies
+                    : require("./LogoDependencies");
+            this.deps = LD.fromActivity(activityOrDeps);
         }
 
         // Bind commonly-used dependencies locally for readability
@@ -419,6 +353,8 @@ class Logo {
                 };
             }
         }
+
+        this._graphicsScheduler = new EmbeddedGraphicsScheduler(this);
     }
 
     // ========= Setters, Getters =================================================================
@@ -814,14 +750,29 @@ class Logo {
     }
 
     /**
-     * Parses receivedArg.
+     * Evaluates a block connection and returns its resolved value for use by
+     * the calling block.
      *
-     * @param logo
-     * @param turtle
-     * @param blk
-     * @param parentBlk
-     * @param receivedArg
-     * @returns {*}
+     * Resolution order:
+     *   1. If `proto.arg` is a function, delegate directly (fastest path).
+     *   2. `intervalname` blocks: update direction state and return the interval
+     *      number as a special case.
+     *   3. Value blocks: return `currentBlock.value`.
+     *   4. Output blocks (`anyout`, `numberout`, `textout`, `booleanout`): evaluate
+     *      by name — built-in cases (`dectofrac`, `hue`, `returnValue`) or plugin
+     *      lookup via `evalArgDict`.
+     *   5. All other blocks: return the block index `blk` as a pass-through.
+     *
+     * @param {Logo} logo - The running Logo instance.
+     * @param {number} turtle - Index of the active turtle.
+     * @param {number|null} blk - Index of the block to evaluate. A null value
+     *     triggers a NOINPUT error on `parentBlk`.
+     * @param {number|null} parentBlk - Index of the calling block; used only
+     *     for error reporting when `blk` is null.
+     * @param {*} receivedArg - Argument forwarded from an enclosing `doArg` /
+     *     `namedDoArg` call; passed through to `proto.arg` when applicable.
+     * @returns {*} The resolved value, or the block index `blk` for non-output
+     *     blocks.
      */
     parseArg(logo, turtle, blk, parentBlk, receivedArg) {
         const tur = logo.turtles.ithTurtle(turtle);
@@ -939,14 +890,24 @@ class Logo {
     }
 
     /**
-     * Updates the music notation used for Lilypond output.
+     * Adds a note event to the Lilypond notation buffer, splitting it across
+     * measure boundaries when necessary.
      *
-     * @param note
-     * @param {number} duration
-     * @param turtle
-     * @param insideChord
-     * @param drum
-     * @param {boolean} [split]
+     * When the note's duration carries it past the end of the current measure,
+     * the note is split: the portion that fits within the current measure (and
+     * any fully-spanned intermediate measures) is written first with ties,
+     * followed by the overflow into the next measure.  Recursion stops when
+     * `split` is false, which all recursive calls pass explicitly.
+     *
+     * @param {string[]} note - Pitch names (e.g. `["G4"]`), or `["R"]` for a
+     *     rest.
+     * @param {number} duration - Reciprocal note duration (e.g. 4 for a
+     *     quarter note, 8 for an eighth note).
+     * @param {number} turtle - Index of the active turtle.
+     * @param {boolean} insideChord - Whether this note is part of a chord.
+     * @param {string[]} drum - Drum patch names (may be empty).
+     * @param {boolean} [split=true] - Allow measure-boundary splitting. Pass
+     *     `false` to write the note directly without further splitting.
      * @returns {void}
      */
     updateNotation(note, duration, turtle, insideChord, drum, split) {
@@ -972,21 +933,26 @@ class Logo {
             tur.singer.beatsPerMeasure / tur.singer.noteValuePerBeat - timeIntoMeasure;
 
         if (split && durationTime > timeLeftInMeasure) {
-            const d = durationTime - timeLeftInMeasure;
-            let d2 = timeLeftInMeasure;
-            const b = tur.singer.beatsPerMeasure / tur.singer.noteValuePerBeat;
-            // console.debug("splitting note across measure boundary.");
-            const obj = this.deps.utils.rationalToFraction(d);
+            // overflowTime: the portion of the note that extends past all
+            // measure boundaries.
+            const overflowTime = durationTime - timeLeftInMeasure;
+            // partialTime: starts as the time remaining in the current measure;
+            // the while-loop below strips any whole measures to find the residual.
+            let partialTime = timeLeftInMeasure;
+            // measureDuration: the total duration of one full measure.
+            const measureDuration = tur.singer.beatsPerMeasure / tur.singer.noteValuePerBeat;
+            const obj = this.deps.utils.rationalToFraction(overflowTime);
 
-            if (d2 > 0) {
-                // Check to see if the note straddles multiple measures
+            if (partialTime > 0) {
+                // Count how many full measures this note spans beyond the first.
                 let i = 0;
-                while (d2 > b) {
+                while (partialTime > measureDuration) {
                     ++i;
-                    d2 -= b;
+                    partialTime -= measureDuration;
                 }
 
-                let obj2 = this.deps.utils.rationalToFraction(d2);
+                // Write the portion that fits within the current partial measure.
+                let obj2 = this.deps.utils.rationalToFraction(partialTime);
                 if (obj2[0] !== 0) {
                     this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
                 }
@@ -996,10 +962,10 @@ class Logo {
                         this.notation.notationInsertTie(turtle);
                         this.notation.notationDrumStaging[turtle].push("tie");
                     }
-                    obj2 = this.deps.utils.rationalToFraction(1 / b);
+                    obj2 = this.deps.utils.rationalToFraction(1 / measureDuration);
                 }
 
-                // Add any measures we straddled
+                // Write one full measure's worth for each intermediate measure.
                 while (i > 0) {
                     i -= 1;
                     if (obj2[0] !== 0) {
@@ -1022,10 +988,9 @@ class Logo {
                 }
             }
 
+            // Write the overflow portion that extends into the next measure.
             if (obj[0] > 0) {
-                if (obj[0] !== 0) {
-                    this.updateNotation(note, obj[1] / obj[0], turtle, insideChord, drum, false);
-                }
+                this.updateNotation(note, obj[1] / obj[0], turtle, insideChord, drum, false);
             }
         } else {
             // .. otherwise proceed as normal
@@ -1033,6 +998,18 @@ class Logo {
         }
     }
 
+    /**
+     * Records a note event into the per-turtle MIDI buffer for later export.
+     *
+     * @param {string[]} note - Array of pitch names.
+     * @param {string[]|null} drum - Drum patch names; only the first element is
+     *     used. Pass a falsy value for non-drum notes.
+     * @param {number} duration - Note duration in beats.
+     * @param {number} turtle - Index of the active turtle.
+     * @param {number} bpm - Tempo in beats per minute at the time of the note.
+     * @param {string} instrument - Instrument name for the note.
+     * @returns {void}
+     */
     notationMIDI(note, drum, duration, turtle, bpm, instrument) {
         if (!this._midiData[turtle]) {
             this._midiData[turtle] = [];
@@ -1277,10 +1254,25 @@ class Logo {
     }
 
     /**
-     * Runs Logo commands.
+     * Initialises interpreter state and launches all turtle execution queues.
      *
-     * @param startHere - index of a block to start from
-     * @param env
+     * This is the main entry point for program execution. It proceeds in two
+     * phases:
+     *
+     *   Phase 1 — Setup: resets run-state flags, clears notation and MIDI
+     *     buffers, initialises every turtle, removes stale event listeners, and
+     *     builds the named-action table by scanning `blocks.stackList`.
+     *
+     *   Phase 2 — Dispatch: kicks off execution by calling `runFromBlock` for
+     *     each start/drum/status/oscilloscope block found on the canvas.
+     *     Status and oscilloscope blocks run first (with a 250 ms head-start so
+     *     they can display their widgets before music begins); all other start
+     *     blocks follow together in a single guarded timeout.
+     *
+     * @param {number|null} startHere - Block index to start from directly, or
+     *     null to discover all start blocks on the canvas automatically.
+     * @param {*} env - Initial argument value forwarded to the first block as
+     *     `receivedArg` (typically null for top-level runs).
      * @returns {void}
      */
     runLogoCommands(startHere, env) {
@@ -1322,7 +1314,7 @@ class Logo {
             this._ignoringBlock = null;
         }
 
-        // NOW reset the flags for the new run
+        // Reset run-state flags for the new execution.
         this._alreadyRunning = false;
         this._prematureRestart = false;
 
@@ -1614,13 +1606,22 @@ class Logo {
     }
 
     /**
-     * Runs from a single block.
+     * Schedules execution of block `blk` after the turtle's current delay.
      *
-     * @param {this} logo
-     * @param turtle
-     * @param blk
-     * @param isflow
-     * @param receivedArg
+     * In step mode (`turtleDelay === TURTLESTEP`), the block is pushed onto
+     * `stepQueue` and executed when the user advances manually.  Otherwise a
+     * guarded `setTimeout` is used, which respects `stopTurtle` and the
+     * turtle's accumulated `waitTime`.
+     *
+     * @param {Logo} logo - The running Logo instance (always `this`).
+     * @param {number} turtle - Index of the active turtle.
+     * @param {number|null} blk - Index of the block to execute; a null value
+     *     returns immediately without scheduling.
+     * @param {number} isflow - 1 when called from within a flow (enables the
+     *     sync-counter yield path in `runFromBlockNow`), 0 for argument
+     *     evaluation.
+     * @param {*} receivedArg - Argument passed down from an enclosing action
+     *     call; forwarded unchanged to `runFromBlockNow`.
      * @returns {void}
      */
     runFromBlock(logo, turtle, blk, isflow, receivedArg) {
@@ -1658,14 +1659,32 @@ class Logo {
     }
 
     /**
-     * Runs a stack of blocks, beginning with block blocklist[blk].
+     * Executes block `blk` synchronously, then continues the turtle's queue.
      *
-     * @param {this} logo
-     * @param turtle
-     * @param blk
-     * @param isflow
-     * @param receivedArg
-     * @param {number} [queueStart]
+     * This is the hot path of the interpreter and handles three phases per
+     * block invocation:
+     *
+     *   (1) Argument evaluation — calls `parseArg` for each non-flow input
+     *       connection, building the `args` array.
+     *
+     *   (2) Block execution — calls either a plugin handler from `evalFlowDict`
+     *       or the block's own `proto.flow` method. Value blocks and arg blocks
+     *       reached as flow blocks display their value instead.
+     *
+     *   (3) Queue continuation — pops the next block from `tur.queue` and
+     *       recurses (directly or via a guarded `setTimeout` to yield the event
+     *       loop periodically). Handles backward-mode traversal, block
+     *       highlighting, and post-run notation export on queue exhaustion.
+     *
+     * @param {Logo} logo - The running Logo instance (always `this`).
+     * @param {number} turtle - Index of the active turtle.
+     * @param {number} blk - Index of the block to execute.
+     * @param {number} isflow - 1 when executing within a flow; enables the
+     *     sync-counter yield path.
+     * @param {*} receivedArg - Argument forwarded from an enclosing action
+     *     call.
+     * @param {number} [queueStart=0] - Queue depth threshold; blocks above
+     *     this index are processed, allowing partial-queue execution.
      * @returns {void}
      */
     runFromBlockNow(logo, turtle, blk, isflow, receivedArg, queueStart) {
@@ -1723,9 +1742,7 @@ class Logo {
         if (proto.args > 0) {
             for (let i = 1; i <= proto.args; i++) {
                 if (proto.dockTypes[i] === "in") {
-                    if (connections[i] === null) {
-                        // console.debug("skipping inflow args");
-                    } else {
+                    if (connections[i] !== null) {
                         args.push(connections[i]);
                     }
                 } else {
@@ -1758,24 +1775,36 @@ class Logo {
             // All flow blocks have a last connection (nextFlow), but
             // it can be null (i.e., end of a flow).
             if (tur.singer.backward.length > 0) {
+                // Inside a "backward" (or "duplicatenotes") clamp: traverse
+                // the block chain in reverse using connections[0] (the
+                // "previous" link) instead of the normal lastConnection.
                 const lastBackward = logo.deps.utils.last(tur.singer.backward);
                 const backwardBlock = logo.blockList[lastBackward];
                 const backwardConnections = backwardBlock.connections;
 
+                // connection[1] for "backward", connection[2] for wrapper
+                // blocks like "duplicatenotes" — points to the first block
+                // inside the clamp.
                 const c = backwardBlock.name === "backward" ? 1 : 2;
 
                 if (!logo.blocks.sameGeneration(backwardConnections[c], blk)) {
+                    // Current block is outside the backward clamp; use normal
+                    // forward flow.
                     nextFlow = lastConnection;
                 } else {
+                    // Walk backward: step to the previous block in the chain.
                     nextFlow = connections[0];
                     if (
                         nextFlow !== null &&
                         (logo.blockList[nextFlow].name === "action" ||
                             logo.blockList[nextFlow].name === "backward")
                     ) {
+                        // Hit a clamp boundary block — stop traversal here.
                         nextFlow = null;
                     } else {
                         if (!logo.blocks.sameGeneration(backwardConnections[c], nextFlow)) {
+                            // nextFlow stepped outside the clamp scope; fall
+                            // back to forward flow.
                             nextFlow = lastConnection;
                         } else {
                             nextFlow = connections[0];
@@ -1903,8 +1932,6 @@ class Logo {
                     }
                 }
             }
-        } else {
-            // console.debug("Ignoring block on overlapped start.");
         }
 
         if (logo.statusMatrix && logo.statusMatrix.isOpen && !logo.inStatusMatrix) {
@@ -1927,8 +1954,6 @@ class Logo {
             if (tur.parentFlowQueue != undefined) {
                 tur.parentFlowQueue.push(blk);
                 tur.queue.push(queueBlock);
-            } else {
-                // console.debug("cannot find queue for turtle " + turtle);
             }
         }
 
@@ -1991,36 +2016,36 @@ class Logo {
                     // If we are at the end of the child flow, queue
                     // the unhighlighting of the parent block to the
                     // flow.
-                    if (tur.unhighlightQueue === undefined) {
-                        // console.debug("cannot find highlight queue for turtle " + turtle);
-                    } else if (tur.parentFlowQueue.length > 0 && tur.queue.length > 0) {
-                        const lastQueue = logo.deps.utils.last(tur.queue);
-                        const lastParentFlow = logo.deps.utils.last(tur.parentFlowQueue);
+                    if (tur.unhighlightQueue !== undefined) {
+                        if (tur.parentFlowQueue.length > 0 && tur.queue.length > 0) {
+                            const lastQueue = logo.deps.utils.last(tur.queue);
+                            const lastParentFlow = logo.deps.utils.last(tur.parentFlowQueue);
 
-                        if (lastQueue.parentBlk !== lastParentFlow) {
-                            tur.unhighlightQueue.push(lastParentFlow);
+                            if (lastQueue.parentBlk !== lastParentFlow) {
+                                tur.unhighlightQueue.push(lastParentFlow);
+                            }
+                        } else if (tur.unhighlightQueue.length > 0) {
+                            // The child flow is finally complete, so unhighlight.
+                            logo._timerManager.setGuardedTimeout(
+                                () => {
+                                    if (logo.blocks.visible) {
+                                        const unhighlightBlock = tur.unhighlightQueue.pop();
+                                        logo.blocks.unhighlight(unhighlightBlock);
+                                        // Clear the currently highlighted block if it was this one
+                                        if (logo._currentlyHighlightedBlock === unhighlightBlock) {
+                                            logo._currentlyHighlightedBlock = null;
+                                        }
+                                        if (logo.stage) {
+                                            logo.deps.markStageDirty();
+                                        }
+                                    } else {
+                                        tur.unhighlightQueue.pop();
+                                    }
+                                },
+                                Math.max(logo.turtleDelay, MIN_HIGHLIGHT_DURATION_MS),
+                                () => logo.stopTurtle
+                            );
                         }
-                    } else if (tur.unhighlightQueue.length > 0) {
-                        // The child flow is finally complete, so unhighlight.
-                        logo._timerManager.setGuardedTimeout(
-                            () => {
-                                if (logo.blocks.visible) {
-                                    const unhighlightBlock = tur.unhighlightQueue.pop();
-                                    logo.blocks.unhighlight(unhighlightBlock);
-                                    // Clear the currently highlighted block if it was this one
-                                    if (logo._currentlyHighlightedBlock === unhighlightBlock) {
-                                        logo._currentlyHighlightedBlock = null;
-                                    }
-                                    if (logo.stage) {
-                                        logo.deps.markStageDirty();
-                                    }
-                                } else {
-                                    tur.unhighlightQueue.pop();
-                                }
-                            },
-                            Math.max(logo.turtleDelay, MIN_HIGHLIGHT_DURATION_MS),
-                            () => logo.stopTurtle
-                        );
                     }
                 }
             }
@@ -2079,9 +2104,7 @@ class Logo {
                                 tur.butNotThese[b] == null ||
                                 tur.butNotThese[b].indexOf(i) === -1
                             ) {
-                                if (tur.singer.runningFromEvent) {
-                                    // console.log("RUNNING FROM EVENT");
-                                } else {
+                                if (!tur.singer.runningFromEvent) {
                                     logo.stage.dispatchEvent(tur.endOfClampSignals[b][i]);
                                 }
                             }
@@ -2162,14 +2185,12 @@ class Logo {
                             document.body.style.cursor = "default";
                         }
                     } else if (logo.runningMxml) {
-                        // console.log("saving mxml output");
                         logo.deps.save.afterSaveMxml();
                         logo.runningMxml = false;
                     } else if (logo.runningMIDI) {
                         logo.deps.save.afterSaveMIDI();
                         logo.runningMIDI = false;
                     } else if (tur.singer.suppressOutput) {
-                        // console.debug("finishing compiling");
                         if (!logo.recording) {
                             logo.deps.errorHandler(_("Playback is ready."));
                         }
@@ -2201,14 +2222,7 @@ class Logo {
                     }
 
                     // Give the last note time to play.
-                    // console.debug(
-                    //     "SETTING LAST NOTE TIMEOUT: " +
-                    //         logo.recording +
-                    //         " " +
-                    //         tur.singer.suppressOutput
-                    // );
                     logo._lastNoteTimeout = logo._timerManager.setTimeout(() => {
-                        // console.debug("LAST NOTE PLAYED");
                         logo._lastNoteTimeout = null;
                         tur.singer.runningFromEvent = false;
                         if (tur.singer.suppressOutput && logo.recording) {
@@ -2238,714 +2252,29 @@ class Logo {
      * @returns {void}
      */
     async dispatchTurtleSignals(turtle, beatValue, blk, delay) {
-        // When turtle commands (forward, right, arc) are inside of notes,
-        // they are run progressively over the course of the note duration.
-
-        const tur = this.turtles.ithTurtle(turtle);
-
-        if (Object.keys(tur.singer.embeddedGraphics).length === 0) return;
-
-        if (!(blk in tur.singer.embeddedGraphics)) return;
-
-        if (tur.singer.embeddedGraphics[blk].length === 0) return;
-
-        // If the previous note's graphics are not complete, add a
-        // slight delay before drawing any new graphics.
-        if (!tur.embeddedGraphicsFinished) {
-            delay += 0.1;
-        }
-
-        tur.embeddedGraphicsFinished = false;
-
-        const suppressOutput = tur.singer.suppressOutput;
-
-        const __pen = (turtle, name, b, timeout) => {
-            let arg;
-            switch (name) {
-                case "penup":
-                case "pendown":
-                    break;
-                default:
-                    arg = this.parseArg(
-                        this,
-                        turtle,
-                        this.blockList[b].connections[1],
-                        b,
-                        this.receivedArg
-                    );
-                    break;
-            }
-            const _penSwitch = name => {
-                switch (name) {
-                    case "penup":
-                        tur.painter.doPenUp();
-                        break;
-                    case "pendown":
-                        tur.painter.doPenDown();
-                        break;
-                    case "setcolor":
-                        tur.painter.doSetColor(arg);
-                        break;
-                    case "sethue":
-                        tur.painter.doSetHue(arg);
-                        break;
-                    case "setshade":
-                        tur.painter.doSetValue(arg);
-                        break;
-                    case "settranslucency":
-                        tur.painter.doSetPenAlpha(arg);
-                        break;
-                    case "setgrey":
-                        tur.painter.doSetChroma(arg);
-                        break;
-                    case "setpensize":
-                        tur.painter.doSetPensize(arg);
-                        break;
-                }
-            };
-
-            if (suppressOutput) {
-                _penSwitch(name);
-            } else {
-                this._timerManager.setGuardedTimeout(
-                    () => _penSwitch(name),
-                    timeout,
-                    () => this.stopTurtle
-                );
-            }
-        };
-
-        const __clear = () => {
-            if (tur.singer.suppressOutput) {
-                const savedPenState = tur.painter.penState;
-                tur.painter.penState = false;
-                tur.painter.doSetXY(0, 0);
-                tur.painter.doSetHeading(0);
-                tur.painter.penState = savedPenState;
-                this.svgBackground = true;
-            } else {
-                tur.painter.penState = false;
-                tur.painter.doSetHeading(0);
-                tur.painter.doSetXY(0, 0);
-                tur.painter.penState = true;
-                // tur.painter.doClear(true, true, true);
-            }
-        };
-
-        const __right = (turtle, b, waitTime, stepTime, sign) => {
-            const arg =
-                this.parseArg(this, turtle, this.blockList[b].connections[1], b, this.receivedArg) *
-                sign;
-            if (suppressOutput) {
-                const savedPenState = tur.painter.penState;
-                tur.painter.penState = false;
-                tur.painter.doRight(arg);
-                tur.painter.penState = savedPenState;
-            } else {
-                for (let t = 0; t < NOTEDIV / tur.singer.dispatchFactor; t++) {
-                    const deltaTime = waitTime + t * stepTime * tur.singer.dispatchFactor;
-                    const deltaArg = arg / (NOTEDIV / tur.singer.dispatchFactor);
-                    this._timerManager.setGuardedTimeout(
-                        () => tur.painter.doRight(deltaArg),
-                        deltaTime,
-                        () => this.stopTurtle
-                    );
-                }
-            }
-        };
-
-        const __setheading = (turtle, b, timeout) => {
-            if (suppressOutput) {
-                const arg = this.parseArg(
-                    this,
-                    turtle,
-                    this.blockList[b].connections[1],
-                    b,
-                    this.receivedArg
-                );
-                tur.painter.doSetHeading(arg);
-            } else {
-                this._timerManager.setGuardedTimeout(
-                    () => {
-                        const arg = this.parseArg(
-                            this,
-                            turtle,
-                            this.blockList[b].connections[1],
-                            b,
-                            this.receivedArg
-                        );
-                        tur.painter.doSetHeading(arg);
-                    },
-                    timeout,
-                    () => this.stopTurtle
-                );
-            }
-        };
-
-        const __forward = (turtle, b, waitTime, stepTime, sign) => {
-            const arg =
-                this.parseArg(this, turtle, this.blockList[b].connections[1], b, this.receivedArg) *
-                sign;
-            if (suppressOutput) {
-                const savedPenState = tur.painter.penState;
-                tur.painter.penState = false;
-                tur.painter.doForward(arg);
-                tur.painter.penState = savedPenState;
-            } else {
-                for (let t = 0; t < NOTEDIV / tur.singer.dispatchFactor; t++) {
-                    const deltaTime = waitTime + t * stepTime * tur.singer.dispatchFactor;
-                    const deltaArg = arg / (NOTEDIV / tur.singer.dispatchFactor);
-                    if (t === 0) {
-                        this._timerManager.setGuardedTimeout(
-                            () => tur.painter.doForward(deltaArg, "first"),
-                            deltaTime,
-                            () => this.stopTurtle
-                        );
-                    } else if (t === Math.ceil(NOTEDIV / tur.singer.dispatchFactor) - 1) {
-                        this._timerManager.setGuardedTimeout(
-                            () => tur.painter.doForward(deltaArg, "last"),
-                            deltaTime,
-                            () => this.stopTurtle
-                        );
-                    } else {
-                        this._timerManager.setGuardedTimeout(
-                            () => tur.painter.doForward(deltaArg, "middle"),
-                            deltaTime,
-                            () => this.stopTurtle
-                        );
-                    }
-                }
-            }
-        };
-
-        const __scrollxy = (turtle, b, timeout) => {
-            if (suppressOutput) {
-                const arg1 = this.parseArg(
-                    this,
-                    turtle,
-                    this.blockList[b].connections[1],
-                    b,
-                    this.receivedArg
-                );
-                const arg2 = this.parseArg(
-                    this,
-                    turtle,
-                    this.blockList[b].connections[2],
-                    b,
-                    this.receivedArg
-                );
-                tur.painter.doScrollXY(arg1, arg2);
-            } else {
-                this._timerManager.setGuardedTimeout(
-                    () => {
-                        const arg1 = this.parseArg(
-                            this,
-                            turtle,
-                            this.blockList[b].connections[1],
-                            b,
-                            this.receivedArg
-                        );
-                        const arg2 = this.parseArg(
-                            this,
-                            turtle,
-                            this.blockList[b].connections[2],
-                            b,
-                            this.receivedArg
-                        );
-                        tur.painter.doScrollXY(arg1, arg2);
-                    },
-                    timeout,
-                    () => this.stopTurtle
-                );
-            }
-        };
-
-        const __setxy = (turtle, b, timeout) => {
-            if (suppressOutput) {
-                const savedPenState = tur.painter.penState;
-                const arg1 = this.parseArg(
-                    this,
-                    turtle,
-                    this.blockList[b].connections[1],
-                    b,
-                    this.receivedArg
-                );
-                const arg2 = this.parseArg(
-                    this,
-                    turtle,
-                    this.blockList[b].connections[2],
-                    b,
-                    this.receivedArg
-                );
-                tur.painter.penState = false;
-                tur.painter.doSetXY(arg1, arg2);
-                tur.painter.penState = savedPenState;
-            } else {
-                this._timerManager.setGuardedTimeout(
-                    () => {
-                        const arg1 = this.parseArg(
-                            this,
-                            turtle,
-                            this.blockList[b].connections[1],
-                            b,
-                            this.receivedArg
-                        );
-                        const arg2 = this.parseArg(
-                            this,
-                            turtle,
-                            this.blockList[b].connections[2],
-                            b,
-                            this.receivedArg
-                        );
-                        tur.painter.doSetXY(arg1, arg2);
-                    },
-                    timeout,
-                    () => this.stopTurtle
-                );
-            }
-        };
-
-        const __show = (turtle, b, timeout) => {
-            if (suppressOutput) return;
-            const arg1 = this.parseArg(
-                this,
-                turtle,
-                this.blockList[b].connections[1],
-                b,
-                this.receivedArg
-            );
-            const arg2 = this.parseArg(
-                this,
-                turtle,
-                this.blockList[b].connections[2],
-                b,
-                this.receivedArg
-            );
-            this._timerManager.setGuardedTimeout(
-                () => this.processShow(turtle, null, arg1, arg2),
-                timeout,
-                () => this.stopTurtle
-            );
-        };
-
-        const __speak = (turtle, b, timeout) => {
-            if (suppressOutput) return;
-            const arg = this.parseArg(
-                this,
-                turtle,
-                this.blockList[b].connections[1],
-                b,
-                this.receivedArg
-            );
-            this._timerManager.setGuardedTimeout(
-                () => this.processSpeak(arg),
-                timeout,
-                () => this.stopTurtle
-            );
-        };
-
-        const __print = (turtle, b, timeout) => {
-            if (suppressOutput) return;
-            const arg = this.parseArg(
-                this,
-                turtle,
-                this.blockList[b].connections[1],
-                b,
-                this.receivedArg
-            );
-            if (arg === undefined) return;
-            this._timerManager.setGuardedTimeout(
-                () => this.deps.textMsg(arg.toString()),
-                timeout,
-                () => this.stopTurtle
-            );
-        };
-
-        const __arc = (turtle, b, waitTime, stepTime) => {
-            const arg1 = this.parseArg(
-                this,
-                turtle,
-                this.blockList[b].connections[1],
-                b,
-                this.receivedArg
-            );
-            const arg2 = this.parseArg(
-                this,
-                turtle,
-                this.blockList[b].connections[2],
-                b,
-                this.receivedArg
-            );
-            if (suppressOutput) {
-                const savedPenState = tur.painter.penState;
-                tur.painter.penState = false;
-                tur.painter.doArc(arg1, arg2);
-                tur.painter.penState = savedPenState;
-            } else {
-                for (let t = 0; t < NOTEDIV / tur.singer.dispatchFactor; t++) {
-                    const deltaTime = waitTime + t * stepTime * tur.singer.dispatchFactor;
-                    const deltaArg = arg1 / (NOTEDIV / tur.singer.dispatchFactor);
-                    this._timerManager.setGuardedTimeout(
-                        () => tur.painter.doArc(deltaArg, arg2),
-                        deltaTime,
-                        () => this.stopTurtle
-                    );
-                }
-            }
-        };
-
-        const __cp1 = (turtle, b, timeout) => {
-            if (suppressOutput) {
-                const arg1 = this.parseArg(
-                    this,
-                    turtle,
-                    this.blockList[b].connections[1],
-                    b,
-                    this.receivedArg
-                );
-                const arg2 = this.parseArg(
-                    this,
-                    turtle,
-                    this.blockList[b].connections[2],
-                    b,
-                    this.receivedArg
-                );
-                tur.painter.cp1x = arg1;
-                tur.painter.cp1y = arg2;
-            } else {
-                this._timerManager.setGuardedTimeout(
-                    () => {
-                        const arg1 = this.parseArg(
-                            this,
-                            turtle,
-                            this.blockList[b].connections[1],
-                            b,
-                            this.receivedArg
-                        );
-                        const arg2 = this.parseArg(
-                            this,
-                            turtle,
-                            this.blockList[b].connections[2],
-                            b,
-                            this.receivedArg
-                        );
-                        tur.painter.cp1x = arg1;
-                        tur.painter.cp1y = arg2;
-                    },
-                    timeout,
-                    () => this.stopTurtle
-                );
-            }
-        };
-
-        const __cp2 = (turtle, b, timeout) => {
-            if (suppressOutput) {
-                const arg1 = this.parseArg(
-                    this,
-                    turtle,
-                    this.blockList[b].connections[1],
-                    b,
-                    this.receivedArg
-                );
-                const arg2 = this.parseArg(
-                    this,
-                    turtle,
-                    this.blockList[b].connections[2],
-                    b,
-                    this.receivedArg
-                );
-                tur.painter.cp2x = arg1;
-                tur.painter.cp2y = arg2;
-            } else {
-                this._timerManager.setGuardedTimeout(
-                    () => {
-                        const arg1 = this.parseArg(
-                            this,
-                            turtle,
-                            this.blockList[b].connections[1],
-                            b,
-                            this.receivedArg
-                        );
-                        const arg2 = this.parseArg(
-                            this,
-                            turtle,
-                            this.blockList[b].connections[2],
-                            b,
-                            this.receivedArg
-                        );
-                        tur.painter.cp2x = arg1;
-                        tur.painter.cp2y = arg2;
-                    },
-                    timeout,
-                    () => this.stopTurtle
-                );
-            }
-        };
-
-        const __bezier = (turtle, b, timeout) => {
-            if (suppressOutput) {
-                const savedPenState = tur.painter.penState;
-                const arg1 = this.parseArg(
-                    this,
-                    turtle,
-                    this.blockList[b].connections[1],
-                    b,
-                    this.receivedArg
-                );
-                const arg2 = this.parseArg(
-                    this,
-                    turtle,
-                    this.blockList[b].connections[2],
-                    b,
-                    this.receivedArg
-                );
-                tur.painter.penState = false;
-                tur.painter.doBezier(arg1, arg2);
-                tur.painter.penState = savedPenState;
-            } else {
-                this._timerManager.setGuardedTimeout(
-                    () => {
-                        const arg1 = this.parseArg(
-                            this,
-                            turtle,
-                            this.blockList[b].connections[1],
-                            b,
-                            this.receivedArg
-                        );
-                        const arg2 = this.parseArg(
-                            this,
-                            turtle,
-                            this.blockList[b].connections[2],
-                            b,
-                            this.receivedArg
-                        );
-                        tur.painter.doBezier(arg1, arg2);
-                    },
-                    timeout,
-                    () => this.stopTurtle
-                );
-            }
-        };
-
-        let inFillClamp = false;
-        const __fill = (turtle, timeout) => {
-            if (suppressOutput) {
-                const savedPenState = tur.painter.penState;
-                tur.painter.penState = false;
-                if (inFillClamp) {
-                    tur.painter.doEndFill();
-                    inFillClamp = false;
-                } else {
-                    tur.painter.doStartFill();
-                    inFillClamp = true;
-                }
-                tur.painter.penState = savedPenState;
-            } else {
-                this._timerManager.setGuardedTimeout(
-                    () => {
-                        if (inFillClamp) {
-                            tur.painter.doEndFill();
-                            inFillClamp = false;
-                        } else {
-                            tur.painter.doStartFill();
-                            inFillClamp = true;
-                        }
-                    },
-                    timeout,
-                    () => this.stopTurtle
-                );
-            }
-        };
-
-        let inHollowLineClamp = false;
-        const __hollowline = (turtle, timeout) => {
-            if (suppressOutput) {
-                if (inHollowLineClamp) {
-                    tur.painter.doEndHollowLine();
-                    inHollowLineClamp = false;
-                } else {
-                    tur.painter.doStartHollowLine();
-                    inHollowLineClamp = true;
-                }
-            } else {
-                this._timerManager.setGuardedTimeout(
-                    () => {
-                        if (inHollowLineClamp) {
-                            tur.painter.doEndHollowLine();
-                            inHollowLineClamp = false;
-                        } else {
-                            tur.painter.doStartHollowLine();
-                            inHollowLineClamp = true;
-                        }
-                    },
-                    timeout,
-                    () => this.stopTurtle
-                );
-            }
-        };
-
-        const embeddedGraphicsLength = tur.singer.embeddedGraphics[blk].length;
-        let extendedGraphicsCounter = 0;
-        for (let i = 0; i < embeddedGraphicsLength; i++) {
-            const b = tur.singer.embeddedGraphics[blk][i];
-            switch (this.blockList[b].name) {
-                case "forward":
-                case "back":
-                case "right":
-                case "left":
-                case "arc":
-                    ++extendedGraphicsCounter;
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        // Cheat by 0.5% so that the mouse has time to complete its work.
-        let stepTime = ((beatValue - delay) * 995) / NOTEDIV;
-        if (stepTime < 0) stepTime = 0;
-
-        // We do each graphics action sequentially, so we need to
-        // divide stepTime by the length of the embedded graphics
-        // array.
-        if (extendedGraphicsCounter > 0) {
-            stepTime = stepTime / extendedGraphicsCounter;
-        }
-
-        let waitTime = delay * 1000;
-
-        // Update the turtle graphics every 50ms within a note.
-        if (stepTime > 200) {
-            tur.singer.dispatchFactor = NOTEDIV / 32;
-        } else if (stepTime > 100) {
-            tur.singer.dispatchFactor = NOTEDIV / 16;
-        } else if (stepTime > 50) {
-            tur.singer.dispatchFactor = NOTEDIV / 8;
-        } else if (stepTime > 25) {
-            tur.singer.dispatchFactor = NOTEDIV / 4;
-        } else if (stepTime > 12.5) {
-            tur.singer.dispatchFactor = NOTEDIV / 2;
-        } else {
-            tur.singer.dispatchFactor = NOTEDIV;
-        }
-
-        for (let i = 0; i < embeddedGraphicsLength; i++) {
-            const b = tur.singer.embeddedGraphics[blk][i];
-            const name = this.blockList[b].name;
-
-            switch (name) {
-                case "setcolor":
-                case "sethue":
-                case "setshade":
-                case "settranslucency":
-                case "setgrey":
-                case "setpensize":
-                    __pen(turtle, name, b, waitTime);
-                    break;
-
-                case "penup":
-                case "pendown":
-                    if (!suppressOutput) {
-                        __pen(turtle, name, null, waitTime);
-                    }
-                    break;
-
-                case "clear":
-                    __clear();
-                    break;
-
-                case "fill":
-                    __fill(turtle, waitTime);
-                    break;
-
-                case "hollowline":
-                    __hollowline(turtle, waitTime);
-                    break;
-
-                case "controlpoint1":
-                    __cp1(turtle, b, waitTime);
-                    break;
-
-                case "controlpoint2":
-                    __cp2(turtle, b, waitTime);
-                    break;
-
-                case "bezier":
-                    /**
-                     * @todo Is there a reasonable way to break the bezier
-                     * curve up into small steps?
-                     */
-                    __bezier(turtle, b, waitTime);
-                    break;
-
-                case "setheading":
-                    __setheading(turtle, b, waitTime);
-                    break;
-
-                case "right":
-                    __right(turtle, b, waitTime, stepTime, 1);
-                    waitTime += NOTEDIV * stepTime;
-                    break;
-
-                case "left":
-                    __right(turtle, b, waitTime, stepTime, -1);
-                    waitTime += NOTEDIV * stepTime;
-                    break;
-
-                case "forward":
-                    __forward(turtle, b, waitTime, stepTime, 1);
-                    waitTime += NOTEDIV * stepTime;
-                    break;
-
-                case "back":
-                    __forward(turtle, b, waitTime, stepTime, -1);
-                    waitTime += NOTEDIV * stepTime;
-                    break;
-
-                case "setxy":
-                    __setxy(turtle, b, waitTime);
-                    break;
-
-                case "scrollxy":
-                    __scrollxy(turtle, b, waitTime);
-                    break;
-
-                case "show":
-                    __show(turtle, b, waitTime);
-                    break;
-
-                case "speak":
-                    __speak(turtle, b, waitTime);
-                    break;
-
-                case "print":
-                    __print(turtle, b, waitTime);
-                    break;
-
-                case "arc":
-                    __arc(turtle, b, waitTime, stepTime);
-                    waitTime += NOTEDIV * stepTime;
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-        // Mark the end time of this note's graphics operations.
-        await this.deps.utils.delayExecution(beatValue * 1000);
-        tur.embeddedGraphicsFinished = true;
+        return this._graphicsScheduler.schedule(turtle, beatValue, blk, delay);
     }
 
     /**
-     * Executes plugin code safely.
-     * @param code - The plugin code (function or string) to execute.
-     * @param logo - The logo object.
-     * @param turtle - The turtle index.
-     * @param blk - The block index.
-     * @param value - An optional value for setters or additional context.
-     * @param args - Additional arguments for different plugin types.
-     * @returns {*} - The result of the execution if applicable.
+     * Executes plugin-provided block code in a sandboxed manner.
+     *
+     * Plugins may supply either a pre-compiled function or a legacy string of
+     * JavaScript.  Functions are called directly inside a try/catch.  Strings
+     * are matched against an allowlist of known-safe math patterns (see
+     * `mathPatterns` below) and executed natively; all other string code is
+     * blocked to prevent arbitrary eval injection (security fix for #5449).
+     *
+     * @param {Function|string} code - Plugin code: a callable or a legacy JS
+     *     string from a plugin definition file (e.g. maths.json).
+     * @param {Logo} logo - The running Logo instance.
+     * @param {number} turtle - Index of the active turtle.
+     * @param {number} blk - Index of the block being evaluated.
+     * @param {*} value - Context value forwarded to the plugin (e.g. the
+     *     current block value for setter blocks).
+     * @param {...*} args - Additional arguments forwarded verbatim to function
+     *     plugins.
+     * @returns {*} The plugin's return value, or `undefined` for void or
+     *     blocked calls.
      */
     safePluginExecute(code, logo, turtle, blk, value, ...args) {
         if (typeof code === "function") {
