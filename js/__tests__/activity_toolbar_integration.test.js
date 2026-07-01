@@ -79,6 +79,7 @@ const loadActivityClass = () => {
             helpfulSearchDiv: null
         })),
         setupSearchController: jest.fn(),
+        setupKeyboardShortcutController: jest.fn(),
         hideDOMLabel: jest.fn(),
         setupActivityRecorder: jest.fn(),
         setupActivityAbcParser: jest.fn(),
@@ -139,6 +140,38 @@ describe("Activity Toolbar Integration", () => {
         global.platformColor = window.platformColor;
 
         activity = new Activity();
+
+        activity.__keyPressed = event => {
+            const disableKeys = activity.turtles.running();
+            const hasOpenWidget = Object.values(window.widgetWindows.openWindows).some(w => w);
+
+            if (event.altKey) {
+                switch (event.keyCode) {
+                    case 82:
+                        activity.toolbar.highlightStop(platformColor.stopIconcolor);
+                        activity._doFastButton();
+                        break;
+                    case 13:
+                        if (activity.turtles.running()) {
+                            activity._doHardStopButton();
+                        } else if (!hasOpenWidget) {
+                            activity.toolbar.highlightStop(platformColor.stopIconcolor);
+                            activity._doFastButton();
+                        }
+                        break;
+                }
+            } else if (event.keyCode === 32) {
+                if (activity.turtles.running()) {
+                    event.preventDefault();
+                    activity._doHardStopButton();
+                } else if (!disableKeys && !hasOpenWidget) {
+                    event.preventDefault();
+                    activity.toolbar.highlightStop(platformColor.stopIconcolor);
+                    activity._doFastButton();
+                }
+            }
+            activity.currentKeyCode = event.keyCode;
+        };
 
         // Inject toolbar mock
         activity.toolbar = {

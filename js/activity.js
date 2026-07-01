@@ -32,7 +32,7 @@ try {
    ErrorHandler, ActivityContext,
    Boundary, CARTESIAN, changeImage, closeWidgets, doRecordButton, setupActivityRecorder,
    setupGridController, setupGridRenderer, setupPluginController, setupToolbarController, setupAlertController, setupAlertRenderer, setupPaletteLoader, PluginDialog,
-   setupSearchController, setupSearchUI,
+   setupSearchController, setupKeyboardShortcutController, setupSearchUI,
    setupActivityAbcParser, setupActivityIdleWatcher,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
@@ -124,6 +124,7 @@ let MYDEFINES = [
     "activity/recorder",
     "activity/idle-watcher",
     "activity/grid-controller",
+    "activity/keyboard-shortcut-controller",
     "activity/grid-renderer",
     "activity/plugin-controller",
     "activity/toolbar-controller",
@@ -132,6 +133,7 @@ let MYDEFINES = [
     "palette/palette-loader",
     "activity/search-controller",
     "search-ui",
+    "activity/keyboard-shortcut-controller",
     "widgets/plugin-dialog",
     "utils/musicutils",
     "utils/synthutils",
@@ -340,7 +342,6 @@ class Activity {
 
         // Flag to disable keyboard during loading of MB
         this.keyboardEnableFlag;
-        this.inTempoWidget = false;
         this.projectID = null;
         try {
             this.storage = localStorage;
@@ -481,6 +482,7 @@ class Activity {
         setupPaletteLoader(this);
         this.searchUI = setupSearchUI(this);
         setupSearchController(this, this.searchUI);
+        setupKeyboardShortcutController(this);
         this.pluginDialog = new PluginDialog({
             onLoadBuiltIn: name => this._loadBuiltInPlugin(name),
             onDelete: () => this._deletePlugin(),
@@ -2365,417 +2367,6 @@ class Activity {
                 [8, "hiddennoflow", 0, 0, [0, null]]
             ];
             this.blocks.loadNewBlocks(samplerStack);
-        };
-
-        /*
-         * Handles keyboard shortcuts in MB
-         */
-        this.__keyPressed = event => {
-            // First, check if the pitch slider is open
-            if (window.widgetWindows.isOpen("slider") === true) {
-                // If the event is an arrow key, let the PitchSlider handle it
-                if (
-                    event.keyCode === 37 ||
-                    event.keyCode === 38 ||
-                    event.keyCode === 39 ||
-                    event.keyCode === 40
-                ) {
-                    // Simply prevent default behavior here
-                    // The actual pitch slider handling is done in the PitchSlider class
-                    event.preventDefault();
-                    event.stopPropagation();
-                    return false;
-                }
-            }
-
-            if (window.widgetWindows.isOpen("JavaScript Editor") === true) return;
-            if (!this.keyboardEnableFlag) {
-                return;
-            }
-            if (document.getElementById("labelDiv").classList.contains("hasKeyboard")) {
-                return;
-            }
-            // Skip hotkeys when value bar is visible (prevents accidental block creation)
-            if (this.printText && this.printText.classList.contains("show")) {
-                return;
-            }
-
-            if (this.keyboardEnableFlag) {
-                if (
-                    document.getElementById("BPMInput") !== null &&
-                    document.getElementById("BPMInput").classList.contains("hasKeyboard")
-                ) {
-                    return;
-                }
-                if (
-                    document.getElementById("musicratio1") !== null &&
-                    document.getElementById("musicratio1").classList.contains("hasKeyboard")
-                ) {
-                    return;
-                }
-                if (
-                    document.getElementById("musicratio2") !== null &&
-                    document.getElementById("musicratio2").classList.contains("hasKeyboard")
-                ) {
-                    return;
-                }
-                if (
-                    document.getElementById("dissectNumber") !== null &&
-                    document.getElementById("dissectNumber").classList.contains("hasKeyboard")
-                ) {
-                    return;
-                }
-                if (
-                    document.getElementById("timbreName") !== null &&
-                    document.getElementById("timbreName").classList.contains("hasKeyboard")
-                ) {
-                    return;
-                }
-            }
-            // const BACKSPACE = 8;
-            const TAB = 9;
-            if (event.keyCode === TAB) {
-                const active = document.activeElement;
-                const isCanvasOrBody =
-                    active === document.body ||
-                    active === document.getElementById("canvas") ||
-                    active === document.getElementById("myCanvas");
-                if (isCanvasOrBody) {
-                    event.preventDefault();
-                    return false;
-                }
-                return;
-            }
-            const ESC = 27;
-            // const ALT = 18;
-            // const CTRL = 17;
-            // const SHIFT = 16;
-            const RETURN = 13;
-            const SPACE = 32;
-            const HOME = 36;
-            const END = 35;
-            const PAGE_UP = 33;
-            const PAGE_DOWN = 34;
-            const KEYCODE_LEFT = 37;
-            const KEYCODE_RIGHT = 39;
-            const KEYCODE_UP = 38;
-            const KEYCODE_DOWN = 40;
-            const DEL = 46;
-            const V = 86;
-            const lilypondModal = document.getElementById("lilypondModal");
-            const samplerPrompt = document.getElementById("samplerPrompt");
-            const planetIframe = document.getElementById("planet-iframe");
-            const pasteEl = this.paste;
-            const wheelDiv = document.getElementById("wheelDiv");
-            const disableKeys =
-                lilypondModal.style.display === "block" ||
-                this.searchWidget.style.visibility === "visible" ||
-                this.helpfulSearchWidget.style.visibility === "visible" ||
-                this.isInputON ||
-                samplerPrompt ||
-                planetIframe.style.display === "" ||
-                pasteEl.style.visibility === "visible" ||
-                wheelDiv.style.display === "" ||
-                this.turtles.running();
-            const widgetTitle = document.getElementsByClassName("wftTitle");
-            for (let i = 0; i < widgetTitle.length; i++) {
-                if (widgetTitle[i].innerHTML === "tempo") {
-                    this.inTempoWidget = true;
-                    break;
-                }
-            }
-            if (
-                (event.altKey && !disableKeys) ||
-                event.keyCode === 13 ||
-                event.key === "/" ||
-                event.key === "\\"
-            ) {
-                switch (event.keyCode) {
-                    case 66: // 'B'
-                        this.textMsg("Alt-B " + _("Saving block artwork"));
-                        this.save.saveBlockArtwork();
-                        break;
-                    case 67: // 'C'
-                        this.textMsg("Alt-C " + _("Copy"));
-                        this.blocks.prepareStackForCopy();
-                        break;
-                    case 69: // 'E'
-                        this.textMsg("Alt-E " + _("Erase"));
-                        this._allClear(false);
-                        break;
-                    case 82: {
-                        // 'R or ENTER'
-                        this.textMsg("Alt-R " + _("Play"));
-                        this.toolbar.highlightStop(platformColor.stopIconcolor);
-                        this._doFastButton();
-                        break;
-                    }
-                    case 13: {
-                        // Alt+ENTER
-                        if (this.isInputON) return;
-
-                        if (this.searchWidget.style.visibility === "visible") {
-                            return;
-                        }
-                        if (pasteEl.style.visibility === "visible") {
-                            this.pasted();
-                            pasteEl.style.visibility = "hidden";
-                            return;
-                        }
-
-                        // Check if any widget window is open
-                        const hasOpenWidget = Object.values(window.widgetWindows.openWindows).some(
-                            w => w
-                        );
-                        if (this.turtles.running()) {
-                            this._doHardStopButton();
-                        } else if (!hasOpenWidget) {
-                            this.toolbar.highlightStop(platformColor.stopIconcolor);
-                            this._doFastButton();
-                        }
-                        break;
-                    }
-                    case 83: // 'S'
-                        this.textMsg("Alt-S " + _("Stop"));
-                        this.logo.doStopTurtles();
-                        break;
-                    case 86: // 'V'
-                        // this.textMsg("Alt-V " + _("Paste"));
-                        this.blocks.pasteStack();
-                        break;
-                    case 72: // 'H' save block help
-                        this.textMsg("Alt-H " + _("Save block help"));
-                        this._saveHelpBlocks();
-                        break;
-                    case 191:
-                        if (
-                            event.key === "/" &&
-                            !this.beginnerMode &&
-                            disableHorizScrollIcon.style.display === "block"
-                        ) {
-                            this.blocksContainer.x += this.canvas.width / 10;
-                            this.stageDirty = true;
-                        }
-                    // fall through
-                    case 220:
-                        if (
-                            event.key === "\\" &&
-                            !this.beginnerMode &&
-                            disableHorizScrollIcon.style.display === "block"
-                        ) {
-                            this.blocksContainer.x -= this.canvas.width / 10;
-                            this.stageDirty = true;
-                        }
-                }
-            } else if (event.ctrlKey) {
-                switch (event.keyCode) {
-                    case V:
-                        // this.textMsg("Ctl-V " + _("Paste"));
-                        this.pasteBox.createBox(this.turtleBlocksScale, 200, 200);
-                        this.pasteBox.show();
-                        pasteEl.style.left =
-                            (this.pasteBox.getPos()[0] + 10) * this.turtleBlocksScale + "px";
-                        pasteEl.style.top =
-                            (this.pasteBox.getPos()[1] + 10) * this.turtleBlocksScale + "px";
-                        pasteEl.focus();
-                        pasteEl.style.visibility = "visible";
-                        this.update = true;
-                        break;
-                }
-            } else if (event.shiftKey && !disableKeys) {
-                switch (event.keyCode) {
-                    case SPACE:
-                        event.preventDefault();
-                        if (this.turtleContainer.scaleX === 1) {
-                            this.turtles.setStageScale(0.5);
-                        } else {
-                            this.turtles.setStageScale(1);
-                        }
-                        break;
-                }
-            } else {
-                if (pasteEl.style.visibility === "visible" && event.keyCode === RETURN) {
-                    if (pasteEl.value.length > 0) {
-                        this.pasted();
-                    }
-                } else if (event.keyCode === SPACE) {
-                    // Check if any widget window is open
-                    const hasOpenWidget = Object.values(window.widgetWindows.openWindows).some(
-                        w => w
-                    );
-                    if (this.turtles.running()) {
-                        event.preventDefault();
-                        this._doHardStopButton();
-                    } else if (!disableKeys && !hasOpenWidget) {
-                        event.preventDefault();
-                        this.toolbar.highlightStop(platformColor.stopIconcolor);
-                        this._doFastButton();
-                    }
-                } else if (!disableKeys) {
-                    switch (event.keyCode) {
-                        case END:
-                            this.textMsg("END " + _("Jumping to the bottom of the page."));
-                            this.blocksContainer.y =
-                                -this.blocks.bottomMostBlock() + this.canvas.height / 2;
-                            this.stageDirty = true;
-                            break;
-                        case PAGE_UP:
-                            this.textMsg("PAGE_UP " + _("Scrolling up."));
-                            this.blocksContainer.y += this.canvas.height / 2;
-                            this.stageDirty = true;
-                            break;
-                        case PAGE_DOWN:
-                            this.textMsg("PAGE_DOWN " + _("Scrolling down."));
-                            this.blocksContainer.y -= this.canvas.height / 2;
-                            this.stageDirty = true;
-                            break;
-                        case DEL:
-                            this.textMsg("DEL " + _("Extracting block"));
-                            this.blocks.extract();
-                            break;
-                        case KEYCODE_UP:
-                            if (this.inTempoWidget) {
-                                this.logo.tempo.speedUp(0);
-                            } else {
-                                if (this.blocks.activeBlock !== null) {
-                                    this.textMsg("UP ARROW " + _("Moving block up."));
-                                    this.blocks.moveStackRelative(
-                                        this.blocks.activeBlock,
-                                        0,
-                                        -STANDARDBLOCKHEIGHT / 2
-                                    );
-                                    this.blocks.blockMoved(this.blocks.activeBlock);
-                                    this.blocks.adjustDocks(this.blocks.activeBlock, true);
-                                } else if (this.palettes.activePalette !== null) {
-                                    this.palettes.activePalette.scrollEvent(STANDARDBLOCKHEIGHT, 1);
-                                } else {
-                                    this.blocksContainer.y += 20;
-                                }
-                                this.stageDirty = true;
-                            }
-                            break;
-                        case KEYCODE_DOWN:
-                            if (this.inTempoWidget) {
-                                this.logo.tempo.slowDown(0);
-                            } else {
-                                if (this.blocks.activeBlock !== null) {
-                                    this.textMsg(`DOWN ARROW ${_("Moving block down.")}`);
-                                    this.blocks.moveStackRelative(
-                                        this.blocks.activeBlock,
-                                        0,
-                                        STANDARDBLOCKHEIGHT / 2
-                                    );
-                                    this.blocks.blockMoved(this.blocks.activeBlock);
-                                    this.blocks.adjustDocks(this.blocks.activeBlock, true);
-                                } else if (this.palettes.activePalette !== null) {
-                                    this.palettes.activePalette.scrollEvent(
-                                        -STANDARDBLOCKHEIGHT,
-                                        1
-                                    );
-                                } else {
-                                    this.blocksContainer.y -= 20;
-                                }
-                                this.stageDirty = true;
-                            }
-                            break;
-                        case KEYCODE_LEFT:
-                            if (!this.inTempoWidget) {
-                                if (this.blocks.activeBlock !== null) {
-                                    this.textMsg(`LEFT ARROW ${_("Moving block left.")}`);
-                                    this.blocks.moveStackRelative(
-                                        this.blocks.activeBlock,
-                                        -STANDARDBLOCKHEIGHT / 2,
-                                        0
-                                    );
-                                    this.blocks.blockMoved(this.blocks.activeBlock);
-                                    this.blocks.adjustDocks(this.blocks.activeBlock, true);
-                                } else if (this.scrollBlockContainer) {
-                                    this.blocksContainer.x += 20;
-                                }
-                                this.stageDirty = true;
-                            }
-                            break;
-                        case KEYCODE_RIGHT:
-                            if (!this.inTempoWidget) {
-                                if (this.blocks.activeBlock !== null) {
-                                    this.textMsg(`RIGHT ARROW ${_("Moving block right.")}`);
-                                    this.blocks.moveStackRelative(
-                                        this.blocks.activeBlock,
-                                        STANDARDBLOCKHEIGHT / 2,
-                                        0
-                                    );
-                                    this.blocks.blockMoved(this.blocks.activeBlock);
-                                    this.blocks.adjustDocks(this.blocks.activeBlock, true);
-                                } else if (this.scrollBlockContainer) {
-                                    this.blocksContainer.x -= 20;
-                                }
-                                this.stageDirty = true;
-                            }
-                            break;
-                        case HOME:
-                            this.textMsg(`HOME ${_("Jump to home position.")}`);
-                            if (this.palettes.mouseOver) {
-                                const dy = Math.max(55 - this.palettes.buttons["rhythm"].y, 0);
-                                this.palettes.menuScrollEvent(1, dy);
-                                this.palettes.hidePaletteIconCircles();
-                            } else if (this.palettes.activePalette !== null) {
-                                this.palettes.activePalette.scrollEvent(
-                                    -this.palettes.activePalette.scrollDiff,
-                                    1
-                                );
-                            } else {
-                                // Bring all the blocks "home".
-                                this._findBlocks();
-                            }
-                            this.stageDirty = true;
-                            break;
-                        case TAB:
-                            break;
-                        case ESC:
-                            if (this.searchWidget.style.visibility === "visible") {
-                                this.textMsg(`ESC ${_("Hide blocks")}`);
-                                this.searchWidget.style.visibility = "hidden";
-                            }
-                            break;
-                        case RETURN: {
-                            // Check if any widget window is open
-                            const hasOpenWidget = Object.values(
-                                window.widgetWindows.openWindows
-                            ).some(w => w);
-                            if (this.turtles.running()) {
-                                event.preventDefault();
-                                this._doHardStopButton();
-                            } else if (!disableKeys && !hasOpenWidget) {
-                                event.preventDefault();
-                                this.toolbar.highlightStop(platformColor.stopIconcolor);
-                                this._doFastButton();
-                            }
-                            break;
-                        }
-                        default:
-                            break;
-                    }
-                }
-
-                // Always store current key so as not to mask it from
-                // the keyboard block.
-                this.currentKeyCode = event.keyCode;
-            }
-        };
-
-        /**
-         * @returns currentKeyCode
-         */
-        this.getCurrentKeyCode = () => {
-            return this.currentKeyCode;
-        };
-
-        /*
-         * Sets current key code to 0
-         */
-        this.clearCurrentKeyCode = () => {
-            this.currentKey = "";
-            this.currentKeyCode = 0;
         };
 
         /*
