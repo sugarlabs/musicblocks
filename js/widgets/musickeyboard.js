@@ -1610,7 +1610,7 @@ function MusicKeyboard(activity) {
             const innerDiv = docById("mkbInnerDiv");
             if (innerDiv) {
                 innerDiv.style.width = "95.5vw";
-                innerDiv.style.height = "75%";
+                innerDiv.style.height = "auto";
                 innerDiv.scrollLeft = innerDiv.scrollWidth;
             }
 
@@ -1625,7 +1625,7 @@ function MusicKeyboard(activity) {
 
             const innerDiv = docById("mkbInnerDiv");
             if (innerDiv) {
-                innerDiv.style.height = "100%";
+                innerDiv.style.height = "auto";
             }
         }
     };
