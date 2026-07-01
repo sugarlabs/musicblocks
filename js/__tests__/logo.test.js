@@ -296,6 +296,29 @@ describe("Logo Class", () => {
         test("initializes synth", () => {
             expect(logo.synth).toBeDefined();
         });
+
+        test("throws error when dependencies object is invalid", () => {
+            expect(() => {
+                new Logo(null);
+            }).toThrow("dependencies must be an object");
+        });
+
+        test("throws when blocks is null", () => {
+            expect(() => {
+                new Logo({
+                    blocks: null,
+                    turtles: {},
+                    stage: {},
+                    errorHandler: () => {}
+                });
+            }).toThrow();
+        });
+
+        test("throws when dependencies are missing", () => {
+            expect(() => {
+                new Logo({});
+            }).toThrow();
+        });
     });
 
     describe("Setters and Getters", () => {

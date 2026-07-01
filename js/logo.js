@@ -76,16 +76,43 @@ class Logo {
      * });
      * const logo = new Logo(deps);
      */
+
+    static validateDeps(deps) {
+        if (!deps || typeof deps !== "object") {
+            throw new Error("Logo initialization failed: dependencies must be an object");
+        }
+
+        const required = ["blocks", "turtles", "stage", "errorHandler"];
+
+        for (const key of required) {
+            if (!(key in deps) || deps[key] == null) {
+                throw new Error(
+                    `Logo initialization failed: missing or invalid dependency "${key}"`
+                );
+            }
+        }
+
+        if (!deps.blocks || !deps.blocks.blockList) {
+            console.warn("Logo: blocks.blockList is missing or malformed");
+        }
+    }
+
     constructor(activityOrDeps) {
+        if (!activityOrDeps || typeof activityOrDeps !== "object") {
+            throw new Error("dependencies must be an object");
+        }
         // Check if this is a LogoDependencies instance
         const isExplicitDeps =
             activityOrDeps &&
-            activityOrDeps.blocks &&
-            activityOrDeps.turtles &&
-            activityOrDeps.stage &&
-            activityOrDeps.errorHandler;
+            typeof activityOrDeps === "object" &&
+            "blocks" in activityOrDeps &&
+            "turtles" in activityOrDeps &&
+            "stage" in activityOrDeps &&
+            "errorHandler" in activityOrDeps;
 
         if (isExplicitDeps) {
+            Logo.validateDeps(activityOrDeps);
+
             // New pattern: explicit dependencies
             this.deps = activityOrDeps;
             // Expose activity facade for backward compatibility with external callers
