@@ -1973,6 +1973,13 @@ describe("noteToPitchOctave", () => {
         const result = noteToPitchOctave("g20");
         expect(result).toEqual(["g", 20]); // Pitch is 'g' and octave is 20
     });
+
+    it("should correctly handle solfege note strings with octave", () => {
+        expect(noteToPitchOctave("do7")).toEqual(["do", 7]);
+        expect(noteToPitchOctave("fa4")).toEqual(["fa", 4]);
+        expect(noteToPitchOctave("sol5")).toEqual(["sol", 5]);
+        expect(noteToPitchOctave("do#7")).toEqual(["do#", 7]);
+    });
 });
 
 describe("pitchToFrequency", () => {
@@ -2461,7 +2468,9 @@ describe("convertFromSolfege", () => {
         { input: "do♯", expected: "C♯" },
         { input: "re♯", expected: "D♯" },
         { input: "E♯", expected: "F" },
-        { input: "R", expected: _("rest") }
+        { input: "R", expected: _("rest") },
+        { input: "do#", expected: "C" + SHARP },
+        { input: "dob", expected: "B" }
     ];
 
     testCases.forEach(({ input, expected }) => {

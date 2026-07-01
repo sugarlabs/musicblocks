@@ -1,6 +1,16 @@
 global.localStorage = {
     beginnerMode: "false"
 };
+global._ = x => x;
+global.TextEncoder = require("util").TextEncoder;
+global.TextDecoder = require("util").TextDecoder;
+global.last = arr => arr[arr.length - 1];
+global.PITCHES = ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"];
+global.PITCHES2 = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"];
+global.SOLFEGENAMES = ["do", "re", "mi", "fa", "sol", "la", "ti"];
+
+const musicutils = require("../../utils/musicutils.js");
+Object.assign(global, musicutils);
 
 const MusicKeyboard = require("../musickeyboard.js");
 
@@ -629,5 +639,53 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
         );
         expect(c4Item).toBeDefined();
         expect(c4Item.blockNumber).toBe(44); // 44 should be kept as the blockNumber because it was sorted first
+    });
+
+    test("handles multi-octave gaps correctly in layout synchronization", () => {
+        const keyboard = new MusicKeyboard(mockActivity);
+        // E4 (mi 4) and C6 (do 6)
+        keyboard.noteNames = ["mi", "do"];
+        keyboard.octaves = [4, 6];
+        keyboard._rowBlocks = [44, 47];
+        keyboard.instruments = ["guitar", "guitar"];
+
+        mockActivity.blocks = {
+            blockList: {
+                44: { name: "pitch", connections: [null, 45, 46, null] },
+                45: { value: "mi" },
+                46: { value: 4 },
+                47: { name: "pitch", connections: [null, 48, 49, null] },
+                48: { value: "do" },
+                49: { value: 6 }
+            },
+            adjustDocks: jest.fn(),
+            clampBlocksToCheck: [],
+            adjustExpandableClampBlock: jest.fn(),
+            sendStackToTrash: jest.fn()
+        };
+
+        keyboard.init();
+
+        // Find E4 (mi 4) and C6 (do 6) in displayLayout
+        const e4Item = keyboard.displayLayout.find(
+            item => item.noteName === "E" && item.noteOctave === 4
+        );
+        const c6Item = keyboard.displayLayout.find(
+            item => item.noteName === "C" && item.noteOctave === 6
+        );
+        expect(e4Item).toBeDefined();
+        expect(c6Item).toBeDefined();
+
+        // Verify that middle octave (e.g. C5) is filled in the displayLayout
+        const c5Item = keyboard.displayLayout.find(
+            item => item.noteName === "C" && item.noteOctave === 5
+        );
+        expect(c5Item).toBeDefined();
+
+        // Verify that octave 4 notes (e.g. G4) are filled with octave 4
+        const g4Item = keyboard.displayLayout.find(
+            item => item.noteName === "G" && item.noteOctave === 4
+        );
+        expect(g4Item).toBeDefined();
     });
 });
