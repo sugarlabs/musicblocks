@@ -2959,11 +2959,13 @@ function MusicKeyboard(activity) {
         let myrow2Id = 0;
         let myrow3Id = 0;
 
-        let parenttbl, parenttbl2, el, newel, newel2, nname;
+        let parenttbl = document.getElementById("myrow");
+        let parenttbl2 = document.getElementById("myrow2");
+        let el, newel, newel2, nname;
+
         for (let p = 0; p < this.displayLayout.length; p++) {
             // If the blockNumber is null, don't add a label.
             if (this.displayLayout[p].noteName > FAKEBLOCKNUMBER) {
-                parenttbl2 = document.getElementById("myrow2");
                 newel2 = document.createElement("td");
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
                 if (
@@ -3005,7 +3007,6 @@ function MusicKeyboard(activity) {
                 newel2.style.visibility = "hidden";
                 parenttbl2.appendChild(newel2);
             } else if (this.displayLayout[p].noteName === "drum") {
-                parenttbl = document.getElementById("myrow");
                 newel = document.createElement("td");
                 newel.style.textAlign = "center";
                 newel.setAttribute("id", "whiteRow" + myrowId.toString());
@@ -3035,7 +3036,6 @@ function MusicKeyboard(activity) {
                 newel.style.zIndex = "100";
                 parenttbl.appendChild(newel);
             } else if (this.displayLayout[p].noteName === "hertz") {
-                parenttbl = document.getElementById("myrow");
                 newel = document.createElement("td");
                 newel.style.textAlign = "center";
                 newel.setAttribute("id", "hertzRow" + myrow3Id.toString());
@@ -3068,7 +3068,6 @@ function MusicKeyboard(activity) {
                 this.displayLayout[p].noteName.includes(SHARP) ||
                 this.displayLayout[p].noteName.includes("#")
             ) {
-                parenttbl2 = document.getElementById("myrow2");
                 newel2 = document.createElement("td");
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
                 newel2.style.textAlign = "center";
@@ -3125,7 +3124,6 @@ function MusicKeyboard(activity) {
                 this.displayLayout[p].noteName.includes(FLAT) ||
                 this.displayLayout[p].noteName.includes("b")
             ) {
-                parenttbl2 = document.getElementById("myrow2");
                 newel2 = document.createElement("td");
                 // elementid2 = document.getElementsByTagName("td").length;
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
@@ -3191,7 +3189,6 @@ function MusicKeyboard(activity) {
                 newel2.style.zIndex = "200";
                 parenttbl2.appendChild(newel2);
             } else {
-                parenttbl = document.getElementById("myrow");
                 newel = document.createElement("td");
                 // elementid = document.getElementsByTagName("td").length;
 
@@ -3242,7 +3239,6 @@ function MusicKeyboard(activity) {
                 parenttbl.appendChild(newel);
             }
         }
-        parenttbl = document.getElementById("myrow");
         newel = document.createElement("td");
         parenttbl.appendChild(newel);
         newel.style.textAlign = "center";
