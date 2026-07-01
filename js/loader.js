@@ -107,13 +107,17 @@ requirejs.config({
         "utils/ManagedTimer": {
             exports: "ManagedTimer"
         },
+        "activity/embedded-graphics-scheduler": {
+            exports: "EmbeddedGraphicsScheduler"
+        },
         "activity/logo": {
             deps: [
                 "activity/turtles",
                 "activity/notation",
                 "utils/synthutils",
                 "activity/logoconstants",
-                "utils/ManagedTimer"
+                "utils/ManagedTimer",
+                "activity/embedded-graphics-scheduler"
             ],
             exports: "Logo"
         },
