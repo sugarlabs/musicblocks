@@ -1355,6 +1355,9 @@ function MusicKeyboard(activity) {
         }
 
         let sortedList = sortableList.sort(function (a, b) {
+            if (a.frequency === b.frequency) {
+                return a.blockNumber - b.blockNumber;
+            }
             return a.frequency - b.frequency;
         });
 
@@ -1392,13 +1395,30 @@ function MusicKeyboard(activity) {
         let newList = fillChromaticGaps(sortedNotesList);
         newList = newList.concat(sortedHertzList);
 
+        const originalNotesMap = {};
+        for (const note of sortedList) {
+            const alphaName = convertFromSolfege(note.noteName);
+            originalNotesMap[alphaName + note.noteOctave] = note;
+        }
+
         for (let i = 0; i < newList.length; i++) {
-            this.layout.push({
-                noteName: newList[i].noteName,
-                noteOctave: newList[i].noteOctave,
-                blockNumber: newList[i].blockNumber,
-                voice: newList[i].voice
-            });
+            const key = newList[i].noteName + newList[i].noteOctave;
+            if (originalNotesMap[key]) {
+                newList[i].blockNumber = originalNotesMap[key].blockNumber;
+                this.layout.push({
+                    noteName: originalNotesMap[key].noteName,
+                    noteOctave: originalNotesMap[key].noteOctave,
+                    blockNumber: originalNotesMap[key].blockNumber,
+                    voice: originalNotesMap[key].voice
+                });
+            } else {
+                this.layout.push({
+                    noteName: newList[i].noteName,
+                    noteOctave: newList[i].noteOctave,
+                    blockNumber: newList[i].blockNumber,
+                    voice: newList[i].voice
+                });
+            }
         }
 
         return newList;
@@ -1590,7 +1610,7 @@ function MusicKeyboard(activity) {
             const innerDiv = docById("mkbInnerDiv");
             if (innerDiv) {
                 innerDiv.style.width = "95.5vw";
-                innerDiv.style.height = "75%";
+                innerDiv.style.height = "auto";
                 innerDiv.scrollLeft = innerDiv.scrollWidth;
             }
 
@@ -1605,7 +1625,7 @@ function MusicKeyboard(activity) {
 
             const innerDiv = docById("mkbInnerDiv");
             if (innerDiv) {
-                innerDiv.style.height = "100%";
+                innerDiv.style.height = "auto";
             }
         }
     };
@@ -1645,7 +1665,7 @@ function MusicKeyboard(activity) {
 
         let n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 8);
 
-        outerDiv.style.overflowY = "hidden";
+        outerDiv.style.overflowY = "auto";
         if (this.displayLayout.length > n) {
             outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (n + 5) + "px";
         } else {
@@ -2310,21 +2330,8 @@ function MusicKeyboard(activity) {
                     });
                     this._sortLayout(this.layout);
 
-                    this.displayLayout = this.layout.map(note => {
-                        if (SOLFEGENAMES.includes(note.noteName)) {
-                            return { ...note, noteName: FIXEDSOLFEGE[note.noteName] };
-                        }
-                        return note;
-                    });
+                    this._syncLayouts();
 
-                    const sortedHertzList = this.displayLayout.filter(
-                        note => note.noteName === "hertz"
-                    );
-                    const sortedNotesList = this.displayLayout.filter(
-                        note => note.noteName !== "hertz"
-                    );
-                    this.displayLayout = fillChromaticGaps(sortedNotesList);
-                    this.displayLayout = this.displayLayout.concat(sortedHertzList);
                     this._createKeyboard();
                     this._createTable();
                     const n = this.layout.length;
@@ -2365,8 +2372,10 @@ function MusicKeyboard(activity) {
             this.activity.blocks.blockList[block].connections.length - 1
         ] = belowBlock;
 
-        this.activity.blocks.adjustDocks(this.blockNo, true);
-        this.activity.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+        if (this.blockNo !== undefined && this.blockNo !== null) {
+            this.activity.blocks.adjustDocks(this.blockNo, true);
+            this.activity.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+        }
         this.activity.blocks.adjustExpandableClampBlock();
         this.activity.refreshCanvas();
     };
@@ -2397,6 +2406,9 @@ function MusicKeyboard(activity) {
                 );
             }
 
+            if (aValue === bValue) {
+                return a.blockNumber - b.blockNumber;
+            }
             return aValue - bValue;
         });
 
@@ -2426,11 +2438,56 @@ function MusicKeyboard(activity) {
             this._removePitchBlock(this.remove[1]);
         }
 
+        this._syncLayouts();
+
         if (this.keyboardShown) {
             this._createKeyboard();
         } else {
             this._createTable();
         }
+    };
+
+    /**
+     * Synchronizes this.layout and this.displayLayout, ensuring all notes
+     * are aligned, gap-filled, and that real note blocks preserve their
+     * original solfege names and blockNumbers.
+     */
+    this._syncLayouts = function () {
+        const originalLayout = this.layout.filter(note => note.blockNumber < FAKEBLOCKNUMBER);
+
+        this.displayLayout = this.layout.map(note => {
+            return { ...note, noteName: convertFromSolfege(note.noteName) };
+        });
+
+        const sortedHertzList = this.displayLayout.filter(note => note.noteName === "hertz");
+        const sortedNotesList = this.displayLayout.filter(note => note.noteName !== "hertz");
+        this.displayLayout = fillChromaticGaps(sortedNotesList);
+        this.displayLayout = this.displayLayout.concat(sortedHertzList);
+
+        const originalNotesMap = {};
+        for (const note of originalLayout) {
+            const alphaName = convertFromSolfege(note.noteName);
+            originalNotesMap[alphaName + note.noteOctave] = note;
+        }
+
+        this.displayLayout = this.displayLayout.map(note => {
+            const key = note.noteName + note.noteOctave;
+            if (originalNotesMap[key]) {
+                return {
+                    ...note,
+                    blockNumber: originalNotesMap[key].blockNumber
+                };
+            }
+            return { ...note };
+        });
+
+        this.layout = this.displayLayout.map(note => {
+            const key = note.noteName + note.noteOctave;
+            if (originalNotesMap[key]) {
+                return { ...originalNotesMap[key] };
+            }
+            return { ...note };
+        });
     };
 
     /**
@@ -2456,8 +2513,10 @@ function MusicKeyboard(activity) {
             this.activity.blocks.blockList[blockNo].connections.length - 1
         ] = null;
         this.activity.blocks.sendStackToTrash(this.activity.blocks.blockList[blockNo]);
-        this.activity.blocks.adjustDocks(this.blockNo, true);
-        this.activity.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+        if (this.blockNo !== undefined && this.blockNo !== null) {
+            this.activity.blocks.adjustDocks(this.blockNo, true);
+            this.activity.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+        }
         this.activity.refreshCanvas();
     };
 
@@ -2468,11 +2527,13 @@ function MusicKeyboard(activity) {
      */
     this._createColumnPieSubmenu = function (index, condition) {
         index = parseInt(index);
-        if (
-            this.activity.blocks.blockList[
-                this.layout[this.layout.length - index - 1].blockNumber
-            ] === undefined
-        ) {
+        const displayLayout = this.displayLayout || this.layout;
+        const layoutItem = displayLayout[displayLayout.length - index - 1];
+
+        if (!layoutItem) {
+            return;
+        }
+        if (this.activity.blocks.blockList[layoutItem.blockNumber] === undefined) {
             return;
         }
 
@@ -2618,12 +2679,24 @@ function MusicKeyboard(activity) {
                 Math.max(0, y * this.activity.getStageScale())
             ) + "px";
 
-        index = this.layout.length - index - 1;
-        const block = this.layout[index].blockNumber;
+        index = displayLayout.length - index - 1;
+        const block = displayLayout[index].blockNumber;
 
         let noteValue =
             this.activity.blocks.blockList[this.activity.blocks.blockList[block].connections[1]]
                 .value;
+
+        if (typeof noteValue === "string") {
+            if (noteValue.endsWith("##") || noteValue.endsWith("x")) {
+                noteValue = noteValue.replace(/(##|x)$/, "𝄪");
+            } else if (noteValue.endsWith("#")) {
+                noteValue = noteValue.replace(/#$/, "♯");
+            } else if (noteValue.endsWith("bb")) {
+                noteValue = noteValue.replace(/bb$/, "𝄫");
+            } else if (noteValue.endsWith("b")) {
+                noteValue = noteValue.replace(/b$/, "♭");
+            }
+        }
 
         if (condition === "pitchblocks") {
             const octaveValue =
@@ -2672,12 +2745,15 @@ function MusicKeyboard(activity) {
             );
             this.activity.blocks.blockList[argBlock].updateCache();
 
-            const cell = docById("labelcol" + (this.layout.length - index - 1));
-            this.layout[index].noteOctave = parseInt(blockValue);
+            const cell = docById("labelcol" + (displayLayout.length - index - 1));
+            displayLayout[index].noteOctave = parseInt(blockValue);
+            if (this.layout[index]) {
+                this.layout[index].noteOctave = parseInt(blockValue);
+            }
             cell.textContent =
-                this.layout[index].noteName + this.layout[index].noteOctave.toString();
-            this._notesPlayed.map(function (item) {
-                if (item.objId === this.layout[index].blockNumber) {
+                displayLayout[index].noteName + displayLayout[index].noteOctave.toString();
+            this._notesPlayed.map(item => {
+                if (item.objId === displayLayout[index].blockNumber) {
                     item.noteOctave = parseInt(blockValue);
                 }
                 return item;
@@ -2733,11 +2809,15 @@ function MusicKeyboard(activity) {
                 );
             }
 
-            const cell = docById("labelcol" + (this.layout.length - index - 1));
-            this.layout[index].noteName = label;
-            this.layout[index].noteOctave = octave;
+            const cell = docById("labelcol" + (displayLayout.length - index - 1));
+            displayLayout[index].noteName = label;
+            displayLayout[index].noteOctave = octave;
+            if (this.layout[index]) {
+                this.layout[index].noteName = label;
+                this.layout[index].noteOctave = octave;
+            }
             cell.textContent =
-                this.layout[index].noteName + this.layout[index].noteOctave.toString();
+                displayLayout[index].noteName + displayLayout[index].noteOctave.toString();
             const temp1 = label;
             let temp2;
             if (temp1 in FIXEDSOLFEGE1) {
@@ -2747,7 +2827,7 @@ function MusicKeyboard(activity) {
             }
 
             this._notesPlayed.map(item => {
-                if (item.objId === this.layout[index].blockNumber) {
+                if (item.objId === displayLayout[index].blockNumber) {
                     item.noteOctave = temp2;
                 }
                 return item;
@@ -2915,8 +2995,8 @@ function MusicKeyboard(activity) {
                     this.displayLayout[p].blockNumber
                 ]);
 
-                if (p < this.layout.length) {
-                    this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
+                this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
+                if (this.layout[p]) {
                     this.layout[p].objId = "blackRow" + myrow2Id.toString();
                 }
 
@@ -3032,8 +3112,8 @@ function MusicKeyboard(activity) {
                             : null
                     );
                 }
-                if (p < this.layout.length) {
-                    this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
+                this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
+                if (this.layout[p]) {
                     this.layout[p].objId = "blackRow" + myrow2Id.toString();
                 }
 
@@ -3101,8 +3181,8 @@ function MusicKeyboard(activity) {
                         );
                     }
                 }
-                if (p < this.layout.length) {
-                    this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
+                this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
+                if (this.layout[p]) {
                     this.layout[p].objId = "blackRow" + myrow2Id.toString();
                 }
 
@@ -3151,8 +3231,8 @@ function MusicKeyboard(activity) {
                         );
                     }
                 }
-                if (p < this.layout.length) {
-                    this.displayLayout[p].objId = "whiteRow" + myrowId.toString();
+                this.displayLayout[p].objId = "whiteRow" + myrowId.toString();
+                if (this.layout[p]) {
                     this.layout[p].objId = "whiteRow" + myrowId.toString();
                 }
 

@@ -1200,8 +1200,8 @@ class Blocks {
              * These checks are to test for malformed data. All blocks
              * should have connections.
              */
-            if (myBlock === null) {
-                console.debug("Saw a null block: " + blk);
+            if (myBlock === null || myBlock === undefined) {
+                console.debug("Saw a null or undefined block: " + blk);
                 if (isOuterCall) this._endDeferCheckBounds();
                 return;
             }
@@ -1257,8 +1257,10 @@ class Blocks {
                 }
 
                 /** Another database integrity check. */
-                if (this.blockList[cblk] === null) {
-                    console.debug("This is not good: we encountered a null block: " + cblk);
+                if (this.blockList[cblk] === null || this.blockList[cblk] === undefined) {
+                    console.debug(
+                        "This is not good: we encountered a null or undefined block: " + cblk
+                    );
                     continue;
                 }
 
