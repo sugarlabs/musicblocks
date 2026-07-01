@@ -142,7 +142,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 .dark .ui-autocomplete .ui-menu-item span,
 .dark .ui-autocomplete .ui-menu-item b,
 .dark .ui-autocomplete .ui-menu-item strong {
-    color: var(--color-text-primary) !important;
+    color: var(--color-text-primary) !important; /* changed primary */
     background-color: transparent !important;
 }
 
