@@ -965,7 +965,7 @@ describe("Logo comprehensive method coverage", () => {
         global.Tone = originalTone;
         turtle0._transportTime = null;
         turtle0._transportEventId = null;
-        delete turtle0.delayParameters;
+        turtle0.delayParameters = null;
     });
 
     test("runFromBlock falls back to setTimeout when Transport is unavailable", () => {
@@ -1305,8 +1305,8 @@ describe("Logo comprehensive method coverage", () => {
         expect(mockActivity.blocks.showBlocks).toHaveBeenCalled();
         expect(document.getElementById).toHaveBeenCalledWith("stop");
 
-        delete turtle0._transportTime;
-        delete turtle1._transportTime;
+        turtle0._transportTime = null;
+        turtle1._transportTime = null;
         global.Tone = originalTone;
         clearIntervalSpy.mockRestore();
     });

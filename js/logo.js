@@ -1408,8 +1408,9 @@ class Logo {
 
         if (Logo._hasTransport) {
             Tone.Transport.start();
+            const transportNow = Tone.Transport.seconds;
             for (const turtle of this.activity.turtles.turtleList) {
-                turtle._transportTime = Tone.Transport.seconds;
+                turtle._transportTime = transportNow;
             }
         }
 
@@ -1723,6 +1724,7 @@ class Logo {
                             const tur2 = logo.activity.turtles.ithTurtle(turtle);
                             tur2._transportTime = Tone.Transport.seconds;
                         }
+                        tur.delayParameters = null;
                         logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg);
                     },
                     delay,
