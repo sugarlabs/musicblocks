@@ -1005,6 +1005,7 @@ class JSEditor {
                 "message" in e ? e.message : e.prefix + this._code.substring(e.start, e.end),
                 "red"
             );
+            throw e;
         }
     }
 
