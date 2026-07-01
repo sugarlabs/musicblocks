@@ -61,36 +61,33 @@ class Queue {
 class Logo {
     /**
      * @constructor
-     * @param {Object|LogoDependencies} activityOrDeps - Either an Activity object (old pattern)
-     *                                                    or a LogoDependencies object (new pattern)
+     * @param {Object|LogoDependencies} activityOrDeps - Either a LogoDependencies object
+     *     (preferred) or a legacy Activity object. When an Activity is passed it is
+     *     converted automatically via {@link LogoDependencies.fromActivity}.
      *
      * @example
-     * // Old pattern (still supported)
+     * // Activity pattern (backward-compatible)
      * const logo = new Logo(activity);
      *
      * @example
-     * // New pattern (explicit dependencies)
-     * const deps = new LogoDependencies({
-     *     blocks: activity.blocks,
-     *     turtles: activity.turtles,
-     *     // ... other dependencies
-     * });
+     * // Explicit dependency pattern
+     * const deps = LogoDependencies.fromActivity(activity);
      * const logo = new Logo(deps);
      */
     constructor(activityOrDeps) {
-        // Check if this is a LogoDependencies instance
+        // `errorHandler` is the single property that distinguishes a LogoDependencies
+        // container from a legacy Activity object (which uses `errorMsg` instead).
+        // Do not change this check without updating LogoDependencies accordingly.
         const isExplicitDeps =
-            activityOrDeps &&
-            activityOrDeps.blocks &&
-            activityOrDeps.turtles &&
-            activityOrDeps.stage &&
-            activityOrDeps.errorHandler;
+            activityOrDeps !== null &&
+            activityOrDeps !== undefined &&
+            typeof activityOrDeps.errorHandler === "function";
 
         if (isExplicitDeps) {
-            // New pattern: explicit dependencies
-            this.deps = activityOrDeps;
-            // Expose activity facade for backward compatibility with external callers
+            // Explicit dependency container: use directly and build a compatibility
+            // facade so callers that expect an activity object still work.
             // (Notation constructor, plugins, getStatsFromNotation, etc.)
+            this.deps = activityOrDeps;
             const deps = this.deps;
             this.activity = {
                 blocks: deps.blocks,
@@ -111,91 +108,17 @@ class Logo {
                 textMsg: msg => deps.textMsg(msg),
                 save: deps.save,
                 statsWindow: deps.statsWindow,
-                logo: this // Self-reference for compatibility
+                logo: this
             };
         } else {
-            // Old pattern: Activity object passed directly
+            // Activity pattern: preserve the original reference for backward
+            // compatibility and derive deps through the factory.
             this.activity = activityOrDeps;
-            // Build a deps view over activity so method bodies use deps throughout
-            const _act = activityOrDeps;
-            this.deps = {
-                blocks: _act.blocks,
-                turtles: _act.turtles,
-                stage: _act.stage,
-                errorHandler: (msg, blk) => _act.errorMsg(msg, blk),
-                messageHandler: {
-                    hide: () => _act.hideMsgs()
-                },
-                storage: {
-                    saveLocally: () => _act.saveLocally()
-                },
-                config: {
-                    get showBlocksAfterRun() {
-                        return _act.showBlocksAfterRun;
-                    },
-                    set showBlocksAfterRun(value) {
-                        _act.showBlocksAfterRun = value;
-                    }
-                },
-                callbacks: {
-                    get onStopTurtle() {
-                        return _act.onStopTurtle;
-                    },
-                    get onRunTurtle() {
-                        return _act.onRunTurtle;
-                    }
-                },
-                refreshCanvas: () => _act.refreshCanvas && _act.refreshCanvas(),
-                textMsg: msg => _act.textMsg && _act.textMsg(msg),
-                markStageDirty: () => {
-                    _act.stageDirty = true;
-                },
-                save: {
-                    afterSaveLilypond: () =>
-                        _act.save && _act.save.afterSaveLilypond && _act.save.afterSaveLilypond(),
-                    afterSaveAbc: () =>
-                        _act.save && _act.save.afterSaveAbc && _act.save.afterSaveAbc(),
-                    afterSaveMxml: () =>
-                        _act.save && _act.save.afterSaveMxml && _act.save.afterSaveMxml(),
-                    afterSaveMIDI: () =>
-                        _act.save && _act.save.afterSaveMIDI && _act.save.afterSaveMIDI()
-                },
-                statsWindow: {
-                    displayInfo: (...args) =>
-                        _act.statsWindow &&
-                        _act.statsWindow.displayInfo &&
-                        _act.statsWindow.displayInfo(...args)
-                },
-                // Audio and utility dependencies
-                instruments: typeof instruments !== "undefined" ? instruments : null,
-                instrumentsFilters:
-                    typeof instrumentsFilters !== "undefined" ? instrumentsFilters : null,
-                instrumentsEffects:
-                    typeof instrumentsEffects !== "undefined" ? instrumentsEffects : null,
-                widgetWindows: typeof window !== "undefined" ? window.widgetWindows : null,
-                Singer: typeof Singer !== "undefined" ? Singer : null,
-                Tone: typeof Tone !== "undefined" ? Tone : null,
-                utils: {
-                    doUseCamera: typeof doUseCamera !== "undefined" ? doUseCamera : null,
-                    doStopVideoCam: typeof doStopVideoCam !== "undefined" ? doStopVideoCam : null,
-                    getIntervalDirection:
-                        typeof getIntervalDirection !== "undefined" ? getIntervalDirection : null,
-                    getIntervalNumber:
-                        typeof getIntervalNumber !== "undefined" ? getIntervalNumber : null,
-                    mixedNumber: typeof mixedNumber !== "undefined" ? mixedNumber : null,
-                    rationalToFraction:
-                        typeof rationalToFraction !== "undefined" ? rationalToFraction : null,
-                    getStatsFromNotation:
-                        typeof getStatsFromNotation !== "undefined" ? getStatsFromNotation : null,
-                    delayExecution: typeof delayExecution !== "undefined" ? delayExecution : null,
-                    last: typeof last !== "undefined" ? last : null
-                },
-                classes: {
-                    Notation: typeof Notation !== "undefined" ? Notation : null,
-                    Synth: typeof Synth !== "undefined" ? Synth : null,
-                    StatusMatrix: typeof StatusMatrix !== "undefined" ? StatusMatrix : null
-                }
-            };
+            const LD =
+                typeof LogoDependencies !== "undefined"
+                    ? LogoDependencies
+                    : require("./LogoDependencies");
+            this.deps = LD.fromActivity(activityOrDeps);
         }
 
         // Bind commonly-used dependencies locally for readability
