@@ -11,14 +11,17 @@
 
 /**
  * @file LogoDependencies.js
- * @description Explicit dependency container for the Logo execution engine.
+ * @description LogoDependencies instance — explicit dependency container for
+ * the Logo execution engine.
  *
- * This class manages Logo's explicit dependencies.
+ * This class bundles the dependencies that Logo requires so they can be
+ * injected explicitly rather than read from globals.
  */
 
 /**
  * @class
- * @classdesc Container for Logo's explicit dependencies.
+ * @classdesc LogoDependencies instance: bundles all dependencies required by
+ * the Logo execution engine into a single typed container.
  */
 class LogoDependencies {
     /**
