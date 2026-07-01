@@ -1438,14 +1438,14 @@ describe("Logo comprehensive method coverage", () => {
         expect(logo.runFromBlockNow).not.toHaveBeenCalled();
     });
 
-    test("runFromBlock falls back to setTimeout when _transportTime is null", () => {
+    test("runFromBlock lazily initializes _transportTime when null", () => {
         const originalTone = global.Tone;
         global.Tone = {
             ...originalTone,
             Transport: {
                 start: jest.fn(),
                 stop: jest.fn(),
-                schedule: jest.fn(),
+                schedule: jest.fn(() => "evt-1"),
                 cancel: jest.fn(),
                 getSecondsAtTime: jest.fn(() => 0),
                 get seconds() {
@@ -1454,10 +1454,6 @@ describe("Logo comprehensive method coverage", () => {
                 set seconds(v) {}
             }
         };
-        timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
-            fn();
-            return 8;
-        });
         logo.runFromBlockNow = jest.fn();
         logo.turtleDelay = 0;
         logo.stopTurtle = false;
@@ -1466,12 +1462,10 @@ describe("Logo comprehensive method coverage", () => {
 
         logo.runFromBlock(logo, 0, 3, 1, "x");
 
-        expect(timeoutSpy).toHaveBeenCalled();
-        expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, 3, 1, "x");
+        expect(turtle0._transportTime).toBe(5);
+        expect(logo.runFromBlockNow).not.toHaveBeenCalled();
 
         global.Tone = originalTone;
-        timeoutSpy.mockRestore();
-        timeoutSpy = null;
     });
 
     test("setDispatchBlock adds clamp signal for normal and backward traversal", () => {
