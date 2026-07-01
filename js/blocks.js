@@ -261,6 +261,9 @@ class Blocks {
 
         /** We keep a list of stacks in the trash. */
         this.trashStacks = [];
+        this.actionHistory = [];
+        this.redoActionHistory = [];
+        this.isUndoingOrRedoing = false;
         /** We keep a list of previews of stacks in the trash. */
         this.trashPreviews = {};
 
@@ -1856,6 +1859,33 @@ class Blocks {
             if (thisBlock === null) {
                 console.debug("blockMoved called with null block.");
                 return;
+            }
+
+            // Record position changes for undo/redo
+            if (this.dragStartX !== undefined && this.dragStartY !== undefined) {
+                const myBlock = this.blockList[thisBlock];
+                if (myBlock && myBlock.container) {
+                    if (
+                        myBlock.container.x !== this.dragStartX ||
+                        myBlock.container.y !== this.dragStartY
+                    ) {
+                        this.actionHistory.push({
+                            type: "move",
+                            blockId: thisBlock,
+                            oldX: this.dragStartX,
+                            oldY: this.dragStartY,
+                            newX: myBlock.container.x,
+                            newY: myBlock.container.y
+                        });
+
+                        // Clear redo history on new action unless we are actively undoing/redoing
+                        if (!this.isUndoingOrRedoing) {
+                            this.redoActionHistory = [];
+                        }
+                    }
+                }
+                this.dragStartX = undefined;
+                this.dragStartY = undefined;
             }
 
             let blk = this.insideExpandableBlock(thisBlock);
@@ -7572,6 +7602,67 @@ class Blocks {
          * @public
          * @returns {void}
          */
+        this.undoAction = () => {
+            if (!this.actionHistory || this.actionHistory.length === 0) {
+                this.activity.textMsg(_("Nothing to undo."), 3000);
+                return;
+            }
+
+            const action = this.actionHistory.pop();
+            this.isUndoingOrRedoing = true;
+
+            if (action.type === "move") {
+                this.moveBlock(action.blockId, action.oldX, action.oldY);
+                this.blockMoved(action.blockId);
+                this.activity.refreshCanvas();
+                this.activity.textMsg(_("Block position restored."), 3000);
+            } else if (action.type === "trash") {
+                this.activity._restoreTrashById(action.blockId);
+                this.activity.textMsg(_("Item restored from the trash."), 3000);
+            } else if (action.type === "restore") {
+                const block = this.blockList[action.blockId];
+                if (block) this.sendStackToTrash(block);
+                this.activity.textMsg(_("Item returned to the trash."), 3000);
+            }
+
+            this.redoActionHistory.push(action);
+            this.isUndoingOrRedoing = false;
+
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv && helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
+                this.activity.__tick();
+            }
+        };
+
+        this.redoAction = () => {
+            if (!this.redoActionHistory || this.redoActionHistory.length === 0) {
+                this.activity.textMsg(_("Nothing to redo."), 3000);
+                return;
+            }
+
+            const action = this.redoActionHistory.pop();
+            this.isUndoingOrRedoing = true;
+
+            if (action.type === "move") {
+                this.moveBlock(action.blockId, action.newX, action.newY);
+                this.blockMoved(action.blockId);
+                this.activity.refreshCanvas();
+                this.activity.textMsg(_("Block position restored."), 3000);
+            } else if (action.type === "trash") {
+                const block = this.blockList[action.blockId];
+                if (block) this.sendStackToTrash(block);
+                this.activity.textMsg(_("Item returned to the trash."), 3000);
+            } else if (action.type === "restore") {
+                this.activity._restoreTrashById(action.blockId);
+                this.activity.textMsg(_("Item restored from the trash."), 3000);
+            }
+
+            this.actionHistory.push(action);
+            this.isUndoingOrRedoing = false;
+        };
+
         this.sendStackToTrash = myBlock => {
             /** First, hide the palettes as they may need updating. */
             for (const name in this.activity.palettes.dict) {
@@ -7590,6 +7681,10 @@ class Blocks {
 
             /** Add this block to the list of blocks in the trash so we can undo this action. */
             this.trashStacks.push(thisBlock);
+            if (!this.isUndoingOrRedoing) {
+                this.actionHistory.push({ type: "trash", blockId: thisBlock });
+                this.redoActionHistory = [];
+            }
 
             // Cap the undo history to prevent unbounded memory growth.
             // Keep the 100 most recent trashed stacks.

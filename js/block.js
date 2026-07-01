@@ -3257,6 +3257,10 @@ class Block {
             // Track time for detecting long pause...
             that.blocks.mouseDownTime = new Date().getTime();
 
+            // Record original coordinates for undoing positional changes
+            that.blocks.dragStartX = that.container.x;
+            that.blocks.dragStartY = that.container.y;
+
             that.blocks.longPressTimeout = setTimeout(() => {
                 that.blocks.activeBlock = that.blockIndex;
                 that._triggerLongPress = true;
