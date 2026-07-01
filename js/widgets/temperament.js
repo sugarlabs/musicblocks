@@ -1294,7 +1294,8 @@ function TemperamentWidget() {
                 input2 <= 0 ||
                 !isFinite(ratio1) ||
                 ratio1 <= 0 ||
-                ratio1 >= that.powerBase
+                ratio1 >= that.powerBase ||
+                input2 > input1 * that.powerBase
             ) {
                 that.activity.errorMsg(
                     _("Please enter a valid ratio (e.g. 3:2) within the octave space."),
