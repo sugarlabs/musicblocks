@@ -38,18 +38,6 @@
 
 // Constants moved to js/logoconstants.js to resolve circular dependency
 
-// In Node.js / Jest, EmbeddedGraphicsScheduler is not a browser global.
-// Load it once at module scope so the constructor stays unconditional.
-// In the browser, loader.js guarantees it is already defined before Logo loads.
-if (typeof EmbeddedGraphicsScheduler === "undefined") {
-    try {
-        global.EmbeddedGraphicsScheduler =
-            require("./embedded-graphics-scheduler").EmbeddedGraphicsScheduler;
-    } catch (e) {
-        // Not a CommonJS environment — the global must arrive via loader.js.
-    }
-}
-
 /**
  * @class
  * @classdesc Queue entry for managing running blocks.

@@ -33,6 +33,9 @@ class EmbeddedGraphicsScheduler {
     /**
      * @constructor
      * @param {Object} logo - The Logo instance this scheduler operates on behalf of.
+     *   Required members: turtles, blockList, parseArg, processShow, processSpeak,
+     *   receivedArg, stopTurtle, svgBackground, _timerManager, deps.utils.delayExecution,
+     *   deps.textMsg.
      */
     constructor(logo) {
         this._logo = logo;

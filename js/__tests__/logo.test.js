@@ -73,6 +73,9 @@ jest.mock("tone", () => ({
     }))
 }));
 
+global.EmbeddedGraphicsScheduler =
+    require("../embedded-graphics-scheduler").EmbeddedGraphicsScheduler;
+
 // Now require the module after globals are set up
 const {
     Queue,
@@ -563,6 +566,16 @@ describe("Logo Class", () => {
             logo.doBreak(mockTurtle);
 
             expect(mockTurtle.queue.length).toBe(0);
+        });
+    });
+
+    describe("dispatchTurtleSignals", () => {
+        test("delegates to EmbeddedGraphicsScheduler", async () => {
+            logo._graphicsScheduler.schedule = jest.fn();
+
+            await logo.dispatchTurtleSignals(0, 1, 2, 3);
+
+            expect(logo._graphicsScheduler.schedule).toHaveBeenCalledWith(0, 1, 2, 3);
         });
     });
 });
