@@ -212,6 +212,8 @@ class PlanetInterface {
             this.activity.sendAllToTrash();
             this.activity.refreshCanvas();
             this.activity.blocks.trashStacks = [];
+            this.activity.blocks.actionHistory = [];
+            this.activity.blocks.redoActionHistory = [];
         };
 
         /**

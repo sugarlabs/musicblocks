@@ -2569,6 +2569,12 @@ class Activity {
                 }
             } else if (event.ctrlKey) {
                 switch (event.keyCode) {
+                    case 90: // 'Z'
+                        this.blocks.undoAction();
+                        break;
+                    case 89: // 'Y'
+                        this.blocks.redoAction();
+                        break;
                     case V:
                         // this.textMsg("Ctl-V " + _("Paste"));
                         this.pasteBox.createBox(this.turtleBlocksScale, 200, 200);
@@ -3153,24 +3159,14 @@ class Activity {
             }
         };
 
+        // Keep restoreTrashPop around as an alias for undoAction so that
+        // older parts of the app (like helpfulWheel) don't crash when calling it.
         const restoreTrashPop = activity => {
-            if (
-                !activity.blocks ||
-                !activity.blocks.trashStacks ||
-                activity.blocks.trashStacks.length === 0
-            ) {
-                activity.textMsg(_("Trash can is empty."), 3000);
-                return;
-            }
-            this._restoreTrashById(this.blocks.trashStacks[this.blocks.trashStacks.length - 1]);
-            activity.textMsg(_("Item restored from the trash."), 3000);
+            activity.blocks.undoAction();
+        };
 
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-                activity.__tick();
-            }
+        const redoAction = activity => {
+            activity.blocks.redoAction();
         };
 
         this._restoreTrashById = blockId => {
@@ -3178,6 +3174,11 @@ class Activity {
             if (blockIndex === -1) return; // Block not found in trash
 
             this.blocks.trashStacks.splice(blockIndex, 1); // Remove from trash
+            /* istanbul ignore next */
+            if (!this.blocks.isUndoingOrRedoing) {
+                this.blocks.actionHistory.push({ type: "restore", blockId: blockId });
+                this.blocks.redoActionHistory = [];
+            }
 
             for (const name in this.palettes.dict) {
                 this.palettes.dict[name].hideMenu(true);
