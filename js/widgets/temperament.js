@@ -21,7 +21,7 @@
 
    _, addTemperamentToDictionary, buildScale,
    deleteTemperamentFromList, docById, FLAT, getNoteFromInterval,
-   getOctaveRatio, getTemperament, getTemperamentKeys,
+   getOctaveRatio, getTemperament, getTemperamentKeys, getTemperamentRatio,
    isCustomTemperament, normalizeNoteAccidentals, parseNoteString, pitchToFrequency, platformColor,
    rationalToFraction, setOctaveRatio, setOctaveRatio, SHARP, Singer,
    slicePath, updateTemperaments, wheelnav, frequencyToPitch
@@ -1894,10 +1894,7 @@ function TemperamentWidget() {
                 const temperamentRatios = [];
                 for (let j = 0; j < t.interval.length; j++) {
                     intervals[j] = t.interval[j];
-                    const raw = t[intervals[j]];
-                    temperamentRatios[j] = (
-                        raw !== null && typeof raw === "object" ? raw.ratio : Number(raw)
-                    ).toFixed(2);
+                    temperamentRatios[j] = getTemperamentRatio(t[intervals[j]]).toFixed(2);
                 }
                 const ratiosEqual =
                     ratios.length === temperamentRatios.length &&
@@ -2687,7 +2684,7 @@ function TemperamentWidget() {
 
                 str[i] = note[i] + str[i][1];
                 this.intervals[i] = t.interval[i];
-                this.ratios[i] = t[this.intervals[i]];
+                this.ratios[i] = getTemperamentRatio(t[this.intervals[i]]);
                 this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
                 if (i === 0) {
                     this.frequencies[i] = this._logo.synth

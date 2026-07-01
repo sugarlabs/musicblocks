@@ -27,6 +27,18 @@ describe("TemperamentWidget basic tests", () => {
             refreshWheel: jest.fn()
         }));
 
+        global.getTemperamentKeys = jest.fn(() => []);
+        global.isCustomTemperament = jest.fn(() => false);
+        global.getTemperamentRatio = jest.fn(value =>
+            value !== null && typeof value === "object" && typeof value.ratio === "number"
+                ? value.ratio
+                : Number(value)
+        );
+        global.getTemperament = jest.fn(() => ({
+            interval: [],
+            pitchNumber: 0
+        }));
+
         global.platformColor = {
             selectorBackground: "#fff",
             selectorBackgroundHOVER: "#eee",
@@ -42,12 +54,6 @@ describe("TemperamentWidget basic tests", () => {
             return note.replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
         };
 
-        global.getTemperamentKeys = jest.fn(() => []);
-        global.isCustomTemperament = jest.fn(() => false);
-        global.getTemperament = jest.fn(() => ({
-            interval: [],
-            pitchNumber: 0
-        }));
         global.pitchToFrequency = jest.fn(() => 440);
         global.frequencyToPitch = jest.fn(() => ["C", 4, 0]);
         global.parseNoteString = jest.fn(note => [note.slice(0, -1), Number(note.slice(-1))]);
