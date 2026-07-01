@@ -270,6 +270,13 @@ describe("Logo Class", () => {
             expect(logo.activity).toBe(mockActivity);
         });
 
+        test("activity reference identity is preserved when constructed with an Activity object", () => {
+            // Regression: the Activity-pattern branch must keep this.activity === the
+            // original object so existing callers (plugins, notation, etc.) are unaffected.
+            const freshLogo = new Logo(mockActivity);
+            expect(freshLogo.activity).toBe(mockActivity);
+        });
+
         test("initializes default volume-related properties", () => {
             expect(logo.stopTurtle).toBe(false);
             expect(logo.time).toBe(0);
@@ -594,6 +601,10 @@ describe("Logo parseArg", () => {
                     parameterQueue: [],
                     singer: { noteDirection: 0 }
                 }))
+            },
+            stage: {
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn()
             },
             errorMsg: jest.fn()
         };
