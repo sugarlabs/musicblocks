@@ -100,6 +100,9 @@ const getPieMenuSize = block => {
     return Math.min(canvas.width, canvas.height);
 };
 
+// Tracks the active exit wheel for outside-click dismissal
+let activeExitWheel = null;
+
 // Debounce resize handler for performance
 let wheelResizeTimeout;
 let wheelResizeListenerAttached = false;
@@ -122,18 +125,77 @@ const disableWheelResizeHandling = () => {
     clearTimeout(wheelResizeTimeout);
 };
 
+const isInteractive = target => {
+    // Clicks inside the block label input should never dismiss the menu
+    const labelDiv = docById("labelDiv");
+    if (labelDiv && typeof labelDiv.contains === "function" && labelDiv.contains(target)) {
+        return true;
+    }
+
+    const wheelDiv = docById("wheelDiv");
+    if (!wheelDiv || typeof wheelDiv.contains !== "function") {
+        return false;
+    }
+
+    if (!wheelDiv.contains(target)) {
+        return false;
+    }
+
+    // Wheelnav slices and titles use IDs matching "wheelnav-*-slice-*" or "wheelnav-*-title-*".
+    // Any element inside wheelDiv that belongs to a wheelnav group is interactive.
+    if (target.closest && target.closest('[id^="wheelnav-"]')) {
+        return true;
+    }
+
+    // Fallback: check computed cursor style (Raphael sets cursor:pointer on interactive slices)
+    if (typeof window !== "undefined" && typeof window.getComputedStyle === "function") {
+        try {
+            if (window.getComputedStyle(target).cursor === "pointer") {
+                return true;
+            }
+        } catch (e) {
+            // Cross-origin or test environments may throw
+        }
+    }
+
+    return false;
+};
+
+const handleOutsideClick = event => {
+    const wheelDiv = docById("wheelDiv");
+    if (!wheelDiv || wheelDiv.style.display === "none") {
+        return;
+    }
+
+    if (!isInteractive(event.target)) {
+        if (
+            activeExitWheel &&
+            activeExitWheel.navItems &&
+            activeExitWheel.navItems[0] &&
+            typeof activeExitWheel.navItems[0].navigateFunction === "function"
+        ) {
+            activeExitWheel.navItems[0].navigateFunction();
+        } else {
+            hideWheelDiv();
+        }
+    }
+};
+
 const showWheelDiv = () => {
     const wheelDiv = docById("wheelDiv");
     if (!wheelDiv) return null;
     wheelDiv.style.display = "";
     enableWheelResizeHandling();
+    document.addEventListener("mousedown", handleOutsideClick);
     return wheelDiv;
 };
 
 const hideWheelDiv = () => {
+    document.removeEventListener("mousedown", handleOutsideClick);
+    activeExitWheel = null;
     const wheelDiv = docById("wheelDiv");
     if (!wheelDiv) return null;
-    docById("wheelDiv").style.display = "none";
+    wheelDiv.style.display = "none";
     disableWheelResizeHandling();
     return wheelDiv;
 };
@@ -213,6 +275,8 @@ const configureExitWheel = exitWheel => {
     if (!exitWheel || !exitWheel.navItems) {
         return;
     }
+
+    activeExitWheel = exitWheel;
 
     const clearSelection = () => {
         exitWheel.selectedNavItemIndex = null;
