@@ -1010,22 +1010,13 @@ class PhraseMaker {
     }
 
     _configureExitWheel(exitWheel) {
+        if (typeof window.configureExitWheel === "function") {
+            window.configureExitWheel(exitWheel);
+        }
+
         if (!exitWheel || !exitWheel.navItems) {
             return;
         }
-
-        const clearSelection = () => {
-            exitWheel.selectedNavItemIndex = null;
-            for (let i = 0; i < exitWheel.navItems.length; i++) {
-                exitWheel.navItems[i].selected = false;
-                exitWheel.navItems[i].hovered = false;
-            }
-            if (exitWheel.raphael && exitWheel.raphael.canvas) {
-                exitWheel.refreshWheel(true);
-            }
-        };
-
-        clearSelection();
 
         for (let i = 0; i < exitWheel.navItems.length; i++) {
             const item = exitWheel.navItems[i];
@@ -1036,17 +1027,6 @@ class PhraseMaker {
                 item.titleHoverAttr.cursor = "pointer";
             }
         }
-
-        exitWheel.navigateWheel = clicked => {
-            const item = exitWheel.navItems[clicked];
-            if (!item || item.enabled === false) {
-                return;
-            }
-            clearSelection();
-            if (typeof item.navigateFunction === "function") {
-                item.navigateFunction();
-            }
-        };
     }
 
     _setupWheelDiv(size, left, top) {
@@ -4181,9 +4161,9 @@ class PhraseMaker {
 
             const __mouseUpHandler = event => {
                 this._mouseUpCell = event.target;
-                if (this._mouseDownCell !== this._mouseUpCell) {
+                if (this._mouseDownCell && this._mouseDownCell !== this._mouseUpCell) {
                     this._tieNotes(this._mouseDownCell, this._mouseUpCell);
-                } else {
+                } else if (this._mouseDownCell) {
                     const nodes = Array.prototype.slice.call(event.target.parentElement.children);
                     this._createpiesubmenu(
                         nodes.indexOf(event.target),
