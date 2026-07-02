@@ -209,7 +209,8 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
                 if (notes[0] === "R") {
                     ar.push([x, "rest2", 0, 0, [prev, null]]);
                 } else if (precurssionFlag) {
-                    const drumname = drumMidi[track.notes[0].midi][0] || "kick drum";
+                    const drumEntry = drumMidi[track.notes[0].midi];
+                    const drumname = (drumEntry && drumEntry[0]) || "kick drum";
                     ar.push(
                         [x, "playdrum", 0, 0, [first ? prev : x - 1, x + 1, null]],
                         [x + 1, ["drumname", { value: drumname }], 0, 0, [x]]
