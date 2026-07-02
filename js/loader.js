@@ -146,6 +146,7 @@ requirejs.config({
                 "activity/alert-renderer",
                 "palette/palette-loader",
                 "activity/search-controller",
+                "activity/keyboard-shortcut-controller",
                 "search-ui"
             ],
             exports: "Activity"
@@ -192,6 +193,7 @@ requirejs.config({
         "activity/alert-renderer": "js/activity/alert-renderer",
         "palette/palette-loader": "js/palette/palette-loader",
         "activity/search-controller": "js/activity/search-controller",
+        "activity/keyboard-shortcut-controller": "js/activity/keyboard-shortcut-controller",
         "search-ui": "js/search-ui",
         "activity/pubsub": "js/pubsub",
         "easeljs.min": "lib/easeljs.min",
