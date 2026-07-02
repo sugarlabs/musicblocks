@@ -385,4 +385,193 @@ describe("PitchStaircase Widget", () => {
             jest.useRealTimers();
         });
     });
+
+    describe("play buttons visual feedback and toggling stop", () => {
+        let mockPlayCell;
+        let mockStepCell;
+        let mockSynth;
+
+        beforeEach(() => {
+            jest.useFakeTimers();
+
+            mockPlayCell = {
+                getAttribute: jest.fn().mockReturnValue("0"),
+                replaceChildren: jest.fn(),
+                classList: {
+                    contains: jest.fn().mockImplementation(cls => cls === "pitch-staircase-btn")
+                }
+            };
+
+            mockStepCell = {
+                classList: {
+                    add: jest.fn(),
+                    remove: jest.fn()
+                },
+                getAttribute: jest.fn().mockReturnValue("220.0"),
+                style: {}
+            };
+
+            mockSynth = {
+                trigger: jest.fn(),
+                stop: jest.fn()
+            };
+
+            psc.activity = {
+                logo: {
+                    synth: mockSynth
+                }
+            };
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+        });
+
+        test("_playOne should change row icon to stop and then back to play", () => {
+            psc._playOne(mockStepCell, mockPlayCell);
+
+            // Verify icon changed to stop-button.svg
+            expect(mockPlayCell.replaceChildren).toHaveBeenCalled();
+            let img1 = mockPlayCell.replaceChildren.mock.calls[0][1];
+            expect(img1.getAttribute("src")).toBe("header-icons/stop-button.svg");
+            expect(psc._playingRowIndex).toBe(0);
+
+            // Advance timers by 1000ms
+            jest.advanceTimersByTime(1000);
+
+            // Verify icon changed back to play-button.svg
+            let img2 = mockPlayCell.replaceChildren.mock.calls[1][1];
+            expect(img2.getAttribute("src")).toBe("header-icons/play-button.svg");
+            expect(psc._playingRowIndex).toBeNull();
+        });
+
+        test("row click mid-play should stop row and synth", () => {
+            // First click plays
+            psc.Stairs = [["A", "", 220.0]];
+            psc._stepTables = [{ rows: [{ cells: [null, mockStepCell] }] }];
+
+            // Re-bind onclick handler mock logic in init or manually as in _makeStairs
+            const playCellClick = () => {
+                const i = Number(mockPlayCell.getAttribute("id"));
+                const stepCell = psc._stepTables[i].rows[0].cells[1];
+                if (psc._playingRowIndex === i) {
+                    clearTimeout(psc._rowStopTimeout);
+                    stepCell.classList.remove("active");
+                    stepCell.style.backgroundColor = platformColor.selectorBackground;
+                    psc._setButtonIcon(mockPlayCell, "play-button.svg", _("Play"));
+                    psc.activity.logo.synth.stop();
+                    psc._playingRowIndex = null;
+                } else {
+                    psc._playOne(stepCell, mockPlayCell);
+                }
+            };
+
+            // Play the row
+            playCellClick();
+            expect(mockSynth.trigger).toHaveBeenCalled();
+            expect(psc._playingRowIndex).toBe(0);
+
+            // Click again to stop
+            mockPlayCell.replaceChildren.mockClear();
+            playCellClick();
+
+            expect(mockSynth.stop).toHaveBeenCalled();
+            expect(psc._playingRowIndex).toBeNull();
+            let img = mockPlayCell.replaceChildren.mock.calls[0][1];
+            expect(img.getAttribute("src")).toBe("header-icons/play-button.svg");
+        });
+
+        test("_playAll and header button click mid-play should play and stop", () => {
+            psc.Stairs = [["A", "", 220.0]];
+            psc._stepTables = [{ rows: [{ cells: [null, mockStepCell] }] }];
+
+            const mockHeaderButton = {
+                replaceChildren: jest.fn(),
+                classList: {
+                    contains: jest.fn().mockReturnValue(false)
+                }
+            };
+            psc._playAllButton = mockHeaderButton;
+
+            const playAllClick = () => {
+                if (psc._isPlayingAll) {
+                    clearTimeout(psc._playAllTimeout);
+                    for (let i = 0; i < psc.Stairs.length; i++) {
+                        const stepCell = psc._stepTables[i].rows[0].cells[1];
+                        stepCell.classList.remove("active");
+                    }
+                    psc._setButtonIcon(psc._playAllButton, "play-chord.svg", _("Play chord"));
+                    psc.activity.logo.synth.stop();
+                    psc._isPlayingAll = false;
+                } else {
+                    psc._playAll();
+                }
+            };
+
+            // Start playing chord
+            playAllClick();
+            expect(mockSynth.trigger).toHaveBeenCalled();
+            expect(psc._isPlayingAll).toBe(true);
+            let img1 = mockHeaderButton.replaceChildren.mock.calls[0][0];
+            expect(img1.getAttribute("src")).toBe("header-icons/stop-button.svg");
+
+            // Stop playing chord
+            mockHeaderButton.replaceChildren.mockClear();
+            playAllClick();
+            expect(mockSynth.stop).toHaveBeenCalled();
+            expect(psc._isPlayingAll).toBe(false);
+            let img2 = mockHeaderButton.replaceChildren.mock.calls[0][0];
+            expect(img2.getAttribute("src")).toBe("header-icons/play-chord.svg");
+        });
+
+        test("playUpAndDown and header button click mid-play should play and stop scale", () => {
+            psc.Stairs = [
+                ["A", "", 220.0],
+                ["B", "", 240.0]
+            ];
+            const mockRowA = { cells: [null, mockStepCell] };
+            const mockRowB = { cells: [null, mockStepCell] };
+            psc._stepTables = [{ rows: [mockRowA] }, { rows: [mockRowB] }];
+
+            const mockHeaderButton = {
+                replaceChildren: jest.fn(),
+                classList: {
+                    contains: jest.fn().mockReturnValue(false)
+                }
+            };
+            psc._playScaleButton = mockHeaderButton;
+
+            const playScaleClick = () => {
+                if (psc._isPlayingScale) {
+                    psc._scaleStopped = true;
+                    clearTimeout(psc._scaleTimeout);
+                    for (let i = 0; i < psc.Stairs.length; i++) {
+                        const stepCell = psc._stepTables[i].rows[0].cells[1];
+                        stepCell.classList.remove("active");
+                    }
+                    psc._setButtonIcon(psc._playScaleButton, "play-scale.svg", _("Play scale"));
+                    psc.activity.logo.synth.stop();
+                    psc._isPlayingScale = false;
+                } else {
+                    psc.playUpAndDown();
+                }
+            };
+
+            // Start playing scale
+            playScaleClick();
+            expect(mockSynth.trigger).toHaveBeenCalled();
+            expect(psc._isPlayingScale).toBe(true);
+            let img1 = mockHeaderButton.replaceChildren.mock.calls[0][0];
+            expect(img1.getAttribute("src")).toBe("header-icons/stop-button.svg");
+
+            // Stop playing scale
+            mockHeaderButton.replaceChildren.mockClear();
+            playScaleClick();
+            expect(mockSynth.stop).toHaveBeenCalled();
+            expect(psc._isPlayingScale).toBe(false);
+            expect(psc._scaleStopped).toBe(true);
+            let img2 = mockHeaderButton.replaceChildren.mock.calls[0][0];
+            expect(img2.getAttribute("src")).toBe("header-icons/play-scale.svg");
+        });
+    });
 });
