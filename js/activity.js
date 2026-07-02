@@ -94,6 +94,7 @@ let MYDEFINES = [
     "utils/retryWithBackoff",
     "utils/error-handler",
     "utils/debugLog",
+    "utils/keyboardShortcuts",
     "activity/artwork",
     "widgets/status",
     "utils/munsell",
@@ -6574,6 +6575,9 @@ define(["domReady!", "activity/exporters"].concat(MYDEFINES), (doc, exportersMod
             activity.domReady(doc);
             activity.doContextMenus();
             activity.doPluginsAndPaletteCols();
+            if (typeof window.initKeyboardShortcuts === "function") {
+                window.initKeyboardShortcuts(activity);
+            }
         } else {
             // Race condition in Firefox: non-AMD scripts might not have
             // finished global assignment yet.
@@ -6585,6 +6589,9 @@ define(["domReady!", "activity/exporters"].concat(MYDEFINES), (doc, exportersMod
                         activity.domReady(doc);
                         activity.doContextMenus();
                         activity.doPluginsAndPaletteCols();
+                        if (typeof window.initKeyboardShortcuts === "function") {
+                            window.initKeyboardShortcuts(activity);
+                        }
                     },
                     {
                         maxWait: 10000,
