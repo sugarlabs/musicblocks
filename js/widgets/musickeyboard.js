@@ -2245,10 +2245,14 @@ function MusicKeyboard(activity) {
                         lastNote = null;
                     }
 
-                    if (
-                        lastNote !== null &&
-                        (pitchLabels[i].includes(lastNote) || lastNote.includes(pitchLabels[i]))
-                    ) {
+                    if (lastNote === null) {
+                        // The keyboard contains only hertz entries, so there
+                        // is no pitch label to anchor against. Skip the match
+                        // search and let the picker below pick a default.
+                        break;
+                    }
+
+                    if (pitchLabels[i].includes(lastNote) || lastNote.includes(pitchLabels[i])) {
                         break;
                     }
                 }
