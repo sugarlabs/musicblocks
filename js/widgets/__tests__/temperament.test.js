@@ -368,7 +368,10 @@ describe("TemperamentWidget basic tests", () => {
                 style: {},
                 append: jest.fn(),
                 onmouseover: null,
-                onclick: null
+                onclick: null,
+                classList: {
+                    add: jest.fn()
+                }
             };
         });
 
