@@ -1,0 +1,223 @@
+:root {
+  --bg-color: #121212;
+  --panel-bg: #1e1e1e;
+  --text-primary: #e0e0e0;
+  --text-secondary: #a0a0a0;
+  
+  --color-note: #ff5252;
+  --color-rhythm: #448aff;
+  --color-repeat: #ffb300;
+  --color-tempo: #69f0ae;
+
+  --border-radius: 8px;
+  --transition-speed: 0.2s;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+#root {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.app-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+/* Palette Styles */
+.palette {
+  width: 300px;
+  background-color: var(--panel-bg);
+  border-right: 1px solid #333;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  overflow-y: auto;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+  z-index: 10;
+}
+
+.palette h2 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #fff;
+  border-bottom: 2px solid #333;
+  padding-bottom: 10px;
+}
+
+.palette-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-radius: var(--border-radius);
+  background-color: #2a2a2a;
+  cursor: grab;
+  transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+  user-select: none;
+  font-weight: 500;
+  gap: 10px;
+}
+
+.palette-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.palette-item:active {
+  cursor: grabbing;
+}
+
+/* Block Types */
+.block-note { border-left: 5px solid var(--color-note); color: var(--color-note); }
+.block-rhythm { border-left: 5px solid var(--color-rhythm); color: var(--color-rhythm); }
+.block-repeat { border-left: 5px solid var(--color-repeat); color: var(--color-repeat); }
+.block-tempo { border-left: 5px solid var(--color-tempo); color: var(--color-tempo); }
+
+/* Workspace Styles */
+.workspace {
+  flex: 1;
+  padding: 40px;
+  background: radial-gradient(circle at center, #1a1a1a 0%, #121212 100%);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.workspace-header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.workspace-header h1 {
+  font-size: 2rem;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.workspace-canvas {
+  width: 100%;
+  max-width: 800px;
+  min-height: 400px;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 2px dashed #444;
+  border-radius: var(--border-radius);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: background-color var(--transition-speed);
+}
+
+.workspace-canvas.is-dragging-over {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: #666;
+}
+
+/* Dropped Blocks */
+.dropped-block {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background-color: #2c2c2c;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  cursor: grab;
+  position: relative;
+  gap: 15px;
+}
+
+.dropped-block:active {
+  cursor: grabbing;
+}
+
+.dropped-block.block-note { background: linear-gradient(90deg, #2c2c2c 0%, rgba(255, 82, 82, 0.1) 100%); border-left: 5px solid var(--color-note); }
+.dropped-block.block-rhythm { background: linear-gradient(90deg, #2c2c2c 0%, rgba(68, 138, 255, 0.1) 100%); border-left: 5px solid var(--color-rhythm); }
+.dropped-block.block-repeat { background: linear-gradient(90deg, #2c2c2c 0%, rgba(255, 179, 0, 0.1) 100%); border-left: 5px solid var(--color-repeat); }
+.dropped-block.block-tempo { background: linear-gradient(90deg, #2c2c2c 0%, rgba(105, 240, 174, 0.1) 100%); border-left: 5px solid var(--color-tempo); }
+
+/* Remove button */
+.remove-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  margin-left: auto;
+  padding: 5px;
+  border-radius: 50%;
+  transition: all var(--transition-speed);
+}
+
+.remove-btn:hover {
+  background-color: rgba(255,0,0,0.2);
+  color: #ff5252;
+}
+
+/* Inputs on blocks */
+.block-input {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid #444;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-family: inherit;
+  width: 80px;
+}
+
+.block-input:focus {
+  outline: none;
+  border-color: var(--color-rhythm);
+}
+
+/* Sortable Item styling */
+.sortable-item {
+  transform-origin: 0 0;
+}
+
+.drag-overlay {
+  opacity: 0.8;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+  transform: scale(1.05);
+}
+
+.nested-canvas {
+  margin-top: 10px;
+  margin-left: 30px;
+  min-height: 50px;
+  border: 1px dashed #555;
+  border-radius: var(--border-radius);
+  padding: 10px;
+  background: rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nested-canvas.is-dragging-over {
+  background: rgba(0,0,0,0.4);
+  border-color: #777;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
