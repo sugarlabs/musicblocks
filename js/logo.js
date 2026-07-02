@@ -357,13 +357,6 @@ class Logo {
         this._graphicsScheduler = new EmbeddedGraphicsScheduler(this);
     }
 
-    /**
-     * @returns {boolean} true if Tone.Transport is available in the runtime.
-     */
-    static get _hasTransport() {
-        return typeof Tone !== "undefined" && Tone.Transport;
-    }
-
     // ========= Setters, Getters =================================================================
 
     /**
@@ -1048,15 +1041,11 @@ class Logo {
                 tur.delayParameters["arg"]
             );
             tur.delayParameters = null;
-        } else if (
-            tur._transportEventId !== null &&
-            Logo._hasTransport &&
-            typeof Tone.Transport.clear === "function"
-        ) {
-            Tone.Transport.clear(tur._transportEventId);
+        } else if (tur._transportEventId !== null && this.synth.transport.isAvailable) {
+            this.synth.transport.clear(tur._transportEventId);
             tur._transportEventId = null;
             if (tur.delayParameters) {
-                tur._transportTime = Tone.Transport.seconds;
+                tur._transportTime = this.synth.transport.seconds;
                 this.runFromBlockNow(
                     this,
                     turtle,
@@ -1209,8 +1198,8 @@ class Logo {
         }
 
         // Cancel all Transport-scheduled events before synth.stop()
-        if (Logo._hasTransport && typeof Tone.Transport.cancel === "function") {
-            Tone.Transport.cancel();
+        if (this.synth.transport.isAvailable) {
+            this.synth.transport.cancel();
         }
 
         // Reset per-turtle Transport scheduling state
@@ -1222,8 +1211,8 @@ class Logo {
         this.synth.stop();
 
         // Reset Transport position for next run
-        if (Logo._hasTransport) {
-            Tone.Transport.seconds = 0;
+        if (this.synth.transport.isAvailable) {
+            this.synth.transport.seconds = 0;
         }
 
         if (this.synth.recorder && this.synth.recorder.state === "recording")
@@ -1406,9 +1395,9 @@ class Logo {
 
         this.prepSynths();
 
-        if (Logo._hasTransport) {
-            Tone.Transport.start();
-            const transportNow = Tone.Transport.seconds;
+        if (this.synth.transport.isAvailable) {
+            this.synth.transport.start();
+            const transportNow = this.synth.transport.seconds;
             for (const turtle of this.activity.turtles.turtleList) {
                 turtle._transportTime = transportNow;
             }
@@ -1688,8 +1677,8 @@ class Logo {
 
         const tur = logo.turtles.ithTurtle(turtle);
 
-        if (tur._transportTime === null && Logo._hasTransport) {
-            tur._transportTime = Tone.Transport.seconds;
+        if (tur._transportTime === null && logo.synth.transport.isAvailable) {
+            tur._transportTime = logo.synth.transport.seconds;
         }
 
         const delay = logo.turtleDelay + tur.waitTime;
@@ -1705,18 +1694,14 @@ class Logo {
             } else if (
                 logo.turtleDelay === 0 &&
                 delay > 0 &&
-                Logo._hasTransport &&
-                typeof Tone.Transport.schedule === "function" &&
+                logo.synth.transport.isAvailable &&
                 tur._transportTime !== null
             ) {
                 const transportTime = tur._transportTime + delay / 1000;
                 tur.delayParameters = { blk: blk, flow: isflow, arg: receivedArg };
-                tur._transportEventId = Tone.Transport.schedule(audioContextTime => {
+                tur._transportEventId = logo.synth.transport.schedule(audioContextTime => {
                     const tur2 = logo.activity.turtles.ithTurtle(turtle);
-                    tur2._transportTime =
-                        typeof Tone.Transport.getSecondsAtTime === "function"
-                            ? Tone.Transport.getSecondsAtTime(audioContextTime)
-                            : Tone.Transport.seconds;
+                    tur2._transportTime = logo.synth.transport.getSecondsAtTime(audioContextTime);
                     tur2._transportEventId = null;
                     tur2.delayParameters = null;
                     if (!logo.stopTurtle) {
@@ -1727,9 +1712,9 @@ class Logo {
                 tur.delayParameters = { blk: blk, flow: isflow, arg: receivedArg };
                 tur.delayTimeout = logo._timerManager.setGuardedTimeout(
                     () => {
-                        if (Logo._hasTransport) {
+                        if (logo.synth.transport.isAvailable) {
                             const tur2 = logo.activity.turtles.ithTurtle(turtle);
-                            tur2._transportTime = Tone.Transport.seconds;
+                            tur2._transportTime = logo.synth.transport.seconds;
                         }
                         tur.delayParameters = null;
                         logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg);

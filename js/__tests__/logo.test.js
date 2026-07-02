@@ -36,7 +36,47 @@ global.Synth = jest.fn().mockImplementation(() => ({
     stopSound: jest.fn(),
     disposeAllInstruments: jest.fn(),
     changeInTemperament: false,
-    recorder: null
+    recorder: null,
+    transport: {
+        get isAvailable() {
+            return typeof global.Tone !== "undefined" && !!global.Tone.Transport;
+        },
+        start() {
+            if (this.isAvailable) global.Tone.Transport.start();
+        },
+        stop() {
+            if (this.isAvailable) global.Tone.Transport.stop();
+        },
+        cancel() {
+            if (this.isAvailable && typeof global.Tone.Transport.cancel === "function") {
+                global.Tone.Transport.cancel();
+            }
+        },
+        clear(id) {
+            if (this.isAvailable && typeof global.Tone.Transport.clear === "function") {
+                global.Tone.Transport.clear(id);
+            }
+        },
+        schedule(callback, time) {
+            if (this.isAvailable && typeof global.Tone.Transport.schedule === "function") {
+                return global.Tone.Transport.schedule(callback, time);
+            }
+            return null;
+        },
+        get seconds() {
+            if (this.isAvailable) return global.Tone.Transport.seconds;
+            return 0;
+        },
+        set seconds(v) {
+            if (this.isAvailable) global.Tone.Transport.seconds = v;
+        },
+        getSecondsAtTime(time) {
+            if (this.isAvailable && typeof global.Tone.Transport.getSecondsAtTime === "function") {
+                return global.Tone.Transport.getSecondsAtTime(time);
+            }
+            return this.seconds;
+        }
+    }
 }));
 global.Singer = {
     setSynthVolume: jest.fn(),
@@ -435,14 +475,28 @@ describe("Logo Class", () => {
     });
 
     describe("doStopTurtles", () => {
-        test("sets stopTurtle to true", () => {
-            logo.sounds = [];
-            logo.synth = {
+        function mockSynth() {
+            return {
                 stop: jest.fn(),
                 stopSound: jest.fn(),
                 disposeAllInstruments: jest.fn(),
-                recorder: null
+                recorder: null,
+                transport: {
+                    get isAvailable() {
+                        return false;
+                    },
+                    cancel: jest.fn(),
+                    get seconds() {
+                        return 0;
+                    },
+                    set seconds(v) {}
+                }
             };
+        }
+
+        test("sets stopTurtle to true", () => {
+            logo.sounds = [];
+            logo.synth = mockSynth();
 
             logo.doStopTurtles();
 
@@ -451,12 +505,7 @@ describe("Logo Class", () => {
 
         test("marks all turtles as stopped", () => {
             logo.sounds = [];
-            logo.synth = {
-                stop: jest.fn(),
-                stopSound: jest.fn(),
-                disposeAllInstruments: jest.fn(),
-                recorder: null
-            };
+            logo.synth = mockSynth();
 
             logo.doStopTurtles();
 
@@ -466,12 +515,7 @@ describe("Logo Class", () => {
         test("stops all sounds", () => {
             const mockSound = { stop: jest.fn() };
             logo.sounds = [mockSound];
-            logo.synth = {
-                stop: jest.fn(),
-                stopSound: jest.fn(),
-                disposeAllInstruments: jest.fn(),
-                recorder: null
-            };
+            logo.synth = mockSynth();
 
             logo.doStopTurtles();
 
@@ -481,12 +525,7 @@ describe("Logo Class", () => {
 
         test("clears step queue", () => {
             logo.sounds = [];
-            logo.synth = {
-                stop: jest.fn(),
-                stopSound: jest.fn(),
-                disposeAllInstruments: jest.fn(),
-                recorder: null
-            };
+            logo.synth = mockSynth();
             logo.stepQueue = { 0: [1, 2, 3] };
 
             logo.doStopTurtles();
@@ -496,12 +535,7 @@ describe("Logo Class", () => {
 
         test("executes ONSTOP plugin hooks", () => {
             logo.sounds = [];
-            logo.synth = {
-                stop: jest.fn(),
-                stopSound: jest.fn(),
-                disposeAllInstruments: jest.fn(),
-                recorder: null
-            };
+            logo.synth = mockSynth();
             logo.evalOnStopList = {
                 firstHook: "code-first",
                 secondHook: "code-second"
@@ -917,7 +951,7 @@ describe("Logo comprehensive method coverage", () => {
         expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, 3, 1, "x");
     });
 
-    test("runFromBlock uses Tone.Transport.schedule for non-zero delay when available", () => {
+    test("runFromBlock uses Transport schedule for non-zero delay when available", () => {
         const originalTone = global.Tone;
         const getSecondsAtTimeMock = jest.fn(t => t + 1);
         let scheduledCallback = null;
@@ -1260,7 +1294,24 @@ describe("Logo comprehensive method coverage", () => {
             stop: jest.fn(),
             stopSound: jest.fn(),
             disposeAllInstruments: jest.fn(),
-            recorder: { state: "recording", stop: jest.fn() }
+            recorder: { state: "recording", stop: jest.fn() },
+            transport: {
+                get isAvailable() {
+                    return typeof global.Tone !== "undefined" && !!global.Tone.Transport;
+                },
+                cancel() {
+                    if (this.isAvailable && typeof global.Tone.Transport.cancel === "function") {
+                        global.Tone.Transport.cancel();
+                    }
+                },
+                get seconds() {
+                    if (this.isAvailable) return global.Tone.Transport.seconds;
+                    return 0;
+                },
+                set seconds(v) {
+                    if (this.isAvailable) global.Tone.Transport.seconds = v;
+                }
+            }
         };
         logo._restoreConnections = jest.fn();
         mockActivity.showBlocksAfterRun = true;
