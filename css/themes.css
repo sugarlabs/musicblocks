@@ -125,6 +125,8 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 
 .dark #search,
 .dark #helpfulSearch {
+    background-color: var(--pc-background) !important;
+    border-color: var(--pc-strokeColor) !important;
     color: var(--color-text-primary) !important;
     -webkit-text-fill-color: var(--color-text-primary) !important;
     caret-color: var(--color-text-primary) !important;
@@ -402,7 +404,7 @@ body.highcontrast {
 .dark #helpdropdown.helpdropdown-menu li.active,
 .dark #helpdropdown.helpdropdown-menu li.selected,
 .dark #helpdropdown.helpdropdown-menu li.active.selected {
-    background: rgba(74, 163, 239, 0.16);
+    background: var(--pc-aux);
 }
 
 .dark #helpdropdown.helpdropdown-menu li:hover > a,
@@ -411,7 +413,7 @@ body.highcontrast {
 .dark #helpdropdown.helpdropdown-menu li > a:hover,
 .dark #helpdropdown.helpdropdown-menu li > a:focus,
 .dark #helpdropdown.helpdropdown-menu li > a.dropdown-item-focused {
-    background: rgba(74, 163, 239, 0.16);
+    background: var(--pc-aux);
     color: var(--color-text-inverse);
 }
 
@@ -450,26 +452,26 @@ body.highcontrast {
 
 .highcontrast .keyboard-shortcuts-panel {
     background: #000000;
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast #helpdropdown.helpdropdown-menu,
 .highcontrast #helpdropdown.helpdropdown-menu li > a {
     background: #000000;
-    color: var(--color-text-inverse);
-    border-color: var(--color-text-inverse);
+    color: var(--color-text-primary);
+    border-color: var(--color-text-primary);
     box-shadow: none;
 }
 
 .highcontrast #helpdropdown.helpdropdown-menu li + li {
-    border-top-color: var(--color-text-inverse);
+    border-top-color: var(--color-text-primary);
 }
 
 .highcontrast #helpdropdown.helpdropdown-menu li:hover,
 .highcontrast #helpdropdown.helpdropdown-menu li.active,
 .highcontrast #helpdropdown.helpdropdown-menu li.selected,
 .highcontrast #helpdropdown.helpdropdown-menu li.active.selected {
-    background: var(--color-brand-secondary);
+    background: var(--color-text-secondary);
 }
 
 .highcontrast #helpdropdown.helpdropdown-menu li:hover > a,
@@ -478,29 +480,29 @@ body.highcontrast {
 .highcontrast #helpdropdown.helpdropdown-menu li > a:hover,
 .highcontrast #helpdropdown.helpdropdown-menu li > a:focus,
 .highcontrast #helpdropdown.helpdropdown-menu li > a.dropdown-item-focused {
-    background: var(--color-brand-secondary);
-    color: var(--color-text-primary);
+    background: var(--color-text-secondary);
+    color: var(--color-text-inverse);
 }
 
 .highcontrast .keyboard-shortcuts-hero,
 .highcontrast .keyboard-shortcuts-section,
 .highcontrast .keyboard-shortcuts-key {
-    border: 1px solid var(--color-border-primary);
-    background: var(--color-bg-primary);
+    border: 1px solid #ffffff;
+    background: #000000;
     box-shadow: none;
-     color: var(--color-text-primary) !important;
+    color: var(--color-text-primary);
 }
 
 .highcontrast .keyboard-shortcuts-section-title,
 .highcontrast .keyboard-shortcuts-action,
 .highcontrast .keyboard-shortcuts-hero-copy,
 .highcontrast .keyboard-shortcuts-hero-title {
-     color: var(--color-text-primary) !important;
+    color: var(--color-text-primary);
 }
 
 .highcontrast .keyboard-shortcuts-row,
 .highcontrast .keyboard-shortcuts-section-title {
-    border-color: var(--color-text-inverse);
+    border-color: var(--color-text-primary);
 }
 
 @media (max-width: 900px) {
@@ -519,11 +521,11 @@ body.highcontrast {
 }
 
 .highcontrast .blue {
-    background-color: var(--color-text-inverse)080 !important;
+    background-color: var(--color-text-inverse) 080 !important;
 }
 
 .highcontrast .blue.darken-1 {
-    background-color: var(--color-text-inverse)0ff !important;
+    background-color: var(--color-text-inverse) 0ff !important;
 }
 
 .highcontrast #floatingWindows > .windowFrame {
@@ -536,21 +538,21 @@ body.highcontrast {
 }
 
 .highcontrast #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
-    color: var(--color-text-primary) !important;
+    color: var(--color-text-primary);
 }
 
 .highcontrast #floatingWindows > .windowFrame > .wfWinBody .wfbWidget {
-    color: var(--color-text-inverse) !important;
+    color: var(--color-text-primary) !important;
     background-color: var(--color-text-inverse) !important;
 }
 
 .highcontrast .popupMsg {
     background-color: var(--color-text-inverse);
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast #printText {
-    border-color: var(--color-text-inverse);
+    border-color: var(--color-text-primary);
 }
 
 .highcontrast #loading-image-container {
@@ -562,7 +564,7 @@ body.highcontrast {
 }
 
 .highcontrast .language-link {
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast #submitLilypond {
@@ -589,22 +591,22 @@ body.highcontrast {
 }
 
 .highcontrast #helpfulSearchDiv {
-    color: var(--color-text-inverse) !important;
+    color: var(--color-text-primary) !important;
     background-color: transparent !important;
 }
 
 .highcontrast #crossButton {
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast #chooseKeyDiv {
     background: #000000;
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast #movable {
     background: #000000;
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast .dropdown-content li > a {
@@ -624,7 +626,7 @@ body.highcontrast {
 }
 
 .highcontrast .modal-message {
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
     background-color: var(--color-text-inverse);
 }
 
@@ -634,16 +636,29 @@ body.highcontrast {
 }
 
 .highcontrast #confirmation-message {
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
 }
 
 .highcontrast .material-tooltip {
-    background-color: var(--color-text-inverse) !important;
-    border: 1px solid #ffffff;
+    background-color: var(--color-tooltip-bg) !important;
+    border: 1px solid var(--color-text-primary);
+    color: var(--color-text-primary) !important;
+}
+
+.highcontrast nav,
+.highcontrast .nav-wrapper,
+.highcontrast .button-container {
+    box-shadow: none !important;
+    border-bottom: none !important;
+    border-color: transparent !important;
 }
 
 .highcontrast .material-tooltip .backdrop {
-    background-color: var(--color-text-inverse) !important;
+    background-color: var(--color-tooltip-bg) !important;
+}
+
+.highcontrast .material-tooltip span {
+    color: var(--color-text-primary) !important;
 }
 
 .highcontrast #languagedropdown li a.selected-language {
@@ -684,14 +699,72 @@ body.highcontrast {
 
 /* Dark Mode Tooltip Styling - Slightly lighter background for better contrast */
 .dark .material-tooltip {
-    background-color: #3a3a3a !important;
+    background-color: var(--color-tooltip-bg) !important;
     color: var(--color-text-primary) !important;
 }
 
 .dark .material-tooltip .backdrop {
-    background-color: #3a3a3a !important;
+    background-color: var(--color-tooltip-bg) !important;
 }
 
 .dark .material-tooltip span {
     color: var(--color-text-primary) !important;
+}
+
+/* =========================================================================
+   Canvas Buttons (Grid, Erase, Collapse, Expand) Visibility
+   ========================================================================= */
+
+/* Dark Mode: frosted glass effect for canvas buttons */
+.dark #buttoncontainerTOP .tooltipped {
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: 8px;
+    padding: 2px;
+    width: 48px;
+    height: 48px;
+    box-sizing: border-box;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dark #buttoncontainerTOP .tooltipped img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.dark #buttoncontainerTOP .tooltipped:hover {
+    background-color: var(--color-bg-tertiary);
+}
+
+/* High Contrast Mode: maximum visibility for canvas buttons */
+.highcontrast #buttoncontainerTOP .tooltipped {
+    background-color: transparent;
+    border: 1px solid var(--color-text-primary);
+    border-radius: 8px;
+    padding: 2px;
+    width: 48px;
+    height: 48px;
+    box-sizing: border-box;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.highcontrast #buttoncontainerTOP .tooltipped img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.highcontrast #buttoncontainerTOP .tooltipped:hover {
+    background-color: transparent;
+    border-color: var(--color-brand-primary);
+    color: var(--color-text-primary);
+}
+
+.highcontrast #buttoncontainerTOP .tooltipped:hover .material-icons,
+.highcontrast #buttoncontainerTOP .tooltipped:hover img {
+    color: var(--color-text-primary) !important;
+    filter: none;
 }

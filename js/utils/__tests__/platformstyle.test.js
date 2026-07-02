@@ -36,6 +36,14 @@ describe("platformstyle", () => {
         global.window.localStorage = ls;
         global.showMaterialHighlight = jest.fn(() => ({ highlight: true }));
         buildDom();
+        global.getComputedStyle = jest.fn(el => ({
+            getPropertyValue: prop => {
+                const theme = global.window.localStorage.themePreference || "light";
+                if (theme === "light" && prop === "--pc-header") return "#4DA6FF";
+                if (theme === "dark" && prop === "--pc-header") return "#1E88E5";
+                return "";
+            }
+        }));
 
         jest.isolateModules(() => {
             require("../platformstyle");
