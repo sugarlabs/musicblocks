@@ -44,7 +44,15 @@ window.widgetWindows = {
     windowFor: jest.fn().mockReturnValue({
         clear: jest.fn(),
         show: jest.fn(),
-        addButton: jest.fn().mockReturnValue({ onclick: null }),
+        addButton: jest.fn().mockImplementation(() => {
+            return {
+                onclick: null,
+                replaceChildren: jest.fn(),
+                classList: {
+                    contains: jest.fn().mockReturnValue(false)
+                }
+            };
+        }),
         addInputButton: jest.fn().mockReturnValue({
             value: "3",
             addEventListener: jest.fn()
@@ -393,6 +401,7 @@ describe("PitchStaircase Widget", () => {
 
         beforeEach(() => {
             jest.useFakeTimers();
+            jest.clearAllTimers();
 
             mockPlayCell = {
                 getAttribute: jest.fn().mockReturnValue("0"),
@@ -413,7 +422,8 @@ describe("PitchStaircase Widget", () => {
 
             mockSynth = {
                 trigger: jest.fn(),
-                stop: jest.fn()
+                stop: jest.fn(),
+                setMasterVolume: jest.fn()
             };
 
             psc.activity = {
@@ -572,6 +582,152 @@ describe("PitchStaircase Widget", () => {
             expect(psc._scaleStopped).toBe(true);
             let img2 = mockHeaderButton.replaceChildren.mock.calls[0][0];
             expect(img2.getAttribute("src")).toBe("header-icons/play-scale.svg");
+        });
+
+        test("init should register and allow toggling play/stop on playAll and playScale buttons", () => {
+            psc.Stairs = [["A", "", 220.0]];
+
+            psc.init({
+                logo: {
+                    synth: mockSynth
+                },
+                textMsg: jest.fn(),
+                palettes: {
+                    dict: {}
+                }
+            });
+
+            // 1. Play All Button
+            expect(psc._playAllButton.onclick).toBeDefined();
+            // Start playing all
+            psc._playAllButton.onclick();
+            expect(mockSynth.trigger).toHaveBeenCalled();
+            expect(psc._isPlayingAll).toBe(true);
+            expect(psc._playAllButton.replaceChildren).toHaveBeenCalled();
+
+            // Stop playing all
+            mockSynth.stop.mockClear();
+            psc._playAllButton.onclick();
+            expect(mockSynth.stop).toHaveBeenCalled();
+            expect(psc._isPlayingAll).toBe(false);
+
+            // 2. Play Scale Button
+            expect(psc._playScaleButton.onclick).toBeDefined();
+            // Start playing scale
+            psc._playScaleButton.onclick();
+            expect(psc._isPlayingScale).toBe(true);
+
+            // Stop playing scale
+            mockSynth.stop.mockClear();
+            psc._playScaleButton.onclick();
+            expect(mockSynth.stop).toHaveBeenCalled();
+            expect(psc._isPlayingScale).toBe(false);
+            expect(psc._scaleStopped).toBe(true);
+        });
+
+        test("init should register and allow toggling play/stop on row play button", () => {
+            psc.Stairs = [["A", "", 220.0]];
+
+            psc.init({
+                logo: {
+                    synth: mockSynth
+                },
+                textMsg: jest.fn(),
+                palettes: {
+                    dict: {}
+                }
+            });
+
+            const playCell = psc._stepTables[0].rows[0].cells[0];
+            const stepCell = psc._stepTables[0].rows[0].cells[1];
+            expect(playCell.onclick).toBeDefined();
+
+            // Mock getAttribute to prevent returning null in tests
+            playCell.setAttribute("id", "0");
+            stepCell.setAttribute("id", "220.0");
+
+            // Mock replaceChildren on cell
+            playCell.replaceChildren = jest.fn();
+
+            // Start playing row
+            playCell.onclick();
+            expect(mockSynth.trigger).toHaveBeenCalled();
+            expect(psc._playingRowIndex).toBe(0);
+
+            // Stop playing row
+            mockSynth.stop.mockClear();
+            playCell.onclick();
+            expect(mockSynth.stop).toHaveBeenCalled();
+            expect(psc._playingRowIndex).toBeNull();
+        });
+
+        test("_playAll should terminate naturally after 1000ms", () => {
+            psc.Stairs = [["A", "", 220.0]];
+            psc._stepTables = [{ rows: [{ cells: [null, mockStepCell] }] }];
+            psc._playAllButton = {
+                replaceChildren: jest.fn(),
+                classList: {
+                    contains: jest.fn().mockReturnValue(false)
+                }
+            };
+
+            psc._playAll();
+            expect(psc._isPlayingAll).toBe(true);
+
+            jest.advanceTimersByTime(1000);
+            expect(psc._isPlayingAll).toBe(false);
+        });
+
+        test("playUpAndDown should play full scale down then up and terminate naturally", () => {
+            psc.Stairs = [
+                ["A", "", 220.0],
+                ["B", "", 240.0]
+            ];
+            const mockRowA = { cells: [null, mockStepCell] };
+            const mockRowB = { cells: [null, mockStepCell] };
+            psc._stepTables = [{ rows: [mockRowA] }, { rows: [mockRowB] }];
+
+            psc._playScaleButton = {
+                replaceChildren: jest.fn(),
+                classList: {
+                    contains: jest.fn().mockReturnValue(false)
+                }
+            };
+
+            // Start playing scale
+            psc.playUpAndDown();
+            expect(mockSynth.trigger).toHaveBeenCalledTimes(1);
+            expect(psc._isPlayingScale).toBe(true);
+
+            // 1. First step timeout (t3) to play index 0 (going down)
+            jest.advanceTimersByTime(1000);
+            expect(mockSynth.trigger).toHaveBeenCalledTimes(2);
+
+            // 2. Next timeout (t3) will trigger index -1
+            jest.advanceTimersByTime(1000);
+
+            // t1 schedules highlights cleanup in 1000ms, t2 schedules _playNext(0, 1) in 200ms
+            jest.advanceTimersByTime(200); // Trigger t2: _playNext(0, 1) going up
+            expect(mockSynth.trigger).toHaveBeenCalledTimes(3);
+
+            // _playNext(0, 1) schedules t3 in 1000ms
+            jest.advanceTimersByTime(1000); // Trigger t3: plays index 1 going up
+            expect(mockSynth.trigger).toHaveBeenCalledTimes(4);
+
+            // _playNext(1, 1) schedules t3 in 1000ms (to index === 2 boundary)
+            jest.advanceTimersByTime(1000);
+
+            // Terminate in 1000ms
+            jest.advanceTimersByTime(1000); // Trigger termination timeout
+
+            expect(psc._isPlayingScale).toBe(false);
+            let img = psc._playScaleButton.replaceChildren.mock.calls[1][0];
+            expect(img.getAttribute("src")).toBe("header-icons/play-scale.svg");
+        });
+
+        test("_setButtonIcon should handle invalid or mock cells gracefully", () => {
+            psc._setButtonIcon(null, "play-button.svg", "Play");
+            psc._setButtonIcon({}, "play-button.svg", "Play");
         });
     });
 });
