@@ -27,6 +27,18 @@ describe("TemperamentWidget basic tests", () => {
             refreshWheel: jest.fn()
         }));
 
+        global.getTemperamentKeys = jest.fn(() => []);
+        global.isCustomTemperament = jest.fn(() => false);
+        global.getTemperamentRatio = jest.fn(value =>
+            value !== null && typeof value === "object" && typeof value.ratio === "number"
+                ? value.ratio
+                : Number(value)
+        );
+        global.getTemperament = jest.fn(() => ({
+            interval: [],
+            pitchNumber: 0
+        }));
+
         global.platformColor = {
             selectorBackground: "#fff",
             selectorBackgroundHOVER: "#eee",
@@ -42,12 +54,6 @@ describe("TemperamentWidget basic tests", () => {
             return note.replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
         };
 
-        global.getTemperamentKeys = jest.fn(() => []);
-        global.isCustomTemperament = jest.fn(() => false);
-        global.getTemperament = jest.fn(() => ({
-            interval: [],
-            pitchNumber: 0
-        }));
         global.pitchToFrequency = jest.fn(() => 440);
         global.frequencyToPitch = jest.fn(() => ["C", 4, 0]);
         global.parseNoteString = jest.fn(note => [note.slice(0, -1), Number(note.slice(-1))]);
@@ -915,6 +921,106 @@ describe("TemperamentWidget basic tests", () => {
         widget.checkTemperament(["1.00", "2.00"]);
 
         expect(widget.inTemperament).toBe("equal");
+    });
+
+    describe("checkTemperament ratio extraction", () => {
+        beforeEach(() => {
+            // Set up temperamentCell via init
+            const mockWidgetWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                getWidgetBody: jest.fn(() => ({ append: jest.fn(), style: {} })),
+                addButton: jest.fn(() => ({
+                    onclick: null,
+                    getElementsByTagName: jest.fn(() => [{}])
+                })),
+                sendToCenter: jest.fn()
+            };
+            global.window.widgetWindows = { windowFor: jest.fn(() => mockWidgetWindow) };
+            global.window.innerWidth = 1200;
+            global.buildScale = jest.fn(() => [["C"], []]);
+            global.getNoteFromInterval = jest.fn(() => ["C", 4]);
+            global.isCustomTemperament = jest.fn(() => false);
+
+            widget.inTemperament = "equal";
+            widget.scale = ["C", "Major"];
+            widget.init({
+                errorMsg: jest.fn(),
+                logo: {
+                    synth: {
+                        startingPitch: "C4",
+                        _getFrequency: jest.fn(() => 440)
+                    }
+                }
+            });
+        });
+
+        test("does not throw when interval values are plain numbers (equal temperament)", () => {
+            global.getTemperamentKeys = jest.fn(() => ["equal"]);
+            global.getTemperament = jest.fn(() => ({
+                interval: ["unison", "octave"],
+                pitchNumber: 1,
+                unison: 1.0,
+                octave: 2.0
+            }));
+
+            expect(() => widget.checkTemperament(["1.00", "2.00"])).not.toThrow();
+        });
+
+        test("does not throw when interval values are {ratio, cents} objects (just intonation)", () => {
+            global.getTemperamentKeys = jest.fn(() => ["just"]);
+            global.getTemperament = jest.fn(() => ({
+                interval: ["unison", "fifth"],
+                pitchNumber: 1,
+                unison: { ratio: 1.0, cents: 0 },
+                fifth: { ratio: 1.5, cents: 701.96 }
+            }));
+
+            expect(() => widget.checkTemperament(["1.00", "1.50"])).not.toThrow();
+        });
+
+        test("correctly extracts ratio from {ratio, cents} object for comparison", () => {
+            global.getTemperamentKeys = jest.fn(() => ["pythagorean"]);
+            global.getTemperament = jest.fn(() => ({
+                interval: ["unison", "fifth"],
+                pitchNumber: 1,
+                unison: { ratio: 1.0, cents: 0 },
+                fifth: { ratio: 1.5, cents: 701.96 }
+            }));
+
+            widget.checkTemperament(["1.00", "1.50"]);
+
+            // ratios match → should be identified as "pythagorean", not "custom"
+            expect(widget.inTemperament).toBe("pythagorean");
+        });
+
+        test("falls back to custom when {ratio, cents} values do not match input ratios", () => {
+            global.getTemperamentKeys = jest.fn(() => ["just"]);
+            global.getTemperament = jest.fn(() => ({
+                interval: ["unison", "fifth"],
+                pitchNumber: 1,
+                unison: { ratio: 1.0, cents: 0 },
+                fifth: { ratio: 1.5, cents: 701.96 }
+            }));
+
+            // Pass ratios that don't match
+            widget.checkTemperament(["1.00", "1.33"]);
+
+            expect(widget.inTemperament).toBe("custom");
+        });
+
+        test("mixed number and object interval values are both handled", () => {
+            global.getTemperamentKeys = jest.fn(() => ["mixed"]);
+            global.getTemperament = jest.fn(() => ({
+                interval: ["unison", "third", "fifth"],
+                pitchNumber: 2,
+                unison: 1.0, // plain number
+                third: { ratio: 1.25, cents: 386.31 }, // object
+                fifth: 1.5 // plain number
+            }));
+
+            expect(() => widget.checkTemperament(["1.00", "1.25", "1.50"])).not.toThrow();
+        });
     });
 
     describe("cents <-> frequency conversion", () => {
