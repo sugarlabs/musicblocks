@@ -174,6 +174,10 @@ class Singer {
         this.staccato = [];
         this.glide = [];
         this.glideOverride = 0;
+        this.inGlide = false;
+        this.glideDuration = 0;
+        this.glideBuffer = [];
+        this.glideStartTime = 0;
         this.swing = [];
         this.swingTarget = [];
         this.swingCarryOver = 0;
@@ -1884,7 +1888,7 @@ class Singer {
             }
 
             // Duration is the duration of the note to be played. doWait sets the wait time for the turtle before the next block is executed
-            const duration = noteBeatValue;
+            const duration = tur.singer.inGlide ? 0 : noteBeatValue;
             // For the outermost note (when nesting), calculate the time for the next note
             if (duration > 0) {
                 tur.singer.previousTurtleTime = tur.singer.turtleTime;
@@ -1917,6 +1921,14 @@ class Singer {
                             break;
                         }
                     }
+                }
+            }
+
+            if (tur.singer.inGlide) {
+                const waitSeconds = isOsc ? noteValue / 1000 : bpmFactor / noteValue;
+                tur.singer.turtleTime += waitSeconds;
+                if (!tur.singer.suppressOutput) {
+                    tur.doWait(waitSeconds);
                 }
             }
             let forceSilence = false;
@@ -2335,78 +2347,37 @@ class Singer {
                                                     future
                                                 );
                                             }
-                                        } else if (last(tur.singer.instrumentNames)) {
+                                        } else {
                                             if (!tur.singer.suppressOutput) {
-                                                // If we are in a glide, use setNote after the first note
-                                                if (tur.singer.glide.length > 0) {
-                                                    if (tur.singer.glideOverride === 0) {
-                                                        activity.logo.synth.trigger(
-                                                            turtle,
-                                                            notes[d],
-                                                            beatValue,
-                                                            last(tur.singer.instrumentNames),
-                                                            paramsEffects,
-                                                            filters,
-                                                            true,
-                                                            future
-                                                        );
-                                                    } else {
-                                                        // trigger first note for entire duration of the glissando
-                                                        const beatValueOverride =
-                                                            bpmFactor * tur.singer.glideOverride;
-                                                        activity.logo.synth.trigger(
-                                                            turtle,
-                                                            notes[d],
-                                                            beatValueOverride,
-                                                            last(tur.singer.instrumentNames),
-                                                            paramsEffects,
-                                                            filters,
-                                                            false,
-                                                            future
-                                                        );
-                                                        tur.singer.glideOverride = 0;
-                                                    }
+                                                const instrument = last(tur.singer.instrumentNames);
+                                                const voice =
+                                                    tur.singer.voices.length > 0
+                                                        ? last(tur.singer.voices)
+                                                        : null;
+                                                const target = instrument || voice || DEFAULTVOICE;
+                                                const isVoice = !!voice;
+
+                                                if (tur.singer.inGlide) {
+                                                    const bufferNote = {
+                                                        target: target,
+                                                        note: notes[d],
+                                                        duration: beatValue,
+                                                        time: tur.singer.turtleTime,
+                                                        isVoice: isVoice
+                                                    };
+                                                    tur.singer.glideBuffer.push(bufferNote);
                                                 } else {
                                                     activity.logo.synth.trigger(
                                                         turtle,
                                                         notes[d],
                                                         beatValue,
-                                                        last(tur.singer.instrumentNames),
+                                                        target,
                                                         paramsEffects,
                                                         filters,
                                                         false,
                                                         future
                                                     );
                                                 }
-                                            }
-                                        } else if (
-                                            tur.singer.voices.length > 0 &&
-                                            last(tur.singer.voices)
-                                        ) {
-                                            if (!tur.singer.suppressOutput) {
-                                                activity.logo.synth.trigger(
-                                                    turtle,
-                                                    notes[d],
-                                                    beatValue,
-                                                    last(tur.singer.voices),
-                                                    paramsEffects,
-                                                    null,
-                                                    false,
-                                                    future
-                                                );
-                                            }
-                                        } else {
-                                            if (!tur.singer.suppressOutput) {
-                                                activity.logo.synth.trigger(
-                                                    turtle,
-                                                    notes[d],
-                                                    beatValue,
-                                                    DEFAULTVOICE,
-                                                    paramsEffects,
-                                                    null,
-                                                    false,
-                                                    future
-                                                );
                                             }
                                         }
                                     }
@@ -2609,6 +2580,67 @@ class Singer {
             callback();
         }
 
+        activity.stageDirty = true;
+    }
+
+    /**
+     * Plays the buffered glissando notes.
+     *
+     * @static
+     * @param {Object} activity - Activity object.
+     * @param {Number} turtle - Turtle index.
+     */
+    static playGlideBuffer(activity, turtle) {
+        const tur = activity.turtles.ithTurtle(turtle);
+        const buffer = tur.singer.glideBuffer;
+        if (buffer.length === 0) return;
+
+        const bpm = tur.singer.bpm[tur.singer.bpm.length - 1];
+        const portamento = 60 / (bpm * 8); // Standard portamento for glide
+
+        // The first note in the buffer should be played normally to establish the starting pitch
+        // Subsequent notes should be played with portamento.
+        const startTime = tur.singer.glideStartTime;
+
+        buffer.forEach((noteObj, index) => {
+            const isFirst = index === 0;
+            const noteDuration = noteObj.duration;
+            const scheduledTime = noteObj.time;
+
+            // Calculate the delay relative to Tone.now()
+            // turtleTime is absolute in seconds relative to project start.
+            // scheduledTime - startTime is the offset within the glide.
+            const delay = scheduledTime - startTime;
+
+            // Trigger the note
+            if (noteObj.isVoice) {
+                activity.synth.setNote(noteObj.target, noteObj.note, true);
+                activity.synth.trigger(
+                    noteObj.target,
+                    noteObj.note,
+                    noteDuration,
+                    true,
+                    true,
+                    delay
+                );
+            } else {
+                if (!isFirst) {
+                    activity.synth.setPortamento(noteObj.target, portamento);
+                }
+                activity.synth.trigger(
+                    noteObj.target,
+                    noteObj.note,
+                    noteDuration,
+                    false,
+                    true,
+                    delay,
+                    !isFirst // doPortamento
+                );
+            }
+        });
+
+        // Reset buffer and state
+        tur.singer.glideBuffer = [];
         activity.stageDirty = true;
     }
 }

@@ -80,7 +80,8 @@ describe("setupOrnamentBlocks", () => {
                 setSlur: jest.fn(),
                 setStaccato: jest.fn()
             },
-            noteCounter: jest.fn((logo, turtle, val) => val)
+            noteCounter: jest.fn((logo, turtle, val) => val),
+            playGlideBuffer: jest.fn()
         };
 
         activity = {
@@ -94,7 +95,14 @@ describe("setupOrnamentBlocks", () => {
             ithTurtle(turtle) {
                 if (!this.turtleObjs[turtle]) {
                     this.turtleObjs[turtle] = {
-                        singer: { staccato: [], glide: [], justCounting: [] }
+                        singer: {
+                            staccato: [],
+                            glide: [],
+                            justCounting: [],
+                            glideBuffer: [],
+                            glideDuration: 0,
+                            inGlide: false
+                        }
                     };
                 }
                 return this.turtleObjs[turtle];
@@ -241,7 +249,8 @@ describe("setupOrnamentBlocks", () => {
             turtleObj.singer.glide = [];
             const result = glideBlock.flow([0.1, 8], logo, turtleIndex, "blkGlide");
             expect(turtleObj.singer.glide).toContain(0.1);
-            expect(Singer.noteCounter).toHaveBeenCalledWith(logo, turtleIndex, 8);
+            expect(turtleObj.singer.inGlide).toBe(true);
+            expect(turtleObj.singer.glideBuffer).toEqual([]);
             expect(logo.notation.notationBeginSlur).toHaveBeenCalledWith(turtleIndex);
             expect(logo.setDispatchBlock).toHaveBeenCalledWith(
                 "blkGlide",
@@ -259,11 +268,11 @@ describe("setupOrnamentBlocks", () => {
             expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, "blkGlide");
             expect(result).toEqual([8, 1]);
         });
-        it("should call notationEndSlur in __listener when justCounting is empty", () => {
+        it("should call playGlideBuffer and notationEndSlur in __listener when justCounting is empty", () => {
             const glideBlock = createdBlocks["glide"];
             const turtleIndex = 0;
             const turtleObj = activity.turtles.ithTurtle(turtleIndex);
-            turtleObj.singer.glide = []; // ← empty, flow() will push 0.1
+            turtleObj.singer.glide = [];
             turtleObj.singer.justCounting = [];
 
             let capturedListener = null;
@@ -273,17 +282,20 @@ describe("setupOrnamentBlocks", () => {
 
             glideBlock.flow([0.1, 8], logo, turtleIndex, "blkGlide");
             expect(capturedListener).not.toBeNull();
+            turtleObj.singer.glideBuffer = [{ note: 60 }];
             capturedListener({});
 
+            expect(Singer.playGlideBuffer).toHaveBeenCalledWith(activity, turtleIndex);
             expect(logo.notation.notationEndSlur).toHaveBeenCalledWith(turtleIndex);
-            expect(turtleObj.singer.glide).toHaveLength(0); // pushed 0.1 then popped
+            expect(turtleObj.singer.glide).toHaveLength(0);
+            expect(turtleObj.singer.inGlide).toBe(false);
         });
 
         it("should skip notationEndSlur in __listener when justCounting is non-empty", () => {
             const glideBlock = createdBlocks["glide"];
             const turtleIndex = 0;
             const turtleObj = activity.turtles.ithTurtle(turtleIndex);
-            turtleObj.singer.glide = []; // ← empty, flow() will push 0.1
+            turtleObj.singer.glide = [];
             turtleObj.singer.justCounting = [true];
 
             let capturedListener = null;
@@ -296,7 +308,7 @@ describe("setupOrnamentBlocks", () => {
             capturedListener({});
 
             expect(logo.notation.notationEndSlur).not.toHaveBeenCalled();
-            expect(turtleObj.singer.glide).toHaveLength(0); // pushed 0.1 then popped
+            expect(turtleObj.singer.glide).toHaveLength(0);
         });
     });
 
