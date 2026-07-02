@@ -19,6 +19,7 @@
  */
 
 global._ = s => s;
+global.AI_SAMPLE_ENDPOINT = "https://test.example.com";
 global.DOUBLEFLAT = "bb";
 global.FLAT = "b";
 global.NATURAL = "n";
@@ -205,7 +206,8 @@ describe("Sampler Widget", () => {
                 },
                 canvas: { width: 1000, height: 800 },
                 getStageScale: () => 1,
-                textMsg: jest.fn()
+                textMsg: jest.fn(),
+                errorMsg: jest.fn()
             };
             global.activity = mockActivity;
             widget.activity = mockActivity;
@@ -756,9 +758,9 @@ describe("Sampler Widget", () => {
             const container = docById("samplerPrompt");
             const textArea = container.querySelector("textarea");
             const buttons = Array.from(container.querySelectorAll("button"));
-            const submit = buttons.find(btn => btn.innerHTML === "Submit");
-            const preview = buttons.find(btn => btn.innerHTML === "Preview");
-            const save = buttons.find(btn => btn.innerHTML === "Save");
+            const submit = buttons.find(btn => btn.textContent === "Submit");
+            const preview = buttons.find(btn => btn.textContent === "Preview");
+            const save = buttons.find(btn => btn.textContent === "Save");
 
             textArea.value = "hello";
             textArea.dispatchEvent(new Event("input"));
@@ -798,7 +800,7 @@ describe("Sampler Widget", () => {
             const container = docById("samplerPrompt");
             const textArea = container.querySelector("textarea");
             const submit = Array.from(container.querySelectorAll("button")).find(
-                btn => btn.innerHTML === "Submit"
+                btn => btn.textContent === "Submit"
             );
 
             textArea.value = "fail";
@@ -1003,15 +1005,22 @@ describe("Sampler Widget", () => {
                 },
                 configurable: true
             });
-            global.alert = jest.fn();
-
             widget.makeTuner(400, 300);
             const startButton = document.getElementById("start");
             startButton.click();
 
             await Promise.resolve();
-            expect(global.alert).toHaveBeenCalled();
+            expect(mockActivity.errorMsg).toHaveBeenCalled();
             errorSpy.mockRestore();
+        });
+    });
+
+    describe("endpoint safety", () => {
+        test("sampler.js contains no hardcoded HTTP IP addresses", () => {
+            const fs = require("fs");
+            const path = require("path");
+            const source = fs.readFileSync(path.resolve(__dirname, "../sampler.js"), "utf8");
+            expect(source).not.toMatch(/http:\/\/\d+\.\d+\.\d+\.\d+/);
         });
     });
 });
