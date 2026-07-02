@@ -186,7 +186,7 @@ jobs:
             # your Jest config), so this step fails the job if coverage drops
             # below the configured minimums.
             - name: Run Jest with coverage
-              run: pnpm test -- --coverage --ci
+              run: pnpm test --coverage --ci
 
             # Upload to Codecov for the PR-vs-base coverage diff + status check.
             # NOTE: secrets (CODECOV_TOKEN) are NOT available to pull_request runs

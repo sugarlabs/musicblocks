@@ -6,8 +6,8 @@ How to write unit tests for block files.
 
 ```bash
 pnpm test                                    # Run all tests
-pnpm test -- path/to/file.test.js           # Run specific test file
-pnpm test -- --coverage                      # Run with coverage report
+pnpm test path/to/file.test.js              # Run specific test file
+pnpm test --coverage                         # Run with coverage report
 ```
 
 ## Testing Blocks

@@ -167,7 +167,7 @@ docker run --rm -it \
 Inside the container:
 
 ```bash
-corepack enable && corepack prepare pnpm@11.8.0 --activate && pnpm install
+corepack enable && corepack prepare pnpm@10.34.4 --activate && pnpm install
 ```
 
 ## 4. Start the development server
@@ -244,7 +244,7 @@ another process is already using port `3000`.
 Stop the conflicting process or run on another port:
 
 ```bash
-pnpm run dev -- --port 3001
+pnpm run dev --port 3001
 ```
 
 ---

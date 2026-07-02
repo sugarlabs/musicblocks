@@ -19,7 +19,7 @@ pnpm test
 For running tests with detailed logs:
 
 ```sh
-pnpm test -- --verbose
+pnpm test --verbose
 ```
 
 ## 📂 Directory Structure
@@ -100,7 +100,7 @@ pnpm test _tests_/filename.test.js
 To watch tests while coding:
 
 ```sh
-pnpm test -- --watch
+pnpm test --watch
 ```
 
 ## 🔄 Updating Snapshots
@@ -108,7 +108,7 @@ pnpm test -- --watch
 If using Jest snapshots, update them with:
 
 ```sh
-pnpm test -- -u
+pnpm test -u
 ```
 
 ## Code Coverage
@@ -155,7 +155,7 @@ These thresholds are intentionally kept as a ratchet — they should only go **u
 
 The GitHub Actions workflow (`.github/workflows/pr-jest-tests.yml`) runs on every pull request:
 
-1. Checks out the PR head commit and runs `pnpm test -- --coverage`.
+1. Checks out the PR head commit and runs `pnpm test --coverage`.
 2. Reads `coverage/coverage-summary.json` to extract per-metric percentages.
 3. Posts a comment on the PR with the coverage summary and pass/fail status.
 4. If any test fails, the comment lists the failing test files.
