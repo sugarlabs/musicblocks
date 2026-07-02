@@ -1247,7 +1247,7 @@ function MusicKeyboard(activity) {
                     k = PITCHES2.indexOf(obj[0]);
                 }
                 if (thisOctave > lastOctave) {
-                    k += 12;
+                    k += 12 * (thisOctave - lastOctave);
                 }
 
                 if (k !== (j + 1) % 12) {

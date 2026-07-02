@@ -6257,15 +6257,19 @@ const durationToNoteValue = duration => {
  * @returns {Array} An array containing [noteName, octave].
  */
 const parseNoteString = note => {
-    // Regex to match note name (letter + optional accidental) and octave (one or more digits, optional negative sign)
-    // Pattern: [A-Ga-g] for note letter, [#b♯♭]? for optional accidental, (-?\d+) for octave (multi-digit, can be negative)
-    const match = note.match(/^([A-Ga-g][#b♯♭]?)(-?\d+)$/);
+    // Regex to match note name and octave (one or more digits, optional negative sign)
+    // Matches valid note prefixes (Western, Solfege, Carnatic) and optional accidentals followed by octave
+    const match = note.match(
+        /^((?:[a-g]|do|re|mi|fa|sol|la|ti|si|ut|sa|ga|ma|pa|dha|ni)(?:[#b♯♭𝄪𝄫x♮]*))(-?\d+)$/iu
+    );
     if (match) {
         return [match[1], Number(match[2])];
     }
     // Fallback to original behavior if regex doesn't match (for edge cases)
     const len = note.length;
-    return [note.substring(0, len - 1), Number(last(note))];
+    const lastChar = note.charAt(len - 1);
+    const octave = lastChar && !isNaN(lastChar) ? Number(lastChar) : NaN;
+    return [note.substring(0, len - 1), octave];
 };
 
 /**
@@ -6683,6 +6687,12 @@ const isInt = value => {
  * @returns {string} The converted note.
  */
 const convertFromSolfege = note => {
+    if (typeof note === "string") {
+        const unicodeNote = note.replace("#", SHARP).replace("b", FLAT);
+        if (unicodeNote in FIXEDSOLFEGE1) {
+            note = FIXEDSOLFEGE1[unicodeNote];
+        }
+    }
     // Convert to common letter class
     if (note in FIXEDSOLFEGE1) {
         note = FIXEDSOLFEGE1[note];
