@@ -6342,6 +6342,18 @@ class Activity {
 
             // Use managed addEventListener instead of onkeydown assignment
             this.addEventListener(document, "keydown", this.handleKeyDown);
+            this.addEventListener(
+                document,
+                "keydown",
+                event => {
+                    if ((event.ctrlKey || event.metaKey) && event.code === "Space") {
+                        event.preventDefault();
+                        event.stopImmediatePropagation();
+                        this._displayHelpfulSearchDiv();
+                    }
+                },
+                true
+            );
 
             if (this.planet !== undefined) {
                 this.planet.planet.setAnalyzeProject(doAnalyzeProject);
