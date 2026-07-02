@@ -761,19 +761,37 @@ class ToolbarUI {
         const icon = docById("themeSelectIcon");
         if (!icon) return;
 
-        themes.forEach(theme => {
-            if (safeStorageGet("themePreference") === theme) {
-                icon.innerHTML = docById(theme).innerHTML;
-            }
-        });
+        // 1. Set the initial icon when the app loads based on saved preference
+        let currentTheme = safeStorageGet("themePreference") || themes[0];
+        if (docById(currentTheme)) {
+            icon.innerHTML = docById(currentTheme).innerHTML;
+        }
 
+        // 2. Direct toggle logic on click
         icon.onclick = () => {
-            themes.forEach(theme => {
-                docById(theme).onclick = () => themeBox[`${theme}_onclick`](this.activity);
-            });
+            // Re-fetch current theme state just in case it changed
+            currentTheme = safeStorageGet("themePreference") || themes[0];
+            
+            // Find where we are in the themes array
+            let currentIndex = themes.indexOf(currentTheme);
+            if (currentIndex === -1) currentIndex = 0;
+            
+            // Calculate the next theme index, looping back to 0 if at the end
+            const nextIndex = (currentIndex + 1) % themes.length;
+            const nextTheme = themes[nextIndex];
+            
+            // Trigger the theme change function
+            if (typeof themeBox[`${nextTheme}_onclick`] === 'function') {
+                themeBox[`${nextTheme}_onclick`](this.activity);
+            }
+            
+            // Update the button's icon to match the new theme visually
+            if (docById(nextTheme)) {
+                icon.innerHTML = docById(nextTheme).innerHTML;
+            }
         };
     }
-
+    
     /**
      * Renders the wrap icon.
      *
