@@ -125,6 +125,7 @@ describe("Blocks Foundation", () => {
             canvas: { width: 1200, height: 900 },
             refreshCanvas: jest.fn(),
             errorMsg: jest.fn(),
+            textMsg: jest.fn(),
             setSelectionMode: jest.fn(),
             stopLoadAnimation: jest.fn(),
             setHomeContainers: jest.fn(),
@@ -191,6 +192,90 @@ describe("Blocks Foundation", () => {
             expect(Array.isArray(blocks.stackList)).toBe(true);
             expect(blocks.stackList.length).toBe(0);
             expect(Array.isArray(blocks.trashStacks)).toBe(true);
+            expect(Array.isArray(blocks.actionHistory)).toBe(true);
+            expect(Array.isArray(blocks.redoActionHistory)).toBe(true);
+            expect(blocks.isUndoingOrRedoing).toBe(false);
+        });
+    });
+
+    describe("Undo/Redo System", () => {
+        it("should successfully undo and redo a block move", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.moveBlock = jest.fn();
+            blocks.blockMoved = jest.fn();
+            blocks.activity.refreshCanvas = jest.fn();
+
+            // Push a fake move action
+            blocks.actionHistory.push({
+                type: "move",
+                blockId: 1,
+                oldX: 10,
+                oldY: 20,
+                newX: 30,
+                newY: 40
+            });
+
+            // Undo it
+            blocks.undoAction();
+            expect(blocks.moveBlock).toHaveBeenCalledWith(1, 10, 20);
+            expect(blocks.blockMoved).toHaveBeenCalledWith(1);
+            expect(blocks.activity.refreshCanvas).toHaveBeenCalled();
+            expect(blocks.redoActionHistory.length).toBe(1);
+            expect(blocks.actionHistory.length).toBe(0);
+
+            // Redo it
+            blocks.redoAction();
+            expect(blocks.moveBlock).toHaveBeenCalledWith(1, 30, 40);
+            expect(blocks.blockMoved).toHaveBeenCalledWith(1); // 2nd time
+            expect(blocks.actionHistory.length).toBe(1);
+            expect(blocks.redoActionHistory.length).toBe(0);
+        });
+
+        it("should successfully undo and redo a block trash", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.activity._restoreTrashById = jest.fn();
+            blocks.sendStackToTrash = jest.fn();
+            blocks.blockList = { 2: { trash: false } }; // mock block
+
+            blocks.actionHistory.push({
+                type: "trash",
+                blockId: 2
+            });
+
+            blocks.undoAction();
+            expect(blocks.activity._restoreTrashById).toHaveBeenCalledWith(2);
+            expect(blocks.redoActionHistory[0].type).toBe("trash");
+
+            blocks.redoAction();
+            expect(blocks.sendStackToTrash).toHaveBeenCalledWith(blocks.blockList[2]);
+            expect(blocks.actionHistory[0].type).toBe("trash");
+        });
+
+        it("should gracefully handle empty history stacks", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.undoAction();
+            blocks.redoAction();
+            expect(blocks.activity.textMsg).toHaveBeenCalledWith(expect.any(String), 3000);
+        });
+
+        it("should only push to actionHistory during sendStackToTrash if not undoing/redoing", () => {
+            const blocks = new Blocks(mockActivity);
+            const mockBlock = { connections: [null], name: "dummy" };
+            blocks.turtles = { turtleList: [] };
+            blocks.activity.trashcan = { stopHighlightAnimation: jest.fn() };
+            const originalGetElementById = document.getElementById;
+            document.getElementById = jest.fn().mockReturnValue({ click: jest.fn() });
+
+            blocks.isUndoingOrRedoing = false;
+            blocks.sendStackToTrash(mockBlock);
+            expect(blocks.actionHistory.length).toBe(1);
+            expect(blocks.actionHistory[0].type).toBe("trash");
+
+            blocks.isUndoingOrRedoing = true;
+            blocks.sendStackToTrash(mockBlock);
+            expect(blocks.actionHistory.length).toBe(1); // Should not push again
+
+            document.getElementById = originalGetElementById;
         });
     });
 
