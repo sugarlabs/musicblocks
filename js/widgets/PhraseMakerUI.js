@@ -50,7 +50,7 @@ const PhraseMakerUI = {
                 wfWinBody.style.overflowX = totalWidth > maxWidth ? "auto" : "hidden";
                 wfWinBody.style.width = "-webkit-fill-available";
                 wfWinBody.style.height = "-webkit-fill-available";
-                wfWinBody.style.background = "#cccccc";
+                wfWinBody.classList.add("pm-window-body-bg");
             }
         }
     },
@@ -64,14 +64,16 @@ const PhraseMakerUI = {
         let cell;
         for (let i = 0; i < row.cells.length; i++) {
             cell = row.cells[i];
-            cell.style.backgroundColor = pm.platformColor.rhythmcellcolor;
+            cell.classList.remove("pm-bg-selector", "pm-bg-tuplet");
+            cell.classList.add("pm-bg-rhythm-cell");
         }
 
         if (pm._matrixHasTuplets) {
             row = pm._tupletNoteValueRow;
             for (let i = 0; i < row.cells.length; i++) {
                 cell = row.cells[i];
-                cell.style.backgroundColor = pm.platformColor.tupletBackground;
+                cell.classList.remove("pm-bg-selector", "pm-bg-rhythm-cell");
+                cell.classList.add("pm-bg-tuplet");
             }
         }
     },
@@ -128,7 +130,8 @@ const PhraseMakerUI = {
 
         const cell = pm._rows[rowIndex].cells[colIndex];
         if (cell) {
-            cell.style.backgroundColor = pm.platformColor.selectorBackground;
+            cell.classList.add("pm-bg-selector");
+            cell.classList.remove("pm-bg-rhythm-cell");
         }
     },
 
@@ -142,8 +145,9 @@ const PhraseMakerUI = {
         if (!pm._rows[rowIndex]) return;
 
         const cell = pm._rows[rowIndex].cells[colIndex];
-        if (cell && cell.style.backgroundColor === pm.platformColor.selectorBackground) {
-            cell.style.backgroundColor = pm.platformColor.rhythmcellcolor;
+        if (cell && cell.classList.contains("pm-bg-selector")) {
+            cell.classList.remove("pm-bg-selector");
+            cell.classList.add("pm-bg-rhythm-cell");
         }
     },
 
@@ -157,13 +161,13 @@ const PhraseMakerUI = {
         if (!cell) return;
 
         if (isActive) {
-            cell.style.backgroundColor = pm.platformColor.selectorBackground;
+            cell.classList.add("pm-bg-selector", "active");
+            cell.classList.remove("pm-bg-rhythm-cell");
             cell.textContent = "\u00a0\u2713"; // checkmark
-            cell.className = "active";
         } else {
-            cell.style.backgroundColor = pm.platformColor.rhythmcellcolor;
+            cell.classList.remove("pm-bg-selector", "active");
+            cell.classList.add("pm-bg-rhythm-cell");
             cell.textContent = "";
-            cell.className = "";
         }
     },
 
