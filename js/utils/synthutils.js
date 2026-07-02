@@ -464,6 +464,52 @@ const instrumentsEffects = { 0: {} };
 const instrumentsFilters = { 0: {} };
 
 /**
+ * Transport wrapper — isolates Tone.Transport behind a stable interface.
+ * All timing/scheduling operations should go through this object so that
+ * Tone.js remains a swappable implementation detail of synthutils.js.
+ */
+const transport = {
+    get isAvailable() {
+        return typeof Tone !== "undefined" && Tone.Transport;
+    },
+    start() {
+        if (this.isAvailable) Tone.Transport.start();
+    },
+    stop() {
+        if (this.isAvailable) Tone.Transport.stop();
+    },
+    cancel() {
+        if (this.isAvailable && typeof Tone.Transport.cancel === "function") {
+            Tone.Transport.cancel();
+        }
+    },
+    clear(id) {
+        if (this.isAvailable && typeof Tone.Transport.clear === "function") {
+            Tone.Transport.clear(id);
+        }
+    },
+    schedule(callback, time) {
+        if (this.isAvailable && typeof Tone.Transport.schedule === "function") {
+            return Tone.Transport.schedule(callback, time);
+        }
+        return null;
+    },
+    get seconds() {
+        if (this.isAvailable) return Tone.Transport.seconds;
+        return 0;
+    },
+    set seconds(v) {
+        if (this.isAvailable) Tone.Transport.seconds = v;
+    },
+    getSecondsAtTime(time) {
+        if (this.isAvailable && typeof Tone.Transport.getSecondsAtTime === "function") {
+            return Tone.Transport.getSecondsAtTime(time);
+        }
+        return this.seconds;
+    }
+};
+
+/**
  * Synth constructor function.
  * @constructor
  */
@@ -502,6 +548,7 @@ function Synth() {
     // Using Tone.js
     // this.tone = new Tone();
     this.tone = null;
+    this.transport = transport;
 
     Tone.Buffer.onload = () => {
         console.debug("sample loaded");
@@ -2344,11 +2391,11 @@ function Synth() {
     };
 
     this.start = () => {
-        Tone.Transport.start();
+        this.transport.start();
     };
 
     this.stop = () => {
-        Tone.Transport.stop();
+        this.transport.stop();
     };
 
     this.rampTo = (turtle, instrumentName, oldVol, volume, rampTime) => {
