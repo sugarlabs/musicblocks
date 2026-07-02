@@ -51,6 +51,7 @@ class PitchStaircase {
         this._stepTables = [];
         this._musicRatio1 = null;
         this._musicRatio2 = null;
+        this._playTimers = {};
     }
 
     /**
@@ -163,9 +164,10 @@ class PitchStaircase {
             });
 
             playCell.onclick = () => {
-                const i = playCell.getAttribute("id");
+                const rowIndex = playCell.getAttribute("id");
                 const stepCell = this._stepTables[i].rows[0].cells[1];
-                this._playOne(stepCell);
+                const img = playCell.querySelector("img");
+                this._playOne(stepCell, img, rowIndex);
             };
         }
     }
@@ -302,17 +304,35 @@ class PitchStaircase {
      * @param {Cell} stepcell
      * @returns {void}
      */
-    _playOne(stepCell) {
+    _playOne(stepCell, img, rowIndex) {
         // The frequency is stored in the stepCell.
         stepCell.classList.add("active");
         stepCell.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         const frequency = Number(stepCell.getAttribute("id"));
         this.activity.logo.synth.trigger(0, frequency, 1, DEFAULTVOICE, null, null);
 
-        setTimeout(() => {
+        if (img) {
+            img.src = "header-icons/pause-button.svg";
+        }
+
+        if (rowIndex !== undefined && this._playTimers[rowIndex]) {
+            clearTimeout(this._playTimers[rowIndex]);
+        }
+
+        const timer = setTimeout(() => {
             stepCell.classList.remove("active");
             stepCell.style.backgroundColor = platformColor.selectorBackground;
+            if (img) {
+                img.src = "header-icons/play-button.svg";
+            }
+            if (rowIndex !== undefined) {
+                this._playTimers[rowIndex] = null;
+            }
         }, 1000);
+
+        if (rowIndex !== undefined) {
+            this._playTimers[rowIndex] = timer;
+        }
     }
 
     /**
