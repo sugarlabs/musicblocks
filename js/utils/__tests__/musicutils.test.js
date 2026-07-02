@@ -86,6 +86,8 @@ const {
     getVoiceSynthName,
     isCustomTemperament,
     getTemperamentName,
+    getTemperamentCents,
+    getTemperamentRatio,
     noteToObj,
     frequencyToPitch,
     getArticulation,
@@ -891,10 +893,14 @@ describe("frequencyToPitch", () => {
     });
 
     it("should work with equal19 temperament", () => {
-        global.TEMPERAMENT = { equal19: [] };
+        global.TEMPERAMENT = {
+            equal: { pitchNumber: 12 },
+            equal19: { pitchNumber: 19 }
+        };
         const result = frequencyToPitch(440, "equal19");
         expect(result[0]).toBe("A");
         expect(result[1]).toBe(4);
+        expect(result[2]).toBe(0);
     });
 
     it("should fallback to 12-EDO for undefined temperament", () => {
@@ -909,6 +915,105 @@ describe("frequencyToPitch", () => {
         const result = frequencyToPitch(440, "unknown");
         expect(result[0]).toBe("A");
         expect(result[1]).toBe(4);
+    });
+});
+
+describe("cents calculations", () => {
+    global.TWELVEHUNDRETHROOT2 = Number("1.0005777895065549");
+    global.A0 = 27.5;
+
+    beforeEach(() => {
+        global.TEMPERAMENT = {
+            equal: { pitchNumber: 12 },
+            equal19: { pitchNumber: 19 },
+            equal31: { pitchNumber: 31 }
+        };
+    });
+
+    describe("getTemperamentCents", () => {
+        it("converts numeric ratio to cents", () => {
+            // 3/2 ratio = 701.96 cents
+            const cents = getTemperamentCents(3 / 2);
+            expect(cents).toBeCloseTo(701.955, 1);
+        });
+
+        it("returns cents from object format", () => {
+            const cents = getTemperamentCents({ ratio: 3 / 2, cents: 700 });
+            expect(cents).toBe(700);
+        });
+
+        it("returns 0 for invalid input", () => {
+            expect(getTemperamentCents(null)).toBe(0);
+            expect(getTemperamentCents(undefined)).toBe(0);
+            expect(getTemperamentCents("invalid")).toBe(0);
+        });
+    });
+
+    describe("getTemperamentRatio", () => {
+        it("returns numeric ratio as-is", () => {
+            expect(getTemperamentRatio(1.5)).toBe(1.5);
+        });
+
+        it("extracts ratio from object format", () => {
+            expect(getTemperamentRatio({ ratio: 3 / 2, cents: 700 })).toBe(3 / 2);
+        });
+
+        it("returns 1 for invalid input", () => {
+            expect(getTemperamentRatio(null)).toBe(1);
+            expect(getTemperamentRatio(undefined)).toBe(1);
+        });
+    });
+
+    describe("frequencyToPitch cents with non-12 EDO", () => {
+        it("computes cents deviation in 19-EDO", () => {
+            // ~0.05 steps above A4 in 19-EDO → stays on "A" with ~3 cents deviation
+            const freq = 440 * Math.pow(2, 0.05 / 19);
+            const result = frequencyToPitch(freq, "equal19");
+            expect(result[0]).toBe("A");
+            expect(result[1]).toBe(4);
+            expect(result[2]).toBeGreaterThan(2);
+            expect(result[2]).toBeLessThan(5);
+        });
+
+        it("computes cents deviation in 31-EDO", () => {
+            // ~0.3 steps above A4 in 31-EDO → stays on "A" with ~12 cents deviation
+            const freq = 440 * Math.pow(2, 0.3 / 31);
+            const result = frequencyToPitch(freq, "equal31");
+            expect(result[0]).toBe("A");
+            expect(result[1]).toBe(4);
+            expect(result[2]).toBeGreaterThan(10);
+            expect(result[2]).toBeLessThan(15);
+        });
+    });
+
+    describe("pitchToFrequency cents with non-12 EDO", () => {
+        it("handles non-zero cents with 19-EDO", () => {
+            // A4 in 19-EDO = pitchNumber 76 (4 * 19)
+            const result = pitchToFrequency("A", 4, 50, "C", "equal19");
+            const expected = A0 * Math.pow(2, 1 / (19 * 100)) ** (76 * 100 + 50);
+            expect(result).toBeCloseTo(expected, 4);
+        });
+
+        it("handles non-zero cents with 31-EDO", () => {
+            // A4 in 31-EDO = pitchNumber 124 (4 * 31)
+            const result = pitchToFrequency("A", 4, 50, "C", "equal31");
+            const expected = A0 * Math.pow(2, 1 / (31 * 100)) ** (124 * 100 + 50);
+            expect(result).toBeCloseTo(expected, 4);
+        });
+
+        it("handles negative cents", () => {
+            const result = pitchToFrequency("A", 4, -30, "C");
+            const expected = A0 * Math.pow(2, 1 / 1200) ** (48 * 100 - 30);
+            expect(result).toBeCloseTo(expected, 4);
+        });
+    });
+
+    describe("frequencyToPitch sub-cent rounding", () => {
+        it("rounds sub-0.5-cent deviation to 0", () => {
+            const freq = 440 * Math.pow(2, 0.003 / 12); // tiny deviation (~0.003 steps = ~0.25 cents)
+            const result = frequencyToPitch(freq);
+            expect(result[2]).toBe(0);
+        });
     });
 });
 
@@ -1868,6 +1973,32 @@ describe("noteToPitchOctave", () => {
         const result = noteToPitchOctave("g20");
         expect(result).toEqual(["g", 20]); // Pitch is 'g' and octave is 20
     });
+
+    it("should correctly handle solfege note strings with octave", () => {
+        expect(noteToPitchOctave("do7")).toEqual(["do", 7]);
+        expect(noteToPitchOctave("fa4")).toEqual(["fa", 4]);
+        expect(noteToPitchOctave("sol5")).toEqual(["sol", 5]);
+        expect(noteToPitchOctave("do#7")).toEqual(["do#", 7]);
+    });
+
+    it("should correctly handle fallback cases for multi-digit digits", () => {
+        expect(noteToPitchOctave("hello10")).toEqual(["hello1", 0]);
+        expect(noteToPitchOctave("xyz123")).toEqual(["xyz12", 3]);
+    });
+
+    it("should correctly handle Carnatic note strings with octave", () => {
+        expect(noteToPitchOctave("sa4")).toEqual(["sa", 4]);
+        expect(noteToPitchOctave("dha-1")).toEqual(["dha", -1]);
+        expect(noteToPitchOctave("ma#5")).toEqual(["ma#", 5]);
+    });
+
+    it("should not match adversarial non-note words and fall back to fallback behavior", () => {
+        expect(noteToPitchOctave("away5")).toEqual(["away", 5]);
+        expect(noteToPitchOctave("regard4")).toEqual(["regard", 4]);
+        expect(noteToPitchOctave("hi4")).toEqual(["hi", 4]);
+        expect(noteToPitchOctave("random9")).toEqual(["random", 9]);
+        expect(noteToPitchOctave("banana2")).toEqual(["banana", 2]);
+    });
 });
 
 describe("pitchToFrequency", () => {
@@ -2195,7 +2326,7 @@ describe("calcOctave", () => {
         "ti"
     ];
     global.FIXEDSOLFEGE1 = {
-        "do𝄫": "B",
+        "do𝄫": "B" + FLAT,
         "do♭": "C" + FLAT,
         "do": "C",
         "do♯": "C" + SHARP,
@@ -2209,13 +2340,13 @@ describe("calcOctave", () => {
         "mi♭": "E" + FLAT,
         "mi": "E",
         "mi♯": "E" + SHARP,
-        "mi𝄪": "G",
+        "mi𝄪": "F" + SHARP,
         "fa𝄫": "E" + FLAT,
         "fa♭": "F" + FLAT,
         "fa": "F",
         "fa♯": "F" + SHARP,
-        "fa𝄪": "G" + SHARP,
-        "sol𝄫": "E",
+        "fa𝄪": "G",
+        "sol𝄫": "F",
         "sol♭": "G" + FLAT,
         "sol": "G",
         "sol♯": "G" + SHARP,
@@ -2229,7 +2360,7 @@ describe("calcOctave", () => {
         "ti♭": "B" + FLAT,
         "ti": "B",
         "ti♯": "B" + SHARP,
-        "ti𝄪": "C",
+        "ti𝄪": "C" + SHARP,
         "R": _("rest")
     };
 
@@ -2312,7 +2443,7 @@ describe("convertFromSolfege", () => {
     const SHARP = "♯";
     const FLAT = "♭";
     global.FIXEDSOLFEGE1 = {
-        "do𝄫": "B",
+        "do𝄫": "B" + FLAT,
         "do♭": "C" + FLAT,
         "do": "C",
         "do♯": "C" + SHARP,
@@ -2326,13 +2457,13 @@ describe("convertFromSolfege", () => {
         "mi♭": "E" + FLAT,
         "mi": "E",
         "mi♯": "E" + SHARP,
-        "mi𝄪": "G",
+        "mi𝄪": "F" + SHARP,
         "fa𝄫": "E" + FLAT,
         "fa♭": "F" + FLAT,
         "fa": "F",
         "fa♯": "F" + SHARP,
-        "fa𝄪": "G" + SHARP,
-        "sol𝄫": "E",
+        "fa𝄪": "G",
+        "sol𝄫": "F",
         "sol♭": "G" + FLAT,
         "sol": "G",
         "sol♯": "G" + SHARP,
@@ -2346,17 +2477,19 @@ describe("convertFromSolfege", () => {
         "ti♭": "B" + FLAT,
         "ti": "B",
         "ti♯": "B" + SHARP,
-        "ti𝄪": "C",
+        "ti𝄪": "C" + SHARP,
         "R": _("rest")
     };
     global.EQUIVALENTNATURALS = { "E♯": "F", "B♯": "C", "C♭": "B", "F♭": "E" };
     const testCases = [
-        { input: "do𝄫", expected: "B" },
+        { input: "do𝄫", expected: "B" + FLAT },
         { input: "do♭", expected: "B" },
         { input: "do♯", expected: "C♯" },
         { input: "re♯", expected: "D♯" },
         { input: "E♯", expected: "F" },
-        { input: "R", expected: _("rest") }
+        { input: "R", expected: _("rest") },
+        { input: "do#", expected: "C" + SHARP },
+        { input: "dob", expected: "B" }
     ];
 
     testCases.forEach(({ input, expected }) => {
@@ -2384,7 +2517,7 @@ describe("convertFactor", () => {
         { input: 0.4375, expected: "4.." },
         { input: 0.5, expected: "2" },
         { input: 0.5625, expected: "2 16" },
-        { input: 0.675, expected: "2 8" },
+        { input: 0.625, expected: "2 8" },
         { input: 0.6875, expected: "2 8 16" },
         { input: 0.75, expected: "2." },
         { input: 0.8125, expected: "2 4 16" },
@@ -3002,6 +3135,64 @@ describe("normalization and pitch parsing extras", () => {
         });
         expect(getPitchInfo({})).toBe(global.INVALIDPITCH);
         expect(_calculate_pitch_number("C", 4, 2)).toBe(58);
+    });
+});
+
+describe("getSolfege with temperament", () => {
+    it("should work with default 12-EDO (equal temperament)", () => {
+        expect(getSolfege("C", "C major", true, "equal")).toBe("do");
+        expect(getSolfege("F#", "G major", true, "equal")).toBe("ti");
+    });
+
+    it("should handle movable solfege in major and minor keys", () => {
+        // C Major: C=do, D=re, E=mi, F=fa, G=sol, A=la, B=ti
+        expect(getSolfege("C", "C major", true, "equal")).toBe("do");
+        expect(getSolfege("D", "C major", true, "equal")).toBe("re");
+        expect(getSolfege("E", "C major", true, "equal")).toBe("mi");
+        // A minor (relative of C): A=la, B=ti, C=do, D=re, E=mi, F=fa, G=sol
+        expect(getSolfege("A", "A minor", true, "equal")).toBe("la");
+        expect(getSolfege("C", "A minor", true, "equal")).toBe("do");
+    });
+
+    it("should fall back to fixed-do when movable is false", () => {
+        expect(getSolfege("C", "C major", false, "equal")).toBe("do");
+        expect(getSolfege("A", "C major", false, "equal")).toBe("la");
+    });
+});
+
+describe("_getStepSize with temperament", () => {
+    it("should work with equal temperament (12-EDO)", () => {
+        expect(_getStepSize("C major", "C", "up", 0, "equal")).toBe(2);
+        expect(_getStepSize("C major", "C", "down", 0, "equal")).toBe(-1);
+    });
+
+    it("should return correct step size for sharps and flats", () => {
+        expect(_getStepSize("F# major", "F#", "up", 0, "equal")).toBe(0);
+        expect(_getStepSize("G# major", "G#", "down", 0, "equal")).toBe(0);
+    });
+
+    it("should return transposition for custom temperaments", () => {
+        expect(_getStepSize("C major", "C", "up", 5, "custom")).toBe(5);
+        expect(_getStepSize("C major", "C", "down", 3, "custom")).toBe(3);
+    });
+});
+
+describe("numberToPitch custom temperament fallback", () => {
+    it("falls back to equal temperament for missing custom temperament entries", () => {
+        addTemperamentToDictionary("test19", {
+            pitchNumber: 19,
+            interval: TEMPERAMENT.equal.interval
+        });
+        // Pitch 0 in 19-EDO = A (starting pitch)
+        expect(numberToPitch(0, "test19", "A4", 0)).toEqual(["A", 4]);
+        // Pitch 19 in 19-EDO = A in next octave
+        expect(numberToPitch(19, "test19", "A4", 0)).toEqual(["A", 5]);
+    });
+
+    it("reports error and falls back when temperament is missing", () => {
+        const activity = { errorMsg: jest.fn() };
+        expect(numberToPitch(0, "nonexistent", "C4", 0, activity)).toEqual(["C", 4]);
+        expect(activity.errorMsg).toHaveBeenCalled();
     });
 });
 

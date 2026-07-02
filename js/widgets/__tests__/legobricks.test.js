@@ -173,4 +173,175 @@ describe("LegoWidget Core Logic", () => {
             expect(legoWidget._getContrastColor("red")).toBe("#FFFFFF");
         });
     });
+
+    describe("clearBlocks", () => {
+        it("should reset the row tracking arrays", () => {
+            legoWidget._rowBlocks = [1];
+            legoWidget._rowMap = [0];
+            legoWidget._rowOffset = [0];
+
+            legoWidget.clearBlocks();
+
+            expect(legoWidget._rowBlocks).toEqual([]);
+            expect(legoWidget._rowMap).toEqual([]);
+            expect(legoWidget._rowOffset).toEqual([]);
+        });
+    });
+
+    describe("addRowBlock", () => {
+        it("should append a row block and update the row map and offset", () => {
+            legoWidget._rowBlocks = [];
+            legoWidget._rowMap = [];
+            legoWidget._rowOffset = [];
+
+            legoWidget.addRowBlock(5);
+
+            expect(legoWidget._rowBlocks).toEqual([5]);
+            expect(legoWidget._rowMap).toEqual([0]);
+            expect(legoWidget._rowOffset).toEqual([0]);
+        });
+
+        it("should offset duplicate row blocks to keep them unique", () => {
+            legoWidget._rowBlocks = [5];
+            legoWidget._rowMap = [0];
+            legoWidget._rowOffset = [0];
+
+            legoWidget.addRowBlock(5);
+
+            expect(legoWidget._rowBlocks).toEqual([5, 1000005]);
+            expect(legoWidget._rowMap).toEqual([0, 1]);
+        });
+    });
+
+    describe("_filterSmallSegments", () => {
+        it("should return the boundaries unchanged when there are two or fewer", () => {
+            expect(legoWidget._filterSmallSegments([0, 500])).toEqual([0, 500]);
+        });
+
+        it("should drop boundaries that create sub-minimum segments", () => {
+            expect(legoWidget._filterSmallSegments([0, 500, 2000, 2500, 4000])).toEqual([
+                0, 2000, 4000
+            ]);
+        });
+
+        it("should keep the final boundary when everything else is filtered out", () => {
+            expect(legoWidget._filterSmallSegments([0, 100, 200])).toEqual([0, 200]);
+        });
+    });
+
+    describe("_analyzeColumnBoundaries", () => {
+        it("should collect cumulative segment end times across rows", () => {
+            legoWidget.colorData = [
+                { colorSegments: [{ duration: 1000 }, { duration: 1000 }] },
+                { colorSegments: [{ duration: 2000 }] }
+            ];
+
+            expect(legoWidget._analyzeColumnBoundaries()).toEqual([0, 1000, 2000]);
+        });
+
+        it("should merge boundaries that fall within the merge threshold", () => {
+            legoWidget.colorData = [{ colorSegments: [{ duration: 300 }] }];
+
+            expect(legoWidget._analyzeColumnBoundaries()).toEqual([0]);
+        });
+    });
+
+    describe("_convertRowToPitch", () => {
+        it("should return null when there is no note", () => {
+            expect(legoWidget._convertRowToPitch({})).toBeNull();
+        });
+
+        it("should return null for an unparseable note string", () => {
+            expect(legoWidget._convertRowToPitch({ note: "xyz" })).toBeNull();
+        });
+
+        it("should convert a natural note to solfege and octave", () => {
+            expect(legoWidget._convertRowToPitch({ note: "C4" })).toEqual({
+                solfege: "do",
+                octave: 4
+            });
+        });
+
+        it("should convert a sharp note to its solfege equivalent", () => {
+            expect(legoWidget._convertRowToPitch({ note: "G#5" })).toEqual({
+                solfege: "sol♯",
+                octave: 5
+            });
+        });
+
+        it("should fall back to do for a note name outside the map", () => {
+            expect(legoWidget._convertRowToPitch({ note: "Cb4" })).toEqual({
+                solfege: "do",
+                octave: 4
+            });
+        });
+    });
+
+    describe("_getColorFamilyByName", () => {
+        it("should return the color family for a known name", () => {
+            expect(legoWidget._getColorFamilyByName("blue")).toEqual({
+                name: "blue",
+                hue: 240
+            });
+        });
+
+        it("should return null for an unknown name", () => {
+            expect(legoWidget._getColorFamilyByName("nonexistent")).toBeNull();
+        });
+    });
+
+    describe("_colorsAreSimilar", () => {
+        it("should return false when either color is missing", () => {
+            expect(legoWidget._colorsAreSimilar(null, { name: "red" })).toBe(false);
+        });
+
+        it("should treat identical names as similar", () => {
+            expect(legoWidget._colorsAreSimilar({ name: "red" }, { name: "red" })).toBe(true);
+        });
+
+        it("should allow close gray variants but not distant ones", () => {
+            expect(
+                legoWidget._colorsAreSimilar(
+                    { name: "white", lightness: 95 },
+                    { name: "gray", lightness: 90 }
+                )
+            ).toBe(true);
+            expect(
+                legoWidget._colorsAreSimilar(
+                    { name: "white", lightness: 95 },
+                    { name: "black", lightness: 5 }
+                )
+            ).toBe(false);
+        });
+
+        it("should compare saturated colors by HSL distance", () => {
+            const red = { name: "red", hue: 0, saturation: 80, lightness: 50 };
+            const nearRed = { name: "orange", hue: 10, saturation: 80, lightness: 50 };
+            const blue = { name: "blue", hue: 240, saturation: 80, lightness: 50 };
+
+            expect(legoWidget._colorsAreSimilar(red, nearRed)).toBe(true);
+            expect(legoWidget._colorsAreSimilar(red, blue)).toBe(false);
+        });
+    });
+
+    describe("_isLineBeyondImageHorizontally", () => {
+        it("should return false when there is no media element", () => {
+            legoWidget.imageWrapper = null;
+
+            expect(legoWidget._isLineBeyondImageHorizontally({ currentX: 100 })).toBe(false);
+        });
+
+        it("should report whether the scan line passed the image right edge", () => {
+            const mediaElement = {
+                getBoundingClientRect: () => ({ left: 50, width: 100 })
+            };
+            legoWidget.imageWrapper = {
+                querySelector: selector => (selector === "img" ? mediaElement : null)
+            };
+            legoWidget.gridOverlay = { getBoundingClientRect: () => ({ left: 0 }) };
+
+            expect(legoWidget._isLineBeyondImageHorizontally({ currentX: 200 })).toBe(true);
+            expect(legoWidget._isLineBeyondImageHorizontally({ currentX: 100 })).toBe(false);
+        });
+    });
 });

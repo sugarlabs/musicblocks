@@ -487,6 +487,16 @@ function SampleWidget() {
                 this.audioPreview = null;
             }
 
+            if (this.is_recording) {
+                this.activity.logo.synth.stopRecording();
+                this.is_recording = false;
+            }
+
+            if (tunerOn) {
+                this.activity.logo.synth.stopTuner();
+                tunerOn = false;
+            }
+
             // Stop pitch detection and release resources (microphone, AudioContext)
             this.stopPitchDetection();
 

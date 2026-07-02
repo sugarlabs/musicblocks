@@ -439,52 +439,6 @@ function waitForReadiness(callback, options = {}) {
     requestAnimationFrame(check);
 }
 
-// Check for Internet Explorer
-
-window.addEventListener("load", () => {
-    const userAgent = window.navigator.userAgent;
-    // For IE 10 or older
-    const MSIE = userAgent.indexOf("MSIE ");
-    let DetectVersionOfIE;
-    if (MSIE > 0) {
-        DetectVersionOfIE = parseInt(
-            userAgent.substring(MSIE + 5, userAgent.indexOf(".", MSIE)),
-            10
-        );
-    }
-
-    // For IE 11
-    const IETrident = userAgent.indexOf("Trident/");
-    if (IETrident > 0) {
-        const IERv = userAgent.indexOf("rv:");
-        DetectVersionOfIE = parseInt(
-            userAgent.substring(IERv + 3, userAgent.indexOf(".", IERv)),
-            10
-        );
-    }
-
-    // For IE 12
-    const IEEDGE = userAgent.indexOf("Edge/");
-    if (IEEDGE > 0) {
-        DetectVersionOfIE = parseInt(
-            userAgent.substring(IEEDGE + 5, userAgent.indexOf(".", IEEDGE)),
-            10
-        );
-    }
-
-    if (typeof DetectVersionOfIE !== "undefined") {
-        document.body.innerHTML =
-            "<div style='margin: 200px;'>" +
-            "<h1 style='font-size: 100px; font-family: Arial; text-align: center; color: #F00;'>Music Blocks</h1>" +
-            "<h3 style='font-size: 40px; font-family: Arial; text-align: center;'>Music Blocks will not work in Internet Explorer, you can use:</h3>" +
-            "<div style='width: 550px; margin: 0 auto;'><a href='https://www.chromium.org/getting-involved/download-chromium' style='float: left; display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Chromium</a>" +
-            "<a href='https://www.google.com/chrome/' style='float: left; margin-left: 40px;display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Chrome</a>" +
-            "<a href='https://support.apple.com/downloads/safari' style='float: left; margin-left: 40px;display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Safari</a>" +
-            "<a href='https://www.mozilla.org/en-US/firefox/new/' style='float: left; margin-left: 40px;display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Firefox</a>" +
-            "</div></div>";
-    }
-});
-
 /**
  * Retrieves a collection of elements by class name.
  * @param {string} classname - The class name to search for.
@@ -953,10 +907,12 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
         await new Promise((resolve, reject) => {
             script.onload = () => {
                 URL.revokeObjectURL(url);
+                document.head.removeChild(script);
                 resolve();
             };
             script.onerror = e => {
                 URL.revokeObjectURL(url);
+                document.head.removeChild(script);
                 console.error("Failed to load CSP Blob script for plugins", e);
                 reject(e);
             };
