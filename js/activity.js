@@ -3950,7 +3950,7 @@ class Activity {
         const loadStart = async that => {
             const __afterLoad = async () => {
                 if (!that.turtles.running()) {
-                    that.stage.update(event);
+                    that.stage.update();
                     for (let turtle = 0; turtle < that.turtles.getTurtleCount(); turtle++) {
                         that.logo.turtleHeaps[turtle] = [];
                         that.logo.turtleDicts[turtle] = {};
