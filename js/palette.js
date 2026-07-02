@@ -682,13 +682,14 @@ class Palettes {
             toggleBtn.onclick = () => this.toggleCollapse();
 
             element.appendChild(toggleBtn);
+            const isSmallScreen = window.innerWidth < 768;
             toggleBtn.style.position = "absolute";
             toggleBtn.style.top = "50%";
-            toggleBtn.style.right = "-25px";
+            toggleBtn.style.right = isSmallScreen ? "-36px" : "-25px";
             toggleBtn.style.transform = "translateY(-50%)";
 
-            toggleBtn.style.height = "52px";
-            toggleBtn.style.width = "24px";
+            toggleBtn.style.height = isSmallScreen ? "72px" : "52px";
+            toggleBtn.style.width = isSmallScreen ? "36px" : "24px";
 
             toggleBtn.style.display = "flex";
             toggleBtn.style.alignItems = "center";
@@ -703,6 +704,13 @@ class Palettes {
 
             toggleBtn.style.fontWeight = "bold";
             toggleBtn.style.fontSize = "14px";
+
+            // Auto-collapse palette on small screens to avoid covering workspace
+            if (window.innerWidth < 768) {
+                setTimeout(() => {
+                    if (!this.collapsed) this.toggleCollapse();
+                }, 100);
+            }
         }
 
         const tr = docById("palette").children[0].children[0].children[0].children[0];
