@@ -33,7 +33,7 @@ try {
    Boundary, CARTESIAN, changeImage, closeWidgets, doRecordButton, setupActivityRecorder,
    setupGridController, setupGridRenderer, setupPluginController, setupToolbarController, setupAlertController, setupAlertRenderer, setupPaletteLoader, PluginDialog,
    setupSearchController, setupSearchUI,
-   setupActivityAbcParser, setupActivityIdleWatcher,
+   setupActivityAbcParser, setupActivityIdleWatcher, SessionStorageManager,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
    DEFAULTDELAY, define, doBrowserCheck, doBrowserCheck, docByClass,
@@ -261,6 +261,9 @@ class Activity {
         }
 
         this._listeners = [];
+        if (typeof SessionStorageManager !== "undefined") {
+            this.sessionStorageManager = new SessionStorageManager();
+        }
 
         this.cellSize = 55;
         this.homeButtonContainer;
@@ -2371,6 +2374,39 @@ class Activity {
          * Handles keyboard shortcuts in MB
          */
         this.__keyPressed = event => {
+            // Check for Ctrl+Shift+R (Hard Refresh) to clear session data
+            if (
+                event.ctrlKey &&
+                event.shiftKey &&
+                (event.key === "r" || event.key === "R" || event.keyCode === 82)
+            ) {
+                console.warn(
+                    "Hard Refresh requested: Clearing session data from indexedDB and localStorage"
+                );
+                this._isHardReloading = true;
+                event.preventDefault();
+                event.stopPropagation();
+
+                const clearAndReload = () => {
+                    let p = this.storage ? this.storage.currentProject : undefined;
+                    if (p && this.storage) {
+                        this.storage.removeItem("SESSION" + p);
+                        this.storage.removeItem("SESSION_TIMESTAMP" + p);
+                    }
+                    window.location.reload(true);
+                };
+
+                if (this.sessionStorageManager) {
+                    this.sessionStorageManager
+                        .clearAllSessions()
+                        .then(clearAndReload)
+                        .catch(clearAndReload);
+                } else {
+                    clearAndReload();
+                }
+                return false;
+            }
+
             // First, check if the pitch slider is open
             if (window.widgetWindows.isOpen("slider") === true) {
                 // If the event is an arrow key, let the PitchSlider handle it
@@ -3996,14 +4032,26 @@ class Activity {
             // Try restarting where we were when we hit save.
             if (that.planet) {
                 that.sessionData = await that.planet.openCurrentProject();
-                if (!that.sessionData) {
-                    if (currentProject !== undefined) {
-                        that.sessionData = that.storage[sessionKey];
-                    }
+            }
+
+            if (!that.sessionData && sessionKey !== null) {
+                let lsData = that.storage[sessionKey];
+                let lsTimestampStr = that.storage["SESSION_TIMESTAMP" + currentProject];
+                let lsTimestamp = lsTimestampStr ? parseInt(lsTimestampStr, 10) : 0;
+
+                let idbPayload = null;
+                if (that.sessionStorageManager) {
+                    idbPayload = await that.sessionStorageManager.loadSession(sessionKey);
                 }
-            } else {
-                if (sessionKey !== null) {
-                    that.sessionData = that.storage[sessionKey];
+
+                if (idbPayload && idbPayload.data) {
+                    if (lsData && lsTimestamp > idbPayload.timestamp) {
+                        that.sessionData = lsData;
+                    } else {
+                        that.sessionData = idbPayload.data;
+                    }
+                } else if (lsData) {
+                    that.sessionData = lsData;
                 }
             }
 
@@ -5310,6 +5358,26 @@ class Activity {
             );
         };
 
+        this._handleBeforeUnload = () => {
+            // Save synchronously to SESSION* keys so manual reload/F5
+            // still has recoverable data even if async saves are cut short.
+            if (!this._isHardReloading) {
+                if (typeof this.__saveLocally === "function") {
+                    this.__saveLocally();
+                }
+                if (
+                    typeof this.saveLocally === "function" &&
+                    this.saveLocally !== this.__saveLocally
+                ) {
+                    this.saveLocally();
+                }
+            }
+            this._stopRenderLoop();
+            if (typeof this._stopAutoSave === "function") {
+                this._stopAutoSave();
+            }
+        };
+
         this.__saveLocally = () => {
             const data = this.prepareExport();
 
@@ -5327,8 +5395,12 @@ class Activity {
             try {
                 p = this.storage.currentProject;
                 this.storage["SESSION" + p] = data;
+                this.storage["SESSION_TIMESTAMP" + p] = Date.now().toString();
             } catch (e) {
-                ErrorHandler.recoverable(e, { operation: "saveLocally_saveSession" });
+                // If it hits QuotaExceededError, it fails silently, which is fine
+                // because saveSessionAsync (IndexedDB) handles large payloads.
+                // We just log it as a warning so it doesn't crash the app.
+                console.warn("localStorage quota exceeded for SESSION. Relying on IndexedDB.", e);
             }
 
             const img = new Image();
@@ -5366,6 +5438,34 @@ class Activity {
             };
 
             img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svgData));
+        };
+
+        this.saveSessionAsync = async () => {
+            // First, trigger __saveLocally for the image thumb and fallback.
+            // If the payload is huge, it will quota exceed but fail silently, which is fine!
+            if (typeof this.__saveLocally === "function") {
+                this.__saveLocally();
+            }
+            // Second, save the massive payload safely to IndexedDB.
+            if (this.sessionStorageManager) {
+                const data = this.prepareExport();
+                let p = this.storage.currentProject;
+                if (!p) return;
+
+                // We use the same timestamp that __saveLocally just wrote,
+                // or generate a new one if it failed.
+                let timestampStr = this.storage["SESSION_TIMESTAMP" + p];
+                let timestamp = timestampStr ? parseInt(timestampStr, 10) : Date.now();
+
+                try {
+                    await this.sessionStorageManager.saveSession("SESSION" + p, data, timestamp);
+                    if (!timestampStr) {
+                        this.storage["SESSION_TIMESTAMP" + p] = timestamp.toString();
+                    }
+                } catch (e) {
+                    console.error("Failed to save session to IndexedDB:", e);
+                }
+            }
         };
 
         // Setup mouse events to start the drag
@@ -5724,23 +5824,7 @@ class Activity {
             // Use managed addEventListener for automatic cleanup
             this.addEventListener(document, "mousemove", this.handleMouseMove);
             this.addEventListener(document, "click", this.handleDocumentClick);
-            this.addEventListener(window, "beforeunload", () => {
-                // Save synchronously to SESSION* keys so manual reload/F5
-                // still has recoverable data even if async saves are cut short.
-                if (typeof this.__saveLocally === "function") {
-                    this.__saveLocally();
-                }
-                if (
-                    typeof this.saveLocally === "function" &&
-                    this.saveLocally !== this.__saveLocally
-                ) {
-                    this.saveLocally();
-                }
-                this._stopRenderLoop();
-                if (typeof this._stopAutoSave === "function") {
-                    this._stopAutoSave();
-                }
-            });
+            this.addEventListener(window, "beforeunload", this._handleBeforeUnload);
 
             this._createMsgContainer(
                 "#ffffff",

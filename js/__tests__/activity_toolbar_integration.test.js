@@ -356,5 +356,92 @@ describe("Activity Toolbar Integration", () => {
 
             expect(activity._doHardStopButton).toHaveBeenCalled();
         });
+
+        test("Ctrl+Shift+R triggers hard refresh logic and clears session DB", () => {
+            let thenCallback;
+            activity.sessionStorageManager = {
+                clearAllSessions: jest.fn().mockReturnValue({
+                    then: cb => {
+                        thenCallback = cb;
+                        return { catch: jest.fn() };
+                    }
+                })
+            };
+            activity.storage = {
+                currentProject: "TestProject",
+                removeItem: jest.fn()
+            };
+
+            const event = {
+                ctrlKey: true,
+                shiftKey: true,
+                key: "r",
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+
+            activity.__keyPressed(event);
+
+            expect(event.preventDefault).toHaveBeenCalled();
+            expect(event.stopPropagation).toHaveBeenCalled();
+            expect(activity._isHardReloading).toBe(true);
+            expect(activity.sessionStorageManager.clearAllSessions).toHaveBeenCalled();
+
+            // Now execute the callback in a try-catch to swallow JSDOM's reload error
+            try {
+                thenCallback();
+            } catch (e) {
+                // Ignore JSDOM "Not implemented: navigation"
+            }
+
+            expect(activity.storage.removeItem).toHaveBeenCalledWith("SESSIONTestProject");
+            expect(activity.storage.removeItem).toHaveBeenCalledWith(
+                "SESSION_TIMESTAMPTestProject"
+            );
+        });
+    });
+
+    describe("beforeunload event", () => {
+        test("calls __saveLocally when _isHardReloading is false", () => {
+            activity.__saveLocally = jest.fn();
+            activity._stopRenderLoop = jest.fn();
+            activity._isHardReloading = false;
+
+            activity._handleBeforeUnload();
+
+            expect(activity.__saveLocally).toHaveBeenCalled();
+        });
+
+        test("does not call __saveLocally when _isHardReloading is true", () => {
+            activity.__saveLocally = jest.fn();
+            activity._stopRenderLoop = jest.fn();
+            activity._isHardReloading = true;
+
+            activity._handleBeforeUnload();
+
+            expect(activity.__saveLocally).not.toHaveBeenCalled();
+        });
+
+        test("calls saveLocally when it differs from __saveLocally", () => {
+            activity.__saveLocally = jest.fn();
+            activity.saveLocally = jest.fn();
+            activity._stopRenderLoop = jest.fn();
+            activity._isHardReloading = false;
+
+            activity._handleBeforeUnload();
+
+            expect(activity.saveLocally).toHaveBeenCalled();
+        });
+
+        test("calls _stopAutoSave if it exists", () => {
+            activity.__saveLocally = jest.fn();
+            activity._stopRenderLoop = jest.fn();
+            activity._stopAutoSave = jest.fn();
+            activity._isHardReloading = false;
+
+            activity._handleBeforeUnload();
+
+            expect(activity._stopAutoSave).toHaveBeenCalled();
+        });
     });
 });
