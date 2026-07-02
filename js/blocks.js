@@ -1264,15 +1264,32 @@ class Blocks {
                     continue;
                 }
 
+                /** Guard against invalid block connections */
+                const connectedBlock = this.blockList[cblk];
+                if (!connectedBlock || !Array.isArray(connectedBlock.connections)) {
+                    console.warn(
+                        "Invalid block connection detected - cblk: " +
+                            cblk +
+                            ", block: " +
+                            (connectedBlock ? connectedBlock.name : "undefined") +
+                            ", parent block: " +
+                            myBlock.name +
+                            " (" +
+                            blk +
+                            ")"
+                    );
+                    continue;
+                }
+
                 /** Find the dock position in the connected block. */
                 let foundMatch = false;
                 let matchingBlock;
                 for (
                     matchingBlock = 0;
-                    matchingBlock < this.blockList[cblk].connections.length;
+                    matchingBlock < connectedBlock.connections.length;
                     matchingBlock++
                 ) {
-                    if (this.blockList[cblk].connections[matchingBlock] === blk) {
+                    if (connectedBlock.connections[matchingBlock] === blk) {
                         foundMatch = true;
                         break;
                     }
