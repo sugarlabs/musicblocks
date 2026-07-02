@@ -894,6 +894,14 @@ function MusicKeyboard(activity) {
          */
         this.keyTable = document.createElement("div");
 
+        const stopPropagationHandler = e => {
+            e.stopPropagation();
+        };
+        this.keyboardDiv.addEventListener("wheel", stopPropagationHandler);
+        this.keyboardDiv.addEventListener("DOMMouseScroll", stopPropagationHandler);
+        this.keyTable.addEventListener("wheel", stopPropagationHandler);
+        this.keyTable.addEventListener("DOMMouseScroll", stopPropagationHandler);
+
         /**
          * Appends keyboard and table divs to the widget window body.
          */
@@ -1666,6 +1674,7 @@ function MusicKeyboard(activity) {
         let n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 8);
 
         outerDiv.style.overflowY = "auto";
+        outerDiv.style.overflowX = "auto";
         if (this.displayLayout.length > n) {
             outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (n + 5) + "px";
         } else {
