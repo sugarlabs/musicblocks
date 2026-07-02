@@ -1345,25 +1345,6 @@
 
         <script>
             document.addEventListener("DOMContentLoaded", function () {
-                let persistentNotification = null;
-
-                function showPersistentNotification() {
-                    if (!persistentNotification) {
-                        persistentNotification = document.createElement("div");
-                        persistentNotification.id = "persistentNotification";
-                        persistentNotification.innerHTML =
-                            "Play only mode enabled. For full Music Blocks experience, use a larger display.";
-                        document.body.appendChild(persistentNotification);
-                    }
-                }
-
-                function removePersistentNotification() {
-                    if (persistentNotification) {
-                        persistentNotification.remove();
-                        persistentNotification = null;
-                    }
-                }
-
                 function hideElementById(elementId) {
                     const elem = document.getElementById(elementId);
                     if (elem) {
@@ -1379,35 +1360,16 @@
                 }
 
                 function togglePlayOnlyMode() {
-                    const isSmallScreen = window.innerWidth < 768 || window.innerHeight < 600;
                     const body = document.body;
-                    const homeButton = document.getElementById("Home [HOME]");
-                    const buttonContainer = document.getElementById("buttoncontainerBOTTOM");
 
-                    if (isSmallScreen) {
-                        // Enable play-only mode
-                        body.classList.add("play-only");
-                        showPersistentNotification();
+                    body.classList.remove("play-only");
 
-                        // Hide certain elements
-                        hideElementById("Show/hide blocks");
-                        hideElementById("Expand/collapse blocks");
-                        hideElementById("Decrease block size");
-                        hideElementById("Increase block size");
-                        hideElementById("grid");
-                        hideElementById("palette");
-                    } else {
-                        // Disable play-only mode
-                        body.classList.remove("play-only");
-                        removePersistentNotification();
-
-                        showElementById("Show/hide blocks");
-                        showElementById("Expand/collapse blocks");
-                        showElementById("Decrease block size");
-                        showElementById("Increase block size");
-                        showElementById("grid");
-                        showElementById("palette");
-                    }
+                    showElementById("Show/hide blocks");
+                    showElementById("Expand/collapse blocks");
+                    showElementById("Decrease block size");
+                    showElementById("Increase block size");
+                    showElementById("grid");
+                    showElementById("palette");
                 }
 
                 togglePlayOnlyMode();
