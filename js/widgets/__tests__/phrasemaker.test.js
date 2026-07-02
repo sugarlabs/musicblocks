@@ -185,9 +185,11 @@ global.document = {
 describe("PhraseMaker Widget", () => {
     let phraseMaker;
     let mockDeps;
+    let originalLocalStorage;
 
     beforeEach(() => {
         jest.useFakeTimers();
+        originalLocalStorage = Object.getOwnPropertyDescriptor(global, "localStorage");
 
         mockDeps = {
             platformColor: global.platformColor,
@@ -218,6 +220,11 @@ describe("PhraseMaker Widget", () => {
     afterEach(() => {
         jest.useRealTimers();
         jest.clearAllMocks();
+        if (originalLocalStorage) {
+            Object.defineProperty(global, "localStorage", originalLocalStorage);
+        } else {
+            delete global.localStorage;
+        }
     });
 
     describe("constructor", () => {
@@ -279,6 +286,57 @@ describe("PhraseMaker Widget", () => {
             expect(phraseMaker.paramsEffects.vibratoIntensity).toBe(0);
             expect(phraseMaker.paramsEffects.distortionAmount).toBe(0);
             expect(phraseMaker.paramsEffects.tremoloFrequency).toBe(0);
+        });
+
+        test("opens when localStorage is blocked", () => {
+            Object.defineProperty(global, "localStorage", {
+                configurable: true,
+                get() {
+                    throw new DOMException("Access denied", "SecurityError");
+                }
+            });
+            window.widgetWindows = {
+                windowFor: jest.fn().mockReturnValue({
+                    clear: jest.fn(),
+                    show: jest.fn(),
+                    addButton: jest.fn().mockReturnValue({
+                        onclick: null,
+                        innerHTML: "",
+                        style: {},
+                        setAttribute: jest.fn()
+                    }),
+                    getWidgetBody: jest.fn().mockReturnValue({
+                        appendChild: jest.fn(),
+                        append: jest.fn()
+                    }),
+                    sendToCenter: jest.fn(),
+                    destroy: jest.fn()
+                })
+            };
+
+            const pm = new PhraseMaker(mockDeps);
+            const activity = {
+                logo: {
+                    synth: {
+                        loadSynth: jest.fn(),
+                        stopSound: jest.fn(),
+                        stop: jest.fn()
+                    }
+                },
+                turtles: {
+                    ithTurtle: jest.fn(() => ({
+                        singer: {
+                            beatsPerMeasure: 4,
+                            noteValuePerBeat: 4,
+                            instrumentNames: []
+                        }
+                    }))
+                },
+                hideMsgs: jest.fn(),
+                textMsg: jest.fn()
+            };
+
+            expect(() => pm.init(activity)).not.toThrow();
         });
     });
 

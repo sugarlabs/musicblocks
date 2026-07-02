@@ -56,6 +56,13 @@ function MusicKeyboard(activity) {
     const HERTZKEYS = [49, 50, 51, 52, 53, 54, 55, 56, 57, 48];
     const WHITEKEYS = [65, 83, 68, 70, 71, 72, 74, 75, 76];
     const SPACE = 32;
+    const getLocalStorageValue = key => {
+        try {
+            return localStorage[key];
+        } catch (e) {
+            return undefined;
+        }
+    };
 
     const setKeyboardCellLabel = (cell, label, octave, prefix = null) => {
         cell.replaceChildren();
@@ -84,7 +91,7 @@ function MusicKeyboard(activity) {
      * Indicates whether the keyboard is in beginner mode.
      * @type {boolean}
      */
-    const beginnerMode = localStorage.beginnerMode;
+    const beginnerMode = getLocalStorageValue("beginnerMode");
 
     /**
      * Number of units in beginner mode.

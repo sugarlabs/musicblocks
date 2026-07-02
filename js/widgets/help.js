@@ -12,6 +12,14 @@
 
 const HELP_SVG_DATA_PREFIX = "data:image/svg+xml;base64,";
 
+var getLocalStorageValue = key => {
+    try {
+        return localStorage[key];
+    } catch (e) {
+        return undefined;
+    }
+};
+
 /* global
 
    _, docById, getMacroExpansion, HELPCONTENT,
@@ -282,14 +290,14 @@ class HelpWidget {
                         // We need to add a case here whenever we add
                         // help artwort support for a new language.
                         // e.g., documentation-es
-                        let language = localStorage.languagePreference;
+                        let language = getLocalStorageValue("languagePreference");
                         if (language === undefined) {
                             language = navigator.language;
                         }
 
                         switch (language) {
                             case "ja":
-                                if (localStorage.kanaPreference === "kana") {
+                                if (getLocalStorageValue("kanaPreference") === "kana") {
                                     path = path + "-kana";
                                 } else {
                                     path = path + "-ja";
@@ -818,14 +826,14 @@ class HelpWidget {
                     // We need to add a case here whenever we add
                     // help artwort support for a new language.
                     // e.g., documentation-es
-                    let language = localStorage.languagePreference;
+                    let language = getLocalStorageValue("languagePreference");
                     if (language === undefined) {
                         language = navigator.language;
                     }
 
                     switch (language) {
                         case "ja":
-                            if (localStorage.kanaPreference === "kana") {
+                            if (getLocalStorageValue("kanaPreference") === "kana") {
                                 path = path + "-kana";
                             } else {
                                 path = path + "-ja";
