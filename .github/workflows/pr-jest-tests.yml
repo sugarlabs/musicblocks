@@ -26,19 +26,22 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
           node-version: '22'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install Dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Run Jest Tests
         id: jest
         run: |
-          npm test -- --coverage --json --outputFile=jest-results.json || echo "TESTS_FAILED=true" >> $GITHUB_ENV
+          pnpm test -- --coverage --json --outputFile=jest-results.json || echo "TESTS_FAILED=true" >> $GITHUB_ENV
           COVERAGE=$(node -e "const s=require('./coverage/coverage-summary.json').total;console.log('Statements: '+s.statements.pct+'% | Branches: '+s.branches.pct+'% | Functions: '+s.functions.pct+'% | Lines: '+s.lines.pct+'%');" 2>/dev/null || echo "Coverage summary unavailable")
           echo "COVERAGE_SUMMARY=$COVERAGE" >> $GITHUB_ENV
 
@@ -51,8 +54,8 @@ jobs:
       - name: Get Master Coverage
         run: |
           cd master-branch
-          npm ci
-          npm test -- --coverage --json --outputFile=master-jest-results.json || true
+          pnpm install --frozen-lockfile
+          pnpm test -- --coverage --json --outputFile=master-jest-results.json || true
           MASTER_COVERAGE=$(node -e "try { const s=require('./coverage/coverage-summary.json').total; console.log('Statements: '+s.statements.pct+'% | Branches: '+s.branches.pct+'% | Functions: '+s.functions.pct+'% | Lines: '+s.lines.pct+'%'); } catch(e) { console.log('Unavailable'); }" 2>/dev/null)
           echo "MASTER_COVERAGE_SUMMARY=$MASTER_COVERAGE" >> $GITHUB_ENV
           cd ..

@@ -102,14 +102,14 @@ Music Blocks, using `cd path/to/musicblocks/`.
 dependencies using the following command
 
     ```bash
-    npm install
+    pnpm install
     ```
 
 4. After cloning the musicblocks repository, you can start a local
-server using npm
+server using pnpm
 
     ```bash
-    npm run dev
+    pnpm run dev
     ```
 
 6. You should see a message `Serving HTTP on 127.0.0.1 port 3000
@@ -166,7 +166,7 @@ To stop the Docker container, use `Ctrl + C` in your terminal. This
 will stop the container and free up the port it was using.
 
 #### Troubleshooting
-When running Music Blocks locally using `npm run dev`, the UI may load successfully even if some interactions appear unresponsive.
+When running Music Blocks locally using `pnpm run dev`, the UI may load successfully even if some interactions appear unresponsive.
 
 New contributors may observe console errors such as:
 - `$ is not defined`
@@ -242,9 +242,9 @@ See [DevContainer README.md](./.devcontainer/README.md) for details.
 
 ### Developer Quick Start
 
-1. Clone and install: `git clone https://github.com/sugarlabs/musicblocks.git && npm install`
-2. Run locally: `npm run dev`
-3. Before pushing: `npm run lint && npx prettier --check . && npm test`
+1. Clone and install: `git clone https://github.com/sugarlabs/musicblocks.git && pnpm install`
+2. Run locally: `pnpm run dev`
+3. Before pushing: `pnpm run lint && pnpm exec prettier --check . && pnpm test`
 
 For writing tests, see [Docs/TESTING.md](./Docs/TESTING.md).
 

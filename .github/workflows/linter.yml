@@ -19,14 +19,17 @@ jobs:
                   fetch-depth: 0
                   ref: ${{ github.event.pull_request.head.sha }}
 
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+
             - name: Set up Node.js
               uses: actions/setup-node@v5
               with:
                   node-version: 22.x
-                  cache: "npm"
+                  cache: "pnpm"
 
             - name: Install dependencies
-              run: npm ci
+              run: pnpm install --frozen-lockfile
 
             - name: Get changed JavaScript files
               id: get_files
@@ -43,11 +46,11 @@ jobs:
               run: |
                   echo "Linting the following files:"
                   cat changed-js-files.txt
-                  xargs -r npx eslint < changed-js-files.txt
+                  xargs -r pnpm exec eslint < changed-js-files.txt
 
             - name: Run Prettier check on changed files
               if: steps.get_files.outputs.has_files == 'true'
               run: |
                   echo "Checking formatting for the following files:"
                   cat changed-js-files.txt
-                  xargs -r npx prettier --check < changed-js-files.txt
+                  xargs -r pnpm exec prettier --check < changed-js-files.txt

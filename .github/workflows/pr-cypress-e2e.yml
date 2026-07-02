@@ -23,17 +23,20 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
           node-version: '22'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Run Cypress E2E Tests
         uses: cypress-io/github-action@v6
         with:
-          install-command: npm ci
-          start: npm start
+          install-command: pnpm install --frozen-lockfile
+          start: pnpm start
           wait-on: 'http://127.0.0.1:3000'
           wait-on-timeout: 120
           browser: chrome
