@@ -1984,10 +1984,10 @@ function Synth() {
                     if (setNote !== undefined && setNote) {
                         if (this._instrumentEpoch !== epoch) return;
                         if (synth.oscillator !== undefined) {
-                            synth.setNote(notes);
+                            synth.setNote(notes, Tone.now() + future);
                         } else if (synth.voices !== undefined) {
                             for (let i = 0; i < synth.voices.length; i++) {
-                                synth.voices[i].setNote(notes);
+                                synth.voices[i].setNote(notes, Tone.now() + future);
                             }
                         }
                     } else {
