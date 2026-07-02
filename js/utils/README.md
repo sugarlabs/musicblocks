@@ -6,28 +6,24 @@ This guide explains how you can add your own custom theme or customize an existi
 
 ### How themes work in Music Blocks
 
-1. When the page loads for the first time, the default theme of light mode is used.
+1. On first load, the theme is chosen from `localStorage.themePreference` or the system color-scheme preference.
 
-2. When you choose a theme, an object stores inside the localStorage called themePreference.
+2. Theme styling now comes from `css/tokens.css`. The active theme is applied by toggling `body.dark` or `body.highcontrast`, which updates CSS custom properties immediately.
 
-3. As of now, all styling of Music Blocks happens at the time of loading. When we change themes, we reload the page.
+3. `js/utils/platformstyle.js` still exposes a compatibility `window.platformColor` object for legacy JS, but new styling should read CSS custom properties instead of hardcoded colors.
 
-4. Most of the Music Blocks theme styles are defined in two places:
+4. Most of the Music Blocks theme styles are defined in:
+    1. css/tokens.css
+    2. css/themes.css
+    3. planet/css/planetThemes.css
 
-    1. css/themes.css
-    2. js/utils/platformstyle.js
-
-5. The Plant theme styles are defined in:
-
-    1. planet/css/planetThemes.css
-
-6. The code to handle themes assignment (by looking at the themePreference object in localStorage) to their respective places is already done. You just have to follow the steps given below to add your theme.
+5. Theme switches are applied instantly. Prefer CSS classes and tokens over `element.style.*` assignments when adding or updating UI.
 
 ---
 
 ### Steps on Theme Customization:
 
-Note: If you want to customise an existing theme, just put your changes in the dark mode and choose dark mode from the theme dropdown. You can skip to step no. 6 if that is your goal.
+Note: If you want to customise an existing theme, update the token values in `css/tokens.css` and the theme-specific overrides in `css/themes.css` or `planet/css/planetThemes.css`.
 
 1.  **Adding your theme's icon to the list in index.html**
 
@@ -36,9 +32,15 @@ Note: If you want to customise an existing theme, just put your changes in the d
 
     ```javascript
     <ul style="display: none;" id="themedropdown" class="dropdown-content">
-        <a id="light" class="tooltipped" data-tooltip="Light Mode"><i class='material-icons'>brightness_7</i></a>
-        <a id="dark" class="tooltipped" data-tooltip="Dark Mode"><i class='material-icons'>brightness_4</i></a>
-        <a id="custom" class="tooltipped" data-tooltip="Custom Theme"><i class='material-icons'>choose_your_material_icon</i></a>
+        <a id="light" class="tooltipped" data-tooltip="Light Mode">
+            <i class="material-icons">brightness_7</i>
+        </a>
+        <a id="dark" class="tooltipped" data-tooltip="Dark Mode">
+            <i class="material-icons">brightness_4</i>
+        </a>
+        <a id="custom" class="tooltipped" data-tooltip="Custom Theme">
+            <i class="material-icons">choose_your_material_icon</i>
+        </a>
     </ul>
     ```
 
@@ -46,7 +48,6 @@ Note: If you want to customise an existing theme, just put your changes in the d
 
     There will be 4 arrays named string (two in an if statement, rest two in the else statement).
     Add your theme's name to the bottom of the pre-existing themes.
-
 
     ```javascript
     string = [[...],
@@ -173,40 +174,18 @@ Note: If you want to customise an existing theme, just put your changes in the d
 
 6.  **Now to add styling for your theme**
 
-    (If you skipped to here, these are the files responsible for styling, the CSS is easy to understand and modify, but to change the color of elements in javascript files, look at the entire code base and search for "platformColor". You will find all the places where JS is used to style. You don't have to add your own theme, you can just change styling in dark mode CSS and JS, and then choose dark mode in the toolbar.)
+    The design token system in `css/tokens.css` is the primary place for defining colour, spacing, and typography values. Component-level CSS files (`css/themes.css`, `planet/css/planetThemes.css`) reference these tokens using `var(--token-name)`.
 
-    You have to add styling to three places,
+    You have to add styling in the following places:
+    1. css/tokens.css (central design token file)
+       Add your theme's token overrides using a body class selector (e.g. `body.custom { --color-bg-primary: ...; }`). Use the existing `body.dark` and `body.highcontrast` blocks as templates.
 
-    1. css/themes.css (this is external styling used for floating windows, search bar, etc.)
+    2. css/themes.css (external styling used for floating windows, search bar, etc.)
        If you go here, you will find styling for dark mode, just write your css using them as a template below the last theme's CSS. There is no light mode here because it is the default.
 
-    2. js/utils/platformstyle.js (this is styling in JS, used to for the rest of the stuff not covered in themes.css)
-       Find the platformThemes object and add your styling there using the dark and light themes as a template
+    3. planet/css/planetThemes.css (styling used for planet page)
+       Add your theme class styles here, following the same pattern as `css/themes.css`.
 
-        ```javascript
-        let platformThemes = {
-        dark: {...},
-        light: {...},
-        custom: {Your Styling}
-        }
-        ```
-
-        There is a "for" loop below this
-
-        ```javascript
-        for (const theme in platformThemes) {
-            if (themePreference === theme) {
-                window.platformColor = platformThemes[theme];
-                break;
-            } else {
-                window.platformColor = platformThemes["light"];
-            }
-        }
-        ```
-
-        This checks for keys (themes) in platformThemes, then assign the window.platformColor to that key(theme).
-        Then platformColor is used to style things elsewhere. if there is no theme in themePreference, it will default to light mode.
-
-    3. planet/css/planetThemes.css (this is styling used for planet page) you can do what you did in the first part of themes.css to add your styling
+    > **Note on `js/utils/platformstyle.js`** (legacy): This file still exposes a `window.platformColor` compatibility object for JS code that has not yet migrated to CSS tokens. If your theme needs to work with existing JS that reads `platformColor`, add an entry to the `platformThemes` object. However, **new code should read CSS custom properties** via `getComputedStyle(document.body).getPropertyValue('--token-name')` instead.
 
 ## And you are done. Good luck creating your theme!
