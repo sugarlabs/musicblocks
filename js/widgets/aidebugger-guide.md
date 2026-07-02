@@ -33,8 +33,8 @@ Music Blocks Frontend → AI Debugger Widget → FastAPI Backend → Google Gemi
 ```bash
 git clone https://github.com/sugarlabs/musicblocks.git
 cd musicblocks
-npm install
-npm run serve  # Access at http://localhost:3000
+pnpm install
+pnpm run serve  # Access at http://localhost:3000
 ```
 
 ### Key Files
@@ -89,7 +89,7 @@ fetch(`${BACKEND_CONFIG.BASE_URL}/analyze`, {
 ### Adding Features
 
 1. **Edit Widget**: Modify `js/widgets/aidebugger.js`
-2. **Test Locally**: Run `npm run serve`
+2. **Test Locally**: Run `pnpm run serve`
 3. **Block Integration**: Update `js/blocks/WidgetBlocks.js` if needed
 4. **Register Widget**: Ensure listed in `js/activity.js`
 

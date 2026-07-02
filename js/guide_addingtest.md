@@ -7,19 +7,19 @@ The Music Blocks repository follows a structured approach for testing using **Je
 Before running or writing tests, ensure that dependencies are installed:
 
 ```sh
-npm install
+pnpm install
 ```
 
 To run the test suite, use:
 
 ```sh
-npm test
+pnpm test
 ```
 
 For running tests with detailed logs:
 
 ```sh
-npm test -- --verbose
+pnpm test -- --verbose
 ```
 
 ## 📂 Directory Structure
@@ -94,13 +94,13 @@ describe("My Function Tests", () => {
 To run a specific test file:
 
 ```sh
-npm test _tests_/filename.test.js
+pnpm test _tests_/filename.test.js
 ```
 
 To watch tests while coding:
 
 ```sh
-npm test -- --watch
+pnpm test -- --watch
 ```
 
 ## 🔄 Updating Snapshots
@@ -108,7 +108,7 @@ npm test -- --watch
 If using Jest snapshots, update them with:
 
 ```sh
-npm test -- -u
+pnpm test -- -u
 ```
 
 ## Code Coverage
@@ -118,7 +118,7 @@ npm test -- -u
 To generate a coverage report, run:
 
 ```sh
-npm run test:coverage
+pnpm run test:coverage
 ```
 
 This executes `jest --coverage`, which collects coverage data according to the settings in `jest.config.js`.
@@ -155,7 +155,7 @@ These thresholds are intentionally kept as a ratchet — they should only go **u
 
 The GitHub Actions workflow (`.github/workflows/pr-jest-tests.yml`) runs on every pull request:
 
-1. Checks out the PR head commit and runs `npm test -- --coverage`.
+1. Checks out the PR head commit and runs `pnpm test -- --coverage`.
 2. Reads `coverage/coverage-summary.json` to extract per-metric percentages.
 3. Posts a comment on the PR with the coverage summary and pass/fail status.
 4. If any test fails, the comment lists the failing test files.

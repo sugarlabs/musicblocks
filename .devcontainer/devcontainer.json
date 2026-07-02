@@ -30,7 +30,7 @@
         }
     },
 
-    "postCreateCommand": "npm install",
+    "postCreateCommand": "corepack enable && corepack prepare pnpm@11.8.0 --activate && pnpm install",
 
     "remoteUser": "node"
 }

@@ -39,19 +39,22 @@ jobs:
                   fetch-depth: 0
                   ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+
             - name: Set up Node.js
               uses: actions/setup-node@v5
               with:
                   node-version: '22'
-                  cache: 'npm'
+                  cache: 'pnpm'
 
             - name: Install dependencies
-              run: npm ci
+              run: pnpm install --frozen-lockfile
 
             - name: Lint PR commits
               if: github.event_name == 'pull_request'
               run: >-
-                  npx commitlint
+                  pnpm exec commitlint
                   --from ${{ github.event.pull_request.base.sha }}
                   --to ${{ github.event.pull_request.head.sha }}
                   --verbose
@@ -70,14 +73,17 @@ jobs:
                   fetch-depth: 0
                   ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+
             - name: Set up Node.js
               uses: actions/setup-node@v5
               with:
                   node-version: '22.x'
-                  cache: 'npm'
+                  cache: 'pnpm'
 
             - name: Install dependencies
-              run: npm ci
+              run: pnpm install --frozen-lockfile
 
             - name: Get changed JavaScript files
               id: get_files
@@ -109,14 +115,14 @@ jobs:
               run: |
                   echo "Linting the following files:"
                   cat changed-js-files.txt
-                  xargs -r npx eslint < changed-js-files.txt
+                  xargs -r pnpm exec eslint < changed-js-files.txt
 
             - name: Run Prettier check on changed files
               if: steps.get_files.outputs.has_files == 'true'
               run: |
                   echo "Checking formatting for the following files:"
                   cat changed-js-files.txt
-                  xargs -r npx prettier --check < changed-js-files.txt
+                  xargs -r pnpm exec prettier --check < changed-js-files.txt
 
     # ----------------------------------------------------------------------
     # Build / smoke test across Node versions
@@ -136,17 +142,20 @@ jobs:
                   fetch-depth: 0
                   ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v5
               with:
                   node-version: ${{ matrix.node-version }}
-                  cache: 'npm'
+                  cache: 'pnpm'
 
             - name: Install dependencies
-              run: npm ci
+              run: pnpm install --frozen-lockfile
 
             - name: Build project
-              run: npm run build --if-present
+              run: pnpm run build --if-present
 
     # ----------------------------------------------------------------------
     # Jest unit tests + coverage threshold + Codecov upload
@@ -161,20 +170,23 @@ jobs:
               with:
                   ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+
             - name: Setup Node.js
               uses: actions/setup-node@v5
               with:
                   node-version: '22'
-                  cache: 'npm'
+                  cache: 'pnpm'
 
             - name: Install dependencies
-              run: npm ci
+              run: pnpm install --frozen-lockfile
 
             # Coverage thresholds are enforced inside Jest (coverageThreshold in
             # your Jest config), so this step fails the job if coverage drops
             # below the configured minimums.
             - name: Run Jest with coverage
-              run: npm test -- --coverage --ci
+              run: pnpm test -- --coverage --ci
 
             # Upload to Codecov for the PR-vs-base coverage diff + status check.
             # NOTE: secrets (CODECOV_TOKEN) are NOT available to pull_request runs
@@ -202,17 +214,20 @@ jobs:
               with:
                   ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+
             - name: Setup Node.js
               uses: actions/setup-node@v5
               with:
                   node-version: '22'
-                  cache: 'npm'
+                  cache: 'pnpm'
 
             - name: Run Cypress E2E tests
               uses: cypress-io/github-action@v6
               with:
-                  install-command: npm ci
-                  start: npm start
+                  install-command: pnpm install --frozen-lockfile
+                  start: pnpm start
                   wait-on: 'http://127.0.0.1:3000'
                   wait-on-timeout: 120
                   browser: chrome
@@ -241,10 +256,17 @@ jobs:
               with:
                   ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+
             - name: Setup Node.js
               uses: actions/setup-node@v5
               with:
                   node-version: '22'
+                  cache: 'pnpm'
 
-            - name: Run npm audit
-              run: npm audit --omit=dev --audit-level=high
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Run pnpm audit
+              run: pnpm audit --prod --audit-level=high

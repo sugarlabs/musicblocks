@@ -1,0 +1,25 @@
+allowBuilds:
+  '@parcel/watcher': true
+  cypress: true
+  electron: true
+  electron-winstaller: true
+  es5-ext: true
+overrides:
+  electron: "40.8.5"
+  flatted: "3.4.2"
+  lodash: "4.18.1"
+  brace-expansion: "2.0.3"
+  tar: "^7.5.10"
+  path-to-regexp: "^8.4.0"
+  picomatch: "^4.0.4"
+  yaml: "^2.8.3"
+  follow-redirects: "^1.16.0"
+  systeminformation: "^5.31.6"
+  ip-address: "^10.2.0"
+  ajv: "^6.14.0"
+  "@commitlint/config-validator>ajv": "^8.0.0"
+  "@isaacs/brace-expansion": "^5.0.1"
+  immutable: "^5.1.5"
+  svgo: "^4.0.1"
+  "@xmldom/xmldom": "^0.8.13"
+  "@gulp-sourcemaps/identity-map>postcss": "^8.4.31"

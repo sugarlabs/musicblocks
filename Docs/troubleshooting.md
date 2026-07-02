@@ -17,7 +17,7 @@ Solution:
 3. Fix the reported errors and reload the page.
 4. Try running the app in Chrome or Firefox if the issue persists.
 
-## npm install Fails with Permission Errors
+## pnpm install Fails with Permission Errors
 
 Problem:
 Dependency installation fails due to permission issues or corrupted files.
@@ -25,12 +25,12 @@ Dependency installation fails due to permission issues or corrupted files.
 Solution:
 Run the following commands from the project root:
 
-rm -rf node_modules package-lock.json  
-npm install
+rm -rf node_modules pnpm-lock.yaml  
+pnpm install
 
 On Windows, use PowerShell or Git Bash.
 
-## npm run lint Fails with Formatting Errors
+## pnpm run lint Fails with Formatting Errors
 
 Problem:
 Linting errors block the build due to formatting issues.
@@ -38,8 +38,8 @@ Linting errors block the build due to formatting issues.
 Solution:
 Run Prettier first, then re-run lint:
 
-npx prettier --write .  
-npm run lint
+pnpm exec prettier --write .  
+pnpm run lint
 
 ## Docker Container Won’t Start
 
@@ -60,11 +60,11 @@ The development server fails to start because port 3000 is already in use.
 Solution:
 Start the server on a different port:
 
-PORT=3001 npm start
+PORT=3001 pnpm start
 
 Or for development mode:
 
-PORT=3001 npm run dev
+PORT=3001 pnpm run dev
 
 Then open http://localhost:3001 in your browser.
 
@@ -87,8 +87,8 @@ Errors such as "Cannot find module" appear during runtime or build.
 Solution:
 Reinstall dependencies:
 
-rm -rf node_modules package-lock.json  
-npm install
+rm -rf node_modules pnpm-lock.yaml  
+pnpm install
 
 ## Still Having Issues?
 
