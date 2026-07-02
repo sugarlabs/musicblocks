@@ -41,6 +41,12 @@ describe("base64Utils", () => {
         expect(decoded).toBe(originalText);
     });
 
+    test("base64Encode should handle large strings without stack overflow", () => {
+        const originalText = "a".repeat(200000);
+        const encoded = base64Utils.base64Encode(originalText);
+        expect(base64Utils.base64Decode(encoded)).toBe(originalText);
+    });
+
     test("base64Encode should handle empty strings", () => {
         expect(base64Utils.base64Encode("")).toBe("");
     });
