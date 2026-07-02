@@ -6258,8 +6258,10 @@ const durationToNoteValue = duration => {
  */
 const parseNoteString = note => {
     // Regex to match note name and octave (one or more digits, optional negative sign)
-    // Matches any note name format (including solfege like do, re, mi) and octave at the end
-    const match = note.match(/^(.+?)(-?\d+)$/);
+    // Matches valid note prefixes (Western, Solfege, Carnatic) and optional accidentals followed by octave
+    const match = note.match(
+        /^((?:[a-g]|do|re|mi|fa|sol|la|ti|si|ut|sa|ga|ma|pa|dha|ni)(?:[#b♯♭𝄪𝄫x♮]*))(-?\d+)$/iu
+    );
     if (match) {
         return [match[1], Number(match[2])];
     }

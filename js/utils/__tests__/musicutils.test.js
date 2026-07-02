@@ -1980,6 +1980,25 @@ describe("noteToPitchOctave", () => {
         expect(noteToPitchOctave("sol5")).toEqual(["sol", 5]);
         expect(noteToPitchOctave("do#7")).toEqual(["do#", 7]);
     });
+
+    it("should correctly handle fallback cases for multi-digit digits", () => {
+        expect(noteToPitchOctave("hello10")).toEqual(["hello1", 0]);
+        expect(noteToPitchOctave("xyz123")).toEqual(["xyz12", 3]);
+    });
+
+    it("should correctly handle Carnatic note strings with octave", () => {
+        expect(noteToPitchOctave("sa4")).toEqual(["sa", 4]);
+        expect(noteToPitchOctave("dha-1")).toEqual(["dha", -1]);
+        expect(noteToPitchOctave("ma#5")).toEqual(["ma#", 5]);
+    });
+
+    it("should not match adversarial non-note words and fall back to fallback behavior", () => {
+        expect(noteToPitchOctave("away5")).toEqual(["away", 5]);
+        expect(noteToPitchOctave("regard4")).toEqual(["regard", 4]);
+        expect(noteToPitchOctave("hi4")).toEqual(["hi", 4]);
+        expect(noteToPitchOctave("random9")).toEqual(["random", 9]);
+        expect(noteToPitchOctave("banana2")).toEqual(["banana", 2]);
+    });
 });
 
 describe("pitchToFrequency", () => {
