@@ -1540,3 +1540,7 @@ if (typeof module !== "undefined" && module.exports) {
         displayMsg
     };
 }
+
+if (typeof window !== "undefined") {
+    window._ = _;
+}
