@@ -79,7 +79,7 @@ class PhraseMaker {
 
         // Bind commonly-used dependencies locally for readability
         // This reduces verbosity while maintaining explicit dependency injection
-        this.platformColor = this._deps.platformColor;
+
         this.docById = this._deps.docById;
         this._ = this._deps._;
         this.wheelnav = this._deps.wheelnav;
@@ -547,18 +547,18 @@ class PhraseMaker {
                 PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1 ||
                 PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1
             ) {
-                cellColor = this.platformColor.graphicsLabelBackground;
+                cellColor = "pm-graphics-label";
             } else {
                 if (drumName === null) {
-                    cellColor = this.platformColor.pitchLabelBackground;
+                    cellColor = "pm-pitch-label";
                 } else {
-                    cellColor = this.platformColor.drumLabelBackground;
+                    cellColor = "pm-drum-label";
                 }
             }
 
             // A cell for the row label graphic
             cell = ptmTableRow.insertCell();
-            cell.style.backgroundColor = cellColor;
+            cell.classList.add(cellColor);
             cell.style.fontSize = this._cellScale * 100 + "%";
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + "px";
@@ -656,7 +656,7 @@ class PhraseMaker {
 
             // A cell for the row label
             cell = ptmTableRow.insertCell();
-            cell.style.backgroundColor = cellColor;
+            cell.classList.add(cellColor);
             cell.style.fontSize = this._cellScale * 100 + "%";
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + "px";
@@ -674,6 +674,14 @@ class PhraseMaker {
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
                 cell.setAttribute("alt", i + "__" + "drumblocks");
 
+                cell.setAttribute("role", "button");
+                cell.setAttribute("tabindex", "0");
+                cell.onkeydown = e => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        cell.click();
+                    }
+                };
                 cell.onclick = event => {
                     let eCell = event.target;
                     if (eCell.getAttribute("alt") === null) {
@@ -694,6 +702,14 @@ class PhraseMaker {
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
                 cell.setAttribute("alt", i + "__" + "synthsblocks");
 
+                cell.setAttribute("role", "button");
+                cell.setAttribute("tabindex", "0");
+                cell.onkeydown = e => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        cell.click();
+                    }
+                };
                 cell.onclick = event => {
                     let eCell = event.target;
                     if (eCell.getAttribute("alt") === null) {
@@ -715,6 +731,14 @@ class PhraseMaker {
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + "px";
                 cell.setAttribute("alt", i + "__" + "graphicsblocks");
 
+                cell.setAttribute("role", "button");
+                cell.setAttribute("tabindex", "0");
+                cell.onkeydown = e => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        cell.click();
+                    }
+                };
                 cell.onclick = event => {
                     let eCell = event.target;
                     if (eCell.getAttribute("alt") === null) {
@@ -738,6 +762,14 @@ class PhraseMaker {
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + "px";
                 cell.setAttribute("alt", i + "__" + "graphicsblocks2");
 
+                cell.setAttribute("role", "button");
+                cell.setAttribute("tabindex", "0");
+                cell.onkeydown = e => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        cell.click();
+                    }
+                };
                 cell.onclick = event => {
                     let eCell = event.target;
                     if (eCell.getAttribute("alt") === null) {
@@ -819,6 +851,14 @@ class PhraseMaker {
                 }
                 cell.setAttribute("alt", i + "__" + "pitchblocks");
 
+                cell.setAttribute("role", "button");
+                cell.setAttribute("tabindex", "0");
+                cell.onkeydown = e => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        cell.click();
+                    }
+                };
                 cell.onclick = event => {
                     let eCell = event.target;
                     if (eCell.getAttribute("alt") === null) {
@@ -858,7 +898,7 @@ class PhraseMaker {
             cell.style.position = "sticky";
             cell.style.left = "1.2px";
             cell.style.zIndex = "1";
-            cell.style.backgroundColor = this.platformColor.lyricsLabelBackground;
+            cell.classList.add("pm-lyrics-label");
             cell.style.textAlign = "center";
             cell.textContent = "";
             const penImg = document.createElement("img");
@@ -875,7 +915,7 @@ class PhraseMaker {
             cell.style.position = "sticky";
             cell.style.left = "1.2px";
             cell.style.zIndex = "1";
-            cell.style.backgroundColor = this.platformColor.lyricsLabelBackground;
+            cell.classList.add("pm-lyrics-label");
             cell.style.textAlign = "center";
             cell.textContent = "Lyrics";
 
@@ -899,7 +939,7 @@ class PhraseMaker {
                 inputCell.style.width = this._noteWidth(noteValue) + "px";
                 inputCell.style.minWidth = inputCell.style.width;
                 inputCell.style.maxWidth = inputCell.style.width;
-                inputCell.style.backgroundColor = this.platformColor.lyricsInputBackground;
+                inputCell.classList.add("pm-lyrics-input");
                 inputCell.style.fontFamily = "sans-serif";
                 inputCell.style.cursor = "default";
                 inputCell.style.borderSpacing = "1px 1px";
@@ -925,15 +965,15 @@ class PhraseMaker {
                 lyricsInput.style.padding = "0";
                 lyricsInput.style.border = "none";
                 lyricsInput.style.borderRadius = "6px";
-                lyricsInput.style.backgroundColor = this.platformColor.lyricsInputBackground;
+                lyricsInput.classList.add("pm-lyrics-input");
 
                 inputCell.appendChild(lyricsInput);
                 inputCell.addEventListener("mouseover", event => {
-                    event.target.style.backgroundColor = this.platformColor.selectorSelected;
+                    event.target.classList.add("pm-selector-selected");
                 });
 
                 inputCell.addEventListener("mouseout", event => {
-                    event.target.style.backgroundColor = this.platformColor.lyricsInputBackground;
+                    event.target.classList.add("pm-lyrics-input");
                 });
                 lyricsInput.addEventListener("focus", () => (this.activity.isInputON = true));
                 lyricsInput.addEventListener("blur", () => (this.activity.isInputON = false));
@@ -978,7 +1018,7 @@ class PhraseMaker {
             Math.floor(2 * MATRIXSOLFEWIDTH * this._cellScale) + "px";
         this._noteValueLabel.style.minWidth = this._noteValueLabel.style.width;
         this._noteValueLabel.style.maxWidth = this._noteValueLabel.style.width;
-        this._noteValueLabel.style.backgroundColor = this.platformColor.labelColor;
+        this._noteValueLabel.classList.add("pm-label-cell");
 
         // Create tables to store individual note values.
         tempTable = document.createElement("table");
@@ -1009,46 +1049,6 @@ class PhraseMaker {
         }
     }
 
-    _configureExitWheel(exitWheel) {
-        if (!exitWheel || !exitWheel.navItems) {
-            return;
-        }
-
-        const clearSelection = () => {
-            exitWheel.selectedNavItemIndex = null;
-            for (let i = 0; i < exitWheel.navItems.length; i++) {
-                exitWheel.navItems[i].selected = false;
-                exitWheel.navItems[i].hovered = false;
-            }
-            if (exitWheel.raphael && exitWheel.raphael.canvas) {
-                exitWheel.refreshWheel(true);
-            }
-        };
-
-        clearSelection();
-
-        for (let i = 0; i < exitWheel.navItems.length; i++) {
-            const item = exitWheel.navItems[i];
-            if (item && item.sliceSelectedAttr) {
-                item.sliceSelectedAttr.cursor = "pointer";
-                item.sliceHoverAttr.cursor = "pointer";
-                item.titleSelectedAttr.cursor = "pointer";
-                item.titleHoverAttr.cursor = "pointer";
-            }
-        }
-
-        exitWheel.navigateWheel = clicked => {
-            const item = exitWheel.navItems[clicked];
-            if (!item || item.enabled === false) {
-                return;
-            }
-            clearSelection();
-            if (typeof item.navigateFunction === "function") {
-                item.navigateFunction();
-            }
-        };
-    }
-
     _setupWheelDiv(size, left, top) {
         const wheelDiv = this.docById("wheelDivptm");
         wheelDiv.style.position = "absolute";
@@ -1064,7 +1064,6 @@ class PhraseMaker {
      */
     _createAddRowPieSubmenu() {
         // This menu is used to add new rows to the matrix.
-        this.docById("wheelDivptm").textContent = "";
         this.docById("wheelDivptm").style.display = "";
         const VALUESLABEL = ["pitch", "hertz", "drum", "graphics", "pen"];
         const VALUES = [
@@ -1099,11 +1098,11 @@ class PhraseMaker {
         this._menuWheel.slicePathFunction = this.slicePath().DonutSlice;
         this._menuWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
         this._menuWheel.colors = [
-            this.platformColor.paletteColors["pitch"][0],
-            this.platformColor.paletteColors["pitch"][1],
-            this.platformColor.paletteColors["drum"][0],
-            this.platformColor.paletteColors["turtle"][0],
-            this.platformColor.paletteColors["turtle"][1]
+            "var(--color-pitch-primary, #90c100)",
+            "var(--color-pitch-secondary, #90c100)",
+            "var(--color-drum-primary, #ff9800)",
+            "var(--color-turtle-primary, #00bcd4)",
+            "var(--color-turtle-secondary, #00bcd4)"
         ];
         this._menuWheel.slicePathCustom.minRadiusPercent = 0.3;
         this._menuWheel.slicePathCustom.maxRadiusPercent = 1.0;
@@ -1120,7 +1119,10 @@ class PhraseMaker {
         this._menuWheel.navItems[3].setTooltip(this._("graphics"));
         this._menuWheel.navItems[4].setTooltip(this._("pen"));
 
-        this._exitWheel.colors = this.platformColor.exitWheelcolors;
+        this._exitWheel.colors = [
+            "var(--color-exit-primary, #e57373)",
+            "var(--color-exit-secondary, #ef5350)"
+        ];
         this._exitWheel.slicePathFunction = this.slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
@@ -1129,7 +1131,6 @@ class PhraseMaker {
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
         this._exitWheel.createWheel(["×", " "]);
-        this._configureExitWheel(this._exitWheel);
 
         const addnotesRect = this.docById("addnotes").getBoundingClientRect();
         const x = addnotesRect.x;
@@ -1152,10 +1153,6 @@ class PhraseMaker {
             this._menuWheel.removeWheel();
             this._exitWheel.removeWheel();
         };
-        if (this._exitWheel.navItems.length > 1) {
-            this._exitWheel.navItems[1].navigateFunction =
-                this._exitWheel.navItems[0].navigateFunction;
-        }
 
         const __selectionChanged = () => {
             label = VALUESLABEL[this._menuWheel.selectedNavItemIndex];
@@ -1323,23 +1320,15 @@ class PhraseMaker {
      * Executes actions related to adding a new pitch block.
      * @param {number} blockN - The index of the block being added.
      */
-    pitchBlockAdded(blockN, retryCount = 0) {
-        setTimeout(() => {
-            this.init(this.activity);
-            let i;
-            for (i = 0; i < this.columnBlocksMap.length; i++) {
-                if (this.columnBlocksMap[i] && this.columnBlocksMap[i][0] === blockN) {
-                    break;
-                }
+    pitchBlockAdded(blockN) {
+        let i;
+        for (i = 0; i < this.columnBlocksMap.length; i++) {
+            if (this.columnBlocksMap[i][0] === blockN) {
+                break;
             }
-            if (i === this.columnBlocksMap.length) {
-                if (retryCount < 5) {
-                    this.pitchBlockAdded(blockN, retryCount + 1);
-                    return;
-                }
-            }
-            this._createColumnPieSubmenu(i, "pitchblocks", true);
-        }, 300);
+        }
+
+        setTimeout(() => this._createColumnPieSubmenu(i, "pitchblocks", true), 500);
     }
 
     /**
@@ -1349,7 +1338,6 @@ class PhraseMaker {
      */
     _createMatrixGraphics2PieSubmenu(blockIndex, blk) {
         // A wheel for modifying 2-arg graphics blocks
-        this.docById("wheelDivptm").textContent = "";
         this.docById("wheelDivptm").style.display = "";
         const arcRadiusLabel = ["10", "20", "30", "40", "50", "60", "70", "80", "90", "100"];
         const arcAngleLabel = ["0", "30", "45", "60", "90", "180"];
@@ -1372,7 +1360,10 @@ class PhraseMaker {
         this._pitchWheel.keynavigateEnabled = false;
         this._pitchWheel.slicePathFunction = this.slicePath().DonutSlice;
         this._pitchWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
-        this._pitchWheel.colors = this.platformColor.blockLabelsWheelcolors;
+        this._pitchWheel.colors = [
+            "var(--color-block-primary, #64b5f6)",
+            "var(--color-block-secondary, #4fc3f7)"
+        ];
         this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
         this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.475;
 
@@ -1382,7 +1373,10 @@ class PhraseMaker {
 
         this._pitchWheel.animatetime = 0;
 
-        this._blockLabelsWheel2.colors = this.platformColor.blockLabelsWheelcolors;
+        this._blockLabelsWheel2.colors = [
+            "var(--color-block-primary, #64b5f6)",
+            "var(--color-block-secondary, #4fc3f7)"
+        ];
         this._blockLabelsWheel2.slicePathFunction = this.slicePath().DonutSlice;
         this._blockLabelsWheel2.slicePathCustom = this.slicePath().DonutSliceCustomization();
         this._blockLabelsWheel2.slicePathCustom.minRadiusPercent = 0.525;
@@ -1392,7 +1386,10 @@ class PhraseMaker {
         this._blockLabelsWheel2.clickModeRotate = false;
         this._blockLabelsWheel2.animatetime = 0;
 
-        this._exitWheel.colors = this.platformColor.exitWheelcolors;
+        this._exitWheel.colors = [
+            "var(--color-exit-primary, #e57373)",
+            "var(--color-exit-secondary, #ef5350)"
+        ];
         this._exitWheel.slicePathFunction = this.slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
@@ -1401,7 +1398,10 @@ class PhraseMaker {
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
 
-        this._blockLabelsWheel.colors = this.platformColor.graphicWheelcolors;
+        this._blockLabelsWheel.colors = [
+            "var(--color-graphic-primary, #ffb74d)",
+            "var(--color-graphic-secondary, #ffcc80)"
+        ];
         this._blockLabelsWheel.slicePathFunction = this.slicePath().DonutSlice;
         this._blockLabelsWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
         this._blockLabelsWheel.slicePathCustom.minRadiusPercent = 0.8;
@@ -1455,7 +1455,6 @@ class PhraseMaker {
         this.xblockValue = [xblockLabelValue.toString(), "x"];
         this.yblockValue = [yblockLabelValue.toString(), "y"];
         this._exitWheel.createWheel(["×", ""]);
-        this._configureExitWheel(this._exitWheel);
 
         this._exitWheel.navItems[0].navigateFunction = () => {
             this.docById("wheelDivptm").style.display = "none";
@@ -1464,10 +1463,6 @@ class PhraseMaker {
             this._blockLabelsWheel.removeWheel();
             this._blockLabelsWheel2.removeWheel();
         };
-        if (this._exitWheel.navItems.length > 1) {
-            this._exitWheel.navItems[1].navigateFunction =
-                this._exitWheel.navItems[0].navigateFunction;
-        }
 
         const __enterArgValue1 = () => {
             this.xblockValue[0] =
@@ -1508,8 +1503,8 @@ class PhraseMaker {
                 const newBlock = this.activity.blocks.blockList.length;
                 this.activity.blocks.loadNewBlocks([
                     [0, thisBlockName, 0, 0, [null, 1, 2, null]],
-                    [1, ["number", { value: parseInt(this.xblockValue[0], 10) }], 0, 0, [0]],
-                    [2, ["number", { value: parseInt(this.yblockValue[0], 10) }], 0, 0, [0]]
+                    [1, ["number", { value: parseInt(this.xblockValue[0]) }], 0, 0, [0]],
+                    [2, ["number", { value: parseInt(this.yblockValue[0]) }], 0, 0, [0]]
                 ]);
 
                 await this._deps.delayExecution(500);
@@ -1521,7 +1516,7 @@ class PhraseMaker {
                 // Just updating a block arg value
                 argBlock = this.activity.blocks.blockList[thisBlock].connections[1];
                 this.activity.blocks.blockList[argBlock].text.text = this.xblockValue[0];
-                this.activity.blocks.blockList[argBlock].value = parseInt(this.xblockValue[0], 10);
+                this.activity.blocks.blockList[argBlock].value = parseInt(this.xblockValue[0]);
 
                 z = this.activity.blocks.blockList[argBlock].container.children.length - 1;
                 this.activity.blocks.blockList[argBlock].container.setChildIndex(
@@ -1532,7 +1527,7 @@ class PhraseMaker {
 
                 argBlock = this.activity.blocks.blockList[thisBlock].connections[2];
                 this.activity.blocks.blockList[argBlock].text.text = this.yblockValue[0];
-                this.activity.blocks.blockList[argBlock].value = parseInt(this.yblockValue[0], 10);
+                this.activity.blocks.blockList[argBlock].value = parseInt(this.yblockValue[0]);
 
                 z = this.activity.blocks.blockList[argBlock].container.children.length - 1;
                 this.activity.blocks.blockList[argBlock].container.setChildIndex(
@@ -1544,8 +1539,8 @@ class PhraseMaker {
 
             // Update the stored values for this node.
             this.rowLabels[blockIndex] = thisBlockName;
-            this.rowArgs[blockIndex][0] = parseInt(this.xblockValue, 10);
-            this.rowArgs[blockIndex][1] = parseInt(this.yblockValue, 10);
+            this.rowArgs[blockIndex][0] = parseInt(this.xblockValue);
+            this.rowArgs[blockIndex][1] = parseInt(this.yblockValue);
 
             // Update the cell label.
             let blockLabel;
@@ -1602,7 +1597,6 @@ class PhraseMaker {
      */
     _createMatrixGraphicsPieSubmenu(blockIndex, condition, blk) {
         // A wheel for modifying 1-arg blocks (graphics and hertz)
-        this.docById("wheelDivptm").textContent = "";
         this.docById("wheelDivptm").style.display = "";
         let valueLabel,
             forwardBackLabel,
@@ -1667,7 +1661,10 @@ class PhraseMaker {
         this._pitchWheel.keynavigateEnabled = false;
         this._pitchWheel.slicePathFunction = this.slicePath().DonutSlice;
         this._pitchWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
-        this._pitchWheel.colors = this.platformColor.blockLabelsWheelcolors;
+        this._pitchWheel.colors = [
+            "var(--color-block-primary, #64b5f6)",
+            "var(--color-block-secondary, #4fc3f7)"
+        ];
         this._pitchWheel.slicePathCustom.minRadiusPercent = 0.525;
         this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.8;
 
@@ -1677,7 +1674,10 @@ class PhraseMaker {
 
         this._pitchWheel.animatetime = 0; // 300;
 
-        this._exitWheel.colors = this.platformColor.exitWheelcolors;
+        this._exitWheel.colors = [
+            "var(--color-exit-primary, #e57373)",
+            "var(--color-exit-secondary, #ef5350)"
+        ];
         this._exitWheel.slicePathFunction = this.slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
@@ -1687,7 +1687,10 @@ class PhraseMaker {
         this._exitWheel.clickModeRotate = false;
 
         if (condition === "graphicsblocks") {
-            this._blockLabelsWheel.colors = this.platformColor.graphicWheelcolors;
+            this._blockLabelsWheel.colors = [
+                "var(--color-graphic-primary, #ffb74d)",
+                "var(--color-graphic-secondary, #ffcc80)"
+            ];
             this._blockLabelsWheel.slicePathFunction = this.slicePath().DonutSlice;
             this._blockLabelsWheel.slicePathCustom = this._deps
                 .slicePath()
@@ -1750,7 +1753,6 @@ class PhraseMaker {
 
         this.blockValue = blockLabelValue.toString();
         this._exitWheel.createWheel(["×", ""]);
-        this._configureExitWheel(this._exitWheel);
 
         this._exitWheel.navItems[0].navigateFunction = () => {
             this.docById("wheelDivptm").style.display = "none";
@@ -1760,10 +1762,6 @@ class PhraseMaker {
                 this._blockLabelsWheel.removeWheel();
             }
         };
-        if (this._exitWheel.navItems.length > 1) {
-            this._exitWheel.navItems[1].navigateFunction =
-                this._exitWheel.navItems[0].navigateFunction;
-        }
 
         const __enterArgValue = () => {
             this.blockValue =
@@ -1817,7 +1815,7 @@ class PhraseMaker {
                 newBlock = this.activity.blocks.blockList.length;
                 this.activity.blocks.loadNewBlocks([
                     [0, thisBlockName, 0, 0, [null, 1, null]],
-                    [1, ["number", { value: parseInt(this.blockValue, 10) }], 0, 0, [0]]
+                    [1, ["number", { value: parseInt(this.blockValue) }], 0, 0, [0]]
                 ]);
 
                 await this._deps.delayExecution(500);
@@ -1829,7 +1827,7 @@ class PhraseMaker {
                 // Just updating a block arg value
                 argBlock = this.activity.blocks.blockList[thisBlock].connections[1];
                 this.activity.blocks.blockList[argBlock].text.text = this.blockValue;
-                this.activity.blocks.blockList[argBlock].value = parseInt(this.blockValue, 10);
+                this.activity.blocks.blockList[argBlock].value = parseInt(this.blockValue);
 
                 z = this.activity.blocks.blockList[argBlock].container.children.length - 1;
                 this.activity.blocks.blockList[argBlock].container.setChildIndex(
@@ -1841,7 +1839,7 @@ class PhraseMaker {
 
             // Update the stored values for this node.
             this.rowLabels[blockIndex] = thisBlockName;
-            this.rowArgs[blockIndex] = parseInt(this.blockValue, 10);
+            this.rowArgs[blockIndex] = parseInt(this.blockValue);
 
             // Update the cell label.
             let cell = this._headcols[blockIndex];
@@ -1929,8 +1927,7 @@ class PhraseMaker {
      * @param {boolean} sortedClose - Determines if the menu is sorted and closed.
      */
     _createColumnPieSubmenu(index, condition, sortedClose) {
-        index = parseInt(index, 10);
-        this.docById("wheelDivptm").textContent = "";
+        index = parseInt(index);
         this.docById("wheelDivptm").style.display = "";
 
         const accidentals = ["𝄪", "♯", "♮", "♭", "𝄫"];
@@ -1948,7 +1945,13 @@ class PhraseMaker {
             noteLabels = drumLabels;
             categories = [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2];
 
-            const COLORS = this.platformColor.piemenuVoicesColors;
+            const COLORS = [
+                "var(--color-voice-1, #ba68c8)",
+                "var(--color-voice-2, #ce93d8)",
+                "var(--color-voice-3, #ab47bc)",
+                "var(--color-voice-4, #9c27b0)",
+                "var(--color-voice-5, #8e24aa)"
+            ];
             for (let i = 0; i < drumLabels.length; i++) {
                 colors.push(COLORS[categories[i] % COLORS.length]);
             }
@@ -1976,7 +1979,10 @@ class PhraseMaker {
         this._pitchWheel.slicePathFunction = this.slicePath().DonutSlice;
         this._pitchWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
         if (condition === "pitchblocks") {
-            this._pitchWheel.colors = this.platformColor.pitchWheelcolors;
+            this._pitchWheel.colors = [
+                "var(--color-pitch-wheel-1, #81c784)",
+                "var(--color-pitch-wheel-2, #aed581)"
+            ];
             this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
             this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.5;
         } else if (condition === "drumblocks") {
@@ -1992,23 +1998,28 @@ class PhraseMaker {
         this._pitchWheel.animatetime = 0; // 300;
         this._pitchWheel.createWheel(noteLabels);
 
-        this._exitWheel.colors = this.platformColor.exitWheelcolors;
+        this._exitWheel.colors = [
+            "var(--color-exit-primary, #e57373)",
+            "var(--color-exit-secondary, #ef5350)"
+        ];
         this._exitWheel.slicePathFunction = this.slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.25;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
         this._exitWheel.createWheel(["×", " "]);
-        this._configureExitWheel(this._exitWheel);
 
         const accidentalLabels = [];
         let octaveLabels = [];
         let block, noteValue, octaveValue, accidentalsValue;
 
         if (condition === "pitchblocks") {
-            this._accidentalsWheel.colors = this.platformColor.accidentalsWheelcolors;
+            this._accidentalsWheel.colors = [
+                "var(--color-acc-1, #fff176)",
+                "var(--color-acc-2, #ffd54f)"
+            ];
             this._accidentalsWheel.slicePathFunction = this.slicePath().DonutSlice;
             this._accidentalsWheel.slicePathCustom = this._deps
                 .slicePath()
@@ -2024,7 +2035,7 @@ class PhraseMaker {
 
             for (let i = 0; i < 9; i++) {
                 accidentalLabels.push(null);
-                this._accidentalsWheel.colors.push(this.platformColor.accidentalsWheelcolorspush);
+                this._accidentalsWheel.colors.push("var(--color-acc-push, #ffb74d)");
             }
 
             this._accidentalsWheel.animatetime = 0; // 300;
@@ -2037,7 +2048,10 @@ class PhraseMaker {
                 this._("double flat")
             ]);
 
-            this._octavesWheel.colors = this.platformColor.octavesWheelcolors;
+            this._octavesWheel.colors = [
+                "var(--color-oct-1, #4dd0e1)",
+                "var(--color-oct-2, #80deea)"
+            ];
             this._octavesWheel.slicePathFunction = this.slicePath().DonutSlice;
             this._octavesWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
             this._octavesWheel.slicePathCustom.minRadiusPercent = 0.75;
@@ -2064,22 +2078,9 @@ class PhraseMaker {
             this._octavesWheel.createWheel(octaveLabels);
         }
 
-        let labelRect = null;
-        if (this._labelcols && this._labelcols[index]) {
-            labelRect = this._labelcols[index].getBoundingClientRect();
-        }
-        let x = labelRect ? labelRect.x : 0;
-        let y = labelRect ? labelRect.y : 0;
-
-        // If the coordinates are 0,0, fallback to addnotes button rect
-        if (x === 0 && y === 0) {
-            const addnotes = this.docById("addnotes");
-            if (addnotes) {
-                const addnotesRect = addnotes.getBoundingClientRect();
-                x = addnotesRect.x;
-                y = addnotesRect.y;
-            }
-        }
+        const labelRect = this._labelcols[index].getBoundingClientRect();
+        const x = labelRect.x;
+        const y = labelRect.y;
 
         this._setupWheelDiv(
             300,
@@ -2093,57 +2094,38 @@ class PhraseMaker {
             )
         );
 
-        let hasBlock = false;
-        if (!this._noteBlocks && index >= 0 && this.columnBlocksMap[index]) {
+        if (!this._noteBlocks) {
             block = this.columnBlocksMap[index][0];
-            if (block !== undefined && this.activity.blocks.blockList[block]) {
-                const conn1 = this.activity.blocks.blockList[block].connections[1];
-                if (conn1 !== undefined && this.activity.blocks.blockList[conn1]) {
-                    noteValue = this.activity.blocks.blockList[conn1].value;
-                    hasBlock = true;
-                }
-            }
-        }
+            noteValue =
+                this.activity.blocks.blockList[this.activity.blocks.blockList[block].connections[1]]
+                    .value;
 
-        if (hasBlock) {
             if (condition === "pitchblocks") {
-                let octaveValue = undefined;
-                const blockObj = this.activity.blocks.blockList[block];
-                const conn2 = blockObj.connections[2];
-                if (conn2 !== undefined && this.activity.blocks.blockList[conn2]) {
-                    octaveValue = this.activity.blocks.blockList[conn2].value;
-                }
+                octaveValue =
+                    this.activity.blocks.blockList[
+                        this.activity.blocks.blockList[block].connections[2]
+                    ].value;
                 accidentalsValue = 2;
 
-                if (noteValue !== undefined) {
-                    for (let i = 0; i < accidentals.length; i++) {
-                        if (noteValue.includes(accidentals[i])) {
-                            accidentalsValue = i;
-                            noteValue = noteValue.substr(0, noteValue.indexOf(accidentals[i]));
-                            break;
-                        }
+                for (let i = 0; i < accidentals.length; i++) {
+                    if (noteValue.includes(accidentals[i])) {
+                        accidentalsValue = i;
+                        noteValue = noteValue.substr(0, noteValue.indexOf(accidentals[i]));
+                        break;
                     }
                 }
 
-                if (this._accidentalsWheel && this._accidentalsWheel.navItems) {
-                    this._accidentalsWheel.navigateWheel(accidentalsValue);
-                }
-                if (
-                    this._octavesWheel &&
-                    this._octavesWheel.navItems &&
-                    octaveValue !== undefined
-                ) {
-                    this._octavesWheel.navigateWheel(octaveLabels.indexOf(octaveValue.toString()));
-                }
+                this._accidentalsWheel.navigateWheel(accidentalsValue);
+                this._octavesWheel.navigateWheel(octaveLabels.indexOf(octaveValue.toString()));
             }
             if (condition === "drumblocks") {
-                const selectorEl = this._deps.docBySelector(
-                    '.labelcol[alt="' + index + '__drumblocks"]'
+                this._pitchWheel.navigateWheel(
+                    noteLabels.indexOf(
+                        this._deps.docBySelector('.labelcol[alt="' + index + '__drumblocks"]')
+                            .innerText
+                    )
                 );
-                if (selectorEl) {
-                    this._pitchWheel.navigateWheel(noteLabels.indexOf(selectorEl.innerText));
-                }
-            } else if (noteValue !== undefined) {
+            } else {
                 this._pitchWheel.navigateWheel(noteLabels.indexOf(noteValue));
             }
         }
@@ -2162,18 +2144,8 @@ class PhraseMaker {
                 this._sort();
             }
         };
-        if (this._exitWheel.navItems.length > 1) {
-            this._exitWheel.navItems[1].navigateFunction =
-                this._exitWheel.navItems[0].navigateFunction;
-        }
 
         const __selectionChanged = () => {
-            if (
-                this._pitchWheel.selectedNavItemIndex === null ||
-                this._pitchWheel.selectedNavItemIndex === undefined
-            ) {
-                return;
-            }
             let label = this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
             const i = noteLabels.indexOf(label);
             let attr, flag, z;
@@ -2194,19 +2166,16 @@ class PhraseMaker {
             }
 
             if (!this._noteBlocks) {
-                const blockObj = this.activity.blocks.blockList[block];
-                if (blockObj) {
-                    noteLabelBlock = blockObj.connections[1];
-                    const noteLabelBlockObj = this.activity.blocks.blockList[noteLabelBlock];
-                    if (noteLabelBlockObj) {
-                        noteLabelBlockObj.text.text = label;
-                        noteLabelBlockObj.value = label;
+                noteLabelBlock = this.activity.blocks.blockList[block].connections[1];
+                this.activity.blocks.blockList[noteLabelBlock].text.text = label;
+                this.activity.blocks.blockList[noteLabelBlock].value = label;
 
-                        z = noteLabelBlockObj.container.children.length - 1;
-                        noteLabelBlockObj.container.setChildIndex(noteLabelBlockObj.text, z);
-                        noteLabelBlockObj.updateCache();
-                    }
-                }
+                z = this.activity.blocks.blockList[noteLabelBlock].container.children.length - 1;
+                this.activity.blocks.blockList[noteLabelBlock].container.setChildIndex(
+                    this.activity.blocks.blockList[noteLabelBlock].text,
+                    z
+                );
+                this.activity.blocks.blockList[noteLabelBlock].updateCache();
             }
 
             if (condition === "pitchblocks") {
@@ -2214,14 +2183,11 @@ class PhraseMaker {
                     this._octavesWheel.navItems[this._octavesWheel.selectedNavItemIndex].title
                 );
 
-                if (!this._noteBlocks && noteLabelBlock) {
-                    const noteLabelBlockObj = this.activity.blocks.blockList[noteLabelBlock];
-                    if (noteLabelBlockObj && noteLabelBlockObj.blocks) {
-                        noteLabelBlockObj.blocks.setPitchOctave(
-                            noteLabelBlockObj.connections[0],
-                            octave
-                        );
-                    }
+                if (!this._noteBlocks) {
+                    this.activity.blocks.blockList[noteLabelBlock].blocks.setPitchOctave(
+                        this.activity.blocks.blockList[noteLabelBlock].connections[0],
+                        octave
+                    );
                 }
 
                 noteObj = [label, octave];
@@ -2244,75 +2210,83 @@ class PhraseMaker {
             }
 
             let cell = this._headcols[index];
-            if (cell) {
-                const drumName = this._deps.getDrumName(this.rowLabels[index]);
-                const BELLSETIDX = {
-                    C: 1,
-                    D: 2,
-                    E: 3,
-                    F: 4,
-                    G: 5,
-                    A: 6,
-                    B: 7,
-                    do: 1,
-                    re: 2,
-                    mi: 3,
-                    fa: 4,
-                    sol: 5,
-                    la: 6,
-                    ti: 7
-                };
-                const noteName = this.rowLabels[index];
-                const w = window.innerWidth;
-                const iconSize = PhraseMaker.ICONSIZE * (w / 1200);
-                if (drumName !== null) {
-                    cell.textContent = "\u00A0\u00A0";
-                    const img = document.createElement("img");
-                    img.src = this._deps.getDrumIcon(drumName);
-                    img.title = this._(drumName);
-                    img.alt = this._(drumName);
-                    img.setAttribute("height", iconSize);
-                    img.setAttribute("width", iconSize);
-                    img.setAttribute("vertical-align", "middle");
-                    cell.appendChild(img);
-                    cell.appendChild(document.createTextNode("\u00A0\u00A0"));
-                } else if (noteName in BELLSETIDX && this.rowArgs[index] === 4) {
-                    cell.textContent = "";
-                    const img = document.createElement("img");
-                    img.src = `images/8_bellset_key_${BELLSETIDX[noteName]}.svg`;
-                    img.setAttribute("width", cell.style.width);
-                    img.setAttribute("vertical-align", "middle");
-                    cell.appendChild(img);
-                } else if (noteName === "C" && this.rowArgs[index] === 5) {
-                    cell.textContent = "";
-                    const img = document.createElement("img");
-                    img.src = "images/8_bellset_key_8.svg";
-                    img.setAttribute("width", cell.style.width);
-                    img.setAttribute("vertical-align", "middle");
-                    cell.appendChild(img);
-                }
+            const drumName = this._deps.getDrumName(this.rowLabels[index]);
+            const BELLSETIDX = {
+                C: 1,
+                D: 2,
+                E: 3,
+                F: 4,
+                G: 5,
+                A: 6,
+                B: 7,
+                do: 1,
+                re: 2,
+                mi: 3,
+                fa: 4,
+                sol: 5,
+                la: 6,
+                ti: 7
+            };
+            const noteName = this.rowLabels[index];
+            const w = window.innerWidth;
+            const iconSize = PhraseMaker.ICONSIZE * (w / 1200);
+            if (drumName !== null) {
+                cell.textContent = "\u00A0\u00A0";
+                const img = document.createElement("img");
+                img.src = this._deps.getDrumIcon(drumName);
+                img.title = this._(drumName);
+                img.alt = this._(drumName);
+                img.setAttribute("height", iconSize);
+                img.setAttribute("width", iconSize);
+                img.setAttribute("vertical-align", "middle");
+                cell.appendChild(img);
+                cell.appendChild(document.createTextNode("\u00A0\u00A0"));
+            } else if (noteName in BELLSETIDX && this.rowArgs[index] === 4) {
+                cell.textContent = "";
+                const img = document.createElement("img");
+                img.src = `images/8_bellset_key_${BELLSETIDX[noteName]}.svg`;
+                img.setAttribute("width", cell.style.width);
+                img.setAttribute("vertical-align", "middle");
+                cell.appendChild(img);
+            } else if (noteName === "C" && this.rowArgs[index] === 5) {
+                cell.textContent = "";
+                const img = document.createElement("img");
+                img.src = "images/8_bellset_key_8.svg";
+                img.setAttribute("width", cell.style.width);
+                img.setAttribute("vertical-align", "middle");
+                cell.appendChild(img);
             }
 
             cell = this._labelcols[index];
-            if (cell) {
-                const drumName = this._deps.getDrumName(this.rowLabels[index]);
-                if (drumName !== null) {
-                    cell.textContent = this._(drumName);
-                    cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
-                } else if (
-                    this._deps.noteIsSolfege(this.rowLabels[index]) &&
-                    !this._deps.isCustomTemperament(this.activity.logo.synth.inTemperament)
-                ) {
-                    cell.textContent = "";
-                    cell.appendChild(
-                        document.createTextNode(this._deps.i18nSolfege(this.rowLabels[index]))
-                    );
-                    const subTitle1 = document.createElement("sub");
-                    subTitle1.textContent = this.rowArgs[index].toString();
-                    cell.appendChild(subTitle1);
+            if (drumName !== null) {
+                cell.textContent = this._(drumName);
+                cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
+            } else if (
+                this._deps.noteIsSolfege(this.rowLabels[i]) &&
+                !this._deps.isCustomTemperament(this.activity.logo.synth.inTemperament)
+            ) {
+                cell.textContent = "";
+                cell.appendChild(
+                    document.createTextNode(this._deps.i18nSolfege(this.rowLabels[index]))
+                );
+                const subTitle1 = document.createElement("sub");
+                subTitle1.textContent = this.rowArgs[index].toString();
+                cell.appendChild(subTitle1);
+                noteObj = this._deps.getNote(
+                    this.rowLabels[index],
+                    this.rowArgs[index],
+                    0,
+                    this.activity.turtles.ithTurtle(0).singer.keySignature,
+                    false,
+                    null,
+                    this.activity.errorMsg,
+                    this.activity.logo.synth.inTemperament
+                );
+            } else {
+                if (this._deps.isCustomTemperament(this.activity.logo.synth.inTemperament)) {
                     noteObj = this._deps.getNote(
-                        this.rowLabels[index],
-                        this.rowArgs[index],
+                        this.rowLabels[i],
+                        this.rowArgs[i],
                         0,
                         this.activity.turtles.ithTurtle(0).singer.keySignature,
                         false,
@@ -2320,40 +2294,26 @@ class PhraseMaker {
                         this.activity.errorMsg,
                         this.activity.logo.synth.inTemperament
                     );
+                    cell.textContent = "";
+                    cell.appendChild(document.createTextNode(this.rowLabels[i]));
+                    const subTitle2 = document.createElement("sub");
+                    subTitle2.textContent = this.rowArgs[i].toString();
+                    cell.appendChild(subTitle2);
                 } else {
-                    if (this._deps.isCustomTemperament(this.activity.logo.synth.inTemperament)) {
-                        noteObj = this._deps.getNote(
-                            this.rowLabels[index],
-                            this.rowArgs[index],
-                            0,
-                            this.activity.turtles.ithTurtle(0).singer.keySignature,
-                            false,
-                            null,
-                            this.activity.errorMsg,
-                            this.activity.logo.synth.inTemperament
-                        );
-                        cell.textContent = "";
-                        cell.appendChild(document.createTextNode(this.rowLabels[index]));
-                        const subTitle2 = document.createElement("sub");
-                        subTitle2.textContent = this.rowArgs[index].toString();
-                        cell.appendChild(subTitle2);
-                    } else {
-                        cell.textContent = "";
-                        cell.appendChild(document.createTextNode(this.rowLabels[index]));
-                        const subTitle3 = document.createElement("sub");
-                        subTitle3.textContent = this.rowArgs[index].toString();
-                        cell.appendChild(subTitle3);
-                        noteObj = [this.rowLabels[index], this.rowArgs[index]];
-                    }
+                    cell.textContent = "";
+                    cell.appendChild(document.createTextNode(this.rowLabels[i]));
+                    const subTitle3 = document.createElement("sub");
+                    subTitle3.textContent = this.rowArgs[i].toString();
+                    cell.appendChild(subTitle3);
+                    noteObj = [this.rowLabels[i], this.rowArgs[i]];
                 }
             }
 
             let noteStored = null;
-            const drumName2 = this._deps.getDrumName(this.rowLabels[index]);
             if (condition === "pitchblocks") {
-                if (noteObj) noteStored = noteObj[0] + noteObj[1];
+                noteStored = noteObj[0] + noteObj[1];
             } else if (condition === "drumblocks") {
-                noteStored = drumName2;
+                noteStored = drumName;
             }
 
             this._noteStored[index] = noteStored;
@@ -2576,7 +2536,7 @@ class PhraseMaker {
             n = row.cells.length;
             for (let i = 0; i < n; i++) {
                 cell = row.cells[i];
-                if (cell.style.backgroundColor === "black") {
+                if (cell.classList.contains("pm-black-cell")) {
                     thisRow.push(i);
                 }
             }
@@ -2839,7 +2799,7 @@ class PhraseMaker {
             // Add then the note cells.
             for (let j = 0, col; (col = this._rows[i].cells[j]); j++) {
                 exportCell = exportRow.insertCell();
-                exportCell.style.backgroundColor = col.style.backgroundColor;
+                exportCell.className = col.className;
                 exportCell.textContent = "";
                 Array.from(col.childNodes).forEach(child =>
                     exportCell.appendChild(child.cloneNode(true))
@@ -2866,7 +2826,7 @@ class PhraseMaker {
             for (let i = 0; i < noteValueRow.cells.length; i++) {
                 exportCell = exportRow.insertCell();
                 col = noteValueRow.cells[i];
-                exportCell.style.backgroundColor = col.style.backgroundColor;
+                exportCell.className = col.className;
                 exportCell.textContent = "";
                 Array.from(col.childNodes).forEach(child =>
                     exportCell.appendChild(child.cloneNode(true))
@@ -2890,7 +2850,7 @@ class PhraseMaker {
             for (let i = 0; i < noteValueRow.cells.length; i++) {
                 exportCell = exportRow.insertCell();
                 col = noteValueRow.cells[i];
-                exportCell.style.backgroundColor = col.style.backgroundColor;
+                exportCell.className = col.className;
                 exportCell.textContent = "";
                 Array.from(col.childNodes).forEach(child =>
                     exportCell.appendChild(child.cloneNode(true))
@@ -2915,7 +2875,7 @@ class PhraseMaker {
         for (let i = 0; i < noteValueRow.cells.length; i++) {
             exportCell = exportRow.insertCell();
             col = noteValueRow.cells[i];
-            exportCell.style.backgroundColor = col.style.backgroundColor;
+            exportCell.className = col.className;
             exportCell.textContent = "";
             Array.from(col.childNodes).forEach(child =>
                 exportCell.appendChild(child.cloneNode(true))
@@ -2936,8 +2896,9 @@ class PhraseMaker {
         exportDocument.body.appendChild(exportDocument.createElement("br"));
         const downloadLink = exportDocument.createElement("a");
         downloadLink.id = "downloadb1";
+        downloadLink.classList.add("pm-download-btn");
         downloadLink.style.cssText =
-            "background: #C374E9; border-radius: 5%; padding: 0.3em; text-decoration: none; margin: 0.5em; color: white;";
+            "background: var(--pm-download-bg, #C374E9); border-radius: 5%; padding: 0.3em; text-decoration: none; margin: 0.5em; color: var(--pm-download-text, white);";
         downloadLink.setAttribute("download", "");
         downloadLink.textContent = "Download Matrix";
         exportDocument.body.appendChild(downloadLink);
@@ -2982,7 +2943,9 @@ class PhraseMaker {
         const numberOfNotes = param[1].length;
         // Check if current bar position is at 0 (start of a measure)
         const isBarLine = this._currentMusicalTime < 0.001 && this._notesToPlay.length > 0;
-        const barStyle = isBarLine ? "3px solid #555" : "1px solid #ccc";
+        const barStyle = isBarLine
+            ? "3px solid var(--bar-line, #555)"
+            : "1px solid var(--border, #ccc)";
 
         let totalNoteInterval = 0;
         // const ptmTable = this.docById("ptmTable");
@@ -3035,7 +2998,7 @@ class PhraseMaker {
             labelCell.style.width = Math.floor(2 * MATRIXSOLFEWIDTH * this._cellScale) + "px";
             labelCell.style.minWidth = labelCell.style.width;
             labelCell.style.maxWidth = labelCell.style.width;
-            labelCell.style.backgroundColor = this.platformColor.labelColor;
+            labelCell.classList.add("pm-label-cell");
 
             labelCell = this._tupletValueLabel;
             labelCell.textContent = this._("tuplet value");
@@ -3044,7 +3007,7 @@ class PhraseMaker {
             labelCell.style.width = Math.floor(2 * MATRIXSOLFEWIDTH * this._cellScale) + "px";
             labelCell.style.minWidth = labelCell.style.width;
             labelCell.style.maxWidth = labelCell.style.width;
-            labelCell.style.backgroundColor = this.platformColor.labelColor;
+            labelCell.classList.add("pm-label-cell");
 
             // Fill in the columns in the tuplet note value row up to
             // where the tuplet begins.
@@ -3052,14 +3015,14 @@ class PhraseMaker {
             valueRow = this._tupletValueRow;
             for (let i = 0; i < firstRow.cells.length; i++) {
                 cell = noteRow.insertCell();
-                cell.style.backgroundColor = this.platformColor.tupletBackground;
+                cell.classList.add("pm-tuplet-bg");
                 cell.style.width = firstRow.cells[i].style.width;
                 cell.style.minWidth = firstRow.cells[i].style.minWidth;
                 cell.style.maxWidth = firstRow.cells[i].style.maxWidth;
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
 
                 cell = valueRow.insertCell();
-                cell.style.backgroundColor = this.platformColor.tupletBackground;
+                cell.classList.add("pm-tuplet-bg");
                 cell.style.width = firstRow.cells[i].style.width;
                 cell.style.minWidth = firstRow.cells[i].style.minWidth;
                 cell.style.maxWidth = firstRow.cells[i].style.maxWidth;
@@ -3080,7 +3043,7 @@ class PhraseMaker {
             cell = noteRow.insertCell(-1);
             numerator = 32 / param[1][i];
             thisNoteValue = 1 / (numerator / (totalNoteInterval / tupletTimeFactor));
-            cell.style.backgroundColor = this.platformColor.tupletBackground;
+            cell.classList.add("pm-tuplet-bg");
             cell.style.width = this._noteWidth(thisNoteValue) + "px";
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
@@ -3089,7 +3052,7 @@ class PhraseMaker {
             cell.style.lineHeight = 60 + "%";
             cell.style.fontSize = this._cellScale * 75 + "%";
             cell.style.textAlign = "center";
-            cell.style.borderLeft = i === 0 ? barStyle : "1px solid #ccc";
+            cell.style.borderLeft = i === 0 ? barStyle : "1px solid var(--border, #ccc)";
             obj = this._deps.toFraction(numerator / (totalNoteInterval / tupletTimeFactor));
 
             if (obj[1] < 13) {
@@ -3125,13 +3088,13 @@ class PhraseMaker {
             for (let j = 0; j < this.rowLabels.length; j++) {
                 // Depending on the row, we choose a different background color.
                 if (PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[j]) !== -1) {
-                    cellColor = this.platformColor.graphicsBackground;
+                    cellColor = "pm-graphics-bg";
                 } else {
                     drumName = this._deps.getDrumName(this.rowLabels[j]);
                     if (drumName === null) {
-                        cellColor = this.platformColor.pitchBackground;
+                        cellColor = "pm-pitch-bg";
                     } else {
-                        cellColor = this.platformColor.drumBackground;
+                        cellColor = "pm-drum-bg";
                     }
                 }
 
@@ -3146,18 +3109,18 @@ class PhraseMaker {
                 cell.style.width = cellWidth;
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
-                cell.style.backgroundColor = cellColor;
-                cell.style.borderLeft = i === 0 ? barStyle : "1px solid #ccc";
+                cell.classList.add(cellColor);
+                cell.style.borderLeft = i === 0 ? barStyle : "1px solid var(--border, #ccc)";
 
                 cell.onmouseover = event => {
-                    if (event.target.style.backgroundColor !== "black") {
-                        event.target.style.backgroundColor = this.platformColor.selectorSelected;
+                    if (!event.target.classList.contains("pm-black-cell")) {
+                        event.target.classList.add("pm-selector-selected");
                     }
                 };
 
                 cell.onmouseout = event => {
-                    if (event.target.style.backgroundColor !== "black") {
-                        event.target.style.backgroundColor = event.target.getAttribute("cellColor");
+                    if (!event.target.classList.contains("pm-black-cell")) {
+                        event.target.classList.remove("pm-selector-selected");
                     }
                 };
             }
@@ -3175,7 +3138,7 @@ class PhraseMaker {
         cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
         cell.style.textAlign = "center";
         cell.textContent = tupletValue;
-        cell.style.backgroundColor = this.platformColor.tupletBackground;
+        cell.classList.add("pm-tuplet-bg");
         cell.style.borderLeft = barStyle;
 
         // And a span in the note value column too.
@@ -3205,7 +3168,7 @@ class PhraseMaker {
                 if (k < parts.length - 1) cell.appendChild(document.createElement("br"));
             }
         }
-        cell.style.backgroundColor = this.platformColor.rhythmcellcolor;
+        cell.classList.add("pm-rhythm-cell");
         cell.style.borderLeft = barStyle;
         this._matrixHasTuplets = true;
 
@@ -3256,7 +3219,9 @@ class PhraseMaker {
             const isBarLine =
                 this._currentMusicalTime < 0.001 && (j > 0 || this._notesToPlay.length > numBeats);
 
-            const barStyle = isBarLine ? "3px solid #555" : "1px solid #ccc";
+            const barStyle = isBarLine
+                ? "3px solid var(--bar-line, #555)"
+                : "1px solid var(--border, #ccc)";
 
             for (let i = 0; i < rowCount; i++) {
                 // Depending on the row, we choose a different background color.
@@ -3264,13 +3229,13 @@ class PhraseMaker {
                     PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1 ||
                     PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1
                 ) {
-                    cellColor = this.platformColor.graphicsBackground;
+                    cellColor = "pm-graphics-bg";
                 } else {
                     drumName = this._deps.getDrumName(this.rowLabels[i]);
                     if (drumName === null) {
-                        cellColor = this.platformColor.pitchBackground;
+                        cellColor = "pm-pitch-bg";
                     } else {
-                        cellColor = this.platformColor.drumBackground;
+                        cellColor = "pm-drum-bg";
                     }
                 }
 
@@ -3284,20 +3249,20 @@ class PhraseMaker {
                 cell.style.width = this._noteWidth(noteValue) + "px";
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
-                cell.style.backgroundColor = cellColor;
+                cell.classList.add(cellColor);
                 cell.style.borderLeft = barStyle;
                 // Using the alt attribute to store the note value
                 cell.setAttribute("alt", 1 / noteValue);
 
                 cell.addEventListener("mouseover", event => {
-                    if (event.target.style.backgroundColor !== "black") {
-                        event.target.style.backgroundColor = this.platformColor.selectorSelected;
+                    if (!event.target.classList.contains("pm-black-cell")) {
+                        event.target.classList.add("pm-selector-selected");
                     }
                 });
 
                 cell.addEventListener("mouseout", event => {
-                    if (event.target.style.backgroundColor !== "black") {
-                        event.target.style.backgroundColor = event.target.getAttribute("cellColor");
+                    if (!event.target.classList.contains("pm-black-cell")) {
+                        event.target.classList.remove("pm-selector-selected");
                     }
                 });
             }
@@ -3328,8 +3293,8 @@ class PhraseMaker {
                     if (k < parts.length - 1) cell.appendChild(document.createElement("br"));
                 }
             }
-            cell.style.backgroundColor = this.platformColor.rhythmcellcolor;
-            cell.style.color = this.platformColor.textColor;
+            cell.classList.add("pm-rhythm-cell");
+
             cell.setAttribute("alt", noteValue);
             cell.style.borderLeft = barStyle;
 
@@ -3343,7 +3308,7 @@ class PhraseMaker {
                 cell.style.maxWidth = cell.style.width;
                 cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
-                cell.style.backgroundColor = this.platformColor.tupletBackground;
+                cell.classList.add("pm-tuplet-bg");
                 cell.style.borderLeft = barStyle;
 
                 row = this._tupletValueRow;
@@ -3353,7 +3318,7 @@ class PhraseMaker {
                 cell.style.maxWidth = cell.style.width;
                 cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
-                cell.style.backgroundColor = this.platformColor.tupletBackground;
+                cell.classList.add("pm-tuplet-bg");
                 cell.style.borderLeft = barStyle;
             }
 
@@ -3635,9 +3600,9 @@ class PhraseMaker {
             this._blockMapHelper.push([this._colBlocks[i], [i]]);
         }
         for (let i = noteToDivide + 1; i < this.activity.logo.tupletRhythms.length; i++) {
-            this._blockMapHelper.push([this._colBlocks[i], [i + parseInt(notesToAdd, 10)]]);
+            this._blockMapHelper.push([this._colBlocks[i], [i + parseInt(notesToAdd)]]);
         }
-        for (let i = 0; i < parseInt(notesToAdd, 10); i++) {
+        for (let i = 0; i < parseInt(notesToAdd); i++) {
             this.activity.logo.tupletRhythms = this.activity.logo.tupletRhythms
                 .slice(0, noteToDivide + i + 1)
                 .concat(this.activity.logo.tupletRhythms.slice(noteToDivide + i));
@@ -3656,7 +3621,7 @@ class PhraseMaker {
         if (this.activity.logo.tupletRhythms.length === 1) {
             return;
         }
-        noteToDivide = parseInt(noteToDivide, 10);
+        noteToDivide = parseInt(noteToDivide);
         this._blockMapHelper = [];
         for (let i = 0; i < noteToDivide; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [i]]);
@@ -3679,7 +3644,7 @@ class PhraseMaker {
      * @private
      */
     _divideNotes(noteToDivide, divideNoteBy) {
-        noteToDivide = parseInt(noteToDivide, 10);
+        noteToDivide = parseInt(noteToDivide);
         this._blockMapHelper = [];
         for (let i = 0; i < noteToDivide; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [i]]);
@@ -3742,7 +3707,7 @@ class PhraseMaker {
             this._blockMapHelper.push([this._colBlocks[i], [j]]);
         }
         j++;
-        for (let i = parseInt(upCellId, 10) + 1; i < this.activity.logo.tupletRhythms.length; i++) {
+        for (let i = parseInt(upCellId) + 1; i < this.activity.logo.tupletRhythms.length; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [j]]);
             j++;
         }
@@ -3761,7 +3726,7 @@ class PhraseMaker {
                     1 / newNote
                 ]
             ])
-            .concat(this.activity.logo.tupletRhythms.slice(parseInt(upCellId, 10) + 1));
+            .concat(this.activity.logo.tupletRhythms.slice(parseInt(upCellId) + 1));
 
         this._readjustNotesBlocks();
         this._syncMarkedBlocks();
@@ -3796,9 +3761,9 @@ class PhraseMaker {
      * @private
      */
     _updateTupletValue(noteToDivide, oldTupletValue, newTupletValue) {
-        noteToDivide = parseInt(noteToDivide, 10);
-        oldTupletValue = parseInt(oldTupletValue, 10);
-        newTupletValue = parseInt(newTupletValue, 10);
+        noteToDivide = parseInt(noteToDivide);
+        oldTupletValue = parseInt(oldTupletValue);
+        newTupletValue = parseInt(newTupletValue);
         this._blockMapHelper = [];
 
         let k = 0;
@@ -3889,7 +3854,6 @@ class PhraseMaker {
      * @private
      */
     _createpiesubmenu(noteToDivide, tupletValue, condition) {
-        this.docById("wheelDivptm").textContent = "";
         this.docById("wheelDivptm").style.display = "";
 
         this._menuWheel = new this.wheelnav("wheelDivptm", null, 800, 800);
@@ -3911,14 +3875,20 @@ class PhraseMaker {
         this.wheelnav.cssMode = true;
         this._menuWheel.keynavigateEnabled = false;
         this._menuWheel.clickModeRotate = false;
-        this._menuWheel.colors = this.platformColor.pitchWheelcolors;
+        this._menuWheel.colors = [
+            "var(--color-pitch-wheel-1, #81c784)",
+            "var(--color-pitch-wheel-2, #aed581)"
+        ];
         this._menuWheel.slicePathFunction = this.slicePath().DonutSlice;
         this._menuWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
         this._menuWheel.sliceSelectedPathCustom = this._menuWheel.slicePathCustom;
         this._menuWheel.sliceInitPathCustom = this._menuWheel.slicePathCustom;
         this._menuWheel.animatetime = 0; // 300;
 
-        this._exitWheel.colors = this.platformColor.exitWheelcolors;
+        this._exitWheel.colors = [
+            "var(--color-exit-primary, #e57373)",
+            "var(--color-exit-secondary, #ef5350)"
+        ];
         this._exitWheel.keynavigateEnabled = false;
         this._exitWheel.clickModeRotate = false;
         this._exitWheel.slicePathFunction = this.slicePath().DonutSlice;
@@ -3972,7 +3942,10 @@ class PhraseMaker {
             this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
             this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
 
-            this._tabsWheel.colors = this.platformColor.pitchWheelcolors;
+            this._tabsWheel.colors = [
+                "var(--color-pitch-wheel-1, #81c784)",
+                "var(--color-pitch-wheel-2, #aed581)"
+            ];
             this._tabsWheel.slicePathFunction = this.slicePath().DonutSlice;
             this._tabsWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
             this._tabsWheel.slicePathCustom.minRadiusPercent = 0.7;
@@ -3989,7 +3962,6 @@ class PhraseMaker {
 
         this._menuWheel.createWheel(mainTabsLabels);
         this._exitWheel.createWheel(exitTabLabel);
-        this._configureExitWheel(this._exitWheel);
 
         let x = 0,
             y = 0;
@@ -4016,14 +3988,7 @@ class PhraseMaker {
             this.docById("wheelDivptm").style.display = "none";
             this._menuWheel.removeWheel();
             this._exitWheel.removeWheel();
-            if (this._tabsWheel) {
-                this._tabsWheel.removeWheel();
-            }
         };
-        if (this._exitWheel.navItems.length > 1) {
-            this._exitWheel.navItems[1].navigateFunction =
-                this._exitWheel.navItems[0].navigateFunction;
-        }
 
         if (condition === "tupletvalue") {
             const __enterValue = () => {
@@ -4038,7 +4003,7 @@ class PhraseMaker {
 
             this._menuWheel.navItems[3].navigateFunction = () => {
                 if (this.newNoteValue > 1) {
-                    this.newNoteValue = String(parseInt(this.newNoteValue, 10) - 1);
+                    this.newNoteValue = String(parseInt(this.newNoteValue) - 1);
                     this.docById("wheelnav-_exitWheel-title-1").children[0].textContent =
                         this.newNoteValue;
                     this._updateTupletValue(this, noteToDivide, tupletValue, this.newNoteValue);
@@ -4046,7 +4011,7 @@ class PhraseMaker {
             };
 
             this._menuWheel.navItems[9].navigateFunction = () => {
-                this.newNoteValue = String(parseInt(this.newNoteValue, 10) + 1);
+                this.newNoteValue = String(parseInt(this.newNoteValue) + 1);
                 this.docById("wheelnav-_exitWheel-title-1").children[0].textContent =
                     this.newNoteValue;
                 this._updateTupletValue(noteToDivide, tupletValue, this.newNoteValue);
@@ -4101,7 +4066,7 @@ class PhraseMaker {
                     const word = this.newNoteValue.split("/");
                     this._updateTuplet(
                         noteToDivide,
-                        parseInt(word[1], 10) / parseInt(word[0], 10),
+                        parseInt(word[1]) / parseInt(word[0]),
                         condition
                     );
                 }
@@ -4195,10 +4160,26 @@ class PhraseMaker {
 
             if (cellTuplet !== undefined) {
                 if (this.activity.logo.tupletRhythms[0][0] === "notes") {
+                    cell.setAttribute("role", "button");
+                    cell.setAttribute("tabindex", "0");
+                    cell.onkeydown = e => {
+                        if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            cell.click();
+                        }
+                    };
                     cell.onclick = event => {
                         this._createpiesubmenu(event.target.getAttribute("id"), null, "tupletnote");
                     };
                 } else {
+                    cell.setAttribute("role", "button");
+                    cell.setAttribute("tabindex", "0");
+                    cell.onkeydown = e => {
+                        if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            cell.click();
+                        }
+                    };
                     cell.onclick = event => {
                         this._createpiesubmenu(
                             event.target.getAttribute("id"),
@@ -4207,6 +4188,14 @@ class PhraseMaker {
                         );
                     };
 
+                    cellTuplet.setAttribute("role", "button");
+                    cellTuplet.setAttribute("tabindex", "0");
+                    cellTuplet.onkeydown = e => {
+                        if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            cellTuplet.click();
+                        }
+                    };
                     cellTuplet.onclick = event => {
                         this._createpiesubmenu(
                             event.target.getAttribute("id"),
@@ -4237,8 +4226,9 @@ class PhraseMaker {
             row = this._rows[i];
             for (let j = 0; j < row.cells.length; j++) {
                 cell = row.cells[j];
-                if (cell.style.backgroundColor === "black") {
-                    cell.style.backgroundColor = cell.getAttribute("cellColor");
+                if (cell.classList.contains("pm-black-cell")) {
+                    cell.classList.remove("pm-black-cell");
+                    cell.classList.add(cell.getAttribute("cellColor"));
                     this._setNotes(j, i, false);
                 }
             }
@@ -4260,12 +4250,14 @@ class PhraseMaker {
                     isMouseDown = true;
                     const i = Number(evt.target.getAttribute("data-i"));
                     const j = Number(evt.target.getAttribute("data-j"));
-                    if (evt.target.style.backgroundColor === "black") {
-                        evt.target.style.backgroundColor = evt.target.getAttribute("cellColor");
+                    if (evt.target.classList.contains("pm-black-cell")) {
+                        evt.target.classList.remove("pm-black-cell");
+                        evt.target.classList.add(evt.target.getAttribute("cellColor"));
                         this._notesToPlay[j][0] = ["R"];
                         if (!this._noteBlocks) this._setNotes(j, i, false);
                     } else {
-                        evt.target.style.backgroundColor = "black";
+                        evt.target.classList.add("pm-black-cell");
+                        evt.target.classList.remove("pm-graphics-bg", "pm-pitch-bg", "pm-drum-bg");
                         if (!this._noteBlocks) this._setNotes(j, i, true);
                     }
                 };
@@ -4274,12 +4266,18 @@ class PhraseMaker {
                     const i = Number(evt.target.getAttribute("data-i"));
                     const j = Number(evt.target.getAttribute("data-j"));
                     if (isMouseDown) {
-                        if (evt.target.style.backgroundColor === "black") {
-                            evt.target.style.backgroundColor = evt.target.getAttribute("cellColor");
+                        if (evt.target.classList.contains("pm-black-cell")) {
+                            evt.target.classList.remove("pm-black-cell");
+                            evt.target.classList.add(evt.target.getAttribute("cellColor"));
                             this._notesToPlay[j][0] = ["R"];
                             if (!this._noteBlocks) this._setNotes(j, i, false);
                         } else {
-                            evt.target.style.backgroundColor = "black";
+                            evt.target.classList.add("pm-black-cell");
+                            evt.target.classList.remove(
+                                "pm-graphics-bg",
+                                "pm-pitch-bg",
+                                "pm-drum-bg"
+                            );
                             if (!this._noteBlocks) this._setNotes(j, i, true);
                         }
                     }
@@ -4305,7 +4303,8 @@ class PhraseMaker {
                 for (let j = 0; j < this._markedColsInRow[ii].length; j++) {
                     c = this._markedColsInRow[ii][j];
                     cell = row.cells[c];
-                    cell.style.backgroundColor = "black";
+                    cell.classList.add("pm-black-cell");
+                    cell.classList.remove("pm-graphics-bg", "pm-pitch-bg", "pm-drum-bg");
                     this._setNoteCell(r, c, cell, false, null);
                 }
             }
@@ -4371,7 +4370,8 @@ class PhraseMaker {
                     if (row !== null && typeof row !== "undefined") {
                         cell = row.cells[c];
                         if (cell !== undefined) {
-                            cell.style.backgroundColor = "black";
+                            cell.classList.add("pm-black-cell");
+                            cell.classList.remove("pm-graphics-bg", "pm-pitch-bg", "pm-drum-bg");
                             this._setNoteCell(r, c, cell, false, null);
                         }
                     }
@@ -4459,7 +4459,7 @@ class PhraseMaker {
         for (let j = 0; j < this.rowLabels.length; j++) {
             row = this._rows[j];
             cell = row.cells[colIndex];
-            if (cell.style.backgroundColor === "black") {
+            if (cell.classList.contains("pm-black-cell")) {
                 this._setNoteCell(j, colIndex, cell, playNote);
             }
         }
@@ -4562,8 +4562,9 @@ class PhraseMaker {
             row = this._rows[i];
             for (let j = 0; j < row.cells.length; j++) {
                 cell = row.cells[j];
-                if (cell.style.backgroundColor === "black") {
-                    cell.style.backgroundColor = cell.getAttribute("cellColor");
+                if (cell.classList.contains("pm-black-cell")) {
+                    cell.classList.remove("pm-black-cell");
+                    cell.classList.add(cell.getAttribute("cellColor"));
                     this._notesToPlay[j][0] = ["R"];
                     this._setNotes(j, i, false);
                 }
@@ -4620,7 +4621,7 @@ class PhraseMaker {
             // which case we output 1 / (3 x 4) instead of 1 / 12.
             if (
                 this._outputAsTuplet[i][0] !== 1 &&
-                parseInt(this._outputAsTuplet[i][1], 10) === this._outputAsTuplet[i][1]
+                parseInt(this._outputAsTuplet[i][1]) === this._outputAsTuplet[i][1]
             ) {
                 // We don't reformat dotted tuplets since they are too complicated.
                 // We are adding 6 blocks: vspace, divide, number, multiply, number, number
@@ -4658,7 +4659,7 @@ class PhraseMaker {
                 // note value is saved as a fraction
                 newStack.push([idx + 2, "divide", 0, 0, [idx, idx + 3, idx + 4]]);
 
-                if (parseInt(note[1], 10) < note[1]) {
+                if (parseInt(note[1]) < note[1]) {
                     // dotted note
                     obj = this._deps.toFraction(note[1]);
                     newStack.push([idx + 3, ["number", { value: obj[1] }], 0, 0, [idx + 2]]);
@@ -4702,7 +4703,7 @@ class PhraseMaker {
                         }
                     }
 
-                    if (!isNaN(parseInt(note[0][j], 10))) {
+                    if (!isNaN(parseInt(note[0][j]))) {
                         obj = null;
                         drumName = null;
                     } else {
@@ -4728,7 +4729,7 @@ class PhraseMaker {
                         ]);
                         newStack.push([
                             thisBlock + 1,
-                            ["number", { value: parseInt(note[0][j], 10) }],
+                            ["number", { value: parseInt(note[0][j]) }],
                             0,
                             0,
                             [thisBlock]
