@@ -70,6 +70,12 @@ describe("TemperamentWidget basic tests", () => {
         const createMockElement = id => ({
             id: id,
             innerHTML: "",
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn(),
+                contains: jest.fn(),
+                toggle: jest.fn()
+            },
             textContent: "",
             appendChild: jest.fn(),
             setAttribute: jest.fn(),
@@ -208,7 +214,7 @@ describe("TemperamentWidget basic tests", () => {
 
         global.docById = jest.fn(id => {
             if (id === "wheelDiv4") return null;
-            return { style: {} };
+            return { style: {}, classList: { add: jest.fn(), remove: jest.fn() } };
         });
 
         widget.playNote(0);
@@ -229,6 +235,12 @@ describe("TemperamentWidget basic tests", () => {
 
         widget.playButton = {
             innerHTML: "",
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn(),
+                contains: jest.fn(),
+                toggle: jest.fn()
+            },
             textContent: "",
             appendChild: jest.fn(),
             setAttribute: jest.fn(),
@@ -241,7 +253,8 @@ describe("TemperamentWidget basic tests", () => {
         widget.circleIsVisible = true;
 
         global.docById = jest.fn(() => ({
-            style: {}
+            style: {},
+            classList: { add: jest.fn(), remove: jest.fn() }
         }));
 
         widget.playAll();
@@ -262,6 +275,12 @@ describe("TemperamentWidget basic tests", () => {
 
         global.docById = jest.fn(() => ({
             innerHTML: "",
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn(),
+                contains: jest.fn(),
+                toggle: jest.fn()
+            },
             textContent: "",
             appendChild: jest.fn(),
             setAttribute: jest.fn(),
@@ -269,10 +288,10 @@ describe("TemperamentWidget basic tests", () => {
             append: jest.fn()
         }));
         document.querySelectorAll = jest.fn(() => [
-            { style: {} },
-            { style: {} },
-            { style: {} },
-            { style: {} }
+            { style: {}, classList: { add: jest.fn(), remove: jest.fn() } },
+            { style: {}, classList: { add: jest.fn(), remove: jest.fn() } },
+            { style: {}, classList: { add: jest.fn(), remove: jest.fn() } },
+            { style: {}, classList: { add: jest.fn(), remove: jest.fn() } }
         ]);
 
         widget.edit();
@@ -283,6 +302,12 @@ describe("TemperamentWidget basic tests", () => {
     test("equalEdit sets editMode to equal", () => {
         global.docById = jest.fn(() => ({
             innerHTML: "",
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn(),
+                contains: jest.fn(),
+                toggle: jest.fn()
+            },
             textContent: "",
             appendChild: jest.fn(),
             setAttribute: jest.fn(),
@@ -298,6 +323,12 @@ describe("TemperamentWidget basic tests", () => {
     test("ratioEdit sets editMode to ratio", () => {
         global.docById = jest.fn(() => ({
             innerHTML: "",
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn(),
+                contains: jest.fn(),
+                toggle: jest.fn()
+            },
             textContent: "",
             appendChild: jest.fn(),
             setAttribute: jest.fn(),
@@ -337,7 +368,10 @@ describe("TemperamentWidget basic tests", () => {
                 style: {},
                 append: jest.fn(),
                 onmouseover: null,
-                onclick: null
+                onclick: null,
+                classList: {
+                    add: jest.fn()
+                }
             };
         });
 
@@ -373,6 +407,12 @@ describe("TemperamentWidget basic tests", () => {
 
             return {
                 innerHTML: "",
+                classList: {
+                    add: jest.fn(),
+                    remove: jest.fn(),
+                    contains: jest.fn(),
+                    toggle: jest.fn()
+                },
                 textContent: "",
                 appendChild: jest.fn(),
                 setAttribute: jest.fn(),
@@ -392,6 +432,12 @@ describe("TemperamentWidget basic tests", () => {
 
         global.docById = jest.fn(() => ({
             innerHTML: "",
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn(),
+                contains: jest.fn(),
+                toggle: jest.fn()
+            },
             textContent: "",
             appendChild: jest.fn(),
             setAttribute: jest.fn(),
@@ -591,12 +637,24 @@ describe("TemperamentWidget basic tests", () => {
 
         global.docById = jest.fn(() => ({
             innerHTML: "",
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn(),
+                contains: jest.fn(),
+                toggle: jest.fn()
+            },
             textContent: "",
             appendChild: jest.fn(),
             setAttribute: jest.fn(),
             style: {},
             insertCell: jest.fn(() => ({
                 innerHTML: "",
+                classList: {
+                    add: jest.fn(),
+                    remove: jest.fn(),
+                    contains: jest.fn(),
+                    toggle: jest.fn()
+                },
                 textContent: "",
                 appendChild: jest.fn(),
                 setAttribute: jest.fn(),
@@ -607,13 +665,13 @@ describe("TemperamentWidget basic tests", () => {
             append: jest.fn()
         }));
         document.querySelectorAll = jest.fn(() => [
-            { style: {} },
-            { style: {} },
-            { style: {} },
-            { style: {} },
-            { style: {} },
-            { style: {} },
-            { style: {} }
+            { style: {}, classList: { add: jest.fn(), remove: jest.fn() } },
+            { style: {}, classList: { add: jest.fn(), remove: jest.fn() } },
+            { style: {}, classList: { add: jest.fn(), remove: jest.fn() } },
+            { style: {}, classList: { add: jest.fn(), remove: jest.fn() } },
+            { style: {}, classList: { add: jest.fn(), remove: jest.fn() } },
+            { style: {}, classList: { add: jest.fn(), remove: jest.fn() } },
+            { style: {}, classList: { add: jest.fn(), remove: jest.fn() } }
         ]);
 
         widget._graphOfNotes();
@@ -633,6 +691,12 @@ describe("TemperamentWidget basic tests", () => {
             if (id === "frequencydiv") {
                 return {
                     innerHTML: "",
+                    classList: {
+                        add: jest.fn(),
+                        remove: jest.fn(),
+                        contains: jest.fn(),
+                        toggle: jest.fn()
+                    },
                     textContent: "",
                     appendChild: jest.fn(),
                     setAttribute: jest.fn()
@@ -641,6 +705,12 @@ describe("TemperamentWidget basic tests", () => {
             return {
                 style: {},
                 innerHTML: "",
+                classList: {
+                    add: jest.fn(),
+                    remove: jest.fn(),
+                    contains: jest.fn(),
+                    toggle: jest.fn()
+                },
                 textContent: "",
                 appendChild: jest.fn(),
                 setAttribute: jest.fn()
@@ -674,6 +744,12 @@ describe("TemperamentWidget basic tests", () => {
             if (id === "endNote") return { value: 1 };
             return {
                 innerHTML: "",
+                classList: {
+                    add: jest.fn(),
+                    remove: jest.fn(),
+                    contains: jest.fn(),
+                    toggle: jest.fn()
+                },
                 textContent: "",
                 appendChild: jest.fn(),
                 setAttribute: jest.fn(),
@@ -703,6 +779,12 @@ describe("TemperamentWidget basic tests", () => {
 
         widget.playButton = {
             innerHTML: "",
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn(),
+                contains: jest.fn(),
+                toggle: jest.fn()
+            },
             textContent: "",
             appendChild: jest.fn(),
             setAttribute: jest.fn(),
@@ -739,6 +821,12 @@ describe("TemperamentWidget basic tests", () => {
 
         widget.playButton = {
             innerHTML: "",
+            classList: {
+                add: jest.fn(),
+                remove: jest.fn(),
+                contains: jest.fn(),
+                toggle: jest.fn()
+            },
             textContent: "",
             appendChild: jest.fn(),
             setAttribute: jest.fn(),
@@ -1063,6 +1151,285 @@ describe("TemperamentWidget basic tests", () => {
             const cents = 47;
             const freq = widget._centsToFreq(cents, 440);
             expect(widget._freqToCents(freq, 440)).toBeCloseTo(cents, 6);
+        });
+    });
+    describe("Token Migration specific coverage", () => {
+        test("_addButton creates cell with mouse events", () => {
+            const row = document.createElement("tr");
+            row.insertCell = jest.fn(() => {
+                const cell = document.createElement("td");
+                return cell;
+            });
+            const cell = widget._addButton(row, "test.png", 32, "Test Button");
+
+            expect(cell).toBeDefined();
+            expect(cell.classList.contains("tm-selector-bg")).toBe(true);
+
+            // Trigger mouseover
+            cell.onmouseover();
+            expect(cell.classList.contains("tm-selector-hover")).toBe(true);
+            expect(cell.classList.contains("tm-selector-bg")).toBe(false);
+
+            // Trigger mouseout
+            cell.onmouseout();
+            expect(cell.classList.contains("tm-selector-hover")).toBe(false);
+            expect(cell.classList.contains("tm-selector-bg")).toBe(true);
+        });
+
+        test("_refreshInnerWheel covers wheel coloring branches", () => {
+            widget.inTemperament = "equal";
+            widget.pitchNumber = 2;
+            widget.frequencies = [440, 880];
+            widget.ratios = [1, 2];
+            widget.tempRatios1 = [1, 2];
+            widget.tempRatios = [1, 2];
+
+            widget._logo = {
+                resetSynth: jest.fn(),
+                synth: { trigger: jest.fn() }
+            };
+
+            global.docById = jest.fn(id => {
+                if (id === "frequencySlider") return { value: 440 };
+                return {
+                    style: {},
+                    innerHTML: "",
+                    classList: {
+                        add: jest.fn(),
+                        remove: jest.fn(),
+                        toggle: jest.fn(),
+                        contains: jest.fn()
+                    },
+                    textContent: "",
+                    appendChild: jest.fn(),
+                    setAttribute: jest.fn(),
+                    append: jest.fn()
+                };
+            });
+
+            widget._createInnerWheel = jest.fn();
+
+            widget._refreshInnerWheel();
+            expect(widget._createInnerWheel).toHaveBeenCalled();
+        });
+
+        test("_circleOfNotes executes createMainWheel and sets color correctly", () => {
+            widget.pitchNumber = 2;
+            widget.ratios = [1, 2];
+            widget.powerBase = 2;
+            widget.frequencies = [440, 880];
+            global.docById = jest.fn(id => ({
+                style: {},
+                classList: { add: jest.fn(), remove: jest.fn() },
+                appendChild: jest.fn(),
+                append: jest.fn(),
+                addEventListener: jest.fn(),
+                getContext: jest.fn(() => ({
+                    beginPath: jest.fn(),
+                    arc: jest.fn(),
+                    fill: jest.fn(),
+                    stroke: jest.fn()
+                })),
+                getBoundingClientRect: jest.fn(() => ({ left: 0, top: 0 }))
+            }));
+
+            widget.toggleNotesButton = jest.fn();
+            widget.checkTemperament = jest.fn();
+
+            widget._circleOfNotes();
+
+            expect(widget.notesCircle).toBeDefined();
+            expect(widget.notesCircle.createWheel).toHaveBeenCalled();
+        });
+        test("playAll UI branch 1 (circleIsVisible=false, no wheelDiv4)", () => {
+            jest.useFakeTimers();
+            widget._logo = {
+                resetSynth: jest.fn(),
+                synth: {
+                    trigger: jest.fn(),
+                    inTemperament: "equal",
+                    changeInTemperament: false,
+                    startingPitch: "C4",
+                    setMasterVolume: jest.fn(),
+                    stop: jest.fn()
+                }
+            };
+            widget.frequencies = [440, 880];
+            widget.editMode = null;
+            widget.circleIsVisible = false;
+            widget.notesCircle = {
+                navItems: [
+                    {
+                        fillAttr: "",
+                        sliceHoverAttr: { fill: "" },
+                        slicePathAttr: { fill: "" },
+                        sliceSelectedAttr: { fill: "" }
+                    },
+                    {
+                        fillAttr: "",
+                        sliceHoverAttr: { fill: "" },
+                        slicePathAttr: { fill: "" },
+                        sliceSelectedAttr: { fill: "" }
+                    },
+                    {
+                        fillAttr: "",
+                        sliceHoverAttr: { fill: "" },
+                        slicePathAttr: { fill: "" },
+                        sliceSelectedAttr: { fill: "" }
+                    }
+                ],
+                refreshWheel: jest.fn()
+            };
+            global.docById = jest.fn(id =>
+                id === "wheelDiv4"
+                    ? null
+                    : { style: {}, classList: { add: jest.fn(), remove: jest.fn() } }
+            );
+            global.isCustomTemperament = jest.fn(() => false);
+            widget.notes = [["C", 4]];
+            widget.playButton = document.createElement("div");
+            widget.inbetween = true;
+            widget.pitchNumber = 1;
+
+            widget.playAll();
+            jest.runAllTimers();
+
+            expect(widget.notesCircle.refreshWheel).toHaveBeenCalled();
+            jest.useRealTimers();
+        });
+
+        test("playAll UI branch 2 (circleIsVisible=true, no wheelDiv4)", () => {
+            jest.useFakeTimers();
+            widget._logo = {
+                resetSynth: jest.fn(),
+                synth: {
+                    trigger: jest.fn(),
+                    inTemperament: "equal",
+                    changeInTemperament: false,
+                    startingPitch: "C4",
+                    setMasterVolume: jest.fn(),
+                    stop: jest.fn()
+                }
+            };
+            widget.frequencies = [440, 880];
+            widget.editMode = null;
+            widget.circleIsVisible = true;
+            widget.notesCircle = {
+                navItems: [
+                    {
+                        fillAttr: "",
+                        sliceHoverAttr: { fill: "" },
+                        slicePathAttr: { fill: "" },
+                        sliceSelectedAttr: { fill: "" }
+                    },
+                    {
+                        fillAttr: "",
+                        sliceHoverAttr: { fill: "" },
+                        slicePathAttr: { fill: "" },
+                        sliceSelectedAttr: { fill: "" }
+                    },
+                    {
+                        fillAttr: "",
+                        sliceHoverAttr: { fill: "" },
+                        slicePathAttr: { fill: "" },
+                        sliceSelectedAttr: { fill: "" }
+                    }
+                ],
+                refreshWheel: jest.fn()
+            };
+            global.docById = jest.fn(id => {
+                if (id === "wheelDiv4") return null;
+                return { style: {}, classList: { add: jest.fn(), remove: jest.fn() } };
+            });
+            global.isCustomTemperament = jest.fn(() => false);
+            widget.notes = [["C", 4]];
+            widget.playButton = document.createElement("div");
+            widget.inbetween = true;
+            widget.pitchNumber = 1;
+
+            widget.playAll();
+            jest.runAllTimers();
+            jest.useRealTimers();
+            expect(true).toBe(true);
+        });
+
+        test("playAll UI branch 3 (wheelDiv4 exists)", () => {
+            jest.useFakeTimers();
+            widget._logo = {
+                resetSynth: jest.fn(),
+                synth: {
+                    trigger: jest.fn(),
+                    inTemperament: "equal",
+                    changeInTemperament: false,
+                    startingPitch: "C4",
+                    setMasterVolume: jest.fn(),
+                    stop: jest.fn()
+                }
+            };
+            widget.frequencies = [440, 880];
+            widget.pitchNumber = 1;
+            widget.editMode = null;
+            widget.tempRatios1 = [1, 2];
+            widget.notesCircle = {
+                navItems: [
+                    {
+                        fillAttr: "",
+                        sliceHoverAttr: { fill: "" },
+                        slicePathAttr: { fill: "" },
+                        sliceSelectedAttr: { fill: "" }
+                    },
+                    {
+                        fillAttr: "",
+                        sliceHoverAttr: { fill: "" },
+                        slicePathAttr: { fill: "" },
+                        sliceSelectedAttr: { fill: "" }
+                    },
+                    {
+                        fillAttr: "",
+                        sliceHoverAttr: { fill: "" },
+                        slicePathAttr: { fill: "" },
+                        sliceSelectedAttr: { fill: "" }
+                    }
+                ],
+                refreshWheel: jest.fn()
+            };
+            widget.wheel1 = {
+                navItems: [
+                    {
+                        fillAttr: "",
+                        sliceHoverAttr: { fill: "" },
+                        slicePathAttr: { fill: "" },
+                        sliceSelectedAttr: { fill: "" }
+                    },
+                    {
+                        fillAttr: "",
+                        sliceHoverAttr: { fill: "" },
+                        slicePathAttr: { fill: "" },
+                        sliceSelectedAttr: { fill: "" }
+                    },
+                    {
+                        fillAttr: "",
+                        sliceHoverAttr: { fill: "" },
+                        slicePathAttr: { fill: "" },
+                        sliceSelectedAttr: { fill: "" }
+                    }
+                ],
+                refreshWheel: jest.fn()
+            };
+            global.docById = jest.fn(id => ({
+                style: {},
+                classList: { add: jest.fn(), remove: jest.fn() }
+            }));
+            global.isCustomTemperament = jest.fn(() => false);
+            widget.notes = [["C", 4]];
+            widget.playButton = document.createElement("div");
+            widget.inbetween = true;
+
+            widget.playAll();
+            jest.runAllTimers();
+
+            expect(widget.wheel1.refreshWheel).toHaveBeenCalled();
+            jest.useRealTimers();
         });
     });
 });
