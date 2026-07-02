@@ -5776,8 +5776,8 @@ class Activity {
             this._setupBlocksContainerEvents();
 
             this.trashcan = new Trashcan(this);
-            this.turtles = new Turtles(this);
             setupGridController(this);
+            this.turtles = new Turtles(this);
             setupGridRenderer(this);
             this.boundary = new Boundary(this.blocksContainer);
             this.blocks = new Blocks(this);
