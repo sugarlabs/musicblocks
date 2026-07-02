@@ -391,6 +391,23 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
         global.SOLFEGENAMES = originalSolfegeNames;
     });
 
+    test("wheel events on keyboardDiv and keyTable stop propagation", () => {
+        const keyboard = new MusicKeyboard(mockActivity);
+        keyboard.init();
+
+        const wheelEvent = new Event("wheel", { bubbles: true });
+        wheelEvent.stopPropagation = jest.fn();
+
+        keyboard.keyboardDiv.dispatchEvent(wheelEvent);
+        expect(wheelEvent.stopPropagation).toHaveBeenCalled();
+
+        const domMouseScrollEvent = new Event("DOMMouseScroll", { bubbles: true });
+        domMouseScrollEvent.stopPropagation = jest.fn();
+
+        keyboard.keyTable.dispatchEvent(domMouseScrollEvent);
+        expect(domMouseScrollEvent.stopPropagation).toHaveBeenCalled();
+    });
+
     test("onclose stops sequence playback, releases active key, and stops all voices", () => {
         const keyboard = new MusicKeyboard(mockActivity);
         keyboard._keysLayout = jest.fn().mockReturnValue([]);
