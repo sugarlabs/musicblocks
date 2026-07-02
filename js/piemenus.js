@@ -100,6 +100,60 @@ const getPieMenuSize = block => {
     return Math.min(canvas.width, canvas.height);
 };
 
+const getPieMenuWheelDelta = (previousIndex, currentIndex, itemCount) => {
+    const halfSpan = itemCount / 2;
+    const delta = currentIndex - previousIndex;
+
+    if (delta > halfSpan) {
+        return delta - itemCount;
+    } else if (delta < -halfSpan) {
+        return delta + itemCount;
+    }
+
+    return delta;
+};
+
+const getPieMenuWheelOctaveDelta = (previousIndex, currentIndex, itemCount) => {
+    const delta = getPieMenuWheelDelta(previousIndex, currentIndex, itemCount);
+
+    if (previousIndex + delta > itemCount - 1) {
+        return -1;
+    } else if (previousIndex + delta < 0) {
+        return 1;
+    }
+
+    return 0;
+};
+
+const getCustomNoteLabel = (key, value) => {
+    if (typeof value === "number") {
+        return key;
+    } else if (Array.isArray(value) && value.length > 1) {
+        return value[1];
+    }
+
+    return "";
+};
+
+const getCustomNoteLabels = temperament => {
+    return Object.keys(temperament)
+        .filter(key => key !== "pitchNumber" && key !== "interval")
+        .sort((a, b) => Number(b) - Number(a))
+        .map(key => getCustomNoteLabel(key, temperament[key]))
+        .filter(label => label !== "");
+};
+
+const navigateWheelWithoutAction = (wheel, index) => {
+    if (!wheel || !wheel.navItems || !wheel.navItems[index]) {
+        return;
+    }
+
+    const navigateFunction = wheel.navItems[index].navigateFunction;
+    wheel.navItems[index].navigateFunction = null;
+    wheel.navigateWheel(index);
+    wheel.navItems[index].navigateFunction = navigateFunction;
+};
+
 // Debounce resize handler for performance
 let wheelResizeTimeout;
 let wheelResizeListenerAttached = false;
@@ -569,25 +623,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
             const label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             const i = noteLabels.indexOf(label);
 
-            const noteCount = noteLabels.length;
-            const halfSpan = noteCount / 2;
-            const deltaPitch = i - prevPitch;
-            let delta;
-            if (deltaPitch > halfSpan) {
-                delta = deltaPitch - noteCount;
-            } else if (deltaPitch < -halfSpan) {
-                delta = deltaPitch + noteCount;
-            } else {
-                delta = deltaPitch;
-            }
-
-            // If we wrapped across C, we need to adjust the octave.
-            let deltaOctave = 0;
-            if (prevPitch + delta > noteCount - 1) {
-                deltaOctave = -1;
-            } else if (prevPitch + delta < 0) {
-                deltaOctave = 1;
-            }
+            const deltaOctave = getPieMenuWheelOctaveDelta(prevPitch, i, noteLabels.length);
             let attr;
             prevPitch = i;
             let note = noteValues[i];
@@ -1028,51 +1064,24 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
         block._octavesWheel.createWheel(octaveLabels);
     }
 
-    //Disable rotation, set navAngle and create the menus
-    block._cusNoteWheel.clickModeRotate = false;
+    // Set navAngle and create the menus.
+    block._cusNoteWheel.clickModeRotate = true;
     block._cusNoteWheel.titleRotateAngle = 180;
     block._cusNoteWheel.animatetime = 0; // 300;
     const labelsDict = {};
     let labels = [];
-    let blockCustom = 0;
     let max = 0;
     for (const t of customLabels) {
         max = max > noteLabels[t]["pitchNumber"] ? max : noteLabels[t]["pitchNumber"];
     }
 
-    // There seems to be two different representations... maybe because
-    // of some legacy projects restoring customTemperamentNotes
     for (const t of customLabels) {
-        labelsDict[t] = [];
-        for (const k in noteLabels[t]) {
-            if (k !== "pitchNumber" && k !== "interval") {
-                if (typeof noteLabels[t][k] === "number") {
-                    // labels.push(k);
-                    labelsDict[t].push(k);
-                    blockCustom++;
-                } else {
-                    if (noteLabels[t][k].length === 3) {
-                        // labels.push(noteLabels[t][k][1]);
-                        labelsDict[t].push(noteLabels[t][k][1]);
-                        blockCustom++;
-                    } else {
-                        for (let ii = 0; ii < noteLabels[t][k].length; ii++) {
-                            // labels.push(noteLabels[t][k][ii][1]);
-                            labelsDict[t].push(noteLabels[t][k][1]);
-                            blockCustom++;
-                        }
-                    }
-                }
-            }
-        }
-        for (let extra = max - blockCustom; extra > 0; extra--) {
-            // labels.push("");
-        }
-        blockCustom = 0;
+        labelsDict[t] = getCustomNoteLabels(noteLabels[t]);
     }
     if (!(selectedCustom in labelsDict)) {
-        selectedCustom = labelsDict[0];
+        selectedCustom = customLabels[0];
     }
+    block.customID = selectedCustom;
     for (let i = 0; i < max; i++) {
         if (i < labelsDict[selectedCustom].length) {
             labels.push(labelsDict[selectedCustom][i]);
@@ -1103,6 +1112,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
     // Avoid auto-selecting the close button on open.
 
     const that = block;
+    let prevPitch = 0;
 
     // position widget
     const x = block.container.x;
@@ -1175,6 +1185,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
                 }
             }
             that._customWheel.refreshWheel();
+            prevPitch = 0;
             that._cusNoteWheel.navigateWheel(0);
         };
     };
@@ -1208,27 +1219,49 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
         }
     }
 
-    if (typeof j === "number" && !isNaN(j)) {
-        block._cusNoteWheel.navigateWheel(max * customLabels.indexOf(selectedCustom) + j);
+    let startingPitchIndex = labels.indexOf(selectedNote);
+    if (startingPitchIndex === -1 && typeof j === "number" && !isNaN(j)) {
+        startingPitchIndex = labelsDict[selectedCustom].length - j - 1;
     }
+    if (startingPitchIndex !== -1) {
+        block._cusNoteWheel.navigateWheel(startingPitchIndex);
+    }
+    prevPitch = block._cusNoteWheel.selectedNavItemIndex;
 
     const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
         hideWheelDiv();
     };
 
-    const __selectionChanged = () => {
+    const __selectionChanged = async () => {
         const label = that._customWheel.navItems[that._customWheel.selectedNavItemIndex].title;
         const note = that._cusNoteWheel.navItems[that._cusNoteWheel.selectedNavItemIndex].title;
+        if (!note) {
+            return;
+        }
+
         that.value = note;
         that.text.text = note;
         let octave = 4;
 
         if (hasOctaveWheel) {
-            // Set the octave of the pitch block if available
+            const selectedPitch = that._cusNoteWheel.selectedNavItemIndex;
+            const deltaOctave = getPieMenuWheelOctaveDelta(prevPitch, selectedPitch, labels.length);
+            prevPitch = selectedPitch;
+
             octave = Number(
                 that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title
             );
+            octave += deltaOctave;
+            if (octave < 1) {
+                octave = 1;
+            } else if (octave > 8) {
+                octave = 8;
+            }
+
+            if (deltaOctave !== 0) {
+                navigateWheelWithoutAction(that._octavesWheel, 8 - octave);
+            }
             that.blocks.setPitchOctave(that.connections[0], octave);
         }
 
@@ -1236,29 +1269,61 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
 
-        const obj = getNote(note, octave, 0, "C major", false, null, that.activity.errorMsg, label);
-        const tur = that.activity.turtles.ithTurtle(0);
-
-        if (!tur.singer.instrumentNames.includes(DEFAULTVOICE)) {
-            that.activity.logo.synth.createDefaultSynth(0);
-            that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
+        try {
+            await Tone.start();
+        } catch (e) {
+            console.debug("Tone.start() skipped or failed", e);
         }
 
-        that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
-        that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+        try {
+            const obj = getNote(
+                note,
+                octave,
+                0,
+                "C major",
+                false,
+                null,
+                that.activity.errorMsg,
+                label
+            );
 
-        if (!that._triggerLock) {
-            that._triggerLock = true;
-            // Get the frequency of the custom note for the preview.
-            const no = that.activity.logo.synth.getCustomFrequency([note + obj[1]], that.customID);
-            if (no !== undefined && no !== "undefined") {
-                instruments[0][DEFAULTVOICE].triggerAttackRelease(no, 1 / 8);
+            if (!that.activity.logo.synth.tone) {
+                that.activity.logo.synth.newTone();
             }
-        }
 
-        setTimeout(() => {
-            that._triggerLock = false;
-        }, 125); // 1/8 second in milliseconds
+            if (!instruments[0] || !instruments[0][DEFAULTVOICE]) {
+                that.activity.logo.synth.createDefaultSynth(0);
+                await that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
+            }
+
+            that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
+            that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+
+            if (!that._triggerLock) {
+                that._triggerLock = true;
+                const frequency = that.activity.logo.synth.getCustomFrequency(
+                    note + obj[1],
+                    that.customID
+                );
+                if (frequency !== undefined && frequency !== "undefined") {
+                    await that.activity.logo.synth.trigger(
+                        0,
+                        frequency,
+                        1 / 8,
+                        DEFAULTVOICE,
+                        null,
+                        null,
+                        false
+                    );
+                }
+            }
+
+            setTimeout(() => {
+                that._triggerLock = false;
+            }, 125); // 1/8 second in milliseconds
+        } catch (e) {
+            console.error("Error in custom pitch preview:", e);
+        }
     };
 
     if (hasOctaveWheel) {
@@ -4535,5 +4600,10 @@ const piemenuDissectNumber = widget => {
 };
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { piemenuPitches };
+    module.exports = {
+        piemenuPitches,
+        piemenuCustomNotes,
+        getPieMenuWheelOctaveDelta,
+        getCustomNoteLabels
+    };
 }

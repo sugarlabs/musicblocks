@@ -1772,7 +1772,10 @@ function Synth() {
 
         if (isCustomTemperament(this.inTemperament)) {
             const notes1 = notes;
-            if (notes.search("[+]") !== -1 || notes.search("[-]") !== -1) {
+            if (
+                typeof notes === "string" &&
+                (notes.search("[+]") !== -1 || notes.search("[-]") !== -1)
+            ) {
                 notes = this.getCustomFrequency(notes, this.inTemperament);
             }
             if (notes === undefined || notes === "undefined") {

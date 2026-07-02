@@ -12,7 +12,12 @@
 const fs = require("fs");
 const path = require("path");
 
-const { piemenuPitches } = require("../piemenus");
+const {
+    piemenuPitches,
+    piemenuCustomNotes,
+    getPieMenuWheelOctaveDelta,
+    getCustomNoteLabels
+} = require("../piemenus");
 
 const piemenusPath = path.join(__dirname, "..", "piemenus.js");
 let piemenusContent;
@@ -33,11 +38,17 @@ global.window = {
     removeEventListener: jest.fn()
 };
 global.wheelnav = jest.fn().mockImplementation(function (div) {
-    const mockWheel = this;
     this.navItems = Array.from({ length: 20 }, () => ({
         title: "",
         enabled: true,
-        navItem: { hide: jest.fn(), show: jest.fn() },
+        navItem: { hide: jest.fn(), show: jest.fn(), title: "" },
+        basicNavTitleMax: { title: "" },
+        basicNavTitleMin: { title: "" },
+        hoverNavTitleMax: { title: "" },
+        hoverNavTitleMin: { title: "" },
+        selectedNavTitleMax: { title: "" },
+        selectedNavTitleMin: { title: "" },
+        initNavTitle: { title: "" },
         sliceSelectedAttr: {},
         sliceHoverAttr: {},
         titleSelectedAttr: {},
@@ -74,7 +85,9 @@ global.platformColor = {
     exitWheelcolors: ["#00ff00"],
     accidentalsWheelcolors: ["#0000ff"],
     octavesWheelcolors: ["#ffff00"],
-    accidentalsWheelcolorspush: "#cccccc"
+    accidentalsWheelcolorspush: "#cccccc",
+    intervalNameWheelcolors: ["#ff00ff"],
+    intervalWheelcolors: ["#00ffff"]
 };
 global._ = jest.fn(s => s);
 global.NOTENAMES = ["C", "D", "E", "F", "G", "A", "B"];
@@ -97,13 +110,14 @@ global.Synth = jest.fn().mockImplementation(() => ({
     loadSynth: jest.fn().mockResolvedValue(),
     setMasterVolume: jest.fn(),
     setVolume: jest.fn(),
+    getCustomFrequency: jest.fn().mockReturnValue(440),
     trigger: jest.fn().mockResolvedValue()
 }));
-global.instruments = [{}];
 global.DEFAULTVOICE = "sine";
 global.PREVIEWVOLUME = 0.5;
 global.getNote = jest.fn().mockReturnValue(["C", 4]);
 global.buildScale = jest.fn(() => [["C", "D", "E", "F", "G", "A", "B", "C"], []]);
+global.instruments = [{ sine: {} }];
 
 describe("piemenus behavioral tests", () => {
     let mockBlock;
@@ -128,7 +142,8 @@ describe("piemenus behavioral tests", () => {
                 blocksContainer: { x: 0, y: 0 },
                 getStageScale: jest.fn().mockReturnValue(1),
                 KeySignatureEnv: ["C", "major", false],
-                logo: { synth: new global.Synth(), errorMsg: jest.fn() }
+                logo: { synth: new global.Synth(), errorMsg: jest.fn() },
+                errorMsg: jest.fn()
             },
             connections: ["mock-id"],
             updateCache: jest.fn(),
@@ -198,6 +213,71 @@ describe("piemenus behavioral tests", () => {
         // prevPitch+delta = 4+1 = 5. 5 > 4, so deltaOctave = -1.
         // Octave 4 -> 3.
         expect(mockBlock.blocks.setPitchOctave).toHaveBeenCalledWith("mock-id", 3);
+    });
+
+    test("pitch wrap helper adjusts octave by musical direction", () => {
+        expect(getPieMenuWheelOctaveDelta(6, 0, 7)).toBe(-1);
+        expect(getPieMenuWheelOctaveDelta(0, 6, 7)).toBe(1);
+        expect(getPieMenuWheelOctaveDelta(4, 0, 5)).toBe(-1);
+        expect(getPieMenuWheelOctaveDelta(0, 4, 5)).toBe(1);
+    });
+
+    test("custom pitch labels are ordered high to low like regular pitch wheels", () => {
+        const temperament = {
+            pitchNumber: 5,
+            0: [1, "C", 4],
+            1: [1.2, "D#", 4],
+            2: [1.4, "F", 4],
+            3: [1.6, "G", 4],
+            4: [1.8, "A#", 4]
+        };
+
+        expect(getCustomNoteLabels(temperament)).toEqual(["A#", "G", "F", "D#", "C"]);
+    });
+
+    test("custom pitch wheel rotates, wraps octave, and previews selected frequency", async () => {
+        const temperament = {
+            pitchNumber: 5,
+            0: [1, "C", 4],
+            1: [1.2, "D#", 4],
+            2: [1.4, "F", 4],
+            3: [1.6, "G", 4],
+            4: [1.8, "A#", 4]
+        };
+
+        mockBlock.blocks.blockList["mock-id"].name = "pitch";
+        mockBlock.name = "customNote";
+        global.getNote.mockImplementation((note, octave) => [note, octave]);
+
+        piemenuCustomNotes(mockBlock, { custom: temperament }, ["custom"], "custom", "C");
+
+        expect(mockBlock._cusNoteWheel.clickModeRotate).toBe(true);
+        expect(mockBlock._cusNoteWheel.createWheel).toHaveBeenCalledWith([
+            "A#",
+            "G",
+            "F",
+            "D#",
+            "C"
+        ]);
+        expect(mockBlock._cusNoteWheel.selectedNavItemIndex).toBe(4);
+
+        mockBlock._cusNoteWheel.selectedNavItemIndex = 0;
+        await mockBlock._cusNoteWheel.navItems[0].navigateFunction();
+
+        expect(mockBlock.blocks.setPitchOctave).toHaveBeenCalledWith("mock-id", 3);
+        expect(mockBlock.activity.logo.synth.getCustomFrequency).toHaveBeenCalledWith(
+            "A#3",
+            "custom"
+        );
+        expect(mockBlock.activity.logo.synth.trigger).toHaveBeenCalledWith(
+            0,
+            440,
+            1 / 8,
+            "sine",
+            null,
+            null,
+            false
+        );
     });
 
     describe("Block Help Menu", () => {
