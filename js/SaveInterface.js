@@ -114,19 +114,19 @@ class SaveInterface {
             '  var codeBlock = document.getElementById("codeBlock");' +
             '  var showHideButton = document.getElementById("showhide");' +
             '  showHideButton.addEventListener("click", function(e) {' +
-            '    e.preventDefault();' +
+            "    e.preventDefault();" +
             '    if (codeBlock.style.display === "none") {' +
             '      codeBlock.style.display = "flex";' +
             '      showHideButton.textContent = "' +
             STR_HIDE +
             '";' +
-            '    } else {' +
+            "    } else {" +
             '      codeBlock.style.display = "none";' +
             '      showHideButton.textContent = "' +
             STR_SHOW +
             '";' +
             "    }" +
-            '  });' +
+            "  });" +
             '  codeBlock.style.display = "none";' +
             '  showHideButton.textContent = "' +
             STR_SHOW +
@@ -424,7 +424,7 @@ class SaveInterface {
 
             Object.entries(data).forEach(([blockIndex, notes]) => {
                 const mainTrack = midi.addTrack();
-                mainTrack.name = `Track ${parseInt(blockIndex) + 1}`;
+                mainTrack.name = `Track ${parseInt(blockIndex, 10) + 1}`;
 
                 const trackMap = new Map();
                 let globalTime = 0;
@@ -438,7 +438,7 @@ class SaveInterface {
                         const drum = noteData.drum || false;
                         if (!trackMap.has(drum)) {
                             const drumTrack = midi.addTrack();
-                            drumTrack.name = `Track ${parseInt(blockIndex) + 1} - ${drum}`;
+                            drumTrack.name = `Track ${parseInt(blockIndex, 10) + 1} - ${drum}`;
                             drumTrack.channel = 9; // Drums must be on Channel 10
                             trackMap.set(drum, drumTrack);
                         }
@@ -459,7 +459,7 @@ class SaveInterface {
                         if (!trackMap.has(instrument)) {
                             const instrumentTrack = midi.addTrack();
                             instrumentTrack.name = `Track ${
-                                parseInt(blockIndex) + 1
+                                parseInt(blockIndex, 10) + 1
                             } - ${instrument}`;
                             instrumentTrack.instrument.number =
                                 Object.prototype.hasOwnProperty.call(instrumentMIDI, instrument)

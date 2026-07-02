@@ -66,7 +66,7 @@ try {
    globalActivity, hideArrows, doAnalyzeProject
  */
 const LEADING = 0;
-const BLOCKSCALES = [1, 1.5, 2, 3, 4];
+const BLOCKSCALES = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4];
 const _THIS_IS_MUSIC_BLOCKS_ = true;
 const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
 
@@ -2340,9 +2340,6 @@ class Activity {
          */
         this.showSearchWidget = () => this.searchController.showSearchWidget();
 
-        /*
-         * Uses JQuery to add autocompleted search suggestions
-         */
         this.doSearch = () => this.searchController.doSearch();
 
         //To create a sampler widget
@@ -5779,8 +5776,9 @@ class Activity {
             this._setupBlocksContainerEvents();
 
             this.trashcan = new Trashcan(this);
-            this.turtles = new Turtles(this);
             setupGridController(this);
+            /* istanbul ignore next -- Activity constructor is browser-only; exercised manually but inaccessible from Jest */
+            this.turtles = new Turtles(this);
             setupGridRenderer(this);
             this.boundary = new Boundary(this.blocksContainer);
             this.blocks = new Blocks(this);
@@ -6284,7 +6282,7 @@ class Activity {
                                     getJSON(url).then(
                                         data => {
                                             const n = data.arg;
-                                            env.push(parseInt(n));
+                                            env.push(parseInt(n, 10));
                                         },
                                         () => {
                                             alert(

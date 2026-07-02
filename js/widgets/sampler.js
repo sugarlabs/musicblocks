@@ -265,7 +265,7 @@ function SampleWidget() {
      * @returns {void}
      */
     this._useOctave = function (o) {
-        this.octaveCenter = parseInt(o);
+        this.octaveCenter = parseInt(o, 10);
     };
 
     /**
@@ -1398,7 +1398,7 @@ function SampleWidget() {
 
                 // Add event listener for slider changes
                 slider.oninput = () => {
-                    const value = parseInt(slider.value);
+                    const value = parseInt(slider.value, 10);
                     this.centAdjustmentValue = value;
                     valueDisplay.textContent = (value >= 0 ? "+" : "") + value + "¢";
                     this.applyCentAdjustment(value);
