@@ -1716,6 +1716,7 @@ class Logo {
                             const tur2 = logo.activity.turtles.ithTurtle(turtle);
                             tur2._transportTime = logo.synth.transport.seconds;
                         }
+                        tur.delayTimeout = null;
                         tur.delayParameters = null;
                         logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg);
                     },
