@@ -335,7 +335,7 @@ const PhraseMakerAudio = {
     __playNote(pm, time, noteCounter) {
         // Show lyrics while playing notes.
         if (pm.lyricsON) {
-            activity.textMsg(pm._lyrics[noteCounter], 3000);
+            pm.activity.textMsg(pm._lyrics[noteCounter], 3000);
         }
         // If the widget is closed, stop playing.
         if (!pm.widgetWindow.isVisible()) {

@@ -225,7 +225,7 @@ class ReflectionMatrix {
         }
 
         widgetWindow.sendToCenter();
-        activity.textMsg(_("Reflect on your project."), 3000);
+        this.activity.textMsg(_("Reflect on your project."), 3000);
     }
 
     /**

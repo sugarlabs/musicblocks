@@ -1003,7 +1003,7 @@ class PhraseMaker {
         }
 
         if (this.isInitial) {
-            activity.textMsg(this._("Click on the table to add notes."), 3000);
+            this.activity.textMsg(this._("Click on the table to add notes."), 3000);
             this.widgetWindow.sendToCenter();
             this.inInitial = false;
         }

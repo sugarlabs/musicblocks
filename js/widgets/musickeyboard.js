@@ -3556,8 +3556,8 @@ function MusicKeyboard(activity) {
             this.activity.blocks.loadNewBlocks(newStack);
         }
 
-        if (actionGroups > 1) activity.textMsg(_("New action blocks generated."), 3000);
-        else activity.textMsg(_("New action block generated."), 3000);
+        if (actionGroups > 1) this.activity.textMsg(_("New action blocks generated."), 3000);
+        else this.activity.textMsg(_("New action block generated."), 3000);
     };
 
     /**
@@ -3699,7 +3699,7 @@ function MusicKeyboard(activity) {
             // re-init widget
             if (this.midiON) {
                 this.midiButton.style.background = "#00FF00";
-                activity.textMsg(_("MIDI device present."), 3000);
+                this.activity.textMsg(_("MIDI device present."), 3000);
                 return;
             }
             midiAccess.inputs.forEach(input => {
@@ -3707,10 +3707,10 @@ function MusicKeyboard(activity) {
             });
             if (midiAccess.inputs.size) {
                 this.midiButton.style.background = "#00FF00";
-                activity.textMsg(_("MIDI device present."), 3000);
+                this.activity.textMsg(_("MIDI device present."), 3000);
                 this.midiON = true;
             } else {
-                activity.textMsg(_("No MIDI device found."), 3000);
+                this.activity.textMsg(_("No MIDI device found."), 3000);
             }
         };
 
@@ -3720,7 +3720,7 @@ function MusicKeyboard(activity) {
          * @memberof ClassName
          */
         const onMIDIFailure = () => {
-            activity.errorMsg(_("Failed to get MIDI access in browser."), 3000);
+            this.activity.errorMsg(_("Failed to get MIDI access in browser."), 3000);
             this.midiON = false;
         };
 
