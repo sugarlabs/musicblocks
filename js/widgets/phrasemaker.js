@@ -1009,6 +1009,26 @@ class PhraseMaker {
         }
     }
 
+    _configureExitWheel(exitWheel) {
+        if (typeof window.configureExitWheel === "function") {
+            window.configureExitWheel(exitWheel);
+        }
+
+        if (!exitWheel || !exitWheel.navItems) {
+            return;
+        }
+
+        for (let i = 0; i < exitWheel.navItems.length; i++) {
+            const item = exitWheel.navItems[i];
+            if (item && item.sliceSelectedAttr) {
+                item.sliceSelectedAttr.cursor = "pointer";
+                item.sliceHoverAttr.cursor = "pointer";
+                item.titleSelectedAttr.cursor = "pointer";
+                item.titleHoverAttr.cursor = "pointer";
+            }
+        }
+    }
+
     _setupWheelDiv(size, left, top) {
         const wheelDiv = this.docById("wheelDivptm");
         wheelDiv.style.position = "absolute";
@@ -1088,6 +1108,7 @@ class PhraseMaker {
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
         this._exitWheel.createWheel(["×", " "]);
+        this._configureExitWheel(this._exitWheel);
 
         const addnotesRect = this.docById("addnotes").getBoundingClientRect();
         const x = addnotesRect.x;
@@ -1400,6 +1421,7 @@ class PhraseMaker {
         this.xblockValue = [xblockLabelValue.toString(), "x"];
         this.yblockValue = [yblockLabelValue.toString(), "y"];
         this._exitWheel.createWheel(["×", ""]);
+        this._configureExitWheel(this._exitWheel);
 
         this._exitWheel.navItems[0].navigateFunction = () => {
             this.docById("wheelDivptm").style.display = "none";
@@ -1689,6 +1711,7 @@ class PhraseMaker {
 
         this.blockValue = blockLabelValue.toString();
         this._exitWheel.createWheel(["×", ""]);
+        this._configureExitWheel(this._exitWheel);
 
         this._exitWheel.navItems[0].navigateFunction = () => {
             this.docById("wheelDivptm").style.display = "none";
@@ -1934,6 +1957,7 @@ class PhraseMaker {
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
         this._exitWheel.createWheel(["×", " "]);
+        this._configureExitWheel(this._exitWheel);
 
         const accidentalLabels = [];
         let octaveLabels = [];
@@ -3866,6 +3890,7 @@ class PhraseMaker {
 
         this._menuWheel.createWheel(mainTabsLabels);
         this._exitWheel.createWheel(exitTabLabel);
+        this._configureExitWheel(this._exitWheel);
 
         let x = 0,
             y = 0;
@@ -4050,9 +4075,9 @@ class PhraseMaker {
 
             const __mouseUpHandler = event => {
                 this._mouseUpCell = event.target;
-                if (this._mouseDownCell !== this._mouseUpCell) {
+                if (this._mouseDownCell && this._mouseDownCell !== this._mouseUpCell) {
                     this._tieNotes(this._mouseDownCell, this._mouseUpCell);
-                } else {
+                } else if (this._mouseDownCell) {
                     const nodes = Array.prototype.slice.call(event.target.parentElement.children);
                     this._createpiesubmenu(
                         nodes.indexOf(event.target),

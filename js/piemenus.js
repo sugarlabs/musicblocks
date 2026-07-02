@@ -130,20 +130,13 @@ const isInteractive = target => {
         return true;
     }
 
-    // 2. Check if the element inside wheelDiv is interactive (slices, titles have cursor: pointer)
-    const wheelDiv = docById("wheelDiv");
-    if (wheelDiv && typeof wheelDiv.contains === "function" && wheelDiv.contains(target)) {
-        // SVG paths or text elements that are clickable will have computed pointer style
-        if (target && target.style && target.style.cursor === "pointer") {
-            return true;
-        }
-        if (typeof window !== "undefined" && typeof window.getComputedStyle === "function") {
-            try {
-                if (window.getComputedStyle(target).cursor === "pointer") {
-                    return true;
-                }
-            } catch (e) {
-                // Ignore computed style failures (e.g. in tests)
+    // 2. Check if inside any of the pie menu containers and is a slice/title/icon (not the container or SVG root)
+    const containers = ["wheelDiv", "wheelDivptm", "chooseKeyDiv"];
+    for (let i = 0; i < containers.length; i++) {
+        const div = docById(containers[i]);
+        if (div && typeof div.contains === "function" && div.contains(target)) {
+            if (target !== div && target.tagName && target.tagName.toLowerCase() !== "svg") {
+                return true;
             }
         }
     }
@@ -153,7 +146,11 @@ const isInteractive = target => {
 
 const handleOutsideClick = event => {
     const wheelDiv = docById("wheelDiv");
-    if (!wheelDiv || wheelDiv.style.display === "none") {
+    const wheelDivptm = docById("wheelDivptm");
+    const wheelDivVisible = wheelDiv && wheelDiv.style.display !== "none";
+    const wheelDivptmVisible = wheelDivptm && wheelDivptm.style.display !== "none";
+
+    if (!wheelDivVisible && !wheelDivptmVisible) {
         return;
     }
 
@@ -165,8 +162,18 @@ const handleOutsideClick = event => {
             typeof activeExitWheel.navItems[0].navigateFunction === "function"
         ) {
             activeExitWheel.navItems[0].navigateFunction();
+            document.removeEventListener("mousedown", handleOutsideClick);
+            activeExitWheel = null;
         } else {
-            hideWheelDiv();
+            if (wheelDivVisible) {
+                hideWheelDiv();
+            } else if (wheelDivptmVisible) {
+                if (wheelDivptm) {
+                    wheelDivptm.style.display = "none";
+                }
+                document.removeEventListener("mousedown", handleOutsideClick);
+                activeExitWheel = null;
+            }
         }
     }
 };
@@ -275,6 +282,18 @@ const configureExitWheel = exitWheel => {
     }
     activeExitWheel = exitWheel;
 
+    // Register mousedown listener after 50ms if either wheel is visible
+    setTimeout(() => {
+        const wheelDiv = docById("wheelDiv");
+        const wheelDivptm = docById("wheelDivptm");
+        const isVisible =
+            (wheelDiv && wheelDiv.style.display !== "none") ||
+            (wheelDivptm && wheelDivptm.style.display !== "none");
+        if (isVisible) {
+            document.addEventListener("mousedown", handleOutsideClick);
+        }
+    }, 50);
+
     const clearSelection = () => {
         exitWheel.selectedNavItemIndex = null;
         for (let i = 0; i < exitWheel.navItems.length; i++) {
@@ -297,8 +316,14 @@ const configureExitWheel = exitWheel => {
         if (typeof item.navigateFunction === "function") {
             item.navigateFunction();
         }
+        document.removeEventListener("mousedown", handleOutsideClick);
+        if (activeExitWheel === exitWheel) {
+            activeExitWheel = null;
+        }
     };
 };
+
+window.configureExitWheel = configureExitWheel;
 
 /**
  * Builds the pitch selection pie menu with optional accidentals
