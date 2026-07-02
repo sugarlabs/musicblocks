@@ -1871,7 +1871,7 @@ function SampleWidget() {
     this._scale = function () {
         let width, height;
         const canvas = document.getElementsByClassName("samplerCanvas");
-        Array.prototype.forEach.call(canvas, ele => {
+        Array.from(canvas).forEach(ele => {
             this.widgetWindow.getWidgetBody().removeChild(ele);
         });
         if (!this.widgetWindow.isMaximized()) {

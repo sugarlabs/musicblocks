@@ -752,7 +752,11 @@ function AIWidget() {
                 const analyser = this.pitchAnalysers[id];
                 if (analyser) {
                     for (const synth in instruments[0]) {
-                        instruments[0][synth].disconnect(analyser);
+                        try {
+                            instruments[0][synth].disconnect(analyser);
+                        } catch (e) {
+                            console.debug("Failed to disconnect synth from analyser:", e);
+                        }
                     }
                     analyser.dispose();
                 }
@@ -962,14 +966,22 @@ function AIWidget() {
             }
 
             if (this.pitchAnalysers[analyser]) {
-                instruments[0][synth].disconnect(this.pitchAnalysers[analyser]);
+                try {
+                    instruments[0][synth].disconnect(this.pitchAnalysers[analyser]);
+                } catch (e) {
+                    console.debug("Failed to disconnect synth from analyser:", e);
+                }
                 instruments[0][synth].connect(this.pitchAnalysers[analyser]);
             }
 
             if (synth === "customsample_" + this.originalSampleName) {
                 analyser = 1;
                 if (this.pitchAnalysers[analyser]) {
-                    instruments[0][synth].disconnect(this.pitchAnalysers[analyser]);
+                    try {
+                        instruments[0][synth].disconnect(this.pitchAnalysers[analyser]);
+                    } catch (e) {
+                        console.debug("Failed to disconnect synth from analyser:", e);
+                    }
                     instruments[0][synth].connect(this.pitchAnalysers[analyser]);
                 }
             }

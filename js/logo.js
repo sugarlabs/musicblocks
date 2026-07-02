@@ -1065,7 +1065,7 @@ class Logo {
                 loopBlkIdx = turtle.queue[i].blk;
                 parentLoopBlock = this.blockList[loopBlkIdx];
                 // Flush the parent from the queue
-                turtle.queue.splice(i, 1);
+                turtle.queue.splice(i, turtle.queue.length - i);
                 break;
             } else if (
                 ["forever", "repeat", "while", "until"].includes(
@@ -1076,7 +1076,7 @@ class Logo {
                 loopBlkIdx = turtle.queue[i].parentBlk;
                 parentLoopBlock = this.blockList[loopBlkIdx];
                 // Flush the parent from the queue
-                turtle.queue.splice(i, 1);
+                turtle.queue.splice(i, turtle.queue.length - i);
                 break;
             }
         }
