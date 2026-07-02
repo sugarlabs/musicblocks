@@ -323,6 +323,45 @@ describe("ProjectStorage", () => {
         });
     });
 
+    describe("port()", () => {
+        it("should not throw when legacy localStorage access fails", async () => {
+            const originalLocalStorage = global.localStorage;
+            global.localStorage = {
+                ...originalLocalStorage,
+                getItem: () => {
+                    throw new Error("Access denied");
+                }
+            };
+
+            await expect(storage.port()).resolves.toBeUndefined();
+            await expect(storage.get(storage.VersionKey)).resolves.toBe("v2");
+            global.localStorage = originalLocalStorage;
+        });
+
+        it("should allow init to complete when legacy localStorage is unavailable", async () => {
+            const originalLocalStorage = global.localStorage;
+            global.localStorage = {
+                ...originalLocalStorage,
+                getItem: () => {
+                    throw new Error("Blocked by policy");
+                }
+            };
+
+            global.localforage = mockLocalforage;
+            await expect(storage.init()).resolves.toBeUndefined();
+
+            expect(storage.data).toEqual(
+                expect.objectContaining({
+                    Projects: {},
+                    LikedProjects: {},
+                    ReportedProjects: {},
+                    DefaultCreatorName: "anonymous"
+                })
+            );
+            global.localStorage = originalLocalStorage;
+        });
+    });
+
     describe("auto-save", () => {
         it("should not start auto-save in init (auto-save lives in activity.js)", async () => {
             // Mock port() to avoid real localStorage access
