@@ -142,6 +142,17 @@ class ToolbarUI {
                 ["helpIcon", _("Help and shortcuts")],
                 ["helpGuideItem", _("Help"), "innerHTML"],
                 ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
+                [
+                    "interactiveTutorialGuideItem",
+                    "<strong>" +
+                        _("Interactive Tutorial") +
+                        "</strong><br/><span style='font-size: 12px; font-weight: normal; color: var(--fg); opacity: 0.7; display: block; margin-top: 4px; line-height: 1.25;'>" +
+                        _(
+                            "Learn Music Blocks by building your first project through a guided interactive walkthrough."
+                        ) +
+                        "</span>",
+                    "innerHTML"
+                ],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -275,6 +286,17 @@ class ToolbarUI {
                 ["helpIcon", _("Help and shortcuts")],
                 ["helpGuideItem", _("Help"), "innerHTML"],
                 ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
+                [
+                    "interactiveTutorialGuideItem",
+                    "<strong>" +
+                        _("Interactive Tutorial") +
+                        "</strong><br/><span style='font-size: 12px; font-weight: normal; color: var(--fg); opacity: 0.7; display: block; margin-top: 4px; line-height: 1.25;'>" +
+                        _(
+                            "Learn Music Blocks by building your first project through a guided interactive walkthrough."
+                        ) +
+                        "</span>",
+                    "innerHTML"
+                ],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -1228,11 +1250,13 @@ class ToolbarUI {
      * @param {Function} onclick - The onclick handler for the help icon.
      * @returns {void}
      */
-    renderHelpIcon(onclick, shortcutsOnclick) {
+    renderHelpIcon(onclick, shortcutsOnclick, tutorialOnclick) {
         const helpIcon = docById("helpIcon");
         const helpGuideItem = docById("helpGuideItem");
         const shortcutsGuideItem = docById("shortcutsGuideItem");
-        const hasDropdownMenu = !!helpGuideItem || !!shortcutsGuideItem;
+        const interactiveTutorialGuideItem = docById("interactiveTutorialGuideItem");
+        const hasDropdownMenu =
+            !!helpGuideItem || !!shortcutsGuideItem || !!interactiveTutorialGuideItem;
 
         if (helpGuideItem) {
             helpGuideItem.onclick = event => {
@@ -1262,6 +1286,17 @@ class ToolbarUI {
                 : () => {
                       onclick(this.activity);
                   };
+        }
+        if (interactiveTutorialGuideItem) {
+            interactiveTutorialGuideItem.onclick = event => {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                if (tutorialOnclick) {
+                    tutorialOnclick(this.activity);
+                }
+            };
         }
     }
 

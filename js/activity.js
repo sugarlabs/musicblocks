@@ -4911,7 +4911,19 @@ class Activity {
             }
             activity._showKeyboardShortcuts();
         };
-
+        const showInteractiveTutorial = activity => {
+            if (window.widgetWindows?.isOpen("help")) {
+                window.widgetWindows.clear("help");
+            }
+            if (window.widgetWindows?.isOpen("keyboard-shortcuts")) {
+                window.widgetWindows.clear("keyboard-shortcuts");
+            }
+            if (typeof FirstProjectTutorial !== "undefined") {
+                new FirstProjectTutorial(activity).start();
+            } else {
+                console.error("FirstProjectTutorial is not loaded");
+            }
+        };
         this._showKeyboardShortcuts = () => {
             const platformKeys = (windowsKeys, macKeys = windowsKeys) =>
                 `${_("Windows/Linux")}: ${windowsKeys}\n${_("Mac")}: ${macKeys}`;
@@ -5155,6 +5167,13 @@ class Activity {
             widgetBody.appendChild(wrapper);
             widgetWindow.sendToCenter();
             requestAnimationFrame(() => widgetWindow.sendToCenter());
+        };
+        /**
+         * Open the help widget at the First Project Tutorial card.
+         * This can be called from anywhere to launch the tutorial info page.
+         */
+        this.openFirstProjectTutorial = () => {
+            HelpWidget.openFirstProjectTutorial(this);
         };
 
         /*
@@ -5725,6 +5744,14 @@ class Activity {
             this.addEventListener(document, "mousemove", this.handleMouseMove);
             this.addEventListener(document, "click", this.handleDocumentClick);
             this.addEventListener(window, "beforeunload", () => {
+                // Do not save while the interactive tutorial is active —
+                // the canvas holds a bare-canvas tutorial state, not the
+                // user's real project. Saving it would corrupt localStorage.
+                if (this._tutorialActive) {
+                    this._stopRenderLoop();
+                    return;
+                }
+
                 // Save synchronously to SESSION* keys so manual reload/F5
                 // still has recoverable data even if async saves are cut short.
                 if (typeof this.__saveLocally === "function") {
@@ -5833,7 +5860,7 @@ class Activity {
             );
             this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
             this.toolbar.renderMenuIcon(showHideAuxMenu);
-            this.toolbar.renderHelpIcon(showHelp, showKeyboardShortcuts);
+            this.toolbar.renderHelpIcon(showHelp, showKeyboardShortcuts, showInteractiveTutorial);
             this.toolbar.renderModeSelectIcon(
                 doSwitchMode,
                 () => doRecordButton(this),
@@ -6555,6 +6582,17 @@ class Activity {
 })();
 
 const activity = new Activity();
+
+// Global function to open First Project Tutorial (starts at card 4)
+// Can be called from console or anywhere: openFirstProjectTutorial()
+window.openFirstProjectTutorial = function () {
+    const act = ActivityContext.getActivity();
+    if (act && act.openFirstProjectTutorial) {
+        act.openFirstProjectTutorial();
+    } else if (typeof HelpWidget !== "undefined") {
+        HelpWidget.openFirstProjectTutorial(act);
+    }
+};
 
 // Execute initialization once all RequireJS modules are loaded AND DOM is ready
 define(["domReady!", "activity/exporters"].concat(MYDEFINES), (doc, exportersModule) => {
