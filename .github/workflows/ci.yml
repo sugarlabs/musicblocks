@@ -155,7 +155,7 @@ jobs:
               run: pnpm install --frozen-lockfile
 
             - name: Build project
-              run: pnpm run build --if-present
+              run: pnpm run --if-present build
 
     # ----------------------------------------------------------------------
     # Jest unit tests + coverage threshold + Codecov upload
