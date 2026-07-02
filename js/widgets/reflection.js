@@ -644,7 +644,7 @@ class ReflectionMatrix {
      * @returns {void}
      */
     renderChatHistory() {
-        this.chatLog.innerHTML = "";
+        this.chatLog.textContent = "";
 
         this.chatHistory.forEach(msg => {
             const messageContainer = document.createElement("div");

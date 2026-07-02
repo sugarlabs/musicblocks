@@ -50,7 +50,8 @@ function makeActivity({ isMusicBlocks = true, currentGrid = 0, selectedNavItemIn
         _showTenor: jest.fn(),
         _hideBass: jest.fn(),
         _showBass: jest.fn(),
-        update: false
+        update: false,
+        refreshCanvas: jest.fn()
     };
 }
 
@@ -99,7 +100,6 @@ describe("doCartesianPolar — grid transitions", () => {
         expect(activity._showPolar).toHaveBeenCalledTimes(1);
         expect(activity._showCartesian).not.toHaveBeenCalled();
         expect(activity.turtles.currentGrid).toBe(3);
-        expect(activity.update).toBe(true);
     });
 
     test("Polar (3) → None (0): hides Polar, shows nothing, updates currentGrid", () => {
@@ -174,13 +174,18 @@ describe("doCartesianPolar — grid transitions", () => {
         expect(activity._showCartesian).not.toHaveBeenCalled();
     });
 
-    test("update flag is set to true after a successful transition", () => {
+    test("calls refreshCanvas() after a transition to trigger an immediate repaint", () => {
+        // Regression guard: setting only activity.update = true is insufficient.
+        // The render loop checks stageDirty; update is converted to stageDirty
+        // only inside __tick, which fires on UI events rather than continuously.
+        // Without refreshCanvas() the grid stays invisible until the next user
+        // interaction wakes the idle loop.
         const activity = makeActivity({ currentGrid: 1, selectedNavItemIndex: 3 });
         setupGridController(activity);
 
-        expect(activity.update).toBe(false);
         activity._doCartesianPolar();
-        expect(activity.update).toBe(true);
+
+        expect(activity.refreshCanvas).toHaveBeenCalledTimes(1);
     });
 });
 

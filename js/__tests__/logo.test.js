@@ -73,6 +73,9 @@ jest.mock("tone", () => ({
     }))
 }));
 
+global.EmbeddedGraphicsScheduler =
+    require("../embedded-graphics-scheduler").EmbeddedGraphicsScheduler;
+
 // Now require the module after globals are set up
 const {
     Queue,
@@ -265,6 +268,13 @@ describe("Logo Class", () => {
     describe("Constructor", () => {
         test("initializes activity reference", () => {
             expect(logo.activity).toBe(mockActivity);
+        });
+
+        test("activity reference identity is preserved when constructed with an Activity object", () => {
+            // Regression: the Activity-pattern branch must keep this.activity === the
+            // original object so existing callers (plugins, notation, etc.) are unaffected.
+            const freshLogo = new Logo(mockActivity);
+            expect(freshLogo.activity).toBe(mockActivity);
         });
 
         test("initializes default volume-related properties", () => {
@@ -565,6 +575,16 @@ describe("Logo Class", () => {
             expect(mockTurtle.queue.length).toBe(0);
         });
     });
+
+    describe("dispatchTurtleSignals", () => {
+        test("delegates to EmbeddedGraphicsScheduler", async () => {
+            logo._graphicsScheduler.schedule = jest.fn();
+
+            await logo.dispatchTurtleSignals(0, 1, 2, 3);
+
+            expect(logo._graphicsScheduler.schedule).toHaveBeenCalledWith(0, 1, 2, 3);
+        });
+    });
 });
 
 describe("Logo parseArg", () => {
@@ -581,6 +601,10 @@ describe("Logo parseArg", () => {
                     parameterQueue: [],
                     singer: { noteDirection: 0 }
                 }))
+            },
+            stage: {
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn()
             },
             errorMsg: jest.fn()
         };
@@ -1063,31 +1087,6 @@ describe("Logo comprehensive method coverage", () => {
         expect(turtle0.doShowText).toHaveBeenCalledWith(20, 999);
     });
 
-    test("dispatchTurtleSignals handles early exits and executes embedded clear action", async () => {
-        timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
-            fn();
-            return 2;
-        });
-        logo.deps.utils.delayExecution = jest.fn(() => Promise.resolve());
-
-        turtle0.singer.embeddedGraphics = {};
-        await logo.dispatchTurtleSignals(0, 0.5, 3, 0);
-        expect(logo.deps.utils.delayExecution).not.toHaveBeenCalled();
-
-        turtle0.singer.embeddedGraphics = { 3: [] };
-        await logo.dispatchTurtleSignals(0, 0.5, 3, 0);
-        expect(logo.deps.utils.delayExecution).not.toHaveBeenCalled();
-
-        turtle0.singer.embeddedGraphics = { 3: [1] };
-        logo.blockList = [null, { name: "clear", connections: [] }];
-        await logo.dispatchTurtleSignals(0, 0.5, 3, 0.1);
-
-        expect(turtle0.painter.doSetHeading).toHaveBeenCalledWith(0);
-        expect(turtle0.painter.doSetXY).toHaveBeenCalledWith(0, 0);
-        expect(logo.deps.utils.delayExecution).toHaveBeenCalledWith(500);
-        expect(turtle0.embeddedGraphicsFinished).toBe(true);
-    });
-
     test("runLogoCommands handles already-running state and status widget initialization", () => {
         const clearTimeoutSpy = jest.spyOn(global, "clearTimeout").mockImplementation(() => {});
         logo._alreadyRunning = true;
@@ -1246,80 +1245,6 @@ describe("Logo comprehensive method coverage", () => {
 
         expect(mockActivity.save.afterSaveMIDI).toHaveBeenCalled();
         expect(logo.runningMIDI).toBe(false);
-    });
-
-    test("dispatchTurtleSignals covers broad graphics switch with deterministic timers", async () => {
-        timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
-            fn();
-            return 13;
-        });
-        logo.parseArg = jest.fn(() => 9);
-        logo.processShow = jest.fn();
-        logo.processSpeak = jest.fn();
-        logo.deps.utils.delayExecution = jest.fn(() => Promise.resolve());
-
-        turtle0.singer.suppressOutput = false;
-        turtle0.embeddedGraphicsFinished = false;
-
-        logo.blockList = [];
-        const names = [
-            "setcolor",
-            "sethue",
-            "setshade",
-            "settranslucency",
-            "setgrey",
-            "setpensize",
-            "penup",
-            "pendown",
-            "fill",
-            "hollowline",
-            "controlpoint1",
-            "controlpoint2",
-            "bezier",
-            "setheading",
-            "right",
-            "left",
-            "forward",
-            "back",
-            "setxy",
-            "scrollxy",
-            "show",
-            "speak",
-            "print",
-            "arc"
-        ];
-
-        names.forEach((name, index) => {
-            logo.blockList[index + 1] = { name, connections: [null, 101, 102] };
-        });
-
-        turtle0.singer.embeddedGraphics = {
-            5: names.map((_, index) => index + 1)
-        };
-
-        await logo.dispatchTurtleSignals(0, 1, 5, 0);
-
-        expect(turtle0.painter.doSetColor).toHaveBeenCalled();
-        expect(turtle0.painter.doSetHue).toHaveBeenCalled();
-        expect(turtle0.painter.doSetValue).toHaveBeenCalled();
-        expect(turtle0.painter.doSetPenAlpha).toHaveBeenCalled();
-        expect(turtle0.painter.doSetChroma).toHaveBeenCalled();
-        expect(turtle0.painter.doSetPensize).toHaveBeenCalled();
-        expect(turtle0.painter.doPenUp).toHaveBeenCalled();
-        expect(turtle0.painter.doPenDown).toHaveBeenCalled();
-        expect(turtle0.painter.doStartFill).toHaveBeenCalled();
-        expect(turtle0.painter.doStartHollowLine).toHaveBeenCalled();
-        expect(turtle0.painter.doBezier).toHaveBeenCalled();
-        expect(turtle0.painter.doSetHeading).toHaveBeenCalled();
-        expect(turtle0.painter.doRight).toHaveBeenCalled();
-        expect(turtle0.painter.doForward).toHaveBeenCalled();
-        expect(turtle0.painter.doArc).toHaveBeenCalled();
-        expect(turtle0.painter.doSetXY).toHaveBeenCalled();
-        expect(turtle0.painter.doScrollXY).toHaveBeenCalled();
-        expect(logo.processShow).toHaveBeenCalled();
-        expect(logo.processSpeak).toHaveBeenCalled();
-        expect(mockActivity.textMsg).toHaveBeenCalledWith("9");
-        expect(logo.deps.utils.delayExecution).toHaveBeenCalledWith(1000);
     });
 
     test("constructor supports explicit dependency object mode", () => {
@@ -1527,48 +1452,6 @@ describe("Logo comprehensive method coverage", () => {
         expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("sig1");
         expect(logo.statusMatrix.updateAll).toHaveBeenCalled();
         expect(mockActivity.blocks.updateParameterBlock).toHaveBeenCalledWith(logo, 0, 10);
-    });
-
-    test("dispatchTurtleSignals with suppressOutput true executes immediate graphics operations", async () => {
-        global.delayExecution = jest.fn(() => Promise.resolve());
-        turtle0.singer.suppressOutput = true;
-        logo.parseArg = jest.fn(() => 7);
-        logo.blockList = [
-            null,
-            { name: "setheading", connections: [null, 9] },
-            { name: "setxy", connections: [null, 9, 10] },
-            { name: "scrollxy", connections: [null, 9, 10] },
-            { name: "right", connections: [null, 9] },
-            { name: "forward", connections: [null, 9] },
-            { name: "arc", connections: [null, 9, 10] },
-            { name: "fill", connections: [] },
-            { name: "hollowline", connections: [] }
-        ];
-        turtle0.singer.embeddedGraphics = { 6: [1, 2, 3, 4, 5, 6, 7, 8] };
-
-        await logo.dispatchTurtleSignals(0, 0.2, 6, 0);
-
-        expect(turtle0.painter.doSetHeading).toHaveBeenCalledWith(7);
-        expect(turtle0.painter.doSetXY).toHaveBeenCalledWith(7, 7);
-        expect(turtle0.painter.doScrollXY).toHaveBeenCalledWith(7, 7);
-        expect(turtle0.painter.doRight).toHaveBeenCalledWith(7);
-        expect(turtle0.painter.doForward).toHaveBeenCalledWith(7);
-        expect(turtle0.painter.doArc).toHaveBeenCalledWith(7, 7);
-        expect(turtle0.painter.doStartFill).toHaveBeenCalled();
-        expect(turtle0.painter.doStartHollowLine).toHaveBeenCalled();
-    });
-
-    test("dispatchTurtleSignals adjusts dispatchFactor for large stepTime", async () => {
-        global.delayExecution = jest.fn(() => Promise.resolve());
-        turtle0.singer.suppressOutput = false;
-        turtle0.singer.dispatchFactor = 1;
-        logo.parseArg = jest.fn(() => 8);
-        logo.blockList = [null, { name: "setcolor", connections: [null, 1] }];
-        turtle0.singer.embeddedGraphics = { 8: [1] };
-
-        await logo.dispatchTurtleSignals(0, 3, 8, 0);
-
-        expect(turtle0.singer.dispatchFactor).toBe(NOTEDIV / 32);
     });
 
     test("processShow covers camera/video/file-url and missing file object branches", () => {

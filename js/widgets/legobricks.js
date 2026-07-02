@@ -1084,7 +1084,7 @@ function LegoWidget() {
         if (!noteMatch) return null;
 
         const noteName = noteMatch[1];
-        const octave = parseInt(noteMatch[2]);
+        const octave = parseInt(noteMatch[2], 10);
 
         // Convert note name to solfege
         const noteToSolfege = {

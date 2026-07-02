@@ -749,6 +749,39 @@ describe("Sampler Widget", () => {
             jest.useRealTimers();
         });
 
+        test("onclose stops an active recording and releases the mic", () => {
+            widget.init(mockActivity, 1);
+
+            widget.is_recording = true;
+
+            widgetWindow.onclose();
+
+            expect(mockActivity.logo.synth.stopRecording).toHaveBeenCalled();
+            expect(widget.is_recording).toBe(false);
+        });
+
+        test("onclose stops the tuner and releases the mic", async () => {
+            widget.init(mockActivity, 1);
+
+            await widget._tunerBtn.onclick();
+
+            widgetWindow.onclose();
+
+            expect(mockActivity.logo.synth.stopTuner).toHaveBeenCalled();
+
+            await widget._tunerBtn.onclick();
+            expect(mockActivity.logo.synth.startTuner).toHaveBeenCalledTimes(2);
+        });
+
+        test("onclose does not call stopRecording/stopTuner when neither is active", () => {
+            widget.init(mockActivity, 1);
+
+            widgetWindow.onclose();
+
+            expect(mockActivity.logo.synth.stopRecording).not.toHaveBeenCalled();
+            expect(mockActivity.logo.synth.stopTuner).not.toHaveBeenCalled();
+        });
+
         test("prompt UI handles submit, preview, and save", async () => {
             widget.init(mockActivity, 1);
             widget._promptBtn.onclick();

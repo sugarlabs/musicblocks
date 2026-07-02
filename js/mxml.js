@@ -50,7 +50,7 @@ saveMxmlOutput = logo => {
 
     Object.keys(logo.notation.notationStaging).forEach(voice => {
         if (logo.notation.notationStaging[voice].length === 0) return;
-        voiceNum = parseInt(voice) + 1;
+        voiceNum = parseInt(voice, 10) + 1;
         add(`<score-part id="P${voiceNum}">`);
         indent++;
         add(`<part-name> Voice #${voiceNum} </part-name>`);
@@ -63,7 +63,7 @@ saveMxmlOutput = logo => {
 
     Object.keys(logo.notation.notationStaging).forEach(voice => {
         if (logo.notation.notationStaging[voice].length === 0) return;
-        voiceNum = parseInt(voice) + 1;
+        voiceNum = parseInt(voice, 10) + 1;
         indent++;
         add(`<part id="P${voiceNum}">`);
         indent++;
@@ -245,14 +245,14 @@ saveMxmlOutput = logo => {
     let mi = 1e5;
     for (let i = 0; i < res.length - 1; i++) {
         if ((res[i] === "P" || res[i] === "#") && "123456789".includes(res[i + 1])) {
-            mi = Math.min(mi, parseInt(res[i + 1]));
+            mi = Math.min(mi, parseInt(res[i + 1], 10));
         }
     }
 
     res = res.split("");
     for (let i = 0; i < res.length - 1; i++) {
         if ((res[i] === "P" || res[i] === "#") && "123456789".includes(res[i + 1])) {
-            res[i + 1] = parseInt(res[i + 1]) - mi + 1;
+            res[i + 1] = parseInt(res[i + 1], 10) - mi + 1;
         }
     }
     res = res.join("");

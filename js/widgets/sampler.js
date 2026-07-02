@@ -265,7 +265,7 @@ function SampleWidget() {
      * @returns {void}
      */
     this._useOctave = function (o) {
-        this.octaveCenter = parseInt(o);
+        this.octaveCenter = parseInt(o, 10);
     };
 
     /**
@@ -485,6 +485,16 @@ function SampleWidget() {
                 this.audioPreview.pause();
                 this.audioPreview.currentTime = 0;
                 this.audioPreview = null;
+            }
+
+            if (this.is_recording) {
+                this.activity.logo.synth.stopRecording();
+                this.is_recording = false;
+            }
+
+            if (tunerOn) {
+                this.activity.logo.synth.stopTuner();
+                tunerOn = false;
             }
 
             // Stop pitch detection and release resources (microphone, AudioContext)
@@ -1388,7 +1398,7 @@ function SampleWidget() {
 
                 // Add event listener for slider changes
                 slider.oninput = () => {
-                    const value = parseInt(slider.value);
+                    const value = parseInt(slider.value, 10);
                     this.centAdjustmentValue = value;
                     valueDisplay.textContent = (value >= 0 ? "+" : "") + value + "¢";
                     this.applyCentAdjustment(value);

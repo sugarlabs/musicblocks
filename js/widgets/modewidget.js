@@ -108,10 +108,14 @@ class ModeWidget {
         this.modeTableDiv.style.display = "inline";
         this.modeTableDiv.style.visibility = "visible";
         this.modeTableDiv.style.border = "0px";
-        this.modeTableDiv.innerHTML =
-            '<div id="meterWheelDiv"></div>' +
-            '<div id="modePianoDiv" class=""></div>' +
-            '<table id="modeTable"></table>';
+        const meterWheelDiv = document.createElement("div");
+        meterWheelDiv.id = "meterWheelDiv";
+        const modePianoDiv = document.createElement("div");
+        modePianoDiv.id = "modePianoDiv";
+        modePianoDiv.className = "";
+        const modeTable = document.createElement("table");
+        modeTable.id = "modeTable";
+        this.modeTableDiv.replaceChildren(meterWheelDiv, modePianoDiv, modeTable);
 
         this.widgetWindow.getWidgetBody().append(this.modeTableDiv);
 
@@ -141,25 +145,11 @@ class ModeWidget {
             if (this._playingStatus()) {
                 this._playing = false;
 
-                this._playButton.innerHTML = `&nbsp;&nbsp;<img 
-                        src="header-icons/play-button.svg" 
-                        title="${_("Play all")}" 
-                        alt="${_("Play all")}" 
-                        height="${ModeWidget.ICONSIZE}" 
-                        width="${ModeWidget.ICONSIZE}" 
-                        vertical-align="middle"
-                    >&nbsp;&nbsp;`;
+                this._setPlayButtonIcon("play-button.svg", _("Play all"));
             } else {
                 this._playing = true;
 
-                this._playButton.innerHTML = `&nbsp;&nbsp;<img 
-                        src="header-icons/stop-button.svg" 
-                        title="${_("Stop")}" 
-                        alt="${_("Stop")}" 
-                        height="${ModeWidget.ICONSIZE}" 
-                        width="${ModeWidget.ICONSIZE}" 
-                        vertical-align="middle"
-                    >&nbsp;&nbsp;`;
+                this._setPlayButtonIcon("stop-button.svg", _("Stop"));
 
                 this._playAll();
             }
@@ -229,6 +219,27 @@ class ModeWidget {
      */
     _playingStatus() {
         return this._playing;
+    }
+
+    /**
+     * @private
+     * @param {string} iconName
+     * @param {string} titleText
+     * @returns {void}
+     */
+    _setPlayButtonIcon(iconName, titleText) {
+        const img = document.createElement("img");
+        img.src = "header-icons/" + iconName;
+        img.title = titleText;
+        img.alt = titleText;
+        img.setAttribute("height", ModeWidget.ICONSIZE);
+        img.setAttribute("width", ModeWidget.ICONSIZE);
+        img.style.verticalAlign = "middle";
+        this._playButton.replaceChildren(
+            document.createTextNode("\u00a0\u00a0"),
+            img,
+            document.createTextNode("\u00a0\u00a0")
+        );
     }
 
     /**
@@ -304,18 +315,28 @@ class ModeWidget {
         modePianoDiv.style.border = "0px";
         modePianoDiv.style.top = "0px";
         modePianoDiv.style.left = "0px";
-        let pianoHTML =
-            '<img src="images/piano_keys.png"  id="modeKeyboard" style="top:0px; left:0px; position:relative;">';
-        for (let i = 0; i < 12; i++) {
-            pianoHTML += '<img id="pkey_' + i + '" style="top:0px; left:0px; position:absolute;">';
-        }
-        modePianoDiv.innerHTML = pianoHTML;
+        const elements = [];
 
-        // Cache piano key elements to avoid repeated getElementById calls
+        const baseImg = document.createElement("img");
+        baseImg.src = "images/piano_keys.png";
+        baseImg.id = "modeKeyboard";
+        baseImg.style.top = "0px";
+        baseImg.style.left = "0px";
+        baseImg.style.position = "relative";
+        elements.push(baseImg);
+
         this._pianoKeys = [];
         for (let i = 0; i < 12; i++) {
-            this._pianoKeys[i] = document.getElementById("pkey_" + i);
+            const keyImg = document.createElement("img");
+            keyImg.id = "pkey_" + i;
+            keyImg.style.top = "0px";
+            keyImg.style.left = "0px";
+            keyImg.style.position = "absolute";
+            elements.push(keyImg);
+            this._pianoKeys[i] = keyImg;
         }
+
+        modePianoDiv.replaceChildren(...elements);
 
         const highlightImgs = [
             "images/highlights/sel_c.png",
@@ -647,14 +668,7 @@ class ModeWidget {
                     if (note_key !== null) {
                         note_key.src = highlightImgs[0];
                     }
-                    this._playButton.innerHTML = `&nbsp;&nbsp;<img 
-                            src="header-icons/play-button.svg" 
-                            title="${_("Play all")}" 
-                            alt="${_("Play all")}" 
-                            height="${ModeWidget.ICONSIZE}" 
-                            width="${ModeWidget.ICONSIZE}" 
-                            vertical-align="middle"
-                        >&nbsp;&nbsp;`;
+                    this._setPlayButtonIcon("play-button.svg", _("Play all"));
                     this._resetNotes();
                     this._locked = false;
                 }, 1000 * time);
@@ -709,14 +723,7 @@ class ModeWidget {
                 this._setTimeout(() => {
                     // Did we just play the last note?
                     this._playing = false;
-                    this._playButton.innerHTML = `&nbsp;&nbsp;<img 
-                            src="header-icons/play-button.svg" 
-                            title="${_("Play all")}" 
-                            alt="${_("Play all")}" 
-                            height="${ModeWidget.ICONSIZE}" 
-                            width="${ModeWidget.ICONSIZE}" 
-                            vertical-align="middle"
-                        >&nbsp;&nbsp;`;
+                    this._setPlayButtonIcon("play-button.svg", _("Play all"));
                     this._resetNotes();
                     this._locked = false;
                 }, 1000 * time);
@@ -883,7 +890,7 @@ class ModeWidget {
         }
 
         // console.debug('setModeName:' + 'not found');
-        table.rows[n].cells[0].innerHTML = "";
+        table.rows[n].cells[0].textContent = "";
         this.widgetWindow.updateTitle("");
     }
 
@@ -896,13 +903,13 @@ class ModeWidget {
         const n = table.rows.length - 1;
 
         // If the mode is not in the list, save it as the new custom mode.
-        if (table.rows[n].cells[0].innerHTML === "") {
+        if (table.rows[n].cells[0].textContent === "") {
             const customMode = this._calculateMode();
             // console.debug("custom mode: " + customMode);
             this.storage.custommode = JSON.stringify(customMode);
         }
 
-        let modeName = table.rows[n].cells[0].innerHTML;
+        let modeName = table.rows[n].cells[0].textContent;
         if (modeName === "") {
             modeName = _("custom");
         }

@@ -4407,7 +4407,7 @@ const piemenuDissectNumber = widget => {
     // Determine wheel values based on beginner mode
     const wheelValues = isBeginnerMode ? [2, 3, 4] : [2, 3, 4, 5, 7];
 
-    const currentValue = parseInt(widget._dissectNumber.value) || 2;
+    const currentValue = parseInt(widget._dissectNumber.value, 10) || 2;
 
     // Show the wheel div
     showWheelDiv();
@@ -4511,7 +4511,7 @@ const piemenuDissectNumber = widget => {
 
     // Set up decrement button (-)
     exitWheel.navItems[1].navigateFunction = () => {
-        const currentVal = parseInt(widget._dissectNumber.value);
+        const currentVal = parseInt(widget._dissectNumber.value, 10);
         const currentIdx = wheelValues.indexOf(currentVal);
 
         // Move to previous value in the array, or stay at first
@@ -4523,7 +4523,7 @@ const piemenuDissectNumber = widget => {
 
     // Set up increment button (+)
     exitWheel.navItems[2].navigateFunction = () => {
-        const currentVal = parseInt(widget._dissectNumber.value);
+        const currentVal = parseInt(widget._dissectNumber.value, 10);
         const currentIdx = wheelValues.indexOf(currentVal);
 
         // Move to next value in the array, or stay at last

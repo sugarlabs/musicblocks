@@ -166,7 +166,7 @@ function AIWidget() {
      * @returns {void}
      */
     this._useOctave = function (o) {
-        this.octaveCenter = parseInt(o);
+        this.octaveCenter = parseInt(o, 10);
     };
 
     /**
@@ -230,7 +230,7 @@ function AIWidget() {
                             ],
                             [
                                 blockId + 4,
-                                ["text", { value: `Voice ${parseInt(lineId) + 1} ` }],
+                                ["text", { value: `Voice ${parseInt(lineId, 10) + 1} ` }],
                                 0,
                                 0,
                                 [blockId + 3]
@@ -372,7 +372,7 @@ function AIWidget() {
                             [
                                 "nameddo",
                                 {
-                                    value: `V: ${parseInt(lineId) + 1} Line ${
+                                    value: `V: ${parseInt(lineId, 10) + 1} Line ${
                                         baseBlocks.length + 1
                                     }`
                                 }
@@ -400,7 +400,7 @@ function AIWidget() {
                             [
                                 "text",
                                 {
-                                    value: `V: ${parseInt(lineId) + 1} Line ${
+                                    value: `V: ${parseInt(lineId, 10) + 1} Line ${
                                         baseBlocks.length + 1
                                     }`
                                 }

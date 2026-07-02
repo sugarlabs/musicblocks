@@ -1545,6 +1545,25 @@ class Block {
                 label = getNoiseName(this.value);
             } else if (this.name === "outputtools") {
                 label = this.overrideName;
+                if (label === null || label === undefined) {
+                    label = this.protoblock.staticLabels[0];
+                }
+                label = _(label);
+            } else if (this.name === "intervalname") {
+                if (this.value !== null) {
+                    if (this.value === "perfect 1") {
+                        label = _("unison");
+                    } else {
+                        const parts = this.value.toString().split(" ");
+                        if (parts.length === 2) {
+                            label = _(parts[0]) + " " + parts[1];
+                        } else {
+                            label = _(this.value.toString());
+                        }
+                    }
+                } else {
+                    label = "???";
+                }
             } else if (this.name === "grid") {
                 label = _(this.value);
             } else {
@@ -3859,7 +3878,7 @@ class Block {
             el.type = "text";
 
             // Ensure it is the child of labelElem
-            labelElem.innerHTML = "";
+            labelElem.textContent = "";
             labelElem.appendChild(el);
 
             this.label = el;
@@ -4433,7 +4452,7 @@ class Block {
                 el.step = "any";
 
                 // Ensure it is the child of labelElem
-                labelElem.innerHTML = "";
+                labelElem.textContent = "";
                 labelElem.appendChild(el);
 
                 this.label = el;
