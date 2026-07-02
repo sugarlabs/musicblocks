@@ -263,6 +263,10 @@ class Activity {
         this._listeners = [];
 
         this.cellSize = 55;
+        this.searchSuggestions = [];
+        this._searchCache = {}; // Cache for search results to improve performance
+        this._searchCloseListener = null;
+        this._searchWidgetLastPos = null;
         this.homeButtonContainer;
 
         this.msgText = null;
@@ -2333,13 +2337,170 @@ class Activity {
         /*
          * Hides search widget
          */
-        this.hideSearchWidget = () => this.searchController.hideSearchWidget();
+        this.hideSearchWidget = () => {
+            // Save position before hiding so keyboard shortcut can restore it
+            if (this.searchWidget.style.visibility === "visible") {
+                this._searchWidgetLastPos = {
+                    left: this.searchWidget.style.left,
+                    top: this.searchWidget.style.top
+                };
+            }
+
+            // Hide the jQuery search results widget.
+            const obj = docByClass("ui-menu");
+            if (obj.length > 0) {
+                obj[0].style.visibility = "hidden";
+            }
+
+            // Remove the document mousedown listener if it exists
+            if (this._searchCloseListener) {
+                this.removeEventListener(document, "mousedown", this._searchCloseListener);
+                this._searchCloseListener = null;
+            }
+
+            this.searchWidget.style.visibility = "hidden";
+            this.searchWidget.idInput_custom = "";
+        };
 
         /*
          * Shows search widget
          */
-        this.showSearchWidget = () => this.searchController.showSearchWidget();
+        this.showSearchWidget = (fromKeyboard = false) => {
+            // ── Toggle: if already visible, close it ──────────────────────────────
+            if (this.searchWidget.style.visibility === "visible") {
+                this.hideSearchWidget();
+                return;
+            }
 
+            // ── Position ──────────────────────────────────────────────────────────
+            if (fromKeyboard && this._searchWidgetLastPos) {
+                // Reopen where the user left it after dragging
+                this.searchWidget.style.left = this._searchWidgetLastPos.left;
+                this.searchWidget.style.top = this._searchWidgetLastPos.top;
+            } else {
+                // Default: align with the palette search button
+                const searchPos = this.palettes.getSearchPos();
+                this.searchWidget.style.left = searchPos.x + "px";
+                this.searchWidget.style.top = searchPos.y + "px";
+            }
+
+            this.searchWidget.style.zIndex = "1001";
+            this.searchWidget.style.border = "2px solid lightblue";
+
+            // Close the helpful-search overlay if open
+            if (this.helpfulSearchDiv) {
+                this._hideHelpfulSearchWidget();
+            }
+
+            // Show widget
+            const obj = docByClass("ui-menu");
+            if (obj.length > 0) {
+                obj[0].style.visibility = "visible";
+            }
+
+            this.searchWidget.value = null;
+            this.searchWidget.style.visibility = "visible";
+            this._makeSearchWidgetDraggable();
+
+            this.searchBlockPosition = [100, 100];
+            this.prepSearchWidget();
+
+            // Close when clicking outside
+            const that = this;
+            const closeListener = e => {
+                const searchEl = document.getElementById("search");
+                const menuEl = document.getElementById("ui-id-1");
+                const paletteRow = document.querySelector("#palette tbody tr");
+
+                if (searchEl && (e.target === searchEl || searchEl.contains(e.target))) return;
+                if (
+                    menuEl &&
+                    menuEl.style.display === "block" &&
+                    (e.target === menuEl || menuEl.contains(e.target))
+                )
+                    return;
+                if (paletteRow && paletteRow.contains(e.target)) return;
+
+                that.hideSearchWidget();
+            };
+
+            this._searchCloseListener = closeListener;
+            this.addEventListener(document, "mousedown", closeListener);
+
+            // Focus after a short delay
+            setTimeout(() => {
+                that.searchWidget.focus();
+                that.doSearch();
+            }, 500);
+        };
+
+        /*
+         * Makes the search widget draggable like Spotlight
+         */
+        this._makeSearchWidgetDraggable = () => {
+            const el = this.searchWidget;
+            if (el._dragInitialized) return;
+            el._dragInitialized = true;
+
+            let isDragging = false;
+            let startX, startY, origLeft, origTop;
+
+            el.style.position = "fixed";
+            el.style.cursor = "move";
+            // Smooth transition only while the widget is at rest
+            el.style.transition = "left 0.15s ease, top 0.15s ease";
+
+            const getDropdown = () =>
+                document.getElementById("ui-id-1") || document.querySelector(".ui-autocomplete");
+
+            /** Snap the autocomplete dropdown under the search input. */
+            const syncDropdown = () => {
+                const dropdown = getDropdown();
+                if (!dropdown) return;
+                const rect = el.getBoundingClientRect();
+                dropdown.style.position = "fixed";
+                dropdown.style.left = rect.left + "px";
+                dropdown.style.top = rect.bottom + 2 + "px"; // 2 px gap
+                dropdown.style.width = rect.width + "px";
+                dropdown.style.zIndex = "36000";
+            };
+
+            el.addEventListener("mousedown", e => {
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                origLeft = parseInt(el.style.left, 10) || 0;
+                origTop = parseInt(el.style.top, 10) || 0;
+
+                // Disable transition while dragging so the widget tracks the cursor
+                el.style.transition = "none";
+                e.stopPropagation();
+            });
+
+            document.addEventListener("mousemove", e => {
+                if (!isDragging) return;
+                el.style.left = origLeft + (e.clientX - startX) + "px";
+                el.style.top = origTop + (e.clientY - startY) + "px";
+                syncDropdown();
+            });
+
+            document.addEventListener("mouseup", () => {
+                if (!isDragging) return;
+                isDragging = false;
+                // Re-enable smooth transition once drag ends
+                el.style.transition = "left 0.15s ease, top 0.15s ease";
+                // Persist the dragged position for the next keyboard-shortcut open
+                this._searchWidgetLastPos = {
+                    left: el.style.left,
+                    top: el.style.top
+                };
+                syncDropdown();
+            });
+
+            // Also sync on every keyup so the dropdown stays aligned while the user
+            // types (jQuery UI may reposition it on content change).
+            el.addEventListener("keyup", syncDropdown);
+        };
         /*
          * Uses JQuery to add autocompleted search suggestions
          */
@@ -2462,6 +2623,11 @@ class Activity {
             const KEYCODE_DOWN = 40;
             const DEL = 46;
             const V = 86;
+            if (event.ctrlKey && event.keyCode === 32) {
+                event.preventDefault();
+                this.showSearchWidget(true);
+                return;
+            }
             const lilypondModal = document.getElementById("lilypondModal");
             const samplerPrompt = document.getElementById("samplerPrompt");
             const planetIframe = document.getElementById("planet-iframe");
@@ -4955,6 +5121,10 @@ class Activity {
                         {
                             keys: platformKeys("Page Down", "Page Down"),
                             action: _("Scroll workspace down")
+                        },
+                        {
+                            keys: platformKeys("Ctrl + Space", "Ctrl + Space"),
+                            action: _("Open block search.")
                         },
                         {
                             keys: platformKeys("Esc", "Esc"),
