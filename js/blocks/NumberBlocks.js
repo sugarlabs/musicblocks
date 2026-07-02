@@ -52,11 +52,23 @@ function setupNumberBlocks(activity) {
     };
 
     /**
-     * Handle math operation errors with standardized response
+     * Handle math operation errors with standardized response.
+     * Maps known error types to their dedicated error messages so that callers
+     * do not need to repeat the same dispatch table.
      */
-    const handleMathError = (logo, error, blk, onError = NANERRORMSG) => {
+    const handleMathError = (logo, error, blk, onError) => {
         logo.stopTurtle = true;
-        activity.errorMsg(onError, blk);
+        let message = onError;
+        if (message === undefined) {
+            if (error && error.message === "DivByZeroError") {
+                message = ZERODIVIDEERRORMSG;
+            } else if (error && error.message === "NoSqrtError") {
+                message = NOSQRTERRORMSG;
+            } else {
+                message = NANERRORMSG;
+            }
+        }
+        activity.errorMsg(message, blk);
     };
 
     /**
