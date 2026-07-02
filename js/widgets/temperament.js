@@ -1284,6 +1284,10 @@ function TemperamentWidget() {
         divAppend.onclick = function (event) {
             const input1 = docById("ratioIn").value;
             const input2 = docById("ratioOut").value;
+            if (Number(input2) === 0) {
+                that.activity.errorMsg(_("Denominator cannot be zero."), 3000);
+                return;
+            }
             const recursion = docById("recursion").value;
             const len = that.frequencies.length;
             const ratio1 = input1 / input2;
