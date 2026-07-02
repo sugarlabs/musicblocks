@@ -2491,15 +2491,9 @@ function Synth() {
         await Tone.start();
         this.mic = new Tone.UserMedia();
         this.recorder = new Tone.Recorder();
-        await this.mic
-            .open()
-            .then(() => {
-                this.mic.connect(this.recorder);
-                this.recorder.start();
-            })
-            .catch(error => {
-                console.error(error);
-            });
+        await this.mic.open();
+        this.mic.connect(this.recorder);
+        this.recorder.start();
     };
 
     const _disposeRecordingPlayer = () => {

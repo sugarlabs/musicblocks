@@ -303,6 +303,42 @@ function SampleWidget() {
     };
 
     /**
+     * Displays a user-facing message when microphone access is denied.
+     * @param {string} msg - The message to display.
+     * @returns {void}
+     */
+    this.showMicDeniedMessage = function (msg) {
+        const printText = document.getElementById("printText");
+        const printTextContent = document.getElementById("printTextContent");
+        if (!printText || !printTextContent) {
+            return;
+        }
+
+        printTextContent.textContent = msg;
+        printText.classList.add("show");
+        printText.style.width = "";
+        printText.style.height = "";
+        printText.style.clip = "";
+        printText.style.overflow = "";
+        printText.style.padding = "";
+        printText.style.margin = "";
+        printText.style.whiteSpace = "";
+        printText.style.border = "";
+
+        setTimeout(function () {
+            printText.classList.remove("show");
+            printText.style.width = "1px";
+            printText.style.height = "1px";
+            printText.style.clip = "rect(0 0 0 0)";
+            printText.style.overflow = "hidden";
+            printText.style.padding = "0";
+            printText.style.margin = "-1px";
+            printText.style.whiteSpace = "nowrap";
+            printText.style.border = "0";
+        }, 3000);
+    };
+
+    /**
      * Saves the sample and generates a new sample block with the provided data.
      * @private
      * @returns {void}
@@ -955,11 +991,16 @@ function SampleWidget() {
         this._recordBtn.onclick = async () => {
             stopTuner();
             if (!this.is_recording) {
-                await this.activity.logo.synth.startRecording();
-                this.is_recording = true;
-                this._recordBtn.getElementsByTagName("img")[0].src = "header-icons/record.svg";
-                this.displayRecordingStartMessage();
-                this.activity.logo.synth.LiveWaveForm();
+                try {
+                    await this.activity.logo.synth.startRecording();
+                    this.is_recording = true;
+                    this._recordBtn.getElementsByTagName("img")[0].src = "header-icons/record.svg";
+                    this.displayRecordingStartMessage();
+                    this.activity.logo.synth.LiveWaveForm();
+                } catch (err) {
+                    console.error(err);
+                    this.showMicDeniedMessage(_("Microphone access denied."));
+                }
             } else {
                 this.recordingURL = await this.activity.logo.synth.stopRecording();
                 this.is_recording = false;
@@ -2279,7 +2320,7 @@ function SampleWidget() {
             this.pitchDetectionAnimationId = requestAnimationFrame(updatePitch);
         } catch (err) {
             console.error(`${err.name}: ${err.message}`);
-            alert(_("Microphone access failed: %s").replace(/%s/g, err.message));
+            this.showMicDeniedMessage(_("Microphone access denied."));
             // Clean up any partially initialized resources
             this.stopPitchDetection();
         }
