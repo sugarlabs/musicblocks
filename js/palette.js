@@ -132,9 +132,45 @@ class Palettes {
         this._handleSearchKeydown = this._handleSearchKeydown.bind(this);
     }
 
+    // handleEmptyResults(searchResults) {
+    // const menu = document.querySelector(".ui-menu");
+    // const searchInput = document.getElementById("search");
+
+    // if (!menu || !searchInput || !searchInput.value.trim()) return;
+
+    // const existingMessage = menu.querySelector(".no-results");
+
+    // // if (searchResults.length === 0) {
+    //     const existingMessage = menu.querySelector(".no-results");
+
+    //     const visibleResults = Array.from(searchResults)
+    //         .filter(el => el.offsetParent !== null);
+        
+    //     if (visibleResults.length === 0) {
+    //         if (!existingMessage) {
+    //             const messageItem = document.createElement("li");
+    //             messageItem.className = "ui-menu-item no-results";
+    //             messageItem.textContent = `No results found for "${searchInput.value}"`;
+        
+    //             messageItem.style.cssText = `
+    //                 opacity: 0.7;
+    //                 pointer-events: none;
+    //                 text-align: center;
+    //                 padding: 6px;
+    //             `;
+        
+    //             menu.appendChild(messageItem);
+    //         }
+    //     } else {
+    //         if (existingMessage) {
+    //             existingMessage.remove();
+    //         }
+    //     }
+    // }
     init() {
         this.halfCellSize = Math.floor(this.cellSize / 2);
     }
+    
 
     init_selectors() {
         for (let i = 0; i < MULTIPALETTES.length; i++) {
@@ -385,8 +421,35 @@ class Palettes {
             event.preventDefault();
             event.stopPropagation();
 
-            const searchResults = document.querySelectorAll(".ui-menu-item");
-            if (searchResults.length === 0) return;
+           const searchResults = document.querySelectorAll(".ui-menu-item");
+
+            setTimeout(() => {
+              const menu = document.querySelector(".ui-autocomplete");
+              const searchInput = document.getElementById("search");
+            
+              if (!menu || !searchInput) return;
+            
+              // remove old message
+              const old = menu.querySelector(".no-results");
+              if (old) old.remove();
+            
+              const visibleResults = Array.from(searchResults)
+                .filter(el => el.offsetParent !== null);
+            
+              if (searchInput.value.trim() !== "" && visibleResults.length === 0) {
+                const li = document.createElement("li");
+                li.className = "ui-menu-item no-results";
+                li.textContent = `No results found for "${searchInput.value}"`;
+            
+                li.style.padding = "6px";
+                li.style.textAlign = "center";
+                li.style.opacity = "0.7";
+            
+                menu.appendChild(li);
+              }
+            }, 50);
+           // if (searchResults.length === 0) return;
+            
 
             // Navigate through search results
             searchResults.forEach(row => {
@@ -404,41 +467,73 @@ class Palettes {
             } else if (event.key === "ArrowUp") {
                 this._searchResultIndex = Math.max(this._searchResultIndex - 1, 0);
             }
-
+                 
+        
+            
+        
+            // Highlight
             const currentResult = searchResults[this._searchResultIndex];
+        
             if (currentResult) {
                 currentResult.classList.add("ui-state-active");
                 currentResult.style.backgroundColor = platformColor.hoverColor;
                 currentResult.dataset.keyboardFocus = "true";
+        
                 currentResult.scrollIntoView({
                     block: "nearest",
                     behavior: "smooth"
                 });
             }
-        } else if (event.key === "Enter") {
-            const searchResults = document.querySelectorAll(".ui-menu-item");
+        
+            // ✅ ENTER (separate block)
+            // if (event.key === "Enter") {
+            //     if (searchResults[this._searchResultIndex]) {
+            //         event.preventDefault();
+            //         event.stopPropagation();
+        
+            //         searchResults[this._searchResultIndex].click();
+        
+            //         this.activity.hideSearchWidget();
+                else if (event.key === "Enter") {
+                    const searchResults = document.querySelectorAll(".ui-menu-item");
+                
+                    if (searchResults[this.__searchResultIndex]) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                
+                        // const item = searchResults[this.__searchResultIndex];
+                
+                        // item.click();
+                
+                        // if (item && item.dataset && item.dataset.block) {
+                        //     this.activity.blocks.loadNewBlocks(item.dataset.block);
+                        // }
+                      const item = searchResults[this.__searchResultIndex];
 
-            if (searchResults[this._searchResultIndex]) {
-                event.preventDefault();
-                event.stopPropagation();
-
-                // Trigger click on the item to select it
-                searchResults[this._searchResultIndex].click();
-
-                // Close search and return focus to palette
-                this.activity.hideSearchWidget();
-                const palette = docById("palette");
-                if (palette) {
-                    palette.focus();
-                    this._navSection = "search";
-                    const tr = palette.children[0]?.children[0]?.children[0]?.children[0];
-                    const listBody = docById("palette")?.children[0]?.children[1]?.children[1];
-                    const blockRows = listBody ? Array.from(listBody.children) : [];
-                    this._updateKeyboardFocus(tr, blockRows);
+// force click
+                        item.click();
+                        
+                        // manually trigger palette selection
+                        const event = new Event("click", { bubbles: true });
+                        item.dispatchEvent(event);
+                        
+                        this.activity.hideSearchWidget();
+                                        
+                    const palette = docById("palette");
+                    if (palette) {
+                        palette.focus();
+                        this._navSection = "search";
+        
+                        const tr = palette.children[0]?.children[0]?.children[0];
+                        const listBody = docById("palette")?.children[0]?.children[1];
+                        const blockRows = listBody ? Array.from(listBody.children) : [];
+        
+                        this._updateKeyboardFocus(tr, blockRows);
+                    }
                 }
             }
-        }
-    }
+        
+        }, 0);
 
     /**
      * Updates visual focus for keyboard navigation
