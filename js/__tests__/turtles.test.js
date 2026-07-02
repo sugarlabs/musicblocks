@@ -526,3 +526,144 @@ describe("setStageScale", () => {
         expect(activityMock.refreshCanvas).toHaveBeenCalled();
     });
 });
+
+describe("aux toolbar collapse and expand", () => {
+    let activityMock;
+    let turtles;
+    let originalImage;
+    let originalDocById;
+
+    beforeEach(() => {
+        originalImage = global.Image;
+        // Extend the real Image so DOM methods like setAttribute work,
+        // but trigger onload when src is set (needed by makeBackground internals).
+        global.Image = class extends originalImage {
+            set src(_value) {
+                if (typeof this.onload === "function") {
+                    this.onload();
+                }
+            }
+            get src() {
+                return "";
+            }
+        };
+
+        originalDocById = global.docById;
+        global.docById = jest.fn(id => document.getElementById(id));
+        global._ = jest.fn(str => str);
+
+        window.jQuery = jest.fn().mockReturnValue({
+            tooltip: jest.fn()
+        });
+        window.jQuery.noConflict = jest.fn(() => () => ({
+            each: jest.fn()
+        }));
+
+        activityMock = {
+            stage: {
+                addChild: jest.fn(),
+                removeChild: jest.fn(),
+                removeAllEventListeners: jest.fn(),
+                on: jest.fn(),
+                x: 0,
+                y: 0
+            },
+            refreshCanvas: jest.fn(),
+            hideAuxMenu: jest.fn(),
+            hideGrids: jest.fn(),
+            helpfulWheelItems: [
+                { label: "Expand", display: false },
+                { label: "Collapse", display: true },
+                { label: "Grid", display: true }
+            ],
+            __tick: jest.fn(),
+            _doCartesianPolar: jest.fn()
+        };
+
+        document.body.innerHTML = `
+            <div id="aux-toolbar" style="display:block"></div>
+            <div id="menu"></div>
+            <button id="toggleAuxBtn" class="blue darken-1"></button>
+            <div id="helpfulWheelDiv" style="display:block"></div>
+            <div id="buttoncontainerTOP"></div>
+        `;
+
+        turtles = new Turtles(activityMock);
+        turtles.activity = activityMock;
+        mixinPrototypes(turtles);
+        turtles._stage = activityMock.stage;
+        turtles._w = 1200;
+        turtles._h = 900;
+        turtles.hideMenu = jest.fn();
+        turtles.setStageScale = jest.fn();
+        turtles.getTurtleCount = jest.fn().mockReturnValue(0);
+        turtles.getTurtle = jest.fn();
+        turtles.masterStage = {
+            removeChild: jest.fn(),
+            addChild: jest.fn(),
+            addChildAt: jest.fn()
+        };
+        turtles._borderContainer = new createjs.Container();
+        turtles._collapsedBoundary = { visible: false };
+        turtles._expandedBoundary = { visible: true };
+        turtles._canvas = { style: {} };
+        turtles.currentGrid = null;
+
+        // Call the real makeBackground to create the real collapse/expand closures
+        turtles.makeBackground();
+
+        // Stub UI objects that collapse()/expand() access but are created
+        // asynchronously inside makeBackground() (via Image.onload chain).
+        turtles._expandButton ??= {
+            style: { visibility: "hidden" }
+        };
+        turtles._collapseButton ??= {
+            style: { visibility: "visible" }
+        };
+        turtles.gridButton ??= {
+            style: { visibility: "visible" },
+            scaleX: 1,
+            scaleY: 1,
+            scale: 1,
+            x: 0,
+            visible: true
+        };
+        turtles._clearButton ??= {
+            scaleX: 1,
+            scaleY: 1,
+            scale: 1,
+            x: 0
+        };
+    });
+
+    afterEach(() => {
+        global.Image = originalImage;
+        global.docById = originalDocById;
+    });
+
+    test("collapse removes highlight classes from auxiliary toolbar button", () => {
+        const btn = document.getElementById("toggleAuxBtn");
+        btn.className = "blue darken-1";
+
+        turtles.collapse();
+
+        expect(btn.classList.contains("blue")).toBe(false);
+        expect(btn.classList.contains("darken-1")).toBe(false);
+        expect(turtles.hideMenu).toHaveBeenCalled();
+        expect(turtles.setStageScale).toHaveBeenCalledWith(0.25);
+        expect(activityMock.hideGrids).toHaveBeenCalled();
+        expect(activityMock.__tick).toHaveBeenCalled();
+    });
+
+    test("expand removes highlight classes from auxiliary toolbar button", () => {
+        const btn = document.getElementById("toggleAuxBtn");
+        btn.className = "blue darken-1";
+
+        turtles.expand();
+
+        expect(btn.classList.contains("blue")).toBe(false);
+        expect(btn.classList.contains("darken-1")).toBe(false);
+        expect(turtles.hideMenu).toHaveBeenCalled();
+        expect(turtles.setStageScale).toHaveBeenCalledWith(1.0);
+    });
+});

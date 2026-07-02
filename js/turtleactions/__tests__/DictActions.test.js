@@ -285,6 +285,15 @@ describe("setupDictActions", () => {
             Turtle.DictActions.setValue("newDict", "key", "value", turtle);
             expect(activity.logo.turtleDicts[turtle].newDict.key).toBe("value");
         });
+
+        it("should set value without logging to console", () => {
+            const consoleSpy = jest.spyOn(console, "log");
+            activity.logo.turtleDicts[turtle] = {};
+            Turtle.DictActions.setValue("testDict", "key", "value", turtle);
+            expect(consoleSpy).not.toHaveBeenCalled();
+            expect(activity.logo.turtleDicts[turtle]["testDict"]["key"]).toBe("value");
+            consoleSpy.mockRestore();
+        });
     });
 
     describe("getValue", () => {

@@ -35,6 +35,8 @@ global.frequencyToPitch = jest.fn(f => ["A", "", 4]);
 global.base64Encode = jest.fn(s => s);
 global.PREVIEWVOLUME = 0.5;
 global.normalizeNoteAccidentals = jest.fn(n => n);
+global.Singer = { masterVolume: [50] };
+global.last = arr => arr[arr.length - 1];
 
 window.innerWidth = 1200;
 window.btoa = jest.fn(s => s);
@@ -302,7 +304,7 @@ describe("PitchStaircase Widget", () => {
             );
         });
 
-        test("should stop synth, set closed to true, and restore master volume to PREVIEWVOLUME on close", () => {
+        test("should stop synth, set closed to true, and restore project master volume on close", () => {
             psc.init(mockActivity);
 
             const widgetWindow = window.widgetWindows.windowFor();
@@ -315,7 +317,7 @@ describe("PitchStaircase Widget", () => {
 
             expect(mockActivity.logo.synth.stop).toHaveBeenCalled();
             expect(mockActivity.logo.synth.setMasterVolume).toHaveBeenCalledWith(
-                global.PREVIEWVOLUME
+                global.Singer.masterVolume[global.Singer.masterVolume.length - 1]
             );
             expect(psc.closed).toBe(true);
             expect(widgetWindow.destroy).toHaveBeenCalled();

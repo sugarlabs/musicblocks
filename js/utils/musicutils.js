@@ -1518,7 +1518,7 @@ const INTERVALVALUES = {
     "major 6": [9, 1, 5 / 3],
     "diminished 7": [9, -1, 9 / 5],
     "augmented 6": [10, 1, 125 / 72],
-    "minor 7": [10, -1, 9 / 5],
+    "minor 7": [10, -1, 16 / 9],
     "major 7": [11, 1, 15 / 8],
     "diminished 8": [11, -1, 48 / 25],
     "diminished octave": [11, -1, 48 / 25],
@@ -1643,7 +1643,7 @@ const PITCH_COLLECTIONS = {
     },
     6: {
         "minor blues": [3, 2, 1, 1, 3, 2],
-        "major blues": [2, 1, 1, 3, 2, 2],
+        "major blues": [2, 1, 1, 3, 2, 3],
         "whole tone": [2, 2, 2, 2, 2, 2]
     },
     5: {
@@ -3327,30 +3327,24 @@ const frequencyToPitch = (hz, temperament) => {
         return ["C", 10, 0];
     }
 
-    // Calculate cents to keep track of drift
-    let cents = 0;
-    // Standard tuning uses CENTS_PER_OCTAVE cents per octave.
-
-    for (let i = 0; i < 10 * CENTS_PER_OCTAVE; i++) {
-        const f = A0 * Math.pow(TWELVEHUNDRETHROOT2, i);
-        if (hz < f * 1.0003 && hz > f * 0.9997) {
-            cents = i % centsPerStep;
-            let j = Math.floor(i / centsPerStep);
-            if (cents > centsPerStep / 2) {
-                cents -= centsPerStep;
-                j += 1;
-            }
-            const aIndex = PITCHES.indexOf("A");
-            return [
-                PITCHES[(j + aIndex) % currentEDO],
-                Math.floor((j + aIndex) / currentEDO),
-                cents
-            ];
-        }
+    const steps = currentEDO * (Math.log(hz / A0) / Math.log(2));
+    const roundedSteps = Math.round(steps);
+    let cents = (steps - roundedSteps) * centsPerStep;
+    if (cents > centsPerStep / 2) {
+        cents -= centsPerStep;
+    } else if (cents <= -centsPerStep / 2) {
+        cents += centsPerStep;
+    }
+    if (Math.abs(cents) < 0.5) {
+        cents = 0;
     }
 
-    // console.debug("Could not find note/octave/cents for " + hz);
-    return ["?", -1, 0];
+    const stepIndex = ((roundedSteps % currentEDO) + currentEDO) % currentEDO;
+    const nameIndex = Math.round((stepIndex / currentEDO) * 12);
+    const pitchName = PITCHES[(nameIndex + PITCHES.indexOf("A")) % PITCHES.length];
+    const octaveNumber = Math.floor((roundedSteps + PITCHES.indexOf("A")) / currentEDO);
+
+    return [pitchName, octaveNumber, cents];
 };
 
 /**
@@ -4034,25 +4028,24 @@ const pitchToNumber = (pitch, octave, keySignature, temperament) => {
  * @param {number} i - The numeric representation of the pitch.
  * @returns {Array} An array containing the pitch and octave.
  */
-const numberToPitchSharp = i => {
+const numberToPitchSharp = (i, temperament) => {
     // numbertoPitch return only flats
     // This function will return sharps.
+    const currentEDO = getCurrentEDO(temperament);
     if (i < 0) {
         let n = 0;
         while (i < 0) {
-            i += 12;
+            i += currentEDO;
             n += 1;
         }
 
-        return [
-            PITCHES2[(i + PITCHES2.indexOf("A")) % 12],
-            Math.floor((i + PITCHES2.indexOf("A")) / 12) - n
-        ];
+        const octave = Math.floor(i / currentEDO) - n;
+        const nameIndex = Math.round(((i % currentEDO) / currentEDO) * 12);
+        return [PITCHES2[(nameIndex + PITCHES2.indexOf("A")) % 12], octave];
     } else {
-        return [
-            PITCHES2[(i + PITCHES2.indexOf("A")) % 12],
-            Math.floor((i + PITCHES2.indexOf("A")) / 12)
-        ];
+        const octave = Math.floor(i / currentEDO);
+        const nameIndex = Math.round(((i % currentEDO) / currentEDO) * 12);
+        return [PITCHES2[(nameIndex + PITCHES2.indexOf("A")) % 12], octave];
     }
 };
 
@@ -4063,15 +4056,16 @@ const numberToPitchSharp = i => {
  * @param {number} octave - The octave number.
  * @returns {number} The numeric representation of the note.
  */
-const getNumber = (notename, octave) => {
+const getNumber = (notename, octave, temperament) => {
     // Converts a note, e.g., C, and octave to a number
+    const currentEDO = getCurrentEDO(temperament);
     let num;
     if (octave < 0) {
         num = 0;
     } else if (octave > 10) {
-        num = 9 * 12;
+        num = 9 * currentEDO;
     } else {
-        num = 12 * (octave - 1);
+        num = currentEDO * (octave - 1);
     }
 
     notename = String(notename);
@@ -4405,28 +4399,31 @@ const numberToPitch = (i, temperament, startPitch, offset, activity) => {
     if (temperament === undefined) {
         temperament = "equal";
     }
+    const currentEDO = getCurrentEDO(temperament);
 
     let n = 0;
     let pitchNumber;
     if (i < 0) {
         while (i < 0) {
-            i += 12;
+            i += currentEDO;
             n += 1; // Count octave bump ups.
         }
 
         if (temperament === "equal") {
+            const nameIndex = Math.round(((i % currentEDO) / currentEDO) * 12);
             return [
-                PITCHES[(i + PITCHES.indexOf("A")) % 12],
-                Math.floor((i + PITCHES.indexOf("A")) / 12) - n
+                PITCHES[(nameIndex + PITCHES.indexOf("A")) % 12],
+                Math.floor((i + PITCHES.indexOf("A")) / currentEDO) - n
             ];
         } else {
             pitchNumber = Math.floor(i - offset);
         }
     } else {
         if (temperament === "equal") {
+            const nameIndex = Math.round(((i % currentEDO) / currentEDO) * 12);
             return [
-                PITCHES[(i + PITCHES.indexOf("A")) % 12],
-                Math.floor((i + PITCHES.indexOf("A")) / 12)
+                PITCHES[(nameIndex + PITCHES.indexOf("A")) % 12],
+                Math.floor((i + PITCHES.indexOf("A")) / currentEDO)
             ];
         } else {
             pitchNumber = Math.floor(i - offset);
@@ -4455,11 +4452,12 @@ const numberToPitch = (i, temperament, startPitch, offset, activity) => {
         if (TEMPERAMENT[temperament][pitchNumber] === undefined) {
             // If custom temperament is not defined, then it will
             // store equal temperament notes.
-            for (let j = 0; j < 12; j++) {
+            for (let j = 0; j < octaveLength; j++) {
                 const number = "" + j;
-                interval = TEMPERAMENT["equal"]["interval"][j];
+                const intervalIndex = Math.round((j * 12) / octaveLength) % 12;
+                interval = TEMPERAMENT["equal"]["interval"][intervalIndex];
                 TEMPERAMENT[temperament][number] = [
-                    Math.pow(2, j / 12),
+                    Math.pow(2, j / octaveLength),
                     getNoteFromInterval(startPitch, interval)[0],
                     getNoteFromInterval(startPitch, interval)[1]
                 ];
@@ -4655,9 +4653,9 @@ function getNote(
             }
         }
         if (getSharpFlatPreference(keySignature) === "sharp") {
-            noteArg = PITCHES2[(noteArg + kOffset) % 12];
+            noteArg = PITCHES2[(noteArg + kOffset) % octaveLength];
         } else {
-            noteArg = PITCHES[(noteArg + kOffset) % 12];
+            noteArg = PITCHES[(noteArg + kOffset) % octaveLength];
         }
     }
 
@@ -4941,10 +4939,10 @@ function getNote(
                     let i = NOTESSHARP.indexOf(note);
                     i += deltaNote;
                     if (i < 0) {
-                        i += 12;
+                        i += octaveLength;
                         octave -= 1;
-                    } else if (i > 11) {
-                        i -= 12;
+                    } else if (i >= octaveLength) {
+                        i -= octaveLength;
                         octave += 1;
                     }
 
@@ -4953,10 +4951,10 @@ function getNote(
                     let i = NOTESFLAT.indexOf(note);
                     i += deltaNote;
                     if (i < 0) {
-                        i += 12;
+                        i += octaveLength;
                         octave -= 1;
-                    } else if (i > 11) {
-                        i -= 12;
+                    } else if (i >= octaveLength) {
+                        i -= octaveLength;
                         octave += 1;
                     }
 
@@ -4969,10 +4967,10 @@ function getNote(
                     let i = NOTESFLAT.indexOf(note);
                     i += deltaNote;
                     if (i < 0) {
-                        i += 12;
+                        i += octaveLength;
                         octave -= 1;
-                    } else if (i > 11) {
-                        i -= 12;
+                    } else if (i >= octaveLength) {
+                        i -= octaveLength;
                         octave += 1;
                     }
 
@@ -4981,10 +4979,10 @@ function getNote(
                     let i = NOTESSHARP.indexOf(note);
                     i += deltaNote;
                     if (i < 0) {
-                        i += 12;
+                        i += octaveLength;
                         octave -= 1;
-                    } else if (i > 11) {
-                        i -= 12;
+                    } else if (i >= octaveLength) {
+                        i -= octaveLength;
                         octave += 1;
                     }
 
@@ -5270,12 +5268,15 @@ function _parse_pitch_string(str) {
  * Calculates a pitch number from a note name and octave.
  * @param {string} noteName - The name of the note (e.g. "C", "C#").
  * @param {number} octave - The octave number.
+ * @param {number} applyOffset - The offset to apply.
+ * @param {string} temperament - The temperament to use (default "equal").
  * @returns {number|string} The calculated pitch number or INVALIDPITCH if calculation fails.
  */
-function _calculate_pitch_number(noteName, octave, applyOffset = 0) {
+function _calculate_pitch_number(noteName, octave, applyOffset = 0, temperament) {
     if (typeof noteName !== "string") {
         return INVALIDPITCH;
     }
+    const currentEDO = getCurrentEDO(temperament);
 
     let name = noteName.replaceAll("#", SHARP).replaceAll("b", FLAT);
 
@@ -5287,7 +5288,7 @@ function _calculate_pitch_number(noteName, octave, applyOffset = 0) {
         let baseIndex = NOTESSHARP.indexOf(baseLetter);
         if (baseIndex === -1) baseIndex = NOTESFLAT.indexOf(baseLetter);
         if (baseIndex === -1) return INVALIDPITCH;
-        const rawPitch = (parseInt(octave, 10) + 1) * 12 + baseIndex + offset;
+        const rawPitch = (parseInt(octave, 10) + 1) * currentEDO + baseIndex + offset;
         return rawPitch - applyOffset;
     }
 
@@ -5308,7 +5309,7 @@ function _calculate_pitch_number(noteName, octave, applyOffset = 0) {
         return INVALIDPITCH;
     }
 
-    return (parseInt(octave, 10) + 1) * 12 + pitchIndex - applyOffset;
+    return (parseInt(octave, 10) + 1) * currentEDO + pitchIndex - applyOffset;
 }
 
 /**
@@ -5383,7 +5384,7 @@ const buildScale = keySignature => {
     let ii = idx;
     for (let i = 0; i < halfSteps.length; i++) {
         ii += halfSteps[i];
-        scale.push(thisScale[ii % SEMITONES]);
+        scale.push(thisScale[ii % thisScale.length]);
     }
 
     // Make sure there are no repeated letter names for seven step scales
@@ -5459,6 +5460,7 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
         //Scalar = Semitone for custom Temperament.
         return transposition;
     }
+    const currentEDO = getCurrentEDO(temperament);
 
     let thisPitch = pitch;
     const obj = buildScale(keySignature);
@@ -5551,53 +5553,42 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
     // Pitch is not in the consonant scale of this key, so we need to
     // shift up or down to the next note in the key.
     let offset = 0;
-    let i = PITCHES.indexOf(thisPitch);
-    if (i !== -1) {
+    let startIndex = PITCHES.indexOf(thisPitch);
+    if (startIndex !== -1) {
+        // Convert starting 12-EDO index to approximate EDO step position
+        let edoStep = Math.round((startIndex * currentEDO) / PITCHES.length);
         while (!scale.includes(thisPitch)) {
-            i = PITCHES.indexOf(thisPitch);
-            if (i === -1) {
-                i = PITCHES2.indexOf(thisPitch);
-            }
-
             if (direction === "up") {
-                i += 1;
-                thisPitch = PITCHES[i % 12];
+                edoStep += 1;
                 offset += 1;
             } else {
-                i -= 1;
-                if (i < 0) {
-                    i += 12;
-                }
-
-                thisPitch = PITCHES[i];
+                edoStep -= 1;
                 offset -= 1;
             }
+            const posInOctave = ((edoStep % currentEDO) + currentEDO) % currentEDO;
+            const nameIndex =
+                Math.round((posInOctave * PITCHES.length) / currentEDO) % PITCHES.length;
+            thisPitch = PITCHES[nameIndex];
         }
 
         return offset;
     }
 
-    i = PITCHES2.indexOf(thisPitch);
-    if (i !== -1) {
+    startIndex = PITCHES2.indexOf(thisPitch);
+    if (startIndex !== -1) {
+        let edoStep = Math.round((startIndex * currentEDO) / PITCHES2.length);
         while (!scale.includes(thisPitch)) {
-            i = PITCHES2.indexOf(thisPitch);
-            if (i === -1) {
-                i = PITCHES.indexOf(thisPitch);
-            }
-
             if (direction === "up") {
-                i += 1;
-                thisPitch = PITCHES2[i % 12];
+                edoStep += 1;
                 offset += 1;
             } else {
-                i -= 1;
-                if (i < 0) {
-                    i += 12;
-                }
-
-                thisPitch = PITCHES2[i];
+                edoStep -= 1;
                 offset -= 1;
             }
+            const posInOctave = ((edoStep % currentEDO) + currentEDO) % currentEDO;
+            const nameIndex =
+                Math.round((posInOctave * PITCHES2.length) / currentEDO) % PITCHES2.length;
+            thisPitch = PITCHES2[nameIndex];
         }
 
         return offset;
@@ -6020,12 +6011,12 @@ const getInterval = (interval, keySignature, pitch) => {
                     let i = PITCHES.indexOf(pitch);
                     if (interval > 0) {
                         i += 1;
-                        pitch = PITCHES[i % 12];
+                        pitch = PITCHES[i % PITCHES.length];
                         // offset -= 1;
                     } else {
                         i -= 1;
                         if (i < 0) {
-                            i += 12;
+                            i += PITCHES.length;
                         }
                         pitch = PITCHES[i];
                         // offset += 1;
@@ -6043,12 +6034,12 @@ const getInterval = (interval, keySignature, pitch) => {
                         let i = PITCHES2.indexOf(pitch);
                         if (interval > 0) {
                             i += 1;
-                            pitch = PITCHES2[i % 12];
+                            pitch = PITCHES2[i % PITCHES2.length];
                             // offset -= 1;
                         } else {
                             i -= 1;
                             if (i < 0) {
-                                i += 12;
+                                i += PITCHES2.length;
                             }
                             pitch = PITCHES2[i];
                             // offset += 1;
@@ -6266,15 +6257,19 @@ const durationToNoteValue = duration => {
  * @returns {Array} An array containing [noteName, octave].
  */
 const parseNoteString = note => {
-    // Regex to match note name (letter + optional accidental) and octave (one or more digits, optional negative sign)
-    // Pattern: [A-Ga-g] for note letter, [#b♯♭]? for optional accidental, (-?\d+) for octave (multi-digit, can be negative)
-    const match = note.match(/^([A-Ga-g][#b♯♭]?)(-?\d+)$/);
+    // Regex to match note name and octave (one or more digits, optional negative sign)
+    // Matches valid note prefixes (Western, Solfege, Carnatic) and optional accidentals followed by octave
+    const match = note.match(
+        /^((?:[a-g]|do|re|mi|fa|sol|la|ti|si|ut|sa|ga|ma|pa|dha|ni)(?:[#b♯♭𝄪𝄫x♮]*))(-?\d+)$/iu
+    );
     if (match) {
         return [match[1], Number(match[2])];
     }
     // Fallback to original behavior if regex doesn't match (for edge cases)
     const len = note.length;
-    return [note.substring(0, len - 1), Number(last(note))];
+    const lastChar = note.charAt(len - 1);
+    const octave = lastChar && !isNaN(lastChar) ? Number(lastChar) : NaN;
+    return [note.substring(0, len - 1), octave];
 };
 
 /**
@@ -6342,14 +6337,18 @@ const noteIsSolfege = note => {
  * Get the solfege representation of a note string.
  * @function
  * @param {string} note - The note string.
+ * @param {string} keySignature - The key signature.
+ * @param {boolean} movable - Whether to use movable-do.
+ * @param {string} [temperament] - The temperament to use (default "equal").
  * @returns {string} The solfege representation.
  */
-const getSolfege = (note, keySignature, movable) => {
+const getSolfege = (note, keySignature, movable, temperament) => {
     if (noteIsSolfege(note)) {
         return note;
     }
 
     if (movable && keySignature) {
+        const currentEDO = getCurrentEDO(temperament);
         const scaleResult = buildScale(keySignature);
         if (!scaleResult) return SOLFEGECONVERSIONTABLE[note];
 
@@ -6382,20 +6381,23 @@ const getSolfege = (note, keySignature, movable) => {
 
         // 3) chromatic fallback (interval based)
         const tonic = scale[0];
-        const tonicPitch = pitchToNumber(tonic, 4, keySignature);
-        const notePitch = pitchToNumber(note, 4, keySignature);
+        const tonicPitch = pitchToNumber(tonic, 4, keySignature, temperament);
+        const notePitch = pitchToNumber(note, 4, keySignature, temperament);
 
-        // semitones from tonic
-        let semitones = (notePitch - tonicPitch + 12) % 12;
+        // semitones from tonic (EDO-aware)
+        let semitones = (((notePitch - tonicPitch) % currentEDO) + currentEDO) % currentEDO;
 
         if (isMinor) {
-            // For minor, relative major is 3 semitones up.
-            // We want solfege relative to the relative major.
-            // e.g. Minor tonic (La) -> +9 -> La
-            semitones = (semitones + 9) % 12;
+            // For minor, relative major is 3 semitones up in 12-EDO terms.
+            // Map to the current EDO and compute la-based offset.
+            const relativeMajorSteps = Math.round((3 * currentEDO) / 12);
+            semitones = (semitones + currentEDO - relativeMajorSteps) % currentEDO;
         }
 
-        return CHROMATIC_SOLFEGE[semitones].toLowerCase();
+        // Map EDO semitones to nearest 12-tone CHROMATIC_SOLFEGE index
+        const chromaticSize = CHROMATIC_SOLFEGE.length;
+        const solfegeIndex = Math.round((semitones * chromaticSize) / currentEDO) % chromaticSize;
+        return CHROMATIC_SOLFEGE[solfegeIndex].toLowerCase();
     }
 
     return SOLFEGECONVERSIONTABLE[note];
@@ -6596,17 +6598,11 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote) => {
 
     if (halfSteps <= 5 || isNaN(halfSteps)) {
         changedCurrent = currentOctave;
-    }
-
-    if (halfSteps > 5 && halfStepsUp > 5 && halfStepsDown < 5) {
+    } else if (halfStepsDown <= halfStepsUp) {
         changedCurrent = Math.max(currentOctave - 1, 1);
-    }
-
-    if (halfSteps > 5 && halfStepsUp < 5 && halfStepsDown > 5) {
+    } else if (halfStepsUp < halfStepsDown) {
         changedCurrent = Math.min(currentOctave + 1, 9);
-    }
-
-    if (halfSteps > 5 && halfStepsUp > 5 && halfStepsDown > 5) {
+    } else {
         changedCurrent = currentOctave;
     }
 
@@ -6691,6 +6687,12 @@ const isInt = value => {
  * @returns {string} The converted note.
  */
 const convertFromSolfege = note => {
+    if (typeof note === "string") {
+        const unicodeNote = note.replace("#", SHARP).replace("b", FLAT);
+        if (unicodeNote in FIXEDSOLFEGE1) {
+            note = FIXEDSOLFEGE1[unicodeNote];
+        }
+    }
     // Convert to common letter class
     if (note in FIXEDSOLFEGE1) {
         note = FIXEDSOLFEGE1[note];
@@ -6753,21 +6755,37 @@ const convertFactor = factor => {
 /**
  * Get pitch information based on the note or pitch provided.
  * @function
- * @param {string|number} noteOrPitch - The note name (e.g. "C4") or a numeric pitch index.
+ * @param {string|number|Object} activity - Activity object or note/pitch (1-arg case).
+ * @param {string} [type] - The type of pitch info to return (4-arg case).
+ * @param {string|number} [currentNote] - The current note (4-arg case).
+ * @param {Object} [tur] - The turtle object (4-arg case).
  * @returns {Object|string} If called with one argument, returns { name, octave, pitchNumber }. Otherwise returns legacy values.
  */
 const getPitchInfo = function (activity, type, currentNote, tur) {
+    // Determine temperament
+    let temperament = "equal";
+    if (arguments.length === 1) {
+        // 1-arg case: try to get from global activity
+        if (typeof globalActivity !== "undefined" && globalActivity?.logo?.synth?.inTemperament) {
+            temperament = globalActivity.logo.synth.inTemperament;
+        }
+    } else if (arguments.length === 4 && activity?.logo?.synth?.inTemperament) {
+        // 4-arg case: get from activity
+        temperament = activity.logo.synth.inTemperament;
+    }
+
     if (arguments.length === 1) {
         const noteOrPitch = activity;
         let name, octave, pitchNumber;
 
         if (typeof noteOrPitch === "number") {
+            const currentEDO = getCurrentEDO(temperament);
             pitchNumber = noteOrPitch;
-            octave = Math.floor(pitchNumber / 12) - 1;
-            name = NOTESSHARP[pitchNumber % 12];
+            octave = Math.floor(pitchNumber / currentEDO) - 1;
+            name = NOTESSHARP[pitchNumber % currentEDO];
         } else if (typeof noteOrPitch === "string") {
             [name, octave] = _parse_pitch_string(noteOrPitch);
-            pitchNumber = _calculate_pitch_number(name, octave);
+            pitchNumber = _calculate_pitch_number(name, octave, 0, temperament);
         } else {
             return INVALIDPITCH;
         }
@@ -6842,7 +6860,10 @@ const getPitchInfo = function (activity, type, currentNote, tur) {
                 }
                 return SOLFEGENAMES[buildScale(tur.singer.keySignature)[0].indexOf(pitch)];
             case "pitch class":
-                return (pitchToNumber(pitch, octave, tur.singer.keySignature) - 3) % 12;
+                return (
+                    (pitchToNumber(pitch, octave, tur.singer.keySignature) - 3) %
+                    getCurrentEDO(temperament)
+                );
             case "scalar class":
                 return scaleDegreeToPitchMapping(
                     tur.singer.keySignature,
@@ -6867,7 +6888,12 @@ const getPitchInfo = function (activity, type, currentNote, tur) {
                     (octave - 4) * YSTAFFOCTAVEHEIGHT
                 );
             case "pitch number":
-                return _calculate_pitch_number(pitch, octave, tur?.singer?.pitchNumberOffset || 0);
+                return _calculate_pitch_number(
+                    pitch,
+                    octave,
+                    tur?.singer?.pitchNumberOffset || 0,
+                    temperament
+                );
             case "pitch in hertz":
                 // This function ignores cents.
                 return activity.logo.synth._getFrequency(

@@ -31,7 +31,8 @@ try {
    ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON, debugLog,
    ErrorHandler, ActivityContext,
    Boundary, CARTESIAN, changeImage, closeWidgets, doRecordButton, setupActivityRecorder,
-   setupGridController, setupGridRenderer, setupPluginController, setupToolbarController, setupAlertController, setupAlertRenderer, PluginDialog,
+   setupGridController, setupGridRenderer, setupPluginController, setupToolbarController, setupAlertController, setupAlertRenderer, setupPaletteLoader, PluginDialog,
+   setupSearchController, setupSearchUI,
    setupActivityAbcParser, setupActivityIdleWatcher,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
@@ -55,7 +56,7 @@ try {
    MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
    SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS,
-   extractProjectDataFromHTML,unescapeHTML
+   extractProjectDataFromHTML,unescapeHTML, pubsub
  */
 
 /*
@@ -65,7 +66,7 @@ try {
    globalActivity, hideArrows, doAnalyzeProject
  */
 const LEADING = 0;
-const BLOCKSCALES = [1, 1.5, 2, 3, 4];
+const BLOCKSCALES = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4];
 const _THIS_IS_MUSIC_BLOCKS_ = true;
 const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
 
@@ -128,6 +129,9 @@ let MYDEFINES = [
     "activity/toolbar-controller",
     "activity/alert-controller",
     "activity/alert-renderer",
+    "palette/palette-loader",
+    "activity/search-controller",
+    "search-ui",
     "widgets/plugin-dialog",
     "utils/musicutils",
     "utils/synthutils",
@@ -259,9 +263,6 @@ class Activity {
         this._listeners = [];
 
         this.cellSize = 55;
-        this.searchSuggestions = [];
-        this._searchCache = {}; // Cache for search results to improve performance
-        this._searchCloseListener = null;
         this.homeButtonContainer;
 
         this.msgText = null;
@@ -357,9 +358,6 @@ class Activity {
         // Flag to indicate the selection mode is on
         this.selectionModeOn = false;
 
-        // Flag to check if the helpful search widget is active or not (for "click" event handler purpose)
-        this.isHelpfulSearchWidgetOn = false;
-
         //Flag to check if any other input box is active or not
         this.isInputON = false;
 
@@ -442,7 +440,17 @@ class Activity {
             let lang = "en";
             if (this.storage.languagePreference !== undefined) {
                 lang = this.storage.languagePreference;
-                if (lang.startsWith("ja")) lang = "ja"; // normalize Japanese
+                if (lang === "kana" || lang === "ja-kana") {
+                    this.storage.languagePreference = "ja";
+                    this.storage.kanaPreference = "kana";
+                    lang = "ja";
+                } else if (lang === "ja-kanji") {
+                    this.storage.languagePreference = "ja";
+                    this.storage.kanaPreference = "kanji";
+                    lang = "ja";
+                } else if (lang.startsWith("ja")) {
+                    lang = "ja"; // normalize Japanese
+                }
                 i18next.changeLanguage(lang);
             } else {
                 lang = navigator.language;
@@ -470,6 +478,9 @@ class Activity {
         setupToolbarController(this);
         setupAlertController(this);
         setupAlertRenderer(this);
+        setupPaletteLoader(this);
+        this.searchUI = setupSearchUI(this);
+        setupSearchController(this, this.searchUI);
         this.pluginDialog = new PluginDialog({
             onLoadBuiltIn: name => this._loadBuiltInPlugin(name),
             onDelete: () => this._deletePlugin(),
@@ -551,11 +562,7 @@ class Activity {
             this.searchWidget.style.visibility = "hidden";
             this.searchWidget.placeholder = _("Search for blocks");
 
-            this.helpfulSearchWidget = document.createElement("input");
-            this.helpfulSearchWidget.setAttribute("id", "helpfulSearch");
-            this.helpfulSearchWidget.style.visibility = "hidden";
-            this.helpfulSearchWidget.placeholder = _("Search for blocks");
-            this.helpfulSearchWidget.classList.add("ui-autocomplete");
+            this.searchUI.createSearchUI();
             this.progressBar.style.visibility = "hidden";
             this.paste.style.visibility = "hidden";
 
@@ -618,84 +625,14 @@ class Activity {
         /*
          * creates helpfulSearchDiv for search
          */
-        this.setHelpfulSearchDiv = () => {
-            if (document.getElementById("helpfulSearchDiv")) {
-                document
-                    .getElementById("helpfulSearchDiv")
-                    .parentNode.removeChild(document.getElementById("helpfulSearchDiv"));
-            }
-            this.helpfulSearchDiv = document.createElement("div");
-            this.helpfulSearchDiv.setAttribute("id", "helpfulSearchDiv");
-
-            document.body.appendChild(this.helpfulSearchDiv);
-
-            // Create the div for the close button (cross button)
-            const closeButtonDiv = document.createElement("div");
-            closeButtonDiv.style.cssText =
-                "position: absolute;" + "top: 10px;" + "right: 10px;" + "cursor: pointer;";
-
-            // Create the cross button itself
-            const closeButton = document.createElement("button");
-            closeButton.textContent = "×";
-            closeButton.id = "crossButton";
-            document.body.appendChild(closeButton);
-
-            closeButtonDiv.appendChild(closeButton);
-
-            this.helpfulSearchDiv.appendChild(closeButtonDiv);
-
-            // Add event listener to remove the search div from the DOM
-            const modeButton = document.getElementById("begIconText");
-            this.addEventListener(closeButton, "click", this._hideHelpfulSearchWidget);
-            this.addEventListener(modeButton, "click", this._hideHelpfulSearchWidget);
-
-            this.helpfulSearchDiv.appendChild(this.helpfulSearchWidget);
-        };
+        this.setHelpfulSearchDiv = () => this.searchController.setHelpfulSearchDiv();
 
         /*
          * displays helpfulSearchDiv on canvas
          */
-        this._displayHelpfulSearchDiv = () => {
-            if (!document.getElementById("helpfulSearchDiv")) {
-                this.setHelpfulSearchDiv(); // Re-create and append the div if it's not found
-            }
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            this.helpfulSearchDiv.style.left =
-                helpfulWheelDiv.offsetLeft + 80 * this.getStageScale() + "px";
-            this.helpfulSearchDiv.style.top =
-                helpfulWheelDiv.offsetTop + 110 * this.getStageScale() + "px";
+        this._displayHelpfulSearchDiv = () => this.searchController._displayHelpfulSearchDiv();
 
-            const windowWidth = window.innerWidth;
-            const windowHeight = window.innerHeight;
-            this.helpfulSearchDiv.style.display = "block";
-            const menuWidth = this.helpfulSearchDiv.offsetWidth;
-            const menuHeight = this.helpfulSearchDiv.offsetHeight;
-
-            if (this.helpfulSearchDiv.offsetLeft + menuWidth > windowWidth) {
-                this.helpfulSearchDiv.style.left = windowWidth - menuWidth + "px";
-            }
-            if (this.helpfulSearchDiv.offsetTop + menuHeight > windowHeight) {
-                this.helpfulSearchDiv.style.top = windowHeight - menuHeight + "px";
-            }
-
-            this.showHelpfulSearchWidget();
-            this.isHelpfulSearchWidgetOn = true;
-        };
-
-        // hides helpfulSearchDiv on canvas
-
-        this._hideHelpfulSearchWidget = e => {
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-            }
-            if (this.helpfulSearchDiv && this.helpfulSearchDiv.parentNode) {
-                this.helpfulSearchDiv.parentNode.removeChild(this.helpfulSearchDiv);
-            }
-            that.__tick();
-        };
+        this._hideHelpfulSearchWidget = e => this.searchController._hideHelpfulSearchWidget(e);
 
         /*
          * Sets up right click functionality opening the context menus
@@ -709,7 +646,7 @@ class Activity {
                     event.preventDefault();
                     event.stopPropagation();
                     if (this.beginnerMode) return;
-                    if (this.isHelpfulSearchWidgetOn) {
+                    if (this.searchUI.isHelpfulSearchWidgetOn) {
                         this._hideHelpfulSearchWidget();
                     }
                     if (
@@ -805,13 +742,7 @@ class Activity {
          * palette colors, and other settings used throughout the application.
          */
         this.doPluginsAndPaletteCols = () => {
-            // Calculate the palette colors.
-            for (const p in platformColor.paletteColors) {
-                PALETTEFILLCOLORS[p] = platformColor.paletteColors[p][0];
-                PALETTESTROKECOLORS[p] = platformColor.paletteColors[p][1];
-                PALETTEHIGHLIGHTCOLORS[p] = platformColor.paletteColors[p][2];
-                HIGHLIGHTSTROKECOLORS[p] = platformColor.paletteColors[p][1];
-            }
+            this.paletteLoader.initializePaletteColors();
 
             this.pluginController.initializePluginState();
 
@@ -989,98 +920,6 @@ class Activity {
         //if any window resize event occurs:
         this._handleRepositionBlocksOnResize = () => repositionBlocks(this);
         this.addEventListener(window, "resize", this._handleRepositionBlocksOnResize);
-
-        /**
-         * Finds and organizes blocks within the workspace.
-         * Arranges blocks in grid format on wide screens and vertically on narrow screens.
-         */
-        this._findBlocks = () => {
-            if (!this.blocks.visible) {
-                this._changeBlockVisibility();
-            }
-
-            this.blocks.activeBlock = null;
-            hideDOMLabel();
-            this.blocks.showBlocks();
-            this.blocksContainer.x = 0;
-            this.blocksContainer.y = 0;
-
-            const screenWidth = window.innerWidth;
-            const isNarrowScreen = screenWidth < RESPONSIVE_BREAKPOINT_MOBILE;
-            const minColumnWidth = 400;
-            const numColumns = isNarrowScreen ? 1 : Math.floor(screenWidth / minColumnWidth);
-
-            const toppos = this.auxToolbar.style.display === "block" ? 90 + this.toolbarHeight : 90;
-            const x = isNarrowScreen
-                ? Math.floor(screenWidth / 2)
-                : Math.floor(this.canvas.width / 4);
-            let y = Math.floor(toppos * this.turtleBlocksScale);
-            const verticalSpacing = Math.floor(40 * this.turtleBlocksScale);
-
-            const columnSpacing = (screenWidth / numColumns) * 1.2;
-            const columnXPositions = Array.from({ length: numColumns }, (_, i) =>
-                Math.floor(i * columnSpacing + columnSpacing / 2)
-            );
-            const columnYPositions = Array(numColumns).fill(y);
-
-            for (const blk in this.blocks.blockList) {
-                if (this.blocks.blockList[blk] && !this.blocks.blockList[blk].trash) {
-                    const myBlock = this.blocks.blockList[blk];
-
-                    // Store original position only once
-                    if (!myBlock.originalPosition) {
-                        myBlock.originalPosition = {
-                            x: myBlock.container.x,
-                            y: myBlock.container.y
-                        };
-                    }
-
-                    if (myBlock.connections[0] === null) {
-                        if (isNarrowScreen) {
-                            const dx = x - myBlock.container.x;
-                            const dy = y - myBlock.container.y;
-                            this.blocks.moveBlockRelative(blk, dx, dy);
-                            y += myBlock.height + verticalSpacing;
-                        } else {
-                            const minYIndex = columnYPositions.indexOf(
-                                Math.min(...columnYPositions)
-                            );
-                            const dx = columnXPositions[minYIndex] - myBlock.container.x;
-                            const dy = columnYPositions[minYIndex] - myBlock.container.y;
-                            this.blocks.moveBlockRelative(blk, dx, dy);
-                            columnYPositions[minYIndex] += myBlock.height + verticalSpacing;
-                        }
-                    }
-
-                    // Making code to make sure that
-                    if (myBlock.connections.length > 0) {
-                        myBlock.connections.forEach(conn => {
-                            if (conn !== null) {
-                                const innerBlock = this.blocks.blockList[conn];
-                                if (innerBlock) {
-                                    innerBlock.container.x =
-                                        myBlock.container.x + innerBlock.relativeX;
-                                    innerBlock.container.y =
-                                        myBlock.container.y + innerBlock.relativeY;
-                                }
-                            }
-                        });
-                    }
-                }
-            }
-
-            repositionBlocks(this);
-            this.setHomeContainers(false);
-            this.boundary.hide();
-
-            for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
-                const savedPenState = this.turtles.turtleList[turtle].painter.penState;
-                this.turtles.turtleList[turtle].painter.penState = false;
-                this.turtles.turtleList[turtle].painter.doSetXY(0, 0);
-                this.turtles.turtleList[turtle].painter.doSetHeading(0);
-                this.turtles.turtleList[turtle].painter.penState = savedPenState;
-            }
-        };
 
         /**
          * Finds and organizes blocks within the workspace.
@@ -1632,24 +1471,10 @@ class Activity {
                     this.showBlocksAfterRun = true;
                 }
 
-                const stopBtn = document.getElementById("stop");
-                if (stopBtn) {
-                    stopBtn.style.display = "inline-block";
-                    stopBtn.style.color = window.platformColor.stopIconcolor;
-                }
+                this.toolbar.highlightStop(window.platformColor.stopIconcolor);
             } else {
                 if (currentDelay === 0) {
-                    const stopBtn = document.getElementById("stop");
-                    if (stopBtn) {
-                        stopBtn.style.color = "white";
-                    }
-
-                    setTimeout(() => {
-                        const stopBtnDelay = document.getElementById("stop");
-                        if (stopBtnDelay) {
-                            stopBtnDelay.style.color = window.platformColor.stopIconcolor;
-                        }
-                    }, 500);
+                    this.toolbar.dimThenRestoreStop(window.platformColor.stopIconcolor);
                 }
             }
         };
@@ -1696,15 +1521,9 @@ class Activity {
             const didRunStart = this.toolbarController.runStep();
 
             if (didRunStart === "started") {
-                const stopBtn = document.getElementById("stop");
-                if (stopBtn) {
-                    stopBtn.style.color = this.toolbar.stopIconColorWhenPlaying;
-                }
+                this.toolbar.highlightStop(this.toolbar.stopIconColorWhenPlaying);
             } else if (didRunStart === "stopped") {
-                const stopBtn = document.getElementById("stop");
-                if (stopBtn) {
-                    stopBtn.style.color = "white";
-                }
+                this.toolbar.resetStop();
             }
         };
 
@@ -1734,7 +1553,7 @@ class Activity {
                 this.cleanupIdleWatcher();
             }
 
-            document.getElementById("stop").style.display = "none";
+            this.toolbar.resetStop();
 
             const widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
@@ -2506,437 +2325,25 @@ class Activity {
             }
         };
 
-        /**
-
-
         /*
-             Prepare a list of blocks for the search bar autocompletion.
-            */
-        this.prepSearchWidget = () => {
-            //searchWidget.style.visibility = "hidden";
-            this.searchBlockPosition = [100, 100];
-
-            this.searchSuggestions = [];
-            this._searchCache = {}; // Reset cache to prevent memory leaks
-            this.deprecatedBlockNames = [];
-
-            // Guard: blocks may not be initialized yet during early loading
-            if (!this.blocks || !this.blocks.protoBlockDict) {
-                console.debug("prepSearchWidget: blocks not yet initialized, skipping");
-                return;
-            }
-
-            for (const i in this.blocks.protoBlockDict) {
-                const block = this.blocks.protoBlockDict[i];
-                const blockLabel = block.staticLabels.join(" ");
-                const artwork = block.palette.model.makeBlockInfo(0, block, block.name, block.name)[
-                    "artwork64"
-                ];
-                if (blockLabel || block.extraSearchTerms !== undefined) {
-                    if (block.deprecated) {
-                        this.deprecatedBlockNames.push(blockLabel);
-                    } else {
-                        // Determine the primary label to display for this block.
-                        let label = blockLabel;
-                        if (label.length === 0) {
-                            // Swap in a preferred, localized name when there is no label.
-                            label = _(block.name);
-                            switch (block.name) {
-                                case "scaledegree2":
-                                    label = _("scale degree");
-                                    break;
-                                case "voicename":
-                                    label = _("voice name");
-                                    break;
-                                case "invertmode":
-                                    label = _("invert mode");
-                                    break;
-                                case "outputtools":
-                                    label = _("output tools");
-                                    break;
-                                case "customNote":
-                                    label = _("custom note");
-                                    break;
-                                case "accidentalname":
-                                    label = _("accidental name");
-                                    break;
-                                case "eastindiansolfege":
-                                    label = _("east indian solfege");
-                                    break;
-                                case "notename":
-                                    label = _("note name");
-                                    break;
-                                case "temperamentname":
-                                    label = _("temperament name");
-                                    break;
-                                case "modename":
-                                    label = _("mode name");
-                                    break;
-                                case "chordname":
-                                    label = _("chord name");
-                                    break;
-                                case "intervalname":
-                                    label = _("interval name");
-                                    break;
-                                case "filtertype":
-                                    label = _("filter type");
-                                    break;
-                                case "oscillatortype":
-                                    label = _("oscillator type");
-                                    break;
-                                case "audiofile":
-                                    label = _("audio file");
-                                    break;
-                                case "noisename":
-                                    label = _("noise name");
-                                    break;
-                                case "drumname":
-                                    label = _("drum name");
-                                    break;
-                                case "effectsname":
-                                    label = _("effects name");
-                                    break;
-                                case "wrapmode":
-                                    label = _("wrap mode");
-                                    break;
-                                case "loadFile":
-                                    label = _("load file");
-                                    break;
-                            }
-                        }
-
-                        // Build a list of lowercased search terms (primary label + extra terms)
-                        // so we can match synonyms without duplicating the visual entry.
-                        const searchTerms = [];
-                        if (label && label.length > 0) {
-                            searchTerms.push(label.toLowerCase());
-                        }
-                        if (block.extraSearchTerms && Array.isArray(block.extraSearchTerms)) {
-                            for (let j = 0; j < block.extraSearchTerms.length; j++) {
-                                const term = block.extraSearchTerms[j];
-                                if (typeof term === "string" && term.length > 0) {
-                                    searchTerms.push(term.toLowerCase());
-                                }
-                            }
-                        }
-
-                        this.searchSuggestions.push({
-                            label: label,
-                            value: block.name,
-                            specialDict: block,
-                            artwork: artwork,
-                            searchTerms: searchTerms
-                        });
-                    }
-                }
-            }
-
-            this.searchSuggestions = this.searchSuggestions.reverse();
-        };
+         * Builds the block list for search bar autocompletion.
+         */
+        this.prepSearchWidget = () => this.searchController.prepSearchWidget();
 
         /*
          * Hides search widget
          */
-        this.hideSearchWidget = () => {
-            // Hide the jQuery search results widget.
-            const obj = docByClass("ui-menu");
-            if (obj.length > 0) {
-                obj[0].style.visibility = "hidden";
-            }
-
-            // Remove the document mousedown listener if it exists
-            if (this._searchCloseListener) {
-                this.removeEventListener(document, "mousedown", this._searchCloseListener);
-                this._searchCloseListener = null;
-            }
-
-            this.searchWidget.style.visibility = "hidden";
-            this.searchWidget.idInput_custom = "";
-        };
+        this.hideSearchWidget = () => this.searchController.hideSearchWidget();
 
         /*
          * Shows search widget
          */
-        this.showSearchWidget = () => {
-            // Bring widget to top.
-            this.searchWidget.style.zIndex = 1001;
-            this.searchWidget.style.border = "2px solid lightblue";
-            if (this.helpfulSearchDiv) {
-                this._hideHelpfulSearchWidget();
-            }
-            if (this.searchWidget.style.visibility === "visible") {
-                this.hideSearchWidget();
-            } else {
-                const obj = docByClass("ui-menu");
-                if (obj.length > 0) {
-                    obj[0].style.visibility = "visible";
-                }
-
-                if (this.searchWidget) {
-                    this.searchWidget.value = null;
-                    this.searchWidget.style.visibility = "visible";
-                    const searchPos = this.palettes.getSearchPos();
-                    this.searchWidget.style.left = searchPos.x + "px";
-                    this.searchWidget.style.top = searchPos.y + "px";
-                }
-
-                this.searchBlockPosition = [100, 100];
-                this.prepSearchWidget();
-
-                const that = this;
-                const closeListener = e => {
-                    if (
-                        document.getElementById("search").style.visibility === "visible" &&
-                        (e.target === document.getElementById("search") ||
-                            document.getElementById("search").contains(e.target))
-                    ) {
-                        //do nothing when clicked in the input field
-                    } else if (
-                        document.getElementById("ui-id-1") &&
-                        document.getElementById("ui-id-1").style.display === "block" &&
-                        (e.target === document.getElementById("ui-id-1") ||
-                            document.getElementById("ui-id-1").contains(e.target))
-                    ) {
-                        //do nothing when clicked on the menu
-                    } else if (
-                        document.querySelector("#palette tbody tr") &&
-                        document.querySelector("#palette tbody tr").contains(e.target)
-                    ) {
-                        //do nothing when clicked on the search row
-                    } else {
-                        // this will hide the search bar if someone clicks on menu items
-                        that.hideSearchWidget();
-                    }
-                };
-                this._searchCloseListener = closeListener;
-                this.addEventListener(document, "mousedown", closeListener);
-
-                // Give the browser time to update before selecting
-                // focus.
-                setTimeout(() => {
-                    that.searchWidget.focus();
-                    that.doSearch();
-                }, 500);
-            }
-        };
+        this.showSearchWidget = () => this.searchController.showSearchWidget();
 
         /*
          * Uses JQuery to add autocompleted search suggestions
          */
-        this.doSearch = () => {
-            // Guard: ensure searchWidget exists before proceeding
-            if (!this.searchWidget) {
-                console.debug("doSearch: searchWidget not yet initialized, skipping");
-                return;
-            }
-
-            const $j = window.jQuery;
-            if (this.searchSuggestions.length === 0) {
-                this.prepSearchWidget();
-            }
-
-            const that = this;
-            const $search = $j("#search");
-
-            if (!$search.data("autocomplete-init")) {
-                $search.autocomplete({
-                    // Custom source so we can match on extraSearchTerms but show each block only once.
-                    source: (request, response) => {
-                        const term = (request.term || "").toLowerCase().trim();
-
-                        // Check cache first for performance
-                        if (that._searchCache[term] !== undefined) {
-                            response(that._searchCache[term]);
-                            return;
-                        }
-
-                        const results = that.searchSuggestions.filter(item => {
-                            // If there is no active term, show all items.
-                            if (!term || term.length === 0) {
-                                return true;
-                            }
-
-                            // Prefer matching against searchTerms when present.
-                            if (item.searchTerms && Array.isArray(item.searchTerms)) {
-                                return item.searchTerms.some(t => t && t.indexOf(term) !== -1);
-                            }
-
-                            // Fallback to label matching for legacy entries.
-                            return (
-                                item.label &&
-                                typeof item.label === "string" &&
-                                item.label.toLowerCase().indexOf(term) !== -1
-                            );
-                        });
-
-                        // Cache the results for future use
-                        that._searchCache[term] = results;
-                        response(results);
-                    },
-                    appendTo: "body",
-                    select: (event, ui) => {
-                        event.preventDefault();
-                        that.searchWidget.value = ui.item.label;
-                        that.searchWidget.idInput_custom = ui.item.value;
-                        that.searchWidget.protoblk = ui.item.specialDict;
-                        that.doSearch();
-                        if (event.keyCode === 13) this.searchWidget.style.visibility = "visible";
-                    },
-                    focus: event => {
-                        event.preventDefault();
-                    }
-                });
-
-                const instance = $search.autocomplete("instance");
-                if (instance) {
-                    instance._renderItem = (ul, item) => {
-                        const li = $j("<li></li>");
-
-                        const img = document.createElement("img");
-                        img.src = item.artwork || "";
-                        img.height = 20;
-                        img.style.cursor = "grab";
-
-                        // Drag-and-drop: mirrors the palette drag pattern in
-                        // palette.js _showMenuItems(). Keep both in sync.
-                        img.ondragstart = () => false;
-
-                        const down = event => {
-                            // Stop jQuery UI autocomplete from handling this
-                            event.stopPropagation();
-                            event.stopImmediatePropagation();
-                            event.preventDefault();
-
-                            const posit = img.style.position;
-                            const zInd = img.style.zIndex;
-                            img.style.position = "absolute";
-                            img.style.zIndex = 10000;
-
-                            // Close the autocomplete dropdown
-                            $j("#search").autocomplete("close");
-
-                            document.body.appendChild(img);
-
-                            const moveAt = (pageX, pageY) => {
-                                img.style.left = pageX - img.offsetWidth / 2 + "px";
-                                img.style.top = pageY - img.offsetHeight / 2 + "px";
-                            };
-
-                            const onMouseMove = e => {
-                                e.preventDefault();
-                                let x, y;
-                                if (e.type === "touchmove") {
-                                    x = e.touches[0].clientX;
-                                    y = e.touches[0].clientY;
-                                } else {
-                                    x = e.pageX;
-                                    y = e.pageY;
-                                }
-                                moveAt(x, y);
-                            };
-                            onMouseMove(event);
-
-                            document.addEventListener("touchmove", onMouseMove, { passive: false });
-                            document.addEventListener("mousemove", onMouseMove);
-
-                            const up = () => {
-                                document.body.style.cursor = "default";
-                                document.removeEventListener("mousemove", onMouseMove);
-                                document.removeEventListener("touchmove", onMouseMove);
-
-                                const x = parseInt(img.style.left);
-                                const y = parseInt(img.style.top);
-
-                                img.style.position = posit;
-                                img.style.zIndex = zInd;
-                                if (img.parentNode === document.body) {
-                                    document.body.removeChild(img);
-                                }
-
-                                if (isNaN(x) && isNaN(y)) return;
-
-                                const protoblk = item.specialDict;
-                                const paletteName = protoblk.palette.name;
-                                const protoName = item.value;
-
-                                that.palettes.dict[paletteName].makeBlockFromSearch(
-                                    protoblk,
-                                    protoName,
-                                    newBlock => {
-                                        that.blocks.moveBlock(
-                                            newBlock,
-                                            (x || that.blocksContainer.x + 100) -
-                                                that.blocksContainer.x,
-                                            (y || that.blocksContainer.y + 100) -
-                                                that.blocksContainer.y
-                                        );
-                                    }
-                                );
-                            };
-
-                            document.addEventListener("mouseup", up, { once: true });
-                            document.addEventListener("touchend", up, { once: true });
-                        };
-
-                        // Capture phase fires BEFORE jQuery UI's event delegation
-                        li[0].addEventListener("mousedown", down, true);
-                        li[0].addEventListener("touchstart", down, {
-                            capture: true,
-                            passive: false
-                        });
-
-                        li.append(img);
-                        li.append($j("<a>").text(" " + item.label));
-
-                        return li.appendTo(
-                            ul.css({
-                                "z-index": 35000,
-                                "max-height": "200px",
-                                "overflow-y": "auto"
-                            })
-                        );
-                    };
-                }
-                $search.data("autocomplete-init", true);
-            }
-
-            const searchInput = this.searchWidget.idInput_custom;
-            if (!searchInput || searchInput.length <= 0) {
-                if (this.searchWidget.value && this.searchWidget.value.length > 0) {
-                    $search.autocomplete("search", this.searchWidget.value);
-                }
-                return;
-            }
-
-            const protoblk = this.searchWidget.protoblk;
-            const paletteName = protoblk.palette.name;
-            const protoName = protoblk.name;
-
-            if (Object.prototype.hasOwnProperty.call(this.blocks.protoBlockDict, protoName)) {
-                this.palettes.dict[paletteName].makeBlockFromSearch(
-                    protoblk,
-                    protoName,
-                    newBlock => {
-                        that.blocks.moveBlock(
-                            newBlock,
-                            100 + that.searchBlockPosition[0] - that.blocksContainer.x,
-                            that.searchBlockPosition[1] - that.blocksContainer.y
-                        );
-                    }
-                );
-
-                // Move the position of the next newly created block.
-                this.searchBlockPosition[0] += STANDARDBLOCKHEIGHT;
-                this.searchBlockPosition[1] += STANDARDBLOCKHEIGHT;
-            } else if (this.deprecatedBlockNames.indexOf(searchInput) > -1) {
-                this.errorMsg(_("This block is deprecated."));
-            } else {
-                this.errorMsg(_("Block cannot be found."));
-            }
-
-            this.searchWidget.value = "";
-            this.update = true;
-        };
+        this.doSearch = () => this.searchController.doSearch();
 
         //To create a sampler widget
         this.makeSamplerWidget = (sampleName, sampleData) => {
@@ -3060,7 +2467,6 @@ class Activity {
             const planetIframe = document.getElementById("planet-iframe");
             const pasteEl = this.paste;
             const wheelDiv = document.getElementById("wheelDiv");
-            const stopbtn = document.getElementById("stop");
             const disableKeys =
                 lilypondModal.style.display === "block" ||
                 this.searchWidget.style.visibility === "visible" ||
@@ -3100,9 +2506,7 @@ class Activity {
                     case 82: {
                         // 'R or ENTER'
                         this.textMsg("Alt-R " + _("Play"));
-                        if (stopbtn) {
-                            stopbtn.style.color = platformColor.stopIconcolor;
-                        }
+                        this.toolbar.highlightStop(platformColor.stopIconcolor);
                         this._doFastButton();
                         break;
                     }
@@ -3126,9 +2530,7 @@ class Activity {
                         if (this.turtles.running()) {
                             this._doHardStopButton();
                         } else if (!hasOpenWidget) {
-                            if (stopbtn) {
-                                stopbtn.style.color = platformColor.stopIconcolor;
-                            }
+                            this.toolbar.highlightStop(platformColor.stopIconcolor);
                             this._doFastButton();
                         }
                         break;
@@ -3206,9 +2608,7 @@ class Activity {
                         this._doHardStopButton();
                     } else if (!disableKeys && !hasOpenWidget) {
                         event.preventDefault();
-                        if (stopbtn) {
-                            stopbtn.style.color = platformColor.stopIconcolor;
-                        }
+                        this.toolbar.highlightStop(platformColor.stopIconcolor);
                         this._doFastButton();
                     }
                 } else if (!disableKeys) {
@@ -3347,10 +2747,7 @@ class Activity {
                                 this._doHardStopButton();
                             } else if (!disableKeys && !hasOpenWidget) {
                                 event.preventDefault();
-                                const stopbtn = document.getElementById("stop");
-                                if (stopbtn) {
-                                    stopbtn.style.color = platformColor.stopIconcolor;
-                                }
+                                this.toolbar.highlightStop(platformColor.stopIconcolor);
                                 this._doFastButton();
                             }
                             break;
@@ -3939,11 +3336,7 @@ class Activity {
         }
 
         this._renderTrashView = () => {
-            if (
-                !activity.blocks ||
-                !activity.blocks.trashStacks ||
-                activity.blocks.trashStacks.length === 0
-            ) {
+            if (!this.blocks || !this.blocks.trashStacks || this.blocks.trashStacks.length === 0) {
                 return;
             }
             const trashList = document.getElementById("trashList");
@@ -3987,13 +3380,17 @@ class Activity {
                 const listItem = document.createElement("div");
                 listItem.classList.add("trash-item");
 
-                const svgData = block.artwork;
-                const encodedData = svgData
-                    ? "data:image/svg+xml;utf8," + encodeURIComponent(svgData)
-                    : "";
+                const preview = this.blocks.trashPreviews[blockId];
+                let imgSrc;
+                if (preview) {
+                    imgSrc = preview;
+                } else {
+                    const svgData = block.artwork;
+                    imgSrc = "data:image/svg+xml;utf8," + encodeURIComponent(svgData);
+                }
 
                 const img = document.createElement("img");
-                img.src = encodedData;
+                img.src = imgSrc;
                 img.alt = "Block Icon";
                 img.classList.add("trash-item-icon");
 
@@ -4003,10 +3400,26 @@ class Activity {
                 listItem.appendChild(textNode);
                 listItem.dataset.blockId = blockId;
 
-                listItem.addEventListener("mouseover", () => listItem.classList.add("hover"));
-                listItem.addEventListener("mouseout", () => listItem.classList.remove("hover"));
+                listItem.addEventListener("mouseover", () => {
+                    listItem.classList.add("hover");
+                });
+                listItem.addEventListener("mouseout", () => {
+                    listItem.classList.remove("hover");
+                });
+
+                img.addEventListener("mouseover", event => {
+                    this._showTrashPreviewPopup(imgSrc, event);
+                });
+                img.addEventListener("mousemove", event => {
+                    this._showTrashPreviewPopup(imgSrc, event);
+                });
+                img.addEventListener("mouseout", () => {
+                    this._hideTrashPreviewPopup();
+                });
+
                 listItem.addEventListener("click", () => {
                     this._restoreTrashById(blockId);
+                    this._hideTrashPreviewPopup();
                     trashView.classList.add("hidden");
                 });
 
@@ -4018,9 +3431,62 @@ class Activity {
 
             const existingView = document.getElementById("trashView");
             if (existingView) {
-                existingView.remove(); // remove from DOM; GC can now collect listeners
+                trashList.replaceChild(trashView, existingView);
+            } else {
+                trashList.appendChild(trashView);
             }
-            trashList.appendChild(trashView);
+        };
+
+        /**
+         * Shows a larger preview popup for trashed items.
+         * @param {string} imgSrc - The source of the image.
+         * @param {MouseEvent} event - The mouse event.
+         * @private
+         */
+        this._showTrashPreviewPopup = (imgSrc, event) => {
+            let popup = document.getElementById("trashPreviewPopup");
+            if (!popup) {
+                popup = document.createElement("div");
+                popup.id = "trashPreviewPopup";
+                popup.classList.add("trash-preview-popup");
+                const img = document.createElement("img");
+                popup.appendChild(img);
+                document.body.appendChild(popup);
+            }
+            const img = popup.firstChild;
+            if (img.src !== imgSrc) {
+                img.src = imgSrc;
+            }
+            popup.style.display = "block";
+
+            // Position next to cursor
+            const xOffset = 20;
+            const yOffset = 20;
+            let x = event.clientX + xOffset;
+            let y = event.clientY + yOffset;
+
+            // Flip if near right edge
+            if (x + 300 > window.innerWidth) {
+                x = event.clientX - 320;
+            }
+            // Flip if near bottom edge
+            if (y + 300 > window.innerHeight) {
+                y = event.clientY - 320;
+            }
+
+            popup.style.left = x + "px";
+            popup.style.top = y + "px";
+        };
+
+        /**
+         * Hides the trash preview popup.
+         * @private
+         */
+        this._hideTrashPreviewPopup = () => {
+            const popup = document.getElementById("trashPreviewPopup");
+            if (popup) {
+                popup.style.display = "none";
+            }
         };
 
         /*
@@ -4137,7 +3603,11 @@ class Activity {
 
                 // If this block is at the top of a stack, push it
                 // onto the trashStacks list.
-                if (myBlock.connections[0] === null) {
+                if (this.blocks.blockList[blk].connections[0] === null) {
+                    const preview = this.blocks.captureStackPreview(blk);
+                    if (preview) {
+                        this.blocks.trashPreviews[blk] = preview;
+                    }
                     this.blocks.trashStacks.push(blk);
                 }
 
@@ -4282,11 +3752,7 @@ class Activity {
                 this.showBlocksAfterRun = false;
             }
 
-            const stopIcon = document.getElementById("stop");
-            if (stopIcon) {
-                stopIcon.style.color = "white";
-                stopIcon.style.display = "none";
-            }
+            this.toolbar.resetStop();
 
             const saveBtn = document.getElementById("saveButton");
             const saveBtnAdv = document.getElementById("saveButtonAdvanced");
@@ -4436,7 +3902,7 @@ class Activity {
          * @param env {specifies environment}
          */
         this.runProject = env => {
-            document.removeEventListener("finishedLoading", this.runProject);
+            pubsub.off("finishedLoading", this.runProject);
 
             const that = this;
             setTimeout(() => {
@@ -4517,7 +3983,7 @@ class Activity {
                     that.keyboardEnableFlag = 1;
                 }
 
-                document.removeEventListener("finishedLoading", __afterLoad);
+                pubsub.off("finishedLoading", __afterLoad);
             };
 
             // Set the flag to zero to disable keyboard
@@ -4543,11 +4009,7 @@ class Activity {
 
             // After we have finished loading the project, clear all
             // to ensure a clean start.
-            if (document.addEventListener) {
-                document.addEventListener("finishedLoading", __afterLoad);
-            } else {
-                document.attachEvent("finishedLoading", __afterLoad);
-            }
+            pubsub.on("finishedLoading", __afterLoad);
 
             if (that.sessionData) {
                 that.doLoadAnimation();
@@ -4676,16 +4138,12 @@ class Activity {
                         that._changeBlockVisibility();
                     }
 
-                    document.removeEventListener("finishedLoading", __functionload);
+                    pubsub.off("finishedLoading", __functionload);
                     that.firstRun = false;
                 }, 1000);
             };
 
-            if (document.addEventListener) {
-                document.addEventListener("finishedLoading", __functionload, false);
-            } else {
-                document.attachEvent("finishedLoading", __functionload);
-            }
+            pubsub.on("finishedLoading", __functionload);
         };
         setupActivityAbcParser(this);
 
@@ -4795,6 +4253,23 @@ class Activity {
          * @param {string|HTMLElement|DocumentFragment} msg - The message to display.
          * @param {number} [duration=60000] - Duration in milliseconds before message disappears.
          */
+        /**
+         * Ensures a visually hidden aria-live region exists for screen reader announcements.
+         * @returns {HTMLElement} The live region element.
+         */
+        const __ensureA11yLiveRegion = () => {
+            let region = document.getElementById("mbA11yLiveRegion");
+            if (region) return region;
+            region = document.createElement("div");
+            region.id = "mbA11yLiveRegion";
+            region.setAttribute("role", "status");
+            region.setAttribute("aria-live", "polite");
+            region.setAttribute("aria-atomic", "true");
+            region.style.cssText =
+                "position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;";
+            document.body.appendChild(region);
+            return region;
+        };
         this.textMsg = (msg, duration = AlertController.MSG_TIMEOUT) => {
             if (this.msgText === null) {
                 // The container may not be ready yet, so do nothing.
@@ -4804,6 +4279,10 @@ class Activity {
             const showMsg = () => {
                 this.alertRenderer.showTextMsg(msg);
             };
+            // Announce to screen readers via aria-live region
+            if (msg && typeof msg === "string") {
+                __ensureA11yLiveRegion().textContent = msg;
+            }
 
             const hideMsg = () => {
                 this.alertRenderer.hideTextMsg();
@@ -4827,6 +4306,11 @@ class Activity {
             // The container may not be ready yet, so do nothing.
             if (this.errorMsgText === null) {
                 return;
+            }
+
+            // Announce errors to screen readers via aria-live region
+            if (msg && typeof msg === "string") {
+                __ensureA11yLiveRegion().textContent = msg;
             }
 
             const showMsg = () => {
@@ -5366,145 +4850,9 @@ class Activity {
         /*
          * Shows search widget on helpfulSearchDiv
          */
-        this.showHelpfulSearchWidget = () => {
-            // Bring widget to top.
-            const $j = window.jQuery;
-            if ($j("#helpfulSearch")) {
-                try {
-                    $j("#helpfulSearch").autocomplete("destroy");
-                } catch {
-                    //
-                }
-            }
-            this.helpfulSearchWidget.style.zIndex = 1001;
-            this.helpfulSearchWidget.idInput_custom = "";
-            if (this.helpfulSearchDiv.style.display === "block") {
-                this.helpfulSearchWidget.value = null;
-                this.helpfulSearchWidget.style.visibility = "visible";
+        this.showHelpfulSearchWidget = () => this.searchController.showHelpfulSearchWidget();
 
-                this.searchBlockPosition = [100, 100];
-                this.prepSearchWidget();
-
-                const that = this;
-                setTimeout(() => {
-                    that.helpfulSearchWidget.focus();
-                    that.doHelpfulSearch();
-                }, 500);
-
-                document.getElementById("helpfulWheelDiv").style.display = "none";
-            }
-        };
-
-        /*
-         * Uses JQuery to add autocompleted search suggestions
-         */
-        this.doHelpfulSearch = () => {
-            const $j = window.jQuery;
-            if (this.searchSuggestions.length === 0) {
-                this.prepSearchWidget();
-            }
-
-            const that = this;
-            const $helpfulSearch = $j("#helpfulSearch");
-
-            if (!$helpfulSearch.data("autocomplete-init")) {
-                $helpfulSearch.autocomplete({
-                    source: (request, response) => {
-                        const term = (request.term || "").toLowerCase().trim();
-
-                        // Check cache first for performance
-                        if (that._searchCache[term] !== undefined) {
-                            response(that._searchCache[term]);
-                            return;
-                        }
-
-                        const results = that.searchSuggestions.filter(item => {
-                            if (!term || term.length === 0) {
-                                return true;
-                            }
-
-                            if (item.searchTerms && Array.isArray(item.searchTerms)) {
-                                return item.searchTerms.some(t => t && t.indexOf(term) !== -1);
-                            }
-
-                            return (
-                                item.label &&
-                                typeof item.label === "string" &&
-                                item.label.toLowerCase().indexOf(term) !== -1
-                            );
-                        });
-
-                        // Cache the results for future use
-                        that._searchCache[term] = results;
-                        response(results);
-                    },
-                    appendTo: "body",
-                    select: (event, ui) => {
-                        event.preventDefault();
-                        that.helpfulSearchWidget.value = ui.item.label;
-                        that.helpfulSearchWidget.idInput_custom = ui.item.value;
-                        that.helpfulSearchWidget.protoblk = ui.item.specialDict;
-                        that.doHelpfulSearch();
-                    },
-                    focus: event => {
-                        event.preventDefault();
-                    }
-                });
-
-                const instance = $helpfulSearch.autocomplete("instance");
-                if (instance) {
-                    instance._renderItem = (ul, item) => {
-                        const li = $j("<li></li>");
-                        const img = document.createElement("img");
-                        img.src = item.artwork || "";
-                        img.height = 20;
-                        li.append(img);
-                        li.append($j("<a>").text(" " + item.label));
-                        return li.appendTo(ul.css("z-index", 35000));
-                    };
-                }
-                $helpfulSearch.data("autocomplete-init", true);
-            }
-
-            const searchInput = this.helpfulSearchWidget.idInput_custom;
-            if (!searchInput || searchInput.length <= 0) {
-                if (this.helpfulSearchWidget.value && this.helpfulSearchWidget.value.length > 0) {
-                    $helpfulSearch.autocomplete("search", this.helpfulSearchWidget.value);
-                }
-                return;
-            }
-
-            const protoblk = this.helpfulSearchWidget.protoblk;
-            const paletteName = protoblk.palette.name;
-            const protoName = protoblk.name;
-
-            if (Object.prototype.hasOwnProperty.call(that.blocks.protoBlockDict, protoName)) {
-                this.palettes.dict[paletteName].makeBlockFromSearch(
-                    protoblk,
-                    protoName,
-                    newBlock => {
-                        that.blocks.moveBlock(
-                            newBlock,
-                            100 + that.searchBlockPosition[0] - that.blocksContainer.x,
-                            that.searchBlockPosition[1] - that.blocksContainer.y
-                        );
-                    }
-                );
-
-                // Move the position of the next newly created block.
-                this.searchBlockPosition[0] += STANDARDBLOCKHEIGHT;
-                this.searchBlockPosition[1] += STANDARDBLOCKHEIGHT;
-            } else if (this.deprecatedBlockNames.indexOf(searchInput) > -1) {
-                this.errorMsg(_("This block is deprecated."));
-            } else {
-                this.errorMsg(_("Block cannot be found."));
-            }
-
-            this.helpfulSearchWidget.value = "";
-            // Hide search div after search is complete.
-            document.getElementById("helpfulSearchDiv").style.display = "none";
-            this.update = true;
-        };
+        this.doHelpfulSearch = () => this.searchController.doHelpfulSearch();
 
         /**
          * Toggles display of javaScript editor widget.
@@ -6317,12 +5665,6 @@ class Activity {
             if (this._initialized) return;
             this._initialized = true;
 
-            // Hide stop button on startup
-            const stopBtn = document.getElementById("stop");
-            if (stopBtn) {
-                stopBtn.style.display = "none";
-            }
-
             // Batch DOM reads before any writes to avoid forced synchronous layout
             this._perfMark("activity.init.start");
             this._clientWidth = document.body.clientWidth;
@@ -6728,7 +6070,7 @@ class Activity {
                                 that.stage.removeAllEventListeners("trashsignal");
 
                                 const __afterLoad = () => {
-                                    document.removeEventListener("finishedLoading", __afterLoad);
+                                    pubsub.off("finishedLoading", __afterLoad);
                                 };
 
                                 // Wait for the old blocks to be removed.
@@ -6736,11 +6078,7 @@ class Activity {
                                     that.blocks.loadNewBlocks(obj);
                                     that.stage.removeAllEventListeners("trashsignal");
 
-                                    if (document.addEventListener) {
-                                        document.addEventListener("finishedLoading", __afterLoad);
-                                    } else {
-                                        document.attachEvent("finishedLoading", __afterLoad);
-                                    }
+                                    pubsub.on("finishedLoading", __afterLoad);
                                 };
 
                                 that.stage.addEventListener("trashsignal", __listener, false);
@@ -6996,11 +6334,6 @@ class Activity {
             // create functionality of 2D drag to select blocks in bulk
             this._create2Ddrag();
 
-            /*
-               document.addEventListener("mousewheel", scrollEvent, false);
-               document.addEventListener("DOMMouseScroll", scrollEvent, false);
-               */
-
             // Named event handler for proper cleanup
             const activity = this;
             this.handleKeyDown = event => {
@@ -7181,81 +6514,7 @@ class Activity {
      * @returns {void}
      */
     regeneratePalettes() {
-        try {
-            // Store current palette positions
-            const palettePositions = {};
-            if (this.palettes && this.palettes.dict) {
-                for (const name in this.palettes.dict) {
-                    const palette = this.palettes.dict[name];
-                    if (
-                        palette &&
-                        palette.container &&
-                        typeof palette.container.x !== "undefined"
-                    ) {
-                        palettePositions[name] = {
-                            x: palette.container.x,
-                            y: palette.container.y,
-                            visible: !!palette.visible
-                        };
-                    }
-                }
-            }
-
-            // Safely hide and clear existing palettes
-            if (!this.palettes) {
-                console.warn("Palettes object not initialized");
-                return;
-            }
-
-            if (typeof this.palettes.hide !== "function") {
-                console.warn("Palettes hide method not available");
-            } else {
-                this.palettes.hide();
-            }
-
-            this.palettes.reinitialize(this.palettes);
-
-            // Increase palette element style.top value for correct alignment
-            const element = docById("palette");
-            element.style.top = `${60 + this.palettes.top}px`;
-
-            // Reinitialize blocks
-            if (this.blocks) {
-                initBasicProtoBlocks(this);
-            }
-
-            // Restore palette positions
-            if (this.palettes && this.palettes.dict) {
-                for (const name in palettePositions) {
-                    const palette = this.palettes.dict[name];
-                    const pos = palettePositions[name];
-
-                    if (palette && palette.container && pos) {
-                        palette.container.x = pos.x;
-                        palette.container.y = pos.y;
-
-                        if (pos.visible) {
-                            palette.showMenu(true);
-                        }
-                    }
-                }
-            }
-
-            // Update the palette display
-            if (this.palettes && typeof this.palettes.updatePalettes === "function") {
-                this.palettes.updatePalettes();
-            }
-
-            // Update blocks
-            if (this.blocks && typeof this.blocks.updateBlockPositions === "function") {
-                this.blocks.updateBlockPositions();
-            }
-
-            this.refreshCanvas();
-        } catch (e) {
-            ErrorHandler.capture(e, { operation: "regeneratePalettes" });
-            this.errorMsg(_("Error regenerating palettes. Please refresh the page."));
-        }
+        this.paletteLoader.regeneratePalettes();
     }
 }
 
