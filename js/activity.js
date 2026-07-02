@@ -32,7 +32,7 @@ try {
    ErrorHandler, ActivityContext,
    Boundary, CARTESIAN, changeImage, closeWidgets, doRecordButton, setupActivityRecorder,
    setupGridController, setupGridRenderer, setupPluginController, setupToolbarController, setupAlertController, setupAlertRenderer, setupPaletteLoader, PluginDialog,
-   setupSearchController,
+   setupSearchController, setupSearchUI,
    setupActivityAbcParser, setupActivityIdleWatcher,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
@@ -56,7 +56,7 @@ try {
    MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
    SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS,
-   extractProjectDataFromHTML,unescapeHTML
+   extractProjectDataFromHTML,unescapeHTML, pubsub
  */
 
 /*
@@ -131,6 +131,7 @@ let MYDEFINES = [
     "activity/alert-renderer",
     "palette/palette-loader",
     "activity/search-controller",
+    "search-ui",
     "widgets/plugin-dialog",
     "utils/musicutils",
     "utils/synthutils",
@@ -439,7 +440,17 @@ class Activity {
             let lang = "en";
             if (this.storage.languagePreference !== undefined) {
                 lang = this.storage.languagePreference;
-                if (lang.startsWith("ja")) lang = "ja"; // normalize Japanese
+                if (lang === "kana" || lang === "ja-kana") {
+                    this.storage.languagePreference = "ja";
+                    this.storage.kanaPreference = "kana";
+                    lang = "ja";
+                } else if (lang === "ja-kanji") {
+                    this.storage.languagePreference = "ja";
+                    this.storage.kanaPreference = "kanji";
+                    lang = "ja";
+                } else if (lang.startsWith("ja")) {
+                    lang = "ja"; // normalize Japanese
+                }
                 i18next.changeLanguage(lang);
             } else {
                 lang = navigator.language;
@@ -468,7 +479,8 @@ class Activity {
         setupAlertController(this);
         setupAlertRenderer(this);
         setupPaletteLoader(this);
-        setupSearchController(this);
+        this.searchUI = setupSearchUI(this);
+        setupSearchController(this, this.searchUI);
         this.pluginDialog = new PluginDialog({
             onLoadBuiltIn: name => this._loadBuiltInPlugin(name),
             onDelete: () => this._deletePlugin(),
@@ -550,11 +562,7 @@ class Activity {
             this.searchWidget.style.visibility = "hidden";
             this.searchWidget.placeholder = _("Search for blocks");
 
-            this.helpfulSearchWidget = document.createElement("input");
-            this.helpfulSearchWidget.setAttribute("id", "helpfulSearch");
-            this.helpfulSearchWidget.style.visibility = "hidden";
-            this.helpfulSearchWidget.placeholder = _("Search for blocks");
-            this.helpfulSearchWidget.classList.add("ui-autocomplete");
+            this.searchUI.createSearchUI();
             this.progressBar.style.visibility = "hidden";
             this.paste.style.visibility = "hidden";
 
@@ -638,7 +646,7 @@ class Activity {
                     event.preventDefault();
                     event.stopPropagation();
                     if (this.beginnerMode) return;
-                    if (this.searchController.isHelpfulSearchWidgetOn) {
+                    if (this.searchUI.isHelpfulSearchWidgetOn) {
                         this._hideHelpfulSearchWidget();
                     }
                     if (
@@ -912,98 +920,6 @@ class Activity {
         //if any window resize event occurs:
         this._handleRepositionBlocksOnResize = () => repositionBlocks(this);
         this.addEventListener(window, "resize", this._handleRepositionBlocksOnResize);
-
-        /**
-         * Finds and organizes blocks within the workspace.
-         * Arranges blocks in grid format on wide screens and vertically on narrow screens.
-         */
-        this._findBlocks = () => {
-            if (!this.blocks.visible) {
-                this._changeBlockVisibility();
-            }
-
-            this.blocks.activeBlock = null;
-            hideDOMLabel();
-            this.blocks.showBlocks();
-            this.blocksContainer.x = 0;
-            this.blocksContainer.y = 0;
-
-            const screenWidth = window.innerWidth;
-            const isNarrowScreen = screenWidth < RESPONSIVE_BREAKPOINT_MOBILE;
-            const minColumnWidth = 400;
-            const numColumns = isNarrowScreen ? 1 : Math.floor(screenWidth / minColumnWidth);
-
-            const toppos = this.auxToolbar.style.display === "block" ? 90 + this.toolbarHeight : 90;
-            const x = isNarrowScreen
-                ? Math.floor(screenWidth / 2)
-                : Math.floor(this.canvas.width / 4);
-            let y = Math.floor(toppos * this.turtleBlocksScale);
-            const verticalSpacing = Math.floor(40 * this.turtleBlocksScale);
-
-            const columnSpacing = (screenWidth / numColumns) * 1.2;
-            const columnXPositions = Array.from({ length: numColumns }, (_, i) =>
-                Math.floor(i * columnSpacing + columnSpacing / 2)
-            );
-            const columnYPositions = Array(numColumns).fill(y);
-
-            for (const blk in this.blocks.blockList) {
-                if (this.blocks.blockList[blk] && !this.blocks.blockList[blk].trash) {
-                    const myBlock = this.blocks.blockList[blk];
-
-                    // Store original position only once
-                    if (!myBlock.originalPosition) {
-                        myBlock.originalPosition = {
-                            x: myBlock.container.x,
-                            y: myBlock.container.y
-                        };
-                    }
-
-                    if (myBlock.connections[0] === null) {
-                        if (isNarrowScreen) {
-                            const dx = x - myBlock.container.x;
-                            const dy = y - myBlock.container.y;
-                            this.blocks.moveBlockRelative(blk, dx, dy);
-                            y += myBlock.height + verticalSpacing;
-                        } else {
-                            const minYIndex = columnYPositions.indexOf(
-                                Math.min(...columnYPositions)
-                            );
-                            const dx = columnXPositions[minYIndex] - myBlock.container.x;
-                            const dy = columnYPositions[minYIndex] - myBlock.container.y;
-                            this.blocks.moveBlockRelative(blk, dx, dy);
-                            columnYPositions[minYIndex] += myBlock.height + verticalSpacing;
-                        }
-                    }
-
-                    // Making code to make sure that
-                    if (myBlock.connections.length > 0) {
-                        myBlock.connections.forEach(conn => {
-                            if (conn !== null) {
-                                const innerBlock = this.blocks.blockList[conn];
-                                if (innerBlock) {
-                                    innerBlock.container.x =
-                                        myBlock.container.x + innerBlock.relativeX;
-                                    innerBlock.container.y =
-                                        myBlock.container.y + innerBlock.relativeY;
-                                }
-                            }
-                        });
-                    }
-                }
-            }
-
-            repositionBlocks(this);
-            this.setHomeContainers(false);
-            this.boundary.hide();
-
-            for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
-                const savedPenState = this.turtles.turtleList[turtle].painter.penState;
-                this.turtles.turtleList[turtle].painter.penState = false;
-                this.turtles.turtleList[turtle].painter.doSetXY(0, 0);
-                this.turtles.turtleList[turtle].painter.doSetHeading(0);
-                this.turtles.turtleList[turtle].painter.penState = savedPenState;
-            }
-        };
 
         /**
          * Finds and organizes blocks within the workspace.
@@ -3420,11 +3336,7 @@ class Activity {
         }
 
         this._renderTrashView = () => {
-            if (
-                !activity.blocks ||
-                !activity.blocks.trashStacks ||
-                activity.blocks.trashStacks.length === 0
-            ) {
+            if (!this.blocks || !this.blocks.trashStacks || this.blocks.trashStacks.length === 0) {
                 return;
             }
             const trashList = document.getElementById("trashList");
@@ -3468,13 +3380,17 @@ class Activity {
                 const listItem = document.createElement("div");
                 listItem.classList.add("trash-item");
 
-                const svgData = block.artwork;
-                const encodedData = svgData
-                    ? "data:image/svg+xml;utf8," + encodeURIComponent(svgData)
-                    : "";
+                const preview = this.blocks.trashPreviews[blockId];
+                let imgSrc;
+                if (preview) {
+                    imgSrc = preview;
+                } else {
+                    const svgData = block.artwork;
+                    imgSrc = "data:image/svg+xml;utf8," + encodeURIComponent(svgData);
+                }
 
                 const img = document.createElement("img");
-                img.src = encodedData;
+                img.src = imgSrc;
                 img.alt = "Block Icon";
                 img.classList.add("trash-item-icon");
 
@@ -3484,10 +3400,26 @@ class Activity {
                 listItem.appendChild(textNode);
                 listItem.dataset.blockId = blockId;
 
-                listItem.addEventListener("mouseover", () => listItem.classList.add("hover"));
-                listItem.addEventListener("mouseout", () => listItem.classList.remove("hover"));
+                listItem.addEventListener("mouseover", () => {
+                    listItem.classList.add("hover");
+                });
+                listItem.addEventListener("mouseout", () => {
+                    listItem.classList.remove("hover");
+                });
+
+                img.addEventListener("mouseover", event => {
+                    this._showTrashPreviewPopup(imgSrc, event);
+                });
+                img.addEventListener("mousemove", event => {
+                    this._showTrashPreviewPopup(imgSrc, event);
+                });
+                img.addEventListener("mouseout", () => {
+                    this._hideTrashPreviewPopup();
+                });
+
                 listItem.addEventListener("click", () => {
                     this._restoreTrashById(blockId);
+                    this._hideTrashPreviewPopup();
                     trashView.classList.add("hidden");
                 });
 
@@ -3499,9 +3431,62 @@ class Activity {
 
             const existingView = document.getElementById("trashView");
             if (existingView) {
-                existingView.remove(); // remove from DOM; GC can now collect listeners
+                trashList.replaceChild(trashView, existingView);
+            } else {
+                trashList.appendChild(trashView);
             }
-            trashList.appendChild(trashView);
+        };
+
+        /**
+         * Shows a larger preview popup for trashed items.
+         * @param {string} imgSrc - The source of the image.
+         * @param {MouseEvent} event - The mouse event.
+         * @private
+         */
+        this._showTrashPreviewPopup = (imgSrc, event) => {
+            let popup = document.getElementById("trashPreviewPopup");
+            if (!popup) {
+                popup = document.createElement("div");
+                popup.id = "trashPreviewPopup";
+                popup.classList.add("trash-preview-popup");
+                const img = document.createElement("img");
+                popup.appendChild(img);
+                document.body.appendChild(popup);
+            }
+            const img = popup.firstChild;
+            if (img.src !== imgSrc) {
+                img.src = imgSrc;
+            }
+            popup.style.display = "block";
+
+            // Position next to cursor
+            const xOffset = 20;
+            const yOffset = 20;
+            let x = event.clientX + xOffset;
+            let y = event.clientY + yOffset;
+
+            // Flip if near right edge
+            if (x + 300 > window.innerWidth) {
+                x = event.clientX - 320;
+            }
+            // Flip if near bottom edge
+            if (y + 300 > window.innerHeight) {
+                y = event.clientY - 320;
+            }
+
+            popup.style.left = x + "px";
+            popup.style.top = y + "px";
+        };
+
+        /**
+         * Hides the trash preview popup.
+         * @private
+         */
+        this._hideTrashPreviewPopup = () => {
+            const popup = document.getElementById("trashPreviewPopup");
+            if (popup) {
+                popup.style.display = "none";
+            }
         };
 
         /*
@@ -3618,7 +3603,11 @@ class Activity {
 
                 // If this block is at the top of a stack, push it
                 // onto the trashStacks list.
-                if (myBlock.connections[0] === null) {
+                if (this.blocks.blockList[blk].connections[0] === null) {
+                    const preview = this.blocks.captureStackPreview(blk);
+                    if (preview) {
+                        this.blocks.trashPreviews[blk] = preview;
+                    }
                     this.blocks.trashStacks.push(blk);
                 }
 
@@ -3913,7 +3902,7 @@ class Activity {
          * @param env {specifies environment}
          */
         this.runProject = env => {
-            document.removeEventListener("finishedLoading", this.runProject);
+            pubsub.off("finishedLoading", this.runProject);
 
             const that = this;
             setTimeout(() => {
@@ -3994,7 +3983,7 @@ class Activity {
                     that.keyboardEnableFlag = 1;
                 }
 
-                document.removeEventListener("finishedLoading", __afterLoad);
+                pubsub.off("finishedLoading", __afterLoad);
             };
 
             // Set the flag to zero to disable keyboard
@@ -4020,11 +4009,7 @@ class Activity {
 
             // After we have finished loading the project, clear all
             // to ensure a clean start.
-            if (document.addEventListener) {
-                document.addEventListener("finishedLoading", __afterLoad);
-            } else {
-                document.attachEvent("finishedLoading", __afterLoad);
-            }
+            pubsub.on("finishedLoading", __afterLoad);
 
             if (that.sessionData) {
                 that.doLoadAnimation();
@@ -4153,16 +4138,12 @@ class Activity {
                         that._changeBlockVisibility();
                     }
 
-                    document.removeEventListener("finishedLoading", __functionload);
+                    pubsub.off("finishedLoading", __functionload);
                     that.firstRun = false;
                 }, 1000);
             };
 
-            if (document.addEventListener) {
-                document.addEventListener("finishedLoading", __functionload, false);
-            } else {
-                document.attachEvent("finishedLoading", __functionload);
-            }
+            pubsub.on("finishedLoading", __functionload);
         };
         setupActivityAbcParser(this);
 
@@ -4272,6 +4253,23 @@ class Activity {
          * @param {string|HTMLElement|DocumentFragment} msg - The message to display.
          * @param {number} [duration=60000] - Duration in milliseconds before message disappears.
          */
+        /**
+         * Ensures a visually hidden aria-live region exists for screen reader announcements.
+         * @returns {HTMLElement} The live region element.
+         */
+        const __ensureA11yLiveRegion = () => {
+            let region = document.getElementById("mbA11yLiveRegion");
+            if (region) return region;
+            region = document.createElement("div");
+            region.id = "mbA11yLiveRegion";
+            region.setAttribute("role", "status");
+            region.setAttribute("aria-live", "polite");
+            region.setAttribute("aria-atomic", "true");
+            region.style.cssText =
+                "position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;";
+            document.body.appendChild(region);
+            return region;
+        };
         this.textMsg = (msg, duration = AlertController.MSG_TIMEOUT) => {
             if (this.msgText === null) {
                 // The container may not be ready yet, so do nothing.
@@ -4281,6 +4279,10 @@ class Activity {
             const showMsg = () => {
                 this.alertRenderer.showTextMsg(msg);
             };
+            // Announce to screen readers via aria-live region
+            if (msg && typeof msg === "string") {
+                __ensureA11yLiveRegion().textContent = msg;
+            }
 
             const hideMsg = () => {
                 this.alertRenderer.hideTextMsg();
@@ -4304,6 +4306,11 @@ class Activity {
             // The container may not be ready yet, so do nothing.
             if (this.errorMsgText === null) {
                 return;
+            }
+
+            // Announce errors to screen readers via aria-live region
+            if (msg && typeof msg === "string") {
+                __ensureA11yLiveRegion().textContent = msg;
             }
 
             const showMsg = () => {
@@ -6063,7 +6070,7 @@ class Activity {
                                 that.stage.removeAllEventListeners("trashsignal");
 
                                 const __afterLoad = () => {
-                                    document.removeEventListener("finishedLoading", __afterLoad);
+                                    pubsub.off("finishedLoading", __afterLoad);
                                 };
 
                                 // Wait for the old blocks to be removed.
@@ -6071,11 +6078,7 @@ class Activity {
                                     that.blocks.loadNewBlocks(obj);
                                     that.stage.removeAllEventListeners("trashsignal");
 
-                                    if (document.addEventListener) {
-                                        document.addEventListener("finishedLoading", __afterLoad);
-                                    } else {
-                                        document.attachEvent("finishedLoading", __afterLoad);
-                                    }
+                                    pubsub.on("finishedLoading", __afterLoad);
                                 };
 
                                 that.stage.addEventListener("trashsignal", __listener, false);
@@ -6330,11 +6333,6 @@ class Activity {
 
             // create functionality of 2D drag to select blocks in bulk
             this._create2Ddrag();
-
-            /*
-               document.addEventListener("mousewheel", scrollEvent, false);
-               document.addEventListener("DOMMouseScroll", scrollEvent, false);
-               */
 
             // Named event handler for proper cleanup
             const activity = this;

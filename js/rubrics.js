@@ -845,11 +845,11 @@ const getStatsFromNotation = activity => {
                 }
             }
 
-            if (item[1] == 2) {
+            if (item[1] === 2) {
                 projectStats["duples"]++;
-            } else if (item[1] == 3) {
+            } else if (item[1] === 3) {
                 projectStats["triplets"]++;
-            } else if (item[1] == 5) {
+            } else if (item[1] === 5) {
                 projectStats["quintuplets"]++;
             }
 

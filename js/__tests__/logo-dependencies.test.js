@@ -42,6 +42,8 @@ global.StatusMatrix = jest.fn();
 global.getStatsFromNotation = jest.fn();
 global.delayExecution = jest.fn();
 global.DEFAULTVOICE = "default";
+global.EmbeddedGraphicsScheduler =
+    require("../embedded-graphics-scheduler").EmbeddedGraphicsScheduler;
 
 const Logo = require("../logo").Logo;
 const LogoDependencies = require("../LogoDependencies");

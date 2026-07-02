@@ -16,7 +16,7 @@
    global
 
    platformColor, _, SYNTHSVG, frequencyToPitch, DEFAULTVOICE,
-   normalizeNoteAccidentals, PREVIEWVOLUME
+   normalizeNoteAccidentals, PREVIEWVOLUME, Singer, last
  */
 
 /*
@@ -24,11 +24,13 @@
     - js/utils/musicutils.js
         SYNTHSVG, frequencyToPitch, DEFAULTVOICE
     - js/utils/utils.js
-        _
+        _, last
     - js/utils/platformstyle.js
         platformColor
     - js/logoconstants.js
         PREVIEWVOLUME
+    - js/turtle-singer.js
+        Singer
 */
 /* exported PitchStaircase */
 
@@ -633,7 +635,9 @@ class PitchStaircase {
         widgetWindow.onclose = () => {
             this.closed = true;
             this.activity.logo.synth.stop();
-            this.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
+            // Restore the project's master volume so audio still works
+            // after exiting mid-playback (was incorrectly left at PREVIEWVOLUME).
+            this.activity.logo.synth.setMasterVolume(last(Singer.masterVolume));
             widgetWindow.destroy();
         };
 
