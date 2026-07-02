@@ -682,7 +682,7 @@ class Block {
             }
 
             // and hide the unhighlighted collapsed artwork...
-            if (this.collapseBlockBitmap !== null) {
+            if (this.collapseBlockBitmap) {
                 this.collapseBlockBitmap.visible = false;
             }
 
@@ -712,15 +712,15 @@ class Block {
             if (this.isCollapsible()) {
                 // There could be a race condition when making a
                 // new action block.
-                if (this.collapseText !== null) {
+                if (this.collapseText) {
                     this.collapseText.visible = false;
                 }
 
-                if (this.collapseBlockBitmap !== null) {
+                if (this.collapseBlockBitmap) {
                     this.collapseBlockBitmap.visible = false;
                 }
 
-                if (this.highlightCollapseBlockBitmap !== null) {
+                if (this.highlightCollapseBlockBitmap) {
                     this.highlightCollapseBlockBitmap.visible = false;
                 }
             }
@@ -1660,9 +1660,9 @@ class Block {
             that.activity.refreshCanvas();
             that.blocks.cleanupAfterLoad(that.name);
             if (that.trash) {
-                that.collapseText.visible = false;
-                that.collapseButtonBitmap.visible = false;
-                that.expandButtonBitmap.visible = false;
+                if (that.collapseText) that.collapseText.visible = false;
+                if (that.collapseButtonBitmap) that.collapseButtonBitmap.visible = false;
+                if (that.expandButtonBitmap) that.expandButtonBitmap.visible = false;
             }
         };
 
@@ -1713,7 +1713,7 @@ class Block {
                         that.protoblock.scale / 3;
 
                 that.container.addChild(that.expandButtonBitmap);
-                that.expandButtonBitmap.visible = that.collapsed;
+                if (that.expandButtonBitmap) that.expandButtonBitmap.visible = that.collapsed;
 
                 that.expandButtonBitmap.x = 2 * that.protoblock.scale;
                 if (that.isInlineCollapsible()) {
@@ -1740,7 +1740,8 @@ class Block {
             that.highlightCollapseBlockBitmap = bitmap;
             that.highlightCollapseBlockBitmap.name = "highlight_collapse_" + thisBlock;
             that.container.addChild(that.highlightCollapseBlockBitmap);
-            that.highlightCollapseBlockBitmap.visible = false;
+            if (that.highlightCollapseBlockBitmap)
+                that.highlightCollapseBlockBitmap.visible = false;
 
             if (that.collapseText === null) {
                 const fontSize = 10 * that.protoblock.scale;
@@ -1899,7 +1900,7 @@ class Block {
             }
 
             that._positionCollapseLabel(that.protoblock.scale);
-            that.collapseText.visible = that.collapsed;
+            if (that.collapseText) that.collapseText.visible = that.collapsed;
             that._ensureDecorationOnTop();
 
             // Save the collapsed block artwork for export.
@@ -1923,7 +1924,7 @@ class Block {
             that.collapseBlockBitmap = bitmap;
             that.collapseBlockBitmap.name = "collapse_" + thisBlock;
             that.container.addChild(that.collapseBlockBitmap);
-            that.collapseBlockBitmap.visible = that.collapsed;
+            if (that.collapseBlockBitmap) that.collapseBlockBitmap.visible = that.collapsed;
             that.activity.refreshCanvas();
 
             const artwork = that.collapseArtwork;
@@ -1955,10 +1956,10 @@ class Block {
         this.container.visible = false;
         if (this.isCollapsible()) {
             // Sometimes these fields are not set.
-            if (this.collapseText !== null) {
+            if (this.collapseText) {
                 this.collapseText.visible = false;
             }
-            if (this.expandButtonBitmap !== null) {
+            if (this.expandButtonBitmap) {
                 this.expandButtonBitmap.visible = false;
             }
             if (this.collapseButtonBitmap !== null) {
@@ -2018,13 +2019,14 @@ class Block {
             this.container.visible = true;
             if (this.isCollapsible()) {
                 if (this.collapsed) {
-                    this.bitmap.visible = false;
-                    this.highlightBitmap.visible = false;
-                    this.collapseBlockBitmap.visible = true;
-                    this.highlightCollapseBlockBitmap.visible = false;
-                    this.collapseText.visible = true;
-                    this.expandButtonBitmap.visible = true;
-                    this.collapseButtonBitmap.visible = false;
+                    if (this.bitmap) this.bitmap.visible = false;
+                    if (this.highlightBitmap) this.highlightBitmap.visible = false;
+                    if (this.collapseBlockBitmap) this.collapseBlockBitmap.visible = true;
+                    if (this.highlightCollapseBlockBitmap)
+                        this.highlightCollapseBlockBitmap.visible = false;
+                    if (this.collapseText) this.collapseText.visible = true;
+                    if (this.expandButtonBitmap) this.expandButtonBitmap.visible = true;
+                    if (this.collapseButtonBitmap) this.collapseButtonBitmap.visible = false;
                     if (this.disconnectedBitmap !== null) {
                         this.disconnectedBitmap.visible = false;
                     }
@@ -2051,11 +2053,12 @@ class Block {
                         this.disconnectedHighlightBitmap.visible = false;
                     }
 
-                    this.collapseBlockBitmap.visible = false;
-                    this.highlightCollapseBlockBitmap.visible = false;
-                    this.collapseText.visible = false;
-                    this.expandButtonBitmap.visible = false;
-                    this.collapseButtonBitmap.visible = true;
+                    if (this.collapseBlockBitmap) this.collapseBlockBitmap.visible = false;
+                    if (this.highlightCollapseBlockBitmap)
+                        this.highlightCollapseBlockBitmap.visible = false;
+                    if (this.collapseText) this.collapseText.visible = false;
+                    if (this.expandButtonBitmap) this.expandButtonBitmap.visible = false;
+                    if (this.collapseButtonBitmap) this.collapseButtonBitmap.visible = true;
                 }
             } else {
                 // If the block is disconnected, use the disconnected bitmap.
@@ -2445,13 +2448,13 @@ class Block {
         this.collapsed = !isCollapsed;
 
         // These are the buttons to collapse/expand the stack.
-        this.collapseButtonBitmap.visible = isCollapsed;
-        this.expandButtonBitmap.visible = !isCollapsed;
+        if (this.collapseButtonBitmap) this.collapseButtonBitmap.visible = isCollapsed;
+        if (this.expandButtonBitmap) this.expandButtonBitmap.visible = !isCollapsed;
 
         // These are the collapse-state bitmaps.
-        this.collapseBlockBitmap.visible = !isCollapsed;
-        this.highlightCollapseBlockBitmap.visible = false;
-        this.collapseText.visible = !isCollapsed;
+        if (this.collapseBlockBitmap) this.collapseBlockBitmap.visible = !isCollapsed;
+        if (this.highlightCollapseBlockBitmap) this.highlightCollapseBlockBitmap.visible = false;
+        if (this.collapseText) this.collapseText.visible = !isCollapsed;
 
         if (this.isInlineCollapsible() && this.collapseText.visible) {
             switch (this.name) {
