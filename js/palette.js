@@ -908,11 +908,13 @@ class Palettes {
         row.addEventListener("mouseover", () => {
             if (!this._keyboardNavActive && !row.dataset.keyboardFocus) {
                 row.style.backgroundColor = platformColor.hoverColor;
+                label.style.color = platformColor.hoverText;
             }
         });
         row.addEventListener("mouseout", () => {
             if (!row.dataset.keyboardFocus) {
                 row.style.backgroundColor = platformColor.paletteBackground;
+                label.style.color = platformColor.paletteText;
             }
         });
 
@@ -935,7 +937,6 @@ class Palettes {
         img.style.width = `${this.cellSize}px`;
         img.style.height = `${this.cellSize}px`;
         label.textContent = toTitleCase(_(name));
-        label.style.color = platformColor.paletteText;
         label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
         label.style.padding = "4px";
         row.style.display = "flex";
