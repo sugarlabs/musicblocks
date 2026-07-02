@@ -386,7 +386,7 @@
   "milliseconds": "אלפיות השנייה",
   "scalar interval %s": "מרווח סקלרי %s",
   "silence": "דְמָמָה",
-  "ti la sol fa mi re do": "אני אתן לך את היחיד",
+  "ti la sol fa mi re do": "סי לה סול פה מי רה דו",
   "down": "מטה",
   "up": "מַעְלָה",
   "Silence block cannot be removed.": "לא ניתן להסיר את בלוק השתיקה.",
@@ -1801,5 +1801,7 @@
   "city": "עיר",
   "day": "יום",
   "high": "גבוה",
-  "low": "נמוך"
+  "low": "נמוך",
+  "Record canvas and toolbars": "הקלט קנבס וסרגלי כלים",
+  "Record canvas only": "הקלט קנבס בלבד"
 }

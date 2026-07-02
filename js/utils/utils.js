@@ -55,9 +55,11 @@ if (typeof module !== "undefined" && module.exports) {
  * @param {string} to - The new base64-encoded SVG data URI.
  */
 const changeImage = (imgElement, from, to) => {
-    const oldSrc = "data:image/svg+xml;base64," + window.btoa(base64Encode(from));
+    if (!to) return;
+
     const newSrc = "data:image/svg+xml;base64," + window.btoa(base64Encode(to));
-    if (imgElement.src === oldSrc) {
+
+    if (imgElement.src !== newSrc) {
         imgElement.src = newSrc;
     }
 };
@@ -288,31 +290,47 @@ let httpPost = async (projectName, data) => {
  * @param {function} [userCallback] - An optional user-defined callback function.
  */
 function HttpRequest(url, loadCallback, userCallback) {
-    // userCallback is an optional callback-handler.
     const req = (this.request = new XMLHttpRequest());
     this.handler = loadCallback;
     this.url = url;
     this.localmode = Boolean(self.location.href.search(/^file:/i) === 0);
     this.userCallback = userCallback;
 
-    const objref = this;
     try {
         req.open("GET", url);
 
-        req.onreadystatechange = () => {
-            objref.handler();
+        req.onload = () => {
+            if ((req.status >= 200 && req.status < 300) || this.localmode) {
+                if (typeof this.handler === "function") this.handler();
+                if (typeof this.userCallback === "function") {
+                    this.userCallback(true, req.responseText);
+                }
+            } else {
+                if (typeof this.handler === "function") this.handler();
+                if (typeof this.userCallback === "function") {
+                    this.userCallback(false, `Error: ${req.status}`);
+                }
+            }
         };
+
+        req.onerror = () => {
+            if (typeof this.handler === "function") this.handler();
+            if (typeof this.userCallback === "function") {
+                this.userCallback(false, "network error");
+            }
+        };
+
+        req.onabort = req.onerror;
+        req.ontimeout = req.onerror;
 
         req.send("");
     } catch (e) {
         if (self.console) {
-            console.debug("Failed to load resource from " + url + ": Network error.");
-
-            console.debug(e);
+            console.debug("Failed to load resource from " + url + ": Network error.", e);
         }
 
-        if (typeof userCallback === "function") {
-            userCallback(false, "network error");
+        if (typeof this.userCallback === "function") {
+            this.userCallback(false, "network error");
         }
 
         this.request = this.handler = this.userCallback = null;
@@ -420,52 +438,6 @@ function waitForReadiness(callback, options = {}) {
     // Start the readiness check loop
     requestAnimationFrame(check);
 }
-
-// Check for Internet Explorer
-
-window.addEventListener("load", () => {
-    const userAgent = window.navigator.userAgent;
-    // For IE 10 or older
-    const MSIE = userAgent.indexOf("MSIE ");
-    let DetectVersionOfIE;
-    if (MSIE > 0) {
-        DetectVersionOfIE = parseInt(
-            userAgent.substring(MSIE + 5, userAgent.indexOf(".", MSIE)),
-            10
-        );
-    }
-
-    // For IE 11
-    const IETrident = userAgent.indexOf("Trident/");
-    if (IETrident > 0) {
-        const IERv = userAgent.indexOf("rv:");
-        DetectVersionOfIE = parseInt(
-            userAgent.substring(IERv + 3, userAgent.indexOf(".", IERv)),
-            10
-        );
-    }
-
-    // For IE 12
-    const IEEDGE = userAgent.indexOf("Edge/");
-    if (IEEDGE > 0) {
-        DetectVersionOfIE = parseInt(
-            userAgent.substring(IEEDGE + 5, userAgent.indexOf(".", IEEDGE)),
-            10
-        );
-    }
-
-    if (typeof DetectVersionOfIE !== "undefined") {
-        document.body.innerHTML =
-            "<div style='margin: 200px;'>" +
-            "<h1 style='font-size: 100px; font-family: Arial; text-align: center; color: #F00;'>Music Blocks</h1>" +
-            "<h3 style='font-size: 40px; font-family: Arial; text-align: center;'>Music Blocks will not work in Internet Explorer, you can use:</h3>" +
-            "<div style='width: 550px; margin: 0 auto;'><a href='https://www.chromium.org/getting-involved/download-chromium' style='float: left; display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Chromium</a>" +
-            "<a href='https://www.google.com/chrome/' style='float: left; margin-left: 40px;display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Chrome</a>" +
-            "<a href='https://support.apple.com/downloads/safari' style='float: left; margin-left: 40px;display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Safari</a>" +
-            "<a href='https://www.mozilla.org/en-US/firefox/new/' style='float: left; margin-left: 40px;display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Firefox</a>" +
-            "</div></div>";
-    }
-});
 
 /**
  * Retrieves a collection of elements by class name.
@@ -935,10 +907,12 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
         await new Promise((resolve, reject) => {
             script.onload = () => {
                 URL.revokeObjectURL(url);
+                document.head.removeChild(script);
                 resolve();
             };
             script.onerror = e => {
                 URL.revokeObjectURL(url);
+                document.head.removeChild(script);
                 console.error("Failed to load CSP Blob script for plugins", e);
                 reject(e);
             };
@@ -1396,7 +1370,8 @@ let delayExecution = duration => {
  * @returns {void}
  */
 function closeWidgets() {
-    window.widgetWindows.hideAllWindows();
+    const names = Object.keys(window.widgetWindows.openWindows);
+    names.forEach(name => window.widgetWindows.closeWindow(name));
 }
 
 /**
@@ -1406,10 +1381,59 @@ function closeWidgets() {
  * @returns {void}
  */
 let closeBlkWidgets = name => {
+    let searchKey = name;
+
+    // NOTE: This mapping only works for widgets that never set their own
+    // `blockNo` property (e.g. ModeWidget). window.widgetWindows.windowFor()
+    // keys a widget's window by `widget.blockNo` if that property is set to
+    // anything other than undefined (including null) — otherwise it falls
+    // back to the `saveAs` or `title` argument. Widgets like PhraseMaker set
+    // `this.blockNo` in their constructor, so they are keyed by blockNo, not
+    // by name, and will NOT be found via this KEY_MAPPING lookup. Adding such
+    // widgets here would silently do nothing. Before adding a new entry,
+    // verify the target widget's windowFor() call and confirm it does not
+    // rely on blockNo for its window key.
+    const KEY_MAPPING = {
+        "pitch-drum mapper": "pitch drum",
+        "custom mode": "custom mode",
+        "tempo": "tempo",
+        "arpeggio": "arpeggio",
+        "timbre": "timbre",
+        "sampler": "sampler",
+        "rhythm maker": "rhythm maker",
+        "oscilloscope": "oscilloscope",
+        "temperament": "temperament",
+        "meter": "meter"
+    };
+
+    for (const origKey in KEY_MAPPING) {
+        const translated = typeof _ === "function" ? _(origKey) : origKey;
+        if (name === translated) {
+            searchKey = KEY_MAPPING[origKey];
+            break;
+        }
+    }
+
+    if (
+        window.widgetWindows &&
+        window.widgetWindows.openWindows &&
+        window.widgetWindows.openWindows[searchKey]
+    ) {
+        window.widgetWindows.closeWindow(searchKey);
+        return;
+    }
+
     const widgetTitle = document.getElementsByClassName("wftTitle");
     for (let i = 0; i < widgetTitle.length; i++) {
-        if (widgetTitle[i].innerHTML === name) {
-            window.widgetWindows.hideWindow(widgetTitle[i].innerHTML);
+        const titleEl = widgetTitle[i];
+        if (titleEl.innerHTML === name || titleEl.id === `${searchKey}WidgetID`) {
+            const winKey =
+                titleEl.id && typeof titleEl.id === "string"
+                    ? titleEl.id.replace("WidgetID", "")
+                    : searchKey;
+            if (window.widgetWindows && typeof window.widgetWindows.closeWindow === "function") {
+                window.widgetWindows.closeWindow(winKey);
+            }
             break;
         }
     }
@@ -1493,6 +1517,26 @@ if (typeof module !== "undefined" && module.exports) {
         delayExecution,
         closeWidgets,
         closeBlkWidgets,
-        importMembers
+        importMembers,
+        changeImage,
+        fnBrowserDetect,
+        canvasPixelRatio,
+        windowHeight,
+        windowWidth,
+        httpGet,
+        httpPost,
+        HttpRequest,
+        docByClass,
+        docByTagName,
+        docById,
+        docByName,
+        docBySelector,
+        getTextWidth,
+        doSVG,
+        isSVGEmpty,
+        prepareMacroExports,
+        processMacroData,
+        hideDOMLabel,
+        displayMsg
     };
 }

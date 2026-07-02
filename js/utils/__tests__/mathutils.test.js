@@ -550,7 +550,6 @@ describe("MathUtility", () => {
         });
 
         test("returns NaN for non-numeric string", () => {
-            // The function uses Math.floor(Number("abc") + 0.5) which gives NaN
             expect(MathUtility.doInt("abc")).toBeNaN();
         });
     });

@@ -11,7 +11,7 @@
 
 /* This widget provides a chat interface for users to interact with AI mentors for project reflection and analysis.*/
 
-/* global _, escapeHTML, isSafeUrl */
+/* global _, escapeHTML, isSafeUrl, DOMPurify */
 
 /**
  * Represents Reflection Widget.
@@ -334,7 +334,7 @@ class ReflectionMatrix {
 
         if (md) {
             let html = this.mdToHTML(reply.response);
-            botReply.innerHTML = html;
+            botReply.innerHTML = DOMPurify.sanitize(html);
         } else {
             botReply.innerText = reply.response;
         }
@@ -644,7 +644,7 @@ class ReflectionMatrix {
      * @returns {void}
      */
     renderChatHistory() {
-        this.chatLog.innerHTML = "";
+        this.chatLog.textContent = "";
 
         this.chatHistory.forEach(msg => {
             const messageContainer = document.createElement("div");

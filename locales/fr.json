@@ -1801,5 +1801,7 @@
   "city": "ville",
   "day": "jour",
   "high": "maximum",
-  "low": "minimum"
+  "low": "minimum",
+  "Record canvas and toolbars": "Enregistrer le canevas et les barres d'outils",
+  "Record canvas only": "Enregistrer le canevas uniquement"
 }

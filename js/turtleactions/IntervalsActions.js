@@ -154,7 +154,7 @@ function setupIntervalsActions(activity) {
             const plural = Math.abs(octave) > 1 ? _("octaves") : _("octave");
 
             let os = numberToStringMap[Math.abs(octave) - 1] || Math.abs(octave);
-            if (totalIntervals % 12 === 0 && letterGap === 0) {
+            if (totalIntervals % temperamentLength === 0 && letterGap === 0) {
                 if (octave < 0) {
                     if (octave === -1) os = "";
                     const a = `${os} ${_("perfect")} ${plural} ${_("below")}`;
@@ -166,7 +166,10 @@ function setupIntervalsActions(activity) {
                 }
             }
 
-            if (totalIntervals > 21) {
+            // +9 is the original 12-EDO offset: intervals beyond
+            // temperamentLength + 9 get an explicit "plus N octave(s)"
+            // suffix. Same offset scales proportionally for all EDOs.
+            if (totalIntervals > temperamentLength + 9) {
                 if (octave >= 1) {
                     lastWord = `, ${_("plus")} ${os} ${plural}`;
                 }

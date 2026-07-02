@@ -30,7 +30,10 @@ try {
 
    ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON, debugLog,
    ErrorHandler, ActivityContext,
-   Boundary, CARTESIAN, changeImage, closeWidgets,
+   Boundary, CARTESIAN, changeImage, closeWidgets, doRecordButton, setupActivityRecorder,
+   setupGridController, setupGridRenderer, setupPluginController, setupToolbarController, setupAlertController, setupAlertRenderer, setupPaletteLoader, PluginDialog,
+   setupSearchController, setupSearchUI,
+   setupActivityAbcParser, setupActivityIdleWatcher,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
    DEFAULTDELAY, define, doBrowserCheck, doBrowserCheck, docByClass,
@@ -53,7 +56,7 @@ try {
    MUSICALMODES, waitForReadiness, i18next, wheelnav, slicePath,
    base64Encode, disableHorizScrollIcon, toFraction, CARTESIANBUTTON,
    SELECTBUTTON, CLEARBUTTON, piemenuGrid, Midi, ABCJS, ensureABCJS,
-   extractProjectDataFromHTML,unescapeHTML
+   extractProjectDataFromHTML,unescapeHTML, pubsub
  */
 
 /*
@@ -66,9 +69,6 @@ const LEADING = 0;
 const BLOCKSCALES = [1, 1.5, 2, 3, 4];
 const _THIS_IS_MUSIC_BLOCKS_ = true;
 const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
-
-const _ERRORMSGTIMEOUT_ = 15000;
-const _MSGTIMEOUT_ = 60000;
 
 // Responsive breakpoint constants
 const RESPONSIVE_BREAKPOINT_TABLET = 768;
@@ -120,6 +120,19 @@ let MYDEFINES = [
     "activity/rubrics",
     "activity/macros",
     "activity/SaveInterface",
+
+    "activity/recorder",
+    "activity/idle-watcher",
+    "activity/grid-controller",
+    "activity/grid-renderer",
+    "activity/plugin-controller",
+    "activity/toolbar-controller",
+    "activity/alert-controller",
+    "activity/alert-renderer",
+    "palette/palette-loader",
+    "activity/search-controller",
+    "search-ui",
+    "widgets/plugin-dialog",
     "utils/musicutils",
     "utils/synthutils",
     "utils/mathutils",
@@ -231,6 +244,8 @@ const doAnalyzeProject = function () {
  * Represents an activity in the application.
  */
 
+let exporters;
+
 class Activity {
     /**
      * Creates an Activity instance.
@@ -246,18 +261,11 @@ class Activity {
         }
 
         this._listeners = [];
-        this._idleWatcherIntervalId = null;
-        this._idleWatcherResetHandler = null;
 
         this.cellSize = 55;
-        this.searchSuggestions = [];
-        this._searchCache = {}; // Cache for search results to improve performance
-        this._searchCloseListener = null;
         this.homeButtonContainer;
 
-        this.msgTimeoutID = null;
         this.msgText = null;
-        this.errorMsgTimeoutID = null;
         this.errorMsgText = null;
         this.errorMsgArrow = null;
         this.errorArtwork = {};
@@ -319,7 +327,16 @@ class Activity {
 
         this.firstTimeUser = false;
         this.beginnerMode = false;
-        this.runMode = "normal";
+        Object.defineProperty(this, "runMode", {
+            get: () => (this.toolbarController ? this.toolbarController.runMode : "normal"),
+            set: val => {
+                if (this.toolbarController) {
+                    this.toolbarController.runMode = val;
+                }
+            },
+            configurable: true,
+            enumerable: true
+        });
 
         // Flag to disable keyboard during loading of MB
         this.keyboardEnableFlag;
@@ -341,9 +358,6 @@ class Activity {
         // Flag to indicate the selection mode is on
         this.selectionModeOn = false;
 
-        // Flag to check if the helpful search widget is active or not (for "click" event handler purpose)
-        this.isHelpfulSearchWidgetOn = false;
-
         //Flag to check if any other input box is active or not
         this.isInputON = false;
 
@@ -363,8 +377,23 @@ class Activity {
         this.stageDirty = false;
         this._renderLoopRafId = null;
         this._renderLoopRunning = false;
+        this.firefoxWarningShown = false;
 
         this.themes = ["light", "dark", "highcontrast"];
+
+        if (navigator.userAgent.includes("Firefox")) {
+            let lastPixelRatio = window.devicePixelRatio;
+
+            setInterval(() => {
+                if (window.devicePixelRatio !== lastPixelRatio) {
+                    lastPixelRatio = window.devicePixelRatio;
+
+                    if (typeof this._onResize === "function") {
+                        this._onResize(false);
+                    }
+                }
+            }, 1000);
+        }
         try {
             // Detect system theme preference (using same logic as ThemeBox)
             const getSystemTheme = () => {
@@ -411,7 +440,17 @@ class Activity {
             let lang = "en";
             if (this.storage.languagePreference !== undefined) {
                 lang = this.storage.languagePreference;
-                if (lang.startsWith("ja")) lang = "ja"; // normalize Japanese
+                if (lang === "kana" || lang === "ja-kana") {
+                    this.storage.languagePreference = "ja";
+                    this.storage.kanaPreference = "kana";
+                    lang = "ja";
+                } else if (lang === "ja-kanji") {
+                    this.storage.languagePreference = "ja";
+                    this.storage.kanaPreference = "kanji";
+                    lang = "ja";
+                } else if (lang.startsWith("ja")) {
+                    lang = "ja"; // normalize Japanese
+                }
                 i18next.changeLanguage(lang);
             } else {
                 lang = navigator.language;
@@ -434,6 +473,22 @@ class Activity {
             ErrorHandler.recoverable(e, { operation: "loadKeySignatureEnv" });
         }
 
+        setupActivityIdleWatcher(this);
+        setupPluginController(this);
+        setupToolbarController(this);
+        setupAlertController(this);
+        setupAlertRenderer(this);
+        setupPaletteLoader(this);
+        this.searchUI = setupSearchUI(this);
+        setupSearchController(this, this.searchUI);
+        this.pluginDialog = new PluginDialog({
+            onLoadBuiltIn: name => this._loadBuiltInPlugin(name),
+            onDelete: () => this._deletePlugin(),
+            onFileSelected: file => this.handlePluginFileSelected(file),
+            closeAuxToolbar: callback => this.toolbar.closeAuxToolbar(callback),
+            showHideAuxMenu: (activity, resize) => activity._showHideAuxMenu(resize)
+        });
+
         /**
          * Initialises major variables and renders default stack.
          * Sets up the initial state and dependencies of the activity.
@@ -453,8 +508,6 @@ class Activity {
 
             // Set up a file chooser for the doOpen function.
             this.fileChooser = document.getElementById("myOpenFile");
-            // Set up a file chooser for the doOpenPlugin function.
-            this.pluginChooser = document.getElementById("myOpenPlugin");
             // The file chooser for all files
             this.allFilesChooser = document.getElementById("myOpenAll");
             this.auxToolbar = document.getElementById("aux-toolbar");
@@ -509,11 +562,7 @@ class Activity {
             this.searchWidget.style.visibility = "hidden";
             this.searchWidget.placeholder = _("Search for blocks");
 
-            this.helpfulSearchWidget = document.createElement("input");
-            this.helpfulSearchWidget.setAttribute("id", "helpfulSearch");
-            this.helpfulSearchWidget.style.visibility = "hidden";
-            this.helpfulSearchWidget.placeholder = _("Search for blocks");
-            this.helpfulSearchWidget.classList.add("ui-autocomplete");
+            this.searchUI.createSearchUI();
             this.progressBar.style.visibility = "hidden";
             this.paste.style.visibility = "hidden";
 
@@ -576,84 +625,14 @@ class Activity {
         /*
          * creates helpfulSearchDiv for search
          */
-        this.setHelpfulSearchDiv = () => {
-            if (document.getElementById("helpfulSearchDiv")) {
-                document
-                    .getElementById("helpfulSearchDiv")
-                    .parentNode.removeChild(document.getElementById("helpfulSearchDiv"));
-            }
-            this.helpfulSearchDiv = document.createElement("div");
-            this.helpfulSearchDiv.setAttribute("id", "helpfulSearchDiv");
-
-            document.body.appendChild(this.helpfulSearchDiv);
-
-            // Create the div for the close button (cross button)
-            const closeButtonDiv = document.createElement("div");
-            closeButtonDiv.style.cssText =
-                "position: absolute;" + "top: 10px;" + "right: 10px;" + "cursor: pointer;";
-
-            // Create the cross button itself
-            const closeButton = document.createElement("button");
-            closeButton.textContent = "×";
-            closeButton.id = "crossButton";
-            document.body.appendChild(closeButton);
-
-            closeButtonDiv.appendChild(closeButton);
-
-            this.helpfulSearchDiv.appendChild(closeButtonDiv);
-
-            // Add event listener to remove the search div from the DOM
-            const modeButton = document.getElementById("begIconText");
-            this.addEventListener(closeButton, "click", this._hideHelpfulSearchWidget);
-            this.addEventListener(modeButton, "click", this._hideHelpfulSearchWidget);
-
-            this.helpfulSearchDiv.appendChild(this.helpfulSearchWidget);
-        };
+        this.setHelpfulSearchDiv = () => this.searchController.setHelpfulSearchDiv();
 
         /*
          * displays helpfulSearchDiv on canvas
          */
-        this._displayHelpfulSearchDiv = () => {
-            if (!document.getElementById("helpfulSearchDiv")) {
-                this.setHelpfulSearchDiv(); // Re-create and append the div if it's not found
-            }
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            this.helpfulSearchDiv.style.left =
-                helpfulWheelDiv.offsetLeft + 80 * this.getStageScale() + "px";
-            this.helpfulSearchDiv.style.top =
-                helpfulWheelDiv.offsetTop + 110 * this.getStageScale() + "px";
+        this._displayHelpfulSearchDiv = () => this.searchController._displayHelpfulSearchDiv();
 
-            const windowWidth = window.innerWidth;
-            const windowHeight = window.innerHeight;
-            this.helpfulSearchDiv.style.display = "block";
-            const menuWidth = this.helpfulSearchDiv.offsetWidth;
-            const menuHeight = this.helpfulSearchDiv.offsetHeight;
-
-            if (this.helpfulSearchDiv.offsetLeft + menuWidth > windowWidth) {
-                this.helpfulSearchDiv.style.left = windowWidth - menuWidth + "px";
-            }
-            if (this.helpfulSearchDiv.offsetTop + menuHeight > windowHeight) {
-                this.helpfulSearchDiv.style.top = windowHeight - menuHeight + "px";
-            }
-
-            this.showHelpfulSearchWidget();
-            this.isHelpfulSearchWidgetOn = true;
-        };
-
-        // hides helpfulSearchDiv on canvas
-
-        this._hideHelpfulSearchWidget = e => {
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-            }
-            if (this.helpfulSearchDiv && this.helpfulSearchDiv.parentNode) {
-                this.helpfulSearchDiv.parentNode.removeChild(this.helpfulSearchDiv);
-            }
-            that.__tick();
-        };
+        this._hideHelpfulSearchWidget = e => this.searchController._hideHelpfulSearchWidget(e);
 
         /*
          * Sets up right click functionality opening the context menus
@@ -667,7 +646,7 @@ class Activity {
                     event.preventDefault();
                     event.stopPropagation();
                     if (this.beginnerMode) return;
-                    if (this.isHelpfulSearchWidgetOn) {
+                    if (this.searchUI.isHelpfulSearchWidgetOn) {
                         this._hideHelpfulSearchWidget();
                     }
                     if (
@@ -763,27 +742,9 @@ class Activity {
          * palette colors, and other settings used throughout the application.
          */
         this.doPluginsAndPaletteCols = () => {
-            // Calculate the palette colors.
-            for (const p in platformColor.paletteColors) {
-                PALETTEFILLCOLORS[p] = platformColor.paletteColors[p][0];
-                PALETTESTROKECOLORS[p] = platformColor.paletteColors[p][1];
-                PALETTEHIGHLIGHTCOLORS[p] = platformColor.paletteColors[p][2];
-                HIGHLIGHTSTROKECOLORS[p] = platformColor.paletteColors[p][1];
-            }
+            this.paletteLoader.initializePaletteColors();
 
-            this.pluginObjs = {
-                PALETTEPLUGINS: {},
-                PALETTEFILLCOLORS: {},
-                PALETTESTROKECOLORS: {},
-                PALETTEHIGHLIGHTCOLORS: {},
-                FLOWPLUGINS: {},
-                ARGPLUGINS: {},
-                BLOCKPLUGINS: {},
-                MACROPLUGINS: {},
-                ONLOAD: {},
-                ONSTART: {},
-                ONSTOP: {}
-            };
+            this.pluginController.initializePluginState();
 
             // Stacks of blocks saved in local storage
             this.macroDict = {};
@@ -815,8 +776,6 @@ class Activity {
             this.onscreenMenu = [];
 
             this.firstRun = true;
-
-            this.pluginsImages = {};
         };
 
         /**
@@ -961,98 +920,6 @@ class Activity {
         //if any window resize event occurs:
         this._handleRepositionBlocksOnResize = () => repositionBlocks(this);
         this.addEventListener(window, "resize", this._handleRepositionBlocksOnResize);
-
-        /**
-         * Finds and organizes blocks within the workspace.
-         * Arranges blocks in grid format on wide screens and vertically on narrow screens.
-         */
-        this._findBlocks = () => {
-            if (!this.blocks.visible) {
-                this._changeBlockVisibility();
-            }
-
-            this.blocks.activeBlock = null;
-            hideDOMLabel();
-            this.blocks.showBlocks();
-            this.blocksContainer.x = 0;
-            this.blocksContainer.y = 0;
-
-            const screenWidth = window.innerWidth;
-            const isNarrowScreen = screenWidth < RESPONSIVE_BREAKPOINT_MOBILE;
-            const minColumnWidth = 400;
-            const numColumns = isNarrowScreen ? 1 : Math.floor(screenWidth / minColumnWidth);
-
-            const toppos = this.auxToolbar.style.display === "block" ? 90 + this.toolbarHeight : 90;
-            const x = isNarrowScreen
-                ? Math.floor(screenWidth / 2)
-                : Math.floor(this.canvas.width / 4);
-            let y = Math.floor(toppos * this.turtleBlocksScale);
-            const verticalSpacing = Math.floor(40 * this.turtleBlocksScale);
-
-            const columnSpacing = (screenWidth / numColumns) * 1.2;
-            const columnXPositions = Array.from({ length: numColumns }, (_, i) =>
-                Math.floor(i * columnSpacing + columnSpacing / 2)
-            );
-            const columnYPositions = Array(numColumns).fill(y);
-
-            for (const blk in this.blocks.blockList) {
-                if (this.blocks.blockList[blk] && !this.blocks.blockList[blk].trash) {
-                    const myBlock = this.blocks.blockList[blk];
-
-                    // Store original position only once
-                    if (!myBlock.originalPosition) {
-                        myBlock.originalPosition = {
-                            x: myBlock.container.x,
-                            y: myBlock.container.y
-                        };
-                    }
-
-                    if (myBlock.connections[0] === null) {
-                        if (isNarrowScreen) {
-                            const dx = x - myBlock.container.x;
-                            const dy = y - myBlock.container.y;
-                            this.blocks.moveBlockRelative(blk, dx, dy);
-                            y += myBlock.height + verticalSpacing;
-                        } else {
-                            const minYIndex = columnYPositions.indexOf(
-                                Math.min(...columnYPositions)
-                            );
-                            const dx = columnXPositions[minYIndex] - myBlock.container.x;
-                            const dy = columnYPositions[minYIndex] - myBlock.container.y;
-                            this.blocks.moveBlockRelative(blk, dx, dy);
-                            columnYPositions[minYIndex] += myBlock.height + verticalSpacing;
-                        }
-                    }
-
-                    // Making code to make sure that
-                    if (myBlock.connections.length > 0) {
-                        myBlock.connections.forEach(conn => {
-                            if (conn !== null) {
-                                const innerBlock = this.blocks.blockList[conn];
-                                if (innerBlock) {
-                                    innerBlock.container.x =
-                                        myBlock.container.x + innerBlock.relativeX;
-                                    innerBlock.container.y =
-                                        myBlock.container.y + innerBlock.relativeY;
-                                }
-                            }
-                        });
-                    }
-                }
-            }
-
-            repositionBlocks(this);
-            this.setHomeContainers(false);
-            this.boundary.hide();
-
-            for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
-                const savedPenState = this.turtles.turtleList[turtle].painter.penState;
-                this.turtles.turtleList[turtle].painter.penState = false;
-                this.turtles.turtleList[turtle].painter.doSetXY(0, 0);
-                this.turtles.turtleList[turtle].painter.doSetHeading(0);
-                this.turtles.turtleList[turtle].painter.penState = savedPenState;
-            }
-        };
 
         /**
          * Finds and organizes blocks within the workspace.
@@ -1353,219 +1220,18 @@ class Activity {
             this.sendAllToTrash(true, true);
         };
 
-        const extractSVGInner = svgString => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(svgString, "image/svg+xml");
-            const svgEl = doc.querySelector("svg");
-            if (!svgEl) return "";
-
-            // Remove drop shadow filters safely
-            svgEl.querySelectorAll("[filter]").forEach(el => {
-                el.removeAttribute("filter");
-            });
-
-            return svgEl.innerHTML;
-        };
-
         /**
          * @returns {SVG} returns SVG of blocks
          */
         this.printBlockSVG = () => {
-            this.blocks.activeBlock = null;
-            let startCounter = 0;
-            const svgParts = [];
-            let xMax = 0;
-            let yMax = 0;
-            let parts;
-            for (let i = 0; i < this.blocks.blockList.length; i++) {
-                if (!this.blocks.blockList[i] || this.blocks.blockList[i].ignore()) {
-                    continue;
-                }
-
-                if (this.blocks.blockList[i].container.x + this.blocks.blockList[i].width > xMax) {
-                    xMax = this.blocks.blockList[i].container.x + this.blocks.blockList[i].width;
-                }
-
-                if (this.blocks.blockList[i].container.y + this.blocks.blockList[i].height > yMax) {
-                    yMax = this.blocks.blockList[i].container.y + this.blocks.blockList[i].height;
-                }
-
-                const rawSVG = this.blocks.blockList[i].collapsed
-                    ? this.blocks.blockCollapseArt[i]
-                    : this.blocks.blockArt[i];
-
-                // Defensive guard: blockArt may be undefined if a block was restored
-                // from trash and regenerateArtwork() has not yet completed (it is
-                // asynchronous). Skip this block rather than injecting <parsererror>
-                // into the SVG output.
-                if (!rawSVG) {
-                    continue;
-                }
-
-                if (this.blocks.blockList[i].isCollapsible()) {
-                    svgParts.push("<g>");
-                }
-
-                svgParts.push(
-                    '<g transform="translate(' +
-                        this.blocks.blockList[i].container.x +
-                        ", " +
-                        this.blocks.blockList[i].container.y +
-                        ')">'
-                );
-
-                if (!SPECIALINPUTS.includes(this.blocks.blockList[i].name)) {
-                    svgParts.push(extractSVGInner(rawSVG));
-                } else {
-                    // Safer SVG manipulation using DOM instead of string splitting
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(rawSVG, "image/svg+xml");
-
-                    // remove dropshadow filter if present
-                    const filtered = doc.querySelector('[style*="filter:url(#dropshadow)"]');
-                    if (filtered) {
-                        filtered.style.filter = "";
-                    }
-
-                    // Find correct tspan to inject value (matches previous behaviour)
-                    let target = null;
-
-                    // 1) Prefer empty tspan (most block SVGs reserve this for value)
-                    target = Array.from(doc.querySelectorAll("text tspan")).find(
-                        t => !t.textContent || t.textContent.trim() === ""
-                    );
-
-                    // 2) Otherwise fallback to last tspan
-                    if (!target) {
-                        const tspans = doc.querySelectorAll("text tspan");
-                        if (tspans.length) target = tspans[tspans.length - 1];
-                    }
-
-                    // 3) Final fallback to text node
-                    if (!target) {
-                        target = doc.querySelector("text");
-                    }
-
-                    if (target) {
-                        const val = this.blocks.blockList[i].value;
-                        target.textContent = typeof val === "string" ? _(val) : val;
-                    }
-
-                    // serialize without outer <svg> wrapper (matches previous behavior)
-                    let serialized = new XMLSerializer().serializeToString(doc.documentElement);
-
-                    // remove outer svg tags because original code skipped them
-                    serialized = serialized.replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, "");
-
-                    svgParts.push(serialized);
-                }
-
-                svgParts.push("</g>");
-
-                if (this.blocks.blockList[i].isCollapsible()) {
-                    let y;
-                    if (INLINECOLLAPSIBLES.includes(this.blocks.blockList[i].name)) {
-                        y = this.blocks.blockList[i].container.y + 4;
-                    } else {
-                        y = this.blocks.blockList[i].container.y + 12;
-                    }
-
-                    svgParts.push(
-                        '<g transform="translate(' +
-                            this.blocks.blockList[i].container.x +
-                            ", " +
-                            y +
-                            ') scale(0.5 0.5)">'
-                    );
-                    if (this.blocks.blockList[i].collapsed) {
-                        parts = EXPANDBUTTON.split("><");
-                    } else {
-                        parts = COLLAPSEBUTTON.split("><");
-                    }
-
-                    for (let p = 2; p < parts.length - 1; p++) {
-                        svgParts.push("<" + parts[p] + ">");
-                    }
-
-                    svgParts.push("</g>");
-                }
-
-                if (this.blocks.blockList[i].name === "start") {
-                    const x = this.blocks.blockList[i].container.x + 110;
-                    const y = this.blocks.blockList[i].container.y + 12;
-                    svgParts.push('<g transform="translate(' + x + ", " + y + ') scale(0.4 0.4)">');
-
-                    parts = TURTLESVG.replace(/fill_color/g, FILLCOLORS[startCounter])
-                        .replace(/stroke_color/g, STROKECOLORS[startCounter])
-                        .split("><");
-
-                    startCounter += 1;
-                    if (startCounter > 9) {
-                        startCounter = 0;
-                    }
-
-                    for (let p = 2; p < parts.length - 1; p++) {
-                        svgParts.push("<" + parts[p] + ">");
-                    }
-
-                    svgParts.push("</g>");
-                }
-
-                if (this.blocks.blockList[i].isCollapsible()) {
-                    svgParts.push("</g>");
-                }
-            }
-
-            svgParts.push("</svg>");
-
-            return (
-                '<svg xmlns="http://www.w3.org/2000/svg" width="' +
-                xMax +
-                '" height="' +
-                yMax +
-                '">' +
-                encodeURIComponent(svgParts.join(""))
-            );
+            return exporters.printBlockSVG(this);
         };
 
         /**
          * @returns {PNG} returns PNG of block artwork
          */
         this.printBlockPNG = async () => {
-            // Setps to convert the SVG to PNG of BlockArtwork
-            // Step 1: Generate the SVG content
-            // Step 2: Create a Canvas element
-            // Step 3: Convert SVG to an Image object
-            // Step 4: Draw SVG on the Canvas and export as PNG
-
-            const svgContent = this.printBlockSVG();
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            const parser = new DOMParser();
-            const svgDoc = parser.parseFromString(decodeURIComponent(svgContent), "image/svg+xml");
-            const svgElement = svgDoc.documentElement;
-            const width = parseInt(svgElement.getAttribute("width"), 10);
-            const height = parseInt(svgElement.getAttribute("height"), 10);
-            canvas.width = width;
-            canvas.height = height;
-            const img = new Image();
-            const svgBlob = new Blob([decodeURIComponent(svgContent)], {
-                type: "image/svg+xml;charset=utf-8"
-            });
-            const url = URL.createObjectURL(svgBlob);
-            return new Promise((resolve, reject) => {
-                img.onload = () => {
-                    ctx.drawImage(img, 0, 0);
-                    URL.revokeObjectURL(url);
-                    const pngDataUrl = canvas.toDataURL("image/png");
-                    resolve(pngDataUrl);
-                };
-                img.onerror = err => {
-                    URL.revokeObjectURL(url);
-                    reject(err);
-                };
-                img.src = url;
-            });
+            return exporters.printBlockPNG(this);
         };
 
         const midiImportBlocks = midi => {
@@ -1782,11 +1448,11 @@ class Activity {
             }
 
             const currentDelay = this.logo.turtleDelay;
-            this.logo.turtleDelay = 0;
-            if (this.logo?.synth?.resume) {
-                this.logo.synth.resume();
-            }
 
+            // Delegate logic / execution control to the ToolbarController
+            this.toolbarController.runFast(env, currentDelay);
+
+            // Keep DOM queries, colors, and block visibilities in activity.js
             const widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
                 if (widgetTitle[i].innerHTML === "tempo") {
@@ -1805,423 +1471,15 @@ class Activity {
                     this.showBlocksAfterRun = true;
                 }
 
-                this.logo.runLogoCommands(null, env);
-                const stopBtn = document.getElementById("stop");
-                if (stopBtn) {
-                    stopBtn.style.display = "inline-block";
-                    stopBtn.style.color = window.platformColor.stopIconcolor;
-                }
+                this.toolbar.highlightStop(window.platformColor.stopIconcolor);
             } else {
-                if (currentDelay !== 0) {
-                    // Keep playing at full speed.
-                    this.logo.step();
-                } else {
-                    // Stop and restart.
-                    const stopBtn = document.getElementById("stop");
-                    if (stopBtn) {
-                        stopBtn.style.color = "white";
-                    }
-                    this.logo.doStopTurtles();
-
-                    const that = this;
-                    setTimeout(() => {
-                        const stopBtnDelay = document.getElementById("stop");
-                        if (stopBtnDelay) {
-                            stopBtnDelay.style.color = window.platformColor.stopIconcolor;
-                        }
-                        that.logo.runLogoCommands(null, env);
-                    }, 500);
+                if (currentDelay === 0) {
+                    this.toolbar.dimThenRestoreStop(window.platformColor.stopIconcolor);
                 }
             }
         };
 
-        let isExecuting = false; // Flag variable to track execution status
-
-        /**
-         * Sets up a record button functionality for the given activity.
-         * @param {object} activity - The activity context.
-         */
-        const doRecordButton = activity => {
-            /**
-             * Executes the record button functionality if execution is not already in progress.
-             */
-            if (isExecuting) {
-                return; // Exit the function if execution is already in progress
-            }
-
-            if (!activity || typeof activity._doRecordButton !== "function") {
-                console.warn("doRecordButton called without valid activity context");
-                isExecuting = false;
-                return;
-            }
-
-            isExecuting = true; // Set the flag to indicate execution has started
-            activity._doRecordButton();
-        };
-
-        /**
-         * Functionality for the record button.
-         * @private
-         */
-        this._doRecordButton = () => {
-            const that = this;
-            const start = document.getElementById("record"),
-                recInside = document.getElementById("rec_inside");
-            let mediaRecorder;
-            const clickEvent = new Event("click");
-            let flag = 0;
-            let currentStream = null;
-            let audioDestination = null;
-
-            /**
-             * Records the screen using the browser's media devices API.
-             * @returns {Promise<MediaStream>} A promise resolving to the recorded media stream.
-             */
-
-            async function recordScreen() {
-                let mode = null;
-                try {
-                    mode = localStorage.getItem("musicBlocksRecordMode");
-                } catch (e) {
-                    mode = null;
-                }
-
-                if (mode === "canvas") {
-                    return await recordCanvasOnly();
-                } else {
-                    return await recordScreenWithTools();
-                }
-            }
-
-            async function recordCanvasOnly() {
-                flag = 1;
-                const canvas = document.getElementById("myCanvas");
-                if (!canvas) {
-                    throw new Error("Canvas element not found");
-                }
-
-                // Get the toolbar height to exclude from recording
-                const toolbar = document.getElementById("toolbars");
-                const toolbarHeight = toolbar ? toolbar.offsetHeight : 0;
-
-                // Get canvas dimensions
-                const canvasRect = canvas.getBoundingClientRect();
-
-                // Get the actual canvas dimensions
-                const canvasWidth = canvas.width;
-                const canvasHeight = canvas.height;
-
-                // Calculate the visible area (excluding toolbar)
-                const visibleHeight = canvasHeight - toolbarHeight;
-
-                // Create a clean recording canvas
-                const recordCanvas = document.createElement("canvas");
-                recordCanvas.width = canvasWidth;
-                recordCanvas.height = canvasHeight;
-                const recordCtx = recordCanvas.getContext("2d");
-
-                // Set background to match the canvas (white/light gray)
-                recordCtx.fillStyle = "#f5f5f5"; // Adjust this color to match your canvas background
-                let animationFrameId;
-
-                // Function to continuously copy canvas content
-                const copyFrame = () => {
-                    // Fill background
-                    recordCtx.fillRect(0, 0, canvasWidth, canvasHeight);
-
-                    // Draw only the visible portion of the canvas (skip the toolbar area)
-                    recordCtx.drawImage(
-                        canvas,
-                        0,
-                        toolbarHeight, // Source x, y (skip toolbar)
-                        canvasWidth,
-                        visibleHeight, // Source width, height
-                        0,
-                        0, // Destination x, y
-                        canvasWidth,
-                        visibleHeight // Destination width, height
-                    );
-
-                    // Continue if still recording
-                    if (flag === 1) {
-                        animationFrameId = requestAnimationFrame(copyFrame);
-                    }
-                };
-
-                // Start copying frames
-                copyFrame();
-
-                // Capture the canvas stream directly at 30fps
-                const canvasStream = recordCanvas.captureStream(30);
-
-                // Add audio track if available
-                const Tone = that.logo.synth.tone;
-                if (Tone && Tone.context) {
-                    const dest = Tone.context.createMediaStreamDestination();
-                    Tone.Destination.connect(dest);
-                    audioDestination = dest;
-                    const audioTrack = dest.stream.getAudioTracks()[0];
-                    if (audioTrack) {
-                        canvasStream.addTrack(audioTrack);
-                    }
-                }
-                currentStream = canvasStream;
-
-                // Clean up animation frame when recording stops
-                canvasStream.getTracks()[0].addEventListener("ended", () => {
-                    if (animationFrameId) {
-                        cancelAnimationFrame(animationFrameId);
-                    }
-                });
-
-                return canvasStream;
-            }
-            async function recordScreenWithTools() {
-                flag = 1;
-
-                try {
-                    return await navigator.mediaDevices.getDisplayMedia({
-                        preferCurrentTab: "True",
-                        systemAudio: "include",
-                        audio: "True",
-                        video: { mediaSource: "tab" },
-                        bandwidthProfile: {
-                            video: {
-                                clientTrackSwitchOffControl: "auto",
-                                contentPreferencesMode: "auto"
-                            }
-                        },
-                        preferredVideoCodecs: "auto"
-                    });
-                } catch (error) {
-                    ErrorHandler.capture(error, { operation: "screenCapture" });
-                    flag = 0;
-                    throw error;
-                }
-            }
-
-            /**
-             * Saves the recorded chunks as a video file.
-             * @param {Blob[]} recordedChunks - The recorded video chunks.
-             */
-            function saveFile(recordedChunks) {
-                flag = 1;
-                recInside.classList.remove("blink");
-                const showDialog = message => {
-                    if (window.MBDialog && typeof window.MBDialog.alert === "function") {
-                        window.MBDialog.alert(message, _("Save recording"));
-                    } else {
-                        alert(message);
-                    }
-                };
-                const finalizeSave = filename => {
-                    if (filename === null || filename.trim() === "") {
-                        showDialog(_("File save canceled"));
-                        flag = 0;
-                        recording();
-                        doRecordButton();
-                        return;
-                    }
-
-                    const blob = new Blob(recordedChunks, { type: "video/webm" });
-                    const url = URL.createObjectURL(blob);
-
-                    activity.save.download("webm", url, filename);
-
-                    recordedChunks = [];
-                    flag = 0;
-
-                    // Allow multiple recordings
-                    recording();
-                    doRecordButton();
-                };
-                // Prevent zero-byte files
-                if (!recordedChunks || recordedChunks.length === 0) {
-                    showDialog(_("Recorded file is empty. File not saved."));
-                    flag = 0;
-                    recording();
-                    doRecordButton();
-                    return;
-                }
-                const blob = new Blob(recordedChunks, {
-                    type: "video/webm"
-                });
-                if (blob.size === 0) {
-                    showDialog(_("Recorded file is empty. File not saved."));
-                    flag = 0;
-                    recording();
-                    doRecordButton();
-                    return;
-                }
-                // Clean up stream after recording
-                if (currentStream) {
-                    currentStream.getTracks().forEach(track => track.stop());
-                    currentStream = null;
-                }
-                if (audioDestination && audioDestination.stream) {
-                    audioDestination.stream.getTracks().forEach(track => track.stop());
-                    audioDestination = null;
-                }
-                mediaRecorder = null;
-                // Prompt to save file
-                const filename = window.prompt(_("Enter file name"));
-                if (filename === null || filename.trim() === "") {
-                    alert(_("File save canceled"));
-                    flag = 0;
-                    recording();
-                    doRecordButton();
-                    return; // Exit without saving the file
-                }
-                const downloadLink = document.createElement("a");
-                downloadLink.href = URL.createObjectURL(blob);
-                downloadLink.download = `${filename}.webm`;
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                that.textMsg(_("Saved! Check your Downloads folder."));
-                URL.revokeObjectURL(blob);
-                document.body.removeChild(downloadLink);
-                flag = 0;
-                // Allow multiple recordings
-                recording();
-                doRecordButton();
-                that.textMsg(_("Recording stopped. File saved."));
-                if (window.MBDialog && typeof window.MBDialog.prompt === "function") {
-                    window.MBDialog.prompt({
-                        title: _("Save recording"),
-                        message: _("Filename:"),
-                        defaultValue: _("recording"),
-                        okText: _("Save"),
-                        cancelText: _("Cancel")
-                    }).then(result => finalizeSave(result));
-                } else {
-                    const filename = window.prompt(_("Enter file name"));
-                    finalizeSave(filename);
-                }
-            }
-            /**
-             * Stops the recording process.
-             */
-            function stopRec() {
-                flag = 0;
-
-                if (mediaRecorder && typeof mediaRecorder.stop === "function") {
-                    mediaRecorder.stop();
-                }
-
-                // Clean up the recording canvas stream
-                if (currentStream) {
-                    currentStream.getTracks().forEach(track => track.stop());
-                }
-                const node = document.createElement("p");
-                node.textContent = "Stopped recording";
-                document.body.appendChild(node);
-            }
-
-            /**
-             * Creates a media recorder instance.
-             * @param {MediaStream} stream - The media stream to be recorded.
-             * @param {string} mimeType - The MIME type of the recording.
-             * @returns {MediaRecorder} The created media recorder instance.
-             */
-            function createRecorder(stream, mimeType) {
-                flag = 1;
-                recInside.classList.add("blink");
-                that.textMsg(_("Recording started. Click stop to finish."));
-                start.removeEventListener("click", createRecorder, true);
-                let recordedChunks = [];
-                mediaRecorder = new MediaRecorder(stream);
-                stream.oninactive = function () {
-                    debugLog("Recording is ready to save");
-                    stopRec();
-                    flag = 0;
-                };
-
-                mediaRecorder.onstop = function () {
-                    //saveFile(recordedChunks);
-                    //recordedChunks = [];
-                    //flag = 0;
-                    //recInside.setAttribute("fill", "#ffffff");
-                    const blob = new Blob(recordedChunks, { type: "video/webm" });
-                    const url = URL.createObjectURL(blob);
-
-                    activity.save.download("webm", url, null);
-
-                    recordedChunks = [];
-                    flag = 0;
-                    recInside.setAttribute("fill", "#ffffff");
-                };
-
-                mediaRecorder.ondataavailable = function (e) {
-                    if (e.data.size > 0) {
-                        recordedChunks.push(e.data);
-                    }
-                };
-
-                mediaRecorder.start(200);
-                setTimeout(() => {
-                    debugLog("Resizing for Record", that.canvas.height);
-                    that._onResize();
-                }, 500);
-                return mediaRecorder;
-            }
-
-            /**
-             * Handles the recording process.
-             */
-            function recording() {
-                // Remove any previous handler to avoid multiple triggers
-                if (start._recordHandler) {
-                    start.removeEventListener("click", start._recordHandler);
-                }
-                const handler = async function handler() {
-                    try {
-                        const stream = await recordScreen();
-                        const mimeType = "video/webm";
-                        mediaRecorder = createRecorder(stream, mimeType);
-                        if (flag === 1) {
-                            start.removeEventListener("click", handler);
-                            // Add stop handler
-                            const stopHandler = function stopHandler() {
-                                if (mediaRecorder && mediaRecorder.state === "recording") {
-                                    mediaRecorder.stop();
-                                    mediaRecorder = new MediaRecorder(stream);
-                                    recInside.classList.remove("blink");
-                                    flag = 0;
-                                    // Clean up stream
-                                    if (currentStream) {
-                                        currentStream.getTracks().forEach(track => track.stop());
-                                    }
-                                    if (audioDestination && audioDestination.stream) {
-                                        audioDestination.stream
-                                            .getTracks()
-                                            .forEach(track => track.stop());
-                                    }
-                                }
-                                start.removeEventListener("click", stopHandler);
-                                // Re-enable recording for next time
-                                recording();
-                            };
-                            start.addEventListener("click", stopHandler);
-                        }
-                        recInside.setAttribute("fill", "red");
-                    } catch (error) {
-                        ErrorHandler.recoverable(error, { operation: "recording" });
-                        that.textMsg(_("Recording failed: %s").replace(/%s/g, error.message));
-                        flag = 0;
-                        // Re-enable recording button
-                        recording();
-                    }
-                };
-                start.addEventListener("click", handler);
-                start._recordHandler = handler;
-            }
-
-            // Start recording process if not already executing
-            if (flag === 0 && isExecuting) {
-                recording();
-                start.dispatchEvent(clickEvent);
-            }
-        };
+        setupActivityRecorder(this);
 
         /*
          * Runs Music Blocks at a slower rate
@@ -2240,16 +1498,7 @@ class Activity {
             this.blocks.activeBlock = null;
             hideDOMLabel();
 
-            this.logo.turtleDelay = DEFAULTDELAY;
-            if (this.logo?.synth?.resume) {
-                this.logo.synth.resume();
-            }
-
-            if (!this.turtles.running()) {
-                this.logo.runLogoCommands();
-            } else {
-                this.logo.step();
-            }
+            this.toolbarController.runSlow();
         };
 
         /*
@@ -2269,33 +1518,12 @@ class Activity {
             this.blocks.activeBlock = null;
             hideDOMLabel();
 
-            const turtleCount = Object.keys(this.logo.stepQueue).length;
-            if (this.logo?.synth?.resume) {
-                this.logo.synth.resume();
-            }
+            const didRunStart = this.toolbarController.runStep();
 
-            if (turtleCount === 0 || this.logo.turtleDelay !== this.TURTLESTEP) {
-                // Either we haven't set up a queue or we are
-                // switching modes.
-                this.logo.turtleDelay = this.TURTLESTEP;
-                // Queue and take first step.
-                if (!this.turtles.running()) {
-                    this.logo.runLogoCommands();
-                    document.getElementById("stop").style.color =
-                        this.toolbar.stopIconColorWhenPlaying;
-                }
-                this.logo.step();
-            } else {
-                const noBlocks = Object.keys(this.logo.stepQueue).every(
-                    key => this.logo.stepQueue[key].length === 0
-                );
-                if (noBlocks) {
-                    this.logo.doStopTurtles();
-                    document.getElementById("stop").style.color = "white";
-                    return;
-                }
-                this.logo.turtleDelay = this.TURTLESTEP;
-                this.logo.step();
+            if (didRunStart === "started") {
+                this.toolbar.highlightStop(this.toolbar.stopIconColorWhenPlaying);
+            } else if (didRunStart === "stopped") {
+                this.toolbar.resetStop();
             }
         };
 
@@ -2316,16 +1544,16 @@ class Activity {
             this.blocks.activeBlock = null;
             hideDOMLabel();
 
-            if (onblur === undefined) {
-                onblur = false;
-            }
-
-            if (onblur && _THIS_IS_MUSIC_BLOCKS_) {
+            const stopped = this.toolbarController.hardStop(onblur);
+            if (!stopped) {
                 return;
             }
 
-            this.logo.doStopTurtles();
-            document.getElementById("stop").style.display = "none";
+            if (this.cleanupIdleWatcher) {
+                this.cleanupIdleWatcher();
+            }
+
+            this.toolbar.resetStop();
 
             const widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
@@ -2335,10 +1563,6 @@ class Activity {
                     }
                     break;
                 }
-            }
-
-            if (this.cleanupIdleWatcher) {
-                this.cleanupIdleWatcher();
             }
         };
 
@@ -2585,12 +1809,8 @@ class Activity {
             }
         };
 
-        /**
-         * Deletes a plugin palette from local storage based on the active palette.
-         * @param {object} activity - The activity object.
-         */
         const deletePlugin = activity => {
-            activity._deletePlugin();
+            activity.pluginDialog.deletePlugin();
         };
 
         /**
@@ -2598,154 +1818,16 @@ class Activity {
          */
         this._deletePlugin = () => {
             if (this.palettes.activePalette !== null) {
-                const obj = safeJSONParse(this.storage.plugins);
-                if (!obj) return;
-
-                if (obj["PALETTEPLUGINS"] && this.palettes.activePalette in obj["PALETTEPLUGINS"]) {
-                    delete obj["PALETTEPLUGINS"][this.palettes.activePalette];
-                }
-                if (
-                    obj["PALETTEFILLCOLORS"] &&
-                    this.palettes.activePalette in obj["PALETTEFILLCOLORS"]
-                ) {
-                    delete obj["PALETTEFILLCOLORS"][this.palettes.activePalette];
-                }
-                if (
-                    obj["PALETTESTROKECOLORS"] &&
-                    this.palettes.activePalette in obj["PALETTESTROKECOLORS"]
-                ) {
-                    delete obj["PALETTESTROKECOLORS"][this.palettes.activePalette];
-                }
-                if (
-                    obj["PALETTEHIGHLIGHTCOLORS"] &&
-                    this.palettes.activePalette in obj["PALETTEHIGHLIGHTCOLORS"]
-                ) {
-                    delete obj["PALETTEHIGHLIGHTCOLORS"][this.palettes.activePalette];
-                }
-                for (
-                    let i = 0;
-                    i < this.palettes.dict[this.palettes.activePalette].protoList.length;
-                    i++
-                ) {
-                    const name =
-                        this.palettes.dict[this.palettes.activePalette].protoList[i]["name"];
-                    if (obj["FLOWPLUGINS"] && name in obj["FLOWPLUGINS"]) {
-                        debugLog("deleting " + name);
-                        delete obj["FLOWPLUGINS"][name];
-                    }
-                    if (name in obj["BLOCKPLUGINS"]) {
-                        debugLog("deleting " + name);
-                        delete obj["BLOCKPLUGINS"][name];
-                    }
-                    if (name in obj["ARGPLUGINS"]) {
-                        debugLog("deleting " + name);
-                        delete obj["ARGPLUGINS"][name];
-                    }
-                }
-                if (this.palettes.activePalette in obj["MACROPLUGINS"]) {
-                    delete obj["MACROPLUGINS"][this.palettes.activePalette];
-                }
-                if (this.palettes.activePalette in obj["ONLOAD"]) {
-                    delete obj["ONLOAD"][this.palettes.activePalette];
-                }
-                if (this.palettes.activePalette in obj["ONSTART"]) {
-                    delete obj["ONSTART"][this.palettes.activePalette];
-                }
-                if (this.palettes.activePalette in obj["ONSTOP"]) {
-                    delete obj["ONSTOP"][this.palettes.activePalette];
-                }
-
-                this.storage.plugins = JSON.stringify(obj);
-                this.textMsg(
-                    this.palettes.activePalette + " " + _("plugins will be removed upon restart.")
+                const paletteName = this.palettes.activePalette;
+                const protoList = this.palettes.dict[paletteName].protoList;
+                const deleted = this.pluginController.deletePluginFromStorage(
+                    paletteName,
+                    protoList
                 );
+                if (deleted) {
+                    this.textMsg(paletteName + " " + _("plugins will be removed upon restart."));
+                }
             }
-        };
-
-        /*
-         * Hides all grids (Cartesian/polar/treble/et al.)
-         */
-        this.hideGrids = () => {
-            this.turtles.setGridLabel(_("show Cartesian"));
-            this._hideCartesian();
-            this._hidePolar();
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                this._hideTreble();
-                this._hideGrand();
-                this._hideSoprano();
-                this._hideAlto();
-                this._hideTenor();
-                this._hideBass();
-            }
-        };
-
-        /*
-         * Renders Cartesian/Polar/Treble/et al. grids
-         */
-        this._doCartesianPolar = () => {
-            switch (this.turtles.currentGrid) {
-                case 1:
-                    this._hideCartesian();
-                    break;
-                case 2:
-                    this._hideCartesian();
-                    this._hidePolar();
-                    break;
-                case 3:
-                    this._hidePolar();
-                    break;
-                case 4:
-                    this._hideTreble();
-                    break;
-                case 5:
-                    this._hideGrand();
-                    break;
-                case 6:
-                    this._hideSoprano();
-                    break;
-                case 7:
-                    this._hideAlto();
-                    break;
-                case 8:
-                    this._hideTenor();
-                    break;
-                case 9:
-                    this._hideBass();
-                    break;
-            }
-
-            switch (this.turtles.gridWheel.selectedNavItemIndex) {
-                case 1:
-                    this._showCartesian();
-                    break;
-                case 2:
-                    this._showCartesian();
-                    this._showPolar();
-                    break;
-                case 3:
-                    this._showPolar();
-                    break;
-                case 4:
-                    this._showTreble();
-                    break;
-                case 5:
-                    this._showGrand();
-                    break;
-                case 6:
-                    this._showSoprano();
-                    break;
-                case 7:
-                    this._showAlto();
-                    break;
-                case 8:
-                    this._showTenor();
-                    break;
-                case 9:
-                    this._showBass();
-                    break;
-            }
-            this.turtles.currentGrid = this.turtles.gridWheel.selectedNavItemIndex;
-            this.update = true;
         };
 
         /*
@@ -2833,6 +1915,7 @@ class Activity {
                 [null, null],
                 [null, null]
             ]; // Array to track two fingers (Y and X coordinates)
+            let initialPinchDistance = null;
 
             /**
              * Handles touch start event on the canvas.
@@ -2846,10 +1929,15 @@ class Activity {
                             initialTouches[i][0] = event.touches[i].clientY;
                             initialTouches[i][1] = event.touches[i].clientX;
                         }
+                        const dx = event.touches[0].clientX - event.touches[1].clientX;
+                        const dy = event.touches[0].clientY - event.touches[1].clientY;
+                        initialPinchDistance = Math.hypot(dx, dy);
                     }
                 },
                 { passive: true }
             );
+
+            myCanvas.style.touchAction = "none";
 
             /**
              * Handles touch move event on the canvas.
@@ -2859,33 +1947,60 @@ class Activity {
                 "touchmove",
                 event => {
                     if (event.touches.length === 2) {
+                        event.preventDefault();
+                        const dx = event.touches[0].clientX - event.touches[1].clientX;
+                        const dy = event.touches[0].clientY - event.touches[1].clientY;
+                        const currentPinchDistance = Math.hypot(dx, dy);
+
+                        if (initialPinchDistance !== null && !that.resizeDebounce) {
+                            const pinchDelta = currentPinchDistance - initialPinchDistance;
+                            if (Math.abs(pinchDelta) > 20) {
+                                if (pinchDelta > 0) {
+                                    doLargerBlocks(that);
+                                } else {
+                                    doSmallerBlocks(that);
+                                }
+                                initialPinchDistance = currentPinchDistance;
+                            }
+                        }
+
+                        let totalDeltaY = 0;
+                        let totalDeltaX = 0;
+                        let count = 0;
+
                         for (let i = 0; i < 2; i++) {
                             const touchY = event.touches[i].clientY;
                             const touchX = event.touches[i].clientX;
 
                             if (initialTouches[i][0] !== null && initialTouches[i][1] !== null) {
-                                const deltaY = touchY - initialTouches[i][0];
-                                const deltaX = touchX - initialTouches[i][1];
+                                totalDeltaY += touchY - initialTouches[i][0];
+                                totalDeltaX += touchX - initialTouches[i][1];
+                                count++;
+                            }
 
-                                if (deltaY !== 0) {
-                                    closeAnyOpenMenusAndLabels();
-                                    that.blocksContainer.y -= deltaY;
-                                }
+                            initialTouches[i][0] = touchY;
+                            initialTouches[i][1] = touchX;
+                        }
 
-                                if (that.scrollBlockContainer && deltaX !== 0) {
-                                    closeAnyOpenMenusAndLabels();
-                                    that.blocksContainer.x -= deltaX;
-                                }
+                        if (count > 0) {
+                            const avgDeltaY = totalDeltaY / count;
+                            const avgDeltaX = totalDeltaX / count;
 
-                                initialTouches[i][0] = touchY;
-                                initialTouches[i][1] = touchX;
+                            if (avgDeltaY !== 0) {
+                                closeAnyOpenMenusAndLabels();
+                                that.blocksContainer.y -= avgDeltaY;
+                            }
+
+                            if (that.scrollBlockContainer && avgDeltaX !== 0) {
+                                closeAnyOpenMenusAndLabels();
+                                that.blocksContainer.x -= avgDeltaX;
                             }
                         }
 
                         that.refreshCanvas();
                     }
                 },
-                { passive: true }
+                { passive: false }
             );
 
             /**
@@ -2896,6 +2011,7 @@ class Activity {
                     initialTouches[i][0] = null;
                     initialTouches[i][1] = null;
                 }
+                initialPinchDistance = null;
             });
 
             /**
@@ -3103,69 +2219,7 @@ class Activity {
          * @param {string} strokeColor - The stroke color of the message container.
          * @param {function} callback - The callback function assigned to the message container.
          * @param {number} y - The position on the canvas.
-         */
-        this._createMsgContainer = (fillColor, strokeColor, callback, y) => {
-            const container = new createjs.Container();
-            this.stage.addChild(container);
-            container.x = this.canvas.width / 2;
-            container.y = y;
-            container.visible = false;
 
-            const img = new Image();
-            const svgData = MSGBLOCK.replace("fill_color", fillColor).replace(
-                "stroke_color",
-                strokeColor
-            );
-
-            const that = this;
-
-            img.onload = () => {
-                const msgBlock = new createjs.Bitmap(img);
-                container.addChild(msgBlock);
-                const text = new createjs.Text("your message here", "20px Arial", "#000000");
-                container.addChild(text);
-                text.textAlign = "center";
-                text.textBaseline = "alphabetic";
-                text.x = 500;
-                text.y = 30;
-
-                const bounds = container.getBounds();
-                container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-
-                const hitArea = new createjs.Shape();
-                hitArea.graphics.beginFill("#FFF").drawRect(0, 0, 1000, 42);
-                hitArea.x = 0;
-                hitArea.y = 0;
-                container.hitArea = hitArea;
-
-                container.on("click", () => {
-                    container.visible = false;
-                    // On the possibility that there was an error
-                    // arrow associated with this container
-                    if (that.errorMsgArrow !== null) {
-                        that.errorMsgArrow.removeAllChildren(); // Hide the error arrow.
-                    }
-
-                    that.update = true;
-                });
-
-                callback(text);
-                that.msgText = text;
-            };
-
-            img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svgData));
-        };
-
-        /*
-         * Creates and renders error message containers with appropriate artwork.
-         * Some error messages have special artwork.
-         */
-        this._createErrorContainers = () => {
-            for (let i = 0; i < ERRORARTWORK.length; i++) {
-                const name = ERRORARTWORK[i];
-                this._makeErrorArtwork(name);
-            }
-        };
 
         /**
          * Initialize an idle watcher that throttles the application's framerate
@@ -3180,16 +2234,41 @@ class Activity {
             this._stopIdleWatcher();
 
             const IDLE_THRESHOLD = 5000; // 5 seconds
+            const ACTIVE_RESET_INTERVAL = 500;
             const ACTIVE_FPS = 60;
             const IDLE_FPS = 1;
+            const idleEvents = ["mousemove", "mousedown", "keydown", "touchstart", "wheel"];
+
+            if (this._idleWatcherResetHandler) {
+                idleEvents.forEach(eventType => {
+                    window.removeEventListener(eventType, this._idleWatcherResetHandler);
+                });
+            }
+
+            if (this._idleWatcherIntervalId) {
+                clearInterval(this._idleWatcherIntervalId);
+                this._idleWatcherIntervalId = null;
+            }
 
             let lastActivity = Date.now();
+            let lastIdleReset = lastActivity;
             this.isAppIdle = false;
+
+            // Prevent duplicate intervals
+            if (this._idleWatcherIntervalId) {
+                clearInterval(this._idleWatcherIntervalId);
+            }
 
             // Wake up function - restores full framerate
             // Stored as instance property for cleanup
             this._resetIdleTimer = () => {
-                lastActivity = Date.now();
+                const now = Date.now();
+                if (!this.isAppIdle && now - lastIdleReset < ACTIVE_RESET_INTERVAL) {
+                    return;
+                }
+
+                lastActivity = now;
+                lastIdleReset = now;
                 if (this.isAppIdle) {
                     this.isAppIdle = false;
                     createjs.Ticker.framerate = ACTIVE_FPS;
@@ -3208,7 +2287,7 @@ class Activity {
             // Periodic check for idle state - store interval ID for cleanup
             this._idleWatcherInterval = setInterval(() => {
                 // Check if music/code is playing
-                const isMusicPlaying = this.turtles?.running() || false;
+                const isMusicPlaying = this.logo?._alreadyRunning || false;
 
                 if (!isMusicPlaying && Date.now() - lastActivity > IDLE_THRESHOLD) {
                     if (!this.isAppIdle) {
@@ -3246,480 +2325,25 @@ class Activity {
             }
         };
 
-        /**
-         * Renders an error message with appropriate artwork.
-         * @param {string} name - The name specifying the SVG to be rendered.
-         */
-        this._makeErrorArtwork = name => {
-            const container = new createjs.Container();
-            this.stage.addChild(container);
-            container.x = this.canvas.width / 2;
-            container.y = 80;
-            this.errorArtwork[name] = container;
-            this.errorArtwork[name].name = name;
-            this.errorArtwork[name].visible = false;
-
-            const img = new Image();
-            img.onload = () => {
-                const artwork = new createjs.Bitmap(img);
-                container.addChild(artwork);
-                const text = new createjs.Text("", "20px Sans", "#000000");
-                container.addChild(text);
-                text.x = 70;
-                text.y = 10;
-
-                const bounds = container.getBounds();
-                container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-
-                const hitArea = new createjs.Shape();
-                hitArea.graphics.beginFill("#FFF").drawRect(0, 0, bounds.width, bounds.height);
-                hitArea.x = 0;
-                hitArea.y = 0;
-                container.hitArea = hitArea;
-
-                const that = this;
-                container.on("click", () => {
-                    container.visible = false;
-                    // On the possibility that there was an error
-                    // arrow associated with this container
-                    if (that.errorMsgArrow !== null && that.errorMsgArrow !== undefined) {
-                        that.errorMsgArrow.removeAllChildren(); // Hide the error arrow.
-                    }
-                    that.update = true;
-                });
-            };
-
-            img.src = "images/" + name + ".svg";
-        };
-
         /*
-             Prepare a list of blocks for the search bar autocompletion.
-            */
-        this.prepSearchWidget = () => {
-            //searchWidget.style.visibility = "hidden";
-            this.searchBlockPosition = [100, 100];
-
-            this.searchSuggestions = [];
-            this._searchCache = {}; // Reset cache to prevent memory leaks
-            this.deprecatedBlockNames = [];
-
-            // Guard: blocks may not be initialized yet during early loading
-            if (!this.blocks || !this.blocks.protoBlockDict) {
-                console.debug("prepSearchWidget: blocks not yet initialized, skipping");
-                return;
-            }
-
-            for (const i in this.blocks.protoBlockDict) {
-                const block = this.blocks.protoBlockDict[i];
-                const blockLabel = block.staticLabels.join(" ");
-                const artwork = block.palette.model.makeBlockInfo(0, block, block.name, block.name)[
-                    "artwork64"
-                ];
-                if (blockLabel || block.extraSearchTerms !== undefined) {
-                    if (block.deprecated) {
-                        this.deprecatedBlockNames.push(blockLabel);
-                    } else {
-                        // Determine the primary label to display for this block.
-                        let label = blockLabel;
-                        if (label.length === 0) {
-                            // Swap in a preferred, localized name when there is no label.
-                            label = _(block.name);
-                            switch (block.name) {
-                                case "scaledegree2":
-                                    label = _("scale degree");
-                                    break;
-                                case "voicename":
-                                    label = _("voice name");
-                                    break;
-                                case "invertmode":
-                                    label = _("invert mode");
-                                    break;
-                                case "outputtools":
-                                    label = _("output tools");
-                                    break;
-                                case "customNote":
-                                    label = _("custom note");
-                                    break;
-                                case "accidentalname":
-                                    label = _("accidental name");
-                                    break;
-                                case "eastindiansolfege":
-                                    label = _("east indian solfege");
-                                    break;
-                                case "notename":
-                                    label = _("note name");
-                                    break;
-                                case "temperamentname":
-                                    label = _("temperament name");
-                                    break;
-                                case "modename":
-                                    label = _("mode name");
-                                    break;
-                                case "chordname":
-                                    label = _("chord name");
-                                    break;
-                                case "intervalname":
-                                    label = _("interval name");
-                                    break;
-                                case "filtertype":
-                                    label = _("filter type");
-                                    break;
-                                case "oscillatortype":
-                                    label = _("oscillator type");
-                                    break;
-                                case "audiofile":
-                                    label = _("audio file");
-                                    break;
-                                case "noisename":
-                                    label = _("noise name");
-                                    break;
-                                case "drumname":
-                                    label = _("drum name");
-                                    break;
-                                case "effectsname":
-                                    label = _("effects name");
-                                    break;
-                                case "wrapmode":
-                                    label = _("wrap mode");
-                                    break;
-                                case "loadFile":
-                                    label = _("load file");
-                                    break;
-                            }
-                        }
-
-                        // Build a list of lowercased search terms (primary label + extra terms)
-                        // so we can match synonyms without duplicating the visual entry.
-                        const searchTerms = [];
-                        if (label && label.length > 0) {
-                            searchTerms.push(label.toLowerCase());
-                        }
-                        if (block.extraSearchTerms && Array.isArray(block.extraSearchTerms)) {
-                            for (let j = 0; j < block.extraSearchTerms.length; j++) {
-                                const term = block.extraSearchTerms[j];
-                                if (typeof term === "string" && term.length > 0) {
-                                    searchTerms.push(term.toLowerCase());
-                                }
-                            }
-                        }
-
-                        this.searchSuggestions.push({
-                            label: label,
-                            value: block.name,
-                            specialDict: block,
-                            artwork: artwork,
-                            searchTerms: searchTerms
-                        });
-                    }
-                }
-            }
-
-            this.searchSuggestions = this.searchSuggestions.reverse();
-        };
+         * Builds the block list for search bar autocompletion.
+         */
+        this.prepSearchWidget = () => this.searchController.prepSearchWidget();
 
         /*
          * Hides search widget
          */
-        this.hideSearchWidget = () => {
-            // Hide the jQuery search results widget.
-            const obj = docByClass("ui-menu");
-            if (obj.length > 0) {
-                obj[0].style.visibility = "hidden";
-            }
-
-            // Remove the document mousedown listener if it exists
-            if (this._searchCloseListener) {
-                this.removeEventListener(document, "mousedown", this._searchCloseListener);
-                this._searchCloseListener = null;
-            }
-
-            this.searchWidget.style.visibility = "hidden";
-            this.searchWidget.idInput_custom = "";
-        };
+        this.hideSearchWidget = () => this.searchController.hideSearchWidget();
 
         /*
          * Shows search widget
          */
-        this.showSearchWidget = () => {
-            // Bring widget to top.
-            this.searchWidget.style.zIndex = 1001;
-            this.searchWidget.style.border = "2px solid lightblue";
-            if (this.helpfulSearchDiv) {
-                this._hideHelpfulSearchWidget();
-            }
-            if (this.searchWidget.style.visibility === "visible") {
-                this.hideSearchWidget();
-            } else {
-                const obj = docByClass("ui-menu");
-                if (obj.length > 0) {
-                    obj[0].style.visibility = "visible";
-                }
-
-                if (this.searchWidget) {
-                    this.searchWidget.value = null;
-                    this.searchWidget.style.visibility = "visible";
-                    const searchPos = this.palettes.getSearchPos();
-                    this.searchWidget.style.left = searchPos.x + "px";
-                    this.searchWidget.style.top = searchPos.y + "px";
-                }
-
-                this.searchBlockPosition = [100, 100];
-                this.prepSearchWidget();
-
-                const that = this;
-                const closeListener = e => {
-                    if (
-                        document.getElementById("search").style.visibility === "visible" &&
-                        (e.target === document.getElementById("search") ||
-                            document.getElementById("search").contains(e.target))
-                    ) {
-                        //do nothing when clicked in the input field
-                    } else if (
-                        document.getElementById("ui-id-1") &&
-                        document.getElementById("ui-id-1").style.display === "block" &&
-                        (e.target === document.getElementById("ui-id-1") ||
-                            document.getElementById("ui-id-1").contains(e.target))
-                    ) {
-                        //do nothing when clicked on the menu
-                    } else if (
-                        document.querySelector("#palette tbody tr") &&
-                        document.querySelector("#palette tbody tr").contains(e.target)
-                    ) {
-                        //do nothing when clicked on the search row
-                    } else {
-                        // this will hide the search bar if someone clicks on menu items
-                        that.hideSearchWidget();
-                    }
-                };
-                this._searchCloseListener = closeListener;
-                this.addEventListener(document, "mousedown", closeListener);
-
-                // Give the browser time to update before selecting
-                // focus.
-                setTimeout(() => {
-                    that.searchWidget.focus();
-                    that.doSearch();
-                }, 500);
-            }
-        };
+        this.showSearchWidget = () => this.searchController.showSearchWidget();
 
         /*
          * Uses JQuery to add autocompleted search suggestions
          */
-        this.doSearch = () => {
-            // Guard: ensure searchWidget exists before proceeding
-            if (!this.searchWidget) {
-                console.debug("doSearch: searchWidget not yet initialized, skipping");
-                return;
-            }
-
-            const $j = window.jQuery;
-            if (this.searchSuggestions.length === 0) {
-                this.prepSearchWidget();
-            }
-
-            const that = this;
-            const $search = $j("#search");
-
-            if (!$search.data("autocomplete-init")) {
-                $search.autocomplete({
-                    // Custom source so we can match on extraSearchTerms but show each block only once.
-                    source: (request, response) => {
-                        const term = (request.term || "").toLowerCase().trim();
-
-                        // Check cache first for performance
-                        if (that._searchCache[term] !== undefined) {
-                            response(that._searchCache[term]);
-                            return;
-                        }
-
-                        const results = that.searchSuggestions.filter(item => {
-                            // If there is no active term, show all items.
-                            if (!term || term.length === 0) {
-                                return true;
-                            }
-
-                            // Prefer matching against searchTerms when present.
-                            if (item.searchTerms && Array.isArray(item.searchTerms)) {
-                                return item.searchTerms.some(t => t && t.indexOf(term) !== -1);
-                            }
-
-                            // Fallback to label matching for legacy entries.
-                            return (
-                                item.label &&
-                                typeof item.label === "string" &&
-                                item.label.toLowerCase().indexOf(term) !== -1
-                            );
-                        });
-
-                        // Cache the results for future use
-                        that._searchCache[term] = results;
-                        response(results);
-                    },
-                    appendTo: "body",
-                    select: (event, ui) => {
-                        event.preventDefault();
-                        that.searchWidget.value = ui.item.label;
-                        that.searchWidget.idInput_custom = ui.item.value;
-                        that.searchWidget.protoblk = ui.item.specialDict;
-                        that.doSearch();
-                        if (event.keyCode === 13) this.searchWidget.style.visibility = "visible";
-                    },
-                    focus: event => {
-                        event.preventDefault();
-                    }
-                });
-
-                const instance = $search.autocomplete("instance");
-                if (instance) {
-                    instance._renderItem = (ul, item) => {
-                        const li = $j("<li></li>");
-
-                        const img = document.createElement("img");
-                        img.src = item.artwork || "";
-                        img.height = 20;
-                        img.style.cursor = "grab";
-
-                        // Drag-and-drop: mirrors the palette drag pattern in
-                        // palette.js _showMenuItems(). Keep both in sync.
-                        img.ondragstart = () => false;
-
-                        const down = event => {
-                            // Stop jQuery UI autocomplete from handling this
-                            event.stopPropagation();
-                            event.stopImmediatePropagation();
-                            event.preventDefault();
-
-                            const posit = img.style.position;
-                            const zInd = img.style.zIndex;
-                            img.style.position = "absolute";
-                            img.style.zIndex = 10000;
-
-                            // Close the autocomplete dropdown
-                            $j("#search").autocomplete("close");
-
-                            document.body.appendChild(img);
-
-                            const moveAt = (pageX, pageY) => {
-                                img.style.left = pageX - img.offsetWidth / 2 + "px";
-                                img.style.top = pageY - img.offsetHeight / 2 + "px";
-                            };
-
-                            const onMouseMove = e => {
-                                e.preventDefault();
-                                let x, y;
-                                if (e.type === "touchmove") {
-                                    x = e.touches[0].clientX;
-                                    y = e.touches[0].clientY;
-                                } else {
-                                    x = e.pageX;
-                                    y = e.pageY;
-                                }
-                                moveAt(x, y);
-                            };
-                            onMouseMove(event);
-
-                            document.addEventListener("touchmove", onMouseMove, { passive: false });
-                            document.addEventListener("mousemove", onMouseMove);
-
-                            const up = () => {
-                                document.body.style.cursor = "default";
-                                document.removeEventListener("mousemove", onMouseMove);
-                                document.removeEventListener("touchmove", onMouseMove);
-
-                                const x = parseInt(img.style.left);
-                                const y = parseInt(img.style.top);
-
-                                img.style.position = posit;
-                                img.style.zIndex = zInd;
-                                if (img.parentNode === document.body) {
-                                    document.body.removeChild(img);
-                                }
-
-                                if (isNaN(x) && isNaN(y)) return;
-
-                                const protoblk = item.specialDict;
-                                const paletteName = protoblk.palette.name;
-                                const protoName = item.value;
-
-                                that.palettes.dict[paletteName].makeBlockFromSearch(
-                                    protoblk,
-                                    protoName,
-                                    newBlock => {
-                                        that.blocks.moveBlock(
-                                            newBlock,
-                                            (x || that.blocksContainer.x + 100) -
-                                                that.blocksContainer.x,
-                                            (y || that.blocksContainer.y + 100) -
-                                                that.blocksContainer.y
-                                        );
-                                    }
-                                );
-                            };
-
-                            document.addEventListener("mouseup", up, { once: true });
-                            document.addEventListener("touchend", up, { once: true });
-                        };
-
-                        // Capture phase fires BEFORE jQuery UI's event delegation
-                        li[0].addEventListener("mousedown", down, true);
-                        li[0].addEventListener("touchstart", down, {
-                            capture: true,
-                            passive: false
-                        });
-
-                        li.append(img);
-                        li.append($j("<a>").text(" " + item.label));
-
-                        return li.appendTo(
-                            ul.css({
-                                "z-index": 35000,
-                                "max-height": "200px",
-                                "overflow-y": "auto"
-                            })
-                        );
-                    };
-                }
-                $search.data("autocomplete-init", true);
-            }
-
-            const searchInput = this.searchWidget.idInput_custom;
-            if (!searchInput || searchInput.length <= 0) {
-                if (this.searchWidget.value && this.searchWidget.value.length > 0) {
-                    $search.autocomplete("search", this.searchWidget.value);
-                }
-                return;
-            }
-
-            const protoblk = this.searchWidget.protoblk;
-            const paletteName = protoblk.palette.name;
-            const protoName = protoblk.name;
-
-            if (Object.prototype.hasOwnProperty.call(this.blocks.protoBlockDict, protoName)) {
-                this.palettes.dict[paletteName].makeBlockFromSearch(
-                    protoblk,
-                    protoName,
-                    newBlock => {
-                        that.blocks.moveBlock(
-                            newBlock,
-                            100 + that.searchBlockPosition[0] - that.blocksContainer.x,
-                            that.searchBlockPosition[1] - that.blocksContainer.y
-                        );
-                    }
-                );
-
-                // Move the position of the next newly created block.
-                this.searchBlockPosition[0] += STANDARDBLOCKHEIGHT;
-                this.searchBlockPosition[1] += STANDARDBLOCKHEIGHT;
-            } else if (this.deprecatedBlockNames.indexOf(searchInput) > -1) {
-                this.errorMsg(_("This block is deprecated."));
-            } else {
-                this.errorMsg(_("Block cannot be found."));
-            }
-
-            this.searchWidget.value = "";
-            this.update = true;
-        };
+        this.doSearch = () => this.searchController.doSearch();
 
         //To create a sampler widget
         this.makeSamplerWidget = (sampleName, sampleData) => {
@@ -3811,9 +2435,16 @@ class Activity {
             // const BACKSPACE = 8;
             const TAB = 9;
             if (event.keyCode === TAB) {
-                // Prevent browser from grabbing TAB key
-                event.preventDefault();
-                return false;
+                const active = document.activeElement;
+                const isCanvasOrBody =
+                    active === document.body ||
+                    active === document.getElementById("canvas") ||
+                    active === document.getElementById("myCanvas");
+                if (isCanvasOrBody) {
+                    event.preventDefault();
+                    return false;
+                }
+                return;
             }
             const ESC = 27;
             // const ALT = 18;
@@ -3836,7 +2467,6 @@ class Activity {
             const planetIframe = document.getElementById("planet-iframe");
             const pasteEl = this.paste;
             const wheelDiv = document.getElementById("wheelDiv");
-            const stopbtn = document.getElementById("stop");
             const disableKeys =
                 lilypondModal.style.display === "block" ||
                 this.searchWidget.style.visibility === "visible" ||
@@ -3876,9 +2506,7 @@ class Activity {
                     case 82: {
                         // 'R or ENTER'
                         this.textMsg("Alt-R " + _("Play"));
-                        if (stopbtn) {
-                            stopbtn.style.color = platformColor.stopIconcolor;
-                        }
+                        this.toolbar.highlightStop(platformColor.stopIconcolor);
                         this._doFastButton();
                         break;
                     }
@@ -3902,9 +2530,7 @@ class Activity {
                         if (this.turtles.running()) {
                             this._doHardStopButton();
                         } else if (!hasOpenWidget) {
-                            if (stopbtn) {
-                                stopbtn.style.color = platformColor.stopIconcolor;
-                            }
+                            this.toolbar.highlightStop(platformColor.stopIconcolor);
                             this._doFastButton();
                         }
                         break;
@@ -3982,9 +2608,7 @@ class Activity {
                         this._doHardStopButton();
                     } else if (!disableKeys && !hasOpenWidget) {
                         event.preventDefault();
-                        if (stopbtn) {
-                            stopbtn.style.color = platformColor.stopIconcolor;
-                        }
+                        this.toolbar.highlightStop(platformColor.stopIconcolor);
                         this._doFastButton();
                     }
                 } else if (!disableKeys) {
@@ -4123,10 +2747,7 @@ class Activity {
                                 this._doHardStopButton();
                             } else if (!disableKeys && !hasOpenWidget) {
                                 event.preventDefault();
-                                const stopbtn = document.getElementById("stop");
-                                if (stopbtn) {
-                                    stopbtn.style.color = platformColor.stopIconcolor;
-                                }
+                                this.toolbar.highlightStop(platformColor.stopIconcolor);
                                 this._doFastButton();
                             }
                             break;
@@ -4235,6 +2856,33 @@ class Activity {
 
             this.stage.canvas.width = w;
             this.stage.canvas.height = h;
+
+            // Firefox large canvas warning
+            const isFirefox = navigator.userAgent.includes("Firefox");
+            const canvasArea = w * h;
+            const FIREFOX_CANVAS_THRESHOLD = 4000000;
+            const warningMsg = _(
+                "Firefox performance may be affected because the canvas is unusually large. For the best experience, consider resetting the browser zoom to 100%."
+            );
+
+            if (isFirefox) {
+                if (canvasArea > FIREFOX_CANVAS_THRESHOLD) {
+                    const isShown = this.printText && this.printText.classList.contains("show");
+                    const hasMsg =
+                        this.printTextContent && this.printTextContent.textContent === warningMsg;
+
+                    // Re-show if not shown or if message was overwritten/hidden
+                    if (!this.firefoxWarningShown || !isShown || !hasMsg) {
+                        this.firefoxWarningShown = true;
+                        this.textMsg(warningMsg, 1000000);
+                    }
+                } else if (this.firefoxWarningShown) {
+                    if (this.printTextContent && this.printTextContent.textContent === warningMsg) {
+                        this.hidePrintText();
+                    }
+                    this.firefoxWarningShown = false;
+                }
+            }
 
             this.turtles.doScale(w, h, this.turtleBlocksScale);
 
@@ -4607,12 +3255,15 @@ class Activity {
 
                     if (uniqueName !== actionArg) {
                         actionArg.value = uniqueName;
+                        const translatedName = _(uniqueName);
                         label =
-                            uniqueName.length > 8 ? uniqueName.substr(0, 7) + "..." : uniqueName;
+                            translatedName.length > 8
+                                ? translatedName.substr(0, 7) + "..."
+                                : translatedName;
                         actionArg.text.text = label;
 
                         if (actionArg.label !== null) {
-                            actionArg.label.value = uniqueName;
+                            actionArg.label.value = translatedName;
                         }
                         actionArg.container.updateCache();
                         for (let b = 0; b < this.blocks.dragGroup.length; b++) {
@@ -4625,10 +3276,11 @@ class Activity {
                             ) {
                                 me.privateData = uniqueName;
                                 me.value = uniqueName;
+                                const translatedMeName = _(uniqueName);
                                 label =
-                                    uniqueName.length > 8
-                                        ? uniqueName.substr(0, 7) + "..."
-                                        : uniqueName;
+                                    translatedMeName.length > 8
+                                        ? translatedMeName.substr(0, 7) + "..."
+                                        : translatedMeName;
                                 me.text.text = label;
                                 me.overrideName = label;
                                 me.regenerateArtwork();
@@ -4684,11 +3336,7 @@ class Activity {
         }
 
         this._renderTrashView = () => {
-            if (
-                !activity.blocks ||
-                !activity.blocks.trashStacks ||
-                activity.blocks.trashStacks.length === 0
-            ) {
+            if (!this.blocks || !this.blocks.trashStacks || this.blocks.trashStacks.length === 0) {
                 return;
             }
             const trashList = document.getElementById("trashList");
@@ -4732,11 +3380,17 @@ class Activity {
                 const listItem = document.createElement("div");
                 listItem.classList.add("trash-item");
 
-                const svgData = block.artwork;
-                const encodedData = "data:image/svg+xml;utf8," + encodeURIComponent(svgData);
+                const preview = this.blocks.trashPreviews[blockId];
+                let imgSrc;
+                if (preview) {
+                    imgSrc = preview;
+                } else {
+                    const svgData = block.artwork;
+                    imgSrc = "data:image/svg+xml;utf8," + encodeURIComponent(svgData);
+                }
 
                 const img = document.createElement("img");
-                img.src = encodedData;
+                img.src = imgSrc;
                 img.alt = "Block Icon";
                 img.classList.add("trash-item-icon");
 
@@ -4746,10 +3400,26 @@ class Activity {
                 listItem.appendChild(textNode);
                 listItem.dataset.blockId = blockId;
 
-                listItem.addEventListener("mouseover", () => listItem.classList.add("hover"));
-                listItem.addEventListener("mouseout", () => listItem.classList.remove("hover"));
+                listItem.addEventListener("mouseover", () => {
+                    listItem.classList.add("hover");
+                });
+                listItem.addEventListener("mouseout", () => {
+                    listItem.classList.remove("hover");
+                });
+
+                img.addEventListener("mouseover", event => {
+                    this._showTrashPreviewPopup(imgSrc, event);
+                });
+                img.addEventListener("mousemove", event => {
+                    this._showTrashPreviewPopup(imgSrc, event);
+                });
+                img.addEventListener("mouseout", () => {
+                    this._hideTrashPreviewPopup();
+                });
+
                 listItem.addEventListener("click", () => {
                     this._restoreTrashById(blockId);
+                    this._hideTrashPreviewPopup();
                     trashView.classList.add("hidden");
                 });
 
@@ -4761,9 +3431,62 @@ class Activity {
 
             const existingView = document.getElementById("trashView");
             if (existingView) {
-                existingView.remove(); // remove from DOM; GC can now collect listeners
+                trashList.replaceChild(trashView, existingView);
+            } else {
+                trashList.appendChild(trashView);
             }
-            trashList.appendChild(trashView);
+        };
+
+        /**
+         * Shows a larger preview popup for trashed items.
+         * @param {string} imgSrc - The source of the image.
+         * @param {MouseEvent} event - The mouse event.
+         * @private
+         */
+        this._showTrashPreviewPopup = (imgSrc, event) => {
+            let popup = document.getElementById("trashPreviewPopup");
+            if (!popup) {
+                popup = document.createElement("div");
+                popup.id = "trashPreviewPopup";
+                popup.classList.add("trash-preview-popup");
+                const img = document.createElement("img");
+                popup.appendChild(img);
+                document.body.appendChild(popup);
+            }
+            const img = popup.firstChild;
+            if (img.src !== imgSrc) {
+                img.src = imgSrc;
+            }
+            popup.style.display = "block";
+
+            // Position next to cursor
+            const xOffset = 20;
+            const yOffset = 20;
+            let x = event.clientX + xOffset;
+            let y = event.clientY + yOffset;
+
+            // Flip if near right edge
+            if (x + 300 > window.innerWidth) {
+                x = event.clientX - 320;
+            }
+            // Flip if near bottom edge
+            if (y + 300 > window.innerHeight) {
+                y = event.clientY - 320;
+            }
+
+            popup.style.left = x + "px";
+            popup.style.top = y + "px";
+        };
+
+        /**
+         * Hides the trash preview popup.
+         * @private
+         */
+        this._hideTrashPreviewPopup = () => {
+            const popup = document.getElementById("trashPreviewPopup");
+            if (popup) {
+                popup.style.display = "none";
+            }
         };
 
         /*
@@ -4880,7 +3603,11 @@ class Activity {
 
                 // If this block is at the top of a stack, push it
                 // onto the trashStacks list.
-                if (myBlock.connections[0] === null) {
+                if (this.blocks.blockList[blk].connections[0] === null) {
+                    const preview = this.blocks.captureStackPreview(blk);
+                    if (preview) {
+                        this.blocks.trashPreviews[blk] = preview;
+                    }
                     this.blocks.trashStacks.push(blk);
                 }
 
@@ -5025,11 +3752,7 @@ class Activity {
                 this.showBlocksAfterRun = false;
             }
 
-            const stopIcon = document.getElementById("stop");
-            if (stopIcon) {
-                stopIcon.style.color = "white";
-                stopIcon.style.display = "none";
-            }
+            this.toolbar.resetStop();
 
             const saveBtn = document.getElementById("saveButton");
             const saveBtnAdv = document.getElementById("saveButtonAdvanced");
@@ -5179,7 +3902,7 @@ class Activity {
          * @param env {specifies environment}
          */
         this.runProject = env => {
-            document.removeEventListener("finishedLoading", this.runProject);
+            pubsub.off("finishedLoading", this.runProject);
 
             const that = this;
             setTimeout(() => {
@@ -5260,7 +3983,7 @@ class Activity {
                     that.keyboardEnableFlag = 1;
                 }
 
-                document.removeEventListener("finishedLoading", __afterLoad);
+                pubsub.off("finishedLoading", __afterLoad);
             };
 
             // Set the flag to zero to disable keyboard
@@ -5286,11 +4009,7 @@ class Activity {
 
             // After we have finished loading the project, clear all
             // to ensure a clean start.
-            if (document.addEventListener) {
-                document.addEventListener("finishedLoading", __afterLoad);
-            } else {
-                document.attachEvent("finishedLoading", __afterLoad);
-            }
+            pubsub.on("finishedLoading", __afterLoad);
 
             if (that.sessionData) {
                 that.doLoadAnimation();
@@ -5419,594 +4138,14 @@ class Activity {
                         that._changeBlockVisibility();
                     }
 
-                    document.removeEventListener("finishedLoading", __functionload);
+                    pubsub.off("finishedLoading", __functionload);
                     that.firstRun = false;
                 }, 1000);
             };
 
-            if (document.addEventListener) {
-                document.addEventListener("finishedLoading", __functionload, false);
-            } else {
-                document.attachEvent("finishedLoading", __functionload);
-            }
+            pubsub.on("finishedLoading", __functionload);
         };
-        // Function to convert ABC pitch to MB pitch
-        function _adjustPitch(note, keySignature) {
-            const accidental = keySignature.accidentals.find(acc => {
-                const noteToCompare = acc.note.toUpperCase().replace(",", "");
-                note = note.replace(",", "");
-                return noteToCompare.toLowerCase() === note.toLowerCase();
-            });
-
-            if (accidental) {
-                return (
-                    note + (accidental.acc === "sharp" ? "♯" : accidental.acc === "flat" ? "♭" : "")
-                );
-            } else {
-                return note;
-            }
-        }
-        // When converting to pitch value from ABC to MB there is issue
-        // with the octave conversion. We map the pitch to audible pitch.
-        function _abcToStandardValue(pitchValue) {
-            const octave = Math.floor(pitchValue / 7) + 4;
-            return octave;
-        }
-        // Creates pitch which consist of note pitch notename you could
-        // see them in the function.
-        function _createPitchBlocks(
-            pitches,
-            blockId,
-            pitchDuration,
-            keySignature,
-            actionBlock,
-            triplet,
-            meterDen
-        ) {
-            const blocks = [];
-
-            const pitch = pitches;
-            pitchDuration = toFraction(pitchDuration);
-            const adjustedNote = _adjustPitch(pitch.name, keySignature).toUpperCase();
-            if (triplet !== null) {
-                pitchDuration[1] = meterDen * triplet;
-            }
-
-            actionBlock.push(
-                [
-                    blockId,
-                    ["newnote", { collapsed: true }],
-                    0,
-                    0,
-                    [blockId - 1, blockId + 1, blockId + 4, blockId + 8]
-                ],
-                [blockId + 1, "divide", 0, 0, [blockId, blockId + 2, blockId + 3]],
-                [blockId + 2, ["number", { value: pitchDuration[0] }], 0, 0, [blockId + 1]],
-                [blockId + 3, ["number", { value: pitchDuration[1] }], 0, 0, [blockId + 1]],
-                [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]],
-                [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
-                [blockId + 6, ["notename", { value: adjustedNote }], 0, 0, [blockId + 5]],
-                [
-                    blockId + 7,
-                    ["number", { value: _abcToStandardValue(pitch.pitch) }],
-                    0,
-                    0,
-                    [blockId + 5]
-                ],
-                [blockId + 8, "hidden", 0, 0, [blockId, blockId + 9]]
-            );
-            return blocks;
-        }
-
-        // Function to search index for particular type of block
-        // mainly used to find nammeddo block in repeat block.
-        function _searchIndexForMusicBlock(array, x) {
-            // Iterate over each sub-array in the main array
-            for (let i = 0; i < array.length; i++) {
-                // Check if the 0th element of the sub-array matches x
-                if (array[i][0] === x) {
-                    // Return the index if a match is found
-                    return i;
-                }
-            }
-            // Return -1 if no match is found
-            return -1;
-        }
-
-        /*
-             The parseABC function converts ABC notation to Music Blocks
-             and is able to convert almost all the ABC notation to Music
-             Blocks. However, the following aspects need work:
-   
-             Hammers, pulls, and sliding offs grace notes (breaking the
-             conversion) Alternate endings (not failing but not showing
-             correctly) and DS al coda Bass voicing (failing)
-           */
-        this.parseABC = async function (tune) {
-            const musicBlocksJSON = [];
-            const staffBlocksMap = {};
-            const organizeBlock = {};
-            let blockId = 0;
-            let tripletFinder = null;
-            const title = (tune.metaText?.title ?? "title").toString().toLowerCase();
-            const instruction = (tune.metaText?.instruction ?? "guitar").toString().toLowerCase();
-
-            tune.lines?.forEach(line => {
-                line.staff?.forEach((staff, staffIndex) => {
-                    if (!Object.prototype.hasOwnProperty.call(organizeBlock, staffIndex)) {
-                        organizeBlock[staffIndex] = {
-                            arrangedBlocks: []
-                        };
-                    }
-
-                    organizeBlock[staffIndex].arrangedBlocks.push(staff);
-                });
-            });
-            for (const lineId in organizeBlock) {
-                organizeBlock[lineId].arrangedBlocks?.forEach(staff => {
-                    if (!Object.prototype.hasOwnProperty.call(staffBlocksMap, lineId)) {
-                        staffBlocksMap[lineId] = {
-                            meterNum: staff?.meter?.value[0]?.num || 4,
-                            meterDen: staff?.meter?.value[0]?.den || 4,
-                            keySignature: staff.key,
-                            baseBlocks: [],
-                            startBlock: [
-                                [
-                                    blockId,
-                                    ["start", { collapsed: false }],
-                                    100,
-                                    100,
-                                    [null, blockId + 1, null]
-                                ],
-                                [blockId + 1, "print", 0, 0, [blockId, blockId + 2, blockId + 3]],
-                                [blockId + 2, ["text", { value: title }], 0, 0, [blockId + 1]],
-                                [
-                                    blockId + 3,
-                                    "setturtlename2",
-                                    0,
-                                    0,
-                                    [blockId + 1, blockId + 4, blockId + 5]
-                                ],
-                                [
-                                    blockId + 4,
-                                    ["text", { value: `Voice ${parseInt(lineId) + 1} ` }],
-                                    0,
-                                    0,
-                                    [blockId + 3]
-                                ],
-                                [
-                                    blockId + 5,
-                                    "meter",
-                                    0,
-                                    0,
-                                    [blockId + 3, blockId + 6, blockId + 7, blockId + 10]
-                                ],
-                                [
-                                    blockId + 6,
-                                    ["number", { value: staff?.meter?.value[0]?.num || 4 }],
-                                    0,
-                                    0,
-                                    [blockId + 5]
-                                ],
-                                [
-                                    blockId + 7,
-                                    "divide",
-                                    0,
-                                    0,
-                                    [blockId + 5, blockId + 8, blockId + 9]
-                                ],
-                                [blockId + 8, ["number", { value: 1 }], 0, 0, [blockId + 7]],
-                                [
-                                    blockId + 9,
-                                    ["number", { value: staff?.meter?.value[0]?.den || 4 }],
-                                    0,
-                                    0,
-                                    [blockId + 7]
-                                ],
-                                [blockId + 10, "vspace", 0, 0, [blockId + 5, blockId + 11]],
-                                [
-                                    blockId + 11,
-                                    "setkey2",
-                                    0,
-                                    0,
-                                    [blockId + 10, blockId + 12, blockId + 13, blockId + 14]
-                                ],
-                                [
-                                    blockId + 12,
-                                    ["notename", { value: staff.key.root }],
-                                    0,
-                                    0,
-                                    [blockId + 11]
-                                ],
-                                [
-                                    blockId + 13,
-                                    [
-                                        "modename",
-                                        { value: staff.key.mode === "m" ? "minor" : "major" }
-                                    ],
-                                    0,
-                                    0,
-                                    [blockId + 11]
-                                ],
-                                //In Settimbre instead of null it should be nameddoblock of first action block
-                                [
-                                    blockId + 14,
-                                    "settimbre",
-                                    0,
-                                    0,
-                                    [blockId + 11, blockId + 15, null, blockId + 16]
-                                ],
-                                [
-                                    blockId + 15,
-                                    ["voicename", { value: instruction }],
-                                    0,
-                                    0,
-                                    [blockId + 14]
-                                ],
-                                [blockId + 16, "hidden", 0, 0, [blockId + 14, null]]
-                            ],
-                            repeatBlock: [],
-                            repeatArray: [],
-                            nameddoArray: {}
-                        };
-
-                        // For adding 17 blocks above
-                        blockId += 17;
-                    }
-
-                    const actionBlock = [];
-                    staff.voices.forEach(voice => {
-                        voice.forEach(element => {
-                            if (element.el_type === "note") {
-                                //check if triplet exists
-                                if (
-                                    element?.startTriplet !== null &&
-                                    element?.startTriplet !== undefined
-                                ) {
-                                    tripletFinder = element.startTriplet;
-                                }
-
-                                // Check and set tripletFinder to null
-                                // if element?.endTriplets exists.
-                                _createPitchBlocks(
-                                    element.pitches[0],
-                                    blockId,
-                                    element.duration,
-                                    staff.key,
-                                    actionBlock,
-                                    tripletFinder,
-                                    staffBlocksMap[lineId].meterDen
-                                );
-                                if (
-                                    element?.endTriplet !== null &&
-                                    element?.endTriplet !== undefined
-                                ) {
-                                    tripletFinder = null;
-                                }
-                                blockId = blockId + 9;
-                            } else if (element.el_type === "bar") {
-                                if (element.type === "bar_left_repeat") {
-                                    staffBlocksMap[lineId].repeatArray.push({
-                                        start: staffBlocksMap[lineId].baseBlocks.length,
-                                        end: -1
-                                    });
-                                } else if (element.type === "bar_right_repeat") {
-                                    const endBlockSearch = staffBlocksMap[lineId].repeatArray;
-
-                                    for (const repeatbar in endBlockSearch) {
-                                        if (endBlockSearch[repeatbar].end === -1) {
-                                            staffBlocksMap[lineId].repeatArray[repeatbar].end =
-                                                staffBlocksMap[lineId].baseBlocks.length;
-                                        }
-                                    }
-                                }
-                            }
-                        });
-
-                        // Update the newnote connection with hidden
-                        actionBlock[0][4][0] = blockId + 3;
-                        actionBlock[actionBlock.length - 1][4][1] = null;
-
-                        // Update the namedo block if not first
-                        // nameddo block appear
-                        if (staffBlocksMap[lineId].baseBlocks.length !== 0) {
-                            staffBlocksMap[lineId].baseBlocks[
-                                staffBlocksMap[lineId].baseBlocks.length - 1
-                            ][0][
-                                staffBlocksMap[lineId].baseBlocks[
-                                    staffBlocksMap[lineId].baseBlocks.length - 1
-                                ][0].length - 4
-                            ][4][1] = blockId;
-                        }
-                        // Add the nameddo action text and hidden
-                        // block for each line
-                        actionBlock.push(
-                            [
-                                blockId,
-                                [
-                                    "nameddo",
-                                    {
-                                        value: `V: ${parseInt(lineId) + 1} Line ${
-                                            staffBlocksMap[lineId]?.baseBlocks?.length + 1
-                                        }`
-                                    }
-                                ],
-                                0,
-                                0,
-                                [
-                                    staffBlocksMap[lineId].baseBlocks.length === 0
-                                        ? null
-                                        : staffBlocksMap[lineId].baseBlocks[
-                                              staffBlocksMap[lineId].baseBlocks.length - 1
-                                          ][0][
-                                              staffBlocksMap[lineId].baseBlocks[
-                                                  staffBlocksMap[lineId].baseBlocks.length - 1
-                                              ][0].length - 4
-                                          ][0],
-                                    null
-                                ]
-                            ],
-                            [
-                                blockId + 1,
-                                ["action", { collapsed: false }],
-                                100,
-                                100,
-                                [null, blockId + 2, blockId + 3, null]
-                            ],
-                            [
-                                blockId + 2,
-                                [
-                                    "text",
-                                    {
-                                        value: `V: ${parseInt(lineId) + 1} Line ${
-                                            staffBlocksMap[lineId]?.baseBlocks?.length + 1
-                                        }`
-                                    }
-                                ],
-                                0,
-                                0,
-                                [blockId + 1]
-                            ],
-                            [blockId + 3, "hidden", 0, 0, [blockId + 1, actionBlock[0][0]]]
-                        ); // blockid of topaction block
-
-                        if (!staffBlocksMap[lineId].nameddoArray) {
-                            staffBlocksMap[lineId].nameddoArray = {};
-                        }
-
-                        // Ensure the array at nameddoArray[lineId] is initialized if it doesn't exist
-                        if (!staffBlocksMap[lineId].nameddoArray[lineId]) {
-                            staffBlocksMap[lineId].nameddoArray[lineId] = [];
-                        }
-
-                        staffBlocksMap[lineId].nameddoArray[lineId].push(blockId);
-                        blockId += 4;
-
-                        musicBlocksJSON.push(actionBlock);
-                        staffBlocksMap[lineId].baseBlocks.push([actionBlock]);
-                    });
-                });
-            }
-
-            const finalBlock = [];
-            for (const staffIndex in staffBlocksMap) {
-                // Validate that the staff has sufficient block data for linking.
-                // Staves with no notes or incomplete structures from certain
-                // ABC notation inputs can cause crashes when accessing nested
-                // array elements without bounds checking.
-                if (
-                    !staffBlocksMap[staffIndex].baseBlocks ||
-                    staffBlocksMap[staffIndex].baseBlocks.length === 0 ||
-                    !staffBlocksMap[staffIndex].baseBlocks[0] ||
-                    !staffBlocksMap[staffIndex].baseBlocks[0][0] ||
-                    staffBlocksMap[staffIndex].baseBlocks[0][0].length < 4 ||
-                    staffBlocksMap[staffIndex].startBlock.length < 3 ||
-                    !staffBlocksMap[staffIndex].nameddoArray ||
-                    !staffBlocksMap[staffIndex].nameddoArray[staffIndex] ||
-                    staffBlocksMap[staffIndex].nameddoArray[staffIndex].length === 0
-                ) {
-                    finalBlock.push(...staffBlocksMap[staffIndex].startBlock);
-                    continue;
-                }
-                staffBlocksMap[staffIndex].startBlock[
-                    staffBlocksMap[staffIndex].startBlock.length - 3
-                ][4][2] =
-                    staffBlocksMap[staffIndex].baseBlocks[0][0][
-                        staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4
-                    ][0];
-                // Update the first namedo block with settimbre
-                staffBlocksMap[staffIndex].baseBlocks[0][0][
-                    staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4
-                ][4][0] =
-                    staffBlocksMap[staffIndex].startBlock[
-                        staffBlocksMap[staffIndex].startBlock.length - 3
-                    ][0];
-                const repeatblockids = staffBlocksMap[staffIndex].repeatArray;
-                for (const repeatId of repeatblockids) {
-                    // Skip repeat entries with out-of-bounds block indices
-                    if (
-                        repeatId.start < 0 ||
-                        repeatId.end < 0 ||
-                        repeatId.start >= staffBlocksMap[staffIndex].baseBlocks.length ||
-                        repeatId.end >= staffBlocksMap[staffIndex].baseBlocks.length
-                    ) {
-                        continue;
-                    }
-
-                    if (repeatId.start === 0) {
-                        staffBlocksMap[staffIndex].repeatBlock.push([
-                            blockId,
-                            "repeat",
-                            0,
-                            0,
-                            [
-                                staffBlocksMap[staffIndex].startBlock[
-                                    staffBlocksMap[staffIndex].startBlock.length - 3
-                                ][0] /*setribmre*/,
-                                blockId + 1,
-                                staffBlocksMap[staffIndex].nameddoArray[staffIndex][0],
-                                staffBlocksMap[staffIndex].nameddoArray[staffIndex][
-                                    repeatId.end + 1
-                                ] === null
-                                    ? null
-                                    : staffBlocksMap[staffIndex].nameddoArray[staffIndex][
-                                          repeatId.end + 1
-                                      ]
-                            ]
-                        ]);
-                        staffBlocksMap[staffIndex].repeatBlock.push([
-                            blockId + 1,
-                            ["number", { value: 2 }],
-                            100,
-                            100,
-                            [blockId]
-                        ]);
-
-                        // Update the settrimbre block
-                        staffBlocksMap[staffIndex].startBlock[
-                            staffBlocksMap[staffIndex].startBlock.length - 3
-                        ][4][2] = blockId;
-                        const firstnammedo = _searchIndexForMusicBlock(
-                            staffBlocksMap[staffIndex].baseBlocks[0][0],
-                            staffBlocksMap[staffIndex].nameddoArray[staffIndex][0]
-                        );
-                        const endnammedo = _searchIndexForMusicBlock(
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0],
-                            staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end]
-                        );
-                        // Because its [0] is the first nammeddo block
-                        // obviously. Check if
-                        // staffBlocksMap[staffIndex].baseBlocks[repeatId.end+1
-                        // exists and has a [0] element
-                        if (
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1] &&
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0]
-                        ) {
-                            const secondnammedo = _searchIndexForMusicBlock(
-                                staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0],
-                                staffBlocksMap[staffIndex].nameddoArray[staffIndex][
-                                    repeatId.end + 1
-                                ]
-                            );
-
-                            if (secondnammedo !== -1) {
-                                staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0][
-                                    secondnammedo
-                                ][4][0] = blockId;
-                            }
-                        }
-                        staffBlocksMap[staffIndex].baseBlocks[0][0][firstnammedo][4][0] = blockId;
-                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][endnammedo][4][1] =
-                            null;
-
-                        blockId += 2;
-                    } else {
-                        const currentnammeddo = _searchIndexForMusicBlock(
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0],
-                            staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.start]
-                        );
-                        const prevnameddo = _searchIndexForMusicBlock(
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.start - 1][0],
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                currentnammeddo
-                            ][4][0]
-                        );
-                        const afternamedo = _searchIndexForMusicBlock(
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0],
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                currentnammeddo
-                            ][4][1]
-                        );
-                        let prevrepeatnameddo = -1;
-                        if (prevnameddo === -1) {
-                            prevrepeatnameddo = _searchIndexForMusicBlock(
-                                staffBlocksMap[staffIndex].repeatBlock,
-                                staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                    currentnammeddo
-                                ][4][0]
-                            );
-                        }
-                        const prevBlockId =
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                currentnammeddo
-                            ][4][0];
-                        const currentBlockId =
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                currentnammeddo
-                            ][0];
-
-                        // Needs null checking optmizie
-                        const nextBlockId =
-                            staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end + 1];
-
-                        staffBlocksMap[staffIndex].repeatBlock.push([
-                            blockId,
-                            "repeat",
-                            0,
-                            0,
-                            [
-                                staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                    currentnammeddo
-                                ][4][0],
-                                blockId + 1,
-                                currentBlockId,
-                                nextBlockId === null ? null : nextBlockId
-                            ]
-                        ]);
-                        staffBlocksMap[staffIndex].repeatBlock.push([
-                            blockId + 1,
-                            ["number", { value: 2 }],
-                            100,
-                            100,
-                            [blockId]
-                        ]);
-                        if (prevnameddo !== -1) {
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.start - 1][0][
-                                prevnameddo
-                            ][4][1] = blockId;
-                        } else {
-                            staffBlocksMap[staffIndex].repeatBlock[prevrepeatnameddo][4][3] =
-                                blockId;
-                        }
-                        if (afternamedo !== -1) {
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][
-                                afternamedo
-                            ][4][1] = null;
-                        }
-                        staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                            currentnammeddo
-                        ][4][0] = blockId;
-                        if (nextBlockId !== null) {
-                            const nextnameddo = _searchIndexForMusicBlock(
-                                staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0],
-                                nextBlockId
-                            );
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0][
-                                nextnameddo
-                            ][4][0] = blockId;
-                        }
-                        blockId += 2;
-                    }
-                }
-
-                const lineBlock = staffBlocksMap[staffIndex].baseBlocks.reduce(
-                    (acc, curr) => acc.concat(curr),
-                    []
-                );
-                // Flatten the multidimensional array
-                const flattenedLineBlock = lineBlock.flat();
-                const combinedBlock = [
-                    ...staffBlocksMap[staffIndex].startBlock,
-                    ...flattenedLineBlock
-                ];
-
-                finalBlock.push(...staffBlocksMap[staffIndex].startBlock);
-                finalBlock.push(...flattenedLineBlock);
-                finalBlock.push(...staffBlocksMap[staffIndex].repeatBlock);
-            }
-            this.blocks.loadNewBlocks(finalBlock);
-            return null;
-        };
+        setupActivityAbcParser(this);
 
         /**
          * @param loadProject all params are from load project function
@@ -6092,247 +4231,101 @@ class Activity {
             }
         };
 
+        /**
+
+
         /*
          * Hides all message containers
          */
         this.hideMsgs = () => {
-            // The containers may not be ready yet, so check before accessing.
-            if (
-                this.errorMsgText === null ||
-                this.msgText === null ||
-                this.errorText === undefined ||
-                this.printText === undefined
-            ) {
-                return;
+            if (this.alertController) {
+                this.alertController.hideAll();
             }
-            this.errorMsgText.parent.visible = false;
-            this.errorText.classList.remove("show");
-            this._hideArrows();
-
-            this.msgText.parent.visible = false;
-            this.printText.classList.remove("show");
-            for (const i in this.errorArtwork) {
-                this.errorArtwork[i].visible = false;
-            }
-
-            this.refreshCanvas();
+            this._hideAlertUI();
         };
 
         const hideArrows = () => {
             globalActivity._hideArrows();
         };
 
-        this._hideArrows = () => {
-            if (this.errorMsgArrow !== null) {
-                this.errorMsgArrow.removeAllChildren();
-                this.refreshCanvas();
-            }
+        /**
+         * Displays a text message on the screen.
+         * @param {string|HTMLElement|DocumentFragment} msg - The message to display.
+         * @param {number} [duration=60000] - Duration in milliseconds before message disappears.
+         */
+        /**
+         * Ensures a visually hidden aria-live region exists for screen reader announcements.
+         * @returns {HTMLElement} The live region element.
+         */
+        const __ensureA11yLiveRegion = () => {
+            let region = document.getElementById("mbA11yLiveRegion");
+            if (region) return region;
+            region = document.createElement("div");
+            region.id = "mbA11yLiveRegion";
+            region.setAttribute("role", "status");
+            region.setAttribute("aria-live", "polite");
+            region.setAttribute("aria-atomic", "true");
+            region.style.cssText =
+                "position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;";
+            document.body.appendChild(region);
+            return region;
         };
-
-        this.textMsg = (msg, duration = _MSGTIMEOUT_) => {
-            if (this.msgTimeoutID !== null) {
-                clearTimeout(this.msgTimeoutID);
-                this.msgTimeoutID = null;
-            }
-
+        this.textMsg = (msg, duration = AlertController.MSG_TIMEOUT) => {
             if (this.msgText === null) {
                 // The container may not be ready yet, so do nothing.
                 return;
             }
 
-            this.printText.classList.add("show");
-
-            // Clean container to avoid appending duplicate messages
-            this.printTextContent.replaceChildren();
-
-            if (typeof msg === "string") {
-                if (msg.includes("<a") && msg.includes("</a>")) {
-                    // Safe parser for reload link
-                    try {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(msg, "text/html");
-                        const link = doc.querySelector("a");
-                        if (link) {
-                            const safeLink = document.createElement("a");
-                            safeLink.href = "#";
-                            safeLink.className = link.className || "language-link";
-                            safeLink.textContent = link.textContent;
-                            safeLink.style.cursor = "pointer";
-
-                            // Copy hover styles programmatically to avoid inline scripts
-                            safeLink.addEventListener("mouseover", () => {
-                                safeLink.style.opacity = 0.5;
-                            });
-                            safeLink.addEventListener("mouseout", () => {
-                                safeLink.style.opacity = 1;
-                            });
-
-                            this.printTextContent.appendChild(safeLink);
-                        } else {
-                            this.printTextContent.textContent = msg;
-                        }
-                    } catch (e) {
-                        this.printTextContent.textContent = msg;
-                    }
-                } else {
-                    this.printTextContent.textContent = msg;
-                }
-            } else if (msg instanceof HTMLElement || msg instanceof DocumentFragment) {
-                this.printTextContent.appendChild(msg);
+            const showMsg = () => {
+                this.alertRenderer.showTextMsg(msg);
+            };
+            // Announce to screen readers via aria-live region
+            if (msg && typeof msg === "string") {
+                __ensureA11yLiveRegion().textContent = msg;
             }
 
-            const that = this;
-            this.msgTimeoutID = setTimeout(() => {
-                that.printText.classList.remove("show");
-                that.msgTimeoutID = null;
-            }, duration);
+            const hideMsg = () => {
+                this.alertRenderer.hideTextMsg();
+            };
+
+            if (this.alertController) {
+                this.alertController.showText(duration, showMsg, hideMsg);
+            } else {
+                showMsg();
+            }
         };
 
-        this.errorMsg = (msg, blk, text, timeout) => {
-            if (this.errorMsgTimeoutID !== null) {
-                clearTimeout(this.errorMsgTimeoutID);
-            }
-
+        /**
+         * Displays an error message on the screen, drawing links or artwork if needed.
+         * @param {string} msg - The error message identifier or text.
+         * @param {string} [blk] - Block ID associated with the error.
+         * @param {string} [text] - Supplemental text for the error.
+         * @param {number} [timeout=15000] - Duration in milliseconds before error disappears.
+         */
+        this.errorMsg = (msg, blk, text, timeout = AlertController.ERROR_MSG_TIMEOUT) => {
             // The container may not be ready yet, so do nothing.
             if (this.errorMsgText === null) {
                 return;
             }
 
-            if (
-                blk !== undefined &&
-                blk !== null &&
-                blk in this.blocks.blockList &&
-                !this.blocks.blockList[blk].collapsed
-            ) {
-                const fromX = this.canvas.width / 2;
-                const fromY = 128;
-                const toX = this.blocks.blockList[blk].container.x + this.blocksContainer.x;
-                const toY = this.blocks.blockList[blk].container.y + this.blocksContainer.y;
-
-                if (this.errorMsgArrow === null) {
-                    this.errorMsgArrow = new createjs.Container();
-                    this.stage.addChild(this.errorMsgArrow);
-                }
-
-                const line = new createjs.Shape();
-                this.errorMsgArrow.addChild(line);
-                line.graphics
-                    .setStrokeStyle(4)
-                    .beginStroke("#ff0031")
-                    .moveTo(fromX, fromY)
-                    .lineTo(toX, toY);
-                this.stage.setChildIndex(this.errorMsgArrow, this.stage.children.length - 1);
-
-                const angle = (Math.atan2(toX - fromX, fromY - toY) / Math.PI) * 180;
-                const head = new createjs.Shape();
-                this.errorMsgArrow.addChild(head);
-                head.graphics
-                    .setStrokeStyle(4)
-                    .beginStroke("#ff0031")
-                    .moveTo(-10, 18)
-                    .lineTo(0, 0)
-                    .lineTo(10, 18);
-                head.x = toX;
-                head.y = toY;
-                head.rotation = angle;
+            // Announce errors to screen readers via aria-live region
+            if (msg && typeof msg === "string") {
+                __ensureA11yLiveRegion().textContent = msg;
             }
 
-            switch (msg) {
-                case NOMICERRORMSG:
-                    this.errorArtwork["nomicrophone"].visible = true;
-                    this.stage.setChildIndex(
-                        this.errorArtwork["nomicrophone"],
-                        this.stage.children.length - 1
-                    );
-                    break;
-                case NOSTRINGERRORMSG:
-                    this.errorArtwork["notastring"].visible = true;
-                    this.stage.setChildIndex(
-                        this.errorArtwork["notastring"],
-                        this.stage.children.length - 1
-                    );
-                    break;
-                case EMPTYHEAPERRORMSG:
-                    this.errorArtwork["emptyheap"].visible = true;
-                    this.stage.setChildIndex(
-                        this.errorArtwork["emptyheap"],
-                        this.stage.children.length - 1
-                    );
-                    break;
-                case NOSQRTERRORMSG:
-                    this.errorArtwork["negroot"].visible = true;
-                    this.stage.setChildIndex(
-                        this.errorArtwork["negroot"],
-                        this.stage.children.length - 1
-                    );
-                    break;
-                case NOACTIONERRORMSG:
-                    if (text === null) {
-                        text = "foo";
-                    }
+            const showMsg = () => {
+                this.alertRenderer.showErrorMsg(msg, blk, text);
+            };
 
-                    this.errorArtwork["nostack"].children[1].text = text;
-                    this.errorArtwork["nostack"].visible = true;
-                    this.errorArtwork["nostack"].updateCache();
-                    this.stage.setChildIndex(
-                        this.errorArtwork["nostack"],
-                        this.stage.children.length - 1
-                    );
-                    break;
-                case NOBOXERRORMSG:
-                    if (text === null) {
-                        text = "foo";
-                    }
+            const hideMsg = () => {
+                this.alertRenderer.hideErrorMsg();
+            };
 
-                    this.errorArtwork["emptybox"].children[1].text = text;
-                    this.errorArtwork["emptybox"].visible = true;
-                    this.errorArtwork["emptybox"].updateCache();
-                    this.stage.setChildIndex(
-                        this.errorArtwork["emptybox"],
-                        this.stage.children.length - 1
-                    );
-                    break;
-                case ZERODIVIDEERRORMSG:
-                    this.errorArtwork["zerodivide"].visible = true;
-                    this.stage.setChildIndex(
-                        this.errorArtwork["zerodivide"],
-                        this.stage.children.length - 1
-                    );
-                    break;
-                case NANERRORMSG:
-                    this.errorArtwork["notanumber"].visible = true;
-                    this.stage.setChildIndex(
-                        this.errorArtwork["notanumber"],
-                        this.stage.children.length - 1
-                    );
-                    break;
-                case NOINPUTERRORMSG:
-                    this.errorArtwork["noinput"].visible = true;
-                    this.stage.setChildIndex(
-                        this.errorArtwork["noinput"],
-                        this.stage.children.length - 1
-                    );
-                    break;
-                default:
-                    // Show and populate errorText div
-                    this.errorText.classList.add("show");
-                    this.errorTextContent.textContent = msg;
-                    break;
+            if (this.alertController) {
+                this.alertController.showError(timeout, showMsg, hideMsg);
+            } else {
+                showMsg();
             }
-
-            let myTimeout = _ERRORMSGTIMEOUT_;
-            if (timeout !== undefined) {
-                myTimeout = timeout;
-            }
-
-            if (myTimeout > 0) {
-                const that = this;
-                this.errorMsgTimeoutID = setTimeout(() => {
-                    that.hideMsgs();
-                }, myTimeout);
-            }
-
-            this.refreshCanvas();
         };
 
         /*
@@ -6352,502 +4345,8 @@ class Activity {
             }
         };
 
-        /*
-         * Hides cartesian grid
-         */
-        this._hideCartesian = () => {
-            this.cartesianBitmap.visible = false;
-            this.cartesianBitmap.uncache();
-            this.update = true;
-        };
-
-        /*
-         * Shows cartesian grid
-         */
-        this._showCartesian = () => {
-            this.cartesianBitmap.visible = true;
-            // Apply color filter based on theme
-            const isDarkMode = document.body.classList.contains("dark");
-            const isHighContrastMode = document.body.classList.contains("highcontrast");
-            if (isDarkMode || isHighContrastMode) {
-                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-                this.cartesianBitmap.filters = [invertFilter];
-            } else {
-                this.cartesianBitmap.filters = [];
-            }
-            this.cartesianBitmap.cache(0, 0, 1200, 900);
-            this.cartesianBitmap.updateCache();
-            this.update = true;
-        };
-
-        /*
-         * Hides polar grid
-         */
-        this._hidePolar = () => {
-            this.polarBitmap.visible = false;
-            this.polarBitmap.uncache();
-            this.update = true;
-        };
-
-        /*
-         * Shows polar grid
-         */
-        this._showPolar = () => {
-            this.polarBitmap.visible = true;
-            // Apply color filter based on theme
-            const isDarkMode = document.body.classList.contains("dark");
-            const isHighContrastMode = document.body.classList.contains("highcontrast");
-            if (isDarkMode || isHighContrastMode) {
-                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-                this.polarBitmap.filters = [invertFilter];
-            } else {
-                this.polarBitmap.filters = [];
-            }
-            this.polarBitmap.cache(0, 0, 1200, 900);
-            this.polarBitmap.updateCache();
-            this.update = true;
-        };
-
-        /*
-         * Hides accidentals
-         */
-        this._hideAccidentals = () => {
-            const newX = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
-            for (let i = 0; i < 7; i++) {
-                this.grandSharpBitmap[i].visible = false;
-                this.grandSharpBitmap[i].x = newX;
-                this.grandFlatBitmap[i].visible = false;
-                this.grandFlatBitmap[i].x = newX;
-
-                this.trebleSharpBitmap[i].visible = false;
-                this.trebleSharpBitmap[i].x = newX;
-                this.trebleFlatBitmap[i].visible = false;
-                this.trebleFlatBitmap[i].x = newX;
-
-                this.sopranoSharpBitmap[i].visible = false;
-                this.sopranoSharpBitmap[i].x = newX;
-                this.sopranoFlatBitmap[i].visible = false;
-                this.sopranoFlatBitmap[i].x = newX;
-
-                this.altoSharpBitmap[i].visible = false;
-                this.altoSharpBitmap[i].x = newX;
-                this.altoFlatBitmap[i].visible = false;
-                this.altoFlatBitmap[i].x = newX;
-
-                this.tenorSharpBitmap[i].visible = false;
-                this.tenorSharpBitmap[i].x = newX;
-                this.tenorFlatBitmap[i].visible = false;
-                this.tenorFlatBitmap[i].x = newX;
-
-                this.bassSharpBitmap[i].visible = false;
-                this.bassSharpBitmap[i].x = newX;
-                this.bassFlatBitmap[i].visible = false;
-                this.bassFlatBitmap[i].x = newX;
-            }
-            this.update = true;
-        };
-
-        /*
-         * Hides musical treble staff
-         */
-        this._hideTreble = () => {
-            this.trebleBitmap.visible = false;
-            this.trebleBitmap.uncache();
-            this._hideAccidentals();
-            this.update = true;
-        };
-
-        /*
-         * Shows musical treble staff
-         */
-        this._showTreble = () => {
-            this.trebleBitmap.visible = true;
-            // Apply color filter based on theme
-            const isDarkMode = document.body.classList.contains("dark");
-            const isHighContrastMode = document.body.classList.contains("highcontrast");
-            if (isDarkMode || isHighContrastMode) {
-                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-                this.trebleBitmap.filters = [invertFilter];
-            } else {
-                this.trebleBitmap.filters = [];
-            }
-            this.trebleBitmap.cache(0, 0, 1200, 900);
-            this.trebleBitmap.updateCache();
-            this._hideAccidentals();
-
-            debugLog(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
-            const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
-
-            debugLog(scale);
-            const _sharps = [
-                "F" + SHARP,
-                "C" + SHARP,
-                "G" + SHARP,
-                "D" + SHARP,
-                "A" + SHARP,
-                "E" + SHARP,
-                "B" + SHARP
-            ];
-            const _flats = [
-                "B" + FLAT,
-                "E" + FLAT,
-                "A" + FLAT,
-                "D" + FLAT,
-                "G" + FLAT,
-                "C" + FLAT,
-                "F" + FLAT
-            ];
-            let dx = 0;
-            for (let i = 0; i < 7; i++) {
-                if (scale.includes(_sharps[i])) {
-                    this.trebleSharpBitmap[i].x += dx;
-                    this.trebleSharpBitmap[i].visible = true;
-                    dx += 15;
-                }
-                if (scale.includes(_flats[i])) {
-                    this.trebleFlatBitmap[i].x += dx;
-                    this.trebleFlatBitmap[i].visible = true;
-                    dx += 15;
-                }
-            }
-
-            this.update = true;
-        };
-
-        /*
-         * Hides musical grand staff
-         */
-        this._hideGrand = () => {
-            this.grandBitmap.visible = false;
-            this.grandBitmap.uncache();
-            this._hideAccidentals();
-            this.update = true;
-        };
-
-        /*
-         * Shows musical grand staff
-         */
-        this._showGrand = () => {
-            this.grandBitmap.visible = true;
-            // Apply color filter based on theme
-            const isDarkMode = document.body.classList.contains("dark");
-            const isHighContrastMode = document.body.classList.contains("highcontrast");
-            if (isDarkMode || isHighContrastMode) {
-                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-                this.grandBitmap.filters = [invertFilter];
-            } else {
-                this.grandBitmap.filters = [];
-            }
-            this.grandBitmap.cache(0, 0, 1200, 900);
-            this.grandBitmap.updateCache();
-            this._hideAccidentals();
-
-            debugLog(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
-            const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
-
-            debugLog(scale);
-            const _sharps = [
-                "F" + SHARP,
-                "C" + SHARP,
-                "G" + SHARP,
-                "D" + SHARP,
-                "A" + SHARP,
-                "E" + SHARP,
-                "B" + SHARP
-            ];
-            const _flats = [
-                "B" + FLAT,
-                "E" + FLAT,
-                "A" + FLAT,
-                "D" + FLAT,
-                "G" + FLAT,
-                "C" + FLAT,
-                "F" + FLAT
-            ];
-            let dx = 0;
-            for (let i = 0; i < 7; i++) {
-                if (scale.includes(_sharps[i])) {
-                    this.grandSharpBitmap[i].x += dx;
-                    this.grandSharpBitmap[i].visible = true;
-                    dx += 15;
-                }
-                if (scale.includes(_flats[i])) {
-                    this.grandFlatBitmap[i].x += dx;
-                    this.grandFlatBitmap[i].visible = true;
-                    dx += 15;
-                }
-            }
-            this.update = true;
-        };
-
-        /*
-         * Hides musical soprano staff
-         */
-        this._hideSoprano = () => {
-            this.sopranoBitmap.visible = false;
-            this.sopranoBitmap.uncache();
-            this.update = true;
-        };
-
-        /*
-         * Shows musical soprano staff
-         */
-        this._showSoprano = () => {
-            this.sopranoBitmap.visible = true;
-            // Apply color filter based on theme
-            const isDarkMode = document.body.classList.contains("dark");
-            const isHighContrastMode = document.body.classList.contains("highcontrast");
-            if (isDarkMode || isHighContrastMode) {
-                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-                this.sopranoBitmap.filters = [invertFilter];
-            } else {
-                this.sopranoBitmap.filters = [];
-            }
-            this.sopranoBitmap.cache(0, 0, 1200, 900);
-            this.sopranoBitmap.updateCache();
-            this._hideAccidentals();
-
-            debugLog(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
-            const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
-
-            debugLog(scale);
-            const _sharps = [
-                "F" + SHARP,
-                "C" + SHARP,
-                "G" + SHARP,
-                "D" + SHARP,
-                "A" + SHARP,
-                "E" + SHARP,
-                "B" + SHARP
-            ];
-            const _flats = [
-                "B" + FLAT,
-                "E" + FLAT,
-                "A" + FLAT,
-                "D" + FLAT,
-                "G" + FLAT,
-                "C" + FLAT,
-                "F" + FLAT
-            ];
-            let dx = 0;
-            for (let i = 0; i < 7; i++) {
-                if (scale.includes(_sharps[i])) {
-                    this.sopranoSharpBitmap[i].x += dx;
-                    this.sopranoSharpBitmap[i].visible = true;
-                    dx += 15;
-                }
-                if (scale.includes(_flats[i])) {
-                    this.sopranoFlatBitmap[i].x += dx;
-                    this.sopranoFlatBitmap[i].visible = true;
-                    dx += 15;
-                }
-            }
-
-            this.update = true;
-        };
-
-        /*
-         * Hides musical alto staff
-         */
-        this._hideAlto = () => {
-            this.altoBitmap.visible = false;
-            this.altoBitmap.uncache();
-            this._hideAccidentals();
-            this.update = true;
-        };
-
         this.__showAltoAccidentals = () => {
             // No-op for Alto clef
-        };
-
-        /*
-         * Shows musical alto staff
-         */
-        this._showAlto = () => {
-            this.altoBitmap.visible = true;
-            // Apply color filter based on theme
-            const isDarkMode = document.body.classList.contains("dark");
-            const isHighContrastMode = document.body.classList.contains("highcontrast");
-            if (isDarkMode || isHighContrastMode) {
-                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-                this.altoBitmap.filters = [invertFilter];
-            } else {
-                this.altoBitmap.filters = [];
-            }
-            this.altoBitmap.cache(0, 0, 1200, 900);
-            this.altoBitmap.updateCache();
-            this._hideAccidentals();
-
-            debugLog(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
-            const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
-
-            debugLog(scale);
-            const _sharps = [
-                "F" + SHARP,
-                "C" + SHARP,
-                "G" + SHARP,
-                "D" + SHARP,
-                "A" + SHARP,
-                "E" + SHARP,
-                "B" + SHARP
-            ];
-            const _flats = [
-                "B" + FLAT,
-                "E" + FLAT,
-                "A" + FLAT,
-                "D" + FLAT,
-                "G" + FLAT,
-                "C" + FLAT,
-                "F" + FLAT
-            ];
-            let dx = 0;
-            for (let i = 0; i < 7; i++) {
-                if (scale.includes(_sharps[i])) {
-                    this.altoSharpBitmap[i].x += dx;
-                    this.altoSharpBitmap[i].visible = true;
-                    dx += 15;
-                }
-                if (scale.includes(_flats[i])) {
-                    this.altoFlatBitmap[i].x += dx;
-                    this.altoFlatBitmap[i].visible = true;
-                    dx += 15;
-                }
-            }
-
-            this.update = true;
-        };
-
-        /*
-         * Hides musical tenor staff
-         */
-        this._hideTenor = () => {
-            this.tenorBitmap.visible = false;
-            this.tenorBitmap.uncache();
-            this.update = true;
-        };
-
-        /*
-         * Shows musical tenor staff
-         */
-        this._showTenor = () => {
-            this.tenorBitmap.visible = true;
-            // Apply color filter based on theme
-            const isDarkMode = document.body.classList.contains("dark");
-            const isHighContrastMode = document.body.classList.contains("highcontrast");
-            if (isDarkMode || isHighContrastMode) {
-                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-                this.tenorBitmap.filters = [invertFilter];
-            } else {
-                this.tenorBitmap.filters = [];
-            }
-            this.tenorBitmap.cache(0, 0, 1200, 900);
-            this.tenorBitmap.updateCache();
-            this._hideAccidentals();
-
-            debugLog(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
-            const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
-
-            debugLog(scale);
-            const _sharps = [
-                "F" + SHARP,
-                "C" + SHARP,
-                "G" + SHARP,
-                "D" + SHARP,
-                "A" + SHARP,
-                "E" + SHARP,
-                "B" + SHARP
-            ];
-            const _flats = [
-                "B" + FLAT,
-                "E" + FLAT,
-                "A" + FLAT,
-                "D" + FLAT,
-                "G" + FLAT,
-                "C" + FLAT,
-                "F" + FLAT
-            ];
-            let dx = 0;
-            for (let i = 0; i < 7; i++) {
-                if (scale.includes(_sharps[i])) {
-                    this.tenorSharpBitmap[i].x += dx;
-                    this.tenorSharpBitmap[i].visible = true;
-                    dx += 15;
-                }
-                if (scale.includes(_flats[i])) {
-                    this.tenorFlatBitmap[i].x += dx;
-                    this.tenorFlatBitmap[i].visible = true;
-                    dx += 15;
-                }
-            }
-
-            this.update = true;
-        };
-
-        /*
-         * Hides musical bass staff
-         */
-        this._hideBass = () => {
-            this.bassBitmap.visible = false;
-            this.bassBitmap.uncache();
-            this._hideAccidentals();
-            this.update = true;
-        };
-
-        /*
-         * Shows musical bass staff
-         */
-        this._showBass = () => {
-            this.bassBitmap.visible = true;
-            // Apply color filter based on theme
-            const isDarkMode = document.body.classList.contains("dark");
-            const isHighContrastMode = document.body.classList.contains("highcontrast");
-            if (isDarkMode || isHighContrastMode) {
-                const invertFilter = new createjs.ColorFilter(-1, -1, -1, 1, 255, 255, 255);
-                this.bassBitmap.filters = [invertFilter];
-            } else {
-                this.bassBitmap.filters = [];
-            }
-            this.bassBitmap.cache(0, 0, 1200, 900);
-            this.bassBitmap.updateCache();
-            this._hideAccidentals();
-
-            debugLog(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
-            const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
-
-            debugLog(scale);
-            const _sharps = [
-                "F" + SHARP,
-                "C" + SHARP,
-                "G" + SHARP,
-                "D" + SHARP,
-                "A" + SHARP,
-                "E" + SHARP,
-                "B" + SHARP
-            ];
-            const _flats = [
-                "B" + FLAT,
-                "E" + FLAT,
-                "A" + FLAT,
-                "D" + FLAT,
-                "G" + FLAT,
-                "C" + FLAT,
-                "F" + FLAT
-            ];
-            let dx = 0;
-            for (let i = 0; i < 7; i++) {
-                if (scale.includes(_sharps[i])) {
-                    this.bassSharpBitmap[i].x += dx;
-                    this.bassSharpBitmap[i].visible = true;
-                    dx += 15;
-                }
-                if (scale.includes(_flats[i])) {
-                    this.bassFlatBitmap[i].x += dx;
-                    this.bassFlatBitmap[i].visible = true;
-                    dx += 15;
-                }
-            }
-
-            this.update = true;
         };
 
         /*
@@ -7050,21 +4549,21 @@ class Activity {
          * Opens plugin by clicking on the plugin open chooser in the DOM (.json).
          */
         const doOpenPlugin = activity => {
-            activity._doOpenPlugin();
+            activity.pluginDialog.openPlugin();
         };
 
         this._loadBuiltInPlugin = name => {
-            const url = "plugins/" + name + ".json";
-            const xhr = new XMLHttpRequest();
-            xhr.open("GET", url, true);
+            // Validate: only allow safe characters (alphanumeric, hyphens, and underscores).
+            // This prevents path traversal attacks like "../../secrets" regardless of caller.
+            if (!/^[a-z0-9\-_]+$/.test(name)) {
+                ErrorHandler.warn("Invalid plugin name rejected: " + name, {
+                    operation: "loadPlugin"
+                });
+                return;
+            }
             const that = this;
-            xhr.onload = async () => {
-                if (xhr.status === 200) {
-                    const obj = await processRawPluginData(that, xhr.responseText, url);
-                    // Save plugins to local storage.
-                    if (obj !== null) {
-                        that.storage.plugins = preparePluginExports(that, obj);
-                    }
+            this.pluginController.loadBuiltInPluginFromXHR(name).then(success => {
+                if (success) {
                     // Refresh the palettes.
                     setTimeout(() => {
                         if (that.palettes.visible) {
@@ -7076,36 +4575,34 @@ class Activity {
                         operation: "loadPlugin"
                     });
                 }
-            };
-            xhr.send();
+            });
         };
 
-        this._doOpenPlugin = () => {
-            this.toolbar.closeAuxToolbar(showHideAuxMenu);
-            const rawName = prompt(
-                _("Enter the name of a built-in plugin, or leave blank to upload a plugin file:")
-            );
-            if (rawName === null) {
-                return; // User cancelled the operation
-            }
+        this.handlePluginFileSelected = file => {
+            const that = this;
+            const reader = new FileReader();
 
-            const name = rawName.trim().toLowerCase();
-            if (name !== "") {
-                // Validate: only allow safe characters (alphanumeric, hyphens, and underscores)
-                // This prevents path traversal attacks like "../../secrets"
-                if (!/^[a-z0-9\-_]+$/.test(name)) {
-                    alert(
-                        _(
-                            "Invalid plugin name. Only alphanumeric characters, hyphens, and underscores are allowed."
-                        )
-                    );
-                    return;
-                }
-                this._loadBuiltInPlugin(name);
-            } else {
-                this.pluginChooser.focus();
-                this.pluginChooser.click();
-            }
+            reader.onload = () => {
+                that.loading = true;
+                document.body.style.cursor = "wait";
+
+                setTimeout(async () => {
+                    const source = file.name ? "file:" + file.name : "file:local-file";
+                    await that.pluginController.loadPluginFromFileContent(reader.result, source);
+
+                    // Refresh the palettes.
+                    setTimeout(() => {
+                        if (that.palettes.visible) {
+                            that.palettes.hide();
+                        }
+                    }, 1000);
+
+                    document.body.style.cursor = "default";
+                    that.loading = false;
+                }, 200);
+            };
+
+            reader.readAsText(file);
         };
 
         /*
@@ -7353,145 +4850,9 @@ class Activity {
         /*
          * Shows search widget on helpfulSearchDiv
          */
-        this.showHelpfulSearchWidget = () => {
-            // Bring widget to top.
-            const $j = window.jQuery;
-            if ($j("#helpfulSearch")) {
-                try {
-                    $j("#helpfulSearch").autocomplete("destroy");
-                } catch {
-                    //
-                }
-            }
-            this.helpfulSearchWidget.style.zIndex = 1001;
-            this.helpfulSearchWidget.idInput_custom = "";
-            if (this.helpfulSearchDiv.style.display === "block") {
-                this.helpfulSearchWidget.value = null;
-                this.helpfulSearchWidget.style.visibility = "visible";
+        this.showHelpfulSearchWidget = () => this.searchController.showHelpfulSearchWidget();
 
-                this.searchBlockPosition = [100, 100];
-                this.prepSearchWidget();
-
-                const that = this;
-                setTimeout(() => {
-                    that.helpfulSearchWidget.focus();
-                    that.doHelpfulSearch();
-                }, 500);
-
-                document.getElementById("helpfulWheelDiv").style.display = "none";
-            }
-        };
-
-        /*
-         * Uses JQuery to add autocompleted search suggestions
-         */
-        this.doHelpfulSearch = () => {
-            const $j = window.jQuery;
-            if (this.searchSuggestions.length === 0) {
-                this.prepSearchWidget();
-            }
-
-            const that = this;
-            const $helpfulSearch = $j("#helpfulSearch");
-
-            if (!$helpfulSearch.data("autocomplete-init")) {
-                $helpfulSearch.autocomplete({
-                    source: (request, response) => {
-                        const term = (request.term || "").toLowerCase().trim();
-
-                        // Check cache first for performance
-                        if (that._searchCache[term] !== undefined) {
-                            response(that._searchCache[term]);
-                            return;
-                        }
-
-                        const results = that.searchSuggestions.filter(item => {
-                            if (!term || term.length === 0) {
-                                return true;
-                            }
-
-                            if (item.searchTerms && Array.isArray(item.searchTerms)) {
-                                return item.searchTerms.some(t => t && t.indexOf(term) !== -1);
-                            }
-
-                            return (
-                                item.label &&
-                                typeof item.label === "string" &&
-                                item.label.toLowerCase().indexOf(term) !== -1
-                            );
-                        });
-
-                        // Cache the results for future use
-                        that._searchCache[term] = results;
-                        response(results);
-                    },
-                    appendTo: "body",
-                    select: (event, ui) => {
-                        event.preventDefault();
-                        that.helpfulSearchWidget.value = ui.item.label;
-                        that.helpfulSearchWidget.idInput_custom = ui.item.value;
-                        that.helpfulSearchWidget.protoblk = ui.item.specialDict;
-                        that.doHelpfulSearch();
-                    },
-                    focus: event => {
-                        event.preventDefault();
-                    }
-                });
-
-                const instance = $helpfulSearch.autocomplete("instance");
-                if (instance) {
-                    instance._renderItem = (ul, item) => {
-                        const li = $j("<li></li>");
-                        const img = document.createElement("img");
-                        img.src = item.artwork || "";
-                        img.height = 20;
-                        li.append(img);
-                        li.append($j("<a>").text(" " + item.label));
-                        return li.appendTo(ul.css("z-index", 35000));
-                    };
-                }
-                $helpfulSearch.data("autocomplete-init", true);
-            }
-
-            const searchInput = this.helpfulSearchWidget.idInput_custom;
-            if (!searchInput || searchInput.length <= 0) {
-                if (this.helpfulSearchWidget.value && this.helpfulSearchWidget.value.length > 0) {
-                    $helpfulSearch.autocomplete("search", this.helpfulSearchWidget.value);
-                }
-                return;
-            }
-
-            const protoblk = this.helpfulSearchWidget.protoblk;
-            const paletteName = protoblk.palette.name;
-            const protoName = protoblk.name;
-
-            if (Object.prototype.hasOwnProperty.call(that.blocks.protoBlockDict, protoName)) {
-                this.palettes.dict[paletteName].makeBlockFromSearch(
-                    protoblk,
-                    protoName,
-                    newBlock => {
-                        that.blocks.moveBlock(
-                            newBlock,
-                            100 + that.searchBlockPosition[0] - that.blocksContainer.x,
-                            that.searchBlockPosition[1] - that.blocksContainer.y
-                        );
-                    }
-                );
-
-                // Move the position of the next newly created block.
-                this.searchBlockPosition[0] += STANDARDBLOCKHEIGHT;
-                this.searchBlockPosition[1] += STANDARDBLOCKHEIGHT;
-            } else if (this.deprecatedBlockNames.indexOf(searchInput) > -1) {
-                this.errorMsg(_("This block is deprecated."));
-            } else {
-                this.errorMsg(_("Block cannot be found."));
-            }
-
-            this.helpfulSearchWidget.value = "";
-            // Hide search div after search is complete.
-            document.getElementById("helpfulSearchDiv").style.display = "none";
-            this.update = true;
-        };
+        this.doHelpfulSearch = () => this.searchController.doHelpfulSearch();
 
         /**
          * Toggles display of javaScript editor widget.
@@ -8304,12 +5665,6 @@ class Activity {
             if (this._initialized) return;
             this._initialized = true;
 
-            // Hide stop button on startup
-            const stopBtn = document.getElementById("stop");
-            if (stopBtn) {
-                stopBtn.style.display = "none";
-            }
-
             // Batch DOM reads before any writes to avoid forced synchronous layout
             this._perfMark("activity.init.start");
             this._clientWidth = document.body.clientWidth;
@@ -8382,9 +5737,8 @@ class Activity {
                     this.saveLocally();
                 }
                 this._stopRenderLoop();
-                if (this._autoSaveInterval !== null) {
-                    clearInterval(this._autoSaveInterval);
-                    this._autoSaveInterval = null;
+                if (typeof this._stopAutoSave === "function") {
+                    this._stopAutoSave();
                 }
             });
 
@@ -8426,6 +5780,8 @@ class Activity {
 
             this.trashcan = new Trashcan(this);
             this.turtles = new Turtles(this);
+            setupGridController(this);
+            setupGridRenderer(this);
             this.boundary = new Boundary(this.blocksContainer);
             this.blocks = new Blocks(this);
             this.palettes = new Palettes(this);
@@ -8513,22 +5869,9 @@ class Activity {
             // data loss from browser crashes (see issue #2994).
             // Deferred while the project is actively running to avoid
             // interrupting playback.
-            this._autoSaveInterval = setInterval(
-                () => {
-                    try {
-                        if (this.logo && this.logo._alreadyRunning) {
-                            return;
-                        }
-
-                        if (this.saveLocally !== null && this.saveLocally !== undefined) {
-                            this.saveLocally();
-                        }
-                    } catch (e) {
-                        ErrorHandler.recoverable(e, { operation: "autoSave" });
-                    }
-                },
-                5 * 60 * 1000
-            );
+            if (typeof this._initAutoSave === "function") {
+                this._initAutoSave();
+            }
 
             initBasicProtoBlocks(this);
 
@@ -8540,11 +5883,7 @@ class Activity {
             }
 
             // Load any plugins saved in local storage.
-            this.pluginData = this.storage.plugins;
-            if (this.pluginData !== null && this.pluginData !== "null") {
-                const obj = await processPluginData(this, this.pluginData, "localStorage:plugins");
-                updatePluginObj(this, obj);
-            }
+            await this.pluginController.loadStoredPlugins();
 
             // Load custom mode saved in local storage.
             const custommodeData = this.storage.custommode;
@@ -8731,7 +6070,7 @@ class Activity {
                                 that.stage.removeAllEventListeners("trashsignal");
 
                                 const __afterLoad = () => {
-                                    document.removeEventListener("finishedLoading", __afterLoad);
+                                    pubsub.off("finishedLoading", __afterLoad);
                                 };
 
                                 // Wait for the old blocks to be removed.
@@ -8739,11 +6078,7 @@ class Activity {
                                     that.blocks.loadNewBlocks(obj);
                                     that.stage.removeAllEventListeners("trashsignal");
 
-                                    if (document.addEventListener) {
-                                        document.addEventListener("finishedLoading", __afterLoad);
-                                    } else {
-                                        document.attachEvent("finishedLoading", __afterLoad);
-                                    }
+                                    pubsub.on("finishedLoading", __afterLoad);
                                 };
 
                                 that.stage.addEventListener("trashsignal", __listener, false);
@@ -8834,55 +6169,6 @@ class Activity {
             this.allFilesChooser.addEventListener("click", event => {
                 event.currentTarget.value = "";
             });
-
-            this.pluginChooser.addEventListener("click", event => {
-                window.scroll(0, 0);
-                event.currentTarget.value = "";
-            });
-
-            this.pluginChooser.addEventListener(
-                "change",
-                () => {
-                    window.scroll(0, 0);
-
-                    // Read file here.
-                    const reader = new FileReader();
-                    const pluginFile = that.pluginChooser.files[0];
-
-                    reader.onload = () => {
-                        that.loading = true;
-                        document.body.style.cursor = "wait";
-                        //doLoadAnimation();
-
-                        setTimeout(async () => {
-                            const obj = await processRawPluginData(
-                                that,
-                                reader.result,
-                                pluginFile && pluginFile.name
-                                    ? "file:" + pluginFile.name
-                                    : "file:local-file"
-                            );
-                            // Save plugins to local storage.
-                            if (obj !== null) {
-                                that.storage.plugins = preparePluginExports(that, obj);
-                            }
-
-                            // Refresh the palettes.
-                            setTimeout(() => {
-                                if (that.palettes.visible) {
-                                    that.palettes.hide();
-                                }
-                            }, 1000);
-
-                            document.body.style.cursor = "default";
-                            that.loading = false;
-                        }, 200);
-                    };
-
-                    reader.readAsText(pluginFile);
-                },
-                false
-            );
 
             // Enable touch interactions if supported on the current device.
             createjs.Touch.enable(this.stage, false, true);
@@ -9047,11 +6333,6 @@ class Activity {
 
             // create functionality of 2D drag to select blocks in bulk
             this._create2Ddrag();
-
-            /*
-               document.addEventListener("mousewheel", scrollEvent, false);
-               document.addEventListener("DOMMouseScroll", scrollEvent, false);
-               */
 
             // Named event handler for proper cleanup
             const activity = this;
@@ -9233,81 +6514,7 @@ class Activity {
      * @returns {void}
      */
     regeneratePalettes() {
-        try {
-            // Store current palette positions
-            const palettePositions = {};
-            if (this.palettes && this.palettes.dict) {
-                for (const name in this.palettes.dict) {
-                    const palette = this.palettes.dict[name];
-                    if (
-                        palette &&
-                        palette.container &&
-                        typeof palette.container.x !== "undefined"
-                    ) {
-                        palettePositions[name] = {
-                            x: palette.container.x,
-                            y: palette.container.y,
-                            visible: !!palette.visible
-                        };
-                    }
-                }
-            }
-
-            // Safely hide and clear existing palettes
-            if (!this.palettes) {
-                console.warn("Palettes object not initialized");
-                return;
-            }
-
-            if (typeof this.palettes.hide !== "function") {
-                console.warn("Palettes hide method not available");
-            } else {
-                this.palettes.hide();
-            }
-
-            this.palettes.reinitialize(this.palettes);
-
-            // Increase palette element style.top value for correct alignment
-            const element = docById("palette");
-            element.style.top = `${60 + this.palettes.top}px`;
-
-            // Reinitialize blocks
-            if (this.blocks) {
-                initBasicProtoBlocks(this);
-            }
-
-            // Restore palette positions
-            if (this.palettes && this.palettes.dict) {
-                for (const name in palettePositions) {
-                    const palette = this.palettes.dict[name];
-                    const pos = palettePositions[name];
-
-                    if (palette && palette.container && pos) {
-                        palette.container.x = pos.x;
-                        palette.container.y = pos.y;
-
-                        if (pos.visible) {
-                            palette.showMenu(true);
-                        }
-                    }
-                }
-            }
-
-            // Update the palette display
-            if (this.palettes && typeof this.palettes.updatePalettes === "function") {
-                this.palettes.updatePalettes();
-            }
-
-            // Update blocks
-            if (this.blocks && typeof this.blocks.updateBlockPositions === "function") {
-                this.blocks.updateBlockPositions();
-            }
-
-            this.refreshCanvas();
-        } catch (e) {
-            ErrorHandler.capture(e, { operation: "regeneratePalettes" });
-            this.errorMsg(_("Error regenerating palettes. Please refresh the page."));
-        }
+        this.paletteLoader.regeneratePalettes();
     }
 }
 
@@ -9350,7 +6557,8 @@ class Activity {
 const activity = new Activity();
 
 // Execute initialization once all RequireJS modules are loaded AND DOM is ready
-define(["domReady!"].concat(MYDEFINES), doc => {
+define(["domReady!", "activity/exporters"].concat(MYDEFINES), (doc, exportersModule) => {
+    exporters = exportersModule;
     const initialize = () => {
         // Defensive check for multiple critical globals that may be delayed
         // due to 'defer' execution timing variances.

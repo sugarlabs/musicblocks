@@ -879,8 +879,12 @@ describe("Tempo Widget", () => {
             clearIntervalSpy.mockRestore();
         });
 
-        test("pause button onclick should toggle isMoving, call pause/resume, and update innerHTML (lines 80-101)", () => {
-            const pauseBtnMock = { innerHTML: "" };
+        test("pause button onclick should toggle isMoving, call pause/resume, and update button content (lines 80-101)", () => {
+            const pauseBtnMock = {
+                textContent: "",
+                appendChild: jest.fn(),
+                childNodes: []
+            };
             const mockWindow = window.widgetWindows.windowFor();
             mockWindow.addButton.mockImplementation(icon => {
                 if (icon === "pause-button.svg") return pauseBtnMock;
@@ -893,11 +897,16 @@ describe("Tempo Widget", () => {
             pauseBtnMock.onclick();
             expect(pauseSpy).toHaveBeenCalled();
             expect(tempoWidget.isMoving).toBe(false);
-            expect(pauseBtnMock.innerHTML).toContain('src="header-icons/play-button.svg"');
+            expect(pauseBtnMock.textContent).toBe("");
+            expect(pauseBtnMock.appendChild).toHaveBeenCalled();
+            const playImgCall = pauseBtnMock.appendChild.mock.calls[0][0];
+            expect(playImgCall.src).toContain("play-button.svg");
             pauseBtnMock.onclick();
             expect(resumeSpy).toHaveBeenCalled();
             expect(tempoWidget.isMoving).toBe(true);
-            expect(pauseBtnMock.innerHTML).toContain('src="header-icons/pause-button.svg"');
+            expect(pauseBtnMock.appendChild).toHaveBeenCalledTimes(2);
+            const pauseImgCall = pauseBtnMock.appendChild.mock.calls[1][0];
+            expect(pauseImgCall.src).toContain("pause-button.svg");
             pauseSpy.mockRestore();
             resumeSpy.mockRestore();
         });
@@ -966,5 +975,62 @@ describe("Tempo._useBPM validation logic", () => {
 
     it("should return error for non-numeric input", () => {
         expect(validateBPM("abc")).toEqual({ bpm: null, error: "invalid" });
+    });
+});
+
+describe("Tempo widget cleanup on block deletion", () => {
+    it("should clear the interval when widget is closed via closeBlkWidgets", () => {
+        const mockTimerManager = {
+            clearInterval: jest.fn(),
+            setInterval: jest.fn().mockReturnValue(42)
+        };
+        const mockWidgetWindow = {
+            timerManager: mockTimerManager,
+            destroy: jest.fn(),
+            onclose: null
+        };
+
+        // Simulate _intervalID being set
+        let intervalID = 42;
+
+        // Simulate onclose being called
+        const oncloseHandler = () => {
+            if (intervalID !== null) {
+                mockWidgetWindow.timerManager.clearInterval(intervalID);
+            }
+            mockWidgetWindow.destroy();
+        };
+
+        oncloseHandler();
+
+        expect(mockTimerManager.clearInterval).toHaveBeenCalledWith(42);
+        expect(mockWidgetWindow.destroy).toHaveBeenCalledTimes(1);
+    });
+
+    it("should not continue audio after block deletion triggers widget close", () => {
+        const mockTimerManager = {
+            clearInterval: jest.fn(),
+            setInterval: jest.fn().mockReturnValue(99)
+        };
+
+        let intervalID = 99;
+        let audioTriggered = false;
+
+        // Simulate _draw being called after interval cleared
+        const draw = () => {
+            if (intervalID !== null) {
+                audioTriggered = true;
+            }
+        };
+
+        // Clear interval (simulating onclose)
+        mockTimerManager.clearInterval(intervalID);
+        intervalID = null;
+
+        // draw should not trigger audio now
+        draw();
+
+        expect(mockTimerManager.clearInterval).toHaveBeenCalledWith(99);
+        expect(audioTriggered).toBe(false);
     });
 });

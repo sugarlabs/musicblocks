@@ -1801,5 +1801,7 @@
   "city": "şehir",
   "day": "gün",
   "high": "yüksek",
-  "low": "Düşük"
+  "low": "Düşük",
+  "Record canvas and toolbars": "Tuvali ve araç çubuklarını kaydet",
+  "Record canvas only": "Yalnızca tuvali kaydet"
 }

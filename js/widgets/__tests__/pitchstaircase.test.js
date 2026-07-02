@@ -33,52 +33,44 @@ global.SYNTHSVG = "<svg>SVGWIDTH XSCALE STOKEWIDTH</svg>";
 global.DEFAULTVOICE = "electronic synth";
 global.frequencyToPitch = jest.fn(f => ["A", "", 4]);
 global.base64Encode = jest.fn(s => s);
+global.PREVIEWVOLUME = 0.5;
+global.normalizeNoteAccidentals = jest.fn(n => n);
+global.Singer = { masterVolume: [50] };
+global.last = arr => arr[arr.length - 1];
 
-global.window = {
-    innerWidth: 1200,
-    btoa: jest.fn(s => s),
-    widgetWindows: {
-        windowFor: jest.fn().mockReturnValue({
-            clear: jest.fn(),
-            show: jest.fn(),
-            addButton: jest.fn().mockReturnValue({ onclick: null }),
-            addInputButton: jest.fn().mockReturnValue({
-                value: "3",
-                addEventListener: jest.fn()
-            }),
-            getWidgetBody: jest.fn().mockReturnValue({
-                appendChild: jest.fn(),
-                append: jest.fn(),
+window.innerWidth = 1200;
+window.btoa = jest.fn(s => s);
+window.widgetWindows = {
+    windowFor: jest.fn().mockReturnValue({
+        clear: jest.fn(),
+        show: jest.fn(),
+        addButton: jest.fn().mockReturnValue({ onclick: null }),
+        addInputButton: jest.fn().mockReturnValue({
+            value: "3",
+            addEventListener: jest.fn()
+        }),
+        addDivider: jest.fn(),
+        getWidgetBody: jest.fn().mockReturnValue({
+            appendChild: jest.fn(),
+            append: jest.fn(),
+            style: {}
+        }),
+        sendToCenter: jest.fn(),
+        onclose: null,
+        onmaximize: null,
+        destroy: jest.fn()
+    })
+};
+
+if (typeof document !== "undefined") {
+    jest.spyOn(document, "getElementsByClassName").mockImplementation(() => {
+        return [
+            {
                 style: {}
-            }),
-            sendToCenter: jest.fn(),
-            onclose: null,
-            onmaximize: null,
-            destroy: jest.fn()
-        })
-    }
-};
-
-global.document = {
-    createElement: jest.fn(() => ({
-        style: {},
-        innerHTML: "",
-        appendChild: jest.fn(),
-        append: jest.fn(),
-        setAttribute: jest.fn(),
-        addEventListener: jest.fn(),
-        insertRow: jest.fn(() => ({
-            insertCell: jest.fn(() => ({
-                style: {},
-                innerHTML: "",
-                appendChild: jest.fn(),
-                setAttribute: jest.fn(),
-                addEventListener: jest.fn(),
-                className: ""
-            }))
-        }))
-    }))
-};
+            }
+        ];
+    });
+}
 
 describe("PitchStaircase Widget", () => {
     let psc;
@@ -275,6 +267,122 @@ describe("PitchStaircase Widget", () => {
             psc._makeStairs = jest.fn();
             psc._refresh();
             expect(psc._makeStairs).toHaveBeenCalledWith(true);
+        });
+    });
+
+    // --- init and close behavior Tests ---
+    describe("init and close behavior", () => {
+        let mockActivity;
+
+        beforeEach(() => {
+            mockActivity = {
+                logo: {
+                    synth: {
+                        setMasterVolume: jest.fn(),
+                        stop: jest.fn()
+                    }
+                },
+                textMsg: jest.fn(),
+                palettes: {
+                    dict: {}
+                }
+            };
+        });
+
+        test("should set master volume to PREVIEWVOLUME and clear/show widget window on init", () => {
+            psc.init(mockActivity);
+
+            expect(mockActivity.logo.synth.setMasterVolume).toHaveBeenCalledWith(
+                global.PREVIEWVOLUME
+            );
+            expect(psc.closed).toBe(false);
+            expect(window.widgetWindows.windowFor).toHaveBeenCalledWith(
+                psc,
+                "pitch staircase",
+                "pitch staircase",
+                true
+            );
+        });
+
+        test("should stop synth, set closed to true, and restore project master volume on close", () => {
+            psc.init(mockActivity);
+
+            const widgetWindow = window.widgetWindows.windowFor();
+            expect(widgetWindow.onclose).toBeDefined();
+
+            // Clear calls from init
+            mockActivity.logo.synth.setMasterVolume.mockClear();
+
+            widgetWindow.onclose();
+
+            expect(mockActivity.logo.synth.stop).toHaveBeenCalled();
+            expect(mockActivity.logo.synth.setMasterVolume).toHaveBeenCalledWith(
+                global.Singer.masterVolume[global.Singer.masterVolume.length - 1]
+            );
+            expect(psc.closed).toBe(true);
+            expect(widgetWindow.destroy).toHaveBeenCalled();
+        });
+    });
+
+    // --- _playNext closed guard Tests ---
+    describe("_playNext closed guard", () => {
+        test("should not trigger synth when closed is true inside _playNext setTimeout", () => {
+            jest.useFakeTimers();
+
+            // Set up stairs and stepTables so we don't throw TypeError when accessing them
+            psc.Stairs = [["A", "", 220.0]];
+            const mockCell = { classList: { add: jest.fn(), remove: jest.fn() } };
+            const mockRow = { cells: [null, mockCell] };
+            psc._stepTables = [{ rows: [mockRow] }];
+
+            psc.activity = {
+                logo: {
+                    synth: {
+                        trigger: jest.fn()
+                    }
+                }
+            };
+
+            // Call _playNext with index 0 and next 1
+            psc.closed = false;
+            psc._playNext(0, 1);
+
+            // Now close the widget before the timeout fires
+            psc.closed = true;
+
+            // Fast-forward time so the setTimeout callback runs
+            jest.advanceTimersByTime(1000);
+
+            // Assert trigger was not called
+            expect(psc.activity.logo.synth.trigger).not.toHaveBeenCalled();
+
+            jest.useRealTimers();
+        });
+
+        test("should trigger synth when closed is false inside _playNext setTimeout", () => {
+            jest.useFakeTimers();
+
+            psc.Stairs = [["A", "", 220.0]];
+            const mockCell = { classList: { add: jest.fn(), remove: jest.fn() } };
+            const mockRow = { cells: [null, mockCell] };
+            psc._stepTables = [{ rows: [mockRow] }];
+
+            psc.activity = {
+                logo: {
+                    synth: {
+                        trigger: jest.fn()
+                    }
+                }
+            };
+
+            psc.closed = false;
+            psc._playNext(0, 1);
+
+            jest.advanceTimersByTime(1000);
+
+            expect(psc.activity.logo.synth.trigger).toHaveBeenCalled();
+
+            jest.useRealTimers();
         });
     });
 });

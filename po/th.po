@@ -3053,7 +3053,7 @@ msgstr "พัก"
 #.TRANS: the note names must be separated by single spaces
 #. AUTOTRANSLATED: Google Translate
 msgid "ti la sol fa mi re do"
-msgstr ""
+msgstr "ที ลา ซอล ฟา มี เร โด"
 
 
 #: js/block.js:2832
@@ -13350,4 +13350,15 @@ msgstr "ต่ำ"
 
 #~msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">Sugar Labs Code of Conduct</a>."
 #~msgstr ""
+
+
+#: index.html (record dropdown)
+#. AUTOTRANSLATED: AI
+msgid "Record canvas and toolbars"
+msgstr "บันทึกผ้าใบและแถบเครื่องมือ"
+
+#: index.html (record dropdown)
+#. AUTOTRANSLATED: AI
+msgid "Record canvas only"
+msgstr "บันทึกเฉพาะผ้าใบ"
 

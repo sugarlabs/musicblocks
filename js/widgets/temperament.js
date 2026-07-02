@@ -162,14 +162,14 @@ function TemperamentWidget() {
         cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.style.backgroundColor = platformColor.selectorBackground;
+        cell.classList.add("temperament-selector-cell");
 
         cell.onmouseover = function () {
-            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
+            this.classList.add("temperament-selector-hover");
         };
 
         cell.onmouseout = function () {
-            this.style.backgroundColor = platformColor.selectorBackground;
+            this.classList.remove("temperament-selector-hover");
         };
 
         return cell;
@@ -1287,6 +1287,22 @@ function TemperamentWidget() {
             const recursion = docById("recursion").value;
             const len = that.frequencies.length;
             const ratio1 = input1 / input2;
+            if (
+                !isFinite(input1) ||
+                !isFinite(input2) ||
+                input1 <= 0 ||
+                input2 <= 0 ||
+                !isFinite(ratio1) ||
+                ratio1 <= 0 ||
+                ratio1 >= that.powerBase ||
+                input2 > input1 * that.powerBase
+            ) {
+                that.activity.errorMsg(
+                    _("Please enter a valid ratio (e.g. 3:2) within the octave space."),
+                    3000
+                );
+                return;
+            }
             const ratio = [];
             const frequency = [];
             const ratioDifference = [];

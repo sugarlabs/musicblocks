@@ -233,7 +233,7 @@ class AST2BlockList {
                         bodyAST,
                         pair.ast.children_properties[0]
                     )) {
-                        if (child.type != "ReturnStatement") {
+                        if (child.type !== "ReturnStatement") {
                             _createNodeAndAddToTree(child, node);
                         }
                     }
@@ -243,7 +243,7 @@ class AST2BlockList {
                             bodyAST,
                             pair.ast.children_properties[1]
                         )) {
-                            if (child.type != "ReturnStatement") {
+                            if (child.type !== "ReturnStatement") {
                                 _createNodeAndAddToTree(child, node);
                             }
                         }
@@ -541,7 +541,7 @@ class AST2BlockList {
             }
 
             function _createArgBlockAndAddToList(node, blockList, parentBlockNumber) {
-                if (node.arguments === undefined || node.arguments.length == 0) {
+                if (node.arguments === undefined || node.arguments.length === 0) {
                     return 0;
                 }
 

@@ -285,7 +285,13 @@ function LegoWidget() {
         // Add control buttons in left sidebar
         this.playButton = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
         this.playButton.onclick = () => {
-            this._playPhrase();
+            if (this.isPlaying) {
+                this._stopPlayback();
+            } else {
+                this._playPhrase();
+                const img = this.playButton.querySelector("img");
+                if (img) img.src = "header-icons/stop-button.svg";
+            }
         };
 
         this.saveButton = widgetWindow.addButton("save-button.svg", ICONSIZE, _("Save"));
@@ -1219,6 +1225,37 @@ function LegoWidget() {
             .getUserMedia({ video: true })
             .then(stream => {
                 this.webcamVideo.srcObject = stream;
+
+                const captureBtn = document.createElement("button");
+                captureBtn.textContent = " Capture";
+                captureBtn.style.cssText =
+                    "position:absolute;bottom:10px;left:50%;transform:translateX(-50%);" +
+                    "padding:8px 16px;font-size:14px;cursor:pointer;z-index:30;" +
+                    "background:#fff;border:2px solid #333;border-radius:6px;";
+                captureBtn.onclick = () => {
+                    const canvas = document.createElement("canvas");
+                    canvas.width = this.webcamVideo.videoWidth;
+                    canvas.height = this.webcamVideo.videoHeight;
+                    canvas.getContext("2d").drawImage(this.webcamVideo, 0, 0);
+                    this._stopWebcam();
+
+                    const img = document.createElement("img");
+                    img.src = canvas.toDataURL("image/png");
+                    img.style.maxWidth = "100%";
+                    img.style.maxHeight = "100%";
+                    img.style.objectFit = "contain";
+                    img.style.borderRadius = "8px";
+                    img.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
+                    this.imageWrapper.replaceChildren(img);
+                    captureBtn.remove();
+
+                    this._makeImageDraggable(this.imageWrapper);
+                    this._showZoomControls();
+                    this._drawGridLines();
+                    this.activity.textMsg(_("Photo captured"));
+                };
+                this.imageWrapper.appendChild(captureBtn);
+
                 this._makeImageDraggable(this.imageWrapper);
                 this._showZoomControls();
                 this._drawGridLines();
@@ -2414,6 +2451,11 @@ function LegoWidget() {
      */
     this._stopPlayback = function () {
         this.isPlaying = false;
+
+        this.activity.hideMsgs();
+
+        const img = this.playButton.querySelector("img");
+        if (img) img.src = "header-icons/play-button.svg";
 
         // Save final color segments for all lines
         if (this.scanningLines) {

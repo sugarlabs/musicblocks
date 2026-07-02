@@ -386,7 +386,7 @@
   "milliseconds": "மில்லி விநாடிகள்",
   "scalar interval %s": "அளவிடல் இடைவெளி %s",
   "silence": "அமைதி",
-  "ti la sol fa mi re do": "ti la sol fa mi re do",
+  "ti la sol fa mi re do": "டி லா சோல் ஃபா மி ரே டோ",
   "down": "கீழே",
   "up": "வரை",
   "Silence block cannot be removed.": "அமைதி தடையை அகற்ற முடியாது.",
@@ -1801,5 +1801,7 @@
   "city": "நகரம்",
   "day": "நாள்",
   "high": "உயர்",
-  "low": "குறைந்த"
+  "low": "குறைந்த",
+  "Record canvas and toolbars": "கருவிப்பலகை மற்றும் கருவிப்பட்டைகளை பதிவு செய்",
+  "Record canvas only": "கருவிப்பலகை மட்டும் பதிவு செய்"
 }

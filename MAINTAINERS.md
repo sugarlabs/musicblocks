@@ -1,8 +1,12 @@
 # Maintainers
 
-This file lists the current Music Blocks maintainers, Area Approvers, and
-Reviewers. See [GOVERNANCE.md](GOVERNANCE.md) for role definitions and the
-pull request flow.
+This file lists the people currently holding Music Blocks project roles.
+
+See [GOVERNANCE.md](GOVERNANCE.md) for what each role means and how pull
+requests move through review.
+
+Changes to this file should follow the role-change process in
+[GOVERNANCE.md](GOVERNANCE.md).
 
 ## Project Maintainers
 
@@ -33,6 +37,14 @@ project's test practice.
 | --- | --- |
 | Docs, Lessons & i18n | [@stutijain2006](https://github.com/stutijain2006) |
 | Blocks & Runtime | [@vanshika2720](https://github.com/vanshika2720) |
+
+## Emeritus
+
+Emeritus is a lightweight record of contributors who previously held a Project
+Maintainer, Area Approver, or Reviewer role. Emeritus contributors are not
+responsible for reviews or approvals.
+
+No emeritus contributors are listed yet.
 
 ## Areas Without an Area Approver
 

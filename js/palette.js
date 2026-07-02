@@ -61,6 +61,12 @@ const makePaletteIcons = (data, width, height) => {
 
     const img = new Image();
     img.src = src;
+    // Decorative icon: the parent element (palette tab, button, etc.)
+    // already carries an aria-label/role, so mark this image as
+    // presentational to avoid duplicate/empty announcements for
+    // screen reader users (WCAG 1.1.1 Non-text Content).
+    img.alt = "";
+    img.setAttribute("role", "presentation");
     if (width) img.width = width;
     if (height) img.height = height;
     return img;
@@ -1313,7 +1319,7 @@ class PaletteModel {
                             label = `${_("store in")} ${block.staticLabels[0]}`;
                         }
                     } else {
-                        label = block.defaults[0];
+                        label = _(block.defaults[0]);
                     }
                 } else if (protoBlock.staticLabels.length > 0) {
                     label = protoBlock.staticLabels[0];
@@ -1540,6 +1546,13 @@ class Palette {
                 this.palettes.cellSize,
                 this.palettes.cellSize
             );
+            // This icon is functional (closes the menu), not decorative,
+            // so override the default presentational/empty-alt markup
+            // applied in makePaletteIcons with a real accessible name.
+            closeImg.removeAttribute("role");
+            closeImg.alt = _("Close");
+            closeImg.setAttribute("role", "button");
+            closeImg.tabIndex = 0;
             closeImg.onclick = () => this.hideMenu();
             closeImg.onmouseover = () => (document.body.style.cursor = "pointer");
             closeImg.onmouseleave = () => (document.body.style.cursor = "default");
@@ -1966,7 +1979,11 @@ class Palette {
                 if (block.name === "print") {
                     const arg = block.connections[1];
                     if (arg !== null && arg in this.activity.blocks.blockList) {
-                        this.activity.logo.parseArg(this.activity.logo, 0, arg);
+                        try {
+                            this.activity.logo.parseArg(this.activity.logo, 0, arg);
+                        } catch (e) {
+                            // turtle not yet initialized; skip field registration
+                        }
                     }
                 }
 

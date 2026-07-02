@@ -5204,7 +5204,7 @@ msgstr "নীরবতা"
 #.TRANS: the note names must be separated by single spaces
 #. AUTOTRANSLATED: Google Translate
 msgid "ti la sol fa mi re do"
-msgstr "আমি তোমাকে একটাই দেব"
+msgstr "তি লা সোল ফা মি রে দো"
 
 
 #: js/block.js:2832
@@ -15649,4 +15649,13 @@ msgstr "কম"
 
 #~msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">Sugar Labs Code of Conduct</a>."
 #~msgstr ""
+
+
+#: index.html (record dropdown)
+msgid "Record canvas and toolbars"
+msgstr "ক্যানভাস এবং টুলবার রেকর্ড করুন"
+
+#: index.html (record dropdown)
+msgid "Record canvas only"
+msgstr "শুধুমাত্র ক্যানভাস রেকর্ড করুন"
 

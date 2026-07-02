@@ -4452,7 +4452,7 @@ msgstr ""
 #.TRANS: the note names must be separated by single spaces
 #.TRANS: the note names must be separated by single spaces
 msgid "ti la sol fa mi re do"
-msgstr ""
+msgstr "ቲ ላ ሶል ፋ ሚ ሬ ዶ"
 
 #: js/block.js:2832
 #: js/blocks/IntervalsBlocks.js:627
@@ -11979,4 +11979,15 @@ msgstr ""
 
 #~msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">Sugar Labs Code of Conduct</a>."
 #~msgstr ""
+
+
+#: index.html (record dropdown)
+#. AUTOTRANSLATED: AI
+msgid "Record canvas and toolbars"
+msgstr "ሸራውን እና የመሳሪያ አሞሌዎችን ይቅረጹ"
+
+#: index.html (record dropdown)
+#. AUTOTRANSLATED: AI
+msgid "Record canvas only"
+msgstr "ሸራውን ብቻ ይቅረጹ"
 

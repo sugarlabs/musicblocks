@@ -1,6 +1,26 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
+const { PubSub } = require("../pubsub");
+
+const activityPath = path.resolve(__dirname, "../activity.js");
+const activityCode = fs.readFileSync(activityPath, "utf8");
+
+const extractFn = (startMarker, endMarker) => {
+    const start = activityCode.indexOf(startMarker);
+    const end = activityCode.indexOf(endMarker, start);
+    return activityCode.slice(start, end).trimEnd();
+};
+
+const runProjectCode = extractFn(
+    "        this.runProject = env => {",
+    "        const standardDurations = ["
+);
+
+const loadProjectCode = extractFn(
+    "        this._loadProject = (projectID, flags) => {",
+    "        setupActivityAbcParser(this);"
+);
 
 const loadLoadStart = () => {
     const activityPath = path.resolve(__dirname, "../activity.js");
@@ -15,6 +35,7 @@ const loadLoadStart = () => {
     code += "\nthis.loadStart = loadStart;";
 
     const recoverable = jest.fn();
+    const pubsub = new PubSub();
     const sandbox = {
         ErrorHandler: {
             recoverable,
@@ -44,21 +65,24 @@ const loadLoadStart = () => {
         globalActivity: null,
         _THIS_IS_MUSIC_BLOCKS_: true,
         LEADING: 0,
-        MYDEFINES: []
+        MYDEFINES: [],
+        setupActivityAbcParser: () => {},
+        pubsub
     };
 
     vm.createContext(sandbox);
     vm.runInContext(code, sandbox);
 
-    return { loadStart: sandbox.loadStart, recoverable };
+    return { loadStart: sandbox.loadStart, recoverable, pubsub };
 };
 
 describe("Activity startup recovery", () => {
     let loadStart;
     let recoverable;
+    let pubsub;
 
     beforeAll(() => {
-        ({ loadStart, recoverable } = loadLoadStart());
+        ({ loadStart, recoverable, pubsub } = loadLoadStart());
     });
 
     afterEach(() => {
@@ -112,6 +136,87 @@ describe("Activity startup recovery", () => {
         expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
         expect(activity.update).toBe(true);
 
-        document.dispatchEvent(new Event("finishedLoading"));
+        pubsub.emit("finishedLoading");
+    });
+});
+
+describe("Activity.runProject – pubsub.off defensive unsubscribe", () => {
+    let sandbox;
+    let pubsub;
+
+    beforeEach(() => {
+        pubsub = new PubSub();
+
+        sandbox = {
+            pubsub,
+            _changeBlockVisibility: jest.fn(),
+            _doFastButton: jest.fn(),
+            setTimeout: () => {}
+        };
+        vm.createContext(sandbox);
+        vm.runInContext(runProjectCode, sandbox);
+    });
+
+    it("calls pubsub.off(finishedLoading) immediately when invoked", () => {
+        const offSpy = jest.spyOn(pubsub, "off");
+        sandbox.runProject(null);
+        expect(offSpy).toHaveBeenCalledWith("finishedLoading", expect.any(Function));
+    });
+});
+
+describe("Activity._loadProject – pubsub listener lifecycle", () => {
+    let sandbox;
+    let pubsub;
+    let fakeTimers;
+
+    beforeEach(() => {
+        pubsub = new PubSub();
+        fakeTimers = [];
+
+        sandbox = {
+            pubsub,
+            planet: {
+                getCurrentProjectName: jest.fn(() => "Test Project"),
+                openProjectFromPlanet: jest.fn(),
+                initialiseNewProject: jest.fn()
+            },
+            loadStart: jest.fn(),
+            loading: false,
+            firstRun: true,
+            update: false,
+            doLoadAnimation: jest.fn(),
+            textMsg: jest.fn(),
+            loadStartWrapper: jest.fn(),
+            _toggleCollapsibleStacks: jest.fn(),
+            _changeBlockVisibility: jest.fn(),
+            turtles: { getTurtleCount: jest.fn(() => 0) },
+            ErrorHandler: { recoverable: jest.fn(), warn: jest.fn() },
+            _: x => x,
+            document: { body: { style: { cursor: "" } } },
+            setTimeout: (fn, delay) => {
+                fakeTimers.push({ fn, delay });
+            }
+        };
+        vm.createContext(sandbox);
+        vm.runInContext(loadProjectCode, sandbox);
+    });
+
+    it("registers a finishedLoading listener before returning", () => {
+        const onSpy = jest.spyOn(pubsub, "on");
+        sandbox._loadProject("project-1");
+        expect(onSpy).toHaveBeenCalledWith("finishedLoading", expect.any(Function));
+    });
+
+    it("unregisters the finishedLoading listener after the deferred callback fires", () => {
+        sandbox._loadProject("project-1");
+        const offSpy = jest.spyOn(pubsub, "off");
+
+        pubsub.emit("finishedLoading");
+
+        const inner = fakeTimers.find(t => t.delay === 1000);
+        expect(inner).toBeDefined();
+        inner.fn();
+
+        expect(offSpy).toHaveBeenCalledWith("finishedLoading", expect.any(Function));
     });
 });

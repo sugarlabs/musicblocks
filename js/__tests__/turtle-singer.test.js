@@ -49,7 +49,7 @@ global.deepClone = value => {
 global.SEMITONES = 12;
 global.pitchToFrequency = jest.fn().mockReturnValue(440);
 global.rationalSum = jest.fn((a, b) => {
-    return [a[0] + b[0], a[1] + b[1]];
+    return [[a[0] + b[0], a[1] + b[1]], null];
 });
 
 const createTurtleMock = () => ({

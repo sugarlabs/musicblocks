@@ -91,25 +91,29 @@ class Tempo {
         pauseBtn.onclick = () => {
             if (this.isMoving) {
                 this.pause();
-                pauseBtn.innerHTML = `<img 
-                        src="header-icons/play-button.svg" 
-                        title="${_("Play")}" 
-                        alt="${_("Play")}" 
-                        height="${Tempo.ICONSIZE}" 
-                        width="${Tempo.ICONSIZE}" 
-                        vertical-align="middle"
-                    >`;
+                // Use createElement to safely update button icon
+                const playImg = document.createElement("img");
+                playImg.src = "header-icons/play-button.svg";
+                playImg.title = _("Play");
+                playImg.alt = _("Play");
+                playImg.height = Tempo.ICONSIZE;
+                playImg.width = Tempo.ICONSIZE;
+                playImg.style.verticalAlign = "middle";
+                pauseBtn.textContent = "";
+                pauseBtn.appendChild(playImg);
                 this.isMoving = false;
             } else {
                 this.resume();
-                pauseBtn.innerHTML = `<img 
-                        src="header-icons/pause-button.svg" 
-                        title="${_("Pause")}" 
-                        alt="${_("Pause")}" 
-                        height="${Tempo.ICONSIZE}" 
-                        width="${Tempo.ICONSIZE}" 
-                        vertical-align="middle"
-                    >`;
+                // Use createElement to safely update button icon
+                const pauseImg = document.createElement("img");
+                pauseImg.src = "header-icons/pause-button.svg";
+                pauseImg.title = _("Pause");
+                pauseImg.alt = _("Pause");
+                pauseImg.height = Tempo.ICONSIZE;
+                pauseImg.width = Tempo.ICONSIZE;
+                pauseImg.style.verticalAlign = "middle";
+                pauseBtn.textContent = "";
+                pauseBtn.appendChild(pauseImg);
                 this.isMoving = true;
             }
         };
@@ -185,7 +189,7 @@ class Tempo {
                 if (this._firstClickTime === null) {
                     this._firstClickTime = d.getTime();
                 } else {
-                    newBPM = parseInt((60 * 1000) / (d.getTime() - this._firstClickTime));
+                    newBPM = parseInt((60 * 1000) / (d.getTime() - this._firstClickTime), 10);
                     if (newBPM > 29 && newBPM < 1001) {
                         this.BPMs[id] = newBPM;
                         this._updateBPM(id);

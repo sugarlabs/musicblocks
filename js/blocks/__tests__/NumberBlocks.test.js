@@ -154,7 +154,7 @@ global.MathUtility = {
     doMinus: (a, b) => Number(a) - Number(b)
 };
 
-global.calcOctave = (currentOctave, val, lastNote, noteValue) => currentOctave + parseInt(val);
+global.calcOctave = (currentOctave, val, lastNote, noteValue) => currentOctave + parseInt(val, 10);
 
 global.toFixed2 = val => Number(val).toFixed(2);
 

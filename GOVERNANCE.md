@@ -92,27 +92,75 @@ infrastructure go to Tests & CI.
 
 ## Role Growth and Changes
 
-Contributors may become Reviewers after making useful reviews or contributions
-in an area over time. Reviewers should understand the area well enough to help
-contributors and give practical feedback.
+The role lists can change as contributors take on new responsibilities or step
+back from active work. Role changes should be public, lightweight, and based on
+visible project work.
 
-Reviewers may become Area Approvers after showing sound judgment in an area and
-a willingness to help move pull requests forward. Area Approvers should
-understand how changes in their area affect the rest of the project.
+### Quick reference
 
-Role changes are made through a pull request that updates
-[MAINTAINERS.md](MAINTAINERS.md). Adding or removing an Area Approver also
-requires an update to [CODEOWNERS](.github/CODEOWNERS), and repository write
-access must be granted before the person is added to CODEOWNERS.
+| Role change | Files to edit | Ask for review from | Adds merge authority? |
+| --- | --- | --- | --- |
+| Add or remove a Reviewer | [MAINTAINERS.md](MAINTAINERS.md) | A Project Maintainer; Area Approvers for the area, if any | No |
+| Add or remove an Area Approver | [MAINTAINERS.md](MAINTAINERS.md) and [CODEOWNERS](.github/CODEOWNERS) | A Project Maintainer; other Area Approvers for the area, if any | Yes, after write access and CODEOWNERS are in place |
+| Add or remove a Project Maintainer | [MAINTAINERS.md](MAINTAINERS.md); [CODEOWNERS](.github/CODEOWNERS) when ownership changes | Current Project Maintainers not being changed | Yes, for additions |
+| Move someone to emeritus | [MAINTAINERS.md](MAINTAINERS.md); [CODEOWNERS](.github/CODEOWNERS) if they are an Area Approver | Use the row above for the role they are leaving | No |
 
-A Project Maintainer approves role changes. It is fine for an area to start
-with one Area Approver, but important areas should grow toward at least two
-active Area Approvers when contributor capacity allows.
+### Making a role-change pull request
 
-Area Approvers should be reasonably responsive when available. If someone is no
-longer active in an area, they may move to emeritus status or be removed from
-CODEOWNERS. Emergency access removal may happen immediately and should be
-documented in a follow-up pull request.
+A role-change pull request may be opened by the contributor, an Area Approver,
+or a Project Maintainer. Keep the pull request focused on the role change.
+
+1. Edit the files listed in the quick reference table.
+2. Open a focused pull request with a direct title, such as "Add Reviewer for
+   Blocks & Runtime" or "Move Area Approver to emeritus".
+3. In the description, name the person, role, area, and whether this is an
+   addition, removal, or move to emeritus. For additions, include a few links to
+   relevant work, such as reviews, merged pull requests, testing, issue
+   discussion, documentation, or community help.
+4. For additions, ask the person being added to confirm that they are willing
+   to take the role. A short comment such as "I am willing to take this role"
+   is enough.
+5. Manually request review from the people listed in the quick reference table.
+
+GitHub may only request the owners of the governance files being edited, not
+the Area Approvers for the affected area. The pull request author should check
+the table above and request those reviewers directly.
+
+### Review and merge
+
+Role-change pull requests use normal GitHub review, not a separate voting
+process. They may be merged when the relevant checks are done:
+
+- for additions, the person being added has confirmed that they are willing to
+  take the role;
+- at least one current Project Maintainer who is not being added or removed has
+  approved;
+- for Reviewer and Area Approver changes, an Area Approver for that area has
+  approved, if the area has one who is not being changed; and
+- open concerns from Project Maintainers and relevant Area Approvers have been
+  answered.
+
+If the area does not have an Area Approver yet, a Project Maintainer handles
+the role change.
+
+### Role notes
+
+Reviewers are listed in [MAINTAINERS.md](MAINTAINERS.md). They do not get merge
+authority and are not added to [CODEOWNERS](.github/CODEOWNERS).
+
+Area Approvers are listed in [MAINTAINERS.md](MAINTAINERS.md) and
+[CODEOWNERS](.github/CODEOWNERS). Repository write access must be granted before
+the CODEOWNERS change becomes active. It is fine for an area to start with one
+Area Approver, but important areas should grow toward at least two active Area
+Approvers when contributor capacity allows.
+
+Emeritus status records that someone previously held a project role. It does
+not make them responsible for reviews, and it does not count as CODEOWNERS
+approval. Area Approvers who are unavailable for a long time should be removed
+from CODEOWNERS so pull requests do not get blocked.
+
+Emergency access removal may happen immediately and should be documented in a
+follow-up pull request.
 
 ## GitHub Permissions
 

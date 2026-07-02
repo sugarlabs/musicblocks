@@ -386,7 +386,7 @@
   "milliseconds": "毫秒",
   "scalar interval %s": "标量间隔 %s",
   "silence": "沉默",
-  "ti la sol fa mi re do": "ti la sol fa mi re do",
+  "ti la sol fa mi re do": "西 拉 梭 发 咪 来 多",
   "down": "向下",
   "up": "向上",
   "Silence block cannot be removed.": "无法移除静音模块",
@@ -1801,5 +1801,7 @@
   "city": "城市",
   "day": "天",
   "high": "高",
-  "low": "低"
+  "low": "低",
+  "Record canvas and toolbars": "录制画布和工具栏",
+  "Record canvas only": "仅录制画布"
 }

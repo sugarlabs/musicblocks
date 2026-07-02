@@ -132,7 +132,7 @@ class PitchSlider {
             const freqLabel = document.createElement("div");
             freqLabel.className = "wfbtItem";
             toolBarDiv.appendChild(freqLabel);
-            freqLabel.innerHTML = `<label>${parseFloat(this.frequencies[id].toFixed(2))}</label>`;
+            freqLabel.textContent = parseFloat(this.frequencies[id].toFixed(2));
 
             this.sliders[id] = slider;
             const changeFreq = () => {
@@ -141,9 +141,7 @@ class PitchSlider {
                     this.frequencies[id],
                     Tone.now() + 0.05
                 );
-                freqLabel.innerHTML = `<label>${parseFloat(
-                    this.frequencies[id].toFixed(2)
-                )}</label>`;
+                freqLabel.textContent = parseFloat(this.frequencies[id].toFixed(2));
             };
 
             slider.oninput = () => {

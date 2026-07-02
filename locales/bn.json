@@ -386,7 +386,7 @@
   "milliseconds": "মিলিসেকেন্ড",
   "scalar interval %s": "স্কেলার ব্যবধান %s",
   "silence": "নীরবতা",
-  "ti la sol fa mi re do": "আমি তোমাকে একটাই দেব",
+  "ti la sol fa mi re do": "তি লা সোল ফা মি রে দো",
   "down": "নিচে",
   "up": "আপ",
   "Silence block cannot be removed.": "নীরবতা ব্লক সরানো যাবে না.",
@@ -1801,5 +1801,7 @@
   "city": "শহর",
   "day": "দিন",
   "high": "উচ্চ",
-  "low": "কম"
+  "low": "কম",
+  "Record canvas and toolbars": "ক্যানভাস এবং টুলবার রেকর্ড করুন",
+  "Record canvas only": "শুধুমাত্র ক্যানভাস রেকর্ড করুন"
 }

@@ -386,7 +386,7 @@
   "milliseconds": "milliseconds",
   "scalar interval %s": "scalar interval %s",
   "silence": "silence",
-  "ti la sol fa mi re do": "ti la sol fa mi re do",
+  "ti la sol fa mi re do": "си ля соль фа ми ре до",
   "down": "down",
   "up": "up",
   "Silence block cannot be removed.": "Silence block cannot be removed.",
@@ -1801,5 +1801,7 @@
   "city": "city",
   "day": "day",
   "high": "high",
-  "low": "low"
+  "low": "low",
+  "Record canvas and toolbars": "Запись холста и панелей инструментов",
+  "Record canvas only": "Запись только холста"
 }

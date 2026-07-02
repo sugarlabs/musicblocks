@@ -386,7 +386,7 @@
   "milliseconds": "밀리초",
   "scalar interval %s": "스칼라 간격 %s",
   "silence": "고요",
-  "ti la sol fa mi re do": "하나만 줄게",
+  "ti la sol fa mi re do": "시 라 솔 파 미 레 도",
   "down": "아래에",
   "up": "위로",
   "Silence block cannot be removed.": "침묵 차단은 제거할 수 없습니다.",
@@ -1801,5 +1801,7 @@
   "city": "도시",
   "day": "낮",
   "high": "높은",
-  "low": "낮은"
+  "low": "낮은",
+  "Record canvas and toolbars": "캔버스와 툴바 녹화",
+  "Record canvas only": "캔버스만 녹화"
 }
