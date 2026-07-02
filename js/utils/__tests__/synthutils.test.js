@@ -348,6 +348,32 @@ describe("Utility Functions (logic-only)", () => {
             // The test is checking for behavior that's been modified
         });
 
+        test("should use triggerAttackRelease for the first glide note and setNote for later notes", async () => {
+            instruments[turtle] = instruments[turtle] || {};
+            instruments[turtle]["glide synth"] = {
+                toDestination() {
+                    return this;
+                },
+                triggerAttackRelease: jest.fn(),
+                setNote: jest.fn()
+            };
+            instrumentsSource["glide synth"] = [0, "glide synth"];
+
+            await trigger(turtle, "C4", beatValue, "glide synth", null, null, false, 0);
+            expect(instruments[turtle]["glide synth"].triggerAttackRelease).toHaveBeenCalledWith(
+                "C4",
+                beatValue,
+                0
+            );
+            expect(instruments[turtle]["glide synth"].setNote).not.toHaveBeenCalled();
+
+            instruments[turtle]["glide synth"].triggerAttackRelease.mockClear();
+
+            await trigger(turtle, "D4", beatValue, "glide synth", null, null, true, 0);
+            expect(instruments[turtle]["glide synth"].setNote).toHaveBeenCalledWith("D4");
+            expect(instruments[turtle]["glide synth"].triggerAttackRelease).not.toHaveBeenCalled();
+        });
+
         test("should ignore effects for basic waveform instruments", () => {
             const mockPerformNotes = jest.fn();
 

@@ -428,6 +428,9 @@ function setupOrnamentBlocks(activity) {
                 }
 
                 tur.singer.glide.pop();
+                // Ensure glideOverride is cleared when the glide ends so it
+                // doesn't persist across subsequent, unrelated notes.
+                tur.singer.glideOverride = 0;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
