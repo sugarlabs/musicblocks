@@ -778,7 +778,7 @@ class Singer {
                     turtle,
                     note,
                     octave,
-                    parseInt(tur.singer.neighborStepPitch)
+                    parseInt(tur.singer.neighborStepPitch, 10)
                 );
                 if (tur.singer.transposition !== 0) {
                     noteObj2 = getNote(
@@ -796,7 +796,7 @@ class Singer {
                 noteObj2 = getNote(
                     note,
                     octave,
-                    tur.singer.transposition + parseInt(tur.singer.neighborStepPitch),
+                    tur.singer.transposition + parseInt(tur.singer.neighborStepPitch, 10),
                     tur.singer.keySignature,
                     tur.singer.movable,
                     null,
@@ -2213,7 +2213,7 @@ class Singer {
                         if (typeof notes[0] === "number") {
                             tur.singer.currentOctave = frequencyToPitch(notes[0])[1];
                         } else {
-                            tur.singer.currentOctave = parseInt(notes[0].slice(len - 1));
+                            tur.singer.currentOctave = parseInt(notes[0].slice(len - 1), 10);
                         }
                         tur.singer.currentCalculatedOctave = tur.singer.currentOctave;
 

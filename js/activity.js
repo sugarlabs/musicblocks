@@ -2340,9 +2340,6 @@ class Activity {
          */
         this.showSearchWidget = () => this.searchController.showSearchWidget();
 
-        /*
-         * Uses JQuery to add autocompleted search suggestions
-         */
         this.doSearch = () => this.searchController.doSearch();
 
         //To create a sampler widget
@@ -6284,7 +6281,7 @@ class Activity {
                                     getJSON(url).then(
                                         data => {
                                             const n = data.arg;
-                                            env.push(parseInt(n));
+                                            env.push(parseInt(n, 10));
                                         },
                                         () => {
                                             alert(
