@@ -131,7 +131,7 @@
   height: 50px;
   margin: 2px;
   transition: background-color 300ms;
-  background-color: #8cc6ff;
+  background-color: var(--pc-widgetButton);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -139,7 +139,7 @@
 }
 
 .wfbtItem:hover {
-  background-color: #7bb5ee;
+  background-color: var(--pc-widgetButtonSelect);
 }
 
 .wfbtItem > input {
