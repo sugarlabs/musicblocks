@@ -28,6 +28,13 @@ const _paletteIconCache = new Map();
 
 const PALETTE_SCALE_FACTOR = 0.5;
 const PALETTE_WIDTH_FACTOR = 3;
+const getPaletteLocalStorageValue = key => {
+    try {
+        return localStorage[key];
+    } catch (e) {
+        return undefined;
+    }
+};
 
 const paletteBlockButtonPush = (blocks, name, arg) => {
     const blk = blocks.makeBlock(name, arg);
@@ -896,7 +903,8 @@ class Palettes {
         label.textContent = toTitleCase(_(name));
         label.style.color = platformColor.paletteText;
         row.style.borderBottom = "1px solid #0CAFFF";
-        label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
+        label.style.fontSize =
+            getPaletteLocalStorageValue("kanaPreference") === "kana" ? "12px" : "16px";
         label.style.padding = "4px";
         row.style.display = "flex";
         row.style.flexDirection = "row";
@@ -936,7 +944,8 @@ class Palettes {
         img.style.height = `${this.cellSize}px`;
         label.textContent = toTitleCase(_(name));
         label.style.color = platformColor.paletteText;
-        label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
+        label.style.fontSize =
+            getPaletteLocalStorageValue("kanaPreference") === "kana" ? "12px" : "16px";
         label.style.padding = "4px";
         row.style.display = "flex";
         row.style.flexDirection = "row";
