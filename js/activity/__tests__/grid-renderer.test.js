@@ -310,10 +310,17 @@ describe.each([
         const renderer = new GridRenderer(activity);
         activity[staffName + "Bitmap"].visible = true;
 
+        // Pre-set some accidentals visible to verify hideAccidentals delegation
+        activity[staffName + "SharpBitmap"][0].visible = true;
+        activity[staffName + "FlatBitmap"][0].visible = true;
+
         renderer["hide" + _label]();
 
         expect(activity[staffName + "Bitmap"].visible).toBe(false);
         expect(activity[staffName + "Bitmap"].uncache).toHaveBeenCalled();
+        // Verify hideAccidentals was called (delegation check)
+        expect(activity[staffName + "SharpBitmap"][0].visible).toBe(false);
+        expect(activity[staffName + "FlatBitmap"][0].visible).toBe(false);
         expect(activity.update).toBe(true);
     });
 });
@@ -330,11 +337,14 @@ describe("_showStaff accidental handling", () => {
         const activity = makeActivity();
         const renderer = new GridRenderer(activity);
 
+        // Pre-set to verify the code actually changes visibility
+        activity.trebleSharpBitmap[1].visible = true;
+
         renderer.showTreble();
 
         // F♯ is the first sharp in the sharps order, so trebleSharpBitmap[0]
         expect(activity.trebleSharpBitmap[0].visible).toBe(true);
-        // Other sharps should stay hidden
+        // Other sharps should be hidden (hideAccidentals resets them)
         expect(activity.trebleSharpBitmap[1].visible).toBe(false);
     });
 
@@ -345,11 +355,14 @@ describe("_showStaff accidental handling", () => {
         const activity = makeActivity();
         const renderer = new GridRenderer(activity);
 
+        // Pre-set to verify the code actually changes visibility
+        activity.grandFlatBitmap[1].visible = true;
+
         renderer.showGrand();
 
         // B♭ is the first flat in the flats order, so grandFlatBitmap[0]
         expect(activity.grandFlatBitmap[0].visible).toBe(true);
-        // Other flats should stay hidden
+        // Other flats should be hidden (hideAccidentals resets them)
         expect(activity.grandFlatBitmap[1].visible).toBe(false);
     });
 
@@ -374,6 +387,12 @@ describe("_showStaff accidental handling", () => {
 
         const activity = makeActivity();
         const renderer = new GridRenderer(activity);
+
+        // Pre-set all accidentals visible to prove they get hidden
+        for (let i = 0; i < 7; i++) {
+            activity.trebleSharpBitmap[i].visible = true;
+            activity.trebleFlatBitmap[i].visible = true;
+        }
 
         renderer.showTreble();
 
