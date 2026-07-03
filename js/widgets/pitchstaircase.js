@@ -303,6 +303,19 @@ class PitchStaircase {
      * @returns {void}
      */
     _playOne(stepCell, img, rowIndex) {
+        const isPlaying = rowIndex !== undefined && !!this._playTimers[rowIndex];
+
+        if (isPlaying) {
+            clearTimeout(this._playTimers[rowIndex]);
+            this._playTimers[rowIndex] = null;
+            stepCell.classList.remove("active");
+            stepCell.style.backgroundColor = platformColor.selectorBackground;
+            if (img) {
+                img.src = "header-icons/play-button.svg";
+            }
+            this.activity.logo.synth.stopSound(0, DEFAULTVOICE);
+            return;
+        }
         // The frequency is stored in the stepCell.
         stepCell.classList.add("active");
         stepCell.style.backgroundColor = platformColor.selectorBackgroundHOVER;
@@ -341,6 +354,13 @@ class PitchStaircase {
         const pitchnotes = [];
 
         for (let i = 0; i < this.Stairs.length; i++) {
+            // Cancel any pending single-row timer so it can't prematurely
+            // strip this row's highlight/icon mid-chord.
+            if (this._playTimers[i]) {
+                clearTimeout(this._playTimers[i]);
+                this._playTimers[i] = null;
+            }
+
             const note = this.Stairs[i][0] + this.Stairs[i][1];
             pitchnotes.push(normalizeNoteAccidentals(note));
             const stepCell = this._stepTables[i].rows[0].cells[1];
