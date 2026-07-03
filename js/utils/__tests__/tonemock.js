@@ -150,6 +150,16 @@ class context {
 class Transport {
     static start() {}
     static stop() {}
+    static schedule() {}
+    static cancel() {}
+    static clear() {}
+    static getSecondsAtTime() {
+        return 0;
+    }
+    static get seconds() {
+        return 0;
+    }
+    static set seconds(value) {}
 }
 
 class ToneAudioBuffer {

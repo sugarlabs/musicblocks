@@ -39,11 +39,15 @@ global.createjs = {
         cache: jest.fn(),
         updateCache: jest.fn(),
         uncache: jest.fn(),
+        bitmapCache: { getCacheDataURL: jest.fn().mockReturnValue("cached-data-url") },
         visible: true,
         children: []
     })),
-    Bitmap: jest.fn().mockImplementation(() => ({
+    Bitmap: jest.fn().mockImplementation(image => ({
         visible: true,
+        scaleX: 1,
+        scaleY: 1,
+        image: image,
         getBounds: jest.fn().mockReturnValue({ x: 0, y: 0, width: 50, height: 50 })
     })),
     Text: jest.fn().mockImplementation(() => ({
@@ -333,6 +337,72 @@ describe("Block Foundation", () => {
                 );
                 generateSpy.mockRestore();
             });
+        });
+    });
+
+    describe("loadThumbnail()", () => {
+        let block;
+        let mockImageInstance;
+        let originalImage;
+
+        beforeEach(() => {
+            block = new Block(mockProtoBlock, mockBlocks);
+            block.blockIndex = 0;
+            block.blocks.blockList = [{ value: null }];
+            block.removeChildBitmap = jest.fn();
+            block._positionMedia = jest.fn();
+            block.container = new global.createjs.Container();
+            block.updateCache = jest.fn();
+
+            originalImage = global.Image;
+            global.Image = jest.fn(() => {
+                mockImageInstance = {
+                    src: "",
+                    width: 100,
+                    height: 100,
+                    naturalWidth: 100,
+                    naturalHeight: 100,
+                    onload: null
+                };
+                return mockImageInstance;
+            });
+        });
+
+        afterEach(() => {
+            global.Image = originalImage;
+        });
+
+        it("should preserve GIF animation for data URI", () => {
+            block.loadThumbnail("data:image/gif;base64,R0lGODlh");
+            expect(mockImageInstance.onload).not.toBeNull();
+            mockImageInstance.onload();
+
+            expect(block.value).toBe("data:image/gif;base64,R0lGODlh");
+            expect(block.imageBitmap).toBeDefined();
+        });
+
+        it("should preserve GIF animation for URL ending in .gif", () => {
+            block.loadThumbnail("http://example.com/image.gif");
+            mockImageInstance.onload();
+
+            expect(block.value).toBe("http://example.com/image.gif");
+        });
+
+        it("should fallback to manual bounds calculation if getBounds returns falsy", () => {
+            const mockCache = jest.fn();
+            global.createjs.Container.mockImplementationOnce(() => ({
+                addChild: jest.fn(),
+                removeChild: jest.fn(),
+                getBounds: jest.fn().mockReturnValue(null),
+                cache: mockCache,
+                bitmapCache: { getCacheDataURL: jest.fn().mockReturnValue("fallback-cached") }
+            }));
+
+            block.loadThumbnail("http://example.com/image.png");
+            mockImageInstance.onload();
+
+            expect(mockCache).toHaveBeenCalledWith(0, 0, 100, 100);
+            expect(block.value).toBe("fallback-cached");
         });
     });
 });

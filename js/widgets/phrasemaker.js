@@ -4146,9 +4146,9 @@ class PhraseMaker {
 
             const __mouseUpHandler = event => {
                 this._mouseUpCell = event.target;
-                if (this._mouseDownCell !== this._mouseUpCell) {
+                if (this._mouseDownCell && this._mouseDownCell !== this._mouseUpCell) {
                     this._tieNotes(this._mouseDownCell, this._mouseUpCell);
-                } else {
+                } else if (this._mouseDownCell) {
                     const nodes = Array.prototype.slice.call(event.target.parentElement.children);
                     this._createpiesubmenu(
                         nodes.indexOf(event.target),
