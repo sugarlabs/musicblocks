@@ -254,7 +254,7 @@ class MathUtility {
                 return 0;
             }
 
-            return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+            return Math.hypot(x1 - x2, y1 - y2);
         } else {
             throw new Error("NanError");
         }
