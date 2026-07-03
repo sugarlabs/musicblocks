@@ -688,8 +688,8 @@ class SVG {
      */
     _doInnie() {
         this.docks.push([
-            (this._x + this._strokeWidth) * this._scale,
-            (this._y + this._innieY2) * this._scale
+            Math.floor((this._x + this._strokeWidth) * this._scale + 0.5),
+            Math.floor((this._y + this._innieY2) * this._scale + 0.5)
         ]);
         if (this.margins[2] === 0) {
             this.margins[1] = (this._y - this._innieY1) * this._scale;
@@ -717,7 +717,10 @@ class SVG {
             return this._rLineTo(0, -this._innieY2);
         }
         // Outie needs to be the first dock element.
-        this.docks.unshift([this._x * this._scale, this._y * this._scale]);
+        this.docks.unshift([
+            Math.floor(this._x * this._scale + 0.5),
+            Math.floor(this._y * this._scale + 0.5)
+        ]);
         return (
             this._rLineTo(0, -this._strokeWidth) +
             this._rLineTo(-this._innieX1 - 2 * this._strokeWidth, 0) +
@@ -738,14 +741,20 @@ class SVG {
     _doSlot() {
         // let x;
         if (this._slot) {
-            this.docks.push([(this._x + this._slotX / 2.0) * this._scale, this._y * this._scale]);
+            this.docks.push([
+                Math.floor((this._x + this._slotX / 2.0) * this._scale + 0.5),
+                Math.floor(this._y * this._scale + 0.5)
+            ]);
             return (
                 this._rLineTo(0, this._slotY) +
                 this._rLineTo(this._slotX, 0) +
                 this._rLineTo(0, -this._slotY)
             );
         } else if (this._cap) {
-            this.docks.push([(this._x + this._slotX / 2.0) * this._scale, this._y * this._scale]);
+            this.docks.push([
+                Math.floor((this._x + this._slotX / 2.0) * this._scale + 0.5),
+                Math.floor(this._y * this._scale + 0.5)
+            ]);
             return (
                 this._rLineTo(this._slotX / 2.0, -this._slotY * 3.0) +
                 this._rLineTo(this._slotX / 2.0, this._slotY * 3.0)
@@ -763,7 +772,10 @@ class SVG {
         if (this._outie) {
             return this._rLineTo(-this._slotX, 0);
         } else if (this._tail) {
-            this.docks.push([(this._x + this._slotX / 2.0) * this._scale, this._y * this._scale]);
+            this.docks.push([
+                Math.floor((this._x + this._slotX / 2.0) * this._scale + 0.5),
+                Math.floor(this._y * this._scale + 0.5)
+            ]);
             return (
                 this._rLineTo(-this._slotX / 2.0, this._slotY * 3.0) +
                 this._rLineTo(-this._slotX / 2.0, -this._slotY * 3.0)
@@ -782,8 +794,8 @@ class SVG {
             return this._rLineTo(-this._slotX, 0);
         }
         this.docks.push([
-            (this._x - this._slotX / 2.0) * this._scale,
-            (this._y + this._strokeWidth) * this._scale
+            Math.floor((this._x - this._slotX / 2.0) * this._scale + 0.5),
+            Math.floor((this._y + this._strokeWidth) * this._scale + 0.5)
         ]);
         return (
             this._rLineTo(-this._strokeWidth, 0) +
@@ -823,7 +835,10 @@ class SVG {
     _startBoolean(xoffset, yoffset) {
         let svg = this._newPath(xoffset, yoffset); // - this._radius);
         this._radius -= this._strokeWidth;
-        this.docks.push([this._x * this._scale, this._y * this._scale]);
+        this.docks.push([
+            Math.floor(this._x * this._scale + 0.5),
+            Math.floor(this._y * this._scale + 0.5)
+        ]);
         svg += this._rarcTo(1, -1, 90, 0, 1);
         this._radius += this._strokeWidth;
         svg += this._rLineTo(this._strokeWidth, 0);
@@ -837,8 +852,8 @@ class SVG {
      */
     _doBoolean() {
         this.docks.push([
-            (this._x - this._radius + this._strokeWidth) * this._scale,
-            (this._y + this._radius) * this._scale
+            Math.floor((this._x - this._radius + this._strokeWidth) * this._scale + 0.5),
+            Math.floor((this._y + this._radius) * this._scale + 0.5)
         ]);
         this.margins[2] = (this._x - this._radius - this._strokeWidth) * this._scale;
         return this._rarcTo(-1, 1, 90, 0, 0) + this._rarcTo(1, 1, 90, 0, 0);
@@ -1366,7 +1381,10 @@ class SVG {
         let svg = '<g transform="matrix(1,0,0,1,0,-' + yoff + ')"> ';
 
         svg += this._newPath(xoffset, yoffset + this._radius);
-        this.docks.push([this._x * this._scale, (this._y - 2 * this._radius) * this._scale]);
+        this.docks.push([
+            Math.floor(this._x * this._scale + 0.5),
+            Math.floor((this._y - 2 * this._radius) * this._scale + 0.5)
+        ]);
         this._radius -= this._strokeWidth;
         svg += this._rarcTo(1, -1, 90, 0, 1);
         this._radius += this._strokeWidth;
