@@ -208,7 +208,7 @@ describe("MusicBlocks Application", () => {
                 expect(ctx.state).to.eq("running");
             });
 
-            cy.get("#stop").click();
+            cy.get("#stop").should("be.visible").click();
 
             cy.window().then(win => {
                 const ctx = win.Tone.context;
