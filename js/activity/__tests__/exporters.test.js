@@ -453,6 +453,9 @@ describe("printBlockSVG", () => {
 
         // Collapsible blocks get extra <g> wrappers and button art
         expect(decoded).toContain("scale(0.5 0.5)");
+        // Should contain COLLAPSEBUTTON parts (since collapsed=false)
+        expect(decoded).toContain("circle");
+        expect(decoded).toContain("line");
     });
 
     test("collapsible block uses EXPANDBUTTON when collapsed", () => {
@@ -476,8 +479,10 @@ describe("printBlockSVG", () => {
         const result = printBlockSVG(activity);
         const decoded = decodeURIComponent(result);
 
-        // When collapsed, uses EXPANDBUTTON parts
+        // When collapsed, uses EXPANDBUTTON parts (rect + path)
         expect(decoded).toContain("scale(0.5 0.5)");
+        expect(decoded).toContain("rect");
+        expect(decoded).toContain("path");
     });
 
     test("INLINECOLLAPSIBLES use y + 4 offset, others use y + 12", () => {
@@ -577,8 +582,14 @@ describe("printBlockSVG", () => {
         const decoded = decodeURIComponent(result);
 
         // The 11th start block (index 10) should wrap to FILLCOLORS[0]
-        // This is verified by having no errors and the SVG containing the first color again
-        expect(decoded).toContain(FILLCOLORS[0]);
+        // Count occurrences of FILLCOLORS[0] — should appear at least twice
+        // (once for block 0, once for block 10 after wrap)
+        const fillMatches = decoded.match(
+            new RegExp(FILLCOLORS[0].replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g")
+        );
+        expect(fillMatches.length).toBeGreaterThanOrEqual(2);
+        // Also verify the second-to-last start uses FILLCOLORS[9]
+        expect(decoded).toContain(FILLCOLORS[9]);
     });
 
     test("encodes SVG parts as URI component in the output", () => {
@@ -644,10 +655,40 @@ describe("printBlockSVG", () => {
 // ===========================================================================
 
 describe("printBlockPNG", () => {
-    test("returns a PNG data URL from block SVG content", async () => {
-        // printBlockPNG relies on Image, canvas, and Blob which are limited
-        // in jsdom. We need to mock URL.createObjectURL and Image loading.
+    // Shared mock state for PNG tests
+    let originalCreateObjectURL;
+    let originalRevokeObjectURL;
+    let originalImage;
+    let originalToDataURL;
+    let mockDrawImage;
+    const mockUrl = "blob:mock-url";
 
+    beforeEach(() => {
+        originalCreateObjectURL = URL.createObjectURL;
+        originalRevokeObjectURL = URL.revokeObjectURL;
+        originalImage = global.Image;
+        originalToDataURL = HTMLCanvasElement.prototype.toDataURL;
+
+        URL.createObjectURL = jest.fn(() => mockUrl);
+        URL.revokeObjectURL = jest.fn();
+        HTMLCanvasElement.prototype.toDataURL = jest.fn(() => "data:image/png;base64,mockdata");
+        mockDrawImage = jest.fn();
+
+        // Override getContext to return a ctx with a mock drawImage
+        HTMLCanvasElement.prototype.getContext = jest.fn(() => ({
+            drawImage: mockDrawImage
+        }));
+    });
+
+    afterEach(() => {
+        URL.createObjectURL = originalCreateObjectURL;
+        URL.revokeObjectURL = originalRevokeObjectURL;
+        global.Image = originalImage;
+        HTMLCanvasElement.prototype.toDataURL = originalToDataURL;
+        delete HTMLCanvasElement.prototype.getContext;
+    });
+
+    test("returns a PNG data URL from block SVG content", async () => {
         const blockSVG =
             '<svg xmlns="http://www.w3.org/2000/svg"><rect width="50" height="30"/></svg>';
         const block = makeBlock({ x: 0, y: 0, width: 50, height: 30 });
@@ -655,44 +696,26 @@ describe("printBlockPNG", () => {
             blockArt: { 0: blockSVG }
         });
 
-        // Mock URL.createObjectURL / revokeObjectURL
-        const mockUrl = "blob:mock-url";
-        const originalCreateObjectURL = URL.createObjectURL;
-        const originalRevokeObjectURL = URL.revokeObjectURL;
-        URL.createObjectURL = jest.fn(() => mockUrl);
-        URL.revokeObjectURL = jest.fn();
-
         // Mock Image to trigger onload synchronously
-        const originalImage = global.Image;
         global.Image = class {
             constructor() {
                 this.onload = null;
                 this.onerror = null;
             }
             set src(_val) {
-                // Trigger onload in the next microtask
                 setTimeout(() => {
                     if (this.onload) this.onload();
                 }, 0);
             }
         };
 
-        // Mock canvas.toDataURL
-        const mockCanvas = document.createElement("canvas");
-        const originalToDataURL = mockCanvas.toDataURL;
-        HTMLCanvasElement.prototype.toDataURL = jest.fn(() => "data:image/png;base64,mockdata");
-
         const result = await printBlockPNG(activity);
 
         expect(result).toBe("data:image/png;base64,mockdata");
         expect(URL.createObjectURL).toHaveBeenCalled();
         expect(URL.revokeObjectURL).toHaveBeenCalledWith(mockUrl);
-
-        // Restore
-        URL.createObjectURL = originalCreateObjectURL;
-        URL.revokeObjectURL = originalRevokeObjectURL;
-        global.Image = originalImage;
-        HTMLCanvasElement.prototype.toDataURL = originalToDataURL;
+        // Verify ctx.drawImage was called to render the image onto canvas
+        expect(mockDrawImage).toHaveBeenCalled();
     });
 
     test("rejects when image loading fails", async () => {
@@ -703,13 +726,6 @@ describe("printBlockPNG", () => {
             blockArt: { 0: blockSVG }
         });
 
-        const mockUrl = "blob:mock-url";
-        const originalCreateObjectURL = URL.createObjectURL;
-        const originalRevokeObjectURL = URL.revokeObjectURL;
-        URL.createObjectURL = jest.fn(() => mockUrl);
-        URL.revokeObjectURL = jest.fn();
-
-        const originalImage = global.Image;
         const mockError = new Error("Image load failed");
         global.Image = class {
             constructor() {
@@ -725,10 +741,5 @@ describe("printBlockPNG", () => {
 
         await expect(printBlockPNG(activity)).rejects.toThrow("Image load failed");
         expect(URL.revokeObjectURL).toHaveBeenCalledWith(mockUrl);
-
-        // Restore
-        URL.createObjectURL = originalCreateObjectURL;
-        URL.revokeObjectURL = originalRevokeObjectURL;
-        global.Image = originalImage;
     });
 });
