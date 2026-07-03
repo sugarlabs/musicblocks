@@ -28,7 +28,7 @@
 }
 
 #floatingWindows > .windowFrame > .wfTopBar .wftButton {
-  background-color: #666;
+  background-color: var(--pc-trashBorder);
   border-radius: 2px;
   width: 21px;
   height: 21px;
@@ -41,6 +41,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
 }
 
 #floatingWindows > .windowFrame > .wfTopBar .wftButton.close:hover {

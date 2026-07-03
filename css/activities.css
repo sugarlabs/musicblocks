@@ -2288,7 +2288,7 @@ table {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    margin-top: 64px;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
 #buttoncontainerTOP .tooltipped img {
