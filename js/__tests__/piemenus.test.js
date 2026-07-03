@@ -25,7 +25,9 @@ global.docById = jest.fn().mockReturnValue({
     getBoundingClientRect: jest.fn().mockReturnValue({ x: 0, y: 0 })
 });
 global.document = {
-    getElementById: global.docById
+    getElementById: global.docById,
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn()
 };
 global.window = {
     innerWidth: 1024,
@@ -206,5 +208,56 @@ describe("piemenus behavioral tests", () => {
                 /if \(typeof HelpWidget === "undefined"\)\s*\{\s*if \(typeof require !== "undefined"\)\s*\{\s*require\(\["widgets\/help"\], function \(\) \{\s*new HelpWidget\(that, true\);/
             );
         });
+    });
+
+    test("outside click closure registers mousedown listener and handles outside clicks", () => {
+        jest.useFakeTimers();
+
+        let mousedownHandler = null;
+        global.document.addEventListener = jest.fn().mockImplementation((event, handler) => {
+            if (event === "mousedown") {
+                mousedownHandler = handler;
+            }
+        });
+
+        // Set mock return for docById("wheelDiv") so that showWheelDiv/hideWheelDiv work
+        const mockWheelDiv = {
+            style: { display: "" },
+            contains: jest.fn().mockReturnValue(false)
+        };
+        global.docById.mockImplementation(id => {
+            if (id === "wheelDiv") {
+                return mockWheelDiv;
+            }
+            return {
+                style: { display: "" },
+                contains: jest.fn().mockReturnValue(false)
+            };
+        });
+
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+        piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
+
+        // Advance timers by 50ms to trigger the event listener registration
+        jest.advanceTimersByTime(50);
+
+        expect(global.document.addEventListener).toHaveBeenCalledWith(
+            "mousedown",
+            expect.any(Function)
+        );
+        expect(mousedownHandler).toBeInstanceOf(Function);
+
+        // Mock exit wheel navigateFunction
+        const mockNavigate = jest.fn();
+        mockBlock._exitWheel.navItems[0].navigateFunction = mockNavigate;
+
+        // Trigger outside click (interactive elements return false)
+        const mockEvent = { target: { style: { cursor: "default" } } };
+        mousedownHandler(mockEvent);
+
+        expect(mockNavigate).toHaveBeenCalled();
+
+        jest.useRealTimers();
     });
 });
