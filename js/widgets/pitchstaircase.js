@@ -206,7 +206,7 @@ class PitchStaircase {
                 if (this._playingRowIndex === i) {
                     clearTimeout(this._rowStopTimeout);
                     stepCell.classList.remove("active");
-                    stepCell.style.backgroundColor = platformColor.selectorBackground;
+                    stepCell.style.backgroundColor = "";
                     this._setButtonIcon(playCell, "play-button.svg", _("Play"));
                     this.activity.logo.synth.stop();
                     this._playingRowIndex = null;
@@ -361,7 +361,7 @@ class PitchStaircase {
 
         this._rowStopTimeout = setTimeout(() => {
             stepCell.classList.remove("active");
-            stepCell.style.backgroundColor = platformColor.selectorBackground;
+            stepCell.style.backgroundColor = "";
             this._setButtonIcon(playCell, "play-button.svg", _("Play"));
             this._playingRowIndex = null;
         }, 1000);

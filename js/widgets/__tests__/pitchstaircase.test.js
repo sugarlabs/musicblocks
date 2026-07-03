@@ -467,7 +467,7 @@ describe("PitchStaircase Widget", () => {
                 if (psc._playingRowIndex === i) {
                     clearTimeout(psc._rowStopTimeout);
                     stepCell.classList.remove("active");
-                    stepCell.style.backgroundColor = platformColor.selectorBackground;
+                    stepCell.style.backgroundColor = "";
                     psc._setButtonIcon(mockPlayCell, "play-button.svg", _("Play"));
                     psc.activity.logo.synth.stop();
                     psc._playingRowIndex = null;
