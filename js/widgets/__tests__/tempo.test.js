@@ -523,10 +523,10 @@ describe("Tempo Widget", () => {
                 call => call[0] === "keyup"
             );
             const keyupHandler = keyupCall[1];
-            keyupHandler({ keyCode: 13 });
+            keyupHandler({ key: "Enter" });
             expect(useBPMSpy).toHaveBeenCalledTimes(1);
             expect(useBPMSpy).toHaveBeenCalledWith(0);
-            keyupHandler({ keyCode: 32 });
+            keyupHandler({ key: "Space" });
             expect(useBPMSpy).toHaveBeenCalledTimes(1);
         });
     });

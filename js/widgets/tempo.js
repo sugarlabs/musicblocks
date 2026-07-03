@@ -205,7 +205,7 @@ class Tempo {
             this.BPMInputs[i].addEventListener(
                 "keyup",
                 (id => e => {
-                    if (e.keyCode === 13) {
+                    if (e.key === "Enter") {
                         this._useBPM(id);
                     }
                 })(i)

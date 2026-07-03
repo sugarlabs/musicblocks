@@ -584,4 +584,44 @@ describe("MathUtility", () => {
             expect(MathUtility.doPlus(true, true)).toBe(2);
         });
     });
+
+    describe("doCalculateDistance", () => {
+        test("returns 0 when both points are the same", () => {
+            expect(MathUtility.doCalculateDistance(3, 4, 3, 4)).toBe(0);
+        });
+
+        test("calculates distance for a 3-4-5 right triangle", () => {
+            expect(MathUtility.doCalculateDistance(0, 0, 3, 4)).toBe(5);
+        });
+
+        test("calculates distance along the x-axis", () => {
+            expect(MathUtility.doCalculateDistance(0, 0, 10, 0)).toBe(10);
+        });
+
+        test("calculates distance along the y-axis", () => {
+            expect(MathUtility.doCalculateDistance(0, 0, 0, 7)).toBe(7);
+        });
+
+        test("handles negative coordinates", () => {
+            expect(MathUtility.doCalculateDistance(-3, -4, 0, 0)).toBe(5);
+        });
+
+        test("is commutative (order of points does not matter)", () => {
+            const d1 = MathUtility.doCalculateDistance(1, 2, 4, 6);
+            const d2 = MathUtility.doCalculateDistance(4, 6, 1, 2);
+            expect(d1).toBe(d2);
+        });
+
+        test("calculates correct distance for floating-point coordinates", () => {
+            expect(MathUtility.doCalculateDistance(1.5, 2.5, 4.5, 6.5)).toBeCloseTo(5, 5);
+        });
+
+        test("throws NanError for non-numeric x1", () => {
+            expect(() => MathUtility.doCalculateDistance("a", 0, 3, 4)).toThrow("NanError");
+        });
+
+        test("throws NanError for non-numeric y2", () => {
+            expect(() => MathUtility.doCalculateDistance(0, 0, 3, "b")).toThrow("NanError");
+        });
+    });
 });
