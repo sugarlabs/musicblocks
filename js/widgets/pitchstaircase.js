@@ -161,6 +161,16 @@ class PitchStaircase {
             });
 
             playCell.onclick = () => {
+                const img = playCell.querySelector("img");
+
+                if (img.src.includes("stop-button.svg")) {
+                    this.activity.logo.synth.setMasterVolume(0);
+
+                    img.src = "header-icons/play-button.svg";
+                    return;
+                }
+                // console.log(img.src);
+                this.activity.logo.synth.setMasterVolume(100);
                 const i = playCell.getAttribute("id");
                 const stepCell = this._stepTables[i].rows[0].cells[1];
                 this._playOne(stepCell);
@@ -302,7 +312,12 @@ class PitchStaircase {
      */
     _playOne(stepCell) {
         // The frequency is stored in the stepCell.
+        const playCell = stepCell.previousElementSibling;
+
+        const img = playCell.querySelector("img");
+
         stepCell.classList.add("active");
+        img.src = "header-icons/stop-button.svg";
         stepCell.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         const frequency = Number(stepCell.getAttribute("id"));
         this.activity.logo.synth.trigger(0, frequency, 1, DEFAULTVOICE, null, null);
@@ -310,6 +325,8 @@ class PitchStaircase {
         setTimeout(() => {
             stepCell.classList.remove("active");
             stepCell.style.backgroundColor = platformColor.selectorBackground;
+
+            img.src = "header-icons/play-button.svg";
         }, 1000);
     }
 
