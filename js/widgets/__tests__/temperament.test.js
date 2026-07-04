@@ -2,6 +2,7 @@ const TemperamentWidget = require("../temperament");
 describe("TemperamentWidget basic tests", () => {
     let widget;
     global._ = jest.fn(text => text);
+    global.PREVIEWVOLUME = 80;
 
     beforeEach(() => {
         document.body.innerHTML = `
@@ -235,9 +236,9 @@ describe("TemperamentWidget basic tests", () => {
             style: {}
         };
 
-        widget.pitchNumber = 0;
-        widget.frequencies = [440];
-        widget.tempRatios1 = [1];
+        widget.pitchNumber = 1;
+        widget.frequencies = [440, 880];
+        widget.tempRatios1 = [1, 2];
         widget.circleIsVisible = true;
 
         global.docById = jest.fn(() => ({

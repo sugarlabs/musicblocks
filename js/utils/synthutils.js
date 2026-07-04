@@ -687,16 +687,28 @@ function Synth() {
                 interval !== "octaveRatio" &&
                 interval !== "generator"
             ) {
-                const noteInfo = getNoteFromInterval(startingPitch, interval);
+                let noteInfo;
                 let ratio;
-                if (typeof t[interval] === "number") {
+                if (!isNaN(interval)) {
+                    if (t[interval] && Array.isArray(t[interval]) && t[interval].length >= 3) {
+                        noteInfo = [t[interval][1], t[interval][2]];
+                        ratio = t[interval][0];
+                    } else {
+                        continue;
+                    }
+                } else if (typeof t[interval] === "number") {
+                    noteInfo = getNoteFromInterval(startingPitch, interval);
                     ratio = t[interval];
                 } else if (
                     t[interval] &&
                     typeof t[interval] === "object" &&
                     typeof t[interval].ratio === "number"
                 ) {
+                    noteInfo = getNoteFromInterval(startingPitch, interval);
                     ratio = t[interval].ratio;
+                } else if (t[interval] && Array.isArray(t[interval]) && t[interval].length >= 3) {
+                    noteInfo = [t[interval][1], t[interval][2]];
+                    ratio = t[interval][0];
                 } else {
                     continue;
                 }
@@ -1819,7 +1831,10 @@ function Synth() {
 
         if (isCustomTemperament(this.inTemperament)) {
             const notes1 = notes;
-            if (notes.search("[+]") !== -1 || notes.search("[-]") !== -1) {
+            if (
+                typeof notes === "string" &&
+                (notes.search("[+]") !== -1 || notes.search("[-]") !== -1)
+            ) {
                 notes = this.getCustomFrequency(notes, this.inTemperament);
             }
             if (notes === undefined || notes === "undefined") {

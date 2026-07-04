@@ -458,6 +458,42 @@ describe("Utility Functions (logic-only)", () => {
             expect(temperamentChanged("equal", "Bb3")).toBe(undefined);
             expect(whichTemperament()).toBe("equal");
         });
+
+        it("should handle custom temperaments with numeric array properties", () => {
+            const customTempName = "myCustomNumericTemp";
+            global.TEMPERAMENT[customTempName] = {
+                pitchNumber: 2,
+                0: [1.0, "C", 4],
+                1: [1.5, "G", 4]
+            };
+            const originalInTemp = Synth.inTemperament;
+            Synth.inTemperament = customTempName;
+            expect(() => temperamentChanged(customTempName, "C4")).not.toThrow();
+            expect(whichTemperament()).toBe(customTempName);
+            expect(Synth.noteFrequencies["C"]).toEqual([4, expect.any(Number)]);
+            expect(Synth.noteFrequencies["G"]).toEqual([4, expect.any(Number)]);
+            delete global.TEMPERAMENT[customTempName];
+            Synth.inTemperament = originalInTemp;
+        });
+
+        it("should skip custom temperament numeric keys that map to plain numbers without throwing", () => {
+            const customTempName = "myCustomNumericTemp2";
+            global.TEMPERAMENT[customTempName] = {
+                "pitchNumber": 2,
+                "0": 1.0,
+                "1": 1.5,
+                "perfect 1": 1.0,
+                "perfect 5": 1.5
+            };
+            const originalInTemp = Synth.inTemperament;
+            Synth.inTemperament = customTempName;
+            expect(() => temperamentChanged(customTempName, "C4")).not.toThrow();
+            expect(whichTemperament()).toBe(customTempName);
+            expect(Synth.noteFrequencies["C"]).toEqual([4, expect.any(Number)]);
+            expect(Synth.noteFrequencies["G"]).toEqual([4, expect.any(Number)]);
+            delete global.TEMPERAMENT[customTempName];
+            Synth.inTemperament = originalInTemp;
+        });
     });
 
     describe("resume", () => {
@@ -1406,6 +1442,28 @@ describe("Utility Functions (logic-only)", () => {
             expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
             const noteArg = mockSynth.triggerAttackRelease.mock.calls[0][0];
             expect(noteArg).toBe(300);
+
+            Synth._getFrequency = originalGetFrequency;
+        });
+
+        it("should handle numeric notes frequency under custom temperament without throwing error", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn()
+            };
+            Synth.inTemperament = "myCustomTemp";
+            const originalGetFrequency = Synth._getFrequency;
+            Synth._getFrequency = jest.fn().mockReturnValue(440);
+
+            await expect(
+                _performNotes.call(Synth, mockSynth, 440, 0.25, null, null, false, 0)
+            ).resolves.not.toThrow();
+
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalledWith(
+                440,
+                0.25,
+                expect.any(Number)
+            );
 
             Synth._getFrequency = originalGetFrequency;
         });
