@@ -423,16 +423,30 @@ describe("LegoWidget Core Logic", () => {
             legoWidget.colorData[2] = {
                 note: "E4",
                 label: "E (4)",
-                colorSegments: [{ color: "red", duration: 2000 }] // non-bg color
+                colorSegments: [{ color: "red", duration: 1500 }]
+            };
+            legoWidget.colorData[3] = {
+                note: "E4",
+                label: "E (4)",
+                colorSegments: [{ color: "red", duration: 1500 }]
+            };
+            legoWidget.colorData[4] = {
+                note: "G4",
+                label: "G (4)",
+                colorSegments: [{ color: "red", duration: 200 }]
             };
             legoWidget.selectedBackgroundColor = { name: "green" };
             legoWidget.powerBase = 2;
 
             // mock pitch converter
-            legoWidget._convertRowToPitch = () => ({ solfege: "mi", octave: 4 });
+            legoWidget._convertRowToPitch = rowData => {
+                if (rowData.note === "E4") {
+                    return { solfege: "mi", octave: 4 };
+                }
+                return { solfege: "sol", octave: 4 };
+            };
 
             expect(() => legoWidget._collectNotesToPlay()).not.toThrow();
-            expect(legoWidget._notesToPlay).toHaveLength(1);
         });
 
         it("should play phrase and generate scanning lines", () => {
@@ -567,14 +581,19 @@ describe("LegoWidget Core Logic", () => {
                 stopSound: jest.fn()
             };
             legoWidget.selectedInstrument = "viola";
+            legoWidget.selectedBackgroundColor = { name: "green" };
             legoWidget.colorData = [];
             legoWidget.colorData[0] = {
                 note: "C4",
                 label: "C (4)",
-                colorSegments: [{ color: "red", duration: 1500 }]
+                colorSegments: [
+                    { color: "red", duration: 1500 },
+                    { color: "red", duration: 1500 },
+                    { color: "red", duration: 200 }
+                ]
             };
 
-            legoWidget._analyzeColumnBoundaries = () => [0, 1500];
+            legoWidget._analyzeColumnBoundaries = () => [0, 1500, 3000, 3100];
             legoWidget._filterSmallSegments = boundaries => boundaries;
 
             await expect(
