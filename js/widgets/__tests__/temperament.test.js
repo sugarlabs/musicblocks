@@ -1135,6 +1135,24 @@ describe("TemperamentWidget basic tests", () => {
             expect(mockActivity.logo.synth.setMasterVolume).toHaveBeenCalled();
         });
 
+        test("playButton click triggers playAll", () => {
+            const playBtn = mockWidgetWindow.addButton.mock.results[0].value;
+            expect(playBtn.onclick).toBeDefined();
+
+            widget.playAll = jest.fn();
+            playBtn.onclick();
+            expect(widget.playAll).toHaveBeenCalled();
+        });
+
+        test("saveButton click triggers _save", () => {
+            const saveBtn = mockWidgetWindow.addButton.mock.results[1].value;
+            expect(saveBtn.onclick).toBeDefined();
+
+            widget._save = jest.fn();
+            saveBtn.onclick();
+            expect(widget._save).toHaveBeenCalled();
+        });
+
         test("noteCell click stops playing if active", () => {
             widget._playing = true;
             widget._playTimeout = setTimeout(() => {}, 1000);
