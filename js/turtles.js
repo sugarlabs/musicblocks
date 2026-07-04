@@ -1170,17 +1170,27 @@ Turtles.TurtlesView = class {
          * initializes all Buttons.
          */
         const __makeAllButtons = () => {
-            let second = false;
-            if (docById("buttoncontainerTOP")) {
-                window.jQuery(".tooltipped").tooltip("close");
-                docById("buttoncontainerTOP").parentElement.removeChild(
-                    docById("buttoncontainerTOP")
-                );
-                second = true;
+            let cont = docById("buttoncontainerTOP");
+            if (cont) {
+                const updatePos = (btn, x) => {
+                    if (btn) {
+                        const rightPos = document.body.clientWidth - x;
+                        btn.style.right = rightPos + "px";
+                    }
+                };
+                updatePos(this._collapseButton, this._w - 55);
+                updatePos(this._expandButton, this._w - 55);
+                updatePos(this._clearButton, this._w - 5 - 2 * 55);
+                updatePos(this.gridButton, this._w - 10 - 3 * 55);
+                if (typeof this.activity.updateFloatingButtonsPosition === "function") {
+                    this.activity.updateFloatingButtonsPosition();
+                }
+                this._locked = false;
+                return;
             }
-            const cont = document.createElement("div");
+            cont = document.createElement("div");
             document.body.appendChild(cont);
-            cont.style.display = second ? "block" : "none";
+            cont.style.display = "none";
             cont.setAttribute("id", "buttoncontainerTOP");
             __makeCollapseButton();
             __makeExpandButton();
@@ -1194,6 +1204,9 @@ Turtles.TurtlesView = class {
                         delay: 100
                     });
                 });
+            if (typeof this.activity.updateFloatingButtonsPosition === "function") {
+                this.activity.updateFloatingButtonsPosition();
+            }
             this._locked = false;
         };
 
