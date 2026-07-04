@@ -344,4 +344,75 @@ describe("LegoWidget Core Logic", () => {
             expect(legoWidget._isLineBeyondImageHorizontally({ currentX: 100 })).toBe(false);
         });
     });
+
+    describe("_addColorSegment and sparse colorData safety", () => {
+        it("should safely add color segment when colorData has holes/sparse elements", () => {
+            legoWidget.matrixData = {
+                rows: [
+                    { note: "C4", label: "C (4)" },
+                    null, // non-note row
+                    { note: "E4", label: "E (4)" }
+                ]
+            };
+            legoWidget.colorData = [];
+
+            // Add color segment for index 2 (sparse slot)
+            legoWidget._addColorSegment(2, { name: "red" }, 1500);
+
+            expect(legoWidget.colorData[2]).toBeDefined();
+            expect(legoWidget.colorData[2].note).toBe("E4");
+            expect(legoWidget.colorData[2].label).toBe("E (4)");
+            expect(legoWidget.colorData[2].colorSegments).toHaveLength(1);
+            expect(legoWidget.colorData[2].colorSegments[0].color).toBe("red");
+            expect(legoWidget.colorData[2].colorSegments[0].duration).toBe(1500);
+        });
+
+        it("should safely handle sparse arrays in _mergeConsecutiveColorSegments", () => {
+            legoWidget.colorData = [];
+            legoWidget.colorData[0] = {
+                note: "C4",
+                colorSegments: [
+                    { color: "red", duration: 1000 },
+                    { color: "red", duration: 1500 }
+                ]
+            };
+            // colorData[1] is undefined/hole
+
+            expect(() => legoWidget._mergeConsecutiveColorSegments()).not.toThrow();
+            expect(legoWidget.colorData[0].colorSegments).toHaveLength(1);
+            expect(legoWidget.colorData[0].colorSegments[0].duration).toBe(2500);
+        });
+
+        it("should safely handle sparse arrays in _analyzeColumnBoundaries", () => {
+            legoWidget.colorData = [];
+            legoWidget.colorData[2] = {
+                note: "E4",
+                colorSegments: [{ duration: 1000 }]
+            };
+            // colorData[0] and colorData[1] are empty/undefined
+
+            let boundaries;
+            expect(() => {
+                boundaries = legoWidget._analyzeColumnBoundaries();
+            }).not.toThrow();
+            expect(boundaries).toEqual([0, 1000]);
+        });
+
+        it("should safely handle sparse arrays in _collectNotesToPlay", () => {
+            legoWidget.colorData = [];
+            legoWidget.colorData[2] = {
+                note: "E4",
+                label: "E (4)",
+                colorSegments: [{ color: "red", duration: 2000 }] // non-bg color
+            };
+            legoWidget.selectedBackgroundColor = { name: "green" };
+            legoWidget.powerBase = 2;
+
+            // mock pitch converter
+            legoWidget._convertRowToPitch = () => ({ solfege: "mi", octave: 4 });
+
+            expect(() => legoWidget._collectNotesToPlay()).not.toThrow();
+            expect(legoWidget._notesToPlay).toHaveLength(1);
+        });
+    });
 });
