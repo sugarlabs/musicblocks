@@ -1297,5 +1297,33 @@ describe("TemperamentWidget basic tests", () => {
 
             expect(widget.wheel1.refreshWheel).toHaveBeenCalled();
         });
+
+        test("playAll with truthy _lastPlaybackIndex does not execute playbackForward reset", () => {
+            widget.circleIsVisible = false;
+            widget.pitchNumber = 2;
+
+            global.docById = jest.fn(id => {
+                if (id === "wheelDiv4") return null;
+                return originalDocById(id);
+            });
+
+            const createMockSlice = () => ({
+                fillAttr: "",
+                sliceHoverAttr: {},
+                slicePathAttr: {},
+                sliceSelectedAttr: {}
+            });
+            widget.notesCircle = {
+                navItems: [createMockSlice(), createMockSlice(), createMockSlice()],
+                refreshWheel: jest.fn()
+            };
+
+            widget._lastPlaybackIndex = 1;
+            widget.playbackForward = false;
+
+            widget.playAll(); // starts playback
+
+            expect(widget.playbackForward).toBe(false);
+        });
     });
 });
