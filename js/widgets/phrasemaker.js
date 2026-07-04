@@ -2761,7 +2761,9 @@ class PhraseMaker {
         if (!exportWindow) {
             console.debug("Could not create export window");
             this.activity.errorMsg(
-                this._("Could not open export window. Please allow pop-ups for this site.")
+                this._(
+                    "Could not open export window. This is often caused by a browser pop-up blocker — check your settings and try again."
+                )
             );
             return;
         }
