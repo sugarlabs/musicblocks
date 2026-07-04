@@ -567,8 +567,13 @@ class ReflectionMatrix {
         this.hideTypingIndicator();
         if (data) {
             this.botReplyDiv(data, false, true);
+            // Expected errors in data.error:
+            // 1. Server-side errors returned by the API (e.g., 500s or rate limits).
+            // 2. Network failures caught by generateAnalysis().
+            if (!data.error) {
+                await this.saveReport(data);
+            }
         }
-        await this.saveReport(data);
     }
 
     /**
