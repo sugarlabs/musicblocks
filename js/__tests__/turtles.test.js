@@ -729,3 +729,64 @@ describe("TurtlesModel doGrid initialization order", () => {
         expect(() => setupGridController(activity)).not.toThrow();
     });
 });
+
+describe("turtleCount", () => {
+    let turtles;
+
+    beforeEach(() => {
+        turtles = {
+            getTurtleCount: jest.fn(),
+            getTurtle: jest.fn(),
+            turtleCount: Turtles.TurtlesModel.prototype.turtleCount
+        };
+    });
+
+    test("counts all turtles when there are no companions and none in trash", () => {
+        turtles.getTurtleCount.mockReturnValue(3);
+        turtles.getTurtle.mockImplementation(t => ({ companionTurtle: undefined, inTrash: false }));
+
+        expect(turtles.turtleCount()).toBe(3);
+    });
+
+    test("does not count turtles in trash", () => {
+        turtles.getTurtleCount.mockReturnValue(3);
+        turtles.getTurtle.mockImplementation(t => ({
+            companionTurtle: undefined,
+            inTrash: t === 1
+        }));
+
+        expect(turtles.turtleCount()).toBe(2);
+    });
+
+    test("does not count turtles that are claimed as companions", () => {
+        turtles.getTurtleCount.mockReturnValue(3);
+        // 0 points to 1
+        turtles.getTurtle.mockImplementation(t => {
+            if (t === 0) return { companionTurtle: 1, inTrash: false };
+            return { companionTurtle: undefined, inTrash: false };
+        });
+
+        // Turtle 0: points to 1. Not claimed. Counted.
+        // Turtle 1: claimed by 0. Not counted.
+        // Turtle 2: Not claimed. Counted.
+        expect(turtles.turtleCount()).toBe(2);
+    });
+
+    test("counts self-referencing turtles if no one else claims them first", () => {
+        turtles.getTurtleCount.mockReturnValue(1);
+        turtles.getTurtle.mockImplementation(t => ({ companionTurtle: t, inTrash: false }));
+
+        expect(turtles.turtleCount()).toBe(1);
+    });
+
+    test("does not count a self-referencing turtle if someone else claims it first", () => {
+        turtles.getTurtleCount.mockReturnValue(2);
+        // 0 points to 1. 1 points to 1.
+        turtles.getTurtle.mockImplementation(t => {
+            if (t === 0) return { companionTurtle: 1, inTrash: false };
+            if (t === 1) return { companionTurtle: 1, inTrash: false };
+        });
+
+        expect(turtles.turtleCount()).toBe(1);
+    });
+});
