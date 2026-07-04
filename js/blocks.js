@@ -5747,10 +5747,7 @@ class Blocks {
              * them as blocks crashes _processOneBlock and stalls
              * _loadCounter, leaving the project half-loaded.
              */
-            while (
-                blockObjs.length > 0 &&
-                !Array.isArray(blockObjs[blockObjs.length - 1][4])
-            ) {
+            while (blockObjs.length > 0 && !Array.isArray(blockObjs[blockObjs.length - 1][4])) {
                 console.debug(
                     "Removing non-block metadata entry from project: " +
                         JSON.stringify(blockObjs[blockObjs.length - 1][1])
