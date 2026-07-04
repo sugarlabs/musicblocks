@@ -439,11 +439,12 @@ describe("LegoWidget Core Logic", () => {
             legoWidget.gridOverlay = {
                 querySelectorAll: jest.fn(() => []),
                 appendChild: jest.fn(),
-                getBoundingClientRect: () => ({ height: 100, width: 200 })
+                getBoundingClientRect: () => ({ height: 30, width: 200 })
             };
             legoWidget.matrixData = {
                 rows: [
                     { note: "C4", label: "C (4)" },
+                    { note: "E4", label: "E (4)" }, // outside bounds
                     { note: null, label: "Zoom" }
                 ]
             };
@@ -459,7 +460,8 @@ describe("LegoWidget Core Logic", () => {
 
             expect(legoWidget.isPlaying).toBe(true);
             expect(legoWidget.colorData[0]).toBeDefined();
-            expect(legoWidget.colorData[1]).toBeUndefined(); // skipped non-note row
+            expect(legoWidget.colorData[1]).toBeDefined(); // covered by the outside bounds block
+            expect(legoWidget.colorData[1].colorSegments[0].color).toBe("green");
             expect(legoWidget.gridOverlay.appendChild).toHaveBeenCalled();
 
             // Clean up
