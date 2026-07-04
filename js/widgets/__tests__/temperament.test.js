@@ -1176,4 +1176,108 @@ describe("TemperamentWidget basic tests", () => {
             expect(widget._lastPlaybackIndex).toBe(0);
         });
     });
+
+    describe("playAll play loop visual wheel coverage", () => {
+        let originalDocById;
+
+        beforeEach(() => {
+            jest.useFakeTimers();
+            originalDocById = global.docById;
+            widget._logo = {
+                resetSynth: jest.fn(),
+                synth: {
+                    trigger: jest.fn(),
+                    stop: jest.fn(),
+                    setMasterVolume: jest.fn(),
+                    startingPitch: "C4"
+                }
+            };
+            widget.playButton = createMockElement("play");
+            widget.tempRatios1 = [1, 2, 3];
+            widget.frequencies = [440, 880, 1320];
+            widget.ratios = [1, 2, 3];
+            widget.notes = [
+                ["C", 4],
+                ["C", 5],
+                ["G", 5]
+            ];
+            widget.scaleNotes = ["C"];
+            widget.intervals = ["unison", "octave", "fifth"];
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+            global.docById = originalDocById;
+        });
+
+        test("colors notesCircle slices during forward and backward play loop ticks", () => {
+            widget.circleIsVisible = false;
+            widget.pitchNumber = 2;
+
+            // Override docById to return null for wheelDiv4
+            global.docById = jest.fn(id => {
+                if (id === "wheelDiv4") {
+                    return null;
+                }
+                return originalDocById(id);
+            });
+
+            // Mock navItems with dummy styling objects
+            const createMockSlice = () => ({
+                fillAttr: "",
+                sliceHoverAttr: {},
+                slicePathAttr: {},
+                sliceSelectedAttr: {}
+            });
+            widget.notesCircle = {
+                navItems: [createMockSlice(), createMockSlice(), createMockSlice()],
+                refreshWheel: jest.fn()
+            };
+
+            widget.playAll(); // starts playback, calls __playLoop(0)
+
+            // Advance timers to trigger subsequent loop ticks
+            jest.advanceTimersByTime(500); // triggers __playLoop(1)
+            jest.advanceTimersByTime(500); // triggers __playLoop(2), which sets playbackForward = false
+            jest.advanceTimersByTime(500); // triggers __playLoop(1) backward
+            jest.advanceTimersByTime(500); // triggers __playLoop(0) backward
+            jest.advanceTimersByTime(500); // triggers completion callback
+
+            expect(widget.notesCircle.refreshWheel).toHaveBeenCalled();
+        });
+
+        test("colors wheel1 slices during forward and backward play loop ticks with wheelDiv4 present", () => {
+            widget.circleIsVisible = false;
+            widget.pitchNumber = 2;
+
+            // Ensure docById("wheelDiv4") returns a mock element (not null)
+            global.docById = jest.fn(id => {
+                if (id === "wheelDiv4") {
+                    return createMockElement("wheelDiv4");
+                }
+                return originalDocById(id);
+            });
+
+            const createMockSlice = () => ({
+                fillAttr: "",
+                sliceHoverAttr: {},
+                slicePathAttr: {},
+                sliceSelectedAttr: {}
+            });
+            widget.wheel1 = {
+                navItems: [createMockSlice(), createMockSlice(), createMockSlice()],
+                refreshWheel: jest.fn()
+            };
+
+            widget.playAll(); // starts playback
+
+            jest.advanceTimersByTime(500);
+            jest.advanceTimersByTime(500);
+            jest.advanceTimersByTime(500);
+            jest.advanceTimersByTime(500);
+            jest.advanceTimersByTime(500);
+
+            expect(widget.wheel1.refreshWheel).toHaveBeenCalled();
+        });
+    });
 });
