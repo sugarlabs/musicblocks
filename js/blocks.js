@@ -5740,6 +5740,24 @@ class Blocks {
                 );
             }
 
+            /**
+             * Turtle Blocks (.tb) files end with turtle-state and
+             * _saved_font_scale entries. These are metadata, not blocks:
+             * their connections field (index 4) is a scalar, so treating
+             * them as blocks crashes _processOneBlock and stalls
+             * _loadCounter, leaving the project half-loaded.
+             */
+            while (
+                blockObjs.length > 0 &&
+                !Array.isArray(blockObjs[blockObjs.length - 1][4])
+            ) {
+                console.debug(
+                    "Removing non-block metadata entry from project: " +
+                        JSON.stringify(blockObjs[blockObjs.length - 1][1])
+                );
+                blockObjs.pop();
+            }
+
             /** Check for blocks connected to themselves, */
             /** and for action blocks not connected to text blocks. */
             for (let b = 0; b < blockObjs.length; b++) {
