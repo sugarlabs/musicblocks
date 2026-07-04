@@ -26,7 +26,27 @@ describe("LegoWidget Core Logic", () => {
     let legoWidget;
 
     beforeEach(() => {
+        global._ = val => val;
+        global.platformColor = {
+            background: "#ffffff",
+            strokeColor: "#333333",
+            selectorSelected: "#0066FF",
+            textColor: "#000000",
+            selectorBackgroundHOFF: "#f8f8f8"
+        };
+        global.Synth = jest.fn().mockImplementation(() => ({
+            loadSamples: jest.fn(),
+            createSynth: jest.fn(),
+            trigger: jest.fn(),
+            stopSound: jest.fn()
+        }));
         legoWidget = new LegoWidget();
+    });
+
+    afterEach(() => {
+        delete global._;
+        delete global.platformColor;
+        delete global.Synth;
     });
 
     describe("_calculateFallbackFrequency", () => {
@@ -342,6 +362,280 @@ describe("LegoWidget Core Logic", () => {
 
             expect(legoWidget._isLineBeyondImageHorizontally({ currentX: 200 })).toBe(true);
             expect(legoWidget._isLineBeyondImageHorizontally({ currentX: 100 })).toBe(false);
+        });
+    });
+
+    describe("_addColorSegment and sparse colorData safety", () => {
+        it("should safely add color segment when colorData has holes/sparse elements", () => {
+            legoWidget.matrixData = {
+                rows: [
+                    { note: "C4", label: "C (4)" },
+                    null, // non-note row
+                    { note: "E4", label: "E (4)" }
+                ]
+            };
+            legoWidget.colorData = [];
+
+            // Add color segment for index 2 (sparse slot)
+            legoWidget._addColorSegment(2, { name: "red" }, 1500);
+
+            expect(legoWidget.colorData[2]).toBeDefined();
+            expect(legoWidget.colorData[2].note).toBe("E4");
+            expect(legoWidget.colorData[2].label).toBe("E (4)");
+            expect(legoWidget.colorData[2].colorSegments).toHaveLength(1);
+            expect(legoWidget.colorData[2].colorSegments[0].color).toBe("red");
+            expect(legoWidget.colorData[2].colorSegments[0].duration).toBe(1500);
+        });
+
+        it("should safely handle sparse arrays in _mergeConsecutiveColorSegments", () => {
+            legoWidget.colorData = [];
+            legoWidget.colorData[0] = {
+                note: "C4",
+                colorSegments: [
+                    { color: "red", duration: 1000 },
+                    { color: "red", duration: 1500 }
+                ]
+            };
+            // colorData[1] is undefined/hole
+
+            expect(() => legoWidget._mergeConsecutiveColorSegments()).not.toThrow();
+            expect(legoWidget.colorData[0].colorSegments).toHaveLength(1);
+            expect(legoWidget.colorData[0].colorSegments[0].duration).toBe(2500);
+        });
+
+        it("should safely handle sparse arrays in _analyzeColumnBoundaries", () => {
+            legoWidget.colorData = [];
+            legoWidget.colorData[2] = {
+                note: "E4",
+                colorSegments: [{ duration: 1000 }]
+            };
+            // colorData[0] and colorData[1] are empty/undefined
+
+            let boundaries;
+            expect(() => {
+                boundaries = legoWidget._analyzeColumnBoundaries();
+            }).not.toThrow();
+            expect(boundaries).toEqual([0, 1000]);
+        });
+
+        it("should safely handle sparse arrays in _collectNotesToPlay", () => {
+            legoWidget.colorData = [];
+            legoWidget.colorData[2] = {
+                note: "E4",
+                label: "E (4)",
+                colorSegments: [{ color: "red", duration: 1500 }]
+            };
+            legoWidget.colorData[3] = {
+                note: "E4",
+                label: "E (4)",
+                colorSegments: [{ color: "red", duration: 1500 }]
+            };
+            legoWidget.colorData[4] = {
+                note: "G4",
+                label: "G (4)",
+                colorSegments: [{ color: "red", duration: 200 }]
+            };
+            legoWidget.selectedBackgroundColor = { name: "green" };
+            legoWidget.powerBase = 2;
+
+            // mock pitch converter
+            legoWidget._convertRowToPitch = rowData => {
+                if (rowData.note === "E4") {
+                    return { solfege: "mi", octave: 4 };
+                }
+                return { solfege: "sol", octave: 4 };
+            };
+
+            expect(() => legoWidget._collectNotesToPlay()).not.toThrow();
+        });
+
+        it("should play phrase and generate scanning lines", () => {
+            legoWidget.activity = {
+                textMsg: jest.fn(),
+                hideMsgs: jest.fn()
+            };
+            legoWidget.playButton = {
+                querySelector: jest.fn(() => ({ src: "" }))
+            };
+            legoWidget.gridOverlay = {
+                querySelectorAll: jest.fn(() => []),
+                appendChild: jest.fn(),
+                getBoundingClientRect: () => ({ height: 30, width: 200 })
+            };
+            legoWidget.matrixData = {
+                rows: [
+                    { note: "C4", label: "C (4)" },
+                    { note: "E4", label: "E (4)" }, // outside bounds
+                    { note: null, label: "Zoom" }
+                ]
+            };
+            legoWidget.selectedBackgroundColor = { name: "green" };
+
+            // Mock window/animation globals
+            const originalRequestAnimationFrame = global.requestAnimationFrame;
+            const originalPerformance = global.performance;
+            global.requestAnimationFrame = jest.fn();
+            global.performance = { now: () => 1000 };
+
+            legoWidget._playPhrase();
+
+            expect(legoWidget.isPlaying).toBe(true);
+            expect(legoWidget.colorData[0]).toBeDefined();
+            expect(legoWidget.colorData[1]).toBeDefined(); // covered by the outside bounds block
+            expect(legoWidget.colorData[1].colorSegments[0].color).toBe("green");
+            expect(legoWidget.gridOverlay.appendChild).toHaveBeenCalled();
+
+            // Clean up
+            global.requestAnimationFrame = originalRequestAnimationFrame;
+            global.performance = originalPerformance;
+        });
+
+        it("should stop playback and generate visualization after timeout", () => {
+            jest.useFakeTimers();
+
+            legoWidget.activity = {
+                textMsg: jest.fn(),
+                hideMsgs: jest.fn()
+            };
+            legoWidget.playButton = {
+                querySelector: jest.fn(() => ({ src: "" }))
+            };
+
+            legoWidget.colorData = [];
+            legoWidget.colorData[0] = {
+                note: "C4",
+                colorSegments: [{ color: "red", duration: 1500 }]
+            };
+            legoWidget.isPlaying = true;
+            legoWidget.hasGeneratedVisualization = false;
+
+            legoWidget._generateColorVisualization = jest.fn();
+            legoWidget._drawColumnLinesOnCanvas = jest.fn();
+
+            legoWidget._stopPlayback();
+
+            jest.runAllTimers();
+
+            expect(legoWidget.isPlaying).toBe(false);
+            expect(legoWidget._generateColorVisualization).toHaveBeenCalled();
+            expect(legoWidget._drawColumnLinesOnCanvas).toHaveBeenCalled();
+
+            jest.useRealTimers();
+        });
+
+        it("should safely generate color visualization", () => {
+            const originalCreateObjectURL = global.URL.createObjectURL;
+            const originalRevokeObjectURL = global.URL.revokeObjectURL;
+            global.URL.createObjectURL = jest.fn(() => "blob:url");
+            global.URL.revokeObjectURL = jest.fn();
+
+            legoWidget.colorData = [];
+            legoWidget.colorData[0] = {
+                note: "C4",
+                label: "C (4)",
+                colorSegments: [{ color: "red", duration: 1500 }]
+            };
+
+            // Mock canvas elements
+            const mockCanvas = {
+                width: 0,
+                height: 0,
+                getContext: jest.fn(() => ({
+                    fillRect: jest.fn(),
+                    fillText: jest.fn(),
+                    strokeRect: jest.fn(),
+                    beginPath: jest.fn(),
+                    moveTo: jest.fn(),
+                    lineTo: jest.fn(),
+                    stroke: jest.fn()
+                })),
+                toBlob: jest.fn(callback => callback(new Blob()))
+            };
+
+            const originalCreateElement = document.createElement;
+            document.createElement = jest.fn(tag => {
+                if (tag === "canvas") return mockCanvas;
+                if (tag === "a") {
+                    const link = originalCreateElement.call(document, "a");
+                    link.click = jest.fn();
+                    return link;
+                }
+                return originalCreateElement.call(document, tag);
+            });
+
+            legoWidget._drawColumnLines = jest.fn();
+            legoWidget.playColorMusicPolyphonic = jest.fn();
+
+            expect(() => legoWidget._generateColorVisualization()).not.toThrow();
+            expect(mockCanvas.toBlob).toHaveBeenCalled();
+
+            // Clean up
+            global.URL.createObjectURL = originalCreateObjectURL;
+            global.URL.revokeObjectURL = originalRevokeObjectURL;
+            document.createElement = originalCreateElement;
+        });
+
+        it("should execute playColorMusicPolyphonic without crash", async () => {
+            legoWidget.synth = {
+                trigger: jest.fn(),
+                stopSound: jest.fn()
+            };
+            legoWidget.selectedInstrument = "viola";
+            legoWidget.selectedBackgroundColor = { name: "green" };
+            legoWidget.colorData = [];
+            legoWidget.colorData[0] = {
+                note: "C4",
+                label: "C (4)",
+                colorSegments: [
+                    { color: "red", duration: 1500 },
+                    { color: "red", duration: 1500 },
+                    { color: "red", duration: 200 }
+                ]
+            };
+
+            legoWidget._analyzeColumnBoundaries = () => [0, 1500, 3000, 3100];
+            legoWidget._filterSmallSegments = boundaries => boundaries;
+
+            await expect(
+                legoWidget.playColorMusicPolyphonic(legoWidget.colorData)
+            ).resolves.not.toThrow();
+        });
+
+        it("should safely handle onclose cleanup without crash even if eyeDropperButton is undefined", () => {
+            const mockWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                addButton: jest.fn(() => ({
+                    querySelector: jest.fn(() => ({ src: "" }))
+                })),
+                getWidgetBody: jest.fn(() => document.createElement("div")),
+                sendToCenter: jest.fn(),
+                destroy: jest.fn()
+            };
+            const originalWidgetWindows = window.widgetWindows;
+            window.widgetWindows = {
+                windowFor: jest.fn(() => mockWindow)
+            };
+
+            legoWidget.matrixData = { rows: [] };
+            legoWidget._stopPlayback = jest.fn();
+            legoWidget._stopWebcam = jest.fn();
+            legoWidget._cleanupDragListeners = jest.fn();
+
+            legoWidget.init({ textMsg: jest.fn() });
+
+            // Trigger onclose callback set by init
+            expect(mockWindow.onclose).toBeDefined();
+            expect(() => mockWindow.onclose()).not.toThrow();
+
+            expect(legoWidget._stopPlayback).toHaveBeenCalled();
+            expect(legoWidget._stopWebcam).toHaveBeenCalled();
+            expect(legoWidget._cleanupDragListeners).toHaveBeenCalled();
+            expect(legoWidget.imageWrapper).toBeNull();
+            expect(legoWidget.webcamVideo).toBeNull();
+            expect(mockWindow.destroy).toHaveBeenCalled();
+
+            window.widgetWindows = originalWidgetWindows;
         });
     });
 });

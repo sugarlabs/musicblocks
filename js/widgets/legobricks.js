@@ -273,9 +273,12 @@ function LegoWidget() {
         widgetWindow.show();
 
         widgetWindow.onclose = () => {
+            this._stopPlayback();
             this._stopWebcam();
             this._deactivateEyeDropper(); // Clean up eye dropper mode
             this._cleanupDragListeners(); // Clean up drag event listeners
+            this.imageWrapper = null;
+            this.webcamVideo = null;
             this.running = false;
             widgetWindow.destroy();
         };
@@ -948,47 +951,45 @@ function LegoWidget() {
 
             // Check each row for non-background colors in this time range
             this.colorData.forEach((rowData, rowIndex) => {
-                if (rowData.colorSegments) {
-                    let currentTime = 0;
+                if (!rowData || !rowData.colorSegments) return;
+                let currentTime = 0;
 
-                    for (const segment of rowData.colorSegments) {
-                        const segmentStart = currentTime;
-                        const segmentEnd = currentTime + segment.duration;
+                for (const segment of rowData.colorSegments) {
+                    const segmentStart = currentTime;
+                    const segmentEnd = currentTime + segment.duration;
 
-                        // Check if this segment overlaps with our time column
-                        if (segmentStart < endTime && segmentEnd > startTime) {
-                            // Calculate the actual overlap duration
-                            const overlapStart = Math.max(segmentStart, startTime);
-                            const overlapEnd = Math.min(segmentEnd, endTime);
-                            const overlapDuration = overlapEnd - overlapStart;
+                    // Check if this segment overlaps with our time column
+                    if (segmentStart < endTime && segmentEnd > startTime) {
+                        // Calculate the actual overlap duration
+                        const overlapStart = Math.max(segmentStart, startTime);
+                        const overlapEnd = Math.min(segmentEnd, endTime);
+                        const overlapDuration = overlapEnd - overlapStart;
 
-                            // Only count as significant if overlap is substantial (>350ms)
-                            // This prevents spillovers <350ms across blue lines from creating duplicate notes
-                            if (overlapDuration > 1000) {
-                                // Check if color is not the selected background color (meaning note should play)
-                                if (segment.color !== this.selectedBackgroundColor.name) {
-                                    hasNonBackgroundColor = true;
+                        // Only count as significant if overlap is substantial (>350ms)
+                        // This prevents spillovers <350ms across blue lines from creating duplicate notes
+                        if (overlapDuration > 1000) {
+                            // Check if color is not the selected background color (meaning note should play)
+                            if (segment.color !== this.selectedBackgroundColor.name) {
+                                hasNonBackgroundColor = true;
 
-                                    // Convert row data to pitch information
-                                    const pitch = this._convertRowToPitch(rowData);
-                                    if (
-                                        pitch &&
-                                        !pitches.some(
-                                            p =>
-                                                p.solfege === pitch.solfege &&
-                                                p.octave === pitch.octave
-                                        )
-                                    ) {
-                                        pitches.push(pitch);
-                                    }
+                                // Convert row data to pitch information
+                                const pitch = this._convertRowToPitch(rowData);
+                                if (
+                                    pitch &&
+                                    !pitches.some(
+                                        p =>
+                                            p.solfege === pitch.solfege && p.octave === pitch.octave
+                                    )
+                                ) {
+                                    pitches.push(pitch);
                                 }
-                            } else if (segment.color !== this.selectedBackgroundColor.name) {
-                                // Ignore small overlaps without logging
                             }
+                        } else if (segment.color !== this.selectedBackgroundColor.name) {
+                            // Ignore small overlaps without logging
                         }
-
-                        currentTime += segment.duration;
                     }
+
+                    currentTime += segment.duration;
                 }
             });
 
@@ -1047,7 +1048,7 @@ function LegoWidget() {
 
         // Collect all segment end times
         this.colorData.forEach(rowData => {
-            if (rowData.colorSegments) {
+            if (rowData && rowData.colorSegments) {
                 let currentTime = 0;
                 rowData.colorSegments.forEach(segment => {
                     currentTime += segment.duration;
@@ -1337,8 +1338,10 @@ function LegoWidget() {
         }
 
         // Reset button appearance
-        this.eyeDropperButton.style.backgroundColor = "";
-        this.eyeDropperButton.style.color = "";
+        if (this.eyeDropperButton) {
+            this.eyeDropperButton.style.backgroundColor = "";
+            this.eyeDropperButton.style.color = "";
+        }
 
         // Remove event listeners
         if (this.imageDisplayArea) {
@@ -2272,11 +2275,11 @@ function LegoWidget() {
         this.matrixData.rows.forEach((row, index) => {
             if (!row.note) return; // Skip non-note rows
 
-            this.colorData.push({
+            this.colorData[index] = {
                 note: row.note,
                 label: row.label,
                 colorSegments: []
-            });
+            };
 
             // Calculate vertical position for this note - fixed to canvas grid
             const topPos = index * ROW_HEIGHT;
@@ -2289,7 +2292,7 @@ function LegoWidget() {
             // Skip if this row is completely outside canvas bounds
             if (clampedTopPos >= canvasHeight || clampedBottomPos <= 0) {
                 // Fill this row with selected background color for the entire duration
-                this.colorData[this.colorData.length - 1].colorSegments.push({
+                this.colorData[index].colorSegments.push({
                     color: this.selectedBackgroundColor.name,
                     duration: 5000, // Default scan duration
                     timestamp: performance.now()
@@ -2483,7 +2486,7 @@ function LegoWidget() {
         if (!this.hasGeneratedVisualization && this.colorData && this.colorData.length > 0) {
             // Check if any colorData actually has color segments (indicating scanning occurred)
             const hasScannedData = this.colorData.some(
-                row => row.colorSegments && row.colorSegments.length > 0
+                row => row && row.colorSegments && row.colorSegments.length > 0
             );
 
             if (hasScannedData) {
@@ -2505,7 +2508,7 @@ function LegoWidget() {
      */
     this._mergeConsecutiveColorSegments = function () {
         this.colorData.forEach(rowData => {
-            if (!rowData.colorSegments || rowData.colorSegments.length <= 1) return;
+            if (!rowData || !rowData.colorSegments || rowData.colorSegments.length <= 1) return;
 
             const mergedSegments = [];
             let currentSegment = null;
@@ -2768,9 +2771,10 @@ function LegoWidget() {
      */
     this._addColorSegment = function (rowIndex, color, duration) {
         if (!this.colorData[rowIndex]) {
+            const row = this.matrixData.rows[rowIndex];
             this.colorData[rowIndex] = {
-                note: this.this.matrixData.rows[rowIndex].note,
-                label: this.this.matrixData.rows[rowIndex].label,
+                note: row ? row.note : undefined,
+                label: row ? row.label : undefined,
                 colorSegments: []
             };
         }
@@ -2908,8 +2912,11 @@ function LegoWidget() {
         };
 
         // Draw each row
+        let visualRowIndex = 0;
         this.colorData.forEach((rowData, rowIndex) => {
-            const y = rowIndex * rowHeight;
+            if (!rowData) return;
+            const y = visualRowIndex * rowHeight;
+            visualRowIndex++;
 
             // Draw row background
             ctx.fillStyle =
@@ -3050,7 +3057,7 @@ function LegoWidget() {
 
             // Check each row for non-background colors in this time range
             colorData.forEach((rowData, rowIndex) => {
-                if (rowData.colorSegments && rowData.note) {
+                if (rowData && rowData.colorSegments && rowData.note) {
                     let currentTime = 0;
                     let hasNonBackgroundColor = false;
 
