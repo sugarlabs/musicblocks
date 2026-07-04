@@ -545,8 +545,8 @@ body.highcontrast {
 }
 
 .highcontrast .popupMsg {
-    background-color: #000000;
-    color: #ffffff;
+    background-color: var(--color-bg-inverse);
+    color: var(--color-text-inverse);
 }
 
 .highcontrast #printText {
