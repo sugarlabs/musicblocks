@@ -118,7 +118,8 @@ describe("Block Foundation", () => {
             image: "forward.svg",
             size: 1,
             docks: [],
-            hidden: false
+            hidden: false,
+            capabilities: Object.create(null)
         };
     });
 
@@ -152,24 +153,21 @@ describe("Block Foundation", () => {
             expect(block.getInfo()).toBe("forward block");
         });
 
-        it("isCollapsible() should return true for collapsible blocks", () => {
-            mockProtoBlock.name = "start";
-            const block = new Block(mockProtoBlock, mockBlocks);
-            expect(block.isCollapsible()).toBe(true);
+        it("hasCapability() should read protoblock capability metadata", () => {
+            mockProtoBlock.capabilities.collapsible = true;
+            mockProtoBlock.capabilities.specialInput = true;
 
-            mockProtoBlock.name = "forward";
-            const block2 = new Block(mockProtoBlock, mockBlocks);
-            expect(block2.isCollapsible()).toBe(false);
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.hasCapability("collapsible")).toBe(true);
+            expect(block.getCapability("specialInput")).toBe(true);
         });
 
-        it("isInlineCollapsible() should return true for inline collapsible blocks", () => {
-            mockProtoBlock.name = "newnote";
-            const block = new Block(mockProtoBlock, mockBlocks);
-            expect(block.isInlineCollapsible()).toBe(true);
+        it("should return falsey values when capability metadata is absent", () => {
+            mockProtoBlock.capabilities = Object.create(null);
 
-            mockProtoBlock.name = "forward";
-            const block2 = new Block(mockProtoBlock, mockBlocks);
-            expect(block2.isInlineCollapsible()).toBe(false);
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.hasCapability("collapsible")).toBe(false);
+            expect(block.getCapability("collapsible")).toBeUndefined();
         });
 
         it("copySize() should sync size from protoblock", () => {
