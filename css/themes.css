@@ -575,14 +575,14 @@ body.highcontrast {
 .highcontrast #search,
 .highcontrast #helpfulSearch,
 .highcontrast .ui-autocomplete {
-    background-color: var(--color-text-inverse) !important;
+    background-color: var(--color-bg-primary) !important;
     color: var(--color-text-primary) !important;
     border: 1px solid #ffffff;
 }
 
 .highcontrast .ui-autocomplete .ui-menu-item a {
     color: var(--color-text-primary) !important;
-    background-color: var(--color-text-inverse) !important;
+    background-color: var(--color-bg-primary) !important;
 }
 
 .highcontrast .ui-autocomplete .ui-menu-item a:hover {

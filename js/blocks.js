@@ -5913,6 +5913,10 @@ class Blocks {
                 const blkData = blockObjs[actionNames[b]];
                 if (typeof blkData[1][1] === "string") {
                     name = blkData[1][1];
+                } else if (typeof blkData[1][1] === "number") {
+                    /** Turtle Blocks files may label actions with numbers. */
+                    name = blkData[1][1].toString();
+                    blkData[1][1] = { value: name };
                 } else {
                     name = blkData[1][1]["value"];
                 }

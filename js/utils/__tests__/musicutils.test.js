@@ -2534,6 +2534,7 @@ describe("convertFactor", () => {
 
     it("should return null for unknown factors", () => {
         expect(convertFactor(0)).toBeNull();
+        expect(convertFactor(0.675)).toBeNull();
         expect(convertFactor("string")).toBeNull(); // Non-numeric input
     });
 });
