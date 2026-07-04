@@ -273,9 +273,12 @@ function LegoWidget() {
         widgetWindow.show();
 
         widgetWindow.onclose = () => {
+            this._stopPlayback();
             this._stopWebcam();
             this._deactivateEyeDropper(); // Clean up eye dropper mode
             this._cleanupDragListeners(); // Clean up drag event listeners
+            this.imageWrapper = null;
+            this.webcamVideo = null;
             this.running = false;
             widgetWindow.destroy();
         };
@@ -1335,8 +1338,10 @@ function LegoWidget() {
         }
 
         // Reset button appearance
-        this.eyeDropperButton.style.backgroundColor = "";
-        this.eyeDropperButton.style.color = "";
+        if (this.eyeDropperButton) {
+            this.eyeDropperButton.style.backgroundColor = "";
+            this.eyeDropperButton.style.color = "";
+        }
 
         // Remove event listeners
         if (this.imageDisplayArea) {

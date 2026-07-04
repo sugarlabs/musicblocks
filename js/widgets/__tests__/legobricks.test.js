@@ -34,12 +34,19 @@ describe("LegoWidget Core Logic", () => {
             textColor: "#000000",
             selectorBackgroundHOFF: "#f8f8f8"
         };
+        global.Synth = jest.fn().mockImplementation(() => ({
+            loadSamples: jest.fn(),
+            createSynth: jest.fn(),
+            trigger: jest.fn(),
+            stopSound: jest.fn()
+        }));
         legoWidget = new LegoWidget();
     });
 
     afterEach(() => {
         delete global._;
         delete global.platformColor;
+        delete global.Synth;
     });
 
     describe("_calculateFallbackFrequency", () => {
@@ -573,6 +580,43 @@ describe("LegoWidget Core Logic", () => {
             await expect(
                 legoWidget.playColorMusicPolyphonic(legoWidget.colorData)
             ).resolves.not.toThrow();
+        });
+
+        it("should safely handle onclose cleanup without crash even if eyeDropperButton is undefined", () => {
+            const mockWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                addButton: jest.fn(() => ({
+                    querySelector: jest.fn(() => ({ src: "" }))
+                })),
+                getWidgetBody: jest.fn(() => document.createElement("div")),
+                sendToCenter: jest.fn(),
+                destroy: jest.fn()
+            };
+            const originalWidgetWindows = window.widgetWindows;
+            window.widgetWindows = {
+                windowFor: jest.fn(() => mockWindow)
+            };
+
+            legoWidget.matrixData = { rows: [] };
+            legoWidget._stopPlayback = jest.fn();
+            legoWidget._stopWebcam = jest.fn();
+            legoWidget._cleanupDragListeners = jest.fn();
+
+            legoWidget.init({ textMsg: jest.fn() });
+
+            // Trigger onclose callback set by init
+            expect(mockWindow.onclose).toBeDefined();
+            expect(() => mockWindow.onclose()).not.toThrow();
+
+            expect(legoWidget._stopPlayback).toHaveBeenCalled();
+            expect(legoWidget._stopWebcam).toHaveBeenCalled();
+            expect(legoWidget._cleanupDragListeners).toHaveBeenCalled();
+            expect(legoWidget.imageWrapper).toBeNull();
+            expect(legoWidget.webcamVideo).toBeNull();
+            expect(mockWindow.destroy).toHaveBeenCalled();
+
+            window.widgetWindows = originalWidgetWindows;
         });
     });
 });
