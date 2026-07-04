@@ -1270,6 +1270,21 @@ table {
     margin: auto;
 }
 
+#helpBodyDiv .help-tour-image,
+#helpBodyDiv .help-tour-detailed-icon,
+#helpBodyDiv .help-tour-icon {
+    display: block;
+    margin: 0 auto 0.5rem;
+}
+
+#helpBodyDiv .help-tour-large-image {
+    max-width: 100%;
+    max-height: min(38vh, 220px);
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
 #helpBodyDiv p {
     margin: 0.5rem 0;
 }
@@ -1318,9 +1333,18 @@ table {
 }
 
 @media (max-width: 600px) {
+    #helpBodyDiv {
+        justify-content: flex-start;
+        padding-top: 1rem;
+    }
+
     #helpBodyDiv .icon-container {
         margin-top: 0;
         padding-top: 0;
+    }
+
+    #helpBodyDiv .help-tour-large-image {
+        max-height: min(32vh, 180px);
     }
 
     .icon-container #findIcon,
