@@ -690,9 +690,10 @@ function Synth() {
                 let noteInfo;
                 let ratio;
                 if (!isNaN(interval)) {
-                    if (t[interval] && Array.isArray(t[interval]) && t[interval].length >= 3) {
-                        noteInfo = [t[interval][1], t[interval][2]];
-                        ratio = t[interval][0];
+                    const val = t[interval];
+                    if (Array.isArray(val) && val.length >= 3) {
+                        noteInfo = [val[1], val[2]];
+                        ratio = val[0];
                     } else {
                         continue;
                     }
@@ -706,9 +707,6 @@ function Synth() {
                 ) {
                     noteInfo = getNoteFromInterval(startingPitch, interval);
                     ratio = t[interval].ratio;
-                } else if (t[interval] && Array.isArray(t[interval]) && t[interval].length >= 3) {
-                    noteInfo = [t[interval][1], t[interval][2]];
-                    ratio = t[interval][0];
                 } else {
                     continue;
                 }

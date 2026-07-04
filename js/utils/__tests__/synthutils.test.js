@@ -494,6 +494,23 @@ describe("Utility Functions (logic-only)", () => {
             delete global.TEMPERAMENT[customTempName];
             Synth.inTemperament = originalInTemp;
         });
+
+        it("should handle standard temperaments with object ratios and invalid ratios", () => {
+            const customTempName = "myCustomNumericTemp3";
+            global.TEMPERAMENT[customTempName] = {
+                "pitchNumber": 3,
+                "perfect 1": { ratio: 1.0 },
+                "perfect 5": 1.5,
+                "major 3": "invalid"
+            };
+            const originalInTemp = Synth.inTemperament;
+            Synth.inTemperament = customTempName;
+            expect(() => temperamentChanged(customTempName, "C4")).not.toThrow();
+            expect(Synth.noteFrequencies["C"]).toEqual([4, expect.any(Number)]);
+            expect(Synth.noteFrequencies["G"]).toEqual([4, expect.any(Number)]);
+            delete global.TEMPERAMENT[customTempName];
+            Synth.inTemperament = originalInTemp;
+        });
     });
 
     describe("resume", () => {

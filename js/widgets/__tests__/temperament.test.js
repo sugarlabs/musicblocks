@@ -1,6 +1,38 @@
 const TemperamentWidget = require("../temperament");
 describe("TemperamentWidget basic tests", () => {
     let widget;
+    const createMockElement = id => ({
+        id: id,
+        innerHTML: "",
+        textContent: "",
+        appendChild: jest.fn(),
+        setAttribute: jest.fn(),
+        style: {},
+        width: 100,
+        height: 100,
+        dataset: { message: "1" },
+        append: jest.fn(),
+        remove: jest.fn(),
+        getElementsByTagName: jest.fn(() => [createMockElement("img")]),
+        addEventListener: jest.fn(),
+        getContext: jest.fn(() => ({
+            beginPath: jest.fn(),
+            arc: jest.fn(),
+            fill: jest.fn(),
+            stroke: jest.fn(),
+            lineWidth: 0,
+            fillStyle: "",
+            strokeStyle: ""
+        })),
+        getBoundingClientRect: jest.fn(() => ({ left: 0, top: 0 })),
+        insertCell: jest.fn(() => createMockElement("cell")),
+        createTHead: jest.fn(() => ({
+            insertRow: jest.fn(() => ({
+                id: "",
+                insertCell: jest.fn(() => createMockElement("cell"))
+            }))
+        }))
+    });
     global._ = jest.fn(text => text);
     global.PREVIEWVOLUME = 80;
 
@@ -46,7 +78,8 @@ describe("TemperamentWidget basic tests", () => {
             labelColor: "#ddd"
         };
 
-        global.Singer = { defaultBPMFactor: 1 };
+        global.last = arr => arr[arr.length - 1];
+        global.Singer = { defaultBPMFactor: 1, masterVolume: [80] };
         const util = require("util");
         global.TextEncoder = util.TextEncoder;
         global.TextDecoder = util.TextDecoder;
@@ -67,39 +100,6 @@ describe("TemperamentWidget basic tests", () => {
 
         global.FLAT = "♭";
         global.SHARP = "♯";
-
-        const createMockElement = id => ({
-            id: id,
-            innerHTML: "",
-            textContent: "",
-            appendChild: jest.fn(),
-            setAttribute: jest.fn(),
-            style: {},
-            width: 100,
-            height: 100,
-            dataset: { message: "1" },
-            append: jest.fn(),
-            remove: jest.fn(),
-            getElementsByTagName: jest.fn(() => [createMockElement("img")]),
-            addEventListener: jest.fn(),
-            getContext: jest.fn(() => ({
-                beginPath: jest.fn(),
-                arc: jest.fn(),
-                fill: jest.fn(),
-                stroke: jest.fn(),
-                lineWidth: 0,
-                fillStyle: "",
-                strokeStyle: ""
-            })),
-            getBoundingClientRect: jest.fn(() => ({ left: 0, top: 0 })),
-            insertCell: jest.fn(() => createMockElement("cell")),
-            createTHead: jest.fn(() => ({
-                insertRow: jest.fn(() => ({
-                    id: "",
-                    insertCell: jest.fn(() => createMockElement("cell"))
-                }))
-            }))
-        });
 
         const mockElements = {};
         global.docById = jest.fn(id => {
@@ -1064,6 +1064,116 @@ describe("TemperamentWidget basic tests", () => {
             const cents = 47;
             const freq = widget._centsToFreq(cents, 440);
             expect(widget._freqToCents(freq, 440)).toBeCloseTo(cents, 6);
+        });
+    });
+
+    describe("TemperamentWidget interactive events", () => {
+        let mockWidgetWindow;
+        let mockActivity;
+
+        beforeEach(() => {
+            mockWidgetWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                getWidgetBody: jest.fn(() => ({ append: jest.fn(), style: {} })),
+                addButton: jest.fn(() => ({
+                    onclick: null,
+                    getElementsByTagName: jest.fn(() => [createMockElement("img")])
+                })),
+                sendToCenter: jest.fn(),
+                destroy: jest.fn(),
+                onclose: null
+            };
+            global.window.widgetWindows = { windowFor: jest.fn(() => mockWidgetWindow) };
+            global.window.innerWidth = 1200;
+            global.buildScale = jest.fn(() => [["C"], []]);
+            global.getNoteFromInterval = jest.fn(() => ["C", 4]);
+            global.isCustomTemperament = jest.fn(() => false);
+
+            mockActivity = {
+                errorMsg: jest.fn(),
+                logo: {
+                    synth: {
+                        startingPitch: "C4",
+                        _getFrequency: jest.fn(() => 440),
+                        setMasterVolume: jest.fn(),
+                        stop: jest.fn(),
+                        trigger: jest.fn()
+                    },
+                    resetSynth: jest.fn()
+                }
+            };
+
+            widget.inTemperament = "equal";
+            widget.scale = ["C", "Major"];
+            widget.octaveChanged = true;
+            widget.init(mockActivity);
+            widget.octaveChanged = true;
+            widget._circleOfNotes();
+
+            widget.tempRatios1 = [1];
+            widget.ratios = [1.0];
+            widget.intervals = ["unison"];
+            widget.notes = [["C", 4]];
+            widget.scaleNotes = ["C"];
+            widget.frequencies = [440];
+            widget.wheel = { removeWheel: jest.fn() };
+            widget.notesCircle = { removeWheel: jest.fn() };
+            widget.wheel1 = { removeWheel: jest.fn() };
+        });
+
+        test("onclose cleans up timeouts and playing state", () => {
+            widget._playing = true;
+            widget._playTimeout = setTimeout(() => {}, 1000);
+
+            expect(mockWidgetWindow.onclose).toBeDefined();
+            mockWidgetWindow.onclose();
+
+            expect(widget._playing).toBe(false);
+            expect(widget._playTimeout).toBeNull();
+            expect(mockActivity.logo.synth.stop).toHaveBeenCalled();
+            expect(mockActivity.logo.synth.setMasterVolume).toHaveBeenCalled();
+        });
+
+        test("noteCell click stops playing if active", () => {
+            widget._playing = true;
+            widget._playTimeout = setTimeout(() => {}, 1000);
+            widget.playButton = createMockElement("play");
+
+            const noteCell = mockWidgetWindow.addButton.mock.results[2].value;
+            expect(noteCell.onclick).toBeDefined();
+
+            // Toggle noteCell twice to cover both circleIsVisible branches
+            noteCell.onclick();
+            expect(widget._playing).toBe(false);
+            expect(widget._lastPlaybackIndex).toBe(0);
+
+            noteCell.onclick();
+            expect(widget._lastPlaybackIndex).toBe(0);
+        });
+
+        test("clear button click resets play state and playback index", () => {
+            const clearBtn = global.docById("clearNotes");
+            expect(clearBtn.onclick).toBeDefined();
+
+            widget._playing = true;
+            widget.playButton = createMockElement("play");
+
+            clearBtn.onclick();
+            expect(widget._playing).toBe(false);
+            expect(widget._lastPlaybackIndex).toBe(0);
+        });
+
+        test("octave space button click resets play state and playback index", () => {
+            const octaveBtn = global.docById("standardOctave");
+            expect(octaveBtn.onclick).toBeDefined();
+
+            widget._playing = true;
+            widget.playButton = createMockElement("play");
+
+            octaveBtn.onclick();
+            expect(widget._playing).toBe(false);
+            expect(widget._lastPlaybackIndex).toBe(0);
         });
     });
 });
