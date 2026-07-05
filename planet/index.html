@@ -222,6 +222,9 @@
                         <div class="col no-margin-left s12">
                             <div class="section projectscontainer" id="global-projects">
                             </div>
+                            <!-- Invisible sentinel watched by IntersectionObserver for infinite scroll -->
+                            <div id="infinite-scroll-sentinel" style="height:1px; width:100%;"></div>
+                            <!-- Fallback button kept for accessibility; hidden by JS when observer is active -->
                             <a class="waves-effect btn-flat centre-button absolute" id="load-more-projects"
                                 style="display: none;"></a>
                         </div>
