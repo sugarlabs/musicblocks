@@ -105,10 +105,11 @@ class ProjectStorage {
         return this.ImageDataURL;
     }
 
-    async initialiseNewProject(name, data, image) {
+    async initialiseNewProject(name, data, image, publishedData) {
         name = name ?? this.defaultProjectName;
         data = data ?? null;
         image = image ?? null;
+        publishedData = publishedData ?? null;
 
         const c = this.generateID();
         this.data.CurrentProject = c;
@@ -116,9 +117,11 @@ class ProjectStorage {
         this.data.Projects[c].ProjectName = name;
         this.data.Projects[c].ProjectData = data;
         this.data.Projects[c].ProjectImage = image;
-        this.data.Projects[c].PublishedData = null;
+        this.data.Projects[c].PublishedData = publishedData;
+        this.data.Projects[c].GitRepoData   = null;   // GitHub repo link (separate from published state)
         this.data.Projects[c].DateLastModified = Date.now();
         await this.save();
+        return c;
     }
 
     async renameProject(id, name) {
@@ -128,6 +131,20 @@ class ProjectStorage {
 
     async addPublishedData(id, data) {
         this.data.Projects[id].PublishedData = data;
+        await this.save();
+    }
+
+    /**
+     * Stores the GitHub repo slug for a project that has a repo but
+     * has NOT yet been published to the planet (visible=0).
+     * Also stores description and tags so the publish form can pre-populate them.
+     */
+    async addGitRepoData(id, repoName, description, tags) {
+        this.data.Projects[id].GitRepoData = {
+            repoName,
+            description: description || "",
+            tags:        tags        || []
+        };
         await this.save();
     }
 
