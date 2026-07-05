@@ -16,9 +16,13 @@ app.get("/env.js", (req, res) => {
     res.setHeader("Surrogate-Control", "no-store");
     res.send(
         `window.MB_ENV=${JSON.stringify(process.env.NODE_ENV || "development")};` +
-            `window.MB_IS_DEV=${JSON.stringify(isDev)};`
+            `window.MB_IS_DEV=${JSON.stringify(isDev)};` +
+            `window.MB_PLANET_API_KEY = "3f2d3a4c-c7a4-4c3c-892e-ac43784f7381";` +
+            `window.MB_PROJECT_API_KEY = "3tgTzMXbbw6xEKX7";` +
+            `window.MB_GIT_BACKEND_URL = "http://localhost:5000";`
     );
 });
+
 
 // Enable compression for all responses
 app.use(
