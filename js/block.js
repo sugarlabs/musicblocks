@@ -3337,6 +3337,11 @@ class Block {
                 );
                 if (movedDx + movedDy > 5) {
                     moved = true;
+                    // Announce block drag to screen readers
+                    if (!that._announced) {
+                        that._announced = true;
+                        that.activity.textMsg(_("Block picked up"), 1000);
+                    }
                 }
             } else {
                 // Make it easier to select text on mobile.
@@ -3511,6 +3516,7 @@ class Block {
             // Clear cached drag state.
             _dragHasRest2 = false;
             moved = false;
+            that._announced = false;
         });
         // Touch long-press to open context menu
         this.container.on("touchstart", () => {
