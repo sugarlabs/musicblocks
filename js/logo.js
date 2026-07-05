@@ -316,8 +316,8 @@ class Logo {
         } else {
             // Node.js / Jest environment — require the module
             try {
-                const { ManagedTimer: MT } = require("./utils/ManagedTimer");
-                this._timerManager = new MT();
+                const ManagedTimerCtor = require("./utils/ManagedTimer");
+                this._timerManager = new ManagedTimerCtor();
             } catch (e) {
                 // Fallback: create a minimal shim so the engine still works
                 this._timerManager = {
