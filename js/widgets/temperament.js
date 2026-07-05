@@ -21,9 +21,9 @@
 
    _, addTemperamentToDictionary, buildScale,
    deleteTemperamentFromList, docById, FLAT, getNoteFromInterval,
-   getOctaveRatio, getTemperament, getTemperamentKeys, getTemperamentRatio,
-   isCustomTemperament, last, normalizeNoteAccidentals, parseNoteString, pitchToFrequency, platformColor,
-   PREVIEWVOLUME, rationalToFraction, setOctaveRatio, setOctaveRatio, SHARP, Singer,
+   getOctaveRatio, getTemperament, getTemperamentKeys,
+   isCustomTemperament, normalizeNoteAccidentals, parseNoteString, pitchToFrequency,
+   rationalToFraction, setOctaveRatio, setOctaveRatio, SHARP, Singer,
    slicePath, updateTemperaments, wheelnav, frequencyToPitch
  */
 
@@ -67,7 +67,6 @@ function TemperamentWidget() {
      * @type {string|null}
      */
     this.inTemperament = null;
-    this._playTimeout = null;
 
     /**
      * Last triggered event.
@@ -163,14 +162,16 @@ function TemperamentWidget() {
         cell.style.height = cell.style.width;
         cell.style.minHeight = cell.style.height;
         cell.style.maxHeight = cell.style.height;
-        cell.classList.add("temperament-selector-cell");
+        cell.classList.add("tm-selector-bg");
 
         cell.onmouseover = function () {
-            this.classList.add("temperament-selector-hover");
+            this.classList.add("tm-selector-hover");
+            this.classList.remove("tm-selector-bg");
         };
 
         cell.onmouseout = function () {
-            this.classList.remove("temperament-selector-hover");
+            this.classList.remove("tm-selector-hover");
+            this.classList.add("tm-selector-bg");
         };
 
         return cell;
@@ -188,7 +189,7 @@ function TemperamentWidget() {
         temperamentTableDiv.style.visibility = "visible";
         temperamentTableDiv.style.border = "0px";
         temperamentTableDiv.style.overflow = "auto";
-        temperamentTableDiv.style.backgroundColor = "white";
+        temperamentTableDiv.classList.add("tm-selector-bg");
         temperamentTableDiv.style.height = "300px";
         temperamentTableDiv.textContent = "";
         const temperamentTable = document.createElement("div");
@@ -229,7 +230,9 @@ function TemperamentWidget() {
         ctx.fillStyle = "rgba(204, 0, 102, 0)";
         ctx.fill();
         ctx.lineWidth = 1;
-        ctx.strokeStyle = platformColor.strokeColor || "#003300";
+        ctx.strokeStyle = getComputedStyle(document.body)
+            .getPropertyValue("--color-text-primary")
+            .trim();
         ctx.stroke();
 
         let angle = [];
@@ -271,8 +274,9 @@ function TemperamentWidget() {
             const sliceAngle = [];
             const angleDiff = [];
             for (let i = 0; i < this.notesCircle.navItemCount; i++) {
-                this.notesCircle.navItems[i].fillAttr =
-                    platformColor.selectorBackground || "#c8C8C8";
+                this.notesCircle.navItems[i].fillAttr = getComputedStyle(document.body)
+                    .getPropertyValue("--color-selector-bg")
+                    .trim();
                 this.notesCircle.navItems[i].titleAttr.font =
                     "20 20px Impact, Charcoal, sans-serif";
                 this.notesCircle.navItems[i].titleSelectedAttr.font =
@@ -345,13 +349,13 @@ function TemperamentWidget() {
             divAppend1 = docById("clearNotes");
             divAppend1.style.height = "30px";
             divAppend1.style.marginLeft = "3px";
-            divAppend1.style.backgroundColor = platformColor.selectorBackground;
+            divAppend1.classList.add("tm-selector-bg");
             divAppend1.style.width = "212px";
 
             divAppend2 = docById("standardOctave");
             divAppend2.style.height = "30px";
             divAppend2.style.marginRight = "3px";
-            divAppend2.style.backgroundColor = platformColor.selectorBackground;
+            divAppend2.classList.add("tm-selector-bg");
             divAppend2.style.width = BUTTONDIVWIDTH / 2 - 8 + "px";
         } else {
             divAppend1 = document.createElement("div");
@@ -361,7 +365,7 @@ function TemperamentWidget() {
             divAppend1.style.position = "absolute";
             divAppend1.style.zIndex = 2;
             divAppend1.style.paddingTop = "5px";
-            divAppend1.style.backgroundColor = platformColor.selectorBackground;
+            divAppend1.classList.add("tm-selector-bg");
             divAppend1.style.height = "25px";
             divAppend1.style.width = docById("wheelDiv2").style.width;
             divAppend1.style.marginTop = docById("wheelDiv2").style.height;
@@ -375,10 +379,6 @@ function TemperamentWidget() {
          */
         if (divAppend1 !== undefined) {
             divAppend1.onclick = function () {
-                if (that._playing) {
-                    that.playAll();
-                }
-                that._lastPlaybackIndex = 0;
                 const ratio = that.ratios[0];
                 that.ratios = [];
                 that.ratios[0] = ratio;
@@ -399,10 +399,6 @@ function TemperamentWidget() {
          */
         if (divAppend2 !== undefined) {
             divAppend2.onclick = function () {
-                if (that._playing) {
-                    that.playAll();
-                }
-                that._lastPlaybackIndex = 0;
                 const powers = [];
                 const compareRatios = [];
                 const frequency = that.frequencies[0];
@@ -759,7 +755,8 @@ function TemperamentWidget() {
 
         const menuItems = document.querySelectorAll("#menuLabels");
         for (let i = 0; i < menuLabels.length; i++) {
-            menuItems[i].style.background = platformColor.labelColor;
+            menuItems[i].classList.add("tm-selector-bg");
+            menuItems[i].style.background = "";
             menuItems[i].style.height = 30 + "px";
             menuItems[i].style.textAlign = "center";
             menuItems[i].style.fontWeight = "bold";
@@ -819,15 +816,17 @@ function TemperamentWidget() {
             notesCell[i][0].appendChild(playImg);
             notesCell[i][0].appendChild(document.createTextNode("\u00A0\u00A0"));
             notesCell[i][0].style.width = 40 + "px";
-            notesCell[i][0].style.backgroundColor = platformColor.selectorBackground;
+            notesCell[i][0].classList.add("tm-selector-bg");
             notesCell[i][0].style.textAlign = "center";
 
             notesCell[i][0].onmouseover = function () {
-                this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
+                this.classList.add("tm-selector-hover");
+                this.classList.remove("tm-selector-bg");
             };
 
             notesCell[i][0].onmouseout = function () {
-                this.style.backgroundColor = platformColor.selectorBackground;
+                this.classList.remove("tm-selector-hover");
+                this.classList.add("tm-selector-bg");
             };
 
             const playImage = docById("play_" + i);
@@ -844,7 +843,7 @@ function TemperamentWidget() {
             notesCell[i][1] = notesRow[i].insertCell(-1);
             notesCell[i][1].id = "pitchNumber_" + i;
             notesCell[i][1].textContent = i;
-            notesCell[i][1].style.backgroundColor = platformColor.selectorBackground;
+            notesCell[i][1].classList.add("tm-selector-bg");
             notesCell[i][1].style.textAlign = "center";
 
             ratios[i] = this.ratios[i];
@@ -853,7 +852,7 @@ function TemperamentWidget() {
             //Ratio
             notesCell[i][2] = notesRow[i].insertCell(-1);
             notesCell[i][2].textContent = ratios[i];
-            notesCell[i][2].style.backgroundColor = platformColor.selectorBackground;
+            notesCell[i][2].classList.add("tm-selector-bg");
             notesCell[i][2].style.textAlign = "center";
 
             if (!isCustomTemperament(this.inTemperament)) {
@@ -861,14 +860,14 @@ function TemperamentWidget() {
                 notesCell[i][3] = notesRow[i].insertCell(-1);
                 notesCell[i][3].textContent = this.intervals[i];
                 notesCell[i][3].style.width = 120 + "px";
-                notesCell[i][3].style.backgroundColor = platformColor.selectorBackground;
+                notesCell[i][3].classList.add("tm-selector-bg");
                 notesCell[i][3].style.textAlign = "center";
 
                 //Notes
                 notesCell[i][4] = notesRow[i].insertCell(-1);
                 notesCell[i][4].textContent = this.notes[i];
                 notesCell[i][4].style.width = 50 + "px";
-                notesCell[i][4].style.backgroundColor = platformColor.selectorBackground;
+                notesCell[i][4].classList.add("tm-selector-bg");
                 notesCell[i][4].style.textAlign = "center";
 
                 //Mode
@@ -883,14 +882,14 @@ function TemperamentWidget() {
                     notesCell[i][5].textContent = _("non scalar");
                 }
                 notesCell[i][5].style.width = 100 + "px";
-                notesCell[i][5].style.backgroundColor = platformColor.selectorBackground;
+                notesCell[i][5].classList.add("tm-selector-bg");
                 notesCell[i][5].style.textAlign = "center";
             }
 
             //Frequency
             notesCell[i][6] = notesRow[i].insertCell(-1);
             notesCell[i][6].textContent = this.frequencies[i];
-            notesCell[i][6].style.backgroundColor = platformColor.selectorBackground;
+            notesCell[i][6].classList.add("tm-selector-bg");
             notesCell[i][6].style.textAlign = "center";
 
             if (isCustomTemperament(this.inTemperament)) {
@@ -910,10 +909,6 @@ function TemperamentWidget() {
      * @returns {void}
      */
     this.edit = function () {
-        if (this._playing) {
-            this.playAll();
-        }
-        this._lastPlaybackIndex = 0;
         this.editMode = null;
         this._logo.synth.setMasterVolume(0);
         this._logo.synth.stop();
@@ -950,44 +945,62 @@ function TemperamentWidget() {
         editOctaveTbody.appendChild(userEditTr);
         const menuItems = document.querySelectorAll("#editMenus");
         for (let i = 0; i < editMenus.length; i++) {
-            menuItems[i].style.background = platformColor.selectorBackground;
+            menuItems[i].classList.add("tm-selector-bg");
+            menuItems[i].style.background = "";
             menuItems[i].style.height = 30 + "px";
             menuItems[i].style.textAlign = "center";
             menuItems[i].style.fontWeight = "bold";
         }
 
-        menuItems[0].style.background = platformColor.selectorBackground || "#c8C8C8";
+        menuItems[0].classList.add("tm-selector-bg");
+        menuItems[0].style.background = "";
         that.equalEdit();
 
         menuItems[0].onclick = function () {
-            menuItems[1].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = platformColor.selectorBackground;
-            menuItems[0].style.background = platformColor.selectorBackground || "#c8C8C8";
+            menuItems[1].classList.add("tm-selector-bg");
+            menuItems[1].style.background = "";
+            menuItems[2].classList.add("tm-selector-bg");
+            menuItems[2].style.background = "";
+            menuItems[3].classList.add("tm-selector-bg");
+            menuItems[3].style.background = "";
+            menuItems[0].classList.add("tm-selector-bg");
+            menuItems[0].style.background = "";
             that.equalEdit();
         };
 
         menuItems[1].onclick = function () {
-            menuItems[0].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = platformColor.selectorBackground;
-            menuItems[1].style.background = platformColor.selectorBackground || "#c8C8C8";
+            menuItems[0].classList.add("tm-selector-bg");
+            menuItems[0].style.background = "";
+            menuItems[2].classList.add("tm-selector-bg");
+            menuItems[2].style.background = "";
+            menuItems[3].classList.add("tm-selector-bg");
+            menuItems[3].style.background = "";
+            menuItems[1].classList.add("tm-selector-bg");
+            menuItems[1].style.background = "";
             that.ratioEdit();
         };
 
         menuItems[2].onclick = function () {
-            menuItems[0].style.background = platformColor.selectorBackground;
-            menuItems[1].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = platformColor.selectorBackground || "#c8C8C8";
+            menuItems[0].classList.add("tm-selector-bg");
+            menuItems[0].style.background = "";
+            menuItems[1].classList.add("tm-selector-bg");
+            menuItems[1].style.background = "";
+            menuItems[3].classList.add("tm-selector-bg");
+            menuItems[3].style.background = "";
+            menuItems[2].classList.add("tm-selector-bg");
+            menuItems[2].style.background = "";
             that.arbitraryEdit();
         };
 
         menuItems[3].onclick = function () {
-            menuItems[0].style.background = platformColor.selectorBackground;
-            menuItems[1].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = platformColor.selectorBackground || "#c8C8C8";
+            menuItems[0].classList.add("tm-selector-bg");
+            menuItems[0].style.background = "";
+            menuItems[1].classList.add("tm-selector-bg");
+            menuItems[1].style.background = "";
+            menuItems[2].classList.add("tm-selector-bg");
+            menuItems[2].style.background = "";
+            menuItems[3].classList.add("tm-selector-bg");
+            menuItems[3].style.background = "";
             that.octaveSpaceEdit();
         };
     };
@@ -1000,7 +1013,7 @@ function TemperamentWidget() {
         this.editMode = "equal";
         docById("userEdit").textContent = "";
         const equalEdit = docById("userEdit");
-        equalEdit.style.backgroundColor = platformColor.selectorBackground || "#c8C8C8";
+        equalEdit.classList.add("tm-selector-bg");
         equalEdit.appendChild(document.createElement("br"));
         equalEdit.appendChild(
             document.createTextNode(_("pitch number") + "\u00A0\u00A0\u00A0\u00A0 ")
@@ -1057,13 +1070,13 @@ function TemperamentWidget() {
             const divAppend1 = docById("preview");
             divAppend1.style.height = "30px";
             divAppend1.style.marginLeft = "3px";
-            divAppend1.style.backgroundColor = platformColor.selectorBackground;
+            divAppend1.classList.add("tm-selector-bg");
             divAppend1.style.width = "215px";
 
             const divAppend2 = docById("done_");
             divAppend2.style.height = "30px";
             divAppend2.style.marginRight = "3px";
-            divAppend2.style.backgroundColor = platformColor.selectorBackground;
+            divAppend2.classList.add("tm-selector-bg");
             divAppend2.style.width = "205px";
         }
 
@@ -1166,14 +1179,24 @@ function TemperamentWidget() {
                 docById("userEdit").appendChild(wheelDiv2);
                 this.createMainWheel(this.tempRatios, pitchNumber);
                 for (let i = 0; i < pitchNumber; i++) {
-                    this.notesCircle.navItems[i].fillAttr =
-                        platformColor.selectorBackground || "#e0e0e0";
-                    this.notesCircle.navItems[i].sliceHoverAttr.fill =
-                        platformColor.selectorBackground || "#e0e0e0";
-                    this.notesCircle.navItems[i].slicePathAttr.fill =
-                        platformColor.selectorBackground || "#e0e0e0";
-                    this.notesCircle.navItems[i].sliceSelectedAttr.fill =
-                        platformColor.selectorBackground || "#e0e0e0";
+                    this.notesCircle.navItems[i].fillAttr = getComputedStyle(document.body)
+                        .getPropertyValue("--color-selector-bg")
+                        .trim();
+                    this.notesCircle.navItems[i].sliceHoverAttr.fill = getComputedStyle(
+                        document.body
+                    )
+                        .getPropertyValue("--color-selector-bg")
+                        .trim();
+                    this.notesCircle.navItems[i].slicePathAttr.fill = getComputedStyle(
+                        document.body
+                    )
+                        .getPropertyValue("--color-selector-bg")
+                        .trim();
+                    this.notesCircle.navItems[i].sliceSelectedAttr.fill = getComputedStyle(
+                        document.body
+                    )
+                        .getPropertyValue("--color-selector-bg")
+                        .trim();
                 }
                 this.notesCircle.refreshWheel();
                 docById("userEdit").style.paddingLeft = "0px";
@@ -1226,7 +1249,7 @@ function TemperamentWidget() {
         this.editMode = "ratio";
         docById("userEdit").textContent = "";
         const ratioEdit = docById("userEdit");
-        ratioEdit.style.backgroundColor = platformColor.selectorBackground || "#c8C8C8";
+        ratioEdit.classList.add("tm-selector-bg");
         ratioEdit.appendChild(document.createElement("br"));
         ratioEdit.appendChild(document.createTextNode(_("ratio") + " \u00A0\u00A0\u00A0\u00A0 "));
         const ratioIn = document.createElement("input");
@@ -1278,13 +1301,13 @@ function TemperamentWidget() {
             const divAppend1 = docById("preview");
             divAppend1.style.height = "30px";
             divAppend1.style.marginLeft = "3px";
-            divAppend1.style.backgroundColor = platformColor.selectorBackground;
+            divAppend1.classList.add("tm-selector-bg");
             divAppend1.style.width = "215px";
 
             const divAppend2 = docById("done_");
             divAppend2.style.height = "30px";
             divAppend2.style.marginRight = "3px";
-            divAppend2.style.backgroundColor = platformColor.selectorBackground;
+            divAppend2.classList.add("tm-selector-bg");
             divAppend2.style.width = "205px";
         }
 
@@ -1381,14 +1404,24 @@ function TemperamentWidget() {
                 docById("userEdit").appendChild(wheelDiv2);
                 that.createMainWheel(that.tempRatios, pitchNumber);
                 for (let i = 0; i < pitchNumber; i++) {
-                    that.notesCircle.navItems[i].fillAttr =
-                        platformColor.selectorBackground || "#e0e0e0";
-                    that.notesCircle.navItems[i].sliceHoverAttr.fill =
-                        platformColor.selectorBackground || "#e0e0e0";
-                    that.notesCircle.navItems[i].slicePathAttr.fill =
-                        platformColor.selectorBackground || "#e0e0e0";
-                    that.notesCircle.navItems[i].sliceSelectedAttr.fill =
-                        platformColor.selectorBackground || "#e0e0e0";
+                    that.notesCircle.navItems[i].fillAttr = getComputedStyle(document.body)
+                        .getPropertyValue("--color-selector-bg")
+                        .trim();
+                    that.notesCircle.navItems[i].sliceHoverAttr.fill = getComputedStyle(
+                        document.body
+                    )
+                        .getPropertyValue("--color-selector-bg")
+                        .trim();
+                    that.notesCircle.navItems[i].slicePathAttr.fill = getComputedStyle(
+                        document.body
+                    )
+                        .getPropertyValue("--color-selector-bg")
+                        .trim();
+                    that.notesCircle.navItems[i].sliceSelectedAttr.fill = getComputedStyle(
+                        document.body
+                    )
+                        .getPropertyValue("--color-selector-bg")
+                        .trim();
                 }
                 that.notesCircle.refreshWheel();
                 docById("userEdit").style.paddingLeft = "0px";
@@ -1502,7 +1535,9 @@ function TemperamentWidget() {
             const angle = [];
             const angleDiff = [];
             for (let i = 0; i < this.wheel1.navItemCount; i++) {
-                this.wheel1.navItems[i].fillAttr = platformColor.selectorBackground || "#e0e0e0";
+                this.wheel1.navItems[i].fillAttr = getComputedStyle(document.body)
+                    .getPropertyValue("--color-selector-bg")
+                    .trim();
                 this.wheel1.navItems[i].titleAttr.font = "20 20px Impact, Charcoal, sans-serif";
                 this.wheel1.navItems[i].titleSelectedAttr.font =
                     "20 20px Impact, Charcoal, sans-serif";
@@ -1566,7 +1601,9 @@ function TemperamentWidget() {
         ctx.fillStyle = "rgba(204, 0, 102, 0)";
         ctx.fill();
         ctx.lineWidth = 1;
-        ctx.strokeStyle = platformColor.strokeColor || "#003300";
+        ctx.strokeStyle = getComputedStyle(document.body)
+            .getPropertyValue("--color-text-primary")
+            .trim();
         ctx.stroke();
 
         this._createOuterWheel = function (ratios, pitchNumber) {
@@ -1591,8 +1628,8 @@ function TemperamentWidget() {
             this.wheel.sliceSelectedPathCustom = this.wheel.slicePathCustom;
             this.wheel.sliceInitPathCustom = this.wheel.slicePathCustom;
             this.wheel.colors = [
-                platformColor.selectorBackground || "#c0c0c0",
-                platformColor.selectorBackground || "#e0e0e0"
+                getComputedStyle(document.body).getPropertyValue("--color-selector-bg").trim(),
+                getComputedStyle(document.body).getPropertyValue("--color-selector-bg").trim()
             ];
             this.wheel.titleRotateAngle = 90;
             this.wheel.navItemsEnabled = false;
@@ -1647,7 +1684,7 @@ function TemperamentWidget() {
         divAppend.textContent = _("done");
         divAppend.style.textAlign = "center";
         divAppend.style.paddingTop = "5px";
-        divAppend.style.backgroundColor = platformColor.selectorBackground;
+        divAppend.classList.add("tm-selector-bg");
         divAppend.style.height = "25px";
         divAppend.style.marginTop = "40px";
         divAppend.style.overflow = "auto";
@@ -1823,7 +1860,7 @@ function TemperamentWidget() {
         const len = this.ratios.length;
         const octaveRatio = this.ratios[len - 1];
         const octaveSpaceEdit = docById("userEdit");
-        octaveSpaceEdit.style.backgroundColor = platformColor.selectorBackground || "#c8C8C8";
+        octaveSpaceEdit.classList.add("tm-selector-bg");
         octaveSpaceEdit.appendChild(document.createElement("br"));
         octaveSpaceEdit.appendChild(document.createElement("br"));
         octaveSpaceEdit.appendChild(
@@ -1853,7 +1890,7 @@ function TemperamentWidget() {
         divAppend.style.textAlign = "center";
         divAppend.style.paddingTop = "5px";
         divAppend.style.marginLeft = "-70px";
-        divAppend.style.backgroundColor = platformColor.selectorBackground;
+        divAppend.classList.add("tm-selector-bg");
         divAppend.style.height = "25px";
         divAppend.style.marginTop = "40px";
         divAppend.style.overflow = "auto";
@@ -1923,7 +1960,8 @@ function TemperamentWidget() {
                 const temperamentRatios = [];
                 for (let j = 0; j < t.interval.length; j++) {
                     intervals[j] = t.interval[j];
-                    temperamentRatios[j] = getTemperamentRatio(t[intervals[j]]).toFixed(2);
+                    temperamentRatios[j] = getTemperamentRatio(t[intervals[j]]);
+                    temperamentRatios[j] = temperamentRatios[j].toFixed(2);
                 }
                 const ratiosEqual =
                     ratios.length === temperamentRatios.length &&
@@ -2292,14 +2330,12 @@ function TemperamentWidget() {
      * @returns {void}
      */
     this.playAll = function () {
-        const duration = 1 / 2;
         let p = 0;
         this._playing = !this._playing;
         this._logo.resetSynth(0);
 
         const cell = this.playButton;
         if (this._playing) {
-            this._logo.synth.setMasterVolume(PREVIEWVOLUME);
             cell.textContent = "\u00A0\u00A0";
             const stopImg = document.createElement("img");
             stopImg.src = "header-icons/stop-button.svg";
@@ -2312,10 +2348,6 @@ function TemperamentWidget() {
             cell.appendChild(stopImg);
             cell.appendChild(document.createTextNode("\u00A0\u00A0"));
         } else {
-            if (this._playTimeout) {
-                clearTimeout(this._playTimeout);
-                this._playTimeout = null;
-            }
             this._logo.synth.setMasterVolume(0);
             this._logo.synth.stop();
             cell.textContent = "\u00A0\u00A0";
@@ -2331,6 +2363,7 @@ function TemperamentWidget() {
             cell.appendChild(document.createTextNode("\u00A0\u00A0"));
         }
 
+        const duration = 1 / 2;
         const startingPitch = this._logo.synth.startingPitch;
         const startPitchParsed = parseNoteString(startingPitch);
         const octave = startPitchParsed[1] - 1;
@@ -2348,14 +2381,11 @@ function TemperamentWidget() {
             pitchNumber = this.tempRatios1.length - 1;
         }
 
+        const currentTime = new Date().getTime();
         const __playLoop = function (i) {
-            that._lastPlaybackIndex = i;
             if (i === pitchNumber) {
                 that.playbackForward = false;
             }
-            // Note: If resuming from _lastPlaybackIndex > 0, the 'p < 2' loop check
-            // starts mid-sequence, meaning the first pass will play fewer notes.
-            // This is intended behavior to pick up exactly where playback was paused.
             if (i === 0) {
                 p++;
             }
@@ -2372,131 +2402,215 @@ function TemperamentWidget() {
             }
 
             if (that.circleIsVisible === false && docById("wheelDiv4") === null) {
-                if (pitchNumber > 1) {
-                    if (i === pitchNumber && that._playing) {
-                        that.notesCircle.navItems[0].fillAttr =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                        that.notesCircle.navItems[0].sliceHoverAttr.fill =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                        that.notesCircle.navItems[0].slicePathAttr.fill =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                        that.notesCircle.navItems[0].sliceSelectedAttr.fill =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                    } else if (that._playing) {
-                        that.notesCircle.navItems[i].fillAttr =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                        that.notesCircle.navItems[i].sliceHoverAttr.fill =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                        that.notesCircle.navItems[i].slicePathAttr.fill =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                        that.notesCircle.navItems[i].sliceSelectedAttr.fill =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                    }
-
-                    if (that.playbackForward === false && i < pitchNumber) {
-                        if (i === pitchNumber - 1) {
-                            that.notesCircle.navItems[0].fillAttr =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.navItems[0].sliceHoverAttr.fill =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.navItems[0].slicePathAttr.fill =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.navItems[0].sliceSelectedAttr.fill =
-                                platformColor.selectorBackground || "#c8C8C8";
-                        } else {
-                            that.notesCircle.navItems[i + 1].fillAttr =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.navItems[i + 1].sliceHoverAttr.fill =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.navItems[i + 1].slicePathAttr.fill =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.navItems[i + 1].sliceSelectedAttr.fill =
-                                platformColor.selectorBackground || "#c8C8C8";
-                        }
-                    } else {
-                        if (i !== 0) {
-                            that.notesCircle.navItems[i - 1].fillAttr =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.navItems[i - 1].sliceHoverAttr.fill =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.navItems[i - 1].slicePathAttr.fill =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.navItems[i - 1].sliceSelectedAttr.fill =
-                                platformColor.selectorBackground || "#c8C8C8";
-                        }
-                    }
-
-                    that.notesCircle.refreshWheel();
+                if (i === pitchNumber && that._playing) {
+                    that.notesCircle.navItems[0].fillAttr = getComputedStyle(document.body)
+                        .getPropertyValue("--color-selector-hover")
+                        .trim();
+                    that.notesCircle.navItems[0].sliceHoverAttr.fill = getComputedStyle(
+                        document.body
+                    )
+                        .getPropertyValue("--color-selector-hover")
+                        .trim();
+                    that.notesCircle.navItems[0].slicePathAttr.fill = getComputedStyle(
+                        document.body
+                    )
+                        .getPropertyValue("--color-selector-hover")
+                        .trim();
+                    that.notesCircle.navItems[0].sliceSelectedAttr.fill = getComputedStyle(
+                        document.body
+                    )
+                        .getPropertyValue("--color-selector-hover")
+                        .trim();
+                } else if (that._playing) {
+                    that.notesCircle.navItems[i].fillAttr = getComputedStyle(document.body)
+                        .getPropertyValue("--color-selector-hover")
+                        .trim();
+                    that.notesCircle.navItems[i].sliceHoverAttr.fill = getComputedStyle(
+                        document.body
+                    )
+                        .getPropertyValue("--color-selector-hover")
+                        .trim();
+                    that.notesCircle.navItems[i].slicePathAttr.fill = getComputedStyle(
+                        document.body
+                    )
+                        .getPropertyValue("--color-selector-hover")
+                        .trim();
+                    that.notesCircle.navItems[i].sliceSelectedAttr.fill = getComputedStyle(
+                        document.body
+                    )
+                        .getPropertyValue("--color-selector-hover")
+                        .trim();
                 }
+
+                if (that.playbackForward === false && i < pitchNumber) {
+                    if (i === pitchNumber - 1) {
+                        that.notesCircle.navItems[0].fillAttr = getComputedStyle(document.body)
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                        that.notesCircle.navItems[0].sliceHoverAttr.fill = getComputedStyle(
+                            document.body
+                        )
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                        that.notesCircle.navItems[0].slicePathAttr.fill = getComputedStyle(
+                            document.body
+                        )
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                        that.notesCircle.navItems[0].sliceSelectedAttr.fill = getComputedStyle(
+                            document.body
+                        )
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                    } else {
+                        that.notesCircle.navItems[i + 1].fillAttr = getComputedStyle(document.body)
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                        that.notesCircle.navItems[i + 1].sliceHoverAttr.fill = getComputedStyle(
+                            document.body
+                        )
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                        that.notesCircle.navItems[i + 1].slicePathAttr.fill = getComputedStyle(
+                            document.body
+                        )
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                        that.notesCircle.navItems[i + 1].sliceSelectedAttr.fill = getComputedStyle(
+                            document.body
+                        )
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                    }
+                } else {
+                    if (i !== 0) {
+                        that.notesCircle.navItems[i - 1].fillAttr = getComputedStyle(document.body)
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                        that.notesCircle.navItems[i - 1].sliceHoverAttr.fill = getComputedStyle(
+                            document.body
+                        )
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                        that.notesCircle.navItems[i - 1].slicePathAttr.fill = getComputedStyle(
+                            document.body
+                        )
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                        that.notesCircle.navItems[i - 1].sliceSelectedAttr.fill = getComputedStyle(
+                            document.body
+                        )
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                    }
+                }
+
+                that.notesCircle.refreshWheel();
             } else if (that.circleIsVisible === true && docById("wheelDiv4") === null) {
-                docById("pitchNumber_" + i).style.background = platformColor.labelColor;
+                docById("pitchNumber_" + i).classList.add("tm-label-bg");
+                docById("pitchNumber_" + i).style.background = "";
                 if (that.playbackForward === false && i < pitchNumber) {
                     const j = i + 1;
-                    docById("pitchNumber_" + j).style.background = platformColor.selectorBackground;
+                    docById("pitchNumber_" + j).classList.add("tm-selector-bg");
+                    docById("pitchNumber_" + j).style.background = "";
                 } else {
                     if (i !== 0) {
                         const j = i - 1;
-                        docById("pitchNumber_" + j).style.background =
-                            platformColor.selectorBackground;
+                        docById("pitchNumber_" + j).classList.add("tm-selector-bg");
+                        docById("pitchNumber_" + j).style.background = "";
                     }
                 }
             } else if (docById("wheelDiv4") !== null) {
-                if (pitchNumber > 1) {
-                    if (i === pitchNumber) {
-                        that.wheel1.navItems[0].fillAttr =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                        that.wheel1.navItems[0].sliceHoverAttr.fill =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                        that.wheel1.navItems[0].slicePathAttr.fill =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                        that.wheel1.navItems[0].sliceSelectedAttr.fill =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                    } else {
-                        that.wheel1.navItems[i].fillAttr =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                        that.wheel1.navItems[i].sliceHoverAttr.fill =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                        that.wheel1.navItems[i].slicePathAttr.fill =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                        that.wheel1.navItems[i].sliceSelectedAttr.fill =
-                            platformColor.selectorBackgroundHOFF || "#808080";
-                    }
-
-                    if (that.playbackForward === false && i < pitchNumber) {
-                        if (i === pitchNumber - 1) {
-                            that.wheel1.navItems[0].fillAttr =
-                                platformColor.selectorBackground || "#e0e0e0";
-                            that.wheel1.navItems[0].sliceHoverAttr.fill =
-                                platformColor.selectorBackground || "#e0e0e0";
-                            that.wheel1.navItems[0].slicePathAttr.fill =
-                                platformColor.selectorBackground || "#e0e0e0";
-                            that.wheel1.navItems[0].sliceSelectedAttr.fill =
-                                platformColor.selectorBackground || "#e0e0e0";
-                        } else {
-                            that.wheel1.navItems[i + 1].fillAttr =
-                                platformColor.selectorBackground || "#e0e0e0";
-                            that.wheel1.navItems[i + 1].sliceHoverAttr.fill =
-                                platformColor.selectorBackground || "#e0e0e0";
-                            that.wheel1.navItems[i + 1].slicePathAttr.fill =
-                                platformColor.selectorBackground || "#e0e0e0";
-                            that.wheel1.navItems[i + 1].sliceSelectedAttr.fill =
-                                platformColor.selectorBackground || "#e0e0e0";
-                        }
-                    } else {
-                        if (i !== 0) {
-                            that.wheel1.navItems[i - 1].fillAttr =
-                                platformColor.selectorBackground || "#e0e0e0";
-                            that.wheel1.navItems[i - 1].sliceHoverAttr.fill =
-                                platformColor.selectorBackground || "#e0e0e0";
-                            that.wheel1.navItems[i - 1].slicePathAttr.fill =
-                                platformColor.selectorBackground || "#e0e0e0";
-                            that.wheel1.navItems[i - 1].sliceSelectedAttr.fill =
-                                platformColor.selectorBackground || "#e0e0e0";
-                        }
-                    }
-
-                    that.wheel1.refreshWheel();
+                if (i === pitchNumber) {
+                    that.wheel1.navItems[0].fillAttr = getComputedStyle(document.body)
+                        .getPropertyValue("--color-selector-hover")
+                        .trim();
+                    that.wheel1.navItems[0].sliceHoverAttr.fill = getComputedStyle(document.body)
+                        .getPropertyValue("--color-selector-hover")
+                        .trim();
+                    that.wheel1.navItems[0].slicePathAttr.fill = getComputedStyle(document.body)
+                        .getPropertyValue("--color-selector-hover")
+                        .trim();
+                    that.wheel1.navItems[0].sliceSelectedAttr.fill = getComputedStyle(document.body)
+                        .getPropertyValue("--color-selector-hover")
+                        .trim();
+                } else {
+                    that.wheel1.navItems[i].fillAttr = getComputedStyle(document.body)
+                        .getPropertyValue("--color-selector-hover")
+                        .trim();
+                    that.wheel1.navItems[i].sliceHoverAttr.fill = getComputedStyle(document.body)
+                        .getPropertyValue("--color-selector-hover")
+                        .trim();
+                    that.wheel1.navItems[i].slicePathAttr.fill = getComputedStyle(document.body)
+                        .getPropertyValue("--color-selector-hover")
+                        .trim();
+                    that.wheel1.navItems[i].sliceSelectedAttr.fill = getComputedStyle(document.body)
+                        .getPropertyValue("--color-selector-hover")
+                        .trim();
                 }
+
+                if (that.playbackForward === false && i < pitchNumber) {
+                    if (i === pitchNumber - 1) {
+                        that.wheel1.navItems[0].fillAttr = getComputedStyle(document.body)
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                        that.wheel1.navItems[0].sliceHoverAttr.fill = getComputedStyle(
+                            document.body
+                        )
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                        that.wheel1.navItems[0].slicePathAttr.fill = getComputedStyle(document.body)
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                        that.wheel1.navItems[0].sliceSelectedAttr.fill = getComputedStyle(
+                            document.body
+                        )
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                    } else {
+                        that.wheel1.navItems[i + 1].fillAttr = getComputedStyle(document.body)
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                        that.wheel1.navItems[i + 1].sliceHoverAttr.fill = getComputedStyle(
+                            document.body
+                        )
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                        that.wheel1.navItems[i + 1].slicePathAttr.fill = getComputedStyle(
+                            document.body
+                        )
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                        that.wheel1.navItems[i + 1].sliceSelectedAttr.fill = getComputedStyle(
+                            document.body
+                        )
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                    }
+                } else {
+                    if (i !== 0) {
+                        that.wheel1.navItems[i - 1].fillAttr = getComputedStyle(document.body)
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                        that.wheel1.navItems[i - 1].sliceHoverAttr.fill = getComputedStyle(
+                            document.body
+                        )
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                        that.wheel1.navItems[i - 1].slicePathAttr.fill = getComputedStyle(
+                            document.body
+                        )
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                        that.wheel1.navItems[i - 1].sliceSelectedAttr.fill = getComputedStyle(
+                            document.body
+                        )
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                    }
+                }
+
+                that.wheel1.refreshWheel();
             }
 
             if (that.playbackForward) {
@@ -2506,7 +2620,7 @@ function TemperamentWidget() {
             }
 
             if (i <= pitchNumber && i >= 0 && that._playing && p < 2) {
-                that._playTimeout = setTimeout(
+                setTimeout(
                     function () {
                         __playLoop(i);
                     },
@@ -2529,43 +2643,51 @@ function TemperamentWidget() {
                 cell.appendChild(document.createTextNode("\u00A0\u00A0"));
                 that._playing = false;
                 that.playbackForward = true;
-                that.inbetween = false;
-                that._playTimeout = setTimeout(
+                this.inbetween = false;
+                setTimeout(
                     function () {
-                        if (pitchNumber > 1 && that.notesCircle && that.notesCircle.navItems) {
-                            that.notesCircle.navItems[0].fillAttr =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.navItems[0].sliceHoverAttr.fill =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.navItems[0].slicePathAttr.fill =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.navItems[0].sliceSelectedAttr.fill =
-                                platformColor.selectorBackground || "#c8C8C8";
-                            that.notesCircle.refreshWheel();
-                        }
+                        that.notesCircle.navItems[0].fillAttr = getComputedStyle(document.body)
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                        that.notesCircle.navItems[0].sliceHoverAttr.fill = getComputedStyle(
+                            document.body
+                        )
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                        that.notesCircle.navItems[0].slicePathAttr.fill = getComputedStyle(
+                            document.body
+                        )
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                        that.notesCircle.navItems[0].sliceSelectedAttr.fill = getComputedStyle(
+                            document.body
+                        )
+                            .getPropertyValue("--color-selector-bg")
+                            .trim();
+                        that.notesCircle.refreshWheel();
                     },
                     Singer.defaultBPMFactor * 1000 * duration
                 );
             }
         };
-        if (this._playing || this.inbetween) {
-            if (
-                this._lastPlaybackIndex === undefined ||
-                this._lastPlaybackIndex === null ||
-                this._lastPlaybackIndex === 0
-            ) {
-                that.playbackForward = true;
-            }
+        if (
+            (this._playing &&
+                currentTime - this.lastClickTime > Singer.defaultBPMFactor * 1000 * duration) ||
+            this.inbetween
+        ) {
+            that.playbackForward = true;
             this.inbetween = false;
             if (this.circleIsVisible) {
                 for (let i = 0; i <= this.pitchNumber; i++) {
                     const pitchElement = docById("pitchNumber_" + i);
-                    pitchElement.style.background = platformColor.selectorBackground;
+                    pitchElement.classList.add("tm-selector-bg");
+                    pitchElement.style.background = "";
                 }
             }
 
-            __playLoop(this._lastPlaybackIndex || 0);
+            __playLoop(0);
         }
+        this.lastClickTime = currentTime;
     };
 
     /**
@@ -2592,13 +2714,8 @@ function TemperamentWidget() {
         const that = this;
 
         widgetWindow.onclose = function () {
-            if (that._playTimeout) {
-                clearTimeout(that._playTimeout);
-                that._playTimeout = null;
-            }
-            that._playing = false;
+            that._logo.synth.setMasterVolume(0);
             that._logo.synth.stop();
-            that._logo.synth.setMasterVolume(last(Singer.masterVolume));
             if (docById("wheelDiv2") !== null) {
                 docById("wheelDiv2").style.display = "none";
                 that.notesCircle.removeWheel();
@@ -2633,11 +2750,10 @@ function TemperamentWidget() {
         temperamentCell.style.minHeight = temperamentCell.style.height;
         temperamentCell.style.maxHeight = temperamentCell.style.height;
         temperamentCell.style.textAlign = "center";
-        temperamentCell.style.backgroundColor = platformColor.selectorBackground;
+        temperamentCell.classList.add("tm-selector-bg");
 
         this.playButton = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play all"));
         this.lastClickTime = 0;
-        this._lastPlaybackIndex = 0;
         this.playbackForward = true;
         this.inbetween = false;
         this.playButton.onclick = function () {
@@ -2734,7 +2850,7 @@ function TemperamentWidget() {
 
                 str[i] = note[i] + str[i][1];
                 this.intervals[i] = t.interval[i];
-                this.ratios[i] = getTemperamentRatio(t[this.intervals[i]]);
+                this.ratios[i] = t[this.intervals[i]];
                 this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
                 if (i === 0) {
                     this.frequencies[i] = this._logo.synth
@@ -2767,10 +2883,6 @@ function TemperamentWidget() {
         this._circleOfNotes();
 
         noteCell.onclick = function () {
-            if (that._playing) {
-                that.playAll();
-            }
-            that._lastPlaybackIndex = 0;
             that.editMode = null;
             if (that.circleIsVisible) {
                 that._circleOfNotes();
