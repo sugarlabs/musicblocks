@@ -3947,6 +3947,7 @@ class Activity {
         const loadStart = async that => {
             const __afterLoad = async () => {
                 if (!that.turtles.running()) {
+                    /* istanbul ignore next -- loadStart's __afterLoad runs post-project-load in a browser-only path; inaccessible from Jest */
                     that.stage.update();
                     for (let turtle = 0; turtle < that.turtles.getTurtleCount(); turtle++) {
                         that.logo.turtleHeaps[turtle] = [];
