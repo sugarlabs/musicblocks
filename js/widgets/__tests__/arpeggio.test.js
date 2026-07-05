@@ -537,6 +537,14 @@ describe("Arpeggio Widget", () => {
 
             expect(arpeggio._playing).toBe(false);
         });
+
+        test("returns immediately if not playing", () => {
+            arpeggio._playing = false;
+            const triggerSpy = jest.spyOn(activityMock.logo.synth, "trigger");
+            arpeggio.__playNote(0);
+            expect(triggerSpy).not.toHaveBeenCalled();
+            triggerSpy.mockRestore();
+        });
     });
 
     // --- __playCell fallback Tests ---
@@ -614,6 +622,75 @@ describe("Arpeggio Widget", () => {
             // cell1 gets cleared when cell2 is clicked (clearColumn is called internally)
             expect(cell1.style.backgroundColor).not.toBe("black");
             expect(cell2.style.backgroundColor).toBe("black");
+        });
+    });
+
+    // --- Playback Teardown Tests ---
+    describe("playback teardown and stop behavior", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+            arpeggio.notesToPlay = [["C4", 1]];
+            arpeggio.init(activityMock);
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+        });
+
+        test("widgetWindow.onclose stops playback and clears timeout", () => {
+            // Start playing
+            const cell = document.getElementById("2,1");
+            cell.onclick({ target: cell });
+            arpeggio.playButton.onclick();
+            expect(arpeggio._playing).toBe(true);
+            expect(arpeggio._playTimeout).not.toBeNull();
+
+            const timeoutSpy = jest.spyOn(global, "clearTimeout");
+
+            // Close window
+            arpeggio.widgetWindow.onclose();
+
+            expect(arpeggio._playing).toBe(false);
+            expect(arpeggio._playTimeout).toBeNull();
+            expect(timeoutSpy).toHaveBeenCalled();
+            expect(activityMock.logo.synth.stop).toHaveBeenCalled();
+            expect(mockWidgetWindow.destroy).toHaveBeenCalled();
+
+            timeoutSpy.mockRestore();
+        });
+
+        test("clicking play button when playing stops playback and clears timeout", () => {
+            const cell = document.getElementById("2,1");
+            cell.onclick({ target: cell });
+            arpeggio.playButton.onclick();
+            expect(arpeggio._playing).toBe(true);
+            expect(arpeggio._playTimeout).not.toBeNull();
+
+            const timeoutSpy = jest.spyOn(global, "clearTimeout");
+
+            // Click to stop
+            arpeggio.playButton.onclick();
+
+            expect(arpeggio._playing).toBe(false);
+            expect(arpeggio._playTimeout).toBeNull();
+            expect(timeoutSpy).toHaveBeenCalled();
+            expect(activityMock.logo.synth.stop).toHaveBeenCalled();
+
+            timeoutSpy.mockRestore();
+        });
+
+        test("_clear stops playback, clears timeout, and resets play button state", () => {
+            const cell = document.getElementById("2,1");
+            cell.onclick({ target: cell });
+            arpeggio.playButton.onclick();
+            expect(arpeggio._playing).toBe(true);
+
+            // Clear widget
+            arpeggio._clear();
+
+            expect(arpeggio._playing).toBe(false);
+            expect(arpeggio._playTimeout).toBeNull();
+            expect(activityMock.logo.synth.stop).toHaveBeenCalled();
         });
     });
 });
