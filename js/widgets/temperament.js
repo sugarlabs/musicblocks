@@ -2353,6 +2353,9 @@ function TemperamentWidget() {
             if (i === pitchNumber) {
                 that.playbackForward = false;
             }
+            // Note: If resuming from _lastPlaybackIndex > 0, the 'p < 2' loop check
+            // starts mid-sequence, meaning the first pass will play fewer notes.
+            // This is intended behavior to pick up exactly where playback was paused.
             if (i === 0) {
                 p++;
             }
@@ -2526,7 +2529,7 @@ function TemperamentWidget() {
                 cell.appendChild(document.createTextNode("\u00A0\u00A0"));
                 that._playing = false;
                 that.playbackForward = true;
-                this.inbetween = false;
+                that.inbetween = false;
                 that._playTimeout = setTimeout(
                     function () {
                         if (pitchNumber > 1 && that.notesCircle && that.notesCircle.navItems) {
@@ -2546,7 +2549,11 @@ function TemperamentWidget() {
             }
         };
         if (this._playing || this.inbetween) {
-            if (!this._lastPlaybackIndex) {
+            if (
+                this._lastPlaybackIndex === undefined ||
+                this._lastPlaybackIndex === null ||
+                this._lastPlaybackIndex === 0
+            ) {
                 that.playbackForward = true;
             }
             this.inbetween = false;
@@ -2557,10 +2564,6 @@ function TemperamentWidget() {
                 }
             }
 
-            console.log(
-                "Starting/Resuming playback from note index:",
-                this._lastPlaybackIndex || 0
-            );
             __playLoop(this._lastPlaybackIndex || 0);
         }
     };
