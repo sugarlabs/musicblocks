@@ -503,6 +503,7 @@ class SearchController {
         const activity = this.activity;
         const handle = document.getElementById("searchDragHandle");
         if (!handle || !activity.searchWidget) return;
+        if (typeof activity.searchWidget.getBoundingClientRect !== "function") return;
         const rect = activity.searchWidget.getBoundingClientRect();
         handle.style.left = rect.left + 4 + "px";
         handle.style.top = rect.top + (rect.height - 38) / 2 + "px";
@@ -616,12 +617,9 @@ class SearchController {
         if (this.helpfulSearchDiv && this.helpfulSearchDiv.parentNode) {
             this.helpfulSearchDiv.parentNode.removeChild(this.helpfulSearchDiv);
         }
-        const hwd = document.getElementById("helpfulWheelDiv");
-        if (hwd) hwd.style.display = "";
         this.isHelpfulSearchWidgetOn = false;
         this.activity.__tick();
     }
-
     /**
      * Shows the helpfulSearchWidget input and triggers doHelpfulSearch.
      */
@@ -641,10 +639,9 @@ class SearchController {
         if (this.helpfulSearchDiv.style.display === "block") {
             activity.helpfulSearchWidget.value = null;
             activity.helpfulSearchWidget.style.visibility = "visible";
-
+            document.getElementById("helpfulWheelDiv").style.display = "none";
             this.searchBlockPosition = [100, 100];
             this.prepSearchWidget();
-
             const that = this;
             setTimeout(() => {
                 activity.helpfulSearchWidget.focus();
