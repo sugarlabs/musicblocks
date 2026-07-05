@@ -323,7 +323,7 @@ class PlanetInterface {
          * Sets the Converter object in the window context.
          */
         this.onConverterLoad = () => {
-            window.Converter = this.planet.Converter;
+            window.Converter = this.planet ? this.planet.Converter : undefined;
         };
 
         /**
