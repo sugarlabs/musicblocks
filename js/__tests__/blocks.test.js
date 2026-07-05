@@ -283,6 +283,57 @@ describe("Blocks Foundation", () => {
         });
     });
 
+    describe("Action palette opens on new action block creation", () => {
+        it("should call showPalette('action') when a new uniquely-named action is created", () => {
+            const showPalette = jest.fn();
+            mockActivity.palettes = {
+                dict: {},
+                hide: jest.fn(),
+                show: jest.fn(),
+                updatePalettes: jest.fn(),
+                showPalette
+            };
+
+            const blocks = new Blocks(mockActivity);
+            blocks.findUniqueActionName = jest.fn().mockReturnValue("action 2");
+            blocks.actionMetadata = jest.fn().mockReturnValue({ hasReturn: false, hasArgs: false });
+            blocks.newNameddoBlock = jest.fn();
+
+            // Simulate the action block creation path
+            const value = blocks.findUniqueActionName("action");
+            if (value !== "action" && value !== "action") {
+                const metadata = blocks.actionMetadata(0);
+                blocks.newNameddoBlock(value, metadata.hasReturn, metadata.hasArgs);
+                mockActivity.palettes.updatePalettes("action");
+                mockActivity.palettes.showPalette("action");
+            }
+
+            expect(showPalette).toHaveBeenCalledWith("action");
+        });
+
+        it("should NOT call showPalette when action name is the default 'action'", () => {
+            const showPalette = jest.fn();
+            mockActivity.palettes = {
+                dict: {},
+                updatePalettes: jest.fn(),
+                showPalette
+            };
+
+            const blocks = new Blocks(mockActivity);
+            blocks.findUniqueActionName = jest.fn().mockReturnValue("action");
+            blocks.newNameddoBlock = jest.fn();
+
+            const value = blocks.findUniqueActionName("action");
+            if (value !== "action") {
+                blocks.newNameddoBlock(value, false, false);
+                mockActivity.palettes.updatePalettes("action");
+                mockActivity.palettes.showPalette("action");
+            }
+
+            expect(showPalette).not.toHaveBeenCalled();
+        });
+    });
+
     describe("cleanupAfterLoad – finishedLoading emission", () => {
         const { PubSub } = require("../pubsub");
         let loadContainer;

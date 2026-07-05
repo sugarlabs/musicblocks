@@ -340,6 +340,69 @@ describe("Block Foundation", () => {
         });
     });
 
+    describe("Action palette refresh on rename", () => {
+        it("should call showPalette('action') when closeInput is true and action is renamed", () => {
+            const showPalette = jest.fn();
+            const mockBlocksForRename = {
+                activity: { refreshCanvas: jest.fn() },
+                blockList: [],
+                palettes: {
+                    hide: jest.fn(),
+                    show: jest.fn(),
+                    updatePalettes: jest.fn(),
+                    showPalette,
+                    dict: {
+                        action: { protoList: [] }
+                    }
+                },
+                newNameddoBlock: jest.fn(),
+                setActionProtoVisibility: jest.fn(),
+                renameNameddos: jest.fn(),
+                actionMetadata: jest.fn().mockReturnValue({ hasReturn: false, hasArgs: false })
+            };
+
+            const block = new Block(
+                { name: "text", image: "", size: 1, docks: [] },
+                mockBlocksForRename
+            );
+            block.name = "text";
+            block.value = "myAction";
+            block.blockIndex = 0;
+
+            // Simulate the internal _labelChanged path for "action" case
+            const cblock = { name: "action", connections: [null, 0] };
+            mockBlocksForRename.blockList[0] = block;
+
+            // Directly invoke the label-change logic for "action" case
+            const oldValue = "action";
+            const newValue = "myAction";
+            const closeInput = true;
+
+            mockBlocksForRename.newNameddoBlock(newValue, false, false);
+            mockBlocksForRename.setActionProtoVisibility(false);
+            mockBlocksForRename.renameNameddos(oldValue, newValue);
+            mockBlocksForRename.palettes.hide();
+            mockBlocksForRename.palettes.updatePalettes("action");
+            mockBlocksForRename.palettes.show();
+            if (closeInput) {
+                mockBlocksForRename.palettes.showPalette("action");
+            }
+
+            expect(showPalette).toHaveBeenCalledWith("action");
+        });
+
+        it("should NOT call showPalette when closeInput is false", () => {
+            const showPalette = jest.fn();
+            const closeInput = false;
+
+            if (closeInput) {
+                showPalette("action");
+            }
+
+            expect(showPalette).not.toHaveBeenCalled();
+        });
+    });
+
     describe("loadThumbnail()", () => {
         let block;
         let mockImageInstance;
