@@ -2815,6 +2815,7 @@ class Blocks {
                 }
             }
             this._endDeferCheckBounds();
+            this._updateViewportCulling();
         };
 
         /**
@@ -3544,6 +3545,15 @@ class Blocks {
             myBlock.container.snapToPixelEnabled = true;
             myBlock.container.x = 0;
             myBlock.container.y = 0;
+
+            // Support viewport culling via _viewportVisible (eye icon takes priority).
+            myBlock.container._origIsVisible = myBlock.container.isVisible;
+            myBlock.container.isVisible = function () {
+                if (!this.visible) return false;
+                if (!myBlock._viewportVisible) return false;
+                return this._origIsVisible.call(this);
+            };
+
             this._updateSpatialGrid(this.blockList.length - 1);
 
             /** and we need to load the images into the container. */
@@ -7752,6 +7762,41 @@ class Blocks {
         };
 
         /***
+         * Culls off-screen blocks from display list rendering.
+         * Recompute after scroll, pan, resize, or project load.
+         */
+        this._updateViewportCulling = () => {
+            const container = this.activity.blocksContainer;
+            const canvas = this.activity.canvas;
+            // Viewport rect in container-space
+            const vpLeft = -container.x;
+            const vpTop = -container.y;
+            const vpRight = vpLeft + canvas.width;
+            const vpBottom = vpTop + canvas.height;
+
+            for (let i = 0; i < this.blockList.length; i++) {
+                const block = this.blockList[i];
+                if (!block || block.trash || !block.container) {
+                    continue;
+                }
+                const c = block.container;
+                // AABB overlap test against viewport rect.
+                // Skip blocks with zero dimensions (async bitmap not yet loaded)
+                // to avoid culling them before their size is known.
+                if (!block.width || !block.height) {
+                    block._viewportVisible = true;
+                    continue;
+                }
+                block._viewportVisible = !(
+                    c.x + block.width <= vpLeft ||
+                    c.x >= vpRight ||
+                    c.y + block.height <= vpTop ||
+                    c.y >= vpBottom
+                );
+            }
+        };
+
+        /***
          * Hides all the blocks.
          *
          * @returns {void}
@@ -7770,6 +7815,8 @@ class Blocks {
         this.showBlocks = () => {
             this.activity.palettes.show();
             this.show();
+            // Recompute culling — off-screen blocks stay hidden during playback.
+            this._updateViewportCulling();
             this.bringToTop();
             this.activity.refreshCanvas();
         };

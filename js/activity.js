@@ -584,6 +584,10 @@ class Activity {
          * 3. GIF animations are playing
          * This eliminates unnecessary 60fps updates when idle.
          */
+        // Track last container position to avoid per-frame culling recompute.
+        this._lastCullContainerX = undefined;
+        this._lastCullContainerY = undefined;
+
         this._startRenderLoop = () => {
             if (this._renderLoopRunning) return;
             this._renderLoopRunning = true;
@@ -597,6 +601,16 @@ class Activity {
                     const isInteracting = this.isDragging || this.isSelecting;
 
                     if (this.stageDirty || hasActiveTweens || hasActiveGifs || isInteracting) {
+                        // Recompute culling when container moved.
+                        if (
+                            this._lastCullContainerX !== this.blocksContainer.x ||
+                            this._lastCullContainerY !== this.blocksContainer.y
+                        ) {
+                            this._lastCullContainerX = this.blocksContainer.x;
+                            this._lastCullContainerY = this.blocksContainer.y;
+                            this.blocks._updateViewportCulling();
+                        }
+
                         this.stage.update();
                         this.stageDirty = false;
                         // Continue the loop if there's work or ongoing interaction
@@ -2853,6 +2867,10 @@ class Activity {
 
             this.stage.canvas.width = w;
             this.stage.canvas.height = h;
+
+            // Viewport size changed — recompute culling on next render frame.
+            this._lastCullContainerX = undefined;
+            this._lastCullContainerY = undefined;
 
             // Firefox large canvas warning
             const isFirefox = navigator.userAgent.includes("Firefox");

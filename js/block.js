@@ -281,6 +281,7 @@ class Block {
         this.collapsed = false; // Is this collapsible block collapsed?
         this.inCollapsed = false; // Is this block in a collapsed stack?
         this.trash = false; // Is this block in the trash?
+        this._viewportVisible = true; // Is this block within the current viewport?
         this.loadComplete = false; // Has the block finished loading?
         this.label = null; // Editable textview in DOM.
         this.labelattr = null; // Editable textview in DOM.
@@ -2016,6 +2017,7 @@ class Block {
         // If it is not in the trash and not in collapsed, then show it.
         if (!this.trash && !this.inCollapsed) {
             this.container.visible = true;
+            this._viewportVisible = true;
             if (this.isCollapsible()) {
                 if (this.collapsed) {
                     this.bitmap.visible = false;
@@ -3591,6 +3593,7 @@ class Block {
                 // the move (workaround for issue #38 -- Blocks fly
                 // apart). Still need to get to the root cause.
                 this.blocks.adjustDocks(this.blockIndex, true);
+                this.blocks._updateViewportCulling();
             }
         } else if (SPECIALINPUTS.includes(this.name) || ["media", "loadFile"].includes(this.name)) {
             if (!haveClick) {
