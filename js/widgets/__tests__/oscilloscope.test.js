@@ -365,6 +365,29 @@ describe("Oscilloscope", () => {
         });
     });
 
+    describe("_scale", () => {
+        test("removes all existing oscilloscopeCanvas elements, not just half", () => {
+            const osc = createOscilloscope();
+            const widgetBody = osc.widgetWindow.getWidgetBody();
+            // document.getElementsByClassName (used inside _scale) only searches
+            // elements attached to the live document tree.
+            document.body.appendChild(widgetBody);
+
+            for (let i = 0; i < 4; i++) {
+                const canvas = document.createElement("canvas");
+                canvas.className = "oscilloscopeCanvas";
+                widgetBody.appendChild(canvas);
+            }
+            expect(document.getElementsByClassName("oscilloscopeCanvas").length).toBe(4);
+
+            osc._scale();
+
+            expect(document.getElementsByClassName("oscilloscopeCanvas").length).toBe(0);
+
+            document.body.removeChild(widgetBody);
+        });
+    });
+
     describe("close", () => {
         test("calls _stopAnimation", () => {
             const osc = createOscilloscope();
