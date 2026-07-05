@@ -3337,10 +3337,26 @@ class Block {
                 );
                 if (movedDx + movedDy > 5) {
                     moved = true;
-                    // Announce block drag to screen readers
+                    // Announce block drag to screen readers (screen reader only, no visual message)
                     if (!that._announced) {
                         that._announced = true;
-                        that.activity.textMsg(_("Block picked up"), 1000);
+                        const blockLabel =
+                            (that.protoblock.staticLabels && that.protoblock.staticLabels[0]) ||
+                            that.name;
+                        const liveRegion =
+                            document.getElementById("mbA11yLiveRegion") ||
+                            (() => {
+                                const r = document.createElement("div");
+                                r.id = "mbA11yLiveRegion";
+                                r.setAttribute("role", "status");
+                                r.setAttribute("aria-live", "polite");
+                                r.setAttribute("aria-atomic", "true");
+                                r.style.cssText =
+                                    "position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;";
+                                document.body.appendChild(r);
+                                return r;
+                            })();
+                        liveRegion.textContent = _("picked up") + " " + blockLabel;
                     }
                 }
             } else {
