@@ -537,6 +537,14 @@ describe("Arpeggio Widget", () => {
 
             expect(arpeggio._playing).toBe(false);
         });
+
+        test("returns immediately if not playing", () => {
+            arpeggio._playing = false;
+            const triggerSpy = jest.spyOn(activityMock.logo.synth, "trigger");
+            arpeggio.__playNote(0);
+            expect(triggerSpy).not.toHaveBeenCalled();
+            triggerSpy.mockRestore();
+        });
     });
 
     // --- __playCell fallback Tests ---
