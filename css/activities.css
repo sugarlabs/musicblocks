@@ -235,6 +235,9 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     transition: all 0.2s ease;
     margin-left: 8px;
 }
+#searchDragHandle {
+    pointer-events: auto;
+}
 
 #search:focus {
     border-color: var(--color-brand-primary-hover);

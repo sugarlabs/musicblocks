@@ -192,6 +192,7 @@ class SearchController {
 
         this.activity.searchWidget.style.visibility = "hidden";
         this.activity.searchWidget.idInput_custom = "";
+        this._hideSearchDragHandle();
     }
 
     /**
@@ -218,6 +219,7 @@ class SearchController {
                 const searchPos = activity.palettes.getSearchPos();
                 activity.searchWidget.style.left = searchPos.x + "px";
                 activity.searchWidget.style.top = searchPos.y + "px";
+                this._addSearchDragHandle();
             }
 
             this.searchBlockPosition = [100, 100];
@@ -228,9 +230,10 @@ class SearchController {
                 if (
                     document.getElementById("search").style.visibility === "visible" &&
                     (e.target === document.getElementById("search") ||
-                        document.getElementById("search").contains(e.target))
+                        document.getElementById("search").contains(e.target) ||
+                        e.target === document.getElementById("searchDragHandle"))
                 ) {
-                    //do nothing when clicked in the input field
+                    //do nothing when clicked in the input field or the drag handle
                 } else if (
                     document.getElementById("ui-id-1") &&
                     document.getElementById("ui-id-1").style.display === "block" &&
@@ -253,6 +256,7 @@ class SearchController {
             setTimeout(() => {
                 activity.searchWidget.focus();
                 that.doSearch();
+                that._positionSearchDragHandle();
             }, 500);
         }
     }
@@ -440,6 +444,76 @@ class SearchController {
 
         activity.searchWidget.value = "";
         activity.update = true;
+    }
+
+    /**
+     * Creates (once) and positions a drag handle for the classic #search
+     * input, so it can be dragged the same way helpfulSearchDiv can.
+     */
+    _addSearchDragHandle() {
+        const activity = this.activity;
+        let handle = document.getElementById("searchDragHandle");
+
+        if (!handle) {
+            handle = document.createElement("div");
+            handle.id = "searchDragHandle";
+            handle.style.cssText =
+                "position:absolute;width:16px;height:38px;cursor:grab;z-index:2001;" +
+                "display:flex;align-items:center;justify-content:center;" +
+                "color:rgba(150,150,150,0.8);font-size:18px;user-select:none;";
+            handle.textContent = "⠿";
+            document.body.appendChild(handle);
+
+            let dragStartX, dragStartY, dragStartLeft, dragStartTop;
+
+            handle.addEventListener("pointerdown", e => {
+                dragStartX = e.clientX;
+                dragStartY = e.clientY;
+                dragStartLeft = parseInt(activity.searchWidget.style.left) || 0;
+                dragStartTop = parseInt(activity.searchWidget.style.top) || 0;
+                activity.searchWidget.style.transition = "none";
+                handle.setPointerCapture(e.pointerId);
+                handle.style.cursor = "grabbing";
+            });
+
+            handle.addEventListener("pointermove", e => {
+                if (!handle.hasPointerCapture(e.pointerId)) return;
+                const newLeft = dragStartLeft + e.clientX - dragStartX;
+                const newTop = dragStartTop + e.clientY - dragStartY;
+                activity.searchWidget.style.left = newLeft + "px";
+                activity.searchWidget.style.top = newTop + "px";
+                this._positionSearchDragHandle();
+            });
+
+            handle.addEventListener("pointerup", e => {
+                handle.releasePointerCapture(e.pointerId);
+                handle.style.cursor = "grab";
+                activity.searchWidget.style.transition = "";
+            });
+        }
+
+        handle.style.display = "flex";
+        this._positionSearchDragHandle();
+    }
+
+    /**
+     * Keeps the drag handle glued to the left edge of #search.
+     */
+    _positionSearchDragHandle() {
+        const activity = this.activity;
+        const handle = document.getElementById("searchDragHandle");
+        if (!handle || !activity.searchWidget) return;
+        const rect = activity.searchWidget.getBoundingClientRect();
+        handle.style.left = rect.left + 4 + "px";
+        handle.style.top = rect.top + (rect.height - 38) / 2 + "px";
+    }
+
+    /**
+     * Hides the drag handle when the classic search widget is hidden.
+     */
+    _hideSearchDragHandle() {
+        const handle = document.getElementById("searchDragHandle");
+        if (handle) handle.style.display = "none";
     }
 
     /**
