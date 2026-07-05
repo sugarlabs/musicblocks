@@ -256,7 +256,7 @@ describe("Blocks Foundation", () => {
 
         it("should stop recursive adjustDocks cycles without overflowing the stack", () => {
             const blocks = new Blocks(mockActivity);
-            const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => { });
+            const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
             const makeDockBlock = (connections, x, y) => ({
                 name: "flow",
                 connections,

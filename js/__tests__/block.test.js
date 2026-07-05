@@ -270,7 +270,7 @@ describe("Block Foundation", () => {
                 block.highlightBitmap = new global.createjs.Bitmap();
                 const generateSpy = jest
                     .spyOn(block, "generateArtwork")
-                    .mockImplementation(() => { });
+                    .mockImplementation(() => {});
 
                 block.regenerateArtwork(false);
 
@@ -289,7 +289,7 @@ describe("Block Foundation", () => {
                 block.highlightCollapseBlockBitmap = new global.createjs.Bitmap();
                 const generateSpy = jest
                     .spyOn(block, "generateArtwork")
-                    .mockImplementation(() => { });
+                    .mockImplementation(() => {});
 
                 block.regenerateArtwork(true);
 
@@ -309,7 +309,7 @@ describe("Block Foundation", () => {
                 block.highlightBitmap = null;
                 const generateSpy = jest
                     .spyOn(block, "generateArtwork")
-                    .mockImplementation(() => { });
+                    .mockImplementation(() => {});
 
                 expect(() => block.regenerateArtwork(false)).not.toThrow();
                 expect(generateSpy).toHaveBeenCalledWith(false);
@@ -323,7 +323,7 @@ describe("Block Foundation", () => {
                 block.imageBitmap = { image: mockImage };
                 const generateSpy = jest
                     .spyOn(block, "generateArtwork")
-                    .mockImplementation(() => { });
+                    .mockImplementation(() => {});
                 block._positionMedia = jest.fn();
 
                 block.regenerateArtwork(false);
@@ -361,7 +361,10 @@ describe("Block Foundation", () => {
                 actionMetadata: jest.fn().mockReturnValue({ hasReturn: false, hasArgs: false })
             };
 
-            const block = new Block({ name: "text", image: "", size: 1, docks: [] }, mockBlocksForRename);
+            const block = new Block(
+                { name: "text", image: "", size: 1, docks: [] },
+                mockBlocksForRename
+            );
             block.name = "text";
             block.value = "myAction";
             block.blockIndex = 0;
