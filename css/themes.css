@@ -404,7 +404,7 @@ body.highcontrast {
 .dark #helpdropdown.helpdropdown-menu li.active,
 .dark #helpdropdown.helpdropdown-menu li.selected,
 .dark #helpdropdown.helpdropdown-menu li.active.selected {
-    background: var(--pc-aux);
+    background: var(--color-info-bg);
 }
 
 .dark #helpdropdown.helpdropdown-menu li:hover > a,
@@ -413,8 +413,8 @@ body.highcontrast {
 .dark #helpdropdown.helpdropdown-menu li > a:hover,
 .dark #helpdropdown.helpdropdown-menu li > a:focus,
 .dark #helpdropdown.helpdropdown-menu li > a.dropdown-item-focused {
-    background: var(--pc-aux);
-    color: var(--color-text-inverse);
+    background: var(--color-info-bg);
+    color: var(--color-text-primary);
 }
 
 .dark .keyboard-shortcuts-hero {
@@ -471,7 +471,7 @@ body.highcontrast {
 .highcontrast #helpdropdown.helpdropdown-menu li.active,
 .highcontrast #helpdropdown.helpdropdown-menu li.selected,
 .highcontrast #helpdropdown.helpdropdown-menu li.active.selected {
-    background: var(--color-text-secondary);
+    background: var(--color-brand-secondary);
 }
 
 .highcontrast #helpdropdown.helpdropdown-menu li:hover > a,
@@ -480,7 +480,7 @@ body.highcontrast {
 .highcontrast #helpdropdown.helpdropdown-menu li > a:hover,
 .highcontrast #helpdropdown.helpdropdown-menu li > a:focus,
 .highcontrast #helpdropdown.helpdropdown-menu li > a.dropdown-item-focused {
-    background: var(--color-text-secondary);
+    background: var(--color-brand-secondary);
     color: var(--color-text-inverse);
 }
 

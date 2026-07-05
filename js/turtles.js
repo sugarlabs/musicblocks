@@ -891,7 +891,8 @@ Turtles.TurtlesView = class {
             container.onmouseover = () => {
                 if (!activity.loading) {
                     document.body.style.cursor = "pointer";
-                    container.style.transition = "0.1s ease-out";
+                    container.style.transition =
+                        "transform 0.1s ease-out, background-color 0.2s ease, border-color 0.2s ease";
                     container.style.transform = "scale(1.15)";
                 }
             };
@@ -899,7 +900,8 @@ Turtles.TurtlesView = class {
             container.onmouseout = () => {
                 if (!activity.loading) {
                     document.body.style.cursor = "default";
-                    container.style.transition = "0.15s ease-out";
+                    container.style.transition =
+                        "transform 0.15s ease-out, background-color 0.2s ease, border-color 0.2s ease";
                     container.style.transform = "scale(1)";
                 }
             };
@@ -1178,10 +1180,13 @@ Turtles.TurtlesView = class {
                         btn.style.right = rightPos + "px";
                     }
                 };
+                // Calculate position from the right edge of the screen.
+                // The magic numbers represent the button width (48px) plus margin/padding.
+                // 55 represents one button slot width (48px + 7px spacing).
                 updatePos(this._collapseButton, this._w - 55);
                 updatePos(this._expandButton, this._w - 55);
-                updatePos(this._clearButton, this._w - 5 - 2 * 55);
-                updatePos(this.gridButton, this._w - 10 - 3 * 55);
+                updatePos(this._clearButton, this._w - 5 - 2 * 55); // Erase button is 2nd from the right
+                updatePos(this.gridButton, this._w - 10 - 3 * 55); // Grid button is 3rd from the right
                 if (typeof this.activity.updateFloatingButtonsPosition === "function") {
                     this.activity.updateFloatingButtonsPosition();
                 }
