@@ -16,6 +16,7 @@ class GitDropdownUI {
     constructor() {
         this.activity = null;
         this._BASE_URL = "";
+        this._prefetchPromise = null;
     }
 
     init(activity) {
@@ -27,6 +28,11 @@ class GitDropdownUI {
         this._BASE_URL = backendUrl.replace(/\/$/, "") + "/api/github";
         this._syncMenuState();
         this._bindButtons();
+        
+        // Pre-fetch commits in the background so Time Travel opens instantly
+        if (this._getRepoName()) {
+            this._prefetchCommits();
+        }
     }
 
     onSaveLocally() {
@@ -51,6 +57,30 @@ class GitDropdownUI {
     }
     _setLastSavedHash(h) {
         localStorage.setItem("mbGitLastSavedHash", h);
+    }
+
+    // ─── Pre-fetching ─────────────────────────────────────────────────────────
+
+    _prefetchCommits() {
+        const repoName = this._getRepoName();
+        if (!repoName) return;
+        
+        this._prefetchPromise = fetch(`${this._BASE_URL}/commitHistory?repoName=${encodeURIComponent(repoName)}`)
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+            })
+            .then(raw => {
+                return (raw.data || raw).map(c => ({
+                    sha: c.sha,
+                    message: c.commit?.message || c.message || "Saved moment",
+                    date: c.commit?.author?.date || c.date || null
+                }));
+            })
+            .catch(e => {
+                console.error("[GitDropdownUI] Prefetch error:", e);
+                return null; // Silent fail for prefetch
+            });
     }
 
     _syncMenuState() {
@@ -164,6 +194,7 @@ class GitDropdownUI {
             localStorage.removeItem("mbGitCurrentSha");
             this.onSaveLocally();
             this._syncMenuState();
+            this._prefetchCommits(); // Refresh cache for this new repo
             this._showToast("Save spot created! Your project is now being tracked.", "success");
         } catch (e) {
             console.error("[GitDropdownUI] create error:", e);
@@ -223,6 +254,7 @@ class GitDropdownUI {
 
             this.onSaveLocally();
             localStorage.removeItem("mbGitCurrentSha");
+            this._prefetchCommits(); // Refresh cache after a new commit
             this._showToast("Moment saved! ✔", "success");
         } catch (e) {
             console.error("[GitDropdownUI] commit error:", e);
@@ -243,24 +275,21 @@ class GitDropdownUI {
             return;
         }
 
+        // If a prefetch hasn't been started, start one now
+        if (!this._prefetchPromise) {
+            this._prefetchCommits();
+        }
+
         let commits = [];
         try {
-            const res = await fetch(
-                `${this._BASE_URL}/commitHistory?repoName=${encodeURIComponent(repoName)}`
-            );
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const raw = await res.json();
-            commits = (raw.data || raw).map(c => ({
-                sha: c.sha,
-                message: c.commit?.message || c.message || "Saved moment",
-                date: c.commit?.author?.date || c.date || null
-            }));
+            // Await the background prefetch (instant if already done)
+            const preloaded = await this._prefetchPromise;
+            if (!preloaded) throw new Error("Prefetch failed");
+            commits = preloaded;
         } catch (e) {
             console.error("[GitDropdownUI] commitHistory error:", e);
-            await window.MBDialog.alert(
-                "Could not load your save history right now. Check your connection and try again.",
-                "Time Travel Unavailable"
-            );
+            this._showToast("Could not load history. Check your connection.", "error");
+            this._prefetchPromise = null; // reset so it tries again next time
             return;
         }
 
@@ -294,14 +323,13 @@ class GitDropdownUI {
         frame.className = "windowFrame git-history-panel";
         frame.setAttribute("role", "dialog");
         frame.setAttribute("aria-modal", "true");
-        frame.setAttribute("aria-label", "Time Travel — Saved Moments");
+        frame.setAttribute("aria-label", "Time Travel");
         frame.style.cssText = [
             "position:fixed;",
+            "width:450px;",
+            "max-width:90vw;",
+            "max-height:85vh;",
             "z-index:10001;",
-            "min-width:340px;",
-            "max-width:480px;",
-            "width:90vw;",
-            "max-height:70vh;",
             "display:flex;",
             "flex-direction:column;",
             "background:var(--bg);",
@@ -311,12 +339,15 @@ class GitDropdownUI {
         const topBar = document.createElement("div");
         topBar.className = "wfTopBar";
 
-        const closeBtn = document.createElement("div");
+        const closeBtn = document.createElement("button");
         closeBtn.className = "wftButton close";
-        closeBtn.title = "Close";
+        closeBtn.setAttribute("aria-label", "Close");
+        closeBtn.innerHTML = "&times;";
 
-        const titleEl = document.createElement("div");
+        const titleEl = document.createElement("span");
         titleEl.className = "wftTitle";
+        titleEl.style.cssText =
+            "flex:1; text-align:center; font-weight:bold; font-size:16px; letter-spacing:1px; color:#555;";
         titleEl.textContent = "Time Travel — Your Saved Moments";
 
         const spacer = document.createElement("div");
