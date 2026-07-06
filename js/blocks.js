@@ -1175,6 +1175,10 @@ class Blocks {
                 this._checkBoundsPending = false;
                 this.scheduleCheckBounds();
             }
+
+            if (this._deferCheckBoundsCount === 0) {
+                this._updateViewportCulling();
+            }
         };
 
         /**
@@ -7776,6 +7780,8 @@ class Blocks {
             if (!canvas || !canvas.width || !canvas.height) return;
 
             const container = this.activity.blocksContainer;
+            if (!container) return;
+
             // Viewport rect in container-space
             const vpLeft = -container.x;
             const vpTop = -container.y;
