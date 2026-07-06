@@ -548,6 +548,9 @@ class Blocks {
             // Rebuild spatial grid after scale change repositions blocks
             this._rebuildSpatialGrid();
 
+            // Viewport changed — recompute culling.
+            this._updateViewportCulling();
+
             /** Force a refresh. */
             await delayExecution(100);
             this.activity.refreshCanvas();
