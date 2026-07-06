@@ -139,6 +139,7 @@ class ToolbarUI {
                 ["saveButtonAdvanced", _("Save project as HTML")],
                 ["planetIcon", _("Find and share projects")],
                 ["planetIconDisabled", _("Offline. Sharing is unavailable")],
+                ["gitProjectBtn", _("My Project")],
                 ["toggleAuxBtn", _("Auxiliary menu")],
                 ["helpIcon", _("Help and shortcuts")],
                 ["helpGuideItem", _("Help"), "innerHTML"],
@@ -216,6 +217,7 @@ class ToolbarUI {
                 _("Save project"),
                 _("Find and share projects"),
                 _("Offline. Sharing is unavailable"),
+                _("My Project"),
                 _("Auxiliary menu"),
                 _("Help and shortcuts"),
                 _("Help"),
@@ -274,6 +276,7 @@ class ToolbarUI {
                 ["saveButtonAdvanced", _("Save project as HTML")],
                 ["planetIcon", _("Find and share projects")],
                 ["planetIconDisabled", _("Offline. Sharing is unavailable")],
+                ["gitProjectBtn", _("My Project")],
                 ["toggleAuxBtn", _("Auxiliary menu")],
                 ["helpIcon", _("Help and shortcuts")],
                 ["helpGuideItem", _("Help"), "innerHTML"],
@@ -302,6 +305,9 @@ class ToolbarUI {
                 ["save-png", _("Save turtle artwork as PNG"), "innerHTML"],
                 ["save-blockartwork-svg", _("Save block artwork as SVG"), "innerHTML"],
                 ["save-blockartwork-png", _("Save block artwork as PNG"), "innerHTML"],
+                ["git-create", _("Create My Save Spot"), "innerHTML"],
+                ["git-commit", _("Mark This Moment"), "innerHTML"],
+                ["git-history", _("Time Travel"), "innerHTML"],
                 ["new-project", _("Confirm"), "innerHTML"],
                 ["enUS", "English (United States)", "innerHTML"],
                 ["enUK", "English (United Kingdom)", "innerHTML"],
@@ -345,6 +351,7 @@ class ToolbarUI {
                 _("Save project as HTML"),
                 _("Find and share projects"),
                 _("Offline. Sharing is unavailable"),
+                _("My Project"),
                 _("Auxiliary menu"),
                 _("Help and shortcuts"),
                 _("Help"),
@@ -2480,6 +2487,25 @@ class ToolbarUI {
             if (btn) btn.style.color = color;
             this._dimTimeout = null;
         }, 500);
+    }
+
+    /**
+     * Renders the "My Project" Git dropdown icon and wires up the Materialize
+     * dropdown trigger. The menu item visibility is managed by GitDropdownUI.
+     *
+     * @public
+     * @param {GitDropdownUI} gitDropdownUI - The GitDropdownUI instance.
+     * @returns {void}
+     */
+    renderGitDropdownIcon(gitDropdownUI) {
+        const btn = docById("gitProjectBtn");
+        if (!btn) return;
+
+        btn.addEventListener("click", () => {
+            if (gitDropdownUI && typeof gitDropdownUI._syncMenuState === "function") {
+                gitDropdownUI._syncMenuState();
+            }
+        });
     }
 }
 
