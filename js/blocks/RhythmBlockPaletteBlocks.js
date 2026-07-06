@@ -742,6 +742,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                         (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
 
                     let timeout = 0;
+                    let totalBeats = 0;
                     let beatValue;
                     let __callback = null;
                     for (let i = 0; i < beatValues.length; i++) {
