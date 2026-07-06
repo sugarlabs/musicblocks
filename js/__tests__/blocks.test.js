@@ -117,7 +117,7 @@ describe("Viewport Culling", () => {
             turtles: {},
             boundary: {},
             macroDict: {},
-            palettes: { dict: {} },
+            palettes: { dict: {}, show: jest.fn() },
             logo: { synth: { loadSynth: jest.fn() } },
             blocksContainer: { x: 0, y: 0 },
             canvas: { width: 800, height: 600 },
@@ -249,6 +249,24 @@ describe("Viewport Culling", () => {
         // Block without container should be skipped, block with container processed
         expect(blocks.blockList[0]._viewportVisible).toBe(undefined);
         expect(blocks.blockList[1]._viewportVisible).toBe(true);
+    });
+
+    it("should showBlocks without throwing", () => {
+        blocks.blockList = [];
+        blocks.showBlocks();
+
+        expect(mockActivity.palettes.show).toHaveBeenCalled();
+        expect(blocks.visible).toBe(true);
+        expect(mockActivity.refreshCanvas).toHaveBeenCalled();
+    });
+
+    it("should update culling during setBlockScale", async () => {
+        blocks.blockList = [];
+        await blocks.setBlockScale(0.8);
+
+        expect(blocks.blockScale).toBe(0.8);
+        expect(blocks.blockList[0]).toBeUndefined();
+        expect(mockActivity.refreshCanvas).toHaveBeenCalled();
     });
 });
 
