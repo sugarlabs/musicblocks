@@ -5,22 +5,42 @@ const PracticeTheme = {
     subtitle: "Quest for the Hidden Treasure",
     intro: `
       <section class="story-card">
-        <h4>The Story Begins</h4>
-        <p>
-          Long ago, magical islands were joined by one great song: the
-          <b>Grand Melody</b>. When the Grand Melody played, flowers bloomed,
-          bridges appeared, rivers danced, and animals sang.
-        </p>
-        <p>
-          Then the Silence Storm swept across the ocean. The song broke into
-          tiny Melody Fragments, and the Heart of Harmony vanished.
-        </p>
-        <p>
-          Join <b>Lyra</b>, a brave young explorer, and <b>Beat</b>, a floating
-          music robot, as they follow Captain Cadence's old journal to find the
-          hidden treasure.
-        </p>
-      </section>
+      <h4>The Story Begins</h4>
+
+      <div class="character-row" aria-label="Meet Lyra and Beat">
+      <span class="character-token lyra-token">
+        <span class="character-name">
+            Lyra
+        </span>
+
+        <span class="character-role">
+            Explorer
+        </span>
+      </span>
+
+      <span class="character-token beat-token">
+        <span class="character-name">
+            Beat
+        </span>
+        <span class="character-role">
+            Music Robot
+        </span>
+      </span>
+    </div>
+
+      <p>
+        Every adventure needs a team! <b>Lyra</b> is a fearless explorer, and
+        <b>Beat</b> is her cheerful music robot who can hear melodies hidden
+        everywhere.
+      </p>
+
+      <p>
+        The magical <b>Grand Melody</b> that once connected all the islands has
+        disappeared. Its pieces are scattered across the sea. Solve musical puzzles,
+        discover hidden melodies, and help your new friends restore the song before
+        the islands fall silent forever.
+      </p>
+    </section>
     `,
     bigBadges: {
         echo_island: {
@@ -41,47 +61,49 @@ const PracticeProblems = [
         description: `
       <section class="story-card">
         <p>
-          Lyra and Beat land on Echo Island. A giant glowing bridge once joined
-          this island to the rest of the world, but after the Silence Storm, the
-          bridge disappeared into the sea.
+          Lyra and Beat step onto Echo Island. The bridge is gone, but the sea
+          is still humming. Beat points to an old song-map carved in stone.
         </p>
+        <div class="bridge-map" aria-label="Bridge song pattern A A B A">
+          <div class="bridge-gate"></div>
+          <div class="bridge-letters">
+            <span>A</span>
+            <span>A</span>
+            <span>B</span>
+            <span>A</span>
+          </div>
+          <div class="bridge-waves"></div>
+        </div>
         <p>
-          Beat scans an old stone tablet. It shows four symbols:
-          <b class="tablet-code">A A B A</b>
-        </p>
-        <p>
-          "These are not just letters," Beat says. "They are musical pieces!"
+          "These marks are sounds," Beat whispers. "If we hear them first, we
+          can wake the bridge."
         </p>
       </section>
 
       <section class="mission-card">
-        <h4>Your Mission</h4>
-        <p>Two music chunks are waiting on the screen:</p>
-        <ul>
-          <li><b>A</b> is the Hot Cross Buns piece.</li>
-          <li><b>B</b> is the Penny piece.</li>
-        </ul>
-        <ol>
-          <li>Drag the music chunks under the <b>Start</b> block.</li>
-          <li>Build the bridge song in this order: <b>A A B A</b>.</li>
-          <li>You may use a <b>repeat</b> block if it helps.</li>
-          <li>Press <b>Play</b> to hear the song.</li>
-          <li>Press <b>Check My Work</b> when the bridge song is ready.</li>
-        </ol>
+        <h4>Bridge Song</h4>
+        <p>
+          Try playing the loose <b>A</b> and <b>B</b> chunks. When their sounds
+          feel familiar, place them under <b>Start</b> to match the song-map
+          above.
+        </p>
+        <p>
+          Press <b>Play</b>. If the bridge starts to glow, press
+          <b>Check My Work</b>.
+        </p>
       </section>
 
       <section class="story-card">
-        <h4>After the Bridge Appears</h4>
+        <h4>Secret Paths</h4>
         <p>
-          Lyra notices that Captain Cadence's journal shows a slightly different
-          bridge. Try changing the music to discover paths he never wrote down.
+          After the bridge rises, try one small change. The island may answer.
         </p>
-        <ul>
-          <li>Change the octave number on a pitch block to make the bridge climb higher.</li>
-          <li>Use the transpose helper block on the screen to change the bridge color.</li>
-          <li>Make your own longer bridge song.</li>
-          <li>Rename the music chunks if you want to mark your discovery.</li>
-        </ul>
+        <div class="explore-grid">
+          <span>Change octave</span>
+          <span>Use transpose</span>
+          <span>Make it longer</span>
+          <span>Rename chunks</span>
+        </div>
       </section>
     `,
         expected: {
@@ -150,56 +172,62 @@ const PracticeProblems = [
         description: `
       <section class="story-card">
         <p>
-          After the bridge rises, Lyra and Beat cross into a quiet grove filled
-          with pale pink blossoms. The trees should be singing, but the Silence
-          Storm has hidden their echo.
+          Across the new bridge, Lyra and Beat find a silent Sakura grove. A
+          journal page flutters from one branch: "Sing the old blossom melody,
+          and the petals will show the next clue."
         </p>
+        <div class="sakura-grove" aria-label="Silent Sakura grove">
+          <div class="sakura-sky-note"></div>
+          <div class="sakura-tree sakura-tree-left">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="sakura-tree sakura-tree-right">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="journal-page">#2</div>
+          <div class="petal petal-one"></div>
+          <div class="petal petal-two"></div>
+          <div class="petal petal-three"></div>
+        </div>
         <p>
-          Beat finds another page from Captain Cadence's journal. It says:
-          "When the Sakura song returns, the grove will point toward the next
-          treasure clue."
-        </p>
-        <p>
-          Beat hums the first few notes. "This melody comes from a traditional
-          song from Japan called <b>Sakura Sakura</b>. The grove remembers it in
-          four small music chunks."
+          Beat hears four sleepy chunks from <b>Sakura Sakura</b>. Play them
+          once, then guide them along the petal trail.
         </p>
       </section>
 
       <section class="mission-card">
-        <h4>Your Mission</h4>
-        <p>Four music chunks are waiting on the screen:</p>
-        <ul>
-          <li><b>Sakura</b></li>
-          <li><b>yayoi</b></li>
-          <li><b>miwatasu</b></li>
-          <li><b>miniyukan</b></li>
-        </ul>
-
-        <ol>
-          <li>Drag the chunks under the <b>Start</b> block.</li>
-          <li>
-            Build this melody path:
-            <b>Sakura yayoi miwatasu yayoi miwatasu Sakura miniyukan</b>.
-          </li>
-          <li>Repeat the whole path <b>4 times</b>.</li>
-          <li>Press <b>Play</b> to wake the grove.</li>
-          <li>Press <b>Check My Work</b> when the Sakura echo is ready.</li>
-        </ol>
+        <h4>Petal Song</h4>
+        <div class="petal-song-map" aria-label="Sakura melody path">
+          <span>Sakura</span>
+          <span>yayoi</span>
+          <span>miwatasu</span>
+          <span>yayoi</span>
+          <span>miwatasu</span>
+          <span>Sakura</span>
+          <span>miniyukan</span>
+        </div>
+        <p>
+          Place the chunks under <b>Start</b> in the trail shown above. Let the
+          trail bloom <b>4 times</b>, press <b>Play</b>, then check the grove.
+        </p>
       </section>
 
       <section class="story-card">
-        <h4>After the Grove Sings</h4>
+        <h4>Hidden Petals</h4>
         <p>
-          Lyra sees blossoms drifting in patterns Captain Cadence never drew.
-          Try changing the music to discover what the grove is hiding.
+          When the trees answer, try one new twist. Some petals hide secret
+          badges.
         </p>
-      <ul>
-          <li>Rename the chunks to make your own explorer map.</li>
-          <li>Change the octave number on a pitch block to lift petals into the air.</li>
-          <li>Use the transpose helper block on the screen to make the grove shine differently.</li>
-          <li>Create a longer Sakura path of your own.</li>
-      </ul>
+        <div class="explore-grid">
+          <span>Rename chunks</span>
+          <span>Lift petals</span>
+          <span>Use transpose</span>
+          <span>Make a longer path</span>
+        </div>
       </section>
     `,
         expected: {
