@@ -1717,9 +1717,6 @@ class BaseBlock extends ProtoBlock {
         }
 
         this.setCapabilities(this._style.capabilities);
-        if (this._style.canCollapse) {
-            this.setCapability("collapsible", true);
-        }
 
         this.staticLabels = [this._style.name || ""];
         this.dockTypes = [];

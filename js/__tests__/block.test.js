@@ -153,6 +153,26 @@ describe("Block Foundation", () => {
             expect(block.getInfo()).toBe("forward block");
         });
 
+        it("isCollapsible() should return true for collapsible blocks", () => {
+            mockProtoBlock.name = "start";
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.isCollapsible()).toBe(true);
+
+            mockProtoBlock.name = "forward";
+            const block2 = new Block(mockProtoBlock, mockBlocks);
+            expect(block2.isCollapsible()).toBe(false);
+        });
+
+        it("isInlineCollapsible() should return true for inline collapsible blocks", () => {
+            mockProtoBlock.name = "newnote";
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.isInlineCollapsible()).toBe(true);
+
+            mockProtoBlock.name = "forward";
+            const block2 = new Block(mockProtoBlock, mockBlocks);
+            expect(block2.isInlineCollapsible()).toBe(false);
+        });
+
         it("hasCapability() should read protoblock capability metadata", () => {
             mockProtoBlock.capabilities.collapsible = true;
             mockProtoBlock.capabilities.specialInput = true;
