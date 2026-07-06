@@ -695,3 +695,204 @@ body.highcontrast {
 .dark .material-tooltip span {
     color: var(--color-text-primary) !important;
 }
+
+/* ==========================================================================
+   Time Travel — History Timeline Panel
+   ========================================================================== */
+
+.git-timeline-body {
+    overflow-y: auto;
+    padding: 0 16px 16px;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.git-timeline-hint {
+    font-size: 12px;
+    color: var(--color-text-secondary, #4b5563);
+    margin: 12px 0 10px;
+    font-style: italic;
+}
+
+.git-timeline-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-left: 2px solid var(--color-brand-primary, #3b82f6);
+}
+
+.git-timeline-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 0 0 18px 16px;
+    position: relative;
+}
+
+.git-timeline-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-brand-primary, #3b82f6);
+    border: 2px solid var(--color-bg-primary, #fff);
+    box-shadow: 0 0 0 2px var(--color-brand-primary, #3b82f6);
+    flex-shrink: 0;
+    margin-left: -22px;
+    margin-top: 4px;
+}
+
+.git-timeline-dot--latest {
+    background: var(--color-success, #10b981);
+    box-shadow: 0 0 0 2px var(--color-success, #10b981);
+}
+
+.git-timeline-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.git-timeline-message {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-primary, #1f2937);
+    word-break: break-word;
+}
+
+.git-timeline-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--color-text-tertiary, #9ca3af);
+    margin: 3px 0 6px;
+}
+
+.git-timeline-latest-badge {
+    background: var(--color-success, #10b981);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 99px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.git-timeline-go-back-btn {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm, 4px);
+    border: 1px solid var(--color-brand-primary, #3b82f6);
+    color: var(--color-brand-primary, #3b82f6);
+    background: transparent;
+    cursor: pointer;
+    transition:
+        background 0.15s,
+        color 0.15s;
+}
+
+.git-timeline-go-back-btn:hover:not(:disabled) {
+    background: var(--color-brand-primary, #3b82f6);
+    color: #fff;
+}
+
+.git-timeline-go-back-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+    border-color: var(--color-border-primary, #d1d5db);
+    color: var(--color-text-tertiary, #9ca3af);
+}
+
+/* "Just Go Back" discard button inside unsaved-work guard */
+.git-guard-discard-btn {
+    border: 1px solid var(--color-error, #ef4444) !important;
+    color: var(--color-error, #ef4444) !important;
+}
+
+.git-guard-discard-btn:hover {
+    background: var(--color-error, #ef4444) !important;
+    color: #fff !important;
+}
+
+/* ==========================================================================
+   Toast (fallback if activity.textMsg is unavailable)
+   ========================================================================== */
+
+.git-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    border-radius: var(--radius-lg, 8px);
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 20000;
+    pointer-events: none;
+    animation: git-toast-in 0.2s ease;
+    box-shadow: var(--shadow-md);
+    max-width: 90vw;
+    text-align: center;
+}
+
+.git-toast--info {
+    background: var(--color-info-bg, #dbeafe);
+    color: var(--color-info, #3b82f6);
+}
+.git-toast--success {
+    background: var(--color-success-bg, #d1fae5);
+    color: var(--color-success, #10b981);
+}
+.git-toast--error {
+    background: var(--color-error-bg, #fee2e2);
+    color: var(--color-error, #ef4444);
+}
+
+@keyframes git-toast-in {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* ==========================================================================
+   Dark Mode Overrides — Git Dropdown
+   ========================================================================== */
+
+.dark .git-timeline-dot {
+    border-color: #1f2937;
+}
+
+.dark .git-timeline-go-back-btn {
+    color: var(--color-brand-primary);
+    border-color: var(--color-brand-primary);
+}
+
+.dark .git-timeline-go-back-btn:hover:not(:disabled) {
+    background: var(--color-brand-primary);
+    color: #111827;
+}
+
+/* ==========================================================================
+   High-Contrast Mode Overrides — Git Dropdown
+   ========================================================================== */
+
+.highcontrast .git-timeline-go-back-btn {
+    border-color: #ffff00 !important;
+    color: #ffff00 !important;
+}
+
+.highcontrast .git-timeline-go-back-btn:hover:not(:disabled) {
+    background: #ffff00 !important;
+    color: #000 !important;
+}
+
+.highcontrast .git-timeline-latest-badge {
+    background: #00ff00 !important;
+    color: #000 !important;
+}
