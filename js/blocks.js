@@ -2822,7 +2822,6 @@ class Blocks {
                 }
             }
             this._endDeferCheckBounds();
-            this._updateViewportCulling();
         };
 
         /**
