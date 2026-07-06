@@ -225,6 +225,31 @@ describe("Viewport Culling", () => {
         expect(blocks.blockList[0]._viewportVisible).toBe(true);
         expect(blocks.blockList[1]._viewportVisible).toBe(true);
     });
+
+    it("should skip null entries in blockList", () => {
+        blocks.blockList = [
+            null,
+            { trash: false, container: { x: 100, y: 100 }, width: 50, height: 30 }
+        ];
+
+        blocks._updateViewportCulling();
+
+        // Should not throw and remaining blocks should still be culled
+        expect(blocks.blockList[1]._viewportVisible).toBe(true);
+    });
+
+    it("should skip blocks without a container", () => {
+        blocks.blockList = [
+            { trash: false, container: null, width: 50, height: 30 },
+            { trash: false, container: { x: 100, y: 100 }, width: 50, height: 30 }
+        ];
+
+        blocks._updateViewportCulling();
+
+        // Block without container should be skipped, block with container processed
+        expect(blocks.blockList[0]._viewportVisible).toBe(undefined);
+        expect(blocks.blockList[1]._viewportVisible).toBe(true);
+    });
 });
 
 describe("Blocks Foundation", () => {
