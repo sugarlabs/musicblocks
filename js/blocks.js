@@ -358,6 +358,10 @@ class Blocks {
         this._checkBoundsScheduled = false;
         // Cached drag group computed once on mousedown, reused during pressmove
         this._cachedDragGroup = null;
+        // Blocks in the active drag group are exempt from viewport culling
+        // during the drag to avoid "pop-in" when off-screen siblings are
+        // dragged into view. Cleared on pressup/mouseout.
+        this._dragActiveGroup = null;
         // Cached top-block map for moveAllBlocksExcept edge-scroll
         this._topBlockCache = null;
         // Throttle timestamp for edge-scroll calls
@@ -3555,7 +3559,19 @@ class Blocks {
             // Support viewport culling via _viewportVisible (eye icon takes priority).
             myBlock.container._origIsVisible = myBlock.container.isVisible;
             myBlock.container.isVisible = function () {
-                if (!myBlock._viewportVisible) return false;
+                if (!myBlock._viewportVisible) {
+                    // During a drag, show blocks in the active drag group even
+                    // if they are off-screen, so the user sees the entire stack
+                    // follow the cursor smoothly instead of "popping in" on release.
+                    if (
+                        myBlock.blocks &&
+                        myBlock.blocks._dragActiveGroup &&
+                        myBlock.blocks._dragActiveGroup.has(myBlock.blockIndex)
+                    ) {
+                        return this._origIsVisible.call(this);
+                    }
+                    return false;
+                }
                 return this._origIsVisible.call(this);
             };
 
@@ -4036,6 +4052,7 @@ class Blocks {
          */
         this.clearCachedDragGroup = () => {
             this._cachedDragGroup = null;
+            this._dragActiveGroup = null;
         };
 
         /**

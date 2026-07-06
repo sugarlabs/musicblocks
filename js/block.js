@@ -3272,6 +3272,13 @@ class Block {
             // Cache the drag group once on mousedown instead of
             // recomputing the tree traversal on every pressmove.
             that.blocks.cacheDragGroup(thisBlock);
+            // Track the drag group for viewport culling exemption during drag,
+            // so off-screen stack siblings remain visible while being dragged
+            // into view (avoids "pop-in" on release).
+            const group = that.blocks._cachedDragGroup;
+            if (group && group.length > 0) {
+                that.blocks._dragActiveGroup = new Set(group);
+            }
             // Invalidate the top-block cache since a drag may
             // disconnect blocks, changing the topology.
             that.blocks.invalidateTopBlockCache();
@@ -3593,7 +3600,6 @@ class Block {
                 // the move (workaround for issue #38 -- Blocks fly
                 // apart). Still need to get to the root cause.
                 this.blocks.adjustDocks(this.blockIndex, true);
-                this.blocks._updateViewportCulling();
             }
         } else if (SPECIALINPUTS.includes(this.name) || ["media", "loadFile"].includes(this.name)) {
             if (!haveClick) {

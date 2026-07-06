@@ -605,8 +605,7 @@ class Activity {
                         if (
                             this.blocks &&
                             this.blocksContainer &&
-                            (isInteracting ||
-                                this._lastCullContainerX !== this.blocksContainer.x ||
+                            (this._lastCullContainerX !== this.blocksContainer.x ||
                                 this._lastCullContainerY !== this.blocksContainer.y)
                         ) {
                             this.blocks._updateViewportCulling();
