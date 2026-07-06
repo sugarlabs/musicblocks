@@ -3552,7 +3552,6 @@ class Blocks {
             // Support viewport culling via _viewportVisible (eye icon takes priority).
             myBlock.container._origIsVisible = myBlock.container.isVisible;
             myBlock.container.isVisible = function () {
-                if (!this.visible) return false;
                 if (!myBlock._viewportVisible) return false;
                 return this._origIsVisible.call(this);
             };
