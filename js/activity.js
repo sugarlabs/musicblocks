@@ -606,9 +606,9 @@ class Activity {
                             this._lastCullContainerX !== this.blocksContainer.x ||
                             this._lastCullContainerY !== this.blocksContainer.y
                         ) {
+                            this.blocks._updateViewportCulling();
                             this._lastCullContainerX = this.blocksContainer.x;
                             this._lastCullContainerY = this.blocksContainer.y;
-                            this.blocks._updateViewportCulling();
                         }
 
                         this.stage.update();

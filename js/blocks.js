@@ -7768,8 +7768,14 @@ class Blocks {
          * Recompute after scroll, pan, resize, or project load.
          */
         this._updateViewportCulling = () => {
-            const container = this.activity.blocksContainer;
             const canvas = this.activity.canvas;
+            // Skip culling until the canvas has been initialized with valid dimensions.
+            // Calling culling too early (e.g. during project load before layout is final)
+            // would mark on-screen blocks as off-screen, and since the viewport never
+            // moves afterward, they'd stay invisible.
+            if (!canvas || !canvas.width || !canvas.height) return;
+
+            const container = this.activity.blocksContainer;
             // Viewport rect in container-space
             const vpLeft = -container.x;
             const vpTop = -container.y;
