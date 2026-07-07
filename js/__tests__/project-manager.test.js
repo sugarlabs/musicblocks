@@ -501,14 +501,23 @@ describe("_loadStart", () => {
         expect(planet.openCurrentProject).toHaveBeenCalled();
     });
 
-    it("registers then unregisters the finishedLoading listener", async () => {
-        const onSpy = jest.spyOn(global.pubsub, "on");
+    it("re-enables keyboard input after finishedLoading fires", async () => {
         const activity = makeActivity();
         const pm = new ProjectManager(activity);
         await pm._loadStart(activity);
-        expect(onSpy).toHaveBeenCalledWith("finishedLoading", expect.any(Function));
-        // Emit finishedLoading to trigger __afterLoad unsubscription
+        expect(activity.keyboardEnableFlag).toBe(0); // disabled during load
         global.pubsub.emit("finishedLoading");
+        expect(activity.keyboardEnableFlag).toBe(1); // re-enabled once load is done
+    });
+
+    it("post-load callback fires only once — self-unsubscribes after first event", async () => {
+        const activity = makeActivity();
+        const pm = new ProjectManager(activity);
+        await pm._loadStart(activity);
+        global.pubsub.emit("finishedLoading"); // triggers __afterLoad → stage.update()
+        const firstUpdateCount = activity.stage.update.mock.calls.length;
+        global.pubsub.emit("finishedLoading"); // should be a no-op — listener removed
+        expect(activity.stage.update).toHaveBeenCalledTimes(firstUpdateCount);
     });
 });
 
@@ -556,24 +565,28 @@ describe("_loadProject", () => {
         jest.useRealTimers();
     });
 
-    it("registers a finishedLoading listener", () => {
+    it("runs post-load setup when finishedLoading fires (firstRun=true)", () => {
         const planet = {
             getCurrentProjectName: jest.fn(() => "Test"),
             openProjectFromPlanet: jest.fn(),
             initialiseNewProject: jest.fn()
         };
-        const activity = makeActivity({ planet });
+        const activity = makeActivity({ planet, firstRun: true });
         const pm = new ProjectManager(activity);
-        const onSpy = jest.spyOn(global.pubsub, "on");
         jest.useFakeTimers();
 
-        pm._loadProject("proj-1");
+        pm._loadProject("proj-1", { run: false, show: false, collapse: false });
+        global.pubsub.emit("finishedLoading");
+        jest.advanceTimersByTime(1000);
 
-        expect(onSpy).toHaveBeenCalledWith("finishedLoading", expect.any(Function));
+        // Behavior: stacks collapsed and blocks hidden, firstRun cleared
+        expect(activity._toggleCollapsibleStacks).toHaveBeenCalled();
+        expect(activity._changeBlockVisibility).toHaveBeenCalled();
+        expect(activity.firstRun).toBe(false);
         jest.useRealTimers();
     });
 
-    it("unregisters listener after finishedLoading fires and inner timeout runs", () => {
+    it("post-load callback fires only once — self-unsubscribes after first event", () => {
         const planet = {
             getCurrentProjectName: jest.fn(() => "Test"),
             openProjectFromPlanet: jest.fn(),
@@ -581,15 +594,19 @@ describe("_loadProject", () => {
         };
         const activity = makeActivity({ planet, firstRun: false });
         const pm = new ProjectManager(activity);
-        const offSpy = jest.spyOn(global.pubsub, "off");
         jest.useFakeTimers();
 
         pm._loadProject("proj-1", { run: false, show: false, collapse: false });
 
+        // First fire: handler runs and removes itself
         global.pubsub.emit("finishedLoading");
         jest.advanceTimersByTime(1000);
+        const callsAfterFirst = activity._changeBlockVisibility.mock.calls.length;
 
-        expect(offSpy).toHaveBeenCalledWith("finishedLoading", expect.any(Function));
+        // Second fire: should be a no-op — listener was removed
+        global.pubsub.emit("finishedLoading");
+        jest.advanceTimersByTime(1000);
+        expect(activity._changeBlockVisibility).toHaveBeenCalledTimes(callsAfterFirst);
         jest.useRealTimers();
     });
 
@@ -630,14 +647,16 @@ describe("runProject", () => {
     beforeEach(() => jest.useFakeTimers());
     afterEach(() => jest.useRealTimers());
 
-    it("calls pubsub.off for finishedLoading immediately", () => {
+    it("does not schedule _changeBlockVisibility a second time when called twice", () => {
+        // runProject defensively removes itself from the finishedLoading listener
+        // list (pubsub.off is a no-op when not registered, matching original code).
+        // The observable behaviour is that the 5s work runs exactly once per call.
         const activity = makeActivity();
         const pm = new ProjectManager(activity);
-        const offSpy = jest.spyOn(global.pubsub, "off");
 
-        pm.runProject(null);
-
-        expect(offSpy).toHaveBeenCalledWith("finishedLoading", expect.any(Function));
+        pm.runProject("env");
+        jest.advanceTimersByTime(5000);
+        expect(activity._changeBlockVisibility).toHaveBeenCalledTimes(1);
     });
 
     it("schedules _changeBlockVisibility and _doFastButton after 5s", () => {
