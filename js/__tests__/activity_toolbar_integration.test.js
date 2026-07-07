@@ -65,6 +65,24 @@ const loadActivityClass = () => {
             recoverable: jest.fn()
         },
         setupActivityIdleWatcher: jest.fn(),
+        setupProjectManager: jest.fn(activity => {
+            activity.projectManager = {
+                doLoadAnimation: jest.fn(),
+                stopLoadAnimation: jest.fn(),
+                prepareExport: jest.fn(),
+                runProject: jest.fn(),
+                getClosestStandardNoteValue: jest.fn(),
+                _loadProject: jest.fn(),
+                loadStartWrapper: jest.fn(),
+                showContents: jest.fn(),
+                justLoadStart: jest.fn(),
+                saveLocally: jest.fn(),
+                newProject: jest.fn(),
+                doLoad: jest.fn(),
+                doMergeLoad: jest.fn(),
+                start: jest.fn()
+            };
+        }),
         setupPluginController: jest.fn(),
         setupToolbarController: jest.fn(),
         setupAlertController: jest.fn(),

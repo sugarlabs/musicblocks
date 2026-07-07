@@ -3,86 +3,60 @@ const path = require("path");
 const vm = require("vm");
 const { PubSub } = require("../pubsub");
 
-const activityPath = path.resolve(__dirname, "../activity.js");
-const activityCode = fs.readFileSync(activityPath, "utf8");
+const loadProjectManager = () => {
+    const pmPath = path.resolve(__dirname, "../project-manager.js");
+    let code = fs.readFileSync(pmPath, "utf8");
+    code += "\nthis.ProjectManager = ProjectManager;";
 
-const extractFn = (startMarker, endMarker) => {
-    const start = activityCode.indexOf(startMarker);
-    const end = activityCode.indexOf(endMarker, start);
-    return activityCode.slice(start, end).trimEnd();
-};
-
-const runProjectCode = extractFn(
-    "        this.runProject = env => {",
-    "        const standardDurations = ["
-);
-
-const loadProjectCode = extractFn(
-    "        this._loadProject = (projectID, flags) => {",
-    "        setupActivityAbcParser(this);"
-);
-
-const loadLoadStart = () => {
-    const activityPath = path.resolve(__dirname, "../activity.js");
-    let code = fs.readFileSync(activityPath, "utf8");
-
-    const startPoint = code.indexOf("const loadStart = async that => {");
-    const endPoint = code.indexOf("        this.loadStartWrapper = async", startPoint);
-    if (startPoint === -1 || endPoint === -1) {
-        throw new Error("Could not locate loadStart in activity.js");
-    }
-    code = code.slice(startPoint, endPoint);
-    code += "\nthis.loadStart = loadStart;";
-
-    const recoverable = jest.fn();
     const pubsub = new PubSub();
     const sandbox = {
-        ErrorHandler: {
-            recoverable,
-            capture: jest.fn(),
-            warn: jest.fn(),
-            userFacing: jest.fn()
-        },
         window: global.window,
         document: global.document,
         console,
         _: key => key,
         define: () => {},
         require: () => {},
+        module: { exports: {} },
         setTimeout,
-        createjs: {},
-        Turtles: class {},
-        Palettes: class {},
-        Blocks: class {},
-        Logo: class {},
-        LanguageBox: class {},
-        ThemeBox: class {},
-        SaveInterface: class {},
-        StatsWindow: class {},
-        Trashcan: class {},
-        PasteBox: class {},
-        HelpWidget: class {},
-        globalActivity: null,
+        pubsub,
+        DATAOBJS: [],
         _THIS_IS_MUSIC_BLOCKS_: true,
-        LEADING: 0,
-        MYDEFINES: [],
-        setupActivityAbcParser: () => {},
-        pubsub
+        ErrorHandler: {
+            recoverable: jest.fn(),
+            capture: jest.fn(),
+            warn: jest.fn(),
+            userFacing: jest.fn()
+        },
+        platformColor: { headingColor: "#000", blueButton: "#00f", blueButtonText: "#fff" },
+        Midi: class {},
+        ABCJS: { parseOnly: jest.fn(() => []) },
+        ensureABCJS: jest.fn(),
+        extractProjectDataFromHTML: jest.fn(),
+        unescapeHTML: jest.fn(x => x),
+        doSVG: jest.fn(() => ""),
+        base64Encode: jest.fn(x => x),
+        debugLog: jest.fn(),
+        getTemperament: jest.fn(() => []),
+        getOctaveRatio: jest.fn(() => 2),
+        transcribeMidi: jest.fn()
     };
-
     vm.createContext(sandbox);
     vm.runInContext(code, sandbox);
 
-    return { loadStart: sandbox.loadStart, recoverable, pubsub };
+    return { ProjectManager: sandbox.ProjectManager, pubsub, ErrorHandler: sandbox.ErrorHandler };
 };
 
 describe("Activity startup recovery", () => {
-    let loadStart;
-    let recoverable;
+    let ProjectManager;
     let pubsub;
+    let recoverable;
 
     beforeAll(() => {
-        ({ loadStart, recoverable, pubsub } = loadLoadStart());
+        ({
+            ProjectManager,
+            pubsub,
+            ErrorHandler: { recoverable }
+        } = loadProjectManager());
     });
 
     afterEach(() => {
@@ -122,7 +96,8 @@ describe("Activity startup recovery", () => {
             update: false
         };
 
-        await loadStart(activity);
+        const pm = new ProjectManager(activity);
+        await pm._loadStart(activity);
 
         expect(recoverable).toHaveBeenCalledTimes(1);
         const [errorArg, contextArg] = recoverable.mock.calls[0];
@@ -141,74 +116,108 @@ describe("Activity startup recovery", () => {
 });
 
 describe("Activity.runProject – pubsub.off defensive unsubscribe", () => {
-    let sandbox;
+    let ProjectManager;
     let pubsub;
 
     beforeEach(() => {
-        pubsub = new PubSub();
-
-        sandbox = {
-            pubsub,
-            _changeBlockVisibility: jest.fn(),
-            _doFastButton: jest.fn(),
-            setTimeout: () => {}
-        };
-        vm.createContext(sandbox);
-        vm.runInContext(runProjectCode, sandbox);
+        ({ ProjectManager, pubsub } = loadProjectManager());
     });
 
     it("calls pubsub.off(finishedLoading) immediately when invoked", () => {
+        const activity = {
+            _changeBlockVisibility: jest.fn(),
+            _doFastButton: jest.fn()
+        };
+        const pm = new ProjectManager(activity);
         const offSpy = jest.spyOn(pubsub, "off");
-        sandbox.runProject(null);
+        pm.runProject(null);
         expect(offSpy).toHaveBeenCalledWith("finishedLoading", expect.any(Function));
     });
 });
 
 describe("Activity._loadProject – pubsub listener lifecycle", () => {
-    let sandbox;
+    let ProjectManager;
     let pubsub;
     let fakeTimers;
+    let sandboxSetTimeout;
 
     beforeEach(() => {
-        pubsub = new PubSub();
         fakeTimers = [];
+        sandboxSetTimeout = (fn, delay) => {
+            fakeTimers.push({ fn, delay });
+        };
 
-        sandbox = {
+        const pmPath = path.resolve(__dirname, "../project-manager.js");
+        let code = fs.readFileSync(pmPath, "utf8");
+        code += "\nthis.ProjectManager = ProjectManager;";
+
+        pubsub = new PubSub();
+        const ErrorHandler = {
+            recoverable: jest.fn(),
+            capture: jest.fn(),
+            warn: jest.fn()
+        };
+        const sandbox = {
+            window: global.window,
+            document: global.document,
+            console,
+            _: key => key,
+            define: () => {},
+            require: () => {},
+            module: { exports: {} },
+            setTimeout: sandboxSetTimeout,
             pubsub,
-            planet: {
-                getCurrentProjectName: jest.fn(() => "Test Project"),
-                openProjectFromPlanet: jest.fn(),
-                initialiseNewProject: jest.fn()
-            },
-            loadStart: jest.fn(),
-            loading: false,
-            firstRun: true,
-            update: false,
-            doLoadAnimation: jest.fn(),
-            textMsg: jest.fn(),
-            loadStartWrapper: jest.fn(),
-            _toggleCollapsibleStacks: jest.fn(),
-            _changeBlockVisibility: jest.fn(),
-            turtles: { getTurtleCount: jest.fn(() => 0) },
-            ErrorHandler: { recoverable: jest.fn(), warn: jest.fn() },
-            _: x => x,
-            document: { body: { style: { cursor: "" } } },
-            setTimeout: (fn, delay) => {
-                fakeTimers.push({ fn, delay });
-            }
+            DATAOBJS: [],
+            _THIS_IS_MUSIC_BLOCKS_: true,
+            ErrorHandler,
+            platformColor: { headingColor: "#000", blueButton: "#00f", blueButtonText: "#fff" },
+            Midi: class {},
+            ABCJS: { parseOnly: jest.fn(() => []) },
+            ensureABCJS: jest.fn(),
+            extractProjectDataFromHTML: jest.fn(),
+            unescapeHTML: jest.fn(x => x),
+            doSVG: jest.fn(() => ""),
+            base64Encode: jest.fn(x => x),
+            debugLog: jest.fn(),
+            getTemperament: jest.fn(() => []),
+            getOctaveRatio: jest.fn(() => 2),
+            transcribeMidi: jest.fn()
         };
         vm.createContext(sandbox);
-        vm.runInContext(loadProjectCode, sandbox);
+        vm.runInContext(code, sandbox);
+        ProjectManager = sandbox.ProjectManager;
+    });
+
+    const makeActivity = fakeTimers => ({
+        planet: {
+            getCurrentProjectName: jest.fn(() => "Test Project"),
+            openProjectFromPlanet: jest.fn(),
+            initialiseNewProject: jest.fn()
+        },
+        loading: false,
+        firstRun: true,
+        update: false,
+        doLoadAnimation: jest.fn(),
+        textMsg: jest.fn(),
+        loadStartWrapper: jest.fn(),
+        _toggleCollapsibleStacks: jest.fn(),
+        _changeBlockVisibility: jest.fn(),
+        turtles: { getTurtleCount: jest.fn(() => 0) },
+        ErrorHandler: { recoverable: jest.fn(), warn: jest.fn() }
     });
 
     it("registers a finishedLoading listener before returning", () => {
+        const activity = makeActivity(fakeTimers);
+        const pm = new ProjectManager(activity);
         const onSpy = jest.spyOn(pubsub, "on");
-        sandbox._loadProject("project-1");
+        pm._loadProject("project-1");
         expect(onSpy).toHaveBeenCalledWith("finishedLoading", expect.any(Function));
     });
 
     it("unregisters the finishedLoading listener after the deferred callback fires", () => {
-        sandbox._loadProject("project-1");
+        const activity = makeActivity(fakeTimers);
+        const pm = new ProjectManager(activity);
+        pm._loadProject("project-1");
         const offSpy = jest.spyOn(pubsub, "off");
 
         pubsub.emit("finishedLoading");
