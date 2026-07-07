@@ -1343,3 +1343,80 @@ describe("LegoWidget — _getColorFamilyByName extended coverage", () => {
         expect(green.hue).toBe(120);
     });
 });
+
+describe("LegoWidget — _addColorSegment", () => {
+    let legoWidget;
+
+    beforeEach(() => {
+        legoWidget = new LegoWidget();
+        // Mock performance.now for timestamp
+        global.performance = { now: jest.fn(() => 12345) };
+    });
+
+    afterEach(() => {
+        delete global.performance;
+    });
+
+    it("should append a segment to an existing colorData entry", () => {
+        legoWidget.colorData = [
+            {
+                note: "C4",
+                label: "Do (4)",
+                colorSegments: [{ color: "red", duration: 500, timestamp: 100 }]
+            }
+        ];
+
+        legoWidget._addColorSegment(0, { name: "blue" }, 1000);
+
+        expect(legoWidget.colorData[0].colorSegments).toHaveLength(2);
+        expect(legoWidget.colorData[0].colorSegments[1].color).toBe("blue");
+        expect(legoWidget.colorData[0].colorSegments[1].duration).toBe(1000);
+    });
+
+    it("should throw when initializing a new entry due to the this.this typo bug", () => {
+        // This test documents the known production bug: this.this.matrixData
+        // on line 2772-2773 of legobricks.js. When colorData[rowIndex] does not
+        // exist yet, _addColorSegment tries to read this.this.matrixData which
+        // causes a TypeError because this.this is undefined.
+        legoWidget.colorData = [];
+        legoWidget.matrixData = {
+            rows: [{ note: "C4", label: "Do (4)" }]
+        };
+
+        expect(() => {
+            legoWidget._addColorSegment(0, { name: "red" }, 1500);
+        }).toThrow(TypeError);
+    });
+
+    it("should not throw when appending to a pre-populated colorData entry", () => {
+        legoWidget.colorData = [
+            {
+                note: "G4",
+                label: "Sol (4)",
+                colorSegments: []
+            }
+        ];
+
+        expect(() => {
+            legoWidget._addColorSegment(0, { name: "green" }, 800);
+        }).not.toThrow();
+
+        expect(legoWidget.colorData[0].colorSegments).toHaveLength(1);
+        expect(legoWidget.colorData[0].colorSegments[0].color).toBe("green");
+        expect(legoWidget.colorData[0].colorSegments[0].duration).toBe(800);
+    });
+
+    it("should record the correct timestamp from performance.now", () => {
+        legoWidget.colorData = [
+            {
+                note: "A4",
+                label: "La (4)",
+                colorSegments: []
+            }
+        ];
+
+        legoWidget._addColorSegment(0, { name: "red" }, 2000);
+
+        expect(legoWidget.colorData[0].colorSegments[0].timestamp).toBe(12345);
+    });
+});
