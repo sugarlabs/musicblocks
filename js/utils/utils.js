@@ -43,7 +43,7 @@ if (typeof module !== "undefined" && module.exports) {
    docBySelector, docByTagName, doPublish, doStopVideoCam, doSVG,
    doUseCamera, format, getTextWidth, hideDOMLabel, httpGet, httpPost, HttpRequest,
    importMembers, isSVGEmpty, prepareMacroExports, preparePluginExports,
-   processMacroData, processRawPluginData, windowHeight, windowWidth,
+   processMacroData, processPluginData, processRawPluginData, windowHeight, windowWidth,
    fnBrowserDetect, waitForReadiness
 */
 
@@ -966,10 +966,16 @@ window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivi
                     delete window.__mb_plugin_registry[registryName];
                 }
                 URL.revokeObjectURL(sUrl);
+                if (sScript.parentNode) {
+                    sScript.parentNode.removeChild(sScript);
+                }
                 resolve();
             };
             sScript.onerror = () => {
                 URL.revokeObjectURL(sUrl);
+                if (sScript.parentNode) {
+                    sScript.parentNode.removeChild(sScript);
+                }
                 resolve(); // Still resolve to let others run
             };
             document.head.appendChild(sScript);
@@ -1535,6 +1541,7 @@ if (typeof module !== "undefined" && module.exports) {
         doSVG,
         isSVGEmpty,
         prepareMacroExports,
+        processPluginData,
         processMacroData,
         hideDOMLabel,
         displayMsg
