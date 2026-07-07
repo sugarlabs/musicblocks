@@ -138,7 +138,7 @@ class GlobalPlanet {
                 this.oldSearchString,
                 this.sortBy,
                 this.index,
-                this.index + this.page + 1,
+                this.index + this.page,
                 this.afterRefreshProjects.bind(this)
             );
         } else {
@@ -146,7 +146,7 @@ class GlobalPlanet {
                 this.searchMode,
                 this.sortBy,
                 this.index,
-                this.index + this.page + 1,
+                this.index + this.page,
                 this.afterRefreshProjects.bind(this)
             );
         }
@@ -163,7 +163,7 @@ class GlobalPlanet {
                 this.oldSearchString,
                 this.sortBy,
                 this.index,
-                this.index + this.page + 1,
+                this.index + this.page,
                 this.afterRefreshProjects.bind(this)
             );
         } else {
@@ -171,7 +171,7 @@ class GlobalPlanet {
                 this.searchMode,
                 this.sortBy,
                 this.index,
-                this.index + this.page + 1,
+                this.index + this.page,
                 this.afterRefreshProjects.bind(this)
             );
         }
@@ -204,7 +204,7 @@ class GlobalPlanet {
             this.oldSearchString,
             this.sortBy,
             this.index,
-            this.index + this.page + 1,
+            this.index + this.page,
             this.afterRefreshProjects.bind(this)
         );
     }
@@ -243,15 +243,17 @@ class GlobalPlanet {
         this.loadCount = toDownload.length;
         const l = data.length;
 
-        if (l === this.page + 1) data.pop();
+        // A full page returned means there may be more projects to load.
+        // (limit === this.page so l === this.page is the maximum possible)
+        const hasMore = l >= this.page;
 
         if (l === 0) {
             this.throwNoProjectsError();
             this.afterAddProjects();
         } else if (this.loadCount === 0) {
             this.render(data);
-            l === this.page + 1 ? this.showLoadMore() : this.hideLoadMore();
-        } else if (l === this.page + 1) {
+            hasMore ? this.showLoadMore() : this.hideLoadMore();
+        } else if (hasMore) {
             this.downloadProjectsToCache(
                 toDownload,
                 function () {
@@ -509,14 +511,19 @@ class GlobalPlanet {
                         remixedName,
                         data,
                         this.cache[id].ProjectImage
-                    );
+                    ).then(newId => {
+                        // Remix has no GitHub repo yet — clear git state in parent toolbar.
+                        Planet._postGitState(newId);
+                    });
                 } else {
                     if (language === "ja") {
                         remixedName = `「${_("My Project")}」${this.remixPrefix}`;
                     } else {
                         remixedName = `${this.remixPrefix}  ${_("My Project")}`;
                     }
-                    Planet.ProjectStorage.initialiseNewProject(remixedName, data, null);
+                    Planet.ProjectStorage.initialiseNewProject(remixedName, data, null).then(newId => {
+                        Planet._postGitState(newId);
+                    });
                 }
 
                 Planet.loadProjectFromData(data);
@@ -590,10 +597,13 @@ class GlobalPlanet {
                     decoded,
                     (this.cache[id] && this.cache[id].ProjectImage) || null,
                     null
-                ).then(newId => {
+                ).then(async newId => {
                     // Record the GitHub repo link + original metadata separately
                     // so Publisher can flip visible=1 without creating a duplicate repo.
-                    Planet.ProjectStorage.addGitRepoData(newId, forkedRepoName, forkDescription, forkTags);
+                    await Planet.ProjectStorage.addGitRepoData(newId, forkedRepoName, forkDescription, forkTags);
+                    // Notify parent toolbar of the forked project's git state so
+                    // Time Travel is available immediately after fork.
+                    Planet._postGitState(newId);
                 });
                 Planet.loadProjectFromData(decoded);
             } else {
@@ -605,8 +615,9 @@ class GlobalPlanet {
                             data,
                             (this.cache[id] && this.cache[id].ProjectImage) || null,
                             null
-                        ).then(newId => {
-                            Planet.ProjectStorage.addGitRepoData(newId, forkedRepoName, forkDescription, forkTags);
+                        ).then(async newId => {
+                            await Planet.ProjectStorage.addGitRepoData(newId, forkedRepoName, forkDescription, forkTags);
+                            Planet._postGitState(newId);
                         });
                         Planet.loadProjectFromData(data);
                     },
