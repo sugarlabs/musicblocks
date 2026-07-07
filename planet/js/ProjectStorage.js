@@ -137,13 +137,15 @@ class ProjectStorage {
     /**
      * Stores the GitHub repo slug for a project that has a repo but
      * has NOT yet been published to the planet (visible=0).
-     * Also stores description and tags so the publish form can pre-populate them.
+     * Also stores description, tags, and the ownership key so Time Travel
+     * can be restored when switching between projects.
      */
-    async addGitRepoData(id, repoName, description, tags) {
+    async addGitRepoData(id, repoName, description, tags, hashedKey) {
         this.data.Projects[id].GitRepoData = {
             repoName,
             description: description || "",
-            tags:        tags        || []
+            tags:        tags        || [],
+            hashedKey:   hashedKey   || ""
         };
         await this.save();
     }

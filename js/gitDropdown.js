@@ -28,7 +28,16 @@ class GitDropdownUI {
         this._BASE_URL = backendUrl.replace(/\/$/, "") + "/api/github";
         this._syncMenuState();
         this._bindButtons();
-        
+
+        // Listen for MB_GIT_STATE messages from the planet iframe.
+        // Fired whenever the user opens a different project so that the
+        // "My Project" toolbar menu reflects the correct repo/key.
+        window.addEventListener("message", e => {
+            if (e.data && e.data.type === "MB_GIT_STATE") {
+                this._applyGitState(e.data.repoName || "", e.data.hashedKey || "");
+            }
+        });
+
         // Pre-fetch commits in the background so Time Travel opens instantly
         if (this._getRepoName()) {
             this._prefetchCommits();
@@ -43,6 +52,32 @@ class GitDropdownUI {
             }
         } catch (e) {
             // Dirty checking is best-effort.
+        }
+    }
+
+    /**
+     * Applies a git state received from the planet iframe (MB_GIT_STATE).
+     * Updates localStorage and refreshes the "My Project" toolbar menu.
+     *
+     * @param {string} repoName   - repo slug, or "" to clear
+     * @param {string} hashedKey  - ownership key for the repo
+     */
+    _applyGitState(repoName, hashedKey) {
+        if (repoName) {
+            localStorage.setItem("mbGitRepoName", repoName);
+            localStorage.setItem("mbGitHashedKey", hashedKey || "");
+        } else {
+            localStorage.removeItem("mbGitRepoName");
+            localStorage.removeItem("mbGitHashedKey");
+        }
+        // Reset the current-SHA so the history panel marks the latest commit
+        // as current whenever we switch to a different project.
+        localStorage.removeItem("mbGitCurrentSha");
+        this._syncMenuState();
+        if (repoName) {
+            // Reset and restart the prefetch for the new project.
+            this._prefetchPromise = null;
+            this._prefetchCommits();
         }
     }
 
@@ -189,12 +224,30 @@ class GitDropdownUI {
             }
 
             const data = await res.json();
-            localStorage.setItem("mbGitRepoName", data.repoName || data.repository || repoName);
-            localStorage.setItem("mbGitHashedKey", data.hashedKey || data.key || "");
+            const savedRepoName = data.repoName || data.repository || repoName;
+            const savedKey = data.hashedKey || data.key || "";
+            localStorage.setItem("mbGitRepoName", savedRepoName);
+            localStorage.setItem("mbGitHashedKey", savedKey);
             localStorage.removeItem("mbGitCurrentSha");
             this.onSaveLocally();
             this._syncMenuState();
             this._prefetchCommits(); // Refresh cache for this new repo
+
+            // Notify the planet iframe so it:
+            //   1. Renames the local project to the user's chosen display name.
+            //   2. Records GitRepoData (repoName + hashedKey) for this project.
+            //   3. Refreshes the local planet card list.
+            const planetIframe = document.getElementById("planet-iframe");
+            if (planetIframe && planetIframe.contentWindow) {
+                planetIframe.contentWindow.postMessage({
+                    type: "MB_GIT_CREATED",
+                    repoName:    savedRepoName,
+                    hashedKey:   savedKey,
+                    displayName: displayName,
+                    description: description
+                }, "*");
+            }
+
             this._showToast("Save spot created! Your project is now being tracked.", "success");
         } catch (e) {
             console.error("[GitDropdownUI] create error:", e);

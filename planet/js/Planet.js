@@ -95,6 +95,34 @@ class Planet {
         this.GlobalPlanet.openGlobalProject(id, error);
     }
 
+    /**
+     * Posts the git state of a project to the parent window so that
+     * GitDropdownUI can update the "My Project" menu and Time Travel option.
+     *
+     * Called whenever the active project changes inside the planet iframe
+     * (openProject from local planet, or after fork/remix from global planet).
+     *
+     * @param {string} id - ProjectStorage project ID
+     */
+    _postGitState(id) {
+        try {
+            const project = this.ProjectStorage.data.Projects[id];
+            const gitData = project && project.GitRepoData;
+            const repoName = gitData ? (gitData.repoName || "") : "";
+            // Prefer the key stored directly in GitRepoData (set by gitDropdown),
+            // then fall back to the ServerInterface per-repo key (set by fork/publish).
+            const hashedKey = repoName
+                ? (gitData.hashedKey || localStorage.getItem("mb_git_key_" + repoName) || "")
+                : "";
+            window.parent.postMessage(
+                { type: "MB_GIT_STATE", repoName, hashedKey },
+                "*"
+            );
+        } catch (e) {
+            console.debug("[Planet] Could not post git state:", e);
+        }
+    }
+
     showNewProjectConfirmation() {
         // Remove existing confirmation if one is already open
         const existing = document.getElementById("new-project-confirmation");
@@ -219,6 +247,23 @@ class Planet {
 
         document.getElementById("planet-new-project").addEventListener("click", evt => {
             this.showNewProjectConfirmation();
+        });
+
+        // Listen for MB_GIT_CREATED messages from gitDropdown.js (parent window).
+        // When the user creates a save spot from the toolbar, we:
+        //   1. Rename the local project to the display name chosen by the user.
+        //   2. Record GitRepoData so the project is linked to its GitHub repo.
+        //   3. Refresh the local planet cards.
+        window.addEventListener("message", e => {
+            if (!e.data || e.data.type !== "MB_GIT_CREATED") return;
+            const id = this.ProjectStorage.getCurrentProjectID();
+            if (!id) return;
+            const { repoName, hashedKey, displayName, description } = e.data;
+            if (displayName) {
+                this.ProjectStorage.renameProject(id, displayName);
+            }
+            this.ProjectStorage.addGitRepoData(id, repoName, description || "", [], hashedKey || "");
+            if (this.LocalPlanet) this.LocalPlanet.updateProjects();
         });
 
         this.ServerInterface.getTagManifest(
