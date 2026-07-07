@@ -1181,6 +1181,10 @@ class Blocks {
             }
 
             if (this._deferCheckBoundsCount === 0) {
+                // Re-cull now — docks repositioned blocks relative to the
+                // viewport. The render loop only re-culls on container move,
+                // so without this, a block that shifted on-screen would stay
+                // invisible until the user scrolls.
                 this._updateViewportCulling();
             }
         };
