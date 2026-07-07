@@ -1373,19 +1373,21 @@ describe("LegoWidget — _addColorSegment", () => {
         expect(legoWidget.colorData[0].colorSegments[1].duration).toBe(1000);
     });
 
-    it("should throw when initializing a new entry due to the this.this typo bug", () => {
-        // This test documents the known production bug: this.this.matrixData
-        // on line 2772-2773 of legobricks.js. When colorData[rowIndex] does not
-        // exist yet, _addColorSegment tries to read this.this.matrixData which
-        // causes a TypeError because this.this is undefined.
+    it("should initialize a new entry correctly when colorData is empty", () => {
+        // This test proves that the previous typo bug (this.this.matrixData)
+        // is fixed and _addColorSegment correctly initializes the row.
         legoWidget.colorData = [];
         legoWidget.matrixData = {
             rows: [{ note: "C4", label: "Do (4)" }]
         };
 
-        expect(() => {
-            legoWidget._addColorSegment(0, { name: "red" }, 1500);
-        }).toThrow(TypeError);
+        legoWidget._addColorSegment(0, { name: "red" }, 1500);
+
+        expect(legoWidget.colorData[0].note).toBe("C4");
+        expect(legoWidget.colorData[0].label).toBe("Do (4)");
+        expect(legoWidget.colorData[0].colorSegments).toHaveLength(1);
+        expect(legoWidget.colorData[0].colorSegments[0].color).toBe("red");
+        expect(legoWidget.colorData[0].colorSegments[0].duration).toBe(1500);
     });
 
     it("should not throw when appending to a pre-populated colorData entry", () => {
