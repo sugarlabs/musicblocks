@@ -2547,11 +2547,9 @@ class Activity {
             // and Planet storage is actually initialized (planet.planet
             // is null when running from file:///index.html), but only
             // if the current project has a name.
-            if (
-                that.planet !== undefined &&
-                that.planet.planet !== null &&
-                that.planet.getCurrentProjectName() !== _("My Project")
-            ) {
+            if (that.planet !== undefined && that.planet.planet !== null) {
+                // Always save current project first (regardless of name)
+                // so it's never lost from local planet when creating a new one.
                 that.planet.saveLocally();
                 that.planet.initialiseNewProject();
                 loadStart(that);
