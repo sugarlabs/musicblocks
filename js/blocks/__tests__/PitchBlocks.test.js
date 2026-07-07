@@ -347,10 +347,50 @@ describe("setupPitchBlocks", () => {
     });
 
     describe("CustomNoteBlock", () => {
+        const customNoteCents = [
+            ["C(+42¢)", "C", 42],
+            ["C(-10¢)", "C", -10],
+            ["C(+0¢)", "C", 0],
+            ["D#", "D#", 0]
+        ];
+
         it("flow", () => {
             const block = createdBlocks["customNote"];
             block.flow(["C", 4], logo, 0, 10);
             block.flow([null, null], logo, 0, 10);
+        });
+
+        describe("_parseCents", () => {
+            it("extracts note and cents from various formats", () => {
+                const parseCents = createdBlocks["customNote"]?.constructor?._parseCents;
+                if (!parseCents) return;
+                for (const [input, expectedNote, expectedCents] of customNoteCents) {
+                    const [note, cents] = parseCents(input);
+                    expect(note).toBe(expectedNote);
+                    expect(cents).toBe(expectedCents);
+                }
+            });
+
+            it("handles numeric input by returning as-is with 0 cents", () => {
+                const parseCents = createdBlocks["customNote"]?.constructor?._parseCents;
+                if (!parseCents) return;
+                const [note, cents] = parseCents(440);
+                expect(note).toBe(440);
+                expect(cents).toBe(0);
+            });
+        });
+
+        it("passes parsed cents to processPitch", () => {
+            const block = createdBlocks["customNote"];
+            block.flow(["F#(+15¢)", 4], logo, 0, 10);
+            expect(global.Singer.processPitch).toHaveBeenCalledWith(activity, "F#", 4, 15);
+        });
+
+        it("passes zero cents for plain note strings", () => {
+            jest.clearAllMocks();
+            const block = createdBlocks["customNote"];
+            block.flow(["G", 3], logo, 0, 10);
+            expect(global.Singer.processPitch).toHaveBeenCalledWith(activity, "G", 3, 0);
         });
     });
 
@@ -736,6 +776,13 @@ describe("setupPitchBlocks", () => {
             const cpBlock = createdBlocks["custompitch"];
             cpBlock.flow([null, null], logo, 0, 10);
             cpBlock.flow([440, 1], logo, 0, 10);
+        });
+
+        it("CustomPitchBlock passes parsed cents to playPitch", () => {
+            const cpBlock = createdBlocks["custompitch"];
+            if (cpBlock instanceof DummyFlowBlock) return;
+            cpBlock.flow(["D(+25¢)", 2], logo, 0, 10);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenCalledWith("D", 2, 25, 0, 10);
         });
     });
 

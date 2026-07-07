@@ -15,12 +15,12 @@
    ValueBlock, NOINPUTERRORMSG, NANERRORMSG, last, FlowBlock,
    FlowClampBlock, Singer, numberToPitch, frequencyToPitch, getNote,
    INVALIDPITCH, pitchToNumber, LeftBlock, SHARP, FLAT, DOUBLEFLAT,
-   DOUBLESHARP, NATURAL, FIXEDSOLFEGE, SOLFEGENAMES1, buildScale,
+    DOUBLESHARP, NATURAL, FIXEDSOLFEGE, SOLFEGENAMES1, buildScale,
    NOTENAMES, NOTENAMES1, getPitchInfo, YSTAFFOCTAVEHEIGHT,
    YSTAFFNOTEHEIGHT, MUSICALMODES, keySignatureToMode, ALLNOTENAMES,
    nthDegreeToPitch, A0, C8, calcOctave, SOLFEGECONVERSIONTABLE,
-   NOTESFLAT, NOTESSHARP, NOTESTEP, scaleDegreeToPitchMapping,
-   INTERVALVALUES
+    NOTESFLAT, NOTESSHARP, NOTESTEP, scaleDegreeToPitchMapping,
+    INTERVALVALUES
  */
 
 /* exported setupPitchBlocks */
@@ -938,7 +938,16 @@ function setupPitchBlocks(activity) {
         constructor() {
             super("customNote");
             this.setPalette("pitch", activity);
-            this.hidden = true;
+            this.hidden = false;
+        }
+
+        static _parseCents(value) {
+            if (typeof value !== "string") return [value, 0];
+            const match = value.match(/^([A-Ga-g][#b♯♭]?)(\(([+-]\d+)¢\))?$/);
+            if (match) {
+                return [match[1], match[3] !== undefined ? parseInt(match[3], 10) : 0];
+            }
+            return [value, 0];
         }
 
         flow(args, logo, turtle, blk) {
@@ -947,9 +956,9 @@ function setupPitchBlocks(activity) {
                 logo.stopTurtle = true;
                 return;
             } else {
-                const note = args[0];
+                const [note, cents] = CustomNoteBlock._parseCents(args[0]);
                 const octave = args[1];
-                return Singer.processPitch(activity, note, octave, 0);
+                return Singer.processPitch(activity, note, octave, cents);
             }
         }
     }
@@ -1234,7 +1243,7 @@ function setupPitchBlocks(activity) {
                 [1, ["customNote", { value: "C(+0¢)" }], 0, 0, [0]],
                 [2, ["number", { value: 4 }], 0, 0, [0]]
             ]);
-            this.hidden = true;
+            this.hidden = false;
         }
 
         flow(args, logo, turtle, blk) {
@@ -1242,7 +1251,9 @@ function setupPitchBlocks(activity) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 logo.stopTurtle = true;
             } else {
-                return Singer.PitchActions.playPitch(args[0], args[1], 0, turtle, blk);
+                const [note, cents] = CustomNoteBlock._parseCents(args[0]);
+                const octave = args[1];
+                return Singer.PitchActions.playPitch(note, octave, cents, turtle, blk);
             }
         }
     }
