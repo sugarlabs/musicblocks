@@ -1516,6 +1516,8 @@ describe("Palettes Class", () => {
                         insertRow: jest.fn(() => ({
                             style: {},
                             innerHTML: "",
+                            textContent: "",
+                            appendChild: jest.fn(),
                             children: [{ style: {}, appendChild: jest.fn() }]
                         }))
                     },
