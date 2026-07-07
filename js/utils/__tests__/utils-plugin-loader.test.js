@@ -36,7 +36,10 @@ describe("processPluginData script cleanup", () => {
     let processPluginData;
     let originalCreateObjectURL;
     let originalRevokeObjectURL;
+    let originalBlob;
     let appendChildSpy;
+    let blobUrls;
+    let blobUrlIndex;
 
     beforeEach(() => {
         jest.useFakeTimers();
@@ -55,7 +58,24 @@ describe("processPluginData script cleanup", () => {
 
         originalCreateObjectURL = URL.createObjectURL;
         originalRevokeObjectURL = URL.revokeObjectURL;
-        URL.createObjectURL = jest.fn(() => "blob:plugin-setup");
+        originalBlob = global.Blob;
+        global.Blob = class {
+            constructor(parts) {
+                this.parts = parts;
+            }
+
+            text() {
+                return Promise.resolve(this.parts.join(""));
+            }
+        };
+        blobUrls = new Map();
+        blobUrlIndex = 0;
+        URL.createObjectURL = jest.fn(blob => {
+            const url = `blob:plugin-setup-${blobUrlIndex}`;
+            blobUrlIndex += 1;
+            blobUrls.set(url, blob);
+            return url;
+        });
         URL.revokeObjectURL = jest.fn();
 
         ({ processPluginData } = require("../utils.js"));
@@ -68,8 +88,10 @@ describe("processPluginData script cleanup", () => {
         }
         URL.createObjectURL = originalCreateObjectURL;
         URL.revokeObjectURL = originalRevokeObjectURL;
+        global.Blob = originalBlob;
         document.head.innerHTML = "";
         delete window.__mb_plugin_registry;
+        delete globalThis.pluginSetupLoaded;
         jest.useRealTimers();
     });
 
@@ -77,7 +99,13 @@ describe("processPluginData script cleanup", () => {
         const originalAppendChild = document.head.appendChild.bind(document.head);
         appendChildSpy = jest.spyOn(document.head, "appendChild").mockImplementation(script => {
             originalAppendChild(script);
-            script.onload();
+            blobUrls
+                .get(script.src)
+                .text()
+                .then(code => {
+                    Function(code)();
+                    script.onload();
+                });
             return script;
         });
 
@@ -91,8 +119,9 @@ describe("processPluginData script cleanup", () => {
             "plugins/test.json"
         );
 
+        expect(globalThis.pluginSetupLoaded).toBe(true);
         expect(document.head.querySelectorAll("script[src^='blob:plugin-setup']")).toHaveLength(0);
-        expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:plugin-setup");
+        expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:plugin-setup-0");
     });
 
     it("removes setup script elements after load errors", async () => {
@@ -114,6 +143,6 @@ describe("processPluginData script cleanup", () => {
         );
 
         expect(document.head.querySelectorAll("script[src^='blob:plugin-setup']")).toHaveLength(0);
-        expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:plugin-setup");
+        expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:plugin-setup-0");
     });
 });
