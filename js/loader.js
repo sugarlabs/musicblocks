@@ -146,7 +146,8 @@ requirejs.config({
                 "activity/alert-renderer",
                 "palette/palette-loader",
                 "activity/search-controller",
-                "search-ui"
+                "search-ui",
+                "project-manager"
             ],
             exports: "Activity"
         },
@@ -193,6 +194,7 @@ requirejs.config({
         "palette/palette-loader": "js/palette/palette-loader",
         "activity/search-controller": "js/activity/search-controller",
         "search-ui": "js/search-ui",
+        "project-manager": "js/project-manager",
         "activity/pubsub": "js/pubsub",
         "easeljs.min": "lib/easeljs.min",
         "tweenjs.min": "lib/tweenjs.min",
