@@ -7627,6 +7627,25 @@ class Blocks {
                 this.activity.refreshCanvas();
             }
 
+            // Announce block sent to trash to screen readers (aria-live only, no visual message)
+            const blockLabel =
+                (myBlock.protoblock.staticLabels && myBlock.protoblock.staticLabels[0]) ||
+                myBlock.name;
+            const liveRegion =
+                document.getElementById("mbA11yLiveRegion") ||
+                (() => {
+                    const r = document.createElement("div");
+                    r.id = "mbA11yLiveRegion";
+                    r.setAttribute("role", "status");
+                    r.setAttribute("aria-live", "polite");
+                    r.setAttribute("aria-atomic", "true");
+                    r.style.cssText =
+                        "position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;";
+                    document.body.appendChild(r);
+                    return r;
+                })();
+            liveRegion.textContent = blockLabel + " " + _("block sent to trash");
+
             /** Adjust the stack from which we just deleted blocks. */
             if (parentBlock !== null) {
                 const topBlk = this.findTopBlock(parentBlock);
