@@ -5921,7 +5921,8 @@ class Activity {
                                     )
                                 );
                             } else {
-                                const cleanData = rawData.replace("\n", " ");
+                                /* istanbul ignore next -- file-chooser change handler is browser-only; inaccessible from Jest */
+                                const cleanData = rawData.replace(/\n/g, " ");
                                 let obj;
                                 try {
                                     if (cleanData.includes("html")) {
@@ -6045,7 +6046,8 @@ class Activity {
                                 _("Cannot load project from the file. Please check the file type.")
                             );
                         } else {
-                            const cleanData = rawData.replace("\n", " ");
+                            /* istanbul ignore next -- drag-and-drop file handler is browser-only; inaccessible from Jest */
+                            const cleanData = rawData.replace(/\n/g, " ");
                             let obj;
                             try {
                                 if (cleanData.includes("html")) {
