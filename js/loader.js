@@ -148,7 +148,8 @@ requirejs.config({
                 "activity/search-controller",
                 "activity/workspace-layout-controller",
                 "search-ui",
-                "project-manager"
+                "project-manager",
+                "keyboard-controller"
             ],
             exports: "Activity"
         },
@@ -197,6 +198,7 @@ requirejs.config({
         "activity/workspace-layout-controller": "js/activity/workspace-layout-controller",
         "search-ui": "js/search-ui",
         "project-manager": "js/project-manager",
+        "keyboard-controller": "js/keyboard-controller",
         "activity/pubsub": "js/pubsub",
         "easeljs.min": "lib/easeljs.min",
         "tweenjs.min": "lib/tweenjs.min",

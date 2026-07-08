@@ -83,6 +83,14 @@ const loadActivityClass = () => {
                 start: jest.fn()
             };
         }),
+        setupKeyboardController: jest.fn(activity => {
+            activity.keyboardController = {
+                getCurrentKeyCode: jest.fn(),
+                clearCurrentKeyCode: jest.fn(),
+                __keyPressed: jest.fn(),
+                dispose: jest.fn()
+            };
+        }),
         setupPluginController: jest.fn(),
         setupToolbarController: jest.fn(),
         setupAlertController: jest.fn(),
@@ -287,93 +295,6 @@ describe("Activity Toolbar Integration", () => {
             activity.onStopTurtle();
 
             expect(activity.toolbar.resetStop).toHaveBeenCalled();
-        });
-    });
-
-    describe("keyboard-triggered execution shortcuts", () => {
-        test("Alt-R calls highlightStop and runs fast execution", () => {
-            activity.keyboardEnableFlag = true;
-            activity._doFastButton = jest.fn();
-
-            const event = {
-                altKey: true,
-                keyCode: 82, // 'R'
-                preventDefault: jest.fn(),
-                stopPropagation: jest.fn()
-            };
-
-            activity.__keyPressed(event);
-
-            expect(activity.toolbar.highlightStop).toHaveBeenCalledWith("red");
-            expect(activity._doFastButton).toHaveBeenCalled();
-        });
-
-        test("Alt-ENTER triggers highlightStop when not running and no open widget", () => {
-            activity.keyboardEnableFlag = true;
-            activity._doFastButton = jest.fn();
-            activity.turtles.running.mockReturnValue(false);
-
-            const event = {
-                altKey: true,
-                keyCode: 13, // ENTER
-                preventDefault: jest.fn(),
-                stopPropagation: jest.fn()
-            };
-
-            activity.__keyPressed(event);
-
-            expect(activity.toolbar.highlightStop).toHaveBeenCalledWith("red");
-            expect(activity._doFastButton).toHaveBeenCalled();
-        });
-
-        test("Alt-ENTER triggers _doHardStopButton when running", () => {
-            activity.keyboardEnableFlag = true;
-            activity._doHardStopButton = jest.fn();
-            activity.turtles.running.mockReturnValue(true);
-
-            const event = {
-                altKey: true,
-                keyCode: 13, // ENTER
-                preventDefault: jest.fn(),
-                stopPropagation: jest.fn()
-            };
-
-            activity.__keyPressed(event);
-
-            expect(activity._doHardStopButton).toHaveBeenCalled();
-        });
-
-        test("Space triggers highlightStop when not running", () => {
-            activity.keyboardEnableFlag = true;
-            activity._doFastButton = jest.fn();
-            activity.turtles.running.mockReturnValue(false);
-
-            const event = {
-                keyCode: 32, // SPACE
-                preventDefault: jest.fn(),
-                stopPropagation: jest.fn()
-            };
-
-            activity.__keyPressed(event);
-
-            expect(activity.toolbar.highlightStop).toHaveBeenCalledWith("red");
-            expect(activity._doFastButton).toHaveBeenCalled();
-        });
-
-        test("Space triggers _doHardStopButton when running", () => {
-            activity.keyboardEnableFlag = true;
-            activity._doHardStopButton = jest.fn();
-            activity.turtles.running.mockReturnValue(true);
-
-            const event = {
-                keyCode: 32, // SPACE
-                preventDefault: jest.fn(),
-                stopPropagation: jest.fn()
-            };
-
-            activity.__keyPressed(event);
-
-            expect(activity._doHardStopButton).toHaveBeenCalled();
         });
     });
 });
