@@ -216,6 +216,15 @@ describe("findBlocks", () => {
         expect(activity.__tick).not.toHaveBeenCalled();
     });
 
+    test("does not throw when helpfulWheelDiv is absent from the DOM", () => {
+        document.body.innerHTML = "";
+        const activity = makeActivity();
+        setupWorkspaceLayoutController(activity);
+
+        expect(() => activity.findBlocks()).not.toThrow();
+        expect(activity.__tick).not.toHaveBeenCalled();
+    });
+
     test("both _findBlocks implementations (row and column) are reachable through findBlocks", () => {
         const blockList = { a: makeBlock("a", { name: "start" }) };
         const activity = makeActivity({ blockList });
