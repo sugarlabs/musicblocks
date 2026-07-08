@@ -1696,6 +1696,7 @@ class Logo {
                 delay > 0 &&
                 logo.synth.transport.isAvailable &&
                 logo.synth.transport.state === "started" &&
+                logo.synth.transport.isClockRunning &&
                 tur._transportTime !== null
             ) {
                 const transportTime = Math.max(

@@ -45,6 +45,9 @@ global.Synth = jest.fn().mockImplementation(() => ({
             if (this.isAvailable) return global.Tone.Transport.state;
             return "stopped";
         },
+        get isClockRunning() {
+            return this.isAvailable;
+        },
         start() {
             if (this.isAvailable) global.Tone.Transport.start();
         },
@@ -159,6 +162,9 @@ function makeSynth() {
         recorder: null,
         transport: {
             get isAvailable() {
+                return false;
+            },
+            get isClockRunning() {
                 return false;
             },
             cancel: jest.fn(),
@@ -1005,6 +1011,9 @@ describe("Logo doStopTurtles", () => {
                     get isAvailable() {
                         return typeof global.Tone !== "undefined" && !!global.Tone.Transport;
                     },
+                    get isClockRunning() {
+                        return this.isAvailable;
+                    },
                     cancel() {
                         if (
                             this.isAvailable &&
@@ -1288,6 +1297,11 @@ describe("Logo runFromBlock", () => {
             });
             global.Tone = {
                 ...savedTone,
+                context: {
+                    get state() {
+                        return "running";
+                    }
+                },
                 Transport: {
                     start: jest.fn(),
                     stop: jest.fn(),

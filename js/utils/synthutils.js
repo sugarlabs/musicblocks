@@ -476,6 +476,12 @@ const transport = {
         if (this.isAvailable) return Tone.Transport.state;
         return "stopped";
     },
+    get isClockRunning() {
+        if (this.isAvailable && typeof Tone !== "undefined" && Tone.context) {
+            return Tone.context.state === "running";
+        }
+        return false;
+    },
     start() {
         if (this.isAvailable) Tone.Transport.start();
     },
