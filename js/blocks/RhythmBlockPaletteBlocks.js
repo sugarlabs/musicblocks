@@ -125,11 +125,11 @@ function setupRhythmBlockPaletteBlocks(activity) {
             if (logo.inMatrix || logo.tuplet) {
                 if (logo.inMatrix) {
                     logo.phraseMaker.addColBlock(blk, arg0);
+                }
 
-                    // Add individual entries for each beat to avoid extra × blocks
-                    for (let i = 0; i < arg0; i++) {
-                        logo.tupletRhythms.push(["individual", 1, noteBeatValue]);
-                    }
+                const tupletIndex = logo.tupletParams.length - 1;
+                for (let i = 0; i < arg0; i++) {
+                    logo.tupletRhythms.push(["individual", tupletIndex, noteBeatValue]);
                 }
 
                 for (let i = 0; i < args[0]; i++) {
@@ -731,11 +731,14 @@ function setupRhythmBlockPaletteBlocks(activity) {
                     // Play rhythm block as if it were a drum.
                     if (tur.singer.drumStyle.length > 0) {
                         logo.clearNoteParams(tur, blk, tur.singer.drumStyle);
+                        tur.singer.inNoteBlock.push(blk);
                     } else {
                         logo.clearNoteParams(tur, blk, [DEFAULTDRUM]);
+                        tur.singer.inNoteBlock.push(blk);
+                        tur.singer.notePitches[last(tur.singer.inNoteBlock)] = ["G"];
+                        tur.singer.noteOctaves[last(tur.singer.inNoteBlock)] = [4];
+                        tur.singer.noteCents[last(tur.singer.inNoteBlock)] = [0];
                     }
-
-                    tur.singer.inNoteBlock.push(blk);
 
                     const bpmFactor =
                         TONEBPM /
