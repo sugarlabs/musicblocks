@@ -639,6 +639,18 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
     const safeEval = (code, label = "plugin") => {
         if (typeof code !== "string" || !userConfirmed) return;
 
+        // Only vetted (built-in/local/previously-approved) plugins may run setup
+        // code (BLOCKPLUGINS, GLOBALS, ONLOAD) in the main realm. Unvetted plugin
+        // setup code is refused here, mirroring the isVettedPlugin() gate already
+        // applied to FLOW/ARG/PARAMETER/ONSTART/ONSTOP handlers and the fail-closed
+        // string handling in Logo.safePluginExecute(). Without this, an unvetted
+        // plugin that cleared the confirmation dialog could execute arbitrary
+        // JavaScript with full activity/window access.
+        if (!isVettedPlugin(pluginSource)) {
+            console.warn("Blocked unvetted plugin setup execution:", label, pluginSource);
+            return;
+        }
+
         // Basic sanity limit
         if (code.length > 500000) {
             console.warn("Plugin code too large:", label);
@@ -1512,6 +1524,7 @@ if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         ...UtilsLogic,
         extractProjectDataFromHTML,
+        processPluginData,
         _,
         format,
         delayExecution,
