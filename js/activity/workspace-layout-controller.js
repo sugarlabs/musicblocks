@@ -35,7 +35,7 @@ class WorkspaceLayoutController {
     findBlocks() {
         const activity = this.activity;
         this._findBlocks();
-        // Cache DOM element reference for performance
+        // Lookup the element once before checking its visibility.
         const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
         if (helpfulWheelDiv && helpfulWheelDiv.style.display !== "none") {
             helpfulWheelDiv.style.display = "none";
@@ -396,11 +396,11 @@ const setupWorkspaceLayoutController = activity => {
     const controller = new WorkspaceLayoutController(activity);
     activity.workspaceLayoutController = controller;
 
-    activity.findBlocks = (...args) => controller.findBlocks(...args);
-    activity.setHomeContainers = (...args) => controller.setHomeContainers(...args);
-    activity.repositionBlocks = (...args) => controller.repositionBlocks(...args);
-    activity._handleRepositionBlocksOnResize = (...args) =>
-        controller._handleRepositionBlocksOnResize(...args);
+    activity.findBlocks = controller.findBlocks.bind(controller);
+    activity.setHomeContainers = controller.setHomeContainers.bind(controller);
+    activity.repositionBlocks = controller.repositionBlocks.bind(controller);
+    activity._handleRepositionBlocksOnResize =
+        controller._handleRepositionBlocksOnResize.bind(controller);
 
     return controller;
 };

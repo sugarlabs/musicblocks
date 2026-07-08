@@ -122,6 +122,16 @@ function makeActivity({ blockList = {}, turtleList = [] } = {}) {
     };
 }
 
+/**
+ * Builds an activity mock and wires it up with setupWorkspaceLayoutController(),
+ * mirroring the real activity.js call site. Reduces per-test boilerplate.
+ */
+function setupActivity(opts = {}) {
+    const activity = makeActivity(opts);
+    setupWorkspaceLayoutController(activity);
+    return activity;
+}
+
 beforeEach(() => {
     document.body.innerHTML = '<div id="helpfulWheelDiv" style="display: none;"></div>';
     setInnerWidth(1000);
@@ -133,16 +143,14 @@ beforeEach(() => {
 
 describe("setupWorkspaceLayoutController", () => {
     test("attaches a WorkspaceLayoutController instance to activity", () => {
-        const activity = makeActivity();
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity();
 
         expect(activity.workspaceLayoutController).toBeInstanceOf(WorkspaceLayoutController);
         expect(activity.workspaceLayoutController.activity).toBe(activity);
     });
 
     test("installs delegation stubs for findBlocks, setHomeContainers, repositionBlocks and _handleRepositionBlocksOnResize", () => {
-        const activity = makeActivity();
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity();
 
         expect(typeof activity.findBlocks).toBe("function");
         expect(typeof activity.setHomeContainers).toBe("function");
@@ -151,31 +159,39 @@ describe("setupWorkspaceLayoutController", () => {
     });
 
     test("default state: _isFirstHomeClick starts true", () => {
-        const activity = makeActivity();
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity();
 
         expect(activity.workspaceLayoutController._isFirstHomeClick).toBe(true);
     });
 
-    test("delegation stubs forward to the controller instance", () => {
-        const activity = makeActivity();
-        setupWorkspaceLayoutController(activity);
+    test("delegation stubs invoke the controller's real behavior, not a copy", () => {
+        // Bound methods can't be intercepted by spying on the controller after
+        // the fact, so this asserts through observable side effects instead —
+        // which also verifies the stubs delegate to the *same* controller
+        // instance rather than some independent implementation.
+        const blockList = { a: makeBlock("a", { name: "start" }) };
+        const activity = setupActivity({ blockList });
         const controller = activity.workspaceLayoutController;
 
-        jest.spyOn(controller, "findBlocks");
-        jest.spyOn(controller, "setHomeContainers");
-        jest.spyOn(controller, "repositionBlocks").mockImplementation(() => {});
-        jest.spyOn(controller, "_handleRepositionBlocksOnResize").mockImplementation(() => {});
-
+        // findBlocks() -> _findBlocks() flips the toggle on this controller.
         activity.findBlocks();
-        activity.setHomeContainers(true);
-        activity.repositionBlocks();
-        activity._handleRepositionBlocksOnResize();
+        expect(controller._isFirstHomeClick).toBe(false);
 
-        expect(controller.findBlocks).toHaveBeenCalledTimes(1);
-        expect(controller.setHomeContainers).toHaveBeenCalledWith(true);
-        expect(controller.repositionBlocks).toHaveBeenCalledTimes(1);
-        expect(controller._handleRepositionBlocksOnResize).toHaveBeenCalledTimes(1);
+        // setHomeContainers() reaches the real global helper.
+        activity.setHomeContainers(true);
+        expect(global.changeImage).toHaveBeenCalledWith(
+            activity.homeButtonContainer.children[0],
+            global.GOHOMEFADEDBUTTON,
+            global.GOHOMEBUTTON
+        );
+
+        // repositionBlocks() -> _findBlocks() flips the toggle again.
+        activity.repositionBlocks();
+        expect(controller._isFirstHomeClick).toBe(true);
+
+        // _handleRepositionBlocksOnResize() -> repositionBlocks() -> _findBlocks().
+        activity._handleRepositionBlocksOnResize();
+        expect(controller._isFirstHomeClick).toBe(false);
     });
 });
 
@@ -185,8 +201,7 @@ describe("setupWorkspaceLayoutController", () => {
 
 describe("findBlocks", () => {
     test("delegates to _findBlocks", () => {
-        const activity = makeActivity();
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity();
         const controller = activity.workspaceLayoutController;
         jest.spyOn(controller, "_findBlocks");
 
@@ -197,8 +212,7 @@ describe("findBlocks", () => {
 
     test("hides helpfulWheelDiv and ticks the activity when it is visible", () => {
         document.getElementById("helpfulWheelDiv").style.display = "block";
-        const activity = makeActivity();
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity();
 
         activity.findBlocks();
 
@@ -208,8 +222,7 @@ describe("findBlocks", () => {
 
     test("does not tick the activity when helpfulWheelDiv is already hidden", () => {
         document.getElementById("helpfulWheelDiv").style.display = "none";
-        const activity = makeActivity();
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity();
 
         activity.findBlocks();
 
@@ -218,8 +231,7 @@ describe("findBlocks", () => {
 
     test("does not throw when helpfulWheelDiv is absent from the DOM", () => {
         document.body.innerHTML = "";
-        const activity = makeActivity();
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity();
 
         expect(() => activity.findBlocks()).not.toThrow();
         expect(activity.__tick).not.toHaveBeenCalled();
@@ -227,8 +239,7 @@ describe("findBlocks", () => {
 
     test("both _findBlocks implementations (row and column) are reachable through findBlocks", () => {
         const blockList = { a: makeBlock("a", { name: "start" }) };
-        const activity = makeActivity({ blockList });
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity({ blockList });
 
         // First call: row layout.
         activity.findBlocks();
@@ -250,8 +261,7 @@ describe("_findBlocks — Home button toggle", () => {
             start1: makeBlock("start1", { name: "start" }),
             other1: makeBlock("other1", { name: "note" })
         };
-        const activity = makeActivity({ blockList });
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity({ blockList });
 
         activity.workspaceLayoutController._findBlocks();
 
@@ -263,8 +273,7 @@ describe("_findBlocks — Home button toggle", () => {
 
     test("second click arranges blocks in columns and flips _isFirstHomeClick back to true", () => {
         const blockList = { a: makeBlock("a") };
-        const activity = makeActivity({ blockList });
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity({ blockList });
         activity.workspaceLayoutController._isFirstHomeClick = false;
 
         activity.workspaceLayoutController._findBlocks();
@@ -274,8 +283,7 @@ describe("_findBlocks — Home button toggle", () => {
 
     test("toggle alternates across repeated calls (regression: repeated Home clicks)", () => {
         const blockList = { a: makeBlock("a") };
-        const activity = makeActivity({ blockList });
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity({ blockList });
         const controller = activity.workspaceLayoutController;
 
         expect(controller._isFirstHomeClick).toBe(true);
@@ -293,9 +301,8 @@ describe("_findBlocks — Home button toggle", () => {
             note1: makeBlock("note1", { name: "note" }),
             start1: makeBlock("start1", { name: "start" })
         };
-        const activity = makeActivity({ blockList });
+        const activity = setupActivity({ blockList });
         activity.blocks.moveBlockRelative = jest.fn(id => callOrder.push(id));
-        setupWorkspaceLayoutController(activity);
 
         activity.workspaceLayoutController._findBlocks();
 
@@ -304,10 +311,9 @@ describe("_findBlocks — Home button toggle", () => {
 
     test("uses toolbarHeight offset when auxToolbar is displayed", () => {
         const blockList = { a: makeBlock("a") };
-        const activity = makeActivity({ blockList });
+        const activity = setupActivity({ blockList });
         activity.auxToolbar.style.display = "block";
         activity.toolbarHeight = 123;
-        setupWorkspaceLayoutController(activity);
 
         expect(() => activity.workspaceLayoutController._findBlocks()).not.toThrow();
         expect(activity.blocks.moveBlockRelative).toHaveBeenCalled();
@@ -318,8 +324,7 @@ describe("_findBlocks — Home button toggle", () => {
             trashed: makeBlock("trashed", { trash: true }),
             kept: makeBlock("kept")
         };
-        const activity = makeActivity({ blockList });
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity({ blockList });
 
         activity.workspaceLayoutController._findBlocks();
 
@@ -332,10 +337,9 @@ describe("_findBlocks — Home button toggle", () => {
 
     test("shows blocks and resets active block / container position", () => {
         const blockList = { a: makeBlock("a") };
-        const activity = makeActivity({ blockList });
+        const activity = setupActivity({ blockList });
         activity.blocks.activeBlock = "someBlock";
         activity.blocksContainer = { x: 55, y: 77 };
-        setupWorkspaceLayoutController(activity);
 
         activity.workspaceLayoutController._findBlocks();
 
@@ -347,9 +351,8 @@ describe("_findBlocks — Home button toggle", () => {
     });
 
     test("calls _changeBlockVisibility when blocks are not visible", () => {
-        const activity = makeActivity({ blockList: { a: makeBlock("a") } });
+        const activity = setupActivity({ blockList: { a: makeBlock("a") } });
         activity.blocks.visible = false;
-        setupWorkspaceLayoutController(activity);
 
         activity.workspaceLayoutController._findBlocks();
 
@@ -357,9 +360,8 @@ describe("_findBlocks — Home button toggle", () => {
     });
 
     test("does not call _changeBlockVisibility when blocks are already visible", () => {
-        const activity = makeActivity({ blockList: { a: makeBlock("a") } });
+        const activity = setupActivity({ blockList: { a: makeBlock("a") } });
         activity.blocks.visible = true;
-        setupWorkspaceLayoutController(activity);
 
         activity.workspaceLayoutController._findBlocks();
 
@@ -367,8 +369,7 @@ describe("_findBlocks — Home button toggle", () => {
     });
 
     test("resets home button and hides boundary", () => {
-        const activity = makeActivity({ blockList: { a: makeBlock("a") } });
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity({ blockList: { a: makeBlock("a") } });
         jest.spyOn(activity.workspaceLayoutController, "setHomeContainers");
 
         activity.workspaceLayoutController._findBlocks();
@@ -382,11 +383,10 @@ describe("_findBlocks — Home button toggle", () => {
             root: makeBlock("root", { name: "start", x: 5, y: 5 }),
             child: makeBlock("child", { connections: [1], x: 20, y: 20 })
         };
-        const activity = makeActivity({ blockList });
+        const activity = setupActivity({ blockList });
         activity.blocks.findDragGroup = jest.fn(function () {
             this.dragGroup = ["root", "child"];
         });
-        setupWorkspaceLayoutController(activity);
 
         activity.workspaceLayoutController._findBlocks();
 
@@ -409,8 +409,7 @@ describe("_findBlocks — Home button toggle", () => {
 describe("_findBlocks — turtle handling", () => {
     test("resets every turtle to the origin with heading 0", () => {
         const turtleList = [makeTurtle(true), makeTurtle(false)];
-        const activity = makeActivity({ turtleList });
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity({ turtleList });
 
         activity.workspaceLayoutController._findBlocks();
 
@@ -422,8 +421,7 @@ describe("_findBlocks — turtle handling", () => {
 
     test("preserves each turtle's original pen state after the move", () => {
         const turtleList = [makeTurtle(true), makeTurtle(false)];
-        const activity = makeActivity({ turtleList });
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity({ turtleList });
 
         activity.workspaceLayoutController._findBlocks();
 
@@ -436,8 +434,7 @@ describe("_findBlocks — turtle handling", () => {
         turtle.painter.doSetXY = jest.fn(() => {
             expect(turtle.painter.penState).toBe(false);
         });
-        const activity = makeActivity({ turtleList: [turtle] });
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity({ turtleList: [turtle] });
 
         activity.workspaceLayoutController._findBlocks();
 
@@ -445,8 +442,7 @@ describe("_findBlocks — turtle handling", () => {
     });
 
     test("handles an empty turtle list without throwing", () => {
-        const activity = makeActivity({ turtleList: [] });
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity({ turtleList: [] });
 
         expect(() => activity.workspaceLayoutController._findBlocks()).not.toThrow();
     });
@@ -458,8 +454,7 @@ describe("_findBlocks — turtle handling", () => {
 
 describe("setHomeContainers", () => {
     test("switches to the active home icon when homeState is true", () => {
-        const activity = makeActivity();
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity();
 
         activity.setHomeContainers(true);
 
@@ -471,8 +466,7 @@ describe("setHomeContainers", () => {
     });
 
     test("switches to the faded home icon when homeState is false", () => {
-        const activity = makeActivity();
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity();
 
         activity.setHomeContainers(false);
 
@@ -484,18 +478,16 @@ describe("setHomeContainers", () => {
     });
 
     test("is a no-op when homeButtonContainer is null", () => {
-        const activity = makeActivity();
+        const activity = setupActivity();
         activity.homeButtonContainer = null;
-        setupWorkspaceLayoutController(activity);
 
         expect(() => activity.setHomeContainers(true)).not.toThrow();
         expect(global.changeImage).not.toHaveBeenCalled();
     });
 
     test("is a no-op when homeButtonContainer is undefined", () => {
-        const activity = makeActivity();
+        const activity = setupActivity();
         activity.homeButtonContainer = undefined;
-        setupWorkspaceLayoutController(activity);
 
         expect(() => activity.setHomeContainers(false)).not.toThrow();
         expect(global.changeImage).not.toHaveBeenCalled();
@@ -510,8 +502,7 @@ describe("repositionBlocks", () => {
     test("desktop width: does not record a beforeMobilePosition/before600pxPosition", () => {
         setInnerWidth(1200);
         const blockList = { root: makeBlock("root", { x: 300, y: 300 }) };
-        const activity = makeActivity({ blockList });
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity({ blockList });
         jest.spyOn(activity.workspaceLayoutController, "_findBlocks").mockImplementation(() => {});
 
         activity.repositionBlocks();
@@ -524,8 +515,7 @@ describe("repositionBlocks", () => {
     test("tablet width: records beforeMobilePosition once", () => {
         setInnerWidth(700); // < RESPONSIVE_BREAKPOINT_TABLET (768)
         const blockList = { root: makeBlock("root", { x: 300, y: 300 }) };
-        const activity = makeActivity({ blockList });
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity({ blockList });
         jest.spyOn(activity.workspaceLayoutController, "_findBlocks").mockImplementation(() => {});
 
         activity.repositionBlocks();
@@ -535,8 +525,7 @@ describe("repositionBlocks", () => {
 
     test("returning to desktop width restores the pre-tablet offset and clears beforeMobilePosition", () => {
         const blockList = { root: makeBlock("root", { x: 300, y: 300 }) };
-        const activity = makeActivity({ blockList });
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity({ blockList });
         jest.spyOn(activity.workspaceLayoutController, "_findBlocks").mockImplementation(() => {});
 
         setInnerWidth(700);
@@ -558,8 +547,7 @@ describe("repositionBlocks", () => {
     test("mobile width: records before600pxPosition once", () => {
         setInnerWidth(500); // < RESPONSIVE_BREAKPOINT_MOBILE (600)
         const blockList = { root: makeBlock("root", { x: 150, y: 150 }) };
-        const activity = makeActivity({ blockList });
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity({ blockList });
         jest.spyOn(activity.workspaceLayoutController, "_findBlocks").mockImplementation(() => {});
 
         activity.repositionBlocks();
@@ -570,8 +558,7 @@ describe("repositionBlocks", () => {
     test("shifts a drag group left when it overflows the right edge of the canvas", () => {
         setInnerWidth(400);
         const blockList = { root: makeBlock("root", { x: 380, y: 0, width: 50 }) };
-        const activity = makeActivity({ blockList });
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity({ blockList });
         jest.spyOn(activity.workspaceLayoutController, "_findBlocks").mockImplementation(() => {});
 
         activity.repositionBlocks();
@@ -583,8 +570,7 @@ describe("repositionBlocks", () => {
     test("shifts a drag group right when it starts left of the canvas origin", () => {
         setInnerWidth(1000);
         const blockList = { root: makeBlock("root", { x: -20, y: 0 }) };
-        const activity = makeActivity({ blockList });
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity({ blockList });
         jest.spyOn(activity.workspaceLayoutController, "_findBlocks").mockImplementation(() => {});
 
         activity.repositionBlocks();
@@ -594,8 +580,7 @@ describe("repositionBlocks", () => {
     });
 
     test("invokes _findBlocks once after repositioning drag groups", () => {
-        const activity = makeActivity({ blockList: { a: makeBlock("a") } });
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity({ blockList: { a: makeBlock("a") } });
         jest.spyOn(activity.workspaceLayoutController, "_findBlocks").mockImplementation(() => {});
 
         activity.repositionBlocks();
@@ -604,8 +589,7 @@ describe("repositionBlocks", () => {
     });
 
     test("handles an empty workspace without throwing", () => {
-        const activity = makeActivity({ blockList: {} });
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity({ blockList: {} });
 
         expect(() => activity.repositionBlocks()).not.toThrow();
     });
@@ -617,8 +601,7 @@ describe("repositionBlocks", () => {
 
 describe("_handleRepositionBlocksOnResize", () => {
     test("delegates to repositionBlocks", () => {
-        const activity = makeActivity({ blockList: { a: makeBlock("a") } });
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity({ blockList: { a: makeBlock("a") } });
         const controller = activity.workspaceLayoutController;
         jest.spyOn(controller, "repositionBlocks").mockImplementation(() => {});
 
@@ -629,8 +612,7 @@ describe("_handleRepositionBlocksOnResize", () => {
 
     test("resize after Home still produces a consistent, non-throwing layout", () => {
         const blockList = { a: makeBlock("a", { name: "start" }) };
-        const activity = makeActivity({ blockList });
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity({ blockList });
 
         activity.findBlocks();
         expect(() => activity._handleRepositionBlocksOnResize()).not.toThrow();
@@ -644,8 +626,7 @@ describe("_handleRepositionBlocksOnResize", () => {
 describe("regressions — workspace size", () => {
     test("single block workspace lays out without error", () => {
         const blockList = { only: makeBlock("only", { name: "start" }) };
-        const activity = makeActivity({ blockList });
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity({ blockList });
 
         expect(() => activity.workspaceLayoutController._findBlocks()).not.toThrow();
         expect(activity.blocks.moveBlockRelative).toHaveBeenCalled();
@@ -656,8 +637,7 @@ describe("regressions — workspace size", () => {
         for (let i = 0; i < 60; i++) {
             blockList[`b${i}`] = makeBlock(`b${i}`, { name: i === 0 ? "start" : "note" });
         }
-        const activity = makeActivity({ blockList });
-        setupWorkspaceLayoutController(activity);
+        const activity = setupActivity({ blockList });
 
         expect(() => activity.workspaceLayoutController._findBlocks()).not.toThrow();
         expect(activity.blocks.moveBlockRelative.mock.calls.length).toBeGreaterThanOrEqual(60);
@@ -665,9 +645,8 @@ describe("regressions — workspace size", () => {
 
     test("hidden blocks (activity.blocks.visible = false) are made visible via _changeBlockVisibility", () => {
         const blockList = { a: makeBlock("a") };
-        const activity = makeActivity({ blockList });
+        const activity = setupActivity({ blockList });
         activity.blocks.visible = false;
-        setupWorkspaceLayoutController(activity);
 
         activity.workspaceLayoutController._findBlocks();
 
