@@ -41,6 +41,10 @@ global.Synth = jest.fn().mockImplementation(() => ({
         get isAvailable() {
             return typeof global.Tone !== "undefined" && !!global.Tone.Transport;
         },
+        get state() {
+            if (this.isAvailable) return global.Tone.Transport.state;
+            return "stopped";
+        },
         start() {
             if (this.isAvailable) global.Tone.Transport.start();
         },
@@ -1287,6 +1291,7 @@ describe("Logo runFromBlock", () => {
                 Transport: {
                     start: jest.fn(),
                     stop: jest.fn(),
+                    state: "started",
                     schedule: scheduleSpy,
                     cancel: jest.fn(),
                     getSecondsAtTime: getSecondsAtTimeMock,

@@ -472,6 +472,10 @@ const transport = {
     get isAvailable() {
         return typeof Tone !== "undefined" && Tone.Transport;
     },
+    get state() {
+        if (this.isAvailable) return Tone.Transport.state;
+        return "stopped";
+    },
     start() {
         if (this.isAvailable) Tone.Transport.start();
     },
