@@ -672,10 +672,30 @@ function setupSensorsBlocks(activity) {
          * @returns {number} - The background color index.
          */
         getBackgroundColor() {
-            const [r, g, b] = platformColor.background
-                .match(/\(([^)]+)\)/)[1]
-                .split(/,\s*/)
-                .map(Number);
+            let r;
+            let g;
+            let b;
+            const background = platformColor.background;
+
+            if (background.startsWith("#")) {
+                const hex =
+                    background.length === 4
+                        ? background
+                              .slice(1)
+                              .split("")
+                              .map(value => value + value)
+                              .join("")
+                        : background.slice(1);
+                r = parseInt(hex.slice(0, 2), 16);
+                g = parseInt(hex.slice(2, 4), 16);
+                b = parseInt(hex.slice(4, 6), 16);
+            } else {
+                [r, g, b] = background
+                    .match(/\(([^)]+)\)/)[1]
+                    .split(/,\s*/)
+                    .map(Number);
+            }
+
             return searchColors(r, g, b);
         }
 
