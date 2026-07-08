@@ -149,7 +149,8 @@ requirejs.config({
                 "activity/workspace-layout-controller",
                 "search-ui",
                 "project-manager",
-                "keyboard-controller"
+                "keyboard-controller",
+                "activity/selection-controller"
             ],
             exports: "Activity"
         },
@@ -196,6 +197,7 @@ requirejs.config({
         "palette/palette-loader": "js/palette/palette-loader",
         "activity/search-controller": "js/activity/search-controller",
         "activity/workspace-layout-controller": "js/activity/workspace-layout-controller",
+        "activity/selection-controller": "js/activity/selection-controller",
         "search-ui": "js/search-ui",
         "project-manager": "js/project-manager",
         "keyboard-controller": "js/keyboard-controller",

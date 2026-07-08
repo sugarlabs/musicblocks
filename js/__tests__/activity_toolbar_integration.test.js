@@ -106,6 +106,7 @@ const loadActivityClass = () => {
         })),
         setupSearchController: jest.fn(),
         setupWorkspaceLayoutController: jest.fn(),
+        setupSelectionController: jest.fn(),
         hideDOMLabel: jest.fn(),
         setupActivityRecorder: jest.fn(),
         setupActivityAbcParser: jest.fn(),

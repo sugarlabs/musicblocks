@@ -34,7 +34,7 @@ try {
    setupGridController, setupGridRenderer, setupPluginController, setupToolbarController, setupAlertController, setupAlertRenderer, setupPaletteLoader, PluginDialog,
    setupProjectManager,
    setupKeyboardController,
-   setupSearchController, setupSearchUI, setupWorkspaceLayoutController,
+   setupSearchController, setupSearchUI, setupWorkspaceLayoutController, setupSelectionController,
    setupActivityAbcParser, setupActivityIdleWatcher,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
@@ -355,15 +355,6 @@ class Activity {
             this.storage = {};
         }
 
-        // Flag to indicate whether the user is performing a 2D drag operation.
-        this.isDragging = false;
-
-        // Flag to indicate whether user is selecting
-        this.isSelecting = false;
-
-        // Flag to indicate the selection mode is on
-        this.selectionModeOn = false;
-
         //Flag to check if any other input box is active or not
         this.isInputON = false;
 
@@ -490,6 +481,7 @@ class Activity {
         this.searchUI = setupSearchUI(this);
         setupSearchController(this, this.searchUI);
         setupWorkspaceLayoutController(this);
+        setupSelectionController(this);
         this.pluginDialog = new PluginDialog({
             onLoadBuiltIn: name => this._loadBuiltInPlugin(name),
             onDelete: () => this._deletePlugin(),
@@ -607,7 +599,8 @@ class Activity {
                 if (this.stage) {
                     const hasActiveTweens = createjs.Tween.hasActiveTweens();
                     const hasActiveGifs = this.gifAnimator && this.gifAnimator.getActiveCount() > 0;
-                    const isInteracting = this.isDragging || this.isSelecting;
+                    const isInteracting =
+                        this.selectionController.isDragging || this.selectionController.isSelecting;
 
                     if (this.stageDirty || hasActiveTweens || hasActiveGifs || isInteracting) {
                         // Recompute culling when container moved.
@@ -3926,294 +3919,18 @@ class Activity {
 
         this.__saveLocally = (...args) => this.projectManager.saveLocally(...args);
 
-        // Setup mouse events to start the drag
-
-        this.setupMouseEvents = () => {
-            this.addEventListener(
-                document,
-                "mousedown",
-                event => {
-                    if (!this.isSelecting) return;
-                    this.moving = false;
-                    // event.preventDefault();
-                    // event.stopPropagation();
-                    if (event.target.id === "myCanvas") {
-                        this._createDrag(event);
-                    }
-                },
-                false
-            );
-        };
-
-        // deselect the selected blocks
-
-        this.deselectSelectedBlocks = () => {
-            this.unhighlightSelectedBlocks(false);
-            this.setSelectionMode(false);
-        };
+        // 2D drag-selection and multi-selection are owned by
+        // SelectionController (js/activity/selection-controller.js).
+        // setupSelectionController() installs the delegation stubs below
+        // (setupMouseEvents, deselectSelectedBlocks, deleteMultipleBlocks,
+        // copyMultipleBlocks, selectMode, _create2Ddrag, _createDrag,
+        // drawSelectionArea, rectanglesOverlap, selectBlocksInDragArea,
+        // unhighlightSelectedBlocks, isEqual, setSelectionMode).
 
         // end the drag on navbar
         this.addEventListener(document.getElementById("toolbars"), "mouseover", () => {
-            this.isDragging = false;
+            this.selectionController.isDragging = false;
         });
-
-        this.deleteMultipleBlocks = () => {
-            if (this.blocks.selectionModeOn) {
-                const blocksArray = this.blocks.selectedBlocks;
-                // figure out which of the blocks in selectedBlocks are clamp blocks and nonClamp blocks.
-                const clampBlocks = [];
-                const nonClampBlocks = [];
-
-                for (let i = 0; i < blocksArray.length; i++) {
-                    if (this.blocks.selectedBlocks[i].isClampBlock()) {
-                        clampBlocks.push(this.blocks.selectedBlocks[i]);
-                    } else if (this.blocks.selectedBlocks[i].isDisconnected()) {
-                        nonClampBlocks.push(this.blocks.selectedBlocks[i]);
-                    }
-                }
-
-                for (let i = 0; i < clampBlocks.length; i++) {
-                    this.blocks.sendStackToTrash(clampBlocks[i]);
-                }
-
-                for (let i = 0; i < nonClampBlocks.length; i++) {
-                    this.blocks.sendStackToTrash(nonClampBlocks[i]);
-                }
-                // set selection mode to false
-                this.blocks.setSelectionToActivity(false);
-                this.refreshCanvas();
-                // Cache DOM element reference for performance
-                document.getElementById("helpfulWheelDiv").style.display = "none";
-            }
-        };
-
-        this.copyMultipleBlocks = () => {
-            if (this.blocks.selectionModeOn && this.blocks.selectedBlocks.length) {
-                const blocksArray = this.blocks.selectedBlocks;
-                let pasteDx = 0,
-                    pasteDy = 0;
-                const map = new Map();
-                for (let i = 0; i < blocksArray.length; i++) {
-                    const idx = blocksArray[i].blockIndex;
-                    map.set(
-                        idx,
-                        blocksArray[i].connections.filter(blk => blk !== null)
-                    );
-
-                    if (
-                        blocksArray[i].connections.some(blkno => {
-                            const a = map.get(blkno);
-                            return a && a.some(b => b === idx);
-                        }) ||
-                        blocksArray[i].trash
-                    )
-                        continue;
-
-                    this.blocks.activeBlock = idx;
-                    this.blocks.pasteDx = pasteDx;
-                    this.blocks.pasteDy = pasteDy;
-                    this.blocks.prepareStackForCopy();
-                    this.blocks.pasteStack();
-                    pasteDx += 21;
-                    pasteDy += 21;
-                }
-
-                this.setSelectionMode(false);
-                this.selectedBlocks = [];
-                this.unhighlightSelectedBlocks(false, false);
-                this.blocks.setSelectedBlocks(this.selectedBlocks);
-                this.refreshCanvas();
-                // Cache DOM element reference for performance
-                document.getElementById("helpfulWheelDiv").style.display = "none";
-            }
-        };
-
-        this.selectMode = () => {
-            this.moving = false;
-            this.isSelecting = !this.isSelecting;
-            this.isSelecting
-                ? this.textMsg(_("Select is enabled."))
-                : this.textMsg(_("Select is disabled."));
-            document.getElementById("helpfulWheelDiv").style.display = "none";
-        };
-
-        this._create2Ddrag = () => {
-            this.dragArea = {};
-            this.selectedBlocks = [];
-            this.startX = 0;
-            this.startY = 0;
-            this.currentX = 0;
-            this.currentY = 0;
-            this.hasMouseMoved = false;
-            // rAF guard for throttling drag-select mousemove
-            this._dragSelectRafPending = false;
-            if (this.selectionArea && this.selectionArea.parentNode) {
-                this.selectionArea.parentNode.removeChild(this.selectionArea);
-            }
-            this.selectionArea = document.createElement("div");
-            document.body.appendChild(this.selectionArea);
-
-            this.setupMouseEvents();
-
-            this.addEventListener(document, "mousemove", event => {
-                this.hasMouseMoved = true;
-                if (this.isDragging && this.isSelecting) {
-                    this.currentX = event.clientX;
-                    this.currentY = event.clientY;
-                    // Throttle drag-select to one update per animation frame
-                    if (
-                        !this._dragSelectRafPending &&
-                        !this.blocks.isBlockMoving &&
-                        !this.turtles.running()
-                    ) {
-                        this._dragSelectRafPending = true;
-                        requestAnimationFrame(() => {
-                            this._dragSelectRafPending = false;
-                            this.setSelectionMode(true);
-                            this.drawSelectionArea();
-                            this.selectedBlocks = this.selectBlocksInDragArea();
-                            this.unhighlightSelectedBlocks(true, true);
-                            this.blocks.setSelectedBlocks(this.selectedBlocks);
-                        });
-                    }
-                }
-            });
-
-            this.addEventListener(document, "mouseup", event => {
-                // event.preventDefault();
-                if (!this.isSelecting) return;
-                this.isDragging = false;
-                this.selectionArea.style.display = "none";
-                this.startX = 0;
-                this.startY = 0;
-                this.currentX = 0;
-                this.currentY = 0;
-                setTimeout(() => {
-                    this.hasMouseMoved = false;
-                }, 100);
-            });
-        };
-
-        // Set starting points of the drag
-
-        this._createDrag = event => {
-            this.isDragging = true;
-            this.startX = event.clientX;
-            this.startY = event.clientY;
-        };
-
-        // Draw the area that has been dragged
-
-        this.drawSelectionArea = () => {
-            const x = Math.min(this.startX, this.currentX);
-            const y = Math.min(this.startY, this.currentY);
-            const width = Math.abs(this.currentX - this.startX);
-            const height = Math.abs(this.currentY - this.startY);
-
-            // Batch all CSS writes into a single cssText assignment
-            // to avoid multiple forced style recalculations.
-            this.selectionArea.style.cssText =
-                "display:flex;position:absolute;" +
-                "left:" +
-                x +
-                "px;top:" +
-                y +
-                "px;" +
-                "width:" +
-                width +
-                "px;height:" +
-                height +
-                "px;" +
-                "z-index:9989;" +
-                "background-color:rgba(137,207,240,0.5);" +
-                "pointer-events:none;";
-
-            this.dragArea = { x, y, width, height };
-        };
-
-        // Check if the block is overlapping the dragged area.
-
-        this.rectanglesOverlap = (rect1, rect2) => {
-            return (
-                rect1.x + rect1.width > rect2.x &&
-                rect1.x < rect2.x + rect2.width &&
-                rect1.y + rect1.height > rect2.y &&
-                rect1.y < rect2.y + rect2.height
-            );
-        };
-
-        // Select the blocks that overlap the dragged area.
-
-        this.selectBlocksInDragArea = (dragArea, blocks) => {
-            const selectedBlocks = [];
-            this.dragRect = this.dragArea;
-
-            this.blocks.blockList.forEach(block => {
-                this.blockRect = {
-                    x: this.scrollBlockContainer
-                        ? block.container.x + this.blocksContainer.x
-                        : block.container.x,
-                    y: block.container.y + this.blocksContainer.y,
-                    height: block.height,
-                    width: block.width
-                };
-
-                if (this.rectanglesOverlap(this.blockRect, this.dragRect)) {
-                    selectedBlocks.push(block);
-                }
-            });
-            return selectedBlocks;
-        };
-
-        // Unhighlight the selected blocks
-
-        this.unhighlightSelectedBlocks = (unhighlight, selectionModeOn) => {
-            const blockIndexMap = new Map();
-            for (const [index, block] of this.blocks.blockList.entries()) {
-                if (block) {
-                    blockIndexMap.set(block, index);
-                }
-            }
-
-            for (let i = 0; i < this.selectedBlocks.length; i++) {
-                const blockIndex = blockIndexMap.get(this.selectedBlocks[i]);
-                if (blockIndex === undefined) {
-                    continue;
-                }
-
-                if (unhighlight) {
-                    this.blocks.unhighlightSelectedBlocks(blockIndex, true);
-                } else {
-                    this.blocks.highlight(blockIndex, true);
-                }
-            }
-
-            if (!unhighlight && this.selectedBlocks.length > 0) {
-                this.refreshCanvas();
-            }
-        };
-
-        // Check if two blocks are the same by identity (reference equality).
-
-        this.isEqual = (obj1, obj2) => {
-            return obj1 === obj2;
-        };
-
-        this.setSelectionMode = selection => {
-            if (selection) {
-                if (!this.selectionModeOn) {
-                    if (this.selectedBlocks.length !== 0) {
-                        this.selectedBlocks = [];
-                        this.selectionModeOn = selection;
-                        this.blocks.setSelection(this.selectionModeOn);
-                    }
-                }
-            } else {
-                this.selectedBlocks = [];
-                this.selectionModeOn = selection;
-                this.blocks.setSelection(this.selectionModeOn);
-            }
-        };
 
         /*
          * Inits everything. The main function.
@@ -4270,8 +3987,8 @@ class Activity {
             };
 
             this.handleDocumentClick = e => {
-                if (!this.hasMouseMoved) {
-                    if (this.selectionModeOn) {
+                if (!this.selectionController.hasMouseMoved) {
+                    if (this.selectionController.selectionModeOn) {
                         this.deselectSelectedBlocks();
                     } else {
                         this._hideHelpfulSearchWidget(e);
