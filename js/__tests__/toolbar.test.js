@@ -1245,6 +1245,57 @@ describe("Toolbar Class", () => {
         expect(mockLangElement.classList.remove).toHaveBeenCalledWith("selected-language");
     });
 
+    test("renderLanguageSelectIcon correctly filters languages when typing in search input", () => {
+        const mockLangElement = {
+            onclick: null,
+            classList: { add: jest.fn(), remove: jest.fn() },
+            style: { display: "" }
+        };
+        const languageSelectIcon = { onclick: null, ...mockLangElement };
+        const langSearch = { addEventListener: jest.fn(), ...mockLangElement };
+
+        const hiParentElement = { style: { display: "" } };
+        const enParentElement = { style: { display: "" } };
+        const hiElement = { innerHTML: "Hindi", parentElement: hiParentElement };
+        const enElement = { innerHTML: "English (United States)", parentElement: enParentElement };
+
+        global.docById.mockImplementation(id => {
+            if (id === "languageSelectIcon") return languageSelectIcon;
+            if (id === "langSearch") return langSearch;
+            if (id === "hi") return hiElement;
+            if (id === "enUS") return enElement;
+            return { innerHTML: "Test", parentElement: { style: { display: "" } } };
+        });
+
+        const languageBox = {};
+        ["enUS", "hi"].forEach(l => {
+            languageBox[`${l}_onclick`] = jest.fn();
+        });
+
+        toolbar.renderLanguageSelectIcon(languageBox);
+
+        // Test click event
+        const clickCallback = langSearch.addEventListener.mock.calls.find(c => c[0] === "click")[1];
+        const stopPropagationMock = jest.fn();
+        clickCallback({ stopPropagation: stopPropagationMock });
+        expect(stopPropagationMock).toHaveBeenCalled();
+
+        // Test input event
+        const searchCallback = langSearch.addEventListener.mock.calls.find(
+            c => c[0] === "input"
+        )[1];
+
+        // Simulate typing "hin"
+        searchCallback({ target: { value: "hin" } });
+        expect(hiParentElement.style.display).toBe("");
+        expect(enParentElement.style.display).toBe("none");
+
+        // Simulate typing "eng"
+        searchCallback({ target: { value: "eng" } });
+        expect(hiParentElement.style.display).toBe("none");
+        expect(enParentElement.style.display).toBe("");
+    });
+
     test("renderModeSelectIcon toggles beginnerMode on click", () => {
         const activity = {
             beginnerMode: false,
