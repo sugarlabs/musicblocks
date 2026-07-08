@@ -794,6 +794,7 @@ describe("MusicKeyboard core logic", () => {
             keyboard.keyboardShown = true;
             keyboard._createKeyboard = jest.fn();
             keyboard._removePitchBlock = jest.fn();
+            keyboard._syncLayouts = jest.fn();
             keyboard.layout = [
                 { noteName: "sol", noteOctave: 4, blockNumber: 3 },
                 { noteName: "hertz", noteOctave: 440, blockNumber: 5 },
