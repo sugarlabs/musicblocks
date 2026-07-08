@@ -2389,6 +2389,7 @@ class Activity {
             }
 
             if (window.widgetWindows.isOpen("JavaScript Editor") === true) return;
+            if (document.activeElement && document.activeElement.id === "langSearch") return;
             if (!this.keyboardEnableFlag) {
                 return;
             }

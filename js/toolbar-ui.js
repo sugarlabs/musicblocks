@@ -1637,6 +1637,56 @@ class ToolbarUI {
             "he"
         ];
 
+        const langSearch = docById("langSearch");
+        if (langSearch) {
+            const englishNames = {
+                enUS: _("English (United States)"),
+                enUK: _("English (United Kingdom)"),
+                es: _("Spanish"),
+                pt: _("Portuguese"),
+                fr: _("French"),
+                it: _("Italian"),
+                de: _("German"),
+                ja: _("Japanese"),
+                kana: _("Japanese (Kana)"),
+                ko: _("Korean"),
+                zhCN: _("Chinese"),
+                th: _("Thai"),
+                ayc: _("Aymara"),
+                quz: _("Quechua"),
+                gug: _("Guarani"),
+                hi: _("Hindi"),
+                ta: _("Tamil"),
+                te: _("Telugu"),
+                ibo: _("Igbo"),
+                tr: _("Turkish"),
+                ar: _("Arabic"),
+                bn: _("Bengali"),
+                ur: _("Urdu"),
+                he: _("Hebrew")
+            };
+
+            langSearch.addEventListener("click", e => {
+                e.stopPropagation();
+            });
+
+            langSearch.addEventListener("input", e => {
+                const query = e.target.value.toLowerCase();
+                languages.forEach(lang => {
+                    const langElem = docById(lang);
+                    if (langElem && langElem.parentElement) {
+                        const nativeName = langElem.innerHTML.toLowerCase();
+                        const englishName = (englishNames[lang] || "").toLowerCase();
+                        if (nativeName.includes(query) || englishName.includes(query)) {
+                            langElem.parentElement.style.display = "";
+                        } else {
+                            langElem.parentElement.style.display = "none";
+                        }
+                    }
+                });
+            });
+        }
+
         /**
          * Updates the selected-language class to highlight the currently selected language.
          * @param {string} selectedLang - The language code to highlight.
