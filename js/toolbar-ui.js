@@ -1666,25 +1666,27 @@ class ToolbarUI {
                 he: _("Hebrew")
             };
 
-            langSearch.addEventListener("click", e => {
-                e.stopPropagation();
-            });
-
-            langSearch.addEventListener("input", e => {
-                const query = e.target.value.toLowerCase();
-                languages.forEach(lang => {
-                    const langElem = docById(lang);
-                    if (langElem && langElem.parentElement) {
-                        const nativeName = langElem.innerHTML.toLowerCase();
-                        const englishName = (englishNames[lang] || "").toLowerCase();
-                        if (nativeName.includes(query) || englishName.includes(query)) {
-                            langElem.parentElement.style.display = "";
-                        } else {
-                            langElem.parentElement.style.display = "none";
-                        }
-                    }
+            if (langSearch.addEventListener) {
+                langSearch.addEventListener("click", e => {
+                    e.stopPropagation();
                 });
-            });
+
+                langSearch.addEventListener("input", e => {
+                    const query = e.target.value.toLowerCase();
+                    languages.forEach(lang => {
+                        const langElem = docById(lang);
+                        if (langElem && langElem.parentElement) {
+                            const nativeName = langElem.innerHTML.toLowerCase();
+                            const englishName = (englishNames[lang] || "").toLowerCase();
+                            if (nativeName.includes(query) || englishName.includes(query)) {
+                                langElem.parentElement.style.display = "";
+                            } else {
+                                langElem.parentElement.style.display = "none";
+                            }
+                        }
+                    });
+                });
+            }
         }
 
         /**
