@@ -214,15 +214,22 @@ function SampleWidget() {
      * @returns {void}
      */
     this.pause = function () {
-        const playImg = document.createElement("img");
-        playImg.src = "header-icons/play-button.svg";
-        playImg.title = _("Play");
-        playImg.alt = _("Play");
-        playImg.height = ICONSIZE;
-        playImg.width = ICONSIZE;
-        playImg.style.verticalAlign = "middle";
-        this.playBtn.textContent = "";
-        this.playBtn.appendChild(playImg);
+        const img = this.playBtn ? this.playBtn.getElementsByTagName("img")[0] : null;
+        if (img) {
+            img.src = "header-icons/play-button.svg";
+            img.title = _("Play");
+            img.alt = _("Play");
+        } else if (this.playBtn) {
+            const playImg = document.createElement("img");
+            playImg.src = "header-icons/play-button.svg";
+            playImg.title = _("Play");
+            playImg.alt = _("Play");
+            playImg.height = ICONSIZE;
+            playImg.width = ICONSIZE;
+            playImg.style.verticalAlign = "middle";
+            this.playBtn.textContent = "";
+            this.playBtn.appendChild(playImg);
+        }
         this.isMoving = false;
     };
 
@@ -231,15 +238,22 @@ function SampleWidget() {
      * @returns {void}
      */
     this.resume = function () {
-        const pauseImg = document.createElement("img");
-        pauseImg.src = "header-icons/pause-button.svg";
-        pauseImg.title = _("Pause");
-        pauseImg.alt = _("Pause");
-        pauseImg.height = ICONSIZE;
-        pauseImg.width = ICONSIZE;
-        pauseImg.style.verticalAlign = "middle";
-        this.playBtn.textContent = "";
-        this.playBtn.appendChild(pauseImg);
+        const img = this.playBtn ? this.playBtn.getElementsByTagName("img")[0] : null;
+        if (img) {
+            img.src = "header-icons/pause-button.svg";
+            img.title = _("Pause");
+            img.alt = _("Pause");
+        } else if (this.playBtn) {
+            const pauseImg = document.createElement("img");
+            pauseImg.src = "header-icons/pause-button.svg";
+            pauseImg.title = _("Pause");
+            pauseImg.alt = _("Pause");
+            pauseImg.height = ICONSIZE;
+            pauseImg.width = ICONSIZE;
+            pauseImg.style.verticalAlign = "middle";
+            this.playBtn.textContent = "";
+            this.playBtn.appendChild(pauseImg);
+        }
         this.isMoving = true;
     };
 
@@ -1017,17 +1031,27 @@ function SampleWidget() {
 
         this._playbackBtn.onclick = () => {
             stopTuner();
+            const img = this._playbackBtn.getElementsByTagName("img")[0];
             if (!this.playback) {
                 this.sampleData = this.recordingURL;
                 this.sampleName = `Recorded Audio ${this.recordingURL}`;
                 this._addSample();
+                if (img) {
+                    img.src = "header-icons/stop-button.svg";
+                }
                 this.activity.logo.synth.playRecording(() => {
                     this.playback = false;
+                    if (img) {
+                        img.src = "header-icons/playback.svg";
+                    }
                 });
                 this.playback = true;
             } else {
                 this.activity.logo.synth.stopPlayBackRecording();
                 this.playback = false;
+                if (img) {
+                    img.src = "header-icons/playback.svg";
+                }
             }
         };
 
