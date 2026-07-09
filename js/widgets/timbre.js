@@ -812,7 +812,7 @@ class TimbreWidget {
             if (this.osc.length === 0) {
                 this._synth();
             } else {
-                activity.errorMsg(_("Unable to use synth due to existing oscillator."), 3000);
+                this.activity.errorMsg(_("Unable to use synth due to existing oscillator"), 3000);
             }
         };
 
@@ -1013,7 +1013,7 @@ class TimbreWidget {
             button.style.backgroundColor = platformColor.widgetButtonSelect;
         };
 
-        activity.textMsg(_("Click on buttons to open the timbre design tools."), 3000);
+        this.activity.textMsg(_("Click on buttons to open the timbre design tools."), 3000);
         widgetWindow.sendToCenter();
     }
 

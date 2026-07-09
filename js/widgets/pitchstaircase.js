@@ -679,7 +679,7 @@ class PitchStaircase {
         }
 
         this.activity.blocks.loadNewBlocks(newStack);
-        activity.textMsg(_("New action block generated."), 3000);
+        this.activity.textMsg(_("New action block generated."), 3000);
     }
 
     /**
@@ -804,7 +804,7 @@ class PitchStaircase {
         widgetWindow.getWidgetBody().append(this._pscTable);
         this._refresh();
 
-        activity.textMsg(_("Click on a note to create a new step."), 3000);
+        this.activity.textMsg(_("Click on a note to create a new step."), 3000);
 
         widgetWindow.onmaximize = () => {
             if (widgetWindow._maximized) {

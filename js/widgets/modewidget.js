@@ -194,8 +194,8 @@ class ModeWidget {
         this._setMode();
 
         //.TRANS: A circle of notes represents the musical mode.
-        activity.textMsg(_("Click in the circle to select notes for the mode."), 3000);
-        window.requestAnimationFrame(() => this.widgetWindow.sendToCenter());
+        this.activity.textMsg(_("Click in the circle to select notes for the mode."), 3000);
+        this._setTimeout(() => this.widgetWindow.sendToCenter(), 0);
     }
 
     /**

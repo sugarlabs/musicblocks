@@ -245,7 +245,7 @@ class Arpeggio {
         };
 
         this.makeClickable();
-        activity.textMsg(_("Click in the grid to add steps to the arpeggio."), 3000);
+        this._activity.textMsg(_("Click in the grid to add steps to the arpeggio."), 3000);
     }
 
     /**

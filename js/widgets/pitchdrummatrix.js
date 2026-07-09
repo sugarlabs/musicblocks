@@ -371,7 +371,7 @@ class PitchDrumMatrix {
             }
         };
 
-        activity.textMsg(_("Click in the grid to map notes to drums."), 3000);
+        this.activity.textMsg(_("Click in the grid to map notes to drums."), 3000);
     }
 
     /**
