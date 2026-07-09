@@ -3865,6 +3865,7 @@ class Block {
      */
     _changeLabel() {
         const that = this;
+        this.originalValue = this.value;
         const x = this.container.x;
         const y = this.container.y;
 
@@ -4713,12 +4714,15 @@ class Block {
 
         this._labelLock = true;
 
+        const oldValue = this.originalValue !== undefined ? this.originalValue : this.value;
+
         if (closeInput) {
             this.label.style.display = "none";
             if (this.labelattr !== null) {
                 this.labelattr.style.display = "none";
             }
             docById("wheelDiv").style.display = "none";
+            this.originalValue = undefined;
         }
 
         // The pie menu may be visible too, so hide it.
@@ -4726,7 +4730,6 @@ class Block {
             docById("wheelDiv").style.display = "none";
         }
 
-        const oldValue = this.value;
         let newValue = this.label.value;
 
         if (this.labelattr !== null) {
@@ -4748,7 +4751,12 @@ class Block {
         if (oldValue === newValue) {
             // Nothing to do in this case.
             this._labelLock = false;
-            if (this.name !== "text" || c === null || this.blocks.blockList[c].name !== "storein") {
+            if (
+                this.name !== "text" ||
+                c === null ||
+                (this.blocks.blockList[c].name !== "storein" &&
+                    this.blocks.blockList[c].name !== "action")
+            ) {
                 return;
             }
         }
@@ -4759,10 +4767,12 @@ class Block {
             let uniqueValue;
             switch (cblock.name) {
                 case "action":
-                    this.blocks.palettes.removeActionPrototype(oldValue);
+                    if (oldValue !== newValue) {
+                        this.blocks.palettes.removeActionPrototype(oldValue);
+                    }
 
                     // Ensure new name is unique.
-                    uniqueValue = this.blocks.findUniqueActionName(newValue);
+                    uniqueValue = this.blocks.findUniqueActionName(newValue, c);
                     if (uniqueValue !== newValue) {
                         newValue = uniqueValue;
                         this.value = newValue;
@@ -4923,45 +4933,52 @@ class Block {
             const cblock = this.blocks.blockList[c];
             switch (cblock.name) {
                 case "action":
-                    // If the label was the name of an action, update the
-                    // associated run this.blocks and the palette buttons
-                    // Rename both do <- name and nameddo blocks.
-                    this.blocks.renameDos(oldValue, newValue);
+                    if (oldValue !== newValue && closeInput) {
+                        this.blocks.renameDos(oldValue, newValue);
 
-                    // eslint-disable-next-line no-case-declarations
-                    const metadata = this.blocks.actionMetadata(c);
-                    if (oldValue === _("action") || oldValue === "action") {
-                        this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
-                        this.blocks.setActionProtoVisibility(false);
-                    }
-
-                    this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
-                    // eslint-disable-next-line no-case-declarations
-                    const blockPalette = this.blocks.palettes.dict["action"];
-                    for (let blk = 0; blk < blockPalette.protoList.length; blk++) {
-                        const block = blockPalette.protoList[blk];
+                        const metadata = this.blocks.actionMetadata(c);
                         if (oldValue === _("action") || oldValue === "action") {
-                            if (block.name === "nameddo" && block.defaults.length === 0) {
-                                block.hidden = true;
-                            }
-                        } else {
-                            if (block.name === "nameddo" && block.defaults[0] === oldValue) {
-                                blockPalette.remove(block, oldValue);
+                            this.blocks.newNameddoBlock(
+                                newValue,
+                                metadata.hasReturn,
+                                metadata.hasArgs
+                            );
+                            this.blocks.setActionProtoVisibility(false);
+                        }
+
+                        this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
+                        const blockPalette = this.blocks.palettes.dict["action"];
+                        for (let blk = 0; blk < blockPalette.protoList.length; blk++) {
+                            const block = blockPalette.protoList[blk];
+                            if (oldValue === _("action") || oldValue === "action") {
+                                if (block.name === "nameddo" && block.defaults.length === 0) {
+                                    block.hidden = true;
+                                }
+                            } else {
+                                if (block.name === "nameddo" && block.defaults[0] === oldValue) {
+                                    blockPalette.remove(block, oldValue);
+                                }
                             }
                         }
-                    }
 
-                    if (oldValue === _("action") || oldValue === "action") {
-                        this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
-                        this.blocks.setActionProtoVisibility(false);
+                        if (oldValue === _("action") || oldValue === "action") {
+                            this.blocks.newNameddoBlock(
+                                newValue,
+                                metadata.hasReturn,
+                                metadata.hasArgs
+                            );
+                            this.blocks.setActionProtoVisibility(false);
+                        }
+                        this.blocks.renameNameddos(oldValue, newValue);
+                        this.blocks.palettes.hide();
+                        this.blocks.palettes.updatePalettes("action");
+                        this.blocks.palettes.show();
+                        this.activity.refreshCanvas();
                     }
-                    this.blocks.renameNameddos(oldValue, newValue);
-                    this.blocks.palettes.hide();
-                    this.blocks.palettes.updatePalettes("action");
-                    this.blocks.palettes.show();
                     // Force-open the action palette so the newly created
                     // action block is immediately visible to the user.
                     if (closeInput) {
+                        this.blocks.palettes.updatePalettes("action");
                         this.blocks.palettes.showPalette("action");
                     }
                     break;

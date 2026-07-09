@@ -419,6 +419,167 @@ describe("Block Foundation", () => {
 
             expect(showPalette).not.toHaveBeenCalled();
         });
+
+        it("should call showPalette('action') and NOT call removeActionPrototype when oldValue === newValue and closeInput is true", () => {
+            const showPalette = jest.fn();
+            const removeActionPrototype = jest.fn();
+            const mockBlocksForRename = {
+                activity: { refreshCanvas: jest.fn() },
+                blockList: [],
+                palettes: {
+                    hide: jest.fn(),
+                    show: jest.fn(),
+                    updatePalettes: jest.fn(),
+                    showPalette,
+                    removeActionPrototype,
+                    dict: {
+                        action: { protoList: [] }
+                    }
+                },
+                newNameddoBlock: jest.fn(),
+                findUniqueActionName: jest.fn().mockImplementation(name => name),
+                setActionProtoVisibility: jest.fn(),
+                renameNameddos: jest.fn(),
+                actionMetadata: jest.fn().mockReturnValue({ hasReturn: false, hasArgs: false })
+            };
+
+            const block = new Block(
+                { name: "text", image: "", size: 1, docks: [] },
+                mockBlocksForRename
+            );
+            block.name = "text";
+            block.value = "myAction";
+            block.blockIndex = 0;
+            block.connections = [1];
+            block.label = { value: "myAction", style: { display: "" } };
+            block.text = { text: "" };
+            block.container = { setChildIndex: jest.fn(), children: [] };
+            block.updateCache = jest.fn();
+
+            const cblock = { name: "action", connections: [null, 0] };
+            mockBlocksForRename.blockList[0] = block;
+            mockBlocksForRename.blockList[1] = cblock;
+
+            const originalDocById = global.docById;
+            global.docById = jest.fn().mockReturnValue({ style: {} });
+
+            block._labelChanged(true, true);
+
+            expect(mockBlocksForRename.palettes.updatePalettes).toHaveBeenCalledWith("action");
+            expect(showPalette).toHaveBeenCalledWith("action");
+            expect(removeActionPrototype).not.toHaveBeenCalled();
+
+            global.docById = originalDocById;
+        });
+
+        it("should call findUniqueActionName with parent index and removeActionPrototype when oldValue !== newValue", () => {
+            const showPalette = jest.fn();
+            const removeActionPrototype = jest.fn();
+            const findUniqueActionName = jest.fn().mockImplementation(name => name);
+            const mockBlocksForRename = {
+                activity: { refreshCanvas: jest.fn() },
+                blockList: [],
+                palettes: {
+                    hide: jest.fn(),
+                    show: jest.fn(),
+                    updatePalettes: jest.fn(),
+                    showPalette,
+                    removeActionPrototype,
+                    dict: {
+                        action: { protoList: [] }
+                    }
+                },
+                newNameddoBlock: jest.fn(),
+                findUniqueActionName,
+                setActionProtoVisibility: jest.fn(),
+                renameNameddos: jest.fn(),
+                renameDos: jest.fn(),
+                actionMetadata: jest.fn().mockReturnValue({ hasReturn: false, hasArgs: false })
+            };
+
+            const block = new Block(
+                { name: "text", image: "", size: 1, docks: [] },
+                mockBlocksForRename
+            );
+            block.name = "text";
+            block.value = "oldAction";
+            block.blockIndex = 0;
+            block.connections = [1];
+            block.label = { value: "newAction", style: { display: "" } };
+            block.text = { text: "" };
+            block.container = { setChildIndex: jest.fn(), children: [] };
+            block.updateCache = jest.fn();
+
+            const cblock = { name: "action", connections: [null, 0] };
+            mockBlocksForRename.blockList[0] = block;
+            mockBlocksForRename.blockList[1] = cblock;
+
+            const originalDocById = global.docById;
+            global.docById = jest.fn().mockReturnValue({ style: {} });
+
+            block._labelChanged(true, true);
+
+            expect(removeActionPrototype).toHaveBeenCalledWith("oldAction");
+            expect(findUniqueActionName).toHaveBeenCalledWith("newAction", 1);
+            expect(mockBlocksForRename.palettes.updatePalettes).toHaveBeenCalledWith("action");
+            expect(showPalette).toHaveBeenCalledWith("action");
+            expect(mockBlocksForRename.activity.refreshCanvas).toHaveBeenCalled();
+
+            global.docById = originalDocById;
+        });
+
+        it("should NOT call renameNameddos or updatePalettes when closeInput is false", () => {
+            const showPalette = jest.fn();
+            const removeActionPrototype = jest.fn();
+            const findUniqueActionName = jest.fn().mockImplementation(name => name);
+            const mockBlocksForRename = {
+                activity: { refreshCanvas: jest.fn() },
+                blockList: [],
+                palettes: {
+                    hide: jest.fn(),
+                    show: jest.fn(),
+                    updatePalettes: jest.fn(),
+                    showPalette,
+                    removeActionPrototype,
+                    dict: {
+                        action: { protoList: [] }
+                    }
+                },
+                newNameddoBlock: jest.fn(),
+                findUniqueActionName,
+                setActionProtoVisibility: jest.fn(),
+                renameNameddos: jest.fn(),
+                renameDos: jest.fn(),
+                actionMetadata: jest.fn().mockReturnValue({ hasReturn: false, hasArgs: false })
+            };
+
+            const block = new Block(
+                { name: "text", image: "", size: 1, docks: [] },
+                mockBlocksForRename
+            );
+            block.name = "text";
+            block.value = "oldAction";
+            block.blockIndex = 0;
+            block.connections = [1];
+            block.label = { value: "newAction", style: { display: "" } };
+            block.text = { text: "" };
+            block.container = { setChildIndex: jest.fn(), children: [] };
+            block.updateCache = jest.fn();
+
+            const cblock = { name: "action", connections: [null, 0] };
+            mockBlocksForRename.blockList[0] = block;
+            mockBlocksForRename.blockList[1] = cblock;
+
+            const originalDocById = global.docById;
+            global.docById = jest.fn().mockReturnValue({ style: {} });
+
+            block._labelChanged(false, true);
+
+            expect(mockBlocksForRename.renameNameddos).not.toHaveBeenCalled();
+            expect(mockBlocksForRename.palettes.updatePalettes).not.toHaveBeenCalled();
+
+            global.docById = originalDocById;
+        });
     });
 
     describe("loadThumbnail()", () => {
