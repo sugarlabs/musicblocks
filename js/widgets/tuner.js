@@ -211,6 +211,12 @@ const TunerUtils = {
         return Math.pow(2, (baseCents + adjustment) / 1200);
     }
 };
+
+if (typeof window !== "undefined") {
+    window.TunerDisplay = TunerDisplay;
+    window.TunerUtils = TunerUtils;
+}
+
 if (typeof module !== "undefined") {
     module.exports = { TunerDisplay, TunerUtils };
 }

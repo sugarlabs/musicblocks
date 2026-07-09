@@ -291,7 +291,7 @@ function setupIntervalsActions(activity) {
             const listenerName = "_definemode_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -369,7 +369,7 @@ function setupIntervalsActions(activity) {
             const listenerName = "_interval_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -403,7 +403,7 @@ function setupIntervalsActions(activity) {
             const listenerName = "_chord_interval_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -440,7 +440,7 @@ function setupIntervalsActions(activity) {
                 const listenerName = "_semitone_interval_" + turtle;
                 if (blk !== undefined && blk in activity.blocks.blockList) {
                     activity.logo.setDispatchBlock(blk, turtle, listenerName);
-                } else if (MusicBlocks.isRun) {
+                } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                     const mouse = Mouse.getMouseFromTurtle(tur);
                     if (mouse !== null) mouse.MB.listeners.push(listenerName);
                 }
@@ -473,7 +473,7 @@ function setupIntervalsActions(activity) {
             const listenerName = "_ratio_interval_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }

@@ -220,6 +220,7 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
         "widgets/musickeyboard",
         "widgets/timbre",
         "widgets/oscilloscope",
+        "widgets/tuner",
         "widgets/sampler",
         "widgets/reflection",
         "widgets/legobricks"

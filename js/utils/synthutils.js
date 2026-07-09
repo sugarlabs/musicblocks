@@ -2615,9 +2615,13 @@ function Synth() {
      * @function
      * @memberof Synth
      */
-    this.playRecording = async () => {
+    this.playRecording = async onEnded => {
         _disposeRecordingPlayer();
+        await Tone.start();
         this.player = new Tone.Player().toDestination();
+        if (typeof onEnded === "function") {
+            this.player.onstop = onEnded;
+        }
         await this.player.load(this.audioURL);
         this.player.start();
     };
