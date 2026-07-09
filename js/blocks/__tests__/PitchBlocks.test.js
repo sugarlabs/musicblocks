@@ -22,6 +22,10 @@
 
 const { setupPitchBlocks } = require("../PitchBlocks");
 
+const SHARP = "\u266F";
+const FLAT = "\u266D";
+const CENTSSYMBOL = "\u00A2";
+
 describe("setupPitchBlocks", () => {
     let activity, logo, createdBlocks, turtles;
 
@@ -348,10 +352,10 @@ describe("setupPitchBlocks", () => {
 
     describe("CustomNoteBlock", () => {
         const customNoteCents = [
-            ["C(+42¢)", "C", 42],
-            ["C(-10¢)", "C", -10],
-            ["C(+0¢)", "C", 0],
-            ["D#", "D#", 0]
+            ["C(+42" + CENTSSYMBOL + ")", "C", 42],
+            ["C(-10" + CENTSSYMBOL + ")", "C", -10],
+            ["C(+0" + CENTSSYMBOL + ")", "C", 0],
+            ["D" + SHARP, "D" + SHARP, 0]
         ];
 
         it("flow", () => {
@@ -382,7 +386,7 @@ describe("setupPitchBlocks", () => {
 
         it("passes parsed cents to processPitch", () => {
             const block = createdBlocks["customNote"];
-            block.flow(["F#(+15¢)", 4], logo, 0, 10);
+            block.flow(["F#(+15" + CENTSSYMBOL + ")", 4], logo, 0, 10);
             expect(global.Singer.processPitch).toHaveBeenCalledWith(activity, "F#", 4, 15);
         });
 
@@ -781,7 +785,7 @@ describe("setupPitchBlocks", () => {
         it("CustomPitchBlock passes parsed cents to playPitch", () => {
             const cpBlock = createdBlocks["custompitch"];
             if (cpBlock instanceof DummyFlowBlock) return;
-            cpBlock.flow(["D(+25¢)", 2], logo, 0, 10);
+            cpBlock.flow(["D(+25" + CENTSSYMBOL + ")", 2], logo, 0, 10);
             expect(global.Singer.PitchActions.playPitch).toHaveBeenCalledWith("D", 2, 25, 0, 10);
         });
     });
