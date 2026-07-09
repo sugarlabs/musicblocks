@@ -4127,14 +4127,14 @@ class Blocks {
          * @returns {void}
          */
         this.setActionProtoVisibility = state => {
-            /** By default, the nameddo protoblock is hidden. */
+            /** By default, the nameddo protoblock is hidden, but user requested it to always be visible. */
             const actionsPalette = this.activity.palettes.dict["action"];
             let stateChanged = false;
             for (let blockId = 0; blockId < actionsPalette.protoList.length; blockId++) {
                 const block = actionsPalette.protoList[blockId];
                 if ("nameddo" === block.name && block.defaults.length === 0) {
-                    if (block.hidden === state) {
-                        block.hidden = !state;
+                    if (block.hidden !== false) {
+                        block.hidden = false;
                         stateChanged = true;
                     }
                 }

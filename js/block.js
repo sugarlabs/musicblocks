@@ -4943,18 +4943,13 @@ class Block {
                                 metadata.hasReturn,
                                 metadata.hasArgs
                             );
-                            this.blocks.setActionProtoVisibility(false);
                         }
 
                         this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
                         const blockPalette = this.blocks.palettes.dict["action"];
                         for (let blk = 0; blk < blockPalette.protoList.length; blk++) {
                             const block = blockPalette.protoList[blk];
-                            if (oldValue === _("action") || oldValue === "action") {
-                                if (block.name === "nameddo" && block.defaults.length === 0) {
-                                    block.hidden = true;
-                                }
-                            } else {
+                            if (oldValue !== _("action") && oldValue !== "action") {
                                 if (block.name === "nameddo" && block.defaults[0] === oldValue) {
                                     blockPalette.remove(block, oldValue);
                                 }
@@ -4967,7 +4962,6 @@ class Block {
                                 metadata.hasReturn,
                                 metadata.hasArgs
                             );
-                            this.blocks.setActionProtoVisibility(false);
                         }
                         this.blocks.renameNameddos(oldValue, newValue);
                         this.blocks.palettes.hide();
