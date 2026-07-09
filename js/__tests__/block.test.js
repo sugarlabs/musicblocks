@@ -118,7 +118,8 @@ describe("Block Foundation", () => {
             image: "forward.svg",
             size: 1,
             docks: [],
-            hidden: false
+            hidden: false,
+            capabilities: Object.create(null)
         };
     });
 
@@ -170,6 +171,23 @@ describe("Block Foundation", () => {
             mockProtoBlock.name = "forward";
             const block2 = new Block(mockProtoBlock, mockBlocks);
             expect(block2.isInlineCollapsible()).toBe(false);
+        });
+
+        it("hasCapability() should read protoblock capability metadata", () => {
+            mockProtoBlock.capabilities.collapsible = true;
+            mockProtoBlock.capabilities.specialInput = true;
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.hasCapability("collapsible")).toBe(true);
+            expect(block.getCapability("specialInput")).toBe(true);
+        });
+
+        it("should return falsey values when capability metadata is absent", () => {
+            mockProtoBlock.capabilities = Object.create(null);
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.hasCapability("collapsible")).toBe(false);
+            expect(block.getCapability("collapsible")).toBeUndefined();
         });
 
         it("copySize() should sync size from protoblock", () => {

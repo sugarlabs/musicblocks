@@ -611,6 +611,38 @@ class Block {
         this.size = this.protoblock.size;
     }
 
+    hasCapability(name) {
+        if (this.protoblock && typeof this.protoblock.hasCapability === "function") {
+            return this.protoblock.hasCapability(name);
+        }
+
+        if (
+            this.protoblock &&
+            this.protoblock.capabilities &&
+            Object.prototype.hasOwnProperty.call(this.protoblock.capabilities, name)
+        ) {
+            return !!this.protoblock.capabilities[name];
+        }
+
+        return false;
+    }
+
+    getCapability(name) {
+        if (this.protoblock && typeof this.protoblock.getCapability === "function") {
+            return this.protoblock.getCapability(name);
+        }
+
+        if (
+            this.protoblock &&
+            this.protoblock.capabilities &&
+            Object.prototype.hasOwnProperty.call(this.protoblock.capabilities, name)
+        ) {
+            return this.protoblock.capabilities[name];
+        }
+
+        return undefined;
+    }
+
     /**
      * Retrieves information about the block.
      * @returns {string} - Information about the block.
