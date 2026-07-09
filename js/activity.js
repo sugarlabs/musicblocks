@@ -33,7 +33,7 @@ try {
    Boundary, CARTESIAN, changeImage, closeWidgets, doRecordButton, setupActivityRecorder,
    setupGridController, setupGridRenderer, setupPluginController, setupToolbarController, setupAlertController, setupAlertRenderer, setupPaletteLoader, PluginDialog,
    setupProjectManager,
-   setupSearchController, setupSearchUI,
+   setupSearchController, setupSearchUI, setupWorkspaceLayoutController,
    setupActivityAbcParser, setupActivityIdleWatcher,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
@@ -133,6 +133,7 @@ let MYDEFINES = [
     "activity/alert-renderer",
     "palette/palette-loader",
     "activity/search-controller",
+    "activity/workspace-layout-controller",
     "search-ui",
     "widgets/plugin-dialog",
     "utils/musicutils",
@@ -484,6 +485,7 @@ class Activity {
         setupPaletteLoader(this);
         this.searchUI = setupSearchUI(this);
         setupSearchController(this, this.searchUI);
+        setupWorkspaceLayoutController(this);
         this.pluginDialog = new PluginDialog({
             onLoadBuiltIn: name => this._loadBuiltInPlugin(name),
             onDelete: () => this._deletePlugin(),
@@ -797,373 +799,13 @@ class Activity {
             this.firstRun = true;
         };
 
-        /**
-         * Recenters blocks by updating their position on the screen.
-         *
-         * This function triggers the `_findBlocks` method on the provided `activity` object,
-         * which recalculates the positions of blocks. If the 'helpfulWheelDiv' element is visible,
-         * it is hidden, and the `__tick` method is called to update the activity state.
-         *
-         * @param {Object} activity - The activity instance containing the blocks to recenter.
-         * @constructor
-         */
-        const findBlocks = activity => {
-            activity._findBlocks();
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-                activity.__tick();
-            }
-        };
-
-        /**
-         * Ensures blocks stay within canvas boundaries when resized.
-         * Ensures that music blocks are responsive to horizontal resizing.
-         * Ensures that overall integrity of blocks isn't hampered with.
-         */
-        function repositionBlocks(activity) {
-            const canvasWidth = window.innerWidth;
-            const processedBlocks = new Set();
-
-            //Array for storing individual dragGroups (the chunks of code linked together which are not connected)
-            const dragGroups = [];
-
-            // Identifying individual dragGroups
-            Object.values(activity.blocks.blockList).forEach(block => {
-                if (!processedBlocks.has(block.id)) {
-                    activity.blocks.findDragGroup(block.id);
-
-                    if (activity.blocks.dragGroup.length > 0) {
-                        dragGroups.push([...activity.blocks.dragGroup]); // Store the group into dragGroups
-                        activity.blocks.dragGroup.forEach(id => processedBlocks.add(id)); // Process individual groups
-                    }
-                }
-            });
-
-            // Repositioning of dragGroups according to horizontal resizing
-            dragGroups.forEach(group => {
-                const referenceBlock = activity.blocks.blockList[group[0]];
-
-                // Store initial positions
-                if (!referenceBlock.initialPosition) {
-                    referenceBlock.initialPosition = {
-                        x: referenceBlock.container.x,
-                        y: referenceBlock.container.y
-                    };
-                }
-
-                if (
-                    canvasWidth < RESPONSIVE_BREAKPOINT_TABLET &&
-                    !referenceBlock.beforeMobilePosition
-                ) {
-                    referenceBlock.beforeMobilePosition = {
-                        x: referenceBlock.container.x,
-                        y: referenceBlock.container.y
-                    };
-                }
-
-                if (
-                    canvasWidth >= RESPONSIVE_BREAKPOINT_TABLET &&
-                    referenceBlock.beforeMobilePosition
-                ) {
-                    const dx = referenceBlock.beforeMobilePosition.x - referenceBlock.container.x;
-                    const dy = referenceBlock.beforeMobilePosition.y - referenceBlock.container.y;
-                    group.forEach(blockId => {
-                        const block = activity.blocks.blockList[blockId];
-                        block.container.x += dx;
-                        block.container.y += dy;
-                    });
-                    referenceBlock.beforeMobilePosition = null; // Clear stored position
-                    //this prevents old groups from affecting new calculations.
-                }
-
-                if (
-                    canvasWidth < RESPONSIVE_BREAKPOINT_MOBILE &&
-                    !referenceBlock.before600pxPosition
-                ) {
-                    referenceBlock.before600pxPosition = {
-                        x: referenceBlock.container.x,
-                        y: referenceBlock.container.y
-                    };
-                }
-
-                if (
-                    canvasWidth >= RESPONSIVE_BREAKPOINT_MOBILE &&
-                    referenceBlock.before600pxPosition
-                ) {
-                    const dx = referenceBlock.before600pxPosition.x - referenceBlock.container.x;
-                    const dy = referenceBlock.before600pxPosition.y - referenceBlock.container.y;
-
-                    group.forEach(blockId => {
-                        const block = activity.blocks.blockList[blockId];
-                        block.container.x += dx;
-                        block.container.y += dy;
-                    });
-                    referenceBlock.before600pxPosition = null;
-                }
-
-                // Ensure blocks stay within horizontal boundary
-                const rightmostX = Math.max(
-                    ...group.map(
-                        id =>
-                            activity.blocks.blockList[id].container.x +
-                            activity.blocks.blockList[id].width
-                    )
-                );
-
-                if (rightmostX > canvasWidth) {
-                    const shiftX = Math.max(10, canvasWidth - rightmostX - 10);
-
-                    group.forEach(blockId => {
-                        activity.blocks.blockList[blockId].container.x += shiftX;
-                    });
-                }
-
-                // Ensures that blocks do not go hide behind the search for blocks div
-                const leftmostX = Math.min(
-                    ...group.map(id => activity.blocks.blockList[id].container.x)
-                );
-                if (leftmostX < 0) {
-                    const shiftX = 100 - leftmostX;
-
-                    group.forEach(blockId => {
-                        activity.blocks.blockList[blockId].container.x += shiftX;
-                    });
-                }
-            });
-
-            activity._findBlocks();
-        }
+        // Workspace layout ("Home" button) functionality has been extracted to
+        // WorkspaceLayoutController (js/activity/workspace-layout-controller.js).
+        // setupWorkspaceLayoutController() installs the delegation stubs below:
+        // findBlocks, setHomeContainers, repositionBlocks, _handleRepositionBlocksOnResize.
 
         //if any window resize event occurs:
-        this._handleRepositionBlocksOnResize = () => repositionBlocks(this);
         this.addEventListener(window, "resize", this._handleRepositionBlocksOnResize);
-
-        /**
-         * Finds and organizes blocks within the workspace.
-         * Blocks are positioned based on their connections and availability within the canvas area.
-         * This method is part of the internal mechanism to ensure that blocks are displayed correctly and efficiently.
-         * @constructor
-         */
-        // Flag to track number of clicks and for alternate mode switching while clicking
-        this._isFirstHomeClick = true;
-
-        this._findBlocks = () => {
-            // Ensure visibility of blocks
-            if (!this.blocks.visible) {
-                this._changeBlockVisibility();
-            }
-
-            // Reset active block and hide DOM label
-            this.blocks.activeBlock = null;
-            hideDOMLabel();
-
-            // Show blocks and set initial container position
-            this.blocks.showBlocks();
-            this.blocksContainer.x = 0;
-            this.blocksContainer.y = 0;
-
-            if (this._isFirstHomeClick) {
-                // First clicked logic (arrange blocks in rows may have overlapping of blocks)
-                let toppos;
-                if (this.auxToolbar.style.display === "block") {
-                    toppos = 90 + this.toolbarHeight;
-                } else {
-                    toppos = 90;
-                }
-                const leftpos = Math.floor(this.canvas.width / 4);
-
-                this.palettes.updatePalettes();
-                let x = Math.floor(leftpos * this.turtleBlocksScale);
-                let y = Math.floor(toppos * this.turtleBlocksScale);
-                let even = true;
-
-                // Defer checkBounds during bulk block moves to avoid O(N²)
-                // overhead: each moveBlockRelative call triggers checkBounds()
-                // which scans all blocks, so N moves × N blocks = O(N²).
-                this.blocks._beginDeferCheckBounds();
-
-                // Position "start" blocks first
-                for (const blk in this.blocks.blockList) {
-                    if (this.blocks.blockList[blk] && !this.blocks.blockList[blk].trash) {
-                        const myBlock = this.blocks.blockList[blk];
-                        if (myBlock.name !== "start") {
-                            continue;
-                        }
-                        if (myBlock.connections[0] === null) {
-                            const dx = x - myBlock.container.x;
-                            const dy = y - myBlock.container.y;
-                            this.blocks.moveBlockRelative(blk, dx, dy);
-                            this.blocks.findDragGroup(blk);
-
-                            if (this.blocks.dragGroup.length > 0) {
-                                for (let b = 0; b < this.blocks.dragGroup.length; b++) {
-                                    const bblk = this.blocks.dragGroup[b];
-                                    if (b !== 0) {
-                                        this.blocks.moveBlockRelative(bblk, dx, dy);
-                                    }
-                                }
-                            }
-
-                            x += Math.floor(150 * this.turtleBlocksScale);
-                            if (x > (this.canvas.width * 7) / 8 / this.turtleBlocksScale) {
-                                even = !even;
-                                if (even) {
-                                    x = Math.floor(leftpos);
-                                } else {
-                                    x = Math.floor(leftpos + STANDARDBLOCKHEIGHT);
-                                }
-                                y += STANDARDBLOCKHEIGHT;
-                            }
-                        }
-                    }
-                }
-
-                // Position other blocks
-                for (const blk in this.blocks.blockList) {
-                    if (this.blocks.blockList[blk] && !this.blocks.blockList[blk].trash) {
-                        const myBlock = this.blocks.blockList[blk];
-                        if (myBlock.name === "start") {
-                            continue;
-                        }
-                        if (myBlock.connections[0] === null) {
-                            const dx = x - myBlock.container.x;
-                            const dy = y - myBlock.container.y;
-                            this.blocks.moveBlockRelative(blk, dx, dy);
-                            this.blocks.findDragGroup(blk);
-
-                            if (this.blocks.dragGroup.length > 0) {
-                                for (let b = 0; b < this.blocks.dragGroup.length; b++) {
-                                    const bblk = this.blocks.dragGroup[b];
-                                    if (b !== 0) {
-                                        this.blocks.moveBlockRelative(bblk, dx, dy);
-                                    }
-                                }
-                            }
-
-                            x += Math.floor(150 * this.turtleBlocksScale);
-                            if (x > (this.canvas.width * 7) / 8 / this.turtleBlocksScale) {
-                                even = !even;
-                                if (even) {
-                                    x = Math.floor(leftpos);
-                                } else {
-                                    x = Math.floor(leftpos + STANDARDBLOCKHEIGHT);
-                                }
-                                y += STANDARDBLOCKHEIGHT;
-                            }
-                        }
-                    }
-                }
-
-                this.blocks._endDeferCheckBounds();
-            } else {
-                // Second click logic (arrange blocks in columns this avoid overlapping of blocks)
-                let toppos;
-                if (this.auxToolbar.style.display === "block") {
-                    toppos = 90 + this.toolbarHeight;
-                } else {
-                    toppos = 90;
-                }
-
-                /**
-                 * Device type resolution ranges and typical orientation:
-                 * Desktop: 1024x768 to 5120x2880 (Landscape primary, Portrait supported)
-                 * Tablet: 768x1024 to 2560x1600 (Portrait common, Landscape supported)
-                 * Mobile: 320x480 to 1440x3200 (Portrait primary, Landscape supported)
-                 * Minimum column width is set to 400px to ensure readability and usability.
-                 */
-
-                const screenWidth = window.innerWidth;
-                const minColumnWidth = 320;
-                const numColumns =
-                    screenWidth <= 320 ? 1 : Math.floor(screenWidth / minColumnWidth);
-
-                const baseColumnSpacing = screenWidth / numColumns;
-                const columnSpacing = baseColumnSpacing * 1.2;
-
-                const initialY = Math.floor(toppos * this.turtleBlocksScale);
-                const baseVerticalSpacing = Math.floor(20 * this.turtleBlocksScale);
-                const verticalSpacing = baseVerticalSpacing * 1.2;
-
-                const columnXPositions = Array.from({ length: numColumns }, (_, i) =>
-                    Math.floor(i * columnSpacing + columnSpacing / 2)
-                );
-                const columnYPositions = Array(numColumns).fill(initialY);
-
-                // Defer checkBounds during bulk block moves (see first-click path).
-                this.blocks._beginDeferCheckBounds();
-
-                for (const blk in this.blocks.blockList) {
-                    if (this.blocks.blockList[blk] && !this.blocks.blockList[blk].trash) {
-                        const myBlock = this.blocks.blockList[blk];
-                        if (myBlock.connections[0] === null) {
-                            let minYIndex = 0;
-                            for (let i = 1; i < numColumns; i++) {
-                                if (columnYPositions[i] < columnYPositions[minYIndex]) {
-                                    minYIndex = i;
-                                }
-                            }
-
-                            const dx = columnXPositions[minYIndex] - myBlock.container.x;
-                            const dy = columnYPositions[minYIndex] - myBlock.container.y;
-                            this.blocks.moveBlockRelative(blk, dx, dy);
-                            this.blocks.findDragGroup(blk);
-
-                            if (this.blocks.dragGroup.length > 0) {
-                                for (let b = 0; b < this.blocks.dragGroup.length; b++) {
-                                    const bblk = this.blocks.dragGroup[b];
-                                    if (b !== 0) {
-                                        this.blocks.moveBlockRelative(bblk, dx, dy);
-                                    }
-                                }
-                            }
-                            columnYPositions[minYIndex] += myBlock.height + verticalSpacing;
-                        }
-                    }
-                }
-
-                this.blocks._endDeferCheckBounds();
-            }
-
-            // Reset go-home button
-            this.setHomeContainers(false);
-            this.boundary.hide();
-
-            // Return mice to the center of the screen.
-            // Reset turtles' positions to center of the screen
-            for (let turtle = 0; turtle < this.turtles.getTurtleCount(); turtle++) {
-                const requiredTurtle = this.turtles.getTurtle(turtle);
-                const savedPenState = requiredTurtle.painter.penState;
-                requiredTurtle.painter.penState = false;
-                requiredTurtle.painter.doSetXY(0, 0);
-                requiredTurtle.painter.doSetHeading(0);
-                requiredTurtle.painter.penState = savedPenState;
-            }
-            // Alternate mode switching on clicking Home button
-            this._isFirstHomeClick = !this._isFirstHomeClick;
-        };
-
-        /**
-         * Toggles the visibility of the home button container.
-         *
-         * Depending on the state provided, this method will either hide or show the home button container.
-         * If the home button container is not initialized, the function will exit early.
-         *
-         * @param {boolean} homeState - If true, shows the container; if false, hides it.
-         * @constructor
-         */
-        this.setHomeContainers = homeState => {
-            if (this.homeButtonContainer === null || this.homeButtonContainer === undefined) {
-                return;
-            }
-
-            if (homeState) {
-                changeImage(this.homeButtonContainer.children[0], GOHOMEFADEDBUTTON, GOHOMEBUTTON);
-            } else {
-                changeImage(this.homeButtonContainer.children[0], GOHOMEBUTTON, GOHOMEFADEDBUTTON);
-            }
-        };
 
         /**
          * Saves the artwork for an individual help block.
@@ -2628,7 +2270,7 @@ class Activity {
                                 );
                             } else {
                                 // Bring all the blocks "home".
-                                this._findBlocks();
+                                this.workspaceLayoutController._findBlocks();
                             }
                             this.stageDirty = true;
                             break;
@@ -4006,7 +3648,7 @@ class Activity {
             this.homeButtonContainer = createButton(
                 GOHOMEFADEDBUTTON,
                 `${_("Home")} [${_("Home").toUpperCase()}]`,
-                findBlocks
+                this.findBlocks
             );
             this.boundary.hide();
 
@@ -4017,7 +3659,7 @@ class Activity {
                         "imgsrc:data:image/svg+xml;base64," +
                         window.btoa(base64Encode(GOHOMEFADEDBUTTON)),
                     display: true,
-                    fn: findBlocks
+                    fn: this.findBlocks
                 });
 
             this.hideBlocksContainer = createButton(
