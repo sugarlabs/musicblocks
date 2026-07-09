@@ -3352,20 +3352,7 @@ class Block {
                         const blockLabel =
                             (that.protoblock.staticLabels && that.protoblock.staticLabels[0]) ||
                             that.name;
-                        const liveRegion =
-                            document.getElementById("mbA11yLiveRegion") ||
-                            (() => {
-                                const r = document.createElement("div");
-                                r.id = "mbA11yLiveRegion";
-                                r.setAttribute("role", "status");
-                                r.setAttribute("aria-live", "polite");
-                                r.setAttribute("aria-atomic", "true");
-                                r.style.cssText =
-                                    "position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;";
-                                document.body.appendChild(r);
-                                return r;
-                            })();
-                        liveRegion.textContent = _("picked up") + " " + blockLabel;
+                        announceToScreenReader(_("picked up") + " " + blockLabel);
                     }
                 }
             } else {
