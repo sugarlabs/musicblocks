@@ -130,7 +130,11 @@ describe("MathUtility", () => {
         });
 
         test("throws error for invalid inputs", () => {
-            expect(() => MathUtility.doMod("a", 3)).toThrow("Invalid number input");
+            expect(() => MathUtility.doMod("a", 3)).toThrow("NanError");
+        });
+
+        test("throws DivByZeroError when divisor is zero", () => {
+            expect(() => MathUtility.doMod(5, 0)).toThrow("DivByZeroError");
         });
 
         // Edge case tests
@@ -159,7 +163,7 @@ describe("MathUtility", () => {
         });
 
         test("throws error when second arg is string", () => {
-            expect(() => MathUtility.doMod(10, "a")).toThrow("Invalid number input");
+            expect(() => MathUtility.doMod(10, "a")).toThrow("NanError");
         });
     });
 
