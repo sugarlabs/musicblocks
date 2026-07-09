@@ -340,10 +340,16 @@ describe("PitchStaircase Widget", () => {
             psc.activity = { logo: { synth: { trigger: jest.fn() } } };
             const stepCell = {
                 classList: { add: jest.fn(), remove: jest.fn() },
-                getAttribute: jest.fn(() => "220")
+                getAttribute: jest.fn(() => "220"),
+                style: {}
+            };
+            const playCell = {
+                getAttribute: jest.fn(() => "0"),
+                replaceChildren: jest.fn(),
+                classList: { contains: jest.fn(() => false) }
             };
 
-            psc._playOne(stepCell);
+            psc._playOne(stepCell, playCell);
 
             expect(stepCell.classList.add).toHaveBeenCalledWith("active");
             expect(psc.activity.logo.synth.trigger).toHaveBeenCalledWith(
@@ -567,7 +573,11 @@ describe("PitchStaircase Widget", () => {
                 clear: jest.fn(),
                 show: jest.fn(),
                 addButton: jest.fn((icon, size, label) => {
-                    const button = { onclick: null };
+                    const button = {
+                        onclick: null,
+                        replaceChildren: jest.fn(),
+                        classList: { contains: jest.fn(() => false) }
+                    };
                     buttons[label] = button;
                     return button;
                 }),
