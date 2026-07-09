@@ -3846,7 +3846,7 @@ class Block {
      */
     _changeLabel() {
         const that = this;
-        this.originalValue = this.value;
+        this._capturedInitialValue = this.value;
         const x = this.container.x;
         const y = this.container.y;
 
@@ -4695,7 +4695,8 @@ class Block {
 
         this._labelLock = true;
 
-        const oldValue = this.originalValue !== undefined ? this.originalValue : this.value;
+        const hasInitialValue = typeof this._capturedInitialValue !== "undefined";
+        const oldValue = hasInitialValue ? this._capturedInitialValue : this.value;
 
         if (closeInput) {
             this.label.style.display = "none";
@@ -4703,7 +4704,7 @@ class Block {
                 this.labelattr.style.display = "none";
             }
             docById("wheelDiv").style.display = "none";
-            this.originalValue = undefined;
+            delete this._capturedInitialValue;
         }
 
         // The pie menu may be visible too, so hide it.
@@ -4732,12 +4733,13 @@ class Block {
         if (oldValue === newValue) {
             // Nothing to do in this case.
             this._labelLock = false;
-            if (
-                this.name !== "text" ||
-                c === null ||
-                (this.blocks.blockList[c].name !== "storein" &&
-                    this.blocks.blockList[c].name !== "action")
-            ) {
+
+            const isText = this.name === "text";
+            const parentBlock = c !== null ? this.blocks.blockList[c] : null;
+            const parentName = parentBlock ? parentBlock.name : "";
+            const requiresUpdate = isText && (parentName === "storein" || parentName === "action");
+
+            if (!requiresUpdate) {
                 return;
             }
         }
@@ -4748,22 +4750,25 @@ class Block {
             let uniqueValue;
             switch (cblock.name) {
                 case "action":
-                    if (oldValue !== newValue) {
-                        this.blocks.palettes.removeActionPrototype(oldValue);
-                    }
-
-                    // Ensure new name is unique.
-                    uniqueValue = this.blocks.findUniqueActionName(newValue, c);
-                    if (uniqueValue !== newValue) {
-                        newValue = uniqueValue;
-                        this.value = newValue;
-                        let label = this.value.toString();
-                        if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                            label = label.substr(0, STRINGLEN) + "...";
+                    {
+                        const isNameChanged = oldValue !== newValue;
+                        if (isNameChanged) {
+                            this.blocks.palettes.removeActionPrototype(oldValue);
                         }
-                        this.text.text = label;
-                        this.label.value = newValue;
-                        this.updateCache();
+
+                        // Ensure new name is unique.
+                        const validatedName = this.blocks.findUniqueActionName(newValue, c);
+                        if (validatedName !== newValue) {
+                            newValue = validatedName;
+                            this.value = newValue;
+                            let label = this.value.toString();
+                            if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
+                                label = label.substr(0, STRINGLEN) + "...";
+                            }
+                            this.text.text = label;
+                            this.label.value = newValue;
+                            this.updateCache();
+                        }
                     }
                     break;
                 case "pitch":
@@ -4914,53 +4919,66 @@ class Block {
             const cblock = this.blocks.blockList[c];
             switch (cblock.name) {
                 case "action":
-                    if (oldValue !== newValue && closeInput) {
-                        this.blocks.renameDos(oldValue, newValue);
+                    {
+                        const isNameChanged = oldValue !== newValue;
+                        if (isNameChanged && closeInput) {
+                            this.blocks.renameDos(oldValue, newValue);
 
-                        const metadata = this.blocks.actionMetadata(c);
-                        if (oldValue === _("action") || oldValue === "action") {
+                            const metadata = this.blocks.actionMetadata(c);
+                            const isDefaultAction =
+                                oldValue === _("action") || oldValue === "action";
+
+                            if (isDefaultAction) {
+                                this.blocks.newNameddoBlock(
+                                    newValue,
+                                    metadata.hasReturn,
+                                    metadata.hasArgs
+                                );
+                                this.blocks.setActionProtoVisibility(false);
+                            }
+
                             this.blocks.newNameddoBlock(
                                 newValue,
                                 metadata.hasReturn,
                                 metadata.hasArgs
                             );
-                            this.blocks.setActionProtoVisibility(false);
-                        }
-
-                        this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
-                        const blockPalette = this.blocks.palettes.dict["action"];
-                        for (let blk = 0; blk < blockPalette.protoList.length; blk++) {
-                            const block = blockPalette.protoList[blk];
-                            if (oldValue === _("action") || oldValue === "action") {
-                                if (block.name === "nameddo" && block.defaults.length === 0) {
-                                    block.hidden = true;
-                                }
-                            } else {
-                                if (block.name === "nameddo" && block.defaults[0] === oldValue) {
-                                    blockPalette.remove(block, oldValue);
+                            const blockPalette = this.blocks.palettes.dict["action"];
+                            for (let blk = 0; blk < blockPalette.protoList.length; blk++) {
+                                const block = blockPalette.protoList[blk];
+                                if (oldValue === _("action") || oldValue === "action") {
+                                    if (block.name === "nameddo" && block.defaults.length === 0) {
+                                        block.hidden = true;
+                                    }
+                                } else {
+                                    if (
+                                        block.name === "nameddo" &&
+                                        block.defaults[0] === oldValue
+                                    ) {
+                                        blockPalette.remove(block, oldValue);
+                                    }
                                 }
                             }
-                        }
 
-                        if (oldValue === _("action") || oldValue === "action") {
-                            this.blocks.newNameddoBlock(
-                                newValue,
-                                metadata.hasReturn,
-                                metadata.hasArgs
-                            );
-                            this.blocks.setActionProtoVisibility(false);
+                            if (oldValue === _("action") || oldValue === "action") {
+                                this.blocks.newNameddoBlock(
+                                    newValue,
+                                    metadata.hasReturn,
+                                    metadata.hasArgs
+                                );
+                                this.blocks.setActionProtoVisibility(false);
+                            }
+                            this.blocks.renameNameddos(oldValue, newValue);
+                            this.blocks.palettes.hide();
+                            this.blocks.palettes.updatePalettes("action");
+                            this.blocks.palettes.show();
+                            this.activity.refreshCanvas();
                         }
-                        this.blocks.renameNameddos(oldValue, newValue);
-                        this.blocks.palettes.hide();
-                        this.blocks.palettes.updatePalettes("action");
-                        this.blocks.palettes.show();
-                        this.activity.refreshCanvas();
-                    }
-                    // Force-open the action palette so the newly created
-                    // action block is immediately visible to the user.
-                    if (closeInput) {
-                        this.blocks.palettes.updatePalettes("action");
-                        this.blocks.palettes.showPalette("action");
+                        // Force-open the action palette so the newly created
+                        // action block is immediately visible to the user.
+                        if (closeInput) {
+                            this.blocks.palettes.updatePalettes("action");
+                            this.blocks.palettes.showPalette("action");
+                        }
                     }
                     break;
                 case "storein":
