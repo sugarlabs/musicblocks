@@ -1070,7 +1070,7 @@ class JSEditor {
             btnDiv.style.lineHeight = "20px";
 
             if (lineContent === "") {
-                btnDiv.innerHTML = "&nbsp;";
+                btnDiv.textContent = "\u00a0";
             } else if (hasDebugger) {
                 btnDiv.style.cursor = "pointer";
                 btnDiv.style.opacity = "1";
@@ -1255,11 +1255,11 @@ class JSEditor {
         if (this.isOpen) {
             this.isOpen = false;
             editorconsole.style.display = "none";
-            if (arrowBtn) arrowBtn.innerHTML = "keyboard_arrow_up";
+            if (arrowBtn) arrowBtn.textContent = "keyboard_arrow_up";
         } else {
             this.isOpen = true;
             editorconsole.style.display = "block";
-            if (arrowBtn) arrowBtn.innerHTML = "keyboard_arrow_down";
+            if (arrowBtn) arrowBtn.textContent = "keyboard_arrow_down";
         }
     }
 

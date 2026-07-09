@@ -97,6 +97,7 @@ const loadActivityClass = () => {
             helpfulSearchDiv: null
         })),
         setupSearchController: jest.fn(),
+        setupWorkspaceLayoutController: jest.fn(),
         hideDOMLabel: jest.fn(),
         setupActivityRecorder: jest.fn(),
         setupActivityAbcParser: jest.fn(),
