@@ -11,6 +11,7 @@ global.SOLFEGENAMES = ["do", "re", "mi", "fa", "sol", "la", "ti"];
 
 const musicutils = require("../../utils/musicutils.js");
 Object.assign(global, musicutils);
+global.debugLog = jest.fn();
 
 const MusicKeyboard = require("../musickeyboard.js");
 
