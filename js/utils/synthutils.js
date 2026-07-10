@@ -477,7 +477,7 @@ const transport = {
         return "stopped";
     },
     get isClockRunning() {
-        if (this.isAvailable && typeof Tone !== "undefined" && Tone.context) {
+        if (this.isAvailable && Tone.context) {
             return Tone.context.state === "running";
         }
         return false;

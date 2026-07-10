@@ -46,7 +46,10 @@ global.Synth = jest.fn().mockImplementation(() => ({
             return "stopped";
         },
         get isClockRunning() {
-            return this.isAvailable;
+            if (this.isAvailable && global.Tone.context) {
+                return global.Tone.context.state === "running";
+            }
+            return false;
         },
         start() {
             if (this.isAvailable) global.Tone.Transport.start();
@@ -1012,7 +1015,10 @@ describe("Logo doStopTurtles", () => {
                         return typeof global.Tone !== "undefined" && !!global.Tone.Transport;
                     },
                     get isClockRunning() {
-                        return this.isAvailable;
+                        if (this.isAvailable && global.Tone.context) {
+                            return global.Tone.context.state === "running";
+                        }
+                        return false;
                     },
                     cancel() {
                         if (
@@ -1347,6 +1353,90 @@ describe("Logo runFromBlock", () => {
             logo.runFromBlock(logo, 0, 3, 1, "x");
 
             expect(timeoutSpy).toHaveBeenCalled();
+            expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, 3, 1, "x");
+        });
+
+        test("falls back to setTimeout when AudioContext is suspended", () => {
+            global.Tone = {
+                ...savedTone,
+                context: {
+                    get state() {
+                        return "suspended";
+                    }
+                },
+                Transport: {
+                    start: jest.fn(),
+                    stop: jest.fn(),
+                    state: "started",
+                    schedule: jest.fn(),
+                    cancel: jest.fn(),
+                    getSecondsAtTime: jest.fn(),
+                    get seconds() {
+                        return 0;
+                    },
+                    set seconds(v) {}
+                }
+            };
+            timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
+                fn();
+                return 5;
+            });
+
+            logo.runFromBlockNow = jest.fn();
+            logo.turtleDelay = 0;
+            logo.stopTurtle = false;
+            turtle0.waitTime = 200;
+
+            logo.runFromBlock(logo, 0, 3, 1, "x");
+
+            expect(timeoutSpy).toHaveBeenCalled();
+            expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, 3, 1, "x");
+        });
+
+        test("clamps transport time to prevent scheduling in the past", () => {
+            const getSecondsAtTimeMock = jest.fn(t => t + 1);
+            let scheduledCallback = null;
+            const scheduleSpy = jest.fn((fn, time) => {
+                scheduledCallback = fn;
+                return "evt-1";
+            });
+            let transportSeconds = 50;
+            global.Tone = {
+                ...savedTone,
+                context: {
+                    get state() {
+                        return "running";
+                    }
+                },
+                Transport: {
+                    start: jest.fn(),
+                    stop: jest.fn(),
+                    state: "started",
+                    schedule: scheduleSpy,
+                    cancel: jest.fn(),
+                    getSecondsAtTime: getSecondsAtTimeMock,
+                    get seconds() {
+                        return transportSeconds;
+                    },
+                    set seconds(v) {
+                        transportSeconds = v;
+                    }
+                }
+            };
+
+            logo.runFromBlockNow = jest.fn();
+            logo.turtleDelay = 0;
+            logo.stopTurtle = false;
+            turtle0.waitTime = 200;
+            turtle0._transportTime = 10;
+
+            logo.runFromBlock(logo, 0, 3, 1, "x");
+
+            const computedTime = 10 + 200 / 1000;
+            expect(computedTime).toBeLessThan(transportSeconds);
+            expect(scheduleSpy).toHaveBeenCalledWith(expect.any(Function), transportSeconds);
+
+            scheduledCallback(55.5);
             expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, 3, 1, "x");
         });
     });
