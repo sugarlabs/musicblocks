@@ -4488,7 +4488,7 @@ class Blocks {
                     continue;
                 }
                 const blkParent = this.blockList[myBlock.connections[0]];
-                if (blkParent === null) {
+                if (!blkParent) {
                     continue;
                 }
 
@@ -4550,15 +4550,17 @@ class Blocks {
                         this.blockList[blk].name
                     )
                 ) {
-                    if (this.blockList[blk].privateData === oldName) {
-                        this.blockList[blk].privateData = newName;
-                        let label = newName;
-                        if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                            label = label.substr(0, STRINGLEN) + "...";
-                        }
+                    const targetBlock = this.blockList[blk];
 
-                        this.blockList[blk].overrideName = label;
-                        this.blockList[blk].regenerateArtwork();
+                    let activeName = targetBlock.privateData || targetBlock.overrideName;
+                    if (!activeName && targetBlock.protoblock && targetBlock.protoblock.defaults) {
+                        activeName = targetBlock.protoblock.defaults[0];
+                    }
+
+                    if (activeName === oldName) {
+                        targetBlock.privateData = newName;
+                        targetBlock.overrideName = newName;
+                        targetBlock.regenerateArtwork();
                     }
                 }
             }

@@ -543,4 +543,82 @@ describe("Blocks Foundation", () => {
             expect(listener).not.toHaveBeenCalled();
         });
     });
+
+    describe("renameNameddos", () => {
+        let blocksInstance;
+
+        beforeEach(() => {
+            mockActivity.palettes.updatePalettes = jest.fn();
+            blocksInstance = new Blocks(mockActivity);
+            mockActivity.palettes.dict["action"] = {
+                protoList: [],
+                remove: jest.fn()
+            };
+        });
+
+        it("should rename blocks using privateData, overrideName, and protoblock.defaults[0] fallbacks", () => {
+            const regenerateArtwork1 = jest.fn();
+            const regenerateArtwork2 = jest.fn();
+            const regenerateArtwork3 = jest.fn();
+
+            const block1 = {
+                name: "nameddo",
+                privateData: "dance",
+                regenerateArtwork: regenerateArtwork1
+            };
+            const block2 = {
+                name: "nameddoArg",
+                privateData: null,
+                overrideName: "dance",
+                regenerateArtwork: regenerateArtwork2
+            };
+            const block3 = {
+                name: "namedcalc",
+                privateData: null,
+                overrideName: null,
+                protoblock: { defaults: ["dance"] },
+                regenerateArtwork: regenerateArtwork3
+            };
+            const block4 = {
+                name: "nameddo",
+                privateData: "other",
+                regenerateArtwork: jest.fn()
+            };
+
+            blocksInstance.blockList = [block1, block2, block3, block4];
+
+            const paletteBlock = {
+                name: "nameddo",
+                defaults: ["dance"]
+            };
+            mockActivity.palettes.dict["action"].protoList.push(paletteBlock);
+
+            blocksInstance.renameNameddos("dance", "jump");
+
+            // Assert block1 updates
+            expect(block1.privateData).toBe("jump");
+            expect(block1.overrideName).toBe("jump");
+            expect(regenerateArtwork1).toHaveBeenCalled();
+
+            // Assert block2 updates
+            expect(block2.privateData).toBe("jump");
+            expect(block2.overrideName).toBe("jump");
+            expect(regenerateArtwork2).toHaveBeenCalled();
+
+            // Assert block3 updates
+            expect(block3.privateData).toBe("jump");
+            expect(block3.overrideName).toBe("jump");
+            // protoblock.defaults[0] must NOT be mutated on workspace instances
+            // because it is a shared reference to the palette prototype template.
+            expect(block3.protoblock.defaults[0]).toBe("dance");
+            expect(regenerateArtwork3).toHaveBeenCalled();
+
+            // Assert block4 remains unchanged
+            expect(block4.privateData).toBe("other");
+            expect(block4.regenerateArtwork).not.toHaveBeenCalled();
+
+            // Assert palette update
+            expect(paletteBlock.defaults[0]).toBe("jump");
+        });
+    });
 });
