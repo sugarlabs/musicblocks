@@ -1872,7 +1872,8 @@ function Synth() {
                             paramsEffects.doTremolo ||
                             paramsEffects.doPhaser ||
                             paramsEffects.doChorus ||
-                            paramsEffects.doNeighbor));
+                            paramsEffects.doNeighbor ||
+                            (paramsEffects.doPortamento && setNote)));
 
                 if (!_needsGraphRewire) {
                     // Apply in-place property mutations then take the fast path.
