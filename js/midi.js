@@ -237,7 +237,7 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
                             ],
                             [
                                 x + 2,
-                                ["number", { value: parseInt(name[name.length - 1]) }],
+                                ["number", { value: parseInt(name[name.length - 1], 10) }],
                                 0,
                                 0,
                                 [x]

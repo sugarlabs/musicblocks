@@ -38,12 +38,12 @@ if (typeof module !== "undefined" && module.exports) {
 }
 
 /* exported
-   canvasPixelRatio, changeImage, closeBlkWidgets, closeWidgets,
+   announceToScreenReader,canvasPixelRatio, changeImage, closeBlkWidgets, closeWidgets,
    delayExecution, displayMsg, doBrowserCheck, docByClass, docByName,
    docBySelector, docByTagName, doPublish, doStopVideoCam, doSVG,
    doUseCamera, format, getTextWidth, hideDOMLabel, httpGet, httpPost, HttpRequest,
    importMembers, isSVGEmpty, prepareMacroExports, preparePluginExports,
-   processMacroData, processRawPluginData, windowHeight, windowWidth,
+   processMacroData, processPluginData, processRawPluginData, windowHeight, windowWidth,
    fnBrowserDetect, waitForReadiness
 */
 
@@ -966,10 +966,16 @@ window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivi
                     delete window.__mb_plugin_registry[registryName];
                 }
                 URL.revokeObjectURL(sUrl);
+                if (sScript.parentNode) {
+                    sScript.parentNode.removeChild(sScript);
+                }
                 resolve();
             };
             sScript.onerror = () => {
                 URL.revokeObjectURL(sUrl);
+                if (sScript.parentNode) {
+                    sScript.parentNode.removeChild(sScript);
+                }
                 resolve(); // Still resolve to let others run
             };
             document.head.appendChild(sScript);
@@ -1450,6 +1456,25 @@ let closeBlkWidgets = name => {
  * @param {*[]} viewArgs - Constructor arguments for the view.
  * @returns {void}
  */
+/**
+ * Announces a message to screen readers via a shared aria-live region.
+ * Creates the region lazily on first use and reuses it for all subsequent calls.
+ * @param {string} msg - The message to announce.
+ */
+const announceToScreenReader = msg => {
+    let region = document.getElementById("mbA11yLiveRegion");
+    if (!region) {
+        region = document.createElement("div");
+        region.id = "mbA11yLiveRegion";
+        region.setAttribute("role", "status");
+        region.setAttribute("aria-live", "polite");
+        region.setAttribute("aria-atomic", "true");
+        region.style.cssText =
+            "position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;";
+        document.body.appendChild(region);
+    }
+    region.textContent = msg;
+};
 let importMembers = (obj, className, modelArgs, viewArgs) => {
     /**
      * Adds methods and variables of one class to another class's instance.
@@ -1535,8 +1560,10 @@ if (typeof module !== "undefined" && module.exports) {
         doSVG,
         isSVGEmpty,
         prepareMacroExports,
+        processPluginData,
         processMacroData,
         hideDOMLabel,
-        displayMsg
+        displayMsg,
+        announceToScreenReader
     };
 }

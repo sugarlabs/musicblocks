@@ -39,11 +39,15 @@ global.createjs = {
         cache: jest.fn(),
         updateCache: jest.fn(),
         uncache: jest.fn(),
+        bitmapCache: { getCacheDataURL: jest.fn().mockReturnValue("cached-data-url") },
         visible: true,
         children: []
     })),
-    Bitmap: jest.fn().mockImplementation(() => ({
+    Bitmap: jest.fn().mockImplementation(image => ({
         visible: true,
+        scaleX: 1,
+        scaleY: 1,
+        image: image,
         getBounds: jest.fn().mockReturnValue({ x: 0, y: 0, width: 50, height: 50 })
     })),
     Text: jest.fn().mockImplementation(() => ({
@@ -114,7 +118,8 @@ describe("Block Foundation", () => {
             image: "forward.svg",
             size: 1,
             docks: [],
-            hidden: false
+            hidden: false,
+            capabilities: Object.create(null)
         };
     });
 
@@ -166,6 +171,23 @@ describe("Block Foundation", () => {
             mockProtoBlock.name = "forward";
             const block2 = new Block(mockProtoBlock, mockBlocks);
             expect(block2.isInlineCollapsible()).toBe(false);
+        });
+
+        it("hasCapability() should read protoblock capability metadata", () => {
+            mockProtoBlock.capabilities.collapsible = true;
+            mockProtoBlock.capabilities.specialInput = true;
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.hasCapability("collapsible")).toBe(true);
+            expect(block.getCapability("specialInput")).toBe(true);
+        });
+
+        it("should return falsey values when capability metadata is absent", () => {
+            mockProtoBlock.capabilities = Object.create(null);
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.hasCapability("collapsible")).toBe(false);
+            expect(block.getCapability("collapsible")).toBeUndefined();
         });
 
         it("copySize() should sync size from protoblock", () => {
@@ -333,6 +355,161 @@ describe("Block Foundation", () => {
                 );
                 generateSpy.mockRestore();
             });
+        });
+    });
+
+    describe("Action label changed behavior", () => {
+        let mockBlocksForRename;
+        let showPalette;
+        let removeActionPrototype;
+        let findUniqueActionName;
+        let originalDocById;
+        let block;
+
+        beforeEach(() => {
+            showPalette = jest.fn();
+            removeActionPrototype = jest.fn();
+            findUniqueActionName = jest.fn().mockImplementation(name => name);
+
+            mockBlocksForRename = {
+                activity: { refreshCanvas: jest.fn() },
+                blockList: [],
+                palettes: {
+                    hide: jest.fn(),
+                    show: jest.fn(),
+                    updatePalettes: jest.fn(),
+                    showPalette,
+                    removeActionPrototype,
+                    dict: {
+                        action: { protoList: [] }
+                    }
+                },
+                newNameddoBlock: jest.fn(),
+                findUniqueActionName,
+                setActionProtoVisibility: jest.fn(),
+                renameNameddos: jest.fn(),
+                renameDos: jest.fn(),
+                actionMetadata: jest.fn().mockReturnValue({ hasReturn: false, hasArgs: false })
+            };
+
+            block = new Block({ name: "text", image: "", size: 1, docks: [] }, mockBlocksForRename);
+            block.name = "text";
+            block.blockIndex = 0;
+            block.connections = [1];
+            block.text = { text: "" };
+            block.container = { setChildIndex: jest.fn(), children: [] };
+            block.updateCache = jest.fn();
+
+            const cblock = { name: "action", connections: [null, 0] };
+            mockBlocksForRename.blockList[0] = block;
+            mockBlocksForRename.blockList[1] = cblock;
+
+            originalDocById = global.docById;
+            global.docById = jest.fn().mockReturnValue({ style: {} });
+        });
+
+        afterEach(() => {
+            global.docById = originalDocById;
+        });
+
+        it("should call showPalette('action') and NOT call removeActionPrototype when oldValue === newValue and closeInput is true", () => {
+            block.value = "myAction";
+            block.label = { value: "myAction", style: { display: "" } };
+
+            block._labelChanged(true, true);
+
+            expect(mockBlocksForRename.palettes.updatePalettes).toHaveBeenCalledWith("action");
+            expect(showPalette).toHaveBeenCalledWith("action");
+            expect(removeActionPrototype).not.toHaveBeenCalled();
+        });
+
+        it("should call findUniqueActionName with parent index and removeActionPrototype when oldValue !== newValue", () => {
+            block.value = "oldAction";
+            block.label = { value: "newAction", style: { display: "" } };
+
+            block._labelChanged(true, true);
+
+            expect(removeActionPrototype).toHaveBeenCalledWith("oldAction");
+            expect(findUniqueActionName).toHaveBeenCalledWith("newAction", 1);
+            expect(mockBlocksForRename.palettes.updatePalettes).toHaveBeenCalledWith("action");
+            expect(showPalette).toHaveBeenCalledWith("action");
+            expect(mockBlocksForRename.activity.refreshCanvas).toHaveBeenCalled();
+        });
+
+        it("should NOT call renameNameddos or updatePalettes when closeInput is false", () => {
+            block.value = "oldAction";
+            block.label = { value: "newAction", style: { display: "" } };
+
+            block._labelChanged(false, true);
+
+            expect(mockBlocksForRename.renameNameddos).not.toHaveBeenCalled();
+            expect(mockBlocksForRename.palettes.updatePalettes).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("loadThumbnail()", () => {
+        let block;
+        let mockImageInstance;
+        let originalImage;
+
+        beforeEach(() => {
+            block = new Block(mockProtoBlock, mockBlocks);
+            block.blockIndex = 0;
+            block.blocks.blockList = [{ value: null }];
+            block.removeChildBitmap = jest.fn();
+            block._positionMedia = jest.fn();
+            block.container = new global.createjs.Container();
+            block.updateCache = jest.fn();
+
+            originalImage = global.Image;
+            global.Image = jest.fn(() => {
+                mockImageInstance = {
+                    src: "",
+                    width: 100,
+                    height: 100,
+                    naturalWidth: 100,
+                    naturalHeight: 100,
+                    onload: null
+                };
+                return mockImageInstance;
+            });
+        });
+
+        afterEach(() => {
+            global.Image = originalImage;
+        });
+
+        it("should preserve GIF animation for data URI", () => {
+            block.loadThumbnail("data:image/gif;base64,R0lGODlh");
+            expect(mockImageInstance.onload).not.toBeNull();
+            mockImageInstance.onload();
+
+            expect(block.value).toBe("data:image/gif;base64,R0lGODlh");
+            expect(block.imageBitmap).toBeDefined();
+        });
+
+        it("should preserve GIF animation for URL ending in .gif", () => {
+            block.loadThumbnail("http://example.com/image.gif");
+            mockImageInstance.onload();
+
+            expect(block.value).toBe("http://example.com/image.gif");
+        });
+
+        it("should fallback to manual bounds calculation if getBounds returns falsy", () => {
+            const mockCache = jest.fn();
+            global.createjs.Container.mockImplementationOnce(() => ({
+                addChild: jest.fn(),
+                removeChild: jest.fn(),
+                getBounds: jest.fn().mockReturnValue(null),
+                cache: mockCache,
+                bitmapCache: { getCacheDataURL: jest.fn().mockReturnValue("fallback-cached") }
+            }));
+
+            block.loadThumbnail("http://example.com/image.png");
+            mockImageInstance.onload();
+
+            expect(mockCache).toHaveBeenCalledWith(0, 0, 100, 100);
+            expect(block.value).toBe("fallback-cached");
         });
     });
 });

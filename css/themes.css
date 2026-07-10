@@ -402,7 +402,7 @@ body.highcontrast {
 .dark #helpdropdown.helpdropdown-menu li.active,
 .dark #helpdropdown.helpdropdown-menu li.selected,
 .dark #helpdropdown.helpdropdown-menu li.active.selected {
-    background: rgba(74, 163, 239, 0.16);
+    background: var(--color-brand-primary);
 }
 
 .dark #helpdropdown.helpdropdown-menu li:hover > a,
@@ -411,8 +411,8 @@ body.highcontrast {
 .dark #helpdropdown.helpdropdown-menu li > a:hover,
 .dark #helpdropdown.helpdropdown-menu li > a:focus,
 .dark #helpdropdown.helpdropdown-menu li > a.dropdown-item-focused {
-    background: rgba(74, 163, 239, 0.16);
-    color: var(--color-text-inverse);
+    background: var(--color-brand-primary);
+    color: var(--color-text-primary);
 }
 
 .dark .keyboard-shortcuts-hero {
@@ -456,7 +456,7 @@ body.highcontrast {
 .highcontrast #helpdropdown.helpdropdown-menu,
 .highcontrast #helpdropdown.helpdropdown-menu li > a {
     background: #000000;
-    color: var(--color-text-inverse);
+    color: var(--color-text-primary);
     border-color: var(--color-text-inverse);
     box-shadow: none;
 }
@@ -469,7 +469,7 @@ body.highcontrast {
 .highcontrast #helpdropdown.helpdropdown-menu li.active,
 .highcontrast #helpdropdown.helpdropdown-menu li.selected,
 .highcontrast #helpdropdown.helpdropdown-menu li.active.selected {
-    background: var(--color-brand-secondary);
+    background: var(--color-text-primary);
 }
 
 .highcontrast #helpdropdown.helpdropdown-menu li:hover > a,
@@ -478,8 +478,8 @@ body.highcontrast {
 .highcontrast #helpdropdown.helpdropdown-menu li > a:hover,
 .highcontrast #helpdropdown.helpdropdown-menu li > a:focus,
 .highcontrast #helpdropdown.helpdropdown-menu li > a.dropdown-item-focused {
-    background: var(--color-brand-secondary);
-    color: var(--color-text-primary);
+    background: var(--color-text-primary);
+    color: var(--color-text-inverse);
 }
 
 .highcontrast .keyboard-shortcuts-hero,
@@ -545,7 +545,7 @@ body.highcontrast {
 }
 
 .highcontrast .popupMsg {
-    background-color: var(--color-text-inverse);
+    background-color: var(--color-bg-inverse);
     color: var(--color-text-inverse);
 }
 
@@ -573,14 +573,14 @@ body.highcontrast {
 .highcontrast #search,
 .highcontrast #helpfulSearch,
 .highcontrast .ui-autocomplete {
-    background-color: var(--color-text-inverse) !important;
+    background-color: var(--color-bg-primary) !important;
     color: var(--color-text-primary) !important;
     border: 1px solid #ffffff;
 }
 
 .highcontrast .ui-autocomplete .ui-menu-item a {
     color: var(--color-text-primary) !important;
-    background-color: var(--color-text-inverse) !important;
+    background-color: var(--color-bg-primary) !important;
 }
 
 .highcontrast .ui-autocomplete .ui-menu-item a:hover {

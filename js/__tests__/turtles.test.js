@@ -18,6 +18,7 @@
  */
 
 const Turtles = require("../turtles");
+const { setupGridController } = require("../activity/grid-controller.js");
 
 global.createjs = {
     Container: jest.fn().mockImplementation(() => ({
@@ -665,5 +666,127 @@ describe("aux toolbar collapse and expand", () => {
         expect(btn.classList.contains("darken-1")).toBe(false);
         expect(turtles.hideMenu).toHaveBeenCalled();
         expect(turtles.setStageScale).toHaveBeenCalledWith(1.0);
+    });
+});
+
+describe("TurtlesModel doGrid initialization order", () => {
+    // Regression guard for the bug where setupGridController() was called after
+    // new Turtles(), causing TurtlesModel to capture undefined for _doGrid and
+    // making activity.turtles.doGrid() throw at runtime.
+    // activity.js must call setupGridController() before new Turtles().
+
+    function makeModelActivity() {
+        return {
+            stage: new createjs.Container(),
+            turtleContainer: new createjs.Container(),
+            canvas: {},
+            hideAuxMenu: jest.fn(),
+            hideGrids: jest.fn(),
+            _doCartesianPolar: jest.fn()
+        };
+    }
+
+    // In the test environment importMembers is mocked, so new Turtles() does not
+    // run the TurtlesModel constructor.  Use Reflect.construct to create an
+    // object whose prototype is Turtles.prototype (giving it the doGrid getter)
+    // while executing the TurtlesModel constructor (which captures _doGrid).
+    // This mirrors what importMembers does at runtime.
+    function buildTurtles(activity) {
+        return Reflect.construct(Turtles.TurtlesModel, [activity], Turtles);
+    }
+
+    test("doGrid is callable when setupGridController runs before Turtles construction", () => {
+        const activity = makeModelActivity();
+        setupGridController(activity);
+        const turtles = buildTurtles(activity);
+
+        expect(typeof turtles.doGrid).toBe("function");
+        expect(() => turtles.doGrid(0)).not.toThrow();
+    });
+
+    test("calling doGrid dispatches to activity._doCartesianPolar", () => {
+        const activity = makeModelActivity();
+        setupGridController(activity);
+        // Spy after setupGridController so the spy is what TurtlesModel captures
+        const spy = jest.spyOn(activity, "_doCartesianPolar");
+        const turtles = buildTurtles(activity);
+
+        turtles.doGrid(0);
+
+        expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    test("setupGridController does not access activity.turtles during initialisation", () => {
+        // Verifies it is safe to call setupGridController before new Turtles().
+        const activity = makeModelActivity();
+        Object.defineProperty(activity, "turtles", {
+            get() {
+                throw new Error("activity.turtles must not be read during setupGridController");
+            },
+            configurable: true
+        });
+
+        expect(() => setupGridController(activity)).not.toThrow();
+    });
+});
+
+describe("turtleCount", () => {
+    let turtles;
+
+    beforeEach(() => {
+        turtles = {
+            getTurtleCount: jest.fn(),
+            getTurtle: jest.fn(),
+            turtleCount: Turtles.TurtlesModel.prototype.turtleCount
+        };
+    });
+
+    test("counts all turtles when there are no companions and none in trash", () => {
+        turtles.getTurtleCount.mockReturnValue(3);
+        turtles.getTurtle.mockImplementation(t => ({ companionTurtle: undefined, inTrash: false }));
+
+        expect(turtles.turtleCount()).toBe(3);
+    });
+
+    test("does not count turtles in trash", () => {
+        turtles.getTurtleCount.mockReturnValue(3);
+        turtles.getTurtle.mockImplementation(t => ({
+            companionTurtle: undefined,
+            inTrash: t === 1
+        }));
+
+        expect(turtles.turtleCount()).toBe(2);
+    });
+
+    test("does not count turtles that are claimed as companions", () => {
+        turtles.getTurtleCount.mockReturnValue(3);
+        // 0 points to 1
+        turtles.getTurtle.mockImplementation(t => {
+            if (t === 0) return { companionTurtle: 1, inTrash: false };
+            return { companionTurtle: undefined, inTrash: false };
+        });
+
+        // Turtle 0: points to 1. Not claimed. Counted.
+        // Turtle 1: claimed by 0. Not counted.
+        // Turtle 2: Not claimed. Counted.
+        expect(turtles.turtleCount()).toBe(2);
+    });
+
+    test("counts self-referencing turtles if no one else claims them first", () => {
+        turtles.getTurtleCount.mockReturnValue(1);
+        turtles.getTurtle.mockImplementation(t => ({ companionTurtle: t, inTrash: false }));
+
+        expect(turtles.turtleCount()).toBe(1);
+    });
+
+    test("does not count a self-referencing turtle if someone else claims it first", () => {
+        turtles.getTurtleCount.mockReturnValue(2);
+        // 0 points to 1. 1 points to 1.
+        turtles.getTurtle.mockImplementation(t => {
+            if (t === 0) return { companionTurtle: 1, inTrash: false };
+            if (t === 1) return { companionTurtle: 1, inTrash: false };
+        });
+
+        expect(turtles.turtleCount()).toBe(1);
     });
 });

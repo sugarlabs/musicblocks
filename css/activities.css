@@ -235,6 +235,9 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     transition: all 0.2s ease;
     margin-left: 8px;
 }
+#searchDragHandle {
+    pointer-events: auto;
+}
 
 #search:focus {
     border-color: var(--color-brand-primary-hover);
@@ -247,32 +250,46 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 }
 
 #helpfulSearchDiv {
-    display: block !important;
-    position: absolute;
+    position: fixed !important;
     background-color: var(--color-bg-secondary);
-    padding: 2px;
+    padding: 0;
     border: 1px solid var(--color-border-primary);
-    width: 230px;
-    z-index: 1;
+    border-radius: 24px;
+    width: 320px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    height: 46px;
+    overflow: hidden;
 }
 
 #helpfulSearch {
-    padding: 2px;
-    border: 2px solid grey;
-    width: 220px;
-    height: 20px;
+    padding: 0 40px 0 28px;
+    border: none;
+    width: 100%;
+    height: 46px;
     font-size: large;
+    background-color: transparent;
+    color: inherit;
+    outline: none;
+    display: block;
+    box-sizing: border-box;
 }
 
 #crossButton {
     position: absolute;
     top: 50%;
-    right: -30px;
+    right: 10px;
     transform: translateY(-50%);
-    background: transparent;
+    background: rgba(80, 80, 80, 0.5);
     border: none;
-    font-size: large;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    color: white;
+    font-size: 14px;
     cursor: pointer;
+    line-height: 22px;
+    text-align: center;
 }
 
 .trash-view {
@@ -1270,6 +1287,21 @@ table {
     margin: auto;
 }
 
+#helpBodyDiv .help-tour-image,
+#helpBodyDiv .help-tour-detailed-icon,
+#helpBodyDiv .help-tour-icon {
+    display: block;
+    margin: 0 auto 0.5rem;
+}
+
+#helpBodyDiv .help-tour-large-image {
+    max-width: 100%;
+    max-height: min(38vh, 220px);
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
 #helpBodyDiv p {
     margin: 0.5rem 0;
 }
@@ -1318,9 +1350,18 @@ table {
 }
 
 @media (max-width: 600px) {
+    #helpBodyDiv {
+        justify-content: flex-start;
+        padding-top: 1rem;
+    }
+
     #helpBodyDiv .icon-container {
         margin-top: 0;
         padding-top: 0;
+    }
+
+    #helpBodyDiv .help-tour-large-image {
+        max-height: min(32vh, 180px);
     }
 
     .icon-container #findIcon,

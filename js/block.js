@@ -281,6 +281,7 @@ class Block {
         this.collapsed = false; // Is this collapsible block collapsed?
         this.inCollapsed = false; // Is this block in a collapsed stack?
         this.trash = false; // Is this block in the trash?
+        this._viewportVisible = true; // Is this block within the current viewport?
         this.loadComplete = false; // Has the block finished loading?
         this.label = null; // Editable textview in DOM.
         this.labelattr = null; // Editable textview in DOM.
@@ -608,6 +609,38 @@ class Block {
      */
     copySize() {
         this.size = this.protoblock.size;
+    }
+
+    hasCapability(name) {
+        if (this.protoblock && typeof this.protoblock.hasCapability === "function") {
+            return this.protoblock.hasCapability(name);
+        }
+
+        if (
+            this.protoblock &&
+            this.protoblock.capabilities &&
+            Object.prototype.hasOwnProperty.call(this.protoblock.capabilities, name)
+        ) {
+            return !!this.protoblock.capabilities[name];
+        }
+
+        return false;
+    }
+
+    getCapability(name) {
+        if (this.protoblock && typeof this.protoblock.getCapability === "function") {
+            return this.protoblock.getCapability(name);
+        }
+
+        if (
+            this.protoblock &&
+            this.protoblock.capabilities &&
+            Object.prototype.hasOwnProperty.call(this.protoblock.capabilities, name)
+        ) {
+            return this.protoblock.capabilities[name];
+        }
+
+        return undefined;
     }
 
     /**
@@ -2016,6 +2049,7 @@ class Block {
         // If it is not in the trash and not in collapsed, then show it.
         if (!this.trash && !this.inCollapsed) {
             this.container.visible = true;
+            this._viewportVisible = true;
             if (this.isCollapsible()) {
                 if (this.collapsed) {
                     this.bitmap.visible = false;
@@ -2292,12 +2326,20 @@ class Block {
             // CRITICAL FIX: PRESERVE GIF
             const src = image.src || "";
 
-            if (src.startsWith("data:image/gif")) {
-                //DO NOT cache GIF , keeps animation
+            if (src.startsWith("data:image/gif") || src.toLowerCase().endsWith(".gif")) {
+                // DO NOT cache GIF , keeps animation
                 that.value = src;
                 that.imageBitmap = bitmap;
             } else {
-                const bounds = myContainer.getBounds();
+                let bounds = myContainer.getBounds();
+                if (!bounds) {
+                    bounds = {
+                        x: 0,
+                        y: 0,
+                        width: (image.naturalWidth || image.width) * bitmap.scaleX,
+                        height: (image.naturalHeight || image.height) * bitmap.scaleY
+                    };
+                }
                 myContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
                 that.value = myContainer.bitmapCache.getCacheDataURL();
                 that.imageBitmap = bitmap;
@@ -3270,6 +3312,13 @@ class Block {
             // Cache the drag group once on mousedown instead of
             // recomputing the tree traversal on every pressmove.
             that.blocks.cacheDragGroup(thisBlock);
+            // Track the drag group for viewport culling exemption during drag,
+            // so off-screen stack siblings remain visible while being dragged
+            // into view (avoids "pop-in" on release).
+            const group = that.blocks._cachedDragGroup;
+            if (group && group.length > 0) {
+                that.blocks._dragActiveGroup = new Set(group);
+            }
             // Invalidate the top-block cache since a drag may
             // disconnect blocks, changing the topology.
             that.blocks.invalidateTopBlockCache();
@@ -3329,6 +3378,14 @@ class Block {
                 );
                 if (movedDx + movedDy > 5) {
                     moved = true;
+                    // Announce block drag to screen readers (screen reader only, no visual message)
+                    if (!that._announced) {
+                        that._announced = true;
+                        const blockLabel =
+                            (that.protoblock.staticLabels && that.protoblock.staticLabels[0]) ||
+                            that.name;
+                        announceToScreenReader(_("picked up") + " " + blockLabel);
+                    }
                 }
             } else {
                 // Make it easier to select text on mobile.
@@ -3503,6 +3560,7 @@ class Block {
             // Clear cached drag state.
             _dragHasRest2 = false;
             moved = false;
+            that._announced = false;
         });
         // Touch long-press to open context menu
         this.container.on("touchstart", () => {
@@ -3807,6 +3865,7 @@ class Block {
      */
     _changeLabel() {
         const that = this;
+        this._capturedInitialValue = this.value;
         const x = this.container.x;
         const y = this.container.y;
 
@@ -4655,12 +4714,16 @@ class Block {
 
         this._labelLock = true;
 
+        const hasInitialValue = typeof this._capturedInitialValue !== "undefined";
+        const oldValue = hasInitialValue ? this._capturedInitialValue : this.value;
+
         if (closeInput) {
             this.label.style.display = "none";
             if (this.labelattr !== null) {
                 this.labelattr.style.display = "none";
             }
             docById("wheelDiv").style.display = "none";
+            delete this._capturedInitialValue;
         }
 
         // The pie menu may be visible too, so hide it.
@@ -4668,7 +4731,6 @@ class Block {
             docById("wheelDiv").style.display = "none";
         }
 
-        const oldValue = this.value;
         let newValue = this.label.value;
 
         if (this.labelattr !== null) {
@@ -4690,7 +4752,13 @@ class Block {
         if (oldValue === newValue) {
             // Nothing to do in this case.
             this._labelLock = false;
-            if (this.name !== "text" || c === null || this.blocks.blockList[c].name !== "storein") {
+
+            const isText = this.name === "text";
+            const parentBlock = c !== null ? this.blocks.blockList[c] : null;
+            const parentName = parentBlock ? parentBlock.name : "";
+            const requiresUpdate = isText && (parentName === "storein" || parentName === "action");
+
+            if (!requiresUpdate) {
                 return;
             }
         }
@@ -4701,20 +4769,25 @@ class Block {
             let uniqueValue;
             switch (cblock.name) {
                 case "action":
-                    this.blocks.palettes.removeActionPrototype(oldValue);
-
-                    // Ensure new name is unique.
-                    uniqueValue = this.blocks.findUniqueActionName(newValue);
-                    if (uniqueValue !== newValue) {
-                        newValue = uniqueValue;
-                        this.value = newValue;
-                        let label = this.value.toString();
-                        if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                            label = label.substr(0, STRINGLEN) + "...";
+                    {
+                        const isNameChanged = oldValue !== newValue;
+                        if (isNameChanged) {
+                            this.blocks.palettes.removeActionPrototype(oldValue);
                         }
-                        this.text.text = label;
-                        this.label.value = newValue;
-                        this.updateCache();
+
+                        // Ensure new name is unique.
+                        const validatedName = this.blocks.findUniqueActionName(newValue, c);
+                        if (validatedName !== newValue) {
+                            newValue = validatedName;
+                            this.value = newValue;
+                            let label = this.value.toString();
+                            if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
+                                label = label.substr(0, STRINGLEN) + "...";
+                            }
+                            this.text.text = label;
+                            this.label.value = newValue;
+                            this.updateCache();
+                        }
                     }
                     break;
                 case "pitch":
@@ -4865,42 +4938,55 @@ class Block {
             const cblock = this.blocks.blockList[c];
             switch (cblock.name) {
                 case "action":
-                    // If the label was the name of an action, update the
-                    // associated run this.blocks and the palette buttons
-                    // Rename both do <- name and nameddo blocks.
-                    this.blocks.renameDos(oldValue, newValue);
+                    {
+                        const isNameChanged = oldValue !== newValue;
+                        if (isNameChanged && closeInput) {
+                            this.blocks.renameDos(oldValue, newValue);
 
-                    // eslint-disable-next-line no-case-declarations
-                    const metadata = this.blocks.actionMetadata(c);
-                    if (oldValue === _("action") || oldValue === "action") {
-                        this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
-                        this.blocks.setActionProtoVisibility(false);
-                    }
+                            const metadata = this.blocks.actionMetadata(c);
+                            const isDefaultAction =
+                                oldValue === _("action") || oldValue === "action";
 
-                    this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
-                    // eslint-disable-next-line no-case-declarations
-                    const blockPalette = this.blocks.palettes.dict["action"];
-                    for (let blk = 0; blk < blockPalette.protoList.length; blk++) {
-                        const block = blockPalette.protoList[blk];
-                        if (oldValue === _("action") || oldValue === "action") {
-                            if (block.name === "nameddo" && block.defaults.length === 0) {
-                                block.hidden = true;
+                            this.blocks.newNameddoBlock(
+                                newValue,
+                                metadata.hasReturn,
+                                metadata.hasArgs
+                            );
+
+                            if (isDefaultAction) {
+                                this.blocks.setActionProtoVisibility(false);
                             }
-                        } else {
-                            if (block.name === "nameddo" && block.defaults[0] === oldValue) {
-                                blockPalette.remove(block, oldValue);
+
+                            const blockPalette = this.blocks.palettes.dict["action"];
+                            for (let blk = 0; blk < blockPalette.protoList.length; blk++) {
+                                const block = blockPalette.protoList[blk];
+                                if (isDefaultAction) {
+                                    if (block.name === "nameddo" && block.defaults.length === 0) {
+                                        block.hidden = true;
+                                    }
+                                } else {
+                                    if (
+                                        block.name === "nameddo" &&
+                                        block.defaults[0] === oldValue
+                                    ) {
+                                        blockPalette.remove(block, oldValue);
+                                    }
+                                }
                             }
+
+                            this.blocks.renameNameddos(oldValue, newValue);
+                            this.blocks.palettes.hide();
+                            this.blocks.palettes.updatePalettes("action");
+                            this.blocks.palettes.show();
+                            this.activity.refreshCanvas();
+                        }
+                        // Force-open the action palette so the newly created
+                        // action block is immediately visible to the user.
+                        if (closeInput) {
+                            this.blocks.palettes.updatePalettes("action");
+                            this.blocks.palettes.showPalette("action");
                         }
                     }
-
-                    if (oldValue === _("action") || oldValue === "action") {
-                        this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
-                        this.blocks.setActionProtoVisibility(false);
-                    }
-                    this.blocks.renameNameddos(oldValue, newValue);
-                    this.blocks.palettes.hide();
-                    this.blocks.palettes.updatePalettes("action");
-                    this.blocks.palettes.show();
                     break;
                 case "storein":
                     // Check to see which connection we are using in

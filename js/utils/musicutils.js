@@ -3297,7 +3297,7 @@ const getTemperamentName = name => {
  * @returns {Array} An array containing the note, octave, and cents.
  */
 const noteToObj = note => {
-    let octave = parseInt(note.slice(note.length - 1));
+    let octave = parseInt(note.slice(note.length - 1), 10);
     if (isNaN(octave)) {
         octave = 4;
     } else {
@@ -4498,8 +4498,8 @@ const GetNotesForInterval = tur => {
             return { firstNote, secondNote: firstNote, octave };
         }
         secondNote = noteStatus[0][1].replace(/\d/g, "");
-        const octavea = parseInt(noteStatus[0][0].replace(/[^0-9]/g, ""));
-        const octaveb = parseInt(noteStatus[0][1].replace(/[^0-9]/g, ""));
+        const octavea = parseInt(noteStatus[0][0].replace(/[^0-9]/g, ""), 10);
+        const octaveb = parseInt(noteStatus[0][1].replace(/[^0-9]/g, ""), 10);
         octave = octaveb - octavea;
     } else if (notePitches) {
         const pitchBlk = notePitches[last(tur.singer.inNoteBlock)];
@@ -4606,7 +4606,10 @@ function getNote(
         // Could be mi#<sub>4</sub> (from matrix) or mi# (from note).
         if (noteArg.substr(-1) === ">") {
             // Read octave and solfege from HTML
-            octave = parseInt(noteArg.slice(noteArg.indexOf(">") + 1, noteArg.indexOf("/") - 1));
+            octave = parseInt(
+                noteArg.slice(noteArg.indexOf(">") + 1, noteArg.indexOf("/") - 1),
+                10
+            );
             noteArg = noteArg.substr(0, noteArg.indexOf("<"));
         }
         if (
@@ -6124,7 +6127,7 @@ const toFraction = d => {
             top += 1;
         } else {
             bot += 1;
-            top = parseInt(d * bot);
+            top = parseInt(d * bot, 10);
         }
         df = top / bot;
     }
@@ -6159,8 +6162,8 @@ const calcNoteValueToDisplay = (a, b) => {
     let value;
     let obj;
     let d0, d1;
-    if (parseInt(noteValue) < noteValue) {
-        noteValueToDisplay = parseInt(noteValue * 1.5);
+    if (parseInt(noteValue, 10) < noteValue) {
+        noteValueToDisplay = parseInt(noteValue * 1.5, 10);
         if (noteValueToDisplay in NSYMBOLS) {
             value = b / a; // * noteValueToDisplay;
             obj = toFraction(value);
@@ -6176,7 +6179,7 @@ const calcNoteValueToDisplay = (a, b) => {
                 NSYMBOLS[noteValueToDisplay] +
                 ".";
         } else {
-            noteValueToDisplay = parseInt(noteValue * 1.75);
+            noteValueToDisplay = parseInt(noteValue * 1.75, 10);
             if (noteValueToDisplay in NSYMBOLS) {
                 value = b / a; // * noteValueToDisplay;
                 obj = toFraction(value);
@@ -6677,7 +6680,7 @@ const calcOctaveInterval = arg => {
  * @returns {boolean} True if the value is an integer, false otherwise.
  */
 const isInt = value => {
-    return !isNaN(value) && parseInt(Number(value)) === value && !isNaN(parseInt(value, 10));
+    return !isNaN(value) && parseInt(Number(value), 10) === value && !isNaN(parseInt(value, 10));
 };
 
 /**

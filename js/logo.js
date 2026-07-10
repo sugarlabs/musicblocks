@@ -316,8 +316,8 @@ class Logo {
         } else {
             // Node.js / Jest environment — require the module
             try {
-                const { ManagedTimer: MT } = require("./utils/ManagedTimer");
-                this._timerManager = new MT();
+                const ManagedTimerCtor = require("./utils/ManagedTimer");
+                this._timerManager = new ManagedTimerCtor();
             } catch (e) {
                 // Fallback: create a minimal shim so the engine still works
                 this._timerManager = {
@@ -1040,6 +1040,21 @@ class Logo {
                 tur.delayParameters["flow"],
                 tur.delayParameters["arg"]
             );
+            tur.delayParameters = null;
+        } else if (tur._transportEventId !== null && this.synth.transport.isAvailable) {
+            this.synth.transport.clear(tur._transportEventId);
+            tur._transportEventId = null;
+            if (tur.delayParameters) {
+                tur._transportTime = this.synth.transport.seconds;
+                this.runFromBlockNow(
+                    this,
+                    turtle,
+                    tur.delayParameters["blk"],
+                    tur.delayParameters["flow"],
+                    tur.delayParameters["arg"]
+                );
+                tur.delayParameters = null;
+            }
         }
     }
 
@@ -1182,7 +1197,24 @@ class Logo {
             }
         }
 
+        // Cancel all Transport-scheduled events before synth.stop()
+        if (this.synth.transport.isAvailable) {
+            this.synth.transport.cancel();
+        }
+
+        // Reset per-turtle Transport scheduling state
+        for (const turtle of this.activity.turtles.turtleList) {
+            turtle._transportTime = null;
+            turtle._transportEventId = null;
+        }
+
         this.synth.stop();
+
+        // Reset Transport position for next run
+        if (this.synth.transport.isAvailable) {
+            this.synth.transport.seconds = 0;
+        }
+
         if (this.synth.recorder && this.synth.recorder.state === "recording")
             this.synth.recorder.stop();
 
@@ -1362,6 +1394,14 @@ class Logo {
         }
 
         this.prepSynths();
+
+        if (this.synth.transport.isAvailable) {
+            this.synth.transport.start();
+            const transportNow = this.synth.transport.seconds;
+            for (const turtle of this.activity.turtles.turtleList) {
+                turtle._transportTime = transportNow;
+            }
+        }
 
         this.notation.notationStaging = {};
         this.notation.notationDrumStaging = {};
@@ -1637,6 +1677,10 @@ class Logo {
 
         const tur = logo.turtles.ithTurtle(turtle);
 
+        if (tur._transportTime === null && logo.synth.transport.isAvailable) {
+            tur._transportTime = logo.synth.transport.seconds;
+        }
+
         const delay = logo.turtleDelay + tur.waitTime;
         tur.doWait(0);
 
@@ -1647,10 +1691,35 @@ class Logo {
                     logo.stepQueue[turtle] = [];
                 }
                 logo.stepQueue[turtle].push(blk);
+            } else if (
+                logo.turtleDelay === 0 &&
+                delay > 0 &&
+                logo.synth.transport.isAvailable &&
+                tur._transportTime !== null
+            ) {
+                const transportTime = tur._transportTime + delay / 1000;
+                tur.delayParameters = { blk: blk, flow: isflow, arg: receivedArg };
+                tur._transportEventId = logo.synth.transport.schedule(audioContextTime => {
+                    const tur2 = logo.activity.turtles.ithTurtle(turtle);
+                    tur2._transportTime = logo.synth.transport.getSecondsAtTime(audioContextTime);
+                    tur2._transportEventId = null;
+                    tur2.delayParameters = null;
+                    if (!logo.stopTurtle) {
+                        logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg);
+                    }
+                }, transportTime);
             } else {
                 tur.delayParameters = { blk: blk, flow: isflow, arg: receivedArg };
                 tur.delayTimeout = logo._timerManager.setGuardedTimeout(
-                    () => logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg),
+                    () => {
+                        if (logo.synth.transport.isAvailable) {
+                            const tur2 = logo.activity.turtles.ithTurtle(turtle);
+                            tur2._transportTime = logo.synth.transport.seconds;
+                        }
+                        tur.delayTimeout = null;
+                        tur.delayParameters = null;
+                        logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg);
+                    },
                     delay,
                     () => logo.stopTurtle
                 );

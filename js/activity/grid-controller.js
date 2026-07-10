@@ -156,19 +156,23 @@ class GridController {
         // Write back through the setter — keeps turtles.currentGrid in sync
         // via the single delegated path.
         this.currentGrid = next;
-        this.activity.update = true;
+        // refreshCanvas() sets stageDirty and starts the RAF loop so the grid
+        // appears immediately. Setting only activity.update = true is
+        // insufficient: the render loop checks stageDirty, and update is only
+        // converted to stageDirty inside __tick, which fires on UI events rather
+        // than continuously. Without this call the grid stays invisible until the
+        // user triggers another interaction.
+        this.activity.refreshCanvas();
     }
 }
 
 /**
  * Attaches a GridController instance and its public surface to the activity.
  *
- * Intended to be called after `activity.turtles` has been initialised so that
- * doCartesianPolar() has access to the turtles state it needs. doCartesianPolar()
- * still guards against a missing turtles reference as a safety net, but callers
- * should not rely on that guard for normal startup flow.
- * hideGrids() is safe to call at any time; it guards the setGridLabel call
- * internally.
+ * Must be called BEFORE `new Turtles(activity)` so that `activity._doCartesianPolar`
+ * is defined when TurtlesModel captures it during construction. Both
+ * doCartesianPolar() and hideGrids() guard against a missing turtles reference
+ * internally, so the controller itself is safe to construct before turtles exists.
  *
  * @param {object} activity - The Activity instance.
  */
