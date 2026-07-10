@@ -503,6 +503,22 @@ describe("widgetWindows", () => {
             expect(win._dy).toBe(40);
         });
 
+        test("touchstart while maximized restores the window and repositions from the touch point", () => {
+            const win = createTestWindow();
+            win._maximize();
+            win._drag.getBoundingClientRect = jest.fn(() => ({
+                left: 50,
+                top: 60,
+                right: 250,
+                bottom: 260
+            }));
+
+            win._nonclose.dispatchEvent(makeTouchEvent("touchstart", 80, 100));
+
+            expect(win._maximized).toBe(false);
+            expect(window.widgetWindows.draggingWindow).toBe(win);
+        });
+
         test("touchmove on the document repositions the dragging window", () => {
             const win = createTestWindow();
             win._drag.getBoundingClientRect = jest.fn(() => ({
