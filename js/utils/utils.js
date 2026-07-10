@@ -38,12 +38,12 @@ if (typeof module !== "undefined" && module.exports) {
 }
 
 /* exported
-   canvasPixelRatio, changeImage, closeBlkWidgets, closeWidgets,
+   announceToScreenReader,canvasPixelRatio, changeImage, closeBlkWidgets, closeWidgets,
    delayExecution, displayMsg, doBrowserCheck, docByClass, docByName,
    docBySelector, docByTagName, doPublish, doStopVideoCam, doSVG,
    doUseCamera, format, getTextWidth, hideDOMLabel, httpGet, httpPost, HttpRequest,
    importMembers, isSVGEmpty, prepareMacroExports, preparePluginExports,
-   processMacroData, processRawPluginData, windowHeight, windowWidth,
+   processMacroData, processPluginData, processRawPluginData, windowHeight, windowWidth,
    fnBrowserDetect, waitForReadiness
 */
 
@@ -438,52 +438,6 @@ function waitForReadiness(callback, options = {}) {
     // Start the readiness check loop
     requestAnimationFrame(check);
 }
-
-// Check for Internet Explorer
-
-window.addEventListener("load", () => {
-    const userAgent = window.navigator.userAgent;
-    // For IE 10 or older
-    const MSIE = userAgent.indexOf("MSIE ");
-    let DetectVersionOfIE;
-    if (MSIE > 0) {
-        DetectVersionOfIE = parseInt(
-            userAgent.substring(MSIE + 5, userAgent.indexOf(".", MSIE)),
-            10
-        );
-    }
-
-    // For IE 11
-    const IETrident = userAgent.indexOf("Trident/");
-    if (IETrident > 0) {
-        const IERv = userAgent.indexOf("rv:");
-        DetectVersionOfIE = parseInt(
-            userAgent.substring(IERv + 3, userAgent.indexOf(".", IERv)),
-            10
-        );
-    }
-
-    // For IE 12
-    const IEEDGE = userAgent.indexOf("Edge/");
-    if (IEEDGE > 0) {
-        DetectVersionOfIE = parseInt(
-            userAgent.substring(IEEDGE + 5, userAgent.indexOf(".", IEEDGE)),
-            10
-        );
-    }
-
-    if (typeof DetectVersionOfIE !== "undefined") {
-        document.body.innerHTML =
-            "<div style='margin: 200px;'>" +
-            "<h1 style='font-size: 100px; font-family: Arial; text-align: center; color: #F00;'>Music Blocks</h1>" +
-            "<h3 style='font-size: 40px; font-family: Arial; text-align: center;'>Music Blocks will not work in Internet Explorer, you can use:</h3>" +
-            "<div style='width: 550px; margin: 0 auto;'><a href='https://www.chromium.org/getting-involved/download-chromium' style='float: left; display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Chromium</a>" +
-            "<a href='https://www.google.com/chrome/' style='float: left; margin-left: 40px;display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Chrome</a>" +
-            "<a href='https://support.apple.com/downloads/safari' style='float: left; margin-left: 40px;display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Safari</a>" +
-            "<a href='https://www.mozilla.org/en-US/firefox/new/' style='float: left; margin-left: 40px;display: inherit; font-family: Arial; font-size: 30px; color: #0327F1; text-decoration: none;'>Firefox</a>" +
-            "</div></div>";
-    }
-});
 
 /**
  * Retrieves a collection of elements by class name.
@@ -953,10 +907,12 @@ window.__mb_plugin_registry["${registryName}"] = function(logo) {
         await new Promise((resolve, reject) => {
             script.onload = () => {
                 URL.revokeObjectURL(url);
+                document.head.removeChild(script);
                 resolve();
             };
             script.onerror = e => {
                 URL.revokeObjectURL(url);
+                document.head.removeChild(script);
                 console.error("Failed to load CSP Blob script for plugins", e);
                 reject(e);
             };
@@ -1010,10 +966,16 @@ window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivi
                     delete window.__mb_plugin_registry[registryName];
                 }
                 URL.revokeObjectURL(sUrl);
+                if (sScript.parentNode) {
+                    sScript.parentNode.removeChild(sScript);
+                }
                 resolve();
             };
             sScript.onerror = () => {
                 URL.revokeObjectURL(sUrl);
+                if (sScript.parentNode) {
+                    sScript.parentNode.removeChild(sScript);
+                }
                 resolve(); // Still resolve to let others run
             };
             document.head.appendChild(sScript);
@@ -1494,6 +1456,25 @@ let closeBlkWidgets = name => {
  * @param {*[]} viewArgs - Constructor arguments for the view.
  * @returns {void}
  */
+/**
+ * Announces a message to screen readers via a shared aria-live region.
+ * Creates the region lazily on first use and reuses it for all subsequent calls.
+ * @param {string} msg - The message to announce.
+ */
+const announceToScreenReader = msg => {
+    let region = document.getElementById("mbA11yLiveRegion");
+    if (!region) {
+        region = document.createElement("div");
+        region.id = "mbA11yLiveRegion";
+        region.setAttribute("role", "status");
+        region.setAttribute("aria-live", "polite");
+        region.setAttribute("aria-atomic", "true");
+        region.style.cssText =
+            "position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;";
+        document.body.appendChild(region);
+    }
+    region.textContent = msg;
+};
 let importMembers = (obj, className, modelArgs, viewArgs) => {
     /**
      * Adds methods and variables of one class to another class's instance.
@@ -1579,8 +1560,10 @@ if (typeof module !== "undefined" && module.exports) {
         doSVG,
         isSVGEmpty,
         prepareMacroExports,
+        processPluginData,
         processMacroData,
         hideDOMLabel,
-        displayMsg
+        displayMsg,
+        announceToScreenReader
     };
 }

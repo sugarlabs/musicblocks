@@ -295,7 +295,7 @@ class Oscilloscope {
         let width, height;
 
         const canvases = document.getElementsByClassName("oscilloscopeCanvas");
-        Array.prototype.forEach.call(canvases, ele => {
+        Array.from(canvases).forEach(ele => {
             this.widgetWindow.getWidgetBody().removeChild(ele);
         });
 

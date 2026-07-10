@@ -103,6 +103,7 @@ const getPieMenuSize = block => {
 // Debounce resize handler for performance
 let wheelResizeTimeout;
 let wheelResizeListenerAttached = false;
+let activeExitWheel = null;
 const debouncedSetWheelSize = () => {
     clearTimeout(wheelResizeTimeout);
     wheelResizeTimeout = setTimeout(setWheelSize, 150);
@@ -122,19 +123,85 @@ const disableWheelResizeHandling = () => {
     clearTimeout(wheelResizeTimeout);
 };
 
+const isInteractive = target => {
+    // 1. Check if inside number/text input label container
+    const labelDiv = docById("labelDiv");
+    if (labelDiv && typeof labelDiv.contains === "function" && labelDiv.contains(target)) {
+        return true;
+    }
+
+    // 2. Check if inside any of the pie menu containers and is a slice/title/icon (not the container or SVG root)
+    const containers = ["wheelDiv", "wheelDivptm", "chooseKeyDiv"];
+    for (let i = 0; i < containers.length; i++) {
+        const div = docById(containers[i]);
+        if (div && typeof div.contains === "function" && div.contains(target)) {
+            if (target !== div && target.tagName && target.tagName.toLowerCase() !== "svg") {
+                return true;
+            }
+        }
+    }
+
+    return false;
+};
+
+const handleOutsideClick = event => {
+    const wheelDiv = docById("wheelDiv");
+    const wheelDivptm = docById("wheelDivptm");
+    const wheelDivVisible = wheelDiv && wheelDiv.style.display !== "none";
+    const wheelDivptmVisible = wheelDivptm && wheelDivptm.style.display !== "none";
+
+    if (!wheelDivVisible && !wheelDivptmVisible) {
+        return;
+    }
+
+    if (!isInteractive(event.target)) {
+        if (
+            activeExitWheel &&
+            activeExitWheel.navItems &&
+            activeExitWheel.navItems[0] &&
+            typeof activeExitWheel.navItems[0].navigateFunction === "function"
+        ) {
+            activeExitWheel.navItems[0].navigateFunction();
+            document.removeEventListener("mousedown", handleOutsideClick);
+            activeExitWheel = null;
+        } else {
+            if (wheelDivVisible) {
+                hideWheelDiv();
+            } else if (wheelDivptmVisible) {
+                if (wheelDivptm) {
+                    wheelDivptm.style.display = "none";
+                }
+                document.removeEventListener("mousedown", handleOutsideClick);
+                activeExitWheel = null;
+            }
+        }
+    }
+};
+
 const showWheelDiv = () => {
     const wheelDiv = docById("wheelDiv");
     if (!wheelDiv) return null;
     wheelDiv.style.display = "";
     enableWheelResizeHandling();
+
+    setTimeout(() => {
+        if (wheelDiv.style.display !== "none") {
+            document.addEventListener("mousedown", handleOutsideClick);
+        }
+    }, 50);
+
     return wheelDiv;
 };
 
 const hideWheelDiv = () => {
     const wheelDiv = docById("wheelDiv");
     if (!wheelDiv) return null;
-    docById("wheelDiv").style.display = "none";
+    wheelDiv.style.display = "none";
     disableWheelResizeHandling();
+
+    document.removeEventListener("mousedown", handleOutsideClick);
+    activeExitWheel = null;
+
     return wheelDiv;
 };
 
@@ -213,6 +280,19 @@ const configureExitWheel = exitWheel => {
     if (!exitWheel || !exitWheel.navItems) {
         return;
     }
+    activeExitWheel = exitWheel;
+
+    // Register mousedown listener after 50ms if either wheel is visible
+    setTimeout(() => {
+        const wheelDiv = docById("wheelDiv");
+        const wheelDivptm = docById("wheelDivptm");
+        const isVisible =
+            (wheelDiv && wheelDiv.style.display !== "none") ||
+            (wheelDivptm && wheelDivptm.style.display !== "none");
+        if (isVisible) {
+            document.addEventListener("mousedown", handleOutsideClick);
+        }
+    }, 50);
 
     const clearSelection = () => {
         exitWheel.selectedNavItemIndex = null;
@@ -236,8 +316,14 @@ const configureExitWheel = exitWheel => {
         if (typeof item.navigateFunction === "function") {
             item.navigateFunction();
         }
+        document.removeEventListener("mousedown", handleOutsideClick);
+        if (activeExitWheel === exitWheel) {
+            activeExitWheel = null;
+        }
     };
 };
+
+window.configureExitWheel = configureExitWheel;
 
 /**
  * Builds the pitch selection pie menu with optional accidentals
@@ -4407,7 +4493,7 @@ const piemenuDissectNumber = widget => {
     // Determine wheel values based on beginner mode
     const wheelValues = isBeginnerMode ? [2, 3, 4] : [2, 3, 4, 5, 7];
 
-    const currentValue = parseInt(widget._dissectNumber.value) || 2;
+    const currentValue = parseInt(widget._dissectNumber.value, 10) || 2;
 
     // Show the wheel div
     showWheelDiv();
@@ -4511,7 +4597,7 @@ const piemenuDissectNumber = widget => {
 
     // Set up decrement button (-)
     exitWheel.navItems[1].navigateFunction = () => {
-        const currentVal = parseInt(widget._dissectNumber.value);
+        const currentVal = parseInt(widget._dissectNumber.value, 10);
         const currentIdx = wheelValues.indexOf(currentVal);
 
         // Move to previous value in the array, or stay at first
@@ -4523,7 +4609,7 @@ const piemenuDissectNumber = widget => {
 
     // Set up increment button (+)
     exitWheel.navItems[2].navigateFunction = () => {
-        const currentVal = parseInt(widget._dissectNumber.value);
+        const currentVal = parseInt(widget._dissectNumber.value, 10);
         const currentIdx = wheelValues.indexOf(currentVal);
 
         // Move to next value in the array, or stay at last

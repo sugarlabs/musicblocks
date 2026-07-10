@@ -588,7 +588,7 @@ class Palettes {
     deltaY(dy) {
         // Cache DOM element reference to avoid multiple lookups and forced reflow
         const palette = document.getElementById("palette");
-        const curr = parseInt(palette.style.top);
+        const curr = parseInt(palette.style.top, 10);
         palette.style.top = curr + dy + "px";
     }
 
@@ -601,13 +601,13 @@ class Palettes {
 
         if (this.collapsed) {
             palette.style.transform = "translateX(-100%)";
-            document.getElementById("paletteToggle").innerHTML = "▶";
+            document.getElementById("paletteToggle").textContent = "▶";
             document.getElementById("paletteToggle").setAttribute("aria-expanded", "false");
             palette.style.transition = "transform 0.3s ease";
             this.paletteWidth = 0;
         } else {
             palette.style.transform = "translateX(0)";
-            document.getElementById("paletteToggle").innerHTML = "◀";
+            document.getElementById("paletteToggle").textContent = "◀";
             document.getElementById("paletteToggle").setAttribute("aria-expanded", "true");
             this.paletteWidth = 55 * PALETTE_WIDTH_FACTOR;
         }
@@ -650,7 +650,7 @@ class Palettes {
             document.body.appendChild(element);
 
             const toggleBtn = document.createElement("div");
-            toggleBtn.innerHTML = "◀";
+            toggleBtn.textContent = "◀";
             toggleBtn.id = "paletteToggle";
             toggleBtn.setAttribute("role", "button");
             toggleBtn.setAttribute("aria-label", _("Toggle Palette"));
@@ -1518,8 +1518,10 @@ class Palette {
             let header = this.menuContainer.children[0];
             header = header.insertRow();
             header.style.backgroundColor = platformColor.paletteLabelBackground;
-            header.innerHTML =
-                '<td style ="width: 100%; height: 42px; box-sizing: border-box; display: flex; flex-direction: row; align-items: center; justify-content: space-between;"></td>';
+            const headerCell = document.createElement("td");
+            headerCell.style.cssText =
+                "width: 100%; height: 42px; box-sizing: border-box; display: flex; flex-direction: row; align-items: center; justify-content: space-between;";
+            header.appendChild(headerCell);
             header = header.children[0];
             header.style.padding = "8px";
 
@@ -1677,8 +1679,8 @@ class Palette {
                     img.onmouseup = null;
                     img.ontouchend = null;
 
-                    const x = parseInt(img.style.left);
-                    const y = parseInt(img.style.top);
+                    const x = parseInt(img.style.left, 10);
+                    const y = parseInt(img.style.top, 10);
 
                     img.style.position = posit;
                     img.style.zIndex = zInd;

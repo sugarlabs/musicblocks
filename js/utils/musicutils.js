@@ -1518,7 +1518,7 @@ const INTERVALVALUES = {
     "major 6": [9, 1, 5 / 3],
     "diminished 7": [9, -1, 9 / 5],
     "augmented 6": [10, 1, 125 / 72],
-    "minor 7": [10, -1, 9 / 5],
+    "minor 7": [10, -1, 16 / 9],
     "major 7": [11, 1, 15 / 8],
     "diminished 8": [11, -1, 48 / 25],
     "diminished octave": [11, -1, 48 / 25],
@@ -1643,7 +1643,7 @@ const PITCH_COLLECTIONS = {
     },
     6: {
         "minor blues": [3, 2, 1, 1, 3, 2],
-        "major blues": [2, 1, 1, 3, 2, 2],
+        "major blues": [2, 1, 1, 3, 2, 3],
         "whole tone": [2, 2, 2, 2, 2, 2]
     },
     5: {
@@ -3297,7 +3297,7 @@ const getTemperamentName = name => {
  * @returns {Array} An array containing the note, octave, and cents.
  */
 const noteToObj = note => {
-    let octave = parseInt(note.slice(note.length - 1));
+    let octave = parseInt(note.slice(note.length - 1), 10);
     if (isNaN(octave)) {
         octave = 4;
     } else {
@@ -4498,8 +4498,8 @@ const GetNotesForInterval = tur => {
             return { firstNote, secondNote: firstNote, octave };
         }
         secondNote = noteStatus[0][1].replace(/\d/g, "");
-        const octavea = parseInt(noteStatus[0][0].replace(/[^0-9]/g, ""));
-        const octaveb = parseInt(noteStatus[0][1].replace(/[^0-9]/g, ""));
+        const octavea = parseInt(noteStatus[0][0].replace(/[^0-9]/g, ""), 10);
+        const octaveb = parseInt(noteStatus[0][1].replace(/[^0-9]/g, ""), 10);
         octave = octaveb - octavea;
     } else if (notePitches) {
         const pitchBlk = notePitches[last(tur.singer.inNoteBlock)];
@@ -4606,7 +4606,10 @@ function getNote(
         // Could be mi#<sub>4</sub> (from matrix) or mi# (from note).
         if (noteArg.substr(-1) === ">") {
             // Read octave and solfege from HTML
-            octave = parseInt(noteArg.slice(noteArg.indexOf(">") + 1, noteArg.indexOf("/") - 1));
+            octave = parseInt(
+                noteArg.slice(noteArg.indexOf(">") + 1, noteArg.indexOf("/") - 1),
+                10
+            );
             noteArg = noteArg.substr(0, noteArg.indexOf("<"));
         }
         if (
@@ -6124,7 +6127,7 @@ const toFraction = d => {
             top += 1;
         } else {
             bot += 1;
-            top = parseInt(d * bot);
+            top = parseInt(d * bot, 10);
         }
         df = top / bot;
     }
@@ -6159,8 +6162,8 @@ const calcNoteValueToDisplay = (a, b) => {
     let value;
     let obj;
     let d0, d1;
-    if (parseInt(noteValue) < noteValue) {
-        noteValueToDisplay = parseInt(noteValue * 1.5);
+    if (parseInt(noteValue, 10) < noteValue) {
+        noteValueToDisplay = parseInt(noteValue * 1.5, 10);
         if (noteValueToDisplay in NSYMBOLS) {
             value = b / a; // * noteValueToDisplay;
             obj = toFraction(value);
@@ -6176,7 +6179,7 @@ const calcNoteValueToDisplay = (a, b) => {
                 NSYMBOLS[noteValueToDisplay] +
                 ".";
         } else {
-            noteValueToDisplay = parseInt(noteValue * 1.75);
+            noteValueToDisplay = parseInt(noteValue * 1.75, 10);
             if (noteValueToDisplay in NSYMBOLS) {
                 value = b / a; // * noteValueToDisplay;
                 obj = toFraction(value);
@@ -6257,15 +6260,19 @@ const durationToNoteValue = duration => {
  * @returns {Array} An array containing [noteName, octave].
  */
 const parseNoteString = note => {
-    // Regex to match note name (letter + optional accidental) and octave (one or more digits, optional negative sign)
-    // Pattern: [A-Ga-g] for note letter, [#b♯♭]? for optional accidental, (-?\d+) for octave (multi-digit, can be negative)
-    const match = note.match(/^([A-Ga-g][#b♯♭]?)(-?\d+)$/);
+    // Regex to match note name and octave (one or more digits, optional negative sign)
+    // Matches valid note prefixes (Western, Solfege, Carnatic) and optional accidentals followed by octave
+    const match = note.match(
+        /^((?:[a-g]|do|re|mi|fa|sol|la|ti|si|ut|sa|ga|ma|pa|dha|ni)(?:[#b♯♭𝄪𝄫x♮]*))(-?\d+)$/iu
+    );
     if (match) {
         return [match[1], Number(match[2])];
     }
     // Fallback to original behavior if regex doesn't match (for edge cases)
     const len = note.length;
-    return [note.substring(0, len - 1), Number(last(note))];
+    const lastChar = note.charAt(len - 1);
+    const octave = lastChar && !isNaN(lastChar) ? Number(lastChar) : NaN;
+    return [note.substring(0, len - 1), octave];
 };
 
 /**
@@ -6594,17 +6601,11 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote) => {
 
     if (halfSteps <= 5 || isNaN(halfSteps)) {
         changedCurrent = currentOctave;
-    }
-
-    if (halfSteps > 5 && halfStepsUp > 5 && halfStepsDown < 5) {
+    } else if (halfStepsDown <= halfStepsUp) {
         changedCurrent = Math.max(currentOctave - 1, 1);
-    }
-
-    if (halfSteps > 5 && halfStepsUp < 5 && halfStepsDown > 5) {
+    } else if (halfStepsUp < halfStepsDown) {
         changedCurrent = Math.min(currentOctave + 1, 9);
-    }
-
-    if (halfSteps > 5 && halfStepsUp > 5 && halfStepsDown > 5) {
+    } else {
         changedCurrent = currentOctave;
     }
 
@@ -6679,7 +6680,7 @@ const calcOctaveInterval = arg => {
  * @returns {boolean} True if the value is an integer, false otherwise.
  */
 const isInt = value => {
-    return !isNaN(value) && parseInt(Number(value)) === value && !isNaN(parseInt(value, 10));
+    return !isNaN(value) && parseInt(Number(value), 10) === value && !isNaN(parseInt(value, 10));
 };
 
 /**
@@ -6689,6 +6690,12 @@ const isInt = value => {
  * @returns {string} The converted note.
  */
 const convertFromSolfege = note => {
+    if (typeof note === "string") {
+        const unicodeNote = note.replace("#", SHARP).replace("b", FLAT);
+        if (unicodeNote in FIXEDSOLFEGE1) {
+            note = FIXEDSOLFEGE1[unicodeNote];
+        }
+    }
     // Convert to common letter class
     if (note in FIXEDSOLFEGE1) {
         note = FIXEDSOLFEGE1[note];

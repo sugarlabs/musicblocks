@@ -705,7 +705,7 @@ class RhythmRuler {
             if (event.keyCode === 13 || event.key === "Enter") {
                 event.preventDefault();
                 event.stopPropagation();
-                const inputValue = parseInt(this._dissectNumber.value);
+                const inputValue = parseInt(this._dissectNumber.value, 10);
                 if (!isNaN(inputValue) && inputValue > 0) {
                     // Validate the input value - allow any number from 2 to 128
                     const validatedValue = Math.min(Math.max(inputValue, 2), 128);

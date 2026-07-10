@@ -511,7 +511,7 @@ function AIDebuggerWidget() {
         typingIndicators.forEach(indicator => {
             const animationId = indicator.getAttribute("data-animation-id");
             if (animationId) {
-                clearInterval(parseInt(animationId));
+                clearInterval(parseInt(animationId, 10));
             }
             indicator.remove();
         });

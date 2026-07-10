@@ -281,6 +281,7 @@ class Block {
         this.collapsed = false; // Is this collapsible block collapsed?
         this.inCollapsed = false; // Is this block in a collapsed stack?
         this.trash = false; // Is this block in the trash?
+        this._viewportVisible = true; // Is this block within the current viewport?
         this.loadComplete = false; // Has the block finished loading?
         this.label = null; // Editable textview in DOM.
         this.labelattr = null; // Editable textview in DOM.
@@ -608,6 +609,38 @@ class Block {
      */
     copySize() {
         this.size = this.protoblock.size;
+    }
+
+    hasCapability(name) {
+        if (this.protoblock && typeof this.protoblock.hasCapability === "function") {
+            return this.protoblock.hasCapability(name);
+        }
+
+        if (
+            this.protoblock &&
+            this.protoblock.capabilities &&
+            Object.prototype.hasOwnProperty.call(this.protoblock.capabilities, name)
+        ) {
+            return !!this.protoblock.capabilities[name];
+        }
+
+        return false;
+    }
+
+    getCapability(name) {
+        if (this.protoblock && typeof this.protoblock.getCapability === "function") {
+            return this.protoblock.getCapability(name);
+        }
+
+        if (
+            this.protoblock &&
+            this.protoblock.capabilities &&
+            Object.prototype.hasOwnProperty.call(this.protoblock.capabilities, name)
+        ) {
+            return this.protoblock.capabilities[name];
+        }
+
+        return undefined;
     }
 
     /**
@@ -1545,6 +1578,25 @@ class Block {
                 label = getNoiseName(this.value);
             } else if (this.name === "outputtools") {
                 label = this.overrideName;
+                if (label === null || label === undefined) {
+                    label = this.protoblock.staticLabels[0];
+                }
+                label = _(label);
+            } else if (this.name === "intervalname") {
+                if (this.value !== null) {
+                    if (this.value === "perfect 1") {
+                        label = _("unison");
+                    } else {
+                        const parts = this.value.toString().split(" ");
+                        if (parts.length === 2) {
+                            label = _(parts[0]) + " " + parts[1];
+                        } else {
+                            label = _(this.value.toString());
+                        }
+                    }
+                } else {
+                    label = "???";
+                }
             } else if (this.name === "grid") {
                 label = _(this.value);
             } else {
@@ -1997,6 +2049,7 @@ class Block {
         // If it is not in the trash and not in collapsed, then show it.
         if (!this.trash && !this.inCollapsed) {
             this.container.visible = true;
+            this._viewportVisible = true;
             if (this.isCollapsible()) {
                 if (this.collapsed) {
                     this.bitmap.visible = false;
@@ -2273,12 +2326,20 @@ class Block {
             // CRITICAL FIX: PRESERVE GIF
             const src = image.src || "";
 
-            if (src.startsWith("data:image/gif")) {
-                //DO NOT cache GIF , keeps animation
+            if (src.startsWith("data:image/gif") || src.toLowerCase().endsWith(".gif")) {
+                // DO NOT cache GIF , keeps animation
                 that.value = src;
                 that.imageBitmap = bitmap;
             } else {
-                const bounds = myContainer.getBounds();
+                let bounds = myContainer.getBounds();
+                if (!bounds) {
+                    bounds = {
+                        x: 0,
+                        y: 0,
+                        width: (image.naturalWidth || image.width) * bitmap.scaleX,
+                        height: (image.naturalHeight || image.height) * bitmap.scaleY
+                    };
+                }
                 myContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
                 that.value = myContainer.bitmapCache.getCacheDataURL();
                 that.imageBitmap = bitmap;
@@ -3251,6 +3312,13 @@ class Block {
             // Cache the drag group once on mousedown instead of
             // recomputing the tree traversal on every pressmove.
             that.blocks.cacheDragGroup(thisBlock);
+            // Track the drag group for viewport culling exemption during drag,
+            // so off-screen stack siblings remain visible while being dragged
+            // into view (avoids "pop-in" on release).
+            const group = that.blocks._cachedDragGroup;
+            if (group && group.length > 0) {
+                that.blocks._dragActiveGroup = new Set(group);
+            }
             // Invalidate the top-block cache since a drag may
             // disconnect blocks, changing the topology.
             that.blocks.invalidateTopBlockCache();
@@ -3310,6 +3378,14 @@ class Block {
                 );
                 if (movedDx + movedDy > 5) {
                     moved = true;
+                    // Announce block drag to screen readers (screen reader only, no visual message)
+                    if (!that._announced) {
+                        that._announced = true;
+                        const blockLabel =
+                            (that.protoblock.staticLabels && that.protoblock.staticLabels[0]) ||
+                            that.name;
+                        announceToScreenReader(_("picked up") + " " + blockLabel);
+                    }
                 }
             } else {
                 // Make it easier to select text on mobile.
@@ -3484,6 +3560,7 @@ class Block {
             // Clear cached drag state.
             _dragHasRest2 = false;
             moved = false;
+            that._announced = false;
         });
         // Touch long-press to open context menu
         this.container.on("touchstart", () => {
@@ -3859,7 +3936,7 @@ class Block {
             el.type = "text";
 
             // Ensure it is the child of labelElem
-            labelElem.innerHTML = "";
+            labelElem.textContent = "";
             labelElem.appendChild(el);
 
             this.label = el;
@@ -4433,7 +4510,7 @@ class Block {
                 el.step = "any";
 
                 // Ensure it is the child of labelElem
-                labelElem.innerHTML = "";
+                labelElem.textContent = "";
                 labelElem.appendChild(el);
 
                 this.label = el;
@@ -4882,6 +4959,11 @@ class Block {
                     this.blocks.palettes.hide();
                     this.blocks.palettes.updatePalettes("action");
                     this.blocks.palettes.show();
+                    // Force-open the action palette so the newly created
+                    // action block is immediately visible to the user.
+                    if (closeInput) {
+                        this.blocks.palettes.showPalette("action");
+                    }
                     break;
                 case "storein":
                     // Check to see which connection we are using in
