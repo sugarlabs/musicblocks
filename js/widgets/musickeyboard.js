@@ -25,7 +25,7 @@
     - lib/wheelnav
         slicePath, wheelnav
     - js/utils/utils.js
-        _, docById, last
+        _, docById, last, debugLog
     - js/turtle-singer.js
         Singer
     - js/utils/musicutils.js
@@ -2317,7 +2317,7 @@ function MusicKeyboard(activity) {
                     ]);
                     break;
                 default:
-                    console.log("Nothing to do for " + label);
+                    debugLog("Nothing to do for " + label);
             }
 
             let aboveBlock = -1;
@@ -2352,7 +2352,7 @@ function MusicKeyboard(activity) {
                         key.objId; //convet solfege to alphabetic.
                 }, 500);
             } else {
-                console.log("Could not find anywhere to insert new block.");
+                debugLog("Could not find anywhere to insert new block.");
             }
         };
 
