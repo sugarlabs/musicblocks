@@ -167,6 +167,9 @@ function makeSynth() {
             get isAvailable() {
                 return false;
             },
+            get state() {
+                return "stopped";
+            },
             get isClockRunning() {
                 return false;
             },
@@ -1014,6 +1017,10 @@ describe("Logo doStopTurtles", () => {
                     get isAvailable() {
                         return typeof global.Tone !== "undefined" && !!global.Tone.Transport;
                     },
+                    get state() {
+                        if (this.isAvailable) return global.Tone.Transport.state;
+                        return "stopped";
+                    },
                     get isClockRunning() {
                         if (this.isAvailable && global.Tone.context) {
                             return global.Tone.context.state === "running";
@@ -1340,6 +1347,43 @@ describe("Logo runFromBlock", () => {
 
         test("falls back to setTimeout when Transport is unavailable", () => {
             global.Tone = { ...savedTone, Transport: undefined };
+            timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
+                fn();
+                return 5;
+            });
+
+            logo.runFromBlockNow = jest.fn();
+            logo.turtleDelay = 0;
+            logo.stopTurtle = false;
+            turtle0.waitTime = 200;
+
+            logo.runFromBlock(logo, 0, 3, 1, "x");
+
+            expect(timeoutSpy).toHaveBeenCalled();
+            expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, 3, 1, "x");
+        });
+
+        test("falls back to setTimeout when Transport is stopped", () => {
+            global.Tone = {
+                ...savedTone,
+                context: {
+                    get state() {
+                        return "running";
+                    }
+                },
+                Transport: {
+                    start: jest.fn(),
+                    stop: jest.fn(),
+                    state: "stopped",
+                    schedule: jest.fn(),
+                    cancel: jest.fn(),
+                    getSecondsAtTime: jest.fn(),
+                    get seconds() {
+                        return 0;
+                    },
+                    set seconds(v) {}
+                }
+            };
             timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
                 fn();
                 return 5;
