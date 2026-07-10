@@ -17,6 +17,18 @@ Globals location
 _, docById
 */
 
+/**
+ * Normalizes a MouseEvent/TouchEvent into a {clientX, clientY} point so drag
+ * handlers can share one code path for mouse and touch input.
+ * @param {MouseEvent|TouchEvent} e
+ * @returns {{clientX: number, clientY: number}}
+ */
+function _pointFromEvent(e) {
+    if (e.touches && e.touches.length) return e.touches[0];
+    if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0];
+    return e;
+}
+
 window.widgetWindows = {
     openWindows: {},
     _posCache: {},
@@ -222,10 +234,20 @@ window.widgetWindows = {
         this._boundHandleGlobalMouseDown = this._handleGlobalMouseDown.bind(this);
         this._boundHandleGlobalKeyDown = this._handleGlobalKeyDown.bind(this);
         this._boundHandleResize = this._handleResize.bind(this);
+        this._boundHandleGlobalTouchMove = this._handleGlobalTouchMove.bind(this);
+        this._boundHandleGlobalTouchEnd = this._handleGlobalTouchEnd.bind(this);
 
         document.addEventListener("mouseup", this._boundHandleGlobalMouseUp, true);
         document.addEventListener("mousemove", this._boundHandleGlobalMouseMove, true);
         document.addEventListener("mousedown", this._boundHandleGlobalMouseDown, true);
+        // Touch counterparts so widget windows can be dragged on touch/mobile
+        // devices, which never fire mouse events.
+        document.addEventListener("touchend", this._boundHandleGlobalTouchEnd, true);
+        document.addEventListener("touchcancel", this._boundHandleGlobalTouchEnd, true);
+        document.addEventListener("touchmove", this._boundHandleGlobalTouchMove, {
+            capture: true,
+            passive: false
+        });
         // Use capture phase (true) to handle keyboard shortcuts before individual
         // widgets can intercept them via stopPropagation().
         document.addEventListener("keydown", this._boundHandleGlobalKeyDown, true);
@@ -238,7 +260,18 @@ window.widgetWindows = {
             this.draggingWindow._docMouseMoveHandler(e);
         }
     },
+    _handleGlobalTouchMove(e) {
+        if (this.draggingWindow) {
+            this.draggingWindow._docMouseMoveHandler(e);
+        }
+    },
     _handleGlobalMouseUp(e) {
+        if (this.draggingWindow) {
+            this.draggingWindow._dragTopHandler(e);
+            this.draggingWindow = null;
+        }
+    },
+    _handleGlobalTouchEnd(e) {
         if (this.draggingWindow) {
             this.draggingWindow._dragTopHandler(e);
             this.draggingWindow = null;
@@ -402,15 +435,35 @@ class WidgetWindow {
         titleEl.id = `${this._key}WidgetID`;
         this._frame.setAttribute("aria-labelledby", titleEl.id);
 
-        this._nonclose.onmousedown = e => {
+        const startDrag = (point, e) => {
             window.widgetWindows.draggingWindow = this;
+            if (this._maximized) {
+                // Perform special repositioning to make the drag feel right when
+                // restoring a window from maximized.
+                let bcr = this._drag.getBoundingClientRect();
+                let dx = (bcr.left - point.clientX) / (bcr.right - bcr.left);
+                const dy = bcr.top - point.clientY;
+
+                this._restore();
+                this.onmaximize();
+
+                bcr = this._drag.getBoundingClientRect();
+                dx *= bcr.right - bcr.left;
+                this.setPosition(point.clientX + dx, point.clientY + dy);
+            }
 
             this.takeFocus();
 
-            this._dx = e.clientX - this._drag.getBoundingClientRect().left;
-            this._dy = e.clientY - this._drag.getBoundingClientRect().top;
+            this._dx = point.clientX - this._drag.getBoundingClientRect().left;
+            this._dy = point.clientY - this._drag.getBoundingClientRect().top;
             e.preventDefault();
         };
+
+        this._nonclose.onmousedown = e => startDrag(e, e);
+        // Touch counterpart so the title bar can be dragged on touch/mobile devices.
+        this._nonclose.addEventListener("touchstart", e => startDrag(_pointFromEvent(e), e), {
+            passive: false
+        });
 
         this._nonclosebuttons = this._create("div", "nonclosebuttons", this._nonclose);
         this._nonclosebuttons.style.display = "flex";
@@ -518,14 +571,16 @@ class WidgetWindow {
         if (this._rafTicking) return;
         this._rafTicking = true;
 
+        const point = _pointFromEvent(e);
+
         requestAnimationFrame(() => {
             if (this._fullscreenEnabled && this._frame.style.top === "64px") {
                 this._overlay(true);
             } else {
                 this._overlay(false);
             }
-            const x = e.clientX - this._dx,
-                y = e.clientY - this._dy;
+            const x = point.clientX - this._dx,
+                y = point.clientY - this._dy;
 
             this.setPosition(x, y);
             this._rafTicking = false;
