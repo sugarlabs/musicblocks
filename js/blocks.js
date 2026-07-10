@@ -4488,7 +4488,7 @@ class Blocks {
                     continue;
                 }
                 const blkParent = this.blockList[myBlock.connections[0]];
-                if (blkParent === null) {
+                if (!blkParent) {
                     continue;
                 }
 
@@ -4550,15 +4550,17 @@ class Blocks {
                         this.blockList[blk].name
                     )
                 ) {
-                    if (this.blockList[blk].privateData === oldName) {
-                        this.blockList[blk].privateData = newName;
-                        let label = newName;
-                        if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                            label = label.substr(0, STRINGLEN) + "...";
-                        }
+                    const targetBlock = this.blockList[blk];
 
-                        this.blockList[blk].overrideName = label;
-                        this.blockList[blk].regenerateArtwork();
+                    let activeName = targetBlock.privateData || targetBlock.overrideName;
+                    if (!activeName && targetBlock.protoblock && targetBlock.protoblock.defaults) {
+                        activeName = targetBlock.protoblock.defaults[0];
+                    }
+
+                    if (activeName === oldName) {
+                        targetBlock.privateData = newName;
+                        targetBlock.overrideName = newName;
+                        targetBlock.regenerateArtwork();
                     }
                 }
             }
@@ -7662,6 +7664,25 @@ class Blocks {
                 closeBlkWidgets(_(title));
                 this.activity.refreshCanvas();
             }
+
+            // Announce block sent to trash to screen readers (aria-live only, no visual message)
+            const blockLabel =
+                (myBlock.protoblock.staticLabels && myBlock.protoblock.staticLabels[0]) ||
+                myBlock.name;
+            const liveRegion =
+                document.getElementById("mbA11yLiveRegion") ||
+                (() => {
+                    const r = document.createElement("div");
+                    r.id = "mbA11yLiveRegion";
+                    r.setAttribute("role", "status");
+                    r.setAttribute("aria-live", "polite");
+                    r.setAttribute("aria-atomic", "true");
+                    r.style.cssText =
+                        "position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;";
+                    document.body.appendChild(r);
+                    return r;
+                })();
+            liveRegion.textContent = blockLabel + " " + _("block sent to trash");
 
             /** Adjust the stack from which we just deleted blocks. */
             if (parentBlock !== null) {

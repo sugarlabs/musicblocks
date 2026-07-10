@@ -1512,6 +1512,77 @@ describe("Utility Functions (logic-only)", () => {
         });
     });
 
+    describe("_performNotes glide/portamento setNote routing ", () => {
+        it("should call setNote (continuous glide) instead of triggerAttackRelease when doPortamento and setNote are true", async () => {
+            const mockSynth = {
+                oscillator: {},
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn(),
+                setNote: jest.fn(),
+                chain: jest.fn().mockReturnThis(),
+                disconnect: jest.fn(),
+                connect: jest.fn()
+            };
+            Synth.inTemperament = "equal";
+
+            const paramsEffects = {
+                doPortamento: true,
+                portamento: 0.05
+            };
+
+            await _performNotes.call(Synth, mockSynth, "D4", 0.5, paramsEffects, null, true, 0);
+
+            // This is the regression check: glide notes must continue the same
+            // voice via setNote, not retrigger a fresh attack+release.
+            expect(mockSynth.setNote).toHaveBeenCalledWith("D4");
+            expect(mockSynth.triggerAttackRelease).not.toHaveBeenCalled();
+        });
+
+        it("should still call triggerAttackRelease for a portamento note when setNote is false", async () => {
+            const mockSynth = {
+                oscillator: {},
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn(),
+                setNote: jest.fn(),
+                chain: jest.fn().mockReturnThis(),
+                disconnect: jest.fn(),
+                connect: jest.fn()
+            };
+            Synth.inTemperament = "equal";
+
+            const paramsEffects = {
+                doPortamento: true,
+                portamento: 0.05
+            };
+
+            await _performNotes.call(Synth, mockSynth, "C4", 0.5, paramsEffects, null, false, 0);
+
+            // Non-continuation notes (setNote=false) should still play normally.
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+            expect(mockSynth.setNote).not.toHaveBeenCalled();
+        });
+
+        it("should route plain (non-portamento) notes through the fast path unaffected", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn(),
+                setNote: jest.fn()
+            };
+            Synth.inTemperament = "equal";
+
+            const paramsEffects = {
+                doPartials: true,
+                partials: [1]
+            };
+
+            await _performNotes.call(Synth, mockSynth, "E4", 0.5, paramsEffects, null, true, 0);
+
+            // No portamento involved — fast path is fine here, no regression expected.
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+            expect(mockSynth.setNote).not.toHaveBeenCalled();
+        });
+    });
+
     describe("_performNotes effects routing and cleanup", () => {
         it("should reconnect synth to destination and disconnect old routing when effects complete", async () => {
             jest.useFakeTimers();

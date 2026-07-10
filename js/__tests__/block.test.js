@@ -118,7 +118,8 @@ describe("Block Foundation", () => {
             image: "forward.svg",
             size: 1,
             docks: [],
-            hidden: false
+            hidden: false,
+            capabilities: Object.create(null)
         };
     });
 
@@ -170,6 +171,23 @@ describe("Block Foundation", () => {
             mockProtoBlock.name = "forward";
             const block2 = new Block(mockProtoBlock, mockBlocks);
             expect(block2.isInlineCollapsible()).toBe(false);
+        });
+
+        it("hasCapability() should read protoblock capability metadata", () => {
+            mockProtoBlock.capabilities.collapsible = true;
+            mockProtoBlock.capabilities.specialInput = true;
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.hasCapability("collapsible")).toBe(true);
+            expect(block.getCapability("specialInput")).toBe(true);
+        });
+
+        it("should return falsey values when capability metadata is absent", () => {
+            mockProtoBlock.capabilities = Object.create(null);
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.hasCapability("collapsible")).toBe(false);
+            expect(block.getCapability("collapsible")).toBeUndefined();
         });
 
         it("copySize() should sync size from protoblock", () => {
@@ -340,10 +358,20 @@ describe("Block Foundation", () => {
         });
     });
 
-    describe("Action palette refresh on rename", () => {
-        it("should call showPalette('action') when closeInput is true and action is renamed", () => {
-            const showPalette = jest.fn();
-            const mockBlocksForRename = {
+    describe("Action label changed behavior", () => {
+        let mockBlocksForRename;
+        let showPalette;
+        let removeActionPrototype;
+        let findUniqueActionName;
+        let originalDocById;
+        let block;
+
+        beforeEach(() => {
+            showPalette = jest.fn();
+            removeActionPrototype = jest.fn();
+            findUniqueActionName = jest.fn().mockImplementation(name => name);
+
+            mockBlocksForRename = {
                 activity: { refreshCanvas: jest.fn() },
                 blockList: [],
                 palettes: {
@@ -351,55 +379,71 @@ describe("Block Foundation", () => {
                     show: jest.fn(),
                     updatePalettes: jest.fn(),
                     showPalette,
+                    removeActionPrototype,
                     dict: {
                         action: { protoList: [] }
                     }
                 },
                 newNameddoBlock: jest.fn(),
+                findUniqueActionName,
                 setActionProtoVisibility: jest.fn(),
                 renameNameddos: jest.fn(),
+                renameDos: jest.fn(),
                 actionMetadata: jest.fn().mockReturnValue({ hasReturn: false, hasArgs: false })
             };
 
-            const block = new Block(
-                { name: "text", image: "", size: 1, docks: [] },
-                mockBlocksForRename
-            );
+            block = new Block({ name: "text", image: "", size: 1, docks: [] }, mockBlocksForRename);
             block.name = "text";
-            block.value = "myAction";
             block.blockIndex = 0;
+            block.connections = [1];
+            block.text = { text: "" };
+            block.container = { setChildIndex: jest.fn(), children: [] };
+            block.updateCache = jest.fn();
 
-            // Simulate the internal _labelChanged path for "action" case
             const cblock = { name: "action", connections: [null, 0] };
             mockBlocksForRename.blockList[0] = block;
+            mockBlocksForRename.blockList[1] = cblock;
 
-            // Directly invoke the label-change logic for "action" case
-            const oldValue = "action";
-            const newValue = "myAction";
-            const closeInput = true;
-
-            mockBlocksForRename.newNameddoBlock(newValue, false, false);
-            mockBlocksForRename.setActionProtoVisibility(false);
-            mockBlocksForRename.renameNameddos(oldValue, newValue);
-            mockBlocksForRename.palettes.hide();
-            mockBlocksForRename.palettes.updatePalettes("action");
-            mockBlocksForRename.palettes.show();
-            if (closeInput) {
-                mockBlocksForRename.palettes.showPalette("action");
-            }
-
-            expect(showPalette).toHaveBeenCalledWith("action");
+            originalDocById = global.docById;
+            global.docById = jest.fn().mockReturnValue({ style: {} });
         });
 
-        it("should NOT call showPalette when closeInput is false", () => {
-            const showPalette = jest.fn();
-            const closeInput = false;
+        afterEach(() => {
+            global.docById = originalDocById;
+        });
 
-            if (closeInput) {
-                showPalette("action");
-            }
+        it("should call showPalette('action') and NOT call removeActionPrototype when oldValue === newValue and closeInput is true", () => {
+            block.value = "myAction";
+            block.label = { value: "myAction", style: { display: "" } };
 
-            expect(showPalette).not.toHaveBeenCalled();
+            block._labelChanged(true, true);
+
+            expect(mockBlocksForRename.palettes.updatePalettes).toHaveBeenCalledWith("action");
+            expect(showPalette).toHaveBeenCalledWith("action");
+            expect(removeActionPrototype).not.toHaveBeenCalled();
+        });
+
+        it("should call findUniqueActionName with parent index and removeActionPrototype when oldValue !== newValue", () => {
+            block.value = "oldAction";
+            block.label = { value: "newAction", style: { display: "" } };
+
+            block._labelChanged(true, true);
+
+            expect(removeActionPrototype).toHaveBeenCalledWith("oldAction");
+            expect(findUniqueActionName).toHaveBeenCalledWith("newAction", 1);
+            expect(mockBlocksForRename.palettes.updatePalettes).toHaveBeenCalledWith("action");
+            expect(showPalette).toHaveBeenCalledWith("action");
+            expect(mockBlocksForRename.activity.refreshCanvas).toHaveBeenCalled();
+        });
+
+        it("should NOT call renameNameddos or updatePalettes when closeInput is false", () => {
+            block.value = "oldAction";
+            block.label = { value: "newAction", style: { display: "" } };
+
+            block._labelChanged(false, true);
+
+            expect(mockBlocksForRename.renameNameddos).not.toHaveBeenCalled();
+            expect(mockBlocksForRename.palettes.updatePalettes).not.toHaveBeenCalled();
         });
     });
 

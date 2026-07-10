@@ -390,7 +390,7 @@ class ToolbarUI {
             const elem = docById(obj[0]);
             if (strings[i].length === 3) {
                 if (elem !== undefined && elem !== null) {
-                    elem.innerHTML = obj[1];
+                    elem.textContent = obj[1];
                 }
             } else {
                 if (elem !== undefined && elem !== null) {
@@ -457,8 +457,12 @@ class ToolbarUI {
     renderLogoIcon(onclick) {
         const logoIcon = docById("mb-logo");
         if (this.language === "ja") {
-            logoIcon.innerHTML =
-                '<img style="width: 100%; transform: scale(0.85);" src="images/logo-ja.svg">';
+            logoIcon.textContent = "";
+            const logoImg = document.createElement("img");
+            logoImg.style.width = "100%";
+            logoImg.style.transform = "scale(0.85)";
+            logoImg.src = "images/logo-ja.svg";
+            logoIcon.appendChild(logoImg);
         }
 
         logoIcon.onmouseenter = () => {
@@ -763,7 +767,10 @@ class ToolbarUI {
 
         themes.forEach(theme => {
             if (safeStorageGet("themePreference") === theme) {
-                icon.innerHTML = docById(theme).innerHTML;
+                icon.textContent = "";
+                Array.from(docById(theme).childNodes).forEach(node =>
+                    icon.appendChild(node.cloneNode(true))
+                );
             }
         });
 
@@ -1042,7 +1049,11 @@ class ToolbarUI {
             Record.classList.remove("hide");
             Record.style.display = "block";
         }
-        Record.innerHTML = `<i class="material-icons main">${RECORDBUTTON}</i>`;
+        Record.textContent = "";
+        const recordIcon = document.createElement("i");
+        recordIcon.className = "material-icons main";
+        recordIcon.textContent = RECORDBUTTON;
+        Record.appendChild(recordIcon);
 
         // Remove any existing onclick handler
         Record.onclick = null;
@@ -1059,7 +1070,12 @@ class ToolbarUI {
                 RecordDropdownArrow.classList.remove("hide");
                 RecordDropdownArrow.style.display = "block";
             }
-            RecordDropdownArrow.innerHTML = `<i class="material-icons main" style="font-size: 28px;">arrow_drop_down</i>`;
+            RecordDropdownArrow.textContent = "";
+            const arrowIcon = document.createElement("i");
+            arrowIcon.className = "material-icons main";
+            arrowIcon.style.fontSize = "28px";
+            arrowIcon.textContent = "arrow_drop_down";
+            RecordDropdownArrow.appendChild(arrowIcon);
 
             // Create handler function for arrow click
             const arrowClickHandler = () => {
@@ -1191,12 +1207,12 @@ class ToolbarUI {
             if (auxToolbar.style.display === "" || auxToolbar.style.display === "none") {
                 onclick(this.activity, false);
                 auxToolbar.style.display = "block";
-                menuIcon.innerHTML = "more_vert";
+                menuIcon.textContent = "more_vert";
                 this._setAuxToolbarButtonState(true);
             } else {
                 onclick(this.activity, true);
                 auxToolbar.style.display = "none";
-                menuIcon.innerHTML = "menu";
+                menuIcon.textContent = "menu";
                 this._setAuxToolbarButtonState(false);
                 docById("chooseKeyDiv").style.display = "none";
                 docById("movable").style.display = "none";
@@ -2260,7 +2276,7 @@ class ToolbarUI {
             onclick(this.activity, false);
             const menuIcon = docById("menu");
             auxToolbar.style.display = "none";
-            menuIcon.innerHTML = "menu";
+            menuIcon.textContent = "menu";
             this._setAuxToolbarButtonState(false);
         }
     };

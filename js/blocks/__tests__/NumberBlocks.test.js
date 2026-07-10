@@ -283,6 +283,19 @@ describe("setupNumberBlocks", () => {
             expect(result).toEqual(0);
             global.MathUtility.doMod = (a, b) => Number(a) % Number(b);
         });
+
+        it("should call errorMsg with ZERODIVIDEERRORMSG when MathUtility.doMod throws DivByZeroError", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2"] };
+            logo.parseArg = jest.fn(() => 5);
+            global.MathUtility.doMod = () => {
+                throw new Error("DivByZeroError");
+            };
+            const modBlock = createdBlocks["mod"];
+            const result = modBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.ZERODIVIDEERRORMSG, 110);
+            expect(result).toEqual(0);
+            global.MathUtility.doMod = (a, b) => Number(a) % Number(b);
+        });
     });
 
     describe("PowerBlock - extra branches", () => {
