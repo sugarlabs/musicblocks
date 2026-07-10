@@ -4928,24 +4928,20 @@ class Block {
                             const isDefaultAction =
                                 oldValue === _("action") || oldValue === "action";
 
-                            if (isDefaultAction) {
-                                this.blocks.newNameddoBlock(
-                                    newValue,
-                                    metadata.hasReturn,
-                                    metadata.hasArgs
-                                );
-                                this.blocks.setActionProtoVisibility(false);
-                            }
-
                             this.blocks.newNameddoBlock(
                                 newValue,
                                 metadata.hasReturn,
                                 metadata.hasArgs
                             );
+
+                            if (isDefaultAction) {
+                                this.blocks.setActionProtoVisibility(false);
+                            }
+
                             const blockPalette = this.blocks.palettes.dict["action"];
                             for (let blk = 0; blk < blockPalette.protoList.length; blk++) {
                                 const block = blockPalette.protoList[blk];
-                                if (oldValue === _("action") || oldValue === "action") {
+                                if (isDefaultAction) {
                                     if (block.name === "nameddo" && block.defaults.length === 0) {
                                         block.hidden = true;
                                     }
@@ -4959,14 +4955,6 @@ class Block {
                                 }
                             }
 
-                            if (oldValue === _("action") || oldValue === "action") {
-                                this.blocks.newNameddoBlock(
-                                    newValue,
-                                    metadata.hasReturn,
-                                    metadata.hasArgs
-                                );
-                                this.blocks.setActionProtoVisibility(false);
-                            }
                             this.blocks.renameNameddos(oldValue, newValue);
                             this.blocks.palettes.hide();
                             this.blocks.palettes.updatePalettes("action");

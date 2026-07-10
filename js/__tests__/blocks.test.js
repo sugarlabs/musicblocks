@@ -608,7 +608,9 @@ describe("Blocks Foundation", () => {
             // Assert block3 updates
             expect(block3.privateData).toBe("jump");
             expect(block3.overrideName).toBe("jump");
-            expect(block3.protoblock.defaults[0]).toBe("jump");
+            // protoblock.defaults[0] must NOT be mutated on workspace instances
+            // because it is a shared reference to the palette prototype template.
+            expect(block3.protoblock.defaults[0]).toBe("dance");
             expect(regenerateArtwork3).toHaveBeenCalled();
 
             // Assert block4 remains unchanged

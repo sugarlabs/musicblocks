@@ -4559,19 +4559,7 @@ class Blocks {
 
                     if (activeName === oldName) {
                         targetBlock.privateData = newName;
-
-                        let displayLabel = newName;
-                        const isTooWide = getTextWidth(displayLabel, "bold 20pt Sans") > TEXTWIDTH;
-                        if (isTooWide) {
-                            displayLabel = displayLabel.substring(0, STRINGLEN) + "...";
-                        }
-
-                        targetBlock.overrideName = displayLabel;
-
-                        if (targetBlock.protoblock && targetBlock.protoblock.defaults) {
-                            targetBlock.protoblock.defaults[0] = newName;
-                        }
-
+                        targetBlock.overrideName = newName;
                         targetBlock.regenerateArtwork();
                     }
                 }
