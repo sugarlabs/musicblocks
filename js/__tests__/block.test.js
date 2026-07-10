@@ -190,6 +190,37 @@ describe("Block Foundation", () => {
             expect(block.getCapability("collapsible")).toBeUndefined();
         });
 
+        it("isNoHitBlock() should return true from capability metadata", () => {
+            mockProtoBlock.capabilities.noHit = true;
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.isNoHitBlock()).toBe(true);
+        });
+
+        it("isNoHitBlock() should fall back to legacy names when metadata is absent", () => {
+            mockProtoBlock.name = "hidden";
+            mockProtoBlock.capabilities = Object.create(null);
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.isNoHitBlock()).toBe(true);
+        });
+
+        it("isNoHitBlock() should respect explicit false metadata without legacy fallback", () => {
+            mockProtoBlock.name = "hidden";
+            mockProtoBlock.capabilities.noHit = false;
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.isNoHitBlock()).toBe(false);
+        });
+
+        it("isNoHitBlock() should return false for ordinary blocks", () => {
+            mockProtoBlock.name = "forward";
+            mockProtoBlock.capabilities = Object.create(null);
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.isNoHitBlock()).toBe(false);
+        });
+
         it("copySize() should sync size from protoblock", () => {
             mockProtoBlock.size = 5;
             const block = new Block(mockProtoBlock, mockBlocks);

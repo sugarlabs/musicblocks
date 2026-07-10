@@ -2128,6 +2128,11 @@ class Block {
      * @returns {boolean} - True if the block is a no-hit block, false otherwise.
      */
     isNoHitBlock() {
+        const noHitCapability = this.getCapability("noHit");
+        if (noHitCapability !== undefined) {
+            return !!noHitCapability;
+        }
+
         return NOHIT.includes(this.name);
     }
 
