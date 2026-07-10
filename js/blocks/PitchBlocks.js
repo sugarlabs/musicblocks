@@ -13,15 +13,15 @@
    global
 
    ValueBlock, NOINPUTERRORMSG, NANERRORMSG, last, FlowBlock,
-   FlowClampBlock, Singer, numberToPitch, frequencyToPitch, getNote,
-   INVALIDPITCH, pitchToNumber, LeftBlock, SHARP, FLAT, DOUBLEFLAT,
-    DOUBLESHARP, NATURAL, FIXEDSOLFEGE, SOLFEGENAMES1, buildScale,
-   NOTENAMES, NOTENAMES1, getPitchInfo, YSTAFFOCTAVEHEIGHT,
-   YSTAFFNOTEHEIGHT, MUSICALMODES, keySignatureToMode, ALLNOTENAMES,
-   nthDegreeToPitch, A0, C8, calcOctave, SOLFEGECONVERSIONTABLE,
-    NOTESFLAT, NOTESSHARP, NOTESTEP, scaleDegreeToPitchMapping,
-    INTERVALVALUES
- */
+    FlowClampBlock, Singer, numberToPitch, frequencyToPitch, getNote,
+    INVALIDPITCH, pitchToNumber, LeftBlock, SHARP, FLAT, DOUBLEFLAT,
+     DOUBLESHARP, NATURAL, FIXEDSOLFEGE, SOLFEGENAMES1, buildScale,
+    NOTENAMES, NOTENAMES1, getPitchInfo, YSTAFFOCTAVEHEIGHT,
+    YSTAFFNOTEHEIGHT, MUSICALMODES, keySignatureToMode, ALLNOTENAMES,
+    nthDegreeToPitch, A0, C8, calcOctave, SOLFEGECONVERSIONTABLE,
+     NOTESFLAT, NOTESSHARP, NOTESTEP, scaleDegreeToPitchMapping,
+     INTERVALVALUES, CENTSSYMBOL
+  */
 
 /* exported setupPitchBlocks */
 
@@ -943,7 +943,9 @@ function setupPitchBlocks(activity) {
 
         static _parseCents(value) {
             if (typeof value !== "string") return [value, 0];
-            const match = value.match(/^([A-Ga-g][#b♯♭]?)(\(([+-]\d+)¢\))?$/);
+            const match = value.match(
+                new RegExp(`^([A-Ga-g](?:[#b♯♭]|𝄪|𝄫)?)(\\(([+-]\\d+)${CENTSSYMBOL}\\))?$`)
+            );
             if (match) {
                 return [match[1], match[3] !== undefined ? parseInt(match[3], 10) : 0];
             }
@@ -958,7 +960,7 @@ function setupPitchBlocks(activity) {
             } else {
                 const [note, cents] = CustomNoteBlock._parseCents(args[0]);
                 const octave = args[1];
-                return Singer.processPitch(activity, note, octave, cents);
+                return Singer.processPitch(activity, note, octave, cents, turtle, blk);
             }
         }
     }

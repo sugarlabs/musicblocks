@@ -100,6 +100,7 @@ describe("setupPitchBlocks", () => {
         global.FLAT = "b";
         global.DOUBLEFLAT = "bb";
         global.DOUBLESHARP = "##";
+        global.CENTSSYMBOL = "¢";
         global.NATURAL = "n";
         global.FIXEDSOLFEGE = { do: "C", re: "D", mi: "E", fa: "F", sol: "G", la: "A", si: "B" };
         global.SOLFEGENAMES1 = [
@@ -355,7 +356,9 @@ describe("setupPitchBlocks", () => {
             ["C(+42" + CENTSSYMBOL + ")", "C", 42],
             ["C(-10" + CENTSSYMBOL + ")", "C", -10],
             ["C(+0" + CENTSSYMBOL + ")", "C", 0],
-            ["D" + SHARP, "D" + SHARP, 0]
+            ["D" + SHARP, "D" + SHARP, 0],
+            ["F𝄪(+42" + CENTSSYMBOL + ")", "F𝄪", 42],
+            ["D𝄫(+42" + CENTSSYMBOL + ")", "D𝄫", 42]
         ];
 
         it("flow", () => {
@@ -387,14 +390,14 @@ describe("setupPitchBlocks", () => {
         it("passes parsed cents to processPitch", () => {
             const block = createdBlocks["customNote"];
             block.flow(["F#(+15" + CENTSSYMBOL + ")", 4], logo, 0, 10);
-            expect(global.Singer.processPitch).toHaveBeenCalledWith(activity, "F#", 4, 15);
+            expect(global.Singer.processPitch).toHaveBeenCalledWith(activity, "F#", 4, 15, 0, 10);
         });
 
         it("passes zero cents for plain note strings", () => {
             jest.clearAllMocks();
             const block = createdBlocks["customNote"];
             block.flow(["G", 3], logo, 0, 10);
-            expect(global.Singer.processPitch).toHaveBeenCalledWith(activity, "G", 3, 0);
+            expect(global.Singer.processPitch).toHaveBeenCalledWith(activity, "G", 3, 0, 0, 10);
         });
     });
 
