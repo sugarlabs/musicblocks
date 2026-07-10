@@ -1695,9 +1695,13 @@ class Logo {
                 logo.turtleDelay === 0 &&
                 delay > 0 &&
                 logo.synth.transport.isAvailable &&
+                logo.synth.transport.isClockRunning &&
                 tur._transportTime !== null
             ) {
-                const transportTime = tur._transportTime + delay / 1000;
+                const transportTime = Math.max(
+                    tur._transportTime + delay / 1000,
+                    logo.synth.transport.seconds
+                );
                 tur.delayParameters = { blk: blk, flow: isflow, arg: receivedArg };
                 tur._transportEventId = logo.synth.transport.schedule(audioContextTime => {
                     const tur2 = logo.activity.turtles.ithTurtle(turtle);
