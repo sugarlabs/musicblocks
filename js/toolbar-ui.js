@@ -1049,11 +1049,7 @@ class ToolbarUI {
             Record.classList.remove("hide");
             Record.style.display = "block";
         }
-        Record.textContent = "";
-        const recordIcon = document.createElement("i");
-        recordIcon.className = "material-icons main";
-        recordIcon.textContent = RECORDBUTTON;
-        Record.appendChild(recordIcon);
+        Record.innerHTML = `<i class="material-icons main">${RECORDBUTTON}</i>`;
 
         // Remove any existing onclick handler
         Record.onclick = null;
