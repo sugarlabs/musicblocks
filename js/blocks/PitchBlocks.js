@@ -938,7 +938,7 @@ function setupPitchBlocks(activity) {
         constructor() {
             super("customNote");
             this.setPalette("pitch", activity);
-            this.hidden = false;
+            this.hidden = true;
         }
 
         static _parseCents(value) {
@@ -1245,7 +1245,7 @@ function setupPitchBlocks(activity) {
                 [1, ["customNote", { value: "C(+0¢)" }], 0, 0, [0]],
                 [2, ["number", { value: 4 }], 0, 0, [0]]
             ]);
-            this.hidden = false;
+            this.hidden = true;
         }
 
         flow(args, logo, turtle, blk) {
