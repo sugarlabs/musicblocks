@@ -120,12 +120,6 @@ const COLLAPSIBLES = [
 ];
 
 /**
- * List of block types that should not trigger any event.
- * @type {string[]}
- */
-const NOHIT = ["hidden", "hiddennoflow"];
-
-/**
  * List of blocks that behave like argument blocks even though they are not
  * strictly classified as arg/value blocks.
  * @type {string[]}
@@ -2128,7 +2122,12 @@ class Block {
      * @returns {boolean} - True if the block is a no-hit block, false otherwise.
      */
     isNoHitBlock() {
-        return NOHIT.includes(this.name);
+        const noHitCapability = this.getCapability("noHit");
+        if (noHitCapability !== undefined) {
+            return !!noHitCapability;
+        }
+
+        return false;
     }
 
     /**

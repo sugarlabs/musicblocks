@@ -1211,6 +1211,7 @@ function setupFlowBlocks(activity) {
         constructor() {
             // Call the constructor of the parent class
             super("hiddennoflow");
+            this.setCapability("noHit");
 
             // Set the palette and activity for the block
             this.setPalette("flow", activity);
@@ -1239,6 +1240,7 @@ function setupFlowBlocks(activity) {
         constructor() {
             // Call the constructor of the parent class
             super("hidden");
+            this.setCapability("noHit");
 
             // Set the palette and activity for the block
             this.setPalette("flow", activity);
