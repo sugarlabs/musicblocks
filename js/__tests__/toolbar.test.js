@@ -103,14 +103,14 @@ describe("Toolbar Class", () => {
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ true", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = true;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(102);
+        expect(global._).toHaveBeenCalledTimes(104);
         expect(global._).toHaveBeenNthCalledWith(1, "About Music Blocks");
     });
 
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ false", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = false;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(84);
+        expect(global._).toHaveBeenCalledTimes(86);
         expect(global._).toHaveBeenNthCalledWith(1, "About Turtle Blocks");
     });
 
@@ -800,11 +800,14 @@ describe("Toolbar Class", () => {
         };
         const helpGuideItem = { onclick: null };
         const shortcutsGuideItem = { onclick: null };
+        const explorerJournalItem = { onclick: null };
+        global.window.openExplorerJournal = jest.fn();
 
         global.docById.mockImplementation(id => {
             if (id === "helpIcon") return helpIcon;
             if (id === "helpGuideItem") return helpGuideItem;
             if (id === "shortcutsGuideItem") return shortcutsGuideItem;
+            if (id === "explorerJournalItem") return explorerJournalItem;
             return null;
         });
 
@@ -816,6 +819,10 @@ describe("Toolbar Class", () => {
         expect(helpIcon.onclick).toBeNull();
         expect(helpGuideItem.onclick).toBeInstanceOf(Function);
         expect(shortcutsGuideItem.onclick).toBeInstanceOf(Function);
+        expect(explorerJournalItem.onclick).toBeInstanceOf(Function);
+
+        explorerJournalItem.onclick({ preventDefault: jest.fn(), stopPropagation: jest.fn() });
+        expect(global.window.openExplorerJournal).toHaveBeenCalled();
     });
 
     test("renderModeSelectIcon handles mode switching and UI updates", () => {

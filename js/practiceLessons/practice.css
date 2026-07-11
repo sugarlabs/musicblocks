@@ -1,14 +1,15 @@
-#practice-panel {
+#practice-panel,
+#explorer-journal-panel {
     position: fixed;
     top: 64px; /* below top toolbar */
     right: 0;
     width: 360px;
     height: calc(100% - 64px);
-    background: #fdfefe;
+    background: var(--panel-bg, #fdfefe);
     z-index: 9000;
     display: flex;
     flex-direction: column;
-    border-left: 2px solid #e0e0e0;
+    border-left: 2px solid var(--border, #e0e0e0);
     box-shadow: -4px 0 12px rgba(0, 0, 0, 0.08);
     font-family: "Arial Rounded MT Bold", "Segoe UI", sans-serif;
 }
@@ -19,13 +20,14 @@
     justify-content: space-between;
     align-items: center;
     padding: 14px 16px;
-    background: linear-gradient(135deg, #2196f3, #1e88e5);
+    background: var(--accent, #2196f3);
     color: white;
     font-size: 18px;
     font-weight: 600;
 }
 
-#close-practice {
+#close-practice,
+#close-explorer-journal {
     background: rgba(255, 255, 255, 0.15);
     border: none;
     color: white;
@@ -37,16 +39,23 @@
     transition: background 0.2s ease;
 }
 
-#close-practice:hover {
+#close-practice:hover,
+#close-explorer-journal:hover {
     background: rgba(255, 255, 255, 0.3);
 }
 
 /* === CONTENT AREA === */
-#practice-content {
+#practice-content,
+#explorer-journal-content {
     flex: 1;
     padding: 14px;
     overflow-y: auto;
-    background: #f5f7fa;
+    background: var(--bg, #f5f7fa);
+    color: var(--fg, #263238);
+}
+
+.journal-header {
+    background: var(--accent, #2196f3);
 }
 
 .quest-title {
@@ -128,6 +137,7 @@
     color: #6c757d;
 }
 
+/* CSS-only character tokens keep the practice story lightweight and asset-free. */
 .character-token::before {
     content: "";
     position: absolute;
@@ -148,6 +158,7 @@
     border: 2px solid #1b4965;
 }
 
+/* CSS-only bridge art avoids image files while preserving the Level 1 story cue. */
 .bridge-map {
     position: relative;
     min-height: 112px;
@@ -228,6 +239,7 @@
         radial-gradient(72px 20px at 138px 8px, transparent 48%, #ffffff 50% 56%, transparent 58%);
 }
 
+/* CSS-only Sakura grove art gives Level 2 a distinct scene without external assets. */
 .sakura-grove {
     position: relative;
     min-height: 128px;
@@ -448,6 +460,455 @@
     color: #5f4b00;
 }
 
+/* === EXPLORER JOURNAL === */
+.journal-cover,
+.journal-page-card,
+.journal-empty-card {
+    margin: 10px 0;
+    padding: 14px;
+    background: var(--panel-bg, #fffdf7);
+    border: 1px solid var(--border, #e4d8b4);
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(88, 61, 18, 0.08);
+}
+
+/* CSS-only book cover keeps Explorer Journal themeable across light, dark, and high contrast. */
+.journal-cover {
+    position: relative;
+    min-height: 112px;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 88% 18%, rgba(255, 209, 102, 0.32) 0 10%, transparent 11%),
+        var(--panel-bg, #fff8dc);
+}
+
+.journal-cover::after {
+    content: "";
+    position: absolute;
+    right: 18px;
+    bottom: 14px;
+    width: 74px;
+    height: 48px;
+    border-radius: 8px 8px 6px 6px;
+    background:
+        linear-gradient(
+            90deg,
+            transparent 48%,
+            color-mix(in srgb, var(--fg, #263238) 24%, transparent) 49% 51%,
+            transparent 52%
+        ),
+        linear-gradient(
+            var(--panel-bg, #ffe8a3),
+            color-mix(in srgb, var(--accent, #2196f3) 34%, var(--panel-bg, #ffffff))
+        );
+    border: 2px solid var(--accent, #2196f3);
+    transform: rotate(-4deg);
+}
+
+.journal-cover h3 {
+    margin: 0;
+    color: var(--accent, #2196f3);
+    font-size: 21px;
+}
+
+.journal-cover p,
+.journal-empty-card p {
+    max-width: 210px;
+    margin: 6px 0 0;
+    color: var(--fg, #5c677d);
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.journal-cover-icon {
+    width: 42px;
+    height: 36px;
+    margin-bottom: 8px;
+    border-radius: 6px 6px 5px 5px;
+    background:
+        linear-gradient(90deg, transparent 47%, rgba(255, 255, 255, 0.5) 48% 52%, transparent 53%),
+        linear-gradient(var(--accent, #8ecae6), var(--accent, #2a9d8f));
+    border: 2px solid var(--border, #1b4965);
+}
+
+.journal-page-list {
+    display: grid;
+    gap: 10px;
+}
+
+.journal-open-page {
+    width: 100%;
+    display: grid;
+    gap: 4px;
+    min-height: 84px;
+    padding: 12px 14px;
+    border: 1px solid var(--border, #d8e2dc);
+    border-radius: 8px;
+    background: var(--panel-bg, #ffffff);
+    color: var(--fg, #263238);
+    text-align: left;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    border-left: 6px solid var(--accent, #2196f3);
+}
+
+.journal-open-page:hover,
+.journal-open-page:focus {
+    outline: 3px solid color-mix(in srgb, var(--accent, #2196f3) 28%, transparent);
+    border-color: var(--accent, #2196f3);
+}
+
+.journal-open-title {
+    color: var(--fg, #263238);
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.journal-open-meta {
+    color: var(--fg, #5c677d);
+    font-size: 12px;
+    opacity: 0.82;
+}
+
+.journal-level-1 {
+    border-left-color: var(--accent, #2196f3);
+}
+
+.journal-level-2 {
+    border-left-color: color-mix(in srgb, var(--accent, #2196f3) 68%, #e91e63);
+}
+
+.journal-page-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+    color: var(--fg, #6c757d);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.journal-page-number {
+    color: var(--accent, #2196f3);
+}
+
+.journal-page-card h4,
+.journal-empty-card h4 {
+    margin: 0 0 10px;
+    color: var(--fg, #264653);
+    font-size: 18px;
+}
+
+.journal-learned {
+    margin: 10px 0;
+}
+
+.journal-learned strong,
+.journal-note-label,
+.journal-prompt-book label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--fg, #34495e);
+    font-size: 13px;
+}
+
+.journal-learned div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.journal-learned span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--accent, #2196f3) 12%, var(--panel-bg, #ffffff));
+    border: 1px solid var(--accent, #2a9d8f);
+    color: var(--fg, #1b6658);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.journal-learned span::before {
+    content: "\2713";
+    margin-right: 5px;
+    color: var(--accent, #2a9d8f);
+    font-weight: 900;
+}
+
+.journal-page-card textarea,
+.journal-prompt-book textarea {
+    width: 100%;
+    min-height: 78px;
+    resize: vertical;
+    box-sizing: border-box;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border, #cfd8dc);
+    background: var(--bg, #ffffff);
+    color: var(--fg, #263238);
+    font:
+        14px "Segoe UI",
+        sans-serif;
+    line-height: 1.35;
+}
+
+.journal-page-card textarea:focus,
+.journal-prompt-book textarea:focus {
+    outline: 3px solid color-mix(in srgb, var(--accent, #2196f3) 28%, transparent);
+    border-color: var(--accent, #2196f3);
+}
+
+.journal-add-note,
+.journal-update-note,
+.journal-delete-note,
+.journal-delete-page,
+#journal-save-general-note,
+#save-journal-prompt {
+    min-height: 38px;
+    margin-top: 10px;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent, #2196f3);
+    color: white;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.journal-note-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.journal-note-actions .journal-add-note,
+.journal-note-actions .journal-update-note,
+.journal-note-actions .journal-delete-note,
+.journal-note-actions .journal-delete-page {
+    margin-top: 0;
+}
+
+.journal-delete-note,
+.journal-delete-page {
+    background: var(--bg, #eceff1);
+    color: var(--fg, #455a64);
+    border: 1px solid var(--border, #cfd8dc);
+}
+
+.journal-delete-note:hover,
+.journal-delete-page:hover {
+    filter: brightness(0.95);
+}
+
+.journal-add-note:hover,
+.journal-update-note:hover,
+#save-journal-prompt:hover,
+#journal-save-general-note:hover {
+    filter: brightness(0.92);
+}
+
+.journal-note-list {
+    display: grid;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.journal-note-card {
+    padding: 10px;
+    border: 1px solid var(--border, #d8e2dc);
+    border-radius: 8px;
+    background: var(--bg, #ffffff);
+}
+
+.journal-note-card.empty {
+    color: var(--fg, #455a64);
+}
+
+.journal-note-card.empty span {
+    display: block;
+    margin-top: 3px;
+    font-size: 12px;
+    opacity: 0.78;
+}
+
+.journal-note-date {
+    margin-bottom: 6px;
+    color: var(--accent, #2196f3);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.journal-new-note {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border, #d8e2dc);
+}
+
+.journal-section {
+    margin: 14px 0 0;
+}
+
+.journal-section-title {
+    margin: 0 0 8px;
+    color: var(--accent, #2196f3);
+    font-size: 14px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.journal-general-section {
+    padding-top: 4px;
+}
+
+.journal-general-empty {
+    margin: 0 0 8px;
+    color: var(--fg, #5c677d);
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.journal-open-general {
+    border-left-color: color-mix(in srgb, var(--accent, #2196f3) 42%, #ffb703);
+}
+
+.journal-fab-add {
+    width: 100%;
+    min-height: 44px;
+    margin-top: 14px;
+    padding: 10px 14px;
+    border: 2px dashed var(--accent, #2196f3);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--accent, #2196f3) 8%, var(--panel-bg, #ffffff));
+    color: var(--accent, #2196f3);
+    font-size: 15px;
+    font-weight: 900;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        filter 0.2s ease;
+}
+
+.journal-fab-add:hover,
+.journal-fab-add:focus {
+    outline: 3px solid color-mix(in srgb, var(--accent, #2196f3) 28%, transparent);
+    filter: brightness(0.97);
+}
+
+.journal-page-card input[type="text"],
+.journal-general-page input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border, #cfd8dc);
+    background: var(--bg, #ffffff);
+    color: var(--fg, #263238);
+    font:
+        14px "Segoe UI",
+        sans-serif;
+    line-height: 1.35;
+}
+
+.journal-page-card input[type="text"]:focus,
+.journal-general-page input[type="text"]:focus {
+    outline: 3px solid color-mix(in srgb, var(--accent, #2196f3) 28%, transparent);
+    border-color: var(--accent, #2196f3);
+}
+
+#explorer-journal-prompt {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    z-index: 9500;
+    width: min(360px, calc(100% - 24px));
+    transform: translate(-50%, -50%);
+}
+
+.journal-prompt-book {
+    position: relative;
+    padding: 18px;
+    border-radius: 10px;
+    background:
+        linear-gradient(
+            90deg,
+            color-mix(in srgb, var(--accent, #2196f3) 18%, transparent) 0 14px,
+            transparent 15px
+        ),
+        var(--panel-bg, #fffdf7);
+    border: 2px solid var(--accent, #2196f3);
+    box-shadow: 0 12px 32px rgba(33, 37, 41, 0.22);
+    color: var(--fg, #263238);
+}
+
+#close-journal-prompt {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: var(--bg, #f1e5c8);
+    color: var(--fg, #5f4b00);
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.journal-prompt-kicker {
+    display: inline-block;
+    margin-bottom: 4px;
+    color: var(--accent, #2196f3);
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.journal-prompt-book h3 {
+    margin: 0 28px 8px 0;
+    color: var(--accent, #2196f3);
+    font-size: 20px;
+}
+
+.journal-prompt-book p {
+    margin: 0 0 12px;
+    color: var(--fg, #4f5d75);
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.journal-prompt-actions {
+    display: flex;
+    gap: 8px;
+}
+
+#skip-journal-prompt {
+    min-height: 38px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: var(--bg, #eceff1);
+    color: var(--fg, #455a64);
+    border: 1px solid var(--border, #cfd8dc);
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+#skip-journal-prompt:hover {
+    filter: brightness(0.95);
+}
+
+@media (max-width: 780px) {
+    #explorer-journal-prompt {
+        width: calc(100% - 24px);
+    }
+}
+
 /* === LEVEL BUTTONS === */
 .level-btn {
     width: 100%;
@@ -641,20 +1102,30 @@
 }
 
 /* === BACK BUTTON === */
-#back-to-levels {
-    display: inline-block;
+#back-to-levels,
+#back-to-journal-index {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     margin-bottom: 12px;
-    padding: 6px 12px;
-    border-radius: 20px;
-    border: none;
-    background: #e3f2fd;
-    color: #1565c0;
+    min-height: 34px;
+    padding: 7px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border, #90caf9);
+    background: var(--panel-bg, #e3f2fd);
+    color: var(--accent, #1565c0);
     font-size: 13px;
+    font-weight: 800;
     cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
-#back-to-levels:hover {
-    background: #bbdefb;
+#back-to-levels:hover,
+#back-to-journal-index:hover,
+#back-to-levels:focus,
+#back-to-journal-index:focus {
+    outline: 3px solid color-mix(in srgb, var(--accent, #2196f3) 26%, transparent);
+    border-color: var(--accent, #2196f3);
 }
 
 /* === LEVEL CONTENT === */
