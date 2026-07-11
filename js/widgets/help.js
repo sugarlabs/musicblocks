@@ -36,7 +36,7 @@ class HelpWidget {
     /**
      * @param {Activity} activity
      */
-    constructor(activity, useActiveBlock) {
+    constructor(activity, useActiveBlock, customCard) {
         this.activity = activity;
         this.beginnerBlocks = [];
         this.advancedBlocks = [];
@@ -44,6 +44,7 @@ class HelpWidget {
         this.index = 0;
         this.isOpen = true;
         this._keydownHandler = null;
+        this._usesCustomCard = !!customCard;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help", false);
         //widgetWindow.getWidgetBody().style.overflowY = "auto";
@@ -60,7 +61,11 @@ class HelpWidget {
             }
             widgetWindow.destroy();
             // Trigger the hint only if they were on the first page of the tour
-            if (this.index === 0 && typeof this.activity.textMsg === "function") {
+            if (
+                !this._usesCustomCard &&
+                this.index === 0 &&
+                typeof this.activity.textMsg === "function"
+            ) {
                 this.activity.textMsg(
                     _(
                         "Start by dragging a block from the left panel and connect it to the Start block."
@@ -73,10 +78,27 @@ class HelpWidget {
         this._helpDiv = document.createElement("div");
 
         // Give the DOM time to create the div.
-        window.requestAnimationFrame(() => this._setup(useActiveBlock, 0));
+        window.requestAnimationFrame(() => {
+            if (customCard) {
+                this._setupCustomCard(customCard);
+            } else {
+                this._setup(useActiveBlock, 0);
+            }
+        });
 
         // Position center
         setTimeout(this.widgetWindow.sendToCenter, 50);
+    }
+
+    /**
+     * Open a standalone help card without adding a page to the main help tour.
+     *
+     * @param {Activity} activity
+     * @param {Object} card
+     * @returns {HelpWidget}
+     */
+    static showCard(activity, card) {
+        return new HelpWidget(activity, false, card);
     }
 
     /**
@@ -535,6 +557,93 @@ class HelpWidget {
         helpBody.append(bodyFragment);
 
         this.widgetWindow.takeFocus();
+    }
+
+    /**
+     * @private
+     * @param {Object} card
+     * @returns {void}
+     */
+    _setupCustomCard(card) {
+        this._helpDiv.style.width = 100 + "%";
+        this._helpDiv.replaceChildren(
+            (() => {
+                const fragment = document.createDocumentFragment();
+                const rightArrow = document.createElement("div");
+                rightArrow.id = "right-arrow";
+                rightArrow.style.display = "none";
+
+                const leftArrow = document.createElement("div");
+                leftArrow.id = "left-arrow";
+                leftArrow.style.display = "none";
+
+                const helpButtonsDiv = document.createElement("div");
+                helpButtonsDiv.id = "helpButtonsDiv";
+                helpButtonsDiv.tabIndex = -1;
+
+                const helpScrollWrapper = document.createElement("div");
+                helpScrollWrapper.id = "helpScrollWrapper";
+
+                const helpBodyDiv = document.createElement("div");
+                helpBodyDiv.id = "helpBodyDiv";
+                helpBodyDiv.tabIndex = -1;
+
+                helpScrollWrapper.append(helpBodyDiv);
+                fragment.append(rightArrow, leftArrow, helpButtonsDiv, helpScrollWrapper);
+                return fragment;
+            })()
+        );
+        this.widgetWindow.getWidgetBody().append(this._helpDiv);
+        this.widgetWindow.updateTitle(card.title || _("Help"));
+
+        const front = {
+            heading: card.heading || card.title || _("Try this"),
+            description: card.description || "",
+            label: card.backLabel || _("What does this mean in music?")
+        };
+        const back = {
+            heading: card.musicHeading || _("What it means in music"),
+            description: card.musicDescription || "",
+            label: card.frontLabel || _("How do I do it?")
+        };
+        let showingBack = false;
+
+        const renderSide = side => {
+            const helpBody = docById("helpBodyDiv");
+            helpBody.replaceChildren();
+            helpBody.style.height = "325px";
+            helpBody.style.width = "345px";
+            helpBody.style.color = "#505050";
+
+            const heading = document.createElement("h1");
+            heading.classList.add("heading");
+            heading.textContent = side.heading;
+
+            const description = document.createElement("p");
+            description.classList.add("description");
+            String(side.description)
+                .split(/<br\s*\/?>/i)
+                .forEach((part, index, parts) => {
+                    description.append(document.createTextNode(part));
+                    if (index < parts.length - 1) {
+                        description.append(document.createElement("br"));
+                    }
+                });
+
+            const flipButton = document.createElement("button");
+            flipButton.type = "button";
+            flipButton.className = "waves-effect waves-light btn";
+            flipButton.textContent = side.label;
+            flipButton.onclick = () => {
+                showingBack = !showingBack;
+                renderSide(showingBack ? back : front);
+            };
+
+            helpBody.append(heading, description, flipButton);
+            this.widgetWindow.takeFocus();
+        };
+
+        renderSide(front);
     }
 
     /**
