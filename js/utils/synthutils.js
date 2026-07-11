@@ -2071,52 +2071,50 @@ function Synth() {
                     }
                 }
 
-                // Schedule cleanup after the note duration.
-                // A 500 ms safety buffer is added beyond the note duration to prevent
-                // premature disposal caused by audio-clock drift or scheduler jitter,
-                // which would otherwise produce crackling artefacts in long sessions.
-                setTimeout(
-                    () => {
-                        try {
-                            // Dispose of effects
-                            effectsToDispose.forEach(effect => {
-                                if (effect && typeof effect.dispose === "function") {
-                                    effect.dispose();
+                const timerManager =
+                    this._timerManager ||
+                    (this.activity && this.activity.logo && this.activity.logo._timerManager);
+                const cleanupFn = () => {
+                    try {
+                        // Dispose of effects
+                        effectsToDispose.forEach(effect => {
+                            if (effect && typeof effect.dispose === "function") {
+                                effect.dispose();
+                            }
+                        });
+
+                        // Dispose of filters
+                        if (temp_filters.length > 0) {
+                            temp_filters.forEach(filter => {
+                                if (filter && typeof filter.dispose === "function") {
+                                    filter.dispose();
                                 }
                             });
-
-                            // Dispose of filters
-                            if (temp_filters.length > 0) {
-                                temp_filters.forEach(filter => {
-                                    if (filter && typeof filter.dispose === "function") {
-                                        filter.dispose();
-                                    }
-                                });
-                            }
-
-                            // Re-establish the dry path only when no other effects chain
-                            // is still active on this synth; otherwise the direct
-                            // connection would bypass the in-flight chain.
-                            const remaining = (_effectsInFlight.get(synth) || 1) - 1;
-                            _effectsInFlight.set(synth, remaining);
-                            if (
-                                remaining === 0 &&
-                                synth &&
-                                typeof synth.toDestination === "function"
-                            ) {
-                                try {
-                                    synth.disconnect();
-                                } catch (_) {
-                                    // Already disconnected — safe to ignore.
-                                }
-                                synth.toDestination();
-                            }
-                        } catch (e) {
-                            console.debug("Error disposing effects:", e);
                         }
-                    },
-                    beatValue * 1000 + 500
-                );
+
+                        // Re-establish the dry path only when no other effects chain
+                        // is still active on this synth; otherwise the direct
+                        // connection would bypass the in-flight chain.
+                        const remaining = (_effectsInFlight.get(synth) || 1) - 1;
+                        _effectsInFlight.set(synth, remaining);
+                        if (remaining === 0 && synth && typeof synth.toDestination === "function") {
+                            try {
+                                synth.disconnect();
+                            } catch (_) {
+                                // Already disconnected — safe to ignore.
+                            }
+                            synth.toDestination();
+                        }
+                    } catch (e) {
+                        console.debug("Error disposing effects:", e);
+                    }
+                };
+
+                if (timerManager && typeof timerManager.setGuardedTimeout === "function") {
+                    timerManager.setGuardedTimeout(cleanupFn, beatValue * 1000 + 500, () => false);
+                } else {
+                    setTimeout(cleanupFn, beatValue * 1000 + 500);
+                }
             }
         } catch (e) {
             console.error("Error in _performNotes:", e);
