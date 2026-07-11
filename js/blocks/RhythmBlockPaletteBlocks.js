@@ -127,9 +127,18 @@ function setupRhythmBlockPaletteBlocks(activity) {
                     logo.phraseMaker.addColBlock(blk, arg0);
                 }
 
-                const tupletIndex = logo.tupletParams.length - 1;
-                for (let i = 0; i < arg0; i++) {
-                    logo.tupletRhythms.push(["individual", tupletIndex, noteBeatValue]);
+                if (logo.tuplet) {
+                    for (let i = 0; i < arg0; i++) {
+                        if (!logo.addingNotesToTuplet) {
+                            logo.tupletRhythms.push(["notes", logo.tupletParams.length - 1]);
+                            logo.addingNotesToTuplet = true;
+                        }
+                        last(logo.tupletRhythms).push(noteBeatValue);
+                    }
+                } else {
+                    for (let i = 0; i < arg0; i++) {
+                        logo.tupletRhythms.push(["individual", 1, noteBeatValue]);
+                    }
                 }
 
                 for (let i = 0; i < args[0]; i++) {
