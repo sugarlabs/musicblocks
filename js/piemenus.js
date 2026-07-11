@@ -1306,8 +1306,9 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
     const __selectionChanged = () => {
         const label = that._customWheel.navItems[that._customWheel.selectedNavItemIndex].title;
         const note = that._cusNoteWheel.navItems[that._cusNoteWheel.selectedNavItemIndex].title;
-        that.value = note;
-        that.text.text = note;
+        const centsMatch = (that.value || "").match(/\([+-]?\d+¢\)/);
+        that.value = centsMatch ? note + centsMatch[0] : note;
+        that.text.text = centsMatch ? note + centsMatch[0] : note;
         let octave = 4;
 
         if (hasOctaveWheel) {

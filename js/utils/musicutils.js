@@ -123,6 +123,13 @@ const SHARP = "♯";
 const FLAT = "♭";
 
 /**
+ * Symbol for cents.
+ * @constant {string}
+ * @default
+ */
+const CENTSSYMBOL = "\u00A2";
+
+/**
  * Symbol for a natural note.
  * @constant {string}
  * @default
@@ -7020,6 +7027,7 @@ if (typeof module !== "undefined" && module.exports) {
         MUSICALMODES,
         SHARP,
         FLAT,
+        CENTSSYMBOL,
         NOTENAMES,
         SOLFEGENAMES1,
         ALLNOTENAMES,
