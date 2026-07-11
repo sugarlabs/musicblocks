@@ -1,8 +1,3 @@
-afterEach(() => {
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
-});
-
 // Provide ErrorHandler global for tests
 global.ErrorHandler = {
     capture: jest.fn(),
