@@ -197,14 +197,6 @@ describe("Block Foundation", () => {
             expect(block.isNoHitBlock()).toBe(true);
         });
 
-        it("isNoHitBlock() should fall back to legacy names when metadata is absent", () => {
-            mockProtoBlock.name = "hidden";
-            mockProtoBlock.capabilities = Object.create(null);
-
-            const block = new Block(mockProtoBlock, mockBlocks);
-            expect(block.isNoHitBlock()).toBe(true);
-        });
-
         it("isNoHitBlock() should respect explicit false metadata without legacy fallback", () => {
             mockProtoBlock.name = "hidden";
             mockProtoBlock.capabilities.noHit = false;

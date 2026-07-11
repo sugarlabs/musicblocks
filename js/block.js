@@ -120,12 +120,6 @@ const COLLAPSIBLES = [
 ];
 
 /**
- * List of block types that should not trigger any event.
- * @type {string[]}
- */
-const NOHIT = ["hidden", "hiddennoflow"];
-
-/**
  * List of blocks that behave like argument blocks even though they are not
  * strictly classified as arg/value blocks.
  * @type {string[]}
@@ -2133,7 +2127,7 @@ class Block {
             return !!noHitCapability;
         }
 
-        return NOHIT.includes(this.name);
+        return false;
     }
 
     /**
