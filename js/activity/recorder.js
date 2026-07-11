@@ -42,8 +42,7 @@ const doRecordButton = activity => {
 const setupActivityRecorder = activityInstance => {
     activityInstance._doRecordButton = () => {
         const that = activityInstance;
-        const start = document.getElementById("record"),
-            recInside = document.getElementById("rec_inside");
+        const start = document.getElementById("record");
         let mediaRecorder;
         const clickEvent = new Event("click");
         let flag = 0;
@@ -182,7 +181,7 @@ const setupActivityRecorder = activityInstance => {
          * @param {Blob[]} recordedChunks - The accumulated recorded chunks.
          */
         function saveFile(recordedChunks) {
-            recInside.classList.remove("blink");
+            start.classList.remove("recording");
 
             const showAlert = message => {
                 if (window.MBDialog && typeof window.MBDialog.alert === "function") {
@@ -276,7 +275,7 @@ const setupActivityRecorder = activityInstance => {
          */
         function createRecorder(stream) {
             flag = 1;
-            recInside.classList.add("blink");
+            start.classList.add("recording");
             that.textMsg(_("Recording started. Click stop to finish."));
             start.removeEventListener("click", createRecorder, true);
             let recordedChunks = [];
@@ -290,7 +289,6 @@ const setupActivityRecorder = activityInstance => {
             mediaRecorder.onstop = function () {
                 saveFile(recordedChunks);
                 recordedChunks = [];
-                recInside.setAttribute("fill", "#ffffff");
             };
 
             mediaRecorder.ondataavailable = function (e) {
@@ -326,7 +324,7 @@ const setupActivityRecorder = activityInstance => {
                         const stopHandler = function stopHandler() {
                             if (mediaRecorder && mediaRecorder.state === "recording") {
                                 mediaRecorder.stop();
-                                recInside.classList.remove("blink");
+                                start.classList.remove("recording");
                                 flag = 0;
                                 cleanupStreams();
                             }
@@ -336,7 +334,6 @@ const setupActivityRecorder = activityInstance => {
                         };
                         start.addEventListener("click", stopHandler);
                     }
-                    recInside.setAttribute("fill", "red");
                 } catch (error) {
                     ErrorHandler.recoverable(error, { operation: "recording" });
                     that.textMsg(_("Recording failed: %s").replace(/%s/g, error.message));

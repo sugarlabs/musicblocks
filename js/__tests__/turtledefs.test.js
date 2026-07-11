@@ -101,7 +101,6 @@ describe("Music Blocks mode (_THIS_IS_TURTLE_BLOCKS_ = false)", () => {
             "WRAPTURTLEBUTTON",
             "MOUSEPALETTEICON",
             "FULLSCREENBUTTON",
-            "RECORDBUTTON",
             "PLUGINSBUTTON",
             "OPENMERGEBUTTON",
             "PITCHPREVIEWBUTTON",

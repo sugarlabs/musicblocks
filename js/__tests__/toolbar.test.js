@@ -584,10 +584,7 @@ describe("Toolbar Class", () => {
     test("updateRecordButton hides record button", () => {
         const recordButton = {
             classList: { add: jest.fn() },
-            style: { display: "" },
-            innerHTML: "",
-            textContent: "",
-            appendChild: jest.fn()
+            style: { display: "" }
         };
         global.docById.mockReturnValue(recordButton);
         global.fnBrowserDetect = jest.fn(() => "firefox");
@@ -597,14 +594,9 @@ describe("Toolbar Class", () => {
     });
 
     test("updateRecordButton keeps only one outside-click listener and dispose removes it", () => {
-        global.RECORDBUTTON = "fiber_manual_record";
-
         const recordButton = {
             classList: { add: jest.fn(), remove: jest.fn() },
             style: { display: "" },
-            innerHTML: "",
-            textContent: "",
-            appendChild: jest.fn(),
             onclick: null
         };
 

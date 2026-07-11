@@ -11,7 +11,7 @@
 
 /*
   global _THIS_IS_MUSIC_BLOCKS_, docById, doSVG, fnBrowserDetect,
-  RECORDBUTTON, saveButton, saveButtonAdvanced, ActivityContext
+  saveButton, saveButtonAdvanced, ActivityContext
 */
 
 /* exported ToolbarUI */
@@ -1049,7 +1049,6 @@ class ToolbarUI {
             Record.classList.remove("hide");
             Record.style.display = "block";
         }
-        Record.innerHTML = `<i class="material-icons main">${RECORDBUTTON}</i>`;
 
         // Remove any existing onclick handler
         Record.onclick = null;
