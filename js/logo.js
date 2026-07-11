@@ -1916,7 +1916,7 @@ class Logo {
                 logo.blocks.highlight(blk, false);
                 logo._currentlyHighlightedBlock = blk;
                 // Force stage update so highlight is visible when blocks were shown during execution
-                if (logo.stage) {
+                if (logo.stage && blk._viewportVisible) {
                     logo.deps.markStageDirty();
                 }
             }
@@ -2066,7 +2066,7 @@ class Logo {
                                     if (logo._currentlyHighlightedBlock === blk) {
                                         logo._currentlyHighlightedBlock = null;
                                     }
-                                    if (logo.stage) {
+                                    if (logo.stage && blk._viewportVisible) {
                                         logo.deps.markStageDirty();
                                     }
                                 }
@@ -2108,7 +2108,7 @@ class Logo {
                                         if (logo._currentlyHighlightedBlock === unhighlightBlock) {
                                             logo._currentlyHighlightedBlock = null;
                                         }
-                                        if (logo.stage) {
+                                        if (logo.stage && unhighlightBlock._viewportVisible) {
                                             logo.deps.markStageDirty();
                                         }
                                     } else {

@@ -676,8 +676,8 @@ class Block {
             return;
         }
 
-        if (!this.container.visible) {
-            // block is hidden, so do nothing.
+        if (!this.container.visible || !this._viewportVisible) {
+            // block is hidden or off-screen, so do nothing.
             return;
         }
 
@@ -844,7 +844,9 @@ class Block {
             if (!this.collapsed) {
                 this.disconnectedBitmap.visible = true;
             }
-            this.container.updateCache();
+            if (this._viewportVisible) {
+                this.container.updateCache();
+            }
         }
     }
 
