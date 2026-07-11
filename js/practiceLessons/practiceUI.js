@@ -1,4 +1,4 @@
-/* global ActivityContext, PracticeManager, PracticeProblems, PracticeTheme, PracticeValidator */
+/* global ActivityContext, HelpWidget, PracticeManager, PracticeProblems, PracticeTheme, PracticeValidator */
 /* exported PracticeUI, ExplorerJournalUI */
 
 const PracticeUI = {
@@ -177,7 +177,29 @@ const PracticeUI = {
             }
         };
 
+        this.attachSecretHelpCards(problem, container);
         this.startBadgeMonitor(problem);
+    },
+
+    attachSecretHelpCards(problem, container) {
+        container.querySelectorAll("[data-secret-help]").forEach(button => {
+            button.onclick = () => {
+                const card = problem.secretHelpCards?.[button.dataset.secretHelp];
+                if (!card) return;
+
+                const activity = this.getActivity();
+                if (typeof HelpWidget === "undefined" || !activity) {
+                    this.showQuestNotice(
+                        card.title,
+                        `${card.description} ${card.musicDescription}`,
+                        "hint"
+                    );
+                    return;
+                }
+
+                HelpWidget.showCard(activity, card);
+            };
+        });
     },
 
     renderBigBadges(bigBadgeIds) {

@@ -7,7 +7,7 @@ const PracticeTheme = {
       <section class="story-card">
       <h4>The Story Begins</h4>
 
-      <div class="character-row" aria-label="Meet Lyra and Beat">
+      <div class="character-row" aria-label="Meet Lyra and Choon">
       <span class="character-token lyra-token">
         <span class="character-name">
             Lyra
@@ -20,7 +20,7 @@ const PracticeTheme = {
 
       <span class="character-token beat-token">
         <span class="character-name">
-            Beat
+            Choon
         </span>
         <span class="character-role">
             Music Robot
@@ -30,7 +30,7 @@ const PracticeTheme = {
 
       <p>
         Every adventure needs a team! <b>Lyra</b> is a fearless explorer, and
-        <b>Beat</b> is her cheerful music robot who can hear melodies hidden
+        <b>Choon</b> is her cheerful music robot who can hear melodies hidden
         everywhere.
       </p>
 
@@ -66,8 +66,8 @@ const PracticeProblems = [
         description: `
       <section class="story-card">
         <p>
-          Lyra and Beat step onto Echo Island. The bridge is gone, but the sea
-          is still humming. Beat points to an old song-map carved in stone.
+          Lyra and Choon step onto Echo Island. The bridge is gone, but the sea
+          is still humming. Choon points to an old song-map carved in stone.
         </p>
         <div class="bridge-map" aria-label="Bridge song pattern A A B A">
           <div class="bridge-gate"></div>
@@ -80,7 +80,7 @@ const PracticeProblems = [
           <div class="bridge-waves"></div>
         </div>
         <p>
-          "These marks are sounds," Beat whispers. "If we hear them first, we
+          "These marks are sounds," Choon whispers. "If we hear them first, we
           can wake the bridge."
         </p>
       </section>
@@ -104,13 +104,51 @@ const PracticeProblems = [
           After the bridge rises, try one small change. The island may answer.
         </p>
         <div class="explore-grid">
-          <span>Change octave</span>
-          <span>Use transpose</span>
-          <span>Make it longer</span>
-          <span>Rename chunks</span>
+          <button type="button" data-secret-help="changeOctave">Change octave</button>
+          <button type="button" data-secret-help="useTranspose">Use transpose</button>
+          <button type="button" data-secret-help="makeLonger">Make it longer</button>
+          <button type="button" data-secret-help="renameChunks">Rename chunks</button>
         </div>
       </section>
     `,
+        secretHelpCards: {
+            changeOctave: {
+                title: "Change octave",
+                heading: "Try a higher or lower version",
+                description:
+                    "Open one pitch block and change its octave number. Try 5 to lift a note higher, or 3 to make it lower. Then press Play and Check My Work.",
+                musicHeading: "What changes musically?",
+                musicDescription:
+                    "An octave keeps the same note name, but moves it to a higher or lower sound. C4 and C5 are both C, but C5 sounds brighter and higher."
+            },
+            useTranspose: {
+                title: "Use transpose",
+                heading: "Shift the bridge song",
+                description:
+                    "Add a transpose block around part of your song, then choose how many steps to shift the notes. Keep the A A B A pattern in place.",
+                musicHeading: "What changes musically?",
+                musicDescription:
+                    "Transposing moves a melody up or down while keeping its shape. The tune still feels familiar, but it starts from a new place."
+            },
+            makeLonger: {
+                title: "Make it longer",
+                heading: "Add another echo",
+                description:
+                    "Add one more chunk after the bridge song, or repeat part of the pattern again. Listen for a longer path before you check the secret.",
+                musicHeading: "What changes musically?",
+                musicDescription:
+                    "Making a melody longer adds another musical idea or repeats one you already made. It can make the ending feel like it travels farther."
+            },
+            renameChunks: {
+                title: "Rename chunks",
+                heading: "Give the chunks explorer names",
+                description:
+                    "Rename at least one action chunk. Pick names that help you remember what each sound does, like Echo A or Bridge B.",
+                musicHeading: "What changes musically?",
+                musicDescription:
+                    "Renaming does not change the sound. It changes how you read your music map, which helps you organize and remember musical ideas."
+            }
+        },
         expected: {
             pattern: ["A", "A", "B", "A"],
             chunkNames: ["A", "B"],
@@ -182,7 +220,7 @@ const PracticeProblems = [
         description: `
       <section class="story-card">
         <p>
-          Across the new bridge, Lyra and Beat find a silent Sakura grove. A
+          Across the new bridge, Lyra and Choon find a silent Sakura grove. A
           journal page flutters from one branch: "Sing the old blossom melody,
           and the petals will show the next clue."
         </p>
@@ -204,7 +242,7 @@ const PracticeProblems = [
           <div class="petal petal-three"></div>
         </div>
         <p>
-          Beat hears four sleepy chunks from <b>Sakura Sakura</b>. Play them
+          Choon hears four sleepy chunks from <b>Sakura Sakura</b>. Play them
           once, then guide them along the petal trail.
         </p>
       </section>
@@ -233,13 +271,51 @@ const PracticeProblems = [
           badges.
         </p>
         <div class="explore-grid">
-          <span>Rename chunks</span>
-          <span>Lift petals</span>
-          <span>Use transpose</span>
-          <span>Make a longer path</span>
+          <button type="button" data-secret-help="renameChunks">Rename chunks</button>
+          <button type="button" data-secret-help="changeOctave">Lift petals</button>
+          <button type="button" data-secret-help="useTranspose">Use transpose</button>
+          <button type="button" data-secret-help="makeLonger">Make a longer path</button>
         </div>
       </section>
     `,
+        secretHelpCards: {
+            renameChunks: {
+                title: "Rename chunks",
+                heading: "Name the Sakura chunks",
+                description:
+                    "Rename one or more melody chunks. Choose names that match what you hear, such as Blossom Start, Petal Turn, or Grove Ending.",
+                musicHeading: "What changes musically?",
+                musicDescription:
+                    "The melody sounds the same, but clear names make a long song easier to follow. Musicians often mark sections so they can rehearse and rearrange them."
+            },
+            changeOctave: {
+                title: "Lift petals",
+                heading: "Move a petal note higher or lower",
+                description:
+                    "Find a pitch block in the Sakura melody and change its octave number. Try lifting one note to 5 or lowering one to 3, then listen again.",
+                musicHeading: "What changes musically?",
+                musicDescription:
+                    "Changing octave keeps the note family the same but moves it higher or lower. A lifted note can sound like a petal floating above the melody."
+            },
+            useTranspose: {
+                title: "Use transpose",
+                heading: "Shift part of the grove melody",
+                description:
+                    "Wrap a small part of the Sakura path in a transpose block and choose a step value. Keep the main trail order the same.",
+                musicHeading: "What changes musically?",
+                musicDescription:
+                    "Transpose moves notes together. The musical shape stays recognizable, but the color of the melody changes."
+            },
+            makeLonger: {
+                title: "Make a longer path",
+                heading: "Extend the petal trail",
+                description:
+                    "Add another chunk, or repeat a favorite Sakura chunk after the required trail. Then press Play and Check My Work.",
+                musicHeading: "What changes musically?",
+                musicDescription:
+                    "A longer path gives the melody more time to travel. Repeating a chunk can make a musical phrase feel intentional and complete."
+            }
+        },
         expected: {
             pattern: [
                 "Sakura",

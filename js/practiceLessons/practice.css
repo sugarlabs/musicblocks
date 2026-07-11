@@ -427,7 +427,7 @@
 }
 
 .sound-chip,
-.explore-grid span {
+.explore-grid button {
     display: inline-flex;
     align-items: center;
     min-height: 30px;
@@ -438,6 +438,7 @@
     color: #5f4b00;
     font-size: 12px;
     font-weight: 700;
+    cursor: pointer;
 }
 
 .bridge-order {
@@ -446,7 +447,7 @@
     color: #1b4332;
 }
 
-.explore-grid span {
+.explore-grid button {
     background: #f8f9fa;
     border-color: #a8dadc;
     color: #34495e;
