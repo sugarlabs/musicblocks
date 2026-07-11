@@ -134,6 +134,7 @@ class Toolbar {
                 ["helpGuideItem", _("Help"), "innerHTML"],
                 ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
                 ["practiceLessonsItem", _("Practice levels"), "innerHTML"],
+                ["explorerJournalItem", _("Explorer Journal"), "innerHTML"],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -268,6 +269,7 @@ class Toolbar {
                 ["helpGuideItem", _("Help"), "innerHTML"],
                 ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
                 ["practiceLessonsItem", _("Practice levels"), "innerHTML"],
+                ["explorerJournalItem", _("Explorer Journal"), "innerHTML"],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -1224,7 +1226,12 @@ class Toolbar {
         const helpGuideItem = docById("helpGuideItem");
         const shortcutsGuideItem = docById("shortcutsGuideItem");
         const practiceLessonsItem = docById("practiceLessonsItem");
-        const hasDropdownMenu = !!helpGuideItem || !!shortcutsGuideItem || !!practiceLessonsItem;
+        const explorerJournalItem = docById("explorerJournalItem");
+        const hasDropdownMenu =
+            !!helpGuideItem ||
+            !!shortcutsGuideItem ||
+            !!practiceLessonsItem ||
+            !!explorerJournalItem;
 
         if (helpGuideItem) {
             helpGuideItem.onclick = event => {
@@ -1256,6 +1263,18 @@ class Toolbar {
                 }
                 if (typeof window.startPracticeMode === "function") {
                     window.startPracticeMode();
+                }
+            };
+        }
+
+        if (explorerJournalItem) {
+            explorerJournalItem.onclick = event => {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                if (typeof window.openExplorerJournal === "function") {
+                    window.openExplorerJournal();
                 }
             };
         }

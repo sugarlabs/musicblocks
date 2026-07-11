@@ -58,6 +58,11 @@ const PracticeProblems = [
         level: 1,
         island: "echo_island",
         title: "The Bridge of Echo Island",
+        journal: {
+            title: "Echo Island",
+            island: "Echo Island",
+            learned: ["Patterns", "Repeat Blocks"]
+        },
         description: `
       <section class="story-card">
         <p>
@@ -169,6 +174,11 @@ const PracticeProblems = [
         level: 2,
         island: "echo_island",
         title: "The Sakura Grove Echo",
+        journal: {
+            title: "Sakura Grove",
+            island: "Echo Island",
+            learned: ["Longer melodies", "Melody chunks"]
+        },
         description: `
       <section class="story-card">
         <p>
