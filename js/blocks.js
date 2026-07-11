@@ -5794,21 +5794,76 @@ class Blocks {
                 blockObjs.pop();
             }
 
-            /** Check for blocks connected to themselves, */
-            /** and for action blocks not connected to text blocks. */
+            /** Check for circular connections in block data. */
+            // 1. Direct self-loops
             for (let b = 0; b < blockObjs.length; b++) {
                 const blkData = blockObjs[b];
-
                 for (const c in blkData[4]) {
                     if (blkData[4][c] === blkData[0]) {
                         console.debug("Circular connection in block data: " + blkData);
-
                         console.debug("Punting loading of new blocks!");
-
                         console.debug(blockObjs);
                         return;
                     }
                 }
+            }
+
+            // 2. Multi-block cycles (DFS on outgoing connections: indices 1 and above)
+            const hasCycle = () => {
+                const adj = new Map();
+                for (let b = 0; b < blockObjs.length; b++) {
+                    const blkData = blockObjs[b];
+                    const id = blkData[0];
+                    const connections = blkData[4] || [];
+                    const neighbors = [];
+                    for (let c = 1; c < connections.length; c++) {
+                        const connId = connections[c];
+                        if (connId !== null && connId !== undefined) {
+                            neighbors.push(connId);
+                        }
+                    }
+                    adj.set(id, neighbors);
+                }
+
+                const visited = new Set();
+                const recStack = new Set();
+
+                const dfs = nodeId => {
+                    visited.add(nodeId);
+                    recStack.add(nodeId);
+
+                    const neighbors = adj.get(nodeId) || [];
+                    for (let i = 0; i < neighbors.length; i++) {
+                        const neighborId = neighbors[i];
+                        if (!visited.has(neighborId)) {
+                            if (dfs(neighborId)) {
+                                return true;
+                            }
+                        } else if (recStack.has(neighborId)) {
+                            return true;
+                        }
+                    }
+
+                    recStack.delete(nodeId);
+                    return false;
+                };
+
+                for (let b = 0; b < blockObjs.length; b++) {
+                    const id = blockObjs[b][0];
+                    if (!visited.has(id)) {
+                        if (dfs(id)) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            };
+
+            if (hasCycle()) {
+                console.debug("Circular connection in block data");
+                console.debug("Punting loading of new blocks!");
+                console.debug(blockObjs);
+                return;
             }
 
             /** We'll need a list of existing storein and action names. */
