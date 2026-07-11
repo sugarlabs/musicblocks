@@ -37,47 +37,62 @@ global.Synth = jest.fn().mockImplementation(() => ({
     disposeAllInstruments: jest.fn(),
     changeInTemperament: false,
     recorder: null,
-    transport: {
-        get isAvailable() {
-            return typeof global.Tone !== "undefined" && !!global.Tone.Transport;
-        },
-        start() {
-            if (this.isAvailable) global.Tone.Transport.start();
-        },
-        stop() {
-            if (this.isAvailable) global.Tone.Transport.stop();
-        },
-        cancel() {
-            if (this.isAvailable && typeof global.Tone.Transport.cancel === "function") {
-                global.Tone.Transport.cancel();
-            }
-        },
-        clear(id) {
-            if (this.isAvailable && typeof global.Tone.Transport.clear === "function") {
-                global.Tone.Transport.clear(id);
-            }
-        },
-        schedule(callback, time) {
-            if (this.isAvailable && typeof global.Tone.Transport.schedule === "function") {
-                return global.Tone.Transport.schedule(callback, time);
-            }
-            return null;
-        },
-        get seconds() {
-            if (this.isAvailable) return global.Tone.Transport.seconds;
-            return 0;
-        },
-        set seconds(v) {
-            if (this.isAvailable) global.Tone.Transport.seconds = v;
-        },
-        getSecondsAtTime(time) {
-            if (this.isAvailable && typeof global.Tone.Transport.getSecondsAtTime === "function") {
-                return global.Tone.Transport.getSecondsAtTime(time);
-            }
-            return this.seconds;
-        }
-    }
+    transport: createTransportMock()
 }));
+
+/**
+ * Returns a transport mock that mirrors the wrapper in synthutils.js.
+ * Centralised here so both the Synth mock and test-local overrides stay in sync.
+ */
+const createTransportMock = () => ({
+    get isAvailable() {
+        return typeof global.Tone !== "undefined" && !!global.Tone.Transport;
+    },
+    get isClockRunning() {
+        return (
+            this.isAvailable &&
+            typeof global.Tone.context !== "undefined" &&
+            global.Tone.context.state === "running" &&
+            global.Tone.Transport.state === "started"
+        );
+    },
+    start() {
+        if (this.isAvailable) global.Tone.Transport.start();
+    },
+    stop() {
+        if (this.isAvailable) global.Tone.Transport.stop();
+    },
+    cancel() {
+        if (this.isAvailable && typeof global.Tone.Transport.cancel === "function") {
+            global.Tone.Transport.cancel();
+        }
+    },
+    clear(id) {
+        if (this.isAvailable && typeof global.Tone.Transport.clear === "function") {
+            global.Tone.Transport.clear(id);
+        }
+    },
+    schedule(callback, time) {
+        if (this.isAvailable && typeof global.Tone.Transport.schedule === "function") {
+            return global.Tone.Transport.schedule(callback, time);
+        }
+        return null;
+    },
+    get seconds() {
+        if (this.isAvailable) return global.Tone.Transport.seconds;
+        return 0;
+    },
+    set seconds(v) {
+        if (this.isAvailable) global.Tone.Transport.seconds = v;
+    },
+    getSecondsAtTime(time) {
+        if (this.isAvailable && typeof global.Tone.Transport.getSecondsAtTime === "function") {
+            return global.Tone.Transport.getSecondsAtTime(time);
+        }
+        return this.seconds;
+    }
+});
+
 global.Singer = {
     setSynthVolume: jest.fn(),
     setMasterVolume: jest.fn(),
@@ -997,26 +1012,7 @@ describe("Logo doStopTurtles", () => {
                 stopSound: jest.fn(),
                 disposeAllInstruments: jest.fn(),
                 recorder: { state: "recording", stop: jest.fn() },
-                transport: {
-                    get isAvailable() {
-                        return typeof global.Tone !== "undefined" && !!global.Tone.Transport;
-                    },
-                    cancel() {
-                        if (
-                            this.isAvailable &&
-                            typeof global.Tone.Transport.cancel === "function"
-                        ) {
-                            global.Tone.Transport.cancel();
-                        }
-                    },
-                    get seconds() {
-                        if (this.isAvailable) return global.Tone.Transport.seconds;
-                        return 0;
-                    },
-                    set seconds(v) {
-                        if (this.isAvailable) global.Tone.Transport.seconds = v;
-                    }
-                }
+                transport: createTransportMock()
             };
         });
 
@@ -1275,7 +1271,7 @@ describe("Logo runFromBlock", () => {
     });
 
     describe("Transport scheduling", () => {
-        test("uses Transport.schedule when available", () => {
+        test("uses Transport.schedule when available and clock is running", () => {
             const getSecondsAtTimeMock = jest.fn(t => t + 1);
             let scheduledCallback = null;
             const scheduleSpy = jest.fn((fn, time) => {
@@ -1284,6 +1280,7 @@ describe("Logo runFromBlock", () => {
             });
             global.Tone = {
                 ...savedTone,
+                context: { state: "running" },
                 Transport: {
                     start: jest.fn(),
                     stop: jest.fn(),
@@ -1293,7 +1290,10 @@ describe("Logo runFromBlock", () => {
                     get seconds() {
                         return 0;
                     },
-                    set seconds(v) {}
+                    set seconds(v) {},
+                    get state() {
+                        return "started";
+                    }
                 }
             };
 
@@ -1329,6 +1329,114 @@ describe("Logo runFromBlock", () => {
 
             expect(timeoutSpy).toHaveBeenCalled();
             expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, 3, 1, "x");
+        });
+
+        test("falls back to setTimeout when AudioContext is suspended", () => {
+            global.Tone = {
+                ...savedTone,
+                context: { state: "suspended" },
+                Transport: {
+                    start: jest.fn(),
+                    stop: jest.fn(),
+                    schedule: jest.fn(),
+                    cancel: jest.fn(),
+                    getSecondsAtTime: jest.fn(() => 0),
+                    get seconds() {
+                        return 5;
+                    },
+                    set seconds(v) {},
+                    get state() {
+                        return "started";
+                    }
+                }
+            };
+            timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
+                fn();
+                return 5;
+            });
+
+            logo.runFromBlockNow = jest.fn();
+            logo.turtleDelay = 0;
+            logo.stopTurtle = false;
+            turtle0.waitTime = 200;
+            turtle0._transportTime = 10;
+
+            logo.runFromBlock(logo, 0, 3, 1, "x");
+
+            expect(global.Tone.Transport.schedule).not.toHaveBeenCalled();
+            expect(timeoutSpy).toHaveBeenCalled();
+            expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, 3, 1, "x");
+        });
+
+        test("falls back to setTimeout when Transport clock is stopped", () => {
+            global.Tone = {
+                ...savedTone,
+                context: { state: "running" },
+                Transport: {
+                    start: jest.fn(),
+                    stop: jest.fn(),
+                    schedule: jest.fn(),
+                    cancel: jest.fn(),
+                    getSecondsAtTime: jest.fn(() => 0),
+                    get seconds() {
+                        return 3;
+                    },
+                    set seconds(v) {},
+                    get state() {
+                        return "stopped";
+                    }
+                }
+            };
+            timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
+                fn();
+                return 5;
+            });
+
+            logo.runFromBlockNow = jest.fn();
+            logo.turtleDelay = 0;
+            logo.stopTurtle = false;
+            turtle0.waitTime = 200;
+            turtle0._transportTime = 10;
+
+            logo.runFromBlock(logo, 0, 3, 1, "x");
+
+            expect(global.Tone.Transport.schedule).not.toHaveBeenCalled();
+            expect(timeoutSpy).toHaveBeenCalled();
+            expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, 3, 1, "x");
+        });
+
+        test("clamps transportTime to prevent scheduling in the past", () => {
+            const scheduleSpy = jest.fn((fn, time) => "evt-clamp");
+            global.Tone = {
+                ...savedTone,
+                context: { state: "running" },
+                Transport: {
+                    start: jest.fn(),
+                    stop: jest.fn(),
+                    schedule: scheduleSpy,
+                    cancel: jest.fn(),
+                    getSecondsAtTime: jest.fn(t => t),
+                    get seconds() {
+                        return 20;
+                    },
+                    set seconds(v) {},
+                    get state() {
+                        return "started";
+                    }
+                }
+            };
+
+            logo.runFromBlockNow = jest.fn();
+            logo.turtleDelay = 0;
+            logo.stopTurtle = false;
+            turtle0.waitTime = 100;
+            turtle0._transportTime = 10;
+
+            logo.runFromBlock(logo, 0, 3, 1, "x");
+
+            const computedTime = 10 + 100 / 1000;
+            expect(computedTime).toBeLessThan(20);
+            expect(scheduleSpy).toHaveBeenCalledWith(expect.any(Function), 20);
         });
     });
 });

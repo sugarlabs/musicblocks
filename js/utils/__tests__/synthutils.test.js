@@ -61,7 +61,8 @@ describe("Utility Functions (logic-only)", () => {
         newTone,
         preloadProjectSamples,
         resolveInstrumentName,
-        Synth;
+        Synth,
+        transport;
 
     const turtle = "turtle1";
 
@@ -193,6 +194,7 @@ describe("Utility Functions (logic-only)", () => {
         newTone = Synth.newTone;
         preloadProjectSamples = Synth.preloadProjectSamples;
         resolveInstrumentName = Synth.resolveInstrumentName;
+        transport = Synth.transport;
     });
 
     describe("setupRecorder", () => {
@@ -896,6 +898,11 @@ describe("Utility Functions (logic-only)", () => {
     });
 
     describe("Tone Transport Controls", () => {
+        afterEach(() => {
+            Tone.context.state = "running";
+            Tone.Transport.state = "started";
+        });
+
         test("start should call Tone.Transport.start", () => {
             const startSpy = jest.spyOn(Tone.Transport, "start");
 
@@ -930,6 +937,28 @@ describe("Utility Functions (logic-only)", () => {
 
             startSpy.mockRestore();
             stopSpy.mockRestore();
+        });
+
+        test("isAvailable returns truthy when Tone.Transport exists", () => {
+            expect(transport.isAvailable).toBeTruthy();
+        });
+
+        test("isClockRunning returns true when context is running and transport is started", () => {
+            Tone.context.state = "running";
+            Tone.Transport.state = "started";
+            expect(transport.isClockRunning).toBe(true);
+        });
+
+        test("isClockRunning returns false when context is suspended", () => {
+            Tone.context.state = "suspended";
+            Tone.Transport.state = "started";
+            expect(transport.isClockRunning).toBe(false);
+        });
+
+        test("isClockRunning returns false when transport is stopped", () => {
+            Tone.context.state = "running";
+            Tone.Transport.state = "stopped";
+            expect(transport.isClockRunning).toBe(false);
         });
     });
 

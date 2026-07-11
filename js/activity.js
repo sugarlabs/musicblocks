@@ -33,7 +33,8 @@ try {
    Boundary, CARTESIAN, changeImage, closeWidgets, doRecordButton, setupActivityRecorder,
    setupGridController, setupGridRenderer, setupPluginController, setupToolbarController, setupAlertController, setupAlertRenderer, setupPaletteLoader, PluginDialog,
    setupProjectManager,
-   setupSearchController, setupSearchUI, setupWorkspaceLayoutController,
+   setupKeyboardController,
+   setupSearchController, setupSearchUI, setupWorkspaceLayoutController, setupSelectionController,
    setupActivityAbcParser, setupActivityIdleWatcher,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
@@ -135,6 +136,7 @@ let MYDEFINES = [
     "activity/search-controller",
     "activity/workspace-layout-controller",
     "search-ui",
+    "keyboard-controller",
     "widgets/plugin-dialog",
     "utils/musicutils",
     "utils/synthutils",
@@ -353,15 +355,6 @@ class Activity {
             this.storage = {};
         }
 
-        // Flag to indicate whether the user is performing a 2D drag operation.
-        this.isDragging = false;
-
-        // Flag to indicate whether user is selecting
-        this.isSelecting = false;
-
-        // Flag to indicate the selection mode is on
-        this.selectionModeOn = false;
-
         //Flag to check if any other input box is active or not
         this.isInputON = false;
 
@@ -479,6 +472,7 @@ class Activity {
 
         setupActivityIdleWatcher(this);
         setupProjectManager(this);
+        setupKeyboardController(this);
         setupPluginController(this);
         setupToolbarController(this);
         setupAlertController(this);
@@ -487,6 +481,7 @@ class Activity {
         this.searchUI = setupSearchUI(this);
         setupSearchController(this, this.searchUI);
         setupWorkspaceLayoutController(this);
+        setupSelectionController(this);
         this.pluginDialog = new PluginDialog({
             onLoadBuiltIn: name => this._loadBuiltInPlugin(name),
             onDelete: () => this._deletePlugin(),
@@ -604,7 +599,8 @@ class Activity {
                 if (this.stage) {
                     const hasActiveTweens = createjs.Tween.hasActiveTweens();
                     const hasActiveGifs = this.gifAnimator && this.gifAnimator.getActiveCount() > 0;
-                    const isInteracting = this.isDragging || this.isSelecting;
+                    const isInteracting =
+                        this.selectionController.isDragging || this.selectionController.isSelecting;
 
                     if (this.stageDirty || hasActiveTweens || hasActiveGifs || isInteracting) {
                         // Recompute culling when container moved.
@@ -1914,415 +1910,21 @@ class Activity {
         };
 
         /*
-         * Handles keyboard shortcuts in MB
+         * Keyboard shortcut dispatch, current-key-code state, and listener
+         * lifecycle are owned by KeyboardController (js/keyboard-controller.js).
          */
-        this.__keyPressed = event => {
-            // First, check if the pitch slider is open
-            if (window.widgetWindows.isOpen("slider") === true) {
-                // If the event is an arrow key, let the PitchSlider handle it
-                if (
-                    event.keyCode === 37 ||
-                    event.keyCode === 38 ||
-                    event.keyCode === 39 ||
-                    event.keyCode === 40
-                ) {
-                    // Simply prevent default behavior here
-                    // The actual pitch slider handling is done in the PitchSlider class
-                    event.preventDefault();
-                    event.stopPropagation();
-                    return false;
-                }
-            }
-
-            if (window.widgetWindows.isOpen("JavaScript Editor") === true) return;
-            if (!this.keyboardEnableFlag) {
-                return;
-            }
-            if (document.getElementById("labelDiv").classList.contains("hasKeyboard")) {
-                return;
-            }
-            // Skip hotkeys when value bar is visible (prevents accidental block creation)
-            if (this.printText && this.printText.classList.contains("show")) {
-                return;
-            }
-
-            if (this.keyboardEnableFlag) {
-                if (
-                    document.getElementById("BPMInput") !== null &&
-                    document.getElementById("BPMInput").classList.contains("hasKeyboard")
-                ) {
-                    return;
-                }
-                if (
-                    document.getElementById("musicratio1") !== null &&
-                    document.getElementById("musicratio1").classList.contains("hasKeyboard")
-                ) {
-                    return;
-                }
-                if (
-                    document.getElementById("musicratio2") !== null &&
-                    document.getElementById("musicratio2").classList.contains("hasKeyboard")
-                ) {
-                    return;
-                }
-                if (
-                    document.getElementById("dissectNumber") !== null &&
-                    document.getElementById("dissectNumber").classList.contains("hasKeyboard")
-                ) {
-                    return;
-                }
-                if (
-                    document.getElementById("timbreName") !== null &&
-                    document.getElementById("timbreName").classList.contains("hasKeyboard")
-                ) {
-                    return;
-                }
-            }
-            // const BACKSPACE = 8;
-            const TAB = 9;
-            if (event.keyCode === TAB) {
-                const active = document.activeElement;
-                const isCanvasOrBody =
-                    active === document.body ||
-                    active === document.getElementById("canvas") ||
-                    active === document.getElementById("myCanvas");
-                if (isCanvasOrBody) {
-                    event.preventDefault();
-                    return false;
-                }
-                return;
-            }
-            const ESC = 27;
-            // const ALT = 18;
-            // const CTRL = 17;
-            // const SHIFT = 16;
-            const RETURN = 13;
-            const SPACE = 32;
-            const HOME = 36;
-            const END = 35;
-            const PAGE_UP = 33;
-            const PAGE_DOWN = 34;
-            const KEYCODE_LEFT = 37;
-            const KEYCODE_RIGHT = 39;
-            const KEYCODE_UP = 38;
-            const KEYCODE_DOWN = 40;
-            const DEL = 46;
-            const V = 86;
-            const lilypondModal = document.getElementById("lilypondModal");
-            const samplerPrompt = document.getElementById("samplerPrompt");
-            const planetIframe = document.getElementById("planet-iframe");
-            const pasteEl = this.paste;
-            const wheelDiv = document.getElementById("wheelDiv");
-            const disableKeys =
-                lilypondModal.style.display === "block" ||
-                this.searchWidget.style.visibility === "visible" ||
-                this.helpfulSearchWidget.style.visibility === "visible" ||
-                this.isInputON ||
-                samplerPrompt ||
-                planetIframe.style.display === "" ||
-                pasteEl.style.visibility === "visible" ||
-                wheelDiv.style.display === "" ||
-                this.turtles.running();
-            const widgetTitle = document.getElementsByClassName("wftTitle");
-            for (let i = 0; i < widgetTitle.length; i++) {
-                if (widgetTitle[i].innerHTML === "tempo") {
-                    this.inTempoWidget = true;
-                    break;
-                }
-            }
-            if (
-                (event.altKey && !disableKeys) ||
-                event.keyCode === 13 ||
-                event.key === "/" ||
-                event.key === "\\"
-            ) {
-                switch (event.keyCode) {
-                    case 66: // 'B'
-                        this.textMsg("Alt-B " + _("Saving block artwork"));
-                        this.save.saveBlockArtwork();
-                        break;
-                    case 67: // 'C'
-                        this.textMsg("Alt-C " + _("Copy"));
-                        this.blocks.prepareStackForCopy();
-                        break;
-                    case 69: // 'E'
-                        this.textMsg("Alt-E " + _("Erase"));
-                        this._allClear(false);
-                        break;
-                    case 82: {
-                        // 'R or ENTER'
-                        this.textMsg("Alt-R " + _("Play"));
-                        this.toolbar.highlightStop(platformColor.stopIconcolor);
-                        this._doFastButton();
-                        break;
-                    }
-                    case 13: {
-                        // Alt+ENTER
-                        if (this.isInputON) return;
-
-                        if (this.searchWidget.style.visibility === "visible") {
-                            return;
-                        }
-                        if (pasteEl.style.visibility === "visible") {
-                            this.pasted();
-                            pasteEl.style.visibility = "hidden";
-                            return;
-                        }
-
-                        // Check if any widget window is open
-                        const hasOpenWidget = Object.values(window.widgetWindows.openWindows).some(
-                            w => w
-                        );
-                        if (this.turtles.running()) {
-                            this._doHardStopButton();
-                        } else if (!hasOpenWidget) {
-                            this.toolbar.highlightStop(platformColor.stopIconcolor);
-                            this._doFastButton();
-                        }
-                        break;
-                    }
-                    case 83: // 'S'
-                        this.textMsg("Alt-S " + _("Stop"));
-                        this.logo.doStopTurtles();
-                        break;
-                    case 86: // 'V'
-                        // this.textMsg("Alt-V " + _("Paste"));
-                        this.blocks.pasteStack();
-                        break;
-                    case 72: // 'H' save block help
-                        this.textMsg("Alt-H " + _("Save block help"));
-                        this._saveHelpBlocks();
-                        break;
-                    case 191:
-                        if (
-                            event.key === "/" &&
-                            !this.beginnerMode &&
-                            disableHorizScrollIcon.style.display === "block"
-                        ) {
-                            this.blocksContainer.x += this.canvas.width / 10;
-                            this.stageDirty = true;
-                        }
-                    // fall through
-                    case 220:
-                        if (
-                            event.key === "\\" &&
-                            !this.beginnerMode &&
-                            disableHorizScrollIcon.style.display === "block"
-                        ) {
-                            this.blocksContainer.x -= this.canvas.width / 10;
-                            this.stageDirty = true;
-                        }
-                }
-            } else if (event.ctrlKey) {
-                switch (event.keyCode) {
-                    case V:
-                        // this.textMsg("Ctl-V " + _("Paste"));
-                        this.pasteBox.createBox(this.turtleBlocksScale, 200, 200);
-                        this.pasteBox.show();
-                        pasteEl.style.left =
-                            (this.pasteBox.getPos()[0] + 10) * this.turtleBlocksScale + "px";
-                        pasteEl.style.top =
-                            (this.pasteBox.getPos()[1] + 10) * this.turtleBlocksScale + "px";
-                        pasteEl.focus();
-                        pasteEl.style.visibility = "visible";
-                        this.update = true;
-                        break;
-                }
-            } else if (event.shiftKey && !disableKeys) {
-                switch (event.keyCode) {
-                    case SPACE:
-                        event.preventDefault();
-                        if (this.turtleContainer.scaleX === 1) {
-                            this.turtles.setStageScale(0.5);
-                        } else {
-                            this.turtles.setStageScale(1);
-                        }
-                        break;
-                }
-            } else {
-                if (pasteEl.style.visibility === "visible" && event.keyCode === RETURN) {
-                    if (pasteEl.value.length > 0) {
-                        this.pasted();
-                    }
-                } else if (event.keyCode === SPACE) {
-                    // Check if any widget window is open
-                    const hasOpenWidget = Object.values(window.widgetWindows.openWindows).some(
-                        w => w
-                    );
-                    if (this.turtles.running()) {
-                        event.preventDefault();
-                        this._doHardStopButton();
-                    } else if (!disableKeys && !hasOpenWidget) {
-                        event.preventDefault();
-                        this.toolbar.highlightStop(platformColor.stopIconcolor);
-                        this._doFastButton();
-                    }
-                } else if (!disableKeys) {
-                    switch (event.keyCode) {
-                        case END:
-                            this.textMsg("END " + _("Jumping to the bottom of the page."));
-                            this.blocksContainer.y =
-                                -this.blocks.bottomMostBlock() + this.canvas.height / 2;
-                            this.stageDirty = true;
-                            break;
-                        case PAGE_UP:
-                            this.textMsg("PAGE_UP " + _("Scrolling up."));
-                            this.blocksContainer.y += this.canvas.height / 2;
-                            this.stageDirty = true;
-                            break;
-                        case PAGE_DOWN:
-                            this.textMsg("PAGE_DOWN " + _("Scrolling down."));
-                            this.blocksContainer.y -= this.canvas.height / 2;
-                            this.stageDirty = true;
-                            break;
-                        case DEL:
-                            this.textMsg("DEL " + _("Extracting block"));
-                            this.blocks.extract();
-                            break;
-                        case KEYCODE_UP:
-                            if (this.inTempoWidget) {
-                                this.logo.tempo.speedUp(0);
-                            } else {
-                                if (this.blocks.activeBlock !== null) {
-                                    this.textMsg("UP ARROW " + _("Moving block up."));
-                                    this.blocks.moveStackRelative(
-                                        this.blocks.activeBlock,
-                                        0,
-                                        -STANDARDBLOCKHEIGHT / 2
-                                    );
-                                    this.blocks.blockMoved(this.blocks.activeBlock);
-                                    this.blocks.adjustDocks(this.blocks.activeBlock, true);
-                                } else if (this.palettes.activePalette !== null) {
-                                    this.palettes.activePalette.scrollEvent(STANDARDBLOCKHEIGHT, 1);
-                                } else {
-                                    this.blocksContainer.y += 20;
-                                }
-                                this.stageDirty = true;
-                            }
-                            break;
-                        case KEYCODE_DOWN:
-                            if (this.inTempoWidget) {
-                                this.logo.tempo.slowDown(0);
-                            } else {
-                                if (this.blocks.activeBlock !== null) {
-                                    this.textMsg(`DOWN ARROW ${_("Moving block down.")}`);
-                                    this.blocks.moveStackRelative(
-                                        this.blocks.activeBlock,
-                                        0,
-                                        STANDARDBLOCKHEIGHT / 2
-                                    );
-                                    this.blocks.blockMoved(this.blocks.activeBlock);
-                                    this.blocks.adjustDocks(this.blocks.activeBlock, true);
-                                } else if (this.palettes.activePalette !== null) {
-                                    this.palettes.activePalette.scrollEvent(
-                                        -STANDARDBLOCKHEIGHT,
-                                        1
-                                    );
-                                } else {
-                                    this.blocksContainer.y -= 20;
-                                }
-                                this.stageDirty = true;
-                            }
-                            break;
-                        case KEYCODE_LEFT:
-                            if (!this.inTempoWidget) {
-                                if (this.blocks.activeBlock !== null) {
-                                    this.textMsg(`LEFT ARROW ${_("Moving block left.")}`);
-                                    this.blocks.moveStackRelative(
-                                        this.blocks.activeBlock,
-                                        -STANDARDBLOCKHEIGHT / 2,
-                                        0
-                                    );
-                                    this.blocks.blockMoved(this.blocks.activeBlock);
-                                    this.blocks.adjustDocks(this.blocks.activeBlock, true);
-                                } else if (this.scrollBlockContainer) {
-                                    this.blocksContainer.x += 20;
-                                }
-                                this.stageDirty = true;
-                            }
-                            break;
-                        case KEYCODE_RIGHT:
-                            if (!this.inTempoWidget) {
-                                if (this.blocks.activeBlock !== null) {
-                                    this.textMsg(`RIGHT ARROW ${_("Moving block right.")}`);
-                                    this.blocks.moveStackRelative(
-                                        this.blocks.activeBlock,
-                                        STANDARDBLOCKHEIGHT / 2,
-                                        0
-                                    );
-                                    this.blocks.blockMoved(this.blocks.activeBlock);
-                                    this.blocks.adjustDocks(this.blocks.activeBlock, true);
-                                } else if (this.scrollBlockContainer) {
-                                    this.blocksContainer.x -= 20;
-                                }
-                                this.stageDirty = true;
-                            }
-                            break;
-                        case HOME:
-                            this.textMsg(`HOME ${_("Jump to home position.")}`);
-                            if (this.palettes.mouseOver) {
-                                const dy = Math.max(55 - this.palettes.buttons["rhythm"].y, 0);
-                                this.palettes.menuScrollEvent(1, dy);
-                                this.palettes.hidePaletteIconCircles();
-                            } else if (this.palettes.activePalette !== null) {
-                                this.palettes.activePalette.scrollEvent(
-                                    -this.palettes.activePalette.scrollDiff,
-                                    1
-                                );
-                            } else {
-                                // Bring all the blocks "home".
-                                this.workspaceLayoutController._findBlocks();
-                            }
-                            this.stageDirty = true;
-                            break;
-                        case TAB:
-                            break;
-                        case ESC:
-                            if (this.searchWidget.style.visibility === "visible") {
-                                this.textMsg(`ESC ${_("Hide blocks")}`);
-                                this.searchWidget.style.visibility = "hidden";
-                            }
-                            break;
-                        case RETURN: {
-                            // Check if any widget window is open
-                            const hasOpenWidget = Object.values(
-                                window.widgetWindows.openWindows
-                            ).some(w => w);
-                            if (this.turtles.running()) {
-                                event.preventDefault();
-                                this._doHardStopButton();
-                            } else if (!disableKeys && !hasOpenWidget) {
-                                event.preventDefault();
-                                this.toolbar.highlightStop(platformColor.stopIconcolor);
-                                this._doFastButton();
-                            }
-                            break;
-                        }
-                        default:
-                            break;
-                    }
-                }
-
-                // Always store current key so as not to mask it from
-                // the keyboard block.
-                this.currentKeyCode = event.keyCode;
-            }
-        };
+        this.__keyPressed = (...args) => this.keyboardController.__keyPressed(...args);
 
         /**
          * @returns currentKeyCode
          */
-        this.getCurrentKeyCode = () => {
-            return this.currentKeyCode;
-        };
+        this.getCurrentKeyCode = (...args) => this.keyboardController.getCurrentKeyCode(...args);
 
         /*
          * Sets current key code to 0
          */
-        this.clearCurrentKeyCode = () => {
-            this.currentKey = "";
-            this.currentKeyCode = 0;
-        };
+        this.clearCurrentKeyCode = (...args) =>
+            this.keyboardController.clearCurrentKeyCode(...args);
 
         /*
          * Handles resizing for MB.
@@ -4317,294 +3919,18 @@ class Activity {
 
         this.__saveLocally = (...args) => this.projectManager.saveLocally(...args);
 
-        // Setup mouse events to start the drag
-
-        this.setupMouseEvents = () => {
-            this.addEventListener(
-                document,
-                "mousedown",
-                event => {
-                    if (!this.isSelecting) return;
-                    this.moving = false;
-                    // event.preventDefault();
-                    // event.stopPropagation();
-                    if (event.target.id === "myCanvas") {
-                        this._createDrag(event);
-                    }
-                },
-                false
-            );
-        };
-
-        // deselect the selected blocks
-
-        this.deselectSelectedBlocks = () => {
-            this.unhighlightSelectedBlocks(false);
-            this.setSelectionMode(false);
-        };
+        // 2D drag-selection and multi-selection are owned by
+        // SelectionController (js/activity/selection-controller.js).
+        // setupSelectionController() installs the delegation stubs below
+        // (setupMouseEvents, deselectSelectedBlocks, deleteMultipleBlocks,
+        // copyMultipleBlocks, selectMode, _create2Ddrag, _createDrag,
+        // drawSelectionArea, rectanglesOverlap, selectBlocksInDragArea,
+        // unhighlightSelectedBlocks, isEqual, setSelectionMode).
 
         // end the drag on navbar
         this.addEventListener(document.getElementById("toolbars"), "mouseover", () => {
-            this.isDragging = false;
+            this.selectionController.isDragging = false;
         });
-
-        this.deleteMultipleBlocks = () => {
-            if (this.blocks.selectionModeOn) {
-                const blocksArray = this.blocks.selectedBlocks;
-                // figure out which of the blocks in selectedBlocks are clamp blocks and nonClamp blocks.
-                const clampBlocks = [];
-                const nonClampBlocks = [];
-
-                for (let i = 0; i < blocksArray.length; i++) {
-                    if (this.blocks.selectedBlocks[i].isClampBlock()) {
-                        clampBlocks.push(this.blocks.selectedBlocks[i]);
-                    } else if (this.blocks.selectedBlocks[i].isDisconnected()) {
-                        nonClampBlocks.push(this.blocks.selectedBlocks[i]);
-                    }
-                }
-
-                for (let i = 0; i < clampBlocks.length; i++) {
-                    this.blocks.sendStackToTrash(clampBlocks[i]);
-                }
-
-                for (let i = 0; i < nonClampBlocks.length; i++) {
-                    this.blocks.sendStackToTrash(nonClampBlocks[i]);
-                }
-                // set selection mode to false
-                this.blocks.setSelectionToActivity(false);
-                this.refreshCanvas();
-                // Cache DOM element reference for performance
-                document.getElementById("helpfulWheelDiv").style.display = "none";
-            }
-        };
-
-        this.copyMultipleBlocks = () => {
-            if (this.blocks.selectionModeOn && this.blocks.selectedBlocks.length) {
-                const blocksArray = this.blocks.selectedBlocks;
-                let pasteDx = 0,
-                    pasteDy = 0;
-                const map = new Map();
-                for (let i = 0; i < blocksArray.length; i++) {
-                    const idx = blocksArray[i].blockIndex;
-                    map.set(
-                        idx,
-                        blocksArray[i].connections.filter(blk => blk !== null)
-                    );
-
-                    if (
-                        blocksArray[i].connections.some(blkno => {
-                            const a = map.get(blkno);
-                            return a && a.some(b => b === idx);
-                        }) ||
-                        blocksArray[i].trash
-                    )
-                        continue;
-
-                    this.blocks.activeBlock = idx;
-                    this.blocks.pasteDx = pasteDx;
-                    this.blocks.pasteDy = pasteDy;
-                    this.blocks.prepareStackForCopy();
-                    this.blocks.pasteStack();
-                    pasteDx += 21;
-                    pasteDy += 21;
-                }
-
-                this.setSelectionMode(false);
-                this.selectedBlocks = [];
-                this.unhighlightSelectedBlocks(false, false);
-                this.blocks.setSelectedBlocks(this.selectedBlocks);
-                this.refreshCanvas();
-                // Cache DOM element reference for performance
-                document.getElementById("helpfulWheelDiv").style.display = "none";
-            }
-        };
-
-        this.selectMode = () => {
-            this.moving = false;
-            this.isSelecting = !this.isSelecting;
-            this.isSelecting
-                ? this.textMsg(_("Select is enabled."))
-                : this.textMsg(_("Select is disabled."));
-            document.getElementById("helpfulWheelDiv").style.display = "none";
-        };
-
-        this._create2Ddrag = () => {
-            this.dragArea = {};
-            this.selectedBlocks = [];
-            this.startX = 0;
-            this.startY = 0;
-            this.currentX = 0;
-            this.currentY = 0;
-            this.hasMouseMoved = false;
-            // rAF guard for throttling drag-select mousemove
-            this._dragSelectRafPending = false;
-            if (this.selectionArea && this.selectionArea.parentNode) {
-                this.selectionArea.parentNode.removeChild(this.selectionArea);
-            }
-            this.selectionArea = document.createElement("div");
-            document.body.appendChild(this.selectionArea);
-
-            this.setupMouseEvents();
-
-            this.addEventListener(document, "mousemove", event => {
-                this.hasMouseMoved = true;
-                if (this.isDragging && this.isSelecting) {
-                    this.currentX = event.clientX;
-                    this.currentY = event.clientY;
-                    // Throttle drag-select to one update per animation frame
-                    if (
-                        !this._dragSelectRafPending &&
-                        !this.blocks.isBlockMoving &&
-                        !this.turtles.running()
-                    ) {
-                        this._dragSelectRafPending = true;
-                        requestAnimationFrame(() => {
-                            this._dragSelectRafPending = false;
-                            this.setSelectionMode(true);
-                            this.drawSelectionArea();
-                            this.selectedBlocks = this.selectBlocksInDragArea();
-                            this.unhighlightSelectedBlocks(true, true);
-                            this.blocks.setSelectedBlocks(this.selectedBlocks);
-                        });
-                    }
-                }
-            });
-
-            this.addEventListener(document, "mouseup", event => {
-                // event.preventDefault();
-                if (!this.isSelecting) return;
-                this.isDragging = false;
-                this.selectionArea.style.display = "none";
-                this.startX = 0;
-                this.startY = 0;
-                this.currentX = 0;
-                this.currentY = 0;
-                setTimeout(() => {
-                    this.hasMouseMoved = false;
-                }, 100);
-            });
-        };
-
-        // Set starting points of the drag
-
-        this._createDrag = event => {
-            this.isDragging = true;
-            this.startX = event.clientX;
-            this.startY = event.clientY;
-        };
-
-        // Draw the area that has been dragged
-
-        this.drawSelectionArea = () => {
-            const x = Math.min(this.startX, this.currentX);
-            const y = Math.min(this.startY, this.currentY);
-            const width = Math.abs(this.currentX - this.startX);
-            const height = Math.abs(this.currentY - this.startY);
-
-            // Batch all CSS writes into a single cssText assignment
-            // to avoid multiple forced style recalculations.
-            this.selectionArea.style.cssText =
-                "display:flex;position:absolute;" +
-                "left:" +
-                x +
-                "px;top:" +
-                y +
-                "px;" +
-                "width:" +
-                width +
-                "px;height:" +
-                height +
-                "px;" +
-                "z-index:9989;" +
-                "background-color:rgba(137,207,240,0.5);" +
-                "pointer-events:none;";
-
-            this.dragArea = { x, y, width, height };
-        };
-
-        // Check if the block is overlapping the dragged area.
-
-        this.rectanglesOverlap = (rect1, rect2) => {
-            return (
-                rect1.x + rect1.width > rect2.x &&
-                rect1.x < rect2.x + rect2.width &&
-                rect1.y + rect1.height > rect2.y &&
-                rect1.y < rect2.y + rect2.height
-            );
-        };
-
-        // Select the blocks that overlap the dragged area.
-
-        this.selectBlocksInDragArea = (dragArea, blocks) => {
-            const selectedBlocks = [];
-            this.dragRect = this.dragArea;
-
-            this.blocks.blockList.forEach(block => {
-                this.blockRect = {
-                    x: this.scrollBlockContainer
-                        ? block.container.x + this.blocksContainer.x
-                        : block.container.x,
-                    y: block.container.y + this.blocksContainer.y,
-                    height: block.height,
-                    width: block.width
-                };
-
-                if (this.rectanglesOverlap(this.blockRect, this.dragRect)) {
-                    selectedBlocks.push(block);
-                }
-            });
-            return selectedBlocks;
-        };
-
-        // Unhighlight the selected blocks
-
-        this.unhighlightSelectedBlocks = (unhighlight, selectionModeOn) => {
-            const blockIndexMap = new Map();
-            for (const [index, block] of this.blocks.blockList.entries()) {
-                if (block) {
-                    blockIndexMap.set(block, index);
-                }
-            }
-
-            for (let i = 0; i < this.selectedBlocks.length; i++) {
-                const blockIndex = blockIndexMap.get(this.selectedBlocks[i]);
-                if (blockIndex === undefined) {
-                    continue;
-                }
-
-                if (unhighlight) {
-                    this.blocks.unhighlightSelectedBlocks(blockIndex, true);
-                } else {
-                    this.blocks.highlight(blockIndex, true);
-                }
-            }
-
-            if (!unhighlight && this.selectedBlocks.length > 0) {
-                this.refreshCanvas();
-            }
-        };
-
-        // Check if two blocks are the same by identity (reference equality).
-
-        this.isEqual = (obj1, obj2) => {
-            return obj1 === obj2;
-        };
-
-        this.setSelectionMode = selection => {
-            if (selection) {
-                if (!this.selectionModeOn) {
-                    if (this.selectedBlocks.length !== 0) {
-                        this.selectedBlocks = [];
-                        this.selectionModeOn = selection;
-                        this.blocks.setSelection(this.selectionModeOn);
-                    }
-                }
-            } else {
-                this.selectedBlocks = [];
-                this.selectionModeOn = selection;
-                this.blocks.setSelection(this.selectionModeOn);
-            }
-        };
 
         /*
          * Inits everything. The main function.
@@ -4661,8 +3987,8 @@ class Activity {
             };
 
             this.handleDocumentClick = e => {
-                if (!this.hasMouseMoved) {
-                    if (this.selectionModeOn) {
+                if (!this.selectionController.hasMouseMoved) {
+                    if (this.selectionController.selectionModeOn) {
                         this.deselectSelectedBlocks();
                     } else {
                         this._hideHelpfulSearchWidget(e);
@@ -4917,14 +4243,8 @@ class Activity {
             // create functionality of 2D drag to select blocks in bulk
             this._create2Ddrag();
 
-            // Named event handler for proper cleanup
-            const activity = this;
-            this.handleKeyDown = event => {
-                activity.__keyPressed(event);
-            };
-
-            // Use managed addEventListener instead of onkeydown assignment
-            this.addEventListener(document, "keydown", this.handleKeyDown);
+            // Keyboard shortcut listener registration/cleanup is owned by
+            // KeyboardController (set up earlier in the constructor).
             this.addEventListener(
                 document,
                 "keydown",
