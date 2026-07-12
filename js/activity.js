@@ -715,6 +715,15 @@ class Activity {
                 helpfulWheelDiv.style.top = windowHeight - 350 + "px";
             }
 
+            // Show bulk actions only when blocks are multi-selected.
+            const selectedBlocksCount = this.blocks.selectedBlocks.filter(
+                block => !block.trash
+            ).length;
+            this.helpfulWheelItems.find(ele => ele.label === "Move to trash").display =
+                selectedBlocksCount > 0;
+            this.helpfulWheelItems.find(ele => ele.label === "Duplicate").display =
+                selectedBlocksCount > 0;
+
             helpfulWheelDiv.style.display = "";
 
             const wheel = new wheelnav("helpfulWheelDiv", null, 300, 300);
@@ -3398,6 +3407,22 @@ class Activity {
                         window.btoa(base64Encode(SELECTBUTTON)),
                     display: true,
                     fn: this.selectMode
+                });
+
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Move to trash"))
+                this.helpfulWheelItems.push({
+                    label: "Move to trash",
+                    icon: "imgsrc:header-icons/empty-trash-button.svg",
+                    display: false,
+                    fn: this.deleteMultipleBlocks
+                });
+
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Duplicate"))
+                this.helpfulWheelItems.push({
+                    label: "Duplicate",
+                    icon: "imgsrc:header-icons/copy-button.svg",
+                    display: false,
+                    fn: this.copyMultipleBlocks
                 });
 
             if (!this.helpfulWheelItems.find(ele => ele.label === "Clear"))
