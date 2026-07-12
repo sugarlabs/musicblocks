@@ -2091,14 +2091,33 @@ table {
 .msgCloseIcon {
     width: 28px;
     height: 28px;
-    filter: invert(100%);
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     transition:
         background-color 0.3s,
         filter 0.3s;
 }
 
-.msgCloseIcon:hover {
+.msgCloseIcon img {
+    width: 28px;
+    height: 28px;
+    filter: invert(100%);
+    transition: filter 0.3s;
+}
+
+.msgCloseIcon:hover img {
     filter: invert(0%);
+}
+
+.msgCloseIcon:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
 }
 
 .disable_highlighting {

@@ -283,23 +283,27 @@
             <div class="popupMsg" id="printText" tabindex="-1" aria-live="polite" role="status">
                 <div class="contentWrapper">
                     <span id="printTextContent"></span>
-                    <img
+                    <button
                         class="msgCloseIcon"
                         onclick="hidePrintText()"
-                        src="images/close.svg"
-                        alt="Close"
-                    />
+                        aria-label="Close notification"
+                        tabindex="0"
+                    >
+                        <img src="images/close.svg" alt="" aria-hidden="true" />
+                    </button>
                 </div>
             </div>
             <div class="popupMsg" id="errorText" tabindex="-1" aria-live="assertive" role="alert">
                 <div class="contentWrapper">
                     <span id="errorTextContent"></span>
-                    <img
+                    <button
                         class="msgCloseIcon"
                         onclick="hideErrorText()"
-                        src="images/close.svg"
-                        alt="Close"
-                    />
+                        aria-label="Close error message"
+                        tabindex="0"
+                    >
+                        <img src="images/close.svg" alt="" aria-hidden="true" />
+                    </button>
                 </div>
             </div>
             <div id="hideContents" style="display: none" tabindex="-1">
@@ -1351,7 +1355,7 @@
                     if (!persistentNotification) {
                         persistentNotification = document.createElement("div");
                         persistentNotification.id = "persistentNotification";
-                        persistentNotification.innerHTML =
+                        persistentNotification.textContent =
                             "Play only mode enabled. For full Music Blocks experience, use a larger display.";
                         document.body.appendChild(persistentNotification);
                     }
