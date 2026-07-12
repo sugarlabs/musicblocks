@@ -417,28 +417,34 @@ function setupOrnamentBlocks(activity) {
                 logo.notation.notationBeginSlur(turtle);
             }
 
-            // Signal the start of a glissando to the singer
+            const isOuterGlide = tur.singer.glide.length === 1;
             tur.singer.inGlide = true;
-            tur.singer.glideDuration = 0;
-            tur.singer.glideStartTime = tur.singer.turtleTime;
-            tur.singer.glideBuffer = [];
+            if (isOuterGlide) {
+                tur.singer.glideStartTime = tur.singer.turtleTime;
+                tur.singer.glideBuffer = [];
+            }
 
-            const listenerName = "_glide_" + turtle;
+            const listenerName = "_glide_" + turtle + "_" + blk;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = event => {
-                if (tur.singer.justCounting.length === 0) {
-                    logo.notation.notationEndSlur(turtle);
-                }
+                const isOuterGlide = tur.singer.glide.length === 1;
+                try {
+                    if (tur.singer.justCounting.length === 0) {
+                        logo.notation.notationEndSlur(turtle);
+                    }
 
-                // Play the buffered glissando
-                if (tur.singer.glideBuffer.length > 0) {
-                    Singer.playGlideBuffer(activity, turtle);
+                    if (isOuterGlide) {
+                        Singer.playGlideBuffer(activity, turtle);
+                    }
+                } finally {
+                    tur.singer.glide.pop();
+                    tur.singer.inGlide = tur.singer.glide.length > 0;
+                    if (!tur.singer.inGlide) {
+                        tur.singer.glideBuffer = [];
+                        tur.singer.glideStartTime = 0;
+                    }
                 }
-
-                // Signal the end of the glissando
-                tur.singer.inGlide = false;
-                tur.singer.glide.pop();
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);

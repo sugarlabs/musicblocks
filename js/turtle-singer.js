@@ -175,7 +175,6 @@ class Singer {
         this.glide = [];
         this.glideOverride = 0;
         this.inGlide = false;
-        this.glideDuration = 0;
         this.glideBuffer = [];
         this.glideStartTime = 0;
         this.swing = [];
@@ -1887,6 +1886,7 @@ class Singer {
                 }
             }
 
+            const glideTime = tur.singer.turtleTime;
             // Duration is the duration of the note to be played. doWait sets the wait time for the turtle before the next block is executed
             const duration = tur.singer.inGlide ? 0 : noteBeatValue;
             // For the outermost note (when nesting), calculate the time for the next note
@@ -2355,15 +2355,16 @@ class Singer {
                                                         ? last(tur.singer.voices)
                                                         : null;
                                                 const target = instrument || voice || DEFAULTVOICE;
-                                                const isVoice = !!voice;
 
                                                 if (tur.singer.inGlide) {
                                                     const bufferNote = {
                                                         target: target,
                                                         note: notes[d],
                                                         duration: beatValue,
-                                                        time: tur.singer.turtleTime,
-                                                        isVoice: isVoice
+                                                        time: glideTime,
+                                                        future: future,
+                                                        paramsEffects: paramsEffects,
+                                                        filters: filters
                                                     };
                                                     tur.singer.glideBuffer.push(bufferNote);
                                                 } else {
@@ -2595,53 +2596,25 @@ class Singer {
         const buffer = tur.singer.glideBuffer;
         if (buffer.length === 0) return;
 
-        const bpm = tur.singer.bpm[tur.singer.bpm.length - 1];
-        const portamento = 60 / (bpm * 8); // Standard portamento for glide
-
-        // The first note in the buffer should be played normally to establish the starting pitch
-        // Subsequent notes should be played with portamento.
         const startTime = tur.singer.glideStartTime;
-
-        buffer.forEach((noteObj, index) => {
-            const isFirst = index === 0;
-            const noteDuration = noteObj.duration;
-            const scheduledTime = noteObj.time;
-
-            // Calculate the delay relative to Tone.now()
-            // turtleTime is absolute in seconds relative to project start.
-            // scheduledTime - startTime is the offset within the glide.
-            const delay = scheduledTime - startTime;
-
-            // Trigger the note
-            if (noteObj.isVoice) {
-                activity.synth.setNote(noteObj.target, noteObj.note, true);
-                activity.synth.trigger(
-                    noteObj.target,
+        try {
+            buffer.forEach((noteObj, index) => {
+                const future = Math.max(0, (noteObj.future || 0) + noteObj.time - startTime);
+                activity.logo.synth.trigger(
+                    turtle,
                     noteObj.note,
-                    noteDuration,
-                    true,
-                    true,
-                    delay
-                );
-            } else {
-                if (!isFirst) {
-                    activity.synth.setPortamento(noteObj.target, portamento);
-                }
-                activity.synth.trigger(
+                    noteObj.duration,
                     noteObj.target,
-                    noteObj.note,
-                    noteDuration,
-                    false,
-                    true,
-                    delay,
-                    !isFirst // doPortamento
+                    noteObj.paramsEffects,
+                    noteObj.filters,
+                    index > 0,
+                    future
                 );
-            }
-        });
-
-        // Reset buffer and state
-        tur.singer.glideBuffer = [];
-        activity.stageDirty = true;
+            });
+        } finally {
+            tur.singer.glideBuffer = [];
+            activity.stageDirty = true;
+        }
     }
 }
 

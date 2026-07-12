@@ -159,6 +159,145 @@ describe("Singer Class", () => {
     });
 });
 
+describe("Singer.playGlideBuffer", () => {
+    let activity;
+    let turtle;
+
+    beforeEach(() => {
+        turtle = {
+            singer: {
+                glideStartTime: 10,
+                glideBuffer: []
+            }
+        };
+        activity = {
+            stageDirty: false,
+            turtles: { ithTurtle: jest.fn().mockReturnValue(turtle) },
+            logo: { synth: { trigger: jest.fn() } }
+        };
+    });
+
+    test("preserves note order, offsets, effects, filters, and portamento", () => {
+        const effects = { doPortamento: true, portamento: 0.125 };
+        const filters = [{ filterFrequency: 440 }];
+        turtle.singer.glideBuffer = [
+            {
+                target: "piano",
+                note: "C4",
+                duration: 0.5,
+                time: 10,
+                future: 0,
+                paramsEffects: effects,
+                filters: filters
+            },
+            {
+                target: "piano",
+                note: "E4",
+                duration: 0.5,
+                time: 10.5,
+                future: 0,
+                paramsEffects: effects,
+                filters: filters
+            },
+            {
+                target: "piano",
+                note: "G4",
+                duration: 0.5,
+                time: 11,
+                future: 0.25,
+                paramsEffects: effects,
+                filters: filters
+            }
+        ];
+
+        Singer.playGlideBuffer(activity, 3);
+
+        expect(activity.logo.synth.trigger).toHaveBeenNthCalledWith(
+            1,
+            3,
+            "C4",
+            0.5,
+            "piano",
+            effects,
+            filters,
+            false,
+            0
+        );
+        expect(activity.logo.synth.trigger).toHaveBeenNthCalledWith(
+            2,
+            3,
+            "E4",
+            0.5,
+            "piano",
+            effects,
+            filters,
+            true,
+            0.5
+        );
+        expect(activity.logo.synth.trigger).toHaveBeenNthCalledWith(
+            3,
+            3,
+            "G4",
+            0.5,
+            "piano",
+            effects,
+            filters,
+            true,
+            1.25
+        );
+        expect(turtle.singer.glideBuffer).toEqual([]);
+        expect(activity.stageDirty).toBe(true);
+    });
+
+    test("uses same real synth API for voice playback", () => {
+        turtle.singer.glideBuffer = [
+            {
+                target: "vocal",
+                note: "C4",
+                duration: 1,
+                time: 10,
+                future: 0,
+                paramsEffects: { doPortamento: true, portamento: 1 / 16 },
+                filters: null
+            }
+        ];
+
+        Singer.playGlideBuffer(activity, 2);
+
+        expect(activity.logo.synth.trigger).toHaveBeenCalledWith(
+            2,
+            "C4",
+            1,
+            "vocal",
+            { doPortamento: true, portamento: 1 / 16 },
+            null,
+            false,
+            0
+        );
+    });
+
+    test("resets the buffer when triggering throws", () => {
+        activity.logo.synth.trigger.mockImplementation(() => {
+            throw new Error("synth failure");
+        });
+        turtle.singer.glideBuffer = [
+            {
+                target: "piano",
+                note: "C4",
+                duration: 1,
+                time: 10,
+                future: 0,
+                paramsEffects: null,
+                filters: null
+            }
+        ];
+
+        expect(() => Singer.playGlideBuffer(activity, 0)).toThrow("synth failure");
+        expect(turtle.singer.glideBuffer).toEqual([]);
+        expect(activity.stageDirty).toBe(true);
+    });
+});
+
 describe("State initialization — note parameters", () => {
     let singer;
 

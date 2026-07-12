@@ -100,8 +100,9 @@ describe("setupOrnamentBlocks", () => {
                             glide: [],
                             justCounting: [],
                             glideBuffer: [],
-                            glideDuration: 0,
-                            inGlide: false
+                            inGlide: false,
+                            turtleTime: 0,
+                            glideStartTime: 0
                         }
                     };
                 }
@@ -251,6 +252,7 @@ describe("setupOrnamentBlocks", () => {
             expect(turtleObj.singer.glide).toContain(0.1);
             expect(turtleObj.singer.inGlide).toBe(true);
             expect(turtleObj.singer.glideBuffer).toEqual([]);
+            expect(Singer.noteCounter).not.toHaveBeenCalled();
             expect(logo.notation.notationBeginSlur).toHaveBeenCalledWith(turtleIndex);
             expect(logo.setDispatchBlock).toHaveBeenCalledWith(
                 "blkGlide",
@@ -259,6 +261,17 @@ describe("setupOrnamentBlocks", () => {
             );
             expect(logo.setTurtleListener).toHaveBeenCalled();
             expect(result).toEqual([8, 1]);
+        });
+
+        it("should not run a side-effecting clamp while starting a glide", () => {
+            const glideBlock = createdBlocks["glide"];
+            const clampFlow = jest.fn();
+            Singer.noteCounter.mockImplementation(clampFlow);
+
+            glideBlock.flow([0.1, "clamp"], logo, 0, "blkGlide");
+
+            expect(Singer.noteCounter).not.toHaveBeenCalled();
+            expect(clampFlow).not.toHaveBeenCalled();
         });
 
         it("should default glide argument and call errorMsg if first argument is invalid", () => {
@@ -289,6 +302,32 @@ describe("setupOrnamentBlocks", () => {
             expect(logo.notation.notationEndSlur).toHaveBeenCalledWith(turtleIndex);
             expect(turtleObj.singer.glide).toHaveLength(0);
             expect(turtleObj.singer.inGlide).toBe(false);
+        });
+
+        it("should keep buffered notes until the outer nested glide ends", () => {
+            const glideBlock = createdBlocks["glide"];
+            const turtleObj = activity.turtles.ithTurtle(0);
+            const listeners = [];
+            logo.setTurtleListener = jest.fn((turtle, name, listener) => listeners.push(listener));
+
+            glideBlock.flow([0.1, "outer"], logo, 0, "outer");
+            turtleObj.singer.glideBuffer.push({ note: "C4" });
+            glideBlock.flow([0.2, "inner"], logo, 0, "inner");
+
+            expect(logo.setTurtleListener.mock.calls[0][1]).not.toBe(
+                logo.setTurtleListener.mock.calls[1][1]
+            );
+            listeners[1]({});
+
+            expect(Singer.playGlideBuffer).not.toHaveBeenCalled();
+            expect(turtleObj.singer.inGlide).toBe(true);
+            expect(turtleObj.singer.glideBuffer).toEqual([{ note: "C4" }]);
+
+            listeners[0]({});
+
+            expect(Singer.playGlideBuffer).toHaveBeenCalledWith(activity, 0);
+            expect(turtleObj.singer.inGlide).toBe(false);
+            expect(turtleObj.singer.glideBuffer).toEqual([]);
         });
 
         it("should skip notationEndSlur in __listener when justCounting is non-empty", () => {
