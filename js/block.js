@@ -835,7 +835,9 @@ class Block {
             }
         }
 
-        this.container.updateCache();
+        if (this._viewportVisible) {
+            this.container.updateCache();
+        }
     }
 
     unhighlightSelectedBlocks(blk, selection) {
