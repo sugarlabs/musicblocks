@@ -4053,18 +4053,17 @@ const piemenuGrid = activity => {
             "imgsrc: images/grid/Tenor.svg",
             "imgsrc: images/grid/Bass.svg"
         ];
-
         gridLabels = [
-            "Blank",
-            "Cartesian",
-            "Cartesian/Polar",
-            "Polar",
-            "Treble",
-            "Grand",
-            "Mezzo Soprano",
-            "Alto",
-            "Tenor",
-            "Bass"
+            _("Blank"),
+            _("Cartesian"),
+            _("Cartesian/Polar"),
+            _("Polar"),
+            _("Treble"),
+            _("Grand"),
+            _("Mezzo Soprano"),
+            _("Alto"),
+            _("Tenor"),
+            _("Bass")
         ];
     }
 
