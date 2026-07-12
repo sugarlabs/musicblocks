@@ -279,6 +279,9 @@ class Turtle {
         this.singer.staccato = [];
         this.singer.glide = [];
         this.singer.glideOverride = 0;
+        this.singer.inGlide = false;
+        this.singer.glideBuffer = [];
+        this.singer.glideStartTime = 0;
         this.singer.swing = [];
         this.singer.swingTarget = [];
         this.singer.swingCarryOver = 0;
