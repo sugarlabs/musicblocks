@@ -264,7 +264,7 @@ describe("FlowBlocks integration", () => {
         // Factor is multiplied before listener runs
         expect(turtle.singer.duplicateFactor).toBe(2);
         const listener = logo.setTurtleListener.mock.calls.pop()[2];
-        listener();
+        expect(listener()).toBeUndefined();
         expect(turtle.singer.duplicateFactor).toBe(1);
 
         // Path where another turtle already stored connections
@@ -312,6 +312,25 @@ describe("FlowBlocks integration", () => {
         }).toThrow();
 
         // The critical guarantee: lock is released even after an error
+        expect(logo.connectionStoreLock).toBe(false);
+    });
+
+    test("DuplicateBlock listener releases lock when restoration throws", () => {
+        const block = getBlock("duplicatenotes");
+        const blk = 0;
+        activity.blocks.blockList = {
+            0: { name: "duplicatenotes", connections: [null, 1, null, 2] },
+            1: { name: "visibleA", connections: [0, 2] },
+            2: { name: "hidden", connections: [1, null] }
+        };
+        activity.blocks.findBottomBlock = jest.fn(() => 1);
+        logo.connectionStore = { 0: {} };
+
+        block.flow([2, 1], logo, 0, blk, []);
+        logo.connectionStore[0][blk] = [["missing", 0, null]];
+        const listener = logo.setTurtleListener.mock.calls.pop()[2];
+
+        expect(() => listener()).toThrow();
         expect(logo.connectionStoreLock).toBe(false);
     });
 

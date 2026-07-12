@@ -793,7 +793,7 @@ describe("setupIntervalsBlocks", () => {
             expect(activity.blocks.blockList.hidden1.connections[1]).toBeNull();
         });
 
-        it("listener restores disconnected links", async () => {
+        it("listener restores disconnected links synchronously without polling", () => {
             activity.blocks.blockList.blkArp = { name: "arpeggio", connections: [null] };
             activity.blocks.blockList.child1 = {
                 name: "note",
@@ -812,12 +812,32 @@ describe("setupIntervalsBlocks", () => {
             const listener =
                 logo.setTurtleListener.mock.calls[logo.setTurtleListener.mock.calls.length - 1][2];
 
-            await listener();
+            jest.useFakeTimers();
+            expect(listener()).toBeUndefined();
+            expect(jest.getTimerCount()).toBe(0);
+            jest.useRealTimers();
 
             expect(activity.blocks.blockList.child1.connections[2]).toBe("child2");
             expect(activity.blocks.blockList.child2.connections[0]).toBe("child1");
             expect(turtleState.singer.duplicateFactor).toBe(1);
             expect(turtleState.singer.inDuplicate).toBe(false);
+            expect(logo.connectionStoreLock).toBe(false);
+        });
+
+        it("listener releases lock when restoration throws", () => {
+            activity.blocks.blockList.blkArp = { name: "arpeggio", connections: [null] };
+            activity.blocks.blockList.child1 = {
+                name: "note",
+                connections: ["blkArp", null, null]
+            };
+            activity.blocks.findBottomBlock = jest.fn(() => "child1");
+
+            createdBlocks.arpeggio.flow(["major", "child1"], logo, turtleIndex, "blkArp", "arg");
+            logo.connectionStore[0].blkArp = [["missing", 0, null]];
+            const listener =
+                logo.setTurtleListener.mock.calls[logo.setTurtleListener.mock.calls.length - 1][2];
+
+            expect(() => listener()).toThrow();
             expect(logo.connectionStoreLock).toBe(false);
         });
     });
