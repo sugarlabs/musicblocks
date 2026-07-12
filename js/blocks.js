@@ -90,7 +90,6 @@ function getInlineCollapsiblesSet() {
 const CAMERAVALUE = "##__CAMERA__##";
 const VIDEOVALUE = "##__VIDEO__##";
 
-const NOTEBLOCKS = ["newnote", "osctime"];
 const PITCHBLOCKS = ["pitch", "steppitch", "hertz", "pitchnumber", "nthmodalpitch", "playdrum"];
 
 const ALLOWED_CONNECTIONS = new Set([
@@ -1605,7 +1604,7 @@ class Blocks {
                         oldBlock
                     ]);
                 }
-            } else if (NOTEBLOCKS.includes(this.blockList[parentblk].name)) {
+            } else if (this.blockList[parentblk].isNoteContainer()) {
                 cblk = this.blockList[parentblk].connections[2];
                 if (cblk === null) {
                     const newVspaceBlock = this.makeBlock("vspace", "__NOARG__");
@@ -1644,7 +1643,7 @@ class Blocks {
             let counter = 0;
 
             while (true) {
-                if (NOTEBLOCKS.includes(this.blockList[c].name)) {
+                if (this.blockList[c].isNoteContainer()) {
                     break;
                 }
 
@@ -1777,7 +1776,7 @@ class Blocks {
             } else {
                 while (thisBlockobj.connections[0] !== null) {
                     const i = thisBlockobj.connections[0];
-                    if (NOTEBLOCKS.includes(this.blockList[i].name)) {
+                    if (this.blockList[i].isNoteContainer()) {
                         break;
                     } else if (this.blockList[i].name === "rest2") {
                         const silenceBlock = i;
@@ -4966,7 +4965,7 @@ class Blocks {
                         /** Connection 1 of a note block is not inside the clamp. */
                         return null;
                     } else {
-                        if (NOTEBLOCKS.includes(this.blockList[cblk].name)) {
+                        if (this.blockList[cblk].isNoteContainer()) {
                             return cblk;
                         } else {
                             return null;
@@ -4979,7 +4978,7 @@ class Blocks {
         };
 
         this._isConnectedToNoteValue = blk => {
-            if (NOTEBLOCKS.includes(this.blockList[blk].name)) {
+            if (this.blockList[blk].isNoteContainer()) {
                 return true;
             } else if (this.blockList[blk].connections[0] === null) {
                 return false;

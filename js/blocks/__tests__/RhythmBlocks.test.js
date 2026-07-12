@@ -50,10 +50,21 @@ global.Queue = class Queue {
 class BaseBlock {
     constructor(name) {
         this.name = name;
+        this.capabilities = Object.create(null);
         this.dockTypes = [null];
         this.size = 1;
         this.lang = "en";
         this.hidden = false;
+    }
+
+    setCapability(name, value = true) {
+        this.capabilities[name] = !!value;
+    }
+
+    getCapability(name) {
+        return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+            ? this.capabilities[name]
+            : undefined;
     }
 
     setPalette(palette) {
@@ -852,6 +863,16 @@ describe("RhythmBlocks", () => {
             listener({});
             expect(turtle.singer.swing.length).toBe(1);
             expect(turtle.singer.swingTarget.length).toBe(1);
+        });
+    });
+
+    describe("noteContainer capability", () => {
+        test("newnote declares noteContainer capability", () => {
+            expect(getBlock("newnote").getCapability("noteContainer")).toBe(true);
+        });
+
+        test("osctime declares noteContainer capability", () => {
+            expect(getBlock("osctime").getCapability("noteContainer")).toBe(true);
         });
     });
 });

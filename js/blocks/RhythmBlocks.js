@@ -67,7 +67,7 @@ function setupRhythmBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -118,7 +118,7 @@ function setupRhythmBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -140,6 +140,7 @@ function setupRhythmBlocks(activity) {
          */
         constructor() {
             super("osctime");
+            this.setCapability("noteContainer");
             this.setPalette("rhythm", activity);
             this.setHelpString([
                 _(
@@ -1115,6 +1116,7 @@ function setupRhythmBlocks(activity) {
          */
         constructor() {
             super("newnote");
+            this.setCapability("noteContainer");
             this.setPalette("rhythm", activity);
             this.beginnerBlock(true);
             this.setHelpString([
