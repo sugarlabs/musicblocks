@@ -4054,17 +4054,18 @@ const piemenuGrid = activity => {
             "imgsrc: images/grid/Bass.svg"
         ];
 
+        // Use the same strings as found in ExtraBlocks.js for i18n purposes.
         gridLabels = [
-            "Blank",
+            "none",
             "Cartesian",
             "Cartesian/Polar",
-            "Polar",
-            "Treble",
-            "Grand",
-            "Mezzo Soprano",
-            "Alto",
-            "Tenor",
-            "Bass"
+            "polar",
+            "treble",
+            "grand staff",
+            "mezzo-soprano",
+            "alto",
+            "tenor",
+            "bass"
         ];
     }
 
@@ -4097,7 +4098,7 @@ const piemenuGrid = activity => {
             activity.turtles.currentGrid = i;
             activity.turtles.doGrid(i);
         };
-        activity.turtles.gridWheel.navItems[i].setTooltip(gridLabels[i]);
+        activity.turtles.gridWheel.navItems[i].setTooltip(_(gridLabels[i]));
     }
 
     activity.turtles._exitWheel.colors = platformColor.exitWheelcolors;
