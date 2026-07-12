@@ -4039,7 +4039,7 @@ const piemenuGrid = activity => {
             ""
         ];
 
-        gridLabels = ["Blank", "Cartesian", "Cartesian/Polar", "Polar", "Blank"];
+        gridLabels = ["none", "Cartesian", "Cartesian/Polar", "polar", "none"];
     } else {
         grids = [
             "imgsrc: images/grid/blank.svg",
