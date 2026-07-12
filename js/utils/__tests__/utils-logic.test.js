@@ -9,6 +9,8 @@
  * (at your option) any later version.
  */
 
+global._ = msg => msg;
+
 const {
     toTitleCase,
     fileExt,
@@ -44,6 +46,10 @@ describe("Utility Logic Functions", () => {
 
         it("returns fallback for non-string input", () => {
             expect(safeJSONParse(null, "fallback")).toBe("fallback");
+        });
+
+        it("returns null fallback by default for invalid JSON", () => {
+            expect(safeJSONParse("invalid")).toBeNull();
         });
     });
 
@@ -170,7 +176,8 @@ describe("Utility Logic Functions", () => {
             expect(oneHundredToFraction(91)).toEqual([11, 12]);
             expect(oneHundredToFraction(96)).toEqual([31, 32]);
             expect(oneHundredToFraction(99)).toEqual([63, 64]);
-            expect(oneHundredToFraction(97)).toEqual([97, 100]);
+            expect(oneHundredToFraction(55)).toEqual([9, 16]);
+            expect(oneHundredToFraction(97)).toEqual([31, 32]);
         });
     });
 
@@ -189,30 +196,33 @@ describe("Utility Logic Functions", () => {
 
     describe("rationalSum()", () => {
         it("adds simple fractions", () => {
-            expect(rationalSum([1, 2], [1, 2])).toEqual([2, 2]);
+            expect(rationalSum([1, 2], [1, 2])).toEqual([[2, 2], null]);
         });
 
         it("handles unequal denominators", () => {
-            expect(rationalSum([1, 3], [1, 6])).toEqual([3, 6]);
+            expect(rationalSum([1, 3], [1, 6])).toEqual([[3, 6], null]);
         });
 
         it("handles invalid input", () => {
-            expect(rationalSum(null, [1, 2])).toEqual([0, 1]);
+            const [result] = rationalSum(null, [1, 2]);
+            expect(result).toEqual([0, 1]);
         });
 
         it("handles zero values", () => {
-            expect(rationalSum([0, 1], [1, 2])).toEqual([1, 2]);
-            expect(rationalSum([1, 2], [0, 1])).toEqual([1, 2]);
+            expect(rationalSum([0, 1], [1, 2])).toEqual([[1, 2], null]);
+            expect(rationalSum([1, 2], [0, 1])).toEqual([[1, 2], null]);
         });
 
         it("handles negative values", () => {
-            expect(rationalSum([-1, 2], [1, 2])).toEqual([0, 2]);
-            expect(rationalSum([1, 2], [-1, 2])).toEqual([0, 2]);
+            expect(rationalSum([-1, 2], [1, 2])).toEqual([[0, 2], null]);
+            expect(rationalSum([1, 2], [-1, 2])).toEqual([[0, 2], null]);
         });
 
         it("handles zero denominator", () => {
-            expect(rationalSum([1, 0], [1, 2])).toEqual([0, 1]);
-            expect(rationalSum([1, 2], [1, 0])).toEqual([0, 1]);
+            const [result1] = rationalSum([1, 0], [1, 2]);
+            expect(result1).toEqual([0, 1]);
+            const [result2] = rationalSum([1, 2], [1, 0]);
+            expect(result2).toEqual([0, 1]);
         });
     });
 

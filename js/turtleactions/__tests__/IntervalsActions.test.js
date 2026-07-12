@@ -291,6 +291,75 @@ describe("setupIntervalsActions", () => {
         expect(typeof Singer.IntervalsActions.GetCurrentInterval(0)).toBe("string");
     });
 
+    describe("GetCurrentInterval with custom temperaments", () => {
+        beforeEach(() => {
+            logo.synth.inTemperament = "custom_edo19";
+            global.TEMPERAMENT.custom_edo19 = { pitchNumber: 19 };
+
+            // Extend SEMITONETOINTERVALMAP so indices up to 24 are accessible
+            global.SEMITONETOINTERVALMAP = Array(25)
+                .fill(null)
+                .map(() => Array(7).fill("test_interval"));
+        });
+
+        test("19-EDO overflow guard triggers at > 28 (not > 21)", () => {
+            // C→B (diff=11), octave=1 → totalIntervals = 11 + 19 = 30
+            // 30 > 28 → trigger overflow, reduce by 19 → 11
+            const notes = { firstNote: "C", secondNote: "B", octave: 1 };
+            GetNotesForInterval.mockReturnValueOnce(notes);
+            GetNotesForInterval.mockReturnValueOnce(notes);
+
+            const result = Singer.IntervalsActions.GetCurrentInterval(0);
+            // lastWord = ", plus one octave" → "test_interval, plus one octave"
+            expect(result).toContain("plus");
+            expect(result).toContain("octave");
+        });
+
+        test("19-EDO overflow with multiple octaves uses correct plural", () => {
+            // C→C (forwardDiff=0 → base=1), octave=2 → totalIntervals = 1 + 19 + 19 = 39
+            // 39 > 28 → trigger overflow, reduce: 39-19=20, 20-19=1
+            const notes = { firstNote: "C", secondNote: "C", octave: 2 };
+            GetNotesForInterval.mockReturnValueOnce(notes);
+            GetNotesForInterval.mockReturnValueOnce(notes);
+
+            const result = Singer.IntervalsActions.GetCurrentInterval(0);
+            // lastWord = ", plus two octaves"
+            expect(result).toContain("two");
+            expect(result).toContain("octaves");
+        });
+
+        test("19-EDO small interval skips overflow guard", () => {
+            // C→D# (diff=3), octave=0 → totalIntervals = 3
+            // 3 > 28 → false, no overflow
+            const notes = { firstNote: "C", secondNote: "D#", octave: 0 };
+            GetNotesForInterval.mockReturnValueOnce(notes);
+            GetNotesForInterval.mockReturnValueOnce(notes);
+
+            const result = Singer.IntervalsActions.GetCurrentInterval(0);
+            expect(result).toBe("test_interval"); // no lastWord
+        });
+
+        test("12-EDO regression: same behavior as before temperament fix", () => {
+            // Reset to default 12-EDO temperament
+            logo.synth.inTemperament = null;
+            delete global.TEMPERAMENT.custom_edo19;
+
+            // Use default mock SEMITONETOINTERVALMAP (13×7 "perfect")
+            global.SEMITONETOINTERVALMAP = Array(13)
+                .fill(null)
+                .map(() => Array(7).fill("perfect"));
+
+            // C→G (diff=7), octave=0 → totalIntervals = 7
+            const notes = { firstNote: "C", secondNote: "G", octave: 0 };
+            GetNotesForInterval.mockReturnValueOnce(notes);
+            GetNotesForInterval.mockReturnValueOnce(notes);
+
+            const result = Singer.IntervalsActions.GetCurrentInterval(0);
+            // SEMITONETOINTERVALMAP[7][4] = "perfect", no lastWord
+            expect(result).toBe("perfect");
+        });
+    });
+
     test("setKey updates keySignature", () => {
         Singer.IntervalsActions.setKey("C", "major", 0);
         expect(turtle.singer.keySignature).toContain("C");

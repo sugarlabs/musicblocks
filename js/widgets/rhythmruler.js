@@ -615,6 +615,8 @@ class RhythmRuler {
             this._playingOne = false;
             this._playingAll = false;
             this.activity.hideMsgs();
+            this._circularCanvas = null;
+            this._circularView = false;
 
             this.widgetWindow.destroy();
         };
@@ -703,7 +705,7 @@ class RhythmRuler {
             if (event.keyCode === 13 || event.key === "Enter") {
                 event.preventDefault();
                 event.stopPropagation();
-                const inputValue = parseInt(this._dissectNumber.value);
+                const inputValue = parseInt(this._dissectNumber.value, 10);
                 if (!isNaN(inputValue) && inputValue > 0) {
                     // Validate the input value - allow any number from 2 to 128
                     const validatedValue = Math.min(Math.max(inputValue, 2), 128);
@@ -1268,7 +1270,7 @@ class RhythmRuler {
 
         this._rulerSelected = cell.parentNode.getAttribute("data-row");
         if (this._progressBar) this._progressBar.remove();
-        this._tapCell.innerHTML = "";
+        this._tapCell.textContent = "";
 
         const d = new Date();
         this._tapTimes.push(d.getTime());

@@ -102,49 +102,48 @@ class SaveInterface {
             _("Project Code") +
             "</h4>" +
             _("This code stores data about the blocks in a project.") +
-            '<a href="#" onclick="toggle(); return false;" id="showhide">' +
+            '<a href="#" id="showhide">' +
             STR_SHOW +
             "</a>" +
-            '<button class="btn" onclick="copyCode()" style="margin-left: 10px;">' +
+            '<button class="btn" id="copyCodeBtn" style="margin-left: 10px;">' +
             _("Copy to Clipboard") +
             "</button>" +
             '</div> <div class="code" id="codeBlock">{{ data }}</div></div></div></div>' +
             '<script type="text/javascript">' +
-            "function toggle() {" +
-            '  var codeBlock = document.getElementsByClassName("code")[0];' +
-            '  var showHideButton = document.getElementById("showhide");' +
-            '  if (codeBlock.style.display === "none") {' +
-            '    codeBlock.style.display = "flex";' +
-            '    showHideButton.textContent = "' +
-            STR_HIDE +
-            '";' +
-            "  } else {" +
-            '    codeBlock.style.display = "none";' +
-            '    showHideButton.textContent = "' +
-            STR_SHOW +
-            '";' +
-            "  }" +
-            "}" +
             'window.addEventListener("load", function() {' +
             '  var codeBlock = document.getElementById("codeBlock");' +
             '  var showHideButton = document.getElementById("showhide");' +
+            '  showHideButton.addEventListener("click", function(e) {' +
+            "    e.preventDefault();" +
+            '    if (codeBlock.style.display === "none") {' +
+            '      codeBlock.style.display = "flex";' +
+            '      showHideButton.textContent = "' +
+            STR_HIDE +
+            '";' +
+            "    } else {" +
+            '      codeBlock.style.display = "none";' +
+            '      showHideButton.textContent = "' +
+            STR_SHOW +
+            '";' +
+            "    }" +
+            "  });" +
             '  codeBlock.style.display = "none";' +
             '  showHideButton.textContent = "' +
             STR_SHOW +
             '";' +
-            "});" +
-            "function copyCode() {" +
-            '  var text = document.getElementById("codeBlock").innerText;' +
-            "  navigator.clipboard.writeText(text).then(function() {" +
-            '    alert("' +
+            '  document.getElementById("copyCodeBtn").addEventListener("click", function() {' +
+            '    var text = document.getElementById("codeBlock").innerText;' +
+            "    navigator.clipboard.writeText(text).then(function() {" +
+            '      alert("' +
             _("Project code copied to clipboard!") +
             '");' +
-            "  }).catch(function() {" +
-            '    alert("' +
+            "    }).catch(function() {" +
+            '      alert("' +
             _("Failed to copy.") +
             '");' +
+            "    });" +
             "  });" +
-            "}" +
+            "});" +
             "</script>";
 
         this.timeLastSaved = -100;
@@ -155,9 +154,11 @@ class SaveInterface {
                 saveButton = "#saveButton";
             }
 
+            const planet = this.getPlanetInterface();
             if (
-                typeof this.PlanetInterface !== "undefined" &&
-                this.PlanetInterface.getTimeLastSaved() !== this.timeLastSaved
+                planet &&
+                typeof planet.getTimeLastSaved === "function" &&
+                planet.getTimeLastSaved() !== this.timeLastSaved
             ) {
                 event.preventDefault();
                 // Will trigger when exit/reload cancelled.
@@ -165,6 +166,14 @@ class SaveInterface {
                 return "";
             }
         });
+    }
+
+    getPlanetInterface(activity = this.activity) {
+        if (!activity) {
+            return this.PlanetInterface;
+        }
+
+        return activity.planet || activity.PlanetInterface || this.PlanetInterface;
     }
 
     showToast(message) {
@@ -224,11 +233,11 @@ class SaveInterface {
             this.showToast(message);
         };
         if (defaultfilename === undefined || defaultfilename === null) {
-            if (this.activity.PlanetInterface === undefined) {
-                defaultfilename = STR_MY_PROJECT;
-            } else {
-                defaultfilename = this.activity.PlanetInterface.getCurrentProjectName();
-            }
+            const planet = this.getPlanetInterface();
+            defaultfilename =
+                planet && typeof planet.getCurrentProjectName === "function"
+                    ? planet.getCurrentProjectName()
+                    : STR_MY_PROJECT;
 
             if (fileExt(defaultfilename) !== extension) {
                 defaultfilename += "." + extension;
@@ -292,31 +301,46 @@ class SaveInterface {
      * @instance
      */
     prepareHTML() {
+        const sanitizeImageURL = value => {
+            if (value === null || value === undefined) return "";
+
+            const raw = String(value).trim();
+            if (raw === "") return "";
+
+            const lower = raw.toLowerCase();
+            if (lower.startsWith("data:")) {
+                return /^data:image\/[a-z0-9.+-]+;base64,[a-z0-9+/=\s]+$/i.test(raw) ? raw : "";
+            }
+
+            if (lower.startsWith("http://") || lower.startsWith("https://")) return raw;
+
+            if (/^[a-z][a-z0-9+.-]*:/i.test(raw)) return "";
+            return raw;
+        };
+
         let file = this.htmlSaveTemplate;
         let description = _("No description provided");
-        if (
-            this.activity.PlanetInterface &&
-            this.activity.PlanetInterface.getCurrentProjectDescription
-        ) {
-            description = this.activity.PlanetInterface.getCurrentProjectDescription();
+        const planet = this.getPlanetInterface();
+        if (planet && typeof planet.getCurrentProjectDescription === "function") {
+            description = planet.getCurrentProjectDescription();
         }
         // let author = '';
         // Currently we're using anonymous for authors - not storing names.
         let name = STR_MY_PROJECT;
-        if (this.activity.PlanetInterface && this.activity.PlanetInterface.getCurrentProjectName) {
-            name = this.activity.PlanetInterface.getCurrentProjectName();
+        if (planet && typeof planet.getCurrentProjectName === "function") {
+            name = planet.getCurrentProjectName();
         }
         const data = this.activity.prepareExport();
         let image = "";
-        if (this.activity.PlanetInterface && this.activity.PlanetInterface.getCurrentProjectImage) {
-            image = this.activity.PlanetInterface.getCurrentProjectImage();
+        if (planet && typeof planet.getCurrentProjectImage === "function") {
+            image = planet.getCurrentProjectImage();
         }
 
         file = file
             .replace(/{{ project_description }}/g, escapeHTML(description))
             .replace(/{{ project_name }}/g, escapeHTML(name))
             .replace(/{{ data }}/g, escapeHTML(data))
-            .replace(/{{ project_image }}/g, escapeHTML(image));
+            .replace(/{{ project_image }}/g, escapeHTML(sanitizeImageURL(image)));
 
         return file;
     }
@@ -354,11 +378,9 @@ class SaveInterface {
         setTimeout(() => {
             const html =
                 "data:text/plain;charset=utf-8," + encodeURIComponent(activity.save.prepareHTML());
-            if (activity.PlanetInterface !== undefined) {
-                activity.save.downloadURL(
-                    activity.PlanetInterface.getCurrentProjectName() + ".html",
-                    html
-                );
+            const planet = this.getPlanetInterface(activity);
+            if (planet && typeof planet.getCurrentProjectName === "function") {
+                activity.save.downloadURL(planet.getCurrentProjectName() + ".html", html);
             } else {
                 activity.save.downloadURL(STR_MY_PROJECT.replace(" ", "_") + ".html", html);
             }
@@ -402,7 +424,7 @@ class SaveInterface {
 
             Object.entries(data).forEach(([blockIndex, notes]) => {
                 const mainTrack = midi.addTrack();
-                mainTrack.name = `Track ${parseInt(blockIndex) + 1}`;
+                mainTrack.name = `Track ${parseInt(blockIndex, 10) + 1}`;
 
                 const trackMap = new Map();
                 let globalTime = 0;
@@ -416,7 +438,7 @@ class SaveInterface {
                         const drum = noteData.drum || false;
                         if (!trackMap.has(drum)) {
                             const drumTrack = midi.addTrack();
-                            drumTrack.name = `Track ${parseInt(blockIndex) + 1} - ${drum}`;
+                            drumTrack.name = `Track ${parseInt(blockIndex, 10) + 1} - ${drum}`;
                             drumTrack.channel = 9; // Drums must be on Channel 10
                             trackMap.set(drum, drumTrack);
                         }
@@ -437,7 +459,7 @@ class SaveInterface {
                         if (!trackMap.has(instrument)) {
                             const instrumentTrack = midi.addTrack();
                             instrumentTrack.name = `Track ${
-                                parseInt(blockIndex) + 1
+                                parseInt(blockIndex, 10) + 1
                             } - ${instrument}`;
                             instrumentTrack.instrument.number =
                                 Object.prototype.hasOwnProperty.call(instrumentMIDI, instrument)
@@ -610,8 +632,8 @@ class SaveInterface {
                     try {
                         activity.save.afterSaveAbc();
                     } catch (e) {
-                        console.error("Error generating ABC output:", e);
-                        activity.errorMsg(_("Error generating ABC output. ") + e.message);
+                        console.error("Error generating ABC output: ", e);
+                        activity.errorMsg(`${_("Error generating ABC output.")} ${e.message}`);
                     } finally {
                         document.body.style.cursor = "default";
                     }
@@ -650,8 +672,8 @@ class SaveInterface {
                 const abc = encodeURIComponent(saveAbcOutput(this.activity));
                 this.activity.save.download("abc", "data:text;utf8," + abc, null);
             } catch (e) {
-                console.error("Error in ABC output generation:", e);
-                this.activity.errorMsg(_("Error generating ABC output. ") + e.message);
+                console.error("Error in ABC output generation: ", e);
+                this.activity.errorMsg(`${_("Error generating ABC output.")} ${e.message}`);
             } finally {
                 document.body.style.cursor = "default";
             }
@@ -702,8 +724,9 @@ class SaveInterface {
 
         const lyext = "ly";
         let filename = STR_MY_PROJECT;
-        if (activity.PlanetInterface !== undefined) {
-            filename = activity.PlanetInterface.getCurrentProjectName();
+        const planet = this.getPlanetInterface(activity);
+        if (planet && typeof planet.getCurrentProjectName === "function") {
+            filename = planet.getCurrentProjectName();
         }
 
         if (fileExt(filename) !== lyext) {
@@ -725,8 +748,8 @@ class SaveInterface {
         //.TRANS: Lilypond is a scripting language for generating sheet music
         docById("submitLilypond").textContent = _("Save as Lilypond");
         docById("fileName").value = filename;
-        if (activity.PlanetInterface !== undefined) {
-            docById("title").value = activity.PlanetInterface.getCurrentProjectName();
+        if (planet && typeof planet.getCurrentProjectName === "function") {
+            docById("title").value = planet.getCurrentProjectName();
         } else {
             //.TRANS: default project title when saving as Lilypond
             docById("title").value = STR_MY_PROJECT;
@@ -840,8 +863,10 @@ class SaveInterface {
                     try {
                         this.afterSaveLilypond();
                     } catch (e) {
-                        console.error("Error generating Lilypond output:", e);
-                        this.activity.errorMsg(_("Error generating Lilypond output. ") + e.message);
+                        console.error("Error generating Lilypond output: ", e);
+                        this.activity.errorMsg(
+                            `${_("Error generating Lilypond output.")} ${e.message}`
+                        );
                     } finally {
                         document.body.style.cursor = "default";
                     }
@@ -898,8 +923,8 @@ class SaveInterface {
                         break;
                 }
             } catch (e) {
-                console.error("Error in Lilypond output generation:", e);
-                this.activity.errorMsg(_("Error generating Lilypond output. ") + e.message);
+                console.error("Error in Lilypond output generation: ", e);
+                this.activity.errorMsg(`${_("Error generating Lilypond output.")} ${e.message}`);
             } finally {
                 this.notationConvert = "";
                 document.body.style.cursor = "default";
@@ -924,8 +949,8 @@ class SaveInterface {
         filename = docById("fileName").value;
         const showCopiedMessage = () => {
             this.activity.textMsg(
-                _("The Lilypond code is copied to clipboard. You can paste it here: ") +
-                    "<a href='http://hacklily.org' target='_blank' rel='noopener noreferrer'>http://hacklily.org</a> "
+                _("The Lilypond code is copied to clipboard. You can paste it here:") +
+                    " <a href='http://hacklily.org' target='_blank' rel='noopener noreferrer'>http://hacklily.org</a> "
             );
         };
 

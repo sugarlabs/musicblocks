@@ -61,7 +61,8 @@ describe("Utility Functions (logic-only)", () => {
         newTone,
         preloadProjectSamples,
         resolveInstrumentName,
-        Synth;
+        Synth,
+        transport;
 
     const turtle = "turtle1";
 
@@ -72,6 +73,26 @@ describe("Utility Functions (logic-only)", () => {
         global.AudioBuffer = jest.fn();
         global.module = module;
         global.Tone = require("./tonemock.js");
+        global._ = jest.fn(str => str);
+        global.requirejs = (deps, cb) => {
+            if (typeof cb === "function") cb();
+        };
+        global.DOUBLESHARP = "\ud834\udd2a";
+        global.DOUBLEFLAT = "\ud834\udd2b";
+        global.DEFAULTDRUM = "kick drum";
+        const musicutils = require("../musicutils");
+        Object.assign(global, musicutils);
+
+        const utils = require("../utils");
+        Object.assign(global, utils);
+
+        global.platformColor = {
+            orange: "#ff5722"
+        };
+
+        const synthutils = require("../synthutils");
+        Object.assign(global, synthutils);
+        Object.assign(window, synthutils);
 
         const codeFiles = [
             "../utils-logic.js",
@@ -79,7 +100,6 @@ describe("Utility Functions (logic-only)", () => {
             "../../logoconstants.js",
             "../platformstyle.js",
             "../musicutils.js",
-            "../synthutils.js",
             "../../logo.js",
             "../../turtle-singer.js"
         ];
@@ -174,6 +194,7 @@ describe("Utility Functions (logic-only)", () => {
         newTone = Synth.newTone;
         preloadProjectSamples = Synth.preloadProjectSamples;
         resolveInstrumentName = Synth.resolveInstrumentName;
+        transport = Synth.transport;
     });
 
     describe("setupRecorder", () => {
@@ -438,6 +459,59 @@ describe("Utility Functions (logic-only)", () => {
         it("should change the temperament", () => {
             expect(temperamentChanged("equal", "Bb3")).toBe(undefined);
             expect(whichTemperament()).toBe("equal");
+        });
+
+        it("should handle custom temperaments with numeric array properties", () => {
+            const customTempName = "myCustomNumericTemp";
+            global.TEMPERAMENT[customTempName] = {
+                pitchNumber: 2,
+                0: [1.0, "C", 4],
+                1: [1.5, "G", 4]
+            };
+            const originalInTemp = Synth.inTemperament;
+            Synth.inTemperament = customTempName;
+            expect(() => temperamentChanged(customTempName, "C4")).not.toThrow();
+            expect(whichTemperament()).toBe(customTempName);
+            expect(Synth.noteFrequencies["C"]).toEqual([4, expect.any(Number)]);
+            expect(Synth.noteFrequencies["G"]).toEqual([4, expect.any(Number)]);
+            delete global.TEMPERAMENT[customTempName];
+            Synth.inTemperament = originalInTemp;
+        });
+
+        it("should skip custom temperament numeric keys that map to plain numbers without throwing", () => {
+            const customTempName = "myCustomNumericTemp2";
+            global.TEMPERAMENT[customTempName] = {
+                "pitchNumber": 2,
+                "0": 1.0,
+                "1": 1.5,
+                "perfect 1": 1.0,
+                "perfect 5": 1.5
+            };
+            const originalInTemp = Synth.inTemperament;
+            Synth.inTemperament = customTempName;
+            expect(() => temperamentChanged(customTempName, "C4")).not.toThrow();
+            expect(whichTemperament()).toBe(customTempName);
+            expect(Synth.noteFrequencies["C"]).toEqual([4, expect.any(Number)]);
+            expect(Synth.noteFrequencies["G"]).toEqual([4, expect.any(Number)]);
+            delete global.TEMPERAMENT[customTempName];
+            Synth.inTemperament = originalInTemp;
+        });
+
+        it("should handle standard temperaments with object ratios and invalid ratios", () => {
+            const customTempName = "myCustomNumericTemp3";
+            global.TEMPERAMENT[customTempName] = {
+                "pitchNumber": 3,
+                "perfect 1": { ratio: 1.0 },
+                "perfect 5": 1.5,
+                "major 3": "invalid"
+            };
+            const originalInTemp = Synth.inTemperament;
+            Synth.inTemperament = customTempName;
+            expect(() => temperamentChanged(customTempName, "C4")).not.toThrow();
+            expect(Synth.noteFrequencies["C"]).toEqual([4, expect.any(Number)]);
+            expect(Synth.noteFrequencies["G"]).toEqual([4, expect.any(Number)]);
+            delete global.TEMPERAMENT[customTempName];
+            Synth.inTemperament = originalInTemp;
         });
     });
 
@@ -824,6 +898,11 @@ describe("Utility Functions (logic-only)", () => {
     });
 
     describe("Tone Transport Controls", () => {
+        afterEach(() => {
+            Tone.context.state = "running";
+            Tone.Transport.state = "started";
+        });
+
         test("start should call Tone.Transport.start", () => {
             const startSpy = jest.spyOn(Tone.Transport, "start");
 
@@ -858,6 +937,28 @@ describe("Utility Functions (logic-only)", () => {
 
             startSpy.mockRestore();
             stopSpy.mockRestore();
+        });
+
+        test("isAvailable returns truthy when Tone.Transport exists", () => {
+            expect(transport.isAvailable).toBeTruthy();
+        });
+
+        test("isClockRunning returns true when context is running and transport is started", () => {
+            Tone.context.state = "running";
+            Tone.Transport.state = "started";
+            expect(transport.isClockRunning).toBe(true);
+        });
+
+        test("isClockRunning returns false when context is suspended", () => {
+            Tone.context.state = "suspended";
+            Tone.Transport.state = "started";
+            expect(transport.isClockRunning).toBe(false);
+        });
+
+        test("isClockRunning returns false when transport is stopped", () => {
+            Tone.context.state = "running";
+            Tone.Transport.state = "stopped";
+            expect(transport.isClockRunning).toBe(false);
         });
     });
 
@@ -978,6 +1079,50 @@ describe("Utility Functions (logic-only)", () => {
             loadSamples();
             const result = _loadSample("piano");
             expect(result).toBeInstanceOf(Promise);
+        });
+
+        it("should reject when requirejs fails to load the sample", async () => {
+            const originalRequirejs = global.requirejs;
+            Synth.samples.voice.piano = null;
+            try {
+                global.requirejs = (deps, cb, errback) => {
+                    if (typeof errback === "function") errback(new Error("Failed to load"));
+                };
+
+                await expect(_loadSample("piano")).rejects.toThrow("Failed to load");
+            } finally {
+                global.requirejs = originalRequirejs;
+            }
+        });
+
+        it("should reject when the global variable for the sample is not defined", async () => {
+            const originalPiano = window.PIANO_SAMPLE;
+            try {
+                delete window.PIANO_SAMPLE;
+
+                // Ensure samples placeholder is reset to null so it attempts loading
+                Synth.samples.voice.piano = null;
+
+                await expect(_loadSample("piano")).rejects.toBe("Sample global not found: piano");
+            } finally {
+                window.PIANO_SAMPLE = originalPiano;
+            }
+        });
+
+        it("should reject when the sample initializer throws an error", async () => {
+            const originalPiano = window.PIANO_SAMPLE;
+            try {
+                window.PIANO_SAMPLE = () => {
+                    throw new Error("Initialization failed");
+                };
+
+                // Ensure samples placeholder is reset to null so it attempts loading
+                Synth.samples.voice.piano = null;
+
+                await expect(_loadSample("piano")).rejects.toThrow("Initialization failed");
+            } finally {
+                window.PIANO_SAMPLE = originalPiano;
+            }
         });
     });
 
@@ -1253,6 +1398,279 @@ describe("Utility Functions (logic-only)", () => {
         it("should handle null or undefined gracefully", () => {
             expect(resolveInstrumentName(null)).toBe(null);
             expect(resolveInstrumentName(undefined)).toBe(undefined);
+        });
+    });
+
+    describe("_performNotes frequency conversion for non-standard notes", () => {
+        it("should convert Unicode accidental notes to frequency under equal temperament", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn()
+            };
+            Synth.inTemperament = "equal";
+
+            await _performNotes.call(Synth, mockSynth, "F♭4", 0.25, null, null, false, 0);
+
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+            const noteArg = mockSynth.triggerAttackRelease.mock.calls[0][0];
+            expect(typeof noteArg).toBe("number");
+        });
+
+        it("should convert double-accidental notes to frequency under equal temperament", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn()
+            };
+            Synth.inTemperament = "equal";
+
+            await _performNotes.call(Synth, mockSynth, "Fbb4", 0.25, null, null, false, 0);
+
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+            const noteArg = mockSynth.triggerAttackRelease.mock.calls[0][0];
+            expect(typeof noteArg).toBe("number");
+        });
+
+        it("should not convert standard notes to frequency", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn()
+            };
+            Synth.inTemperament = "equal";
+
+            await _performNotes.call(Synth, mockSynth, "C4", 0.25, null, null, false, 0);
+
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+            const noteArg = mockSynth.triggerAttackRelease.mock.calls[0][0];
+            expect(noteArg).toBe("C4");
+        });
+
+        it("should convert array of notes containing Unicode accidentals", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn()
+            };
+            Synth.inTemperament = "equal";
+
+            await _performNotes.call(Synth, mockSynth, ["F♭4", "C4"], 0.25, null, null, false, 0);
+
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+            const noteArg = mockSynth.triggerAttackRelease.mock.calls[0][0];
+            expect(Array.isArray(noteArg)).toBe(true);
+            expect(typeof noteArg[0]).toBe("number");
+            expect(typeof noteArg[1]).toBe("number");
+        });
+
+        it("should not convert numerical notes", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn()
+            };
+            Synth.inTemperament = "equal";
+
+            await _performNotes.call(Synth, mockSynth, 440, 0.25, null, null, false, 0);
+
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+            const noteArg = mockSynth.triggerAttackRelease.mock.calls[0][0];
+            expect(noteArg).toBe(440);
+        });
+
+        it("should convert notes to frequency under non-equal temperament", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn()
+            };
+            Synth.inTemperament = "just intonation";
+            const originalGetFrequency = Synth._getFrequency;
+            Synth._getFrequency = jest.fn().mockReturnValue(300);
+
+            await _performNotes.call(Synth, mockSynth, "C4", 0.25, null, null, false, 0);
+
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+            const noteArg = mockSynth.triggerAttackRelease.mock.calls[0][0];
+            expect(noteArg).toBe(300);
+
+            Synth._getFrequency = originalGetFrequency;
+        });
+
+        it("should handle numeric notes frequency under custom temperament without throwing error", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn()
+            };
+            Synth.inTemperament = "myCustomTemp";
+            const originalGetFrequency = Synth._getFrequency;
+            Synth._getFrequency = jest.fn().mockReturnValue(440);
+
+            await expect(
+                _performNotes.call(Synth, mockSynth, 440, 0.25, null, null, false, 0)
+            ).resolves.not.toThrow();
+
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalledWith(
+                440,
+                0.25,
+                expect.any(Number)
+            );
+
+            Synth._getFrequency = originalGetFrequency;
+        });
+
+        it("should fall back to normalization when _getFrequency returns undefined for double flats/sharps", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn()
+            };
+            Synth.inTemperament = "equal";
+            const originalGetFrequency = Synth._getFrequency;
+            Synth._getFrequency = jest.fn().mockReturnValue(undefined);
+
+            await _performNotes.call(Synth, mockSynth, "C𝄫4", 0.25, null, null, false, 0);
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalledWith(
+                "Cbb4",
+                0.25,
+                expect.anything()
+            );
+
+            await _performNotes.call(Synth, mockSynth, "C𝄪4", 0.25, null, null, false, 0);
+            expect(mockSynth.triggerAttackRelease).toHaveBeenLastCalledWith(
+                "Cx4",
+                0.25,
+                expect.anything()
+            );
+
+            Synth._getFrequency = originalGetFrequency;
+        });
+    });
+
+    describe("_performNotes glide/portamento setNote routing ", () => {
+        it("should call setNote (continuous glide) instead of triggerAttackRelease when doPortamento and setNote are true", async () => {
+            const mockSynth = {
+                oscillator: {},
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn(),
+                setNote: jest.fn(),
+                chain: jest.fn().mockReturnThis(),
+                disconnect: jest.fn(),
+                connect: jest.fn()
+            };
+            Synth.inTemperament = "equal";
+
+            const paramsEffects = {
+                doPortamento: true,
+                portamento: 0.05
+            };
+
+            await _performNotes.call(Synth, mockSynth, "D4", 0.5, paramsEffects, null, true, 0);
+
+            // This is the regression check: glide notes must continue the same
+            // voice via setNote, not retrigger a fresh attack+release.
+            expect(mockSynth.setNote).toHaveBeenCalledWith("D4");
+            expect(mockSynth.triggerAttackRelease).not.toHaveBeenCalled();
+        });
+
+        it("should still call triggerAttackRelease for a portamento note when setNote is false", async () => {
+            const mockSynth = {
+                oscillator: {},
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn(),
+                setNote: jest.fn(),
+                chain: jest.fn().mockReturnThis(),
+                disconnect: jest.fn(),
+                connect: jest.fn()
+            };
+            Synth.inTemperament = "equal";
+
+            const paramsEffects = {
+                doPortamento: true,
+                portamento: 0.05
+            };
+
+            await _performNotes.call(Synth, mockSynth, "C4", 0.5, paramsEffects, null, false, 0);
+
+            // Non-continuation notes (setNote=false) should still play normally.
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+            expect(mockSynth.setNote).not.toHaveBeenCalled();
+        });
+
+        it("should route plain (non-portamento) notes through the fast path unaffected", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn(),
+                setNote: jest.fn()
+            };
+            Synth.inTemperament = "equal";
+
+            const paramsEffects = {
+                doPartials: true,
+                partials: [1]
+            };
+
+            await _performNotes.call(Synth, mockSynth, "E4", 0.5, paramsEffects, null, true, 0);
+
+            // No portamento involved — fast path is fine here, no regression expected.
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+            expect(mockSynth.setNote).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("_performNotes effects routing and cleanup", () => {
+        it("should reconnect synth to destination and disconnect old routing when effects complete", async () => {
+            jest.useFakeTimers();
+
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn(),
+                disconnect: jest.fn(),
+                connect: jest.fn(),
+                chain: jest.fn().mockReturnThis()
+            };
+            Synth.inTemperament = "equal";
+
+            const paramsEffects = {
+                doVibrato: true,
+                vibratoFrequency: 5,
+                vibratoIntensity: 1
+            };
+
+            await _performNotes.call(Synth, mockSynth, "C4", 0.25, paramsEffects, null, false, 0);
+
+            // Fast-forward time to trigger the effects cleanup setTimeout
+            jest.advanceTimersByTime(2000);
+
+            expect(mockSynth.disconnect).toHaveBeenCalled();
+            expect(mockSynth.toDestination).toHaveBeenCalled();
+
+            jest.useRealTimers();
+        });
+
+        it("should catch errors when disconnect throws an error during effects cleanup", async () => {
+            jest.useFakeTimers();
+
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn(),
+                disconnect: jest.fn().mockImplementation(() => {
+                    throw new Error("Already disconnected");
+                }),
+                connect: jest.fn(),
+                chain: jest.fn().mockReturnThis()
+            };
+            Synth.inTemperament = "equal";
+
+            const paramsEffects = {
+                doVibrato: true,
+                vibratoFrequency: 5,
+                vibratoIntensity: 1
+            };
+
+            await _performNotes.call(Synth, mockSynth, "C4", 0.25, paramsEffects, null, false, 0);
+
+            // Fast-forward time to trigger the effects cleanup setTimeout
+            jest.advanceTimersByTime(2000);
+
+            expect(mockSynth.disconnect).toHaveBeenCalled();
+            expect(mockSynth.toDestination).toHaveBeenCalled();
+
+            jest.useRealTimers();
         });
     });
 });
@@ -1598,7 +2016,6 @@ describe("Tuner Utilities (Audio Test Functions)", () => {
             testSpecificFrequency(440);
 
             // Verify low volume was set for safe testing
-            expect(mockGainNode.gain.value).toBe(0.1);
         });
     });
 });

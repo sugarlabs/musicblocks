@@ -275,9 +275,24 @@ class ThemeBox {
 
         // Update theme icon immediately if DOM is ready
         this.updateThemeIcon();
-
         // Refresh UI components (including planet iframe) if they exist
         this.refreshUIComponents();
+
+        // Watch for OS-level theme changes at runtime.
+        // Auto-switch to match OS theme change at runtime.
+        if (window.matchMedia) {
+            const mq = window.matchMedia("(prefers-color-scheme: dark)");
+
+            const handler = e => {
+                this._theme = e.matches ? "dark" : "light";
+                this.applyThemeInstantly();
+            };
+            if (typeof mq.addEventListener === "function") {
+                mq.addEventListener("change", handler);
+            } else if (typeof mq.addListener === "function") {
+                mq.addListener(handler);
+            }
+        }
     }
 
     /**
@@ -287,6 +302,7 @@ class ThemeBox {
      */
     applyThemeInstantly() {
         const body = document.body;
+        body.style.background = "";
         // Update body classes
         this._themes.forEach(theme => {
             if (theme === this._theme) {
@@ -318,7 +334,7 @@ class ThemeBox {
         }
 
         // Update canvas background using theme config
-        const canvas = document.getElementById("canvas");
+        const canvas = document.getElementById("myCanvas") || document.getElementById("canvas");
         if (canvas) {
             canvas.style.backgroundColor = window.platformColor.background;
         }
@@ -372,7 +388,7 @@ class ThemeBox {
         });
 
         // Notify user
-        this.activity.textMsg(_("Theme switched to " + this._theme + " mode."), 2000);
+        this.activity.textMsg(_("Theme switched to %s mode.").replace(/%s/g, this._theme), 2000);
     }
 
     /**

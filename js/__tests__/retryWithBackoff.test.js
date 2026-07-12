@@ -152,21 +152,31 @@ describe("retryWithBackoff", () => {
     });
 
     describe("max retries exceeded", () => {
-        it("should reject with an error when max retries are exhausted", async () => {
+        it("should reject with an error when max retries are exhausted and not call final delay", async () => {
             const check = jest.fn(() => null);
+            const onSuccess = jest.fn();
+            const onRetry = jest.fn();
+            const delayFn = jest.fn(() => Promise.resolve());
 
             await expect(
                 retryWithBackoff({
                     check,
-                    onSuccess: jest.fn(),
-                    delayFn: instantDelay,
+                    onSuccess,
+                    onRetry,
+                    delayFn,
                     maxRetries: 3,
+                    initialDelay: 10,
                     errorMessage: "COULD NOT CREATE CACHE"
                 })
             ).rejects.toThrow("COULD NOT CREATE CACHE");
 
             // check called for attempts 0, 1, 2, 3 then fail on count=4 > maxRetries=3
             expect(check).toHaveBeenCalledTimes(4);
+            expect(onRetry).toHaveBeenCalledTimes(3);
+            expect(onRetry).toHaveBeenLastCalledWith(2);
+            expect(delayFn).toHaveBeenCalledTimes(3);
+            expect(delayFn).toHaveBeenLastCalledWith(40);
+            expect(onSuccess).not.toHaveBeenCalled();
         });
 
         it("should use default error message when none provided", async () => {
@@ -225,6 +235,25 @@ describe("retryWithBackoff", () => {
 
             // First delay should be 50 * 2^0 = 50
             expect(delayFn).toHaveBeenCalledWith(50);
+        });
+
+        it("should use default delay function if none provided", async () => {
+            jest.useFakeTimers();
+            const check = jest.fn().mockReturnValueOnce(false).mockReturnValueOnce(true);
+
+            const promise = retryWithBackoff({
+                check,
+                onSuccess: jest.fn(),
+                initialDelay: 50
+            });
+
+            // Advance timers by 50ms to resolve the default delay (50 * 2^0 = 50ms)
+            jest.advanceTimersByTime(50);
+
+            await promise;
+            expect(check).toHaveBeenCalledTimes(2);
+
+            jest.useRealTimers();
         });
     });
 
@@ -346,6 +375,47 @@ describe("retryWithBackoff", () => {
 
             expect(callCount).toBe(2);
             expect(onSuccess).toHaveBeenCalled();
+        });
+
+        it("should await an async check function and retry until it resolves truthy", async () => {
+            let callCount = 0;
+            const onSuccess = jest.fn();
+
+            await retryWithBackoff({
+                check: async () => {
+                    callCount++;
+                    return callCount >= 3 ? "ready" : false;
+                },
+                onSuccess,
+                delayFn: instantDelay,
+                maxRetries: 5
+            });
+
+            expect(callCount).toBe(3);
+            expect(onSuccess).toHaveBeenCalledWith("ready");
+        });
+
+        it("should not defer sync checks to microtask queue", async () => {
+            const order = [];
+
+            const promise = retryWithBackoff({
+                check: () => {
+                    order.push("check");
+                    return true;
+                },
+                onSuccess: () => {
+                    order.push("onSuccess");
+                },
+                delayFn: instantDelay
+            });
+
+            // Sync check + onSuccess should run before any awaited microtask
+            order.push("after-call");
+            await promise;
+
+            expect(order[0]).toBe("check");
+            expect(order[1]).toBe("onSuccess");
+            expect(order[2]).toBe("after-call");
         });
     });
 });

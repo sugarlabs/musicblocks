@@ -19,7 +19,13 @@
 
 /* exported setupRhythmBlockPaletteBlocks */
 
-const language = localStorage.languagePreference || navigator.language;
+let language;
+try {
+    language = localStorage.languagePreference;
+} catch (e) {
+    language = undefined;
+}
+language = language || navigator.language;
 let rhythmBlockPalette = language === "ja" ? "rhythm" : "widgets";
 if (_THIS_IS_TURTLE_BLOCKS_) {
     rhythmBlockPalette = "rhythm";
@@ -140,7 +146,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 // polyphonic rhythms.
                 if (logo.rhythmRulerMeasure === null) {
                     logo.rhythmRulerMeasure = arg0 * arg1;
-                } else if (logo.rhythmRulerMeasure != arg0 * arg1) {
+                } else if (logo.rhythmRulerMeasure !== arg0 * arg1) {
                     activity.textMsg(_("polyphonic rhythm"));
                 }
 
@@ -182,7 +188,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 const bpmFactor =
                     TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
 
-                const beatValue = bpmFactor == null ? 1 : bpmFactor / noteBeatValue;
+                const beatValue = bpmFactor === null ? 1 : bpmFactor / noteBeatValue;
 
                 let __callback;
 
@@ -292,7 +298,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("sixtyfourthNote", _("1/64 note") + " 𝅘𝅥𝅱");
+                super("sixtyfourthNote", `${_("1/64 note")} 𝅘𝅥𝅱`);
             }
 
             this.setPalette(rhythmBlockPalette, activity);
@@ -323,7 +329,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("thirtysecondNote", _("1/32 note") + " 𝅘𝅥𝅰");
+                super("thirtysecondNote", `${_("1/32 note")} 𝅘𝅥𝅰`);
             }
 
             // Set the palette and activity for the block
@@ -357,7 +363,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("sixteenthNote", _("1/16 note") + " 𝅘𝅥𝅯");
+                super("sixteenthNote", `${_("1/16 note")} 𝅘𝅥𝅯`);
             }
 
             // Set the palette and activity for the block
@@ -386,7 +392,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
          */
         constructor() {
             // TRANS: Do not modify the following line
-            super("eighthNote", _("eighth note") + " ♪");
+            super("eighthNote", `${_("eighth note")} ♪`);
 
             // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
@@ -414,7 +420,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
          */
         constructor() {
             // TRANS: Do not modify the following line
-            super("quarterNote", _("quarter note") + " ♩");
+            super("quarterNote", `${_("quarter note")} ♩`);
 
             // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
@@ -447,7 +453,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("halfNote", _("half note") + " 𝅗𝅥");
+                super("halfNote", `${_("half note")} 𝅗𝅥`);
             }
 
             // Set the palette and activity for the block
@@ -481,7 +487,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("wholeNote", _("whole note") + " 𝅝");
+                super("wholeNote", `${_("whole note")} 𝅝`);
             }
 
             // Set the palette and activity for the block
@@ -738,9 +744,8 @@ function setupRhythmBlockPaletteBlocks(activity) {
                     tur.singer.inNoteBlock.push(blk);
 
                     const bpmFactor =
-                        TONEBPM / tur.singer.bpm.length > 0
-                            ? last(tur.singer.bpm)
-                            : Singer.masterBPM;
+                        TONEBPM /
+                        (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
 
                     let timeout = 0;
                     let beatValue;

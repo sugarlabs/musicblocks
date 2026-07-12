@@ -144,9 +144,16 @@ function setupRhythmActions(activity) {
                         );
 
                         const nextBeat = 1 / noteBeatValue - 2 * tur.singer.neighborNoteValue;
-                        tur.singer.neighborArgCurrentBeat.push(
-                            tur.singer.beatFactor * (1 / nextBeat)
-                        );
+                        if (nextBeat <= 0 || !isFinite(nextBeat)) {
+                            activity.errorMsg(
+                                _("Neighbor note value is too large for the current note duration."),
+                                blk
+                            );
+                        } else {
+                            tur.singer.neighborArgCurrentBeat.push(
+                                tur.singer.beatFactor * (1 / nextBeat)
+                            );
+                        }
                     }
 
                     Singer.processNote(
@@ -194,7 +201,10 @@ function setupRhythmActions(activity) {
         static playRest(turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            if (tur.singer.inNoteBlock.length > 0) {
+            if (
+                tur.singer.inNoteBlock.length > 0 &&
+                tur.singer.notePitches[last(tur.singer.inNoteBlock)] !== undefined
+            ) {
                 tur.singer.notePitches[last(tur.singer.inNoteBlock)].push("rest");
                 tur.singer.noteOctaves[last(tur.singer.inNoteBlock)].push(4);
                 tur.singer.noteCents[last(tur.singer.inNoteBlock)].push(0);

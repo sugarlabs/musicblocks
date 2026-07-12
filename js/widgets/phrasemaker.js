@@ -1009,6 +1009,26 @@ class PhraseMaker {
         }
     }
 
+    _configureExitWheel(exitWheel) {
+        if (typeof window.configureExitWheel === "function") {
+            window.configureExitWheel(exitWheel);
+        }
+
+        if (!exitWheel || !exitWheel.navItems) {
+            return;
+        }
+
+        for (let i = 0; i < exitWheel.navItems.length; i++) {
+            const item = exitWheel.navItems[i];
+            if (item && item.sliceSelectedAttr) {
+                item.sliceSelectedAttr.cursor = "pointer";
+                item.sliceHoverAttr.cursor = "pointer";
+                item.titleSelectedAttr.cursor = "pointer";
+                item.titleHoverAttr.cursor = "pointer";
+            }
+        }
+    }
+
     _setupWheelDiv(size, left, top) {
         const wheelDiv = this.docById("wheelDivptm");
         wheelDiv.style.position = "absolute";
@@ -1024,6 +1044,7 @@ class PhraseMaker {
      */
     _createAddRowPieSubmenu() {
         // This menu is used to add new rows to the matrix.
+        this.docById("wheelDivptm").textContent = "";
         this.docById("wheelDivptm").style.display = "";
         const VALUESLABEL = ["pitch", "hertz", "drum", "graphics", "pen"];
         const VALUES = [
@@ -1088,6 +1109,7 @@ class PhraseMaker {
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
         this._exitWheel.createWheel(["×", " "]);
+        this._configureExitWheel(this._exitWheel);
 
         const addnotesRect = this.docById("addnotes").getBoundingClientRect();
         const x = addnotesRect.x;
@@ -1110,6 +1132,10 @@ class PhraseMaker {
             this._menuWheel.removeWheel();
             this._exitWheel.removeWheel();
         };
+        if (this._exitWheel.navItems.length > 1) {
+            this._exitWheel.navItems[1].navigateFunction =
+                this._exitWheel.navItems[0].navigateFunction;
+        }
 
         const __selectionChanged = () => {
             label = VALUESLABEL[this._menuWheel.selectedNavItemIndex];
@@ -1277,15 +1303,23 @@ class PhraseMaker {
      * Executes actions related to adding a new pitch block.
      * @param {number} blockN - The index of the block being added.
      */
-    pitchBlockAdded(blockN) {
-        let i;
-        for (i = 0; i < this.columnBlocksMap.length; i++) {
-            if (this.columnBlocksMap[i][0] === blockN) {
-                break;
+    pitchBlockAdded(blockN, retryCount = 0) {
+        setTimeout(() => {
+            this.init(this.activity);
+            let i;
+            for (i = 0; i < this.columnBlocksMap.length; i++) {
+                if (this.columnBlocksMap[i] && this.columnBlocksMap[i][0] === blockN) {
+                    break;
+                }
             }
-        }
-
-        setTimeout(() => this._createColumnPieSubmenu(i, "pitchblocks", true), 500);
+            if (i === this.columnBlocksMap.length) {
+                if (retryCount < 5) {
+                    this.pitchBlockAdded(blockN, retryCount + 1);
+                    return;
+                }
+            }
+            this._createColumnPieSubmenu(i, "pitchblocks", true);
+        }, 300);
     }
 
     /**
@@ -1295,6 +1329,7 @@ class PhraseMaker {
      */
     _createMatrixGraphics2PieSubmenu(blockIndex, blk) {
         // A wheel for modifying 2-arg graphics blocks
+        this.docById("wheelDivptm").textContent = "";
         this.docById("wheelDivptm").style.display = "";
         const arcRadiusLabel = ["10", "20", "30", "40", "50", "60", "70", "80", "90", "100"];
         const arcAngleLabel = ["0", "30", "45", "60", "90", "180"];
@@ -1400,6 +1435,7 @@ class PhraseMaker {
         this.xblockValue = [xblockLabelValue.toString(), "x"];
         this.yblockValue = [yblockLabelValue.toString(), "y"];
         this._exitWheel.createWheel(["×", ""]);
+        this._configureExitWheel(this._exitWheel);
 
         this._exitWheel.navItems[0].navigateFunction = () => {
             this.docById("wheelDivptm").style.display = "none";
@@ -1408,6 +1444,10 @@ class PhraseMaker {
             this._blockLabelsWheel.removeWheel();
             this._blockLabelsWheel2.removeWheel();
         };
+        if (this._exitWheel.navItems.length > 1) {
+            this._exitWheel.navItems[1].navigateFunction =
+                this._exitWheel.navItems[0].navigateFunction;
+        }
 
         const __enterArgValue1 = () => {
             this.xblockValue[0] =
@@ -1448,8 +1488,8 @@ class PhraseMaker {
                 const newBlock = this.activity.blocks.blockList.length;
                 this.activity.blocks.loadNewBlocks([
                     [0, thisBlockName, 0, 0, [null, 1, 2, null]],
-                    [1, ["number", { value: parseInt(this.xblockValue[0]) }], 0, 0, [0]],
-                    [2, ["number", { value: parseInt(this.yblockValue[0]) }], 0, 0, [0]]
+                    [1, ["number", { value: parseInt(this.xblockValue[0], 10) }], 0, 0, [0]],
+                    [2, ["number", { value: parseInt(this.yblockValue[0], 10) }], 0, 0, [0]]
                 ]);
 
                 await this._deps.delayExecution(500);
@@ -1461,7 +1501,7 @@ class PhraseMaker {
                 // Just updating a block arg value
                 argBlock = this.activity.blocks.blockList[thisBlock].connections[1];
                 this.activity.blocks.blockList[argBlock].text.text = this.xblockValue[0];
-                this.activity.blocks.blockList[argBlock].value = parseInt(this.xblockValue[0]);
+                this.activity.blocks.blockList[argBlock].value = parseInt(this.xblockValue[0], 10);
 
                 z = this.activity.blocks.blockList[argBlock].container.children.length - 1;
                 this.activity.blocks.blockList[argBlock].container.setChildIndex(
@@ -1472,7 +1512,7 @@ class PhraseMaker {
 
                 argBlock = this.activity.blocks.blockList[thisBlock].connections[2];
                 this.activity.blocks.blockList[argBlock].text.text = this.yblockValue[0];
-                this.activity.blocks.blockList[argBlock].value = parseInt(this.yblockValue[0]);
+                this.activity.blocks.blockList[argBlock].value = parseInt(this.yblockValue[0], 10);
 
                 z = this.activity.blocks.blockList[argBlock].container.children.length - 1;
                 this.activity.blocks.blockList[argBlock].container.setChildIndex(
@@ -1484,8 +1524,8 @@ class PhraseMaker {
 
             // Update the stored values for this node.
             this.rowLabels[blockIndex] = thisBlockName;
-            this.rowArgs[blockIndex][0] = parseInt(this.xblockValue);
-            this.rowArgs[blockIndex][1] = parseInt(this.yblockValue);
+            this.rowArgs[blockIndex][0] = parseInt(this.xblockValue, 10);
+            this.rowArgs[blockIndex][1] = parseInt(this.yblockValue, 10);
 
             // Update the cell label.
             let blockLabel;
@@ -1542,6 +1582,7 @@ class PhraseMaker {
      */
     _createMatrixGraphicsPieSubmenu(blockIndex, condition, blk) {
         // A wheel for modifying 1-arg blocks (graphics and hertz)
+        this.docById("wheelDivptm").textContent = "";
         this.docById("wheelDivptm").style.display = "";
         let valueLabel,
             forwardBackLabel,
@@ -1689,6 +1730,7 @@ class PhraseMaker {
 
         this.blockValue = blockLabelValue.toString();
         this._exitWheel.createWheel(["×", ""]);
+        this._configureExitWheel(this._exitWheel);
 
         this._exitWheel.navItems[0].navigateFunction = () => {
             this.docById("wheelDivptm").style.display = "none";
@@ -1698,6 +1740,10 @@ class PhraseMaker {
                 this._blockLabelsWheel.removeWheel();
             }
         };
+        if (this._exitWheel.navItems.length > 1) {
+            this._exitWheel.navItems[1].navigateFunction =
+                this._exitWheel.navItems[0].navigateFunction;
+        }
 
         const __enterArgValue = () => {
             this.blockValue =
@@ -1751,7 +1797,7 @@ class PhraseMaker {
                 newBlock = this.activity.blocks.blockList.length;
                 this.activity.blocks.loadNewBlocks([
                     [0, thisBlockName, 0, 0, [null, 1, null]],
-                    [1, ["number", { value: parseInt(this.blockValue) }], 0, 0, [0]]
+                    [1, ["number", { value: parseInt(this.blockValue, 10) }], 0, 0, [0]]
                 ]);
 
                 await this._deps.delayExecution(500);
@@ -1763,7 +1809,7 @@ class PhraseMaker {
                 // Just updating a block arg value
                 argBlock = this.activity.blocks.blockList[thisBlock].connections[1];
                 this.activity.blocks.blockList[argBlock].text.text = this.blockValue;
-                this.activity.blocks.blockList[argBlock].value = parseInt(this.blockValue);
+                this.activity.blocks.blockList[argBlock].value = parseInt(this.blockValue, 10);
 
                 z = this.activity.blocks.blockList[argBlock].container.children.length - 1;
                 this.activity.blocks.blockList[argBlock].container.setChildIndex(
@@ -1775,7 +1821,7 @@ class PhraseMaker {
 
             // Update the stored values for this node.
             this.rowLabels[blockIndex] = thisBlockName;
-            this.rowArgs[blockIndex] = parseInt(this.blockValue);
+            this.rowArgs[blockIndex] = parseInt(this.blockValue, 10);
 
             // Update the cell label.
             let cell = this._headcols[blockIndex];
@@ -1863,7 +1909,8 @@ class PhraseMaker {
      * @param {boolean} sortedClose - Determines if the menu is sorted and closed.
      */
     _createColumnPieSubmenu(index, condition, sortedClose) {
-        index = parseInt(index);
+        index = parseInt(index, 10);
+        this.docById("wheelDivptm").textContent = "";
         this.docById("wheelDivptm").style.display = "";
 
         const accidentals = ["𝄪", "♯", "♮", "♭", "𝄫"];
@@ -1929,11 +1976,12 @@ class PhraseMaker {
         this._exitWheel.slicePathFunction = this.slicePath().DonutSlice;
         this._exitWheel.slicePathCustom = this.slicePath().DonutSliceCustomization();
         this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.25;
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
         this._exitWheel.createWheel(["×", " "]);
+        this._configureExitWheel(this._exitWheel);
 
         const accidentalLabels = [];
         let octaveLabels = [];
@@ -1996,9 +2044,22 @@ class PhraseMaker {
             this._octavesWheel.createWheel(octaveLabels);
         }
 
-        const labelRect = this._labelcols[index].getBoundingClientRect();
-        const x = labelRect.x;
-        const y = labelRect.y;
+        let labelRect = null;
+        if (this._labelcols && this._labelcols[index]) {
+            labelRect = this._labelcols[index].getBoundingClientRect();
+        }
+        let x = labelRect ? labelRect.x : 0;
+        let y = labelRect ? labelRect.y : 0;
+
+        // If the coordinates are 0,0, fallback to addnotes button rect
+        if (x === 0 && y === 0) {
+            const addnotes = this.docById("addnotes");
+            if (addnotes) {
+                const addnotesRect = addnotes.getBoundingClientRect();
+                x = addnotesRect.x;
+                y = addnotesRect.y;
+            }
+        }
 
         this._setupWheelDiv(
             300,
@@ -2012,38 +2073,57 @@ class PhraseMaker {
             )
         );
 
-        if (!this._noteBlocks) {
+        let hasBlock = false;
+        if (!this._noteBlocks && index >= 0 && this.columnBlocksMap[index]) {
             block = this.columnBlocksMap[index][0];
-            noteValue =
-                this.activity.blocks.blockList[this.activity.blocks.blockList[block].connections[1]]
-                    .value;
+            if (block !== undefined && this.activity.blocks.blockList[block]) {
+                const conn1 = this.activity.blocks.blockList[block].connections[1];
+                if (conn1 !== undefined && this.activity.blocks.blockList[conn1]) {
+                    noteValue = this.activity.blocks.blockList[conn1].value;
+                    hasBlock = true;
+                }
+            }
+        }
 
+        if (hasBlock) {
             if (condition === "pitchblocks") {
-                octaveValue =
-                    this.activity.blocks.blockList[
-                        this.activity.blocks.blockList[block].connections[2]
-                    ].value;
+                let octaveValue = undefined;
+                const blockObj = this.activity.blocks.blockList[block];
+                const conn2 = blockObj.connections[2];
+                if (conn2 !== undefined && this.activity.blocks.blockList[conn2]) {
+                    octaveValue = this.activity.blocks.blockList[conn2].value;
+                }
                 accidentalsValue = 2;
 
-                for (let i = 0; i < accidentals.length; i++) {
-                    if (noteValue.includes(accidentals[i])) {
-                        accidentalsValue = i;
-                        noteValue = noteValue.substr(0, noteValue.indexOf(accidentals[i]));
-                        break;
+                if (noteValue !== undefined) {
+                    for (let i = 0; i < accidentals.length; i++) {
+                        if (noteValue.includes(accidentals[i])) {
+                            accidentalsValue = i;
+                            noteValue = noteValue.substr(0, noteValue.indexOf(accidentals[i]));
+                            break;
+                        }
                     }
                 }
 
-                this._accidentalsWheel.navigateWheel(accidentalsValue);
-                this._octavesWheel.navigateWheel(octaveLabels.indexOf(octaveValue.toString()));
+                if (this._accidentalsWheel && this._accidentalsWheel.navItems) {
+                    this._accidentalsWheel.navigateWheel(accidentalsValue);
+                }
+                if (
+                    this._octavesWheel &&
+                    this._octavesWheel.navItems &&
+                    octaveValue !== undefined
+                ) {
+                    this._octavesWheel.navigateWheel(octaveLabels.indexOf(octaveValue.toString()));
+                }
             }
             if (condition === "drumblocks") {
-                this._pitchWheel.navigateWheel(
-                    noteLabels.indexOf(
-                        this._deps.docBySelector('.labelcol[alt="' + index + '__drumblocks"]')
-                            .innerText
-                    )
+                const selectorEl = this._deps.docBySelector(
+                    '.labelcol[alt="' + index + '__drumblocks"]'
                 );
-            } else {
+                if (selectorEl) {
+                    this._pitchWheel.navigateWheel(noteLabels.indexOf(selectorEl.innerText));
+                }
+            } else if (noteValue !== undefined) {
                 this._pitchWheel.navigateWheel(noteLabels.indexOf(noteValue));
             }
         }
@@ -2062,8 +2142,18 @@ class PhraseMaker {
                 this._sort();
             }
         };
+        if (this._exitWheel.navItems.length > 1) {
+            this._exitWheel.navItems[1].navigateFunction =
+                this._exitWheel.navItems[0].navigateFunction;
+        }
 
         const __selectionChanged = () => {
+            if (
+                this._pitchWheel.selectedNavItemIndex === null ||
+                this._pitchWheel.selectedNavItemIndex === undefined
+            ) {
+                return;
+            }
             let label = this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
             const i = noteLabels.indexOf(label);
             let attr, flag, z;
@@ -2084,16 +2174,19 @@ class PhraseMaker {
             }
 
             if (!this._noteBlocks) {
-                noteLabelBlock = this.activity.blocks.blockList[block].connections[1];
-                this.activity.blocks.blockList[noteLabelBlock].text.text = label;
-                this.activity.blocks.blockList[noteLabelBlock].value = label;
+                const blockObj = this.activity.blocks.blockList[block];
+                if (blockObj) {
+                    noteLabelBlock = blockObj.connections[1];
+                    const noteLabelBlockObj = this.activity.blocks.blockList[noteLabelBlock];
+                    if (noteLabelBlockObj) {
+                        noteLabelBlockObj.text.text = label;
+                        noteLabelBlockObj.value = label;
 
-                z = this.activity.blocks.blockList[noteLabelBlock].container.children.length - 1;
-                this.activity.blocks.blockList[noteLabelBlock].container.setChildIndex(
-                    this.activity.blocks.blockList[noteLabelBlock].text,
-                    z
-                );
-                this.activity.blocks.blockList[noteLabelBlock].updateCache();
+                        z = noteLabelBlockObj.container.children.length - 1;
+                        noteLabelBlockObj.container.setChildIndex(noteLabelBlockObj.text, z);
+                        noteLabelBlockObj.updateCache();
+                    }
+                }
             }
 
             if (condition === "pitchblocks") {
@@ -2101,11 +2194,14 @@ class PhraseMaker {
                     this._octavesWheel.navItems[this._octavesWheel.selectedNavItemIndex].title
                 );
 
-                if (!this._noteBlocks) {
-                    this.activity.blocks.blockList[noteLabelBlock].blocks.setPitchOctave(
-                        this.activity.blocks.blockList[noteLabelBlock].connections[0],
-                        octave
-                    );
+                if (!this._noteBlocks && noteLabelBlock) {
+                    const noteLabelBlockObj = this.activity.blocks.blockList[noteLabelBlock];
+                    if (noteLabelBlockObj && noteLabelBlockObj.blocks) {
+                        noteLabelBlockObj.blocks.setPitchOctave(
+                            noteLabelBlockObj.connections[0],
+                            octave
+                        );
+                    }
                 }
 
                 noteObj = [label, octave];
@@ -2128,83 +2224,75 @@ class PhraseMaker {
             }
 
             let cell = this._headcols[index];
-            const drumName = this._deps.getDrumName(this.rowLabels[index]);
-            const BELLSETIDX = {
-                C: 1,
-                D: 2,
-                E: 3,
-                F: 4,
-                G: 5,
-                A: 6,
-                B: 7,
-                do: 1,
-                re: 2,
-                mi: 3,
-                fa: 4,
-                sol: 5,
-                la: 6,
-                ti: 7
-            };
-            const noteName = this.rowLabels[index];
-            const w = window.innerWidth;
-            const iconSize = PhraseMaker.ICONSIZE * (w / 1200);
-            if (drumName !== null) {
-                cell.textContent = "\u00A0\u00A0";
-                const img = document.createElement("img");
-                img.src = this._deps.getDrumIcon(drumName);
-                img.title = this._(drumName);
-                img.alt = this._(drumName);
-                img.setAttribute("height", iconSize);
-                img.setAttribute("width", iconSize);
-                img.setAttribute("vertical-align", "middle");
-                cell.appendChild(img);
-                cell.appendChild(document.createTextNode("\u00A0\u00A0"));
-            } else if (noteName in BELLSETIDX && this.rowArgs[index] === 4) {
-                cell.textContent = "";
-                const img = document.createElement("img");
-                img.src = `images/8_bellset_key_${BELLSETIDX[noteName]}.svg`;
-                img.setAttribute("width", cell.style.width);
-                img.setAttribute("vertical-align", "middle");
-                cell.appendChild(img);
-            } else if (noteName === "C" && this.rowArgs[index] === 5) {
-                cell.textContent = "";
-                const img = document.createElement("img");
-                img.src = "images/8_bellset_key_8.svg";
-                img.setAttribute("width", cell.style.width);
-                img.setAttribute("vertical-align", "middle");
-                cell.appendChild(img);
+            if (cell) {
+                const drumName = this._deps.getDrumName(this.rowLabels[index]);
+                const BELLSETIDX = {
+                    C: 1,
+                    D: 2,
+                    E: 3,
+                    F: 4,
+                    G: 5,
+                    A: 6,
+                    B: 7,
+                    do: 1,
+                    re: 2,
+                    mi: 3,
+                    fa: 4,
+                    sol: 5,
+                    la: 6,
+                    ti: 7
+                };
+                const noteName = this.rowLabels[index];
+                const w = window.innerWidth;
+                const iconSize = PhraseMaker.ICONSIZE * (w / 1200);
+                if (drumName !== null) {
+                    cell.textContent = "\u00A0\u00A0";
+                    const img = document.createElement("img");
+                    img.src = this._deps.getDrumIcon(drumName);
+                    img.title = this._(drumName);
+                    img.alt = this._(drumName);
+                    img.setAttribute("height", iconSize);
+                    img.setAttribute("width", iconSize);
+                    img.setAttribute("vertical-align", "middle");
+                    cell.appendChild(img);
+                    cell.appendChild(document.createTextNode("\u00A0\u00A0"));
+                } else if (noteName in BELLSETIDX && this.rowArgs[index] === 4) {
+                    cell.textContent = "";
+                    const img = document.createElement("img");
+                    img.src = `images/8_bellset_key_${BELLSETIDX[noteName]}.svg`;
+                    img.setAttribute("width", cell.style.width);
+                    img.setAttribute("vertical-align", "middle");
+                    cell.appendChild(img);
+                } else if (noteName === "C" && this.rowArgs[index] === 5) {
+                    cell.textContent = "";
+                    const img = document.createElement("img");
+                    img.src = "images/8_bellset_key_8.svg";
+                    img.setAttribute("width", cell.style.width);
+                    img.setAttribute("vertical-align", "middle");
+                    cell.appendChild(img);
+                }
             }
 
             cell = this._labelcols[index];
-            if (drumName !== null) {
-                cell.textContent = this._(drumName);
-                cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
-            } else if (
-                this._deps.noteIsSolfege(this.rowLabels[i]) &&
-                !this._deps.isCustomTemperament(this.activity.logo.synth.inTemperament)
-            ) {
-                cell.textContent = "";
-                cell.appendChild(
-                    document.createTextNode(this._deps.i18nSolfege(this.rowLabels[index]))
-                );
-                const subTitle1 = document.createElement("sub");
-                subTitle1.textContent = this.rowArgs[index].toString();
-                cell.appendChild(subTitle1);
-                noteObj = this._deps.getNote(
-                    this.rowLabels[index],
-                    this.rowArgs[index],
-                    0,
-                    this.activity.turtles.ithTurtle(0).singer.keySignature,
-                    false,
-                    null,
-                    this.activity.errorMsg,
-                    this.activity.logo.synth.inTemperament
-                );
-            } else {
-                if (this._deps.isCustomTemperament(this.activity.logo.synth.inTemperament)) {
+            if (cell) {
+                const drumName = this._deps.getDrumName(this.rowLabels[index]);
+                if (drumName !== null) {
+                    cell.textContent = this._(drumName);
+                    cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
+                } else if (
+                    this._deps.noteIsSolfege(this.rowLabels[index]) &&
+                    !this._deps.isCustomTemperament(this.activity.logo.synth.inTemperament)
+                ) {
+                    cell.textContent = "";
+                    cell.appendChild(
+                        document.createTextNode(this._deps.i18nSolfege(this.rowLabels[index]))
+                    );
+                    const subTitle1 = document.createElement("sub");
+                    subTitle1.textContent = this.rowArgs[index].toString();
+                    cell.appendChild(subTitle1);
                     noteObj = this._deps.getNote(
-                        this.rowLabels[i],
-                        this.rowArgs[i],
+                        this.rowLabels[index],
+                        this.rowArgs[index],
                         0,
                         this.activity.turtles.ithTurtle(0).singer.keySignature,
                         false,
@@ -2212,26 +2300,40 @@ class PhraseMaker {
                         this.activity.errorMsg,
                         this.activity.logo.synth.inTemperament
                     );
-                    cell.textContent = "";
-                    cell.appendChild(document.createTextNode(this.rowLabels[i]));
-                    const subTitle2 = document.createElement("sub");
-                    subTitle2.textContent = this.rowArgs[i].toString();
-                    cell.appendChild(subTitle2);
                 } else {
-                    cell.textContent = "";
-                    cell.appendChild(document.createTextNode(this.rowLabels[i]));
-                    const subTitle3 = document.createElement("sub");
-                    subTitle3.textContent = this.rowArgs[i].toString();
-                    cell.appendChild(subTitle3);
-                    noteObj = [this.rowLabels[i], this.rowArgs[i]];
+                    if (this._deps.isCustomTemperament(this.activity.logo.synth.inTemperament)) {
+                        noteObj = this._deps.getNote(
+                            this.rowLabels[index],
+                            this.rowArgs[index],
+                            0,
+                            this.activity.turtles.ithTurtle(0).singer.keySignature,
+                            false,
+                            null,
+                            this.activity.errorMsg,
+                            this.activity.logo.synth.inTemperament
+                        );
+                        cell.textContent = "";
+                        cell.appendChild(document.createTextNode(this.rowLabels[index]));
+                        const subTitle2 = document.createElement("sub");
+                        subTitle2.textContent = this.rowArgs[index].toString();
+                        cell.appendChild(subTitle2);
+                    } else {
+                        cell.textContent = "";
+                        cell.appendChild(document.createTextNode(this.rowLabels[index]));
+                        const subTitle3 = document.createElement("sub");
+                        subTitle3.textContent = this.rowArgs[index].toString();
+                        cell.appendChild(subTitle3);
+                        noteObj = [this.rowLabels[index], this.rowArgs[index]];
+                    }
                 }
             }
 
             let noteStored = null;
+            const drumName2 = this._deps.getDrumName(this.rowLabels[index]);
             if (condition === "pitchblocks") {
-                noteStored = noteObj[0] + noteObj[1];
+                if (noteObj) noteStored = noteObj[0] + noteObj[1];
             } else if (condition === "drumblocks") {
-                noteStored = drumName;
+                noteStored = drumName2;
             }
 
             this._noteStored[index] = noteStored;
@@ -3513,9 +3615,9 @@ class PhraseMaker {
             this._blockMapHelper.push([this._colBlocks[i], [i]]);
         }
         for (let i = noteToDivide + 1; i < this.activity.logo.tupletRhythms.length; i++) {
-            this._blockMapHelper.push([this._colBlocks[i], [i + parseInt(notesToAdd)]]);
+            this._blockMapHelper.push([this._colBlocks[i], [i + parseInt(notesToAdd, 10)]]);
         }
-        for (let i = 0; i < parseInt(notesToAdd); i++) {
+        for (let i = 0; i < parseInt(notesToAdd, 10); i++) {
             this.activity.logo.tupletRhythms = this.activity.logo.tupletRhythms
                 .slice(0, noteToDivide + i + 1)
                 .concat(this.activity.logo.tupletRhythms.slice(noteToDivide + i));
@@ -3534,7 +3636,7 @@ class PhraseMaker {
         if (this.activity.logo.tupletRhythms.length === 1) {
             return;
         }
-        noteToDivide = parseInt(noteToDivide);
+        noteToDivide = parseInt(noteToDivide, 10);
         this._blockMapHelper = [];
         for (let i = 0; i < noteToDivide; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [i]]);
@@ -3557,7 +3659,7 @@ class PhraseMaker {
      * @private
      */
     _divideNotes(noteToDivide, divideNoteBy) {
-        noteToDivide = parseInt(noteToDivide);
+        noteToDivide = parseInt(noteToDivide, 10);
         this._blockMapHelper = [];
         for (let i = 0; i < noteToDivide; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [i]]);
@@ -3620,7 +3722,7 @@ class PhraseMaker {
             this._blockMapHelper.push([this._colBlocks[i], [j]]);
         }
         j++;
-        for (let i = parseInt(upCellId) + 1; i < this.activity.logo.tupletRhythms.length; i++) {
+        for (let i = parseInt(upCellId, 10) + 1; i < this.activity.logo.tupletRhythms.length; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [j]]);
             j++;
         }
@@ -3639,7 +3741,7 @@ class PhraseMaker {
                     1 / newNote
                 ]
             ])
-            .concat(this.activity.logo.tupletRhythms.slice(parseInt(upCellId) + 1));
+            .concat(this.activity.logo.tupletRhythms.slice(parseInt(upCellId, 10) + 1));
 
         this._readjustNotesBlocks();
         this._syncMarkedBlocks();
@@ -3674,9 +3776,9 @@ class PhraseMaker {
      * @private
      */
     _updateTupletValue(noteToDivide, oldTupletValue, newTupletValue) {
-        noteToDivide = parseInt(noteToDivide);
-        oldTupletValue = parseInt(oldTupletValue);
-        newTupletValue = parseInt(newTupletValue);
+        noteToDivide = parseInt(noteToDivide, 10);
+        oldTupletValue = parseInt(oldTupletValue, 10);
+        newTupletValue = parseInt(newTupletValue, 10);
         this._blockMapHelper = [];
 
         let k = 0;
@@ -3767,6 +3869,7 @@ class PhraseMaker {
      * @private
      */
     _createpiesubmenu(noteToDivide, tupletValue, condition) {
+        this.docById("wheelDivptm").textContent = "";
         this.docById("wheelDivptm").style.display = "";
 
         this._menuWheel = new this.wheelnav("wheelDivptm", null, 800, 800);
@@ -3866,6 +3969,7 @@ class PhraseMaker {
 
         this._menuWheel.createWheel(mainTabsLabels);
         this._exitWheel.createWheel(exitTabLabel);
+        this._configureExitWheel(this._exitWheel);
 
         let x = 0,
             y = 0;
@@ -3892,7 +3996,14 @@ class PhraseMaker {
             this.docById("wheelDivptm").style.display = "none";
             this._menuWheel.removeWheel();
             this._exitWheel.removeWheel();
+            if (this._tabsWheel) {
+                this._tabsWheel.removeWheel();
+            }
         };
+        if (this._exitWheel.navItems.length > 1) {
+            this._exitWheel.navItems[1].navigateFunction =
+                this._exitWheel.navItems[0].navigateFunction;
+        }
 
         if (condition === "tupletvalue") {
             const __enterValue = () => {
@@ -3907,7 +4018,7 @@ class PhraseMaker {
 
             this._menuWheel.navItems[3].navigateFunction = () => {
                 if (this.newNoteValue > 1) {
-                    this.newNoteValue = String(parseInt(this.newNoteValue) - 1);
+                    this.newNoteValue = String(parseInt(this.newNoteValue, 10) - 1);
                     this.docById("wheelnav-_exitWheel-title-1").children[0].textContent =
                         this.newNoteValue;
                     this._updateTupletValue(this, noteToDivide, tupletValue, this.newNoteValue);
@@ -3915,7 +4026,7 @@ class PhraseMaker {
             };
 
             this._menuWheel.navItems[9].navigateFunction = () => {
-                this.newNoteValue = String(parseInt(this.newNoteValue) + 1);
+                this.newNoteValue = String(parseInt(this.newNoteValue, 10) + 1);
                 this.docById("wheelnav-_exitWheel-title-1").children[0].textContent =
                     this.newNoteValue;
                 this._updateTupletValue(noteToDivide, tupletValue, this.newNoteValue);
@@ -3970,7 +4081,7 @@ class PhraseMaker {
                     const word = this.newNoteValue.split("/");
                     this._updateTuplet(
                         noteToDivide,
-                        parseInt(word[1]) / parseInt(word[0]),
+                        parseInt(word[1], 10) / parseInt(word[0], 10),
                         condition
                     );
                 }
@@ -4050,9 +4161,9 @@ class PhraseMaker {
 
             const __mouseUpHandler = event => {
                 this._mouseUpCell = event.target;
-                if (this._mouseDownCell !== this._mouseUpCell) {
+                if (this._mouseDownCell && this._mouseDownCell !== this._mouseUpCell) {
                     this._tieNotes(this._mouseDownCell, this._mouseUpCell);
-                } else {
+                } else if (this._mouseDownCell) {
                     const nodes = Array.prototype.slice.call(event.target.parentElement.children);
                     this._createpiesubmenu(
                         nodes.indexOf(event.target),
@@ -4489,7 +4600,7 @@ class PhraseMaker {
             // which case we output 1 / (3 x 4) instead of 1 / 12.
             if (
                 this._outputAsTuplet[i][0] !== 1 &&
-                parseInt(this._outputAsTuplet[i][1]) === this._outputAsTuplet[i][1]
+                parseInt(this._outputAsTuplet[i][1], 10) === this._outputAsTuplet[i][1]
             ) {
                 // We don't reformat dotted tuplets since they are too complicated.
                 // We are adding 6 blocks: vspace, divide, number, multiply, number, number
@@ -4527,7 +4638,7 @@ class PhraseMaker {
                 // note value is saved as a fraction
                 newStack.push([idx + 2, "divide", 0, 0, [idx, idx + 3, idx + 4]]);
 
-                if (parseInt(note[1]) < note[1]) {
+                if (parseInt(note[1], 10) < note[1]) {
                     // dotted note
                     obj = this._deps.toFraction(note[1]);
                     newStack.push([idx + 3, ["number", { value: obj[1] }], 0, 0, [idx + 2]]);
@@ -4571,7 +4682,7 @@ class PhraseMaker {
                         }
                     }
 
-                    if (!isNaN(parseInt(note[0][j]))) {
+                    if (!isNaN(parseInt(note[0][j], 10))) {
                         obj = null;
                         drumName = null;
                     } else {
@@ -4597,7 +4708,7 @@ class PhraseMaker {
                         ]);
                         newStack.push([
                             thisBlock + 1,
-                            ["number", { value: parseInt(note[0][j]) }],
+                            ["number", { value: parseInt(note[0][j], 10) }],
                             0,
                             0,
                             [thisBlock]

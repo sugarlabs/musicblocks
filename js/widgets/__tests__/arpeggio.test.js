@@ -354,5 +354,343 @@ describe("Arpeggio Widget", () => {
 
             jest.useRealTimers();
         });
+
+        test("erase button onclick clears all black cells", () => {
+            const cell = document.getElementById("2,1");
+            cell.onclick({ target: cell });
+            expect(cell.style.backgroundColor).toBe("black");
+
+            const eraseBtn = arpeggio.widgetWindow.addButton.mock.results.find(
+                res => res.value.title === "Clear"
+            ).value;
+            eraseBtn.onclick();
+
+            expect(cell.style.backgroundColor).not.toBe("black");
+        });
+    });
+
+    // --- _inMode / _getBackgroundColor Tests ---
+    describe("_inMode and _getBackgroundColor", () => {
+        beforeEach(() => {
+            arpeggio.init(activityMock);
+        });
+
+        test("_inMode returns true for an index present in modeNumbers", () => {
+            // modeNumbers is "0 2 4 5 7 9 11" -> ["0","2","4","5","7","9","11"]
+            expect(arpeggio._inMode(0)).toBe(true);
+            expect(arpeggio._inMode(4)).toBe(true);
+            expect(arpeggio._inMode(11)).toBe(true);
+        });
+
+        test("_inMode returns false for an index not in modeNumbers", () => {
+            expect(arpeggio._inMode(1)).toBe(false);
+            expect(arpeggio._inMode(3)).toBe(false);
+            expect(arpeggio._inMode(99)).toBe(false);
+        });
+
+        test("_getBackgroundColor returns selectorSelected for a mode row", () => {
+            // row 0 maps to ii = (13 - 0 - 1) % 12 = 0, which is in mode
+            const color = arpeggio._getBackgroundColor(0);
+            expect(color).toBe(platformColor.selectorSelected);
+        });
+
+        test("_getBackgroundColor returns selectorBackground for a non-mode row", () => {
+            // row 1 maps to ii = (13 - 1 - 1) % 12 = 11, which is in mode
+            // row 2 maps to ii = (13 - 2 - 1) % 12 = 10, which is NOT in mode
+            const color = arpeggio._getBackgroundColor(2);
+            expect(color).toBe(platformColor.selectorBackground);
+        });
+    });
+
+    // --- makeClickable blockMap restore Tests ---
+    describe("makeClickable blockMap restore", () => {
+        test("pre-populated blockMap entry restores cell to black on init", () => {
+            // _rowBlocks[0] = 0, _colBlocks[0] = 1 after init
+            // Pre-set blockMap before init so makeClickable restores it
+            arpeggio._blockMap = [[0, 1]];
+            arpeggio.init(activityMock);
+
+            const table = document.getElementById("arpeggioCellTable0");
+            const cell = table.rows[0].cells[0];
+            expect(cell.style.backgroundColor).toBe("black");
+        });
+
+        test("blockMap entry [-1,-1] is skipped without errors during restore", () => {
+            arpeggio._blockMap = [[-1, -1]];
+            expect(() => arpeggio.init(activityMock)).not.toThrow();
+        });
+
+        test("blockMap entry with timeStep not in _colBlocks is skipped", () => {
+            // 9999 will never match any colBlock
+            arpeggio._blockMap = [[0, 9999]];
+            expect(() => arpeggio.init(activityMock)).not.toThrow();
+        });
+    });
+
+    // --- __makePairsList Tests ---
+    describe("__makePairsList", () => {
+        beforeEach(() => {
+            arpeggio.notesToPlay = [["C4", 1]];
+            arpeggio.init(activityMock);
+        });
+
+        test("returns all [-1, j] pairs when no cells are selected", () => {
+            const pairs = arpeggio.__makePairsList();
+            expect(pairs).toHaveLength(arpeggio.defaultCols);
+            pairs.forEach((pair, j) => {
+                expect(pair).toEqual([-1, j]);
+            });
+        });
+
+        test("returns correct [row, col] for a column with a selected cell", () => {
+            const cell = document.getElementById("3,2");
+            cell.onclick({ target: cell });
+
+            const pairs = arpeggio.__makePairsList();
+            expect(pairs[2]).toEqual([3, 2]);
+        });
+    });
+
+    // --- _save chordValues format Tests ---
+    describe("_save chordValues format", () => {
+        beforeEach(() => {
+            arpeggio.notesToPlay = [["C4", 1]];
+            arpeggio.init(activityMock);
+        });
+
+        test("mode row cell produces [scalar, 0] in chordValues", () => {
+            // row 12 maps to ii = (13 - 12 - 1) % 12 = 0, which IS in modeNumbers
+            const cell = document.getElementById("12,0");
+            cell.onclick({ target: cell });
+
+            arpeggio._save();
+
+            const chordValues = global.setCustomChord.mock.calls[0][0];
+            expect(chordValues[0][1]).toBe(0);
+            expect(typeof chordValues[0][0]).toBe("number");
+        });
+
+        test("non-mode row cell produces [scalar, semitoneOffset] in chordValues", () => {
+            // row 3 maps to ii = (13 - 3 - 1) % 12 = 9, which IS in mode
+            // row 4 maps to ii = (13 - 4 - 1) % 12 = 8, which is NOT in modeNumbers
+            // Force __makePairsList to return a non-mode pair directly
+            arpeggio.__makePairsList = () => [
+                [4, 0],
+                [-1, 1],
+                [-1, 2],
+                [-1, 3]
+            ];
+
+            arpeggio._save();
+
+            const chordValues = global.setCustomChord.mock.calls[0][0];
+            expect(chordValues[0][1]).toBeGreaterThan(0);
+        });
+
+        test("top row cell (row 0) produces [modeNumbers.length, 0] for octave", () => {
+            // pairs[i][0] === 0 triggers the octave edge case in _save
+            arpeggio.__makePairsList = () => [
+                [0, 0],
+                [-1, 1],
+                [-1, 2],
+                [-1, 3]
+            ];
+
+            arpeggio._save();
+
+            const chordValues = global.setCustomChord.mock.calls[0][0];
+            expect(chordValues[0]).toEqual([arpeggio._modeNumbers.length, 0]);
+        });
+
+        test("empty column produces rest ['-','-'] in chordValues", () => {
+            arpeggio._save();
+
+            const chordValues = global.setCustomChord.mock.calls[0][0];
+            chordValues.forEach(val => {
+                expect(val).toEqual(["-", "-"]);
+            });
+        });
+    });
+
+    // --- __playNote edge case Tests ---
+    describe("__playNote edge cases", () => {
+        beforeEach(() => {
+            arpeggio.init(activityMock);
+        });
+
+        test("rest entry (empty pitch string) does not trigger synth", () => {
+            jest.useFakeTimers();
+
+            arpeggio._playing = true;
+            arpeggio._playList = [["", 0.25]];
+            arpeggio.__playNote(0);
+
+            expect(activityMock.logo.synth.trigger).not.toHaveBeenCalled();
+
+            jest.useRealTimers();
+        });
+
+        test("index past end of playList resets _playing to false", () => {
+            arpeggio._playing = true;
+            arpeggio._playList = [];
+            arpeggio.__playNote(0);
+
+            expect(arpeggio._playing).toBe(false);
+        });
+
+        test("returns immediately if not playing", () => {
+            arpeggio._playing = false;
+            const triggerSpy = jest.spyOn(activityMock.logo.synth, "trigger");
+            arpeggio.__playNote(0);
+            expect(triggerSpy).not.toHaveBeenCalled();
+            triggerSpy.mockRestore();
+        });
+    });
+
+    // --- __playCell fallback Tests ---
+    describe("__playCell with empty notesToPlay", () => {
+        beforeEach(() => {
+            arpeggio.notesToPlay = [["C4", 1]];
+            arpeggio.init(activityMock);
+        });
+
+        test("uses letter and octave from notesToPlay[0] when populated", () => {
+            // notesToPlay[0] = ["C4", 1] -> letter = "C", octave = 4
+            const cell = document.createElement("td");
+            arpeggio.__playCell(3, 0, cell, true);
+
+            expect(global.getNote).toHaveBeenCalledWith(
+                "C",
+                4,
+                expect.any(Number),
+                expect.anything(),
+                false,
+                null,
+                expect.anything()
+            );
+            expect(activityMock.logo.synth.trigger).toHaveBeenCalled();
+        });
+
+        test("defaults to C4 when notesToPlay is empty", () => {
+            // The notesToPlay.length === 0 guard sets letter="C", octave=4
+            // getNote is called with those values before the crash at notesToPlay[0][1]
+            arpeggio.notesToPlay = [];
+            const cell = document.createElement("td");
+
+            try {
+                arpeggio.__playCell(3, 0, cell, true);
+            } catch (_) {
+                // notesToPlay[0][1] read for duration crashes after getNote succeeds
+            }
+
+            expect(global.getNote).toHaveBeenCalledWith(
+                "C",
+                4,
+                expect.any(Number),
+                expect.anything(),
+                false,
+                null,
+                expect.anything()
+            );
+        });
+    });
+
+    // --- _clearColumn skip-self Tests ---
+    describe("_clearColumn skip-self guard", () => {
+        beforeEach(() => {
+            arpeggio.notesToPlay = [["C4", 1]];
+            arpeggio.init(activityMock);
+        });
+
+        test("cell at the target row is not cleared when _clearColumn is called", () => {
+            const cell = document.getElementById("3,1");
+            cell.onclick({ target: cell });
+            expect(cell.style.backgroundColor).toBe("black");
+
+            // Call _clearColumn for col 1, skipping row 3
+            arpeggio._clearColumn(1, 3);
+
+            expect(cell.style.backgroundColor).toBe("black");
+        });
+
+        test("cells in other rows of the same column are cleared", () => {
+            const cell1 = document.getElementById("3,1");
+            const cell2 = document.getElementById("4,1");
+            cell1.onclick({ target: cell1 });
+            cell2.onclick({ target: cell2 });
+
+            // cell1 gets cleared when cell2 is clicked (clearColumn is called internally)
+            expect(cell1.style.backgroundColor).not.toBe("black");
+            expect(cell2.style.backgroundColor).toBe("black");
+        });
+    });
+
+    // --- Playback Teardown Tests ---
+    describe("playback teardown and stop behavior", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+            arpeggio.notesToPlay = [["C4", 1]];
+            arpeggio.init(activityMock);
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+        });
+
+        test("widgetWindow.onclose stops playback and clears timeout", () => {
+            // Start playing
+            const cell = document.getElementById("2,1");
+            cell.onclick({ target: cell });
+            arpeggio.playButton.onclick();
+            expect(arpeggio._playing).toBe(true);
+            expect(arpeggio._playTimeout).not.toBeNull();
+
+            const timeoutSpy = jest.spyOn(global, "clearTimeout");
+
+            // Close window
+            arpeggio.widgetWindow.onclose();
+
+            expect(arpeggio._playing).toBe(false);
+            expect(arpeggio._playTimeout).toBeNull();
+            expect(timeoutSpy).toHaveBeenCalled();
+            expect(activityMock.logo.synth.stop).toHaveBeenCalled();
+            expect(mockWidgetWindow.destroy).toHaveBeenCalled();
+
+            timeoutSpy.mockRestore();
+        });
+
+        test("clicking play button when playing stops playback and clears timeout", () => {
+            const cell = document.getElementById("2,1");
+            cell.onclick({ target: cell });
+            arpeggio.playButton.onclick();
+            expect(arpeggio._playing).toBe(true);
+            expect(arpeggio._playTimeout).not.toBeNull();
+
+            const timeoutSpy = jest.spyOn(global, "clearTimeout");
+
+            // Click to stop
+            arpeggio.playButton.onclick();
+
+            expect(arpeggio._playing).toBe(false);
+            expect(arpeggio._playTimeout).toBeNull();
+            expect(timeoutSpy).toHaveBeenCalled();
+            expect(activityMock.logo.synth.stop).toHaveBeenCalled();
+
+            timeoutSpy.mockRestore();
+        });
+
+        test("_clear stops playback, clears timeout, and resets play button state", () => {
+            const cell = document.getElementById("2,1");
+            cell.onclick({ target: cell });
+            arpeggio.playButton.onclick();
+            expect(arpeggio._playing).toBe(true);
+
+            // Clear widget
+            arpeggio._clear();
+
+            expect(arpeggio._playing).toBe(false);
+            expect(arpeggio._playTimeout).toBeNull();
+            expect(activityMock.logo.synth.stop).toHaveBeenCalled();
+        });
     });
 });

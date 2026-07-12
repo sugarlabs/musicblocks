@@ -53,6 +53,7 @@ setupHelperDOM();
 const {
     getCookie,
     setCookie,
+    toggleText,
     toggleExpandable,
     hideOnClickOutside,
     updateCheckboxes
@@ -163,6 +164,32 @@ describe("helper.js", () => {
 
             toggleExpandable("toggle", "cls");
             expect(el.className).toBe("cls open");
+        });
+    });
+
+    describe("toggleText", () => {
+        it("should toggle the visible text without parsing HTML", () => {
+            document.body.innerHTML = '<div id="view-more-chips">Show more tags ▼</div>';
+
+            toggleText("view-more-chips", "Show more tags ▼", "Show fewer tags ▲");
+            expect(document.getElementById("view-more-chips").textContent).toBe(
+                "Show fewer tags ▲"
+            );
+
+            toggleText("view-more-chips", "Show more tags ▼", "Show fewer tags ▲");
+            expect(document.getElementById("view-more-chips").textContent).toBe("Show more tags ▼");
+        });
+
+        it("should not interpret malicious HTML when toggling text", () => {
+            document.body.innerHTML = '<div id="view-more-chips"></div>';
+            const el = document.getElementById("view-more-chips");
+
+            el.textContent = "Show more tags ▼<img src=x onerror=alert(1)>";
+
+            toggleText("view-more-chips", "Show more tags ▼", "Show fewer tags ▲");
+
+            expect(el.querySelector("img")).toBe(null);
+            expect(el.textContent).toBe("Show fewer tags ▲<img src=x onerror=alert(1)>");
         });
     });
 

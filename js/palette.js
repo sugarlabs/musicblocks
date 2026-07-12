@@ -61,6 +61,12 @@ const makePaletteIcons = (data, width, height) => {
 
     const img = new Image();
     img.src = src;
+    // Decorative icon: the parent element (palette tab, button, etc.)
+    // already carries an aria-label/role, so mark this image as
+    // presentational to avoid duplicate/empty announcements for
+    // screen reader users (WCAG 1.1.1 Non-text Content).
+    img.alt = "";
+    img.setAttribute("role", "presentation");
     if (width) img.width = width;
     if (height) img.height = height;
     return img;
@@ -582,7 +588,7 @@ class Palettes {
     deltaY(dy) {
         // Cache DOM element reference to avoid multiple lookups and forced reflow
         const palette = document.getElementById("palette");
-        const curr = parseInt(palette.style.top);
+        const curr = parseInt(palette.style.top, 10);
         palette.style.top = curr + dy + "px";
     }
 
@@ -595,13 +601,13 @@ class Palettes {
 
         if (this.collapsed) {
             palette.style.transform = "translateX(-100%)";
-            document.getElementById("paletteToggle").innerHTML = "▶";
+            document.getElementById("paletteToggle").textContent = "▶";
             document.getElementById("paletteToggle").setAttribute("aria-expanded", "false");
             palette.style.transition = "transform 0.3s ease";
             this.paletteWidth = 0;
         } else {
             palette.style.transform = "translateX(0)";
-            document.getElementById("paletteToggle").innerHTML = "◀";
+            document.getElementById("paletteToggle").textContent = "◀";
             document.getElementById("paletteToggle").setAttribute("aria-expanded", "true");
             this.paletteWidth = 55 * PALETTE_WIDTH_FACTOR;
         }
@@ -644,7 +650,7 @@ class Palettes {
             document.body.appendChild(element);
 
             const toggleBtn = document.createElement("div");
-            toggleBtn.innerHTML = "◀";
+            toggleBtn.textContent = "◀";
             toggleBtn.id = "paletteToggle";
             toggleBtn.setAttribute("role", "button");
             toggleBtn.setAttribute("aria-label", _("Toggle Palette"));
@@ -1310,10 +1316,10 @@ class PaletteModel {
                         if (block.staticLabels[0] === _("store in box")) {
                             label = _("store in box");
                         } else {
-                            label = _("store in") + " " + block.staticLabels[0];
+                            label = `${_("store in")} ${block.staticLabels[0]}`;
                         }
                     } else {
-                        label = block.defaults[0];
+                        label = _(block.defaults[0]);
                     }
                 } else if (protoBlock.staticLabels.length > 0) {
                     label = protoBlock.staticLabels[0];
@@ -1512,8 +1518,10 @@ class Palette {
             let header = this.menuContainer.children[0];
             header = header.insertRow();
             header.style.backgroundColor = platformColor.paletteLabelBackground;
-            header.innerHTML =
-                '<td style ="width: 100%; height: 42px; box-sizing: border-box; display: flex; flex-direction: row; align-items: center; justify-content: space-between;"></td>';
+            const headerCell = document.createElement("td");
+            headerCell.style.cssText =
+                "width: 100%; height: 42px; box-sizing: border-box; display: flex; flex-direction: row; align-items: center; justify-content: space-between;";
+            header.appendChild(headerCell);
             header = header.children[0];
             header.style.padding = "8px";
 
@@ -1540,6 +1548,13 @@ class Palette {
                 this.palettes.cellSize,
                 this.palettes.cellSize
             );
+            // This icon is functional (closes the menu), not decorative,
+            // so override the default presentational/empty-alt markup
+            // applied in makePaletteIcons with a real accessible name.
+            closeImg.removeAttribute("role");
+            closeImg.alt = _("Close");
+            closeImg.setAttribute("role", "button");
+            closeImg.tabIndex = 0;
             closeImg.onclick = () => this.hideMenu();
             closeImg.onmouseover = () => (document.body.style.cursor = "pointer");
             closeImg.onmouseleave = () => (document.body.style.cursor = "default");
@@ -1664,8 +1679,8 @@ class Palette {
                     img.onmouseup = null;
                     img.ontouchend = null;
 
-                    const x = parseInt(img.style.left);
-                    const y = parseInt(img.style.top);
+                    const x = parseInt(img.style.left, 10);
+                    const y = parseInt(img.style.top, 10);
 
                     img.style.position = posit;
                     img.style.zIndex = zInd;
@@ -1758,7 +1773,7 @@ class Palette {
                 break;
             } else if (
                 ["storein"].includes(this.model.blocks[i].blkname) &&
-                this.model.blocks[i].modname === _("store in") + " " + name
+                this.model.blocks[i].modname === `${_("store in")} ${name}`
             ) {
                 this.model.blocks.splice(i, 1);
                 break;
@@ -1966,7 +1981,11 @@ class Palette {
                 if (block.name === "print") {
                     const arg = block.connections[1];
                     if (arg !== null && arg in this.activity.blocks.blockList) {
-                        this.activity.logo.parseArg(this.activity.logo, 0, arg);
+                        try {
+                            this.activity.logo.parseArg(this.activity.logo, 0, arg);
+                        } catch (e) {
+                            // turtle not yet initialized; skip field registration
+                        }
                     }
                 }
 

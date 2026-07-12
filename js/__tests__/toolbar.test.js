@@ -103,14 +103,14 @@ describe("Toolbar Class", () => {
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ true", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = true;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(141);
+        expect(global._).toHaveBeenCalledTimes(102);
         expect(global._).toHaveBeenNthCalledWith(1, "About Music Blocks");
     });
 
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ false", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = false;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(123);
+        expect(global._).toHaveBeenCalledTimes(84);
         expect(global._).toHaveBeenNthCalledWith(1, "About Turtle Blocks");
     });
 
@@ -182,7 +182,8 @@ describe("Toolbar Class", () => {
     test("renderLogoIcon sets up logo with correct interactions", () => {
         const elements = {
             "mb-logo": {
-                innerHTML: "",
+                textContent: "",
+                appendChild: jest.fn(),
                 onmouseenter: null,
                 onmouseleave: null,
                 onclick: null,
@@ -208,7 +209,7 @@ describe("Toolbar Class", () => {
 
         //Non-Japanese language
         toolbar.renderLogoIcon(mockOnClick);
-        expect(elements["mb-logo"].innerHTML).toBe("");
+        expect(elements["mb-logo"].textContent).toBe("");
         expect(typeof elements["mb-logo"].onmouseenter).toBe("function");
         expect(typeof elements["mb-logo"].onmouseleave).toBe("function");
         expect(typeof elements["mb-logo"].onclick).toBe("function");
@@ -225,8 +226,7 @@ describe("Toolbar Class", () => {
         // Japanese language
         toolbar.language = "ja";
         toolbar.renderLogoIcon(mockOnClick);
-        expect(elements["mb-logo"].innerHTML).toContain("logo-ja.svg");
-        expect(elements["mb-logo"].innerHTML).toContain("transform: scale(0.85)");
+        expect(elements["mb-logo"].appendChild).toHaveBeenCalled();
         elements["mb-logo"].onclick();
         expect(mockOnClick).toHaveBeenCalledTimes(2);
     });
@@ -385,10 +385,19 @@ describe("Toolbar Class", () => {
     });
 
     test("renderThemeSelectIcon sets onclick and updates theme selection", () => {
-        const themeSelectIcon = { onclick: null };
+        const themeSelectIcon = {
+            onclick: null,
+            textContent: "",
+            childNodes: [],
+            appendChild: jest.fn(),
+            cloneNode: jest.fn()
+        };
         const themes = ["light", "dark"];
         const themeBox = { setAttribute: jest.fn() };
-        global.docById.mockReturnValue(themeSelectIcon);
+        global.docById.mockImplementation(id => {
+            if (id === "themeSelectIcon") return themeSelectIcon;
+            return { childNodes: [], cloneNode: jest.fn() };
+        });
         global.localStorage.themePreference = "light";
         toolbar.renderThemeSelectIcon(themeBox, themes);
         expect(themeSelectIcon.onclick).toBeInstanceOf(Function);
@@ -576,7 +585,9 @@ describe("Toolbar Class", () => {
         const recordButton = {
             classList: { add: jest.fn() },
             style: { display: "" },
-            innerHTML: ""
+            innerHTML: "",
+            textContent: "",
+            appendChild: jest.fn()
         };
         global.docById.mockReturnValue(recordButton);
         global.fnBrowserDetect = jest.fn(() => "firefox");
@@ -592,6 +603,8 @@ describe("Toolbar Class", () => {
             classList: { add: jest.fn(), remove: jest.fn() },
             style: { display: "" },
             innerHTML: "",
+            textContent: "",
+            appendChild: jest.fn(),
             onclick: null
         };
 
@@ -599,6 +612,8 @@ describe("Toolbar Class", () => {
             classList: { add: jest.fn(), remove: jest.fn() },
             style: { display: "" },
             innerHTML: "",
+            textContent: "",
+            appendChild: jest.fn(),
             addEventListener: jest.fn(),
             removeEventListener: jest.fn(),
             querySelector: jest.fn(() => ({ textContent: "arrow_drop_down" })),
@@ -728,7 +743,7 @@ describe("Toolbar Class", () => {
         clickHandler();
 
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, false);
-        expect(elements.menu.innerHTML).toBe("more_vert");
+        expect(elements.menu.textContent).toBe("more_vert");
         expect(elements.toggleAuxBtn.classList.add).toHaveBeenCalledWith("blue", "darken-1");
         expect(elements.search.classList.toggle).toHaveBeenCalledWith("open");
 
@@ -737,7 +752,7 @@ describe("Toolbar Class", () => {
 
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, true);
         expect(elements["aux-toolbar"].style.display).toBe("none");
-        expect(elements.menu.innerHTML).toBe("menu");
+        expect(elements.menu.textContent).toBe("menu");
         expect(elements.toggleAuxBtn.classList.remove).toHaveBeenCalledWith("blue", "darken-1");
         expect(elements.toggleAuxBtn.className).toBe("tooltipped aux-toggle");
         expect(elements.chooseKeyDiv.style.display).toBe("none");
@@ -1062,7 +1077,7 @@ describe("Toolbar Class", () => {
     test("closeAuxToolbar hides auxiliary toolbar if visible", () => {
         const elements = {
             "aux-toolbar": { style: { display: "block" } },
-            "menu": { innerHTML: "" },
+            "menu": { innerHTML: "", textContent: "", appendChild: jest.fn() },
             "toggleAuxBtn": {
                 className: "some-class blue darken-1",
                 classList: {
@@ -1077,7 +1092,7 @@ describe("Toolbar Class", () => {
         toolbar.activity = {};
         toolbar.closeAuxToolbar(mockOnClick);
         expect(elements["aux-toolbar"].style.display).toBe("none");
-        expect(elements.menu.innerHTML).toBe("menu");
+        expect(elements.menu.textContent).toBe("menu");
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, false);
         expect(elements.toggleAuxBtn.classList.remove).toHaveBeenCalledWith("blue", "darken-1");
     });
@@ -1283,6 +1298,8 @@ describe("Toolbar Class", () => {
             classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn(() => false) },
             style: { display: "block" },
             innerHTML: "",
+            textContent: "",
+            appendChild: jest.fn(),
             addEventListener: jest.fn(),
             querySelector: jest.fn(() => ({ textContent: "" })),
             contains: jest.fn(() => false)
@@ -1393,5 +1410,175 @@ describe("FocusCycleManager", () => {
         });
         expect(blocks.activeBlock).toBeNull();
         expect(manager._currentZone).toBe("workspace");
+    });
+
+    test("tab keydown cycles forward workspace -> toolbar -> palette", () => {
+        const manager = new Toolbar.FocusCycleManager();
+        manager._keyboardMode = false;
+        manager._currentZone = "workspace";
+
+        manager._leaveZone = jest.fn();
+        manager._enterZone = jest.fn();
+
+        const event = {
+            key: "Tab",
+            shiftKey: false,
+            preventDefault: jest.fn(),
+            stopPropagation: jest.fn()
+        };
+
+        manager._onKeyDown(event);
+
+        expect(manager._keyboardMode).toBe(true);
+        expect(manager._currentZone).toBe("toolbar");
+        expect(manager._leaveZone).toHaveBeenCalledWith("workspace");
+        expect(manager._enterZone).toHaveBeenCalledWith("toolbar");
+    });
+
+    test("shift+tab keydown cycles backward workspace -> palette -> toolbar", () => {
+        const manager = new Toolbar.FocusCycleManager();
+        manager._keyboardMode = false;
+        manager._currentZone = "workspace";
+
+        manager._leaveZone = jest.fn();
+        manager._enterZone = jest.fn();
+
+        const event = {
+            key: "Tab",
+            shiftKey: true,
+            preventDefault: jest.fn(),
+            stopPropagation: jest.fn()
+        };
+
+        manager._onKeyDown(event);
+
+        expect(manager._keyboardMode).toBe(true);
+        expect(manager._currentZone).toBe("palette");
+        expect(manager._leaveZone).toHaveBeenCalledWith("workspace");
+        expect(manager._enterZone).toHaveBeenCalledWith("palette");
+    });
+
+    test("bypasses focus cycling when target is an input or text box", () => {
+        const manager = new Toolbar.FocusCycleManager();
+        const activeInput = document.createElement("input");
+        activeInput.type = "text";
+        document.body.appendChild(activeInput);
+        activeInput.focus();
+
+        const event = {
+            key: "Tab",
+            shiftKey: false,
+            preventDefault: jest.fn(),
+            stopPropagation: jest.fn()
+        };
+
+        manager._onKeyDown(event);
+
+        expect(manager._keyboardMode).toBe(false);
+        expect(event.preventDefault).not.toHaveBeenCalled();
+
+        document.body.removeChild(activeInput);
+    });
+
+    test("dispose removes all document-level event listeners", () => {
+        const addSpy = jest.spyOn(document, "addEventListener").mockImplementation(() => {});
+        const removeSpy = jest.spyOn(document, "removeEventListener").mockImplementation(() => {});
+
+        const manager = new Toolbar.FocusCycleManager();
+        manager.init();
+        manager.dispose();
+
+        expect(removeSpy).toHaveBeenCalledWith("keydown", expect.any(Function), true);
+        expect(removeSpy).toHaveBeenCalledWith("mousedown", expect.any(Function), false);
+        expect(removeSpy).toHaveBeenCalledWith("focusin", expect.any(Function), true);
+
+        addSpy.mockRestore();
+        removeSpy.mockRestore();
+    });
+
+    test("entering toolbar zone focuses first visible button if no last focused button is present", () => {
+        const manager = new Toolbar.FocusCycleManager();
+        const toolbars = document.createElement("div");
+        toolbars.id = "toolbars";
+        const firstBtn = document.createElement("button");
+        firstBtn.setAttribute("tabindex", "0");
+        toolbars.appendChild(firstBtn);
+        document.body.appendChild(toolbars);
+
+        const getElementSpy = jest.spyOn(document, "getElementById").mockImplementation(id => {
+            if (id === "toolbars") return toolbars;
+            return null;
+        });
+
+        const styleSpy = jest.spyOn(window, "getComputedStyle").mockImplementation(() => ({
+            display: "block",
+            visibility: "visible"
+        }));
+
+        Object.defineProperty(firstBtn, "offsetWidth", { value: 100, configurable: true });
+        firstBtn.focus = jest.fn();
+
+        manager._enterZone("toolbar");
+
+        expect(firstBtn.focus).toHaveBeenCalled();
+
+        getElementSpy.mockRestore();
+        styleSpy.mockRestore();
+        document.body.removeChild(toolbars);
+    });
+
+    test("entering toolbar zone focuses last focused button if present", () => {
+        const manager = new Toolbar.FocusCycleManager();
+        const toolbars = document.createElement("div");
+        toolbars.id = "toolbars";
+        const lastBtn = document.createElement("button");
+        lastBtn.setAttribute("tabindex", "0");
+        toolbars.appendChild(lastBtn);
+        document.body.appendChild(toolbars);
+
+        const getElementSpy = jest.spyOn(document, "getElementById").mockImplementation(id => {
+            if (id === "toolbars") return toolbars;
+            return null;
+        });
+
+        const styleSpy = jest.spyOn(window, "getComputedStyle").mockImplementation(() => ({
+            display: "block",
+            visibility: "visible"
+        }));
+
+        Object.defineProperty(lastBtn, "offsetWidth", { value: 100, configurable: true });
+        lastBtn.focus = jest.fn();
+
+        manager._lastFocusedButton = lastBtn;
+        manager._enterZone("toolbar");
+
+        expect(lastBtn.focus).toHaveBeenCalled();
+
+        getElementSpy.mockRestore();
+        styleSpy.mockRestore();
+        document.body.removeChild(toolbars);
+    });
+});
+
+describe("toolbar.js compatibility shim", () => {
+    test("shim re-exports the same class as toolbar-ui", () => {
+        const shim = require("../toolbar");
+        const direct = require("../toolbar-ui");
+        expect(shim).toBe(direct);
+    });
+
+    test("shim preserves FocusCycleManager on the export", () => {
+        const shim = require("../toolbar");
+        expect(typeof shim.FocusCycleManager).toBe("function");
+    });
+
+    test("instances created via shim are ToolbarUI instances", () => {
+        const shim = require("../toolbar");
+        const instance = new shim();
+        expect(instance).toBeInstanceOf(shim);
+        expect(typeof instance.init).toBe("function");
+        expect(typeof instance.highlightStop).toBe("function");
+        expect(typeof instance.resetStop).toBe("function");
+        expect(typeof instance.dimThenRestoreStop).toBe("function");
     });
 });

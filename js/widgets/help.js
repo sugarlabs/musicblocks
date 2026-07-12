@@ -444,7 +444,7 @@ class HelpWidget {
         img.alt = `${title} icon`;
 
         if (this._isLargeTourImage(title)) {
-            img.classList.add("help-tour-image");
+            img.classList.add("help-tour-image", "help-tour-large-image");
         } else if (this._isDetailedTourIcon(title)) {
             img.classList.add("help-tour-detailed-icon");
         } else {
@@ -876,7 +876,7 @@ class HelpWidget {
                     const advLink = document.createElement("a");
                     advLink.className = "tooltipped";
                     advLink.dataset.toggle = "tooltip";
-                    advLink.title = _("This block is only available in advance mode");
+                    advLink.title = _("This block is only available in advance mode.");
                     advLink.dataset.position = "bottom";
                     const advIconEl = document.createElement("i");
                     advIconEl.id = "advIconText";

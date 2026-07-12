@@ -113,6 +113,7 @@ global.FlowClampBlock = FlowClampBlock;
 global.StackClampBlock = StackClampBlock;
 global.LeftBlock = LeftBlock;
 global.ValueBlock = ValueBlock;
+global.isSafeUrl = require("../../utils/utils-logic").isSafeUrl;
 
 describe("ActionBlocks", () => {
     let activity;

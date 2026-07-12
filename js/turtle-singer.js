@@ -495,14 +495,13 @@ class Singer {
         const saveSuppressStatus = tur.singer.suppressOutput;
 
         // We need to save the state of the boxes and heap although there is a potential of a boxes collision with other turtles
-        // eslint-disable-next-line eqeqeq
-        const saveBoxes = logo.boxes != null ? deepClone(logo.boxes) : undefined;
-        // eslint-disable-next-line eqeqeq
-        const saveTurtleHeaps =
-            logo.turtleHeaps[turtle] != null ? deepClone(logo.turtleHeaps[turtle]) : undefined;
-        // eslint-disable-next-line eqeqeq
-        const saveTurtleDicts =
-            logo.turtleDicts[turtle] != null ? deepClone(logo.turtleDicts[turtle]) : undefined;
+        const saveBoxes = logo.boxes ? deepClone(logo.boxes) : undefined;
+        const saveTurtleHeaps = logo.turtleHeaps[turtle]
+            ? deepClone(logo.turtleHeaps[turtle])
+            : undefined;
+        const saveTurtleDicts = logo.turtleDicts[turtle]
+            ? deepClone(logo.turtleDicts[turtle])
+            : undefined;
         // .. and the turtle state
         const saveX = tur.x;
         const saveY = tur.y;
@@ -545,32 +544,20 @@ class Singer {
             activity.turtles.getTurtle(turtle).queue.length
         );
 
-        const returnValue = rationalSum(tur.singer.notesPlayed, [
+        const [returnValue, noteCountErr] = rationalSum(tur.singer.notesPlayed, [
             -saveNoteCount[0],
             saveNoteCount[1]
         ]);
+        if (noteCountErr) {
+            activity.errorMsg(noteCountErr);
+        }
         tur.singer.notesPlayed = saveNoteCount;
         tur.singer.tallyNotes = saveTallyNotes;
 
         // Restore previous state
-        // eslint-disable-next-line eqeqeq
-        if (saveBoxes == null) {
-            logo.boxes = {};
-        } else {
-            logo.boxes = saveBoxes;
-        }
-        // eslint-disable-next-line eqeqeq
-        if (saveTurtleHeaps == null) {
-            logo.turtleHeaps = {};
-        } else {
-            logo.turtleHeaps[turtle] = saveTurtleHeaps;
-        }
-        // eslint-disable-next-line eqeqeq
-        if (saveTurtleDicts == null) {
-            logo.turtleDicts = {};
-        } else {
-            logo.turtleDicts[turtle] = saveTurtleDicts;
-        }
+        logo.boxes = saveBoxes ?? {};
+        logo.turtleHeaps[turtle] = saveTurtleHeaps ?? {};
+        logo.turtleDicts[turtle] = saveTurtleDicts ?? {};
 
         tur.painter.doPenUp();
         tur.painter.doSetXY(saveX, saveY);
@@ -615,14 +602,9 @@ class Singer {
 
         const saveState = {
             suppressOutput: tur.singer.suppressOutput,
-            // eslint-disable-next-line eqeqeq
-            boxes: logo.boxes != null ? deepClone(logo.boxes) : undefined,
-            // eslint-disable-next-line eqeqeq
-            turtleHeaps:
-                logo.turtleHeaps[turtle] != null ? deepClone(logo.turtleHeaps[turtle]) : undefined,
-            // eslint-disable-next-line eqeqeq
-            turtleDicts:
-                logo.turtleDicts[turtle] != null ? deepClone(logo.turtleDicts[turtle]) : undefined,
+            boxes: logo.boxes ? deepClone(logo.boxes) : undefined,
+            turtleHeaps: logo.turtleHeaps[turtle] ? deepClone(logo.turtleHeaps[turtle]) : undefined,
+            turtleDicts: logo.turtleDicts[turtle] ? deepClone(logo.turtleDicts[turtle]) : undefined,
             x: tur.x,
             y: tur.y,
             color: tur.painter.color,
@@ -679,14 +661,9 @@ class Singer {
             penState: saveState.penState
         });
 
-        // eslint-disable-next-line eqeqeq
-        activity.logo.boxes = saveState.boxes != null ? saveState.boxes : {};
-        // eslint-disable-next-line eqeqeq
-        activity.logo.turtleHeaps[turtle] =
-            saveState.turtleHeaps != null ? saveState.turtleHeaps : {};
-        // eslint-disable-next-line eqeqeq
-        activity.logo.turtleDicts[turtle] =
-            saveState.turtleDicts != null ? saveState.turtleDicts : {};
+        activity.logo.boxes = saveState.boxes ?? {};
+        activity.logo.turtleHeaps[turtle] = saveState.turtleHeaps ?? {};
+        activity.logo.turtleDicts[turtle] = saveState.turtleDicts ?? {};
 
         tur.painter.doPenUp();
         tur.painter.doSetXY(saveState.x, saveState.y);
@@ -805,7 +782,7 @@ class Singer {
                     turtle,
                     note,
                     octave,
-                    parseInt(tur.singer.neighborStepPitch)
+                    parseInt(tur.singer.neighborStepPitch, 10)
                 );
                 if (tur.singer.transposition !== 0) {
                     noteObj2 = getNote(
@@ -823,7 +800,7 @@ class Singer {
                 noteObj2 = getNote(
                     note,
                     octave,
-                    tur.singer.transposition + parseInt(tur.singer.neighborStepPitch),
+                    tur.singer.transposition + parseInt(tur.singer.neighborStepPitch, 10),
                     tur.singer.keySignature,
                     tur.singer.movable,
                     null,
@@ -1988,7 +1965,15 @@ class Singer {
                 if (activity.logo.stopTurtle) return;
 
                 if (tur.singer.inNoteBlock.length === tur.singer.whichNoteToCount) {
-                    tur.singer.notesPlayed = rationalSum(tur.singer.notesPlayed, [1, noteValue]);
+                    const [notesPlayed, notesPlayedErr] = rationalSum(tur.singer.notesPlayed, [
+                        1,
+                        noteValue
+                    ]);
+                    if (notesPlayedErr) {
+                        activity.errorMsg(notesPlayedErr);
+                    } else {
+                        tur.singer.notesPlayed = notesPlayed;
+                    }
                     tur.singer.tallyNotes++;
                 }
 
@@ -2240,7 +2225,7 @@ class Singer {
                         if (typeof notes[0] === "number") {
                             tur.singer.currentOctave = frequencyToPitch(notes[0])[1];
                         } else {
-                            tur.singer.currentOctave = parseInt(notes[0].slice(len - 1));
+                            tur.singer.currentOctave = parseInt(notes[0].slice(len - 1), 10);
                         }
                         tur.singer.currentCalculatedOctave = tur.singer.currentOctave;
 
@@ -2307,9 +2292,9 @@ class Singer {
                                 if (tur.singer.oscList[thisBlk].length > 0) {
                                     if (notes.length > 1) {
                                         activity.errorMsg(
-                                            last(tur.singer.oscList[thisBlk]) +
-                                                ": " +
-                                                _("synth cannot play chords."),
+                                            `${last(tur.singer.oscList[thisBlk])}: ${_(
+                                                "synth cannot play chords."
+                                            )}`,
                                             blk
                                         );
                                     }

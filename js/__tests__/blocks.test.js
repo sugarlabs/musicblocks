@@ -106,6 +106,170 @@ global.splitSolfege = jest.fn();
 global.updateTemperaments = jest.fn();
 global.showZoomOverlay = jest.fn();
 
+describe("Viewport Culling", () => {
+    let mockActivity;
+    let blocks;
+
+    beforeEach(() => {
+        mockActivity = {
+            storage: {},
+            trashcan: {},
+            turtles: {},
+            boundary: {},
+            macroDict: {},
+            palettes: { dict: {}, show: jest.fn() },
+            logo: { synth: { loadSynth: jest.fn() } },
+            blocksContainer: { x: 0, y: 0 },
+            canvas: { width: 800, height: 600 },
+            refreshCanvas: jest.fn(),
+            errorMsg: jest.fn(),
+            setSelectionMode: jest.fn(),
+            stopLoadAnimation: jest.fn(),
+            setHomeContainers: jest.fn(),
+            __tick: jest.fn()
+        };
+        blocks = new Blocks(mockActivity);
+    });
+
+    it("should mark blocks inside the viewport as visible", () => {
+        blocks.blockList = [
+            { trash: false, container: { x: 100, y: 100 }, width: 50, height: 30 },
+            { trash: false, container: { x: 0, y: 0 }, width: 800, height: 600 },
+            { trash: false, container: { x: 400, y: 300 }, width: 10, height: 10 }
+        ];
+
+        blocks._updateViewportCulling();
+
+        expect(blocks.blockList[0]._viewportVisible).toBe(true);
+        expect(blocks.blockList[1]._viewportVisible).toBe(true);
+        expect(blocks.blockList[2]._viewportVisible).toBe(true);
+    });
+
+    it("should mark blocks outside the viewport as not visible", () => {
+        blocks.blockList = [
+            { trash: false, container: { x: -200, y: 100 }, width: 50, height: 30 },
+            { trash: false, container: { x: 900, y: 100 }, width: 50, height: 30 },
+            { trash: false, container: { x: 100, y: -100 }, width: 50, height: 30 },
+            { trash: false, container: { x: 100, y: 700 }, width: 50, height: 30 }
+        ];
+
+        blocks._updateViewportCulling();
+
+        expect(blocks.blockList[0]._viewportVisible).toBe(false);
+        expect(blocks.blockList[1]._viewportVisible).toBe(false);
+        expect(blocks.blockList[2]._viewportVisible).toBe(false);
+        expect(blocks.blockList[3]._viewportVisible).toBe(false);
+    });
+
+    it("should handle scrolled viewport offset", () => {
+        mockActivity.blocksContainer.x = -200;
+        mockActivity.blocksContainer.y = -100;
+
+        blocks.blockList = [
+            { trash: false, container: { x: 0, y: 0 }, width: 50, height: 30 },
+            { trash: false, container: { x: 300, y: 200 }, width: 50, height: 30 },
+            { trash: false, container: { x: 1000, y: 800 }, width: 50, height: 30 }
+        ];
+
+        blocks._updateViewportCulling();
+
+        // vp rect = (200, 100) to (1000, 700)
+        // Block at (0,0) with w=50,h=30: (0+50) <= 200 → off-screen left
+        expect(blocks.blockList[0]._viewportVisible).toBe(false);
+        expect(blocks.blockList[1]._viewportVisible).toBe(true);
+        expect(blocks.blockList[2]._viewportVisible).toBe(false);
+    });
+
+    it("should skip trashed blocks without modifying their visibility", () => {
+        blocks.blockList = [
+            {
+                trash: true,
+                container: { x: -500, y: -500 },
+                width: 50,
+                height: 30,
+                _viewportVisible: true
+            },
+            { trash: false, container: { x: 100, y: 100 }, width: 50, height: 30 }
+        ];
+
+        blocks._updateViewportCulling();
+
+        expect(blocks.blockList[0]._viewportVisible).toBe(true);
+        expect(blocks.blockList[1]._viewportVisible).toBe(true);
+    });
+
+    it("should consider edge-aligned blocks as visible", () => {
+        blocks.blockList = [
+            { trash: false, container: { x: 0, y: 0 }, width: 1, height: 600 },
+            { trash: false, container: { x: 799, y: 0 }, width: 1, height: 600 },
+            { trash: false, container: { x: 0, y: 599 }, width: 800, height: 1 }
+        ];
+
+        blocks._updateViewportCulling();
+
+        // One pixel inside the viewport edge
+        expect(blocks.blockList[0]._viewportVisible).toBe(true);
+        expect(blocks.blockList[1]._viewportVisible).toBe(true);
+        expect(blocks.blockList[2]._viewportVisible).toBe(true);
+    });
+
+    it("should handle zero-dimension blocks (async bitmap not yet loaded)", () => {
+        blocks.blockList = [
+            { trash: false, container: { x: -100, y: -100 }, width: 0, height: 0 },
+            { trash: false, container: { x: 100, y: 100 }, width: 0, height: 0 }
+        ];
+
+        blocks._updateViewportCulling();
+
+        // Zero-dim blocks are kept visible until dimensions stabilize
+        expect(blocks.blockList[0]._viewportVisible).toBe(true);
+        expect(blocks.blockList[1]._viewportVisible).toBe(true);
+    });
+
+    it("should skip null entries in blockList", () => {
+        blocks.blockList = [
+            null,
+            { trash: false, container: { x: 100, y: 100 }, width: 50, height: 30 }
+        ];
+
+        blocks._updateViewportCulling();
+
+        // Should not throw and remaining blocks should still be culled
+        expect(blocks.blockList[1]._viewportVisible).toBe(true);
+    });
+
+    it("should skip blocks without a container", () => {
+        blocks.blockList = [
+            { trash: false, container: null, width: 50, height: 30 },
+            { trash: false, container: { x: 100, y: 100 }, width: 50, height: 30 }
+        ];
+
+        blocks._updateViewportCulling();
+
+        // Block without container should be skipped, block with container processed
+        expect(blocks.blockList[0]._viewportVisible).toBe(undefined);
+        expect(blocks.blockList[1]._viewportVisible).toBe(true);
+    });
+
+    it("should showBlocks without throwing", () => {
+        blocks.blockList = [];
+        blocks.showBlocks();
+
+        expect(mockActivity.palettes.show).toHaveBeenCalled();
+        expect(blocks.visible).toBe(true);
+        expect(mockActivity.refreshCanvas).toHaveBeenCalled();
+    });
+
+    it("should update culling during setBlockScale", async () => {
+        blocks.blockList = [];
+        await blocks.setBlockScale(0.8);
+
+        expect(blocks.blockScale).toBe(0.8);
+        expect(blocks.blockList[0]).toBeUndefined();
+        expect(mockActivity.refreshCanvas).toHaveBeenCalled();
+    });
+});
+
 describe("Blocks Foundation", () => {
     let mockActivity;
 
@@ -228,6 +392,233 @@ describe("Blocks Foundation", () => {
 
             expect(() => blocks._findTwoArgs()).not.toThrow();
             expect(blocks._expandablesList).toEqual([1]);
+        });
+    });
+
+    describe("Stack Cleanup And Dock Adjustment", () => {
+        it("should expand clamps once after adjusting all queued docks", () => {
+            const blocks = new Blocks(mockActivity);
+            const callOrder = [];
+
+            blocks._checkArgClampBlocks = [];
+            blocks._checkTwoArgBlocks = [];
+            blocks._adjustTheseDocks = [11, 17, 23];
+            blocks._adjustTheseStacks = [];
+            blocks.adjustDocks = jest.fn(blk => {
+                callOrder.push(`dock:${blk}`);
+            });
+            blocks._expandClamps = jest.fn(() => {
+                callOrder.push("expand");
+            });
+
+            blocks._cleanupStacks();
+
+            expect(blocks.adjustDocks).toHaveBeenCalledTimes(3);
+            expect(blocks._expandClamps).toHaveBeenCalledTimes(1);
+            expect(callOrder).toEqual(["dock:11", "dock:17", "dock:23", "expand"]);
+        });
+
+        it("should stop recursive adjustDocks cycles without overflowing the stack", () => {
+            const blocks = new Blocks(mockActivity);
+            const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+            const makeDockBlock = (connections, x, y) => ({
+                name: "flow",
+                connections,
+                docks: [
+                    [0, 0],
+                    [0, 20]
+                ],
+                container: { x, y },
+                isTwoArgBooleanBlock: jest.fn().mockReturnValue(false),
+                isInlineCollapsible: jest.fn().mockReturnValue(false),
+                collapsed: false
+            });
+
+            blocks.blockList = [makeDockBlock([null, 1], 0, 0), makeDockBlock([0, 0], 0, 20)];
+            blocks._moveBlock = jest.fn();
+
+            expect(() => blocks.adjustDocks(0, true)).not.toThrow();
+            expect(blocks._moveBlock).toHaveBeenCalled();
+            expect(debugSpy).toHaveBeenCalledWith(
+                expect.stringContaining("Infinite loop encountered while adjusting docks")
+            );
+
+            debugSpy.mockRestore();
+        });
+    });
+
+    describe("Action palette opens on new action block creation", () => {
+        it("should call showPalette('action') when a new uniquely-named action is created", () => {
+            const showPalette = jest.fn();
+            mockActivity.palettes = {
+                dict: {},
+                hide: jest.fn(),
+                show: jest.fn(),
+                updatePalettes: jest.fn(),
+                showPalette
+            };
+
+            const blocks = new Blocks(mockActivity);
+            blocks.findUniqueActionName = jest.fn().mockReturnValue("action 2");
+            blocks.actionMetadata = jest.fn().mockReturnValue({ hasReturn: false, hasArgs: false });
+            blocks.newNameddoBlock = jest.fn();
+
+            // Simulate the action block creation path
+            const value = blocks.findUniqueActionName("action");
+            if (value !== "action" && value !== "action") {
+                const metadata = blocks.actionMetadata(0);
+                blocks.newNameddoBlock(value, metadata.hasReturn, metadata.hasArgs);
+                mockActivity.palettes.updatePalettes("action");
+                mockActivity.palettes.showPalette("action");
+            }
+
+            expect(showPalette).toHaveBeenCalledWith("action");
+        });
+
+        it("should NOT call showPalette when action name is the default 'action'", () => {
+            const showPalette = jest.fn();
+            mockActivity.palettes = {
+                dict: {},
+                updatePalettes: jest.fn(),
+                showPalette
+            };
+
+            const blocks = new Blocks(mockActivity);
+            blocks.findUniqueActionName = jest.fn().mockReturnValue("action");
+            blocks.newNameddoBlock = jest.fn();
+
+            const value = blocks.findUniqueActionName("action");
+            if (value !== "action") {
+                blocks.newNameddoBlock(value, false, false);
+                mockActivity.palettes.updatePalettes("action");
+                mockActivity.palettes.showPalette("action");
+            }
+
+            expect(showPalette).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("cleanupAfterLoad – finishedLoading emission", () => {
+        const { PubSub } = require("../pubsub");
+        let loadContainer;
+
+        beforeEach(() => {
+            global.pubsub = new PubSub();
+            loadContainer = document.createElement("div");
+            loadContainer.id = "load-container";
+            document.body.appendChild(loadContainer);
+        });
+
+        afterEach(() => {
+            loadContainer.remove();
+            delete global.pubsub;
+        });
+
+        it("emits finishedLoading when _loadCounter reaches zero", async () => {
+            const blocks = new Blocks(mockActivity);
+            blocks._loadCounter = 1;
+            blocks.blockList = [];
+            blocks.blocksToCollapse = [];
+            blocks._findDrumURLs = jest.fn();
+            blocks.updateBlockPositions = jest.fn();
+            blocks._cleanupStacks = jest.fn();
+
+            const listener = jest.fn();
+            global.pubsub.on("finishedLoading", listener);
+
+            await blocks.cleanupAfterLoad();
+
+            expect(listener).toHaveBeenCalledTimes(1);
+        });
+
+        it("does not emit finishedLoading when _loadCounter is still positive", async () => {
+            const blocks = new Blocks(mockActivity);
+            blocks._loadCounter = 2;
+
+            const listener = jest.fn();
+            global.pubsub.on("finishedLoading", listener);
+
+            await blocks.cleanupAfterLoad();
+
+            expect(listener).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("renameNameddos", () => {
+        let blocksInstance;
+
+        beforeEach(() => {
+            mockActivity.palettes.updatePalettes = jest.fn();
+            blocksInstance = new Blocks(mockActivity);
+            mockActivity.palettes.dict["action"] = {
+                protoList: [],
+                remove: jest.fn()
+            };
+        });
+
+        it("should rename blocks using privateData, overrideName, and protoblock.defaults[0] fallbacks", () => {
+            const regenerateArtwork1 = jest.fn();
+            const regenerateArtwork2 = jest.fn();
+            const regenerateArtwork3 = jest.fn();
+
+            const block1 = {
+                name: "nameddo",
+                privateData: "dance",
+                regenerateArtwork: regenerateArtwork1
+            };
+            const block2 = {
+                name: "nameddoArg",
+                privateData: null,
+                overrideName: "dance",
+                regenerateArtwork: regenerateArtwork2
+            };
+            const block3 = {
+                name: "namedcalc",
+                privateData: null,
+                overrideName: null,
+                protoblock: { defaults: ["dance"] },
+                regenerateArtwork: regenerateArtwork3
+            };
+            const block4 = {
+                name: "nameddo",
+                privateData: "other",
+                regenerateArtwork: jest.fn()
+            };
+
+            blocksInstance.blockList = [block1, block2, block3, block4];
+
+            const paletteBlock = {
+                name: "nameddo",
+                defaults: ["dance"]
+            };
+            mockActivity.palettes.dict["action"].protoList.push(paletteBlock);
+
+            blocksInstance.renameNameddos("dance", "jump");
+
+            // Assert block1 updates
+            expect(block1.privateData).toBe("jump");
+            expect(block1.overrideName).toBe("jump");
+            expect(regenerateArtwork1).toHaveBeenCalled();
+
+            // Assert block2 updates
+            expect(block2.privateData).toBe("jump");
+            expect(block2.overrideName).toBe("jump");
+            expect(regenerateArtwork2).toHaveBeenCalled();
+
+            // Assert block3 updates
+            expect(block3.privateData).toBe("jump");
+            expect(block3.overrideName).toBe("jump");
+            // protoblock.defaults[0] must NOT be mutated on workspace instances
+            // because it is a shared reference to the palette prototype template.
+            expect(block3.protoblock.defaults[0]).toBe("dance");
+            expect(regenerateArtwork3).toHaveBeenCalled();
+
+            // Assert block4 remains unchanged
+            expect(block4.privateData).toBe("other");
+            expect(block4.regenerateArtwork).not.toHaveBeenCalled();
+
+            // Assert palette update
+            expect(paletteBlock.defaults[0]).toBe("jump");
         });
     });
 });

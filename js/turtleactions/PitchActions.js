@@ -123,7 +123,8 @@ function setupPitchActions(activity) {
             } else {
                 pitchName = lastNotePlayed[0].slice(0, lastNotePlayed[0].length - 1);
                 octave = parseInt(
-                    lastNotePlayed[0].slice(lastNotePlayed[0].length - 1, lastNotePlayed[0].length)
+                    lastNotePlayed[0].slice(lastNotePlayed[0].length - 1, lastNotePlayed[0].length),
+                    10
                 );
             }
             if (tur.singer.inverted) {
@@ -661,13 +662,13 @@ function setupPitchActions(activity) {
             } else {
                 let len = tur.singer.previousNotePlayed[0].length;
                 let pitch = tur.singer.previousNotePlayed[0].slice(0, len - 1);
-                let octave = parseInt(tur.singer.previousNotePlayed[0].slice(len - 1));
+                let octave = parseInt(tur.singer.previousNotePlayed[0].slice(len - 1), 10);
                 let obj = [pitch, octave];
                 const previousValue = pitchToNumber(obj[0], obj[1], tur.singer.keySignature);
 
                 len = tur.singer.lastNotePlayed[0].length;
                 pitch = tur.singer.lastNotePlayed[0].slice(0, len - 1);
-                octave = parseInt(tur.singer.lastNotePlayed[0].slice(len - 1));
+                octave = parseInt(tur.singer.lastNotePlayed[0].slice(len - 1), 10);
                 obj = [pitch, octave];
 
                 let delta = pitchToNumber(obj[0], obj[1], tur.singer.keySignature) - previousValue;

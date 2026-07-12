@@ -22,6 +22,10 @@
 
 const { setupPitchBlocks } = require("../PitchBlocks");
 
+const SHARP = "\u266F";
+const FLAT = "\u266D";
+const CENTSSYMBOL = "\u00A2";
+
 describe("setupPitchBlocks", () => {
     let activity, logo, createdBlocks, turtles;
 
@@ -96,6 +100,7 @@ describe("setupPitchBlocks", () => {
         global.FLAT = "b";
         global.DOUBLEFLAT = "bb";
         global.DOUBLESHARP = "##";
+        global.CENTSSYMBOL = "¢";
         global.NATURAL = "n";
         global.FIXEDSOLFEGE = { do: "C", re: "D", mi: "E", fa: "F", sol: "G", la: "A", si: "B" };
         global.SOLFEGENAMES1 = [
@@ -347,10 +352,52 @@ describe("setupPitchBlocks", () => {
     });
 
     describe("CustomNoteBlock", () => {
+        const customNoteCents = [
+            ["C(+42" + CENTSSYMBOL + ")", "C", 42],
+            ["C(-10" + CENTSSYMBOL + ")", "C", -10],
+            ["C(+0" + CENTSSYMBOL + ")", "C", 0],
+            ["D" + SHARP, "D" + SHARP, 0],
+            ["F𝄪(+42" + CENTSSYMBOL + ")", "F𝄪", 42],
+            ["D𝄫(+42" + CENTSSYMBOL + ")", "D𝄫", 42]
+        ];
+
         it("flow", () => {
             const block = createdBlocks["customNote"];
             block.flow(["C", 4], logo, 0, 10);
             block.flow([null, null], logo, 0, 10);
+        });
+
+        describe("_parseCents", () => {
+            it("extracts note and cents from various formats", () => {
+                const parseCents = createdBlocks["customNote"]?.constructor?._parseCents;
+                if (!parseCents) return;
+                for (const [input, expectedNote, expectedCents] of customNoteCents) {
+                    const [note, cents] = parseCents(input);
+                    expect(note).toBe(expectedNote);
+                    expect(cents).toBe(expectedCents);
+                }
+            });
+
+            it("handles numeric input by returning as-is with 0 cents", () => {
+                const parseCents = createdBlocks["customNote"]?.constructor?._parseCents;
+                if (!parseCents) return;
+                const [note, cents] = parseCents(440);
+                expect(note).toBe(440);
+                expect(cents).toBe(0);
+            });
+        });
+
+        it("passes parsed cents to processPitch", () => {
+            const block = createdBlocks["customNote"];
+            block.flow(["F#(+15" + CENTSSYMBOL + ")", 4], logo, 0, 10);
+            expect(global.Singer.processPitch).toHaveBeenCalledWith(activity, "F#", 4, 15, 0, 10);
+        });
+
+        it("passes zero cents for plain note strings", () => {
+            jest.clearAllMocks();
+            const block = createdBlocks["customNote"];
+            block.flow(["G", 3], logo, 0, 10);
+            expect(global.Singer.processPitch).toHaveBeenCalledWith(activity, "G", 3, 0, 0, 10);
         });
     });
 
@@ -435,7 +482,7 @@ describe("setupPitchBlocks", () => {
     describe("Transposition Blocks", () => {
         it("SetRatioTranspositionBlock", () => {
             const block = createdBlocks["setratio"];
-            const spy = jest.spyOn(console, "log").mockImplementation(() => {});
+            const spy = jest.spyOn(console, "warn").mockImplementation(() => {});
 
             activity.blocks.blockList[10].connections[1] = 20;
 
@@ -736,6 +783,13 @@ describe("setupPitchBlocks", () => {
             const cpBlock = createdBlocks["custompitch"];
             cpBlock.flow([null, null], logo, 0, 10);
             cpBlock.flow([440, 1], logo, 0, 10);
+        });
+
+        it("CustomPitchBlock passes parsed cents to playPitch", () => {
+            const cpBlock = createdBlocks["custompitch"];
+            if (cpBlock instanceof DummyFlowBlock) return;
+            cpBlock.flow(["D(+25" + CENTSSYMBOL + ")", 2], logo, 0, 10);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenCalledWith("D", 2, 25, 0, 10);
         });
     });
 

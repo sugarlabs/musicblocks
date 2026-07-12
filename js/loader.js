@@ -63,6 +63,9 @@ requirejs.config({
             deps: ["utils/utils"],
             exports: "retryWithBackoff"
         },
+        "utils/error-handler": {
+            exports: "ErrorHandler"
+        },
         "activity/turtledefs": {
             deps: ["utils/utils"],
             exports: "createDefaultStack"
@@ -72,7 +75,7 @@ requirejs.config({
             exports: "Block"
         },
         "activity/blocks": {
-            deps: ["activity/block"],
+            deps: ["activity/block", "activity/pubsub"],
             exports: "Blocks"
         },
         "activity/turtle-singer": {
@@ -104,23 +107,50 @@ requirejs.config({
         "utils/ManagedTimer": {
             exports: "ManagedTimer"
         },
+        "activity/embedded-graphics-scheduler": {
+            exports: "EmbeddedGraphicsScheduler"
+        },
+        "activity/LogoDependencies": {
+            exports: "LogoDependencies"
+        },
         "activity/logo": {
             deps: [
                 "activity/turtles",
                 "activity/notation",
                 "utils/synthutils",
                 "activity/logoconstants",
-                "utils/ManagedTimer"
+                "utils/ManagedTimer",
+                "activity/embedded-graphics-scheduler",
+                "activity/LogoDependencies"
             ],
             exports: "Logo"
         },
         "activity/activity": {
             deps: [
                 "utils/utils",
+                "utils/error-handler",
                 "activity/activity-context",
                 "activity/logo",
                 "activity/blocks",
-                "activity/turtles"
+                "activity/turtles",
+                "activity/recorder",
+                "activity/abc-parser",
+                "activity/idle-watcher",
+                "activity/grid-controller",
+                "activity/grid-renderer",
+                "activity/plugin-controller",
+                "widgets/plugin-dialog",
+                "activity/toolbar-controller",
+                "activity/toolbar-ui",
+                "activity/alert-controller",
+                "activity/alert-renderer",
+                "palette/palette-loader",
+                "activity/search-controller",
+                "activity/workspace-layout-controller",
+                "search-ui",
+                "project-manager",
+                "keyboard-controller",
+                "activity/selection-controller"
             ],
             exports: "Activity"
         },
@@ -154,6 +184,24 @@ requirejs.config({
         "utils": "js/utils",
         "widgets": "js/widgets",
         "activity": "js",
+        "activity/recorder": "js/activity/recorder",
+        "activity/exporters": "js/activity/exporters",
+        "activity/abc-parser": "js/activity/abc-parser",
+        "activity/idle-watcher": "js/activity/idle-watcher",
+        "activity/grid-controller": "js/activity/grid-controller",
+        "activity/grid-renderer": "js/activity/grid-renderer",
+        "activity/plugin-controller": "js/activity/plugin-controller",
+        "activity/toolbar-controller": "js/activity/toolbar-controller",
+        "activity/alert-controller": "js/activity/alert-controller",
+        "activity/alert-renderer": "js/activity/alert-renderer",
+        "palette/palette-loader": "js/palette/palette-loader",
+        "activity/search-controller": "js/activity/search-controller",
+        "activity/workspace-layout-controller": "js/activity/workspace-layout-controller",
+        "activity/selection-controller": "js/activity/selection-controller",
+        "search-ui": "js/search-ui",
+        "project-manager": "js/project-manager",
+        "keyboard-controller": "js/keyboard-controller",
+        "activity/pubsub": "js/pubsub",
         "easeljs.min": "lib/easeljs.min",
         "tweenjs.min": "lib/tweenjs.min",
         "prefixfree.min": "lib/prefixfree.min",
@@ -288,10 +336,24 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
 
     function updateContent() {
         if (!i18next.isInitialized) return;
+        const lang = i18next.language;
         const elements = document.querySelectorAll("[data-i18n]");
         elements.forEach(element => {
             const key = element.getAttribute("data-i18n");
-            element.textContent = i18next.t(key);
+            if (lang && lang.startsWith("ja")) {
+                const kanaPref =
+                    (window.localStorage && window.localStorage.getItem("kanaPreference")) ||
+                    "kanji";
+                const script = kanaPref === "kana" ? "kana" : "kanji";
+                const result = i18next.t(key, { returnObjects: true });
+                if (result && typeof result === "object") {
+                    element.textContent = result[script] || key;
+                } else {
+                    element.textContent = typeof result === "string" ? result : key;
+                }
+            } else {
+                element.textContent = i18next.t(key);
+            }
         });
     }
 
@@ -299,6 +361,16 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
         try {
             const savedLanguage = window.localStorage && window.localStorage.languagePreference;
             if (savedLanguage) {
+                if (savedLanguage === "kana" || savedLanguage === "ja-kana") {
+                    window.localStorage.setItem("languagePreference", "ja");
+                    window.localStorage.setItem("kanaPreference", "kana");
+                    return "ja";
+                }
+                if (savedLanguage === "ja-kanji") {
+                    window.localStorage.setItem("languagePreference", "ja");
+                    window.localStorage.setItem("kanaPreference", "kanji");
+                    return "ja";
+                }
                 return savedLanguage.startsWith("ja") ? "ja" : savedLanguage;
             }
         } catch (e) {
@@ -403,6 +475,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                 "tweenjs.min",
                 "utils/platformstyle",
                 "utils/utils",
+                "activity/pubsub",
                 "activity/turtledefs",
                 "activity/block",
                 "activity/blocks",

@@ -103,6 +103,7 @@ const getPieMenuSize = block => {
 // Debounce resize handler for performance
 let wheelResizeTimeout;
 let wheelResizeListenerAttached = false;
+let activeExitWheel = null;
 const debouncedSetWheelSize = () => {
     clearTimeout(wheelResizeTimeout);
     wheelResizeTimeout = setTimeout(setWheelSize, 150);
@@ -122,19 +123,85 @@ const disableWheelResizeHandling = () => {
     clearTimeout(wheelResizeTimeout);
 };
 
+const isInteractive = target => {
+    // 1. Check if inside number/text input label container
+    const labelDiv = docById("labelDiv");
+    if (labelDiv && typeof labelDiv.contains === "function" && labelDiv.contains(target)) {
+        return true;
+    }
+
+    // 2. Check if inside any of the pie menu containers and is a slice/title/icon (not the container or SVG root)
+    const containers = ["wheelDiv", "wheelDivptm", "chooseKeyDiv"];
+    for (let i = 0; i < containers.length; i++) {
+        const div = docById(containers[i]);
+        if (div && typeof div.contains === "function" && div.contains(target)) {
+            if (target !== div && target.tagName && target.tagName.toLowerCase() !== "svg") {
+                return true;
+            }
+        }
+    }
+
+    return false;
+};
+
+const handleOutsideClick = event => {
+    const wheelDiv = docById("wheelDiv");
+    const wheelDivptm = docById("wheelDivptm");
+    const wheelDivVisible = wheelDiv && wheelDiv.style.display !== "none";
+    const wheelDivptmVisible = wheelDivptm && wheelDivptm.style.display !== "none";
+
+    if (!wheelDivVisible && !wheelDivptmVisible) {
+        return;
+    }
+
+    if (!isInteractive(event.target)) {
+        if (
+            activeExitWheel &&
+            activeExitWheel.navItems &&
+            activeExitWheel.navItems[0] &&
+            typeof activeExitWheel.navItems[0].navigateFunction === "function"
+        ) {
+            activeExitWheel.navItems[0].navigateFunction();
+            document.removeEventListener("mousedown", handleOutsideClick);
+            activeExitWheel = null;
+        } else {
+            if (wheelDivVisible) {
+                hideWheelDiv();
+            } else if (wheelDivptmVisible) {
+                if (wheelDivptm) {
+                    wheelDivptm.style.display = "none";
+                }
+                document.removeEventListener("mousedown", handleOutsideClick);
+                activeExitWheel = null;
+            }
+        }
+    }
+};
+
 const showWheelDiv = () => {
     const wheelDiv = docById("wheelDiv");
     if (!wheelDiv) return null;
     wheelDiv.style.display = "";
     enableWheelResizeHandling();
+
+    setTimeout(() => {
+        if (wheelDiv.style.display !== "none") {
+            document.addEventListener("mousedown", handleOutsideClick);
+        }
+    }, 50);
+
     return wheelDiv;
 };
 
 const hideWheelDiv = () => {
     const wheelDiv = docById("wheelDiv");
     if (!wheelDiv) return null;
-    docById("wheelDiv").style.display = "none";
+    wheelDiv.style.display = "none";
     disableWheelResizeHandling();
+
+    document.removeEventListener("mousedown", handleOutsideClick);
+    activeExitWheel = null;
+
     return wheelDiv;
 };
 
@@ -213,6 +280,19 @@ const configureExitWheel = exitWheel => {
     if (!exitWheel || !exitWheel.navItems) {
         return;
     }
+    activeExitWheel = exitWheel;
+
+    // Register mousedown listener after 50ms if either wheel is visible
+    setTimeout(() => {
+        const wheelDiv = docById("wheelDiv");
+        const wheelDivptm = docById("wheelDivptm");
+        const isVisible =
+            (wheelDiv && wheelDiv.style.display !== "none") ||
+            (wheelDivptm && wheelDivptm.style.display !== "none");
+        if (isVisible) {
+            document.addEventListener("mousedown", handleOutsideClick);
+        }
+    }, 50);
 
     const clearSelection = () => {
         exitWheel.selectedNavItemIndex = null;
@@ -236,8 +316,14 @@ const configureExitWheel = exitWheel => {
         if (typeof item.navigateFunction === "function") {
             item.navigateFunction();
         }
+        document.removeEventListener("mousedown", handleOutsideClick);
+        if (activeExitWheel === exitWheel) {
+            activeExitWheel = null;
+        }
     };
 };
+
+window.configureExitWheel = configureExitWheel;
 
 /**
  * Builds the pitch selection pie menu with optional accidentals
@@ -1220,8 +1306,9 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
     const __selectionChanged = () => {
         const label = that._customWheel.navItems[that._customWheel.selectedNavItemIndex].title;
         const note = that._cusNoteWheel.navItems[that._cusNoteWheel.selectedNavItemIndex].title;
-        that.value = note;
-        that.text.text = note;
+        const centsMatch = (that.value || "").match(/\([+-]?\d+¢\)/);
+        that.value = centsMatch ? note + centsMatch[0] : note;
+        that.text.text = centsMatch ? note + centsMatch[0] : note;
         let octave = 4;
 
         if (hasOctaveWheel) {
@@ -3179,6 +3266,7 @@ const piemenuIntervals = (block, selectedInterval) => {
             )
         ) + "px";
 
+    let isInitialized = false;
     // Add function to each main menu for show/hide sub menus
     // TODO: Add all tabs to each interval
     const __setupAction = (i, activeTabs) => {
@@ -3193,6 +3281,10 @@ const piemenuIntervals = (block, selectedInterval) => {
                         that._intervalWheel.navItems[l * 8 + j].navItem.show();
                     }
                 }
+            }
+            if (isInitialized && activeTabs.length > 0) {
+                that._intervalWheel.navigateWheel(i * 8 + activeTabs[0] - 1);
+                __selectionChanged();
             }
         };
     };
@@ -3227,6 +3319,7 @@ const piemenuIntervals = (block, selectedInterval) => {
     } else {
         block._intervalWheel.navigateWheel(INTERVALS[i][2][0] - 1);
     }
+    isInitialized = true;
 
     const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
@@ -3398,9 +3491,9 @@ const piemenuModes = (block, selectedMode) => {
             that.text.text =
                 that._modeNameWheel.navItems[that._modeNameWheel.selectedNavItemIndex].title;
 
-            if (that.text.text === _("major") + " / " + _("ionian")) {
+            if (that.text.text === `${_("major")} / ${_("ionian")}`) {
                 that.value = "major";
-            } else if (that.text.text === _("minor") + " / " + _("aeolian")) {
+            } else if (that.text.text === `${_("minor")} / ${_("aeolian")}`) {
                 that.value = "aeolian";
             } else {
                 for (let i = 0; i < MODE_PIE_MENUS[modeGroup].length; i++) {
@@ -3471,11 +3564,11 @@ const piemenuModes = (block, selectedMode) => {
             switch (modename) {
                 case "ionian":
                 case "major":
-                    labels.push(_("major") + " / " + _("ionian"));
+                    labels.push(`${_("major")} / ${_("ionian")}`);
                     break;
                 case "aeolian":
                 case "minor":
-                    labels.push(_("minor") + " / " + _("aeolian"));
+                    labels.push(`${_("minor")} / ${_("aeolian")}`);
                     break;
                 default:
                     if (modename === " ") {
@@ -4228,10 +4321,9 @@ const piemenuKey = activity => {
                     activity.blocks.blockList[activity.blocks.blockList.length - 1].value =
                         activity.KeySignatureEnv[1];
                     activity.textMsg(
-                        _("You have chosen key for your pitch preview.") +
-                            activity.KeySignatureEnv[0] +
-                            " " +
-                            activity.KeySignatureEnv[1]
+                        `${_("You have chosen key for your pitch preview.")} ${
+                            activity.KeySignatureEnv[0]
+                        } ${activity.KeySignatureEnv[1]}`
                     );
                 }
             }
@@ -4402,7 +4494,7 @@ const piemenuDissectNumber = widget => {
     // Determine wheel values based on beginner mode
     const wheelValues = isBeginnerMode ? [2, 3, 4] : [2, 3, 4, 5, 7];
 
-    const currentValue = parseInt(widget._dissectNumber.value) || 2;
+    const currentValue = parseInt(widget._dissectNumber.value, 10) || 2;
 
     // Show the wheel div
     showWheelDiv();
@@ -4506,7 +4598,7 @@ const piemenuDissectNumber = widget => {
 
     // Set up decrement button (-)
     exitWheel.navItems[1].navigateFunction = () => {
-        const currentVal = parseInt(widget._dissectNumber.value);
+        const currentVal = parseInt(widget._dissectNumber.value, 10);
         const currentIdx = wheelValues.indexOf(currentVal);
 
         // Move to previous value in the array, or stay at first
@@ -4518,7 +4610,7 @@ const piemenuDissectNumber = widget => {
 
     // Set up increment button (+)
     exitWheel.navItems[2].navigateFunction = () => {
-        const currentVal = parseInt(widget._dissectNumber.value);
+        const currentVal = parseInt(widget._dissectNumber.value, 10);
         const currentIdx = wheelValues.indexOf(currentVal);
 
         // Move to next value in the array, or stay at last

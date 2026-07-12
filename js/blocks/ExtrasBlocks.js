@@ -13,7 +13,7 @@
    global
    _, last, FlowBlock, ValueBlock, LeftBlock, NOINPUTERRORMSG,
    NANERRORMSG, mixedNumber, TONEBPM, DEFAULTDELAY, Singer,
-   StackClampBlock, platformColor, StatusMatrix
+   StackClampBlock, StatusMatrix
 */
 
 /* exported setupExtrasBlocks */
@@ -33,7 +33,7 @@ function setupExtrasBlocks(activity) {
             super("float2string", _("fraction"));
             this.setPalette("extras", activity);
             this.setHelpString([
-                _("Convert a float to a fraction") + " 0.5 -> 1/2",
+                `${_("Convert a float to a fraction")}: 0.5 -> 1/2`,
                 "documentation",
                 null,
                 "float2string"
@@ -93,7 +93,7 @@ function setupExtrasBlocks(activity) {
                 name: _("save as ABC"),
                 args: 1,
                 argTypes: ["textin"],
-                defaults: [_("title") + ".abc"]
+                defaults: [`${_("title")}.abc`]
             });
             this.hidden = true;
             this.deprecated = true;
@@ -129,7 +129,7 @@ function setupExtrasBlocks(activity) {
                 name: _("save as Lilypond"),
                 args: 1,
                 argTypes: ["textin"],
-                defaults: [_("title") + ".ly"]
+                defaults: [`${_("title")}.ly`]
             });
             this.hidden = true;
             this.deprecated = true;
@@ -165,7 +165,7 @@ function setupExtrasBlocks(activity) {
                 name: _("save as SVG"),
                 args: 1,
                 argTypes: ["textin"],
-                defaults: [_("title") + ".svg"]
+                defaults: [`${_("title")}.svg`]
             });
             this.hidden = true;
             this.deprecated = true;
@@ -192,7 +192,8 @@ function setupExtrasBlocks(activity) {
                         '" width="' +
                         logo.canvas.width +
                         '" fill="' +
-                        platformColor.background +
+                        (getComputedStyle(document.body).getPropertyValue("--bg").trim() ||
+                            "#ffffff") +
                         '"/> ' +
                         logo.svgOutput;
                 }
@@ -399,7 +400,7 @@ function setupExtrasBlocks(activity) {
 
             if (args.length === 1) {
                 const bpmFactor =
-                    TONEBPM / tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
+                    TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
 
                 const noteBeatValue = bpmFactor / (1 / args[0]);
                 tur.singer.previousTurtleTime = tur.singer.turtleTime;

@@ -316,6 +316,61 @@ describe("save HTML methods", () => {
         expect(html).toContain("&lt;/script&gt;");
     });
 
+    it("should block unsafe project image URLs in prepareHTML", () => {
+        const unsafeImageActivity = {
+            beginnerMode: false,
+            PlanetInterface: {
+                getCurrentProjectName: jest.fn(() => "Mock Project"),
+                getCurrentProjectDescription: jest.fn(() => "Mock Description"),
+                getCurrentProjectImage: jest.fn(() => "javascript:alert(1)")
+            },
+            prepareExport: jest.fn(() => "Mock Exported Data")
+        };
+
+        const si = new SaveInterface(unsafeImageActivity);
+        const html = si.prepareHTML();
+
+        expect(html).toContain('src=""');
+        expect(html).not.toContain("javascript:alert(1)");
+    });
+
+    it("should reject non-image data URLs in prepareHTML", () => {
+        const dataUrlActivity = {
+            beginnerMode: false,
+            PlanetInterface: {
+                getCurrentProjectName: jest.fn(() => "Mock Project"),
+                getCurrentProjectDescription: jest.fn(() => "Mock Description"),
+                getCurrentProjectImage: jest.fn(() => "data:text/html;base64,PHNjcmlwdD4=")
+            },
+            prepareExport: jest.fn(() => "Mock Exported Data")
+        };
+
+        const si = new SaveInterface(dataUrlActivity);
+        const html = si.prepareHTML();
+
+        expect(html).toContain('src=""');
+        expect(html).not.toContain("data:text/html;base64,PHNjcmlwdD4=");
+    });
+
+    it("should allow valid image data URLs in prepareHTML", () => {
+        const validImageActivity = {
+            beginnerMode: false,
+            PlanetInterface: {
+                getCurrentProjectName: jest.fn(() => "Mock Project"),
+                getCurrentProjectDescription: jest.fn(() => "Mock Description"),
+                getCurrentProjectImage: jest.fn(
+                    () => "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA"
+                )
+            },
+            prepareExport: jest.fn(() => "Mock Exported Data")
+        };
+
+        const si = new SaveInterface(validImageActivity);
+        const html = si.prepareHTML();
+
+        expect(html).toContain("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA");
+    });
+
     it("should compose exported page initialization with other load handlers", () => {
         const si = new SaveInterface({
             PlanetInterface: {
@@ -334,6 +389,23 @@ describe("save HTML methods", () => {
 
     it("escapeHTML should encode all five HTML special characters", () => {
         expect(escapeHTML("&<>\"'")).toBe("&amp;&lt;&gt;&quot;&#039;");
+    });
+
+    it("should use the active Planet project metadata in prepareHTML", () => {
+        const activity = {
+            prepareExport: jest.fn(() => "Mock Exported Data"),
+            planet: {
+                getCurrentProjectName: jest.fn(() => "Planet Project"),
+                getCurrentProjectDescription: jest.fn(() => "Planet Description"),
+                getCurrentProjectImage: jest.fn(() => "planet-image.png")
+            }
+        };
+
+        const html = new SaveInterface(activity).prepareHTML();
+
+        expect(html).toContain("<title>Planet Project</title>");
+        expect(html).toContain("<p>Planet Description</p>");
+        expect(html).toContain('src="planet-image.png"');
     });
 
     it("should handle missing project fields gracefully in prepareHTML", () => {
@@ -429,6 +501,26 @@ describe("save HTML methods", () => {
         expect(mockGetProjectName).toHaveBeenCalled();
         expect(mockDownloadURL).toHaveBeenCalledWith(
             "MockProject.html",
+            "data:text/plain;charset=utf-8,%3Chtml%3EMock%20HTML%3C%2Fhtml%3E"
+        );
+    });
+
+    it("should use the active Planet project name for HTML downloads without a prompt", () => {
+        const activity = {
+            save: {
+                prepareHTML: jest.fn(() => "<html>Mock HTML</html>"),
+                downloadURL: jest.fn()
+            },
+            planet: {
+                getCurrentProjectName: jest.fn(() => "Planet Project")
+            }
+        };
+
+        instance.saveHTMLNoPrompt(activity);
+        jest.runAllTimers();
+
+        expect(activity.save.downloadURL).toHaveBeenCalledWith(
+            "Planet Project.html",
             "data:text/plain;charset=utf-8,%3Chtml%3EMock%20HTML%3C%2Fhtml%3E"
         );
     });
@@ -816,6 +908,32 @@ describe("beforeunload warning", () => {
 
         expect(preventDefault).toHaveBeenCalled();
     });
+
+    it("should check the active Planet project save time before unloading", () => {
+        let savedHandler;
+
+        global.jQuery = jest.fn(() => ({
+            on: jest.fn((event, handler) => {
+                if (event === "beforeunload") {
+                    savedHandler = handler;
+                }
+            }),
+            trigger: jest.fn()
+        }));
+
+        const instance = new SaveInterface({
+            beginnerMode: false,
+            planet: {
+                getTimeLastSaved: () => 100
+            }
+        });
+        instance.timeLastSaved = 0;
+
+        const preventDefault = jest.fn();
+        savedHandler({ preventDefault });
+
+        expect(preventDefault).toHaveBeenCalled();
+    });
 });
 
 describe("saveLilypond Methods", () => {
@@ -963,6 +1081,21 @@ describe("saveLilypond Methods", () => {
         expect(docById("fileName").value).toBe("Test Project.ly");
         expect(docById("title").value).toBe("Test Project");
         expect(docById("author").value).toBe("Custom Author");
+    });
+
+    it("should use the active Planet project name in Lilypond fields", () => {
+        const activity = {
+            ...mockActivity,
+            PlanetInterface: undefined,
+            planet: {
+                getCurrentProjectName: jest.fn(() => "Planet Score")
+            }
+        };
+
+        instance.saveLilypond(activity);
+
+        expect(docById("fileName").value).toBe("Planet Score.ly");
+        expect(docById("title").value).toBe("Planet Score");
     });
 
     it("should close the modal when close button is clicked", () => {

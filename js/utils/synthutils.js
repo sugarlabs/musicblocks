@@ -464,6 +464,60 @@ const instrumentsEffects = { 0: {} };
 const instrumentsFilters = { 0: {} };
 
 /**
+ * Transport wrapper — isolates Tone.Transport behind a stable interface.
+ * All timing/scheduling operations should go through this object so that
+ * Tone.js remains a swappable implementation detail of synthutils.js.
+ */
+const transport = {
+    get isAvailable() {
+        return typeof Tone !== "undefined" && Tone.Transport;
+    },
+    get isClockRunning() {
+        return (
+            this.isAvailable &&
+            typeof Tone.context !== "undefined" &&
+            Tone.context.state === "running" &&
+            Tone.Transport.state === "started"
+        );
+    },
+    start() {
+        if (this.isAvailable) Tone.Transport.start();
+    },
+    stop() {
+        if (this.isAvailable) Tone.Transport.stop();
+    },
+    cancel() {
+        if (this.isAvailable && typeof Tone.Transport.cancel === "function") {
+            Tone.Transport.cancel();
+        }
+    },
+    clear(id) {
+        if (this.isAvailable && typeof Tone.Transport.clear === "function") {
+            Tone.Transport.clear(id);
+        }
+    },
+    schedule(callback, time) {
+        if (this.isAvailable && typeof Tone.Transport.schedule === "function") {
+            return Tone.Transport.schedule(callback, time);
+        }
+        return null;
+    },
+    get seconds() {
+        if (this.isAvailable) return Tone.Transport.seconds;
+        return 0;
+    },
+    set seconds(v) {
+        if (this.isAvailable) Tone.Transport.seconds = v;
+    },
+    getSecondsAtTime(time) {
+        if (this.isAvailable && typeof Tone.Transport.getSecondsAtTime === "function") {
+            return Tone.Transport.getSecondsAtTime(time);
+        }
+        return this.seconds;
+    }
+};
+
+/**
  * Synth constructor function.
  * @constructor
  */
@@ -502,6 +556,7 @@ function Synth() {
     // Using Tone.js
     // this.tone = new Tone();
     this.tone = null;
+    this.transport = transport;
 
     Tone.Buffer.onload = () => {
         console.debug("sample loaded");
@@ -631,10 +686,39 @@ function Synth() {
                 interval !== "pitchNumber" &&
                 interval !== "interval" &&
                 interval !== "octave" &&
-                typeof t[interval] === "number"
+                interval !== "isEDO" &&
+                interval !== "edo" &&
+                interval !== "name" &&
+                interval !== "description" &&
+                interval !== "noteLabels" &&
+                interval !== "ratios" &&
+                interval !== "octaveRatio" &&
+                interval !== "generator"
             ) {
-                const noteInfo = getNoteFromInterval(startingPitch, interval);
-                this.noteFrequencies[noteInfo[0]] = [noteInfo[1], t[interval] * frequency];
+                let noteInfo;
+                let ratio;
+                if (!isNaN(interval)) {
+                    const val = t[interval];
+                    if (Array.isArray(val) && val.length >= 3) {
+                        noteInfo = [val[1], val[2]];
+                        ratio = val[0];
+                    } else {
+                        continue;
+                    }
+                } else if (typeof t[interval] === "number") {
+                    noteInfo = getNoteFromInterval(startingPitch, interval);
+                    ratio = t[interval];
+                } else if (
+                    t[interval] &&
+                    typeof t[interval] === "object" &&
+                    typeof t[interval].ratio === "number"
+                ) {
+                    noteInfo = getNoteFromInterval(startingPitch, interval);
+                    ratio = t[interval].ratio;
+                } else {
+                    continue;
+                }
+                this.noteFrequencies[noteInfo[0]] = [noteInfo[1], ratio * frequency];
             }
         }
 
@@ -876,26 +960,30 @@ function Synth() {
             }
 
             // Load the sample module using require
-            require([sampleInfo.path], () => {
-                try {
-                    const sampleData = window[sampleInfo.global];
-                    if (sampleData) {
-                        this.samples[sampleType][sampleName] = sampleData();
-                        resolve();
-                    } else {
-                        console.error(
-                            `Global variable ${sampleInfo.global} not found for sample ${sampleName}`
-                        );
-                        reject(`Sample global not found: ${sampleName}`);
+            requirejs(
+                [sampleInfo.path],
+                () => {
+                    try {
+                        const sampleData = window[sampleInfo.global];
+                        if (sampleData) {
+                            this.samples[sampleType][sampleName] = sampleData();
+                            resolve();
+                        } else {
+                            console.error(
+                                `Global variable ${sampleInfo.global} not found for sample ${sampleName}`
+                            );
+                            reject(`Sample global not found: ${sampleName}`);
+                        }
+                    } catch (e) {
+                        console.error(`Error processing sample ${sampleName}:`, e);
+                        reject(e);
                     }
-                } catch (e) {
-                    console.error(`Error processing sample ${sampleName}:`, e);
-                    reject(e);
+                },
+                err => {
+                    console.error(`Failed to load sample module for ${sampleName}:`, err);
+                    reject(err);
                 }
-            }, err => {
-                console.error(`Failed to load sample module for ${sampleName}:`, err);
-                reject(err);
-            });
+            );
         });
     };
 
@@ -1702,7 +1790,26 @@ function Synth() {
         setNote,
         future
     ) => {
-        if (this.inTemperament !== "equal" && !isCustomTemperament(this.inTemperament)) {
+        const isStandardNote = note => {
+            if (typeof note !== "string") return true;
+            if (note.toUpperCase() === "R") return true;
+            return /^[A-Ga-g][#b]?-?\d+$/i.test(note);
+        };
+
+        const needsFreqConversion = () => {
+            if (this.inTemperament !== "equal" && !isCustomTemperament(this.inTemperament)) {
+                return true;
+            }
+            if (typeof notes === "string") {
+                return !isStandardNote(notes);
+            }
+            if (Array.isArray(notes)) {
+                return notes.some(n => !isStandardNote(n));
+            }
+            return false;
+        };
+
+        if (needsFreqConversion()) {
             if (typeof notes === "number") {
                 notes = notes;
             } else {
@@ -1730,7 +1837,10 @@ function Synth() {
 
         if (isCustomTemperament(this.inTemperament)) {
             const notes1 = notes;
-            if (notes.search("[+]") !== -1 || notes.search("[-]") !== -1) {
+            if (
+                typeof notes === "string" &&
+                (notes.search("[+]") !== -1 || notes.search("[-]") !== -1)
+            ) {
                 notes = this.getCustomFrequency(notes, this.inTemperament);
             }
             if (notes === undefined || notes === "undefined") {
@@ -1770,7 +1880,8 @@ function Synth() {
                             paramsEffects.doTremolo ||
                             paramsEffects.doPhaser ||
                             paramsEffects.doChorus ||
-                            paramsEffects.doNeighbor));
+                            paramsEffects.doNeighbor ||
+                            (paramsEffects.doPortamento && setNote)));
 
                 if (!_needsGraphRewire) {
                     // Apply in-place property mutations then take the fast path.
@@ -1993,6 +2104,11 @@ function Synth() {
                                 synth &&
                                 typeof synth.toDestination === "function"
                             ) {
+                                try {
+                                    synth.disconnect();
+                                } catch (_) {
+                                    // Already disconnected — safe to ignore.
+                                }
                                 synth.toDestination();
                             }
                         } catch (e) {
@@ -2297,11 +2413,11 @@ function Synth() {
     };
 
     this.start = () => {
-        Tone.Transport.start();
+        this.transport.start();
     };
 
     this.stop = () => {
-        Tone.Transport.stop();
+        this.transport.stop();
     };
 
     this.rampTo = (turtle, instrumentName, oldVol, volume, rampTime) => {
@@ -2456,6 +2572,10 @@ function Synth() {
     };
 
     const _disposeRecordingPlayer = () => {
+        if (this._recordingPlayTimeout) {
+            clearTimeout(this._recordingPlayTimeout);
+            this._recordingPlayTimeout = null;
+        }
         if (this.player) {
             try {
                 if (typeof this.player.stop === "function") {
@@ -2508,11 +2628,45 @@ function Synth() {
      * @function
      * @memberof Synth
      */
-    this.playRecording = async () => {
+    this.playRecording = async onEnded => {
         _disposeRecordingPlayer();
+        if (!this.audioURL) {
+            if (typeof onEnded === "function") {
+                onEnded();
+            }
+            return;
+        }
+        await Tone.start();
+        if (
+            Tone.context &&
+            Tone.context.state !== "running" &&
+            typeof Tone.context.resume === "function"
+        ) {
+            await Tone.context.resume();
+        }
         this.player = new Tone.Player().toDestination();
+        let endedCalled = false;
+        const handleEnded = () => {
+            if (endedCalled) return;
+            endedCalled = true;
+            if (this._recordingPlayTimeout) {
+                clearTimeout(this._recordingPlayTimeout);
+                this._recordingPlayTimeout = null;
+            }
+            if (typeof onEnded === "function") {
+                onEnded();
+            }
+        };
+        this.player.onstop = handleEnded;
+        if ("onended" in this.player) {
+            this.player.onended = handleEnded;
+        }
         await this.player.load(this.audioURL);
         this.player.start();
+        if (this.player.buffer && this.player.buffer.duration) {
+            const durationMs = Math.ceil(this.player.buffer.duration * 1000) + 100;
+            this._recordingPlayTimeout = setTimeout(handleEnded, durationMs);
+        }
     };
 
     /**
@@ -3016,7 +3170,7 @@ function Synth() {
                                                 const octave =
                                                     tempBlock._octavesWheel.navItems[i].title;
                                                 if (octave && !isNaN(octave)) {
-                                                    selectionState.octave = parseInt(octave);
+                                                    selectionState.octave = parseInt(octave, 10);
                                                     updateTargetNote();
                                                 }
                                             };
@@ -3081,7 +3235,7 @@ function Synth() {
                                         }
 
                                         // Adjust for octave (C4 is the reference octave)
-                                        const octaveDiff = parseInt(octave) - 4;
+                                        const octaveDiff = parseInt(octave, 10) - 4;
                                         freq *= Math.pow(2, octaveDiff);
 
                                         targetPitch.frequency = freq;
@@ -3625,7 +3779,7 @@ function Synth() {
 
         // Add event listener for slider changes
         slider.oninput = () => {
-            const value = parseInt(slider.value);
+            const value = parseInt(slider.value, 10);
             valueDisplay.textContent = (value >= 0 ? "+" : "") + value + "¢";
             this.centsValue = value;
             // Update tuner display if it exists
@@ -3758,4 +3912,20 @@ function Synth() {
     this.mic = null;
 
     return this;
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        Synth,
+        NOISENAMES,
+        VOICENAMES,
+        DRUMNAMES,
+        EFFECTSNAMES,
+        CUSTOMSAMPLES,
+        instrumentsEffects,
+        instrumentsFilters,
+        instruments,
+        instrumentsSource,
+        DEFAULTSYNTHVOLUME
+    };
 }
