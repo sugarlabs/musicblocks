@@ -1513,8 +1513,8 @@ describe("Palettes Class", () => {
             global.cameraPALETTE = "<svg></svg>";
             global.videoPALETTE = "<svg></svg>";
             mockActivity.pluginsImages = { customimg: "<svg></svg>" };
-            document.addEventListener = jest.fn();
-            document.removeEventListener = jest.fn();
+            jest.spyOn(document, "addEventListener").mockImplementation(() => {});
+            jest.spyOn(document, "removeEventListener").mockImplementation(() => {});
 
             palettes.add("test");
             const palette = palettes.dict.test;
@@ -1608,8 +1608,8 @@ describe("Palettes Class", () => {
 
                 return el;
             });
-            document.addEventListener = jest.fn();
-            document.removeEventListener = jest.fn();
+            jest.spyOn(document, "addEventListener").mockImplementation(() => {});
+            jest.spyOn(document, "removeEventListener").mockImplementation(() => {});
 
             palettes.add("test");
             const palette = palettes.dict.test;

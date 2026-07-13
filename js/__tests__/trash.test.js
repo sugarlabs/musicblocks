@@ -85,7 +85,6 @@ global.Image = jest.fn(() => {
     return img;
 });
 
-jest.spyOn(global.window, "addEventListener").mockImplementation(() => {});
 jest.useFakeTimers();
 
 describe("Trashcan Class", () => {
