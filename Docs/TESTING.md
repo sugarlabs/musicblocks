@@ -5,9 +5,9 @@ How to write unit tests for block files.
 ## Running Tests
 
 ```bash
-npm test                                    # Run all tests
-npm test -- path/to/file.test.js           # Run specific test file
-npm test -- --coverage                      # Run with coverage report
+pnpm test                                    # Run all tests
+pnpm test -- path/to/file.test.js           # Run specific test file
+pnpm test -- --coverage                      # Run with coverage report
 ```
 
 ## Testing Blocks
@@ -138,4 +138,4 @@ describe("YourBlocks", () => {
 1. Check the source file's `flow()` or `arg()` method to understand what it expects
 2. Mock only what's needed for the specific test
 3. Use `jest.fn()` for methods you want to verify were called
-4. Run `npx prettier --write` on your test file before committing
+4. Run `pnpm exec prettier --write` on your test file before committing

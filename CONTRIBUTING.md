@@ -111,14 +111,14 @@ understanding of the codebase.
 Run these commands locally before submitting a PR:
 
 ```bash
-npm run lint              # ESLint
-npx prettier --check .    # Formatting
-npm test                  # Jest
+pnpm run lint              # ESLint
+pnpm exec prettier --check .    # Formatting
+pnpm test                  # Jest
 ```
 
 NOTE: Only run `prettier` on the files you have modified.
 
-If formatting fails, run `npx prettier --write .` to fix it.
+If formatting fails, run `pnpm exec prettier --write .` to fix it.
 
 ### Creating Pull Requests
 
@@ -135,9 +135,9 @@ Follow these steps when contributing:
 3.  Run required checks before pushing:
 
     ```
-    npm run lint
-    npx prettier --check .
-    npm test
+    pnpm run lint
+    pnpm exec prettier --check .
+    pnpm test
     ```
 
 4.  Commit with clear, descriptive messages:

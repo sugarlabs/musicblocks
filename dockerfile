@@ -3,9 +3,12 @@ FROM node:20-slim AS build
 
 WORKDIR /app
 
-COPY package*.json ./
+# Enable corepack and activate pnpm
+RUN corepack enable && corepack prepare pnpm@10.15.0 --activate
 
-RUN npm install
+COPY package.json pnpm-lock.yaml ./
+
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 

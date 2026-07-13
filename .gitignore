@@ -9,3 +9,7 @@ Docs/architecture/dev_architecture.html
 
 # Lighthouse CI
 .lighthouseci/
+
+# Prevent accidental npm lockfile creation (project uses pnpm)
+package-lock.json
+npm-debug.log*
