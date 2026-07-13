@@ -2550,7 +2550,7 @@ class Singer {
                 tur.singer._unhighlightTimers[blk] = setTimeout(() => {
                     if (activity.blocks.visible && blk in activity.blocks.blockList) {
                         activity.blocks.unhighlight(blk);
-                        if (activity.stage) {
+                        if (activity.stage && activity.blocks.blockList[blk]._viewportVisible) {
                             activity.stageDirty = true;
                         }
                     }

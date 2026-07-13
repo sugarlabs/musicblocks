@@ -1916,7 +1916,7 @@ class Logo {
                 logo.blocks.highlight(blk, false);
                 logo._currentlyHighlightedBlock = blk;
                 // Force stage update so highlight is visible when blocks were shown during execution
-                if (logo.stage && blk._viewportVisible) {
+                if (logo.stage && currentBlock._viewportVisible) {
                     logo.deps.markStageDirty();
                 }
             }
@@ -2066,7 +2066,7 @@ class Logo {
                                     if (logo._currentlyHighlightedBlock === blk) {
                                         logo._currentlyHighlightedBlock = null;
                                     }
-                                    if (logo.stage && blk._viewportVisible) {
+                                    if (logo.stage && currentBlock._viewportVisible) {
                                         logo.deps.markStageDirty();
                                     }
                                 }
@@ -2103,13 +2103,29 @@ class Logo {
                                 () => {
                                     if (logo.blocks.visible) {
                                         const unhighlightBlock = tur.unhighlightQueue.pop();
-                                        logo.blocks.unhighlight(unhighlightBlock);
-                                        // Clear the currently highlighted block if it was this one
-                                        if (logo._currentlyHighlightedBlock === unhighlightBlock) {
-                                            logo._currentlyHighlightedBlock = null;
-                                        }
-                                        if (logo.stage && unhighlightBlock._viewportVisible) {
-                                            logo.deps.markStageDirty();
+                                        if (
+                                            unhighlightBlock !== null &&
+                                            unhighlightBlock !== undefined &&
+                                            logo.blockList[unhighlightBlock]
+                                        ) {
+                                            logo.blocks.unhighlight(unhighlightBlock);
+                                            // Clear the currently highlighted block if it was this one
+                                            if (
+                                                logo._currentlyHighlightedBlock === unhighlightBlock
+                                            ) {
+                                                logo._currentlyHighlightedBlock = null;
+                                            }
+                                            if (
+                                                logo.stage &&
+                                                logo.blockList[unhighlightBlock]._viewportVisible
+                                            ) {
+                                                logo.deps.markStageDirty();
+                                            }
+                                        } else {
+                                            console.debug(
+                                                "unhighlightQueue: skipped invalid block ref",
+                                                unhighlightBlock
+                                            );
                                         }
                                     } else {
                                         tur.unhighlightQueue.pop();
