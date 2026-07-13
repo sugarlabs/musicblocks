@@ -23,6 +23,7 @@
 global._ = msg => msg;
 global.getCurrentEDO = () => 12;
 global.clampNumber = require("../../utils/utils-logic.js").clampNumber;
+global.announceToScreenReader = jest.fn();
 
 const mockOscillator = {
     toDestination: jest.fn().mockReturnThis(),
