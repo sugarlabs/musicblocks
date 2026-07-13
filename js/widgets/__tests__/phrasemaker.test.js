@@ -23,6 +23,7 @@
 // --- Global Mocks ---
 
 global._ = msg => msg;
+global.announceToScreenReader = jest.fn();
 global.last = arr => arr[arr.length - 1];
 global.LCD = (a, b) => (a * b) / gcd(a, b);
 function gcd(a, b) {
