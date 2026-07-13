@@ -208,7 +208,8 @@ class PitchStaircase {
                     stepCell.classList.remove("active");
                     stepCell.style.backgroundColor = "";
                     this._setButtonIcon(playCell, "play-button.svg", _("Play"));
-                    this.activity.logo.synth.stop();
+                    const frequency = Number(stepCell.getAttribute("id"));
+                    this.activity.logo.synth.stopSound(0, DEFAULTVOICE, frequency);
                     this._playingRowIndex = null;
                 } else {
                     this._playOne(stepCell, playCell);
