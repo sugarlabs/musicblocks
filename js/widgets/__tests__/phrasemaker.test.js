@@ -59,8 +59,6 @@ global.DEFAULTDRUM = "kick drum";
 global.DEFAULTVOLUME = 50;
 global.PREVIEWVOLUME = 50;
 global.normalizeNoteAccidentals = note => note;
-global.SHARP = "♯";
-global.FLAT = "♭";
 global.MATRIXSOLFEHEIGHT = 30;
 global.MATRIXSOLFEWIDTH = 80;
 global.EIGHTHNOTEWIDTH = 24;

@@ -33,10 +33,10 @@ describe("setupIntervalsActions", () => {
         global.isCustomTemperament = jest.fn(() => false);
         global.TEMPERAMENT = { equal: { pitchNumber: 12 } };
 
-        global.MUSICALMODES = {
-            major: [2, 2, 1, 2, 2, 2, 1],
-            minor: [2, 1, 2, 2, 1, 2, 2]
-        };
+        // Set up test-specific mocks for SEMITONETOINTERVALMAP and ALLNOTESTEP
+        global.SEMITONETOINTERVALMAP = Array(13)
+            .fill(null)
+            .map(() => Array(7).fill("perfect"));
 
         global.ALLNOTESTEP = {
             "Cb": 0,
@@ -61,11 +61,6 @@ describe("setupIntervalsActions", () => {
             "B": 12,
             "B#": 0
         };
-        global.NOTENAMES = ["C", "D", "E", "F", "G", "A", "B"];
-
-        global.SEMITONETOINTERVALMAP = Array(13)
-            .fill(null)
-            .map(() => Array(7).fill("perfect"));
 
         global.GetNotesForInterval = jest.fn(() => ({
             firstNote: "C",

@@ -1,3 +1,6 @@
+// Load centralized music constants for all tests
+require("./js/utils/MusicConstants.js");
+
 // Provide ErrorHandler global for tests
 global.ErrorHandler = {
     capture: jest.fn(),

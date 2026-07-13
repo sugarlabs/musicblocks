@@ -47,12 +47,6 @@ global.NOTATIONSTACCATO = NOTATIONSTACCATO;
 global.NOTATIONTUPLETVALUE = NOTATIONTUPLETVALUE;
 global.NOTATIONDOTCOUNT = NOTATIONDOTCOUNT;
 
-global.SHARP = "♯";
-global.FLAT = "♭";
-global.NATURAL = "♮";
-global.DOUBLESHARP = "𝄪";
-global.DOUBLEFLAT = "𝄫";
-
 global._ = jest.fn(str => str);
 global.last = jest.fn(array => array[array.length - 1]);
 

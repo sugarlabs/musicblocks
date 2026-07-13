@@ -5,7 +5,6 @@ global._ = x => x;
 global.TextEncoder = require("util").TextEncoder;
 global.TextDecoder = require("util").TextDecoder;
 global.last = arr => arr[arr.length - 1];
-global.PITCHES = ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"];
 global.PITCHES2 = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"];
 global.SOLFEGENAMES = ["do", "re", "mi", "fa", "sol", "la", "ti"];
 

@@ -19,12 +19,6 @@
  */
 
 global._ = s => s;
-global.DOUBLEFLAT = "bb";
-global.FLAT = "b";
-global.NATURAL = "n";
-global.SHARP = "#";
-global.DOUBLESHARP = "x";
-
 global.instruments = [{}];
 global.TunerUtils = {
     calculatePlaybackRate: jest.fn(),
