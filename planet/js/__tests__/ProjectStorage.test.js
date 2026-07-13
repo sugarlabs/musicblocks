@@ -456,6 +456,31 @@ describe("ProjectStorage", () => {
             expect(storage.getCurrentProjectName()).toBe("My Project");
         });
 
+        it("getCurrentProjectName should return default for an empty string name", () => {
+            storage.data.Projects["proj1"].ProjectName = "";
+            expect(storage.getCurrentProjectName()).toBe("My Project");
+        });
+
+        it("getCurrentProjectName should return default for a whitespace-only name", () => {
+            storage.data.Projects["proj1"].ProjectName = "   \t  ";
+            expect(storage.getCurrentProjectName()).toBe("My Project");
+        });
+
+        it("getCurrentProjectName should return default for a null name", () => {
+            storage.data.Projects["proj1"].ProjectName = null;
+            expect(storage.getCurrentProjectName()).toBe("My Project");
+        });
+
+        it("getCurrentProjectName should return default for an undefined name", () => {
+            storage.data.Projects["proj1"].ProjectName = undefined;
+            expect(storage.getCurrentProjectName()).toBe("My Project");
+        });
+
+        it("getCurrentProjectName should preserve a valid name with surrounding whitespace", () => {
+            storage.data.Projects["proj1"].ProjectName = "  Song A  ";
+            expect(storage.getCurrentProjectName()).toBe("  Song A  ");
+        });
+
         it("getCurrentProjectID should return current project ID", () => {
             expect(storage.getCurrentProjectID()).toBe("proj1");
         });

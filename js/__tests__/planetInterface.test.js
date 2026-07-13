@@ -191,11 +191,16 @@ describe("PlanetInterface", () => {
     });
 
     // Regression test for #7350: when running from file:///index.html,
-    // planet.planet is null so getCurrentProjectName() must return ""
-    // to prevent _afterDelete from entering the Planet branch.
-    test("getCurrentProjectName returns empty string when inner Planet is null (#7350)", () => {
+    // planet.planet is null. _afterDelete no longer relies on the return
+    // value of getCurrentProjectName() to skip the Planet branch (it checks
+    // that.planet.planet !== null directly), so it is safe for this getter
+    // to fall back to the default project name like every other caller.
+    test("getCurrentProjectName returns the default project name when inner Planet is null (#7350)", () => {
+        const saved_ = global._;
+        global._ = jest.fn(str => str);
         planetInterface.planet = null;
-        expect(planetInterface.getCurrentProjectName()).toBe("");
+        expect(planetInterface.getCurrentProjectName()).toBe("My Project");
+        global._ = saved_;
     });
 
     test("loadProjectFromData: default merge=false", () => {
@@ -512,10 +517,13 @@ describe("PlanetInterface", () => {
     });
 
     it("project getters return safe defaults when Planet storage is unavailable", () => {
+        const saved_ = global._;
+        global._ = jest.fn(str => str);
         planetInterface.planet = null;
-        expect(planetInterface.getCurrentProjectName()).toBe("");
+        expect(planetInterface.getCurrentProjectName()).toBe("My Project");
         expect(planetInterface.getCurrentProjectDescription()).toBe("");
         expect(planetInterface.getCurrentProjectImage()).toBeNull();
         expect(planetInterface.getTimeLastSaved()).toBeNull();
+        global._ = saved_;
     });
 });
