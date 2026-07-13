@@ -19,7 +19,7 @@
    noteIsSolfege, isCustomTemperament, i18nSolfege, getNote, DEFAULTDRUM, last,
    DRUMS, SHARP, FLAT, PREVIEWVOLUME, DEFAULTVOLUME, noteToFrequency,
    LCD, calcNoteValueToDisplay, NOTESYMBOLS,
-   EIGHTHNOTEWIDTH, docBySelector, getTemperament, normalizeNoteAccidentals, parseNoteString
+   EIGHTHNOTEWIDTH, docBySelector, getTemperament, normalizeNoteAccidentals, parseNoteString, announceToScreenReader
 */
 
 /*
@@ -596,6 +596,7 @@ class PhraseMaker {
         const iconSize = PhraseMaker.ICONSIZE * this._cellScale;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "phrase maker");
+        announceToScreenReader(_("Phrase Maker opened"));
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
@@ -619,6 +620,7 @@ class PhraseMaker {
             this._stopOrCloseClicked = true;
             this.activity.hideMsgs();
             this.docById("wheelDivptm").style.display = "none";
+            announceToScreenReader(_("Phrase Maker closed"));
             widgetWindow.destroy();
         };
 

@@ -13,7 +13,7 @@
 // from given frequency to nextoctave frequency(two times the given frequency)
 // in continuous manner.
 
-/* global _, Tone, getCurrentEDO, clampNumber */
+/* global _, Tone, getCurrentEDO, clampNumber, announceToScreenReader */
 
 /*
    Global locations
@@ -58,6 +58,7 @@ class PitchSlider {
 
         this._cellScale = 1.0;
         this.widgetWindow = window.widgetWindows.windowFor(this, "pitch slider", "slider", true);
+        announceToScreenReader(_("Pitch Slider opened"));
 
         this.isActive = true;
 
@@ -71,6 +72,7 @@ class PitchSlider {
             }
             this.isActive = false;
             activity.logo.pitchSlider = null;
+            announceToScreenReader(_("Pitch Slider closed"));
             this.widgetWindow.destroy();
         };
 
