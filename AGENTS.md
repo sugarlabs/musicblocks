@@ -129,7 +129,7 @@ Keep the first line under 72 characters. Add a blank line before any extended de
   bootstrap sequence. Changing load order here can break startup.
 - If adding a new source file, register it in the `js/loader.js` shim config and
   add it to the `MYDEFINES` array in `js/activity.js`.
-- Run locally with `npm start` or `npm run serve:dev` (static HTTP server on port 3000).
+- Run locally with `pnpm start` or `pnpm run serve:dev` (static HTTP server on port 3000).
   There is no transpilation step for development.
 - Keep accurate `/* global */` and `/* exported */` headers in browser scripts.
 - If a file already uses guarded `module.exports` for Jest, preserve that pattern:
@@ -189,9 +189,9 @@ Keep the first line under 72 characters. Add a blank line before any extended de
 
 Standard validation:
 
-- `npm run lint`
-- `npx prettier --check .` (only on files you modified)
-- `npm test`
+- `pnpm run lint`
+- `pnpm exec prettier --check .` (only on files you modified)
+- `pnpm test`
 
 ### Test file conventions
 
@@ -214,7 +214,7 @@ Ask the user for a browser check when the change affects UI, widgets, drag/drop,
 
 When asking for browser testing, give exact steps:
 
-1. Run `npm run dev` or `npm run serve:dev`
+1. Run `pnpm run dev` or `pnpm run serve:dev`
 2. Open `http://127.0.0.1:3000`
 3. Reproduce the issue with the smallest possible project
 4. State the expected result
@@ -226,7 +226,7 @@ For pure logic bugs with strong focused tests, do not block on manual browser te
 
 ### Always
 
-- Run `npm run lint`, `npx prettier --check .`, and `npm test` before
+- Run `pnpm run lint`, `pnpm exec prettier --check .`, and `pnpm test` before
   proposing a change as complete.
 - Include the AGPL license header in every new source file.
 - Keep `/* global */` and `/* exported */` comments accurate.

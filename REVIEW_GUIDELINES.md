@@ -10,11 +10,11 @@
 
 **Required checks**
 - Rebase on master before requesting review (`git fetch upstream && git rebase upstream/master`).
-- Run `npm test` locally and confirm no new test failures are introduced.
-- Run `npx prettier --write <changed files>` before pushing.
+- Run `pnpm test` locally and confirm no new test failures are introduced.
+- Run `pnpm exec prettier --write <changed files>` before pushing.
 - Sign off every commit with DCO (`git commit -s`).
 - Run regression tests before submitting to catch unintended side effects:
-  - Run the full test suite (`npm test`), not just the tests related to your change.
+  - Run the full test suite (`pnpm test`), not just the tests related to your change.
   - If you modified a shared utility function, test each affected module manually.
   - For UI changes, verify that both light and dark themes still work correctly.
   - For block behavior changes, run the browser smoke test and interact with the affected blocks manually.

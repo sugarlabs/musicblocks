@@ -49,7 +49,7 @@ Prerequisites
 -------------
 
 * It facilitates debugging if you have Music Blocks up and
-  running. You can use the <code>npm run serve</code> command to launch
+  running. You can use the <code>pnpm run serve</code> command to launch
   a local instance of Music Blocks.
 
 * To define the `blocks` in your plugin, you will need to know

@@ -3,7 +3,7 @@
 **Related issue:** [#6608](https://github.com/sugarlabs/musicblocks/issues/6608)
 **Status:** In progress — first pass (home/launch screen)
 **Tooling used:** axe DevTools (axe-core 4.11.4), Chrome DevTools, manual keyboard navigation
-**Test URL:** `http://127.0.0.1:3000/` (local dev server, `npm run serve`)
+**Test URL:** `http://127.0.0.1:3000/` (local dev server, `pnpm run serve`)
 
 This report documents accessibility violations found during a WCAG 2.1 AA
 audit of Music Blocks, along with the affected files, severity, and

@@ -67,7 +67,7 @@ Dev Containers: Reopen in Container
 VS Code will automatically:
 
 - Pull the Node.js 20 container image
-- Install dependencies using `npm install`
+- Install dependencies using `pnpm install`
 - Install recommended extensions
 - Forward port `3000`
 
@@ -78,7 +78,7 @@ The initial setup may take a few minutes.
 Open a terminal inside the container and run:
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 ## 6. Open in browser
@@ -129,7 +129,7 @@ Codespaces will:
 Open the integrated terminal and run:
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 ## 5. Open the forwarded port
@@ -167,13 +167,13 @@ docker run --rm -it \
 Inside the container:
 
 ```bash
-npm install
+pnpm install
 ```
 
 ## 4. Start the development server
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 ## 5. Open in browser
@@ -192,10 +192,10 @@ http://localhost:3000
 |---|---|
 | Base Image | `mcr.microsoft.com/devcontainers/javascript-node:20` |
 | Node.js Version | 20 LTS |
-| Pre-installed Tools | `git`, `node`, `npm` |
+| Pre-installed Tools | `git`, `node`, `npm`, `pnpm` |
 | VS Code Extensions | ESLint, Prettier, JSON support |
 | Forwarded Port | `3000` |
-| Post-create Hook | `npm install` |
+| Post-create Hook | `pnpm install` |
 
 ---
 
@@ -204,25 +204,25 @@ http://localhost:3000
 ## Run tests
 
 ```bash
-npm test
+pnpm test
 ```
 
 ## Run linter
 
 ```bash
-npm run lint
+pnpm run lint
 ```
 
 ## Check formatting
 
 ```bash
-npx prettier --check .
+pnpm exec prettier --check .
 ```
 
 ## Format all files
 
 ```bash
-npx prettier --write .
+pnpm exec prettier --write .
 ```
 
 ---
@@ -244,7 +244,7 @@ another process is already using port `3000`.
 Stop the conflicting process or run on another port:
 
 ```bash
-npm run dev -- --port 3001
+pnpm run dev -- --port 3001
 ```
 
 ---
