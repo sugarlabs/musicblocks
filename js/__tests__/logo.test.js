@@ -96,6 +96,7 @@ const createTransportMock = () => ({
 global.Singer = {
     setSynthVolume: jest.fn(),
     setMasterVolume: jest.fn(),
+    clearPitchToFrequencyCache: jest.fn(),
     masterBPM: 90,
     defaultBPMFactor: 1
 };

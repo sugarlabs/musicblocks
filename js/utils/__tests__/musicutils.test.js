@@ -219,6 +219,7 @@ describe("Temperament Functions", () => {
         [_("Equal (12EDO)"), "equal", "equal"],
         [_("Equal (5EDO)"), "equal5", "equal5"],
         [_("Equal (7EDO)"), "equal7", "equal7"],
+        [_("Equal (17EDO)"), "equal17", "equal17"],
         [_("Equal (19EDO)"), "equal19", "equal19"],
         [_("Equal (31EDO)"), "equal31", "equal31"],
         [_("5-limit Just Intonation"), "just intonation", "just intonation"],
@@ -231,6 +232,7 @@ describe("Temperament Functions", () => {
         [_("Equal (12EDO)"), "equal", "equal"],
         [_("Equal (5EDO)"), "equal5", "equal5"],
         [_("Equal (7EDO)"), "equal7", "equal7"],
+        [_("Equal (17EDO)"), "equal17", "equal17"],
         [_("Equal (19EDO)"), "equal19", "equal19"],
         [_("Equal (31EDO)"), "equal31", "equal31"],
         [_("5-limit Just Intonation"), "just intonation", "just intonation"],
@@ -243,6 +245,7 @@ describe("Temperament Functions", () => {
         "equal": true,
         "equal5": true,
         "equal7": true,
+        "equal17": true,
         "equal19": true,
         "equal31": true,
         "just intonation": true,
@@ -256,6 +259,7 @@ describe("Temperament Functions", () => {
             [_("Equal (12EDO)"), "equal", "equal"],
             [_("Equal (5EDO)"), "equal5", "equal5"],
             [_("Equal (7EDO)"), "equal7", "equal7"],
+            [_("Equal (17EDO)"), "equal17", "equal17"],
             [_("Equal (19EDO)"), "equal19", "equal19"],
             [_("Equal (31EDO)"), "equal31", "equal31"],
             [_("5-limit Just Intonation"), "just intonation", "just intonation"],
@@ -290,7 +294,7 @@ describe("Temperament Functions", () => {
     describe("getTemperamentKeys", () => {
         it("should return an array with the correct length", () => {
             const keys = getTemperamentKeys();
-            expect(keys.length).toBe(10);
+            expect(keys.length).toBe(11);
         });
 
         it("should return an array containing all keys", () => {
@@ -300,6 +304,7 @@ describe("Temperament Functions", () => {
                     "equal",
                     "equal5",
                     "equal7",
+                    "equal17",
                     "equal19",
                     "equal31",
                     "just intonation",
@@ -1573,6 +1578,76 @@ describe("getNote", () => {
         const result = getNote("invalidNote", 4, 0, "C major");
         expect(result).toBeDefined();
     });
+
+    it("should return cents for fractional positive transposition", () => {
+        // 2.5 semitones = 2 semitones + 50 cents
+        const result = getNote("C", 4, 2.5, "C major");
+        expect(result[0]).toBe("D");
+        expect(result[1]).toBe(4);
+        expect(result[2]).toBe(50);
+    });
+
+    it("should return cents for fractional negative transposition", () => {
+        // -1.3 semitones = -1 semitone - 30 cents
+        const result = getNote("C", 4, -1.3, "C major");
+        expect(result[0]).toBe("B");
+        expect(result[2]).toBeCloseTo(-30, 0);
+    });
+
+    it("should return 0 cents for integer transposition", () => {
+        const result = getNote("C", 4, 3, "C major");
+        expect(result[2]).toBe(0);
+    });
+
+    it("should return 0 cents for zero transposition", () => {
+        const result = getNote("C", 4, 0, "C major");
+        expect(result[2]).toBe(0);
+    });
+
+    it("should handle small fractional transposition as cents", () => {
+        // 0.07 semitones = 7 cents
+        const result = getNote("C", 4, 0.07, "C major");
+        expect(result[2]).toBeCloseTo(7, 0);
+    });
+});
+
+describe("getPitchInfo with frequency input", () => {
+    it("should handle numeric frequency input via 1-arg form as pitch number", () => {
+        // 1-arg form treats number as pitch number, not frequency
+        const result = getPitchInfo(60);
+        expect(result.name).toBe("C");
+        expect(result.octave).toBe(4);
+    });
+});
+
+describe("frequencyToPitch cents precision", () => {
+    it("should return correct cents for A4+50 cents", () => {
+        // A4 + 50 cents = 440 * 2^(50/1200)
+        // This is halfway between A and B♭, function rounds to nearest
+        const freq = 440 * Math.pow(2, 50 / 1200);
+        const result = frequencyToPitch(freq);
+        // 50 cents above A4 is exactly between A and B♭
+        expect(result[1]).toBe(4);
+        expect(Math.abs(result[2])).toBeLessThanOrEqual(50);
+    });
+
+    it("should return correct cents for A4-30 cents", () => {
+        // A4 - 30 cents = 440 * 2^(-30/1200)
+        const freq = 440 * Math.pow(2, -30 / 1200);
+        const result = frequencyToPitch(freq);
+        expect(result[0]).toBe("A");
+        expect(result[1]).toBe(4);
+        expect(result[2]).toBeCloseTo(-30, 0);
+    });
+
+    it("should return correct cents for C4+25 cents", () => {
+        // C4 + 25 cents = 261.63 * 2^(25/1200)
+        const freq = 261.63 * Math.pow(2, 25 / 1200);
+        const result = frequencyToPitch(freq);
+        expect(result[0]).toBe("C");
+        expect(result[1]).toBe(4);
+        expect(result[2]).toBeCloseTo(25, 0);
+    });
 });
 
 describe("buildScale", () => {
@@ -2480,7 +2555,19 @@ describe("convertFromSolfege", () => {
         "ti𝄪": "C" + SHARP,
         "R": _("rest")
     };
-    global.EQUIVALENTNATURALS = { "E♯": "F", "B♯": "C", "C♭": "B", "F♭": "E" };
+    global.EQUIVALENTNATURALS = {
+        "E♯": "F",
+        "B♯": "C",
+        "C♭": "B",
+        "F♭": "E",
+        "D𝄪": "E",
+        "A𝄪": "B",
+        "G𝄪": "A",
+        "E𝄪": "F♯",
+        "C𝄪": "D",
+        "F𝄪": "G",
+        "B𝄪": "C♯"
+    };
     const testCases = [
         { input: "do𝄫", expected: "B" + FLAT },
         { input: "do♭", expected: "B" },
@@ -2501,6 +2588,36 @@ describe("convertFromSolfege", () => {
     it("should return the input if no conversion is available", () => {
         const nonSolfegeNote = "X";
         expect(convertFromSolfege(nonSolfegeNote)).toBe(nonSolfegeNote);
+    });
+});
+
+describe("EQUIVALENTNATURALS extended mappings", () => {
+    it("should map D𝄪 to E", () => {
+        expect(global.EQUIVALENTNATURALS["D𝄪"]).toBe("E");
+    });
+
+    it("should map A𝄪 to B", () => {
+        expect(global.EQUIVALENTNATURALS["A𝄪"]).toBe("B");
+    });
+
+    it("should map G𝄪 to A", () => {
+        expect(global.EQUIVALENTNATURALS["G𝄪"]).toBe("A");
+    });
+
+    it("should map E♯ to F (original)", () => {
+        expect(global.EQUIVALENTNATURALS["E♯"]).toBe("F");
+    });
+
+    it("should map B♯ to C (original)", () => {
+        expect(global.EQUIVALENTNATURALS["B♯"]).toBe("C");
+    });
+
+    it("should map C♭ to B (original)", () => {
+        expect(global.EQUIVALENTNATURALS["C♭"]).toBe("B");
+    });
+
+    it("should map F♭ to E (original)", () => {
+        expect(global.EQUIVALENTNATURALS["F♭"]).toBe("E");
     });
 });
 
