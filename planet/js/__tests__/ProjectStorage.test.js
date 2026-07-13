@@ -267,6 +267,77 @@ describe("ProjectStorage", () => {
         });
     });
 
+    describe("port()", () => {
+        afterEach(() => {
+            jest.restoreAllMocks();
+        });
+
+        it("should port legacy localStorage data when not already ported", async () => {
+            jest.spyOn(Storage.prototype, "getItem").mockReturnValueOnce(
+                JSON.stringify({ Projects: { legacy: { ProjectName: "Old Project" } } })
+            );
+
+            await storage.port();
+
+            const ported = await storage.get(storage.LocalStorageKey);
+            expect(ported).toEqual(
+                JSON.stringify({ Projects: { legacy: { ProjectName: "Old Project" } } })
+            );
+
+            const version = await storage.get(storage.VersionKey);
+            expect(version).toBe(storage.Version);
+        });
+
+        it("should not re-port if already at current version", async () => {
+            await storage.set(storage.VersionKey, storage.Version);
+            const setSpy = jest.spyOn(storage, "set");
+
+            await storage.port();
+
+            expect(setSpy).not.toHaveBeenCalledWith(storage.LocalStorageKey, expect.anything());
+        });
+
+        it("should not throw when localStorage.getItem throws (restricted environment)", async () => {
+            const consoleSpy = jest.spyOn(console, "debug").mockImplementation();
+            jest.spyOn(Storage.prototype, "getItem").mockImplementationOnce(() => {
+                throw new Error("SecurityError: localStorage is disabled");
+            });
+
+            await expect(storage.port()).resolves.not.toThrow();
+
+            expect(consoleSpy).toHaveBeenCalledWith(
+                "localStorage unavailable during port(); skipping legacy read.",
+                expect.any(Error)
+            );
+        });
+
+        it("should still set version key after a guarded localStorage failure", async () => {
+            jest.spyOn(Storage.prototype, "getItem").mockImplementationOnce(() => {
+                throw new Error("SecurityError: localStorage is disabled");
+            });
+
+            await storage.port();
+
+            const version = await storage.get(storage.VersionKey);
+            expect(version).toBe(storage.Version);
+        });
+
+        it("should not crash init() when localStorage is unavailable throughout startup", async () => {
+            global.localforage = mockLocalforage; // init() reassigns this.LocalStorage from the global
+            Storage.prototype.getItem = jest.fn(() => {
+                throw new Error("SecurityError: localStorage is disabled");
+            });
+            jest.spyOn(console, "debug").mockImplementation();
+
+            try {
+                await expect(storage.init()).resolves.not.toThrow();
+                expect(storage.data).not.toBeNull();
+            } finally {
+                global.localforage = null;
+            }
+        });
+    });
+
     describe("initialiseStorage()", () => {
         it("should initialize empty data structure on first run", async () => {
             storage.data = null;
