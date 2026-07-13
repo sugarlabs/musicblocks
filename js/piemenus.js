@@ -4054,7 +4054,7 @@ const piemenuGrid = activity => {
             "imgsrc: images/grid/Bass.svg"
         ];
 
-        // Use the same strings as found in ExtraBlocks.js for i18n purposes.
+        // Use the same strings as found in ExtrasBlocks.js for i18n purposes.
         gridLabels = [
             "none",
             "Cartesian",
