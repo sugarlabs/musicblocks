@@ -3591,12 +3591,6 @@ class Activity {
                         {
                             keys: platformKeys("Esc", "Esc"),
                             action: _("Hide block search when it is open")
-                        },
-                        {
-                            keys: platformKeys("d,r,m,f,s,l,t", "d,r,m,f,s,l,t"),
-                            action: _(
-                                "You can type d to create a do block and r to create a re block etc."
-                            )
                         }
                     ]
                 },
