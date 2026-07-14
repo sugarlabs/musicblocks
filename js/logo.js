@@ -1917,8 +1917,9 @@ class Logo {
                 // Highlight the current block
                 logo.blocks.highlight(blk, false);
                 logo._currentlyHighlightedBlock = blk;
-                // Force stage update so highlight is visible when blocks were shown during execution
-                if (logo.stage) {
+                // Force stage update so highlight is visible when blocks were shown during execution.
+                // Skip if the block is off-screen — the highlight is invisible anyway.
+                if (logo.stage && currentBlock._viewportVisible !== false) {
                     logo.deps.markStageDirty();
                 }
             }

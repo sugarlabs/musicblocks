@@ -753,7 +753,9 @@ class Block {
             }
         }
 
-        this.container.updateCache();
+        if (this._viewportVisible !== false) {
+            this.container.updateCache();
+        }
     }
 
     /**
@@ -835,7 +837,9 @@ class Block {
             }
         }
 
-        this.container.updateCache();
+        if (this._viewportVisible !== false) {
+            this.container.updateCache();
+        }
     }
 
     unhighlightSelectedBlocks(blk, selection) {
