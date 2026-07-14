@@ -56,6 +56,10 @@ function setupNumberBlocks(activity) {
      */
     const handleMathError = (logo, error, blk, onError = NANERRORMSG) => {
         logo.stopTurtle = true;
+        if (error && error.message === "DivByZeroError") {
+            activity.errorMsg(ZERODIVIDEERRORMSG, blk);
+            return;
+        }
         activity.errorMsg(onError, blk);
     };
 

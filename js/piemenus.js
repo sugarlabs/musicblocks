@@ -1306,8 +1306,9 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
     const __selectionChanged = () => {
         const label = that._customWheel.navItems[that._customWheel.selectedNavItemIndex].title;
         const note = that._cusNoteWheel.navItems[that._cusNoteWheel.selectedNavItemIndex].title;
-        that.value = note;
-        that.text.text = note;
+        const centsMatch = (that.value || "").match(/\([+-]?\d+¢\)/);
+        that.value = centsMatch ? note + centsMatch[0] : note;
+        that.text.text = centsMatch ? note + centsMatch[0] : note;
         let octave = 4;
 
         if (hasOctaveWheel) {
@@ -4038,7 +4039,7 @@ const piemenuGrid = activity => {
             ""
         ];
 
-        gridLabels = ["Blank", "Cartesian", "Cartesian/Polar", "Polar", "Blank"];
+        gridLabels = ["none", "Cartesian", "Cartesian/Polar", "polar", "none"];
     } else {
         grids = [
             "imgsrc: images/grid/blank.svg",
@@ -4053,17 +4054,18 @@ const piemenuGrid = activity => {
             "imgsrc: images/grid/Bass.svg"
         ];
 
+        // Use the same strings as found in ExtrasBlocks.js for i18n purposes.
         gridLabels = [
-            "Blank",
+            "none",
             "Cartesian",
             "Cartesian/Polar",
-            "Polar",
-            "Treble",
-            "Grand",
-            "Mezzo Soprano",
-            "Alto",
-            "Tenor",
-            "Bass"
+            "polar",
+            "treble",
+            "grand staff",
+            "mezzo-soprano",
+            "alto",
+            "tenor",
+            "bass"
         ];
     }
 
@@ -4096,7 +4098,7 @@ const piemenuGrid = activity => {
             activity.turtles.currentGrid = i;
             activity.turtles.doGrid(i);
         };
-        activity.turtles.gridWheel.navItems[i].setTooltip(gridLabels[i]);
+        activity.turtles.gridWheel.navItems[i].setTooltip(_(gridLabels[i]));
     }
 
     activity.turtles._exitWheel.colors = platformColor.exitWheelcolors;

@@ -13,15 +13,15 @@
    global
 
    ValueBlock, NOINPUTERRORMSG, NANERRORMSG, last, FlowBlock,
-   FlowClampBlock, Singer, numberToPitch, frequencyToPitch, getNote,
-   INVALIDPITCH, pitchToNumber, LeftBlock, SHARP, FLAT, DOUBLEFLAT,
-   DOUBLESHARP, NATURAL, FIXEDSOLFEGE, SOLFEGENAMES1, buildScale,
-   NOTENAMES, NOTENAMES1, getPitchInfo, YSTAFFOCTAVEHEIGHT,
-   YSTAFFNOTEHEIGHT, MUSICALMODES, keySignatureToMode, ALLNOTENAMES,
-   nthDegreeToPitch, A0, C8, calcOctave, SOLFEGECONVERSIONTABLE,
-   NOTESFLAT, NOTESSHARP, NOTESTEP, scaleDegreeToPitchMapping,
-   INTERVALVALUES
- */
+    FlowClampBlock, Singer, numberToPitch, frequencyToPitch, getNote,
+    INVALIDPITCH, pitchToNumber, LeftBlock, SHARP, FLAT, DOUBLEFLAT,
+     DOUBLESHARP, NATURAL, FIXEDSOLFEGE, SOLFEGENAMES1, buildScale,
+    NOTENAMES, NOTENAMES1, getPitchInfo, YSTAFFOCTAVEHEIGHT,
+    YSTAFFNOTEHEIGHT, MUSICALMODES, keySignatureToMode, ALLNOTENAMES,
+    nthDegreeToPitch, A0, C8, calcOctave, SOLFEGECONVERSIONTABLE,
+     NOTESFLAT, NOTESSHARP, NOTESTEP, scaleDegreeToPitchMapping,
+     INTERVALVALUES, CENTSSYMBOL
+  */
 
 /* exported setupPitchBlocks */
 
@@ -941,15 +941,26 @@ function setupPitchBlocks(activity) {
             this.hidden = true;
         }
 
+        static _parseCents(value) {
+            if (typeof value !== "string") return [value, 0];
+            const match = value.match(
+                new RegExp(`^([A-Ga-g](?:[#b♯♭]|𝄪|𝄫)?)(\\(([+-]\\d+)${CENTSSYMBOL}\\))?$`)
+            );
+            if (match) {
+                return [match[1], match[3] !== undefined ? parseInt(match[3], 10) : 0];
+            }
+            return [value, 0];
+        }
+
         flow(args, logo, turtle, blk) {
             if (args[0] === null || args[1] === null) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 logo.stopTurtle = true;
                 return;
             } else {
-                const note = args[0];
+                const [note, cents] = CustomNoteBlock._parseCents(args[0]);
                 const octave = args[1];
-                return Singer.processPitch(activity, note, octave, 0);
+                return Singer.processPitch(activity, note, octave, cents, turtle, blk);
             }
         }
     }
@@ -1242,7 +1253,9 @@ function setupPitchBlocks(activity) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 logo.stopTurtle = true;
             } else {
-                return Singer.PitchActions.playPitch(args[0], args[1], 0, turtle, blk);
+                const [note, cents] = CustomNoteBlock._parseCents(args[0]);
+                const octave = args[1];
+                return Singer.PitchActions.playPitch(note, octave, cents, turtle, blk);
             }
         }
     }

@@ -472,6 +472,14 @@ const transport = {
     get isAvailable() {
         return typeof Tone !== "undefined" && Tone.Transport;
     },
+    get isClockRunning() {
+        return (
+            this.isAvailable &&
+            typeof Tone.context !== "undefined" &&
+            Tone.context.state === "running" &&
+            Tone.Transport.state === "started"
+        );
+    },
     start() {
         if (this.isAvailable) Tone.Transport.start();
     },
@@ -761,6 +769,7 @@ function Synth() {
                 //To get frequencies in Temperament Widget.
                 this.temperamentChanged(temperament, this.startingPitch);
             }
+            Singer.clearPitchToFrequencyCache();
         }
 
         if (this.inTemperament === "equal") {
@@ -785,7 +794,7 @@ function Synth() {
 
         const __getFrequency = oneNote => {
             const parsed = parseNoteString(oneNote);
-            const noteName = parsed[0];
+            const noteName = normalizeNoteAccidentals(parsed[0]);
             const octave = parsed[1];
 
             for (const note in this.noteFrequencies) {
@@ -796,7 +805,7 @@ function Synth() {
                     } else {
                         //Note to be played is not in the same octave.
                         const power = octave - this.noteFrequencies[note][0];
-                        return this.noteFrequencies[note][1] * Math.pow(2, power);
+                        return this.noteFrequencies[note][1] * Math.pow(getOctaveRatio(), power);
                     }
                 }
             }
@@ -1801,6 +1810,13 @@ function Synth() {
             return false;
         };
 
+        // Normalize Unicode accidentals to ASCII so Tone.js can parse the note names.
+        if (typeof notes === "string") {
+            notes = normalizeNoteAccidentals(notes);
+        } else if (Array.isArray(notes)) {
+            notes = notes.map(n => (typeof n === "string" ? normalizeNoteAccidentals(n) : n));
+        }
+
         if (needsFreqConversion()) {
             if (typeof notes === "number") {
                 notes = notes;
@@ -1872,7 +1888,8 @@ function Synth() {
                             paramsEffects.doTremolo ||
                             paramsEffects.doPhaser ||
                             paramsEffects.doChorus ||
-                            paramsEffects.doNeighbor));
+                            paramsEffects.doNeighbor ||
+                            (paramsEffects.doPortamento && setNote)));
 
                 if (!_needsGraphRewire) {
                     // Apply in-place property mutations then take the fast path.
@@ -2563,6 +2580,10 @@ function Synth() {
     };
 
     const _disposeRecordingPlayer = () => {
+        if (this._recordingPlayTimeout) {
+            clearTimeout(this._recordingPlayTimeout);
+            this._recordingPlayTimeout = null;
+        }
         if (this.player) {
             try {
                 if (typeof this.player.stop === "function") {
@@ -2615,11 +2636,45 @@ function Synth() {
      * @function
      * @memberof Synth
      */
-    this.playRecording = async () => {
+    this.playRecording = async onEnded => {
         _disposeRecordingPlayer();
+        if (!this.audioURL) {
+            if (typeof onEnded === "function") {
+                onEnded();
+            }
+            return;
+        }
+        await Tone.start();
+        if (
+            Tone.context &&
+            Tone.context.state !== "running" &&
+            typeof Tone.context.resume === "function"
+        ) {
+            await Tone.context.resume();
+        }
         this.player = new Tone.Player().toDestination();
+        let endedCalled = false;
+        const handleEnded = () => {
+            if (endedCalled) return;
+            endedCalled = true;
+            if (this._recordingPlayTimeout) {
+                clearTimeout(this._recordingPlayTimeout);
+                this._recordingPlayTimeout = null;
+            }
+            if (typeof onEnded === "function") {
+                onEnded();
+            }
+        };
+        this.player.onstop = handleEnded;
+        if ("onended" in this.player) {
+            this.player.onended = handleEnded;
+        }
         await this.player.load(this.audioURL);
         this.player.start();
+        if (this.player.buffer && this.player.buffer.duration) {
+            const durationMs = Math.ceil(this.player.buffer.duration * 1000) + 100;
+            this._recordingPlayTimeout = setTimeout(handleEnded, durationMs);
+        }
     };
 
     /**
@@ -3853,7 +3908,7 @@ function Synth() {
     this.startingPitchOctave = 4;
     this.octaveTranspose = 0;
     this.inTemperament = "equal";
-    this.changeInTemperament = "equal";
+    this.changeInTemperament = false;
     this.inTransposition = 0;
     this.transposition = 2;
     this.playbackRate = 1;

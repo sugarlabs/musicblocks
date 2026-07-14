@@ -61,7 +61,8 @@ describe("Utility Functions (logic-only)", () => {
         newTone,
         preloadProjectSamples,
         resolveInstrumentName,
-        Synth;
+        Synth,
+        transport;
 
     const turtle = "turtle1";
 
@@ -193,6 +194,7 @@ describe("Utility Functions (logic-only)", () => {
         newTone = Synth.newTone;
         preloadProjectSamples = Synth.preloadProjectSamples;
         resolveInstrumentName = Synth.resolveInstrumentName;
+        transport = Synth.transport;
     });
 
     describe("setupRecorder", () => {
@@ -896,6 +898,11 @@ describe("Utility Functions (logic-only)", () => {
     });
 
     describe("Tone Transport Controls", () => {
+        afterEach(() => {
+            Tone.context.state = "running";
+            Tone.Transport.state = "started";
+        });
+
         test("start should call Tone.Transport.start", () => {
             const startSpy = jest.spyOn(Tone.Transport, "start");
 
@@ -930,6 +937,28 @@ describe("Utility Functions (logic-only)", () => {
 
             startSpy.mockRestore();
             stopSpy.mockRestore();
+        });
+
+        test("isAvailable returns truthy when Tone.Transport exists", () => {
+            expect(transport.isAvailable).toBeTruthy();
+        });
+
+        test("isClockRunning returns true when context is running and transport is started", () => {
+            Tone.context.state = "running";
+            Tone.Transport.state = "started";
+            expect(transport.isClockRunning).toBe(true);
+        });
+
+        test("isClockRunning returns false when context is suspended", () => {
+            Tone.context.state = "suspended";
+            Tone.Transport.state = "started";
+            expect(transport.isClockRunning).toBe(false);
+        });
+
+        test("isClockRunning returns false when transport is stopped", () => {
+            Tone.context.state = "running";
+            Tone.Transport.state = "stopped";
+            expect(transport.isClockRunning).toBe(false);
         });
     });
 
@@ -1373,7 +1402,7 @@ describe("Utility Functions (logic-only)", () => {
     });
 
     describe("_performNotes frequency conversion for non-standard notes", () => {
-        it("should convert Unicode accidental notes to frequency under equal temperament", async () => {
+        it("should normalize Unicode accidental notes and pass through as standard notes under equal temperament", async () => {
             const mockSynth = {
                 toDestination: jest.fn().mockReturnThis(),
                 triggerAttackRelease: jest.fn()
@@ -1384,7 +1413,8 @@ describe("Utility Functions (logic-only)", () => {
 
             expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
             const noteArg = mockSynth.triggerAttackRelease.mock.calls[0][0];
-            expect(typeof noteArg).toBe("number");
+            // "F♭4" -> "Fb4" is a standard note name, so it passes through as a string.
+            expect(noteArg).toBe("Fb4");
         });
 
         it("should convert double-accidental notes to frequency under equal temperament", async () => {
@@ -1415,7 +1445,7 @@ describe("Utility Functions (logic-only)", () => {
             expect(noteArg).toBe("C4");
         });
 
-        it("should convert array of notes containing Unicode accidentals", async () => {
+        it("should normalize and pass array of notes containing Unicode accidentals", async () => {
             const mockSynth = {
                 toDestination: jest.fn().mockReturnThis(),
                 triggerAttackRelease: jest.fn()
@@ -1427,8 +1457,10 @@ describe("Utility Functions (logic-only)", () => {
             expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
             const noteArg = mockSynth.triggerAttackRelease.mock.calls[0][0];
             expect(Array.isArray(noteArg)).toBe(true);
-            expect(typeof noteArg[0]).toBe("number");
-            expect(typeof noteArg[1]).toBe("number");
+            // After normalization, "F♭4" -> "Fb4" which is a standard note name
+            // that Tone.js can parse directly, so it passes through as a string.
+            expect(noteArg[0]).toBe("Fb4");
+            expect(noteArg[1]).toBe("C4");
         });
 
         it("should not convert numerical notes", async () => {
@@ -1509,6 +1541,77 @@ describe("Utility Functions (logic-only)", () => {
             );
 
             Synth._getFrequency = originalGetFrequency;
+        });
+    });
+
+    describe("_performNotes glide/portamento setNote routing ", () => {
+        it("should call setNote (continuous glide) instead of triggerAttackRelease when doPortamento and setNote are true", async () => {
+            const mockSynth = {
+                oscillator: {},
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn(),
+                setNote: jest.fn(),
+                chain: jest.fn().mockReturnThis(),
+                disconnect: jest.fn(),
+                connect: jest.fn()
+            };
+            Synth.inTemperament = "equal";
+
+            const paramsEffects = {
+                doPortamento: true,
+                portamento: 0.05
+            };
+
+            await _performNotes.call(Synth, mockSynth, "D4", 0.5, paramsEffects, null, true, 0);
+
+            // This is the regression check: glide notes must continue the same
+            // voice via setNote, not retrigger a fresh attack+release.
+            expect(mockSynth.setNote).toHaveBeenCalledWith("D4");
+            expect(mockSynth.triggerAttackRelease).not.toHaveBeenCalled();
+        });
+
+        it("should still call triggerAttackRelease for a portamento note when setNote is false", async () => {
+            const mockSynth = {
+                oscillator: {},
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn(),
+                setNote: jest.fn(),
+                chain: jest.fn().mockReturnThis(),
+                disconnect: jest.fn(),
+                connect: jest.fn()
+            };
+            Synth.inTemperament = "equal";
+
+            const paramsEffects = {
+                doPortamento: true,
+                portamento: 0.05
+            };
+
+            await _performNotes.call(Synth, mockSynth, "C4", 0.5, paramsEffects, null, false, 0);
+
+            // Non-continuation notes (setNote=false) should still play normally.
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+            expect(mockSynth.setNote).not.toHaveBeenCalled();
+        });
+
+        it("should route plain (non-portamento) notes through the fast path unaffected", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn(),
+                setNote: jest.fn()
+            };
+            Synth.inTemperament = "equal";
+
+            const paramsEffects = {
+                doPartials: true,
+                partials: [1]
+            };
+
+            await _performNotes.call(Synth, mockSynth, "E4", 0.5, paramsEffects, null, true, 0);
+
+            // No portamento involved — fast path is fine here, no regression expected.
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+            expect(mockSynth.setNote).not.toHaveBeenCalled();
         });
     });
 

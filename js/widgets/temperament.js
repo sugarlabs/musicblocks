@@ -413,8 +413,10 @@ function TemperamentWidget() {
                 }
 
                 for (let i = 0; i < that.ratios.length; i++) {
-                    powers[i] = 12 * (Math.log10(that.ratios[i]) / Math.log10(that.powerBase));
-                    that.ratios[i] = Math.pow(that.powerBase, powers[i] / 12);
+                    powers[i] =
+                        that.pitchNumber *
+                        (Math.log10(that.ratios[i]) / Math.log10(that.powerBase));
+                    that.ratios[i] = Math.pow(that.powerBase, powers[i] / that.pitchNumber);
                     compareRatios[i] = that.ratios[i].toFixed(2);
                     that.frequencies[i] = that.ratios[i] * frequency;
                     that.frequencies[i] = that.frequencies[i].toFixed(2);
@@ -1879,8 +1881,9 @@ function TemperamentWidget() {
             that.frequencies = [];
 
             for (let i = 0; i < len; i++) {
-                powers[i] = 12 * (Math.log10(that.ratios[i]) / Math.log10(that.powerBase));
-                that.ratios[i] = Math.pow(ratio, powers[i] / 12);
+                powers[i] =
+                    that.pitchNumber * (Math.log10(that.ratios[i]) / Math.log10(that.powerBase));
+                that.ratios[i] = Math.pow(ratio, powers[i] / that.pitchNumber);
                 compareRatios[i] = that.ratios[i].toFixed(2);
                 that.frequencies[i] = that.ratios[i] * frequency;
                 that.frequencies[i] = that.frequencies[i].toFixed(2);

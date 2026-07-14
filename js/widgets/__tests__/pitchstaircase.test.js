@@ -332,6 +332,333 @@ describe("PitchStaircase Widget", () => {
         });
     });
 
+    // --- _playOne Tests ---
+    describe("_playOne", () => {
+        test("triggers the synth with the cell frequency and toggles the active class", () => {
+            jest.useFakeTimers();
+
+            psc.activity = { logo: { synth: { trigger: jest.fn() } } };
+            const stepCell = {
+                classList: { add: jest.fn(), remove: jest.fn() },
+                getAttribute: jest.fn(() => "220"),
+                style: {}
+            };
+            const playCell = {
+                getAttribute: jest.fn(() => "0"),
+                replaceChildren: jest.fn(),
+                classList: { contains: jest.fn(() => false) }
+            };
+
+            psc._playOne(stepCell, playCell);
+
+            expect(stepCell.classList.add).toHaveBeenCalledWith("active");
+            expect(psc.activity.logo.synth.trigger).toHaveBeenCalledWith(
+                0,
+                220,
+                1,
+                global.DEFAULTVOICE,
+                null,
+                null
+            );
+
+            expect(stepCell.classList.remove).not.toHaveBeenCalled();
+            jest.advanceTimersByTime(1000);
+            expect(stepCell.classList.remove).toHaveBeenCalledWith("active");
+
+            jest.useRealTimers();
+        });
+    });
+
+    // --- _playAll Tests ---
+    describe("_playAll", () => {
+        const makeStepCell = () => ({ classList: { add: jest.fn(), remove: jest.fn() } });
+
+        test("triggers every stair note and clears the active class after the timeout", () => {
+            jest.useFakeTimers();
+
+            psc.Stairs = [
+                ["A", "", 220.0],
+                ["B", "", 246.94]
+            ];
+            const cells = [makeStepCell(), makeStepCell()];
+            psc._stepTables = cells.map(cell => ({ rows: [{ cells: [null, cell] }] }));
+            psc.activity = { logo: { synth: { trigger: jest.fn() } } };
+
+            psc._playAll();
+
+            expect(global.normalizeNoteAccidentals).toHaveBeenCalledTimes(2);
+            expect(psc.activity.logo.synth.trigger).toHaveBeenCalledTimes(2);
+            cells.forEach(cell => expect(cell.classList.add).toHaveBeenCalledWith("active"));
+
+            jest.advanceTimersByTime(1000);
+            cells.forEach(cell => expect(cell.classList.remove).toHaveBeenCalledWith("active"));
+
+            jest.useRealTimers();
+        });
+    });
+
+    // --- playUpAndDown Tests ---
+    describe("playUpAndDown", () => {
+        test("plays the last stair then walks downward via _playNext", () => {
+            psc.Stairs = [
+                ["A", "", 220.0],
+                ["B", "", 246.94],
+                ["C", "", 261.63]
+            ];
+            const lastCell = { classList: { add: jest.fn(), remove: jest.fn() } };
+            psc._stepTables = [
+                { rows: [{ cells: [null, {}] }] },
+                { rows: [{ cells: [null, {}] }] },
+                { rows: [{ cells: [null, lastCell] }] }
+            ];
+            psc.activity = { logo: { synth: { trigger: jest.fn() } } };
+            psc._playNext = jest.fn();
+
+            psc.playUpAndDown();
+
+            expect(lastCell.classList.add).toHaveBeenCalledWith("active");
+            expect(psc.activity.logo.synth.trigger).toHaveBeenCalled();
+            expect(psc._playNext).toHaveBeenCalledWith(1, -1);
+        });
+    });
+
+    // --- _dissectStair Tests ---
+    describe("_dissectStair", () => {
+        const makeEvent = id => ({ target: { getAttribute: jest.fn(() => String(id)) } });
+
+        beforeEach(() => {
+            psc._musicRatio1 = { value: "3" };
+            psc._musicRatio2 = { value: "2" };
+            psc._history = [];
+            psc._makeStairs = jest.fn();
+        });
+
+        test("returns early without rebuilding when the frequency is not a known stair", () => {
+            psc.Stairs = [["A", "", 220.0, 1, 1, 220.0, 4]];
+
+            psc._dissectStair(makeEvent(999));
+
+            expect(psc.Stairs).toHaveLength(1);
+            expect(psc._makeStairs).not.toHaveBeenCalled();
+        });
+
+        test("inserts a new lower-frequency step and rebuilds the staircase", () => {
+            psc.Stairs = [["A", "", 220.0, 1, 1, 220.0, 4]];
+
+            psc._dissectStair(makeEvent(220));
+
+            expect(psc.Stairs).toHaveLength(2);
+            expect(psc.Stairs[0][2]).toBeCloseTo(330);
+            expect(psc._history).toContain(0);
+            expect(psc._makeStairs).toHaveBeenCalled();
+        });
+
+        test("sanitises invalid ratio inputs to their defaults", () => {
+            psc._musicRatio1 = { value: "not-a-number" };
+            psc._musicRatio2 = { value: "-5" };
+            psc.Stairs = [["A", "", 220.0, 1, 1, 220.0, 4]];
+
+            psc._dissectStair(makeEvent(220));
+
+            expect(psc._musicRatio1.value).toBe(3);
+            expect(psc._musicRatio2.value).toBe(2);
+        });
+
+        test("replaces an existing step when the computed frequency already exists", () => {
+            psc.Stairs = [
+                ["A", "", 330.0, 1, 1, 330.0, 4],
+                ["A", "", 220.0, 1, 1, 220.0, 4]
+            ];
+
+            psc._dissectStair(makeEvent(220));
+
+            expect(psc.Stairs).toHaveLength(2);
+            expect(psc._makeStairs).toHaveBeenCalled();
+        });
+    });
+
+    // --- _makeStairs Tests ---
+    describe("_makeStairs", () => {
+        test("renders a row and step table for each stair using the real DOM", () => {
+            psc._pscTable = document.createElement("table");
+            psc._cellScale = 1;
+            psc._stepTables = [];
+            psc.Stairs = [
+                ["A", "", 220.0, 1, 1, 220.0, 4],
+                ["B", "", 246.94, 1, 1, 246.94, 4]
+            ];
+
+            psc._makeStairs();
+
+            expect(psc._stepTables).toHaveLength(2);
+            expect(psc._pscTable.rows).toHaveLength(2);
+            expect(psc._stepTables[0].rows[0].cells.length).toBe(2);
+        });
+
+        test("wires a click handler on the step cell that dissects the stair", () => {
+            psc._pscTable = document.createElement("table");
+            psc._cellScale = 1;
+            psc._stepTables = [];
+            psc.Stairs = [["A", "", 220.0, 1, 1, 220.0, 4]];
+            psc._dissectStair = jest.fn();
+
+            psc._makeStairs();
+
+            const stepCell = psc._stepTables[0].rows[0].cells[1];
+            stepCell.dispatchEvent(new window.Event("click"));
+            expect(psc._dissectStair).toHaveBeenCalled();
+        });
+    });
+
+    // --- _save Tests ---
+    describe("_save", () => {
+        let mockActivity;
+
+        beforeEach(() => {
+            mockActivity = {
+                palettes: { dict: { foo: { hideMenu: jest.fn() } } },
+                refreshCanvas: jest.fn(),
+                blocks: { loadNewBlocks: jest.fn() },
+                textMsg: jest.fn()
+            };
+            psc.activity = mockActivity;
+            global.activity = { textMsg: jest.fn() };
+        });
+
+        afterEach(() => {
+            delete global.activity;
+        });
+
+        test("hides palettes, refreshes the canvas, and loads a generated block stack", () => {
+            psc.Stairs = [["A", "", 220.0, 1, 1, 220.0, 4]];
+
+            psc._save();
+
+            expect(mockActivity.palettes.dict.foo.hideMenu).toHaveBeenCalledWith(true);
+            expect(mockActivity.refreshCanvas).toHaveBeenCalled();
+            expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalledWith(expect.any(Array));
+            expect(global.activity.textMsg).toHaveBeenCalled();
+        });
+
+        test("emits a pitch block when the pitch has zero cents", () => {
+            global.frequencyToPitch.mockReturnValueOnce(["A", "", 0]);
+            psc.Stairs = [["A", "", 220.0, 1, 1, 220.0, 4]];
+
+            psc._save();
+
+            const stack = mockActivity.blocks.loadNewBlocks.mock.calls[0][0];
+            expect(stack.some(block => block[1] === "pitch")).toBe(true);
+        });
+
+        test("emits a hertz block when the pitch has non-zero cents", () => {
+            psc.Stairs = [["A", "", 220.0, 1, 1, 220.0, 4]];
+
+            psc._save();
+
+            const stack = mockActivity.blocks.loadNewBlocks.mock.calls[0][0];
+            expect(stack.some(block => block[1] === "hertz")).toBe(true);
+        });
+    });
+
+    // --- init button handlers Tests ---
+    describe("init button handlers", () => {
+        let mockActivity;
+        let buttons;
+        let widgetWindow;
+        let wfbElement;
+
+        beforeEach(() => {
+            buttons = {};
+            widgetWindow = {
+                clear: jest.fn(),
+                show: jest.fn(),
+                addButton: jest.fn((icon, size, label) => {
+                    const button = {
+                        onclick: null,
+                        replaceChildren: jest.fn(),
+                        classList: { contains: jest.fn(() => false) }
+                    };
+                    buttons[label] = button;
+                    return button;
+                }),
+                addInputButton: jest.fn(value => ({ value, addEventListener: jest.fn() })),
+                addDivider: jest.fn(),
+                getWidgetBody: jest.fn(() => ({ append: jest.fn(), style: {} })),
+                destroy: jest.fn(),
+                onclose: null,
+                onmaximize: null,
+                _maximized: false
+            };
+            window.widgetWindows.windowFor = jest.fn(() => widgetWindow);
+
+            wfbElement = { style: {} };
+            document.getElementsByClassName.mockReturnValue([wfbElement]);
+
+            mockActivity = {
+                logo: { synth: { setMasterVolume: jest.fn(), stop: jest.fn() } },
+                textMsg: jest.fn(),
+                palettes: { dict: {} }
+            };
+
+            psc.init(mockActivity);
+        });
+
+        test("Play chord button plays all stairs", () => {
+            psc._playAll = jest.fn();
+            buttons["Play chord"].onclick();
+            expect(psc._playAll).toHaveBeenCalled();
+        });
+
+        test("Play scale button plays up and down", () => {
+            psc.playUpAndDown = jest.fn();
+            buttons["Play scale"].onclick();
+            expect(psc.playUpAndDown).toHaveBeenCalled();
+        });
+
+        test("Undo button removes the last stair", () => {
+            psc._undo = jest.fn();
+            buttons["Undo"].onclick();
+            expect(psc._undo).toHaveBeenCalled();
+        });
+
+        test("Clear button repeatedly undoes until exhausted", () => {
+            psc._undo = jest
+                .fn()
+                .mockReturnValueOnce(true)
+                .mockReturnValueOnce(true)
+                .mockReturnValue(false);
+            buttons["Clear"].onclick();
+            expect(psc._undo).toHaveBeenCalledTimes(3);
+        });
+
+        test("Save button saves once and holds a debounce lock", () => {
+            jest.useFakeTimers();
+            psc._save = jest.fn();
+
+            buttons["Save"].onclick();
+            expect(psc._save).toHaveBeenCalledTimes(1);
+            expect(psc._save_lock).toBe(true);
+
+            buttons["Save"].onclick();
+            expect(psc._save).toHaveBeenCalledTimes(1);
+
+            jest.advanceTimersByTime(1000);
+            expect(psc._save_lock).toBe(false);
+
+            jest.useRealTimers();
+        });
+
+        test("onmaximize grows the widget body when maximized", () => {
+            widgetWindow._maximized = true;
+            widgetWindow.onmaximize();
+            expect(wfbElement.style.maxHeight).toBe(16 * PitchStaircase.BUTTONSIZE + "px");
+
+            widgetWindow._maximized = false;
+            widgetWindow.onmaximize();
+            expect(wfbElement.style.maxHeight).toBe(10 * PitchStaircase.BUTTONSIZE + "px");
+        });
+    });
+
     // --- _playNext closed guard Tests ---
     describe("_playNext closed guard", () => {
         test("should not trigger synth when closed is true inside _playNext setTimeout", () => {

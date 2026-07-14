@@ -358,6 +358,10 @@ class Blocks {
         this._checkBoundsScheduled = false;
         // Cached drag group computed once on mousedown, reused during pressmove
         this._cachedDragGroup = null;
+        // Blocks in the active drag group are exempt from viewport culling
+        // during the drag to avoid "pop-in" when off-screen siblings are
+        // dragged into view. Cleared on pressup/mouseout.
+        this._dragActiveGroup = null;
         // Cached top-block map for moveAllBlocksExcept edge-scroll
         this._topBlockCache = null;
         // Throttle timestamp for edge-scroll calls
@@ -547,6 +551,9 @@ class Blocks {
 
             // Rebuild spatial grid after scale change repositions blocks
             this._rebuildSpatialGrid();
+
+            // Viewport changed — recompute culling.
+            this._updateViewportCulling();
 
             /** Force a refresh. */
             await delayExecution(100);
@@ -1171,6 +1178,14 @@ class Blocks {
             if (this._deferCheckBoundsCount === 0 && this._checkBoundsPending) {
                 this._checkBoundsPending = false;
                 this.scheduleCheckBounds();
+            }
+
+            if (this._deferCheckBoundsCount === 0) {
+                // Re-cull now — docks repositioned blocks relative to the
+                // viewport. The render loop only re-culls on container move,
+                // so without this, a block that shifted on-screen would stay
+                // invisible until the user scrolls.
+                this._updateViewportCulling();
             }
         };
 
@@ -3544,6 +3559,26 @@ class Blocks {
             myBlock.container.snapToPixelEnabled = true;
             myBlock.container.x = 0;
             myBlock.container.y = 0;
+
+            // Support viewport culling via _viewportVisible (eye icon takes priority).
+            myBlock.container._origIsVisible = myBlock.container.isVisible;
+            myBlock.container.isVisible = function () {
+                if (!myBlock._viewportVisible) {
+                    // During a drag, show blocks in the active drag group even
+                    // if they are off-screen, so the user sees the entire stack
+                    // follow the cursor smoothly instead of "popping in" on release.
+                    if (
+                        myBlock.blocks &&
+                        myBlock.blocks._dragActiveGroup &&
+                        myBlock.blocks._dragActiveGroup.has(myBlock.blockIndex)
+                    ) {
+                        return this._origIsVisible.call(this);
+                    }
+                    return false;
+                }
+                return this._origIsVisible.call(this);
+            };
+
             this._updateSpatialGrid(this.blockList.length - 1);
 
             /** and we need to load the images into the container. */
@@ -4022,6 +4057,7 @@ class Blocks {
          */
         this.clearCachedDragGroup = () => {
             this._cachedDragGroup = null;
+            this._dragActiveGroup = null;
         };
 
         /**
@@ -4452,7 +4488,7 @@ class Blocks {
                     continue;
                 }
                 const blkParent = this.blockList[myBlock.connections[0]];
-                if (blkParent === null) {
+                if (!blkParent) {
                     continue;
                 }
 
@@ -4514,15 +4550,17 @@ class Blocks {
                         this.blockList[blk].name
                     )
                 ) {
-                    if (this.blockList[blk].privateData === oldName) {
-                        this.blockList[blk].privateData = newName;
-                        let label = newName;
-                        if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                            label = label.substr(0, STRINGLEN) + "...";
-                        }
+                    const targetBlock = this.blockList[blk];
 
-                        this.blockList[blk].overrideName = label;
-                        this.blockList[blk].regenerateArtwork();
+                    let activeName = targetBlock.privateData || targetBlock.overrideName;
+                    if (!activeName && targetBlock.protoblock && targetBlock.protoblock.defaults) {
+                        activeName = targetBlock.protoblock.defaults[0];
+                    }
+
+                    if (activeName === oldName) {
+                        targetBlock.privateData = newName;
+                        targetBlock.overrideName = newName;
+                        targetBlock.regenerateArtwork();
                     }
                 }
             }
@@ -7627,6 +7665,25 @@ class Blocks {
                 this.activity.refreshCanvas();
             }
 
+            // Announce block sent to trash to screen readers (aria-live only, no visual message)
+            const blockLabel =
+                (myBlock.protoblock.staticLabels && myBlock.protoblock.staticLabels[0]) ||
+                myBlock.name;
+            const liveRegion =
+                document.getElementById("mbA11yLiveRegion") ||
+                (() => {
+                    const r = document.createElement("div");
+                    r.id = "mbA11yLiveRegion";
+                    r.setAttribute("role", "status");
+                    r.setAttribute("aria-live", "polite");
+                    r.setAttribute("aria-atomic", "true");
+                    r.style.cssText =
+                        "position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;";
+                    document.body.appendChild(r);
+                    return r;
+                })();
+            liveRegion.textContent = blockLabel + " " + _("block sent to trash");
+
             /** Adjust the stack from which we just deleted blocks. */
             if (parentBlock !== null) {
                 const topBlk = this.findTopBlock(parentBlock);
@@ -7772,6 +7829,49 @@ class Blocks {
         };
 
         /***
+         * Culls off-screen blocks from display list rendering.
+         * Recompute after scroll, pan, resize, or project load.
+         */
+        this._updateViewportCulling = () => {
+            const canvas = this.activity.canvas;
+            // Skip culling until the canvas has been initialized with valid dimensions.
+            // Calling culling too early (e.g. during project load before layout is final)
+            // would mark on-screen blocks as off-screen, and since the viewport never
+            // moves afterward, they'd stay invisible.
+            if (!canvas || !canvas.width || !canvas.height) return;
+
+            const container = this.activity.blocksContainer;
+            if (!container) return;
+
+            // Viewport rect in container-space
+            const vpLeft = -container.x;
+            const vpTop = -container.y;
+            const vpRight = vpLeft + canvas.width;
+            const vpBottom = vpTop + canvas.height;
+
+            for (let i = 0; i < this.blockList.length; i++) {
+                const block = this.blockList[i];
+                if (!block || block.trash || !block.container) {
+                    continue;
+                }
+                const c = block.container;
+                // AABB overlap test against viewport rect.
+                // Skip blocks with zero dimensions (async bitmap not yet loaded)
+                // to avoid culling them before their size is known.
+                if (!block.width || !block.height) {
+                    block._viewportVisible = true;
+                    continue;
+                }
+                block._viewportVisible = !(
+                    c.x + block.width <= vpLeft ||
+                    c.x >= vpRight ||
+                    c.y + block.height <= vpTop ||
+                    c.y >= vpBottom
+                );
+            }
+        };
+
+        /***
          * Hides all the blocks.
          *
          * @returns {void}
@@ -7790,6 +7890,8 @@ class Blocks {
         this.showBlocks = () => {
             this.activity.palettes.show();
             this.show();
+            // Recompute culling — off-screen blocks stay hidden during playback.
+            this._updateViewportCulling();
             this.bringToTop();
             this.activity.refreshCanvas();
         };

@@ -123,6 +123,13 @@ const SHARP = "♯";
 const FLAT = "♭";
 
 /**
+ * Symbol for cents.
+ * @constant {string}
+ * @default
+ */
+const CENTSSYMBOL = "\u00A2";
+
+/**
  * Symbol for a natural note.
  * @constant {string}
  * @default
@@ -305,7 +312,19 @@ const EQUIVALENTSHARPS = {
  * Maps from notes with specific accidentals to their equivalent natural notes.
  * @constant {Object.<string, string>}
  */
-const EQUIVALENTNATURALS = { "E♯": "F", "B♯": "C", "C♭": "B", "F♭": "E" };
+const EQUIVALENTNATURALS = {
+    "E♯": "F",
+    "B♯": "C",
+    "C♭": "B",
+    "F♭": "E",
+    "D𝄪": "E",
+    "A𝄪": "B",
+    "G𝄪": "A",
+    "E𝄪": "F♯",
+    "C𝄪": "D",
+    "F𝄪": "G",
+    "B𝄪": "C♯"
+};
 
 /**
  * Maps from natural notes to their equivalent notes with specific accidentals.
@@ -1734,6 +1753,7 @@ const INITIALTEMPERAMENTS = [
     [_("Equal (12EDO)"), "equal", "equal"],
     [_("Equal (5EDO)"), "equal5", "equal5"],
     [_("Equal (7EDO)"), "equal7", "equal7"],
+    [_("Equal (17EDO)"), "equal17", "equal17"],
     [_("Equal (19EDO)"), "equal19", "equal19"],
     [_("Equal (31EDO)"), "equal31", "equal31"],
     [_("5-limit Just Intonation"), "just intonation", "just intonation"],
@@ -1750,6 +1770,7 @@ let TEMPERAMENTS = [
     [_("Equal (12EDO)"), "equal", "equal"],
     [_("Equal (5EDO)"), "equal5", "equal5"],
     [_("Equal (7EDO)"), "equal7", "equal7"],
+    [_("Equal (17EDO)"), "equal17", "equal17"],
     [_("Equal (19EDO)"), "equal19", "equal19"],
     [_("Equal (31EDO)"), "equal31", "equal31"],
     [_("5-limit Just Intonation"), "just intonation", "just intonation"],
@@ -1767,6 +1788,7 @@ const PreDefinedTemperaments = {
     "equal": true,
     "equal5": true,
     "equal7": true,
+    "equal17": true,
     "equal19": true,
     "equal31": true,
     "just intonation": true,
@@ -2094,6 +2116,53 @@ const TEMPERAMENT = {
             "perfect 4",
             "perfect 5",
             "major 6",
+            "perfect 8"
+        ]
+    },
+    "equal17": {
+        isEDO: true,
+        edo: 17,
+        name: "Equal (17EDO)",
+        description: "17 Equal Divisions of the Octave",
+        ratios: [
+            1,
+            Math.pow(2, 1 / 17),
+            Math.pow(2, 2 / 17),
+            Math.pow(2, 3 / 17),
+            Math.pow(2, 4 / 17),
+            Math.pow(2, 5 / 17),
+            Math.pow(2, 6 / 17),
+            Math.pow(2, 7 / 17),
+            Math.pow(2, 8 / 17),
+            Math.pow(2, 9 / 17),
+            Math.pow(2, 10 / 17),
+            Math.pow(2, 11 / 17),
+            Math.pow(2, 12 / 17),
+            Math.pow(2, 13 / 17),
+            Math.pow(2, 14 / 17),
+            Math.pow(2, 15 / 17),
+            Math.pow(2, 16 / 17)
+        ],
+        octaveRatio: 2,
+        pitchNumber: 17,
+        interval: [
+            "perfect 1",
+            "minor 2",
+            "augmented 1",
+            "minor 3",
+            "major 2",
+            "augmented 2",
+            "major 3",
+            "perfect 4",
+            "augmented 4",
+            "diminished 5",
+            "perfect 5",
+            "augmented 5",
+            "minor 6",
+            "major 6",
+            "augmented 6",
+            "minor 7",
+            "major 7",
             "perfect 8"
         ]
     },
@@ -4473,8 +4542,13 @@ const numberToPitch = (i, temperament, startPitch, offset, activity) => {
             return [TEMPERAMENT[temperament][pitchNumber][1], o];
         }
     } else {
-        interval = TEMPERAMENT[temperament]["interval"][pitchNumber];
-        return getNoteFromInterval(startPitch, interval);
+        const intervalArray = TEMPERAMENT[temperament]["interval"];
+        const idx =
+            ((pitchNumber % intervalArray.length) + intervalArray.length) % intervalArray.length;
+        const octaveOffset = Math.floor(pitchNumber / intervalArray.length);
+        interval = intervalArray[idx];
+        const noteObj = getNoteFromInterval(startPitch, interval);
+        return [noteObj[0], noteObj[1] + octaveOffset];
     }
 };
 
@@ -6313,9 +6387,9 @@ const pitchToFrequency = (pitch, octave, cents, keySignature, temperament) => {
  * @param {string} keySignature - The key signature.
  * @returns {number} The calculated frequency.
  */
-const noteToFrequency = (note, keySignature) => {
+const noteToFrequency = (note, keySignature, temperament) => {
     const obj = noteToPitchOctave(note);
-    return pitchToFrequency(obj[0], obj[1], 0, keySignature);
+    return pitchToFrequency(obj[0], obj[1], 0, keySignature, temperament);
 };
 
 /**
@@ -7020,6 +7094,7 @@ if (typeof module !== "undefined" && module.exports) {
         MUSICALMODES,
         SHARP,
         FLAT,
+        CENTSSYMBOL,
         NOTENAMES,
         SOLFEGENAMES1,
         ALLNOTENAMES,

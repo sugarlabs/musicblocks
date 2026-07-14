@@ -182,7 +182,8 @@ describe("Toolbar Class", () => {
     test("renderLogoIcon sets up logo with correct interactions", () => {
         const elements = {
             "mb-logo": {
-                innerHTML: "",
+                textContent: "",
+                appendChild: jest.fn(),
                 onmouseenter: null,
                 onmouseleave: null,
                 onclick: null,
@@ -208,7 +209,7 @@ describe("Toolbar Class", () => {
 
         //Non-Japanese language
         toolbar.renderLogoIcon(mockOnClick);
-        expect(elements["mb-logo"].innerHTML).toBe("");
+        expect(elements["mb-logo"].textContent).toBe("");
         expect(typeof elements["mb-logo"].onmouseenter).toBe("function");
         expect(typeof elements["mb-logo"].onmouseleave).toBe("function");
         expect(typeof elements["mb-logo"].onclick).toBe("function");
@@ -225,8 +226,7 @@ describe("Toolbar Class", () => {
         // Japanese language
         toolbar.language = "ja";
         toolbar.renderLogoIcon(mockOnClick);
-        expect(elements["mb-logo"].innerHTML).toContain("logo-ja.svg");
-        expect(elements["mb-logo"].innerHTML).toContain("transform: scale(0.85)");
+        expect(elements["mb-logo"].appendChild).toHaveBeenCalled();
         elements["mb-logo"].onclick();
         expect(mockOnClick).toHaveBeenCalledTimes(2);
     });
@@ -385,10 +385,19 @@ describe("Toolbar Class", () => {
     });
 
     test("renderThemeSelectIcon sets onclick and updates theme selection", () => {
-        const themeSelectIcon = { onclick: null };
+        const themeSelectIcon = {
+            onclick: null,
+            textContent: "",
+            childNodes: [],
+            appendChild: jest.fn(),
+            cloneNode: jest.fn()
+        };
         const themes = ["light", "dark"];
         const themeBox = { setAttribute: jest.fn() };
-        global.docById.mockReturnValue(themeSelectIcon);
+        global.docById.mockImplementation(id => {
+            if (id === "themeSelectIcon") return themeSelectIcon;
+            return { childNodes: [], cloneNode: jest.fn() };
+        });
         global.localStorage.themePreference = "light";
         toolbar.renderThemeSelectIcon(themeBox, themes);
         expect(themeSelectIcon.onclick).toBeInstanceOf(Function);
@@ -576,7 +585,9 @@ describe("Toolbar Class", () => {
         const recordButton = {
             classList: { add: jest.fn() },
             style: { display: "" },
-            innerHTML: ""
+            innerHTML: "",
+            textContent: "",
+            appendChild: jest.fn()
         };
         global.docById.mockReturnValue(recordButton);
         global.fnBrowserDetect = jest.fn(() => "firefox");
@@ -592,6 +603,8 @@ describe("Toolbar Class", () => {
             classList: { add: jest.fn(), remove: jest.fn() },
             style: { display: "" },
             innerHTML: "",
+            textContent: "",
+            appendChild: jest.fn(),
             onclick: null
         };
 
@@ -599,6 +612,8 @@ describe("Toolbar Class", () => {
             classList: { add: jest.fn(), remove: jest.fn() },
             style: { display: "" },
             innerHTML: "",
+            textContent: "",
+            appendChild: jest.fn(),
             addEventListener: jest.fn(),
             removeEventListener: jest.fn(),
             querySelector: jest.fn(() => ({ textContent: "arrow_drop_down" })),
@@ -728,7 +743,7 @@ describe("Toolbar Class", () => {
         clickHandler();
 
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, false);
-        expect(elements.menu.innerHTML).toBe("more_vert");
+        expect(elements.menu.textContent).toBe("more_vert");
         expect(elements.toggleAuxBtn.classList.add).toHaveBeenCalledWith("blue", "darken-1");
         expect(elements.search.classList.toggle).toHaveBeenCalledWith("open");
 
@@ -737,7 +752,7 @@ describe("Toolbar Class", () => {
 
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, true);
         expect(elements["aux-toolbar"].style.display).toBe("none");
-        expect(elements.menu.innerHTML).toBe("menu");
+        expect(elements.menu.textContent).toBe("menu");
         expect(elements.toggleAuxBtn.classList.remove).toHaveBeenCalledWith("blue", "darken-1");
         expect(elements.toggleAuxBtn.className).toBe("tooltipped aux-toggle");
         expect(elements.chooseKeyDiv.style.display).toBe("none");
@@ -1062,7 +1077,7 @@ describe("Toolbar Class", () => {
     test("closeAuxToolbar hides auxiliary toolbar if visible", () => {
         const elements = {
             "aux-toolbar": { style: { display: "block" } },
-            "menu": { innerHTML: "" },
+            "menu": { innerHTML: "", textContent: "", appendChild: jest.fn() },
             "toggleAuxBtn": {
                 className: "some-class blue darken-1",
                 classList: {
@@ -1077,7 +1092,7 @@ describe("Toolbar Class", () => {
         toolbar.activity = {};
         toolbar.closeAuxToolbar(mockOnClick);
         expect(elements["aux-toolbar"].style.display).toBe("none");
-        expect(elements.menu.innerHTML).toBe("menu");
+        expect(elements.menu.textContent).toBe("menu");
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, false);
         expect(elements.toggleAuxBtn.classList.remove).toHaveBeenCalledWith("blue", "darken-1");
     });
@@ -1283,6 +1298,8 @@ describe("Toolbar Class", () => {
             classList: { add: jest.fn(), remove: jest.fn(), contains: jest.fn(() => false) },
             style: { display: "block" },
             innerHTML: "",
+            textContent: "",
+            appendChild: jest.fn(),
             addEventListener: jest.fn(),
             querySelector: jest.fn(() => ({ textContent: "" })),
             contains: jest.fn(() => false)
