@@ -1946,6 +1946,7 @@ describe("Palettes Class", () => {
             expect(capturedBlocks[5][1]).toEqual(["number", 8]);
             expect(capturedBlocks[6][1]).toEqual(["text", { value: "bye" }]);
 
+            expect(collapseToggle).toHaveBeenCalled();
             expect(mockActivity.blocks.blockList.length).toBeGreaterThan(0);
 
             jest.useRealTimers();
