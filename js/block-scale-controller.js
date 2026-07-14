@@ -47,12 +47,7 @@ class BlockScaleController {
         await this.setSmallerLargerStatus();
         activity.stageDirty = true;
 
-        // Cache DOM element reference for performance
-        const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-        if (helpfulWheelDiv.style.display !== "none") {
-            helpfulWheelDiv.style.display = "none";
-            activity.__tick();
-        }
+        this._hideHelpfulWheelIfVisible();
     }
 
     /**
@@ -80,9 +75,18 @@ class BlockScaleController {
         await this.setSmallerLargerStatus();
         activity.stageDirty = true;
 
+        this._hideHelpfulWheelIfVisible();
+    }
+
+    /**
+     * Hides the helpful wheel (if currently visible) and ticks the activity
+     * so the canvas reflects the change immediately.
+     */
+    _hideHelpfulWheelIfVisible() {
+        const activity = this.activity;
         // Cache DOM element reference for performance
         const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-        if (helpfulWheelDiv.style.display !== "none") {
+        if (helpfulWheelDiv && helpfulWheelDiv.style.display !== "none") {
             helpfulWheelDiv.style.display = "none";
             activity.__tick();
         }
@@ -109,7 +113,7 @@ class BlockScaleController {
             );
         }
 
-        if (BLOCKSCALES[activity.blockscale] === 4) {
+        if (BLOCKSCALES[activity.blockscale] === BLOCKSCALES[BLOCKSCALES.length - 1]) {
             await changeImage(
                 activity.largerContainer.children[0],
                 BIGGERBUTTON,

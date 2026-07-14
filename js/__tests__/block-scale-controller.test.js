@@ -181,6 +181,15 @@ describe("doLargerBlocks", () => {
 
         expect(activity.__tick).not.toHaveBeenCalled();
     });
+
+    test("does not throw when the helpful wheel div is absent from the DOM", async () => {
+        document.body.innerHTML = "";
+        const activity = makeActivity(DEFAULT_INDEX);
+        const controller = setupBlockScaleController(activity);
+
+        await expect(controller.doLargerBlocks()).resolves.toBeUndefined();
+        expect(activity.__tick).not.toHaveBeenCalled();
+    });
 });
 
 // ---------------------------------------------------------------------------
