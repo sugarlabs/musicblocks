@@ -7755,14 +7755,20 @@ class Blocks {
                     delete this.blockCollapseArt[blk];
                 }
 
-                const title = this.blockList[blk].protoblock.staticLabels[0];
+                const pb = this.blockList[blk].protoblock;
+                const title =
+                    pb && pb.staticLabels && pb.staticLabels[0]
+                        ? pb.staticLabels[0]
+                        : this.blockList[blk].name;
                 closeBlkWidgets(_(title));
                 this.activity.refreshCanvas();
             }
 
             // Announce block sent to trash to screen readers (aria-live only, no visual message)
             const blockLabel =
-                (myBlock.protoblock.staticLabels && myBlock.protoblock.staticLabels[0]) ||
+                (myBlock.protoblock &&
+                    myBlock.protoblock.staticLabels &&
+                    myBlock.protoblock.staticLabels[0]) ||
                 myBlock.name;
             const liveRegion =
                 document.getElementById("mbA11yLiveRegion") ||
