@@ -358,6 +358,15 @@ describe("TrashController click-outside handling", () => {
 // setupTrashController() — wiring onto the activity object
 // ---------------------------------------------------------------------------
 
+describe("TrashController construction", () => {
+    test("does not throw when the restoreIcon element is not present in the DOM", () => {
+        document.body.innerHTML = "";
+        const activity = makeActivity();
+
+        expect(() => new TrashController(activity)).not.toThrow();
+    });
+});
+
 describe("setupTrashController", () => {
     test("installs a trashController plus delegation stubs on the activity", () => {
         const activity = makeActivity();

@@ -25,9 +25,25 @@ class TrashController {
         this._trashViewClickHandler = null;
 
         // Add event listener for trash icon click
-        document.getElementById("restoreIcon").addEventListener("click", () => {
-            this.renderTrashView();
-        });
+        const restoreIcon = document.getElementById("restoreIcon");
+        if (restoreIcon) {
+            restoreIcon.addEventListener("click", () => {
+                this.renderTrashView();
+            });
+        }
+    }
+
+    /**
+     * @private
+     * @returns {boolean} true if there is nothing in the trash to restore.
+     */
+    _isTrashEmpty() {
+        const activity = this.activity;
+        return (
+            !activity.blocks ||
+            !activity.blocks.trashStacks ||
+            activity.blocks.trashStacks.length === 0
+        );
     }
 
     /**
@@ -37,11 +53,7 @@ class TrashController {
      */
     restoreTrash() {
         const activity = this.activity;
-        if (
-            !activity.blocks ||
-            !activity.blocks.trashStacks ||
-            activity.blocks.trashStacks.length === 0
-        ) {
+        if (this._isTrashEmpty()) {
             activity.textMsg(_("Trash can is empty."), 3000);
             return;
         }
@@ -59,11 +71,7 @@ class TrashController {
      */
     restoreLastFromTrash() {
         const activity = this.activity;
-        if (
-            !activity.blocks ||
-            !activity.blocks.trashStacks ||
-            activity.blocks.trashStacks.length === 0
-        ) {
+        if (this._isTrashEmpty()) {
             activity.textMsg(_("Trash can is empty."), 3000);
             return;
         }
@@ -242,11 +250,7 @@ class TrashController {
      */
     renderTrashView() {
         const activity = this.activity;
-        if (
-            !activity.blocks ||
-            !activity.blocks.trashStacks ||
-            activity.blocks.trashStacks.length === 0
-        ) {
+        if (this._isTrashEmpty()) {
             return;
         }
         const trashList = document.getElementById("trashList");
