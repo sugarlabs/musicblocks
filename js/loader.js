@@ -150,7 +150,8 @@ requirejs.config({
                 "search-ui",
                 "project-manager",
                 "keyboard-controller",
-                "activity/selection-controller"
+                "activity/selection-controller",
+                "activity/trash-controller"
             ],
             exports: "Activity"
         },

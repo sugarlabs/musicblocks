@@ -35,6 +35,7 @@ try {
    setupProjectManager,
    setupKeyboardController,
    setupSearchController, setupSearchUI, setupWorkspaceLayoutController, setupSelectionController,
+   setupTrashController,
    setupActivityAbcParser, setupActivityIdleWatcher,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
@@ -135,6 +136,7 @@ let MYDEFINES = [
     "palette/palette-loader",
     "activity/search-controller",
     "activity/workspace-layout-controller",
+    "activity/trash-controller",
     "search-ui",
     "keyboard-controller",
     "widgets/plugin-dialog",
@@ -2291,364 +2293,14 @@ class Activity {
             this._handleOrientationChangeResizeCanvas
         );
 
-        /*
-         * Restore last stack pushed to trashStack back onto canvas.
-         * Hides palettes before update
-         * Repositions blocks about trash area
-         */
-        const restoreTrash = activity => {
-            if (
-                !activity.blocks ||
-                !activity.blocks.trashStacks ||
-                activity.blocks.trashStacks.length === 0
-            ) {
-                activity.textMsg(_("Trash can is empty."), 3000);
-                return;
-            }
-
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-                activity.__tick();
-            }
-        };
-
-        const restoreTrashPop = activity => {
-            if (
-                !activity.blocks ||
-                !activity.blocks.trashStacks ||
-                activity.blocks.trashStacks.length === 0
-            ) {
-                activity.textMsg(_("Trash can is empty."), 3000);
-                return;
-            }
-            this._restoreTrashById(this.blocks.trashStacks[this.blocks.trashStacks.length - 1]);
-            activity.textMsg(_("Item restored from the trash."), 3000);
-
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-                activity.__tick();
-            }
-        };
-
-        this._restoreTrashById = blockId => {
-            const blockIndex = this.blocks.trashStacks.indexOf(blockId);
-            if (blockIndex === -1) return; // Block not found in trash
-
-            this.blocks.trashStacks.splice(blockIndex, 1); // Remove from trash
-
-            for (const name in this.palettes.dict) {
-                this.palettes.dict[name].hideMenu(true);
-            }
-            this.blocks.activeBlock = null;
-            this.refreshCanvas();
-
-            const dx = 0;
-            const dy = -this.cellSize * 3; // Reposition
-
-            // Restore drag group
-            this.blocks.findDragGroup(blockId);
-            for (let b = 0; b < this.blocks.dragGroup.length; b++) {
-                const blk = this.blocks.dragGroup[b];
-                this.blocks.blockList[blk].trash = false;
-                this.blocks.moveBlockRelative(blk, dx, dy);
-
-                const block = this.blocks.blockList[blk];
-
-                // Re-populate blocks.blockArt[blk] if it was deleted on trash.
-                // sendStackToTrash() and sendAllToTrash() both delete blockArt[blk]
-                // to free memory. Without regeneration, printBlockSVG() receives
-                // undefined here, passes it to DOMParser.parseFromString(undefined),
-                // and injects a <parsererror> node into every Save Block Artwork
-                // export (activity.js ~line 1394).
-                if (!this.blocks.blockArt[blk]) {
-                    block.regenerateArtwork(block.isCollapsible());
-                }
-
-                // Re-cache the container if it was uncached to save
-                // memory in sendStackToTrash().
-                if (block.container && !block.container.bitmapCache) {
-                    block.container.cache(
-                        0,
-                        0,
-                        Math.max(block.width, 1),
-                        Math.max(block.height, 1)
-                    );
-                }
-
-                this.blocks.blockList[blk].show();
-            }
-            this.blocks.raiseStackToTop(blockId);
-            const restoredBlock = this.blocks.blockList[blockId];
-
-            if (restoredBlock.name === "start" || restoredBlock.name === "drum") {
-                const turtle = restoredBlock.value;
-                const primaryTurtle = this.turtles.getTurtle(turtle);
-                primaryTurtle.inTrash = false;
-                primaryTurtle.container.visible = true;
-
-                // FIX: Restore the companion turtle if one exists.
-                // sendStackToTrash() in blocks.js (~line 7257) sets BOTH the primary
-                // and companion turtle to inTrash=true / visible=false when trashing a
-                // start/drum block. Without this mirror restore, the companion stays
-                // inTrash=true permanently, and logo.js (~line 1519) silently skips it:
-                //   if (!tur.inTrash) { tur.running = true; ... }
-                // This means onEveryBeatDo callbacks are dead after any trash+restore.
-                const comp = primaryTurtle.companionTurtle;
-                if (comp !== null && comp !== undefined) {
-                    const companionTurtle = this.turtles.getTurtle(comp);
-                    if (companionTurtle) {
-                        companionTurtle.inTrash = false;
-                        companionTurtle.container.visible = true;
-                    }
-                }
-            } else if (restoredBlock.name === "action") {
-                const actionArg = this.blocks.blockList[restoredBlock.connections[1]];
-                if (actionArg !== null) {
-                    let label;
-                    const oldName = actionArg.value;
-                    restoredBlock.trash = true;
-                    const uniqueName = this.blocks.findUniqueActionName(oldName);
-                    restoredBlock.trash = false;
-
-                    if (uniqueName !== actionArg) {
-                        actionArg.value = uniqueName;
-                        const translatedName = _(uniqueName);
-                        label =
-                            translatedName.length > 8
-                                ? translatedName.substr(0, 7) + "..."
-                                : translatedName;
-                        actionArg.text.text = label;
-
-                        if (actionArg.label !== null) {
-                            actionArg.label.value = translatedName;
-                        }
-                        actionArg.container.updateCache();
-                        for (let b = 0; b < this.blocks.dragGroup.length; b++) {
-                            const me = this.blocks.blockList[this.blocks.dragGroup[b]];
-                            if (
-                                ["nameddo", "nameddoArg", "namedcalc", "namedcalcArg"].includes(
-                                    me.name
-                                ) &&
-                                me.privateData === oldName
-                            ) {
-                                me.privateData = uniqueName;
-                                me.value = uniqueName;
-                                const translatedMeName = _(uniqueName);
-                                label =
-                                    translatedMeName.length > 8
-                                        ? translatedMeName.substr(0, 7) + "..."
-                                        : translatedMeName;
-                                me.text.text = label;
-                                me.overrideName = label;
-                                me.regenerateArtwork();
-                                me.container.updateCache();
-                            }
-                        }
-                    }
-
-                    // Re-add the action to the palette
-                    const actionName = actionArg.value;
-                    this.blocks.newNameddoBlock(
-                        actionName,
-                        this.blocks.actionHasReturn(blockId),
-                        this.blocks.actionHasArgs(blockId)
-                    );
-                    this.palettes.updatePalettes("action");
-                }
-            }
-            activity.textMsg(_("Item restored from the trash."), 3000);
-
-            this.refreshCanvas();
-        };
-
-        // Add event listener for trash icon click
-        document.getElementById("restoreIcon").addEventListener("click", () => {
-            this._renderTrashView();
-        });
-
-        // Store the click handler reference for proper cleanup
-        let trashViewClickHandler = null;
-
-        // function to hide trashView from canvas
-        function handleClickOutsideTrashView(trashView) {
-            // Remove existing listener to prevent duplicates
-            if (trashViewClickHandler) {
-                document.removeEventListener("click", trashViewClickHandler);
-            }
-
-            let firstClick = true;
-            trashViewClickHandler = event => {
-                if (firstClick) {
-                    firstClick = false;
-                    return;
-                }
-                if (!trashView.contains(event.target) && event.target !== trashView) {
-                    trashView.style.display = "none";
-                    // Clean up listener when trashView is hidden
-                    document.removeEventListener("click", trashViewClickHandler);
-                    trashViewClickHandler = null;
-                }
-            };
-            document.addEventListener("click", trashViewClickHandler);
-        }
-
-        this._renderTrashView = () => {
-            if (!this.blocks || !this.blocks.trashStacks || this.blocks.trashStacks.length === 0) {
-                return;
-            }
-            const trashList = document.getElementById("trashList");
-            const trashView = document.createElement("div");
-            trashView.id = "trashView";
-            trashView.classList.add("trash-view");
-
-            // Sticky icons
-            const buttonContainer = document.createElement("div");
-            buttonContainer.classList.add("button-container");
-
-            const restoreLastIcon = document.createElement("a");
-            restoreLastIcon.id = "restoreLastIcon";
-            restoreLastIcon.classList.add("restore-last-icon");
-            restoreLastIcon.innerHTML = '<i class="material-icons md-48">restore_from_trash</i>';
-            restoreLastIcon.addEventListener("click", () => {
-                this._restoreTrashById(this.blocks.trashStacks[this.blocks.trashStacks.length - 1]);
-                trashView.classList.add("hidden");
-            });
-
-            const restoreAllIcon = document.createElement("a");
-            restoreAllIcon.id = "restoreAllIcon";
-            restoreAllIcon.classList.add("restore-all-icon");
-            restoreAllIcon.innerHTML = '<i class="material-icons md-48">delete_sweep</i>';
-            restoreAllIcon.addEventListener("click", () => {
-                while (this.blocks.trashStacks.length > 0) {
-                    this._restoreTrashById(this.blocks.trashStacks[0]);
-                }
-                trashView.classList.add("hidden");
-            });
-            restoreLastIcon.setAttribute("title", _("Restore last item"));
-            restoreAllIcon.setAttribute("title", _("Restore all items"));
-
-            buttonContainer.appendChild(restoreLastIcon);
-            buttonContainer.appendChild(restoreAllIcon);
-            trashView.appendChild(buttonContainer);
-
-            // Render trash items
-            this.blocks.trashStacks.forEach(blockId => {
-                const block = this.blocks.blockList[blockId];
-                const listItem = document.createElement("div");
-                listItem.classList.add("trash-item");
-
-                const preview = this.blocks.trashPreviews[blockId];
-                let imgSrc;
-                if (preview) {
-                    imgSrc = preview;
-                } else {
-                    const svgData = block.artwork;
-                    imgSrc = "data:image/svg+xml;utf8," + encodeURIComponent(svgData);
-                }
-
-                const img = document.createElement("img");
-                img.src = imgSrc;
-                img.alt = "Block Icon";
-                img.classList.add("trash-item-icon");
-
-                const textNode = document.createTextNode(block.name);
-
-                listItem.appendChild(img);
-                listItem.appendChild(textNode);
-                listItem.dataset.blockId = blockId;
-
-                listItem.addEventListener("mouseover", () => {
-                    listItem.classList.add("hover");
-                });
-                listItem.addEventListener("mouseout", () => {
-                    listItem.classList.remove("hover");
-                });
-
-                img.addEventListener("mouseover", event => {
-                    this._showTrashPreviewPopup(imgSrc, event);
-                });
-                img.addEventListener("mousemove", event => {
-                    this._showTrashPreviewPopup(imgSrc, event);
-                });
-                img.addEventListener("mouseout", () => {
-                    this._hideTrashPreviewPopup();
-                });
-
-                listItem.addEventListener("click", () => {
-                    this._restoreTrashById(blockId);
-                    this._hideTrashPreviewPopup();
-                    trashView.classList.add("hidden");
-                });
-
-                trashView.appendChild(listItem);
-            });
-
-            // Attach outside-click listener once, after all items are rendered
-            handleClickOutsideTrashView(trashView);
-
-            const existingView = document.getElementById("trashView");
-            if (existingView) {
-                trashList.replaceChild(trashView, existingView);
-            } else {
-                trashList.appendChild(trashView);
-            }
-        };
-
-        /**
-         * Shows a larger preview popup for trashed items.
-         * @param {string} imgSrc - The source of the image.
-         * @param {MouseEvent} event - The mouse event.
-         * @private
-         */
-        this._showTrashPreviewPopup = (imgSrc, event) => {
-            let popup = document.getElementById("trashPreviewPopup");
-            if (!popup) {
-                popup = document.createElement("div");
-                popup.id = "trashPreviewPopup";
-                popup.classList.add("trash-preview-popup");
-                const img = document.createElement("img");
-                popup.appendChild(img);
-                document.body.appendChild(popup);
-            }
-            const img = popup.firstChild;
-            if (img.src !== imgSrc) {
-                img.src = imgSrc;
-            }
-            popup.style.display = "block";
-
-            // Position next to cursor
-            const xOffset = 20;
-            const yOffset = 20;
-            let x = event.clientX + xOffset;
-            let y = event.clientY + yOffset;
-
-            // Flip if near right edge
-            if (x + 300 > window.innerWidth) {
-                x = event.clientX - 320;
-            }
-            // Flip if near bottom edge
-            if (y + 300 > window.innerHeight) {
-                y = event.clientY - 320;
-            }
-
-            popup.style.left = x + "px";
-            popup.style.top = y + "px";
-        };
-
-        /**
-         * Hides the trash preview popup.
-         * @private
-         */
-        this._hideTrashPreviewPopup = () => {
-            const popup = document.getElementById("trashPreviewPopup");
-            if (popup) {
-                popup.style.display = "none";
-            }
-        };
+        // Sets up TrashController (js/trash-controller.js), which owns restoring
+        // blocks from the trash (individually, in bulk, or the most recent one),
+        // rendering the trash panel, and the restoreIcon click handling.
+        // this.restoreTrash, this.restoreTrashPop, this._restoreTrashById,
+        // this._renderTrashView, this._showTrashPreviewPopup, and
+        // this._hideTrashPreviewPopup are delegation stubs installed by
+        // setupTrashController() so external callers continue to work unchanged.
+        setupTrashController(this);
 
         /*
          * Open aux menu
@@ -3343,7 +2995,7 @@ class Activity {
                     label: "Restore",
                     icon: "imgsrc:header-icons/restore-from-trash.svg",
                     display: true,
-                    fn: restoreTrashPop
+                    fn: this.restoreTrashPop
                 });
 
             if (!this.helpfulWheelItems.find(ele => ele.label === "Turtle Wrap Off"))
@@ -4141,7 +3793,7 @@ class Activity {
             this.toolbar.renderRunStepIcon(doStepButton);
             this.toolbar.renderThemeSelectIcon(this.themeBox, this.themes);
             this.toolbar.renderMergeIcon(() => this.projectManager.doMergeLoad());
-            this.toolbar.renderRestoreIcon(restoreTrash);
+            this.toolbar.renderRestoreIcon(this.restoreTrash);
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.toolbar.renderChooseKeyIcon(chooseKeyMenu);
             }
