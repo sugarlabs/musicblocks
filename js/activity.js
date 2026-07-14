@@ -37,6 +37,7 @@ try {
    setupSearchController, setupSearchUI, setupWorkspaceLayoutController, setupSelectionController,
    setupTrashController,
    setupHelpController,
+   setupBlockScaleController,
    setupActivityAbcParser, setupActivityIdleWatcher,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
@@ -139,6 +140,7 @@ let MYDEFINES = [
     "activity/workspace-layout-controller",
     "activity/trash-controller",
     "activity/help-controller",
+    "activity/block-scale-controller",
     "search-ui",
     "keyboard-controller",
     "widgets/plugin-dialog",
@@ -486,6 +488,7 @@ class Activity {
         setupSearchController(this, this.searchUI);
         setupWorkspaceLayoutController(this);
         setupSelectionController(this);
+        setupBlockScaleController(this);
         this.pluginDialog = new PluginDialog({
             onLoadBuiltIn: name => this._loadBuiltInPlugin(name),
             onDelete: () => this._deletePlugin(),
@@ -1190,118 +1193,6 @@ class Activity {
 
         this.stopLoadAnimation = (...args) => this.projectManager.stopLoadAnimation(...args);
 
-        /**
-         * Increases the size of blocks in the activity.
-         * @param {object} activity - The activity object.
-         */
-        const doLargerBlocks = async activity => {
-            await activity._doLargerBlocks();
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-                activity.__tick();
-            }
-        };
-
-        this._doLargerBlocks = async () => {
-            this.blocks.activeBlock = null;
-
-            if (!this.resizeDebounce) {
-                if (this.blockscale < BLOCKSCALES.length - 1) {
-                    this.resizeDebounce = true;
-                    this.blockscale += 1;
-                    this.clearCache();
-                    await this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
-                    this.blocks.checkBounds();
-                    this.refreshCanvas();
-                }
-
-                const that = this;
-                setTimeout(() => {
-                    that.resizeDebounce = false;
-                }, 200);
-            }
-
-            await this.setSmallerLargerStatus();
-            this.stageDirty = true;
-        };
-
-        /**
-         * Decreases the size of blocks in the activity.
-         * @param {object} activity - The activity object.
-         */
-        const doSmallerBlocks = async activity => {
-            await activity._doSmallerBlocks();
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-                activity.__tick();
-            }
-        };
-
-        /**
-         * Manages the resizing of blocks to handle larger size.
-         */
-        this._doSmallerBlocks = async () => {
-            this.blocks.activeBlock = null;
-
-            if (!this.resizeDebounce) {
-                if (this.blockscale > 0) {
-                    this.resizeDebounce = true;
-                    this.blockscale -= 1;
-                    this.clearCache();
-                    await this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
-                    this.blocks.checkBounds();
-                    this.refreshCanvas();
-                }
-
-                const that = this;
-                setTimeout(() => {
-                    that.resizeDebounce = false;
-                }, 200);
-            }
-
-            await this.setSmallerLargerStatus();
-            this.stageDirty = true;
-        };
-
-        /*
-         * If either the block size has reached its minimum or maximum,
-         * then the icons to make them smaller/bigger will be hidden.
-         * Sets the status of the smaller and larger block icons based on the current block size.
-         */
-        this.setSmallerLargerStatus = async () => {
-            if (BLOCKSCALES[this.blockscale] < DEFAULTBLOCKSCALE) {
-                await changeImage(
-                    this.smallerContainer.children[0],
-                    SMALLERBUTTON,
-                    SMALLERDISABLEBUTTON
-                );
-            } else {
-                await changeImage(
-                    this.smallerContainer.children[0],
-                    SMALLERDISABLEBUTTON,
-                    SMALLERBUTTON
-                );
-            }
-
-            if (BLOCKSCALES[this.blockscale] === 4) {
-                await changeImage(
-                    this.largerContainer.children[0],
-                    BIGGERBUTTON,
-                    BIGGERDISABLEBUTTON
-                );
-            } else {
-                await changeImage(
-                    this.largerContainer.children[0],
-                    BIGGERDISABLEBUTTON,
-                    BIGGERBUTTON
-                );
-            }
-        };
-
         const deletePlugin = activity => {
             activity.pluginDialog.deletePlugin();
         };
@@ -1449,9 +1340,9 @@ class Activity {
                             const pinchDelta = currentPinchDistance - initialPinchDistance;
                             if (Math.abs(pinchDelta) > 20) {
                                 if (pinchDelta > 0) {
-                                    doLargerBlocks(that);
+                                    that.doLargerBlocks();
                                 } else {
-                                    doSmallerBlocks(that);
+                                    that.doSmallerBlocks();
                                 }
                                 initialPinchDistance = currentPinchDistance;
                             }
@@ -1520,7 +1411,7 @@ class Activity {
 
                 if (event.ctrlKey) {
                     event.preventDefault();
-                    delY < 0 ? doLargerBlocks(that) : doSmallerBlocks(that);
+                    delY < 0 ? that.doLargerBlocks() : that.doSmallerBlocks();
                 } else {
                     closeAnyOpenMenusAndLabels();
                     if (that.scrollBlockContainer) {
@@ -2898,7 +2789,7 @@ class Activity {
             this.smallerContainer = createButton(
                 SMALLERBUTTON,
                 _("Decrease block size"),
-                doSmallerBlocks
+                this.doSmallerBlocks
             );
 
             if (!this.helpfulWheelItems.find(ele => ele.label === "Decrease block size"))
@@ -2908,13 +2799,13 @@ class Activity {
                         "imgsrc:data:image/svg+xml;base64," +
                         window.btoa(base64Encode(SMALLERBUTTON)),
                     display: true,
-                    fn: doSmallerBlocks
+                    fn: this.doSmallerBlocks
                 });
 
             this.largerContainer = createButton(
                 BIGGERBUTTON,
                 _("Increase block size"),
-                doLargerBlocks
+                this.doLargerBlocks
             );
 
             if (!this.helpfulWheelItems.find(ele => ele.label === "Increase block size"))
@@ -2924,7 +2815,7 @@ class Activity {
                         "imgsrc:data:image/svg+xml;base64," +
                         window.btoa(base64Encode(BIGGERBUTTON)),
                     display: true,
-                    fn: doLargerBlocks
+                    fn: this.doLargerBlocks
                 });
 
             if (!this.helpfulWheelItems.find(ele => ele.label === "Restore"))
