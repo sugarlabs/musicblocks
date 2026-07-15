@@ -937,10 +937,16 @@ function TemperamentWidget() {
 
         const editMenus = [_("equal"), _("ratios"), _("arbitrary"), _("octave space")];
 
+        const menuItems = [];
         for (let i = 0; i < editMenus.length; i++) {
             const td = document.createElement("td");
-            td.id = "editMenus";
+            td.className = "editMenus";
             td.textContent = editMenus[i];
+            td.style.background = platformColor.selectorBackground;
+            td.style.height = 30 + "px";
+            td.style.textAlign = "center";
+            td.style.fontWeight = "bold";
+            menuItems.push(td);
             editOctaveTr.appendChild(td);
         }
 
@@ -950,13 +956,6 @@ function TemperamentWidget() {
         userEditTd.id = "userEdit";
         userEditTr.appendChild(userEditTd);
         editOctaveTbody.appendChild(userEditTr);
-        const menuItems = document.querySelectorAll("#editMenus");
-        for (let i = 0; i < editMenus.length; i++) {
-            menuItems[i].style.background = platformColor.selectorBackground;
-            menuItems[i].style.height = 30 + "px";
-            menuItems[i].style.textAlign = "center";
-            menuItems[i].style.fontWeight = "bold";
-        }
 
         menuItems[0].style.background = platformColor.selectorBackground || "#c8C8C8";
         that.equalEdit();
