@@ -213,7 +213,7 @@ function setupDrumBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             let arg = args[0];
-            if (args.length !== 1 || arg == null || typeof arg !== "string") {
+            if (args.length !== 1 || arg === null || arg === undefined || typeof arg !== "string") {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg = "noise1";
             }
@@ -535,7 +535,7 @@ function setupDrumBlocks(activity) {
             /**
              * Validate input and handle errors.
              */
-            if (args.length !== 1 || arg == null || typeof arg !== "string") {
+            if (args.length !== 1 || arg === null || arg === undefined || typeof arg !== "string") {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg = DEFAULTDRUM;
             }
@@ -551,6 +551,12 @@ function setupDrumBlocks(activity) {
 
             /**
              * Handle different contexts for playing the drum.
+             *
+             * Widget contexts (matrix / keyboard) only register the drum.
+             * All other runtime contexts play it: inside a Note block, or
+             * stand-alone under Start (DrumActions treats that as a 1/4 note).
+             * Previously, a drum connected to Start but not inside a Note hit
+             * "PLAY DRUM ERROR: missing context" and never sounded.
              */
             if (logo.inPitchDrumMatrix) {
                 // Handle Pitch Drum Matrix context
@@ -574,16 +580,9 @@ function setupDrumBlocks(activity) {
                 logo.musicKeyboard.noteNames.push("drum");
                 logo.musicKeyboard.octaves.push(null);
                 logo.musicKeyboard.addRowBlock(blk);
-            } else if (
-                tur.singer.inNoteBlock.length > 0 ||
-                (activity.blocks.blockList[blk].connections[0] == null &&
-                    last(activity.blocks.blockList[blk].connections) == null)
-            ) {
-                // Handle other contexts
-                Singer.DrumActions.playDrum(args[0], turtle, blk);
             } else {
-                console.debug("PLAY DRUM ERROR: missing context");
-                return;
+                // Runtime playback: in-note or stand-alone under Start / flow
+                Singer.DrumActions.playDrum(args[0], turtle, blk);
             }
 
             /**
