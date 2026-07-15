@@ -159,7 +159,8 @@ class TrashController {
             }
         } else if (restoredBlock.name === "action") {
             const actionArg = activity.blocks.blockList[restoredBlock.connections[1]];
-            if (actionArg !== null && actionArg !== undefined) {
+            // eslint-disable-next-line eqeqeq
+            if (actionArg != null) {
                 let label;
                 const oldName = actionArg.value;
                 restoredBlock.trash = true;
