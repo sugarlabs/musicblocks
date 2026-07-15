@@ -97,6 +97,7 @@ const loadActivityClass = () => {
         setupWorkspaceLayoutController: jest.fn(),
         setupSelectionController: jest.fn(),
         setupTrashController: jest.fn(),
+        setupHelpController: jest.fn(),
         hideDOMLabel: jest.fn(),
         setupActivityRecorder: jest.fn(),
         setupActivityAbcParser: jest.fn(),

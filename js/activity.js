@@ -36,6 +36,7 @@ try {
    setupKeyboardController,
    setupSearchController, setupSearchUI, setupWorkspaceLayoutController, setupSelectionController,
    setupTrashController,
+   setupHelpController,
    setupActivityAbcParser, setupActivityIdleWatcher,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
@@ -137,6 +138,7 @@ let MYDEFINES = [
     "activity/search-controller",
     "activity/workspace-layout-controller",
     "activity/trash-controller",
+    "activity/help-controller",
     "search-ui",
     "keyboard-controller",
     "widgets/plugin-dialog",
@@ -815,79 +817,14 @@ class Activity {
         //if any window resize event occurs:
         this.addEventListener(window, "resize", this._handleRepositionBlocksOnResize);
 
-        /**
-         * Saves the artwork for an individual help block.
-         * The process involves clearing the block list, generating the help blocks,
-         * and saving them as SVG files.
-         *
-         * @param {string} name - The name of the help block.
-         * @param {number} delay - The delay before executing the save process (in milliseconds).
-         */
-        this.__saveHelpBlock = (name, delay) => {
-            // Save the artwork for an individual help block.
-            // (1) clear the block list
-            // (2) generate the help blocks
-            // (3) save the blocks as svg
-
-            const that = this;
-            setTimeout(() => {
-                that.sendAllToTrash(false, true);
-                setTimeout(() => {
-                    const message = that.blocks.protoBlockDict[name].helpString;
-                    if (message.length < 4) {
-                        // If there is nothing specified, just load the block.
-                        const obj = that.palettes.getProtoNameAndPalette(name);
-                        const protoblk = obj[0];
-                        const paletteName = obj[1];
-                        const protoName = obj[2];
-
-                        if (that.blocks.protoBlockDict.hasOwnProperty(protoName)) {
-                            that.palettes.dict[paletteName].makeBlockFromSearch(
-                                protoblk,
-                                protoName,
-                                newBlock => {
-                                    that.blocks.moveBlock(newBlock, 0, 0);
-                                }
-                            );
-                        }
-                    } else if (typeof message[3] === "string") {
-                        // If it is a string, load the macro associated with this block.
-                        const blocksToLoad = getMacroExpansion(that, message[3], 0, 0);
-                        that.blocks.loadNewBlocks(blocksToLoad);
-                    } else {
-                        // Load the block.
-                        const blocksToLoad = message[3];
-                        that.blocks.loadNewBlocks(blocksToLoad);
-                    }
-
-                    setTimeout(() => {
-                        debugLog("Saving help artwork: " + name + "_block.svg");
-                        const svg = "data:image/svg+xml;utf8," + that.printBlockSVG();
-                        that.save.download("svg", svg, name + "_block.svg");
-                    }, 500);
-                }, 500);
-            }, delay + 1000);
-        };
-
-        this._saveHelpBlocks = () => {
-            // Save the artwork for every help block.
-            const blockHelpList = [];
-            for (const key in this.blocks.protoBlockDict) {
-                if (
-                    this.blocks.protoBlockDict[key].helpString !== undefined &&
-                    this.blocks.protoBlockDict[key].helpString.length !== 0
-                ) {
-                    blockHelpList.push(key);
-                }
-            }
-
-            let i = 0;
-            for (const name of blockHelpList) {
-                this.__saveHelpBlock(name, i * 2000);
-                i++;
-            }
-            this.sendAllToTrash(true, true);
-        };
+        // Sets up HelpController (js/help-controller.js), which owns the help
+        // window, about page, keyboard shortcuts dialog, statistics window,
+        // JavaScript editor launch, and the Alt-H save-help-block workflow.
+        // this.showHelp, this.showAboutPage, this.showKeyboardShortcuts,
+        // this.toggleJSWindow, this.doAnalytics, and this._saveHelpBlocks are
+        // delegation stubs installed by setupHelpController() so external
+        // callers continue to work unchanged.
+        setupHelpController(this);
 
         /**
          * @returns {SVG} returns SVG of blocks
@@ -3138,316 +3075,6 @@ class Activity {
 
         this.doHelpfulSearch = () => this.searchController.doHelpfulSearch();
 
-        /**
-         * Toggles display of javaScript editor widget.
-         */
-        const toggleJSWindow = async activity => {
-            await lazyLoad([
-                "widgets/jseditor",
-                "activity/js-export/samples/sample",
-                "activity/js-export/export",
-                "activity/js-export/interface",
-                "activity/js-export/constraints",
-                "activity/js-export/ASTutils",
-                "activity/js-export/generate",
-                "activity/js-export/ast2blocklist",
-                "activity/js-export/API/GraphicsBlocksAPI",
-                "activity/js-export/API/PenBlocksAPI",
-                "activity/js-export/API/RhythmBlocksAPI",
-                "activity/js-export/API/MeterBlocksAPI",
-                "activity/js-export/API/PitchBlocksAPI",
-                "activity/js-export/API/IntervalsBlocksAPI",
-                "activity/js-export/API/ToneBlocksAPI",
-                "activity/js-export/API/OrnamentBlocksAPI",
-                "activity/js-export/API/VolumeBlocksAPI",
-                "activity/js-export/API/DrumBlocksAPI",
-                "activity/js-export/API/DictBlocksAPI"
-            ]);
-            new JSEditor(activity);
-        };
-
-        const doAnalytics = async activity => {
-            if (!activity.statsWindow || !activity.statsWindow.isOpen) {
-                await lazyLoad("widgets/statistics");
-                activity.statsWindow = new StatsWindow(activity);
-            }
-        };
-
-        /*
-         * Shows help page
-         */
-        const showHelp = activity => {
-            if (window.widgetWindows?.isOpen("keyboard-shortcuts")) {
-                window.widgetWindows.clear("keyboard-shortcuts");
-            }
-            activity._showHelp();
-        };
-
-        this._showHelp = async () => {
-            // Will show welcome page by default.
-            await lazyLoad("widgets/help");
-            new HelpWidget(this, false);
-        };
-
-        const showKeyboardShortcuts = activity => {
-            if (window.widgetWindows?.isOpen("help")) {
-                window.widgetWindows.clear("help");
-            }
-            activity._showKeyboardShortcuts();
-        };
-
-        this._showKeyboardShortcuts = () => {
-            const platformKeys = (windowsKeys, macKeys = windowsKeys) =>
-                `${_("Windows/Linux")}: ${windowsKeys}\n${_("Mac")}: ${macKeys}`;
-
-            const shortcutSections = [
-                {
-                    title: _("Workspace"),
-                    items: [
-                        {
-                            keys: platformKeys("Alt + R", "Option + R"),
-                            action: _("Play project")
-                        },
-                        {
-                            keys: platformKeys("Alt + S", "Option + S"),
-                            action: _("Stop project")
-                        },
-                        {
-                            keys: platformKeys("Alt + Enter", "Option + Enter"),
-                            action: _("Play or stop depending on the current state")
-                        },
-                        {
-                            keys: platformKeys("Space", "Space"),
-                            action: _("Play or stop when no text input or widget is active")
-                        },
-                        {
-                            keys: platformKeys("Shift + Space", "Shift + Space"),
-                            action: _("Toggle stage scale")
-                        },
-                        {
-                            keys: platformKeys("Home", "Home"),
-                            action: _("Jump to home position")
-                        },
-                        {
-                            keys: platformKeys("End", "End"),
-                            action: _("Jump to the bottom of the workspace")
-                        },
-                        {
-                            keys: platformKeys("Page Up", "Page Up"),
-                            action: _("Scroll workspace up")
-                        },
-                        {
-                            keys: platformKeys("Page Down", "Page Down"),
-                            action: _("Scroll workspace down")
-                        },
-                        {
-                            keys: platformKeys("Esc", "Esc"),
-                            action: _("Hide block search when it is open")
-                        }
-                    ]
-                },
-                {
-                    title: _("Editing"),
-                    items: [
-                        {
-                            keys: platformKeys("Alt + C", "Option + C"),
-                            action: _("Copy selected stack.")
-                        },
-                        {
-                            keys: platformKeys("Alt + V", "Option + V"),
-                            action: _("Paste previous stack.")
-                        },
-                        {
-                            keys: platformKeys("Ctrl + V", "Control + V"),
-                            action: _("Open the JSON paste box.")
-                        },
-                        {
-                            keys: platformKeys("Enter", "Enter"),
-                            action: _("Paste JSON when the paste box is focused.")
-                        },
-                        {
-                            keys: platformKeys("Delete", "Delete"),
-                            action: _("Extract the active block.")
-                        },
-                        {
-                            keys: platformKeys("Alt + E", "Option + E"),
-                            action: _("Clear workspace.")
-                        },
-                        {
-                            keys: platformKeys("Alt + B", "Option + B"),
-                            action: _("Save block artwork.")
-                        },
-                        {
-                            keys: platformKeys("Alt + H", "Option + H"),
-                            action: _("Save block help.")
-                        }
-                    ]
-                },
-                {
-                    title: _("Navigation"),
-                    items: [
-                        {
-                            keys: platformKeys("Tab / Shift + Tab", "Tab / Shift + Tab"),
-                            action: _("Move focus between the toolbar, palettes, and workspace.")
-                        },
-                        {
-                            keys: platformKeys(_("Arrow keys"), _("Arrow keys")),
-                            action: _(
-                                "Move the active block, scroll palettes, adjust the tempo widget, or pan the workspace depending on context."
-                            )
-                        },
-                        {
-                            keys: platformKeys("/", "/"),
-                            action: _("Pan workspace right when horizontal scrolling is enabled.")
-                        },
-                        {
-                            keys: platformKeys("\\", "\\"),
-                            action: _("Pan workspace left when horizontal scrolling is enabled.")
-                        }
-                    ]
-                },
-                {
-                    title: _("Toolbar"),
-                    items: [
-                        {
-                            keys: platformKeys(
-                                _("Arrow Left / Arrow Right"),
-                                _("Arrow Left / Arrow Right")
-                            ),
-                            action: _("Move focus within the current toolbar.")
-                        },
-                        {
-                            keys: platformKeys(
-                                _("Arrow Up / Arrow Down"),
-                                _("Arrow Up / Arrow Down")
-                            ),
-                            action: _("Move focus between main and auxiliary toolbars.")
-                        },
-                        {
-                            keys: platformKeys("Enter", "Enter"),
-                            action: _("Activate the focused toolbar button.")
-                        },
-                        {
-                            keys: platformKeys("Esc", "Esc"),
-                            action: _("Exit toolbar keyboard navigation.")
-                        }
-                    ]
-                },
-                {
-                    title: _("Widget Windows"),
-                    items: [
-                        {
-                            keys: platformKeys("Esc", "Esc"),
-                            action: _("Close the focused widget window.")
-                        },
-                        {
-                            keys: platformKeys("Ctrl + Shift + M", "Command + Shift + M"),
-                            action: _("Maximize or restore the focused widget window.")
-                        }
-                    ]
-                },
-                {
-                    title: _("Help and Pitch Slider"),
-                    items: [
-                        {
-                            keys: platformKeys(
-                                _("Arrow Left / Arrow Right"),
-                                _("Arrow Left / Arrow Right")
-                            ),
-                            action: _("Move between help pages when Help is open.")
-                        },
-                        {
-                            keys: platformKeys(_("Arrow keys"), _("Arrow keys")),
-                            action: _("Adjust pitch by semitone when Pitch Slider is open.")
-                        }
-                    ]
-                }
-            ];
-
-            const widgetWindow = window.widgetWindows.windowFor(
-                this,
-                _("Keyboard shortcuts"),
-                "keyboard-shortcuts",
-                true
-            );
-            widgetWindow.clear();
-            widgetWindow.show();
-
-            const widgetBody = widgetWindow.getWidgetBody();
-            widgetBody.className = "wfbWidget keyboard-shortcuts-widget";
-            widgetBody.style.padding = "0";
-            widgetBody.style.display = "block";
-            widgetBody.style.height = "min(72vh, 680px)";
-            widgetBody.style.width = "min(68vw, 760px)";
-            widgetBody.style.maxWidth = "100%";
-            widgetBody.style.overflow = "hidden";
-
-            const wrapper = document.createElement("div");
-            wrapper.className = "keyboard-shortcuts-panel";
-
-            const intro = document.createElement("div");
-            intro.className = "keyboard-shortcuts-hero";
-            const titleDiv = document.createElement("div");
-            titleDiv.className = "keyboard-shortcuts-hero-title";
-            titleDiv.textContent = _("Keyboard shortcuts");
-
-            const copyDiv = document.createElement("div");
-            copyDiv.className = "keyboard-shortcuts-hero-copy";
-            copyDiv.textContent = _(
-                "Shortcuts are context-sensitive. Some only work when a related panel, widget, or mode is active. Windows/Linux and Mac equivalents are shown together."
-            );
-
-            intro.appendChild(titleDiv);
-            intro.appendChild(copyDiv);
-            wrapper.appendChild(intro);
-
-            shortcutSections.forEach(section => {
-                const sectionCard = document.createElement("section");
-                sectionCard.className = "keyboard-shortcuts-section";
-
-                const heading = document.createElement("div");
-                heading.textContent = section.title;
-                heading.className = "keyboard-shortcuts-section-title";
-                sectionCard.appendChild(heading);
-
-                section.items.forEach(item => {
-                    const row = document.createElement("div");
-                    row.className = "keyboard-shortcuts-row";
-
-                    const key = document.createElement("div");
-                    key.textContent = item.keys;
-                    key.className = "keyboard-shortcuts-key";
-
-                    const action = document.createElement("div");
-                    action.textContent = item.action;
-                    action.className = "keyboard-shortcuts-action";
-
-                    row.appendChild(key);
-                    row.appendChild(action);
-                    sectionCard.appendChild(row);
-                });
-
-                wrapper.appendChild(sectionCard);
-            });
-
-            widgetBody.appendChild(wrapper);
-            widgetWindow.sendToCenter();
-            requestAnimationFrame(() => widgetWindow.sendToCenter());
-        };
-
-        /*
-         * Shows about page
-         */
-        const showAboutPage = activity => {
-            activity._showAboutPage();
-        };
-
-        this._showAboutPage = async () => {
-            // Will show welcome page by default.
-            await lazyLoad("widgets/help");
-            new HelpWidget(this, false);
-        };
-
         /*
          * Makes non-toolbar buttons, e.g., the palette menu buttons
          */
@@ -3745,7 +3372,7 @@ class Activity {
 
             // Show help on startup if first-time user.
             if (this.firstTimeUser) {
-                this._showHelp();
+                this.showHelp();
             }
 
             try {
@@ -3760,7 +3387,7 @@ class Activity {
             this.toolbar = new Toolbar();
             this.toolbar.init(this);
 
-            this.toolbar.renderLogoIcon(showAboutPage);
+            this.toolbar.renderLogoIcon(this.showAboutPage);
             this.toolbar.renderPlayIcon(doFastButton);
             this.toolbar.renderStopIcon(doHardStopButton);
             this.toolbar.renderNewProjectIcon(() => this.projectManager.newProject());
@@ -3780,11 +3407,11 @@ class Activity {
             );
             this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
             this.toolbar.renderMenuIcon(showHideAuxMenu);
-            this.toolbar.renderHelpIcon(showHelp, showKeyboardShortcuts);
+            this.toolbar.renderHelpIcon(this.showHelp, this.showKeyboardShortcuts);
             this.toolbar.renderModeSelectIcon(
                 doSwitchMode,
                 () => doRecordButton(this),
-                doAnalytics,
+                this.doAnalytics,
                 doOpenPlugin,
                 deletePlugin,
                 setScroller
@@ -3797,7 +3424,7 @@ class Activity {
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.toolbar.renderChooseKeyIcon(chooseKeyMenu);
             }
-            this.toolbar.renderJavaScriptIcon(toggleJSWindow);
+            this.toolbar.renderJavaScriptIcon(this.toggleJSWindow);
             this.toolbar.renderLanguageSelectIcon(this.languageBox);
             this.toolbar.renderWrapIcon();
             this._perfMark("activity.init.ui_ready");

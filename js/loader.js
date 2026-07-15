@@ -151,7 +151,8 @@ requirejs.config({
                 "project-manager",
                 "keyboard-controller",
                 "activity/selection-controller",
-                "activity/trash-controller"
+                "activity/trash-controller",
+                "activity/help-controller"
             ],
             exports: "Activity"
         },
