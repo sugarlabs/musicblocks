@@ -103,14 +103,14 @@ describe("Toolbar Class", () => {
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ true", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = true;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(102);
+        expect(global._).toHaveBeenCalledTimes(103);
         expect(global._).toHaveBeenNthCalledWith(1, "About Music Blocks");
     });
 
     test("sets correct strings for _THIS_IS_MUSIC_BLOCKS_ false", () => {
         global._THIS_IS_MUSIC_BLOCKS_ = false;
         toolbar.init({});
-        expect(global._).toHaveBeenCalledTimes(84);
+        expect(global._).toHaveBeenCalledTimes(85);
         expect(global._).toHaveBeenNthCalledWith(1, "About Turtle Blocks");
     });
 
@@ -1302,6 +1302,42 @@ describe("Toolbar Class", () => {
         );
         begIcon.onclick();
         expect(toolbar.activity.beginnerMode).toBe(true);
+    });
+
+    test("renderHelpIcon wires click handlers for help, ui map, and keyboard shortcuts", () => {
+        const helpIcon = { onclick: null };
+        const helpGuideItem = { onclick: null };
+        const uiMapGuideItem = { onclick: null };
+        const shortcutsGuideItem = { onclick: null };
+
+        global.docById.mockImplementation(id => {
+            if (id === "helpIcon") return helpIcon;
+            if (id === "helpGuideItem") return helpGuideItem;
+            if (id === "uiMapGuideItem") return uiMapGuideItem;
+            if (id === "shortcutsGuideItem") return shortcutsGuideItem;
+            return null;
+        });
+
+        const mockHelpClick = jest.fn();
+        const mockUIMapClick = jest.fn();
+        const mockShortcutsClick = jest.fn();
+
+        toolbar.renderHelpIcon(mockHelpClick, mockUIMapClick, mockShortcutsClick);
+
+        expect(helpGuideItem.onclick).toBeInstanceOf(Function);
+        expect(uiMapGuideItem.onclick).toBeInstanceOf(Function);
+        expect(shortcutsGuideItem.onclick).toBeInstanceOf(Function);
+
+        const mockEvent = { preventDefault: jest.fn(), stopPropagation: jest.fn() };
+
+        helpGuideItem.onclick(mockEvent);
+        expect(mockHelpClick).toHaveBeenCalledWith(toolbar.activity);
+
+        uiMapGuideItem.onclick(mockEvent);
+        expect(mockUIMapClick).toHaveBeenCalledWith(toolbar.activity);
+
+        shortcutsGuideItem.onclick(mockEvent);
+        expect(mockShortcutsClick).toHaveBeenCalledWith(toolbar.activity);
     });
 });
 

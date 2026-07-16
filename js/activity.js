@@ -5826,6 +5826,9 @@ class Activity {
             if (window.widgetWindows?.isOpen("keyboard-shortcuts")) {
                 window.widgetWindows.clear("keyboard-shortcuts");
             }
+            if (window.widgetWindows?.isOpen("ui-map")) {
+                window.widgetWindows.clear("ui-map");
+            }
             activity._showHelp();
         };
 
@@ -5833,6 +5836,24 @@ class Activity {
             // Will show welcome page by default.
             await lazyLoad("widgets/help");
             new HelpWidget(this, false);
+        };
+
+        /*
+         * Shows UI Map reference panel
+         */
+        const showUIMap = activity => {
+            if (window.widgetWindows?.isOpen("help")) {
+                window.widgetWindows.clear("help");
+            }
+            if (window.widgetWindows?.isOpen("keyboard-shortcuts")) {
+                window.widgetWindows.clear("keyboard-shortcuts");
+            }
+            activity._showUIMap();
+        };
+
+        this._showUIMap = async () => {
+            await lazyLoad("widgets/uimap");
+            new UIMapWidget(this);
         };
 
         const showKeyboardShortcuts = activity => {
@@ -6769,7 +6790,7 @@ class Activity {
             );
             this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
             this.toolbar.renderMenuIcon(showHideAuxMenu);
-            this.toolbar.renderHelpIcon(showHelp, showKeyboardShortcuts);
+            this.toolbar.renderHelpIcon(showHelp, showUIMap, showKeyboardShortcuts);
             this.toolbar.renderModeSelectIcon(
                 doSwitchMode,
                 () => doRecordButton(this),

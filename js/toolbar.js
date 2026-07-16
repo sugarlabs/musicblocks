@@ -132,6 +132,7 @@ class Toolbar {
                 ["toggleAuxBtn", _("Auxiliary menu")],
                 ["helpIcon", _("Help and shortcuts")],
                 ["helpGuideItem", _("Help"), "innerHTML"],
+                ["uiMapGuideItem", _("UI Map"), "innerHTML"],
                 ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
@@ -265,6 +266,7 @@ class Toolbar {
                 ["toggleAuxBtn", _("Auxiliary menu")],
                 ["helpIcon", _("Help and shortcuts")],
                 ["helpGuideItem", _("Help"), "innerHTML"],
+                ["uiMapGuideItem", _("UI Map"), "innerHTML"],
                 ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
@@ -1211,17 +1213,20 @@ class Toolbar {
     }
 
     /**
-     * Renders the help icon with the provided onclick handler.
+     * Renders the help icon with the provided onclick handlers.
      *
      * @public
-     * @param {Function} onclick - The onclick handler for the help icon.
+     * @param {Function} onclick - The onclick handler for the help tour.
+     * @param {Function} uiMapOnclick - The onclick handler for the UI Map guide item.
+     * @param {Function} shortcutsOnclick - The onclick handler for keyboard shortcuts guide item.
      * @returns {void}
      */
-    renderHelpIcon(onclick, shortcutsOnclick) {
+    renderHelpIcon(onclick, uiMapOnclick, shortcutsOnclick) {
         const helpIcon = docById("helpIcon");
         const helpGuideItem = docById("helpGuideItem");
+        const uiMapGuideItem = docById("uiMapGuideItem");
         const shortcutsGuideItem = docById("shortcutsGuideItem");
-        const hasDropdownMenu = !!helpGuideItem || !!shortcutsGuideItem;
+        const hasDropdownMenu = !!helpGuideItem || !!uiMapGuideItem || !!shortcutsGuideItem;
 
         if (helpGuideItem) {
             helpGuideItem.onclick = event => {
@@ -1230,6 +1235,18 @@ class Toolbar {
                     event.stopPropagation();
                 }
                 onclick(this.activity);
+            };
+        }
+
+        if (uiMapGuideItem) {
+            uiMapGuideItem.onclick = event => {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                if (uiMapOnclick) {
+                    uiMapOnclick(this.activity);
+                }
             };
         }
 
