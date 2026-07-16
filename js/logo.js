@@ -2296,6 +2296,17 @@ class Logo {
                         }
                     }
 
+                    // Execute plugin stop callbacks so cleanup runs
+                    // consistently whether the user presses Stop or
+                    // playback finishes normally (mirrors doStopTurtles).
+                    for (const arg in logo.evalOnStopList) {
+                        logo.safePluginExecute(logo.evalOnStopList[arg], logo);
+                    }
+
+                    // Clear stale sound references left after natural
+                    // completion (mirrors doStopTurtles).
+                    logo.sounds = [];
+
                     // Give the last note time to play.
                     logo._lastNoteTimeout = logo._timerManager.setTimeout(() => {
                         logo._lastNoteTimeout = null;
