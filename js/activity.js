@@ -2140,21 +2140,9 @@ class Activity {
             }
         };
 
-        /*
-         * Toggles block/palette visibility
-         */
-        const changeBlockVisibility = activity => {
-            activity._changeBlockVisibility();
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-                activity.__tick();
-            }
-        };
-        // Exposed so ContextMenuController (activity/context-menu-controller.js) can
-        // reference it from the helpfulWheelItems registry it builds.
-        this.changeBlockVisibility = changeBlockVisibility;
+        // changeBlockVisibility (the helpful-wheel "Show/hide blocks" action) has
+        // been extracted to ContextMenuController; see
+        // ContextMenuController.changeBlockVisibility.
 
         this._changeBlockVisibility = () => {
             hideDOMLabel();
@@ -2179,21 +2167,9 @@ class Activity {
             }
         };
 
-        /*
-         * Toggles collapsible stacks (if collapsed stacks expand and vice versa)
-         */
-        const toggleCollapsibleStacks = activity => {
-            activity._toggleCollapsibleStacks();
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-                activity.__tick();
-            }
-        };
-        // Exposed so ContextMenuController (activity/context-menu-controller.js) can
-        // reference it from the helpfulWheelItems registry it builds.
-        this.toggleCollapsibleStacks = toggleCollapsibleStacks;
+        // toggleCollapsibleStacks (the helpful-wheel "Expand/collapse blocks"
+        // action) has been extracted to ContextMenuController; see
+        // ContextMenuController.toggleCollapsibleStacks.
 
         this._toggleCollapsibleStacks = () => {
             hideDOMLabel();

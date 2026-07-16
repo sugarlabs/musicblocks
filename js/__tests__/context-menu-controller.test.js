@@ -107,7 +107,8 @@ function makeActivity() {
         blocks: {
             isCoordinateOnBlock: jest.fn(() => false),
             selectedBlocks: [],
-            checkBounds: jest.fn()
+            checkBounds: jest.fn(),
+            trashStacks: []
         },
         canvas: { offsetLeft: 0, offsetTop: 0 },
         getStageScale: () => 1,
@@ -116,16 +117,18 @@ function makeActivity() {
         findBlocks: jest.fn(),
         boundary: { hide: jest.fn() },
         toolbar: { changeWrap: jest.fn() },
-        changeBlockVisibility: jest.fn(),
-        toggleCollapsibleStacks: jest.fn(),
+        _changeBlockVisibility: jest.fn(),
+        _toggleCollapsibleStacks: jest.fn(),
+        _restoreTrashById: jest.fn(),
         doSmallerBlocks: jest.fn(),
         doLargerBlocks: jest.fn(),
-        restoreTrashPop: jest.fn(),
         setScroller: jest.fn(),
         chooseKeyMenu: jest.fn(),
         selectMode: jest.fn(),
         deleteMultipleBlocks: jest.fn(),
         copyMultipleBlocks: jest.fn(),
+        textMsg: jest.fn(),
+        __tick: jest.fn(),
         _allClear: jest.fn(),
         turtles: {
             collapse: jest.fn(),
@@ -439,6 +442,48 @@ describe("ContextMenuController", () => {
             expect(home.fn).toBe(activity.findBlocks);
         });
 
+        test("wires 'Show/hide blocks', 'Expand/collapse blocks' and 'Restore' to the controller's own methods", () => {
+            controller.setupPaletteMenu();
+            const showHide = activity.helpfulWheelItems.find(
+                ele => ele.label === "Show/hide blocks"
+            );
+            const expandCollapse = activity.helpfulWheelItems.find(
+                ele => ele.label === "Expand/collapse blocks"
+            );
+            const restore = activity.helpfulWheelItems.find(ele => ele.label === "Restore");
+
+            expect(showHide.fn).toBe(controller.changeBlockVisibility);
+            expect(expandCollapse.fn).toBe(controller.toggleCollapsibleStacks);
+            expect(restore.fn).toBe(controller.restoreTrashPop);
+        });
+
+        test("'Show/hide blocks', 'Expand/collapse blocks' and 'Restore' work when invoked unbound, exactly as displayHelpfulWheel invokes them (ele.fn(activity), not controller.method(activity))", () => {
+            controller.setupPaletteMenu();
+            const showHide = activity.helpfulWheelItems.find(
+                ele => ele.label === "Show/hide blocks"
+            );
+            const expandCollapse = activity.helpfulWheelItems.find(
+                ele => ele.label === "Expand/collapse blocks"
+            );
+            const restore = activity.helpfulWheelItems.find(ele => ele.label === "Restore");
+            activity.blocks.trashStacks = ["block-1"];
+
+            // Extract the bare function references, matching how
+            // wheelItems.forEach(... wheel.navItems[i].navigateFunction = () => ele.fn(activity))
+            // calls them in displayHelpfulWheel: as plain functions, not as
+            // controller method calls, so `this` is never bound inside them.
+            const showHideFn = showHide.fn;
+            const expandCollapseFn = expandCollapse.fn;
+            const restoreFn = restore.fn;
+
+            expect(() => showHideFn(activity)).not.toThrow();
+            expect(() => expandCollapseFn(activity)).not.toThrow();
+            expect(() => restoreFn(activity)).not.toThrow();
+            expect(activity._changeBlockVisibility).toHaveBeenCalled();
+            expect(activity._toggleCollapsibleStacks).toHaveBeenCalled();
+            expect(activity._restoreTrashById).toHaveBeenCalledWith("block-1");
+        });
+
         test("search delegation entries call back into the controller's own methods", () => {
             const displaySpy = jest.spyOn(controller, "_displayHelpfulSearchDiv");
             const hideSpy = jest.spyOn(controller, "_hideHelpfulSearchWidget");
@@ -454,6 +499,49 @@ describe("ContextMenuController", () => {
 
             expect(displaySpy).toHaveBeenCalled();
             expect(hideSpy).toHaveBeenCalled();
+        });
+    });
+
+    // -----------------------------------------------------------------------
+    describe("wheel-item action helpers (controller-private)", () => {
+        test("changeBlockVisibility delegates to activity._changeBlockVisibility and closes the wheel", () => {
+            mockElement.style.display = "block";
+            controller.changeBlockVisibility(activity);
+            expect(activity._changeBlockVisibility).toHaveBeenCalled();
+            expect(mockElement.style.display).toBe("none");
+            expect(activity.__tick).toHaveBeenCalled();
+        });
+
+        test("changeBlockVisibility does not tick when the wheel is already hidden", () => {
+            mockElement.style.display = "none";
+            controller.changeBlockVisibility(activity);
+            expect(activity._changeBlockVisibility).toHaveBeenCalled();
+            expect(activity.__tick).not.toHaveBeenCalled();
+        });
+
+        test("toggleCollapsibleStacks delegates to activity._toggleCollapsibleStacks and closes the wheel", () => {
+            mockElement.style.display = "block";
+            controller.toggleCollapsibleStacks(activity);
+            expect(activity._toggleCollapsibleStacks).toHaveBeenCalled();
+            expect(mockElement.style.display).toBe("none");
+            expect(activity.__tick).toHaveBeenCalled();
+        });
+
+        test("restoreTrashPop shows an empty-trash message and returns early when there is nothing to restore", () => {
+            activity.blocks.trashStacks = [];
+            controller.restoreTrashPop(activity);
+            expect(activity.textMsg).toHaveBeenCalledWith("Trash can is empty.", 3000);
+            expect(activity._restoreTrashById).not.toHaveBeenCalled();
+        });
+
+        test("restoreTrashPop restores the most recently trashed block and closes the wheel", () => {
+            activity.blocks.trashStacks = ["block-1", "block-2"];
+            mockElement.style.display = "block";
+            controller.restoreTrashPop(activity);
+            expect(activity._restoreTrashById).toHaveBeenCalledWith("block-2");
+            expect(activity.textMsg).toHaveBeenCalledWith("Item restored from the trash.", 3000);
+            expect(mockElement.style.display).toBe("none");
+            expect(activity.__tick).toHaveBeenCalled();
         });
     });
 

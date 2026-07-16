@@ -124,7 +124,7 @@ const loadActivityClass = () => {
         LEADING: 0,
         MYDEFINES: [],
 
-        // globals referenced by _setupPaletteMenu and _displayHelpfulWheel
+        // globals referenced by setupPaletteMenu and displayHelpfulWheel
         wheelnav: WheelnavMock,
         slicePath: () => ({
             DonutSlice: {},
@@ -142,9 +142,8 @@ const loadActivityClass = () => {
         COLLAPSEBUTTON: "<svg/>",
         EXPANDBUTTON: "<svg/>",
         _THIS_IS_MUSIC_BLOCKS_: true,
-        changeBlockVisibility: jest.fn(),
-        toggleCollapsibleStacks: jest.fn(),
-        restoreTrashPop: jest.fn(),
+        doSmallerBlocks: jest.fn(),
+        doLargerBlocks: jest.fn(),
         setScroller: jest.fn(),
         chooseKeyMenu: jest.fn(),
         piemenuGrid: jest.fn()

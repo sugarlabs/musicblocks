@@ -16,6 +16,25 @@
 
 /* exported setupContextMenuController, ContextMenuController */
 
+/*
+ * Hides the helpful wheel (if currently shown) and ticks the activity so the
+ * canvas re-renders. Shared by the wheel-item action helpers below (each of
+ * which closes the wheel after performing its action — mirrors the identical
+ * inline block each of them used before extraction).
+ *
+ * Kept as a plain module-level function, not a class method: changeBlockVisibility
+ * / toggleCollapsibleStacks / restoreTrashPop are stored as bare `fn:`/`action`
+ * references in the helpfulWheelItems registry and invoked later as `fn(activity)`
+ * (not `controller.fn(activity)`), so anything they call must not depend on `this`.
+ */
+const closeHelpfulWheelAndTick = activity => {
+    const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+    if (helpfulWheelDiv.style.display !== "none") {
+        helpfulWheelDiv.style.display = "none";
+        activity.__tick();
+    }
+};
+
 class ContextMenuController {
     /**
      * @param {object} activity - The Activity instance.
@@ -187,7 +206,7 @@ class ContextMenuController {
         activity.hideBlocksContainer = createButton(
             SHOWBLOCKSBUTTON,
             _("Show/hide blocks"),
-            activity.changeBlockVisibility
+            this.changeBlockVisibility
         );
 
         if (!activity.helpfulWheelItems.find(ele => ele.label === "Show/hide blocks"))
@@ -197,13 +216,13 @@ class ContextMenuController {
                     "imgsrc:data:image/svg+xml;base64," +
                     window.btoa(base64Encode(SHOWBLOCKSBUTTON)),
                 display: true,
-                fn: activity.changeBlockVisibility
+                fn: this.changeBlockVisibility
             });
 
         activity.collapseBlocksContainer = createButton(
             COLLAPSEBLOCKSBUTTON,
             _("Expand/collapse blocks"),
-            activity.toggleCollapsibleStacks
+            this.toggleCollapsibleStacks
         );
 
         if (!activity.helpfulWheelItems.find(ele => ele.label === "Expand/collapse blocks"))
@@ -213,7 +232,7 @@ class ContextMenuController {
                     "imgsrc:data:image/svg+xml;base64," +
                     window.btoa(base64Encode(COLLAPSEBLOCKSBUTTON)),
                 display: true,
-                fn: activity.toggleCollapsibleStacks
+                fn: this.toggleCollapsibleStacks
             });
 
         activity.smallerContainer = createButton(
@@ -250,7 +269,7 @@ class ContextMenuController {
                 label: "Restore",
                 icon: "imgsrc:header-icons/restore-from-trash.svg",
                 display: true,
-                fn: activity.restoreTrashPop
+                fn: this.restoreTrashPop
             });
 
         if (!activity.helpfulWheelItems.find(ele => ele.label === "Turtle Wrap Off"))
@@ -379,6 +398,53 @@ class ContextMenuController {
             });
     }
 
+    /*
+     * Toggles block/palette visibility. Only referenced from the
+     * helpfulWheelItems registry built by setupPaletteMenu, so it lives here
+     * rather than on Activity. Takes `activity` as an explicit parameter
+     * (rather than reading `this.activity`) because it is stored as a bare
+     * `fn:`/`action` reference and invoked later as `fn(activity)`.
+     */
+    changeBlockVisibility(activity) {
+        activity._changeBlockVisibility();
+        closeHelpfulWheelAndTick(activity);
+    }
+
+    /*
+     * Toggles collapsible stacks (if collapsed stacks expand and vice versa).
+     * Only referenced from the helpfulWheelItems registry built by
+     * setupPaletteMenu, so it lives here rather than on Activity. See the
+     * `changeBlockVisibility` comment above for why it takes `activity` as a
+     * parameter instead of reading `this.activity`.
+     */
+    toggleCollapsibleStacks(activity) {
+        activity._toggleCollapsibleStacks();
+        closeHelpfulWheelAndTick(activity);
+    }
+
+    /*
+     * Restores the most recently trashed block. Only referenced from the
+     * helpfulWheelItems registry built by setupPaletteMenu, so it lives here
+     * rather than on Activity. See the `changeBlockVisibility` comment above
+     * for why it takes `activity` as a parameter instead of reading
+     * `this.activity`.
+     */
+    restoreTrashPop(activity) {
+        if (
+            !activity.blocks ||
+            !activity.blocks.trashStacks ||
+            activity.blocks.trashStacks.length === 0
+        ) {
+            activity.textMsg(_("Trash can is empty."), 3000);
+            return;
+        }
+        activity._restoreTrashById(
+            activity.blocks.trashStacks[activity.blocks.trashStacks.length - 1]
+        );
+        activity.textMsg(_("Item restored from the trash."), 3000);
+        closeHelpfulWheelAndTick(activity);
+    }
+
     /**
      * Makes non-toolbar buttons, e.g., the palette menu buttons.
      */
@@ -463,6 +529,12 @@ class ContextMenuController {
 
     /*
      * Toggles Aux menu visibility and positioning.
+     *
+     * Kept public (underscore-prefixed name preserved) intentionally: this
+     * method is called directly as `activity._showHideAuxMenu(resize)` by
+     * project-manager.js and by the inline PluginDialog callback in
+     * activity.js, so it cannot be made private without breaking those
+     * external callers.
      */
     _showHideAuxMenu(resize) {
         const activity = this.activity;
