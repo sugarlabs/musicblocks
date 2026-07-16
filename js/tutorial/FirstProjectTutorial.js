@@ -693,7 +693,7 @@ class FirstProjectTutorial {
             z-index: 9999;
             pointer-events: none;
             transition: all 0.3s ease;
-            border: 3px solid #1e88e5;
+            border: 3px solid var(--color-selector-selected);
         `;
 
         // Create WidgetWindow
@@ -859,27 +859,27 @@ class FirstProjectTutorial {
                 margin: 0 0 10px 0;
                 font-size: 17px;
                 font-weight: 700;
-                color: #ffffff;
+                color: var(--color-text-primary);
                 line-height: 1.3;
             ">${step.title}</h3>
             <p style="
                 margin: 0 0 16px 0;
-                color: #b0c4de;
+                color: var(--color-text-secondary);
                 line-height: 1.6;
                 font-size: 13.5px;
             ">${step.content}</p>
             <div id="tutorial-challenge" style="
-                background: ${step.isReflection ? "#2c2615" : "#0a1c30"};
+                background: ${step.isReflection ? "var(--color-warning-bg)" : "var(--color-info-bg)"};
                 padding: 12px 16px;
                 border-radius: 8px;
                 margin-bottom: 8px;
                 font-weight: 500;
                 font-size: 13px;
-                color: #ffffff;
+                color: var(--color-text-primary);
                 display: flex;
                 align-items: center;
                 gap: 10px;
-                border-left: 3px solid ${step.isReflection ? "#FFD54F" : phase.accent};
+                border-left: 3px solid ${step.isReflection ? "var(--color-warning)" : phase.accent};
             ">
                 <span id="challenge-icon" style="font-size: 16px;">${isCompleted ? "✅" : step.isReflection ? "💭" : "🎯"}</span>
                 <span id="challenge-text">${
@@ -920,7 +920,7 @@ class FirstProjectTutorial {
                 " onmouseover="this.style.background='#0052cc';" onmouseout="this.style.background='#0066FF';">${step.isLast ? "🚀 " + _("Start Exploring!") : _("Next") + " →"}</button>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-                <span style="font-size: 10px; color: #555555;">${_("Esc to close • ←→ to navigate")}</span>
+                <span style="font-size: 10px; color: var(--color-text-secondary);">${_("Esc to close • ←→ to navigate")}</span>
                 <div>${progressDots}</div>
             </div>
         `;
@@ -1089,7 +1089,7 @@ class FirstProjectTutorial {
 
         hintArea.innerHTML = `
             <a id="tutorial-hint-link" href="#" style="
-                color: #0066FF;
+                color: var(--color-brand-primary);
                 font-size: 12px;
                 text-decoration: none;
                 font-weight: 500;
@@ -1123,7 +1123,7 @@ class FirstProjectTutorial {
 
         hintArea.innerHTML = `
             <div style="
-                background: #0a1c30;
+                background: var(--color-info-bg);
                 padding: 10px 14px;
                 border-radius: 6px;
                 font-size: 12.5px;
