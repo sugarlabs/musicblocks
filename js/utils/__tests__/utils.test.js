@@ -1198,6 +1198,27 @@ describe("processRawPluginData()", () => {
         debugSpy.mockRestore();
         errorSpy.mockRestore();
     });
+
+    it("handles plugin processing errors without logging raw plugin data", async () => {
+        const activity = { errorMsg: jest.fn() };
+        const rawData = JSON.stringify({
+            PALETTEPLUGINS: { testPalette: "test" }
+        });
+        const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+        const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+
+        const result = await processRawPluginData(activity, rawData, "plugins/test.json");
+
+        expect(result).toBeNull();
+        expect(logSpy).not.toHaveBeenCalledWith(rawData);
+        expect(warnSpy).toHaveBeenCalledWith("Plugin data could not be processed.");
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            expect.stringContaining("Error loading plugin:")
+        );
+
+        warnSpy.mockRestore();
+        logSpy.mockRestore();
+    });
 });
 
 describe("prepareMacroExports()", () => {
