@@ -832,6 +832,74 @@ describe("Toolbar Class", () => {
         expect(helpGuideItem.onclick).toBeInstanceOf(Function);
         expect(shortcutsGuideItem.onclick).toBeInstanceOf(Function);
     });
+    test("renderModeSelectIcon handles mode switch and calls themeBox handlers", () => {
+        const elements = {
+            beginnerMode: { style: { display: "" }, onclick: null },
+            advancedMode: { style: { display: "" }, onclick: null },
+            record: { style: { display: "" }, classList: { remove: jest.fn(), add: jest.fn() } },
+            recordDropdownArrow: {
+                style: { display: "" },
+                classList: { remove: jest.fn(), add: jest.fn() },
+                addEventListener: jest.fn(),
+                querySelector: jest.fn()
+            },
+            recorddropdown: {
+                style: { display: "" },
+                classList: { remove: jest.fn(), add: jest.fn() }
+            },
+            saveButton: { style: { display: "" } },
+            saveButtonAdvanced: { style: { display: "" } }
+        };
+
+        global.docById.mockImplementation(id => elements[id] || { style: {}, onclick: null });
+        global.safeStorageGet = jest.fn();
+        global.safeStorageSet = jest.fn();
+        global.doSVG = jest.fn();
+
+        toolbar.activity = {
+            beginnerMode: true,
+            themeBox: {
+                light_onclick: jest.fn(),
+                highcontrast_onclick: jest.fn()
+            },
+            save: {
+                saveHTML: jest.fn(),
+                saveSVG: jest.fn(),
+                saveMIDI: jest.fn(),
+                savePNG: jest.fn(),
+                saveWAV: jest.fn(),
+                saveLilypond: jest.fn(),
+                saveAbc: jest.fn(),
+                saveMxml: jest.fn(),
+                saveBlockArtwork: jest.fn(),
+                saveBlockArtworkPNG: jest.fn()
+            },
+            toolbar: toolbar
+        };
+
+        const mockOnClick = jest.fn();
+        toolbar.renderModeSelectIcon(
+            mockOnClick,
+            jest.fn(),
+            jest.fn(),
+            jest.fn(),
+            jest.fn(),
+            jest.fn()
+        );
+
+        // Trigger beginner mode switch -> should become false (advanced mode)
+        elements.beginnerMode.onclick();
+
+        expect(toolbar.activity.beginnerMode).toBe(false);
+        expect(toolbar.activity.themeBox.highcontrast_onclick).toHaveBeenCalled();
+        expect(mockOnClick).toHaveBeenCalled();
+
+        // Trigger advanced mode switch -> should become true (beginner mode)
+        elements.advancedMode.onclick();
+
+        expect(toolbar.activity.beginnerMode).toBe(true);
+        expect(toolbar.activity.themeBox.light_onclick).toHaveBeenCalled();
+    });
 
     test("renderModeSelectIcon handles mode switching and UI updates", () => {
         // Mock DOM elements

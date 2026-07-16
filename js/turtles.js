@@ -901,7 +901,8 @@ Turtles.TurtlesView = class {
             container.onmouseover = () => {
                 if (!activity.loading) {
                     document.body.style.cursor = "pointer";
-                    container.style.transition = "0.1s ease-out";
+                    container.style.transition =
+                        "transform 0.1s ease-out, background-color 0.2s ease, border-color 0.2s ease";
                     container.style.transform = "scale(1.15)";
                 }
             };
@@ -909,7 +910,8 @@ Turtles.TurtlesView = class {
             container.onmouseout = () => {
                 if (!activity.loading) {
                     document.body.style.cursor = "default";
-                    container.style.transition = "0.15s ease-out";
+                    container.style.transition =
+                        "transform 0.15s ease-out, background-color 0.2s ease, border-color 0.2s ease";
                     container.style.transform = "scale(1)";
                 }
             };
@@ -1180,17 +1182,30 @@ Turtles.TurtlesView = class {
          * initializes all Buttons.
          */
         const __makeAllButtons = () => {
-            let second = false;
-            if (docById("buttoncontainerTOP")) {
-                window.jQuery(".tooltipped").tooltip("close");
-                docById("buttoncontainerTOP").parentElement.removeChild(
-                    docById("buttoncontainerTOP")
-                );
-                second = true;
+            let cont = docById("buttoncontainerTOP");
+            if (cont) {
+                const updatePos = (btn, x) => {
+                    if (btn) {
+                        const rightPos = document.body.clientWidth - x;
+                        btn.style.right = rightPos + "px";
+                    }
+                };
+                // Calculate position from the right edge of the screen.
+                // The magic numbers represent the button width (48px) plus margin/padding.
+                // 55 represents one button slot width (48px + 7px spacing).
+                updatePos(this._collapseButton, this._w - 55);
+                updatePos(this._expandButton, this._w - 55);
+                updatePos(this._clearButton, this._w - 5 - 2 * 55); // Erase button is 2nd from the right
+                updatePos(this.gridButton, this._w - 10 - 3 * 55); // Grid button is 3rd from the right
+                if (typeof this.activity.updateFloatingButtonsPosition === "function") {
+                    this.activity.updateFloatingButtonsPosition();
+                }
+                this._locked = false;
+                return;
             }
-            const cont = document.createElement("div");
+            cont = document.createElement("div");
             document.body.appendChild(cont);
-            cont.style.display = second ? "block" : "none";
+            cont.style.display = "none";
             cont.setAttribute("id", "buttoncontainerTOP");
             __makeCollapseButton();
             __makeExpandButton();
@@ -1204,6 +1219,9 @@ Turtles.TurtlesView = class {
                         delay: 100
                     });
                 });
+            if (typeof this.activity.updateFloatingButtonsPosition === "function") {
+                this.activity.updateFloatingButtonsPosition();
+            }
             this._locked = false;
         };
 

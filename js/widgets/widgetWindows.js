@@ -46,6 +46,38 @@ window.widgetWindows = {
             return;
         }
 
+        // Handle Tab key for focus management in widget windows
+        if (e.key === "Tab" && focused._windowDiv) {
+            // Get all focusable elements in the window
+            const elements = focused._windowDiv.querySelectorAll(
+                'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+            );
+            const focusableElements = Array.from(elements).filter(el => {
+                return (
+                    el.offsetWidth > 0 &&
+                    el.offsetHeight > 0 &&
+                    window.getComputedStyle(el).visibility !== "hidden"
+                );
+            });
+
+            if (focusableElements.length > 0) {
+                const firstElement = focusableElements[0];
+                const lastElement = focusableElements[focusableElements.length - 1];
+
+                if (e.shiftKey) {
+                    if (activeElement === firstElement) {
+                        e.preventDefault();
+                        lastElement.focus();
+                    }
+                } else {
+                    if (activeElement === lastElement) {
+                        e.preventDefault();
+                        firstElement.focus();
+                    }
+                }
+            }
+        }
+
         // Handle Maximize (Cmd/Ctrl + Shift + M)
         const isModifierActive = e.metaKey || e.ctrlKey;
         if (isModifierActive && e.shiftKey && e.code === "KeyM") {
@@ -663,7 +695,7 @@ class WidgetWindow {
         if (this.timerManager) {
             this.timerManager.clearAll();
         }
-        window.widgetWindows.openWindows[this._key] = undefined;
+        delete window.widgetWindows.openWindows[this._key];
     }
 
     /**
@@ -686,6 +718,24 @@ class WidgetWindow {
      * @returns {void}
      */
     show() {
+        if (this._frame && !this._frame.parentElement) {
+            const windows = docById("floatingWindows");
+            if (windows) {
+                windows.appendChild(this._frame);
+                if (this._widget && this._widgetWheelHandler) {
+                    this._widget.addEventListener("wheel", this._widgetWheelHandler, {
+                        passive: false
+                    });
+                    this._widget.addEventListener("DOMMouseScroll", this._widgetWheelHandler, {
+                        passive: false
+                    });
+                }
+            }
+        }
+        if (this._overlayframe && !this._overlayframe.parentElement && this._fullscreenEnabled) {
+            document.body.appendChild(this._overlayframe);
+        }
+        window.widgetWindows.openWindows[this._key] = this;
         this._frame.style.display = "block";
     }
 

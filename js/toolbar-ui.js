@@ -1461,6 +1461,14 @@ class ToolbarUI {
 
             updateUIForMode();
 
+            if (this.activity.themeBox) {
+                if (this.activity.beginnerMode) {
+                    this.activity.themeBox.light_onclick();
+                } else {
+                    this.activity.themeBox.highcontrast_onclick();
+                }
+            }
+
             // Reinitialize tooltips after mode switch
             if (!this.tooltipsDisabled) {
                 $j(".tooltipped").tooltip({

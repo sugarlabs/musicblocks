@@ -352,17 +352,20 @@ class PitchStaircase {
     _playOne(stepCell, playCell) {
         // The frequency is stored in the stepCell.
         stepCell.classList.add("active");
-        stepCell.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        const i = Number(playCell.getAttribute("id"));
-        this._playingRowIndex = i;
         const frequency = Number(stepCell.getAttribute("id"));
         this.activity.logo.synth.trigger(0, frequency, 1, DEFAULTVOICE, null, null);
-        this._setButtonIcon(playCell, "stop-button.svg", _("Stop"));
+
+        if (playCell) {
+            this._playingRowIndex = Number(playCell.getAttribute("id"));
+            this._setButtonIcon(playCell, "stop-button.svg", _("Stop"));
+        }
 
         this._rowStopTimeout = setTimeout(() => {
             stepCell.classList.remove("active");
             stepCell.style.backgroundColor = "";
-            this._setButtonIcon(playCell, "play-button.svg", _("Play"));
+            if (playCell) {
+                this._setButtonIcon(playCell, "play-button.svg", _("Play"));
+            }
             this._playingRowIndex = null;
         }, 1000);
     }

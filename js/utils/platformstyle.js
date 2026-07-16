@@ -36,510 +36,374 @@ window.platform = {
 platform.androidWebkit = platform.android && !platform.FF;
 platform.FFOS = platform.FF && (platform.mobile || platform.tablet) && !platform.android;
 
-const platformThemes = {
-    dark: {
-        textColor: "#E2E2E2",
-        blockText: "#FFFFFF",
-        dialogueBox: "#1C1C1C",
-        strokeColor: "#E2E2E2",
-        fillColor: "#F9F9F9",
-        blueButton: "#0066FF",
-        blueButtonHover: "#023a76",
-        blueButtonText: "white",
-        cancelButton: "#f1f1f1",
-        cancelButtonHover: "#afafaf",
-        headingColor: "#0066ff",
-        hoverColor: "#808080",
-        widgetButton: "#225A91",
-        widgetButtonSelect: "#979797",
-        widgetBackground: "#454545",
-        paletteColors: {
-            widgets: ["#2E7D32", "#1B5E20", "#1B5E20", "#81C784"],
-            pitch: ["#2E7D32", "#1B5E20", "#1B5E20", "#81C784"],
-            rhythm: ["#BF360C", "#8C2A0B", "#8C2A0B", "#FF8A65"],
-            meter: ["#BF360C", "#8C2A0B", "#8C2A0B", "#FF8A65"],
-            tone: ["#00838F", "#005662", "#005662", "#4DD0E1"],
-            ornament: ["#00838F", "#005662", "#005662", "#4DD0E1"],
-            intervals: ["#2E7D32", "#1B5E20", "#1B5E20", "#81C784"],
-            volume: ["#00838F", "#005662", "#005662", "#4DD0E1"],
-            drum: ["#00838F", "#005662", "#005662", "#4DD0E1"],
-            graphics: ["#3949AB", "#283593", "#283593", "#7986CB"],
-            turtle: ["#3949AB", "#283593", "#283593", "#7986CB"],
-            pen: ["#3949AB", "#283593", "#283593", "#7986CB"],
-            boxes: ["#E65100", "#BF360C", "#BF360C", "#FFB74D"],
-            action: ["#FF8F00", "#FF6F00", "#FF6F00", "#FFE082"],
-            media: ["#C62828", "#8E0000", "#8E0000", "#FF8A80"],
-            number: ["#AD1457", "#880E4F", "#880E4F", "#F48FB1"],
-            boolean: ["#7B1FA2", "#4A0072", "#4A0072", "#CE93D8"],
-            flow: ["#5D4037", "#3E2723", "#3E2723", "#BCAAA4"],
-            sensors: ["#827717", "#4B830D", "#4B830D", "#E6EE9C"],
-            extras: ["#424242", "#212121", "#212121", "#9E9E9E"],
-            program: ["#424242", "#212121", "#212121", "#9E9E9E"],
-            myblocks: ["#FF8F00", "#FF6F00", "#FF6F00", "#FFE082"],
-            heap: ["#5D4037", "#3E2723", "#3E2723", "#BCAAA4"],
-            dictionary: ["#5D4037", "#3E2723", "#3E2723", "#BCAAA4"],
-            ensemble: ["#3949AB", "#283593", "#283593", "#7986CB"]
-        },
-
-        disconnected: "#5C5C5C",
-        header: "#1E88E5",
-        aux: "#1976D2",
-        sub: "#64B5F6",
-        doHeaderShadow: !platform.FF,
-        rule: "#303030",
-        ruleColor: "#303030",
-        trashColor: "#757575",
-        trashBorder: "#424242",
-        trashActive: "#E53935",
-        background: "#303030", // Very dark gray
-        paletteSelected: "#1E1E1E",
-        paletteBackground: "#1C1C1C",
-        paletteLabelBackground: "#022363",
-        paletteLabelSelected: "#01143b",
-        paletteText: "#BDBDBD",
-        rulerHighlight: "#FFEB3B",
-        selectorBackground: "#64B5F6",
-        selectorSelected: "#1E88E5",
-        labelColor: "#BDBDBD",
-        lyricsLabelBackground: "#C7225D",
-        lyricsInputBackground: "#D15A84",
-        tupletBackground: "#424242",
-        drumBackground: "#00ACC1",
-        pitchBackground: "#4CAF50",
-        graphicsBackground: "#7986CB",
-        drumLabelBackground: "#008BA3",
-        pitchLabelBackground: "#388E3C",
-        graphicsLabelBackground: "#5C6BC0",
-        rhythmcellcolor: "#303030",
-        stopIconcolor: "#D50000",
-        hitAreaGraphicsBeginFill: "#121212",
-        orange: "#FB8C00", // 5YR
-        piemenuBasic: ["#00ACC1", "#4CAF50", "#008BA3", "#4CAF50", "#008BA3"],
-        exitWheelcolors: ["#757575", "#BDBDBD"],
-        exitWheelcolors2: ["#757575", "#7986CB", "#4CAF50"],
-        pitchWheelcolors: [
-            "#388E3C",
-            "#4CAF50",
-            "#388E3C",
-            "#008BA3",
-            "#388E3C",
-            "#4CAF50",
-            "#66BB6A"
-        ],
-        gridWheelcolors: {
-            wheel: ["#D6D6D6"],
-            selected: {
-                fill: "#858585",
-                stroke: "#777"
-            }
-        },
-        drumWheelcolors: ["#008BA3", "#00ACC1"],
-        graphicWheelcolors: ["#7986CB", "#5C6BC0"],
-        accidentalsWheelcolors: ["#388E3C", "#4CAF50", "#388E3C", "#008BA3", "#388E3C"],
-        accidentalsWheelcolorspush: "#424242",
-        octavesWheelcolors: [
-            "#FFCDD2",
-            "#EF9A9A",
-            "#FFCDD2",
-            "#EF9A9A",
-            "#FFCDD2",
-            "#EF9A9A",
-            "#FFCDD2",
-            "#EF9A9A",
-            "#424242",
-            "#424242",
-            "#424242",
-            "#424242",
-            "#424242",
-            "#424242"
-        ],
-        blockLabelsWheelcolors: [
-            "#FFCDD2",
-            "#EF9A9A",
-            "#FFCDD2",
-            "#EF9A9A",
-            "#FFCDD2",
-            "#EF9A9A",
-            "#FFCDD2",
-            "#EF9A9A",
-            "#FFCDD2",
-            "#EF9A9A",
-            "#FFCDD2",
-            "#EF9A9A"
-        ],
-        noteValueWheelcolors: ["#FFCDD2", "#EF9A9A"],
-        tabsWheelcolors: ["#FFCDD2", "#EF9A9A"],
-        numberWheelcolors: ["#FFCDD2", "#EF9A9A"],
-        piemenuBasicundefined: ["#388E3C", "#4CAF50", "#008BA3"],
-        booleanWheelcolors: ["#C5CAE9", "#9FA8DA"],
-        piemenuVoicesColors: ["#00ACC1", "#4CAF50", "#008BA3", "#4CAF50", "#008BA3"],
-        intervalNameWheelcolors: ["#388E3C", "#4CAF50", "#388E3C", "#008BA3", "#4CAF50"],
-        intervalWheelcolors: ["#388E3C", "#4CAF50", "#388E3C", "#008BA3", "#4CAF50"],
-        modeWheelcolors: ["#388E3C", "#4CAF50"],
-        modeGroupWheelcolors: [
-            "#FFCDD2",
-            "#EF9A9A",
-            "#FFCDD2",
-            "#EF9A9A",
-            "#FFCDD2",
-            "#EF9A9A",
-            "#FFCDD2",
-            "#EF9A9A",
-            "#424242",
-            "#424242",
-            "#424242",
-            "#424242",
-            "#424242",
-            "#424242"
-        ],
-        modePieMenusIfColorPush: "#66BB6A",
-        modePieMenusElseColorPush: "#81C784",
-        wheelcolors: ["#424242", "#616161", "#424242", "#616161", "#424242"]
-    },
-    light: {
-        textColor: "black",
-        blockText: "#282828",
-        dialogueBox: "#fff",
-        strokeColor: "#E2E2E2",
-        fillColor: "#F9F9F9",
-        blueButton: "#0066FF",
-        blueButtonHover: "#023a76",
-        blueButtonText: "white",
-        cancelButton: "#f1f1f1",
-        cancelButtonHover: "#afafaf",
-        headingColor: "#0066ff",
-        hoverColor: "#E0E0E0",
-        widgetBackground: "#ccc",
-        widgetButton: "#8cc6ff",
-        widgetButtonSelect: "#C8C8C8",
-        paletteColors: {
-            widgets: ["#7CD622", "#57AD02", "#57AD02", "#B4EB7D"],
-            pitch: ["#7CD622", "#57AD02", "#57AD02", "#B4EB7D"],
-            // rhythm: ["#FE994F", "#E86B0E", "#E86B0E", "#FEC092"],
-            rhythm: ["#FF8700", "#E86B0E", "#E86B0E", "#FEC092"],
-            meter: ["#FE994F", "#E86B0E", "#E86B0E", "#FEC092"],
-            tone: ["#3EDCDD", "#1DBCBD", "#1DBCBD", "#A1EEEF"],
-            ornament: ["#3EDCDD", "#1DBCBD", "#1DBCBD", "#A1EEEF"],
-            intervals: ["#7CD622", "#57AD02", "#57AD02", "#B4EB7D"],
-            volume: ["#3EDCDD", "#1DBCBD", "#1DBCBD", "#A1EEEF"],
-            drum: ["#3EDCDD", "#1DBCBD", "#1DBCBD", "#A1EEEF"],
-            graphics: ["#92A9FF", "#5370DC", "#5370DC", "#CDD8FF"],
-            turtle: ["#92A9FF", "#5370DC", "#5370DC", "#CDD8FF"],
-            pen: ["#92A9FF", "#5370DC", "#5370DC", "#CDD8FF"],
-            // boxes: ["#FFBF00", "#DAAF30", "#DAAF30", "#FFE391"],
-            boxes: ["#FFB900", "#d18600", "#d18600", "#FFD092"],
-            // action: ["#FFBF00", "#DAAF30", "#DAAF30", "#FFE391"],
-            action: ["#F3C800", "#DAAF30", "#DAAF30", "#FFE391"],
-            media: ["#FF664B", "#EA4326", "#EA4326", "#FFB9E2"],
-            number: ["#FF6EA1", "#FF2C76", "#FF2C76", "#FFCDDF"],
-            boolean: ["#D97DF5", "#B653D3", "#B653D3", "#EDC6A3"],
-            flow: ["#D98A43", "#B7651A", "#B7651A", "#ECC6A4"],
-            // sensors: ["#FF664B", "#EA4326", "#EA4326", "#FFB9E2"],
-            sensors: ["#AABB00", "#748400", "#748400", "#FFE391"],
-            extras: ["#C4C4C4", "#A0A0A0", "#A0A0A0", "#D0D0D0"],
-            program: ["#C4C4C4", "#A0A0A0", "#A0A0A0", "#D0D0D0"],
-            myblocks: ["#FFBF00", "#DAAF30", "#DAAF30", "#FFE391"],
-            heap: ["#D98A43", "#B7651A", "#B7651A", "#ECC6A4"],
-            dictionary: ["#D98A43", "#B7651A", "#B7651A", "#ECC6A4"],
-            ensemble: ["#92A9FF", "#5370DC", "#5370DC", "#CDD8FF"]
-        },
-
-        disconnected: "#C4C4C4", // disconnected block color
-        header: platform.FF ? "#4DA6FF" : "#4DA6FF",
-        aux: "#1A8CFF",
-        sub: "#8CC6FF",
-        doHeaderShadow: !platform.FF,
-        rule: "#E2E2E2",
-        ruleColor: "#E2E2E2",
-        trashColor: "#C0C0C0",
-        trashBorder: "#808080",
-        trashActive: "#FF0000",
-        background: "#F9F9F9",
-        paletteSelected: "#F3F3F3",
-        paletteBackground: "#FFFFFF",
-        paletteLabelBackground: "#8CC6FF",
-        paletteLabelSelected: "#1A8CFF",
-        paletteText: "#666666",
-        rulerHighlight: "#FFBF00",
-        selectorBackground: "#8CC6FF",
-        selectorSelected: "#1A8CFF",
-        labelColor: "#a0a0a0",
-        lyricsLabelBackground: "#FF2B77",
-        lyricsInputBackground: "#FF6EA1",
-        tupletBackground: "#c0c0c0",
-        drumBackground: "#3EDCDD",
-        pitchBackground: "#7CD622",
-        graphicsBackground: "#92A9FF",
-        drumLabelBackground: "#25C3C0",
-        pitchLabelBackground: "#77C428",
-        graphicsLabelBackground: "#728FF9",
-        rhythmcellcolor: "#c8c8c8",
-        stopIconcolor: "#ea174c",
-        hitAreaGraphicsBeginFill: "#FFF",
-        orange: "#e37a00", // 5YR
-        piemenuBasic: ["#3ea4a3", "#60bfbc", "#1d8989", "#60bfbc", "#1d8989"],
-        exitWheelcolors: ["#808080", "#c0c0c0"],
-        exitWheelcolors2: ["#808080", "#92a9ff", "#80a080"],
-        pitchWheelcolors: [
-            "#77c428",
-            "#93e042",
-            "#77c428",
-            "#5ba900",
-            "#77c428",
-            "#93e042",
-            "#adfd55"
-        ],
-        gridWheelcolors: {
-            wheel: ["#ffffff"],
-            selected: {
-                fill: "#dedede",
-                stroke: "#a3a3a3"
-            }
-        },
-        drumWheelcolors: ["#1fadae", "#3edcdd"],
-        graphicWheelcolors: ["#92a9ff", "#728ff9"],
-        accidentalsWheelcolors: ["#77c428", "#93e042", "#77c428", "#5ba900", "#77c428"],
-        accidentalsWheelcolorspush: "#c0c0c0",
-        octavesWheelcolors: [
-            "#ffb2bc",
-            "#ffccd6",
-            "#ffb2bc",
-            "#ffccd6",
-            "#ffb2bc",
-            "#ffccd6",
-            "#ffb2bc",
-            "#ffccd6",
-            "#c0c0c0",
-            "#c0c0c0",
-            "#c0c0c0",
-            "#c0c0c0",
-            "#c0c0c0",
-            "#c0c0c0"
-        ],
-        blockLabelsWheelcolors: [
-            "#ffb2bc",
-            "#ffccd6",
-            "#ffb2bc",
-            "#ffccd6",
-            "#ffb2bc",
-            "#ffccd6",
-            "#ffb2bc",
-            "#ffccd6",
-            "#ffb2bc",
-            "#ffccd6",
-            "#ffb2bc",
-            "#ffccd6"
-        ],
-        noteValueWheelcolors: ["#ffb2bc", "#ffccd6"],
-        tabsWheelcolors: ["#ffb2bc", "#ffccd6"],
-        numberWheelcolors: ["#ffb2bc", "#ffccd6"],
-        piemenuBasicundefined: ["#77c428", "#93e042", "#5ba900"],
-        booleanWheelcolors: ["#d3cf76", "#b8b45f"],
-        piemenuVoicesColors: ["#3ea4a3", "#60bfbc", "#1d8989", "#60bfbc", "#1d8989"],
-        intervalNameWheelcolors: ["#77c428", "#93e042", "#77c428", "#5ba900", "#93e042"],
-        intervalWheelcolors: ["#77c428", "#93e042", "#77c428", "#5ba900", "#93e042"],
-        modeWheelcolors: ["#77c428", "#93e042"],
-        modeGroupWheelcolors: [
-            "#ffb2bc",
-            "#ffccd6",
-            "#ffb2bc",
-            "#ffccd6",
-            "#ffb2bc",
-            "#ffccd6",
-            "#ffb2bc",
-            "#ffccd6",
-            "#c0c0c0",
-            "#c0c0c0",
-            "#c0c0c0",
-            "#c0c0c0",
-            "#c0c0c0",
-            "#c0c0c0"
-        ],
-        modePieMenusIfColorPush: "#4b8b0e",
-        modePieMenusElseColorPush: "#66a62d",
-        wheelcolors: ["#424242", "#616161", "#424242", "#616161", "#424242"]
-    },
-    highcontrast: {
-        textColor: "#FFFFFF",
-        blockText: "#000000",
-        dialogueBox: "#000000",
-        strokeColor: "#FFFFFF",
-        fillColor: "#FFFFFF",
-        blueButton: "#00FFFF",
-        blueButtonHover: "#00CCCC",
-        blueButtonText: "black",
-        cancelButton: "#FFFFFF",
-        cancelButtonHover: "#CCCCCC",
-        headingColor: "#ffff00",
-        hoverColor: "#666666",
-        widgetBackground: "#000000",
-        widgetButton: "#00FFFF",
-        widgetButtonSelect: "#FFFFFF",
-        paletteColors: {
-            widgets: ["#00FF00", "#00CC00", "#00CC00", "#66FF66"],
-            pitch: ["#00FF00", "#00CC00", "#00CC00", "#66FF66"],
-            rhythm: ["#FF8C9E", "#FFB3C1", "#FFD1DC", "#FFB3A7"],
-            meter: ["#FF8C9E", "#FFB3C1", "#FFD1DC", "#FFB3A7"],
-            tone: ["#00FFFF", "#00CCCC", "#00CCCC", "#66FFFF"],
-            ornament: ["#00FFFF", "#00CCCC", "#00CCCC", "#66FFFF"],
-            intervals: ["#00FF00", "#00CC00", "#00CC00", "#66FF66"],
-            volume: ["#00FFFF", "#00CCCC", "#00CCCC", "#66FFFF"],
-            drum: ["#00FFFF", "#00CCCC", "#00CCCC", "#66FFFF"],
-            graphics: ["#FF29FF", "#FF8CFF", "#FFB3FF", "#FFD1FF"],
-            turtle: ["#FF00FF", "#CC00CC", "#CC00CC", "#FF66FF"],
-            pen: ["#FF29FF", "#FF8CFF", "#FFB3FF", "#FFD1FF"],
-            boxes: ["#FFFF00", "#CCCC00", "#CCCC00", "#FFFF66"],
-            action: ["#FFFF00", "#CCCC00", "#CCCC00", "#FFFF66"],
-            media: ["#FF8C9E", "#FFB3C1", "#FFD1DC", "#FFB3A7"],
-            number: ["#FF29FF", "#FF8CFF", "#FFB3FF", "#FFD1FF"],
-            boolean: ["#FF29FF", "#FF8CFF", "#FFB3FF", "#FFD1FF"],
-            flow: ["#FFFF00", "#CCCC00", "#CCCC00", "#FFFF66"],
-            sensors: ["#00FF00", "#00CC00", "#00CC00", "#66FF66"],
-            extras: ["#FFFFFF", "#CCCCCC", "#CCCCCC", "#FFFFFF"],
-            program: ["#FFFFFF", "#CCCCCC", "#CCCCCC", "#FFFFFF"],
-            myblocks: ["#FFFF00", "#CCCC00", "#CCCC00", "#FFFF66"],
-            heap: ["#FFFF00", "#CCCC00", "#CCCC00", "#FFFF66"],
-            dictionary: ["#FFFF00", "#CCCC00", "#CCCC00", "#FFFF66"],
-            ensemble: ["#FF29FF", "#FF8CFF", "#FFB3FF", "#FFD1FF"]
-        },
-
-        disconnected: "#666666",
-        header: "#00FFFF",
-        aux: "#00CCCC",
-        sub: "#00FFFF",
-        doHeaderShadow: !platform.FF,
-        rule: "#FFFFFF",
-        ruleColor: "#FFFFFF",
-        trashColor: "#FFFFFF",
-        trashBorder: "#FFFFFF",
-        trashActive: "#FF0000",
-        background: "#000000",
-        paletteSelected: "#111111",
-        paletteBackground: "#000000",
-        paletteLabelBackground: "#000080",
-        paletteLabelSelected: "#0000FF",
-        paletteText: "#FFFFFF",
-        rulerHighlight: "#FFFF00",
-        selectorBackground: "#00FFFF",
-        selectorSelected: "#00CCCC",
-        labelColor: "#FFFFFF",
-        lyricsLabelBackground: "#FF00FF",
-        lyricsInputBackground: "#FF66FF",
-        tupletBackground: "#333333",
-        drumBackground: "#00FFFF",
-        pitchBackground: "#00FF00",
-        graphicsBackground: "#FF00FF",
-        drumLabelBackground: "#00CCCC",
-        pitchLabelBackground: "#00CC00",
-        graphicsLabelBackground: "#CC00CC",
-        rhythmcellcolor: "#333333",
-        stopIconcolor: "#FF0000",
-        hitAreaGraphicsBeginFill: "#000000",
-        orange: "#FF8800",
-        piemenuBasic: ["#00FFFF", "#00FF00", "#00CCCC", "#00FF00", "#00CCCC"],
-        exitWheelcolors: ["#FFFFFF", "#CCCCCC"],
-        exitWheelcolors2: ["#FFFFFF", "#FF00FF", "#00FF00"],
-        pitchWheelcolors: [
-            "#00CC00",
-            "#00FF00",
-            "#00CC00",
-            "#009900",
-            "#00CC00",
-            "#00FF00",
-            "#33FF33"
-        ],
-        gridWheelcolors: {
-            wheel: ["#FFFFFF"],
-            selected: {
-                fill: "#dedede",
-                stroke: "#000000"
-            }
-        },
-        drumWheelcolors: ["#00CCCC", "#00FFFF"],
-        graphicWheelcolors: ["#FF00FF", "#CC00CC"],
-        accidentalsWheelcolors: ["#00CC00", "#00FF00", "#00CC00", "#009900", "#00CC00"],
-        accidentalsWheelcolorspush: "#333333",
-        octavesWheelcolors: [
-            "#FF6666",
-            "#FFCCCC",
-            "#FF6666",
-            "#FFCCCC",
-            "#FF6666",
-            "#FFCCCC",
-            "#FF6666",
-            "#FFCCCC",
-            "#333333",
-            "#333333",
-            "#333333",
-            "#333333",
-            "#333333",
-            "#333333"
-        ],
-        blockLabelsWheelcolors: [
-            "#FF6666",
-            "#FFCCCC",
-            "#FF6666",
-            "#FFCCCC",
-            "#FF6666",
-            "#FFCCCC",
-            "#FF6666",
-            "#FFCCCC",
-            "#FF6666",
-            "#FFCCCC",
-            "#FF6666",
-            "#FFCCCC"
-        ],
-        noteValueWheelcolors: ["#FF6666", "#FFCCCC"],
-        tabsWheelcolors: ["#FF6666", "#FFCCCC"],
-        numberWheelcolors: ["#FF6666", "#FFCCCC"],
-        piemenuBasicundefined: ["#00CC00", "#00FF00", "#009900"],
-        booleanWheelcolors: ["#FFFF66", "#FFFFCC"],
-        piemenuVoicesColors: ["#00FFFF", "#00FF00", "#00CCCC", "#00FF00", "#00CCCC"],
-        intervalNameWheelcolors: ["#00CC00", "#00FF00", "#00CC00", "#009900", "#00FF00"],
-        intervalWheelcolors: ["#00CC00", "#00FF00", "#00CC00", "#009900", "#00FF00"],
-        modeWheelcolors: ["#00CC00", "#00FF00"],
-        modeGroupWheelcolors: [
-            "#FF6666",
-            "#FFCCCC",
-            "#FF6666",
-            "#FFCCCC",
-            "#FF6666",
-            "#FFCCCC",
-            "#FF6666",
-            "#FFCCCC",
-            "#333333",
-            "#333333",
-            "#333333",
-            "#333333",
-            "#333333",
-            "#333333"
-        ],
-        modePieMenusIfColorPush: "#009900",
-        modePieMenusElseColorPush: "#33FF33",
-        wheelcolors: ["#424242", "#616161", "#424242", "#616161", "#424242"]
-    }
-};
-
 // Detect system theme preference
 const getSystemThemePreference = () => {
-    if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        return "dark";
-    }
+    // Defaulting to light theme as requested
     return "light";
 };
 
 // Use stored preference, or fallback to system preference
 const activeTheme = themePreference || getSystemThemePreference();
 
-// Set platformColor based on active theme
-if (platformThemes[activeTheme]) {
-    window.platformColor = platformThemes[activeTheme];
-} else {
-    window.platformColor = platformThemes["light"];
-}
+const syncPlatformColor = theme => {
+    const el = document.body || document.documentElement;
+    if (el && theme) {
+        // Ensure the correct class is present before reading CSS variables
+        el.classList.remove("light", "dark", "highcontrast");
+        el.classList.add(theme);
+    }
+    const style = getComputedStyle(el);
+    const getC = token => {
+        let val = style.getPropertyValue(token);
+        return val ? val.trim() : "";
+    };
 
-const _themeMeta = document.querySelector("meta[name=theme-color]");
-if (_themeMeta) _themeMeta.content = platformColor.header;
+    window.platformColor = {
+        textColor: getC("--pc-textColor"),
+        blockText: getC("--pc-blockText"),
+        dialogueBox: getC("--pc-dialogueBox"),
+        strokeColor: getC("--pc-strokeColor"),
+        fillColor: getC("--pc-fillColor"),
+        blueButton: getC("--pc-blueButton"),
+        blueButtonHover: getC("--pc-blueButtonHover"),
+        blueButtonText: getC("--pc-blueButtonText"),
+        cancelButton: getC("--pc-cancelButton"),
+        cancelButtonHover: getC("--pc-cancelButtonHover"),
+        headingColor: getC("--pc-headingColor"),
+        hoverColor: getC("--pc-hoverColor"),
+        widgetBackground: getC("--pc-widgetBackground"),
+        widgetButton: getC("--pc-widgetButton"),
+        widgetButtonSelect: getC("--pc-widgetButtonSelect"),
+        paletteColors: {
+            widgets: [
+                getC("--pc-paletteColors-widgets-0"),
+                getC("--pc-paletteColors-widgets-1"),
+                getC("--pc-paletteColors-widgets-2"),
+                getC("--pc-paletteColors-widgets-3")
+            ],
+            pitch: [
+                getC("--pc-paletteColors-pitch-0"),
+                getC("--pc-paletteColors-pitch-1"),
+                getC("--pc-paletteColors-pitch-2"),
+                getC("--pc-paletteColors-pitch-3")
+            ],
+            rhythm: [
+                getC("--pc-paletteColors-rhythm-0"),
+                getC("--pc-paletteColors-rhythm-1"),
+                getC("--pc-paletteColors-rhythm-2"),
+                getC("--pc-paletteColors-rhythm-3")
+            ],
+            meter: [
+                getC("--pc-paletteColors-meter-0"),
+                getC("--pc-paletteColors-meter-1"),
+                getC("--pc-paletteColors-meter-2"),
+                getC("--pc-paletteColors-meter-3")
+            ],
+            tone: [
+                getC("--pc-paletteColors-tone-0"),
+                getC("--pc-paletteColors-tone-1"),
+                getC("--pc-paletteColors-tone-2"),
+                getC("--pc-paletteColors-tone-3")
+            ],
+            ornament: [
+                getC("--pc-paletteColors-ornament-0"),
+                getC("--pc-paletteColors-ornament-1"),
+                getC("--pc-paletteColors-ornament-2"),
+                getC("--pc-paletteColors-ornament-3")
+            ],
+            intervals: [
+                getC("--pc-paletteColors-intervals-0"),
+                getC("--pc-paletteColors-intervals-1"),
+                getC("--pc-paletteColors-intervals-2"),
+                getC("--pc-paletteColors-intervals-3")
+            ],
+            volume: [
+                getC("--pc-paletteColors-volume-0"),
+                getC("--pc-paletteColors-volume-1"),
+                getC("--pc-paletteColors-volume-2"),
+                getC("--pc-paletteColors-volume-3")
+            ],
+            drum: [
+                getC("--pc-paletteColors-drum-0"),
+                getC("--pc-paletteColors-drum-1"),
+                getC("--pc-paletteColors-drum-2"),
+                getC("--pc-paletteColors-drum-3")
+            ],
+            graphics: [
+                getC("--pc-paletteColors-graphics-0"),
+                getC("--pc-paletteColors-graphics-1"),
+                getC("--pc-paletteColors-graphics-2"),
+                getC("--pc-paletteColors-graphics-3")
+            ],
+            turtle: [
+                getC("--pc-paletteColors-turtle-0"),
+                getC("--pc-paletteColors-turtle-1"),
+                getC("--pc-paletteColors-turtle-2"),
+                getC("--pc-paletteColors-turtle-3")
+            ],
+            pen: [
+                getC("--pc-paletteColors-pen-0"),
+                getC("--pc-paletteColors-pen-1"),
+                getC("--pc-paletteColors-pen-2"),
+                getC("--pc-paletteColors-pen-3")
+            ],
+            boxes: [
+                getC("--pc-paletteColors-boxes-0"),
+                getC("--pc-paletteColors-boxes-1"),
+                getC("--pc-paletteColors-boxes-2"),
+                getC("--pc-paletteColors-boxes-3")
+            ],
+            action: [
+                getC("--pc-paletteColors-action-0"),
+                getC("--pc-paletteColors-action-1"),
+                getC("--pc-paletteColors-action-2"),
+                getC("--pc-paletteColors-action-3")
+            ],
+            media: [
+                getC("--pc-paletteColors-media-0"),
+                getC("--pc-paletteColors-media-1"),
+                getC("--pc-paletteColors-media-2"),
+                getC("--pc-paletteColors-media-3")
+            ],
+            number: [
+                getC("--pc-paletteColors-number-0"),
+                getC("--pc-paletteColors-number-1"),
+                getC("--pc-paletteColors-number-2"),
+                getC("--pc-paletteColors-number-3")
+            ],
+            boolean: [
+                getC("--pc-paletteColors-boolean-0"),
+                getC("--pc-paletteColors-boolean-1"),
+                getC("--pc-paletteColors-boolean-2"),
+                getC("--pc-paletteColors-boolean-3")
+            ],
+            flow: [
+                getC("--pc-paletteColors-flow-0"),
+                getC("--pc-paletteColors-flow-1"),
+                getC("--pc-paletteColors-flow-2"),
+                getC("--pc-paletteColors-flow-3")
+            ],
+            sensors: [
+                getC("--pc-paletteColors-sensors-0"),
+                getC("--pc-paletteColors-sensors-1"),
+                getC("--pc-paletteColors-sensors-2"),
+                getC("--pc-paletteColors-sensors-3")
+            ],
+            extras: [
+                getC("--pc-paletteColors-extras-0"),
+                getC("--pc-paletteColors-extras-1"),
+                getC("--pc-paletteColors-extras-2"),
+                getC("--pc-paletteColors-extras-3")
+            ],
+            program: [
+                getC("--pc-paletteColors-program-0"),
+                getC("--pc-paletteColors-program-1"),
+                getC("--pc-paletteColors-program-2"),
+                getC("--pc-paletteColors-program-3")
+            ],
+            myblocks: [
+                getC("--pc-paletteColors-myblocks-0"),
+                getC("--pc-paletteColors-myblocks-1"),
+                getC("--pc-paletteColors-myblocks-2"),
+                getC("--pc-paletteColors-myblocks-3")
+            ],
+            heap: [
+                getC("--pc-paletteColors-heap-0"),
+                getC("--pc-paletteColors-heap-1"),
+                getC("--pc-paletteColors-heap-2"),
+                getC("--pc-paletteColors-heap-3")
+            ],
+            dictionary: [
+                getC("--pc-paletteColors-dictionary-0"),
+                getC("--pc-paletteColors-dictionary-1"),
+                getC("--pc-paletteColors-dictionary-2"),
+                getC("--pc-paletteColors-dictionary-3")
+            ],
+            ensemble: [
+                getC("--pc-paletteColors-ensemble-0"),
+                getC("--pc-paletteColors-ensemble-1"),
+                getC("--pc-paletteColors-ensemble-2"),
+                getC("--pc-paletteColors-ensemble-3")
+            ]
+        },
+        disconnected: getC("--pc-disconnected"),
+        header: getC("--pc-header"),
+        aux: getC("--pc-aux"),
+        sub: getC("--pc-sub"),
+        doHeaderShadow: getC("--pc-doHeaderShadow"),
+        rule: getC("--pc-rule"),
+        ruleColor: getC("--pc-ruleColor"),
+        trashColor: getC("--pc-trashColor"),
+        trashBorder: getC("--pc-trashBorder"),
+        trashActive: getC("--pc-trashActive"),
+        background: getC("--pc-background"),
+        paletteSelected: getC("--pc-paletteSelected"),
+        paletteBackground: getC("--pc-paletteBackground"),
+        paletteLabelBackground: getC("--pc-paletteLabelBackground"),
+        paletteLabelSelected: getC("--pc-paletteLabelSelected"),
+        paletteText: getC("--pc-paletteText"),
+        rulerHighlight: getC("--pc-rulerHighlight"),
+        selectorBackground: getC("--pc-selectorBackground"),
+        selectorSelected: getC("--pc-selectorSelected"),
+        labelColor: getC("--pc-labelColor"),
+        lyricsLabelBackground: getC("--pc-lyricsLabelBackground"),
+        lyricsInputBackground: getC("--pc-lyricsInputBackground"),
+        tupletBackground: getC("--pc-tupletBackground"),
+        drumBackground: getC("--pc-drumBackground"),
+        pitchBackground: getC("--pc-pitchBackground"),
+        graphicsBackground: getC("--pc-graphicsBackground"),
+        drumLabelBackground: getC("--pc-drumLabelBackground"),
+        pitchLabelBackground: getC("--pc-pitchLabelBackground"),
+        graphicsLabelBackground: getC("--pc-graphicsLabelBackground"),
+        rhythmcellcolor: getC("--pc-rhythmcellcolor"),
+        stopIconcolor: getC("--pc-stopIconcolor"),
+        hitAreaGraphicsBeginFill: getC("--pc-hitAreaGraphicsBeginFill"),
+        orange: getC("--pc-orange"),
+        piemenuBasic: [
+            getC("--pc-piemenuBasic-0"),
+            getC("--pc-piemenuBasic-1"),
+            getC("--pc-piemenuBasic-2"),
+            getC("--pc-piemenuBasic-3"),
+            getC("--pc-piemenuBasic-4")
+        ],
+        exitWheelcolors: [getC("--pc-exitWheelcolors-0"), getC("--pc-exitWheelcolors-1")],
+        exitWheelcolors2: [
+            getC("--pc-exitWheelcolors2-0"),
+            getC("--pc-exitWheelcolors2-1"),
+            getC("--pc-exitWheelcolors2-2")
+        ],
+        pitchWheelcolors: [
+            getC("--pc-pitchWheelcolors-0"),
+            getC("--pc-pitchWheelcolors-1"),
+            getC("--pc-pitchWheelcolors-2"),
+            getC("--pc-pitchWheelcolors-3"),
+            getC("--pc-pitchWheelcolors-4"),
+            getC("--pc-pitchWheelcolors-5"),
+            getC("--pc-pitchWheelcolors-6")
+        ],
+        gridWheelcolors: {
+            wheel: [getC("--pc-gridWheelcolors-wheel-0")],
+            selected: {
+                fill: getC("--pc-gridWheelcolors-selected-fill"),
+                stroke: getC("--pc-gridWheelcolors-selected-stroke")
+            }
+        },
+        drumWheelcolors: [getC("--pc-drumWheelcolors-0"), getC("--pc-drumWheelcolors-1")],
+        graphicWheelcolors: [getC("--pc-graphicWheelcolors-0"), getC("--pc-graphicWheelcolors-1")],
+        accidentalsWheelcolors: [
+            getC("--pc-accidentalsWheelcolors-0"),
+            getC("--pc-accidentalsWheelcolors-1"),
+            getC("--pc-accidentalsWheelcolors-2"),
+            getC("--pc-accidentalsWheelcolors-3"),
+            getC("--pc-accidentalsWheelcolors-4")
+        ],
+        accidentalsWheelcolorspush: getC("--pc-accidentalsWheelcolorspush"),
+        octavesWheelcolors: [
+            getC("--pc-octavesWheelcolors-0"),
+            getC("--pc-octavesWheelcolors-1"),
+            getC("--pc-octavesWheelcolors-2"),
+            getC("--pc-octavesWheelcolors-3"),
+            getC("--pc-octavesWheelcolors-4"),
+            getC("--pc-octavesWheelcolors-5"),
+            getC("--pc-octavesWheelcolors-6"),
+            getC("--pc-octavesWheelcolors-7"),
+            getC("--pc-octavesWheelcolors-8"),
+            getC("--pc-octavesWheelcolors-9"),
+            getC("--pc-octavesWheelcolors-10"),
+            getC("--pc-octavesWheelcolors-11"),
+            getC("--pc-octavesWheelcolors-12"),
+            getC("--pc-octavesWheelcolors-13")
+        ],
+        blockLabelsWheelcolors: [
+            getC("--pc-blockLabelsWheelcolors-0"),
+            getC("--pc-blockLabelsWheelcolors-1"),
+            getC("--pc-blockLabelsWheelcolors-2"),
+            getC("--pc-blockLabelsWheelcolors-3"),
+            getC("--pc-blockLabelsWheelcolors-4"),
+            getC("--pc-blockLabelsWheelcolors-5"),
+            getC("--pc-blockLabelsWheelcolors-6"),
+            getC("--pc-blockLabelsWheelcolors-7"),
+            getC("--pc-blockLabelsWheelcolors-8"),
+            getC("--pc-blockLabelsWheelcolors-9"),
+            getC("--pc-blockLabelsWheelcolors-10"),
+            getC("--pc-blockLabelsWheelcolors-11")
+        ],
+        noteValueWheelcolors: [
+            getC("--pc-noteValueWheelcolors-0"),
+            getC("--pc-noteValueWheelcolors-1")
+        ],
+        tabsWheelcolors: [getC("--pc-tabsWheelcolors-0"), getC("--pc-tabsWheelcolors-1")],
+        numberWheelcolors: [getC("--pc-numberWheelcolors-0"), getC("--pc-numberWheelcolors-1")],
+        piemenuBasicundefined: [
+            getC("--pc-piemenuBasicundefined-0"),
+            getC("--pc-piemenuBasicundefined-1"),
+            getC("--pc-piemenuBasicundefined-2")
+        ],
+        booleanWheelcolors: [getC("--pc-booleanWheelcolors-0"), getC("--pc-booleanWheelcolors-1")],
+        piemenuVoicesColors: [
+            getC("--pc-piemenuVoicesColors-0"),
+            getC("--pc-piemenuVoicesColors-1"),
+            getC("--pc-piemenuVoicesColors-2"),
+            getC("--pc-piemenuVoicesColors-3"),
+            getC("--pc-piemenuVoicesColors-4")
+        ],
+        intervalNameWheelcolors: [
+            getC("--pc-intervalNameWheelcolors-0"),
+            getC("--pc-intervalNameWheelcolors-1"),
+            getC("--pc-intervalNameWheelcolors-2"),
+            getC("--pc-intervalNameWheelcolors-3"),
+            getC("--pc-intervalNameWheelcolors-4")
+        ],
+        intervalWheelcolors: [
+            getC("--pc-intervalWheelcolors-0"),
+            getC("--pc-intervalWheelcolors-1"),
+            getC("--pc-intervalWheelcolors-2"),
+            getC("--pc-intervalWheelcolors-3"),
+            getC("--pc-intervalWheelcolors-4")
+        ],
+        modeWheelcolors: [getC("--pc-modeWheelcolors-0"), getC("--pc-modeWheelcolors-1")],
+        modeGroupWheelcolors: [
+            getC("--pc-modeGroupWheelcolors-0"),
+            getC("--pc-modeGroupWheelcolors-1"),
+            getC("--pc-modeGroupWheelcolors-2"),
+            getC("--pc-modeGroupWheelcolors-3"),
+            getC("--pc-modeGroupWheelcolors-4"),
+            getC("--pc-modeGroupWheelcolors-5"),
+            getC("--pc-modeGroupWheelcolors-6"),
+            getC("--pc-modeGroupWheelcolors-7"),
+            getC("--pc-modeGroupWheelcolors-8"),
+            getC("--pc-modeGroupWheelcolors-9"),
+            getC("--pc-modeGroupWheelcolors-10"),
+            getC("--pc-modeGroupWheelcolors-11"),
+            getC("--pc-modeGroupWheelcolors-12"),
+            getC("--pc-modeGroupWheelcolors-13")
+        ],
+        modePieMenusIfColorPush: getC("--pc-modePieMenusIfColorPush"),
+        modePieMenusElseColorPush: getC("--pc-modePieMenusElseColorPush"),
+        wheelcolors: [
+            getC("--pc-wheelcolors-0"),
+            getC("--pc-wheelcolors-1"),
+            getC("--pc-wheelcolors-2"),
+            getC("--pc-wheelcolors-3"),
+            getC("--pc-wheelcolors-4")
+        ]
+    };
+
+    const themeColorMeta = document.querySelector("meta[name=theme-color]");
+    if (themeColorMeta && window.platformColor) {
+        themeColorMeta.content = window.platformColor.header;
+    }
+
+    return window.platformColor;
+};
+
+window.syncPlatformColor = syncPlatformColor;
+
+try {
+    syncPlatformColor(activeTheme);
+} catch (e) {
+    window.platformColor = {};
+}
 
 /**
  * @public
