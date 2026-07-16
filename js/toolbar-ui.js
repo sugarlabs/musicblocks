@@ -142,6 +142,17 @@ class ToolbarUI {
                 ["helpIcon", _("Help and shortcuts")],
                 ["helpGuideItem", _("Help"), "innerHTML"],
                 ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
+                [
+                    "interactiveTutorialGuideItem",
+                    "<strong>" +
+                        _("Interactive Tutorial") +
+                        "</strong><br/><span style='font-size: 12px; font-weight: normal; color: var(--fg); opacity: 0.7; display: block; margin-top: 4px; line-height: 1.25;'>" +
+                        _(
+                            "Learn Music Blocks by building your first project through a guided interactive walkthrough."
+                        ) +
+                        "</span>",
+                    "innerHTML"
+                ],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -275,6 +286,17 @@ class ToolbarUI {
                 ["helpIcon", _("Help and shortcuts")],
                 ["helpGuideItem", _("Help"), "innerHTML"],
                 ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
+                [
+                    "interactiveTutorialGuideItem",
+                    "<strong>" +
+                        _("Interactive Tutorial") +
+                        "</strong><br/><span style='font-size: 12px; font-weight: normal; color: var(--fg); opacity: 0.7; display: block; margin-top: 4px; line-height: 1.25;'>" +
+                        _(
+                            "Learn Music Blocks by building your first project through a guided interactive walkthrough."
+                        ) +
+                        "</span>",
+                    "innerHTML"
+                ],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -390,7 +412,7 @@ class ToolbarUI {
             const elem = docById(obj[0]);
             if (strings[i].length === 3) {
                 if (elem !== undefined && elem !== null) {
-                    elem.textContent = obj[1];
+                    elem.innerHTML = obj[1];
                 }
             } else {
                 if (elem !== undefined && elem !== null) {
@@ -457,12 +479,8 @@ class ToolbarUI {
     renderLogoIcon(onclick) {
         const logoIcon = docById("mb-logo");
         if (this.language === "ja") {
-            logoIcon.textContent = "";
-            const logoImg = document.createElement("img");
-            logoImg.style.width = "100%";
-            logoImg.style.transform = "scale(0.85)";
-            logoImg.src = "images/logo-ja.svg";
-            logoIcon.appendChild(logoImg);
+            logoIcon.innerHTML =
+                '<img style="width: 100%; transform: scale(0.85);" src="images/logo-ja.svg">';
         }
 
         logoIcon.onmouseenter = () => {
@@ -586,7 +604,7 @@ class ToolbarUI {
         // Prevents listener accumulation when renderNewProjectIcon is called multiple times
         this._cleanupModalListeners?.();
 
-        newDropdown.textContent = "";
+        newDropdown.innerHTML = "";
         const title = document.createElement("div");
         title.classList.add("new-project-title");
         title.textContent = _("New project");
@@ -767,10 +785,7 @@ class ToolbarUI {
 
         themes.forEach(theme => {
             if (safeStorageGet("themePreference") === theme) {
-                icon.textContent = "";
-                Array.from(docById(theme).childNodes).forEach(node =>
-                    icon.appendChild(node.cloneNode(true))
-                );
+                icon.innerHTML = docById(theme).innerHTML;
             }
         });
 
@@ -1066,12 +1081,7 @@ class ToolbarUI {
                 RecordDropdownArrow.classList.remove("hide");
                 RecordDropdownArrow.style.display = "block";
             }
-            RecordDropdownArrow.textContent = "";
-            const arrowIcon = document.createElement("i");
-            arrowIcon.className = "material-icons main";
-            arrowIcon.style.fontSize = "28px";
-            arrowIcon.textContent = "arrow_drop_down";
-            RecordDropdownArrow.appendChild(arrowIcon);
+            RecordDropdownArrow.innerHTML = `<i class="material-icons main" style="font-size: 28px;">arrow_drop_down</i>`;
 
             // Create handler function for arrow click
             const arrowClickHandler = () => {
@@ -1203,12 +1213,12 @@ class ToolbarUI {
             if (auxToolbar.style.display === "" || auxToolbar.style.display === "none") {
                 onclick(this.activity, false);
                 auxToolbar.style.display = "block";
-                menuIcon.textContent = "more_vert";
+                menuIcon.innerHTML = "more_vert";
                 this._setAuxToolbarButtonState(true);
             } else {
                 onclick(this.activity, true);
                 auxToolbar.style.display = "none";
-                menuIcon.textContent = "menu";
+                menuIcon.innerHTML = "menu";
                 this._setAuxToolbarButtonState(false);
                 docById("chooseKeyDiv").style.display = "none";
                 docById("movable").style.display = "none";
@@ -1240,11 +1250,13 @@ class ToolbarUI {
      * @param {Function} onclick - The onclick handler for the help icon.
      * @returns {void}
      */
-    renderHelpIcon(onclick, shortcutsOnclick) {
+    renderHelpIcon(onclick, shortcutsOnclick, tutorialOnclick) {
         const helpIcon = docById("helpIcon");
         const helpGuideItem = docById("helpGuideItem");
         const shortcutsGuideItem = docById("shortcutsGuideItem");
-        const hasDropdownMenu = !!helpGuideItem || !!shortcutsGuideItem;
+        const interactiveTutorialGuideItem = docById("interactiveTutorialGuideItem");
+        const hasDropdownMenu =
+            !!helpGuideItem || !!shortcutsGuideItem || !!interactiveTutorialGuideItem;
 
         if (helpGuideItem) {
             helpGuideItem.onclick = event => {
@@ -1274,6 +1286,17 @@ class ToolbarUI {
                 : () => {
                       onclick(this.activity);
                   };
+        }
+        if (interactiveTutorialGuideItem) {
+            interactiveTutorialGuideItem.onclick = event => {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                if (tutorialOnclick) {
+                    tutorialOnclick(this.activity);
+                }
+            };
         }
     }
 
@@ -2272,7 +2295,7 @@ class ToolbarUI {
             onclick(this.activity, false);
             const menuIcon = docById("menu");
             auxToolbar.style.display = "none";
-            menuIcon.textContent = "menu";
+            menuIcon.innerHTML = "menu";
             this._setAuxToolbarButtonState(false);
         }
     };

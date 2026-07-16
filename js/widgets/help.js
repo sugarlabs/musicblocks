@@ -14,7 +14,7 @@ const HELP_SVG_DATA_PREFIX = "data:image/svg+xml;base64,";
 
 /* global
 
-   _, docById, getMacroExpansion, HELPCONTENT,
+   _, docById, getMacroExpansion, HELPCONTENT, FirstProjectTutorial,
 */
 /*
      Globals locations
@@ -35,14 +35,17 @@ class HelpWidget {
 
     /**
      * @param {Activity} activity
+     * @param {boolean} useActiveBlock - Show help for the active block
+     * @param {number} startPage - Optional starting page index (0-indexed)
      */
-    constructor(activity, useActiveBlock) {
+    constructor(activity, useActiveBlock, startPage = 0) {
         this.activity = activity;
         this.beginnerBlocks = [];
         this.advancedBlocks = [];
         this.appendedBlockList = [];
         this.index = 0;
         this.isOpen = true;
+        this.startPage = startPage;
         this._keydownHandler = null;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help", false);
@@ -73,10 +76,37 @@ class HelpWidget {
         this._helpDiv = document.createElement("div");
 
         // Give the DOM time to create the div.
-        window.requestAnimationFrame(() => this._setup(useActiveBlock, 0));
+        setTimeout(() => this._setup(useActiveBlock, this.startPage), 0);
 
         // Position center
         setTimeout(this.widgetWindow.sendToCenter, 50);
+    }
+
+    /**
+     * Static method to get the index of the First Project Tutorial card
+     * @returns {number} The index of the tutorial card
+     */
+    static getFirstProjectTutorialIndex() {
+        // The tutorial card is added after the "About" card in Music Blocks
+        // We search for it by title
+        if (typeof HELPCONTENT !== "undefined") {
+            for (let i = 0; i < HELPCONTENT.length; i++) {
+                if (HELPCONTENT[i][0].includes("Build Your First Project")) {
+                    return i;
+                }
+            }
+        }
+        // Default fallback - the tutorial card is typically at position 3
+        return 3;
+    }
+
+    /**
+     * Static method to open help widget directly at the First Project Tutorial
+     * @param {Activity} activity
+     */
+    static openFirstProjectTutorial(activity) {
+        const tutorialIndex = HelpWidget.getFirstProjectTutorialIndex();
+        return new HelpWidget(activity, false, tutorialIndex);
     }
 
     /**
@@ -435,6 +465,13 @@ class HelpWidget {
         rightArrow.classList.toggle("disabled", page === HELPCONTENT.length - 1);
         leftArrow.classList.toggle("disabled", page === 0);
 
+        // Check if this is the First Project Tutorial card
+        const pageTitle = HELPCONTENT[page][0];
+        const isFirstProjectTutorial =
+            pageTitle.includes("Build Your First Project") ||
+            pageTitle.includes("First Project") ||
+            pageTitle.toLowerCase().includes("build your first");
+
         // Previous HTML content is removed, and new one is generated.
         const bodyFragment = document.createDocumentFragment();
         const imageP = document.createElement("p");
@@ -444,7 +481,7 @@ class HelpWidget {
         img.alt = `${title} icon`;
 
         if (this._isLargeTourImage(title)) {
-            img.classList.add("help-tour-image", "help-tour-large-image");
+            img.classList.add("help-tour-image");
         } else if (this._isDetailedTourIcon(title)) {
             img.classList.add("help-tour-detailed-icon");
         } else {
@@ -491,7 +528,49 @@ class HelpWidget {
             bodyFragment.append(linkParagraph);
         }
 
-        if ([_("Congratulations.")].includes(HELPCONTENT[page][0])) {
+        // Add Start Tutorial and Skip buttons for the First Project Tutorial card
+        if (isFirstProjectTutorial) {
+            body += `
+                <div id="tutorial-buttons-container" style="
+                    display: flex;
+                    flex-direction: row;
+                    gap: 12px;
+                    margin-top: 20px;
+                    justify-content: center;
+                ">
+                    <button id="start-tutorial-btn" style="
+                        padding: 12px 24px;
+                        background: #4CAF50;
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        font-size: 14px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                    " onmouseover="this.style.background='#45a049';" 
+                       onmouseout="this.style.background='#4CAF50';">
+                        ▶ Start Tutorial
+                    </button>
+                    <button id="skip-tutorial-btn" style="
+                        padding: 12px 24px;
+                        background: #e0e0e0;
+                        color: #505050;
+                        border: none;
+                        border-radius: 6px;
+                        font-size: 14px;
+                        font-weight: 500;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                    " onmouseover="this.style.background='#d0d0d0';" 
+                       onmouseout="this.style.background='#e0e0e0';">
+                        Skip →
+                    </button>
+                </div>
+            `;
+        }
+
+        if ([_("Congratulations."), _("Congratulations!")].includes(HELPCONTENT[page][0])) {
             const cell = docById("right-arrow");
 
             cell.onclick = () => {
@@ -534,6 +613,39 @@ class HelpWidget {
         helpBody.style.color = "#505050";
         helpBody.append(bodyFragment);
 
+        // Setup tutorial button handlers if on First Project Tutorial page
+        if (isFirstProjectTutorial) {
+            const startBtn = docById("start-tutorial-btn");
+            const skipBtn = docById("skip-tutorial-btn");
+
+            if (startBtn) {
+                startBtn.onclick = () => {
+                    // Close the help widget
+                    this.widgetWindow.close();
+
+                    // Start the interactive tutorial
+                    if (typeof FirstProjectTutorial !== "undefined") {
+                        const tutorial = new FirstProjectTutorial(this.activity);
+                        tutorial.start();
+                    } else {
+                        console.error("FirstProjectTutorial is not loaded");
+                    }
+                };
+            }
+
+            if (skipBtn) {
+                skipBtn.onclick = () => {
+                    // Go to the next page (skip the tutorial)
+                    page = page + 1;
+                    if (page >= HELPCONTENT.length) {
+                        page = 0;
+                    }
+                    this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
+                    this._showPage(page);
+                };
+            }
+        }
+
         this.widgetWindow.takeFocus();
     }
 
@@ -543,14 +655,19 @@ class HelpWidget {
      * @returns {boolean}
      */
     _isLargeTourImage(title) {
-        return [
-            _("Welcome to Music Blocks"),
-            _("Meet Mr. Mouse!"),
-            _("Guide"),
-            _("About"),
-            _("Congratulations."),
-            _("Congratulations!")
-        ].includes(title);
+        return (
+            [
+                _("Welcome to Music Blocks"),
+                _("Meet Mr. Mouse!"),
+                _("Guide"),
+                _("About"),
+                _("Congratulations."),
+                _("Congratulations!")
+            ].includes(title) ||
+            title.includes("Build Your First Project") ||
+            title.includes("First Project") ||
+            title.toLowerCase().includes("build your first")
+        );
     }
 
     /**
