@@ -746,7 +746,7 @@ class PitchStaircase {
                     stepCell.classList.remove("active");
                 }
                 this._setButtonIcon(this._playAllButton, "play-chord.svg", _("Play chord"));
-                this.activity.logo.synth.stop();
+                this.activity.logo.synth.stopSound(0, DEFAULTVOICE);
                 this._isPlayingAll = false;
             } else {
                 this._playAll();
@@ -767,7 +767,7 @@ class PitchStaircase {
                     stepCell.classList.remove("active");
                 }
                 this._setButtonIcon(this._playScaleButton, "play-scale.svg", _("Play scale"));
-                this.activity.logo.synth.stop();
+                this.activity.logo.synth.stopSound(0, DEFAULTVOICE);
                 this._isPlayingScale = false;
             } else {
                 this.playUpAndDown();
