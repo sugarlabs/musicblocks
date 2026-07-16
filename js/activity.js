@@ -683,6 +683,111 @@ class Activity {
                 },
                 false
             );
+
+            // Phase 4: Mobile Gestures (Long-Press & Pinch-to-Zoom)
+            const myCanvas = document.getElementById("myCanvas");
+            if (myCanvas) {
+                let canvasLongPressTimer = null;
+                let touchStartX = 0;
+                let touchStartY = 0;
+                let initialPinchDistance = null;
+                let initialScale = 1;
+
+                myCanvas.addEventListener(
+                    "touchstart",
+                    event => {
+                        if (event.touches.length === 1) {
+                            touchStartX = event.touches[0].clientX;
+                            touchStartY = event.touches[0].clientY;
+                            canvasLongPressTimer = setTimeout(() => {
+                                if (this.beginnerMode) return;
+                                if (this.isHelpfulSearchWidgetOn) {
+                                    this._hideHelpfulSearchWidget();
+                                }
+                                const syntheticEvent = {
+                                    clientX: touchStartX,
+                                    clientY: touchStartY,
+                                    target: myCanvas,
+                                    preventDefault: () => {},
+                                    stopPropagation: () => {}
+                                };
+                                if (!this.blocks.isCoordinateOnBlock(touchStartX, touchStartY)) {
+                                    this._displayHelpfulWheel(syntheticEvent);
+                                }
+                            }, 500); // 500ms long press
+                        } else if (event.touches.length === 2) {
+                            clearTimeout(canvasLongPressTimer); // Cancel long press if zooming
+                            const dx = event.touches[0].clientX - event.touches[1].clientX;
+                            const dy = event.touches[0].clientY - event.touches[1].clientY;
+                            initialPinchDistance = Math.sqrt(dx * dx + dy * dy);
+                            initialScale = this.turtleBlocksScale;
+                        }
+                    },
+                    { passive: false }
+                );
+
+                myCanvas.addEventListener(
+                    "touchmove",
+                    event => {
+                        if (event.touches.length === 1) {
+                            const dx = Math.abs(event.touches[0].clientX - touchStartX);
+                            const dy = Math.abs(event.touches[0].clientY - touchStartY);
+                            if (dx > 10 || dy > 10) {
+                                clearTimeout(canvasLongPressTimer);
+                            }
+                        } else if (event.touches.length === 2 && initialPinchDistance !== null) {
+                            event.preventDefault(); // Prevent default browser zoom
+                            const dx = event.touches[0].clientX - event.touches[1].clientX;
+                            const dy = event.touches[0].clientY - event.touches[1].clientY;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            const scaleFactor = distance / initialPinchDistance;
+
+                            let newScale = initialScale * scaleFactor;
+                            newScale = Math.max(0.3, Math.min(newScale, 3.0)); // Clamp scale
+
+                            if (Math.abs(this.turtleBlocksScale - newScale) > 0.05) {
+                                this.turtleBlocksScale = newScale;
+                                this.stage.scaleX = this.turtleBlocksScale;
+                                this.stage.scaleY = this.turtleBlocksScale;
+                                this.turtles.doScale(
+                                    this.canvas.width,
+                                    this.canvas.height,
+                                    this.turtleBlocksScale
+                                );
+                                this.boundary.setScale(
+                                    this.canvas.width,
+                                    this.canvas.height,
+                                    this.turtleBlocksScale
+                                );
+                                this.trashcan.resizeEvent(this.turtleBlocksScale);
+
+                                // Re-center grids
+                                const newX = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+                                const newY =
+                                    this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+                                this.cartesianBitmap.x = newX;
+                                this.cartesianBitmap.y = newY;
+                                this.polarBitmap.x = newX;
+                                this.polarBitmap.y = newY;
+                                this.trebleBitmap.x = newX;
+                                this.trebleBitmap.y = newY;
+                                this.grandBitmap.x = newX;
+                                this.grandBitmap.y = newY;
+
+                                this.update = true;
+                            }
+                        }
+                    },
+                    { passive: false }
+                );
+
+                myCanvas.addEventListener("touchend", event => {
+                    clearTimeout(canvasLongPressTimer);
+                    if (event.touches.length < 2) {
+                        initialPinchDistance = null;
+                    }
+                });
+            }
         };
 
         /*
@@ -1817,26 +1922,20 @@ class Activity {
             const smallSide = Math.min(w, h);
             let mobileSize;
             if (smallSide < this.cellSize * 9) {
-                mobileSize = false;
-                /*
-                   if (w < this.cellSize * 10) {
-                       this.turtleBlocksScale = smallSide / (this.cellSize * 11);
-                   } else {
-                       this.turtleBlocksScale = Math.max(smallSide / (this.cellSize * 11), 0.75);
-                   }
-                   */
+                mobileSize = true;
+                if (w < this.cellSize * 10) {
+                    this.turtleBlocksScale = smallSide / (this.cellSize * 11);
+                } else {
+                    this.turtleBlocksScale = Math.max(smallSide / (this.cellSize * 11), 0.75);
+                }
             } else {
                 mobileSize = false;
-                /*
-                   if (w / 1200 > h / 900) {
-                       this.turtleBlocksScale = w / 1200;
-                   } else {
-                       this.turtleBlocksScale = h / 900;
-                   }
-                   */
+                if (w / 1200 > h / 900) {
+                    this.turtleBlocksScale = w / 1200;
+                } else {
+                    this.turtleBlocksScale = h / 900;
+                }
             }
-
-            this.turtleBlocksScale = 1.0;
 
             this.stage.scaleX = this.turtleBlocksScale;
             this.stage.scaleY = this.turtleBlocksScale;

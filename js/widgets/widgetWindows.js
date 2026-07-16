@@ -70,9 +70,9 @@ window.widgetWindows = {
         this._handleGlobalMouseUp = this._handleGlobalMouseUp.bind(this);
         this._handleGlobalMouseDown = this._handleGlobalMouseDown.bind(this);
 
-        document.addEventListener("mouseup", this._handleGlobalMouseUp, true);
-        document.addEventListener("mousemove", this._handleGlobalMouseMove, true);
-        document.addEventListener("mousedown", this._handleGlobalMouseDown, true);
+        document.addEventListener("pointerup", this._handleGlobalMouseUp, true);
+        document.addEventListener("pointermove", this._handleGlobalMouseMove, true);
+        document.addEventListener("pointerdown", this._handleGlobalMouseDown, true);
 
         this._globalListenersInitialized = true;
     },
@@ -236,7 +236,9 @@ class WidgetWindow {
         titleEl.textContent = _(this._title);
         titleEl.id = `${this._key}WidgetID`;
 
-        this._nonclose.onmousedown = e => {
+        this._nonclose.style.touchAction = "none"; // Prevent scrolling when dragging widget
+
+        this._nonclose.onpointerdown = e => {
             window.widgetWindows.draggingWindow = this;
             if (this._maximized) {
                 // Perform special repositioning to make the drag feel right when
