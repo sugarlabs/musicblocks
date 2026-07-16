@@ -58,6 +58,8 @@ class PitchStaircase {
         this._isPlayingScale = false;
         this._scaleStopped = false;
         this._scaleTimeout = null;
+        this._playAllNotes = [];
+        this._playScaleNotes = [];
     }
 
     /**
@@ -374,6 +376,8 @@ class PitchStaircase {
      */
     _playAll() {
         const pitchnotes = [];
+        this._playAllNotes = [];
+
         this._isPlayingAll = true;
         if (this._playAllButton) {
             this._setButtonIcon(
@@ -386,10 +390,13 @@ class PitchStaircase {
         for (let i = 0; i < this.Stairs.length; i++) {
             const note = this.Stairs[i][0] + this.Stairs[i][1];
             pitchnotes.push(normalizeNoteAccidentals(note));
+            this._playAllNotes.push(normalizeNoteAccidentals(note));
             const stepCell = this._stepTables[i].rows[0].cells[1];
             stepCell.classList.add("active");
             this.activity.logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
         }
+
+        this._playAllNotes = [...pitchnotes];
 
         this._playAllTimeout = setTimeout(() => {
             for (let i = 0; i < this.Stairs.length; i++) {
@@ -410,17 +417,27 @@ class PitchStaircase {
     playUpAndDown() {
         this._scaleStopped = false;
         this._isPlayingScale = true;
+        this._playScaleNotes = [];
+
         if (this._playScaleButton) {
             this._setButtonIcon(this._playScaleButton, "stop-button.svg", _("Stop"));
         }
+
         const pitchnotes = [];
         const note =
             this.Stairs[this.Stairs.length - 1][0] + this.Stairs[this.Stairs.length - 1][1];
-        pitchnotes.push(normalizeNoteAccidentals(note));
+
+        const normalizedNote = normalizeNoteAccidentals(note);
+
+        pitchnotes.push(normalizedNote);
+        this._playScaleNotes.push(normalizedNote);
+
         const last = this.Stairs.length - 1;
         const stepCell = this._stepTables[last].rows[0].cells[1];
         stepCell.classList.add("active");
+
         this.activity.logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
+
         this._playNext(this.Stairs.length - 2, -1);
     }
 
@@ -473,7 +490,10 @@ class PitchStaircase {
 
         const pitchnotes = [];
         const note = this.Stairs[index][0] + this.Stairs[index][1];
-        pitchnotes.push(normalizeNoteAccidentals(note));
+        const normalizedNote = normalizeNoteAccidentals(note);
+
+        this._playScaleNotes.push(normalizedNote);
+        pitchnotes.push(normalizedNote);
         const previousRowNumber = index - next;
         // _stepTables is a dense array; a negative index yields undefined,
         // not null, so use != null (loose) to catch both.
@@ -743,7 +763,10 @@ class PitchStaircase {
                     stepCell.classList.remove("active");
                 }
                 this._setButtonIcon(this._playAllButton, "play-chord.svg", _("Play chord"));
-                this.activity.logo.synth.stop();
+                for (const notes of this._playAllNotes) {
+                    this.activity.logo.synth.stopSound(0, DEFAULTVOICE, notes);
+                }
+
                 this._isPlayingAll = false;
             } else {
                 this._playAll();
@@ -759,12 +782,19 @@ class PitchStaircase {
             if (this._isPlayingScale) {
                 this._scaleStopped = true;
                 clearTimeout(this._scaleTimeout);
+
                 for (let i = 0; i < this.Stairs.length; i++) {
                     const stepCell = this._stepTables[i].rows[0].cells[1];
                     stepCell.classList.remove("active");
                 }
+
                 this._setButtonIcon(this._playScaleButton, "play-scale.svg", _("Play scale"));
-                this.activity.logo.synth.stop();
+
+                for (const note of this._playScaleNotes) {
+                    this.activity.logo.synth.stopSound(0, DEFAULTVOICE, note);
+                }
+
+                this._playScaleNotes = [];
                 this._isPlayingScale = false;
             } else {
                 this.playUpAndDown();
