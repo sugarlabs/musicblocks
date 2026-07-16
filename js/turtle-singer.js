@@ -1094,10 +1094,18 @@ class Singer {
                     tur.singer.pitchDrumTable[noteObj[0] + noteObj[1]] = drumname;
                 }
 
-                tur.singer.notePitches[last(tur.singer.inNoteBlock)].push(noteObj[0]);
-                tur.singer.noteOctaves[last(tur.singer.inNoteBlock)].push(noteObj[1]);
-                tur.singer.noteCents[last(tur.singer.inNoteBlock)].push(cents);
-                tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(
+                const thisBlk = last(tur.singer.inNoteBlock);
+                if (tur.singer.notePitches[thisBlk] === undefined) {
+                    console.warn("addPitch: notePitches not initialized for block", thisBlk);
+                    tur.singer.notePitches[thisBlk] = [];
+                    tur.singer.noteOctaves[thisBlk] = [];
+                    tur.singer.noteCents[thisBlk] = [];
+                    tur.singer.noteHertz[thisBlk] = [];
+                }
+                tur.singer.notePitches[thisBlk].push(noteObj[0]);
+                tur.singer.noteOctaves[thisBlk].push(noteObj[1]);
+                tur.singer.noteCents[thisBlk].push(cents);
+                tur.singer.noteHertz[thisBlk].push(
                     cents === 0
                         ? 0
                         : getCachedPitchToFrequency(

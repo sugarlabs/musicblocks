@@ -1086,4 +1086,24 @@ describe("processPitch internal addPitch behavior", () => {
         expect(firstState.length).toBe(1);
         expect(turtleMock.singer.notePitches[blk].length).toBe(2);
     });
+
+    it("should initialize missing notePitches and warn when block data is uninitialized", () => {
+        const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+        const blk = "uninitBlk";
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = {};
+        turtleMock.singer.noteOctaves = {};
+        turtleMock.singer.noteCents = {};
+        turtleMock.singer.noteHertz = {};
+        turtleMock.singer.noteBeatValues = { [blk]: [] };
+
+        Singer.processPitch(activityMock, "C", 4, 0, turtleMock, blk);
+
+        expect(warnSpy).toHaveBeenCalledWith(
+            "addPitch: notePitches not initialized for block",
+            blk
+        );
+        expect(turtleMock.singer.notePitches[blk]).toEqual(["C"]);
+        warnSpy.mockRestore();
+    });
 });

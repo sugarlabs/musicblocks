@@ -102,8 +102,12 @@ function setupDrumActions(activity) {
 
                 const noteBeatValue = 4;
 
-                const __callback = () =>
-                    tur.singer.inNoteBlock.splice(tur.singer.inNoteBlock.indexOf(blk), 1);
+                const __callback = () => {
+                    const idx = tur.singer.inNoteBlock.indexOf(blk);
+                    if (idx !== -1) {
+                        tur.singer.inNoteBlock.splice(idx, 1);
+                    }
+                };
 
                 Singer.processNote(activity, noteBeatValue, false, blk, turtle, __callback);
             }

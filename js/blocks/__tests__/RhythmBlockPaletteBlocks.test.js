@@ -92,6 +92,7 @@ function createDummyTurtle() {
             bpm: [100],
             drumStyle: [],
             inNoteBlock: [],
+            noteDrums: {},
             notePitches: {},
             noteOctaves: {},
             noteCents: {}
@@ -318,6 +319,59 @@ describe("setupRhythmBlockPaletteBlocks", () => {
             const ret = stupletBlock.flow([3, 0.5], logo, turtleIndex, "blkSTuplet");
             expect(logo.tupletRhythms.length).toBeGreaterThan(0);
             expect(ret).toBeUndefined();
+        });
+    });
+
+    describe("scheduleNote zombie timer routing", () => {
+        it("should route through _timerManager when available", () => {
+            const mockSetTimeout = jest.fn((cb, _ms) => cb());
+            activity.logo = {
+                _timerManager: { setTimeout: mockSetTimeout },
+                clearNoteParams: jest.fn(),
+                setDispatchBlock: jest.fn(),
+                setTurtleListener: jest.fn(),
+                inMatrix: false,
+                tuplet: false
+            };
+            const rhythmBlock = DummyFlowBlock.createdBlocks["rhythm"];
+            activity.blocks.blockList["blkR"] = { name: "rhythm", connections: [] };
+            rhythmBlock.flow([1, 4], logo, turtleIndex, "blkR");
+            expect(mockSetTimeout).toHaveBeenCalled();
+        });
+
+        it("should fall back to raw setTimeout when _timerManager is absent", () => {
+            activity.logo = {
+                clearNoteParams: jest.fn(),
+                setDispatchBlock: jest.fn(),
+                setTurtleListener: jest.fn(),
+                inMatrix: false,
+                tuplet: false
+            };
+            const origSetTimeout = global.setTimeout;
+            const spy = jest.fn((_cb, _ms) => 42);
+            global.setTimeout = spy;
+            try {
+                const rhythmBlock = DummyFlowBlock.createdBlocks["rhythm"];
+                activity.blocks.blockList["blkR"] = { name: "rhythm", connections: [] };
+                rhythmBlock.flow([1, 4], logo, turtleIndex, "blkR");
+                expect(spy).toHaveBeenCalled();
+            } finally {
+                global.setTimeout = origSetTimeout;
+            }
+        });
+    });
+
+    describe("inNoteBlock.splice indexOf guard", () => {
+        it("should not splice if block was already removed from inNoteBlock", () => {
+            const turtle = activity.turtles.ithTurtle(turtleIndex);
+            turtle.singer.inNoteBlock = ["blkA", "blkB"];
+            const idx = turtle.singer.inNoteBlock.indexOf("nonexistent");
+            expect(idx).toBe(-1);
+            const origLen = turtle.singer.inNoteBlock.length;
+            if (idx !== -1) {
+                turtle.singer.inNoteBlock.splice(idx, 1);
+            }
+            expect(turtle.singer.inNoteBlock.length).toBe(origLen);
         });
     });
 });

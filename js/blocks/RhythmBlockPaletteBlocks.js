@@ -33,7 +33,8 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
 
 function setupRhythmBlockPaletteBlocks(activity) {
     /**
-     * Schedules a note to be played after a timeout.
+     * Schedules a note to be played after a timeout, routed through
+     * _timerManager so it is cancelled on stop.
      * @param {object} activity - The activity object.
      * @param {number} beat - The beat value.
      * @param {string} blk - The block ID.
@@ -42,7 +43,13 @@ function setupRhythmBlockPaletteBlocks(activity) {
      * @param {number} timeout - The timeout in milliseconds.
      */
     const scheduleNote = (activity, beat, blk, turtle, callback, timeout) => {
-        setTimeout(() => Singer.processNote(activity, beat, false, blk, turtle, callback), timeout);
+        const timerMgr = activity.logo && activity.logo._timerManager;
+        const schedule = timerMgr
+            ? cb => timerMgr.setTimeout(cb, timeout)
+            : cb => setTimeout(cb, timeout);
+        schedule(() => {
+            Singer.processNote(activity, beat, false, blk, turtle, callback);
+        });
     };
 
     /**
@@ -196,7 +203,10 @@ function setupRhythmBlockPaletteBlocks(activity) {
                     if (i === arg0 - 1) {
                         __callback = () => {
                             delete tur.singer.noteDrums[blk];
-                            tur.singer.inNoteBlock.splice(tur.singer.inNoteBlock.indexOf(blk), 1);
+                            const idx = tur.singer.inNoteBlock.indexOf(blk);
+                            if (idx !== -1) {
+                                tur.singer.inNoteBlock.splice(idx, 1);
+                            }
                         };
                     } else {
                         __callback = null;
@@ -757,10 +767,10 @@ function setupRhythmBlockPaletteBlocks(activity) {
                         if (i === beatValues.length - 1) {
                             __callback = () => {
                                 delete tur.singer.noteDrums[blk];
-                                tur.singer.inNoteBlock.splice(
-                                    tur.singer.inNoteBlock.indexOf(blk),
-                                    1
-                                );
+                                const idx = tur.singer.inNoteBlock.indexOf(blk);
+                                if (idx !== -1) {
+                                    tur.singer.inNoteBlock.splice(idx, 1);
+                                }
                             };
                         } else {
                             __callback = null;
@@ -975,10 +985,13 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 const beatValue = bpmFactor / noteBeatValue / arg0;
 
                 const __rhythmPlayNote = (thisBeat, blk, turtle, callback, timeout) => {
-                    setTimeout(
-                        () => Singer.processNote(activity, thisBeat, false, blk, turtle, callback),
-                        timeout
-                    );
+                    const timerMgr = activity.logo && activity.logo._timerManager;
+                    const schedule = timerMgr
+                        ? cb => timerMgr.setTimeout(cb, timeout)
+                        : cb => setTimeout(cb, timeout);
+                    schedule(() => {
+                        Singer.processNote(activity, thisBeat, false, blk, turtle, callback);
+                    });
                 };
 
                 let __callback = null;
@@ -986,7 +999,10 @@ function setupRhythmBlockPaletteBlocks(activity) {
                     if (i === arg0 - 1) {
                         __callback = () => {
                             delete tur.singer.noteDrums[blk];
-                            tur.singer.inNoteBlock.splice(tur.singer.inNoteBlock.indexOf(blk), 1);
+                            const idx = tur.singer.inNoteBlock.indexOf(blk);
+                            if (idx !== -1) {
+                                tur.singer.inNoteBlock.splice(idx, 1);
+                            }
                         };
                     } else {
                         __callback = null;

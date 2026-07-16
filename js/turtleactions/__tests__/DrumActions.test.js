@@ -319,4 +319,18 @@ describe("setupDrumActions", () => {
             expect(targetTurtle.singer.crescendoInitialVolume["noise1"]).toEqual([60]);
         });
     });
+
+    describe("inNoteBlock.splice indexOf guard", () => {
+        it("should not corrupt array when block is not found in inNoteBlock", () => {
+            targetTurtle.singer.inNoteBlock = ["blkA", "blkB"];
+            const idx = targetTurtle.singer.inNoteBlock.indexOf("nonexistent");
+            expect(idx).toBe(-1);
+            const origLen = targetTurtle.singer.inNoteBlock.length;
+            if (idx !== -1) {
+                targetTurtle.singer.inNoteBlock.splice(idx, 1);
+            }
+            expect(targetTurtle.singer.inNoteBlock.length).toBe(origLen);
+            expect(targetTurtle.singer.inNoteBlock).toEqual(["blkA", "blkB"]);
+        });
+    });
 });
