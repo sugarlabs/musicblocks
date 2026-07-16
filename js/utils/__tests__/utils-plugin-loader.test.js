@@ -145,4 +145,25 @@ describe("processPluginData script cleanup", () => {
         expect(document.head.querySelectorAll("script[src^='blob:plugin-setup']")).toHaveLength(0);
         expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:plugin-setup-0");
     });
+
+    it("returns null when plugin JSON cannot be parsed", async () => {
+        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        const consoleDebugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+
+        const result = await processPluginData(
+            createActivity(),
+            "{invalid plugin json",
+            "plugins/test.json"
+        );
+
+        expect(result).toBeNull();
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+            'PluginProcessor: Failed to parse plugin data from source "plugins/test.json":',
+            expect.any(SyntaxError)
+        );
+        expect(consoleDebugSpy).not.toHaveBeenCalledWith(expect.anything(), "{invalid plugin json");
+
+        consoleErrorSpy.mockRestore();
+        consoleDebugSpy.mockRestore();
+    });
 });
