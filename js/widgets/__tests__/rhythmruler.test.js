@@ -866,3 +866,288 @@ describe("RhythmRuler Widget", () => {
         });
     });
 });
+
+// =============================================================================
+// Pointer Events – rhythm cells (__addCellEventHandlers)
+// =============================================================================
+describe("RhythmRuler Pointer Events – rhythm cells (__addCellEventHandlers)", () => {
+    let rhythmRuler;
+    let mockActivity;
+
+    function makeFakeRhythmCell(rowIndex = 0, cellIndex = 0) {
+        const listeners = {};
+        return {
+            cellIndex,
+            id: `cell_${rowIndex}_${cellIndex}`,
+            style: { backgroundColor: "", touchAction: "" },
+            textContent: "",
+            innerHTML: "",
+            appendChild: jest.fn(),
+            getAttribute: jest.fn(() => null),
+            setAttribute: jest.fn(),
+            removeEventListener: jest.fn(),
+            addEventListener: jest.fn((type, fn) => {
+                listeners[type] = fn;
+            }),
+            parentNode: { getAttribute: jest.fn(() => String(rowIndex)) },
+            _listeners: listeners
+        };
+    }
+
+    beforeEach(() => {
+        rhythmRuler = new RhythmRuler();
+        mockActivity = {
+            logo: {
+                synth: { trigger: jest.fn(), stop: jest.fn(), loadSynth: jest.fn() },
+                resetSynth: jest.fn(),
+                turtleDelay: 0
+            },
+            blocks: { blockList: {}, protoBlockDict: {}, loadNewBlocks: jest.fn() },
+            turtles: {
+                ithTurtle: jest.fn().mockReturnValue({
+                    singer: { beatsPerMeasure: 4, noteValuePerBeat: 4 }
+                })
+            },
+            refreshCanvas: jest.fn(),
+            saveLocally: jest.fn(),
+            textMsg: jest.fn(),
+            errorMsg: jest.fn(),
+            hideMsgs: jest.fn()
+        };
+        rhythmRuler.activity = mockActivity;
+        rhythmRuler.widgetWindow = mockWindow.widgetWindows.windowFor();
+        rhythmRuler.Rulers = [[[4, 4, 4, 4], []]];
+        rhythmRuler.Drums = ["snare drum"];
+    });
+
+    afterEach(() => {
+        if (rhythmRuler && typeof rhythmRuler._clearWidgetTimers === "function") {
+            rhythmRuler._clearWidgetTimers();
+        }
+        jest.useRealTimers();
+        jest.clearAllMocks();
+    });
+
+    test("__addCellEventHandlers sets touchAction to pan-x so the ruler is still scrollable", () => {
+        const cell = makeFakeRhythmCell(0, 0);
+        rhythmRuler.__addCellEventHandlers(cell, 80, 4);
+        expect(cell.style.touchAction).toBe("pan-x");
+    });
+
+    test("__addCellEventHandlers registers pointerdown and pointerup, not legacy mousedown/mouseup", () => {
+        const cell = makeFakeRhythmCell(0, 0);
+        rhythmRuler.__addCellEventHandlers(cell, 80, 4);
+        const registeredTypes = cell.addEventListener.mock.calls.map(c => c[0]);
+        expect(registeredTypes).toContain("pointerdown");
+        expect(registeredTypes).toContain("pointerup");
+        expect(registeredTypes).not.toContain("mousedown");
+        expect(registeredTypes).not.toContain("mouseup");
+    });
+
+    test("__addCellEventHandlers registers a click handler for tap-to-dissect", () => {
+        const cell = makeFakeRhythmCell(0, 0);
+        rhythmRuler.__addCellEventHandlers(cell, 80, 4);
+        const registeredTypes = cell.addEventListener.mock.calls.map(c => c[0]);
+        expect(registeredTypes).toContain("click");
+    });
+
+    test("pointerdown on a cell records it as _mouseDownCell and starts long-press timer", () => {
+        jest.useFakeTimers();
+        const cell = makeFakeRhythmCell(0, 0);
+        rhythmRuler.__addCellEventHandlers(cell, 80, 4);
+        cell._listeners["pointerdown"]({ currentTarget: cell });
+        expect(rhythmRuler._mouseDownCell).toBe(cell);
+        expect(rhythmRuler._longPressStartTime).not.toBeNull();
+    });
+
+    test("pointerup clears _mouseDownCell and _mouseUpCell after handling", () => {
+        jest.useFakeTimers();
+        const cell = makeFakeRhythmCell(0, 0);
+        rhythmRuler.__addCellEventHandlers(cell, 80, 4);
+        rhythmRuler._tieRuler = jest.fn();
+        jest.spyOn(rhythmRuler, "__toggleRestState").mockImplementation();
+
+        cell._listeners["pointerdown"]({ currentTarget: cell });
+
+        const savedEFP = document.elementFromPoint;
+        document.elementFromPoint = jest.fn(() => cell);
+        cell._listeners["pointerup"]({ clientX: 10, clientY: 10, target: cell });
+        document.elementFromPoint = savedEFP;
+
+        expect(rhythmRuler._mouseDownCell).toBeNull();
+        expect(rhythmRuler._mouseUpCell).toBeNull();
+    });
+
+    test("click handler calls _dissectRuler when not in a long press", () => {
+        const cell = makeFakeRhythmCell(0, 2);
+        rhythmRuler.__addCellEventHandlers(cell, 80, 4);
+        rhythmRuler._inLongPress = false;
+        const dissectSpy = jest.spyOn(rhythmRuler, "_dissectRuler").mockImplementation();
+        cell._listeners["click"]({ currentTarget: cell });
+        expect(dissectSpy).toHaveBeenCalledTimes(1);
+    });
+
+    test("click handler does NOT call _dissectRuler during a long press", () => {
+        const cell = makeFakeRhythmCell(0, 0);
+        rhythmRuler.__addCellEventHandlers(cell, 80, 4);
+        rhythmRuler._inLongPress = true;
+        const dissectSpy = jest.spyOn(rhythmRuler, "_dissectRuler").mockImplementation();
+        cell._listeners["click"]({ currentTarget: cell });
+        expect(dissectSpy).not.toHaveBeenCalled();
+    });
+
+    test("mouseover and mouseout handlers are registered for hover tooltip on narrow cells", () => {
+        const cell = makeFakeRhythmCell(0, 0);
+        rhythmRuler.__addCellEventHandlers(cell, 10, 4);
+        const registeredTypes = cell.addEventListener.mock.calls.map(c => c[0]);
+        expect(registeredTypes).toContain("mouseover");
+        expect(registeredTypes).toContain("mouseout");
+    });
+});
+
+// =============================================================================
+// Pointer Events – circular canvas (_toggleCircularView)
+// =============================================================================
+describe("RhythmRuler Pointer Events – circular canvas (_toggleCircularView)", () => {
+    let rhythmRuler;
+
+    function makeMockCanvas() {
+        const listeners = {};
+        return {
+            width: 0,
+            height: 0,
+            style: { display: "", margin: "", touchAction: "" },
+            addEventListener: jest.fn((type, fn) => {
+                listeners[type] = fn;
+            }),
+            getBoundingClientRect: jest.fn().mockReturnValue({ left: 0, top: 0 }),
+            getContext: jest.fn().mockReturnValue({
+                clearRect: jest.fn(),
+                beginPath: jest.fn(),
+                arc: jest.fn(),
+                moveTo: jest.fn(),
+                lineTo: jest.fn(),
+                closePath: jest.fn(),
+                fill: jest.fn(),
+                stroke: jest.fn(),
+                fillText: jest.fn(),
+                fillStyle: "",
+                strokeStyle: "",
+                lineWidth: 1,
+                font: "",
+                textAlign: "",
+                textBaseline: ""
+            }),
+            _listeners: listeners
+        };
+    }
+
+    function makeWidgetBody() {
+        return {
+            clientWidth: 500,
+            clientHeight: 400,
+            append: jest.fn(),
+            appendChild: jest.fn(),
+            insertRow: jest.fn().mockReturnValue({
+                setAttribute: jest.fn(),
+                insertCell: jest.fn().mockReturnValue({
+                    style: {},
+                    setAttribute: jest.fn(),
+                    appendChild: jest.fn(),
+                    addEventListener: jest.fn(),
+                    textContent: "",
+                    replaceChildren: jest.fn()
+                })
+            })
+        };
+    }
+
+    beforeEach(() => {
+        rhythmRuler = new RhythmRuler();
+        rhythmRuler.activity = {
+            logo: {
+                synth: { trigger: jest.fn(), stop: jest.fn(), loadSynth: jest.fn() },
+                resetSynth: jest.fn(),
+                turtleDelay: 0
+            },
+            blocks: { blockList: {}, protoBlockDict: {}, loadNewBlocks: jest.fn() },
+            turtles: {
+                ithTurtle: jest.fn().mockReturnValue({
+                    singer: { beatsPerMeasure: 4, noteValuePerBeat: 4 }
+                })
+            },
+            refreshCanvas: jest.fn(),
+            saveLocally: jest.fn(),
+            textMsg: jest.fn(),
+            errorMsg: jest.fn(),
+            hideMsgs: jest.fn()
+        };
+        rhythmRuler.widgetWindow = mockWindow.widgetWindows.windowFor();
+        rhythmRuler.Rulers = [[[4, 4, 4, 4], []]];
+        rhythmRuler._rhythmRulerTable = { style: { display: "" } };
+        rhythmRuler._rulers = [{ cells: [] }];
+    });
+
+    afterEach(() => {
+        if (rhythmRuler && typeof rhythmRuler._clearWidgetTimers === "function") {
+            rhythmRuler._clearWidgetTimers();
+        }
+        jest.clearAllMocks();
+    });
+
+    test("circular canvas style has touchAction defined after _toggleCircularView", () => {
+        const canvas = makeMockCanvas();
+        rhythmRuler._circularView = true;
+        rhythmRuler._circularCanvas = canvas;
+        rhythmRuler._toggleCircularView();
+        expect(canvas.style.touchAction).toBeDefined();
+    });
+
+    test("_toggleCircularView registers pointerdown, pointermove, pointerup on the canvas", () => {
+        rhythmRuler._circularView = true;
+        rhythmRuler._circularCanvas = null;
+        const canvas = makeMockCanvas();
+        const origCreate = document.createElement;
+        document.createElement = jest.fn(tag => (tag === "canvas" ? canvas : origCreate(tag)));
+        rhythmRuler.widgetWindow.getWidgetBody = jest.fn().mockReturnValue(makeWidgetBody());
+        rhythmRuler._toggleCircularView();
+        document.createElement = origCreate;
+
+        const types = canvas.addEventListener.mock.calls.map(c => c[0]);
+        expect(types).toContain("pointerdown");
+        expect(types).toContain("pointermove");
+        expect(types).toContain("pointerup");
+    });
+
+    test("_toggleCircularView registers pointercancel and pointerleave for drag-end cleanup", () => {
+        rhythmRuler._circularView = true;
+        rhythmRuler._circularCanvas = null;
+        const canvas = makeMockCanvas();
+        const origCreate = document.createElement;
+        document.createElement = jest.fn(tag => (tag === "canvas" ? canvas : origCreate(tag)));
+        rhythmRuler.widgetWindow.getWidgetBody = jest.fn().mockReturnValue(makeWidgetBody());
+        rhythmRuler._toggleCircularView();
+        document.createElement = origCreate;
+
+        const types = canvas.addEventListener.mock.calls.map(c => c[0]);
+        expect(types).toContain("pointercancel");
+        expect(types).toContain("pointerleave");
+    });
+
+    test("_toggleCircularView does NOT register legacy mouse events on the canvas", () => {
+        rhythmRuler._circularView = true;
+        rhythmRuler._circularCanvas = null;
+        const canvas = makeMockCanvas();
+        const origCreate = document.createElement;
+        document.createElement = jest.fn(tag => (tag === "canvas" ? canvas : origCreate(tag)));
+        rhythmRuler.widgetWindow.getWidgetBody = jest.fn().mockReturnValue(makeWidgetBody());
+        rhythmRuler._toggleCircularView();
+        document.createElement = origCreate;
+
+        const types = canvas.addEventListener.mock.calls.map(c => c[0]);
+        expect(types).not.toContain("mousedown");
+        expect(types).not.toContain("mouseup");
+        expect(types).not.toContain("mousemove");
+        expect(types).not.toContain("mouseleave");
+    });
+});

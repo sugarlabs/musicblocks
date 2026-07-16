@@ -1481,7 +1481,8 @@ function MusicKeyboard(activity) {
 
     /**
      * Makes the music keyboard cells clickable for interaction.
-     * Handles mouse events such as click, mouseover, and mouseup on the keyboard cells.
+     * Handles pointer events (pointerdown/pointermove/pointerup/pointercancel) on the
+     * keyboard cells, supporting mouse, touch, and stylus input uniformly.
      * Triggers the creation of pie submenu based on the clicked cell attributes.
      */
     this.makeClickable = function () {
@@ -1501,7 +1502,13 @@ function MusicKeyboard(activity) {
             };
         }
 
-        let row, isMouseDown;
+        let row;
+        // Tracks whether a pointer is currently held down across all cells so
+        // that drag-paint (toggling cells while swiping) works on both mouse and
+        // touch. A single flag shared across the loop closure is sufficient
+        // because only one pointer can paint at a time.
+        let isPointerDown = false;
+
         for (let i = 0; i < this.layout.length; i++) {
             // The buttons get added to the embedded table.
             row = docById("mkb" + i);
@@ -1510,42 +1517,67 @@ function MusicKeyboard(activity) {
                 // Give each clickable cell a unique id
                 cell.setAttribute("id", i + ":" + j);
 
-                isMouseDown = false;
+                // Allow the keyboard to be scrolled horizontally on narrow
+                // mobile viewports while still suppressing pinch-zoom on each cell.
+                cell.style.touchAction = "pan-x";
 
-                cell.onmousedown = e => {
-                    cell = e.target;
-                    isMouseDown = true;
-                    const obj = cell.id.split(":");
-                    // i = Number(obj[0]);
-                    const j = Number(obj[1]);
-                    if (cell.style.backgroundColor === "black") {
-                        cell.style.backgroundColor = cell.getAttribute("cellColor");
-                        this._setNotes(j, false);
+                // Use Pointer Events so that mouse clicks, touchscreen taps, and
+                // stylus presses all trigger the same toggle behaviour.  The
+                // legacy onmousedown handler was silently ignored on touch devices.
+                cell.addEventListener("pointerdown", e => {
+                    // Suppress ghost mouse events on touch screens and prevent
+                    // the browser from taking over scroll/zoom during this press.
+                    e.preventDefault();
+                    // Capture the pointer so that pointermove continues to fire
+                    // on this element even if the finger slides off it.
+                    cell.setPointerCapture(e.pointerId);
+                    isPointerDown = true;
+
+                    const target = e.currentTarget;
+                    const obj = target.id.split(":");
+                    const colJ = Number(obj[1]);
+                    if (target.style.backgroundColor === "black") {
+                        target.style.backgroundColor = target.getAttribute("cellColor");
+                        this._setNotes(colJ, false);
                     } else {
-                        cell.style.backgroundColor = "black";
-                        this._setNotes(j, true);
+                        target.style.backgroundColor = "black";
+                        this._setNotes(colJ, true);
                     }
-                };
+                });
 
-                cell.onmouseover = () => {
-                    // let obj, i, j;
-                    // obj = cell.id.split(":");
-                    // i = Number(obj[0]);
-                    // j = Number(obj[1]);
-                    if (isMouseDown) {
-                        if (cell.style.backgroundColor === "black") {
-                            cell.style.backgroundColor = cell.getAttribute("cellColor");
-                            this._setNotes(j, false);
-                        } else {
-                            cell.style.backgroundColor = "black";
-                            this._setNotes(j, true);
-                        }
+                // pointermove fires while the pointer moves with the button/finger held.
+                // Because we used setPointerCapture, the event target is always the cell
+                // that received pointerdown, so we use elementFromPoint to resolve the
+                // actual cell under the finger — the same technique used in rhythmruler.js.
+                cell.addEventListener("pointermove", e => {
+                    if (!isPointerDown) return;
+
+                    const hovered = document.elementFromPoint(e.clientX, e.clientY);
+                    if (!hovered || hovered === e.currentTarget) return;
+
+                    // Only act if the pointer moved to a different note-grid cell.
+                    if (!hovered.id || !hovered.id.includes(":")) return;
+
+                    const obj = hovered.id.split(":");
+                    const colJ = Number(obj[1]);
+                    if (hovered.style.backgroundColor === "black") {
+                        hovered.style.backgroundColor = hovered.getAttribute("cellColor");
+                        this._setNotes(colJ, false);
+                    } else {
+                        hovered.style.backgroundColor = "black";
+                        this._setNotes(colJ, true);
                     }
-                };
+                });
 
-                cell.onmouseup = function () {
-                    isMouseDown = false;
-                };
+                cell.addEventListener("pointerup", () => {
+                    isPointerDown = false;
+                });
+
+                // pointercancel fires when the OS interrupts the pointer gesture
+                // (e.g. an incoming call, or the browser taking over a scroll).
+                cell.addEventListener("pointercancel", () => {
+                    isPointerDown = false;
+                });
             }
         }
     };
