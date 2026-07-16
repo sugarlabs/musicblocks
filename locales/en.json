@@ -421,8 +421,6 @@
   "There is no block selected.": "There is no block selected.",
   "avatar": "avatar",
   "sample": "sample",
-  "Interactive Tutorial": "Interactive Tutorial",
-    "Learn Music Blocks by building your first project through a guided interactive walkthrough.": "Learn Music Blocks by building your first project through a guided interactive walkthrough.",
   "Refresh your browser to change your language preference.": "Refresh your browser to change your language preference.",
   "Music Blocks is already set to this language.": "Music Blocks is already set to this language.",
   "Failed to load EaselJS. Please refresh the page.": "Failed to load EaselJS. Please refresh the page.",
@@ -1805,5 +1803,12 @@
   "high": "high",
   "low": "low",
   "Record canvas and toolbars": "Record canvas and toolbars",
-  "Record canvas only": "Record canvas only"
+  "Record canvas only": "Record canvas only",
+  "Interface Tour": "Interface Tour",
+  "A short walkthrough of each part of the Music Blocks window.": "A short walkthrough of each part of the Music Blocks window.",
+  "Start Tour": "Start Tour",
+  "New to Music Blocks? Take a short walkthrough of the window.": "New to Music Blocks? Take a short walkthrough of the window.",
+  "We will highlight the toolbar, palettes, workspace, and other main sections so you know where everything lives.": "We will highlight the toolbar, palettes, workspace, and other main sections so you know where everything lives.",
+  "You only need to click Next — nothing on your project will change.": "You only need to click Next — nothing on your project will change.",
+  "Click Start Tour below to begin!": "Click Start Tour below to begin!"
 }

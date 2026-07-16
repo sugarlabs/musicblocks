@@ -463,16 +463,16 @@ const createHelpContent = activity => {
                 _("Music Blocks Guide")
             ],
             [
-                _("Build Your First Project"),
-                _("Ready to explore Music Blocks by building something?") +
+                _("Interface Tour"),
+                _("New to Music Blocks? Take a short walkthrough of the window.") +
                     " " +
                     _(
-                        "This guided adventure challenges you to discover blocks, connect ideas, and compose your own melody — step by step."
+                        "We will highlight the toolbar, palettes, workspace, and other main sections so you know where everything lives."
                     ) +
                     " " +
-                    _("You'll reflect on what you build along the way.") +
+                    _("You only need to click Next — nothing on your project will change.") +
                     " " +
-                    _("Click the Start Tutorial button below to begin your journey!"),
+                    _("Click Start Tour below to begin!"),
                 "data:image/svg+xml;base64," + window.btoa(base64Encode(MOUSEPALETTEICON))
             ],
             [

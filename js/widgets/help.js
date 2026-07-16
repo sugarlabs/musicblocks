@@ -83,30 +83,53 @@ class HelpWidget {
     }
 
     /**
-     * Static method to get the index of the First Project Tutorial card
-     * @returns {number} The index of the tutorial card
+     * Static method to get the index of the Interface Tour card
+     * @returns {number} The index of the tour card
      */
     static getFirstProjectTutorialIndex() {
-        // The tutorial card is added after the "About" card in Music Blocks
-        // We search for it by title
         if (typeof HELPCONTENT !== "undefined") {
             for (let i = 0; i < HELPCONTENT.length; i++) {
-                if (HELPCONTENT[i][0].includes("Build Your First Project")) {
+                const title = HELPCONTENT[i][0];
+                if (
+                    title.includes("Interface Tour") ||
+                    title.includes("Build Your First Project") ||
+                    title.includes("First Project")
+                ) {
                     return i;
                 }
             }
         }
-        // Default fallback - the tutorial card is typically at position 3
+        // Default fallback - the tour card is typically at position 3
         return 3;
     }
 
     /**
-     * Static method to open help widget directly at the First Project Tutorial
+     * Static method to open help widget directly at the Interface Tour card
      * @param {Activity} activity
      */
     static openFirstProjectTutorial(activity) {
         const tutorialIndex = HelpWidget.getFirstProjectTutorialIndex();
         return new HelpWidget(activity, false, tutorialIndex);
+    }
+
+    /**
+     * Whether a help page is the Interface Tour launcher card.
+     * @private
+     * @param {string} pageTitle
+     * @returns {boolean}
+     */
+    static _isInterfaceTourCard(pageTitle) {
+        if (!pageTitle) {
+            return false;
+        }
+        const lower = pageTitle.toLowerCase();
+        return (
+            pageTitle.includes("Interface Tour") ||
+            pageTitle.includes("Build Your First Project") ||
+            pageTitle.includes("First Project") ||
+            lower.includes("interface tour") ||
+            lower.includes("build your first")
+        );
     }
 
     /**
@@ -465,12 +488,9 @@ class HelpWidget {
         rightArrow.classList.toggle("disabled", page === HELPCONTENT.length - 1);
         leftArrow.classList.toggle("disabled", page === 0);
 
-        // Check if this is the First Project Tutorial card
+        // Check if this is the Interface Tour launcher card
         const pageTitle = HELPCONTENT[page][0];
-        const isFirstProjectTutorial =
-            pageTitle.includes("Build Your First Project") ||
-            pageTitle.includes("First Project") ||
-            pageTitle.toLowerCase().includes("build your first");
+        const isInterfaceTour = HelpWidget._isInterfaceTourCard(pageTitle);
 
         // Previous HTML content is removed, and new one is generated.
         const bodyFragment = document.createDocumentFragment();
@@ -528,46 +548,32 @@ class HelpWidget {
             bodyFragment.append(linkParagraph);
         }
 
-        // Add Start Tutorial and Skip buttons for the First Project Tutorial card
-        if (isFirstProjectTutorial) {
-            body += `
-                <div id="tutorial-buttons-container" style="
-                    display: flex;
-                    flex-direction: row;
-                    gap: 12px;
-                    margin-top: 20px;
-                    justify-content: center;
-                ">
-                    <button id="start-tutorial-btn" style="
-                        padding: 12px 24px;
-                        background: #4CAF50;
-                        color: white;
-                        border: none;
-                        border-radius: 6px;
-                        font-size: 14px;
-                        font-weight: 600;
-                        cursor: pointer;
-                        transition: all 0.2s ease;
-                    " onmouseover="this.style.background='#45a049';" 
-                       onmouseout="this.style.background='#4CAF50';">
-                        ▶ Start Tutorial
-                    </button>
-                    <button id="skip-tutorial-btn" style="
-                        padding: 12px 24px;
-                        background: #e0e0e0;
-                        color: #505050;
-                        border: none;
-                        border-radius: 6px;
-                        font-size: 14px;
-                        font-weight: 500;
-                        cursor: pointer;
-                        transition: all 0.2s ease;
-                    " onmouseover="this.style.background='#d0d0d0';" 
-                       onmouseout="this.style.background='#e0e0e0';">
-                        Skip →
-                    </button>
-                </div>
-            `;
+        // Add Start Tour and Skip buttons for the Interface Tour card
+        if (isInterfaceTour) {
+            const buttonContainer = document.createElement("div");
+            buttonContainer.id = "tutorial-buttons-container";
+            buttonContainer.style.cssText =
+                "display: flex; flex-direction: row; gap: 12px; margin-top: 20px; " +
+                "justify-content: center;";
+
+            const startBtn = document.createElement("button");
+            startBtn.id = "start-tutorial-btn";
+            startBtn.type = "button";
+            startBtn.textContent = "▶ " + _("Start Tour");
+            startBtn.style.cssText =
+                "padding: 12px 24px; background: #4CAF50; color: white; border: none; " +
+                "border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;";
+
+            const skipBtn = document.createElement("button");
+            skipBtn.id = "skip-tutorial-btn";
+            skipBtn.type = "button";
+            skipBtn.textContent = _("Skip") + " →";
+            skipBtn.style.cssText =
+                "padding: 12px 24px; background: #e0e0e0; color: #505050; border: none; " +
+                "border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer;";
+
+            buttonContainer.append(startBtn, skipBtn);
+            bodyFragment.append(buttonContainer);
         }
 
         if ([_("Congratulations."), _("Congratulations!")].includes(HELPCONTENT[page][0])) {
@@ -613,17 +619,15 @@ class HelpWidget {
         helpBody.style.color = "#505050";
         helpBody.append(bodyFragment);
 
-        // Setup tutorial button handlers if on First Project Tutorial page
-        if (isFirstProjectTutorial) {
+        // Setup tour button handlers if on Interface Tour page
+        if (isInterfaceTour) {
             const startBtn = docById("start-tutorial-btn");
             const skipBtn = docById("skip-tutorial-btn");
 
             if (startBtn) {
                 startBtn.onclick = () => {
-                    // Close the help widget
                     this.widgetWindow.close();
 
-                    // Start the interactive tutorial
                     if (typeof FirstProjectTutorial !== "undefined") {
                         const tutorial = new FirstProjectTutorial(this.activity);
                         tutorial.start();
@@ -635,7 +639,6 @@ class HelpWidget {
 
             if (skipBtn) {
                 skipBtn.onclick = () => {
-                    // Go to the next page (skip the tutorial)
                     page = page + 1;
                     if (page >= HELPCONTENT.length) {
                         page = 0;
@@ -663,10 +666,7 @@ class HelpWidget {
                 _("About"),
                 _("Congratulations."),
                 _("Congratulations!")
-            ].includes(title) ||
-            title.includes("Build Your First Project") ||
-            title.includes("First Project") ||
-            title.toLowerCase().includes("build your first")
+            ].includes(title) || HelpWidget._isInterfaceTourCard(title)
         );
     }
 

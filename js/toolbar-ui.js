@@ -142,17 +142,7 @@ class ToolbarUI {
                 ["helpIcon", _("Help and shortcuts")],
                 ["helpGuideItem", _("Help"), "innerHTML"],
                 ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
-                [
-                    "interactiveTutorialGuideItem",
-                    "<strong>" +
-                        _("Interactive Tutorial") +
-                        "</strong><br/><span style='font-size: 12px; font-weight: normal; color: var(--fg); opacity: 0.7; display: block; margin-top: 4px; line-height: 1.25;'>" +
-                        _(
-                            "Learn Music Blocks by building your first project through a guided interactive walkthrough."
-                        ) +
-                        "</span>",
-                    "innerHTML"
-                ],
+                ["interactiveTutorialGuideItem", _("Interactive Tutorial"), "innerHTML"],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -286,17 +276,7 @@ class ToolbarUI {
                 ["helpIcon", _("Help and shortcuts")],
                 ["helpGuideItem", _("Help"), "innerHTML"],
                 ["shortcutsGuideItem", _("Keyboard shortcuts"), "innerHTML"],
-                [
-                    "interactiveTutorialGuideItem",
-                    "<strong>" +
-                        _("Interactive Tutorial") +
-                        "</strong><br/><span style='font-size: 12px; font-weight: normal; color: var(--fg); opacity: 0.7; display: block; margin-top: 4px; line-height: 1.25;'>" +
-                        _(
-                            "Learn Music Blocks by building your first project through a guided interactive walkthrough."
-                        ) +
-                        "</span>",
-                    "innerHTML"
-                ],
+                ["interactiveTutorialGuideItem", _("Interactive Tutorial"), "innerHTML"],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
