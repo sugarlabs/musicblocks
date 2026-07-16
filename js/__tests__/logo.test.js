@@ -1684,6 +1684,50 @@ describe("Logo runFromBlockNow", () => {
             logo.runFromBlockNow(logo, 0, 0, 0, null);
             expect(mockActivity.errorMsg).toHaveBeenCalledWith("Playback is ready.", undefined);
         });
+
+        test("executes evalOnStopList callbacks on natural completion", () => {
+            logo.evalOnStopList = {
+                hookA: "code-a",
+                hookB: "code-b"
+            };
+            logo.safePluginExecute = jest.fn();
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(logo.safePluginExecute).toHaveBeenCalledTimes(2);
+            expect(logo.safePluginExecute).toHaveBeenCalledWith("code-a", logo);
+            expect(logo.safePluginExecute).toHaveBeenCalledWith("code-b", logo);
+        });
+
+        test("clears stale sounds array on natural completion", () => {
+            const mockSound = { stop: jest.fn() };
+            logo.sounds = [mockSound];
+            logo.safePluginExecute = jest.fn();
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(logo.sounds).toEqual([]);
+        });
+
+        test("does not execute evalOnStopList when turtles are still running", () => {
+            logo.safePluginExecute = jest.fn();
+            logo.evalOnStopList = { hookA: "code-a" };
+            mockActivity.turtles.running.mockReturnValue(true);
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(logo.safePluginExecute).not.toHaveBeenCalled();
+        });
+
+        test("does not clear sounds when turtles are still running", () => {
+            logo.safePluginExecute = jest.fn();
+            logo.sounds = [{ stop: jest.fn() }];
+            mockActivity.turtles.running.mockReturnValue(true);
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(logo.sounds).toHaveLength(1);
+        });
     });
 
     test("dispatches end-of-clamp signals and updates status matrix", () => {
