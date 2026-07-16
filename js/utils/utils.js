@@ -658,7 +658,6 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
             `PluginProcessor: Failed to parse plugin data from source "${pluginSource}":`,
             error
         );
-        console.debug("Malformed plugin data:", pluginData);
         return null;
     }
     // Create a palette entry.
@@ -1045,9 +1044,7 @@ const processRawPluginData = async (activity, rawData, pluginSource) => {
     } catch (e) {
         obj = null;
 
-        console.log(rawData);
-
-        console.log(cleanData);
+        console.warn("Plugin data could not be processed.");
         activity.errorMsg("Error loading plugin: " + e);
     }
 
@@ -1157,9 +1154,7 @@ let processMacroData = (macroData, palettes, blocks, macroDict) => {
 
             palettes.makePalettes(1);
         } catch (e) {
-            console.log(macroData);
-
-            console.debug(e);
+            console.warn("Macro data could not be parsed.");
         }
     }
 };
@@ -1561,6 +1556,7 @@ if (typeof module !== "undefined" && module.exports) {
         isSVGEmpty,
         prepareMacroExports,
         processPluginData,
+        processRawPluginData,
         processMacroData,
         hideDOMLabel,
         displayMsg,

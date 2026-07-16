@@ -122,6 +122,7 @@ const {
     doSVG,
     isSVGEmpty,
     prepareMacroExports,
+    processRawPluginData,
     processMacroData,
     hideDOMLabel,
     displayMsg,
@@ -1153,14 +1154,49 @@ describe("processMacroData()", () => {
         expect(palettes.add).not.toHaveBeenCalled();
     });
 
-    it("handles invalid JSON gracefully", () => {
+    it("handles invalid JSON gracefully without logging macro data", () => {
         const macroDict = {};
         const palettes = { add: jest.fn(), makePalettes: jest.fn() };
         const blocks = { addToMyPalette: jest.fn() };
-        const spy = jest.spyOn(console, "debug").mockImplementation(() => {});
-        processMacroData("{invalid", palettes, blocks, macroDict);
+        const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+        const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+        const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+        const macroData = "{invalid secretMacroData";
+
+        processMacroData(macroData, palettes, blocks, macroDict);
+
         expect(palettes.makePalettes).not.toHaveBeenCalled();
-        spy.mockRestore();
+        expect(logSpy).not.toHaveBeenCalledWith(macroData);
+        expect(debugSpy).not.toHaveBeenCalledWith(expect.anything(), macroData);
+        expect(warnSpy).toHaveBeenCalledWith("Macro data could not be parsed.");
+
+        logSpy.mockRestore();
+        debugSpy.mockRestore();
+        warnSpy.mockRestore();
+    });
+});
+
+describe("processRawPluginData()", () => {
+    it("handles invalid JSON without logging plugin data", async () => {
+        const activity = { errorMsg: jest.fn() };
+        const rawData = "{invalid secretPluginData";
+        const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+        const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+        const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+        const result = await processRawPluginData(activity, rawData, "plugins/test.json");
+
+        expect(result).toBeNull();
+        expect(logSpy).not.toHaveBeenCalledWith(rawData);
+        expect(debugSpy).not.toHaveBeenCalledWith(expect.anything(), rawData);
+        expect(errorSpy).toHaveBeenCalledWith(
+            'PluginProcessor: Failed to parse plugin data from source "plugins/test.json":',
+            expect.any(SyntaxError)
+        );
+
+        logSpy.mockRestore();
+        debugSpy.mockRestore();
+        errorSpy.mockRestore();
     });
 });
 
