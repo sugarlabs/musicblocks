@@ -147,6 +147,7 @@ requirejs.config({
                 "palette/palette-loader",
                 "activity/search-controller",
                 "activity/workspace-layout-controller",
+                "activity/block-scale-controller",
                 "search-ui",
                 "project-manager",
                 "keyboard-controller",
