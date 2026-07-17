@@ -712,8 +712,8 @@ body.highcontrast {
 /* ── top bar ── */
 .git-tt-topbar {
     padding: 26px 24px 22px !important;
-    background: linear-gradient(135deg, #dcedc8 0%, #e8f5e9 100%) !important;
-    border-bottom: 3px dashed #c5e1a5 !important;
+    background: linear-gradient(135deg, #bbdefb 0%, #e3f2fd 100%) !important;
+    border-bottom: 3px dashed #90caf9 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
@@ -729,9 +729,9 @@ body.highcontrast {
 .git-tt-badge {
     width: 52px; height: 52px;
     border-radius: 16px;
-    background: linear-gradient(140deg, #8bc34a, #558b2f);
+    background: linear-gradient(140deg, #2196f3, #1565c0);
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.14);
+    box-shadow: 0 6px 14px rgba(33,150,243,0.35);
     transform: rotate(-5deg);
     flex-shrink: 0;
 }
@@ -817,8 +817,8 @@ body.highcontrast {
 .git-tt-node.now svg { width: 32px; height: 32px; }
 
 @keyframes git-tt-pulse {
-    0%,100% { box-shadow: 0 0 0 0 rgba(139,195,74,.5), 0 8px 20px rgba(0,0,0,0.14); }
-    50%      { box-shadow: 0 0 0 10px rgba(139,195,74,0), 0 8px 20px rgba(0,0,0,0.14); }
+    0%,100% { box-shadow: 0 0 0 0 rgba(33,150,243,.5), 0 8px 20px rgba(0,0,0,0.14); }
+    50%      { box-shadow: 0 0 0 10px rgba(33,150,243,0), 0 8px 20px rgba(0,0,0,0.14); }
 }
 
 /* "YOU ARE HERE" label */
@@ -837,9 +837,9 @@ body.highcontrast {
     letter-spacing: 0.04em;
 }
 
-/* node color classes */
+/* node color classes — "c-green" uses MB toolbar blue; rest stay vibrant */
 .git-tt-node.c-now    { background: linear-gradient(150deg, #fff176, #fdd835); }
-.git-tt-node.c-green  { background: linear-gradient(150deg, #8bc34a, #558b2f); }
+.git-tt-node.c-green  { background: linear-gradient(150deg, #2196f3, #1565c0); }
 .git-tt-node.c-pink   { background: linear-gradient(150deg, #ef9a9a, #e57373); }
 .git-tt-node.c-teal   { background: linear-gradient(150deg, #4db6ac, #00897b); }
 .git-tt-node.c-orange { background: linear-gradient(150deg, #ffb74d, #fb8c00); }
@@ -876,7 +876,7 @@ body.highcontrast {
 }
 
 .git-tt-latest-badge {
-    background: #10b981;
+    background: #2196f3;
     color: #fff;
     font-size: 9.5px;
     font-weight: 800;
@@ -892,7 +892,7 @@ body.highcontrast {
     margin-top: 3px;
 }
 
-/* "Take me here" button */
+/* "Take me here" button — MB toolbar blue */
 .git-tt-go-btn {
     display: inline-flex;
     align-items: center;
@@ -900,16 +900,16 @@ body.highcontrast {
     font-size: 11.5px;
     font-weight: 700;
     color: #fff;
-    background: linear-gradient(150deg, #8bc34a, #558b2f);
+    background: linear-gradient(150deg, #2196f3, #1565c0);
     border: none;
     padding: 5px 12px;
     border-radius: 9px;
     cursor: pointer;
-    box-shadow: 0 4px 0 #4a7227, 0 6px 14px rgba(0,0,0,0.12);
+    box-shadow: 0 4px 0 #0d47a1, 0 6px 14px rgba(33,150,243,0.25);
     transition: transform 0.1s, box-shadow 0.1s;
 }
 .git-tt-go-btn:hover  { transform: translateY(-1px); }
-.git-tt-go-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #4a7227; }
+.git-tt-go-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #0d47a1; }
 
 /* "your song right now" chip */
 .git-tt-now-chip {
@@ -934,11 +934,9 @@ body.highcontrast {
 
 /* dark-mode overrides */
 .dark .git-tt-frame { background: #1f2937; }
-.dark .git-tt-topbar { background: linear-gradient(135deg, #2d4a1e 0%, #1f3318 100%) !important; border-bottom-color: #3a6327 !important; }
-.dark .git-tt-hint { background: #374151; color: #f9fafb; }
+.dark .git-tt-topbar { background: linear-gradient(135deg, #0d2744 0%, #1a3558 100%) !important; border-bottom-color: #1565c0 !important; }
 .dark .git-tt-msg  { color: #f9fafb; }
 .dark .git-tt-now-chip { background: #5d4a00; color: #fdd835; }
-.dark .git-tt-footer { color: #6b7280; }
 .dark .git-tt-node { border-color: #1f2937; }
 .dark .git-tt-title { color: #f9fafb; }
 .dark .git-tt-subtitle { color: #9ca3af; }
