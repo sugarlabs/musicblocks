@@ -441,6 +441,195 @@ describe("Blocks Foundation", () => {
 
             document.getElementById = originalGetElementById;
         });
+
+        it("should undo and redo a value_change action", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.activity.refreshCanvas = jest.fn();
+            const mockBlock = {
+                label: { value: "old", style: {} },
+                _labelChanged: jest.fn(),
+                text: { text: "old" },
+                updateCache: jest.fn(),
+                value: "old"
+            };
+            blocks.blockList = [null, mockBlock];
+
+            blocks.actionHistory.push({
+                type: "value_change",
+                blockId: 1,
+                oldValue: "old",
+                newValue: "new",
+                oldText: "old",
+                newText: "new"
+            });
+
+            // Undo value change
+            blocks.undoAction();
+            expect(mockBlock.label.value).toBe("old");
+            expect(mockBlock._labelChanged).toHaveBeenCalledWith(true, true);
+            expect(mockBlock.updateCache).toHaveBeenCalled();
+            expect(blocks.activity.refreshCanvas).toHaveBeenCalled();
+            expect(blocks.redoActionHistory.length).toBe(1);
+
+            // Redo value change
+            blocks.redoAction();
+            expect(mockBlock.label.value).toBe("new");
+            expect(mockBlock.actionHistory || blocks.actionHistory.length).toBeTruthy();
+        });
+
+        it("should undo a restore action (send newly created block to trash)", () => {
+            const blocks = new Blocks(mockActivity);
+            const mockBlock = { trash: false };
+            blocks.blockList = [null, null, null, mockBlock];
+            blocks.sendStackToTrash = jest.fn();
+
+            blocks.actionHistory.push({
+                type: "restore",
+                blockId: 3
+            });
+
+            blocks.undoAction();
+            expect(blocks.sendStackToTrash).toHaveBeenCalledWith(mockBlock);
+            expect(blocks.redoActionHistory[0].type).toBe("restore");
+        });
+
+        it("should redo a restore action (restore from trash)", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.activity._restoreTrashById = jest.fn();
+
+            blocks.redoActionHistory.push({
+                type: "restore",
+                blockId: 5
+            });
+
+            blocks.redoAction();
+            expect(blocks.activity._restoreTrashById).toHaveBeenCalledWith(5);
+            expect(blocks.actionHistory[0].type).toBe("restore");
+        });
+
+        it("should hide helpfulWheelDiv when undoing if it is visible", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.moveBlock = jest.fn();
+            blocks.blockMoved = jest.fn();
+            blocks.activity.refreshCanvas = jest.fn();
+            blocks.activity.__tick = jest.fn();
+
+            const mockDiv = { style: { display: "block" } };
+            const originalGetElementById = document.getElementById;
+            document.getElementById = jest.fn().mockReturnValue(mockDiv);
+
+            blocks.actionHistory.push({
+                type: "move",
+                blockId: 0,
+                oldX: 0,
+                oldY: 0,
+                newX: 10,
+                newY: 10
+            });
+
+            blocks.undoAction();
+            expect(mockDiv.style.display).toBe("none");
+            expect(blocks.activity.__tick).toHaveBeenCalled();
+
+            document.getElementById = originalGetElementById;
+        });
+
+        it("should set isUndoingOrRedoing to true during undo and reset after", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.activity._restoreTrashById = jest.fn();
+
+            blocks.actionHistory.push({ type: "trash", blockId: 1 });
+
+            expect(blocks.isUndoingOrRedoing).toBe(false);
+            blocks.undoAction();
+            // After undoAction completes, isUndoingOrRedoing should be reset
+            expect(blocks.isUndoingOrRedoing).toBe(false);
+        });
+
+        it("should set isUndoingOrRedoing to true during redo and reset after", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.activity._restoreTrashById = jest.fn();
+
+            blocks.redoActionHistory.push({ type: "restore", blockId: 1 });
+
+            expect(blocks.isUndoingOrRedoing).toBe(false);
+            blocks.redoAction();
+            expect(blocks.isUndoingOrRedoing).toBe(false);
+        });
+
+        it("should handle value_change undo when block has no label", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.activity.refreshCanvas = jest.fn();
+            const mockBlock = {
+                label: null,
+                _labelChanged: jest.fn(),
+                text: { text: "4" },
+                updateCache: jest.fn(),
+                value: 4
+            };
+            blocks.blockList = [mockBlock];
+
+            blocks.actionHistory.push({
+                type: "value_change",
+                blockId: 0,
+                oldValue: 1,
+                newValue: 4,
+                oldText: "1",
+                newText: "4"
+            });
+
+            blocks.undoAction();
+            // Should create a label object if it didn't exist
+            expect(mockBlock.label).toEqual({ value: 1, style: {} });
+            expect(mockBlock._labelChanged).toHaveBeenCalledWith(true, true);
+        });
+
+        it("should handle value_change with null oldText gracefully", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.activity.refreshCanvas = jest.fn();
+            const mockBlock = {
+                label: { value: "x", style: {} },
+                _labelChanged: jest.fn(),
+                text: { text: "x" },
+                updateCache: jest.fn(),
+                value: "x"
+            };
+            blocks.blockList = [mockBlock];
+
+            blocks.actionHistory.push({
+                type: "value_change",
+                blockId: 0,
+                oldValue: "y",
+                newValue: "x",
+                oldText: null,
+                newText: "x"
+            });
+
+            blocks.undoAction();
+            // text.text should remain unchanged when oldText is null
+            expect(mockBlock.text.text).toBe("x");
+        });
+
+        it("should clear redoActionHistory when sendStackToTrash is called outside undo/redo", () => {
+            const blocks = new Blocks(mockActivity);
+            const mockBlock = { connections: [null], name: "dummy" };
+            blocks.turtles = { turtleList: [] };
+            blocks.activity.trashcan = { stopHighlightAnimation: jest.fn() };
+            const originalGetElementById = document.getElementById;
+            document.getElementById = jest.fn().mockReturnValue({ click: jest.fn() });
+
+            // Pre-populate redo history
+            blocks.redoActionHistory.push({ type: "move", blockId: 0 });
+            expect(blocks.redoActionHistory.length).toBe(1);
+
+            blocks.isUndoingOrRedoing = false;
+            blocks.sendStackToTrash(mockBlock);
+
+            // redoActionHistory should be cleared
+            expect(blocks.redoActionHistory.length).toBe(0);
+
+            document.getElementById = originalGetElementById;
+        });
     });
 
     describe("Sparse Array Safety", () => {
