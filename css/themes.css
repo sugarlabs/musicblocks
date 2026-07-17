@@ -875,6 +875,15 @@ body.highcontrast {
     color: #9ca3af;
 }
 
+.git-tt-date-text {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.git-tt-stop:hover .git-tt-date-text {
+    opacity: 1;
+}
+
 .git-tt-latest-badge {
     background: #2196f3;
     color: #fff;
