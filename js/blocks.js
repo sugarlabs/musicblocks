@@ -1968,32 +1968,41 @@ class Blocks {
                  * Check if we are disconnecting blocks from widget blocks;
                  * then reinit if widget windows is open.
                  */
-                let lockInit = false;
-                for (let x = 0; x < widgetTitle.length; x++) {
-                    if (lockInit === false) {
-                        switch (widgetTitle[x].innerHTML) {
-                            case "oscilloscope":
-                            case "tempo":
-                            case "rhythm maker":
-                            case "pitch slider":
-                            case "pitch staircase":
-                            case "status":
-                            case "phrase maker":
-                            case "lego bricks":
-                            case "custom mode":
-                            case "music keyboard":
-                            case "pitch drum":
-                            case "meter":
-                            case "temperament":
-                            case "timbre":
-                                lockInit = true;
-                                if (
-                                    this.blockList[initialTopBlock].protoblock.staticLabels[0] ===
-                                    widgetTitle[x].innerHTML
-                                ) {
-                                    this.reInitWidget(initialTopBlock, 1500);
+                if (cBlock) {
+                    let initialTopBlock = this.findTopBlock(cBlock.blockIndex);
+                    if (
+                        this.blockList[initialTopBlock] &&
+                        this.dragStartX !== undefined &&
+                        this.dragStartY !== undefined
+                    ) {
+                        let lockInit = false;
+                        for (let x = 0; x < widgetTitle.length; x++) {
+                            if (lockInit === false) {
+                                switch (widgetTitle[x].innerHTML) {
+                                    case "oscilloscope":
+                                    case "tempo":
+                                    case "rhythm maker":
+                                    case "pitch slider":
+                                    case "pitch staircase":
+                                    case "status":
+                                    case "phrase maker":
+                                    case "lego bricks":
+                                    case "custom mode":
+                                    case "music keyboard":
+                                    case "pitch drum":
+                                    case "meter":
+                                    case "temperament":
+                                    case "timbre":
+                                        lockInit = true;
+                                        if (
+                                            this.blockList[initialTopBlock].protoblock
+                                                .staticLabels[0] === widgetTitle[x].innerHTML
+                                        ) {
+                                            this.reInitWidget(initialTopBlock, 1500);
+                                        }
+                                        break;
                                 }
-                                break;
+                            }
                         }
                     }
                 }
@@ -2488,7 +2497,7 @@ class Blocks {
 
                 /** Check if top block is one of the widget blocks. */
                 let lockInit = false;
-                if (c === null) {
+                if (c === null && this.dragStartX !== undefined && this.dragStartY !== undefined) {
                     for (let i = 0; i < widgetTitle.length; i++) {
                         const that = this;
                         if (lockInit === false) {
