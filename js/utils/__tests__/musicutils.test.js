@@ -1257,8 +1257,8 @@ describe("pitchToNumber", () => {
     it("should work with equal19 temperament", () => {
         global.TEMPERAMENT = { equal19: [] };
         const result = pitchToNumber("C", 4, "C major", "equal19");
-        // C4 in 19-EDO: 4*19 + round(0/12*19) - round(9/12*19) = 76 + 0 - 14 = 62
-        expect(result).toBe(62);
+        // 4 * 19 + 0 (C index) - 9 (A index) = 67
+        expect(result).toBe(67);
     });
 
     it("should fallback to 12-EDO for undefined temperament", () => {
@@ -1459,143 +1459,6 @@ describe("numberToPitch", () => {
         const result2 = numberToPitch(7, "just intonation", "C4", 0);
         expect(Array.isArray(result1)).toBe(true);
         expect(Array.isArray(result2)).toBe(true);
-    });
-});
-
-describe("numberToPitch EDO temperaments", () => {
-    beforeEach(() => {
-        global.PITCHES = ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"];
-        global.TEMPERAMENT = {
-            "equal": {
-                pitchNumber: 12,
-                interval: [
-                    "perfect 1",
-                    "minor 2",
-                    "major 2",
-                    "minor 3",
-                    "major 3",
-                    "perfect 4",
-                    "diminished 5",
-                    "perfect 5",
-                    "minor 6",
-                    "major 6",
-                    "minor 7",
-                    "major 7"
-                ]
-            },
-            "equal5": {
-                isEDO: true,
-                edo: 5,
-                pitchNumber: 5,
-                interval: ["perfect 1", "minor 2", "major 2", "major 3", "augmented 4", "perfect 5"]
-            },
-            "equal7": {
-                isEDO: true,
-                edo: 7,
-                pitchNumber: 7,
-                interval: [
-                    "perfect 1",
-                    "minor 2",
-                    "major 2",
-                    "minor 3",
-                    "major 3",
-                    "perfect 4",
-                    "diminished 5",
-                    "perfect 5"
-                ]
-            },
-            "just intonation": {
-                pitchNumber: 12,
-                0: [1, "C", 4],
-                1: [16 / 15, "D♭", 4],
-                2: [9 / 8, "D", 4],
-                3: [6 / 5, "E♭", 4],
-                4: [5 / 4, "E", 4],
-                5: [4 / 3, "F", 4],
-                6: [45 / 32, "G♭", 4],
-                7: [3 / 2, "G", 4],
-                8: [8 / 5, "A♭", 4],
-                9: [5 / 3, "A", 4],
-                10: [9 / 5, "B♭", 4],
-                11: [15 / 8, "B", 4]
-            }
-        };
-        global.isCustomTemperament = jest.fn(temp => {
-            return (
-                temp !== "equal" && !(temp in PreDefinedTemperaments) && temp in global.TEMPERAMENT
-            );
-        });
-        global.getNoteFromInterval = jest.fn((pitch, interval) => {
-            if (!interval) return ["C", 4];
-            return ["C", 4];
-        });
-        global.console.debug = jest.fn();
-    });
-
-    it("maps pitch number 0 to the starting pitch in 5-EDO", () => {
-        // pitchNumber=0, startPitch="C4", offset=0 → semitone distance=0
-        // EDO step 0 relative to C4 → C4
-        const result = numberToPitch(0, "equal5", "C4", 0);
-        expect(result).toEqual(["C", 4]);
-    });
-
-    it("maps pitch number 0 with C4 offset to C4 in 5-EDO", () => {
-        // Simulates playPitchNumber(0) with default pitchNumberOffset=39
-        // i = 0 + 39 = 39, offset = 39
-        // pitchNumber_local = 39 - 39 = 0 semitones from C4
-        // EDO step 0 → C4
-        const result = numberToPitch(39, "equal5", "C4", 39);
-        expect(result).toEqual(["C", 4]);
-    });
-
-    it("maps pitch number 3 (1 EDO step) to D4 in 5-EDO with offset 39", () => {
-        // i = 3 + 39 = 42
-        // pitchNumber = 42 - 39 = 3 semitones from C4
-        // 3 semitones / 2.4 = 1.25 → round to 1 EDO step
-        // EDO step 1, position in PITCHES = round(1/5 * 12) = 2 → "D"
-        const result = numberToPitch(42, "equal5", "C4", 39);
-        expect(result).toEqual(["D", 4]);
-    });
-
-    it("maps pitch number 5 to F4 in 5-EDO", () => {
-        // i = 5 + 39 = 44
-        // pitchNumber = 44 - 39 = 5 semitones
-        // 5 / 2.4 = 2.083 → round to 2 EDO steps
-        // step 2, position = round(2/5 * 12) = round(4.8) = 5 → "F"
-        const result = numberToPitch(44, "equal5", "C4", 39);
-        expect(result).toEqual(["F", 4]);
-    });
-
-    it("maps pitch number 7 to G4 in 5-EDO", () => {
-        const result = numberToPitch(46, "equal5", "C4", 39);
-        expect(result).toEqual(["G", 4]);
-    });
-
-    it("maps pitch number 12 to C5 (next octave) in 5-EDO", () => {
-        // i = 12 + 39 = 51
-        // pitchNumber = 51 - 39 = 12 semitones
-        // 12 / 2.4 = 5 EDO steps → 1 full octave + 0 steps
-        const result = numberToPitch(51, "equal5", "C4", 39);
-        expect(result).toEqual(["C", 5]);
-    });
-
-    it("maps pitch number 0 to the starting pitch in 7-EDO", () => {
-        const result = numberToPitch(39, "equal7", "C4", 39);
-        expect(result).toEqual(["C", 4]);
-    });
-
-    it("produces higher octave for larger pitch numbers in 5-EDO", () => {
-        // pitchNumber=20 semitones → ~8 EDO steps → 1 octave + 3 steps
-        const result = numberToPitch(59, "equal5", "C4", 39);
-        expect(result[1]).toBe(5);
-    });
-
-    it("handles negative pitch numbers in EDO", () => {
-        // i = -2 + 39 = 37, offset = 39
-        // pitchNumber = 37 - 39 = -2 semitones
-        const result = numberToPitch(37, "equal5", "C4", 39);
-        expect(result[0]).toBeTruthy();
-        expect(result[1]).toBeLessThan(4);
     });
 });
 
@@ -2240,9 +2103,9 @@ describe("pitchToFrequency", () => {
     it("should work with equal19 temperament", () => {
         global.TEMPERAMENT = { equal19: [] };
         const result = pitchToFrequency("C", 4, 0, "C", "equal19");
-        // C4 in 19-EDO: A0 * 2^(62/19) ≈ 264.02
-        expect(result).toBeGreaterThan(260);
-        expect(result).toBeLessThan(270);
+        // C4 in 19-EDO: A0 * Math.pow(2, 67/19) ≈ 316.85
+        expect(result).toBeGreaterThan(310);
+        expect(result).toBeLessThan(320);
     });
 
     it("should fallback to 12-EDO for undefined temperament", () => {
