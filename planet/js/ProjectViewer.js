@@ -73,19 +73,35 @@ class ProjectViewer {
         setBoldText(document.getElementById("projectviewer-downloads"), proj.ProjectDownloads);
         setBoldText(document.getElementById("projectviewer-likes"), proj.ProjectLikes);
 
-        let img = proj.ProjectImage;
-        if (img === "" || img === null)
-            img =
-                proj.ProjectIsMusicBlocks === 1 ? this.PlaceholderMBImage : this.PlaceholderTBImage;
+        // ── Thumbnail ────────────────────────────────────────────────────
+        // Use the REST thumbnail endpoint when available, fall back to
+        // the in-memory data URL or a placeholder.
+        let img;
+        if (proj.hasThumbnail === 1 && Planet.ServerInterface.getThumbnailUrl) {
+            img = Planet.ServerInterface.getThumbnailUrl(this.id);
+        } else if (proj.ProjectImage && proj.ProjectImage !== "") {
+            img = proj.ProjectImage;
+        } else {
+            img = proj.ProjectIsMusicBlocks === 1
+                ? this.PlaceholderMBImage
+                : this.PlaceholderTBImage;
+        }
 
         document.getElementById("projectviewer-image").src = img;
         document.getElementById("projectviewer-description").textContent = proj.ProjectDescription;
+
+        // ── Tags ─────────────────────────────────────────────────────────
+        // ProjectTags is an array of lowercase topic strings (e.g. ["music","math"]).
+        // Planet.TagsManifest keys are the same lowercase strings.
         const tagcontainer = document.getElementById("projectviewer-tags");
         tagcontainer.innerHTML = "";
         for (let i = 0; i < proj.ProjectTags.length; i++) {
             const chip = document.createElement("div");
             chip.classList.add("chipselect");
-            chip.textContent = _(Planet.TagsManifest[proj.ProjectTags[i]].TagName);
+            const entry = Planet.TagsManifest && Planet.TagsManifest[proj.ProjectTags[i]];
+            chip.textContent = entry
+                ? _(entry.TagName)
+                : _(proj.ProjectTags[i].charAt(0).toUpperCase() + proj.ProjectTags[i].slice(1));
             tagcontainer.appendChild(chip);
         }
 
@@ -102,6 +118,17 @@ class ProjectViewer {
     }
 
     download() {
+        const Planet = this.Planet;
+        const proj   = this.ProjectCache[this.id];
+
+        // If the backend exposes a ZIP download endpoint, use it directly.
+        // This avoids fetching the full JSON into memory just to re-save it.
+        if (Planet.ServerInterface.downloadProjectZip) {
+            Planet.ServerInterface.downloadProjectZip(this.id);
+            return;
+        }
+
+        // Fallback: fetch project data and use SaveInterface
         this.Planet.GlobalPlanet.getData(this.id, this.afterDownload.bind(this));
     }
 

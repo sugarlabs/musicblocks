@@ -182,9 +182,10 @@ class LocalCard {
             frag.getElementById(`local-project-cloud-${this.id}`).style.display = "initial";
 
             frag.getElementById(`local-project-cloud-${this.id}`).addEventListener("click", evt => {
+                const publishedId = this.ProjectData.PublishedData.repoName || this.id;
                 document.getElementById("global-tab").click();
-                Planet.GlobalPlanet.forceAddToCache(this.id, () => {
-                    Planet.GlobalPlanet.ProjectViewer.open(this.id);
+                Planet.GlobalPlanet.forceAddToCache(publishedId, () => {
+                    Planet.GlobalPlanet.ProjectViewer.open(publishedId);
                 });
             });
         }

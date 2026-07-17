@@ -17,6 +17,7 @@
         <link rel="apple-touch-icon" href="/activity/activity-icon-color-512.png" />
         <link rel="manifest" href="android_chrome_manifest.json" />
 
+
         <!-- Stylesheets -->
         <link
             rel="preload"
@@ -169,6 +170,7 @@
         <script src="lib/astring.min.js" defer></script>
         <script src="lib/purify.min.js" defer></script>
         <script src="js/utils/mb-dialog.js" defer></script>
+        <script src="js/gitDropdown.js" defer></script>
         <script src="js/svgAssetSelector.js" defer></script>
         <script src="lib/acorn.min.js" defer></script>
         <script src="env.js" defer></script>
@@ -564,6 +566,20 @@
                             <ul class="main right">
                                 <li>
                                     <a
+                                        id="gitProjectBtn"
+                                        class="tooltipped dropdown-trigger"
+                                        data-position="bottom"
+                                        data-tooltip="My Project"
+                                        data-activates="gitdropdown"
+                                        role="button"
+                                        tabindex="0"
+                                        aria-label="My Project"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" style="width: 38px; height: 38px; margin: 0; vertical-align: middle;"><rect width="256" height="256" fill="none"/><path d="M64,88v24a16,16,0,0,0,16,16h96a16,16,0,0,0,16-16V88" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/><line x1="128" y1="128" x2="128" y2="168" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/><circle cx="64" cy="64" r="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/><circle cx="128" cy="192" r="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/><circle cx="192" cy="64" r="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/></svg>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
                                         id="FullScreen"
                                         class="FullScreen tooltipped dropdown-trigger"
                                         data-position="bottom"
@@ -918,6 +934,18 @@
                             <a id="record-canvas-only" role="button" tabindex="0"
                                 >Record canvas only</a
                             >
+                        </li>
+                    </ul>
+
+                    <ul id="gitdropdown" class="dropdown-content">
+                        <li id="git-item-create">
+                            <a id="git-create" role="button" tabindex="0">Create My Save Spot</a>
+                        </li>
+                        <li id="git-item-commit" style="display: none">
+                            <a id="git-commit" role="button" tabindex="0">Mark This Moment</a>
+                        </li>
+                        <li id="git-item-history" style="display: none">
+                            <a id="git-history" role="button" tabindex="0">Time Travel</a>
                         </li>
                     </ul>
 

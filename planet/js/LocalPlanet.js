@@ -112,6 +112,10 @@ class LocalPlanet {
     openProject(id) {
         const Planet = this.Planet;
         Planet.ProjectStorage.setCurrentProjectID(id);
+        // Notify the parent window of the new project's git state so that
+        // the "My Project" toolbar menu (gitDropdownUI) shows Time Travel
+        // when the opened project has a GitHub save spot.
+        Planet._postGitState(id);
         Planet.loadProjectFromData(this.ProjectTable[id].ProjectData);
     }
 

@@ -2526,6 +2526,50 @@ class Activity {
 
         this.showContents = (...args) => this.projectManager.showContents(...args);
 
+        /*
+         * Sets up a new "clean" MB i.e. new project instance
+         */
+        const _afterDelete = that => {
+            if (that.turtles.running()) {
+                that._doHardStopButton();
+            }
+
+            // Clear the Git tracking for the new project
+            localStorage.removeItem("mbGitRepoName");
+            localStorage.removeItem("mbGitHashedKey");
+            localStorage.removeItem("mbGitLastSavedHash");
+            localStorage.removeItem("mbGitCurrentSha");
+            if (that.gitDropdownUI) {
+                that.gitDropdownUI._syncMenuState();
+            }
+
+            // Use the planet New Project mechanism if it is available
+            // and Planet storage is actually initialized (planet.planet
+            // is null when running from file:///index.html), but only
+            // if the current project has a name.
+            if (that.planet !== undefined && that.planet.planet !== null) {
+                // Always save current project first (regardless of name)
+                // so it's never lost from local planet when creating a new one.
+                that.planet.saveLocally();
+                that.planet.initialiseNewProject();
+                loadStart(that);
+                that.planet.saveLocally();
+            } else {
+                that.toolbar.closeAuxToolbar(showHideAuxMenu);
+
+                setTimeout(() => {
+                    // Don't create the new blocks in sendAllToTrash so as to
+                    // avoid clearing the screen of any graphics. Do it here
+                    // instead.
+                    that.sendAllToTrash(false, false);
+                    that.blocks.loadNewBlocks(DATAOBJS);
+                }, 1000);
+            }
+        };
+
+        /**
+
+
         this.justLoadStart = (...args) => this.projectManager.justLoadStart(...args);
 
         /*
@@ -3297,6 +3341,14 @@ class Activity {
                 this.save.saveBlockArtworkPNG.bind(this.save)
             );
             this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
+
+            // Initialise the Git dropdown ("My Project") after the planet
+            // is ready so activity.prepareExport() is available.
+            if (typeof GitDropdownUI !== "undefined") {
+                this.gitDropdownUI = new GitDropdownUI();
+                this.gitDropdownUI.init(this);
+                this.toolbar.renderGitDropdownIcon(this.gitDropdownUI);
+            }
             this.toolbar.renderMenuIcon(showHideAuxMenu);
             this.toolbar.renderHelpIcon(this.showHelp, this.showKeyboardShortcuts);
             this.toolbar.renderModeSelectIcon(
@@ -3329,6 +3381,17 @@ class Activity {
             }
 
             window.saveLocally = this.saveLocally;
+
+            // Keep the Git dirty-check hash up to date after every local save.
+            if (this.gitDropdownUI) {
+                const _origSaveLocally = this.saveLocally;
+                this.saveLocally = (...args) => {
+                    const result = _origSaveLocally.apply(this, args);
+                    this.gitDropdownUI.onSaveLocally();
+                    return result;
+                };
+                window.saveLocally = this.saveLocally;
+            }
 
             // Auto-save live workspace every 5 minutes to guard against
             // data loss from browser crashes (see issue #2994).

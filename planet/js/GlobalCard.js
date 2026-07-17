@@ -31,6 +31,9 @@ class GlobalCard {
         this.PlaceholderMBImage = "images/mbgraphic.png";
         this.PlaceholderTBImage = "images/tbgraphic.png";
 
+        /** @type {IntersectionObserver|null} — disconnected once thumbnail loads */
+        this._thumbObserver = null;
+
         this.renderData = `
             <div class="col no-margin-left s12 m6 l4"> 
                 <div class="card" style="height:95%;"> 
@@ -52,13 +55,16 @@ class GlobalCard {
                             )}" id="global-project-more-details-{ID}"><i class="material-icons">info</i></a> 
                             <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_(
                                 "Open in Music Blocks"
-                            )}" id="global-project-open-{ID}"><i class="material-icons">launch</i></a> 
+                            )}" id="global-project-open-{ID}"><i class="material-icons">launch</i></a>
+                            <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_(
+                                "Fork project"
+                            )}" id="global-project-fork-{ID}"><i class="material-icons">call_split</i></a>
                             <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_(
                                 "Merge with current project"
                             )}" id="global-project-merge-{ID}"><i class="material-icons">merge_type</i></a> 
                             <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${`${
                                 Planet.ProjectStorage.isLiked(this.id) ? "Unlike" : "Like"
-                            } project`}"><i class="material-icons"id="global-like-icon-{ID}"></i><span class="likes-count" id="global-project-likes-{ID}"></span></a>
+                            } project`}"><i class="material-icons" id="global-like-icon-{ID}"></i><span class="likes-count" id="global-project-likes-{ID}"></span></a>
 
                             <div id="global-share-{ID}"> 
                                 <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_(
@@ -68,10 +74,10 @@ class GlobalCard {
                                 <div class="card share-card" id="global-sharebox-{ID}" style="display:none;"> 
                                     <div class="card-content shareurltext"> 
                                             <div class="shareurltitle">${_("Share")}</div> 
-                                            <input type="text" name="shareurl" class="shareurlinput" data-originalurl="https://musicblocks.sugarlabs.org/index.html?id={ID}"> 
-                                            <a class="copyshareurl tooltipped" data-clipboard-text="https://musicblocks.sugarlabs.org/index.html?id={ID}&run=True" data-delay="50" data-tooltip="${_(
+                                            <input type="text" name="shareurl" class="shareurlinput" data-originalurl="https://musicblocks.sugarlabs.org/index.html?repo={ID}"> 
+                                            <a class="copyshareurl tooltipped" data-clipboard-text="https://musicblocks.sugarlabs.org/index.html?repo={ID}&run=True" data-delay="50" data-tooltip="${_(
                                                 "Copy link to clipboard"
-                                            )}"><i class="material-icons"alt="Copy!">file_copy</i></a>
+                                            )}"><i class="material-icons" alt="Copy!">file_copy</i></a>
                                             <div class="shareurl-advanced" id="global-advanced-{ID}"> 
                                                     <div class="shareurltitle">${_("Flags")}</div> 
                                                     <div><input type="checkbox" name="run" id="global-checkboxrun-{ID}" checked><label for="global-checkboxrun-{ID}">${_(
@@ -124,29 +130,50 @@ class GlobalCard {
         const html = this.renderData.replace(new RegExp("{ID}", "g"), this.id);
         const frag = document.createRange().createContextualFragment(html);
 
-        // set image
-        let source;
+        // ── Thumbnail (lazy) ─────────────────────────────────────────────
+        // Cards render immediately with a shimmer placeholder.
+        // The real thumbnail URL is only fetched when the card scrolls
+        // into view (via IntersectionObserver), keeping initial render fast.
+        const imageId  = `global-project-image-${this.id}`;
+        const imgEl    = frag.getElementById(imageId);
+        const placeholder = this.ProjectData.ProjectIsMusicBlocks === 1
+            ? this.PlaceholderMBImage
+            : this.PlaceholderTBImage;
 
-        const projectImage = this.ProjectData.ProjectImage;
-        if (projectImage !== null && projectImage !== "") source = projectImage;
-        else {
-            source =
-                this.ProjectData.ProjectIsMusicBlocks === 1
-                    ? this.PlaceholderMBImage
-                    : this.PlaceholderTBImage;
+        const hasThumbnail = this.ProjectData.hasThumbnail;
+        const dataUrl      = this.ProjectData.ProjectImage;
+
+        if (dataUrl && dataUrl !== "" && !hasThumbnail) {
+            // Already in memory (data-URL from migrated project) — apply immediately.
+            imgEl.src = dataUrl;
+        } else {
+            // Show the placeholder + shimmer; lazy-load the real image on scroll.
+            imgEl.src = placeholder;
+            imgEl.classList.add("mb-thumb-loading");
+
+            if (hasThumbnail === 1 && Planet.ServerInterface.getThumbnailUrl) {
+                const realSrc = Planet.ServerInterface.getThumbnailUrl(this.id);
+                this._lazyLoadImage(imgEl, realSrc);
+            } else {
+                // No thumbnail available — remove shimmer right away.
+                imgEl.classList.remove("mb-thumb-loading");
+            }
         }
 
-        const imageId = `global-project-image-${this.id}`;
-        frag.getElementById(imageId).src = source;
-
         // set tags
+        // ProjectTags is now an array of lowercase topic strings (e.g. ["music","math"]).
+        // Planet.TagsManifest keys are those same lowercase strings.
         const tagcontainer = frag.getElementById(`global-project-tags-${this.id}`);
         tagcontainer.classList.add("global-tags-container");
 
         for (let i = 0; i < this.ProjectData.ProjectTags.length; i++) {
+            const tag = this.ProjectData.ProjectTags[i];
             const chip = document.createElement("div");
             chip.classList.add("chipselect");
-            chip.textContent = _(Planet.TagsManifest[this.ProjectData.ProjectTags[i]].TagName);
+            const entry = Planet.TagsManifest && Planet.TagsManifest[tag];
+            chip.textContent = entry
+                ? _(entry.TagName)
+                : _(tag.charAt(0).toUpperCase() + tag.slice(1));
             tagcontainer.appendChild(chip);
         }
 
@@ -177,6 +204,11 @@ class GlobalCard {
 
         frag.getElementById(`global-project-image-${this.id}`).addEventListener("click", evt => {
             Planet.GlobalPlanet.ProjectViewer.open(this.id);
+        });
+
+        // set fork button listener
+        frag.getElementById(`global-project-fork-${this.id}`).addEventListener("click", evt => {
+            Planet.GlobalPlanet.forkGlobalProject(this.id, evt.currentTarget);
         });
 
         // set merge modify listener
@@ -246,7 +278,52 @@ class GlobalCard {
         });
     }
 
+    /**
+     * Attaches a one-shot IntersectionObserver to the image element.
+     * Once the element enters the viewport, the real src is applied
+     * and the observer immediately disconnects.
+     *
+     * @param {HTMLImageElement} imgEl
+     * @param {string}           realSrc
+     */
+    _lazyLoadImage(imgEl, realSrc) {
+        if (this._thumbObserver) {
+            this._thumbObserver.disconnect();
+        }
+
+        this._thumbObserver = new IntersectionObserver(
+            (entries, observer) => {
+                const entry = entries[0];
+                if (!entry.isIntersecting) return;
+
+                // Swap in the real URL.
+                const image = entry.target;
+                image.src = realSrc;
+                image.onload = () => {
+                    image.classList.remove("mb-thumb-loading");
+                    image.classList.add("mb-thumb-loaded");
+                };
+                image.onerror = () => {
+                    // Network failure — silently keep the placeholder.
+                    image.classList.remove("mb-thumb-loading");
+                };
+
+                // One-shot: stop observing after the first intersection.
+                observer.disconnect();
+                this._thumbObserver = null;
+            },
+            { rootMargin: "100px" }
+        );
+
+        this._thumbObserver.observe(imgEl);
+    }
+
     cleanup() {
+        if (this._thumbObserver) {
+            this._thumbObserver.disconnect();
+            this._thumbObserver = null;
+        }
+
         if (this.likeTimeout) {
             clearTimeout(this.likeTimeout);
             this.likeTimeout = null;
@@ -265,13 +342,18 @@ class GlobalCard {
         if (this.likePending) return;
         const Planet = this.Planet;
         clearTimeout(this.likeTimeout);
-        let like = true;
-        if (Planet.ProjectStorage.isLiked(this.id)) like = false;
+        const like = !Planet.ProjectStorage.isLiked(this.id);
         this.likePending = true;
+        // Optimistic UI update before the round-trip
+        this.setLike(like);
         this.likeTimeout = setTimeout(() => {
+            // GitServerInterface.likeProject uses repoName (this.id) directly
             Planet.ServerInterface.likeProject(this.id, like, data => {
                 this.likePending = false;
-                this.afterLike(data, like);
+                if (!data.success) {
+                    // Roll back optimistic update on failure
+                    this.setLike(!like);
+                }
             });
         }, 500);
     }

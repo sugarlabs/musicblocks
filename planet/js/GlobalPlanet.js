@@ -45,11 +45,14 @@ class GlobalPlanet {
         this.cache = {};
         this.loadCount = 0;
         this.cards = [];
-        this.loadButtonShown = true;
+        this.loadButtonShown = false;
         this.searching = false;
         this.searchString = "";
         this.oldSearchString = "";
         this.remixPrefix = _("Remix of");
+
+        /** @type {IntersectionObserver|null} */
+        this._scrollObserver = null;
     }
 
     initTagList() {
@@ -64,24 +67,18 @@ class GlobalPlanet {
             if (this.specialTags[i].defaultTag === true) this.defaultTag = t;
         }
 
-        const tagsToInitialise = [];
-
-        const keys = Object.keys(Planet.TagsManifest);
+        // Planet.TagsManifest keys are now lowercase topic strings (e.g. "music").
+        // Build GlobalTag instances from all topics returned by the backend.
+        const keys = Object.keys(Planet.TagsManifest || {});
         for (let i = 0; i < keys.length; i++) {
             t = new GlobalTag(Planet);
             t.init({ id: keys[i] });
             this.tags.push(t);
-            if (this.defaultMainTags.indexOf(Planet.TagsManifest[keys[i]].TagName) !== -1) {
-                t.selected = true;
-                tagsToInitialise.push(t);
-            }
         }
 
         this.sortBy = document.getElementById("sort-select").value;
 
         if (this.defaultTag !== false) this.selectSpecialTag(this.defaultTag);
-
-        for (let i = 0; i < tagsToInitialise.length; i++) tagsToInitialise[i].select();
 
         this.refreshTagList();
     }
@@ -141,7 +138,7 @@ class GlobalPlanet {
                 this.oldSearchString,
                 this.sortBy,
                 this.index,
-                this.index + this.page + 1,
+                this.index + this.page,
                 this.afterRefreshProjects.bind(this)
             );
         } else {
@@ -149,7 +146,7 @@ class GlobalPlanet {
                 this.searchMode,
                 this.sortBy,
                 this.index,
-                this.index + this.page + 1,
+                this.index + this.page,
                 this.afterRefreshProjects.bind(this)
             );
         }
@@ -166,7 +163,7 @@ class GlobalPlanet {
                 this.oldSearchString,
                 this.sortBy,
                 this.index,
-                this.index + this.page + 1,
+                this.index + this.page,
                 this.afterRefreshProjects.bind(this)
             );
         } else {
@@ -174,7 +171,7 @@ class GlobalPlanet {
                 this.searchMode,
                 this.sortBy,
                 this.index,
-                this.index + this.page + 1,
+                this.index + this.page,
                 this.afterRefreshProjects.bind(this)
             );
         }
@@ -183,30 +180,33 @@ class GlobalPlanet {
     search() {
         const Planet = this.Planet;
 
-        if (!this.searching) {
-            if (this.searchString === "") {
-                this.oldSearchString = "";
-                this.searching = false;
-                this.showTags();
-            } else {
-                this.searching = true;
-                this.hideTags();
-            }
+        if (this.searching) return;
 
-            this.oldSearchString = this.searchString;
-            this.index = 0;
-            this._cleanupCards();
-            document.getElementById("global-projects").innerHTML = "";
-            this.showLoading();
-            this.hideLoadMore();
-            Planet.ServerInterface.searchProjects(
-                this.oldSearchString,
-                this.sortBy,
-                this.index,
-                this.index + this.page + 1,
-                this.afterRefreshProjects.bind(this)
-            );
+        if (this.searchString === "") {
+            // Search was cleared — restore the previous tag/browse view.
+            this.oldSearchString = "";
+            this.searching = false;
+            this.showTags();
+            this.refreshProjects(); // uses this.searchMode (the active tag / All Projects)
+            return;
         }
+
+        // A real search query — go into search mode.
+        this.searching = true;
+        this.hideTags();
+        this.oldSearchString = this.searchString;
+        this.index = 0;
+        this._cleanupCards();
+        document.getElementById("global-projects").innerHTML = "";
+        this.showLoading();
+        this.hideLoadMore();
+        Planet.ServerInterface.searchProjects(
+            this.oldSearchString,
+            this.sortBy,
+            this.index,
+            this.index + this.page,
+            this.afterRefreshProjects.bind(this)
+        );
     }
 
     _cleanupCards() {
@@ -243,15 +243,17 @@ class GlobalPlanet {
         this.loadCount = toDownload.length;
         const l = data.length;
 
-        if (l === this.page + 1) data.pop();
+        // A full page returned means there may be more projects to load.
+        // (limit === this.page so l === this.page is the maximum possible)
+        const hasMore = l >= this.page;
 
         if (l === 0) {
             this.throwNoProjectsError();
             this.afterAddProjects();
         } else if (this.loadCount === 0) {
             this.render(data);
-            l === this.page + 1 ? this.showLoadMore() : this.hideLoadMore();
-        } else if (l === this.page + 1) {
+            hasMore ? this.showLoadMore() : this.hideLoadMore();
+        } else if (hasMore) {
             this.downloadProjectsToCache(
                 toDownload,
                 function () {
@@ -293,7 +295,7 @@ class GlobalPlanet {
             this.cache[id] = data.data;
             this.cache[id].ProjectData = null;
         } else {
-            this.throwOfflineError();
+            console.warn(`[GlobalPlanet] Skipping project ${id} - failed to load details.`);
         }
 
         this.loadCount -= 1;
@@ -369,16 +371,25 @@ class GlobalPlanet {
         // Make sure the container doesn't display the offlineHTML or noProjectsHTML even when cards are being rendered.
         this.cleanContainer();
 
+        let rendered = 0;
         for (let i = 0; i < data.length; i++) {
             if (this.cache.hasOwnProperty(data[i][0])) {
                 const g = new GlobalCard(this.Planet);
                 g.init(data[i][0]);
                 g.render();
                 this.cards.push(g);
+                rendered++;
             } else {
-                this.throwOfflineError();
-                return;
+                // Project failed to load (e.g. unpublished fork, 404) — skip it
+                // instead of crashing the entire grid.
+                console.warn(`[GlobalPlanet] render: skipping ${data[i][0]} — not in cache`);
             }
+        }
+
+        // If nothing rendered at all, show "no projects" rather than an empty grid.
+        if (rendered === 0 && data.length > 0) {
+            this.throwNoProjectsError();
+            return;
         }
 
         jQuery(".tooltipped").tooltip({ delay: 50 });
@@ -421,13 +432,55 @@ class GlobalPlanet {
     hideLoadMore() {
         document.getElementById("load-more-projects").style.display = "none";
         this.loadButtonShown = false;
+        this._detachScrollObserver();
     }
 
     showLoadMore() {
-        const l = document.getElementById("load-more-projects");
-        l.style.display = "block";
-        l.classList.remove("disabled");
+        // Keep the fallback button hidden — infinite scroll handles paging.
+        document.getElementById("load-more-projects").style.display = "none";
         this.loadButtonShown = true;
+        this._attachScrollObserver();
+    }
+
+    // ── Infinite scroll helpers ───────────────────────────────────────────
+
+    /**
+     * Creates (or reuses) an IntersectionObserver that watches
+     * #infinite-scroll-sentinel.  When the sentinel enters the viewport
+     * and more pages are available, the next page is loaded automatically.
+     */
+    _attachScrollObserver() {
+        const sentinel = document.getElementById("infinite-scroll-sentinel");
+        if (!sentinel) return;
+
+        // Reuse an existing observer rather than stacking multiple ones.
+        if (this._scrollObserver) {
+            this._scrollObserver.observe(sentinel);
+            return;
+        }
+
+        this._scrollObserver = new IntersectionObserver(
+            (entries) => {
+                const entry = entries[0];
+                if (entry.isIntersecting && this.loadButtonShown) {
+                    this.loadMoreProjects();
+                }
+            },
+            {
+                // Start loading a little before the sentinel actually
+                // reaches the bottom edge of the viewport.
+                rootMargin: "200px"
+            }
+        );
+
+        this._scrollObserver.observe(sentinel);
+    }
+
+    /** Stops watching the sentinel (called when there are no more pages). */
+    _detachScrollObserver() {
+        if (this._scrollObserver) {
+            this._scrollObserver.disconnect();
+        }
     }
 
     hideTags() {
@@ -458,20 +511,120 @@ class GlobalPlanet {
                         remixedName,
                         data,
                         this.cache[id].ProjectImage
-                    );
+                    ).then(newId => {
+                        // Remix has no GitHub repo yet — clear git state in parent toolbar.
+                        Planet._postGitState(newId);
+                    });
                 } else {
                     if (language === "ja") {
                         remixedName = `「${_("My Project")}」${this.remixPrefix}`;
                     } else {
                         remixedName = `${this.remixPrefix}  ${_("My Project")}`;
                     }
-                    Planet.ProjectStorage.initialiseNewProject(remixedName, data, null);
+                    Planet.ProjectStorage.initialiseNewProject(remixedName, data, null).then(newId => {
+                        Planet._postGitState(newId);
+                    });
                 }
 
                 Planet.loadProjectFromData(data);
             },
             error
         );
+    }
+
+    /**
+     * Forks a global project on GitHub (creates a new repo + new key),
+     * then opens the forked project data in Music Blocks so the student
+     * can edit it immediately.
+     *
+     * @param {string} id     - source repoName
+     * @param {Function} [error] - optional error callback
+     */
+    forkGlobalProject(id, forkBtnArg, error) {
+        const Planet = this.Planet;
+        if (error === undefined) error = null;
+
+        // Show a loading indicator on the fork button
+        const forkBtn = forkBtnArg || document.getElementById(`global-project-fork-${id}`);
+        if (forkBtn) forkBtn.classList.add("disabled");
+
+        Planet.ServerInterface.forkProject(id, result => {
+            if (forkBtn) forkBtn.classList.remove("disabled");
+
+            if (!result.success) {
+                console.error("[GlobalPlanet] Fork failed:", result.error);
+                if (error) error();
+                return;
+            }
+
+            const forkedRepoName = result.repository;
+            const forkedData     = result.projectData;
+
+            let remixedName;
+            const language = localStorage.languagePreference;
+            const originalName = (this.cache[id] && this.cache[id].ProjectName) || id;
+
+            if (language === "ja") {
+                remixedName = `「${originalName}」${this.remixPrefix}`;
+            } else {
+                remixedName = `${this.remixPrefix} ${originalName}`;
+            }
+
+            // Build the PublishedData stub so that when the student later
+            // clicks Publish, Publisher.js knows the repo already exists on
+            // GitHub and only needs visible=1 flipped — no new repo created.
+            // We store this in GitRepoData (NOT PublishedData) so the local
+            // card does not falsely show the "published" cloud icon.
+            // Also carry over the original's description and tags so the
+            // publish form can pre-populate them for the student to edit.
+            const originalCache = this.cache[id] || {};
+            const forkDescription = originalCache.ProjectDescription || result.description || "";
+            const forkTags = originalCache.ProjectTags
+                ? (Array.isArray(originalCache.ProjectTags)
+                    ? originalCache.ProjectTags
+                    : [originalCache.ProjectTags])
+                : [];
+
+            // If the fork returned project data directly, decode then open it.
+            // Otherwise fall back to fetching it via getData().
+            if (forkedData) {
+                // forkedData is a base64+URI-encoded string (same as getProjectData
+                // returns).  decodeTB() must be applied before loadProjectFromData.
+                const decoded = Planet.ProjectStorage.decodeTB(forkedData);
+                // Pass null for publishedData — fork is NOT published yet.
+                Planet.ProjectStorage.initialiseNewProject(
+                    remixedName,
+                    decoded,
+                    (this.cache[id] && this.cache[id].ProjectImage) || null,
+                    null
+                ).then(async newId => {
+                    // Record the GitHub repo link + original metadata separately
+                    // so Publisher can flip visible=1 without creating a duplicate repo.
+                    await Planet.ProjectStorage.addGitRepoData(newId, forkedRepoName, forkDescription, forkTags);
+                    // Notify parent toolbar of the forked project's git state so
+                    // Time Travel is available immediately after fork.
+                    Planet._postGitState(newId);
+                });
+                Planet.loadProjectFromData(decoded);
+            } else {
+                this.getData(
+                    forkedRepoName,
+                    data => {
+                        Planet.ProjectStorage.initialiseNewProject(
+                            remixedName,
+                            data,
+                            (this.cache[id] && this.cache[id].ProjectImage) || null,
+                            null
+                        ).then(async newId => {
+                            await Planet.ProjectStorage.addGitRepoData(newId, forkedRepoName, forkDescription, forkTags);
+                            Planet._postGitState(newId);
+                        });
+                        Planet.loadProjectFromData(data);
+                    },
+                    error
+                );
+            }
+        });
     }
 
     mergeGlobalProject(id, error) {
@@ -607,8 +760,6 @@ class GlobalPlanet {
                 // document.getElementById("two_header").style.display = "none";
             });
 
-            // Infinite scroll disabled - server overload prevention
-            document.body.onscroll = null;
             this.ProjectViewer = new ProjectViewer(Planet);
             this.ProjectViewer.init();
         }
