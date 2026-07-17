@@ -4087,8 +4087,15 @@ const pitchToNumber = (pitch, octave, keySignature, temperament) => {
             }
         }
     }
-    // We start at A0.
-    return octave * currentEDO + pitchNumber - PITCHES.indexOf("A") + transposition;
+    // For EDO temperaments, convert the 12-EDO pitch position to the
+    // current EDO's step position so pitchToNumber ↔ numberToPitch round-trip.
+    if (currentEDO !== 12) {
+        pitchNumber = Math.round((pitchNumber / 12) * currentEDO);
+    }
+    // We start at A0. For EDO temperaments the offset must be proportional
+    // to the current EDO so that pitchToNumber ↔ numberToPitch are inverses.
+    const offset = Math.round((PITCHES.indexOf("A") / 12) * currentEDO);
+    return octave * currentEDO + pitchNumber - offset + transposition;
 };
 
 /**
@@ -4542,13 +4549,40 @@ const numberToPitch = (i, temperament, startPitch, offset, activity) => {
             return [TEMPERAMENT[temperament][pitchNumber][1], o];
         }
     } else {
-        const intervalArray = TEMPERAMENT[temperament]["interval"];
-        const idx =
-            ((pitchNumber % intervalArray.length) + intervalArray.length) % intervalArray.length;
-        const octaveOffset = Math.floor(pitchNumber / intervalArray.length);
-        interval = intervalArray[idx];
-        const noteObj = getNoteFromInterval(startPitch, interval);
-        return [noteObj[0], noteObj[1] + octaveOffset];
+        const t = TEMPERAMENT[temperament];
+        if (t && t.isEDO) {
+            // pitchNumber is the semitone distance from the starting pitch
+            // (i - offset). Convert it to EDO steps relative to startPitch so
+            // that the notes are distributed across the current EDO's scale
+            // instead of being pushed to ultrasonic octaves.
+            const startParsed = parseNoteString(startPitch);
+            const startNotePos = PITCHES.indexOf(startParsed[0]);
+            const semitonesPerEdoStep = 12 / currentEDO;
+            const stepsFromStart = Math.round(pitchNumber / semitonesPerEdoStep);
+
+            let idx = stepsFromStart;
+            if (idx < 0) {
+                while (idx < 0) {
+                    idx += currentEDO;
+                    n += 1;
+                }
+            }
+
+            const stepInOctave = ((idx % currentEDO) + currentEDO) % currentEDO;
+            const nameIndex = Math.round((stepInOctave / currentEDO) * 12) % 12;
+            const noteName = PITCHES[(nameIndex + startNotePos) % 12];
+            const octave = startParsed[1] + Math.floor(idx / currentEDO) - n;
+            return [noteName, octave];
+        } else {
+            const intervalArray = TEMPERAMENT[temperament]["interval"];
+            const idx =
+                ((pitchNumber % intervalArray.length) + intervalArray.length) %
+                intervalArray.length;
+            const octaveOffset = Math.floor(pitchNumber / intervalArray.length);
+            interval = intervalArray[idx];
+            const noteObj = getNoteFromInterval(startPitch, interval);
+            return [noteObj[0], noteObj[1] + octaveOffset];
+        }
     }
 };
 
