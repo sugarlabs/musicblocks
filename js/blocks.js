@@ -7615,14 +7615,11 @@ class Blocks {
                 this.moveBlock(action.blockId, action.oldX, action.oldY);
                 this.blockMoved(action.blockId);
                 this.activity.refreshCanvas();
-                this.activity.textMsg(_("Block position restored."), 3000);
             } else if (action.type === "trash") {
                 this.activity._restoreTrashById(action.blockId);
-                this.activity.textMsg(_("Item restored from the trash."), 3000);
             } else if (action.type === "restore") {
                 const block = this.blockList[action.blockId];
                 if (block) this.sendStackToTrash(block);
-                this.activity.textMsg(_("Item returned to the trash."), 3000);
             } else if (action.type === "value_change") {
                 const block = this.blockList[action.blockId];
                 if (block) {
@@ -7637,7 +7634,6 @@ class Blocks {
                     block.updateCache();
                     this.activity.refreshCanvas();
                 }
-                this.activity.textMsg(_("Value change undone."), 3000);
             }
 
             this.redoActionHistory.push(action);
@@ -7664,14 +7660,11 @@ class Blocks {
                 this.moveBlock(action.blockId, action.newX, action.newY);
                 this.blockMoved(action.blockId);
                 this.activity.refreshCanvas();
-                this.activity.textMsg(_("Block position restored."), 3000);
             } else if (action.type === "trash") {
                 const block = this.blockList[action.blockId];
                 if (block) this.sendStackToTrash(block);
-                this.activity.textMsg(_("Item returned to the trash."), 3000);
             } else if (action.type === "restore") {
                 this.activity._restoreTrashById(action.blockId);
-                this.activity.textMsg(_("Item restored from the trash."), 3000);
             } else if (action.type === "value_change") {
                 const block = this.blockList[action.blockId];
                 if (block) {
@@ -7686,7 +7679,6 @@ class Blocks {
                     block.updateCache();
                     this.activity.refreshCanvas();
                 }
-                this.activity.textMsg(_("Value change redone."), 3000);
             }
 
             this.actionHistory.push(action);
