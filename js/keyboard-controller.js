@@ -240,9 +240,11 @@ class KeyboardController {
         } else if (event.ctrlKey) {
             switch (event.keyCode) {
                 case 90: // 'Z'
+                    event.preventDefault();
                     activity.blocks.undoAction();
                     break;
                 case 89: // 'Y'
+                    event.preventDefault();
                     activity.blocks.redoAction();
                     break;
                 case V:
