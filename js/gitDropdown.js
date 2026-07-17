@@ -630,7 +630,7 @@ class GitDropdownUI {
         const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
         path.setAttribute("d", d);
         path.setAttribute("fill", "none");
-        path.setAttribute("stroke", "#aed581");
+        path.setAttribute("stroke", "#90caf9");
         path.setAttribute("stroke-width", "4");
         path.setAttribute("stroke-linecap", "round");
         path.setAttribute("stroke-dasharray", "5 13");
