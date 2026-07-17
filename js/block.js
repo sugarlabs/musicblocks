@@ -280,6 +280,7 @@ class Block {
         this.label = null; // Editable textview in DOM.
         this.labelattr = null; // Editable textview in DOM.
         this.text = null; // A dynamically generated text label on block itself.
+        this.valueInitialized = false;
 
         let _value = null;
         Object.defineProperty(this, "value", {
@@ -290,6 +291,7 @@ class Block {
                     this.blocks.actionHistory &&
                     !this.blocks.isUndoingOrRedoing &&
                     _value !== newVal &&
+                    this.valueInitialized &&
                     this.loadComplete &&
                     this.blockIndex !== undefined
                 ) {
@@ -307,6 +309,7 @@ class Block {
                     });
                     this.blocks.redoActionHistory = [];
                 }
+                this.valueInitialized = true;
                 _value = newVal;
             },
             enumerable: true,
