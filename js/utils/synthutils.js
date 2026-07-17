@@ -597,6 +597,12 @@ function Synth() {
      */
     this.noteFrequencies = {};
     /**
+     * Tracks which temperament was last used to build noteFrequencies,
+     * so _getFrequency can rebuild when the temperament changes.
+     * @type {string|null}
+     */
+    this._lastTemperamentBuilt = null;
+    /**
      * Tuner microphone input.
      * @type {Tone.UserMedia|null}
      */
@@ -681,44 +687,74 @@ function Synth() {
             [startParsed[0]]: [startParsed[1], frequency]
         };
 
-        for (const interval in t) {
-            if (
-                interval !== "pitchNumber" &&
-                interval !== "interval" &&
-                interval !== "octave" &&
-                interval !== "isEDO" &&
-                interval !== "edo" &&
-                interval !== "name" &&
-                interval !== "description" &&
-                interval !== "noteLabels" &&
-                interval !== "ratios" &&
-                interval !== "octaveRatio" &&
-                interval !== "generator"
-            ) {
-                let noteInfo;
-                let ratio;
-                if (!isNaN(interval)) {
-                    const val = t[interval];
-                    if (Array.isArray(val) && val.length >= 3) {
-                        noteInfo = [val[1], val[2]];
-                        ratio = val[0];
+        if (t && t.isEDO && t.pitchNumber) {
+            // EDO temperaments map all 12 note names onto the EDO's steps using
+            // proportional distribution. The interval-name based mapping below
+            // only covers a subset of note names and assigns some of them
+            // octave ratios (e.g. "perfect 5" -> ratio 2), which is wrong for
+            // EDO scales. Build the full dictionary here instead.
+            const edo = t.pitchNumber;
+            const edoPitches = [
+                "C",
+                "D" + FLAT,
+                "D",
+                "E" + FLAT,
+                "E",
+                "F",
+                "G" + FLAT,
+                "G",
+                "A" + FLAT,
+                "A",
+                "B" + FLAT,
+                "B"
+            ];
+            const startNotePos = edoPitches.indexOf(startParsed[0]);
+            for (let pos = 0; pos < 12; pos++) {
+                const edoStep = Math.round((pos / 12) * edo) % edo;
+                const ratio = Math.pow(2, edoStep / edo);
+                const noteName = edoPitches[(pos + startNotePos) % 12];
+                this.noteFrequencies[noteName] = [startParsed[1], ratio * frequency];
+            }
+        } else {
+            for (const interval in t) {
+                if (
+                    interval !== "pitchNumber" &&
+                    interval !== "interval" &&
+                    interval !== "octave" &&
+                    interval !== "isEDO" &&
+                    interval !== "edo" &&
+                    interval !== "name" &&
+                    interval !== "description" &&
+                    interval !== "noteLabels" &&
+                    interval !== "ratios" &&
+                    interval !== "octaveRatio" &&
+                    interval !== "generator"
+                ) {
+                    let noteInfo;
+                    let ratio;
+                    if (!isNaN(interval)) {
+                        const val = t[interval];
+                        if (Array.isArray(val) && val.length >= 3) {
+                            noteInfo = [val[1], val[2]];
+                            ratio = val[0];
+                        } else {
+                            continue;
+                        }
+                    } else if (typeof t[interval] === "number") {
+                        noteInfo = getNoteFromInterval(startingPitch, interval);
+                        ratio = t[interval];
+                    } else if (
+                        t[interval] &&
+                        typeof t[interval] === "object" &&
+                        typeof t[interval].ratio === "number"
+                    ) {
+                        noteInfo = getNoteFromInterval(startingPitch, interval);
+                        ratio = t[interval].ratio;
                     } else {
                         continue;
                     }
-                } else if (typeof t[interval] === "number") {
-                    noteInfo = getNoteFromInterval(startingPitch, interval);
-                    ratio = t[interval];
-                } else if (
-                    t[interval] &&
-                    typeof t[interval] === "object" &&
-                    typeof t[interval].ratio === "number"
-                ) {
-                    noteInfo = getNoteFromInterval(startingPitch, interval);
-                    ratio = t[interval].ratio;
-                } else {
-                    continue;
+                    this.noteFrequencies[noteInfo[0]] = [noteInfo[1], ratio * frequency];
                 }
-                this.noteFrequencies[noteInfo[0]] = [noteInfo[1], ratio * frequency];
             }
         }
 
@@ -772,6 +808,18 @@ function Synth() {
             Singer.clearPitchToFrequencyCache();
         }
 
+        // Ensure noteFrequencies matches the current temperament.
+        // This covers the case where the temperament was switched via blocks
+        // (not the widget) and temperamentChanged was never called.
+        if (
+            this.inTemperament !== "equal" &&
+            !isCustomTemperament(this.inTemperament) &&
+            this._lastTemperamentBuilt !== this.inTemperament
+        ) {
+            this.temperamentChanged(this.inTemperament, this.startingPitch);
+            this._lastTemperamentBuilt = this.inTemperament;
+        }
+
         if (this.inTemperament === "equal") {
             if (typeof notes === "string") {
                 const parsed = parseNoteString(notes);
@@ -806,6 +854,28 @@ function Synth() {
                         //Note to be played is not in the same octave.
                         const power = octave - this.noteFrequencies[note][0];
                         return this.noteFrequencies[note][1] * Math.pow(getOctaveRatio(), power);
+                    }
+                }
+            }
+
+            // Fallback for EDO temperaments: compute frequency from proportional position.
+            // This handles notes like "D" or "F" that aren't in the 12-EDO interval
+            // name lookup but are valid 12-EDO approximation names for the EDO scale.
+            const t = TEMPERAMENT[this.inTemperament];
+            if (t && t.isEDO) {
+                const currentEDO = t.pitchNumber;
+                const pitchPos12 = PITCHES.indexOf(noteName);
+                if (pitchPos12 !== -1) {
+                    const edoStep = Math.round((pitchPos12 / 12) * currentEDO) % currentEDO;
+                    const ratio = Math.pow(2, edoStep / currentEDO);
+                    // Use the starting pitch frequency as the base (always stored
+                    // at key "C" in noteFrequencies by temperamentChanged).
+                    const baseFreq = this.noteFrequencies["C"];
+                    if (baseFreq) {
+                        const baseOctave = baseFreq[0];
+                        const baseFrequency = baseFreq[1];
+                        const power = octave - baseOctave;
+                        return baseFrequency * ratio * Math.pow(getOctaveRatio(), power);
                     }
                 }
             }
@@ -3901,6 +3971,7 @@ function Synth() {
     this._instrumentEpoch = 0;
     this.tone = null;
     this.noteFrequencies = {};
+    this._lastTemperamentBuilt = null;
     this.startingPitch = "C4";
     this.audioURL = null;
     this.player = null;
