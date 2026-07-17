@@ -1949,15 +1949,6 @@ class Palette {
 
         let newBlock;
         const __myCallback = newBlock => {
-            // Register block creation in history so Ctrl+Z can delete it
-            if (this.activity.blocks.actionHistory && !this.activity.blocks.isUndoingOrRedoing) {
-                this.activity.blocks.actionHistory.push({
-                    type: "restore",
-                    blockId: newBlock
-                });
-                this.activity.blocks.redoActionHistory = [];
-            }
-
             // Move the drag group under the cursor.
             this.activity.blocks.findDragGroup(newBlock);
             for (const i in this.activity.blocks.dragGroup) {
