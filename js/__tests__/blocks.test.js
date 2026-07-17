@@ -630,6 +630,55 @@ describe("Blocks Foundation", () => {
 
             document.getElementById = originalGetElementById;
         });
+
+        it("should cap trashStacks at MAX_TRASH_UNDO", () => {
+            const blocks = new Blocks(mockActivity);
+            const mockBlock = { connections: [null], name: "dummy" };
+            blocks.turtles = { turtleList: [] };
+            blocks.activity.trashcan = { stopHighlightAnimation: jest.fn() };
+            const originalGetElementById = document.getElementById;
+            document.getElementById = jest.fn().mockReturnValue({ click: jest.fn() });
+
+            blocks.trashStacks = new Array(100).fill(1);
+            blocks.trashPreviews = { 1: "preview_data" };
+            blocks.trashStacks[0] = 1;
+
+            blocks.sendStackToTrash(mockBlock);
+
+            expect(blocks.trashStacks.length).toBe(100);
+            expect(blocks.trashPreviews[1]).toBeUndefined();
+
+            document.getElementById = originalGetElementById;
+        });
+
+        it("should gracefully handle missing blocks during undo/redo", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = []; // Empty blocklist
+            blocks.sendStackToTrash = jest.fn();
+            blocks.activity._restoreTrashById = jest.fn();
+
+            blocks.actionHistory.push({ type: "restore", blockId: 1 });
+            blocks.undoAction();
+            expect(blocks.sendStackToTrash).not.toHaveBeenCalled();
+
+            blocks.actionHistory.push({
+                type: "value_change",
+                blockId: 1,
+                oldValue: 1,
+                newValue: 2
+            });
+            blocks.undoAction();
+            expect(blocks.activity.refreshCanvas).not.toHaveBeenCalled();
+
+            blocks.redoActionHistory.push({ type: "restore", blockId: 1 });
+            // Should not throw or do anything
+            blocks.redoAction();
+            expect(blocks.activity._restoreTrashById).toHaveBeenCalled();
+
+            blocks.redoActionHistory.push({ type: "value_change", blockId: 1, newValue: 2 });
+            blocks.redoAction();
+            expect(blocks.activity.refreshCanvas).not.toHaveBeenCalled();
+        });
     });
 
     describe("Sparse Array Safety", () => {
