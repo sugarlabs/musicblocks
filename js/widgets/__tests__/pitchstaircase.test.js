@@ -588,7 +588,7 @@ describe("PitchStaircase Widget", () => {
             window.widgetWindows.windowFor = jest.fn(() => widgetWindow);
 
             wfbElement = { style: {} };
-            document.getElementsByClassName.mockReturnValue([wfbElement]);
+            jest.spyOn(document, "getElementsByClassName").mockReturnValue([wfbElement]);
 
             mockActivity = {
                 logo: { synth: { setMasterVolume: jest.fn(), stop: jest.fn() } },
@@ -754,6 +754,10 @@ describe("PitchStaircase Widget", () => {
                     synth: mockSynth
                 }
             };
+
+            jest.spyOn(document, "getElementsByClassName").mockImplementation(className =>
+                className === "wfbWidget" ? [{ style: {} }] : []
+            );
         });
 
         afterEach(() => {
