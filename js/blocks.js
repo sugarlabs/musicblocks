@@ -7623,6 +7623,21 @@ class Blocks {
                 const block = this.blockList[action.blockId];
                 if (block) this.sendStackToTrash(block);
                 this.activity.textMsg(_("Item returned to the trash."), 3000);
+            } else if (action.type === "value_change") {
+                const block = this.blockList[action.blockId];
+                if (block) {
+                    if (!block.label) block.label = { value: action.oldValue, style: {} };
+                    block.label.value = action.oldValue;
+                    block._labelChanged(true, true);
+
+                    block.value = action.oldValue;
+                    if (action.oldText !== null && block.text) {
+                        block.text.text = action.oldText;
+                    }
+                    block.updateCache();
+                    this.activity.refreshCanvas();
+                }
+                this.activity.textMsg(_("Value change undone."), 3000);
             }
 
             this.redoActionHistory.push(action);
@@ -7657,6 +7672,21 @@ class Blocks {
             } else if (action.type === "restore") {
                 this.activity._restoreTrashById(action.blockId);
                 this.activity.textMsg(_("Item restored from the trash."), 3000);
+            } else if (action.type === "value_change") {
+                const block = this.blockList[action.blockId];
+                if (block) {
+                    if (!block.label) block.label = { value: action.newValue, style: {} };
+                    block.label.value = action.newValue;
+                    block._labelChanged(true, true);
+
+                    block.value = action.newValue;
+                    if (action.newText !== null && block.text) {
+                        block.text.text = action.newText;
+                    }
+                    block.updateCache();
+                    this.activity.refreshCanvas();
+                }
+                this.activity.textMsg(_("Value change redone."), 3000);
             }
 
             this.actionHistory.push(action);
