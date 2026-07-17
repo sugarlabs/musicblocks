@@ -99,8 +99,10 @@ class GitDropdownUI {
     _prefetchCommits() {
         const repoName = this._getRepoName();
         if (!repoName) return;
-        
-        this._prefetchPromise = fetch(`${this._BASE_URL}/commitHistory?repoName=${encodeURIComponent(repoName)}`)
+
+        this._prefetchPromise = fetch(
+            `${this._BASE_URL}/commitHistory?repoName=${encodeURIComponent(repoName)}`
+        )
             .then(res => {
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 return res.json();
@@ -239,13 +241,16 @@ class GitDropdownUI {
             //   3. Refreshes the local planet card list.
             const planetIframe = document.getElementById("planet-iframe");
             if (planetIframe && planetIframe.contentWindow) {
-                planetIframe.contentWindow.postMessage({
-                    type: "MB_GIT_CREATED",
-                    repoName:    savedRepoName,
-                    hashedKey:   savedKey,
-                    displayName: displayName,
-                    description: description
-                }, "*");
+                planetIframe.contentWindow.postMessage(
+                    {
+                        type: "MB_GIT_CREATED",
+                        repoName: savedRepoName,
+                        hashedKey: savedKey,
+                        displayName: displayName,
+                        description: description
+                    },
+                    "*"
+                );
             }
 
             this._showToast("Save spot created! Your project is now being tracked.", "success");
@@ -363,112 +368,187 @@ class GitDropdownUI {
         const container = document.getElementById("floatingWindows") || document.body;
         const cleanupFns = [];
         const close = () => {
-            cleanupFns.forEach(cleanup => cleanup());
+            cleanupFns.forEach(fn => fn());
             this._closeHistoryPanel();
         };
 
+        // ── overlay ──────────────────────────────────────────────────────────
         const overlay = document.createElement("div");
         overlay.className = "mb-dialog-overlay git-history-panel";
         overlay.style.cssText =
             "position:fixed;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.40);z-index:10000;";
 
+        // ── outer frame ──────────────────────────────────────────────────────
         const frame = document.createElement("div");
-        frame.className = "windowFrame git-history-panel";
+        frame.className = "windowFrame git-history-panel git-tt-frame";
         frame.setAttribute("role", "dialog");
         frame.setAttribute("aria-modal", "true");
         frame.setAttribute("aria-label", "Time Travel");
-        frame.style.cssText = [
-            "position:fixed;",
-            "width:450px;",
-            "max-width:90vw;",
-            "max-height:85vh;",
-            "z-index:10001;",
-            "display:flex;",
-            "flex-direction:column;",
-            "background:var(--bg);",
-            "border-color:var(--border);"
-        ].join("");
+        frame.style.cssText =
+            "position:fixed;width:580px;max-width:94vw;max-height:88vh;" +
+            "z-index:10001;display:flex;flex-direction:column;overflow:hidden;";
 
+        // ── top bar ──────────────────────────────────────────────────────────
         const topBar = document.createElement("div");
-        topBar.className = "wfTopBar";
+        topBar.className = "wfTopBar git-tt-topbar";
 
         const closeBtn = document.createElement("button");
         closeBtn.className = "wftButton close";
         closeBtn.setAttribute("aria-label", "Close");
         closeBtn.innerHTML = "&times;";
 
-        const titleEl = document.createElement("span");
-        titleEl.className = "wftTitle";
-        titleEl.style.cssText =
-            "flex:1; text-align:center; font-weight:bold; font-size:16px; letter-spacing:1px; color:#555;";
-        titleEl.textContent = "Time Travel — Your Saved Moments";
+        const titleWrap = document.createElement("div");
+        titleWrap.className = "git-tt-title-wrap";
 
-        const spacer = document.createElement("div");
-        spacer.style.width = "21px";
+        const titleBadge = document.createElement("div");
+        titleBadge.className = "git-tt-badge";
+        // clock icon
+        titleBadge.innerHTML = `<svg viewBox="0 0 24 24" fill="none" width="22" height="22">
+          <circle cx="12" cy="13" r="8" stroke="white" stroke-width="2"/>
+          <path d="M12 9v4l3 2" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <path d="M9 2c-2 .3-3.6 1.4-4.7 3" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <path d="M15 2c2 .3 3.6 1.4 4.7 3" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>`;
 
+        const titleText = document.createElement("div");
+        const titleH = document.createElement("span");
+        titleH.className = "git-tt-title";
+        titleH.textContent = "Time Travel";
+        const titleSub = document.createElement("span");
+        titleSub.className = "git-tt-subtitle";
+        titleSub.textContent = "Every save, forever yours ✦";
+        titleText.appendChild(titleH);
+        titleText.appendChild(titleSub);
+
+        titleWrap.appendChild(titleBadge);
+        titleWrap.appendChild(titleText);
+        topBar.appendChild(titleWrap);
         topBar.appendChild(closeBtn);
-        topBar.appendChild(titleEl);
-        topBar.appendChild(spacer);
 
+        // ── no hint bar — removed per design ─────────────────────────────────
+
+        // ── scrollable body with winding path ────────────────────────────────
         const body = document.createElement("div");
-        body.className = "wfWinBody git-timeline-body";
+        body.className = "wfWinBody git-tt-body";
 
-        const hint = document.createElement("p");
-        hint.className = "git-timeline-hint";
-        hint.textContent = "Click any saved moment below to go back to it.";
-        body.appendChild(hint);
+        const wrap = document.createElement("div");
+        wrap.className = "git-tt-wrap";
 
-        const list = document.createElement("ul");
-        list.className = "git-timeline-list";
+        // Node colour cycle (skip index 0 which is "now" / yellow)
+        const colours = ["c-green", "c-pink", "c-teal", "c-orange", "c-blue", "c-purple", "c-red"];
+
+        // Node SVG icons (cycle through them)
+        const icons = [
+            // blocks grid+
+            `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M18 14v7M14.5 17.5h7"/></svg>`,
+            // copy
+            `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`,
+            // repeat
+            `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>`,
+            // swap
+            `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3l4 4-4 4"/><path d="M21 7H9a4 4 0 0 0-4 4v1"/><path d="M7 21l-4-4 4-4"/><path d="M3 17h12a4 4 0 0 0 4-4v-1"/></svg>`,
+            // up arrow
+            `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M6 11l6-6 6 6"/></svg>`,
+            // edit pencil
+            `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5Z"/></svg>`,
+            // star
+            `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`
+        ];
+
+        const currentSha = localStorage.getItem("mbGitCurrentSha");
 
         commits.forEach((commit, idx) => {
-            const li = document.createElement("li");
-            li.className = "git-timeline-item";
+            const isNow = currentSha ? commit.sha === currentSha : idx === 0;
+            const side = idx % 2 === 0 ? "right" : "left";
 
-            const dot = document.createElement("div");
-            dot.className = "git-timeline-dot" + (idx === 0 ? " git-timeline-dot--latest" : "");
+            const stop = document.createElement("div");
+            stop.className = `git-tt-stop ${side}${isNow ? " now-stop" : ""}`;
 
-            const content = document.createElement("div");
-            content.className = "git-timeline-content";
+            // node bubble
+            const nodeClass = isNow
+                ? "c-now"
+                : colours[(idx - 1 + colours.length) % colours.length];
+            const node = document.createElement("div");
+            node.className = `git-tt-node ${nodeClass}${isNow ? " now" : ""}`;
 
-            const msg = document.createElement("div");
-            msg.className = "git-timeline-message";
-            msg.textContent = commit.message;
-
-            const meta = document.createElement("div");
-            meta.className = "git-timeline-meta";
-            meta.textContent = commit.date ? this._relativeTime(commit.date) : "";
-
-            if (idx === 0) {
-                const badge = document.createElement("span");
-                badge.className = "git-timeline-latest-badge";
-                badge.textContent = "Latest";
-                meta.appendChild(badge);
+            if (isNow) {
+                // music note for "now"
+                node.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="#5d4000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="28" height="28"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`;
+                const badge = document.createElement("div");
+                badge.className = "git-tt-you-here";
+                badge.textContent = "YOU ARE HERE";
+                node.appendChild(badge);
+            } else {
+                node.innerHTML = icons[(idx - 1) % icons.length];
             }
 
-            const currentSha = localStorage.getItem("mbGitCurrentSha");
-            const isCurrent = currentSha ? commit.sha === currentSha : idx === 0;
+            // text
+            const text = document.createElement("div");
+            text.className = "git-tt-text";
 
-            const goBackBtn = document.createElement("button");
-            goBackBtn.className = "git-timeline-go-back-btn";
-            goBackBtn.textContent = isCurrent ? "Current version" : "Restore this moment";
-            goBackBtn.disabled = isCurrent;
+            const msgEl = document.createElement("div");
+            msgEl.className = "git-tt-msg";
+            msgEl.textContent = commit.message;
 
-            goBackBtn.addEventListener("click", () => {
-                close();
-                this._confirmTimeTravel(commit.sha, commit.message);
-            });
+            const timeEl = document.createElement("div");
+            timeEl.className = "git-tt-time";
+            timeEl.textContent = commit.date ? this._relativeTime(commit.date) : "";
 
-            content.appendChild(msg);
-            content.appendChild(meta);
-            content.appendChild(goBackBtn);
+            if (idx === 0) {
+                const latestBadge = document.createElement("span");
+                latestBadge.className = "git-tt-latest-badge";
+                latestBadge.textContent = "Latest";
+                timeEl.appendChild(latestBadge);
+            }
 
-            li.appendChild(dot);
-            li.appendChild(content);
-            list.appendChild(li);
+            const btnRow = document.createElement("div");
+            btnRow.className = "git-tt-btn-row";
+
+            if (isNow) {
+                const chip = document.createElement("span");
+                chip.className = "git-tt-now-chip";
+                chip.innerHTML = `<svg viewBox="0 0 24 24" fill="#5d4000" width="12" height="12"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z"/></svg> Your song right now`;
+                btnRow.appendChild(chip);
+            } else {
+                const btn = document.createElement("button");
+                btn.className = "git-tt-go-btn";
+                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Take me here`;
+                btn.addEventListener("click", () => {
+                    close();
+                    this._confirmTimeTravel(commit.sha, commit.message);
+                });
+                btnRow.appendChild(btn);
+            }
+
+            text.appendChild(msgEl);
+            text.appendChild(timeEl);
+            text.appendChild(btnRow);
+
+            stop.appendChild(node);
+            stop.appendChild(text);
+            wrap.appendChild(stop);
         });
 
-        body.appendChild(list);
+        // last stop — start flag
+        if (commits.length > 0) {
+            const flagStop = document.createElement("div");
+            const flagSide = commits.length % 2 === 0 ? "right" : "left";
+            flagStop.className = `git-tt-stop ${flagSide}`;
+
+            const flagNode = document.createElement("div");
+            flagNode.className = "git-tt-node c-grey";
+            flagNode.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="28" height="28"><path d="M5 3v18"/><path d="M5 4h11l-2 4 2 4H5"/></svg>`;
+
+            const flagText = document.createElement("div");
+            flagText.className = "git-tt-text";
+            flagText.innerHTML = `<div class="git-tt-flag-note">The very beginning</div><div class="git-tt-msg">Where your project started ✦</div>`;
+
+            flagStop.appendChild(flagNode);
+            flagStop.appendChild(flagText);
+            wrap.appendChild(flagStop);
+        }
+
+        body.appendChild(wrap);
 
         frame.appendChild(topBar);
         frame.appendChild(body);
@@ -479,7 +559,9 @@ class GitDropdownUI {
             const w = frame.offsetWidth;
             const h = frame.offsetHeight;
             frame.style.left = `${Math.max((window.innerWidth - w) / 2, 8)}px`;
-            frame.style.top = `${Math.max((window.innerHeight - h) / 2, 64)}px`;
+            frame.style.top = `${Math.max((window.innerHeight - h) / 2, 48)}px`;
+            // Draw winding SVG path connecting all nodes after layout is settled
+            this._drawTimeTravelPath(wrap);
         });
 
         closeBtn.addEventListener("click", close);
@@ -489,7 +571,6 @@ class GitDropdownUI {
         };
         document.addEventListener("keydown", escHandler, true);
         cleanupFns.push(() => document.removeEventListener("keydown", escHandler, true));
-
         cleanupFns.push(this._makeDraggable(frame, topBar));
 
         frame.tabIndex = -1;
@@ -498,6 +579,64 @@ class GitDropdownUI {
 
     _closeHistoryPanel() {
         document.querySelectorAll(".git-history-panel").forEach(el => el.remove());
+    }
+
+    /**
+     * After the stops are in the DOM, measure each node's centre position
+     * and draw a smooth bezier dashed path through them as an SVG overlay.
+     */
+    _drawTimeTravelPath(wrap) {
+        const nodes = [...wrap.querySelectorAll(".git-tt-node")];
+        if (nodes.length < 2) return;
+
+        const wrapRect = wrap.getBoundingClientRect();
+        const wrapWidth = wrapRect.width;
+        const halfW = wrapWidth / 2;
+
+        // The path flows through the TEXT/BUTTON zone of each stop — NOT the node icon.
+        // Right-side stop (node on far right ~92%): path aims at x ≈ 72% → text area
+        // Left-side  stop (node on far left  ~8%): path aims at x ≈ 28% → text area
+        // This keeps the node circles as edge decorations the path passes *near*,
+        // while the dashed line flows smoothly through the content region.
+        const pts = nodes.map(n => {
+            const r = n.getBoundingClientRect();
+            const cx = r.left - wrapRect.left + r.width / 2;
+            const cy = r.top - wrapRect.top + r.height / 2;
+            const tx =
+                cx > halfW
+                    ? wrapWidth * 0.72 // right-side stop → aim into left-of-node text area
+                    : wrapWidth * 0.28; // left-side  stop → aim into right-of-node text area
+            return { x: tx, y: cy };
+        });
+
+        const svgH = pts[pts.length - 1].y + 56;
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.style.cssText =
+            `position:absolute;top:0;left:0;width:100%;height:${svgH}px;` +
+            "pointer-events:none;z-index:0;overflow:visible;";
+
+        // Smooth S-curve with vertical tangents at every node:
+        //   cp1 = (src.x,  midY)  → path leaves the node heading straight DOWN
+        //   cp2 = (dst.x,  midY)  → path arrives  at next node heading straight DOWN
+        // The cross-over happens at midY — no U-turns, no tight turns, perfectly fluid.
+        let d = `M ${pts[0].x} ${pts[0].y}`;
+        for (let i = 1; i < pts.length; i++) {
+            const p = pts[i - 1];
+            const c = pts[i];
+            const midY = (p.y + c.y) / 2;
+            d += ` C ${p.x} ${midY}  ${c.x} ${midY}  ${c.x} ${c.y}`;
+        }
+
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", d);
+        path.setAttribute("fill", "none");
+        path.setAttribute("stroke", "#aed581");
+        path.setAttribute("stroke-width", "4");
+        path.setAttribute("stroke-linecap", "round");
+        path.setAttribute("stroke-dasharray", "5 13");
+        svg.appendChild(path);
+
+        wrap.insertBefore(svg, wrap.firstChild);
     }
 
     async _confirmTimeTravel(sha, commitMessage) {

@@ -697,114 +697,253 @@ body.highcontrast {
 }
 
 /* ==========================================================================
-   Time Travel — History Timeline Panel
+   Time Travel — Winding Map Timeline
    ========================================================================== */
 
-.git-timeline-body {
-    overflow-y: auto;
-    padding: 0 16px 16px;
-    flex: 1 1 auto;
-    min-height: 0;
+/* ── frame shell ── */
+.git-tt-frame {
+    background: #ffffff;
+    border-radius: 20px !important;
+    box-shadow: 0 24px 56px rgba(0,0,0,0.18) !important;
+    border: none !important;
+    font-family: system-ui, -apple-system, sans-serif;
 }
 
-.git-timeline-hint {
-    font-size: 12px;
-    color: var(--color-text-secondary, #4b5563);
-    margin: 12px 0 10px;
-    font-style: italic;
-}
-
-.git-timeline-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    border-left: 2px solid var(--color-brand-primary, #3b82f6);
-}
-
-.git-timeline-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 0 0 18px 16px;
-    position: relative;
-}
-
-.git-timeline-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: var(--color-brand-primary, #3b82f6);
-    border: 2px solid var(--color-bg-primary, #fff);
-    box-shadow: 0 0 0 2px var(--color-brand-primary, #3b82f6);
+/* ── top bar ── */
+.git-tt-topbar {
+    padding: 26px 24px 22px !important;
+    background: linear-gradient(135deg, #dcedc8 0%, #e8f5e9 100%) !important;
+    border-bottom: 3px dashed #c5e1a5 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
     flex-shrink: 0;
-    margin-left: -22px;
-    margin-top: 4px;
 }
 
-.git-timeline-dot--latest {
-    background: var(--color-success, #10b981);
-    box-shadow: 0 0 0 2px var(--color-success, #10b981);
+.git-tt-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-.git-timeline-content {
-    flex: 1;
-    min-width: 0;
+.git-tt-badge {
+    width: 52px; height: 52px;
+    border-radius: 16px;
+    background: linear-gradient(140deg, #8bc34a, #558b2f);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.14);
+    transform: rotate(-5deg);
+    flex-shrink: 0;
 }
 
-.git-timeline-message {
+.git-tt-title {
+    display: block;
+    font-weight: 800;
+    font-size: 20px;
+    color: #1f2937;
+    line-height: 1.2;
+}
+
+.git-tt-subtitle {
+    display: block;
     font-size: 13px;
     font-weight: 600;
-    color: var(--color-text-primary, #1f2937);
+    color: #6b7280;
+    margin-top: 3px;
+}
+
+/* ── scrollable body ── */
+.git-tt-body {
+    display: block !important;   /* override wfWinBody flex-row */
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 0 0 16px;
+    background: #fafafa;
+}
+
+/* ── winding path wrap ── */
+.git-tt-wrap {
+    position: relative;
+    padding: 32px 0 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;   /* generous gap so the S-curves are gradual, not cramped */
+}
+
+/* ── individual stop ── */
+.git-tt-stop {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+}
+/* right stop: text on left fills space, node pushed to right edge */
+.git-tt-stop.right {
+    flex-direction: row-reverse;
+    padding: 0 12px 0 28px;
+}
+/* left stop: node on left edge, text fills right */
+.git-tt-stop.left {
+    flex-direction: row;
+    padding: 0 28px 0 12px;
+}
+.git-tt-stop.right .git-tt-text { align-items: flex-end; text-align: right; }
+.git-tt-stop.left  .git-tt-text { align-items: flex-start; text-align: left; }
+.git-tt-stop.right .git-tt-btn-row { justify-content: flex-end; }
+.git-tt-stop.left  .git-tt-btn-row { justify-content: flex-start; }
+
+/* ── node bubble ── */
+.git-tt-node {
+    flex: 0 0 auto;
+    width: 68px; height: 68px;
+    border-radius: 50% 46% 50% 50% / 46% 50% 50% 54%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.16);
+    border: 4px solid #fff;
+    position: relative;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+    z-index: 1;  /* float above SVG path */
+}
+.git-tt-node:hover { transform: scale(1.1) rotate(-5deg); }
+.git-tt-node svg { width: 26px; height: 26px; }
+
+/* "now" node — bigger + pulsing green glow */
+.git-tt-node.now {
+    width: 80px; height: 80px;
+    animation: git-tt-pulse 2.4s ease-in-out infinite;
+}
+.git-tt-node.now svg { width: 32px; height: 32px; }
+
+@keyframes git-tt-pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(139,195,74,.5), 0 8px 20px rgba(0,0,0,0.14); }
+    50%      { box-shadow: 0 0 0 10px rgba(139,195,74,0), 0 8px 20px rgba(0,0,0,0.14); }
+}
+
+/* "YOU ARE HERE" label */
+.git-tt-you-here {
+    position: absolute;
+    top: -14px; left: 50%;
+    transform: translateX(-50%) rotate(-3deg);
+    background: #fdd835;
+    color: #5d4000;
+    font-size: 9.5px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 7px;
+    white-space: nowrap;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.18);
+    letter-spacing: 0.04em;
+}
+
+/* node color classes */
+.git-tt-node.c-now    { background: linear-gradient(150deg, #fff176, #fdd835); }
+.git-tt-node.c-green  { background: linear-gradient(150deg, #8bc34a, #558b2f); }
+.git-tt-node.c-pink   { background: linear-gradient(150deg, #ef9a9a, #e57373); }
+.git-tt-node.c-teal   { background: linear-gradient(150deg, #4db6ac, #00897b); }
+.git-tt-node.c-orange { background: linear-gradient(150deg, #ffb74d, #fb8c00); }
+.git-tt-node.c-blue   { background: linear-gradient(150deg, #64b5f6, #1e88e5); }
+.git-tt-node.c-purple { background: linear-gradient(150deg, #9575cd, #5e35b1); }
+.git-tt-node.c-red    { background: linear-gradient(150deg, #e57373, #c62828); }
+.git-tt-node.c-grey   { background: linear-gradient(150deg, #cfd8dc, #90a4ae); }
+
+/* ── text column ── */
+.git-tt-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;   /* prevent flex child from overflowing */
+    z-index: 1;     /* float above SVG path */
+}
+
+.git-tt-msg {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1.3;
     word-break: break-word;
 }
 
-.git-timeline-meta {
+.git-tt-time {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 11px;
-    color: var(--color-text-tertiary, #9ca3af);
-    margin: 3px 0 6px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #9ca3af;
 }
 
-.git-timeline-latest-badge {
-    background: var(--color-success, #10b981);
+.git-tt-latest-badge {
+    background: #10b981;
     color: #fff;
-    font-size: 10px;
-    font-weight: 700;
-    padding: 1px 6px;
+    font-size: 9.5px;
+    font-weight: 800;
+    padding: 1px 7px;
     border-radius: 99px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
-.git-timeline-go-back-btn {
-    font-size: 12px;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: var(--radius-sm, 4px);
-    border: 1px solid var(--color-brand-primary, #3b82f6);
-    color: var(--color-brand-primary, #3b82f6);
-    background: transparent;
-    cursor: pointer;
-    transition:
-        background 0.15s,
-        color 0.15s;
+.git-tt-btn-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 3px;
 }
 
-.git-timeline-go-back-btn:hover:not(:disabled) {
-    background: var(--color-brand-primary, #3b82f6);
+/* "Take me here" button */
+.git-tt-go-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 700;
     color: #fff;
+    background: linear-gradient(150deg, #8bc34a, #558b2f);
+    border: none;
+    padding: 5px 12px;
+    border-radius: 9px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #4a7227, 0 6px 14px rgba(0,0,0,0.12);
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+.git-tt-go-btn:hover  { transform: translateY(-1px); }
+.git-tt-go-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #4a7227; }
+
+/* "your song right now" chip */
+.git-tt-now-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #5d4000;
+    background: #fff9c4;
+    padding: 5px 12px;
+    border-radius: 10px;
 }
 
-.git-timeline-go-back-btn:disabled {
-    opacity: 0.4;
-    cursor: default;
-    border-color: var(--color-border-primary, #d1d5db);
-    color: var(--color-text-tertiary, #9ca3af);
+/* start-flag note */
+.git-tt-flag-note {
+    font-size: 11.5px;
+    font-style: italic;
+    color: #9ca3af;
+    margin-bottom: 1px;
 }
 
-/* "Just Go Back" discard button inside unsaved-work guard */
+/* dark-mode overrides */
+.dark .git-tt-frame { background: #1f2937; }
+.dark .git-tt-topbar { background: linear-gradient(135deg, #2d4a1e 0%, #1f3318 100%) !important; border-bottom-color: #3a6327 !important; }
+.dark .git-tt-hint { background: #374151; color: #f9fafb; }
+.dark .git-tt-msg  { color: #f9fafb; }
+.dark .git-tt-now-chip { background: #5d4a00; color: #fdd835; }
+.dark .git-tt-footer { color: #6b7280; }
+.dark .git-tt-node { border-color: #1f2937; }
+.dark .git-tt-title { color: #f9fafb; }
+.dark .git-tt-subtitle { color: #9ca3af; }
+
+/* ── "Just Go Back" discard button inside unsaved-work guard ── */
 .git-guard-discard-btn {
     border: 1px solid var(--color-error, #ef4444) !important;
     color: var(--color-error, #ef4444) !important;
