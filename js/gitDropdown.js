@@ -1,4 +1,4 @@
-// Copyright (c) 2026 Hari Hara Vardhan K
+// Copyright (c) 2026 Harihara Vardhan K
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -455,31 +455,54 @@ class GitDropdownUI {
             `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="white"><path d="M155.51,24.81a8,8,0,0,0-8.42.88L77.25,80H32A16,16,0,0,0,16,96v64a16,16,0,0,0,16,16H77.25l69.84,54.31A8,8,0,0,0,160,224V32A8,8,0,0,0,155.51,24.81ZM32,96H72v64H32ZM144,207.64,88,164.09V91.91l56-43.55Zm54-106.08a40,40,0,0,1,0,52.88,8,8,0,0,1-12-10.58,24,24,0,0,0,0-31.72,8,8,0,0,1,12-10.58ZM248,128a79.9,79.9,0,0,1-20.37,53.34,8,8,0,0,1-11.92-10.67,64,64,0,0,0,0-85.33,8,8,0,1,1,11.92-10.67A79.83,79.83,0,0,1,248,128Z"/></svg>`
         ];
 
+        // Filter out backend infrastructure commits — not meaningful to students.
+        // The infra messages are always "Add metaData.json" and "Add projectData.json".
+        const INFRA_PATTERN =
+            /^(add (metadata|metaData|projectdata|projectData)\.json|update thumbnail\.png)$/i;
+
+        // Capture the SHA of the "Add metaData.json" commit to use as the project origin.
+        // It is always the oldest of the two infra commits, i.e. the very last in the list
+        // (commits are newest-first). We grab it before filtering.
+        const metaCommit = commits.find(c => /add metaData\.json/i.test(c.message));
+        const originSha = metaCommit ? metaCommit.sha : null;
+        const originMsg = metaCommit ? metaCommit.message : null;
+
+        // Visible commits: strip the two infra entries
+        const visibleCommits = commits.filter(c => !INFRA_PATTERN.test(c.message));
+
         const currentSha = localStorage.getItem("mbGitCurrentSha");
 
-        commits.forEach((commit, idx) => {
+        // Separate counter for non-now icon/colour assignment
+        // so that each commit's icon stays stable regardless of which commit is "now".
+        let iconIdx = 0;
+
+        visibleCommits.forEach((commit, idx) => {
             const isNow = currentSha ? commit.sha === currentSha : idx === 0;
             const side = idx % 2 === 0 ? "right" : "left";
 
             const stop = document.createElement("div");
             stop.className = `git-tt-stop ${side}${isNow ? " now-stop" : ""}`;
 
-            // node bubble
-            const nodeClass = isNow
-                ? "c-now"
-                : colours[(idx - 1 + colours.length) % colours.length];
+            // node bubble — colour and icon are fixed per commit position,
+            // independent of which commit is currently "isNow"
+            const nodeColour = isNow ? "c-now" : colours[iconIdx % colours.length];
+            const nodeIcon = isNow
+                ? null // always fixed Phosphor note below
+                : icons[iconIdx % icons.length];
+            if (!isNow) iconIdx++;
+
             const node = document.createElement("div");
-            node.className = `git-tt-node ${nodeClass}${isNow ? " now" : ""}`;
+            node.className = `git-tt-node ${nodeColour}${isNow ? " now" : ""}`;
 
             if (isNow) {
-                // music note for "now"
-                node.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="#5d4000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="28" height="28"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`;
+                // Always the same Phosphor music-note for the active commit node
+                node.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="#5d4000" width="32" height="32"><path d="M210.3,56.34l-80-24A8,8,0,0,0,120,40V148.26A48,48,0,1,0,136,184V98.75l69.7,20.91A8,8,0,0,0,216,112V64A8,8,0,0,0,210.3,56.34ZM88,216a32,32,0,1,1,32-32A32,32,0,0,1,88,216ZM200,101.25l-64-19.2V50.75L200,70Z"/></svg>`;
                 const badge = document.createElement("div");
                 badge.className = "git-tt-you-here";
                 badge.textContent = "YOU ARE HERE";
                 node.appendChild(badge);
             } else {
-                node.innerHTML = icons[(idx - 1) % icons.length];
+                node.innerHTML = nodeIcon;
             }
 
             // text
@@ -490,29 +513,30 @@ class GitDropdownUI {
             msgEl.className = "git-tt-msg";
             msgEl.textContent = commit.message;
 
-            const timeEl = document.createElement("div");
-            timeEl.className = "git-tt-time";
-
             const dateSpan = document.createElement("span");
             dateSpan.className = "git-tt-date-text";
             dateSpan.textContent = commit.date ? this._relativeTime(commit.date) : "";
-            timeEl.appendChild(dateSpan);
 
             if (idx === 0) {
                 const latestBadge = document.createElement("span");
                 latestBadge.className = "git-tt-latest-badge";
                 latestBadge.textContent = "Latest";
-                timeEl.appendChild(latestBadge);
+                msgEl.appendChild(latestBadge); // always visible next to message
             }
 
             const btnRow = document.createElement("div");
             btnRow.className = "git-tt-btn-row";
 
             if (isNow) {
-                const chip = document.createElement("span");
-                chip.className = "git-tt-now-chip";
-                chip.innerHTML = `<svg viewBox="0 0 24 24" fill="#5d4000" width="12" height="12"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z"/></svg> Your song right now`;
-                btnRow.appendChild(chip);
+                // "Clear Changes" — lets student discard unsaved edits and restore to this save
+                const clearBtn = document.createElement("button");
+                clearBtn.className = "git-tt-clear-btn";
+                clearBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg> Clear Changes`;
+                clearBtn.addEventListener("click", () => {
+                    close();
+                    this._clearChanges(commit.sha, commit.message);
+                });
+                btnRow.appendChild(clearBtn);
             } else {
                 const btn = document.createElement("button");
                 btn.className = "git-tt-go-btn";
@@ -524,8 +548,10 @@ class GitDropdownUI {
                 btnRow.appendChild(btn);
             }
 
+            // Date sits in the button row — opacity 0 until hovered, no layout shift
+            btnRow.appendChild(dateSpan);
+
             text.appendChild(msgEl);
-            text.appendChild(timeEl);
             text.appendChild(btnRow);
 
             stop.appendChild(node);
@@ -533,19 +559,49 @@ class GitDropdownUI {
             wrap.appendChild(stop);
         });
 
-        // last stop — start flag
-        if (commits.length > 0) {
+        // last stop — start flag (always shown; "Take me here" restores to origin)
+        {
+            const isAtOrigin = !!(originSha && currentSha === originSha);
+
             const flagStop = document.createElement("div");
-            const flagSide = commits.length % 2 === 0 ? "right" : "left";
-            flagStop.className = `git-tt-stop ${flagSide}`;
+            const flagSide = visibleCommits.length % 2 === 0 ? "right" : "left";
+            flagStop.className = `git-tt-stop ${flagSide}${isAtOrigin ? " now-stop" : ""}`;
 
             const flagNode = document.createElement("div");
-            flagNode.className = "git-tt-node c-grey";
-            flagNode.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="white" width="28" height="28"><path d="M42.76,50A8,8,0,0,0,40,56V224a8,8,0,0,0,16,0V179.77c26.79-21.16,49.87-9.75,76.45,3.41,16.4,8.11,34.06,16.85,53,16.85,13.93,0,28.54-4.75,43.82-18a8,8,0,0,0,2.76-6V56A8,8,0,0,0,218.76,50c-28,24.23-51.72,12.49-79.21-1.12C111.07,34.76,78.78,18.79,42.76,50ZM216,172.25c-26.79,21.16-49.87,9.74-76.45-3.41-25-12.35-52.81-26.13-83.55-8.4V59.79c26.79-21.16,49.87-9.75,76.45,3.4,25,12.35,52.82,26.13,83.55,8.4Z"/></svg>`;
+            if (isAtOrigin) {
+                flagNode.className = "git-tt-node c-now now";
+                flagNode.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="#5d4000" width="32" height="32"><path d="M210.3,56.34l-80-24A8,8,0,0,0,120,40V148.26A48,48,0,1,0,136,184V98.75l69.7,20.91A8,8,0,0,0,216,112V64A8,8,0,0,0,210.3,56.34ZM88,216a32,32,0,1,1,32-32A32,32,0,0,1,88,216ZM200,101.25l-64-19.2V50.75L200,70Z"/></svg>`;
+                const badge = document.createElement("div");
+                badge.className = "git-tt-you-here";
+                badge.textContent = "YOU ARE HERE";
+                flagNode.appendChild(badge);
+            } else {
+                flagNode.className = "git-tt-node c-grey";
+                flagNode.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="white" width="28" height="28"><path d="M42.76,50A8,8,0,0,0,40,56V224a8,8,0,0,0,16,0V179.77c26.79-21.16,49.87-9.75,76.45,3.41,16.4,8.11,34.06,16.85,53,16.85,13.93,0,28.54-4.75,43.82-18a8,8,0,0,0,2.76-6V56A8,8,0,0,0,218.76,50c-28,24.23-51.72,12.49-79.21-1.12C111.07,34.76,78.78,18.79,42.76,50ZM216,172.25c-26.79,21.16-49.87,9.74-76.45-3.41-25-12.35-52.81-26.13-83.55-8.4V59.79c26.79-21.16,49.87-9.75,76.45,3.4,25,12.35,52.82,26.13,83.55,8.4Z"/></svg>`;
+            }
 
             const flagText = document.createElement("div");
             flagText.className = "git-tt-text";
             flagText.innerHTML = `<div class="git-tt-flag-note">The very beginning</div><div class="git-tt-msg">Where your project started ✦</div>`;
+
+            const flagBtnRow = document.createElement("div");
+            flagBtnRow.className = "git-tt-btn-row";
+            if (isAtOrigin) {
+                const chip = document.createElement("span");
+                chip.className = "git-tt-now-chip";
+                chip.innerHTML = `<svg viewBox="0 0 24 24" fill="#5d4000" width="12" height="12"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z"/></svg> Your song right now`;
+                flagBtnRow.appendChild(chip);
+            } else if (originSha) {
+                const flagBtn = document.createElement("button");
+                flagBtn.className = "git-tt-go-btn";
+                flagBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Take me here`;
+                flagBtn.addEventListener("click", () => {
+                    close();
+                    this._confirmTimeTravel(originSha, originMsg || "project start");
+                });
+                flagBtnRow.appendChild(flagBtn);
+            }
+            flagText.appendChild(flagBtnRow);
 
             flagStop.appendChild(flagNode);
             flagStop.appendChild(flagText);
@@ -564,7 +620,6 @@ class GitDropdownUI {
             const h = frame.offsetHeight;
             frame.style.left = `${Math.max((window.innerWidth - w) / 2, 8)}px`;
             frame.style.top = `${Math.max((window.innerHeight - h) / 2, 48)}px`;
-            // Draw winding SVG path connecting all nodes after layout is settled
             this._drawTimeTravelPath(wrap);
         });
 
@@ -583,6 +638,88 @@ class GitDropdownUI {
 
     _closeHistoryPanel() {
         document.querySelectorAll(".git-history-panel").forEach(el => el.remove());
+    }
+
+    /** Centre a fixed-position frame in the viewport after layout. */
+    _centerFrame(frame, offsetTop = 80) {
+        requestAnimationFrame(() => {
+            frame.style.left = `${Math.max((window.innerWidth - frame.offsetWidth) / 2, 8)}px`;
+            frame.style.top = `${Math.max((window.innerHeight - frame.offsetHeight) / 2, offsetTop)}px`;
+        });
+    }
+
+    /**
+     * Build a standard MB-style modal shell (overlay + windowFrame + topBar + body/widget).
+     * Returns { overlay, frame, body, widget, cleanup } where cleanup() removes everything
+     * and fires any registered cleanupFns.
+     *
+     * @param {string} title       - title shown in wftTitle
+     * @param {number} zBase       - z-index base (overlay = zBase, frame = zBase+1)
+     */
+    _buildSystemDialog(title, zBase = 10002) {
+        document.querySelectorAll(".mb-system-dialog").forEach(el => el.remove());
+
+        const container = document.getElementById("floatingWindows") || document.body;
+        const cleanupFns = [];
+
+        const overlay = document.createElement("div");
+        overlay.className = "mb-dialog-overlay mb-system-dialog";
+        overlay.style.cssText = `position:fixed;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.45);z-index:${zBase};`;
+
+        const frame = document.createElement("div");
+        frame.className = "windowFrame mb-system-dialog";
+        frame.setAttribute("role", "dialog");
+        frame.setAttribute("aria-modal", "true");
+        frame.setAttribute("aria-label", title);
+        frame.style.cssText =
+            `position:fixed;min-width:320px;max-width:480px;z-index:${zBase + 1};` +
+            "background:var(--bg);border-color:var(--border);";
+
+        const topBar = document.createElement("div");
+        topBar.className = "wfTopBar";
+        const closeBtn = document.createElement("div");
+        closeBtn.className = "wftButton close";
+        closeBtn.title = "Cancel";
+        const titleEl = document.createElement("div");
+        titleEl.className = "wftTitle";
+        titleEl.textContent = title;
+        const spacer = document.createElement("div");
+        spacer.style.width = "21px";
+        topBar.appendChild(closeBtn);
+        topBar.appendChild(titleEl);
+        topBar.appendChild(spacer);
+
+        const body = document.createElement("div");
+        body.className = "wfWinBody";
+        const widget = document.createElement("div");
+        widget.className = "wfbWidget";
+        widget.style.cssText =
+            "padding:20px;display:flex;flex-direction:column;gap:16px;color:var(--fg);";
+        body.appendChild(widget);
+
+        frame.appendChild(topBar);
+        frame.appendChild(body);
+        container.appendChild(overlay);
+        container.appendChild(frame);
+
+        const cleanup = () => {
+            cleanupFns.forEach(fn => fn());
+            overlay.remove();
+            frame.remove();
+        };
+        closeBtn.addEventListener("click", cleanup);
+        overlay.addEventListener("click", cleanup);
+        const escHandler = e => {
+            if (e.key === "Escape") cleanup();
+        };
+        document.addEventListener("keydown", escHandler, true);
+        cleanupFns.push(() => document.removeEventListener("keydown", escHandler, true));
+        cleanupFns.push(this._makeDraggable(frame, topBar));
+
+        frame.tabIndex = -1;
+        frame.focus();
+
+        return { overlay, frame, topBar, widget, cleanup, cleanupFns };
     }
 
     /**
@@ -635,9 +772,9 @@ class GitDropdownUI {
         path.setAttribute("d", d);
         path.setAttribute("fill", "none");
         path.setAttribute("stroke", "#90caf9");
-        path.setAttribute("stroke-width", "4");
+        path.setAttribute("stroke-width", "5");
         path.setAttribute("stroke-linecap", "round");
-        path.setAttribute("stroke-dasharray", "5 13");
+        path.setAttribute("stroke-dasharray", "4 22");
         svg.appendChild(path);
 
         wrap.insertBefore(svg, wrap.firstChild);
@@ -675,6 +812,64 @@ class GitDropdownUI {
         );
     }
 
+    async _clearChanges(sha, commitMessage) {
+        const { frame, widget, cleanup } = this._buildSystemDialog("Clear Your Changes");
+        this._centerFrame(frame);
+
+        const msgEl = document.createElement("p");
+        msgEl.style.margin = "0";
+        msgEl.textContent = `This will erase everything you've done since your last save and restore "${commitMessage}". What would you like to do?`;
+
+        const actions = document.createElement("div");
+        actions.style.cssText = "display:flex;flex-direction:column;gap:10px;";
+
+        const mkBtn = (cls, text) => {
+            const b = document.createElement("button");
+            b.className = cls;
+            b.textContent = text;
+            b.style.cssText = "width:100%;text-align:left;";
+            return b;
+        };
+        const btnSave = mkBtn("confirm-button", "Save a backup first, then clear");
+        const btnDiscard = mkBtn(
+            "cancel-button git-guard-discard-btn",
+            "Discard changes — I don't need them"
+        );
+        const btnCancel = mkBtn("cancel-button", "Keep editing");
+
+        btnCancel.addEventListener("click", cleanup);
+
+        btnSave.addEventListener("click", async () => {
+            cleanup();
+            const repoName = this._getRepoName();
+            const hashedKey = this._getHashedKey();
+            if (repoName && hashedKey) {
+                const defaultMsg = this._defaultCommitMessage();
+                const userMsg = await window.MBDialog.prompt({
+                    title: "Save Backup",
+                    message: "Name this backup before clearing:",
+                    defaultValue: defaultMsg,
+                    okText: "Save & Clear",
+                    cancelText: "Cancel"
+                });
+                if (userMsg === null) return;
+                await this._doCommit(repoName, hashedKey, userMsg.trim() || defaultMsg);
+            }
+            await this._restoreCommit(sha, commitMessage);
+        });
+
+        btnDiscard.addEventListener("click", async () => {
+            cleanup();
+            await this._restoreCommit(sha, commitMessage);
+        });
+
+        actions.appendChild(btnSave);
+        actions.appendChild(btnDiscard);
+        actions.appendChild(btnCancel);
+        widget.appendChild(msgEl);
+        widget.appendChild(actions);
+    }
+
     async _restoreCommit(sha, commitMessage) {
         const repoName = this._getRepoName();
         try {
@@ -700,49 +895,8 @@ class GitDropdownUI {
     }
 
     _showUnsavedGuard(onSaveFirst, onJustGoBack) {
-        document.querySelectorAll(".mb-system-dialog").forEach(el => el.remove());
-
-        const container = document.getElementById("floatingWindows") || document.body;
-        const cleanupFns = [];
-
-        const overlay = document.createElement("div");
-        overlay.className = "mb-dialog-overlay mb-system-dialog";
-        overlay.style.cssText =
-            "position:fixed;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.45);z-index:10002;";
-
-        const frame = document.createElement("div");
-        frame.className = "windowFrame mb-system-dialog";
-        frame.setAttribute("role", "dialog");
-        frame.setAttribute("aria-modal", "true");
-        frame.setAttribute("aria-label", "Unsaved Changes");
-        frame.style.cssText =
-            "position:fixed;min-width:320px;max-width:480px;z-index:10003;background:var(--bg);border-color:var(--border);";
-
-        const topBar = document.createElement("div");
-        topBar.className = "wfTopBar";
-
-        const closeBtn = document.createElement("div");
-        closeBtn.className = "wftButton close";
-        closeBtn.title = "Cancel";
-
-        const titleEl = document.createElement("div");
-        titleEl.className = "wftTitle";
-        titleEl.textContent = "You Have Unsaved Work";
-
-        const spacer = document.createElement("div");
-        spacer.style.width = "21px";
-
-        topBar.appendChild(closeBtn);
-        topBar.appendChild(titleEl);
-        topBar.appendChild(spacer);
-
-        const body = document.createElement("div");
-        body.className = "wfWinBody";
-
-        const widget = document.createElement("div");
-        widget.className = "wfbWidget";
-        widget.style.cssText =
-            "padding:20px;display:flex;flex-direction:column;gap:16px;color:var(--fg);";
+        const { frame, widget, cleanup } = this._buildSystemDialog("You Have Unsaved Work");
+        this._centerFrame(frame);
 
         const msg = document.createElement("p");
         msg.style.margin = "0";
@@ -752,68 +906,35 @@ class GitDropdownUI {
         const actions = document.createElement("div");
         actions.style.cssText = "display:flex;flex-direction:column;gap:10px;";
 
-        const btnSaveFirst = document.createElement("button");
-        btnSaveFirst.className = "confirm-button";
-        btnSaveFirst.textContent = "Save a Checkpoint First, Then Go Back";
-        btnSaveFirst.style.cssText = "width:100%;text-align:left;";
-
-        const btnJustGoBack = document.createElement("button");
-        btnJustGoBack.className = "cancel-button git-guard-discard-btn";
-        btnJustGoBack.textContent = "Just Go Back (I don't need to save)";
-        btnJustGoBack.style.cssText = "width:100%;text-align:left;";
-
-        const btnCancel = document.createElement("button");
-        btnCancel.className = "cancel-button";
-        btnCancel.textContent = "Cancel — Stay Here";
-        btnCancel.style.cssText = "width:100%;text-align:left;";
-
-        actions.appendChild(btnSaveFirst);
-        actions.appendChild(btnJustGoBack);
-        actions.appendChild(btnCancel);
-
-        widget.appendChild(msg);
-        widget.appendChild(actions);
-        body.appendChild(widget);
-        frame.appendChild(topBar);
-        frame.appendChild(body);
-        container.appendChild(overlay);
-        container.appendChild(frame);
-
-        requestAnimationFrame(() => {
-            const w = frame.offsetWidth;
-            const h = frame.offsetHeight;
-            frame.style.left = `${Math.max((window.innerWidth - w) / 2, 8)}px`;
-            frame.style.top = `${Math.max((window.innerHeight - h) / 2, 80)}px`;
-        });
-
-        const cleanup = () => {
-            cleanupFns.forEach(cleanupFn => cleanupFn());
-            overlay.remove();
-            frame.remove();
+        const mkBtn = (cls, text) => {
+            const b = document.createElement("button");
+            b.className = cls;
+            b.textContent = text;
+            b.style.cssText = "width:100%;text-align:left;";
+            return b;
         };
+        const btnSave = mkBtn("confirm-button", "Save a Checkpoint First, Then Go Back");
+        const btnGoBack = mkBtn(
+            "cancel-button git-guard-discard-btn",
+            "Just Go Back (I don't need to save)"
+        );
+        const btnCancel = mkBtn("cancel-button", "Cancel — Stay Here");
 
-        closeBtn.addEventListener("click", cleanup);
         btnCancel.addEventListener("click", cleanup);
-        overlay.addEventListener("click", cleanup);
-        const escHandler = e => {
-            if (e.key === "Escape") cleanup();
-        };
-        document.addEventListener("keydown", escHandler, true);
-        cleanupFns.push(() => document.removeEventListener("keydown", escHandler, true));
-
-        btnSaveFirst.addEventListener("click", () => {
+        btnSave.addEventListener("click", () => {
             cleanup();
             onSaveFirst();
         });
-
-        btnJustGoBack.addEventListener("click", () => {
+        btnGoBack.addEventListener("click", () => {
             cleanup();
             onJustGoBack();
         });
 
-        cleanupFns.push(this._makeDraggable(frame, topBar));
-        frame.tabIndex = -1;
-        frame.focus();
+        actions.appendChild(btnSave);
+        actions.appendChild(btnGoBack);
+        actions.appendChild(btnCancel);
+        widget.appendChild(msg);
+        widget.appendChild(actions);
     }
 
     _hasUnsavedChanges() {

@@ -758,17 +758,17 @@ body.highcontrast {
     overflow-y: auto;
     flex: 1 1 auto;
     min-height: 0;
-    padding: 0 0 16px;
-    background: #fafafa;
+    padding: 0 0 24px;
+    background: #eef5ff;  /* subtle blue tint — map atmosphere, not noise */
 }
 
 /* ── winding path wrap ── */
 .git-tt-wrap {
     position: relative;
-    padding: 32px 0 24px;
+    padding: 36px 0 28px;
     display: flex;
     flex-direction: column;
-    gap: 56px;   /* generous gap so the S-curves are gradual, not cramped */
+    gap: 72px;   /* generous gap — curves stay gradual, content breathes */
 }
 
 /* ── individual stop ── */
@@ -796,15 +796,15 @@ body.highcontrast {
 /* ── node bubble ── */
 .git-tt-node {
     flex: 0 0 auto;
-    width: 68px; height: 68px;
+    width: 64px; height: 64px;
     border-radius: 50% 46% 50% 50% / 46% 50% 50% 54%;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.16);
-    border: 4px solid #fff;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.13);
+    border: 5px solid #fff;
     position: relative;
     transition: transform 0.2s ease;
     cursor: pointer;
-    z-index: 1;  /* float above SVG path */
+    z-index: 1;
 }
 .git-tt-node:hover { transform: scale(1.1) rotate(-5deg); }
 .git-tt-node svg { width: 26px; height: 26px; }
@@ -852,37 +852,24 @@ body.highcontrast {
 .git-tt-text {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
     flex: 1;
-    min-width: 0;   /* prevent flex child from overflowing */
-    z-index: 1;     /* float above SVG path */
+    min-width: 0;
+    z-index: 1;
 }
 
 .git-tt-msg {
-    font-size: 14px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 15px;
     font-weight: 700;
-    color: #1f2937;
+    color: #111827;
     line-height: 1.3;
     word-break: break-word;
 }
 
-.git-tt-time {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11.5px;
-    font-weight: 600;
-    color: #9ca3af;
-}
-
-.git-tt-date-text {
-    opacity: 0;
-    transition: opacity 0.2s ease;
-}
-
-.git-tt-stop:hover .git-tt-date-text {
-    opacity: 1;
-}
 
 .git-tt-latest-badge {
     background: #2196f3;
@@ -897,9 +884,26 @@ body.highcontrast {
 
 .git-tt-btn-row {
     display: flex;
-    gap: 6px;
-    margin-top: 3px;
+    align-items: center;
+    gap: 8px;
 }
+
+/* Date text lives inline in .git-tt-btn-row, always to the RIGHT of the button */
+.git-tt-date-text {
+    font-size: 11px;
+    font-weight: 600;
+    color: #9ca3af;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+    white-space: nowrap;
+    align-self: center;
+    order: 1;  /* left stops: date to the RIGHT of the button */
+}
+.git-tt-stop:hover .git-tt-date-text { opacity: 1; }
+
+/* right stops: text is on the left, so date sits to the LEFT of the button */
+.git-tt-stop.right .git-tt-date-text { order: -1; }
+
 
 /* "Take me here" button — MB toolbar blue */
 .git-tt-go-btn {
@@ -932,6 +936,25 @@ body.highcontrast {
     padding: 5px 12px;
     border-radius: 10px;
 }
+
+/* "Clear Changes" button — same 3D design as go-btn, red to signal destructive */
+.git-tt-clear-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(150deg, #ef5350, #c62828);
+    border: none;
+    padding: 5px 12px;
+    border-radius: 9px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #b71c1c, 0 6px 14px rgba(198,40,40,0.25);
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+.git-tt-clear-btn:hover  { transform: translateY(-1px); }
+.git-tt-clear-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #b71c1c; }
 
 /* start-flag note */
 .git-tt-flag-note {
