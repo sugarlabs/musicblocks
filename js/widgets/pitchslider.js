@@ -25,6 +25,14 @@
 class PitchSlider {
     static ICONSIZE = 32;
     static SEMITONE = Math.pow(2, 1 / 12);
+    /**
+     * Returns the step size ratio for the given EDO.
+     * @param {number} edo - divisions per octave (defaults to 12)
+     * @returns {number}
+     */
+    static stepRatio(edo) {
+        return Math.pow(2, 1 / (edo || 12));
+    }
 
     /**
      * @constructor

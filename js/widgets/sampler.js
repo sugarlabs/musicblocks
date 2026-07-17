@@ -39,6 +39,20 @@ function SampleWidget() {
     const CENTERPITCHHERTZ = 220;
     const SAMPLEWAITTIME = 500;
 
+    /**
+     * Returns the current EDO from the active temperament, defaulting to 12.
+     * @returns {number}
+     */
+    const _getCurrentEDO = () => {
+        const synth = this.activity?.logo?.synth;
+        if (synth && synth.inTemperament) {
+            const t =
+                typeof getTemperament === "function" ? getTemperament(synth.inTemperament) : null;
+            return t?.pitchNumber || 12;
+        }
+        return 12;
+    };
+
     // Oscilloscope constants
     const SAMPLEANALYSERSIZE = 8192;
     const SAMPLEOSCCOLORS = ["#3030FF", "#FF3050"];
@@ -1549,14 +1563,19 @@ function SampleWidget() {
      */
     this._calculateFrequency = function () {
         let semitones = 0;
+        const currentEDO = _getCurrentEDO();
 
-        semitones += isNaN(this.octaveCenter) ? 0 : this.octaveCenter * 12;
-        semitones += isNaN(this.pitchCenter) ? 0 : MAJORSCALE[this.pitchCenter];
-        semitones += isNaN(this.accidentalCenter) ? 0 : this.accidentalCenter - 2;
+        semitones += isNaN(this.octaveCenter) ? 0 : this.octaveCenter * currentEDO;
+        semitones += isNaN(this.pitchCenter)
+            ? 0
+            : Math.round((MAJORSCALE[this.pitchCenter] / 12) * currentEDO);
+        semitones += isNaN(this.accidentalCenter)
+            ? 0
+            : Math.round(((this.accidentalCenter - 2) / 12) * currentEDO);
 
-        // A4 = 440Hz at semitone position 57
-        const netChange = semitones - 57;
-        const frequency = Math.floor(440 * Math.pow(2, netChange / 12));
+        const a4Position = Math.round((57 / 12) * currentEDO);
+        const netChange = semitones - a4Position;
+        const frequency = Math.floor(440 * Math.pow(2, netChange / currentEDO));
 
         return frequency;
     };
@@ -1592,13 +1611,19 @@ function SampleWidget() {
         this._updateBlocks();
 
         let finalCenter = 0;
+        const currentEDO = _getCurrentEDO();
 
-        finalCenter += isNaN(this.octaveCenter) ? 0 : this.octaveCenter * 12;
-        finalCenter += isNaN(this.pitchCenter) ? 0 : MAJORSCALE[this.pitchCenter];
-        finalCenter += isNaN(this.accidentalCenter) ? 0 : this.accidentalCenter - 2;
+        finalCenter += isNaN(this.octaveCenter) ? 0 : this.octaveCenter * currentEDO;
+        finalCenter += isNaN(this.pitchCenter)
+            ? 0
+            : Math.round((MAJORSCALE[this.pitchCenter] / 12) * currentEDO);
+        finalCenter += isNaN(this.accidentalCenter)
+            ? 0
+            : Math.round(((this.accidentalCenter - 2) / 12) * currentEDO);
 
-        const netChange = finalCenter - 57;
-        const reffinalpitch = Math.floor(440 * Math.pow(2, netChange / 12));
+        const a4Position = Math.round((57 / 12) * currentEDO);
+        const netChange = finalCenter - a4Position;
+        const reffinalpitch = Math.floor(440 * Math.pow(2, netChange / currentEDO));
 
         this.activity.logo.synth.trigger(
             0,
@@ -2018,8 +2043,9 @@ function SampleWidget() {
                             this.octaveCenter
                         ) -
                             57) /
-                            12
-                    )
+                            _getCurrentEDO()
+                    ),
+                _getCurrentEDO()
             );
             this.tunerDisplay.update(noteObj[0], noteObj[1], this.centsValue);
 
@@ -2242,20 +2268,22 @@ function SampleWidget() {
     /**
      * Convert frequency to note and cents
      */
-    const frequencyToNote = frequency => {
+    const frequencyToNote = (frequency, edo) => {
         if (frequency <= 0) return { note: "---", cents: 0 };
 
         const A4 = 440;
         const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+        const currentEDO = edo || _getCurrentEDO();
 
-        const midiNote = 69 + 12 * Math.log2(frequency / A4);
+        const midiNote = 69 + currentEDO * Math.log2(frequency / A4);
         const roundedMidi = Math.round(midiNote);
 
-        const noteIndex = roundedMidi % 12;
-        const octave = Math.floor(roundedMidi / 12) - 1;
+        const steppedIndex = ((roundedMidi % currentEDO) + currentEDO) % currentEDO;
+        const noteIndex = Math.round((steppedIndex / currentEDO) * 12) % 12;
+        const octave = Math.floor(roundedMidi / currentEDO) - 1;
         const noteName = noteNames[noteIndex] + octave;
 
-        const nearestFreq = A4 * Math.pow(2, (roundedMidi - 69) / 12);
+        const nearestFreq = A4 * Math.pow(2, (roundedMidi - 69) / currentEDO);
         const centsOffset = Math.round(1200 * Math.log2(frequency / nearestFreq));
 
         return { note: noteName, cents: centsOffset };

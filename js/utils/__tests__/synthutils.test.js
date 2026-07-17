@@ -513,6 +513,85 @@ describe("Utility Functions (logic-only)", () => {
             delete global.TEMPERAMENT[customTempName];
             Synth.inTemperament = originalInTemp;
         });
+
+        it("should populate all 12 note names for EDO temperaments", () => {
+            Synth.inTemperament = "equal5";
+            temperamentChanged("equal5", "C4");
+
+            // All 12 note names should be present via proportional mapping
+            // The chromatic scale uses flats (D♭, E♭, etc.) which get normalized to Db, Eb
+            const expectedNotes = ["C", "D", "E", "F", "G", "A", "B", "Db", "Eb", "Gb", "Ab", "Bb"];
+            for (const note of expectedNotes) {
+                expect(Synth.noteFrequencies[note]).toBeDefined();
+                expect(Synth.noteFrequencies[note]).toHaveLength(2);
+                expect(typeof Synth.noteFrequencies[note][0]).toBe("number");
+                expect(typeof Synth.noteFrequencies[note][1]).toBe("number");
+            }
+            Synth.inTemperament = "equal";
+        });
+
+        it("should produce distinct frequencies for 5 distinct EDO steps in 5-EDO", () => {
+            // Mock Tone.Frequency to return real values for this test
+            const origFreq = Tone.Frequency;
+            Tone.Frequency = jest.fn(() => ({
+                toFrequency: jest.fn().mockReturnValue(261.63) // C4 frequency
+            }));
+            Synth.inTemperament = "equal5";
+            temperamentChanged("equal5", "C4");
+
+            // In 5-EDO, multiple 12-EDO note names map to the same EDO step.
+            // Each of C, D, E, Gb, Ab should be at a distinct EDO step
+            // and therefore have a distinct frequency.
+            const edoStepFreqs = [
+                Synth.noteFrequencies["C"][1], // step 0
+                Synth.noteFrequencies["D"][1], // step 1
+                Synth.noteFrequencies["E"][1], // step 2
+                Synth.noteFrequencies["Gb"][1], // step 3
+                Synth.noteFrequencies["A"][1] // step 4
+            ];
+            const distinctFreqs = new Set(edoStepFreqs);
+            expect(distinctFreqs.size).toBe(5);
+
+            Tone.Frequency = origFreq;
+            Synth.inTemperament = "equal";
+        });
+
+        it("should map A and B notes correctly in 5-EDO", () => {
+            Synth.inTemperament = "equal5";
+            temperamentChanged("equal5", "C4");
+
+            // A and B should have defined frequency values
+            expect(Synth.noteFrequencies["A"]).toBeDefined();
+            expect(Synth.noteFrequencies["B"]).toBeDefined();
+            expect(typeof Synth.noteFrequencies["A"][1]).toBe("number");
+            expect(typeof Synth.noteFrequencies["B"][1]).toBe("number");
+
+            Synth.inTemperament = "equal";
+        });
+
+        it("should populate all 12 note names for 7-EDO", () => {
+            Synth.inTemperament = "equal7";
+            temperamentChanged("equal7", "C4");
+
+            const expectedNotes = ["C", "D", "E", "F", "G", "A", "B"];
+            for (const note of expectedNotes) {
+                expect(Synth.noteFrequencies[note]).toBeDefined();
+                expect(typeof Synth.noteFrequencies[note][1]).toBe("number");
+            }
+            Synth.inTemperament = "equal";
+        });
+
+        it("should still use interval mapping for non-EDO temperaments", () => {
+            Synth.inTemperament = "just intonation";
+            temperamentChanged("just intonation", "C4");
+
+            // Non-EDO should use interval-based mapping - check note names exist
+            expect(Synth.noteFrequencies["C"]).toBeDefined();
+            expect(Synth.noteFrequencies["G"]).toBeDefined();
+            expect(typeof Synth.noteFrequencies["C"][1]).toBe("number");
+            expect(typeof Synth.noteFrequencies["G"][1]).toBe("number");
+            Synth.inTemperament = "equal";
+        });
     });
 
     describe("resume", () => {

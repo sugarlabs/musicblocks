@@ -184,19 +184,21 @@ const TunerUtils = {
      * @param {number} frequency - The frequency to convert
      * @returns {Array} [note, cents, frequency]
      */
-    frequencyToPitch: function (frequency) {
+    frequencyToPitch: function (frequency, edo) {
         const A4 = 440;
         const C0 = A4 * Math.pow(2, -4.75);
         const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+        const currentEDO = edo || 12;
 
         if (frequency < C0) {
             return ["C", 0, C0];
         }
 
-        const h = Math.round(12 * Math.log2(frequency / C0));
-        const octave = Math.floor(h / 12);
-        const n = h % 12;
-        const cents = Math.round(1200 * Math.log2(frequency / (C0 * Math.pow(2, h / 12))));
+        const h = Math.round(currentEDO * Math.log2(frequency / C0));
+        const octave = Math.floor(h / currentEDO);
+        const steppedN = ((h % currentEDO) + currentEDO) % currentEDO;
+        const n = Math.round((steppedN / currentEDO) * 12) % 12;
+        const cents = Math.round(1200 * Math.log2(frequency / (C0 * Math.pow(2, h / currentEDO))));
 
         return [noteNames[n], cents, frequency];
     },
