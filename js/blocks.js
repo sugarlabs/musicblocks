@@ -27,7 +27,7 @@
     setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments,
     docById, define, BlocksDependencies, deepClone, pubsub,
     MINIMUMDOCKDISTANCE, LONGSTACK, SPATIAL_GRID_CELL_SIZE,
-    CAMERAVALUE, VIDEOVALUE, NOTEBLOCKS, PITCHBLOCKS, ALLOWED_CONNECTIONS
+    CAMERAVALUE, VIDEOVALUE, ALLOWED_CONNECTIONS
 */
 
 /* global showZoomOverlay */
@@ -38,7 +38,7 @@
         createjs
    - js/block-constants.js
         MINIMUMDOCKDISTANCE, LONGSTACK, SPATIAL_GRID_CELL_SIZE,
-        CAMERAVALUE, VIDEOVALUE, NOTEBLOCKS, PITCHBLOCKS, ALLOWED_CONNECTIONS
+        CAMERAVALUE, VIDEOVALUE, ALLOWED_CONNECTIONS
    - js/block.js
         Block
    - js/piemenus.js
@@ -58,6 +58,9 @@
         updateTemperaments
 */
 // Constants moved to js/block-constants.js
+
+const NOTEBLOCKS = ["newnote", "osctime"];
+const PITCHBLOCKS = ["pitch", "steppitch", "hertz", "pitchnumber", "nthmodalpitch", "playdrum"];
 
 /**
  * Lazy-initialized Sets for O(1) collapsible type checks in hot paths.

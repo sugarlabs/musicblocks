@@ -12,7 +12,7 @@
 /*
    exported
    MINIMUMDOCKDISTANCE, LONGSTACK, SPATIAL_GRID_CELL_SIZE,
-   CAMERAVALUE, VIDEOVALUE, NOTEBLOCKS, PITCHBLOCKS, ALLOWED_CONNECTIONS
+   CAMERAVALUE, VIDEOVALUE, ALLOWED_CONNECTIONS
  */
 
 /**
@@ -34,9 +34,6 @@ const SPATIAL_GRID_CELL_SIZE = 50;
 /** Special value flags to uniquely identify these media blocks. */
 const CAMERAVALUE = "##__CAMERA__##";
 const VIDEOVALUE = "##__VIDEO__##";
-
-const NOTEBLOCKS = ["newnote", "osctime"];
-const PITCHBLOCKS = ["pitch", "steppitch", "hertz", "pitchnumber", "nthmodalpitch", "playdrum"];
 
 const ALLOWED_CONNECTIONS = new Set([
     "vspaceout:vspacein",
@@ -115,8 +112,6 @@ const blockConstants = {
     SPATIAL_GRID_CELL_SIZE,
     CAMERAVALUE,
     VIDEOVALUE,
-    NOTEBLOCKS,
-    PITCHBLOCKS,
     ALLOWED_CONNECTIONS
 };
 
