@@ -25,7 +25,9 @@
    getVoiceSynthName, i18nSolfege, last, MathUtility, mixedNumber,
    piemenuBlockContext, prepareMacroExports, ProtoBlock,
     setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments,
-    docById, define, BlocksDependencies, deepClone, pubsub
+    docById, define, BlocksDependencies, deepClone, pubsub,
+    MINIMUMDOCKDISTANCE, LONGSTACK, SPATIAL_GRID_CELL_SIZE,
+    CAMERAVALUE, VIDEOVALUE
 */
 
 /* global showZoomOverlay */
@@ -34,6 +36,9 @@
    Global locations
    - js/activity.js
         createjs
+   - js/block-constants.js
+        MINIMUMDOCKDISTANCE, LONGSTACK, SPATIAL_GRID_CELL_SIZE,
+        CAMERAVALUE, VIDEOVALUE
    - js/block.js
         Block
    - js/piemenus.js
@@ -52,43 +57,7 @@
         setOctaveRatio, splitScaleDegree, splitSolfege,
         updateTemperaments
 */
-/**
- * Minimum distance (squared) between two docks required before
- * connecting them.
- */
-const MINIMUMDOCKDISTANCE = 400;
-
-/** Soft limit on the number of blocks in a single stack. */
-const LONGSTACK = 300;
-
-/**
- * Spatial grid cell size in pixels for O(1) nearest-dock lookups.
- * Chosen so that MINIMUMDOCKDISTANCE (20px radius at default scale)
- * is always covered by checking a block's cell plus its 8 neighbors.
- */
-const SPATIAL_GRID_CELL_SIZE = 50;
-
-/**
- * Lazy-initialized Sets for O(1) collapsible type checks in hot paths.
- * Built on first access because the COLLAPSIBLES/INLINECOLLAPSIBLES
- * globals may not yet exist at module parse time in test environments.
- */
-let _collapsiblesSet = null;
-let _inlineCollapsiblesSet = null;
-
-function getCollapsiblesSet() {
-    if (!_collapsiblesSet) _collapsiblesSet = new Set(COLLAPSIBLES);
-    return _collapsiblesSet;
-}
-
-function getInlineCollapsiblesSet() {
-    if (!_inlineCollapsiblesSet) _inlineCollapsiblesSet = new Set(INLINECOLLAPSIBLES);
-    return _inlineCollapsiblesSet;
-}
-
-/** Special value flags to uniquely identify these media blocks. */
-const CAMERAVALUE = "##__CAMERA__##";
-const VIDEOVALUE = "##__VIDEO__##";
+// Constants moved to js/block-constants.js
 
 const NOTEBLOCKS = ["newnote", "osctime"];
 const PITCHBLOCKS = ["pitch", "steppitch", "hertz", "pitchnumber", "nthmodalpitch", "playdrum"];
@@ -163,6 +132,24 @@ const ALLOWED_CONNECTIONS = new Set([
     "scaledegreeout:anyin",
     "noteout:anyin"
 ]);
+
+/**
+ * Lazy-initialized Sets for O(1) collapsible type checks in hot paths.
+ * Built on first access because the COLLAPSIBLES/INLINECOLLAPSIBLES
+ * globals may not yet exist at module parse time in test environments.
+ */
+let _collapsiblesSet = null;
+let _inlineCollapsiblesSet = null;
+
+function getCollapsiblesSet() {
+    if (!_collapsiblesSet) _collapsiblesSet = new Set(COLLAPSIBLES);
+    return _collapsiblesSet;
+}
+
+function getInlineCollapsiblesSet() {
+    if (!_inlineCollapsiblesSet) _inlineCollapsiblesSet = new Set(INLINECOLLAPSIBLES);
+    return _inlineCollapsiblesSet;
+}
 
 /**
  * Blocks holds the list of blocks and most of the block-associated
