@@ -12,7 +12,7 @@
 /*
    exported
    MINIMUMDOCKDISTANCE, LONGSTACK, SPATIAL_GRID_CELL_SIZE,
-   CAMERAVALUE, VIDEOVALUE, ALLOWED_CONNECTIONS
+   CAMERAVALUE, VIDEOVALUE
  */
 
 /**
@@ -35,84 +35,12 @@ const SPATIAL_GRID_CELL_SIZE = 50;
 const CAMERAVALUE = "##__CAMERA__##";
 const VIDEOVALUE = "##__VIDEO__##";
 
-const ALLOWED_CONNECTIONS = new Set([
-    "vspaceout:vspacein",
-    "vspacein:vspaceout",
-    "in:out",
-    "out:in",
-    "in:vspaceout",
-    "vspaceout:in",
-    "out:vspacein",
-    "vspacein:out",
-    "numberin:numberout",
-    "numberin:anyout",
-    "numberout:numberin",
-    "anyout:numberin",
-    "textin:textout",
-    "textin:anyout",
-    "textout:textin",
-    "anyout:textin",
-    "booleanout:booleanin",
-    "booleanin:booleanout",
-    "mediain:mediaout",
-    "mediaout:mediain",
-    "mediain:textout",
-    "textout:mediain",
-    "filein:fileout",
-    "fileout:filein",
-    "casein:caseout",
-    "caseout:casein",
-    "vspaceout:casein",
-    "casein:vspaceout",
-    "vspacein:caseout",
-    "caseout:vspacein",
-    "solfegein:anyout",
-    "solfegein:solfegeout",
-    "solfegein:textout",
-    "solfegein:noteout",
-    "solfegein:scaledegreeout",
-    "solfegein:numberout",
-    "anyout:solfegein",
-    "solfegeout:solfegein",
-    "textout:solfegein",
-    "noteout:solfegein",
-    "scaledegreeout:solfegein",
-    "numberout:solfegein",
-    "notein:solfegeout",
-    "notein:scaledegreeout",
-    "notein:textout",
-    "notein:noteout",
-    "solfegeout:notein",
-    "scaledegreeout:notein",
-    "textout:notein",
-    "noteout:notein",
-    "pitchout:anyin",
-    "gridout:anyin",
-    "anyin:textout",
-    "anyin:mediaout",
-    "anyin:numberout",
-    "anyin:anyout",
-    "anyin:fileout",
-    "anyin:solfegeout",
-    "anyin:scaledegreeout",
-    "anyin:noteout",
-    "textout:anyin",
-    "mediaout:anyin",
-    "numberout:anyin",
-    "anyout:anyin",
-    "fileout:anyin",
-    "solfegeout:anyin",
-    "scaledegreeout:anyin",
-    "noteout:anyin"
-]);
-
 const blockConstants = {
     MINIMUMDOCKDISTANCE,
     LONGSTACK,
     SPATIAL_GRID_CELL_SIZE,
     CAMERAVALUE,
-    VIDEOVALUE,
-    ALLOWED_CONNECTIONS
+    VIDEOVALUE
 };
 
 if (typeof module !== "undefined" && module.exports) {
