@@ -75,7 +75,7 @@ requirejs.config({
             exports: "Block"
         },
         "activity/blocks": {
-            deps: ["activity/block", "activity/pubsub"],
+            deps: ["activity/block", "activity/pubsub", "activity/block-constants"],
             exports: "Blocks"
         },
         "activity/turtle-singer": {

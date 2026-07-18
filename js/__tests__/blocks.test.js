@@ -18,6 +18,11 @@
 
 const Blocks = require("../blocks");
 
+// Expose constants that blocks.js references as bare globals at runtime
+// (e.g. MINIMUMDOCKDISTANCE in blockMoved, ALLOWED_CONNECTIONS in _testConnectionType).
+const blockConstants = require("../block-constants");
+Object.assign(global, blockConstants);
+
 // --- MOCK SETUP ---
 
 // Mock CreateJS
