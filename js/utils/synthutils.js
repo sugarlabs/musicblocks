@@ -2692,6 +2692,10 @@ function Synth() {
      * @memberof Synth
      */
     this.LiveWaveForm = () => {
+        if (this.analyser) {
+            this.mic.disconnect(this.analyser);
+            this.analyser.dispose();
+        }
         this.analyser = new Tone.Analyser("waveform", 8192);
         this.mic.connect(this.analyser);
     };
@@ -3844,6 +3848,16 @@ function Synth() {
         this._instrumentEpoch++;
         _disposeRecordingPlayer();
         _revokeRecordingURL();
+
+        if (this.analyser) {
+            try {
+                this.mic.disconnect(this.analyser);
+                this.analyser.dispose();
+            } catch (e) {
+                console.debug("Error disposing analyser:", e);
+            }
+            this.analyser = null;
+        }
 
         for (const turtle in instruments) {
             for (const instrumentName in instruments[turtle]) {
