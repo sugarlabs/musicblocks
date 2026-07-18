@@ -9,6 +9,20 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+/*
+   These are intentionally bare globals, not RequireJS dependency-injected
+   parameters. This file follows the same convention as blocks.js and
+   block.js: the app is not built as real ES modules, so RequireJS's shim
+   `deps` (see loader.js) only sequences <script> load order, and the
+   values below are attached to `window` by the modules that own them
+   before this file's code ever runs. Converting this one file to receive
+   them as AMD parameters would make it inconsistent with every other
+   script in js/ without removing the underlying global dependency (the
+   values still come from window at runtime either way).
+   - js/utils/utils.js: delayExecution, getTextWidth, _
+   - js/artwork.js: DEFAULTBLOCKSCALE
+   - js/block.js: STRINGLEN, TEXTWIDTH, COLLAPSIBLES, INLINECOLLAPSIBLES
+*/
 /* global DEFAULTBLOCKSCALE, STRINGLEN, TEXTWIDTH, delayExecution, getTextWidth, _,
    COLLAPSIBLES, INLINECOLLAPSIBLES */
 

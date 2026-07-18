@@ -53,7 +53,19 @@ function makeBlocks(blockList) {
         activity: {
             refreshCanvas: jest.fn(),
             errorMsg: jest.fn(),
-            palettes: { dict: { action: { protoList: [], hideMenu: jest.fn() } } },
+            palettes: {
+                dict: {
+                    action: {
+                        protoList: [],
+                        hideMenu: jest.fn(),
+                        remove: jest.fn(),
+                        updatePalettes: jest.fn()
+                    }
+                },
+                updatePalettes: jest.fn(),
+                hide: jest.fn(),
+                show: jest.fn()
+            },
             turtles: { running: jest.fn().mockReturnValue(false) },
             logo: { doStopTurtles: jest.fn() }
         },
@@ -118,9 +130,60 @@ function makeFlowBlock({ x, y, docks, connections, name = "flow" }) {
         isArgBlock: () => false,
         isArgumentLikeBlock: () => false,
         isArgFlowClampBlock: () => false,
+        isArgClamp: () => false,
         isInlineCollapsible: () => false,
+        isNoHitBlock: () => false,
         highlight: jest.fn(),
         unhighlight: jest.fn()
+    };
+}
+
+// A target block with a dock slot already occupied by another block, plus a
+// spare far/incompatible dock so it is never mistaken for the occupied one.
+// Index 1 is the slot under test; it is never the last dock, so the
+// isNoHitBlock() "hidden block below" check never fires.
+function makeArgHost({ occupantIdx, extra = {} }) {
+    return {
+        name: "print",
+        trash: false,
+        inCollapsed: false,
+        collapsed: false,
+        container: { x: 0, y: 0 },
+        docks: [
+            [0, -20, "in"],
+            [0, 0, "numberin"],
+            [1000, 1000, "in"]
+        ],
+        connections: [null, occupantIdx, null],
+        isArgBlock: () => false,
+        isArgumentLikeBlock: () => false,
+        isArgClamp: () => false,
+        isArgFlowClampBlock: () => false,
+        isInlineCollapsible: () => false,
+        highlight: jest.fn(),
+        unhighlight: jest.fn(),
+        ...extra
+    };
+}
+
+function makeMovingArg({ value = "value", extra = {} } = {}) {
+    return {
+        name: "namedbox",
+        trash: false,
+        inCollapsed: false,
+        collapsed: false,
+        container: { x: 0, y: 15 },
+        docks: [[0, 0, "numberout"]],
+        connections: [null],
+        value,
+        text: { text: "" },
+        isArgBlock: () => true,
+        isArgumentLikeBlock: () => false,
+        isArgFlowClampBlock: () => false,
+        isInlineCollapsible: () => false,
+        highlight: jest.fn(),
+        unhighlight: jest.fn(),
+        ...extra
     };
 }
 
@@ -450,6 +513,794 @@ describe("BlockDragController", () => {
             // Too far from anything new, so it should end up fully disconnected.
             expect(oldParent.connections[1]).toBeNull();
             expect(moving.connections[0]).toBeNull();
+        });
+    });
+
+    describe("dock snapping (blockMoved) — argument, action, storein, and widget branches", () => {
+        it("sends a default-value occupant (e.g. a bare number block) to the trash when it is replaced", async () => {
+            const occupant = makeMovingArg({ value: "5" });
+            occupant.name = "number";
+            occupant.container = { x: 0, y: 0 };
+            const target = makeArgHost({ occupantIdx: 1 });
+            const moving = makeMovingArg({ value: "10" });
+
+            const blocks = makeBlocks([target, occupant, moving]);
+
+            await blocks.blockMoved(2);
+
+            expect(blocks.sendStackToTrash).toHaveBeenCalledWith(occupant);
+            expect(moving.connections[0]).toBe(0);
+        });
+
+        it("nudges a non-default-value occupant aside instead of trashing it when it is replaced", async () => {
+            const occupant = makeMovingArg({ value: "oldBox" });
+            occupant.container = { x: 0, y: 0 };
+            const target = makeArgHost({ occupantIdx: 1 });
+            const moving = makeMovingArg({ value: "newBox" });
+
+            const blocks = makeBlocks([target, occupant, moving]);
+
+            await blocks.blockMoved(2);
+
+            expect(blocks.sendStackToTrash).not.toHaveBeenCalled();
+            // findDragGroup + moveBlockRelative(..., 40, 40) nudged it aside.
+            expect(occupant.container).toEqual({ x: 40, y: 40 });
+        });
+
+        it("creates/updates an arg-clamp slot when connecting to an empty argClamp dock", async () => {
+            const target = makeArgHost({ occupantIdx: null });
+            target.name = "makeblock";
+            target.isArgClamp = () => true;
+            target.argClampSlots = [1, 1];
+            target.updateArgSlots = jest.fn();
+
+            const moving = makeMovingArg({ value: "3" });
+
+            const blocks = makeBlocks([target, moving]);
+            blocks._getBlockSize = jest.fn(() => 4);
+
+            await blocks.blockMoved(1);
+
+            expect(moving.connections[0]).toBe(0);
+            expect(target.argClampSlots[0]).toBe(4);
+            expect(target.updateArgSlots).toHaveBeenCalledWith(target.argClampSlots);
+        });
+
+        it("renames the action stack and updates the palette when a name-arg block is swapped on an action block", async () => {
+            const occupant = makeMovingArg({ value: "oldName" });
+            occupant.container = { x: 0, y: 0 };
+            const target = makeArgHost({ occupantIdx: 1 });
+            target.name = "action";
+            const moving = makeMovingArg({ value: "newName" });
+            moving.container = { x: 0, y: 15, updateCache: jest.fn() };
+
+            const blocks = makeBlocks([target, occupant, moving]);
+            blocks.findUniqueActionName = jest.fn(() => "newName2");
+            blocks.protoBlockDict["myDo_oldName"] = {};
+            blocks.activity.palettes.dict.action.protoList = [
+                { name: "nameddo", staticLabels: ["oldName"] }
+            ];
+
+            await blocks.blockMoved(2);
+
+            expect(moving.value).toBe("newName2");
+            expect(blocks.newNameddoBlock).toHaveBeenCalledWith("newName2", false, false);
+            expect(blocks.activity.palettes.dict.action.remove).toHaveBeenCalledWith(
+                blocks.activity.palettes.dict.action.protoList[0],
+                "oldName"
+            );
+            expect(blocks.renameNameddos).toHaveBeenCalledWith("oldName", "newName2");
+            expect(blocks.renameDos).toHaveBeenCalledWith("oldName", "newName2");
+            expect(blocks.protoBlockDict["myDo_oldName"]).toBeUndefined();
+        });
+
+        it("adds storein/namedbox palette entries when a value block is attached to a storein block's name dock", async () => {
+            const occupant = makeMovingArg({ value: "old" });
+            occupant.container = { x: 0, y: 0 };
+            const target = makeArgHost({ occupantIdx: 1 });
+            target.name = "storein";
+            const moving = makeMovingArg({ value: "myBox" });
+            moving.container = { x: 0, y: 15 };
+
+            const blocks = makeBlocks([target, occupant, moving]);
+
+            await blocks.blockMoved(2);
+
+            expect(blocks.newStorein2Block).toHaveBeenCalledWith("myBox");
+            expect(blocks.newNamedboxBlock).toHaveBeenCalledWith("myBox");
+            expect(blocks.activity.palettes.updatePalettes).toHaveBeenCalledWith("boxes");
+        });
+
+        it("reinitializes an open widget window when a block is dragged out of its stack", async () => {
+            const wftTitle = document.createElement("div");
+            wftTitle.className = "wftTitle";
+            wftTitle.innerHTML = "tempo";
+            document.body.appendChild(wftTitle);
+
+            try {
+                const parent = makeFlowBlock({
+                    x: -500,
+                    y: -500,
+                    docks: [
+                        [0, 0, "in"],
+                        [0, 20, "out"]
+                    ],
+                    connections: [null, 1],
+                    name: "parent"
+                });
+                const moving = makeFlowBlock({
+                    x: 5000,
+                    y: 5000,
+                    docks: [[0, 0, "in"]],
+                    connections: [0],
+                    name: "moving"
+                });
+                moving.protoblock = { staticLabels: ["tempo"] };
+
+                const blocks = makeBlocks([parent, moving]);
+
+                await blocks.blockMoved(1);
+
+                expect(parent.connections[1]).toBeNull();
+                expect(moving.connections[0]).toBeNull();
+                expect(blocks.raiseStackToTop).toHaveBeenCalledWith(1);
+                expect(blocks.reInitWidget).toHaveBeenCalledWith(1, 1500);
+            } finally {
+                wftTitle.remove();
+            }
+        });
+
+        it("removes the note block's default/silence placeholder when a new block is inserted", async () => {
+            const target = makeFlowBlock({
+                x: 0,
+                y: 0,
+                docks: [
+                    [0, 0, "in"],
+                    [0, 20, "out"]
+                ],
+                connections: [null, null],
+                name: "target"
+            });
+            const moving = makeFlowBlock({
+                x: 0,
+                y: 15,
+                docks: [[0, 0, "in"]],
+                connections: [null, null],
+                name: "pitch"
+            });
+
+            const blocks = makeBlocks([target, moving]);
+            blocks._insideNoteBlock = jest.fn(() => 0);
+            blocks.deletePreviousDefault = jest.fn(() => 0);
+
+            await blocks.blockMoved(1);
+
+            expect(moving.connections[0]).toBe(0);
+            expect(blocks.deletePreviousDefault).toHaveBeenCalledWith(1);
+        });
+
+        it("accumulates clampBlocksToCheck entries for a block moved inside an expandable block", async () => {
+            const parentExpandable = makeFlowBlock({
+                x: -500,
+                y: -500,
+                docks: [[0, 0, "in"]],
+                connections: [null],
+                name: "repeat"
+            });
+            const moving = makeFlowBlock({
+                x: 5000,
+                y: 5000,
+                docks: [[0, 0, "in"]],
+                connections: [null],
+                name: "moving"
+            });
+
+            const blocks = makeBlocks([parentExpandable, moving]);
+            let calls = 0;
+            blocks.insideExpandableBlock = jest.fn(() => {
+                calls += 1;
+                return calls === 1 ? 0 : null;
+            });
+
+            await blocks.blockMoved(1);
+
+            expect(blocks.clampBlocksToCheck).toEqual([[0, 0]]);
+            expect(blocks.addDefaultBlock).toHaveBeenCalledWith(0, 1, false);
+            expect(blocks.adjustExpandableClampBlock).toHaveBeenCalled();
+        });
+
+        it("doubles clampBlocksToCheck entries for both of ifthenelse's clamps", async () => {
+            const parentExpandable = makeFlowBlock({
+                x: -500,
+                y: -500,
+                docks: [[0, 0, "in"]],
+                connections: [null],
+                name: "ifthenelse"
+            });
+            const moving = makeFlowBlock({
+                x: 5000,
+                y: 5000,
+                docks: [[0, 0, "in"]],
+                connections: [null],
+                name: "moving"
+            });
+
+            const blocks = makeBlocks([parentExpandable, moving]);
+            let calls = 0;
+            blocks.insideExpandableBlock = jest.fn(() => {
+                calls += 1;
+                return calls === 1 ? 0 : null;
+            });
+
+            await blocks.blockMoved(1);
+
+            expect(blocks.clampBlocksToCheck).toEqual([
+                [0, 0],
+                [0, 1]
+            ]);
+        });
+
+        it("bounces an arg block to the right, snapping back to its last-good position first", async () => {
+            const target = makeArgHost({ occupantIdx: null });
+            target.docks[1] = [0, 0, "textin"]; // incompatible with "numberout"
+            const moving = makeMovingArg({ value: "1" });
+            moving.lastGoodX = 100;
+            moving.lastGoodY = 200;
+
+            const blocks = makeBlocks([target, moving]);
+
+            await blocks.blockMoved(1);
+
+            expect(moving.connections[0]).toBeNull();
+            // Snapped back to lastGood, then bounced +60 on x only (arg blocks).
+            expect(moving.container).toEqual({ x: 160, y: 200 });
+        });
+
+        it("bounces a flow block down-and-right on an illegal connection", async () => {
+            const target = makeFlowBlock({
+                x: 0,
+                y: 0,
+                docks: [
+                    [0, 0, "in"],
+                    [0, 20, "textout"] // incompatible with "in"
+                ],
+                connections: [null, null],
+                name: "target"
+            });
+            const moving = makeFlowBlock({
+                x: 0,
+                y: 15,
+                docks: [[0, 0, "in"]],
+                connections: [null],
+                name: "moving"
+            });
+
+            const blocks = makeBlocks([target, moving]);
+
+            await blocks.blockMoved(1);
+
+            expect(moving.connections[0]).toBeNull();
+            expect(moving.container).toEqual({ x: 42, y: 75 });
+        });
+
+        it("warns when the resulting stack exceeds the long-stack threshold", async () => {
+            const target = makeFlowBlock({
+                x: 0,
+                y: 0,
+                docks: [
+                    [0, 0, "in"],
+                    [0, 20, "out"]
+                ],
+                connections: [null, null],
+                name: "target"
+            });
+            const moving = makeFlowBlock({
+                x: 0,
+                y: 15,
+                docks: [[0, 0, "in"]],
+                connections: [null],
+                name: "moving"
+            });
+
+            const blocks = makeBlocks([target, moving]);
+            blocks._countBlocksInStack = jest.fn(() => 301);
+
+            await blocks.blockMoved(1);
+
+            expect(moving.connections[0]).toBe(0);
+            expect(blocks.activity.errorMsg).toHaveBeenCalledWith(
+                "Consider breaking this stack into parts."
+            );
+        });
+    });
+
+    describe("delegation stubs forward calls to the controller", () => {
+        it.each([
+            ["findDragGroup", [0]],
+            ["cacheDragGroup", [0]],
+            ["clearCachedDragGroup", []],
+            ["moveBlockRelative", [0, 1, 2]],
+            ["moveBlockRelativeBatched", [0, 1, 2]],
+            ["moveStackRelative", [0, 1, 2]]
+        ])(
+            "blocks.%s(...) forwards to controller.%s(...) with the same arguments",
+            (method, args) => {
+                const blockList = [
+                    makeFlowBlock({ x: 0, y: 0, docks: [[0, 0, "in"]], connections: [null] })
+                ];
+                const blocks = makeBlocks(blockList);
+                const spy = jest.spyOn(blocks.blockDragController, method);
+
+                blocks[method](...args);
+
+                expect(spy).toHaveBeenCalledWith(...args);
+            }
+        );
+
+        it("blocks.blockMoved(...) forwards to controller.blockMoved(...) with the same arguments", async () => {
+            const blockList = [
+                makeFlowBlock({ x: 0, y: 0, docks: [[0, 0, "in"]], connections: [null] })
+            ];
+            const blocks = makeBlocks(blockList);
+            const spy = jest.spyOn(blocks.blockDragController, "blockMoved");
+
+            await blocks.blockMoved(0);
+
+            expect(spy).toHaveBeenCalledWith(0);
+        });
+    });
+
+    describe("edge cases and guards", () => {
+        it("_adjustBlockPositions is a no-op for a single-block drag group and adjusts docks for a multi-block one", () => {
+            const blockList = [
+                makeFlowBlock({ x: 0, y: 0, docks: [[0, 0, "in"]], connections: [null] })
+            ];
+            const blocks = makeBlocks(blockList);
+
+            blocks.dragGroup = [0];
+            blocks.blockDragController._adjustBlockPositions();
+            expect(blocks.adjustDocks).not.toHaveBeenCalled();
+
+            blocks.dragGroup = [0, 1];
+            blocks.blockDragController._adjustBlockPositions();
+            expect(blocks.adjustDocks).toHaveBeenCalledWith(0, true);
+        });
+
+        it("_calculateDragGroup guards against null, missing, and malformed blocks without throwing", () => {
+            const blockList = [
+                null,
+                { connections: null },
+                { connections: [] },
+                makeFlowBlock({ x: 0, y: 0, docks: [[0, 0, "in"]], connections: [null] })
+            ];
+            const blocks = makeBlocks(blockList);
+            const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+
+            expect(() => blocks.blockDragController._calculateDragGroup(null)).not.toThrow();
+
+            blocks.dragGroup = [];
+            expect(() => blocks.blockDragController._calculateDragGroup(1)).not.toThrow();
+            expect(blocks.dragGroup).toEqual([1]);
+
+            blocks.dragGroup = [];
+            expect(() => blocks.blockDragController._calculateDragGroup(2)).not.toThrow();
+            expect(blocks.dragGroup).toEqual([2]);
+
+            debugSpy.mockRestore();
+        });
+
+        it("_calculateDragGroup stops recursing once the loop counter exceeds the block list length", () => {
+            const blockList = [
+                { connections: [null, 0] } // a block that "connects to itself" so recursion never bottoms out
+            ];
+            const blocks = makeBlocks(blockList);
+            const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+
+            expect(() => blocks.findDragGroup(0)).not.toThrow();
+            expect(debugSpy).toHaveBeenCalledWith(
+                expect.stringContaining("Maximum loop counter exceeded")
+            );
+
+            debugSpy.mockRestore();
+        });
+
+        it("moveBlockRelative logs instead of throwing when the block has no container yet", () => {
+            const blockList = [{ name: "pending", container: null }];
+            const blocks = makeBlocks(blockList);
+            const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+
+            expect(() => blocks.moveBlockRelative(0, 5, 5)).not.toThrow();
+            expect(debugSpy).toHaveBeenCalledWith(expect.stringContaining("No container yet"));
+
+            debugSpy.mockRestore();
+        });
+
+        it("blockMoved guards against a null thisBlock and a missing block entry", async () => {
+            const blocks = makeBlocks([null]);
+            const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+
+            await expect(blocks.blockMoved(null)).resolves.toBeUndefined();
+            expect(debugSpy).toHaveBeenCalledWith(expect.stringContaining("null block."));
+
+            await expect(blocks.blockMoved(0)).resolves.toBeUndefined();
+            expect(debugSpy).toHaveBeenCalledWith(
+                expect.stringContaining("null block found in blockMoved")
+            );
+
+            debugSpy.mockRestore();
+        });
+
+        it("marks a two-arg block's parent for layout re-checking when an arg block is dragged away from it", async () => {
+            const twoArgParent = {
+                name: "plus2",
+                trash: false,
+                container: { x: -500, y: -500 },
+                docks: [
+                    [0, 0, "in"],
+                    [0, 10, "numberin"],
+                    [0, 20, "numberin"]
+                ],
+                connections: [null, 1, null],
+                isTwoArgBlock: () => true,
+                isArgClamp: () => false,
+                isInlineCollapsible: () => false
+            };
+            const moving = makeMovingArg({ value: "5" });
+            moving.container = { x: 5000, y: 5000 }; // far from anything, so it ends up disconnected
+            moving.connections = [0]; // currently plugged into twoArgParent's first arg slot
+
+            const blocks = makeBlocks([twoArgParent, moving]);
+
+            await blocks.blockMoved(1);
+
+            expect(twoArgParent.connections[1]).toBeNull();
+            expect(blocks._adjustExpandableTwoArgBlock).toHaveBeenCalledWith([0]);
+        });
+
+        it("overrides an existing arg-clamp slot occupant, cascading a new slot when none is free", async () => {
+            const target = {
+                name: "makeblock",
+                trash: false,
+                container: { x: 0, y: 0 },
+                docks: [
+                    [0, -20, "in"],
+                    [0, 0, "numberin"]
+                ],
+                connections: [null, 1],
+                argClampSlots: [1],
+                isArgClamp: () => true,
+                isArgumentLikeBlock: () => false,
+                isInlineCollapsible: () => false,
+                isNoHitBlock: () => false,
+                updateArgSlots: jest.fn(),
+                highlight: jest.fn(),
+                unhighlight: jest.fn()
+            };
+            const occupant = makeMovingArg({ value: "old" });
+            occupant.container = { x: 0, y: 0 };
+            occupant.isNoHitBlock = () => false;
+            const moving = makeMovingArg({ value: "new" });
+
+            const blocks = makeBlocks([target, occupant, moving]);
+            blocks._getBlockSize = jest.fn(() => 2);
+
+            await blocks.blockMoved(2);
+
+            expect(moving.connections[0]).toBe(0);
+            // The occupant slot was full, so a new slot was pushed and the
+            // moved block's size recorded for it.
+            expect(target.argClampSlots).toEqual([1, 2]);
+            expect(target.connections.length).toBe(3);
+            expect(target.updateArgSlots).toHaveBeenCalledWith(target.argClampSlots);
+        });
+
+        it("renames a freshly-attached action block whose value collides with an existing action stack", async () => {
+            const otherActionName = {
+                name: "namedbox",
+                value: "dance",
+                trash: false,
+                inCollapsed: false,
+                collapsed: false,
+                container: { x: -999, y: -999 },
+                docks: [[0, 0, "numberout"]],
+                connections: [],
+                isNoHitBlock: () => false,
+                isInlineCollapsible: () => false
+            };
+            const otherAction = {
+                name: "action",
+                trash: false,
+                container: { x: -999, y: -999 },
+                docks: [
+                    [0, 0, "in"],
+                    [0, 20, "numberin"]
+                ],
+                connections: [null, 1],
+                isArgClamp: () => false,
+                isInlineCollapsible: () => false,
+                isNoHitBlock: () => false
+            };
+            const target = makeFlowBlock({
+                x: 0,
+                y: 0,
+                docks: [
+                    [0, 0, "in"],
+                    [0, 20, "out"]
+                ],
+                connections: [null, null],
+                name: "action"
+            });
+            const moving = makeFlowBlock({
+                x: 0,
+                y: 15,
+                docks: [[0, 0, "in"]],
+                connections: [null],
+                name: "flow2"
+            });
+            moving.value = "dance";
+            moving.text = { text: "" };
+            moving.container.updateCache = jest.fn();
+
+            const blocks = makeBlocks([otherAction, otherActionName, target, moving]);
+            blocks.findUniqueActionName = jest.fn(() => "dance2");
+
+            await blocks.blockMoved(3);
+
+            expect(moving.value).toBe("dance2");
+            expect(blocks.newNameddoBlock).toHaveBeenCalledWith("dance2", false, false);
+            expect(blocks.setActionProtoVisibility).toHaveBeenCalledWith(false);
+        });
+
+        it("stops running turtles and resets the stop button color after a successful connection", async () => {
+            const target = makeFlowBlock({
+                x: 0,
+                y: 0,
+                docks: [
+                    [0, 0, "in"],
+                    [0, 20, "out"]
+                ],
+                connections: [null, null],
+                name: "target"
+            });
+            const moving = makeFlowBlock({
+                x: 0,
+                y: 15,
+                docks: [[0, 0, "in"]],
+                connections: [null],
+                name: "moving"
+            });
+
+            const blocks = makeBlocks([target, moving]);
+            blocks.activity.turtles.running = jest.fn().mockReturnValue(true);
+            const stopBtn = document.createElement("button");
+            stopBtn.id = "stop";
+            document.body.appendChild(stopBtn);
+
+            try {
+                await blocks.blockMoved(1);
+
+                expect(blocks.activity.logo.doStopTurtles).toHaveBeenCalled();
+                expect(stopBtn.style.color).toBe("white");
+            } finally {
+                stopBtn.remove();
+            }
+        });
+
+        it("unhighlights the connected blocks after the highlight timeout elapses", async () => {
+            jest.useFakeTimers();
+            try {
+                const target = makeFlowBlock({
+                    x: 0,
+                    y: 0,
+                    docks: [
+                        [0, 0, "in"],
+                        [0, 20, "out"]
+                    ],
+                    connections: [null, null],
+                    name: "target"
+                });
+                const moving = makeFlowBlock({
+                    x: 0,
+                    y: 15,
+                    docks: [[0, 0, "in"]],
+                    connections: [null],
+                    name: "moving"
+                });
+
+                const blocks = makeBlocks([target, moving]);
+
+                await blocks.blockMoved(1);
+
+                expect(target.unhighlight).not.toHaveBeenCalled();
+                jest.runAllTimers();
+
+                expect(target.unhighlight).toHaveBeenCalled();
+                expect(moving.unhighlight).toHaveBeenCalled();
+            } finally {
+                jest.useRealTimers();
+            }
+        });
+
+        it("skips candidates that are collapsed, in the trash, or nested inside a collapsed block", async () => {
+            const collapsedCandidate = makeFlowBlock({
+                x: 0,
+                y: 15,
+                docks: [
+                    [0, 0, "in"],
+                    [0, 20, "out"]
+                ],
+                connections: [null, null],
+                name: "repeat" // in the COLLAPSIBLES mock list
+            });
+            collapsedCandidate.collapsed = true;
+
+            const trashedCandidate = makeFlowBlock({
+                x: 0,
+                y: 15,
+                docks: [
+                    [0, 0, "in"],
+                    [0, 20, "out"]
+                ],
+                connections: [null, null],
+                name: "target2"
+            });
+            trashedCandidate.trash = true;
+
+            const inCollapsedCandidate = makeFlowBlock({
+                x: 0,
+                y: 15,
+                docks: [
+                    [0, 0, "in"],
+                    [0, 20, "out"]
+                ],
+                connections: [null, null],
+                name: "target3"
+            });
+            inCollapsedCandidate.inCollapsed = true;
+
+            const moving = makeFlowBlock({
+                x: 0,
+                y: 15,
+                docks: [[0, 0, "in"]],
+                connections: [null],
+                name: "moving"
+            });
+
+            const blocks = makeBlocks([
+                collapsedCandidate,
+                trashedCandidate,
+                inCollapsedCandidate,
+                moving
+            ]);
+
+            await blocks.blockMoved(3);
+
+            expect(moving.connections[0]).toBeNull();
+        });
+
+        it("reinitializes an open widget window on a brand-new (not just override) connection", async () => {
+            const wftTitle = document.createElement("div");
+            wftTitle.className = "wftTitle";
+            wftTitle.innerHTML = "tempo";
+            document.body.appendChild(wftTitle);
+
+            try {
+                const target = makeFlowBlock({
+                    x: 0,
+                    y: 0,
+                    docks: [
+                        [0, 0, "in"],
+                        [0, 20, "out"]
+                    ],
+                    connections: [null, null],
+                    name: "target"
+                });
+                const moving = makeFlowBlock({
+                    x: 0,
+                    y: 15,
+                    docks: [[0, 0, "in"]],
+                    connections: [null],
+                    name: "moving"
+                });
+                moving.protoblock = { staticLabels: ["tempo"] };
+
+                const blocks = makeBlocks([target, moving]);
+
+                await blocks.blockMoved(1);
+
+                expect(moving.connections[0]).toBe(0);
+                expect(blocks.reInitWidget).toHaveBeenCalledWith(1, 1500);
+            } finally {
+                wftTitle.remove();
+            }
+        });
+
+        it("queues a parent's ARG/FLOW layout re-check based on getLayoutUpdateType after connecting an argument-like block", async () => {
+            const target = makeFlowBlock({
+                x: 0,
+                y: 0,
+                docks: [
+                    [0, -20, "in"],
+                    [0, 0, "numberin"]
+                ],
+                connections: [null, null],
+                name: "target"
+            });
+            target.getLayoutUpdateType = jest.fn().mockReturnValue("ARG");
+
+            const moving = makeMovingArg({ value: "1" });
+            moving.isArgumentLikeBlock = () => true;
+
+            const blocks = makeBlocks([target, moving]);
+
+            await blocks.blockMoved(1);
+
+            expect(moving.connections[0]).toBe(0);
+            expect(target.getLayoutUpdateType).toHaveBeenCalledWith(1);
+            expect(blocks._checkTwoArgBlocks).toContain(0);
+        });
+
+        it("queues a FLOW layout re-check (vspace add/remove) when getLayoutUpdateType returns FLOW", async () => {
+            const target = makeFlowBlock({
+                x: 0,
+                y: 0,
+                docks: [
+                    [0, -20, "in"],
+                    [0, 0, "numberin"]
+                ],
+                connections: [null, null],
+                name: "target"
+            });
+            target.getLayoutUpdateType = jest.fn().mockReturnValue("FLOW");
+
+            const moving = makeMovingArg({ value: "1" });
+            moving.isArgumentLikeBlock = () => true;
+
+            const blocks = makeBlocks([target, moving]);
+
+            await blocks.blockMoved(1);
+
+            expect(moving.connections[0]).toBe(0);
+            expect(blocks._addRemoveVspaceBlock).toHaveBeenCalledWith(0);
+        });
+
+        it("deletes the trailing default/silence block when a block is inserted below it inside a note clamp", async () => {
+            const occupant = makeFlowBlock({
+                x: 0,
+                y: 40,
+                docks: [[0, 0, "in"]],
+                connections: [null],
+                name: "occupant"
+            });
+            const target = makeFlowBlock({
+                x: 0,
+                y: 0,
+                docks: [
+                    [0, 0, "in"],
+                    [0, 20, "out"]
+                ],
+                connections: [null, 1],
+                name: "target"
+            });
+            const moving = makeFlowBlock({
+                x: 0,
+                y: 15,
+                docks: [
+                    [0, 0, "in"],
+                    [0, 20, "out"]
+                ],
+                connections: [null, null],
+                name: "moving"
+            });
+            moving.protoblock = { style: "flow" };
+
+            const blocks = makeBlocks([target, occupant, moving]);
+            blocks._insideNoteBlock = jest.fn(() => 0);
+
+            await blocks.blockMoved(2);
+
+            expect(moving.connections[0]).toBe(0);
+            expect(blocks.deleteNextDefault).toHaveBeenCalledWith(2);
         });
     });
 

@@ -644,4 +644,137 @@ describe("Blocks Foundation", () => {
             expect(paletteBlock.defaults[0]).toBe("jump");
         });
     });
+
+    describe("Block dragging via the real BlockDragController", () => {
+        // The rest of this file exercises BlockDragController only through a
+        // minimal hand-built stand-in (see block-drag-controller.test.js).
+        // This suite instead drives it through a genuine `new Blocks(...)`
+        // instance, so the delegation stubs, the real _testConnectionType /
+        // _getNearbyBlocks implementations, and the real dragGroup state are
+        // all exercised together, not just the controller in isolation.
+        let blocks;
+
+        beforeEach(() => {
+            mockActivity.turtles = { running: jest.fn().mockReturnValue(false) };
+            blocks = new Blocks(mockActivity);
+
+            // Subsystems that are outside the scope of dragging itself.
+            blocks.findTopBlock = jest.fn(blk => blk);
+            blocks.insideExpandableBlock = jest.fn(() => null);
+            blocks.addDefaultBlock = jest.fn();
+            blocks.adjustExpandableClampBlock = jest.fn();
+            blocks._insideNoteBlock = jest.fn(() => null);
+        });
+
+        function makeRealFlowBlock({ x, y, docks, connections, name = "flow" }) {
+            return {
+                name,
+                trash: false,
+                inCollapsed: false,
+                collapsed: false,
+                container: { x, y },
+                docks,
+                connections,
+                isArgBlock: () => false,
+                isArgumentLikeBlock: () => false,
+                isArgFlowClampBlock: () => false,
+                isArgClamp: () => false,
+                isInlineCollapsible: () => false,
+                isNoHitBlock: () => false,
+                isTwoArgBooleanBlock: () => false,
+                highlight: jest.fn(),
+                unhighlight: jest.fn()
+            };
+        }
+
+        it("computes a real drag group and moves it through the real Blocks instance", () => {
+            blocks.blockList = [
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 0,
+                    docks: [
+                        [0, 0, "in"],
+                        [0, 20, "out"]
+                    ],
+                    connections: [null, 1]
+                }),
+                makeRealFlowBlock({ x: 0, y: 20, docks: [[0, 0, "in"]], connections: [0] })
+            ];
+
+            blocks.findDragGroup(0);
+            expect(blocks.dragGroup).toEqual([0, 1]);
+
+            blocks.moveStackRelative(0, 10, 5);
+
+            expect(blocks.blockList[0].container).toEqual({ x: 10, y: 5 });
+            expect(blocks.blockList[1].container).toEqual({ x: 10, y: 25 });
+        });
+
+        it("snaps a dragged block onto a real, compatible dock using the real _testConnectionType", async () => {
+            blocks.blockList = [
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 0,
+                    docks: [
+                        [0, 0, "in"],
+                        [0, 20, "out"]
+                    ],
+                    connections: [null, null],
+                    name: "target"
+                }),
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 15,
+                    docks: [[0, 0, "in"]],
+                    connections: [null],
+                    name: "moving"
+                })
+            ];
+
+            await blocks.blockMoved(1);
+
+            expect(blocks.blockList[1].connections[0]).toBe(0);
+            expect(blocks.blockList[0].connections[1]).toBe(1);
+        });
+
+        it("does not snap across a real, incompatible dock type", async () => {
+            blocks.blockList = [
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 0,
+                    docks: [
+                        [0, 0, "in"],
+                        [0, 20, "numberout"]
+                    ],
+                    connections: [null, null],
+                    name: "target"
+                }),
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 15,
+                    docks: [[0, 0, "in"]],
+                    connections: [null],
+                    name: "moving"
+                })
+            ];
+
+            await blocks.blockMoved(1);
+
+            expect(blocks.blockList[1].connections[0]).toBeNull();
+            expect(blocks.blockList[0].connections[1]).toBeNull();
+        });
+
+        it("exposes the same BlockDragController instance to every delegated method", () => {
+            expect(blocks.blockDragController).toBeDefined();
+            expect(blocks.findDragGroup).not.toBe(blocks.blockDragController.findDragGroup);
+            blocks.blockList = [
+                makeRealFlowBlock({ x: 0, y: 0, docks: [[0, 0, "in"]], connections: [null] })
+            ];
+
+            const spy = jest.spyOn(blocks.blockDragController, "findDragGroup");
+            blocks.findDragGroup(0);
+
+            expect(spy).toHaveBeenCalledWith(0);
+        });
+    });
 });
