@@ -9,6 +9,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+/**
+ * Centralizes dock compatibility rules and connection validation used by Blocks.
+ */
+
 const ALLOWED_CONNECTIONS = new Set([
     "vspaceout:vspacein",
     "vspacein:vspaceout",
@@ -100,17 +104,20 @@ const ConnectionValidator = {
     testConnectionType
 };
 
-// Export ConnectionValidator
-if (typeof define === "function" && define.amd) {
-    define([], function () {
-        return ConnectionValidator;
-    });
-}
+Object.freeze(ConnectionValidator);
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = ConnectionValidator;
 }
 
-if (typeof window !== "undefined") {
+/* global define */
+if (typeof define === "function" && define.amd) {
+    define(function () {
+        return ConnectionValidator;
+    });
+}
+
+// Skipped under CommonJS (e.g. Jest) to avoid polluting the global scope there.
+if (typeof window !== "undefined" && typeof module === "undefined") {
     window.ConnectionValidator = ConnectionValidator;
 }
