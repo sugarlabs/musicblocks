@@ -153,7 +153,8 @@ requirejs.config({
                 "keyboard-controller",
                 "activity/selection-controller",
                 "activity/trash-controller",
-                "activity/help-controller"
+                "activity/help-controller",
+                "activity/context-menu-controller"
             ],
             exports: "Activity"
         },
