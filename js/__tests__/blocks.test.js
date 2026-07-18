@@ -73,6 +73,9 @@ global.getTextWidth = jest.fn().mockReturnValue(100);
 global.Block = jest.fn();
 global.ProtoBlock = jest.fn();
 
+// Use the real ConnectionValidator so dock connection behavior stays accurate.
+global.ConnectionValidator = require("../connection-validator");
+
 // Mock Constants
 global.DEFAULTBLOCKSCALE = 1.0;
 global.STANDARDBLOCKHEIGHT = 20;

@@ -74,8 +74,16 @@ requirejs.config({
             deps: ["activity/turtledefs", "utils/retryWithBackoff"],
             exports: "Block"
         },
+        "activity/connection-validator": {
+            exports: "ConnectionValidator"
+        },
         "activity/blocks": {
-            deps: ["activity/block", "activity/pubsub", "activity/block-constants"],
+            deps: [
+                "activity/block",
+                "activity/pubsub",
+                "activity/block-constants",
+                "activity/connection-validator"
+            ],
             exports: "Blocks"
         },
         "activity/turtle-singer": {
