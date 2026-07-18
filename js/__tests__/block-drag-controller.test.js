@@ -20,6 +20,8 @@
 global.DEFAULTBLOCKSCALE = 1.0;
 global.STRINGLEN = 30;
 global.TEXTWIDTH = 100;
+global.MINIMUMDOCKDISTANCE = 400;
+global.LONGSTACK = 300;
 global.delayExecution = jest.fn().mockResolvedValue(null);
 global.getTextWidth = jest.fn().mockReturnValue(100);
 global._ = jest.fn(str => str);

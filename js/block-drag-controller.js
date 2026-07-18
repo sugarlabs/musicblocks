@@ -22,6 +22,7 @@
    - js/utils/utils.js: delayExecution, getTextWidth, _
    - js/artwork.js: DEFAULTBLOCKSCALE
    - js/block.js: STRINGLEN, TEXTWIDTH
+   - js/block-constants.js: MINIMUMDOCKDISTANCE, LONGSTACK
 
    Block classification (COLLAPSIBLES, INLINECOLLAPSIBLES, and similar
    capability/identity lists) is intentionally NOT read here. That data
@@ -30,18 +31,10 @@
    (see the dock-snapping candidate scan below), so there is exactly one
    place that constructs Sets from those lists.
 */
-/* global DEFAULTBLOCKSCALE, STRINGLEN, TEXTWIDTH, delayExecution, getTextWidth, _ */
+/* global DEFAULTBLOCKSCALE, STRINGLEN, TEXTWIDTH, delayExecution, getTextWidth, _,
+   MINIMUMDOCKDISTANCE, LONGSTACK */
 
 /* exported setupBlockDragController, BlockDragController */
-
-/**
- * Minimum distance (squared) between two docks required before
- * connecting them.
- */
-const MINIMUMDOCKDISTANCE = 400;
-
-/** Soft limit on the number of blocks in a single stack. */
-const LONGSTACK = 300;
 
 /**
  * Manages block dragging: computing the group of connected blocks that
