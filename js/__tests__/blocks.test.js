@@ -76,6 +76,10 @@ global.ProtoBlock = jest.fn();
 // Use the real ConnectionValidator so dock connection behavior stays accurate.
 global.ConnectionValidator = require("../connection-validator");
 
+// Use the real BlockDragController so drag-group and dock-snapping
+// behavior stays accurate rather than silently becoming a no-op.
+global.setupBlockDragController = require("../block-drag-controller").setupBlockDragController;
+
 // Mock Constants
 global.DEFAULTBLOCKSCALE = 1.0;
 global.STANDARDBLOCKHEIGHT = 20;

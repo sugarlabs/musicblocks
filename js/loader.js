@@ -77,12 +77,17 @@ requirejs.config({
         "activity/connection-validator": {
             exports: "ConnectionValidator"
         },
+        "activity/block-drag-controller": {
+            deps: ["activity/block-constants"],
+            exports: "setupBlockDragController"
+        },
         "activity/blocks": {
             deps: [
                 "activity/block",
                 "activity/pubsub",
                 "activity/block-constants",
-                "activity/connection-validator"
+                "activity/connection-validator",
+                "activity/block-drag-controller"
             ],
             exports: "Blocks"
         },
