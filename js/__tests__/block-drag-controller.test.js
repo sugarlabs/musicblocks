@@ -23,8 +23,13 @@ global.TEXTWIDTH = 100;
 global.delayExecution = jest.fn().mockResolvedValue(null);
 global.getTextWidth = jest.fn().mockReturnValue(100);
 global._ = jest.fn(str => str);
-global.COLLAPSIBLES = ["repeat", "forever", "if"];
-global.INLINECOLLAPSIBLES = ["newnote", "interval", "osctime"];
+
+// NOTE: block classification (COLLAPSIBLES, INLINECOLLAPSIBLES, and similar
+// capability lists) is owned by blocks.js, not by BlockDragController — see
+// makeBlocks()'s getCollapsiblesSet/getInlineCollapsiblesSet below, which
+// stand in for the real Blocks-owned delegation the controller calls
+// through. This file deliberately does not set COLLAPSIBLES/INLINECOLLAPSIBLES
+// as globals, since the controller no longer reads them directly.
 
 const { setupBlockDragController, BlockDragController } = require("../block-drag-controller");
 
@@ -78,6 +83,12 @@ function makeBlocks(blockList) {
             new Set(["in:out", "out:in", "numberin:numberout", "numberout:numberin"]).has(
                 type1 + ":" + type2
             ),
+
+        // Block classification stays owned by (the mocked) Blocks here too:
+        // the controller only ever calls these two delegates, it never
+        // builds its own Set from a capability list.
+        getCollapsiblesSet: () => new Set(["repeat", "forever", "if"]),
+        getInlineCollapsiblesSet: () => new Set(["newnote", "interval", "osctime"]),
 
         // Full-scan fallback identical to the real _getNearbyBlocks when the
         // spatial grid has not been populated.
@@ -1130,7 +1141,7 @@ describe("BlockDragController", () => {
                     [0, 20, "out"]
                 ],
                 connections: [null, null],
-                name: "repeat" // in the COLLAPSIBLES mock list
+                name: "repeat" // matches makeBlocks()'s getCollapsiblesSet()
             });
             collapsedCandidate.collapsed = true;
 

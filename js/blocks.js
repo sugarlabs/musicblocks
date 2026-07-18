@@ -16,7 +16,7 @@
    DEFAULTBLOCKSCALE, DEFAULTDRUM, DEFAULTEFFECT, DEFAULTFILTER,
    DEFAULTFILTERTYPE, DEFAULTINTERVAL, DEFAULTINVERT, DEFAULTMODE,
    DEFAULTNOISE, DEFAULTOSCILLATORTYPE, DEFAULTTEMPERAMENT,
-   DEFAULTVOICE, NATURAL, NUMBERBLOCKDEFAULT,
+   DEFAULTVOICE, INLINECOLLAPSIBLES, NATURAL, NUMBERBLOCKDEFAULT,
     SPECIALINPUTS, STANDARDBLOCKHEIGHT, STRINGLEN, TEXTWIDTH,
     WESTERN2EISOLFEGENAMES, WIDENAMES, addTemperamentToDictionary,
    Block, closeBlkWidgets, ConnectionValidator, createjs, delayExecution, DEFAULTCHORD,
@@ -1739,6 +1739,17 @@ class Blocks {
         this._testConnectionType = (type1, type2) => {
             return ConnectionValidator.testConnectionType(type1, type2);
         };
+
+        /**
+         * Exposes the collapsible-type lookups so BlockDragController (and
+         * any other consumer) can query block classification without
+         * owning or duplicating the COLLAPSIBLES/INLINECOLLAPSIBLES lists
+         * themselves.
+         * @public
+         * @returns {Set}
+         */
+        this.getCollapsiblesSet = getCollapsiblesSet;
+        this.getInlineCollapsiblesSet = getInlineCollapsiblesSet;
 
         /**
          * Ensure that all the blocks are where they are supposed to be.

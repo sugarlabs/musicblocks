@@ -21,10 +21,16 @@
    values still come from window at runtime either way).
    - js/utils/utils.js: delayExecution, getTextWidth, _
    - js/artwork.js: DEFAULTBLOCKSCALE
-   - js/block.js: STRINGLEN, TEXTWIDTH, COLLAPSIBLES, INLINECOLLAPSIBLES
+   - js/block.js: STRINGLEN, TEXTWIDTH
+
+   Block classification (COLLAPSIBLES, INLINECOLLAPSIBLES, and similar
+   capability/identity lists) is intentionally NOT read here. That data
+   is owned by blocks.js; this controller reaches it only through the
+   Blocks-owned getCollapsiblesSet()/getInlineCollapsiblesSet() methods
+   (see the dock-snapping candidate scan below), so there is exactly one
+   place that constructs Sets from those lists.
 */
-/* global DEFAULTBLOCKSCALE, STRINGLEN, TEXTWIDTH, delayExecution, getTextWidth, _,
-   COLLAPSIBLES, INLINECOLLAPSIBLES */
+/* global DEFAULTBLOCKSCALE, STRINGLEN, TEXTWIDTH, delayExecution, getTextWidth, _ */
 
 /* exported setupBlockDragController, BlockDragController */
 
@@ -36,24 +42,6 @@ const MINIMUMDOCKDISTANCE = 400;
 
 /** Soft limit on the number of blocks in a single stack. */
 const LONGSTACK = 300;
-
-/**
- * Lazy-initialized Sets for O(1) collapsible type checks in hot paths.
- * Built on first access because the COLLAPSIBLES/INLINECOLLAPSIBLES
- * globals may not yet exist at module parse time in test environments.
- */
-let _collapsiblesSet = null;
-let _inlineCollapsiblesSet = null;
-
-function getCollapsiblesSet() {
-    if (!_collapsiblesSet) _collapsiblesSet = new Set(COLLAPSIBLES);
-    return _collapsiblesSet;
-}
-
-function getInlineCollapsiblesSet() {
-    if (!_inlineCollapsiblesSet) _inlineCollapsiblesSet = new Set(INLINECOLLAPSIBLES);
-    return _inlineCollapsiblesSet;
-}
 
 /**
  * Manages block dragging: computing the group of connected blocks that
@@ -423,8 +411,8 @@ class BlockDragController {
                 continue;
             }
 
-            if (getCollapsiblesSet().has(blocks.blockList[b].name)) {
-                if (!getInlineCollapsiblesSet().has(blocks.blockList[b].name)) {
+            if (blocks.getCollapsiblesSet().has(blocks.blockList[b].name)) {
+                if (!blocks.getInlineCollapsiblesSet().has(blocks.blockList[b].name)) {
                     if (blocks.blockList[b].collapsed) {
                         continue;
                     }
