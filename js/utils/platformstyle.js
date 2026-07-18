@@ -531,6 +531,9 @@ const getSystemThemePreference = () => {
 // Use stored preference, or fallback to system preference
 const activeTheme = themePreference || getSystemThemePreference();
 
+// Expose platformThemes globally so themebox.js can reference it
+window.platformThemes = platformThemes;
+
 // Set platformColor based on active theme
 if (platformThemes[activeTheme]) {
     window.platformColor = platformThemes[activeTheme];

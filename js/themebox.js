@@ -12,212 +12,14 @@
 //A dropdown for selecting theme
 
 /*
-   global platformColor, getSystemThemePreference,
+   global platformColor, platformThemes, getSystemThemePreference,
    PALETTEFILLCOLORS, PALETTESTROKECOLORS,
    PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
    MULTIPALETTEICONS, PALETTEICONS, makePaletteIcons,
    globalActivity, createjs
 */
 
-/* exported ThemeBox, themeConfigs */
-
-const themeConfigs = {
-    dark: {
-        textColor: "#E2E2E2",
-        blockText: "#FFFFFF",
-        dialogueBox: "#1C1C1C",
-        strokeColor: "#E2E2E2",
-        fillColor: "#F9F9F9",
-        blueButton: "#0066FF",
-        blueButtonHover: "#023a76",
-        cancelButton: "#f1f1f1",
-        cancelButtonHover: "#afafaf",
-        hoverColor: "#808080",
-        widgetButton: "#225A91",
-        widgetButtonSelect: "#979797",
-        widgetBackground: "#454545",
-        paletteColors: {
-            widgets: ["#2E7D32", "#1B5E20", "#1B5E20", "#81C784"],
-            pitch: ["#2E7D32", "#1B5E20", "#1B5E20", "#81C784"],
-            rhythm: ["#BF360C", "#8C2A0B", "#8C2A0B", "#FF8A65"],
-            meter: ["#BF360C", "#8C2A0B", "#8C2A0B", "#FF8A65"],
-            tone: ["#00838F", "#005662", "#005662", "#4DD0E1"],
-            ornament: ["#00838F", "#005662", "#005662", "#4DD0E1"],
-            intervals: ["#2E7D32", "#1B5E20", "#1B5E20", "#81C784"],
-            volume: ["#00838F", "#005662", "#005662", "#4DD0E1"],
-            drum: ["#00838F", "#005662", "#005662", "#4DD0E1"],
-            graphics: ["#3949AB", "#283593", "#283593", "#7986CB"],
-            turtle: ["#3949AB", "#283593", "#283593", "#7986CB"],
-            pen: ["#3949AB", "#283593", "#283593", "#7986CB"],
-            boxes: ["#E65100", "#BF360C", "#BF360C", "#FFB74D"],
-            action: ["#FF8F00", "#FF6F00", "#FF6F00", "#FFE082"],
-            media: ["#C62828", "#8E0000", "#8E0000", "#FF8A80"],
-            number: ["#AD1457", "#880E4F", "#880E4F", "#F48FB1"],
-            boolean: ["#7B1FA2", "#4A0072", "#4A0072", "#CE93D8"],
-            flow: ["#5D4037", "#3E2723", "#3E2723", "#BCAAA4"],
-            sensors: ["#827717", "#4B830D", "#4B830D", "#E6EE9C"],
-            extras: ["#424242", "#212121", "#212121", "#9E9E9E"],
-            program: ["#424242", "#212121", "#212121", "#9E9E9E"],
-            myblocks: ["#FF8F00", "#FF6F00", "#FF6F00", "#FFE082"],
-            heap: ["#5D4037", "#3E2723", "#3E2723", "#BCAAA4"],
-            dictionary: ["#5D4037", "#3E2723", "#3E2723", "#BCAAA4"],
-            ensemble: ["#3949AB", "#283593", "#283593", "#7986CB"]
-        },
-        disconnected: "#5C5C5C",
-        header: "#1E88E5",
-        aux: "#1976D2",
-        sub: "#64B5F6",
-        rule: "#303030",
-        ruleColor: "#303030",
-        trashColor: "#757575",
-        trashBorder: "#424242",
-        trashActive: "#E53935",
-        background: "#303030",
-        paletteSelected: "#1E1E1E",
-        paletteBackground: "#1C1C1C",
-        paletteLabelBackground: "#022363",
-        paletteLabelSelected: "#01143b",
-        paletteText: "#BDBDBD",
-        rulerHighlight: "#FFEB3B",
-        selectorBackground: "#64B5F6",
-        selectorSelected: "#1E88E5",
-        labelColor: "#BDBDBD",
-        rhythmcellcolor: "#303030",
-        stopIconcolor: "#D50000",
-        hitAreaGraphicsBeginFill: "#121212",
-        orange: "#FB8C00"
-    },
-    light: {
-        textColor: "black",
-        blockText: "#282828",
-        dialogueBox: "#fff",
-        strokeColor: "#E2E2E2",
-        fillColor: "#F9F9F9",
-        blueButton: "#0066FF",
-        blueButtonHover: "#023a76",
-        cancelButton: "#f1f1f1",
-        cancelButtonHover: "#afafaf",
-        hoverColor: "#E0E0E0",
-        widgetBackground: "#ccc",
-        widgetButton: "#8cc6ff",
-        widgetButtonSelect: "#C8C8C8",
-        paletteColors: {
-            widgets: ["#7CD622", "#57AD02", "#57AD02", "#B4EB7D"],
-            pitch: ["#7CD622", "#57AD02", "#57AD02", "#B4EB7D"],
-            rhythm: ["#FF8700", "#E86B0E", "#E86B0E", "#FEC092"],
-            meter: ["#FE994F", "#E86B0E", "#E86B0E", "#FEC092"],
-            tone: ["#3EDCDD", "#1DBCBD", "#1DBCBD", "#A1EEEF"],
-            ornament: ["#3EDCDD", "#1DBCBD", "#1DBCBD", "#A1EEEF"],
-            intervals: ["#7CD622", "#57AD02", "#57AD02", "#B4EB7D"],
-            volume: ["#3EDCDD", "#1DBCBD", "#1DBCBD", "#A1EEEF"],
-            drum: ["#3EDCDD", "#1DBCBD", "#1DBCBD", "#A1EEEF"],
-            graphics: ["#92A9FF", "#5370DC", "#5370DC", "#CDD8FF"],
-            turtle: ["#92A9FF", "#5370DC", "#5370DC", "#CDD8FF"],
-            pen: ["#92A9FF", "#5370DC", "#5370DC", "#CDD8FF"],
-            boxes: ["#FFB900", "#d18600", "#d18600", "#FFD092"],
-            action: ["#F3C800", "#DAAF30", "#DAAF30", "#FFE391"],
-            media: ["#FF664B", "#EA4326", "#EA4326", "#FFB9E2"],
-            number: ["#FF6EA1", "#FF2C76", "#FF2C76", "#FFCDDF"],
-            boolean: ["#D97DF5", "#B653D3", "#B653D3", "#EDC6A3"],
-            flow: ["#D98A43", "#B7651A", "#B7651A", "#ECC6A4"],
-            sensors: ["#AABB00", "#748400", "#748400", "#FFE391"],
-            extras: ["#C4C4C4", "#A0A0A0", "#A0A0A0", "#D0D0D0"],
-            program: ["#C4C4C4", "#A0A0A0", "#A0A0A0", "#D0D0D0"],
-            myblocks: ["#FFBF00", "#DAAF30", "#DAAF30", "#FFE391"],
-            heap: ["#D98A43", "#B7651A", "#B7651A", "#ECC6A4"],
-            dictionary: ["#D98A43", "#B7651A", "#B7651A", "#ECC6A4"],
-            ensemble: ["#92A9FF", "#5370DC", "#5370DC", "#CDD8FF"]
-        },
-        disconnected: "#C4C4C4",
-        header: "#4DA6FF",
-        aux: "#1A8CFF",
-        sub: "#8CC6FF",
-        rule: "#E2E2E2",
-        ruleColor: "#E2E2E2",
-        trashColor: "#C0C0C0",
-        trashBorder: "#808080",
-        trashActive: "#FF0000",
-        background: "#F9F9F9",
-        paletteSelected: "#F3F3F3",
-        paletteBackground: "#FFFFFF",
-        paletteLabelBackground: "#8CC6FF",
-        paletteLabelSelected: "#1A8CFF",
-        paletteText: "#666666",
-        rulerHighlight: "#FFBF00",
-        selectorBackground: "#8CC6FF",
-        selectorSelected: "#1A8CFF",
-        labelColor: "#a0a0a0",
-        rhythmcellcolor: "#c8c8c8",
-        stopIconcolor: "#ea174c",
-        hitAreaGraphicsBeginFill: "#FFF",
-        orange: "#e37a00"
-    },
-    highcontrast: {
-        textColor: "#FFFFFF",
-        blockText: "#000000",
-        dialogueBox: "#000000",
-        strokeColor: "#FFFFFF",
-        fillColor: "#FFFFFF",
-        blueButton: "#00FFFF",
-        blueButtonHover: "#00CCCC",
-        cancelButton: "#FFFFFF",
-        cancelButtonHover: "#CCCCCC",
-        hoverColor: "#666666",
-        widgetButton: "#00FFFF",
-        widgetButtonSelect: "#FFFFFF",
-        widgetBackground: "#000000",
-        paletteColors: {
-            widgets: ["#00FF00", "#00CC00", "#00CC00", "#66FF66"],
-            pitch: ["#00FF00", "#00CC00", "#00CC00", "#66FF66"],
-            rhythm: ["#FF8C9E", "#FFB3C1", "#FFD1DC", "#FFB3A7"],
-            meter: ["#FF8C9E", "#FFB3C1", "#FFD1DC", "#FFB3A7"],
-            tone: ["#00FFFF", "#00CCCC", "#00CCCC", "#66FFFF"],
-            ornament: ["#00FFFF", "#00CCCC", "#00CCCC", "#66FFFF"],
-            intervals: ["#00FF00", "#00CC00", "#00CC00", "#66FF66"],
-            volume: ["#00FFFF", "#00CCCC", "#00CCCC", "#66FFFF"],
-            drum: ["#00FFFF", "#00CCCC", "#00CCCC", "#66FFFF"],
-            graphics: ["#FF29FF", "#FF8CFF", "#FFB3FF", "#FFD1FF"],
-            turtle: ["#FF00FF", "#CC00CC", "#CC00CC", "#FF66FF"],
-            pen: ["#FF29FF", "#FF8CFF", "#FFB3FF", "#FFD1FF"],
-            boxes: ["#FFFF00", "#CCCC00", "#CCCC00", "#FFFF66"],
-            action: ["#FFFF00", "#CCCC00", "#CCCC00", "#FFFF66"],
-            media: ["#FF8C9E", "#FFB3C1", "#FFD1DC", "#FFB3A7"],
-            number: ["#FF29FF", "#FF8CFF", "#FFB3FF", "#FFD1FF"],
-            boolean: ["#FF29FF", "#FF8CFF", "#FFB3FF", "#FFD1FF"],
-            flow: ["#FFFF00", "#CCCC00", "#CCCC00", "#FFFF66"],
-            sensors: ["#00FF00", "#00CC00", "#00CC00", "#66FF66"],
-            extras: ["#FFFFFF", "#CCCCCC", "#CCCCCC", "#FFFFFF"],
-            program: ["#FFFFFF", "#CCCCCC", "#CCCCCC", "#FFFFFF"],
-            myblocks: ["#FFFF00", "#CCCC00", "#CCCC00", "#FFFF66"],
-            heap: ["#FFFF00", "#CCCC00", "#CCCC00", "#FFFF66"],
-            dictionary: ["#FFFF00", "#CCCC00", "#CCCC00", "#FFFF66"],
-            ensemble: ["#FF29FF", "#FF8CFF", "#FFB3FF", "#FFD1FF"]
-        },
-        disconnected: "#666666",
-        header: "#00FFFF",
-        aux: "#00CCCC",
-        sub: "#00FFFF",
-        rule: "#FFFFFF",
-        ruleColor: "#FFFFFF",
-        trashColor: "#FFFFFF",
-        trashBorder: "#FFFFFF",
-        trashActive: "#FF0000",
-        background: "#000000",
-        paletteSelected: "#111111",
-        paletteBackground: "#000000",
-        paletteLabelBackground: "#000080",
-        paletteLabelSelected: "#0000FF",
-        paletteText: "#FFFFFF",
-        rulerHighlight: "#FFFF00",
-        selectorBackground: "#00FFFF",
-        selectorSelected: "#00CCCC",
-        labelColor: "#FFFFFF",
-        rhythmcellcolor: "#333333",
-        stopIconcolor: "#FF0000",
-        hitAreaGraphicsBeginFill: "#000000",
-        orange: "#FF8800"
-    }
-};
+/* exported ThemeBox */
 
 class ThemeBox {
     /**
@@ -269,8 +71,8 @@ class ThemeBox {
         });
 
         // Sync platformColor with the active theme config on startup
-        if (themeConfigs[this._theme] && window.platformColor) {
-            Object.assign(window.platformColor, themeConfigs[this._theme]);
+        if (platformThemes[this._theme] && window.platformColor) {
+            Object.assign(window.platformColor, platformThemes[this._theme]);
         }
 
         // Update theme icon immediately if DOM is ready
@@ -313,8 +115,8 @@ class ThemeBox {
         });
 
         // Update platformColor globally
-        if (themeConfigs[this._theme]) {
-            Object.assign(window.platformColor, themeConfigs[this._theme]);
+        if (platformThemes[this._theme]) {
+            Object.assign(window.platformColor, platformThemes[this._theme]);
         }
 
         // Update palette colors in global variables used by blocks

@@ -31,6 +31,31 @@ window.platformColor = {
     selectorSelected: "#1A8CFF"
 };
 
+// Mock window.platformThemes (single source of truth for theme colors)
+window.platformThemes = {
+    dark: {
+        textColor: "#E2E2E2",
+        blockText: "#FFFFFF",
+        background: "#303030",
+        header: "#1E88E5",
+        paletteColors: {}
+    },
+    light: {
+        textColor: "black",
+        blockText: "#282828",
+        background: "#F9F9F9",
+        header: "#4DA6FF",
+        paletteColors: {}
+    },
+    highcontrast: {
+        textColor: "#FFFFFF",
+        blockText: "#000000",
+        background: "#000000",
+        header: "#00FFFF",
+        paletteColors: {}
+    }
+};
+
 // Mock document elements
 document.body.innerHTML = `
     <meta name="theme-color" content="#4DA6FF">
