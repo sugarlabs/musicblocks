@@ -120,12 +120,10 @@ const blockConstants = {
     ALLOWED_CONNECTIONS
 };
 
-// Maintain CommonJS compatibility for tests
 if (typeof module !== "undefined" && module.exports) {
     module.exports = blockConstants;
 }
 
-// Implement additive AMD define
 /* global define */
 if (typeof define === "function" && define.amd) {
     define(function () {
@@ -133,8 +131,7 @@ if (typeof define === "function" && define.amd) {
     });
 }
 
-// Preserve existing global exposure when loaded as a plain browser script.
-// Skipped when running as a CommonJS module (e.g. Jest) to avoid polluting the global scope.
+// Skipped under CommonJS (e.g. Jest) to avoid polluting the global scope there.
 if (typeof window !== "undefined" && typeof module === "undefined") {
     Object.assign(window, blockConstants);
 }

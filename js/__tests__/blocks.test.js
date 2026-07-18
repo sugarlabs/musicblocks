@@ -14,14 +14,25 @@
  * This file establishes the mocking infrastructure for the 7,500-line blocks.js.
  */
 
-/* global jest, describe, it, expect, beforeEach */
+/* global jest, describe, it, expect, beforeEach, beforeAll, afterAll */
 
 const Blocks = require("../blocks");
 
-// Expose constants that blocks.js references as bare globals at runtime
-// (e.g. MINIMUMDOCKDISTANCE in blockMoved, ALLOWED_CONNECTIONS in _testConnectionType).
+// blocks.js references these constants (MINIMUMDOCKDISTANCE, ALLOWED_CONNECTIONS, etc.) as
+// bare globals at runtime. In the browser they're provided by loader.js's RequireJS shim
+// load order; under CommonJS there's no such preload, so install them for this suite only
+// and remove them afterward rather than leaving a permanent global mutation.
 const blockConstants = require("../block-constants");
-Object.assign(global, blockConstants);
+
+beforeAll(() => {
+    Object.assign(global, blockConstants);
+});
+
+afterAll(() => {
+    for (const key of Object.keys(blockConstants)) {
+        delete global[key];
+    }
+});
 
 // --- MOCK SETUP ---
 
