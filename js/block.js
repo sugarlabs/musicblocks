@@ -2131,6 +2131,19 @@ class Block {
     }
 
     /**
+     * Checks if the block is a note container.
+     * @returns {boolean} - True if the block is a note container, false otherwise.
+     */
+    isNoteContainer() {
+        const noteContainerCapability = this.getCapability("noteContainer");
+        if (noteContainerCapability !== undefined) {
+            return !!noteContainerCapability;
+        }
+
+        return false;
+    }
+
+    /**
      * Checks if the block is an argument block.
      * @returns {boolean} - True if the block is an argument block, false otherwise.
      */
