@@ -19,7 +19,7 @@
    DEFAULTVOICE, INLINECOLLAPSIBLES, NATURAL, NUMBERBLOCKDEFAULT,
     SPECIALINPUTS, STANDARDBLOCKHEIGHT, STRINGLEN, TEXTWIDTH,
     WESTERN2EISOLFEGENAMES, WIDENAMES, addTemperamentToDictionary,
-   Block, closeBlkWidgets, createjs, delayExecution, DEFAULTCHORD,
+   Block, closeBlkWidgets, ConnectionValidator, createjs, delayExecution, DEFAULTCHORD,
    deleteTemperamentFromList, getDrumSynthName, getNoiseName,
    getNoiseSynthName, getTemperamentsList, getTextWidth,
    getVoiceSynthName, i18nSolfege, last, MathUtility, mixedNumber,
@@ -41,6 +41,8 @@
         CAMERAVALUE, VIDEOVALUE
    - js/block.js
         Block
+   - js/connection-validator.js
+        ConnectionValidator
    - js/piemenus.js
         piemenuBlockContext
    - js/protoblocks.js
@@ -61,77 +63,6 @@
 
 const NOTEBLOCKS = ["newnote", "osctime"];
 const PITCHBLOCKS = ["pitch", "steppitch", "hertz", "pitchnumber", "nthmodalpitch", "playdrum"];
-
-const ALLOWED_CONNECTIONS = new Set([
-    "vspaceout:vspacein",
-    "vspacein:vspaceout",
-    "in:out",
-    "out:in",
-    "in:vspaceout",
-    "vspaceout:in",
-    "out:vspacein",
-    "vspacein:out",
-    "numberin:numberout",
-    "numberin:anyout",
-    "numberout:numberin",
-    "anyout:numberin",
-    "textin:textout",
-    "textin:anyout",
-    "textout:textin",
-    "anyout:textin",
-    "booleanout:booleanin",
-    "booleanin:booleanout",
-    "mediain:mediaout",
-    "mediaout:mediain",
-    "mediain:textout",
-    "textout:mediain",
-    "filein:fileout",
-    "fileout:filein",
-    "casein:caseout",
-    "caseout:casein",
-    "vspaceout:casein",
-    "casein:vspaceout",
-    "vspacein:caseout",
-    "caseout:vspacein",
-    "solfegein:anyout",
-    "solfegein:solfegeout",
-    "solfegein:textout",
-    "solfegein:noteout",
-    "solfegein:scaledegreeout",
-    "solfegein:numberout",
-    "anyout:solfegein",
-    "solfegeout:solfegein",
-    "textout:solfegein",
-    "noteout:solfegein",
-    "scaledegreeout:solfegein",
-    "numberout:solfegein",
-    "notein:solfegeout",
-    "notein:scaledegreeout",
-    "notein:textout",
-    "notein:noteout",
-    "solfegeout:notein",
-    "scaledegreeout:notein",
-    "textout:notein",
-    "noteout:notein",
-    "pitchout:anyin",
-    "gridout:anyin",
-    "anyin:textout",
-    "anyin:mediaout",
-    "anyin:numberout",
-    "anyin:anyout",
-    "anyin:fileout",
-    "anyin:solfegeout",
-    "anyin:scaledegreeout",
-    "anyin:noteout",
-    "textout:anyin",
-    "mediaout:anyin",
-    "numberout:anyin",
-    "anyout:anyin",
-    "fileout:anyin",
-    "solfegeout:anyin",
-    "scaledegreeout:anyin",
-    "noteout:anyin"
-]);
 
 /**
  * Lazy-initialized Sets for O(1) collapsible type checks in hot paths.
@@ -2569,8 +2500,7 @@ class Blocks {
          * @returns boolean
          */
         this._testConnectionType = (type1, type2) => {
-            /** Can these two blocks dock? */
-            return ALLOWED_CONNECTIONS.has(type1 + ":" + type2);
+            return ConnectionValidator.testConnectionType(type1, type2);
         };
 
         /**
