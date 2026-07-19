@@ -1942,6 +1942,11 @@ class Palette {
     }
 
     _makeBlockFromProtoblock(protoblk, moved, blkname, event, saveX, saveY) {
+        // Prevent block creation from triggering a 'move' undo action
+        // by clearing the palette block's drag start coordinates
+        this.activity.blocks.dragStartX = undefined;
+        this.activity.blocks.dragStartY = undefined;
+
         let newBlock;
         const __myCallback = newBlock => {
             // Move the drag group under the cursor.
@@ -2087,6 +2092,18 @@ class Palette {
                 }
 
                 initializeStatusMatrix(topBlk);
+
+                // Add block creation to the undo history
+                if (
+                    this.activity.blocks.actionHistory &&
+                    !this.activity.blocks.isUndoingOrRedoing
+                ) {
+                    this.activity.blocks.actionHistory.push({
+                        type: "restore",
+                        blockId: topBlk
+                    });
+                    this.activity.blocks.redoActionHistory = [];
+                }
             } else if (this.name === "myblocks") {
                 // If we are on the myblocks palette, it is a macro.
                 const macroName = blkname.replace("macro_", "");
@@ -2152,6 +2169,18 @@ class Palette {
                 setTimeout(() => {
                     this.activity.blocks.blockList[topBlk].collapseToggle();
                 }, 500);
+
+                // Add block creation to the undo history
+                if (
+                    this.activity.blocks.actionHistory &&
+                    !this.activity.blocks.isUndoingOrRedoing
+                ) {
+                    this.activity.blocks.actionHistory.push({
+                        type: "restore",
+                        blockId: topBlk
+                    });
+                    this.activity.blocks.redoActionHistory = [];
+                }
             } else {
                 newBlock = this._makeBlockFromPalette(protoblk, blkname, __myCallback);
                 // Ensure that the newly created block is not under
@@ -2165,6 +2194,18 @@ class Palette {
                         this.activity.palettes.paletteWidth * 2,
                         this.activity.blocks.blockList[newBlock].container.y
                     );
+                }
+
+                // Add block creation to the undo history
+                if (
+                    this.activity.blocks.actionHistory &&
+                    !this.activity.blocks.isUndoingOrRedoing
+                ) {
+                    this.activity.blocks.actionHistory.push({
+                        type: "restore",
+                        blockId: newBlock
+                    });
+                    this.activity.blocks.redoActionHistory = [];
                 }
             }
         }

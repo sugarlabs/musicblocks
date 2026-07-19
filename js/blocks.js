@@ -178,6 +178,9 @@ class Blocks {
 
         /** We keep a list of stacks in the trash. */
         this.trashStacks = [];
+        this.actionHistory = [];
+        this.redoActionHistory = [];
+        this.isUndoingOrRedoing = false;
         /** We keep a list of previews of stacks in the trash. */
         this.trashPreviews = {};
 
@@ -1775,6 +1778,33 @@ class Blocks {
                 return;
             }
 
+            // Record position changes for undo/redo
+            if (this.dragStartX !== undefined && this.dragStartY !== undefined) {
+                const myBlock = this.blockList[thisBlock];
+                if (myBlock && myBlock.container) {
+                    if (
+                        myBlock.container.x !== this.dragStartX ||
+                        myBlock.container.y !== this.dragStartY
+                    ) {
+                        this.actionHistory.push({
+                            type: "move",
+                            blockId: thisBlock,
+                            oldX: this.dragStartX,
+                            oldY: this.dragStartY,
+                            newX: myBlock.container.x,
+                            newY: myBlock.container.y
+                        });
+
+                        // Clear redo history on new action unless we are actively undoing/redoing
+                        if (!this.isUndoingOrRedoing) {
+                            this.redoActionHistory = [];
+                        }
+                    }
+                }
+                this.dragStartX = undefined;
+                this.dragStartY = undefined;
+            }
+
             let blk = this.insideExpandableBlock(thisBlock);
             let expandableLoopCounter = 0;
 
@@ -1855,32 +1885,41 @@ class Blocks {
                  * Check if we are disconnecting blocks from widget blocks;
                  * then reinit if widget windows is open.
                  */
-                let lockInit = false;
-                for (let x = 0; x < widgetTitle.length; x++) {
-                    if (lockInit === false) {
-                        switch (widgetTitle[x].innerHTML) {
-                            case "oscilloscope":
-                            case "tempo":
-                            case "rhythm maker":
-                            case "pitch slider":
-                            case "pitch staircase":
-                            case "status":
-                            case "phrase maker":
-                            case "lego bricks":
-                            case "custom mode":
-                            case "music keyboard":
-                            case "pitch drum":
-                            case "meter":
-                            case "temperament":
-                            case "timbre":
-                                lockInit = true;
-                                if (
-                                    this.blockList[initialTopBlock].protoblock.staticLabels[0] ===
-                                    widgetTitle[x].innerHTML
-                                ) {
-                                    this.reInitWidget(initialTopBlock, 1500);
+                if (cBlock) {
+                    let initialTopBlock = this.findTopBlock(cBlock.blockIndex);
+                    if (
+                        this.blockList[initialTopBlock] &&
+                        this.dragStartX !== undefined &&
+                        this.dragStartY !== undefined
+                    ) {
+                        let lockInit = false;
+                        for (let x = 0; x < widgetTitle.length; x++) {
+                            if (lockInit === false) {
+                                switch (widgetTitle[x].innerHTML) {
+                                    case "oscilloscope":
+                                    case "tempo":
+                                    case "rhythm maker":
+                                    case "pitch slider":
+                                    case "pitch staircase":
+                                    case "status":
+                                    case "phrase maker":
+                                    case "lego bricks":
+                                    case "custom mode":
+                                    case "music keyboard":
+                                    case "pitch drum":
+                                    case "meter":
+                                    case "temperament":
+                                    case "timbre":
+                                        lockInit = true;
+                                        if (
+                                            this.blockList[initialTopBlock].protoblock
+                                                .staticLabels[0] === widgetTitle[x].innerHTML
+                                        ) {
+                                            this.reInitWidget(initialTopBlock, 1500);
+                                        }
+                                        break;
                                 }
-                                break;
+                            }
                         }
                     }
                 }
@@ -2375,7 +2414,7 @@ class Blocks {
 
                 /** Check if top block is one of the widget blocks. */
                 let lockInit = false;
-                if (c === null) {
+                if (c === null && this.dragStartX !== undefined && this.dragStartY !== undefined) {
                     for (let i = 0; i < widgetTitle.length; i++) {
                         const that = this;
                         if (lockInit === false) {
@@ -7488,6 +7527,89 @@ class Blocks {
          * @public
          * @returns {void}
          */
+        this.undoAction = () => {
+            if (!this.actionHistory || this.actionHistory.length === 0) {
+                this.activity.textMsg(_("Nothing to undo."), 3000);
+                return;
+            }
+
+            const action = this.actionHistory.pop();
+            this.isUndoingOrRedoing = true;
+
+            if (action.type === "move") {
+                this.moveBlock(action.blockId, action.oldX, action.oldY);
+                this.blockMoved(action.blockId);
+                this.activity.refreshCanvas();
+            } else if (action.type === "trash") {
+                this.activity._restoreTrashById(action.blockId);
+            } else if (action.type === "restore") {
+                const block = this.blockList[action.blockId];
+                if (block) this.sendStackToTrash(block);
+            } else if (action.type === "value_change") {
+                const block = this.blockList[action.blockId];
+                if (block) {
+                    if (!block.label) block.label = { value: action.oldValue, style: {} };
+                    block.label.value = action.oldValue;
+                    block._labelChanged(true, true);
+
+                    block.value = action.oldValue;
+                    if (action.oldText !== null && block.text) {
+                        block.text.text = action.oldText;
+                    }
+                    block.updateCache();
+                    this.activity.refreshCanvas();
+                }
+            }
+
+            this.redoActionHistory.push(action);
+            this.isUndoingOrRedoing = false;
+
+            // Cache DOM element reference for performance
+            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
+            if (helpfulWheelDiv && helpfulWheelDiv.style.display !== "none") {
+                helpfulWheelDiv.style.display = "none";
+                this.activity.__tick();
+            }
+        };
+
+        this.redoAction = () => {
+            if (!this.redoActionHistory || this.redoActionHistory.length === 0) {
+                this.activity.textMsg(_("Nothing to redo."), 3000);
+                return;
+            }
+
+            const action = this.redoActionHistory.pop();
+            this.isUndoingOrRedoing = true;
+
+            if (action.type === "move") {
+                this.moveBlock(action.blockId, action.newX, action.newY);
+                this.blockMoved(action.blockId);
+                this.activity.refreshCanvas();
+            } else if (action.type === "trash") {
+                const block = this.blockList[action.blockId];
+                if (block) this.sendStackToTrash(block);
+            } else if (action.type === "restore") {
+                this.activity._restoreTrashById(action.blockId);
+            } else if (action.type === "value_change") {
+                const block = this.blockList[action.blockId];
+                if (block) {
+                    if (!block.label) block.label = { value: action.newValue, style: {} };
+                    block.label.value = action.newValue;
+                    block._labelChanged(true, true);
+
+                    block.value = action.newValue;
+                    if (action.newText !== null && block.text) {
+                        block.text.text = action.newText;
+                    }
+                    block.updateCache();
+                    this.activity.refreshCanvas();
+                }
+            }
+
+            this.actionHistory.push(action);
+            this.isUndoingOrRedoing = false;
+        };
+
         this.sendStackToTrash = myBlock => {
             /** First, hide the palettes as they may need updating. */
             for (const name in this.activity.palettes.dict) {
@@ -7506,6 +7628,10 @@ class Blocks {
 
             /** Add this block to the list of blocks in the trash so we can undo this action. */
             this.trashStacks.push(thisBlock);
+            if (!this.isUndoingOrRedoing) {
+                this.actionHistory.push({ type: "trash", blockId: thisBlock });
+                this.redoActionHistory = [];
+            }
 
             // Cap the undo history to prevent unbounded memory growth.
             // Keep the 100 most recent trashed stacks.
@@ -7576,14 +7702,20 @@ class Blocks {
                     delete this.blockCollapseArt[blk];
                 }
 
-                const title = this.blockList[blk].protoblock.staticLabels[0];
+                const pb = this.blockList[blk].protoblock;
+                const title =
+                    pb && pb.staticLabels && pb.staticLabels[0]
+                        ? pb.staticLabels[0]
+                        : this.blockList[blk].name;
                 closeBlkWidgets(_(title));
                 this.activity.refreshCanvas();
             }
 
             // Announce block sent to trash to screen readers (aria-live only, no visual message)
             const blockLabel =
-                (myBlock.protoblock.staticLabels && myBlock.protoblock.staticLabels[0]) ||
+                (myBlock.protoblock &&
+                    myBlock.protoblock.staticLabels &&
+                    myBlock.protoblock.staticLabels[0]) ||
                 myBlock.name;
             const liveRegion =
                 document.getElementById("mbA11yLiveRegion") ||

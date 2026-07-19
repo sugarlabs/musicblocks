@@ -904,8 +904,8 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
             that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
 
         if (selection["attr"] === "♮") {
-            that.text.text = selection["note"];
             that.value = selectedNoteValue;
+            that.text.text = selection["note"];
         } else {
             that.value = selectedNoteValue + selection["attr"];
             that.text.text = selection["note"] + selection["attr"];
@@ -996,12 +996,12 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
 
         if (selectedAccidental === "♮" || selectedAccidental === "") {
             // Natural or no accidental: display only the note
-            that.text.text = selectedNote;
             that.value = selectedNoteValue;
+            that.text.text = selectedNote;
         } else {
             // Combine note and accidental for display
-            that.text.text = selectedNote + selectedAccidental;
             that.value = selectedNoteValue + selectedAccidental;
+            that.text.text = selectedNote + selectedAccidental;
         }
 
         // Ensure proper layering of the text element
@@ -1018,6 +1018,8 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
         if (hasOctaveWheel) {
             that._octavesWheel.removeWheel();
         }
+        that.label.style.display = "none";
+        docById("labelDiv").classList.remove("hasKeyboard");
     };
 };
 
@@ -1883,8 +1885,9 @@ const piemenuNoteValue = (block, noteValue) => {
      * @private
      */
     const __selectionChanged = () => {
-        that.text.text = that._tabsWheel.navItems[that._tabsWheel.selectedNavItemIndex].title;
-        that.value = Number(that.text.text);
+        const newText = that._tabsWheel.navItems[that._tabsWheel.selectedNavItemIndex].title;
+        that.value = Number(newText);
+        that.text.text = newText;
 
         // Make sure text is on top.
         that.container.setChildIndex(that.text, that.container.children.length - 1);
@@ -1902,6 +1905,7 @@ const piemenuNoteValue = (block, noteValue) => {
         that._noteValueWheel.removeWheel();
         that._exitWheel.removeWheel();
         that.label.style.display = "none";
+        docById("labelDiv").classList.remove("hasKeyboard");
         if (that._check_meter_block !== null) {
             that.blocks.meter_block_changed(that._check_meter_block);
         }
@@ -2141,6 +2145,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         that._numberWheel.removeWheel();
         that._exitWheel.removeWheel();
         that.label.style.display = "none";
+        docById("labelDiv").classList.remove("hasKeyboard");
 
         if (that._check_meter_block !== null) {
             that.blocks.meter_block_changed(that._check_meter_block);
@@ -2473,6 +2478,7 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
         that._numberWheel.removeWheel();
         that._exitWheel.removeWheel();
         that.label.style.display = "none";
+        docById("labelDiv").classList.remove("hasKeyboard");
     };
 
     const labelElem = docById("labelDiv");
@@ -2883,8 +2889,8 @@ const piemenuChords = (block, selectedChord) => {
     const that = block;
 
     const __selectionChanged = () => {
-        that.text.text = that._chordWheel.navItems[that._chordWheel.selectedNavItemIndex].title;
         that.value = CHORDNAMES[that._chordWheel.selectedNavItemIndex];
+        that.text.text = that._chordWheel.navItems[that._chordWheel.selectedNavItemIndex].title;
 
         // Make sure text is on top.
         that.container.setChildIndex(that.text, that.container.children.length - 1);
