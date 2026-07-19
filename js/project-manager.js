@@ -367,11 +367,7 @@ class ProjectManager {
             that.gitDropdownUI._syncMenuState();
         }
 
-        if (
-            that.planet !== undefined &&
-            that.planet.planet !== null &&
-            that.planet.getCurrentProjectName() !== _("My Project")
-        ) {
+        if (that.planet !== undefined && that.planet.planet !== null) {
             // Save the current project before switching away from it.
             that.planet.saveLocally();
             // Create the new project slot and clear the canvas synchronously.
