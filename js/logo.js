@@ -1156,8 +1156,7 @@ class Logo {
      * @returns {void}
      */
     _cleanupAfterCompletion() {
-        // Guard: skip if cleanup already ran (e.g. two turtles finish far
-        // apart and both fire their _lastNoteTimeout callbacks).
+        // Skip if cleanup already ran (two turtles finishing far apart).
         if (!this._synthsInitialized && this.sounds.length === 0) {
             return;
         }
@@ -1223,11 +1222,7 @@ class Logo {
         this.stopTurtle = true;
         this.turtles.markAllAsStopped();
 
-        // Cancel ALL pending managed timers to prevent zombie turtle graphics,
-        // phantom sounds, and stale block highlighting. This is the primary
-        // mechanism for the zombie-timer fix — every setTimeout dispatched by
-        // dispatchTurtleSignals, runFromBlock, and runFromBlockNow is tracked
-        // by _timerManager, so clearAll() cancels them in one sweep.
+        // Cancel all pending timers to prevent zombie graphics and sounds.
         const cancelledTimers = this._timerManager.clearAll();
         if (cancelledTimers > 0) {
             console.debug(
@@ -1235,8 +1230,7 @@ class Logo {
             );
         }
 
-        // Prevent _lastNoteTimeout from firing _cleanupAfterCompletion
-        // again when the next run enters runLogoCommands.
+        // Prevent stale timeout from firing cleanup on next run.
         this._lastNoteTimeout = null;
 
         this._cleanupAfterCompletion();
@@ -1245,17 +1239,14 @@ class Logo {
             this.safePluginExecute(this.evalOnStopList[arg], this);
         }
 
-        // Reset drawing on explicit Stop.  Not inside _cleanupAfterCompletion
-        // because that also fires on natural completion where the drawing must
-        // be preserved for SVG/PNG export.
+        // Clear canvas on explicit Stop only — natural completion
+        // preserves drawings for SVG/PNG export.
         for (const turtle of this.turtles.turtleList) {
             turtle.painter.doClear(true, true, true);
         }
 
-        // Stop the recorder if it was running (e.g. WAV export).  This is
-        // intentionally NOT in _cleanupAfterCompletion because that method
-        // also fires during natural completion, and during WAV recording we
-        // need the recorder to keep running until the recording is complete.
+        // Recorder stop is Stop-only — natural completion must not
+        // interrupt an in-progress WAV recording.
         if (this.synth.recorder && this.synth.recorder.state === "recording")
             this.synth.recorder.stop();
 
@@ -1380,9 +1371,7 @@ class Logo {
         if (this._lastNoteTimeout != null) {
             this._timerManager.clearTimeout(this._lastNoteTimeout);
             this._lastNoteTimeout = null;
-            // The previous run's deferred cleanup never fired — run it now
-            // so stale SVG output, Transport events, and instruments don't
-            // carry over into the new execution.
+            // Previous run's cleanup never fired — run it now.
             this._cleanupAfterCompletion();
         }
 
@@ -2326,11 +2315,8 @@ class Logo {
                         }
                     }
 
-                    // Give the last note time to play, then clean up stale
-                    // audio and transport state.  If a previous timeout is
-                    // still pending (e.g. from a second turtle completing),
-                    // cancel it first to prevent orphaned timers from
-                    // firing cleanup during a subsequent run.
+                    // Wait a beat for the last note, then clean up.
+                    // Cancel any pending timer from a previous turtle.
                     if (logo._lastNoteTimeout !== null) {
                         logo._timerManager.clearTimeout(logo._lastNoteTimeout);
                     }
@@ -2340,13 +2326,8 @@ class Logo {
                         if (tur.singer.suppressOutput && logo.recording) {
                             tur.singer.suppressOutput = false;
                         }
-                        // Guard: skip cleanup if a new run is already active.
-                        // runLogoCommands() handles previous-run cleanup at
-                        // line 1376–1383 when it detects a pending
-                        // _lastNoteTimeout.  This guard also prevents double
-                        // cleanup when two turtles schedule overlapping timers
-                        // (both enter this callback, but only the first should
-                        // clean up).
+                        // Skip if a new run already started or another
+                        // turtle's callback already cleaned up.
                         if (!logo.turtles.running()) {
                             logo._cleanupAfterCompletion();
                         }

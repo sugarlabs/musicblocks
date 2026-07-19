@@ -31,9 +31,8 @@ class ToolbarController {
     }
 
     /**
-     * Resets drawing state for all turtles before a fresh run.
-     * Called from toolbar Run paths only — not on block clicks or
-     * widget-triggered runs, so canvas is not wiped unexpectedly.
+     * Clears canvas for all turtles before a fresh Run.
+     * Toolbar Run paths only — not on block clicks or widgets.
      */
     _clearAllTurtles() {
         for (const turtle of this.activity.turtles.turtleList) {
