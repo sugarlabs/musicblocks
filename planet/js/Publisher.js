@@ -170,21 +170,25 @@ class Publisher {
         this.IsShareLink = IsShareLink === undefined ? false : IsShareLink;
         const name = this.ProjectTable[id].ProjectName;
         let image = this.ProjectTable[id].ProjectImage;
-        const published    = this.ProjectTable[id].PublishedData;
-        const gitRepoData  = this.ProjectTable[id].GitRepoData || null;
+        const published = this.ProjectTable[id].PublishedData;
+        const gitRepoData = this.ProjectTable[id].GitRepoData || null;
         const DATA = this.ProjectTable[id].ProjectData;
 
         // Description priority: previously published > git repo (fork source) > empty
         const description =
-            published    && published.ProjectDescription   ? published.ProjectDescription   :
-            gitRepoData  && gitRepoData.description        ? gitRepoData.description        :
-            "";
+            published && published.ProjectDescription
+                ? published.ProjectDescription
+                : gitRepoData && gitRepoData.description
+                  ? gitRepoData.description
+                  : "";
 
         // Tags priority: previously published > git repo (fork source) > auto-detected from blocks
         const tags =
-            published    && published.ProjectTags          ? published.ProjectTags          :
-            gitRepoData  && gitRepoData.tags && gitRepoData.tags.length ? gitRepoData.tags :
-            this.dataToTags(DATA);
+            published && published.ProjectTags
+                ? published.ProjectTags
+                : gitRepoData && gitRepoData.tags && gitRepoData.tags.length
+                  ? gitRepoData.tags
+                  : this.dataToTags(DATA);
 
         document.getElementById("publisher-ptitle").textContent = _(
             `${published !== null ? "Republish" : "Publish"}  Project`
@@ -259,33 +263,36 @@ class Publisher {
         if (errors === true) this.hideProgressBar();
         else {
             const submitobj = {};
-            submitobj.ProjectID          = id;
-            submitobj.ProjectName        = title.value;
+            submitobj.ProjectID = id;
+            submitobj.ProjectName = title.value;
             submitobj.ProjectDescription = description.value;
             submitobj.ProjectSearchKeywords = this.parseProject(this.ProjectTable[id].ProjectData);
             // GitServerInterface expects the raw project JSON object, not encoded TB.
             // If ProjectData is a string, parse it; if already an object, use as-is.
             let rawProjectData = this.ProjectTable[id].ProjectData;
             try {
-                rawProjectData = typeof rawProjectData === "string"
-                    ? JSON.parse(rawProjectData)
-                    : rawProjectData;
-            } catch (_) { /* keep as string */ }
-            submitobj.ProjectData        = rawProjectData;
-            submitobj.ProjectImage       = this.ProjectTable[id].ProjectImage;
+                rawProjectData =
+                    typeof rawProjectData === "string"
+                        ? JSON.parse(rawProjectData)
+                        : rawProjectData;
+            } catch (_) {
+                /* keep as string */
+            }
+            submitobj.ProjectData = rawProjectData;
+            submitobj.ProjectImage = this.ProjectTable[id].ProjectImage;
             submitobj.ProjectIsMusicBlocks = Planet.IsMusicBlocks ? 1 : 0;
             submitobj.ProjectCreatorName = Planet.ProjectStorage.getDefaultCreatorName();
             // Convert tag objects to comma-separated theme string for the new backend
             const tagArr = this.getTags(); // returns array of tag-id strings
-            submitobj.ProjectTags        = tagArr; // kept for legacy compat
-            submitobj.theme              = tagArr.join(",");  // new backend field
-            submitobj.repoName           = title.value;
-            submitobj.description        = description.value;
-            submitobj.creatorName        = Planet.ProjectStorage.getDefaultCreatorName();
+            submitobj.ProjectTags = tagArr; // kept for legacy compat
+            submitobj.theme = tagArr.join(","); // new backend field
+            submitobj.repoName = title.value;
+            submitobj.description = description.value;
+            submitobj.creatorName = Planet.ProjectStorage.getDefaultCreatorName();
 
             const published = {};
             published.ProjectDescription = description.value;
-            published.ProjectTags        = tagArr;
+            published.ProjectTags = tagArr;
             document.getElementById("publisher-submit").style.cursor = "wait";
             document.getElementById("publisher-cancel").style.cursor = "wait";
 
@@ -317,14 +324,16 @@ class Publisher {
             //   2. PublishedData.repoName — set after a prior successful publish
             //      (repo exists, visible=1, user is re-publishing after an edit)
             // If neither exists, create a fresh repo then publish.
-            const projectEntry   = this.ProjectTable[id];
-            const gitRepoData    = projectEntry.GitRepoData;
+            const projectEntry = this.ProjectTable[id];
+            const gitRepoData = projectEntry.GitRepoData;
             const existingPublished = projectEntry.PublishedData;
 
             const existingRepoName =
-                (gitRepoData    && gitRepoData.repoName)    ? gitRepoData.repoName    :
-                (existingPublished && existingPublished.repoName) ? existingPublished.repoName :
-                null;
+                gitRepoData && gitRepoData.repoName
+                    ? gitRepoData.repoName
+                    : existingPublished && existingPublished.repoName
+                      ? existingPublished.repoName
+                      : null;
             const existingKey = existingRepoName
                 ? Planet.ServerInterface.getKey(existingRepoName)
                 : null;
@@ -346,56 +355,60 @@ class Publisher {
                 Planet.ServerInterface.publishProject(
                     existingRepoName,
                     existingKey,
-                    (publishData) => {
+                    publishData => {
                         const combined = {
                             success: publishData.success,
-                            error:   publishData.error || null
+                            error: publishData.error || null
                         };
                         this.afterPublishProject(combined, id, title.value, published);
                     },
-                    title.value,     // updated project name
-                    descriptionVal,  // updated description
-                    tagsVal,         // updated tags
-                    thumbnailVal     // canonical thumbnail = canvas state right now
+                    title.value, // updated project name
+                    descriptionVal, // updated description
+                    tagsVal, // updated tags
+                    thumbnailVal // canonical thumbnail = canvas state right now
                 );
             } else {
                 // ── NO REPO YET: create one, then publish ─────────────────
                 const send = JSON.stringify(submitobj);
 
-                Planet.ServerInterface.addProject(
-                    send,
-                    (createData) => {
-                        if (!createData.success) {
-                            this.afterPublishProject(createData, id, title.value, published);
-                            return;
-                        }
-
-                        const repoName = createData.repository;
-                        const key      = createData.key;
-
-                        // Store the repo slug so LocalCard can link to it later.
-                        published.repoName = repoName;
-
-                        // Capture the thumbnail at publish time (canonical image).
-                        const thumbnailVal = this.ProjectTable[id].ProjectImage || null;
-
-                        Planet.ServerInterface.publishProject(
-                            repoName,
-                            key,
-                            (publishData) => {
-                                const combined = {
-                                    success: publishData.success,
-                                    error:   publishData.error || null
-                                };
-                                this.afterPublishProject(combined, id, title.value, published);
-                            },
-                            undefined,     // projectName already set during /create
-                            undefined,     // description already set during /create
-                            undefined,     // tags already set during /create
-                            thumbnailVal   // canonical thumbnail = canvas state right now
-                        );
+                Planet.ServerInterface.addProject(send, createData => {
+                    if (!createData.success) {
+                        this.afterPublishProject(createData, id, title.value, published);
+                        return;
                     }
-                );
+
+                    const repoName = createData.repository;
+                    const key = createData.key;
+
+                    // Store the repo slug so LocalCard can link to it later.
+                    published.repoName = repoName;
+
+                    const descriptionVal =
+                        document.getElementById("publish-description").value || "";
+                    const tagsVal = this.getTags();
+                    Planet.ProjectStorage.addGitRepoData(id, repoName, descriptionVal, tagsVal, key)
+                        .then(() => Planet._postGitState(id))
+                        .catch(e => console.error(e));
+
+                    // Capture the thumbnail at publish time (canonical image).
+                    const thumbnailVal = this.ProjectTable[id].ProjectImage || null;
+
+                    Planet.ServerInterface.publishProject(
+                        repoName,
+                        key,
+                        publishData => {
+                            const combined = {
+                                success: publishData.success,
+                                error: publishData.error || null
+                            };
+                            this.afterPublishProject(combined, id, title.value, published);
+                        },
+                        undefined, // projectName already set during /create
+                        undefined, // description already set during /create
+                        undefined, // tags already set during /create
+                        thumbnailVal // canonical thumbnail = canvas state right now
+                    );
+                });
             }
         }
     }
