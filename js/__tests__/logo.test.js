@@ -1216,6 +1216,16 @@ describe("Logo runLogoCommands", () => {
 
         expect(logo.actions["my-action"]).toBe(2);
     });
+
+    test("fires _cleanupAfterCompletion when _lastNoteTimeout is cancelled on re-run", () => {
+        logo._lastNoteTimeout = 42;
+        logo._cleanupAfterCompletion = jest.fn();
+
+        logo.runLogoCommands(null, null);
+
+        expect(logo._cleanupAfterCompletion).toHaveBeenCalled();
+        expect(logo._lastNoteTimeout).toBeNull();
+    });
 });
 
 // ─── Logo runFromBlock ────────────────────────────────────────────────────────

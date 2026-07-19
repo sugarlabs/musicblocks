@@ -1233,6 +1233,12 @@ class Logo {
             );
         }
 
+        // Prevent _lastNoteTimeout from firing _cleanupAfterCompletion
+        // again when the next run enters runLogoCommands.
+        if (this._lastNoteTimeout !== null) {
+            this._lastNoteTimeout = null;
+        }
+
         this._cleanupAfterCompletion();
 
         // Reset drawing on explicit Stop.  Not inside _cleanupAfterCompletion
