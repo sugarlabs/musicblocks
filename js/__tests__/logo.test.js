@@ -1252,6 +1252,51 @@ describe("Logo runLogoCommands", () => {
 
         global.Tone = savedTone;
     });
+
+    test("second _cleanupAfterCompletion call is a no-op when synths already disposed", () => {
+        const savedTone = global.Tone;
+        global.Tone = {
+            Transport: { cancel: jest.fn(), seconds: 0, start: jest.fn(), stop: jest.fn() },
+            UserMedia: savedTone.UserMedia
+        };
+
+        const stopSpy = jest.spyOn(logo.synth, "stop");
+        const disposeSpy = jest.spyOn(logo.synth, "disposeAllInstruments");
+
+        logo._synthsInitialized = true;
+
+        logo._cleanupAfterCompletion();
+        expect(stopSpy).toHaveBeenCalledTimes(1);
+        expect(disposeSpy).toHaveBeenCalledTimes(1);
+        expect(logo._synthsInitialized).toBe(false);
+
+        logo._cleanupAfterCompletion();
+        expect(stopSpy).toHaveBeenCalledTimes(1);
+        expect(disposeSpy).toHaveBeenCalledTimes(1);
+
+        global.Tone = savedTone;
+    });
+
+    test("two turtles finishing far apart do not double-dispose instruments", () => {
+        const savedTone = global.Tone;
+        global.Tone = {
+            Transport: { cancel: jest.fn(), seconds: 0, start: jest.fn(), stop: jest.fn() },
+            UserMedia: savedTone.UserMedia
+        };
+
+        const disposeSpy = jest.spyOn(logo.synth, "disposeAllInstruments");
+
+        logo._synthsInitialized = true;
+        logo._cleanupAfterCompletion();
+        expect(disposeSpy).toHaveBeenCalledTimes(1);
+        expect(logo._synthsInitialized).toBe(false);
+
+        logo._synthsInitialized = false;
+        logo._cleanupAfterCompletion();
+        expect(disposeSpy).toHaveBeenCalledTimes(1);
+
+        global.Tone = savedTone;
+    });
 });
 
 // ─── Logo runFromBlock ────────────────────────────────────────────────────────

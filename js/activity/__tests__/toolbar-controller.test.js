@@ -202,3 +202,27 @@ describe("ToolbarController.hardStop", () => {
         delete global._THIS_IS_MUSIC_BLOCKS_;
     });
 });
+
+describe("ToolbarController._clearAllTurtles", () => {
+    test("calls doClear on each turtle painter", () => {
+        const painter0 = { doClear: jest.fn() };
+        const painter1 = { doClear: jest.fn() };
+        const activity = makeMockActivity();
+        activity.turtles.turtleList = [{ painter: painter0 }, { painter: painter1 }];
+        setupToolbarController(activity);
+        const controller = activity.toolbarController;
+
+        controller._clearAllTurtles();
+
+        expect(painter0.doClear).toHaveBeenCalledWith(true, true, true);
+        expect(painter1.doClear).toHaveBeenCalledWith(true, true, true);
+    });
+
+    test("is a no-op when turtleList is empty", () => {
+        const activity = makeMockActivity();
+        setupToolbarController(activity);
+        const controller = activity.toolbarController;
+
+        expect(() => controller._clearAllTurtles()).not.toThrow();
+    });
+});

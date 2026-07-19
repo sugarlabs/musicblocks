@@ -1156,6 +1156,12 @@ class Logo {
      * @returns {void}
      */
     _cleanupAfterCompletion() {
+        // Guard: skip if cleanup already ran (e.g. two turtles finish far
+        // apart and both fire their _lastNoteTimeout callbacks).
+        if (!this._synthsInitialized && this.sounds.length === 0) {
+            return;
+        }
+
         for (const sound in this.sounds) {
             this.sounds[sound].stop();
         }
