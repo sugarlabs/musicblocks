@@ -1415,14 +1415,6 @@ class Logo {
             turtle.embeddedGraphicsFinished = true;
         }
 
-        // Clear previous drawings so each new run starts with a clean canvas.
-        // This must happen here, not inside _cleanupAfterCompletion, because
-        // that method also fires on natural completion where drawings are
-        // preserved for SVG/PNG export.
-        for (const turtle of this.turtles.turtleList) {
-            turtle.painter.doClear(true, true, true);
-        }
-
         this.prepSynths();
 
         if (this.synth.transport.isAvailable) {

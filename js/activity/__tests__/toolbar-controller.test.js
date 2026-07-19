@@ -23,7 +23,8 @@ function makeMockActivity() {
         TURTLESTEP: -1,
         cleanupIdleWatcher: jest.fn(),
         turtles: {
-            running: jest.fn().mockReturnValue(false)
+            running: jest.fn().mockReturnValue(false),
+            turtleList: []
         },
         logo: {
             turtleDelay: 500,

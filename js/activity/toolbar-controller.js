@@ -44,6 +44,9 @@ class ToolbarController {
         }
 
         if (!this.activity.turtles.running()) {
+            for (const turtle of this.activity.turtles.turtleList) {
+                turtle.painter.doClear(true, true, true);
+            }
             this.activity.logo.runLogoCommands(null, env);
         } else {
             if (currentDelay !== 0) {
@@ -72,6 +75,9 @@ class ToolbarController {
         }
 
         if (!this.activity.turtles.running()) {
+            for (const turtle of this.activity.turtles.turtleList) {
+                turtle.painter.doClear(true, true, true);
+            }
             this.activity.logo.runLogoCommands();
         } else {
             this.activity.logo.step();
@@ -97,6 +103,9 @@ class ToolbarController {
             // Queue and take first step.
             let started = false;
             if (!this.activity.turtles.running()) {
+                for (const turtle of this.activity.turtles.turtleList) {
+                    turtle.painter.doClear(true, true, true);
+                }
                 this.activity.logo.runLogoCommands();
                 started = true;
             }
