@@ -2323,14 +2323,29 @@ class Logo {
                     }
 
                     // Give the last note time to play, then clean up stale
-                    // audio and transport state.
+                    // audio and transport state.  If a previous timeout is
+                    // still pending (e.g. from a second turtle completing),
+                    // cancel it first to prevent orphaned timers from
+                    // firing cleanup during a subsequent run.
+                    if (logo._lastNoteTimeout !== null) {
+                        logo._timerManager.clearTimeout(logo._lastNoteTimeout);
+                    }
                     logo._lastNoteTimeout = logo._timerManager.setTimeout(() => {
                         logo._lastNoteTimeout = null;
                         tur.singer.runningFromEvent = false;
                         if (tur.singer.suppressOutput && logo.recording) {
                             tur.singer.suppressOutput = false;
                         }
-                        logo._cleanupAfterCompletion();
+                        // Guard: skip cleanup if a new run is already active.
+                        // runLogoCommands() handles previous-run cleanup at
+                        // line 1376–1383 when it detects a pending
+                        // _lastNoteTimeout.  This guard also prevents double
+                        // cleanup when two turtles schedule overlapping timers
+                        // (both enter this callback, but only the first should
+                        // clean up).
+                        if (!logo.turtles.running()) {
+                            logo._cleanupAfterCompletion();
+                        }
                     }, 1000);
                 }
             };
