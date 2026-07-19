@@ -31,6 +31,7 @@ const _b64Cache = new Map();
 /*
    exported
 
+   SHARP, FLAT, NATURAL, DOUBLESHARP, DOUBLEFLAT,
    SYNTHSVG, RSYMBOLS, NOTENAMES, ALLNOTENAMES, NOTENAMES1,
    WESTERN2EISOLFEGENAMES, PITCHES1, PITCHES3, SCALENOTES,
    EASTINDIANSOLFNOTES, DRUMS, GRAPHICS, SOLFATTRS, DEGREES,
@@ -56,7 +57,7 @@ const _b64Cache = new Map();
    addTemperamentToList, getTemperament, deleteTemperamentFromList,
    addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
    DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
-   INTERVALVALUES, getIntervalRatio, frequencyToPitch, NOTESTEP,
+   INTERVALVALUES, MUSICALMODES, getIntervalRatio, frequencyToPitch, NOTESTEP,
    GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
    SEMITONES, CHROMATIC_SOLFEGE, INTERVAL_CENTS, TEMPERAMENT_INTERVALS,
    INTERVAL_ORDER
@@ -7024,15 +7025,24 @@ if (typeof module !== "undefined" && module.exports) {
         NOTESFLAT,
         NOTESSHARP,
         NOTESTEP,
+        ALLNOTESTEP,
         MUSICALMODES,
         SHARP,
         FLAT,
+        NATURAL,
+        DOUBLESHARP,
+        DOUBLEFLAT,
         CENTSSYMBOL,
         NOTENAMES,
         SOLFEGENAMES1,
         ALLNOTENAMES,
         NOTENAMES1,
         PITCHES1,
-        PITCHES3
+        PITCHES3,
+        SEMITONETOINTERVALMAP,
+        EQUIVALENTACCIDENTALS,
+        INTERVALVALUES,
+        FIXEDSOLFEGE,
+        FIXEDSOLFEGE1
     };
 }

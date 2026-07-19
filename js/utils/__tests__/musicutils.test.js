@@ -2645,7 +2645,7 @@ describe("getPitchInfo", () => {
         expect(getPitchInfo("InvalidNote")).toEqual({
             name: null,
             octave: null,
-            pitchNumber: "Invalid pitch"
+            pitchNumber: global.INVALIDPITCH
         });
     });
 
@@ -2868,8 +2868,8 @@ describe("_calculate_pitch_number", () => {
     });
 
     it("should return INVALIDPITCH for invalid input", () => {
-        expect(_calculate_pitch_number("Invalid", 4)).toBe("Invalid pitch");
-        expect(_calculate_pitch_number(null, 4)).toBe("Invalid pitch");
+        expect(_calculate_pitch_number("Invalid", 4)).toBe(global.INVALIDPITCH);
+        expect(_calculate_pitch_number(null, 4)).toBe(global.INVALIDPITCH);
     });
 });
 
