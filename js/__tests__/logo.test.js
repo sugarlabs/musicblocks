@@ -223,7 +223,8 @@ function createMockTurtle(overrides = {}) {
             doStartFill: jest.fn(),
             doEndFill: jest.fn(),
             doStartHollowLine: jest.fn(),
-            doEndHollowLine: jest.fn()
+            doEndHollowLine: jest.fn(),
+            doClear: jest.fn()
         }
     };
     return {
@@ -1177,7 +1178,9 @@ describe("Logo runLogoCommands", () => {
     });
 
     test("handles already-running state and status widget initialization", () => {
-        const clearTimeoutSpy = jest.spyOn(global, "clearTimeout").mockImplementation(() => {});
+        const clearManagedTimerSpy = jest
+            .spyOn(logo._timerManager, "clearTimeout")
+            .mockReturnValue(true);
         logo._alreadyRunning = true;
         logo._runningBlock = 7;
         logo._lastNoteTimeout = 99;
@@ -1190,10 +1193,10 @@ describe("Logo runLogoCommands", () => {
 
         logo.runLogoCommands(null, null);
 
-        expect(clearTimeoutSpy).toHaveBeenCalledWith(99);
+        expect(clearManagedTimerSpy).toHaveBeenCalledWith(99);
         expect(statusInit).toHaveBeenCalledWith(mockActivity);
         expect(logo.statusFields).toEqual([[2, "currentpitch"]]);
-        clearTimeoutSpy.mockRestore();
+        clearManagedTimerSpy.mockRestore();
     });
 
     test("builds actions dictionary from action stack", () => {
