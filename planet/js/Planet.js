@@ -108,16 +108,13 @@ class Planet {
         try {
             const project = this.ProjectStorage.data.Projects[id];
             const gitData = project && project.GitRepoData;
-            const repoName = gitData ? (gitData.repoName || "") : "";
+            const repoName = gitData ? gitData.repoName || "" : "";
             // Prefer the key stored directly in GitRepoData (set by gitDropdown),
             // then fall back to the ServerInterface per-repo key (set by fork/publish).
             const hashedKey = repoName
-                ? (gitData.hashedKey || localStorage.getItem("mb_git_key_" + repoName) || "")
+                ? gitData.hashedKey || localStorage.getItem("mb_git_key_" + repoName) || ""
                 : "";
-            window.parent.postMessage(
-                { type: "MB_GIT_STATE", repoName, hashedKey },
-                "*"
-            );
+            window.parent.postMessage({ type: "MB_GIT_STATE", repoName, hashedKey }, "*");
         } catch (e) {
             console.debug("[Planet] Could not post git state:", e);
         }
@@ -196,6 +193,13 @@ class Planet {
         confirmBtn.style.marginRight = "16px";
         confirmBtn.addEventListener("click", () => {
             overlay.remove();
+            // Tell the parent window (gitDropdown) that git state is being cleared
+            // so it can reset its repo/key tracking and prefetch cache immediately.
+            try {
+                window.parent.postMessage({ type: "MB_NEW_PROJECT" }, "*");
+            } catch (e) {
+                /* ignore cross-origin */
+            }
             this.loadNewProject();
         });
 
@@ -262,7 +266,13 @@ class Planet {
             if (displayName) {
                 this.ProjectStorage.renameProject(id, displayName);
             }
-            this.ProjectStorage.addGitRepoData(id, repoName, description || "", [], hashedKey || "");
+            this.ProjectStorage.addGitRepoData(
+                id,
+                repoName,
+                description || "",
+                [],
+                hashedKey || ""
+            );
             if (this.LocalPlanet) this.LocalPlanet.updateProjects();
         });
 

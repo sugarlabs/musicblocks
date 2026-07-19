@@ -33,8 +33,17 @@ class GitDropdownUI {
         // Fired whenever the user opens a different project so that the
         // "My Project" toolbar menu reflects the correct repo/key.
         window.addEventListener("message", e => {
-            if (e.data && e.data.type === "MB_GIT_STATE") {
+            if (!e.data) return;
+            if (e.data.type === "MB_GIT_STATE") {
                 this._applyGitState(e.data.repoName || "", e.data.hashedKey || "");
+            } else if (e.data.type === "MB_NEW_PROJECT") {
+                // User confirmed New Project from inside the planet iframe.
+                // Clear all git tracking immediately — same as _afterDelete in activity.js.
+                localStorage.removeItem("mbGitRepoName");
+                localStorage.removeItem("mbGitHashedKey");
+                localStorage.removeItem("mbGitLastSavedHash");
+                localStorage.removeItem("mbGitCurrentSha");
+                this.clearForNewProject();
             }
         });
 
@@ -138,6 +147,16 @@ class GitDropdownUI {
             btn.setAttribute("data-tooltip", tip);
             btn.setAttribute("aria-label", tip);
         }
+    }
+
+    /**
+     * Called by activity.js when the user starts a fresh new project.
+     * Clears all git tracking state so the new project starts with a clean slate.
+     */
+    clearForNewProject() {
+        // Invalidate any cached commit list from the previous project
+        this._prefetchPromise = null;
+        this._syncMenuState();
     }
 
     _bindButtons() {
@@ -561,7 +580,13 @@ class GitDropdownUI {
 
         // last stop — start flag (always shown; "Take me here" restores to origin)
         {
-            const isAtOrigin = !!(originSha && currentSha === originSha);
+            // A fresh project has no currentSha yet; if there are no visible user commits,
+            // the origin IS where the user currently is.
+            const isAtOrigin = originSha
+                ? currentSha
+                    ? currentSha === originSha
+                    : visibleCommits.length === 0
+                : false;
 
             const flagStop = document.createElement("div");
             const flagSide = visibleCommits.length % 2 === 0 ? "right" : "left";
@@ -587,17 +612,22 @@ class GitDropdownUI {
             const flagBtnRow = document.createElement("div");
             flagBtnRow.className = "git-tt-btn-row";
             if (isAtOrigin) {
-                const chip = document.createElement("span");
-                chip.className = "git-tt-now-chip";
-                chip.innerHTML = `<svg viewBox="0 0 24 24" fill="#5d4000" width="12" height="12"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z"/></svg> Your song right now`;
-                flagBtnRow.appendChild(chip);
+                // Only show the Clear Changes button — no "your song right now" chip
+                const clearOriginBtn = document.createElement("button");
+                clearOriginBtn.className = "git-tt-clear-btn";
+                clearOriginBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg> Clear Changes`;
+                clearOriginBtn.addEventListener("click", () => {
+                    close();
+                    this._clearChanges(originSha, "Start point");
+                });
+                flagBtnRow.appendChild(clearOriginBtn);
             } else if (originSha) {
                 const flagBtn = document.createElement("button");
                 flagBtn.className = "git-tt-go-btn";
                 flagBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Take me here`;
                 flagBtn.addEventListener("click", () => {
                     close();
-                    this._confirmTimeTravel(originSha, originMsg || "project start");
+                    this._confirmTimeTravel(originSha, "Start point");
                 });
                 flagBtnRow.appendChild(flagBtn);
             }
@@ -667,7 +697,7 @@ class GitDropdownUI {
         overlay.style.cssText = `position:fixed;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.45);z-index:${zBase};`;
 
         const frame = document.createElement("div");
-        frame.className = "windowFrame mb-system-dialog";
+        frame.className = "windowFrame mb-system-dialog git-system-dialog";
         frame.setAttribute("role", "dialog");
         frame.setAttribute("aria-modal", "true");
         frame.setAttribute("aria-label", title);
@@ -692,9 +722,8 @@ class GitDropdownUI {
         const body = document.createElement("div");
         body.className = "wfWinBody";
         const widget = document.createElement("div");
-        widget.className = "wfbWidget";
-        widget.style.cssText =
-            "padding:20px;display:flex;flex-direction:column;gap:16px;color:var(--fg);";
+        widget.className = "wfbWidget git-system-widget";
+        widget.style.cssText = "padding:20px;display:flex;flex-direction:column;gap:16px;";
         body.appendChild(widget);
 
         frame.appendChild(topBar);
@@ -818,7 +847,13 @@ class GitDropdownUI {
 
         const msgEl = document.createElement("p");
         msgEl.style.margin = "0";
-        msgEl.textContent = `This will erase everything you've done since your last save and restore "${commitMessage}". What would you like to do?`;
+        // Use a friendly label — never expose raw git commit messages like "Add metaData.json"
+        const displayLabel = /add (metadata|metaData|projectdata|projectData)\.json/i.test(
+            commitMessage
+        )
+            ? "Start point"
+            : commitMessage;
+        msgEl.textContent = `This will erase everything you've done since your last save and restore "${displayLabel}". What would you like to do?`;
 
         const actions = document.createElement("div");
         actions.style.cssText = "display:flex;flex-direction:column;gap:10px;";
@@ -887,7 +922,13 @@ class GitDropdownUI {
 
             this.onSaveLocally();
             localStorage.setItem("mbGitCurrentSha", sha);
-            this._showToast(`Restored: "${commitMessage}"`, "success");
+            // Use a friendly label — never expose raw git commit messages like "Add metaData.json"
+            const displayLabel = /add (metadata|metaData|projectdata|projectData)\.json/i.test(
+                commitMessage
+            )
+                ? "Start point"
+                : commitMessage;
+            this._showToast(`Restored: "${displayLabel}"`, "success");
         } catch (e) {
             console.error("[GitDropdownUI] restoreCommit error:", e);
             this._showToast("Could not restore that saved moment. Try again.", "error");
