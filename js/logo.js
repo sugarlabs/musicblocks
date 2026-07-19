@@ -1209,12 +1209,6 @@ class Logo {
         for (const arg in this.evalOnStopList) {
             this.safePluginExecute(this.evalOnStopList[arg], this);
         }
-
-        // Reset visual state (position, pen, skin) for each turtle
-        // so the next run starts from a clean slate.
-        for (const turtle in this.turtles.turtleList) {
-            this.turtles.getTurtle(turtle).painter.doClear(true, true, true);
-        }
     }
 
     /**
@@ -1240,6 +1234,13 @@ class Logo {
         }
 
         this._cleanupAfterCompletion();
+
+        // Reset drawing on explicit Stop.  Not inside _cleanupAfterCompletion
+        // because that also fires on natural completion where the drawing must
+        // be preserved for SVG/PNG export.
+        for (const turtle of this.turtles.turtleList) {
+            turtle.painter.doClear(true, true, true);
+        }
 
         // Stop the recorder if it was running (e.g. WAV export).  This is
         // intentionally NOT in _cleanupAfterCompletion because that method
@@ -1412,6 +1413,14 @@ class Logo {
 
         for (const turtle of this.turtles.turtleList) {
             turtle.embeddedGraphicsFinished = true;
+        }
+
+        // Clear previous drawings so each new run starts with a clean canvas.
+        // This must happen here, not inside _cleanupAfterCompletion, because
+        // that method also fires on natural completion where drawings are
+        // preserved for SVG/PNG export.
+        for (const turtle of this.turtles.turtleList) {
+            turtle.painter.doClear(true, true, true);
         }
 
         this.prepSynths();
@@ -2316,7 +2325,7 @@ class Logo {
                     }
 
                     // Give the last note time to play, then clean up stale
-                    // audio and visual state so the next run starts clean.
+                    // audio and transport state.
                     logo._lastNoteTimeout = logo._timerManager.setTimeout(() => {
                         logo._lastNoteTimeout = null;
                         tur.singer.runningFromEvent = false;
