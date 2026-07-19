@@ -154,6 +154,7 @@ requirejs.config({
                 "activity/plugin-controller",
                 "widgets/plugin-dialog",
                 "activity/toolbar-controller",
+                "activity/focus-cycle-manager",
                 "activity/toolbar-ui",
                 "activity/alert-controller",
                 "activity/alert-renderer",
