@@ -249,6 +249,7 @@ class GitDropdownUI {
             const savedKey = data.hashedKey || data.key || "";
             localStorage.setItem("mbGitRepoName", savedRepoName);
             localStorage.setItem("mbGitHashedKey", savedKey);
+            localStorage.setItem("mb_git_key_" + savedRepoName, savedKey);
             localStorage.removeItem("mbGitCurrentSha");
             this.onSaveLocally();
             this._syncMenuState();
