@@ -3479,6 +3479,43 @@ describe("actual drum lookup helpers", () => {
         expect(actualMusicUtils.getDrumSymbol("snare drum")).toBe("sn");
         expect(actualMusicUtils.getDrumSymbol("missing")).toBe("hh");
     });
+
+    describe("_parse_pitch_string", () => {
+        const _parse_pitch_string = actualMusicUtils._parse_pitch_string;
+        const SHARP = actualMusicUtils.SHARP || "♯";
+        const FLAT = actualMusicUtils.FLAT || "♭";
+        const DOUBLESHARP = actualMusicUtils.DOUBLESHARP || "𝄪";
+        const DOUBLEFLAT = actualMusicUtils.DOUBLEFLAT || "𝄫";
+
+        it("should parse standard pitches without accidentals", () => {
+            expect(_parse_pitch_string("C4")).toEqual(["C", 4]);
+            expect(_parse_pitch_string("A10")).toEqual(["A", 10]);
+        });
+
+        it("should parse pitches with single accidentals", () => {
+            expect(_parse_pitch_string("C#4")).toEqual(["C" + SHARP, 4]);
+            expect(_parse_pitch_string("Bb-1")).toEqual(["B" + FLAT, -1]);
+            expect(_parse_pitch_string("C" + SHARP + "4")).toEqual(["C" + SHARP, 4]);
+            expect(_parse_pitch_string("C" + FLAT + "4")).toEqual(["C" + FLAT, 4]);
+        });
+
+        it("should parse double accidentals using unicode or text", () => {
+            expect(_parse_pitch_string("F" + DOUBLESHARP + "5")).toEqual(["F" + DOUBLESHARP, 5]);
+            expect(_parse_pitch_string("C" + DOUBLEFLAT + "4")).toEqual(["C" + DOUBLEFLAT, 4]);
+            expect(_parse_pitch_string("Cx4")).toEqual(["C" + DOUBLESHARP, 4]);
+        });
+
+        it("should parse multiple accidentals that cancel out or combine", () => {
+            expect(_parse_pitch_string("C#b4")).toEqual(["C", 4]);
+            expect(_parse_pitch_string("D###4")).toEqual(["D" + SHARP + SHARP + SHARP, 4]);
+            expect(_parse_pitch_string("Ebbb2")).toEqual(["E" + FLAT + FLAT + FLAT, 2]);
+        });
+
+        it("should fallback when regex fails to match (e.g., missing octave)", () => {
+            expect(_parse_pitch_string("x")).toEqual(["x", 4]);
+            expect(_parse_pitch_string("X#")).toEqual(["X" + SHARP, 4]);
+        });
+    });
 });
 
 describe("_getStepSize freeze guard (non-12 EDO temperaments)", () => {
