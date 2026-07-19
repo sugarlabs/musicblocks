@@ -1220,11 +1220,36 @@ describe("Logo runLogoCommands", () => {
     test("fires _cleanupAfterCompletion when _lastNoteTimeout is cancelled on re-run", () => {
         logo._lastNoteTimeout = 42;
         logo._cleanupAfterCompletion = jest.fn();
+        logo._synthsInitialized = true;
 
         logo.runLogoCommands(null, null);
 
         expect(logo._cleanupAfterCompletion).toHaveBeenCalled();
         expect(logo._lastNoteTimeout).toBeNull();
+    });
+
+    test("pending _lastNoteTimeout triggers full synth teardown on re-run", () => {
+        const savedTone = global.Tone;
+        global.Tone = {
+            Transport: { cancel: jest.fn(), seconds: 0, start: jest.fn(), stop: jest.fn() },
+            UserMedia: savedTone.UserMedia
+        };
+
+        const stopSpy = jest.spyOn(logo.synth, "stop");
+        const disposeSpy = jest.spyOn(logo.synth, "disposeAllInstruments");
+        const cancelSpy = jest.spyOn(logo.synth.transport, "cancel");
+
+        logo._lastNoteTimeout = 77;
+        logo._synthsInitialized = true;
+
+        logo.runLogoCommands(null, null);
+
+        expect(stopSpy).toHaveBeenCalled();
+        expect(disposeSpy).toHaveBeenCalled();
+        expect(cancelSpy).toHaveBeenCalled();
+        expect(logo._synthsInitialized).toBe(false);
+
+        global.Tone = savedTone;
     });
 });
 
