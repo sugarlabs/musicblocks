@@ -1205,10 +1205,6 @@ class Logo {
         if (this.cameraID != null) {
             this.deps.utils.doStopVideoCam(this.cameraID, this.setCameraID);
         }
-
-        for (const arg in this.evalOnStopList) {
-            this.safePluginExecute(this.evalOnStopList[arg], this);
-        }
     }
 
     /**
@@ -1235,11 +1231,13 @@ class Logo {
 
         // Prevent _lastNoteTimeout from firing _cleanupAfterCompletion
         // again when the next run enters runLogoCommands.
-        if (this._lastNoteTimeout !== null) {
-            this._lastNoteTimeout = null;
-        }
+        this._lastNoteTimeout = null;
 
         this._cleanupAfterCompletion();
+
+        for (const arg in this.evalOnStopList) {
+            this.safePluginExecute(this.evalOnStopList[arg], this);
+        }
 
         // Reset drawing on explicit Stop.  Not inside _cleanupAfterCompletion
         // because that also fires on natural completion where the drawing must
