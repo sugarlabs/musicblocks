@@ -2540,7 +2540,14 @@ class Activity {
             localStorage.removeItem("mbGitLastSavedHash");
             localStorage.removeItem("mbGitCurrentSha");
             if (that.gitDropdownUI) {
-                that.gitDropdownUI._syncMenuState();
+                // clearForNewProject() resets the prefetch cache in addition
+                // to updating the menu — prevents old project's commits from
+                // appearing in Time Travel when starting a fresh project.
+                if (typeof that.gitDropdownUI.clearForNewProject === "function") {
+                    that.gitDropdownUI.clearForNewProject();
+                } else {
+                    that.gitDropdownUI._syncMenuState();
+                }
             }
 
             // Use the planet New Project mechanism if it is available
@@ -2566,9 +2573,6 @@ class Activity {
                 }, 1000);
             }
         };
-
-        /**
-
 
         this.justLoadStart = (...args) => this.projectManager.justLoadStart(...args);
 

@@ -354,15 +354,39 @@ class ProjectManager {
             that._doHardStopButton();
         }
 
+        // Clear the Git tracking for the new project — mirrors the
+        // same cleanup done in activity.js _afterDelete (which is only
+        // reached via a different code path).
+        localStorage.removeItem("mbGitRepoName");
+        localStorage.removeItem("mbGitHashedKey");
+        localStorage.removeItem("mbGitLastSavedHash");
+        localStorage.removeItem("mbGitCurrentSha");
+        if (that.gitDropdownUI && typeof that.gitDropdownUI.clearForNewProject === "function") {
+            that.gitDropdownUI.clearForNewProject();
+        } else if (that.gitDropdownUI && typeof that.gitDropdownUI._syncMenuState === "function") {
+            that.gitDropdownUI._syncMenuState();
+        }
+
         if (
             that.planet !== undefined &&
             that.planet.planet !== null &&
             that.planet.getCurrentProjectName() !== _("My Project")
         ) {
+            // Save the current project before switching away from it.
             that.planet.saveLocally();
+            // Create the new project slot and clear the canvas synchronously.
             that.planet.initialiseNewProject();
-            pm._loadStart(that);
-            that.planet.saveLocally();
+            // _loadStart is async: it fires loadNewBlocks and then emits
+            // "finishedLoading". We save the NEW project only after that
+            // event fires so we capture the fresh start blocks, not stale data.
+            pm._loadStart(that)
+                .then(() => {
+                    that.planet.saveLocally();
+                })
+                .catch(() => {
+                    // Best-effort — ignore if _loadStart rejects unexpectedly.
+                    that.planet.saveLocally();
+                });
         } else {
             that.toolbar.closeAuxToolbar((act, resize) => act._showHideAuxMenu(resize));
 
