@@ -73,6 +73,52 @@ describe("FocusCycleManager module", () => {
             manager.dispose();
         });
 
+        test("dispose removes exactly the (type, handler, capture) triples init adds", () => {
+            const added = [];
+            const removed = [];
+            const addSpy = jest
+                .spyOn(document, "addEventListener")
+                .mockImplementation((...args) => added.push(args));
+            const removeSpy = jest
+                .spyOn(document, "removeEventListener")
+                .mockImplementation((...args) => removed.push(args));
+
+            const manager = new FocusCycleManager();
+            manager.init();
+            manager.dispose();
+
+            expect(removed.length).toBe(added.length);
+            added.forEach(([type, fn, capture]) => {
+                const match = removed.find(
+                    ([rType, rFn, rCapture]) => rType === type && rFn === fn && rCapture === capture
+                );
+                expect(match).toBeDefined();
+            });
+
+            // After dispose, init must fully re-register (no partial init).
+            manager.init();
+            expect(added.length).toBe(6);
+
+            addSpy.mockRestore();
+            removeSpy.mockRestore();
+        });
+
+        test("the announcer node stays a singleton across instances and re-inits", () => {
+            const first = new FocusCycleManager();
+            const second = new FocusCycleManager();
+            first.init();
+            second.init();
+            first.dispose();
+            first.init();
+
+            expect(document.querySelectorAll("#fcm-announcer").length).toBe(1);
+            expect(first._liveRegion).toBe(second._liveRegion);
+
+            first.dispose();
+            expect(first._liveRegion).toBeNull();
+            second.dispose();
+        });
+
         test("dispose removes all document-level listeners so Tab no longer cycles", () => {
             const manager = new FocusCycleManager();
             manager.init();
