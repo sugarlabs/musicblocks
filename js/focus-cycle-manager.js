@@ -32,6 +32,7 @@ class FocusCycleManager {
         this._keyboardMode = false; // true only while Tab-navigating
         this._lastFocusedButton = null; // last toolbar button focused by keyboard
         this._liveRegion = null;
+        this._initialized = false; // guards against duplicate listener registration
 
         // Bind handlers so they can be removed if needed.
         this._onKeyDown = this._onKeyDown.bind(this);
@@ -40,6 +41,11 @@ class FocusCycleManager {
     }
 
     init() {
+        // Calling init() twice on the same instance must not register
+        // duplicate document-level listeners.
+        if (this._initialized) return;
+        this._initialized = true;
+
         // Capture phase so we intercept Tab before anything else.
         document.addEventListener("keydown", this._onKeyDown, true);
         // BUBBLE phase for mousedown — canvas and other elements receive
@@ -48,8 +54,13 @@ class FocusCycleManager {
         // Track last-focused toolbar button for memory restoration.
         document.addEventListener("focusin", this._onFocusIn, true);
 
-        // Visually-hidden ARIA live region for screen readers.
-        if (!document.getElementById("fcm-announcer")) {
+        // Visually-hidden ARIA live region for screen readers. Reattach the
+        // existing node if a previous instance already created it (e.g. after
+        // an init → dispose → init cycle) so announcements are not lost.
+        const existingRegion = document.getElementById("fcm-announcer");
+        if (existingRegion) {
+            this._liveRegion = existingRegion;
+        } else {
             const r = document.createElement("div");
             r.id = "fcm-announcer";
             r.setAttribute("aria-live", "polite");
@@ -468,6 +479,7 @@ class FocusCycleManager {
         document.removeEventListener("mousedown", this._onMouseDown, false);
         document.removeEventListener("focusin", this._onFocusIn, true);
         this._liveRegion = null;
+        this._initialized = false;
     }
 }
 
