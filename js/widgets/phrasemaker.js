@@ -3609,7 +3609,7 @@ class PhraseMaker {
      * @private
      */
     _addNotes(noteToDivide, notesToAdd) {
-        noteToDivide = parseInt(noteToDivide);
+        noteToDivide = parseInt(noteToDivide, 10);
         this._blockMapHelper = [];
         for (let i = 0; i <= noteToDivide; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [i]]);
