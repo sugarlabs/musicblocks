@@ -525,11 +525,17 @@ class ToolbarUI {
             onclick(this.activity);
             handleClick();
             stopIcon.style.color = this.stopIconColorWhenPlaying;
-            saveButton.disabled = true;
-            saveButtonAdvanced.disabled = true;
-            saveButton.className = "grey-text inactiveLink";
-            saveButtonAdvanced.className = "grey-text inactiveLink";
-            recordButton.className = "grey-text inactiveLink";
+            if (saveButton) {
+                saveButton.disabled = true;
+                saveButton.className = "grey-text inactiveLink";
+            }
+            if (saveButtonAdvanced) {
+                saveButtonAdvanced.disabled = true;
+                saveButtonAdvanced.className = "grey-text inactiveLink";
+            }
+            if (recordButton) {
+                recordButton.className = "grey-text inactiveLink";
+            }
             isPlayIconRunning = true;
             play_button_debounce_timeout = setTimeout(function () {
                 handleClick();
@@ -563,11 +569,17 @@ class ToolbarUI {
         stopIcon.onclick = () => {
             onclick(this.activity);
             stopIcon.style.color = "white";
-            saveButton.disabled = false;
-            saveButtonAdvanced.disabled = false;
-            saveButton.className = "";
-            saveButtonAdvanced.className = "";
-            recordButton.className = "";
+            if (saveButton) {
+                saveButton.disabled = false;
+                saveButton.className = "";
+            }
+            if (saveButtonAdvanced) {
+                saveButtonAdvanced.disabled = false;
+                saveButtonAdvanced.className = "";
+            }
+            if (recordButton) {
+                recordButton.className = "";
+            }
         };
     }
 
@@ -1035,7 +1047,7 @@ class ToolbarUI {
         this._cleanupRecordDropdownListeners();
 
         if (hideIn.includes(browser)) {
-            Record.classList.add("hide");
+            if (Record) Record.classList.add("hide");
             if (RecordDropdownArrow) RecordDropdownArrow.classList.add("hide");
             return;
         }
@@ -1717,13 +1729,16 @@ class ToolbarUI {
 
             // Set up click handlers for each language
             languages.forEach(lang => {
-                docById(lang).onclick = () => {
-                    // Update highlight to newly selected language
-                    updateSelectedLanguageHighlight(lang);
+                const elem = docById(lang);
+                if (elem) {
+                    elem.onclick = () => {
+                        // Update highlight to newly selected language
+                        updateSelectedLanguageHighlight(lang);
 
-                    // Call the original language change handler
-                    languageBox[`${lang}_onclick`](this.activity);
-                };
+                        // Call the original language change handler
+                        languageBox[`${lang}_onclick`](this.activity);
+                    };
+                }
             });
         };
     }

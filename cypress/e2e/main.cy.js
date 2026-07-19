@@ -1,15 +1,7 @@
 /* global Cypress, cy, before */
 
 Cypress.on("uncaught:exception", err => {
-    const ignored = [
-        "ResizeObserver loop limit exceeded",
-        "Cannot read properties of undefined",
-        "Cannot read properties of null",
-        "Cannot set properties of null",
-        "Cannot set properties of undefined",
-        "_ is not defined",
-        "Permissions check failed"
-    ];
+    const ignored = ["ResizeObserver loop limit exceeded"];
     return !ignored.some(msg => err.message.includes(msg));
 });
 
