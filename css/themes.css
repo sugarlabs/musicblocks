@@ -93,6 +93,13 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
     background-color: var(--color-bg-secondary) !important;
 }
 
+/* Override the above rule for our git/mb-dialog modals — they need fg text, not border-colour */
+.dark #floatingWindows > .windowFrame.mb-system-dialog > .wfWinBody .wfbWidget,
+.dark .mb-system-dialog .wfbWidget {
+    color: var(--fg) !important;
+    background-color: var(--panel-bg) !important;
+}
+
 .dark .popupMsg {
     background-color: var(--color-brand-primary-hover);
     color: var(--color-text-secondary);
@@ -542,6 +549,13 @@ body.highcontrast {
 .highcontrast #floatingWindows > .windowFrame > .wfWinBody .wfbWidget {
     color: var(--color-text-inverse) !important;
     background-color: var(--color-text-inverse) !important;
+}
+
+/* Override the above for our git/mb-dialog modals — they need fg text on dark bg */
+.highcontrast #floatingWindows > .windowFrame.mb-system-dialog > .wfWinBody .wfbWidget,
+.highcontrast .mb-system-dialog .wfbWidget {
+    color: #fff !important;
+    background-color: #000 !important;
 }
 
 .highcontrast .popupMsg {
@@ -1056,6 +1070,7 @@ body.highcontrast {
     color: #ffff00 !important;
 }
 
+
 .highcontrast .git-timeline-go-back-btn:hover:not(:disabled) {
     background: #ffff00 !important;
     color: #000 !important;
@@ -1065,3 +1080,191 @@ body.highcontrast {
     background: #00ff00 !important;
     color: #000 !important;
 }
+
+/* ==========================================================================
+   MBDialog (alert / prompt modals) — dark & high-contrast
+   ========================================================================== */
+
+/* Message text inherits --fg via widget.style.color in mb-dialog.js already,
+   but ensure it overrides any computed white-on-white / black-on-black */
+.dark .mb-system-dialog .wfbWidget,
+.dark .mb-system-dialog .wfbWidget p,
+.dark .mb-system-dialog .wfbWidget div {
+    color: var(--fg) !important;
+    background-color: var(--panel-bg) !important;
+}
+
+.highcontrast .mb-system-dialog .wfbWidget,
+.highcontrast .mb-system-dialog .wfbWidget p,
+.highcontrast .mb-system-dialog .wfbWidget div {
+    color: var(--fg) !important;
+    background-color: var(--panel-bg) !important;
+}
+
+/* Input field inside MBDialog prompt */
+.dark .mb-system-dialog input[type="text"] {
+    background-color: #2a2a2d !important;
+    color: #f0f0f0 !important;
+    border-color: #555 !important;
+}
+
+.highcontrast .mb-system-dialog input[type="text"] {
+    background-color: #000 !important;
+    color: #fff !important;
+    border-color: #fff !important;
+}
+
+/* Confirm / OK buttons */
+.dark .mb-system-dialog .confirm-button {
+    background-color: #1565c0 !important;
+    color: #fff !important;
+    border: none !important;
+}
+.dark .mb-system-dialog .confirm-button:hover {
+    background-color: #1976d2 !important;
+}
+
+.highcontrast .mb-system-dialog .confirm-button {
+    background-color: #ffff00 !important;
+    color: #000 !important;
+    border: 2px solid #fff !important;
+}
+.highcontrast .mb-system-dialog .confirm-button:hover {
+    background-color: #e0e000 !important;
+}
+
+/* Cancel buttons */
+.dark .mb-system-dialog .cancel-button {
+    background-color: #3a3a3d !important;
+    color: #e0e0e0 !important;
+    border: 1px solid #555 !important;
+}
+.dark .mb-system-dialog .cancel-button:hover {
+    background-color: #afafaf;
+}
+
+/* In dark/HC modes the hardcoded 'color: black' on .cancel-button is invisible */
+.dark .cancel-button,
+.highcontrast .cancel-button {
+    color: var(--fg) !important;
+    background-color: var(--color-bg-tertiary, #3a3a3d) !important;
+}
+.dark .cancel-button:hover,
+.highcontrast .cancel-button:hover {
+    background-color: #5a5a5d !important;
+}
+
+.highcontrast .mb-system-dialog .cancel-button {
+    background-color: #000 !important;
+    color: #fff !important;
+    border: 2px solid #fff !important;
+}
+.highcontrast .mb-system-dialog .cancel-button:hover {
+    background-color: #333 !important;
+}
+
+/* ==========================================================================
+   git-system-dialog (Clear Changes / Unsaved Work guard dialogs)
+   ========================================================================== */
+
+.dark .git-system-dialog,
+.dark .git-system-widget {
+    background-color: var(--bg) !important;
+    color: var(--fg) !important;
+}
+
+.dark .git-system-widget p,
+.dark .git-system-widget span {
+    color: var(--fg) !important;
+}
+
+.highcontrast .git-system-dialog,
+.highcontrast .git-system-widget {
+    background-color: #000 !important;
+    color: #fff !important;
+}
+
+.highcontrast .git-system-widget p,
+.highcontrast .git-system-widget span {
+    color: #fff !important;
+}
+
+/* Discard / destructive button in guard dialogs */
+.dark .git-guard-discard-btn {
+    border-color: #ef5350 !important;
+    color: #ef5350 !important;
+    background-color: transparent !important;
+}
+.dark .git-guard-discard-btn:hover {
+    background-color: #ef5350 !important;
+    color: #fff !important;
+}
+
+.highcontrast .git-guard-discard-btn {
+    border-color: #ff6b6b !important;
+    color: #ff6b6b !important;
+    background-color: #000 !important;
+}
+.highcontrast .git-guard-discard-btn:hover {
+    background-color: #ff6b6b !important;
+    color: #000 !important;
+}
+
+/* ==========================================================================
+   Time Travel panel — dark & high-contrast
+   ========================================================================== */
+
+/* Body / background */
+.dark .git-tt-body   { background: #111827; }
+.dark .git-tt-wrap   { /* no extra bg needed — body covers it */ }
+
+/* Flag note ("The very beginning") */
+.dark .git-tt-flag-note   { color: #6b7280; }
+.highcontrast .git-tt-flag-note { color: #aaa !important; }
+
+/* Date text */
+.dark .git-tt-date-text   { color: #6b7280; }
+.highcontrast .git-tt-date-text { color: #ccc !important; }
+
+/* Node border */
+.highcontrast .git-tt-node { border-color: #000 !important; }
+
+/* Latest badge */
+.dark .git-tt-latest-badge         { background: #1565c0; color: #fff; }
+.highcontrast .git-tt-latest-badge { background: #00ff00 !important; color: #000 !important; }
+
+/* YOU ARE HERE badge */
+.dark .git-tt-you-here {
+    background: #fdd835;
+    color: #5d4000;
+}
+.highcontrast .git-tt-you-here {
+    background: #ffff00 !important;
+    color: #000 !important;
+    border: 1px solid #000 !important;
+}
+
+/* Top-bar title/subtitle */
+.highcontrast .git-tt-title    { color: #fff !important; }
+.highcontrast .git-tt-subtitle { color: #ccc !important; }
+.highcontrast .git-tt-topbar {
+    background: #000 !important;
+    border-bottom-color: #fff !important;
+}
+.highcontrast .git-tt-frame  { background: #000 !important; }
+.highcontrast .git-tt-body   { background: #111 !important; }
+.highcontrast .git-tt-msg    { color: #fff !important; }
+
+/* Go / Clear buttons — high contrast */
+.highcontrast .git-tt-go-btn {
+    background: #ffff00 !important;
+    color: #000 !important;
+    box-shadow: 0 3px 0 #b8b800, 0 6px 12px rgba(255,255,0,0.2) !important;
+}
+.highcontrast .git-tt-clear-btn {
+    background: #ff4444 !important;
+    color: #fff !important;
+    box-shadow: 0 3px 0 #990000, 0 6px 12px rgba(255,0,0,0.2) !important;
+}
+
+
