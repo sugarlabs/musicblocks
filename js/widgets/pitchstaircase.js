@@ -796,6 +796,13 @@ class PitchStaircase {
 
         widgetWindow.addButton("erase-button.svg", PitchStaircase.ICONSIZE, _("Clear")).onclick =
             () => {
+                if (this._isPlayingScale) {
+                    this._scaleStopped = true;
+                    clearTimeout(this._scaleTimeout);
+                    this._setButtonIcon(this._playScaleButton, "play-scale.svg", _("Play scale"));
+                    this._isPlayingScale = false;
+                }
+                this.activity.logo.synth.stop();
                 while (this._undo());
             };
 
