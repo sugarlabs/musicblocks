@@ -9,6 +9,7 @@
  * (at your option) any later version.
  */
 
+const DomHelpers = require("../dom-helpers.js");
 const {
     docByClass,
     docByTagName,
@@ -18,7 +19,7 @@ const {
     hideDOMLabel,
     displayMsg,
     closeWidgets
-} = require("../dom-helpers.js");
+} = DomHelpers;
 
 describe("DOM query helpers", () => {
     beforeEach(() => {
@@ -126,35 +127,18 @@ describe("compatibility export via utils.js", () => {
     // that accidentally re-implements rather than re-exports gets caught.
     const utils = require("../utils.js");
 
-    it("utils.docById is the same function as dom-helpers' docById", () => {
-        expect(utils.docById).toBe(docById);
-    });
-
-    it("utils.docByClass is the same function as dom-helpers' docByClass", () => {
-        expect(utils.docByClass).toBe(docByClass);
-    });
-
-    it("utils.docByTagName is the same function as dom-helpers' docByTagName", () => {
-        expect(utils.docByTagName).toBe(docByTagName);
-    });
-
-    it("utils.docByName is the same function as dom-helpers' docByName", () => {
-        expect(utils.docByName).toBe(docByName);
-    });
-
-    it("utils.docBySelector is the same function as dom-helpers' docBySelector", () => {
-        expect(utils.docBySelector).toBe(docBySelector);
-    });
-
-    it("utils.hideDOMLabel is the same function as dom-helpers' hideDOMLabel", () => {
-        expect(utils.hideDOMLabel).toBe(hideDOMLabel);
-    });
-
-    it("utils.displayMsg is the same function as dom-helpers' displayMsg", () => {
-        expect(utils.displayMsg).toBe(displayMsg);
-    });
-
-    it("utils.closeWidgets is the same function as dom-helpers' closeWidgets", () => {
-        expect(utils.closeWidgets).toBe(closeWidgets);
+    [
+        "docById",
+        "docByClass",
+        "docByTagName",
+        "docByName",
+        "docBySelector",
+        "hideDOMLabel",
+        "displayMsg",
+        "closeWidgets"
+    ].forEach(name => {
+        it(`utils.${name} is the same function as dom-helpers' ${name}`, () => {
+            expect(utils[name]).toBe(DomHelpers[name]);
+        });
     });
 });
