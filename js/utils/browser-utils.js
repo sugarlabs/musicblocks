@@ -149,6 +149,12 @@ if (typeof module !== "undefined" && module.exports) {
 }
 
 if (typeof window !== "undefined") {
+    // BrowserUtils is what the RequireJS shim reads via `exports`. The
+    // individual globals are required for compatibility: the callers are
+    // classic scripts that invoke these by bare name (fnBrowserDetect() in
+    // js/toolbar-ui.js, doBrowserCheck() in js/activity.js) rather than
+    // receiving an injected module, so removing them would break the app.
+    // This matches how utils-logic.js and dom-helpers.js publish their own.
     window.BrowserUtils = BrowserUtils;
     Object.assign(window, BrowserUtils);
 }
