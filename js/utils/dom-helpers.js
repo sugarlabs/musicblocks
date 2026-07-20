@@ -136,5 +136,12 @@ if (typeof module !== "undefined" && module.exports) {
 // requiring the module under test.
 if (typeof window !== "undefined" && (typeof module === "undefined" || !module.exports)) {
     window.DomHelpers = DomHelpers;
-    Object.assign(window, DomHelpers);
+    window.docByClass = docByClass;
+    window.docByTagName = docByTagName;
+    window.docById = docById;
+    window.docByName = docByName;
+    window.docBySelector = docBySelector;
+    window.hideDOMLabel = hideDOMLabel;
+    window.displayMsg = displayMsg;
+    window.closeWidgets = closeWidgets;
 }
