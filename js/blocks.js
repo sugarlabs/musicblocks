@@ -774,6 +774,7 @@ class Blocks {
          */
         this._getBlockSize = blk => {
             const myBlock = this.blockList[blk];
+            if (myBlock === undefined) return 0;
             /** Special case for collapsed note blocks. */
             if (["newnote", "interval", "osctime"].includes(myBlock.name) && myBlock.collapsed) {
                 return 1;
