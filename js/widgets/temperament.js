@@ -762,23 +762,23 @@ function TemperamentWidget() {
         const menuItems = document.querySelectorAll("#menuLabels");
         for (let i = 0; i < menuLabels.length; i++) {
             menuItems[i].style.background = platformColor.labelColor;
-            menuItems[i].style.height = 30 + "px";
+            menuItems[i].style.height = "30px";
             menuItems[i].style.textAlign = "center";
             menuItems[i].style.fontWeight = "bold";
-            if (isCustomTemperament(this.inTemperament)) {
-                menuItems[0].style.width = 40 + "px";
-                menuItems[1].style.width = 120 + "px";
-                menuItems[2].style.width = 120 + "px";
-                menuItems[3].style.width = 140 + "px";
-            } else {
-                menuItems[0].style.width = 40 + "px";
-                menuItems[1].style.width = 40 + "px";
-                menuItems[2].style.width = 60 + "px";
-                menuItems[3].style.width = 120 + "px";
-                menuItems[4].style.width = 50 + "px";
-                menuItems[5].style.width = 100 + "px";
-                menuItems[6].style.width = 95 + "px";
-            }
+        }
+        if (isCustomTemperament(this.inTemperament)) {
+            menuItems[0].style.width = "40px";
+            menuItems[1].style.width = "120px";
+            menuItems[2].style.width = "120px";
+            menuItems[3].style.width = "140px";
+        } else {
+            menuItems[0].style.width = "40px";
+            menuItems[1].style.width = "40px";
+            menuItems[2].style.width = "60px";
+            menuItems[3].style.width = "120px";
+            menuItems[4].style.width = "50px";
+            menuItems[5].style.width = "100px";
+            menuItems[6].style.width = "95px";
         }
         const trGraph = document.createElement("tr");
         const tdGraph = document.createElement("td");

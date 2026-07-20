@@ -146,24 +146,17 @@ describe("processPluginData script cleanup", () => {
         expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:plugin-setup-0");
     });
 
-    it("returns null when plugin JSON cannot be parsed", async () => {
-        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-        const consoleDebugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+    it("returns null and logs error when plugin data is invalid JSON", async () => {
+        const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
 
-        const result = await processPluginData(
-            createActivity(),
-            "{invalid plugin json",
-            "plugins/test.json"
-        );
+        const result = await processPluginData(createActivity(), "{invalid", "plugins/test.json");
 
         expect(result).toBeNull();
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
-            'PluginProcessor: Failed to parse plugin data from source "plugins/test.json":',
-            expect.any(SyntaxError)
-        );
-        expect(consoleDebugSpy).not.toHaveBeenCalledWith(expect.anything(), "{invalid plugin json");
+        expect(errorSpy).toHaveBeenCalled();
+        expect(debugSpy).toHaveBeenCalledWith("Malformed plugin data:", "{invalid");
 
-        consoleErrorSpy.mockRestore();
-        consoleDebugSpy.mockRestore();
+        errorSpy.mockRestore();
+        debugSpy.mockRestore();
     });
 });

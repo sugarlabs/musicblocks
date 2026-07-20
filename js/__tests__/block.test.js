@@ -213,6 +213,29 @@ describe("Block Foundation", () => {
             expect(block.isNoHitBlock()).toBe(false);
         });
 
+        it("isNoteContainer() should return true from capability metadata", () => {
+            mockProtoBlock.capabilities.noteContainer = true;
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.isNoteContainer()).toBe(true);
+        });
+
+        it("isNoteContainer() should respect explicit false metadata", () => {
+            mockProtoBlock.name = "newnote";
+            mockProtoBlock.capabilities.noteContainer = false;
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.isNoteContainer()).toBe(false);
+        });
+
+        it("isNoteContainer() should return false for ordinary blocks", () => {
+            mockProtoBlock.name = "forward";
+            mockProtoBlock.capabilities = Object.create(null);
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.isNoteContainer()).toBe(false);
+        });
+
         it("copySize() should sync size from protoblock", () => {
             mockProtoBlock.size = 5;
             const block = new Block(mockProtoBlock, mockBlocks);

@@ -55,8 +55,11 @@ requirejs.config({
         "utils/utils-logic": {
             exports: "UtilsLogic"
         },
+        "utils/dom-helpers": {
+            exports: "DomHelpers"
+        },
         "utils/utils": {
-            deps: ["utils/platformstyle", "utils/utils-logic"],
+            deps: ["utils/platformstyle", "utils/utils-logic", "utils/dom-helpers"],
             exports: "_"
         },
         "utils/retryWithBackoff": {
@@ -74,8 +77,21 @@ requirejs.config({
             deps: ["activity/turtledefs", "utils/retryWithBackoff"],
             exports: "Block"
         },
+        "activity/connection-validator": {
+            exports: "ConnectionValidator"
+        },
+        "activity/block-drag-controller": {
+            deps: ["activity/block-constants"],
+            exports: "setupBlockDragController"
+        },
         "activity/blocks": {
-            deps: ["activity/block", "activity/pubsub"],
+            deps: [
+                "activity/block",
+                "activity/pubsub",
+                "activity/block-constants",
+                "activity/connection-validator",
+                "activity/block-drag-controller"
+            ],
             exports: "Blocks"
         },
         "activity/turtle-singer": {
@@ -147,12 +163,14 @@ requirejs.config({
                 "palette/palette-loader",
                 "activity/search-controller",
                 "activity/workspace-layout-controller",
+                "activity/block-scale-controller",
                 "search-ui",
                 "project-manager",
                 "keyboard-controller",
                 "activity/selection-controller",
                 "activity/trash-controller",
-                "activity/help-controller"
+                "activity/help-controller",
+                "activity/context-menu-controller"
             ],
             exports: "Activity"
         },
