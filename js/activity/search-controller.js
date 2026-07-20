@@ -285,7 +285,7 @@ class SearchController {
                     const term = (request.term || "").toLowerCase().trim();
                     response(that.filterSuggestions(term));
                 },
-                delay: 200,
+                delay: 400,
                 appendTo: "body",
                 select: (event, ui) => {
                     event.preventDefault();
@@ -670,7 +670,7 @@ class SearchController {
                     const term = (request.term || "").toLowerCase().trim();
                     response(that.filterSuggestions(term));
                 },
-                delay: 200,
+                delay: 400,
                 appendTo: "body",
                 select: (event, ui) => {
                     event.preventDefault();
