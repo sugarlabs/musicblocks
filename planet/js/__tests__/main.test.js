@@ -7,7 +7,6 @@
 
 "use strict";
 
-// Mock the Planet class
 class PlanetMock {
     constructor(isMusicBlocks, storage) {
         this.isMusicBlocks = isMusicBlocks;
@@ -23,7 +22,6 @@ class PlanetMock {
 PlanetMock.instances = [];
 global.Planet = PlanetMock;
 
-// Mock window.parent as a separate object for the security origin check
 const mockParent = {};
 Object.defineProperty(window, "parent", {
     value: mockParent,
@@ -31,8 +29,6 @@ Object.defineProperty(window, "parent", {
     configurable: true
 });
 
-// Require the file under test. This executes the top-level script,
-// including registering the window.message event listener.
 require("../main.js");
 
 describe("main.js", () => {
@@ -64,7 +60,7 @@ describe("main.js", () => {
         it("should ignore events not originating from window.parent", () => {
             const event = new MessageEvent("message", {
                 data: { type: "MB_PLATFORM_COLOR", payload: { orange: "#ff5722" } },
-                source: window // not window.parent
+                source: window
             });
             window.dispatchEvent(event);
 
@@ -73,7 +69,7 @@ describe("main.js", () => {
 
         it("should ignore messages with empty or invalid type", () => {
             const event = new MessageEvent("message", {
-                data: { payload: { orange: "#ff5722" } }, // missing type
+                data: { payload: { orange: "#ff5722" } },
                 source: window.parent
             });
             window.dispatchEvent(event);
@@ -122,6 +118,44 @@ describe("main.js", () => {
             expect(document.body.classList.contains("another-class")).toBe(true);
             expect(document.body.classList.contains("new-theme")).toBe(true);
             expect(document.body.classList.contains("extra-class")).toBe(true);
+        });
+
+        it("should ignore MB_PLATFORM_COLOR messages with missing or null payloads", () => {
+            const event = new MessageEvent("message", {
+                data: { type: "MB_PLATFORM_COLOR", payload: null },
+                source: window.parent
+            });
+            window.dispatchEvent(event);
+
+            expect(window._mbPlatformColor).toBeUndefined();
+        });
+
+        it("should ignore MB_BLOCK_NAMES messages with missing or null payloads", () => {
+            const event = new MessageEvent("message", {
+                data: { type: "MB_BLOCK_NAMES", payload: null },
+                source: window.parent
+            });
+            window.dispatchEvent(event);
+
+            expect(window._mbBlockDisplayNames).toBeUndefined();
+        });
+
+        it("should handle MB_APPLY_THEME safely if add/remove are non-arrays or missing", () => {
+            document.body.classList.add("baseline-theme");
+
+            const event = new MessageEvent("message", {
+                data: {
+                    type: "MB_APPLY_THEME",
+                    payload: {
+                        add: "not-an-array"
+                    }
+                },
+                source: window.parent
+            });
+            window.dispatchEvent(event);
+
+            expect(document.body.classList.contains("baseline-theme")).toBe(true);
+            expect(document.body.classList.contains("not-an-array")).toBe(false);
         });
     });
 });
