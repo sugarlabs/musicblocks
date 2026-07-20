@@ -1145,25 +1145,20 @@ class Logo {
     }
 
     /**
-     * Stops the turtles and cleans up a few odds and ends.
-     * The stop button was pressed.
+     * Cleans up audio, transport, and visual state after a run has fully
+     * completed — either naturally (via _lastNoteTimeout) or on explicit stop.
+     *
+     * This is the shared subset of doStopTurtles that is safe to call from
+     * the deferred natural-completion path.  It does NOT set stopTurtle,
+     * cancel managed timers, or reset UI — those belong only in
+     * doStopTurtles when the user presses Stop.
      *
      * @returns {void}
      */
-    doStopTurtles() {
-        this.stopTurtle = true;
-        this.turtles.markAllAsStopped();
-
-        // Cancel ALL pending managed timers to prevent zombie turtle graphics,
-        // phantom sounds, and stale block highlighting. This is the primary
-        // mechanism for the zombie-timer fix — every setTimeout dispatched by
-        // dispatchTurtleSignals, runFromBlock, and runFromBlockNow is tracked
-        // by _timerManager, so clearAll() cancels them in one sweep.
-        const cancelledTimers = this._timerManager.clearAll();
-        if (cancelledTimers > 0) {
-            console.debug(
-                "ManagedTimer: cancelled " + cancelledTimers + " pending timer(s) on stop"
-            );
+    _cleanupAfterCompletion() {
+        // Skip if cleanup already ran (two turtles finishing far apart).
+        if (!this._synthsInitialized && this.sounds.length === 0) {
+            return;
         }
 
         for (const sound in this.sounds) {
@@ -1186,8 +1181,6 @@ class Logo {
             if (comp) {
                 const compTurtle = this.turtles.getTurtle(comp);
                 compTurtle.running = false;
-                // Null tur.interval after cancel to prevent stale-ID no-op
-                // on next onEveryBeatDo registration (MeterActions.js ~253).
                 if (compTurtle.interval !== undefined) {
                     if (!this._timerManager.clearInterval(compTurtle.interval)) {
                         clearInterval(compTurtle.interval);
@@ -1197,30 +1190,19 @@ class Logo {
             }
         }
 
-        // Cancel all Transport-scheduled events before synth.stop()
+        // Cancel Transport-scheduled events and reset position
         if (this.synth.transport.isAvailable) {
             this.synth.transport.cancel();
+            this.synth.transport.seconds = 0;
         }
 
-        // Reset per-turtle Transport scheduling state
-        for (const turtle of this.activity.turtles.turtleList) {
-            turtle._transportTime = null;
-            turtle._transportEventId = null;
+        for (const t of this.activity.turtles.turtleList) {
+            t._transportTime = null;
+            t._transportEventId = null;
         }
 
         this.synth.stop();
 
-        // Reset Transport position for next run
-        if (this.synth.transport.isAvailable) {
-            this.synth.transport.seconds = 0;
-        }
-
-        if (this.synth.recorder && this.synth.recorder.state === "recording")
-            this.synth.recorder.stop();
-
-        // Dispose all Tone.js instruments to free decoded AudioBuffers
-        // and Web Audio nodes. They will be re-created by prepSynths()
-        // on the next run.
         this.synth.disposeAllInstruments();
         this._synthsInitialized = false;
 
@@ -1228,10 +1210,45 @@ class Logo {
         if (this.cameraID != null) {
             this.deps.utils.doStopVideoCam(this.cameraID, this.setCameraID);
         }
+    }
+
+    /**
+     * Stops the turtles and cleans up a few odds and ends.
+     * The stop button was pressed.
+     *
+     * @returns {void}
+     */
+    doStopTurtles() {
+        this.stopTurtle = true;
+        this.turtles.markAllAsStopped();
+
+        // Cancel all pending timers to prevent zombie graphics and sounds.
+        const cancelledTimers = this._timerManager.clearAll();
+        if (cancelledTimers > 0) {
+            console.debug(
+                "ManagedTimer: cancelled " + cancelledTimers + " pending timer(s) on stop"
+            );
+        }
+
+        // Prevent stale timeout from firing cleanup on next run.
+        this._lastNoteTimeout = null;
+
+        this._cleanupAfterCompletion();
 
         for (const arg in this.evalOnStopList) {
             this.safePluginExecute(this.evalOnStopList[arg], this);
         }
+
+        // Clear canvas on explicit Stop only — natural completion
+        // preserves drawings for SVG/PNG export.
+        for (const turtle of this.turtles.turtleList) {
+            turtle.painter.doClear(true, true, true);
+        }
+
+        // Recorder stop is Stop-only — natural completion must not
+        // interrupt an in-progress WAV recording.
+        if (this.synth.recorder && this.synth.recorder.state === "recording")
+            this.synth.recorder.stop();
 
         this.onStopTurtle();
         this.blocks.bringToTop();
@@ -1352,8 +1369,10 @@ class Logo {
 
         // eslint-disable-next-line eqeqeq
         if (this._lastNoteTimeout != null) {
-            clearTimeout(this._lastNoteTimeout);
+            this._timerManager.clearTimeout(this._lastNoteTimeout);
             this._lastNoteTimeout = null;
+            // Previous run's cleanup never fired — run it now.
+            this._cleanupAfterCompletion();
         }
 
         this._restoreConnections(); // Restore any broken connections.
@@ -2296,23 +2315,21 @@ class Logo {
                         }
                     }
 
-                    // Execute plugin stop callbacks so cleanup runs
-                    // consistently whether the user presses Stop or
-                    // playback finishes normally (mirrors doStopTurtles).
-                    for (const arg in logo.evalOnStopList) {
-                        logo.safePluginExecute(logo.evalOnStopList[arg], logo);
+                    // Wait a beat for the last note, then clean up.
+                    // Cancel any pending timer from a previous turtle.
+                    if (logo._lastNoteTimeout !== null) {
+                        logo._timerManager.clearTimeout(logo._lastNoteTimeout);
                     }
-
-                    // Clear stale sound references left after natural
-                    // completion (mirrors doStopTurtles).
-                    logo.sounds = [];
-
-                    // Give the last note time to play.
                     logo._lastNoteTimeout = logo._timerManager.setTimeout(() => {
                         logo._lastNoteTimeout = null;
                         tur.singer.runningFromEvent = false;
                         if (tur.singer.suppressOutput && logo.recording) {
                             tur.singer.suppressOutput = false;
+                        }
+                        // Skip if a new run already started or another
+                        // turtle's callback already cleaned up.
+                        if (!logo.turtles.running()) {
+                            logo._cleanupAfterCompletion();
                         }
                     }, 1000);
                 }
