@@ -160,6 +160,40 @@ Follow these steps when contributing:
 
 7.  Respond to review feedback and update your branch as needed.
 
+### Draft Pull Requests
+
+Draft pull requests are for work that is still in progress. Opening
+one early is encouraged — it shares your progress, makes your work
+visible so others don't duplicate it, and is a good way to ask for
+occasional high-level feedback on your direction.
+
+While a PR is in draft, maintainers are not expected to perform a full
+code review; feedback, when given, is usually brief and high-level.
+Comprehensive review should generally be expected only after the PR is
+marked **Ready for Review**.
+
+When you believe your work is complete, tested, and ready for detailed
+review, convert the PR from draft to **Ready for Review**. This is the
+signal maintainers use to begin a thorough review.
+
+### Review Expectations
+
+Maintainers and reviewers decide when and how to review based on
+project priorities and reviewer availability.
+
+- Avoid repeatedly requesting full reviews while a PR is still marked
+  as draft.
+- Review comments should remain focused on improving the code.
+
+### Respectful Communication
+
+Keep discussions professional, respectful, and focused on the code.
+
+- If there is disagreement about the review process, discuss it calmly
+  without personal arguments.
+- Avoid confrontational language and assume good intent from everyone
+  involved.
+
 ### Reviews and Area Ownership
 
 All reviews are welcome. Reviewing pull requests is a good way to help the
