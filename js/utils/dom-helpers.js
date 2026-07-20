@@ -10,12 +10,15 @@
  */
 
 /**
- * Migration note:
- * These DOM helper functions were extracted from js/utils/utils.js so that
- * document-access utilities live in one place, separate from the pure logic
- * functions in js/utils/utils-logic.js. They are loaded as a RequireJS
- * dependency of utils/utils and assigned to window globals, matching the
- * existing utils-logic.js pattern.
+ * DOM utility helpers used throughout Music Blocks: element lookups
+ * (docById, docByClass, docByName, docBySelector, docByTagName) and a
+ * couple of small widget/label helpers (hideDOMLabel, closeWidgets) that
+ * are grouped here for the same reason. displayMsg is a legacy no-op that
+ * predates the current message/alert system; it's kept alongside these
+ * rather than in utils.js because its original implementation was a DOM
+ * helper (toggling a message container's visibility) even though it does
+ * nothing today. Loaded as a RequireJS dependency of utils/utils and
+ * assigned to window globals, matching the utils-logic.js pattern.
  */
 
 /* exported
@@ -113,7 +116,7 @@ function closeWidgets() {
     names.forEach(name => window.widgetWindows.closeWindow(name));
 }
 
-const DomHelpers = {
+var DomHelpers = {
     docByClass,
     docByTagName,
     docById,
