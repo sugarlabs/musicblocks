@@ -1,7 +1,11 @@
 name: Lighthouse CI
 
 on:
-  pull_request_target:
+  # This workflow builds and executes the PR's own code (npm ci runs lifecycle
+  # scripts from the branch, and Lighthouse loads the built app). That must not
+  # happen in the trusted pull_request_target context, so it runs as
+  # pull_request: an unprivileged, read-only context with no repository secrets.
+  pull_request:
     types: [opened, synchronize, reopened]
   push:
     branches: [master]
@@ -103,7 +107,10 @@ jobs:
           echo "SEO_EMOJI=$(get_emoji '${{ steps.parse.outputs.SEO_SCORE }}')" >> $GITHUB_OUTPUT
 
       - name: Comment on PR
-        if: github.event_name == 'pull_request'
+        # Fork PRs get a read-only GITHUB_TOKEN under pull_request, so posting a
+        # comment would fail. Scores stay available to every PR through the
+        # uploaded .lighthouseci/ artifact below.
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         uses: thollander/actions-comment-pull-request@v3
         with:
           message: |
