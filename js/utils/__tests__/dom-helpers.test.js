@@ -29,29 +29,43 @@ describe("DOM query helpers", () => {
         document.querySelector = jest.fn(() => null);
     });
 
-    it("docById delegates to getElementById", () => {
-        docById("test");
+    it("docById delegates to getElementById and returns its result", () => {
+        const element = { id: "test" };
+        document.getElementById = jest.fn(() => element);
+        expect(docById("test")).toBe(element);
         expect(document.getElementById).toHaveBeenCalledWith("test");
     });
 
-    it("docByClass delegates to getElementsByClassName", () => {
-        docByClass("myClass");
+    it("docByClass delegates to getElementsByClassName and returns its result", () => {
+        const elements = [{ className: "myClass" }];
+        document.getElementsByClassName = jest.fn(() => elements);
+        expect(docByClass("myClass")).toBe(elements);
         expect(document.getElementsByClassName).toHaveBeenCalledWith("myClass");
     });
 
-    it("docByTagName delegates to getElementsByTagName", () => {
-        docByTagName("div");
+    it("docByTagName delegates to getElementsByTagName and returns its result", () => {
+        const elements = [{ tagName: "DIV" }];
+        document.getElementsByTagName = jest.fn(() => elements);
+        expect(docByTagName("div")).toBe(elements);
         expect(document.getElementsByTagName).toHaveBeenCalledWith("div");
     });
 
-    it("docByName delegates to getElementsByName", () => {
-        docByName("field");
+    it("docByName delegates to getElementsByName and returns its result", () => {
+        const elements = [{ name: "field" }];
+        document.getElementsByName = jest.fn(() => elements);
+        expect(docByName("field")).toBe(elements);
         expect(document.getElementsByName).toHaveBeenCalledWith("field");
     });
 
-    it("docBySelector delegates to querySelector", () => {
-        docBySelector("#app > .main");
+    it("docBySelector delegates to querySelector and returns its result", () => {
+        const element = { matches: "#app > .main" };
+        document.querySelector = jest.fn(() => element);
+        expect(docBySelector("#app > .main")).toBe(element);
         expect(document.querySelector).toHaveBeenCalledWith("#app > .main");
+    });
+
+    it("docById returns null when getElementById finds nothing", () => {
+        expect(docById("missing")).toBeNull();
     });
 });
 
