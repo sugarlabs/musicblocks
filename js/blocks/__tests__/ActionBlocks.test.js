@@ -276,6 +276,46 @@ describe("ActionBlocks", () => {
         });
     });
 
+    describe("CalcBlock - arg (new arg method)", () => {
+        test("calls errorMsg when cblk is null", () => {
+            const block = getBlock("calc");
+            activity.blocks.blockList[110] = { connections: [null, null] };
+
+            const result = block.arg(logo, 0, 110, null);
+
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 110);
+            expect(result).toBe(0);
+        });
+
+        test("returns result when action exists", () => {
+            const block = getBlock("calc");
+            activity.blocks.blockList[110] = { connections: [null, "c1"] };
+            logo.parseArg = jest.fn(() => "myAction");
+            logo.actions["myAction"] = [];
+            logo.returns[0] = [100];
+            activity.turtles.getTurtle = jest.fn(() => ({
+                running: false,
+                queue: []
+            }));
+
+            const result = block.arg(logo, 0, 110, null);
+
+            expect(logo.runFromBlockNow).toHaveBeenCalled();
+            expect(result).toBe(100);
+        });
+
+        test("calls errorMsg when action not found", () => {
+            const block = getBlock("calc");
+            activity.blocks.blockList[110] = { connections: [null, "c1"] };
+            logo.parseArg = jest.fn(() => "missingAction");
+
+            const result = block.arg(logo, 0, 110, null);
+
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, 110, "missingAction");
+            expect(result).toBe(0);
+        });
+    });
+
     describe("DoBlock", () => {
         test("returns action for execution", () => {
             const block = getBlock("do");
