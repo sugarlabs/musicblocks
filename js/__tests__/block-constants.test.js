@@ -36,5 +36,7 @@ describe("block-constants", () => {
         expect(global.MINIMUMDOCKDISTANCE).toBeUndefined();
         expect(global.LONGSTACK).toBeUndefined();
         expect(global.SPATIAL_GRID_CELL_SIZE).toBeUndefined();
+        expect(global.CAMERAVALUE).toBeUndefined();
+        expect(global.VIDEOVALUE).toBeUndefined();
     });
 });
