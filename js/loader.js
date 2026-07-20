@@ -55,8 +55,11 @@ requirejs.config({
         "utils/utils-logic": {
             exports: "UtilsLogic"
         },
+        "utils/dom-helpers": {
+            exports: "DomHelpers"
+        },
         "utils/utils": {
-            deps: ["utils/platformstyle", "utils/utils-logic"],
+            deps: ["utils/platformstyle", "utils/utils-logic", "utils/dom-helpers"],
             exports: "_"
         },
         "utils/retryWithBackoff": {
