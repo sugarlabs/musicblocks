@@ -1255,14 +1255,46 @@ describe("Utility Functions (logic-only)", () => {
     describe("stopTuner", () => {
         it("should not throw when tunerMic is null", () => {
             Synth.tunerMic = null;
+            Synth.tunerAnalyser = null;
             expect(() => stopTuner()).not.toThrow();
         });
 
-        it("should call close on tunerMic when it exists", () => {
+        it("should call close on tunerMic and null it", () => {
             const mockClose = jest.fn();
             Synth.tunerMic = { close: mockClose };
+            Synth.tunerAnalyser = null;
             stopTuner();
             expect(mockClose).toHaveBeenCalledTimes(1);
+            expect(Synth.tunerMic).toBeNull();
+        });
+
+        it("should disconnect and dispose tunerAnalyser when both exist", () => {
+            const mockDisconnect = jest.fn();
+            const mockDispose = jest.fn();
+            const mockClose = jest.fn();
+            const analyser = { dispose: mockDispose };
+            Synth.tunerMic = { close: mockClose, disconnect: mockDisconnect };
+            Synth.tunerAnalyser = analyser;
+
+            stopTuner();
+
+            expect(mockDisconnect).toHaveBeenCalledWith(analyser);
+            expect(mockDispose).toHaveBeenCalled();
+            expect(mockClose).toHaveBeenCalled();
+            expect(Synth.tunerAnalyser).toBeNull();
+            expect(Synth.tunerMic).toBeNull();
+        });
+
+        it("should skip analyser disposal when tunerAnalyser is null", () => {
+            const mockDisconnect = jest.fn();
+            const mockClose = jest.fn();
+            Synth.tunerMic = { close: mockClose, disconnect: mockDisconnect };
+            Synth.tunerAnalyser = null;
+
+            stopTuner();
+
+            expect(mockDisconnect).not.toHaveBeenCalled();
+            expect(mockClose).toHaveBeenCalled();
         });
 
         it("should cancel any pending tuner animation frame", () => {
@@ -1272,6 +1304,7 @@ describe("Utility Functions (logic-only)", () => {
             Synth._tunerRafId = 123;
             Synth._tunerActive = true;
             Synth.tunerMic = null;
+            Synth.tunerAnalyser = null;
             stopTuner();
             expect(mockCancel).toHaveBeenCalledWith(123);
             expect(Synth._tunerRafId).toBeNull();

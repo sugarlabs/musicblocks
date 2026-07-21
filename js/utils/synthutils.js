@@ -3626,9 +3626,14 @@ function Synth() {
         this._tunerRafId = null;
         this._tunerSegments = null;
         if (this.tunerMic) {
+            if (this.tunerAnalyser) {
+                this.tunerMic.disconnect(this.tunerAnalyser);
+                this.tunerAnalyser.dispose();
+            }
             this.tunerMic.close();
         }
         this.tunerAnalyser = null;
+        this.tunerMic = null;
     };
 
     const frequencyToNote = frequency => {
