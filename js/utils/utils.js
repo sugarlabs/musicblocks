@@ -28,6 +28,8 @@
         platformColor
     - js/utils/utils-logic.js
         resolveObject
+    - js/utils/browser-utils.js
+        canvasPixelRatio, doBrowserCheck, fnBrowserDetect, windowHeight, windowWidth
 */
 
 if (typeof module !== "undefined" && module.exports) {
@@ -35,16 +37,23 @@ if (typeof module !== "undefined" && module.exports) {
         (typeof window !== "undefined" && window.UtilsLogic) ||
         (typeof require !== "undefined" ? require("./utils-logic") : {});
     var { resolveObject } = UtilsLogic;
+
+    var DomHelpers =
+        (typeof window !== "undefined" && window.DomHelpers) ||
+        (typeof require !== "undefined" ? require("./dom-helpers") : {});
+
+    var BrowserUtils =
+        (typeof window !== "undefined" && window.BrowserUtils) ||
+        (typeof require !== "undefined" ? require("./browser-utils") : {});
 }
 
 /* exported
-   announceToScreenReader,canvasPixelRatio, changeImage, closeBlkWidgets, closeWidgets,
-   delayExecution, displayMsg, doBrowserCheck, docByClass, docByName,
-   docBySelector, docByTagName, doPublish, doStopVideoCam, doSVG,
-   doUseCamera, format, getTextWidth, hideDOMLabel, httpGet, httpPost, HttpRequest,
+   announceToScreenReader, changeImage, closeBlkWidgets,
+   delayExecution,
+   doPublish, doStopVideoCam, doSVG,
+   doUseCamera, format, getTextWidth, httpGet, httpPost, HttpRequest,
    importMembers, isSVGEmpty, prepareMacroExports, preparePluginExports,
-   processMacroData, processPluginData, processRawPluginData, windowHeight, windowWidth,
-   fnBrowserDetect, waitForReadiness
+   processMacroData, processPluginData, processRawPluginData, waitForReadiness
 */
 
 /**
@@ -166,77 +175,6 @@ let format = (str, data) => {
 };
 
 /**
- * Detects the current browser name.
- * @function
- * @returns {string} The name of the detected browser.
- */
-function fnBrowserDetect() {
-    const userAgent = navigator.userAgent;
-    let browserName;
-
-    if (userAgent.match(/chrome|chromium|crios/i)) {
-        browserName = "chrome";
-    } else if (userAgent.match(/firefox|fxios/i)) {
-        browserName = "firefox";
-    } else if (userAgent.match(/safari/i)) {
-        browserName = "safari";
-    } else if (userAgent.match(/opr\//i)) {
-        browserName = "opera";
-    } else if (userAgent.match(/edg/i)) {
-        browserName = "edge";
-    } else {
-        browserName = "No browser detection";
-    }
-    return browserName;
-}
-
-/**
- * Returns the pixel ratio of the canvas for high-resolution displays.
- * @function
- * @returns {number} The canvas pixel ratio.
- */
-function canvasPixelRatio() {
-    const devicePixelRatio = window.devicePixelRatio || 1;
-    const context = document.querySelector("#myCanvas").getContext("2d");
-    const backingStoreRatio =
-        context.webkitBackingStorePixelRatio ||
-        context.mozBackingStorePixelRatio ||
-        context.msBackingStorePixelRatio ||
-        context.oBackingStorePixelRatio ||
-        context.backingStorePixelRatio ||
-        1;
-    return devicePixelRatio / backingStoreRatio;
-}
-
-/**
- * Returns the height of the window, accounting for Android-specific behavior.
- * @function
- * @returns {number} The window height.
- */
-function windowHeight() {
-    const onAndroid = /Android/i.test(navigator.userAgent);
-    if (onAndroid) {
-        return window.outerHeight;
-    } else {
-        return window.innerHeight;
-    }
-}
-
-/**
- * Returns the width of the window, accounting for Android-specific behavior.
- * @function
- * @returns {number} The window width.
- */
-function windowWidth() {
-    const onAndroid = /Android/i.test(navigator.userAgent);
-    if (onAndroid) {
-        return window.outerWidth;
-    } else {
-        return window.innerWidth;
-    }
-}
-
-/**
  * Performs an HTTP GET request to retrieve data from the server.
  * Uses async fetch to avoid blocking the UI during network requests.
  * @param {string|null} projectName - The name of the project (or null for the base URL).
@@ -338,46 +276,6 @@ function HttpRequest(url, loadCallback, userCallback) {
 }
 
 /**
- * Checks the browser type and version.
- * Sets properties in the jQuery.browser object based on the user agent.
- * @function
- */
-function doBrowserCheck() {
-    jQuery.uaMatch = ua => {
-        ua = ua.toLowerCase();
-
-        const match =
-            /(chrome)[ /]([\w.]+)/.exec(ua) ||
-            /(webkit)[ /]([\w.]+)/.exec(ua) ||
-            /(opera)(?:.*version|)[ /]([\w.]+)/.exec(ua) ||
-            /(msie) ([\w.]+)/.exec(ua) ||
-            (ua.indexOf("compatible") < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec(ua)) ||
-            [];
-
-        return {
-            browser: match[1] || "",
-            version: match[2] || "0"
-        };
-    };
-
-    const matched = jQuery.uaMatch(navigator.userAgent);
-    const browser = {};
-
-    if (matched.browser) {
-        browser[matched.browser] = true;
-        browser.version = matched.version;
-    }
-
-    if (browser.chrome) {
-        browser.webkit = true;
-    } else if (browser.webkit) {
-        browser.safari = true;
-    }
-
-    jQuery.browser = browser;
-}
-
-/**
  * Wait for critical dependencies to be ready before calling callback.
  * Uses polling with exponential backoff and maximum timeout.
  * This replaces the arbitrary 5-second delay for Firefox with actual readiness checks.
@@ -439,50 +337,8 @@ function waitForReadiness(callback, options = {}) {
     requestAnimationFrame(check);
 }
 
-/**
- * Retrieves a collection of elements by class name.
- * @param {string} classname - The class name to search for.
- * @returns {HTMLCollectionOf<Element>} A collection of elements with the specified class name.
- */
-function docByClass(classname) {
-    return document.getElementsByClassName(classname);
-}
-
-/**
- * Retrieves a collection of elements by tag name.
- * @param {string} tag - The tag name to search for.
- * @returns {NodeList} A collection of elements with the specified tag name.
- */
-function docByTagName(tag) {
-    return document.getElementsByTagName(tag);
-}
-
-/**
- * Retrieves an element by its ID.
- * @param {string} id - The ID of the element to retrieve.
- * @returns {HTMLElement|null} The element with the specified ID, or null if not found.
- */
-function docById(id) {
-    return document.getElementById(id);
-}
-
-/**
- * Retrieves a collection of elements by name.
- * @param {string} name - The name attribute value to search for.
- * @returns {NodeListOf<Element>} A collection of elements with the specified name attribute.
- */
-function docByName(name) {
-    return document.getElementsByName(name);
-}
-
-/**
- * Retrieves the first element that matches a specified CSS selector.
- * @param {string} selector - A CSS selector string.
- * @returns {Element|null} The first element that matches the selector, or null if not found.
- */
-function docBySelector(selector) {
-    return document.querySelector(selector);
-}
+// docByClass(), docByTagName(), docById(), docByName(), docBySelector()
+// moved to js/utils/dom-helpers.js
 
 // last() and deepClone() moved to js/utils/utils-logic.js
 
@@ -1315,40 +1171,7 @@ function doStopVideoCam(cameraID, setCameraID) {
     CameraManager.reset();
 }
 
-/**
- * Hides certain DOM elements related to labels.
- */
-function hideDOMLabel() {
-    const textLabel = docById("textLabel");
-    if (textLabel !== null) {
-        textLabel.style.display = "none";
-    }
-
-    const numberLabel = docById("numberLabel");
-    if (numberLabel !== null) {
-        numberLabel.style.display = "none";
-    }
-
-    const piemenu = docById("wheelDiv");
-    if (piemenu !== null) {
-        piemenu.style.display = "none";
-    }
-}
-
-/**
- * Displays a message (currently unused).
- * @returns {undefined}
- */
-function displayMsg(/*blocks, text*/) {
-    /*
-    let msgContainer = blocks.msgText.parent;
-    msgContainer.visible = true;
-    blocks.msgText.text = text;
-    msgContainer.updateCache();
-    blocks.stage.setChildIndex(msgContainer, blocks.stage.getNumChildren() - 1);
-    */
-    return;
-}
+// hideDOMLabel() and displayMsg() moved to js/utils/dom-helpers.js
 
 // safeSVG() and toFixed2() moved to js/utils/utils-logic.js
 
@@ -1370,15 +1193,7 @@ let delayExecution = duration => {
     });
 };
 
-/**
- * Closes all widgets in the window.
- *
- * @returns {void}
- */
-function closeWidgets() {
-    const names = Object.keys(window.widgetWindows.openWindows);
-    names.forEach(name => window.widgetWindows.closeWindow(name));
-}
+// closeWidgets() moved to js/utils/dom-helpers.js
 
 /**
  * Closes a specific widget by its name.
@@ -1536,34 +1351,24 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         ...UtilsLogic,
+        ...DomHelpers,
+        ...BrowserUtils,
         extractProjectDataFromHTML,
         _,
         format,
         delayExecution,
-        closeWidgets,
         closeBlkWidgets,
         importMembers,
         changeImage,
-        fnBrowserDetect,
-        canvasPixelRatio,
-        windowHeight,
-        windowWidth,
         httpGet,
         httpPost,
         HttpRequest,
-        docByClass,
-        docByTagName,
-        docById,
-        docByName,
-        docBySelector,
         getTextWidth,
         doSVG,
         isSVGEmpty,
         prepareMacroExports,
         processPluginData,
         processMacroData,
-        hideDOMLabel,
-        displayMsg,
         announceToScreenReader
     };
 }

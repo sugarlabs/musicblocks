@@ -35,6 +35,10 @@ try {
    setupProjectManager,
    setupKeyboardController,
    setupSearchController, setupSearchUI, setupWorkspaceLayoutController, setupSelectionController,
+   setupTrashController,
+   setupHelpController,
+   setupBlockScaleController,
+   setupContextMenuController,
    setupActivityAbcParser, setupActivityIdleWatcher,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
@@ -135,6 +139,10 @@ let MYDEFINES = [
     "palette/palette-loader",
     "activity/search-controller",
     "activity/workspace-layout-controller",
+    "activity/trash-controller",
+    "activity/help-controller",
+    "activity/block-scale-controller",
+    "activity/context-menu-controller",
     "search-ui",
     "keyboard-controller",
     "widgets/plugin-dialog",
@@ -482,6 +490,8 @@ class Activity {
         setupSearchController(this, this.searchUI);
         setupWorkspaceLayoutController(this);
         setupSelectionController(this);
+        setupBlockScaleController(this);
+        setupContextMenuController(this);
         this.pluginDialog = new PluginDialog({
             onLoadBuiltIn: name => this._loadBuiltInPlugin(name),
             onDelete: () => this._deletePlugin(),
@@ -640,119 +650,13 @@ class Activity {
             }
         };
 
-        /*
-         * creates helpfulSearchDiv for search
-         */
-        this.setHelpfulSearchDiv = () => this.searchController.setHelpfulSearchDiv();
-
-        /*
-         * displays helpfulSearchDiv on canvas
-         */
-        this._displayHelpfulSearchDiv = () => this.searchController._displayHelpfulSearchDiv();
-
-        this._hideHelpfulSearchWidget = e => this.searchController._hideHelpfulSearchWidget(e);
-
-        /*
-         * Sets up right click functionality opening the context menus
-         * (if block is right clicked)
-         */
-        this.doContextMenus = () => {
-            this.addEventListener(
-                document,
-                "contextmenu",
-                event => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    if (this.beginnerMode) return;
-                    if (this.searchUI.isHelpfulSearchWidgetOn) {
-                        this._hideHelpfulSearchWidget();
-                    }
-                    if (
-                        !this.blocks.isCoordinateOnBlock(event.clientX, event.clientY) &&
-                        event.target.id === "myCanvas"
-                    ) {
-                        this._displayHelpfulWheel(event);
-                    }
-                },
-                false
-            );
-        };
-
-        /*
-         * displays helpfulWheel on canvas on right click
-         */
-        this._displayHelpfulWheel = event => {
-            // Cache DOM element reference for performance (7 lookups reduced to 1)
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            helpfulWheelDiv.style.position = "absolute";
-
-            const x = event.clientX;
-            const y = event.clientY;
-
-            const canvasLeft = this.canvas.offsetLeft + 28 * this.getStageScale();
-            const canvasTop = this.canvas.offsetTop + 6 * this.getStageScale();
-
-            const helpfulWheelLeft = Math.max(
-                Math.round(x * this.getStageScale() + canvasLeft) - 150,
-                canvasLeft
-            );
-            const helpfulWheelTop = Math.max(
-                Math.round(y * this.getStageScale() + canvasTop) - 150,
-                canvasTop
-            );
-
-            helpfulWheelDiv.style.left = helpfulWheelLeft + "px";
-
-            helpfulWheelDiv.style.top = helpfulWheelTop + "px";
-
-            const windowWidth = window.innerWidth - 20;
-            const windowHeight = window.innerHeight - 20;
-
-            if (helpfulWheelLeft + 350 > windowWidth) {
-                helpfulWheelDiv.style.left = windowWidth - 350 + "px";
-            }
-            if (helpfulWheelTop + 350 > windowHeight) {
-                helpfulWheelDiv.style.top = windowHeight - 350 + "px";
-            }
-
-            helpfulWheelDiv.style.display = "";
-
-            const wheel = new wheelnav("helpfulWheelDiv", null, 300, 300);
-            wheel.colors = platformColor.wheelcolors;
-            wheel.slicePathFunction = slicePath().DonutSlice;
-            wheel.slicePathCustom = slicePath().DonutSliceCustomization();
-            wheel.slicePathCustom.minRadiusPercent = 0.45;
-            wheel.slicePathCustom.maxRadiusPercent = 1.0;
-            wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
-            wheel.sliceInitPathCustom = wheel.slicePathCustom;
-            wheel.clickModeRotate = false;
-            const wheelItems = this.helpfulWheelItems.filter(ele => ele.display);
-            wheel.initWheel(wheelItems.map(ele => _(ele.label)));
-
-            wheelItems.forEach((ele, i) => {
-                if (ele.icon) {
-                    wheel.navItems[i].setTitle(ele.icon);
-                }
-            });
-
-            wheel.createWheel();
-
-            wheel.navItems[0].selected = false;
-
-            wheelItems.forEach((ele, i) => {
-                wheel.navItems[i].setTooltip(_(ele.label));
-                wheel.navItems[i].navigateFunction = () => ele.fn(this);
-            });
-            const closeHelpfulWheel = e => {
-                const isClickInside = helpfulWheelDiv.contains(e.target);
-                if (!isClickInside) {
-                    helpfulWheelDiv.style.display = "none";
-                    this.removeEventListener(document, "click", closeHelpfulWheel);
-                }
-            };
-
-            this.addEventListener(document, "click", closeHelpfulWheel);
-        };
+        // Context menu / helpful wheel / bottom toolbar functionality has been
+        // extracted to ContextMenuController (js/context-menu-controller.js).
+        // setupContextMenuController() installs the delegation stubs below:
+        // setHelpfulSearchDiv, _displayHelpfulSearchDiv, _hideHelpfulSearchWidget,
+        // doContextMenus, displayHelpfulWheel, setupPaletteMenu, makeButton,
+        // loadButtonDragHandler, openAuxMenu, _showHideAuxMenu, showHideAuxMenu,
+        // hideAuxMenu, deltaY.
 
         /**
          * Sets up plugin and palette boilerplate.
@@ -804,79 +708,14 @@ class Activity {
         //if any window resize event occurs:
         this.addEventListener(window, "resize", this._handleRepositionBlocksOnResize);
 
-        /**
-         * Saves the artwork for an individual help block.
-         * The process involves clearing the block list, generating the help blocks,
-         * and saving them as SVG files.
-         *
-         * @param {string} name - The name of the help block.
-         * @param {number} delay - The delay before executing the save process (in milliseconds).
-         */
-        this.__saveHelpBlock = (name, delay) => {
-            // Save the artwork for an individual help block.
-            // (1) clear the block list
-            // (2) generate the help blocks
-            // (3) save the blocks as svg
-
-            const that = this;
-            setTimeout(() => {
-                that.sendAllToTrash(false, true);
-                setTimeout(() => {
-                    const message = that.blocks.protoBlockDict[name].helpString;
-                    if (message.length < 4) {
-                        // If there is nothing specified, just load the block.
-                        const obj = that.palettes.getProtoNameAndPalette(name);
-                        const protoblk = obj[0];
-                        const paletteName = obj[1];
-                        const protoName = obj[2];
-
-                        if (that.blocks.protoBlockDict.hasOwnProperty(protoName)) {
-                            that.palettes.dict[paletteName].makeBlockFromSearch(
-                                protoblk,
-                                protoName,
-                                newBlock => {
-                                    that.blocks.moveBlock(newBlock, 0, 0);
-                                }
-                            );
-                        }
-                    } else if (typeof message[3] === "string") {
-                        // If it is a string, load the macro associated with this block.
-                        const blocksToLoad = getMacroExpansion(that, message[3], 0, 0);
-                        that.blocks.loadNewBlocks(blocksToLoad);
-                    } else {
-                        // Load the block.
-                        const blocksToLoad = message[3];
-                        that.blocks.loadNewBlocks(blocksToLoad);
-                    }
-
-                    setTimeout(() => {
-                        debugLog("Saving help artwork: " + name + "_block.svg");
-                        const svg = "data:image/svg+xml;utf8," + that.printBlockSVG();
-                        that.save.download("svg", svg, name + "_block.svg");
-                    }, 500);
-                }, 500);
-            }, delay + 1000);
-        };
-
-        this._saveHelpBlocks = () => {
-            // Save the artwork for every help block.
-            const blockHelpList = [];
-            for (const key in this.blocks.protoBlockDict) {
-                if (
-                    this.blocks.protoBlockDict[key].helpString !== undefined &&
-                    this.blocks.protoBlockDict[key].helpString.length !== 0
-                ) {
-                    blockHelpList.push(key);
-                }
-            }
-
-            let i = 0;
-            for (const name of blockHelpList) {
-                this.__saveHelpBlock(name, i * 2000);
-                i++;
-            }
-            this.sendAllToTrash(true, true);
-        };
+        // Sets up HelpController (js/help-controller.js), which owns the help
+        // window, about page, keyboard shortcuts dialog, statistics window,
+        // JavaScript editor launch, and the Alt-H save-help-block workflow.
+        // this.showHelp, this.showAboutPage, this.showKeyboardShortcuts,
+        // this.toggleJSWindow, this.doAnalytics, and this._saveHelpBlocks are
+        // delegation stubs installed by setupHelpController() so external
+        // callers continue to work unchanged.
+        setupHelpController(this);
 
         /**
          * @returns {SVG} returns SVG of blocks
@@ -1206,6 +1045,9 @@ class Activity {
                 helpfulWheelDiv.style.display = "none";
             }
         };
+        // Exposed so ContextMenuController (activity/context-menu-controller.js) can
+        // reference it from the helpfulWheelItems registry it builds.
+        this.setScroller = setScroller;
 
         /**
          * Initializes the functionality of the horizontal scroll icon.
@@ -1241,118 +1083,6 @@ class Activity {
         this.doLoadAnimation = (...args) => this.projectManager.doLoadAnimation(...args);
 
         this.stopLoadAnimation = (...args) => this.projectManager.stopLoadAnimation(...args);
-
-        /**
-         * Increases the size of blocks in the activity.
-         * @param {object} activity - The activity object.
-         */
-        const doLargerBlocks = async activity => {
-            await activity._doLargerBlocks();
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-                activity.__tick();
-            }
-        };
-
-        this._doLargerBlocks = async () => {
-            this.blocks.activeBlock = null;
-
-            if (!this.resizeDebounce) {
-                if (this.blockscale < BLOCKSCALES.length - 1) {
-                    this.resizeDebounce = true;
-                    this.blockscale += 1;
-                    this.clearCache();
-                    await this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
-                    this.blocks.checkBounds();
-                    this.refreshCanvas();
-                }
-
-                const that = this;
-                setTimeout(() => {
-                    that.resizeDebounce = false;
-                }, 200);
-            }
-
-            await this.setSmallerLargerStatus();
-            this.stageDirty = true;
-        };
-
-        /**
-         * Decreases the size of blocks in the activity.
-         * @param {object} activity - The activity object.
-         */
-        const doSmallerBlocks = async activity => {
-            await activity._doSmallerBlocks();
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-                activity.__tick();
-            }
-        };
-
-        /**
-         * Manages the resizing of blocks to handle larger size.
-         */
-        this._doSmallerBlocks = async () => {
-            this.blocks.activeBlock = null;
-
-            if (!this.resizeDebounce) {
-                if (this.blockscale > 0) {
-                    this.resizeDebounce = true;
-                    this.blockscale -= 1;
-                    this.clearCache();
-                    await this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
-                    this.blocks.checkBounds();
-                    this.refreshCanvas();
-                }
-
-                const that = this;
-                setTimeout(() => {
-                    that.resizeDebounce = false;
-                }, 200);
-            }
-
-            await this.setSmallerLargerStatus();
-            this.stageDirty = true;
-        };
-
-        /*
-         * If either the block size has reached its minimum or maximum,
-         * then the icons to make them smaller/bigger will be hidden.
-         * Sets the status of the smaller and larger block icons based on the current block size.
-         */
-        this.setSmallerLargerStatus = async () => {
-            if (BLOCKSCALES[this.blockscale] < DEFAULTBLOCKSCALE) {
-                await changeImage(
-                    this.smallerContainer.children[0],
-                    SMALLERBUTTON,
-                    SMALLERDISABLEBUTTON
-                );
-            } else {
-                await changeImage(
-                    this.smallerContainer.children[0],
-                    SMALLERDISABLEBUTTON,
-                    SMALLERBUTTON
-                );
-            }
-
-            if (BLOCKSCALES[this.blockscale] === 4) {
-                await changeImage(
-                    this.largerContainer.children[0],
-                    BIGGERBUTTON,
-                    BIGGERDISABLEBUTTON
-                );
-            } else {
-                await changeImage(
-                    this.largerContainer.children[0],
-                    BIGGERDISABLEBUTTON,
-                    BIGGERBUTTON
-                );
-            }
-        };
 
         const deletePlugin = activity => {
             activity.pluginDialog.deletePlugin();
@@ -1501,9 +1231,9 @@ class Activity {
                             const pinchDelta = currentPinchDistance - initialPinchDistance;
                             if (Math.abs(pinchDelta) > 20) {
                                 if (pinchDelta > 0) {
-                                    doLargerBlocks(that);
+                                    that.doLargerBlocks();
                                 } else {
-                                    doSmallerBlocks(that);
+                                    that.doSmallerBlocks();
                                 }
                                 initialPinchDistance = currentPinchDistance;
                             }
@@ -1572,7 +1302,7 @@ class Activity {
 
                 if (event.ctrlKey) {
                     event.preventDefault();
-                    delY < 0 ? doLargerBlocks(that) : doSmallerBlocks(that);
+                    delY < 0 ? that.doLargerBlocks() : that.doSmallerBlocks();
                 } else {
                     closeAnyOpenMenusAndLabels();
                     if (that.scrollBlockContainer) {
@@ -2042,7 +1772,7 @@ class Activity {
             this.trashcan.resizeEvent(this.turtleBlocksScale);
 
             // We need to reposition the palette buttons
-            this._setupPaletteMenu();
+            this.setupPaletteMenu();
 
             // Reposition coordinate grids.
             const newX = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
@@ -2220,7 +1950,7 @@ class Activity {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
                 handleResize();
-                this._setupPaletteMenu();
+                this.setupPaletteMenu();
             }, 200);
         };
         this.addEventListener(window, "resize", this._handleWindowResize);
@@ -2282,446 +2012,18 @@ class Activity {
             this._handleOrientationChangeResizeCanvas
         );
 
-        /*
-         * Restore last stack pushed to trashStack back onto canvas.
-         * Hides palettes before update
-         * Repositions blocks about trash area
-         */
-        const restoreTrash = activity => {
-            if (
-                !activity.blocks ||
-                !activity.blocks.trashStacks ||
-                activity.blocks.trashStacks.length === 0
-            ) {
-                activity.textMsg(_("Trash can is empty."), 3000);
-                return;
-            }
+        // Sets up TrashController (js/trash-controller.js), which owns restoring
+        // blocks from the trash (individually, in bulk, or the most recent one),
+        // rendering the trash panel, and the restoreIcon click handling.
+        // this.restoreTrash, this.restoreTrashPop, this._restoreTrashById,
+        // this._renderTrashView, this._showTrashPreviewPopup, and
+        // this._hideTrashPreviewPopup are delegation stubs installed by
+        // setupTrashController() so external callers continue to work unchanged.
+        setupTrashController(this);
 
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-                activity.__tick();
-            }
-        };
-
-        const restoreTrashPop = activity => {
-            if (
-                !activity.blocks ||
-                !activity.blocks.trashStacks ||
-                activity.blocks.trashStacks.length === 0
-            ) {
-                activity.textMsg(_("Trash can is empty."), 3000);
-                return;
-            }
-            this._restoreTrashById(this.blocks.trashStacks[this.blocks.trashStacks.length - 1]);
-            activity.textMsg(_("Item restored from the trash."), 3000);
-
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-                activity.__tick();
-            }
-        };
-
-        this._restoreTrashById = blockId => {
-            const blockIndex = this.blocks.trashStacks.indexOf(blockId);
-            if (blockIndex === -1) return; // Block not found in trash
-
-            this.blocks.trashStacks.splice(blockIndex, 1); // Remove from trash
-
-            for (const name in this.palettes.dict) {
-                this.palettes.dict[name].hideMenu(true);
-            }
-            this.blocks.activeBlock = null;
-            this.refreshCanvas();
-
-            const dx = 0;
-            const dy = -this.cellSize * 3; // Reposition
-
-            // Restore drag group
-            this.blocks.findDragGroup(blockId);
-            for (let b = 0; b < this.blocks.dragGroup.length; b++) {
-                const blk = this.blocks.dragGroup[b];
-                this.blocks.blockList[blk].trash = false;
-                this.blocks.moveBlockRelative(blk, dx, dy);
-
-                const block = this.blocks.blockList[blk];
-
-                // Re-populate blocks.blockArt[blk] if it was deleted on trash.
-                // sendStackToTrash() and sendAllToTrash() both delete blockArt[blk]
-                // to free memory. Without regeneration, printBlockSVG() receives
-                // undefined here, passes it to DOMParser.parseFromString(undefined),
-                // and injects a <parsererror> node into every Save Block Artwork
-                // export (activity.js ~line 1394).
-                if (!this.blocks.blockArt[blk]) {
-                    block.regenerateArtwork(block.isCollapsible());
-                }
-
-                // Re-cache the container if it was uncached to save
-                // memory in sendStackToTrash().
-                if (block.container && !block.container.bitmapCache) {
-                    block.container.cache(
-                        0,
-                        0,
-                        Math.max(block.width, 1),
-                        Math.max(block.height, 1)
-                    );
-                }
-
-                this.blocks.blockList[blk].show();
-            }
-            this.blocks.raiseStackToTop(blockId);
-            const restoredBlock = this.blocks.blockList[blockId];
-
-            if (restoredBlock.name === "start" || restoredBlock.name === "drum") {
-                const turtle = restoredBlock.value;
-                const primaryTurtle = this.turtles.getTurtle(turtle);
-                primaryTurtle.inTrash = false;
-                primaryTurtle.container.visible = true;
-
-                // FIX: Restore the companion turtle if one exists.
-                // sendStackToTrash() in blocks.js (~line 7257) sets BOTH the primary
-                // and companion turtle to inTrash=true / visible=false when trashing a
-                // start/drum block. Without this mirror restore, the companion stays
-                // inTrash=true permanently, and logo.js (~line 1519) silently skips it:
-                //   if (!tur.inTrash) { tur.running = true; ... }
-                // This means onEveryBeatDo callbacks are dead after any trash+restore.
-                const comp = primaryTurtle.companionTurtle;
-                if (comp !== null && comp !== undefined) {
-                    const companionTurtle = this.turtles.getTurtle(comp);
-                    if (companionTurtle) {
-                        companionTurtle.inTrash = false;
-                        companionTurtle.container.visible = true;
-                    }
-                }
-            } else if (restoredBlock.name === "action") {
-                const actionArg = this.blocks.blockList[restoredBlock.connections[1]];
-                if (actionArg !== null) {
-                    let label;
-                    const oldName = actionArg.value;
-                    restoredBlock.trash = true;
-                    const uniqueName = this.blocks.findUniqueActionName(oldName);
-                    restoredBlock.trash = false;
-
-                    if (uniqueName !== actionArg) {
-                        actionArg.value = uniqueName;
-                        const translatedName = _(uniqueName);
-                        label =
-                            translatedName.length > 8
-                                ? translatedName.substr(0, 7) + "..."
-                                : translatedName;
-                        actionArg.text.text = label;
-
-                        if (actionArg.label !== null) {
-                            actionArg.label.value = translatedName;
-                        }
-                        actionArg.container.updateCache();
-                        for (let b = 0; b < this.blocks.dragGroup.length; b++) {
-                            const me = this.blocks.blockList[this.blocks.dragGroup[b]];
-                            if (
-                                ["nameddo", "nameddoArg", "namedcalc", "namedcalcArg"].includes(
-                                    me.name
-                                ) &&
-                                me.privateData === oldName
-                            ) {
-                                me.privateData = uniqueName;
-                                me.value = uniqueName;
-                                const translatedMeName = _(uniqueName);
-                                label =
-                                    translatedMeName.length > 8
-                                        ? translatedMeName.substr(0, 7) + "..."
-                                        : translatedMeName;
-                                me.text.text = label;
-                                me.overrideName = label;
-                                me.regenerateArtwork();
-                                me.container.updateCache();
-                            }
-                        }
-                    }
-
-                    // Re-add the action to the palette
-                    const actionName = actionArg.value;
-                    this.blocks.newNameddoBlock(
-                        actionName,
-                        this.blocks.actionHasReturn(blockId),
-                        this.blocks.actionHasArgs(blockId)
-                    );
-                    this.palettes.updatePalettes("action");
-                }
-            }
-            activity.textMsg(_("Item restored from the trash."), 3000);
-
-            this.refreshCanvas();
-        };
-
-        // Add event listener for trash icon click
-        document.getElementById("restoreIcon").addEventListener("click", () => {
-            this._renderTrashView();
-        });
-
-        // Store the click handler reference for proper cleanup
-        let trashViewClickHandler = null;
-
-        // function to hide trashView from canvas
-        function handleClickOutsideTrashView(trashView) {
-            // Remove existing listener to prevent duplicates
-            if (trashViewClickHandler) {
-                document.removeEventListener("click", trashViewClickHandler);
-            }
-
-            let firstClick = true;
-            trashViewClickHandler = event => {
-                if (firstClick) {
-                    firstClick = false;
-                    return;
-                }
-                if (!trashView.contains(event.target) && event.target !== trashView) {
-                    trashView.style.display = "none";
-                    // Clean up listener when trashView is hidden
-                    document.removeEventListener("click", trashViewClickHandler);
-                    trashViewClickHandler = null;
-                }
-            };
-            document.addEventListener("click", trashViewClickHandler);
-        }
-
-        this._renderTrashView = () => {
-            if (!this.blocks || !this.blocks.trashStacks || this.blocks.trashStacks.length === 0) {
-                return;
-            }
-            const trashList = document.getElementById("trashList");
-            const trashView = document.createElement("div");
-            trashView.id = "trashView";
-            trashView.classList.add("trash-view");
-
-            // Sticky icons
-            const buttonContainer = document.createElement("div");
-            buttonContainer.classList.add("button-container");
-
-            const restoreLastIcon = document.createElement("a");
-            restoreLastIcon.id = "restoreLastIcon";
-            restoreLastIcon.classList.add("restore-last-icon");
-            restoreLastIcon.innerHTML = '<i class="material-icons md-48">restore_from_trash</i>';
-            restoreLastIcon.addEventListener("click", () => {
-                this._restoreTrashById(this.blocks.trashStacks[this.blocks.trashStacks.length - 1]);
-                trashView.classList.add("hidden");
-            });
-
-            const restoreAllIcon = document.createElement("a");
-            restoreAllIcon.id = "restoreAllIcon";
-            restoreAllIcon.classList.add("restore-all-icon");
-            restoreAllIcon.innerHTML = '<i class="material-icons md-48">delete_sweep</i>';
-            restoreAllIcon.addEventListener("click", () => {
-                while (this.blocks.trashStacks.length > 0) {
-                    this._restoreTrashById(this.blocks.trashStacks[0]);
-                }
-                trashView.classList.add("hidden");
-            });
-            restoreLastIcon.setAttribute("title", _("Restore last item"));
-            restoreAllIcon.setAttribute("title", _("Restore all items"));
-
-            buttonContainer.appendChild(restoreLastIcon);
-            buttonContainer.appendChild(restoreAllIcon);
-            trashView.appendChild(buttonContainer);
-
-            // Render trash items
-            this.blocks.trashStacks.forEach(blockId => {
-                const block = this.blocks.blockList[blockId];
-                const listItem = document.createElement("div");
-                listItem.classList.add("trash-item");
-
-                const preview = this.blocks.trashPreviews[blockId];
-                let imgSrc;
-                if (preview) {
-                    imgSrc = preview;
-                } else {
-                    const svgData = block.artwork;
-                    imgSrc = "data:image/svg+xml;utf8," + encodeURIComponent(svgData);
-                }
-
-                const img = document.createElement("img");
-                img.src = imgSrc;
-                img.alt = "Block Icon";
-                img.classList.add("trash-item-icon");
-
-                const textNode = document.createTextNode(block.name);
-
-                listItem.appendChild(img);
-                listItem.appendChild(textNode);
-                listItem.dataset.blockId = blockId;
-
-                listItem.addEventListener("mouseover", () => {
-                    listItem.classList.add("hover");
-                });
-                listItem.addEventListener("mouseout", () => {
-                    listItem.classList.remove("hover");
-                });
-
-                img.addEventListener("mouseover", event => {
-                    this._showTrashPreviewPopup(imgSrc, event);
-                });
-                img.addEventListener("mousemove", event => {
-                    this._showTrashPreviewPopup(imgSrc, event);
-                });
-                img.addEventListener("mouseout", () => {
-                    this._hideTrashPreviewPopup();
-                });
-
-                listItem.addEventListener("click", () => {
-                    this._restoreTrashById(blockId);
-                    this._hideTrashPreviewPopup();
-                    trashView.classList.add("hidden");
-                });
-
-                trashView.appendChild(listItem);
-            });
-
-            // Attach outside-click listener once, after all items are rendered
-            handleClickOutsideTrashView(trashView);
-
-            const existingView = document.getElementById("trashView");
-            if (existingView) {
-                trashList.replaceChild(trashView, existingView);
-            } else {
-                trashList.appendChild(trashView);
-            }
-        };
-
-        /**
-         * Shows a larger preview popup for trashed items.
-         * @param {string} imgSrc - The source of the image.
-         * @param {MouseEvent} event - The mouse event.
-         * @private
-         */
-        this._showTrashPreviewPopup = (imgSrc, event) => {
-            let popup = document.getElementById("trashPreviewPopup");
-            if (!popup) {
-                popup = document.createElement("div");
-                popup.id = "trashPreviewPopup";
-                popup.classList.add("trash-preview-popup");
-                const img = document.createElement("img");
-                popup.appendChild(img);
-                document.body.appendChild(popup);
-            }
-            const img = popup.firstChild;
-            if (img.src !== imgSrc) {
-                img.src = imgSrc;
-            }
-            popup.style.display = "block";
-
-            // Position next to cursor
-            const xOffset = 20;
-            const yOffset = 20;
-            let x = event.clientX + xOffset;
-            let y = event.clientY + yOffset;
-
-            // Flip if near right edge
-            if (x + 300 > window.innerWidth) {
-                x = event.clientX - 320;
-            }
-            // Flip if near bottom edge
-            if (y + 300 > window.innerHeight) {
-                y = event.clientY - 320;
-            }
-
-            popup.style.left = x + "px";
-            popup.style.top = y + "px";
-        };
-
-        /**
-         * Hides the trash preview popup.
-         * @private
-         */
-        this._hideTrashPreviewPopup = () => {
-            const popup = document.getElementById("trashPreviewPopup");
-            if (popup) {
-                popup.style.display = "none";
-            }
-        };
-
-        /*
-         * Open aux menu
-         */
-        this._openAuxMenu = () => {
-            if (!this.turtles.running() && this.toolbarHeight === 0) {
-                this._showHideAuxMenu(false);
-            }
-        };
-
-        /*
-         * Toggles Aux menu visibility and positioning
-         */
-        const showHideAuxMenu = (activity, resize) => {
-            activity._showHideAuxMenu(resize);
-        };
-
-        this._showHideAuxMenu = resize => {
-            const cellsize = 55;
-            let dy;
-
-            // function to increase or decrease the "top" property of the top-right corner buttons
-
-            const topRightButtons = document.querySelectorAll("#buttoncontainerTOP .tooltipped");
-            const gridElement = document.getElementById("Grid");
-            const btnY = gridElement ? gridElement.getBoundingClientRect().top : 70 + LEADING + 6;
-
-            this.changeTopButtonsPosition = value => {
-                topRightButtons.forEach(child => {
-                    child.style.top = `${btnY + value}px`;
-                });
-            };
-
-            if (!resize && this.toolbarHeight === 0) {
-                dy = cellsize + LEADING + 5;
-
-                this.toolbarHeight = dy;
-                this.palettes.deltaY(dy);
-                this.turtles.deltaY(dy);
-                this.blocksContainer.y += dy;
-                this.changeTopButtonsPosition(dy);
-
-                this.cartesianBitmap.y += dy;
-                this.polarBitmap.y += dy;
-                this.trebleBitmap.y += dy;
-                this.grandBitmap.y += dy;
-                this.sopranoBitmap.y += dy;
-                this.altoBitmap.y += dy;
-                this.tenorBitmap.y += dy;
-                this.bassBitmap.y += dy;
-                this.blocks.checkBounds();
-            } else {
-                dy = this.toolbarHeight;
-                this.toolbarHeight = 0;
-
-                this.turtles.deltaY(-dy);
-                this.palettes.deltaY(-dy);
-                this.blocksContainer.y -= dy;
-                this.changeTopButtonsPosition(-dy);
-
-                this.cartesianBitmap.y -= dy;
-                this.polarBitmap.y -= dy;
-                this.trebleBitmap.y -= dy;
-                this.grandBitmap.y -= dy;
-                this.sopranoBitmap.y -= dy;
-                this.altoBitmap.y -= dy;
-                this.tenorBitmap.y -= dy;
-                this.bassBitmap.y -= dy;
-            }
-
-            this.refreshCanvas();
-        };
-
-        /*
-         * Hides aux menu
-         */
-        this.hideAuxMenu = () => {
-            if (this.toolbarHeight > 0) {
-                this._showHideAuxMenu(false);
-                this.menuButtonsVisible = false;
-            }
-        };
+        // Aux menu open/close/toggle (_openAuxMenu, _showHideAuxMenu, showHideAuxMenu,
+        // hideAuxMenu) has been extracted to ContextMenuController; see the
+        // delegation stubs installed by setupContextMenuController() above.
 
         /**
          * Hide the palettes before update, then deletes everything/sends all to trash.
@@ -2838,18 +2140,9 @@ class Activity {
             }
         };
 
-        /*
-         * Toggles block/palette visibility
-         */
-        const changeBlockVisibility = activity => {
-            activity._changeBlockVisibility();
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-                activity.__tick();
-            }
-        };
+        // changeBlockVisibility (the helpful-wheel "Show/hide blocks" action) has
+        // been extracted to ContextMenuController; see
+        // ContextMenuController.changeBlockVisibility.
 
         this._changeBlockVisibility = () => {
             hideDOMLabel();
@@ -2874,18 +2167,9 @@ class Activity {
             }
         };
 
-        /*
-         * Toggles collapsible stacks (if collapsed stacks expand and vice versa)
-         */
-        const toggleCollapsibleStacks = activity => {
-            activity._toggleCollapsibleStacks();
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-                activity.__tick();
-            }
-        };
+        // toggleCollapsibleStacks (the helpful-wheel "Expand/collapse blocks"
+        // action) has been extracted to ContextMenuController; see
+        // ContextMenuController.toggleCollapsibleStacks.
 
         this._toggleCollapsibleStacks = () => {
             hideDOMLabel();
@@ -2997,7 +2281,7 @@ class Activity {
         this._doOpenSamples = () => {
             if (document.getElementById("palette").style.display !== "none")
                 document.getElementById("palette").style.display = "none";
-            this.toolbar.closeAuxToolbar(showHideAuxMenu);
+            this.toolbar.closeAuxToolbar(this.showHideAuxMenu);
             this.planet.openPlanet();
             if (document.getElementById("buttoncontainerBOTTOM").style.display !== "none")
                 document.getElementById("buttoncontainerBOTTOM").style.display = "none";
@@ -3023,6 +2307,9 @@ class Activity {
                 helpfulWheelDiv.style.display = "none";
             }
         };
+        // Exposed so ContextMenuController (activity/context-menu-controller.js) can
+        // reference it from the helpfulWheelItems registry it builds.
+        this.chooseKeyMenu = chooseKeyMenu;
 
         window.prepareExport = (...args) => this.projectManager.prepareExport(...args);
 
@@ -3220,239 +2507,10 @@ class Activity {
             reader.readAsText(file);
         };
 
-        /*
-         * Sets up palette buttons and functions
-         * e.g. Home, Collapse, Expand
-         * These menu items are on the canvas, not the toolbar.
-         */
-        this._setupPaletteMenu = () => {
-            this.helpfulWheelItems = [];
-            const btnSize = this.cellSize;
-            const createButton = (icon, label, action) => {
-                const button = this._makeButton(icon, label, x, y, btnSize, 0);
-                this._loadButtonDragHandler(button, action, this);
-                x += btnSize;
-                return button;
-            };
-
-            let x = window.innerWidth - 4 * btnSize - 27.5;
-            const y = window.innerHeight - 57.5;
-
-            const removeButtonContainer = document.getElementById("buttoncontainerBOTTOM");
-            if (removeButtonContainer) {
-                removeButtonContainer.parentNode.removeChild(removeButtonContainer);
-            }
-
-            const ButtonHolder = document.createElement("div");
-            ButtonHolder.setAttribute("id", "buttoncontainerBOTTOM");
-            ButtonHolder.style.display = "block";
-            document.body.appendChild(ButtonHolder);
-
-            this.homeButtonContainer = createButton(
-                GOHOMEFADEDBUTTON,
-                `${_("Home")} [${_("Home").toUpperCase()}]`,
-                this.findBlocks
-            );
-            this.boundary.hide();
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Home [HOME]"))
-                this.helpfulWheelItems.push({
-                    label: "Home [HOME]",
-                    icon:
-                        "imgsrc:data:image/svg+xml;base64," +
-                        window.btoa(base64Encode(GOHOMEFADEDBUTTON)),
-                    display: true,
-                    fn: this.findBlocks
-                });
-
-            this.hideBlocksContainer = createButton(
-                SHOWBLOCKSBUTTON,
-                _("Show/hide blocks"),
-                changeBlockVisibility
-            );
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Show/hide blocks"))
-                this.helpfulWheelItems.push({
-                    label: "Show/hide blocks",
-                    icon:
-                        "imgsrc:data:image/svg+xml;base64," +
-                        window.btoa(base64Encode(SHOWBLOCKSBUTTON)),
-                    display: true,
-                    fn: changeBlockVisibility
-                });
-
-            this.collapseBlocksContainer = createButton(
-                COLLAPSEBLOCKSBUTTON,
-                _("Expand/collapse blocks"),
-                toggleCollapsibleStacks
-            );
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Expand/collapse blocks"))
-                this.helpfulWheelItems.push({
-                    label: "Expand/collapse blocks",
-                    icon:
-                        "imgsrc:data:image/svg+xml;base64," +
-                        window.btoa(base64Encode(COLLAPSEBLOCKSBUTTON)),
-                    display: true,
-                    fn: toggleCollapsibleStacks
-                });
-
-            this.smallerContainer = createButton(
-                SMALLERBUTTON,
-                _("Decrease block size"),
-                doSmallerBlocks
-            );
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Decrease block size"))
-                this.helpfulWheelItems.push({
-                    label: "Decrease block size",
-                    icon:
-                        "imgsrc:data:image/svg+xml;base64," +
-                        window.btoa(base64Encode(SMALLERBUTTON)),
-                    display: true,
-                    fn: doSmallerBlocks
-                });
-
-            this.largerContainer = createButton(
-                BIGGERBUTTON,
-                _("Increase block size"),
-                doLargerBlocks
-            );
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Increase block size"))
-                this.helpfulWheelItems.push({
-                    label: "Increase block size",
-                    icon:
-                        "imgsrc:data:image/svg+xml;base64," +
-                        window.btoa(base64Encode(BIGGERBUTTON)),
-                    display: true,
-                    fn: doLargerBlocks
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Restore"))
-                this.helpfulWheelItems.push({
-                    label: "Restore",
-                    icon: "imgsrc:header-icons/restore-from-trash.svg",
-                    display: true,
-                    fn: restoreTrashPop
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Turtle Wrap Off"))
-                this.helpfulWheelItems.push({
-                    label: "Turtle Wrap Off",
-                    icon: "imgsrc:header-icons/wrap-text.svg",
-                    display: true,
-                    fn: this.toolbar.changeWrap
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Turtle Wrap On"))
-                this.helpfulWheelItems.push({
-                    label: "Turtle Wrap On",
-                    icon: "imgsrc:header-icons/wrap-text.svg",
-                    display: false,
-                    fn: this.toolbar.changeWrap
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Enable horizontal scrolling"))
-                this.helpfulWheelItems.push({
-                    label: "Enable horizontal scrolling",
-                    icon: "imgsrc:header-icons/compare-arrows.svg",
-                    display: this.beginnerMode ? false : true,
-                    fn: setScroller
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Disable horizontal scrolling"))
-                this.helpfulWheelItems.push({
-                    label: "Disable horizontal scrolling",
-                    icon: "imgsrc:header-icons/lock.svg",
-                    display: false,
-                    fn: setScroller
-                });
-
-            if (
-                _THIS_IS_MUSIC_BLOCKS_ &&
-                !this.helpfulWheelItems.find(ele => ele.label === "Set Pitch Preview")
-            )
-                this.helpfulWheelItems.push({
-                    label: "Set Pitch Preview",
-                    icon: "imgsrc:header-icons/music-note.svg",
-                    display: true,
-                    fn: chooseKeyMenu
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Grid"))
-                this.helpfulWheelItems.push({
-                    label: "Grid",
-                    icon:
-                        "imgsrc:data:image/svg+xml;base64," +
-                        window.btoa(base64Encode(CARTESIANBUTTON)),
-                    display: true,
-                    fn: piemenuGrid
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Select"))
-                this.helpfulWheelItems.push({
-                    label: "Select",
-                    icon:
-                        "imgsrc:data:image/svg+xml;base64," +
-                        window.btoa(base64Encode(SELECTBUTTON)),
-                    display: true,
-                    fn: this.selectMode
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Clear"))
-                this.helpfulWheelItems.push({
-                    label: "Clear",
-                    icon:
-                        "imgsrc:data:image/svg+xml;base64," +
-                        window.btoa(base64Encode(CLEARBUTTON)),
-                    display: true,
-                    fn: () => this._allClear(false)
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Collapse"))
-                this.helpfulWheelItems.push({
-                    label: "Collapse",
-                    icon:
-                        "imgsrc:data:image/svg+xml;base64," +
-                        window.btoa(base64Encode(COLLAPSEBUTTON)),
-                    display: true,
-                    fn: this.turtles.collapse
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Expand"))
-                this.helpfulWheelItems.push({
-                    label: "Expand",
-                    icon:
-                        "imgsrc:data:image/svg+xml;base64," +
-                        window.btoa(base64Encode(EXPANDBUTTON)),
-                    display: false,
-                    fn: this.turtles.expand
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Search for Blocks"))
-                this.helpfulWheelItems.push({
-                    label: "Search for Blocks",
-                    icon: "imgsrc:header-icons/search-button.svg",
-                    display: true,
-                    fn: this._displayHelpfulSearchDiv
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Paste previous stack"))
-                this.helpfulWheelItems.push({
-                    label: "Paste previous stack",
-                    icon: "imgsrc:header-icons/copy-button.svg",
-                    display: false,
-                    fn: this.turtles.expand
-                });
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Close"))
-                this.helpfulWheelItems.push({
-                    label: "Close",
-                    icon: "imgsrc:header-icons/cancel-button.svg",
-                    display: true,
-                    fn: this._hideHelpfulSearchWidget
-                });
-        };
+        // Palette/bottom-toolbar menu construction (_setupPaletteMenu and the
+        // helpfulWheelItems registry it builds) has been extracted to
+        // ContextMenuController; see the setupPaletteMenu delegation stub
+        // installed by setupContextMenuController() above.
 
         /*
          * Shows search widget on helpfulSearchDiv
@@ -3461,384 +2519,10 @@ class Activity {
 
         this.doHelpfulSearch = () => this.searchController.doHelpfulSearch();
 
-        /**
-         * Toggles display of javaScript editor widget.
-         */
-        const toggleJSWindow = async activity => {
-            await lazyLoad([
-                "widgets/jseditor",
-                "activity/js-export/samples/sample",
-                "activity/js-export/export",
-                "activity/js-export/interface",
-                "activity/js-export/constraints",
-                "activity/js-export/ASTutils",
-                "activity/js-export/generate",
-                "activity/js-export/ast2blocklist",
-                "activity/js-export/API/GraphicsBlocksAPI",
-                "activity/js-export/API/PenBlocksAPI",
-                "activity/js-export/API/RhythmBlocksAPI",
-                "activity/js-export/API/MeterBlocksAPI",
-                "activity/js-export/API/PitchBlocksAPI",
-                "activity/js-export/API/IntervalsBlocksAPI",
-                "activity/js-export/API/ToneBlocksAPI",
-                "activity/js-export/API/OrnamentBlocksAPI",
-                "activity/js-export/API/VolumeBlocksAPI",
-                "activity/js-export/API/DrumBlocksAPI",
-                "activity/js-export/API/DictBlocksAPI"
-            ]);
-            new JSEditor(activity);
-        };
-
-        const doAnalytics = async activity => {
-            if (!activity.statsWindow || !activity.statsWindow.isOpen) {
-                await lazyLoad("widgets/statistics");
-                activity.statsWindow = new StatsWindow(activity);
-            }
-        };
-
-        /*
-         * Shows help page
-         */
-        const showHelp = activity => {
-            if (window.widgetWindows?.isOpen("keyboard-shortcuts")) {
-                window.widgetWindows.clear("keyboard-shortcuts");
-            }
-            activity._showHelp();
-        };
-
-        this._showHelp = async () => {
-            // Will show welcome page by default.
-            await lazyLoad("widgets/help");
-            new HelpWidget(this, false);
-        };
-
-        const showKeyboardShortcuts = activity => {
-            if (window.widgetWindows?.isOpen("help")) {
-                window.widgetWindows.clear("help");
-            }
-            activity._showKeyboardShortcuts();
-        };
-
-        this._showKeyboardShortcuts = () => {
-            const platformKeys = (windowsKeys, macKeys = windowsKeys) =>
-                `${_("Windows/Linux")}: ${windowsKeys}\n${_("Mac")}: ${macKeys}`;
-
-            const shortcutSections = [
-                {
-                    title: _("Workspace"),
-                    items: [
-                        {
-                            keys: platformKeys("Alt + R", "Option + R"),
-                            action: _("Play project")
-                        },
-                        {
-                            keys: platformKeys("Alt + S", "Option + S"),
-                            action: _("Stop project")
-                        },
-                        {
-                            keys: platformKeys("Alt + Enter", "Option + Enter"),
-                            action: _("Play or stop depending on the current state")
-                        },
-                        {
-                            keys: platformKeys("Space", "Space"),
-                            action: _("Play or stop when no text input or widget is active")
-                        },
-                        {
-                            keys: platformKeys("Shift + Space", "Shift + Space"),
-                            action: _("Toggle stage scale")
-                        },
-                        {
-                            keys: platformKeys("Home", "Home"),
-                            action: _("Jump to home position")
-                        },
-                        {
-                            keys: platformKeys("End", "End"),
-                            action: _("Jump to the bottom of the workspace")
-                        },
-                        {
-                            keys: platformKeys("Page Up", "Page Up"),
-                            action: _("Scroll workspace up")
-                        },
-                        {
-                            keys: platformKeys("Page Down", "Page Down"),
-                            action: _("Scroll workspace down")
-                        },
-                        {
-                            keys: platformKeys("Esc", "Esc"),
-                            action: _("Hide block search when it is open")
-                        },
-                        {
-                            keys: platformKeys("d,r,m,f,s,l,t", "d,r,m,f,s,l,t"),
-                            action: _(
-                                "You can type d to create a do block and r to create a re block etc."
-                            )
-                        }
-                    ]
-                },
-                {
-                    title: _("Editing"),
-                    items: [
-                        {
-                            keys: platformKeys("Alt + C", "Option + C"),
-                            action: _("Copy selected stack.")
-                        },
-                        {
-                            keys: platformKeys("Alt + V", "Option + V"),
-                            action: _("Paste previous stack.")
-                        },
-                        {
-                            keys: platformKeys("Ctrl + V", "Control + V"),
-                            action: _("Open the JSON paste box.")
-                        },
-                        {
-                            keys: platformKeys("Enter", "Enter"),
-                            action: _("Paste JSON when the paste box is focused.")
-                        },
-                        {
-                            keys: platformKeys("Delete", "Delete"),
-                            action: _("Extract the active block.")
-                        },
-                        {
-                            keys: platformKeys("Alt + E", "Option + E"),
-                            action: _("Clear workspace.")
-                        },
-                        {
-                            keys: platformKeys("Alt + B", "Option + B"),
-                            action: _("Save block artwork.")
-                        },
-                        {
-                            keys: platformKeys("Alt + H", "Option + H"),
-                            action: _("Save block help.")
-                        }
-                    ]
-                },
-                {
-                    title: _("Navigation"),
-                    items: [
-                        {
-                            keys: platformKeys("Tab / Shift + Tab", "Tab / Shift + Tab"),
-                            action: _("Move focus between the toolbar, palettes, and workspace.")
-                        },
-                        {
-                            keys: platformKeys(_("Arrow keys"), _("Arrow keys")),
-                            action: _(
-                                "Move the active block, scroll palettes, adjust the tempo widget, or pan the workspace depending on context."
-                            )
-                        },
-                        {
-                            keys: platformKeys("/", "/"),
-                            action: _("Pan workspace right when horizontal scrolling is enabled.")
-                        },
-                        {
-                            keys: platformKeys("\\", "\\"),
-                            action: _("Pan workspace left when horizontal scrolling is enabled.")
-                        }
-                    ]
-                },
-                {
-                    title: _("Toolbar"),
-                    items: [
-                        {
-                            keys: platformKeys(
-                                _("Arrow Left / Arrow Right"),
-                                _("Arrow Left / Arrow Right")
-                            ),
-                            action: _("Move focus within the current toolbar.")
-                        },
-                        {
-                            keys: platformKeys(
-                                _("Arrow Up / Arrow Down"),
-                                _("Arrow Up / Arrow Down")
-                            ),
-                            action: _("Move focus between main and auxiliary toolbars.")
-                        },
-                        {
-                            keys: platformKeys("Enter", "Enter"),
-                            action: _("Activate the focused toolbar button.")
-                        },
-                        {
-                            keys: platformKeys("Esc", "Esc"),
-                            action: _("Exit toolbar keyboard navigation.")
-                        }
-                    ]
-                },
-                {
-                    title: _("Widget Windows"),
-                    items: [
-                        {
-                            keys: platformKeys("Esc", "Esc"),
-                            action: _("Close the focused widget window.")
-                        },
-                        {
-                            keys: platformKeys("Ctrl + Shift + M", "Command + Shift + M"),
-                            action: _("Maximize or restore the focused widget window.")
-                        }
-                    ]
-                },
-                {
-                    title: _("Help and Pitch Slider"),
-                    items: [
-                        {
-                            keys: platformKeys(
-                                _("Arrow Left / Arrow Right"),
-                                _("Arrow Left / Arrow Right")
-                            ),
-                            action: _("Move between help pages when Help is open.")
-                        },
-                        {
-                            keys: platformKeys(_("Arrow keys"), _("Arrow keys")),
-                            action: _("Adjust pitch by semitone when Pitch Slider is open.")
-                        }
-                    ]
-                }
-            ];
-
-            const widgetWindow = window.widgetWindows.windowFor(
-                this,
-                _("Keyboard shortcuts"),
-                "keyboard-shortcuts",
-                true
-            );
-            widgetWindow.clear();
-            widgetWindow.show();
-
-            const widgetBody = widgetWindow.getWidgetBody();
-            widgetBody.className = "wfbWidget keyboard-shortcuts-widget";
-            widgetBody.style.padding = "0";
-            widgetBody.style.display = "block";
-            widgetBody.style.height = "min(72vh, 680px)";
-            widgetBody.style.width = "min(68vw, 760px)";
-            widgetBody.style.maxWidth = "100%";
-            widgetBody.style.overflow = "hidden";
-
-            const wrapper = document.createElement("div");
-            wrapper.className = "keyboard-shortcuts-panel";
-
-            const intro = document.createElement("div");
-            intro.className = "keyboard-shortcuts-hero";
-            const titleDiv = document.createElement("div");
-            titleDiv.className = "keyboard-shortcuts-hero-title";
-            titleDiv.textContent = _("Keyboard shortcuts");
-
-            const copyDiv = document.createElement("div");
-            copyDiv.className = "keyboard-shortcuts-hero-copy";
-            copyDiv.textContent = _(
-                "Shortcuts are context-sensitive. Some only work when a related panel, widget, or mode is active. Windows/Linux and Mac equivalents are shown together."
-            );
-
-            intro.appendChild(titleDiv);
-            intro.appendChild(copyDiv);
-            wrapper.appendChild(intro);
-
-            shortcutSections.forEach(section => {
-                const sectionCard = document.createElement("section");
-                sectionCard.className = "keyboard-shortcuts-section";
-
-                const heading = document.createElement("div");
-                heading.textContent = section.title;
-                heading.className = "keyboard-shortcuts-section-title";
-                sectionCard.appendChild(heading);
-
-                section.items.forEach(item => {
-                    const row = document.createElement("div");
-                    row.className = "keyboard-shortcuts-row";
-
-                    const key = document.createElement("div");
-                    key.textContent = item.keys;
-                    key.className = "keyboard-shortcuts-key";
-
-                    const action = document.createElement("div");
-                    action.textContent = item.action;
-                    action.className = "keyboard-shortcuts-action";
-
-                    row.appendChild(key);
-                    row.appendChild(action);
-                    sectionCard.appendChild(row);
-                });
-
-                wrapper.appendChild(sectionCard);
-            });
-
-            widgetBody.appendChild(wrapper);
-            widgetWindow.sendToCenter();
-            requestAnimationFrame(() => widgetWindow.sendToCenter());
-        };
-
-        /*
-         * Shows about page
-         */
-        const showAboutPage = activity => {
-            activity._showAboutPage();
-        };
-
-        this._showAboutPage = async () => {
-            // Will show welcome page by default.
-            await lazyLoad("widgets/help");
-            new HelpWidget(this, false);
-        };
-
-        /*
-         * Makes non-toolbar buttons, e.g., the palette menu buttons
-         */
-        this._makeButton = (name, label, x, y) => {
-            const container = document.createElement("div");
-            container.setAttribute("id", "" + label);
-            container.setAttribute("class", "tooltipped");
-            container.setAttribute("data-tooltip", label);
-            container.setAttribute("data-position", "top");
-            window.jQuery(".tooltipped").tooltip({
-                html: true,
-                delay: 100
-            });
-
-            const that = this;
-            container.onmouseover = () => {
-                if (!that.loading) {
-                    document.body.style.cursor = "pointer";
-                    container.style.transition = "0.12s ease-out";
-                    container.style.transform = "scale(1.15)";
-                }
-            };
-
-            container.onmouseout = () => {
-                if (!that.loading) {
-                    document.body.style.cursor = "default";
-                    container.style.transition = "0.15s ease-out";
-                    container.style.transform = "scale(1)";
-                }
-            };
-
-            const img = new Image();
-            img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(name));
-            // Accessibility: derive alt text from the button label
-            const altText = label ? label.replace(/\s*\[.*\]$/, "") : "Toolbar button";
-            img.setAttribute("alt", altText);
-
-            // Batch DOM reads before writes to avoid forced synchronous layout
-            const rightPos = document.body.clientWidth - x;
-            container.appendChild(img);
-            container.setAttribute(
-                "style",
-                "position: absolute; right:" + rightPos + "px;  top: " + y + "px;"
-            );
-            document.getElementById("buttoncontainerBOTTOM").appendChild(container);
-            return container;
-        };
-
-        /**
-         * Handles button dragging, long hovering and prevents multiple button presses.
-         * @param container longAction
-         * @param hoverAction extraLongImg
-         */
-        this._loadButtonDragHandler = (container, actionClick, arg) => {
-            const that = this;
-            container.onmousedown = () => {
-                if (!that.loading) {
-                    document.body.style.cursor = "default";
-                }
-                actionClick(arg);
-            };
-        };
+        // Non-toolbar button creation and drag handling (_makeButton,
+        // _loadButtonDragHandler) has been extracted to ContextMenuController;
+        // see the makeButton/loadButtonDragHandler delegation stubs installed
+        // by setupContextMenuController() above.
 
         /*
          * Handles pasted strings into input fields
@@ -3873,28 +2557,9 @@ class Activity {
             this.pasteBox.hide();
         };
 
-        /**
-         * Handles changes in y coordinates of elements when aux toolbar is opened.
-         * Repositions elements on screen by a certain amount (dy).
-         * @param dy how much of a change in y
-         */
-        this.deltaY = dy => {
-            this.toolbarHeight += dy;
-            for (let i = 0; i < this.onscreenButtons.length; i++) {
-                this.onscreenButtons[i].y += dy;
-            }
-
-            for (let i = 0; i < this.onscreenMenu.length; i++) {
-                this.onscreenMenu[i].y += dy;
-            }
-
-            this.palettes.deltaY(dy);
-            this.turtles.deltaY(dy);
-
-            // this.menuContainer.y += dy;
-            this.blocksContainer.y += dy;
-            this.refreshCanvas();
-        };
+        // deltaY (repositions elements on screen when the aux toolbar opens/closes)
+        // has been extracted to ContextMenuController; see the delegation stub
+        // installed by setupContextMenuController() above.
 
         /*
          * Ran once dom is ready and editable
@@ -4074,7 +2739,7 @@ class Activity {
 
             // Show help on startup if first-time user.
             if (this.firstTimeUser) {
-                this._showHelp();
+                this.showHelp();
             }
 
             try {
@@ -4089,7 +2754,7 @@ class Activity {
             this.toolbar = new Toolbar();
             this.toolbar.init(this);
 
-            this.toolbar.renderLogoIcon(showAboutPage);
+            this.toolbar.renderLogoIcon(this.showAboutPage);
             this.toolbar.renderPlayIcon(doFastButton);
             this.toolbar.renderStopIcon(doHardStopButton);
             this.toolbar.renderNewProjectIcon(() => this.projectManager.newProject());
@@ -4108,12 +2773,12 @@ class Activity {
                 this.save.saveBlockArtworkPNG.bind(this.save)
             );
             this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
-            this.toolbar.renderMenuIcon(showHideAuxMenu);
-            this.toolbar.renderHelpIcon(showHelp, showKeyboardShortcuts);
+            this.toolbar.renderMenuIcon(this.showHideAuxMenu);
+            this.toolbar.renderHelpIcon(this.showHelp, this.showKeyboardShortcuts);
             this.toolbar.renderModeSelectIcon(
                 doSwitchMode,
                 () => doRecordButton(this),
-                doAnalytics,
+                this.doAnalytics,
                 doOpenPlugin,
                 deletePlugin,
                 setScroller
@@ -4122,11 +2787,11 @@ class Activity {
             this.toolbar.renderRunStepIcon(doStepButton);
             this.toolbar.renderThemeSelectIcon(this.themeBox, this.themes);
             this.toolbar.renderMergeIcon(() => this.projectManager.doMergeLoad());
-            this.toolbar.renderRestoreIcon(restoreTrash);
+            this.toolbar.renderRestoreIcon(this.restoreTrash);
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.toolbar.renderChooseKeyIcon(chooseKeyMenu);
             }
-            this.toolbar.renderJavaScriptIcon(toggleJSWindow);
+            this.toolbar.renderJavaScriptIcon(this.toggleJSWindow);
             this.toolbar.renderLanguageSelectIcon(this.languageBox);
             this.toolbar.renderWrapIcon();
             this._perfMark("activity.init.ui_ready");

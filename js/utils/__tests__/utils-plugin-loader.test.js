@@ -145,4 +145,18 @@ describe("processPluginData script cleanup", () => {
         expect(document.head.querySelectorAll("script[src^='blob:plugin-setup']")).toHaveLength(0);
         expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:plugin-setup-0");
     });
+
+    it("returns null and logs error when plugin data is invalid JSON", async () => {
+        const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+
+        const result = await processPluginData(createActivity(), "{invalid", "plugins/test.json");
+
+        expect(result).toBeNull();
+        expect(errorSpy).toHaveBeenCalled();
+        expect(debugSpy).toHaveBeenCalledWith("Malformed plugin data:", "{invalid");
+
+        errorSpy.mockRestore();
+        debugSpy.mockRestore();
+    });
 });

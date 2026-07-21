@@ -1402,7 +1402,7 @@ describe("Utility Functions (logic-only)", () => {
     });
 
     describe("_performNotes frequency conversion for non-standard notes", () => {
-        it("should convert Unicode accidental notes to frequency under equal temperament", async () => {
+        it("should normalize Unicode accidental notes and pass through as standard notes under equal temperament", async () => {
             const mockSynth = {
                 toDestination: jest.fn().mockReturnThis(),
                 triggerAttackRelease: jest.fn()
@@ -1413,7 +1413,8 @@ describe("Utility Functions (logic-only)", () => {
 
             expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
             const noteArg = mockSynth.triggerAttackRelease.mock.calls[0][0];
-            expect(typeof noteArg).toBe("number");
+            // "F♭4" -> "Fb4" is a standard note name, so it passes through as a string.
+            expect(noteArg).toBe("Fb4");
         });
 
         it("should convert double-accidental notes to frequency under equal temperament", async () => {
@@ -1444,7 +1445,7 @@ describe("Utility Functions (logic-only)", () => {
             expect(noteArg).toBe("C4");
         });
 
-        it("should convert array of notes containing Unicode accidentals", async () => {
+        it("should normalize and pass array of notes containing Unicode accidentals", async () => {
             const mockSynth = {
                 toDestination: jest.fn().mockReturnThis(),
                 triggerAttackRelease: jest.fn()
@@ -1456,8 +1457,10 @@ describe("Utility Functions (logic-only)", () => {
             expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
             const noteArg = mockSynth.triggerAttackRelease.mock.calls[0][0];
             expect(Array.isArray(noteArg)).toBe(true);
-            expect(typeof noteArg[0]).toBe("number");
-            expect(typeof noteArg[1]).toBe("number");
+            // After normalization, "F♭4" -> "Fb4" which is a standard note name
+            // that Tone.js can parse directly, so it passes through as a string.
+            expect(noteArg[0]).toBe("Fb4");
+            expect(noteArg[1]).toBe("C4");
         });
 
         it("should not convert numerical notes", async () => {

@@ -686,7 +686,7 @@ class Block {
                 // block is hidden, so do nothing.
                 return;
             }
-        } else if (!this.bitmap.visible) {
+        } else if (this.bitmap === null || !this.bitmap.visible) {
             return;
         }
 
@@ -753,7 +753,9 @@ class Block {
             }
         }
 
-        this.container.updateCache();
+        if (this._viewportVisible !== false) {
+            this.container.updateCache();
+        }
     }
 
     /**
@@ -835,7 +837,9 @@ class Block {
             }
         }
 
-        this.container.updateCache();
+        if (this._viewportVisible !== false) {
+            this.container.updateCache();
+        }
     }
 
     unhighlightSelectedBlocks(blk, selection) {
@@ -2125,6 +2129,19 @@ class Block {
         const noHitCapability = this.getCapability("noHit");
         if (noHitCapability !== undefined) {
             return !!noHitCapability;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if the block is a note container.
+     * @returns {boolean} - True if the block is a note container, false otherwise.
+     */
+    isNoteContainer() {
+        const noteContainerCapability = this.getCapability("noteContainer");
+        if (noteContainerCapability !== undefined) {
+            return !!noteContainerCapability;
         }
 
         return false;

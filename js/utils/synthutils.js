@@ -769,6 +769,7 @@ function Synth() {
                 //To get frequencies in Temperament Widget.
                 this.temperamentChanged(temperament, this.startingPitch);
             }
+            Singer.clearPitchToFrequencyCache();
         }
 
         if (this.inTemperament === "equal") {
@@ -793,7 +794,7 @@ function Synth() {
 
         const __getFrequency = oneNote => {
             const parsed = parseNoteString(oneNote);
-            const noteName = parsed[0];
+            const noteName = normalizeNoteAccidentals(parsed[0]);
             const octave = parsed[1];
 
             for (const note in this.noteFrequencies) {
@@ -804,7 +805,7 @@ function Synth() {
                     } else {
                         //Note to be played is not in the same octave.
                         const power = octave - this.noteFrequencies[note][0];
-                        return this.noteFrequencies[note][1] * Math.pow(2, power);
+                        return this.noteFrequencies[note][1] * Math.pow(getOctaveRatio(), power);
                     }
                 }
             }
@@ -1809,6 +1810,13 @@ function Synth() {
             return false;
         };
 
+        // Normalize Unicode accidentals to ASCII so Tone.js can parse the note names.
+        if (typeof notes === "string") {
+            notes = normalizeNoteAccidentals(notes);
+        } else if (Array.isArray(notes)) {
+            notes = notes.map(n => (typeof n === "string" ? normalizeNoteAccidentals(n) : n));
+        }
+
         if (needsFreqConversion()) {
             if (typeof notes === "number") {
                 notes = notes;
@@ -2684,6 +2692,10 @@ function Synth() {
      * @memberof Synth
      */
     this.LiveWaveForm = () => {
+        if (this.analyser) {
+            this.mic.disconnect(this.analyser);
+            this.analyser.dispose();
+        }
         this.analyser = new Tone.Analyser("waveform", 8192);
         this.mic.connect(this.analyser);
     };
@@ -3837,6 +3849,16 @@ function Synth() {
         _disposeRecordingPlayer();
         _revokeRecordingURL();
 
+        if (this.analyser) {
+            try {
+                this.mic.disconnect(this.analyser);
+                this.analyser.dispose();
+            } catch (e) {
+                console.debug("Error disposing analyser:", e);
+            }
+            this.analyser = null;
+        }
+
         for (const turtle in instruments) {
             for (const instrumentName in instruments[turtle]) {
                 if (
@@ -3900,7 +3922,7 @@ function Synth() {
     this.startingPitchOctave = 4;
     this.octaveTranspose = 0;
     this.inTemperament = "equal";
-    this.changeInTemperament = "equal";
+    this.changeInTemperament = false;
     this.inTransposition = 0;
     this.transposition = 2;
     this.playbackRate = 1;

@@ -30,11 +30,11 @@
         "dist": "electron-builder"
     },
     "devDependencies": {
-        "@commitlint/cli": "^19.0.0",
-        "@commitlint/config-conventional": "^19.0.0",
         "@babel/core": "^7.28.5",
         "@babel/eslint-parser": "^7.28.5",
         "@babel/preset-env": "^7.29.5",
+        "@commitlint/cli": "^19.0.0",
+        "@commitlint/config-conventional": "^19.0.0",
         "cross-env": "^7.0.3",
         "cypress": "^15.15.0",
         "electron": "40.8.5",
@@ -52,12 +52,12 @@
         "jest-environment-jsdom": "^30.4.1",
         "lint-staged": "^15.5.2",
         "nodemon": "^3.1.9",
-        "prettier": "^3.8.3"
+        "prettier": "3.9.5"
     },
     "dependencies": {
         "@tonejs/midi": "^2.0.28",
         "abcjs": "6.3.0",
-        "autoprefixer": "^10.5.0",
+        "autoprefixer": "10.5.2",
         "compression": "^1.8.1",
         "cssnano": "^7.1.9",
         "express": "5.2.1",
@@ -73,8 +73,8 @@
         "jquery": "3.7.1",
         "jquery-ui-dist": "1.12.1",
         "materialize-css": "0.100.2",
-        "postcss": "^8.5.14",
-        "sass": "^1.98.0",
+        "postcss": "8.5.18",
+        "sass": "1.101.0",
         "tone": "^15.1.22"
     },
     "build": {
@@ -101,7 +101,7 @@
         "picomatch": "^4.0.4",
         "yaml": "^2.8.3",
         "follow-redirects": "^1.16.0",
-        "systeminformation": "^5.31.6",
+        "systeminformation": "^5.31.17",
         "ip-address": "^10.2.0",
         "ajv": "^6.14.0",
         "@commitlint/config-validator": {
