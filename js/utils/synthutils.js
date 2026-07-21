@@ -2111,7 +2111,11 @@ function Synth() {
                 };
 
                 if (timerManager && typeof timerManager.setGuardedTimeout === "function") {
-                    timerManager.setGuardedTimeout(cleanupFn, beatValue * 1000 + 500, () => false);
+                    timerManager.setGuardedTimeout(cleanupFn, beatValue * 1000 + 500, () =>
+                        Boolean(
+                            this.activity && this.activity.logo && this.activity.logo.stopTurtle
+                        )
+                    );
                 } else {
                     setTimeout(cleanupFn, beatValue * 1000 + 500);
                 }

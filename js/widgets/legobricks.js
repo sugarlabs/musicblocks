@@ -353,7 +353,6 @@ function LegoWidget() {
     this._initAudio = function () {
         // Create a new synthesizer instance
         this.synth = new Synth();
-        this.synth._timerManager = this._timerManager;
         this.synth.loadSamples();
 
         // Create the default electronic synth for all pitch playback

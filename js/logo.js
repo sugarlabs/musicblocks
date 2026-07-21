@@ -270,7 +270,6 @@ class Logo {
         // Load the default synthesizer
         this.synth = new this.deps.classes.Synth();
         this.synth.activity = this.activity; // Reference for voice tracking
-        this.synth._timerManager = this._timerManager; // Share timer manager
         this.synth.changeInTemperament = false;
         this._synthsInitialized = false;
 
@@ -353,6 +352,9 @@ class Logo {
                     }
                 };
             }
+        }
+        if (this.synth) {
+            this.synth._timerManager = this._timerManager;
         }
 
         this._graphicsScheduler = new EmbeddedGraphicsScheduler(this);
