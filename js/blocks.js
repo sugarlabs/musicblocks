@@ -5794,27 +5794,22 @@ class Blocks {
                 blockObjs.pop();
             }
 
-            /** Check for circular connections in block data. */
-            // 1. Direct self-loops
-            for (let b = 0; b < blockObjs.length; b++) {
-                const blkData = blockObjs[b];
-                for (const c in blkData[4]) {
-                    if (blkData[4][c] === blkData[0]) {
-                        console.debug("Circular connection in block data: " + blkData);
-                        console.debug("Punting loading of new blocks!");
-                        console.debug(blockObjs);
-                        return;
-                    }
-                }
-            }
-
-            // 2. Multi-block cycles (DFS on outgoing connections: indices 1 and above)
+            /** Check for circular connections in block data using iterative DFS. */
             const hasCycle = () => {
                 const adj = new Map();
                 for (let b = 0; b < blockObjs.length; b++) {
                     const blkData = blockObjs[b];
                     const id = blkData[0];
                     const connections = blkData[4] || [];
+
+                    // Direct self-loop check on any dock
+                    for (let c = 0; c < connections.length; c++) {
+                        if (connections[c] === id) {
+                            return true;
+                        }
+                    }
+
+                    // Outgoing child connections (docks 1 and above)
                     const neighbors = [];
                     for (let c = 1; c < connections.length; c++) {
                         const connId = connections[c];
@@ -5826,33 +5821,41 @@ class Blocks {
                 }
 
                 const visited = new Set();
-                const recStack = new Set();
-
-                const dfs = nodeId => {
-                    visited.add(nodeId);
-                    recStack.add(nodeId);
-
-                    const neighbors = adj.get(nodeId) || [];
-                    for (let i = 0; i < neighbors.length; i++) {
-                        const neighborId = neighbors[i];
-                        if (!visited.has(neighborId)) {
-                            if (dfs(neighborId)) {
-                                return true;
-                            }
-                        } else if (recStack.has(neighborId)) {
-                            return true;
-                        }
-                    }
-
-                    recStack.delete(nodeId);
-                    return false;
-                };
+                const activeStack = new Set();
 
                 for (let b = 0; b < blockObjs.length; b++) {
-                    const id = blockObjs[b][0];
-                    if (!visited.has(id)) {
-                        if (dfs(id)) {
-                            return true;
+                    const startId = blockObjs[b][0];
+                    if (visited.has(startId)) {
+                        continue;
+                    }
+
+                    // Stack stores tuple: [nodeId, neighborIndex]
+                    const stack = [[startId, 0]];
+                    visited.add(startId);
+                    activeStack.add(startId);
+
+                    while (stack.length > 0) {
+                        const top = stack[stack.length - 1];
+                        const nodeId = top[0];
+                        const neighborIndex = top[1];
+                        const neighbors = adj.get(nodeId) || [];
+
+                        if (neighborIndex < neighbors.length) {
+                            top[1]++;
+                            const neighborId = neighbors[neighborIndex];
+
+                            if (activeStack.has(neighborId)) {
+                                return true;
+                            }
+
+                            if (!visited.has(neighborId)) {
+                                visited.add(neighborId);
+                                activeStack.add(neighborId);
+                                stack.push([neighborId, 0]);
+                            }
+                        } else {
+                            activeStack.delete(nodeId);
+                            stack.pop();
                         }
                     }
                 }
@@ -5860,6 +5863,7 @@ class Blocks {
             };
 
             if (hasCycle()) {
+                console.warn("Circular connection in block data");
                 console.debug("Circular connection in block data");
                 console.debug("Punting loading of new blocks!");
                 console.debug(blockObjs);
