@@ -9,6 +9,11 @@
 
 module.exports = {
     extends: ["@commitlint/config-conventional"],
+    // Skip linting for automated bot commits. Dependabot generates commit
+    // bodies with long changelog URLs and an `updated-dependencies:` trailer
+    // that exceed body-max-line-length; those messages are not hand-authored
+    // and should not be held to the Conventional Commits body rules.
+    ignores: [(message) => /Signed-off-by: dependabot\[bot\]/.test(message)],
     rules: {
         // Allowed commit types. Extend this list if the project needs more.
         "type-enum": [
