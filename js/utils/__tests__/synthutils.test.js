@@ -1672,6 +1672,69 @@ describe("Utility Functions (logic-only)", () => {
 
             jest.useRealTimers();
         });
+
+        it("should route effects cleanup through setGuardedTimeout when timerManager is available", async () => {
+            const mockTimerManager = {
+                setGuardedTimeout: jest.fn()
+            };
+            const originalTimerManager = Synth._timerManager;
+            Synth._timerManager = mockTimerManager;
+
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn(),
+                disconnect: jest.fn(),
+                connect: jest.fn(),
+                chain: jest.fn().mockReturnThis()
+            };
+            Synth.inTemperament = "equal";
+
+            const paramsEffects = {
+                doVibrato: true,
+                vibratoFrequency: 5,
+                vibratoIntensity: 1
+            };
+
+            try {
+                await _performNotes.call(
+                    Synth,
+                    mockSynth,
+                    "C4",
+                    0.25,
+                    paramsEffects,
+                    null,
+                    false,
+                    0
+                );
+
+                expect(mockTimerManager.setGuardedTimeout).toHaveBeenCalledWith(
+                    expect.any(Function),
+                    750,
+                    expect.any(Function)
+                );
+
+                // Extract and test the stop guard function
+                const stopGuardFn = mockTimerManager.setGuardedTimeout.mock.calls[0][2];
+                expect(stopGuardFn()).toBe(false);
+
+                // Mock activity and test stop guard function
+                Synth.activity = {
+                    logo: {
+                        stopTurtle: true
+                    }
+                };
+                expect(stopGuardFn()).toBe(true);
+
+                // Extract and test the cleanup callback
+                const cleanupFn = mockTimerManager.setGuardedTimeout.mock.calls[0][0];
+                cleanupFn();
+                expect(mockSynth.disconnect).toHaveBeenCalled();
+                expect(mockSynth.toDestination).toHaveBeenCalled();
+            } finally {
+                Synth._timerManager = originalTimerManager;
+                Synth.activity = undefined;
+            }
+        });
     });
 });
 

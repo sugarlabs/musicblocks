@@ -2110,6 +2110,10 @@ function Synth() {
                     }
                 };
 
+                // Schedule cleanup after the note duration.
+                // A 500 ms safety buffer is added beyond the note duration to prevent
+                // premature disposal caused by audio-clock drift or scheduler jitter,
+                // which would otherwise produce crackling artefacts in long sessions.
                 if (timerManager && typeof timerManager.setGuardedTimeout === "function") {
                     timerManager.setGuardedTimeout(cleanupFn, beatValue * 1000 + 500, () =>
                         Boolean(
