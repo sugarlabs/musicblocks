@@ -1297,6 +1297,46 @@ describe("Logo runLogoCommands", () => {
 
         global.Tone = savedTone;
     });
+
+    describe("performance instrumentation", () => {
+        let savedTracker;
+        let savedDebugFlag;
+
+        beforeEach(() => {
+            savedTracker = global.performanceTracker;
+            savedDebugFlag = window.DEBUG_PERFORMANCE;
+            global.performanceTracker = {
+                enable: jest.fn(),
+                disable: jest.fn(),
+                startRun: jest.fn()
+            };
+            mockActivity.blocks.stackList = [];
+            logo.blockList = [];
+        });
+
+        afterEach(() => {
+            global.performanceTracker = savedTracker;
+            window.DEBUG_PERFORMANCE = savedDebugFlag;
+        });
+
+        test("disables the tracker when performance mode is off", () => {
+            logo.runLogoCommands(null, null);
+
+            expect(global.performanceTracker.disable).toHaveBeenCalled();
+            expect(global.performanceTracker.enable).not.toHaveBeenCalled();
+            expect(global.performanceTracker.startRun).toHaveBeenCalled();
+        });
+
+        test("enables the tracker when performance mode is on", () => {
+            window.DEBUG_PERFORMANCE = true;
+
+            logo.runLogoCommands(null, null);
+
+            expect(global.performanceTracker.enable).toHaveBeenCalled();
+            expect(global.performanceTracker.disable).not.toHaveBeenCalled();
+            expect(global.performanceTracker.startRun).toHaveBeenCalled();
+        });
+    });
 });
 
 // ─── Logo runFromBlock ────────────────────────────────────────────────────────
@@ -1675,6 +1715,35 @@ describe("Logo runFromBlockNow", () => {
             logo.runFromBlockNow(logo, 0, 0, 0, null);
 
             expect(global.performanceTracker.enterBlock).toHaveBeenCalledTimes(1);
+        });
+
+        test("profiling on exits the block when the flow does not return early", () => {
+            global.performanceTracker = {
+                isEnabled: () => true,
+                enterBlock: jest.fn(),
+                exitBlock: jest.fn(),
+                disable: jest.fn()
+            };
+            global.performance = { now: jest.fn(() => 100) };
+            mockActivity.blocks.visible = false;
+            logo.blockList = [
+                {
+                    name: "noop",
+                    protoblock: {
+                        args: 0,
+                        dockTypes: [],
+                        flow: jest.fn(() => undefined)
+                    },
+                    connections: [null],
+                    isValueBlock: () => false,
+                    isArgBlock: () => false
+                }
+            ];
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(global.performanceTracker.enterBlock).toHaveBeenCalledTimes(1);
+            expect(global.performanceTracker.exitBlock).toHaveBeenCalledTimes(1);
         });
     });
 
