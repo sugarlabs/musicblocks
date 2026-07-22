@@ -17,7 +17,7 @@
    DEFAULTFILTERTYPE, DEFAULTINTERVAL, DEFAULTINVERT, DEFAULTMODE,
    DEFAULTNOISE, DEFAULTOSCILLATORTYPE, DEFAULTTEMPERAMENT,
    DEFAULTVOICE, INLINECOLLAPSIBLES, NATURAL, NUMBERBLOCKDEFAULT,
-    SPECIALINPUTS, STANDARDBLOCKHEIGHT, STRINGLEN, TEXTWIDTH,
+    STANDARDBLOCKHEIGHT, STRINGLEN, TEXTWIDTH,
     WESTERN2EISOLFEGENAMES, WIDENAMES, addTemperamentToDictionary,
    Block, closeBlkWidgets, ConnectionValidator, createjs, delayExecution, DEFAULTCHORD,
    deleteTemperamentFromList, getDrumSynthName, getNoiseName,
@@ -510,7 +510,7 @@ class Blocks {
             const firstConnection = blkObj.connections[0];
             let connectionIdx;
 
-            if (!SPECIALINPUTS.includes(blkObj.name)) {
+            if (!blkObj.hasValueDrivenLabel()) {
                 const clampList = [];
                 this.findNestedClampBlocks(blk, clampList);
 

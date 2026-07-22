@@ -10,7 +10,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global DOMParser, XMLSerializer, SPECIALINPUTS, _, INLINECOLLAPSIBLES, EXPANDBUTTON, COLLAPSEBUTTON, TURTLESVG, FILLCOLORS, STROKECOLORS */
+/* global DOMParser, XMLSerializer, _, INLINECOLLAPSIBLES, EXPANDBUTTON, COLLAPSEBUTTON, TURTLESVG, FILLCOLORS, STROKECOLORS */
 
 const extractSVGInner = svgString => {
     const parser = new DOMParser();
@@ -69,7 +69,7 @@ const printBlockSVG = activity => {
                 ')">'
         );
 
-        if (!SPECIALINPUTS.includes(activity.blocks.blockList[i].name)) {
+        if (!activity.blocks.blockList[i].hasValueDrivenLabel()) {
             svgParts.push(extractSVGInner(rawSVG));
         } else {
             // Safer SVG manipulation using DOM instead of string splitting
