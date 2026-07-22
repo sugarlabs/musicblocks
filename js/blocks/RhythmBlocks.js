@@ -1182,6 +1182,10 @@ function setupRhythmBlocks(activity) {
             if (tur.singer.inNoteBlock.length > 0) {
                 tur.singer.delayedNotes.push([blk, value]);
             }
+            // If we are in the phrasemaker, we need to push a rhythm entry.
+            if (logo.inMatrix && value > 0) {
+                logo.tupletRhythms.push(["individual", 1, 1 / value]);
+            }
             Singer.RhythmActions.playNote(value, "newnote", turtle, blk, _callback);
             return [args[1], 1];
         }
