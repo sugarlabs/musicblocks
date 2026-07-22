@@ -539,7 +539,7 @@ class ToolbarUI {
             saveButtonAdvanced.disabled = true;
             saveButton.className = "grey-text inactiveLink";
             saveButtonAdvanced.className = "grey-text inactiveLink";
-            recordButton.className = "grey-text inactiveLink";
+            recordButton.classList.add("grey-text", "inactiveLink");
             isPlayIconRunning = true;
             play_button_debounce_timeout = setTimeout(function () {
                 handleClick();
@@ -577,7 +577,7 @@ class ToolbarUI {
             saveButtonAdvanced.disabled = false;
             saveButton.className = "";
             saveButtonAdvanced.className = "";
-            recordButton.className = "";
+            recordButton.classList.remove("grey-text", "inactiveLink");
         };
     }
 
@@ -1066,7 +1066,6 @@ class ToolbarUI {
             Record.classList.remove("hide");
             Record.style.display = "block";
         }
-        Record.innerHTML = `<i class="material-icons main">${RECORDBUTTON}</i>`;
 
         // Remove any existing onclick handler
         Record.onclick = null;

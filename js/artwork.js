@@ -29,7 +29,7 @@
    FADEDDOWNICON, CLOSEICON, CARTESIANBUTTON, CARTESIANPOLARBUTTON,
    EFFECTPALETTEICON, CLEARBUTTON, COLLAPSEBUTTON, EXPANDBUTTON,
    NOGRIDBUTTON, PLAYBUTTON, POLARBUTTON, STEPBUTTON, RUNBUTTON,
-   STEPMUSICBUTTON, STOPBUTTON, RECORDBUTTON, CARTESIAN, POLAR, TREBLE, SOPRANO,
+   STEPMUSICBUTTON, STOPBUTTON, CARTESIAN, POLAR, TREBLE, SOPRANO,
    ALTO, TENOR, BASS, GRAND, GRAPHICSICONX, TRASHICON, PALETTEICONS,
    CANCELBUTTON, STOPTURTLEBUTTON, NEWBUTTON, LOADBUTTON,
    OPENMERGEBUTTON, OPENBUTTON, PLANETBUTTON, HELPBUTTON, SLOWBUTTON,
@@ -562,9 +562,6 @@ const STEPMUSICBUTTON =
 
 const STOPBUTTON =
     '<?xml version="1.0" encoding="UTF-8" standalone="no"?> <svg width="55" height="55" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" id="svg975" version="1.1" viewBox="0 0 28 28"> <title id="title967">アセット 24</title> <circle id="circle969" style="fill:#ffffff;stroke-width:0.9285714" r="13" cy="14" cx="14" /> <rect id="rect971" style="fill:#0050a0" ry="1" rx="1" height="9" width="9" y="9.5" x="9.5" /> </svg>';
-
-const RECORDBUTTON =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="55" height="55"><circle cx="30" cy="30" r="20" stroke="currentColor" fill="none" stroke-width="6" /><circle id="rec_inside" cx="30" cy="30" r="8" fill="currentColor" /></svg>';
 
 const RECORDHELPBUTTON =
     '<svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" viewBox="0 0 55 55"><circle cx="30" cy="30" r="20" stroke="#292929" stroke-opacity="0.4" fill="none" stroke-width="6"/><circle id="rec_inside" cx="30" cy="30" r="8" fill="#292929" fill-opacity="0.4"/></svg>';
