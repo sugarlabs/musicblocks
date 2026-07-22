@@ -256,7 +256,7 @@ describe("setupDrumBlocks", () => {
         const playNoiseBlock = new (class extends global.FlowBlock {
             flow = args => {
                 const arg = args[0];
-                if (args.length !== 1 || arg == null || typeof arg !== "string") {
+                if (args.length !== 1 || arg === null || typeof arg !== "string") {
                     activity.errorMsg(global.NOINPUTERRORMSG, 0);
                 }
             };
@@ -322,7 +322,7 @@ describe("setupDrumBlocks", () => {
         setupDrumBlocks(activity);
         const playDrumBlock = new (class extends global.FlowBlock {
             flow = args => {
-                if (args.length !== 1 || args[0] == null) {
+                if (args.length !== 1 || args[0] === null) {
                     console.debug("PLAY DRUM ERROR: missing context");
                 }
             };
@@ -339,7 +339,7 @@ describe("setupDrumBlocks", () => {
         const playDrumBlock = new (class extends global.FlowBlock {
             flow = args => {
                 let arg = args[0];
-                if (args.length !== 1 || arg == null || typeof arg !== "string") {
+                if (args.length !== 1 || arg === null || typeof arg !== "string") {
                     activity.errorMsg(global.NOINPUTERRORMSG, 0);
                     arg = global.DEFAULTDRUM;
                 }
@@ -364,7 +364,7 @@ describe("setupDrumBlocks", () => {
         const playDrumBlock = new (class extends global.FlowBlock {
             flow = args => {
                 let arg = args[0];
-                if (args.length !== 1 || arg == null || typeof arg !== "string") {
+                if (args.length !== 1 || arg === null || typeof arg !== "string") {
                     activity.errorMsg(global.NOINPUTERRORMSG, 0);
                     arg = global.DEFAULTDRUM;
                 }
@@ -391,7 +391,7 @@ describe("setupDrumBlocks", () => {
         const playDrumBlock = new (class extends global.FlowBlock {
             flow = args => {
                 let arg = args[0];
-                if (args.length !== 1 || arg == null || typeof arg !== "string") {
+                if (args.length !== 1 || arg === null || typeof arg !== "string") {
                     activity.errorMsg(global.NOINPUTERRORMSG, 0);
                     arg = global.DEFAULTDRUM;
                 }
@@ -428,7 +428,7 @@ describe("setupDrumBlocks", () => {
         const playDrumBlock = new (class extends global.FlowBlock {
             flow = args => {
                 let arg = args[0];
-                if (args.length !== 1 || arg == null || typeof arg !== "string") {
+                if (args.length !== 1 || arg === null || typeof arg !== "string") {
                     activity.errorMsg(global.NOINPUTERRORMSG, 0);
                     arg = global.DEFAULTDRUM;
                 }
