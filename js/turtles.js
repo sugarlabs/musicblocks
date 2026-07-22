@@ -1045,7 +1045,10 @@ Turtles.TurtlesView = class {
             updateSpeakButton();
 
             this._speakToggleButton.onclick = () => {
-                if (typeof window.getA11ySpeakEnabled === "function" && typeof window.setA11ySpeakEnabled === "function") {
+                if (
+                    typeof window.getA11ySpeakEnabled === "function" &&
+                    typeof window.setA11ySpeakEnabled === "function"
+                ) {
                     window.setA11ySpeakEnabled(!window.getA11ySpeakEnabled());
                 }
                 updateSpeakButton();
