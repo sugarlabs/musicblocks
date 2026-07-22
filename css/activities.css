@@ -448,11 +448,21 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     line-height: 30px;
 }
 
-#record.recording .material-icons {
+#record {
+    position: relative;
+}
+
+#record .dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+}
+
+#record.recording .dot {
     color: red;
     animation: blink-animation 1.5s infinite;
 }
-
 @keyframes blink-animation {
     50% {
         opacity: 0;

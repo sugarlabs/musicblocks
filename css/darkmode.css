@@ -32,7 +32,7 @@ body.highcontrast {
 }
 
 /* Ensure record button turns red during recording in high contrast mode */
-.highcontrast #record.recording .material-icons {
+.highcontrast #record.recording .dot {
     color: #ff0000 !important;
 }
 
