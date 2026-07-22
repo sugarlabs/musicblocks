@@ -1,6 +1,5 @@
 describe("recorder", () => {
     let mockStart;
-    let mockRecInside;
 
     beforeEach(() => {
         jest.useFakeTimers();
@@ -15,17 +14,12 @@ describe("recorder", () => {
             addEventListener: jest.fn(),
             removeEventListener: jest.fn(),
             dispatchEvent: jest.fn(),
-            _recordHandler: null
-        };
-
-        mockRecInside = {
             classList: { add: jest.fn(), remove: jest.fn() },
-            setAttribute: jest.fn()
+            _recordHandler: null
         };
 
         jest.spyOn(document, "getElementById").mockImplementation(id => {
             if (id === "record") return mockStart;
-            if (id === "rec_inside") return mockRecInside;
             return null;
         });
 
