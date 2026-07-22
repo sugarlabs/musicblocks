@@ -448,7 +448,8 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     line-height: 30px;
 }
 
-.blink {
+#record.recording .material-icons {
+    color: red;
     animation: blink-animation 1.5s infinite;
 }
 
