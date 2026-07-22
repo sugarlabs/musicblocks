@@ -108,8 +108,9 @@
             "ajv": "^8.0.0"
         },
         "@isaacs/brace-expansion": "^5.0.1",
-        "immutable": "^5.1.5",
-        "svgo": "^4.0.1",
+        "immutable": "^5.1.9",
+        "svgo": "^4.0.2",
+        "body-parser": "^2.3.0",
         "@xmldom/xmldom": "^0.8.13",
         "@gulp-sourcemaps/identity-map": {
             "postcss": "^8.4.31"
