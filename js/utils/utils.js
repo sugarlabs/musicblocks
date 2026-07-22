@@ -1049,15 +1049,22 @@ const CameraManager = {
     listenerVideoElement: null,
 
     /**
-     * Starts (or idempotently restarts) the capture interval.
-     * Clears any interval already running before starting a new one, so
-     * calling this repeatedly never leaks intervals.
+     * Starts the capture interval if one isn't already running. Idempotent:
+     * if a capture interval is already active, this is a no-op that returns
+     * the existing interval id, rather than clearing and restarting it.
+     *
+     * This matters when doUseCamera is invoked rapidly and repeatedly (e.g.
+     * from inside a "forever" loop): clearing and restarting the interval on
+     * every call would cancel it before it ever gets a chance to fire,
+     * meaning draw() would never run and no frame would ever be captured.
      * @param {function} draw - callback invoked on each tick
      * @param {number} periodMs - interval period in milliseconds
-     * @returns {number} the new interval id
+     * @returns {number} the active interval id
      */
     startCapture(draw, periodMs = 100) {
-        this.stopCapture();
+        if (this.intervalId !== null) {
+            return this.intervalId;
+        }
         this.intervalId = window.setInterval(draw, periodMs);
         return this.intervalId;
     },

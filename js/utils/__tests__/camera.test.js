@@ -96,9 +96,38 @@ describe("CameraManager lifecycle", () => {
         const first = CameraManager.startCapture(draw, 100);
         const second = CameraManager.startCapture(draw, 100);
 
-        expect(clearIntervalSpy).toHaveBeenCalledWith(first);
-        expect(CameraManager.intervalId).toBe(second);
-        expect(intervalSpy).toHaveBeenCalledTimes(2);
+        // Idempotent: the second call must NOT clear/restart the interval
+        // that's already running, or a fast, repeated caller (like a
+        // "forever" loop) could cancel it before it ever fires.
+        expect(clearIntervalSpy).not.toHaveBeenCalled();
+        expect(second).toBe(first);
+        expect(CameraManager.intervalId).toBe(first);
+        expect(intervalSpy).toHaveBeenCalledTimes(1);
+    });
+
+    test("startCapture called rapidly and repeatedly (simulating a forever loop) never prevents the interval from firing", () => {
+        // Use REAL timers here so we can assert the interval genuinely fires,
+        // which is exactly what broke when startCapture unconditionally
+        // cleared and restarted itself on every call.
+        jest.restoreAllMocks();
+        jest.useRealTimers();
+
+        const draw = jest.fn();
+
+        // Simulate a forever loop calling startCapture much faster than
+        // the 20ms period below.
+        const rapidCalls = setInterval(() => {
+            CameraManager.startCapture(draw, 20);
+        }, 2);
+
+        return new Promise(resolve => {
+            setTimeout(() => {
+                clearInterval(rapidCalls);
+                CameraManager.stopCapture();
+                expect(draw.mock.calls.length).toBeGreaterThan(0);
+                resolve();
+            }, 100);
+        });
     });
 
     test("stopCapture is idempotent (safe with no interval active)", () => {
@@ -228,15 +257,20 @@ describe("doUseCamera", () => {
         expect(handlerCount).toBe(1);
     });
 
-    test("Video capture (isVideo=true): repeated calls never leave more than one interval running", async () => {
+    test("Video capture (isVideo=true): repeated calls reuse the existing interval instead of restarting it", async () => {
         doUseCamera(["t"], turtlesCtx.turtles, "t", true, null, setCameraID, errorMsg);
         await Promise.resolve();
         dom.video.fireCanplay();
         expect(setCameraID).toHaveBeenCalledTimes(1);
+        const firstId = setCameraID.mock.calls[0][0];
 
+        // A second call in quick succession (as a "forever" loop would do)
+        // must NOT clear the running interval - only reuse/report it -
+        // otherwise the interval could be cancelled before it ever fires.
         doUseCamera(["t"], turtlesCtx.turtles, "t", true, null, setCameraID, errorMsg);
-        expect(window.clearInterval).toHaveBeenCalled();
+        expect(window.clearInterval).not.toHaveBeenCalled();
         expect(setCameraID).toHaveBeenCalledTimes(2);
+        expect(setCameraID.mock.calls[1][0]).toBe(firstId);
     });
 
     test("browser without getUserMedia support reports an error and does not throw", () => {
