@@ -83,7 +83,6 @@ global.setupBlockDragController = require("../block-drag-controller").setupBlock
 // Mock Constants
 global.DEFAULTBLOCKSCALE = 1.0;
 global.STANDARDBLOCKHEIGHT = 20;
-global.SPECIALINPUTS = ["number", "text", "boolean"];
 global.COLLAPSIBLES = ["repeat", "forever", "if"];
 global.INLINECOLLAPSIBLES = ["newnote", "interval", "osctime"];
 global.DEFAULTACCIDENTAL = "natural";
