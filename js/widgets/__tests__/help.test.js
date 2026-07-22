@@ -667,7 +667,7 @@ describe("HelpWidget", () => {
             expect(link).toBeNull();
         });
 
-        test("_showPage sets helpBody text color", () => {
+        test("_showPage leaves helpBody color to theme CSS", () => {
             const activity = createMockActivity();
             const hw = new HelpWidget(activity, false);
             jest.runAllTimers();
@@ -675,7 +675,18 @@ describe("HelpWidget", () => {
             hw._showPage(0);
 
             const helpBody = document.getElementById("helpBodyDiv");
-            expect(helpBody.style.color).toBe("rgb(80, 80, 80)");
+            expect(helpBody.style.color).toBe("");
+        });
+
+        test("_showPage does not duplicate the window title as an in-card heading", () => {
+            const activity = createMockActivity();
+            const hw = new HelpWidget(activity, false);
+            jest.runAllTimers();
+
+            hw._showPage(1);
+
+            const helpBody = document.getElementById("helpBodyDiv");
+            expect(helpBody.querySelector("h1")).toBeNull();
         });
 
         test("_showPage calls takeFocus", () => {

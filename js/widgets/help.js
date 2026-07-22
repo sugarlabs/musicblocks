@@ -52,6 +52,8 @@ class HelpWidget {
         widgetWindow.getWidgetBody().style.maxHeight = "70vh";
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
+        widgetWindow.getWidgetFrame().classList.add("help-widget-frame");
+        widgetWindow.getWidgetBody().classList.add("help-widget-body");
         widgetWindow.show();
         widgetWindow.onclose = () => {
             this.isOpen = false;
@@ -76,6 +78,7 @@ class HelpWidget {
 
         // Position the widget and make it visible.
         this._helpDiv = document.createElement("div");
+        this._helpDiv.className = "help-widget-panel";
 
         // Give the DOM time to create the div.
         window.requestAnimationFrame(() => {
@@ -241,8 +244,8 @@ class HelpWidget {
 
         if (!useActiveBlock) {
             // display help menu
-            docById("helpBodyDiv").style.height = "325px";
-            docById("helpBodyDiv").style.width = "345px";
+            docById("helpBodyDiv").style.minHeight = "325px";
+            docById("helpBodyDiv").style.maxWidth = "345px";
             this._showPage(page);
         } else {
             // display help for this block
@@ -481,11 +484,6 @@ class HelpWidget {
         imageP.append(img);
         bodyFragment.append(imageP);
 
-        const heading = document.createElement("h1");
-        heading.classList.add("heading");
-        heading.textContent = HELPCONTENT[page][0];
-        bodyFragment.append(heading);
-
         const description = document.createElement("p");
         description.classList.add("description");
         const descParts = HELPCONTENT[page][1].split(/<br\s*\/?>/i);
@@ -553,7 +551,6 @@ class HelpWidget {
             };
         }
 
-        helpBody.style.color = "#505050";
         helpBody.append(bodyFragment);
 
         this.widgetWindow.takeFocus();
@@ -611,13 +608,12 @@ class HelpWidget {
         const renderSide = side => {
             const helpBody = docById("helpBodyDiv");
             helpBody.replaceChildren();
-            helpBody.style.height = "325px";
-            helpBody.style.width = "345px";
-            helpBody.style.color = "#505050";
-
-            const heading = document.createElement("h1");
-            heading.classList.add("heading");
-            heading.textContent = side.heading;
+            const heading =
+                side.heading && side.heading !== card.title ? document.createElement("h1") : null;
+            if (heading) {
+                heading.classList.add("heading");
+                heading.textContent = side.heading;
+            }
 
             const description = document.createElement("p");
             description.classList.add("description");
@@ -632,14 +628,17 @@ class HelpWidget {
 
             const flipButton = document.createElement("button");
             flipButton.type = "button";
-            flipButton.className = "waves-effect waves-light btn";
+            flipButton.className = "help-card-action";
             flipButton.textContent = side.label;
             flipButton.onclick = () => {
                 showingBack = !showingBack;
                 renderSide(showingBack ? back : front);
             };
 
-            helpBody.append(heading, description, flipButton);
+            if (heading) {
+                helpBody.append(heading);
+            }
+            helpBody.append(description, flipButton);
             this.widgetWindow.takeFocus();
         };
 
@@ -806,7 +805,10 @@ class HelpWidget {
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
+        widgetWindow.getWidgetFrame().classList.add("help-widget-frame");
+        widgetWindow.getWidgetBody().classList.add("help-widget-body");
         this._helpDiv = document.createElement("div");
+        this._helpDiv.className = "help-widget-panel";
 
         //this._helpDiv.style.width = "500px";
         this._helpDiv.style.height = "70vh";
@@ -882,7 +884,10 @@ class HelpWidget {
                 const widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
                 this.widgetWindow = widgetWindow;
                 widgetWindow.clear();
+                widgetWindow.getWidgetFrame().classList.add("help-widget-frame");
+                widgetWindow.getWidgetBody().classList.add("help-widget-body");
                 this._helpDiv = document.createElement("div");
+                this._helpDiv.className = "help-widget-panel";
                 this._setup(false, HELPCONTENT.length - 1);
             } else {
                 this.index -= 1;
