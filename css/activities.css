@@ -1120,7 +1120,8 @@ table {
 #left-arrow {
     position: absolute;
     background-size: 40px;
-    top: 195px;
+    top: 50%;
+    transform: translateY(-50%);
     height: 40px;
     width: 40px;
 }
@@ -1216,48 +1217,131 @@ table {
     border: 0 !important;
 }
 
+.help-widget-body {
+    background: transparent !important;
+}
+
+.help-widget-frame {
+    background: var(--help-window-bg, #ffffff) !important;
+    border: 1px solid color-mix(in srgb, var(--accent, #2196f3) 45%, var(--border, #cccccc)) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
+    overflow: hidden;
+}
+
+.help-widget-frame > .wfTopBar {
+    min-height: 44px;
+    background: var(--accent, #2196f3) !important;
+    border-bottom: 0 !important;
+    color: var(--help-action-fg, #ffffff);
+}
+
+.help-widget-frame > .wfTopBar .wftTitle {
+    color: var(--help-action-fg, #ffffff) !important;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.help-widget-frame > .wfWinBody,
+.help-widget-frame > .wfWinBody .wfbWidget.help-widget-body {
+    background:
+        linear-gradient(180deg, color-mix(in srgb, var(--accent, #2196f3) 7%, transparent) 0%, transparent 42%),
+        var(--help-window-bg, #ffffff) !important;
+}
+
+.help-widget-panel {
+    background: transparent;
+}
+
 #helpBodyDiv {
     position: relative;
     margin: 0 auto !important;
     left: 0 !important;
-    border: 0 !important;
+    border: 1px solid color-mix(in srgb, var(--accent, #2196f3) 38%, var(--border, #cccccc));
+    border-radius: 10px;
     overflow-x: hidden;
-    overflow: visible;
     width: calc(100% - 130px) !important;
     max-width: 350px;
-    padding-top: 2.5rem; 
-    padding-bottom: 2.5rem;
+    min-height: 325px;
+    padding: 2rem 1.4rem;
+    background:
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--accent, #2196f3) 10%, transparent) 0%,
+            transparent 38%
+        ),
+        var(--help-card-bg, #ffffff);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.14);
+    color: var(--fg, #666666);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 0.85rem;
 }
 
 #helpScrollWrapper {
     overflow-y: auto;
+    padding: 16px 0;
 }
 
 #helpBodyDiv .heading,
 #helpBodyDiv .description,
 #helpBodyDiv .message {
     text-align: center;
-    line-height: 1.2;
-    margin: auto;
+    line-height: 1.35;
+    margin: 0;
+    color: var(--fg, #666666);
+}
+
+#helpBodyDiv .heading {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--accent, #2196f3) 55%, var(--fg, #666666));
 }
 
 #helpBodyDiv p {
-    margin: 0.5rem 0; 
+    margin: 0.35rem 0;
 }
 
 #helpBodyDiv a {
-    color: #2196F3;
+    color: var(--accent, #2196f3);
     text-decoration: underline;
     font-weight: 600;
     transition: color 0.2s ease;
 }
 
 #helpBodyDiv a:hover {
-    color: #2b8be5;
+    color: color-mix(in srgb, var(--accent, #2196f3) 72%, var(--fg, #666666));
+}
+
+#helpBodyDiv .help-card-action {
+    flex: 0 0 auto;
+    max-width: 100%;
+    min-height: 38px;
+    margin-top: 0.35rem;
+    padding: 0.55rem 1rem;
+    border: 1px solid color-mix(in srgb, var(--accent, #2196f3) 70%, var(--border, #cccccc));
+    border-radius: 8px;
+    background: var(--accent, #2196f3);
+    color: var(--help-action-fg, #ffffff);
+    font:
+        700 0.92rem/1.2 "Fira Sans",
+        sans-serif;
+    letter-spacing: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+    box-shadow: 0 3px 10px color-mix(in srgb, var(--accent, #2196f3) 28%, transparent);
+}
+
+#helpBodyDiv .help-card-action:hover,
+#helpBodyDiv .help-card-action:focus {
+    background: color-mix(in srgb, var(--accent, #2196f3) 82%, var(--fg, #666666));
+    outline: 2px solid color-mix(in srgb, var(--accent, #2196f3) 50%, transparent);
+    outline-offset: 2px;
 }
 
 #helpBodyDiv .icon-container {
@@ -1281,7 +1365,7 @@ table {
 }
 
 #helpBodyDiv figure {
-    margin-left: 0.5rem; 
+    margin-left: 0.5rem;
     margin-bottom: 1rem;
 }
 
@@ -1308,12 +1392,14 @@ table {
 @media (max-width: 450px) {
     #helpBodyDiv {
         width: 240px;
+        padding: 1.5rem 1rem;
     }
 }
 
 @media (max-width: 320px) {
     #helpBodyDiv {
         width: 200px;
+        padding: 1.25rem 0.85rem;
     }
 }
 

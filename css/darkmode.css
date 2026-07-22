@@ -39,14 +39,32 @@ body.highcontrast {
 }
 
 .highcontrast #helpBodyDiv {
+    --help-action-fg: #000000;
+    --help-card-bg: #000000;
+    --help-window-bg: #000000;
     background: #000000;
     color: var(--fg);
-    border: 1px solid #ffffff;
+    border-color: #ffffff;
+    box-shadow: none;
 }
 
 .highcontrast #helpBodyDiv > .heading,
 .highcontrast #helpBodyDiv p {
     color: var(--fg);
+}
+
+.highcontrast #helpBodyDiv .help-card-action {
+    background: #00ffff;
+    border-color: #ffffff;
+    color: #000000;
+    box-shadow: none;
+}
+
+.highcontrast #helpBodyDiv .help-card-action:hover,
+.highcontrast #helpBodyDiv .help-card-action:focus {
+    background: #ffffff;
+    color: #000000;
+    outline: 3px solid #ffff00;
 }
 
 .highcontrast #helpBodyDiv .help-tour-white-icon {
@@ -57,6 +75,34 @@ body.highcontrast {
     background-color: var(--bg) !important;
 }
 
+.highcontrast #floatingWindows > .windowFrame > .wfWinBody .wfbWidget.help-widget-body {
+    background-color: transparent !important;
+}
+
+.highcontrast #floatingWindows > .windowFrame.help-widget-frame {
+    background: #000000 !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: none;
+}
+
+.highcontrast #floatingWindows > .windowFrame.help-widget-frame > .wfTopBar {
+    background: #000080 !important;
+    border-bottom: 2px solid #ffffff !important;
+}
+
+.highcontrast #floatingWindows > .windowFrame.help-widget-frame > .wfTopBar .wftTitle {
+    color: #ffffff !important;
+}
+
+.highcontrast #floatingWindows > .windowFrame.help-widget-frame > .wfWinBody,
+.highcontrast
+    #floatingWindows
+    > .windowFrame.help-widget-frame
+    > .wfWinBody
+    .wfbWidget.help-widget-body {
+    background: #000000 !important;
+}
+
 .highcontrast #floatingWindows .windowFrame {
     background-color: var(--bg) !important;
     border: 1px solid #ffffff;
@@ -64,8 +110,14 @@ body.highcontrast {
 
 /* Help widget colors */
 .dark #helpBodyDiv {
-    background: #505050;
+    --help-action-fg: #ffffff;
+    --help-card-bg: var(--panel-bg);
+    --help-window-bg: #1d1d20;
+    background:
+        linear-gradient(180deg, rgba(63, 224, 209, 0.12) 0%, rgba(63, 224, 209, 0.03) 38%),
+        var(--panel-bg);
     color: var(--fg);
+    border-color: #366795;
 }
 
 .dark #helpBodyDiv > .heading,
@@ -73,9 +125,48 @@ body.highcontrast {
     color: var(--fg);
 }
 
+.dark #helpBodyDiv .help-card-action {
+    background: #1e88e5;
+    border-color: #64b5f6;
+}
+
+.dark #helpBodyDiv .help-card-action:hover,
+.dark #helpBodyDiv .help-card-action:focus {
+    background: #1976d2;
+}
+
 /* Fix white side bars in Help / Tour widget */
 .dark #floatingWindows .wfWinBody {
     background-color: var(--bg) !important;
+}
+
+.dark #floatingWindows > .windowFrame > .wfWinBody .wfbWidget.help-widget-body {
+    background-color: transparent !important;
+}
+
+.dark #floatingWindows > .windowFrame.help-widget-frame {
+    background: #1d1d20 !important;
+    border-color: #366795 !important;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
+}
+
+.dark #floatingWindows > .windowFrame.help-widget-frame > .wfTopBar {
+    background: #1e88e5 !important;
+}
+
+.dark #floatingWindows > .windowFrame.help-widget-frame > .wfTopBar .wftTitle {
+    color: #ffffff !important;
+}
+
+.dark #floatingWindows > .windowFrame.help-widget-frame > .wfWinBody,
+.dark
+    #floatingWindows
+    > .windowFrame.help-widget-frame
+    > .wfWinBody
+    .wfbWidget.help-widget-body {
+    background:
+        linear-gradient(180deg, rgba(63, 224, 209, 0.08) 0%, rgba(63, 224, 209, 0.02) 42%),
+        #1d1d20 !important;
 }
 
 .dark #floatingWindows .windowFrame {
