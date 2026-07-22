@@ -867,7 +867,6 @@ describe("RhythmRuler Widget", () => {
     });
 });
 
-<<<<<<< HEAD
 describe("RhythmRuler widget timer fallback (no ManagedTimer)", () => {
     let rhythmRuler;
 
@@ -1025,7 +1024,9 @@ describe("RhythmRuler _get_save_lock", () => {
 
         rhythmRuler._save_lock = true;
         expect(rhythmRuler._get_save_lock()).toBe(true);
-=======
+    });
+});
+
 // =============================================================================
 // Pointer Events – rhythm cells (__addCellEventHandlers)
 // =============================================================================
@@ -1308,6 +1309,5 @@ describe("RhythmRuler Pointer Events – circular canvas (_toggleCircularView)",
         expect(types).not.toContain("mouseup");
         expect(types).not.toContain("mousemove");
         expect(types).not.toContain("mouseleave");
->>>>>>> 8850aa9d7 (fix: make Music Keyboard responsive on touch devices (#7111))
     });
 });
