@@ -16,11 +16,16 @@ Cypress.on("uncaught:exception", err => {
 describe("MusicBlocks Application", () => {
     before(() => {
         cy.visit("http://localhost:3000");
+        // Wait for loading to complete - the container should be hidden
+        cy.get("#loading-image-container", { timeout: 30000 }).should("not.be.visible");
+        // Verify the main canvas/content is visible, indicating app is ready
+        cy.get("#canvas", { timeout: 30000 }).should("be.visible");
+        cy.wait(2000); // Additional buffer for UI to fully render
     });
 
     describe("Loading and Initial Render", () => {
         it("should display the loading animation container", () => {
-            cy.get("#loading-image-container").should("be.visible");
+            cy.get("#loading-image-container").should("not.be.visible");
         });
 
         it("should display the canvas after loading", () => {
@@ -79,7 +84,9 @@ describe("MusicBlocks Application", () => {
         });
 
         it("should toggle the toolbar menu", () => {
-            cy.get("#toggleAuxBtn").click();
+            // Ensure parent container is visible
+            cy.get("#hideContents").should("be.visible");
+            cy.get("#toggleAuxBtn").should("be.visible").click();
             cy.get("#aux-toolbar").should("be.visible");
             cy.get("#toggleAuxBtn").click();
             cy.get("#aux-toolbar").should("not.be.visible");
@@ -88,16 +95,20 @@ describe("MusicBlocks Application", () => {
 
     describe("File Operations", () => {
         it("should open the file load modal", () => {
-            cy.get("#load").click();
+            cy.get("#hideContents").should("be.visible");
+            cy.get("#load").should("be.visible").click();
             cy.get("#myOpenFile").should("exist");
         });
 
         it("should open the save dropdown", () => {
-            cy.get("#saveButton").click();
+            cy.get("#hideContents").should("be.visible");
+            cy.get("#saveButton").should("be.visible").click();
             cy.get("#saveddropdownbeg").should("be.visible");
         });
 
         it("should display all file save options", () => {
+            cy.get("#hideContents").should("be.visible");
+            cy.get("#saveButton").should("be.visible").click();
             cy.get("#saveddropdownbeg").should("be.visible");
             cy.get("#save-html-beg").should("exist");
             cy.get("#save-png-beg").should("exist");
@@ -129,6 +140,9 @@ describe("MusicBlocks Application", () => {
         });
 
         it("should verify sidebar elements exist, are visible, and clickable", () => {
+            // Ensure loading overlay is gone
+            cy.get("#loading-image-container").should("not.be.visible");
+
             const sidebarElements = [
                 "thead > tr > :nth-child(1) > img",
                 "tr > :nth-child(2) > img",
