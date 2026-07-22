@@ -183,6 +183,19 @@ class Oscilloscope {
 
         document.removeEventListener("visibilitychange", this._handleVisibilityChange);
 
+        for (const key of Object.keys(this.pitchAnalysers)) {
+            if (
+                this.pitchAnalysers[key] &&
+                typeof this.pitchAnalysers[key].dispose === "function"
+            ) {
+                try {
+                    this.pitchAnalysers[key].dispose();
+                } catch (e) {
+                    console.debug("Error disposing pitch analyser:", e);
+                }
+            }
+        }
+
         this.drawVisualIDs = {};
         this._canvasState = {};
         this.pitchAnalysers = {};
