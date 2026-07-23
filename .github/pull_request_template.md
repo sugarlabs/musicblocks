@@ -15,6 +15,14 @@
 <!-- Link any related Jira tickets, GitHub issues, etc. (e.g., Closes #123) -->
 
 
+## Screenshots / Logs
+<!-- If applicable, add screenshots (for UI changes) or log snippets (for backend/test fixes) to help explain your changes. -->
+
+
+## Testing Instructions
+<!-- Please explain how this change was tested or provide steps so reviewers can verify it. -->
+
+
 ## PR Checklist
 <!-- Make sure you have completed the following steps before submitting: -->
 - [ ] My code follows the style guidelines of this project.
