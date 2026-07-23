@@ -309,7 +309,7 @@ msgstr "लिलीपॉंड के रूप में सहेजें"
 #.TRANS: default project title when saving as Lilypond
 #.TRANS: default project author when saving as Lilypond
 msgid "Mr. Mouse"
-msgstr "श्री माउस"
+msgstr "मिस्टर माउस"
 
 
 #: js/SaveInterface.js:845
@@ -886,7 +886,7 @@ msgstr "संगीत"
 
 #: js/turtledefs.js:187
 msgid "Music Blocks"
-msgstr "संगीत ब्लॉक्स"
+msgstr "म्यूज़िक ब्लॉक्स"
 
 
 #: js/turtledefs.js:423
@@ -1047,7 +1047,7 @@ msgstr "मिस्टर माउस से मिलें!"
 
 #: js/turtledefs.js:451
 msgid "Mr Mouse is our Music Blocks conductor."
-msgstr "मिस्टर माउस हमारे संगीत ब्लॉक्स कंडक्टर हैं।"
+msgstr "मिस्टर माउस हमारे म्यूज़िक ब्लॉक्स कंडक्टर हैं।"
 
 
 #: js/turtledefs.js:453
@@ -7733,7 +7733,7 @@ msgstr "ताम्बुल सेट करें"
 
 #: js/blocks/IntervalsBlocks.js:53
 msgid "The Set temperament block is used to choose the tuning system used by Music Blocks."
-msgstr "सेट ताम्बुल ब्लॉक का उपयोग संगीत ब्लॉक्स द्वारा उपयोग किए जाने वाले सुर सिस्टम को चुनने के लिए किया जाता है।"
+msgstr "सेट ताम्बुल ब्लॉक का उपयोग म्यूज़िक ब्लॉक्स द्वारा उपयोग किए जाने वाले सुर सिस्टम को चुनने के लिए किया जाता है।"
 
 
 #: js/blocks/IntervalsBlocks.js:99
@@ -9144,7 +9144,7 @@ msgstr "मैट्रिक्स में कम से कम एक पि
 
 #: js/blocks/WidgetBlocks.js:1735
 msgid "The Status block opens a tool for inspecting the status of Music Blocks as it is running."
-msgstr "स्थिति ब्लॉक एक उपकरण खोलता है जिससे चल रहे संगीत ब्लॉक्स की स्थिति की जाँच की जा सकती है।"
+msgstr "स्थिति ब्लॉक एक उपकरण खोलता है जिससे चल रहे म्यूज़िक ब्लॉक्स की स्थिति की जाँच की जा सकती है।"
 
 
 #: js/blocks/WidgetBlocks.js:1905
@@ -11888,7 +11888,7 @@ msgstr "नीचा"
 #: js/SaveInterface.js:61
 
 #~msgid "Music Blocks Project"
-#~msgstr "संगीत ब्लॉक्स परियोजना"
+#~msgstr "म्यूज़िक ब्लॉक्स परियोजना"
 
 
 #: js/activity.js:1649
