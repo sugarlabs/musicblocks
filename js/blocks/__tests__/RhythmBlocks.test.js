@@ -22,6 +22,7 @@
 
 const { setupRhythmBlocks } = jest.requireActual("../RhythmBlocks");
 const Blocks = jest.requireActual("../../blocks");
+global.setupBlockDragController = require("../../block-drag-controller").setupBlockDragController;
 
 global._ = s => s;
 global.NOINPUTERRORMSG = "NO_INPUT";
