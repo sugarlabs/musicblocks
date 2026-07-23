@@ -95,7 +95,7 @@
         "electron": "40.8.5",
         "flatted": "3.4.2",
         "lodash": "4.18.1",
-        "brace-expansion": "2.0.3",
+        "brace-expansion": "^2.1.2",
         "tar": "^7.5.10",
         "path-to-regexp": "^8.4.0",
         "picomatch": "^4.0.4",
