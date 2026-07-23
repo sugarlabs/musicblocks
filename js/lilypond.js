@@ -406,7 +406,7 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
 
             // If it is a tuplet, look ahead to see if it is complete.
             // While you are at it, add up the durations.
-            if (obj[NOTATIONTUPLETVALUE] != null) {
+            if (obj[NOTATIONTUPLETVALUE] !== null) {
                 let f;
                 targetDuration = 1 / logo.notation.notationStaging[turtle][i][NOTATIONDURATION];
                 tupletDuration = 1 / logo.notation.notationStaging[turtle][i][NOTATIONROUNDDOWN];
@@ -497,7 +497,7 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             }
 
             if (
-                obj[NOTATIONTUPLETVALUE] != null &&
+                obj[NOTATIONTUPLETVALUE] !== null &&
                 obj[NOTATIONTUPLETVALUE][0] * obj[NOTATIONTUPLETVALUE][1] > 0
             ) {
                 // Lilypond tuplets look like this: \tuplet 3/2 { f8 g a }
