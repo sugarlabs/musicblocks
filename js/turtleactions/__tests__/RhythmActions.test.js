@@ -234,6 +234,28 @@ describe("setupRhythmActions", () => {
         expect(targetTurtle.singer.dotCount).toBe(0);
     });
 
+    it("updates dotCount and beatFactor correctly for negative dot values (fractional dots)", () => {
+        let listener;
+        activity.logo.setTurtleListener = jest.fn((_, __, fn) => {
+            listener = fn;
+        });
+
+        targetTurtle.singer.dotCount = 0;
+        targetTurtle.singer.beatFactor = 1;
+
+        // value = -2 means half dot, i.e., increase dotCount by -1 / -2 = 0.5
+        Singer.RhythmActions.doRhythmicDot(-2, 0, 1);
+
+        expect(targetTurtle.singer.dotCount).toBe(0.5);
+        expect(targetTurtle.singer.beatFactor).not.toBe(1);
+
+        // Call the listener to simulate the teardown
+        listener();
+
+        expect(targetTurtle.singer.dotCount).toBe(0);
+        expect(targetTurtle.singer.beatFactor).toBe(1);
+    });
+
     it("multiplies beatFactor correctly", () => {
         targetTurtle.singer.beatFactor = 2;
 
