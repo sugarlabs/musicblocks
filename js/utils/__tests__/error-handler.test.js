@@ -123,5 +123,31 @@ describe("ErrorHandler", () => {
 
             delete global.window.ActivityContext;
         });
+
+        it("catches and suppresses errors if getActivity throws", () => {
+            global.window.ActivityContext = {
+                getActivity: () => {
+                    throw new Error("Activity not ready");
+                }
+            };
+
+            expect(() => {
+                ErrorHandler.userFacing("fail", { operation: "save" }, "ui msg");
+            }).not.toThrow();
+
+            delete global.window.ActivityContext;
+        });
+
+        it("handles case where activity exists but errorMsg is not a function", () => {
+            global.window.ActivityContext = {
+                getActivity: () => ({ errorMsg: "not a function" })
+            };
+
+            expect(() => {
+                ErrorHandler.userFacing("fail", { operation: "save" }, "ui msg");
+            }).not.toThrow();
+
+            delete global.window.ActivityContext;
+        });
     });
 });
