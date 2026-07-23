@@ -30,6 +30,7 @@ function setupDrumBlocks(activity) {
         constructor() {
             // Call the constructor of the parent class (ValueBlock)
             super("noisename", _("noise name"));
+            this.setCapability("valueDrivenLabel");
 
             /**
              * Sets the palette for the block.
@@ -73,6 +74,7 @@ function setupDrumBlocks(activity) {
         constructor() {
             // Call the constructor of the parent class (ValueBlock)
             super("drumname", _("drum name"));
+            this.setCapability("valueDrivenLabel");
 
             /**
              * Sets the palette for the block.
@@ -117,6 +119,7 @@ function setupDrumBlocks(activity) {
         constructor() {
             // Call the constructor of the parent class (ValueBlock)
             super("effectsname", _("effects name"));
+            this.setCapability("valueDrivenLabel");
 
             /**
              * Sets the palette for the block.
@@ -213,7 +216,7 @@ function setupDrumBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             let arg = args[0];
-            if (args.length !== 1 || arg == null || typeof arg !== "string") {
+            if (args.length !== 1 || arg === null || arg === undefined || typeof arg !== "string") {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg = "noise1";
             }
@@ -535,7 +538,7 @@ function setupDrumBlocks(activity) {
             /**
              * Validate input and handle errors.
              */
-            if (args.length !== 1 || arg == null || typeof arg !== "string") {
+            if (args.length !== 1 || arg === null || arg === undefined || typeof arg !== "string") {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg = DEFAULTDRUM;
             }
@@ -576,8 +579,8 @@ function setupDrumBlocks(activity) {
                 logo.musicKeyboard.addRowBlock(blk);
             } else if (
                 tur.singer.inNoteBlock.length > 0 ||
-                (activity.blocks.blockList[blk].connections[0] == null &&
-                    last(activity.blocks.blockList[blk].connections) == null)
+                (activity.blocks.blockList[blk].connections[0] === null &&
+                    last(activity.blocks.blockList[blk].connections) === null)
             ) {
                 // Handle other contexts
                 Singer.DrumActions.playDrum(args[0], turtle, blk);

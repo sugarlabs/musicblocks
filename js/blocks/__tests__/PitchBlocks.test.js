@@ -37,6 +37,7 @@ describe("setupPitchBlocks", () => {
             createdBlocks[name] = this;
             this.connections = [null, null, null, null, null];
             this.value = null;
+            this.capabilities = Object.create(null);
         }
         setPalette() {
             return this;
@@ -55,6 +56,15 @@ describe("setupPitchBlocks", () => {
         }
         makeMacro() {
             return this;
+        }
+        setCapability(name, value = true) {
+            this.capabilities[name] = !!value;
+            return this;
+        }
+        getCapability(name) {
+            return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+                ? this.capabilities[name]
+                : undefined;
         }
         flow() {
             return this;
@@ -873,6 +883,15 @@ describe("setupPitchBlocks", () => {
                     expect(createdBlocks[name]).toBeDefined();
                 }
             });
+        });
+
+        it("marks solfege and customNote as value-driven labels", () => {
+            expect(createdBlocks["solfege"].getCapability("valueDrivenLabel")).toBe(true);
+            expect(createdBlocks["customNote"].getCapability("valueDrivenLabel")).toBe(true);
+        });
+
+        it("does not mark pitchnumber as a value-driven label block", () => {
+            expect(createdBlocks["pitchnumber"].getCapability("valueDrivenLabel")).toBeUndefined();
         });
     });
 

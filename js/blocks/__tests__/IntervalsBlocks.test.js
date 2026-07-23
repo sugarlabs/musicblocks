@@ -33,6 +33,7 @@ describe("setupIntervalsBlocks", () => {
         constructor(name) {
             this.name = name;
             createdBlocks[name] = this;
+            this.capabilities = Object.create(null);
         }
         setPalette() {
             return this;
@@ -52,6 +53,15 @@ describe("setupIntervalsBlocks", () => {
         }
         setup() {
             return this;
+        }
+        setCapability(name, value = true) {
+            this.capabilities[name] = !!value;
+            return this;
+        }
+        getCapability(name) {
+            return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+                ? this.capabilities[name]
+                : undefined;
         }
     }
 
@@ -175,6 +185,22 @@ describe("setupIntervalsBlocks", () => {
 
         turtleIndex = 0;
         setupIntervalsBlocks(activity);
+    });
+
+    describe("valueDrivenLabel capability", () => {
+        it("marks temperamentname as value-driven", () => {
+            expect(createdBlocks["temperamentname"].getCapability("valueDrivenLabel")).toBe(true);
+        });
+
+        it("marks modename as value-driven", () => {
+            expect(createdBlocks["modename"].getCapability("valueDrivenLabel")).toBe(true);
+        });
+
+        it("does not mark intervalnumber as value-driven", () => {
+            expect(
+                createdBlocks["intervalnumber"].getCapability("valueDrivenLabel")
+            ).toBeUndefined();
+        });
     });
 
     describe("Setup", () => {
