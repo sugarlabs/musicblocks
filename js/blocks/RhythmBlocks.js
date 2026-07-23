@@ -619,7 +619,7 @@ function setupRhythmBlocks(activity) {
                 activity.errorMsg(_("An argument of -1 results in a note value of 0."), blk);
                 arg = 0;
             } else {
-                tur.singer.dotCount += 1 / arg;
+                tur.singer.dotCount += -1 / arg;
             }
 
             const newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
@@ -631,7 +631,7 @@ function setupRhythmBlocks(activity) {
             const __listener = event => {
                 const currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
                 tur.singer.beatFactor *= currentDotFactor;
-                tur.singer.dotCount -= arg >= 0 ? arg : 1 / arg;
+                tur.singer.dotCount -= arg >= 0 ? arg : -1 / arg;
                 const newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
                 tur.singer.beatFactor /= newDotFactor;
             };
