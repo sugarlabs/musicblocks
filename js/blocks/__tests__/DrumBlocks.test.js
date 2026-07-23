@@ -256,7 +256,12 @@ describe("setupDrumBlocks", () => {
         const playNoiseBlock = new (class extends global.FlowBlock {
             flow = args => {
                 const arg = args[0];
-                if (args.length !== 1 || arg == null || typeof arg !== "string") {
+                if (
+                    args.length !== 1 ||
+                    arg === null ||
+                    arg === undefined ||
+                    typeof arg !== "string"
+                ) {
                     activity.errorMsg(global.NOINPUTERRORMSG, 0);
                 }
             };
@@ -322,7 +327,7 @@ describe("setupDrumBlocks", () => {
         setupDrumBlocks(activity);
         const playDrumBlock = new (class extends global.FlowBlock {
             flow = args => {
-                if (args.length !== 1 || args[0] == null) {
+                if (args.length !== 1 || args[0] === null || args[0] === undefined) {
                     console.debug("PLAY DRUM ERROR: missing context");
                 }
             };
@@ -339,7 +344,12 @@ describe("setupDrumBlocks", () => {
         const playDrumBlock = new (class extends global.FlowBlock {
             flow = args => {
                 let arg = args[0];
-                if (args.length !== 1 || arg == null || typeof arg !== "string") {
+                if (
+                    args.length !== 1 ||
+                    arg === null ||
+                    arg === undefined ||
+                    typeof arg !== "string"
+                ) {
                     activity.errorMsg(global.NOINPUTERRORMSG, 0);
                     arg = global.DEFAULTDRUM;
                 }
@@ -364,7 +374,12 @@ describe("setupDrumBlocks", () => {
         const playDrumBlock = new (class extends global.FlowBlock {
             flow = args => {
                 let arg = args[0];
-                if (args.length !== 1 || arg == null || typeof arg !== "string") {
+                if (
+                    args.length !== 1 ||
+                    arg === null ||
+                    arg === undefined ||
+                    typeof arg !== "string"
+                ) {
                     activity.errorMsg(global.NOINPUTERRORMSG, 0);
                     arg = global.DEFAULTDRUM;
                 }
@@ -391,7 +406,12 @@ describe("setupDrumBlocks", () => {
         const playDrumBlock = new (class extends global.FlowBlock {
             flow = args => {
                 let arg = args[0];
-                if (args.length !== 1 || arg == null || typeof arg !== "string") {
+                if (
+                    args.length !== 1 ||
+                    arg === null ||
+                    arg === undefined ||
+                    typeof arg !== "string"
+                ) {
                     activity.errorMsg(global.NOINPUTERRORMSG, 0);
                     arg = global.DEFAULTDRUM;
                 }
@@ -428,7 +448,12 @@ describe("setupDrumBlocks", () => {
         const playDrumBlock = new (class extends global.FlowBlock {
             flow = args => {
                 let arg = args[0];
-                if (args.length !== 1 || arg == null || typeof arg !== "string") {
+                if (
+                    args.length !== 1 ||
+                    arg === null ||
+                    arg === undefined ||
+                    typeof arg !== "string"
+                ) {
                     activity.errorMsg(global.NOINPUTERRORMSG, 0);
                     arg = global.DEFAULTDRUM;
                 }
@@ -594,6 +619,32 @@ describe("real DrumBlocks instances - direct method coverage", () => {
         };
         instances["playdrum"].flow(["snare"], logo, 0, "blk1");
         expect(global.Singer.DrumActions.playDrum).toHaveBeenCalledWith("snare", 0, "blk1");
+    });
+
+    test("real PlayDrumBlock flow() plays stand-alone drum under Start (not in note)", () => {
+        // Connected under Start: parent connection set, not inside a Note block.
+        // This used to log "PLAY DRUM ERROR: missing context" and never play.
+        activity.turtles.ithTurtle = jest.fn(() => ({
+            singer: {
+                drumStyle: [],
+                inNoteBlock: [],
+                noteBeatValues: {},
+                beatFactor: 1,
+                pushedNote: false
+            }
+        }));
+        activity.blocks.blockList["blk1"].connections = ["startBlk", "drumnameBlk", null];
+        const logo = {
+            inPitchDrumMatrix: false,
+            inMatrix: false,
+            inMusicKeyboard: false,
+            drumBlocks: [],
+            pitchDrumMatrix: { drums: [], addColBlock: jest.fn() },
+            phraseMaker: { rowLabels: [], rowArgs: [], addRowBlock: jest.fn() },
+            musicKeyboard: { instruments: [], noteNames: [], octaves: [], addRowBlock: jest.fn() }
+        };
+        instances["playdrum"].flow(["kick drum"], logo, 0, "blk1");
+        expect(global.Singer.DrumActions.playDrum).toHaveBeenCalledWith("kick drum", 0, "blk1");
     });
 
     test("real PlayDrumBlock flow() pushes to pitchDrumMatrix", () => {
