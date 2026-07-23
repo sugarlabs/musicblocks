@@ -508,6 +508,20 @@ describe("setupIntervalsActions", () => {
         expect(activity.errorMsg).toHaveBeenCalled();
     });
 
+    test("defineMode does not crash when blk is undefined (JS-Export path)", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+
+        // blk is not passed — simulates JS-Export / headless execution
+        Singer.IntervalsActions.defineMode("pentatonic", 0, undefined);
+
+        turtle.singer.defineMode.push(0, 2, 4, 7, 9);
+
+        // Should not throw a TypeError even though blk is undefined
+        expect(() => listener()).not.toThrow();
+        expect(MUSICALMODES.pentatonic).toBeDefined();
+    });
+
     test("setTemperament state changes", () => {
         Singer.IntervalsActions.setTemperament("equal", "C", 4);
         expect(logo.synth.inTemperament).toBe("equal");
