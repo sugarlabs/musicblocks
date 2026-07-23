@@ -463,6 +463,17 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     color: red;
     animation: blink-animation 1.5s infinite;
 }
+
+@media (max-width: 690px) {
+
+    #record .ring,
+    #record .dot {
+        font-size: 26px !important;
+        margin: 0 !important;
+        width: auto !important;
+    }
+}
+
 @keyframes blink-animation {
     50% {
         opacity: 0;
