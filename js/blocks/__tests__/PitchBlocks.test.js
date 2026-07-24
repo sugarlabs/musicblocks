@@ -88,7 +88,7 @@ describe("setupPitchBlocks", () => {
 
         global._ = jest.fn(str => str);
         // Override music constants with ASCII symbols for this test
-        // (MusicConstants.js is auto-loaded via jest.setup.js)
+        // (musicutils.js is auto-loaded via jest.setup.js)
         global.SHARP = "#";
         global.FLAT = "b";
         global.DOUBLEFLAT = "bb";
