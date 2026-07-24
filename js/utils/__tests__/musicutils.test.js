@@ -2363,6 +2363,12 @@ describe("getNumNote", () => {
 
         expect(getNumNote(13, 1)).toEqual(["do♯", 2]);
     });
+
+    it("should decrement octave for 'ti' note", () => {
+        expect(getNumNote(0, 0)).toEqual(["ti", 0]);
+        expect(getNumNote(12, 0)).toEqual(["ti", 1]);
+        expect(getNumNote(0, 12)).toEqual(["ti", 1]);
+    });
 });
 
 describe("calcOctave", () => {
