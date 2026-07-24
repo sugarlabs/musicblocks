@@ -142,7 +142,7 @@ class ToolbarController {
         // Use bare global: set by loader.js as window._THIS_IS_MUSIC_BLOCKS_ = true.
         // All other files in this repo (toolbar.js, status.js, turtledefs.js) access
         // it the same way via /* global _THIS_IS_MUSIC_BLOCKS_ */.
-        if (onblur && _THIS_IS_MUSIC_BLOCKS_) {
+        if (onblur && typeof _THIS_IS_MUSIC_BLOCKS_ !== "undefined" && _THIS_IS_MUSIC_BLOCKS_) {
             return false;
         }
 
