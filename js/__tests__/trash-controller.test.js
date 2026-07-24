@@ -112,6 +112,15 @@ describe("TrashController.restoreTrash", () => {
         expect(document.getElementById("helpfulWheelDiv").style.display).toBe("none");
         expect(activity.__tick).toHaveBeenCalled();
     });
+
+    test("does not throw when helpfulWheelDiv is not present in the DOM", () => {
+        const activity = makeActivity();
+        activity.blocks.trashStacks = ["blk1"];
+        document.getElementById("helpfulWheelDiv").remove();
+        const controller = new TrashController(activity);
+
+        expect(() => controller.restoreTrash()).not.toThrow();
+    });
 });
 
 // ---------------------------------------------------------------------------
@@ -140,6 +149,16 @@ describe("TrashController.restoreLastFromTrash", () => {
 
         expect(spy).toHaveBeenCalledWith("blk2");
         expect(activity.textMsg).toHaveBeenCalledWith("Item restored from the trash.", 3000);
+    });
+
+    test("does not throw when helpfulWheelDiv is not present in the DOM", () => {
+        const activity = makeActivity();
+        activity.blocks.blockList.blk1 = makeBlock();
+        activity.blocks.trashStacks = ["blk1"];
+        document.getElementById("helpfulWheelDiv").remove();
+        const controller = new TrashController(activity);
+
+        expect(() => controller.restoreLastFromTrash()).not.toThrow();
     });
 });
 
