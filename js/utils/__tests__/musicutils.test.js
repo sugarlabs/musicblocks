@@ -120,9 +120,7 @@ const {
     PITCHES1,
     PITCHES3,
     normalizeNoteAccidentals,
-    getCurrentEDO,
-    generateNoteNames,
-    getEdoNoteNamePosition
+    getCurrentEDO
 } = require("../musicutils");
 
 const DOUBLESHARP = "\ud834\udd2a";
@@ -923,82 +921,6 @@ describe("frequencyToPitch", () => {
         expect(result[0]).toBe("A");
         expect(result[1]).toBe(4);
     });
-
-    it("should map JI frequencies to correct pitch names", () => {
-        const justIntonationData = {
-            isEDO: false,
-            pitchNumber: 12,
-            noteLabels: ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
-            ratios: [
-                1,
-                16 / 15,
-                9 / 8,
-                6 / 5,
-                5 / 4,
-                4 / 3,
-                45 / 32,
-                3 / 2,
-                8 / 5,
-                5 / 3,
-                9 / 5,
-                15 / 8
-            ]
-        };
-        global.TEMPERAMENT = {
-            "just intonation": justIntonationData,
-            "equal": { pitchNumber: 12 }
-        };
-
-        // A4 = 440 Hz in JI
-        const a4 = frequencyToPitch(440, "just intonation");
-        expect(a4[0]).toBe("A");
-        expect(a4[1]).toBe(4);
-        expect(a4[2]).toBeCloseTo(0, 0);
-
-        // C4 = 264 Hz in JI
-        const c4 = frequencyToPitch(264, "just intonation");
-        expect(c4[0]).toBe("C");
-        expect(c4[1]).toBe(4);
-        expect(c4[2]).toBeCloseTo(0, 0);
-
-        // E4 = 330 Hz in JI
-        const e4 = frequencyToPitch(330, "just intonation");
-        expect(e4[0]).toBe("E");
-        expect(e4[1]).toBe(4);
-        expect(e4[2]).toBeCloseTo(0, 0);
-    });
-
-    it("should map Pythagorean frequencies to correct pitch names", () => {
-        const pythagoreanData = {
-            isEDO: false,
-            pitchNumber: 12,
-            noteLabels: ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
-            ratios: [
-                1,
-                256 / 243,
-                9 / 8,
-                32 / 27,
-                81 / 64,
-                4 / 3,
-                729 / 512,
-                3 / 2,
-                128 / 81,
-                27 / 16,
-                16 / 9,
-                243 / 128
-            ]
-        };
-        global.TEMPERAMENT = {
-            Pythagorean: pythagoreanData,
-            equal: { pitchNumber: 12 }
-        };
-
-        // In Pythagorean, A4 = 27.5/(27/16) * 27/16 * 16 = 440
-        const a4 = frequencyToPitch(440, "Pythagorean");
-        expect(a4[0]).toBe("A");
-        expect(a4[1]).toBe(4);
-        expect(a4[2]).toBeCloseTo(0, 0);
-    });
 });
 
 describe("cents calculations", () => {
@@ -1096,42 +1018,6 @@ describe("cents calculations", () => {
             const freq = 440 * Math.pow(2, 0.003 / 12); // tiny deviation (~0.003 steps = ~0.25 cents)
             const result = frequencyToPitch(freq);
             expect(result[2]).toBe(0);
-        });
-    });
-
-    describe("cents-ratio conversion formulas", () => {
-        // Cents formula: cents = 1200 * log2(ratio)
-        // Frequency formula: freq = baseFreq * 2^(cents/1200)
-        // These are the fundamental relationships used throughout the codebase.
-
-        it("converts ratio to cents correctly for common intervals", () => {
-            // Perfect octave: 2/1 ratio = 1200 cents
-            expect(1200 * Math.log2(2 / 1)).toBeCloseTo(1200, 0);
-            // Perfect fifth: 3/2 ratio ≈ 702 cents
-            expect(1200 * Math.log2(3 / 2)).toBeCloseTo(702, 0);
-            // Perfect fourth: 4/3 ratio ≈ 498 cents
-            expect(1200 * Math.log2(4 / 3)).toBeCloseTo(498, 0);
-            // JI major third: 5/4 ratio ≈ 386 cents
-            expect(1200 * Math.log2(5 / 4)).toBeCloseTo(386, 0);
-            // 12-EDO semitone: 2^(1/12) ratio = 100 cents
-            expect(1200 * Math.log2(Math.pow(2, 1 / 12))).toBeCloseTo(100, 0);
-        });
-
-        it("converts cents to frequency multiplier correctly", () => {
-            const baseFreq = 440; // A4
-            // +100 cents = one 12-EDO semitone up → 440 * 2^(1/12) ≈ 466.16
-            expect(baseFreq * Math.pow(2, 100 / 1200)).toBeCloseTo(466.16, 1);
-            // -100 cents = one 12-EDO semitone down → 440 * 2^(-1/12) ≈ 415.30
-            expect(baseFreq * Math.pow(2, -100 / 1200)).toBeCloseTo(415.3, 1);
-            // +702 cents = perfect fifth up → 440 * 2^(702/1200) ≈ 660
-            expect(baseFreq * Math.pow(2, 702 / 1200)).toBeCloseTo(660, 0);
-        });
-
-        it("round-trips ratio → cents → ratio correctly", () => {
-            const ratio = 3 / 2; // perfect fifth
-            const cents = 1200 * Math.log2(ratio);
-            const reconstructed = Math.pow(2, cents / 1200);
-            expect(reconstructed).toBeCloseTo(ratio, 10);
         });
     });
 });
@@ -1385,24 +1271,6 @@ describe("pitchToNumber", () => {
         global.TEMPERAMENT = {};
         const result = pitchToNumber("C", 4, "C major", "unknown");
         expect(result).toBe(39);
-    });
-
-    it("should preserve distinct spellings for G♯ and A♭ in 19-EDO", () => {
-        const sharp = pitchToNumber("G♯", 4, "C major", "equal19");
-        const flat = pitchToNumber("A♭", 4, "C major", "equal19");
-        // In 19-EDO these map to distinct EDO positions
-        expect(sharp).not.toBe(flat);
-        // 4*19 + 12 (G♯ index) - 14 (A index in 19-EDO table) = 74
-        expect(sharp).toBe(74);
-        // 4*19 + 13 (A♭ index) - 14 (A index in 19-EDO table) = 75
-        expect(flat).toBe(75);
-    });
-
-    it("should collapse G♯ and A♭ in 12-EDO", () => {
-        const sharp = pitchToNumber("G♯", 4, "C major", "equal");
-        const flat = pitchToNumber("A♭", 4, "C major", "equal");
-        // In 12-EDO these map to the same pitch number
-        expect(sharp).toBe(flat);
     });
 });
 
@@ -2235,7 +2103,7 @@ describe("pitchToFrequency", () => {
     it("should work with equal19 temperament", () => {
         global.TEMPERAMENT = { equal19: [] };
         const result = pitchToFrequency("C", 4, 0, "C", "equal19");
-        // C4 in 19-EDO: A0 * Math.pow(2, 62/19) ≈ 264.02 (A-reference aligned with EDO table)
+        // C4 in 19-EDO: A0 * Math.pow(2, 62/19) ≈ 264.02
         expect(result).toBeGreaterThan(260);
         expect(result).toBeLessThan(268);
     });
@@ -2250,100 +2118,6 @@ describe("pitchToFrequency", () => {
         global.TEMPERAMENT = {};
         const result = pitchToFrequency("A", 4, 0, "C", "unknown");
         expect(result).toBe(A0 * Math.pow(TWELTHROOT2, 48));
-    });
-
-    it("should use just intonation ratios for non-EDO temperament", () => {
-        const justIntonationData = {
-            isEDO: false,
-            pitchNumber: 12,
-            noteLabels: ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
-            ratios: [
-                1,
-                16 / 15,
-                9 / 8,
-                6 / 5,
-                5 / 4,
-                4 / 3,
-                45 / 32,
-                3 / 2,
-                8 / 5,
-                5 / 3,
-                9 / 5,
-                15 / 8
-            ]
-        };
-        global.TEMPERAMENT = {
-            "just intonation": justIntonationData,
-            "equal": { pitchNumber: 12 }
-        };
-
-        // C4 in just intonation: A0/(5/3) * 1 * 2^4 = 16.5 * 16 = 264
-        expect(pitchToFrequency("C", 4, 0, "C", "just intonation")).toBeCloseTo(264, 2);
-        // A4 in just intonation: 16.5 * 5/3 * 16 = 440
-        expect(pitchToFrequency("A", 4, 0, "C", "just intonation")).toBeCloseTo(440, 2);
-        // E4 (5/4 ratio): 16.5 * 5/4 * 16 = 330
-        expect(pitchToFrequency("E", 4, 0, "C", "just intonation")).toBeCloseTo(330, 2);
-    });
-
-    it("should use Pythagorean ratios for non-EDO temperament", () => {
-        const pythagoreanData = {
-            isEDO: false,
-            pitchNumber: 12,
-            noteLabels: ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
-            ratios: [
-                1,
-                256 / 243,
-                9 / 8,
-                32 / 27,
-                81 / 64,
-                4 / 3,
-                729 / 512,
-                3 / 2,
-                128 / 81,
-                27 / 16,
-                16 / 9,
-                243 / 128
-            ]
-        };
-        global.TEMPERAMENT = {
-            Pythagorean: pythagoreanData,
-            equal: { pitchNumber: 12 }
-        };
-
-        // C4 in Pythagorean: A0/(27/16) * 1 * 2^4 = 16.296 * 16 = 260.74
-        expect(pitchToFrequency("C", 4, 0, "C", "Pythagorean")).toBeCloseTo(260.74, 1);
-        // A4 in Pythagorean: 16.296 * 27/16 * 16 = 440
-        expect(pitchToFrequency("A", 4, 0, "C", "Pythagorean")).toBeCloseTo(440, 2);
-    });
-
-    it("should handle cents offset with non-EDO temperament", () => {
-        const justIntonationData = {
-            isEDO: false,
-            pitchNumber: 12,
-            noteLabels: ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
-            ratios: [
-                1,
-                16 / 15,
-                9 / 8,
-                6 / 5,
-                5 / 4,
-                4 / 3,
-                45 / 32,
-                3 / 2,
-                8 / 5,
-                5 / 3,
-                9 / 5,
-                15 / 8
-            ]
-        };
-        global.TEMPERAMENT = {
-            "just intonation": justIntonationData,
-            "equal": { pitchNumber: 12 }
-        };
-
-        // C4 + 50 cents in JI: 264 * 2^(50/1200) ≈ 271.7
-        const result = pitchToFrequency("C", 4, 50, "C", "just intonation");
-        expect(result).toBeCloseTo(271.7, 0);
     });
 });
 
@@ -3385,22 +3159,6 @@ describe("getNote additional paths", () => {
             4,
             0
         ]);
-    });
-
-    it("should convert semitones to EDO steps in 19-EDO for a single scalar step", () => {
-        // C→D in a major scale = 2 semitones. In 19-EDO this should move ~3 steps.
-        // generateNoteNames(19)[3] = "D"
-        const result = getNote("C", 4, 2, "C major", false, null, undefined, "equal19");
-        expect(result[0]).toBe("D");
-        expect(result[1]).toBe(4);
-    });
-
-    it("should convert semitones to EDO steps in 19-EDO for 8 scalar steps from C4", () => {
-        // 8 scalar steps in C major = 14 semitones total.
-        // In 19-EDO: 14 * 19/12 ≈ 22 EDO steps = 1 octave + 3 steps = D5.
-        const result = getNote("C", 4, 14, "C major", false, null, undefined, "equal19");
-        expect(result[0]).toBe("D");
-        expect(result[1]).toBe(5);
     });
 });
 

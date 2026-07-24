@@ -35,7 +35,8 @@ describe("setupIntervalsActions", () => {
 
         global.MUSICALMODES = {
             major: [2, 2, 1, 2, 2, 2, 1],
-            minor: [2, 1, 2, 2, 1, 2, 2]
+            minor: [2, 1, 2, 2, 1, 2, 2],
+            custom: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         };
 
         global.ALLNOTESTEP = {
@@ -75,6 +76,7 @@ describe("setupIntervalsActions", () => {
 
         global.getNote = jest.fn(() => ["C"]);
         global.getModeLength = jest.fn(() => 7);
+        global.getCurrentEDO = jest.fn(() => 12);
 
         global.MusicBlocks = { isRun: false };
         global.Mouse = { getMouseFromTurtle: jest.fn() };

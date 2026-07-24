@@ -3539,7 +3539,6 @@ const frequencyToPitch = (hz, temperament) => {
         let bestNote = t.noteLabels[0];
         let bestOctave = 0;
         let bestCents = Infinity;
-        let bestFreq = 0;
 
         for (let o = Math.max(0, approxOctave - 1); o <= approxOctave + 1; o++) {
             for (let i = 0; i < t.noteLabels.length; i++) {
@@ -3549,7 +3548,6 @@ const frequencyToPitch = (hz, temperament) => {
                     bestCents = centsDiff;
                     bestNote = t.noteLabels[i];
                     bestOctave = o;
-                    bestFreq = freq;
                 }
             }
         }
