@@ -6740,7 +6740,10 @@ class Blocks {
             }
             this.activity.refreshCanvas();
             this.activity.trashcan.stopHighlightAnimation();
-            document.getElementById("hideContents").click();
+            const hideContents = document.getElementById("hideContents");
+            if (hideContents && typeof hideContents.click === "function") {
+                hideContents.click();
+            }
         };
 
         /***

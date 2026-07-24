@@ -776,4 +776,73 @@ describe("Blocks Foundation", () => {
             expect(spy).toHaveBeenCalledWith(0);
         });
     });
+
+    describe("sendStackToTrash DOM safety", () => {
+        it("should safely complete sendStackToTrash when #hideContents element is missing from DOM", () => {
+            const mockActivity = {
+                palettes: { dict: {} },
+                refreshCanvas: jest.fn(),
+                trashcan: { stopHighlightAnimation: jest.fn() }
+            };
+            const blocksInstance = new Blocks(mockActivity);
+
+            const mockBlock = {
+                blockIndex: 1,
+                connections: [null],
+                container: { uncache: jest.fn() },
+                protoblock: { style: "normal", parameter: false, staticLabels: ["test"] },
+                hide: jest.fn()
+            };
+
+            blocksInstance.blockList[1] = mockBlock;
+            blocksInstance.captureStackPreview = jest.fn().mockReturnValue(null);
+            blocksInstance._cleanupStacks = jest.fn();
+
+            const originalGetElementById = document.getElementById;
+            document.getElementById = jest.fn().mockReturnValue(null);
+
+            try {
+                expect(() => blocksInstance.sendStackToTrash(mockBlock)).not.toThrow();
+            } finally {
+                document.getElementById = originalGetElementById;
+            }
+        });
+
+        it("should click #hideContents when it exists in DOM", () => {
+            const mockActivity = {
+                palettes: { dict: {} },
+                refreshCanvas: jest.fn(),
+                trashcan: { stopHighlightAnimation: jest.fn() }
+            };
+            const blocksInstance = new Blocks(mockActivity);
+
+            const mockBlock = {
+                blockIndex: 1,
+                connections: [null],
+                container: { uncache: jest.fn() },
+                protoblock: { style: "normal", parameter: false, staticLabels: ["test"] },
+                hide: jest.fn()
+            };
+
+            blocksInstance.blockList[1] = mockBlock;
+            blocksInstance.captureStackPreview = jest.fn().mockReturnValue(null);
+            blocksInstance._cleanupStacks = jest.fn();
+
+            const mockClick = jest.fn();
+            const originalGetElementById = document.getElementById;
+            document.getElementById = jest.fn().mockImplementation(id => {
+                if (id === "hideContents") {
+                    return { click: mockClick };
+                }
+                return null;
+            });
+
+            try {
+                blocksInstance.sendStackToTrash(mockBlock);
+                expect(mockClick).toHaveBeenCalled();
+            } finally {
+                document.getElementById = originalGetElementById;
+            }
+        });
+    });
 });
