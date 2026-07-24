@@ -615,4 +615,150 @@ describe("TimbreWidget", () => {
             expect(timbre.activity.blocks.blockList[3].value).toBe("7");
         });
     });
+
+    describe("Effects and Envelope Event Listeners (Coverage)", () => {
+        let mockDocument;
+        let mockDocById;
+        let mockDocByName;
+
+        const createBlock = (name, connections, value) => ({
+            name,
+            connections,
+            value,
+            text: { text: value === undefined ? "" : value.toString() },
+            updateCache: jest.fn(),
+            isClampBlock: jest.fn(() => false)
+        });
+
+        beforeEach(() => {
+            mockDocument = global.document;
+            mockDocById = global.docById;
+            mockDocByName = global.docByName;
+
+            global.document = jsdomDocument;
+            global.docById = id => jsdomDocument.getElementById(id);
+            global.docByName = name => jsdomDocument.getElementsByName(name);
+            jsdomDocument.body.textContent = "";
+
+            const blocks = {
+                blockList: [createBlock("settimbre", [null, null, null])],
+                clampBlocksToCheck: [],
+                findBottomBlock: jest.fn(() => null),
+                adjustDocks: jest.fn(),
+                adjustExpandableClampBlock: jest.fn(),
+                sendStackToTrash: jest.fn(),
+                loadNewBlocks: jest.fn(blockObjs => {
+                    const blockOffset = blocks.blockList.length;
+                    for (const blockObj of blockObjs) {
+                        const blockName = Array.isArray(blockObj[1]) ? blockObj[1][0] : blockObj[1];
+                        const value = Array.isArray(blockObj[1]) ? blockObj[1][1].value : undefined;
+                        const connections = blockObj[4].map(connection =>
+                            connection === null ? null : connection + blockOffset
+                        );
+                        blocks.blockList.push(createBlock(blockName, connections, value));
+                    }
+                })
+            };
+
+            timbre.activity = {
+                blocks,
+                logo: { synth: { createSynth: jest.fn() } },
+                refreshCanvas: jest.fn(),
+                saveLocally: jest.fn()
+            };
+            timbre.timbreTableDiv = jsdomDocument.createElement("div");
+            timbre.timbreTableDiv.id = "timbreTable";
+            jsdomDocument.body.appendChild(timbre.timbreTableDiv);
+
+            timbre.blockNo = 0;
+            timbre._update = jest.fn();
+            timbre._playNote = jest.fn();
+            timbre.clampConnection = jest.fn();
+            timbre.clampConnectionVspace = jest.fn();
+            timbre.instrumentName = "custom";
+            global.instrumentsEffects[0]["custom"] = {};
+
+            jest.useFakeTimers();
+        });
+
+        afterEach(() => {
+            jsdomDocument.body.textContent = "";
+            global.document = mockDocument;
+            global.docById = mockDocById;
+            global.docByName = mockDocByName;
+            jest.useRealTimers();
+        });
+
+        const triggerChange = (id, value) => {
+            const el = jsdomDocument.getElementById(id);
+            if (el) {
+                el.value = value;
+                el.dispatchEvent(new jsdomDocument.defaultView.Event("change", { bubbles: true }));
+            }
+        };
+
+        const selectEffect = async name => {
+            const r = jsdomDocument.querySelector('input[value="' + name + '"]');
+            if (r) {
+                r.checked = true;
+                const promise = r.onclick({ target: r });
+                jest.runAllTimers();
+                await promise;
+            }
+        };
+
+        test("should update Tremolo params", async () => {
+            timbre._effects();
+            await selectEffect("Tremolo");
+            triggerChange("myRangeFx0", "45");
+            expect(global.instrumentsEffects[0]["custom"]["tremoloFrequency"]).toBe(45);
+            triggerChange("myRangeFx1", "55");
+            expect(global.instrumentsEffects[0]["custom"]["tremoloDepth"]).toBe(0.55);
+        });
+
+        test("should update Vibrato params", async () => {
+            timbre._effects();
+            await selectEffect("Vibrato");
+            triggerChange("myRangeFx0", "30");
+            expect(global.instrumentsEffects[0]["custom"]["vibratoIntensity"]).toBe(0.25);
+        });
+
+        test("should update Chorus params", async () => {
+            timbre._effects();
+            await selectEffect("Chorus");
+            triggerChange("myRangeFx0", "20");
+            expect(global.instrumentsEffects[0]["custom"]["chorusRate"]).toBe(20);
+            triggerChange("myRangeFx1", "10");
+            expect(global.instrumentsEffects[0]["custom"]["delayTime"]).toBe(10);
+            triggerChange("myRangeFx2", "50");
+            expect(global.instrumentsEffects[0]["custom"]["chorusDepth"]).toBe(0.5);
+        });
+
+        test("should update Phaser params", async () => {
+            timbre._effects();
+            await selectEffect("Phaser");
+            triggerChange("myRangeFx0", "12");
+            expect(global.instrumentsEffects[0]["custom"]["rate"]).toBe(12);
+            triggerChange("myRangeFx1", "3");
+            expect(global.instrumentsEffects[0]["custom"]["octaves"]).toBe(3);
+            triggerChange("myRangeFx2", "400");
+            expect(global.instrumentsEffects[0]["custom"]["baseFrequency"]).toBe(400);
+        });
+
+        test("should update Distortion params", async () => {
+            timbre._effects();
+            await selectEffect("Distortion");
+            triggerChange("myRangeFx0", "75");
+            expect(global.instrumentsEffects[0]["custom"]["distortionAmount"]).toBe(0.75);
+        });
+
+        test("should update Envelope params", async () => {
+            timbre._envelope();
+            // envelope uses a different delay? actually _envelope has NO delay execution!
+            triggerChange("myRange0", "15");
+            expect(timbre.synthVals["envelope"]["attack"]).toBe(0.15);
+            triggerChange("myRange3", "25");
+            expect(timbre.synthVals["envelope"]["release"]).toBe(0.25);
+        });
+    });
 });
