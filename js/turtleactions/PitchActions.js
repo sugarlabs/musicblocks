@@ -25,7 +25,7 @@
    nthDegreeToPitch, SHARP, FLAT, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    numberToPitch, ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
    keySignatureToMode, getInterval, EFFECTSNAMES, NANERRORMSG, frequencyToPitch,
-   MusicBlocks, Mouse, isCustomTemperament
+   MusicBlocks, Mouse, isCustomTemperament, getCurrentEDO
 */
 
 /*
@@ -44,7 +44,7 @@
         pitchToNumber, getStepSizeUp, getStepSizeDown, calcOctave, getNote, nthDegreeToPitch,
         SHARP, FLAT, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE, numberToPitch,
         ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
-        keySignatureToMode, getInterval, frequencyToPitch, isCustomTemperament
+        keySignatureToMode, getInterval, frequencyToPitch, isCustomTemperament, getCurrentEDO
 */
 
 /*exported setupPitchActions*/
@@ -194,16 +194,12 @@ function setupPitchActions(activity) {
             }
             let scaleDegree;
 
-            // Choose a reference based on the key selected.
-            // This is based on the position of a note on the circle of fifths e.g C --> 1, G-->8.
-            // Subtract one to make it zero based.
-            let ref = NOTESTEP[obj[0].substr(0, 1)] - 1;
-            // Adjust reference if sharps/flats are present i.e increase by one for a sharp and decrease by one for a flat
-            if (obj[0].substr(1) === FLAT) {
-                ref--;
-            } else if (obj[0].substr(1) === SHARP) {
-                ref++;
-            }
+            // Reference position of the key note within the octave, in EDO steps (0-based).
+            // Uses pitchToNumber for EDO-aware lookup instead of hardcoded 12-EDO NOTESTEP.
+            const temperament = activity.logo.synth.inTemperament;
+            const ref =
+                pitchToNumber(obj[0], 4, tur.singer.keySignature, temperament) %
+                getCurrentEDO(temperament);
 
             /*
             Number of semitones is used to calculate changes in deltaSemi defined above.
@@ -243,9 +239,11 @@ function setupPitchActions(activity) {
 
             const [note, _offset] = nthDegreeToPitch(tur.singer.keySignature, scaleDegree);
             let semitones = ref;
-            semitones += NOTESFLAT.includes(note)
-                ? NOTESFLAT.indexOf(note) - ref
-                : NOTESSHARP.indexOf(note) - ref;
+            // EDO-aware position lookup instead of hardcoded 12-EDO NOTESFLAT/NOTESSHARP.
+            const notePos =
+                pitchToNumber(note, 4, tur.singer.keySignature, temperament) %
+                getCurrentEDO(temperament);
+            semitones += notePos - ref;
             /** calculates changes in reference octave which occur a semitone before the reference key */
             const deltaOctave = Math.floor(number / modeLength);
             /** calculates changes in octave when crossing B */
