@@ -353,7 +353,7 @@ Feel free. But, please don't spam :p.
    any satisfactory answer, then ask it in a comment. If it is a general
    question about Music Blocks, please use the new
    [discussions](https://github.com/sugarlabs/musicblocks/discussions)
-   tab on top the the repository, or the _Sugar-dev Devel
+   tab on top of the repository, or the _Sugar-dev Devel
    <[sugar-devel@lists.sugarlabs.org](mailto:sugar-devel@lists.sugarlabs.org)>_
    mailing list. We also have a
    [matrix channel](https://matrix.to/#/#music-blocks:matrix.org).
