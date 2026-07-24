@@ -1340,3 +1340,138 @@ describe("MXML Methods", () => {
         );
     });
 });
+
+describe("project name fallback regression (follow-up to PR #7800)", () => {
+    // These tests wire the real ProjectStorage implementation in as the
+    // `planet` backend (instead of a hand-rolled mock) so the fix is
+    // verified end-to-end: an invalid stored ProjectName must never
+    // surface as a blank filename or blank title in any SaveInterface
+    // export path.
+    const ProjectStorage = require("../../planet/js/ProjectStorage");
+
+    let storage;
+
+    const makeStorageWithName = name => {
+        const s = new ProjectStorage({});
+        s.data = {
+            CurrentProject: "proj1",
+            Projects: {
+                proj1: {
+                    ProjectName: name,
+                    ProjectData: null,
+                    ProjectImage: null,
+                    PublishedData: null,
+                    DateLastModified: 1000
+                }
+            }
+        };
+        return s;
+    };
+
+    beforeEach(() => {
+        document.body.innerHTML = "";
+        delete window.MBDialog;
+        Object.defineProperty(window, "prompt", {
+            writable: true,
+            value: jest.fn((message, defaultValue) => defaultValue)
+        });
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+        jest.restoreAllMocks();
+    });
+
+    it.each([
+        ["empty string", ""],
+        ["whitespace-only", "   \t  "],
+        ["null", null],
+        ["undefined", undefined]
+    ])("download() falls back to 'My Project' when stored name is %s", (_label, invalidName) => {
+        storage = makeStorageWithName(invalidName);
+        const instance = new SaveInterface({ planet: storage });
+        mockDownloadURL = jest.spyOn(instance, "downloadURL");
+
+        instance.download("png", "data", null);
+
+        expect(mockDownloadURL).toHaveBeenCalledWith("My Project.png", "data");
+    });
+
+    it("download() preserves a valid stored name unchanged", () => {
+        storage = makeStorageWithName("My Song");
+        const instance = new SaveInterface({ planet: storage });
+        mockDownloadURL = jest.spyOn(instance, "downloadURL");
+
+        instance.download("png", "data", null);
+
+        expect(mockDownloadURL).toHaveBeenCalledWith("My Song.png", "data");
+    });
+
+    it("prepareHTML() never embeds a blank project title", () => {
+        storage = makeStorageWithName("");
+        const instance = new SaveInterface({
+            planet: storage,
+            prepareExport: () => "DATA"
+        });
+        instance.htmlSaveTemplate = "<title>{{ project_name }}</title>";
+
+        expect(instance.prepareHTML()).toContain("<title>My Project</title>");
+    });
+
+    it("saveHTMLNoPrompt() never downloads to a blank/dot filename", () => {
+        jest.useFakeTimers();
+        storage = makeStorageWithName("   ");
+        let capturedName = null;
+        const activity = {
+            save: {
+                prepareHTML: () => "<html></html>",
+                downloadURL: name => {
+                    capturedName = name;
+                }
+            },
+            planet: storage
+        };
+
+        const instance = new SaveInterface({ planet: storage });
+        instance.saveHTMLNoPrompt(activity);
+        jest.runAllTimers();
+
+        expect(capturedName).toBe("My Project.html");
+        jest.useRealTimers();
+    });
+
+    it("saveLilypond() populates the modal fileName/title fields with 'My Project' instead of blank", () => {
+        document.body.innerHTML = `
+            <div id="lilypondModal" style="display: none;">
+                <span class="close"></span>
+                <input type="text" id="fileName" value="">
+                <input type="text" id="title" value="">
+                <input type="text" id="author" value="">
+                <input type="checkbox" id="MIDICheck">
+                <input type="checkbox" id="guitarCheck">
+                <button id="submitLilypond"></button>
+                <div id="fileNameText"></div>
+                <div id="titleText"></div>
+                <div id="authorText"></div>
+                <div id="MIDIText"></div>
+                <div id="guitarText"></div>
+            </div>
+        `;
+        global.docById = jest.fn(id => document.getElementById(id));
+        global.docByClass = jest.fn(cls => document.getElementsByClassName(cls));
+
+        storage = makeStorageWithName("");
+        const activity = {
+            planet: storage,
+            storage: { getItem: () => null, setItem: () => {} },
+            logo: { recordingBuffer: { hasData: false } },
+            save: { saveLYFile: jest.fn() }
+        };
+
+        const instance = new SaveInterface(activity);
+        instance.saveLilypond(activity);
+
+        expect(document.getElementById("fileName").value).toBe("My Project.ly");
+        expect(document.getElementById("title").value).toBe("My Project");
+    });
+});
