@@ -1,0 +1,64 @@
+name: Docs PR Bot
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  comment-on-docs-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Check for doc file changes
+        id: doc-changes
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const files = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+            });
+
+            const docFiles = files.data.filter(f =>
+              f.filename.startsWith('docs/') ||
+              f.filename.startsWith('Docs/') ||
+              f.filename.endsWith('.md') ||
+              f.filename.endsWith('.mdx')
+            );
+
+            core.setOutput('has_doc_changes', docFiles.length > 0 ? 'true' : 'false');
+
+      - name: Post bot comment
+        if: steps.doc-changes.outputs.has_doc_changes == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: `## 📸 Documentation PR — Media Required
+
+            Thanks for contributing documentation updates!
+
+            Please attach a **screenshot or short screen recording** showing the documentation running locally.
+            This helps reviewers verify the changes quickly and ensures docs were tested before submission.
+
+            ### How to attach media:
+            \`\`\`markdown
+            ## Screenshot
+            <img width="1200" alt="docs-preview" src="YOUR_IMAGE_URL" />
+
+            ## Video
+            https://user-images.githubusercontent.com/your-video.mp4
+            \`\`\`
+
+            You can drag and drop images/videos directly into the PR description box on GitHub.
+
+            > ⚠️ The CI check will **block merging** until valid media is detected in the PR description.
+
+            📚 See [contributing instructions](https://github.com/sugarlabs/musicblocks/blob/master/README.md) for local setup help.`
+            });

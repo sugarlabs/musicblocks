@@ -1,0 +1,53 @@
+name: Docs Media Check
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  check-media:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Check for doc file changes
+        id: doc-changes
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const files = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+            });
+
+            const docFiles = files.data.filter(f =>
+              f.filename.startsWith('docs/') ||
+              f.filename.startsWith('Docs/') ||
+              f.filename.endsWith('.md') ||
+              f.filename.endsWith('.md') ||
+              f.filename.endsWith('.mdx')
+            );
+
+            core.setOutput('has_doc_changes', docFiles.length > 0 ? 'true' : 'false');
+
+      - name: Check PR body for media
+        if: steps.doc-changes.outputs.has_doc_changes == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.pull_request.body || '';
+
+            const hasImage = /!\[.*?\]\(.*?\)|<img\s[^>]*src=/i.test(body);
+            const hasVideo = /https:\/\/user-images\.githubusercontent\.com\/.*\.(mp4|gif|webm)/i.test(body);
+            const hasMedia = hasImage || hasVideo;
+
+            if (!hasMedia) {
+              core.setFailed(
+                'Documentation changes detected, but no screenshot or video attachment was found in the PR description.\n' +
+                'Please attach proof of local verification before merging.'
+              );
+            } else {
+              console.log('Media attachment found. Check passed.');
+            }
