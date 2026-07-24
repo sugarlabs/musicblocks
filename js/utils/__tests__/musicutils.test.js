@@ -23,7 +23,6 @@ global._ = jest.fn(str => str);
 global.window = {
     btoa: jest.fn(str => Buffer.from(str, "utf8").toString("base64"))
 };
-global.INVALIDPITCH = "Not a valid pitch name";
 
 const {
     scaleDegreeToPitchMapping,
@@ -2763,7 +2762,7 @@ describe("getPitchInfo", () => {
         expect(getPitchInfo("InvalidNote")).toEqual({
             name: null,
             octave: null,
-            pitchNumber: "Not a valid pitch name"
+            pitchNumber: global.INVALIDPITCH
         });
     });
 
@@ -2986,8 +2985,8 @@ describe("_calculate_pitch_number", () => {
     });
 
     it("should return INVALIDPITCH for invalid input", () => {
-        expect(_calculate_pitch_number("Invalid", 4)).toBe("Not a valid pitch name");
-        expect(_calculate_pitch_number(null, 4)).toBe("Not a valid pitch name");
+        expect(_calculate_pitch_number("Invalid", 4)).toBe(global.INVALIDPITCH);
+        expect(_calculate_pitch_number(null, 4)).toBe(global.INVALIDPITCH);
     });
 });
 

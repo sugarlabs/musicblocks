@@ -97,83 +97,16 @@ describe("setupPitchBlocks", () => {
         jest.clearAllMocks();
 
         global._ = jest.fn(str => str);
-        global.ValueBlock = DummyValueBlock;
-        global.FlowBlock = DummyFlowBlock;
-        global.FlowClampBlock = DummyFlowClampBlock;
-        global.LeftBlock = DummyLeftBlock;
-        global.NOINPUTERRORMSG = "No input provided";
-        global.NANERRORMSG = "Not a number";
-        global.INVALIDPITCH = "Invalid pitch";
-        global.last = jest.fn(arr => arr[arr.length - 1]);
-
+        // Override music constants with ASCII symbols for this test
+        // (MusicConstants.js is auto-loaded via jest.setup.js)
         global.SHARP = "#";
         global.FLAT = "b";
         global.DOUBLEFLAT = "bb";
         global.DOUBLESHARP = "##";
-        global.CENTSSYMBOL = "¢";
         global.NATURAL = "n";
-        global.FIXEDSOLFEGE = { do: "C", re: "D", mi: "E", fa: "F", sol: "G", la: "A", si: "B" };
-        global.SOLFEGENAMES1 = [
-            "do",
-            "re",
-            "mi",
-            "fa",
-            "sol",
-            "la",
-            "si",
-            "do#",
-            "dob",
-            "do##",
-            "dobb",
-            "do##",
-            "dobb"
-        ];
-        global.NOTENAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-        global.NOTENAMES1 = [
-            "C",
-            "D",
-            "E",
-            "F",
-            "G",
-            "A",
-            "B",
-            "C#",
-            "Db",
-            "D#",
-            "Eb",
-            "F#",
-            "Gb",
-            "G#",
-            "Ab",
-            "A#",
-            "Bb"
-        ];
-        global.ALLNOTENAMES = [
-            "C",
-            "C#",
-            "Db",
-            "D",
-            "D#",
-            "Eb",
-            "E",
-            "F",
-            "F#",
-            "Gb",
-            "G",
-            "G#",
-            "Ab",
-            "A",
-            "A#",
-            "Bb",
-            "B"
-        ];
-        global.MUSICALMODES = { major: [2, 2, 1, 2, 2, 2, 1], minor: [2, 1, 2, 2, 1, 2, 2] };
-        global.YSTAFFOCTAVEHEIGHT = 70;
-        global.YSTAFFNOTEHEIGHT = 10;
-        global.A0 = 27.5;
-        global.C8 = 4186;
-        global.NOTESSHARP = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-        global.NOTESFLAT = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+
+        // Test-specific overrides
+        global.INTERVALVALUES = { "major third": [0, 0, 1.25], "minor third": [0, 0, 1.2] };
         global.NOTESTEP = { C: 1, D: 3, E: 5, F: 6, G: 8, A: 10, B: 12 };
         global.SOLFEGECONVERSIONTABLE = {
             C: "do",
@@ -184,7 +117,22 @@ describe("setupPitchBlocks", () => {
             A: "la",
             B: "si"
         };
-        global.INTERVALVALUES = { "major third": [0, 0, 1.25], "minor third": [0, 0, 1.2] };
+
+        // Test infrastructure setup
+        global.ValueBlock = DummyValueBlock;
+        global.FlowBlock = DummyFlowBlock;
+        global.FlowClampBlock = DummyFlowClampBlock;
+        global.LeftBlock = DummyLeftBlock;
+        global.NOINPUTERRORMSG = "No input provided";
+        global.NANERRORMSG = "Not a number";
+        global.INVALIDPITCH = "Invalid pitch";
+        global.last = jest.fn(arr => arr[arr.length - 1]);
+
+        // UI constants
+        global.YSTAFFOCTAVEHEIGHT = 70;
+        global.YSTAFFNOTEHEIGHT = 10;
+        global.A0 = 27.5;
+        global.C8 = 4186;
 
         global.numberToPitch = jest.fn(num => ["C", Math.floor(num / 12)]);
         global.frequencyToPitch = jest.fn(freq => {
