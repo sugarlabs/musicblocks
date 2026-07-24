@@ -70,16 +70,6 @@ window.widgetWindows = {
     })
 };
 
-if (typeof document !== "undefined") {
-    jest.spyOn(document, "getElementsByClassName").mockImplementation(() => {
-        return [
-            {
-                style: {}
-            }
-        ];
-    });
-}
-
 describe("PitchStaircase Widget", () => {
     let psc;
 
@@ -295,6 +285,12 @@ describe("PitchStaircase Widget", () => {
                     dict: {}
                 }
             };
+
+            if (typeof document !== "undefined") {
+                jest.spyOn(document, "getElementsByClassName").mockImplementation(() => [
+                    { style: {} }
+                ]);
+            }
         });
 
         test("should set master volume to PREVIEWVOLUME and clear/show widget window on init", () => {
@@ -592,7 +588,7 @@ describe("PitchStaircase Widget", () => {
             window.widgetWindows.windowFor = jest.fn(() => widgetWindow);
 
             wfbElement = { style: {} };
-            document.getElementsByClassName.mockReturnValue([wfbElement]);
+            jest.spyOn(document, "getElementsByClassName").mockReturnValue([wfbElement]);
 
             mockActivity = {
                 logo: { synth: { setMasterVolume: jest.fn(), stop: jest.fn() } },
@@ -758,6 +754,10 @@ describe("PitchStaircase Widget", () => {
                     synth: mockSynth
                 }
             };
+
+            jest.spyOn(document, "getElementsByClassName").mockImplementation(className =>
+                className === "wfbWidget" ? [{ style: {} }] : []
+            );
         });
 
         afterEach(() => {

@@ -85,7 +85,6 @@ global.Image = jest.fn(() => {
     return img;
 });
 
-jest.spyOn(global.window, "addEventListener").mockImplementation(() => {});
 jest.useFakeTimers();
 
 describe("Trashcan Class", () => {
@@ -112,8 +111,11 @@ describe("Trashcan Class", () => {
     });
 
     it("should resize and debounce the event listener", () => {
+        const addEventListenerSpy = jest
+            .spyOn(window, "addEventListener")
+            .mockImplementation(() => {});
         trashcan.resizeEvent(1);
-        const resizeFn = window.addEventListener.mock.calls[0][1];
+        const resizeFn = addEventListenerSpy.mock.calls[0][1];
         resizeFn(); // simulate resize
         jest.advanceTimersByTime(300);
     });
