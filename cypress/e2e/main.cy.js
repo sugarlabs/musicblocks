@@ -218,4 +218,20 @@ describe("MusicBlocks Application", () => {
             cy.get("#canvas").should("exist").and("be.visible");
         });
     });
+
+    describe("Mobile Editing Access", () => {
+        it("should keep editing UI available on a narrow viewport", () => {
+            cy.viewport(375, 667);
+            cy.visit("http://localhost:3000");
+            cy.waitForAppReady();
+
+            cy.get("body").should("not.have.class", "play-only");
+            cy.get("#persistentNotification").should("not.exist");
+            cy.get("#palette").should("be.visible");
+
+            cy.get("body").type("{esc}");
+            cy.get('[width="126"] tbody tr').eq(1).find("img").click();
+            cy.get("#palette img", { timeout: 15000 }).should("have.length.greaterThan", 0);
+        });
+    });
 });

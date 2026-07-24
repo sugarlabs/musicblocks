@@ -970,9 +970,6 @@ class Palettes {
     }
 
     showPalette(name) {
-        if (this.mobile) {
-            return;
-        }
         // In order to open the search widget and palette menu simultaneously
         // this.activity.hideSearchWidget(true);
         this.dict[name].showMenu(true);
