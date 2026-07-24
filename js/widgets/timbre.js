@@ -1897,6 +1897,21 @@ class TimbreWidget {
             insideDivEnv.appendChild(spanEnv);
             wrapperEnv.appendChild(insideDivEnv);
 
+            wrapperEnv.addEventListener("change", event => {
+                const elem = event.target;
+                docById("myRange" + i).value = parseFloat(elem.value);
+                docById("myspan" + i).textContent = elem.value;
+                this.synthVals["envelope"][this.adsrMap[i]] = parseFloat(elem.value) / 100;
+                this._update(blockValue, parseFloat(elem.value), i);
+                this.activity.logo.synth.createSynth(
+                    0,
+                    this.instrumentName,
+                    this.synthVals["oscillator"]["source"],
+                    this.synthVals
+                );
+                this._playNote("G4", 1 / 8);
+            });
+
             env.appendChild(wrapperEnv);
         }
         const envAppend = document.createElement("div");
@@ -1910,24 +1925,6 @@ class TimbreWidget {
         for (let i = 0; i < 4; i++) {
             this.synthVals["envelope"][this.adsrMap[i]] = parseFloat(this.ENVs[i]) / 100;
             this._update(blockValue, this.ENVs[i], i);
-        }
-
-        for (let i = 0; i < 4; i++) {
-            document.getElementById("wrapperEnv" + i).addEventListener("change", event => {
-                const elem = event.target;
-                const m = elem.id.slice(-1);
-                docById("myRange" + m).value = parseFloat(elem.value);
-                docById("myspan" + m).textContent = elem.value;
-                this.synthVals["envelope"][this.adsrMap[m]] = parseFloat(elem.value) / 100;
-                this._update(blockValue, parseFloat(elem.value), m);
-                this.activity.logo.synth.createSynth(
-                    0,
-                    this.instrumentName,
-                    this.synthVals["oscillator"]["source"],
-                    this.synthVals
-                );
-                this._playNote("G4", 1 / 8);
-            });
         }
 
         if (newEnvelope) {

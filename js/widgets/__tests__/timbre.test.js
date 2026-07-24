@@ -614,5 +614,25 @@ describe("TimbreWidget", () => {
             expect(timbre.activity.blocks.blockList[2].value).toBe("12");
             expect(timbre.activity.blocks.blockList[3].value).toBe("7");
         });
+
+        test("updates envelope parameter when wrapperEnv range changes", () => {
+            timbre.isActive["envelope"] = true;
+            jest.spyOn(timbre, "_update").mockImplementation();
+            jest.spyOn(timbre, "_playNote").mockImplementation();
+            jest.spyOn(timbre.activity.logo.synth, "createSynth").mockImplementation();
+
+            timbre._envelope(false);
+
+            const changeEvent = new jsdomDocument.defaultView.Event("change", { bubbles: true });
+            const envSlider = jsdomDocument.getElementById("myRange0");
+            envSlider.value = "50";
+
+            envSlider.dispatchEvent(changeEvent);
+
+            expect(timbre.synthVals.envelope.attack).toBe(0.5);
+            expect(timbre._update).toHaveBeenCalled();
+            expect(timbre.activity.logo.synth.createSynth).toHaveBeenCalled();
+            expect(timbre._playNote).toHaveBeenCalledWith("G4", 1 / 8);
+        });
     });
 });
