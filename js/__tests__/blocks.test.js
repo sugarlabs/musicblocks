@@ -644,6 +644,90 @@ describe("Blocks Foundation", () => {
         });
     });
 
+    describe("loadNewBlocks", () => {
+        let blocksInstance;
+        let mockActivity;
+        let debugSpy;
+
+        beforeEach(() => {
+            mockActivity = {
+                turtles: {
+                    getTurtle: jest.fn(),
+                    getTurtleCount: jest.fn().mockReturnValue(0)
+                },
+                palettes: {
+                    dict: {
+                        action: { protoList: [] }
+                    }
+                }
+            };
+            blocksInstance = new Blocks(mockActivity);
+            blocksInstance.blockList = [];
+            debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+        });
+
+        afterEach(() => {
+            debugSpy.mockRestore();
+        });
+
+        it("should load valid acyclic project blocks without pouting/aborting", () => {
+            const project = [
+                [0, "start", 100, 100, [null, 1, null]],
+                [1, "forward", 200, 100, [0, null, null]]
+            ];
+            const processSpy = jest
+                .spyOn(blocksInstance, "_processOneBlock")
+                .mockImplementation(() => {});
+
+            blocksInstance.loadNewBlocks(project);
+
+            expect(debugSpy).not.toHaveBeenCalledWith(
+                expect.stringContaining("Circular connection in block data")
+            );
+            processSpy.mockRestore();
+        });
+
+        it("should reject direct self-loop (A -> A)", () => {
+            const project = [[0, "start", 100, 100, [0, null, null]]];
+
+            blocksInstance.loadNewBlocks(project);
+
+            expect(debugSpy).toHaveBeenCalledWith(
+                expect.stringContaining("Circular connection in block data")
+            );
+            expect(debugSpy).toHaveBeenCalledWith("Punting loading of new blocks!");
+        });
+
+        it("should reject dual-block cycle (A -> B -> A)", () => {
+            const project = [
+                [0, "start", 100, 100, [null, 1, null]],
+                [1, "action", 200, 100, [null, 0, null]]
+            ];
+
+            blocksInstance.loadNewBlocks(project);
+
+            expect(debugSpy).toHaveBeenCalledWith(
+                expect.stringContaining("Circular connection in block data")
+            );
+            expect(debugSpy).toHaveBeenCalledWith("Punting loading of new blocks!");
+        });
+
+        it("should reject multi-block cycle (A -> B -> C -> A)", () => {
+            const project = [
+                [0, "start", 100, 100, [null, 1, null]],
+                [1, "action", 200, 100, [null, 2, null]],
+                [2, "forward", 300, 100, [null, 0, null]]
+            ];
+
+            blocksInstance.loadNewBlocks(project);
+
+            expect(debugSpy).toHaveBeenCalledWith(
+                expect.stringContaining("Circular connection in block data")
+            );
+            expect(debugSpy).toHaveBeenCalledWith("Punting loading of new blocks!");
+        });
+    });
+
     describe("Block dragging via the real BlockDragController", () => {
         // The rest of this file exercises BlockDragController only through a
         // minimal hand-built stand-in (see block-drag-controller.test.js).
