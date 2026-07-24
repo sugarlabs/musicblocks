@@ -923,38 +923,24 @@ function generateNoteNames(edo) {
         return EDO_NOTE_NAMES[edo];
     }
 
-    const SHARP_NAMES = [
-        "C",
-        "C" + SHARP,
-        "D",
-        "D" + SHARP,
-        "E",
-        "F",
-        "F" + SHARP,
-        "G",
-        "G" + SHARP,
-        "A",
-        "A" + SHARP,
-        "B"
-    ];
-    const FLAT_NAMES = [
-        "C",
-        "D" + FLAT,
-        "D",
-        "E" + FLAT,
-        "E",
-        "F",
-        "G" + FLAT,
-        "G",
-        "A" + FLAT,
-        "A",
-        "B" + FLAT,
-        "B"
-    ];
     const naturals = ["C", "D", "E", "F", "G", "A", "B"];
     const naturalPos12 = [0, 2, 4, 5, 7, 9, 11];
 
     if (edo <= 12) {
+        const SHARP_NAMES = [
+            "C",
+            "C" + SHARP,
+            "D",
+            "D" + SHARP,
+            "E",
+            "F",
+            "F" + SHARP,
+            "G",
+            "G" + SHARP,
+            "A",
+            "A" + SHARP,
+            "B"
+        ];
         EDO_NOTE_NAMES[edo] = SHARP_NAMES.slice(0, edo);
         return EDO_NOTE_NAMES[edo];
     }
