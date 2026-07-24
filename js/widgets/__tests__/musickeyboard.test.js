@@ -169,8 +169,8 @@ describe("MusicKeyboard add-row submenu", () => {
         expect(() => keyboard._menuWheel.navItems[0].navigateFunction()).not.toThrow();
         expect(loadNewBlocks).toHaveBeenCalledWith([
             [0, ["pitch", {}], 0, 0, [null, 1, 2, null]],
-            [1, ["solfege", { value: "do♯" }], 0, 0, [0]],
-            [2, ["number", { value: 392 }], 0, 0, [0]]
+            [1, ["solfege", { value: "do" }], 0, 0, [0]],
+            [2, ["number", { value: 4 }], 0, 0, [0]]
         ]);
     });
 
