@@ -343,7 +343,13 @@ function setupPitchActions(activity) {
                         const p = tur.singer.notePitches[blockId][startLength];
                         const o = tur.singer.noteOctaves[blockId][startLength];
                         const c = tur.singer.noteCents[blockId][startLength];
-                        transformedHertz = pitchToFrequency(p, o, c, tur.singer.keySignature);
+                        transformedHertz = pitchToFrequency(
+                            p,
+                            o,
+                            c,
+                            tur.singer.keySignature,
+                            activity.logo.synth.inTemperament
+                        );
 
                         if (c !== 0) {
                             const formattedHertz = Number(transformedHertz.toFixed(2));
@@ -396,7 +402,13 @@ function setupPitchActions(activity) {
                 tur.singer.noteCents[last(tur.singer.inNoteBlock)].push(obj[2]);
                 if (obj[2] !== 0) {
                     tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(
-                        pitchToFrequency(obj[0], obj[1], obj[2], tur.singer.keySignature)
+                        pitchToFrequency(
+                            obj[0],
+                            obj[1],
+                            obj[2],
+                            tur.singer.keySignature,
+                            activity.logo.synth.inTemperament
+                        )
                     );
                 } else {
                     tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(0);
