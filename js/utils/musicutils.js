@@ -5639,6 +5639,29 @@ const buildScale = keySignature => {
         halfSteps = MUSICALMODES[obj[1]];
     }
 
+    // Determine current EDO from global state
+    let currentEDO = 12;
+    if (typeof globalActivity !== "undefined" && globalActivity?.logo?.synth?.inTemperament) {
+        currentEDO = getCurrentEDO(globalActivity.logo.synth.inTemperament);
+    }
+
+    // For non-12 EDO: use EDO-specific note names and handle octave wrapping
+    if (currentEDO !== 12) {
+        const edoNames = generateNoteNames(currentEDO);
+        let idx = edoNames.indexOf(myKeySignature);
+        if (idx === -1) {
+            idx = 0;
+        }
+
+        const scale = [myKeySignature];
+        let ii = idx;
+        for (let i = 0; i < halfSteps.length; i++) {
+            ii = (ii + halfSteps[i] + edoNames.length) % edoNames.length;
+            scale.push(edoNames[ii]);
+        }
+        return [scale, halfSteps];
+    }
+
     let thisScale;
     if (NOTESFLAT.includes(myKeySignature)) {
         if (SHARPPREFERENCE.includes(obj[0].toLowerCase() + " " + obj[1])) {
