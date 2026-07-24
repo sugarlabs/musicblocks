@@ -131,8 +131,17 @@ function setupRhythmBlockPaletteBlocks(activity) {
             if (logo.inMatrix || logo.tuplet) {
                 if (logo.inMatrix) {
                     logo.phraseMaker.addColBlock(blk, arg0);
+                }
 
-                    // Add individual entries for each beat to avoid extra × blocks
+                if (logo.tuplet) {
+                    for (let i = 0; i < arg0; i++) {
+                        if (!logo.addingNotesToTuplet) {
+                            logo.tupletRhythms.push(["notes", logo.tupletParams.length - 1]);
+                            logo.addingNotesToTuplet = true;
+                        }
+                        last(logo.tupletRhythms).push(noteBeatValue);
+                    }
+                } else {
                     for (let i = 0; i < arg0; i++) {
                         logo.tupletRhythms.push(["individual", 1, noteBeatValue]);
                     }
@@ -737,17 +746,21 @@ function setupRhythmBlockPaletteBlocks(activity) {
                     // Play rhythm block as if it were a drum.
                     if (tur.singer.drumStyle.length > 0) {
                         logo.clearNoteParams(tur, blk, tur.singer.drumStyle);
+                        tur.singer.inNoteBlock.push(blk);
                     } else {
                         logo.clearNoteParams(tur, blk, [DEFAULTDRUM]);
+                        tur.singer.inNoteBlock.push(blk);
+                        tur.singer.notePitches[last(tur.singer.inNoteBlock)] = ["G"];
+                        tur.singer.noteOctaves[last(tur.singer.inNoteBlock)] = [4];
+                        tur.singer.noteCents[last(tur.singer.inNoteBlock)] = [0];
                     }
-
-                    tur.singer.inNoteBlock.push(blk);
 
                     const bpmFactor =
                         TONEBPM /
                         (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
 
                     let timeout = 0;
+                    let totalBeats = 0;
                     let beatValue;
                     let __callback = null;
                     for (let i = 0; i < beatValues.length; i++) {
