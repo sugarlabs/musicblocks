@@ -82,7 +82,6 @@ global.document = {
 // Mock Constants
 global.STANDARDBLOCKHEIGHT = 20;
 global.DEFAULTBLOCKSCALE = 1.0;
-global.SPECIALINPUTS = ["number", "text", "boolean"];
 global.COLLAPSIBLES = ["repeat", "forever", "if"];
 global.INLINECOLLAPSIBLES = ["newnote", "interval", "osctime"];
 global.platformColor = {
@@ -211,6 +210,52 @@ describe("Block Foundation", () => {
 
             const block = new Block(mockProtoBlock, mockBlocks);
             expect(block.isNoHitBlock()).toBe(false);
+        });
+
+        it("isNoteContainer() should return true from capability metadata", () => {
+            mockProtoBlock.capabilities.noteContainer = true;
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.isNoteContainer()).toBe(true);
+        });
+
+        it("isNoteContainer() should respect explicit false metadata", () => {
+            mockProtoBlock.name = "newnote";
+            mockProtoBlock.capabilities.noteContainer = false;
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.isNoteContainer()).toBe(false);
+        });
+
+        it("isNoteContainer() should return false for ordinary blocks", () => {
+            mockProtoBlock.name = "forward";
+            mockProtoBlock.capabilities = Object.create(null);
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.isNoteContainer()).toBe(false);
+        });
+
+        it("hasValueDrivenLabel() should return true from capability metadata", () => {
+            mockProtoBlock.capabilities.valueDrivenLabel = true;
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.hasValueDrivenLabel()).toBe(true);
+        });
+
+        it("hasValueDrivenLabel() should respect explicit false metadata", () => {
+            mockProtoBlock.name = "number";
+            mockProtoBlock.capabilities.valueDrivenLabel = false;
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.hasValueDrivenLabel()).toBe(false);
+        });
+
+        it("hasValueDrivenLabel() should return false for ordinary blocks", () => {
+            mockProtoBlock.name = "forward";
+            mockProtoBlock.capabilities = Object.create(null);
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.hasValueDrivenLabel()).toBe(false);
         });
 
         it("copySize() should sync size from protoblock", () => {
@@ -533,6 +578,58 @@ describe("Block Foundation", () => {
 
             expect(mockCache).toHaveBeenCalledWith(0, 0, 100, 100);
             expect(block.value).toBe("fallback-cached");
+        });
+    });
+
+    describe("hide", () => {
+        it("should not throw when container is null", () => {
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.container = null;
+            expect(() => b.hide()).not.toThrow();
+        });
+
+        it("should set container.visible to false when container exists", () => {
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.container = { visible: true };
+            b.hide();
+            expect(b.container.visible).toBe(false);
+        });
+
+        it("should guard collapsible fields that are null", () => {
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.name = "repeat";
+            b.collapseText = null;
+            b.expandButtonBitmap = null;
+            b.collapseButtonBitmap = null;
+            expect(() => b.hide()).not.toThrow();
+        });
+    });
+
+    describe("show", () => {
+        it("should not throw when container is null and not trashed", () => {
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.container = null;
+            b.trash = false;
+            b.inCollapsed = false;
+            expect(() => b.show()).not.toThrow();
+        });
+
+        it("should set container.visible to true when container exists", () => {
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.container = { visible: false };
+            b.trash = false;
+            b.inCollapsed = false;
+            b.bitmap = { visible: false };
+            b.highlightBitmap = { visible: true };
+            b.highlightCollapseBlockBitmap = { visible: false };
+            b.collapseBlockBitmap = { visible: false };
+            b.collapseText = null;
+            b.expandButtonBitmap = null;
+            b.collapseButtonBitmap = null;
+            b.disconnectedBitmap = null;
+            b.disconnectedHighlightBitmap = null;
+            b.show();
+            expect(b.container.visible).toBe(true);
         });
     });
 });

@@ -92,6 +92,7 @@ function setupIntervalsBlocks(activity) {
         constructor() {
             // Call the constructor of the parent class
             super("temperamentname", _("temperament name"));
+            this.setCapability("valueDrivenLabel");
 
             // Set the palette, activity, extra width, and form the block with specific parameters
             this.setPalette("tone", activity);
@@ -117,6 +118,7 @@ function setupIntervalsBlocks(activity) {
         constructor() {
             // Call the constructor of the parent class
             super("modename");
+            this.setCapability("valueDrivenLabel");
 
             // Set the palette, activity, help string, extra width, and form the block with specific parameters
             this.setPalette("intervals", activity);
@@ -138,6 +140,7 @@ function setupIntervalsBlocks(activity) {
         constructor() {
             // Call the constructor of the parent class
             super("chordname");
+            this.setCapability("valueDrivenLabel");
 
             // Set the palette, activity, help string, extra width, and form the block with specific parameters
             this.setPalette("intervals", activity);
@@ -240,6 +243,7 @@ function setupIntervalsBlocks(activity) {
         constructor() {
             // Call the constructor of the parent class
             super("intervalname");
+            this.setCapability("valueDrivenLabel");
 
             // Set the palette, activity, help string, extra width, and form the block with specific parameters
             this.setPalette("intervals", activity);

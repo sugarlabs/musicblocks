@@ -492,8 +492,8 @@ class SearchUI {
                 document.removeEventListener("mousemove", onMouseMove);
                 document.removeEventListener("touchmove", onMouseMove);
 
-                const x = parseInt(img.style.left);
-                const y = parseInt(img.style.top);
+                const x = parseInt(img.style.left, 10);
+                const y = parseInt(img.style.top, 10);
 
                 img.style.position = posit;
                 img.style.zIndex = zInd;

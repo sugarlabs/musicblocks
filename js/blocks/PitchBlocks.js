@@ -129,6 +129,7 @@ function setupPitchBlocks(activity) {
     class InvertModeBlock extends ValueBlock {
         constructor() {
             super("invertmode");
+            this.setCapability("valueDrivenLabel");
             this.setPalette("pitch", activity);
             this.formBlock({ outType: "textout" });
             this.hidden = true;
@@ -421,6 +422,7 @@ function setupPitchBlocks(activity) {
     class OutputToolsBlocks extends LeftBlock {
         constructor() {
             super("outputtools", _("pitch converter"));
+            this.setCapability("valueDrivenLabel");
             this.setPalette("pitch", activity);
             this.beginnerBlock(true);
             this.extraWidth = 50;
@@ -877,6 +879,7 @@ function setupPitchBlocks(activity) {
     class AccidentalNameBlock extends ValueBlock {
         constructor() {
             super("accidentalname", _("accidental selector"));
+            this.setCapability("valueDrivenLabel");
             this.setPalette("pitch", activity);
             this.setHelpString([
                 _(
@@ -893,6 +896,7 @@ function setupPitchBlocks(activity) {
     class EastIndianSolfegeBlock extends ValueBlock {
         constructor() {
             super("eastindiansolfege", _("east indian solfege"));
+            this.setCapability("valueDrivenLabel");
             this.setPalette("pitch", activity);
             this.setHelpString([
                 _("Pitch can be specified in terms of ni dha pa ma ga re sa."),
@@ -907,6 +911,7 @@ function setupPitchBlocks(activity) {
     class NoteNameBlock extends ValueBlock {
         constructor() {
             super("notename", _("note name"));
+            this.setCapability("valueDrivenLabel");
             this.setPalette("pitch", activity);
             this.setHelpString([
                 _("Pitch can be specified in terms of C D E F G A B."),
@@ -922,6 +927,7 @@ function setupPitchBlocks(activity) {
     class SolfegeBlock extends ValueBlock {
         constructor() {
             super("solfege", _("solfege"));
+            this.setCapability("valueDrivenLabel");
             this.setPalette("pitch", activity);
             this.setHelpString([
                 _("Pitch can be specified in terms of do re mi fa sol la ti."),
@@ -937,6 +943,7 @@ function setupPitchBlocks(activity) {
     class CustomNoteBlock extends ValueBlock {
         constructor() {
             super("customNote");
+            this.setCapability("valueDrivenLabel");
             this.setPalette("pitch", activity);
             this.hidden = true;
         }
@@ -1842,6 +1849,7 @@ function setupPitchBlocks(activity) {
         constructor() {
             //.TRANS: a numeric mapping of the notes in an octave based on the musical mode
             super("scaledegree2", _("scale degree"));
+            this.setCapability("valueDrivenLabel");
             this.setPalette("pitch", activity);
             this.extraWidth = 10;
             this.setHelpString([

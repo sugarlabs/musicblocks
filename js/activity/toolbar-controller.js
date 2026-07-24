@@ -31,6 +31,16 @@ class ToolbarController {
     }
 
     /**
+     * Clears canvas for all turtles before a fresh Run.
+     * Toolbar Run paths only — not on block clicks or widgets.
+     */
+    _clearAllTurtles() {
+        for (const turtle of this.activity.turtles.turtleList) {
+            turtle.painter.doClear(true, true, true);
+        }
+    }
+
+    /**
      * Runs Music Blocks at full speed.
      * @param {object} env - Environment parameters for execution.
      * @param {number} currentDelay - The turtle delay before this button action.
@@ -44,6 +54,7 @@ class ToolbarController {
         }
 
         if (!this.activity.turtles.running()) {
+            this._clearAllTurtles();
             this.activity.logo.runLogoCommands(null, env);
         } else {
             if (currentDelay !== 0) {
@@ -72,6 +83,7 @@ class ToolbarController {
         }
 
         if (!this.activity.turtles.running()) {
+            this._clearAllTurtles();
             this.activity.logo.runLogoCommands();
         } else {
             this.activity.logo.step();
@@ -97,6 +109,7 @@ class ToolbarController {
             // Queue and take first step.
             let started = false;
             if (!this.activity.turtles.running()) {
+                this._clearAllTurtles();
                 this.activity.logo.runLogoCommands();
                 started = true;
             }

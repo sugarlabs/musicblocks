@@ -15,32 +15,6 @@
 // Global mocks required by exporters.js
 // ---------------------------------------------------------------------------
 
-global.SPECIALINPUTS = [
-    "text",
-    "number",
-    "solfege",
-    "eastindiansolfege",
-    "scaledegree2",
-    "notename",
-    "voicename",
-    "modename",
-    "chordname",
-    "drumname",
-    "effectsname",
-    "filtertype",
-    "oscillatortype",
-    "boolean",
-    "intervalname",
-    "invertmode",
-    "accidentalname",
-    "temperamentname",
-    "noisename",
-    "customNote",
-    "grid",
-    "outputtools",
-    "wrapmode"
-];
-
 global.INLINECOLLAPSIBLES = ["newnote", "interval", "osctime", "definemode"];
 
 // Minimal SVG-like strings for collapse/expand buttons (split on "><")
@@ -105,7 +79,8 @@ function makeBlock(overrides = {}) {
         collapsed: overrides.collapsed || false,
         value: overrides.value !== undefined ? overrides.value : "",
         ignore: overrides.ignore || jest.fn(() => false),
-        isCollapsible: overrides.isCollapsible || jest.fn(() => false)
+        isCollapsible: overrides.isCollapsible || jest.fn(() => false),
+        hasValueDrivenLabel: overrides.hasValueDrivenLabel || jest.fn(() => false)
     };
 }
 
@@ -284,7 +259,7 @@ describe("printBlockSVG", () => {
         expect(result).toContain("svg");
     });
 
-    test("handles SPECIALINPUTS blocks with value injection", () => {
+    test("handles value-driven-label blocks with value injection", () => {
         const specialSVG =
             '<svg xmlns="http://www.w3.org/2000/svg">' +
             "<text><tspan>label</tspan><tspan></tspan></text>" +
@@ -296,7 +271,8 @@ describe("printBlockSVG", () => {
             y: 5,
             width: 60,
             height: 30,
-            value: 42
+            value: 42,
+            hasValueDrivenLabel: jest.fn(() => true)
         });
 
         const activity = makeActivity([block], {
@@ -310,7 +286,7 @@ describe("printBlockSVG", () => {
         expect(decoded).toContain("42");
     });
 
-    test("handles SPECIALINPUTS blocks with string value and gettext", () => {
+    test("handles value-driven-label blocks with string value and gettext", () => {
         const specialSVG =
             '<svg xmlns="http://www.w3.org/2000/svg">' + "<text><tspan></tspan></text>" + "</svg>";
 
@@ -324,7 +300,8 @@ describe("printBlockSVG", () => {
             y: 0,
             width: 60,
             height: 30,
-            value: "hello"
+            value: "hello",
+            hasValueDrivenLabel: jest.fn(() => true)
         });
 
         const activity = makeActivity([block], {
@@ -340,7 +317,7 @@ describe("printBlockSVG", () => {
         global._ = originalTranslate;
     });
 
-    test("handles SPECIALINPUTS with last tspan fallback (no empty tspan)", () => {
+    test("handles value-driven-label blocks with last tspan fallback (no empty tspan)", () => {
         const specialSVG =
             '<svg xmlns="http://www.w3.org/2000/svg">' +
             "<text><tspan>existing</tspan><tspan>last</tspan></text>" +
@@ -352,7 +329,8 @@ describe("printBlockSVG", () => {
             y: 0,
             width: 60,
             height: 30,
-            value: 99
+            value: 99,
+            hasValueDrivenLabel: jest.fn(() => true)
         });
 
         const activity = makeActivity([block], {
@@ -365,7 +343,7 @@ describe("printBlockSVG", () => {
         expect(decoded).toContain("99");
     });
 
-    test("handles SPECIALINPUTS with text element fallback (no tspan)", () => {
+    test("handles value-driven-label blocks with text element fallback (no tspan)", () => {
         const specialSVG =
             '<svg xmlns="http://www.w3.org/2000/svg">' + "<text>old value</text>" + "</svg>";
 
@@ -375,7 +353,8 @@ describe("printBlockSVG", () => {
             y: 0,
             width: 60,
             height: 30,
-            value: "true"
+            value: "true",
+            hasValueDrivenLabel: jest.fn(() => true)
         });
 
         const activity = makeActivity([block], {
@@ -388,7 +367,7 @@ describe("printBlockSVG", () => {
         expect(decoded).toContain("true");
     });
 
-    test("removes dropshadow filter from SPECIALINPUTS SVG", () => {
+    test("removes dropshadow filter from value-driven-label SVG", () => {
         const specialSVG =
             '<svg xmlns="http://www.w3.org/2000/svg">' +
             '<g style="filter:url(#dropshadow)">' +
@@ -402,7 +381,8 @@ describe("printBlockSVG", () => {
             y: 0,
             width: 60,
             height: 30,
-            value: 7
+            value: 7,
+            hasValueDrivenLabel: jest.fn(() => true)
         });
 
         const activity = makeActivity([block], {

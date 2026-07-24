@@ -31,11 +31,21 @@ global.toFixed2 = jest.fn(n => n);
 global.ValueBlock = class {
     constructor(name) {
         this.name = name;
+        this.capabilities = Object.create(null);
     }
     setPalette = jest.fn();
     setHelpString = jest.fn();
     formBlock = jest.fn();
     beginnerBlock = jest.fn();
+    setCapability(name, value = true) {
+        this.capabilities[name] = !!value;
+        return this;
+    }
+    getCapability(name) {
+        return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+            ? this.capabilities[name]
+            : undefined;
+    }
 
     setup(activity) {
         activity.blocks[this.name] = this.constructor;
@@ -303,6 +313,10 @@ describe("GraphicsBlocks", () => {
     describe("WrapModeBlock (wrapmode)", () => {
         test("WrapModeBlock is registered", () => {
             expect(activity.blocks.wrapmode).toBeDefined();
+        });
+        test("WrapModeBlock declares the valueDrivenLabel capability", () => {
+            const block = new activity.blocks.wrapmode();
+            expect(block.getCapability("valueDrivenLabel")).toBe(true);
         });
         test("arg returns true when wrap is on", () => {
             turtleObj.painter.wrap = true;

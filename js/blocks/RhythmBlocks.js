@@ -67,7 +67,8 @@ function setupRhythmBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
+                parentId !== undefined &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -118,7 +119,8 @@ function setupRhythmBlocks(activity) {
             const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                parentId != null &&
+                parentId !== null &&
+                parentId !== undefined &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {
@@ -140,6 +142,7 @@ function setupRhythmBlocks(activity) {
          */
         constructor() {
             super("osctime");
+            this.setCapability("noteContainer");
             this.setPalette("rhythm", activity);
             this.setHelpString([
                 _(
@@ -1115,6 +1118,7 @@ function setupRhythmBlocks(activity) {
          */
         constructor() {
             super("newnote");
+            this.setCapability("noteContainer");
             this.setPalette("rhythm", activity);
             this.beginnerBlock(true);
             this.setHelpString([
@@ -1177,6 +1181,10 @@ function setupRhythmBlocks(activity) {
             const tur = activity.turtles.ithTurtle(turtle);
             if (tur.singer.inNoteBlock.length > 0) {
                 tur.singer.delayedNotes.push([blk, value]);
+            }
+            // If we are in the phrasemaker, we need to push a rhythm entry.
+            if (logo.inMatrix && value > 0) {
+                logo.tupletRhythms.push(["individual", 1, 1 / value]);
             }
             Singer.RhythmActions.playNote(value, "newnote", turtle, blk, _callback);
             return [args[1], 1];

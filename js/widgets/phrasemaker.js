@@ -2562,9 +2562,11 @@ class PhraseMaker {
             }
             this._markedColsInRow.push(thisRow);
         }
+
         // create a 'Set' object that contains only unique values
         const uniqueFrequencies = new Set();
         const sortableList = [];
+        const rowsWeSkipped = [];
         let drumName;
         // Make a list to sort, skipping drums and graphics.
         // frequency;label;arg;row index
@@ -2597,7 +2599,15 @@ class PhraseMaker {
                 ]);
 
                 uniqueFrequencies.add(frequencyKey);
+            } else {
+                // We need to track the rows we skip in case any cells should be marked.
+                rowsWeSkipped.push([[...uniqueFrequencies].indexOf(frequencyKey), i]);
             }
+        }
+
+        // Add the rows we skipped when capturing marked columns.
+        for (let i = 0; i < rowsWeSkipped.length; i++) {
+            this._markedColsInRow[rowsWeSkipped[i][0]].push(rowsWeSkipped[i][1]);
         }
 
         // Add the stuff we didn't sort.
@@ -3609,7 +3619,7 @@ class PhraseMaker {
      * @private
      */
     _addNotes(noteToDivide, notesToAdd) {
-        noteToDivide = parseInt(noteToDivide);
+        noteToDivide = parseInt(noteToDivide, 10);
         this._blockMapHelper = [];
         for (let i = 0; i <= noteToDivide; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [i]]);
