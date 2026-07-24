@@ -985,6 +985,7 @@ function setupBooleanBlocks(activity) {
          */
         constructor() {
             super("boolean");
+            this.setCapability("valueDrivenLabel");
 
             /**
              * Sets the palette for the block.

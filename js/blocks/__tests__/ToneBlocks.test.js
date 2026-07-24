@@ -33,6 +33,7 @@ class DummyFlowBlock {
     constructor(type, label) {
         this.type = type;
         this.label = label;
+        this.capabilities = Object.create(null);
     }
     setPalette(palette, activity) {
         this.palette = palette;
@@ -57,6 +58,15 @@ class DummyFlowBlock {
     }
     makeMacro(fn) {
         this.macro = fn;
+    }
+    setCapability(name, value = true) {
+        this.capabilities[name] = !!value;
+        return this;
+    }
+    getCapability(name) {
+        return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+            ? this.capabilities[name]
+            : undefined;
     }
 }
 

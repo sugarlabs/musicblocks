@@ -82,7 +82,6 @@ global.document = {
 // Mock Constants
 global.STANDARDBLOCKHEIGHT = 20;
 global.DEFAULTBLOCKSCALE = 1.0;
-global.SPECIALINPUTS = ["number", "text", "boolean"];
 global.COLLAPSIBLES = ["repeat", "forever", "if"];
 global.INLINECOLLAPSIBLES = ["newnote", "interval", "osctime"];
 global.platformColor = {
@@ -211,6 +210,52 @@ describe("Block Foundation", () => {
 
             const block = new Block(mockProtoBlock, mockBlocks);
             expect(block.isNoHitBlock()).toBe(false);
+        });
+
+        it("isNoteContainer() should return true from capability metadata", () => {
+            mockProtoBlock.capabilities.noteContainer = true;
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.isNoteContainer()).toBe(true);
+        });
+
+        it("isNoteContainer() should respect explicit false metadata", () => {
+            mockProtoBlock.name = "newnote";
+            mockProtoBlock.capabilities.noteContainer = false;
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.isNoteContainer()).toBe(false);
+        });
+
+        it("isNoteContainer() should return false for ordinary blocks", () => {
+            mockProtoBlock.name = "forward";
+            mockProtoBlock.capabilities = Object.create(null);
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.isNoteContainer()).toBe(false);
+        });
+
+        it("hasValueDrivenLabel() should return true from capability metadata", () => {
+            mockProtoBlock.capabilities.valueDrivenLabel = true;
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.hasValueDrivenLabel()).toBe(true);
+        });
+
+        it("hasValueDrivenLabel() should respect explicit false metadata", () => {
+            mockProtoBlock.name = "number";
+            mockProtoBlock.capabilities.valueDrivenLabel = false;
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.hasValueDrivenLabel()).toBe(false);
+        });
+
+        it("hasValueDrivenLabel() should return false for ordinary blocks", () => {
+            mockProtoBlock.name = "forward";
+            mockProtoBlock.capabilities = Object.create(null);
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.hasValueDrivenLabel()).toBe(false);
         });
 
         it("copySize() should sync size from protoblock", () => {

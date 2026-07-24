@@ -354,8 +354,8 @@ class SearchController {
                             document.removeEventListener("mousemove", onMouseMove);
                             document.removeEventListener("touchmove", onMouseMove);
 
-                            const x = parseInt(img.style.left);
-                            const y = parseInt(img.style.top);
+                            const x = parseInt(img.style.left, 10);
+                            const y = parseInt(img.style.top, 10);
 
                             img.style.position = posit;
                             img.style.zIndex = zInd;
@@ -469,8 +469,8 @@ class SearchController {
             handle.addEventListener("pointerdown", e => {
                 dragStartX = e.clientX;
                 dragStartY = e.clientY;
-                dragStartLeft = parseInt(activity.searchWidget.style.left) || 0;
-                dragStartTop = parseInt(activity.searchWidget.style.top) || 0;
+                dragStartLeft = parseInt(activity.searchWidget.style.left, 10) || 0;
+                dragStartTop = parseInt(activity.searchWidget.style.top, 10) || 0;
                 activity.searchWidget.style.transition = "none";
                 handle.setPointerCapture(e.pointerId);
                 handle.style.cursor = "grabbing";
@@ -555,8 +555,8 @@ class SearchController {
         dragHandle.addEventListener("pointerdown", e => {
             dragStartX = e.clientX;
             dragStartY = e.clientY;
-            dragStartLeft = parseInt(this.helpfulSearchDiv.style.left) || 0;
-            dragStartTop = parseInt(this.helpfulSearchDiv.style.top) || 0;
+            dragStartLeft = parseInt(this.helpfulSearchDiv.style.left, 10) || 0;
+            dragStartTop = parseInt(this.helpfulSearchDiv.style.top, 10) || 0;
             dragHandle.setPointerCapture(e.pointerId);
             dragHandle.style.cursor = "grabbing";
         });

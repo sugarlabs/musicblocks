@@ -37,6 +37,8 @@ try {
    setupSearchController, setupSearchUI, setupWorkspaceLayoutController, setupSelectionController,
    setupTrashController,
    setupHelpController,
+   setupBlockScaleController,
+   setupContextMenuController,
    setupActivityAbcParser, setupActivityIdleWatcher,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
@@ -53,7 +55,7 @@ try {
    piemenuKey, POLAR, preparePluginExports, processMacroData,
    processPluginData, processRawPluginData, SaveInterface,
    SHOWBLOCKSBUTTON, SMALLERBUTTON, SMALLERDISABLEBUTTON, SOPRANO,
-   SPECIALINPUTS, STANDARDBLOCKHEIGHT, StatsWindow, STROKECOLORS,
+   STANDARDBLOCKHEIGHT, StatsWindow, STROKECOLORS,
    TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, TURTLESVG,
    updatePluginObj, ZERODIVIDEERRORMSG, GRAND_G, GRAND_F,
    SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
@@ -139,6 +141,8 @@ let MYDEFINES = [
     "activity/workspace-layout-controller",
     "activity/trash-controller",
     "activity/help-controller",
+    "activity/block-scale-controller",
+    "activity/context-menu-controller",
     "search-ui",
     "keyboard-controller",
     "widgets/plugin-dialog",
@@ -486,6 +490,8 @@ class Activity {
         setupSearchController(this, this.searchUI);
         setupWorkspaceLayoutController(this);
         setupSelectionController(this);
+        setupBlockScaleController(this);
+        setupContextMenuController(this);
         this.pluginDialog = new PluginDialog({
             onLoadBuiltIn: name => this._loadBuiltInPlugin(name),
             onDelete: () => this._deletePlugin(),
@@ -644,128 +650,13 @@ class Activity {
             }
         };
 
-        /*
-         * creates helpfulSearchDiv for search
-         */
-        this.setHelpfulSearchDiv = () => this.searchController.setHelpfulSearchDiv();
-
-        /*
-         * displays helpfulSearchDiv on canvas
-         */
-        this._displayHelpfulSearchDiv = () => this.searchController._displayHelpfulSearchDiv();
-
-        this._hideHelpfulSearchWidget = e => this.searchController._hideHelpfulSearchWidget(e);
-
-        /*
-         * Sets up right click functionality opening the context menus
-         * (if block is right clicked)
-         */
-        this.doContextMenus = () => {
-            this.addEventListener(
-                document,
-                "contextmenu",
-                event => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    if (this.beginnerMode) return;
-                    if (this.searchUI.isHelpfulSearchWidgetOn) {
-                        this._hideHelpfulSearchWidget();
-                    }
-                    if (
-                        !this.blocks.isCoordinateOnBlock(event.clientX, event.clientY) &&
-                        event.target.id === "myCanvas"
-                    ) {
-                        this._displayHelpfulWheel(event);
-                    }
-                },
-                false
-            );
-        };
-
-        /*
-         * displays helpfulWheel on canvas on right click
-         */
-        this._displayHelpfulWheel = event => {
-            // Cache DOM element reference for performance (7 lookups reduced to 1)
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            helpfulWheelDiv.style.position = "absolute";
-
-            const x = event.clientX;
-            const y = event.clientY;
-
-            const canvasLeft = this.canvas.offsetLeft + 28 * this.getStageScale();
-            const canvasTop = this.canvas.offsetTop + 6 * this.getStageScale();
-
-            const helpfulWheelLeft = Math.max(
-                Math.round(x * this.getStageScale() + canvasLeft) - 150,
-                canvasLeft
-            );
-            const helpfulWheelTop = Math.max(
-                Math.round(y * this.getStageScale() + canvasTop) - 150,
-                canvasTop
-            );
-
-            helpfulWheelDiv.style.left = helpfulWheelLeft + "px";
-
-            helpfulWheelDiv.style.top = helpfulWheelTop + "px";
-
-            const windowWidth = window.innerWidth - 20;
-            const windowHeight = window.innerHeight - 20;
-
-            if (helpfulWheelLeft + 350 > windowWidth) {
-                helpfulWheelDiv.style.left = windowWidth - 350 + "px";
-            }
-            if (helpfulWheelTop + 350 > windowHeight) {
-                helpfulWheelDiv.style.top = windowHeight - 350 + "px";
-            }
-
-            // Show bulk actions only when blocks are multi-selected.
-            const selectedBlocksCount = this.blocks.selectedBlocks.filter(
-                block => !block.trash
-            ).length;
-            this.helpfulWheelItems.find(ele => ele.label === "Move to trash").display =
-                selectedBlocksCount > 0;
-            this.helpfulWheelItems.find(ele => ele.label === "Duplicate").display =
-                selectedBlocksCount > 0;
-
-            helpfulWheelDiv.style.display = "";
-
-            const wheel = new wheelnav("helpfulWheelDiv", null, 300, 300);
-            wheel.colors = platformColor.wheelcolors;
-            wheel.slicePathFunction = slicePath().DonutSlice;
-            wheel.slicePathCustom = slicePath().DonutSliceCustomization();
-            wheel.slicePathCustom.minRadiusPercent = 0.45;
-            wheel.slicePathCustom.maxRadiusPercent = 1.0;
-            wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
-            wheel.sliceInitPathCustom = wheel.slicePathCustom;
-            wheel.clickModeRotate = false;
-            const wheelItems = this.helpfulWheelItems.filter(ele => ele.display);
-            wheel.initWheel(wheelItems.map(ele => _(ele.label)));
-
-            wheelItems.forEach((ele, i) => {
-                if (ele.icon) {
-                    wheel.navItems[i].setTitle(ele.icon);
-                }
-            });
-
-            wheel.createWheel();
-
-            wheel.navItems[0].selected = false;
-
-            wheelItems.forEach((ele, i) => {
-                wheel.navItems[i].setTooltip(_(ele.label));
-                wheel.navItems[i].navigateFunction = () => ele.fn(this);
-            });
-            const closeHelpfulWheel = e => {
-                const isClickInside = helpfulWheelDiv.contains(e.target);
-                if (!isClickInside) {
-                    helpfulWheelDiv.style.display = "none";
-                    this.removeEventListener(document, "click", closeHelpfulWheel);
-                }
-            };
-
-            this.addEventListener(document, "click", closeHelpfulWheel);
-        };
+        // Context menu / helpful wheel / bottom toolbar functionality has been
+        // extracted to ContextMenuController (js/context-menu-controller.js).
+        // setupContextMenuController() installs the delegation stubs below:
+        // setHelpfulSearchDiv, _displayHelpfulSearchDiv, _hideHelpfulSearchWidget,
+        // doContextMenus, displayHelpfulWheel, setupPaletteMenu, makeButton,
+        // loadButtonDragHandler, openAuxMenu, _showHideAuxMenu, showHideAuxMenu,
+        // hideAuxMenu, deltaY.
 
         /**
          * Sets up plugin and palette boilerplate.
@@ -1154,6 +1045,9 @@ class Activity {
                 helpfulWheelDiv.style.display = "none";
             }
         };
+        // Exposed so ContextMenuController (activity/context-menu-controller.js) can
+        // reference it from the helpfulWheelItems registry it builds.
+        this.setScroller = setScroller;
 
         /**
          * Initializes the functionality of the horizontal scroll icon.
@@ -1189,118 +1083,6 @@ class Activity {
         this.doLoadAnimation = (...args) => this.projectManager.doLoadAnimation(...args);
 
         this.stopLoadAnimation = (...args) => this.projectManager.stopLoadAnimation(...args);
-
-        /**
-         * Increases the size of blocks in the activity.
-         * @param {object} activity - The activity object.
-         */
-        const doLargerBlocks = async activity => {
-            await activity._doLargerBlocks();
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-                activity.__tick();
-            }
-        };
-
-        this._doLargerBlocks = async () => {
-            this.blocks.activeBlock = null;
-
-            if (!this.resizeDebounce) {
-                if (this.blockscale < BLOCKSCALES.length - 1) {
-                    this.resizeDebounce = true;
-                    this.blockscale += 1;
-                    this.clearCache();
-                    await this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
-                    this.blocks.checkBounds();
-                    this.refreshCanvas();
-                }
-
-                const that = this;
-                setTimeout(() => {
-                    that.resizeDebounce = false;
-                }, 200);
-            }
-
-            await this.setSmallerLargerStatus();
-            this.stageDirty = true;
-        };
-
-        /**
-         * Decreases the size of blocks in the activity.
-         * @param {object} activity - The activity object.
-         */
-        const doSmallerBlocks = async activity => {
-            await activity._doSmallerBlocks();
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-                activity.__tick();
-            }
-        };
-
-        /**
-         * Manages the resizing of blocks to handle larger size.
-         */
-        this._doSmallerBlocks = async () => {
-            this.blocks.activeBlock = null;
-
-            if (!this.resizeDebounce) {
-                if (this.blockscale > 0) {
-                    this.resizeDebounce = true;
-                    this.blockscale -= 1;
-                    this.clearCache();
-                    await this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
-                    this.blocks.checkBounds();
-                    this.refreshCanvas();
-                }
-
-                const that = this;
-                setTimeout(() => {
-                    that.resizeDebounce = false;
-                }, 200);
-            }
-
-            await this.setSmallerLargerStatus();
-            this.stageDirty = true;
-        };
-
-        /*
-         * If either the block size has reached its minimum or maximum,
-         * then the icons to make them smaller/bigger will be hidden.
-         * Sets the status of the smaller and larger block icons based on the current block size.
-         */
-        this.setSmallerLargerStatus = async () => {
-            if (BLOCKSCALES[this.blockscale] < DEFAULTBLOCKSCALE) {
-                await changeImage(
-                    this.smallerContainer.children[0],
-                    SMALLERBUTTON,
-                    SMALLERDISABLEBUTTON
-                );
-            } else {
-                await changeImage(
-                    this.smallerContainer.children[0],
-                    SMALLERDISABLEBUTTON,
-                    SMALLERBUTTON
-                );
-            }
-
-            if (BLOCKSCALES[this.blockscale] === 4) {
-                await changeImage(
-                    this.largerContainer.children[0],
-                    BIGGERBUTTON,
-                    BIGGERDISABLEBUTTON
-                );
-            } else {
-                await changeImage(
-                    this.largerContainer.children[0],
-                    BIGGERDISABLEBUTTON,
-                    BIGGERBUTTON
-                );
-            }
-        };
 
         const deletePlugin = activity => {
             activity.pluginDialog.deletePlugin();
@@ -1449,9 +1231,9 @@ class Activity {
                             const pinchDelta = currentPinchDistance - initialPinchDistance;
                             if (Math.abs(pinchDelta) > 20) {
                                 if (pinchDelta > 0) {
-                                    doLargerBlocks(that);
+                                    that.doLargerBlocks();
                                 } else {
-                                    doSmallerBlocks(that);
+                                    that.doSmallerBlocks();
                                 }
                                 initialPinchDistance = currentPinchDistance;
                             }
@@ -1520,7 +1302,7 @@ class Activity {
 
                 if (event.ctrlKey) {
                     event.preventDefault();
-                    delY < 0 ? doLargerBlocks(that) : doSmallerBlocks(that);
+                    delY < 0 ? that.doLargerBlocks() : that.doSmallerBlocks();
                 } else {
                     closeAnyOpenMenusAndLabels();
                     if (that.scrollBlockContainer) {
@@ -1990,7 +1772,7 @@ class Activity {
             this.trashcan.resizeEvent(this.turtleBlocksScale);
 
             // We need to reposition the palette buttons
-            this._setupPaletteMenu();
+            this.setupPaletteMenu();
 
             // Reposition coordinate grids.
             const newX = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
@@ -2168,7 +1950,7 @@ class Activity {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
                 handleResize();
-                this._setupPaletteMenu();
+                this.setupPaletteMenu();
             }, 200);
         };
         this.addEventListener(window, "resize", this._handleWindowResize);
@@ -2239,87 +2021,9 @@ class Activity {
         // setupTrashController() so external callers continue to work unchanged.
         setupTrashController(this);
 
-        /*
-         * Open aux menu
-         */
-        this._openAuxMenu = () => {
-            if (!this.turtles.running() && this.toolbarHeight === 0) {
-                this._showHideAuxMenu(false);
-            }
-        };
-
-        /*
-         * Toggles Aux menu visibility and positioning
-         */
-        const showHideAuxMenu = (activity, resize) => {
-            activity._showHideAuxMenu(resize);
-        };
-
-        this._showHideAuxMenu = resize => {
-            const cellsize = 55;
-            let dy;
-
-            // function to increase or decrease the "top" property of the top-right corner buttons
-
-            const topRightButtons = document.querySelectorAll("#buttoncontainerTOP .tooltipped");
-            const gridElement = document.getElementById("Grid");
-            const btnY = gridElement ? gridElement.getBoundingClientRect().top : 70 + LEADING + 6;
-
-            this.changeTopButtonsPosition = value => {
-                topRightButtons.forEach(child => {
-                    child.style.top = `${btnY + value}px`;
-                });
-            };
-
-            if (!resize && this.toolbarHeight === 0) {
-                dy = cellsize + LEADING + 5;
-
-                this.toolbarHeight = dy;
-                this.palettes.deltaY(dy);
-                this.turtles.deltaY(dy);
-                this.blocksContainer.y += dy;
-                this.changeTopButtonsPosition(dy);
-
-                this.cartesianBitmap.y += dy;
-                this.polarBitmap.y += dy;
-                this.trebleBitmap.y += dy;
-                this.grandBitmap.y += dy;
-                this.sopranoBitmap.y += dy;
-                this.altoBitmap.y += dy;
-                this.tenorBitmap.y += dy;
-                this.bassBitmap.y += dy;
-                this.blocks.checkBounds();
-            } else {
-                dy = this.toolbarHeight;
-                this.toolbarHeight = 0;
-
-                this.turtles.deltaY(-dy);
-                this.palettes.deltaY(-dy);
-                this.blocksContainer.y -= dy;
-                this.changeTopButtonsPosition(-dy);
-
-                this.cartesianBitmap.y -= dy;
-                this.polarBitmap.y -= dy;
-                this.trebleBitmap.y -= dy;
-                this.grandBitmap.y -= dy;
-                this.sopranoBitmap.y -= dy;
-                this.altoBitmap.y -= dy;
-                this.tenorBitmap.y -= dy;
-                this.bassBitmap.y -= dy;
-            }
-
-            this.refreshCanvas();
-        };
-
-        /*
-         * Hides aux menu
-         */
-        this.hideAuxMenu = () => {
-            if (this.toolbarHeight > 0) {
-                this._showHideAuxMenu(false);
-                this.menuButtonsVisible = false;
-            }
-        };
+        // Aux menu open/close/toggle (_openAuxMenu, _showHideAuxMenu, showHideAuxMenu,
+        // hideAuxMenu) has been extracted to ContextMenuController; see the
+        // delegation stubs installed by setupContextMenuController() above.
 
         /**
          * Hide the palettes before update, then deletes everything/sends all to trash.
@@ -2436,18 +2140,9 @@ class Activity {
             }
         };
 
-        /*
-         * Toggles block/palette visibility
-         */
-        const changeBlockVisibility = activity => {
-            activity._changeBlockVisibility();
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-                activity.__tick();
-            }
-        };
+        // changeBlockVisibility (the helpful-wheel "Show/hide blocks" action) has
+        // been extracted to ContextMenuController; see
+        // ContextMenuController.changeBlockVisibility.
 
         this._changeBlockVisibility = () => {
             hideDOMLabel();
@@ -2472,18 +2167,9 @@ class Activity {
             }
         };
 
-        /*
-         * Toggles collapsible stacks (if collapsed stacks expand and vice versa)
-         */
-        const toggleCollapsibleStacks = activity => {
-            activity._toggleCollapsibleStacks();
-            // Cache DOM element reference for performance
-            const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-            if (helpfulWheelDiv.style.display !== "none") {
-                helpfulWheelDiv.style.display = "none";
-                activity.__tick();
-            }
-        };
+        // toggleCollapsibleStacks (the helpful-wheel "Expand/collapse blocks"
+        // action) has been extracted to ContextMenuController; see
+        // ContextMenuController.toggleCollapsibleStacks.
 
         this._toggleCollapsibleStacks = () => {
             hideDOMLabel();
@@ -2595,7 +2281,7 @@ class Activity {
         this._doOpenSamples = () => {
             if (document.getElementById("palette").style.display !== "none")
                 document.getElementById("palette").style.display = "none";
-            this.toolbar.closeAuxToolbar(showHideAuxMenu);
+            this.toolbar.closeAuxToolbar(this.showHideAuxMenu);
             this.planet.openPlanet();
             if (document.getElementById("buttoncontainerBOTTOM").style.display !== "none")
                 document.getElementById("buttoncontainerBOTTOM").style.display = "none";
@@ -2621,6 +2307,9 @@ class Activity {
                 helpfulWheelDiv.style.display = "none";
             }
         };
+        // Exposed so ContextMenuController (activity/context-menu-controller.js) can
+        // reference it from the helpfulWheelItems registry it builds.
+        this.chooseKeyMenu = chooseKeyMenu;
 
         window.prepareExport = (...args) => this.projectManager.prepareExport(...args);
 
@@ -2818,255 +2507,10 @@ class Activity {
             reader.readAsText(file);
         };
 
-        /*
-         * Sets up palette buttons and functions
-         * e.g. Home, Collapse, Expand
-         * These menu items are on the canvas, not the toolbar.
-         */
-        this._setupPaletteMenu = () => {
-            this.helpfulWheelItems = [];
-            const btnSize = this.cellSize;
-            const createButton = (icon, label, action) => {
-                const button = this._makeButton(icon, label, x, y, btnSize, 0);
-                this._loadButtonDragHandler(button, action, this);
-                x += btnSize;
-                return button;
-            };
-
-            let x = window.innerWidth - 4 * btnSize - 27.5;
-            const y = window.innerHeight - 57.5;
-
-            const removeButtonContainer = document.getElementById("buttoncontainerBOTTOM");
-            if (removeButtonContainer) {
-                removeButtonContainer.parentNode.removeChild(removeButtonContainer);
-            }
-
-            const ButtonHolder = document.createElement("div");
-            ButtonHolder.setAttribute("id", "buttoncontainerBOTTOM");
-            ButtonHolder.style.display = "block";
-            document.body.appendChild(ButtonHolder);
-
-            this.homeButtonContainer = createButton(
-                GOHOMEFADEDBUTTON,
-                `${_("Home")} [${_("Home").toUpperCase()}]`,
-                this.findBlocks
-            );
-            this.boundary.hide();
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Home [HOME]"))
-                this.helpfulWheelItems.push({
-                    label: "Home [HOME]",
-                    icon:
-                        "imgsrc:data:image/svg+xml;base64," +
-                        window.btoa(base64Encode(GOHOMEFADEDBUTTON)),
-                    display: true,
-                    fn: this.findBlocks
-                });
-
-            this.hideBlocksContainer = createButton(
-                SHOWBLOCKSBUTTON,
-                _("Show/hide blocks"),
-                changeBlockVisibility
-            );
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Show/hide blocks"))
-                this.helpfulWheelItems.push({
-                    label: "Show/hide blocks",
-                    icon:
-                        "imgsrc:data:image/svg+xml;base64," +
-                        window.btoa(base64Encode(SHOWBLOCKSBUTTON)),
-                    display: true,
-                    fn: changeBlockVisibility
-                });
-
-            this.collapseBlocksContainer = createButton(
-                COLLAPSEBLOCKSBUTTON,
-                _("Expand/collapse blocks"),
-                toggleCollapsibleStacks
-            );
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Expand/collapse blocks"))
-                this.helpfulWheelItems.push({
-                    label: "Expand/collapse blocks",
-                    icon:
-                        "imgsrc:data:image/svg+xml;base64," +
-                        window.btoa(base64Encode(COLLAPSEBLOCKSBUTTON)),
-                    display: true,
-                    fn: toggleCollapsibleStacks
-                });
-
-            this.smallerContainer = createButton(
-                SMALLERBUTTON,
-                _("Decrease block size"),
-                doSmallerBlocks
-            );
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Decrease block size"))
-                this.helpfulWheelItems.push({
-                    label: "Decrease block size",
-                    icon:
-                        "imgsrc:data:image/svg+xml;base64," +
-                        window.btoa(base64Encode(SMALLERBUTTON)),
-                    display: true,
-                    fn: doSmallerBlocks
-                });
-
-            this.largerContainer = createButton(
-                BIGGERBUTTON,
-                _("Increase block size"),
-                doLargerBlocks
-            );
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Increase block size"))
-                this.helpfulWheelItems.push({
-                    label: "Increase block size",
-                    icon:
-                        "imgsrc:data:image/svg+xml;base64," +
-                        window.btoa(base64Encode(BIGGERBUTTON)),
-                    display: true,
-                    fn: doLargerBlocks
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Restore"))
-                this.helpfulWheelItems.push({
-                    label: "Restore",
-                    icon: "imgsrc:header-icons/restore-from-trash.svg",
-                    display: true,
-                    fn: this.restoreTrashPop
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Turtle Wrap Off"))
-                this.helpfulWheelItems.push({
-                    label: "Turtle Wrap Off",
-                    icon: "imgsrc:header-icons/wrap-text.svg",
-                    display: true,
-                    fn: this.toolbar.changeWrap
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Turtle Wrap On"))
-                this.helpfulWheelItems.push({
-                    label: "Turtle Wrap On",
-                    icon: "imgsrc:header-icons/wrap-text.svg",
-                    display: false,
-                    fn: this.toolbar.changeWrap
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Enable horizontal scrolling"))
-                this.helpfulWheelItems.push({
-                    label: "Enable horizontal scrolling",
-                    icon: "imgsrc:header-icons/compare-arrows.svg",
-                    display: this.beginnerMode ? false : true,
-                    fn: setScroller
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Disable horizontal scrolling"))
-                this.helpfulWheelItems.push({
-                    label: "Disable horizontal scrolling",
-                    icon: "imgsrc:header-icons/lock.svg",
-                    display: false,
-                    fn: setScroller
-                });
-
-            if (
-                _THIS_IS_MUSIC_BLOCKS_ &&
-                !this.helpfulWheelItems.find(ele => ele.label === "Set Pitch Preview")
-            )
-                this.helpfulWheelItems.push({
-                    label: "Set Pitch Preview",
-                    icon: "imgsrc:header-icons/music-note.svg",
-                    display: true,
-                    fn: chooseKeyMenu
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Grid"))
-                this.helpfulWheelItems.push({
-                    label: "Grid",
-                    icon:
-                        "imgsrc:data:image/svg+xml;base64," +
-                        window.btoa(base64Encode(CARTESIANBUTTON)),
-                    display: true,
-                    fn: piemenuGrid
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Select"))
-                this.helpfulWheelItems.push({
-                    label: "Select",
-                    icon:
-                        "imgsrc:data:image/svg+xml;base64," +
-                        window.btoa(base64Encode(SELECTBUTTON)),
-                    display: true,
-                    fn: this.selectMode
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Move to trash"))
-                this.helpfulWheelItems.push({
-                    label: "Move to trash",
-                    icon: "imgsrc:header-icons/empty-trash-button.svg",
-                    display: false,
-                    fn: this.deleteMultipleBlocks
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Duplicate"))
-                this.helpfulWheelItems.push({
-                    label: "Duplicate",
-                    icon: "imgsrc:header-icons/copy-button.svg",
-                    display: false,
-                    fn: this.copyMultipleBlocks
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Clear"))
-                this.helpfulWheelItems.push({
-                    label: "Clear",
-                    icon:
-                        "imgsrc:data:image/svg+xml;base64," +
-                        window.btoa(base64Encode(CLEARBUTTON)),
-                    display: true,
-                    fn: () => this._allClear(false)
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Collapse"))
-                this.helpfulWheelItems.push({
-                    label: "Collapse",
-                    icon:
-                        "imgsrc:data:image/svg+xml;base64," +
-                        window.btoa(base64Encode(COLLAPSEBUTTON)),
-                    display: true,
-                    fn: this.turtles.collapse
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Expand"))
-                this.helpfulWheelItems.push({
-                    label: "Expand",
-                    icon:
-                        "imgsrc:data:image/svg+xml;base64," +
-                        window.btoa(base64Encode(EXPANDBUTTON)),
-                    display: false,
-                    fn: this.turtles.expand
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Search for Blocks"))
-                this.helpfulWheelItems.push({
-                    label: "Search for Blocks",
-                    icon: "imgsrc:header-icons/search-button.svg",
-                    display: true,
-                    fn: this._displayHelpfulSearchDiv
-                });
-
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Paste previous stack"))
-                this.helpfulWheelItems.push({
-                    label: "Paste previous stack",
-                    icon: "imgsrc:header-icons/copy-button.svg",
-                    display: false,
-                    fn: this.turtles.expand
-                });
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Close"))
-                this.helpfulWheelItems.push({
-                    label: "Close",
-                    icon: "imgsrc:header-icons/cancel-button.svg",
-                    display: true,
-                    fn: this._hideHelpfulSearchWidget
-                });
-        };
+        // Palette/bottom-toolbar menu construction (_setupPaletteMenu and the
+        // helpfulWheelItems registry it builds) has been extracted to
+        // ContextMenuController; see the setupPaletteMenu delegation stub
+        // installed by setupContextMenuController() above.
 
         /*
          * Shows search widget on helpfulSearchDiv
@@ -3075,68 +2519,10 @@ class Activity {
 
         this.doHelpfulSearch = () => this.searchController.doHelpfulSearch();
 
-        /*
-         * Makes non-toolbar buttons, e.g., the palette menu buttons
-         */
-        this._makeButton = (name, label, x, y) => {
-            const container = document.createElement("div");
-            container.setAttribute("id", "" + label);
-            container.setAttribute("class", "tooltipped");
-            container.setAttribute("data-tooltip", label);
-            container.setAttribute("data-position", "top");
-            window.jQuery(".tooltipped").tooltip({
-                html: true,
-                delay: 100
-            });
-
-            const that = this;
-            container.onmouseover = () => {
-                if (!that.loading) {
-                    document.body.style.cursor = "pointer";
-                    container.style.transition = "0.12s ease-out";
-                    container.style.transform = "scale(1.15)";
-                }
-            };
-
-            container.onmouseout = () => {
-                if (!that.loading) {
-                    document.body.style.cursor = "default";
-                    container.style.transition = "0.15s ease-out";
-                    container.style.transform = "scale(1)";
-                }
-            };
-
-            const img = new Image();
-            img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(name));
-            // Accessibility: derive alt text from the button label
-            const altText = label ? label.replace(/\s*\[.*\]$/, "") : "Toolbar button";
-            img.setAttribute("alt", altText);
-
-            // Batch DOM reads before writes to avoid forced synchronous layout
-            const rightPos = document.body.clientWidth - x;
-            container.appendChild(img);
-            container.setAttribute(
-                "style",
-                "position: absolute; right:" + rightPos + "px;  top: " + y + "px;"
-            );
-            document.getElementById("buttoncontainerBOTTOM").appendChild(container);
-            return container;
-        };
-
-        /**
-         * Handles button dragging, long hovering and prevents multiple button presses.
-         * @param container longAction
-         * @param hoverAction extraLongImg
-         */
-        this._loadButtonDragHandler = (container, actionClick, arg) => {
-            const that = this;
-            container.onmousedown = () => {
-                if (!that.loading) {
-                    document.body.style.cursor = "default";
-                }
-                actionClick(arg);
-            };
-        };
+        // Non-toolbar button creation and drag handling (_makeButton,
+        // _loadButtonDragHandler) has been extracted to ContextMenuController;
+        // see the makeButton/loadButtonDragHandler delegation stubs installed
+        // by setupContextMenuController() above.
 
         /*
          * Handles pasted strings into input fields
@@ -3171,28 +2557,9 @@ class Activity {
             this.pasteBox.hide();
         };
 
-        /**
-         * Handles changes in y coordinates of elements when aux toolbar is opened.
-         * Repositions elements on screen by a certain amount (dy).
-         * @param dy how much of a change in y
-         */
-        this.deltaY = dy => {
-            this.toolbarHeight += dy;
-            for (let i = 0; i < this.onscreenButtons.length; i++) {
-                this.onscreenButtons[i].y += dy;
-            }
-
-            for (let i = 0; i < this.onscreenMenu.length; i++) {
-                this.onscreenMenu[i].y += dy;
-            }
-
-            this.palettes.deltaY(dy);
-            this.turtles.deltaY(dy);
-
-            // this.menuContainer.y += dy;
-            this.blocksContainer.y += dy;
-            this.refreshCanvas();
-        };
+        // deltaY (repositions elements on screen when the aux toolbar opens/closes)
+        // has been extracted to ContextMenuController; see the delegation stub
+        // installed by setupContextMenuController() above.
 
         /*
          * Ran once dom is ready and editable
@@ -3406,12 +2773,8 @@ class Activity {
                 this.save.saveBlockArtworkPNG.bind(this.save)
             );
             this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
-            this.toolbar.renderMenuIcon(showHideAuxMenu);
-            this.toolbar.renderHelpIcon(
-                this.showHelp,
-                this.showKeyboardShortcuts,
-                this.showInteractiveTutorial
-            );
+            this.toolbar.renderMenuIcon(this.showHideAuxMenu);
+            this.toolbar.renderHelpIcon(this.showHelp, this.showKeyboardShortcuts,this.showInteractiveTutorial);
             this.toolbar.renderModeSelectIcon(
                 doSwitchMode,
                 () => doRecordButton(this),

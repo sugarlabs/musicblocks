@@ -252,6 +252,30 @@ function setupActionBlocks(activity) {
                 argTypes: ["anyin"]
             });
         }
+        arg(logo, turtle, blk, receivedArg) {
+            const cblk = activity.blocks.blockList[blk].connections[1];
+            if (cblk === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return 0;
+            } else {
+                const name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                if (name in logo.actions) {
+                    activity.turtles.getTurtle(turtle).running = true;
+                    logo.runFromBlockNow(
+                        logo,
+                        turtle,
+                        logo.actions[name],
+                        true,
+                        [],
+                        activity.turtles.getTurtle(turtle).queue.length
+                    );
+                    return logo.returns[turtle].pop();
+                } else {
+                    activity.errorMsg(NOACTIONERRORMSG, blk, name);
+                    return 0;
+                }
+            }
+        }
     }
     /**
      * Represents a Named Calculate block that returns a value calculated by an action.

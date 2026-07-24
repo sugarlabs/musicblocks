@@ -127,36 +127,6 @@ const COLLAPSIBLES = [
 const ARG_LIKE_BLOCKS = ["doArg", "calcArg", "namedcalcArg", "makeblock"];
 
 /**
- * List of special input types.
- * @type {string[]}
- */
-const SPECIALINPUTS = [
-    "text",
-    "number",
-    "solfege",
-    "eastindiansolfege",
-    "scaledegree2",
-    "notename",
-    "voicename",
-    "modename",
-    "chordname",
-    "drumname",
-    "effectsname",
-    "filtertype",
-    "oscillatortype",
-    "boolean",
-    "intervalname",
-    "invertmode",
-    "accidentalname",
-    "temperamentname",
-    "noisename",
-    "customNote",
-    "grid",
-    "outputtools",
-    "wrapmode"
-];
-
-/**
  * List of block types whose names should be widened.
  * @type {string[]}
  */
@@ -686,7 +656,7 @@ class Block {
                 // block is hidden, so do nothing.
                 return;
             }
-        } else if (!this.bitmap.visible) {
+        } else if (this.bitmap === null || !this.bitmap.visible) {
             return;
         }
 
@@ -753,7 +723,9 @@ class Block {
             }
         }
 
-        this.container.updateCache();
+        if (this._viewportVisible !== false) {
+            this.container.updateCache();
+        }
     }
 
     /**
@@ -835,7 +807,9 @@ class Block {
             }
         }
 
-        this.container.updateCache();
+        if (this._viewportVisible !== false) {
+            this.container.updateCache();
+        }
     }
 
     unhighlightSelectedBlocks(blk, selection) {
@@ -1408,7 +1382,7 @@ class Block {
             }
         } else if (this.protoblock.staticLabels.length > 0 && !this.protoblock.image) {
             // Label should be defined inside _().
-            if (SPECIALINPUTS.includes(this.name)) {
+            if (this.hasValueDrivenLabel()) {
                 block_label = "";
             } else {
                 block_label = this.protoblock.staticLabels[0];
@@ -1466,7 +1440,7 @@ class Block {
         // const thisBlock = this.blockIndex;
         let proto, obj, label, attr;
         // Value blocks get a modifiable text label.
-        if (SPECIALINPUTS.includes(this.name)) {
+        if (this.hasValueDrivenLabel()) {
             if (this.value === null) {
                 switch (this.name) {
                     case "text":
@@ -2128,6 +2102,27 @@ class Block {
         }
 
         return false;
+    }
+
+    /**
+     * Checks if the block is a note container.
+     * @returns {boolean} - True if the block is a note container, false otherwise.
+     */
+    isNoteContainer() {
+        const noteContainerCapability = this.getCapability("noteContainer");
+        if (noteContainerCapability !== undefined) {
+            return !!noteContainerCapability;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if the block derives its visible inline label from its value.
+     * @returns {boolean} - True if the block has value-driven label behavior.
+     */
+    hasValueDrivenLabel() {
+        return this.hasCapability("valueDrivenLabel");
     }
 
     /**
@@ -3004,7 +2999,7 @@ class Block {
         this.text.y = Math.floor((TEXTY * blockScale) / 2 + 0.5);
 
         // Some special cases
-        if (SPECIALINPUTS.includes(this.name)) {
+        if (this.hasValueDrivenLabel()) {
             this.text.textAlign = "center";
             this.text.x = Math.floor((VALUETEXTX * blockScale) / 2 + 10.0);
             if (EXTRAWIDENAMES.includes(this.name)) {
@@ -3197,7 +3192,7 @@ class Block {
             } else if ((!window.hasMouse && getInput) || (window.hasMouse && !moved)) {
                 if (["media", "audiofile", "loadFile"].includes(that.name)) {
                     that._doOpenMedia(thisBlock);
-                } else if (SPECIALINPUTS.includes(that.name)) {
+                } else if (that.hasValueDrivenLabel()) {
                     if (!that.trash) {
                         if (that._triggerLongPress) {
                             that._triggerLongPress = false;
@@ -3649,7 +3644,7 @@ class Block {
                 // apart). Still need to get to the root cause.
                 this.blocks.adjustDocks(this.blockIndex, true);
             }
-        } else if (SPECIALINPUTS.includes(this.name) || ["media", "loadFile"].includes(this.name)) {
+        } else if (this.hasValueDrivenLabel() || ["media", "loadFile"].includes(this.name)) {
             if (!haveClick) {
                 // Simulate click on Android.
                 if (new Date().getTime() - this.blocks.mouseDownTime < 500) {
