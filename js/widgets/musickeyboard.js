@@ -19,7 +19,7 @@
    MATRIXSOLFEHEIGHT, i18nSolfege, MATRIXSOLFEWIDTH, toFraction,
    wheelnav, slicePath, getNote, PREVIEWVOLUME, DEFAULTVOICE,
    PITCHES3, SOLFEGENAMES, SOLFEGECONVERSIONTABLE, NOTESSHARP,
-   NOTESFLAT, PITCHES, PITCHES2, convertFromSolfege, normalizeNoteAccidentals, */
+   NOTESFLAT, PITCHES, PITCHES2, convertFromSolfege, normalizeNoteAccidentals, announceToScreenReader */
 /*
    Global Locations
     - lib/wheelnav
@@ -663,6 +663,7 @@ function MusicKeyboard(activity) {
          * @type {Window}
          */
         const widgetWindow = window.widgetWindows.windowFor(this, "music keyboard");
+        announceToScreenReader(_("Music Keyboard opened"));
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
@@ -742,6 +743,7 @@ function MusicKeyboard(activity) {
             if (this._durationWheel) this._durationWheel.removeWheel();
             if (this._accidentalsWheel) this._accidentalsWheel.removeWheel();
             if (this._octavesWheel) this._octavesWheel.removeWheel();
+            announceToScreenReader(_("Music Keyboard closed"));
             widgetWindow.destroy();
         };
 

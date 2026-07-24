@@ -21,6 +21,7 @@
  */
 
 global._ = msg => msg;
+global.announceToScreenReader = jest.fn();
 
 const mockOscillator = {
     toDestination: jest.fn().mockReturnThis(),
