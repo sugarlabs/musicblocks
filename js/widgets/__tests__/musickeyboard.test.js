@@ -11,6 +11,7 @@ global.SOLFEGENAMES = ["do", "re", "mi", "fa", "sol", "la", "ti"];
 
 const musicutils = require("../../utils/musicutils.js");
 Object.assign(global, musicutils);
+global.debugLog = jest.fn();
 
 const MusicKeyboard = require("../musickeyboard.js");
 
@@ -172,6 +173,40 @@ describe("MusicKeyboard add-row submenu", () => {
             [1, ["solfege", { value: "do♯" }], 0, 0, [0]],
             [2, ["number", { value: 392 }], 0, 0, [0]]
         ]);
+    });
+
+    test("logs via debugLog for unrecognized label and when no valid aboveBlock exists", () => {
+        const loadNewBlocks = jest.fn();
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            blocks: {
+                blockList: [],
+                loadNewBlocks
+            },
+            errorMsg: jest.fn()
+        });
+
+        keyboard.layout = [
+            { noteName: "hertz", noteOctave: 392, blockNumber: 100001 },
+            { noteName: "hertz", noteOctave: 436, blockNumber: 100002 }
+        ];
+
+        keyboard._createAddRowPieSubmenu();
+
+        // Force selectedNavItemIndex out of bounds so VALUESLABEL[index] is undefined,
+        // hitting the default case in the switch statement.
+        keyboard._menuWheel.selectedNavItemIndex = 5;
+        global.debugLog.mockClear();
+
+        expect(() => keyboard._menuWheel.navItems[0].navigateFunction()).not.toThrow();
+
+        // The default case logs the unrecognized label.
+        expect(global.debugLog).toHaveBeenCalledWith("Nothing to do for undefined");
+        // All blockNumbers >= FAKEBLOCKNUMBER so else-branch fires too.
+        expect(global.debugLog).toHaveBeenCalledWith(
+            "Could not find anywhere to insert new block."
+        );
     });
 
     test("creates pie submenu and sets z-index, top position, and exit wheel correctly", () => {
