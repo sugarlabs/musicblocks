@@ -442,6 +442,40 @@ describe("Oscilloscope", () => {
             expect(osc.pitchAnalysers).toEqual({});
         });
 
+        test("disposes Tone.Analyser instances before clearing pitchAnalysers", () => {
+            const osc = createOscilloscope();
+            const mockDispose = jest.fn();
+            osc.pitchAnalysers = {
+                0: { dispose: mockDispose },
+                1: { dispose: mockDispose }
+            };
+
+            osc.close();
+
+            expect(mockDispose).toHaveBeenCalledTimes(2);
+            expect(osc.pitchAnalysers).toEqual({});
+        });
+
+        test("skips null, undefined, or non-function pitchAnalyser entries on close", () => {
+            const osc = createOscilloscope();
+            osc.pitchAnalysers = { 0: {}, 1: null, 2: undefined };
+
+            expect(() => osc.close()).not.toThrow();
+            expect(osc.pitchAnalysers).toEqual({});
+        });
+
+        test("catches errors if dispose throws during pitchAnalysers cleanup", () => {
+            const osc = createOscilloscope();
+            const failingDispose = jest.fn(() => {
+                throw new Error("AudioContext closed");
+            });
+            osc.pitchAnalysers = { 0: { dispose: failingDispose } };
+
+            expect(() => osc.close()).not.toThrow();
+            expect(failingDispose).toHaveBeenCalled();
+            expect(osc.pitchAnalysers).toEqual({});
+        });
+
         test("calls widgetWindow.destroy", () => {
             const osc = createOscilloscope();
 
