@@ -21,7 +21,7 @@
 
 /*
    global _, NOINPUTERRORMSG, Singer, MUSICALMODES, MusicBlocks, Mouse, getNote,
-   getModeLength, isCustomTemperament, TEMPERAMENT
+   getModeLength, isCustomTemperament, TEMPERAMENT, getCurrentEDO
 */
 
 /*
@@ -31,9 +31,9 @@
     js/logo.js
         NOINPUTERRORMSG
     js/utils/musicutils.js
-        MUSICALMODES, MODE_PIE_MENUS, getNote, getModeLength, NOTESTEP,
-        GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
-        isCustomTemperament, TEMPERAMENT
+         MUSICALMODES, MODE_PIE_MENUS, getNote, getModeLength, NOTESTEP,
+         GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
+         isCustomTemperament, TEMPERAMENT, getCurrentEDO
     js/turtle-singer.js
         Singer
     js/js-export/export.js
@@ -182,10 +182,15 @@ function setupIntervalsActions(activity) {
                 lastWord += ` ${_("below")}`;
             }
 
+            const mapEntry = SEMITONETOINTERVALMAP[totalIntervals];
+            const intervalName =
+                mapEntry && mapEntry[letterGap] !== undefined
+                    ? mapEntry[letterGap]
+                    : `${totalIntervals} ${_("steps")}`;
             const interval =
                 totalIntervals % temperamentLength === 0 && letterGap === 0
-                    ? SEMITONETOINTERVALMAP[totalIntervals][letterGap]
-                    : SEMITONETOINTERVALMAP[totalIntervals][letterGap] + lastWord;
+                    ? intervalName
+                    : intervalName + lastWord;
             return interval;
         }
 
@@ -505,6 +510,12 @@ function setupIntervalsActions(activity) {
                 activity.logo.temperamentSelected[len - 2]
             ) {
                 activity.logo.synth.changeInTemperament = true;
+            }
+
+            // Update the default custom mode to match the new EDO's step count.
+            const edo = getCurrentEDO(temperament);
+            if (MUSICALMODES["custom"].length !== edo) {
+                MUSICALMODES["custom"] = new Array(edo).fill(1);
             }
         }
     };

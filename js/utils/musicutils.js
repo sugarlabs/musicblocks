@@ -56,10 +56,10 @@ const _b64Cache = new Map();
    addTemperamentToList, getTemperament, deleteTemperamentFromList,
    addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
    DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
-   INTERVALVALUES, getIntervalRatio, frequencyToPitch, NOTESTEP,
-   GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
-   SEMITONES, CHROMATIC_SOLFEGE, INTERVAL_CENTS, TEMPERAMENT_INTERVALS,
-   INTERVAL_ORDER
+    INTERVALVALUES, getIntervalRatio, frequencyToPitch, NOTESTEP,
+    GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
+    SEMITONES, CHROMATIC_SOLFEGE, INTERVAL_CENTS, TEMPERAMENT_INTERVALS,
+    INTERVAL_ORDER, generateNoteNames, getEdoNoteNamePosition
 */
 
 /**
@@ -124,6 +124,14 @@ const FLAT = "♭";
 
 /**
  * Symbol for cents.
+ *
+ * Cents are a logarithmic unit for measuring musical intervals:
+ *   - 1 cent = 1/1200 of an octave (12-EDO semitone = 100 cents)
+ *   - To convert a ratio to cents: cents = 1200 * log2(ratio)
+ *   - To convert cents to a frequency multiplier: multiplier = 2^(cents/1200)
+ *
+ * Example: A4 = 440 Hz, A4 + 33 cents = 440 * 2^(33/1200) ≈ 448.17 Hz
+ *
  * @constant {string}
  * @default
  */
@@ -899,6 +907,138 @@ const getCurrentEDO = temperament => {
     const t = TEMPERAMENT[temperament];
     return t && t.pitchNumber ? t.pitchNumber : 12;
 };
+
+const EDO_NOTE_NAMES = {};
+
+/**
+ * Generates a note name table for any EDO.
+ * For EDO > 12: interleaves sharp and flat accidentals between naturals.
+ * For EDO <= 12: uses the standard sharp names.
+ * Results are cached in EDO_NOTE_NAMES.
+ * @param {number} edo - number of steps per octave
+ * @returns {string[]} array of note names, length = edo
+ */
+function generateNoteNames(edo) {
+    if (EDO_NOTE_NAMES[edo]) {
+        return EDO_NOTE_NAMES[edo];
+    }
+
+    const naturals = ["C", "D", "E", "F", "G", "A", "B"];
+    const naturalPos12 = [0, 2, 4, 5, 7, 9, 11];
+
+    if (edo <= 12) {
+        const SHARP_NAMES = [
+            "C",
+            "C" + SHARP,
+            "D",
+            "D" + SHARP,
+            "E",
+            "F",
+            "F" + SHARP,
+            "G",
+            "G" + SHARP,
+            "A",
+            "A" + SHARP,
+            "B"
+        ];
+        EDO_NOTE_NAMES[edo] = SHARP_NAMES.slice(0, edo);
+        return EDO_NOTE_NAMES[edo];
+    }
+
+    // Compute ideal step counts for each of the 7 intervals, rounding down.
+    // Distribute remaining steps to intervals with the largest fractional part.
+    const intervals = [];
+    let totalFloor = 0;
+    for (let n = 0; n < 7; n++) {
+        const posDiff = (naturalPos12[(n + 1) % 7] - naturalPos12[n] + 12) % 12;
+        const ideal = (edo * posDiff) / 12;
+        const floored = Math.floor(ideal);
+        intervals.push({ index: n, frac: ideal - floored, steps: floored });
+        totalFloor += floored;
+    }
+
+    let remaining = edo - totalFloor;
+    intervals.sort((a, b) => b.frac - a.frac);
+    for (let i = 0; i < remaining; i++) {
+        intervals[i].steps++;
+    }
+    intervals.sort((a, b) => a.index - b.index);
+
+    const repeatChar = (ch, count) => {
+        let s = "";
+        for (let i = 0; i < count; i++) s += ch;
+        return s;
+    };
+
+    const names = [];
+    for (let n = 0; n < 7; n++) {
+        const natural = naturals[n];
+        const nextNatural = naturals[(n + 1) % 7];
+        const edoSteps = intervals[n].steps;
+
+        names.push(natural);
+
+        const numAccidentals = edoSteps - 1;
+        const sharpCount = Math.ceil(numAccidentals / 2);
+        const flatCount = Math.floor(numAccidentals / 2);
+
+        for (let s = 1; s <= sharpCount; s++) {
+            names.push(natural + repeatChar(SHARP, s));
+        }
+        for (let f = flatCount; f >= 1; f--) {
+            names.push(nextNatural + repeatChar(FLAT, f));
+        }
+    }
+
+    EDO_NOTE_NAMES[edo] = names;
+    return names;
+}
+
+/**
+ * Returns the index of a note name in an EDO-specific name table.
+ * @param {string} name - note name (e.g., "C♯", "D♭")
+ * @param {number} edo - number of steps per octave
+ * @returns {number} position in the EDO name table, or -1 if not found
+ */
+function getEdoNoteNamePosition(name, edo) {
+    const normalizedName = name
+        .replaceAll("#", SHARP)
+        .replaceAll("b", FLAT)
+        .replaceAll(DOUBLESHARP, SHARP + SHARP)
+        .replaceAll(DOUBLEFLAT, FLAT + FLAT);
+
+    if (edo <= 12) {
+        const idx = PITCHES2.indexOf(normalizedName);
+        if (idx !== -1) return idx;
+        return PITCHES.indexOf(normalizedName);
+    }
+
+    const names = generateNoteNames(edo);
+    let idx = names.indexOf(normalizedName);
+    if (idx !== -1) return idx;
+
+    // Fallback: try sharp equivalent
+    if (normalizedName in EQUIVALENTSHARPS) {
+        idx = names.indexOf(EQUIVALENTSHARPS[normalizedName]);
+        if (idx !== -1) return idx;
+    }
+    if (normalizedName in EQUIVALENTFLATS) {
+        idx = names.indexOf(EQUIVALENTFLATS[normalizedName]);
+        if (idx !== -1) return idx;
+    }
+
+    // Try 12-EDO proportional fallback
+    const pos12 = PITCHES2.indexOf(normalizedName);
+    if (pos12 !== -1) {
+        return Math.round((pos12 / 12) * edo) % edo;
+    }
+    const posFlat = PITCHES.indexOf(normalizedName);
+    if (posFlat !== -1) {
+        return Math.round((posFlat / 12) * edo) % edo;
+    }
+
+    return -1;
+}
 
 /**
  * Number of semitones in an octave.
@@ -2350,6 +2490,9 @@ const TEMPERAMENT = {
         "edo": 12,
         "name": "5-limit Just Intonation",
         "description": "Pure integer ratios based on the 5-limit prime limit system",
+        // Cents are derived from ratios: cents = 1200 * log2(ratio)
+        // Example: perfect 5 = 3/2 ratio → 1200 * log2(1.5) ≈ 702 cents
+        // In 12-EDO, perfect 5 = 700 cents (slightly flat vs JI's pure 702 cents)
         "noteLabels": ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
         "ratios": [
             1 / 1,
@@ -2398,6 +2541,9 @@ const TEMPERAMENT = {
         "name": "Pythagorean Tuning",
         "description":
             "Tuning system based on pure perfect fifths (3/2 ratio) from ancient Greek theory",
+        // All intervals derived by stacking 3/2 ratios (fifths).
+        // Example: major 3 = 81/64 ≈ 408 cents (vs JI's 5/4 = 386 cents, 12-EDO's 400 cents)
+        // Pythagorean major 3 is noticeably sharp compared to JI's pure major third.
         "noteLabels": ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
         "ratios": [
             1 / 1,
@@ -3384,6 +3530,35 @@ const noteToObj = note => {
  */
 const frequencyToPitch = (hz, temperament) => {
     const currentEDO = getCurrentEDO(temperament);
+    const t = getTemperament(temperament);
+    if (t && !t.isEDO && t.noteLabels && t.ratios) {
+        const aIdx = t.noteLabels.indexOf("A");
+        const baseRefFreq = A0 / t.ratios[aIdx];
+        const approxOctave = Math.floor(Math.log(hz / baseRefFreq) / Math.log(2));
+
+        let bestNote = t.noteLabels[0];
+        let bestOctave = 0;
+        let bestCents = Infinity;
+
+        for (let o = Math.max(0, approxOctave - 1); o <= approxOctave + 1; o++) {
+            for (let i = 0; i < t.noteLabels.length; i++) {
+                const freq = baseRefFreq * t.ratios[i] * Math.pow(2, o);
+                const centsDiff = 1200 * (Math.log(hz / freq) / Math.log(2));
+                if (Math.abs(centsDiff) < Math.abs(bestCents)) {
+                    bestCents = centsDiff;
+                    bestNote = t.noteLabels[i];
+                    bestOctave = o;
+                }
+            }
+        }
+
+        if (Math.abs(bestCents) < 0.5) {
+            bestCents = 0;
+        }
+
+        return [bestNote, bestOctave, Math.round(bestCents * 10) / 10];
+    }
+
     // 1200 cents = one octave (constant for all temperaments)
     const centsPerStep = 1200 / currentEDO;
 
@@ -3409,6 +3584,16 @@ const frequencyToPitch = (hz, temperament) => {
     }
 
     const stepIndex = ((roundedSteps % currentEDO) + currentEDO) % currentEDO;
+
+    if (currentEDO !== 12) {
+        const names = generateNoteNames(currentEDO);
+        const aIndex = names.indexOf("A");
+        const tableIndex = (stepIndex + aIndex) % currentEDO;
+        const pitchName = names[tableIndex];
+        const octaveNumber = Math.floor((roundedSteps + aIndex) / currentEDO);
+        return [pitchName, octaveNumber, cents];
+    }
+
     const nameIndex = Math.round((stepIndex / currentEDO) * 12);
     const pitchName = PITCHES[(nameIndex + PITCHES.indexOf("A")) % PITCHES.length];
     const octaveNumber = Math.floor((roundedSteps + PITCHES.indexOf("A")) / currentEDO);
@@ -4027,6 +4212,7 @@ const pitchToNumber = (pitch, octave, keySignature, temperament) => {
     if (pitch.toUpperCase() === "R") {
         return 0;
     }
+    const originalPitch = pitch;
     // Check for flat, sharp, double flat, or double sharp.
     let transposition = 0;
     const len = pitch.length;
@@ -4065,6 +4251,39 @@ const pitchToNumber = (pitch, octave, keySignature, temperament) => {
                 pitch = pitch.slice(0, len - 1);
                 transposition += 1;
             }
+        }
+    }
+
+    // For EDO > 12, use the EDO-specific name table for ALL pitches
+    // (naturals and accidentals alike) so that the A reference is
+    // consistent with the table's natural positions.
+    if (currentEDO !== 12) {
+        const names = generateNoteNames(currentEDO);
+        const aIndex = names.indexOf("A");
+        const normalizedPitch = originalPitch.replaceAll("#", SHARP).replaceAll("b", FLAT);
+        let edoPos = names.indexOf(normalizedPitch);
+        if (edoPos === -1) {
+            // Fallback: try the 12-EDO arrays with proportional mapping
+            const fallbackPos = PITCHES2.indexOf(normalizedPitch);
+            if (fallbackPos !== -1) {
+                edoPos = Math.round((fallbackPos / 12) * currentEDO);
+            } else {
+                const sharpPos = PITCHES.indexOf(normalizedPitch);
+                if (sharpPos !== -1) {
+                    edoPos = Math.round((sharpPos / 12) * currentEDO);
+                }
+            }
+        }
+        if (edoPos !== -1) {
+            return octave * currentEDO + edoPos - aIndex;
+        }
+    }
+
+    // 12-EDO or fallback path: use PITCHES array with transposition.
+    if (transposition !== 0) {
+        const edoPos = getEdoNoteNamePosition(originalPitch, currentEDO);
+        if (edoPos !== -1) {
+            return octave * currentEDO + edoPos - PITCHES.indexOf("A");
         }
     }
 
@@ -4139,7 +4358,7 @@ const getNumber = (notename, octave, temperament) => {
 
     notename = String(notename);
     if (notename.substring(0, 1) in NOTESTEP) {
-        num += NOTESTEP[notename.substring(0, 1)];
+        num += Math.round((NOTESTEP[notename.substring(0, 1)] / 12) * currentEDO);
         if (notename.length >= 1) {
             const delta = notename.substring(1);
             if (delta === "bb" || delta === DOUBLEFLAT) {
@@ -4542,10 +4761,12 @@ const numberToPitch = (i, temperament, startPitch, offset, activity) => {
             return [TEMPERAMENT[temperament][pitchNumber][1], o];
         }
     } else {
+        const temperamentPitchNumber = TEMPERAMENT[temperament]["pitchNumber"] || 12;
         const intervalArray = TEMPERAMENT[temperament]["interval"];
         const idx =
-            ((pitchNumber % intervalArray.length) + intervalArray.length) % intervalArray.length;
-        const octaveOffset = Math.floor(pitchNumber / intervalArray.length);
+            ((pitchNumber % temperamentPitchNumber) + temperamentPitchNumber) %
+            temperamentPitchNumber;
+        const octaveOffset = Math.floor(pitchNumber / temperamentPitchNumber);
         interval = intervalArray[idx];
         const noteObj = getNoteFromInterval(startPitch, interval);
         return [noteObj[0], noteObj[1] + octaveOffset];
@@ -4676,6 +4897,11 @@ function getNote(
         transpositionCents = (transposition - transpositionFloor) * 100;
     }
 
+    // Scale transposition from semitones to EDO steps
+    if (octaveLength !== 12) {
+        transpositionFloor = Math.round((transpositionFloor * octaveLength) / 12);
+    }
+
     if (typeof noteArg !== "number") {
         // Could be mi#<sub>4</sub> (from matrix) or mi# (from note).
         if (noteArg.substr(-1) === ">") {
@@ -4699,9 +4925,9 @@ function getNote(
         }
         if (!isNaN(noteAsNumber)) {
             if (["#", SHARP].includes(noteArg.substr(-1))) {
-                transpositionFloor += 1;
+                transpositionFloor += Math.round(octaveLength / 12);
             } else if (["b", FLAT].includes(noteArg.substr(-1))) {
-                transpositionFloor -= 1;
+                transpositionFloor -= Math.round(octaveLength / 12);
             }
             noteArg = Number(noteAsNumber);
         }
@@ -5011,61 +5237,21 @@ function getNote(
 
             octave += deltaOctave;
 
-            if (deltaNote > 0) {
-                if (NOTESSHARP.includes(note)) {
-                    let i = NOTESSHARP.indexOf(note);
-                    i += deltaNote;
+            if (deltaNote !== 0) {
+                const foundIdx = getEdoNoteNamePosition(note, octaveLength);
+                if (foundIdx !== -1) {
+                    let i = foundIdx + deltaNote;
+                    const nameTableLength = generateNoteNames(octaveLength).length;
                     if (i < 0) {
-                        i += octaveLength;
+                        i += nameTableLength;
                         octave -= 1;
-                    } else if (i >= octaveLength) {
-                        i -= octaveLength;
+                    } else if (i >= nameTableLength) {
+                        i -= nameTableLength;
                         octave += 1;
                     }
-
-                    note = NOTESSHARP[i];
-                } else if (NOTESFLAT.includes(note)) {
-                    let i = NOTESFLAT.indexOf(note);
-                    i += deltaNote;
-                    if (i < 0) {
-                        i += octaveLength;
-                        octave -= 1;
-                    } else if (i >= octaveLength) {
-                        i -= octaveLength;
-                        octave += 1;
-                    }
-
-                    note = NOTESFLAT[i];
+                    note = generateNoteNames(octaveLength)[i];
                 } else {
-                    console.debug("note not found? " + note);
-                }
-            } else if (deltaNote < 0) {
-                if (NOTESFLAT.includes(note)) {
-                    let i = NOTESFLAT.indexOf(note);
-                    i += deltaNote;
-                    if (i < 0) {
-                        i += octaveLength;
-                        octave -= 1;
-                    } else if (i >= octaveLength) {
-                        i -= octaveLength;
-                        octave += 1;
-                    }
-
-                    note = NOTESFLAT[i];
-                } else if (NOTESSHARP.includes(note)) {
-                    let i = NOTESSHARP.indexOf(note);
-                    i += deltaNote;
-                    if (i < 0) {
-                        i += octaveLength;
-                        octave -= 1;
-                    } else if (i >= octaveLength) {
-                        i -= octaveLength;
-                        octave += 1;
-                    }
-
-                    note = NOTESSHARP[i];
-                } else {
-                    console.debug("note not found? " + note);
+                    console.debug("note not found in EDO table? " + note);
                 }
             }
         }
@@ -5435,6 +5621,29 @@ const buildScale = keySignature => {
         halfSteps = customMode;
     } else {
         halfSteps = MUSICALMODES[obj[1]];
+    }
+
+    // Determine current EDO from global state
+    let currentEDO = 12;
+    if (typeof globalActivity !== "undefined" && globalActivity?.logo?.synth?.inTemperament) {
+        currentEDO = getCurrentEDO(globalActivity.logo.synth.inTemperament);
+    }
+
+    // For non-12 EDO: use EDO-specific note names and handle octave wrapping
+    if (currentEDO !== 12) {
+        const edoNames = generateNoteNames(currentEDO);
+        let idx = edoNames.indexOf(myKeySignature);
+        if (idx === -1) {
+            idx = 0;
+        }
+
+        const scale = [myKeySignature];
+        let ii = idx;
+        for (let i = 0; i < halfSteps.length; i++) {
+            ii = (ii + halfSteps[i] + edoNames.length) % edoNames.length;
+            scale.push(edoNames[ii]);
+        }
+        return [scale, halfSteps];
     }
 
     let thisScale;
@@ -6371,8 +6580,27 @@ const noteToPitchOctave = note => {
  */
 const pitchToFrequency = (pitch, octave, cents, keySignature, temperament) => {
     const currentEDO = getCurrentEDO(temperament);
+    const t = getTemperament(temperament);
+    if (t && !t.isEDO && t.noteLabels && t.ratios) {
+        const noteIdx = t.noteLabels.indexOf(pitch);
+        if (noteIdx !== -1) {
+            const aIdx = t.noteLabels.indexOf("A");
+            const baseRefFreq = A0 / t.ratios[aIdx];
+            let freq = baseRefFreq * t.ratios[noteIdx] * Math.pow(2, octave);
+            if (cents !== 0) {
+                freq *= Math.pow(2, cents / 1200);
+            }
+            return freq;
+        }
+    }
+
     const pitchNumber = pitchToNumber(pitch, octave, keySignature, temperament);
 
+    // Frequency = A0 * 2^(pitchNumber / currentEDO)
+    // With cents offset: Frequency = A0 * 2^((pitchNumber * 100 + cents) / (currentEDO * 100))
+    // This works because 1 semitone = 100 cents, and 2^(1/1200) is the cents resolution.
+    // Example: 19-EDO, A4 (pitchNumber=48), 0 cents → 27.5 * 2^(48/19) ≈ 440 Hz
+    // Example: 19-EDO, A4 + 50 cents → 27.5 * 2^((48*100+50)/(19*100)) ≈ 447.8 Hz
     if (cents === 0) {
         return A0 * Math.pow(2, 1 / currentEDO) ** pitchNumber;
     } else {
@@ -7048,6 +7276,8 @@ if (typeof module !== "undefined" && module.exports) {
         getIntervalNumber,
         getIntervalDirection,
         getIntervalRatio,
+        generateNoteNames,
+        getEdoNoteNamePosition,
 
         getModeNumbers,
         getDrumIndex,

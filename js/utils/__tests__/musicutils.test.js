@@ -1257,8 +1257,8 @@ describe("pitchToNumber", () => {
     it("should work with equal19 temperament", () => {
         global.TEMPERAMENT = { equal19: [] };
         const result = pitchToNumber("C", 4, "C major", "equal19");
-        // 4 * 19 + 0 (C index) - 9 (A index) = 67
-        expect(result).toBe(67);
+        // 4 * 19 + 0 (C index) - 14 (A index in 19-EDO table) = 62
+        expect(result).toBe(62);
     });
 
     it("should fallback to 12-EDO for undefined temperament", () => {
@@ -2103,9 +2103,9 @@ describe("pitchToFrequency", () => {
     it("should work with equal19 temperament", () => {
         global.TEMPERAMENT = { equal19: [] };
         const result = pitchToFrequency("C", 4, 0, "C", "equal19");
-        // C4 in 19-EDO: A0 * Math.pow(2, 67/19) ≈ 316.85
-        expect(result).toBeGreaterThan(310);
-        expect(result).toBeLessThan(320);
+        // C4 in 19-EDO: A0 * Math.pow(2, 62/19) ≈ 264.02
+        expect(result).toBeGreaterThan(260);
+        expect(result).toBeLessThan(268);
     });
 
     it("should fallback to 12-EDO for undefined temperament", () => {
