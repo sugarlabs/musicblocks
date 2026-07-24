@@ -38,6 +38,7 @@ canvas.id = "myCanvas";
 document.body.appendChild(canvas);
 
 Object.defineProperty(window, "localStorage", {
+    configurable: true,
     writable: true,
     value: { languagePreference: "en" }
 });
@@ -93,6 +94,23 @@ describe("widgetWindows", () => {
             const win = createTestWindow();
 
             expect(win._visible).toBe(true);
+        });
+
+        test("falls back when localStorage is blocked during language setup", () => {
+            const originalLocalStorage = Object.getOwnPropertyDescriptor(window, "localStorage");
+
+            Object.defineProperty(window, "localStorage", {
+                configurable: true,
+                get() {
+                    throw new DOMException("Access denied", "SecurityError");
+                }
+            });
+
+            try {
+                expect(() => createTestWindow()).not.toThrow();
+            } finally {
+                Object.defineProperty(window, "localStorage", originalLocalStorage);
+            }
         });
 
         test("creates a window with _maximized set to false", () => {
