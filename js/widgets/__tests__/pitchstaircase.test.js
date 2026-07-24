@@ -631,6 +631,37 @@ describe("PitchStaircase Widget", () => {
             expect(psc._undo).toHaveBeenCalledTimes(3);
         });
 
+        test("Clear button stops scale playback and resets icon before undoing", () => {
+            // Simulate that a scale is currently playing when Clear is clicked.
+            psc._isPlayingScale = true;
+            psc._scaleTimeout = 123;
+            psc._undo = jest.fn().mockReturnValue(false);
+
+            buttons["Clear"].onclick();
+
+            // Playback state should be fully reset.
+            expect(psc._scaleStopped).toBe(true);
+            expect(psc._isPlayingScale).toBe(false);
+            expect(mockActivity.logo.synth.stop).toHaveBeenCalled();
+
+            // The Play scale button icon should reset back to "Play scale".
+            const img = buttons["Play scale"].replaceChildren.mock.calls.at(-1)[0];
+            expect(img.getAttribute("src")).toBe("header-icons/play-scale.svg");
+
+            // Clear should still run its normal undo loop.
+            expect(psc._undo).toHaveBeenCalled();
+        });
+
+        test("Clear button does not touch scale state when nothing is playing", () => {
+            psc._isPlayingScale = false;
+            psc._undo = jest.fn().mockReturnValue(false);
+
+            buttons["Clear"].onclick();
+
+            expect(mockActivity.logo.synth.stop).toHaveBeenCalled();
+            expect(psc._undo).toHaveBeenCalled();
+        });
+
         test("Save button saves once and holds a debounce lock", () => {
             jest.useFakeTimers();
             psc._save = jest.fn();
