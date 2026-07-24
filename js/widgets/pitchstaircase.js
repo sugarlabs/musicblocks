@@ -719,6 +719,13 @@ class PitchStaircase {
         widgetWindow.show();
         widgetWindow.onclose = () => {
             this.closed = true;
+            clearTimeout(this._rowStopTimeout);
+            clearTimeout(this._playAllTimeout);
+            clearTimeout(this._scaleTimeout);
+            this._scaleStopped = true;
+            this._isPlayingAll = false;
+            this._isPlayingScale = false;
+            this._playingRowIndex = null;
             this.activity.logo.synth.stop();
             // Restore the project's master volume so audio still works
             // after exiting mid-playback (was incorrectly left at PREVIEWVOLUME).
