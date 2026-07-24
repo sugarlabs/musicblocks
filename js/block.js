@@ -1953,6 +1953,9 @@ class Block {
      * @returns {void}
      */
     hide() {
+        if (!this.container) {
+            return;
+        }
         this.container.visible = false;
         if (this.isCollapsible()) {
             // Sometimes these fields are not set.
@@ -2015,7 +2018,7 @@ class Block {
      */
     show() {
         // If it is not in the trash and not in collapsed, then show it.
-        if (!this.trash && !this.inCollapsed) {
+        if (!this.trash && !this.inCollapsed && this.container) {
             this.container.visible = true;
             this._viewportVisible = true;
             if (this.isCollapsible()) {

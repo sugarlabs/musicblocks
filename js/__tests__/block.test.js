@@ -580,4 +580,56 @@ describe("Block Foundation", () => {
             expect(block.value).toBe("fallback-cached");
         });
     });
+
+    describe("hide", () => {
+        it("should not throw when container is null", () => {
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.container = null;
+            expect(() => b.hide()).not.toThrow();
+        });
+
+        it("should set container.visible to false when container exists", () => {
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.container = { visible: true };
+            b.hide();
+            expect(b.container.visible).toBe(false);
+        });
+
+        it("should guard collapsible fields that are null", () => {
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.name = "repeat";
+            b.collapseText = null;
+            b.expandButtonBitmap = null;
+            b.collapseButtonBitmap = null;
+            expect(() => b.hide()).not.toThrow();
+        });
+    });
+
+    describe("show", () => {
+        it("should not throw when container is null and not trashed", () => {
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.container = null;
+            b.trash = false;
+            b.inCollapsed = false;
+            expect(() => b.show()).not.toThrow();
+        });
+
+        it("should set container.visible to true when container exists", () => {
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.container = { visible: false };
+            b.trash = false;
+            b.inCollapsed = false;
+            b.bitmap = { visible: false };
+            b.highlightBitmap = { visible: true };
+            b.highlightCollapseBlockBitmap = { visible: false };
+            b.collapseBlockBitmap = { visible: false };
+            b.collapseText = null;
+            b.expandButtonBitmap = null;
+            b.collapseButtonBitmap = null;
+            b.disconnectedBitmap = null;
+            b.disconnectedHighlightBitmap = null;
+            b.show();
+            expect(b.container.visible).toBe(true);
+        });
+    });
 });
