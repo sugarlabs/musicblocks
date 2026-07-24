@@ -2100,7 +2100,16 @@ class Singer {
                             // Apply harmonic here instead of in synth.
                             const p = partials.indexOf(1);
                             if (p > 0) {
-                                note = noteToFrequency(note, tur.singer.keySignature) * (p + 1);
+                                const parsed = parseNoteString(note);
+                                note =
+                                    pitchToFrequency(
+                                        parsed[0],
+                                        parsed[1],
+                                        0,
+                                        tur.singer.keySignature,
+                                        activity.logo.synth.inTemperament
+                                    ) *
+                                    (p + 1);
                             }
 
                             notes.push(note);

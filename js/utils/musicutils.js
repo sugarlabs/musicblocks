@@ -4729,10 +4729,11 @@ function getNote(
                 console.log("Cannot find " + keySignature.split(" ")[0] + ". Reverting to C");
             }
         }
+        const nameIndex = Math.round(((noteArg + kOffset) / octaveLength) * 12) % 12;
         if (getSharpFlatPreference(keySignature) === "sharp") {
-            noteArg = PITCHES2[(noteArg + kOffset) % octaveLength];
+            noteArg = PITCHES2[nameIndex];
         } else {
-            noteArg = PITCHES[(noteArg + kOffset) % octaveLength];
+            noteArg = PITCHES[nameIndex];
         }
     }
 

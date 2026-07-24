@@ -1963,7 +1963,8 @@ function TemperamentWidget() {
                 startPitchParsed[0],
                 startPitchParsed[1],
                 0,
-                "C Major"
+                "C Major",
+                this.inTemperament
             );
 
             let addOctave = "";
@@ -2249,8 +2250,7 @@ function TemperamentWidget() {
         }
 
         // Ensure per-note playback uses the currently selected temperament mapping.
-        this._logo.synth.inTemperament = this.inTemperament;
-        this._logo.synth.changeInTemperament = true;
+        this._logo.setUserTemperament(this.inTemperament);
 
         if (docById("wheelDiv4") === null) {
             if (this.editMode === "equal" && this.eqTempHzs && this.eqTempHzs.length) {
@@ -2337,7 +2337,13 @@ function TemperamentWidget() {
         const startingPitch = this._logo.synth.startingPitch;
         const startPitchParsed = parseNoteString(startingPitch);
         const octave = startPitchParsed[1] - 1;
-        const startPitch = pitchToFrequency(startPitchParsed[0], octave, 0, "C Major");
+        const startPitch = pitchToFrequency(
+            startPitchParsed[0],
+            octave,
+            0,
+            "C Major",
+            this._logo.synth.inTemperament
+        );
 
         const that = this;
         let pitchNumber = this.pitchNumber;

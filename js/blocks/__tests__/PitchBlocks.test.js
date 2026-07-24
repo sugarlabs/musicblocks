@@ -38,6 +38,7 @@ describe("setupPitchBlocks", () => {
             this.connections = [null, null, null, null, null];
             this.value = null;
             this.capabilities = Object.create(null);
+            this._macroFunc = null;
         }
         setPalette() {
             return this;
@@ -54,7 +55,8 @@ describe("setupPitchBlocks", () => {
         setup() {
             return this;
         }
-        makeMacro() {
+        makeMacro(fn) {
+            this._macroFunc = fn;
             return this;
         }
         setCapability(name, value = true) {
@@ -812,6 +814,17 @@ describe("setupPitchBlocks", () => {
                 }
             });
             expect(true).toBe(true);
+        });
+    });
+
+    describe("CustomPitchBlock macro", () => {
+        it("CustomPitchBlock macro creates a 'custompitch' block (not 'pitch')", () => {
+            const cpBlock = createdBlocks["custompitch"];
+            if (!cpBlock || !cpBlock._macroFunc) return;
+            const macro = cpBlock._macroFunc(0, 0);
+            expect(macro[0][1]).toBe("custompitch");
+            expect(macro[1][1][0]).toBe("customNote");
+            expect(macro[2][1][0]).toBe("number");
         });
     });
 
