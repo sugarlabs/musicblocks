@@ -80,7 +80,8 @@ describe("setupOrnamentBlocks", () => {
                 setSlur: jest.fn(),
                 setStaccato: jest.fn()
             },
-            noteCounter: jest.fn((logo, turtle, val) => val)
+            noteCounter: jest.fn((logo, turtle, val) => val),
+            playGlideBuffer: jest.fn()
         };
 
         activity = {
@@ -94,7 +95,15 @@ describe("setupOrnamentBlocks", () => {
             ithTurtle(turtle) {
                 if (!this.turtleObjs[turtle]) {
                     this.turtleObjs[turtle] = {
-                        singer: { staccato: [], glide: [], justCounting: [] }
+                        singer: {
+                            staccato: [],
+                            glide: [],
+                            justCounting: [],
+                            glideBuffer: [],
+                            inGlide: false,
+                            turtleTime: 0,
+                            glideStartTime: 0
+                        }
                     };
                 }
                 return this.turtleObjs[turtle];
@@ -241,7 +250,9 @@ describe("setupOrnamentBlocks", () => {
             turtleObj.singer.glide = [];
             const result = glideBlock.flow([0.1, 8], logo, turtleIndex, "blkGlide");
             expect(turtleObj.singer.glide).toContain(0.1);
-            expect(Singer.noteCounter).toHaveBeenCalledWith(logo, turtleIndex, 8);
+            expect(turtleObj.singer.inGlide).toBe(true);
+            expect(turtleObj.singer.glideBuffer).toEqual([]);
+            expect(Singer.noteCounter).not.toHaveBeenCalled();
             expect(logo.notation.notationBeginSlur).toHaveBeenCalledWith(turtleIndex);
             expect(logo.setDispatchBlock).toHaveBeenCalledWith(
                 "blkGlide",
@@ -252,6 +263,17 @@ describe("setupOrnamentBlocks", () => {
             expect(result).toEqual([8, 1]);
         });
 
+        it("should not run a side-effecting clamp while starting a glide", () => {
+            const glideBlock = createdBlocks["glide"];
+            const clampFlow = jest.fn();
+            Singer.noteCounter.mockImplementation(clampFlow);
+
+            glideBlock.flow([0.1, "clamp"], logo, 0, "blkGlide");
+
+            expect(Singer.noteCounter).not.toHaveBeenCalled();
+            expect(clampFlow).not.toHaveBeenCalled();
+        });
+
         it("should default glide argument and call errorMsg if first argument is invalid", () => {
             const glideBlock = createdBlocks["glide"];
             const turtleIndex = 0;
@@ -259,11 +281,11 @@ describe("setupOrnamentBlocks", () => {
             expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, "blkGlide");
             expect(result).toEqual([8, 1]);
         });
-        it("should call notationEndSlur in __listener when justCounting is empty", () => {
+        it("should call playGlideBuffer and notationEndSlur in __listener when justCounting is empty", () => {
             const glideBlock = createdBlocks["glide"];
             const turtleIndex = 0;
             const turtleObj = activity.turtles.ithTurtle(turtleIndex);
-            turtleObj.singer.glide = []; // ← empty, flow() will push 0.1
+            turtleObj.singer.glide = [];
             turtleObj.singer.justCounting = [];
 
             let capturedListener = null;
@@ -273,17 +295,46 @@ describe("setupOrnamentBlocks", () => {
 
             glideBlock.flow([0.1, 8], logo, turtleIndex, "blkGlide");
             expect(capturedListener).not.toBeNull();
+            turtleObj.singer.glideBuffer = [{ note: 60 }];
             capturedListener({});
 
+            expect(Singer.playGlideBuffer).toHaveBeenCalledWith(activity, turtleIndex);
             expect(logo.notation.notationEndSlur).toHaveBeenCalledWith(turtleIndex);
-            expect(turtleObj.singer.glide).toHaveLength(0); // pushed 0.1 then popped
+            expect(turtleObj.singer.glide).toHaveLength(0);
+            expect(turtleObj.singer.inGlide).toBe(false);
+        });
+
+        it("should keep buffered notes until the outer nested glide ends", () => {
+            const glideBlock = createdBlocks["glide"];
+            const turtleObj = activity.turtles.ithTurtle(0);
+            const listeners = [];
+            logo.setTurtleListener = jest.fn((turtle, name, listener) => listeners.push(listener));
+
+            glideBlock.flow([0.1, "outer"], logo, 0, "outer");
+            turtleObj.singer.glideBuffer.push({ note: "C4" });
+            glideBlock.flow([0.2, "inner"], logo, 0, "inner");
+
+            expect(logo.setTurtleListener.mock.calls[0][1]).not.toBe(
+                logo.setTurtleListener.mock.calls[1][1]
+            );
+            listeners[1]({});
+
+            expect(Singer.playGlideBuffer).not.toHaveBeenCalled();
+            expect(turtleObj.singer.inGlide).toBe(true);
+            expect(turtleObj.singer.glideBuffer).toEqual([{ note: "C4" }]);
+
+            listeners[0]({});
+
+            expect(Singer.playGlideBuffer).toHaveBeenCalledWith(activity, 0);
+            expect(turtleObj.singer.inGlide).toBe(false);
+            expect(turtleObj.singer.glideBuffer).toEqual([]);
         });
 
         it("should skip notationEndSlur in __listener when justCounting is non-empty", () => {
             const glideBlock = createdBlocks["glide"];
             const turtleIndex = 0;
             const turtleObj = activity.turtles.ithTurtle(turtleIndex);
-            turtleObj.singer.glide = []; // ← empty, flow() will push 0.1
+            turtleObj.singer.glide = [];
             turtleObj.singer.justCounting = [true];
 
             let capturedListener = null;
@@ -296,7 +347,7 @@ describe("setupOrnamentBlocks", () => {
             capturedListener({});
 
             expect(logo.notation.notationEndSlur).not.toHaveBeenCalled();
-            expect(turtleObj.singer.glide).toHaveLength(0); // pushed 0.1 then popped
+            expect(turtleObj.singer.glide).toHaveLength(0);
         });
     });
 

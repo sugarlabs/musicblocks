@@ -160,6 +160,18 @@ describe("Turtle", () => {
     });
 
     describe("initTurtle()", () => {
+        it("should clear interrupted Glide state", () => {
+            turtle.singer.inGlide = true;
+            turtle.singer.glideBuffer = [{ note: "C4" }];
+            turtle.singer.glideStartTime = 12;
+
+            turtle.initTurtle(false);
+
+            expect(turtle.singer.inGlide).toBe(false);
+            expect(turtle.singer.glideBuffer).toEqual([]);
+            expect(turtle.singer.glideStartTime).toBe(0);
+        });
+
         it("should reset _waitTime to 0", () => {
             turtle.doWait(5);
             turtle.initTurtle(false);
