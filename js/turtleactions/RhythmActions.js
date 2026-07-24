@@ -139,17 +139,18 @@ function setupRhythmActions(activity) {
 
                 if (tur.singer.inNoteBlock.length > 0) {
                     if (tur.singer.inNeighbor.length > 0) {
-                        tur.singer.neighborArgBeat.push(
-                            tur.singer.beatFactor * (1 / tur.singer.neighborNoteValue)
-                        );
-
                         const nextBeat = 1 / noteBeatValue - 2 * tur.singer.neighborNoteValue;
                         if (nextBeat <= 0 || !isFinite(nextBeat)) {
                             activity.errorMsg(
-                                _("Neighbor note value is too large for the current note duration."),
+                                _(
+                                    "Neighbor note value is too large for the current note duration."
+                                ),
                                 blk
                             );
                         } else {
+                            tur.singer.neighborArgBeat.push(
+                                tur.singer.beatFactor * (1 / tur.singer.neighborNoteValue)
+                            );
                             tur.singer.neighborArgCurrentBeat.push(
                                 tur.singer.beatFactor * (1 / nextBeat)
                             );

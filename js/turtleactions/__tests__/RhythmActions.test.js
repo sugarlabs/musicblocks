@@ -551,4 +551,29 @@ describe("setupRhythmActions", () => {
 
         expect(targetTurtle.singer.multipleVoices).toBe(true);
     });
+    it("pushes to both neighbor beat arrays when nextBeat is valid", () => {
+        targetTurtle.singer.inNeighbor = [1];
+        targetTurtle.singer.neighborNoteValue = 0.25;
+
+        Singer.RhythmActions.playNote(1, "note", 0, 1, jest.fn());
+        const listener = activity.logo.setTurtleListener.mock.calls[0][2];
+        listener();
+
+        expect(targetTurtle.singer.neighborArgBeat).toEqual([4]);
+        expect(targetTurtle.singer.neighborArgCurrentBeat).toEqual([2]);
+    });
+    it("keeps neighbor beat arrays in sync when nextBeat is invalid", () => {
+        targetTurtle.singer.inNeighbor = [1];
+        targetTurtle.singer.neighborNoteValue = 1;
+        activity.errorMsg = jest.fn();
+
+        Singer.RhythmActions.playNote(1, "note", 0, 1, jest.fn());
+        const listener = activity.logo.setTurtleListener.mock.calls[0][2];
+        listener();
+
+        expect(activity.errorMsg).toHaveBeenCalled();
+        expect(targetTurtle.singer.neighborArgBeat.length).toBe(
+            targetTurtle.singer.neighborArgCurrentBeat.length
+        );
+    });
 });
