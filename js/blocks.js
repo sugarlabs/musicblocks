@@ -1390,19 +1390,24 @@ class Blocks {
                 cblk = this.blockList[parentblk].connections[2];
                 if (cblk === null) {
                     /**
-                     * Adjust Docks
-                     * @param - args - arguments
-                     * @public
-                     * @returns {void}
+                     * Restore the octave (number) placeholder for the pitch block's
+                     * second argument slot. Capture the future block index now so the
+                     * postProcess closure references the correct entry even when the
+                     * name-slot restoration below also appends a block.
                      */
+                    const octaveBlkIdx = this.blockList.length;
                     const postProcess = args => {
                         const parentblk = args[0];
                         const oldBlock = args[1];
-                        const blk = this.blockList.length - 1;
+                        const blk = args[2];
 
                         this.blockList[parentblk].connections[2] = blk;
 
-                        const octave = this.blockList[oldBlock].value;
+                        // Use the removed block's value only when it is a number;
+                        // if a name block was placed in the octave slot fall back
+                        // to the default octave of 4.
+                        const rawOctave = this.blockList[oldBlock].value;
+                        const octave = typeof rawOctave === "number" ? rawOctave : 4;
                         this.blockList[blk].value = octave;
 
                         this.blockList[blk].text.text = octave.toString();
@@ -1416,23 +1421,24 @@ class Blocks {
 
                     this._makeNewBlockWithConnections("number", 0, [parentblk], postProcess, [
                         parentblk,
-                        oldBlock
+                        oldBlock,
+                        octaveBlkIdx
                     ]);
                 }
 
                 const oblk = this.blockList[parentblk].connections[1];
                 if (oblk === null) {
                     /**
-                     * Adjust Docks
-                     * @param - args - arguments
-                     * @public
-                     * @returns {void}
+                     * Restore the name (solfege/notename/etc.) placeholder for the
+                     * pitch block's first argument slot. Capture the future block index
+                     * now so the postProcess closure is immune to the list growing
+                     * further before execution.
                      */
+                    const nameBlkIdx = this.blockList.length;
                     const postProcess = args => {
                         const parentblk = args[0];
                         const value = args[1];
-
-                        const blk = this.blockList.length - 1;
+                        const blk = args[2];
 
                         this.blockList[parentblk].connections[1] = blk;
 
@@ -1457,6 +1463,10 @@ class Blocks {
                         this.adjustDocks(parentblk, true);
                     };
 
+                    // When the removed block was itself in the name slot, mirror its
+                    // type in the replacement placeholder (e.g. notename → notename,
+                    // eastindiansolfege → eastindiansolfege). When the block came from
+                    // the octave slot (a number), fall back to the default "solfege".
                     let newBlockName = "solfege";
                     let newBlockValue = "sol";
                     switch (this.blockList[oldBlock].name) {
@@ -1478,7 +1488,8 @@ class Blocks {
 
                     this._makeNewBlockWithConnections(newBlockName, 0, [parentblk], postProcess, [
                         parentblk,
-                        newBlockValue
+                        newBlockValue,
+                        nameBlkIdx
                     ]);
                 }
             } else if (this.blockList[parentblk].name === "storein") {
