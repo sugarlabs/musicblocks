@@ -448,8 +448,30 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     line-height: 30px;
 }
 
-.blink {
+#record {
+    position: relative;
+}
+
+#record .dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+}
+
+#record.recording .dot {
+    color: red;
     animation: blink-animation 1.5s infinite;
+}
+
+@media (max-width: 690px) {
+
+    #record .ring,
+    #record .dot {
+        font-size: 26px !important;
+        margin: 0 !important;
+        width: auto !important;
+    }
 }
 
 @keyframes blink-animation {
