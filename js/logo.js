@@ -365,6 +365,9 @@ class Logo {
                 };
             }
         }
+        if (this.synth) {
+            this.synth._timerManager = this._timerManager;
+        }
 
         this._graphicsScheduler = new EmbeddedGraphicsScheduler(this);
     }
