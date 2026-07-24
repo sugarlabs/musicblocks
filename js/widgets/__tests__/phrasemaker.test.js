@@ -1372,4 +1372,55 @@ describe("PhraseMaker Widget", () => {
 
         phraseMaker._blockReplace(0, 1);
     });
+
+    describe("_export", () => {
+        const originalOpen = global.window.open;
+
+        afterEach(() => {
+            global.window.open = originalOpen;
+        });
+
+        test("shows a warning and returns safely when the popup is blocked", () => {
+            global.window.open = jest.fn().mockReturnValue(null);
+            phraseMaker.activity = { errorMsg: jest.fn() };
+
+            expect(() => phraseMaker._export()).not.toThrow();
+
+            expect(phraseMaker.activity.errorMsg).toHaveBeenCalledTimes(1);
+            expect(phraseMaker.activity.errorMsg).toHaveBeenCalledWith(
+                expect.stringContaining("export window")
+            );
+        });
+
+        test("builds the export document without warning when the popup succeeds", () => {
+            const makeCell = () => ({ style: {}, appendChild: jest.fn(), setAttribute: jest.fn() });
+            const makeRow = () => ({ insertCell: jest.fn(makeCell) });
+            const exportTableMock = {
+                createTHead: jest.fn(() => ({ insertRow: jest.fn(makeRow) }))
+            };
+            const exportDocumentMock = {
+                createElement: jest.fn(() => ({
+                    style: {},
+                    appendChild: jest.fn(),
+                    setAttribute: jest.fn()
+                })),
+                getElementById: jest.fn(id =>
+                    id === "exportTable" ? exportTableMock : { download: "", href: "" }
+                ),
+                head: { appendChild: jest.fn() },
+                body: { appendChild: jest.fn() },
+                documentElement: { outerHTML: "<html></html>" },
+                close: jest.fn()
+            };
+            global.window.open = jest.fn().mockReturnValue({ document: exportDocumentMock });
+            phraseMaker.activity = { errorMsg: jest.fn() };
+            phraseMaker._noteValueRow = { cells: [] };
+            phraseMaker._generateDataURI = jest.fn(() => "data:text/html;base64,mock");
+
+            expect(() => phraseMaker._export()).not.toThrow();
+
+            expect(phraseMaker.activity.errorMsg).not.toHaveBeenCalled();
+            expect(exportDocumentMock.close).toHaveBeenCalled();
+        });
+    });
 });
