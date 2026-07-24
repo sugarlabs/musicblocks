@@ -20,7 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const { setupEnsembleBlocks, getTargetTurtle } = require("../EnsembleBlocks");
+const { setupEnsembleBlocks, getTargetTurtle, _blockFindTurtle } = require("../EnsembleBlocks");
 
 describe("setupEnsembleBlocks", () => {
     let activity, logo, createdBlocks, turtles;
@@ -290,6 +290,54 @@ describe("setupEnsembleBlocks", () => {
             }));
             const result = getTargetTurtle(turtles, "Yertle");
             expect(result).toBeNull();
+        });
+    });
+
+    describe("_blockFindTurtle", () => {
+        const blk = 50;
+
+        beforeEach(() => {
+            activity.blocks.blockList[blk] = { connections: [null, 100] };
+            activity.blocks.blockList[100] = { name: "text", value: "Yertle" };
+        });
+
+        it("should return null if block not found in blockList", () => {
+            delete activity.blocks.blockList[blk];
+            const result = _blockFindTurtle(activity, 0, blk, undefined);
+            expect(result).toBeNull();
+        });
+
+        it("should return null if turtle name connection is null", () => {
+            activity.blocks.blockList[blk].connections[1] = null;
+            const result = _blockFindTurtle(activity, 0, blk, undefined);
+            expect(result).toBeNull();
+        });
+
+        it("should return null if parsed turtle name is null", () => {
+            logo.parseArg.mockReturnValue(null);
+            const result = _blockFindTurtle(activity, 0, blk, undefined);
+            expect(result).toBeNull();
+        });
+
+        it("should call errorMsg and return null when target turtle not found", () => {
+            logo.parseArg.mockReturnValue("NonExistent");
+            const result = _blockFindTurtle(activity, 0, blk, undefined);
+            expect(activity.errorMsg).toHaveBeenCalledWith("Cannot find turtle NonExistent", blk);
+            expect(result).toBeNull();
+        });
+
+        it("should return turtle object when turtle found", () => {
+            logo.parseArg.mockReturnValue("Yertle");
+            const result = _blockFindTurtle(activity, 0, blk, undefined);
+            expect(result).toBeDefined();
+            expect(result.name).toBe("Yertle");
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("should pass receivedArg to parseArg", () => {
+            logo.parseArg.mockReturnValue("Turtle1");
+            _blockFindTurtle(activity, 0, blk, "Turtle1");
+            expect(logo.parseArg).toHaveBeenCalledWith(activity.logo, 0, 100, blk, "Turtle1");
         });
     });
 
