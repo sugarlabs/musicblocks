@@ -3600,6 +3600,16 @@ const frequencyToPitch = (hz, temperament) => {
     }
 
     const stepIndex = ((roundedSteps % currentEDO) + currentEDO) % currentEDO;
+
+    if (currentEDO !== 12) {
+        const names = generateNoteNames(currentEDO);
+        const aIndex = names.indexOf("A");
+        const tableIndex = (stepIndex + aIndex) % currentEDO;
+        const pitchName = names[tableIndex];
+        const octaveNumber = Math.floor((roundedSteps + aIndex) / currentEDO);
+        return [pitchName, octaveNumber, cents];
+    }
+
     const nameIndex = Math.round((stepIndex / currentEDO) * 12);
     const pitchName = PITCHES[(nameIndex + PITCHES.indexOf("A")) % PITCHES.length];
     const octaveNumber = Math.floor((roundedSteps + PITCHES.indexOf("A")) / currentEDO);
@@ -4218,6 +4228,7 @@ const pitchToNumber = (pitch, octave, keySignature, temperament) => {
     if (pitch.toUpperCase() === "R") {
         return 0;
     }
+    const originalPitch = pitch;
     // Check for flat, sharp, double flat, or double sharp.
     let transposition = 0;
     const len = pitch.length;
@@ -4256,6 +4267,39 @@ const pitchToNumber = (pitch, octave, keySignature, temperament) => {
                 pitch = pitch.slice(0, len - 1);
                 transposition += 1;
             }
+        }
+    }
+
+    // For EDO > 12, use the EDO-specific name table for ALL pitches
+    // (naturals and accidentals alike) so that the A reference is
+    // consistent with the table's natural positions.
+    if (currentEDO !== 12) {
+        const names = generateNoteNames(currentEDO);
+        const aIndex = names.indexOf("A");
+        const normalizedPitch = originalPitch.replaceAll("#", SHARP).replaceAll("b", FLAT);
+        let edoPos = names.indexOf(normalizedPitch);
+        if (edoPos === -1) {
+            // Fallback: try the 12-EDO arrays with proportional mapping
+            const fallbackPos = PITCHES2.indexOf(normalizedPitch);
+            if (fallbackPos !== -1) {
+                edoPos = Math.round((fallbackPos / 12) * currentEDO);
+            } else {
+                const sharpPos = PITCHES.indexOf(normalizedPitch);
+                if (sharpPos !== -1) {
+                    edoPos = Math.round((sharpPos / 12) * currentEDO);
+                }
+            }
+        }
+        if (edoPos !== -1) {
+            return octave * currentEDO + edoPos - aIndex;
+        }
+    }
+
+    // 12-EDO or fallback path: use PITCHES array with transposition.
+    if (transposition !== 0) {
+        const edoPos = getEdoNoteNamePosition(originalPitch, currentEDO);
+        if (edoPos !== -1) {
+            return octave * currentEDO + edoPos - PITCHES.indexOf("A");
         }
     }
 

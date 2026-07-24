@@ -120,7 +120,9 @@ const {
     PITCHES1,
     PITCHES3,
     normalizeNoteAccidentals,
-    getCurrentEDO
+    getCurrentEDO,
+    generateNoteNames,
+    getEdoNoteNamePosition
 } = require("../musicutils");
 
 const DOUBLESHARP = "\ud834\udd2a";
@@ -1369,8 +1371,8 @@ describe("pitchToNumber", () => {
     it("should work with equal19 temperament", () => {
         global.TEMPERAMENT = { equal19: [] };
         const result = pitchToNumber("C", 4, "C major", "equal19");
-        // 4 * 19 + 0 (C index) - 9 (A index) = 67
-        expect(result).toBe(67);
+        // 4 * 19 + 0 (C index) - 14 (A index in 19-EDO table) = 62
+        expect(result).toBe(62);
     });
 
     it("should fallback to 12-EDO for undefined temperament", () => {
@@ -1383,6 +1385,24 @@ describe("pitchToNumber", () => {
         global.TEMPERAMENT = {};
         const result = pitchToNumber("C", 4, "C major", "unknown");
         expect(result).toBe(39);
+    });
+
+    it("should preserve distinct spellings for G♯ and A♭ in 19-EDO", () => {
+        const sharp = pitchToNumber("G♯", 4, "C major", "equal19");
+        const flat = pitchToNumber("A♭", 4, "C major", "equal19");
+        // In 19-EDO these map to distinct EDO positions
+        expect(sharp).not.toBe(flat);
+        // 4*19 + 12 (G♯ index) - 14 (A index in 19-EDO table) = 74
+        expect(sharp).toBe(74);
+        // 4*19 + 13 (A♭ index) - 14 (A index in 19-EDO table) = 75
+        expect(flat).toBe(75);
+    });
+
+    it("should collapse G♯ and A♭ in 12-EDO", () => {
+        const sharp = pitchToNumber("G♯", 4, "C major", "equal");
+        const flat = pitchToNumber("A♭", 4, "C major", "equal");
+        // In 12-EDO these map to the same pitch number
+        expect(sharp).toBe(flat);
     });
 });
 
@@ -2215,9 +2235,9 @@ describe("pitchToFrequency", () => {
     it("should work with equal19 temperament", () => {
         global.TEMPERAMENT = { equal19: [] };
         const result = pitchToFrequency("C", 4, 0, "C", "equal19");
-        // C4 in 19-EDO: A0 * Math.pow(2, 67/19) ≈ 316.85
-        expect(result).toBeGreaterThan(310);
-        expect(result).toBeLessThan(320);
+        // C4 in 19-EDO: A0 * Math.pow(2, 62/19) ≈ 264.02 (A-reference aligned with EDO table)
+        expect(result).toBeGreaterThan(260);
+        expect(result).toBeLessThan(268);
     });
 
     it("should fallback to 12-EDO for undefined temperament", () => {
@@ -3365,6 +3385,22 @@ describe("getNote additional paths", () => {
             4,
             0
         ]);
+    });
+
+    it("should convert semitones to EDO steps in 19-EDO for a single scalar step", () => {
+        // C→D in a major scale = 2 semitones. In 19-EDO this should move ~3 steps.
+        // generateNoteNames(19)[3] = "D"
+        const result = getNote("C", 4, 2, "C major", false, null, undefined, "equal19");
+        expect(result[0]).toBe("D");
+        expect(result[1]).toBe(4);
+    });
+
+    it("should convert semitones to EDO steps in 19-EDO for 8 scalar steps from C4", () => {
+        // 8 scalar steps in C major = 14 semitones total.
+        // In 19-EDO: 14 * 19/12 ≈ 22 EDO steps = 1 octave + 3 steps = D5.
+        const result = getNote("C", 4, 14, "C major", false, null, undefined, "equal19");
+        expect(result[0]).toBe("D");
+        expect(result[1]).toBe(5);
     });
 });
 
