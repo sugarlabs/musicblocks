@@ -276,6 +276,7 @@ class Logo {
         };
 
         this.temperamentSelected = [];
+        this._userTemperament = "equal";
         this.customTemperamentDefined = false;
         this.specialArgs = [];
 
@@ -1131,6 +1132,17 @@ class Logo {
 
     // ========= Behavior =========================================================================
 
+    resetTemperament() {
+        this.synth.changeInTemperament = false;
+        this.synth.inTemperament = this._userTemperament || "equal";
+    }
+
+    setUserTemperament(temperament) {
+        this._userTemperament = temperament;
+        this.synth.inTemperament = temperament;
+        this.synth.changeInTemperament = true;
+    }
+
     /**
      * Initialises a turtle.
      *
@@ -1417,8 +1429,7 @@ class Logo {
 
         this.deps.Singer.masterBPM = TARGETBPM;
         this.deps.Singer.defaultBPMFactor = TONEBPM / TARGETBPM;
-        this.synth.changeInTemperament = false;
-        this.synth.inTemperament = "equal";
+        this.resetTemperament();
         this.deps.Singer.clearPitchToFrequencyCache();
 
         this._checkingCompletionState = false;

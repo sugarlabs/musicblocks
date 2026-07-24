@@ -1458,7 +1458,10 @@ class Block {
                             this.activity.logo.synth.startingPitch.substring(
                                 0,
                                 this.activity.logo.synth.startingPitch.length - 1
-                            ) + "(+0)";
+                            ) +
+                            "(+0" +
+                            CENTSSYMBOL +
+                            ")";
                         break;
                     case "notename":
                         this.value = "G";

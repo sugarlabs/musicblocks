@@ -123,6 +123,10 @@ describe("TemperamentWidget basic tests", () => {
     test("playNote triggers synth", () => {
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: {
                 trigger: jest.fn()
             }
@@ -167,6 +171,10 @@ describe("TemperamentWidget basic tests", () => {
     test("playNote uses equal temperament branch", () => {
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: { trigger: jest.fn() }
         };
 
@@ -184,6 +192,10 @@ describe("TemperamentWidget basic tests", () => {
     test("playNote uses ratio temperament branch", () => {
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: { trigger: jest.fn() }
         };
 
@@ -201,6 +213,10 @@ describe("TemperamentWidget basic tests", () => {
     test("playNote uses wheelDiv4 branch", () => {
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: { trigger: jest.fn() }
         };
 
@@ -220,6 +236,10 @@ describe("TemperamentWidget basic tests", () => {
     test("playAll toggles playing state", () => {
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: {
                 trigger: jest.fn(),
                 stop: jest.fn(),
@@ -408,6 +428,10 @@ describe("TemperamentWidget basic tests", () => {
     test("playNote default branch triggers correct frequency", () => {
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: {
                 trigger: jest.fn()
             }
@@ -434,6 +458,10 @@ describe("TemperamentWidget basic tests", () => {
     test("playNote uses note-name mapping for default temperaments", () => {
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: {
                 trigger: jest.fn(),
                 inTemperament: "equal",
@@ -466,6 +494,10 @@ describe("TemperamentWidget basic tests", () => {
     test("playNote keeps equal temperament on frequency path", () => {
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: {
                 trigger: jest.fn(),
                 inTemperament: "equal",
@@ -496,6 +528,10 @@ describe("TemperamentWidget basic tests", () => {
     test("playNote keeps custom temperament on frequency path", () => {
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: {
                 trigger: jest.fn(),
                 inTemperament: "custom",
@@ -526,6 +562,10 @@ describe("TemperamentWidget basic tests", () => {
     test("playNote no-ops on out-of-range pitch index", () => {
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: {
                 trigger: jest.fn(),
                 inTemperament: "equal19",
@@ -650,6 +690,10 @@ describe("TemperamentWidget basic tests", () => {
 
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: { trigger: jest.fn() }
         };
 
@@ -694,6 +738,10 @@ describe("TemperamentWidget basic tests", () => {
     test("playAll handles reverse playback", () => {
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: {
                 trigger: jest.fn(),
                 stop: jest.fn(),
@@ -731,6 +779,10 @@ describe("TemperamentWidget basic tests", () => {
     test("playAll stops when already playing", () => {
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: {
                 stop: jest.fn(),
                 setMasterVolume: jest.fn(),
@@ -1232,6 +1284,10 @@ describe("TemperamentWidget basic tests", () => {
             originalDocById = global.docById;
             widget._logo = {
                 resetSynth: jest.fn(),
+                setUserTemperament: jest.fn(function (t) {
+                    this.synth.inTemperament = t;
+                    this.synth.changeInTemperament = true;
+                }),
                 synth: {
                     trigger: jest.fn(),
                     stop: jest.fn(),
