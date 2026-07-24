@@ -837,15 +837,12 @@ describe("RhythmBlocks", () => {
             capturedListener({});
             expect(turtle.singer.dotCount).toBeDefined();
         });
-
         test("RhythmicDotBlock calls errorMsg when arg is null", () => {
             const block = getBlock("rhythmicdot");
             block.flow([null, 1], logo, 0, 5);
             expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 5);
         });
-    });
-
-    // ── NoteBlock callback (lines 193-197) ──────────────────────────────
+    }); // ── NoteBlock callback (lines 193-197) ──────────────────────────────
     describe("NoteBlock callback queue path", () => {
         test("callback pushes queue block to turtle", () => {
             const block = getBlock("osctime");
