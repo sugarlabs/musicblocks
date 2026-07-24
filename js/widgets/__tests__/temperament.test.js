@@ -1193,6 +1193,35 @@ describe("TemperamentWidget basic tests", () => {
             expect(widget._playing).toBe(false);
             expect(widget._lastPlaybackIndex).toBe(0);
         });
+        test("ratioEdit shows error toast when ratioOut is 0", () => {
+            const inputValues = { ratioIn: "5", ratioOut: "0", recursion: "1" };
+            let capturedDivAppend;
+
+            global.docById = jest.fn(id => {
+                if (id in inputValues) {
+                    return { value: inputValues[id] };
+                }
+                if (id === "userEdit") {
+                    return {
+                        textContent: "",
+                        style: {},
+                        appendChild: jest.fn(),
+                        append: jest.fn(el => {
+                            capturedDivAppend = el;
+                        })
+                    };
+                }
+                return createMockElement(id);
+            });
+
+            widget.ratioEdit();
+            capturedDivAppend.onclick({ target: { textContent: "done" } });
+
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                expect.stringContaining("valid ratio"),
+                3000
+            );
+        });
     });
 
     describe("playAll play loop visual wheel coverage", () => {
