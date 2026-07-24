@@ -45,7 +45,15 @@ describe("fnBrowserDetect()", () => {
         ["firefox", "Mozilla/5.0 FxiOS/121.0"],
         ["safari", "Mozilla/5.0 Safari/605.1.15"],
         ["opera", "Mozilla/5.0 OPR/106.0"],
-        ["edge", "Mozilla/5.0 Edg/120.0"]
+        [
+            "opera",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36 OPR/106.0.0.0"
+        ],
+        ["edge", "Mozilla/5.0 Edg/120.0"],
+        [
+            "edge",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0"
+        ]
     ])("detects %s from %s", (expected, userAgent) => {
         setUserAgent(userAgent);
         expect(fnBrowserDetect()).toBe(expected);
