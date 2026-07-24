@@ -201,8 +201,13 @@ class WidgetWindow {
     _createUIelements() {
         const windows = docById("floatingWindows");
         this._frame = this._create("div", "windowFrame", windows);
+        this._frame.setAttribute("role", "dialog");
+        this._frame.setAttribute("aria-label", _(this._title));
+        this._frame.setAttribute("tabindex", "-1");
         this._overlayframe = this._create("div", "windowFrame", windows);
         this._drag = this._create("div", "wfTopBar", this._frame);
+        this._drag.setAttribute("role", "toolbar");
+        this._drag.setAttribute("aria-label", _("Window controls"));
         this._drag.style.display = "flex";
         this._drag.style.justifyContent = "space-between";
 
@@ -235,6 +240,7 @@ class WidgetWindow {
         titleEl.replaceChildren();
         titleEl.textContent = _(this._title);
         titleEl.id = `${this._key}WidgetID`;
+        this._frame.setAttribute("aria-labelledby", titleEl.id);
 
         this._nonclose.onmousedown = e => {
             window.widgetWindows.draggingWindow = this;
@@ -306,6 +312,8 @@ class WidgetWindow {
 
         this._body = this._create("div", "wfWinBody", this._frame);
         this._toolbar = this._create("div", "wfbToolbar", this._body);
+        this._toolbar.setAttribute("role", "toolbar");
+        this._toolbar.setAttribute("aria-label", _("Widget toolbar"));
 
         this._widget = this._create("div", "wfbWidget", this._body);
         this._widgetWheelHandler = event => {
@@ -509,6 +517,7 @@ class WidgetWindow {
     updateTitle(title) {
         const wftTitle = docById(this._key + "WidgetID");
         wftTitle.textContent = title;
+        this._frame.setAttribute("aria-label", title);
     }
 
     /**
@@ -539,6 +548,9 @@ class WidgetWindow {
      */
     addButton(icon, iconSize, label, parent) {
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
+        el.setAttribute("role", "button");
+        el.setAttribute("aria-label", label);
+        el.setAttribute("tabindex", "0");
         const img = document.createElement("img");
         img.src = `header-icons/${icon}`;
         img.title = label;
@@ -580,6 +592,7 @@ class WidgetWindow {
      */
     _restore() {
         this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
+        this._maxminIcon.parentElement.setAttribute("aria-label", _("Maximize window"));
         this._maximized = false;
 
         if (this._savedPos) {
@@ -600,6 +613,7 @@ class WidgetWindow {
      */
     _maximize() {
         this._maxminIcon.setAttribute("src", "header-icons/icon-contract.svg");
+        this._maxminIcon.parentElement.setAttribute("aria-label", _("Restore window"));
         this._maximized = true;
         this.unroll();
         this.takeFocus();
@@ -738,6 +752,8 @@ class WidgetWindow {
     _rollup() {
         this._rolled = true;
         this._body.style.display = "none";
+        this._rollButton.setAttribute("aria-label", _("Expand window"));
+        this._rollButton.setAttribute("aria-expanded", "false");
         return this;
     }
 
@@ -748,8 +764,12 @@ class WidgetWindow {
     unroll() {
         this._rolled = false;
         this._body.style.display = "flex";
-        if (this._rollButton && this._rollButton.classList.contains("plus")) {
-            this._rollButton.classList.remove("plus");
+        if (this._rollButton) {
+            if (this._rollButton.classList.contains("plus")) {
+                this._rollButton.classList.remove("plus");
+            }
+            this._rollButton.setAttribute("aria-label", _("Roll up window"));
+            this._rollButton.setAttribute("aria-expanded", "true");
         }
         return this;
     }
