@@ -17,6 +17,10 @@ function getActivity() {
 
 const PracticeValidator = {
     validate(problem) {
+        if (problem?.expected?.phraseMakerWorkflow) {
+            return this.validatePhraseMakerLesson(problem);
+        }
+
         if (problem?.expected?.rhythmMakerWorkflow) {
             return this.validateRhythmMakerWorkflow();
         }
@@ -84,6 +88,16 @@ const PracticeValidator = {
                 return this.validate(problem);
             case "completeRhythmWorkflow":
                 return this.validateRhythmMakerWorkflow();
+            case "completePhraseWorkflow":
+                return this.validatePhraseMakerLesson(problem);
+            case "completedTwoPartForm":
+                return this.validateTwoPartForm();
+            case "usedRepeatLoop":
+                return this.hasConnectedBlockNamed(["repeat"]);
+            case "changedPhraseDrums":
+                return this.hasChangedPhraseDrums();
+            case "createdPhraseVariation":
+                return this.hasCreatedPhraseVariation();
             case "renamedChunks":
                 return this.hasRenamedChunks(problem.expected?.chunkNames);
             case "changedOctave":
@@ -295,6 +309,128 @@ const PracticeValidator = {
 
             return this.actionContainsBlockNamed(block, blockList, ["playdrum"]);
         });
+    },
+
+    validatePhraseMakerLesson(problem) {
+        const expected = problem?.expected || {};
+
+        if (expected.phraseMakerWorkflow && !this.validatePhraseMakerWorkflow()) {
+            return false;
+        }
+
+        if (expected.twoPartForm && !this.validateTwoPartForm()) {
+            return false;
+        }
+
+        if (
+            Array.isArray(expected.blocks) &&
+            !expected.blocks.every(name => this.hasBlockNamed([name]))
+        ) {
+            return false;
+        }
+
+        if (expected.minNotes && this.countPhraseMakerDrumNotes() < expected.minNotes) {
+            return false;
+        }
+
+        return true;
+    },
+
+    validatePhraseMakerWorkflow() {
+        const blockList = this.getBlockList();
+        const exportedActions = this.getPhraseMakerActionNames(blockList);
+        if (exportedActions.size === 0) return false;
+
+        const referencedActions = this.getStartActionReferences(blockList);
+        return referencedActions.some(actionName => exportedActions.has(actionName));
+    },
+
+    validateTwoPartForm() {
+        const blockList = this.getBlockList();
+        const exportedActions = this.getPhraseMakerActionNames(blockList);
+        if (exportedActions.size < 2) return false;
+
+        const referencedActions = new Set(this.getStartActionReferences(blockList));
+        let referencedParts = 0;
+        exportedActions.forEach(actionName => {
+            if (referencedActions.has(actionName)) {
+                referencedParts++;
+            }
+        });
+
+        return referencedParts >= 2;
+    },
+
+    getPhraseMakerActionNames(blockList) {
+        const names = new Set();
+
+        Object.values(blockList).forEach(block => {
+            if (!block || block.trash || block.name !== "action") return;
+
+            const actionName = this.getActionName(block, blockList);
+            if (!actionName) return;
+
+            if (this.actionContainsBlockNamed(block, blockList, ["playdrum"])) {
+                names.add(actionName);
+            }
+        });
+
+        return names;
+    },
+
+    countPhraseMakerDrumNotes() {
+        const blockList = this.getBlockList();
+        let count = 0;
+
+        Object.values(blockList).forEach(block => {
+            if (!block || block.trash || block.name !== "action") return;
+            count += this.countBlocksInAction(block, blockList, ["playdrum"]);
+        });
+
+        return count;
+    },
+
+    countBlocksInAction(actionBlock, blockList, names) {
+        const blockNames = new Set(names);
+        const seen = new Set();
+        let count = 0;
+
+        const visit = blockId => {
+            if (blockId === null || blockId === undefined || seen.has(blockId)) return;
+
+            const block = blockList[blockId];
+            if (!block || block.trash) return;
+
+            seen.add(blockId);
+            if (blockNames.has(block.name)) {
+                count++;
+            }
+
+            (block.connections || []).forEach(visit);
+        };
+
+        visit(actionBlock.connections?.[2]);
+        return count;
+    },
+
+    hasChangedPhraseDrums() {
+        const starterDrums = new Set(["ride bell", "snare drum", "tom tom", "kick drum"]);
+        const blockList = this.getBlockList();
+
+        return Object.values(blockList).some(block => {
+            if (!block || block.trash || block.name !== "drumname") return false;
+            return block.value && !starterDrums.has(block.value);
+        });
+    },
+
+    hasCreatedPhraseVariation() {
+        const blockList = this.getBlockList();
+        const phraseActions = this.getPhraseMakerActionNames(blockList);
+        const referencedActions = this.getStartActionReferences(blockList).filter(actionName =>
+            phraseActions.has(actionName)
+        );
+
+        return phraseActions.size > 2 || referencedActions.length > 2;
     },
 
     actionContainsBlockNamed(actionBlock, blockList, names) {

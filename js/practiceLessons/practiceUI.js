@@ -64,7 +64,8 @@ const PracticeUI = {
         const projectFiles = {
             1: "hcb_level1.tb",
             2: "sakura.tb",
-            3: "rhythm_maker_level3.tb"
+            3: "rhythm_maker_level3.tb",
+            4: "phrase_maker_level4.tb"
         };
 
         const file = projectFiles[level];
@@ -300,7 +301,9 @@ const PracticeUI = {
 
     showSuccessMessage(problem, newBadges, newBigBadges) {
         const completionBadge = problem.badges?.find(badge =>
-            ["completePattern", "completeRhythmWorkflow"].includes(badge.criterion)
+            ["completePattern", "completeRhythmWorkflow", "completePhraseWorkflow"].includes(
+                badge.criterion
+            )
         );
         const messages = [
             completionBadge?.message || "The lesson song shines, and the island answers.",

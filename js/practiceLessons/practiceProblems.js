@@ -527,5 +527,170 @@ const PracticeProblems = [
             }
         ],
         bigBadge: PracticeTheme.bigBadges.echo_island
+    },
+
+    {
+        level: 4,
+        island: "echo_island",
+        title: "Chest, Snap, Clap - Build the Rhythm",
+        journal: {
+            title: "Body Beat Cove",
+            island: "Echo Island",
+            completeTitle: "Body Beat Cove Complete",
+            learned: ["Phrase Maker", "Two-part form", "Body percussion"]
+        },
+        description: `
+      <section class="story-card">
+        <p>
+          The Pulse Cave opens onto a bright stone cove. Three carvings glow on
+          the sand: <b>chest</b>, <b>snap</b>, and <b>clap</b>. Choon taps the
+          pattern on his metal shell, and the rocks answer back.
+        </p>
+        <div class="body-beat-cove" aria-label="Chest snap clap rhythm map">
+          <div class="cove-sun"></div>
+          <div class="body-beat-row">
+            <span>Chest</span>
+            <span>Snap</span>
+            <span>Clap</span>
+          </div>
+          <div class="body-beat-grid">
+            <span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div class="journal-page body-beat-journal-page">#4</div>
+        </div>
+        <p>
+          "This rhythm has two halves," Lyra says. "If we map the body sounds
+          over time, the cove can show the next treasure mark."
+        </p>
+      </section>
+
+      <section class="mission-card">
+        <h4>Body Beat Map</h4>
+        <p>
+          Open <b>Phrase Maker</b> and use drum rows for the body sounds. Build
+          the first half with <b>8 eighth notes</b>.
+        </p>
+        <p>
+          Build the second half with <b>7 eighth notes and 2 sixteenth notes</b>.
+          Export both halves as <b>Action</b> blocks, place them under
+          <b>Start</b>, and use a <b>repeat</b> block to loop the rhythm.
+        </p>
+      </section>
+
+      <section class="story-card">
+        <h4>Secret Body Beats</h4>
+        <p>
+          Once the cove starts clapping back, try a body-rhythm twist. These
+          discoveries are about form, loops, sound choices, and remixing.
+        </p>
+        <div class="explore-grid">
+          <button type="button" data-secret-help="openPhraseMaker">Open Phrase Maker</button>
+          <button type="button" data-secret-help="exportHalves">Export two halves</button>
+          <button type="button" data-secret-help="loopGroove">Loop the groove</button>
+          <button type="button" data-secret-help="swapBodySounds">Swap body sounds</button>
+          <button type="button" data-secret-help="remixGroove">Make your own groove</button>
+        </div>
+      </section>
+    `,
+        secretHelpCards: {
+            openPhraseMaker: {
+                title: "Open Phrase Maker",
+                type: "block",
+                blockName: "matrix"
+            },
+            exportHalves: {
+                title: "Export two halves",
+                heading: "Make two rhythm chunks",
+                description:
+                    "Use Phrase Maker to build the first half, then save it as an action. Build the second half with its shorter sixteenth-note ending and save that too. Place both action chunks under Start.<br>Musically, two chunks make a call-and-answer shape: the first half sets the pattern, and the second half changes the ending.",
+                singlePage: true
+            },
+            loopGroove: {
+                title: "Loop the groove",
+                heading: "Make the body beat repeat",
+                description:
+                    "Put a repeat block under Start and place both Phrase Maker action chunks inside it. Try repeating the full groove 2 or 4 times.<br>This unlocks the Loop Leader discovery because a rhythm becomes easier to feel when it comes around again.",
+                singlePage: true
+            },
+            swapBodySounds: {
+                title: "Swap body sounds",
+                heading: "Change the cove's body sounds",
+                description:
+                    "Click a drum name inside your Phrase Maker action and choose a different sound from the pie menu. For example, replace one drum with a bell, clap, or another percussion sound.<br>Musically, the timing stays the same, but the color of the rhythm changes.",
+                singlePage: true
+            },
+            remixGroove: {
+                title: "Make your own groove",
+                heading: "Add one extra body-beat idea",
+                description:
+                    "After your two-part rhythm works, add another exported Phrase Maker action or call one of your actions one more time under Start.<br>This unlocks the Cove Remixer discovery because you are extending the form beyond the required rhythm.",
+                singlePage: true
+            }
+        },
+        expected: {
+            blocks: ["repeat", "playdrum"],
+            phraseMakerWorkflow: true,
+            twoPartForm: true,
+            minNotes: 6
+        },
+        incomplete: {
+            title: "The Body Beat Cove Is Waiting",
+            message:
+                "Choon hears some taps, but the cove needs two Phrase Maker action chunks under Start, looped with a repeat block. Export both halves, place both actions in the loop, then check again."
+        },
+        rewards: [
+            "Melody Fragment #4",
+            "Captain's Journal Page #4",
+            "Treasure Clue: The treasure door listens for two body-beat answers inside one loop."
+        ],
+        badges: [
+            {
+                id: "body_beat_builder",
+                label: "Body Beat Builder",
+                shortLabel: "Body",
+                iconKey: "body",
+                criterion: "completePhraseWorkflow",
+                message:
+                    "The cove claps back in two parts. Lyra records the body rhythm in Captain Cadence's journal."
+            },
+            {
+                id: "two_part_mapper",
+                label: "Two-Part Mapper",
+                shortLabel: "Parts",
+                iconKey: "parts",
+                criterion: "completedTwoPartForm",
+                message:
+                    "Hidden Discovery: Two-Part Mapper. Your first half and second half answer each other clearly."
+            },
+            {
+                id: "loop_leader",
+                label: "Loop Leader",
+                shortLabel: "Loop",
+                iconKey: "loop",
+                criterion: "usedRepeatLoop",
+                message:
+                    "Hidden Discovery: Loop Leader. The body beat circles around until everyone can feel the groove."
+            },
+            {
+                id: "body_sound_designer",
+                label: "Body Sound Designer",
+                shortLabel: "Sound",
+                iconKey: "sound",
+                criterion: "changedPhraseDrums",
+                message:
+                    "Hidden Discovery: Body Sound Designer. The same rhythm speaks with a new sound color."
+            },
+            {
+                id: "cove_remixer",
+                label: "Cove Remixer",
+                shortLabel: "Remix",
+                iconKey: "remix",
+                criterion: "createdPhraseVariation",
+                message:
+                    "Secret Treasure Coin found. Your extra body-beat idea makes the cove dance in a new way."
+            }
+        ],
+        bigBadge: PracticeTheme.bigBadges.echo_island
     }
 ];
