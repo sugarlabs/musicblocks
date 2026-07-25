@@ -63,7 +63,8 @@ const PracticeUI = {
 
         const projectFiles = {
             1: "hcb_level1.tb",
-            2: "sakura.tb"
+            2: "sakura.tb",
+            3: "rhythm_maker_level3.tb"
         };
 
         const file = projectFiles[level];
@@ -298,9 +299,11 @@ const PracticeUI = {
     },
 
     showSuccessMessage(problem, newBadges, newBigBadges) {
+        const completionBadge = problem.badges?.find(badge =>
+            ["completePattern", "completeRhythmWorkflow"].includes(badge.criterion)
+        );
         const messages = [
-            problem.badges?.find(badge => badge.criterion === "completePattern")?.message ||
-                "The lesson song shines, and the island answers.",
+            completionBadge?.message || "The lesson song shines, and the island answers.",
             "Melody Fragment restored. Captain's Journal Page found.",
             ...newBadges.map(badge => badge.message),
             ...newBigBadges.map(badge => badge.message)
@@ -334,10 +337,11 @@ const PracticeUI = {
         );
     },
 
-    showIncompleteMessage() {
+    showIncompleteMessage(problem) {
         this.showQuestNotice(
-            "The Bridge Is Still Sleeping",
-            "Beat hears a few echoes, but the stone tablet is waiting for A A B A. Try the bridge song again, then press Check My Work.",
+            problem?.incomplete?.title || "The Bridge Is Still Sleeping",
+            problem?.incomplete?.message ||
+                "Beat hears a few echoes, but the stone tablet is waiting for A A B A. Try the bridge song again, then press Check My Work.",
             "hint"
         );
     },

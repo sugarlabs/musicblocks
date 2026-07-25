@@ -391,6 +391,94 @@
     margin: 8px 0;
 }
 
+.rhythm-cave {
+    position: relative;
+    min-height: 150px;
+    overflow: hidden;
+    border: 1px solid #9bd7f5;
+    border-radius: 8px;
+    background:
+        radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.92) 0 16%, transparent 17%),
+        linear-gradient(180deg, #dff4ff 0%, #9bd7f5 62%, #5fb9d6 63% 100%);
+}
+
+.cave-mouth {
+    position: absolute;
+    left: 50%;
+    bottom: 26px;
+    width: 118px;
+    height: 78px;
+    transform: translateX(-50%);
+    border-radius: 60px 60px 18px 18px;
+    background: #17415c;
+    box-shadow:
+        inset 0 0 0 10px #2a6f8f,
+        0 8px 0 rgba(23, 65, 92, 0.18);
+}
+
+.pulse-lights {
+    position: absolute;
+    left: 50%;
+    top: 24px;
+    display: flex;
+    gap: 12px;
+    transform: translateX(-50%);
+}
+
+.pulse-lights span {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ffd166;
+    border: 2px solid #b7791f;
+    box-shadow: 0 0 14px rgba(255, 209, 102, 0.72);
+}
+
+.pulse-lights span:nth-child(2),
+.pulse-lights span:nth-child(4) {
+    transform: translateY(12px);
+    background: #f4978e;
+    border-color: #b94b47;
+}
+
+.rhythm-river {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 34px;
+    background: #53b6d8;
+}
+
+.rhythm-river span {
+    position: absolute;
+    top: -9px;
+    width: 58px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.rhythm-river span:nth-child(1) {
+    left: 18px;
+}
+
+.rhythm-river span:nth-child(2) {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.rhythm-river span:nth-child(3) {
+    right: 18px;
+}
+
+.rhythm-journal-page {
+    right: 18px;
+    left: auto;
+    bottom: 46px;
+    transform: rotate(7deg);
+}
+
 .petal-song-map span {
     position: relative;
     min-height: 34px;
@@ -577,6 +665,10 @@
 
 .journal-level-2 {
     border-left-color: color-mix(in srgb, var(--accent, #2196f3) 68%, #e91e63);
+}
+
+.journal-level-3 {
+    border-left-color: color-mix(in srgb, var(--accent, #2196f3) 64%, #00a676);
 }
 
 .journal-page-top {
@@ -1034,6 +1126,22 @@
 
 .level-badge-coin::after {
     content: "$";
+}
+
+.level-badge-rhythm::after {
+    content: "Rh";
+}
+
+.level-badge-beat::after {
+    content: "Bt";
+}
+
+.level-badge-drum::after {
+    content: "Dr";
+}
+
+.level-badge-machine::after {
+    content: "Dm";
 }
 
 .level-badge-discovery::after {

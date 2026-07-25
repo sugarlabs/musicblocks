@@ -374,5 +374,158 @@ const PracticeProblems = [
             }
         ],
         bigBadge: PracticeTheme.bigBadges.echo_island
+    },
+
+    {
+        level: 3,
+        island: "echo_island",
+        title: "The Pulse Cave Rhythm",
+        journal: {
+            title: "Pulse Cave",
+            island: "Echo Island",
+            completeTitle: "Pulse Cave Complete",
+            learned: ["Beat", "Rhythm Maker", "Exported rhythm actions"]
+        },
+        description: `
+      <section class="story-card">
+        <p>
+          Past the Sakura grove, Lyra and Choon hear a soft tapping inside a
+          blue cave. The treasure map is quiet, but the cave walls blink like a
+          heartbeat.
+        </p>
+        <div class="rhythm-cave" aria-label="Pulse Cave beat map">
+          <div class="cave-mouth"></div>
+          <div class="pulse-lights">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="rhythm-river">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="journal-page rhythm-journal-page">#3</div>
+        </div>
+        <p>
+          "This clue is not a melody first," Choon says. "It is a pulse. We
+          need to build the beat before the next song can wake up."
+        </p>
+      </section>
+
+      <section class="mission-card">
+        <h4>Pulse Cave Beat</h4>
+        <p>
+          Open <b>Rhythm Maker</b>. Create a steady beat, try a few long and
+          short rhythm changes, then click <b>Save rhythms</b>.
+        </p>
+        <p>
+          Find the exported rhythm action in the <b>Action</b> palette, place
+          it under <b>Start</b>, press <b>Play</b>, and listen for the cave's
+          heartbeat.
+        </p>
+      </section>
+
+      <section class="story-card">
+        <h4>Secret Beats</h4>
+        <p>
+          After the cave starts blinking, try a rhythm experiment. These
+          discoveries are about beat, length, and drum color.
+        </p>
+        <div class="explore-grid">
+          <button type="button" data-secret-help="openMaker">Open Rhythm Maker</button>
+          <button type="button" data-secret-help="saveRhythm">Save rhythms</button>
+          <button type="button" data-secret-help="changeLength">Change note lengths</button>
+          <button type="button" data-secret-help="swapDrum">Try another drum</button>
+          <button type="button" data-secret-help="drumMachine">Save drum machine</button>
+        </div>
+      </section>
+    `,
+        secretHelpCards: {
+            openMaker: {
+                title: "Open Rhythm Maker",
+                type: "block",
+                blockName: "rhythmruler2"
+            },
+            saveRhythm: {
+                title: "Save rhythms",
+                heading: "Turn your beat into a chunk",
+                description:
+                    "Use Rhythm Maker to shape the pulse, then press Save rhythms. Music Blocks creates a new action called rhythm. Put that action under Start so your program can play it.<br>Musically, exporting turns your rhythm idea into a reusable pattern.",
+                singlePage: true
+            },
+            changeLength: {
+                title: "Change note lengths",
+                heading: "Stretch or shorten the beat",
+                description:
+                    "Open Rhythm Maker and change one rhythm value so the pulse is no longer all the same length. Try changing the rhythm from 1/1 to 1/2, 1/4, or another value, then listen again.<br>This unlocks the Beat Shaper discovery because longer and shorter notes change the rhythm pattern while the beat keeps moving.",
+                singlePage: true
+            },
+            swapDrum: {
+                title: "Try another drum",
+                type: "block",
+                blockName: "setdrum"
+            },
+            drumMachine: {
+                title: "Save drum machine",
+                heading: "Make the cave answer with drums",
+                description:
+                    "After trying a rhythm, press Save drum machine in Rhythm Maker. This creates an action that plays drum sounds directly. Use it when you want the beat to sound like a percussion pattern, not just a rhythm guide.",
+                singlePage: true
+            }
+        },
+        expected: {
+            rhythmMakerWorkflow: true
+        },
+        incomplete: {
+            title: "The Pulse Cave Is Still Quiet",
+            message:
+                "Choon hears the beat in Rhythm Maker, but Start is not playing the exported rhythm yet. Click Save rhythms, find the rhythm action, place it under Start, then press Check My Work."
+        },
+        rewards: [
+            "Melody Fragment #3",
+            "Captain's Journal Page #3",
+            "Treasure Clue: The next path opens when a steady pulse carries a changing rhythm."
+        ],
+        badges: [
+            {
+                id: "pulse_cave_keeper",
+                label: "Pulse Cave Keeper",
+                shortLabel: "Pulse",
+                iconKey: "rhythm",
+                criterion: "completeRhythmWorkflow",
+                message:
+                    "The cave lights blink in time. Lyra and Choon save the rhythm path in Captain Cadence's journal."
+            },
+            {
+                id: "beat_shaper",
+                label: "Beat Shaper",
+                shortLabel: "Beat",
+                iconKey: "beat",
+                criterion: "changedRhythmLength",
+                message:
+                    "Hidden Discovery: Beat Shaper. The cave pulse stretches and snaps as your notes become longer and shorter."
+            },
+            {
+                id: "drum_taster",
+                label: "Drum Taster",
+                shortLabel: "Drum",
+                iconKey: "drum",
+                criterion: "changedDrumSound",
+                message:
+                    "Hidden Discovery: Drum Taster. A new drum color echoes from the cave wall."
+            },
+            {
+                id: "drum_machine_builder",
+                label: "Drum Machine Builder",
+                shortLabel: "Machine",
+                iconKey: "machine",
+                criterion: "savedDrumMachine",
+                message:
+                    "Hidden Discovery: Drum Machine Builder. The cave answers with a full percussion pattern."
+            }
+        ],
+        bigBadge: PracticeTheme.bigBadges.echo_island
     }
 ];

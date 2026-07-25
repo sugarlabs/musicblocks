@@ -17,6 +17,10 @@ function getActivity() {
 
 const PracticeValidator = {
     validate(problem) {
+        if (problem?.expected?.rhythmMakerWorkflow) {
+            return this.validateRhythmMakerWorkflow();
+        }
+
         if (!problem?.expected?.pattern) return false;
 
         return this.validatePattern(problem.expected.pattern);
@@ -78,6 +82,8 @@ const PracticeValidator = {
         switch (criterion) {
             case "completePattern":
                 return this.validate(problem);
+            case "completeRhythmWorkflow":
+                return this.validateRhythmMakerWorkflow();
             case "renamedChunks":
                 return this.hasRenamedChunks(problem.expected?.chunkNames);
             case "changedOctave":
@@ -91,6 +97,12 @@ const PracticeValidator = {
                 ]);
             case "createdVariation":
                 return this.hasCreatedVariation(problem.expected?.pattern);
+            case "changedRhythmLength":
+                return this.hasChangedRhythmLength();
+            case "changedDrumSound":
+                return this.hasChangedDrumSound();
+            case "savedDrumMachine":
+                return this.hasSavedDrumMachineAction();
             default:
                 return false;
         }
@@ -206,6 +218,115 @@ const PracticeValidator = {
         if (sequence.length <= expectedPattern.length) return false;
 
         return this.matchesPattern(sequence.slice(0, expectedPattern.length), expectedPattern);
+    },
+
+    validateRhythmMakerWorkflow() {
+        const blockList = this.getBlockList();
+        const exportedActions = this.getRhythmMakerActionNames(blockList);
+        if (exportedActions.size === 0) return false;
+
+        const referencedActions = this.getStartActionReferences(blockList);
+        return referencedActions.some(actionName => exportedActions.has(actionName));
+    },
+
+    getRhythmMakerActionNames(blockList) {
+        const names = new Set();
+
+        Object.values(blockList).forEach(block => {
+            if (!block || block.trash || block.name !== "action") return;
+
+            const actionName = this.getActionName(block, blockList);
+            if (!actionName) return;
+
+            if (this.actionContainsBlockNamed(block, blockList, ["rhythm2", "stuplet"])) {
+                names.add(actionName);
+            }
+        });
+
+        return names;
+    },
+
+    getStartActionReferences(blockList) {
+        const startBlock = Object.values(blockList).find(
+            block => block?.name === "start" && !block.trash
+        );
+        if (!startBlock) return [];
+
+        return this.extractPatternSequence(startBlock.connections?.[1], blockList);
+    },
+
+    hasChangedRhythmLength() {
+        const blockList = this.getBlockList();
+
+        return Object.values(blockList).some(block => {
+            if (!block || block.trash || block.name !== "rhythm2") return false;
+
+            const count = Number(blockList[block.connections?.[1]]?.value) || 0;
+            const divideBlock = blockList[block.connections?.[2]];
+            const numerator = Number(blockList[divideBlock?.connections?.[1]]?.value) || 0;
+            const denominator = Number(blockList[divideBlock?.connections?.[2]]?.value) || 0;
+
+            return count !== 1 || numerator !== 1 || denominator !== 1;
+        });
+    },
+
+    hasChangedDrumSound() {
+        const drumNames = this.getSetDrumNames();
+
+        return drumNames.some(drumName => drumName && drumName !== "snare drum");
+    },
+
+    getSetDrumNames() {
+        const blockList = this.getBlockList();
+
+        return Object.values(blockList)
+            .filter(block => block && !block.trash && block.name === "setdrum")
+            .map(block => {
+                const drumBlock = blockList[block.connections?.[1]];
+                return drumBlock?.value || drumBlock?.privateData || "";
+            });
+    },
+
+    hasSavedDrumMachineAction() {
+        const blockList = this.getBlockList();
+
+        return Object.values(blockList).some(block => {
+            if (!block || block.trash || block.name !== "action") return false;
+
+            return this.actionContainsBlockNamed(block, blockList, ["playdrum"]);
+        });
+    },
+
+    actionContainsBlockNamed(actionBlock, blockList, names) {
+        const blockNames = new Set(names);
+        let currentId = this.unwrapHiddenFlow(actionBlock.connections?.[2], blockList);
+        let guard = 0;
+
+        while (currentId && guard < 100) {
+            const block = blockList[currentId];
+            if (!block || block.trash) return false;
+
+            if (this.blockTreeContainsNamed(currentId, blockList, blockNames)) return true;
+
+            currentId = this.getNextFlowId(block, blockList);
+            guard++;
+        }
+
+        return false;
+    },
+
+    blockTreeContainsNamed(blockId, blockList, blockNames, seen = new Set()) {
+        if (blockId === null || blockId === undefined || seen.has(blockId)) return false;
+
+        const block = blockList[blockId];
+        if (!block || block.trash) return false;
+
+        seen.add(blockId);
+        if (blockNames.has(block.name)) return true;
+
+        return (block.connections || []).some(connectionId =>
+            this.blockTreeContainsNamed(connectionId, blockList, blockNames, seen)
+        );
     },
 
     getBlockList() {
