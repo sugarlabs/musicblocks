@@ -1907,7 +1907,11 @@ function setupPitchBlocks(activity) {
             this.setHelpString([
                 _(
                     "The Pitch block specifies the pitch name and octave of a note that together determine the frequency of the note."
-                ),
+                ) +
+                    " " +
+                    _(
+                        "Changing the octave number keeps the pitch name but makes the note sound higher or lower."
+                    ),
                 "documentation",
                 null,
                 "note1"

@@ -36,7 +36,7 @@ class HelpWidget {
     /**
      * @param {Activity} activity
      */
-    constructor(activity, useActiveBlock, customCard) {
+    constructor(activity, useActiveBlock, customCard, blockHelpName) {
         this.activity = activity;
         this.beginnerBlocks = [];
         this.advancedBlocks = [];
@@ -44,7 +44,8 @@ class HelpWidget {
         this.index = 0;
         this.isOpen = true;
         this._keydownHandler = null;
-        this._usesCustomCard = !!customCard;
+        this._usesCustomCard = !!customCard || !!blockHelpName;
+        this._standaloneBlockHelp = false;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help", false);
         //widgetWindow.getWidgetBody().style.overflowY = "auto";
@@ -82,7 +83,9 @@ class HelpWidget {
 
         // Give the DOM time to create the div.
         window.requestAnimationFrame(() => {
-            if (customCard) {
+            if (blockHelpName) {
+                this._showBlockHelp(blockHelpName);
+            } else if (customCard) {
                 this._setupCustomCard(customCard);
             } else {
                 this._setup(useActiveBlock, 0);
@@ -102,6 +105,17 @@ class HelpWidget {
      */
     static showCard(activity, card) {
         return new HelpWidget(activity, false, card);
+    }
+
+    /**
+     * Open the existing block help for a specific block without changing the main tour.
+     *
+     * @param {Activity} activity
+     * @param {string} blockName
+     * @returns {HelpWidget}
+     */
+    static showBlockHelp(activity, blockName) {
+        return new HelpWidget(activity, false, null, blockName);
     }
 
     /**
@@ -222,11 +236,7 @@ class HelpWidget {
                 const label =
                     this.activity.blocks.blockList[this.activity.blocks.activeBlock].protoblock
                         .staticLabels[0];
-                if (page === 0) {
-                    this.widgetWindow.updateTitle(_("Take a tour"));
-                } else {
-                    this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
-                }
+                this.widgetWindow.updateTitle(_(label));
             }
 
             rightArrow = document.getElementById("right-arrow");
@@ -299,7 +309,8 @@ class HelpWidget {
 
                 if (message) {
                     const helpBody = docById("helpBodyDiv");
-                    helpBody.style.height = "70vh";
+                    helpBody.classList.add("help-block-card");
+                    helpBody.style.removeProperty("height");
 
                     const bodyFragment = document.createDocumentFragment();
                     if (message.length > 1) {
@@ -332,16 +343,17 @@ class HelpWidget {
 
                         // body = body + '<p><img src="' + path + "/" + name + '_block.svg"></p>';
                         const imageSrc = `Docs/${path}/${name}_block.svg`;
-                        const p = document.createElement("p");
-                        p.style.width = "100%";
+                        const figure = document.createElement("figure");
+                        figure.classList.add("blockImage-wrapper");
                         const img = document.createElement("img");
-                        img.style.maxWidth = "100%";
+                        img.classList.add("blockImage");
                         img.src = imageSrc;
-                        p.append(img);
-                        bodyFragment.append(p);
+                        figure.append(img);
+                        bodyFragment.append(figure);
                     }
 
                     const messageParagraph = document.createElement("p");
+                    messageParagraph.classList.add("message");
                     const messageParts = message[0].split(/<br\s*\/?>/i);
                     messageParts.forEach((part, index) => {
                         messageParagraph.append(document.createTextNode(part));
@@ -603,6 +615,7 @@ class HelpWidget {
             description: card.musicDescription || "",
             label: card.frontLabel || _("How do I do it?")
         };
+        const canFlip = !card.singlePage && !!card.musicDescription;
         let showingBack = false;
 
         const renderSide = side => {
@@ -626,23 +639,39 @@ class HelpWidget {
                     }
                 });
 
-            const flipButton = document.createElement("button");
-            flipButton.type = "button";
-            flipButton.className = "help-card-action";
-            flipButton.textContent = side.label;
-            flipButton.onclick = () => {
-                showingBack = !showingBack;
-                renderSide(showingBack ? back : front);
-            };
-
             if (heading) {
                 helpBody.append(heading);
             }
-            helpBody.append(description, flipButton);
+            helpBody.append(description);
+            if (canFlip) {
+                const flipButton = document.createElement("button");
+                flipButton.type = "button";
+                flipButton.className = "help-card-action";
+                flipButton.textContent = side.label;
+                flipButton.onclick = () => {
+                    showingBack = !showingBack;
+                    renderSide(showingBack ? back : front);
+                };
+                helpBody.append(flipButton);
+            }
             this.widgetWindow.takeFocus();
         };
 
         renderSide(front);
+    }
+
+    /**
+     * @private
+     * @param {string} blockName
+     * @returns {void}
+     */
+    _showBlockHelp(blockName) {
+        const block = this.activity.blocks.protoBlockDict[blockName];
+        if (!block) return;
+        this._standaloneBlockHelp = true;
+        this.appendedBlockList = [blockName];
+        this.index = 0;
+        this._blockHelp(block);
     }
 
     /**
@@ -811,7 +840,6 @@ class HelpWidget {
         this._helpDiv.className = "help-widget-panel";
 
         //this._helpDiv.style.width = "500px";
-        this._helpDiv.style.height = "70vh";
         // this._helpDiv.style.backgroundColor = "#e8e8e8";
 
         this._helpDiv.replaceChildren(
@@ -865,10 +893,16 @@ class HelpWidget {
         };
         document.addEventListener("keydown", this._keydownHandler);
 
-        if (this.index === this.appendedBlockList.length - 1) {
+        if (this._standaloneBlockHelp) {
+            rightArrow.style.display = "none";
+            rightArrow.classList.remove("hover");
+            leftArrow.style.display = "none";
+            leftArrow.classList.remove("hover");
+        } else if (this.index === this.appendedBlockList.length - 1) {
             rightArrow.classList.add("disabled");
         }
         cell.onclick = () => {
+            if (this._standaloneBlockHelp) return;
             if (this.index !== this.appendedBlockList.length - 1) {
                 this.index += 1;
             }
@@ -880,6 +914,7 @@ class HelpWidget {
         cell = docById("left-arrow");
 
         cell.onclick = () => {
+            if (this._standaloneBlockHelp) return;
             if (this.index === 0) {
                 const widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
                 this.widgetWindow = widgetWindow;
@@ -923,7 +958,8 @@ class HelpWidget {
             const message = block.helpString;
 
             const helpBody = docById("helpBodyDiv");
-            helpBody.style.height = "70vh";
+            helpBody.classList.add("help-block-card");
+            helpBody.style.removeProperty("height");
             // helpBody.style.backgroundColor = "#e8e8e8";
             if (message) {
                 const bodyFragment = document.createDocumentFragment();

@@ -790,6 +790,57 @@ describe("HelpWidget", () => {
             expect(helpBody.textContent).not.toContain("Change one pitch octave.");
         });
 
+        test("single-page custom card does not render a flip button", () => {
+            const activity = createMockActivity();
+            HelpWidget.showCard(activity, {
+                title: "Make it longer",
+                heading: "Make the sound last longer",
+                description: "Add another chunk or repeat a favorite chunk.",
+                singlePage: true
+            });
+            jest.runAllTimers();
+
+            const helpBody = document.getElementById("helpBodyDiv");
+            expect(helpBody.textContent).toContain("Make the sound last longer");
+            expect(helpBody.querySelector("button")).toBeNull();
+        });
+
+        test("showBlockHelp opens an existing proto block help entry", () => {
+            const block = {
+                name: "pitch",
+                staticLabels: ["pitch"],
+                helpString: ["Pitch help", "documentation"],
+                beginnerModeBlock: true,
+                palette: {
+                    name: "pitch",
+                    palettes: {
+                        showPalette: jest.fn()
+                    }
+                }
+            };
+            const activity = createMockActivity({
+                protoBlockDict: {
+                    pitch: block
+                }
+            });
+            const blockHelpSpy = jest
+                .spyOn(HelpWidget.prototype, "_blockHelp")
+                .mockImplementation(function (protoBlock) {
+                    this.widgetWindow.updateTitle(protoBlock.staticLabels[0]);
+                });
+
+            const hw = HelpWidget.showBlockHelp(activity, "pitch");
+            jest.runAllTimers();
+
+            expect(hw).toBeInstanceOf(HelpWidget);
+            expect(hw._standaloneBlockHelp).toBe(true);
+            expect(hw.appendedBlockList).toEqual(["pitch"]);
+            expect(blockHelpSpy).toHaveBeenCalledWith(block);
+            expect(mockWidgetWindow.updateTitle).toHaveBeenCalledWith("pitch");
+
+            blockHelpSpy.mockRestore();
+        });
+
         test("closing a custom card does not show the tour starter hint", () => {
             const activity = createMockActivity();
             HelpWidget.showCard(activity, {

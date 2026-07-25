@@ -191,13 +191,17 @@ const PracticeUI = {
                 if (typeof HelpWidget === "undefined" || !activity) {
                     this.showQuestNotice(
                         card.title,
-                        `${card.description} ${card.musicDescription}`,
+                        `${card.description || ""} ${card.musicDescription || ""}`.trim(),
                         "hint"
                     );
                     return;
                 }
 
-                HelpWidget.showCard(activity, card);
+                if (card.type === "block" && card.blockName) {
+                    HelpWidget.showBlockHelp(activity, card.blockName);
+                } else {
+                    HelpWidget.showCard(activity, card);
+                }
             };
         });
     },

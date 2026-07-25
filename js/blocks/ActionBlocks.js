@@ -1309,7 +1309,9 @@ function setupActionBlocks(activity) {
                     "The Action block is used to group together blocks so that they can be used more than once."
                 ) +
                     " " +
-                    _("It is often used for storing a phrase of music that is repeated."),
+                    _("It is often used for storing a phrase of music that is repeated.") +
+                    " " +
+                    _("You can rename an Action block to give a music chunk a helpful name."),
                 "documentation",
                 null,
                 "actionhelp"

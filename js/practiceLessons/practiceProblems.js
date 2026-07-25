@@ -114,39 +114,25 @@ const PracticeProblems = [
         secretHelpCards: {
             changeOctave: {
                 title: "Change octave",
-                heading: "Try a higher or lower version",
-                description:
-                    "Open one pitch block and change its octave number. Try 5 to lift a note higher, or 3 to make it lower. Then press Play and Check My Work.",
-                musicHeading: "What changes musically?",
-                musicDescription:
-                    "An octave keeps the same note name, but moves it to a higher or lower sound. C4 and C5 are both C, but C5 sounds brighter and higher."
+                type: "block",
+                blockName: "pitch"
             },
             useTranspose: {
                 title: "Use transpose",
-                heading: "Shift the bridge song",
-                description:
-                    "Add a transpose block around part of your song, then choose how many steps to shift the notes. Keep the A A B A pattern in place.",
-                musicHeading: "What changes musically?",
-                musicDescription:
-                    "Transposing moves a melody up or down while keeping its shape. The tune still feels familiar, but it starts from a new place."
+                type: "block",
+                blockName: "settransposition"
             },
             makeLonger: {
                 title: "Make it longer",
-                heading: "Add another echo",
+                heading: "Make the sound last longer",
                 description:
-                    "Add one more chunk after the bridge song, or repeat part of the pattern again. Listen for a longer path before you check the secret.",
-                musicHeading: "What changes musically?",
-                musicDescription:
-                    "Making a melody longer adds another musical idea or repeats one you already made. It can make the ending feel like it travels farther."
+                    "You can make a tone or path longer by adding another action chunk after the song, repeating a favorite chunk, or placing more notes inside an action before you play it again.<br>Musically, this gives the melody more time to travel without changing the main idea.",
+                singlePage: true
             },
             renameChunks: {
                 title: "Rename chunks",
-                heading: "Give the chunks explorer names",
-                description:
-                    "Rename at least one action chunk. Pick names that help you remember what each sound does, like Echo A or Bridge B.",
-                musicHeading: "What changes musically?",
-                musicDescription:
-                    "Renaming does not change the sound. It changes how you read your music map, which helps you organize and remember musical ideas."
+                type: "block",
+                blockName: "action"
             }
         },
         expected: {
@@ -281,39 +267,25 @@ const PracticeProblems = [
         secretHelpCards: {
             renameChunks: {
                 title: "Rename chunks",
-                heading: "Name the Sakura chunks",
-                description:
-                    "Rename one or more melody chunks. Choose names that match what you hear, such as Blossom Start, Petal Turn, or Grove Ending.",
-                musicHeading: "What changes musically?",
-                musicDescription:
-                    "The melody sounds the same, but clear names make a long song easier to follow. Musicians often mark sections so they can rehearse and rearrange them."
+                type: "block",
+                blockName: "action"
             },
             changeOctave: {
                 title: "Lift petals",
-                heading: "Move a petal note higher or lower",
-                description:
-                    "Find a pitch block in the Sakura melody and change its octave number. Try lifting one note to 5 or lowering one to 3, then listen again.",
-                musicHeading: "What changes musically?",
-                musicDescription:
-                    "Changing octave keeps the note family the same but moves it higher or lower. A lifted note can sound like a petal floating above the melody."
+                type: "block",
+                blockName: "pitch"
             },
             useTranspose: {
                 title: "Use transpose",
-                heading: "Shift part of the grove melody",
-                description:
-                    "Wrap a small part of the Sakura path in a transpose block and choose a step value. Keep the main trail order the same.",
-                musicHeading: "What changes musically?",
-                musicDescription:
-                    "Transpose moves notes together. The musical shape stays recognizable, but the color of the melody changes."
+                type: "block",
+                blockName: "settransposition"
             },
             makeLonger: {
                 title: "Make a longer path",
                 heading: "Extend the petal trail",
                 description:
-                    "Add another chunk, or repeat a favorite Sakura chunk after the required trail. Then press Play and Check My Work.",
-                musicHeading: "What changes musically?",
-                musicDescription:
-                    "A longer path gives the melody more time to travel. Repeating a chunk can make a musical phrase feel intentional and complete."
+                    "You can make the path longer by adding another action chunk, repeating a favorite Sakura chunk, or placing more notes inside an action before you use it again.<br>Musically, a longer path gives the melody more time to bloom while the pattern still feels connected.",
+                singlePage: true
             }
         },
         expected: {
