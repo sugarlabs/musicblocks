@@ -29,7 +29,8 @@ const mockGlobals = {
     getStepSizeUp: jest.fn().mockReturnValue(1),
     numberToPitch: jest.fn().mockReturnValue(["C", 4]),
     pitchToNumber: jest.fn().mockReturnValue(60),
-    getTemperament: jest.fn().mockReturnValue({ pitchNumber: 12 })
+    getTemperament: jest.fn().mockReturnValue({ pitchNumber: 12 }),
+    getCurrentEDO: jest.fn().mockReturnValue(12)
 };
 
 global.getNote = mockGlobals.getNote;
@@ -38,6 +39,7 @@ global.getStepSizeUp = mockGlobals.getStepSizeUp;
 global.numberToPitch = mockGlobals.numberToPitch;
 global.pitchToNumber = mockGlobals.pitchToNumber;
 global.getTemperament = mockGlobals.getTemperament;
+global.getCurrentEDO = mockGlobals.getCurrentEDO;
 global.last = jest.fn(array => array[array.length - 1]);
 global.deepClone = value => {
     if (typeof structuredClone === "function") {

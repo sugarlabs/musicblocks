@@ -725,23 +725,25 @@ function setupPitchActions(activity) {
          */
         static consonantStepSize(stepType, turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
+            const temp = activity.logo.synth.inTemperament;
+            const edo = getCurrentEDO(temp);
+
+            const _step = (direction, pitch) => {
+                let step =
+                    direction === "up"
+                        ? getStepSizeUp(tur.singer.keySignature, pitch, undefined, temp)
+                        : getStepSizeDown(tur.singer.keySignature, pitch, undefined, temp);
+                if (edo !== 12) {
+                    step = (step * 12) / edo;
+                }
+                return step;
+            };
 
             if (tur.singer.lastNotePlayed !== null) {
                 const len = tur.singer.lastNotePlayed[0].length;
-
-                return stepType === "up"
-                    ? getStepSizeUp(
-                          tur.singer.keySignature,
-                          tur.singer.lastNotePlayed[0].slice(0, len - 1)
-                      )
-                    : getStepSizeDown(
-                          tur.singer.keySignature,
-                          tur.singer.lastNotePlayed[0].slice(0, len - 1)
-                      );
+                return _step(stepType, tur.singer.lastNotePlayed[0].slice(0, len - 1));
             } else {
-                return stepType === "up"
-                    ? getStepSizeUp(tur.singer.keySignature, "G")
-                    : getStepSizeDown(tur.singer.keySignature, "G");
+                return _step(stepType, "G");
             }
         }
     };

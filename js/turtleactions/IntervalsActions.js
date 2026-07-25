@@ -500,6 +500,7 @@ function setupIntervalsActions(activity) {
          */
         static setTemperament(temperament, pitch, octave) {
             activity.logo.synth.inTemperament = temperament;
+            activity.logo._userTemperament = temperament;
             activity.logo.synth.startingPitch = pitch + "" + octave;
 
             activity.logo.temperamentSelected.push(temperament);

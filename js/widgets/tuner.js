@@ -188,7 +188,7 @@ const TunerUtils = {
         const A4 = 440;
         const C0 = A4 * Math.pow(2, -4.75);
         const currentEDO = edo || 12;
-        const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+        const noteNames = generateNoteNames(currentEDO);
 
         if (frequency < C0) {
             return ["C", 0, C0];
@@ -197,10 +197,9 @@ const TunerUtils = {
         const h = Math.round(currentEDO * Math.log2(frequency / C0));
         const octave = Math.floor(h / currentEDO);
         const steppedN = ((h % currentEDO) + currentEDO) % currentEDO;
-        const n = Math.round((steppedN / currentEDO) * 12) % 12;
         const cents = Math.round(1200 * Math.log2(frequency / (C0 * Math.pow(2, h / currentEDO))));
 
-        return [noteNames[n], cents, frequency];
+        return [noteNames[steppedN], cents, frequency];
     },
 
     /**
