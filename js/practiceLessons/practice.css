@@ -479,6 +479,84 @@
     transform: rotate(7deg);
 }
 
+.body-beat-cove {
+    position: relative;
+    min-height: 152px;
+    overflow: hidden;
+    border: 1px solid #9bd7f5;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #dff7ff 0 52%, #f8dc9b 53% 100%), #f8dc9b;
+}
+
+.cove-sun {
+    position: absolute;
+    right: 18px;
+    top: 16px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #ffd166;
+    box-shadow: 0 0 0 8px rgba(255, 209, 102, 0.25);
+}
+
+.body-beat-row {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    top: 34px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.body-beat-row span {
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #1f5f82;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #123047;
+    font-size: 15px;
+    font-weight: 900;
+    box-shadow: 0 5px 0 rgba(31, 95, 130, 0.18);
+}
+
+.body-beat-grid {
+    position: absolute;
+    left: 18px;
+    right: 72px;
+    bottom: 24px;
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: 5px;
+}
+
+.body-beat-grid span {
+    height: 22px;
+    border-radius: 5px;
+    background: #39c6d1;
+    border: 2px solid #178995;
+}
+
+.body-beat-grid span:nth-child(3n) {
+    background: #ffca3a;
+    border-color: #b7791f;
+}
+
+.body-beat-grid span:nth-child(5n) {
+    background: #f4978e;
+    border-color: #b94b47;
+}
+
+.body-beat-journal-page {
+    right: 18px;
+    left: auto;
+    bottom: 18px;
+    transform: rotate(-8deg);
+}
+
 .petal-song-map span {
     position: relative;
     min-height: 34px;
@@ -669,6 +747,10 @@
 
 .journal-level-3 {
     border-left-color: color-mix(in srgb, var(--accent, #2196f3) 64%, #00a676);
+}
+
+.journal-level-4 {
+    border-left-color: color-mix(in srgb, var(--accent, #2196f3) 58%, #ffca3a);
 }
 
 .journal-page-top {
@@ -1142,6 +1224,26 @@
 
 .level-badge-machine::after {
     content: "Dm";
+}
+
+.level-badge-body::after {
+    content: "Bo";
+}
+
+.level-badge-parts::after {
+    content: "2P";
+}
+
+.level-badge-loop::after {
+    content: "Lp";
+}
+
+.level-badge-sound::after {
+    content: "So";
+}
+
+.level-badge-remix::after {
+    content: "Rx";
 }
 
 .level-badge-discovery::after {
