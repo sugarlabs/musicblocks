@@ -1,0 +1,58 @@
+# Label definitions synced to the repo by .github/workflows/label-sync.yml
+#
+# Colors are chosen to stay consistent with the palette already used for
+# PR-category labels in .github/workflows/pr-category-check.yml, so that
+# related concepts (e.g. "bug fix" on PRs and "Issue-Bug" on issues) share
+# the same color.
+#
+# To add or update a label: edit this file and open a PR. The sync
+# workflow will create/update the label in the repo automatically once
+# merged to master.
+
+- name: Issue-Bug
+  color: D73A4A
+  description: Fixes a bug or incorrect behavior
+
+- name: Issue-Enhancement
+  color: 9333EA
+  description: Adds new functionality or improves an existing feature
+
+- name: Issue-Documentation
+  color: 10B981
+  description: Updates to docs, comments, or README
+
+- name: Issue-Performance
+  color: F97316
+  description: Improves performance (load time, memory, rendering)
+
+- name: Issue-User-Experience
+  color: EC4899
+  description: UI/UX bugs, inconsistencies, or improvement suggestions
+
+- name: testing
+  color: 3B82F6
+  description: Adds or updates test coverage
+
+- name: good first issue
+  color: 7EE787
+  description: Good for newcomers
+
+- name: help wanted
+  color: FBCA04
+  description: Extra attention is needed
+
+- name: question
+  color: D876E3
+  description: Further information is requested
+
+- name: needs discussion
+  color: 6E7781
+  description: Requires maintainer/community discussion before proceeding
+
+- name: wontfix
+  color: FFFFFF
+  description: This will not be worked on
+
+- name: duplicate
+  color: CFD3D7
+  description: This issue or pull request already exists

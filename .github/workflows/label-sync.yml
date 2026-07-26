@@ -1,0 +1,37 @@
+name: Label Sync
+
+# Keeps repository issue labels (name, color, description) in sync with
+# the definitions in .github/labels.yml. This lets contributors propose
+# label color/description changes via a normal PR, instead of requiring
+# repo Settings access.
+#
+# Related: #7910 (color coding for issue labels to improve discoverability)
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - ".github/labels.yml"
+      - ".github/workflows/label-sync.yml"
+  workflow_dispatch: {}
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  sync:
+    name: Sync labels from .github/labels.yml
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Sync labels
+        uses: micnncim/action-label-syncer@v1
+        with:
+          manifest: .github/labels.yml
+          prune: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
