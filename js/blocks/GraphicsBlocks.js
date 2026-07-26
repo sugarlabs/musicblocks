@@ -1158,6 +1158,7 @@ function setupGraphicsBlocks(activity) {
             // Call the constructor of the parent class
             super("wrapmode");
             this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
 
             // Set the palette, activity, and form the block with specific parameters
             this.setPalette("graphics", activity);

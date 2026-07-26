@@ -673,6 +673,7 @@ function setupExtrasBlocks(activity) {
         constructor() {
             super("grid");
             this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
             this.setPalette("extras", activity);
             this.setHelpString();
             this.formBlock({ outType: "gridout" });
