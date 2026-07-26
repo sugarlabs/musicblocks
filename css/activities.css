@@ -2154,8 +2154,8 @@ table {
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: #1d4ed8;
-    color: #ffffff;
+    background-color: var(--color-notification-bg);
+    color: var(--color-text-inverse);
     padding: 15px 20px;
     border-radius: 8px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
