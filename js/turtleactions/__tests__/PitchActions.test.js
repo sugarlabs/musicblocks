@@ -67,6 +67,7 @@ describe("Tests for Singer.PitchActions setup", () => {
     beforeEach(() => {
         // Add temperament globals only for this test
         global.isCustomTemperament = musicUtils.isCustomTemperament;
+        global.isTrueEDO = musicUtils.isTrueEDO;
         global.TEMPERAMENT = musicUtils.TEMPERAMENT;
 
         blkId = 1;
@@ -131,6 +132,7 @@ describe("Tests for Singer.PitchActions setup", () => {
     afterEach(() => {
         // Clean up globals to prevent test pollution
         delete global.isCustomTemperament;
+        delete global.isTrueEDO;
         delete global.TEMPERAMENT;
     });
 

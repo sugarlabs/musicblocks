@@ -1009,12 +1009,6 @@ function getEdoNoteNamePosition(name, edo) {
         .replaceAll(DOUBLESHARP, SHARP + SHARP)
         .replaceAll(DOUBLEFLAT, FLAT + FLAT);
 
-    if (edo <= 12) {
-        const idx = PITCHES2.indexOf(normalizedName);
-        if (idx !== -1) return idx;
-        return PITCHES.indexOf(normalizedName);
-    }
-
     const names = generateNoteNames(edo);
     let idx = names.indexOf(normalizedName);
     if (idx !== -1) return idx;
@@ -1029,7 +1023,7 @@ function getEdoNoteNamePosition(name, edo) {
         if (idx !== -1) return idx;
     }
 
-    // Try 12-EDO proportional fallback
+    // Try 12-EDO proportional fallback for notes not in the EDO name set
     const pos12 = PITCHES2.indexOf(normalizedName);
     if (pos12 !== -1) {
         return Math.round((pos12 / 12) * edo) % edo;
@@ -3453,6 +3447,21 @@ const isCustomTemperament = temperament => {
 };
 
 /**
+ * Check if a temperament is a true equal division of the octave (EDO).
+ * True EDOs have uniform step sizes; non-equal temperaments (JI, meantone,
+ * Pythagorean) have unequal intervals despite having a pitch count.
+ * @function
+ * @param {string} temperament - The name of the temperament.
+ * @returns {boolean} True if the temperament is a true equal division.
+ */
+const isTrueEDO = temperament => {
+    if (!temperament || typeof temperament !== "string") {
+        return false;
+    }
+    return temperament.startsWith("equal");
+};
+
+/**
  * Extract ratio from a temperament interval value.
  * Handles both legacy numeric format and new {ratio, cents} object format.
  * @function
@@ -4324,23 +4333,37 @@ const pitchToNumber = (pitch, octave, keySignature, temperament) => {
  * @returns {Array} An array containing the pitch and octave.
  */
 const numberToPitchSharp = (i, temperament) => {
-    // numbertoPitch return only flats
-    // This function will return sharps.
     const currentEDO = getCurrentEDO(temperament);
+    if (currentEDO === 12) {
+        if (i < 0) {
+            let n = 0;
+            while (i < 0) {
+                i += 12;
+                n += 1;
+            }
+            const octave = Math.floor(i / 12) - n;
+            const nameIndex = Math.round(((i % 12) / 12) * 12);
+            return [PITCHES2[(nameIndex + PITCHES2.indexOf("A")) % 12], octave];
+        } else {
+            const octave = Math.floor(i / 12);
+            const nameIndex = Math.round(((i % 12) / 12) * 12);
+            return [PITCHES2[(nameIndex + PITCHES2.indexOf("A")) % 12], octave];
+        }
+    }
+    const edoNames = generateNoteNames(currentEDO);
     if (i < 0) {
         let n = 0;
         while (i < 0) {
             i += currentEDO;
             n += 1;
         }
-
         const octave = Math.floor(i / currentEDO) - n;
-        const nameIndex = Math.round(((i % currentEDO) / currentEDO) * 12);
-        return [PITCHES2[(nameIndex + PITCHES2.indexOf("A")) % 12], octave];
+        const nameIndex = i % currentEDO;
+        return [edoNames[nameIndex], octave];
     } else {
         const octave = Math.floor(i / currentEDO);
-        const nameIndex = Math.round(((i % currentEDO) / currentEDO) * 12);
-        return [PITCHES2[(nameIndex + PITCHES2.indexOf("A")) % 12], octave];
+        const nameIndex = i % currentEDO;
+        return [edoNames[nameIndex], octave];
     }
 };
 
@@ -4705,21 +4728,33 @@ const numberToPitch = (i, temperament, startPitch, offset, activity) => {
         }
 
         if (temperament === "equal") {
-            const nameIndex = Math.round(((i % currentEDO) / currentEDO) * 12);
-            return [
-                PITCHES[(nameIndex + PITCHES.indexOf("A")) % 12],
-                Math.floor((i + PITCHES.indexOf("A")) / currentEDO) - n
-            ];
+            if (currentEDO === 12) {
+                const nameIndex = Math.round(((i % currentEDO) / currentEDO) * 12);
+                return [
+                    PITCHES[(nameIndex + PITCHES.indexOf("A")) % 12],
+                    Math.floor((i + PITCHES.indexOf("A")) / currentEDO) - n
+                ];
+            } else {
+                const edoNames = generateNoteNames(currentEDO);
+                const nameIndex = i % currentEDO;
+                return [edoNames[nameIndex], Math.floor(i / currentEDO) - n];
+            }
         } else {
             pitchNumber = Math.floor(i - offset);
         }
     } else {
         if (temperament === "equal") {
-            const nameIndex = Math.round(((i % currentEDO) / currentEDO) * 12);
-            return [
-                PITCHES[(nameIndex + PITCHES.indexOf("A")) % 12],
-                Math.floor((i + PITCHES.indexOf("A")) / currentEDO)
-            ];
+            if (currentEDO === 12) {
+                const nameIndex = Math.round(((i % currentEDO) / currentEDO) * 12);
+                return [
+                    PITCHES[(nameIndex + PITCHES.indexOf("A")) % 12],
+                    Math.floor((i + PITCHES.indexOf("A")) / currentEDO)
+                ];
+            } else {
+                const edoNames = generateNoteNames(currentEDO);
+                const nameIndex = i % currentEDO;
+                return [edoNames[nameIndex], Math.floor(i / currentEDO)];
+            }
         } else {
             pitchNumber = Math.floor(i - offset);
         }
@@ -4769,14 +4804,34 @@ const numberToPitch = (i, temperament, startPitch, offset, activity) => {
         }
     } else {
         const temperamentPitchNumber = TEMPERAMENT[temperament]["pitchNumber"] || 12;
-        const intervalArray = TEMPERAMENT[temperament]["interval"];
+        const noteNames = generateNoteNames(temperamentPitchNumber);
+
+        // Determine the starting note's position in the EDO name table.
+        let startPos = 0;
+        let baseOctave = 4;
+        if (startPitch) {
+            const octMatch = startPitch.match(/(-?\d+)$/);
+            if (octMatch) {
+                baseOctave = parseInt(octMatch[1], 10);
+                startPitch = startPitch.slice(0, -octMatch[1].length);
+            }
+            const normalized = startPitch.replace(/#/g, SHARP).replace(/b/g, FLAT);
+            const pos = noteNames.indexOf(normalized);
+            if (pos !== -1) {
+                startPos = pos;
+            }
+        }
+
         const idx =
             ((pitchNumber % temperamentPitchNumber) + temperamentPitchNumber) %
             temperamentPitchNumber;
         const octaveOffset = Math.floor(pitchNumber / temperamentPitchNumber);
-        interval = intervalArray[idx];
-        const noteObj = getNoteFromInterval(startPitch, interval);
-        return [noteObj[0], noteObj[1] + octaveOffset];
+        const noteName =
+            noteNames[
+                (((startPos + idx) % temperamentPitchNumber) + temperamentPitchNumber) %
+                    temperamentPitchNumber
+            ];
+        return [noteName, baseOctave + octaveOffset];
     }
 };
 
@@ -4851,12 +4906,13 @@ function base64Encode(str) {
  * @function
  * @param {string|number} noteArg - The note name or pitch number.
  * @param {number} octave - The octave value.
- * @param {number} transposition - The transposition value.
+ * @param {number} transposition - The transposition value (semitones, or EDO steps if isAlreadyEdoSteps is true).
  * @param {string} keySignature - The key signature (default is "C major").
  * @param {boolean} movable - Whether the key signature is movable (default is false).
  * @param {string} direction - The direction of the note (unused parameter).
  * @param {string} errorMsg - The error message (unused parameter).
  * @param {string} [temperament="equal"] - The temperament to use (default is "equal").
+ * @param {boolean} [isAlreadyEdoSteps=false] - If true, transposition is already in EDO steps; skip semitone-to-EDO conversion.
  * @returns {Array} An array containing the note, octave, and cents
  */
 function getNote(
@@ -4867,7 +4923,8 @@ function getNote(
     movable,
     direction,
     errorMsg,
-    temperament
+    temperament,
+    isAlreadyEdoSteps
 ) {
     if (typeof noteArg === "number") {
         noteArg = noteArg.toString();
@@ -4904,9 +4961,12 @@ function getNote(
         transpositionCents = (transposition - transpositionFloor) * 100;
     }
 
-    // Scale transposition from semitones to EDO steps
-    if (octaveLength !== 12) {
-        transpositionFloor = Math.round((transpositionFloor * octaveLength) / 12);
+    // Scale transposition from semitones to EDO steps.
+    // Use the original transposition value (not the already-floored transpositionFloor)
+    // to preserve fractional precision during conversion.
+    // Skip this conversion if transposition is already in EDO steps (non-equal temperaments).
+    if (octaveLength !== 12 && !isAlreadyEdoSteps) {
+        transpositionFloor = Math.round((transposition * octaveLength) / 12);
     }
 
     if (typeof noteArg !== "number") {
@@ -5636,7 +5696,8 @@ const buildScale = keySignature => {
         currentEDO = getCurrentEDO(globalActivity.logo.synth.inTemperament);
     }
 
-    // For non-12 EDO: use EDO-specific note names and handle octave wrapping
+    // For non-12 EDO: convert 12-EDO semitone intervals to EDO step counts
+    // using cumulative positions to preserve the total interval sum.
     if (currentEDO !== 12) {
         const edoNames = generateNoteNames(currentEDO);
         let idx = edoNames.indexOf(myKeySignature);
@@ -5644,13 +5705,31 @@ const buildScale = keySignature => {
             idx = 0;
         }
 
+        // Convert semitone intervals to EDO step intervals via cumulative positions
+        const edoHalfSteps = [];
+        let cumSemitones = 0;
+        let cumEdoPos = 0;
+        for (let i = 0; i < halfSteps.length; i++) {
+            cumSemitones += halfSteps[i];
+            const newCumEdoPos = Math.round((cumSemitones * currentEDO) / 12);
+            let step = newCumEdoPos - cumEdoPos;
+            // When EDO < scale degrees (e.g. 5-EDO major), cumulative rounding
+            // can produce 0-length intervals. Ensure minimum step of 1 so that
+            // stepping never gets stuck on a repeated note.
+            if (step < 1) {
+                step = 1;
+            }
+            edoHalfSteps.push(step);
+            cumEdoPos += step;
+        }
+
         const scale = [myKeySignature];
         let ii = idx;
-        for (let i = 0; i < halfSteps.length; i++) {
-            ii = (ii + halfSteps[i] + edoNames.length) % edoNames.length;
+        for (let i = 0; i < edoHalfSteps.length; i++) {
+            ii = (ii + edoHalfSteps[i] + edoNames.length) % edoNames.length;
             scale.push(edoNames[ii]);
         }
-        return [scale, halfSteps];
+        return [scale, edoHalfSteps];
     }
 
     let thisScale;
@@ -6420,7 +6499,11 @@ const toFraction = d => {
     let top = 1;
     let bot = 1;
 
+    let iterGuard = 0;
     while (Math.abs(df - d) > 0.00000001) {
+        if (iterGuard++ > 10000) {
+            break;
+        }
         if (df < d) {
             top += 1;
         } else {
@@ -7309,6 +7392,7 @@ if (typeof module !== "undefined" && module.exports) {
         getVoiceIcon,
         getVoiceSynthName,
         isCustomTemperament,
+        isTrueEDO,
         getTemperamentRatio,
         getTemperamentCents,
         getTemperamentName,

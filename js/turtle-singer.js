@@ -24,7 +24,7 @@
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
    noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction,
-   SEMITONES, normalizeNoteAccidentals, parseNoteString, getCurrentEDO
+   SEMITONES, normalizeNoteAccidentals, parseNoteString, getCurrentEDO, isTrueEDO
  */
 
 /*
@@ -312,6 +312,8 @@ class Singer {
 
         const activity = logo.activity;
         const tur = activity.turtles.ithTurtle(turtle);
+        const temper = logo.synth.inTemperament;
+        const edo = getCurrentEDO(temper);
 
         let noteObj = getNote(
             note,
@@ -321,47 +323,62 @@ class Singer {
             tur.singer.movable,
             null,
             activity.errorMsg,
-            logo.synth.inTemperament
+            temper
         );
 
-        if (isCustomTemperament(logo.synth.inTemperament)) {
+        if (isCustomTemperament(temper)) {
             noteObj = getNote(
                 noteObj[0],
                 noteObj[1],
                 steps > 0
-                    ? getStepSizeUp(
-                          tur.singer.keySignature,
-                          noteObj[0],
-                          steps,
-                          logo.synth.inTemperament
-                      )
-                    : getStepSizeDown(
-                          tur.singer.keySignature,
-                          noteObj[0],
-                          steps,
-                          logo.synth.inTemperament
-                      ),
+                    ? getStepSizeUp(tur.singer.keySignature, noteObj[0], steps, temper)
+                    : getStepSizeDown(tur.singer.keySignature, noteObj[0], steps, temper),
                 tur.singer.keySignature,
                 tur.singer.movable,
                 null,
                 activity.errorMsg,
-                logo.synth.inTemperament
+                temper
             );
-        } else {
-            const curTemp = logo.synth.inTemperament;
-            const curEDO = getCurrentEDO(curTemp);
+        } else if (!isTrueEDO(temper)) {
+            // Non-equal temperaments (JI, meantone, Pythagorean): skip the
+            // lossy (stepEdo * 12) / curEDO semitone conversion. Pass EDO
+            // steps directly to getNote which handles temperament lookup.
+            const curTemp = temper;
             for (let i = 0; i < Math.abs(steps); i++) {
-                let stepSize =
+                const stepEdo =
                     steps > 0
                         ? getStepSizeUp(tur.singer.keySignature, noteObj[0], undefined, curTemp)
                         : getStepSizeDown(tur.singer.keySignature, noteObj[0], undefined, curTemp);
-                if (curEDO !== 12) {
-                    stepSize = (stepSize * 12) / curEDO;
-                }
+
                 noteObj = getNote(
                     noteObj[0],
                     noteObj[1],
-                    stepSize,
+                    stepEdo,
+                    tur.singer.keySignature,
+                    tur.singer.movable,
+                    null,
+                    activity.errorMsg,
+                    curTemp,
+                    true // isAlreadyEdoSteps — skip semitone-to-EDO conversion
+                );
+            }
+        } else {
+            const curTemp = temper;
+            const curEDO = edo;
+            for (let i = 0; i < Math.abs(steps); i++) {
+                let stepEdo =
+                    steps > 0
+                        ? getStepSizeUp(tur.singer.keySignature, noteObj[0], undefined, curTemp)
+                        : getStepSizeDown(tur.singer.keySignature, noteObj[0], undefined, curTemp);
+                // _getStepSize returns EDO step counts (from EDO-aware buildScale).
+                // Convert to semitones so getNote's EDO conversion restores
+                // the correct EDO step count via exact round-trip.
+                const stepSemi = curEDO !== 12 ? (stepEdo * 12) / curEDO : stepEdo;
+
+                noteObj = getNote(
+                    noteObj[0],
+                    noteObj[1],
+                    stepSemi,
                     tur.singer.keySignature,
                     tur.singer.movable,
                     null,

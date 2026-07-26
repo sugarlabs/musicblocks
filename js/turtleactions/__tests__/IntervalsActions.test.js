@@ -31,6 +31,7 @@ describe("setupIntervalsActions", () => {
 
         // Mock temperament globals only for this test
         global.isCustomTemperament = jest.fn(() => false);
+        global.isTrueEDO = jest.fn(() => true);
         global.TEMPERAMENT = { equal: { pitchNumber: 12 } };
 
         // Set up test-specific mocks for SEMITONETOINTERVALMAP and ALLNOTESTEP
@@ -129,6 +130,7 @@ describe("setupIntervalsActions", () => {
     afterEach(() => {
         // Clean up globals to prevent test pollution
         delete global.isCustomTemperament;
+        delete global.isTrueEDO;
         delete global.TEMPERAMENT;
     });
 
