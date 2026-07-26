@@ -3160,6 +3160,21 @@ describe("getNote additional paths", () => {
             0
         ]);
     });
+
+    it("uses transpositionFloor (not raw transposition) for custom temperament note stepping", () => {
+        addTemperamentToDictionary("testtemp", {
+            pitchNumber: 12,
+            interval: TEMPERAMENT.equal.interval
+        });
+
+        // transposition = 2.5 → transpositionFloor = 2, cents = 50
+        // With the bug, deltaNote was 2.5 % 12 = 2.5 (fractional),
+        // causing incorrect interval lookup.
+        // With the fix, deltaNote is 2 % 12 = 2 (integer).
+        const result = getNote("C", 4, 2.5, "C major", false, undefined, undefined, "testtemp");
+        expect(result[0]).toBe("D");
+        expect(result[1]).toBe(4);
+    });
 });
 
 describe("scaleDegreeToPitchMapping extended modes", () => {

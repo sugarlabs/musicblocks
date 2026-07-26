@@ -5234,7 +5234,7 @@ function getNote(
                 deltaNote = -(-transpositionFloor % octaveLength);
             } else {
                 deltaOctave = Math.floor(transpositionFloor / octaveLength);
-                deltaNote = transposition % octaveLength;
+                deltaNote = transpositionFloor % octaveLength;
             }
 
             octave += deltaOctave;
