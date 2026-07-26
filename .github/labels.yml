@@ -5,6 +5,10 @@
 # related concepts (e.g. "bug fix" on PRs and "Issue-Bug" on issues) share
 # the same color.
 #
+# Names must match the repo's existing labels EXACTLY (case-sensitive) or
+# the syncer will create duplicates instead of recoloring the originals.
+# Verified against github.com/sugarlabs/musicblocks/labels.
+#
 # To add or update a label: edit this file and open a PR. The sync
 # workflow will create/update the label in the repo automatically once
 # merged to master.
@@ -29,30 +33,22 @@
   color: EC4899
   description: UI/UX bugs, inconsistencies, or improvement suggestions
 
-- name: testing
+- name: Issue-Testing
   color: 3B82F6
   description: Adds or updates test coverage
 
-- name: good first issue
-  color: 7EE787
-  description: Good for newcomers
-
-- name: help wanted
-  color: FBCA04
-  description: Extra attention is needed
-
-- name: question
+- name: Issue-Question
   color: D876E3
   description: Further information is requested
 
-- name: needs discussion
-  color: 6E7781
-  description: Requires maintainer/community discussion before proceeding
-
-- name: wontfix
+- name: Issue-Wontfix
   color: FFFFFF
   description: This will not be worked on
 
-- name: duplicate
+- name: Issue-Duplicate
   color: CFD3D7
   description: This issue or pull request already exists
+
+- name: Good first issue
+  color: 7EE787
+  description: Good for newcomers
