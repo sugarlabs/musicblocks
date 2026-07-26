@@ -3338,3 +3338,57 @@ describe("actual drum lookup helpers", () => {
         expect(actualMusicUtils.getDrumSymbol("missing")).toBe("hh");
     });
 });
+
+describe("_getStepSize freeze guard (non-12 EDO temperaments)", () => {
+    const cases = [
+        ["C major", "G#", "up", "equal17"],
+        ["C major", "G#", "down", "equal17"],
+        ["C major", "G#", "up", "equal19"],
+        ["C major", "G#", "down", "equal19"],
+        ["C major", "C", "up", "equal31"],
+        ["C major", "F#", "up", "equal31"],
+        ["F# major", "C", "up", "equal19"],
+        ["F# major", "E#", "down", "equal19"],
+        ["Bb major", "C", "down", "equal17"],
+        ["Bb major", "G", "up", "equal31"]
+    ];
+    for (const [key, pitch, direction, temperament] of cases) {
+        it(`returns number for ${temperament} ${key} ${pitch} ${direction}`, () => {
+            const result = _getStepSize(key, pitch, direction, 0, temperament);
+            expect(typeof result).toBe("number");
+        });
+    }
+});
+
+describe("pitchToNumber A reference for non-12 EDO", () => {
+    it("A4 maps to 440 Hz for all EDOs", () => {
+        const edos = [
+            ["equal5", 5],
+            ["equal7", 7],
+            ["equal", 12],
+            ["equal17", 17],
+            ["equal19", 19],
+            ["equal31", 31]
+        ];
+        for (const [temp, edo] of edos) {
+            const freq = pitchToFrequency("A", 4, 0, "C major", temp);
+            expect(freq).toBeCloseTo(440, 0);
+        }
+    });
+
+    it("C4 is approximately 261-270 Hz for all EDOs", () => {
+        const edos = [
+            ["equal5", 5],
+            ["equal7", 7],
+            ["equal", 12],
+            ["equal17", 17],
+            ["equal19", 19],
+            ["equal31", 31]
+        ];
+        for (const [temp, edo] of edos) {
+            const freq = pitchToFrequency("C", 4, 0, "C major", temp);
+            expect(freq).toBeGreaterThan(240);
+            expect(freq).toBeLessThan(280);
+        }
+    });
+});

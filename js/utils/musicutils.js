@@ -4261,7 +4261,12 @@ const pitchToNumber = (pitch, octave, keySignature, temperament) => {
     // consistent with the table's natural positions.
     if (currentEDO !== 12) {
         const names = generateNoteNames(currentEDO);
-        const aIndex = names.indexOf("A");
+        let aIndex = names.indexOf("A");
+        if (aIndex === -1) {
+            // For EDO < 10, A may not appear in the note name table.
+            // Use its proportional position from 12-EDO (A is at index 9).
+            aIndex = Math.round((9 / 12) * currentEDO);
+        }
         const normalizedPitch = originalPitch.replaceAll("#", SHARP).replaceAll("b", FLAT);
         let edoPos = names.indexOf(normalizedPitch);
         if (edoPos === -1) {
@@ -5422,7 +5427,7 @@ function getNote(
                 deltaNote = -(-transpositionFloor % octaveLength);
             } else {
                 deltaOctave = Math.floor(transpositionFloor / octaveLength);
-                deltaNote = transposition % octaveLength;
+                deltaNote = transpositionFloor % octaveLength;
             }
 
             octave += deltaOctave;
@@ -5845,7 +5850,11 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
     if (startIndex !== -1) {
         // Convert starting 12-EDO index to approximate EDO step position
         let edoStep = Math.round((startIndex * currentEDO) / PITCHES.length);
-        while (!scale.includes(thisPitch)) {
+        let guard = 0;
+        while (!scale.some(s => logicalEquals(s, thisPitch))) {
+            if (guard++ > currentEDO + 12) {
+                break;
+            }
             if (direction === "up") {
                 edoStep += 1;
                 offset += 1;
@@ -5865,7 +5874,11 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
     startIndex = PITCHES2.indexOf(thisPitch);
     if (startIndex !== -1) {
         let edoStep = Math.round((startIndex * currentEDO) / PITCHES2.length);
-        while (!scale.includes(thisPitch)) {
+        let guard = 0;
+        while (!scale.some(s => logicalEquals(s, thisPitch))) {
+            if (guard++ > currentEDO + 12) {
+                break;
+            }
             if (direction === "up") {
                 edoStep += 1;
                 offset += 1;
