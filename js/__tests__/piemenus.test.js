@@ -79,15 +79,6 @@ global.platformColor = {
     accidentalsWheelcolorspush: "#cccccc"
 };
 global._ = jest.fn(s => s);
-global.NOTENAMES = ["C", "D", "E", "F", "G", "A", "B"];
-global.SOLFEGENAMES = ["do", "re", "mi", "fa", "sol", "la", "ti"];
-global.FIXEDSOLFEGE = { do: "C", re: "D", mi: "E", fa: "F", sol: "G", la: "A", ti: "B" };
-global.SHARP = "♯";
-global.FLAT = "♭";
-global.NATURAL = "♮";
-global.DOUBLESHARP = "𝄪";
-global.DOUBLEFLAT = "𝄫";
-global.EQUIVALENTACCIDENTALS = { F: "E♯", C: "B♯", B: "C♭", E: "F♭", G: "F𝄪", D: "C𝄪", A: "G𝄪" };
 global.Tone = {
     start: jest.fn().mockResolvedValue(),
     context: { state: "running" }

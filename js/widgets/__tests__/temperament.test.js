@@ -98,9 +98,6 @@ describe("TemperamentWidget basic tests", () => {
             DonutSliceCustomization: () => ({})
         }));
 
-        global.FLAT = "♭";
-        global.SHARP = "♯";
-
         const mockElements = {};
         global.docById = jest.fn(id => {
             if (!mockElements[id]) {
