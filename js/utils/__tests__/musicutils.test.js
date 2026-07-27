@@ -3392,3 +3392,50 @@ describe("pitchToNumber A reference for non-12 EDO", () => {
         }
     });
 });
+
+describe("EDO octave boundary resolution", () => {
+    it("resolves 19-EDO scale degrees 0–21 across the C4–C5 octave boundary", () => {
+        const temper = "equal19";
+        const c4pn = pitchToNumber("C", 4, "C major", temper);
+
+        // Degree 0  → C4
+        expect(numberToPitch(c4pn, temper)).toEqual(["C", 4]);
+        expect(pitchToFrequency("C", 4, 0, "C major", temper)).toBeCloseTo(264.02, 1);
+
+        // Degree 18 → B♯4 (last degree before octave completion)
+        expect(numberToPitch(c4pn + 18, temper)).toEqual(["B" + SHARP, 4]);
+
+        // Degree 19 → C5 (octave completion, N = EDO)
+        expect(numberToPitch(c4pn + 19, temper)).toEqual(["C", 5]);
+        expect(pitchToFrequency("C", 5, 0, "C major", temper)).toBeCloseTo(528.05, 1);
+
+        // Verify exact octave ratio
+        const c4freq = pitchToFrequency("C", 4, 0, "C major", temper);
+        const c5freq = pitchToFrequency("C", 5, 0, "C major", temper);
+        expect(c5freq / c4freq).toBeCloseTo(2.0, 4);
+
+        // Degree 21 → D♭5 (first step into next octave)
+        expect(numberToPitch(c4pn + 21, temper)).toEqual(["D" + FLAT, 5]);
+        expect(pitchToFrequency("D" + FLAT, 5, 0, "C major", temper)).toBeCloseTo(568.01, 1);
+    });
+
+    it.each([
+        ["equal", 12],
+        ["equal17", 17],
+        ["equal19", 19],
+        ["equal31", 31]
+    ])("resolves degree N = %s-EDO to C5 with exact octave ratio", (temper, edo) => {
+        const c4pn = pitchToNumber("C", 4, "C major", temper);
+
+        // Degree 0 → C4
+        expect(numberToPitch(c4pn, temper)).toEqual(["C", 4]);
+
+        // Degree N → C5 (octave completion)
+        expect(numberToPitch(c4pn + edo, temper)).toEqual(["C", 5]);
+
+        // Exact octave ratio: C5 = 2 × C4
+        const c4freq = pitchToFrequency("C", 4, 0, "C major", temper);
+        const c5freq = pitchToFrequency("C", 5, 0, "C major", temper);
+        expect(c5freq / c4freq).toBeCloseTo(2.0, 4);
+    });
+});

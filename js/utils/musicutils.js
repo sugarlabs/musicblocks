@@ -4772,7 +4772,7 @@ const numberToPitch = (i, temperament, startPitch, offset, activity) => {
             n += 1; // Count octave bump ups.
         }
 
-        if (temperament === "equal") {
+        if (isTrueEDO(temperament)) {
             if (currentEDO === 12) {
                 const nameIndex = Math.round(((i % currentEDO) / currentEDO) * 12);
                 return [
@@ -4781,14 +4781,18 @@ const numberToPitch = (i, temperament, startPitch, offset, activity) => {
                 ];
             } else {
                 const edoNames = generateNoteNames(currentEDO);
-                const nameIndex = i % currentEDO;
-                return [edoNames[nameIndex], Math.floor(i / currentEDO) - n];
+                let aIndex = edoNames.indexOf("A");
+                if (aIndex === -1) {
+                    aIndex = Math.round((9 / 12) * currentEDO);
+                }
+                const nameIndex = (((i + aIndex) % currentEDO) + currentEDO) % currentEDO;
+                return [edoNames[nameIndex], Math.floor((i + aIndex) / currentEDO) - n];
             }
         } else {
             pitchNumber = Math.floor(i - offset);
         }
     } else {
-        if (temperament === "equal") {
+        if (isTrueEDO(temperament)) {
             if (currentEDO === 12) {
                 const nameIndex = Math.round(((i % currentEDO) / currentEDO) * 12);
                 return [
@@ -4797,8 +4801,12 @@ const numberToPitch = (i, temperament, startPitch, offset, activity) => {
                 ];
             } else {
                 const edoNames = generateNoteNames(currentEDO);
-                const nameIndex = i % currentEDO;
-                return [edoNames[nameIndex], Math.floor(i / currentEDO)];
+                let aIndex = edoNames.indexOf("A");
+                if (aIndex === -1) {
+                    aIndex = Math.round((9 / 12) * currentEDO);
+                }
+                const nameIndex = (((i + aIndex) % currentEDO) + currentEDO) % currentEDO;
+                return [edoNames[nameIndex], Math.floor((i + aIndex) / currentEDO)];
             }
         } else {
             pitchNumber = Math.floor(i - offset);
