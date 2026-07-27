@@ -5132,24 +5132,26 @@ function getNote(
             noteArg = STOSHARP[noteArg];
         }
 
-        if (noteArg in EXTRATRANSPOSITIONS) {
-            octave += EXTRATRANSPOSITIONS[noteArg][1];
-            note = EXTRATRANSPOSITIONS[noteArg][0];
-        } else if (NOTESSHARP.includes(noteArg.toUpperCase())) {
-            note = noteArg.toUpperCase();
-        } else if (NOTESFLAT.includes(noteArg)) {
-            note = noteArg;
-        } else if (NOTESFLAT2.includes(noteArg)) {
-            // Convert to uppercase, e.g., d♭ -> D♭.
-            note = NOTESFLAT[NOTESFLAT2.indexOf(noteArg)];
-        } else if (octaveLength !== 12) {
-            // For microtonal EDOs, look up against the EDO-specific name table.
-            // generateNoteNames uses repeated SHARP/FLAT characters for accidentals.
+        if (octaveLength !== 12) {
+            // For microtonal EDOs, check the EDO-specific name table first.
+            // This ensures EDO-native entries (e.g. B♯ in 19-EDO at position 18)
+            // are resolved without going through 12-EDO EXTRATRANSPOSITIONS, which
+            // would prematurely convert them to enharmonic equivalents and corrupt
+            // the octave calculation.
             const edoNames = generateNoteNames(octaveLength);
             const normalizedName = noteArg.replaceAll("#", SHARP).replaceAll("b", FLAT);
             const edoIdx = edoNames.indexOf(normalizedName);
             if (edoIdx !== -1) {
                 note = edoNames[edoIdx];
+            } else if (noteArg in EXTRATRANSPOSITIONS) {
+                octave += EXTRATRANSPOSITIONS[noteArg][1];
+                note = EXTRATRANSPOSITIONS[noteArg][0];
+            } else if (NOTESSHARP.includes(noteArg.toUpperCase())) {
+                note = noteArg.toUpperCase();
+            } else if (NOTESFLAT.includes(noteArg)) {
+                note = noteArg;
+            } else if (NOTESFLAT2.includes(noteArg)) {
+                note = NOTESFLAT[NOTESFLAT2.indexOf(noteArg)];
             } else {
                 if (errorMsg !== undefined) {
                     console.debug(
@@ -5165,6 +5167,16 @@ function getNote(
                 }
                 return ["R", "", 0];
             }
+        } else if (noteArg in EXTRATRANSPOSITIONS) {
+            octave += EXTRATRANSPOSITIONS[noteArg][1];
+            note = EXTRATRANSPOSITIONS[noteArg][0];
+        } else if (NOTESSHARP.includes(noteArg.toUpperCase())) {
+            note = noteArg.toUpperCase();
+        } else if (NOTESFLAT.includes(noteArg)) {
+            note = noteArg;
+        } else if (NOTESFLAT2.includes(noteArg)) {
+            // Convert to uppercase, e.g., d♭ -> D♭.
+            note = NOTESFLAT[NOTESFLAT2.indexOf(noteArg)];
         } else {
             if (["#", SHARP, FLAT, "b"].includes(noteArg.substr(-1))) {
                 sharpFlat = true;
@@ -5403,6 +5415,9 @@ function getNote(
         }
 
         // Try to find a note in the current keySignature
+        // When converting through EQUIVALENTNATURALS, B↔C crosses an SPN
+        // octave boundary (B♯4 = C5, C♭4 = B3). Adjust the octave so the
+        // note letter's SPN position matches the actual pitch register.
         switch (getSharpFlatPreference(keySignature)) {
             case "flat":
                 if (note in EQUIVALENTFLATS) {
@@ -5416,7 +5431,14 @@ function getNote(
                 break;
             case "natural":
                 if (note in EQUIVALENTNATURALS) {
+                    const origLetter = note.charAt(0);
                     note = EQUIVALENTNATURALS[note];
+                    const newLetter = note.charAt(0);
+                    if (origLetter === "B" && newLetter === "C") {
+                        octave += 1;
+                    } else if (origLetter === "C" && newLetter === "B") {
+                        octave -= 1;
+                    }
                 }
                 break;
             default:
