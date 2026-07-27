@@ -69,6 +69,18 @@ class PhraseMaker {
     // stylePhraseMaker();
 
     /**
+     * This widget's AMD module dependencies, declared on the definition
+     * itself (mirrors the capability metadata on Protoblock).
+     */
+    static dependencies = [
+        "widgets/PhraseMakerUtils",
+        "widgets/PhraseMakerGrid",
+        "widgets/PhraseMakerUI",
+        "widgets/PhraseMakerAudio",
+        "widgets/phrasemaker"
+    ];
+
+    /**
      * Constructs a new instance of the PhraseMaker.
      * @param {object} deps - Explicit dependencies for the widget
      */
