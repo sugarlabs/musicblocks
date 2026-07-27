@@ -82,10 +82,14 @@ global.last = arr => (arr && arr.length ? arr[arr.length - 1] : undefined);
 
 // Mock widget classes
 global.MeterWidget = jest.fn();
+global.MeterWidget.dependencies = ["widgets/meterwidget"];
 global.Oscilloscope = jest.fn();
+global.Oscilloscope.dependencies = ["widgets/oscilloscope"];
 global.ModeWidget = jest.fn();
+global.ModeWidget.dependencies = ["widgets/modewidget"];
 global.StatusMatrix = jest.fn(() => ({ init: jest.fn() }));
 global.Tempo = jest.fn(() => ({ BPMBlocks: [], BPMs: [], init: jest.fn() }));
+global.Tempo.dependencies = ["widgets/tempo"];
 global.TimbreWidget = jest.fn(() => ({
     instrumentName: "testInstrument",
     blockNo: null,
@@ -118,23 +122,44 @@ global.TimbreWidget = jest.fn(() => ({
     },
     init: jest.fn()
 }));
+global.TimbreWidget.dependencies = ["widgets/timbre"];
 global.SampleWidget = jest.fn(() => ({ init: jest.fn() }));
+global.SampleWidget.dependencies = ["widgets/sampler"];
 global.AIDebuggerWidget = jest.fn(() => ({ init: jest.fn() }));
+global.AIDebuggerWidget.dependencies = ["widgets/aidebugger"];
 global.TemperamentWidget = jest.fn(() => ({
     inTemperament: null,
     scale: null,
     init: jest.fn()
 }));
+global.TemperamentWidget.dependencies = ["widgets/temperament"];
 
 global.MusicKeyboard = jest.fn();
+global.MusicKeyboard.dependencies = ["widgets/musickeyboard"];
 global.PhraseMaker = jest.fn();
+global.PhraseMaker.dependencies = [
+    "widgets/PhraseMakerUtils",
+    "widgets/PhraseMakerGrid",
+    "widgets/PhraseMakerUI",
+    "widgets/PhraseMakerAudio",
+    "widgets/phrasemaker"
+];
 global.Arpeggio = jest.fn();
+global.Arpeggio.dependencies = ["widgets/arpeggio"];
 global.PitchDrumMatrix = jest.fn();
+global.PitchDrumMatrix.dependencies = ["widgets/pitchdrummatrix"];
 global.PitchSlider = jest.fn();
+global.PitchSlider.dependencies = ["widgets/pitchslider"];
 global.PitchStaircase = jest.fn();
+global.PitchStaircase.dependencies = ["widgets/pitchstaircase"];
 global.RhythmRuler = jest.fn();
+global.RhythmRuler.dependencies = ["widgets/rhythmruler"];
 global.ReflectionMatrix = jest.fn();
+global.ReflectionMatrix.dependencies = ["widgets/reflection"];
 global.LegoWidget = jest.fn();
+global.LegoWidget.dependencies = ["widgets/legobricks"];
+global.AIWidget = jest.fn(() => ({ init: jest.fn() }));
+global.AIWidget.dependencies = ["widgets/aiwidget"];
 
 global.platformColor = jest.fn();
 global.docById = jest.fn();
@@ -625,6 +650,102 @@ describe("setupWidgetBlocks", () => {
             listener();
 
             expect(initSnapshots[1]).toEqual(["field1:beatvalue"]);
+        });
+    });
+
+    describe("Widget dependency metadata wiring", () => {
+        // _ensureWidget()/_lazyRequire() are local closures inside
+        // setupWidgetBlocks() and aren't exported, so their `modules`
+        // argument can't be intercepted at runtime without changing the
+        // loader itself. Instead, assert directly against the source that
+        // each call site reads modules from the widget's own static
+        // `dependencies`, not a hardcoded literal -- this is the one thing
+        // that actually matters for "single source of truth."
+        const widgetBlocksSource = require("fs").readFileSync(
+            require("path").join(__dirname, "..", "WidgetBlocks.js"),
+            "utf8"
+        );
+
+        it.each([
+            ["temperament", "TemperamentWidget"],
+            ["sample", "SampleWidget"],
+            ["timbre", "TimbreWidget"],
+            ["tempo", "Tempo"],
+            ["arpeggio", "Arpeggio"],
+            ["pitchDrumMatrix", "PitchDrumMatrix"],
+            ["pitchSlider", "PitchSlider"],
+            ["musicKeyboard", "MusicKeyboard"],
+            ["pitchStaircase", "PitchStaircase"],
+            ["rhythmRuler", "RhythmRuler"],
+            ["phraseMaker", "PhraseMaker"],
+            ["aiMusic", "AIWidget"],
+            ["reflection", "ReflectionMatrix"],
+            ["legoWidget", "LegoWidget"],
+            ["aiDebugger", "AIDebuggerWidget"]
+        ])(
+            "_ensureWidget's %s call site reads modules from %s.dependencies",
+            (widgetKey, className) => {
+                const callSite = new RegExp(
+                    `_ensureWidget\\(\\s*logo,\\s*"${widgetKey}",\\s*${className}\\.dependencies,`
+                );
+                expect(widgetBlocksSource).toMatch(callSite);
+            }
+        );
+
+        it.each(["MeterWidget", "Oscilloscope", "ModeWidget"])(
+            "_lazyRequire's %s call site reads modules from its own dependencies",
+            className => {
+                expect(widgetBlocksSource).toMatch(
+                    new RegExp(`_lazyRequire\\(${className}\\.dependencies,`)
+                );
+            }
+        );
+
+        // Exercise the previously-untested call sites so the metadata read
+        // (Widget.dependencies) actually executes, not just gets matched
+        // textually above.
+        it.each([
+            ["arpeggiomatrix", "arpBlk", "arpeggio", global.Arpeggio],
+            ["pitchdrummatrix", "pdmBlk", "pitchDrumMatrix", global.PitchDrumMatrix],
+            ["pitchslider", "psBlk", "pitchSlider", global.PitchSlider],
+            ["pitchstaircase", "pstBlk", "pitchStaircase", global.PitchStaircase],
+            ["rhythmruler2", "rrBlk", "rhythmRuler", global.RhythmRuler],
+            ["reflection", "reflBlk", "reflection", global.ReflectionMatrix],
+            ["legobricks", "legoBlk", "legoWidget", global.LegoWidget]
+        ])("%s lazy-loads its widget on first use", (type, blk, logoKey, Widget) => {
+            const block = getBlock(type);
+
+            const interruption = block.flow(["childBlk"], logo, 0, blk, "received");
+
+            expect(interruption).toEqual([null, 0, true]);
+            expect(Widget).toHaveBeenCalledTimes(1);
+            expect(logo[logoKey]).toBeDefined();
+        });
+
+        it.each([
+            ["meterwidget", "meterBlk", "meterWidget", global.MeterWidget],
+            ["oscilloscope", "oscBlk", "Oscilloscope", global.Oscilloscope],
+            ["modewidget", "modeBlk", "modeWidget", global.ModeWidget]
+        ])("%s lazy-loads its widget once its listener fires", (type, blk, logoKey, Widget) => {
+            const block = getBlock(type);
+            block.flow(["childBlk"], logo, 0, blk);
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+
+            listener();
+
+            expect(Widget).toHaveBeenCalledTimes(1);
+            expect(logo[logoKey]).toBeDefined();
+        });
+
+        it("aimusic lazy-loads AIWidget once its listener fires", () => {
+            const aiMusic = getBlock("aimusic");
+            aiMusic.flow(["childBlk"], logo, 0, "aiMusicBlk");
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+
+            listener();
+
+            expect(global.AIWidget).toHaveBeenCalledTimes(1);
+            expect(logo.aiMusic).toBeDefined();
         });
     });
 });
