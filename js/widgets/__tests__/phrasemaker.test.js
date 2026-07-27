@@ -1371,3 +1371,21 @@ describe("PhraseMaker Widget", () => {
         phraseMaker._blockReplace(0, 1);
     });
 });
+
+describe("PhraseMaker.dependencies", () => {
+    test("declares its AMD module dependencies as definition-attached metadata", () => {
+        expect(Array.isArray(PhraseMaker.dependencies)).toBe(true);
+        expect(PhraseMaker.dependencies).toEqual([
+            "widgets/PhraseMakerUtils",
+            "widgets/PhraseMakerGrid",
+            "widgets/PhraseMakerUI",
+            "widgets/PhraseMakerAudio",
+            "widgets/phrasemaker"
+        ]);
+    });
+
+    test("is not read by widget instances at construction time", () => {
+        const instance = new PhraseMaker({});
+        expect(instance.dependencies).toBeUndefined();
+    });
+});

@@ -69,6 +69,23 @@ class PhraseMaker {
     // stylePhraseMaker();
 
     /**
+     * Declarative list of this widget's AMD module dependencies, attached to
+     * the widget definition itself (mirrors the additive capability metadata
+     * on Protoblock in js/protoblocks.js). This is descriptive metadata only:
+     * WidgetBlocks.js's _ensureWidget() still receives its own explicit
+     * modules array and does not read this property. Keeping the two in sync
+     * is a manual step for now; a future change can have the loader consume
+     * this list directly instead of a hardcoded literal.
+     */
+    static dependencies = [
+        "widgets/PhraseMakerUtils",
+        "widgets/PhraseMakerGrid",
+        "widgets/PhraseMakerUI",
+        "widgets/PhraseMakerAudio",
+        "widgets/phrasemaker"
+    ];
+
+    /**
      * Constructs a new instance of the PhraseMaker.
      * @param {object} deps - Explicit dependencies for the widget
      */
