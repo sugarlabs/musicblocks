@@ -53,6 +53,12 @@
  * rotating, and inverting modes.
  */
 class ModeWidget {
+    /**
+     * This widget's AMD module dependencies, declared on the definition
+     * itself (mirrors the capability metadata on Protoblock).
+     */
+    static dependencies = ["widgets/modewidget"];
+
     static ICONSIZE = 32;
     static BUTTONSIZE = 53;
     static ROTATESPEED = 125;

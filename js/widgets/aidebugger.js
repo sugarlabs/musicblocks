@@ -15,6 +15,12 @@
 offering intelligent assistance, cool suggestions, and helping take your musical creations to new heights! */
 
 /**
+ * This widget's AMD module dependencies, declared on the definition
+ * itself (mirrors the capability metadata on Protoblock).
+ */
+AIDebuggerWidget.dependencies = ["widgets/aidebugger"];
+
+/**
  * Represents a AI Widget.
  * @constructor
  */

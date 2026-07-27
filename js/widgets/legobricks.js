@@ -9,6 +9,12 @@
 */
 
 /**
+ * This widget's AMD module dependencies, declared on the definition
+ * itself (mirrors the capability metadata on Protoblock).
+ */
+LegoWidget.dependencies = ["widgets/legobricks"];
+
+/**
  * Represents a LEGO Bricks Widget with Phrase Maker functionality.
  * @constructor
  */

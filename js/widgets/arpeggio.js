@@ -30,6 +30,12 @@
 /* exported Arpeggio */
 
 class Arpeggio {
+    /**
+     * This widget's AMD module dependencies, declared on the definition
+     * itself (mirrors the capability metadata on Protoblock).
+     */
+    static dependencies = ["widgets/arpeggio"];
+
     static BUTTONDIVWIDTH = 295;
     static CELLSIZE = 28;
     static BUTTONSIZE = 53;

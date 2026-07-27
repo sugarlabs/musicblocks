@@ -19,6 +19,12 @@
 
 /* exported Abhijeet Singh */
 /**
+ * This widget's AMD module dependencies, declared on the definition
+ * itself (mirrors the capability metadata on Protoblock).
+ */
+AIWidget.dependencies = ["widgets/aiwidget"];
+
+/**
  * Represents a AI Widget.
  * @constructor
  */

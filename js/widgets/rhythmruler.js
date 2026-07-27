@@ -65,6 +65,12 @@
  */
 class RhythmRuler {
     /**
+     * This widget's AMD module dependencies, declared on the definition
+     * itself (mirrors the capability metadata on Protoblock).
+     */
+    static dependencies = ["widgets/rhythmruler"];
+
+    /**
      * Height of the RhythmRuler widget.
      * @type {number}
      */

@@ -35,6 +35,12 @@
 /* exported PitchStaircase */
 
 class PitchStaircase {
+    /**
+     * This widget's AMD module dependencies, declared on the definition
+     * itself (mirrors the capability metadata on Protoblock).
+     */
+    static dependencies = ["widgets/pitchstaircase"];
+
     static BUTTONDIVWIDTH = 476; // 8 buttons 476 = (55 + 4) * 8
     static OUTERWINDOWWIDTH = 685;
     static INNERWINDOWWIDTH = 600;

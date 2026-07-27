@@ -31,6 +31,12 @@
 
 /* exported Tempo */
 class Tempo {
+    /**
+     * This widget's AMD module dependencies, declared on the definition
+     * itself (mirrors the capability metadata on Protoblock).
+     */
+    static dependencies = ["widgets/tempo"];
+
     static TEMPOSYNTH = "bottle";
     static TEMPOINTERVAL = 5;
     static BUTTONDIVWIDTH = 476; // 8 buttons 476 = (55 + 4) * 8

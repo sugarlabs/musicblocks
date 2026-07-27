@@ -38,6 +38,12 @@
  * @classdesc pertains to setting up all features of the Oscilloscope Widget.
  */
 class Oscilloscope {
+    /**
+     * This widget's AMD module dependencies, declared on the definition
+     * itself (mirrors the capability metadata on Protoblock).
+     */
+    static dependencies = ["widgets/oscilloscope"];
+
     static ICONSIZE = 40;
     static analyserSize = 8192;
     static DRAW_TIMEOUT = 1000;

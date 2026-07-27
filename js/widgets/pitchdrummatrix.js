@@ -44,6 +44,12 @@
  */
 class PitchDrumMatrix {
     /**
+     * This widget's AMD module dependencies, declared on the definition
+     * itself (mirrors the capability metadata on Protoblock).
+     */
+    static dependencies = ["widgets/pitchdrummatrix"];
+
+    /**
      * Width of the button division.
      *
      * @type {number}

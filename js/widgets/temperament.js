@@ -30,6 +30,12 @@
 /* exported TemperamentWidget */
 
 /**
+ * This widget's AMD module dependencies, declared on the definition
+ * itself (mirrors the capability metadata on Protoblock).
+ */
+TemperamentWidget.dependencies = ["widgets/temperament"];
+
+/**
  * Represents a widget for managing temperament settings.
  * @constructor
  */

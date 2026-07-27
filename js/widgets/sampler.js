@@ -20,6 +20,12 @@
 
 /* exported SampleWidget */
 /**
+ * This widget's AMD module dependencies, declared on the definition
+ * itself (mirrors the capability metadata on Protoblock).
+ */
+SampleWidget.dependencies = ["widgets/sampler"];
+
+/**
  * Represents a Sample Widget.
  * @constructor
  */

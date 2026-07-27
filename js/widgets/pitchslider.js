@@ -23,6 +23,12 @@
 
 /* exported PitchSlider */
 class PitchSlider {
+    /**
+     * This widget's AMD module dependencies, declared on the definition
+     * itself (mirrors the capability metadata on Protoblock).
+     */
+    static dependencies = ["widgets/pitchslider"];
+
     static ICONSIZE = 32;
     static SEMITONE = Math.pow(2, 1 / 12);
 

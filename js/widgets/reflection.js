@@ -19,6 +19,12 @@
  */
 
 class ReflectionMatrix {
+    /**
+     * This widget's AMD module dependencies, declared on the definition
+     * itself (mirrors the capability metadata on Protoblock).
+     */
+    static dependencies = ["widgets/reflection"];
+
     static BUTTONDIVWIDTH = 535;
     static OUTERWINDOWWIDTH = "858px";
     static OUTERWINDOWHEIGHT = "550px";

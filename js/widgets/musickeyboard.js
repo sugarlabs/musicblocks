@@ -41,6 +41,12 @@
 /* exported MusicKeyboard */
 
 /**
+ * This widget's AMD module dependencies, declared on the definition
+ * itself (mirrors the capability metadata on Protoblock).
+ */
+MusicKeyboard.dependencies = ["widgets/musickeyboard"];
+
+/**
  * Represents a Music Keyboard interface.
  * @constructor
  * @param {Activity} activity - The activity associated with the keyboard.
