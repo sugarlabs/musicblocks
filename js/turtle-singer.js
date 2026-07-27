@@ -339,7 +339,7 @@ class Singer {
                 activity.errorMsg,
                 temper,
                 false,
-                true // clampIndex — prevent octave overshoot
+                false // allow octave wrap for scalar traversal
             );
         } else if (!isTrueEDO(temper)) {
             const curTemp = temper;
@@ -358,7 +358,7 @@ class Singer {
                     activity.errorMsg,
                     curTemp,
                     true, // isAlreadyEdoSteps
-                    true // clampIndex
+                    false // allow octave wrap
                 );
             }
         } else {
@@ -381,7 +381,7 @@ class Singer {
                     activity.errorMsg,
                     curTemp,
                     false,
-                    true // clampIndex
+                    false // allow octave wrap
                 );
             }
         }

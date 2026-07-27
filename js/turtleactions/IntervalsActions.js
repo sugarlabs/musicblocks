@@ -21,7 +21,7 @@
 
 /*
    global _, NOINPUTERRORMSG, Singer, MUSICALMODES, MusicBlocks, Mouse, getNote,
-   getModeLength, isCustomTemperament, TEMPERAMENT, getCurrentEDO
+   getModeLength, isCustomTemperament, TEMPERAMENT, getCurrentEDO, EDOBOUNDEXCEEDED
 */
 
 /*
@@ -308,8 +308,19 @@ function setupIntervalsActions(activity) {
                     activity.errorMsg(_("Adding missing pitch number 0."));
                 }
 
-                const pitchNumbers = tur.singer.defineMode.sort((a, b) => a - b);
                 const temperamentLength = Singer.IntervalsActions.getTemperamentLength();
+
+                // Filter out pitches outside [0, temperamentLength - 1]
+                let pitchNumbers = tur.singer.defineMode.sort((a, b) => a - b);
+                const inBounds = pitchNumbers.filter(p => p >= 0 && p < temperamentLength);
+                if (inBounds.length !== pitchNumbers.length) {
+                    activity.errorMsg(EDOBOUNDEXCEEDED, null);
+                }
+                pitchNumbers = inBounds;
+
+                if (pitchNumbers.length > temperamentLength) {
+                    activity.errorMsg(EDOBOUNDEXCEEDED, null);
+                }
 
                 for (let i = 0; i < pitchNumbers.length; i++) {
                     // Apply mod arithmetic for custom temperaments

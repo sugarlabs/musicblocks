@@ -12,7 +12,7 @@
 /*
    global
 
-   _, last, DRUMNAMES, NOISENAMES, VOICENAMES, INVALIDPITCH, EDOBOUNDEXCEEDED,
+   _, last, DRUMNAMES, NOISENAMES, VOICENAMES, INVALIDPITCH,
    CUSTOMSAMPLES, globalActivity
  */
 
@@ -5385,9 +5385,6 @@ function getNote(
                         // Clamp to valid range instead of wrapping across octaves.
                         if (i < 0 || i >= nameTableLength) {
                             i = Math.max(0, Math.min(i, nameTableLength - 1));
-                            if (errorMsg !== undefined) {
-                                errorMsg(EDOBOUNDEXCEEDED, null);
-                            }
                         }
                     } else {
                         if (i < 0) {
