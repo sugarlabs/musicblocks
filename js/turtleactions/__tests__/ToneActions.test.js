@@ -277,6 +277,7 @@ describe("setupToneActions", () => {
                 1
             );
             expect(activity.logo.stopTurtle).toBe(true);
+            expect(targetTurtle.singer.vibratoIntensity).toEqual([]);
             expect(targetTurtle.singer.vibratoRate).toEqual([]);
         });
 
