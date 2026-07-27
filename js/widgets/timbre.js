@@ -39,10 +39,7 @@
 /* exported TimbreWidget */
 
 class TimbreWidget {
-    /**
-     * This widget's AMD module dependencies, declared on the definition
-     * itself (mirrors the capability metadata on Protoblock).
-     */
+    /** AMD module dependencies for lazy loading. */
     static dependencies = ["widgets/timbre"];
 
     static BUTTONSIZE = 53;

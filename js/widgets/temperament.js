@@ -29,10 +29,7 @@
 
 /* exported TemperamentWidget */
 
-/**
- * This widget's AMD module dependencies, declared on the definition
- * itself (mirrors the capability metadata on Protoblock).
- */
+/** AMD module dependencies for lazy loading. */
 TemperamentWidget.dependencies = ["widgets/temperament"];
 
 /**

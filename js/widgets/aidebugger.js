@@ -14,10 +14,7 @@
 /* This widget provides an AI-powered debugging interface for Music Blocks projects,
 offering intelligent assistance, cool suggestions, and helping take your musical creations to new heights! */
 
-/**
- * This widget's AMD module dependencies, declared on the definition
- * itself (mirrors the capability metadata on Protoblock).
- */
+/** AMD module dependencies for lazy loading. */
 AIDebuggerWidget.dependencies = ["widgets/aidebugger"];
 
 /**
