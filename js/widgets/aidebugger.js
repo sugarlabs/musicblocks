@@ -962,14 +962,12 @@ function AIDebuggerWidget() {
                 const childBlockType = Array.isArray(blockMap[childId][1])
                     ? blockMap[childId][1][0]
                     : blockMap[childId][1];
-                if (
-                    !(
-                        childBlockType === "divide" &&
-                        (parentBlockType === "newnote" ||
-                            parentBlockType === "setmasterbpm2" ||
-                            parentBlockType === "arc")
-                    )
-                ) {
+                if (!(
+                    childBlockType === "divide" &&
+                    (parentBlockType === "newnote" ||
+                        parentBlockType === "setmasterbpm2" ||
+                        parentBlockType === "arc")
+                )) {
                     output.push(
                         ...this._processBlock(
                             blockMap[childId],
