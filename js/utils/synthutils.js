@@ -688,6 +688,15 @@ function Synth() {
             [startParsed[0]]: [startParsed[1], frequency]
         };
 
+        // EDO temperaments compute frequencies via pitchToFrequency directly
+        // and never use noteFrequencies, so skip building the table.
+        // This also avoids crashing on microtonal interval names (e.g. "mid 2")
+        // that exist in the temperament definition but not in INTERVALVALUES.
+        if (t && t.isEDO) {
+            this.changeInTemperament = false;
+            return;
+        }
+
         for (const interval in t) {
             if (
                 interval !== "pitchNumber" &&

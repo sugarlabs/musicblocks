@@ -9,6 +9,7 @@ if (typeof global.TextEncoder === "undefined") {
 
 // Set up globals needed by musicutils.js
 global.INVALIDPITCH = "Not a valid pitch name";
+global.EDOBOUNDEXCEEDED = "Pitch index exceeds EDO range";
 
 // Load centralized music constants for all tests
 const {

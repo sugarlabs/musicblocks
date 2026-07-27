@@ -2832,7 +2832,13 @@ class Activity {
                 // Parse and update the custom musical mode with saved data.
                 try {
                     const customModeDataObj = JSON.parse(custommodeData);
-                    Object.assign(MUSICALMODES["custom"], customModeDataObj);
+                    const src = Array.isArray(customModeDataObj)
+                        ? customModeDataObj
+                        : Object.values(customModeDataObj);
+                    for (let i = 0; i < MUSICALMODES["custom"].length; i++) {
+                        const val = Number(src[i]);
+                        MUSICALMODES["custom"][i] = !isNaN(val) && val > 0 ? val : 1;
+                    }
                 } catch (e) {
                     ErrorHandler.recoverable(e, { operation: "parseCustomMode" });
                 }

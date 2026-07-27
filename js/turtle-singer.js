@@ -337,19 +337,17 @@ class Singer {
                 tur.singer.movable,
                 null,
                 activity.errorMsg,
-                temper
+                temper,
+                false,
+                true // clampIndex — prevent octave overshoot
             );
         } else if (!isTrueEDO(temper)) {
-            // Non-equal temperaments (JI, meantone, Pythagorean): skip the
-            // lossy (stepEdo * 12) / curEDO semitone conversion. Pass EDO
-            // steps directly to getNote which handles temperament lookup.
             const curTemp = temper;
             for (let i = 0; i < Math.abs(steps); i++) {
                 const stepEdo =
                     steps > 0
                         ? getStepSizeUp(tur.singer.keySignature, noteObj[0], undefined, curTemp)
                         : getStepSizeDown(tur.singer.keySignature, noteObj[0], undefined, curTemp);
-
                 noteObj = getNote(
                     noteObj[0],
                     noteObj[1],
@@ -359,7 +357,8 @@ class Singer {
                     null,
                     activity.errorMsg,
                     curTemp,
-                    true // isAlreadyEdoSteps — skip semitone-to-EDO conversion
+                    true, // isAlreadyEdoSteps
+                    true // clampIndex
                 );
             }
         } else {
@@ -370,9 +369,6 @@ class Singer {
                     steps > 0
                         ? getStepSizeUp(tur.singer.keySignature, noteObj[0], undefined, curTemp)
                         : getStepSizeDown(tur.singer.keySignature, noteObj[0], undefined, curTemp);
-                // _getStepSize returns EDO step counts (from EDO-aware buildScale).
-                // Convert to semitones so getNote's EDO conversion restores
-                // the correct EDO step count via exact round-trip.
                 const stepSemi = curEDO !== 12 ? (stepEdo * 12) / curEDO : stepEdo;
 
                 noteObj = getNote(
@@ -383,7 +379,9 @@ class Singer {
                     tur.singer.movable,
                     null,
                     activity.errorMsg,
-                    curTemp
+                    curTemp,
+                    false,
+                    true // clampIndex
                 );
             }
         }
@@ -2131,6 +2129,13 @@ class Singer {
                             }
 
                             notes.push(note);
+                            console.log(
+                                i +
+                                    "]=" +
+                                    note +
+                                    " temperament=" +
+                                    activity.logo.synth.inTemperament
+                            );
                         }
 
                         if (duration > 0) {

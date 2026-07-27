@@ -12,8 +12,8 @@
 /*
    global
 
-   _, last, DRUMNAMES, NOISENAMES, VOICENAMES, INVALIDPITCH, CUSTOMSAMPLES,
-   globalActivity
+   _, last, DRUMNAMES, NOISENAMES, VOICENAMES, INVALIDPITCH, EDOBOUNDEXCEEDED,
+   CUSTOMSAMPLES, globalActivity
  */
 
 const _b64Cache = new Map();
@@ -333,7 +333,29 @@ const EQUIVALENTNATURALS = {
     "E𝄪": "F♯",
     "C𝄪": "D",
     "F𝄪": "G",
-    "B𝄪": "C♯"
+    "B𝄪": "C♯",
+    "C𝄫": "B",
+    "D𝄫": "C",
+    "E𝄫": "D",
+    "F𝄫": "E",
+    "G𝄫": "F",
+    "A𝄫": "G",
+    "B𝄫": "A",
+    // Two-character forms (from _parse_pitch_string normalization)
+    "D♯♯": "E",
+    "A♯♯": "B",
+    "G♯♯": "A",
+    "E♯♯": "F♯",
+    "C♯♯": "D",
+    "F♯♯": "G",
+    "B♯♯": "C♯",
+    "C♭♭": "B",
+    "D♭♭": "C",
+    "E♭♭": "D",
+    "F♭♭": "E",
+    "G♭♭": "F",
+    "A♭♭": "G",
+    "B♭♭": "A"
 };
 
 /**
@@ -2644,6 +2666,29 @@ const TEMPERAMENT = {
         "edo": 21,
         "name": "1/4 Comma Meantone",
         "description": "Meantone temperament with 1/4 syntonic comma",
+        "noteLabels": [
+            "C",
+            "D" + FLAT,
+            "C" + SHARP,
+            "D",
+            "D" + SHARP,
+            "E" + FLAT,
+            "E",
+            "E" + SHARP,
+            "F",
+            "F" + SHARP,
+            "G" + FLAT,
+            "G",
+            "G" + SHARP,
+            "A" + FLAT,
+            "A",
+            "A" + SHARP,
+            "B" + FLAT,
+            "B",
+            "B" + SHARP,
+            "C" + FLAT,
+            "C"
+        ],
         "ratios": [
             1,
             16 / 15,
@@ -3740,10 +3785,10 @@ const getScaleAndHalfSteps = keySignature => {
     const obj = keySignatureToMode(keySignature);
     let myKeySignature = obj[0];
     let halfSteps;
-    if (obj[1] === "CUSTOM") {
-        halfSteps = customMode;
+    if (obj[1].toLowerCase() === "custom") {
+        halfSteps = customMode.slice();
     } else {
-        halfSteps = MUSICALMODES[obj[1]];
+        halfSteps = MUSICALMODES[obj[1]].slice();
     }
 
     const solfege = [];
@@ -4913,6 +4958,7 @@ function base64Encode(str) {
  * @param {string} errorMsg - The error message (unused parameter).
  * @param {string} [temperament="equal"] - The temperament to use (default is "equal").
  * @param {boolean} [isAlreadyEdoSteps=false] - If true, transposition is already in EDO steps; skip semitone-to-EDO conversion.
+ * @param {boolean} [clampIndex=false] - If true, clamp pitch index to 0..edo-1 instead of wrapping across octaves.
  * @returns {Array} An array containing the note, octave, and cents
  */
 function getNote(
@@ -4924,7 +4970,8 @@ function getNote(
     direction,
     errorMsg,
     temperament,
-    isAlreadyEdoSteps
+    isAlreadyEdoSteps,
+    clampIndex
 ) {
     if (typeof noteArg === "number") {
         noteArg = noteArg.toString();
@@ -5040,6 +5087,7 @@ function getNote(
 
         switch (articulation) {
             case "bb":
+            case "♭♭":
             case DOUBLEFLAT:
                 noteArg += "b";
                 rememberFlat = true;
@@ -5051,6 +5099,7 @@ function getNote(
                 rememberFlat = true;
                 break;
             case "##":
+            case "♯♯":
             case "*":
             case "x":
             case DOUBLESHARP:
@@ -5093,6 +5142,29 @@ function getNote(
         } else if (NOTESFLAT2.includes(noteArg)) {
             // Convert to uppercase, e.g., d♭ -> D♭.
             note = NOTESFLAT[NOTESFLAT2.indexOf(noteArg)];
+        } else if (octaveLength !== 12) {
+            // For microtonal EDOs, look up against the EDO-specific name table.
+            // generateNoteNames uses repeated SHARP/FLAT characters for accidentals.
+            const edoNames = generateNoteNames(octaveLength);
+            const normalizedName = noteArg.replaceAll("#", SHARP).replaceAll("b", FLAT);
+            const edoIdx = edoNames.indexOf(normalizedName);
+            if (edoIdx !== -1) {
+                note = edoNames[edoIdx];
+            } else {
+                if (errorMsg !== undefined) {
+                    console.debug(
+                        "WARNING: EDO note [" +
+                            noteArg +
+                            "] (normalized: " +
+                            normalizedName +
+                            ") not found in generateNoteNames(" +
+                            octaveLength +
+                            ")"
+                    );
+                    errorMsg(INVALIDPITCH, null);
+                }
+                return ["R", "", 0];
+            }
         } else {
             if (["#", SHARP, FLAT, "b"].includes(noteArg.substr(-1))) {
                 sharpFlat = true;
@@ -5309,12 +5381,22 @@ function getNote(
                 if (foundIdx !== -1) {
                     let i = foundIdx + deltaNote;
                     const nameTableLength = generateNoteNames(octaveLength).length;
-                    if (i < 0) {
-                        i += nameTableLength;
-                        octave -= 1;
-                    } else if (i >= nameTableLength) {
-                        i -= nameTableLength;
-                        octave += 1;
+                    if (clampIndex) {
+                        // Clamp to valid range instead of wrapping across octaves.
+                        if (i < 0 || i >= nameTableLength) {
+                            i = Math.max(0, Math.min(i, nameTableLength - 1));
+                            if (errorMsg !== undefined) {
+                                errorMsg(EDOBOUNDEXCEEDED, null);
+                            }
+                        }
+                    } else {
+                        if (i < 0) {
+                            i += nameTableLength;
+                            octave -= 1;
+                        } else if (i >= nameTableLength) {
+                            i -= nameTableLength;
+                            octave += 1;
+                        }
                     }
                     note = generateNoteNames(octaveLength)[i];
                 } else {
@@ -5362,13 +5444,19 @@ function getNote(
             }
         }
 
-        if (rememberSharp) {
-            if (note in EQUIVALENTSHARPS) {
-                note = EQUIVALENTSHARPS[note];
-            }
-        } else if (rememberFlat) {
-            if (note in EQUIVALENTFLATS) {
-                note = EQUIVALENTFLATS[note];
+        // Preserve input accidental style only when no transposition was applied.
+        // When transpositionFloor is non-zero, EQUIVALENTSHARPS/EQUIVALENTFLATS could
+        // undo the pitch change (e.g. E♭→D♯ changes the actual pitch in microtonal
+        // temperaments where they are not enharmonically equivalent).
+        if (transpositionFloor === 0) {
+            if (rememberSharp) {
+                if (note in EQUIVALENTSHARPS) {
+                    note = EQUIVALENTSHARPS[note];
+                }
+            } else if (rememberFlat) {
+                if (note in EQUIVALENTFLATS) {
+                    note = EQUIVALENTFLATS[note];
+                }
             }
         }
     } else if (isCustomTemperament(temperament)) {
@@ -5608,20 +5696,67 @@ function _calculate_pitch_number(noteName, octave, applyOffset = 0, temperament)
     }
     const currentEDO = getCurrentEDO(temperament);
 
-    let name = noteName.replaceAll("#", SHARP).replaceAll("b", FLAT);
+    let name = noteName
+        .replaceAll("x", DOUBLESHARP)
+        .replaceAll("*", DOUBLESHARP)
+        .replaceAll("#", SHARP)
+        .replaceAll("b", FLAT);
 
-    // Handle double accidentals (𝄪 / 𝄫) by computing offset directly from
-    // the base note letter, since they won't appear in NOTESSHARP/NOTESFLAT.
-    if (name.includes(DOUBLESHARP) || name.includes(DOUBLEFLAT)) {
-        const offset = name.includes(DOUBLESHARP) ? 2 : -2;
-        const baseLetter = name.replace(DOUBLESHARP, "").replace(DOUBLEFLAT, "");
-        let baseIndex = NOTESSHARP.indexOf(baseLetter);
-        if (baseIndex === -1) baseIndex = NOTESFLAT.indexOf(baseLetter);
-        if (baseIndex === -1) return INVALIDPITCH;
-        const rawPitch = (parseInt(octave, 10) + 1) * currentEDO + baseIndex + offset;
-        return rawPitch - applyOffset;
+    // Non-equal temperaments: look up directly against the temperament's own noteLabels.
+    // Do NOT use generateNoteNames() which produces EDO-specific names.
+    const t = temperament ? getTemperament(temperament) : null;
+    if (t && !isTrueEDO(temperament) && t.noteLabels && t.ratios) {
+        const noteIdx = t.noteLabels.indexOf(name);
+        if (noteIdx !== -1) {
+            const aIdx = t.noteLabels.indexOf("A");
+            const offset = aIdx !== -1 ? aIdx : 0;
+            const result =
+                (parseInt(octave, 10) + 1) * t.ratios.length + noteIdx - offset - applyOffset;
+            return result;
+        }
+        return INVALIDPITCH;
     }
 
+    // For non-12 EDO: normalize double accidentals to repeated single characters
+    // to match the EDO name table (generateNoteNames uses SHARP/FLAT repeated).
+    // Must happen before EQUIVALENT lookups so the EDO table match is tried first.
+    if (currentEDO !== 12) {
+        name = name.replaceAll(DOUBLESHARP, SHARP + SHARP).replaceAll(DOUBLEFLAT, FLAT + FLAT);
+    }
+
+    // For non-12 EDO: look up directly in the EDO-specific name table first.
+    // Do NOT use EQUIVALENTNATURALS which maps to 12-EDO enharmonic equivalents.
+    if (currentEDO !== 12) {
+        const edoNames = generateNoteNames(currentEDO);
+        let edoIndex = edoNames.indexOf(name);
+        if (edoIndex === -1) {
+            // Try EQUIVALENTSHARPS / EQUIVALENTFLATS for single-accidental aliases
+            if (EQUIVALENTSHARPS[name]) {
+                edoIndex = edoNames.indexOf(EQUIVALENTSHARPS[name]);
+            } else if (EQUIVALENTFLATS[name]) {
+                edoIndex = edoNames.indexOf(EQUIVALENTFLATS[name]);
+            }
+        }
+        if (edoIndex !== -1) {
+            const aIndex = edoNames.indexOf("A");
+            const offset = aIndex !== -1 ? aIndex : Math.round((9 / 12) * currentEDO);
+            return (parseInt(octave, 10) + 1) * currentEDO + edoIndex - offset - applyOffset;
+        }
+        // Name not found in EDO table — return INVALIDPITCH rather than
+        // falling back to 12-EDO arrays which would give wrong results.
+        console.debug(
+            "WARNING: _calculate_pitch_number: [" +
+                name +
+                '] (from input "' +
+                noteName +
+                '") not found in generateNoteNames(' +
+                currentEDO +
+                ")"
+        );
+        return INVALIDPITCH;
+    }
+
+    // 12-EDO path: use EQUIVALENT lookups then NOTESSHARP / NOTESFLAT.
     if (EQUIVALENTSHARPS[name]) {
         name = EQUIVALENTSHARPS[name];
     } else if (EQUIVALENTFLATS[name]) {
@@ -5684,10 +5819,10 @@ const buildScale = keySignature => {
     }
 
     let halfSteps;
-    if (obj[1] === "CUSTOM") {
-        halfSteps = customMode;
+    if (obj[1].toLowerCase() === "custom") {
+        halfSteps = customMode.slice();
     } else {
-        halfSteps = MUSICALMODES[obj[1]];
+        halfSteps = MUSICALMODES[obj[1]].slice();
     }
 
     // Determine current EDO from global state
@@ -5703,6 +5838,21 @@ const buildScale = keySignature => {
         let idx = edoNames.indexOf(myKeySignature);
         if (idx === -1) {
             idx = 0;
+        }
+
+        // For "custom" (chromatic) mode in non-12 EDO, generate a full EDO-length
+        // scale with step=1 for every pitch class, instead of converting the
+        // hardcoded 12-element customMode array (which would only produce ~12
+        // notes and leave many pitch classes unreachable via scalar stepping).
+        if (obj[1].toLowerCase() === "custom") {
+            const scale = [myKeySignature];
+            let ii = idx;
+            const steps = new Array(currentEDO).fill(1);
+            for (let i = 0; i < currentEDO; i++) {
+                ii = (ii + 1 + edoNames.length) % edoNames.length;
+                scale.push(edoNames[ii]);
+            }
+            return [scale, steps];
         }
 
         // Convert semitone intervals to EDO step intervals via cumulative positions
@@ -7185,7 +7335,8 @@ const getPitchInfo = function (activity, type, currentNote, tur) {
             const currentEDO = getCurrentEDO(temperament);
             pitchNumber = noteOrPitch;
             octave = Math.floor(pitchNumber / currentEDO) - 1;
-            name = NOTESSHARP[pitchNumber % currentEDO];
+            const edoNames = generateNoteNames(currentEDO);
+            name = edoNames[pitchNumber % currentEDO];
         } else if (typeof noteOrPitch === "string") {
             [name, octave] = _parse_pitch_string(noteOrPitch);
             pitchNumber = _calculate_pitch_number(name, octave, 0, temperament);
