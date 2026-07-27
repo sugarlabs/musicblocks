@@ -4773,6 +4773,9 @@ class Blocks {
          * return {void}
          */
         this.loadNewBlocks = blockObjs => {
+            /** Suppress intermediate canvas redraws during block loading. */
+            this.activity._suppressRefresh = true;
+
             /**
              * Playback Queue has been deprecated, but some old projects
              * may still have playback blocks appended, which we will
@@ -6217,6 +6220,8 @@ class Blocks {
 
             this.blocksToCollapse = [];
 
+            /** All blocks loaded — allow canvas redraws again. */
+            this.activity._suppressRefresh = false;
             this.activity.refreshCanvas();
 
             /** Do a final check on the action and boxes palettes. */
