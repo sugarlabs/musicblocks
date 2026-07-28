@@ -897,10 +897,14 @@ class ServerInterface {
                 return;
             }
 
-            // Guard: offline commits require a GitHub repo to already exist.
-            // Without one, a draft can never be synced — block it with a clear message.
+            // Guard: offline commits require either a real GitHub repo (hashedKey set)
+            // or a pending offline repo creation (repoName set by queueRepoCreation).
+            // We only block if the project was never registered at all —
+            // an empty hashedKey is fine here because it's filled on reconnect.
             const gitData = this.Planet?.ProjectStorage?.data?.Projects?.[projectId]?.GitRepoData;
-            if (!gitData?.repoName || !gitData?.hashedKey) {
+            const hasPendingRepo =
+                !!this.Planet?.ProjectStorage?.data?.Projects?.[projectId]?.pendingRepoCreation;
+            if (!gitData?.repoName && !hasPendingRepo) {
                 callback({
                     success: false,
                     offline: true,

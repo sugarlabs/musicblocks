@@ -144,6 +144,22 @@ class ProjectStorage {
      * can be restored when switching between projects.
      */
     async addGitRepoData(id, repoName, description, tags, hashedKey) {
+        // Guard: auto-initialise the project slot if it doesn't exist yet.
+        // This can happen when a brand-new project clicks "Save a spot" while
+        // offline before the project has been persisted to ProjectStorage.
+        if (!this.data.Projects[id]) {
+            this.data.Projects[id] = {
+                ProjectName: this.defaultProjectName,
+                ProjectData: null,
+                ProjectImage: null,
+                PublishedData: null,
+                GitRepoData: null,
+                commitDrafts: [],
+                cachedCommits: [],
+                pendingRepoCreation: null,
+                DateLastModified: Date.now()
+            };
+        }
         this.data.Projects[id].GitRepoData = {
             repoName,
             description: description || "",
@@ -161,7 +177,20 @@ class ProjectStorage {
      * @returns {Promise<void>}
      */
     async setPendingRepoCreation(id, details) {
-        if (!this.data.Projects[id]) return;
+        // Auto-initialise the project slot if it doesn't exist yet.
+        if (!this.data.Projects[id]) {
+            this.data.Projects[id] = {
+                ProjectName: this.defaultProjectName,
+                ProjectData: null,
+                ProjectImage: null,
+                PublishedData: null,
+                GitRepoData: null,
+                commitDrafts: [],
+                cachedCommits: [],
+                pendingRepoCreation: null,
+                DateLastModified: Date.now()
+            };
+        }
         this.data.Projects[id].pendingRepoCreation = { ...details, status: "pending" };
         await this.save();
     }
