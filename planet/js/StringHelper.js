@@ -26,7 +26,7 @@ class StringHelper {
         // append to innerhtml
 
         this.strings = [
-            ["logo-container", _("Planet")],
+            ["logo-container", _("Git Planet")],
             ["close-planet", _("Close Planet"), "data-tooltip"],
             ["planet-open-file", _("Open project from file"), "data-tooltip"],
             ["planet-new-project", _("New project"), "data-tooltip"],
@@ -96,7 +96,7 @@ class StringHelper {
                 } else if (HTML_ALLOWED_IDS.has(obj[0])) {
                     elem.innerHTML = elem.innerHTML + sanitizeAllowedHTML(obj[1]);
                 } else {
-                    elem.textContent = (elem.textContent || "") + obj[1];
+                    elem.appendChild(document.createTextNode(obj[1]));
                 }
             }
         }
