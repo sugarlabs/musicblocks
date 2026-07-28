@@ -17,6 +17,10 @@ class GitDropdownUI {
         this.activity = null;
         this._BASE_URL = "";
         this._prefetchPromise = null;
+
+        // Cached connectivity state — updated by _isOnline().
+        // Starts optimistic; the first real probe on init() decides.
+        this._online = true;
     }
 
     init(activity) {
@@ -26,14 +30,18 @@ class GitDropdownUI {
                 ? MB_GIT_BACKEND_URL
                 : "http://localhost:5001";
         this._BASE_URL = backendUrl.replace(/\/$/, "") + "/api/github";
+
+        // Tracks whether the Time Travel panel is currently open.
+        // Used by the MB_SYNC_COMPLETE handler to decide whether to auto-refresh.
+        this._historyPanelOpen = false;
+
         this._syncMenuState();
         this._bindButtons();
 
-        // Listen for MB_GIT_STATE messages from the planet iframe.
-        // Fired whenever the user opens a different project so that the
-        // "My Project" toolbar menu reflects the correct repo/key.
+        // Listen for messages from the planet iframe.
         window.addEventListener("message", e => {
             if (!e.data) return;
+
             if (e.data.type === "MB_GIT_STATE") {
                 this._applyGitState(e.data.repoName || "", e.data.hashedKey || "");
             } else if (e.data.type === "MB_NEW_PROJECT") {
@@ -44,6 +52,21 @@ class GitDropdownUI {
                 localStorage.removeItem("mbGitLastSavedHash");
                 localStorage.removeItem("mbGitCurrentSha");
                 this.clearForNewProject();
+            } else if (e.data.type === "MB_SYNC_COMPLETE") {
+                // OfflineCommitManager finished pushing drafts to GitHub.
+                // 1. Show a success toast so the student knows their offline saves landed.
+                const count = e.data.synced || 0;
+                this._showToast(
+                    `${count} offline save${count !== 1 ? "s" : ""} synced to GitHub ✔`,
+                    "success"
+                );
+                // 2. Invalidate the prefetch cache so the panel shows live data.
+                this._prefetchPromise = null;
+                this._prefetchCommits();
+                // 3. If the Time Travel panel is open, auto-refresh it.
+                if (this._historyPanelOpen) {
+                    this._showHistoryPanel();
+                }
             }
         });
 
@@ -104,6 +127,61 @@ class GitDropdownUI {
     }
 
     // ─── Pre-fetching ─────────────────────────────────────────────────────────
+
+    // ─── Connectivity detection ───────────────────────────────────────────────
+
+    /**
+     * Probes the backend /health endpoint to determine real connectivity.
+     * navigator.onLine is NOT used because it's always true on localhost.
+     * Caches the result in this._online so callers get an instant answer.
+     *
+     * @returns {Promise<boolean>}
+     */
+    async _isOnline() {
+        const probeUrl = this._BASE_URL.replace("/api/github", "") + "/health";
+        try {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), 4000);
+            await fetch(probeUrl, { method: "HEAD", cache: "no-store", signal: controller.signal });
+            clearTimeout(timer);
+            this._online = true;
+
+            // Trigger sync on planet iframe whenever we confirm online connectivity
+            const planetIframe = document.getElementById("planet-iframe");
+            if (planetIframe && planetIframe.contentWindow) {
+                planetIframe.contentWindow.postMessage({ type: "MB_TRIGGER_SYNC" }, "*");
+            }
+        } catch (_) {
+            this._online = false;
+        }
+        return this._online;
+    }
+
+    /**
+     * Returns a promise that resolves with the first matching postMessage
+     * from the planet iframe, or rejects after a timeout.
+     *
+     * @param {string}  type      Message type to wait for
+     * @param {number}  [timeout] Max wait in ms (default 10 000)
+     * @returns {Promise<MessageEvent>}
+     */
+    _waitForMessage(type, timeout = 10_000) {
+        return new Promise((resolve, reject) => {
+            const timer = setTimeout(() => {
+                window.removeEventListener("message", handler);
+                reject(new Error(`Timeout waiting for ${type}`));
+            }, timeout);
+
+            function handler(e) {
+                if (e.data && e.data.type === type) {
+                    clearTimeout(timer);
+                    window.removeEventListener("message", handler);
+                    resolve(e.data);
+                }
+            }
+            window.addEventListener("message", handler);
+        });
+    }
 
     _prefetchCommits() {
         const repoName = this._getRepoName();
@@ -211,11 +289,64 @@ class GitDropdownUI {
     async _doCreate(repoName, displayName, description) {
         const projectData = this._getProjectData();
         const thumbnail = this._getThumbnail();
+        const fullDesc = description || `${displayName} — a Music Blocks project`;
 
+        // ── Connectivity check ────────────────────────────────────────────────
+        const online = await this._isOnline();
+
+        if (!online) {
+            // ── Offline path — queue repo creation via planet iframe bridge ───
+            this._showToast("You're offline. Queuing save spot for when you reconnect…", "info");
+            const planetIframe = document.getElementById("planet-iframe");
+            if (!planetIframe || !planetIframe.contentWindow) {
+                this._showToast("Could not queue save spot — planet frame unavailable.", "error");
+                return;
+            }
+
+            planetIframe.contentWindow.postMessage(
+                {
+                    type: "MB_OFFLINE_CREATE",
+                    repoName,
+                    projectName: displayName,
+                    description: fullDesc,
+                    creatorName: "anonymous",
+                    tags: [],
+                    projectId: null // planet uses its current project ID
+                },
+                "*"
+            );
+
+            try {
+                const result = await this._waitForMessage("MB_OFFLINE_CREATE_RESULT");
+                if (result.success) {
+                    const offlineRepo = result.repository;
+                    // Store locally so the toolbar shows the "My Project" state
+                    localStorage.setItem("mbGitRepoName", offlineRepo);
+                    localStorage.setItem("mbGitHashedKey", ""); // unknown until online
+                    this.onSaveLocally();
+                    this._syncMenuState();
+                    this._showToast(
+                        "Save spot queued! It will be created on GitHub when you reconnect. ✔",
+                        "success"
+                    );
+                } else {
+                    this._showToast(
+                        "Could not queue save spot — " + (result.error || "unknown error"),
+                        "error"
+                    );
+                }
+            } catch (e) {
+                console.error("[GitDropdownUI] offline create bridge timeout:", e);
+                this._showToast("Offline queue timed out — please try again.", "error");
+            }
+            return;
+        }
+
+        // ── Online path — direct fetch to backend ────────────────────────────
         const body = {
             repoName,
             projectName: displayName,
-            description: description || `${displayName} — a Music Blocks project`,
+            description: fullDesc,
             creatorName: "anonymous",
             projectData,
             thumbnail,
@@ -285,8 +416,7 @@ class GitDropdownUI {
 
     async _showCommitFlow() {
         const repoName = this._getRepoName();
-        const hashedKey = this._getHashedKey();
-        if (!repoName || !hashedKey) {
+        if (!repoName) {
             await window.MBDialog.alert(
                 'Create a save spot first by clicking "Create My Save Spot".',
                 "No Save Spot Yet"
@@ -304,13 +434,67 @@ class GitDropdownUI {
         });
         if (message === null) return;
 
-        await this._doCommit(repoName, hashedKey, message.trim() || defaultMsg);
+        await this._doCommit(repoName, this._getHashedKey(), message.trim() || defaultMsg);
     }
 
     async _doCommit(repoName, hashedKey, commitMessage) {
         const projectData = this._getProjectData();
         const thumbnail = this._getThumbnail();
 
+        // ── Connectivity check — use a real probe, not navigator.onLine ──────
+        // navigator.onLine is always true on localhost even with WiFi off.
+        const online = await this._isOnline();
+
+        if (!online) {
+            // ── Offline path — save draft via planet iframe bridge ────────────
+            this._showToast("You're offline. Saving a draft…", "info");
+            const planetIframe = document.getElementById("planet-iframe");
+            if (!planetIframe || !planetIframe.contentWindow) {
+                this._showToast("Could not save offline — planet frame unavailable.", "error");
+                return;
+            }
+
+            planetIframe.contentWindow.postMessage(
+                {
+                    type: "MB_OFFLINE_COMMIT",
+                    projectId: null, // planet uses its current project ID
+                    repoName,
+                    hashedKey,
+                    projectData,
+                    commitMessage
+                },
+                "*"
+            );
+
+            try {
+                const result = await this._waitForMessage("MB_OFFLINE_COMMIT_RESULT");
+                if (result.success) {
+                    this.onSaveLocally();
+                    this._showToast("Saved offline ✔ — will sync when you reconnect.", "success");
+                } else if (result.error === "OFFLINE_DRAFT_CAP_REACHED") {
+                    this._showToast(
+                        "You've reached 5 offline saves. Connect to the internet to sync first.",
+                        "error"
+                    );
+                } else if (result.error === "NO_REPO_WHILE_OFFLINE") {
+                    this._showToast(
+                        "Create a save spot first (while online), then you can save offline.",
+                        "error"
+                    );
+                } else {
+                    this._showToast(
+                        "Offline save failed — " + (result.error || "unknown error"),
+                        "error"
+                    );
+                }
+            } catch (e) {
+                console.error("[GitDropdownUI] offline commit bridge timeout:", e);
+                this._showToast("Offline save timed out — please try again.", "error");
+            }
+            return;
+        }
+
+        // ── Online path — direct fetch to backend ────────────────────────────
         const body = { repoName, key: hashedKey, projectData, thumbnail, commitMessage };
 
         try {
@@ -358,35 +542,97 @@ class GitDropdownUI {
             this._prefetchCommits();
         }
 
-        let commits = [];
+        let liveCommits = [];
+        let isOfflineHistory = false;
+
         try {
             // Await the background prefetch (instant if already done)
             const preloaded = await this._prefetchPromise;
             if (!preloaded) throw new Error("Prefetch failed");
-            commits = preloaded;
+            liveCommits = preloaded;
         } catch (e) {
-            console.error("[GitDropdownUI] commitHistory error:", e);
-            this._showToast("Could not load history. Check your connection.", "error");
-            this._prefetchPromise = null; // reset so it tries again next time
-            return;
+            console.error("[GitDropdownUI] commitHistory prefetch failed, trying local cache:", e);
+            this._prefetchPromise = null;
+            isOfflineHistory = true;
         }
+
+        // ── Always fetch local pending drafts and merge them in ──────────────
+        // Even when online, a student may have offline drafts awaiting sync.
+        // Pending commits appear at the TOP of the timeline with a special badge.
+        let pendingCommits = [];
+        const planetIframe = document.getElementById("planet-iframe");
+        if (planetIframe && planetIframe.contentWindow) {
+            try {
+                planetIframe.contentWindow.postMessage({ type: "MB_GET_LOCAL_HISTORY" }, "*");
+                const result = await this._waitForMessage("MB_LOCAL_HISTORY_RESULT", 5000);
+                if (result.data && result.data.length > 0) {
+                    // Only include pending (not-yet-synced) drafts — synced ones are
+                    // already in the live GitHub history as real commits.
+                    pendingCommits = result.data
+                        .filter(c => c.status === "pending" || c.status === "pending-repo")
+                        .map(c => ({
+                            sha: c.sha || null,
+                            message: c.message || "Offline save",
+                            date: c.date || new Date().toISOString(),
+                            draftId: c.draftId,
+                            projectData: c.projectData || null,
+                            _pending: true,
+                            _pendingRepo: c.status === "pending-repo"
+                        }));
+                }
+            } catch (_) {
+                /* local history unavailable — non-fatal */
+            }
+
+            // If the live fetch failed, also grab cached synced commits as fallback
+            if (isOfflineHistory) {
+                try {
+                    planetIframe.contentWindow.postMessage({ type: "MB_GET_LOCAL_HISTORY" }, "*");
+                    const result2 = await this._waitForMessage("MB_LOCAL_HISTORY_RESULT", 5000);
+                    if (result2.data && result2.data.length > 0) {
+                        liveCommits = result2.data
+                            .filter(c => c.status === "synced")
+                            .map(c => ({
+                                sha: c.sha || null,
+                                message: c.message || "Saved moment",
+                                date: c.date || new Date().toISOString(),
+                                projectData: c.projectData || null
+                            }));
+                    }
+                } catch (_) {
+                    /* ignore */
+                }
+            }
+        }
+
+        // Merge: pending drafts first (newest first), then live GitHub commits
+        const commits = [...pendingCommits, ...liveCommits];
 
         if (commits.length === 0) {
-            await window.MBDialog.alert(
-                'You haven\'t saved any moments yet. Click "Mark This Moment" to save your first one!',
-                "No Saved Moments Yet"
-            );
+            if (isOfflineHistory) {
+                await window.MBDialog.alert(
+                    "You're offline. Connect to the network to view commits for this project.",
+                    "Network Connection Required"
+                );
+            } else {
+                await window.MBDialog.alert(
+                    'You haven\'t saved any moments yet. Click "Mark This Moment" to save your first one!',
+                    "No Saved Moments Yet"
+                );
+            }
             return;
         }
 
-        this._renderHistoryPanel(commits);
+        this._renderHistoryPanel(commits, isOfflineHistory);
     }
 
-    _renderHistoryPanel(commits) {
+    _renderHistoryPanel(commits, isOffline = false) {
         document.querySelectorAll(".git-history-panel").forEach(el => el.remove());
+        this._historyPanelOpen = true;
 
         const container = document.getElementById("floatingWindows") || document.body;
         const cleanupFns = [];
+
         const close = () => {
             cleanupFns.forEach(fn => fn());
             this._closeHistoryPanel();
@@ -480,15 +726,20 @@ class GitDropdownUI {
         const INFRA_PATTERN =
             /^(add (metadata|metaData|projectdata|projectData)\.json|update thumbnail\.png)$/i;
 
-        // Capture the SHA of the "Add metaData.json" commit to use as the project origin.
-        // It is always the oldest of the two infra commits, i.e. the very last in the list
-        // (commits are newest-first). We grab it before filtering.
+        // Capture the SHA/commit of the "Add metaData.json" commit to use as the project origin.
+        // If not found (e.g. offline-created repo), fallback to the oldest commit in the list.
         const metaCommit = commits.find(c => /add metaData\.json/i.test(c.message));
-        const originSha = metaCommit ? metaCommit.sha : null;
-        const originMsg = metaCommit ? metaCommit.message : null;
-
         // Visible commits: strip the two infra entries
         const visibleCommits = commits.filter(c => !INFRA_PATTERN.test(c.message));
+
+        const originTarget =
+            metaCommit ||
+            (visibleCommits.length > 0 ? visibleCommits[visibleCommits.length - 1] : null);
+        const originSha = metaCommit
+            ? metaCommit.sha
+            : originTarget && typeof originTarget === "object"
+              ? originTarget.sha
+              : originTarget;
 
         const currentSha = localStorage.getItem("mbGitCurrentSha");
 
@@ -497,24 +748,32 @@ class GitDropdownUI {
         let iconIdx = 0;
 
         visibleCommits.forEach((commit, idx) => {
-            const isNow = currentSha ? commit.sha === currentSha : idx === 0;
+            const isPending = !!commit._pending; // offline draft awaiting sync
+            const isNow = !isPending && (currentSha ? commit.sha === currentSha : idx === 0);
             const side = idx % 2 === 0 ? "right" : "left";
 
             const stop = document.createElement("div");
             stop.className = `git-tt-stop ${side}${isNow ? " now-stop" : ""}`;
 
-            // node bubble — colour and icon are fixed per commit position,
-            // independent of which commit is currently "isNow"
-            const nodeColour = isNow ? "c-now" : colours[iconIdx % colours.length];
-            const nodeIcon = isNow
-                ? null // always fixed Phosphor note below
-                : icons[iconIdx % icons.length];
-            if (!isNow) iconIdx++;
+            // ── Node colour ──────────────────────────────────────────────────
+            let nodeColour;
+            if (isPending)
+                nodeColour = "c-pending"; // amber — awaiting sync
+            else if (isNow) nodeColour = "c-now";
+            else nodeColour = colours[iconIdx % colours.length];
+
+            if (!isNow && !isPending) iconIdx++;
 
             const node = document.createElement("div");
-            node.className = `git-tt-node ${nodeColour}${isNow ? " now" : ""}`;
+            node.className = `git-tt-node ${nodeColour}${isNow ? " now" : ""}${isPending ? " pending-node" : ""}`;
 
-            if (isNow) {
+            // ── Node icon ────────────────────────────────────────────────────
+            if (isPending) {
+                // Hourglass icon for pending commits
+                node.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="white" width="26" height="26">
+                    <path d="M200,75.64V40a16,16,0,0,0-16-16H72A16,16,0,0,0,56,40V75.64a16.06,16.06,0,0,0,5.65,12.14L102.06,128,61.65,168.22A16.07,16.07,0,0,0,56,180.36V216a16,16,0,0,0,16,16H184a16,16,0,0,0,16-16V180.36a16.07,16.07,0,0,0-5.65-12.14L154.06,128l40.29-40.22A16.06,16.06,0,0,0,200,75.64ZM72,40H184V75.64L128,131.14,72,75.64ZM184,216H72V180.36L128,124.86l56,55.5Z"/>
+                </svg>`;
+            } else if (isNow) {
                 // Always the same Phosphor music-note for the active commit node
                 node.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="#5d4000" width="32" height="32"><path d="M210.3,56.34l-80-24A8,8,0,0,0,120,40V148.26A48,48,0,1,0,136,184V98.75l69.7,20.91A8,8,0,0,0,216,112V64A8,8,0,0,0,210.3,56.34ZM88,216a32,32,0,1,1,32-32A32,32,0,0,1,88,216ZM200,101.25l-64-19.2V50.75L200,70Z"/></svg>`;
                 const badge = document.createElement("div");
@@ -522,10 +781,10 @@ class GitDropdownUI {
                 badge.textContent = "YOU ARE HERE";
                 node.appendChild(badge);
             } else {
-                node.innerHTML = nodeIcon;
+                node.innerHTML = icons[iconIdx % icons.length];
             }
 
-            // text
+            // ── Text area ────────────────────────────────────────────────────
             const text = document.createElement("div");
             text.className = "git-tt-text";
 
@@ -537,13 +796,36 @@ class GitDropdownUI {
             dateSpan.className = "git-tt-date-text";
             dateSpan.textContent = commit.date ? this._relativeTime(commit.date) : "";
 
-            if (idx === 0) {
+            // ── Badges ───────────────────────────────────────────────────────
+            if (isPending) {
+                // "Sync Pending" amber pill — primary identifier for offline drafts
+                const syncBadge = document.createElement("span");
+                syncBadge.className = "git-tt-sync-pending-badge";
+                syncBadge.innerHTML =
+                    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"` +
+                    ` stroke-linecap="round" stroke-linejoin="round" width="10" height="10">` +
+                    `<path d="M1 4v6h6M23 20v-6h-6"/>` +
+                    `<path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/>` +
+                    `</svg> Sync Pending`;
+                msgEl.appendChild(syncBadge);
+
+                if (commit._pendingRepo) {
+                    // Extra note when the repo itself hasn't been created yet
+                    const repoNote = document.createElement("span");
+                    repoNote.className = "git-tt-sync-pending-badge";
+                    repoNote.style.marginLeft = "4px";
+                    repoNote.textContent = "Repo pending";
+                    msgEl.appendChild(repoNote);
+                }
+            } else if (idx - visibleCommits.filter(c => c._pending).length === 0) {
+                // "Latest" badge on the first non-pending commit
                 const latestBadge = document.createElement("span");
                 latestBadge.className = "git-tt-latest-badge";
                 latestBadge.textContent = "Latest";
-                msgEl.appendChild(latestBadge); // always visible next to message
+                msgEl.appendChild(latestBadge);
             }
 
+            // ── Action buttons ───────────────────────────────────────────────
             const btnRow = document.createElement("div");
             btnRow.className = "git-tt-btn-row";
 
@@ -554,7 +836,7 @@ class GitDropdownUI {
                 clearBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg> Clear Changes`;
                 clearBtn.addEventListener("click", () => {
                     close();
-                    this._clearChanges(commit.sha, commit.message);
+                    this._clearChanges(commit, commit.message);
                 });
                 btnRow.appendChild(clearBtn);
             } else {
@@ -563,7 +845,7 @@ class GitDropdownUI {
                 btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Take me here`;
                 btn.addEventListener("click", () => {
                     close();
-                    this._confirmTimeTravel(commit.sha, commit.message);
+                    this._confirmTimeTravel(commit, commit.message);
                 });
                 btnRow.appendChild(btn);
             }
@@ -587,7 +869,8 @@ class GitDropdownUI {
                 ? currentSha
                     ? currentSha === originSha
                     : visibleCommits.length === 0
-                : false;
+                : visibleCommits.length === 0 ||
+                  (currentSha === null && visibleCommits.length === 1);
 
             const flagStop = document.createElement("div");
             const flagSide = visibleCommits.length % 2 === 0 ? "right" : "left";
@@ -619,16 +902,16 @@ class GitDropdownUI {
                 clearOriginBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg> Clear Changes`;
                 clearOriginBtn.addEventListener("click", () => {
                     close();
-                    this._clearChanges(originSha, "Start point");
+                    this._clearChanges(originTarget || "origin", "Start point");
                 });
                 flagBtnRow.appendChild(clearOriginBtn);
-            } else if (originSha) {
+            } else if (originTarget) {
                 const flagBtn = document.createElement("button");
                 flagBtn.className = "git-tt-go-btn";
                 flagBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Take me here`;
                 flagBtn.addEventListener("click", () => {
                     close();
-                    this._confirmTimeTravel(originSha, "Start point");
+                    this._confirmTimeTravel(originTarget, "Start point");
                 });
                 flagBtnRow.appendChild(flagBtn);
             }
@@ -642,6 +925,19 @@ class GitDropdownUI {
         body.appendChild(wrap);
 
         frame.appendChild(topBar);
+        // Offline banner — shown when the live prefetch failed and we're
+        // displaying locally cached drafts instead of live GitHub history.
+        if (isOffline) {
+            const banner = document.createElement("div");
+            banner.style.cssText =
+                "background:#92400e;color:#fff;font-size:12px;padding:6px 14px;" +
+                "display:flex;align-items:center;gap:6px;border-bottom:1px solid #78350f;";
+            banner.innerHTML =
+                `<svg viewBox="0 0 24 24" fill="white" width="14" height="14" style="flex-shrink:0">` +
+                `<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>` +
+                `</svg>You're offline — showing locally saved drafts`;
+            frame.appendChild(banner);
+        }
         frame.appendChild(body);
         container.appendChild(overlay);
         container.appendChild(frame);
@@ -668,6 +964,7 @@ class GitDropdownUI {
     }
 
     _closeHistoryPanel() {
+        this._historyPanelOpen = false;
         document.querySelectorAll(".git-history-panel").forEach(el => el.remove());
     }
 
@@ -810,19 +1107,18 @@ class GitDropdownUI {
         wrap.insertBefore(svg, wrap.firstChild);
     }
 
-    async _confirmTimeTravel(sha, commitMessage) {
+    async _confirmTimeTravel(commitTarget, commitMessage) {
         const isDirty = this._hasUnsavedChanges();
 
         if (!isDirty) {
-            await this._restoreCommit(sha, commitMessage);
+            await this._restoreCommit(commitTarget, commitMessage);
             return;
         }
 
         this._showUnsavedGuard(
             async () => {
                 const repoName = this._getRepoName();
-                const hashedKey = this._getHashedKey();
-                if (repoName && hashedKey) {
+                if (repoName) {
                     const defaultMsg = this._defaultCommitMessage();
                     const msg = await window.MBDialog.prompt({
                         title: "Mark This Moment",
@@ -832,17 +1128,17 @@ class GitDropdownUI {
                         cancelText: "Cancel"
                     });
                     if (msg === null) return;
-                    await this._doCommit(repoName, hashedKey, msg.trim() || defaultMsg);
+                    await this._doCommit(repoName, this._getHashedKey(), msg.trim() || defaultMsg);
                 }
-                await this._restoreCommit(sha, commitMessage);
+                await this._restoreCommit(commitTarget, commitMessage);
             },
             async () => {
-                await this._restoreCommit(sha, commitMessage);
+                await this._restoreCommit(commitTarget, commitMessage);
             }
         );
     }
 
-    async _clearChanges(sha, commitMessage) {
+    async _clearChanges(commitTarget, commitMessage) {
         const { frame, widget, cleanup } = this._buildSystemDialog("Clear Your Changes");
         this._centerFrame(frame);
 
@@ -878,8 +1174,7 @@ class GitDropdownUI {
         btnSave.addEventListener("click", async () => {
             cleanup();
             const repoName = this._getRepoName();
-            const hashedKey = this._getHashedKey();
-            if (repoName && hashedKey) {
+            if (repoName) {
                 const defaultMsg = this._defaultCommitMessage();
                 const userMsg = await window.MBDialog.prompt({
                     title: "Save Backup",
@@ -889,14 +1184,14 @@ class GitDropdownUI {
                     cancelText: "Cancel"
                 });
                 if (userMsg === null) return;
-                await this._doCommit(repoName, hashedKey, userMsg.trim() || defaultMsg);
+                await this._doCommit(repoName, this._getHashedKey(), userMsg.trim() || defaultMsg);
             }
-            await this._restoreCommit(sha, commitMessage);
+            await this._restoreCommit(commitTarget, commitMessage);
         });
 
         btnDiscard.addEventListener("click", async () => {
             cleanup();
-            await this._restoreCommit(sha, commitMessage);
+            await this._restoreCommit(commitTarget, commitMessage);
         });
 
         actions.appendChild(btnSave);
@@ -906,15 +1201,54 @@ class GitDropdownUI {
         widget.appendChild(actions);
     }
 
-    async _restoreCommit(sha, commitMessage) {
+    async _restoreCommit(commitTarget, commitMessage) {
         const repoName = this._getRepoName();
+        let sha = null;
+        let message = commitMessage;
+        let projectData = null;
+
+        if (typeof commitTarget === "object" && commitTarget !== null) {
+            sha = commitTarget.sha || null;
+            message = commitTarget.message || commitMessage;
+            projectData = commitTarget.projectData || null;
+        } else {
+            sha = commitTarget;
+        }
+
         try {
             this._showToast("Travelling back in time…", "info");
-            const res = await fetch(
-                `${this._BASE_URL}/getProjectDataAtCommit?repoName=${encodeURIComponent(repoName)}&sha=${encodeURIComponent(sha)}`
-            );
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const projectData = await res.json();
+
+            // If projectData is not already present, attempt to fetch it
+            if (!projectData) {
+                if (sha && (await this._isOnline())) {
+                    const res = await fetch(
+                        `${this._BASE_URL}/getProjectDataAtCommit?repoName=${encodeURIComponent(repoName)}&sha=${encodeURIComponent(sha)}`
+                    );
+                    if (res.ok) {
+                        projectData = await res.json();
+                    }
+                }
+
+                // Fallback: Query planet iframe for local history draft data if online fetch failed or offline
+                if (!projectData) {
+                    const planetIframe = document.getElementById("planet-iframe");
+                    if (planetIframe && planetIframe.contentWindow) {
+                        planetIframe.contentWindow.postMessage(
+                            { type: "MB_GET_LOCAL_HISTORY" },
+                            "*"
+                        );
+                        const result = await this._waitForMessage("MB_LOCAL_HISTORY_RESULT", 5000);
+                        const match = (result.data || []).find(
+                            c => (sha && c.sha === sha) || c.message === message
+                        );
+                        if (match && match.projectData) {
+                            projectData = match.projectData;
+                        }
+                    }
+                }
+            }
+
+            if (!projectData) throw new Error("Could not find project data for this saved moment.");
 
             this.activity.sendAllToTrash(false, true);
             this.activity.blocks.loadNewBlocks(
@@ -922,13 +1256,17 @@ class GitDropdownUI {
             );
 
             this.onSaveLocally();
-            localStorage.setItem("mbGitCurrentSha", sha);
-            // Use a friendly label — never expose raw git commit messages like "Add metaData.json"
+            if (sha) {
+                localStorage.setItem("mbGitCurrentSha", sha);
+            } else {
+                localStorage.removeItem("mbGitCurrentSha");
+            }
+
             const displayLabel = /add (metadata|metaData|projectdata|projectData)\.json/i.test(
-                commitMessage
+                message
             )
                 ? "Start point"
-                : commitMessage;
+                : message;
             this._showToast(`Restored: "${displayLabel}"`, "success");
         } catch (e) {
             console.error("[GitDropdownUI] restoreCommit error:", e);

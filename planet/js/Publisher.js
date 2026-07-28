@@ -528,16 +528,26 @@ class Publisher {
         const Planet = this.Planet;
 
         if (!Planet.ConnectedToServer) {
-            let element = document.getElementById("publisher-form");
-            element.parentNode.removeChild(element);
-            element = document.getElementById("publisher-submit");
-            element.parentNode.removeChild(element);
-            const frag = document.createRange().createContextualFragment(this.PublisherOfflineHTML);
-            document.getElementById("publisher-content").appendChild(frag);
-        } else {
-            this.addTags();
-            this.initSubmit();
+            // Keep the form intact so the student can still queue a publish offline.
+            // The OfflineCommitManager will replay the POST /create + /publish when
+            // connectivity returns. Show a dismissible amber banner instead of
+            // removing the form entirely.
+            const banner = document.createElement("div");
+            banner.id = "publisher-offline-banner";
+            banner.style.cssText =
+                "background:#92400e;color:#fff;border-radius:4px;padding:10px 14px;" +
+                "margin-bottom:12px;font-size:13px;display:flex;align-items:flex-start;gap:8px;";
+            banner.innerHTML =
+                `<svg viewBox="0 0 24 24" fill="white" width="16" height="16" style="flex-shrink:0;margin-top:1px">` +
+                `<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>` +
+                `</svg>` +
+                `<span>You're currently offline. You can still fill in the details — your project will be queued and published automatically when you reconnect.</span>`;
+            const content = document.getElementById("publisher-content");
+            if (content) content.insertBefore(banner, content.firstChild);
         }
+
+        this.addTags();
+        this.initSubmit();
     }
 }
 
