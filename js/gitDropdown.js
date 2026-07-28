@@ -51,6 +51,7 @@ class GitDropdownUI {
                 localStorage.removeItem("mbGitHashedKey");
                 localStorage.removeItem("mbGitLastSavedHash");
                 localStorage.removeItem("mbGitCurrentSha");
+                localStorage.removeItem("mbGitCurrentDraftId");
                 this.clearForNewProject();
             } else if (e.data.type === "MB_SYNC_COMPLETE") {
                 // OfflineCommitManager finished pushing drafts to GitHub.
@@ -105,6 +106,7 @@ class GitDropdownUI {
         // Reset the current-SHA so the history panel marks the latest commit
         // as current whenever we switch to a different project.
         localStorage.removeItem("mbGitCurrentSha");
+        localStorage.removeItem("mbGitCurrentDraftId");
         this._syncMenuState();
         if (repoName) {
             // Reset and restart the prefetch for the new project.
@@ -382,6 +384,7 @@ class GitDropdownUI {
             localStorage.setItem("mbGitHashedKey", savedKey);
             localStorage.setItem("mb_git_key_" + savedRepoName, savedKey);
             localStorage.removeItem("mbGitCurrentSha");
+            localStorage.removeItem("mbGitCurrentDraftId");
             this.onSaveLocally();
             this._syncMenuState();
             this._prefetchCommits(); // Refresh cache for this new repo
@@ -516,6 +519,7 @@ class GitDropdownUI {
 
             this.onSaveLocally();
             localStorage.removeItem("mbGitCurrentSha");
+            localStorage.removeItem("mbGitCurrentDraftId");
             this._prefetchCommits(); // Refresh cache after a new commit
             this._showToast("Moment saved! ✔", "success");
         } catch (e) {
@@ -609,17 +613,26 @@ class GitDropdownUI {
         const commits = [...pendingCommits, ...liveCommits];
 
         if (commits.length === 0) {
-            if (isOfflineHistory) {
+            if (isOfflineHistory && !repoName) {
+                // Truly no registration at all — this shouldn't happen but guard it
                 await window.MBDialog.alert(
                     "You're offline. Connect to the network to view commits for this project.",
                     "Network Connection Required"
                 );
-            } else {
-                await window.MBDialog.alert(
-                    'You haven\'t saved any moments yet. Click "Mark This Moment" to save your first one!',
-                    "No Saved Moments Yet"
-                );
+                return;
             }
+            if (isOfflineHistory) {
+                // Offline-created project with no drafts yet, OR an existing project
+                // opened offline with no cached commits.
+                // Either way, still show the panel — the origin flag is enough.
+                this._renderHistoryPanel([], true);
+                return;
+            }
+            // Online but genuinely empty — prompt the student to save
+            await window.MBDialog.alert(
+                'You haven\'t saved any moments yet. Click "Mark This Moment" to save your first one!',
+                "No Saved Moments Yet"
+            );
             return;
         }
 
@@ -742,15 +755,32 @@ class GitDropdownUI {
               : originTarget;
 
         const currentSha = localStorage.getItem("mbGitCurrentSha");
+        const currentDraftId = localStorage.getItem("mbGitCurrentDraftId");
 
         // Separate counter for non-now icon/colour assignment
         // so that each commit's icon stays stable regardless of which commit is "now".
         let iconIdx = 0;
+        // Track whether any commit node is already "now" so the origin flag
+        // doesn't also claim to be "now" (double Clear Changes bug).
+        let anyCommitIsNow = false;
 
         visibleCommits.forEach((commit, idx) => {
             const isPending = !!commit._pending; // offline draft awaiting sync
-            const isNow = !isPending && (currentSha ? commit.sha === currentSha : idx === 0);
+
+            // isNow: which commit is the student currently at?
+            // - For live commits: match by SHA
+            // - For pending drafts: match by draftId
+            // - Default (nothing stored): the very first (newest) commit is "now"
+            let isNow;
+            if (isPending) {
+                isNow = currentDraftId
+                    ? commit.draftId === currentDraftId
+                    : !currentSha && idx === 0; // newest pending is default if nothing stored
+            } else {
+                isNow = currentSha ? commit.sha === currentSha : idx === 0;
+            }
             const side = idx % 2 === 0 ? "right" : "left";
+            if (isNow) anyCommitIsNow = true;
 
             const stop = document.createElement("div");
             stop.className = `git-tt-stop ${side}${isNow ? " now-stop" : ""}`;
@@ -776,12 +806,16 @@ class GitDropdownUI {
             } else if (isNow) {
                 // Always the same Phosphor music-note for the active commit node
                 node.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="#5d4000" width="32" height="32"><path d="M210.3,56.34l-80-24A8,8,0,0,0,120,40V148.26A48,48,0,1,0,136,184V98.75l69.7,20.91A8,8,0,0,0,216,112V64A8,8,0,0,0,210.3,56.34ZM88,216a32,32,0,1,1,32-32A32,32,0,0,1,88,216ZM200,101.25l-64-19.2V50.75L200,70Z"/></svg>`;
+            } else {
+                node.innerHTML = icons[iconIdx % icons.length];
+            }
+
+            // YOU ARE HERE badge — added regardless of pending/live status
+            if (isNow) {
                 const badge = document.createElement("div");
                 badge.className = "git-tt-you-here";
                 badge.textContent = "YOU ARE HERE";
                 node.appendChild(badge);
-            } else {
-                node.innerHTML = icons[iconIdx % icons.length];
             }
 
             // ── Text area ────────────────────────────────────────────────────
@@ -798,7 +832,7 @@ class GitDropdownUI {
 
             // ── Badges ───────────────────────────────────────────────────────
             if (isPending) {
-                // "Sync Pending" amber pill — primary identifier for offline drafts
+                // "Sync Pending" amber pill — only badge on commit nodes
                 const syncBadge = document.createElement("span");
                 syncBadge.className = "git-tt-sync-pending-badge";
                 syncBadge.innerHTML =
@@ -808,15 +842,6 @@ class GitDropdownUI {
                     `<path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/>` +
                     `</svg> Sync Pending`;
                 msgEl.appendChild(syncBadge);
-
-                if (commit._pendingRepo) {
-                    // Extra note when the repo itself hasn't been created yet
-                    const repoNote = document.createElement("span");
-                    repoNote.className = "git-tt-sync-pending-badge";
-                    repoNote.style.marginLeft = "4px";
-                    repoNote.textContent = "Repo pending";
-                    msgEl.appendChild(repoNote);
-                }
             } else if (idx - visibleCommits.filter(c => c._pending).length === 0) {
                 // "Latest" badge on the first non-pending commit
                 const latestBadge = document.createElement("span");
@@ -863,14 +888,23 @@ class GitDropdownUI {
 
         // last stop — start flag (always shown; "Take me here" restores to origin)
         {
-            // A fresh project has no currentSha yet; if there are no visible user commits,
-            // the origin IS where the user currently is.
-            const isAtOrigin = originSha
-                ? currentSha
-                    ? currentSha === originSha
-                    : visibleCommits.length === 0
-                : visibleCommits.length === 0 ||
-                  (currentSha === null && visibleCommits.length === 1);
+            // The origin is "now" only when no other commit node already claimed that position.
+            // Without this guard, a project with 1 pending commit and no stored SHA/draftId
+            // would show BOTH the pending commit AND the origin as "now" simultaneously.
+            const isAtOrigin =
+                !anyCommitIsNow &&
+                (originSha
+                    ? currentSha
+                        ? currentSha === originSha
+                        : visibleCommits.length === 0
+                    : visibleCommits.length === 0 ||
+                      (currentSha === null && visibleCommits.length === 1));
+
+            // Detect if the repo itself is pending creation:
+            // no live commits from GitHub AND we're offline means the GitHub
+            // repo hasn't been created yet (offline-created project).
+            const hasLiveCommits = visibleCommits.some(c => !c._pending && c.sha);
+            const isRepoPending = isOffline && !hasLiveCommits;
 
             const flagStop = document.createElement("div");
             const flagSide = visibleCommits.length % 2 === 0 ? "right" : "left";
@@ -891,7 +925,25 @@ class GitDropdownUI {
 
             const flagText = document.createElement("div");
             flagText.className = "git-tt-text";
-            flagText.innerHTML = `<div class="git-tt-flag-note">The very beginning</div><div class="git-tt-msg">Where your project started ✦</div>`;
+
+            // "The very beginning" subtitle sits ABOVE the main text line —
+            // must be a separate element, not nested inside flagMsgEl.
+            const flagNote = document.createElement("div");
+            flagNote.className = "git-tt-flag-note";
+            flagNote.textContent = "The very beginning";
+
+            const flagMsgEl = document.createElement("div");
+            flagMsgEl.className = "git-tt-msg";
+            flagMsgEl.textContent = "Where your project started ✦";
+
+            // Show "Save Spot Pending" badge on the origin flag when the
+            // project itself was created offline and the GitHub repo hasn't been created yet.
+            if (isRepoPending) {
+                const repoNote = document.createElement("span");
+                repoNote.className = "git-tt-sync-pending-badge";
+                repoNote.textContent = "Save Spot Pending";
+                flagMsgEl.appendChild(repoNote);
+            }
 
             const flagBtnRow = document.createElement("div");
             flagBtnRow.className = "git-tt-btn-row";
@@ -915,6 +967,8 @@ class GitDropdownUI {
                 });
                 flagBtnRow.appendChild(flagBtn);
             }
+            flagText.appendChild(flagNote);
+            flagText.appendChild(flagMsgEl);
             flagText.appendChild(flagBtnRow);
 
             flagStop.appendChild(flagNode);
@@ -925,9 +979,19 @@ class GitDropdownUI {
         body.appendChild(wrap);
 
         frame.appendChild(topBar);
-        // Offline banner — shown when the live prefetch failed and we're
-        // displaying locally cached drafts instead of live GitHub history.
+        // Offline banner — always shown when isOffline, tells student
+        // how many more commits they can save before having to reconnect.
         if (isOffline) {
+            const OFFLINE_CAP = 5;
+            const pendingCount = commits.filter(c => c._pending).length;
+            const remaining = Math.max(0, OFFLINE_CAP - pendingCount);
+            const remainingText =
+                remaining === 0
+                    ? "no more offline commits can be made"
+                    : remaining === 1
+                      ? "1 more commit can be made"
+                      : `${remaining} more commits can be made`;
+
             const banner = document.createElement("div");
             banner.style.cssText =
                 "background:#92400e;color:#fff;font-size:12px;padding:6px 14px;" +
@@ -935,7 +999,7 @@ class GitDropdownUI {
             banner.innerHTML =
                 `<svg viewBox="0 0 24 24" fill="white" width="14" height="14" style="flex-shrink:0">` +
                 `<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>` +
-                `</svg>You're offline — showing locally saved drafts`;
+                `</svg>Showing locally saved drafts &nbsp;·&nbsp; ${remainingText}`;
             frame.appendChild(banner);
         }
         frame.appendChild(body);
@@ -1256,10 +1320,22 @@ class GitDropdownUI {
             );
 
             this.onSaveLocally();
-            if (sha) {
+            const draftId =
+                typeof commitTarget === "object" && commitTarget !== null
+                    ? commitTarget.draftId || null
+                    : null;
+
+            if (draftId) {
+                // Pending offline draft — track by draftId, clear any SHA
+                localStorage.setItem("mbGitCurrentDraftId", draftId);
+                localStorage.removeItem("mbGitCurrentSha");
+            } else if (sha) {
+                // Live GitHub commit — track by SHA, clear any draftId
                 localStorage.setItem("mbGitCurrentSha", sha);
+                localStorage.removeItem("mbGitCurrentDraftId");
             } else {
                 localStorage.removeItem("mbGitCurrentSha");
+                localStorage.removeItem("mbGitCurrentDraftId");
             }
 
             const displayLabel = /add (metadata|metaData|projectdata|projectData)\.json/i.test(
