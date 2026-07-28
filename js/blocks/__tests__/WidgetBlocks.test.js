@@ -657,49 +657,62 @@ describe("setupWidgetBlocks", () => {
         // _ensureWidget()/_lazyRequire() are local closures inside
         // setupWidgetBlocks() and aren't exported, so their `modules`
         // argument can't be intercepted at runtime without changing the
-        // loader itself. Instead, assert directly against the source that
-        // each call site reads modules from the widget's own static
-        // `dependencies`, not a hardcoded literal -- this is the one thing
-        // that actually matters for "single source of truth."
-        const widgetBlocksSource = require("fs").readFileSync(
-            require("path").join(__dirname, "..", "WidgetBlocks.js"),
-            "utf8"
-        );
+        // loader itself, and in this non-AMD test environment `_lazyRequire`
+        // ignores `modules` entirely, so no behavioural test can observe it
+        // either. As a last resort, a single source-text check confirms
+        // every call site reads modules from the widget's own static
+        // `dependencies` rather than a hardcoded literal; kept to one test
+        // (not one per widget) since it's the wiring itself being checked,
+        // not per-widget behaviour -- the behavioural tests below cover that.
+        it("every _ensureWidget/_lazyRequire call site reads modules from its widget's dependencies", () => {
+            const widgetBlocksSource = require("fs").readFileSync(
+                require("path").join(__dirname, "..", "WidgetBlocks.js"),
+                "utf8"
+            );
+            const ensureWidgetSites = [
+                ["temperament", "TemperamentWidget"],
+                ["sample", "SampleWidget"],
+                ["timbre", "TimbreWidget"],
+                ["tempo", "Tempo"],
+                ["arpeggio", "Arpeggio"],
+                ["pitchDrumMatrix", "PitchDrumMatrix"],
+                ["pitchSlider", "PitchSlider"],
+                ["musicKeyboard", "MusicKeyboard"],
+                ["pitchStaircase", "PitchStaircase"],
+                ["rhythmRuler", "RhythmRuler"],
+                ["phraseMaker", "PhraseMaker"],
+                ["aiMusic", "AIWidget"],
+                ["reflection", "ReflectionMatrix"],
+                ["legoWidget", "LegoWidget"],
+                ["aiDebugger", "AIDebuggerWidget"]
+            ];
+            const lazyRequireSites = ["MeterWidget", "Oscilloscope", "ModeWidget"];
 
-        it.each([
-            ["temperament", "TemperamentWidget"],
-            ["sample", "SampleWidget"],
-            ["timbre", "TimbreWidget"],
-            ["tempo", "Tempo"],
-            ["arpeggio", "Arpeggio"],
-            ["pitchDrumMatrix", "PitchDrumMatrix"],
-            ["pitchSlider", "PitchSlider"],
-            ["musicKeyboard", "MusicKeyboard"],
-            ["pitchStaircase", "PitchStaircase"],
-            ["rhythmRuler", "RhythmRuler"],
-            ["phraseMaker", "PhraseMaker"],
-            ["aiMusic", "AIWidget"],
-            ["reflection", "ReflectionMatrix"],
-            ["legoWidget", "LegoWidget"],
-            ["aiDebugger", "AIDebuggerWidget"]
-        ])(
-            "_ensureWidget's %s call site reads modules from %s.dependencies",
-            (widgetKey, className) => {
+            const notWired = [];
+            for (const [widgetKey, className] of ensureWidgetSites) {
                 const callSite = new RegExp(
                     `_ensureWidget\\(\\s*logo,\\s*"${widgetKey}",\\s*${className}\\.dependencies,`
                 );
-                expect(widgetBlocksSource).toMatch(callSite);
+                if (!callSite.test(widgetBlocksSource)) {
+                    notWired.push(
+                        `_ensureWidget("${widgetKey}") should read ${className}.dependencies`
+                    );
+                }
             }
-        );
+            for (const className of lazyRequireSites) {
+                if (
+                    !new RegExp(`_lazyRequire\\(${className}\\.dependencies,`).test(
+                        widgetBlocksSource
+                    )
+                ) {
+                    notWired.push(
+                        `_lazyRequire(...) for ${className} should read ${className}.dependencies`
+                    );
+                }
+            }
 
-        it.each(["MeterWidget", "Oscilloscope", "ModeWidget"])(
-            "_lazyRequire's %s call site reads modules from its own dependencies",
-            className => {
-                expect(widgetBlocksSource).toMatch(
-                    new RegExp(`_lazyRequire\\(${className}\\.dependencies,`)
-                );
-            }
-        );
+            expect(notWired).toEqual([]);
+        });
 
         // Exercise the previously-untested call sites so the metadata read
         // (Widget.dependencies) actually executes, not just gets matched
