@@ -29,9 +29,7 @@
   color: F97316
   description: Improves performance (load time, memory, rendering)
 
-- name: Issue-User-Experience
-  color: EC4899
-  description: UI/UX bugs, inconsistencies, or improvement suggestions
+
 
 - name: Issue-Testing
   color: 3B82F6
