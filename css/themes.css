@@ -862,6 +862,38 @@ body.highcontrast {
 .git-tt-node.c-red    { background: linear-gradient(150deg, #e57373, #c62828); }
 .git-tt-node.c-grey   { background: linear-gradient(150deg, #cfd8dc, #90a4ae); }
 
+/* Amber "sync pending" node — offline draft awaiting network */
+.git-tt-node.c-pending {
+    background: linear-gradient(150deg, #fcd34d, #d97706);
+    box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.5);
+}
+@keyframes git-pending-pulse {
+    0%   { box-shadow: 0 0 0 0   rgba(217, 119, 6, 0.5); }
+    60%  { box-shadow: 0 0 0 10px rgba(217, 119, 6, 0);  }
+    100% { box-shadow: 0 0 0 0   rgba(217, 119, 6, 0);   }
+}
+.git-tt-node.pending-node {
+    animation: git-pending-pulse 2s ease-out infinite;
+}
+
+/* "Sync Pending" badge — amber pill next to commit message */
+.git-tt-sync-pending-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #92400e;
+    color: #fef3c7;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 99px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+
 /* ── text column ── */
 .git-tt-text {
     display: flex;
