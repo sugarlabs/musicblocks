@@ -457,6 +457,7 @@ function setupBoxesBlocks(activity) {
             if (
                 logo.inStatusMatrix &&
                 parentId !== null &&
+                parentId !== undefined &&
                 parentId in activity.blocks.blockList &&
                 activity.blocks.blockList[parentId]?.name === "print"
             ) {

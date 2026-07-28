@@ -563,7 +563,10 @@ const analyzeProject = activity => {
             case "fill":
             case "hollowline":
             case "start":
-                if (activity.blocks.blockList[blk].connections[1] === null) {
+                if (
+                    activity.blocks.blockList[blk].connections[1] === null ||
+                    activity.blocks.blockList[blk].connections[1] === undefined
+                ) {
                     continue;
                 }
                 break;
@@ -584,24 +587,35 @@ const analyzeProject = activity => {
             case "chorus":
             case "phaser":
             case "action":
-                if (activity.blocks.blockList[blk].connections[2] === null) {
+                if (
+                    activity.blocks.blockList[blk].connections[2] === null ||
+                    activity.blocks.blockList[blk].connections[2] === undefined
+                ) {
                     continue;
                 }
                 break;
             case "tuplet2":
-                if (activity.blocks.blockList[blk].connections[3] === null) {
+                if (
+                    activity.blocks.blockList[blk].connections[3] === null ||
+                    activity.blocks.blockList[blk].connections[3] === undefined
+                ) {
                     continue;
                 }
                 break;
             case "invert":
-                if (activity.blocks.blockList[blk].connections[4] === null) {
+                if (
+                    activity.blocks.blockList[blk].connections[4] === null ||
+                    activity.blocks.blockList[blk].connections[4] === undefined
+                ) {
                     continue;
                 }
                 break;
             default:
                 if (
-                    activity.blocks.blockList[blk].connections[0] === null &&
-                    last(activity.blocks.blockList[blk].connections) === null
+                    (activity.blocks.blockList[blk].connections[0] === null ||
+                        activity.blocks.blockList[blk].connections[0] === undefined) &&
+                    (last(activity.blocks.blockList[blk].connections) === null ||
+                        last(activity.blocks.blockList[blk].connections) === undefined)
                 ) {
                     continue;
                 }
