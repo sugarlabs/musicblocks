@@ -193,6 +193,59 @@ describe("piemenus behavioral tests", () => {
         expect(mockBlock.blocks.setPitchOctave).toHaveBeenCalledWith("mock-id", 3);
     });
 
+    describe("Phrase Maker refresh on pitch change", () => {
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+
+        beforeEach(() => {
+            // hasOctaveWheel requires the parent block to be a "pitch"-family wrapper.
+            mockBlock.blocks.blockList["mock-id"].name = "pitch";
+        });
+
+        test("notifies an open Phrase Maker when the exit wheel commits a new pitch", () => {
+            const refreshRowForBlock = jest.fn();
+            mockBlock.activity.logo.phraseMaker = { refreshRowForBlock };
+
+            piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
+
+            // Select G (index 4), natural accidental, octave 5.
+            mockBlock._pitchWheel.selectedNavItemIndex = 4;
+            mockBlock._accidentalsWheel.selectedNavItemIndex = 2;
+            mockBlock._accidentalsWheel.navItems[2].title = "♮";
+            mockBlock._octavesWheel.selectedNavItemIndex = 3;
+
+            mockBlock._exitWheel.navItems[0].navigateFunction();
+
+            expect(refreshRowForBlock).toHaveBeenCalledWith("mock-id", "G", "♮", 5);
+        });
+
+        test("does not throw and does not touch unrelated widgets when no Phrase Maker is open", () => {
+            piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
+
+            mockBlock._pitchWheel.selectedNavItemIndex = 4;
+            mockBlock._accidentalsWheel.selectedNavItemIndex = 2;
+            mockBlock._octavesWheel.selectedNavItemIndex = 3;
+
+            expect(() => mockBlock._exitWheel.navItems[0].navigateFunction()).not.toThrow();
+        });
+
+        test("does not notify Phrase Maker for a scaledegree2 block", () => {
+            mockBlock.name = "scaledegree2";
+            const refreshRowForBlock = jest.fn();
+            mockBlock.activity.logo.phraseMaker = { refreshRowForBlock };
+
+            piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
+
+            mockBlock._pitchWheel.selectedNavItemIndex = 4;
+            mockBlock._accidentalsWheel.selectedNavItemIndex = 2;
+            mockBlock._octavesWheel.selectedNavItemIndex = 3;
+
+            mockBlock._exitWheel.navItems[0].navigateFunction();
+
+            expect(refreshRowForBlock).not.toHaveBeenCalled();
+        });
+    });
+
     describe("Block Help Menu", () => {
         it("should load help before opening the aux pie menu help widget", () => {
             expect(piemenusContent).toMatch(

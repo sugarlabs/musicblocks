@@ -1008,6 +1008,24 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         // Refresh the block's cache
         that.updateCache();
+
+        // If this block is a tracked row in an already-open Phrase Maker,
+        // refresh that row so the matrix reflects the new pitch immediately.
+        if (hasOctaveWheel && that.name !== "scaledegree2") {
+            const phraseMaker = that.activity.logo.phraseMaker;
+            if (phraseMaker && typeof phraseMaker.refreshRowForBlock === "function") {
+                const newOctave = Number(
+                    that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title
+                );
+                phraseMaker.refreshRowForBlock(
+                    that.connections[0],
+                    selectedNoteValue,
+                    selectedAccidental,
+                    newOctave
+                );
+            }
+        }
+
         // Hide the pie menu and remove the wheels
         hideWheelDiv();
         that._pitchWheel.removeWheel();
