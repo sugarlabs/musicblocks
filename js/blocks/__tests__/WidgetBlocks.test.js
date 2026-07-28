@@ -664,6 +664,12 @@ describe("setupWidgetBlocks", () => {
         // `dependencies` rather than a hardcoded literal; kept to one test
         // (not one per widget) since it's the wiring itself being checked,
         // not per-widget behaviour -- the behavioural tests below cover that.
+        //
+        // Caveat: this relies on source-text matching, which can become
+        // brittle during future refactors (e.g. reformatting the
+        // _ensureWidget calls). If dependency resolution is ever exposed
+        // through a helper or otherwise made observable behaviourally,
+        // prefer replacing these regex assertions with behavioural tests.
         it("every _ensureWidget/_lazyRequire call site reads modules from its widget's dependencies", () => {
             const widgetBlocksSource = require("fs").readFileSync(
                 require("path").join(__dirname, "..", "WidgetBlocks.js"),
