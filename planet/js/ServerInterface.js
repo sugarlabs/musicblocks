@@ -66,24 +66,24 @@ class ServerInterface {
         this.Planet = Planet;
 
         // Base URL for the Express backend. Reads from env.js if set.
-        this.BaseURL = (window.MB_GIT_BACKEND_URL || "http://localhost:5000") + "/api/github";
+        this.BaseURL = (window.MB_GIT_BACKEND_URL || "http://localhost:5001") + "/api/github";
 
         this.ConnectionFailureData = { success: false, error: "ERROR_CONNECTION_FAILURE" };
 
         // Per-request rate limiting / retry (reuse existing RequestManager)
         this.requestManager = new RequestManager({
-            minDelay:        300,
-            maxRetries:      3,
-            baseRetryDelay:  1000,
-            maxConcurrent:   4
+            minDelay: 300,
+            maxRetries: 3,
+            baseRetryDelay: 1000,
+            maxConcurrent: 4
         });
 
         // IndexedDB cache (reuse existing CacheManager)
         this.cacheManager = new CacheManager({
-            dbName:          "MusicBlocksGitCache",
-            metadataExpiry:  30 * 60 * 1000,           // 30 minutes
-            projectExpiry:   7 * 24 * 60 * 60 * 1000,  // 7 days
-            maxCacheSize:    200
+            dbName: "MusicBlocksGitCache",
+            metadataExpiry: 30 * 60 * 1000, // 30 minutes
+            projectExpiry: 7 * 24 * 60 * 60 * 1000, // 7 days
+            maxCacheSize: 200
         });
 
         this.cacheInitialized = false;
@@ -121,8 +121,8 @@ class ServerInterface {
     async _get(path) {
         try {
             const res = await fetch(this.BaseURL + path, {
-                method:  "GET",
-                headers: { "Accept": "application/json" }
+                method: "GET",
+                headers: { Accept: "application/json" }
             });
             if (!res.ok) {
                 console.warn(`[ServerInterface] GET ${path} → HTTP ${res.status}`);
@@ -148,14 +148,18 @@ class ServerInterface {
                 method,
                 headers: {
                     "Content-Type": "application/json",
-                    "Accept":       "application/json"
+                    "Accept": "application/json"
                 },
                 body: JSON.stringify(body)
             });
             if (!res.ok) {
                 const text = await res.text().catch(() => "");
                 console.warn(`[ServerInterface] ${method} ${path} → HTTP ${res.status}`, text);
-                try { return JSON.parse(text); } catch (_) { return null; }
+                try {
+                    return JSON.parse(text);
+                } catch (_) {
+                    return null;
+                }
             }
             return await res.json();
         } catch (err) {
@@ -210,43 +214,44 @@ class ServerInterface {
      */
     _normaliseProjectRow(row) {
         const tags = row.theme
-            ? row.theme.split(",").map(t => t.trim().toLowerCase()).filter(Boolean)
+            ? row.theme
+                  .split(",")
+                  .map(t => t.trim().toLowerCase())
+                  .filter(Boolean)
             : [];
 
         return {
             // Identity
-            repoName:             row.repoName,
-            planetId:             row.planetId || null,
+            repoName: row.repoName,
+            planetId: row.planetId || null,
 
             // Display fields (legacy names expected by UI classes)
-            ProjectName:          row.projectName     || "",
-            ProjectDescription:   row.description     || "",
-            ProjectCreatorName:   row.creatorName     || "",
-            ProjectTags:          tags,
-            ProjectIsMusicBlocks: row.isMusicBlocks   ?? 1,
+            ProjectName: row.projectName || "",
+            ProjectDescription: row.description || "",
+            ProjectCreatorName: row.creatorName || "",
+            ProjectTags: tags,
+            ProjectIsMusicBlocks: row.isMusicBlocks ?? 1,
 
             // Stats
-            ProjectLikes:         row.likes           || 0,
-            ProjectDownloads:     row.downloads       || 0,
+            ProjectLikes: row.likes || 0,
+            ProjectDownloads: row.downloads || 0,
 
             // Dates
-            ProjectCreatedDate:   row.createdAt       || null,
-            ProjectLastUpdated:   row.updatedAt       || null,
+            ProjectCreatedDate: row.createdAt || null,
+            ProjectLastUpdated: row.updatedAt || null,
 
             // Thumbnail: GlobalCard lazy-loads this via IntersectionObserver
             // using the hasThumbnail flag.  ProjectImage is only set here for
             // legacy data-URL images (migrated projects without a REST thumbnail).
-            ProjectImage: (row.hasThumbnail !== 1 && row.projectImage)
-                ? row.projectImage
-                : null,
+            ProjectImage: row.hasThumbnail !== 1 && row.projectImage ? row.projectImage : null,
 
             // Loaded lazily by downloadProject()
-            ProjectData:  null,
+            ProjectData: null,
 
             // Metadata flags
             hasThumbnail: row.hasThumbnail || 0,
-            visible:      row.visible      || 0,
-            isMigrated:   row.isMigrated   || 0
+            visible: row.visible || 0,
+            isMigrated: row.isMigrated || 0
         };
     }
 
@@ -306,11 +311,12 @@ class ServerInterface {
                 return;
             }
 
-            const response = manifestResponse && Array.isArray(manifestResponse.data)
-                ? manifestResponse
-                : await this._get(
-                    `/allRepos?page=1&limit=${this._TOPIC_SAMPLE_LIMIT}&sort=likes`
-                );
+            const response =
+                manifestResponse && Array.isArray(manifestResponse.data)
+                    ? manifestResponse
+                    : await this._get(
+                          `/allRepos?page=1&limit=${this._TOPIC_SAMPLE_LIMIT}&sort=likes`
+                      );
 
             if (!response || !Array.isArray(response.data)) {
                 callback(this.ConnectionFailureData);
@@ -329,8 +335,7 @@ class ServerInterface {
 
             // Sort by usage; mark the top N as primary display tags
             const PRIMARY_TAG_LIMIT = 8;
-            const sortedTopics = Object.entries(topicCounts)
-                .sort((a, b) => b[1] - a[1]);
+            const sortedTopics = Object.entries(topicCounts).sort((a, b) => b[1] - a[1]);
 
             const manifest = {};
             let primaryCount = 0;
@@ -338,10 +343,10 @@ class ServerInterface {
             for (const [topic, count] of sortedTopics) {
                 const isDisplay = primaryCount < PRIMARY_TAG_LIMIT;
                 manifest[topic] = {
-                    TagName:          topic.charAt(0).toUpperCase() + topic.slice(1),
+                    TagName: topic.charAt(0).toUpperCase() + topic.slice(1),
                     IsTagUserAddable: "1",
-                    IsDisplayTag:     isDisplay ? "1" : "0",
-                    usageCount:       count
+                    IsDisplayTag: isDisplay ? "1" : "0",
+                    usageCount: count
                 };
                 if (isDisplay) primaryCount++;
             }
@@ -368,13 +373,13 @@ class ServerInterface {
     async downloadProjectList(tags, sort, start, end, callback) {
         try {
             const limit = end - start;
-            const page  = Math.floor(start / limit) + 1;
+            const page = Math.floor(start / limit) + 1;
 
             const sortMap = {
-                "RECENT":       "createdAt",
-                "LIKED":        "likes",
-                "DOWNLOADED":   "downloads",
-                "ALPHABETICAL": "projectName"
+                RECENT: "createdAt",
+                LIKED: "likes",
+                DOWNLOADED: "downloads",
+                ALPHABETICAL: "projectName"
             };
             const sortParam = sortMap[sort] || "createdAt";
 
@@ -423,7 +428,9 @@ class ServerInterface {
                     list.push([repoName, new Date().toISOString()]);
                 }
             }
-        } catch (_) { /* localStorage unavailable */ }
+        } catch (_) {
+            /* localStorage unavailable */
+        }
         return list;
     }
 
@@ -446,7 +453,7 @@ class ServerInterface {
 
         try {
             const limit = end - start;
-            const page  = Math.floor(start / limit) + 1;
+            const page = Math.floor(start / limit) + 1;
 
             const response = await this._get(
                 `/search?q=${encodeURIComponent(query.trim())}&page=${page}&limit=${limit}`
@@ -541,6 +548,39 @@ class ServerInterface {
      * @param {Function} callback               called with { success, key, repository }
      */
     async addProject(serialisedProjectJSON, callback) {
+        // ── Offline guard ────────────────────────────────────────────────
+        // If we have no internet, queue the repo creation locally.
+        // A placeholder repo ID is assigned so offline commits can still be saved.
+        // When back online, _createPendingRepo() will replay POST /create
+        // and push all pending commits in order.
+        if (this.offlineManager && !this.offlineManager.isOnline) {
+            let projectObj;
+            try {
+                projectObj = JSON.parse(serialisedProjectJSON);
+            } catch (e) {
+                callback({ success: false, error: "INVALID_PROJECT_JSON" });
+                return;
+            }
+
+            const projectId = this.Planet?.ProjectStorage?.getCurrentProjectID();
+            if (!projectId) {
+                callback({ success: false, error: "NO_CURRENT_PROJECT_ID" });
+                return;
+            }
+
+            const result = await this.offlineManager.queueRepoCreation(projectId, {
+                projectName: projectObj.ProjectName || projectObj.projectName || "Untitled",
+                description: projectObj.ProjectDescription || projectObj.description || "",
+                tags: projectObj.ProjectTags || [],
+                creatorName: projectObj.ProjectCreatorName || projectObj.creatorName || "",
+                thumbnail: projectObj.thumbnail || projectObj.ProjectImage || ""
+            });
+
+            callback(result);
+            return;
+        }
+
+        // ── Online path (unchanged) ───────────────────────────────────────
         try {
             let projectObj;
             try {
@@ -551,17 +591,17 @@ class ServerInterface {
             }
 
             const body = {
-                projectData: projectObj.ProjectData    || projectObj.projectData,
-                projectName: projectObj.ProjectName    || projectObj.projectName  || "Untitled",
-                repoName:    projectObj.repoName       || projectObj.ProjectName  || "untitled",
+                projectData: projectObj.ProjectData || projectObj.projectData,
+                projectName: projectObj.ProjectName || projectObj.projectName || "Untitled",
+                repoName: projectObj.repoName || projectObj.ProjectName || "untitled",
                 description: projectObj.ProjectDescription || projectObj.description || "",
-                theme:       projectObj.theme || (
-                    Array.isArray(projectObj.ProjectTags)
+                theme:
+                    projectObj.theme ||
+                    (Array.isArray(projectObj.ProjectTags)
                         ? projectObj.ProjectTags.join(",")
-                        : "music"
-                ),
+                        : "music"),
                 creatorName: projectObj.ProjectCreatorName || projectObj.creatorName || "",
-                thumbnail:   projectObj.thumbnail || projectObj.ProjectImage || ""
+                thumbnail: projectObj.thumbnail || projectObj.ProjectImage || ""
             };
 
             const response = await this._post("/create", body);
@@ -611,7 +651,6 @@ class ServerInterface {
                 body.thumbnail = thumbnail;
             }
             const response = await this._post("/publish", body);
-
 
             if (!response || response.error) {
                 callback({ success: false, error: response?.error || "PUBLISH_FAILED" });
@@ -681,9 +720,9 @@ class ServerInterface {
             this.saveKey(response.repoName, response.key);
 
             callback({
-                success:     true,
-                repository:  response.repoName,
-                key:         response.key,
+                success: true,
+                repository: response.repoName,
+                key: response.key,
                 projectData: response.projectData || null,
                 description: response.description || ""
             });
@@ -705,7 +744,7 @@ class ServerInterface {
      */
     async likeProject(repoName, like, callback) {
         try {
-            const userId   = this.Planet.UserID || "anon";
+            const userId = this.Planet.UserID || "anon";
             const response = await this._post("/like", { repoName, userId, like });
 
             if (!response || response.error) {
@@ -755,8 +794,8 @@ class ServerInterface {
      */
     downloadProjectZip(repoName) {
         const url = `${this.BaseURL}/download/${encodeURIComponent(repoName)}`;
-        const a   = document.createElement("a");
-        a.href     = url;
+        const a = document.createElement("a");
+        a.href = url;
         a.download = `${repoName}.zip`;
         a.style.display = "none";
         document.body.appendChild(a);
@@ -803,8 +842,163 @@ class ServerInterface {
     async getStats() {
         return {
             requests: this.requestManager.getStats(),
-            cache:    await this.cacheManager.getStats()
+            cache: await this.cacheManager.getStats()
         };
+    }
+
+    // ── Offline-aware commit ───────────────────────────────────────────────
+
+    /**
+     * Commits a project — online or offline.
+     *
+     * Online:  calls editProject() directly. On success, refreshes the local
+     *          commit cache so Version History stays current.
+     *
+     * Offline: calls OfflineCommitManager.saveDraft(). The same commit message
+     *          the student typed propagates to GitHub once connectivity returns.
+     *          Returns { success: false, offline: true } if the 5-draft cap is hit.
+     *
+     * The caller (gitDropdown.js) is responsible for showing the correct UI
+     * state ("Saving offline…" toast, cap-reached error, etc.)
+     *
+     * @param {string}   projectId      Planet project ID
+     * @param {string}   repoName       GitHub repo slug
+     * @param {string}   hashedKey      ownership key
+     * @param {*}        projectData    current project data
+     * @param {string}   commitMessage  written by the student in the commit modal
+     * @param {Function} callback       called with result object
+     */
+    async commitProject(projectId, repoName, hashedKey, projectData, commitMessage, callback) {
+        const offline = !this.offlineManager?.isOnline;
+
+        if (!offline) {
+            // ── Online path ──────────────────────────────────────────────
+            try {
+                const result = await new Promise(resolve => {
+                    this.editProject(repoName, hashedKey, projectData, commitMessage, resolve);
+                });
+
+                if (result && result.success) {
+                    // Keep local cache fresh after a successful commit
+                    if (this.offlineManager) {
+                        await this.offlineManager.refreshCache(projectId, repoName);
+                    }
+                }
+
+                callback(result);
+            } catch (err) {
+                console.error("[ServerInterface] commitProject (online) error:", err);
+                callback(this.ConnectionFailureData);
+            }
+        } else {
+            // ── Offline path ─────────────────────────────────────────────
+            if (!this.offlineManager) {
+                callback({ success: false, error: "OFFLINE_MANAGER_NOT_INITIALISED" });
+                return;
+            }
+
+            // Guard: offline commits require a GitHub repo to already exist.
+            // Without one, a draft can never be synced — block it with a clear message.
+            const gitData = this.Planet?.ProjectStorage?.data?.Projects?.[projectId]?.GitRepoData;
+            if (!gitData?.repoName || !gitData?.hashedKey) {
+                callback({
+                    success: false,
+                    offline: true,
+                    error: "NO_REPO_WHILE_OFFLINE",
+                    message:
+                        'This project hasn\'t been saved to GitHub yet. Please connect to the internet and click "Save a spot" first, then you can save commits offline.'
+                });
+                return;
+            }
+
+            const result = await this.offlineManager.saveDraft(
+                projectId,
+                projectData,
+                commitMessage
+            );
+
+            if (result.saved) {
+                callback({ success: true, offline: true });
+            } else if (result.reason === "cap") {
+                callback({
+                    success: false,
+                    offline: true,
+                    error: "OFFLINE_DRAFT_CAP_REACHED",
+                    message:
+                        "You have reached the maximum of 5 offline saves. Please connect to the internet to sync your changes before saving again."
+                });
+            } else {
+                callback({ success: false, offline: true, error: "OFFLINE_SAVE_FAILED" });
+            }
+        }
+    }
+
+    // ── Offline-aware history ──────────────────────────────────────────────
+
+    /**
+     * Returns commit history for the Version History panel.
+     *
+     * Online:  fetches full GitHub history and refreshes the local cache.
+     * Offline: returns the local view (pending drafts + last 3 cached commits).
+     *
+     * @param {string}   projectId
+     * @param {string}   repoName
+     * @param {Function} callback  called with { success, data: [], isOffline? }
+     */
+    async getHistoryForProject(projectId, repoName, callback) {
+        const offline = !this.offlineManager?.isOnline;
+
+        if (!offline) {
+            // ── Online path ──────────────────────────────────────────────
+            try {
+                const result = await new Promise(resolve => {
+                    this.getCommitHistory(repoName, resolve);
+                });
+
+                if (result && result.success) {
+                    // Refresh local cache with the latest 3 from GitHub
+                    if (this.offlineManager) {
+                        await this.offlineManager.refreshCache(projectId, repoName);
+                    }
+                    callback(result);
+                } else {
+                    // Fall back to local view if GitHub is unreachable
+                    this._fallbackToLocalHistory(projectId, callback);
+                }
+            } catch (err) {
+                console.error("[ServerInterface] getHistoryForProject (online) error:", err);
+                this._fallbackToLocalHistory(projectId, callback);
+            }
+        } else {
+            // ── Offline path ─────────────────────────────────────────────
+            this._fallbackToLocalHistory(projectId, callback);
+        }
+    }
+
+    /**
+     * Returns the local history view (pending drafts + cached commits).
+     * @private
+     */
+    _fallbackToLocalHistory(projectId, callback) {
+        if (!this.offlineManager) {
+            callback({ success: true, data: [], isOffline: true });
+            return;
+        }
+        const history = this.offlineManager.getLocalHistory(projectId);
+        callback({ success: true, data: history, isOffline: true });
+    }
+
+    // ── Offline manager attachment ─────────────────────────────────────────
+
+    /**
+     * Attaches an OfflineCommitManager instance.
+     * Called by Planet.js after both ServerInterface and OfflineCommitManager
+     * are initialised.
+     * @param {OfflineCommitManager} manager
+     */
+    attachOfflineManager(manager) {
+        this.offlineManager = manager;
+        console.debug("[ServerInterface] OfflineCommitManager attached.");
     }
 }
 
