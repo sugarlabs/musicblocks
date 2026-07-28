@@ -45,6 +45,10 @@ if (typeof module !== "undefined" && module.exports) {
     var BrowserUtils =
         (typeof window !== "undefined" && window.BrowserUtils) ||
         (typeof require !== "undefined" ? require("./browser-utils") : {});
+
+    var HttpUtils =
+        (typeof window !== "undefined" && window.HttpUtils) ||
+        (typeof require !== "undefined" ? require("./http-utils") : {});
 }
 
 /* exported
@@ -173,107 +177,6 @@ let format = (str, data) => {
         return _(item);
     });
 };
-
-/**
- * Performs an HTTP GET request to retrieve data from the server.
- * Uses async fetch to avoid blocking the UI during network requests.
- * @param {string|null} projectName - The name of the project (or null for the base URL).
- * @throws {Error} Throws an error if the HTTP status code is greater than 299.
- * @returns {Promise<string>} A promise that resolves to the response text from the server.
- */
-let httpGet = async projectName => {
-    const url = projectName === null ? window.server : window.server + projectName;
-    const response = await fetch(url, {
-        method: "GET",
-        headers: {
-            "x-api-key": window.MB_PROJECT_API_KEY || ""
-        }
-    });
-
-    if (!response.ok) {
-        throw new Error("Error from server");
-    }
-
-    return response.text();
-};
-
-/**
- * Performs an HTTP POST request to send data to the server.
- * Uses async fetch to avoid blocking the UI during network requests.
- * @param {string} projectName - The name of the project.
- * @param {string} data - The data to be sent in the POST request.
- * @returns {Promise<string>} A promise that resolves to the response text from the server.
- */
-let httpPost = async (projectName, data) => {
-    const response = await fetch(window.server + projectName, {
-        method: "POST",
-        headers: {
-            "x-api-key": window.MB_PROJECT_API_KEY || ""
-        },
-        body: data
-    });
-
-    if (!response.ok) {
-        throw new Error("Error from server");
-    }
-
-    return response.text();
-};
-
-/**
- * Constructor function for making an HTTP request.
- * @constructor
- * @param {string} url - The URL to make the HTTP request to.
- * @param {function} loadCallback - The callback function to handle the loaded response.
- * @param {function} [userCallback] - An optional user-defined callback function.
- */
-function HttpRequest(url, loadCallback, userCallback) {
-    const req = (this.request = new XMLHttpRequest());
-    this.handler = loadCallback;
-    this.url = url;
-    this.localmode = Boolean(self.location.href.search(/^file:/i) === 0);
-    this.userCallback = userCallback;
-
-    try {
-        req.open("GET", url);
-
-        req.onload = () => {
-            if ((req.status >= 200 && req.status < 300) || this.localmode) {
-                if (typeof this.handler === "function") this.handler();
-                if (typeof this.userCallback === "function") {
-                    this.userCallback(true, req.responseText);
-                }
-            } else {
-                if (typeof this.handler === "function") this.handler();
-                if (typeof this.userCallback === "function") {
-                    this.userCallback(false, `Error: ${req.status}`);
-                }
-            }
-        };
-
-        req.onerror = () => {
-            if (typeof this.handler === "function") this.handler();
-            if (typeof this.userCallback === "function") {
-                this.userCallback(false, "network error");
-            }
-        };
-
-        req.onabort = req.onerror;
-        req.ontimeout = req.onerror;
-
-        req.send("");
-    } catch (e) {
-        if (self.console) {
-            console.debug("Failed to load resource from " + url + ": Network error.", e);
-        }
-
-        if (typeof this.userCallback === "function") {
-            this.userCallback(false, "network error");
-        }
-
-        this.request = this.handler = this.userCallback = null;
-    }
-}
 
 /**
  * Wait for critical dependencies to be ready before calling callback.
@@ -1353,6 +1256,7 @@ if (typeof module !== "undefined" && module.exports) {
         ...UtilsLogic,
         ...DomHelpers,
         ...BrowserUtils,
+        ...HttpUtils,
         extractProjectDataFromHTML,
         _,
         format,
@@ -1360,9 +1264,6 @@ if (typeof module !== "undefined" && module.exports) {
         closeBlkWidgets,
         importMembers,
         changeImage,
-        httpGet,
-        httpPost,
-        HttpRequest,
         getTextWidth,
         doSVG,
         isSVGEmpty,
