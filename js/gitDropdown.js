@@ -17,10 +17,6 @@ class GitDropdownUI {
         this.activity = null;
         this._BASE_URL = "";
         this._prefetchPromise = null;
-
-        // Cached connectivity state — updated by _isOnline().
-        // Starts optimistic; the first real probe on init() decides.
-        this._online = true;
     }
 
     init(activity) {
@@ -128,35 +124,23 @@ class GitDropdownUI {
         localStorage.setItem("mbGitLastSavedHash", h);
     }
 
-    // ─── Pre-fetching ─────────────────────────────────────────────────────────
-
     // ─── Connectivity detection ───────────────────────────────────────────────
 
     /**
-     * Probes the backend /health endpoint to determine real connectivity.
-     * navigator.onLine is NOT used because it's always true on localhost.
-     * Caches the result in this._online so callers get an instant answer.
+     * Returns whether the browser currently has network connectivity.
+     * Uses navigator.onLine — the browser updates this synchronously when
+     * the OS-level network interface goes up or down, so it is reliable for
+     * detecting "no network at all" (WiFi off, cable unplugged).
      *
-     * @returns {Promise<boolean>}
+     * We do NOT probe /health here. The express backend being slow is a separate
+     * concern handled by the AbortController in _doCommit. This check only
+     * answers "does the device have any network?" so we can skip the fetch
+     * entirely when we already know the answer is no.
+     *
+     * @returns {boolean}
      */
-    async _isOnline() {
-        const probeUrl = this._BASE_URL.replace("/api/github", "") + "/health";
-        try {
-            const controller = new AbortController();
-            const timer = setTimeout(() => controller.abort(), 4000);
-            await fetch(probeUrl, { method: "HEAD", cache: "no-store", signal: controller.signal });
-            clearTimeout(timer);
-            this._online = true;
-
-            // Trigger sync on planet iframe whenever we confirm online connectivity
-            const planetIframe = document.getElementById("planet-iframe");
-            if (planetIframe && planetIframe.contentWindow) {
-                planetIframe.contentWindow.postMessage({ type: "MB_TRIGGER_SYNC" }, "*");
-            }
-        } catch (_) {
-            this._online = false;
-        }
-        return this._online;
+    _isOffline() {
+        return !navigator.onLine;
     }
 
     /**
@@ -293,11 +277,10 @@ class GitDropdownUI {
         const thumbnail = this._getThumbnail();
         const fullDesc = description || `${displayName} — a Music Blocks project`;
 
-        // ── Connectivity check ────────────────────────────────────────────────
-        const online = await this._isOnline();
-
-        if (!online) {
-            // ── Offline path — queue repo creation via planet iframe bridge ───
+        // ── Instant offline pre-check ─────────────────────────────────────────
+        // Same pattern as _doCommit: if the device has no network right now,
+        // skip the fetch entirely and queue the repo creation locally.
+        if (this._isOffline()) {
             this._showToast("You're offline. Queuing save spot for when you reconnect…", "info");
             const planetIframe = document.getElementById("planet-iframe");
             if (!planetIframe || !planetIframe.contentWindow) {
@@ -313,7 +296,7 @@ class GitDropdownUI {
                     description: fullDesc,
                     creatorName: "anonymous",
                     tags: [],
-                    projectId: null // planet uses its current project ID
+                    projectId: null
                 },
                 "*"
             );
@@ -322,9 +305,8 @@ class GitDropdownUI {
                 const result = await this._waitForMessage("MB_OFFLINE_CREATE_RESULT");
                 if (result.success) {
                     const offlineRepo = result.repository;
-                    // Store locally so the toolbar shows the "My Project" state
                     localStorage.setItem("mbGitRepoName", offlineRepo);
-                    localStorage.setItem("mbGitHashedKey", ""); // unknown until online
+                    localStorage.setItem("mbGitHashedKey", "");
                     this.onSaveLocally();
                     this._syncMenuState();
                     this._showToast(
@@ -345,6 +327,13 @@ class GitDropdownUI {
         }
 
         // ── Online path — direct fetch to backend ────────────────────────────
+        // Wire AbortController to the offline event — same pattern as _doCommit.
+        // If the network drops while POST /create is in-flight, abort immediately
+        // and silently queue the repo creation instead of showing an error toast.
+        const createController = new AbortController();
+        const abortCreateOnOffline = () => createController.abort("offline");
+        window.addEventListener("offline", abortCreateOnOffline, { once: true });
+
         const body = {
             repoName,
             projectName: displayName,
@@ -360,8 +349,11 @@ class GitDropdownUI {
             const res = await fetch(`${this._BASE_URL}/create`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(body)
+                body: JSON.stringify(body),
+                signal: createController.signal
             });
+
+            window.removeEventListener("offline", abortCreateOnOffline);
 
             if (!res.ok) {
                 const err = await res.json().catch(() => ({}));
@@ -409,11 +401,66 @@ class GitDropdownUI {
 
             this._showToast("Save spot created! Your project is now being tracked.", "success");
         } catch (e) {
-            console.error("[GitDropdownUI] create error:", e);
-            this._showToast(
-                "Could not create save spot. Check your connection and try again.",
-                "error"
-            );
+            window.removeEventListener("offline", abortCreateOnOffline);
+
+            // Network failure mid-create (abort or TypeError) → silently queue offline
+            const isNetworkFailure =
+                e.name === "AbortError" || e instanceof TypeError || this._isOffline();
+
+            if (isNetworkFailure) {
+                console.warn("[GitDropdownUI] Network lost during create — queuing offline.", e);
+                this._showToast(
+                    "You're offline. Queuing save spot for when you reconnect…",
+                    "info"
+                );
+                const planetIframe = document.getElementById("planet-iframe");
+                if (!planetIframe || !planetIframe.contentWindow) {
+                    this._showToast(
+                        "Could not queue save spot — planet frame unavailable.",
+                        "error"
+                    );
+                    return;
+                }
+                planetIframe.contentWindow.postMessage(
+                    {
+                        type: "MB_OFFLINE_CREATE",
+                        repoName,
+                        projectName: displayName,
+                        description: fullDesc,
+                        creatorName: "anonymous",
+                        tags: [],
+                        projectId: null
+                    },
+                    "*"
+                );
+                try {
+                    const result = await this._waitForMessage("MB_OFFLINE_CREATE_RESULT");
+                    if (result.success) {
+                        localStorage.setItem("mbGitRepoName", result.repository);
+                        localStorage.setItem("mbGitHashedKey", "");
+                        this.onSaveLocally();
+                        this._syncMenuState();
+                        this._showToast(
+                            "Save spot queued! It will be created on GitHub when you reconnect. ✔",
+                            "success"
+                        );
+                    } else {
+                        this._showToast(
+                            "Could not queue save spot — " + (result.error || "unknown error"),
+                            "error"
+                        );
+                    }
+                } catch (_) {
+                    this._showToast("Offline queue timed out — please try again.", "error");
+                }
+            } else {
+                // Server-side error — still report it
+                console.error("[GitDropdownUI] create server error:", e);
+                this._showToast(
+                    "Could not create save spot — the server returned an error.",
+                    "error"
+                );
+            }
         }
     }
 
@@ -444,60 +491,26 @@ class GitDropdownUI {
         const projectData = this._getProjectData();
         const thumbnail = this._getThumbnail();
 
-        // ── Connectivity check — use a real probe, not navigator.onLine ──────
-        // navigator.onLine is always true on localhost even with WiFi off.
-        const online = await this._isOnline();
-
-        if (!online) {
-            // ── Offline path — save draft via planet iframe bridge ────────────
-            this._showToast("You're offline. Saving a draft…", "info");
-            const planetIframe = document.getElementById("planet-iframe");
-            if (!planetIframe || !planetIframe.contentWindow) {
-                this._showToast("Could not save offline — planet frame unavailable.", "error");
-                return;
-            }
-
-            planetIframe.contentWindow.postMessage(
-                {
-                    type: "MB_OFFLINE_COMMIT",
-                    projectId: null, // planet uses its current project ID
-                    repoName,
-                    hashedKey,
-                    projectData,
-                    commitMessage
-                },
-                "*"
-            );
-
-            try {
-                const result = await this._waitForMessage("MB_OFFLINE_COMMIT_RESULT");
-                if (result.success) {
-                    this.onSaveLocally();
-                    this._showToast("Saved offline ✔ — will sync when you reconnect.", "success");
-                } else if (result.error === "OFFLINE_DRAFT_CAP_REACHED") {
-                    this._showToast(
-                        "You've reached 5 offline saves. Connect to the internet to sync first.",
-                        "error"
-                    );
-                } else if (result.error === "NO_REPO_WHILE_OFFLINE") {
-                    this._showToast(
-                        "Create a save spot first (while online), then you can save offline.",
-                        "error"
-                    );
-                } else {
-                    this._showToast(
-                        "Offline save failed — " + (result.error || "unknown error"),
-                        "error"
-                    );
-                }
-            } catch (e) {
-                console.error("[GitDropdownUI] offline commit bridge timeout:", e);
-                this._showToast("Offline save timed out — please try again.", "error");
-            }
+        // ── Step 1: instant offline check ────────────────────────────────────
+        // navigator.onLine is updated synchronously by the browser when the
+        // OS network interface changes — no fetch needed, no waiting.
+        // If the device has no network right now, skip straight to offline draft.
+        if (this._isOffline()) {
+            await this._saveOfflineDraft(repoName, hashedKey, projectData, commitMessage);
             return;
         }
 
-        // ── Online path — direct fetch to backend ────────────────────────────
+        // ── Step 2: attempt the commit, abort instantly if network drops ──────
+        // Wire an AbortController to the browser "offline" event so that if
+        // the network disappears *while* the PUT /edit is in-flight, the fetch
+        // is cancelled immediately — no "network unreachable" toast, just a
+        // silent fallback to an offline draft.
+        // If express is slow but alive the offline event never fires and we
+        // simply wait for the response as usual.
+        const controller = new AbortController();
+        const abortOnOffline = () => controller.abort("offline");
+        window.addEventListener("offline", abortOnOffline, { once: true });
+
         const body = { repoName, key: hashedKey, projectData, thumbnail, commitMessage };
 
         try {
@@ -505,8 +518,12 @@ class GitDropdownUI {
             const res = await fetch(`${this._BASE_URL}/edit`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(body)
+                body: JSON.stringify(body),
+                signal: controller.signal
             });
+
+            // Fetch succeeded — clean up the offline listener
+            window.removeEventListener("offline", abortOnOffline);
 
             if (!res.ok) {
                 const err = await res.json().catch(() => ({}));
@@ -523,11 +540,87 @@ class GitDropdownUI {
             this._prefetchCommits(); // Refresh cache after a new commit
             this._showToast("Moment saved! ✔", "success");
         } catch (e) {
-            console.error("[GitDropdownUI] commit error:", e);
-            this._showToast(
-                "Could not save this moment. Check your connection and try again.",
-                "error"
-            );
+            window.removeEventListener("offline", abortOnOffline);
+
+            // ── Network error or mid-commit disconnect → silent offline draft ─
+            // AbortError  = we aborted because the offline event fired
+            // TypeError   = browser-level network failure ("Failed to fetch")
+            // !onLine     = network dropped just before the check reached catch
+            const isNetworkFailure =
+                e.name === "AbortError" || e instanceof TypeError || this._isOffline();
+
+            if (isNetworkFailure) {
+                console.warn(
+                    "[GitDropdownUI] Network lost during commit — saving offline draft.",
+                    e
+                );
+                await this._saveOfflineDraft(repoName, hashedKey, projectData, commitMessage);
+            } else {
+                // Server-side error (4xx/5xx that wasn't caught above, or unexpected)
+                console.error("[GitDropdownUI] commit server error:", e);
+                this._showToast(
+                    "Could not save this moment — the server returned an error.",
+                    "error"
+                );
+            }
+        }
+    }
+
+    /**
+     * Saves a commit as a local offline draft via the planet iframe bridge.
+     * Called when the device is already offline (pre-check) or when the network
+     * drops mid-commit (abort fallback). Never shows a network-error toast.
+     *
+     * @param {string} repoName
+     * @param {string} hashedKey
+     * @param {*}      projectData
+     * @param {string} commitMessage
+     */
+    async _saveOfflineDraft(repoName, hashedKey, projectData, commitMessage) {
+        this._showToast("Saving offline draft…", "info");
+
+        const planetIframe = document.getElementById("planet-iframe");
+        if (!planetIframe || !planetIframe.contentWindow) {
+            this._showToast("Could not save offline — planet frame unavailable.", "error");
+            return;
+        }
+
+        planetIframe.contentWindow.postMessage(
+            {
+                type: "MB_OFFLINE_COMMIT",
+                projectId: null,
+                repoName,
+                hashedKey,
+                projectData,
+                commitMessage
+            },
+            "*"
+        );
+
+        try {
+            const result = await this._waitForMessage("MB_OFFLINE_COMMIT_RESULT");
+            if (result.success) {
+                this.onSaveLocally();
+                this._showToast("Saved offline ✔ — will sync when you reconnect.", "success");
+            } else if (result.error === "OFFLINE_DRAFT_CAP_REACHED") {
+                this._showToast(
+                    "You've reached 5 offline saves. Connect to the internet to sync first.",
+                    "error"
+                );
+            } else if (result.error === "NO_REPO_WHILE_OFFLINE") {
+                this._showToast(
+                    "Create a save spot first (while online), then you can save offline.",
+                    "error"
+                );
+            } else {
+                this._showToast(
+                    "Offline save failed — " + (result.error || "unknown error"),
+                    "error"
+                );
+            }
+        } catch (e) {
+            console.error("[GitDropdownUI] offline commit bridge timeout:", e);
+            this._showToast("Offline save timed out — please try again.", "error");
         }
     }
 
@@ -1284,7 +1377,7 @@ class GitDropdownUI {
 
             // If projectData is not already present, attempt to fetch it
             if (!projectData) {
-                if (sha && (await this._isOnline())) {
+                if (sha && !this._isOffline()) {
                     const res = await fetch(
                         `${this._BASE_URL}/getProjectDataAtCommit?repoName=${encodeURIComponent(repoName)}&sha=${encodeURIComponent(sha)}`
                     );

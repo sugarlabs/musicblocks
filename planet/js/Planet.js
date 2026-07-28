@@ -327,7 +327,8 @@ class Planet {
                         } catch (_) {
                             /* cross-origin guard */
                         }
-                    }
+                    },
+                    true // forceOffline = true
                 );
                 return;
             }
