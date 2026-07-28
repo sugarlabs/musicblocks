@@ -566,6 +566,146 @@ describe("Blocks Foundation", () => {
         });
     });
 
+    describe("_suppressRefresh during loading", () => {
+        const { PubSub } = require("../pubsub");
+        let mockActivity;
+        let loadContainer;
+
+        beforeEach(() => {
+            global.pubsub = new PubSub();
+            mockActivity = {
+                storage: {},
+                trashcan: {},
+                turtles: {},
+                boundary: {},
+                macroDict: {},
+                palettes: {
+                    dict: {},
+                    show: jest.fn(),
+                    updatePalettes: jest.fn(),
+                    showPalette: jest.fn()
+                },
+                logo: { synth: { loadSynth: jest.fn(), preloadProjectSamples: jest.fn() } },
+                blocksContainer: { x: 0, y: 0 },
+                canvas: { width: 800, height: 600 },
+                refreshCanvas: jest.fn(),
+                errorMsg: jest.fn(),
+                setSelectionMode: jest.fn(),
+                stopLoadAnimation: jest.fn(),
+                setHomeContainers: jest.fn(),
+                __tick: jest.fn(),
+                _suppressRefresh: false
+            };
+            loadContainer = document.createElement("div");
+            loadContainer.id = "load-container";
+            document.body.appendChild(loadContainer);
+        });
+
+        afterEach(() => {
+            loadContainer.remove();
+            delete global.pubsub;
+        });
+
+        it("sets _suppressRefresh true during loadNewBlocks", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks._processOneBlock = jest.fn();
+            blocks.protoBlockDict = {};
+            blocks.newStorein2Block = jest.fn();
+            blocks.newNamedboxBlock = jest.fn();
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks.customTemperamentDefined = true;
+
+            // Minimal valid block object: [id, name, x, y, connections]
+            const blockObjs = [[0, "forward", 0, 0, [null, null, null]]];
+
+            // Capture the flag state during the synchronous body
+            let flagDuringLoad = null;
+            const origProcessChunk = blocks._processOneBlock;
+            blocks._processOneBlock = jest.fn(() => {
+                flagDuringLoad = mockActivity._suppressRefresh;
+            });
+
+            blocks.loadNewBlocks(blockObjs);
+
+            // Flag should be true during processing (before cleanupAfterLoad resets it)
+            expect(flagDuringLoad).toBe(true);
+        });
+
+        it("resets _suppressRefresh on circular connection early return", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+
+            // Block connected to itself: connections[0] === block id
+            const blockObjs = [[0, "forward", 0, 0, [0, null, null]]];
+
+            blocks.loadNewBlocks(blockObjs);
+
+            expect(mockActivity._suppressRefresh).toBe(false);
+        });
+
+        it("resets _suppressRefresh after cleanupAfterLoad finishes", async () => {
+            const blocks = new Blocks(mockActivity);
+            blocks._loadCounter = 1;
+            blocks.blockList = [];
+            blocks.blocksToCollapse = [];
+            blocks._findDrumURLs = jest.fn();
+            blocks.updateBlockPositions = jest.fn();
+            blocks._cleanupStacks = jest.fn();
+            blocks.actionMetadata = jest.fn();
+            blocks.newNameddoBlock = jest.fn();
+            blocks.newStorein2Block = jest.fn();
+            blocks.newNamedboxBlock = jest.fn();
+            blocks._rebuildSpatialGrid = jest.fn();
+
+            mockActivity._suppressRefresh = true;
+
+            await blocks.cleanupAfterLoad();
+
+            expect(mockActivity._suppressRefresh).toBe(false);
+            expect(mockActivity.refreshCanvas).toHaveBeenCalled();
+        });
+
+        it("resets _suppressRefresh even if cleanupAfterLoad body throws", async () => {
+            const blocks = new Blocks(mockActivity);
+            blocks._loadCounter = 1;
+            blocks.blockList = [];
+            blocks.blocksToCollapse = [];
+            blocks._findDrumURLs = jest.fn(() => {
+                throw new Error("test error");
+            });
+
+            mockActivity._suppressRefresh = true;
+
+            await expect(blocks.cleanupAfterLoad()).rejects.toThrow("test error");
+
+            expect(mockActivity._suppressRefresh).toBe(false);
+            expect(mockActivity.refreshCanvas).toHaveBeenCalled();
+        });
+
+        it("resets _suppressRefresh if loadNewBlocks throws", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.protoBlockDict = {};
+            blocks.newStorein2Block = jest.fn();
+            blocks.newNamedboxBlock = jest.fn();
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks.customTemperamentDefined = true;
+
+            // Valid block object to pass initial checks
+            const blockObjs = [[0, "forward", 0, 0, [null, null, null]]];
+
+            // Make the block repair loop throw by corrupting blockObjs after validation
+            const origProcessChunk = blocks._processOneBlock;
+            blocks._processOneBlock = jest.fn(() => {
+                throw new Error("simulated processing error");
+            });
+
+            expect(() => blocks.loadNewBlocks(blockObjs)).toThrow("simulated processing error");
+            expect(mockActivity._suppressRefresh).toBe(false);
+        });
+    });
+
     describe("renameNameddos", () => {
         let blocksInstance;
 
