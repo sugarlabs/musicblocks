@@ -132,7 +132,12 @@ const FLAT = "♭";
  *   - To convert a ratio to cents: cents = 1200 * log2(ratio)
  *   - To convert cents to a frequency multiplier: multiplier = 2^(cents/1200)
  *
- * Example: A4 = 440 Hz, A4 + 33 cents = 440 * 2^(33/1200) ≈ 448.17 Hz
+ * Examples:
+ *   12-EDO step = 100 ¢ (1200 / 12)
+ *   5-EDO  step = 240 ¢ (1200 / 5)
+ *   19-EDO step ≈ 63.16 ¢ (1200 / 19)
+ *
+ * Example: A4 = 440 Hz, A4 + 33 ¢ = 440 * 2^(33/1200) ≈ 448.17 Hz
  *
  * @constant {string}
  * @default
@@ -934,10 +939,33 @@ const getCurrentEDO = temperament => {
 
 const EDO_NOTE_NAMES = {};
 
+const SHARP_NAMES = [
+    "C",
+    "C" + SHARP,
+    "D",
+    "D" + SHARP,
+    "E",
+    "F",
+    "F" + SHARP,
+    "G",
+    "G" + SHARP,
+    "A",
+    "A" + SHARP,
+    "B"
+];
+
 /**
  * Generates a note name table for any EDO.
+ *
+ * Examples:
+ *   generateNoteNames(5)  → ["C", "D", "E", "G", "A"]
+ *   generateNoteNames(7)  → ["C", "D", "E", "F", "G", "A", "B"]
+ *   generateNoteNames(12) → ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"]
+ *   generateNoteNames(19) → ["C", "C♯", "D♭", "D", "D♯", "E♭", "E", "E♯", "F", "F♯", "G♭", "G", "G♯", "A♭", "A", "A♯", "B♭", "B", "B♯"]
+ *
+ * For 12-EDO: returns the standard 12-tone chromatic names.
+ * For small EDOs (5, 7): returns the subset of natural letters without accidentals.
  * For EDO > 12: interleaves sharp and flat accidentals between naturals.
- * For EDO <= 12: uses the standard sharp names.
  * Results are cached in EDO_NOTE_NAMES.
  * @param {number} edo - number of steps per octave
  * @returns {string[]} array of note names, length = edo
@@ -950,23 +978,20 @@ function generateNoteNames(edo) {
     const naturals = ["C", "D", "E", "F", "G", "A", "B"];
     const naturalPos12 = [0, 2, 4, 5, 7, 9, 11];
 
-    if (edo <= 12) {
-        const SHARP_NAMES = [
-            "C",
-            "C" + SHARP,
-            "D",
-            "D" + SHARP,
-            "E",
-            "F",
-            "F" + SHARP,
-            "G",
-            "G" + SHARP,
-            "A",
-            "A" + SHARP,
-            "B"
-        ];
-        EDO_NOTE_NAMES[edo] = SHARP_NAMES.slice(0, edo);
-        return EDO_NOTE_NAMES[edo];
+    if (edo === 12) {
+        EDO_NOTE_NAMES[edo] = SHARP_NAMES;
+        return SHARP_NAMES;
+    }
+
+    if (edo === 7) {
+        EDO_NOTE_NAMES[edo] = naturals;
+        return naturals;
+    }
+
+    if (edo === 5) {
+        const pentatonic = ["C", "D", "E", "G", "A"];
+        EDO_NOTE_NAMES[edo] = pentatonic;
+        return pentatonic;
     }
 
     // Compute ideal step counts for each of the 7 intervals, rounding down.
@@ -1020,6 +1045,14 @@ function generateNoteNames(edo) {
 
 /**
  * Returns the index of a note name in an EDO-specific name table.
+ *
+ * Examples:
+ *   getEdoNoteNamePosition("C♯", 12)  → 1
+ *   getEdoNoteNamePosition("D♭", 19)  → 2
+ *   getEdoNoteNamePosition("E♯", 19)  → 7
+ *   getEdoNoteNamePosition("G",   7)  → 4
+ *   getEdoNoteNamePosition("C♯",  7)  → -1 (not in 7-EDO)
+ *
  * @param {string} name - note name (e.g., "C♯", "D♭")
  * @param {number} edo - number of steps per octave
  * @returns {number} position in the EDO name table, or -1 if not found

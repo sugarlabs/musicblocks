@@ -312,8 +312,8 @@ class Singer {
 
         const activity = logo.activity;
         const tur = activity.turtles.ithTurtle(turtle);
-        const temper = logo.synth.inTemperament;
-        const edo = getCurrentEDO(temper);
+        const temperament = logo.synth.inTemperament;
+        const edo = getCurrentEDO(temperament);
 
         let noteObj = getNote(
             note,
@@ -323,26 +323,26 @@ class Singer {
             tur.singer.movable,
             null,
             activity.errorMsg,
-            temper
+            temperament
         );
 
-        if (isCustomTemperament(temper)) {
+        if (isCustomTemperament(temperament)) {
             noteObj = getNote(
                 noteObj[0],
                 noteObj[1],
                 steps > 0
-                    ? getStepSizeUp(tur.singer.keySignature, noteObj[0], steps, temper)
-                    : getStepSizeDown(tur.singer.keySignature, noteObj[0], steps, temper),
+                    ? getStepSizeUp(tur.singer.keySignature, noteObj[0], steps, temperament)
+                    : getStepSizeDown(tur.singer.keySignature, noteObj[0], steps, temperament),
                 tur.singer.keySignature,
                 tur.singer.movable,
                 null,
                 activity.errorMsg,
-                temper,
+                temperament,
                 false,
                 false // allow octave wrap for scalar traversal
             );
-        } else if (!isTrueEDO(temper)) {
-            const curTemp = temper;
+        } else if (!isTrueEDO(temperament)) {
+            const curTemp = temperament;
             for (let i = 0; i < Math.abs(steps); i++) {
                 const stepEdo =
                     steps > 0
@@ -362,7 +362,8 @@ class Singer {
                 );
             }
         } else {
-            const curTemp = temper;
+            const curTemp = temperament;
+
             const curEDO = edo;
             if (curEDO === 12) {
                 for (let i = 0; i < Math.abs(steps); i++) {

@@ -269,7 +269,9 @@ function setupPitchActions(activity) {
             const tur = activity.turtles.ithTurtle(turtle);
 
             if (tur.singer.inDefineMode) {
-                tur.singer.defineMode.push(pitchNumber);
+                const currentEDO = getCurrentEDO(activity.logo.synth.inTemperament);
+                const normalizedPitch = ((pitchNumber % currentEDO) + currentEDO) % currentEDO;
+                tur.singer.defineMode.push(normalizedPitch);
                 return;
             } else {
                 if (
@@ -734,7 +736,7 @@ function setupPitchActions(activity) {
                         ? getStepSizeUp(tur.singer.keySignature, pitch, undefined, temp)
                         : getStepSizeDown(tur.singer.keySignature, pitch, undefined, temp);
                 if (edo !== 12) {
-                    step = (step * 12) / edo;
+                    step = 1;
                 }
                 return step;
             };
