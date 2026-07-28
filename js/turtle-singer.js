@@ -364,25 +364,48 @@ class Singer {
         } else {
             const curTemp = temper;
             const curEDO = edo;
-            for (let i = 0; i < Math.abs(steps); i++) {
-                let stepEdo =
-                    steps > 0
-                        ? getStepSizeUp(tur.singer.keySignature, noteObj[0], undefined, curTemp)
-                        : getStepSizeDown(tur.singer.keySignature, noteObj[0], undefined, curTemp);
-                const stepSemi = curEDO !== 12 ? (stepEdo * 12) / curEDO : stepEdo;
+            if (curEDO === 12) {
+                for (let i = 0; i < Math.abs(steps); i++) {
+                    const stepEdo =
+                        steps > 0
+                            ? getStepSizeUp(tur.singer.keySignature, noteObj[0], undefined, curTemp)
+                            : getStepSizeDown(
+                                  tur.singer.keySignature,
+                                  noteObj[0],
+                                  undefined,
+                                  curTemp
+                              );
 
-                noteObj = getNote(
-                    noteObj[0],
-                    noteObj[1],
-                    stepSemi,
-                    tur.singer.keySignature,
-                    tur.singer.movable,
-                    null,
-                    activity.errorMsg,
-                    curTemp,
-                    false,
-                    false // allow octave wrap
-                );
+                    noteObj = getNote(
+                        noteObj[0],
+                        noteObj[1],
+                        stepEdo,
+                        tur.singer.keySignature,
+                        tur.singer.movable,
+                        null,
+                        activity.errorMsg,
+                        curTemp,
+                        true,
+                        false // allow octave wrap
+                    );
+                }
+            } else {
+                for (let i = 0; i < Math.abs(steps); i++) {
+                    const stepEdo = steps > 0 ? 1 : -1;
+
+                    noteObj = getNote(
+                        noteObj[0],
+                        noteObj[1],
+                        stepEdo,
+                        tur.singer.keySignature,
+                        tur.singer.movable,
+                        null,
+                        activity.errorMsg,
+                        curTemp,
+                        true,
+                        false // allow octave wrap
+                    );
+                }
             }
         }
 

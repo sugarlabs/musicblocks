@@ -1035,12 +1035,12 @@ function getEdoNoteNamePosition(name, edo) {
     let idx = names.indexOf(normalizedName);
     if (idx !== -1) return idx;
 
-    // Fallback: try sharp equivalent
-    if (normalizedName in EQUIVALENTSHARPS) {
+    // Fallback: try sharp equivalent (12-EDO only — non-12 EDO has distinct pitch classes)
+    if (edo === 12 && normalizedName in EQUIVALENTSHARPS) {
         idx = names.indexOf(EQUIVALENTSHARPS[normalizedName]);
         if (idx !== -1) return idx;
     }
-    if (normalizedName in EQUIVALENTFLATS) {
+    if (edo === 12 && normalizedName in EQUIVALENTFLATS) {
         idx = names.indexOf(EQUIVALENTFLATS[normalizedName]);
         if (idx !== -1) return idx;
     }
@@ -5077,10 +5077,15 @@ function getNote(
                 console.log("Cannot find " + keySignature.split(" ")[0] + ". Reverting to C");
             }
         }
-        if (getSharpFlatPreference(keySignature) === "sharp") {
-            noteArg = PITCHES2[(noteArg + kOffset) % octaveLength];
+        if (octaveLength === 12) {
+            if (getSharpFlatPreference(keySignature) === "sharp") {
+                noteArg = PITCHES2[(noteArg + kOffset) % octaveLength];
+            } else {
+                noteArg = PITCHES[(noteArg + kOffset) % octaveLength];
+            }
         } else {
-            noteArg = PITCHES[(noteArg + kOffset) % octaveLength];
+            const edoNames = generateNoteNames(octaveLength);
+            noteArg = edoNames[(noteArg + kOffset) % octaveLength];
         }
     }
 
@@ -5378,7 +5383,7 @@ function getNote(
                 return ["R", "", 0];
             }
 
-            if (note in EXTRATRANSPOSITIONS) {
+            if (octaveLength === 12 && note in EXTRATRANSPOSITIONS) {
                 octave += EXTRATRANSPOSITIONS[note][1];
                 note = EXTRATRANSPOSITIONS[note][0];
             }
@@ -5428,17 +5433,17 @@ function getNote(
         // note letter's SPN position matches the actual pitch register.
         switch (getSharpFlatPreference(keySignature)) {
             case "flat":
-                if (note in EQUIVALENTFLATS) {
+                if (octaveLength === 12 && note in EQUIVALENTFLATS) {
                     note = EQUIVALENTFLATS[note];
                 }
                 break;
             case "sharp":
-                if (note in EQUIVALENTSHARPS) {
+                if (octaveLength === 12 && note in EQUIVALENTSHARPS) {
                     note = EQUIVALENTSHARPS[note];
                 }
                 break;
             case "natural":
-                if (note in EQUIVALENTNATURALS) {
+                if (octaveLength === 12 && note in EQUIVALENTNATURALS) {
                     const origLetter = note.charAt(0);
                     note = EQUIVALENTNATURALS[note];
                     const newLetter = note.charAt(0);
@@ -5457,12 +5462,12 @@ function getNote(
         if (direction !== undefined) {
             switch (direction) {
                 case -1:
-                    if (note in EQUIVALENTFLATS) {
+                    if (octaveLength === 12 && note in EQUIVALENTFLATS) {
                         note = EQUIVALENTFLATS[note];
                     }
                     break;
                 case 1:
-                    if (note in EQUIVALENTSHARPS) {
+                    if (octaveLength === 12 && note in EQUIVALENTSHARPS) {
                         note = EQUIVALENTSHARPS[note];
                     }
                     break;
@@ -5477,11 +5482,11 @@ function getNote(
         // temperaments where they are not enharmonically equivalent).
         if (transpositionFloor === 0) {
             if (rememberSharp) {
-                if (note in EQUIVALENTSHARPS) {
+                if (octaveLength === 12 && note in EQUIVALENTSHARPS) {
                     note = EQUIVALENTSHARPS[note];
                 }
             } else if (rememberFlat) {
-                if (note in EQUIVALENTFLATS) {
+                if (octaveLength === 12 && note in EQUIVALENTFLATS) {
                     note = EQUIVALENTFLATS[note];
                 }
             }
@@ -6069,19 +6074,19 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
         }
     }
 
-    if (ii === -1) {
+    if (currentEDO === 12 && ii === -1) {
         if (thisPitch in EQUIVALENTFLATS) {
             ii = scale.indexOf(EQUIVALENTFLATS[thisPitch]);
         }
     }
 
-    if (ii === -1) {
+    if (currentEDO === 12 && ii === -1) {
         if (thisPitch in EQUIVALENTSHARPS) {
             ii = scale.indexOf(EQUIVALENTSHARPS[thisPitch]);
         }
     }
 
-    if (ii === -1) {
+    if (currentEDO === 12 && ii === -1) {
         if (thisPitch in EQUIVALENTNATURALS) {
             ii = scale.indexOf(EQUIVALENTNATURALS[thisPitch]);
         }
@@ -7415,7 +7420,10 @@ const getPitchInfo = function (activity, type, currentNote, tur) {
     }
     // Map the pitch to the current scale.
     pitch = pitch.replaceAll("#", SHARP).replaceAll("b", FLAT);
-    if (!buildScale(tur.singer.keySignature)[0].includes(pitch)) {
+    if (
+        getCurrentEDO(temperament) === 12 &&
+        !buildScale(tur.singer.keySignature)[0].includes(pitch)
+    ) {
         if (pitch in EQUIVALENTFLATS) {
             pitch = EQUIVALENTFLATS[pitch];
         } else if (pitch in EQUIVALENTSHARPS) {
