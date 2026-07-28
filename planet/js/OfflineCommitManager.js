@@ -171,14 +171,6 @@ class OfflineCommitManager {
             "" // placeholder — filled when repo is created
         );
 
-        // Save an initial commit draft for project creation so the timeline
-        // has a "Project created" initial commit offline.
-        const initialData =
-            projectDetails.projectData ||
-            this.storage.data?.Projects?.[projectId]?.ProjectData ||
-            [];
-        await this.saveDraft(projectId, initialData, "Project created");
-
         console.debug(
             `[OfflineCommitManager] Repo creation queued for project ${projectId}: ${repoName}`
         );
@@ -201,8 +193,11 @@ class OfflineCommitManager {
             .filter(d => d.status === "pending")
             .sort((a, b) => a.timestamp - b.timestamp);
 
-        const initialData =
-            drafts[0]?.data || this.storage.data?.Projects?.[projectId]?.ProjectData || null;
+        // Use the project's stored data as the initial file content in the repo.
+        // Do NOT use drafts[0].data here — all drafts are pushed as proper named
+        // commits via syncPending, so the student's first offline commit message
+        // appears correctly in the timeline.
+        const initialData = this.storage.data?.Projects?.[projectId]?.ProjectData || null;
 
         // Send the pre-generated repoName (from queueRepoCreation) so the
         // backend uses exactly this name — mbGitRepoName stays the same.
@@ -254,10 +249,10 @@ class OfflineCommitManager {
         // Clear the pending creation flag
         await this.storage.clearPendingRepoCreation(projectId);
 
-        // The first draft's data was committed via POST /create — mark it synced
-        if (drafts[0]) {
-            await this.storage.updateDraftStatus(projectId, drafts[0].id, "synced");
-        }
+        // All drafts (including the first) are pushed as proper named commits
+        // via syncPending — do NOT mark any draft as synced here.
+        // The repo was initialised with the project's stored data; the student's
+        // offline commits will appear in the timeline with their original messages.
 
         // Notify parent window so toolbar shows the confirmed repo + key
         try {
@@ -270,10 +265,10 @@ class OfflineCommitManager {
         }
 
         console.debug(
-            `[OfflineCommitManager] Pending repo created: ${actualRepoName}. Syncing remaining drafts…`
+            `[OfflineCommitManager] Pending repo created: ${actualRepoName}. Syncing all drafts…`
         );
 
-        // Push remaining drafts (draft 2, 3, …) to the real repo
+        // Push ALL drafts (draft 1, 2, 3, …) to the real repo as proper commits
         await this.syncPending(projectId, actualRepoName, realKey);
     }
 
