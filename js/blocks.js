@@ -4826,6 +4826,7 @@ class Blocks {
                         console.debug("Punting loading of new blocks!");
 
                         console.debug(blockObjs);
+                        this.activity._suppressRefresh = false;
                         return;
                     }
                 }
@@ -6205,84 +6206,86 @@ class Blocks {
                 return;
             }
 
-            this._findDrumURLs();
+            try {
+                this._findDrumURLs();
 
-            this.updateBlockPositions();
+                this.updateBlockPositions();
 
-            // Rebuild spatial grid after all blocks are positioned
-            this._rebuildSpatialGrid();
+                // Rebuild spatial grid after all blocks are positioned
+                this._rebuildSpatialGrid();
 
-            this._cleanupStacks();
+                this._cleanupStacks();
 
-            for (let i = 0; i < this.blocksToCollapse.length; i++) {
-                this.blockList[this.blocksToCollapse[i]].collapseToggle();
-            }
-
-            this.blocksToCollapse = [];
-
-            /** All blocks loaded — allow canvas redraws again. */
-            this.activity._suppressRefresh = false;
-            this.activity.refreshCanvas();
-
-            /** Do a final check on the action and boxes palettes. */
-            let updatePalettes = false;
-            for (const blk in this.blockList) {
-                if (!this.blockList[blk].trash && this.blockList[blk].name === "action") {
-                    const myBlock = this.blockList[blk];
-                    const c = myBlock.connections[1];
-                    if (
-                        c !== null &&
-                        this.blockList[c].value !== _("action") &&
-                        this.blockList[c].value !== "action"
-                    ) {
-                        const metadata = this.actionMetadata(blk);
-                        if (
-                            this.newNameddoBlock(
-                                this.blockList[c].value,
-                                metadata.hasReturn,
-                                metadata.hasArgs
-                            )
-                        ) {
-                            updatePalettes = true;
-                        }
-                    }
+                for (let i = 0; i < this.blocksToCollapse.length; i++) {
+                    this.blockList[this.blocksToCollapse[i]].collapseToggle();
                 }
-            }
 
-            if (updatePalettes) {
-                this.activity.palettes.updatePalettes("action");
-            }
+                this.blocksToCollapse = [];
 
-            updatePalettes = false;
-            for (const blk in this.blockList) {
-                if (!this.blockList[blk].trash && this.blockList[blk].name === "storein") {
-                    const myBlock = this.blockList[blk];
-                    const c = myBlock.connections[1];
-                    if (c !== null && this.blockList[c].value !== _("box")) {
-                        const name = this.blockList[c].value;
-                        if (name !== null) {
-                            /** Is there an old block with this name still around? */
+                /** Do a final check on the action and boxes palettes. */
+                let updatePalettes = false;
+                for (const blk in this.blockList) {
+                    if (!this.blockList[blk].trash && this.blockList[blk].name === "action") {
+                        const myBlock = this.blockList[blk];
+                        const c = myBlock.connections[1];
+                        if (
+                            c !== null &&
+                            this.blockList[c].value !== _("action") &&
+                            this.blockList[c].value !== "action"
+                        ) {
+                            const metadata = this.actionMetadata(blk);
                             if (
-                                this.protoBlockDict["myStorein_" + name] === undefined ||
-                                this.protoBlockDict["yourStorein2_" + name] === undefined
+                                this.newNameddoBlock(
+                                    this.blockList[c].value,
+                                    metadata.hasReturn,
+                                    metadata.hasArgs
+                                )
                             ) {
-                                /** this.newStoreinBlock(this.blockList[c].value); */
-                                this.newStorein2Block(this.blockList[c].value);
-                                this.newNamedboxBlock(this.blockList[c].value);
                                 updatePalettes = true;
                             }
                         }
                     }
                 }
-            }
 
-            document.body.style.cursor = "default";
-            document.getElementById("load-container").style.display = "none";
-            // Stop the loading animation interval to prevent CPU waste
-            if (this.activity.stopLoadAnimation) {
-                this.activity.stopLoadAnimation();
+                if (updatePalettes) {
+                    this.activity.palettes.updatePalettes("action");
+                }
+
+                updatePalettes = false;
+                for (const blk in this.blockList) {
+                    if (!this.blockList[blk].trash && this.blockList[blk].name === "storein") {
+                        const myBlock = this.blockList[blk];
+                        const c = myBlock.connections[1];
+                        if (c !== null && this.blockList[c].value !== _("box")) {
+                            const name = this.blockList[c].value;
+                            if (name !== null) {
+                                /** Is there an old block with this name still around? */
+                                if (
+                                    this.protoBlockDict["myStorein_" + name] === undefined ||
+                                    this.protoBlockDict["yourStorein2_" + name] === undefined
+                                ) {
+                                    /** this.newStoreinBlock(this.blockList[c].value); */
+                                    this.newStorein2Block(this.blockList[c].value);
+                                    this.newNamedboxBlock(this.blockList[c].value);
+                                    updatePalettes = true;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                document.body.style.cursor = "default";
+                document.getElementById("load-container").style.display = "none";
+                // Stop the loading animation interval to prevent CPU waste
+                if (this.activity.stopLoadAnimation) {
+                    this.activity.stopLoadAnimation();
+                }
+                pubsub.emit("finishedLoading");
+            } finally {
+                /** All blocks loaded — allow canvas redraws again. */
+                this.activity._suppressRefresh = false;
+                this.activity.refreshCanvas();
             }
-            pubsub.emit("finishedLoading");
         };
 
         /**
