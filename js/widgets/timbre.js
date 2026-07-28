@@ -39,6 +39,9 @@
 /* exported TimbreWidget */
 
 class TimbreWidget {
+    /** AMD module dependencies for lazy loading. */
+    static dependencies = ["widgets/timbre"];
+
     static BUTTONSIZE = 53;
     static ICONSIZE = 32;
 

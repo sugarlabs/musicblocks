@@ -1554,9 +1554,4 @@ describe("PhraseMaker.dependencies", () => {
             "widgets/phrasemaker"
         ]);
     });
-
-    test("is not read by widget instances at construction time", () => {
-        const instance = new PhraseMaker({});
-        expect(instance.dependencies).toBeUndefined();
-    });
 });

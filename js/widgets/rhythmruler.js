@@ -64,6 +64,9 @@
  * @requires EFFECTSNAMES
  */
 class RhythmRuler {
+    /** AMD module dependencies for lazy loading. */
+    static dependencies = ["widgets/rhythmruler"];
+
     /**
      * Height of the RhythmRuler widget.
      * @type {number}

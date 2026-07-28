@@ -19,6 +19,9 @@
 */
 
 /* exported SampleWidget */
+/** AMD module dependencies for lazy loading. */
+SampleWidget.dependencies = ["widgets/sampler"];
+
 /**
  * Represents a Sample Widget.
  * @constructor

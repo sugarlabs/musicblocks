@@ -23,6 +23,9 @@
 
 /* exported PitchSlider */
 class PitchSlider {
+    /** AMD module dependencies for lazy loading. */
+    static dependencies = ["widgets/pitchslider"];
+
     static ICONSIZE = 32;
     static SEMITONE = Math.pow(2, 1 / 12);
 

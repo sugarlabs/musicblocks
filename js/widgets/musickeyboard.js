@@ -40,6 +40,9 @@
 */
 /* exported MusicKeyboard */
 
+/** AMD module dependencies for lazy loading. */
+MusicKeyboard.dependencies = ["widgets/musickeyboard"];
+
 /**
  * Represents a Music Keyboard interface.
  * @constructor

@@ -29,6 +29,9 @@
 
 /* exported TemperamentWidget */
 
+/** AMD module dependencies for lazy loading. */
+TemperamentWidget.dependencies = ["widgets/temperament"];
+
 /**
  * Represents a widget for managing temperament settings.
  * @constructor

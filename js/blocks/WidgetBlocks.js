@@ -330,7 +330,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "temperament",
-                ["widgets/temperament"],
+                TemperamentWidget.dependencies,
                 () => new TemperamentWidget(),
                 turtle,
                 blk,
@@ -416,7 +416,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "sample",
-                ["widgets/sampler"],
+                SampleWidget.dependencies,
                 () => new SampleWidget(),
                 turtle,
                 blk,
@@ -506,7 +506,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "timbre",
-                ["widgets/timbre"],
+                TimbreWidget.dependencies,
                 () => new TimbreWidget(),
                 turtle,
                 blk,
@@ -615,7 +615,7 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
-                _lazyRequire(["widgets/meterwidget"], function () {
+                _lazyRequire(MeterWidget.dependencies, function () {
                     logo.meterWidget = new MeterWidget(activity, blk);
                     logo.insideMeterWidget = false;
                 });
@@ -687,7 +687,7 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
-                _lazyRequire(["widgets/oscilloscope"], function () {
+                _lazyRequire(Oscilloscope.dependencies, function () {
                     logo.Oscilloscope = new Oscilloscope(activity);
                     logo.inOscilloscope = false;
                 });
@@ -746,7 +746,7 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
-                _lazyRequire(["widgets/modewidget"], function () {
+                _lazyRequire(ModeWidget.dependencies, function () {
                     logo.modeWidget = new ModeWidget(activity);
                     logo.insideModeWidget = false;
                 });
@@ -805,7 +805,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "tempo",
-                ["widgets/tempo"],
+                Tempo.dependencies,
                 () => new Tempo(),
                 turtle,
                 blk,
@@ -882,7 +882,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "arpeggio",
-                ["widgets/arpeggio"],
+                Arpeggio.dependencies,
                 () => new Arpeggio(),
                 turtle,
                 blk,
@@ -964,7 +964,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "pitchDrumMatrix",
-                ["widgets/pitchdrummatrix"],
+                PitchDrumMatrix.dependencies,
                 () => new PitchDrumMatrix(),
                 turtle,
                 blk,
@@ -1045,7 +1045,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "pitchSlider",
-                ["widgets/pitchslider"],
+                PitchSlider.dependencies,
                 () => new PitchSlider(),
                 turtle,
                 blk,
@@ -1204,7 +1204,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "musicKeyboard",
-                ["widgets/musickeyboard"],
+                MusicKeyboard.dependencies,
                 () => new MusicKeyboard(activity),
                 turtle,
                 blk,
@@ -1276,7 +1276,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "pitchStaircase",
-                ["widgets/pitchstaircase"],
+                PitchStaircase.dependencies,
                 () => new PitchStaircase(),
                 turtle,
                 blk,
@@ -1391,7 +1391,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "rhythmRuler",
-                ["widgets/rhythmruler"],
+                RhythmRuler.dependencies,
                 () => new RhythmRuler(),
                 turtle,
                 blk,
@@ -1599,13 +1599,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "phraseMaker",
-                [
-                    "widgets/PhraseMakerUtils",
-                    "widgets/PhraseMakerGrid",
-                    "widgets/PhraseMakerUI",
-                    "widgets/PhraseMakerAudio",
-                    "widgets/phrasemaker"
-                ],
+                PhraseMaker.dependencies,
                 () => {
                     // Create explicit dependency object for PhraseMaker
                     const phraseMakerDeps = {
@@ -1929,7 +1923,7 @@ function setupWidgetBlocks(activity) {
                 const interruption = _ensureWidget(
                     logo,
                     "aiMusic",
-                    ["widgets/aiwidget"],
+                    AIWidget.dependencies,
                     () => new AIWidget(),
                     turtle,
                     blk,
@@ -1980,7 +1974,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "reflection",
-                ["widgets/reflection"],
+                ReflectionMatrix.dependencies,
                 () => new ReflectionMatrix(),
                 turtle,
                 blk,
@@ -2065,7 +2059,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "legoWidget",
-                ["widgets/legobricks"],
+                LegoWidget.dependencies,
                 () => new LegoWidget(),
                 turtle,
                 blk,
@@ -2135,7 +2129,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "aiDebugger",
-                ["widgets/aidebugger"],
+                AIDebuggerWidget.dependencies,
                 () => new AIDebuggerWidget(),
                 turtle,
                 blk,

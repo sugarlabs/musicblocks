@@ -23,7 +23,34 @@ imported in `js/activity.js`.
 
     This class will contain the code that defines the behavior of your widget.
 
-3. **Initialize the Class**
+3. **Declare the widget's lazy-load dependencies:**
+   If your widget is loaded lazily by `js/blocks/WidgetBlocks.js` (via
+   `_ensureWidget()` or `_lazyRequire()`), declare its AMD module id(s) as a
+   `dependencies` property on the widget definition itself, rather than
+   passing a literal array at the call site. The widget definition is the
+   single source of truth for this list — `WidgetBlocks.js` reads
+   `Widget.dependencies` instead of maintaining its own copy.
+
+    For an ES6 class widget, use a `static` field:
+
+    ```javascript
+    class UniqueClass {
+        static dependencies = ["widgets/UniqueClassFileName"];
+        // Blocks with some functionality
+    }
+    ```
+
+    For a constructor-function widget, assign the property on the function
+    itself, since `static` class-field syntax doesn't apply:
+
+    ```javascript
+    function UniqueClass() {
+        // Blocks with some functionality
+    }
+    UniqueClass.dependencies = ["widgets/UniqueClassFileName"];
+    ```
+
+4. **Initialize the Class**
    Define the block that will be used to launch your widget in `js/blocks/WidgetBlocks.`
    Don't forget to initialize the class. (Look at the code towards the end of the file.)
 
@@ -31,7 +58,7 @@ imported in `js/activity.js`.
     new UniqueClass().setup(activity);
     ```
 
-4. **Import the widget**
+5. **Import the widget**
    In `js/activity.js`, import the widget code.
 
     ```javascript

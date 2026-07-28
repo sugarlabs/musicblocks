@@ -19,6 +19,9 @@
  */
 
 class ReflectionMatrix {
+    /** AMD module dependencies for lazy loading. */
+    static dependencies = ["widgets/reflection"];
+
     static BUTTONDIVWIDTH = 535;
     static OUTERWINDOWWIDTH = "858px";
     static OUTERWINDOWHEIGHT = "550px";

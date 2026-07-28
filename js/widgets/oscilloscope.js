@@ -38,6 +38,9 @@
  * @classdesc pertains to setting up all features of the Oscilloscope Widget.
  */
 class Oscilloscope {
+    /** AMD module dependencies for lazy loading. */
+    static dependencies = ["widgets/oscilloscope"];
+
     static ICONSIZE = 40;
     static analyserSize = 8192;
     static DRAW_TIMEOUT = 1000;
