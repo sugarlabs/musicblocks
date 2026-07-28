@@ -109,14 +109,21 @@ describe("Block Foundation", () => {
                     }
                 }
             },
-            blockList: []
+            blockList: [],
+            octaveNumber: jest.fn().mockReturnValue(false),
+            noteValueNumber: jest.fn().mockReturnValue(false),
+            octaveModifierNumber: jest.fn().mockReturnValue(false),
+            intervalModifierNumber: jest.fn().mockReturnValue(false)
         };
 
         mockProtoBlock = {
             name: "forward",
             image: "forward.svg",
             size: 1,
-            docks: [],
+            docks: [
+                [0, 0, 0],
+                [0, 0, 0]
+            ],
             hidden: false,
             capabilities: Object.create(null)
         };
@@ -256,6 +263,58 @@ describe("Block Foundation", () => {
 
             const block = new Block(mockProtoBlock, mockBlocks);
             expect(block.hasValueDrivenLabel()).toBe(false);
+        });
+
+        describe("discreteChoice capability and _usePiemenu()", () => {
+            it("hasCapability('discreteChoice') should return true when configured in metadata", () => {
+                mockProtoBlock.capabilities.discreteChoice = true;
+                const block = new Block(mockProtoBlock, mockBlocks);
+                expect(block.hasCapability("discreteChoice")).toBe(true);
+                expect(block._usePiemenu()).toBe(true);
+            });
+
+            it("hasCapability('discreteChoice') should return false when not configured", () => {
+                mockProtoBlock.capabilities = Object.create(null);
+                const block = new Block(mockProtoBlock, mockBlocks);
+                expect(block.hasCapability("discreteChoice")).toBe(false);
+                expect(block._usePiemenu()).toBe(false);
+            });
+
+            it("should support dynamic inherited pie menus based on parent connections", () => {
+                mockProtoBlock.name = "number";
+                mockProtoBlock.capabilities = Object.create(null);
+
+                const childBlock = new Block(mockProtoBlock, mockBlocks);
+                childBlock.blockIndex = 1;
+                childBlock.connections = [0, null];
+
+                const parentProtoBlock = {
+                    name: "tempo",
+                    capabilities: Object.create(null),
+                    piemenuValuesC1: [60, 120, 180]
+                };
+                const parentBlock = new Block(parentProtoBlock, mockBlocks);
+                parentBlock.blockIndex = 0;
+                parentBlock.connections = [null, 1];
+
+                mockBlocks.blockList = [parentBlock, childBlock];
+                mockBlocks.octaveNumber = jest.fn(() => false);
+                mockBlocks.noteValueNumber = jest.fn(() => false);
+                mockBlocks.octaveModifierNumber = jest.fn(() => false);
+                mockBlocks.intervalModifierNumber = jest.fn(() => false);
+
+                expect(childBlock.hasCapability("discreteChoice")).toBe(false);
+                expect(childBlock._usePiemenu()).toBe(true);
+            });
+
+            it("should handle empty/unpopulated connections array without throwing", () => {
+                mockProtoBlock.capabilities = Object.create(null);
+                const block = new Block(mockProtoBlock, mockBlocks);
+                block.connections = []; // connections[0] is undefined
+
+                expect(() => block._usePiemenu()).not.toThrow();
+                expect(block._usePiemenu()).toBe(false);
+            });
         });
 
         it("copySize() should sync size from protoblock", () => {

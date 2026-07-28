@@ -150,34 +150,6 @@ const WIDENAMES = [
 const EXTRAWIDENAMES = [];
 
 /**
- * List of block types with pie menus.
- * @type {string[]}
- */
-const PIEMENUS = [
-    "solfege",
-    "eastindiansolfege",
-    "scaledegree2",
-    "notename",
-    "voicename",
-    "drumname",
-    "effectsname",
-    "accidentalname",
-    "invertmode",
-    "boolean",
-    "filtertype",
-    "oscillatortype",
-    "intervalname",
-    "modename",
-    "chordname",
-    "temperamentname",
-    "noisename",
-    "customNote",
-    "grid",
-    "outputtools",
-    "wrapmode"
-];
-
-/**
  * Async function to create bitmap from SVG data.
  * @param {string} data - SVG data.
  * @param {Function} callback - Callback function.
@@ -3698,7 +3670,7 @@ class Block {
         this._check_meter_block = null;
 
         // Special pie menus
-        if (PIEMENUS.includes(this.name)) {
+        if (this.hasCapability("discreteChoice")) {
             return true;
         }
 
@@ -3746,13 +3718,11 @@ class Block {
      * @returns {boolean} - Indicates whether a pie menu should be used.
      */
     _usePieNumberC1() {
-        // Return true if this number block plugs into Connection 1 of
-        // a block that uses a pie menu. Add block names to the list
-        // below and the switch statement in the _changeLabel
-        // function.
+        // Dynamic numeric pie menus are inherited from the connected parent
+        // block via piemenuValuesC1 metadata on its protoblock.
         const cblk = this.connections[0];
 
-        if (cblk === null) {
+        if (cblk === null || cblk === undefined) {
             return false;
         }
 
@@ -3771,13 +3741,11 @@ class Block {
      * @returns {boolean} - True if the block plugs into Connection 2 of a pie menu block, false otherwise.
      */
     _usePieNumberC2() {
-        // Return true if this number block plugs into Connection 2 of
-        // a block that uses a pie menu. Add block names to the list
-        // below and the switch statement in the _changeLabel
-        // function.
+        // Dynamic numeric pie menus are inherited from the connected parent
+        // block via piemenuValuesC2 metadata on its protoblock.
         const cblk = this.connections[0];
 
-        if (cblk === null) {
+        if (cblk === null || cblk === undefined) {
             return false;
         }
 
@@ -3796,13 +3764,11 @@ class Block {
      * @returns {boolean} - True if the block plugs into Connection 3 of a pie menu block, false otherwise.
      */
     _usePieNumberC3() {
-        // Return true if this number block plugs into Connection 3 of
-        // a block that uses a pie menu. Add block names to the list
-        // below and the switch statement in the _changeLabel
-        // function.
+        // Dynamic numeric pie menus are inherited from the connected parent
+        // block via piemenuValuesC3 metadata on its protoblock.
         const cblk = this.connections[0];
 
-        if (cblk === null) {
+        if (cblk === null || cblk === undefined) {
             return false;
         }
 
