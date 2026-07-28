@@ -13,7 +13,8 @@
    global
 
    _, setCookie, getCookie, StringHelper, ProjectStorage, ServerInterface,
-   Converter, SaveInterface, LocalPlanet, GlobalPlanet
+   Converter, SaveInterface, LocalPlanet, GlobalPlanet,
+   NetworkMonitor, OfflineCommitManager
 */
 /*
    exported
@@ -241,6 +242,17 @@ class Planet {
         this.ServerInterface = new ServerInterface(this);
         this.ServerInterface.init();
 
+        // Wire up offline commit management
+        if (typeof OfflineCommitManager !== "undefined" && typeof NetworkMonitor !== "undefined") {
+            this.OfflineCommitManager = new OfflineCommitManager(
+                this.ProjectStorage,
+                this.ServerInterface
+            );
+            this.ServerInterface.attachOfflineManager(this.OfflineCommitManager);
+        } else {
+            console.warn("[Planet] OfflineCommitManager not available — offline commits disabled.");
+        }
+
         document.getElementById("close-planet").addEventListener("click", evt => {
             this.closeButton();
         });
@@ -258,22 +270,153 @@ class Planet {
         //   1. Rename the local project to the display name chosen by the user.
         //   2. Record GitRepoData so the project is linked to its GitHub repo.
         //   3. Refresh the local planet cards.
-        window.addEventListener("message", e => {
-            if (!e.data || e.data.type !== "MB_GIT_CREATED") return;
-            const id = this.ProjectStorage.getCurrentProjectID();
-            if (!id) return;
-            const { repoName, hashedKey, displayName, description } = e.data;
-            if (displayName) {
-                this.ProjectStorage.renameProject(id, displayName);
+        window.addEventListener("message", async e => {
+            if (!e.data) return;
+
+            // ── Git state sync from gitDropdown ──────────────────────────
+            if (e.data.type === "MB_GIT_CREATED") {
+                const id = this.ProjectStorage.getCurrentProjectID();
+                if (!id) return;
+                const { repoName, hashedKey, displayName, description } = e.data;
+                if (displayName) {
+                    await this.ProjectStorage.renameProject(id, displayName);
+                }
+                await this.ProjectStorage.addGitRepoData(
+                    id,
+                    repoName,
+                    description || "",
+                    [],
+                    hashedKey || ""
+                );
+                // Fire _postGitState only after IndexedDB has been updated so
+                // MB_GIT_STATE carries the real key, not a stale empty value.
+                this._postGitState(id);
+                if (this.LocalPlanet) this.LocalPlanet.updateProjects();
+                return;
             }
-            this.ProjectStorage.addGitRepoData(
-                id,
-                repoName,
-                description || "",
-                [],
-                hashedKey || ""
-            );
-            if (this.LocalPlanet) this.LocalPlanet.updateProjects();
+
+            // ── Offline commit — save draft when server is unreachable ────
+            // Posted by gitDropdown.js when it detects the backend is down.
+            // Payload: { type, projectId, repoName, hashedKey, projectData, commitMessage }
+            if (e.data.type === "MB_OFFLINE_COMMIT") {
+                const { projectId, repoName, hashedKey, projectData, commitMessage } = e.data;
+                const id = projectId || this.ProjectStorage.getCurrentProjectID();
+                if (!id || !this.ServerInterface) {
+                    e.source?.postMessage(
+                        {
+                            type: "MB_OFFLINE_COMMIT_RESULT",
+                            success: false,
+                            error: "NO_PROJECT_ID"
+                        },
+                        "*"
+                    );
+                    return;
+                }
+                this.ServerInterface.commitProject(
+                    id,
+                    repoName,
+                    hashedKey,
+                    projectData,
+                    commitMessage,
+                    result => {
+                        try {
+                            e.source?.postMessage(
+                                { type: "MB_OFFLINE_COMMIT_RESULT", ...result },
+                                "*"
+                            );
+                        } catch (_) {
+                            /* cross-origin guard */
+                        }
+                    }
+                );
+                return;
+            }
+
+            // ── Offline repo creation — queue while server is unreachable ─
+            // Posted by gitDropdown.js's _doCreate() when offline.
+            // Payload: { type, projectId, projectName, description, tags, creatorName, thumbnail, repoName }
+            if (e.data.type === "MB_OFFLINE_CREATE") {
+                const { projectName, description, tags, creatorName, thumbnail, repoName } = e.data;
+                const id = e.data.projectId || this.ProjectStorage.getCurrentProjectID();
+                if (!id || !this.OfflineCommitManager) {
+                    e.source?.postMessage(
+                        {
+                            type: "MB_OFFLINE_CREATE_RESULT",
+                            success: false,
+                            error: "NO_PROJECT_OR_MANAGER"
+                        },
+                        "*"
+                    );
+                    return;
+                }
+                try {
+                    const result = await this.OfflineCommitManager.queueRepoCreation(id, {
+                        projectName,
+                        description,
+                        tags: tags || [],
+                        creatorName,
+                        thumbnail,
+                        repoName
+                    });
+                    // Persist the git repo data so _postGitState reports the offline repo name
+                    if (result.success) {
+                        await this.ProjectStorage.addGitRepoData(
+                            id,
+                            result.repository,
+                            description || "",
+                            tags || [],
+                            ""
+                        );
+                        this._postGitState(id);
+                        if (this.LocalPlanet) this.LocalPlanet.updateProjects();
+                    }
+                    e.source?.postMessage({ type: "MB_OFFLINE_CREATE_RESULT", ...result }, "*");
+                } catch (err) {
+                    e.source?.postMessage(
+                        { type: "MB_OFFLINE_CREATE_RESULT", success: false, error: String(err) },
+                        "*"
+                    );
+                }
+                return;
+            }
+
+            // ── Local history request — for offline history panel ─────────
+            // Posted by gitDropdown.js's _showHistoryPanel() when the prefetch fails.
+            // Payload: { type, projectId, repoName }
+            if (e.data.type === "MB_GET_LOCAL_HISTORY") {
+                const id = e.data.projectId || this.ProjectStorage.getCurrentProjectID();
+                if (!id || !this.OfflineCommitManager) {
+                    e.source?.postMessage(
+                        {
+                            type: "MB_LOCAL_HISTORY_RESULT",
+                            success: true,
+                            data: [],
+                            isOffline: true
+                        },
+                        "*"
+                    );
+                    return;
+                }
+                const history = this.OfflineCommitManager.getLocalHistory(id);
+                e.source?.postMessage(
+                    {
+                        type: "MB_LOCAL_HISTORY_RESULT",
+                        success: true,
+                        data: history,
+                        isOffline: true
+                    },
+                    "*"
+                );
+                return;
+            }
+
+            // ── Trigger active sync — posted when online connectivity is confirmed ─
+            if (e.data.type === "MB_TRIGGER_SYNC") {
+                if (this.OfflineCommitManager) {
+                    this.OfflineCommitManager.triggerSync();
+                }
+                return;
+            }
         });
 
         this.ServerInterface.getTagManifest(
