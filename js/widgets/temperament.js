@@ -2253,6 +2253,7 @@ function TemperamentWidget() {
 
         // Ensure per-note playback uses the currently selected temperament mapping.
         this._logo.synth.inTemperament = this.inTemperament;
+        this._logo._userTemperament = this.inTemperament;
         this._logo.synth.changeInTemperament = true;
 
         if (docById("wheelDiv4") === null) {

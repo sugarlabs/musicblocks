@@ -673,13 +673,29 @@ function Synth() {
             startPitch = startPitch.replace(SHARP, "#");
         }
 
-        const frequency = Tone.Frequency(startPitch).toFrequency();
+        let frequency;
+        if (t && !t.isEDO && t.noteLabels && t.ratios) {
+            // For JI/Pythagorean: compute from A0 reference, not 12-EDO Tone.Frequency
+            const startParsed = parseNoteString(startingPitch);
+            frequency = pitchToFrequency(startParsed[0], startParsed[1], 0, "C major", temperament);
+        } else {
+            frequency = Tone.Frequency(startPitch).toFrequency();
+        }
 
         const startParsed = parseNoteString(startingPitch);
         this.noteFrequencies = {
             // note: [octave, Frequency]
             [startParsed[0]]: [startParsed[1], frequency]
         };
+
+        // EDO temperaments compute frequencies via pitchToFrequency directly
+        // and never use noteFrequencies, so skip building the table.
+        // This also avoids crashing on microtonal interval names (e.g. "mid 2")
+        // that exist in the temperament definition but not in INTERVALVALUES.
+        if (t && t.isEDO) {
+            this.changeInTemperament = false;
+            return;
+        }
 
         for (const interval in t) {
             if (
@@ -784,6 +800,29 @@ function Synth() {
                     if (typeof notes[i] === "string") {
                         const parsed = parseNoteString(notes[i]);
                         results.push(pitchToFrequency(parsed[0], parsed[1], 0, "c major"));
+                    } else {
+                        results.push(notes[i]);
+                    }
+                }
+                return results;
+            }
+        }
+
+        const t = getTemperament(this.inTemperament);
+        if (t && t.isEDO) {
+            if (typeof notes === "string") {
+                const parsed = parseNoteString(notes);
+                return pitchToFrequency(parsed[0], parsed[1], 0, "c major", this.inTemperament);
+            } else if (typeof notes === "number") {
+                return notes;
+            } else {
+                const results = [];
+                for (let i = 0; i < notes.length; i++) {
+                    if (typeof notes[i] === "string") {
+                        const parsed = parseNoteString(notes[i]);
+                        results.push(
+                            pitchToFrequency(parsed[0], parsed[1], 0, "c major", this.inTemperament)
+                        );
                     } else {
                         results.push(notes[i]);
                     }

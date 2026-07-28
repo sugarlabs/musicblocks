@@ -285,6 +285,9 @@ class Logo {
         this.synth.changeInTemperament = false;
         this._synthsInitialized = false;
 
+        // Persistent user-selected temperament (survives across runs).
+        this._userTemperament = null;
+
         // Mode widget
         this.modeBlock = null;
 
@@ -1418,7 +1421,7 @@ class Logo {
         this.deps.Singer.masterBPM = TARGETBPM;
         this.deps.Singer.defaultBPMFactor = TONEBPM / TARGETBPM;
         this.synth.changeInTemperament = false;
-        this.synth.inTemperament = "equal";
+        this.synth.inTemperament = this._userTemperament || "equal";
         this.deps.Singer.clearPitchToFrequencyCache();
 
         this._checkingCompletionState = false;

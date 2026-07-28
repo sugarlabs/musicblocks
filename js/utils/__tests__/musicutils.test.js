@@ -1256,8 +1256,8 @@ describe("pitchToNumber", () => {
     it("should work with equal19 temperament", () => {
         global.TEMPERAMENT = { equal19: [] };
         const result = pitchToNumber("C", 4, "C major", "equal19");
-        // 4 * 19 + 0 (C index) - 9 (A index) = 67
-        expect(result).toBe(67);
+        // 4 * 19 + 0 (C index) - 14 (A index in 19-EDO table) = 62
+        expect(result).toBe(62);
     });
 
     it("should fallback to 12-EDO for undefined temperament", () => {
@@ -2102,9 +2102,9 @@ describe("pitchToFrequency", () => {
     it("should work with equal19 temperament", () => {
         global.TEMPERAMENT = { equal19: [] };
         const result = pitchToFrequency("C", 4, 0, "C", "equal19");
-        // C4 in 19-EDO: A0 * Math.pow(2, 67/19) ≈ 316.85
-        expect(result).toBeGreaterThan(310);
-        expect(result).toBeLessThan(320);
+        // C4 in 19-EDO: A0 * Math.pow(2, 62/19) ≈ 264.02
+        expect(result).toBeGreaterThan(260);
+        expect(result).toBeLessThan(268);
     });
 
     it("should fallback to 12-EDO for undefined temperament", () => {
@@ -3336,5 +3336,106 @@ describe("actual drum lookup helpers", () => {
         expect(actualMusicUtils.getDrumSymbol("")).toBe("hh");
         expect(actualMusicUtils.getDrumSymbol("snare drum")).toBe("sn");
         expect(actualMusicUtils.getDrumSymbol("missing")).toBe("hh");
+    });
+});
+
+describe("_getStepSize freeze guard (non-12 EDO temperaments)", () => {
+    const cases = [
+        ["C major", "G#", "up", "equal17"],
+        ["C major", "G#", "down", "equal17"],
+        ["C major", "G#", "up", "equal19"],
+        ["C major", "G#", "down", "equal19"],
+        ["C major", "C", "up", "equal31"],
+        ["C major", "F#", "up", "equal31"],
+        ["F# major", "C", "up", "equal19"],
+        ["F# major", "E#", "down", "equal19"],
+        ["Bb major", "C", "down", "equal17"],
+        ["Bb major", "G", "up", "equal31"]
+    ];
+    for (const [key, pitch, direction, temperament] of cases) {
+        it(`returns number for ${temperament} ${key} ${pitch} ${direction}`, () => {
+            const result = _getStepSize(key, pitch, direction, 0, temperament);
+            expect(typeof result).toBe("number");
+        });
+    }
+});
+
+describe("pitchToNumber A reference for non-12 EDO", () => {
+    it("A4 maps to 440 Hz for all EDOs", () => {
+        const edos = [
+            ["equal5", 5],
+            ["equal7", 7],
+            ["equal", 12],
+            ["equal17", 17],
+            ["equal19", 19],
+            ["equal31", 31]
+        ];
+        for (const [temp, edo] of edos) {
+            const freq = pitchToFrequency("A", 4, 0, "C major", temp);
+            expect(freq).toBeCloseTo(440, 0);
+        }
+    });
+
+    it("C4 is approximately 261-270 Hz for all EDOs", () => {
+        const edos = [
+            ["equal5", 5],
+            ["equal7", 7],
+            ["equal", 12],
+            ["equal17", 17],
+            ["equal19", 19],
+            ["equal31", 31]
+        ];
+        for (const [temp, edo] of edos) {
+            const freq = pitchToFrequency("C", 4, 0, "C major", temp);
+            expect(freq).toBeGreaterThan(240);
+            expect(freq).toBeLessThan(280);
+        }
+    });
+});
+
+describe("EDO octave boundary resolution", () => {
+    it("resolves 19-EDO scale degrees 0–21 across the C4–C5 octave boundary", () => {
+        const temper = "equal19";
+        const c4pn = pitchToNumber("C", 4, "C major", temper);
+
+        // Degree 0  → C4
+        expect(numberToPitch(c4pn, temper)).toEqual(["C", 4]);
+        expect(pitchToFrequency("C", 4, 0, "C major", temper)).toBeCloseTo(264.02, 1);
+
+        // Degree 18 → B♯4 (last degree before octave completion)
+        expect(numberToPitch(c4pn + 18, temper)).toEqual(["B" + SHARP, 4]);
+
+        // Degree 19 → C5 (octave completion, N = EDO)
+        expect(numberToPitch(c4pn + 19, temper)).toEqual(["C", 5]);
+        expect(pitchToFrequency("C", 5, 0, "C major", temper)).toBeCloseTo(528.05, 1);
+
+        // Verify exact octave ratio
+        const c4freq = pitchToFrequency("C", 4, 0, "C major", temper);
+        const c5freq = pitchToFrequency("C", 5, 0, "C major", temper);
+        expect(c5freq / c4freq).toBeCloseTo(2.0, 4);
+
+        // Degree 21 → D♭5 (first step into next octave)
+        expect(numberToPitch(c4pn + 21, temper)).toEqual(["D" + FLAT, 5]);
+        expect(pitchToFrequency("D" + FLAT, 5, 0, "C major", temper)).toBeCloseTo(568.01, 1);
+    });
+
+    it.each([
+        ["equal", 12],
+        ["equal17", 17],
+        ["equal19", 19],
+        ["equal31", 31]
+    ])("resolves degree N = %s-EDO to C5 with exact octave ratio", (temper, edo) => {
+        const c4pn = pitchToNumber("C", 4, "C major", temper);
+
+        // Degree 0 → C4
+        expect(numberToPitch(c4pn, temper)).toEqual(["C", 4]);
+
+        // Degree N → C5 (octave completion)
+        expect(numberToPitch(c4pn + edo, temper)).toEqual(["C", 5]);
+
+        // Exact octave ratio: C5 = 2 × C4
+        const c4freq = pitchToFrequency("C", 4, 0, "C major", temper);
+        const c5freq = pitchToFrequency("C", 5, 0, "C major", temper);
+        expect(c5freq / c4freq).toBeCloseTo(2.0, 4);
     });
 });

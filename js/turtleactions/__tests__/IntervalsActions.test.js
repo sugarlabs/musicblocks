@@ -31,12 +31,19 @@ describe("setupIntervalsActions", () => {
 
         // Mock temperament globals only for this test
         global.isCustomTemperament = jest.fn(() => false);
+        global.isTrueEDO = jest.fn(() => true);
         global.TEMPERAMENT = { equal: { pitchNumber: 12 } };
 
         // Set up test-specific mocks for SEMITONETOINTERVALMAP and ALLNOTESTEP
         global.SEMITONETOINTERVALMAP = Array(13)
             .fill(null)
             .map(() => Array(7).fill("perfect"));
+
+        global.MUSICALMODES = {
+            major: [2, 2, 1, 2, 2, 2, 1],
+            minor: [2, 1, 2, 2, 1, 2, 2],
+            custom: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        };
 
         global.ALLNOTESTEP = {
             "Cb": 0,
@@ -70,6 +77,7 @@ describe("setupIntervalsActions", () => {
 
         global.getNote = jest.fn(() => ["C"]);
         global.getModeLength = jest.fn(() => 7);
+        global.getCurrentEDO = jest.fn(() => 12);
 
         global.MusicBlocks = { isRun: false };
         global.Mouse = { getMouseFromTurtle: jest.fn() };
@@ -122,6 +130,7 @@ describe("setupIntervalsActions", () => {
     afterEach(() => {
         // Clean up globals to prevent test pollution
         delete global.isCustomTemperament;
+        delete global.isTrueEDO;
         delete global.TEMPERAMENT;
     });
 
