@@ -868,8 +868,16 @@ class ServerInterface {
      * @param {string}   commitMessage  written by the student in the commit modal
      * @param {Function} callback       called with result object
      */
-    async commitProject(projectId, repoName, hashedKey, projectData, commitMessage, callback) {
-        const offline = !this.offlineManager?.isOnline;
+    async commitProject(
+        projectId,
+        repoName,
+        hashedKey,
+        projectData,
+        commitMessage,
+        callback,
+        forceOffline = false
+    ) {
+        const offline = forceOffline || !this.offlineManager?.isOnline;
 
         if (!offline) {
             // ── Online path ──────────────────────────────────────────────
@@ -883,57 +891,57 @@ class ServerInterface {
                     if (this.offlineManager) {
                         await this.offlineManager.refreshCache(projectId, repoName);
                     }
+                    callback(result);
+                    return;
                 }
 
-                callback(result);
+                console.warn(
+                    "[ServerInterface] Online commit failed, falling back to offline draft:",
+                    result?.error
+                );
             } catch (err) {
                 console.error("[ServerInterface] commitProject (online) error:", err);
-                callback(this.ConnectionFailureData);
             }
+        }
+
+        // ── Offline path (or fallback when online editProject fails) ─────────
+        if (!this.offlineManager) {
+            callback({ success: false, error: "OFFLINE_MANAGER_NOT_INITIALISED" });
+            return;
+        }
+
+        // Guard: offline commits require either a real GitHub repo (hashedKey set)
+        // or a pending offline repo creation (repoName set by queueRepoCreation).
+        // We only block if the project was never registered at all —
+        // an empty hashedKey is fine here because it's filled on reconnect.
+        const gitData = this.Planet?.ProjectStorage?.data?.Projects?.[projectId]?.GitRepoData;
+        const hasPendingRepo =
+            !!this.Planet?.ProjectStorage?.data?.Projects?.[projectId]?.pendingRepoCreation;
+        if (!gitData?.repoName && !repoName && !hasPendingRepo) {
+            callback({
+                success: false,
+                offline: true,
+                error: "NO_REPO_WHILE_OFFLINE",
+                message:
+                    'This project hasn\'t been saved to GitHub yet. Please connect to the internet and click "Save a spot" first, then you can save commits offline.'
+            });
+            return;
+        }
+
+        const result = await this.offlineManager.saveDraft(projectId, projectData, commitMessage);
+
+        if (result.saved) {
+            callback({ success: true, offline: true });
+        } else if (result.reason === "cap") {
+            callback({
+                success: false,
+                offline: true,
+                error: "OFFLINE_DRAFT_CAP_REACHED",
+                message:
+                    "You have reached the maximum of 5 offline saves. Please connect to the internet to sync your changes before saving again."
+            });
         } else {
-            // ── Offline path ─────────────────────────────────────────────
-            if (!this.offlineManager) {
-                callback({ success: false, error: "OFFLINE_MANAGER_NOT_INITIALISED" });
-                return;
-            }
-
-            // Guard: offline commits require either a real GitHub repo (hashedKey set)
-            // or a pending offline repo creation (repoName set by queueRepoCreation).
-            // We only block if the project was never registered at all —
-            // an empty hashedKey is fine here because it's filled on reconnect.
-            const gitData = this.Planet?.ProjectStorage?.data?.Projects?.[projectId]?.GitRepoData;
-            const hasPendingRepo =
-                !!this.Planet?.ProjectStorage?.data?.Projects?.[projectId]?.pendingRepoCreation;
-            if (!gitData?.repoName && !hasPendingRepo) {
-                callback({
-                    success: false,
-                    offline: true,
-                    error: "NO_REPO_WHILE_OFFLINE",
-                    message:
-                        'This project hasn\'t been saved to GitHub yet. Please connect to the internet and click "Save a spot" first, then you can save commits offline.'
-                });
-                return;
-            }
-
-            const result = await this.offlineManager.saveDraft(
-                projectId,
-                projectData,
-                commitMessage
-            );
-
-            if (result.saved) {
-                callback({ success: true, offline: true });
-            } else if (result.reason === "cap") {
-                callback({
-                    success: false,
-                    offline: true,
-                    error: "OFFLINE_DRAFT_CAP_REACHED",
-                    message:
-                        "You have reached the maximum of 5 offline saves. Please connect to the internet to sync your changes before saving again."
-                });
-            } else {
-                callback({ success: false, offline: true, error: "OFFLINE_SAVE_FAILED" });
-            }
+            callback({ success: false, offline: true, error: "OFFLINE_SAVE_FAILED" });
         }
     }
 
