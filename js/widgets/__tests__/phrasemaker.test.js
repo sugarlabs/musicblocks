@@ -1370,6 +1370,177 @@ describe("PhraseMaker Widget", () => {
 
         phraseMaker._blockReplace(0, 1);
     });
+
+    describe("refreshRowForBlock", () => {
+        const buildMockCell = () => ({
+            style: {},
+            textContent: "",
+            appendChild: jest.fn(),
+            setAttribute: jest.fn()
+        });
+
+        beforeEach(() => {
+            phraseMaker.blockNo = 42;
+            phraseMaker.activity = {
+                turtles: {
+                    ithTurtle: jest.fn(() => ({
+                        singer: { keySignature: 0 }
+                    }))
+                },
+                logo: { synth: { inTemperament: "equal" } },
+                errorMsg: jest.fn()
+            };
+            phraseMaker._rowBlocks = [7];
+            phraseMaker.rowLabels = ["sol"];
+            phraseMaker.rowArgs = [4];
+            phraseMaker._headcols = [buildMockCell()];
+            phraseMaker._labelcols = [buildMockCell()];
+            phraseMaker._noteStored = [];
+            phraseMaker._deps.getDrumName = jest.fn(() => null);
+            phraseMaker._deps.noteIsSolfege = jest.fn(() => false);
+            phraseMaker._deps.isCustomTemperament = jest.fn(() => false);
+            global.window.widgetWindows = {
+                isOpen: jest.fn(() => true)
+            };
+        });
+
+        test("updates the matching row and repaints only that row's cells, without a full rebuild", () => {
+            const initSpy = jest.spyOn(phraseMaker, "init");
+
+            phraseMaker.refreshRowForBlock(7, "la", "", 5);
+
+            expect(phraseMaker.rowLabels[0]).toBe("la");
+            expect(phraseMaker.rowArgs[0]).toBe(5);
+            expect(phraseMaker._labelcols[0].appendChild).toHaveBeenCalled();
+            expect(phraseMaker._noteStored[0]).toBe("la5");
+            // Reuses the existing row-scoped redraw; does not rebuild the whole matrix.
+            expect(initSpy).not.toHaveBeenCalled();
+        });
+
+        test("resolves the row through getNote when a non-natural accidental is selected", () => {
+            phraseMaker._deps.getNote = jest.fn(() => ["la#", 5]);
+
+            phraseMaker.refreshRowForBlock(7, "la", "♯", 5);
+
+            expect(phraseMaker._deps.getNote).toHaveBeenCalledWith(
+                "la♯",
+                5,
+                0,
+                0,
+                false,
+                null,
+                phraseMaker.activity.errorMsg,
+                "equal"
+            );
+            expect(phraseMaker.rowLabels[0]).toBe("la#");
+            expect(phraseMaker.rowArgs[0]).toBe(5);
+        });
+
+        test("is a no-op when the pitch block is not a tracked row", () => {
+            phraseMaker.refreshRowForBlock(999, "la", "", 5);
+
+            expect(phraseMaker.rowLabels).toEqual(["sol"]);
+            expect(phraseMaker.rowArgs).toEqual([4]);
+            expect(phraseMaker._labelcols[0].appendChild).not.toHaveBeenCalled();
+        });
+
+        test("is a no-op when Phrase Maker is not currently open", () => {
+            global.window.widgetWindows.isOpen = jest.fn(() => false);
+
+            phraseMaker.refreshRowForBlock(7, "la", "", 5);
+
+            expect(phraseMaker.rowLabels).toEqual(["sol"]);
+            expect(phraseMaker.rowArgs).toEqual([4]);
+        });
+
+        test("is a no-op when window.widgetWindows itself is unavailable", () => {
+            global.window.widgetWindows = undefined;
+
+            expect(() => phraseMaker.refreshRowForBlock(7, "la", "", 5)).not.toThrow();
+            expect(phraseMaker.rowLabels).toEqual(["sol"]);
+            expect(phraseMaker.rowArgs).toEqual([4]);
+        });
+
+        test("paints a drum icon in both the header and label cells when the note resolves to a drum name", () => {
+            phraseMaker._deps.getDrumName = jest.fn(label =>
+                label === "kick" ? "kick drum" : null
+            );
+
+            phraseMaker.refreshRowForBlock(7, "kick", "", 5);
+
+            expect(phraseMaker._headcols[0].appendChild).toHaveBeenCalled();
+            expect(phraseMaker._labelcols[0].textContent).toBe("kick drum");
+        });
+
+        test("paints a bellset icon in the header cell for a bellset note at octave 4", () => {
+            // "la" is a BELLSETIDX key; octave 4 is the bellset trigger condition.
+            phraseMaker.refreshRowForBlock(7, "la", "", 4);
+
+            expect(phraseMaker._headcols[0].appendChild).toHaveBeenCalledWith(
+                expect.objectContaining({ src: expect.stringContaining("8_bellset_key_") })
+            );
+        });
+
+        test("paints the top-C bellset icon in the header cell for note C at octave 5", () => {
+            phraseMaker.refreshRowForBlock(7, "C", "", 5);
+
+            // document.createElement runs against real jsdom here (the file-level
+            // `global.document` mock doesn't apply inside jsdom's test environment),
+            // so the appended node is a real <img>; only its src is asserted on.
+            const appendedImg = phraseMaker._headcols[0].appendChild.mock.calls[0][0];
+            expect(appendedImg.src).toContain("8_bellset_key_8.svg");
+        });
+
+        test("renders an i18n solfege label with an octave subscript when the note is solfege", () => {
+            phraseMaker._deps.noteIsSolfege = jest.fn(() => true);
+            phraseMaker._deps.i18nSolfege = jest.fn(label => `translated-${label}`);
+            phraseMaker._deps.getNote = jest.fn(() => ["la", 6]);
+
+            // Octave 6 avoids the unrelated bellset header branches (which trigger on 4/5).
+            phraseMaker.refreshRowForBlock(7, "la", "", 6);
+
+            const appendedTextNode = phraseMaker._labelcols[0].appendChild.mock.calls[0][0];
+            expect(appendedTextNode.textContent).toBe("translated-la");
+        });
+
+        test("renders the raw label plus a translated sub-note when using a custom temperament", () => {
+            phraseMaker._deps.isCustomTemperament = jest.fn(() => true);
+            phraseMaker._deps.getNote = jest.fn(() => ["la", 6]);
+
+            phraseMaker.refreshRowForBlock(7, "la", "", 6);
+
+            expect(phraseMaker._deps.getNote).toHaveBeenCalled();
+            const appendedTextNode = phraseMaker._labelcols[0].appendChild.mock.calls[0][0];
+            expect(appendedTextNode.textContent).toBe("la");
+        });
+
+        test("is idempotent across repeated refreshes with the same value", () => {
+            phraseMaker.refreshRowForBlock(7, "la", "", 5);
+            const callsAfterFirst = phraseMaker._labelcols[0].appendChild.mock.calls.length;
+
+            phraseMaker.refreshRowForBlock(7, "la", "", 5);
+
+            expect(phraseMaker.rowLabels[0]).toBe("la");
+            expect(phraseMaker.rowArgs[0]).toBe(5);
+            // Each call repaints the row the same way; it doesn't accumulate state.
+            expect(phraseMaker._labelcols[0].appendChild.mock.calls.length).toBe(
+                callsAfterFirst * 2
+            );
+        });
+
+        test("_repaintRowCells stores the drum name directly when called with a drumblocks condition", () => {
+            // refreshRowForBlock always uses "pitchblocks"; the "drumblocks" noteStored
+            // branch is only reachable via __selectionChanged's internal call, so it's
+            // exercised directly here per the private-helper carve-out.
+            phraseMaker._deps.getDrumName = jest.fn(() => "snare drum");
+            phraseMaker.rowLabels = ["snare"];
+            phraseMaker.rowArgs = [-1];
+
+            phraseMaker._repaintRowCells(0, "drumblocks");
+
+            expect(phraseMaker._noteStored[0]).toBe("snare drum");
+        });
+    });
 });
 
 describe("PhraseMaker.dependencies", () => {

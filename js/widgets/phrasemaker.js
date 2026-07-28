@@ -308,6 +308,187 @@ class PhraseMaker {
     }
 
     /**
+     * Refreshes a single matrix row after its pitch block's value changed
+     * outside the widget (e.g., via the block's own pie menu on the canvas),
+     * so an already-open matrix reflects the new pitch immediately.
+     * No-ops if the matrix is closed or the block is not a tracked row,
+     * matching the note resolution already used by the matrix's own
+     * pitch pie menu in _createColumnPieSubmenu.
+     *
+     * Takes the already-resolved note/accidental/octave rather than a
+     * block id, because the caller (piemenuPitches' exit handler) has
+     * those values on hand at the exact moment of commit; re-deriving
+     * them here would mean re-parsing an already-merged block.value
+     * string back into note+accidental, and would tie this method to
+     * one specific block layout ("pitch" wrapper + connections[1] leaf)
+     * instead of just "here is the row's new value."
+     * @param {number} pitchBlockIndex - Index of the pitch-wrapper block tracked in _rowBlocks.
+     * @param {string} noteValue - The newly selected note/solfege value, without accidental.
+     * @param {string} accidental - The newly selected accidental ("♮" or "" for natural).
+     * @param {number} octave - The newly selected octave.
+     * @returns {void}
+     */
+    refreshRowForBlock(pitchBlockIndex, noteValue, accidental, octave) {
+        if (!window.widgetWindows || !window.widgetWindows.isOpen(this.blockNo)) return;
+
+        const index = this._rowBlocks.indexOf(pitchBlockIndex);
+        if (index === -1) return;
+
+        let noteName = noteValue;
+        let noteOctave = octave;
+        if (accidental !== "♮" && accidental !== "") {
+            const noteObj = this._deps.getNote(
+                noteValue + accidental,
+                octave,
+                0,
+                this.activity.turtles.ithTurtle(0).singer.keySignature,
+                false,
+                null,
+                this.activity.errorMsg,
+                this.activity.logo.synth.inTemperament
+            );
+            noteName = noteObj[0];
+            noteOctave = noteObj[1];
+        }
+
+        this.rowLabels[index] = noteName;
+        this.rowArgs[index] = noteOctave;
+        this._repaintRowCells(index, "pitchblocks");
+    }
+
+    /**
+     * Repaints a single matrix row's header and label cells from the
+     * current rowLabels[index]/rowArgs[index], and refreshes the cached
+     * note text used for export/playback. This is the same row-scoped
+     * redraw already used by the matrix's own pitch/drum pie menu
+     * (see __selectionChanged in _createColumnPieSubmenu), factored out
+     * so it can also be reused by refreshRowForBlock without rebuilding
+     * the whole matrix.
+     * @private
+     * @param {number} index - Row index into rowLabels/rowArgs.
+     * @param {string} condition - "pitchblocks" or "drumblocks".
+     * @returns {void}
+     */
+    _repaintRowCells(index, condition) {
+        let noteObj = [this.rowLabels[index], this.rowArgs[index]];
+
+        let cell = this._headcols[index];
+        if (cell) {
+            const drumName = this._deps.getDrumName(this.rowLabels[index]);
+            const BELLSETIDX = {
+                C: 1,
+                D: 2,
+                E: 3,
+                F: 4,
+                G: 5,
+                A: 6,
+                B: 7,
+                do: 1,
+                re: 2,
+                mi: 3,
+                fa: 4,
+                sol: 5,
+                la: 6,
+                ti: 7
+            };
+            const noteName = this.rowLabels[index];
+            const w = window.innerWidth;
+            const iconSize = PhraseMaker.ICONSIZE * (w / 1200);
+            if (drumName !== null) {
+                cell.textContent = "\u00A0\u00A0";
+                const img = document.createElement("img");
+                img.src = this._deps.getDrumIcon(drumName);
+                img.title = this._(drumName);
+                img.alt = this._(drumName);
+                img.setAttribute("height", iconSize);
+                img.setAttribute("width", iconSize);
+                img.setAttribute("vertical-align", "middle");
+                cell.appendChild(img);
+                cell.appendChild(document.createTextNode("\u00A0\u00A0"));
+            } else if (noteName in BELLSETIDX && this.rowArgs[index] === 4) {
+                cell.textContent = "";
+                const img = document.createElement("img");
+                img.src = `images/8_bellset_key_${BELLSETIDX[noteName]}.svg`;
+                img.setAttribute("width", cell.style.width);
+                img.setAttribute("vertical-align", "middle");
+                cell.appendChild(img);
+            } else if (noteName === "C" && this.rowArgs[index] === 5) {
+                cell.textContent = "";
+                const img = document.createElement("img");
+                img.src = "images/8_bellset_key_8.svg";
+                img.setAttribute("width", cell.style.width);
+                img.setAttribute("vertical-align", "middle");
+                cell.appendChild(img);
+            }
+        }
+
+        cell = this._labelcols[index];
+        if (cell) {
+            const drumName = this._deps.getDrumName(this.rowLabels[index]);
+            if (drumName !== null) {
+                cell.textContent = this._(drumName);
+                cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
+            } else if (
+                this._deps.noteIsSolfege(this.rowLabels[index]) &&
+                !this._deps.isCustomTemperament(this.activity.logo.synth.inTemperament)
+            ) {
+                cell.textContent = "";
+                cell.appendChild(
+                    document.createTextNode(this._deps.i18nSolfege(this.rowLabels[index]))
+                );
+                const subTitle1 = document.createElement("sub");
+                subTitle1.textContent = this.rowArgs[index].toString();
+                cell.appendChild(subTitle1);
+                noteObj = this._deps.getNote(
+                    this.rowLabels[index],
+                    this.rowArgs[index],
+                    0,
+                    this.activity.turtles.ithTurtle(0).singer.keySignature,
+                    false,
+                    null,
+                    this.activity.errorMsg,
+                    this.activity.logo.synth.inTemperament
+                );
+            } else {
+                if (this._deps.isCustomTemperament(this.activity.logo.synth.inTemperament)) {
+                    noteObj = this._deps.getNote(
+                        this.rowLabels[index],
+                        this.rowArgs[index],
+                        0,
+                        this.activity.turtles.ithTurtle(0).singer.keySignature,
+                        false,
+                        null,
+                        this.activity.errorMsg,
+                        this.activity.logo.synth.inTemperament
+                    );
+                    cell.textContent = "";
+                    cell.appendChild(document.createTextNode(this.rowLabels[index]));
+                    const subTitle2 = document.createElement("sub");
+                    subTitle2.textContent = this.rowArgs[index].toString();
+                    cell.appendChild(subTitle2);
+                } else {
+                    cell.textContent = "";
+                    cell.appendChild(document.createTextNode(this.rowLabels[index]));
+                    const subTitle3 = document.createElement("sub");
+                    subTitle3.textContent = this.rowArgs[index].toString();
+                    cell.appendChild(subTitle3);
+                    noteObj = [this.rowLabels[index], this.rowArgs[index]];
+                }
+            }
+        }
+
+        let noteStored = null;
+        const drumName2 = this._deps.getDrumName(this.rowLabels[index]);
+        if (condition === "pitchblocks") {
+            if (noteObj) noteStored = noteObj[0] + noteObj[1];
+        } else if (condition === "drumblocks") {
+            noteStored = drumName2;
+        }
+
+        this._noteStored[index] = noteStored;
+    }
+
+    /**
      * Adds a column block to the PhraseMaker matrix.
      * This method is called when encountering rhythm blocks during matrix creation.
      * @param {number} rhythmBlock - The rhythm block identifier to add to the matrix column.
@@ -2235,120 +2416,7 @@ class PhraseMaker {
                 this.rowLabels[index] = label;
             }
 
-            let cell = this._headcols[index];
-            if (cell) {
-                const drumName = this._deps.getDrumName(this.rowLabels[index]);
-                const BELLSETIDX = {
-                    C: 1,
-                    D: 2,
-                    E: 3,
-                    F: 4,
-                    G: 5,
-                    A: 6,
-                    B: 7,
-                    do: 1,
-                    re: 2,
-                    mi: 3,
-                    fa: 4,
-                    sol: 5,
-                    la: 6,
-                    ti: 7
-                };
-                const noteName = this.rowLabels[index];
-                const w = window.innerWidth;
-                const iconSize = PhraseMaker.ICONSIZE * (w / 1200);
-                if (drumName !== null) {
-                    cell.textContent = "\u00A0\u00A0";
-                    const img = document.createElement("img");
-                    img.src = this._deps.getDrumIcon(drumName);
-                    img.title = this._(drumName);
-                    img.alt = this._(drumName);
-                    img.setAttribute("height", iconSize);
-                    img.setAttribute("width", iconSize);
-                    img.setAttribute("vertical-align", "middle");
-                    cell.appendChild(img);
-                    cell.appendChild(document.createTextNode("\u00A0\u00A0"));
-                } else if (noteName in BELLSETIDX && this.rowArgs[index] === 4) {
-                    cell.textContent = "";
-                    const img = document.createElement("img");
-                    img.src = `images/8_bellset_key_${BELLSETIDX[noteName]}.svg`;
-                    img.setAttribute("width", cell.style.width);
-                    img.setAttribute("vertical-align", "middle");
-                    cell.appendChild(img);
-                } else if (noteName === "C" && this.rowArgs[index] === 5) {
-                    cell.textContent = "";
-                    const img = document.createElement("img");
-                    img.src = "images/8_bellset_key_8.svg";
-                    img.setAttribute("width", cell.style.width);
-                    img.setAttribute("vertical-align", "middle");
-                    cell.appendChild(img);
-                }
-            }
-
-            cell = this._labelcols[index];
-            if (cell) {
-                const drumName = this._deps.getDrumName(this.rowLabels[index]);
-                if (drumName !== null) {
-                    cell.textContent = this._(drumName);
-                    cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
-                } else if (
-                    this._deps.noteIsSolfege(this.rowLabels[index]) &&
-                    !this._deps.isCustomTemperament(this.activity.logo.synth.inTemperament)
-                ) {
-                    cell.textContent = "";
-                    cell.appendChild(
-                        document.createTextNode(this._deps.i18nSolfege(this.rowLabels[index]))
-                    );
-                    const subTitle1 = document.createElement("sub");
-                    subTitle1.textContent = this.rowArgs[index].toString();
-                    cell.appendChild(subTitle1);
-                    noteObj = this._deps.getNote(
-                        this.rowLabels[index],
-                        this.rowArgs[index],
-                        0,
-                        this.activity.turtles.ithTurtle(0).singer.keySignature,
-                        false,
-                        null,
-                        this.activity.errorMsg,
-                        this.activity.logo.synth.inTemperament
-                    );
-                } else {
-                    if (this._deps.isCustomTemperament(this.activity.logo.synth.inTemperament)) {
-                        noteObj = this._deps.getNote(
-                            this.rowLabels[index],
-                            this.rowArgs[index],
-                            0,
-                            this.activity.turtles.ithTurtle(0).singer.keySignature,
-                            false,
-                            null,
-                            this.activity.errorMsg,
-                            this.activity.logo.synth.inTemperament
-                        );
-                        cell.textContent = "";
-                        cell.appendChild(document.createTextNode(this.rowLabels[index]));
-                        const subTitle2 = document.createElement("sub");
-                        subTitle2.textContent = this.rowArgs[index].toString();
-                        cell.appendChild(subTitle2);
-                    } else {
-                        cell.textContent = "";
-                        cell.appendChild(document.createTextNode(this.rowLabels[index]));
-                        const subTitle3 = document.createElement("sub");
-                        subTitle3.textContent = this.rowArgs[index].toString();
-                        cell.appendChild(subTitle3);
-                        noteObj = [this.rowLabels[index], this.rowArgs[index]];
-                    }
-                }
-            }
-
-            let noteStored = null;
-            const drumName2 = this._deps.getDrumName(this.rowLabels[index]);
-            if (condition === "pitchblocks") {
-                if (noteObj) noteStored = noteObj[0] + noteObj[1];
-            } else if (condition === "drumblocks") {
-                noteStored = drumName2;
-            }
-
-            this._noteStored[index] = noteStored;
+            this._repaintRowCells(index, condition);
         };
 
         const __pitchPreview = () => {
