@@ -1254,6 +1254,11 @@ function setupPitchBlocks(activity) {
         constructor() {
             super("custompitch", _("custom pitch"));
             this.setPalette("pitch", activity);
+            this.formBlock({
+                args: 2,
+                argTypes: ["anyin", "anyin"],
+                defaults: ["C", 4]
+            });
             this.makeMacro((x, y) => [
                 [0, "custompitch", x, y, [null, 1, 2, null]],
                 [1, ["customNote", { value: "C(+0¢)" }], 0, 0, [0]],
