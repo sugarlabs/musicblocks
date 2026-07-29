@@ -345,10 +345,6 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
         window.Materialize = M;
     }
 
-    // Define essential globals for core modules
-    window._THIS_IS_MUSIC_BLOCKS_ = true;
-    window._THIS_IS_TURTLE_BLOCKS_ = false;
-
     // Load highlight optionally
     requirejs(
         ["highlight"],
