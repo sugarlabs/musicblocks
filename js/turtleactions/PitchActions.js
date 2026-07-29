@@ -740,17 +740,13 @@ function setupPitchActions(activity) {
         static consonantStepSize(stepType, turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
             const temp = activity.logo.synth.inTemperament;
-            const edo = getCurrentEDO(temp);
 
             const _step = (direction, pitch) => {
-                let step =
+                const step =
                     direction === "up"
                         ? getStepSizeUp(tur.singer.keySignature, pitch, undefined, temp)
                         : getStepSizeDown(tur.singer.keySignature, pitch, undefined, temp);
-                if (edo !== 12) {
-                    step = 1;
-                }
-                return step;
+                return typeof step === "number" && !isNaN(step) ? step : 1;
             };
 
             if (tur.singer.lastNotePlayed !== null) {
