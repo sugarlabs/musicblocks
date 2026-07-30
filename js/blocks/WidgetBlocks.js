@@ -132,7 +132,7 @@ function setupWidgetBlocks(activity) {
     function _lazyLoadWidget(logo, widgetKey, modules, factory, onReady) {
         _lazyRequire(modules, function () {
             logo[widgetKey] = factory();
-            if (onReady) onReady();
+            onReady?.();
         });
     }
 
