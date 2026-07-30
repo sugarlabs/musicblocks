@@ -43,14 +43,17 @@ imported in `js/activity.js`.
       while the widget is loading, and calls `logo.runFromBlockNow(...)`
       once it's ready so the interpreter re-enters the block. Use this when
       the rest of the block's `flow()` logic depends on the widget already
-      existing.
+      existing. This is the standard loading path — most widgets use it,
+      e.g. `TemperamentWidget`.
     - **`_lazyLoadWidget(logo, widgetKey, modules, factory, onReady)`**
       — for widgets constructed inside a turtle listener (registered via
       `logo.setTurtleListener`) rather than in `flow()` itself. No guard or
       interruption signal: the listener already runs once, after the
       interpreter has moved on, so there's nothing for an interruption to
       interrupt. `onReady` runs after the widget is assigned to `logo`, for
-      any cleanup that used to follow the assignment inline.
+      any cleanup that used to follow the assignment inline. Used by
+      listener-deferred widgets that load only once their turtle listener
+      fires, e.g. `MeterWidget`, `Oscilloscope`, and `ModeWidget`.
 
     Do not write a third, ad hoc lazy-loading pattern at a new call site —
     route through one of these two.
