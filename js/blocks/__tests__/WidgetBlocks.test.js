@@ -654,23 +654,25 @@ describe("setupWidgetBlocks", () => {
     });
 
     describe("Widget dependency metadata wiring", () => {
-        // _ensureWidget()/_lazyRequire() are local closures inside
+        // _ensureWidget()/_lazyLoadWidget() are local closures inside
         // setupWidgetBlocks() and aren't exported, so their `modules`
         // argument can't be intercepted at runtime without changing the
         // loader itself, and in this non-AMD test environment `_lazyRequire`
-        // ignores `modules` entirely, so no behavioural test can observe it
-        // either. As a last resort, a single source-text check confirms
-        // every call site reads modules from the widget's own static
-        // `dependencies` rather than a hardcoded literal; kept to one test
-        // (not one per widget) since it's the wiring itself being checked,
-        // not per-widget behaviour -- the behavioural tests below cover that.
+        // (which both of them delegate to) ignores `modules` entirely, so no
+        // behavioural test can observe it either. As a last resort, a single
+        // source-text check confirms every call site reads modules from the
+        // widget's own static `dependencies` rather than a hardcoded
+        // literal; kept to one test (not one per widget) since it's the
+        // wiring itself being checked, not per-widget behaviour -- the
+        // behavioural tests below cover that.
         //
         // Caveat: this relies on source-text matching, which can become
         // brittle during future refactors (e.g. reformatting the
-        // _ensureWidget calls). If dependency resolution is ever exposed
-        // through a helper or otherwise made observable behaviourally,
-        // prefer replacing these regex assertions with behavioural tests.
-        it("every _ensureWidget/_lazyRequire call site reads modules from its widget's dependencies", () => {
+        // _ensureWidget/_lazyLoadWidget calls). If dependency resolution is
+        // ever exposed through a helper or otherwise made observable
+        // behaviourally, prefer replacing these regex assertions with
+        // behavioural tests.
+        it("every _ensureWidget/_lazyLoadWidget call site reads modules from its widget's dependencies", () => {
             const widgetBlocksSource = require("fs").readFileSync(
                 require("path").join(__dirname, "..", "WidgetBlocks.js"),
                 "utf8"
@@ -692,7 +694,11 @@ describe("setupWidgetBlocks", () => {
                 ["legoWidget", "LegoWidget"],
                 ["aiDebugger", "AIDebuggerWidget"]
             ];
-            const lazyRequireSites = ["MeterWidget", "Oscilloscope", "ModeWidget"];
+            const lazyLoadWidgetSites = [
+                ["meterWidget", "MeterWidget"],
+                ["Oscilloscope", "Oscilloscope"],
+                ["modeWidget", "ModeWidget"]
+            ];
 
             const notWired = [];
             for (const [widgetKey, className] of ensureWidgetSites) {
@@ -705,14 +711,13 @@ describe("setupWidgetBlocks", () => {
                     );
                 }
             }
-            for (const className of lazyRequireSites) {
-                if (
-                    !new RegExp(`_lazyRequire\\(${className}\\.dependencies,`).test(
-                        widgetBlocksSource
-                    )
-                ) {
+            for (const [widgetKey, className] of lazyLoadWidgetSites) {
+                const callSite = new RegExp(
+                    `_lazyLoadWidget\\(\\s*logo,\\s*"${widgetKey}",\\s*${className}\\.dependencies,`
+                );
+                if (!callSite.test(widgetBlocksSource)) {
                     notWired.push(
-                        `_lazyRequire(...) for ${className} should read ${className}.dependencies`
+                        `_lazyLoadWidget("${widgetKey}") should read ${className}.dependencies`
                     );
                 }
             }
