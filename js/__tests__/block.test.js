@@ -265,6 +265,44 @@ describe("Block Foundation", () => {
             expect(block.hasValueDrivenLabel()).toBe(false);
         });
 
+        describe("isArgumentLikeBlock()", () => {
+            it("should return true for a normal value block (style 'value' / isArgBlock())", () => {
+                mockProtoBlock.name = "number";
+                mockProtoBlock.style = "value";
+                mockProtoBlock.capabilities = Object.create(null);
+
+                const block = new Block(mockProtoBlock, mockBlocks);
+                expect(block.isArgumentLikeBlock()).toBe(true);
+            });
+
+            it("should return false for a normal command block", () => {
+                mockProtoBlock.name = "forward";
+                mockProtoBlock.style = "command";
+                mockProtoBlock.capabilities = Object.create(null);
+
+                const block = new Block(mockProtoBlock, mockBlocks);
+                expect(block.isArgumentLikeBlock()).toBe(false);
+            });
+
+            it("should return true for doArg block which has argumentLike capability", () => {
+                mockProtoBlock.name = "doArg";
+                mockProtoBlock.style = "flow";
+                mockProtoBlock.capabilities = { argumentLike: true };
+
+                const block = new Block(mockProtoBlock, mockBlocks);
+                expect(block.isArgumentLikeBlock()).toBe(true);
+            });
+
+            it("should return true for makeblock block which has argumentLike capability", () => {
+                mockProtoBlock.name = "makeblock";
+                mockProtoBlock.style = "left";
+                mockProtoBlock.capabilities = { argumentLike: true };
+
+                const block = new Block(mockProtoBlock, mockBlocks);
+                expect(block.isArgumentLikeBlock()).toBe(true);
+            });
+        });
+
         describe("discreteChoice capability and _usePiemenu()", () => {
             it("hasCapability('discreteChoice') should return true when configured in metadata", () => {
                 mockProtoBlock.capabilities.discreteChoice = true;
