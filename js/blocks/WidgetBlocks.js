@@ -1884,12 +1884,6 @@ function setupWidgetBlocks(activity) {
             };
 
             const structuralFields = collectStatusFields();
-            if (!logo.statusMatrix.isOpen || logo.statusFields.length === 0) {
-                logo.statusFields = structuralFields.slice();
-            }
-
-            dedupeStatusFields();
-            logo.statusMatrix.init(activity);
             logo.statusFields = []; // Clear for the actual interpreter run
 
             logo.inStatusMatrix = true;
@@ -2019,7 +2013,6 @@ function setupWidgetBlocks(activity) {
             );
             if (interruption) return interruption;
 
-            logo.reflection.init(activity);
             logo.statusFields = [];
 
             logo.inReflectionMatrix = true;

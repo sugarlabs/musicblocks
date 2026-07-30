@@ -154,7 +154,7 @@ global.PitchStaircase = jest.fn();
 global.PitchStaircase.dependencies = ["widgets/pitchstaircase"];
 global.RhythmRuler = jest.fn();
 global.RhythmRuler.dependencies = ["widgets/rhythmruler"];
-global.ReflectionMatrix = jest.fn();
+global.ReflectionMatrix = jest.fn(() => ({ init: jest.fn() }));
 global.ReflectionMatrix.dependencies = ["widgets/reflection"];
 global.LegoWidget = jest.fn();
 global.LegoWidget.dependencies = ["widgets/legobricks"];
@@ -594,7 +594,10 @@ describe("setupWidgetBlocks", () => {
 
             status.flow(["childBlk"], logo, 0, "statusBlk");
 
-            expect(initSnapshots[0]).toEqual(["3:outputtools", "6:beatvalue"]);
+            // The widget is only built once the listener fires at the end
+            // of the clamp, not eagerly inside flow() itself.
+            expect(logo.statusMatrix.init).not.toHaveBeenCalled();
+
             const listener = logo.setTurtleListener.mock.calls[0][2];
             logo.statusFields = [
                 [3, "outputtools"],
@@ -605,7 +608,8 @@ describe("setupWidgetBlocks", () => {
 
             listener();
 
-            expect(initSnapshots[1]).toEqual(["3:outputtools", "6:beatvalue"]);
+            expect(logo.statusMatrix.init).toHaveBeenCalledTimes(1);
+            expect(initSnapshots[0]).toEqual(["3:outputtools", "6:beatvalue"]);
         });
 
         it("rebuilds status fields from the stack when runtime registration is empty", () => {
@@ -642,14 +646,48 @@ describe("setupWidgetBlocks", () => {
 
             status.flow(["childBlk"], logo, 0, "statusBlk");
 
-            expect(initSnapshots[0]).toEqual(["field1:beatvalue"]);
+            // The widget is only built once the listener fires at the end
+            // of the clamp, not eagerly inside flow() itself.
+            expect(logo.statusMatrix.init).not.toHaveBeenCalled();
 
             const listener = logo.setTurtleListener.mock.calls[0][2];
             logo.statusFields = [];
 
             listener();
 
-            expect(initSnapshots[1]).toEqual(["field1:beatvalue"]);
+            expect(logo.statusMatrix.init).toHaveBeenCalledTimes(1);
+            expect(initSnapshots[0]).toEqual(["field1:beatvalue"]);
+        });
+    });
+
+    describe("ReflectionBlock", () => {
+        it("does not initialize the widget until its listener fires", () => {
+            const reflection = getBlock("reflection");
+
+            // First call: widget lazy-loads, flow() returns before reaching init().
+            reflection.flow(["childBlk"], logo, 0, "reflBlk", "received");
+            // Second call: widget is now cached, flow() proceeds.
+            reflection.flow(["childBlk"], logo, 0, "reflBlk");
+
+            expect(logo.reflection.init).not.toHaveBeenCalled();
+
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            listener();
+
+            expect(logo.reflection.init).toHaveBeenCalledTimes(1);
+        });
+
+        it("constructs the widget once and initializes once per open", () => {
+            const reflection = getBlock("reflection");
+
+            reflection.flow(["childBlk"], logo, 0, "reflBlk", "received");
+            reflection.flow(["childBlk"], logo, 0, "reflBlk");
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            listener();
+
+            expect(global.ReflectionMatrix).toHaveBeenCalledTimes(1);
+            expect(logo.reflection.init).toHaveBeenCalledTimes(1);
+            expect(logo.inReflectionMatrix).toBe(false);
         });
     });
 
