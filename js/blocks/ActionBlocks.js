@@ -505,6 +505,7 @@ function setupActionBlocks(activity) {
          */
         constructor() {
             super("namedcalcArg");
+            this.setCapability("argumentLike");
 
             /**
              * Sets the palette for the block.
@@ -597,6 +598,7 @@ function setupActionBlocks(activity) {
          */
         constructor() {
             super("doArg");
+            this.setCapability("argumentLike");
 
             /**
              * Sets the palette for the block.
@@ -692,6 +694,7 @@ function setupActionBlocks(activity) {
          */
         constructor() {
             super("calcArg");
+            this.setCapability("argumentLike");
 
             /**
              * Sets the palette for the block.
