@@ -1410,10 +1410,16 @@ function Synth() {
      */
     this.createDefaultSynth = turtle => {
         console.debug("create default poly/default/custom synth for turtle " + turtle);
-        const default_synth = new Tone.PolySynth(Tone.AMSynth, POLYCOUNT).toDestination();
-        instruments[turtle]["electronic synth"] = default_synth;
+        // "electronic synth" and "custom" must be separate instances. "custom" is a
+        // member of BUILTIN_SYNTHS, so ___createSynth disposes whatever sits under
+        // that key before rebuilding it. Sharing one node meant that rebuilding
+        // "custom" also destroyed the synth "electronic synth" was still pointing at.
+        instruments[turtle]["electronic synth"] = new Tone.PolySynth(
+            Tone.AMSynth,
+            POLYCOUNT
+        ).toDestination();
         instrumentsSource["electronic synth"] = [0, "electronic synth"];
-        instruments[turtle]["custom"] = default_synth;
+        instruments[turtle]["custom"] = new Tone.PolySynth(Tone.AMSynth, POLYCOUNT).toDestination();
         instrumentsSource["custom"] = [0, "custom"];
     };
 
@@ -2429,6 +2435,9 @@ function Synth() {
 
     this.stopSound = (turtle, instrumentName, note) => {
         if (!instrumentsSource[instrumentName] || !instruments[turtle]?.[instrumentName]) return;
+        // A disposed node is still truthy and its key is still present, so the guard
+        // above lets it through. Calling into Tone at that point throws.
+        if (instruments[turtle][instrumentName].disposed) return;
         const flag = instrumentsSource[instrumentName][0];
         switch (flag) {
             case 1: // drum

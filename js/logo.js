@@ -1201,8 +1201,14 @@ class Logo {
                 tur.singer.killAllVoices();
             }
 
+            // One bad instrument must not abort the rest of the teardown below,
+            // which is what disposes instruments and resets _synthsInitialized.
             for (const instrumentName in this.deps.instruments[turtle]) {
-                this.synth.stopSound(turtle, instrumentName);
+                try {
+                    this.synth.stopSound(turtle, instrumentName);
+                } catch (e) {
+                    console.debug("Error stopping instrument " + instrumentName + ":", e);
+                }
             }
             const comp = this.turtles.getTurtle(turtle).companionTurtle;
             if (comp) {
