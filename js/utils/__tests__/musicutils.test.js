@@ -3128,6 +3128,62 @@ describe("getNote additional paths", () => {
         );
     });
 
+    it("resolves solfege notes in non-12 EDO temperaments", () => {
+        expect(getNote("do", 4, 0, "C major", false, undefined, undefined, "equal19")).toEqual([
+            "C",
+            4,
+            0
+        ]);
+        expect(getNote("re", 4, 0, "C major", false, undefined, undefined, "equal19")).toEqual([
+            "D",
+            4,
+            0
+        ]);
+        expect(getNote("mi", 4, 0, "C major", false, undefined, undefined, "equal19")).toEqual([
+            "E",
+            4,
+            0
+        ]);
+        expect(getNote("sol", 4, 0, "C major", false, undefined, undefined, "equal19")).toEqual([
+            "G",
+            4,
+            0
+        ]);
+    });
+
+    it("resolves solfege with accidentals in non-12 EDO temperaments", () => {
+        expect(
+            getNote("do" + SHARP, 4, 0, "C major", false, undefined, undefined, "equal19")
+        ).toEqual(["C" + SHARP, 4, 0]);
+        expect(
+            getNote("re" + FLAT, 4, 0, "C major", false, undefined, undefined, "equal19")
+        ).toEqual(["D" + FLAT, 4, 0]);
+    });
+
+    it("resolves movable solfege in non-12 EDO temperaments", () => {
+        expect(getNote("do", 4, 0, "D major", true, undefined, undefined, "equal19")).toEqual([
+            "D",
+            4,
+            0
+        ]);
+        expect(getNote("re", 4, 0, "D major", true, undefined, undefined, "equal19")).toEqual([
+            "E",
+            4,
+            0
+        ]);
+    });
+
+    it("reports invalid solfege in non-12 EDO temperaments through the error callback", () => {
+        const errorMsg = jest.fn();
+
+        expect(getNote("zz", 4, 0, "C major", false, undefined, errorMsg, "equal19")).toEqual([
+            "R",
+            "",
+            0
+        ]);
+        expect(errorMsg).toHaveBeenCalledWith(global.INVALIDPITCH, null);
+    });
+
     it("uses key preference and direction to choose enharmonic spelling", () => {
         expect(getNote("B#", 4, 0, "C major", false)).toEqual(["C", 5, 0]);
         expect(getNote("B#", 4, 0, "G major", false, 1)).toEqual(["C", 5, 0]);
