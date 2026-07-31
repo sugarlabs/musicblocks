@@ -424,6 +424,50 @@ describe("PitchDrumMatrix Widget", () => {
             jest.useRealTimers();
         });
 
+        test("should correctly handle multiple drums selected for the same pitch", () => {
+            jest.useFakeTimers();
+
+            const mockActivity = {
+                logo: {
+                    synth: {
+                        stop: jest.fn()
+                    },
+                    turtleDelay: 0
+                },
+                hideMsgs: jest.fn(),
+                textMsg: jest.fn()
+            };
+            pdm.init(mockActivity);
+
+            const mockCellBlack = { style: { backgroundColor: "black" } };
+            const mockRow = { cells: [mockCellBlack, mockCellBlack] }; // Multiple black cells
+            const mockTable = { rows: [mockRow, mockRow] };
+
+            docById.mockImplementation(id => {
+                if (id === "pdmTable" || id === "pdmDrumTable") {
+                    return mockTable;
+                }
+                if (id === "pdmCellTable0" || id === "pdmCellTable1") {
+                    return { rows: [mockRow] };
+                }
+                return { style: {} };
+            });
+
+            pdm._setPairCell = jest.fn();
+            pdm._playing = true;
+
+            pdm.playButton.appendChild = jest.fn();
+
+            pdm._playAll();
+
+            jest.runAllTimers();
+
+            // The setPairCell function should be called 2 times total since we have 1 active row with 2 drums
+            expect(pdm._setPairCell).toHaveBeenCalledTimes(2);
+            expect(pdm._playing).toBe(false);
+            jest.useRealTimers();
+        });
+
         test("should display a message when playing all with an empty grid", () => {
             const mockActivity = {
                 logo: {

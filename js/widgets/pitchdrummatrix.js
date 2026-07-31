@@ -761,7 +761,7 @@ class PitchDrumMatrix {
         const pairRowIndex = pairs[i][0];
         const table = docById("pdmCellTable" + pairRowIndex);
         row = table.rows[0];
-        const cell = row.cells[pairs[i][1]];
+        const cell = pairs[i][1] !== -1 ? row.cells[pairs[i][1]] : undefined;
 
         pdmTable = docById("pdmTable");
         const pdmTableRow = pdmTable.rows[pairRowIndex];
@@ -825,12 +825,8 @@ class PitchDrumMatrix {
 
         table = docById("pdmCellTable" + rowi);
         row = table.rows[0];
-        for (let i = 0; i < row.cells.length; i++) {
-            cell = row.cells[i];
-            if (cell.style.backgroundColor === "black") {
-                this._setPairCell(rowi, i, cell, playNote);
-            }
-        }
+        cell = row.cells[coli];
+        this._setPairCell(rowi, coli, cell, playNote);
     }
 
     /**
