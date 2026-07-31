@@ -16,7 +16,7 @@
    global
 
    platformColor, _, SYNTHSVG, frequencyToPitch, DEFAULTVOICE,
-   normalizeNoteAccidentals, PREVIEWVOLUME, Singer, last
+   normalizeNoteAccidentals, PREVIEWVOLUME, Singer, last, announceToScreenReader
  */
 
 /*
@@ -717,6 +717,7 @@ class PitchStaircase {
             "pitch staircase",
             true
         );
+        announceToScreenReader(_("Pitch Staircase opened"));
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
@@ -726,6 +727,7 @@ class PitchStaircase {
             // Restore the project's master volume so audio still works
             // after exiting mid-playback (was incorrectly left at PREVIEWVOLUME).
             this.activity.logo.synth.setMasterVolume(last(Singer.masterVolume));
+            announceToScreenReader(_("Pitch Staircase closed"));
             widgetWindow.destroy();
         };
 

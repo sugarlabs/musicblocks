@@ -2,6 +2,7 @@ global.localStorage = {
     beginnerMode: "false"
 };
 global._ = x => x;
+global.announceToScreenReader = jest.fn();
 global.TextEncoder = require("util").TextEncoder;
 global.TextDecoder = require("util").TextDecoder;
 global.last = arr => arr[arr.length - 1];
