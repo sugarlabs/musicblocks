@@ -115,6 +115,28 @@ function setupWidgetBlocks(activity) {
     }
 
     /**
+     * Deferred widget loader for construction inside a turtle listener rather
+     * than directly in flow(). Unlike _ensureWidget, there is no "loading"
+     * guard or interruption signal: listener bodies already run once, after
+     * the interpreter has moved on, so there is nothing for an interruption
+     * to interrupt. Shares the same (logo, widgetKey, modules, factory, ...)
+     * argument shape as _ensureWidget so the two loading paths read the same
+     * way at the call site.
+     *
+     * @param {object} logo - The logo object.
+     * @param {string} widgetKey - The key for the widget in the logo object.
+     * @param {string[]} modules - The modules to require.
+     * @param {Function} factory - Builds the widget instance.
+     * @param {Function} [onReady] - Optional callback run after assignment.
+     */
+    function _lazyLoadWidget(logo, widgetKey, modules, factory, onReady) {
+        _lazyRequire(modules, function () {
+            logo[widgetKey] = factory();
+            onReady?.();
+        });
+    }
+
+    /**
      * Represents a block for controlling sound envelope (ADSR).
      * @extends FlowBlock
      */
@@ -617,10 +639,15 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
-                _lazyRequire(MeterWidget.dependencies, function () {
-                    logo.meterWidget = new MeterWidget(activity, blk);
-                    logo.insideMeterWidget = false;
-                });
+                _lazyLoadWidget(
+                    logo,
+                    "meterWidget",
+                    MeterWidget.dependencies,
+                    () => new MeterWidget(activity, blk),
+                    () => {
+                        logo.insideMeterWidget = false;
+                    }
+                );
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -689,10 +716,15 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
-                _lazyRequire(Oscilloscope.dependencies, function () {
-                    logo.Oscilloscope = new Oscilloscope(activity);
-                    logo.inOscilloscope = false;
-                });
+                _lazyLoadWidget(
+                    logo,
+                    "Oscilloscope",
+                    Oscilloscope.dependencies,
+                    () => new Oscilloscope(activity),
+                    () => {
+                        logo.inOscilloscope = false;
+                    }
+                );
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -748,10 +780,15 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
-                _lazyRequire(ModeWidget.dependencies, function () {
-                    logo.modeWidget = new ModeWidget(activity);
-                    logo.insideModeWidget = false;
-                });
+                _lazyLoadWidget(
+                    logo,
+                    "modeWidget",
+                    ModeWidget.dependencies,
+                    () => new ModeWidget(activity),
+                    () => {
+                        logo.insideModeWidget = false;
+                    }
+                );
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -1849,12 +1886,6 @@ function setupWidgetBlocks(activity) {
             };
 
             const structuralFields = collectStatusFields();
-            if (!logo.statusMatrix.isOpen || logo.statusFields.length === 0) {
-                logo.statusFields = structuralFields.slice();
-            }
-
-            dedupeStatusFields();
-            logo.statusMatrix.init(activity);
             logo.statusFields = []; // Clear for the actual interpreter run
 
             logo.inStatusMatrix = true;
@@ -1984,7 +2015,6 @@ function setupWidgetBlocks(activity) {
             );
             if (interruption) return interruption;
 
-            logo.reflection.init(activity);
             logo.statusFields = [];
 
             logo.inReflectionMatrix = true;

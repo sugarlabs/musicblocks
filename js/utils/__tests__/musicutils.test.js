@@ -3393,6 +3393,61 @@ describe("pitchToNumber A reference for non-12 EDO", () => {
     });
 });
 
+describe("getNoteFromInterval with temperament parameter", () => {
+    it("accepts temperament parameter and produces valid output for equal temperament", () => {
+        // This tests that the third parameter is threaded through to underlying functions
+        const result = getNoteFromInterval("C4", "major 2", "equal");
+        expect(result).toBeDefined();
+        expect(Array.isArray(result)).toBe(true);
+        expect(result.length).toBeGreaterThanOrEqual(2);
+    });
+});
+
+describe("numberToPitch uses noteLabels for non-EDO ratio temperaments", () => {
+    it("uses 1/3 comma meantone noteLabels for pitch 0 (C)", () => {
+        const result = numberToPitch(0, "1/3 comma meantone", "C4", 0);
+        expect(result[0]).toBe("C");
+        expect(result[1]).toBe(4);
+    });
+
+    it("uses 1/3 comma meantone noteLabels for pitch 3 (D)", () => {
+        const result = numberToPitch(3, "1/3 comma meantone", "C4", 0);
+        expect(result[0]).toBe("D");
+        expect(result[1]).toBe(4);
+    });
+
+    it("uses 1/3 comma meantone noteLabels for pitch 6 (E)", () => {
+        const result = numberToPitch(6, "1/3 comma meantone", "C4", 0);
+        expect(result[0]).toBe("E");
+        expect(result[1]).toBe(4);
+    });
+
+    it("uses 1/3 comma meantone noteLabels for pitch 18 (B♯)", () => {
+        const result = numberToPitch(18, "1/3 comma meantone", "C4", 0);
+        expect(result[0]).toBe("B" + SHARP);
+        expect(result[1]).toBe(4);
+    });
+
+    it("uses 1/3 comma meantone noteLabels for pitch 19 (C, next octave)", () => {
+        const result = numberToPitch(19, "1/3 comma meantone", "C4", 0);
+        expect(result[0]).toBe("C");
+        expect(result[1]).toBe(5);
+    });
+});
+
+describe("pitchToFrequency uses 1/3 comma meantone ratios", () => {
+    it("produces A4 ≈ 440 Hz", () => {
+        const freq = pitchToFrequency("A", 4, 0, "C major", "1/3 comma meantone");
+        expect(freq).toBeCloseTo(440, 0);
+    });
+
+    it("produces exact octave ratio (C5 = 2 × C4)", () => {
+        const c4 = pitchToFrequency("C", 4, 0, "C major", "1/3 comma meantone");
+        const c5 = pitchToFrequency("C", 5, 0, "C major", "1/3 comma meantone");
+        expect(c5 / c4).toBeCloseTo(2.0, 4);
+    });
+});
+
 describe("EDO octave boundary resolution", () => {
     it("resolves 19-EDO scale degrees 0–21 across the C4–C5 octave boundary", () => {
         const temper = "equal19";

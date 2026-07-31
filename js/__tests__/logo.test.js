@@ -1717,6 +1717,31 @@ describe("Logo runFromBlockNow", () => {
             expect(global.performanceTracker.enterBlock).toHaveBeenCalledTimes(1);
         });
 
+        test("profiling exits the block when the iteration-budget guard trips", () => {
+            let now = 0;
+            global.performanceTracker = {
+                isEnabled: () => true,
+                enterBlock: jest.fn(),
+                exitBlock: jest.fn(),
+                disable: jest.fn()
+            };
+            global.performance = {
+                now: jest.fn(() => {
+                    now += 5;
+                    return now;
+                })
+            };
+
+            logo._iterationBudget = 1;
+            logo.blockList = [makeFlowBlock("noop")];
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+            expect(mockActivity.errorMsg).toHaveBeenCalled();
+            expect(global.performanceTracker.enterBlock).toHaveBeenCalledTimes(1);
+            expect(global.performanceTracker.exitBlock).toHaveBeenCalledTimes(1);
+        });
+
         test("profiling on exits the block when the flow does not return early", () => {
             global.performanceTracker = {
                 isEnabled: () => true,

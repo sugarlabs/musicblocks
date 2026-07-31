@@ -523,4 +523,47 @@ describe("setupIntervalsActions", () => {
         Singer.IntervalsActions.setTemperament("pythagorean", "C", 4);
         expect(logo.synth.changeInTemperament).toBe(true);
     });
+
+    describe("getTemperamentLength", () => {
+        beforeEach(() => {
+            delete global.TEMPERAMENT.custom_edo19;
+            global.TEMPERAMENT = {
+                "equal": { pitchNumber: 12 },
+                "equal19": { pitchNumber: 19 },
+                "equal31": { pitchNumber: 31 },
+                "just intonation": { pitchNumber: 12 },
+                "1/3 comma meantone": { pitchNumber: 19 }
+            };
+        });
+
+        test("returns 12 for equal temperament", () => {
+            logo.synth.inTemperament = "equal";
+            expect(Singer.IntervalsActions.getTemperamentLength()).toBe(12);
+        });
+
+        test("returns 19 for equal19", () => {
+            logo.synth.inTemperament = "equal19";
+            expect(Singer.IntervalsActions.getTemperamentLength()).toBe(19);
+        });
+
+        test("returns 31 for equal31", () => {
+            logo.synth.inTemperament = "equal31";
+            expect(Singer.IntervalsActions.getTemperamentLength()).toBe(31);
+        });
+
+        test("returns 12 for just intonation", () => {
+            logo.synth.inTemperament = "just intonation";
+            expect(Singer.IntervalsActions.getTemperamentLength()).toBe(12);
+        });
+
+        test("returns 19 for 1/3 comma meantone", () => {
+            logo.synth.inTemperament = "1/3 comma meantone";
+            expect(Singer.IntervalsActions.getTemperamentLength()).toBe(19);
+        });
+
+        test("falls back to 12 when no temperament is set", () => {
+            logo.synth.inTemperament = undefined;
+            expect(Singer.IntervalsActions.getTemperamentLength()).toBe(12);
+        });
+    });
 });

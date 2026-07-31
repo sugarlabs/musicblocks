@@ -154,7 +154,7 @@ global.PitchStaircase = jest.fn();
 global.PitchStaircase.dependencies = ["widgets/pitchstaircase"];
 global.RhythmRuler = jest.fn();
 global.RhythmRuler.dependencies = ["widgets/rhythmruler"];
-global.ReflectionMatrix = jest.fn();
+global.ReflectionMatrix = jest.fn(() => ({ init: jest.fn() }));
 global.ReflectionMatrix.dependencies = ["widgets/reflection"];
 global.LegoWidget = jest.fn();
 global.LegoWidget.dependencies = ["widgets/legobricks"];
@@ -594,7 +594,10 @@ describe("setupWidgetBlocks", () => {
 
             status.flow(["childBlk"], logo, 0, "statusBlk");
 
-            expect(initSnapshots[0]).toEqual(["3:outputtools", "6:beatvalue"]);
+            // The widget is only built once the listener fires at the end
+            // of the clamp, not eagerly inside flow() itself.
+            expect(logo.statusMatrix.init).not.toHaveBeenCalled();
+
             const listener = logo.setTurtleListener.mock.calls[0][2];
             logo.statusFields = [
                 [3, "outputtools"],
@@ -605,7 +608,8 @@ describe("setupWidgetBlocks", () => {
 
             listener();
 
-            expect(initSnapshots[1]).toEqual(["3:outputtools", "6:beatvalue"]);
+            expect(logo.statusMatrix.init).toHaveBeenCalledTimes(1);
+            expect(initSnapshots[0]).toEqual(["3:outputtools", "6:beatvalue"]);
         });
 
         it("rebuilds status fields from the stack when runtime registration is empty", () => {
@@ -642,35 +646,71 @@ describe("setupWidgetBlocks", () => {
 
             status.flow(["childBlk"], logo, 0, "statusBlk");
 
-            expect(initSnapshots[0]).toEqual(["field1:beatvalue"]);
+            // The widget is only built once the listener fires at the end
+            // of the clamp, not eagerly inside flow() itself.
+            expect(logo.statusMatrix.init).not.toHaveBeenCalled();
 
             const listener = logo.setTurtleListener.mock.calls[0][2];
             logo.statusFields = [];
 
             listener();
 
-            expect(initSnapshots[1]).toEqual(["field1:beatvalue"]);
+            expect(logo.statusMatrix.init).toHaveBeenCalledTimes(1);
+            expect(initSnapshots[0]).toEqual(["field1:beatvalue"]);
+        });
+    });
+
+    describe("ReflectionBlock", () => {
+        it("does not initialize the widget until its listener fires", () => {
+            const reflection = getBlock("reflection");
+
+            // First call: widget lazy-loads, flow() returns before reaching init().
+            reflection.flow(["childBlk"], logo, 0, "reflBlk", "received");
+            // Second call: widget is now cached, flow() proceeds.
+            reflection.flow(["childBlk"], logo, 0, "reflBlk");
+
+            expect(logo.reflection.init).not.toHaveBeenCalled();
+
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            listener();
+
+            expect(logo.reflection.init).toHaveBeenCalledTimes(1);
+        });
+
+        it("constructs the widget once and initializes once per open", () => {
+            const reflection = getBlock("reflection");
+
+            reflection.flow(["childBlk"], logo, 0, "reflBlk", "received");
+            reflection.flow(["childBlk"], logo, 0, "reflBlk");
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            listener();
+
+            expect(global.ReflectionMatrix).toHaveBeenCalledTimes(1);
+            expect(logo.reflection.init).toHaveBeenCalledTimes(1);
+            expect(logo.inReflectionMatrix).toBe(false);
         });
     });
 
     describe("Widget dependency metadata wiring", () => {
-        // _ensureWidget()/_lazyRequire() are local closures inside
+        // _ensureWidget()/_lazyLoadWidget() are local closures inside
         // setupWidgetBlocks() and aren't exported, so their `modules`
         // argument can't be intercepted at runtime without changing the
         // loader itself, and in this non-AMD test environment `_lazyRequire`
-        // ignores `modules` entirely, so no behavioural test can observe it
-        // either. As a last resort, a single source-text check confirms
-        // every call site reads modules from the widget's own static
-        // `dependencies` rather than a hardcoded literal; kept to one test
-        // (not one per widget) since it's the wiring itself being checked,
-        // not per-widget behaviour -- the behavioural tests below cover that.
+        // (which both of them delegate to) ignores `modules` entirely, so no
+        // behavioural test can observe it either. As a last resort, a single
+        // source-text check confirms every call site reads modules from the
+        // widget's own static `dependencies` rather than a hardcoded
+        // literal; kept to one test (not one per widget) since it's the
+        // wiring itself being checked, not per-widget behaviour -- the
+        // behavioural tests below cover that.
         //
         // Caveat: this relies on source-text matching, which can become
         // brittle during future refactors (e.g. reformatting the
-        // _ensureWidget calls). If dependency resolution is ever exposed
-        // through a helper or otherwise made observable behaviourally,
-        // prefer replacing these regex assertions with behavioural tests.
-        it("every _ensureWidget/_lazyRequire call site reads modules from its widget's dependencies", () => {
+        // _ensureWidget/_lazyLoadWidget calls). If dependency resolution is
+        // ever exposed through a helper or otherwise made observable
+        // behaviourally, prefer replacing these regex assertions with
+        // behavioural tests.
+        it("every _ensureWidget/_lazyLoadWidget call site reads modules from its widget's dependencies", () => {
             const widgetBlocksSource = require("fs").readFileSync(
                 require("path").join(__dirname, "..", "WidgetBlocks.js"),
                 "utf8"
@@ -692,7 +732,11 @@ describe("setupWidgetBlocks", () => {
                 ["legoWidget", "LegoWidget"],
                 ["aiDebugger", "AIDebuggerWidget"]
             ];
-            const lazyRequireSites = ["MeterWidget", "Oscilloscope", "ModeWidget"];
+            const lazyLoadWidgetSites = [
+                ["meterWidget", "MeterWidget"],
+                ["Oscilloscope", "Oscilloscope"],
+                ["modeWidget", "ModeWidget"]
+            ];
 
             const notWired = [];
             for (const [widgetKey, className] of ensureWidgetSites) {
@@ -705,14 +749,13 @@ describe("setupWidgetBlocks", () => {
                     );
                 }
             }
-            for (const className of lazyRequireSites) {
-                if (
-                    !new RegExp(`_lazyRequire\\(${className}\\.dependencies,`).test(
-                        widgetBlocksSource
-                    )
-                ) {
+            for (const [widgetKey, className] of lazyLoadWidgetSites) {
+                const callSite = new RegExp(
+                    `_lazyLoadWidget\\(\\s*logo,\\s*"${widgetKey}",\\s*${className}\\.dependencies,`
+                );
+                if (!callSite.test(widgetBlocksSource)) {
                     notWired.push(
-                        `_lazyRequire(...) for ${className} should read ${className}.dependencies`
+                        `_lazyLoadWidget("${widgetKey}") should read ${className}.dependencies`
                     );
                 }
             }

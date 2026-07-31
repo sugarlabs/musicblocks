@@ -104,6 +104,7 @@ describe("setupIntervalsBlocks", () => {
         global.Singer = {
             IntervalsActions: {
                 setTemperament: jest.fn(),
+                getTemperamentLength: jest.fn(() => 12),
                 GetIntervalNumber: jest.fn(() => 5),
                 GetCurrentInterval: jest.fn(() => 7),
                 setSemitoneInterval: jest.fn(),
@@ -345,6 +346,27 @@ describe("setupIntervalsBlocks", () => {
         it("calls setTemperament", () => {
             createdBlocks.settemperament.flow(["equal", "C", 4], logo, turtleIndex, "blk");
             expect(Singer.IntervalsActions.setTemperament).toHaveBeenCalledWith("equal", "C", 4);
+        });
+    });
+
+    describe("TemperamentLengthBlock", () => {
+        it("creates the temperamentlength block", () => {
+            expect(createdBlocks.temperamentlength).toBeDefined();
+        });
+
+        it("returns temperament length via arg()", () => {
+            Singer.IntervalsActions.getTemperamentLength = jest.fn(() => 19);
+            const result = createdBlocks.temperamentlength.arg(logo, turtleIndex, "blk");
+            expect(result).toBe(19);
+        });
+
+        it("registers status field when under print in status matrix", () => {
+            logo.inStatusMatrix = true;
+            activity.blocks.blockList.blk = { connections: ["print1"] };
+            activity.blocks.blockList.print1 = { name: "print" };
+            createdBlocks.temperamentlength.arg(logo, turtleIndex, "blk");
+            expect(logo.statusFields).toContainEqual(["blk", "temperamentlength"]);
+            logo.inStatusMatrix = false;
         });
     });
 

@@ -120,13 +120,6 @@ const COLLAPSIBLES = [
 ];
 
 /**
- * List of blocks that behave like argument blocks even though they are not
- * strictly classified as arg/value blocks.
- * @type {string[]}
- */
-const ARG_LIKE_BLOCKS = ["doArg", "calcArg", "namedcalcArg", "makeblock"];
-
-/**
  * List of block types whose names should be widened.
  * @type {string[]}
  */
@@ -1430,7 +1423,10 @@ class Block {
                             this.activity.logo.synth.startingPitch.substring(
                                 0,
                                 this.activity.logo.synth.startingPitch.length - 1
-                            ) + "(+0)";
+                            ) +
+                            "(+0" +
+                            CENTSSYMBOL +
+                            ")";
                         break;
                     case "notename":
                         this.value = "G";
@@ -2116,7 +2112,7 @@ class Block {
      * @returns {boolean} - True if the block is argument-like, false otherwise.
      */
     isArgumentLikeBlock() {
-        return this.isArgBlock() || ARG_LIKE_BLOCKS.includes(this.name);
+        return this.isArgBlock() || this.hasCapability("argumentLike");
     }
 
     /**

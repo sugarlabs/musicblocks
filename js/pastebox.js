@@ -42,7 +42,7 @@ class PasteBox {
      * @returns {void}
      */
     hide() {
-        if (this._container != null) {
+        if (this._container !== null) {
             this._container.visible = false;
             this.activity.refreshCanvas();
             // paste.visible = false;
@@ -58,7 +58,7 @@ class PasteBox {
      * @param {number} y coordinate
      */
     createBox(scale, x, y) {
-        if (this._container == null) {
+        if (this._container === null) {
             this._scale = scale;
 
             this._container = new createjs.Container();
