@@ -680,16 +680,16 @@ class PitchDrumMatrix {
         for (let i = 0; i < pdmTable.rows.length - 1; i++) {
             table = docById("pdmCellTable" + i);
             row = table.rows[0];
-            let j;
-            for (j = 0; j < row.cells.length; j++) {
+            let found = false;
+            for (let j = 0; j < row.cells.length; j++) {
                 cell = row.cells[j];
                 if (cell.style.backgroundColor === "black") {
                     pairs.push([i, j]);
-                    break;
+                    found = true;
                 }
             }
 
-            if (j === row.cells.length) {
+            if (!found) {
                 pairs.push([i, -1]);
             }
         }
@@ -758,12 +758,13 @@ class PitchDrumMatrix {
         const drumTable = docById("pdmDrumTable");
         let row = drumTable.rows[0];
         // const drumCell = row.cells[i];
-        const table = docById("pdmCellTable" + i);
+        const pairRowIndex = pairs[i][0];
+        const table = docById("pdmCellTable" + pairRowIndex);
         row = table.rows[0];
-        const cell = row.cells[i];
+        const cell = row.cells[pairs[i][1]];
 
         pdmTable = docById("pdmTable");
-        const pdmTableRow = pdmTable.rows[i];
+        const pdmTableRow = pdmTable.rows[pairRowIndex];
         const pitchCell = pdmTableRow.cells[0];
         pitchCell.style.backgroundColor = platformColor.selectorBackground;
 
@@ -809,29 +810,9 @@ class PitchDrumMatrix {
         let table = docById("pdmCellTable" + rowi);
         row = table.rows[0];
 
-        // For the moment, we can only have one drum per pitch, so
-        // clear the row.
         let pitchBlock;
         let drumBlock;
         let cell;
-        if (playNote) {
-            let obj;
-            for (let i = 0; i < row.cells.length; i++) {
-                if (i === coli) {
-                    continue;
-                }
-
-                cell = row.cells[i];
-                if (cell.style.backgroundColor === "black") {
-                    pitchBlock = this._rowBlocks[rowi];
-                    drumBlock = this._colBlocks[i];
-                    this.removeNode(pitchBlock, drumBlock);
-                    cell.style.backgroundColor = platformColor.selectorBackground;
-                    obj = cell.id.split(","); // row,column
-                    this._setCellPitchDrum(Number(obj[0]), Number(obj[1]), false);
-                }
-            }
-        }
 
         pitchBlock = this._rowBlocks[rowi];
         drumBlock = this._colBlocks[coli];
