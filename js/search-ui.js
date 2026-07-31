@@ -222,10 +222,23 @@ class SearchUI {
         $search.autocomplete({
             source: (request, response) => {
                 const term = (request.term || "").toLowerCase().trim();
-                response(sourceFn(term));
+                let results = sourceFn(term);
+                if (results.length === 0) {
+                    results = [
+                        {
+                            label: "0 blocks match '" + (request.term || "") + "'",
+                            noResult: true
+                        }
+                    ];
+                }
+                response(results);
             },
             appendTo: "body",
             select: (event, ui) => {
+                if (ui.item && ui.item.noResult) {
+                    event.preventDefault();
+                    return false;
+                }
                 event.preventDefault();
                 activity.searchWidget.value = ui.item.label;
                 activity.searchWidget.idInput_custom = ui.item.value;
@@ -239,7 +252,30 @@ class SearchUI {
 
         const instance = $search.autocomplete("instance");
         if (instance) {
-            instance._renderItem = (ul, item) => this._renderMainItem($j, ul, item, dropCb);
+            instance._resizeMenu = function () {
+                if (this.menu && this.menu.element) {
+                    this.menu.element[0].style.setProperty("width", "320px", "important");
+                }
+            };
+            if (instance.menu && instance.menu.element) {
+                instance.menu.element.addClass("main-search-dropdown");
+                instance.menu.element[0].style.setProperty("width", "320px", "important");
+            }
+            instance._renderItem = (ul, item) => {
+                ul.addClass("main-search-dropdown");
+                ul[0].style.setProperty("width", "320px", "important");
+                if (item.noResult) {
+                    const li = $j("<li class='no-results-message ui-state-disabled'></li>");
+                    li[0].style.setProperty("opacity", "1", "important");
+                    const wrapper = $j("<div class='ui-menu-item-wrapper'></div>").text(item.label);
+                    wrapper[0].style.setProperty("color", "var(--color-text-primary)", "important");
+                    wrapper[0].style.setProperty("text-align", "center", "important");
+                    wrapper[0].style.setProperty("font-style", "italic", "important");
+                    li.append(wrapper);
+                    return li.appendTo(ul);
+                }
+                return this._renderMainItem($j, ul, item, dropCb);
+            };
         }
         $search.data("autocomplete-init", true);
     }
@@ -303,11 +339,21 @@ class SearchUI {
         $helpfulSearch.autocomplete({
             source: (request, response) => {
                 const term = (request.term || "").toLowerCase().trim();
-                response(sourceFn(term));
+                let results = sourceFn(term);
+                if (results.length === 0) {
+                    results = [
+                        {
+                            label: "0 blocks match '" + (request.term || "") + "'",
+                            noResult: true
+                        }
+                    ];
+                }
+                response(results);
             },
             appendTo: "body",
             select: (event, ui) => {
                 event.preventDefault();
+                if (ui.item.noResult) return;
                 activity.helpfulSearchWidget.value = ui.item.label;
                 activity.helpfulSearchWidget.idInput_custom = ui.item.value;
                 activity.helpfulSearchWidget.protoblk = ui.item.specialDict;
@@ -321,6 +367,11 @@ class SearchUI {
         const instance = $helpfulSearch.autocomplete("instance");
         if (instance) {
             instance._renderItem = (ul, item) => {
+                if (item.noResult) {
+                    const li = $j("<li class='no-results-message ui-state-disabled'></li>");
+                    li.append($j("<a>").text(item.label));
+                    return li.appendTo(ul.css("z-index", 35000));
+                }
                 const li = $j("<li></li>");
                 const img = document.createElement("img");
                 img.src = item.artwork || "";
@@ -442,6 +493,18 @@ class SearchUI {
      * @returns {jQuery}
      */
     _renderMainItem($j, ul, item, dropCb) {
+        if (item.noResult) {
+            const li = $j("<li class='no-results-message ui-state-disabled'></li>");
+            li.append($j("<a>").text(item.label));
+            return li.appendTo(
+                ul.css({
+                    "z-index": 35000,
+                    "max-height": "200px",
+                    "overflow-y": "auto"
+                })
+            );
+        }
+
         const li = $j("<li></li>");
 
         const img = document.createElement("img");

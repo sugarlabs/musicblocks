@@ -11,7 +11,7 @@
 
 // This is the "Offline page" service worker
 
-const CACHE = "pwabuilder-precache";
+const CACHE = "pwabuilder-precache-5";
 const offlineFallbackPage = "/index.html";
 const precacheFiles = [
     /* Add an array of files to precache for your app */
@@ -32,10 +32,25 @@ self.addEventListener("install", function (event) {
     );
 });
 
-// Allow sw to control of current page
 self.addEventListener("activate", function (event) {
     console.log("[PWA Builder] Claiming clients for current page");
-    event.waitUntil(self.clients.claim());
+    event.waitUntil(
+        caches
+            .keys()
+            .then(function (cacheNames) {
+                return Promise.all(
+                    cacheNames.map(function (cacheName) {
+                        if (cacheName !== CACHE) {
+                            console.log("[PWA Builder] Deleting old cache:", cacheName);
+                            return caches.delete(cacheName);
+                        }
+                    })
+                );
+            })
+            .then(function () {
+                return self.clients.claim();
+            })
+    );
 });
 
 function isPrecachedRequest(request) {

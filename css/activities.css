@@ -224,25 +224,82 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 #search[type="text"] {
     position: absolute;
     z-index: 2000;
-    width: 300px;
+    width: 320px;
     height: 48px;
-    padding: 0 16px;
+    padding: 0 20px;
     background-color: var(--color-bg-primary);
-    border: 2px solid var(--color-brand-primary);
+    border: 2px solid var(--color-brand-primary, #4da6ff);
     border-radius: 24px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    font-size: 18px;
-    transition: all 0.2s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    font-size: 16px;
+    font-family: inherit;
+    color: var(--color-text-primary);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     margin-left: 8px;
+}
+#search[type="text"]::placeholder {
+    color: var(--color-text-tertiary);
+    font-style: italic;
 }
 #searchDragHandle {
     pointer-events: auto;
 }
 
 #search:focus {
-    border-color: var(--color-brand-primary-hover);
-    box-shadow: 0 4px 12px rgba(77, 166, 255, 0.2);
+    border-color: var(--color-brand-primary-hover, #66b3ff);
+    box-shadow: 0 6px 20px rgba(77, 166, 255, 0.35);
     outline: none;
+    transform: translateY(-1px);
+}
+
+.main-search-dropdown {
+    width: 320px !important;
+    background-color: var(--color-bg-primary) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+    padding: 8px 0 !important;
+    border: 1px solid var(--color-border-primary) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    max-height: 350px !important;
+    z-index: 10002 !important;
+}
+
+.main-search-dropdown::-webkit-scrollbar {
+    width: 8px;
+}
+.main-search-dropdown::-webkit-scrollbar-track {
+    background: transparent;
+}
+.main-search-dropdown::-webkit-scrollbar-thumb {
+    background: var(--color-border-primary);
+    border-radius: 4px;
+}
+
+.main-search-dropdown .ui-menu-item {
+    border-radius: 8px !important;
+    margin: 4px 8px !important;
+    padding: 8px 12px !important;
+    transition:
+        background-color 0.2s ease,
+        transform 0.1s ease !important;
+}
+
+.main-search-dropdown .ui-menu-item:hover:not(.ui-state-disabled) {
+    transform: translateX(4px);
+}
+
+.main-search-dropdown .no-results-message {
+    padding: 10px 12px !important;
+    text-align: center !important;
+    font-style: italic !important;
+    background-color: transparent !important;
+    pointer-events: none !important;
+}
+
+.main-search-dropdown .no-results-message a,
+.main-search-dropdown .no-results-message .ui-menu-item-wrapper {
+    color: var(--color-text-primary) !important;
 }
 
 #search.open {

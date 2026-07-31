@@ -14,7 +14,7 @@
 // Localization helper for early bootstrap
 const t_ = typeof _ === "function" ? _ : s => s;
 
-const ASSET_VERSION = window.location.protocol === "file:" ? "" : "v=999999_fix7";
+const ASSET_VERSION = window.location.protocol === "file:" ? "" : "v=999999_fix10";
 
 requirejs.config({
     baseUrl: "./",

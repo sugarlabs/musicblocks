@@ -201,7 +201,11 @@ class SearchController {
     showSearchWidget() {
         const activity = this.activity;
         activity.searchWidget.style.zIndex = 1001;
-        activity.searchWidget.style.border = "2px solid lightblue";
+        activity.searchWidget.style.border = "2px solid #4da6ff";
+        activity.searchWidget.style.boxShadow = "0 4px 16px rgba(0, 0, 0, 0.4)";
+        activity.searchWidget.style.borderRadius = "24px";
+        activity.searchWidget.style.width = "320px";
+
         if (this.helpfulSearchDiv) {
             this._hideHelpfulSearchWidget();
         }
@@ -283,10 +287,23 @@ class SearchController {
             $search.autocomplete({
                 source: (request, response) => {
                     const term = (request.term || "").toLowerCase().trim();
-                    response(that.filterSuggestions(term));
+                    let results = that.filterSuggestions(term);
+                    if (results.length === 0) {
+                        results = [
+                            {
+                                label: "0 blocks match '" + (request.term || "") + "'",
+                                noResult: true
+                            }
+                        ];
+                    }
+                    response(results);
                 },
                 appendTo: "body",
                 select: (event, ui) => {
+                    if (ui.item && ui.item.noResult) {
+                        event.preventDefault();
+                        return false;
+                    }
                     event.preventDefault();
                     activity.searchWidget.value = ui.item.label;
                     activity.searchWidget.idInput_custom = ui.item.value;
@@ -301,7 +318,34 @@ class SearchController {
 
             const instance = $search.autocomplete("instance");
             if (instance) {
+                instance._resizeMenu = function () {
+                    if (this.menu && this.menu.element) {
+                        this.menu.element[0].style.setProperty("width", "320px", "important");
+                    }
+                };
+                if (instance.menu && instance.menu.element) {
+                    instance.menu.element.addClass("main-search-dropdown");
+                    instance.menu.element[0].style.setProperty("width", "320px", "important");
+                }
                 instance._renderItem = (ul, item) => {
+                    ul.addClass("main-search-dropdown");
+                    ul[0].style.setProperty("width", "320px", "important");
+                    if (item.noResult) {
+                        const li = $j("<li class='no-results-message ui-state-disabled'></li>");
+                        li[0].style.setProperty("opacity", "1", "important");
+                        const wrapper = $j("<div class='ui-menu-item-wrapper'></div>").text(
+                            item.label
+                        );
+                        wrapper[0].style.setProperty(
+                            "color",
+                            "var(--color-text-primary)",
+                            "important"
+                        );
+                        wrapper[0].style.setProperty("text-align", "center", "important");
+                        wrapper[0].style.setProperty("font-style", "italic", "important");
+                        li.append(wrapper);
+                        return li.appendTo(ul);
+                    }
                     const li = $j("<li></li>");
 
                     const img = document.createElement("img");

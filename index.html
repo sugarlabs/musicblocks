@@ -40,7 +40,7 @@
          If you change `?v=fixed` (or remove/add a query param), update sw.js so offline still works. -->
         <link
             rel="preload"
-            href="css/activities.css?v=fixed"
+            href="css/activities.css"
             as="style"
             onload="
                 this.onload = null;
@@ -190,17 +190,18 @@
                 this.rel = 'stylesheet';
             "
         />
-        <noscript><link rel="stylesheet" href="css/tokens.css?v=fixed" /></noscript>
+        <noscript><link rel="stylesheet" href="css/tokens.css" /></noscript>
         <link
             rel="preload"
-            href="css/themes.css?v=fixed"
+            href="css/themes.css"
             as="style"
             onload="
                 this.onload = null;
                 this.rel = 'stylesheet';
             "
         />
-        <noscript><link rel="stylesheet" href="css/themes.css?v=fixed" /></noscript>
+        <noscript><link rel="stylesheet" href="css/themes.css" /></noscript>
+        <noscript> <link rel="stylesheet" href="css/activities.css" /></noscript>
         <script>
             let ast2blocklist_config;
             window.ast2blocklist_config_failed = false;

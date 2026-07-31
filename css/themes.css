@@ -135,13 +135,13 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
     border-color: var(--color-border-primary) !important;
 }
 
-/* Ensure all text inside autocomplete items is white */
-.dark .ui-autocomplete .ui-menu-item,
-.dark .ui-autocomplete .ui-menu-item a,
-.dark .ui-autocomplete .ui-menu-item .ui-menu-item-wrapper,
-.dark .ui-autocomplete .ui-menu-item span,
-.dark .ui-autocomplete .ui-menu-item b,
-.dark .ui-autocomplete .ui-menu-item strong {
+/* Ensure all text inside autocomplete items is white, EXCEPT for disabled no-results text */
+.dark .ui-autocomplete .ui-menu-item:not(.ui-state-disabled),
+.dark .ui-autocomplete .ui-menu-item:not(.ui-state-disabled) a,
+.dark .ui-autocomplete .ui-menu-item:not(.ui-state-disabled) .ui-menu-item-wrapper,
+.dark .ui-autocomplete .ui-menu-item:not(.ui-state-disabled) span,
+.dark .ui-autocomplete .ui-menu-item:not(.ui-state-disabled) b,
+.dark .ui-autocomplete .ui-menu-item:not(.ui-state-disabled) strong {
     color: var(--color-text-primary) !important;
     background-color: transparent !important;
 }
@@ -488,14 +488,14 @@ body.highcontrast {
     border: 1px solid var(--color-border-primary);
     background: var(--color-bg-primary);
     box-shadow: none;
-     color: var(--color-text-primary) !important;
+    color: var(--color-text-primary) !important;
 }
 
 .highcontrast .keyboard-shortcuts-section-title,
 .highcontrast .keyboard-shortcuts-action,
 .highcontrast .keyboard-shortcuts-hero-copy,
 .highcontrast .keyboard-shortcuts-hero-title {
-     color: var(--color-text-primary) !important;
+    color: var(--color-text-primary) !important;
 }
 
 .highcontrast .keyboard-shortcuts-row,
@@ -519,11 +519,11 @@ body.highcontrast {
 }
 
 .highcontrast .blue {
-    background-color: var(--color-text-inverse)080 !important;
+    background-color: var(--color-text-inverse) !important;
 }
 
 .highcontrast .blue.darken-1 {
-    background-color: var(--color-text-inverse)0ff !important;
+    background-color: var(--color-text-inverse) !important;
 }
 
 .highcontrast #floatingWindows > .windowFrame {
