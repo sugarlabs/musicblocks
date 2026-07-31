@@ -340,6 +340,8 @@ function setupWidgetBlocks(activity) {
 
             logo.insideTemperament = true;
             logo.temperament.inTemperament = args[0];
+            logo.synth.changeInTemperament = true;
+            logo.synth.temperamentChanged(args[0], logo.synth.startingPitch);
             const scale = [];
 
             if (

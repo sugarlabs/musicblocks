@@ -13,7 +13,7 @@
 // from given frequency to nextoctave frequency(two times the given frequency)
 // in continuous manner.
 
-/* global _, Tone */
+/* global _, Tone, getCurrentEDO */
 
 /*
    Global locations
@@ -27,8 +27,6 @@ class PitchSlider {
     static dependencies = ["widgets/pitchslider"];
 
     static ICONSIZE = 32;
-    static SEMITONE = Math.pow(2, 1 / 12);
-
     /**
      * @constructor
      */
@@ -46,6 +44,8 @@ class PitchSlider {
      */
     init(activity) {
         this.activity = activity;
+        const edo = getCurrentEDO(activity.logo.synth.inTemperament);
+        const semitone = Math.pow(2, 1 / edo);
         if (window.widgetWindows.openWindows["slider"]) return;
         if (!this.frequencies || !this.frequencies.length) this.frequencies = [392];
 
@@ -92,10 +92,10 @@ class PitchSlider {
 
                     if (event.key === "ArrowUp" || event.key === "ArrowRight") {
                         // Move up by a semitone
-                        slider.value = Math.min(currentValue * PitchSlider.SEMITONE, max);
+                        slider.value = Math.min(currentValue * semitone, max);
                     } else if (event.key === "ArrowDown" || event.key === "ArrowLeft") {
                         // Move down by a semitone
-                        slider.value = Math.max(currentValue / PitchSlider.SEMITONE, min);
+                        slider.value = Math.max(currentValue / semitone, min);
                     }
 
                     const inputEvent = new Event("input", { bubbles: true });
@@ -162,7 +162,7 @@ class PitchSlider {
                 _("Move up"),
                 toolBarDiv
             ).onclick = () => {
-                slider.value = Math.min(parseFloat(slider.value) * PitchSlider.SEMITONE, max);
+                slider.value = Math.min(parseFloat(slider.value) * semitone, max);
                 changeFreq();
                 oscillators[id].triggerAttackRelease(this.frequencies[id], "4n");
             };
@@ -173,7 +173,7 @@ class PitchSlider {
                 _("Move down"),
                 toolBarDiv
             ).onclick = () => {
-                slider.value = Math.max(parseFloat(slider.value) / PitchSlider.SEMITONE, min);
+                slider.value = Math.max(parseFloat(slider.value) / semitone, min);
                 changeFreq();
                 oscillators[id].triggerAttackRelease(this.frequencies[id], "4n");
             };

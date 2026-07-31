@@ -6044,8 +6044,13 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
         temperament = "equal";
     }
     if (isCustomTemperament(temperament)) {
-        //Scalar = Semitone for custom Temperament.
-        return transposition;
+        const t = getTemperament(temperament);
+        if (!t || !t.ratios) {
+            // Scalar = Semitone for custom Temperament with no ratios.
+            return transposition;
+        }
+        // For custom temperaments with ratios, fall through to ratio-based
+        // step size calculation below.
     }
     const currentEDO = getCurrentEDO(temperament);
 
@@ -7176,7 +7181,7 @@ const getNumNote = (value, delta, temperament) => {
  * @param {string} currentNote - The current note.
  * @returns {number} The calculated octave.
  */
-const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote) => {
+const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote, temperament) => {
     // Calculate the octave based on the current Octave and the arg,
     // which can be a number, a 'number' as a string, 'current',
     // 'previous', or 'next'.
@@ -7184,6 +7189,8 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote) => {
     if (typeof arg === "number") {
         return Math.max(1, Math.min(Math.floor(arg), 9));
     }
+
+    const currentEDO = getCurrentEDO(temperament);
 
     // The relative octave for tritones are arbitrated as being in the
     // current octave, so we need to determine the number of half
@@ -7196,9 +7203,9 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote) => {
         note = currentNote;
     }
 
-    const stepCurrentNote = getNumber(note, currentOctave);
-    const stepUpCurrentNote = getNumber(note, currentOctave + 1);
-    const stepDownCurrentNote = getNumber(note, currentOctave - 1);
+    const stepCurrentNote = getNumber(note, currentOctave, temperament);
+    const stepUpCurrentNote = getNumber(note, currentOctave + 1, temperament);
+    const stepDownCurrentNote = getNumber(note, currentOctave - 1, temperament);
 
     if (lastNotePlayed !== null) {
         lastNotePlayed = lastNotePlayed[0];
@@ -7208,13 +7215,15 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote) => {
         lastNotePlayed = "G";
     }
 
-    const stepLastNotePlayed = getNumber(lastNotePlayed, currentOctave);
+    const stepLastNotePlayed = getNumber(lastNotePlayed, currentOctave, temperament);
 
     const halfSteps = Math.abs(stepLastNotePlayed - stepCurrentNote);
     const halfStepsUp = Math.abs(stepLastNotePlayed - stepUpCurrentNote);
     const halfStepsDown = Math.abs(stepLastNotePlayed - stepDownCurrentNote);
 
-    if (halfSteps <= 5 || isNaN(halfSteps)) {
+    const octaveThreshold = Math.round(currentEDO / 4);
+
+    if (halfSteps <= octaveThreshold || isNaN(halfSteps)) {
         changedCurrent = currentOctave;
     } else if (halfStepsDown <= halfStepsUp) {
         changedCurrent = Math.max(currentOctave - 1, 1);

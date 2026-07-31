@@ -251,7 +251,13 @@ function setupPitchActions(activity) {
             const _octave =
                 (isNegativeArg ? -1 : 1) * (deltaOctave + deltaSemi) +
                 Math.floor(
-                    calcOctave(tur.singer.currentOctave, octave, tur.singer.lastNotePlayed, note)
+                    calcOctave(
+                        tur.singer.currentOctave,
+                        octave,
+                        tur.singer.lastNotePlayed,
+                        note,
+                        activity.logo.synth.inTemperament
+                    )
                 );
 
             Singer.processPitch(activity, note, _octave, 0, turtle, blk);
@@ -581,7 +587,8 @@ function setupPitchActions(activity) {
                     tur.singer.currentOctave,
                     octave,
                     tur.singer.lastNotePlayed,
-                    name
+                    name,
+                    activity.logo.synth.inTemperament
                 );
                 tur.singer.invertList.push([name, _octave, mode]);
             }
@@ -615,7 +622,7 @@ function setupPitchActions(activity) {
                 const obj = numberToPitch(
                     Math.floor(number) +
                         activity.turtles.ithTurtle(turtle).singer.pitchNumberOffset,
-                    undefined,
+                    activity.logo.synth.inTemperament,
                     undefined,
                     undefined,
                     activity
@@ -641,9 +648,20 @@ function setupPitchActions(activity) {
             const tur = activity.turtles.ithTurtle(turtle);
 
             const _octave = Math.floor(
-                calcOctave(tur.singer.currentOctave, octave, tur.singer.lastNotePlayed, pitch)
+                calcOctave(
+                    tur.singer.currentOctave,
+                    octave,
+                    tur.singer.lastNotePlayed,
+                    pitch,
+                    activity.logo.synth.inTemperament
+                )
             );
-            tur.singer.pitchNumberOffset = pitchToNumber(pitch, _octave, tur.singer.keySignature);
+            tur.singer.pitchNumberOffset = pitchToNumber(
+                pitch,
+                _octave,
+                tur.singer.keySignature,
+                activity.logo.synth.inTemperament
+            );
         }
 
         /**
@@ -664,14 +682,25 @@ function setupPitchActions(activity) {
                 let pitch = tur.singer.previousNotePlayed[0].slice(0, len - 1);
                 let octave = parseInt(tur.singer.previousNotePlayed[0].slice(len - 1), 10);
                 let obj = [pitch, octave];
-                const previousValue = pitchToNumber(obj[0], obj[1], tur.singer.keySignature);
+                const previousValue = pitchToNumber(
+                    obj[0],
+                    obj[1],
+                    tur.singer.keySignature,
+                    activity.logo.synth.inTemperament
+                );
 
                 len = tur.singer.lastNotePlayed[0].length;
                 pitch = tur.singer.lastNotePlayed[0].slice(0, len - 1);
                 octave = parseInt(tur.singer.lastNotePlayed[0].slice(len - 1), 10);
                 obj = [pitch, octave];
 
-                let delta = pitchToNumber(obj[0], obj[1], tur.singer.keySignature) - previousValue;
+                let delta =
+                    pitchToNumber(
+                        obj[0],
+                        obj[1],
+                        tur.singer.keySignature,
+                        activity.logo.synth.inTemperament
+                    ) - previousValue;
                 if (outType === "deltapitch") {
                     // half-step difference
                     return delta;
@@ -684,8 +713,18 @@ function setupPitchActions(activity) {
                         i++;
                         const nhalf =
                             type === "up"
-                                ? getStepSizeUp(tur.singer.keySignature, pitch, 0, "equal")
-                                : getStepSizeDown(tur.singer.keySignature, pitch, 0, "equal");
+                                ? getStepSizeUp(
+                                      tur.singer.keySignature,
+                                      pitch,
+                                      0,
+                                      activity.logo.synth.inTemperament
+                                  )
+                                : getStepSizeDown(
+                                      tur.singer.keySignature,
+                                      pitch,
+                                      0,
+                                      activity.logo.synth.inTemperament
+                                  );
                         delta -= nhalf;
                         scalarDelta += type === "up" ? 1 : -1;
                         obj = getNote(
