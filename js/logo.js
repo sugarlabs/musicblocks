@@ -1837,6 +1837,7 @@ class Logo {
             logo._iterationBudget = logo._MAX_ITERATIONS + 1;
             if (profilingEnabled) {
                 Logo._recordBlockTiming(logo, blk, profilingStart);
+                performanceTracker.exitBlock();
             }
             return;
         }
