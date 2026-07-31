@@ -3663,10 +3663,11 @@ function MusicKeyboard(activity) {
          */
         const numberToPitch = num => {
             const offset = 4;
-            const octave = offset + Math.floor((num - 60) / 12);
-            const pitch1 = NOTESSHARP[num % 12];
-            const pitch2 = NOTESFLAT[num % 12];
-            return [pitch1, pitch2, octave];
+            const currentEDO = getCurrentEDO(this.activity.logo.synth.inTemperament);
+            const octave = offset + Math.floor((num - 60) / currentEDO);
+            const noteNames = generateNoteNames(currentEDO);
+            const pitch1 = noteNames[num % currentEDO];
+            return [pitch1, pitch1, octave];
         };
 
         //event attributes : timeStamp , data

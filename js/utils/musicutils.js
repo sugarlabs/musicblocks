@@ -5021,6 +5021,231 @@ function base64Encode(str) {
 }
 
 /**
+ * Resolve a solfege note argument (e.g. "do", "re♯") to a note name for the
+ * given key signature and octave length. Shared by the 12-EDO and microtonal
+ * EDO paths in getNote().
+ * @function
+ * @param {string} noteArg - The note argument (expected to be solfege).
+ * @param {string} keySignature - The key signature (e.g. "C major").
+ * @param {boolean} movable - Whether movable-do solfege is in effect.
+ * @param {number} octaveLength - The number of steps in the octave.
+ * @param {number} octave - The current octave (adjusted in the return value).
+ * @param {number} transpositionFloor - The current transposition floor (adjusted in the return value).
+ * @returns {Array|null} [note, octave, transpositionFloor] on success, or null
+ *   if noteArg is not a resolvable solfege name.
+ */
+const getNoteFromSolfege = (
+    noteArg,
+    keySignature,
+    movable,
+    octaveLength,
+    octave,
+    transpositionFloor
+) => {
+    let sharpFlat = false;
+    if (["#", SHARP, FLAT, "b"].includes(noteArg.substr(-1))) {
+        sharpFlat = true;
+    }
+
+    if (!keySignature) {
+        keySignature = "C major";
+    }
+
+    let obj;
+
+    if (movable) {
+        obj = getScaleAndHalfSteps(keySignature);
+    } else {
+        obj = getScaleAndHalfSteps("C major");
+    }
+
+    let thisScale = obj[0];
+    const halfSteps = obj[1];
+    const myKeySignature = obj[2];
+    const mode = obj[3];
+    let offset;
+    if (movable) {
+        // Ensure it is a valid key signature.
+        offset = thisScale.indexOf(myKeySignature);
+        if (offset === -1) {
+            console.debug(
+                "WARNING: Key " +
+                    myKeySignature +
+                    " not found in " +
+                    thisScale +
+                    ". Using default of C"
+            );
+            offset = 0;
+            thisScale = NOTESSHARP;
+        }
+
+        // We need to set the octave relative to the tonic.
+        // Starting from C_4 (note_octave)
+        // All keys C# -- F# would remain in octave four
+        // All keys Gb -- B would be in octave three (since
+        // going down is closer than going up)
+        if (offset > 5) {
+            transpositionFloor -= octaveLength; // go down one octave
+        }
+    } else {
+        offset = 0;
+    }
+
+    if (sharpFlat) {
+        if (noteArg.substr(-1) === "#") {
+            offset += 1;
+        } else if (noteArg.substr(-1) === SHARP) {
+            offset += 1;
+        } else if (noteArg.substr(-1) === FLAT) {
+            offset -= 1;
+        } else if (noteArg.substr(-1) === "b") {
+            offset -= 1;
+        }
+    }
+
+    let solfegePart;
+    if (halfSteps.includes(noteArg.substr(0, 1).toLowerCase())) {
+        solfegePart = noteArg.substr(0, 1).toLowerCase();
+    } else if (halfSteps.includes(noteArg.substr(0, 2).toLowerCase())) {
+        solfegePart = noteArg.substr(0, 2).toLowerCase();
+    } else if (halfSteps.includes(noteArg.substr(0, 3).toLowerCase())) {
+        solfegePart = noteArg.substr(0, 3).toLowerCase();
+    } else {
+        // The note should already be translated, but just in case...
+        // Reverse any i18n
+        // solfnotes_ is used in the interface for i18n
+        const i18nObj = splitI18nSolfege(noteArg);
+        if (SOLFNOTES.includes(i18nObj[0])) {
+            solfegePart = i18nObj[0];
+        } else {
+            solfegePart = noteArg.substr(0, 2).toLowerCase();
+        }
+    }
+
+    if (movable) {
+        let i;
+        switch (mode) {
+            case "dorian":
+                i = SOLFEGENAMES.indexOf(solfegePart);
+                if (i > 0) {
+                    transpositionFloor += octaveLength;
+                }
+
+                transpositionFloor -= octaveLength;
+                i += 6;
+                if (i > 6) {
+                    i -= 7;
+                }
+
+                solfegePart = SOLFEGENAMES[i];
+                break;
+            case "phrygian":
+                i = SOLFEGENAMES.indexOf(solfegePart);
+                if (i > 1) {
+                    transpositionFloor += octaveLength;
+                }
+
+                i += 5;
+                if (i > 6) {
+                    i -= 7;
+                }
+
+                solfegePart = SOLFEGENAMES[i];
+                break;
+            case "lydian":
+                i = SOLFEGENAMES.indexOf(solfegePart);
+                if (i > 2) {
+                    transpositionFloor += octaveLength;
+                }
+
+                i += 4;
+                if (i > 6) {
+                    i -= 7;
+                }
+
+                solfegePart = SOLFEGENAMES[i];
+                break;
+            case "mixolydian":
+                i = SOLFEGENAMES.indexOf(solfegePart);
+                if (i > 3) {
+                    transpositionFloor += octaveLength;
+                }
+
+                i += 3;
+                if (i > 6) {
+                    i -= 7;
+                }
+
+                solfegePart = SOLFEGENAMES[i];
+                break;
+            case "minor":
+            case "aeolian":
+                i = SOLFEGENAMES.indexOf(solfegePart);
+                if (i > 4) {
+                    transpositionFloor += octaveLength;
+                }
+
+                i += 2;
+                if (i > 6) {
+                    i -= 7;
+                }
+
+                solfegePart = SOLFEGENAMES[i];
+                break;
+            case "locrian":
+                i = SOLFEGENAMES.indexOf(solfegePart);
+                if (i > 5) {
+                    transpositionFloor += octaveLength;
+                }
+
+                i += 1;
+                if (i > 6) {
+                    i -= 7;
+                }
+
+                solfegePart = SOLFEGENAMES[i];
+                break;
+            case "major":
+            case "ionian":
+            default:
+                break;
+        }
+    }
+
+    let index;
+    if (halfSteps.includes(solfegePart)) {
+        index = halfSteps.indexOf(solfegePart) + offset;
+        if (index >= thisScale.length) {
+            index -= thisScale.length;
+            octave += 1;
+        } else if (index < 0) {
+            index += thisScale.length;
+            octave -= 1;
+        }
+
+        let note = thisScale[index];
+        // In non-12 EDO temperaments, enharmonic spellings are distinct
+        // pitches, so the resolved note must honor the input's accidental.
+        if (octaveLength !== 12 && sharpFlat) {
+            if (noteArg.substr(-1) === "#" || noteArg.substr(-1) === SHARP) {
+                note = NOTESSHARP[index];
+            } else {
+                note = NOTESFLAT[index];
+            }
+        }
+
+        if (octaveLength === 12 && note in EXTRATRANSPOSITIONS) {
+            octave += EXTRATRANSPOSITIONS[note][1];
+            note = EXTRATRANSPOSITIONS[note][0];
+        }
+
+        return [note, octave, transpositionFloor];
+    }
+
+    return null;
+};
+
+/**
  * Get the note based on various parameters.
  * @function
  * @param {string|number} noteArg - The note name or pitch number.
@@ -5059,7 +5284,6 @@ function getNote(
             ? TEMPERAMENT[temperament].pitchNumber
             : 12;
 
-    let sharpFlat = false;
     let rememberFlat = false;
     let rememberSharp = false;
     let transpositionFloor = 0;
@@ -5232,7 +5456,21 @@ function getNote(
             } else if (NOTESFLAT2.includes(noteArg)) {
                 note = NOTESFLAT[NOTESFLAT2.indexOf(noteArg)];
             } else {
-                if (errorMsg !== undefined) {
+                // Fall back to solfege resolution so microtonal EDOs accept
+                // solfege names (e.g. "do", "re♯") just like 12-EDO does.
+                const solfegeNote = getNoteFromSolfege(
+                    noteArg,
+                    keySignature,
+                    movable,
+                    octaveLength,
+                    octave,
+                    transpositionFloor
+                );
+                if (solfegeNote !== null && edoNames.includes(solfegeNote[0])) {
+                    note = solfegeNote[0];
+                    octave = solfegeNote[1];
+                    transpositionFloor = solfegeNote[2];
+                } else if (errorMsg !== undefined) {
                     console.debug(
                         "WARNING: EDO note [" +
                             noteArg +
@@ -5243,8 +5481,10 @@ function getNote(
                             ")"
                     );
                     errorMsg(INVALIDPITCH, null);
+                    return ["R", "", 0];
+                } else {
+                    return ["R", "", 0];
                 }
-                return ["R", "", 0];
             }
         } else if (noteArg in EXTRATRANSPOSITIONS) {
             octave += EXTRATRANSPOSITIONS[noteArg][1];
@@ -5257,190 +5497,17 @@ function getNote(
             // Convert to uppercase, e.g., d♭ -> D♭.
             note = NOTESFLAT[NOTESFLAT2.indexOf(noteArg)];
         } else {
-            if (["#", SHARP, FLAT, "b"].includes(noteArg.substr(-1))) {
-                sharpFlat = true;
-            }
-
-            if (!keySignature) {
-                keySignature = "C major";
-            }
-
-            let obj;
-
-            if (movable) {
-                obj = getScaleAndHalfSteps(keySignature);
-            } else {
-                obj = getScaleAndHalfSteps("C major");
-            }
-
-            let thisScale = obj[0];
-            const halfSteps = obj[1];
-            const myKeySignature = obj[2];
-            const mode = obj[3];
-            let offset;
-            if (movable) {
-                // Ensure it is a valid key signature.
-                offset = thisScale.indexOf(myKeySignature);
-                if (offset === -1) {
-                    console.debug(
-                        "WARNING: Key " +
-                            myKeySignature +
-                            " not found in " +
-                            thisScale +
-                            ". Using default of C"
-                    );
-                    offset = 0;
-                    thisScale = NOTESSHARP;
-                }
-
-                // We need to set the octave relative to the tonic.
-                // Starting from C_4 (note_octave)
-                // All keys C# -- F# would remain in octave four
-                // All keys Gb -- B would be in octave three (since
-                // going down is closer than going up)
-                if (offset > 5) {
-                    transpositionFloor -= octaveLength; // go down one octave
-                }
-            } else {
-                offset = 0;
-            }
-
-            if (sharpFlat) {
-                if (noteArg.substr(-1) === "#") {
-                    offset += 1;
-                } else if (noteArg.substr(-1) === SHARP) {
-                    offset += 1;
-                } else if (noteArg.substr(-1) === FLAT) {
-                    offset -= 1;
-                } else if (noteArg.substr(-1) === "b") {
-                    offset -= 1;
-                }
-            }
-
-            let solfegePart;
-            if (halfSteps.includes(noteArg.substr(0, 1).toLowerCase())) {
-                solfegePart = noteArg.substr(0, 1).toLowerCase();
-            } else if (halfSteps.includes(noteArg.substr(0, 2).toLowerCase())) {
-                solfegePart = noteArg.substr(0, 2).toLowerCase();
-            } else if (halfSteps.includes(noteArg.substr(0, 3).toLowerCase())) {
-                solfegePart = noteArg.substr(0, 3).toLowerCase();
-            } else {
-                // The note should already be translated, but just in case...
-                // Reverse any i18n
-                // solfnotes_ is used in the interface for i18n
-                const obj = splitI18nSolfege(noteArg);
-                if (SOLFNOTES.includes(obj[0])) {
-                    solfegePart = obj[0];
-                } else {
-                    solfegePart = noteArg.substr(0, 2).toLowerCase();
-                }
-            }
-
-            if (movable) {
-                let i;
-                switch (mode) {
-                    case "dorian":
-                        i = SOLFEGENAMES.indexOf(solfegePart);
-                        if (i > 0) {
-                            transpositionFloor += octaveLength;
-                        }
-
-                        transpositionFloor -= octaveLength;
-                        i += 6;
-                        if (i > 6) {
-                            i -= 7;
-                        }
-
-                        solfegePart = SOLFEGENAMES[i];
-                        break;
-                    case "phrygian":
-                        i = SOLFEGENAMES.indexOf(solfegePart);
-                        if (i > 1) {
-                            transpositionFloor += octaveLength;
-                        }
-
-                        i += 5;
-                        if (i > 6) {
-                            i -= 7;
-                        }
-
-                        solfegePart = SOLFEGENAMES[i];
-                        break;
-                    case "lydian":
-                        i = SOLFEGENAMES.indexOf(solfegePart);
-                        if (i > 2) {
-                            transpositionFloor += octaveLength;
-                        }
-
-                        i += 4;
-                        if (i > 6) {
-                            i -= 7;
-                        }
-
-                        solfegePart = SOLFEGENAMES[i];
-                        break;
-                    case "mixolydian":
-                        i = SOLFEGENAMES.indexOf(solfegePart);
-                        if (i > 3) {
-                            transpositionFloor += octaveLength;
-                        }
-
-                        i += 3;
-                        if (i > 6) {
-                            i -= 7;
-                        }
-
-                        solfegePart = SOLFEGENAMES[i];
-                        break;
-                    case "minor":
-                    case "aeolian":
-                        i = SOLFEGENAMES.indexOf(solfegePart);
-                        if (i > 4) {
-                            transpositionFloor += octaveLength;
-                        }
-
-                        i += 2;
-                        if (i > 6) {
-                            i -= 7;
-                        }
-
-                        solfegePart = SOLFEGENAMES[i];
-                        break;
-                    case "locrian":
-                        i = SOLFEGENAMES.indexOf(solfegePart);
-                        if (i > 5) {
-                            transpositionFloor += octaveLength;
-                        }
-
-                        i += 1;
-                        if (i > 6) {
-                            i -= 7;
-                        }
-
-                        solfegePart = SOLFEGENAMES[i];
-                        break;
-                    case "major":
-                    case "ionian":
-                    default:
-                        break;
-                }
-            }
-
-            let index;
-            if (halfSteps.includes(solfegePart)) {
-                index = halfSteps.indexOf(solfegePart) + offset;
-                if (index >= octaveLength) {
-                    index -= octaveLength;
-                    octave += 1;
-                } else if (index < 0) {
-                    index += octaveLength;
-                    octave -= 1;
-                }
-
-                note = thisScale[index];
-            } else {
+            const solfegeNote = getNoteFromSolfege(
+                noteArg,
+                keySignature,
+                movable,
+                octaveLength,
+                octave,
+                transpositionFloor
+            );
+            if (solfegeNote === null) {
                 console.debug(
-                    "WARNING: Note [" + noteArg + "] not found in " + halfSteps + ". Returning REST"
+                    "WARNING: Note [" + noteArg + "] not found in the scale. Returning REST"
                 );
                 if (errorMsg !== undefined) {
                     errorMsg(INVALIDPITCH, null);
@@ -5449,10 +5516,9 @@ function getNote(
                 return ["R", "", 0];
             }
 
-            if (octaveLength === 12 && note in EXTRATRANSPOSITIONS) {
-                octave += EXTRATRANSPOSITIONS[note][1];
-                note = EXTRATRANSPOSITIONS[note][0];
-            }
+            note = solfegeNote[0];
+            octave = solfegeNote[1];
+            transpositionFloor = solfegeNote[2];
         }
 
         if (transpositionFloor && transpositionFloor !== 0) {
@@ -6077,8 +6143,13 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
         temperament = "equal";
     }
     if (isCustomTemperament(temperament)) {
-        //Scalar = Semitone for custom Temperament.
-        return transposition;
+        const t = getTemperament(temperament);
+        if (!t || !t.ratios) {
+            // Scalar = Semitone for custom Temperament with no ratios.
+            return transposition;
+        }
+        // For custom temperaments with ratios, fall through to ratio-based
+        // step size calculation below.
     }
     const currentEDO = getCurrentEDO(temperament);
 
@@ -7209,7 +7280,7 @@ const getNumNote = (value, delta, temperament) => {
  * @param {string} currentNote - The current note.
  * @returns {number} The calculated octave.
  */
-const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote) => {
+const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote, temperament) => {
     // Calculate the octave based on the current Octave and the arg,
     // which can be a number, a 'number' as a string, 'current',
     // 'previous', or 'next'.
@@ -7217,6 +7288,8 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote) => {
     if (typeof arg === "number") {
         return Math.max(1, Math.min(Math.floor(arg), 9));
     }
+
+    const currentEDO = getCurrentEDO(temperament);
 
     // The relative octave for tritones are arbitrated as being in the
     // current octave, so we need to determine the number of half
@@ -7229,9 +7302,9 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote) => {
         note = currentNote;
     }
 
-    const stepCurrentNote = getNumber(note, currentOctave);
-    const stepUpCurrentNote = getNumber(note, currentOctave + 1);
-    const stepDownCurrentNote = getNumber(note, currentOctave - 1);
+    const stepCurrentNote = getNumber(note, currentOctave, temperament);
+    const stepUpCurrentNote = getNumber(note, currentOctave + 1, temperament);
+    const stepDownCurrentNote = getNumber(note, currentOctave - 1, temperament);
 
     if (lastNotePlayed !== null) {
         lastNotePlayed = lastNotePlayed[0];
@@ -7241,13 +7314,15 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote) => {
         lastNotePlayed = "G";
     }
 
-    const stepLastNotePlayed = getNumber(lastNotePlayed, currentOctave);
+    const stepLastNotePlayed = getNumber(lastNotePlayed, currentOctave, temperament);
 
     const halfSteps = Math.abs(stepLastNotePlayed - stepCurrentNote);
     const halfStepsUp = Math.abs(stepLastNotePlayed - stepUpCurrentNote);
     const halfStepsDown = Math.abs(stepLastNotePlayed - stepDownCurrentNote);
 
-    if (halfSteps <= 5 || isNaN(halfSteps)) {
+    const octaveThreshold = Math.round(currentEDO / 4);
+
+    if (halfSteps <= octaveThreshold || isNaN(halfSteps)) {
         changedCurrent = currentOctave;
     } else if (halfStepsDown <= halfStepsUp) {
         changedCurrent = Math.max(currentOctave - 1, 1);

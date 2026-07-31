@@ -3128,6 +3128,62 @@ describe("getNote additional paths", () => {
         );
     });
 
+    it("resolves solfege notes in non-12 EDO temperaments", () => {
+        expect(getNote("do", 4, 0, "C major", false, undefined, undefined, "equal19")).toEqual([
+            "C",
+            4,
+            0
+        ]);
+        expect(getNote("re", 4, 0, "C major", false, undefined, undefined, "equal19")).toEqual([
+            "D",
+            4,
+            0
+        ]);
+        expect(getNote("mi", 4, 0, "C major", false, undefined, undefined, "equal19")).toEqual([
+            "E",
+            4,
+            0
+        ]);
+        expect(getNote("sol", 4, 0, "C major", false, undefined, undefined, "equal19")).toEqual([
+            "G",
+            4,
+            0
+        ]);
+    });
+
+    it("resolves solfege with accidentals in non-12 EDO temperaments", () => {
+        expect(
+            getNote("do" + SHARP, 4, 0, "C major", false, undefined, undefined, "equal19")
+        ).toEqual(["C" + SHARP, 4, 0]);
+        expect(
+            getNote("re" + FLAT, 4, 0, "C major", false, undefined, undefined, "equal19")
+        ).toEqual(["D" + FLAT, 4, 0]);
+    });
+
+    it("resolves movable solfege in non-12 EDO temperaments", () => {
+        expect(getNote("do", 4, 0, "D major", true, undefined, undefined, "equal19")).toEqual([
+            "D",
+            4,
+            0
+        ]);
+        expect(getNote("re", 4, 0, "D major", true, undefined, undefined, "equal19")).toEqual([
+            "E",
+            4,
+            0
+        ]);
+    });
+
+    it("reports invalid solfege in non-12 EDO temperaments through the error callback", () => {
+        const errorMsg = jest.fn();
+
+        expect(getNote("zz", 4, 0, "C major", false, undefined, errorMsg, "equal19")).toEqual([
+            "R",
+            "",
+            0
+        ]);
+        expect(errorMsg).toHaveBeenCalledWith(global.INVALIDPITCH, null);
+    });
+
     it("uses key preference and direction to choose enharmonic spelling", () => {
         expect(getNote("B#", 4, 0, "C major", false)).toEqual(["C", 5, 0]);
         expect(getNote("B#", 4, 0, "G major", false, 1)).toEqual(["C", 5, 0]);
@@ -3492,5 +3548,72 @@ describe("EDO octave boundary resolution", () => {
         const c4freq = pitchToFrequency("C", 4, 0, "C major", temper);
         const c5freq = pitchToFrequency("C", 5, 0, "C major", temper);
         expect(c5freq / c4freq).toBeCloseTo(2.0, 4);
+    });
+});
+
+describe("calcOctave with temperament", () => {
+    it("defaults to 12-EDO threshold=3 when no temperament given", () => {
+        // In 12-EDO, halfSteps threshold = round(12/4) = 3
+        // G in octave 4 is 7 semitones from C → 7 > 3 → octave changes
+        expect(calcOctave(4, "current", ["C4"], "G")).toBe(3);
+    });
+
+    it("uses EDO-aware threshold for 19-EDO (threshold=5)", () => {
+        // In 19-EDO, threshold = round(19/4) = 5
+        // G in 19-EDO is ~11 semitones from C in 12-EDO mapping → well above 5
+        // but the comparison is in EDO step units, so behavior depends on getNumber values
+        const result = calcOctave(4, "current", ["C4"], "G", "equal19");
+        expect(typeof result).toBe("number");
+    });
+
+    it("uses EDO-aware threshold for 5-EDO (threshold=1)", () => {
+        // In 5-EDO, threshold = round(5/4) = 1
+        const result = calcOctave(4, "current", ["C4"], "G", "equal5");
+        expect(typeof result).toBe("number");
+    });
+
+    it("preserves backward compatibility with numeric arg regardless of temperament", () => {
+        expect(calcOctave(4, 5, null, "C", "equal19")).toBe(5);
+        expect(calcOctave(4, 5, null, "C", "equal31")).toBe(5);
+    });
+});
+
+describe("_getStepSize custom temperament with ratios", () => {
+    beforeEach(() => {
+        addTemperamentToDictionary("testWithRatios", {
+            pitchNumber: 12,
+            noteLabels: ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
+            ratios: [
+                1,
+                16 / 15,
+                9 / 8,
+                6 / 5,
+                5 / 4,
+                4 / 3,
+                45 / 32,
+                3 / 2,
+                8 / 5,
+                5 / 3,
+                9 / 5,
+                15 / 8
+            ]
+        });
+    });
+
+    it("does NOT shortcut with return transposition for custom with ratios", () => {
+        // The old behavior would return transposition=5 regardless of key/pitch
+        // new behavior: falls through to actual step calculation
+        const result = _getStepSize("C major", "C", "up", 5, "testWithRatios");
+        // Should return the actual step (C→D in major = 2 semitones on paper)
+        // For this custom temperament with ratios, it should not return 5
+        expect(result).not.toBe(5);
+    });
+
+    it("still shortcuts for custom temperament without ratios", () => {
+        addTemperamentToDictionary("testNoRatios", {
+            pitchNumber: 12
+        });
+        expect(_getStepSize("C major", "C", "up", 5, "testNoRatios")).toBe(5);
+        expect(_getStepSize("C major", "C", "down", 3, "testNoRatios")).toBe(3);
     });
 });

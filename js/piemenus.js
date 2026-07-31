@@ -20,8 +20,9 @@
    getMunsellColor, COLORS40, frequencyToPitch, instruments,
    DOUBLESHARP, NATURAL, DOUBLEFLAT, EQUIVALENTACCIDENTALS,
    FIXEDSOLFEGE, NOTENAMES, numberToPitch,
-   nthDegreeToPitch, SOLFEGENAMES, buildScale, _THIS_IS_TURTLE_BLOCKS_,
-   CHORDNAMES, Synth, Tone, activity
+    nthDegreeToPitch, SOLFEGENAMES, buildScale, getCurrentEDO, generateNoteNames,
+    _THIS_IS_TURTLE_BLOCKS_,
+    CHORDNAMES, Synth, Tone, activity
 */
 
 /*
@@ -3455,7 +3456,9 @@ const piemenuModes = (block, selectedMode) => {
     block._modeWheel.navAngle = -90;
     // block._modeWheel.selectedNavItemIndex = 2;
     block._modeWheel.animatetime = 0; // 300;
-    block._modeWheel.createWheel(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"]);
+    const currentEDO = getCurrentEDO(block.activity.logo.synth.inTemperament);
+    const modeWheelLabels = Array.from({ length: currentEDO }, (_, i) => String(i));
+    block._modeWheel.createWheel(modeWheelLabels);
 
     block._modeGroupWheel.colors = platformColor.modeGroupWheelcolors;
     block._modeGroupWheel.slicePathFunction = slicePath().DonutSlice;
@@ -3533,8 +3536,9 @@ const piemenuModes = (block, selectedMode) => {
 
     // Add function to each main menu for show/hide sub menus
     const __setupAction = (i, activeTabs) => {
+        const edoforHide = currentEDO;
         that._modeNameWheel.navItems[i].navigateFunction = () => {
-            for (let j = 0; j < 12; j++) {
+            for (let j = 0; j < edoforHide; j++) {
                 if (!activeTabs.includes(j)) {
                     that._modeWheel.navItems[j].navItem.hide();
                 } else {
@@ -3678,12 +3682,11 @@ const piemenuModes = (block, selectedMode) => {
     const __playNote = () => {
         let o = 0;
         if (octave) {
-            o = 12;
+            o = currentEDO;
         }
 
         const i = that._modeWheel.selectedNavItemIndex;
-        // The mode doesn't matter here, since we are using semi-tones
-        const obj = getNote(key, 4, i + o, key + " chromatic", false, null, null);
+        const obj = getNote(key, 4, i + o, key + " chromatic", false, null, null, null, true);
         obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
 
         const tur = that.activity.turtles.ithTurtle(0);
@@ -3701,12 +3704,12 @@ const piemenuModes = (block, selectedMode) => {
     const __playScale = (activeTabs, idx) => {
         // loop through selecting modeWheel slices with a delay.
         if (idx < activeTabs.length) {
-            if (activeTabs[idx] < 12) {
+            if (activeTabs[idx] < currentEDO) {
                 octave = false;
                 that._modeWheel.navigateWheel(activeTabs[idx]);
             } else {
                 octave = true;
-                that._modeWheel.navigateWheel(0);
+                that._modeWheel.navigateWheel(activeTabs[idx] - currentEDO);
             }
 
             timeout = setTimeout(() => {
@@ -3722,16 +3725,17 @@ const piemenuModes = (block, selectedMode) => {
      */
     const __prepScale = () => {
         const activeTabs = [0];
-        const mode = MUSICALMODES[that.value];
-        for (let k = 0; k < mode.length - 1; k++) {
-            activeTabs.push(last(activeTabs) + mode[k]);
+        const scaleInfo = buildScale(key + " " + that.value);
+        const modeIntervals = scaleInfo[1];
+        for (let k = 0; k < modeIntervals.length - 1; k++) {
+            activeTabs.push(last(activeTabs) + modeIntervals[k]);
         }
 
-        activeTabs.push(12);
-        activeTabs.push(12);
+        activeTabs.push(currentEDO);
+        activeTabs.push(currentEDO);
 
-        for (let k = mode.length - 1; k >= 0; k--) {
-            activeTabs.push(last(activeTabs) - mode[k]);
+        for (let k = modeIntervals.length - 1; k >= 0; k--) {
+            activeTabs.push(last(activeTabs) - modeIntervals[k]);
         }
 
         docById("wheelnav-_exitWheel-title-1").style.fill = platformColor.textColor || "#ffffff";
@@ -3787,7 +3791,7 @@ const piemenuModes = (block, selectedMode) => {
             )
         ) + "px";
 
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < currentEDO; i++) {
         that._modeWheel.navItems[i].navigateFunction = __playNote;
     }
 
