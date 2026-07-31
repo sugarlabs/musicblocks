@@ -139,7 +139,7 @@ const setupActivityRecorder = activityInstance => {
             flag = 1;
 
             try {
-                return await navigator.mediaDevices.getDisplayMedia({
+                const stream = await navigator.mediaDevices.getDisplayMedia({
                     preferCurrentTab: "True",
                     systemAudio: "include",
                     audio: "True",
@@ -152,6 +152,8 @@ const setupActivityRecorder = activityInstance => {
                     },
                     preferredVideoCodecs: "auto"
                 });
+                currentStream = stream;
+                return stream;
             } catch (error) {
                 ErrorHandler.capture(error, { operation: "screenCapture" });
                 flag = 0;
