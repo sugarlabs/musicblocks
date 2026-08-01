@@ -517,5 +517,58 @@ describe("PitchDrumMatrix Widget", () => {
                 3000
             );
         });
+        test("should recursively play next pair and handle falsy drumImg correctly", () => {
+            jest.useFakeTimers();
+
+            const mockActivity = {
+                logo: {
+                    synth: { stop: jest.fn(), trigger: jest.fn() },
+                    turtleDelay: 0
+                },
+                turtles: {
+                    ithTurtle: jest.fn(() => ({ singer: { keySignature: "" } }))
+                },
+                hideMsgs: jest.fn(),
+                textMsg: jest.fn(),
+                errorMsg: jest.fn()
+            };
+            pdm.init(mockActivity);
+
+            // mockCellBlack1 returns null for querySelector("img")
+            const mockCellBlack1 = {
+                style: { backgroundColor: "black" },
+                dataset: { noteArg: "C", octave: "4" },
+                querySelector: jest.fn(() => null)
+            };
+            const mockCellBlack2 = {
+                style: { backgroundColor: "black" },
+                dataset: { noteArg: "D", octave: "4" },
+                querySelector: jest.fn(() => ({ title: "snare" }))
+            };
+
+            const mockRow1 = { cells: [mockCellBlack1, mockCellBlack1] };
+            const mockRow2 = { cells: [mockCellBlack2, mockCellBlack2] };
+
+            const mockTable = { rows: [mockRow1, mockRow2, mockRow1] }; // 3 rows -> length-1 is 2
+
+            docById.mockImplementation(id => {
+                if (id === "pdmTable" || id === "pdmDrumTable") {
+                    return mockTable;
+                }
+                if (id === "pdmCellTable0") return { rows: [mockRow1] };
+                if (id === "pdmCellTable1") return { rows: [mockRow2] };
+                if (id === "pdmCellTable2") return { rows: [mockRow1] };
+                return { style: {} };
+            });
+
+            pdm._playing = true;
+            pdm.playButton.appendChild = jest.fn();
+
+            pdm._playAll();
+            jest.runAllTimers();
+
+            expect(mockActivity.logo.synth.trigger).toHaveBeenCalled();
+            jest.useRealTimers();
+        });
     });
 });

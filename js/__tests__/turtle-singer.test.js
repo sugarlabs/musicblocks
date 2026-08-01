@@ -1169,3 +1169,58 @@ describe("processPitch internal addPitch behavior", () => {
         expect(turtleMock.singer.notePitches[blk].length).toBe(2);
     });
 });
+
+describe("PitchDrumTable Multiple Drums Coverage", () => {
+    let turtleMock;
+    let activityMock;
+    let logoMock;
+    let singer;
+
+    beforeEach(() => {
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        activityMock = createActivityMock(turtleMock);
+        logoMock = createLogoMock(activityMock);
+        singer = turtleMock.singer;
+    });
+
+    test("processPitch() adds multiple drums correctly", () => {
+        singer.inNoteBlock = [0];
+        singer.notePitches = { 0: [] };
+        singer.noteOctaves = { 0: [] };
+        singer.noteCents = { 0: [] };
+        singer.noteHertz = { 0: [] };
+        singer.noteBeatValues = { 0: [] };
+        singer.drumStyle = ["snare"];
+        Singer.processPitch(activityMock, "C", 4, 0, turtleMock, "mockBlk");
+        expect(singer.pitchDrumTable["C4"]).toEqual(["snare"]);
+
+        singer.drumStyle = ["kick"];
+        Singer.processPitch(activityMock, "C", 4, 0, turtleMock, "mockBlk");
+        expect(singer.pitchDrumTable["C4"]).toEqual(["snare", "kick"]);
+
+        // Add same drum again shouldn't duplicate
+        Singer.processPitch(activityMock, "C", 4, 0, turtleMock, "mockBlk");
+        expect(singer.pitchDrumTable["C4"]).toEqual(["snare", "kick"]);
+    });
+
+    test("processNote() array trigger coverage", () => {
+        singer.inNoteBlock = ["mockBlk"];
+        singer.notePitches = { mockBlk: ["C"] };
+        singer.noteOctaves = { mockBlk: [4] };
+        singer.noteCents = { mockBlk: [0] };
+        singer.noteHertz = { mockBlk: [0] };
+        singer.noteBeatValues = { mockBlk: [1] };
+        singer.noteDrums = { mockBlk: [] };
+        singer.embeddedGraphics = { mockBlk: [] };
+        singer.oscList = { mockBlk: [] };
+
+        singer.pitchDrumTable["C4"] = ["snare", "kick"];
+        singer.instrumentNames = [];
+        activityMock.logo.synth.trigger = jest.fn();
+
+        Singer.processNote(activityMock, 1, false, "mockBlk", turtleMock, jest.fn());
+
+        expect(activityMock.logo.synth.trigger).toHaveBeenCalledTimes(2);
+    });
+});
