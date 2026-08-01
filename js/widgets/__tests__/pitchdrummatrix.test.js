@@ -24,6 +24,7 @@ const PitchDrumMatrix = require("../pitchdrummatrix.js");
 
 // --- Global Mocks ---
 global._ = msg => msg;
+global.normalizeNoteAccidentals = jest.fn(n => n);
 global.platformColor = {
     labelColor: "#90c100",
     selectorBackground: "#f0f0f0",
@@ -340,16 +341,24 @@ describe("PitchDrumMatrix Widget", () => {
             const mockActivity = {
                 logo: {
                     synth: {
-                        stop: jest.fn()
+                        stop: jest.fn(),
+                        trigger: jest.fn()
                     },
                     turtleDelay: 0
+                },
+                turtles: {
+                    ithTurtle: jest.fn(() => ({ singer: { keySignature: "" } }))
                 },
                 hideMsgs: jest.fn(),
                 textMsg: jest.fn()
             };
             pdm.init(mockActivity);
 
-            const mockCell = { style: { backgroundColor: "black" } };
+            const mockCell = {
+                style: { backgroundColor: "black" },
+                dataset: { noteArg: "C", octave: "4" },
+                querySelector: jest.fn(() => ({ title: "snare" }))
+            };
             const mockRow = { cells: [mockCell] };
             const mockTable = { rows: [mockRow, mockRow] };
 
@@ -385,16 +394,24 @@ describe("PitchDrumMatrix Widget", () => {
             const mockActivity = {
                 logo: {
                     synth: {
-                        stop: jest.fn()
+                        stop: jest.fn(),
+                        trigger: jest.fn()
                     },
                     turtleDelay: 0
+                },
+                turtles: {
+                    ithTurtle: jest.fn(() => ({ singer: { keySignature: "" } }))
                 },
                 hideMsgs: jest.fn(),
                 textMsg: jest.fn()
             };
             pdm.init(mockActivity);
 
-            const mockCell = { style: { backgroundColor: "black" } };
+            const mockCell = {
+                style: { backgroundColor: "black" },
+                dataset: { noteArg: "C", octave: "4" },
+                querySelector: jest.fn(() => ({ title: "snare" }))
+            };
             const mockRow = { cells: [mockCell] };
             const mockTable = { rows: [mockRow, mockRow] };
 
@@ -430,16 +447,24 @@ describe("PitchDrumMatrix Widget", () => {
             const mockActivity = {
                 logo: {
                     synth: {
-                        stop: jest.fn()
+                        stop: jest.fn(),
+                        trigger: jest.fn()
                     },
                     turtleDelay: 0
+                },
+                turtles: {
+                    ithTurtle: jest.fn(() => ({ singer: { keySignature: "" } }))
                 },
                 hideMsgs: jest.fn(),
                 textMsg: jest.fn()
             };
             pdm.init(mockActivity);
 
-            const mockCellBlack = { style: { backgroundColor: "black" } };
+            const mockCellBlack = {
+                style: { backgroundColor: "black" },
+                dataset: { noteArg: "C", octave: "4" },
+                querySelector: jest.fn(() => ({ title: "snare" }))
+            };
             const mockRow = { cells: [mockCellBlack, mockCellBlack] }; // Multiple black cells
             const mockTable = { rows: [mockRow, mockRow] };
 
@@ -462,8 +487,8 @@ describe("PitchDrumMatrix Widget", () => {
 
             jest.runAllTimers();
 
-            // The setPairCell function should be called 2 times total since we have 1 active row with 2 drums
-            expect(pdm._setPairCell).toHaveBeenCalledTimes(2);
+            // synth.trigger should be called 3 times: 1 for the pitch, and 2 for the drums
+            expect(mockActivity.logo.synth.trigger).toHaveBeenCalledTimes(3);
             expect(pdm._playing).toBe(false);
             jest.useRealTimers();
         });
