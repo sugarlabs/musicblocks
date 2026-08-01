@@ -48,6 +48,10 @@ global.getTemperament = mockGlobals.getTemperament;
 global.getCurrentEDO = mockGlobals.getCurrentEDO;
 global.getEdoNoteNamePosition = mockGlobals.getEdoNoteNamePosition;
 global.generateNoteNames = mockGlobals.generateNoteNames;
+global.parseNoteString = jest.fn().mockReturnValue(["C", 4]);
+global.normalizeNoteAccidentals = jest.fn(note => note);
+global.getCachedPitchToFrequency = jest.fn().mockReturnValue(440);
+global.MIN_HIGHLIGHT_DURATION_MS = 400;
 global.EDOBOUNDEXCEEDED = "Pitch index exceeds EDO range";
 global.last = jest.fn(array => array[array.length - 1]);
 global.deepClone = value => {
@@ -71,7 +75,10 @@ const createTurtleMock = () => ({
     notePitches: { 0: [] },
     noteOctaves: { 0: [] },
     noteCents: { 0: [] },
-    noteHertz: { 0: [] }
+    noteHertz: { 0: [] },
+    noteDrums: { 0: [] },
+    doWait: jest.fn(),
+    blink: jest.fn()
 });
 
 const createActivityMock = turtleMock => ({
@@ -82,6 +89,9 @@ const createActivityMock = turtleMock => ({
     blocks: {
         blockList: {
             mockBlk: {
+                oscList: {
+                    0: []
+                },
                 connections: [0, 0]
             }
         }
@@ -90,10 +100,16 @@ const createActivityMock = turtleMock => ({
         synth: {
             setMasterVolume: jest.fn(),
             setVolume: jest.fn(),
-            rampTo: jest.fn()
+            rampTo: jest.fn(),
+            trigger: jest.fn(),
+            start: jest.fn(),
+            getFrequency: jest.fn().mockReturnValue(440),
+            getCustomFrequency: jest.fn().mockReturnValue(440)
         },
         pitchDrumMatrix: { addRowBlock: jest.fn() },
         notation: { notationInsertTie: jest.fn(), notationRemoveTie: jest.fn() },
+        dispatchTurtleSignals: jest.fn(),
+        specialArgs: [],
         firstNoteTime: null,
         stopTurtle: false,
         inPitchDrumMatrix: false,
@@ -1068,6 +1084,61 @@ describe("processPitch internal addPitch behavior", () => {
         Singer.processPitch(activityMock, "C", 4, 0, turtleMock, blk);
         const mapping = turtleMock.singer.pitchDrumTable;
         expect(mapping["C4"]).toEqual(["snare"]);
+    });
+
+    test("should store multiple drums for a single pitch", () => {
+        const blk = "blk";
+        turtleMock.singer.drumStyle = ["snare"];
+        Singer.processPitch(activityMock, "C", 4, 0, turtleMock, blk);
+        turtleMock.singer.drumStyle = ["kick"];
+        Singer.processPitch(activityMock, "C", 4, 0, turtleMock, blk);
+        turtleMock.singer.drumStyle = ["kick"]; // Duplicate should not be added again
+        Singer.processPitch(activityMock, "C", 4, 0, turtleMock, blk);
+
+        const mapping = turtleMock.singer.pitchDrumTable;
+        expect(mapping["C4"]).toEqual(["snare", "kick"]);
+    });
+
+    test("should handle playNotes with multiple mapped drums", () => {
+        const blk = 0;
+
+        turtleMock.singer.drumStyle = [];
+        turtleMock.singer.pitchDrumTable["C4"] = ["snare", "kick"];
+        turtleMock.singer.instrumentNames = [];
+        turtleMock.singer.suppressOutput = false;
+        turtleMock.singer.defaultNoteValue = 4;
+        activityMock.logo.synth.inTemperament = 1;
+
+        turtleMock.singer.oscList[blk] = [];
+        turtleMock.singer.bpm = [60];
+        turtleMock.singer.noteDrums[blk] = [];
+        turtleMock.singer.tieFirstDrums = [];
+
+        Singer.processNote.mockRestore();
+
+        // Push a pitch so processNote will pop it and play it
+        Singer.processPitch(activityMock, "C", 4, 0, turtleMock, blk);
+
+        expect(activityMock.logo.synth.trigger).toHaveBeenCalledWith(
+            expect.any(Object),
+            "C4",
+            expect.any(Number),
+            "snare",
+            null,
+            null,
+            expect.any(Boolean),
+            expect.any(Number)
+        );
+        expect(activityMock.logo.synth.trigger).toHaveBeenCalledWith(
+            expect.any(Object),
+            "C4",
+            expect.any(Number),
+            "kick",
+            null,
+            null,
+            expect.any(Boolean),
+            expect.any(Number)
+        );
     });
 
     it("should maintain consistent state relationships when updating pitch (invariant)", () => {

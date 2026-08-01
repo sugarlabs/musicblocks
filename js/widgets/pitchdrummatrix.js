@@ -765,9 +765,35 @@ class PitchDrumMatrix {
         pitchCell.style.backgroundColor = platformColor.selectorBackground;
 
         if (cols.length > 0) {
+            const noteArg = pitchCell.dataset.noteArg;
+            const octave = parseInt(pitchCell.dataset.octave, 10);
+            const noteObj = getNote(
+                noteArg,
+                octave,
+                0,
+                this.activity.turtles.ithTurtle(0).singer.keySignature,
+                false,
+                null,
+                this.activity.errorMsg
+            );
+            const note = noteObj[0] + noteObj[1];
+            const waitTime = Singer.defaultBPMFactor * 1000 * 0.25;
+
+            this.activity.logo.synth.trigger(
+                0,
+                normalizeNoteAccidentals(note),
+                0.125,
+                "default",
+                null,
+                null
+            );
+
             for (let c of cols) {
-                const cell = row.cells[c];
-                this._setPairCell(pairs[i][0], c, cell, true);
+                const drumImg = drumTable.rows[0].cells[c].querySelector("img");
+                const drumName = getDrumSynthName(drumImg ? drumImg.title : "");
+                setTimeout(() => {
+                    this.activity.logo.synth.trigger(0, "C2", 0.125, drumName, null, null);
+                }, waitTime);
             }
         }
 
