@@ -1067,7 +1067,7 @@ describe("processPitch internal addPitch behavior", () => {
         turtleMock.singer.drumStyle = ["snare"];
         Singer.processPitch(activityMock, "C", 4, 0, turtleMock, blk);
         const mapping = turtleMock.singer.pitchDrumTable;
-        expect(mapping["C4"]).toBe("snare");
+        expect(mapping["C4"]).toEqual(["snare"]);
     });
 
     it("should maintain consistent state relationships when updating pitch (invariant)", () => {

@@ -680,22 +680,19 @@ class PitchDrumMatrix {
         for (let i = 0; i < pdmTable.rows.length - 1; i++) {
             table = docById("pdmCellTable" + i);
             row = table.rows[0];
-            let found = false;
+            let cols = [];
             for (let j = 0; j < row.cells.length; j++) {
                 cell = row.cells[j];
                 if (cell.style.backgroundColor === "black") {
-                    pairs.push([i, j]);
-                    found = true;
+                    cols.push(j);
                 }
             }
 
-            if (!found) {
-                pairs.push([i, -1]);
-            }
+            pairs.push([i, cols]);
         }
         let isEmpty = true;
         for (let i = 0; i < pairs.length; i++) {
-            if (pairs[i][1] !== -1) {
+            if (pairs[i][1].length > 0) {
                 isEmpty = false;
                 break;
             }
@@ -757,19 +754,21 @@ class PitchDrumMatrix {
         let pdmTable = docById("pdmTable");
         const drumTable = docById("pdmDrumTable");
         let row = drumTable.rows[0];
-        // const drumCell = row.cells[i];
         const pairRowIndex = pairs[i][0];
         const table = docById("pdmCellTable" + pairRowIndex);
         row = table.rows[0];
-        const cell = pairs[i][1] !== -1 ? row.cells[pairs[i][1]] : undefined;
+        const cols = pairs[i][1];
 
         pdmTable = docById("pdmTable");
         const pdmTableRow = pdmTable.rows[pairRowIndex];
         const pitchCell = pdmTableRow.cells[0];
         pitchCell.style.backgroundColor = platformColor.selectorBackground;
 
-        if (pairs[i][1] !== -1) {
-            this._setPairCell(pairs[i][0], pairs[i][1], cell, true);
+        if (cols.length > 0) {
+            for (let c of cols) {
+                const cell = row.cells[c];
+                this._setPairCell(pairs[i][0], c, cell, true);
+            }
         }
 
         if (i < pairs.length - 1) {

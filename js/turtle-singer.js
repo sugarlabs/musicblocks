@@ -1140,7 +1140,13 @@ class Singer {
 
                 if (tur.singer.drumStyle.length > 0) {
                     const drumname = last(tur.singer.drumStyle);
-                    tur.singer.pitchDrumTable[noteObj[0] + noteObj[1]] = drumname;
+                    const key = noteObj[0] + noteObj[1];
+                    if (!tur.singer.pitchDrumTable[key]) {
+                        tur.singer.pitchDrumTable[key] = [];
+                    }
+                    if (!tur.singer.pitchDrumTable[key].includes(drumname)) {
+                        tur.singer.pitchDrumTable[key].push(drumname);
+                    }
                 }
 
                 tur.singer.notePitches[last(tur.singer.inNoteBlock)].push(noteObj[0]);
@@ -1249,7 +1255,13 @@ class Singer {
                 activity.errorMsg,
                 activity.logo.synth.inTemperament
             );
-            tur.singer.pitchDrumTable[noteObj1[0] + noteObj1[1]] = drumname;
+            const key = noteObj1[0] + noteObj1[1];
+            if (!tur.singer.pitchDrumTable[key]) {
+                tur.singer.pitchDrumTable[key] = [];
+            }
+            if (!tur.singer.pitchDrumTable[key].includes(drumname)) {
+                tur.singer.pitchDrumTable[key].push(drumname);
+            }
         } else if (activity.logo.inPitchStaircase) {
             const frequency = getCachedPitchToFrequency(
                 note,
@@ -1354,7 +1366,13 @@ class Singer {
 
                 if (tur.singer.drumStyle.length > 0) {
                     const drumname = last(tur.singer.drumStyle);
-                    tur.singer.pitchDrumTable[noteObj[0] + noteObj[1]] = drumname;
+                    const key = noteObj[0] + noteObj[1];
+                    if (!tur.singer.pitchDrumTable[key]) {
+                        tur.singer.pitchDrumTable[key] = [];
+                    }
+                    if (!tur.singer.pitchDrumTable[key].includes(drumname)) {
+                        tur.singer.pitchDrumTable[key].push(drumname);
+                    }
                 }
 
                 tur.singer.notePitches[last(tur.singer.inNoteBlock)].push(noteObj[0]);
@@ -2414,16 +2432,32 @@ class Singer {
                                             !hasSetTimbreInSetDrum
                                         ) {
                                             if (!tur.singer.suppressOutput) {
-                                                activity.logo.synth.trigger(
-                                                    turtle,
-                                                    notes[d],
-                                                    beatValue,
-                                                    tur.singer.pitchDrumTable[notes[d]],
-                                                    null,
-                                                    null,
-                                                    false,
-                                                    future
-                                                );
+                                                const drums = tur.singer.pitchDrumTable[notes[d]];
+                                                if (Array.isArray(drums)) {
+                                                    for (let i = 0; i < drums.length; i++) {
+                                                        activity.logo.synth.trigger(
+                                                            turtle,
+                                                            notes[d],
+                                                            beatValue,
+                                                            drums[i],
+                                                            null,
+                                                            null,
+                                                            false,
+                                                            future
+                                                        );
+                                                    }
+                                                } else {
+                                                    activity.logo.synth.trigger(
+                                                        turtle,
+                                                        notes[d],
+                                                        beatValue,
+                                                        drums,
+                                                        null,
+                                                        null,
+                                                        false,
+                                                        future
+                                                    );
+                                                }
                                             }
                                         } else if (last(tur.singer.instrumentNames)) {
                                             if (!tur.singer.suppressOutput) {
