@@ -236,9 +236,27 @@ class PlanetInterface {
                 240,
                 320 / this.activity.canvas.width
             );
+            const handleSaveError = e => {
+                if (
+                    e?.name === "QuotaExceededError" ||
+                    e?.code === DOMException.QUOTA_EXCEEDED_ERR ||
+                    e?.message === "Not enough space to save locally"
+                ) {
+                    this.activity.textMsg(
+                        _(
+                            "Error: Unable to save because you ran out of local storage. Try deleting some saved projects."
+                        )
+                    );
+                } else {
+                    console.error(e);
+                    this.activity.textMsg(_("Could not save your project."));
+                }
+            };
             try {
                 if (svgData === null || svgData === undefined || svgData === "") {
-                    return Promise.resolve(this.planet.ProjectStorage.saveLocally(data, null));
+                    return Promise.resolve(
+                        this.planet.ProjectStorage.saveLocally(data, null)
+                    ).catch(handleSaveError);
                 } else {
                     const fallbackImage =
                         typeof this.planet.ProjectStorage.getCurrentProjectImage === "function"
@@ -246,7 +264,7 @@ class PlanetInterface {
                             : null;
                     const savePromise = Promise.resolve(
                         this.planet.ProjectStorage.saveLocally(data, fallbackImage)
-                    );
+                    ).catch(handleSaveError);
                     const img = new Image();
                     const t = this;
                     img.onload = () => {
@@ -259,9 +277,7 @@ class PlanetInterface {
                                     data,
                                     bitmap.bitmapCache.getCacheDataURL()
                                 )
-                            ).catch(error => {
-                                console.error(error);
-                            });
+                            ).catch(handleSaveError);
                         } catch (error) {
                             console.error(error);
                         }
