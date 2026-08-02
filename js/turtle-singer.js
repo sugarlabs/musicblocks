@@ -688,7 +688,6 @@ class Singer {
             cblk,
             true,
             actionArgs,
-            [],
             activity.turtles.getTurtle(turtle).queue.length
         );
         const returnValue = tur.singer.tallyNotes - saveState.tallyNotes;

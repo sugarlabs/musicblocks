@@ -817,6 +817,19 @@ describe("numberOfNotes — state restoration and tally logic", () => {
         expect(turtleMock.singer.tallyNotes).toBe(2);
         expect(turtleMock.painter.doPenUp).toHaveBeenCalled();
     });
+
+    test("passes the queue depth as queueStart (6th argument) to runFromBlockNow", () => {
+        // Regression: a stray [] used to occupy the queueStart slot, pushing the
+        // computed queue depth into a nonexistent 7th parameter. queueStart then
+        // coerced to 0 and the counting run unwound the entire turtle queue.
+        activityMock.turtles.getTurtle = jest.fn().mockReturnValue({ queue: [10, 11, 12] });
+
+        Singer.numberOfNotes(logoMock, 0, 123);
+
+        const callArgs = activityMock.logo.runFromBlockNow.mock.calls[0];
+        expect(callArgs).toHaveLength(6);
+        expect(callArgs[5]).toBe(3);
+    });
 });
 
 describe("processPitch — note block execution path", () => {
