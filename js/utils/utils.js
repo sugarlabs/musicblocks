@@ -1396,7 +1396,6 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
 
         // Loop for all variables of class type's instance
         for (const name of Object.keys(obj.added)) {
-            if (isUnsafeObjectKey(name)) continue;
             obj[name] = obj.added[name];
 
             // Remove variable entry from obj (removing each entry right after
