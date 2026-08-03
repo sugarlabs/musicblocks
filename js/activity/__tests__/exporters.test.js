@@ -15,8 +15,6 @@
 // Global mocks required by exporters.js
 // ---------------------------------------------------------------------------
 
-global.INLINECOLLAPSIBLES = ["newnote", "interval", "osctime", "definemode"];
-
 // Minimal SVG-like strings for collapse/expand buttons (split on "><")
 global.EXPANDBUTTON =
     '<svg><g><rect width="10" height="10"></rect><path d="M0 0"></path></g></svg>';
@@ -80,6 +78,7 @@ function makeBlock(overrides = {}) {
         value: overrides.value !== undefined ? overrides.value : "",
         ignore: overrides.ignore || jest.fn(() => false),
         isCollapsible: overrides.isCollapsible || jest.fn(() => false),
+        isInlineCollapsible: overrides.isInlineCollapsible || jest.fn(() => false),
         hasValueDrivenLabel: overrides.hasValueDrivenLabel || jest.fn(() => false)
     };
 }
@@ -476,7 +475,8 @@ describe("printBlockSVG", () => {
             y: 100,
             width: 50,
             height: 30,
-            isCollapsible: jest.fn(() => true)
+            isCollapsible: jest.fn(() => true),
+            isInlineCollapsible: jest.fn(() => true)
         });
 
         const activity1 = makeActivity([inlineBlock], {

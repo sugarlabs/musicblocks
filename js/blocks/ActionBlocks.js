@@ -1214,6 +1214,7 @@ function setupActionBlocks(activity) {
          */
         constructor() {
             super("start");
+            this.setCapability("collapsible");
 
             /**
              * Sets the palette for the block.
@@ -1306,6 +1307,7 @@ function setupActionBlocks(activity) {
          */
         constructor() {
             super("action");
+            this.setCapability("collapsible");
 
             /**
              * Sets the palette for the block.
@@ -1498,6 +1500,7 @@ function setupActionBlocks(activity) {
          */
         constructor() {
             super("temperament1");
+            this.setCapability("collapsible");
 
             /**
              * Sets the palette for the block.

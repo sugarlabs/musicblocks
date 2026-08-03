@@ -554,6 +554,7 @@ function setupExtrasBlocks(activity) {
          */
         constructor() {
             super("drum");
+            this.setCapability("collapsible");
             this.setPalette("extras", activity);
             this.setHelpString();
 

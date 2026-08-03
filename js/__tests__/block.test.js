@@ -82,8 +82,7 @@ global.document = {
 // Mock Constants
 global.STANDARDBLOCKHEIGHT = 20;
 global.DEFAULTBLOCKSCALE = 1.0;
-global.COLLAPSIBLES = ["repeat", "forever", "if"];
-global.INLINECOLLAPSIBLES = ["newnote", "interval", "osctime"];
+
 global.platformColor = {
     paletteLabelBackground: "#ffffff",
     paletteLabelSelected: "#0000ff",
@@ -160,21 +159,21 @@ describe("Block Foundation", () => {
         });
 
         it("isCollapsible() should return true for collapsible blocks", () => {
-            mockProtoBlock.name = "start";
+            mockProtoBlock.capabilities.collapsible = true;
             const block = new Block(mockProtoBlock, mockBlocks);
             expect(block.isCollapsible()).toBe(true);
 
-            mockProtoBlock.name = "forward";
+            mockProtoBlock.capabilities.collapsible = false;
             const block2 = new Block(mockProtoBlock, mockBlocks);
             expect(block2.isCollapsible()).toBe(false);
         });
 
         it("isInlineCollapsible() should return true for inline collapsible blocks", () => {
-            mockProtoBlock.name = "newnote";
+            mockProtoBlock.capabilities.inlineCollapsible = true;
             const block = new Block(mockProtoBlock, mockBlocks);
             expect(block.isInlineCollapsible()).toBe(true);
 
-            mockProtoBlock.name = "forward";
+            mockProtoBlock.capabilities.inlineCollapsible = false;
             const block2 = new Block(mockProtoBlock, mockBlocks);
             expect(block2.isInlineCollapsible()).toBe(false);
         });

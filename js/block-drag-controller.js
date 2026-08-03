@@ -24,12 +24,9 @@
    - js/block.js: STRINGLEN, TEXTWIDTH
    - js/block-constants.js: MINIMUMDOCKDISTANCE, LONGSTACK
 
-   Block classification (COLLAPSIBLES, INLINECOLLAPSIBLES, and similar
-   capability/identity lists) is intentionally NOT read here. That data
-   is owned by blocks.js; this controller reaches it only through the
-   Blocks-owned getCollapsiblesSet()/getInlineCollapsiblesSet() methods
-   (see the dock-snapping candidate scan below), so there is exactly one
-   place that constructs Sets from those lists.
+   Block collapsibility is determined via the capability-metadata system:
+   call block.isCollapsible() / block.isInlineCollapsible() on the Block
+   instance directly. No global classification lists are consulted here.
 */
 /* global DEFAULTBLOCKSCALE, STRINGLEN, TEXTWIDTH, delayExecution, getTextWidth, _,
    MINIMUMDOCKDISTANCE, LONGSTACK */
@@ -404,9 +401,17 @@ class BlockDragController {
                 continue;
             }
 
-            if (blocks.getCollapsiblesSet().has(blocks.blockList[b].name)) {
-                if (!blocks.getInlineCollapsiblesSet().has(blocks.blockList[b].name)) {
-                    if (blocks.blockList[b].collapsed) {
+            const targetBlock = blocks.blockList[b];
+            if (
+                targetBlock &&
+                typeof targetBlock.isCollapsible === "function" &&
+                targetBlock.isCollapsible()
+            ) {
+                if (
+                    typeof targetBlock.isInlineCollapsible === "function" &&
+                    !targetBlock.isInlineCollapsible()
+                ) {
+                    if (targetBlock.collapsed) {
                         continue;
                     }
                 }

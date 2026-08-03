@@ -32,8 +32,6 @@ global._ = s => s;
 global.NOINPUTERRORMSG = "NO_INPUT";
 global.DEFAULTDRUM = "kick";
 global.DEFAULTBLOCKSCALE = 1.0;
-global.COLLAPSIBLES = ["repeat", "forever", "if"];
-global.INLINECOLLAPSIBLES = ["newnote", "interval", "osctime"];
 global.last = arr => (arr && arr.length > 0 ? arr[arr.length - 1] : null);
 global.NOINPUTERRORMSG = "NO_INPUT";
 global.DEFAULTDRUM = "kick";

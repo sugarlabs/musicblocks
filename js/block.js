@@ -91,33 +91,6 @@ const STRINGLEN = 9;
  * @type {number}
  */
 const LONGPRESSTIME = 1500;
-const INLINECOLLAPSIBLES = ["newnote", "interval", "osctime", "definemode"];
-
-/**
- * List of block types that are collapsible inline.
- * @type {string[]}
- */
-const COLLAPSIBLES = [
-    "drum",
-    "start",
-    "action",
-    "temperament1",
-    "matrix",
-    "pitchdrummatrix",
-    "rhythmruler2",
-    "timbre",
-    "status",
-    "pitchstaircase",
-    "tempo",
-    "pitchslider",
-    "modewidget",
-    "newnote",
-    "musickeyboard",
-    "temperament",
-    "interval",
-    "osctime",
-    "definemode"
-];
 
 /**
  * List of block types whose names should be widened.
@@ -585,7 +558,7 @@ class Block {
      * @returns {boolean} - Returns true if the block is collapsible, otherwise false.
      */
     isCollapsible() {
-        return COLLAPSIBLES.includes(this.name);
+        return this.hasCapability("collapsible");
     }
 
     /**
@@ -593,7 +566,7 @@ class Block {
      * @returns {boolean} - Returns true if the block is inline collapsible, otherwise false.
      */
     isInlineCollapsible() {
-        return INLINECOLLAPSIBLES.includes(this.name);
+        return this.hasCapability("inlineCollapsible");
     }
 
     /**
@@ -1956,8 +1929,8 @@ class Block {
             return false;
         }
 
-        if (COLLAPSIBLES.includes(this.name)) {
-            if (!INLINECOLLAPSIBLES.includes(this.name)) {
+        if (this.isCollapsible()) {
+            if (!this.isInlineCollapsible()) {
                 return false;
             }
         }

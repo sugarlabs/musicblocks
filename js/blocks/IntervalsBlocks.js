@@ -1103,6 +1103,8 @@ function setupIntervalsBlocks(activity) {
          */
         constructor() {
             super("interval");
+            this.setCapability("collapsible");
+            this.setCapability("inlineCollapsible");
             this.setPalette("intervals", activity);
             this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
             this.beginnerBlock(true);
@@ -1156,6 +1158,8 @@ function setupIntervalsBlocks(activity) {
          */
         constructor() {
             super("definemode");
+            this.setCapability("collapsible");
+            this.setCapability("inlineCollapsible");
             this.setPalette("intervals", activity);
             this.setHelpString([
                 _(
