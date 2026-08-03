@@ -4,14 +4,18 @@
     top: 64px; /* below top toolbar */
     right: 0;
     width: 360px;
-    height: calc(100% - 64px);
+    max-width: calc(100vw - 16px);
+    height: min(760px, calc(100% - 80px));
     background: var(--panel-bg, #fdfefe);
     z-index: 9000;
     display: flex;
     flex-direction: column;
-    border-left: 2px solid var(--border, #e0e0e0);
+    border: 2px solid var(--border, #e0e0e0);
+    border-radius: 8px;
     box-shadow: -4px 0 12px rgba(0, 0, 0, 0.08);
     font-family: "Arial Rounded MT Bold", "Segoe UI", sans-serif;
+    overflow: hidden;
+    resize: both;
 }
 
 /* === HEADER === */
@@ -24,6 +28,18 @@
     color: white;
     font-size: 18px;
     font-weight: 600;
+    user-select: none;
+}
+
+.practice-draggable-header {
+    cursor: move;
+    touch-action: none;
+}
+
+#practice-panel.dragging,
+#explorer-journal-panel.dragging {
+    opacity: 0.96;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
 }
 
 #close-practice,
