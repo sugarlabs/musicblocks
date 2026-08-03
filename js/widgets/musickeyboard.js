@@ -300,12 +300,12 @@ function MusicKeyboard(activity) {
     };
 
     /**
-     * Sets the play button's icon/label to reflect whether playback is
+     * Rebuilds the play button's icon/label to reflect whether playback is
      * currently active.
      * @param {HTMLElement} playButtonCell - The play button element.
      * @param {boolean} isPlaying - Whether playback is currently active.
      */
-    this._setPlayButtonIcon = (playButtonCell, isPlaying) => {
+    this._updatePlayButtonIcon = (playButtonCell, isPlaying) => {
         playButtonCell.replaceChildren(
             document.createTextNode("\u00a0\u00a0"),
             (() => {
@@ -1016,7 +1016,7 @@ function MusicKeyboard(activity) {
         const playButtonCell = this.playButton;
 
         if (this.playingNow) {
-            this._setPlayButtonIcon(playButtonCell, true);
+            this._updatePlayButtonIcon(playButtonCell, true);
 
             if (selectedNotes.length < 1) {
                 return;
@@ -1063,7 +1063,7 @@ function MusicKeyboard(activity) {
             }
 
             this._stopOrCloseClicked = true;
-            this._setPlayButtonIcon(playButtonCell, false);
+            this._updatePlayButtonIcon(playButtonCell, false);
         }
     };
 
@@ -1138,7 +1138,7 @@ function MusicKeyboard(activity) {
 
                 this.playOne(counter + 1, maxDuration, playButtonCell);
             } else {
-                this._setPlayButtonIcon(playButtonCell, false);
+                this._updatePlayButtonIcon(playButtonCell, false);
                 this.playingNow = false;
                 if (!this.keyboardShown) {
                     this._createTable();
