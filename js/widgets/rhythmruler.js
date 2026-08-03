@@ -2203,6 +2203,7 @@ class RhythmRuler {
 
         if (this._playing) {
             // Play the current note.
+            this.activity.logo.synth.loadSynth(0, drum);
             if (noteValue > 0) {
                 if (foundVoice) {
                     this.activity.logo.synth.trigger(
