@@ -4,6 +4,7 @@
 const PracticeUI = {
     badgeCheckTimer: null,
     noticeTimer: null,
+    currentLevel: null,
 
     getActivity() {
         if (window.ActivityContext && typeof window.ActivityContext.getActivity === "function") {
@@ -15,6 +16,71 @@ const PracticeUI = {
         }
 
         return null;
+    },
+
+    makePanelDraggable(panel, handle) {
+        let startX = 0;
+        let startY = 0;
+        let startLeft = 0;
+        let startTop = 0;
+        let dragging = false;
+
+        handle.classList.add("practice-draggable-header");
+        handle.onpointerdown = event => {
+            if (event.target.closest("button")) return;
+
+            const rect = panel.getBoundingClientRect();
+            dragging = true;
+            startX = event.clientX;
+            startY = event.clientY;
+            startLeft = rect.left;
+            startTop = rect.top;
+
+            panel.classList.add("dragging");
+            this.bringPanelToFront(panel);
+            handle.setPointerCapture(event.pointerId);
+        };
+
+        handle.onpointermove = event => {
+            if (!dragging) return;
+
+            const nextLeft = startLeft + event.clientX - startX;
+            const nextTop = startTop + event.clientY - startY;
+            const maxLeft = Math.max(0, window.innerWidth - panel.offsetWidth);
+            const maxTop = Math.max(0, window.innerHeight - panel.offsetHeight);
+
+            panel.style.left = `${Math.min(Math.max(0, nextLeft), maxLeft)}px`;
+            panel.style.top = `${Math.min(Math.max(0, nextTop), maxTop)}px`;
+            panel.style.right = "auto";
+        };
+
+        handle.onpointerup = event => {
+            dragging = false;
+            panel.classList.remove("dragging");
+            handle.releasePointerCapture(event.pointerId);
+        };
+
+        handle.onpointercancel = event => {
+            dragging = false;
+            panel.classList.remove("dragging");
+            handle.releasePointerCapture(event.pointerId);
+        };
+
+        panel.onpointerdown = () => this.bringPanelToFront(panel);
+    },
+
+    bringPanelToFront(panel) {
+        const nextZ = Number(document.body.dataset.practicePanelZ || 9000) + 1;
+        document.body.dataset.practicePanelZ = String(nextZ);
+        panel.style.zIndex = nextZ;
+    },
+
+    restorePanel(panel, fallbackRight) {
+        panel.style.display = "flex";
+        if (!panel.style.left && fallbackRight !== undefined) {
+            panel.style.right = fallbackRight;
+        }
+        this.bringPanelToFront(panel);
     },
 
     loadProjectData(activity, projectData) {
@@ -30,9 +96,15 @@ const PracticeUI = {
     },
 
     open() {
-        if (document.getElementById("practice-panel")) return;
-
-        ExplorerJournalUI.close();
+        const existingPanel = document.getElementById("practice-panel");
+        if (existingPanel) {
+            this.restorePanel(existingPanel, "0");
+            if (this.currentLevel) {
+                const problem = PracticeProblems.find(p => p.level === this.currentLevel);
+                this.startBadgeMonitor(problem);
+            }
+            return;
+        }
 
         const panel = document.createElement("div");
         panel.id = "practice-panel";
@@ -47,11 +119,13 @@ const PracticeUI = {
     `;
 
         document.body.appendChild(panel);
+        this.makePanelDraggable(panel, panel.querySelector(".practice-menu-header"));
+        this.restorePanel(panel, "0");
 
         document.getElementById("close-practice").onclick = () => {
             this.stopBadgeMonitor();
             this.dismissQuestNotice();
-            panel.remove();
+            panel.style.display = "none";
         };
 
         this.renderLevelMenu();
@@ -83,6 +157,7 @@ const PracticeUI = {
     },
 
     renderLevelMenu() {
+        this.currentLevel = null;
         this.stopBadgeMonitor();
         this.dismissQuestNotice();
 
@@ -118,6 +193,7 @@ const PracticeUI = {
     },
 
     renderLevel(level) {
+        this.currentLevel = level;
         const problem = PracticeProblems.find(p => p.level === level);
         const container = document.getElementById("practice-content");
 
@@ -426,13 +502,13 @@ const PracticeUI = {
 
 const ExplorerJournalUI = {
     open() {
-        if (document.getElementById("explorer-journal-panel")) return;
+        const existingPanel = document.getElementById("explorer-journal-panel");
+        if (existingPanel) {
+            PracticeUI.restorePanel(existingPanel, "376px");
+            return;
+        }
 
-        PracticeUI.stopBadgeMonitor();
         PracticeUI.dismissQuestNotice();
-
-        const practicePanel = document.getElementById("practice-panel");
-        if (practicePanel) practicePanel.remove();
 
         const panel = document.createElement("div");
         panel.id = "explorer-journal-panel";
@@ -445,13 +521,15 @@ const ExplorerJournalUI = {
     `;
 
         document.body.appendChild(panel);
+        PracticeUI.makePanelDraggable(panel, panel.querySelector(".practice-menu-header"));
+        PracticeUI.restorePanel(panel, document.getElementById("practice-panel") ? "376px" : "0");
         document.getElementById("close-explorer-journal").onclick = () => this.close();
         this.renderIndex();
     },
 
     close() {
         const panel = document.getElementById("explorer-journal-panel");
-        if (panel) panel.remove();
+        if (panel) panel.style.display = "none";
         this.closeCompletionPrompt();
     },
 
