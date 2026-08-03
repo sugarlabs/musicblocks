@@ -1,4 +1,4 @@
-/* global ActivityContext, HelpWidget, PracticeManager, PracticeProblems, PracticeTheme, PracticeValidator */
+/* global ActivityContext, HelpWidget, PracticeManager, PracticeProblems, PracticeTheme, PracticeValidator, loadPracticeLessons */
 /* exported PracticeUI, ExplorerJournalUI */
 
 const PracticeUI = {
@@ -95,7 +95,25 @@ const PracticeUI = {
         activity.refreshCanvas();
     },
 
-    open() {
+    async ensureLessonData() {
+        if (typeof loadPracticeLessons !== "function") return true;
+
+        try {
+            await loadPracticeLessons();
+            return true;
+        } catch (e) {
+            this.showQuestNotice(
+                "Practice Lessons Not Ready",
+                "The lesson file could not be loaded. Please check js/practiceLessons/practiceLessons.json.",
+                "hint"
+            );
+            return false;
+        }
+    },
+
+    async open() {
+        if (!(await this.ensureLessonData())) return;
+
         const existingPanel = document.getElementById("practice-panel");
         if (existingPanel) {
             this.restorePanel(existingPanel, "0");
@@ -501,7 +519,9 @@ const PracticeUI = {
 };
 
 const ExplorerJournalUI = {
-    open() {
+    async open() {
+        if (!(await PracticeUI.ensureLessonData())) return;
+
         const existingPanel = document.getElementById("explorer-journal-panel");
         if (existingPanel) {
             PracticeUI.restorePanel(existingPanel, "376px");
