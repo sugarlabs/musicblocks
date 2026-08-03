@@ -18,7 +18,7 @@
  */
 
 /* exported
-   deepClone, fileBasename, fileExt, hex2rgb, hexToRGB, isSafeUrl, last,
+   deepClone, fileBasename, fileExt, hex2rgb, hexToRGB, isSafeUrl, isUnsafeObjectKey, last,
    mixedNumber, nearestBeat, oneHundredToFraction, rationalSum, rgbToHex,
    safeSVG, safeJSONParse, toFixed2, toTitleCase, unescapeHTML, escapeHTML,
    rationalToFraction, GCD, LCD, resolveObject
@@ -187,6 +187,19 @@ var safeSVG = text => {
     if (typeof text !== "string") return text;
     return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 };
+
+/**
+ * Reserved property names that must never be used as keys when copying
+ * externally-supplied data onto a plain object. Assigning to these keys
+ * via bracket notation can reach Object.prototype (prototype pollution)
+ * or overwrite the target's own constructor reference.
+ */
+var RESERVED_OBJECT_KEYS = ["__proto__", "constructor", "prototype"];
+
+/**
+ * Checks whether a key is unsafe to assign onto a plain object.
+ */
+var isUnsafeObjectKey = key => RESERVED_OBJECT_KEYS.includes(key);
 
 /**
  * Formats a number to at most two decimal places.
@@ -604,6 +617,7 @@ var UtilsLogic = {
     unescapeHTML,
     isSafeUrl,
     safeSVG,
+    isUnsafeObjectKey,
     toFixed2,
     rationalToFraction,
     GCD,
