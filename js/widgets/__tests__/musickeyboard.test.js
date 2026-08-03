@@ -939,4 +939,59 @@ describe("MusicKeyboard core logic", () => {
             expect(refreshCanvas).toHaveBeenCalled();
         });
     });
+
+    describe("_roundNoteDuration", () => {
+        test("rounds to the nearest sixteenth in normal mode", () => {
+            const keyboard = new MusicKeyboard({});
+
+            expect(keyboard._roundNoteDuration(0.3)).toBeCloseTo(0.3125);
+        });
+
+        test("rounds to the nearest eighth in beginner mode", () => {
+            const savedBeginnerMode = global.localStorage.beginnerMode;
+            global.localStorage.beginnerMode = "true";
+            const keyboard = new MusicKeyboard({});
+            global.localStorage.beginnerMode = savedBeginnerMode;
+
+            expect(keyboard._roundNoteDuration(0.2)).toBeCloseTo(0.25);
+        });
+
+        test("clamps a rounded-to-zero duration to the minimum positive value", () => {
+            const keyboard = new MusicKeyboard({});
+
+            expect(keyboard._roundNoteDuration(0.01)).toBe(0.125);
+        });
+
+        test("returns a positive duration for a negative input", () => {
+            const keyboard = new MusicKeyboard({});
+
+            expect(keyboard._roundNoteDuration(-0.3)).toBeCloseTo(0.3125);
+        });
+    });
+
+    describe("_updatePlayButtonIcon", () => {
+        test("shows a stop icon while playing", () => {
+            const keyboard = new MusicKeyboard({});
+            const cell = document.createElement("td");
+
+            keyboard._updatePlayButtonIcon(cell, true);
+
+            const img = cell.querySelector("img");
+            expect(img.src).toContain("header-icons/stop-button.svg");
+            expect(img.title).toBe("Stop");
+            expect(img.alt).toBe("Stop");
+        });
+
+        test("shows a play icon when stopped", () => {
+            const keyboard = new MusicKeyboard({});
+            const cell = document.createElement("td");
+
+            keyboard._updatePlayButtonIcon(cell, false);
+
+            const img = cell.querySelector("img");
+            expect(img.src).toContain("header-icons/play-button.svg");
+            expect(img.title).toBe("Play");
+            expect(img.alt).toBe("Play");
+        });
+    });
 });
