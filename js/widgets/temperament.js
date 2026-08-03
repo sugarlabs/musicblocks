@@ -53,10 +53,12 @@ function TemperamentWidget() {
     const ICONSIZE = 32;
 
     /**
-     * Reference to the temperament table div.
+     * Reference to the temperament table div. Created in init() since it
+     * is not needed (and should not be attached to the DOM) until the
+     * widget is actually opened.
      * @type {HTMLElement}
      */
-    const temperamentTableDiv = document.createElement("div");
+    let temperamentTableDiv;
 
     /**
      * Reference to the temperament cell.
@@ -2591,6 +2593,8 @@ function TemperamentWidget() {
 
         const w = window.innerWidth;
         this._cellScale = w / 1200;
+
+        temperamentTableDiv = document.createElement("div");
 
         const widgetWindow = window.widgetWindows.windowFor(this, "temperament");
         this.widgetWindow = widgetWindow;

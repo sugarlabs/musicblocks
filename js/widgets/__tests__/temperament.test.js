@@ -268,6 +268,42 @@ describe("TemperamentWidget basic tests", () => {
     });
 
     test("edit sets editMode to null and prepares UI", () => {
+        // edit() reads temperamentTableDiv, which only exists once init(activity)
+        // has run, so the widget must be initialized first (matching production
+        // usage, where edit() is only reachable via a button created in init()).
+        global.window.widgetWindows = {
+            windowFor: jest.fn(() => ({
+                clear: jest.fn(),
+                show: jest.fn(),
+                getWidgetBody: jest.fn(() => ({ append: jest.fn(), style: {} })),
+                addButton: jest.fn(() => ({
+                    onclick: null,
+                    getElementsByTagName: jest.fn(() => [{}])
+                })),
+                sendToCenter: jest.fn()
+            }))
+        };
+        global.buildScale = jest.fn(() => [["C"], []]);
+        global.getNoteFromInterval = jest.fn(() => ["C", 4]);
+        global.getTemperament = jest.fn(() => ({
+            interval: [],
+            pitchNumber: 1,
+            0: 1,
+            1: 2
+        }));
+
+        widget.inTemperament = "equal";
+        widget.scale = ["C", "Major"];
+        widget.init({
+            errorMsg: jest.fn(),
+            logo: {
+                synth: {
+                    startingPitch: "C4",
+                    _getFrequency: jest.fn(() => 440)
+                }
+            }
+        });
+
         widget._logo = {
             synth: {
                 setMasterVolume: jest.fn(),
@@ -608,6 +644,43 @@ describe("TemperamentWidget basic tests", () => {
     });
 
     test("_graphOfNotes renders table view", () => {
+        // _graphOfNotes() reads temperamentTableDiv, which only exists once
+        // init(activity) has run, so the widget must be initialized first
+        // (matching production usage, where _graphOfNotes() is only reachable
+        // via a button created in init()).
+        global.window.widgetWindows = {
+            windowFor: jest.fn(() => ({
+                clear: jest.fn(),
+                show: jest.fn(),
+                getWidgetBody: jest.fn(() => ({ append: jest.fn(), style: {} })),
+                addButton: jest.fn(() => ({
+                    onclick: null,
+                    getElementsByTagName: jest.fn(() => [{}])
+                })),
+                sendToCenter: jest.fn()
+            }))
+        };
+        global.buildScale = jest.fn(() => [["C"], []]);
+        global.getNoteFromInterval = jest.fn(() => ["C", 4]);
+        global.getTemperament = jest.fn(() => ({
+            interval: [],
+            pitchNumber: 1,
+            0: 1,
+            1: 2
+        }));
+
+        widget.inTemperament = "equal";
+        widget.scale = ["C", "Major"];
+        widget.init({
+            errorMsg: jest.fn(),
+            logo: {
+                synth: {
+                    startingPitch: "C4",
+                    _getFrequency: jest.fn(() => 440)
+                }
+            }
+        });
+
         widget.toggleNotesButton = jest.fn();
         widget.notesCircle = {
             removeWheel: jest.fn()
