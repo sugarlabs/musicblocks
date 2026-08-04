@@ -252,7 +252,7 @@ describe("LocalCard", () => {
             card.render();
 
             const cloud = document.getElementById("local-project-cloud-p12");
-            expect(cloud.style.display).toBe("initial");
+            expect(cloud.style.display).toBe("inline-flex");
 
             cloud.click();
             expect(planet.GlobalPlanet.forceAddToCache).toHaveBeenCalledWith(
