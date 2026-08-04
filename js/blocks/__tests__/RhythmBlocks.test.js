@@ -22,9 +22,9 @@
 
 const { setupRhythmBlocks } = jest.requireActual("../RhythmBlocks");
 
-// Use the real BlockDragController so the Blocks constructor can attach
-// drag delegation methods (blocks.js calls setupBlockDragController(this)).
-global.setupBlockDragController = require("../../block-drag-controller").setupBlockDragController;
+global.setupBlockDragController = jest.requireActual(
+    "../../block-drag-controller"
+).setupBlockDragController;
 
 const Blocks = jest.requireActual("../../blocks");
 
