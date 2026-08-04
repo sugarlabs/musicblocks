@@ -21,7 +21,7 @@
 
 /*
    global _, NOINPUTERRORMSG, Singer, MUSICALMODES, MusicBlocks, Mouse, getNote,
-   getModeLength, isCustomTemperament, TEMPERAMENT
+   getModeLength, isCustomTemperament, TEMPERAMENT, getCurrentEDO, EDOBOUNDEXCEEDED
 */
 
 /*
@@ -31,9 +31,9 @@
     js/logo.js
         NOINPUTERRORMSG
     js/utils/musicutils.js
-        MUSICALMODES, MODE_PIE_MENUS, getNote, getModeLength, NOTESTEP,
-        GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
-        isCustomTemperament, TEMPERAMENT
+         MUSICALMODES, MODE_PIE_MENUS, getNote, getModeLength, NOTESTEP,
+         GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
+         isCustomTemperament, TEMPERAMENT, getCurrentEDO
     js/turtle-singer.js
         Singer
     js/js-export/export.js
@@ -182,10 +182,15 @@ function setupIntervalsActions(activity) {
                 lastWord += ` ${_("below")}`;
             }
 
+            const mapEntry = SEMITONETOINTERVALMAP[totalIntervals];
+            const intervalName =
+                mapEntry && mapEntry[letterGap] !== undefined
+                    ? mapEntry[letterGap]
+                    : `${totalIntervals} ${_("steps")}`;
             const interval =
                 totalIntervals % temperamentLength === 0 && letterGap === 0
-                    ? SEMITONETOINTERVALMAP[totalIntervals][letterGap]
-                    : SEMITONETOINTERVALMAP[totalIntervals][letterGap] + lastWord;
+                    ? intervalName
+                    : intervalName + lastWord;
             return interval;
         }
 
@@ -303,8 +308,19 @@ function setupIntervalsActions(activity) {
                     activity.errorMsg(_("Adding missing pitch number 0."));
                 }
 
-                const pitchNumbers = tur.singer.defineMode.sort((a, b) => a - b);
                 const temperamentLength = Singer.IntervalsActions.getTemperamentLength();
+
+                // Filter out pitches outside [0, temperamentLength - 1]
+                let pitchNumbers = tur.singer.defineMode.sort((a, b) => a - b);
+                const inBounds = pitchNumbers.filter(p => p >= 0 && p < temperamentLength);
+                if (inBounds.length !== pitchNumbers.length) {
+                    activity.errorMsg(EDOBOUNDEXCEEDED, null);
+                }
+                pitchNumbers = inBounds;
+
+                if (pitchNumbers.length > temperamentLength) {
+                    activity.errorMsg(EDOBOUNDEXCEEDED, null);
+                }
 
                 for (let i = 0; i < pitchNumbers.length; i++) {
                     // Apply mod arithmetic for custom temperaments
@@ -495,6 +511,7 @@ function setupIntervalsActions(activity) {
          */
         static setTemperament(temperament, pitch, octave) {
             activity.logo.synth.inTemperament = temperament;
+            activity.logo._userTemperament = temperament;
             activity.logo.synth.startingPitch = pitch + "" + octave;
 
             activity.logo.temperamentSelected.push(temperament);
@@ -505,6 +522,12 @@ function setupIntervalsActions(activity) {
                 activity.logo.temperamentSelected[len - 2]
             ) {
                 activity.logo.synth.changeInTemperament = true;
+            }
+
+            // Update the default custom mode to match the new EDO's step count.
+            const edo = getCurrentEDO(temperament);
+            if (MUSICALMODES["custom"].length !== edo) {
+                MUSICALMODES["custom"] = new Array(edo).fill(1);
             }
         }
     };

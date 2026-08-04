@@ -82,7 +82,6 @@ global.document = {
 // Mock Constants
 global.STANDARDBLOCKHEIGHT = 20;
 global.DEFAULTBLOCKSCALE = 1.0;
-global.SPECIALINPUTS = ["number", "text", "boolean"];
 global.COLLAPSIBLES = ["repeat", "forever", "if"];
 global.INLINECOLLAPSIBLES = ["newnote", "interval", "osctime"];
 global.platformColor = {
@@ -110,14 +109,21 @@ describe("Block Foundation", () => {
                     }
                 }
             },
-            blockList: []
+            blockList: [],
+            octaveNumber: jest.fn().mockReturnValue(false),
+            noteValueNumber: jest.fn().mockReturnValue(false),
+            octaveModifierNumber: jest.fn().mockReturnValue(false),
+            intervalModifierNumber: jest.fn().mockReturnValue(false)
         };
 
         mockProtoBlock = {
             name: "forward",
             image: "forward.svg",
             size: 1,
-            docks: [],
+            docks: [
+                [0, 0, 0],
+                [0, 0, 0]
+            ],
             hidden: false,
             capabilities: Object.create(null)
         };
@@ -234,6 +240,119 @@ describe("Block Foundation", () => {
 
             const block = new Block(mockProtoBlock, mockBlocks);
             expect(block.isNoteContainer()).toBe(false);
+        });
+
+        it("hasValueDrivenLabel() should return true from capability metadata", () => {
+            mockProtoBlock.capabilities.valueDrivenLabel = true;
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.hasValueDrivenLabel()).toBe(true);
+        });
+
+        it("hasValueDrivenLabel() should respect explicit false metadata", () => {
+            mockProtoBlock.name = "number";
+            mockProtoBlock.capabilities.valueDrivenLabel = false;
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.hasValueDrivenLabel()).toBe(false);
+        });
+
+        it("hasValueDrivenLabel() should return false for ordinary blocks", () => {
+            mockProtoBlock.name = "forward";
+            mockProtoBlock.capabilities = Object.create(null);
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.hasValueDrivenLabel()).toBe(false);
+        });
+
+        describe("isArgumentLikeBlock()", () => {
+            it("should return true for a normal value block (style 'value' / isArgBlock())", () => {
+                mockProtoBlock.name = "number";
+                mockProtoBlock.style = "value";
+                mockProtoBlock.capabilities = Object.create(null);
+
+                const block = new Block(mockProtoBlock, mockBlocks);
+                expect(block.isArgumentLikeBlock()).toBe(true);
+            });
+
+            it("should return false for a normal command block", () => {
+                mockProtoBlock.name = "forward";
+                mockProtoBlock.style = "command";
+                mockProtoBlock.capabilities = Object.create(null);
+
+                const block = new Block(mockProtoBlock, mockBlocks);
+                expect(block.isArgumentLikeBlock()).toBe(false);
+            });
+
+            it("should return true for doArg block which has argumentLike capability", () => {
+                mockProtoBlock.name = "doArg";
+                mockProtoBlock.style = "flow";
+                mockProtoBlock.capabilities = { argumentLike: true };
+
+                const block = new Block(mockProtoBlock, mockBlocks);
+                expect(block.isArgumentLikeBlock()).toBe(true);
+            });
+
+            it("should return true for makeblock block which has argumentLike capability", () => {
+                mockProtoBlock.name = "makeblock";
+                mockProtoBlock.style = "left";
+                mockProtoBlock.capabilities = { argumentLike: true };
+
+                const block = new Block(mockProtoBlock, mockBlocks);
+                expect(block.isArgumentLikeBlock()).toBe(true);
+            });
+        });
+
+        describe("discreteChoice capability and _usePiemenu()", () => {
+            it("hasCapability('discreteChoice') should return true when configured in metadata", () => {
+                mockProtoBlock.capabilities.discreteChoice = true;
+                const block = new Block(mockProtoBlock, mockBlocks);
+                expect(block.hasCapability("discreteChoice")).toBe(true);
+                expect(block._usePiemenu()).toBe(true);
+            });
+
+            it("hasCapability('discreteChoice') should return false when not configured", () => {
+                mockProtoBlock.capabilities = Object.create(null);
+                const block = new Block(mockProtoBlock, mockBlocks);
+                expect(block.hasCapability("discreteChoice")).toBe(false);
+                expect(block._usePiemenu()).toBe(false);
+            });
+
+            it("should support dynamic inherited pie menus based on parent connections", () => {
+                mockProtoBlock.name = "number";
+                mockProtoBlock.capabilities = Object.create(null);
+
+                const childBlock = new Block(mockProtoBlock, mockBlocks);
+                childBlock.blockIndex = 1;
+                childBlock.connections = [0, null];
+
+                const parentProtoBlock = {
+                    name: "tempo",
+                    capabilities: Object.create(null),
+                    piemenuValuesC1: [60, 120, 180]
+                };
+                const parentBlock = new Block(parentProtoBlock, mockBlocks);
+                parentBlock.blockIndex = 0;
+                parentBlock.connections = [null, 1];
+
+                mockBlocks.blockList = [parentBlock, childBlock];
+                mockBlocks.octaveNumber = jest.fn(() => false);
+                mockBlocks.noteValueNumber = jest.fn(() => false);
+                mockBlocks.octaveModifierNumber = jest.fn(() => false);
+                mockBlocks.intervalModifierNumber = jest.fn(() => false);
+
+                expect(childBlock.hasCapability("discreteChoice")).toBe(false);
+                expect(childBlock._usePiemenu()).toBe(true);
+            });
+
+            it("should handle empty/unpopulated connections array without throwing", () => {
+                mockProtoBlock.capabilities = Object.create(null);
+                const block = new Block(mockProtoBlock, mockBlocks);
+                block.connections = []; // connections[0] is undefined
+
+                expect(() => block._usePiemenu()).not.toThrow();
+                expect(block._usePiemenu()).toBe(false);
+            });
         });
 
         it("copySize() should sync size from protoblock", () => {
@@ -556,6 +675,58 @@ describe("Block Foundation", () => {
 
             expect(mockCache).toHaveBeenCalledWith(0, 0, 100, 100);
             expect(block.value).toBe("fallback-cached");
+        });
+    });
+
+    describe("hide", () => {
+        it("should not throw when container is null", () => {
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.container = null;
+            expect(() => b.hide()).not.toThrow();
+        });
+
+        it("should set container.visible to false when container exists", () => {
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.container = { visible: true };
+            b.hide();
+            expect(b.container.visible).toBe(false);
+        });
+
+        it("should guard collapsible fields that are null", () => {
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.name = "repeat";
+            b.collapseText = null;
+            b.expandButtonBitmap = null;
+            b.collapseButtonBitmap = null;
+            expect(() => b.hide()).not.toThrow();
+        });
+    });
+
+    describe("show", () => {
+        it("should not throw when container is null and not trashed", () => {
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.container = null;
+            b.trash = false;
+            b.inCollapsed = false;
+            expect(() => b.show()).not.toThrow();
+        });
+
+        it("should set container.visible to true when container exists", () => {
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.container = { visible: false };
+            b.trash = false;
+            b.inCollapsed = false;
+            b.bitmap = { visible: false };
+            b.highlightBitmap = { visible: true };
+            b.highlightCollapseBlockBitmap = { visible: false };
+            b.collapseBlockBitmap = { visible: false };
+            b.collapseText = null;
+            b.expandButtonBitmap = null;
+            b.collapseButtonBitmap = null;
+            b.disconnectedBitmap = null;
+            b.disconnectedHighlightBitmap = null;
+            b.show();
+            expect(b.container.visible).toBe(true);
         });
     });
 });

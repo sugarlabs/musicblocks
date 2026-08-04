@@ -8,6 +8,9 @@
    _, piemenuVoices, docById, platformColor, noteToFrequency
 */
 
+/** AMD module dependencies for lazy loading. */
+LegoWidget.dependencies = ["widgets/legobricks"];
+
 /**
  * Represents a LEGO Bricks Widget with Phrase Maker functionality.
  * @constructor

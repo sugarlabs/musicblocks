@@ -26,18 +26,29 @@ const Singer = require("../turtle-singer");
 const mockGlobals = {
     getNote: jest.fn().mockReturnValue(["C", 4]),
     isCustomTemperament: jest.fn(),
+    isTrueEDO: jest.fn().mockReturnValue(true),
     getStepSizeUp: jest.fn().mockReturnValue(1),
     numberToPitch: jest.fn().mockReturnValue(["C", 4]),
     pitchToNumber: jest.fn().mockReturnValue(60),
-    getTemperament: jest.fn().mockReturnValue({ pitchNumber: 12 })
+    getTemperament: jest.fn().mockReturnValue({ pitchNumber: 12 }),
+    getCurrentEDO: jest.fn().mockReturnValue(12),
+    getEdoNoteNamePosition: jest.fn().mockReturnValue(0),
+    generateNoteNames: jest
+        .fn()
+        .mockReturnValue(["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"])
 };
 
 global.getNote = mockGlobals.getNote;
 global.isCustomTemperament = mockGlobals.isCustomTemperament;
+global.isTrueEDO = mockGlobals.isTrueEDO;
 global.getStepSizeUp = mockGlobals.getStepSizeUp;
 global.numberToPitch = mockGlobals.numberToPitch;
 global.pitchToNumber = mockGlobals.pitchToNumber;
 global.getTemperament = mockGlobals.getTemperament;
+global.getCurrentEDO = mockGlobals.getCurrentEDO;
+global.getEdoNoteNamePosition = mockGlobals.getEdoNoteNamePosition;
+global.generateNoteNames = mockGlobals.generateNoteNames;
+global.EDOBOUNDEXCEEDED = "Pitch index exceeds EDO range";
 global.last = jest.fn(array => array[array.length - 1]);
 global.deepClone = value => {
     if (typeof structuredClone === "function") {

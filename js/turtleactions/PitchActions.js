@@ -25,7 +25,7 @@
    nthDegreeToPitch, SHARP, FLAT, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    numberToPitch, ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
    keySignatureToMode, getInterval, EFFECTSNAMES, NANERRORMSG, frequencyToPitch,
-   MusicBlocks, Mouse, isCustomTemperament
+   MusicBlocks, Mouse, isCustomTemperament, getCurrentEDO
 */
 
 /*
@@ -44,7 +44,7 @@
         pitchToNumber, getStepSizeUp, getStepSizeDown, calcOctave, getNote, nthDegreeToPitch,
         SHARP, FLAT, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE, numberToPitch,
         ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
-        keySignatureToMode, getInterval, frequencyToPitch, isCustomTemperament
+        keySignatureToMode, getInterval, frequencyToPitch, isCustomTemperament, getCurrentEDO
 */
 
 /*exported setupPitchActions*/
@@ -194,16 +194,12 @@ function setupPitchActions(activity) {
             }
             let scaleDegree;
 
-            // Choose a reference based on the key selected.
-            // This is based on the position of a note on the circle of fifths e.g C --> 1, G-->8.
-            // Subtract one to make it zero based.
-            let ref = NOTESTEP[obj[0].substr(0, 1)] - 1;
-            // Adjust reference if sharps/flats are present i.e increase by one for a sharp and decrease by one for a flat
-            if (obj[0].substr(1) === FLAT) {
-                ref--;
-            } else if (obj[0].substr(1) === SHARP) {
-                ref++;
-            }
+            // Reference position of the key note within the octave, in EDO steps (0-based).
+            // Uses pitchToNumber for EDO-aware lookup instead of hardcoded 12-EDO NOTESTEP.
+            const temperament = activity.logo.synth.inTemperament;
+            const ref =
+                pitchToNumber(obj[0], 4, tur.singer.keySignature, temperament) %
+                getCurrentEDO(temperament);
 
             /*
             Number of semitones is used to calculate changes in deltaSemi defined above.
@@ -243,9 +239,11 @@ function setupPitchActions(activity) {
 
             const [note, _offset] = nthDegreeToPitch(tur.singer.keySignature, scaleDegree);
             let semitones = ref;
-            semitones += NOTESFLAT.includes(note)
-                ? NOTESFLAT.indexOf(note) - ref
-                : NOTESSHARP.indexOf(note) - ref;
+            // EDO-aware position lookup instead of hardcoded 12-EDO NOTESFLAT/NOTESSHARP.
+            const notePos =
+                pitchToNumber(note, 4, tur.singer.keySignature, temperament) %
+                getCurrentEDO(temperament);
+            semitones += notePos - ref;
             /** calculates changes in reference octave which occur a semitone before the reference key */
             const deltaOctave = Math.floor(number / modeLength);
             /** calculates changes in octave when crossing B */
@@ -253,7 +251,13 @@ function setupPitchActions(activity) {
             const _octave =
                 (isNegativeArg ? -1 : 1) * (deltaOctave + deltaSemi) +
                 Math.floor(
-                    calcOctave(tur.singer.currentOctave, octave, tur.singer.lastNotePlayed, note)
+                    calcOctave(
+                        tur.singer.currentOctave,
+                        octave,
+                        tur.singer.lastNotePlayed,
+                        note,
+                        activity.logo.synth.inTemperament
+                    )
                 );
 
             Singer.processPitch(activity, note, _octave, 0, turtle, blk);
@@ -271,7 +275,9 @@ function setupPitchActions(activity) {
             const tur = activity.turtles.ithTurtle(turtle);
 
             if (tur.singer.inDefineMode) {
-                tur.singer.defineMode.push(pitchNumber);
+                const currentEDO = getCurrentEDO(activity.logo.synth.inTemperament);
+                const normalizedPitch = ((pitchNumber % currentEDO) + currentEDO) % currentEDO;
+                tur.singer.defineMode.push(normalizedPitch);
                 return;
             } else {
                 if (
@@ -343,7 +349,13 @@ function setupPitchActions(activity) {
                         const p = tur.singer.notePitches[blockId][startLength];
                         const o = tur.singer.noteOctaves[blockId][startLength];
                         const c = tur.singer.noteCents[blockId][startLength];
-                        transformedHertz = pitchToFrequency(p, o, c, tur.singer.keySignature);
+                        transformedHertz = pitchToFrequency(
+                            p,
+                            o,
+                            c,
+                            tur.singer.keySignature,
+                            activity.logo.synth.inTemperament
+                        );
 
                         if (c !== 0) {
                             const formattedHertz = Number(transformedHertz.toFixed(2));
@@ -396,7 +408,13 @@ function setupPitchActions(activity) {
                 tur.singer.noteCents[last(tur.singer.inNoteBlock)].push(obj[2]);
                 if (obj[2] !== 0) {
                     tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(
-                        pitchToFrequency(obj[0], obj[1], obj[2], tur.singer.keySignature)
+                        pitchToFrequency(
+                            obj[0],
+                            obj[1],
+                            obj[2],
+                            tur.singer.keySignature,
+                            activity.logo.synth.inTemperament
+                        )
                     );
                 } else {
                     tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(0);
@@ -581,7 +599,8 @@ function setupPitchActions(activity) {
                     tur.singer.currentOctave,
                     octave,
                     tur.singer.lastNotePlayed,
-                    name
+                    name,
+                    activity.logo.synth.inTemperament
                 );
                 tur.singer.invertList.push([name, _octave, mode]);
             }
@@ -615,7 +634,7 @@ function setupPitchActions(activity) {
                 const obj = numberToPitch(
                     Math.floor(number) +
                         activity.turtles.ithTurtle(turtle).singer.pitchNumberOffset,
-                    undefined,
+                    activity.logo.synth.inTemperament,
                     undefined,
                     undefined,
                     activity
@@ -641,9 +660,20 @@ function setupPitchActions(activity) {
             const tur = activity.turtles.ithTurtle(turtle);
 
             const _octave = Math.floor(
-                calcOctave(tur.singer.currentOctave, octave, tur.singer.lastNotePlayed, pitch)
+                calcOctave(
+                    tur.singer.currentOctave,
+                    octave,
+                    tur.singer.lastNotePlayed,
+                    pitch,
+                    activity.logo.synth.inTemperament
+                )
             );
-            tur.singer.pitchNumberOffset = pitchToNumber(pitch, _octave, tur.singer.keySignature);
+            tur.singer.pitchNumberOffset = pitchToNumber(
+                pitch,
+                _octave,
+                tur.singer.keySignature,
+                activity.logo.synth.inTemperament
+            );
         }
 
         /**
@@ -664,14 +694,25 @@ function setupPitchActions(activity) {
                 let pitch = tur.singer.previousNotePlayed[0].slice(0, len - 1);
                 let octave = parseInt(tur.singer.previousNotePlayed[0].slice(len - 1), 10);
                 let obj = [pitch, octave];
-                const previousValue = pitchToNumber(obj[0], obj[1], tur.singer.keySignature);
+                const previousValue = pitchToNumber(
+                    obj[0],
+                    obj[1],
+                    tur.singer.keySignature,
+                    activity.logo.synth.inTemperament
+                );
 
                 len = tur.singer.lastNotePlayed[0].length;
                 pitch = tur.singer.lastNotePlayed[0].slice(0, len - 1);
                 octave = parseInt(tur.singer.lastNotePlayed[0].slice(len - 1), 10);
                 obj = [pitch, octave];
 
-                let delta = pitchToNumber(obj[0], obj[1], tur.singer.keySignature) - previousValue;
+                let delta =
+                    pitchToNumber(
+                        obj[0],
+                        obj[1],
+                        tur.singer.keySignature,
+                        activity.logo.synth.inTemperament
+                    ) - previousValue;
                 if (outType === "deltapitch") {
                     // half-step difference
                     return delta;
@@ -684,8 +725,18 @@ function setupPitchActions(activity) {
                         i++;
                         const nhalf =
                             type === "up"
-                                ? getStepSizeUp(tur.singer.keySignature, pitch, 0, "equal")
-                                : getStepSizeDown(tur.singer.keySignature, pitch, 0, "equal");
+                                ? getStepSizeUp(
+                                      tur.singer.keySignature,
+                                      pitch,
+                                      0,
+                                      activity.logo.synth.inTemperament
+                                  )
+                                : getStepSizeDown(
+                                      tur.singer.keySignature,
+                                      pitch,
+                                      0,
+                                      activity.logo.synth.inTemperament
+                                  );
                         delta -= nhalf;
                         scalarDelta += type === "up" ? 1 : -1;
                         obj = getNote(
@@ -727,23 +778,21 @@ function setupPitchActions(activity) {
          */
         static consonantStepSize(stepType, turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
+            const temp = activity.logo.synth.inTemperament;
+
+            const _step = (direction, pitch) => {
+                const step =
+                    direction === "up"
+                        ? getStepSizeUp(tur.singer.keySignature, pitch, undefined, temp)
+                        : getStepSizeDown(tur.singer.keySignature, pitch, undefined, temp);
+                return typeof step === "number" && !isNaN(step) ? step : 1;
+            };
 
             if (tur.singer.lastNotePlayed !== null) {
                 const len = tur.singer.lastNotePlayed[0].length;
-
-                return stepType === "up"
-                    ? getStepSizeUp(
-                          tur.singer.keySignature,
-                          tur.singer.lastNotePlayed[0].slice(0, len - 1)
-                      )
-                    : getStepSizeDown(
-                          tur.singer.keySignature,
-                          tur.singer.lastNotePlayed[0].slice(0, len - 1)
-                      );
+                return _step(stepType, tur.singer.lastNotePlayed[0].slice(0, len - 1));
             } else {
-                return stepType === "up"
-                    ? getStepSizeUp(tur.singer.keySignature, "G")
-                    : getStepSizeDown(tur.singer.keySignature, "G");
+                return _step(stepType, "G");
             }
         }
     };

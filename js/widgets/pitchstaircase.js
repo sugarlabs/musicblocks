@@ -35,6 +35,9 @@
 /* exported PitchStaircase */
 
 class PitchStaircase {
+    /** AMD module dependencies for lazy loading. */
+    static dependencies = ["widgets/pitchstaircase"];
+
     static BUTTONDIVWIDTH = 476; // 8 buttons 476 = (55 + 4) * 8
     static OUTERWINDOWWIDTH = 685;
     static INNERWINDOWWIDTH = 600;

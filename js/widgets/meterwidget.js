@@ -51,6 +51,9 @@
  * @exports MeterWidget
  */
 class MeterWidget {
+    /** AMD module dependencies for lazy loading. */
+    static dependencies = ["widgets/meterwidget"];
+
     // A pie menu is used to show the meter and strong beats
     /**
      * Width of the button div.

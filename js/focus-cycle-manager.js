@@ -279,6 +279,14 @@ class FocusCycleManager {
         if (active.closest('.sweet-alert, .modal, [role="dialog"], .widget, .dropdown-content')) {
             return true;
         }
+        // Bypass Tab cycling when a notification popup is visible so
+        // keyboard users can Tab to the close button naturally.
+        const printText = document.getElementById("printText");
+        const errorText = document.getElementById("errorText");
+        const isVisible = el => el instanceof Element && getComputedStyle(el).display !== "none";
+        if (isVisible(printText) || isVisible(errorText)) {
+            return true;
+        }
         return false;
     }
 

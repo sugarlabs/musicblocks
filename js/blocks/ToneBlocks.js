@@ -103,6 +103,8 @@ function setupToneBlocks(activity) {
          */
         constructor() {
             super("filtertype");
+            this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
             this.setPalette("tone", activity);
             this.setHelpString();
             this.formBlock({ outType: "textout" });
@@ -122,6 +124,8 @@ function setupToneBlocks(activity) {
          */
         constructor() {
             super("oscillatortype");
+            this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
             this.setPalette("tone", activity);
             this.setHelpString();
             this.formBlock({ outType: "textout" });
@@ -919,6 +923,8 @@ function setupToneBlocks(activity) {
          */
         constructor() {
             super("voicename", _("set instrument"));
+            this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
             this.setPalette("tone", activity);
             this.setHelpString([
                 _(

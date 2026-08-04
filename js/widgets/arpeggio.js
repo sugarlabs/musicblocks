@@ -30,6 +30,9 @@
 /* exported Arpeggio */
 
 class Arpeggio {
+    /** AMD module dependencies for lazy loading. */
+    static dependencies = ["widgets/arpeggio"];
+
     static BUTTONDIVWIDTH = 295;
     static CELLSIZE = 28;
     static BUTTONSIZE = 53;

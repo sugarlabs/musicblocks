@@ -39,6 +39,18 @@
 // Constants moved to js/logoconstants.js to resolve circular dependency
 
 /**
+ * Resolves the performance instrumentation module.
+ *
+ * `performanceTracker` is loaded on demand (see `runLogoCommands`), so it is
+ * absent for the whole of a normal run. Every instrumentation call site goes
+ * through this accessor rather than repeating the `typeof` guard.
+ *
+ * @returns {Object|null} The tracker, or null when it has not been loaded.
+ */
+const getPerformanceTracker = () =>
+    typeof performanceTracker === "undefined" ? null : performanceTracker;
+
+/**
  * @class
  * @classdesc Queue entry for managing running blocks.
  */
@@ -264,6 +276,7 @@ class Logo {
         };
 
         this.temperamentSelected = [];
+        this._userTemperament = "equal";
         this.customTemperamentDefined = false;
         this.specialArgs = [];
 
@@ -272,6 +285,9 @@ class Logo {
         this.synth.activity = this.activity; // Reference for voice tracking
         this.synth.changeInTemperament = false;
         this._synthsInitialized = false;
+
+        // Persistent user-selected temperament (survives across runs).
+        this._userTemperament = null;
 
         // Mode widget
         this.modeBlock = null;
@@ -1119,6 +1135,17 @@ class Logo {
 
     // ========= Behavior =========================================================================
 
+    resetTemperament() {
+        this.synth.changeInTemperament = false;
+        this.synth.inTemperament = this._userTemperament || "equal";
+    }
+
+    setUserTemperament(temperament) {
+        this._userTemperament = temperament;
+        this.synth.inTemperament = temperament;
+        this.synth.changeInTemperament = true;
+    }
+
     /**
      * Initialises a turtle.
      *
@@ -1332,7 +1359,7 @@ class Logo {
 
         if (
             performanceModeEnabled &&
-            typeof performanceTracker === "undefined" &&
+            !getPerformanceTracker() &&
             typeof requirejs === "function" &&
             !this._performanceTrackerLoadFailed
         ) {
@@ -1347,11 +1374,12 @@ class Logo {
             return;
         }
 
-        if (typeof performanceTracker !== "undefined") {
+        const tracker = getPerformanceTracker();
+        if (tracker) {
             if (performanceModeEnabled) {
-                performanceTracker.enable();
+                tracker.enable();
             } else {
-                performanceTracker.disable();
+                tracker.disable();
             }
         }
 
@@ -1404,8 +1432,7 @@ class Logo {
 
         this.deps.Singer.masterBPM = TARGETBPM;
         this.deps.Singer.defaultBPMFactor = TONEBPM / TARGETBPM;
-        this.synth.changeInTemperament = false;
-        this.synth.inTemperament = "equal";
+        this.resetTemperament();
         this.deps.Singer.clearPitchToFrequencyCache();
 
         this._checkingCompletionState = false;
@@ -1567,9 +1594,7 @@ class Logo {
         }
 
         // Performance instrumentation: begin tracking
-        if (typeof performanceTracker !== "undefined") {
-            performanceTracker.startRun();
-        }
+        getPerformanceTracker()?.startRun();
 
         /*
         ===========================================================================
@@ -1782,10 +1807,9 @@ class Logo {
      * @returns {void}
      */
     runFromBlockNow(logo, turtle, blk, isflow, receivedArg, queueStart) {
+        const tracker = getPerformanceTracker();
         const profilingEnabled =
-            typeof performanceTracker !== "undefined" &&
-            typeof performanceTracker.isEnabled === "function" &&
-            performanceTracker.isEnabled();
+            tracker && typeof tracker.isEnabled === "function" && tracker.isEnabled();
         let profilingStart = null;
         if (profilingEnabled) {
             profilingStart =
@@ -1795,7 +1819,7 @@ class Logo {
             if (!logo.blockTimings) {
                 logo.blockTimings = {};
             }
-            performanceTracker.enterBlock();
+            tracker.enterBlock();
         }
 
         this._alreadyRunning = true;
@@ -1813,6 +1837,7 @@ class Logo {
             logo._iterationBudget = logo._MAX_ITERATIONS + 1;
             if (profilingEnabled) {
                 Logo._recordBlockTiming(logo, blk, profilingStart);
+                performanceTracker.exitBlock();
             }
             return;
         }
@@ -1972,7 +1997,7 @@ class Logo {
                 if (ret) {
                     if (profilingEnabled) {
                         Logo._recordBlockTiming(logo, blk, profilingStart);
-                        performanceTracker.exitBlock();
+                        tracker.exitBlock();
                     }
                     return ret;
                 }
@@ -2241,10 +2266,13 @@ class Logo {
                     queueStart === 0 &&
                     tur.singer.justCounting.length === 0
                 ) {
-                    // Performance instrumentation: end tracking and log stats
-                    if (typeof performanceTracker !== "undefined") {
-                        performanceTracker.endRun();
-                        performanceTracker.logStats();
+                    // Performance instrumentation: end tracking and log stats.
+                    // Looked up again because this runs on a timeout, well
+                    // after the lookup at the top of runFromBlockNow.
+                    const runTracker = getPerformanceTracker();
+                    if (runTracker) {
+                        runTracker.endRun();
+                        runTracker.logStats();
                     }
 
                     if (logo.runningLilypond) {
@@ -2341,7 +2369,7 @@ class Logo {
 
         if (profilingEnabled) {
             Logo._recordBlockTiming(logo, blk, profilingStart);
-            performanceTracker.exitBlock();
+            tracker.exitBlock();
         }
     }
 
@@ -2479,11 +2507,9 @@ Logo._recordBlockTiming = function _recordBlockTiming(logo, blk, profilingStart)
             entry.max = elapsed;
         }
     } catch (e) {
-        if (
-            typeof performanceTracker !== "undefined" &&
-            typeof performanceTracker.disable === "function"
-        ) {
-            performanceTracker.disable();
+        const tracker = getPerformanceTracker();
+        if (tracker && typeof tracker.disable === "function") {
+            tracker.disable();
         }
     }
 };

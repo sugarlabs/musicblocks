@@ -742,7 +742,7 @@ function setupMediaBlocks(activity) {
          * @param {Logo} logo - The logo object.
          */
         flow(args, logo) {
-            if (logo.cameraID != null) {
+            if (logo.cameraID !== null) {
                 doStopVideoCam(logo.cameraID, logo.setCameraID);
             }
         }
@@ -1044,6 +1044,7 @@ function setupMediaBlocks(activity) {
          */
         constructor() {
             super("text", _("text"));
+            this.setCapability("valueDrivenLabel");
 
             // Set extra width for the block
             this.extraWidth = 30;

@@ -28,6 +28,8 @@
         platformColor
     - js/utils/utils-logic.js
         resolveObject
+    - js/utils/browser-utils.js
+        canvasPixelRatio, doBrowserCheck, fnBrowserDetect, windowHeight, windowWidth
 */
 
 if (typeof module !== "undefined" && module.exports) {
@@ -39,16 +41,19 @@ if (typeof module !== "undefined" && module.exports) {
     var DomHelpers =
         (typeof window !== "undefined" && window.DomHelpers) ||
         (typeof require !== "undefined" ? require("./dom-helpers") : {});
+
+    var BrowserUtils =
+        (typeof window !== "undefined" && window.BrowserUtils) ||
+        (typeof require !== "undefined" ? require("./browser-utils") : {});
 }
 
 /* exported
-   announceToScreenReader,canvasPixelRatio, changeImage, closeBlkWidgets,
-   delayExecution, doBrowserCheck,
+   announceToScreenReader, changeImage, closeBlkWidgets,
+   delayExecution,
    doPublish, doStopVideoCam, doSVG,
    doUseCamera, format, getTextWidth, httpGet, httpPost, HttpRequest,
    importMembers, isSVGEmpty, prepareMacroExports, preparePluginExports,
-   processMacroData, processPluginData, processRawPluginData, windowHeight, windowWidth,
-   fnBrowserDetect, waitForReadiness
+   processMacroData, processPluginData, processRawPluginData, waitForReadiness
 */
 
 /**
@@ -170,77 +175,6 @@ let format = (str, data) => {
 };
 
 /**
- * Detects the current browser name.
- * @function
- * @returns {string} The name of the detected browser.
- */
-function fnBrowserDetect() {
-    const userAgent = navigator.userAgent;
-    let browserName;
-
-    if (userAgent.match(/chrome|chromium|crios/i)) {
-        browserName = "chrome";
-    } else if (userAgent.match(/firefox|fxios/i)) {
-        browserName = "firefox";
-    } else if (userAgent.match(/safari/i)) {
-        browserName = "safari";
-    } else if (userAgent.match(/opr\//i)) {
-        browserName = "opera";
-    } else if (userAgent.match(/edg/i)) {
-        browserName = "edge";
-    } else {
-        browserName = "No browser detection";
-    }
-    return browserName;
-}
-
-/**
- * Returns the pixel ratio of the canvas for high-resolution displays.
- * @function
- * @returns {number} The canvas pixel ratio.
- */
-function canvasPixelRatio() {
-    const devicePixelRatio = window.devicePixelRatio || 1;
-    const context = document.querySelector("#myCanvas").getContext("2d");
-    const backingStoreRatio =
-        context.webkitBackingStorePixelRatio ||
-        context.mozBackingStorePixelRatio ||
-        context.msBackingStorePixelRatio ||
-        context.oBackingStorePixelRatio ||
-        context.backingStorePixelRatio ||
-        1;
-    return devicePixelRatio / backingStoreRatio;
-}
-
-/**
- * Returns the height of the window, accounting for Android-specific behavior.
- * @function
- * @returns {number} The window height.
- */
-function windowHeight() {
-    const onAndroid = /Android/i.test(navigator.userAgent);
-    if (onAndroid) {
-        return window.outerHeight;
-    } else {
-        return window.innerHeight;
-    }
-}
-
-/**
- * Returns the width of the window, accounting for Android-specific behavior.
- * @function
- * @returns {number} The window width.
- */
-function windowWidth() {
-    const onAndroid = /Android/i.test(navigator.userAgent);
-    if (onAndroid) {
-        return window.outerWidth;
-    } else {
-        return window.innerWidth;
-    }
-}
-
-/**
  * Performs an HTTP GET request to retrieve data from the server.
  * Uses async fetch to avoid blocking the UI during network requests.
  * @param {string|null} projectName - The name of the project (or null for the base URL).
@@ -339,46 +273,6 @@ function HttpRequest(url, loadCallback, userCallback) {
 
         this.request = this.handler = this.userCallback = null;
     }
-}
-
-/**
- * Checks the browser type and version.
- * Sets properties in the jQuery.browser object based on the user agent.
- * @function
- */
-function doBrowserCheck() {
-    jQuery.uaMatch = ua => {
-        ua = ua.toLowerCase();
-
-        const match =
-            /(chrome)[ /]([\w.]+)/.exec(ua) ||
-            /(webkit)[ /]([\w.]+)/.exec(ua) ||
-            /(opera)(?:.*version|)[ /]([\w.]+)/.exec(ua) ||
-            /(msie) ([\w.]+)/.exec(ua) ||
-            (ua.indexOf("compatible") < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec(ua)) ||
-            [];
-
-        return {
-            browser: match[1] || "",
-            version: match[2] || "0"
-        };
-    };
-
-    const matched = jQuery.uaMatch(navigator.userAgent);
-    const browser = {};
-
-    if (matched.browser) {
-        browser[matched.browser] = true;
-        browser.version = matched.version;
-    }
-
-    if (browser.chrome) {
-        browser.webkit = true;
-    } else if (browser.webkit) {
-        browser.safari = true;
-    }
-
-    jQuery.browser = browser;
 }
 
 /**
@@ -1458,6 +1352,7 @@ if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         ...UtilsLogic,
         ...DomHelpers,
+        ...BrowserUtils,
         extractProjectDataFromHTML,
         _,
         format,
@@ -1465,10 +1360,6 @@ if (typeof module !== "undefined" && module.exports) {
         closeBlkWidgets,
         importMembers,
         changeImage,
-        fnBrowserDetect,
-        canvasPixelRatio,
-        windowHeight,
-        windowWidth,
         httpGet,
         httpPost,
         HttpRequest,

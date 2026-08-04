@@ -55,7 +55,7 @@ try {
    piemenuKey, POLAR, preparePluginExports, processMacroData,
    processPluginData, processRawPluginData, SaveInterface,
    SHOWBLOCKSBUTTON, SMALLERBUTTON, SMALLERDISABLEBUTTON, SOPRANO,
-   SPECIALINPUTS, STANDARDBLOCKHEIGHT, StatsWindow, STROKECOLORS,
+   STANDARDBLOCKHEIGHT, StatsWindow, STROKECOLORS,
    TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, TURTLESVG,
    updatePluginObj, ZERODIVIDEERRORMSG, GRAND_G, GRAND_F,
    SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator,
@@ -2246,7 +2246,11 @@ class Activity {
         let maxRefreshTime = 0;
         let lastRefreshReport = performance.now();
 
+        /** Suppress intermediate refreshCanvas() calls during project loading. */
+        this._suppressRefresh = false;
+
         this.refreshCanvas = () => {
+            if (this._suppressRefresh) return;
             this.stageDirty = true;
             this.update = true;
             this._startRenderLoop();
@@ -2832,7 +2836,13 @@ class Activity {
                 // Parse and update the custom musical mode with saved data.
                 try {
                     const customModeDataObj = JSON.parse(custommodeData);
-                    Object.assign(MUSICALMODES["custom"], customModeDataObj);
+                    const src = Array.isArray(customModeDataObj)
+                        ? customModeDataObj
+                        : Object.values(customModeDataObj);
+                    for (let i = 0; i < MUSICALMODES["custom"].length; i++) {
+                        const val = Number(src[i]);
+                        MUSICALMODES["custom"][i] = !isNaN(val) && val > 0 ? val : 1;
+                    }
                 } catch (e) {
                     ErrorHandler.recoverable(e, { operation: "parseCustomMode" });
                 }

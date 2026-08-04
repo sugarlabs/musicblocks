@@ -120,43 +120,6 @@ const COLLAPSIBLES = [
 ];
 
 /**
- * List of blocks that behave like argument blocks even though they are not
- * strictly classified as arg/value blocks.
- * @type {string[]}
- */
-const ARG_LIKE_BLOCKS = ["doArg", "calcArg", "namedcalcArg", "makeblock"];
-
-/**
- * List of special input types.
- * @type {string[]}
- */
-const SPECIALINPUTS = [
-    "text",
-    "number",
-    "solfege",
-    "eastindiansolfege",
-    "scaledegree2",
-    "notename",
-    "voicename",
-    "modename",
-    "chordname",
-    "drumname",
-    "effectsname",
-    "filtertype",
-    "oscillatortype",
-    "boolean",
-    "intervalname",
-    "invertmode",
-    "accidentalname",
-    "temperamentname",
-    "noisename",
-    "customNote",
-    "grid",
-    "outputtools",
-    "wrapmode"
-];
-
-/**
  * List of block types whose names should be widened.
  * @type {string[]}
  */
@@ -178,34 +141,6 @@ const WIDENAMES = [
  * @type {string[]}
  */
 const EXTRAWIDENAMES = [];
-
-/**
- * List of block types with pie menus.
- * @type {string[]}
- */
-const PIEMENUS = [
-    "solfege",
-    "eastindiansolfege",
-    "scaledegree2",
-    "notename",
-    "voicename",
-    "drumname",
-    "effectsname",
-    "accidentalname",
-    "invertmode",
-    "boolean",
-    "filtertype",
-    "oscillatortype",
-    "intervalname",
-    "modename",
-    "chordname",
-    "temperamentname",
-    "noisename",
-    "customNote",
-    "grid",
-    "outputtools",
-    "wrapmode"
-];
 
 /**
  * Async function to create bitmap from SVG data.
@@ -686,7 +621,7 @@ class Block {
                 // block is hidden, so do nothing.
                 return;
             }
-        } else if (!this.bitmap.visible) {
+        } else if (this.bitmap === null || !this.bitmap.visible) {
             return;
         }
 
@@ -1412,7 +1347,7 @@ class Block {
             }
         } else if (this.protoblock.staticLabels.length > 0 && !this.protoblock.image) {
             // Label should be defined inside _().
-            if (SPECIALINPUTS.includes(this.name)) {
+            if (this.hasValueDrivenLabel()) {
                 block_label = "";
             } else {
                 block_label = this.protoblock.staticLabels[0];
@@ -1470,7 +1405,7 @@ class Block {
         // const thisBlock = this.blockIndex;
         let proto, obj, label, attr;
         // Value blocks get a modifiable text label.
-        if (SPECIALINPUTS.includes(this.name)) {
+        if (this.hasValueDrivenLabel()) {
             if (this.value === null) {
                 switch (this.name) {
                     case "text":
@@ -1488,7 +1423,10 @@ class Block {
                             this.activity.logo.synth.startingPitch.substring(
                                 0,
                                 this.activity.logo.synth.startingPitch.length - 1
-                            ) + "(+0)";
+                            ) +
+                            "(+0" +
+                            CENTSSYMBOL +
+                            ")";
                         break;
                     case "notename":
                         this.value = "G";
@@ -1983,6 +1921,9 @@ class Block {
      * @returns {void}
      */
     hide() {
+        if (!this.container) {
+            return;
+        }
         this.container.visible = false;
         if (this.isCollapsible()) {
             // Sometimes these fields are not set.
@@ -2045,7 +1986,7 @@ class Block {
      */
     show() {
         // If it is not in the trash and not in collapsed, then show it.
-        if (!this.trash && !this.inCollapsed) {
+        if (!this.trash && !this.inCollapsed && this.container) {
             this.container.visible = true;
             this._viewportVisible = true;
             if (this.isCollapsible()) {
@@ -2148,6 +2089,14 @@ class Block {
     }
 
     /**
+     * Checks if the block derives its visible inline label from its value.
+     * @returns {boolean} - True if the block has value-driven label behavior.
+     */
+    hasValueDrivenLabel() {
+        return this.hasCapability("valueDrivenLabel");
+    }
+
+    /**
      * Checks if the block is an argument block.
      * @returns {boolean} - True if the block is an argument block, false otherwise.
      */
@@ -2163,7 +2112,7 @@ class Block {
      * @returns {boolean} - True if the block is argument-like, false otherwise.
      */
     isArgumentLikeBlock() {
-        return this.isArgBlock() || ARG_LIKE_BLOCKS.includes(this.name);
+        return this.isArgBlock() || this.hasCapability("argumentLike");
     }
 
     /**
@@ -3021,7 +2970,7 @@ class Block {
         this.text.y = Math.floor((TEXTY * blockScale) / 2 + 0.5);
 
         // Some special cases
-        if (SPECIALINPUTS.includes(this.name)) {
+        if (this.hasValueDrivenLabel()) {
             this.text.textAlign = "center";
             this.text.x = Math.floor((VALUETEXTX * blockScale) / 2 + 10.0);
             if (EXTRAWIDENAMES.includes(this.name)) {
@@ -3214,7 +3163,7 @@ class Block {
             } else if ((!window.hasMouse && getInput) || (window.hasMouse && !moved)) {
                 if (["media", "audiofile", "loadFile"].includes(that.name)) {
                     that._doOpenMedia(thisBlock);
-                } else if (SPECIALINPUTS.includes(that.name)) {
+                } else if (that.hasValueDrivenLabel()) {
                     if (!that.trash) {
                         if (that._triggerLongPress) {
                             that._triggerLongPress = false;
@@ -3666,7 +3615,7 @@ class Block {
                 // apart). Still need to get to the root cause.
                 this.blocks.adjustDocks(this.blockIndex, true);
             }
-        } else if (SPECIALINPUTS.includes(this.name) || ["media", "loadFile"].includes(this.name)) {
+        } else if (this.hasValueDrivenLabel() || ["media", "loadFile"].includes(this.name)) {
             if (!haveClick) {
                 // Simulate click on Android.
                 if (new Date().getTime() - this.blocks.mouseDownTime < 500) {
@@ -3717,7 +3666,7 @@ class Block {
         this._check_meter_block = null;
 
         // Special pie menus
-        if (PIEMENUS.includes(this.name)) {
+        if (this.hasCapability("discreteChoice")) {
             return true;
         }
 
@@ -3765,13 +3714,11 @@ class Block {
      * @returns {boolean} - Indicates whether a pie menu should be used.
      */
     _usePieNumberC1() {
-        // Return true if this number block plugs into Connection 1 of
-        // a block that uses a pie menu. Add block names to the list
-        // below and the switch statement in the _changeLabel
-        // function.
+        // Dynamic numeric pie menus are inherited from the connected parent
+        // block via piemenuValuesC1 metadata on its protoblock.
         const cblk = this.connections[0];
 
-        if (cblk === null) {
+        if (cblk === null || cblk === undefined) {
             return false;
         }
 
@@ -3790,13 +3737,11 @@ class Block {
      * @returns {boolean} - True if the block plugs into Connection 2 of a pie menu block, false otherwise.
      */
     _usePieNumberC2() {
-        // Return true if this number block plugs into Connection 2 of
-        // a block that uses a pie menu. Add block names to the list
-        // below and the switch statement in the _changeLabel
-        // function.
+        // Dynamic numeric pie menus are inherited from the connected parent
+        // block via piemenuValuesC2 metadata on its protoblock.
         const cblk = this.connections[0];
 
-        if (cblk === null) {
+        if (cblk === null || cblk === undefined) {
             return false;
         }
 
@@ -3815,13 +3760,11 @@ class Block {
      * @returns {boolean} - True if the block plugs into Connection 3 of a pie menu block, false otherwise.
      */
     _usePieNumberC3() {
-        // Return true if this number block plugs into Connection 3 of
-        // a block that uses a pie menu. Add block names to the list
-        // below and the switch statement in the _changeLabel
-        // function.
+        // Dynamic numeric pie menus are inherited from the connected parent
+        // block via piemenuValuesC3 metadata on its protoblock.
         const cblk = this.connections[0];
 
-        if (cblk === null) {
+        if (cblk === null || cblk === undefined) {
             return false;
         }
 

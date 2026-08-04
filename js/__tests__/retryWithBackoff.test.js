@@ -239,21 +239,23 @@ describe("retryWithBackoff", () => {
 
         it("should use default delay function if none provided", async () => {
             jest.useFakeTimers();
-            const check = jest.fn().mockReturnValueOnce(false).mockReturnValueOnce(true);
+            try {
+                const check = jest.fn().mockReturnValueOnce(false).mockReturnValueOnce(true);
 
-            const promise = retryWithBackoff({
-                check,
-                onSuccess: jest.fn(),
-                initialDelay: 50
-            });
+                const promise = retryWithBackoff({
+                    check,
+                    onSuccess: jest.fn(),
+                    initialDelay: 50
+                });
 
-            // Advance timers by 50ms to resolve the default delay (50 * 2^0 = 50ms)
-            jest.advanceTimersByTime(50);
+                // Advance timers by 50ms to resolve the default delay (50 * 2^0 = 50ms)
+                jest.advanceTimersByTime(50);
 
-            await promise;
-            expect(check).toHaveBeenCalledTimes(2);
-
-            jest.useRealTimers();
+                await promise;
+                expect(check).toHaveBeenCalledTimes(2);
+            } finally {
+                jest.useRealTimers();
+            }
         });
     });
 
