@@ -115,7 +115,10 @@ class Planet {
             const hashedKey = repoName
                 ? gitData.hashedKey || localStorage.getItem("mb_git_key_" + repoName) || ""
                 : "";
-            window.parent.postMessage({ type: "MB_GIT_STATE", repoName, hashedKey }, "*");
+            window.parent.postMessage(
+                { type: "MB_GIT_STATE", repoName, hashedKey, projectId: id },
+                "*"
+            );
         } catch (e) {
             console.debug("[Planet] Could not post git state:", e);
         }
