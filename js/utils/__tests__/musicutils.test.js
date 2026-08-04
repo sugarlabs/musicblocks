@@ -119,7 +119,11 @@ const {
     PITCHES1,
     PITCHES3,
     normalizeNoteAccidentals,
-    getCurrentEDO
+    getCurrentEDO,
+    scalePatternToEDO,
+    PITCH_COLLECTIONS_EDO_OVERRIDES,
+    getModePattern,
+    generateNoteNames
 } = require("../musicutils");
 
 const DOUBLESHARP = "\ud834\udd2a";
@@ -1729,6 +1733,75 @@ describe("buildScale", () => {
             ["C", "D", "E", "F", "G", "A", "B", "C"],
             [2, 2, 1, 2, 2, 2, 1]
         ]); // Default C major scale
+    });
+});
+
+describe("scalePatternToEDO", () => {
+    const major = [2, 2, 1, 2, 2, 2, 1];
+
+    it("returns the identity for 12-EDO", () => {
+        expect(scalePatternToEDO(major, 12)).toEqual(major);
+    });
+
+    it("converts the major pattern to 19-EDO steps", () => {
+        expect(scalePatternToEDO(major, 19)).toEqual([3, 3, 2, 3, 3, 3, 2]);
+    });
+
+    it("converts the major pattern to 31-EDO steps", () => {
+        expect(scalePatternToEDO(major, 31)).toEqual([5, 5, 3, 5, 5, 5, 3]);
+    });
+
+    it("clamps steps to a minimum of 1 for small EDOs", () => {
+        expect(scalePatternToEDO(major, 5)).toEqual([1, 1, 1, 1, 1, 1, 1]);
+    });
+});
+
+describe("getModePattern", () => {
+    it("returns PITCH_COLLECTIONS_EDO_OVERRIDES when present", () => {
+        PITCH_COLLECTIONS_EDO_OVERRIDES[19] = { major: [3, 2, 3, 3, 3, 2, 3] };
+        try {
+            expect(getModePattern("major", 19)).toEqual([3, 2, 3, 3, 3, 2, 3]);
+        } finally {
+            delete PITCH_COLLECTIONS_EDO_OVERRIDES[19];
+        }
+    });
+
+    it("falls back to scalePatternToEDO conversion when no override exists", () => {
+        expect(getModePattern("minor", 19)).toEqual([3, 2, 3, 3, 2, 3, 3]);
+    });
+
+    it("keeps the 12-EDO pattern identical", () => {
+        expect(getModePattern("major", 12)).toEqual([2, 2, 1, 2, 2, 2, 1]);
+    });
+});
+
+describe("buildScale with explicit EDO", () => {
+    it.each([
+        [19, [3, 3, 2, 3, 3, 3, 2]],
+        [31, [5, 5, 3, 5, 5, 5, 3]]
+    ])("builds the C major scale in %i-EDO", (edo, expectedSteps) => {
+        const [scale, steps] = buildScale("C major", edo);
+        const names = generateNoteNames(edo);
+        expect(steps).toEqual(expectedSteps);
+        expect(steps.reduce((a, b) => a + b, 0)).toBe(edo);
+        expect(scale[0]).toBe("C");
+        expect(scale[scale.length - 1]).toBe("C");
+        expect(scale.slice(0, -1).every(name => names.includes(name))).toBe(true);
+        expect(scale.length).toBe(steps.length + 1);
+    });
+
+    it("clamps steps for 5-EDO so the scale never gets stuck", () => {
+        const [scale, steps] = buildScale("C major", 5);
+        expect(steps).toEqual([1, 1, 1, 1, 1, 1, 1]);
+        expect(scale[0]).toBe("C");
+        expect(scale.length).toBe(8);
+    });
+
+    it("keeps the 12-EDO result identical when edo is 12", () => {
+        expect(buildScale("C major", 12)).toEqual([
+            ["C", "D", "E", "F", "G", "A", "B", "C"],
+            [2, 2, 1, 2, 2, 2, 1]
+        ]);
     });
 });
 
