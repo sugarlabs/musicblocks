@@ -40,6 +40,11 @@ class GitDropdownUI {
 
             if (e.data.type === "MB_GIT_STATE") {
                 this._applyGitState(e.data.repoName || "", e.data.hashedKey || "");
+                // Persist the planet project ID so MB_OFFLINE_COMMIT can include it
+                // even after the iframe re-initialises (online-created project + go offline).
+                if (e.data.projectId) {
+                    localStorage.setItem("mbGitCurrentProjectId", e.data.projectId);
+                }
             } else if (e.data.type === "MB_NEW_PROJECT") {
                 // User confirmed New Project from inside the planet iframe.
                 // Clear all git tracking immediately — same as _afterDelete in activity.js.
@@ -48,6 +53,7 @@ class GitDropdownUI {
                 localStorage.removeItem("mbGitLastSavedHash");
                 localStorage.removeItem("mbGitCurrentSha");
                 localStorage.removeItem("mbGitCurrentDraftId");
+                localStorage.removeItem("mbGitCurrentProjectId");
                 this.clearForNewProject();
             } else if (e.data.type === "MB_SYNC_COMPLETE") {
                 // OfflineCommitManager finished pushing drafts to GitHub.
@@ -588,7 +594,10 @@ class GitDropdownUI {
         planetIframe.contentWindow.postMessage(
             {
                 type: "MB_OFFLINE_COMMIT",
-                projectId: null,
+                // Pass the project ID so Planet.js can find the right project in IndexedDB.
+                // This covers the case where the project was created online and the iframe
+                // has been re-initialised since then (CurrentProject would be null otherwise).
+                projectId: localStorage.getItem("mbGitCurrentProjectId") || null,
                 repoName,
                 hashedKey,
                 projectData,
