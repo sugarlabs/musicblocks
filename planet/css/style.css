@@ -338,13 +338,39 @@ a {
 	color: #f44337;
 }
 
-.published-cloud {
+/* badge strip — absolutely positioned row of icon badges on the card image */
+.card-badges {
 	position: absolute;
-	z-index: 100;
-	margin-left: 15px;
-	margin-top: 15px;
-	color: #fff;
+	z-index: 5;
+	top: 15px;
+	left: 22px;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 6px;
 }
+
+/* shared style for both the published-cloud and git-repo badge */
+.published-cloud,
+.git-repo-badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	color: #fff;
+	cursor: pointer;
+}
+
+/* git-branch badge icon — white Phosphor SVG */
+.git-repo-badge-icon {
+	width: 18px;
+	height: 18px;
+	/* turn the black Phosphor SVG white */
+	filter: brightness(0) invert(1);
+	display: block;
+}
+
 
 .centre-load {
 	left: calc(50% - 18px);
