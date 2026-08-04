@@ -1372,3 +1372,7 @@ if (typeof module !== "undefined" && module.exports) {
         announceToScreenReader
     };
 }
+
+if (typeof window !== "undefined") {
+    window._ = _;
+}
