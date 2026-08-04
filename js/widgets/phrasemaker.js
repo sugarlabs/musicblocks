@@ -3501,37 +3501,45 @@ class PhraseMaker {
      * @private
      */
     _addRhythmBlock(value, times) {
-        let RHYTHMOBJ = [];
-        value = this._deps.toFraction(value);
-        const topOfClamp = this.activity.blocks.blockList[this.blockNo].connections[1];
-        const bottomOfClamp = this.activity.blocks.findBottomBlock(topOfClamp);
-        if (this.activity.blocks.blockList[bottomOfClamp].name === "vspace") {
-            RHYTHMOBJ = [
-                [0, ["rhythm2", {}], 0, 0, [null, 1, 2, 5]],
-                [1, ["number", { value: times }], 0, 0, [0]],
-                [2, ["divide", {}], 0, 0, [0, 3, 4]],
-                [3, ["number", { value: value[1] }], 0, 0, [2]],
-                [4, ["number", { value: value[0] }], 0, 0, [2]],
-                [5, ["vspace", {}], 0, 0, [0, null]]
-            ];
-        } else {
-            RHYTHMOBJ = [
-                [0, "vspace", 0, 0, [null, 1]],
-                [1, ["rhythm2", {}], 0, 0, [0, 2, 3, 6]],
-                [2, ["number", { value: times }], 0, 0, [1]],
-                [3, ["divide", {}], 0, 0, [1, 4, 5]],
-                [4, ["number", { value: value[1] }], 0, 0, [3]],
-                [5, ["number", { value: value[0] }], 0, 0, [3]],
-                [6, ["vspace", {}], 0, 0, [1, null]]
-            ];
-        }
-        this.activity.blocks.loadNewBlocks(RHYTHMOBJ);
-        if (this.activity.blocks.blockList[bottomOfClamp].name === "vspace") {
-            setTimeout(() => this.blockConnection(6, bottomOfClamp), 500);
-        } else {
-            setTimeout(() => this.blockConnection(7, bottomOfClamp), 500);
-        }
-        this.activity.refreshCanvas();
+        return new Promise(resolve => {
+            let RHYTHMOBJ = [];
+            value = this._deps.toFraction(value);
+            const topOfClamp = this.activity.blocks.blockList[this.blockNo].connections[1];
+            const bottomOfClamp = this.activity.blocks.findBottomBlock(topOfClamp);
+            if (this.activity.blocks.blockList[bottomOfClamp].name === "vspace") {
+                RHYTHMOBJ = [
+                    [0, ["rhythm2", {}], 0, 0, [null, 1, 2, 5]],
+                    [1, ["number", { value: times }], 0, 0, [0]],
+                    [2, ["divide", {}], 0, 0, [0, 3, 4]],
+                    [3, ["number", { value: value[1] }], 0, 0, [2]],
+                    [4, ["number", { value: value[0] }], 0, 0, [2]],
+                    [5, ["vspace", {}], 0, 0, [0, null]]
+                ];
+            } else {
+                RHYTHMOBJ = [
+                    [0, "vspace", 0, 0, [null, 1]],
+                    [1, ["rhythm2", {}], 0, 0, [0, 2, 3, 6]],
+                    [2, ["number", { value: times }], 0, 0, [1]],
+                    [3, ["divide", {}], 0, 0, [1, 4, 5]],
+                    [4, ["number", { value: value[1] }], 0, 0, [3]],
+                    [5, ["number", { value: value[0] }], 0, 0, [3]],
+                    [6, ["vspace", {}], 0, 0, [1, null]]
+                ];
+            }
+            this.activity.blocks.loadNewBlocks(RHYTHMOBJ);
+            if (this.activity.blocks.blockList[bottomOfClamp].name === "vspace") {
+                setTimeout(() => {
+                    this.blockConnection(6, bottomOfClamp);
+                    resolve();
+                }, 500);
+            } else {
+                setTimeout(() => {
+                    this.blockConnection(7, bottomOfClamp);
+                    resolve();
+                }, 500);
+            }
+            this.activity.refreshCanvas();
+        });
     }
 
     /**
@@ -3614,7 +3622,7 @@ class PhraseMaker {
      * This method updates, adds, or deletes rhythm notes blocks as necessary to match the adjusted notes.
      * @private
      */
-    _readjustNotesBlocks() {
+    async _readjustNotesBlocks() {
         let notesBlockMap = this._mapNotesBlocks("rhythm2");
         const adjustedNotes = this.recalculateBlocks();
 
@@ -3631,11 +3639,12 @@ class PhraseMaker {
         }
 
         for (let i = 0; i < n; i++) {
-            this._addRhythmBlock(
+            await this._addRhythmBlock(
                 adjustedNotes[notesBlockMap.length + i][0],
                 adjustedNotes[notesBlockMap.length + i][1]
             );
         }
+
         for (let i = n; i < 0; i++) {
             this._deleteRhythmBlock(notesBlockMap[notesBlockMap.length + i]);
         }
@@ -3695,7 +3704,7 @@ class PhraseMaker {
      * @param {number} notesToAdd - The number of notes to add to the divided section.
      * @private
      */
-    _addNotes(noteToDivide, notesToAdd) {
+    async _addNotes(noteToDivide, notesToAdd) {
         noteToDivide = parseInt(noteToDivide, 10);
         this._blockMapHelper = [];
         for (let i = 0; i <= noteToDivide; i++) {
@@ -3709,7 +3718,7 @@ class PhraseMaker {
                 .slice(0, noteToDivide + i + 1)
                 .concat(this.activity.logo.tupletRhythms.slice(noteToDivide + i));
         }
-        this._readjustNotesBlocks();
+        await this._readjustNotesBlocks();
         this._syncMarkedBlocks();
         this._restartGrid.call(this);
     }
@@ -3719,7 +3728,7 @@ class PhraseMaker {
      * @param {number} noteToDivide - The index of the note to delete.
      * @private
      */
-    _deleteNotes(noteToDivide) {
+    async _deleteNotes(noteToDivide) {
         if (this.activity.logo.tupletRhythms.length === 1) {
             return;
         }
@@ -3734,7 +3743,7 @@ class PhraseMaker {
         this.activity.logo.tupletRhythms = this.activity.logo.tupletRhythms
             .slice(0, noteToDivide)
             .concat(this.activity.logo.tupletRhythms.slice(noteToDivide + 1));
-        this._readjustNotesBlocks();
+        await this._readjustNotesBlocks();
         this._syncMarkedBlocks();
         this._restartGrid.call(this);
     }
@@ -3745,7 +3754,7 @@ class PhraseMaker {
      * @param {number} divideNoteBy - The factor to divide the note by.
      * @private
      */
-    _divideNotes(noteToDivide, divideNoteBy) {
+    async _divideNotes(noteToDivide, divideNoteBy) {
         noteToDivide = parseInt(noteToDivide, 10);
         this._blockMapHelper = [];
         for (let i = 0; i < noteToDivide; i++) {
@@ -3777,7 +3786,7 @@ class PhraseMaker {
             j++;
             this._blockMapHelper.push([this._colBlocks[i], [j]]);
         }
-        this._readjustNotesBlocks();
+        await this._readjustNotesBlocks();
         this._syncMarkedBlocks();
         this._restartGrid.call(this);
     }
@@ -3788,7 +3797,7 @@ class PhraseMaker {
      * @param {Object} mouseUpCell - The ending cell of the selection.
      * @private
      */
-    _tieNotes(mouseDownCell, mouseUpCell) {
+    async _tieNotes(mouseDownCell, mouseUpCell) {
         let downCellId = null;
         let upCellId = null;
         if (mouseDownCell.id < mouseUpCell.id) {
@@ -3830,7 +3839,7 @@ class PhraseMaker {
             ])
             .concat(this.activity.logo.tupletRhythms.slice(parseInt(upCellId, 10) + 1));
 
-        this._readjustNotesBlocks();
+        await this._readjustNotesBlocks();
         this._syncMarkedBlocks();
         this._restartGrid.call(this);
     }
