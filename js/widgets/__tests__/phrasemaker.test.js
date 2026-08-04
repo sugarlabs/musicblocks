@@ -699,7 +699,7 @@ describe("PhraseMaker Widget", () => {
 
         expect(phraseMaker.activity.blocks.sendStackToTrash).toHaveBeenCalled();
     });
-    test("_addRhythmBlock loads new rhythm blocks safely", () => {
+    test("_addRhythmBlock loads new rhythm blocks safely", async () => {
         phraseMaker.blockNo = 0;
 
         phraseMaker._deps.toFraction = jest.fn(v => v);
@@ -715,21 +715,59 @@ describe("PhraseMaker Widget", () => {
             refreshCanvas: jest.fn()
         };
 
-        phraseMaker._addRhythmBlock([1, 4], 2);
+        await phraseMaker._addRhythmBlock([1, 4], 2);
 
         expect(phraseMaker.activity.blocks.loadNewBlocks).toHaveBeenCalled();
         expect(phraseMaker.blockConnection).toHaveBeenCalled();
     });
-    test("_readjustNotesBlocks updates and adds blocks", () => {
+    test("_addRhythmBlock loads new rhythm blocks safely (non-vspace)", async () => {
+        phraseMaker.blockNo = 0;
+
+        phraseMaker._deps.toFraction = jest.fn(v => v);
+        phraseMaker.blockConnection = jest.fn();
+        jest.spyOn(global, "setTimeout").mockImplementation(fn => fn());
+
+        phraseMaker.activity = {
+            blocks: {
+                blockList: [{ connections: [null, 1] }, { name: "action", connections: [] }],
+                findBottomBlock: jest.fn(() => 1),
+                loadNewBlocks: jest.fn()
+            },
+            refreshCanvas: jest.fn()
+        };
+
+        await phraseMaker._addRhythmBlock([1, 4], 2);
+
+        expect(phraseMaker.activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        expect(phraseMaker.blockConnection).toHaveBeenCalledWith(7, 1);
+    });
+    test("_readjustNotesBlocks awaits sequentially to prevent concurrency regressions", async () => {
         phraseMaker._mapNotesBlocks = jest.fn(() => [0]);
-        phraseMaker.recalculateBlocks = jest.fn(() => [[[1, 4], 2]]);
+        // Provide multiple blocks to recalculate to test loop concurrency
+        phraseMaker.recalculateBlocks = jest.fn(() => [
+            [[1, 4], 2],
+            [[1, 8], 1],
+            [[1, 4], 2]
+        ]);
         phraseMaker._update = jest.fn();
-        phraseMaker._addRhythmBlock = jest.fn();
         phraseMaker._deleteRhythmBlock = jest.fn();
 
-        phraseMaker._readjustNotesBlocks();
+        let activeCalls = 0;
+        let maxConcurrentCalls = 0;
+        phraseMaker._addRhythmBlock = jest.fn(async () => {
+            activeCalls++;
+            maxConcurrentCalls = Math.max(maxConcurrentCalls, activeCalls);
+            // Yield back to the microtask queue to allow other promises to run if they were started concurrently
+            await Promise.resolve();
+            activeCalls--;
+        });
+
+        await phraseMaker._readjustNotesBlocks();
 
         expect(phraseMaker._update).toHaveBeenCalled();
+        expect(phraseMaker._addRhythmBlock).toHaveBeenCalledTimes(2);
+        // Ensures `await` is executed sequentially; if Promise.all were used, this would be 2
+        expect(maxConcurrentCalls).toBe(1);
     });
     test("_restartGrid regenerates grid", () => {
         phraseMaker.init = jest.fn();
@@ -772,7 +810,7 @@ describe("PhraseMaker Widget", () => {
 
         expect(phraseMaker._setNotes).toHaveBeenCalled();
     });
-    test("_divideNotes modifies tupletRhythms", () => {
+    test("_divideNotes modifies tupletRhythms", async () => {
         phraseMaker._readjustNotesBlocks = jest.fn();
         phraseMaker._syncMarkedBlocks = jest.fn();
         phraseMaker._restartGrid = jest.fn();
@@ -785,7 +823,7 @@ describe("PhraseMaker Widget", () => {
 
         phraseMaker._colBlocks = [[0, 0]];
 
-        phraseMaker._divideNotes(0, 2);
+        await phraseMaker._divideNotes(0, 2);
 
         expect(phraseMaker._readjustNotesBlocks).toHaveBeenCalled();
     });
@@ -836,7 +874,7 @@ describe("PhraseMaker Widget", () => {
 
         expect(phraseMaker._update).toHaveBeenCalled();
     });
-    test("_tieNotes merges note durations", () => {
+    test("_tieNotes merges note durations", async () => {
         phraseMaker._readjustNotesBlocks = jest.fn();
         phraseMaker._syncMarkedBlocks = jest.fn();
         phraseMaker._restartGrid = jest.fn();
@@ -857,7 +895,7 @@ describe("PhraseMaker Widget", () => {
             }
         };
 
-        phraseMaker._tieNotes({ id: 0 }, { id: 2 });
+        await phraseMaker._tieNotes({ id: 0 }, { id: 2 });
 
         expect(phraseMaker._readjustNotesBlocks).toHaveBeenCalled();
     });
