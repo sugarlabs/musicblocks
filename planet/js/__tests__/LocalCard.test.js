@@ -154,6 +154,15 @@ describe("LocalCard", () => {
             expect(img.src).toContain("mbgraphic.png");
         });
 
+        it("should use the placeholder MB image when IsMusicBlocks is boolean true (regression: true !== 1)", () => {
+            planet.IsMusicBlocks = true;
+            const card = prepareCard("p2b", { ProjectImage: null });
+            card.render();
+
+            const img = document.querySelector("#local-projects img.project-card-image");
+            expect(img.src).toContain("mbgraphic.png");
+        });
+
         it("should use the placeholder TB image when IsMusicBlocks is not 1", () => {
             planet.IsMusicBlocks = 0;
             const card = prepareCard("p3", { ProjectImage: null });
