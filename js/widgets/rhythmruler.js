@@ -1014,7 +1014,13 @@ class RhythmRuler {
                     }
                 }
 
-                await this.activity.logo.synth.loadSynth(0, drum);
+                // A single failed drum load must not reject the whole preload,
+                // which would block all playback.
+                try {
+                    await this.activity.logo.synth.loadSynth(0, drum);
+                } catch (error) {
+                    console.debug("Failed to preload " + drum + " synth: ", error);
+                }
             })
         );
 
@@ -2089,7 +2095,16 @@ class RhythmRuler {
         }
 
         if (this._drumLoadPromise) {
-            await this._drumLoadPromise;
+            try {
+                await this._drumLoadPromise;
+            } catch (error) {
+                console.debug("Failed to preload drum synths: ", error);
+            }
+        }
+
+        // Do not resume if the user paused or stopped while the synths were loading.
+        if (!this._playingAll) {
+            return;
         }
         this._playAll();
     }
@@ -2123,7 +2138,16 @@ class RhythmRuler {
      */
     async _playOne() {
         if (this._drumLoadPromise) {
-            await this._drumLoadPromise;
+            try {
+                await this._drumLoadPromise;
+            } catch (error) {
+                console.debug("Failed to preload drum synths: ", error);
+            }
+        }
+
+        // Do not start if the user stopped playback while the synths were loading.
+        if (!this._playingOne) {
+            return;
         }
         this.activity.logo.synth.stop();
         this.activity.logo.resetSynth(0);
