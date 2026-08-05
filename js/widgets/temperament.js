@@ -767,11 +767,11 @@ function TemperamentWidget() {
     };
 
     /** Hides and removes a wheelnav wheel if its container div is present in the DOM. */
-    this._removeWheelIfPresent = function (divId, wheelProp) {
+    const removeWheelIfPresent = (divId, wheel) => {
         const el = docById(divId);
         if (el !== null) {
             el.style.display = "none";
-            this[wheelProp].removeWheel();
+            wheel.removeWheel();
         }
     };
 
@@ -783,7 +783,7 @@ function TemperamentWidget() {
         this.circleIsVisible = true;
         this.toggleNotesButton();
         temperamentTableDiv.textContent = "";
-        this._removeWheelIfPresent("wheelDiv2", "notesCircle");
+        removeWheelIfPresent("wheelDiv2", this.notesCircle);
 
         const notesGraph = document.createElement("table");
         notesGraph.id = "notesGraph";
@@ -981,7 +981,7 @@ function TemperamentWidget() {
         this._logo.synth.setMasterVolume(0);
         this._logo.synth.stop();
         const that = this;
-        this._removeWheelIfPresent("wheelDiv2", "notesCircle");
+        removeWheelIfPresent("wheelDiv2", this.notesCircle);
         temperamentTableDiv.textContent = "";
         const editOctaveTable = document.createElement("table");
         editOctaveTable.id = "editOctave";
@@ -1053,11 +1053,11 @@ function TemperamentWidget() {
     };
 
     /** Recolors a preview wheelnav wheel's slices back to the default background. */
-    this._paintPreviewWheelColors = function (pitchNumber) {
+    const paintPreviewWheelColors = (navObj, pitchNumber) => {
         for (let i = 0; i < pitchNumber; i++) {
-            setNavItemColor(this.notesCircle, i, platformColor.selectorBackground || "#e0e0e0");
+            setNavItemColor(navObj, i, platformColor.selectorBackground || "#e0e0e0");
         }
-        this.notesCircle.refreshWheel();
+        navObj.refreshWheel();
     };
 
     /**
@@ -1199,7 +1199,7 @@ function TemperamentWidget() {
                 wheelDiv2.className = "wheelNav";
                 docById("userEdit").appendChild(wheelDiv2);
                 this.createMainWheel(this.tempRatios, pitchNumber);
-                this._paintPreviewWheelColors(pitchNumber);
+                paintPreviewWheelColors(this.notesCircle, pitchNumber);
                 docById("userEdit").style.paddingLeft = "0px";
                 addDivision(true);
                 divAppend.style.marginTop = docById("wheelDiv2").style.height;
@@ -1363,7 +1363,7 @@ function TemperamentWidget() {
                 wheelDiv2.className = "wheelNav";
                 docById("userEdit").appendChild(wheelDiv2);
                 that.createMainWheel(that.tempRatios, pitchNumber);
-                that._paintPreviewWheelColors(pitchNumber);
+                paintPreviewWheelColors(that.notesCircle, pitchNumber);
                 docById("userEdit").style.paddingLeft = "0px";
                 addButtons(true);
                 divAppend.style.marginTop = docById("wheelDiv2").style.height;
@@ -2521,9 +2521,9 @@ function TemperamentWidget() {
             that._playing = false;
             that._logo.synth.stop();
             that._logo.synth.setMasterVolume(last(Singer.masterVolume));
-            that._removeWheelIfPresent("wheelDiv2", "notesCircle");
-            that._removeWheelIfPresent("wheelDiv3", "wheel");
-            that._removeWheelIfPresent("wheelDiv4", "wheel1");
+            removeWheelIfPresent("wheelDiv2", that.notesCircle);
+            removeWheelIfPresent("wheelDiv3", that.wheel);
+            removeWheelIfPresent("wheelDiv4", that.wheel1);
 
             this.destroy();
         };
