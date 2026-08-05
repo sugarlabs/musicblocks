@@ -1195,158 +1195,51 @@ describe("PhraseMaker Widget", () => {
         phraseMaker.lyricsON = true;
         phraseMaker._save();
 
-        // Pin down [blockType, connections] for every pushed block, in order,
-        // for both runs. This locks in the exact lastConnection wiring
-        // produced by the (currently duplicated) null-vs-thisBlock+offset
-        // guard, so a later extraction of that guard into a helper can be
-        // verified byte-for-byte.
-        const toSignature = newStack =>
-            newStack.map(entry => [Array.isArray(entry[1]) ? entry[1][0] : entry[1], entry[4]]);
+        // Narrow, non-brittle signature: for every block whose connections
+        // array is wired up by _computeLastConnection (hertz/playdrum/arc/
+        // forward/pitch — the 6 call sites the helper replaced), record only
+        // [blockType, lastConnection]. This pins down exactly what the
+        // extraction must preserve without hardcoding the surrounding
+        // newnote/vspace/divide/number scaffolding, which is unrelated to
+        // this refactor and would make the test brittle against unrelated
+        // future changes to _save()'s block-building logic.
+        const LAST_CONNECTION_TYPES = ["hertz", "playdrum", "arc", "forward", "pitch"];
+        const toLastConnectionSignature = newStack =>
+            newStack
+                .filter(entry => LAST_CONNECTION_TYPES.includes(entry[1]))
+                .map(entry => [entry[1], entry[4][entry[4].length - 1]]);
 
         const [lyricsOffCall, lyricsOnCall] = phraseMaker.activity.blocks.loadNewBlocks.mock.calls;
-        const signatureLyricsOff = toSignature(lyricsOffCall[0]);
-        const signatureLyricsOn = toSignature(lyricsOnCall[0]);
 
-        // lyricsON = false, every note[0] is length 1: the guard's
-        // `(note[0].length === 1 || ...)` half is always true, so
-        // lastConnection is null for every pitch/drum/graphics block.
-        expect(signatureLyricsOff).toEqual([
-            ["action", [null, 1, 2, null]],
-            ["text", [0]],
-            ["newnote", [0, 4, 3, 9]],
-            ["vspace", [2, 7]],
-            ["divide", [2, 5, 6]],
-            ["number", [4]],
-            ["number", [4]],
-            ["hertz", [3, 8, null]],
-            ["number", [7]],
-            ["newnote", [2, 11, 10, 16]],
-            ["vspace", [9, 14]],
-            ["divide", [9, 12, 13]],
-            ["number", [11]],
-            ["number", [11]],
-            ["playdrum", [10, 15, null]],
-            ["drumname", [14]],
-            ["newnote", [9, 18, 17, 23]],
-            ["vspace", [16, 21]],
-            ["divide", [16, 19, 20]],
-            ["number", [18]],
-            ["number", [18]],
-            ["playdrum", [17, 22, null]],
-            ["text", [21]],
-            ["newnote", [16, 25, 24, 31]],
-            ["vspace", [23, 28]],
-            ["divide", [23, 26, 27]],
-            ["number", [25]],
-            ["number", [25]],
-            ["arc", [24, 29, 30, null]],
-            ["number", [28]],
-            ["number", [28]],
-            ["newnote", [23, 33, 32, 38]],
-            ["vspace", [31, 36]],
-            ["divide", [31, 34, 35]],
-            ["number", [33]],
-            ["number", [33]],
-            ["forward", [32, 37, null]],
-            ["number", [36]],
-            ["newnote", [31, 40, 39, 46]],
-            ["vspace", [38, 43]],
-            ["divide", [38, 41, 42]],
-            ["number", [40]],
-            ["number", [40]],
-            ["pitch", [39, 44, 45, null]],
-            ["solfege", [43]],
-            ["number", [43]],
-            ["newnote", [38, 48, 47, null]],
-            ["vspace", [46, 51]],
-            ["divide", [46, 49, 50]],
-            ["number", [48]],
-            ["number", [48]],
-            ["pitch", [47, 52, 53, 54]],
-            ["solfege", [51]],
-            ["number", [51]],
-            ["pitch", [51, 55, 56, null]],
-            ["solfege", [54]],
-            ["number", [54]]
+        // lyricsON = false, every note[0] is length 1 except the trailing
+        // multi-pitch note: the guard's `(note[0].length === 1 || ...)` half
+        // is true for every single-length note, so lastConnection is null
+        // there; the multi-pitch note's non-last pitch (C4) still resolves
+        // to thisBlock+3 via the `j === note[0].length - 1` half being false.
+        expect(toLastConnectionSignature(lyricsOffCall[0])).toEqual([
+            ["hertz", null],
+            ["playdrum", null], // kick
+            ["playdrum", null], // http url
+            ["arc", null],
+            ["forward", null],
+            ["pitch", null], // single-length E4
+            ["pitch", 54], // multi-pitch C4, j=0, not last -> thisBlock(51)+3
+            ["pitch", null] // multi-pitch G4, j=1, last
         ]);
 
         // lyricsON = true: the guard's `!this.lyricsON` half is always
         // false, so lastConnection is thisBlock+offset for every block,
         // regardless of position — pinning down each type's exact offset
-        // (hertz/playdrum/playdrum-url/1-arg-graphics: +2,
-        // 2-arg-graphics/pitch: +3).
-        expect(signatureLyricsOn).toEqual([
-            ["action", [null, 1, 2, null]],
-            ["text", [0]],
-            ["newnote", [0, 4, 3, 11]],
-            ["vspace", [2, 7]],
-            ["divide", [2, 5, 6]],
-            ["number", [4]],
-            ["number", [4]],
-            ["hertz", [3, 8, 9]],
-            ["number", [7]],
-            ["print", [7, 10, null]],
-            ["text", [9]],
-            ["newnote", [2, 13, 12, 20]],
-            ["vspace", [11, 16]],
-            ["divide", [11, 14, 15]],
-            ["number", [13]],
-            ["number", [13]],
-            ["playdrum", [12, 17, 18]],
-            ["drumname", [16]],
-            ["print", [16, 19, null]],
-            ["text", [18]],
-            ["newnote", [11, 22, 21, 29]],
-            ["vspace", [20, 25]],
-            ["divide", [20, 23, 24]],
-            ["number", [22]],
-            ["number", [22]],
-            ["playdrum", [21, 26, 27]],
-            ["text", [25]],
-            ["print", [25, 28, null]],
-            ["text", [27]],
-            ["newnote", [20, 31, 30, 39]],
-            ["vspace", [29, 34]],
-            ["divide", [29, 32, 33]],
-            ["number", [31]],
-            ["number", [31]],
-            ["arc", [30, 35, 36, 37]],
-            ["number", [34]],
-            ["number", [34]],
-            ["print", [34, 38, null]],
-            ["text", [37]],
-            ["newnote", [29, 41, 40, 48]],
-            ["vspace", [39, 44]],
-            ["divide", [39, 42, 43]],
-            ["number", [41]],
-            ["number", [41]],
-            ["forward", [40, 45, 46]],
-            ["number", [44]],
-            ["print", [44, 47, null]],
-            ["text", [46]],
-            ["newnote", [39, 50, 49, 58]],
-            ["vspace", [48, 53]],
-            ["divide", [48, 51, 52]],
-            ["number", [50]],
-            ["number", [50]],
-            ["pitch", [49, 54, 55, 56]],
-            ["solfege", [53]],
-            ["number", [53]],
-            ["print", [53, 57, null]],
-            ["text", [56]],
-            ["newnote", [48, 60, 59, null]],
-            ["vspace", [58, 63]],
-            ["divide", [58, 61, 62]],
-            ["number", [60]],
-            ["number", [60]],
-            ["pitch", [59, 64, 65, 66]],
-            ["solfege", [63]],
-            ["number", [63]],
-            ["pitch", [63, 67, 68, 69]],
-            ["solfege", [66]],
-            ["number", [66]],
-            ["print", [66, 70, null]],
-            ["text", [69]]
+        // (hertz/playdrum/forward: +2, arc/pitch: +3).
+        expect(toLastConnectionSignature(lyricsOnCall[0])).toEqual([
+            ["hertz", 9], // thisBlock(7)+2
+            ["playdrum", 18], // kick, thisBlock(16)+2
+            ["playdrum", 27], // http url, thisBlock(25)+2
+            ["arc", 37], // thisBlock(34)+3
+            ["forward", 46], // thisBlock(44)+2
+            ["pitch", 56], // single-length E4, thisBlock(53)+3
+            ["pitch", 66], // multi-pitch C4, j=0, thisBlock(63)+3
+            ["pitch", 69] // multi-pitch G4, j=1, thisBlock(66)+3
         ]);
 
         expect(phraseMaker.activity.blocks.loadNewBlocks).toHaveBeenCalledTimes(2);
