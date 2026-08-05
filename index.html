@@ -110,6 +110,12 @@
 
         <!-- <script src="lib/mespeak.js"></script> -->
 
+        <!-- Release config: resolves Turtle/Music mode from URL/hostname and seeds
+     window._THIS_IS_*_ globals. Must load first, synchronously, before
+     loader.js and activity.js read those globals. -->
+        <script src="js/releaseconfig.js"></script>
+
+
         <script src="dist/vendor.min.js"></script>
         <link
             rel="preload"
@@ -283,23 +289,27 @@
             <div class="popupMsg" id="printText" tabindex="-1" aria-live="polite" role="status">
                 <div class="contentWrapper">
                     <span id="printTextContent"></span>
-                    <img
+                    <button
                         class="msgCloseIcon"
                         onclick="hidePrintText()"
-                        src="images/close.svg"
-                        alt="Close"
-                    />
+                        aria-label="Close notification"
+                        tabindex="0"
+                    >
+                        <img src="images/close.svg" alt="" aria-hidden="true" />
+                    </button>
                 </div>
             </div>
             <div class="popupMsg" id="errorText" tabindex="-1" aria-live="assertive" role="alert">
                 <div class="contentWrapper">
                     <span id="errorTextContent"></span>
-                    <img
+                    <button
                         class="msgCloseIcon"
                         onclick="hideErrorText()"
-                        src="images/close.svg"
-                        alt="Close"
-                    />
+                        aria-label="Close error message"
+                        tabindex="0"
+                    >
+                        <img src="images/close.svg" alt="" aria-hidden="true" />
+                    </button>
                 </div>
             </div>
             <div id="hideContents" style="display: none" tabindex="-1">
@@ -481,7 +491,6 @@
                             tabindex="-1"
                         />
                         <ul class="matches"></ul>
-                        <input onkeypress="doPaste()" type="submit" value="" tabindex="-1" />
                     </div>
 
                     <div id="myProgress" tabindex="-1">
@@ -931,6 +940,9 @@
                         <li><a id="enUK" role="button" tabindex="0"></a></li>
                         <li><a id="es" role="button" tabindex="0"></a></li>
                         <li><a id="pt" role="button" tabindex="0"></a></li>
+                        <li><a id="fr" role="button" tabindex="0"></a></li>
+                        <li><a id="it" role="button" tabindex="0"></a></li>
+                        <li><a id="de" role="button" tabindex="0"></a></li>
                         <li><a id="ja" role="button" tabindex="0"></a></li>
                         <li><a id="kana" role="button" tabindex="0"></a></li>
                         <li><a id="ko" role="button" tabindex="0"></a></li>
@@ -941,6 +953,7 @@
                         <li><a id="quz" role="button" tabindex="0"></a></li>
                         <li><a id="gug" role="button" tabindex="0"></a></li>
                         <li><a id="hi" role="button" tabindex="0"></a></li>
+                        <li><a id="ta" role="button" tabindex="0"></a></li>
                         <li><a id="te" role="button" tabindex="0"></a></li>
                         <li><a id="ibo" role="button" tabindex="0"></a></li>
                         <li><a id="ar" role="button" tabindex="0"></a></li>
@@ -1351,7 +1364,7 @@
                     if (!persistentNotification) {
                         persistentNotification = document.createElement("div");
                         persistentNotification.id = "persistentNotification";
-                        persistentNotification.innerHTML =
+                        persistentNotification.textContent =
                             "Play only mode enabled. For full Music Blocks experience, use a larger display.";
                         document.body.appendChild(persistentNotification);
                     }

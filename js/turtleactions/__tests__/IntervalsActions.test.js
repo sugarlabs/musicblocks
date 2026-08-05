@@ -31,11 +31,18 @@ describe("setupIntervalsActions", () => {
 
         // Mock temperament globals only for this test
         global.isCustomTemperament = jest.fn(() => false);
+        global.isTrueEDO = jest.fn(() => true);
         global.TEMPERAMENT = { equal: { pitchNumber: 12 } };
+
+        // Set up test-specific mocks for SEMITONETOINTERVALMAP and ALLNOTESTEP
+        global.SEMITONETOINTERVALMAP = Array(13)
+            .fill(null)
+            .map(() => Array(7).fill("perfect"));
 
         global.MUSICALMODES = {
             major: [2, 2, 1, 2, 2, 2, 1],
-            minor: [2, 1, 2, 2, 1, 2, 2]
+            minor: [2, 1, 2, 2, 1, 2, 2],
+            custom: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         };
 
         global.ALLNOTESTEP = {
@@ -61,11 +68,6 @@ describe("setupIntervalsActions", () => {
             "B": 12,
             "B#": 0
         };
-        global.NOTENAMES = ["C", "D", "E", "F", "G", "A", "B"];
-
-        global.SEMITONETOINTERVALMAP = Array(13)
-            .fill(null)
-            .map(() => Array(7).fill("perfect"));
 
         global.GetNotesForInterval = jest.fn(() => ({
             firstNote: "C",
@@ -75,6 +77,7 @@ describe("setupIntervalsActions", () => {
 
         global.getNote = jest.fn(() => ["C"]);
         global.getModeLength = jest.fn(() => 7);
+        global.getCurrentEDO = jest.fn(() => 12);
 
         global.MusicBlocks = { isRun: false };
         global.Mouse = { getMouseFromTurtle: jest.fn() };
@@ -127,6 +130,7 @@ describe("setupIntervalsActions", () => {
     afterEach(() => {
         // Clean up globals to prevent test pollution
         delete global.isCustomTemperament;
+        delete global.isTrueEDO;
         delete global.TEMPERAMENT;
     });
 
@@ -518,5 +522,48 @@ describe("setupIntervalsActions", () => {
         Singer.IntervalsActions.setTemperament("equal", "C", 4);
         Singer.IntervalsActions.setTemperament("pythagorean", "C", 4);
         expect(logo.synth.changeInTemperament).toBe(true);
+    });
+
+    describe("getTemperamentLength", () => {
+        beforeEach(() => {
+            delete global.TEMPERAMENT.custom_edo19;
+            global.TEMPERAMENT = {
+                "equal": { pitchNumber: 12 },
+                "equal19": { pitchNumber: 19 },
+                "equal31": { pitchNumber: 31 },
+                "just intonation": { pitchNumber: 12 },
+                "1/3 comma meantone": { pitchNumber: 19 }
+            };
+        });
+
+        test("returns 12 for equal temperament", () => {
+            logo.synth.inTemperament = "equal";
+            expect(Singer.IntervalsActions.getTemperamentLength()).toBe(12);
+        });
+
+        test("returns 19 for equal19", () => {
+            logo.synth.inTemperament = "equal19";
+            expect(Singer.IntervalsActions.getTemperamentLength()).toBe(19);
+        });
+
+        test("returns 31 for equal31", () => {
+            logo.synth.inTemperament = "equal31";
+            expect(Singer.IntervalsActions.getTemperamentLength()).toBe(31);
+        });
+
+        test("returns 12 for just intonation", () => {
+            logo.synth.inTemperament = "just intonation";
+            expect(Singer.IntervalsActions.getTemperamentLength()).toBe(12);
+        });
+
+        test("returns 19 for 1/3 comma meantone", () => {
+            logo.synth.inTemperament = "1/3 comma meantone";
+            expect(Singer.IntervalsActions.getTemperamentLength()).toBe(19);
+        });
+
+        test("falls back to 12 when no temperament is set", () => {
+            logo.synth.inTemperament = undefined;
+            expect(Singer.IntervalsActions.getTemperamentLength()).toBe(12);
+        });
     });
 });

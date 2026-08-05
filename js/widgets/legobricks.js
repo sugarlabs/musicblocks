@@ -8,6 +8,9 @@
    _, piemenuVoices, docById, platformColor, noteToFrequency
 */
 
+/** AMD module dependencies for lazy loading. */
+LegoWidget.dependencies = ["widgets/legobricks"];
+
 /**
  * Represents a LEGO Bricks Widget with Phrase Maker functionality.
  * @constructor
@@ -17,6 +20,50 @@ function LegoWidget() {
     const WIDGETWIDTH = 1200;
     const WIDGETHEIGHT = 700;
     const ROW_HEIGHT = 40; // Fixed row height for both matrix and image canvas
+
+    // Hex codes for the color families used by the eye dropper and color
+    // detection visualization.
+    const COLOR_HEX_MAP = {
+        red: "#FF0000",
+        orange: "#FFA500",
+        yellow: "#FFFF00",
+        green: "#00FF00",
+        blue: "#0000FF",
+        purple: "#800080",
+        pink: "#FFC0CB",
+        cyan: "#00FFFF",
+        magenta: "#FF00FF",
+        white: "#FFFFFF",
+        black: "#000000",
+        gray: "#808080"
+    };
+
+    /**
+     * Creates a thin vertical separator span used between toolbar control groups.
+     * @returns {HTMLElement} The separator element.
+     */
+    const createControlSeparator = () => {
+        const separator = document.createElement("span");
+        separator.textContent = "|";
+        separator.style.margin = "0 8px";
+        separator.style.color = "#888";
+        return separator;
+    };
+
+    /**
+     * Creates an absolutely-positioned, draggable-ready wrapper div for
+     * displaying an uploaded image or webcam feed.
+     * @returns {HTMLElement} The wrapper element.
+     */
+    const createImageWrapper = () => {
+        const wrapper = document.createElement("div");
+        wrapper.style.position = "absolute";
+        wrapper.style.left = "0px";
+        wrapper.style.top = "0px";
+        wrapper.style.transformOrigin = "top left";
+        wrapper.style.cursor = "grab";
+        return wrapper;
+    };
 
     // Matrix data structure with pitch mappings
     this.matrixData = {
@@ -256,17 +303,11 @@ function LegoWidget() {
     };
 
     /**
-     * Initializes the LEGO Widget with Phrase Maker functionality.
-     * @param {object} activity - The activity object.
-     * @returns {void}
+     * Creates the widget window and wires up its close/maximize behavior.
+     * @private
+     * @returns {object} The created widget window.
      */
-    this.init = function (activity) {
-        this.activity = activity;
-        this.running = true;
-
-        // Initialize audio synthesizer
-        this._initAudio();
-
+    this._createWidgetWindow = function () {
         const widgetWindow = window.widgetWindows.windowFor(this, "LEGO BRICKS");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
@@ -285,7 +326,16 @@ function LegoWidget() {
 
         widgetWindow.onmaximize = this._scale.bind(this);
 
-        // Add control buttons in left sidebar
+        return widgetWindow;
+    };
+
+    /**
+     * Adds the control buttons to the widget window's sidebar.
+     * @private
+     * @param {object} widgetWindow - The widget window to add buttons to.
+     * @returns {void}
+     */
+    this._createToolbarButtons = function (widgetWindow) {
         this.playButton = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
         this.playButton.onclick = () => {
             if (this.isPlaying) {
@@ -325,6 +375,22 @@ function LegoWidget() {
         this.clearButton.onclick = () => {
             this._clearPhrase();
         };
+    };
+
+    /**
+     * Initializes the LEGO Widget with Phrase Maker functionality.
+     * @param {object} activity - The activity object.
+     * @returns {void}
+     */
+    this.init = function (activity) {
+        this.activity = activity;
+        this.running = true;
+
+        // Initialize audio synthesizer
+        this._initAudio();
+
+        const widgetWindow = this._createWidgetWindow();
+        this._createToolbarButtons(widgetWindow);
 
         // Create main container
         this.createMainContainer();
@@ -554,30 +620,14 @@ function LegoWidget() {
         this.fileInput.style.display = "none";
         this.fileInput.onchange = e => this._handleImageUpload(e);
         document.body.appendChild(this.fileInput);
-
-        // Initialize row headers
-        this._initializeRowHeaders();
     };
 
     /**
-     * Creates zoom controls with precise adjustments.
-     * @returns {void}
+     * Creates the instrument selector label and pie-menu button.
+     * @private
+     * @returns {HTMLElement[]} Elements to append, in display order.
      */
-    this.createZoomControls = function () {
-        this.zoomControls = document.createElement("div");
-        this.zoomControls.style.position = "absolute"; // Changed to absolute positioning
-        this.zoomControls.style.bottom = "0";
-        this.zoomControls.style.left = "180px"; // Align with image area
-        this.zoomControls.style.right = "0";
-        this.zoomControls.style.padding = "10px";
-        this.zoomControls.style.backgroundColor = "#f0f0f0";
-        this.zoomControls.style.borderTop = "1px solid #888";
-        this.zoomControls.style.display = "flex";
-        this.zoomControls.style.alignItems = "center";
-        this.zoomControls.style.gap = "8px";
-        this.zoomControls.style.zIndex = "20"; // Ensure it's above the grid
-
-        // Instrument selector (pie menu button)
+    this._createInstrumentControls = function () {
         const instrumentLabel = document.createElement("span");
         instrumentLabel.textContent = "Instrument:";
         instrumentLabel.style.fontSize = "12px";
@@ -595,6 +645,15 @@ function LegoWidget() {
         this.instrumentButton.style.cursor = "pointer";
         this.instrumentButton.onclick = () => this._createInstrumentPieMenu();
 
+        return [instrumentLabel, this.instrumentButton];
+    };
+
+    /**
+     * Creates the zoom label, +/- buttons, slider, and value display.
+     * @private
+     * @returns {HTMLElement[]} Elements to append, in display order.
+     */
+    this._createZoomSliderControls = function () {
         const zoomLabel = document.createElement("span");
         zoomLabel.textContent = "Zoom:";
         zoomLabel.style.fontSize = "12px";
@@ -621,13 +680,15 @@ function LegoWidget() {
         this.zoomValue.style.fontSize = "12px";
         this.zoomValue.style.minWidth = "40px";
 
-        // Add separator
-        const separator = document.createElement("span");
-        separator.textContent = "|";
-        separator.style.margin = "0 8px";
-        separator.style.color = "#888";
+        return [zoomLabel, zoomOut, this.zoomSlider, zoomIn, this.zoomValue];
+    };
 
-        // Add vertical spacing controls
+    /**
+     * Creates the column-spacing label, +/- buttons, slider, and value display.
+     * @private
+     * @returns {HTMLElement[]} Elements to append, in display order.
+     */
+    this._createSpacingControls = function () {
         const spacingLabel = document.createElement("span");
         spacingLabel.textContent = "Column Spacing:";
         spacingLabel.style.fontSize = "12px";
@@ -654,13 +715,15 @@ function LegoWidget() {
         this.spacingValue.style.fontSize = "12px";
         this.spacingValue.style.minWidth = "40px";
 
-        // Add separator
-        const separator2 = document.createElement("span");
-        separator2.textContent = "|";
-        separator2.style.margin = "0 8px";
-        separator2.style.color = "#888";
+        return [spacingLabel, spacingOut, this.spacingSlider, spacingIn, this.spacingValue];
+    };
 
-        // Add eye dropper button
+    /**
+     * Creates the eye dropper label and toggle button.
+     * @private
+     * @returns {HTMLElement[]} Elements to append, in display order.
+     */
+    this._createEyeDropperControls = function () {
         const eyeDropperLabel = document.createElement("span");
         eyeDropperLabel.textContent = "Eye Dropper:";
         eyeDropperLabel.style.fontSize = "12px";
@@ -677,13 +740,15 @@ function LegoWidget() {
         this.eyeDropperButton.title = "Click to activate eye dropper mode";
         this.eyeDropperButton.onclick = () => this._toggleEyeDropper();
 
-        // Add separator
-        const separator3 = document.createElement("span");
-        separator3.textContent = "|";
-        separator3.style.margin = "0 8px";
-        separator3.style.color = "#888";
+        return [eyeDropperLabel, this.eyeDropperButton];
+    };
 
-        // Add background color display
+    /**
+     * Creates the background color label and swatch display.
+     * @private
+     * @returns {HTMLElement[]} Elements to append, in display order.
+     */
+    this._createBackgroundColorControls = function () {
         const backgroundLabel = document.createElement("span");
         backgroundLabel.textContent = "Background:";
         backgroundLabel.style.fontSize = "12px";
@@ -704,25 +769,41 @@ function LegoWidget() {
         this.backgroundColorDisplay.style.minWidth = "60px";
         this.backgroundColorDisplay.style.textAlign = "center";
 
-        this.zoomControls.appendChild(instrumentLabel);
-        this.zoomControls.appendChild(this.instrumentButton);
-        this.zoomControls.appendChild(zoomLabel);
-        this.zoomControls.appendChild(zoomOut);
-        this.zoomControls.appendChild(this.zoomSlider);
-        this.zoomControls.appendChild(zoomIn);
-        this.zoomControls.appendChild(this.zoomValue);
-        this.zoomControls.appendChild(separator);
-        this.zoomControls.appendChild(spacingLabel);
-        this.zoomControls.appendChild(spacingOut);
-        this.zoomControls.appendChild(this.spacingSlider);
-        this.zoomControls.appendChild(spacingIn);
-        this.zoomControls.appendChild(this.spacingValue);
-        this.zoomControls.appendChild(separator2);
-        this.zoomControls.appendChild(eyeDropperLabel);
-        this.zoomControls.appendChild(this.eyeDropperButton);
-        this.zoomControls.appendChild(separator3);
-        this.zoomControls.appendChild(backgroundLabel);
-        this.zoomControls.appendChild(this.backgroundColorDisplay);
+        return [backgroundLabel, this.backgroundColorDisplay];
+    };
+
+    /**
+     * Creates zoom controls with precise adjustments.
+     * @returns {void}
+     */
+    this.createZoomControls = function () {
+        this.zoomControls = document.createElement("div");
+        Object.assign(this.zoomControls.style, {
+            position: "absolute", // Changed to absolute positioning
+            bottom: "0",
+            left: "180px", // Align with image area
+            right: "0",
+            padding: "10px",
+            backgroundColor: "#f0f0f0",
+            borderTop: "1px solid #888",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            zIndex: "20" // Ensure it's above the grid
+        });
+
+        const elements = [
+            ...this._createInstrumentControls(),
+            ...this._createZoomSliderControls(),
+            createControlSeparator(),
+            ...this._createSpacingControls(),
+            createControlSeparator(),
+            ...this._createEyeDropperControls(),
+            createControlSeparator(),
+            ...this._createBackgroundColorControls()
+        ];
+
+        elements.forEach(element => this.zoomControls.appendChild(element));
     };
 
     /**
@@ -1170,12 +1251,7 @@ function LegoWidget() {
             reader.onload = e => {
                 this.imageDisplayArea.replaceChildren();
 
-                this.imageWrapper = document.createElement("div");
-                this.imageWrapper.style.position = "absolute";
-                this.imageWrapper.style.left = "0px";
-                this.imageWrapper.style.top = "0px";
-                this.imageWrapper.style.transformOrigin = "top left";
-                this.imageWrapper.style.cursor = "grab";
+                this.imageWrapper = createImageWrapper();
 
                 const img = document.createElement("img");
                 img.src = e.target.result;
@@ -1188,9 +1264,7 @@ function LegoWidget() {
                 this.imageWrapper.appendChild(img);
                 this.imageDisplayArea.appendChild(this.imageWrapper);
 
-                this._makeImageDraggable(this.imageWrapper);
-                this._showZoomControls();
-                this._drawGridLines();
+                this._activateMediaDisplay();
 
                 this.activity.textMsg(_("Image uploaded successfully"));
             };
@@ -1206,12 +1280,7 @@ function LegoWidget() {
     this._startWebcam = function () {
         this.imageDisplayArea.replaceChildren();
 
-        this.imageWrapper = document.createElement("div");
-        this.imageWrapper.style.position = "absolute";
-        this.imageWrapper.style.left = "0px";
-        this.imageWrapper.style.top = "0px";
-        this.imageWrapper.style.transformOrigin = "top left";
-        this.imageWrapper.style.cursor = "grab";
+        this.imageWrapper = createImageWrapper();
 
         this.webcamVideo = document.createElement("video");
         this.webcamVideo.autoplay = true;
@@ -1250,16 +1319,12 @@ function LegoWidget() {
                     this.imageWrapper.replaceChildren(img);
                     captureBtn.remove();
 
-                    this._makeImageDraggable(this.imageWrapper);
-                    this._showZoomControls();
-                    this._drawGridLines();
+                    this._activateMediaDisplay();
                     this.activity.textMsg(_("Photo captured"));
                 };
                 this.imageWrapper.appendChild(captureBtn);
 
-                this._makeImageDraggable(this.imageWrapper);
-                this._showZoomControls();
-                this._drawGridLines();
+                this._activateMediaDisplay();
                 this.activity.textMsg(_("Webcam started"));
             })
             .catch(err => {
@@ -1565,21 +1630,7 @@ function LegoWidget() {
      * @returns {string} Hex color code
      */
     this._getColorHex = function (colorName) {
-        const colorMap = {
-            red: "#FF0000",
-            orange: "#FFA500",
-            yellow: "#FFFF00",
-            green: "#00FF00",
-            blue: "#0000FF",
-            purple: "#800080",
-            pink: "#FFC0CB",
-            cyan: "#00FFFF",
-            magenta: "#FF00FF",
-            white: "#FFFFFF",
-            black: "#000000",
-            gray: "#808080"
-        };
-        return colorMap[colorName] || "#808080";
+        return COLOR_HEX_MAP[colorName] || "#808080";
     };
 
     /**
@@ -1607,6 +1658,18 @@ function LegoWidget() {
             document.removeEventListener("mouseup", this._dragUpHandler);
             this._dragUpHandler = null;
         }
+    };
+
+    /**
+     * Activates the image/webcam display area: makes it draggable and
+     * refreshes the zoom controls and grid overlay for the new media.
+     * @private
+     * @returns {void}
+     */
+    this._activateMediaDisplay = function () {
+        this._makeImageDraggable(this.imageWrapper);
+        this._showZoomControls();
+        this._drawGridLines();
     };
 
     /**
@@ -2815,21 +2878,7 @@ function LegoWidget() {
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
         // Color mapping
-        const colorMap = {
-            red: "#FF0000",
-            orange: "#FFA500",
-            yellow: "#FFFF00",
-            green: "#00FF00",
-            blue: "#0000FF",
-            purple: "#800080",
-            pink: "#FFC0CB",
-            cyan: "#00FFFF",
-            magenta: "#FF00FF",
-            white: "#FFFFFF",
-            black: "#000000",
-            gray: "#808080",
-            unknown: "#C0C0C0"
-        };
+        const colorMap = { ...COLOR_HEX_MAP, unknown: "#C0C0C0" };
 
         // Draw each row
         let visualRowIndex = 0;

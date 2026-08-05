@@ -98,9 +98,6 @@ describe("TemperamentWidget basic tests", () => {
             DonutSliceCustomization: () => ({})
         }));
 
-        global.FLAT = "♭";
-        global.SHARP = "♯";
-
         const mockElements = {};
         global.docById = jest.fn(id => {
             if (!mockElements[id]) {
@@ -123,6 +120,10 @@ describe("TemperamentWidget basic tests", () => {
     test("playNote triggers synth", () => {
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: {
                 trigger: jest.fn()
             }
@@ -167,6 +168,10 @@ describe("TemperamentWidget basic tests", () => {
     test("playNote uses equal temperament branch", () => {
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: { trigger: jest.fn() }
         };
 
@@ -184,6 +189,10 @@ describe("TemperamentWidget basic tests", () => {
     test("playNote uses ratio temperament branch", () => {
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: { trigger: jest.fn() }
         };
 
@@ -201,6 +210,10 @@ describe("TemperamentWidget basic tests", () => {
     test("playNote uses wheelDiv4 branch", () => {
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: { trigger: jest.fn() }
         };
 
@@ -220,6 +233,10 @@ describe("TemperamentWidget basic tests", () => {
     test("playAll toggles playing state", () => {
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: {
                 trigger: jest.fn(),
                 stop: jest.fn(),
@@ -251,6 +268,42 @@ describe("TemperamentWidget basic tests", () => {
     });
 
     test("edit sets editMode to null and prepares UI", () => {
+        // edit() reads temperamentTableDiv, which only exists once init(activity)
+        // has run, so the widget must be initialized first (matching production
+        // usage, where edit() is only reachable via a button created in init()).
+        global.window.widgetWindows = {
+            windowFor: jest.fn(() => ({
+                clear: jest.fn(),
+                show: jest.fn(),
+                getWidgetBody: jest.fn(() => ({ append: jest.fn(), style: {} })),
+                addButton: jest.fn(() => ({
+                    onclick: null,
+                    getElementsByTagName: jest.fn(() => [{}])
+                })),
+                sendToCenter: jest.fn()
+            }))
+        };
+        global.buildScale = jest.fn(() => [["C"], []]);
+        global.getNoteFromInterval = jest.fn(() => ["C", 4]);
+        global.getTemperament = jest.fn(() => ({
+            interval: [],
+            pitchNumber: 1,
+            0: 1,
+            1: 2
+        }));
+
+        widget.inTemperament = "equal";
+        widget.scale = ["C", "Major"];
+        widget.init({
+            errorMsg: jest.fn(),
+            logo: {
+                synth: {
+                    startingPitch: "C4",
+                    _getFrequency: jest.fn(() => 440)
+                }
+            }
+        });
+
         widget._logo = {
             synth: {
                 setMasterVolume: jest.fn(),
@@ -408,6 +461,10 @@ describe("TemperamentWidget basic tests", () => {
     test("playNote default branch triggers correct frequency", () => {
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: {
                 trigger: jest.fn()
             }
@@ -434,6 +491,10 @@ describe("TemperamentWidget basic tests", () => {
     test("playNote uses note-name mapping for default temperaments", () => {
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: {
                 trigger: jest.fn(),
                 inTemperament: "equal",
@@ -466,6 +527,10 @@ describe("TemperamentWidget basic tests", () => {
     test("playNote keeps equal temperament on frequency path", () => {
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: {
                 trigger: jest.fn(),
                 inTemperament: "equal",
@@ -496,6 +561,10 @@ describe("TemperamentWidget basic tests", () => {
     test("playNote keeps custom temperament on frequency path", () => {
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: {
                 trigger: jest.fn(),
                 inTemperament: "custom",
@@ -526,6 +595,10 @@ describe("TemperamentWidget basic tests", () => {
     test("playNote no-ops on out-of-range pitch index", () => {
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: {
                 trigger: jest.fn(),
                 inTemperament: "equal19",
@@ -571,6 +644,43 @@ describe("TemperamentWidget basic tests", () => {
     });
 
     test("_graphOfNotes renders table view", () => {
+        // _graphOfNotes() reads temperamentTableDiv, which only exists once
+        // init(activity) has run, so the widget must be initialized first
+        // (matching production usage, where _graphOfNotes() is only reachable
+        // via a button created in init()).
+        global.window.widgetWindows = {
+            windowFor: jest.fn(() => ({
+                clear: jest.fn(),
+                show: jest.fn(),
+                getWidgetBody: jest.fn(() => ({ append: jest.fn(), style: {} })),
+                addButton: jest.fn(() => ({
+                    onclick: null,
+                    getElementsByTagName: jest.fn(() => [{}])
+                })),
+                sendToCenter: jest.fn()
+            }))
+        };
+        global.buildScale = jest.fn(() => [["C"], []]);
+        global.getNoteFromInterval = jest.fn(() => ["C", 4]);
+        global.getTemperament = jest.fn(() => ({
+            interval: [],
+            pitchNumber: 1,
+            0: 1,
+            1: 2
+        }));
+
+        widget.inTemperament = "equal";
+        widget.scale = ["C", "Major"];
+        widget.init({
+            errorMsg: jest.fn(),
+            logo: {
+                synth: {
+                    startingPitch: "C4",
+                    _getFrequency: jest.fn(() => 440)
+                }
+            }
+        });
+
         widget.toggleNotesButton = jest.fn();
         widget.notesCircle = {
             removeWheel: jest.fn()
@@ -650,6 +760,10 @@ describe("TemperamentWidget basic tests", () => {
 
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: { trigger: jest.fn() }
         };
 
@@ -694,6 +808,10 @@ describe("TemperamentWidget basic tests", () => {
     test("playAll handles reverse playback", () => {
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: {
                 trigger: jest.fn(),
                 stop: jest.fn(),
@@ -731,6 +849,10 @@ describe("TemperamentWidget basic tests", () => {
     test("playAll stops when already playing", () => {
         widget._logo = {
             resetSynth: jest.fn(),
+            setUserTemperament: jest.fn(function (t) {
+                this.synth.inTemperament = t;
+                this.synth.changeInTemperament = true;
+            }),
             synth: {
                 stop: jest.fn(),
                 setMasterVolume: jest.fn(),
@@ -1193,6 +1315,35 @@ describe("TemperamentWidget basic tests", () => {
             expect(widget._playing).toBe(false);
             expect(widget._lastPlaybackIndex).toBe(0);
         });
+        test("ratioEdit shows error toast when ratioOut is 0", () => {
+            const inputValues = { ratioIn: "5", ratioOut: "0", recursion: "1" };
+            let capturedDivAppend;
+
+            global.docById = jest.fn(id => {
+                if (id in inputValues) {
+                    return { value: inputValues[id] };
+                }
+                if (id === "userEdit") {
+                    return {
+                        textContent: "",
+                        style: {},
+                        appendChild: jest.fn(),
+                        append: jest.fn(el => {
+                            capturedDivAppend = el;
+                        })
+                    };
+                }
+                return createMockElement(id);
+            });
+
+            widget.ratioEdit();
+            capturedDivAppend.onclick({ target: { textContent: "done" } });
+
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                expect.stringContaining("valid ratio"),
+                3000
+            );
+        });
     });
 
     describe("playAll play loop visual wheel coverage", () => {
@@ -1203,6 +1354,10 @@ describe("TemperamentWidget basic tests", () => {
             originalDocById = global.docById;
             widget._logo = {
                 resetSynth: jest.fn(),
+                setUserTemperament: jest.fn(function (t) {
+                    this.synth.inTemperament = t;
+                    this.synth.changeInTemperament = true;
+                }),
                 synth: {
                     trigger: jest.fn(),
                     stop: jest.fn(),

@@ -14,6 +14,9 @@
 /* This widget provides an AI-powered debugging interface for Music Blocks projects,
 offering intelligent assistance, cool suggestions, and helping take your musical creations to new heights! */
 
+/** AMD module dependencies for lazy loading. */
+AIDebuggerWidget.dependencies = ["widgets/aidebugger"];
+
 /**
  * Represents a AI Widget.
  * @constructor
@@ -956,14 +959,12 @@ function AIDebuggerWidget() {
                 const childBlockType = Array.isArray(blockMap[childId][1])
                     ? blockMap[childId][1][0]
                     : blockMap[childId][1];
-                if (
-                    !(
-                        childBlockType === "divide" &&
-                        (parentBlockType === "newnote" ||
-                            parentBlockType === "setmasterbpm2" ||
-                            parentBlockType === "arc")
-                    )
-                ) {
+                if (!(
+                    childBlockType === "divide" &&
+                    (parentBlockType === "newnote" ||
+                        parentBlockType === "setmasterbpm2" ||
+                        parentBlockType === "arc")
+                )) {
                     output.push(
                         ...this._processBlock(
                             blockMap[childId],

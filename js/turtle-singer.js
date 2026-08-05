@@ -24,7 +24,7 @@
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
    noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction,
-   SEMITONES, normalizeNoteAccidentals, parseNoteString
+   SEMITONES, normalizeNoteAccidentals, parseNoteString, getCurrentEDO, isTrueEDO
  */
 
 /*
@@ -34,7 +34,8 @@
     js/utils/musicutils.js
         frequencyToPitch, pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp, getStepSizeDown,
         numberToPitch, pitchToNumber, noteIsSolfege, getSolfege, SOLFEGENAMES1,
-        SOLFEGECONVERSIONTABLE, getInterval, noteToFrequency, getTemperament, getOctaveRatio
+        SOLFEGECONVERSIONTABLE, getInterval, noteToFrequency, getTemperament, getOctaveRatio,
+        getCurrentEDO
     js/utils/utils.js
         rationalSum, _, rationalToFraction
     js/utils/synthutils.js
@@ -311,6 +312,8 @@ class Singer {
 
         const activity = logo.activity;
         const tur = activity.turtles.ithTurtle(turtle);
+        const temperament = logo.synth.inTemperament;
+        const edo = getCurrentEDO(temperament);
 
         let noteObj = getNote(
             note,
@@ -320,46 +323,90 @@ class Singer {
             tur.singer.movable,
             null,
             activity.errorMsg,
-            logo.synth.inTemperament
+            temperament
         );
 
-        if (isCustomTemperament(logo.synth.inTemperament)) {
+        if (isCustomTemperament(temperament)) {
             noteObj = getNote(
                 noteObj[0],
                 noteObj[1],
                 steps > 0
-                    ? getStepSizeUp(
-                          tur.singer.keySignature,
-                          noteObj[0],
-                          steps,
-                          logo.synth.inTemperament
-                      )
-                    : getStepSizeDown(
-                          tur.singer.keySignature,
-                          noteObj[0],
-                          steps,
-                          logo.synth.inTemperament
-                      ),
+                    ? getStepSizeUp(tur.singer.keySignature, noteObj[0], steps, temperament)
+                    : getStepSizeDown(tur.singer.keySignature, noteObj[0], steps, temperament),
                 tur.singer.keySignature,
                 tur.singer.movable,
                 null,
                 activity.errorMsg,
-                logo.synth.inTemperament
+                temperament,
+                false,
+                false // allow octave wrap for scalar traversal
             );
-        } else {
+        } else if (!isTrueEDO(temperament)) {
+            const curTemp = temperament;
             for (let i = 0; i < Math.abs(steps); i++) {
+                const stepEdo =
+                    steps > 0
+                        ? getStepSizeUp(tur.singer.keySignature, noteObj[0], undefined, curTemp)
+                        : getStepSizeDown(tur.singer.keySignature, noteObj[0], undefined, curTemp);
                 noteObj = getNote(
                     noteObj[0],
                     noteObj[1],
-                    steps > 0
-                        ? getStepSizeUp(tur.singer.keySignature, noteObj[0])
-                        : getStepSizeDown(tur.singer.keySignature, noteObj[0]),
+                    stepEdo,
                     tur.singer.keySignature,
                     tur.singer.movable,
                     null,
                     activity.errorMsg,
-                    logo.synth.inTemperament
+                    curTemp,
+                    true, // isAlreadyEdoSteps
+                    false // allow octave wrap
                 );
+            }
+        } else {
+            const curTemp = temperament;
+
+            const curEDO = edo;
+            if (curEDO === 12) {
+                for (let i = 0; i < Math.abs(steps); i++) {
+                    const stepEdo =
+                        steps > 0
+                            ? getStepSizeUp(tur.singer.keySignature, noteObj[0], undefined, curTemp)
+                            : getStepSizeDown(
+                                  tur.singer.keySignature,
+                                  noteObj[0],
+                                  undefined,
+                                  curTemp
+                              );
+
+                    noteObj = getNote(
+                        noteObj[0],
+                        noteObj[1],
+                        stepEdo,
+                        tur.singer.keySignature,
+                        tur.singer.movable,
+                        null,
+                        activity.errorMsg,
+                        curTemp,
+                        true,
+                        false // allow octave wrap
+                    );
+                }
+            } else {
+                for (let i = 0; i < Math.abs(steps); i++) {
+                    const stepEdo = steps > 0 ? 1 : -1;
+
+                    noteObj = getNote(
+                        noteObj[0],
+                        noteObj[1],
+                        stepEdo,
+                        tur.singer.keySignature,
+                        tur.singer.movable,
+                        null,
+                        activity.errorMsg,
+                        curTemp,
+                        true,
+                        false // allow octave wrap
+                    );
+                }
             }
         }
 
@@ -395,12 +442,14 @@ class Singer {
         const n1 = firstNote + tur.singer.pitchNumberOffset;
         let n2 = lastNote + tur.singer.pitchNumberOffset;
 
+        const temp = activity.logo.synth.inTemperament;
+
         let i = 0;
-        let noteObj = numberToPitch(n2);
+        let noteObj = numberToPitch(n2, temp, undefined, tur.singer.pitchNumberOffset, activity);
         while (i++ < 100) {
-            n2 += getStepSizeUp(tur.singer.keySignature, noteObj[0], 1);
+            n2 += getStepSizeUp(tur.singer.keySignature, noteObj[0], 1, temp);
             if (n2 >= n1) break;
-            noteObj = numberToPitch(n2);
+            noteObj = numberToPitch(n2, temp, undefined, tur.singer.pitchNumberOffset, activity);
         }
 
         return positive ? i : -i;
@@ -639,7 +688,6 @@ class Singer {
             cblk,
             true,
             actionArgs,
-            [],
             activity.turtles.getTurtle(turtle).queue.length
         );
         const returnValue = tur.singer.tallyNotes - saveState.tallyNotes;
@@ -2100,10 +2148,26 @@ class Singer {
                             // Apply harmonic here instead of in synth.
                             const p = partials.indexOf(1);
                             if (p > 0) {
-                                note = noteToFrequency(note, tur.singer.keySignature) * (p + 1);
+                                const parsed = parseNoteString(note);
+                                note =
+                                    pitchToFrequency(
+                                        parsed[0],
+                                        parsed[1],
+                                        0,
+                                        tur.singer.keySignature,
+                                        activity.logo.synth.inTemperament
+                                    ) *
+                                    (p + 1);
                             }
 
                             notes.push(note);
+                            console.log(
+                                i +
+                                    "]=" +
+                                    note +
+                                    " temperament=" +
+                                    activity.logo.synth.inTemperament
+                            );
                         }
 
                         if (duration > 0) {

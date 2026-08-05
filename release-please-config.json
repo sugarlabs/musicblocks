@@ -1,0 +1,31 @@
+{
+    "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+    "last-release-sha": "971b63fad2a28c44c05f9cce29c8d2b97a216e18",
+    "commit-search-depth": 3000,
+    "separate-pull-requests": false,
+    "pull-request-title-pattern": "chore(release): v${version}",
+    "packages": {
+        ".": {
+            "release-type": "node",
+            "package-name": "musicblocks",
+            "changelog-path": "CHANGELOG.md",
+            "include-component-in-tag": false,
+            "include-v-in-tag": true,
+            "draft": false,
+            "prerelease": false,
+            "changelog-sections": [
+                { "type": "feat", "section": "Features" },
+                { "type": "fix", "section": "Bug Fixes" },
+                { "type": "perf", "section": "Performance Improvements" },
+                { "type": "revert", "section": "Reverts" },
+                { "type": "docs", "section": "Documentation" },
+                { "type": "refactor", "section": "Code Refactoring", "hidden": true },
+                { "type": "build", "section": "Build System", "hidden": true },
+                { "type": "chore", "section": "Miscellaneous Chores", "hidden": true },
+                { "type": "ci", "section": "Continuous Integration", "hidden": true },
+                { "type": "style", "section": "Styles", "hidden": true },
+                { "type": "test", "section": "Tests", "hidden": true }
+            ]
+        }
+    }
+}

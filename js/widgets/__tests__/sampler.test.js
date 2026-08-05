@@ -19,12 +19,6 @@
  */
 
 global._ = s => s;
-global.DOUBLEFLAT = "bb";
-global.FLAT = "b";
-global.NATURAL = "n";
-global.SHARP = "#";
-global.DOUBLESHARP = "x";
-
 global.instruments = [{}];
 global.TunerUtils = {
     calculatePlaybackRate: jest.fn(),
@@ -105,6 +99,12 @@ describe("Sampler Widget", () => {
         jest.clearAllMocks();
         global.instruments = [{}];
         global.CUSTOMSAMPLES = [];
+        global.SHARP = "#";
+        global.FLAT = "b";
+        global.DOUBLESHARP = "x";
+        global.DOUBLEFLAT = "bb";
+        global.NATURAL = "n";
+
         document.body.innerHTML = `
             <div id="wheelDiv"></div>
             <div id="wheelDivptm"></div>

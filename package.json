@@ -1,6 +1,6 @@
 {
     "name": "musicblocks",
-    "version": "3.4.1",
+    "version": "3.7.1",
     "main": "electron-main.js",
     "description": "A musical microworld",
     "repository": {
@@ -101,19 +101,21 @@
         "picomatch": "^4.0.4",
         "yaml": "^2.8.3",
         "follow-redirects": "^1.16.0",
-        "systeminformation": "^5.31.6",
+        "systeminformation": "^5.31.17",
         "ip-address": "^10.2.0",
         "ajv": "^6.14.0",
         "@commitlint/config-validator": {
             "ajv": "^8.0.0"
         },
         "@isaacs/brace-expansion": "^5.0.1",
-        "immutable": "^5.1.5",
-        "svgo": "^4.0.1",
+        "immutable": "5.1.9",
+        "svgo": "4.0.2",
         "@xmldom/xmldom": "^0.8.13",
         "@gulp-sourcemaps/identity-map": {
             "postcss": "^8.4.31"
-        }
+        },
+        "body-parser": "2.3.0",
+        "qs": "6.15.3"
     },
     "lint-staged": {
         "*.{js,mjs}": [

@@ -14,9 +14,25 @@
  * This file establishes the mocking infrastructure for the 7,500-line blocks.js.
  */
 
-/* global jest, describe, it, expect, beforeEach */
+/* global jest, describe, it, expect, beforeEach, beforeAll, afterAll */
 
 const Blocks = require("../blocks");
+
+// blocks.js references these constants (MINIMUMDOCKDISTANCE, ALLOWED_CONNECTIONS, etc.) as
+// bare globals at runtime. In the browser they're provided by loader.js's RequireJS shim
+// load order; under CommonJS there's no such preload, so install them for this suite only
+// and remove them afterward rather than leaving a permanent global mutation.
+const blockConstants = require("../block-constants");
+
+beforeAll(() => {
+    Object.assign(global, blockConstants);
+});
+
+afterAll(() => {
+    for (const key of Object.keys(blockConstants)) {
+        delete global[key];
+    }
+});
 
 // --- MOCK SETUP ---
 
@@ -57,10 +73,16 @@ global.getTextWidth = jest.fn().mockReturnValue(100);
 global.Block = jest.fn();
 global.ProtoBlock = jest.fn();
 
+// Use the real ConnectionValidator so dock connection behavior stays accurate.
+global.ConnectionValidator = require("../connection-validator");
+
+// Use the real BlockDragController so drag-group and dock-snapping
+// behavior stays accurate rather than silently becoming a no-op.
+global.setupBlockDragController = require("../block-drag-controller").setupBlockDragController;
+
 // Mock Constants
 global.DEFAULTBLOCKSCALE = 1.0;
 global.STANDARDBLOCKHEIGHT = 20;
-global.SPECIALINPUTS = ["number", "text", "boolean"];
 global.COLLAPSIBLES = ["repeat", "forever", "if"];
 global.INLINECOLLAPSIBLES = ["newnote", "interval", "osctime"];
 global.DEFAULTACCIDENTAL = "natural";
@@ -867,6 +889,146 @@ describe("Blocks Foundation", () => {
         });
     });
 
+    describe("_suppressRefresh during loading", () => {
+        const { PubSub } = require("../pubsub");
+        let mockActivity;
+        let loadContainer;
+
+        beforeEach(() => {
+            global.pubsub = new PubSub();
+            mockActivity = {
+                storage: {},
+                trashcan: {},
+                turtles: {},
+                boundary: {},
+                macroDict: {},
+                palettes: {
+                    dict: {},
+                    show: jest.fn(),
+                    updatePalettes: jest.fn(),
+                    showPalette: jest.fn()
+                },
+                logo: { synth: { loadSynth: jest.fn(), preloadProjectSamples: jest.fn() } },
+                blocksContainer: { x: 0, y: 0 },
+                canvas: { width: 800, height: 600 },
+                refreshCanvas: jest.fn(),
+                errorMsg: jest.fn(),
+                setSelectionMode: jest.fn(),
+                stopLoadAnimation: jest.fn(),
+                setHomeContainers: jest.fn(),
+                __tick: jest.fn(),
+                _suppressRefresh: false
+            };
+            loadContainer = document.createElement("div");
+            loadContainer.id = "load-container";
+            document.body.appendChild(loadContainer);
+        });
+
+        afterEach(() => {
+            loadContainer.remove();
+            delete global.pubsub;
+        });
+
+        it("sets _suppressRefresh true during loadNewBlocks", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks._processOneBlock = jest.fn();
+            blocks.protoBlockDict = {};
+            blocks.newStorein2Block = jest.fn();
+            blocks.newNamedboxBlock = jest.fn();
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks.customTemperamentDefined = true;
+
+            // Minimal valid block object: [id, name, x, y, connections]
+            const blockObjs = [[0, "forward", 0, 0, [null, null, null]]];
+
+            // Capture the flag state during the synchronous body
+            let flagDuringLoad = null;
+            const origProcessChunk = blocks._processOneBlock;
+            blocks._processOneBlock = jest.fn(() => {
+                flagDuringLoad = mockActivity._suppressRefresh;
+            });
+
+            blocks.loadNewBlocks(blockObjs);
+
+            // Flag should be true during processing (before cleanupAfterLoad resets it)
+            expect(flagDuringLoad).toBe(true);
+        });
+
+        it("resets _suppressRefresh on circular connection early return", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+
+            // Block connected to itself: connections[0] === block id
+            const blockObjs = [[0, "forward", 0, 0, [0, null, null]]];
+
+            blocks.loadNewBlocks(blockObjs);
+
+            expect(mockActivity._suppressRefresh).toBe(false);
+        });
+
+        it("resets _suppressRefresh after cleanupAfterLoad finishes", async () => {
+            const blocks = new Blocks(mockActivity);
+            blocks._loadCounter = 1;
+            blocks.blockList = [];
+            blocks.blocksToCollapse = [];
+            blocks._findDrumURLs = jest.fn();
+            blocks.updateBlockPositions = jest.fn();
+            blocks._cleanupStacks = jest.fn();
+            blocks.actionMetadata = jest.fn();
+            blocks.newNameddoBlock = jest.fn();
+            blocks.newStorein2Block = jest.fn();
+            blocks.newNamedboxBlock = jest.fn();
+            blocks._rebuildSpatialGrid = jest.fn();
+
+            mockActivity._suppressRefresh = true;
+
+            await blocks.cleanupAfterLoad();
+
+            expect(mockActivity._suppressRefresh).toBe(false);
+            expect(mockActivity.refreshCanvas).toHaveBeenCalled();
+        });
+
+        it("resets _suppressRefresh even if cleanupAfterLoad body throws", async () => {
+            const blocks = new Blocks(mockActivity);
+            blocks._loadCounter = 1;
+            blocks.blockList = [];
+            blocks.blocksToCollapse = [];
+            blocks._findDrumURLs = jest.fn(() => {
+                throw new Error("test error");
+            });
+
+            mockActivity._suppressRefresh = true;
+
+            await expect(blocks.cleanupAfterLoad()).rejects.toThrow("test error");
+
+            expect(mockActivity._suppressRefresh).toBe(false);
+            expect(mockActivity.refreshCanvas).toHaveBeenCalled();
+        });
+
+        it("resets _suppressRefresh if loadNewBlocks throws", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.protoBlockDict = {};
+            blocks.newStorein2Block = jest.fn();
+            blocks.newNamedboxBlock = jest.fn();
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks.customTemperamentDefined = true;
+
+            // Valid block object to pass initial checks
+            const blockObjs = [[0, "forward", 0, 0, [null, null, null]]];
+
+            // Make the block repair loop throw by corrupting blockObjs after validation
+            const origProcessChunk = blocks._processOneBlock;
+            blocks._processOneBlock = jest.fn(() => {
+                throw new Error("simulated processing error");
+            });
+
+            expect(() => blocks.loadNewBlocks(blockObjs)).toThrow("simulated processing error");
+            expect(mockActivity._suppressRefresh).toBe(false);
+        });
+    });
+
     describe("renameNameddos", () => {
         let blocksInstance;
 
@@ -942,6 +1104,139 @@ describe("Blocks Foundation", () => {
 
             // Assert palette update
             expect(paletteBlock.defaults[0]).toBe("jump");
+        });
+    });
+
+    describe("Block dragging via the real BlockDragController", () => {
+        // The rest of this file exercises BlockDragController only through a
+        // minimal hand-built stand-in (see block-drag-controller.test.js).
+        // This suite instead drives it through a genuine `new Blocks(...)`
+        // instance, so the delegation stubs, the real _testConnectionType /
+        // _getNearbyBlocks implementations, and the real dragGroup state are
+        // all exercised together, not just the controller in isolation.
+        let blocks;
+
+        beforeEach(() => {
+            mockActivity.turtles = { running: jest.fn().mockReturnValue(false) };
+            blocks = new Blocks(mockActivity);
+
+            // Subsystems that are outside the scope of dragging itself.
+            blocks.findTopBlock = jest.fn(blk => blk);
+            blocks.insideExpandableBlock = jest.fn(() => null);
+            blocks.addDefaultBlock = jest.fn();
+            blocks.adjustExpandableClampBlock = jest.fn();
+            blocks._insideNoteBlock = jest.fn(() => null);
+        });
+
+        function makeRealFlowBlock({ x, y, docks, connections, name = "flow" }) {
+            return {
+                name,
+                trash: false,
+                inCollapsed: false,
+                collapsed: false,
+                container: { x, y },
+                docks,
+                connections,
+                isArgBlock: () => false,
+                isArgumentLikeBlock: () => false,
+                isArgFlowClampBlock: () => false,
+                isArgClamp: () => false,
+                isInlineCollapsible: () => false,
+                isNoHitBlock: () => false,
+                isTwoArgBooleanBlock: () => false,
+                highlight: jest.fn(),
+                unhighlight: jest.fn()
+            };
+        }
+
+        it("computes a real drag group and moves it through the real Blocks instance", () => {
+            blocks.blockList = [
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 0,
+                    docks: [
+                        [0, 0, "in"],
+                        [0, 20, "out"]
+                    ],
+                    connections: [null, 1]
+                }),
+                makeRealFlowBlock({ x: 0, y: 20, docks: [[0, 0, "in"]], connections: [0] })
+            ];
+
+            blocks.findDragGroup(0);
+            expect(blocks.dragGroup).toEqual([0, 1]);
+
+            blocks.moveStackRelative(0, 10, 5);
+
+            expect(blocks.blockList[0].container).toEqual({ x: 10, y: 5 });
+            expect(blocks.blockList[1].container).toEqual({ x: 10, y: 25 });
+        });
+
+        it("snaps a dragged block onto a real, compatible dock using the real _testConnectionType", async () => {
+            blocks.blockList = [
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 0,
+                    docks: [
+                        [0, 0, "in"],
+                        [0, 20, "out"]
+                    ],
+                    connections: [null, null],
+                    name: "target"
+                }),
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 15,
+                    docks: [[0, 0, "in"]],
+                    connections: [null],
+                    name: "moving"
+                })
+            ];
+
+            await blocks.blockMoved(1);
+
+            expect(blocks.blockList[1].connections[0]).toBe(0);
+            expect(blocks.blockList[0].connections[1]).toBe(1);
+        });
+
+        it("does not snap across a real, incompatible dock type", async () => {
+            blocks.blockList = [
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 0,
+                    docks: [
+                        [0, 0, "in"],
+                        [0, 20, "numberout"]
+                    ],
+                    connections: [null, null],
+                    name: "target"
+                }),
+                makeRealFlowBlock({
+                    x: 0,
+                    y: 15,
+                    docks: [[0, 0, "in"]],
+                    connections: [null],
+                    name: "moving"
+                })
+            ];
+
+            await blocks.blockMoved(1);
+
+            expect(blocks.blockList[1].connections[0]).toBeNull();
+            expect(blocks.blockList[0].connections[1]).toBeNull();
+        });
+
+        it("exposes the same BlockDragController instance to every delegated method", () => {
+            expect(blocks.blockDragController).toBeDefined();
+            expect(blocks.findDragGroup).not.toBe(blocks.blockDragController.findDragGroup);
+            blocks.blockList = [
+                makeRealFlowBlock({ x: 0, y: 0, docks: [[0, 0, "in"]], connections: [null] })
+            ];
+
+            const spy = jest.spyOn(blocks.blockDragController, "findDragGroup");
+            blocks.findDragGroup(0);
+
+            expect(spy).toHaveBeenCalledWith(0);
         });
     });
 });

@@ -13,7 +13,7 @@ const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 
-// Captures every wheelnav instance created by _displayHelpfulWheel so tests
+// Captures every wheelnav instance created by displayHelpfulWheel so tests
 // can assert on the labels passed to initWheel.
 const wheelInstances = [];
 
@@ -42,7 +42,19 @@ const loadActivityClass = () => {
         code = code.substring(0, splitPoint);
     }
 
-    code += "\nthis.Activity = Activity;";
+    // ContextMenuController now owns _setupPaletteMenu/_displayHelpfulWheel.
+    // Concatenate its source (minus the AMD/CommonJS export tail) ahead of
+    // activity.js so setupContextMenuController() resolves for real inside
+    // this sandbox, sharing the same mocked globals (wheelnav, base64Encode,
+    // the button icon constants, etc.) already defined below.
+    const controllerPath = path.resolve(__dirname, "../context-menu-controller.js");
+    let controllerCode = fs.readFileSync(controllerPath, "utf8");
+    const controllerSplitPoint = controllerCode.indexOf("if (typeof define");
+    if (controllerSplitPoint !== -1) {
+        controllerCode = controllerCode.substring(0, controllerSplitPoint);
+    }
+
+    code = controllerCode + "\n" + code + "\nthis.Activity = Activity;";
 
     const sandbox = {
         window: global.window,
@@ -112,7 +124,7 @@ const loadActivityClass = () => {
         LEADING: 0,
         MYDEFINES: [],
 
-        // globals referenced by _setupPaletteMenu and _displayHelpfulWheel
+        // globals referenced by setupPaletteMenu and displayHelpfulWheel
         wheelnav: WheelnavMock,
         slicePath: () => ({
             DonutSlice: {},
@@ -130,9 +142,8 @@ const loadActivityClass = () => {
         COLLAPSEBUTTON: "<svg/>",
         EXPANDBUTTON: "<svg/>",
         _THIS_IS_MUSIC_BLOCKS_: true,
-        changeBlockVisibility: jest.fn(),
-        toggleCollapsibleStacks: jest.fn(),
-        restoreTrashPop: jest.fn(),
+        doSmallerBlocks: jest.fn(),
+        doLargerBlocks: jest.fn(),
         setScroller: jest.fn(),
         chooseKeyMenu: jest.fn(),
         piemenuGrid: jest.fn()
@@ -177,8 +188,8 @@ describe("Helpful wheel bulk actions (issue #7794)", () => {
         activity = new Activity();
 
         activity.cellSize = 40;
-        activity._makeButton = jest.fn(() => mockElement);
-        activity._loadButtonDragHandler = jest.fn();
+        activity.contextMenuController.makeButton = jest.fn(() => mockElement);
+        activity.contextMenuController.loadButtonDragHandler = jest.fn();
         activity.boundary = { hide: jest.fn() };
         activity.toolbar = { changeWrap: jest.fn() };
         activity.turtles = { collapse: jest.fn(), expand: jest.fn() };
@@ -197,9 +208,9 @@ describe("Helpful wheel bulk actions (issue #7794)", () => {
 
     const getItem = label => activity.helpfulWheelItems.find(ele => ele.label === label);
 
-    describe("_setupPaletteMenu registration", () => {
+    describe("setupPaletteMenu registration", () => {
         test("registers 'Move to trash' and 'Duplicate', hidden by default", () => {
-            activity._setupPaletteMenu();
+            activity.setupPaletteMenu();
 
             const trash = getItem("Move to trash");
             const dup = getItem("Duplicate");
@@ -214,17 +225,17 @@ describe("Helpful wheel bulk actions (issue #7794)", () => {
         });
     });
 
-    describe("_displayHelpfulWheel visibility toggle", () => {
+    describe("displayHelpfulWheel visibility toggle", () => {
         const rightClick = { clientX: 400, clientY: 300 };
 
         beforeEach(() => {
-            activity._setupPaletteMenu();
+            activity.setupPaletteMenu();
         });
 
         test("hides bulk actions when no blocks are selected", () => {
             activity.blocks = { selectedBlocks: [] };
 
-            activity._displayHelpfulWheel(rightClick);
+            activity.displayHelpfulWheel(rightClick);
 
             expect(getItem("Move to trash").display).toBe(false);
             expect(getItem("Duplicate").display).toBe(false);
@@ -236,7 +247,7 @@ describe("Helpful wheel bulk actions (issue #7794)", () => {
         test("shows bulk actions when blocks are selected", () => {
             activity.blocks = { selectedBlocks: [{ trash: false }, { trash: false }] };
 
-            activity._displayHelpfulWheel(rightClick);
+            activity.displayHelpfulWheel(rightClick);
 
             expect(getItem("Move to trash").display).toBe(true);
             expect(getItem("Duplicate").display).toBe(true);
@@ -248,7 +259,7 @@ describe("Helpful wheel bulk actions (issue #7794)", () => {
         test("ignores selected blocks that are already in the trash", () => {
             activity.blocks = { selectedBlocks: [{ trash: true }] };
 
-            activity._displayHelpfulWheel(rightClick);
+            activity.displayHelpfulWheel(rightClick);
 
             expect(getItem("Move to trash").display).toBe(false);
             expect(getItem("Duplicate").display).toBe(false);
@@ -256,11 +267,11 @@ describe("Helpful wheel bulk actions (issue #7794)", () => {
 
         test("hides bulk actions again once the selection is gone", () => {
             activity.blocks = { selectedBlocks: [{ trash: false }] };
-            activity._displayHelpfulWheel(rightClick);
+            activity.displayHelpfulWheel(rightClick);
             expect(getItem("Move to trash").display).toBe(true);
 
             activity.blocks.selectedBlocks = [];
-            activity._displayHelpfulWheel(rightClick);
+            activity.displayHelpfulWheel(rightClick);
             expect(getItem("Move to trash").display).toBe(false);
             expect(getItem("Duplicate").display).toBe(false);
         });

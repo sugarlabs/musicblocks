@@ -56,6 +56,11 @@ jobs:
                   --to ${{ github.event.pull_request.head.sha }}
                   --verbose
 
+            # NOTE: on a squash merge the commit that lands on master is the PR
+            # TITLE, not any of the commits linted above. That is checked by
+            # pr-title-check.yml, which needs the `edited` trigger this
+            # workflow deliberately does not have.
+
     # ----------------------------------------------------------------------
     # ESLint + Prettier on changed JS files only
     # ----------------------------------------------------------------------

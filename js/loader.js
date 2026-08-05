@@ -55,8 +55,19 @@ requirejs.config({
         "utils/utils-logic": {
             exports: "UtilsLogic"
         },
+        "utils/dom-helpers": {
+            exports: "DomHelpers"
+        },
+        "utils/browser-utils": {
+            exports: "BrowserUtils"
+        },
         "utils/utils": {
-            deps: ["utils/platformstyle", "utils/utils-logic"],
+            deps: [
+                "utils/platformstyle",
+                "utils/utils-logic",
+                "utils/dom-helpers",
+                "utils/browser-utils"
+            ],
             exports: "_"
         },
         "utils/retryWithBackoff": {
@@ -74,8 +85,21 @@ requirejs.config({
             deps: ["activity/turtledefs", "utils/retryWithBackoff"],
             exports: "Block"
         },
+        "activity/connection-validator": {
+            exports: "ConnectionValidator"
+        },
+        "activity/block-drag-controller": {
+            deps: ["activity/block-constants"],
+            exports: "setupBlockDragController"
+        },
         "activity/blocks": {
-            deps: ["activity/block", "activity/pubsub"],
+            deps: [
+                "activity/block",
+                "activity/pubsub",
+                "activity/block-constants",
+                "activity/connection-validator",
+                "activity/block-drag-controller"
+            ],
             exports: "Blocks"
         },
         "activity/turtle-singer": {
@@ -141,6 +165,7 @@ requirejs.config({
                 "activity/plugin-controller",
                 "widgets/plugin-dialog",
                 "activity/toolbar-controller",
+                "activity/focus-cycle-manager",
                 "activity/toolbar-ui",
                 "activity/alert-controller",
                 "activity/alert-renderer",
@@ -153,7 +178,8 @@ requirejs.config({
                 "keyboard-controller",
                 "activity/selection-controller",
                 "activity/trash-controller",
-                "activity/help-controller"
+                "activity/help-controller",
+                "activity/context-menu-controller"
             ],
             exports: "Activity"
         },
@@ -318,10 +344,6 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
         window.M = M;
         window.Materialize = M;
     }
-
-    // Define essential globals for core modules
-    window._THIS_IS_MUSIC_BLOCKS_ = true;
-    window._THIS_IS_TURTLE_BLOCKS_ = false;
 
     // Load highlight optionally
     requirejs(
