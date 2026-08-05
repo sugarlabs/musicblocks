@@ -916,4 +916,110 @@ describe("Blocks Foundation", () => {
             expect(spy).toHaveBeenCalledWith(0);
         });
     });
+
+    describe("sendStackToTrash – turtle container guard", () => {
+        let blocks;
+        let mockTurtleList;
+        let origGetById;
+
+        beforeEach(() => {
+            mockActivity.turtles = { running: jest.fn().mockReturnValue(false) };
+            blocks = new Blocks(mockActivity);
+            blocks.activity.trashcan = { stopHighlightAnimation: jest.fn() };
+            blocks.captureStackPreview = jest.fn();
+            blocks.findDragGroup = jest.fn(() => {
+                blocks.dragGroup = [0];
+            });
+            blocks.insideExpandableBlock = jest.fn(() => null);
+            blocks.addDefaultBlock = jest.fn();
+            blocks.deleteActionBlock = jest.fn();
+            blocks.findTopBlock = jest.fn(blk => blk);
+            blocks._cleanupStacks = jest.fn();
+            blocks.blockArt = {};
+            blocks.blockCollapseArt = {};
+
+            mockTurtleList = [];
+            blocks.turtles = { turtleList: mockTurtleList };
+
+            origGetById = document.getElementById;
+            document.getElementById = jest.fn(id => {
+                if (id === "hideContents") return { click: jest.fn() };
+                if (id === "mbA11yLiveRegion") return { textContent: "" };
+                return origGetById.call(document, id);
+            });
+        });
+
+        afterEach(() => {
+            document.getElementById = origGetById;
+        });
+
+        function makeStartBlock(turtleIndex) {
+            return {
+                name: "start",
+                value: turtleIndex,
+                blockIndex: 0,
+                trash: false,
+                connections: [null],
+                protoblock: { staticLabels: ["start"] },
+                hide: jest.fn(),
+                container: { uncache: jest.fn() },
+                isTwoArgBlock: jest.fn().mockReturnValue(false),
+                isArgBlock: jest.fn().mockReturnValue(false),
+                isExpandableBlock: jest.fn().mockReturnValue(false),
+                isArgClamp: jest.fn().mockReturnValue(false)
+            };
+        }
+
+        it("should not crash when start block turtle has null container", () => {
+            const myBlock = makeStartBlock(0);
+            blocks.blockList = [myBlock];
+
+            mockTurtleList[0] = { container: null, inTrash: false, companionTurtle: null };
+
+            expect(() => blocks.sendStackToTrash(myBlock)).not.toThrow();
+            expect(mockTurtleList[0].inTrash).toBe(true);
+        });
+
+        it("should not crash when companion turtle has null container", () => {
+            const myBlock = makeStartBlock(0);
+            blocks.blockList = [myBlock];
+
+            mockTurtleList[0] = { container: null, inTrash: false, companionTurtle: 1 };
+            mockTurtleList[1] = { container: null, inTrash: false };
+
+            expect(() => blocks.sendStackToTrash(myBlock)).not.toThrow();
+            expect(mockTurtleList[0].inTrash).toBe(true);
+            expect(mockTurtleList[1].inTrash).toBe(true);
+        });
+
+        it("should hide container when turtle has a valid container", () => {
+            const mockContainer = { visible: true, uncache: jest.fn() };
+            const myBlock = makeStartBlock(0);
+            blocks.blockList = [myBlock];
+
+            mockTurtleList[0] = { container: mockContainer, inTrash: false, companionTurtle: null };
+
+            blocks.sendStackToTrash(myBlock);
+
+            expect(mockContainer.visible).toBe(false);
+            expect(mockTurtleList[0].inTrash).toBe(true);
+        });
+
+        it("should hide both containers when companion turtle has valid containers", () => {
+            const container0 = { visible: true, uncache: jest.fn() };
+            const container1 = { visible: true, uncache: jest.fn() };
+            const myBlock = makeStartBlock(0);
+            blocks.blockList = [myBlock];
+
+            mockTurtleList[0] = { container: container0, inTrash: false, companionTurtle: 1 };
+            mockTurtleList[1] = { container: container1, inTrash: false };
+
+            blocks.sendStackToTrash(myBlock);
+
+            expect(container0.visible).toBe(false);
+            expect(container1.visible).toBe(false);
+            expect(mockTurtleList[0].inTrash).toBe(true);
+            expect(mockTurtleList[1].inTrash).toBe(true);
+        });
+    });
 });
