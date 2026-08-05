@@ -246,9 +246,9 @@ class TimbreWidget {
         timbreTable.id = "timbreTable";
         this.timbreTableDiv.appendChild(timbreTable);
 
-        const env = docById("timbreTable");
-        env.textContent = "";
-        return env;
+        // timbreTable was just created and appended above, so it's already
+        // the element docById("timbreTable") would return; skip the lookup.
+        return timbreTable;
     }
 
     /**
@@ -1531,6 +1531,9 @@ class TimbreWidget {
                         );
                     }
 
+                    // NoiseSynthParams[0] holds a string (e.g. "white"), not a number,
+                    // so it's passed through as-is rather than via parseFloat like the
+                    // other synth branches below.
                     subDiv.appendChild(
                         createLabeledSlider(
                             0,
