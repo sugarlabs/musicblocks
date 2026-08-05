@@ -142,6 +142,8 @@ function setupRhythmBlocks(activity) {
          */
         constructor() {
             super("osctime");
+            this.setCapability("collapsible");
+            this.setCapability("inlineCollapsible");
             this.setCapability("noteContainer");
             this.setPalette("rhythm", activity);
             this.setHelpString([
@@ -1118,6 +1120,8 @@ function setupRhythmBlocks(activity) {
          */
         constructor() {
             super("newnote");
+            this.setCapability("collapsible");
+            this.setCapability("inlineCollapsible");
             this.setCapability("noteContainer");
             this.setPalette("rhythm", activity);
             this.beginnerBlock(true);

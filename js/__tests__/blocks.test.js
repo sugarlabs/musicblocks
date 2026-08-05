@@ -83,8 +83,6 @@ global.setupBlockDragController = require("../block-drag-controller").setupBlock
 // Mock Constants
 global.DEFAULTBLOCKSCALE = 1.0;
 global.STANDARDBLOCKHEIGHT = 20;
-global.COLLAPSIBLES = ["repeat", "forever", "if"];
-global.INLINECOLLAPSIBLES = ["newnote", "interval", "osctime"];
 global.DEFAULTACCIDENTAL = "natural";
 global.DEFAULTDRUM = "snare";
 global.DEFAULTEFFECT = "none";
@@ -914,6 +912,108 @@ describe("Blocks Foundation", () => {
             blocks.findDragGroup(0);
 
             expect(spy).toHaveBeenCalledWith(0);
+        });
+    });
+
+    describe("Collapsible Capability Migration Behavior", () => {
+        let mockActivity;
+        let blocks;
+
+        beforeEach(() => {
+            mockActivity = {
+                storage: {},
+                trashcan: {},
+                turtles: {},
+                boundary: {},
+                macroDict: {},
+                palettes: { dict: {}, show: jest.fn() },
+                logo: { synth: { loadSynth: jest.fn() } },
+                blocksContainer: { x: 0, y: 0 },
+                canvas: { width: 800, height: 600 },
+                refreshCanvas: jest.fn(),
+                errorMsg: jest.fn(),
+                setSelectionMode: jest.fn(),
+                stopLoadAnimation: jest.fn(),
+                setHomeContainers: jest.fn(),
+                __tick: jest.fn()
+            };
+            blocks = new Blocks(mockActivity);
+        });
+
+        it("toggleCollapsibles toggles standard collapsible blocks and definemode, but excludes newnote", () => {
+            const mockStartBlock = {
+                name: "start",
+                trash: false,
+                collapsed: false,
+                isCollapsible: () => true,
+                isInlineCollapsible: () => false,
+                collapseToggle: jest.fn(function () {
+                    this.collapsed = !this.collapsed;
+                })
+            };
+
+            const mockDefinemodeBlock = {
+                name: "definemode",
+                trash: false,
+                collapsed: false,
+                isCollapsible: () => true,
+                isInlineCollapsible: () => true,
+                collapseToggle: jest.fn(function () {
+                    this.collapsed = !this.collapsed;
+                })
+            };
+
+            const mockNewNoteBlock = {
+                name: "newnote",
+                trash: false,
+                collapsed: false,
+                isCollapsible: () => true,
+                isInlineCollapsible: () => true,
+                collapseToggle: jest.fn(function () {
+                    this.collapsed = !this.collapsed;
+                })
+            };
+
+            blocks.blockList = [mockStartBlock, mockDefinemodeBlock, mockNewNoteBlock];
+
+            // Trigger toggleCollapsibles (all are currently uncollapsed, so it should collapse start and definemode, but skip newnote)
+            blocks.toggleCollapsibles();
+
+            expect(mockStartBlock.collapseToggle).toHaveBeenCalled();
+            expect(mockDefinemodeBlock.collapseToggle).toHaveBeenCalled();
+            expect(mockNewNoteBlock.collapseToggle).not.toHaveBeenCalled();
+        });
+
+        it("_processOneBlock correctly uses ProtoBlock capability metadata to initialize collapsed state on load", () => {
+            blocks.protoBlockDict = {
+                start: {
+                    name: "start",
+                    hasCapability: capability => capability === "collapsible"
+                },
+                forward: {
+                    name: "forward",
+                    hasCapability: () => false
+                }
+            };
+
+            const blockObjs = [
+                [0, "start", 0, 0, [null]],
+                [1, "forward", 0, 0, [null]]
+            ];
+
+            blocks._makeNewBlockWithConnections = jest.fn();
+            blocks.turtles = { getTurtleCount: () => 1, addTurtle: jest.fn() };
+
+            blocks._processOneBlock(0, blockObjs, 0, true);
+            blocks._processOneBlock(1, blockObjs, 0, false);
+
+            expect(blocks._makeNewBlockWithConnections).toHaveBeenCalledTimes(2);
+            // Check that postProcess received blkInfo with collapsed: false for 'start'
+            const startCallArgs = blocks._makeNewBlockWithConnections.mock.calls[0];
+            expect(startCallArgs[4][1]).toEqual({ value: null, collapsed: false });
+
+            const forwardCallArgs = blocks._makeNewBlockWithConnections.mock.calls[1];
+            expect(forwardCallArgs[4]).toBeUndefined();
         });
     });
 });

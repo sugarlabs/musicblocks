@@ -26,12 +26,10 @@ global.delayExecution = jest.fn().mockResolvedValue(null);
 global.getTextWidth = jest.fn().mockReturnValue(100);
 global._ = jest.fn(str => str);
 
-// NOTE: block classification (COLLAPSIBLES, INLINECOLLAPSIBLES, and similar
-// capability lists) is owned by blocks.js, not by BlockDragController — see
-// makeBlocks()'s getCollapsiblesSet/getInlineCollapsiblesSet below, which
-// stand in for the real Blocks-owned delegation the controller calls
-// through. This file deliberately does not set COLLAPSIBLES/INLINECOLLAPSIBLES
-// as globals, since the controller no longer reads them directly.
+// NOTE: block collapsibility is determined via the capability-metadata system.
+// BlockDragController calls block.isCollapsible() / block.isInlineCollapsible()
+// directly on Block instances; no global COLLAPSIBLES/INLINECOLLAPSIBLES arrays
+// or Blocks-owned Set helpers are consulted. This file does not set those globals.
 
 const { setupBlockDragController, BlockDragController } = require("../block-drag-controller");
 
@@ -86,12 +84,6 @@ function makeBlocks(blockList) {
                 type1 + ":" + type2
             ),
 
-        // Block classification stays owned by (the mocked) Blocks here too:
-        // the controller only ever calls these two delegates, it never
-        // builds its own Set from a capability list.
-        getCollapsiblesSet: () => new Set(["repeat", "forever", "if"]),
-        getInlineCollapsiblesSet: () => new Set(["newnote", "interval", "osctime"]),
-
         // Full-scan fallback identical to the real _getNearbyBlocks when the
         // spatial grid has not been populated.
         _getNearbyBlocks: () => blockList.map((_b, i) => i),
@@ -144,6 +136,7 @@ function makeFlowBlock({ x, y, docks, connections, name = "flow" }) {
         isArgumentLikeBlock: () => false,
         isArgFlowClampBlock: () => false,
         isArgClamp: () => false,
+        isCollapsible: () => false,
         isInlineCollapsible: () => false,
         isNoHitBlock: () => false,
         highlight: jest.fn(),
@@ -172,6 +165,7 @@ function makeArgHost({ occupantIdx, extra = {} }) {
         isArgumentLikeBlock: () => false,
         isArgClamp: () => false,
         isArgFlowClampBlock: () => false,
+        isCollapsible: () => false,
         isInlineCollapsible: () => false,
         highlight: jest.fn(),
         unhighlight: jest.fn(),
@@ -1143,8 +1137,9 @@ describe("BlockDragController", () => {
                     [0, 20, "out"]
                 ],
                 connections: [null, null],
-                name: "repeat" // matches makeBlocks()'s getCollapsiblesSet()
+                name: "repeat"
             });
+            collapsedCandidate.isCollapsible = () => true;
             collapsedCandidate.collapsed = true;
 
             const trashedCandidate = makeFlowBlock({

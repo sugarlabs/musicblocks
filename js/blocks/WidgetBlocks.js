@@ -315,6 +315,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("temperament");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.setHelpString([
                 _("The Temperament tool is used to define custom tuning."),
@@ -473,6 +474,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("timbre");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.setHelpString();
 
@@ -743,6 +745,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("modewidget");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
@@ -807,6 +810,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("tempo");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
@@ -962,6 +966,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("pitchdrummatrix");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.setHelpString([
                 _("The Pitch drum matrix is used to map pitches to drum sounds."),
@@ -1054,6 +1059,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("pitchslider");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
             this.setHelpString([
@@ -1202,6 +1208,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("musickeyboard");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
@@ -1281,6 +1288,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("pitchstaircase");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
@@ -1384,6 +1392,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("rhythmruler2");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
 
             this.setHelpString([
@@ -1535,6 +1544,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("matrix");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
@@ -1761,6 +1771,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("status");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 

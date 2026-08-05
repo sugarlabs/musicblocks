@@ -12,11 +12,11 @@
 /*
    global docById, define,
 
-   BACKWARDCOMPATIBILITYDICT, COLLAPSIBLES, DEFAULTACCIDENTAL,
-   DEFAULTBLOCKSCALE, DEFAULTDRUM, DEFAULTEFFECT, DEFAULTFILTER,
-   DEFAULTFILTERTYPE, DEFAULTINTERVAL, DEFAULTINVERT, DEFAULTMODE,
-   DEFAULTNOISE, DEFAULTOSCILLATORTYPE, DEFAULTTEMPERAMENT,
-   DEFAULTVOICE, INLINECOLLAPSIBLES, NATURAL, NUMBERBLOCKDEFAULT,
+    BACKWARDCOMPATIBILITYDICT, DEFAULTACCIDENTAL,
+    DEFAULTBLOCKSCALE, DEFAULTDRUM, DEFAULTEFFECT, DEFAULTFILTER,
+    DEFAULTFILTERTYPE, DEFAULTINTERVAL, DEFAULTINVERT, DEFAULTMODE,
+    DEFAULTNOISE, DEFAULTOSCILLATORTYPE, DEFAULTTEMPERAMENT,
+    DEFAULTVOICE, NATURAL, NUMBERBLOCKDEFAULT,
     STANDARDBLOCKHEIGHT, STRINGLEN, TEXTWIDTH,
     WESTERN2EISOLFEGENAMES, WIDENAMES, addTemperamentToDictionary,
    Block, closeBlkWidgets, ConnectionValidator, createjs, delayExecution, DEFAULTCHORD,
@@ -64,24 +64,6 @@
 // Constants moved to js/block-constants.js
 
 const PITCHBLOCKS = ["pitch", "steppitch", "hertz", "pitchnumber", "nthmodalpitch", "playdrum"];
-
-/**
- * Lazy-initialized Sets for O(1) collapsible type checks in hot paths.
- * Built on first access because the COLLAPSIBLES/INLINECOLLAPSIBLES
- * globals may not yet exist at module parse time in test environments.
- */
-let _collapsiblesSet = null;
-let _inlineCollapsiblesSet = null;
-
-function getCollapsiblesSet() {
-    if (!_collapsiblesSet) _collapsiblesSet = new Set(COLLAPSIBLES);
-    return _collapsiblesSet;
-}
-
-function getInlineCollapsiblesSet() {
-    if (!_inlineCollapsiblesSet) _inlineCollapsiblesSet = new Set(INLINECOLLAPSIBLES);
-    return _inlineCollapsiblesSet;
-}
 
 /**
  * Blocks holds the list of blocks and most of the block-associated
@@ -601,7 +583,7 @@ class Blocks {
                     continue;
                 }
 
-                if (COLLAPSIBLES.includes(myBlock.name) && !myBlock.trash) {
+                if (myBlock.isCollapsible() && !myBlock.trash) {
                     if (myBlock.collapsed) {
                         someCollapsed = true;
                     } else {
@@ -620,7 +602,7 @@ class Blocks {
                         continue;
                     }
 
-                    if (COLLAPSIBLES.includes(myBlock.name) && !myBlock.trash) {
+                    if (myBlock.isCollapsible() && !myBlock.trash) {
                         myBlock.collapseToggle();
                     }
                 }
@@ -631,7 +613,7 @@ class Blocks {
                         continue;
                     }
 
-                    if (COLLAPSIBLES.includes(myBlock.name) && !myBlock.trash) {
+                    if (myBlock.isCollapsible() && !myBlock.trash) {
                         if (!myBlock.collapsed) {
                             myBlock.collapseToggle();
                         }
@@ -1739,17 +1721,6 @@ class Blocks {
         this._testConnectionType = (type1, type2) => {
             return ConnectionValidator.testConnectionType(type1, type2);
         };
-
-        /**
-         * Exposes the collapsible-type lookups so BlockDragController (and
-         * any other consumer) can query block classification without
-         * owning or duplicating the COLLAPSIBLES/INLINECOLLAPSIBLES lists
-         * themselves.
-         * @public
-         * @returns {Set}
-         */
-        this.getCollapsiblesSet = getCollapsiblesSet;
-        this.getInlineCollapsiblesSet = getInlineCollapsiblesSet;
 
         /**
          * Ensure that all the blocks are where they are supposed to be.
@@ -4956,7 +4927,8 @@ class Blocks {
                             break;
                     }
 
-                    if (COLLAPSIBLES.includes(name)) {
+                    const proto = this.protoBlockDict[name];
+                    if (proto && proto.hasCapability("collapsible")) {
                         if (
                             typeof blkData[1] === "object" &&
                             blkData[1].length > 1 &&
@@ -5391,7 +5363,12 @@ class Blocks {
                         blkInfo = [blkData[1][0], { value: null }];
                     } else if (["number", "string"].includes(typeof blkData[1][1])) {
                         blkInfo = [blkData[1][0], { value: blkData[1][1] }];
-                        if (COLLAPSIBLES.includes(blkData[1][0])) {
+                        const normName =
+                            blkData[1][0] in BACKWARDCOMPATIBILITYDICT
+                                ? BACKWARDCOMPATIBILITYDICT[blkData[1][0]]
+                                : blkData[1][0];
+                        const proto = this.protoBlockDict[normName];
+                        if (proto && proto.hasCapability("collapsible")) {
                             blkInfo[1]["collapsed"] = false;
                         }
                     } else {
@@ -5399,7 +5376,12 @@ class Blocks {
                     }
                 } else {
                     blkInfo = [blkData[1], { value: null }];
-                    if (COLLAPSIBLES.includes(blkData[1])) {
+                    const normName =
+                        blkData[1] in BACKWARDCOMPATIBILITYDICT
+                            ? BACKWARDCOMPATIBILITYDICT[blkData[1]]
+                            : blkData[1];
+                    const proto = this.protoBlockDict[normName];
+                    if (proto && proto.hasCapability("collapsible")) {
                         blkInfo[1]["collapsed"] = false;
                     }
                 }
