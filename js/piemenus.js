@@ -1037,8 +1037,12 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
         if (hasOctaveWheel) {
             that._octavesWheel.removeWheel();
         }
-        that.label.style.display = "none";
-        docById("labelDiv").classList.remove("hasKeyboard");
+        if (that.label) {
+            that.label.style.display = "none";
+        }
+        if (docById("labelDiv") && docById("labelDiv").classList) {
+            docById("labelDiv").classList.remove("hasKeyboard");
+        }
     };
 };
 
@@ -1924,8 +1928,12 @@ const piemenuNoteValue = (block, noteValue) => {
         hideWheelDiv();
         that._noteValueWheel.removeWheel();
         that._exitWheel.removeWheel();
-        that.label.style.display = "none";
-        docById("labelDiv").classList.remove("hasKeyboard");
+        if (that.label) {
+            that.label.style.display = "none";
+        }
+        if (docById("labelDiv") && docById("labelDiv").classList) {
+            docById("labelDiv").classList.remove("hasKeyboard");
+        }
         if (that._check_meter_block !== null) {
             that.blocks.meter_block_changed(that._check_meter_block);
         }
@@ -2164,8 +2172,12 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         hideWheelDiv();
         that._numberWheel.removeWheel();
         that._exitWheel.removeWheel();
-        that.label.style.display = "none";
-        docById("labelDiv").classList.remove("hasKeyboard");
+        if (that.label) {
+            that.label.style.display = "none";
+        }
+        if (docById("labelDiv") && docById("labelDiv").classList) {
+            docById("labelDiv").classList.remove("hasKeyboard");
+        }
 
         if (that._check_meter_block !== null) {
             that.blocks.meter_block_changed(that._check_meter_block);
@@ -2497,8 +2509,12 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
         hideWheelDiv();
         that._numberWheel.removeWheel();
         that._exitWheel.removeWheel();
-        that.label.style.display = "none";
-        docById("labelDiv").classList.remove("hasKeyboard");
+        if (that.label) {
+            that.label.style.display = "none";
+        }
+        if (docById("labelDiv") && docById("labelDiv").classList) {
+            docById("labelDiv").classList.remove("hasKeyboard");
+        }
     };
 
     const labelElem = docById("labelDiv");
