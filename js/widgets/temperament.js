@@ -150,6 +150,11 @@ function TemperamentWidget() {
      */
     const ratioToWheelAngle = (ratio, base) => 270 + 360 * (Math.log10(ratio) / Math.log10(base));
 
+    // Exposed for direct unit testing: this pure formula only ever runs
+    // inside loops gated by a real wheelnav instance's navItemCount, which
+    // is impractical to simulate faithfully in a unit test.
+    this._ratioToWheelAngle = ratioToWheelAngle;
+
     /**
      * Converts a frequency ratio to cents relative to the tonic. 1200 cents
      * equals one octave (ratio === base).
