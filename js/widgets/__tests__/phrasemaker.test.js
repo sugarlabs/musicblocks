@@ -1143,6 +1143,214 @@ describe("PhraseMaker Widget", () => {
 
         expect(phraseMaker.activity.blocks.loadNewBlocks).toHaveBeenCalled();
     });
+    test("_save wires lastConnection identically across all block types (characterization)", () => {
+        global.PhraseMakerAudio = { collectNotesToPlay: jest.fn() };
+
+        phraseMaker._rows = [];
+        phraseMaker._rowBlocks = [];
+        phraseMaker._colBlocks = [];
+        phraseMaker._blockMap = {};
+        phraseMaker._rowMap = [];
+        phraseMaker._rowOffset = [];
+
+        phraseMaker.lyricsON = false;
+
+        phraseMaker._notesToPlay = [
+            [["440"], 4], // hertz
+            [["kick"], 4], // drum
+            [["http://x.wav"], 4], // drum url
+            [["arc: 50: 90"], 4], // 2-arg graphics
+            [["forward: 100"], 4], // 1-arg graphics
+            [["E4"], 4], // plain pitch, single-length note
+            [["C4", "G4"], 4] // multi pitch: exercises j !== length-1 vs j === length-1
+        ];
+        phraseMaker._outputAsTuplet = Array(7).fill([1, 4]);
+
+        phraseMaker._deps.getDrumName = jest.fn(n => (n === "kick" ? "kick" : null));
+        phraseMaker._deps.toFraction = jest.fn(() => [1, 4]);
+        phraseMaker._deps.isCustomTemperament = jest.fn(() => false);
+        phraseMaker._deps.SOLFEGECONVERSIONTABLE = { C: "do", G: "so" };
+
+        global.PhraseMakerUtils = {
+            MATRIXGRAPHICS: ["forward"],
+            MATRIXGRAPHICS2: ["arc"],
+            MATRIXSYNTHS: []
+        };
+
+        phraseMaker.activity = {
+            blocks: {
+                palettes: { dict: {} },
+                loadNewBlocks: jest.fn()
+            },
+            refreshCanvas: jest.fn(),
+            textMsg: jest.fn(),
+            logo: { synth: { inTemperament: "equal" } }
+        };
+
+        phraseMaker._save();
+
+        // Second run with lyricsON = true so the guard's `!this.lyricsON`
+        // half is false, forcing every block into the thisBlock+offset
+        // branch (the null branch is already exercised above).
+        phraseMaker.lyricsON = true;
+        phraseMaker._save();
+
+        // Pin down [blockType, connections] for every pushed block, in order,
+        // for both runs. This locks in the exact lastConnection wiring
+        // produced by the (currently duplicated) null-vs-thisBlock+offset
+        // guard, so a later extraction of that guard into a helper can be
+        // verified byte-for-byte.
+        const toSignature = newStack =>
+            newStack.map(entry => [Array.isArray(entry[1]) ? entry[1][0] : entry[1], entry[4]]);
+
+        const [lyricsOffCall, lyricsOnCall] = phraseMaker.activity.blocks.loadNewBlocks.mock.calls;
+        const signatureLyricsOff = toSignature(lyricsOffCall[0]);
+        const signatureLyricsOn = toSignature(lyricsOnCall[0]);
+
+        // lyricsON = false, every note[0] is length 1: the guard's
+        // `(note[0].length === 1 || ...)` half is always true, so
+        // lastConnection is null for every pitch/drum/graphics block.
+        expect(signatureLyricsOff).toEqual([
+            ["action", [null, 1, 2, null]],
+            ["text", [0]],
+            ["newnote", [0, 4, 3, 9]],
+            ["vspace", [2, 7]],
+            ["divide", [2, 5, 6]],
+            ["number", [4]],
+            ["number", [4]],
+            ["hertz", [3, 8, null]],
+            ["number", [7]],
+            ["newnote", [2, 11, 10, 16]],
+            ["vspace", [9, 14]],
+            ["divide", [9, 12, 13]],
+            ["number", [11]],
+            ["number", [11]],
+            ["playdrum", [10, 15, null]],
+            ["drumname", [14]],
+            ["newnote", [9, 18, 17, 23]],
+            ["vspace", [16, 21]],
+            ["divide", [16, 19, 20]],
+            ["number", [18]],
+            ["number", [18]],
+            ["playdrum", [17, 22, null]],
+            ["text", [21]],
+            ["newnote", [16, 25, 24, 31]],
+            ["vspace", [23, 28]],
+            ["divide", [23, 26, 27]],
+            ["number", [25]],
+            ["number", [25]],
+            ["arc", [24, 29, 30, null]],
+            ["number", [28]],
+            ["number", [28]],
+            ["newnote", [23, 33, 32, 38]],
+            ["vspace", [31, 36]],
+            ["divide", [31, 34, 35]],
+            ["number", [33]],
+            ["number", [33]],
+            ["forward", [32, 37, null]],
+            ["number", [36]],
+            ["newnote", [31, 40, 39, 46]],
+            ["vspace", [38, 43]],
+            ["divide", [38, 41, 42]],
+            ["number", [40]],
+            ["number", [40]],
+            ["pitch", [39, 44, 45, null]],
+            ["solfege", [43]],
+            ["number", [43]],
+            ["newnote", [38, 48, 47, null]],
+            ["vspace", [46, 51]],
+            ["divide", [46, 49, 50]],
+            ["number", [48]],
+            ["number", [48]],
+            ["pitch", [47, 52, 53, 54]],
+            ["solfege", [51]],
+            ["number", [51]],
+            ["pitch", [51, 55, 56, null]],
+            ["solfege", [54]],
+            ["number", [54]]
+        ]);
+
+        // lyricsON = true: the guard's `!this.lyricsON` half is always
+        // false, so lastConnection is thisBlock+offset for every block,
+        // regardless of position — pinning down each type's exact offset
+        // (hertz/playdrum/playdrum-url/1-arg-graphics: +2,
+        // 2-arg-graphics/pitch: +3).
+        expect(signatureLyricsOn).toEqual([
+            ["action", [null, 1, 2, null]],
+            ["text", [0]],
+            ["newnote", [0, 4, 3, 11]],
+            ["vspace", [2, 7]],
+            ["divide", [2, 5, 6]],
+            ["number", [4]],
+            ["number", [4]],
+            ["hertz", [3, 8, 9]],
+            ["number", [7]],
+            ["print", [7, 10, null]],
+            ["text", [9]],
+            ["newnote", [2, 13, 12, 20]],
+            ["vspace", [11, 16]],
+            ["divide", [11, 14, 15]],
+            ["number", [13]],
+            ["number", [13]],
+            ["playdrum", [12, 17, 18]],
+            ["drumname", [16]],
+            ["print", [16, 19, null]],
+            ["text", [18]],
+            ["newnote", [11, 22, 21, 29]],
+            ["vspace", [20, 25]],
+            ["divide", [20, 23, 24]],
+            ["number", [22]],
+            ["number", [22]],
+            ["playdrum", [21, 26, 27]],
+            ["text", [25]],
+            ["print", [25, 28, null]],
+            ["text", [27]],
+            ["newnote", [20, 31, 30, 39]],
+            ["vspace", [29, 34]],
+            ["divide", [29, 32, 33]],
+            ["number", [31]],
+            ["number", [31]],
+            ["arc", [30, 35, 36, 37]],
+            ["number", [34]],
+            ["number", [34]],
+            ["print", [34, 38, null]],
+            ["text", [37]],
+            ["newnote", [29, 41, 40, 48]],
+            ["vspace", [39, 44]],
+            ["divide", [39, 42, 43]],
+            ["number", [41]],
+            ["number", [41]],
+            ["forward", [40, 45, 46]],
+            ["number", [44]],
+            ["print", [44, 47, null]],
+            ["text", [46]],
+            ["newnote", [39, 50, 49, 58]],
+            ["vspace", [48, 53]],
+            ["divide", [48, 51, 52]],
+            ["number", [50]],
+            ["number", [50]],
+            ["pitch", [49, 54, 55, 56]],
+            ["solfege", [53]],
+            ["number", [53]],
+            ["print", [53, 57, null]],
+            ["text", [56]],
+            ["newnote", [48, 60, 59, null]],
+            ["vspace", [58, 63]],
+            ["divide", [58, 61, 62]],
+            ["number", [60]],
+            ["number", [60]],
+            ["pitch", [59, 64, 65, 66]],
+            ["solfege", [63]],
+            ["number", [63]],
+            ["pitch", [63, 67, 68, 69]],
+            ["solfege", [66]],
+            ["number", [66]],
+            ["print", [66, 70, null]],
+            ["text", [69]]
+        ]);
+
+        expect(phraseMaker.activity.blocks.loadNewBlocks).toHaveBeenCalledTimes(2);
+    });
     test("_save covers 7-block tuplet branch", () => {
         phraseMaker._rows = [];
         phraseMaker._rowBlocks = [];
@@ -1277,6 +1485,98 @@ describe("PhraseMaker Widget", () => {
         phraseMaker.init(mockActivity);
 
         expect(mockActivity.textMsg).toHaveBeenCalled();
+    });
+    test("isInitial ensures the first-open message fires only once across repeated init() calls", () => {
+        const mockActivity = {
+            turtles: {
+                ithTurtle: jest.fn(() => ({
+                    singer: {
+                        beatsPerMeasure: 4,
+                        noteValuePerBeat: 4,
+                        keySignature: 0
+                    }
+                }))
+            },
+            logo: {
+                tupletRhythms: [["notes", 0, 4]],
+                synth: {
+                    inTemperament: "equal",
+                    stopSound: jest.fn(),
+                    stop: jest.fn(),
+                    loadSynth: jest.fn()
+                }
+            },
+            blocks: {
+                protoBlockDict: {
+                    forward: { staticLabels: ["Forward"] }
+                }
+            },
+            canvas: { width: 800, height: 600 },
+            getStageScale: jest.fn(() => 1),
+            hideMsgs: jest.fn(),
+            textMsg: jest.fn()
+        };
+
+        phraseMaker._rows = [];
+        phraseMaker._headcols = [];
+        phraseMaker._labelcols = [];
+        phraseMaker._blockMap = {};
+        phraseMaker.blockNo = 0;
+        phraseMaker.rowLabels = ["C", "kick", "forward"];
+        phraseMaker.rowArgs = [4, 4, 100];
+        phraseMaker._deps.getDrumName = jest.fn(name => (name === "kick" ? "kick" : null));
+        phraseMaker.lyricsON = true;
+
+        global.PhraseMakerUtils = {
+            MATRIXGRAPHICS: ["forward"],
+            MATRIXGRAPHICS2: [],
+            MATRIXSYNTHS: []
+        };
+
+        global.window.widgetWindows = {
+            windowFor: jest.fn().mockReturnValue({
+                clear: jest.fn(),
+                show: jest.fn(),
+                addButton: jest.fn().mockReturnValue({
+                    onclick: null,
+                    innerHTML: "",
+                    style: {},
+                    setAttribute: jest.fn()
+                }),
+                getWidgetBody: jest.fn().mockReturnValue({
+                    appendChild: jest.fn(),
+                    append: jest.fn()
+                }),
+                sendToCenter: jest.fn(),
+                destroy: jest.fn()
+            })
+        };
+        global.PhraseMakerUI = {
+            calculateNoteWidth: jest.fn(() => 80),
+            resetMatrix: jest.fn()
+        };
+
+        expect(phraseMaker.isInitial).toBe(true);
+
+        phraseMaker.init(mockActivity);
+
+        expect(mockActivity.textMsg).toHaveBeenCalledTimes(1);
+        expect(mockActivity.textMsg).toHaveBeenCalledWith("Click on the table to add notes.", 3000);
+        expect(phraseMaker.isInitial).toBe(false);
+
+        // init() itself doesn't clear row-building state between calls (the
+        // real caller always builds a fresh matrix); reset just enough of it
+        // here so a second call completes, to prove the first-open message
+        // does not repeat once isInitial has flipped to false.
+        phraseMaker._rows = [];
+        phraseMaker._headcols = [];
+        phraseMaker._labelcols = [];
+        phraseMaker._blockMap = {};
+
+        phraseMaker.init(mockActivity);
+
+        expect(mockActivity.textMsg).toHaveBeenCalledTimes(1);
+        expect(phraseMaker.isInitial).toBe(false);
     });
     test("_createColumnPieSubmenu executes", () => {
         phraseMaker.platformColor = {
