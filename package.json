@@ -79,7 +79,7 @@
         "jquery": "3.7.1",
         "jquery-ui-dist": "1.12.1",
         "materialize-css": "0.100.2",
-        "postcss": "8.5.18",
+        "postcss": "8.5.23",
         "sass": "1.101.0",
         "tone": "^15.1.22"
     },
