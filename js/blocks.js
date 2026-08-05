@@ -6670,12 +6670,18 @@ class Blocks {
                     const comp = this.turtles.turtleList[turtle].companionTurtle;
                     if (comp) {
                         this.turtles.turtleList[comp].inTrash = true;
-                        this.turtles.turtleList[comp].container.visible = false;
+                        if (this.turtles.turtleList[comp].container) {
+                            this.turtles.turtleList[comp].container.visible = false;
+                        }
                         this.turtles.turtleList[turtle].inTrash = true;
-                        this.turtles.turtleList[turtle].container.visible = false;
+                        if (this.turtles.turtleList[turtle].container) {
+                            this.turtles.turtleList[turtle].container.visible = false;
+                        }
                     } else {
                         this.turtles.turtleList[turtle].inTrash = true;
-                        this.turtles.turtleList[turtle].container.visible = false;
+                        if (this.turtles.turtleList[turtle].container) {
+                            this.turtles.turtleList[turtle].container.visible = false;
+                        }
                     }
                 }
             } else if (myBlock.name === "action") {
