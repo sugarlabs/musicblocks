@@ -192,6 +192,18 @@ describe("canvasPixelRatio()", () => {
         stubCanvas({ [property]: 2 });
         expect(canvasPixelRatio()).toBe(2);
     });
+
+    it("safely returns devicePixelRatio when #myCanvas is not present in DOM", () => {
+        window.devicePixelRatio = 2;
+        document.querySelector = jest.fn(() => null);
+        expect(canvasPixelRatio()).toBe(2);
+    });
+
+    it("safely returns devicePixelRatio when canvas.getContext returns null", () => {
+        window.devicePixelRatio = 2;
+        document.querySelector = jest.fn(() => ({ getContext: jest.fn(() => null) }));
+        expect(canvasPixelRatio()).toBe(2);
+    });
 });
 
 // Distinct literals so an inner/outer mix-up cannot produce a passing assertion.
