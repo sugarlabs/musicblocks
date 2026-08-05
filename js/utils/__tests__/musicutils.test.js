@@ -54,6 +54,7 @@ const {
     noteToFrequency,
     setOctaveRatio,
     getOctaveRatio,
+    ratioToWheelAngle,
     TEMPERAMENT,
     getTemperamentsList,
     getTemperament,
@@ -697,6 +698,18 @@ describe("getNoiseIcon", () => {
     });
     it("should be case sensitive for noise names", () => {
         expect(getNoiseIcon("WHITE NOISE")).toBe("images/synth.svg");
+    });
+});
+
+describe("ratioToWheelAngle", () => {
+    it("returns 270 degrees for unison (ratio === base^0)", () => {
+        expect(ratioToWheelAngle(1, 2)).toBe(270);
+    });
+    it("returns 630 degrees (270 + 360) for one full octave (ratio === base)", () => {
+        expect(ratioToWheelAngle(2, 2)).toBeCloseTo(630, 6);
+    });
+    it("returns 450 degrees (270 + 180) for a half octave (ratio === sqrt(base))", () => {
+        expect(ratioToWheelAngle(Math.sqrt(2), 2)).toBeCloseTo(450, 6);
     });
 });
 

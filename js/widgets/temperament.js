@@ -23,7 +23,7 @@
    deleteTemperamentFromList, docById, FLAT, getNoteFromInterval,
    getOctaveRatio, getTemperament, getTemperamentKeys, getTemperamentRatio,
    isCustomTemperament, last, normalizeNoteAccidentals, parseNoteString, pitchToFrequency, platformColor,
-   PREVIEWVOLUME, rationalToFraction, setOctaveRatio, setOctaveRatio, SHARP, Singer,
+   PREVIEWVOLUME, ratioToWheelAngle, rationalToFraction, setOctaveRatio, setOctaveRatio, SHARP, Singer,
    slicePath, updateTemperaments, wheelnav, frequencyToPitch
  */
 
@@ -140,38 +140,10 @@ function TemperamentWidget() {
      */
     this.playbackForward = true;
 
-    /**
-     * Converts a frequency ratio to the wheel angle (in degrees) used to
-     * position a note around a circle-of-notes wheel. 270 is the wheel's
-     * start angle; a ratio equal to base (one full octave) maps to +360.
-     * @param {number} ratio - The ratio relative to the tonic.
-     * @param {number} base - The octave ratio (e.g. 2 for a 2:1 octave).
-     * @returns {number} The wheel angle in degrees.
-     */
-    const ratioToWheelAngle = (ratio, base) => 270 + 360 * (Math.log10(ratio) / Math.log10(base));
-
-    // Exposed for direct unit testing: this pure formula only ever runs
-    // inside loops gated by a real wheelnav instance's navItemCount, which
-    // is impractical to simulate faithfully in a unit test.
-    this._ratioToWheelAngle = ratioToWheelAngle;
-
-    /**
-     * Converts a frequency ratio to cents relative to the tonic. 1200 cents
-     * equals one octave (ratio === base).
-     * @param {number} ratio - The ratio relative to the tonic.
-     * @param {number} base - The octave ratio (e.g. 2 for a 2:1 octave).
-     * @returns {number} The offset in cents.
-     */
+    /** Converts a ratio to cents relative to the tonic (1200 cents = 1 octave). */
     const ratioToCents = (ratio, base) => 1200 * (Math.log10(ratio) / Math.log10(base));
 
-    /**
-     * Recomputes a frequencies array from a ratios array and a base
-     * frequency, rounding each entry to two decimal places.
-     * @param {number[]} ratios - The ratios relative to the tonic.
-     * @param {number} baseFrequency - The frequency (Hz) of the tonic.
-     * @param {number} count - The highest index (inclusive) to compute.
-     * @returns {string[]} The frequencies, each formatted to 2 decimal places.
-     */
+    /** Recomputes a frequencies array from ratios and a tonic frequency, each entry to 2dp. */
     const computeFrequencies = (ratios, baseFrequency, count) => {
         const frequencies = [];
         for (let i = 0; i <= count; i++) {
@@ -180,15 +152,7 @@ function TemperamentWidget() {
         return frequencies;
     };
 
-    /**
-     * Sets all four wheelnav slice-color attributes for a nav item to the
-     * same color, matching the properties wheelnav reads for fill/hover/
-     * selection state.
-     * @param {Object} navObj - A wheelnav instance (e.g. this.notesCircle).
-     * @param {number} index - The nav item index to recolor.
-     * @param {string} color - The CSS color to apply.
-     * @returns {void}
-     */
+    /** Sets a wheelnav nav item's fill/hover/path/selected color attributes to one color. */
     const setNavItemColor = (navObj, index, color) => {
         navObj.navItems[index].fillAttr = color;
         navObj.navItems[index].sliceHoverAttr.fill = color;
@@ -196,28 +160,7 @@ function TemperamentWidget() {
         navObj.navItems[index].sliceSelectedAttr.fill = color;
     };
 
-    /**
-     * Sets the mouse cursor to a pointer while hovering the given element.
-     * @param {HTMLElement} el - The element to attach the hover handler to.
-     * @returns {void}
-     */
-    const enablePointerCursor = el => {
-        el.onmouseover = function () {
-            this.style.cursor = "pointer";
-        };
-    };
-
-    /**
-     * Builds (or rebuilds) the "preview"/"done" button pair shown while
-     * editing a temperament, appending it to the given container.
-     * @param {HTMLElement} divAppend - The container div for the button pair.
-     * @param {HTMLElement} container - The parent element to append divAppend to.
-     * @param {string} marginLeft - The CSS marginLeft to apply (offsets the
-     *   pair to align under the differently-indented equal/ratio edit forms).
-     * @param {boolean} preview - Whether "preview" mode is active; toggles the
-     *   left button's label between "preview" and "back".
-     * @returns {void}
-     */
+    /** Builds the "preview"/"done" button pair shown while editing a temperament. */
     const addPreviewDoneButtonPair = (divAppend, container, marginLeft, preview) => {
         divAppend.id = "divAppend";
         divAppend.textContent = "";
@@ -823,14 +766,7 @@ function TemperamentWidget() {
         return baseFreq * Math.pow(2, cents / 1200);
     };
 
-    /**
-     * Hides and removes a wheelnav wheel if its container div is currently
-     * present in the DOM.
-     * @param {string} divId - The id of the wheel's container div.
-     * @param {string} wheelProp - The name of the widget property (e.g.
-     *   "notesCircle") holding the wheelnav instance to remove.
-     * @returns {void}
-     */
+    /** Hides and removes a wheelnav wheel if its container div is present in the DOM. */
     this._removeWheelIfPresent = function (divId, wheelProp) {
         const el = docById(divId);
         if (el !== null) {
@@ -1116,12 +1052,7 @@ function TemperamentWidget() {
         };
     };
 
-    /**
-     * Recolors and redraws a preview wheelnav wheel's slices back to the
-     * default background color after a preview edit.
-     * @param {number} pitchNumber - The number of nav items to recolor.
-     * @returns {void}
-     */
+    /** Recolors a preview wheelnav wheel's slices back to the default background. */
     this._paintPreviewWheelColors = function (pitchNumber) {
         for (let i = 0; i < pitchNumber; i++) {
             setNavItemColor(this.notesCircle, i, platformColor.selectorBackground || "#e0e0e0");
@@ -1176,7 +1107,9 @@ function TemperamentWidget() {
 
         addDivision(false);
 
-        enablePointerCursor(divAppend);
+        divAppend.onmouseover = function () {
+            this.style.cursor = "pointer";
+        };
 
         let pitchNumber = this.pitchNumber;
         let pitchNumber1 = Number(docById("octaveIn").value);
@@ -1344,7 +1277,9 @@ function TemperamentWidget() {
 
         addButtons(false);
 
-        enablePointerCursor(divAppend);
+        divAppend.onmouseover = function () {
+            this.style.cursor = "pointer";
+        };
 
         divAppend.onclick = function (event) {
             const input1 = docById("ratioIn").value;
@@ -1687,7 +1622,9 @@ function TemperamentWidget() {
         divAppend.style.overflow = "auto";
         arbitraryEdit.append(divAppend);
 
-        enablePointerCursor(divAppend);
+        divAppend.onmouseover = function () {
+            this.style.cursor = "pointer";
+        };
 
         divAppend.onclick = function () {
             that.ratios = that.tempRatios1.slice();
@@ -1883,7 +1820,9 @@ function TemperamentWidget() {
         divAppend.style.overflow = "auto";
         octaveSpaceEdit.append(divAppend);
 
-        enablePointerCursor(divAppend);
+        divAppend.onmouseover = function () {
+            this.style.cursor = "pointer";
+        };
 
         divAppend.onclick = function () {
             const startRatio = docById("startNote").value;
@@ -2320,13 +2259,7 @@ function TemperamentWidget() {
         this._playing = !this._playing;
         this._logo.resetSynth(0);
 
-        /**
-         * Replaces a button cell's contents with a single icon/label pair.
-         * @param {HTMLTableCellElement} cell - The cell to update.
-         * @param {string} icon - The icon file name.
-         * @param {string} label - The title/alt text for the icon.
-         * @returns {void}
-         */
+        /** Replaces a button cell's contents with a single icon/label pair. */
         const setPlayButtonIcon = (cell, icon, label) => {
             cell.textContent = "\u00A0\u00A0";
             const img = document.createElement("img");

@@ -2990,6 +2990,15 @@ const getOctaveRatio = () => {
 };
 
 /**
+ * Converts a frequency ratio to a circle-of-notes wheel angle in degrees.
+ * @function
+ * @param {number} ratio - The ratio relative to the tonic.
+ * @param {number} base - The octave ratio (e.g. 2 for a 2:1 octave).
+ * @returns {number} The wheel angle in degrees.
+ */
+const ratioToWheelAngle = (ratio, base) => 270 + 360 * (Math.log10(ratio) / Math.log10(base));
+
+/**
  * Get the list of available temperaments.
  * @function
  * @returns {Array<Array<string>>} The list of available temperaments.
@@ -7706,6 +7715,7 @@ const getPitchInfo = function (activity, type, currentNote, tur) {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         updateTemperaments,
+        ratioToWheelAngle,
         scaleDegreeToPitchMapping,
         buildScale,
         getNote,

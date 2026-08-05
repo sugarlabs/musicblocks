@@ -67,6 +67,9 @@ describe("TemperamentWidget basic tests", () => {
                 ? value.ratio
                 : Number(value)
         );
+        global.ratioToWheelAngle = jest.fn(
+            (ratio, base) => 270 + 360 * (Math.log10(ratio) / Math.log10(base))
+        );
         global.getTemperament = jest.fn(() => ({
             interval: [],
             pitchNumber: 0
@@ -1487,23 +1490,8 @@ describe("TemperamentWidget basic tests", () => {
     // separately callable units before, so none had dedicated coverage;
     // each block tests through the widget's public API wherever practical.
 
-    describe("extracted helper: ratioToWheelAngle", () => {
-        // Exposed as widget._ratioToWheelAngle because its only call sites in
-        // createMainWheel/_createInnerWheel sit in loops gated by a real
-        // wheelnav instance's navItemCount, which the test suite's wheelnav
-        // mock never sets, so those loops never execute under mocking.
-        test("returns 270 degrees for unison (ratio === base^0)", () => {
-            expect(widget._ratioToWheelAngle(1, 2)).toBe(270);
-        });
-
-        test("returns 630 degrees (270 + 360) for one full octave (ratio === base)", () => {
-            expect(widget._ratioToWheelAngle(2, 2)).toBeCloseTo(630, 6);
-        });
-
-        test("returns 450 degrees (270 + 180) for a half octave (ratio === sqrt(base))", () => {
-            expect(widget._ratioToWheelAngle(Math.sqrt(2), 2)).toBeCloseTo(450, 6);
-        });
-    });
+    // ratioToWheelAngle lives in js/utils/musicutils.js (see musicutils.test.js)
+    // since it's a general tuning-math helper, not TemperamentWidget-specific.
 
     describe("extracted helper: ratioToCents (exercised via init())", () => {
         test("computes cents for each pitch from its ratio during init()", () => {
@@ -1573,36 +1561,37 @@ describe("TemperamentWidget basic tests", () => {
         });
     });
 
-    describe("extracted helper: _paintPreviewWheelColors (drives setNavItemColor)", () => {
-        const makeSlice = () => ({
-            fillAttr: "",
-            sliceHoverAttr: {},
-            slicePathAttr: {},
-            sliceSelectedAttr: {}
-        });
+    describe("extracted helper: _paintPreviewWheelColors (exercised via equalEdit's preview click)", () => {
+        test("previewing an equal-division edit colors every nav item and refreshes the wheel", () => {
+            global.docById = jest.fn(id => {
+                if (id === "octaveIn") return { value: "0" };
+                if (id === "octaveOut") return { value: "0" };
+                if (id === "divisions") return { value: "1" };
+                return createMockElement(id);
+            });
 
-        test("colors every nav item to the selector background and refreshes the wheel", () => {
+            widget.ratios = [1, 2];
+            widget.frequencies = [440, 880];
+            widget.pitchNumber = 1;
+            widget.powerBase = 2;
+            widget.checkTemperament = jest.fn();
+            widget.createMainWheel = jest.fn();
             widget.notesCircle = {
-                navItems: [makeSlice(), makeSlice(), makeSlice()],
+                navItems: [
+                    { fillAttr: "", sliceHoverAttr: {}, slicePathAttr: {}, sliceSelectedAttr: {} }
+                ],
                 refreshWheel: jest.fn()
             };
 
-            widget._paintPreviewWheelColors(3);
+            widget.equalEdit();
+            widget.performEqualEdit({ target: { textContent: "preview" } });
 
-            widget.notesCircle.navItems.forEach(item => {
-                expect(item.fillAttr).toBe(global.platformColor.selectorBackground);
-                expect(item.sliceHoverAttr.fill).toBe(global.platformColor.selectorBackground);
-                expect(item.slicePathAttr.fill).toBe(global.platformColor.selectorBackground);
-                expect(item.sliceSelectedAttr.fill).toBe(global.platformColor.selectorBackground);
-            });
-            expect(widget.notesCircle.refreshWheel).toHaveBeenCalled();
-        });
-
-        test("refreshes the wheel even when there are no nav items to color", () => {
-            widget.notesCircle = { navItems: [], refreshWheel: jest.fn() };
-
-            widget._paintPreviewWheelColors(0);
-
+            expect(widget.createMainWheel).toHaveBeenCalled();
+            const item = widget.notesCircle.navItems[0];
+            expect(item.fillAttr).toBe(global.platformColor.selectorBackground);
+            expect(item.sliceHoverAttr.fill).toBe(global.platformColor.selectorBackground);
+            expect(item.slicePathAttr.fill).toBe(global.platformColor.selectorBackground);
+            expect(item.sliceSelectedAttr.fill).toBe(global.platformColor.selectorBackground);
             expect(widget.notesCircle.refreshWheel).toHaveBeenCalled();
         });
     });
@@ -1668,23 +1657,68 @@ describe("TemperamentWidget basic tests", () => {
         });
     });
 
-    describe("extracted helper: _removeWheelIfPresent", () => {
-        test("hides the div and removes the wheel when the div is present", () => {
+    describe("extracted helper: _removeWheelIfPresent (exercised via edit())", () => {
+        const initWidget = () => {
+            global.window.widgetWindows = {
+                windowFor: jest.fn(() => ({
+                    clear: jest.fn(),
+                    show: jest.fn(),
+                    getWidgetBody: jest.fn(() => ({ append: jest.fn(), style: {} })),
+                    addButton: jest.fn(() => ({
+                        onclick: null,
+                        getElementsByTagName: jest.fn(() => [{}])
+                    })),
+                    sendToCenter: jest.fn()
+                }))
+            };
+            global.buildScale = jest.fn(() => [["C"], []]);
+            global.getNoteFromInterval = jest.fn(() => ["C", 4]);
+            global.getTemperament = jest.fn(() => ({
+                interval: [],
+                pitchNumber: 1,
+                0: 1,
+                1: 2
+            }));
+
+            widget.inTemperament = "equal";
+            widget.scale = ["C", "Major"];
+            widget.init({
+                errorMsg: jest.fn(),
+                logo: {
+                    synth: {
+                        startingPitch: "C4",
+                        _getFrequency: jest.fn(() => 440)
+                    }
+                }
+            });
+            widget._logo = { synth: { setMasterVolume: jest.fn(), stop: jest.fn() } };
+            document.querySelectorAll = jest.fn(() => [
+                { style: {} },
+                { style: {} },
+                { style: {} },
+                { style: {} }
+            ]);
+        };
+
+        test("edit() hides and removes the circle-of-notes wheel when it is on screen", () => {
+            initWidget();
             const wheelDiv = { style: {} };
-            global.docById = jest.fn(id => (id === "wheelDiv2" ? wheelDiv : null));
+            global.docById = jest.fn(id => (id === "wheelDiv2" ? wheelDiv : createMockElement(id)));
             widget.notesCircle = { removeWheel: jest.fn() };
 
-            widget._removeWheelIfPresent("wheelDiv2", "notesCircle");
+            widget.edit();
 
             expect(wheelDiv.style.display).toBe("none");
             expect(widget.notesCircle.removeWheel).toHaveBeenCalled();
         });
 
-        test("does nothing when the div is not present", () => {
-            global.docById = jest.fn(() => null);
+        test("edit() leaves the wheel alone when it is not on screen", () => {
+            initWidget();
+            global.docById = jest.fn(id => (id === "wheelDiv2" ? null : createMockElement(id)));
             widget.notesCircle = { removeWheel: jest.fn() };
 
-            expect(() => widget._removeWheelIfPresent("wheelDiv2", "notesCircle")).not.toThrow();
+            widget.edit();
+
             expect(widget.notesCircle.removeWheel).not.toHaveBeenCalled();
         });
     });
