@@ -778,17 +778,19 @@ function LegoWidget() {
      */
     this.createZoomControls = function () {
         this.zoomControls = document.createElement("div");
-        this.zoomControls.style.position = "absolute"; // Changed to absolute positioning
-        this.zoomControls.style.bottom = "0";
-        this.zoomControls.style.left = "180px"; // Align with image area
-        this.zoomControls.style.right = "0";
-        this.zoomControls.style.padding = "10px";
-        this.zoomControls.style.backgroundColor = "#f0f0f0";
-        this.zoomControls.style.borderTop = "1px solid #888";
-        this.zoomControls.style.display = "flex";
-        this.zoomControls.style.alignItems = "center";
-        this.zoomControls.style.gap = "8px";
-        this.zoomControls.style.zIndex = "20"; // Ensure it's above the grid
+        Object.assign(this.zoomControls.style, {
+            position: "absolute", // Changed to absolute positioning
+            bottom: "0",
+            left: "180px", // Align with image area
+            right: "0",
+            padding: "10px",
+            backgroundColor: "#f0f0f0",
+            borderTop: "1px solid #888",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            zIndex: "20" // Ensure it's above the grid
+        });
 
         const elements = [
             ...this._createInstrumentControls(),
