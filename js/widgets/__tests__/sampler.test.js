@@ -921,8 +921,8 @@ describe("Sampler Widget", () => {
             widget.is_recording = true;
             widget.running = true;
             widget.pitchAnalysers = {
-                0: { getValue: jest.fn(() => [0, 0.5, -0.5]) },
-                1: { getValue: jest.fn(() => [0, 0.5, -0.5]) }
+                0: { getValue: jest.fn(() => [0, 0.5, -0.5]), dispose: jest.fn() },
+                1: { getValue: jest.fn(() => [0, 0.5, -0.5]), dispose: jest.fn() }
             };
             global.TunerUtils.frequencyToPitch.mockReturnValue(["A4", 0]);
             global.detectPitch = jest.fn(() => 440);
@@ -958,8 +958,8 @@ describe("Sampler Widget", () => {
             widget.drawVisualIDs = {};
             widget.running = true;
             widget.pitchAnalysers = {
-                0: { getValue: jest.fn(() => [0.1, -0.1]) },
-                1: { getValue: jest.fn(() => [0.2, -0.2]) }
+                0: { getValue: jest.fn(() => [0.1, -0.1]), dispose: jest.fn() },
+                1: { getValue: jest.fn(() => [0.2, -0.2]), dispose: jest.fn() }
             };
             widget.tunerDisplay = new global.TunerDisplay(
                 document.createElement("canvas"),
