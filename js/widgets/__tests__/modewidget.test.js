@@ -509,6 +509,21 @@ describe("ModeWidget", () => {
         expect(modeWidget._modeLabelCell.textContent).toBe("C ionian");
     });
 
+    test("should refuse to save a mode with nothing but the tonic selected", () => {
+        // The state left behind by Clear: _calculateMode() returns [12].
+        modeWidget._selectedNotes = Array(12).fill(false);
+        modeWidget._selectedNotes[0] = true;
+
+        const result = modeWidget._saveCustomMode("emptyMode", modeWidget._calculateMode());
+
+        expect(result).toBe(false);
+        expect(MUSICALMODES["emptyMode"]).toBeUndefined();
+        expect(getSavedCustomModes().some(m => m.name === "emptyMode")).toBe(false);
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+            expect.stringContaining("Please select at least one note")
+        );
+    });
+
     test("should refuse to overwrite a built-in mode on save", () => {
         const originalIonian = MUSICALMODES.ionian;
 
