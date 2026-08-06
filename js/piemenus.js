@@ -1058,6 +1058,11 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
 
     showWheelDiv();
 
+    // Set the customID up front so the preview synth can resolve a
+    // frequency even before the user has clicked the temperament tab
+    // (e.g. when there is only one custom temperament defined).
+    block.customID = selectedCustom;
+
     // Some blocks have both pitch and octave, so we can modify
     // both at once.
     const hasOctaveWheel =
@@ -1092,7 +1097,6 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
     block._customWheel.sliceInitPathCustom = block._customWheel.slicePathCustom;
     block._customWheel.titleRotateAngle = 0;
     block._customWheel.animatetime = 0; // 300;
-    block._customWheel.clickModeRotate = false;
     block._customWheel.createWheel(customLabels);
 
     block._cusNoteWheel.colors = platformColor.intervalWheelcolors;
@@ -1133,8 +1137,8 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
         block._octavesWheel.createWheel(octaveLabels);
     }
 
-    //Disable rotation, set navAngle and create the menus
-    block._cusNoteWheel.clickModeRotate = false;
+    // Set navAngle and create the menus. Rotation is left enabled so
+    // the custom note wheel behaves like the regular pitch wheels.
     block._cusNoteWheel.titleRotateAngle = 180;
     block._cusNoteWheel.animatetime = 0; // 300;
     const labelsDict = {};
@@ -1174,6 +1178,11 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
             // labels.push("");
         }
         blockCustom = 0;
+
+        // Notes are collected low-to-high (pitch number order). Reverse
+        // so they display high-to-low, matching the regular pitch wheels
+        // (e.g. solfege is laid out "ti la sol fa mi re do").
+        labelsDict[t].reverse();
     }
     if (!(selectedCustom in labelsDict)) {
         selectedCustom = labelsDict[0];
@@ -1314,7 +1323,12 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
     }
 
     if (typeof j === "number" && !isNaN(j)) {
-        block._cusNoteWheel.navigateWheel(max * customLabels.indexOf(selectedCustom) + j);
+        // j is the ascending pitch-number index; the note wheel is laid
+        // out high-to-low, so convert to the reversed display index.
+        const reversedIndex = labelsDict[selectedCustom].length - 1 - j;
+        block._cusNoteWheel.navigateWheel(
+            max * customLabels.indexOf(selectedCustom) + reversedIndex
+        );
     }
 
     const __exitMenu = () => {
