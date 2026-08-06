@@ -902,6 +902,16 @@ class ModeWidget {
      * @returns {void}
      */
     _save() {
+        // The tonic is always selected, so a mode with a single
+        // interval is one where nothing else has been selected, e.g.
+        // just after Clear. Saving it would overwrite any custom mode
+        // the user has already stored with a degenerate [12] and
+        // generate a meaningless "custom" action block.
+        if (this._calculateMode().length < 2) {
+            this.textMsg(_("Please select at least one note before saving."), 3000);
+            return;
+        }
+
         const table = docById("modeTable");
         const n = table.rows.length - 1;
 

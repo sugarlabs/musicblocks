@@ -61,6 +61,20 @@ global.normalizeNoteAccidentals = jest.fn().mockImplementation(n => n);
 global.MUSICALMODES = {
     ionian: [2, 2, 1, 2, 2, 2, 1]
 };
+global.NOTESTABLE = {
+    0: "ti",
+    1: "do",
+    2: "do♯",
+    3: "re",
+    4: "re♯",
+    5: "mi",
+    6: "fa",
+    7: "fa♯",
+    8: "sol",
+    9: "sol♯",
+    10: "la",
+    11: "la♯"
+};
 
 // Mock slicePath
 global.slicePath = jest.fn().mockReturnValue({
@@ -277,6 +291,35 @@ describe("ModeWidget", () => {
         for (let i = 1; i < 12; i++) {
             expect(modeWidget._selectedNotes[i]).toBe(false);
         }
+    });
+
+    test("should not save a mode when only the root is selected", () => {
+        modeWidget.blocks.loadNewBlocks = jest.fn();
+        modeWidget.storage.custommode = JSON.stringify([2, 2, 1, 2, 2, 2, 1]);
+        modeWidget._selectedNotes = Array(12).fill(false);
+        modeWidget._selectedNotes[0] = true;
+
+        modeWidget._save();
+
+        // The previously saved custom mode is left untouched and no
+        // action block is generated.
+        expect(modeWidget.storage.custommode).toBe(JSON.stringify([2, 2, 1, 2, 2, 2, 1]));
+        expect(modeWidget.blocks.loadNewBlocks).not.toHaveBeenCalled();
+        expect(mockActivity.textMsg).toHaveBeenCalledWith(
+            "Please select at least one note before saving.",
+            3000
+        );
+    });
+
+    test("should save a mode when notes other than the root are selected", () => {
+        modeWidget.blocks.loadNewBlocks = jest.fn();
+        modeWidget._selectedNotes = Array(12).fill(false);
+        modeWidget._selectedNotes[0] = true;
+        modeWidget._selectedNotes[7] = true;
+
+        modeWidget._save();
+
+        expect(modeWidget.blocks.loadNewBlocks).toHaveBeenCalled();
     });
 
     test("should trigger synth when playing a note", () => {
