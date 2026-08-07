@@ -59,9 +59,10 @@ const _b64Cache = new Map();
    addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
    DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
     INTERVALVALUES, MUSICALMODES, getIntervalRatio, frequencyToPitch, NOTESTEP,
-    GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
-    SEMITONES, CHROMATIC_SOLFEGE, INTERVAL_CENTS, TEMPERAMENT_INTERVALS,
-    INTERVAL_ORDER, generateNoteNames, getEdoNoteNamePosition
+   GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
+   SEMITONES, CHROMATIC_SOLFEGE, INTERVAL_CENTS, TEMPERAMENT_INTERVALS,
+   INTERVAL_ORDER, generateNoteNames, getEdoNoteNamePosition,
+   scalePatternToEDO, PITCH_COLLECTIONS_EDO_OVERRIDES, getModePattern
 */
 
 /**
@@ -2989,6 +2990,15 @@ const getOctaveRatio = () => {
 };
 
 /**
+ * Converts a frequency ratio to a circle-of-notes wheel angle in degrees.
+ * @function
+ * @param {number} ratio - The ratio relative to the tonic.
+ * @param {number} base - The octave ratio (e.g. 2 for a 2:1 octave).
+ * @returns {number} The wheel angle in degrees.
+ */
+const ratioToWheelAngle = (ratio, base) => 270 + 360 * (Math.log10(ratio) / Math.log10(base));
+
+/**
  * Get the list of available temperaments.
  * @function
  * @returns {Array<Array<string>>} The list of available temperaments.
@@ -3837,17 +3847,23 @@ const SOLFMAPPER = ["do", "do", "re", "re", "mi", "fa", "fa", "sol", "sol", "la"
  * Get the scale and solfege with half-steps for a given key signature.
  * @function
  * @param {string} keySignature - The key signature string.
+ * @param {number} [edo] - Number of steps per octave (defaults to 12).
  * @returns {Array} An array containing the scale notes, solfege with half-steps, key signature, and mode.
  */
-const getScaleAndHalfSteps = keySignature => {
+const getScaleAndHalfSteps = (keySignature, edo = 12) => {
     // Determine scale and half-step pattern from key signature
     const obj = keySignatureToMode(keySignature);
     let myKeySignature = obj[0];
-    let halfSteps;
-    if (obj[1].toLowerCase() === "custom") {
-        halfSteps = customMode.slice();
-    } else {
-        halfSteps = MUSICALMODES[obj[1]].slice();
+    const halfSteps = getModePattern(obj[1], edo);
+
+    if (edo !== 12) {
+        // EDO-native scale: 12-EDO solfege slots are a 12-EDO-only concept, so
+        // the step pattern is returned in the solfege slot for non-12 EDO.
+        const edoNames = generateNoteNames(edo);
+        if (myKeySignature in EXTRATRANSPOSITIONS) {
+            myKeySignature = EXTRATRANSPOSITIONS[myKeySignature][0];
+        }
+        return [edoNames, halfSteps, myKeySignature, obj[1]];
     }
 
     const solfege = [];
@@ -5942,12 +5958,88 @@ function _calculate_pitch_number(noteName, octave, applyOffset = 0, temperament)
 }
 
 /**
+ * Convert a 12-EDO semitone step pattern to steps in the given EDO.
+ *
+ * Uses cumulative positions (not per-interval rounding) so the total interval
+ * sum is preserved as closely as possible. Each step is at least 1 so stepping
+ * never gets stuck on a repeated note. For 12-EDO this is the identity.
+ * @function
+ * @param {Array} pattern - The 12-EDO step pattern (e.g. major [2, 2, 1, 2, 2, 2, 1]).
+ * @param {number} edo - Number of steps per octave.
+ * @returns {Array} The converted step pattern in the target EDO.
+ */
+const scalePatternToEDO = (pattern, edo) => {
+    if (edo === 12) {
+        return pattern.slice();
+    }
+
+    const result = [];
+    let cumSemitones = 0;
+    let cumEdoPos = 0;
+    for (let i = 0; i < pattern.length; i++) {
+        cumSemitones += pattern[i];
+        const newCumEdoPos = Math.round((cumSemitones * edo) / 12);
+        let step = newCumEdoPos - cumEdoPos;
+        // When EDO < scale degrees (e.g. 5-EDO major), cumulative rounding
+        // can produce 0-length intervals. Ensure minimum step of 1 so that
+        // stepping never gets stuck on a repeated note.
+        if (step < 1) {
+            step = 1;
+        }
+        result.push(step);
+        cumEdoPos += step;
+    }
+    return result;
+};
+
+/**
+ * Optional per-EDO overrides for the standard 12-EDO mode patterns.
+ *
+ * Keyed by edo, then by mode name. When an override exists it takes priority
+ * over the naive scalePatternToEDO conversion of MUSICALMODES.
+ * @constant
+ * @type {Object}
+ */
+const PITCH_COLLECTIONS_EDO_OVERRIDES = {};
+
+/**
+ * Get the step pattern for a mode in the given EDO.
+ *
+ * Lookup order: PITCH_COLLECTIONS_EDO_OVERRIDES[edo][mode] first, then the
+ * scalePatternToEDO conversion of MUSICALMODES[mode]. For the "custom"
+ * (chromatic) mode, 12-EDO uses the stored customMode pattern and non-12 EDO
+ * returns a full EDO-length step-1 pattern.
+ * @function
+ * @param {string} mode - The mode name (e.g. "major").
+ * @param {number} edo - Number of steps per octave.
+ * @returns {Array} The step pattern for the mode in the target EDO.
+ */
+const getModePattern = (mode, edo = 12) => {
+    const overrides = PITCH_COLLECTIONS_EDO_OVERRIDES[edo];
+    if (overrides && Object.prototype.hasOwnProperty.call(overrides, mode)) {
+        return overrides[mode].slice();
+    }
+    if (mode.toLowerCase() === "custom") {
+        if (edo === 12) {
+            return customMode.slice();
+        }
+        return new Array(edo).fill(1);
+    }
+    if (mode in MUSICALMODES) {
+        return scalePatternToEDO(MUSICALMODES[mode], edo);
+    }
+    return scalePatternToEDO(MUSICALMODES.major, edo);
+};
+
+/**
  * Build the scale based on the given key signature.
  * @function
  * @param {string} keySignature - The key signature.
+ * @param {number} [edo] - Number of steps per octave. When omitted, the
+ *     current temperament's EDO is used (legacy behavior).
  * @returns {Array} An array containing the scale and the corresponding intervals.
  */
-const buildScale = keySignature => {
+const buildScale = (keySignature, edo) => {
     // FIX ME: temporary hard-coded fix to avoid errors in pitch preview
     if (keySignature === "C♭ major") {
         const scale = [
@@ -5982,17 +6074,14 @@ const buildScale = keySignature => {
         myKeySignature = obj[0];
     }
 
-    let halfSteps;
-    if (obj[1].toLowerCase() === "custom") {
-        halfSteps = customMode.slice();
-    } else {
-        halfSteps = MUSICALMODES[obj[1]].slice();
-    }
-
-    // Determine current EDO from global state
-    let currentEDO = 12;
-    if (typeof globalActivity !== "undefined" && globalActivity?.logo?.synth?.inTemperament) {
-        currentEDO = getCurrentEDO(globalActivity.logo.synth.inTemperament);
+    // Determine active EDO: an explicit parameter wins; otherwise fall back to
+    // the global temperament state so existing callers keep working unchanged.
+    let currentEDO = edo;
+    if (currentEDO === undefined) {
+        currentEDO = 12;
+        if (typeof globalActivity !== "undefined" && globalActivity?.logo?.synth?.inTemperament) {
+            currentEDO = getCurrentEDO(globalActivity.logo.synth.inTemperament);
+        }
     }
 
     // For non-12 EDO: convert 12-EDO semitone intervals to EDO step counts
@@ -6004,38 +6093,11 @@ const buildScale = keySignature => {
             idx = 0;
         }
 
-        // For "custom" (chromatic) mode in non-12 EDO, generate a full EDO-length
-        // scale with step=1 for every pitch class, instead of converting the
-        // hardcoded 12-element customMode array (which would only produce ~12
-        // notes and leave many pitch classes unreachable via scalar stepping).
-        if (obj[1].toLowerCase() === "custom") {
-            const scale = [myKeySignature];
-            let ii = idx;
-            const steps = new Array(currentEDO).fill(1);
-            for (let i = 0; i < currentEDO; i++) {
-                ii = (ii + 1 + edoNames.length) % edoNames.length;
-                scale.push(edoNames[ii]);
-            }
-            return [scale, steps];
-        }
-
-        // Convert semitone intervals to EDO step intervals via cumulative positions
-        const edoHalfSteps = [];
-        let cumSemitones = 0;
-        let cumEdoPos = 0;
-        for (let i = 0; i < halfSteps.length; i++) {
-            cumSemitones += halfSteps[i];
-            const newCumEdoPos = Math.round((cumSemitones * currentEDO) / 12);
-            let step = newCumEdoPos - cumEdoPos;
-            // When EDO < scale degrees (e.g. 5-EDO major), cumulative rounding
-            // can produce 0-length intervals. Ensure minimum step of 1 so that
-            // stepping never gets stuck on a repeated note.
-            if (step < 1) {
-                step = 1;
-            }
-            edoHalfSteps.push(step);
-            cumEdoPos += step;
-        }
+        // For "custom" (chromatic) mode in non-12 EDO, getModePattern returns a
+        // full EDO-length scale with step=1 for every pitch class, instead of
+        // converting the hardcoded 12-element customMode array (which would only
+        // produce ~12 notes and leave many pitch classes unreachable).
+        const edoHalfSteps = getModePattern(obj[1], currentEDO);
 
         const scale = [myKeySignature];
         let ii = idx;
@@ -6045,6 +6107,8 @@ const buildScale = keySignature => {
         }
         return [scale, edoHalfSteps];
     }
+
+    const halfSteps = getModePattern(obj[1], currentEDO);
 
     let thisScale;
     if (NOTESFLAT.includes(myKeySignature)) {
@@ -7651,6 +7715,7 @@ const getPitchInfo = function (activity, type, currentNote, tur) {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         updateTemperaments,
+        ratioToWheelAngle,
         scaleDegreeToPitchMapping,
         buildScale,
         getNote,
@@ -7729,6 +7794,9 @@ if (typeof module !== "undefined" && module.exports) {
         getArticulation,
         keySignatureToMode,
         getScaleAndHalfSteps,
+        scalePatternToEDO,
+        PITCH_COLLECTIONS_EDO_OVERRIDES,
+        getModePattern,
         modeMapper,
         getSharpFlatPreference,
         getCustomNote,

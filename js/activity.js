@@ -73,8 +73,14 @@ try {
  */
 const LEADING = 0;
 const BLOCKSCALES = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4];
-const _THIS_IS_MUSIC_BLOCKS_ = true;
-const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
+const _THIS_IS_MUSIC_BLOCKS_ =
+    typeof window !== "undefined" && typeof window._THIS_IS_MUSIC_BLOCKS_ !== "undefined"
+        ? window._THIS_IS_MUSIC_BLOCKS_
+        : true;
+const _THIS_IS_TURTLE_BLOCKS_ =
+    typeof window !== "undefined" && typeof window._THIS_IS_TURTLE_BLOCKS_ !== "undefined"
+        ? window._THIS_IS_TURTLE_BLOCKS_
+        : !_THIS_IS_MUSIC_BLOCKS_;
 
 // Responsive breakpoint constants
 const RESPONSIVE_BREAKPOINT_TABLET = 768;

@@ -1092,10 +1092,9 @@ class ProjectManager {
             } else {
                 if (urlParts[1].indexOf("=") > 0) {
                     args = urlParts[1].split("=");
-                }
-
-                if (args[0].toLowerCase() === "id") {
-                    that.projectID = args[1];
+                    if (args[0].toLowerCase() === "id") {
+                        that.projectID = args[1];
+                    }
                 }
             }
         }
