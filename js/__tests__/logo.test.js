@@ -1564,6 +1564,56 @@ describe("Logo runFromBlock", () => {
             expect(scheduleSpy).toHaveBeenCalledWith(expect.any(Function), 20);
         });
     });
+
+    describe("fast-export synchronous scheduling", () => {
+        test("runs runFromBlockNow synchronously while exporting notation", () => {
+            timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
+                fn();
+                return 5;
+            });
+            logo.runFromBlockNow = jest.fn();
+            logo.turtleDelay = 25;
+            logo.stopTurtle = false;
+            turtle0.waitTime = 10;
+            logo.runningLilypond = true;
+
+            logo.runFromBlock(logo, 0, 3, 1, "x");
+
+            expect(timeoutSpy).not.toHaveBeenCalled();
+            expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, 3, 1, "x");
+        });
+
+        test("yields via setGuardedTimeout every _EXPORT_YIELD_AFTER_SYNC_RUNS transitions", () => {
+            const guardedSpy = jest.spyOn(logo.timerManager, "setGuardedTimeout");
+            logo.runFromBlockNow = jest.fn();
+            logo.turtleDelay = 25;
+            logo.stopTurtle = false;
+            turtle0.waitTime = 10;
+            logo.runningMxml = true;
+
+            for (let i = 0; i < logo._EXPORT_YIELD_AFTER_SYNC_RUNS; i++) {
+                logo.runFromBlock(logo, 0, 3, 1, "x");
+            }
+
+            expect(logo.runFromBlockNow).toHaveBeenCalledTimes(
+                logo._EXPORT_YIELD_AFTER_SYNC_RUNS - 1
+            );
+            expect(guardedSpy).toHaveBeenCalledTimes(1);
+            expect(guardedSpy).toHaveBeenCalledWith(expect.any(Function), 0, expect.any(Function));
+
+            logo.runFromBlock(logo, 0, 3, 1, "x");
+            expect(logo.runFromBlockNow).toHaveBeenCalledTimes(logo._EXPORT_YIELD_AFTER_SYNC_RUNS);
+            expect(guardedSpy).toHaveBeenCalledTimes(1);
+        });
+
+        test("_exportingNotation is false outside exports", () => {
+            logo.runningLilypond = false;
+            logo.runningAbc = false;
+            logo.runningMxml = false;
+            logo.runningMIDI = false;
+            expect(logo._exportingNotation).toBe(false);
+        });
+    });
 });
 
 // ─── Logo runFromBlockNow ─────────────────────────────────────────────────────
@@ -1817,6 +1867,7 @@ describe("Logo runFromBlockNow", () => {
             expect(mockActivity.statsWindow.displayInfo).toHaveBeenCalled();
             expect(logo.runningLilypond).toBe(false);
 
+            logo._exportNotationFinished = false;
             logo.runningLilypond = false;
             logo.collectingStats = false;
             logo.runFromBlockNow(logo, 0, 0, 0, null);
@@ -1828,10 +1879,12 @@ describe("Logo runFromBlockNow", () => {
             logo.runFromBlockNow(logo, 0, 0, 0, null);
             expect(mockActivity.save.afterSaveAbc).toHaveBeenCalled();
 
+            logo._exportNotationFinished = false;
             logo.runningMxml = true;
             logo.runFromBlockNow(logo, 0, 0, 0, null);
             expect(mockActivity.save.afterSaveMxml).toHaveBeenCalled();
 
+            logo._exportNotationFinished = false;
             turtle0.singer.suppressOutput = true;
             logo.recording = false;
             logo.runFromBlockNow(logo, 0, 0, 0, null);
