@@ -465,12 +465,11 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 }
 
 @media (max-width: 690px) {
-
     #record .ring,
     #record .dot {
-        font-size: 26px !important;
-        margin: 0 !important;
-        width: auto !important;
+        font-size: 26px;
+        margin: 0;
+        width: auto;
     }
 }
 
