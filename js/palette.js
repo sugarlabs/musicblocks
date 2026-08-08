@@ -888,13 +888,14 @@ class Palettes {
         const row = listBody.insertRow(-1);
         const img = row.insertCell(-1);
         const label = row.insertCell(-1);
+        row.classList.add("palette-row");
+        label.classList.add("palette-row-label");
         img.appendChild(icon);
         img.style.padding = "4px";
         img.style.boxSizing = "content-box";
         img.style.width = `${this.cellSize}px`;
         img.style.height = `${this.cellSize}px`;
         label.textContent = toTitleCase(_(name));
-        label.style.color = platformColor.paletteText;
         row.style.borderBottom = "1px solid #0CAFFF";
         label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
         label.style.padding = "4px";
@@ -902,17 +903,16 @@ class Palettes {
         row.style.flexDirection = "row";
         row.style.alignItems = "center";
         row.style.width = "126px";
-        row.style.backgroundColor = platformColor.paletteBackground;
 
         // Mouse hover - only work if not in keyboard navigation mode
         row.addEventListener("mouseover", () => {
             if (!this._keyboardNavActive && !row.dataset.keyboardFocus) {
-                row.style.backgroundColor = platformColor.hoverColor;
+                row.classList.add("palette-row--hover");
             }
         });
         row.addEventListener("mouseout", () => {
             if (!row.dataset.keyboardFocus) {
-                row.style.backgroundColor = platformColor.paletteBackground;
+                row.classList.remove("palette-row--hover");
             }
         });
 
@@ -929,30 +929,30 @@ class Palettes {
         const row = listBody.insertRow(-1);
         const img = row.insertCell(-1);
         const label = row.insertCell(-1);
+        row.classList.add("palette-row");
+        label.classList.add("palette-row-label");
         img.appendChild(icon);
         img.style.padding = "4px";
         img.style.boxSizing = "content-box";
         img.style.width = `${this.cellSize}px`;
         img.style.height = `${this.cellSize}px`;
         label.textContent = toTitleCase(_(name));
-        label.style.color = platformColor.paletteText;
         label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
         label.style.padding = "4px";
         row.style.display = "flex";
         row.style.flexDirection = "row";
         row.style.alignItems = "center";
         row.style.width = "126px";
-        row.style.backgroundColor = platformColor.paletteBackground;
 
         // Mouse hover - only work if not in keyboard navigation mode
         row.addEventListener("mouseover", () => {
             if (!this._keyboardNavActive && !row.dataset.keyboardFocus) {
-                row.style.backgroundColor = platformColor.hoverColor;
+                row.classList.add("palette-row--hover");
             }
         });
         row.addEventListener("mouseout", () => {
             if (!row.dataset.keyboardFocus) {
-                row.style.backgroundColor = platformColor.paletteBackground;
+                row.classList.remove("palette-row--hover");
             }
         });
 

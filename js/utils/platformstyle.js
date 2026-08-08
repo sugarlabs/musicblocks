@@ -39,6 +39,7 @@ platform.FFOS = platform.FF && (platform.mobile || platform.tablet) && !platform
 const platformThemes = {
     dark: {
         textColor: "#E2E2E2",
+        hoverText: "#FFFFFF",
         blockText: "#FFFFFF",
         dialogueBox: "#1C1C1C",
         strokeColor: "#E2E2E2",
@@ -198,6 +199,7 @@ const platformThemes = {
     },
     light: {
         textColor: "black",
+        hoverText: "#000000",
         blockText: "#282828",
         dialogueBox: "#fff",
         strokeColor: "#E2E2E2",
@@ -361,6 +363,7 @@ const platformThemes = {
     },
     highcontrast: {
         textColor: "#FFFFFF",
+        hoverText: "#FFFFFF",
         blockText: "#000000",
         dialogueBox: "#000000",
         strokeColor: "#FFFFFF",

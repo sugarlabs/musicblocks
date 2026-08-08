@@ -1210,7 +1210,6 @@ table {
     color: var(--color-text-inverse);
     font-size: 1.1em;
     text-align: center;
-    height: 55px;
 }
 
 .close-button {
@@ -2050,9 +2049,20 @@ table {
     border: 0;
 }
 
-#palette th:hover,
-#palette tr:hover {
-    background-color: rgba(211, 211, 211, 0.7);
+#palette tr.palette-row {
+    background-color: var(--color-palette-bg);
+}
+
+#palette tr.palette-row .palette-row-label {
+    color: var(--color-palette-text);
+}
+
+#palette tr.palette-row.palette-row--hover {
+    background-color: var(--color-palette-hover-bg);
+}
+
+#palette tr.palette-row.palette-row--hover .palette-row-label {
+    color: var(--color-palette-text-hover);
 }
 
 #printText {
