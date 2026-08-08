@@ -249,4 +249,41 @@ describe("Turtle", () => {
             expect(turtle.butNotThese).toEqual({});
         });
     });
+
+    describe("Cache Management (_createCache & updateCache)", () => {
+        beforeEach(() => {
+            global.retryWithBackoff = jest.fn(async ({ check, onSuccess, onRetry }) => {
+                const res = check ? check() : true;
+                if (onRetry) onRetry(0);
+                if (onSuccess) await onSuccess(res);
+                return res;
+            });
+        });
+
+        it("_createCache should get bounds and cache container", async () => {
+            const mockBounds = { x: 5, y: 15, width: 80, height: 80 };
+            turtle.container = {
+                getBounds: jest.fn().mockReturnValue(mockBounds),
+                cache: jest.fn()
+            };
+
+            await turtle._createCache();
+
+            expect(turtle.bounds).toEqual(mockBounds);
+            expect(turtle.container.cache).toHaveBeenCalledWith(5, 15, 80, 80);
+        });
+
+        it("updateCache should update container cache and refresh canvas", async () => {
+            turtle.bounds = { x: 0, y: 0, width: 100, height: 100 };
+            turtle.container = {
+                bitmapCache: {},
+                updateCache: jest.fn()
+            };
+
+            await turtle.updateCache();
+
+            expect(turtle.container.updateCache).toHaveBeenCalled();
+            expect(mockActivity.refreshCanvas).toHaveBeenCalled();
+        });
+    });
 });
