@@ -579,10 +579,13 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                       )
                     : true)))
     ) {
-        if (scale[6 - i][0] === FIXEDSOLFEGE[note] || scale[6 - i][0] === note) {
-            accidental = scale[6 - i].substr(1);
+        if (
+            scale[scale.length - 1 - i][0] === FIXEDSOLFEGE[note] ||
+            scale[scale.length - 1 - i][0] === note
+        ) {
+            accidental = scale[scale.length - 1 - i].substr(1);
         } else {
-            accidental = EQUIVALENTACCIDENTALS[scale[6 - i]].substr(1);
+            accidental = EQUIVALENTACCIDENTALS[scale[scale.length - 1 - i]].substr(1);
         }
         block.value = block.value
             .replace(SHARP, "")
