@@ -12,12 +12,21 @@
 const fs = require("fs");
 const path = require("path");
 
-const { piemenuPitches } = require("../piemenus");
+const { piemenuPitches, piemenuIntervals } = require("../piemenus");
 
 const piemenusPath = path.join(__dirname, "..", "piemenus.js");
 let piemenusContent;
 
 // Mock Globals
+global.INTERVALS = [
+    ["perfect", "perfect", [1, 4, 5, 8]],
+    ["minor", "minor", [2, 3, 6, 7]]
+];
+global.INTERVALVALUES = { "perfect 1": [0, 1], "perfect 4": [0, 4] };
+global.DEFAULTVOLUME = 0.5;
+global.SHARP = "#";
+global.FLAT = "b";
+global.Singer = { setSynthVolume: jest.fn() };
 global.docById = jest.fn().mockReturnValue({
     style: { display: "", opacity: "" },
     addEventListener: jest.fn(),
@@ -303,5 +312,53 @@ describe("piemenus behavioral tests", () => {
         expect(mockNavigate).toHaveBeenCalled();
 
         jest.useRealTimers();
+    });
+
+    describe("piemenuIntervals tests", () => {
+        let mockBlock;
+
+        beforeEach(() => {
+            mockBlock = {
+                blocks: {
+                    stageClick: false,
+                    blockScale: 1,
+                    turtles: { _canvas: { width: 800, height: 600 } }
+                },
+                container: { x: 10, y: 10, setChildIndex: jest.fn(), children: [] },
+                activity: {
+                    canvas: { offsetLeft: 0, offsetTop: 0 },
+                    blocksContainer: { x: 0, y: 0 },
+                    getStageScale: () => 1,
+                    turtles: { ithTurtle: () => ({ singer: { instrumentNames: ["sine"] } }) },
+                    logo: {
+                        synth: {
+                            createDefaultSynth: jest.fn(),
+                            loadSynth: jest.fn(),
+                            setMasterVolume: jest.fn(),
+                            trigger: jest.fn()
+                        }
+                    }
+                },
+                text: { text: "" },
+                updateCache: jest.fn()
+            };
+        });
+
+        test("sets enabled property on navItems based on activeTabs", () => {
+            piemenuIntervals(mockBlock, "perfect 4");
+
+            // Manually trigger the navigateFunction on the first interval (perfect)
+            mockBlock._intervalNameWheel.navItems[0].navigateFunction();
+
+            // The perfect interval has active tabs [1, 4, 5, 8]
+            // We expect the first 8 navItems in _intervalWheel to be show()n
+            // and enabled correctly.
+            // j = 0 -> tab 1 (enabled = true)
+            // j = 1 -> tab 2 (enabled = false)
+            expect(mockBlock._intervalWheel.navItems[0].navItem.show).toHaveBeenCalled();
+            expect(mockBlock._intervalWheel.navItems[0].enabled).toBe(true);
+            expect(mockBlock._intervalWheel.navItems[1].enabled).toBe(false);
+            expect(mockBlock._intervalWheel.navItems[3].enabled).toBe(true); // tab 4
+        });
     });
 });
