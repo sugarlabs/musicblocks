@@ -453,6 +453,29 @@ describe("Utility Functions (logic-only)", () => {
                 0
             );
         });
+
+        test("should reload a drum that was disposed on Stop so the second play is audible (#7996)", async () => {
+            if (!instruments[turtle]) {
+                instruments[turtle] = {}; // Initialize instruments for the turtle
+            }
+
+            // First run: the drum loads as a Tone.Player sample
+            await loadSynth(turtle, "snare drum");
+            expect(instruments[turtle]["snare drum"]).toBeInstanceOf(Tone.Player);
+
+            // Stop: disposeAllInstruments() removes all drums from instruments
+            Synth.disposeAllInstruments();
+            expect(instruments[turtle]["snare drum"]).toBeUndefined();
+
+            // Second run: prepSynths() only recreates the default synth
+            createDefaultSynth(turtle);
+
+            // trigger() must lazily reload the drum instead of silently skipping
+            await trigger(turtle, ["C2"], beatValue, "snare drum", null, null, false, 0);
+
+            expect(instruments[turtle]["snare drum"]).toBeInstanceOf(Tone.Player);
+            expect(instruments[turtle]["snare drum"].start).toHaveBeenCalled();
+        });
     });
 
     describe("temperamentChanged", () => {
