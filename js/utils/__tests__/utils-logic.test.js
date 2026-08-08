@@ -249,6 +249,16 @@ describe("Utility Logic Functions", () => {
         it("converts hex to rgba string", () => {
             expect(hex2rgb("ff0000")).toBe("rgba(255,0,0,1)");
         });
+
+        it("handles leading hash prefix", () => {
+            expect(hex2rgb("#ff0000")).toBe("rgba(255,0,0,1)");
+            expect(hex2rgb("#00ff00")).toBe("rgba(0,255,0,1)");
+        });
+
+        it("returns fallback rgba for invalid or non-string inputs", () => {
+            expect(hex2rgb(null)).toBe("rgba(0,0,0,1)");
+            expect(hex2rgb("invalid")).toBe("rgba(0,0,0,1)");
+        });
     });
 
     describe("resolveObject()", () => {

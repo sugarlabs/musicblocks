@@ -552,7 +552,10 @@ var hexToRGB = hex => {
  * Converts a hexcode to RGBA format.
  */
 var hex2rgb = hex => {
-    const bigint = parseInt(hex, 16);
+    if (typeof hex !== "string") return "rgba(0,0,0,1)";
+    const cleanHex = hex.startsWith("#") ? hex.slice(1) : hex;
+    const bigint = parseInt(cleanHex, 16);
+    if (Number.isNaN(bigint)) return "rgba(0,0,0,1)";
     const r = (bigint >> 16) & 255;
     const g = (bigint >> 8) & 255;
     const b = bigint & 255;
