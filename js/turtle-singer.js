@@ -312,7 +312,7 @@ class Singer {
 
         const activity = logo.activity;
         const tur = activity.turtles.ithTurtle(turtle);
-        const temperament = logo.synth.inTemperament;
+        const temperament = logo && logo.synth && logo.synth.inTemperament;
         const edo = getCurrentEDO(temperament);
 
         let noteObj = getNote(
