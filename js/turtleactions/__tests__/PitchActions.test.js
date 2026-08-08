@@ -44,7 +44,8 @@ Object.assign(global, {
     MUSICALMODES: musicUtils.MUSICALMODES,
     SHARP: musicUtils.SHARP,
     FLAT: musicUtils.FLAT,
-    getCurrentEDO: musicUtils.getCurrentEDO
+    getCurrentEDO: musicUtils.getCurrentEDO,
+    getModeLength: musicUtils.getModeLength
 });
 
 global.NANERRORMSG = require("../../logo").NANERRORMSG;
