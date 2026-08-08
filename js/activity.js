@@ -1303,7 +1303,7 @@ class Activity {
             /**
              * Handles touch end event on the canvas.
              */
-            const __touchHandler = () => {
+            const __touchEndHandler = () => {
                 for (let i = 0; i < 2; i++) {
                     initialTouches[i][0] = null;
                     initialTouches[i][1] = null;
@@ -1317,9 +1317,9 @@ class Activity {
             }
 
             // Store the handler reference for future cleanup
-            this._touchEndHandler = __touchHandler;
+            this._touchEndHandler = __touchEndHandler;
 
-            this.addEventListener(myCanvas, "touchend", __touchHandler);
+            this.addEventListener(myCanvas, "touchend", __touchEndHandler);
 
             /**
              * Handles wheel event on the canvas.
