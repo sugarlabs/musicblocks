@@ -332,12 +332,18 @@ describe("setupToneActions", () => {
             Singer.ToneActions.doChorus(1.5, 20, 150, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Depth is out of range.", 1);
             expect(activity.logo.stopTurtle).toBe(true);
+            expect(targetTurtle.singer.chorusRate).toEqual([]);
+            expect(targetTurtle.singer.delayTime).toEqual([]);
+            expect(targetTurtle.singer.chorusDepth).toEqual([]);
         });
 
         it("should show error for negative chorus depth", () => {
             Singer.ToneActions.doChorus(1.5, 20, -10, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Depth is out of range.", 1);
             expect(activity.logo.stopTurtle).toBe(true);
+            expect(targetTurtle.singer.chorusRate).toEqual([]);
+            expect(targetTurtle.singer.delayTime).toEqual([]);
+            expect(targetTurtle.singer.chorusDepth).toEqual([]);
         });
 
         it("should NOT register a mouse listener when blk is undefined", () => {
@@ -410,12 +416,16 @@ describe("setupToneActions", () => {
             Singer.ToneActions.doTremolo(5, 150, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Depth is out of range.", 1);
             expect(activity.logo.stopTurtle).toBe(true);
+            expect(targetTurtle.singer.tremoloFrequency).toEqual([]);
+            expect(targetTurtle.singer.tremoloDepth).toEqual([]);
         });
 
         it("should show error for negative tremolo depth", () => {
             Singer.ToneActions.doTremolo(5, -50, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Depth is out of range.", 1);
             expect(activity.logo.stopTurtle).toBe(true);
+            expect(targetTurtle.singer.tremoloFrequency).toEqual([]);
+            expect(targetTurtle.singer.tremoloDepth).toEqual([]);
         });
 
         it("should NOT register a mouse listener when blk is undefined", () => {
@@ -452,12 +462,14 @@ describe("setupToneActions", () => {
             Singer.ToneActions.doDistortion(150, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Distortion must be from 0 to 100.", 1);
             expect(activity.logo.stopTurtle).toBe(true);
+            expect(targetTurtle.singer.distortionAmount).toEqual([]);
         });
 
         it("should show error for negative distortion amount", () => {
             Singer.ToneActions.doDistortion(-10, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Distortion must be from 0 to 100.", 1);
             expect(activity.logo.stopTurtle).toBe(true);
+            expect(targetTurtle.singer.distortionAmount).toEqual([]);
         });
 
         it("should NOT register a mouse listener when blk is undefined", () => {

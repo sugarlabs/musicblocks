@@ -192,6 +192,7 @@ function setupToneActions(activity) {
             if (chorusDepth < 0 || chorusDepth > 1) {
                 activity.errorMsg(_("Depth is out of range."), blk);
                 activity.logo.stopTurtle = true;
+                return;
             }
 
             const tur = activity.turtles.ithTurtle(turtle);
@@ -265,6 +266,7 @@ function setupToneActions(activity) {
                 //.TRANS: Depth is the intesity of the tremolo or chorus effect.
                 activity.errorMsg(_("Depth is out of range."), blk);
                 activity.logo.stopTurtle = true;
+                return;
             }
 
             const tur = activity.turtles.ithTurtle(turtle);
@@ -301,6 +303,7 @@ function setupToneActions(activity) {
             if (distortion < 0 || distortion > 1) {
                 activity.errorMsg(_("Distortion must be from 0 to 100."), blk);
                 activity.logo.stopTurtle = true;
+                return;
             }
 
             const tur = activity.turtles.ithTurtle(turtle);
