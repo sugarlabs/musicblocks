@@ -40,19 +40,30 @@
 /js/planetInterface.js @zealot-zew
 /js/SaveInterface.js @zealot-zew
 
-# Tests and CI infrastructure. These rules come after source rules so test
-# files do not fall back to Walter or Devin.
+# Tests and CI infrastructure. These rules come after source rules so shared
+# test paths do not fall back to Walter or Devin.
 /.github/workflows/ @omsuneri @Ashutoshx7
 /.husky/ @omsuneri @Ashutoshx7
 /cypress/ @omsuneri @Ashutoshx7
+/test/ @omsuneri @Ashutoshx7
 /cypress.config.js @omsuneri @Ashutoshx7
 /jest.config.js @omsuneri @Ashutoshx7
-/jest.setup.js @omsuneri @Ashutoshx7
 /eslint.config.mjs @omsuneri @Ashutoshx7
+/commitlint.config.js @omsuneri @Ashutoshx7
+/lighthouserc.js @omsuneri @Ashutoshx7
+/.prettierignore @omsuneri @Ashutoshx7
+/.prettierrc @omsuneri @Ashutoshx7
 /js/__tests__/ @omsuneri @Ashutoshx7
+/js/activity/__tests__/ @omsuneri @Ashutoshx7
+/js/palette/__tests__/ @omsuneri @Ashutoshx7
 /js/utils/__tests__/ @omsuneri @Ashutoshx7
 /js/widgets/__tests__/ @omsuneri @Ashutoshx7
 /js/turtleactions/__tests__/ @omsuneri @Ashutoshx7
+
+# Planet feature tests that live outside the Planet directory.
+/js/__tests__/planetInterface.test.js @zealot-zew
+/js/__tests__/SaveInterface.test.js @zealot-zew
+
 /js/blocks/__tests__/DrumBlocks*.test.js @omsuneri @Ashutoshx7
 /js/blocks/__tests__/EnsembleBlocks*.test.js @omsuneri @Ashutoshx7
 /js/blocks/__tests__/IntervalsBlocks*.test.js @omsuneri @Ashutoshx7
