@@ -606,6 +606,32 @@ class PitchDrumMatrix {
     }
 
     /**
+     * Updates the play button icon to show "Play" or "Stop".
+     *
+     * @private
+     * @param {"play"|"stop"} state - Which icon to show.
+     * @returns {void}
+     */
+    _setPlayButtonIcon(state) {
+        const icon = this.playButton;
+        const isStop = state === "stop";
+        const src = isStop ? "header-icons/stop-button.svg" : "header-icons/play-button.svg";
+        const label = isStop ? _("Stop") : _("Play");
+
+        icon.textContent = "\u00A0\u00A0";
+        const img = document.createElement("img");
+        img.src = src;
+        img.title = label;
+        img.alt = label;
+        img.setAttribute("height", PitchDrumMatrix.ICONSIZE);
+        img.setAttribute("width", PitchDrumMatrix.ICONSIZE);
+        img.setAttribute("vertical-align", "middle");
+        img.setAttribute("align-content", "center");
+        icon.appendChild(img);
+        icon.appendChild(document.createTextNode("\u00A0\u00A0"));
+    }
+
+    /**
      * Handles the scaling of the widget.
      *
      * @private
@@ -640,31 +666,10 @@ class PitchDrumMatrix {
      */
     _playAll() {
         // Play all of the pitch/drum combinations in the matrix.
-        const icon = this.playButton;
         if (this._playing) {
-            icon.textContent = "\u00A0\u00A0";
-            const img = document.createElement("img");
-            img.src = "header-icons/stop-button.svg";
-            img.title = _("Stop");
-            img.alt = _("Stop");
-            img.setAttribute("height", PitchDrumMatrix.ICONSIZE);
-            img.setAttribute("width", PitchDrumMatrix.ICONSIZE);
-            img.setAttribute("vertical-align", "middle");
-            img.setAttribute("align-content", "center");
-            icon.appendChild(img);
-            icon.appendChild(document.createTextNode("\u00A0\u00A0"));
+            this._setPlayButtonIcon("stop");
         } else {
-            icon.textContent = "\u00A0\u00A0";
-            const img = document.createElement("img");
-            img.src = "header-icons/play-button.svg";
-            img.title = _("Play");
-            img.alt = _("Play");
-            img.setAttribute("height", PitchDrumMatrix.ICONSIZE);
-            img.setAttribute("width", PitchDrumMatrix.ICONSIZE);
-            img.setAttribute("vertical-align", "middle");
-            img.setAttribute("align-content", "center");
-            icon.appendChild(img);
-            icon.appendChild(document.createTextNode("\u00A0\u00A0"));
+            this._setPlayButtonIcon("play");
             this._playing = false;
             return;
         }
@@ -710,33 +715,13 @@ class PitchDrumMatrix {
                     return;
                 }
                 this._playing = false;
-                icon.textContent = "\u00A0\u00A0";
-                const img = document.createElement("img");
-                img.src = "header-icons/play-button.svg";
-                img.title = _("Play");
-                img.alt = _("Play");
-                img.setAttribute("height", PitchDrumMatrix.ICONSIZE);
-                img.setAttribute("width", PitchDrumMatrix.ICONSIZE);
-                img.setAttribute("vertical-align", "middle");
-                img.setAttribute("align-content", "center");
-                icon.appendChild(img);
-                icon.appendChild(document.createTextNode("\u00A0\u00A0"));
+                this._setPlayButtonIcon("play");
             }, pairs.length * 1000);
         } else {
             if (!this.widgetWindow._maximized) {
                 this.activity.textMsg(_("Click in the grid to map notes to drums."), 3000);
             }
-            icon.textContent = "\u00A0\u00A0";
-            const img = document.createElement("img");
-            img.src = "header-icons/play-button.svg";
-            img.title = _("Play");
-            img.alt = _("Play");
-            img.setAttribute("height", PitchDrumMatrix.ICONSIZE);
-            img.setAttribute("width", PitchDrumMatrix.ICONSIZE);
-            img.setAttribute("vertical-align", "middle");
-            img.setAttribute("align-content", "center");
-            icon.appendChild(img);
-            icon.appendChild(document.createTextNode("\u00A0\u00A0"));
+            this._setPlayButtonIcon("play");
         }
     }
 
