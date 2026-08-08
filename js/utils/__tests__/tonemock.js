@@ -39,6 +39,8 @@ class Sampler {
         this.triggerRelease = jest.fn().mockReturnThis();
         this.triggerAttackRelease = jest.fn().mockReturnThis();
         this.chain = jest.fn().mockReturnThis();
+        this.playbackRate = { value: 1 };
+        this.loaded = true;
     }
 }
 
@@ -62,6 +64,7 @@ class Player {
             })
         };
         this.playbackRate = { value: 1 };
+        this.loaded = true;
     }
 }
 
