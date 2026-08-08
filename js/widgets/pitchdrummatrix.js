@@ -680,22 +680,19 @@ class PitchDrumMatrix {
         for (let i = 0; i < pdmTable.rows.length - 1; i++) {
             table = docById("pdmCellTable" + i);
             row = table.rows[0];
-            let j;
-            for (j = 0; j < row.cells.length; j++) {
+            let cols = [];
+            for (let j = 0; j < row.cells.length; j++) {
                 cell = row.cells[j];
                 if (cell.style.backgroundColor === "black") {
-                    pairs.push([i, j]);
-                    break;
+                    cols.push(j);
                 }
             }
 
-            if (j === row.cells.length) {
-                pairs.push([i, -1]);
-            }
+            pairs.push([i, cols]);
         }
         let isEmpty = true;
         for (let i = 0; i < pairs.length; i++) {
-            if (pairs[i][1] !== -1) {
+            if (pairs[i][1].length > 0) {
                 isEmpty = false;
                 break;
             }
@@ -757,18 +754,47 @@ class PitchDrumMatrix {
         let pdmTable = docById("pdmTable");
         const drumTable = docById("pdmDrumTable");
         let row = drumTable.rows[0];
-        // const drumCell = row.cells[i];
-        const table = docById("pdmCellTable" + i);
+        const pairRowIndex = pairs[i][0];
+        const table = docById("pdmCellTable" + pairRowIndex);
         row = table.rows[0];
-        const cell = row.cells[i];
+        const cols = pairs[i][1];
 
         pdmTable = docById("pdmTable");
-        const pdmTableRow = pdmTable.rows[i];
+        const pdmTableRow = pdmTable.rows[pairRowIndex];
         const pitchCell = pdmTableRow.cells[0];
         pitchCell.style.backgroundColor = platformColor.selectorBackground;
 
-        if (pairs[i][1] !== -1) {
-            this._setPairCell(pairs[i][0], pairs[i][1], cell, true);
+        if (cols.length > 0) {
+            const noteArg = pitchCell.dataset.noteArg;
+            const octave = parseInt(pitchCell.dataset.octave, 10);
+            const noteObj = getNote(
+                noteArg,
+                octave,
+                0,
+                this.activity.turtles.ithTurtle(0).singer.keySignature,
+                false,
+                null,
+                this.activity.errorMsg
+            );
+            const note = noteObj[0] + noteObj[1];
+            const waitTime = Singer.defaultBPMFactor * 1000 * 0.25;
+
+            this.activity.logo.synth.trigger(
+                0,
+                normalizeNoteAccidentals(note),
+                0.125,
+                "default",
+                null,
+                null
+            );
+
+            for (let c of cols) {
+                const drumImg = drumTable.rows[0].cells[c].querySelector("img");
+                const drumName = getDrumSynthName(drumImg ? drumImg.title : "");
+                setTimeout(() => {
+                    this.activity.logo.synth.trigger(0, "C2", 0.125, drumName, null, null);
+                }, waitTime);
+            }
         }
 
         if (i < pairs.length - 1) {
@@ -809,29 +835,9 @@ class PitchDrumMatrix {
         let table = docById("pdmCellTable" + rowi);
         row = table.rows[0];
 
-        // For the moment, we can only have one drum per pitch, so
-        // clear the row.
         let pitchBlock;
         let drumBlock;
         let cell;
-        if (playNote) {
-            let obj;
-            for (let i = 0; i < row.cells.length; i++) {
-                if (i === coli) {
-                    continue;
-                }
-
-                cell = row.cells[i];
-                if (cell.style.backgroundColor === "black") {
-                    pitchBlock = this._rowBlocks[rowi];
-                    drumBlock = this._colBlocks[i];
-                    this.removeNode(pitchBlock, drumBlock);
-                    cell.style.backgroundColor = platformColor.selectorBackground;
-                    obj = cell.id.split(","); // row,column
-                    this._setCellPitchDrum(Number(obj[0]), Number(obj[1]), false);
-                }
-            }
-        }
 
         pitchBlock = this._rowBlocks[rowi];
         drumBlock = this._colBlocks[coli];
@@ -844,12 +850,8 @@ class PitchDrumMatrix {
 
         table = docById("pdmCellTable" + rowi);
         row = table.rows[0];
-        for (let i = 0; i < row.cells.length; i++) {
-            cell = row.cells[i];
-            if (cell.style.backgroundColor === "black") {
-                this._setPairCell(rowi, i, cell, playNote);
-            }
-        }
+        cell = row.cells[coli];
+        this._setPairCell(rowi, coli, cell, playNote);
     }
 
     /**

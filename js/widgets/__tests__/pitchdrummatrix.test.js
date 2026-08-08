@@ -24,6 +24,7 @@ const PitchDrumMatrix = require("../pitchdrummatrix.js");
 
 // --- Global Mocks ---
 global._ = msg => msg;
+global.normalizeNoteAccidentals = jest.fn(n => n);
 global.platformColor = {
     labelColor: "#90c100",
     selectorBackground: "#f0f0f0",
@@ -340,16 +341,24 @@ describe("PitchDrumMatrix Widget", () => {
             const mockActivity = {
                 logo: {
                     synth: {
-                        stop: jest.fn()
+                        stop: jest.fn(),
+                        trigger: jest.fn()
                     },
                     turtleDelay: 0
+                },
+                turtles: {
+                    ithTurtle: jest.fn(() => ({ singer: { keySignature: "" } }))
                 },
                 hideMsgs: jest.fn(),
                 textMsg: jest.fn()
             };
             pdm.init(mockActivity);
 
-            const mockCell = { style: { backgroundColor: "black" } };
+            const mockCell = {
+                style: { backgroundColor: "black" },
+                dataset: { noteArg: "C", octave: "4" },
+                querySelector: jest.fn(() => ({ title: "snare" }))
+            };
             const mockRow = { cells: [mockCell] };
             const mockTable = { rows: [mockRow, mockRow] };
 
@@ -385,16 +394,24 @@ describe("PitchDrumMatrix Widget", () => {
             const mockActivity = {
                 logo: {
                     synth: {
-                        stop: jest.fn()
+                        stop: jest.fn(),
+                        trigger: jest.fn()
                     },
                     turtleDelay: 0
+                },
+                turtles: {
+                    ithTurtle: jest.fn(() => ({ singer: { keySignature: "" } }))
                 },
                 hideMsgs: jest.fn(),
                 textMsg: jest.fn()
             };
             pdm.init(mockActivity);
 
-            const mockCell = { style: { backgroundColor: "black" } };
+            const mockCell = {
+                style: { backgroundColor: "black" },
+                dataset: { noteArg: "C", octave: "4" },
+                querySelector: jest.fn(() => ({ title: "snare" }))
+            };
             const mockRow = { cells: [mockCell] };
             const mockTable = { rows: [mockRow, mockRow] };
 
@@ -424,6 +441,58 @@ describe("PitchDrumMatrix Widget", () => {
             jest.useRealTimers();
         });
 
+        test("should correctly handle multiple drums selected for the same pitch", () => {
+            jest.useFakeTimers();
+
+            const mockActivity = {
+                logo: {
+                    synth: {
+                        stop: jest.fn(),
+                        trigger: jest.fn()
+                    },
+                    turtleDelay: 0
+                },
+                turtles: {
+                    ithTurtle: jest.fn(() => ({ singer: { keySignature: "" } }))
+                },
+                hideMsgs: jest.fn(),
+                textMsg: jest.fn()
+            };
+            pdm.init(mockActivity);
+
+            const mockCellBlack = {
+                style: { backgroundColor: "black" },
+                dataset: { noteArg: "C", octave: "4" },
+                querySelector: jest.fn(() => ({ title: "snare" }))
+            };
+            const mockRow = { cells: [mockCellBlack, mockCellBlack] }; // Multiple black cells
+            const mockTable = { rows: [mockRow, mockRow] };
+
+            docById.mockImplementation(id => {
+                if (id === "pdmTable" || id === "pdmDrumTable") {
+                    return mockTable;
+                }
+                if (id === "pdmCellTable0" || id === "pdmCellTable1") {
+                    return { rows: [mockRow] };
+                }
+                return { style: {} };
+            });
+
+            pdm._setPairCell = jest.fn();
+            pdm._playing = true;
+
+            pdm.playButton.appendChild = jest.fn();
+
+            pdm._playAll();
+
+            jest.runAllTimers();
+
+            // synth.trigger should be called 3 times: 1 for the pitch, and 2 for the drums
+            expect(mockActivity.logo.synth.trigger).toHaveBeenCalledTimes(3);
+            expect(pdm._playing).toBe(false);
+            jest.useRealTimers();
+        });
+
         test("should display a message when playing all with an empty grid", () => {
             const mockActivity = {
                 logo: {
@@ -447,6 +516,59 @@ describe("PitchDrumMatrix Widget", () => {
                 "Click in the grid to map notes to drums.",
                 3000
             );
+        });
+        test("should recursively play next pair and handle falsy drumImg correctly", () => {
+            jest.useFakeTimers();
+
+            const mockActivity = {
+                logo: {
+                    synth: { stop: jest.fn(), trigger: jest.fn() },
+                    turtleDelay: 0
+                },
+                turtles: {
+                    ithTurtle: jest.fn(() => ({ singer: { keySignature: "" } }))
+                },
+                hideMsgs: jest.fn(),
+                textMsg: jest.fn(),
+                errorMsg: jest.fn()
+            };
+            pdm.init(mockActivity);
+
+            // mockCellBlack1 returns null for querySelector("img")
+            const mockCellBlack1 = {
+                style: { backgroundColor: "black" },
+                dataset: { noteArg: "C", octave: "4" },
+                querySelector: jest.fn(() => null)
+            };
+            const mockCellBlack2 = {
+                style: { backgroundColor: "black" },
+                dataset: { noteArg: "D", octave: "4" },
+                querySelector: jest.fn(() => ({ title: "snare" }))
+            };
+
+            const mockRow1 = { cells: [mockCellBlack1, mockCellBlack1] };
+            const mockRow2 = { cells: [mockCellBlack2, mockCellBlack2] };
+
+            const mockTable = { rows: [mockRow1, mockRow2, mockRow1] }; // 3 rows -> length-1 is 2
+
+            docById.mockImplementation(id => {
+                if (id === "pdmTable" || id === "pdmDrumTable") {
+                    return mockTable;
+                }
+                if (id === "pdmCellTable0") return { rows: [mockRow1] };
+                if (id === "pdmCellTable1") return { rows: [mockRow2] };
+                if (id === "pdmCellTable2") return { rows: [mockRow1] };
+                return { style: {} };
+            });
+
+            pdm._playing = true;
+            pdm.playButton.appendChild = jest.fn();
+
+            pdm._playAll();
+            jest.runAllTimers();
+
+            expect(mockActivity.logo.synth.trigger).toHaveBeenCalled();
+            jest.useRealTimers();
         });
     });
 });
