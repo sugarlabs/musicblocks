@@ -996,6 +996,34 @@ class RhythmRuler {
         this._buildRulerTable(widgetWindow);
         this._restoreDissectHistory();
 
+        this._drumLoadPromise = Promise.all(
+            this.Drums.map(async drumIndex => {
+                let drum = "snare drum";
+
+                if (drumIndex !== null) {
+                    const drumblockno = this.activity.blocks.blockList[drumIndex].connections[1];
+                    drum = this.activity.blocks.blockList[drumblockno].value;
+                }
+
+                for (let d = 0; d < DRUMNAMES.length; d++) {
+                    if (DRUMNAMES[d][0].replace("-", " ") === drum) {
+                        drum = DRUMNAMES[d][1];
+                        break;
+                    } else if (DRUMNAMES[d][1] === drum) {
+                        break;
+                    }
+                }
+
+                // A single failed drum load must not reject the whole preload,
+                // which would block all playback.
+                try {
+                    await this.activity.logo.synth.loadSynth(0, drum);
+                } catch (error) {
+                    console.debug("Failed to preload " + drum + " synth: ", error);
+                }
+            })
+        );
+
         activity.textMsg(_("Click on the ruler to divide it."), 3000);
     }
 
@@ -2052,7 +2080,7 @@ class RhythmRuler {
      * @private
      * @returns {void}
      */
-    __resume() {
+    async __resume() {
         this._clearWidgetTimers();
         this._setButtonIcon(this._playAllCell, "pause-button.svg", _("Pause"));
         this.activity.logo.turtleDelay = 0;
@@ -2066,6 +2094,18 @@ class RhythmRuler {
             this._offsets[i] = 0;
         }
 
+        if (this._drumLoadPromise) {
+            try {
+                await this._drumLoadPromise;
+            } catch (error) {
+                console.debug("Failed to preload drum synths: ", error);
+            }
+        }
+
+        // Do not resume if the user paused or stopped while the synths were loading.
+        if (!this._playingAll) {
+            return;
+        }
         this._playAll();
     }
 
@@ -2096,7 +2136,19 @@ class RhythmRuler {
      * @private
      * @returns {void}
      */
-    _playOne() {
+    async _playOne() {
+        if (this._drumLoadPromise) {
+            try {
+                await this._drumLoadPromise;
+            } catch (error) {
+                console.debug("Failed to preload drum synths: ", error);
+            }
+        }
+
+        // Do not start if the user stopped playback while the synths were loading.
+        if (!this._playingOne) {
+            return;
+        }
         this.activity.logo.synth.stop();
         this.activity.logo.resetSynth(0);
         if (this._startingTime === null) {

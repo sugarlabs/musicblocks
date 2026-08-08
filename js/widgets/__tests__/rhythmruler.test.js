@@ -80,6 +80,7 @@ const mockWindow = {
                 value: val,
                 addEventListener: jest.fn(),
                 classList: { add: jest.fn(), remove: jest.fn() },
+                style: {},
                 onfocus: null,
                 onblur: null
             })),
@@ -109,7 +110,7 @@ const mockWindow = {
     },
     innerWidth: 1200
 };
-global.window = mockWindow;
+Object.assign(window, mockWindow);
 
 // Mock Document
 global.document = {
@@ -566,6 +567,154 @@ describe("RhythmRuler Widget", () => {
             expect(rhythmRuler._playingAll).toBe(true);
             expect(rhythmRuler._playingOne).toBe(true);
             expect(rhythmRuler._cellCounter).toBe(5);
+        });
+    });
+
+    // =========================================================================
+    // DRUM PRELOAD PLAYBACK GATING TESTS
+    // =========================================================================
+    describe("Drum Preload Playback Gating", () => {
+        beforeEach(() => {
+            rhythmRuler.activity = mockActivity;
+            rhythmRuler.Rulers = [[[4], []]];
+            rhythmRuler._playAllCell = {
+                innerHTML: "",
+                style: {},
+                replaceChildren: jest.fn(),
+                appendChild: jest.fn()
+            };
+        });
+
+        test("__resume waits for the drum preload before starting playback", async () => {
+            let resolvePreload;
+            rhythmRuler._drumLoadPromise = new Promise(resolve => {
+                resolvePreload = resolve;
+            });
+
+            const playAllSpy = jest.spyOn(rhythmRuler, "_playAll").mockImplementation();
+
+            const resumePromise = rhythmRuler.__resume();
+            expect(playAllSpy).not.toHaveBeenCalled();
+
+            resolvePreload();
+            await resumePromise;
+
+            expect(playAllSpy).toHaveBeenCalledTimes(1);
+        });
+
+        test("__resume does not start playback if the user paused while synths were loading", async () => {
+            let resolvePreload;
+            rhythmRuler._drumLoadPromise = new Promise(resolve => {
+                resolvePreload = resolve;
+            });
+
+            const playAllSpy = jest.spyOn(rhythmRuler, "_playAll").mockImplementation();
+            jest.spyOn(rhythmRuler, "_calculateZebraStripes").mockImplementation();
+
+            const resumePromise = rhythmRuler.__resume();
+            rhythmRuler.__pause();
+            resolvePreload();
+            await resumePromise;
+
+            expect(playAllSpy).not.toHaveBeenCalled();
+        });
+
+        test("__resume still starts playback when the drum preload fails", async () => {
+            const rejection = Promise.reject(new Error("drum load failed"));
+            rejection.catch(() => {});
+            rhythmRuler._drumLoadPromise = rejection;
+
+            const playAllSpy = jest.spyOn(rhythmRuler, "_playAll").mockImplementation();
+
+            await expect(rhythmRuler.__resume()).resolves.toBeUndefined();
+            expect(playAllSpy).toHaveBeenCalledTimes(1);
+        });
+
+        test("_playOne waits for the drum preload before looping", async () => {
+            let resolvePreload;
+            rhythmRuler._drumLoadPromise = new Promise(resolve => {
+                resolvePreload = resolve;
+            });
+            rhythmRuler._playingOne = true;
+            rhythmRuler._playing = true;
+            rhythmRuler._rulerSelected = 0;
+
+            const loopSpy = jest.spyOn(rhythmRuler, "__loop").mockImplementation();
+
+            const playOnePromise = rhythmRuler._playOne();
+            expect(loopSpy).not.toHaveBeenCalled();
+            expect(mockActivity.logo.synth.stop).not.toHaveBeenCalled();
+
+            resolvePreload();
+            await playOnePromise;
+
+            expect(loopSpy).toHaveBeenCalledTimes(1);
+            expect(loopSpy).toHaveBeenCalledWith(0, 0, 0);
+        });
+
+        test("_playOne does not start looping if stopped while synths were loading", async () => {
+            let resolvePreload;
+            rhythmRuler._drumLoadPromise = new Promise(resolve => {
+                resolvePreload = resolve;
+            });
+            rhythmRuler._playingOne = true;
+            rhythmRuler._playing = true;
+            rhythmRuler._rulerSelected = 0;
+
+            const loopSpy = jest.spyOn(rhythmRuler, "__loop").mockImplementation();
+
+            const playOnePromise = rhythmRuler._playOne();
+            rhythmRuler._playingOne = false;
+            resolvePreload();
+            await playOnePromise;
+
+            expect(loopSpy).not.toHaveBeenCalled();
+        });
+
+        test("_playOne still loops when the drum preload fails", async () => {
+            const rejection = Promise.reject(new Error("drum load failed"));
+            rejection.catch(() => {});
+            rhythmRuler._drumLoadPromise = rejection;
+            rhythmRuler._playingOne = true;
+            rhythmRuler._playing = true;
+            rhythmRuler._rulerSelected = 0;
+
+            const loopSpy = jest.spyOn(rhythmRuler, "__loop").mockImplementation();
+
+            await expect(rhythmRuler._playOne()).resolves.toBeUndefined();
+            expect(loopSpy).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    // =========================================================================
+    // DRUM PRELOAD BUILD (init) TESTS
+    // =========================================================================
+    describe("Drum Preload Build (init)", () => {
+        beforeEach(() => {
+            rhythmRuler.Drums = [0];
+            mockActivity.blocks.blockList[0] = { connections: [null, 100] };
+            mockActivity.blocks.blockList[100] = { value: "snare drum" };
+        });
+
+        test("init resolves the drum preload when loadSynth succeeds", async () => {
+            mockActivity.logo.synth.loadSynth.mockResolvedValue();
+
+            rhythmRuler.init(mockActivity);
+
+            await rhythmRuler._drumLoadPromise;
+            expect(mockActivity.logo.synth.loadSynth).toHaveBeenCalledWith(0, "snare drum");
+        });
+
+        test("init isolates a single loadSynth failure without blocking playback", async () => {
+            const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+            mockActivity.logo.synth.loadSynth.mockRejectedValue(new Error("drum load failed"));
+
+            rhythmRuler.init(mockActivity);
+
+            await rhythmRuler._drumLoadPromise;
+            expect(mockActivity.logo.synth.loadSynth).toHaveBeenCalledWith(0, "snare drum");
+            expect(debugSpy).toHaveBeenCalled();
+            debugSpy.mockRestore();
         });
     });
 
