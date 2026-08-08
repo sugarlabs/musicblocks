@@ -1202,21 +1202,29 @@ class Activity {
              * Handles touch start event on the canvas.
              * @param {TouchEvent} event - The touch event object.
              */
-            myCanvas.addEventListener(
-                "touchstart",
-                event => {
-                    if (event.touches.length === 2) {
-                        for (let i = 0; i < 2; i++) {
-                            initialTouches[i][0] = event.touches[i].clientY;
-                            initialTouches[i][1] = event.touches[i].clientX;
-                        }
-                        const dx = event.touches[0].clientX - event.touches[1].clientX;
-                        const dy = event.touches[0].clientY - event.touches[1].clientY;
-                        initialPinchDistance = Math.hypot(dx, dy);
+            const __touchStartHandler = event => {
+                if (event.touches.length === 2) {
+                    for (let i = 0; i < 2; i++) {
+                        initialTouches[i][0] = event.touches[i].clientY;
+                        initialTouches[i][1] = event.touches[i].clientX;
                     }
-                },
-                { passive: true }
-            );
+                    const dx = event.touches[0].clientX - event.touches[1].clientX;
+                    const dy = event.touches[0].clientY - event.touches[1].clientY;
+                    initialPinchDistance = Math.hypot(dx, dy);
+                }
+            };
+
+            // Remove previous touchstart event listener if it exists
+            if (this._touchStartHandler) {
+                this.removeEventListener(myCanvas, "touchstart", this._touchStartHandler, {
+                    passive: true
+                });
+            }
+
+            // Store the handler reference for future cleanup
+            this._touchStartHandler = __touchStartHandler;
+
+            this.addEventListener(myCanvas, "touchstart", __touchStartHandler, { passive: true });
 
             myCanvas.style.touchAction = "none";
 
@@ -1224,76 +1232,94 @@ class Activity {
              * Handles touch move event on the canvas.
              * @param {TouchEvent} event - The touch event object.
              */
-            myCanvas.addEventListener(
-                "touchmove",
-                event => {
-                    if (event.touches.length === 2) {
-                        event.preventDefault();
-                        const dx = event.touches[0].clientX - event.touches[1].clientX;
-                        const dy = event.touches[0].clientY - event.touches[1].clientY;
-                        const currentPinchDistance = Math.hypot(dx, dy);
+            const __touchMoveHandler = event => {
+                if (event.touches.length === 2) {
+                    event.preventDefault();
+                    const dx = event.touches[0].clientX - event.touches[1].clientX;
+                    const dy = event.touches[0].clientY - event.touches[1].clientY;
+                    const currentPinchDistance = Math.hypot(dx, dy);
 
-                        if (initialPinchDistance !== null && !that.resizeDebounce) {
-                            const pinchDelta = currentPinchDistance - initialPinchDistance;
-                            if (Math.abs(pinchDelta) > 20) {
-                                if (pinchDelta > 0) {
-                                    that.doLargerBlocks();
-                                } else {
-                                    that.doSmallerBlocks();
-                                }
-                                initialPinchDistance = currentPinchDistance;
+                    if (initialPinchDistance !== null && !that.resizeDebounce) {
+                        const pinchDelta = currentPinchDistance - initialPinchDistance;
+                        if (Math.abs(pinchDelta) > 20) {
+                            if (pinchDelta > 0) {
+                                that.doLargerBlocks();
+                            } else {
+                                that.doSmallerBlocks();
                             }
+                            initialPinchDistance = currentPinchDistance;
                         }
-
-                        let totalDeltaY = 0;
-                        let totalDeltaX = 0;
-                        let count = 0;
-
-                        for (let i = 0; i < 2; i++) {
-                            const touchY = event.touches[i].clientY;
-                            const touchX = event.touches[i].clientX;
-
-                            if (initialTouches[i][0] !== null && initialTouches[i][1] !== null) {
-                                totalDeltaY += touchY - initialTouches[i][0];
-                                totalDeltaX += touchX - initialTouches[i][1];
-                                count++;
-                            }
-
-                            initialTouches[i][0] = touchY;
-                            initialTouches[i][1] = touchX;
-                        }
-
-                        if (count > 0) {
-                            const avgDeltaY = totalDeltaY / count;
-                            const avgDeltaX = totalDeltaX / count;
-
-                            if (avgDeltaY !== 0) {
-                                closeAnyOpenMenusAndLabels();
-                                that.blocksContainer.y -= avgDeltaY;
-                            }
-
-                            if (that.scrollBlockContainer && avgDeltaX !== 0) {
-                                closeAnyOpenMenusAndLabels();
-                                that.blocksContainer.x -= avgDeltaX;
-                            }
-                        }
-
-                        that.refreshCanvas();
                     }
-                },
-                { passive: false }
-            );
+
+                    let totalDeltaY = 0;
+                    let totalDeltaX = 0;
+                    let count = 0;
+
+                    for (let i = 0; i < 2; i++) {
+                        const touchY = event.touches[i].clientY;
+                        const touchX = event.touches[i].clientX;
+
+                        if (initialTouches[i][0] !== null && initialTouches[i][1] !== null) {
+                            totalDeltaY += touchY - initialTouches[i][0];
+                            totalDeltaX += touchX - initialTouches[i][1];
+                            count++;
+                        }
+
+                        initialTouches[i][0] = touchY;
+                        initialTouches[i][1] = touchX;
+                    }
+
+                    if (count > 0) {
+                        const avgDeltaY = totalDeltaY / count;
+                        const avgDeltaX = totalDeltaX / count;
+
+                        if (avgDeltaY !== 0) {
+                            closeAnyOpenMenusAndLabels();
+                            that.blocksContainer.y -= avgDeltaY;
+                        }
+
+                        if (that.scrollBlockContainer && avgDeltaX !== 0) {
+                            closeAnyOpenMenusAndLabels();
+                            that.blocksContainer.x -= avgDeltaX;
+                        }
+                    }
+
+                    that.refreshCanvas();
+                }
+            };
+
+            // Remove previous touchmove event listener if it exists
+            if (this._touchMoveHandler) {
+                this.removeEventListener(myCanvas, "touchmove", this._touchMoveHandler, {
+                    passive: false
+                });
+            }
+
+            // Store the handler reference for future cleanup
+            this._touchMoveHandler = __touchMoveHandler;
+
+            this.addEventListener(myCanvas, "touchmove", __touchMoveHandler, { passive: false });
 
             /**
              * Handles touch end event on the canvas.
              */
-            myCanvas.addEventListener("touchend", () => {
+            const __touchHandler = () => {
                 for (let i = 0; i < 2; i++) {
                     initialTouches[i][0] = null;
                     initialTouches[i][1] = null;
                 }
                 initialPinchDistance = null;
-            });
+            };
+
+            // Remove previous touchend event listener if it exists
+            if (this._touchEndHandler) {
+                this.removeEventListener(myCanvas, "touchend", this._touchEndHandler);
+            }
+
+            // Store the handler reference for future cleanup
+            this._touchEndHandler = __touchHandler;
+
+            this.addEventListener(myCanvas, "touchend", __touchHandler);
 
             /**
              * Handles wheel event on the canvas.
