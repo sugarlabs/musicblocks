@@ -275,6 +275,22 @@ describe("setupRhythmBlockPaletteBlocks", () => {
             expect(logo.setTurtleListener).toHaveBeenCalled();
             expect(ret).toEqual([4, 1]);
         });
+        it("should not throw ReferenceError for totalBeats when the dispatch listener runs", () => {
+            logo.inMatrix = false;
+            logo.tupletRhythms = [["notes", 0, 4, 4]];
+            logo.tupletParams = [[1, 1]];
+            const turtle = activity.turtles.ithTurtle(turtleIndex);
+            turtle.singer.beatFactor = 1;
+            activity.blocks.blockList["blkTuplet4"] = { name: "tuplet4" };
+
+            const tuplet4Block = DummyFlowBlock.createdBlocks["tuplet4"];
+            tuplet4Block.flow([2, 4, 88], logo, turtleIndex, "blkTuplet4");
+
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+
+            expect(() => listener()).not.toThrow();
+            expect(turtle.doWait).toHaveBeenCalled();
+        });
     });
 
     describe("SeptupletBlock", () => {
