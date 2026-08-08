@@ -92,6 +92,7 @@
         }
     },
     "overrides": {
+        "nanoid": "^3.3.17",
         "electron": "40.8.5",
         "flatted": "3.4.2",
         "lodash": "4.18.1",
