@@ -80,6 +80,7 @@ const mockWindow = {
                 value: val,
                 addEventListener: jest.fn(),
                 classList: { add: jest.fn(), remove: jest.fn() },
+                style: {},
                 onfocus: null,
                 onblur: null
             })),
@@ -109,7 +110,7 @@ const mockWindow = {
     },
     innerWidth: 1200
 };
-global.window = mockWindow;
+Object.assign(window, mockWindow);
 
 // Mock Document
 global.document = {
@@ -682,6 +683,38 @@ describe("RhythmRuler Widget", () => {
 
             await expect(rhythmRuler._playOne()).resolves.toBeUndefined();
             expect(loopSpy).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    // =========================================================================
+    // DRUM PRELOAD BUILD (init) TESTS
+    // =========================================================================
+    describe("Drum Preload Build (init)", () => {
+        beforeEach(() => {
+            rhythmRuler.Drums = [0];
+            mockActivity.blocks.blockList[0] = { connections: [null, 100] };
+            mockActivity.blocks.blockList[100] = { value: "snare drum" };
+        });
+
+        test("init resolves the drum preload when loadSynth succeeds", async () => {
+            mockActivity.logo.synth.loadSynth.mockResolvedValue();
+
+            rhythmRuler.init(mockActivity);
+
+            await rhythmRuler._drumLoadPromise;
+            expect(mockActivity.logo.synth.loadSynth).toHaveBeenCalledWith(0, "snare drum");
+        });
+
+        test("init isolates a single loadSynth failure without blocking playback", async () => {
+            const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+            mockActivity.logo.synth.loadSynth.mockRejectedValue(new Error("drum load failed"));
+
+            rhythmRuler.init(mockActivity);
+
+            await rhythmRuler._drumLoadPromise;
+            expect(mockActivity.logo.synth.loadSynth).toHaveBeenCalledWith(0, "snare drum");
+            expect(debugSpy).toHaveBeenCalled();
+            debugSpy.mockRestore();
         });
     });
 
