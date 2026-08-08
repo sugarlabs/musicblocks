@@ -1039,7 +1039,7 @@ Turtles.TurtlesView = class {
                 if (auxToolbar.style.display === "block") {
                     const menuIcon = docById("menu");
                     auxToolbar.style.display = "none";
-                    menuIcon.innerHTML = "menu";
+                    menuIcon.textContent = "menu";
                     docById("toggleAuxBtn").classList.remove("blue", "darken-1");
                 }
                 this._expandButton.style.visibility = "visible";
@@ -1062,7 +1062,7 @@ Turtles.TurtlesView = class {
             if (auxToolbar.style.display === "block") {
                 const menuIcon = docById("menu");
                 auxToolbar.style.display = "none";
-                menuIcon.innerHTML = "menu";
+                menuIcon.textContent = "menu";
                 docById("toggleAuxBtn").classList.remove("blue", "darken-1");
             }
 
@@ -1115,7 +1115,7 @@ Turtles.TurtlesView = class {
             if (auxToolbar.style.display === "block") {
                 const menuIcon = docById("menu");
                 auxToolbar.style.display = "none";
-                menuIcon.innerHTML = "menu";
+                menuIcon.textContent = "menu";
                 docById("toggleAuxBtn").classList.remove("blue", "darken-1");
             }
             this.hideMenu();

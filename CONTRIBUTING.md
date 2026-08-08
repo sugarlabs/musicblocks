@@ -160,6 +160,40 @@ Follow these steps when contributing:
 
 7.  Respond to review feedback and update your branch as needed.
 
+### Draft Pull Requests
+
+Draft pull requests are for work that is still in progress. Opening
+one early is encouraged — it shares your progress, makes your work
+visible so others don't duplicate it, and is a good way to ask for
+occasional high-level feedback on your direction.
+
+While a PR is in draft, maintainers are not expected to perform a full
+code review; feedback, when given, is usually brief and high-level.
+Comprehensive review should generally be expected only after the PR is
+marked **Ready for Review**.
+
+When you believe your work is complete, tested, and ready for detailed
+review, convert the PR from draft to **Ready for Review**. This is the
+signal maintainers use to begin a thorough review.
+
+### Review Expectations
+
+Maintainers and reviewers decide when and how to review based on
+project priorities and reviewer availability.
+
+- Avoid repeatedly requesting full reviews while a PR is still marked
+  as draft.
+- Review comments should remain focused on improving the code.
+
+### Respectful Communication
+
+Keep discussions professional, respectful, and focused on the code.
+
+- If there is disagreement about the review process, discuss it calmly
+  without personal arguments.
+- Avoid confrontational language and assume good intent from everyone
+  involved.
+
 ### Reviews and Area Ownership
 
 All reviews are welcome. Reviewing pull requests is a good way to help the
@@ -217,6 +251,134 @@ This means that even after your pull request is merged, your changes may not imm
 If your changes are not visible right away, it does **not** indicate a problem with your PR or implementation.
 
 This note is included to prevent contributors from spending time debugging caching or deployment issues unnecessarily.
+
+### Releases and the Changelog
+
+[CHANGELOG.md](CHANGELOG.md) is generated, not hand-written. It is
+maintained by [release-please](https://github.com/googleapis/release-please)
+from the Conventional Commit messages that land on `master` — the same
+format already enforced by the `commitlint` job on every PR.
+
+What this means for you as a contributor:
+
+- Write a real Conventional Commit subject. It becomes the changelog
+  line verbatim, so `fix(palette): correct drag offset on touch devices`
+  reads well and `fix: stuff` does not.
+- `feat`, `fix`, `perf`, `docs`, and `revert` appear in the changelog.
+  `build`, `chore`, `ci`, `refactor`, `style`, and `test` are still valid
+  commit types and still required to pass linting — they are just hidden
+  from the changelog. Two of those are deliberate policy rather than
+  housekeeping: **added or changed tests** and **pure refactors** are not
+  listed in release notes. A refactor changes no behaviour by definition,
+  and tests matter to reviewers rather than to the people reading what
+  shipped. Commit them as `test:` / `refactor:` and they are excluded
+  automatically.
+- Hiding a type is not purely cosmetic. release-please skips creating a
+  release PR entirely when every commit since the last release is a hidden
+  type (it treats the rendered notes being empty as "no user-facing
+  changes"). So a stretch of pure refactor or test work will no longer
+  open a release PR on its own — which is intended, but worth knowing if
+  you are waiting for one to appear.
+- Version bumps are computed separately from all of this: `feat` bumps the
+  minor, a breaking change bumps the major, and **every other type bumps
+  the patch** — including `docs`, `refactor`, `chore`, and `test`. Hidden
+  types therefore still influence the version number of a release that is
+  going out for other reasons; they just do not print a line.
+- A `BREAKING CHANGE:` footer (or a `!` after the type, e.g. `feat!:`)
+  triggers a major version bump and its own changelog section.
+- Never edit the version sections of `CHANGELOG.md` by hand — the next
+  release run would overwrite your changes.
+- **Your PR title must also be a Conventional Commit.** If your PR is
+  squash-merged, the title becomes the single commit on `master`, and
+  that title — not your individual commits — is what the changelog is
+  built from. Both are linted: commits by the `commitlint` job in
+  `ci.yml`, the title by `pr-title-check.yml`. Renaming a PR re-runs the
+  title check, so a red title check clears once you fix the title.
+
+What this means for maintainers:
+
+Pushes to `master` keep a `chore(release): vX.Y.Z` pull request open and
+up to date. Nothing is published while it sits there; it just accumulates
+entries. Merging it bumps the version in `package.json`, commits the
+changelog, tags `vX.Y.Z`, and cuts the GitHub release. Deployment remains
+manual, as noted above.
+
+Releases here are infrequent — the tag history averages two to three a
+year — so expect that PR to stay open for a long stretch and to grow
+large. That is normal: release-please rewrites the same PR on every push
+rather than opening new ones. If it is closed, the next push to `master`
+recreates it. A long-lived release PR is safe only because
+`commit-search-depth` is sized for it; see point 4 below before lowering
+that value.
+
+Two things to check when adopting this, and one to clean up later:
+
+1.  **Branch protection.** The release PR is opened by the default
+    `GITHUB_TOKEN`, and GitHub does not let a `GITHUB_TOKEN`-driven event
+    start other workflow runs — so CI never runs on the release PR. If
+    `master` requires status checks to pass, those checks stay pending
+    forever and the release PR cannot be merged normally. There is no way
+    to express "exempt this one PR": ruleset bypass actors key off who
+    performs the merge, and that is a human maintainer, so exempting them
+    exempts every PR they touch. The two real options are:
+    - Give the action a GitHub App token or PAT, so its PR triggers CI like
+      any other. This costs least-privilege but keeps the merge normal.
+    - Leave `GITHUB_TOKEN` and have an admin bypass the checks on each
+      release. This is the recommended option at any plausible cadence for
+      this project: even at one release a month it is twelve admin merges
+      a year, which is not worth holding a long-lived PAT to avoid.
+
+    Also note that if `master` has required checks, `pr-title-check.yml`
+    should be added to that set — otherwise a bad PR title is advisory
+    only and can still be squash-merged, which is the exact failure this
+    setup is meant to prevent.
+
+2.  **Post-release steps belong in `release-please.yml`.** The same
+    restriction means a workflow triggered by `release: [published]` or
+    `push: tags: ['v*']` will never fire for these releases. Build,
+    publish, or notify steps must be downstream jobs in that workflow,
+    gated on its `release_created` output.
+3.  **`last-release-sha` is the adoption commit, not the `v3.7.1` tag.**
+    This is deliberate. There are 1,193 commits between `v3.7.1` and the
+    adoption point; pointing the floor at the tag would put roughly 487
+    entries — including a ~400-line "Bug Fixes" section — into the very
+    first release PR, generated from subjects written before anyone knew
+    they would become release notes. It would also not work as configured:
+    release-please fetches at most `commit-search-depth` commits, which
+    defaults to **500**, so a floor 1,193 commits back would never be
+    reached without also raising that value.
+
+    The trade-off is that work between `v3.7.1` and adoption appears in
+    neither the old GitHub releases nor this changelog. `CHANGELOG.md`
+    says so explicitly and points at `git log v3.7.1..` for that window.
+
+    Once the first automated release has landed and its tag exists,
+    release-please finds the previous release from the tag and this key
+    becomes dead weight and a stale floor — remove it then.
+
+4.  **`commit-search-depth` is raised to 3000, and must stay raised.**
+    release-please walks back from `master` fetching at most this many
+    commits, looking for the previous release. The default is 500. That
+    was historically adequate here — the gaps between `v3.5.3` and
+    `v3.7.1` ran 16 to 369 commits — but this repository now moves at
+    roughly 210 commits a month, so a six-month release cycle is about
+    1,250 commits. At the default, every release would silently truncate.
+
+    "Silently" is the important word. If the walk hits the depth limit
+    before finding its anchor, release-please does not warn or fail:
+
+    ```js
+    const index = commits.findIndex(commit => commit.sha === lastReleaseSha);
+    if (index === -1) {
+        return commits; // every commit it managed to fetch
+    }
+    ```
+
+    You would get a plausible-looking release PR containing several
+    hundred commits that belong to an earlier release, with nothing in the
+    logs to say so. 3000 covers well over a year at current velocity. If
+    the changelog ever looks like it reaches too far back, raise this
+    before looking anywhere else.
 
 ### License Header
 

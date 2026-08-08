@@ -108,7 +108,7 @@ function setupToneActions(activity) {
             const listenerName = "_settimbre_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -150,7 +150,7 @@ function setupToneActions(activity) {
             const listenerName = "_vibrato_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -203,7 +203,7 @@ function setupToneActions(activity) {
             const listenerName = "_chorus_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -236,7 +236,7 @@ function setupToneActions(activity) {
             const listenerName = "_phaser_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -275,7 +275,7 @@ function setupToneActions(activity) {
             const listenerName = "_tremolo_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -310,7 +310,7 @@ function setupToneActions(activity) {
             const listenerName = "_distortion_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -351,7 +351,7 @@ function setupToneActions(activity) {
             const listenerName = "_harmonic_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }

@@ -39,6 +39,18 @@
 // Constants moved to js/logoconstants.js to resolve circular dependency
 
 /**
+ * Resolves the performance instrumentation module.
+ *
+ * `performanceTracker` is loaded on demand (see `runLogoCommands`), so it is
+ * absent for the whole of a normal run. Every instrumentation call site goes
+ * through this accessor rather than repeating the `typeof` guard.
+ *
+ * @returns {Object|null} The tracker, or null when it has not been loaded.
+ */
+const getPerformanceTracker = () =>
+    typeof performanceTracker === "undefined" ? null : performanceTracker;
+
+/**
  * @class
  * @classdesc Queue entry for managing running blocks.
  */
@@ -251,6 +263,7 @@ class Logo {
         this.runningMxml = false;
         this.runningMIDI = false;
         this._checkingCompletionState = false;
+        this._exportNotationFinished = false;
         this.recording = false;
 
         // Buffer for recording musical output (Issue #2330)
@@ -264,6 +277,7 @@ class Logo {
         };
 
         this.temperamentSelected = [];
+        this._userTemperament = "equal";
         this.customTemperamentDefined = false;
         this.specialArgs = [];
 
@@ -272,6 +286,9 @@ class Logo {
         this.synth.activity = this.activity; // Reference for voice tracking
         this.synth.changeInTemperament = false;
         this._synthsInitialized = false;
+
+        // Persistent user-selected temperament (survives across runs).
+        this._userTemperament = null;
 
         // Mode widget
         this.modeBlock = null;
@@ -290,6 +307,7 @@ class Logo {
 
         this._syncCounter = 0;
         this._YIELD_AFTER_SYNC_RUNS = 1000;
+        this._EXPORT_YIELD_AFTER_SYNC_RUNS = 100; // Sync yield threshold during exports.
         this._iterationBudget = this._MAX_ITERATIONS + 1;
         this._MAX_ITERATIONS = 1000000;
 
@@ -316,8 +334,8 @@ class Logo {
         } else {
             // Node.js / Jest environment — require the module
             try {
-                const { ManagedTimer: MT } = require("./utils/ManagedTimer");
-                this._timerManager = new MT();
+                const ManagedTimerCtor = require("./utils/ManagedTimer");
+                this._timerManager = new ManagedTimerCtor();
             } catch (e) {
                 // Fallback: create a minimal shim so the engine still works
                 this._timerManager = {
@@ -1119,6 +1137,17 @@ class Logo {
 
     // ========= Behavior =========================================================================
 
+    resetTemperament() {
+        this.synth.changeInTemperament = false;
+        this.synth.inTemperament = this._userTemperament || "equal";
+    }
+
+    setUserTemperament(temperament) {
+        this._userTemperament = temperament;
+        this.synth.inTemperament = temperament;
+        this.synth.changeInTemperament = true;
+    }
+
     /**
      * Initialises a turtle.
      *
@@ -1137,33 +1166,24 @@ class Logo {
         this.notation.pickupPoint[turtle] = null;
         this.notation.pickupPOW2[turtle] = false;
 
-        this.turtles
-            .ithTurtle(turtle)
-            .initTurtle(
-                this.runningLilypond || this.runningAbc || this.runningMxml || this.runningMIDI
-            );
+        this.turtles.ithTurtle(turtle).initTurtle(this._exportingNotation);
     }
 
     /**
-     * Stops the turtles and cleans up a few odds and ends.
-     * The stop button was pressed.
+     * Cleans up audio, transport, and visual state after a run has fully
+     * completed — either naturally (via _lastNoteTimeout) or on explicit stop.
+     *
+     * This is the shared subset of doStopTurtles that is safe to call from
+     * the deferred natural-completion path.  It does NOT set stopTurtle,
+     * cancel managed timers, or reset UI — those belong only in
+     * doStopTurtles when the user presses Stop.
      *
      * @returns {void}
      */
-    doStopTurtles() {
-        this.stopTurtle = true;
-        this.turtles.markAllAsStopped();
-
-        // Cancel ALL pending managed timers to prevent zombie turtle graphics,
-        // phantom sounds, and stale block highlighting. This is the primary
-        // mechanism for the zombie-timer fix — every setTimeout dispatched by
-        // dispatchTurtleSignals, runFromBlock, and runFromBlockNow is tracked
-        // by _timerManager, so clearAll() cancels them in one sweep.
-        const cancelledTimers = this._timerManager.clearAll();
-        if (cancelledTimers > 0) {
-            console.debug(
-                "ManagedTimer: cancelled " + cancelledTimers + " pending timer(s) on stop"
-            );
+    _cleanupAfterCompletion() {
+        // Skip if cleanup already ran (two turtles finishing far apart).
+        if (!this._synthsInitialized && this.sounds.length === 0) {
+            return;
         }
 
         for (const sound in this.sounds) {
@@ -1186,8 +1206,6 @@ class Logo {
             if (comp) {
                 const compTurtle = this.turtles.getTurtle(comp);
                 compTurtle.running = false;
-                // Null tur.interval after cancel to prevent stale-ID no-op
-                // on next onEveryBeatDo registration (MeterActions.js ~253).
                 if (compTurtle.interval !== undefined) {
                     if (!this._timerManager.clearInterval(compTurtle.interval)) {
                         clearInterval(compTurtle.interval);
@@ -1197,30 +1215,19 @@ class Logo {
             }
         }
 
-        // Cancel all Transport-scheduled events before synth.stop()
+        // Cancel Transport-scheduled events and reset position
         if (this.synth.transport.isAvailable) {
             this.synth.transport.cancel();
+            this.synth.transport.seconds = 0;
         }
 
-        // Reset per-turtle Transport scheduling state
-        for (const turtle of this.activity.turtles.turtleList) {
-            turtle._transportTime = null;
-            turtle._transportEventId = null;
+        for (const t of this.activity.turtles.turtleList) {
+            t._transportTime = null;
+            t._transportEventId = null;
         }
 
         this.synth.stop();
 
-        // Reset Transport position for next run
-        if (this.synth.transport.isAvailable) {
-            this.synth.transport.seconds = 0;
-        }
-
-        if (this.synth.recorder && this.synth.recorder.state === "recording")
-            this.synth.recorder.stop();
-
-        // Dispose all Tone.js instruments to free decoded AudioBuffers
-        // and Web Audio nodes. They will be re-created by prepSynths()
-        // on the next run.
         this.synth.disposeAllInstruments();
         this._synthsInitialized = false;
 
@@ -1228,10 +1235,45 @@ class Logo {
         if (this.cameraID != null) {
             this.deps.utils.doStopVideoCam(this.cameraID, this.setCameraID);
         }
+    }
+
+    /**
+     * Stops the turtles and cleans up a few odds and ends.
+     * The stop button was pressed.
+     *
+     * @returns {void}
+     */
+    doStopTurtles() {
+        this.stopTurtle = true;
+        this.turtles.markAllAsStopped();
+
+        // Cancel all pending timers to prevent zombie graphics and sounds.
+        const cancelledTimers = this._timerManager.clearAll();
+        if (cancelledTimers > 0) {
+            console.debug(
+                "ManagedTimer: cancelled " + cancelledTimers + " pending timer(s) on stop"
+            );
+        }
+
+        // Prevent stale timeout from firing cleanup on next run.
+        this._lastNoteTimeout = null;
+
+        this._cleanupAfterCompletion();
 
         for (const arg in this.evalOnStopList) {
             this.safePluginExecute(this.evalOnStopList[arg], this);
         }
+
+        // Clear canvas on explicit Stop only — natural completion
+        // preserves drawings for SVG/PNG export.
+        for (const turtle of this.turtles.turtleList) {
+            turtle.painter.doClear(true, true, true);
+        }
+
+        // Recorder stop is Stop-only — natural completion must not
+        // interrupt an in-progress WAV recording.
+        if (this.synth.recorder && this.synth.recorder.state === "recording")
+            this.synth.recorder.stop();
 
         this.onStopTurtle();
         this.blocks.bringToTop();
@@ -1315,7 +1357,7 @@ class Logo {
 
         if (
             performanceModeEnabled &&
-            typeof performanceTracker === "undefined" &&
+            !getPerformanceTracker() &&
             typeof requirejs === "function" &&
             !this._performanceTrackerLoadFailed
         ) {
@@ -1330,11 +1372,12 @@ class Logo {
             return;
         }
 
-        if (typeof performanceTracker !== "undefined") {
+        const tracker = getPerformanceTracker();
+        if (tracker) {
             if (performanceModeEnabled) {
-                performanceTracker.enable();
+                tracker.enable();
             } else {
-                performanceTracker.disable();
+                tracker.disable();
             }
         }
 
@@ -1352,8 +1395,10 @@ class Logo {
 
         // eslint-disable-next-line eqeqeq
         if (this._lastNoteTimeout != null) {
-            clearTimeout(this._lastNoteTimeout);
+            this._timerManager.clearTimeout(this._lastNoteTimeout);
             this._lastNoteTimeout = null;
+            // Previous run's cleanup never fired — run it now.
+            this._cleanupAfterCompletion();
         }
 
         this._restoreConnections(); // Restore any broken connections.
@@ -1385,9 +1430,11 @@ class Logo {
 
         this.deps.Singer.masterBPM = TARGETBPM;
         this.deps.Singer.defaultBPMFactor = TONEBPM / TARGETBPM;
-        this.synth.changeInTemperament = false;
+        this.resetTemperament();
+        this.deps.Singer.clearPitchToFrequencyCache();
 
         this._checkingCompletionState = false;
+        this._exportNotationFinished = false;
 
         for (const turtle of this.turtles.turtleList) {
             turtle.embeddedGraphicsFinished = true;
@@ -1546,9 +1593,7 @@ class Logo {
         }
 
         // Performance instrumentation: begin tracking
-        if (typeof performanceTracker !== "undefined") {
-            performanceTracker.startRun();
-        }
+        getPerformanceTracker()?.startRun();
 
         /*
         ===========================================================================
@@ -1645,6 +1690,11 @@ class Logo {
         this.deps.refreshCanvas();
     }
 
+    // True while headlessly exporting notation.
+    get _exportingNotation() {
+        return this.runningLilypond || this.runningAbc || this.runningMxml || this.runningMIDI;
+    }
+
     /**
      * Schedules execution of block `blk` after the turtle's current delay.
      *
@@ -1671,6 +1721,22 @@ class Logo {
 
         this.receivedArg = receivedArg;
 
+        // Synchronous fast path for notation exports; yield every 100 transitions.
+        if (logo._exportingNotation) {
+            logo._syncCounter++;
+            if (logo._syncCounter >= logo._EXPORT_YIELD_AFTER_SYNC_RUNS) {
+                logo._syncCounter = 0;
+                logo._timerManager.setGuardedTimeout(
+                    () => logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg),
+                    0,
+                    () => logo.stopTurtle
+                );
+            } else {
+                logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg);
+            }
+            return;
+        }
+
         // Reset async yield counters – execution will go through
         // setTimeout below, giving the event loop a chance to breathe.
         logo._syncCounter = 0;
@@ -1695,9 +1761,13 @@ class Logo {
                 logo.turtleDelay === 0 &&
                 delay > 0 &&
                 logo.synth.transport.isAvailable &&
+                logo.synth.transport.isClockRunning &&
                 tur._transportTime !== null
             ) {
-                const transportTime = tur._transportTime + delay / 1000;
+                const transportTime = Math.max(
+                    tur._transportTime + delay / 1000,
+                    logo.synth.transport.seconds
+                );
                 tur.delayParameters = { blk: blk, flow: isflow, arg: receivedArg };
                 tur._transportEventId = logo.synth.transport.schedule(audioContextTime => {
                     const tur2 = logo.activity.turtles.ithTurtle(turtle);
@@ -1757,10 +1827,9 @@ class Logo {
      * @returns {void}
      */
     runFromBlockNow(logo, turtle, blk, isflow, receivedArg, queueStart) {
+        const tracker = getPerformanceTracker();
         const profilingEnabled =
-            typeof performanceTracker !== "undefined" &&
-            typeof performanceTracker.isEnabled === "function" &&
-            performanceTracker.isEnabled();
+            tracker && typeof tracker.isEnabled === "function" && tracker.isEnabled();
         let profilingStart = null;
         if (profilingEnabled) {
             profilingStart =
@@ -1770,7 +1839,7 @@ class Logo {
             if (!logo.blockTimings) {
                 logo.blockTimings = {};
             }
-            performanceTracker.enterBlock();
+            tracker.enterBlock();
         }
 
         this._alreadyRunning = true;
@@ -1788,6 +1857,7 @@ class Logo {
             logo._iterationBudget = logo._MAX_ITERATIONS + 1;
             if (profilingEnabled) {
                 Logo._recordBlockTiming(logo, blk, profilingStart);
+                performanceTracker.exitBlock();
             }
             return;
         }
@@ -1911,8 +1981,9 @@ class Logo {
                 // Highlight the current block
                 logo.blocks.highlight(blk, false);
                 logo._currentlyHighlightedBlock = blk;
-                // Force stage update so highlight is visible when blocks were shown during execution
-                if (logo.stage) {
+                // Force stage update so highlight is visible when blocks were shown during execution.
+                // Skip if the block is off-screen — the highlight is invisible anyway.
+                if (logo.stage && currentBlock._viewportVisible !== false) {
                     logo.deps.markStageDirty();
                 }
             }
@@ -1946,7 +2017,7 @@ class Logo {
                 if (ret) {
                     if (profilingEnabled) {
                         Logo._recordBlockTiming(logo, blk, profilingStart);
-                        performanceTracker.exitBlock();
+                        tracker.exitBlock();
                     }
                     return ret;
                 }
@@ -2210,18 +2281,26 @@ class Logo {
             // ensured that the turtle is really finished running
             // yet. Hence the timeout.
             const __checkCompletionState = () => {
+                if (logo._exportNotationFinished) {
+                    return;
+                }
+
                 if (
                     !logo.turtles.running() &&
                     queueStart === 0 &&
                     tur.singer.justCounting.length === 0
                 ) {
-                    // Performance instrumentation: end tracking and log stats
-                    if (typeof performanceTracker !== "undefined") {
-                        performanceTracker.endRun();
-                        performanceTracker.logStats();
+                    // Performance instrumentation: end tracking and log stats.
+                    // Looked up again because this runs on a timeout, well
+                    // after the lookup at the top of runFromBlockNow.
+                    const runTracker = getPerformanceTracker();
+                    if (runTracker) {
+                        runTracker.endRun();
+                        runTracker.logStats();
                     }
 
                     if (logo.runningLilypond) {
+                        logo._exportNotationFinished = true;
                         try {
                             if (logo.collectingStats) {
                                 logo.projectStats = logo.deps.utils.getStatsFromNotation(
@@ -2242,6 +2321,7 @@ class Logo {
                             document.body.style.cursor = "default";
                         }
                     } else if (logo.runningAbc) {
+                        logo._exportNotationFinished = true;
                         try {
                             logo.deps.save.afterSaveAbc();
                         } catch (e) {
@@ -2254,9 +2334,11 @@ class Logo {
                             document.body.style.cursor = "default";
                         }
                     } else if (logo.runningMxml) {
+                        logo._exportNotationFinished = true;
                         logo.deps.save.afterSaveMxml();
                         logo.runningMxml = false;
                     } else if (logo.runningMIDI) {
+                        logo._exportNotationFinished = true;
                         logo.deps.save.afterSaveMIDI();
                         logo.runningMIDI = false;
                     } else if (tur.singer.suppressOutput) {
@@ -2290,12 +2372,21 @@ class Logo {
                         }
                     }
 
-                    // Give the last note time to play.
+                    // Wait a beat for the last note, then clean up.
+                    // Cancel any pending timer from a previous turtle.
+                    if (logo._lastNoteTimeout !== null) {
+                        logo._timerManager.clearTimeout(logo._lastNoteTimeout);
+                    }
                     logo._lastNoteTimeout = logo._timerManager.setTimeout(() => {
                         logo._lastNoteTimeout = null;
                         tur.singer.runningFromEvent = false;
                         if (tur.singer.suppressOutput && logo.recording) {
                             tur.singer.suppressOutput = false;
+                        }
+                        // Skip if a new run already started or another
+                        // turtle's callback already cleaned up.
+                        if (!logo.turtles.running()) {
+                            logo._cleanupAfterCompletion();
                         }
                     }, 1000);
                 }
@@ -2306,7 +2397,7 @@ class Logo {
 
         if (profilingEnabled) {
             Logo._recordBlockTiming(logo, blk, profilingStart);
-            performanceTracker.exitBlock();
+            tracker.exitBlock();
         }
     }
 
@@ -2444,11 +2535,9 @@ Logo._recordBlockTiming = function _recordBlockTiming(logo, blk, profilingStart)
             entry.max = elapsed;
         }
     } catch (e) {
-        if (
-            typeof performanceTracker !== "undefined" &&
-            typeof performanceTracker.disable === "function"
-        ) {
-            performanceTracker.disable();
+        const tracker = getPerformanceTracker();
+        if (tracker && typeof tracker.disable === "function") {
+            tracker.disable();
         }
     }
 };

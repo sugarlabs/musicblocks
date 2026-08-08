@@ -91,76 +91,6 @@ const STRINGLEN = 9;
  * @type {number}
  */
 const LONGPRESSTIME = 1500;
-const INLINECOLLAPSIBLES = ["newnote", "interval", "osctime", "definemode"];
-
-/**
- * List of block types that are collapsible inline.
- * @type {string[]}
- */
-const COLLAPSIBLES = [
-    "drum",
-    "start",
-    "action",
-    "temperament1",
-    "matrix",
-    "pitchdrummatrix",
-    "rhythmruler2",
-    "timbre",
-    "status",
-    "pitchstaircase",
-    "tempo",
-    "pitchslider",
-    "modewidget",
-    "newnote",
-    "musickeyboard",
-    "temperament",
-    "interval",
-    "osctime",
-    "definemode"
-];
-
-/**
- * List of block types that should not trigger any event.
- * @type {string[]}
- */
-const NOHIT = ["hidden", "hiddennoflow"];
-
-/**
- * List of blocks that behave like argument blocks even though they are not
- * strictly classified as arg/value blocks.
- * @type {string[]}
- */
-const ARG_LIKE_BLOCKS = ["doArg", "calcArg", "namedcalcArg", "makeblock"];
-
-/**
- * List of special input types.
- * @type {string[]}
- */
-const SPECIALINPUTS = [
-    "text",
-    "number",
-    "solfege",
-    "eastindiansolfege",
-    "scaledegree2",
-    "notename",
-    "voicename",
-    "modename",
-    "chordname",
-    "drumname",
-    "effectsname",
-    "filtertype",
-    "oscillatortype",
-    "boolean",
-    "intervalname",
-    "invertmode",
-    "accidentalname",
-    "temperamentname",
-    "noisename",
-    "customNote",
-    "grid",
-    "outputtools",
-    "wrapmode"
-];
 
 /**
  * List of block types whose names should be widened.
@@ -184,34 +114,6 @@ const WIDENAMES = [
  * @type {string[]}
  */
 const EXTRAWIDENAMES = [];
-
-/**
- * List of block types with pie menus.
- * @type {string[]}
- */
-const PIEMENUS = [
-    "solfege",
-    "eastindiansolfege",
-    "scaledegree2",
-    "notename",
-    "voicename",
-    "drumname",
-    "effectsname",
-    "accidentalname",
-    "invertmode",
-    "boolean",
-    "filtertype",
-    "oscillatortype",
-    "intervalname",
-    "modename",
-    "chordname",
-    "temperamentname",
-    "noisename",
-    "customNote",
-    "grid",
-    "outputtools",
-    "wrapmode"
-];
 
 /**
  * Async function to create bitmap from SVG data.
@@ -281,6 +183,7 @@ class Block {
         this.collapsed = false; // Is this collapsible block collapsed?
         this.inCollapsed = false; // Is this block in a collapsed stack?
         this.trash = false; // Is this block in the trash?
+        this._viewportVisible = true; // Is this block within the current viewport?
         this.loadComplete = false; // Has the block finished loading?
         this.label = null; // Editable textview in DOM.
         this.labelattr = null; // Editable textview in DOM.
@@ -610,6 +513,38 @@ class Block {
         this.size = this.protoblock.size;
     }
 
+    hasCapability(name) {
+        if (this.protoblock && typeof this.protoblock.hasCapability === "function") {
+            return this.protoblock.hasCapability(name);
+        }
+
+        if (
+            this.protoblock &&
+            this.protoblock.capabilities &&
+            Object.prototype.hasOwnProperty.call(this.protoblock.capabilities, name)
+        ) {
+            return !!this.protoblock.capabilities[name];
+        }
+
+        return false;
+    }
+
+    getCapability(name) {
+        if (this.protoblock && typeof this.protoblock.getCapability === "function") {
+            return this.protoblock.getCapability(name);
+        }
+
+        if (
+            this.protoblock &&
+            this.protoblock.capabilities &&
+            Object.prototype.hasOwnProperty.call(this.protoblock.capabilities, name)
+        ) {
+            return this.protoblock.capabilities[name];
+        }
+
+        return undefined;
+    }
+
     /**
      * Retrieves information about the block.
      * @returns {string} - Information about the block.
@@ -623,7 +558,7 @@ class Block {
      * @returns {boolean} - Returns true if the block is collapsible, otherwise false.
      */
     isCollapsible() {
-        return COLLAPSIBLES.includes(this.name);
+        return this.hasCapability("collapsible");
     }
 
     /**
@@ -631,7 +566,7 @@ class Block {
      * @returns {boolean} - Returns true if the block is inline collapsible, otherwise false.
      */
     isInlineCollapsible() {
-        return INLINECOLLAPSIBLES.includes(this.name);
+        return this.hasCapability("inlineCollapsible");
     }
 
     /**
@@ -659,7 +594,7 @@ class Block {
                 // block is hidden, so do nothing.
                 return;
             }
-        } else if (!this.bitmap.visible) {
+        } else if (this.bitmap === null || !this.bitmap.visible) {
             return;
         }
 
@@ -726,7 +661,9 @@ class Block {
             }
         }
 
-        this.container.updateCache();
+        if (this._viewportVisible !== false) {
+            this.container.updateCache();
+        }
     }
 
     /**
@@ -808,7 +745,9 @@ class Block {
             }
         }
 
-        this.container.updateCache();
+        if (this._viewportVisible !== false) {
+            this.container.updateCache();
+        }
     }
 
     unhighlightSelectedBlocks(blk, selection) {
@@ -1381,7 +1320,7 @@ class Block {
             }
         } else if (this.protoblock.staticLabels.length > 0 && !this.protoblock.image) {
             // Label should be defined inside _().
-            if (SPECIALINPUTS.includes(this.name)) {
+            if (this.hasValueDrivenLabel()) {
                 block_label = "";
             } else {
                 block_label = this.protoblock.staticLabels[0];
@@ -1439,7 +1378,7 @@ class Block {
         // const thisBlock = this.blockIndex;
         let proto, obj, label, attr;
         // Value blocks get a modifiable text label.
-        if (SPECIALINPUTS.includes(this.name)) {
+        if (this.hasValueDrivenLabel()) {
             if (this.value === null) {
                 switch (this.name) {
                     case "text":
@@ -1457,7 +1396,10 @@ class Block {
                             this.activity.logo.synth.startingPitch.substring(
                                 0,
                                 this.activity.logo.synth.startingPitch.length - 1
-                            ) + "(+0)";
+                            ) +
+                            "(+0" +
+                            CENTSSYMBOL +
+                            ")";
                         break;
                     case "notename":
                         this.value = "G";
@@ -1952,6 +1894,9 @@ class Block {
      * @returns {void}
      */
     hide() {
+        if (!this.container) {
+            return;
+        }
         this.container.visible = false;
         if (this.isCollapsible()) {
             // Sometimes these fields are not set.
@@ -1984,8 +1929,8 @@ class Block {
             return false;
         }
 
-        if (COLLAPSIBLES.includes(this.name)) {
-            if (!INLINECOLLAPSIBLES.includes(this.name)) {
+        if (this.isCollapsible()) {
+            if (!this.isInlineCollapsible()) {
                 return false;
             }
         }
@@ -2014,8 +1959,9 @@ class Block {
      */
     show() {
         // If it is not in the trash and not in collapsed, then show it.
-        if (!this.trash && !this.inCollapsed) {
+        if (!this.trash && !this.inCollapsed && this.container) {
             this.container.visible = true;
+            this._viewportVisible = true;
             if (this.isCollapsible()) {
                 if (this.collapsed) {
                     this.bitmap.visible = false;
@@ -2094,7 +2040,33 @@ class Block {
      * @returns {boolean} - True if the block is a no-hit block, false otherwise.
      */
     isNoHitBlock() {
-        return NOHIT.includes(this.name);
+        const noHitCapability = this.getCapability("noHit");
+        if (noHitCapability !== undefined) {
+            return !!noHitCapability;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if the block is a note container.
+     * @returns {boolean} - True if the block is a note container, false otherwise.
+     */
+    isNoteContainer() {
+        const noteContainerCapability = this.getCapability("noteContainer");
+        if (noteContainerCapability !== undefined) {
+            return !!noteContainerCapability;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if the block derives its visible inline label from its value.
+     * @returns {boolean} - True if the block has value-driven label behavior.
+     */
+    hasValueDrivenLabel() {
+        return this.hasCapability("valueDrivenLabel");
     }
 
     /**
@@ -2113,7 +2085,7 @@ class Block {
      * @returns {boolean} - True if the block is argument-like, false otherwise.
      */
     isArgumentLikeBlock() {
-        return this.isArgBlock() || ARG_LIKE_BLOCKS.includes(this.name);
+        return this.isArgBlock() || this.hasCapability("argumentLike");
     }
 
     /**
@@ -2971,7 +2943,7 @@ class Block {
         this.text.y = Math.floor((TEXTY * blockScale) / 2 + 0.5);
 
         // Some special cases
-        if (SPECIALINPUTS.includes(this.name)) {
+        if (this.hasValueDrivenLabel()) {
             this.text.textAlign = "center";
             this.text.x = Math.floor((VALUETEXTX * blockScale) / 2 + 10.0);
             if (EXTRAWIDENAMES.includes(this.name)) {
@@ -3164,7 +3136,7 @@ class Block {
             } else if ((!window.hasMouse && getInput) || (window.hasMouse && !moved)) {
                 if (["media", "audiofile", "loadFile"].includes(that.name)) {
                     that._doOpenMedia(thisBlock);
-                } else if (SPECIALINPUTS.includes(that.name)) {
+                } else if (that.hasValueDrivenLabel()) {
                     if (!that.trash) {
                         if (that._triggerLongPress) {
                             that._triggerLongPress = false;
@@ -3278,6 +3250,13 @@ class Block {
             // Cache the drag group once on mousedown instead of
             // recomputing the tree traversal on every pressmove.
             that.blocks.cacheDragGroup(thisBlock);
+            // Track the drag group for viewport culling exemption during drag,
+            // so off-screen stack siblings remain visible while being dragged
+            // into view (avoids "pop-in" on release).
+            const group = that.blocks._cachedDragGroup;
+            if (group && group.length > 0) {
+                that.blocks._dragActiveGroup = new Set(group);
+            }
             // Invalidate the top-block cache since a drag may
             // disconnect blocks, changing the topology.
             that.blocks.invalidateTopBlockCache();
@@ -3337,6 +3316,14 @@ class Block {
                 );
                 if (movedDx + movedDy > 5) {
                     moved = true;
+                    // Announce block drag to screen readers (screen reader only, no visual message)
+                    if (!that._announced) {
+                        that._announced = true;
+                        const blockLabel =
+                            (that.protoblock.staticLabels && that.protoblock.staticLabels[0]) ||
+                            that.name;
+                        announceToScreenReader(_("picked up") + " " + blockLabel);
+                    }
                 }
             } else {
                 // Make it easier to select text on mobile.
@@ -3511,6 +3498,7 @@ class Block {
             // Clear cached drag state.
             _dragHasRest2 = false;
             moved = false;
+            that._announced = false;
         });
         // Touch long-press to open context menu
         this.container.on("touchstart", () => {
@@ -3600,7 +3588,7 @@ class Block {
                 // apart). Still need to get to the root cause.
                 this.blocks.adjustDocks(this.blockIndex, true);
             }
-        } else if (SPECIALINPUTS.includes(this.name) || ["media", "loadFile"].includes(this.name)) {
+        } else if (this.hasValueDrivenLabel() || ["media", "loadFile"].includes(this.name)) {
             if (!haveClick) {
                 // Simulate click on Android.
                 if (new Date().getTime() - this.blocks.mouseDownTime < 500) {
@@ -3651,7 +3639,7 @@ class Block {
         this._check_meter_block = null;
 
         // Special pie menus
-        if (PIEMENUS.includes(this.name)) {
+        if (this.hasCapability("discreteChoice")) {
             return true;
         }
 
@@ -3699,13 +3687,11 @@ class Block {
      * @returns {boolean} - Indicates whether a pie menu should be used.
      */
     _usePieNumberC1() {
-        // Return true if this number block plugs into Connection 1 of
-        // a block that uses a pie menu. Add block names to the list
-        // below and the switch statement in the _changeLabel
-        // function.
+        // Dynamic numeric pie menus are inherited from the connected parent
+        // block via piemenuValuesC1 metadata on its protoblock.
         const cblk = this.connections[0];
 
-        if (cblk === null) {
+        if (cblk === null || cblk === undefined) {
             return false;
         }
 
@@ -3724,13 +3710,11 @@ class Block {
      * @returns {boolean} - True if the block plugs into Connection 2 of a pie menu block, false otherwise.
      */
     _usePieNumberC2() {
-        // Return true if this number block plugs into Connection 2 of
-        // a block that uses a pie menu. Add block names to the list
-        // below and the switch statement in the _changeLabel
-        // function.
+        // Dynamic numeric pie menus are inherited from the connected parent
+        // block via piemenuValuesC2 metadata on its protoblock.
         const cblk = this.connections[0];
 
-        if (cblk === null) {
+        if (cblk === null || cblk === undefined) {
             return false;
         }
 
@@ -3749,13 +3733,11 @@ class Block {
      * @returns {boolean} - True if the block plugs into Connection 3 of a pie menu block, false otherwise.
      */
     _usePieNumberC3() {
-        // Return true if this number block plugs into Connection 3 of
-        // a block that uses a pie menu. Add block names to the list
-        // below and the switch statement in the _changeLabel
-        // function.
+        // Dynamic numeric pie menus are inherited from the connected parent
+        // block via piemenuValuesC3 metadata on its protoblock.
         const cblk = this.connections[0];
 
-        if (cblk === null) {
+        if (cblk === null || cblk === undefined) {
             return false;
         }
 
@@ -3815,6 +3797,7 @@ class Block {
      */
     _changeLabel() {
         const that = this;
+        this._capturedInitialValue = this.value;
         const x = this.container.x;
         const y = this.container.y;
 
@@ -4663,12 +4646,16 @@ class Block {
 
         this._labelLock = true;
 
+        const hasInitialValue = typeof this._capturedInitialValue !== "undefined";
+        const oldValue = hasInitialValue ? this._capturedInitialValue : this.value;
+
         if (closeInput) {
             this.label.style.display = "none";
             if (this.labelattr !== null) {
                 this.labelattr.style.display = "none";
             }
             docById("wheelDiv").style.display = "none";
+            delete this._capturedInitialValue;
         }
 
         // The pie menu may be visible too, so hide it.
@@ -4676,7 +4663,6 @@ class Block {
             docById("wheelDiv").style.display = "none";
         }
 
-        const oldValue = this.value;
         let newValue = this.label.value;
 
         if (this.labelattr !== null) {
@@ -4698,7 +4684,13 @@ class Block {
         if (oldValue === newValue) {
             // Nothing to do in this case.
             this._labelLock = false;
-            if (this.name !== "text" || c === null || this.blocks.blockList[c].name !== "storein") {
+
+            const isText = this.name === "text";
+            const parentBlock = c !== null ? this.blocks.blockList[c] : null;
+            const parentName = parentBlock ? parentBlock.name : "";
+            const requiresUpdate = isText && (parentName === "storein" || parentName === "action");
+
+            if (!requiresUpdate) {
                 return;
             }
         }
@@ -4709,20 +4701,25 @@ class Block {
             let uniqueValue;
             switch (cblock.name) {
                 case "action":
-                    this.blocks.palettes.removeActionPrototype(oldValue);
-
-                    // Ensure new name is unique.
-                    uniqueValue = this.blocks.findUniqueActionName(newValue);
-                    if (uniqueValue !== newValue) {
-                        newValue = uniqueValue;
-                        this.value = newValue;
-                        let label = this.value.toString();
-                        if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                            label = label.substr(0, STRINGLEN) + "...";
+                    {
+                        const isNameChanged = oldValue !== newValue;
+                        if (isNameChanged) {
+                            this.blocks.palettes.removeActionPrototype(oldValue);
                         }
-                        this.text.text = label;
-                        this.label.value = newValue;
-                        this.updateCache();
+
+                        // Ensure new name is unique.
+                        const validatedName = this.blocks.findUniqueActionName(newValue, c);
+                        if (validatedName !== newValue) {
+                            newValue = validatedName;
+                            this.value = newValue;
+                            let label = this.value.toString();
+                            if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
+                                label = label.substr(0, STRINGLEN) + "...";
+                            }
+                            this.text.text = label;
+                            this.label.value = newValue;
+                            this.updateCache();
+                        }
                     }
                     break;
                 case "pitch":
@@ -4873,42 +4870,55 @@ class Block {
             const cblock = this.blocks.blockList[c];
             switch (cblock.name) {
                 case "action":
-                    // If the label was the name of an action, update the
-                    // associated run this.blocks and the palette buttons
-                    // Rename both do <- name and nameddo blocks.
-                    this.blocks.renameDos(oldValue, newValue);
+                    {
+                        const isNameChanged = oldValue !== newValue;
+                        if (isNameChanged && closeInput) {
+                            this.blocks.renameDos(oldValue, newValue);
 
-                    // eslint-disable-next-line no-case-declarations
-                    const metadata = this.blocks.actionMetadata(c);
-                    if (oldValue === _("action") || oldValue === "action") {
-                        this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
-                        this.blocks.setActionProtoVisibility(false);
-                    }
+                            const metadata = this.blocks.actionMetadata(c);
+                            const isDefaultAction =
+                                oldValue === _("action") || oldValue === "action";
 
-                    this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
-                    // eslint-disable-next-line no-case-declarations
-                    const blockPalette = this.blocks.palettes.dict["action"];
-                    for (let blk = 0; blk < blockPalette.protoList.length; blk++) {
-                        const block = blockPalette.protoList[blk];
-                        if (oldValue === _("action") || oldValue === "action") {
-                            if (block.name === "nameddo" && block.defaults.length === 0) {
-                                block.hidden = true;
+                            this.blocks.newNameddoBlock(
+                                newValue,
+                                metadata.hasReturn,
+                                metadata.hasArgs
+                            );
+
+                            if (isDefaultAction) {
+                                this.blocks.setActionProtoVisibility(false);
                             }
-                        } else {
-                            if (block.name === "nameddo" && block.defaults[0] === oldValue) {
-                                blockPalette.remove(block, oldValue);
+
+                            const blockPalette = this.blocks.palettes.dict["action"];
+                            for (let blk = 0; blk < blockPalette.protoList.length; blk++) {
+                                const block = blockPalette.protoList[blk];
+                                if (isDefaultAction) {
+                                    if (block.name === "nameddo" && block.defaults.length === 0) {
+                                        block.hidden = true;
+                                    }
+                                } else {
+                                    if (
+                                        block.name === "nameddo" &&
+                                        block.defaults[0] === oldValue
+                                    ) {
+                                        blockPalette.remove(block, oldValue);
+                                    }
+                                }
                             }
+
+                            this.blocks.renameNameddos(oldValue, newValue);
+                            this.blocks.palettes.hide();
+                            this.blocks.palettes.updatePalettes("action");
+                            this.blocks.palettes.show();
+                            this.activity.refreshCanvas();
+                        }
+                        // Force-open the action palette so the newly created
+                        // action block is immediately visible to the user.
+                        if (closeInput) {
+                            this.blocks.palettes.updatePalettes("action");
+                            this.blocks.palettes.showPalette("action");
                         }
                     }
-
-                    if (oldValue === _("action") || oldValue === "action") {
-                        this.blocks.newNameddoBlock(newValue, metadata.hasReturn, metadata.hasArgs);
-                        this.blocks.setActionProtoVisibility(false);
-                    }
-                    this.blocks.renameNameddos(oldValue, newValue);
-                    this.blocks.palettes.hide();
-                    this.blocks.palettes.updatePalettes("action");
-                    this.blocks.palettes.show();
                     break;
                 case "storein":
                     // Check to see which connection we are using in

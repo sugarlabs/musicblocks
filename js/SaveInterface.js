@@ -232,10 +232,13 @@ class SaveInterface {
             }
             this.showToast(message);
         };
+
         if (defaultfilename === undefined || defaultfilename === null) {
             const planet = this.getPlanetInterface();
             defaultfilename =
-                planet && typeof planet.getCurrentProjectName === "function"
+                planet &&
+                typeof planet.getCurrentProjectName === "function" &&
+                planet.getCurrentProjectName().length > 0
                     ? planet.getCurrentProjectName()
                     : STR_MY_PROJECT;
 

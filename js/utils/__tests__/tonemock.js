@@ -144,10 +144,12 @@ class PolySynth {
 }
 
 class context {
+    static state = "running";
     static resume() {}
 }
 
 class Transport {
+    static _state = "started";
     static start() {}
     static stop() {}
     static schedule() {}
@@ -156,10 +158,19 @@ class Transport {
     static getSecondsAtTime() {
         return 0;
     }
+    static _seconds = 0;
     static get seconds() {
-        return 0;
+        return Transport._seconds;
     }
-    static set seconds(value) {}
+    static set seconds(value) {
+        Transport._seconds = value;
+    }
+    static get state() {
+        return Transport._state;
+    }
+    static set state(v) {
+        Transport._state = v;
+    }
 }
 
 class ToneAudioBuffer {

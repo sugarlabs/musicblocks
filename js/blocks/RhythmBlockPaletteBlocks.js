@@ -19,7 +19,13 @@
 
 /* exported setupRhythmBlockPaletteBlocks */
 
-const language = localStorage.languagePreference || navigator.language;
+let language;
+try {
+    language = localStorage.languagePreference;
+} catch (e) {
+    language = undefined;
+}
+language = language || navigator.language;
 let rhythmBlockPalette = language === "ja" ? "rhythm" : "widgets";
 if (_THIS_IS_TURTLE_BLOCKS_) {
     rhythmBlockPalette = "rhythm";

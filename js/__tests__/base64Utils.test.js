@@ -64,6 +64,13 @@ describe("base64Utils", () => {
         expect(decoded).toBe(longString);
     });
 
+    test("base64Encode should handle inputs exceeding 128KB without call stack overflow", () => {
+        const largeString = "x".repeat(150000);
+        const encoded = base64Utils.base64Encode(largeString);
+        const decoded = base64Utils.base64Decode(encoded);
+        expect(decoded).toBe(largeString);
+    });
+
     test("base64Encode and base64Decode should be reversible for Unicode", () => {
         const original = "Hello 世界 🎵 こんにちは नमस्ते";
         const encoded = base64Utils.base64Encode(original);

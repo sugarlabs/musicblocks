@@ -20,8 +20,9 @@
    getMunsellColor, COLORS40, frequencyToPitch, instruments,
    DOUBLESHARP, NATURAL, DOUBLEFLAT, EQUIVALENTACCIDENTALS,
    FIXEDSOLFEGE, NOTENAMES, numberToPitch,
-   nthDegreeToPitch, SOLFEGENAMES, buildScale, _THIS_IS_TURTLE_BLOCKS_,
-   CHORDNAMES, Synth, Tone, activity
+    nthDegreeToPitch, SOLFEGENAMES, buildScale, getCurrentEDO, generateNoteNames,
+    _THIS_IS_TURTLE_BLOCKS_,
+    CHORDNAMES, Synth, Tone, activity
 */
 
 /*
@@ -578,10 +579,13 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                       )
                     : true)))
     ) {
-        if (scale[6 - i][0] === FIXEDSOLFEGE[note] || scale[6 - i][0] === note) {
-            accidental = scale[6 - i].substr(1);
+        if (
+            scale[scale.length - 1 - i][0] === FIXEDSOLFEGE[note] ||
+            scale[scale.length - 1 - i][0] === note
+        ) {
+            accidental = scale[scale.length - 1 - i].substr(1);
         } else {
-            accidental = EQUIVALENTACCIDENTALS[scale[6 - i]].substr(1);
+            accidental = EQUIVALENTACCIDENTALS[scale[scale.length - 1 - i]].substr(1);
         }
         block.value = block.value
             .replace(SHARP, "")
@@ -1008,6 +1012,24 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         // Refresh the block's cache
         that.updateCache();
+
+        // If this block is a tracked row in an already-open Phrase Maker,
+        // refresh that row so the matrix reflects the new pitch immediately.
+        if (hasOctaveWheel && that.name !== "scaledegree2") {
+            const phraseMaker = that.activity.logo.phraseMaker;
+            if (phraseMaker && typeof phraseMaker.refreshRowForBlock === "function") {
+                const newOctave = Number(
+                    that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title
+                );
+                phraseMaker.refreshRowForBlock(
+                    that.connections[0],
+                    selectedNoteValue,
+                    selectedAccidental,
+                    newOctave
+                );
+            }
+        }
+
         // Hide the pie menu and remove the wheels
         hideWheelDiv();
         that._pitchWheel.removeWheel();
@@ -1305,9 +1327,11 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
 
     const __selectionChanged = () => {
         const label = that._customWheel.navItems[that._customWheel.selectedNavItemIndex].title;
-        const note = that._cusNoteWheel.navItems[that._cusNoteWheel.selectedNavItemIndex].title;
-        that.value = note;
-        that.text.text = note;
+        const rawNote = that._cusNoteWheel.navItems[that._cusNoteWheel.selectedNavItemIndex].title;
+        const centsMatch = (that.value || "").match(/\([+-]?\d+¢\)/);
+        const note = (rawNote || "").replace(/\([+-]?\d+¢\)/g, "");
+        that.value = centsMatch ? note + centsMatch[0] : note;
+        that.text.text = centsMatch ? note + centsMatch[0] : note;
         let octave = 4;
 
         if (hasOctaveWheel) {
@@ -3435,7 +3459,9 @@ const piemenuModes = (block, selectedMode) => {
     block._modeWheel.navAngle = -90;
     // block._modeWheel.selectedNavItemIndex = 2;
     block._modeWheel.animatetime = 0; // 300;
-    block._modeWheel.createWheel(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"]);
+    const currentEDO = getCurrentEDO(block.activity.logo.synth.inTemperament);
+    const modeWheelLabels = Array.from({ length: currentEDO }, (_, i) => String(i));
+    block._modeWheel.createWheel(modeWheelLabels);
 
     block._modeGroupWheel.colors = platformColor.modeGroupWheelcolors;
     block._modeGroupWheel.slicePathFunction = slicePath().DonutSlice;
@@ -3513,8 +3539,9 @@ const piemenuModes = (block, selectedMode) => {
 
     // Add function to each main menu for show/hide sub menus
     const __setupAction = (i, activeTabs) => {
+        const edoforHide = currentEDO;
         that._modeNameWheel.navItems[i].navigateFunction = () => {
-            for (let j = 0; j < 12; j++) {
+            for (let j = 0; j < edoforHide; j++) {
                 if (!activeTabs.includes(j)) {
                     that._modeWheel.navItems[j].navItem.hide();
                 } else {
@@ -3658,12 +3685,11 @@ const piemenuModes = (block, selectedMode) => {
     const __playNote = () => {
         let o = 0;
         if (octave) {
-            o = 12;
+            o = currentEDO;
         }
 
         const i = that._modeWheel.selectedNavItemIndex;
-        // The mode doesn't matter here, since we are using semi-tones
-        const obj = getNote(key, 4, i + o, key + " chromatic", false, null, null);
+        const obj = getNote(key, 4, i + o, key + " chromatic", false, null, null, null, true);
         obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
 
         const tur = that.activity.turtles.ithTurtle(0);
@@ -3681,12 +3707,12 @@ const piemenuModes = (block, selectedMode) => {
     const __playScale = (activeTabs, idx) => {
         // loop through selecting modeWheel slices with a delay.
         if (idx < activeTabs.length) {
-            if (activeTabs[idx] < 12) {
+            if (activeTabs[idx] < currentEDO) {
                 octave = false;
                 that._modeWheel.navigateWheel(activeTabs[idx]);
             } else {
                 octave = true;
-                that._modeWheel.navigateWheel(0);
+                that._modeWheel.navigateWheel(activeTabs[idx] - currentEDO);
             }
 
             timeout = setTimeout(() => {
@@ -3702,16 +3728,17 @@ const piemenuModes = (block, selectedMode) => {
      */
     const __prepScale = () => {
         const activeTabs = [0];
-        const mode = MUSICALMODES[that.value];
-        for (let k = 0; k < mode.length - 1; k++) {
-            activeTabs.push(last(activeTabs) + mode[k]);
+        const scaleInfo = buildScale(key + " " + that.value);
+        const modeIntervals = scaleInfo[1];
+        for (let k = 0; k < modeIntervals.length - 1; k++) {
+            activeTabs.push(last(activeTabs) + modeIntervals[k]);
         }
 
-        activeTabs.push(12);
-        activeTabs.push(12);
+        activeTabs.push(currentEDO);
+        activeTabs.push(currentEDO);
 
-        for (let k = mode.length - 1; k >= 0; k--) {
-            activeTabs.push(last(activeTabs) - mode[k]);
+        for (let k = modeIntervals.length - 1; k >= 0; k--) {
+            activeTabs.push(last(activeTabs) - modeIntervals[k]);
         }
 
         docById("wheelnav-_exitWheel-title-1").style.fill = platformColor.textColor || "#ffffff";
@@ -3767,7 +3794,7 @@ const piemenuModes = (block, selectedMode) => {
             )
         ) + "px";
 
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < currentEDO; i++) {
         that._modeWheel.navItems[i].navigateFunction = __playNote;
     }
 
@@ -4038,7 +4065,7 @@ const piemenuGrid = activity => {
             ""
         ];
 
-        gridLabels = ["Blank", "Cartesian", "Cartesian/Polar", "Polar", "Blank"];
+        gridLabels = ["none", "Cartesian", "Cartesian/Polar", "polar", "none"];
     } else {
         grids = [
             "imgsrc: images/grid/blank.svg",
@@ -4053,17 +4080,18 @@ const piemenuGrid = activity => {
             "imgsrc: images/grid/Bass.svg"
         ];
 
+        // Use the same strings as found in ExtrasBlocks.js for i18n purposes.
         gridLabels = [
-            "Blank",
+            "none",
             "Cartesian",
             "Cartesian/Polar",
-            "Polar",
-            "Treble",
-            "Grand",
-            "Mezzo Soprano",
-            "Alto",
-            "Tenor",
-            "Bass"
+            "polar",
+            "treble",
+            "grand staff",
+            "mezzo-soprano",
+            "alto",
+            "tenor",
+            "bass"
         ];
     }
 
@@ -4096,7 +4124,7 @@ const piemenuGrid = activity => {
             activity.turtles.currentGrid = i;
             activity.turtles.doGrid(i);
         };
-        activity.turtles.gridWheel.navItems[i].setTooltip(gridLabels[i]);
+        activity.turtles.gridWheel.navItems[i].setTooltip(_(gridLabels[i]));
     }
 
     activity.turtles._exitWheel.colors = platformColor.exitWheelcolors;

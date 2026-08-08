@@ -43,7 +43,9 @@ Object.assign(global, {
     NOTESTEP: musicUtils.NOTESTEP,
     MUSICALMODES: musicUtils.MUSICALMODES,
     SHARP: musicUtils.SHARP,
-    FLAT: musicUtils.FLAT
+    FLAT: musicUtils.FLAT,
+    getCurrentEDO: musicUtils.getCurrentEDO,
+    getModeLength: musicUtils.getModeLength
 });
 
 global.NANERRORMSG = require("../../logo").NANERRORMSG;
@@ -66,6 +68,7 @@ describe("Tests for Singer.PitchActions setup", () => {
     beforeEach(() => {
         // Add temperament globals only for this test
         global.isCustomTemperament = musicUtils.isCustomTemperament;
+        global.isTrueEDO = musicUtils.isTrueEDO;
         global.TEMPERAMENT = musicUtils.TEMPERAMENT;
 
         blkId = 1;
@@ -130,6 +133,7 @@ describe("Tests for Singer.PitchActions setup", () => {
     afterEach(() => {
         // Clean up globals to prevent test pollution
         delete global.isCustomTemperament;
+        delete global.isTrueEDO;
         delete global.TEMPERAMENT;
     });
 
@@ -694,6 +698,54 @@ describe("Tests for Singer.PitchActions setup", () => {
         test("invert registers listener only", () => {
             Singer.PitchActions.invert("C", 4, "even", 0);
             expect(tl).toHaveBeenCalledWith(0, "_invert_0", expect.any(Function));
+        });
+    });
+
+    describe("numToPitch temperament awareness", () => {
+        test("default temperament works (12-EDO)", () => {
+            const result = Singer.PitchActions.numToPitch(0, "pitch", 0);
+            expect(result).toEqual(expect.any(String));
+        });
+
+        test("uses synth.inTemperament for numberToPitch call", () => {
+            // activity.logo.synth.inTemperament is "equal" in the mock
+            // Ensure no crash and returns valid pitch
+            const pitch = Singer.PitchActions.numToPitch(39, "pitch", 0);
+            const octave = Singer.PitchActions.numToPitch(39, "octave", 0);
+            expect(typeof pitch).toBe("string");
+            expect(typeof octave).toBe("number");
+        });
+    });
+
+    describe("setPitchNumberOffset temperament awareness", () => {
+        test("passes inTemperament to pitchToNumber", () => {
+            const original = global.pitchToNumber;
+            global.pitchToNumber = jest.fn(() => 0);
+            Singer.PitchActions.setPitchNumberOffset("C", 4, 0);
+            const callArgs = global.pitchToNumber.mock.calls[0];
+            expect(callArgs.length).toBe(4);
+            expect(callArgs[3]).toBe("equal");
+            global.pitchToNumber = original;
+        });
+    });
+
+    describe("deltaPitch temperament awareness", () => {
+        test("uses inTemperament for getStepSizeUp/Down", () => {
+            turtle.singer.previousNotePlayed = ["C4", 4];
+            turtle.singer.lastNotePlayed = ["E4", 4];
+            const originalUp = global.getStepSizeUp;
+            const originalDown = global.getStepSizeDown;
+            global.getStepSizeUp = jest.fn(() => 2);
+            global.getStepSizeDown = jest.fn(() => -2);
+            Singer.PitchActions.deltaPitch("deltascalarpitch", 0);
+            const allCalls = [
+                ...global.getStepSizeUp.mock.calls,
+                ...global.getStepSizeDown.mock.calls
+            ];
+            const hasTemperament = allCalls.some(args => args[3] === "equal");
+            expect(hasTemperament).toBe(true);
+            global.getStepSizeUp = originalUp;
+            global.getStepSizeDown = originalDown;
         });
     });
 });

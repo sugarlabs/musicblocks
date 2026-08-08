@@ -59,6 +59,7 @@ class DummyValueBlock {
         this.displayName = displayName || name;
         createdBlocks[name] = this;
         this.extraWidth = 0;
+        this.capabilities = Object.create(null);
     }
     setPalette(palette, activity) {
         return this;
@@ -79,6 +80,15 @@ class DummyValueBlock {
     }
     setup(activity) {
         return this;
+    }
+    setCapability(name, value = true) {
+        this.capabilities[name] = !!value;
+        return this;
+    }
+    getCapability(name) {
+        return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+            ? this.capabilities[name]
+            : undefined;
     }
     arg(logo, turtle, blk) {
         return global.activity.blocks.blockList[blk].value;
@@ -280,6 +290,19 @@ describe("setupNumberBlocks", () => {
             const modBlock = createdBlocks["mod"];
             const result = modBlock.arg(logo, 0, 110, null);
             expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(result).toEqual(0);
+            global.MathUtility.doMod = (a, b) => Number(a) % Number(b);
+        });
+
+        it("should call errorMsg with ZERODIVIDEERRORMSG when MathUtility.doMod throws DivByZeroError", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2"] };
+            logo.parseArg = jest.fn(() => 5);
+            global.MathUtility.doMod = () => {
+                throw new Error("DivByZeroError");
+            };
+            const modBlock = createdBlocks["mod"];
+            const result = modBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.ZERODIVIDEERRORMSG, 110);
             expect(result).toEqual(0);
             global.MathUtility.doMod = (a, b) => Number(a) % Number(b);
         });
@@ -954,6 +977,10 @@ describe("setupNumberBlocks", () => {
     });
 
     describe("NumberBlock", () => {
+        it("declares the valueDrivenLabel capability", () => {
+            expect(createdBlocks["number"].getCapability("valueDrivenLabel")).toBe(true);
+        });
+
         it("should return the block's numeric value", () => {
             activity.blocks.blockList[230] = { value: "123.45" };
             const numberBlock = createdBlocks["number"];

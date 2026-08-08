@@ -23,7 +23,6 @@ global._ = jest.fn(str => str);
 global.window = {
     btoa: jest.fn(str => Buffer.from(str, "utf8").toString("base64"))
 };
-global.INVALIDPITCH = "Not a valid pitch name";
 
 const {
     scaleDegreeToPitchMapping,
@@ -55,6 +54,7 @@ const {
     noteToFrequency,
     setOctaveRatio,
     getOctaveRatio,
+    ratioToWheelAngle,
     TEMPERAMENT,
     getTemperamentsList,
     getTemperament,
@@ -120,7 +120,11 @@ const {
     PITCHES1,
     PITCHES3,
     normalizeNoteAccidentals,
-    getCurrentEDO
+    getCurrentEDO,
+    scalePatternToEDO,
+    PITCH_COLLECTIONS_EDO_OVERRIDES,
+    getModePattern,
+    generateNoteNames
 } = require("../musicutils");
 
 const DOUBLESHARP = "\ud834\udd2a";
@@ -219,6 +223,7 @@ describe("Temperament Functions", () => {
         [_("Equal (12EDO)"), "equal", "equal"],
         [_("Equal (5EDO)"), "equal5", "equal5"],
         [_("Equal (7EDO)"), "equal7", "equal7"],
+        [_("Equal (17EDO)"), "equal17", "equal17"],
         [_("Equal (19EDO)"), "equal19", "equal19"],
         [_("Equal (31EDO)"), "equal31", "equal31"],
         [_("5-limit Just Intonation"), "just intonation", "just intonation"],
@@ -231,6 +236,7 @@ describe("Temperament Functions", () => {
         [_("Equal (12EDO)"), "equal", "equal"],
         [_("Equal (5EDO)"), "equal5", "equal5"],
         [_("Equal (7EDO)"), "equal7", "equal7"],
+        [_("Equal (17EDO)"), "equal17", "equal17"],
         [_("Equal (19EDO)"), "equal19", "equal19"],
         [_("Equal (31EDO)"), "equal31", "equal31"],
         [_("5-limit Just Intonation"), "just intonation", "just intonation"],
@@ -243,6 +249,7 @@ describe("Temperament Functions", () => {
         "equal": true,
         "equal5": true,
         "equal7": true,
+        "equal17": true,
         "equal19": true,
         "equal31": true,
         "just intonation": true,
@@ -256,6 +263,7 @@ describe("Temperament Functions", () => {
             [_("Equal (12EDO)"), "equal", "equal"],
             [_("Equal (5EDO)"), "equal5", "equal5"],
             [_("Equal (7EDO)"), "equal7", "equal7"],
+            [_("Equal (17EDO)"), "equal17", "equal17"],
             [_("Equal (19EDO)"), "equal19", "equal19"],
             [_("Equal (31EDO)"), "equal31", "equal31"],
             [_("5-limit Just Intonation"), "just intonation", "just intonation"],
@@ -290,7 +298,7 @@ describe("Temperament Functions", () => {
     describe("getTemperamentKeys", () => {
         it("should return an array with the correct length", () => {
             const keys = getTemperamentKeys();
-            expect(keys.length).toBe(10);
+            expect(keys.length).toBe(11);
         });
 
         it("should return an array containing all keys", () => {
@@ -300,6 +308,7 @@ describe("Temperament Functions", () => {
                     "equal",
                     "equal5",
                     "equal7",
+                    "equal17",
                     "equal19",
                     "equal31",
                     "just intonation",
@@ -689,6 +698,18 @@ describe("getNoiseIcon", () => {
     });
     it("should be case sensitive for noise names", () => {
         expect(getNoiseIcon("WHITE NOISE")).toBe("images/synth.svg");
+    });
+});
+
+describe("ratioToWheelAngle", () => {
+    it("returns 270 degrees for unison (ratio === base^0)", () => {
+        expect(ratioToWheelAngle(1, 2)).toBe(270);
+    });
+    it("returns 630 degrees (270 + 360) for one full octave (ratio === base)", () => {
+        expect(ratioToWheelAngle(2, 2)).toBeCloseTo(630, 6);
+    });
+    it("returns 450 degrees (270 + 180) for a half octave (ratio === sqrt(base))", () => {
+        expect(ratioToWheelAngle(Math.sqrt(2), 2)).toBeCloseTo(450, 6);
     });
 });
 
@@ -1252,8 +1273,8 @@ describe("pitchToNumber", () => {
     it("should work with equal19 temperament", () => {
         global.TEMPERAMENT = { equal19: [] };
         const result = pitchToNumber("C", 4, "C major", "equal19");
-        // 4 * 19 + 0 (C index) - 9 (A index) = 67
-        expect(result).toBe(67);
+        // 4 * 19 + 0 (C index) - 14 (A index in 19-EDO table) = 62
+        expect(result).toBe(62);
     });
 
     it("should fallback to 12-EDO for undefined temperament", () => {
@@ -1573,6 +1594,76 @@ describe("getNote", () => {
         const result = getNote("invalidNote", 4, 0, "C major");
         expect(result).toBeDefined();
     });
+
+    it("should return cents for fractional positive transposition", () => {
+        // 2.5 semitones = 2 semitones + 50 cents
+        const result = getNote("C", 4, 2.5, "C major");
+        expect(result[0]).toBe("D");
+        expect(result[1]).toBe(4);
+        expect(result[2]).toBe(50);
+    });
+
+    it("should return cents for fractional negative transposition", () => {
+        // -1.3 semitones = -1 semitone - 30 cents
+        const result = getNote("C", 4, -1.3, "C major");
+        expect(result[0]).toBe("B");
+        expect(result[2]).toBeCloseTo(-30, 0);
+    });
+
+    it("should return 0 cents for integer transposition", () => {
+        const result = getNote("C", 4, 3, "C major");
+        expect(result[2]).toBe(0);
+    });
+
+    it("should return 0 cents for zero transposition", () => {
+        const result = getNote("C", 4, 0, "C major");
+        expect(result[2]).toBe(0);
+    });
+
+    it("should handle small fractional transposition as cents", () => {
+        // 0.07 semitones = 7 cents
+        const result = getNote("C", 4, 0.07, "C major");
+        expect(result[2]).toBeCloseTo(7, 0);
+    });
+});
+
+describe("getPitchInfo with frequency input", () => {
+    it("should handle numeric frequency input via 1-arg form as pitch number", () => {
+        // 1-arg form treats number as pitch number, not frequency
+        const result = getPitchInfo(60);
+        expect(result.name).toBe("C");
+        expect(result.octave).toBe(4);
+    });
+});
+
+describe("frequencyToPitch cents precision", () => {
+    it("should return correct cents for A4+50 cents", () => {
+        // A4 + 50 cents = 440 * 2^(50/1200)
+        // This is halfway between A and B♭, function rounds to nearest
+        const freq = 440 * Math.pow(2, 50 / 1200);
+        const result = frequencyToPitch(freq);
+        // 50 cents above A4 is exactly between A and B♭
+        expect(result[1]).toBe(4);
+        expect(Math.abs(result[2])).toBeLessThanOrEqual(50);
+    });
+
+    it("should return correct cents for A4-30 cents", () => {
+        // A4 - 30 cents = 440 * 2^(-30/1200)
+        const freq = 440 * Math.pow(2, -30 / 1200);
+        const result = frequencyToPitch(freq);
+        expect(result[0]).toBe("A");
+        expect(result[1]).toBe(4);
+        expect(result[2]).toBeCloseTo(-30, 0);
+    });
+
+    it("should return correct cents for C4+25 cents", () => {
+        // C4 + 25 cents = 261.63 * 2^(25/1200)
+        const freq = 261.63 * Math.pow(2, 25 / 1200);
+        const result = frequencyToPitch(freq);
+        expect(result[0]).toBe("C");
+        expect(result[1]).toBe(4);
+        expect(result[2]).toBeCloseTo(25, 0);
+    });
 });
 
 describe("buildScale", () => {
@@ -1655,6 +1746,75 @@ describe("buildScale", () => {
             ["C", "D", "E", "F", "G", "A", "B", "C"],
             [2, 2, 1, 2, 2, 2, 1]
         ]); // Default C major scale
+    });
+});
+
+describe("scalePatternToEDO", () => {
+    const major = [2, 2, 1, 2, 2, 2, 1];
+
+    it("returns the identity for 12-EDO", () => {
+        expect(scalePatternToEDO(major, 12)).toEqual(major);
+    });
+
+    it("converts the major pattern to 19-EDO steps", () => {
+        expect(scalePatternToEDO(major, 19)).toEqual([3, 3, 2, 3, 3, 3, 2]);
+    });
+
+    it("converts the major pattern to 31-EDO steps", () => {
+        expect(scalePatternToEDO(major, 31)).toEqual([5, 5, 3, 5, 5, 5, 3]);
+    });
+
+    it("clamps steps to a minimum of 1 for small EDOs", () => {
+        expect(scalePatternToEDO(major, 5)).toEqual([1, 1, 1, 1, 1, 1, 1]);
+    });
+});
+
+describe("getModePattern", () => {
+    it("returns PITCH_COLLECTIONS_EDO_OVERRIDES when present", () => {
+        PITCH_COLLECTIONS_EDO_OVERRIDES[19] = { major: [3, 2, 3, 3, 3, 2, 3] };
+        try {
+            expect(getModePattern("major", 19)).toEqual([3, 2, 3, 3, 3, 2, 3]);
+        } finally {
+            delete PITCH_COLLECTIONS_EDO_OVERRIDES[19];
+        }
+    });
+
+    it("falls back to scalePatternToEDO conversion when no override exists", () => {
+        expect(getModePattern("minor", 19)).toEqual([3, 2, 3, 3, 2, 3, 3]);
+    });
+
+    it("keeps the 12-EDO pattern identical", () => {
+        expect(getModePattern("major", 12)).toEqual([2, 2, 1, 2, 2, 2, 1]);
+    });
+});
+
+describe("buildScale with explicit EDO", () => {
+    it.each([
+        [19, [3, 3, 2, 3, 3, 3, 2]],
+        [31, [5, 5, 3, 5, 5, 5, 3]]
+    ])("builds the C major scale in %i-EDO", (edo, expectedSteps) => {
+        const [scale, steps] = buildScale("C major", edo);
+        const names = generateNoteNames(edo);
+        expect(steps).toEqual(expectedSteps);
+        expect(steps.reduce((a, b) => a + b, 0)).toBe(edo);
+        expect(scale[0]).toBe("C");
+        expect(scale[scale.length - 1]).toBe("C");
+        expect(scale.slice(0, -1).every(name => names.includes(name))).toBe(true);
+        expect(scale.length).toBe(steps.length + 1);
+    });
+
+    it("clamps steps for 5-EDO so the scale never gets stuck", () => {
+        const [scale, steps] = buildScale("C major", 5);
+        expect(steps).toEqual([1, 1, 1, 1, 1, 1, 1]);
+        expect(scale[0]).toBe("C");
+        expect(scale.length).toBe(8);
+    });
+
+    it("keeps the 12-EDO result identical when edo is 12", () => {
+        expect(buildScale("C major", 12)).toEqual([
+            ["C", "D", "E", "F", "G", "A", "B", "C"],
+            [2, 2, 1, 2, 2, 2, 1]
+        ]);
     });
 });
 
@@ -2028,9 +2188,9 @@ describe("pitchToFrequency", () => {
     it("should work with equal19 temperament", () => {
         global.TEMPERAMENT = { equal19: [] };
         const result = pitchToFrequency("C", 4, 0, "C", "equal19");
-        // C4 in 19-EDO: A0 * Math.pow(2, 67/19) ≈ 316.85
-        expect(result).toBeGreaterThan(310);
-        expect(result).toBeLessThan(320);
+        // C4 in 19-EDO: A0 * Math.pow(2, 62/19) ≈ 264.02
+        expect(result).toBeGreaterThan(260);
+        expect(result).toBeLessThan(268);
     });
 
     it("should fallback to 12-EDO for undefined temperament", () => {
@@ -2480,7 +2640,19 @@ describe("convertFromSolfege", () => {
         "ti𝄪": "C" + SHARP,
         "R": _("rest")
     };
-    global.EQUIVALENTNATURALS = { "E♯": "F", "B♯": "C", "C♭": "B", "F♭": "E" };
+    global.EQUIVALENTNATURALS = {
+        "E♯": "F",
+        "B♯": "C",
+        "C♭": "B",
+        "F♭": "E",
+        "D𝄪": "E",
+        "A𝄪": "B",
+        "G𝄪": "A",
+        "E𝄪": "F♯",
+        "C𝄪": "D",
+        "F𝄪": "G",
+        "B𝄪": "C♯"
+    };
     const testCases = [
         { input: "do𝄫", expected: "B" + FLAT },
         { input: "do♭", expected: "B" },
@@ -2501,6 +2673,36 @@ describe("convertFromSolfege", () => {
     it("should return the input if no conversion is available", () => {
         const nonSolfegeNote = "X";
         expect(convertFromSolfege(nonSolfegeNote)).toBe(nonSolfegeNote);
+    });
+});
+
+describe("EQUIVALENTNATURALS extended mappings", () => {
+    it("should map D𝄪 to E", () => {
+        expect(global.EQUIVALENTNATURALS["D𝄪"]).toBe("E");
+    });
+
+    it("should map A𝄪 to B", () => {
+        expect(global.EQUIVALENTNATURALS["A𝄪"]).toBe("B");
+    });
+
+    it("should map G𝄪 to A", () => {
+        expect(global.EQUIVALENTNATURALS["G𝄪"]).toBe("A");
+    });
+
+    it("should map E♯ to F (original)", () => {
+        expect(global.EQUIVALENTNATURALS["E♯"]).toBe("F");
+    });
+
+    it("should map B♯ to C (original)", () => {
+        expect(global.EQUIVALENTNATURALS["B♯"]).toBe("C");
+    });
+
+    it("should map C♭ to B (original)", () => {
+        expect(global.EQUIVALENTNATURALS["C♭"]).toBe("B");
+    });
+
+    it("should map F♭ to E (original)", () => {
+        expect(global.EQUIVALENTNATURALS["F♭"]).toBe("E");
     });
 });
 
@@ -2646,7 +2848,7 @@ describe("getPitchInfo", () => {
         expect(getPitchInfo("InvalidNote")).toEqual({
             name: null,
             octave: null,
-            pitchNumber: "Not a valid pitch name"
+            pitchNumber: global.INVALIDPITCH
         });
     });
 
@@ -2869,8 +3071,8 @@ describe("_calculate_pitch_number", () => {
     });
 
     it("should return INVALIDPITCH for invalid input", () => {
-        expect(_calculate_pitch_number("Invalid", 4)).toBe("Not a valid pitch name");
-        expect(_calculate_pitch_number(null, 4)).toBe("Not a valid pitch name");
+        expect(_calculate_pitch_number("Invalid", 4)).toBe(global.INVALIDPITCH);
+        expect(_calculate_pitch_number(null, 4)).toBe(global.INVALIDPITCH);
     });
 });
 
@@ -3010,6 +3212,62 @@ describe("getNote additional paths", () => {
                 expect(note[2]).toBe(0);
             }
         );
+    });
+
+    it("resolves solfege notes in non-12 EDO temperaments", () => {
+        expect(getNote("do", 4, 0, "C major", false, undefined, undefined, "equal19")).toEqual([
+            "C",
+            4,
+            0
+        ]);
+        expect(getNote("re", 4, 0, "C major", false, undefined, undefined, "equal19")).toEqual([
+            "D",
+            4,
+            0
+        ]);
+        expect(getNote("mi", 4, 0, "C major", false, undefined, undefined, "equal19")).toEqual([
+            "E",
+            4,
+            0
+        ]);
+        expect(getNote("sol", 4, 0, "C major", false, undefined, undefined, "equal19")).toEqual([
+            "G",
+            4,
+            0
+        ]);
+    });
+
+    it("resolves solfege with accidentals in non-12 EDO temperaments", () => {
+        expect(
+            getNote("do" + SHARP, 4, 0, "C major", false, undefined, undefined, "equal19")
+        ).toEqual(["C" + SHARP, 4, 0]);
+        expect(
+            getNote("re" + FLAT, 4, 0, "C major", false, undefined, undefined, "equal19")
+        ).toEqual(["D" + FLAT, 4, 0]);
+    });
+
+    it("resolves movable solfege in non-12 EDO temperaments", () => {
+        expect(getNote("do", 4, 0, "D major", true, undefined, undefined, "equal19")).toEqual([
+            "D",
+            4,
+            0
+        ]);
+        expect(getNote("re", 4, 0, "D major", true, undefined, undefined, "equal19")).toEqual([
+            "E",
+            4,
+            0
+        ]);
+    });
+
+    it("reports invalid solfege in non-12 EDO temperaments through the error callback", () => {
+        const errorMsg = jest.fn();
+
+        expect(getNote("zz", 4, 0, "C major", false, undefined, errorMsg, "equal19")).toEqual([
+            "R",
+            "",
+            0
+        ]);
+        expect(errorMsg).toHaveBeenCalledWith(global.INVALIDPITCH, null);
     });
 
     it("uses key preference and direction to choose enharmonic spelling", () => {
@@ -3220,5 +3478,254 @@ describe("actual drum lookup helpers", () => {
         expect(actualMusicUtils.getDrumSymbol("")).toBe("hh");
         expect(actualMusicUtils.getDrumSymbol("snare drum")).toBe("sn");
         expect(actualMusicUtils.getDrumSymbol("missing")).toBe("hh");
+    });
+});
+
+describe("_getStepSize freeze guard (non-12 EDO temperaments)", () => {
+    const cases = [
+        ["C major", "G#", "up", "equal17"],
+        ["C major", "G#", "down", "equal17"],
+        ["C major", "G#", "up", "equal19"],
+        ["C major", "G#", "down", "equal19"],
+        ["C major", "C", "up", "equal31"],
+        ["C major", "F#", "up", "equal31"],
+        ["F# major", "C", "up", "equal19"],
+        ["F# major", "E#", "down", "equal19"],
+        ["Bb major", "C", "down", "equal17"],
+        ["Bb major", "G", "up", "equal31"]
+    ];
+    for (const [key, pitch, direction, temperament] of cases) {
+        it(`returns number for ${temperament} ${key} ${pitch} ${direction}`, () => {
+            const result = _getStepSize(key, pitch, direction, 0, temperament);
+            expect(typeof result).toBe("number");
+        });
+    }
+});
+
+describe("pitchToNumber A reference for non-12 EDO", () => {
+    it("A4 maps to 440 Hz for all EDOs", () => {
+        const edos = [
+            ["equal5", 5],
+            ["equal7", 7],
+            ["equal", 12],
+            ["equal17", 17],
+            ["equal19", 19],
+            ["equal31", 31]
+        ];
+        for (const [temp, edo] of edos) {
+            const freq = pitchToFrequency("A", 4, 0, "C major", temp);
+            expect(freq).toBeCloseTo(440, 0);
+        }
+    });
+
+    it("C4 is approximately 261-270 Hz for all EDOs", () => {
+        const edos = [
+            ["equal5", 5],
+            ["equal7", 7],
+            ["equal", 12],
+            ["equal17", 17],
+            ["equal19", 19],
+            ["equal31", 31]
+        ];
+        for (const [temp, edo] of edos) {
+            const freq = pitchToFrequency("C", 4, 0, "C major", temp);
+            expect(freq).toBeGreaterThan(240);
+            expect(freq).toBeLessThan(280);
+        }
+    });
+});
+
+describe("getNoteFromInterval with temperament parameter", () => {
+    it("accepts temperament parameter and produces valid output for equal temperament", () => {
+        // This tests that the third parameter is threaded through to underlying functions
+        const result = getNoteFromInterval("C4", "major 2", "equal");
+        expect(result).toBeDefined();
+        expect(Array.isArray(result)).toBe(true);
+        expect(result.length).toBeGreaterThanOrEqual(2);
+    });
+});
+
+describe("numberToPitch uses noteLabels for non-EDO ratio temperaments", () => {
+    it("uses 1/3 comma meantone noteLabels for pitch 0 (C)", () => {
+        const result = numberToPitch(0, "1/3 comma meantone", "C4", 0);
+        expect(result[0]).toBe("C");
+        expect(result[1]).toBe(4);
+    });
+
+    it("uses 1/3 comma meantone noteLabels for pitch 3 (D)", () => {
+        const result = numberToPitch(3, "1/3 comma meantone", "C4", 0);
+        expect(result[0]).toBe("D");
+        expect(result[1]).toBe(4);
+    });
+
+    it("uses 1/3 comma meantone noteLabels for pitch 6 (E)", () => {
+        const result = numberToPitch(6, "1/3 comma meantone", "C4", 0);
+        expect(result[0]).toBe("E");
+        expect(result[1]).toBe(4);
+    });
+
+    it("uses 1/3 comma meantone noteLabels for pitch 18 (B♯)", () => {
+        const result = numberToPitch(18, "1/3 comma meantone", "C4", 0);
+        expect(result[0]).toBe("B" + SHARP);
+        expect(result[1]).toBe(4);
+    });
+
+    it("uses 1/3 comma meantone noteLabels for pitch 19 (C, next octave)", () => {
+        const result = numberToPitch(19, "1/3 comma meantone", "C4", 0);
+        expect(result[0]).toBe("C");
+        expect(result[1]).toBe(5);
+    });
+});
+
+describe("pitchToFrequency uses 1/3 comma meantone ratios", () => {
+    it("produces A4 ≈ 440 Hz", () => {
+        const freq = pitchToFrequency("A", 4, 0, "C major", "1/3 comma meantone");
+        expect(freq).toBeCloseTo(440, 0);
+    });
+
+    it("produces exact octave ratio (C5 = 2 × C4)", () => {
+        const c4 = pitchToFrequency("C", 4, 0, "C major", "1/3 comma meantone");
+        const c5 = pitchToFrequency("C", 5, 0, "C major", "1/3 comma meantone");
+        expect(c5 / c4).toBeCloseTo(2.0, 4);
+    });
+});
+
+describe("EDO octave boundary resolution", () => {
+    it("resolves 19-EDO scale degrees 0–21 across the C4–C5 octave boundary", () => {
+        const temper = "equal19";
+        const c4pn = pitchToNumber("C", 4, "C major", temper);
+
+        // Degree 0  → C4
+        expect(numberToPitch(c4pn, temper)).toEqual(["C", 4]);
+        expect(pitchToFrequency("C", 4, 0, "C major", temper)).toBeCloseTo(264.02, 1);
+
+        // Degree 18 → B♯4 (last degree before octave completion)
+        expect(numberToPitch(c4pn + 18, temper)).toEqual(["B" + SHARP, 4]);
+
+        // Degree 19 → C5 (octave completion, N = EDO)
+        expect(numberToPitch(c4pn + 19, temper)).toEqual(["C", 5]);
+        expect(pitchToFrequency("C", 5, 0, "C major", temper)).toBeCloseTo(528.05, 1);
+
+        // Verify exact octave ratio
+        const c4freq = pitchToFrequency("C", 4, 0, "C major", temper);
+        const c5freq = pitchToFrequency("C", 5, 0, "C major", temper);
+        expect(c5freq / c4freq).toBeCloseTo(2.0, 4);
+
+        // Degree 21 → D♭5 (first step into next octave)
+        expect(numberToPitch(c4pn + 21, temper)).toEqual(["D" + FLAT, 5]);
+        expect(pitchToFrequency("D" + FLAT, 5, 0, "C major", temper)).toBeCloseTo(568.01, 1);
+    });
+
+    it.each([
+        ["equal", 12],
+        ["equal17", 17],
+        ["equal19", 19],
+        ["equal31", 31]
+    ])("resolves degree N = %s-EDO to C5 with exact octave ratio", (temper, edo) => {
+        const c4pn = pitchToNumber("C", 4, "C major", temper);
+
+        // Degree 0 → C4
+        expect(numberToPitch(c4pn, temper)).toEqual(["C", 4]);
+
+        // Degree N → C5 (octave completion)
+        expect(numberToPitch(c4pn + edo, temper)).toEqual(["C", 5]);
+
+        // Exact octave ratio: C5 = 2 × C4
+        const c4freq = pitchToFrequency("C", 4, 0, "C major", temper);
+        const c5freq = pitchToFrequency("C", 5, 0, "C major", temper);
+        expect(c5freq / c4freq).toBeCloseTo(2.0, 4);
+    });
+});
+
+describe("calcOctave with temperament", () => {
+    it("defaults to 12-EDO threshold=3 when no temperament given", () => {
+        // In 12-EDO, halfSteps threshold = round(12/4) = 3
+        // G in octave 4 is 7 semitones from C → 7 > 3 → octave changes
+        expect(calcOctave(4, "current", ["C4"], "G")).toBe(3);
+    });
+
+    it("uses EDO-aware threshold for 19-EDO (threshold=5)", () => {
+        // In 19-EDO, threshold = round(19/4) = 5
+        // G in 19-EDO is ~11 semitones from C in 12-EDO mapping → well above 5
+        // but the comparison is in EDO step units, so behavior depends on getNumber values
+        const result = calcOctave(4, "current", ["C4"], "G", "equal19");
+        expect(typeof result).toBe("number");
+    });
+
+    it("uses EDO-aware threshold for 5-EDO (threshold=1)", () => {
+        // In 5-EDO, threshold = round(5/4) = 1
+        const result = calcOctave(4, "current", ["C4"], "G", "equal5");
+        expect(typeof result).toBe("number");
+    });
+
+    it("preserves backward compatibility with numeric arg regardless of temperament", () => {
+        expect(calcOctave(4, 5, null, "C", "equal19")).toBe(5);
+        expect(calcOctave(4, 5, null, "C", "equal31")).toBe(5);
+    });
+});
+
+describe("_getStepSize custom temperament with ratios", () => {
+    beforeEach(() => {
+        addTemperamentToDictionary("testWithRatios", {
+            pitchNumber: 12,
+            noteLabels: ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
+            ratios: [
+                1,
+                16 / 15,
+                9 / 8,
+                6 / 5,
+                5 / 4,
+                4 / 3,
+                45 / 32,
+                3 / 2,
+                8 / 5,
+                5 / 3,
+                9 / 5,
+                15 / 8
+            ]
+        });
+    });
+
+    it("does NOT shortcut with return transposition for custom with ratios", () => {
+        // The old behavior would return transposition=5 regardless of key/pitch
+        // new behavior: falls through to actual step calculation
+        const result = _getStepSize("C major", "C", "up", 5, "testWithRatios");
+        // Should return the actual step (C→D in major = 2 semitones on paper)
+        // For this custom temperament with ratios, it should not return 5
+        expect(result).not.toBe(5);
+    });
+
+    it("still shortcuts for custom temperament without ratios", () => {
+        addTemperamentToDictionary("testNoRatios", {
+            pitchNumber: 12
+        });
+        expect(_getStepSize("C major", "C", "up", 5, "testNoRatios")).toBe(5);
+        expect(_getStepSize("C major", "C", "down", 3, "testNoRatios")).toBe(3);
+    });
+});
+
+describe("getStepSizeDown with custom temperament", () => {
+    beforeEach(() => {
+        addTemperamentToDictionary("testWithRatios19", {
+            pitchNumber: 19,
+            noteLabels: generateNoteNames(19),
+            ratios: Array.from({ length: 19 }, (_, i) => Math.pow(2, i / 19))
+        });
+    });
+
+    it("computes the real EDO-native step for a custom temperament with ratios (no shortcut)", () => {
+        const result = getStepSizeDown("C major", "D", 5, "testWithRatios19");
+        // The 19-EDO major scale has C -> D = 3 steps; the transposition
+        // shortcut (5) must NOT be returned, and neither may the 12-EDO step (2).
+        expect(result).not.toBe(-5);
+        expect(result).toBe(-3);
+    });
+
+    it("steps natively across multiple scale degrees in the custom temperament", () => {
+        // C# is NOT in the C major scale: the EDO-native fallback walk must
+        // step down one 19-EDO position (C# -> C) and report -1, not the
+        // proportional 12-EDO result (-2) produced by the PITCHES2 walk.
+        const result = getStepSizeDown("C major", "C#", 5, "testWithRatios19");
+        expect(result).toBe(-1);
     });
 });

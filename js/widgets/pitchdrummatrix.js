@@ -43,6 +43,9 @@
  * @exports PitchDrumMatrix
  */
 class PitchDrumMatrix {
+    /** AMD module dependencies for lazy loading. */
+    static dependencies = ["widgets/pitchdrummatrix"];
+
     /**
      * Width of the button division.
      *

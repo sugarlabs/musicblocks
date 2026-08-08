@@ -302,3 +302,7 @@ class GlobalCard {
         this.ProjectData = this.Planet.GlobalPlanet.cache[id];
     }
 }
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { GlobalCard };
+}

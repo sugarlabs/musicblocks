@@ -30,6 +30,9 @@
 /* exported Arpeggio */
 
 class Arpeggio {
+    /** AMD module dependencies for lazy loading. */
+    static dependencies = ["widgets/arpeggio"];
+
     static BUTTONDIVWIDTH = 295;
     static CELLSIZE = 28;
     static BUTTONSIZE = 53;
@@ -45,6 +48,7 @@ class Arpeggio {
         // These arrays get created each time the matrix is built.
         this._blockMap = []; // pairs storage
         this.defaultCols = Arpeggio.DEFAULTCOLS;
+        this._playTimeout = null;
     }
 
     /**
@@ -119,6 +123,13 @@ class Arpeggio {
 
         // For the button callbacks
         widgetWindow.onclose = () => {
+            if (this._playTimeout) {
+                clearTimeout(this._playTimeout);
+                this._playTimeout = null;
+            }
+            this._playing = false;
+            this._activity.logo.synth.stop();
+
             arpeggioTableDiv.style.visibility = "hidden";
             this._activity.hideMsgs();
             widgetWindow.destroy();
@@ -522,6 +533,11 @@ class Arpeggio {
                 })(),
                 document.createTextNode("\u00a0\u00a0")
             );
+            if (this._playTimeout) {
+                clearTimeout(this._playTimeout);
+                this._playTimeout = null;
+            }
+            this._activity.logo.synth.stop();
             this._playing = false;
             return;
         }
@@ -593,6 +609,9 @@ class Arpeggio {
      * @returns {void}
      */
     __playNote(i) {
+        if (!this._playing) {
+            return;
+        }
         if (i < this._playList.length) {
             if (this._playList[i][0].length > 0) {
                 this._activity.logo.synth.trigger(
@@ -605,7 +624,7 @@ class Arpeggio {
                     null
                 );
             }
-            setTimeout(() => {
+            this._playTimeout = setTimeout(() => {
                 this.__playNote(i + 1);
             }, 2600 * this._playList[i][1]);
         } else {
@@ -734,6 +753,30 @@ class Arpeggio {
      * @returns {void}
      */
     _clear() {
+        if (this._playing) {
+            this._playing = false;
+            if (this._playTimeout) {
+                clearTimeout(this._playTimeout);
+                this._playTimeout = null;
+            }
+            this._activity.logo.synth.stop();
+            const icon = this.playButton;
+            icon.replaceChildren(
+                document.createTextNode("\u00a0\u00a0"),
+                (() => {
+                    const img = document.createElement("img");
+                    img.src = "header-icons/play-button.svg";
+                    img.title = _("Play");
+                    img.alt = _("Play");
+                    img.height = Arpeggio.ICONSIZE;
+                    img.width = Arpeggio.ICONSIZE;
+                    img.style.verticalAlign = "middle";
+                    img.style.alignContent = "center";
+                    return img;
+                })(),
+                document.createTextNode("\u00a0\u00a0")
+            );
+        }
         // "Unclick" every entry in the matrix.
         const arpeggioTable = docById("arpeggioTable");
         let table;

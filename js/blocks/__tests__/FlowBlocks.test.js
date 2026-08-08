@@ -31,6 +31,7 @@ global.POSNUMBER = "POS_NUMBER";
 class BaseBlock {
     constructor(name) {
         this.name = name;
+        this.capabilities = Object.create(null);
         this.dockTypes = [null];
         this.size = 1;
         this.lang = "en";
@@ -43,6 +44,16 @@ class BaseBlock {
 
     setHelpString(help) {
         this.help = help;
+    }
+
+    setCapability(name, value = true) {
+        this.capabilities[name] = !!value;
+    }
+
+    getCapability(name) {
+        return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+            ? this.capabilities[name]
+            : undefined;
     }
 
     formBlock(defn) {
@@ -484,6 +495,11 @@ describe("FlowBlocks integration", () => {
     test("Hidden block variants simply no-op", () => {
         expect(() => getBlock("hiddennoflow").flow()).not.toThrow();
         expect(() => getBlock("hidden").flow()).not.toThrow();
+    });
+
+    test("Hidden block variants declare the noHit capability", () => {
+        expect(getBlock("hiddennoflow").getCapability("noHit")).toBe(true);
+        expect(getBlock("hidden").getCapability("noHit")).toBe(true);
     });
 
     test("WaitForBlock ignores malformed args and While/Until guard arg length", () => {

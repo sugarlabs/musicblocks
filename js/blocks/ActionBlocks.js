@@ -252,6 +252,30 @@ function setupActionBlocks(activity) {
                 argTypes: ["anyin"]
             });
         }
+        arg(logo, turtle, blk, receivedArg) {
+            const cblk = activity.blocks.blockList[blk].connections[1];
+            if (cblk === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return 0;
+            } else {
+                const name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                if (name in logo.actions) {
+                    activity.turtles.getTurtle(turtle).running = true;
+                    logo.runFromBlockNow(
+                        logo,
+                        turtle,
+                        logo.actions[name],
+                        true,
+                        [],
+                        activity.turtles.getTurtle(turtle).queue.length
+                    );
+                    return logo.returns[turtle].pop();
+                } else {
+                    activity.errorMsg(NOACTIONERRORMSG, blk, name);
+                    return 0;
+                }
+            }
+        }
     }
     /**
      * Represents a Named Calculate block that returns a value calculated by an action.
@@ -481,6 +505,7 @@ function setupActionBlocks(activity) {
          */
         constructor() {
             super("namedcalcArg");
+            this.setCapability("argumentLike");
 
             /**
              * Sets the palette for the block.
@@ -573,6 +598,7 @@ function setupActionBlocks(activity) {
          */
         constructor() {
             super("doArg");
+            this.setCapability("argumentLike");
 
             /**
              * Sets the palette for the block.
@@ -668,6 +694,7 @@ function setupActionBlocks(activity) {
          */
         constructor() {
             super("calcArg");
+            this.setCapability("argumentLike");
 
             /**
              * Sets the palette for the block.
@@ -1187,6 +1214,7 @@ function setupActionBlocks(activity) {
          */
         constructor() {
             super("start");
+            this.setCapability("collapsible");
 
             /**
              * Sets the palette for the block.
@@ -1279,6 +1307,7 @@ function setupActionBlocks(activity) {
          */
         constructor() {
             super("action");
+            this.setCapability("collapsible");
 
             /**
              * Sets the palette for the block.
@@ -1471,6 +1500,7 @@ function setupActionBlocks(activity) {
          */
         constructor() {
             super("temperament1");
+            this.setCapability("collapsible");
 
             /**
              * Sets the palette for the block.

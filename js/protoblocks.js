@@ -81,6 +81,8 @@ class ProtoBlock {
         this.textWidth = 0;
         this.labelOffset = 0;
         this.beginnerModeBlock = false;
+        // Capability metadata is additive and starts empty.
+        this.capabilities = Object.create(null);
     }
 
     /**
@@ -96,6 +98,55 @@ class ProtoBlock {
         const b = c.getBounds();
         this.textWidth = b.width;
         this.extraWidth += Math.max(b.width - 30, 0);
+    }
+
+    /**
+     * Sets a single capability flag on the protoblock.
+     * @param {string} name - Capability name.
+     * @param {boolean} [value=true] - Capability value.
+     * @returns {void}
+     */
+    setCapability(name, value = true) {
+        this.capabilities[name] = !!value;
+    }
+
+    /**
+     * Merges capability flags into the protoblock.
+     * @param {Object} capabilities - Capability flags to merge.
+     * @returns {void}
+     */
+    setCapabilities(capabilities) {
+        if (!capabilities) {
+            return;
+        }
+
+        for (const name in capabilities) {
+            if (Object.prototype.hasOwnProperty.call(capabilities, name)) {
+                this.setCapability(name, capabilities[name]);
+            }
+        }
+    }
+
+    /**
+     * Reads a capability flag from the protoblock.
+     * @param {string} name - Capability name.
+     * @returns {boolean} - True if the capability is enabled.
+     */
+    hasCapability(name) {
+        return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+            ? !!this.capabilities[name]
+            : false;
+    }
+
+    /**
+     * Returns the raw capability value from the protoblock.
+     * @param {string} name - Capability name.
+     * @returns {*} - Stored capability value, if any.
+     */
+    getCapability(name) {
+        return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+            ? this.capabilities[name]
+            : undefined;
     }
 
     // What follows are the initializations for different block
@@ -1630,6 +1681,7 @@ class BaseBlock extends ProtoBlock {
         this._style.defaults ||= [];
         this._style.flows ||= {};
         this._style.flows.labels ||= [];
+        this._style.capabilities ||= {};
 
         if (this._style.args > 1) {
             this.expandable = true;
@@ -1663,6 +1715,8 @@ class BaseBlock extends ProtoBlock {
             this.size++;
             this.image = this._style.image;
         }
+
+        this.setCapabilities(this._style.capabilities);
 
         this.staticLabels = [this._style.name || ""];
         this.dockTypes = [];

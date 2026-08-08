@@ -472,6 +472,14 @@ const transport = {
     get isAvailable() {
         return typeof Tone !== "undefined" && Tone.Transport;
     },
+    get isClockRunning() {
+        return (
+            this.isAvailable &&
+            typeof Tone.context !== "undefined" &&
+            Tone.context.state === "running" &&
+            Tone.Transport.state === "started"
+        );
+    },
     start() {
         if (this.isAvailable) Tone.Transport.start();
     },
@@ -665,13 +673,29 @@ function Synth() {
             startPitch = startPitch.replace(SHARP, "#");
         }
 
-        const frequency = Tone.Frequency(startPitch).toFrequency();
+        let frequency;
+        if (t && !t.isEDO && t.noteLabels && t.ratios) {
+            // For JI/Pythagorean: compute from A0 reference, not 12-EDO Tone.Frequency
+            const startParsed = parseNoteString(startingPitch);
+            frequency = pitchToFrequency(startParsed[0], startParsed[1], 0, "C major", temperament);
+        } else {
+            frequency = Tone.Frequency(startPitch).toFrequency();
+        }
 
         const startParsed = parseNoteString(startingPitch);
         this.noteFrequencies = {
             // note: [octave, Frequency]
             [startParsed[0]]: [startParsed[1], frequency]
         };
+
+        // EDO temperaments compute frequencies via pitchToFrequency directly
+        // and never use noteFrequencies, so skip building the table.
+        // This also avoids crashing on microtonal interval names (e.g. "mid 2")
+        // that exist in the temperament definition but not in INTERVALVALUES.
+        if (t && t.isEDO) {
+            this.changeInTemperament = false;
+            return;
+        }
 
         for (const interval in t) {
             if (
@@ -687,15 +711,25 @@ function Synth() {
                 interval !== "octaveRatio" &&
                 interval !== "generator"
             ) {
-                const noteInfo = getNoteFromInterval(startingPitch, interval);
+                let noteInfo;
                 let ratio;
-                if (typeof t[interval] === "number") {
+                if (!isNaN(interval)) {
+                    const val = t[interval];
+                    if (Array.isArray(val) && val.length >= 3) {
+                        noteInfo = [val[1], val[2]];
+                        ratio = val[0];
+                    } else {
+                        continue;
+                    }
+                } else if (typeof t[interval] === "number") {
+                    noteInfo = getNoteFromInterval(startingPitch, interval);
                     ratio = t[interval];
                 } else if (
                     t[interval] &&
                     typeof t[interval] === "object" &&
                     typeof t[interval].ratio === "number"
                 ) {
+                    noteInfo = getNoteFromInterval(startingPitch, interval);
                     ratio = t[interval].ratio;
                 } else {
                     continue;
@@ -751,6 +785,7 @@ function Synth() {
                 //To get frequencies in Temperament Widget.
                 this.temperamentChanged(temperament, this.startingPitch);
             }
+            Singer.clearPitchToFrequencyCache();
         }
 
         if (this.inTemperament === "equal") {
@@ -773,9 +808,32 @@ function Synth() {
             }
         }
 
+        const t = getTemperament(this.inTemperament);
+        if (t && t.isEDO) {
+            if (typeof notes === "string") {
+                const parsed = parseNoteString(notes);
+                return pitchToFrequency(parsed[0], parsed[1], 0, "c major", this.inTemperament);
+            } else if (typeof notes === "number") {
+                return notes;
+            } else {
+                const results = [];
+                for (let i = 0; i < notes.length; i++) {
+                    if (typeof notes[i] === "string") {
+                        const parsed = parseNoteString(notes[i]);
+                        results.push(
+                            pitchToFrequency(parsed[0], parsed[1], 0, "c major", this.inTemperament)
+                        );
+                    } else {
+                        results.push(notes[i]);
+                    }
+                }
+                return results;
+            }
+        }
+
         const __getFrequency = oneNote => {
             const parsed = parseNoteString(oneNote);
-            const noteName = parsed[0];
+            const noteName = normalizeNoteAccidentals(parsed[0]);
             const octave = parsed[1];
 
             for (const note in this.noteFrequencies) {
@@ -786,7 +844,7 @@ function Synth() {
                     } else {
                         //Note to be played is not in the same octave.
                         const power = octave - this.noteFrequencies[note][0];
-                        return this.noteFrequencies[note][1] * Math.pow(2, power);
+                        return this.noteFrequencies[note][1] * Math.pow(getOctaveRatio(), power);
                     }
                 }
             }
@@ -1791,6 +1849,13 @@ function Synth() {
             return false;
         };
 
+        // Normalize Unicode accidentals to ASCII so Tone.js can parse the note names.
+        if (typeof notes === "string") {
+            notes = normalizeNoteAccidentals(notes);
+        } else if (Array.isArray(notes)) {
+            notes = notes.map(n => (typeof n === "string" ? normalizeNoteAccidentals(n) : n));
+        }
+
         if (needsFreqConversion()) {
             if (typeof notes === "number") {
                 notes = notes;
@@ -1819,7 +1884,10 @@ function Synth() {
 
         if (isCustomTemperament(this.inTemperament)) {
             const notes1 = notes;
-            if (notes.search("[+]") !== -1 || notes.search("[-]") !== -1) {
+            if (
+                typeof notes === "string" &&
+                (notes.search("[+]") !== -1 || notes.search("[-]") !== -1)
+            ) {
                 notes = this.getCustomFrequency(notes, this.inTemperament);
             }
             if (notes === undefined || notes === "undefined") {
@@ -1859,7 +1927,8 @@ function Synth() {
                             paramsEffects.doTremolo ||
                             paramsEffects.doPhaser ||
                             paramsEffects.doChorus ||
-                            paramsEffects.doNeighbor));
+                            paramsEffects.doNeighbor ||
+                            (paramsEffects.doPortamento && setNote)));
 
                 if (!_needsGraphRewire) {
                     // Apply in-place property mutations then take the fast path.
@@ -2550,6 +2619,10 @@ function Synth() {
     };
 
     const _disposeRecordingPlayer = () => {
+        if (this._recordingPlayTimeout) {
+            clearTimeout(this._recordingPlayTimeout);
+            this._recordingPlayTimeout = null;
+        }
         if (this.player) {
             try {
                 if (typeof this.player.stop === "function") {
@@ -2602,11 +2675,45 @@ function Synth() {
      * @function
      * @memberof Synth
      */
-    this.playRecording = async () => {
+    this.playRecording = async onEnded => {
         _disposeRecordingPlayer();
+        if (!this.audioURL) {
+            if (typeof onEnded === "function") {
+                onEnded();
+            }
+            return;
+        }
+        await Tone.start();
+        if (
+            Tone.context &&
+            Tone.context.state !== "running" &&
+            typeof Tone.context.resume === "function"
+        ) {
+            await Tone.context.resume();
+        }
         this.player = new Tone.Player().toDestination();
+        let endedCalled = false;
+        const handleEnded = () => {
+            if (endedCalled) return;
+            endedCalled = true;
+            if (this._recordingPlayTimeout) {
+                clearTimeout(this._recordingPlayTimeout);
+                this._recordingPlayTimeout = null;
+            }
+            if (typeof onEnded === "function") {
+                onEnded();
+            }
+        };
+        this.player.onstop = handleEnded;
+        if ("onended" in this.player) {
+            this.player.onended = handleEnded;
+        }
         await this.player.load(this.audioURL);
         this.player.start();
+        if (this.player.buffer && this.player.buffer.duration) {
+            const durationMs = Math.ceil(this.player.buffer.duration * 1000) + 100;
+            this._recordingPlayTimeout = setTimeout(handleEnded, durationMs);
+        }
     };
 
     /**
@@ -2624,6 +2731,10 @@ function Synth() {
      * @memberof Synth
      */
     this.LiveWaveForm = () => {
+        if (this.analyser) {
+            this.mic.disconnect(this.analyser);
+            this.analyser.dispose();
+        }
         this.analyser = new Tone.Analyser("waveform", 8192);
         this.mic.connect(this.analyser);
     };
@@ -3777,6 +3888,16 @@ function Synth() {
         _disposeRecordingPlayer();
         _revokeRecordingURL();
 
+        if (this.analyser) {
+            try {
+                this.mic.disconnect(this.analyser);
+                this.analyser.dispose();
+            } catch (e) {
+                console.debug("Error disposing analyser:", e);
+            }
+            this.analyser = null;
+        }
+
         for (const turtle in instruments) {
             for (const instrumentName in instruments[turtle]) {
                 if (
@@ -3840,7 +3961,7 @@ function Synth() {
     this.startingPitchOctave = 4;
     this.octaveTranspose = 0;
     this.inTemperament = "equal";
-    this.changeInTemperament = "equal";
+    this.changeInTemperament = false;
     this.inTransposition = 0;
     this.transposition = 2;
     this.playbackRate = 1;

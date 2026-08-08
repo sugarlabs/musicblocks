@@ -56,6 +56,7 @@ describe("setupActivityIdleWatcher", () => {
 
     afterEach(() => {
         jest.clearAllMocks();
+        jest.restoreAllMocks();
         jest.useRealTimers();
         delete global.createjs;
         delete global.debugLog;
@@ -162,6 +163,58 @@ describe("setupActivityIdleWatcher", () => {
 
             expect(mockActivity.isAppIdle).toBe(false);
             expect(global.createjs.Ticker.framerate).toBe(60);
+            expect(mockActivity.stageDirty).toBe(true);
+        });
+
+        it("does not accumulate listeners or intervals when called twice", () => {
+            setupActivityIdleWatcher(mockActivity);
+            mockActivity._initIdleWatcher();
+
+            const firstListenerCount = mockActivity.addEventListener.mock.calls.length;
+            const firstInterval = mockActivity._idleWatcherInterval;
+
+            const clearIntervalSpy = jest.spyOn(global, "clearInterval");
+
+            // Call _initIdleWatcher again (double init)
+            mockActivity._initIdleWatcher();
+
+            // The old interval should have been cleared by _stopIdleWatcher
+            expect(clearIntervalSpy).toHaveBeenCalledWith(firstInterval);
+
+            // Listeners should be re-added, not accumulated
+            // The second init should have removed old listeners then added new ones
+            expect(mockActivity.removeEventListener).toHaveBeenCalledWith(
+                window,
+                "mousemove",
+                expect.any(Function)
+            );
+            expect(mockActivity.removeEventListener).toHaveBeenCalledWith(
+                window,
+                "mousedown",
+                expect.any(Function)
+            );
+            expect(mockActivity.removeEventListener).toHaveBeenCalledWith(
+                window,
+                "keydown",
+                expect.any(Function)
+            );
+            expect(mockActivity.removeEventListener).toHaveBeenCalledWith(
+                window,
+                "touchstart",
+                expect.any(Function)
+            );
+            expect(mockActivity.removeEventListener).toHaveBeenCalledWith(
+                window,
+                "wheel",
+                expect.any(Function)
+            );
+
+            // New interval should be a different handle
+            expect(mockActivity._idleWatcherInterval).not.toBe(firstInterval);
+
+            // addEventListener should have been called same number of times each init
+            // (5 listeners per init, so 10 total)
+            expect(mockActivity.addEventListener).toHaveBeenCalledTimes(firstListenerCount * 2);
         });
     });
 
@@ -239,6 +292,17 @@ describe("setupActivityIdleWatcher", () => {
             expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(testError, {
                 operation: "autoSave"
             });
+        });
+
+        it("does not throw when saveLocally is null", () => {
+            setupActivityIdleWatcher(mockActivity);
+            mockActivity.saveLocally = null;
+            mockActivity._initAutoSave();
+
+            jest.advanceTimersByTime(5 * 60 * 1000);
+
+            // Should not crash and ErrorHandler should not be called
+            expect(global.ErrorHandler.recoverable).not.toHaveBeenCalled();
         });
     });
 

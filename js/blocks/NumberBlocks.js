@@ -56,6 +56,10 @@ function setupNumberBlocks(activity) {
      */
     const handleMathError = (logo, error, blk, onError = NANERRORMSG) => {
         logo.stopTurtle = true;
+        if (error && error.message === "DivByZeroError") {
+            activity.errorMsg(ZERODIVIDEERRORMSG, blk);
+            return;
+        }
         activity.errorMsg(onError, blk);
     };
 
@@ -922,6 +926,7 @@ function setupNumberBlocks(activity) {
     class NumberBlock extends ValueBlock {
         constructor() {
             super("number", _("number"));
+            this.setCapability("valueDrivenLabel");
             this.setPalette("number", activity);
             this.beginnerBlock(true);
 

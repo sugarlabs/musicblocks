@@ -278,7 +278,7 @@ class Notation {
      * @returns {void}
      */
     notationMeter(turtle, count, value) {
-        if (this._pickupPoint[turtle] != null) {
+        if (this._pickupPoint[turtle] !== null) {
             // Lilypond prefers meter to be before partials.
             const d = this._notationStaging[turtle].length - this._pickupPoint[turtle];
             const pickup = [];

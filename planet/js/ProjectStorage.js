@@ -283,7 +283,12 @@ class ProjectStorage {
     }
 
     async port() {
-        const oldProjectData = localStorage.getItem(this.LocalStorageKey);
+        let oldProjectData = null;
+        try {
+            oldProjectData = localStorage.getItem(this.LocalStorageKey);
+        } catch (e) {
+            console.debug("localStorage unavailable during port(); skipping legacy read.", e);
+        }
         const isPortedAlready = await this.get(this.VersionKey);
         if (isPortedAlready !== this.Version) {
             // port

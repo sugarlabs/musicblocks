@@ -55,8 +55,19 @@ requirejs.config({
         "utils/utils-logic": {
             exports: "UtilsLogic"
         },
+        "utils/dom-helpers": {
+            exports: "DomHelpers"
+        },
+        "utils/browser-utils": {
+            exports: "BrowserUtils"
+        },
         "utils/utils": {
-            deps: ["utils/platformstyle", "utils/utils-logic"],
+            deps: [
+                "utils/platformstyle",
+                "utils/utils-logic",
+                "utils/dom-helpers",
+                "utils/browser-utils"
+            ],
             exports: "_"
         },
         "utils/retryWithBackoff": {
@@ -74,8 +85,21 @@ requirejs.config({
             deps: ["activity/turtledefs", "utils/retryWithBackoff"],
             exports: "Block"
         },
+        "activity/connection-validator": {
+            exports: "ConnectionValidator"
+        },
+        "activity/block-drag-controller": {
+            deps: ["activity/block-constants"],
+            exports: "setupBlockDragController"
+        },
         "activity/blocks": {
-            deps: ["activity/block", "activity/pubsub"],
+            deps: [
+                "activity/block",
+                "activity/pubsub",
+                "activity/block-constants",
+                "activity/connection-validator",
+                "activity/block-drag-controller"
+            ],
             exports: "Blocks"
         },
         "activity/turtle-singer": {
@@ -141,12 +165,21 @@ requirejs.config({
                 "activity/plugin-controller",
                 "widgets/plugin-dialog",
                 "activity/toolbar-controller",
+                "activity/focus-cycle-manager",
                 "activity/toolbar-ui",
                 "activity/alert-controller",
                 "activity/alert-renderer",
                 "palette/palette-loader",
                 "activity/search-controller",
-                "search-ui"
+                "activity/workspace-layout-controller",
+                "activity/block-scale-controller",
+                "search-ui",
+                "project-manager",
+                "keyboard-controller",
+                "activity/selection-controller",
+                "activity/trash-controller",
+                "activity/help-controller",
+                "activity/context-menu-controller"
             ],
             exports: "Activity"
         },
@@ -192,7 +225,11 @@ requirejs.config({
         "activity/alert-renderer": "js/activity/alert-renderer",
         "palette/palette-loader": "js/palette/palette-loader",
         "activity/search-controller": "js/activity/search-controller",
+        "activity/workspace-layout-controller": "js/activity/workspace-layout-controller",
+        "activity/selection-controller": "js/activity/selection-controller",
         "search-ui": "js/search-ui",
+        "project-manager": "js/project-manager",
+        "keyboard-controller": "js/keyboard-controller",
         "activity/pubsub": "js/pubsub",
         "easeljs.min": "lib/easeljs.min",
         "tweenjs.min": "lib/tweenjs.min",
@@ -307,10 +344,6 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
         window.M = M;
         window.Materialize = M;
     }
-
-    // Define essential globals for core modules
-    window._THIS_IS_MUSIC_BLOCKS_ = true;
-    window._THIS_IS_TURTLE_BLOCKS_ = false;
 
     // Load highlight optionally
     requirejs(

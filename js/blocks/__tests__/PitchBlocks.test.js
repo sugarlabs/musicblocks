@@ -22,6 +22,10 @@
 
 const { setupPitchBlocks } = require("../PitchBlocks");
 
+const SHARP = "\u266F";
+const FLAT = "\u266D";
+const CENTSSYMBOL = "\u00A2";
+
 describe("setupPitchBlocks", () => {
     let activity, logo, createdBlocks, turtles;
 
@@ -33,6 +37,8 @@ describe("setupPitchBlocks", () => {
             createdBlocks[name] = this;
             this.connections = [null, null, null, null, null];
             this.value = null;
+            this.capabilities = Object.create(null);
+            this._macroFunc = null;
         }
         setPalette() {
             return this;
@@ -49,8 +55,18 @@ describe("setupPitchBlocks", () => {
         setup() {
             return this;
         }
-        makeMacro() {
+        makeMacro(fn) {
+            this._macroFunc = fn;
             return this;
+        }
+        setCapability(name, value = true) {
+            this.capabilities[name] = !!value;
+            return this;
+        }
+        getCapability(name) {
+            return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+                ? this.capabilities[name]
+                : undefined;
         }
         flow() {
             return this;
@@ -83,82 +99,16 @@ describe("setupPitchBlocks", () => {
         jest.clearAllMocks();
 
         global._ = jest.fn(str => str);
-        global.ValueBlock = DummyValueBlock;
-        global.FlowBlock = DummyFlowBlock;
-        global.FlowClampBlock = DummyFlowClampBlock;
-        global.LeftBlock = DummyLeftBlock;
-        global.NOINPUTERRORMSG = "No input provided";
-        global.NANERRORMSG = "Not a number";
-        global.INVALIDPITCH = "Invalid pitch";
-        global.last = jest.fn(arr => arr[arr.length - 1]);
-
+        // Override music constants with ASCII symbols for this test
+        // (musicutils.js is auto-loaded via jest.setup.js)
         global.SHARP = "#";
         global.FLAT = "b";
         global.DOUBLEFLAT = "bb";
         global.DOUBLESHARP = "##";
         global.NATURAL = "n";
-        global.FIXEDSOLFEGE = { do: "C", re: "D", mi: "E", fa: "F", sol: "G", la: "A", si: "B" };
-        global.SOLFEGENAMES1 = [
-            "do",
-            "re",
-            "mi",
-            "fa",
-            "sol",
-            "la",
-            "si",
-            "do#",
-            "dob",
-            "do##",
-            "dobb",
-            "do##",
-            "dobb"
-        ];
-        global.NOTENAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-        global.NOTENAMES1 = [
-            "C",
-            "D",
-            "E",
-            "F",
-            "G",
-            "A",
-            "B",
-            "C#",
-            "Db",
-            "D#",
-            "Eb",
-            "F#",
-            "Gb",
-            "G#",
-            "Ab",
-            "A#",
-            "Bb"
-        ];
-        global.ALLNOTENAMES = [
-            "C",
-            "C#",
-            "Db",
-            "D",
-            "D#",
-            "Eb",
-            "E",
-            "F",
-            "F#",
-            "Gb",
-            "G",
-            "G#",
-            "Ab",
-            "A",
-            "A#",
-            "Bb",
-            "B"
-        ];
-        global.MUSICALMODES = { major: [2, 2, 1, 2, 2, 2, 1], minor: [2, 1, 2, 2, 1, 2, 2] };
-        global.YSTAFFOCTAVEHEIGHT = 70;
-        global.YSTAFFNOTEHEIGHT = 10;
-        global.A0 = 27.5;
-        global.C8 = 4186;
-        global.NOTESSHARP = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-        global.NOTESFLAT = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+
+        // Test-specific overrides
+        global.INTERVALVALUES = { "major third": [0, 0, 1.25], "minor third": [0, 0, 1.2] };
         global.NOTESTEP = { C: 1, D: 3, E: 5, F: 6, G: 8, A: 10, B: 12 };
         global.SOLFEGECONVERSIONTABLE = {
             C: "do",
@@ -169,7 +119,22 @@ describe("setupPitchBlocks", () => {
             A: "la",
             B: "si"
         };
-        global.INTERVALVALUES = { "major third": [0, 0, 1.25], "minor third": [0, 0, 1.2] };
+
+        // Test infrastructure setup
+        global.ValueBlock = DummyValueBlock;
+        global.FlowBlock = DummyFlowBlock;
+        global.FlowClampBlock = DummyFlowClampBlock;
+        global.LeftBlock = DummyLeftBlock;
+        global.NOINPUTERRORMSG = "No input provided";
+        global.NANERRORMSG = "Not a number";
+        global.INVALIDPITCH = "Invalid pitch";
+        global.last = jest.fn(arr => arr[arr.length - 1]);
+
+        // UI constants
+        global.YSTAFFOCTAVEHEIGHT = 70;
+        global.YSTAFFNOTEHEIGHT = 10;
+        global.A0 = 27.5;
+        global.C8 = 4186;
 
         global.numberToPitch = jest.fn(num => ["C", Math.floor(num / 12)]);
         global.frequencyToPitch = jest.fn(freq => {
@@ -347,10 +312,52 @@ describe("setupPitchBlocks", () => {
     });
 
     describe("CustomNoteBlock", () => {
+        const customNoteCents = [
+            ["C(+42" + CENTSSYMBOL + ")", "C", 42],
+            ["C(-10" + CENTSSYMBOL + ")", "C", -10],
+            ["C(+0" + CENTSSYMBOL + ")", "C", 0],
+            ["D" + SHARP, "D" + SHARP, 0],
+            ["F𝄪(+42" + CENTSSYMBOL + ")", "F𝄪", 42],
+            ["D𝄫(+42" + CENTSSYMBOL + ")", "D𝄫", 42]
+        ];
+
         it("flow", () => {
             const block = createdBlocks["customNote"];
             block.flow(["C", 4], logo, 0, 10);
             block.flow([null, null], logo, 0, 10);
+        });
+
+        describe("_parseCents", () => {
+            it("extracts note and cents from various formats", () => {
+                const parseCents = createdBlocks["customNote"]?.constructor?._parseCents;
+                if (!parseCents) return;
+                for (const [input, expectedNote, expectedCents] of customNoteCents) {
+                    const [note, cents] = parseCents(input);
+                    expect(note).toBe(expectedNote);
+                    expect(cents).toBe(expectedCents);
+                }
+            });
+
+            it("handles numeric input by returning as-is with 0 cents", () => {
+                const parseCents = createdBlocks["customNote"]?.constructor?._parseCents;
+                if (!parseCents) return;
+                const [note, cents] = parseCents(440);
+                expect(note).toBe(440);
+                expect(cents).toBe(0);
+            });
+        });
+
+        it("passes parsed cents to processPitch", () => {
+            const block = createdBlocks["customNote"];
+            block.flow(["F#(+15" + CENTSSYMBOL + ")", 4], logo, 0, 10);
+            expect(global.Singer.processPitch).toHaveBeenCalledWith(activity, "F#", 4, 15, 0, 10);
+        });
+
+        it("passes zero cents for plain note strings", () => {
+            jest.clearAllMocks();
+            const block = createdBlocks["customNote"];
+            block.flow(["G", 3], logo, 0, 10);
+            expect(global.Singer.processPitch).toHaveBeenCalledWith(activity, "G", 3, 0, 0, 10);
         });
     });
 
@@ -737,6 +744,13 @@ describe("setupPitchBlocks", () => {
             cpBlock.flow([null, null], logo, 0, 10);
             cpBlock.flow([440, 1], logo, 0, 10);
         });
+
+        it("CustomPitchBlock passes parsed cents to playPitch", () => {
+            const cpBlock = createdBlocks["custompitch"];
+            if (cpBlock instanceof DummyFlowBlock) return;
+            cpBlock.flow(["D(+25" + CENTSSYMBOL + ")", 2], logo, 0, 10);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenCalledWith("D", 2, 25, 0, 10);
+        });
     });
 
     describe("Macro Execution", () => {
@@ -748,6 +762,17 @@ describe("setupPitchBlocks", () => {
                 }
             });
             expect(true).toBe(true);
+        });
+    });
+
+    describe("CustomPitchBlock macro", () => {
+        it("CustomPitchBlock macro creates a 'custompitch' block (not 'pitch')", () => {
+            const cpBlock = createdBlocks["custompitch"];
+            if (!cpBlock || !cpBlock._macroFunc) return;
+            const macro = cpBlock._macroFunc(0, 0);
+            expect(macro[0][1]).toBe("custompitch");
+            expect(macro[1][1][0]).toBe("customNote");
+            expect(macro[2][1][0]).toBe("number");
         });
     });
 
@@ -819,6 +844,15 @@ describe("setupPitchBlocks", () => {
                     expect(createdBlocks[name]).toBeDefined();
                 }
             });
+        });
+
+        it("marks solfege and customNote as value-driven labels", () => {
+            expect(createdBlocks["solfege"].getCapability("valueDrivenLabel")).toBe(true);
+            expect(createdBlocks["customNote"].getCapability("valueDrivenLabel")).toBe(true);
+        });
+
+        it("does not mark pitchnumber as a value-driven label block", () => {
+            expect(createdBlocks["pitchnumber"].getCapability("valueDrivenLabel")).toBeUndefined();
         });
     });
 
