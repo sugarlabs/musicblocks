@@ -48,9 +48,14 @@ function openSvgAssetSelector(onSelectBuiltIn, onUploadFromDevice) {
             // Header
             const header = document.createElement("div");
             header.className = "svg-selector-header";
-            header.innerHTML =
-                "<h3>Choose an Image</h3>" +
-                '<button class="svg-selector-close" aria-label="Close">&times;</button>';
+            const h3 = document.createElement("h3");
+            h3.textContent = "Choose an Image";
+            const closeBtn = document.createElement("button");
+            closeBtn.className = "svg-selector-close";
+            closeBtn.setAttribute("aria-label", "Close");
+            closeBtn.textContent = "×";
+            header.appendChild(h3);
+            header.appendChild(closeBtn);
             modal.appendChild(header);
 
             // Tabs
@@ -60,14 +65,20 @@ function openSvgAssetSelector(onSelectBuiltIn, onUploadFromDevice) {
             const tabBuiltIn = document.createElement("button");
             tabBuiltIn.className = "svg-selector-tab active";
             tabBuiltIn.id = "svgTabBuiltIn";
-            tabBuiltIn.innerHTML =
-                '<span class="tab-icon material-icons">collections</span> Built-in Images';
+            const tabBuiltInIcon = document.createElement("span");
+            tabBuiltInIcon.className = "tab-icon material-icons";
+            tabBuiltInIcon.textContent = "collections";
+            tabBuiltIn.appendChild(tabBuiltInIcon);
+            tabBuiltIn.appendChild(document.createTextNode(" Built-in Images"));
 
             const tabUpload = document.createElement("button");
             tabUpload.className = "svg-selector-tab";
             tabUpload.id = "svgTabUpload";
-            tabUpload.innerHTML =
-                '<span class="tab-icon material-icons">file_upload</span> Upload from Device';
+            const tabUploadIcon = document.createElement("span");
+            tabUploadIcon.className = "tab-icon material-icons";
+            tabUploadIcon.textContent = "file_upload";
+            tabUpload.appendChild(tabUploadIcon);
+            tabUpload.appendChild(document.createTextNode(" Upload from Device"));
 
             tabBar.appendChild(tabBuiltIn);
             tabBar.appendChild(tabUpload);
@@ -127,7 +138,11 @@ function openSvgAssetSelector(onSelectBuiltIn, onUploadFromDevice) {
 
             const uploadBtn = document.createElement("button");
             uploadBtn.className = "svg-upload-btn";
-            uploadBtn.innerHTML = '<span class="material-icons">cloud_upload</span> Choose File';
+            const uploadBtnIcon = document.createElement("span");
+            uploadBtnIcon.className = "material-icons";
+            uploadBtnIcon.textContent = "cloud_upload";
+            uploadBtn.appendChild(uploadBtnIcon);
+            uploadBtn.appendChild(document.createTextNode(" Choose File"));
 
             const uploadHint = document.createElement("span");
             uploadHint.className = "svg-upload-hint";
