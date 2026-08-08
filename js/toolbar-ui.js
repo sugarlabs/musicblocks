@@ -1275,6 +1275,17 @@ class ToolbarUI {
             };
         }
 
+        const gitTutorialItem = docById("gitTutorialItem");
+        if (gitTutorialItem && typeof GitTutorial !== "undefined") {
+            gitTutorialItem.onclick = event => {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                GitTutorial.open(this.activity);
+            };
+        }
+
         if (helpIcon) {
             helpIcon.onclick = hasDropdownMenu
                 ? null
