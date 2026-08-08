@@ -90,3 +90,4 @@ app.listen(PORT, HOST, () => {
     console.log(`Music Blocks running at http://${HOST}:${PORT}/`);
     console.log("Compression enabled");
 });
+
