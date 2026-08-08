@@ -75,7 +75,8 @@ class PlanetInterface {
             document.querySelector("#theme-color").content = platformColor.header;
             this.activity.stage.enableDOMEvents(true);
             window.scroll(0, 0);
-            docById("buttoncontainerBOTTOM").style.display = "block";
+            const buttonContainerBottom = docById("buttoncontainerBOTTOM");
+            if (buttonContainerBottom) buttonContainerBottom.style.display = "block";
             docById("buttoncontainerTOP").style.display = "block";
         };
 
