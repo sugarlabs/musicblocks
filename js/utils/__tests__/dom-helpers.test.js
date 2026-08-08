@@ -91,6 +91,11 @@ describe("hideDOMLabel()", () => {
         document.getElementById = jest.fn(() => null);
         expect(() => hideDOMLabel()).not.toThrow();
     });
+
+    it("does not throw when elements lack a style property", () => {
+        document.getElementById = jest.fn(() => ({}));
+        expect(() => hideDOMLabel()).not.toThrow();
+    });
 });
 
 describe("displayMsg()", () => {
@@ -116,6 +121,16 @@ describe("closeWidgets()", () => {
 
     it("does not throw when openWindows is empty", () => {
         window.widgetWindows.openWindows = {};
+        expect(() => closeWidgets()).not.toThrow();
+    });
+
+    it("does not throw when window.widgetWindows is undefined", () => {
+        delete window.widgetWindows;
+        expect(() => closeWidgets()).not.toThrow();
+    });
+
+    it("does not throw when window.widgetWindows.openWindows is undefined", () => {
+        window.widgetWindows = {};
         expect(() => closeWidgets()).not.toThrow();
     });
 });
