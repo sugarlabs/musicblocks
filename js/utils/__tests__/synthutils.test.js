@@ -1676,6 +1676,39 @@ describe("Utility Functions (logic-only)", () => {
             jest.useRealTimers();
         });
     });
+
+    describe("default voice is independent of the custom voice", () => {
+        beforeEach(() => {
+            instruments[turtle] = {};
+        });
+
+        it("gives 'electronic synth' and 'custom' separate synth instances", () => {
+            createDefaultSynth(turtle);
+
+            expect(instruments[turtle]["electronic synth"]).toBeDefined();
+            expect(instruments[turtle]["custom"]).toBeDefined();
+            expect(instruments[turtle]["custom"]).not.toBe(instruments[turtle]["electronic synth"]);
+        });
+
+        it("keeps the default voice usable after the custom voice is rebuilt", async () => {
+            createDefaultSynth(turtle);
+            const defaultVoice = instruments[turtle]["electronic synth"];
+
+            // "custom" is in BUILTIN_SYNTHS, so this disposes and rebuilds that key.
+            await createSynth(turtle, "custom", "custom", null);
+
+            expect(defaultVoice.disposed).toBe(false);
+            expect(instruments[turtle]["electronic synth"]).toBe(defaultVoice);
+            expect(() => defaultVoice.triggerAttackRelease("C4", 0.5)).not.toThrow();
+        });
+
+        it("does not throw when stopping an already disposed instrument", () => {
+            createDefaultSynth(turtle);
+            instruments[turtle]["electronic synth"].dispose();
+
+            expect(() => stopSound(turtle, "electronic synth")).not.toThrow();
+        });
+    });
 });
 
 describe("Tuner Utilities (Audio Test Functions)", () => {
