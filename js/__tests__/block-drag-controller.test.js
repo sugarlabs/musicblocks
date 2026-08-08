@@ -895,6 +895,23 @@ describe("BlockDragController", () => {
 
             debugSpy.mockRestore();
         });
+        it("guards against a connection pointing at a not-yet-populated slot in blockList", () => {
+            // blockList is pre-sized for the whole incoming batch (as blocks.js's
+            // chunked loader does via `_loadCounter = blockObjs.length`), but a
+            // later chunk hasn't been written into it yet, so index 1 is a genuine
+            // array hole (undefined) rather than an explicit null placeholder.
+            // Regression test for the "Cannot read properties of undefined
+            // (reading 'connections')" crash on rapid next-project + play.
+            const blockList = [];
+            blockList[0] = { connections: [null, 1] };
+            blockList.length = 3;
+            const blocks = makeBlocks(blockList);
+            const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+
+            expect(() => blocks.findDragGroup(0)).not.toThrow();
+
+            debugSpy.mockRestore();
+        });
 
         it("_calculateDragGroup stops recursing once the loop counter exceeds the block list length", () => {
             const blockList = [

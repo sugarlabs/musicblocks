@@ -124,9 +124,12 @@ class BlockDragController {
         }
 
         const myBlock = blocks.blockList[blk];
-        /** If this happens, something is really broken. */
-        if (myBlock === null) {
-            console.debug("null block encountered... this is bad. " + blk);
+        /** If this happens, something is really broken.
+         *  Covers both an explicit null entry and an undefined one (e.g. an
+         *  index that points past the currently-loaded portion of
+         *  blockList, or a block removed from the array). */
+        if (!myBlock) {
+            console.debug("null/missing block encountered... this is bad. " + blk);
             return;
         }
 
