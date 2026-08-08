@@ -4493,11 +4493,22 @@ const numberToPitchSharp = (i, temperament) => {
  * @function
  * @param {string} notename - The note name (e.g., C, D, E, etc.).
  * @param {number} octave - The octave number.
+ * @param {string} temperament - The temperament used for pitch calculation.
+ * @param {number} [edo] - Number of steps per octave. When omitted, the
+ *     temperament's EDO is used (legacy behavior).
  * @returns {number} The numeric representation of the note.
+ * @example
+ * getNumber("C", 4, "equal")     // 12-EDO: 37
+ * getNumber("C", 4, "equal", 19) // 19-EDO: 57
+ * getNumber("C", 4, "equal", 31) // 31-EDO: 93
+ * getNumber("A", 4, "equal")     // 12-EDO: 69 (MIDI A4)
  */
-const getNumber = (notename, octave, temperament) => {
+const getNumber = (notename, octave, temperament, edo) => {
     // Converts a note, e.g., C, and octave to a number
-    const currentEDO = getCurrentEDO(temperament);
+    let currentEDO = edo;
+    if (!currentEDO) {
+        currentEDO = getCurrentEDO(temperament);
+    }
     let num;
     if (octave < 0) {
         num = 0;
@@ -6076,8 +6087,10 @@ const buildScale = (keySignature, edo) => {
 
     // Determine active EDO: an explicit parameter wins; otherwise fall back to
     // the global temperament state so existing callers keep working unchanged.
+    // Guard on falsy (not just undefined) so null/0/NaN never leak into the
+    // non-12 EDO branch and produce a degenerate step pattern.
     let currentEDO = edo;
-    if (currentEDO === undefined) {
+    if (!currentEDO) {
         currentEDO = 12;
         if (typeof globalActivity !== "undefined" && globalActivity?.logo?.synth?.inTemperament) {
             currentEDO = getCurrentEDO(globalActivity.logo.synth.inTemperament);
@@ -6199,9 +6212,21 @@ const buildScale = (keySignature, edo) => {
  * @param {string} direction - The direction of the step ("up" or "down").
  * @param {number} transposition - The transposition value.
  * @param {string} temperament - The temperament used for pitch calculation.
+ * @param {number} [edo] - Number of steps per octave. When omitted, the
+ *     temperament's own EDO is used (legacy behavior).
  * @returns {number} The step size in half-steps.
+ * @example
+ * // 12-EDO: C major scale steps
+ * _getStepSize("C major", "C", "up", 0, "equal")     // 2 (C→D)
+ * _getStepSize("C major", "E", "up", 0, "equal")     // 1 (E→F)
+ * // 19-EDO: C major scale steps (wider intervals)
+ * _getStepSize("C major", "C", "up", 0, "equal", 19) // 3 (C→D)
+ * _getStepSize("C major", "E", "up", 0, "equal", 19) // 2 (E→F)
+ * // 31-EDO: C major scale steps
+ * _getStepSize("C major", "C", "up", 0, "equal", 31) // 5 (C→D)
+ * _getStepSize("C major", "E", "up", 0, "equal", 31) // 3 (E→F)
  */
-const _getStepSize = (keySignature, pitch, direction, transposition, temperament) => {
+const _getStepSize = (keySignature, pitch, direction, transposition, temperament, edo) => {
     // Returns how many half-steps to the next note in this key.
     if (temperament === undefined) {
         temperament = "equal";
@@ -6215,10 +6240,16 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
         // For custom temperaments with ratios, fall through to ratio-based
         // step size calculation below.
     }
-    const currentEDO = getCurrentEDO(temperament);
+    let currentEDO = edo;
+    if (!currentEDO) {
+        currentEDO = getCurrentEDO(temperament);
+    }
 
     let thisPitch = pitch;
-    const obj = buildScale(keySignature);
+    // Thread the EDO into the scale builder so the scale/step data always
+    // matches the temperament being measured instead of the global
+    // temperament state (12-EDO stays byte-for-byte identical).
+    const obj = buildScale(keySignature, currentEDO);
     const scale = obj[0];
     const halfSteps = obj[1];
 
@@ -6308,53 +6339,79 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
     // Pitch is not in the consonant scale of this key, so we need to
     // shift up or down to the next note in the key.
     let offset = 0;
-    let startIndex = PITCHES.indexOf(thisPitch);
-    if (startIndex !== -1) {
-        // Convert starting 12-EDO index to approximate EDO step position
-        let edoStep = Math.round((startIndex * currentEDO) / PITCHES.length);
-        let guard = 0;
-        while (!scale.some(s => logicalEquals(s, thisPitch))) {
-            if (guard++ > currentEDO + 12) {
-                break;
+    if (currentEDO === 12) {
+        let startIndex = PITCHES.indexOf(thisPitch);
+        if (startIndex !== -1) {
+            // Convert starting 12-EDO index to approximate EDO step position
+            let edoStep = Math.round((startIndex * currentEDO) / PITCHES.length);
+            let guard = 0;
+            while (!scale.some(s => logicalEquals(s, thisPitch))) {
+                if (guard++ > currentEDO + 12) {
+                    break;
+                }
+                if (direction === "up") {
+                    edoStep += 1;
+                    offset += 1;
+                } else {
+                    edoStep -= 1;
+                    offset -= 1;
+                }
+                const posInOctave = ((edoStep % currentEDO) + currentEDO) % currentEDO;
+                const nameIndex =
+                    Math.round((posInOctave * PITCHES.length) / currentEDO) % PITCHES.length;
+                thisPitch = PITCHES[nameIndex];
             }
-            if (direction === "up") {
-                edoStep += 1;
-                offset += 1;
-            } else {
-                edoStep -= 1;
-                offset -= 1;
-            }
-            const posInOctave = ((edoStep % currentEDO) + currentEDO) % currentEDO;
-            const nameIndex =
-                Math.round((posInOctave * PITCHES.length) / currentEDO) % PITCHES.length;
-            thisPitch = PITCHES[nameIndex];
+
+            return offset;
         }
 
-        return offset;
-    }
+        startIndex = PITCHES2.indexOf(thisPitch);
+        if (startIndex !== -1) {
+            let edoStep = Math.round((startIndex * currentEDO) / PITCHES2.length);
+            let guard = 0;
+            while (!scale.some(s => logicalEquals(s, thisPitch))) {
+                if (guard++ > currentEDO + 12) {
+                    break;
+                }
+                if (direction === "up") {
+                    edoStep += 1;
+                    offset += 1;
+                } else {
+                    edoStep -= 1;
+                    offset -= 1;
+                }
+                const posInOctave = ((edoStep % currentEDO) + currentEDO) % currentEDO;
+                const nameIndex =
+                    Math.round((posInOctave * PITCHES2.length) / currentEDO) % PITCHES2.length;
+                thisPitch = PITCHES2[nameIndex];
+            }
 
-    startIndex = PITCHES2.indexOf(thisPitch);
-    if (startIndex !== -1) {
-        let edoStep = Math.round((startIndex * currentEDO) / PITCHES2.length);
-        let guard = 0;
-        while (!scale.some(s => logicalEquals(s, thisPitch))) {
-            if (guard++ > currentEDO + 12) {
-                break;
-            }
-            if (direction === "up") {
-                edoStep += 1;
-                offset += 1;
-            } else {
-                edoStep -= 1;
-                offset -= 1;
-            }
-            const posInOctave = ((edoStep % currentEDO) + currentEDO) % currentEDO;
-            const nameIndex =
-                Math.round((posInOctave * PITCHES2.length) / currentEDO) % PITCHES2.length;
-            thisPitch = PITCHES2[nameIndex];
+            return offset;
         }
+    } else {
+        // EDO-native fallback: walk the EDO's own note positions instead of
+        // the hardcoded 12-EDO PITCHES/PITCHES2 tables.
+        const edoNames = generateNoteNames(currentEDO);
+        let edoIndex = getEdoNoteNamePosition(thisPitch, currentEDO);
+        if (edoIndex !== -1) {
+            let guard = 0;
+            while (!scale.some(s => logicalEquals(s, thisPitch))) {
+                if (guard++ > currentEDO + 12) {
+                    break;
+                }
+                if (direction === "up") {
+                    edoIndex += 1;
+                    offset += 1;
+                } else {
+                    edoIndex -= 1;
+                    offset -= 1;
+                }
+                const posInOctave = ((edoIndex % currentEDO) + currentEDO) % currentEDO;
+                thisPitch = edoNames[posInOctave];
+            }
 
-        return offset;
+            return offset;
+        }
     }
 
     // Should never get here, but just in case.
@@ -6370,10 +6427,12 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
  * @param {string} pitch - The pitch (note name).
  * @param {number} transposition - The transposition value.
  * @param {string} temperament - The temperament used for pitch calculation.
+ * @param {number} [edo] - Number of steps per octave. When omitted, the
+ *     temperament's own EDO is used (legacy behavior).
  * @returns {number} The step size in half-steps.
  */
-const getStepSizeUp = (keySignature, pitch, transposition, temperament) => {
-    return _getStepSize(keySignature, pitch, "up", transposition, temperament);
+const getStepSizeUp = (keySignature, pitch, transposition, temperament, edo) => {
+    return _getStepSize(keySignature, pitch, "up", transposition, temperament, edo);
 };
 
 /**
@@ -6383,20 +6442,30 @@ const getStepSizeUp = (keySignature, pitch, transposition, temperament) => {
  * @param {string} pitch - The pitch (note name).
  * @param {number} transposition - The transposition value.
  * @param {string} temperament - The temperament used for pitch calculation.
+ * @param {number} [edo] - Number of steps per octave. When omitted, the
+ *     temperament's own EDO is used (legacy behavior).
  * @returns {number} The step size in half-steps.
  */
-const getStepSizeDown = (keySignature, pitch, transposition, temperament) => {
-    return _getStepSize(keySignature, pitch, "down", transposition, temperament);
+const getStepSizeDown = (keySignature, pitch, transposition, temperament, edo) => {
+    return _getStepSize(keySignature, pitch, "down", transposition, temperament, edo);
 };
 
 /**
  * Get the length of the mode (number of notes) for the given key signature.
  * @function
  * @param {string} keySignature - The key signature.
+ * @param {number} [edo] - Number of steps per octave. When omitted, the
+ *     global temperament state is used (legacy behavior).
  * @returns {number} The length of the mode.
+ * @example
+ * getModeLength("C major")          // 7 (always 7 for major)
+ * getModeLength("C major", 19)      // 7 (same mode, different EDO)
+ * getModeLength("C major", 31)      // 7
+ * getModeLength("C chromatic")      // 12 (chromatic scale)
+ * getModeLength("C chromatic", 19)  // 19 (19-note chromatic)
  */
-const getModeLength = keySignature => {
-    return buildScale(keySignature)[1].length;
+const getModeLength = (keySignature, edo) => {
+    return buildScale(keySignature, edo)[1].length;
 };
 
 /**
@@ -6406,9 +6475,18 @@ const getModeLength = keySignature => {
  * @param {number} scaleDegree - The scale degree.
  * @param {boolean} movable - Indicates if movable do is present.
  * @param {string} pitch - The pitch (note name).
+ * @param {number} [edo] - Number of steps per octave. When omitted, the
+ *     global temperament state is used (legacy behavior).
  * @returns {string|Array} The pitch corresponding to the scale degree or vice versa.
+ * @example
+ * // 12-EDO: degree → pitch
+ * scaleDegreeToPitchMapping("C major", 3, true, null)     // "E"
+ * // 19-EDO: degree → pitch (same note names, different frequencies)
+ * scaleDegreeToPitchMapping("C major", 3, true, null, 19) // "E"
+ * // 31-EDO: degree → pitch
+ * scaleDegreeToPitchMapping("C major", 5, true, null, 31) // "G"
  */
-const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch) => {
+const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo) => {
     if (pitch === null) {
         scaleDegree -= 1;
     }
@@ -6416,7 +6494,7 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch) =>
 
     // Info variables according to chosen mode
     const chosenMode = keySignatureToMode(keySignature);
-    const obj1 = buildScale(keySignature);
+    const obj1 = buildScale(keySignature, edo);
     const chosenModeScale = obj1[0];
     const chosenModePattern = obj1[1];
 
@@ -6433,7 +6511,7 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch) =>
 
     // if movable do is present just return the major/perfect tones
     if (movable) {
-        finalScale = buildScale(chosenMode[0] + " major")[0];
+        finalScale = buildScale(chosenMode[0] + " major", edo)[0];
 
         if (pitch === null) {
             return finalScale[scaleDegree];
@@ -6488,7 +6566,7 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch) =>
             }
         } else if (chosenModePattern.length < 7) {
             // Major scale of the choosen key is used as fallback
-            const majorScale = buildScale(chosenMode[0] + " major")[0];
+            const majorScale = buildScale(chosenMode[0] + " major", edo)[0];
 
             // according to the choosenModePattern, calculate defined scale degrees
             for (let i = 0; i < chosenModePattern.length; i++) {
@@ -6691,12 +6769,23 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch) =>
  * @function
  * @param {string} keySignature - The key signature.
  * @param {number} scaleDegree - The scale degree.
+ * @param {number} [edo] - Number of steps per octave. When omitted, the
+ *     global temperament state is used (legacy behavior).
  * @returns {string} The note corresponding to the scale degree in the current key signature.
+ * @example
+ * // 12-EDO: C major scale degrees
+ * nthDegreeToPitch("C major", 1)     // ["C", 0]
+ * nthDegreeToPitch("C major", 4)     // ["F", 0]
+ * // 19-EDO: same scale degrees, 19-EDO frequencies
+ * nthDegreeToPitch("C major", 1, 19) // ["C", 0]
+ * nthDegreeToPitch("C major", 4, 19) // ["F", 0]
+ * // 31-EDO
+ * nthDegreeToPitch("C major", 5, 31) // ["G", 0]
  */
-const nthDegreeToPitch = (keySignature, scaleDegree) => {
+const nthDegreeToPitch = (keySignature, scaleDegree, edo) => {
     // Returns note corresponding to scale degree in current key
     // signature. Used for movable solfege.
-    const scale = buildScale(keySignature)[0];
+    const scale = buildScale(keySignature, edo)[0];
     const modeLength = scale.length - 1;
 
     // Scale degree is specified as do === 1, re === 2, etc., so we need
@@ -6717,11 +6806,20 @@ const nthDegreeToPitch = (keySignature, scaleDegree) => {
  * @param {number} interval - The interval value.
  * @param {string} keySignature - The key signature.
  * @param {string} pitch - The pitch (note name).
+ * @param {number} [edo] - Number of steps per octave. When omitted, the
+ *     global temperament state is used (legacy behavior).
  * @returns {number} The relative interval value.
+ * @example
+ * // 12-EDO: interval from E in C major = 4 semitones (E→G#)
+ * getInterval(2, "C major", "E")     // 3 (E→F, 1 scale step)
+ * // 19-EDO: same scale step, different EDO spacing
+ * getInterval(2, "C major", "E", 19) // 2 (E→F in 19-EDO)
+ * // 31-EDO
+ * getInterval(2, "C major", "E", 31) // 3 (E→F in 31-EDO)
  */
-const getInterval = (interval, keySignature, pitch) => {
+const getInterval = (interval, keySignature, pitch, edo) => {
     // Step size interval based on the position (pitch) in the scale
-    const obj = buildScale(keySignature);
+    const obj = buildScale(keySignature, edo);
     const scale = obj[0];
     const halfSteps = obj[1];
     // Offet is used in the case that the pitch is not in the current scale.
@@ -7120,22 +7218,35 @@ const noteIsSolfege = note => {
 };
 
 /**
- * Get the solfege representation of a note string.
+ * Convert a note to its solfege representation.
  * @function
- * @param {string} note - The note string.
+ * @param {string} note - The note to convert.
  * @param {string} keySignature - The key signature.
- * @param {boolean} movable - Whether to use movable-do.
- * @param {string} [temperament] - The temperament to use (default "equal").
+ * @param {boolean} movable - Indicates if movable do is present.
+ * @param {string} temperament - The temperament used for pitch calculation.
+ * @param {number} [edo] - Number of steps per octave. When omitted, the
+ *     temperament's EDO (and the global temperament state for the scale
+ *     builder) is used (legacy behavior).
  * @returns {string} The solfege representation.
+ * @example
+ * // 12-EDO: C major
+ * getSolfege("E", "C major", true, "equal")     // "mi"
+ * // 19-EDO: same solfege names, different frequencies
+ * getSolfege("E", "C major", true, "equal", 19) // "mi"
+ * // 31-EDO
+ * getSolfege("G", "C major", true, "equal", 31) // "sol"
  */
-const getSolfege = (note, keySignature, movable, temperament) => {
+const getSolfege = (note, keySignature, movable, temperament, edo) => {
     if (noteIsSolfege(note)) {
         return note;
     }
 
     if (movable && keySignature) {
-        const currentEDO = getCurrentEDO(temperament);
-        const scaleResult = buildScale(keySignature);
+        let currentEDO = edo;
+        if (!currentEDO) {
+            currentEDO = getCurrentEDO(temperament);
+        }
+        const scaleResult = buildScale(keySignature, currentEDO);
         if (!scaleResult) return SOLFEGECONVERSIONTABLE[note];
 
         const scale = scaleResult[0];
