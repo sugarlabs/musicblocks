@@ -31,7 +31,8 @@ const {
     escapeHTML,
     unescapeHTML,
     deepClone,
-    isSafeUrl
+    isSafeUrl,
+    isUnsafeObjectKey
 } = require("../utils-logic.js");
 
 describe("Utility Logic Functions", () => {
@@ -336,6 +337,20 @@ describe("Utility Logic Functions", () => {
             expect(isSafeUrl("java\tscript:alert(1)")).toBe(false);
             expect(isSafeUrl("jav\rascript:alert(1)")).toBe(false);
             expect(isSafeUrl(" javascript:alert(1)")).toBe(false);
+        });
+    });
+
+    describe("isUnsafeObjectKey()", () => {
+        it("flags reserved prototype-related keys", () => {
+            expect(isUnsafeObjectKey("__proto__")).toBe(true);
+            expect(isUnsafeObjectKey("constructor")).toBe(true);
+            expect(isUnsafeObjectKey("prototype")).toBe(true);
+        });
+
+        it("allows ordinary keys", () => {
+            expect(isUnsafeObjectKey("myPlugin")).toBe(false);
+            expect(isUnsafeObjectKey("FLOWPLUGINS")).toBe(false);
+            expect(isUnsafeObjectKey("")).toBe(false);
         });
     });
 });

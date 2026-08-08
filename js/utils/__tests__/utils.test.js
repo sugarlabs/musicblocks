@@ -1162,6 +1162,23 @@ describe("processMacroData()", () => {
         expect(palettes.makePalettes).not.toHaveBeenCalled();
         spy.mockRestore();
     });
+
+    it("does not pollute Object.prototype when macroData contains a __proto__ key", () => {
+        const macroDict = {};
+        const palettes = { add: jest.fn(), makePalettes: jest.fn() };
+        const blocks = { addToMyPalette: jest.fn() };
+        const maliciousData = JSON.stringify({
+            __proto__: { polluted: true },
+            constructor: { polluted: true }
+        });
+
+        processMacroData(maliciousData, palettes, blocks, macroDict);
+
+        expect({}.polluted).toBeUndefined();
+        expect(Object.prototype.polluted).toBeUndefined();
+        expect(Object.prototype.hasOwnProperty.call(macroDict, "__proto__")).toBe(false);
+        expect(Object.prototype.hasOwnProperty.call(macroDict, "constructor")).toBe(false);
+    });
 });
 
 describe("prepareMacroExports()", () => {
