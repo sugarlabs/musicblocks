@@ -25,7 +25,7 @@
    nthDegreeToPitch, SHARP, FLAT, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    numberToPitch, ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
    keySignatureToMode, getInterval, EFFECTSNAMES, NANERRORMSG, frequencyToPitch,
-   MusicBlocks, Mouse, isCustomTemperament, getCurrentEDO
+    MusicBlocks, Mouse, isCustomTemperament, getCurrentEDO, parseNoteString
 */
 
 /*
@@ -690,9 +690,7 @@ function setupPitchActions(activity) {
             if (tur.singer.previousNotePlayed == null) {
                 return 0;
             } else {
-                let len = tur.singer.previousNotePlayed[0].length;
-                let pitch = tur.singer.previousNotePlayed[0].slice(0, len - 1);
-                let octave = parseInt(tur.singer.previousNotePlayed[0].slice(len - 1), 10);
+                let [pitch, octave] = parseNoteString(tur.singer.previousNotePlayed[0]);
                 let obj = [pitch, octave];
                 const previousValue = pitchToNumber(
                     obj[0],
@@ -701,9 +699,7 @@ function setupPitchActions(activity) {
                     activity.logo.synth.inTemperament
                 );
 
-                len = tur.singer.lastNotePlayed[0].length;
-                pitch = tur.singer.lastNotePlayed[0].slice(0, len - 1);
-                octave = parseInt(tur.singer.lastNotePlayed[0].slice(len - 1), 10);
+                [pitch, octave] = parseNoteString(tur.singer.lastNotePlayed[0]);
                 obj = [pitch, octave];
 
                 let delta =
@@ -789,8 +785,7 @@ function setupPitchActions(activity) {
             };
 
             if (tur.singer.lastNotePlayed !== null) {
-                const len = tur.singer.lastNotePlayed[0].length;
-                return _step(stepType, tur.singer.lastNotePlayed[0].slice(0, len - 1));
+                return _step(stepType, parseNoteString(tur.singer.lastNotePlayed[0])[0]);
             } else {
                 return _step(stepType, "G");
             }
