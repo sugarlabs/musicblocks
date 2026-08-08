@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global _, lazyLoad, HelpWidget, StatsWindow, JSEditor, getMacroExpansion, debugLog */
+/* global _, lazyLoad, HelpWidget, StatsWindow, JSEditor, getMacroExpansion, debugLog, FirstProjectTutorial */
 
 /* exported setupHelpController, HelpController */
 
@@ -82,6 +82,31 @@ class HelpController {
             window.widgetWindows.clear("help");
         }
         this._showKeyboardShortcuts();
+    }
+
+    /**
+     * Starts the interface tutorial walkthrough.
+     */
+    showInteractiveTutorial() {
+        if (window.widgetWindows?.isOpen("help")) {
+            window.widgetWindows.clear("help");
+        }
+        if (window.widgetWindows?.isOpen("keyboard-shortcuts")) {
+            window.widgetWindows.clear("keyboard-shortcuts");
+        }
+        if (typeof FirstProjectTutorial !== "undefined") {
+            new FirstProjectTutorial(this.activity).start();
+        } else {
+            console.error("FirstProjectTutorial is not loaded");
+        }
+    }
+
+    /**
+     * Opens the help widget on the Interface Tour card.
+     */
+    async openFirstProjectTutorial() {
+        await lazyLoad("widgets/help");
+        HelpWidget.openFirstProjectTutorial(this.activity);
     }
 
     /**
@@ -411,6 +436,8 @@ const setupHelpController = activity => {
     activity.showHelp = (...args) => controller.showHelp(...args);
     activity.showAboutPage = (...args) => controller.showAboutPage(...args);
     activity.showKeyboardShortcuts = (...args) => controller.showKeyboardShortcuts(...args);
+    activity.showInteractiveTutorial = (...args) => controller.showInteractiveTutorial(...args);
+    activity.openFirstProjectTutorial = (...args) => controller.openFirstProjectTutorial(...args);
     activity.toggleJSWindow = (...args) => controller.toggleJSEditor(...args);
     activity.doAnalytics = (...args) => controller.showStats(...args);
     activity._saveHelpBlocks = (...args) => controller.saveHelpBlocks(...args);
