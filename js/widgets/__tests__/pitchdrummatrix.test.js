@@ -211,6 +211,79 @@ describe("PitchDrumMatrix Widget", () => {
         });
     });
 
+    describe("block and node methods", () => {
+        test("clearBlocks resets the row and column block arrays", () => {
+            pdm._rowBlocks = [10, 20];
+            pdm._colBlocks = [30];
+
+            pdm.clearBlocks();
+
+            expect(pdm._rowBlocks).toEqual([]);
+            expect(pdm._colBlocks).toEqual([]);
+        });
+
+        test("addRowBlock appends a pitch block", () => {
+            pdm.addRowBlock(10);
+            pdm.addRowBlock(20);
+
+            expect(pdm._rowBlocks).toEqual([10, 20]);
+        });
+
+        test("addColBlock appends a drum block", () => {
+            pdm.addColBlock(30);
+            pdm.addColBlock(40);
+
+            expect(pdm._colBlocks).toEqual([30, 40]);
+        });
+
+        test("addNode adds new intersections", () => {
+            pdm.addNode(0, 1);
+            pdm.addNode(1, 0);
+
+            expect(pdm._blockMap).toEqual([
+                [0, 1],
+                [1, 0]
+            ]);
+        });
+
+        test("addNode ignores a duplicate intersection", () => {
+            pdm.addNode(0, 1);
+            pdm.addNode(0, 1);
+
+            expect(pdm._blockMap).toEqual([[0, 1]]);
+        });
+
+        test("removeNode marks a matching intersection as removed", () => {
+            pdm.addNode(0, 1);
+            pdm.addNode(1, 0);
+
+            pdm.removeNode(0, 1);
+
+            expect(pdm._blockMap).toEqual([
+                [-1, -1],
+                [1, 0]
+            ]);
+        });
+
+        test("removeNode leaves the map unchanged when nothing matches", () => {
+            pdm.addNode(0, 1);
+
+            pdm.removeNode(5, 5);
+
+            expect(pdm._blockMap).toEqual([[0, 1]]);
+        });
+    });
+
+    describe("_get_save_lock", () => {
+        test("returns the current save lock state", () => {
+            pdm._save_lock = false;
+            expect(pdm._get_save_lock()).toBe(false);
+
+            pdm._save_lock = true;
+            expect(pdm._get_save_lock()).toBe(true);
+        });
+    });
+
     // --- Playing State Tests ---
     describe("playing state", () => {
         test("should toggle playing state", () => {
