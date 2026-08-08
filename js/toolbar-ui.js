@@ -485,6 +485,22 @@ class ToolbarUI {
      * @param {Function} onclick - The onclick handler for the play icon.
      * @returns {void}
      */
+    _speakToolbarLabel(label) {
+        if (!label) return;
+        if (!("speechSynthesis" in window)) return;
+        if (typeof window.getA11ySpeakEnabled === "function" && !window.getA11ySpeakEnabled())
+            return;
+        try {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(label);
+            utterance.rate = 1;
+            utterance.pitch = 1;
+            window.speechSynthesis.speak(utterance);
+        } catch {
+            // Ignore speech synthesis errors
+        }
+    }
+
     renderPlayIcon(onclick) {
         const playIcon = docById("play");
         const stopIcon = docById("stop");
@@ -518,10 +534,8 @@ class ToolbarUI {
         };
 
         var tempClick = (playIcon.onclick = () => {
-            const hideMsgs = () => {
-                this.activity.hideMsgs();
-            };
             isPlayIconRunning = false;
+            this._speakToolbarLabel(_("Play"));
             onclick(this.activity);
             handleClick();
             stopIcon.style.color = this.stopIconColorWhenPlaying;
@@ -561,6 +575,7 @@ class ToolbarUI {
             }
         });
         stopIcon.onclick = () => {
+            this._speakToolbarLabel(_("Stop"));
             onclick(this.activity);
             stopIcon.style.color = "white";
             saveButton.disabled = false;
