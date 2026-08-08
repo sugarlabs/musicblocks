@@ -2324,9 +2324,11 @@ function Synth() {
                 future = 0.0;
             }
 
-            // Ensure synth is properly initialized
-            if (!tempSynth) {
-                console.warn("Synth not initialized, creating default synth");
+            // Ensure the requested instrument is properly initialized. It may be
+            // missing because all instruments are disposed on Stop, so reload it
+            // on demand instead of silently playing (or skipping) the note.
+            if (!tempSynth || !(instrumentName in instruments[turtle])) {
+                console.debug("Synth not initialized, loading " + instrumentName);
                 this.createDefaultSynth(turtle);
                 await this.loadSynth(turtle, instrumentName);
 
@@ -2336,6 +2338,17 @@ function Synth() {
                 }
 
                 tempSynth = instruments[turtle][instrumentName];
+                flag = instrumentsSource[instrumentName] ? instrumentsSource[instrumentName][0] : 0;
+
+                // Apply any cent adjustment to the freshly loaded sample
+                if (flag === 2 && tempSynth && tempSynth.playbackRate) {
+                    const sampleName = instrumentsSource[instrumentName][1];
+                    if (this.sampleCentAdjustments && this.sampleCentAdjustments[sampleName]) {
+                        const centAdjustment = this.sampleCentAdjustments[sampleName];
+                        const playbackRate = Math.pow(2, centAdjustment / 1200);
+                        tempSynth.playbackRate.value = playbackRate;
+                    }
+                }
             }
 
             // Final validation: ensure synth still exists and is valid
