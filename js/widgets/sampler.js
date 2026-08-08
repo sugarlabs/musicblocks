@@ -434,6 +434,19 @@ function SampleWidget() {
     };
 
     /**
+     * Detaches the pending change listener from the shared file chooser, if any.
+     * @private
+     * @returns {void}
+     */
+    this._removeFileChooserListener = () => {
+        if (this._fileChooser && this._fileChooserAction) {
+            this._fileChooser.removeEventListener("change", this._fileChooserAction);
+        }
+        this._fileChooser = null;
+        this._fileChooserAction = null;
+    };
+
+    /**
      * Initializes the sampler widget.
      * @param {Activity} activity - The activity instance.
      * @param {number} timbreBlock - The timbre block number.
@@ -544,7 +557,18 @@ function SampleWidget() {
             if (this._octavesWheel !== undefined) {
                 this._octavesWheel.removeWheel();
             }
+            for (const id in this.pitchAnalysers) {
+                const analyser = this.pitchAnalysers[id];
+                if (analyser) {
+                    for (const synth in instruments[0]) {
+                        instruments[0][synth].disconnect(analyser);
+                    }
+                    analyser.dispose();
+                }
+            }
             this.pitchAnalysers = {};
+
+            this._removeFileChooserListener();
 
             if (this._dropZone) {
                 this._dropZone.removeEventListener("dragover", this._dragOverHandler);
@@ -588,13 +612,20 @@ function SampleWidget() {
                 stopTuner();
                 const fileChooser = docById("myOpenAll");
 
-                const __readerAction = function (event) {
+                // The file chooser is shared and its change event never fires when
+                // the user cancels, so drop any listener left over from a previous
+                // click before adding a new one.
+                that._removeFileChooserListener();
+
+                const __readerAction = function () {
                     window.scroll(0, 0);
                     const sampleFile = fileChooser.files[0];
                     that.handleFiles(sampleFile);
-                    fileChooser.removeEventListener("change", __readerAction);
+                    that._removeFileChooserListener();
                 };
 
+                that._fileChooser = fileChooser;
+                that._fileChooserAction = __readerAction;
                 fileChooser.addEventListener("change", __readerAction, false);
                 fileChooser.focus();
                 fileChooser.click();

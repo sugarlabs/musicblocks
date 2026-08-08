@@ -29,7 +29,8 @@ global.cancelAnimationFrame = jest.fn();
 global.setTimeout = setTimeout;
 global.Tone = {
     Analyser: jest.fn(() => ({
-        connect: jest.fn()
+        connect: jest.fn(),
+        dispose: jest.fn()
     }))
 };
 global.requestAnimationFrame = jest.fn(() => 1);
@@ -771,6 +772,57 @@ describe("Sampler Widget", () => {
 
             await widget._tunerBtn.onclick();
             expect(mockActivity.logo.synth.startTuner).toHaveBeenCalledTimes(2);
+        });
+
+        test("onclose disposes the pitch analysers and disconnects the synths", () => {
+            widget.init(mockActivity, 1);
+            widget.originalSampleName = "test";
+            global.instruments[0] = {
+                "electronic synth": { connect: jest.fn(), disconnect: jest.fn() },
+                "customsample_test": { connect: jest.fn(), disconnect: jest.fn() }
+            };
+
+            widget.reconnectSynthsToAnalyser();
+            const analysers = Object.values(widget.pitchAnalysers);
+            expect(analysers).toHaveLength(2);
+
+            widgetWindow.onclose();
+
+            for (const analyser of analysers) {
+                expect(analyser.dispose).toHaveBeenCalled();
+                expect(global.instruments[0]["electronic synth"].disconnect).toHaveBeenCalledWith(
+                    analyser
+                );
+                expect(global.instruments[0].customsample_test.disconnect).toHaveBeenCalledWith(
+                    analyser
+                );
+            }
+            expect(widget.pitchAnalysers).toEqual({});
+        });
+
+        test("upload button does not stack change listeners when the picker is cancelled", () => {
+            widget.init(mockActivity, 1);
+            const uploadButton = widgetWindow._buttons.find(btn => btn.tip === "Upload sample");
+            const fileChooser = docById("myOpenAll");
+            Object.defineProperty(fileChooser, "files", {
+                value: [{ name: "sample.wav" }]
+            });
+            fileChooser.focus = jest.fn();
+            fileChooser.click = jest.fn();
+            window.scroll = jest.fn();
+            widget.handleFiles = jest.fn();
+
+            // Two clicks with a cancel in between must leave only one listener.
+            uploadButton.onclick();
+            uploadButton.onclick();
+            fileChooser.dispatchEvent(new Event("change"));
+            expect(widget.handleFiles).toHaveBeenCalledTimes(1);
+
+            // A listener left pending at close time is detached.
+            uploadButton.onclick();
+            widgetWindow.onclose();
+            fileChooser.dispatchEvent(new Event("change"));
+            expect(widget.handleFiles).toHaveBeenCalledTimes(1);
         });
 
         test("onclose does not call stopRecording/stopTuner when neither is active", () => {
