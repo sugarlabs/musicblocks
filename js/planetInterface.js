@@ -93,9 +93,15 @@ class PlanetInterface {
             this.iframe.style.display = "block";
             this.iframe.style.zIndex = "9999";
             try {
-                this.iframe.contentWindow.document.getElementById("local-tab").click();
+                const localTab = this.iframe.contentWindow.document.getElementById("local-tab");
+                if (!localTab) {
+                    throw new Error("local-tab not found");
+                }
+
+                localTab.click();
             } catch (e) {
                 console.error(e);
+                this.activity.errorMsg(_("Planet view is not ready yet."));
             }
         };
 
