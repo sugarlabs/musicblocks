@@ -1,0 +1,16 @@
+name: DCO Check
+on:
+  pull_requests:
+    types: [opened, synchorinze, reopened]
+
+
+jobs:
+  check-dco:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: DCO Check
+        uses: tim-actions/dco@v1   

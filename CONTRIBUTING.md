@@ -140,10 +140,24 @@ Follow these steps when contributing:
     npm test
     ```
 
+### Developer Certificate of Origin (DCO)
+
+All commits should be signed off using:
+
+```bash
+git commit -s -m "your commit message"
+```
+
+This adds a line such as:
+
+Signed-off-by: Your Name <your-email@example.com>
+
+If DCO enforcement is enabled, pull requests containing commits without a sign-off will fail the DCO check.
+
 4.  Commit with clear, descriptive messages:
 
     ```
-    git commit -m "docs: add AI contribution guidelines (Related to #XXXX)"
+    git commit -s -m "docs: add AI contribution guidelines (Related to #XXXX)"
     ```
 
 5.  Push your branch:
