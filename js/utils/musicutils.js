@@ -4488,6 +4488,11 @@ const numberToPitchSharp = (i, temperament) => {
  * @param {number} [edo] - Number of steps per octave. When omitted, the
  *     temperament's EDO is used (legacy behavior).
  * @returns {number} The numeric representation of the note.
+ * @example
+ * getNumber("C", 4, "equal")     // 12-EDO: 37
+ * getNumber("C", 4, "equal", 19) // 19-EDO: 57
+ * getNumber("C", 4, "equal", 31) // 31-EDO: 93
+ * getNumber("A", 4, "equal")     // 12-EDO: 69 (MIDI A4)
  */
 const getNumber = (notename, octave, temperament, edo) => {
     // Converts a note, e.g., C, and octave to a number
@@ -6201,6 +6206,16 @@ const buildScale = (keySignature, edo) => {
  * @param {number} [edo] - Number of steps per octave. When omitted, the
  *     temperament's own EDO is used (legacy behavior).
  * @returns {number} The step size in half-steps.
+ * @example
+ * // 12-EDO: C major scale steps
+ * _getStepSize("C major", "C", "up", 0, "equal")     // 2 (C→D)
+ * _getStepSize("C major", "E", "up", 0, "equal")     // 1 (E→F)
+ * // 19-EDO: C major scale steps (wider intervals)
+ * _getStepSize("C major", "C", "up", 0, "equal", 19) // 3 (C→D)
+ * _getStepSize("C major", "E", "up", 0, "equal", 19) // 2 (E→F)
+ * // 31-EDO: C major scale steps
+ * _getStepSize("C major", "C", "up", 0, "equal", 31) // 5 (C→D)
+ * _getStepSize("C major", "E", "up", 0, "equal", 31) // 3 (E→F)
  */
 const _getStepSize = (keySignature, pitch, direction, transposition, temperament, edo) => {
     // Returns how many half-steps to the next note in this key.
@@ -6433,6 +6448,12 @@ const getStepSizeDown = (keySignature, pitch, transposition, temperament, edo) =
  * @param {number} [edo] - Number of steps per octave. When omitted, the
  *     global temperament state is used (legacy behavior).
  * @returns {number} The length of the mode.
+ * @example
+ * getModeLength("C major")          // 7 (always 7 for major)
+ * getModeLength("C major", 19)      // 7 (same mode, different EDO)
+ * getModeLength("C major", 31)      // 7
+ * getModeLength("C chromatic")      // 12 (chromatic scale)
+ * getModeLength("C chromatic", 19)  // 19 (19-note chromatic)
  */
 const getModeLength = (keySignature, edo) => {
     return buildScale(keySignature, edo)[1].length;
@@ -6448,6 +6469,13 @@ const getModeLength = (keySignature, edo) => {
  * @param {number} [edo] - Number of steps per octave. When omitted, the
  *     global temperament state is used (legacy behavior).
  * @returns {string|Array} The pitch corresponding to the scale degree or vice versa.
+ * @example
+ * // 12-EDO: degree → pitch
+ * scaleDegreeToPitchMapping("C major", 3, true, null)     // "E"
+ * // 19-EDO: degree → pitch (same note names, different frequencies)
+ * scaleDegreeToPitchMapping("C major", 3, true, null, 19) // "E"
+ * // 31-EDO: degree → pitch
+ * scaleDegreeToPitchMapping("C major", 5, true, null, 31) // "G"
  */
 const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo) => {
     if (pitch === null) {
@@ -6735,6 +6763,15 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, ed
  * @param {number} [edo] - Number of steps per octave. When omitted, the
  *     global temperament state is used (legacy behavior).
  * @returns {string} The note corresponding to the scale degree in the current key signature.
+ * @example
+ * // 12-EDO: C major scale degrees
+ * nthDegreeToPitch("C major", 1)     // ["C", 0]
+ * nthDegreeToPitch("C major", 4)     // ["F", 0]
+ * // 19-EDO: same scale degrees, 19-EDO frequencies
+ * nthDegreeToPitch("C major", 1, 19) // ["C", 0]
+ * nthDegreeToPitch("C major", 4, 19) // ["F", 0]
+ * // 31-EDO
+ * nthDegreeToPitch("C major", 5, 31) // ["G", 0]
  */
 const nthDegreeToPitch = (keySignature, scaleDegree, edo) => {
     // Returns note corresponding to scale degree in current key
@@ -6763,6 +6800,13 @@ const nthDegreeToPitch = (keySignature, scaleDegree, edo) => {
  * @param {number} [edo] - Number of steps per octave. When omitted, the
  *     global temperament state is used (legacy behavior).
  * @returns {number} The relative interval value.
+ * @example
+ * // 12-EDO: interval from E in C major = 4 semitones (E→G#)
+ * getInterval(2, "C major", "E")     // 3 (E→F, 1 scale step)
+ * // 19-EDO: same scale step, different EDO spacing
+ * getInterval(2, "C major", "E", 19) // 2 (E→F in 19-EDO)
+ * // 31-EDO
+ * getInterval(2, "C major", "E", 31) // 3 (E→F in 31-EDO)
  */
 const getInterval = (interval, keySignature, pitch, edo) => {
     // Step size interval based on the position (pitch) in the scale
@@ -7165,16 +7209,23 @@ const noteIsSolfege = note => {
 };
 
 /**
- * Get the solfege representation of a note string.
+ * Convert a note to its solfege representation.
  * @function
- * @param {string} note - The note string.
+ * @param {string} note - The note to convert.
  * @param {string} keySignature - The key signature.
- * @param {boolean} movable - Whether to use movable-do.
- * @param {string} [temperament] - The temperament to use (default "equal").
+ * @param {boolean} movable - Indicates if movable do is present.
+ * @param {string} temperament - The temperament used for pitch calculation.
  * @param {number} [edo] - Number of steps per octave. When omitted, the
  *     temperament's EDO (and the global temperament state for the scale
  *     builder) is used (legacy behavior).
  * @returns {string} The solfege representation.
+ * @example
+ * // 12-EDO: C major
+ * getSolfege("E", "C major", true, "equal")     // "mi"
+ * // 19-EDO: same solfege names, different frequencies
+ * getSolfege("E", "C major", true, "equal", 19) // "mi"
+ * // 31-EDO
+ * getSolfege("G", "C major", true, "equal", 31) // "sol"
  */
 const getSolfege = (note, keySignature, movable, temperament, edo) => {
     if (noteIsSolfege(note)) {
