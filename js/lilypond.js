@@ -15,7 +15,7 @@
    _, toFraction, last, SHARP, FLAT, frequencyToPitch, NATURAL,
    DOUBLESHARP, DOUBLEFLAT, getScaleAndHalfSteps, NOTATIONTUPLETVALUE,
    NOTATIONNOTE, NOTATIONDURATION, NOTATIONROUNDDOWN, NOTATIONSTACCATO,
-   NOTATIONDOTCOUNT
+   NOTATIONDOTCOUNT, getCurrentEDO
  */
 
 /*
@@ -23,8 +23,9 @@
      - lib/wheelnav
          slicePath, wheelnav
      
-     - js/utils/musicutils.js
-         toFraction, frequencyToPitch, NATURAL, DOUBLESHARP, DOUBLEFLAT, getScaleAndHalfSteps
+      - js/utils/musicutils.js
+          toFraction, frequencyToPitch, NATURAL, DOUBLESHARP, DOUBLEFLAT, getScaleAndHalfSteps,
+          getCurrentEDO
      
      - js/utils/utils.js
          _, last
@@ -62,7 +63,7 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
 
         // Convert frequencies here.
         if (typeof note === "number") {
-            const pitchObj = frequencyToPitch(note);
+            const pitchObj = frequencyToPitch(note, logo.synth.inTemperament);
             note = pitchObj[0] + pitchObj[1];
         }
 
@@ -269,63 +270,73 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                     ) {
                         logo.notationNotes[turtle] += " \\key " + key + " \\" + mode + "\n";
                     } else {
-                        obj = getScaleAndHalfSteps(keySignature);
-                        // Check to see if it is possible to construct the mode.
-                        // freygish = #`((0 . ,NATURAL) (1 . ,FLAT) (2 . ,NATURAL)
-                        // (3 . ,NATURAL) (4 . ,NATURAL) (5 . ,FLAT) (6 . ,FLAT))
-                        let modeDef = "\n" + mode.replace(/ /g, "_") + " = #`(";
-                        let prevNote = "";
-                        let n,
-                            nn = -1;
-                        for (let ii = 0; ii < obj[1].length; ii++) {
-                            if (obj[1][ii] !== "") {
-                                // Are we repeating notes, e.g., Db and D?
-                                if (obj[0][ii].substr(0, 1) === prevNote) {
-                                    modeDef = "";
-                                    break;
-                                } else {
-                                    prevNote = obj[0][ii].substr(0, 1);
-                                }
-
-                                n = ["C", "D", "E", "F", "G", "A", "B"].indexOf(
-                                    obj[0][ii].substr(0, 1)
-                                );
-
-                                // Did we skip any notes?
-                                if (n > nn) {
-                                    if (n - nn > 1) {
-                                        for (let j = nn + 1; j < n; j++) {
-                                            modeDef += "(" + j + " . ,NATURAL) ";
-                                        }
-                                    }
-
-                                    nn = n;
-
-                                    if (obj[0][ii].length === 1) {
-                                        modeDef += "(" + n + " . ,NATURAL) ";
-                                    } else {
-                                        if (obj[0][ii].substr(1, 1) === FLAT) {
-                                            modeDef += "(" + n + " . ,FLAT) ";
-                                        } else {
-                                            modeDef += "(" + n + " . ,SHARP) ";
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        if (modeDef !== "") {
-                            if (n < 6) {
-                                for (let j = n + 1; j < 7; j++) {
-                                    modeDef += "(" + j + " . ,NATURAL) ";
-                                }
-                            }
-
-                            modeDef += ")\n";
-
-                            lilypond.freygish += modeDef;
+                        const currentEDO = getCurrentEDO(logo.synth.inTemperament);
+                        if (currentEDO !== 12) {
                             logo.notationNotes[turtle] +=
-                                " \\key " + key + " \\" + mode.replace(/ /g, "_") + "\n";
+                                '% Custom mode "' +
+                                mode +
+                                '" not supported in ' +
+                                currentEDO +
+                                "-EDO\n";
+                        } else {
+                            obj = getScaleAndHalfSteps(keySignature);
+                            // Check to see if it is possible to construct the mode.
+                            // freygish = #`((0 . ,NATURAL) (1 . ,FLAT) (2 . ,NATURAL)
+                            // (3 . ,NATURAL) (4 . ,NATURAL) (5 . ,FLAT) (6 . ,FLAT))
+                            let modeDef = "\n" + mode.replace(/ /g, "_") + " = #`(";
+                            let prevNote = "";
+                            let n,
+                                nn = -1;
+                            for (let ii = 0; ii < obj[1].length; ii++) {
+                                if (obj[1][ii] !== "") {
+                                    // Are we repeating notes, e.g., Db and D?
+                                    if (obj[0][ii].substr(0, 1) === prevNote) {
+                                        modeDef = "";
+                                        break;
+                                    } else {
+                                        prevNote = obj[0][ii].substr(0, 1);
+                                    }
+
+                                    n = ["C", "D", "E", "F", "G", "A", "B"].indexOf(
+                                        obj[0][ii].substr(0, 1)
+                                    );
+
+                                    // Did we skip any notes?
+                                    if (n > nn) {
+                                        if (n - nn > 1) {
+                                            for (let j = nn + 1; j < n; j++) {
+                                                modeDef += "(" + j + " . ,NATURAL) ";
+                                            }
+                                        }
+
+                                        nn = n;
+
+                                        if (obj[0][ii].length === 1) {
+                                            modeDef += "(" + n + " . ,NATURAL) ";
+                                        } else {
+                                            if (obj[0][ii].substr(1, 1) === FLAT) {
+                                                modeDef += "(" + n + " . ,FLAT) ";
+                                            } else {
+                                                modeDef += "(" + n + " . ,SHARP) ";
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (modeDef !== "") {
+                                if (n < 6) {
+                                    for (let j = n + 1; j < 7; j++) {
+                                        modeDef += "(" + j + " . ,NATURAL) ";
+                                    }
+                                }
+
+                                modeDef += ")\n";
+
+                                lilypond.freygish += modeDef;
+                                logo.notationNotes[turtle] +=
+                                    " \\key " + key + " \\" + mode.replace(/ /g, "_") + "\n";
+                            }
                         }
                     }
                     i += 2;

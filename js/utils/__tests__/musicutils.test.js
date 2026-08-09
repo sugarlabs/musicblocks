@@ -3703,3 +3703,29 @@ describe("_getStepSize custom temperament with ratios", () => {
         expect(_getStepSize("C major", "C", "down", 3, "testNoRatios")).toBe(3);
     });
 });
+
+describe("getStepSizeDown with custom temperament", () => {
+    beforeEach(() => {
+        addTemperamentToDictionary("testWithRatios19", {
+            pitchNumber: 19,
+            noteLabels: generateNoteNames(19),
+            ratios: Array.from({ length: 19 }, (_, i) => Math.pow(2, i / 19))
+        });
+    });
+
+    it("computes the real EDO-native step for a custom temperament with ratios (no shortcut)", () => {
+        const result = getStepSizeDown("C major", "D", 5, "testWithRatios19");
+        // The 19-EDO major scale has C -> D = 3 steps; the transposition
+        // shortcut (5) must NOT be returned, and neither may the 12-EDO step (2).
+        expect(result).not.toBe(-5);
+        expect(result).toBe(-3);
+    });
+
+    it("steps natively across multiple scale degrees in the custom temperament", () => {
+        // C# is NOT in the C major scale: the EDO-native fallback walk must
+        // step down one 19-EDO position (C# -> C) and report -1, not the
+        // proportional 12-EDO result (-2) produced by the PITCHES2 walk.
+        const result = getStepSizeDown("C major", "C#", 5, "testWithRatios19");
+        expect(result).toBe(-1);
+    });
+});
