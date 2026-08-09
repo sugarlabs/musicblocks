@@ -2729,6 +2729,56 @@ class Activity {
             setupGridRenderer(this);
             this.boundary = new Boundary(this.blocksContainer);
             this.blocks = new Blocks(this);
+            // PerfSense instrumentation: expose stage + blocks for external benchmark metrics
+            window.__mb = window.__mb || {};
+            window.__mb.blocks = this.blocks;
+            window.__mb.loadProject = function (blockArray) {
+                if (that.blocks && typeof that.blocks.loadNewBlocks === "function") {
+                    that.blocks.loadNewBlocks(blockArray);
+                }
+            };
+            var _mbExpose = function () {
+                window.__mb.stage = that.stage;
+            };
+            var _mbProj = new URLSearchParams(window.location.search).get("perfsenseProject");
+            if (_mbProj) {
+                fetch(_mbProj)
+                    .then(function (r) {
+                        return r.text();
+                    })
+                    .then(function (html) {
+                        var m = html.match(/<div class="code">([\s\S]*?)<\/div>/);
+                        if (m && that.blocks && typeof that.blocks.loadNewBlocks === "function") {
+                            try {
+                                that.blocks.loadNewBlocks(JSON.parse(m[1].trim()));
+                            } catch (e) {
+                                /* ignore */
+                            }
+                        }
+                        var _stable = 0,
+                            _last = -1;
+                        var _iv = setInterval(function () {
+                            var c =
+                                that.blocks && that.blocks.blockList
+                                    ? Object.keys(that.blocks.blockList).length
+                                    : 0;
+                            if (c === _last) {
+                                _stable++;
+                            } else {
+                                _stable = 0;
+                            }
+                            _last = c;
+                            if (_stable >= 3 && c > 100) {
+                                clearInterval(_iv);
+                                _mbExpose();
+                            }
+                        }, 1000);
+                        setTimeout(_mbExpose, 30000);
+                    })
+                    .catch(_mbExpose);
+            } else {
+                _mbExpose();
+            }
             this.palettes = new Palettes(this);
             this.palettes.init();
             this.logo = new Logo(this);
