@@ -1016,4 +1016,76 @@ describe("Blocks Foundation", () => {
             expect(forwardCallArgs[4]).toBeUndefined();
         });
     });
+
+    describe("SoundSpecifier Capability & Traversal Migration", () => {
+        let blocks;
+
+        beforeEach(() => {
+            blocks = new Blocks({});
+        });
+
+        it("_blockInStack matches using array of names and predicate function", () => {
+            blocks.blockList = [
+                { name: "start", connections: [null, 1] },
+                { name: "pitch", isSoundSpecifier: () => true, connections: [0] }
+            ];
+
+            expect(blocks._blockInStack(0, ["pitch"])).toBe(true);
+            expect(blocks._blockInStack(0, ["rest2"])).toBe(false);
+
+            expect(
+                blocks._blockInStack(0, blk => blk.isSoundSpecifier && blk.isSoundSpecifier())
+            ).toBe(true);
+            expect(blocks._blockInStack(0, blk => blk.name === "nonexistent")).toBe(false);
+        });
+
+        it("findFirstPitchBlock identifies soundSpecifier blocks and rest2 block", () => {
+            const pitchBlock = { name: "pitch", isSoundSpecifier: () => true, connections: [] };
+            const restBlock = { name: "rest2", isSoundSpecifier: () => false, connections: [] };
+            const forwardBlock = {
+                name: "forward",
+                isSoundSpecifier: () => false,
+                connections: [1]
+            };
+
+            blocks.blockList = [forwardBlock, pitchBlock, restBlock];
+
+            // Traversal from forward -> pitch
+            expect(blocks.findFirstPitchBlock(0)).toBe(1);
+
+            // Traversal for rest2
+            blocks.blockList[0].connections = [2];
+            expect(blocks.findFirstPitchBlock(0)).toBe(2);
+
+            // Traversal with no sound specifier or rest2
+            blocks.blockList[0].connections = [null];
+            expect(blocks.findFirstPitchBlock(0)).toBe(null);
+        });
+
+        it("_deletePitchBlocks extracts soundSpecifier blocks from note stack", () => {
+            const pitchBlock = {
+                name: "pitch",
+                isSoundSpecifier: () => true,
+                connections: [0, null]
+            };
+            const drumBlock = {
+                name: "playdrum",
+                isSoundSpecifier: () => true,
+                connections: [null]
+            };
+
+            blocks.blockList = [
+                { name: "note", isNoteContainer: () => true, connections: [null, 1] },
+                pitchBlock,
+                drumBlock
+            ];
+
+            blocks._extractBlock = jest.fn();
+
+            // Run _deletePitchBlocks starting on pitchBlock
+            blocks._deletePitchBlocks(1);
+
+            expect(blocks._extractBlock).toHaveBeenCalledWith(1, false);
+        });
+    });
 });

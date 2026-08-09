@@ -500,6 +500,7 @@ function setupDrumBlocks(activity) {
             /**
              * Set the palette, configure as a beginner block, and form the block.
              */
+            this.setCapability("soundSpecifier");
             this.setPalette("drum", activity);
             this.beginnerBlock(true);
 
