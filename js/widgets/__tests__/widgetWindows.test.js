@@ -764,6 +764,7 @@ describe("widgetWindows", () => {
             document.head.appendChild(style);
             document.documentElement.classList.add("play-only");
             nav.id = "toolbars";
+            nav.style.position = "fixed";
             nav.style.zIndex = "1001";
 
             try {
@@ -774,6 +775,7 @@ describe("widgetWindows", () => {
                 style.remove();
                 document.documentElement.classList.remove("play-only");
                 nav.removeAttribute("id");
+                nav.style.removeProperty("position");
                 nav.style.removeProperty("z-index");
             }
         });
