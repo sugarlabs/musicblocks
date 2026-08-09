@@ -572,16 +572,13 @@ describe("Arpeggio Widget", () => {
         });
 
         test("defaults to C4 when notesToPlay is empty", () => {
-            // The notesToPlay.length === 0 guard sets letter="C", octave=4
-            // getNote is called with those values before the crash at notesToPlay[0][1]
+            // The notesToPlay.length === 0 guard should provide a complete fallback note.
             arpeggio.notesToPlay = [];
             const cell = document.createElement("td");
 
-            try {
+            expect(() => {
                 arpeggio.__playCell(3, 0, cell, true);
-            } catch (_) {
-                // notesToPlay[0][1] read for duration crashes after getNote succeeds
-            }
+            }).not.toThrow();
 
             expect(global.getNote).toHaveBeenCalledWith(
                 "C",
@@ -592,6 +589,7 @@ describe("Arpeggio Widget", () => {
                 null,
                 expect.anything()
             );
+            expect(activityMock.logo.synth.trigger).toHaveBeenCalled();
         });
     });
 

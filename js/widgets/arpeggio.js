@@ -692,14 +692,9 @@ class Arpeggio {
      */
     __playCell(rowIndex, colIndex, cell, playNote) {
         if (playNote) {
-            let letter, octave;
-            if (this.notesToPlay.length === 0) {
-                letter = "C";
-                octave = 4;
-            } else {
-                letter = this.notesToPlay[0][0].slice(0, -1);
-                octave = Number(this.notesToPlay[0][0].substr(this.notesToPlay[0][0].length - 1));
-            }
+            const noteData = this.notesToPlay[0] || ["C4", 1 / 4];
+            const letter = noteData[0].slice(0, -1);
+            const octave = Number(noteData[0].slice(-1));
             const noteObj = getNote(
                 letter,
                 octave,
@@ -714,7 +709,7 @@ class Arpeggio {
             this._activity.logo.synth.trigger(
                 0,
                 normalizeNoteAccidentals(note),
-                this.notesToPlay[0][1],
+                noteData[1],
                 DEFAULTVOICE,
                 null,
                 null,
