@@ -245,10 +245,13 @@ class MeterWidget {
         let v1, c1, c2, c3;
         if (this._meterBlock !== null) {
             c1 = this.activity.blocks.blockList[this._meterBlock].connections[1];
-            v1 = c1 !== null ? this.activity.blocks.blockList[c1].value : 4;
+            v1 =
+                c1 !== null && this.activity.blocks.blockList[c1]
+                    ? this.activity.blocks.blockList[c1].value
+                    : 4;
             c2 = this.activity.blocks.blockList[this._meterBlock].connections[2];
-            c3 = this.activity.blocks.blockList[c2].connections[2];
-            if (c2 !== null) {
+            if (c2 !== null && this.activity.blocks.blockList[c2]) {
+                c3 = this.activity.blocks.blockList[c2].connections[2];
                 this._beatValue = this.activity.blocks.blockList[c2].value;
             }
 
@@ -292,19 +295,22 @@ class MeterWidget {
             divInput.children[0].value = Math.min(el.max, Math.max(el.min, el.value));
             divInput2.children[0].value = Math.min(el2.max, Math.max(el2.min, el2.value));
 
-            const bnBlk = this.activity.blocks.blockList[c1]; // number of beats
-            const bvBlk = this.activity.blocks.blockList[c3]; // beat value
-
             const bnValue = divInput.children[0].value;
             const bvValue = divInput2.children[0].value;
 
-            bnBlk.value = bnValue;
-            bnBlk.text.text = bnValue;
-            bnBlk.container.setChildIndex(bnBlk.text, bnBlk.container.children.length - 1);
+            const bnBlk = c1 !== null ? this.activity.blocks.blockList[c1] : null;
+            if (bnBlk) {
+                bnBlk.value = bnValue;
+                bnBlk.text.text = bnValue;
+                bnBlk.container.setChildIndex(bnBlk.text, bnBlk.container.children.length - 1);
+            }
 
-            bvBlk.value = bvValue;
-            bvBlk.text.text = bvValue;
-            bvBlk.container.setChildIndex(bvBlk.text, bvBlk.container.children.length - 1);
+            const bvBlk = c3 !== null ? this.activity.blocks.blockList[c3] : null;
+            if (bvBlk) {
+                bvBlk.value = bvValue;
+                bvBlk.text.text = bvValue;
+                bvBlk.container.setChildIndex(bvBlk.text, bvBlk.container.children.length - 1);
+            }
 
             this.activity.logo.runLogoCommands(widgetBlock);
         };
