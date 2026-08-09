@@ -1629,6 +1629,7 @@ function setupPitchBlocks(activity) {
         constructor() {
             //.TRANS: a measure of frequency: one cycle per second
             super("hertz", _("hertz"));
+            this.setCapability("soundSpecifier");
             this.setPalette("pitch", activity);
             this.beginnerBlock(true);
             this.setHelpString([
@@ -1732,6 +1733,7 @@ function setupPitchBlocks(activity) {
         constructor() {
             //.TRANS: a mapping of pitch to the 88 piano keys
             super("pitchnumber", _("pitch number"));
+            this.setCapability("soundSpecifier");
             this.setPalette("pitch", activity);
             this.beginnerBlock(true);
             this.setHelpString([
@@ -1816,6 +1818,7 @@ function setupPitchBlocks(activity) {
         constructor() {
             //.TRANS: a numeric mapping of the notes in an octave based on the musical mode
             super("nthmodalpitch", _("nth modal pitch"));
+            this.setCapability("soundSpecifier");
             this.setPalette("pitch", activity);
             this.piemenuValuesC1 = [7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6, -7];
             this.setHelpString([
@@ -1895,6 +1898,7 @@ function setupPitchBlocks(activity) {
         constructor() {
             //.TRANS: step some number of notes in current musical scale
             super("steppitch", _("scalar step") + " (+/–)");
+            this.setCapability("soundSpecifier");
             this.setPalette("pitch", activity);
             this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
             this.beginnerBlock(true);
@@ -1936,6 +1940,7 @@ function setupPitchBlocks(activity) {
         constructor() {
             //.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
             super("pitch", _("pitch"));
+            this.setCapability("soundSpecifier");
             this.setPalette("pitch", activity);
             this.beginnerBlock(true);
             this.setHelpString([
