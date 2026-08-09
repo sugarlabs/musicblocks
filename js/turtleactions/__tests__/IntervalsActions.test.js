@@ -69,6 +69,10 @@ describe("setupIntervalsActions", () => {
             "B#": 0
         };
 
+        global.pitchToNumber = jest.fn((note, octave, keySig, temperament) => {
+            return global.ALLNOTESTEP[note] || 0;
+        });
+
         global.GetNotesForInterval = jest.fn(() => ({
             firstNote: "C",
             secondNote: "G",

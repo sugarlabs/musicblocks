@@ -23,9 +23,9 @@
 /*
    globals Singer, pitchToNumber, getStepSizeUp, getStepSizeDown, calcOctave, last, getNote,
    nthDegreeToPitch, SHARP, FLAT, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
-   numberToPitch, ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
+   numberToPitch, ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP,
    keySignatureToMode, getInterval, EFFECTSNAMES, NANERRORMSG, frequencyToPitch,
-   MusicBlocks, Mouse, isCustomTemperament, getCurrentEDO
+   MusicBlocks, Mouse, isCustomTemperament, getCurrentEDO, getModeLength
 */
 
 /*
@@ -187,11 +187,7 @@ function setupPitchActions(activity) {
             const obj = keySignatureToMode(tur.singer.keySignature);
             let modeLength;
 
-            if (isCustomTemperament(activity.logo.synth.inTemperament)) {
-                modeLength = Singer.IntervalsActions.getTemperamentLength();
-            } else {
-                modeLength = MUSICALMODES[obj[1]].length;
-            }
+            modeLength = getModeLength(tur.singer.keySignature);
             let scaleDegree;
 
             // Reference position of the key note within the octave, in EDO steps (0-based).
@@ -237,7 +233,11 @@ function setupPitchActions(activity) {
                 scaleDegree = (number % modeLength) + 1;
             }
 
-            const [note, _offset] = nthDegreeToPitch(tur.singer.keySignature, scaleDegree);
+            const [note, _offset] = nthDegreeToPitch(
+                tur.singer.keySignature,
+                scaleDegree,
+                getCurrentEDO(temperament)
+            );
             let semitones = ref;
             // EDO-aware position lookup instead of hardcoded 12-EDO NOTESFLAT/NOTESSHARP.
             const notePos =
