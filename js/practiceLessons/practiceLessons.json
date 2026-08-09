@@ -10,6 +10,13 @@
                 "shortLabel": "Guardian",
                 "iconKey": "island",
                 "message": "Big Badge unlocked: Echo Island Guardian. The island can hear music again!"
+            },
+            "harmony_geometry_reef": {
+                "id": "geometry_reef_navigator",
+                "label": "Geometry Reef Navigator",
+                "shortLabel": "Navigator",
+                "iconKey": "island",
+                "message": "Big Badge unlocked: Geometry Reef Navigator. Lyra can now read the reef's shape-rhythm map!"
             }
         }
     },
@@ -408,6 +415,219 @@
                 }
             ],
             "bigBadgeId": "echo_island"
+        },
+        {
+            "level": 5,
+            "island": "harmony_geometry_reef",
+            "title": "The Shape Drum Reef",
+            "journal": {
+                "title": "Shape Drum Reef",
+                "island": "Harmony Geometry Reef",
+                "completeTitle": "Shape Drum Reef Complete",
+                "learned": ["360 degree turns", "Polygons", "Geometry and rhythm"]
+            },
+            "description": "\n      <section class=\"story-card\">\n        <p>\n          After the Body Beat Cove claps back, Captain Cadence's map folds into\n          three glowing outlines. Choon hears each shape like a rhythm: one whole\n          circle split into equal beats.\n        </p>\n        <div class=\"geometry-reef\" aria-label=\"Triangle square and pentagon reef map\">\n          <div class=\"geometry-orbit\"></div>\n          <div class=\"geometry-shape geometry-triangle\"></div>\n          <div class=\"geometry-shape geometry-square\"></div>\n          <div class=\"geometry-shape geometry-pentagon\"></div>\n          <div class=\"journal-page geometry-journal-page\">#5</div>\n        </div>\n        <p>\n          \"A full turn is <b>360 degrees</b>,\" Choon says. \"Split the turn into\n          sides, and the turtle draws the rhythm of a shape.\"\n        </p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Shape Rhythm</h4>\n        <p>\n          Use the loose <b>repeat</b>, <b>forward</b>, and <b>right</b> blocks to\n          draw a <b>square</b>: repeat <b>4</b>, forward <b>100</b>, right\n          <b>90</b>.\n        </p>\n        <p>\n          Then duplicate the idea to keep three separate <b>Start</b> programs:\n          a <b>triangle</b>, a <b>square</b>, and a <b>pentagon</b>.\n        </p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Hidden Shape Beats</h4>\n        <p>\n          When the three shapes appear, try one deeper geometry trick. The reef\n          hides badges in math, color, and new polygons.\n        </p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"repeatSides\">Repeat sides</button>\n          <button type=\"button\" data-secret-help=\"turnRight\">Turn right</button>\n          <button type=\"button\" data-secret-help=\"divideCircle\">Divide 360</button>\n          <button type=\"button\" data-secret-help=\"useBox\">Use box</button>\n          <button type=\"button\" data-secret-help=\"colorShape\">Change color</button>\n          <button type=\"button\" data-secret-help=\"extraPolygon\">Make another shape</button>\n        </div>\n      </section>\n    ",
+            "secretHelpCards": {
+                "repeatSides": {
+                    "title": "Repeat sides",
+                    "type": "block",
+                    "blockName": "repeat"
+                },
+                "turnRight": {
+                    "title": "Turn right",
+                    "type": "block",
+                    "blockName": "right"
+                },
+                "divideCircle": {
+                    "title": "Divide 360",
+                    "type": "block",
+                    "blockName": "divide"
+                },
+                "useBox": {
+                    "title": "Use box",
+                    "type": "block",
+                    "blockName": "storein"
+                },
+                "colorShape": {
+                    "title": "Change color",
+                    "type": "block",
+                    "blockName": "setcolor"
+                },
+                "extraPolygon": {
+                    "title": "Make another shape",
+                    "heading": "Try a new split of the circle",
+                    "description": "After triangle, square, and pentagon work, duplicate one Start program and change the repeat number and turn angle for another polygon. For example, 6 sides turns by 60 degrees because 360 divided by 6 is 60.<br>This unlocks the Polygon Explorer discovery because you used the same whole-circle idea beyond the required shapes.",
+                    "singlePage": true
+                }
+            },
+            "expected": {
+                "basicShapeSet": true
+            },
+            "incomplete": {
+                "title": "The Shape Reef Is Still Faint",
+                "message": "Choon sees part of the reef, but it needs three separate Start programs: triangle, square, and pentagon. Each one should use repeat, forward, and right with the correct turn."
+            },
+            "rewards": [
+                "Melody Fragment #5",
+                "Captain's Journal Page #5",
+                "Treasure Clue: The Heart of Harmony listens for circles split into equal shape beats."
+            ],
+            "badges": [
+                {
+                    "id": "shape_reef_builder",
+                    "label": "Shape Reef Builder",
+                    "shortLabel": "Shapes",
+                    "iconKey": "shape",
+                    "criterion": "completeBasicShapeSet",
+                    "message": "The reef lights up with triangle, square, and pentagon rhythms. Lyra saves the shape clue in Captain Cadence's journal."
+                },
+                {
+                    "id": "circle_divider",
+                    "label": "Circle Divider",
+                    "shortLabel": "Divide",
+                    "iconKey": "divide",
+                    "criterion": "usedGeometryDivision",
+                    "message": "Hidden Discovery: Circle Divider. You split 360 degrees like a whole note divided into beats."
+                },
+                {
+                    "id": "box_geometer",
+                    "label": "Box Geometer",
+                    "shortLabel": "Box",
+                    "iconKey": "box",
+                    "criterion": "usedBoxVariable",
+                    "message": "Hidden Discovery: Box Geometer. One stored number now guides the shape's repeat and turn."
+                },
+                {
+                    "id": "reef_colorist",
+                    "label": "Reef Colorist",
+                    "shortLabel": "Color",
+                    "iconKey": "color",
+                    "criterion": "changedShapeColor",
+                    "message": "Hidden Discovery: Reef Colorist. The geometry reef glows with a new color."
+                },
+                {
+                    "id": "polygon_explorer",
+                    "label": "Polygon Explorer",
+                    "shortLabel": "Polygon",
+                    "iconKey": "polygon",
+                    "criterion": "createdExtraPolygon",
+                    "message": "Secret Treasure Coin found. You drew a new shape Captain Cadence did not mark on the reef."
+                }
+            ],
+            "bigBadgeId": "harmony_geometry_reef"
+        },
+        {
+            "level": 6,
+            "island": "harmony_geometry_reef",
+            "title": "The Spinning Polyrhythm Lagoon",
+            "journal": {
+                "title": "Spinning Polyrhythm Lagoon",
+                "island": "Harmony Geometry Reef",
+                "completeTitle": "Polyrhythm Lagoon Complete",
+                "learned": ["Polyrhythms", "Duplets and triplets", "Sound-sync animation"]
+            },
+            "description": "\n      <section class=\"story-card\">\n        <p>\n          Beyond the Shape Drum Reef, Lyra finds a lagoon where two ripples dance\n          at once. One ripple taps in <b>2</b>. The other taps in <b>3</b>.\n          Choon whispers, \"That is a <b>polyrhythm</b>: two rhythms moving\n          together, meeting, and separating.\"\n        </p>\n        <div class=\"polyrhythm-lagoon\" aria-label=\"Two rhythm ripples and a spinning avatar\">\n          <div class=\"lagoon-ring lagoon-ring-two\"><span>2</span></div>\n          <div class=\"lagoon-ring lagoon-ring-three\"><span>3</span></div>\n          <div class=\"avatar-orb\"></div>\n          <div class=\"journal-page lagoon-journal-page\">#6</div>\n        </div>\n        <p>\n          Captain Cadence's page says: \"When the beats move differently, let an\n          avatar show the motion so your eyes can hear the rhythm too.\"\n        </p>\n      </section>\n\n      <section class=\"mission-card\">\n        <h4>Lagoon Mission</h4>\n        <p>\n          Use the two rhythm rulers on the screen: keep one as a <b>duplet</b>\n          rhythm and one as a <b>triplet</b> rhythm. Then connect an <b>avatar</b>\n          and an <b>on every note do</b> action so the music makes something move.\n        </p>\n        <p>\n          Press Play and listen for the moment when the 2-beat ripple and the\n          3-beat ripple meet again.\n        </p>\n      </section>\n\n      <section class=\"story-card\">\n        <h4>Hidden Ripple Tricks</h4>\n        <p>\n          The lagoon has extra marks for explorers who make the rhythm visible in\n          new ways.\n        </p>\n        <div class=\"explore-grid\">\n          <button type=\"button\" data-secret-help=\"dupletTriplet\">Duplet + triplet</button>\n          <button type=\"button\" data-secret-help=\"extraRipple\">New rhythm ripple</button>\n          <button type=\"button\" data-secret-help=\"everyNote\">Every note action</button>\n          <button type=\"button\" data-secret-help=\"avatar\">Avatar</button>\n          <button type=\"button\" data-secret-help=\"noteMotion\">Note-value motion</button>\n          <button type=\"button\" data-secret-help=\"pitchVoice\">Pitch voice</button>\n          <button type=\"button\" data-secret-help=\"turnMotion\">Turn motion</button>\n        </div>\n      </section>\n    ",
+            "secretHelpCards": {
+                "dupletTriplet": {
+                    "title": "Duplet + triplet",
+                    "type": "block",
+                    "blockName": "rhythm2"
+                },
+                "everyNote": {
+                    "title": "Every note action",
+                    "type": "block",
+                    "blockName": "everybeatdo"
+                },
+                "avatar": {
+                    "title": "Avatar",
+                    "type": "block",
+                    "blockName": "turtleshell"
+                },
+                "noteMotion": {
+                    "title": "Note-value motion",
+                    "heading": "Let notes control movement",
+                    "description": "Use a mouse note value or mouse notes played block inside the animation action. A short note can make a small turn, and a longer note can make a bigger turn. This helps the avatar show the rhythm instead of only playing it.",
+                    "singlePage": true
+                },
+                "pitchVoice": {
+                    "title": "Pitch voice",
+                    "type": "block",
+                    "blockName": "pitch"
+                },
+                "turnMotion": {
+                    "title": "Turn motion",
+                    "type": "block",
+                    "blockName": "right"
+                },
+                "extraRipple": {
+                    "title": "New rhythm ripple",
+                    "type": "block",
+                    "blockName": "stuplet"
+                }
+            },
+            "expected": {
+                "animatedPolyrhythm": true
+            },
+            "incomplete": {
+                "title": "The Lagoon Is Still Quiet",
+                "message": "Choon hears the 2-beat and 3-beat ripples, but the lagoon also needs animation. Connect an on every note do action and an avatar so the rhythm makes motion on the screen."
+            },
+            "rewards": [
+                "Melody Fragment #6",
+                "Captain's Journal Page #6",
+                "Treasure Clue: The Heart of Harmony appears when different beats move together without losing their own path."
+            ],
+            "badges": [
+                {
+                    "id": "lagoon_conductor",
+                    "label": "Lagoon Conductor",
+                    "shortLabel": "Lagoon",
+                    "iconKey": "polyrhythm",
+                    "criterion": "completeAnimatedPolyrhythm",
+                    "message": "The duplet and triplet ripples begin to spin together. Lyra adds the lagoon's moving rhythm to Captain Cadence's journal."
+                },
+                {
+                    "id": "extra_ripple_maker",
+                    "label": "Extra Ripple Maker",
+                    "shortLabel": "Ripple",
+                    "iconKey": "sync",
+                    "criterion": "createdExtraPolyrhythmDivisor",
+                    "message": "Hidden Discovery: Extra Ripple Maker. You added a rhythm ripple beyond the lagoon's 2 and 3 pattern."
+                },
+                {
+                    "id": "avatar_spark",
+                    "label": "Avatar Spark",
+                    "shortLabel": "Avatar",
+                    "iconKey": "avatar",
+                    "criterion": "usedAvatarAnimation",
+                    "message": "Hidden Discovery: Avatar Spark. The lagoon has a performer now."
+                },
+                {
+                    "id": "note_motion_mapper",
+                    "label": "Note Motion Mapper",
+                    "shortLabel": "Motion",
+                    "iconKey": "motion",
+                    "criterion": "usedNoteValueMotion",
+                    "message": "Hidden Discovery: Note Motion Mapper. Your animation listens to note values, just like Captain Cadence hinted."
+                },
+                {
+                    "id": "singing_ripple",
+                    "label": "Singing Ripple",
+                    "shortLabel": "Voice",
+                    "iconKey": "voice",
+                    "criterion": "createdPitchPolyrhythm",
+                    "message": "Hidden Discovery: Singing Ripple. You added a pitched voice to the moving rhythm."
+                },
+                {
+                    "id": "spin_choreographer",
+                    "label": "Spin Choreographer",
+                    "shortLabel": "Spin",
+                    "iconKey": "spin",
+                    "criterion": "changedAnimationTurn",
+                    "message": "Secret Treasure Coin found. Your avatar turns with the rhythm and shows the lagoon's phase shift."
+                }
+            ],
+            "bigBadgeId": "harmony_geometry_reef"
         }
     ]
 }

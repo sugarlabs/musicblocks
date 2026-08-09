@@ -17,6 +17,14 @@ function getActivity() {
 
 const PracticeValidator = {
     validate(problem) {
+        if (problem?.expected?.animatedPolyrhythm) {
+            return this.validateAnimatedPolyrhythm();
+        }
+
+        if (problem?.expected?.basicShapeSet) {
+            return this.validateBasicShapeSet();
+        }
+
         if (problem?.expected?.phraseMakerWorkflow) {
             return this.validatePhraseMakerLesson(problem);
         }
@@ -90,6 +98,10 @@ const PracticeValidator = {
                 return this.validateRhythmMakerWorkflow();
             case "completePhraseWorkflow":
                 return this.validatePhraseMakerLesson(problem);
+            case "completeBasicShapeSet":
+                return this.validateBasicShapeSet();
+            case "completeAnimatedPolyrhythm":
+                return this.validateAnimatedPolyrhythm();
             case "completedTwoPartForm":
                 return this.validateTwoPartForm();
             case "usedRepeatLoop":
@@ -117,6 +129,40 @@ const PracticeValidator = {
                 return this.hasChangedDrumSound();
             case "savedDrumMachine":
                 return this.hasSavedDrumMachineAction();
+            case "usedGeometryDivision":
+                return this.hasConnectedBlockNamed(["divide"]);
+            case "usedBoxVariable":
+                return this.hasConnectedBlockNamed([
+                    "namedbox",
+                    "storein",
+                    "storein2",
+                    "box",
+                    "box1",
+                    "box2"
+                ]);
+            case "changedShapeColor":
+                return this.hasConnectedBlockNamed(["setcolor", "sethue", "setshade", "setgrey"]);
+            case "createdExtraPolygon":
+                return this.hasPolygonOutsideSides(new Set([3, 4, 5]));
+            case "usedDupletTripletRhythms":
+                return this.hasRhythmDivisors(new Set([2, 3]));
+            case "createdExtraPolyrhythmDivisor":
+                return this.hasExtraRhythmDivisor(new Set([2, 3]));
+            case "usedAvatarAnimation":
+                return this.hasConnectedBlockNamed(["turtleshell"]);
+            case "usedEveryNoteAction":
+                return this.hasConnectedBlockNamed(["everybeatdo"]);
+            case "usedNoteValueMotion":
+                return this.hasConnectedBlockNamed([
+                    "turtlenote",
+                    "turtlenote2",
+                    "turtleelapsednotes",
+                    "elapsednotes"
+                ]);
+            case "createdPitchPolyrhythm":
+                return this.hasConnectedBlockNamed(["pitch", "settimbre"]);
+            case "changedAnimationTurn":
+                return this.hasConnectedBlockNamed(["right", "left", "setheading"]);
             default:
                 return false;
         }
@@ -311,6 +357,176 @@ const PracticeValidator = {
         });
     },
 
+    validateAnimatedPolyrhythm() {
+        return (
+            this.hasRhythmDivisors(new Set([2, 3])) &&
+            this.hasConnectedBlockNamed(["everybeatdo"]) &&
+            this.hasConnectedBlockNamed(["turtleshell"])
+        );
+    },
+
+    hasRhythmDivisors(requiredDivisors) {
+        const foundDivisors = this.getRhythmDivisors();
+
+        for (const divisor of requiredDivisors) {
+            if (!foundDivisors.has(divisor)) {
+                return false;
+            }
+        }
+
+        return true;
+    },
+
+    hasExtraRhythmDivisor(starterDivisors) {
+        for (const divisor of this.getRhythmDivisors()) {
+            if (!starterDivisors.has(divisor)) {
+                return true;
+            }
+        }
+
+        return false;
+    },
+
+    getRhythmDivisors() {
+        const blockList = this.getBlockList();
+        const divisors = new Set();
+
+        Object.values(blockList).forEach(block => {
+            if (!block || block.trash) return;
+
+            if (block.name === "rhythm2") {
+                const divideBlock = blockList[block.connections?.[2]];
+                const denominator = this.getNumericValue(divideBlock?.connections?.[2], blockList);
+
+                if (denominator) {
+                    divisors.add(denominator);
+                }
+            }
+
+            if (block.name === "stuplet") {
+                const tupletCount = this.getNumericValue(block.connections?.[1], blockList);
+
+                if (tupletCount) {
+                    divisors.add(tupletCount);
+                }
+            }
+        });
+
+        return divisors;
+    },
+
+    validateBasicShapeSet() {
+        const blockList = this.getBlockList();
+        const startBlocks = Object.values(blockList).filter(
+            block => block?.name === "start" && !block.trash
+        );
+        const remainingSides = new Set([3, 4, 5]);
+
+        startBlocks.forEach(startBlock => {
+            this.getStartBlockPolygonSides(startBlock, blockList).forEach(sides => {
+                remainingSides.delete(sides);
+            });
+        });
+
+        return remainingSides.size === 0;
+    },
+
+    hasPolygonOutsideSides(requiredSides) {
+        const blockList = this.getBlockList();
+        const startBlocks = Object.values(blockList).filter(
+            block => block?.name === "start" && !block.trash
+        );
+
+        return startBlocks.some(startBlock => {
+            for (const sides of this.getStartBlockPolygonSides(startBlock, blockList)) {
+                if (!requiredSides.has(sides)) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
+    },
+
+    getStartBlockPolygonSides(startBlock, blockList) {
+        const sides = new Set();
+        this.collectPolygonSides(startBlock.connections?.[1], blockList, sides);
+        return sides;
+    },
+
+    collectPolygonSides(blockId, blockList, sides, seen = new Set()) {
+        let currentId = this.unwrapHiddenFlow(blockId, blockList);
+        let guard = 0;
+
+        while (currentId && guard < 100) {
+            if (seen.has(currentId)) return;
+            seen.add(currentId);
+
+            const block = blockList[currentId];
+            if (!block || block.trash) return;
+
+            if (block.name === "repeat") {
+                const repeatCount = this.getNumericValue(block.connections?.[1], blockList);
+                const bodyId = block.connections?.[2];
+                const turnAngle = this.getFirstBlockArgumentValue(bodyId, blockList, "right");
+                const hasForward = this.flowContainsBlockNamed(bodyId, blockList, ["forward"]);
+
+                if (hasForward && repeatCount && this.isPolygonTurn(repeatCount, turnAngle)) {
+                    sides.add(repeatCount);
+                }
+
+                this.collectPolygonSides(bodyId, blockList, sides, seen);
+            }
+
+            currentId = this.getNextFlowId(block, blockList);
+            guard++;
+        }
+    },
+
+    isPolygonTurn(sides, angle) {
+        if (!sides || !angle) return false;
+
+        return Math.abs(360 / sides - angle) < 0.001;
+    },
+
+    getFirstBlockArgumentValue(blockId, blockList, name) {
+        let currentId = this.unwrapHiddenFlow(blockId, blockList);
+        let guard = 0;
+
+        while (currentId && guard < 100) {
+            const block = blockList[currentId];
+            if (!block || block.trash) return null;
+
+            if (block.name === name) {
+                return this.getNumericValue(block.connections?.[1], blockList);
+            }
+
+            currentId = this.getNextFlowId(block, blockList);
+            guard++;
+        }
+
+        return null;
+    },
+
+    getNumericValue(blockId, blockList) {
+        const block = blockList[blockId];
+        if (!block || block.trash) return null;
+
+        if (block.name === "number") {
+            return Number(block.value);
+        }
+
+        if (block.name === "divide") {
+            const numerator = this.getNumericValue(block.connections?.[1], blockList);
+            const denominator = this.getNumericValue(block.connections?.[2], blockList);
+            if (!denominator) return null;
+
+            return numerator / denominator;
+        }
+
+        return Number.isFinite(Number(block.value)) ? Number(block.value) : null;
+    },
+
     validatePhraseMakerLesson(problem) {
         const expected = problem?.expected || {};
 
@@ -411,6 +627,24 @@ const PracticeValidator = {
 
         visit(actionBlock.connections?.[2]);
         return count;
+    },
+
+    flowContainsBlockNamed(blockId, blockList, names) {
+        const blockNames = new Set(names);
+        let currentId = this.unwrapHiddenFlow(blockId, blockList);
+        let guard = 0;
+
+        while (currentId && guard < 100) {
+            const block = blockList[currentId];
+            if (!block || block.trash) return false;
+
+            if (blockNames.has(block.name)) return true;
+
+            currentId = this.getNextFlowId(block, blockList);
+            guard++;
+        }
+
+        return false;
     },
 
     hasChangedPhraseDrums() {
