@@ -573,6 +573,135 @@
     transform: rotate(-8deg);
 }
 
+/* CSS-only geometry reef art keeps Level 5 visual without adding image assets. */
+.geometry-reef {
+    position: relative;
+    min-height: 152px;
+    overflow: hidden;
+    border: 1px solid #b4d6c1;
+    border-radius: 8px;
+    background:
+        radial-gradient(circle at 50% 46%, rgba(255, 255, 255, 0.72) 0 26%, transparent 27%),
+        linear-gradient(180deg, #dff7ff 0 48%, #b7e4c7 49% 100%);
+}
+
+.geometry-orbit {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 112px;
+    height: 112px;
+    transform: translate(-50%, -50%);
+    border: 4px dashed #2a9d8f;
+    border-radius: 50%;
+}
+
+.geometry-shape {
+    position: absolute;
+}
+
+.geometry-triangle {
+    left: 26px;
+    bottom: 32px;
+    width: 0;
+    height: 0;
+    border-right: 28px solid transparent;
+    border-bottom: 48px solid #ffb703;
+    border-left: 28px solid transparent;
+}
+
+.geometry-square {
+    left: 50%;
+    bottom: 34px;
+    width: 50px;
+    height: 50px;
+    transform: translateX(-50%) rotate(8deg);
+    border: 5px solid #457b9d;
+    background: rgba(69, 123, 157, 0.18);
+}
+
+.geometry-pentagon {
+    right: 26px;
+    bottom: 34px;
+    width: 56px;
+    height: 54px;
+    background: #f4978e;
+    clip-path: polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%);
+    box-shadow: inset 0 0 0 5px rgba(138, 49, 44, 0.2);
+}
+
+.geometry-journal-page {
+    left: 50%;
+    bottom: 94px;
+    transform: translateX(-50%) rotate(-4deg);
+}
+
+/* CSS-only lagoon art keeps Level 6 animation story lightweight and themeable. */
+.polyrhythm-lagoon {
+    position: relative;
+    min-height: 164px;
+    overflow: hidden;
+    border: 1px solid #a9c7de;
+    border-radius: 8px;
+    background:
+        radial-gradient(circle at 50% 58%, rgba(255, 255, 255, 0.7) 0 16%, transparent 17%),
+        radial-gradient(circle at 34% 48%, rgba(77, 171, 247, 0.22) 0 24%, transparent 25%),
+        radial-gradient(circle at 65% 48%, rgba(42, 157, 143, 0.22) 0 28%, transparent 29%),
+        linear-gradient(180deg, #eaf8ff 0 42%, #bde0fe 43% 100%);
+}
+
+.lagoon-ring {
+    position: absolute;
+    top: 48%;
+    width: 86px;
+    height: 86px;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 900;
+}
+
+.lagoon-ring span {
+    position: relative;
+    z-index: 1;
+}
+
+.lagoon-ring-two {
+    left: 38px;
+    border: 5px solid #457b9d;
+    color: #234b63;
+}
+
+.lagoon-ring-three {
+    right: 38px;
+    border: 5px dashed #2a9d8f;
+    color: #126b61;
+}
+
+.avatar-orb {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 44px;
+    height: 44px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 50% 35%, #fff6cf 0 18%, transparent 19%),
+        linear-gradient(135deg, #ffca3a, #f4978e);
+    border: 4px solid rgba(98, 68, 18, 0.28);
+    box-shadow: 0 5px 14px rgba(28, 72, 91, 0.22);
+}
+
+.lagoon-journal-page {
+    left: 50%;
+    bottom: 14px;
+    transform: translateX(-50%) rotate(4deg);
+}
+
 .petal-song-map span {
     position: relative;
     min-height: 34px;
@@ -1260,6 +1389,52 @@
 
 .level-badge-remix::after {
     content: "Rx";
+}
+
+.level-badge-shape::after {
+    content: "Sh";
+}
+
+.level-badge-divide::after {
+    content: "360";
+    font-size: 10px;
+}
+
+.level-badge-box::after {
+    content: "Bx";
+}
+
+.level-badge-color::after {
+    content: "Co";
+}
+
+.level-badge-polygon::after {
+    content: "Pg";
+}
+
+.level-badge-polyrhythm::after {
+    content: "2:3";
+    font-size: 10px;
+}
+
+.level-badge-sync::after {
+    content: "Sy";
+}
+
+.level-badge-avatar::after {
+    content: "Av";
+}
+
+.level-badge-motion::after {
+    content: "Mo";
+}
+
+.level-badge-voice::after {
+    content: "Vo";
+}
+
+.level-badge-spin::after {
+    content: "Sp";
 }
 
 .level-badge-discovery::after {

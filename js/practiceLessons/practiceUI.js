@@ -157,7 +157,9 @@ const PracticeUI = {
             1: "hcb_level1.tb",
             2: "sakura.tb",
             3: "rhythm_maker_level3.tb",
-            4: "phrase_maker_level4.tb"
+            4: "phrase_maker_level4.tb",
+            5: "geometry_rhythm_level5.tb",
+            6: "animated_polyrhythms_level6.tb"
         };
 
         const file = projectFiles[level];
@@ -395,9 +397,13 @@ const PracticeUI = {
 
     showSuccessMessage(problem, newBadges, newBigBadges) {
         const completionBadge = problem.badges?.find(badge =>
-            ["completePattern", "completeRhythmWorkflow", "completePhraseWorkflow"].includes(
-                badge.criterion
-            )
+            [
+                "completePattern",
+                "completeRhythmWorkflow",
+                "completePhraseWorkflow",
+                "completeBasicShapeSet",
+                "completeAnimatedPolyrhythm"
+            ].includes(badge.criterion)
         );
         const messages = [
             completionBadge?.message || "The lesson song shines, and the island answers.",
@@ -489,7 +495,14 @@ const PracticeUI = {
 
         this.badgeCheckTimer = setInterval(() => {
             const hiddenBadges = PracticeValidator.assessBadges(problem).filter(
-                badge => badge.criterion !== "completePattern"
+                badge =>
+                    ![
+                        "completePattern",
+                        "completeRhythmWorkflow",
+                        "completePhraseWorkflow",
+                        "completeBasicShapeSet",
+                        "completeAnimatedPolyrhythm"
+                    ].includes(badge.criterion)
             );
             const newBadges = PracticeManager.awardLevelBadges(problem, hiddenBadges);
 
