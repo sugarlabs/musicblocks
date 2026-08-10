@@ -27,7 +27,8 @@ describe("OrnamentActions", () => {
         beginSlurCalls,
         endSlurCalls,
         mouseMB,
-        listenerFunctions;
+        listenerFunctions,
+        errorMsgCalls;
 
     beforeEach(() => {
         dispatchCalls = [];
@@ -46,9 +47,12 @@ describe("OrnamentActions", () => {
                 neighborNoteValue: []
             }
         };
+        global._ = msg => msg;
+        errorMsgCalls = [];
         activity = {
             turtles: { ithTurtle: () => turtle },
             blocks: { blockList: { 1: {}, 2: {} } },
+            errorMsg: (msg, blk) => errorMsgCalls.push({ msg, blk }),
             logo: {
                 setDispatchBlock: (blk, idx, name) =>
                     dispatchCalls.push({ blk, turtleIndex: idx, listenerName: name }),
@@ -120,6 +124,15 @@ describe("OrnamentActions", () => {
                 });
             }
         );
+
+        test("dispatches errorMsg when staccato value is zero or invalid", () => {
+            [0, null, undefined, NaN, "invalid"].forEach(val => {
+                const initialStaccato = [...turtle.singer.staccato];
+                Singer.OrnamentActions.setStaccato(val, 0, 1);
+                expect(errorMsgCalls.length).toBeGreaterThan(0);
+                expect(turtle.singer.staccato).toEqual(initialStaccato);
+            });
+        });
     });
 
     describe("setSlur", () => {
@@ -205,6 +218,15 @@ describe("OrnamentActions", () => {
                 });
             }
         );
+
+        test("dispatches errorMsg when slur value is zero or invalid", () => {
+            [0, null, undefined, NaN, "invalid"].forEach(val => {
+                const initialStaccato = [...turtle.singer.staccato];
+                Singer.OrnamentActions.setSlur(val, 0, 1);
+                expect(errorMsgCalls.length).toBeGreaterThan(0);
+                expect(turtle.singer.staccato).toEqual(initialStaccato);
+            });
+        });
     });
 
     describe("doNeighbor", () => {
