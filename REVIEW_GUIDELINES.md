@@ -33,6 +33,7 @@
 - Check whether failures are pre-existing or introduced by this PR.
 - Verify that mock property names in tests match the source code.
 - Thoroughly check folder structure especially for tests — new test files are sometimes created when tests could have been added to existing files instead (e.g. `js/__tests__/` and `js/widgets/__tests__/` are different).
+- When a PR adds a new test or CI path, or moves or removes a directory, check whether `.github/CODEOWNERS` needs updating.
 - If the PR description lists regression-testing steps, spot-check that they were actually followed.
 
   **Security and approval**
