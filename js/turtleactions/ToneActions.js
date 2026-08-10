@@ -135,11 +135,13 @@ function setupToneActions(activity) {
             if (intensity < 1 || intensity > 100) {
                 activity.errorMsg(_("Vibrato intensity must be between 1 and 100."), blk);
                 activity.logo.stopTurtle = true;
+                return;
             }
 
             if (rate <= 0) {
                 activity.errorMsg(_("Vibrato rate must be greater than 0."), blk);
                 activity.logo.stopTurtle = true;
+                return;
             }
 
             const tur = activity.turtles.ithTurtle(turtle);
