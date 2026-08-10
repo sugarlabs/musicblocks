@@ -63,8 +63,6 @@
 */
 // Constants moved to js/block-constants.js
 
-const PITCHBLOCKS = ["pitch", "steppitch", "hertz", "pitchnumber", "nthmodalpitch", "playdrum"];
-
 /**
  * Blocks holds the list of blocks and most of the block-associated
  * methods, since most block manipulations are inter-block.
@@ -1559,12 +1557,12 @@ class Blocks {
                 }
 
                 const nextBlock = last(this.blockList[thisBlock].connections);
-                if (PITCHBLOCKS.includes(this.blockList[thisBlock].name)) {
+                if (this.blockList[thisBlock]?.isSoundSpecifier?.()) {
                     this._extractBlock(thisBlock, false);
                 } else if (["flat", "sharp"].includes(this.blockList[thisBlock].name)) {
                     /** The pitch block might be inside a sharp or flat block. */
                     const b = this.blockList[thisBlock].connections[1];
-                    if (this._blockInStack(b, PITCHBLOCKS)) {
+                    if (this._blockInStack(b, blk => blk?.isSoundSpecifier?.())) {
                         this._extractBlock(thisBlock, false);
                     }
                 }
@@ -2200,11 +2198,15 @@ class Blocks {
          * @private
          * @returns boolean
          */
-        this._blockInStack = (thisBlock, names) => {
-            /** Is there a block of any of these names in this stack? */
+        this._blockInStack = (thisBlock, namesOrPredicate) => {
+            /** Is there a block of any of these names/predicates in this stack? */
             let counter = 0;
             while (thisBlock !== null) {
-                if (names.includes(this.blockList[thisBlock].name)) {
+                const matched =
+                    typeof namesOrPredicate === "function"
+                        ? namesOrPredicate(this.blockList[thisBlock])
+                        : namesOrPredicate.includes(this.blockList[thisBlock].name);
+                if (matched) {
                     return true;
                 }
 
@@ -4087,7 +4089,7 @@ class Blocks {
                 return null;
             }
 
-            if (PITCHBLOCKS.includes(this.blockList[blk].name)) {
+            if (this.blockList[blk]?.isSoundSpecifier?.()) {
                 return blk;
             } else if (this.blockList[blk].name === "rest2") {
                 return blk;

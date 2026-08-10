@@ -2062,6 +2062,14 @@ class Block {
     }
 
     /**
+     * Checks if the block specifies a sound element (pitch, frequency, or drum).
+     * @returns {boolean} - True if the block has soundSpecifier capability.
+     */
+    isSoundSpecifier() {
+        return this.hasCapability("soundSpecifier");
+    }
+
+    /**
      * Checks if the block derives its visible inline label from its value.
      * @returns {boolean} - True if the block has value-driven label behavior.
      */

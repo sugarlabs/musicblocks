@@ -38,6 +38,7 @@
     --color-info: #3b82f6;
     --color-info-bg: #dbeafe;
     --color-notification-bg: #1d4ed8;
+    --color-notification-text: #ffffff;
 
     /* =========================================================================
      Spacing (Base 4px scale)
@@ -113,6 +114,7 @@ body.dark {
     --color-brand-primary: #60a5fa;
     --color-brand-primary-hover: #3b82f6;
     --color-notification-bg: #1d4ed8;
+    --color-notification-text: #ffffff;
     --color-brand-secondary: #a78bfa;
 
     --color-selector-bg: #64b5f6;
@@ -150,6 +152,7 @@ body.highcontrast {
     --color-brand-primary: #ffff00;
     --color-brand-primary-hover: #ffffff;
     --color-notification-bg: #0000ff;
+    --color-notification-text: #ffffff;
     --color-brand-secondary: #00ffff;
 
     --color-selector-bg: #00ffff;

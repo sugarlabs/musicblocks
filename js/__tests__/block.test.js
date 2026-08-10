@@ -241,6 +241,21 @@ describe("Block Foundation", () => {
             expect(block.isNoteContainer()).toBe(false);
         });
 
+        it("isSoundSpecifier() should return true from capability metadata", () => {
+            mockProtoBlock.capabilities.soundSpecifier = true;
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.isSoundSpecifier()).toBe(true);
+        });
+
+        it("isSoundSpecifier() should return false for ordinary blocks", () => {
+            mockProtoBlock.name = "forward";
+            mockProtoBlock.capabilities = Object.create(null);
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.isSoundSpecifier()).toBe(false);
+        });
+
         it("hasValueDrivenLabel() should return true from capability metadata", () => {
             mockProtoBlock.capabilities.valueDrivenLabel = true;
 
