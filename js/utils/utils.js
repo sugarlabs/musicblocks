@@ -1036,17 +1036,86 @@ let prepareMacroExports = (name, stack, macroDict) => {
 };
 
 // Camera functionality module
-// Encapsulates camera-related operations for video/image capture
+// Encapsulates camera-related operations for video/image capture.
+// All interval/listener lifecycle state lives here (not in doUseCamera's
+// closures) so that repeated doUseCamera(...) calls can never accumulate
+// more than one active interval or one active canplay listener.
 const CameraManager = {
     isSetup: false,
     canPlayHandler: null,
     intervalId: null,
+    // Tracks the exact element a listener was attached to, so cleanup always
+    // targets the right node even if #camVideo is ever replaced in the DOM.
+    listenerVideoElement: null,
 
     /**
-     * Resets the camera setup state
+     * Starts the capture interval if one isn't already running. Idempotent:
+     * if a capture interval is already active, this is a no-op that returns
+     * the existing interval id, rather than clearing and restarting it.
+     *
+     * This matters when doUseCamera is invoked rapidly and repeatedly (e.g.
+     * from inside a "forever" loop): clearing and restarting the interval on
+     * every call would cancel it before it ever gets a chance to fire,
+     * meaning draw() would never run and no frame would ever be captured.
+     * @param {function} draw - callback invoked on each tick
+     * @param {number} periodMs - interval period in milliseconds
+     * @returns {number} the active interval id
+     */
+    startCapture(draw, periodMs = 100) {
+        if (this.intervalId !== null) {
+            return this.intervalId;
+        }
+        this.intervalId = window.setInterval(draw, periodMs);
+        return this.intervalId;
+    },
+
+    /**
+     * Stops the capture interval if one is running. Safe to call when no
+     * interval is active (idempotent).
+     */
+    stopCapture() {
+        if (this.intervalId !== null) {
+            window.clearInterval(this.intervalId);
+            this.intervalId = null;
+        }
+    },
+
+    /**
+     * Attaches a canplay handler to a video element, first removing any
+     * previously attached handler (from this element or a prior one).
+     * Idempotent: calling this repeatedly never leaves more than one
+     * listener registered.
+     * @param {HTMLVideoElement} video
+     * @param {function} handler
+     */
+    setCanplayListener(video, handler) {
+        this.clearCanplayListener();
+        video.addEventListener("canplay", handler, false);
+        this.canPlayHandler = handler;
+        this.listenerVideoElement = video;
+    },
+
+    /**
+     * Removes the currently tracked canplay handler from the element it was
+     * actually attached to. Safe to call when no listener is active.
+     */
+    clearCanplayListener() {
+        if (this.canPlayHandler && this.listenerVideoElement) {
+            this.listenerVideoElement.removeEventListener("canplay", this.canPlayHandler, false);
+        }
+        this.canPlayHandler = null;
+        this.listenerVideoElement = null;
+    },
+
+    /**
+     * Resets the camera setup state and tears down any active interval or
+     * listener. Called on doStopVideoCam so a Stop always returns to a
+     * clean slate before the next Camera/Video block run.
      */
     reset() {
         this.isSetup = false;
+        this.stopCapture();
+        this.clearCanplayListener();
     }
 };
 
@@ -1082,6 +1151,15 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
         turtles.getTurtle(turtle).doShowImage(args[0], data);
     }
 
+    function startCaptureOrDraw() {
+        if (isVideo) {
+            cameraID = CameraManager.startCapture(draw, 100);
+            setCameraID(cameraID);
+        } else {
+            draw();
+        }
+    }
+
     if (!CameraManager.isSetup) {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             errorMsg("Your browser does not support the webcam");
@@ -1103,21 +1181,7 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
     } else {
         streaming = true;
         video.play();
-        if (isVideo) {
-            if (CameraManager.intervalId !== null) {
-                window.clearInterval(CameraManager.intervalId);
-                CameraManager.intervalId = null;
-            }
-            cameraID = window.setInterval(draw, 100);
-            CameraManager.intervalId = cameraID;
-            setCameraID(cameraID);
-        } else {
-            draw();
-        }
-    }
-
-    if (CameraManager.canPlayHandler) {
-        video.removeEventListener("canplay", CameraManager.canPlayHandler, false);
+        startCaptureOrDraw();
     }
 
     function handleCanPlay() {
@@ -1128,24 +1192,11 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
             canvas.setAttribute("width", w);
             canvas.setAttribute("height", h);
             streaming = true;
-
-            if (isVideo) {
-                if (CameraManager.intervalId !== null) {
-                    window.clearInterval(CameraManager.intervalId);
-                    CameraManager.intervalId = null;
-                }
-                cameraID = window.setInterval(draw, 100);
-                CameraManager.intervalId = cameraID;
-                setCameraID(cameraID);
-            } else {
-                draw();
-            }
+            startCaptureOrDraw();
         }
     }
 
-    CameraManager.canPlayHandler = handleCanPlay;
-
-    video.addEventListener("canplay", CameraManager.canPlayHandler, false);
+    CameraManager.setCanplayListener(video, handleCanPlay);
 };
 
 /**
@@ -1369,6 +1420,9 @@ if (typeof module !== "undefined" && module.exports) {
         prepareMacroExports,
         processPluginData,
         processMacroData,
-        announceToScreenReader
+        announceToScreenReader,
+        doUseCamera,
+        doStopVideoCam,
+        CameraManager
     };
 }
