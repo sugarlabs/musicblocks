@@ -2324,10 +2324,14 @@ function Synth() {
                 future = 0.0;
             }
 
-            // Ensure synth is properly initialized
-            if (!tempSynth) {
-                console.warn("Synth not initialized, creating default synth");
-                this.createDefaultSynth(turtle);
+            // Ensure the requested instrument is properly initialized. It may be
+            // missing because all instruments are disposed on Stop, so reload it
+            // on demand instead of silently playing (or skipping) the note.
+            if (!tempSynth || !(instrumentName in instruments[turtle])) {
+                console.debug("Synth not initialized, loading " + instrumentName);
+                if (!instruments[turtle]["electronic synth"]) {
+                    this.createDefaultSynth(turtle);
+                }
                 await this.loadSynth(turtle, instrumentName);
 
                 // Check if instruments were disposed while we were waiting
@@ -2336,6 +2340,30 @@ function Synth() {
                 }
 
                 tempSynth = instruments[turtle][instrumentName];
+                flag = instrumentsSource[instrumentName] ? instrumentsSource[instrumentName][0] : 0;
+
+                // Wait for the sample buffer to finish decoding so the reloaded
+                // instrument is audible on the first trigger after a Stop.
+                // Tone.js exposes buffer readiness as a boolean `loaded` flag (it
+                // is not a promise), so wait on the global download queue, like
+                // _performNotes() does, when the sample is not ready yet.
+                if (tempSynth && typeof tempSynth.loaded === "boolean" && !tempSynth.loaded) {
+                    try {
+                        await Tone.ToneAudioBuffer.loaded();
+                    } catch (e) {
+                        console.debug("Error waiting for sample to load:", e);
+                    }
+                }
+
+                // Apply any cent adjustment to the freshly loaded sample
+                if (flag === 2 && tempSynth && tempSynth.playbackRate) {
+                    const sampleName = instrumentsSource[instrumentName][1];
+                    if (this.sampleCentAdjustments && this.sampleCentAdjustments[sampleName]) {
+                        const centAdjustment = this.sampleCentAdjustments[sampleName];
+                        const playbackRate = Math.pow(2, centAdjustment / 1200);
+                        tempSynth.playbackRate.value = playbackRate;
+                    }
+                }
             }
 
             // Final validation: ensure synth still exists and is valid

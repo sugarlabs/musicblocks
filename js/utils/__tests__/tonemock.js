@@ -39,6 +39,8 @@ class Sampler {
         this.triggerRelease = jest.fn().mockReturnThis();
         this.triggerAttackRelease = jest.fn().mockReturnThis();
         this.chain = jest.fn().mockReturnThis();
+        this.playbackRate = { value: 1 };
+        this.loaded = true;
     }
 }
 
@@ -52,6 +54,17 @@ class Player {
         this.stop = jest.fn().mockReturnThis();
         this.dispose = jest.fn().mockReturnThis();
         this.triggerAttackRelease = jest.fn().mockReturnThis();
+        this.volume = {
+            value: 0,
+            cancelScheduledValues: jest.fn().mockReturnThis(),
+            setValueAtTime: jest.fn().mockReturnThis(),
+            linearRampToValueAtTime: jest.fn().mockReturnThis(),
+            rampTo: jest.fn().mockImplementation(val => {
+                this.volume.value = val;
+            })
+        };
+        this.playbackRate = { value: 1 };
+        this.loaded = true;
     }
 }
 
