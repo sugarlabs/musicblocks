@@ -940,7 +940,7 @@ describe("Blocks Foundation", () => {
             blocks = new Blocks(mockActivity);
         });
 
-        it("toggleCollapsibles toggles standard collapsible blocks and definemode, but excludes newnote", () => {
+        it("toggleCollapsibles toggles standard collapsible blocks but excludes inlineCollapsible ones", () => {
             const mockStartBlock = {
                 name: "start",
                 trash: false,
@@ -974,14 +974,91 @@ describe("Blocks Foundation", () => {
                 })
             };
 
-            blocks.blockList = [mockStartBlock, mockDefinemodeBlock, mockNewNoteBlock];
+            const mockIntervalBlock = {
+                name: "interval",
+                trash: false,
+                collapsed: false,
+                isCollapsible: () => true,
+                isInlineCollapsible: () => true,
+                collapseToggle: jest.fn(function () {
+                    this.collapsed = !this.collapsed;
+                })
+            };
 
-            // Trigger toggleCollapsibles (all are currently uncollapsed, so it should collapse start and definemode, but skip newnote)
+            blocks.blockList = [
+                mockStartBlock,
+                mockDefinemodeBlock,
+                mockNewNoteBlock,
+                mockIntervalBlock
+            ];
+
+            // All currently uncollapsed: collapse standard collapsibles, skip inline ones
             blocks.toggleCollapsibles();
 
             expect(mockStartBlock.collapseToggle).toHaveBeenCalled();
-            expect(mockDefinemodeBlock.collapseToggle).toHaveBeenCalled();
+            expect(mockDefinemodeBlock.collapseToggle).not.toHaveBeenCalled();
             expect(mockNewNoteBlock.collapseToggle).not.toHaveBeenCalled();
+            expect(mockIntervalBlock.collapseToggle).not.toHaveBeenCalled();
+        });
+
+        it("_getBlockSize spoofs size 1 for collapsed inlineCollapsible blocks including definemode", () => {
+            blocks.blockList = [
+                {
+                    name: "newnote",
+                    size: 4,
+                    collapsed: true,
+                    isInlineCollapsible: () => true
+                },
+                {
+                    name: "definemode",
+                    size: 5,
+                    collapsed: true,
+                    isInlineCollapsible: () => true
+                },
+                {
+                    name: "start",
+                    size: 3,
+                    collapsed: true,
+                    isInlineCollapsible: () => false
+                },
+                {
+                    name: "newnote",
+                    size: 4,
+                    collapsed: false,
+                    isInlineCollapsible: () => true
+                }
+            ];
+
+            expect(blocks._getBlockSize(0)).toBe(1);
+            expect(blocks._getBlockSize(1)).toBe(1);
+            expect(blocks._getBlockSize(2)).toBe(3);
+            expect(blocks._getBlockSize(3)).toBe(4);
+        });
+
+        it("_getStackSize spoofs size 1 for collapsed inlineCollapsible blocks including definemode", () => {
+            blocks.blocksToCollapse = [];
+            blocks._sizeCounter = 0;
+            blocks.blockList = [
+                {
+                    name: "definemode",
+                    size: 5,
+                    collapsed: true,
+                    isClampBlock: () => false,
+                    isInlineCollapsible: () => true,
+                    connections: [null]
+                },
+                {
+                    name: "newnote",
+                    size: 4,
+                    collapsed: true,
+                    isClampBlock: () => false,
+                    isInlineCollapsible: () => true,
+                    connections: [null]
+                }
+            ];
+
+            expect(blocks._getStackSize(0)).toBe(1);
+            expect(blocks._getStackSize(1)).toBe(1);
         });
 
         it("_processOneBlock correctly uses ProtoBlock capability metadata to initialize collapsed state on load", () => {

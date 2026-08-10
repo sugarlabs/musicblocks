@@ -568,8 +568,9 @@ class Blocks {
         };
 
         /**
-         * Toggle state of collapsible blocks, except for note blocks,
-         * which are handled separately.
+         * Toggle state of collapsible blocks, except for inline-collapsible
+         * blocks (e.g. note, interval, osctime, definemode), which are
+         * handled separately.
          * @public
          * @returns {void}
          */
@@ -577,7 +578,7 @@ class Blocks {
             let allCollapsed = true;
             let someCollapsed = false;
             for (const myBlock of this.blockList) {
-                if (!myBlock || ["newnote", "interval", "osctime"].includes(myBlock.name)) {
+                if (!myBlock || myBlock.isInlineCollapsible()) {
                     continue;
                 }
 
@@ -596,7 +597,7 @@ class Blocks {
                  * If any blocks are collapsed, collapse them all.
                  */
                 for (const myBlock of this.blockList) {
-                    if (!myBlock || ["newnote", "interval", "osctime"].includes(myBlock.name)) {
+                    if (!myBlock || myBlock.isInlineCollapsible()) {
                         continue;
                     }
 
@@ -607,7 +608,7 @@ class Blocks {
             } else {
                 /** If no blocks are collapsed, collapse them all. */
                 for (const myBlock of this.blockList) {
-                    if (!myBlock || ["newnote", "interval", "osctime"].includes(myBlock.name)) {
+                    if (!myBlock || myBlock.isInlineCollapsible()) {
                         continue;
                     }
 
@@ -755,8 +756,8 @@ class Blocks {
         this._getBlockSize = blk => {
             const myBlock = this.blockList[blk];
             if (myBlock === undefined) return 0;
-            /** Special case for collapsed note blocks. */
-            if (["newnote", "interval", "osctime"].includes(myBlock.name) && myBlock.collapsed) {
+            /** Special case for collapsed inline-collapsible blocks. */
+            if (myBlock.isInlineCollapsible() && myBlock.collapsed) {
                 return 1;
             }
 
@@ -1020,13 +1021,10 @@ class Blocks {
                 size = myBlock.size;
             }
 
-            /** If the note value block is collapsed, spoof size. */
+            /** If the inline-collapsible block is collapsed, spoof size. */
             if (this.blocksToCollapse.indexOf(blk) !== -1) {
                 size = 1;
-            } else if (
-                ["newnote", "interval", "osctime"].includes(myBlock.name) &&
-                myBlock.collapsed
-            ) {
+            } else if (myBlock.isInlineCollapsible() && myBlock.collapsed) {
                 size = 1;
             }
 
