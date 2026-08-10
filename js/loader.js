@@ -134,6 +134,9 @@ requirejs.config({
         "activity/embedded-graphics-scheduler": {
             exports: "EmbeddedGraphicsScheduler"
         },
+        "activity/kokoro-speech": {
+            exports: "KokoroSpeech"
+        },
         "activity/LogoDependencies": {
             exports: "LogoDependencies"
         },
@@ -145,6 +148,7 @@ requirejs.config({
                 "activity/logoconstants",
                 "utils/ManagedTimer",
                 "activity/embedded-graphics-scheduler",
+                "activity/kokoro-speech",
                 "activity/LogoDependencies"
             ],
             exports: "Logo"

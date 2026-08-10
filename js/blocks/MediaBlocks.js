@@ -562,7 +562,6 @@ function setupMediaBlocks(activity) {
      * @extends FlowBlock
      */
     class SpeakBlock extends FlowBlock {
-        // Eliminating until we find a better option.
         /**
          * Constructs a SpeakBlock instance.
          * @constructor
@@ -576,7 +575,7 @@ function setupMediaBlocks(activity) {
 
             // Set help string for the block
             this.setHelpString([
-                _("The Speak block outputs to the text-to-speech synthesizer"),
+                _("The Speak block reads its text aloud using the built-in speech synthesizer."),
                 "documentation",
                 ""
             ]);
@@ -587,9 +586,6 @@ function setupMediaBlocks(activity) {
                 defaults: ["hello"],
                 argTypes: ["textin"]
             });
-
-            // Set the block as hidden
-            this.hidden = true;
         }
 
         /**
@@ -600,18 +596,20 @@ function setupMediaBlocks(activity) {
          * @param {string} blk - The block identifier.
          */
         flow(args, logo, turtle, blk) {
+            if (args.length !== 1) {
+                return;
+            }
+
             const tur = activity.turtles.ithTurtle(turtle);
 
-            if (args.length === 1) {
-                if (logo.meSpeak !== null) {
-                    if (tur.singer.inNoteBlock.length > 0) {
-                        tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
-                    } else {
-                        if (!tur.singer.suppressOutput) {
-                            logo.processSpeak(args[0]);
-                        }
-                    }
-                }
+            // Inside a note block, hand the block off to the embedded-graphics
+            // scheduler so the speech lines up with the note's timing instead
+            // of firing the instant the block is reached. Outside a note, and
+            // as long as we're not silently pre-running the project, speak now.
+            if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
+            } else if (!tur.singer.suppressOutput) {
+                logo.processSpeak(args[0]);
             }
         }
     }

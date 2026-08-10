@@ -307,7 +307,6 @@ function createMockActivity(turtle) {
         showBlocksAfterRun: false,
         onStopTurtle: jest.fn(),
         onRunTurtle: jest.fn(),
-        meSpeak: { speak: jest.fn() },
         save: {
             afterSaveLilypond: jest.fn(),
             afterSaveAbc: jest.fn(),
@@ -516,7 +515,6 @@ describe("Logo constructor", () => {
             storage: { saveLocally: jest.fn() },
             config: { showBlocksAfterRun: false },
             callbacks: { onStopTurtle: jest.fn(), onRunTurtle: jest.fn() },
-            meSpeak: { speak: jest.fn() },
             classes: {
                 Notation: jest.fn(() => ({})),
                 Synth: jest.fn(() => ({}))
@@ -2671,5 +2669,201 @@ describe("Logo processShow", () => {
 
         global.CAMERAVALUE = originalCameraValue;
         global.VIDEOVALUE = originalVideoValue;
+    });
+});
+describe("Logo.processSpeak", () => {
+    let logo;
+    let speakMock;
+    let cancelMock;
+    let utterances;
+
+    // A tiny stand-in for the Web Speech API. We capture the utterances that
+    // get spoken so the assertions can look at what the browser would have said.
+    function installSpeechSynthesis(voices = []) {
+        utterances = [];
+        speakMock = jest.fn(u => utterances.push(u));
+        cancelMock = jest.fn();
+
+        global.window.speechSynthesis = {
+            speak: speakMock,
+            cancel: cancelMock,
+            getVoices: () => voices
+        };
+
+        // jsdom doesn't provide SpeechSynthesisUtterance, so give it a plain
+        // constructor that just records the text.
+        global.SpeechSynthesisUtterance = function (text) {
+            this.text = text;
+            this.lang = "";
+            this.voice = null;
+            this.rate = null;
+            this.pitch = null;
+            this.volume = null;
+            this.onerror = null;
+        };
+    }
+
+    // jsdom's navigator.language is read-only, so reassigning global.navigator
+    // does nothing. Redefine the property instead.
+    function setLanguage(lang) {
+        Object.defineProperty(global.navigator, "language", {
+            value: lang,
+            configurable: true
+        });
+    }
+
+    // Switch the neural voice on and hand back the fake engine it will use.
+    function enableKokoro() {
+        const engine = { speak: jest.fn(), cancel: jest.fn() };
+        global.window.KokoroSpeech = function () {
+            return engine;
+        };
+        window.localStorage.setItem("kokoroSpeech", "on");
+        return engine;
+    }
+
+    beforeEach(() => {
+        setupLogoEnv();
+        logo = new Logo(createMockActivity());
+        setLanguage("en-US");
+    });
+
+    afterEach(() => {
+        window.localStorage.removeItem("kokoroSpeech");
+        delete global.window.KokoroSpeech;
+        delete global.window.speechSynthesis;
+        delete global.SpeechSynthesisUtterance;
+        jest.restoreAllMocks();
+    });
+
+    describe("with the built-in browser voice, the default", () => {
+        test("speaks the given text through the synthesizer", () => {
+            installSpeechSynthesis();
+            logo.processSpeak("hello world");
+            expect(speakMock).toHaveBeenCalledTimes(1);
+            expect(utterances[0].text).toBe("hello world");
+        });
+
+        test("queues consecutive phrases instead of cutting the first one off", () => {
+            installSpeechSynthesis();
+            logo.processSpeak("first");
+            logo.processSpeak("second");
+            // Two Speak blocks in a row should both be heard, in order, so
+            // nothing is cancelled between them.
+            expect(cancelMock).not.toHaveBeenCalled();
+            expect(speakMock).toHaveBeenCalledTimes(2);
+            expect(utterances.map(u => u.text)).toEqual(["first", "second"]);
+        });
+
+        test("clears queued speech when a run starts or Stop is pressed", () => {
+            installSpeechSynthesis();
+            logo.processSpeak("left over from the last run");
+            expect(cancelMock).not.toHaveBeenCalled();
+
+            logo._cancelSpeech();
+            expect(cancelMock).toHaveBeenCalledTimes(1);
+        });
+
+        test("cancelling speech is safe when the API is unavailable", () => {
+            expect(() => logo._cancelSpeech()).not.toThrow();
+        });
+
+        test("ignores empty or whitespace-only text", () => {
+            installSpeechSynthesis();
+            logo.processSpeak("");
+            logo.processSpeak("   ");
+            expect(speakMock).not.toHaveBeenCalled();
+        });
+
+        test("coerces non-string input to a string", () => {
+            installSpeechSynthesis();
+            logo.processSpeak(42);
+            expect(utterances[0].text).toBe("42");
+        });
+
+        test("does nothing and does not throw when the API is unavailable", () => {
+            // No speechSynthesis on window at all.
+            expect(() => logo.processSpeak("hello")).not.toThrow();
+        });
+
+        test("prefers a voice matching the current locale", () => {
+            installSpeechSynthesis([
+                { lang: "en-US", name: "US English" },
+                { lang: "hi-IN", name: "Hindi India" }
+            ]);
+            setLanguage("hi-IN");
+            logo.processSpeak("नमस्ते");
+            expect(utterances[0].voice.name).toBe("Hindi India");
+            expect(utterances[0].lang).toBe("hi-IN");
+        });
+
+        test("falls back to a same-language voice when the region differs", () => {
+            installSpeechSynthesis([
+                { lang: "en-US", name: "US English" },
+                { lang: "es-MX", name: "Spanish Mexico" }
+            ]);
+            setLanguage("es-ES");
+            logo.processSpeak("hola");
+            expect(utterances[0].voice.name).toBe("Spanish Mexico");
+        });
+
+        test("lets the browser choose when no voices are loaded yet", () => {
+            installSpeechSynthesis([]); // empty, as on Chrome's first call
+            logo.processSpeak("hello");
+            expect(utterances[0].voice).toBeNull();
+            expect(utterances[0].lang).toBe("en-US");
+        });
+    });
+
+    describe("with the neural voice switched on", () => {
+        test("sends the phrase to Kokoro instead of the browser", () => {
+            installSpeechSynthesis();
+            const engine = enableKokoro();
+
+            logo.processSpeak("hello world");
+
+            expect(engine.speak).toHaveBeenCalledWith("hello world");
+            expect(speakMock).not.toHaveBeenCalled();
+        });
+
+        test("is off unless it has been explicitly switched on", () => {
+            installSpeechSynthesis();
+            const engine = { speak: jest.fn(), cancel: jest.fn() };
+            global.window.KokoroSpeech = function () {
+                return engine;
+            };
+            // No "kokoroSpeech" entry in localStorage: nothing should be
+            // downloaded, so the browser voice does the talking.
+            logo.processSpeak("hello world");
+
+            expect(engine.speak).not.toHaveBeenCalled();
+            expect(speakMock).toHaveBeenCalledTimes(1);
+        });
+
+        test("builds the engine once and reuses it", () => {
+            const engine = enableKokoro();
+            logo.processSpeak("first");
+            logo.processSpeak("second");
+            expect(engine.speak.mock.calls.map(c => c[0])).toEqual(["first", "second"]);
+        });
+
+        test("falls back to the browser voice if the engine isn't loaded", () => {
+            installSpeechSynthesis();
+            window.localStorage.setItem("kokoroSpeech", "on");
+            // Switched on, but js/kokoro-speech.js never loaded.
+            logo.processSpeak("hello world");
+            expect(speakMock).toHaveBeenCalledTimes(1);
+        });
+
+        test("cancelling stops both engines", () => {
+            installSpeechSynthesis();
+            const engine = enableKokoro();
+            logo.processSpeak("something");
+
+            logo._cancelSpeech();
+
+            expect(engine.cancel).toHaveBeenCalledTimes(1);
+            expect(cancelMock).toHaveBeenCalledTimes(1);
+        });
     });
 });

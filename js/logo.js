@@ -27,7 +27,7 @@
    EMPTYHEAPERRORMSG, INVALIDPITCH, POSNUMBER, NOTATIONNOTE, NOTATIONDURATION,
    NOTATIONDOTCOUNT, NOTATIONTUPLETVALUE, NOTATIONROUNDDOWN,
    NOTATIONINSIDECHORD, NOTATIONSTACCATO, ManagedTimer,
-   EmbeddedGraphicsScheduler
+   EmbeddedGraphicsScheduler, KokoroSpeech
  */
 
 /*
@@ -627,13 +627,173 @@ class Logo {
     }
 
     /**
-     * Speaks all characters in the range of comma, full stop, space, A to Z, a to z in the input text.
+     * Speaks the given text aloud.
+     *
+     * Two engines are available. The Web Speech API is the default because it
+     * costs nothing: it is already in the browser, it works offline, and it
+     * starts talking immediately. Kokoro is a neural voice that sounds much
+     * more human, but it has to fetch about 92 MB of weights the first time it
+     * runs, so it is opt-in rather than the default. See js/kokoro-speech.js.
      *
      * @param {string} text
      * @returns {void}
      */
     processSpeak(text) {
-        // meSpeak was removed from the codebase.
+        // The Speak block used to run on meSpeak, a JavaScript port of espeak
+        // that was bundled with the app. It was heavy, it sounded robotic, and
+        // it was eventually dropped, which left the block doing nothing at all.
+
+        const phrase = text === null || text === undefined ? "" : String(text);
+        if (phrase.trim() === "") {
+            return;
+        }
+
+        const kokoro = this._kokoroIfEnabled();
+        if (kokoro !== null) {
+            kokoro.speak(phrase);
+            return;
+        }
+
+        this._speakWithWebSpeech(phrase);
+    }
+
+    /**
+     * Silences anything the Speak block still has queued, whichever engine is
+     * doing the talking.
+     *
+     * Called when a run starts and when Stop is pressed, so speech left over
+     * from a previous run never bleeds into the next one.
+     *
+     * @returns {void}
+     */
+    _cancelSpeech() {
+        if (this._kokoroSpeech) {
+            this._kokoroSpeech.cancel();
+        }
+        if (typeof window !== "undefined" && window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+        }
+    }
+
+    /**
+     * The Kokoro engine, but only if the user has asked for it.
+     *
+     * Turned on by setting "kokoroSpeech" to "on" in localStorage. Building the
+     * engine is cheap and downloads nothing; the weights are only fetched once
+     * something is actually spoken.
+     *
+     * @returns {KokoroSpeech|null} null when it is switched off or unavailable
+     */
+    _kokoroIfEnabled() {
+        let enabled = false;
+        try {
+            enabled =
+                typeof localStorage !== "undefined" &&
+                localStorage.getItem("kokoroSpeech") === "on";
+        } catch (e) {
+            // Storage can be blocked outright in a locked-down profile.
+            return null;
+        }
+        if (!enabled) {
+            return null;
+        }
+
+        if (!this._kokoroSpeech) {
+            const Speech =
+                typeof KokoroSpeech !== "undefined"
+                    ? KokoroSpeech
+                    : typeof window !== "undefined" && window.KokoroSpeech;
+            if (!Speech) {
+                return null;
+            }
+            this._kokoroSpeech = new Speech();
+        }
+        return this._kokoroSpeech;
+    }
+
+    /**
+     * Speaks a phrase with the browser's built-in synthesizer.
+     *
+     * @param {string} phrase
+     * @returns {void}
+     */
+    _speakWithWebSpeech(phrase) {
+        // Bail quietly if we're somewhere without the API (an older browser, a
+        // test runner, a server-side render). Speaking is a nice-to-have, so a
+        // missing synthesizer should never throw and take a running project down.
+        if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+            return;
+        }
+
+        const synth = window.speechSynthesis;
+
+        // Nothing is cancelled here on purpose. The synthesizer keeps its own
+        // queue, so two Speak blocks one after another are read one after the
+        // other instead of the second cutting the first off mid-word. Leftover
+        // speech from an earlier run is cleared by _cancelSpeech() when the next
+        // run starts or when Stop is pressed.
+        const utterance = new SpeechSynthesisUtterance(phrase);
+
+        // Try to pronounce the words in the child's own language rather than
+        // reading them as if they were English. We look for a voice that
+        // matches the current locale and quietly fall back to the browser
+        // default if there isn't one.
+        const preferredLang = navigator.language || "en-US";
+        const voice = this._pickSpeechVoice(synth, preferredLang);
+        if (voice) {
+            utterance.voice = voice;
+            utterance.lang = voice.lang;
+        } else {
+            utterance.lang = preferredLang;
+        }
+
+        // Calm, clear defaults that read well for kids: normal speed, natural
+        // pitch, full volume.
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+
+        utterance.onerror = event => {
+            // "interrupted" and "canceled" are what a Stop or a fresh Run looks
+            // like from in here, so they aren't worth surfacing.
+            if (event.error === "interrupted" || event.error === "canceled") {
+                return;
+            }
+            console.warn(`Speak block: speech synthesis failed (${event.error}).`);
+        };
+
+        synth.speak(utterance);
+    }
+
+    /**
+     * Picks the best available speech-synthesis voice for a language.
+     *
+     * @param {SpeechSynthesis} synth - the window.speechSynthesis instance
+     * @param {string} preferredLang - a BCP-47 tag like "hi-IN" or "es"
+     * @returns {SpeechSynthesisVoice|null} the best match, or null to let the
+     *     browser choose its own default
+     */
+    _pickSpeechVoice(synth, preferredLang) {
+        // getVoices() is famously empty on the very first call in some browsers:
+        // Chrome loads the list asynchronously and fires 'voiceschanged' a beat
+        // later. By the time a child actually presses Run the list has almost
+        // always populated. If it hasn't yet, returning null just lets the
+        // browser pick its own default, which is still perfectly fine.
+        const voices = synth.getVoices();
+        if (!voices || voices.length === 0) {
+            return null;
+        }
+
+        const wanted = preferredLang.toLowerCase();
+        const base = wanted.split("-")[0];
+
+        // Prefer an exact locale match ("hi-IN"), then any voice for the same
+        // language ("hi-*"), and otherwise let the browser decide.
+        return (
+            voices.find(v => v.lang && v.lang.toLowerCase() === wanted) ||
+            voices.find(v => v.lang && v.lang.toLowerCase().split("-")[0] === base) ||
+            null
+        );
     }
 
     /**
@@ -1246,6 +1406,7 @@ class Logo {
     doStopTurtles() {
         this.stopTurtle = true;
         this.turtles.markAllAsStopped();
+        this._cancelSpeech();
 
         // Cancel all pending timers to prevent zombie graphics and sounds.
         const cancelledTimers = this._timerManager.clearAll();
@@ -1392,6 +1553,10 @@ class Logo {
         // Reset run-state flags for the new execution.
         this._alreadyRunning = false;
         this._prematureRestart = false;
+
+        // Drop any speech the previous run left queued, so pressing Run twice
+        // doesn't leave the old phrases talking over the new ones.
+        this._cancelSpeech();
 
         // eslint-disable-next-line eqeqeq
         if (this._lastNoteTimeout != null) {
