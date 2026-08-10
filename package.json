@@ -92,6 +92,7 @@
         }
     },
     "overrides": {
+        "@electron/rebuild": "3.7.2",
         "nanoid": "^3.3.17",
         "electron": "40.8.5",
         "flatted": "3.4.2",
