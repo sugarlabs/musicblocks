@@ -94,6 +94,7 @@ function setupIntervalsBlocks(activity) {
             super("temperamentname", _("temperament name"));
             this.setCapability("valueDrivenLabel");
             this.setCapability("discreteChoice");
+            this.setCapability("wideLabel");
 
             // Set the palette, activity, extra width, and form the block with specific parameters
             this.setPalette("tone", activity);
@@ -121,6 +122,7 @@ function setupIntervalsBlocks(activity) {
             super("modename");
             this.setCapability("valueDrivenLabel");
             this.setCapability("discreteChoice");
+            this.setCapability("wideLabel");
 
             // Set the palette, activity, help string, extra width, and form the block with specific parameters
             this.setPalette("intervals", activity);
@@ -144,6 +146,7 @@ function setupIntervalsBlocks(activity) {
             super("chordname");
             this.setCapability("valueDrivenLabel");
             this.setCapability("discreteChoice");
+            this.setCapability("wideLabel");
 
             // Set the palette, activity, help string, extra width, and form the block with specific parameters
             this.setPalette("intervals", activity);
@@ -248,6 +251,7 @@ function setupIntervalsBlocks(activity) {
             super("intervalname");
             this.setCapability("valueDrivenLabel");
             this.setCapability("discreteChoice");
+            this.setCapability("wideLabel");
 
             // Set the palette, activity, help string, extra width, and form the block with specific parameters
             this.setPalette("intervals", activity);

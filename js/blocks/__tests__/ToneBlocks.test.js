@@ -551,6 +551,10 @@ describe("setupToneBlocks", () => {
             voiceName.setup(activity);
             expect(voiceName.extraWidth).toEqual(50);
         });
+
+        it("declares the wideLabel capability", () => {
+            expect(getBlock("voicename").getCapability("wideLabel")).toBe(true);
+        });
     });
 
     describe("SetTimbreBlock", () => {

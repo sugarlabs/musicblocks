@@ -204,7 +204,7 @@ describe("setupIntervalsBlocks", () => {
         });
     });
 
-    describe("inlineCollapsible capability", () => {
+describe("inlineCollapsible capability", () => {
         it("interval declares collapsible and inlineCollapsible", () => {
             expect(createdBlocks.interval.getCapability("collapsible")).toBe(true);
             expect(createdBlocks.interval.getCapability("inlineCollapsible")).toBe(true);
@@ -215,6 +215,19 @@ describe("setupIntervalsBlocks", () => {
         it("definemode declares collapsible and inlineCollapsible", () => {
             expect(createdBlocks.definemode.getCapability("collapsible")).toBe(true);
             expect(createdBlocks.definemode.getCapability("inlineCollapsible")).toBe(true);
+        });
+    });
+
+    describe("wideLabel capability", () => {
+        it("marks temperament/mode/chord/interval name blocks as wideLabel", () => {
+            expect(createdBlocks["temperamentname"].getCapability("wideLabel")).toBe(true);
+            expect(createdBlocks["modename"].getCapability("wideLabel")).toBe(true);
+            expect(createdBlocks["chordname"].getCapability("wideLabel")).toBe(true);
+            expect(createdBlocks["intervalname"].getCapability("wideLabel")).toBe(true);
+        });
+
+        it("does not mark intervalnumber as wideLabel", () => {
+            expect(createdBlocks["intervalnumber"].getCapability("wideLabel")).toBeUndefined();
         });
     });
 
