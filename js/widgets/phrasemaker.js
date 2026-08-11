@@ -261,7 +261,6 @@ class PhraseMaker {
         this._blockMap = {};
 
         this.blockNo = null;
-        this.notesBlockMap = [];
         this._blockMapHelper = [];
         this.columnBlocksMap = [];
 
@@ -1195,7 +1194,7 @@ class PhraseMaker {
         if (this.isInitial) {
             activity.textMsg(this._("Click on the table to add notes."), 3000);
             this.widgetWindow.sendToCenter();
-            this.inInitial = false;
+            this.isInitial = false;
         }
     }
 
@@ -4648,6 +4647,25 @@ class PhraseMaker {
     }
 
     /**
+     * Computes the lastConnection value for a pitch/drum/graphics block being
+     * pushed inside _save()'s note loop: null if it is the final block in the
+     * note (and lyrics are off), otherwise thisBlock + offset.
+     * @param {Array} note - the note entry currently being processed.
+     * @param {number} j - index into note[0] for the current pitch/drum entry.
+     * @param {number} thisBlock - the block index the connection is relative to.
+     * @param {number} offset - block-index offset to the next sibling block.
+     * @returns {number|null}
+     * @private
+     */
+    _computeLastConnection(note, j, thisBlock, offset) {
+        // The last connection in last pitch block is null.
+        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
+            return null;
+        }
+        return thisBlock + offset;
+    }
+
+    /**
      * Saves the current matrix state as an action stack consisting of note and pitch blocks.
      * @private
      */
@@ -4788,12 +4806,7 @@ class PhraseMaker {
 
                     if (obj === null) {
                         // add a hertz block
-                        // The last connection in last pitch block is null.
-                        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
-                            lastConnection = null;
-                        } else {
-                            lastConnection = thisBlock + 2;
-                        }
+                        lastConnection = this._computeLastConnection(note, j, thisBlock, 2);
 
                         newStack.push([
                             thisBlock,
@@ -4813,12 +4826,7 @@ class PhraseMaker {
                         previousBlock = thisBlock - 2;
                     } else if (drumName !== null) {
                         // add a playdrum block
-                        // The last connection in last pitch block is null.
-                        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
-                            lastConnection = null;
-                        } else {
-                            lastConnection = thisBlock + 2;
-                        }
+                        lastConnection = this._computeLastConnection(note, j, thisBlock, 2);
 
                         newStack.push([
                             thisBlock,
@@ -4838,12 +4846,7 @@ class PhraseMaker {
                         previousBlock = thisBlock - 2;
                     } else if (note[0][j].slice(0, 4) === "http") {
                         // add a playdrum block with URL
-                        // The last connection in last pitch block is null.
-                        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
-                            lastConnection = null;
-                        } else {
-                            lastConnection = thisBlock + 2;
-                        }
+                        lastConnection = this._computeLastConnection(note, j, thisBlock, 2);
 
                         newStack.push([
                             thisBlock,
@@ -4863,12 +4866,7 @@ class PhraseMaker {
                         previousBlock = thisBlock - 2;
                     } else if (obj.length > 2) {
                         // add a 2-arg graphics block
-                        // The last connection in last pitch block is null.
-                        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
-                            lastConnection = null;
-                        } else {
-                            lastConnection = thisBlock + 3;
-                        }
+                        lastConnection = this._computeLastConnection(note, j, thisBlock, 3);
 
                         newStack.push([
                             thisBlock,
@@ -4895,12 +4893,7 @@ class PhraseMaker {
                         previousBlock = thisBlock - 3;
                     } else if (obj.length > 1) {
                         // add a 1-arg graphics block
-                        // The last connection in last pitch block is null.
-                        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
-                            lastConnection = null;
-                        } else {
-                            lastConnection = thisBlock + 2;
-                        }
+                        lastConnection = this._computeLastConnection(note, j, thisBlock, 2);
 
                         newStack.push([
                             thisBlock,
@@ -4920,12 +4913,7 @@ class PhraseMaker {
                         previousBlock = thisBlock - 2;
                     } else {
                         // add a pitch block
-                        // The last connection in last pitch block is null.
-                        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
-                            lastConnection = null;
-                        } else {
-                            lastConnection = thisBlock + 3;
-                        }
+                        lastConnection = this._computeLastConnection(note, j, thisBlock, 3);
 
                         if (note[0][j][1] === "♯") {
                             if (

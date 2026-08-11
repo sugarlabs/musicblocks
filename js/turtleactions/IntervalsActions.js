@@ -21,7 +21,8 @@
 
 /*
    global _, NOINPUTERRORMSG, Singer, MUSICALMODES, MusicBlocks, Mouse, getNote,
-   getModeLength, isCustomTemperament, TEMPERAMENT, getCurrentEDO, EDOBOUNDEXCEEDED
+   getModeLength, isCustomTemperament, TEMPERAMENT, getCurrentEDO, EDOBOUNDEXCEEDED,
+   pitchToNumber
 */
 
 /*
@@ -33,7 +34,7 @@
     js/utils/musicutils.js
          MUSICALMODES, MODE_PIE_MENUS, getNote, getModeLength, NOTESTEP,
          GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
-         isCustomTemperament, TEMPERAMENT, getCurrentEDO
+         isCustomTemperament, TEMPERAMENT, getCurrentEDO, pitchToNumber
     js/turtle-singer.js
         Singer
     js/js-export/export.js
@@ -89,7 +90,11 @@ function setupIntervalsActions(activity) {
         static GetIntervalNumber(turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
             let { firstNote, secondNote, octave } = GetNotesForInterval(tur);
-            let totalIntervals = Math.abs(ALLNOTESTEP[firstNote] - ALLNOTESTEP[secondNote]);
+            const temperament = activity.logo.synth.inTemperament;
+            const keySig = tur.singer.keySignature;
+            const firstStep = pitchToNumber(firstNote, 0, keySig, temperament);
+            const secondStep = pitchToNumber(secondNote, 0, keySig, temperament);
+            let totalIntervals = Math.abs(firstStep - secondStep);
 
             // Use dynamic temperament length for custom tunings
             const temperamentLength = this.getTemperamentLength();
@@ -97,9 +102,7 @@ function setupIntervalsActions(activity) {
             // Handle octave boundary wrap-around for enharmonic equivalents
             // For cases like B (12) to B#/Cb (0), the raw difference is 12 but should be 1
             // Calculate forward distance across octave boundary using modular arithmetic
-            const forwardDiff =
-                (ALLNOTESTEP[secondNote] - ALLNOTESTEP[firstNote] + temperamentLength) %
-                temperamentLength;
+            const forwardDiff = (secondStep - firstStep + temperamentLength) % temperamentLength;
             // When notes are at octave boundary (forwardDiff === 0), use 1 semitone
             // Otherwise use the shorter of raw difference or forward distance
             totalIntervals = forwardDiff === 0 ? 1 : Math.min(totalIntervals, forwardDiff);

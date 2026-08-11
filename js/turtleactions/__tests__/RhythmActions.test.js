@@ -131,7 +131,7 @@ describe("setupRhythmActions", () => {
 
         Singer.RhythmActions.playNote(1, "note", 0, 1, enqueue);
 
-        expect(enqueue).toHaveBeenCalled();
+        expect(enqueue).not.toHaveBeenCalled();
         expect(activity.stage.dispatchEvent).toHaveBeenCalledWith("__everybeat_0__");
     });
 
@@ -150,7 +150,7 @@ describe("setupRhythmActions", () => {
         Singer.RhythmActions.playNote(1, "note", 0, 1, enqueue);
 
         expect(targetTurtle.singer.currentBeat).toBe(2);
-        expect(enqueue).toHaveBeenCalled();
+        expect(enqueue).not.toHaveBeenCalled();
         expect(activity.stage.dispatchEvent).toHaveBeenCalledWith("__beat_2_0__");
     });
 
@@ -169,7 +169,7 @@ describe("setupRhythmActions", () => {
         Singer.RhythmActions.playNote(1, "note", 0, 1, enqueue);
 
         expect(targetTurtle.singer.currentBeat).toBe(2);
-        expect(enqueue).toHaveBeenCalled();
+        expect(enqueue).not.toHaveBeenCalled();
         expect(activity.stage.dispatchEvent).toHaveBeenCalledWith("__offbeat_0__");
     });
     it("triggers factorList beat event when beat matches factor", () => {
@@ -186,7 +186,7 @@ describe("setupRhythmActions", () => {
 
         Singer.RhythmActions.playNote(1, "note", 0, 1, enqueue);
 
-        expect(enqueue).toHaveBeenCalled();
+        expect(enqueue).not.toHaveBeenCalled();
         expect(activity.stage.dispatchEvent).toHaveBeenCalledWith("__beat_2_0__");
     });
     it("adds rest note when inside a note block", () => {

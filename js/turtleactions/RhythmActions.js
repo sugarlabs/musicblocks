@@ -47,13 +47,16 @@ function setupRhythmActions(activity) {
          * @param {String} blkName - note block type name
          * @param {Object} turtle - Turtle object
          * @param {Object} blk - corresponding Block object index in blocks.blockList or custom block number
-         * @param {Function} _enqueue - callback
+         * @param {Function} _enqueue - callback, no longer invoked by playNote. The note clamp's
+         *     child flow is queued by the interpreter from the flow block's `[childFlow, 1]` return
+         *     value (runFromBlockNow step 3); kept for signature compatibility.
          * @returns {void}
          */
         static playNote(value, blkName, turtle, blk, _enqueue) {
             /**
-             * We queue up the child flow of the note clamp and once all of the children are run, we
-             * trigger a _playnote_ event, then wait for the note to play. The note can be specified
+             * The interpreter queues the child flow of the note clamp from the flow block's
+             * `[childFlow, 1]` return value and, once all of the children are run, triggers a
+             * _playnote_ event, then waits for the note to play. The note can be specified
              * by pitch or synth blocks. The osctime block specifies the duration in milleseconds
              * while the note block specifies duration as a beat value.
              *
@@ -79,23 +82,26 @@ function setupRhythmActions(activity) {
                 tur.singer.currentMeasure = measureValue;
 
                 /**
-                 * Queue any beat actions.
-                 * Put the childFlow into the queue before the beat action so logo the beat action is
-                 * at the end of the FILO.
+                 * Dispatch any beat actions (everybeat / on-beat / offbeat / every-beat-N).
+                 *
+                 * The note clamp's child flow is queued by the interpreter instead: the note
+                 * blocks (newnote / note / osctime) return `[childFlow, 1]`, which makes
+                 * `runFromBlockNow` step (3) push the clamp onto the turtle queue exactly once.
+                 * Calling `_enqueue()` here as well queued the same child flow a second time
+                 * whenever a beat event was registered, so the clamp ran twice per note. The
+                 * second run executed after the note was consumed, re-triggering clamp content
+                 * (e.g. drums) outside of the note context and overwriting the note's timing.
                  * Note: The offbeat cannot be Beat 1.
                  */
                 const turtleID = tur.id;
 
                 if (tur.singer.beatList.includes("everybeat")) {
-                    _enqueue();
                     activity.stage.dispatchEvent("__everybeat_" + turtleID + "__");
                 }
 
                 if (tur.singer.beatList.includes(beatValue)) {
-                    _enqueue();
                     activity.stage.dispatchEvent("__beat_" + beatValue + "_" + turtleID + "__");
                 } else if (beatValue > 1 && tur.singer.beatList.includes("offbeat")) {
-                    _enqueue();
                     activity.stage.dispatchEvent("__offbeat_" + turtleID + "__");
                 }
 
@@ -103,7 +109,6 @@ function setupRhythmActions(activity) {
                     beatValue + tur.singer.beatsPerMeasure * (tur.singer.currentMeasure - 1);
                 for (let f = 0; f < tur.singer.factorList.length; f++) {
                     if (thisBeat % tur.singer.factorList[f] === 0) {
-                        _enqueue();
                         const eventName =
                             "__beat_" + tur.singer.factorList[f] + "_" + turtleID + "__";
                         activity.stage.dispatchEvent(eventName);
@@ -146,7 +151,9 @@ function setupRhythmActions(activity) {
                         const nextBeat = 1 / noteBeatValue - 2 * tur.singer.neighborNoteValue;
                         if (nextBeat <= 0 || !isFinite(nextBeat)) {
                             activity.errorMsg(
-                                _("Neighbor note value is too large for the current note duration."),
+                                _(
+                                    "Neighbor note value is too large for the current note duration."
+                                ),
                                 blk
                             );
                         } else {

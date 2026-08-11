@@ -453,6 +453,128 @@ describe("Utility Functions (logic-only)", () => {
                 0
             );
         });
+
+        test("should reload a drum that was disposed on Stop so the second play is audible (#7996)", async () => {
+            if (!instruments[turtle]) {
+                instruments[turtle] = {}; // Initialize instruments for the turtle
+            }
+
+            // First run: the drum loads as a Tone.Player sample
+            await loadSynth(turtle, "snare drum");
+            expect(instruments[turtle]["snare drum"]).toBeInstanceOf(Tone.Player);
+
+            // Stop: disposeAllInstruments() removes all drums from instruments
+            Synth.disposeAllInstruments();
+            expect(instruments[turtle]["snare drum"]).toBeUndefined();
+
+            // Second run: prepSynths() only recreates the default synth
+            createDefaultSynth(turtle);
+
+            // The reloaded drum's buffer has not finished decoding yet, so
+            // trigger() must wait for it before starting playback.
+            const RealPlayer = Tone.Player;
+            Tone.Player = class extends RealPlayer {
+                constructor(sample) {
+                    super(sample);
+                    this.loaded = false;
+                }
+            };
+            const loadedSpy = jest.spyOn(Tone.ToneAudioBuffer, "loaded");
+            let reloadedPlayer;
+            try {
+                // trigger() must lazily reload the drum instead of silently skipping
+                await trigger(turtle, ["C2"], beatValue, "snare drum", null, null, false, 0);
+                reloadedPlayer = instruments[turtle]["snare drum"];
+                expect(loadedSpy).toHaveBeenCalled();
+                expect(reloadedPlayer).toBeInstanceOf(Tone.Player);
+                expect(reloadedPlayer.start).toHaveBeenCalled();
+            } finally {
+                Tone.Player = RealPlayer;
+                loadedSpy.mockRestore();
+            }
+        });
+
+        test("should keep playing even if the reloaded drum's buffer fails to decode (#7996)", async () => {
+            if (!instruments[turtle]) {
+                instruments[turtle] = {}; // Initialize instruments for the turtle
+            }
+
+            await loadSynth(turtle, "snare drum");
+            Synth.disposeAllInstruments();
+            createDefaultSynth(turtle);
+
+            const RealPlayer = Tone.Player;
+            Tone.Player = class extends RealPlayer {
+                constructor(sample) {
+                    super(sample);
+                    this.loaded = false;
+                }
+            };
+            const loadedSpy = jest
+                .spyOn(Tone.ToneAudioBuffer, "loaded")
+                .mockRejectedValue(new Error("decode failed"));
+            try {
+                await trigger(turtle, ["C2"], beatValue, "snare drum", null, null, false, 0);
+            } finally {
+                Tone.Player = RealPlayer;
+                loadedSpy.mockRestore();
+            }
+
+            expect(instruments[turtle]["snare drum"].start).toHaveBeenCalled();
+        });
+
+        test("should reapply the cent adjustment when a voice sample is reloaded after Stop (#7996)", async () => {
+            if (!instruments[turtle]) {
+                instruments[turtle] = {}; // Initialize instruments for the turtle
+            }
+
+            // A voice sample (flag 2) with a cent adjustment
+            const sourceName = "reloadCentVoice";
+            Synth.samples.voice[sourceName] = "data:audio/ogg;base64,SGVsbG8=";
+            Synth.sampleCentAdjustments[sourceName] = 50;
+
+            // First run: the voice sample loads as a Tone.Sampler
+            await loadSynth(turtle, sourceName);
+            expect(instruments[turtle][sourceName]).toBeInstanceOf(Tone.Sampler);
+            expect(instrumentsSource[sourceName]).toStrictEqual([2, sourceName]);
+
+            // Stop: disposeAllInstruments() removes the sampler from instruments
+            Synth.disposeAllInstruments();
+            expect(instruments[turtle][sourceName]).toBeUndefined();
+
+            // Second run: prepSynths() only recreates the default synth, but if it
+            // is missing too, trigger() must create it before reloading the sample.
+            await trigger(turtle, ["C4"], beatValue, sourceName, null, null, false, 0);
+
+            expect(instruments[turtle][sourceName]).toBeInstanceOf(Tone.Sampler);
+            expect(instruments[turtle][sourceName].playbackRate.value).toBeCloseTo(
+                Math.pow(2, 50 / 1200)
+            );
+        });
+
+        test("should bail out of the reload if instruments are disposed mid-load (#7996)", async () => {
+            if (!instruments[turtle]) {
+                instruments[turtle] = {}; // Initialize instruments for the turtle
+            }
+
+            await loadSynth(turtle, "snare drum");
+            Synth.disposeAllInstruments();
+            createDefaultSynth(turtle);
+
+            // Dispose again while the reload is in progress
+            const realLoadSynth = Synth.loadSynth;
+            Synth.loadSynth = jest.fn(async (t, name) => {
+                await realLoadSynth.call(Synth, t, name);
+                Synth.disposeAllInstruments();
+            });
+            try {
+                await trigger(turtle, ["C2"], beatValue, "snare drum", null, null, false, 0);
+            } finally {
+                Synth.loadSynth = realLoadSynth;
+            }
+
+            expect(instruments[turtle]["snare drum"]).toBeUndefined();
+        });
     });
 
     describe("temperamentChanged", () => {
@@ -1674,6 +1796,69 @@ describe("Utility Functions (logic-only)", () => {
             expect(mockSynth.toDestination).toHaveBeenCalled();
 
             jest.useRealTimers();
+        });
+
+        it("should route effects cleanup through setGuardedTimeout when timerManager is available", async () => {
+            const mockTimerManager = {
+                setGuardedTimeout: jest.fn()
+            };
+            const originalTimerManager = Synth._timerManager;
+            Synth._timerManager = mockTimerManager;
+
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn(),
+                disconnect: jest.fn(),
+                connect: jest.fn(),
+                chain: jest.fn().mockReturnThis()
+            };
+            Synth.inTemperament = "equal";
+
+            const paramsEffects = {
+                doVibrato: true,
+                vibratoFrequency: 5,
+                vibratoIntensity: 1
+            };
+
+            try {
+                await _performNotes.call(
+                    Synth,
+                    mockSynth,
+                    "C4",
+                    0.25,
+                    paramsEffects,
+                    null,
+                    false,
+                    0
+                );
+
+                expect(mockTimerManager.setGuardedTimeout).toHaveBeenCalledWith(
+                    expect.any(Function),
+                    750,
+                    expect.any(Function)
+                );
+
+                // Extract and test the stop guard function
+                const stopGuardFn = mockTimerManager.setGuardedTimeout.mock.calls[0][2];
+                expect(stopGuardFn()).toBe(false);
+
+                // Mock activity and test stop guard function
+                Synth.activity = {
+                    logo: {
+                        stopTurtle: true
+                    }
+                };
+                expect(stopGuardFn()).toBe(true);
+
+                // Extract and test the cleanup callback
+                const cleanupFn = mockTimerManager.setGuardedTimeout.mock.calls[0][0];
+                cleanupFn();
+                expect(mockSynth.disconnect).toHaveBeenCalled();
+                expect(mockSynth.toDestination).toHaveBeenCalled();
+            } finally {
+                Synth._timerManager = originalTimerManager;
+                Synth.activity = undefined;
+            }
         });
     });
 });

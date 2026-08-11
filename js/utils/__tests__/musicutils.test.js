@@ -54,6 +54,7 @@ const {
     noteToFrequency,
     setOctaveRatio,
     getOctaveRatio,
+    ratioToWheelAngle,
     TEMPERAMENT,
     getTemperamentsList,
     getTemperament,
@@ -697,6 +698,18 @@ describe("getNoiseIcon", () => {
     });
     it("should be case sensitive for noise names", () => {
         expect(getNoiseIcon("WHITE NOISE")).toBe("images/synth.svg");
+    });
+});
+
+describe("ratioToWheelAngle", () => {
+    it("returns 270 degrees for unison (ratio === base^0)", () => {
+        expect(ratioToWheelAngle(1, 2)).toBe(270);
+    });
+    it("returns 630 degrees (270 + 360) for one full octave (ratio === base)", () => {
+        expect(ratioToWheelAngle(2, 2)).toBeCloseTo(630, 6);
+    });
+    it("returns 450 degrees (270 + 180) for a half octave (ratio === sqrt(base))", () => {
+        expect(ratioToWheelAngle(Math.sqrt(2), 2)).toBeCloseTo(450, 6);
     });
 });
 
@@ -3466,6 +3479,43 @@ describe("actual drum lookup helpers", () => {
         expect(actualMusicUtils.getDrumSymbol("snare drum")).toBe("sn");
         expect(actualMusicUtils.getDrumSymbol("missing")).toBe("hh");
     });
+
+    describe("_parse_pitch_string", () => {
+        const _parse_pitch_string = actualMusicUtils._parse_pitch_string;
+        const SHARP = actualMusicUtils.SHARP || "♯";
+        const FLAT = actualMusicUtils.FLAT || "♭";
+        const DOUBLESHARP = actualMusicUtils.DOUBLESHARP || "𝄪";
+        const DOUBLEFLAT = actualMusicUtils.DOUBLEFLAT || "𝄫";
+
+        it("should parse standard pitches without accidentals", () => {
+            expect(_parse_pitch_string("C4")).toEqual(["C", 4]);
+            expect(_parse_pitch_string("A10")).toEqual(["A", 10]);
+        });
+
+        it("should parse pitches with single accidentals", () => {
+            expect(_parse_pitch_string("C#4")).toEqual(["C" + SHARP, 4]);
+            expect(_parse_pitch_string("Bb-1")).toEqual(["B" + FLAT, -1]);
+            expect(_parse_pitch_string("C" + SHARP + "4")).toEqual(["C" + SHARP, 4]);
+            expect(_parse_pitch_string("C" + FLAT + "4")).toEqual(["C" + FLAT, 4]);
+        });
+
+        it("should parse double accidentals using unicode or text", () => {
+            expect(_parse_pitch_string("F" + DOUBLESHARP + "5")).toEqual(["F" + DOUBLESHARP, 5]);
+            expect(_parse_pitch_string("C" + DOUBLEFLAT + "4")).toEqual(["C" + DOUBLEFLAT, 4]);
+            expect(_parse_pitch_string("Cx4")).toEqual(["C" + DOUBLESHARP, 4]);
+        });
+
+        it("should parse multiple accidentals that cancel out or combine", () => {
+            expect(_parse_pitch_string("C#b4")).toEqual(["C", 4]);
+            expect(_parse_pitch_string("D###4")).toEqual(["D" + SHARP + SHARP + SHARP, 4]);
+            expect(_parse_pitch_string("Ebbb2")).toEqual(["E" + FLAT + FLAT + FLAT, 2]);
+        });
+
+        it("should fallback when regex fails to match (e.g., missing octave)", () => {
+            expect(_parse_pitch_string("x")).toEqual(["x", 4]);
+            expect(_parse_pitch_string("X#")).toEqual(["X" + SHARP, 4]);
+        });
+    });
 });
 
 describe("_getStepSize freeze guard (non-12 EDO temperaments)", () => {
@@ -3688,5 +3738,31 @@ describe("_getStepSize custom temperament with ratios", () => {
         });
         expect(_getStepSize("C major", "C", "up", 5, "testNoRatios")).toBe(5);
         expect(_getStepSize("C major", "C", "down", 3, "testNoRatios")).toBe(3);
+    });
+});
+
+describe("getStepSizeDown with custom temperament", () => {
+    beforeEach(() => {
+        addTemperamentToDictionary("testWithRatios19", {
+            pitchNumber: 19,
+            noteLabels: generateNoteNames(19),
+            ratios: Array.from({ length: 19 }, (_, i) => Math.pow(2, i / 19))
+        });
+    });
+
+    it("computes the real EDO-native step for a custom temperament with ratios (no shortcut)", () => {
+        const result = getStepSizeDown("C major", "D", 5, "testWithRatios19");
+        // The 19-EDO major scale has C -> D = 3 steps; the transposition
+        // shortcut (5) must NOT be returned, and neither may the 12-EDO step (2).
+        expect(result).not.toBe(-5);
+        expect(result).toBe(-3);
+    });
+
+    it("steps natively across multiple scale degrees in the custom temperament", () => {
+        // C# is NOT in the C major scale: the EDO-native fallback walk must
+        // step down one 19-EDO position (C# -> C) and report -1, not the
+        // proportional 12-EDO result (-2) produced by the PITCHES2 walk.
+        const result = getStepSizeDown("C major", "C#", 5, "testWithRatios19");
+        expect(result).toBe(-1);
     });
 });

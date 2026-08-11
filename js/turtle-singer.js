@@ -312,7 +312,7 @@ class Singer {
 
         const activity = logo.activity;
         const tur = activity.turtles.ithTurtle(turtle);
-        const temperament = logo.synth.inTemperament;
+        const temperament = logo && logo.synth && logo.synth.inTemperament;
         const edo = getCurrentEDO(temperament);
 
         let noteObj = getNote(
@@ -331,8 +331,8 @@ class Singer {
                 noteObj[0],
                 noteObj[1],
                 steps > 0
-                    ? getStepSizeUp(tur.singer.keySignature, noteObj[0], steps, temperament)
-                    : getStepSizeDown(tur.singer.keySignature, noteObj[0], steps, temperament),
+                    ? getStepSizeUp(tur.singer.keySignature, noteObj[0], steps, temperament, edo)
+                    : getStepSizeDown(tur.singer.keySignature, noteObj[0], steps, temperament, edo),
                 tur.singer.keySignature,
                 tur.singer.movable,
                 null,
@@ -346,8 +346,20 @@ class Singer {
             for (let i = 0; i < Math.abs(steps); i++) {
                 const stepEdo =
                     steps > 0
-                        ? getStepSizeUp(tur.singer.keySignature, noteObj[0], undefined, curTemp)
-                        : getStepSizeDown(tur.singer.keySignature, noteObj[0], undefined, curTemp);
+                        ? getStepSizeUp(
+                              tur.singer.keySignature,
+                              noteObj[0],
+                              undefined,
+                              curTemp,
+                              edo
+                          )
+                        : getStepSizeDown(
+                              tur.singer.keySignature,
+                              noteObj[0],
+                              undefined,
+                              curTemp,
+                              edo
+                          );
                 noteObj = getNote(
                     noteObj[0],
                     noteObj[1],
@@ -365,48 +377,36 @@ class Singer {
             const curTemp = temperament;
 
             const curEDO = edo;
-            if (curEDO === 12) {
-                for (let i = 0; i < Math.abs(steps); i++) {
-                    const stepEdo =
-                        steps > 0
-                            ? getStepSizeUp(tur.singer.keySignature, noteObj[0], undefined, curTemp)
-                            : getStepSizeDown(
-                                  tur.singer.keySignature,
-                                  noteObj[0],
-                                  undefined,
-                                  curTemp
-                              );
+            for (let i = 0; i < Math.abs(steps); i++) {
+                const stepEdo =
+                    steps > 0
+                        ? getStepSizeUp(
+                              tur.singer.keySignature,
+                              noteObj[0],
+                              undefined,
+                              curTemp,
+                              curEDO
+                          )
+                        : getStepSizeDown(
+                              tur.singer.keySignature,
+                              noteObj[0],
+                              undefined,
+                              curTemp,
+                              curEDO
+                          );
 
-                    noteObj = getNote(
-                        noteObj[0],
-                        noteObj[1],
-                        stepEdo,
-                        tur.singer.keySignature,
-                        tur.singer.movable,
-                        null,
-                        activity.errorMsg,
-                        curTemp,
-                        true,
-                        false // allow octave wrap
-                    );
-                }
-            } else {
-                for (let i = 0; i < Math.abs(steps); i++) {
-                    const stepEdo = steps > 0 ? 1 : -1;
-
-                    noteObj = getNote(
-                        noteObj[0],
-                        noteObj[1],
-                        stepEdo,
-                        tur.singer.keySignature,
-                        tur.singer.movable,
-                        null,
-                        activity.errorMsg,
-                        curTemp,
-                        true,
-                        false // allow octave wrap
-                    );
-                }
+                noteObj = getNote(
+                    noteObj[0],
+                    noteObj[1],
+                    stepEdo,
+                    tur.singer.keySignature,
+                    tur.singer.movable,
+                    null,
+                    activity.errorMsg,
+                    curTemp,
+                    true,
+                    false // allow octave wrap
+                );
             }
         }
 
@@ -443,11 +443,12 @@ class Singer {
         let n2 = lastNote + tur.singer.pitchNumberOffset;
 
         const temp = activity.logo.synth.inTemperament;
+        const edo = getCurrentEDO(temp);
 
         let i = 0;
         let noteObj = numberToPitch(n2, temp, undefined, tur.singer.pitchNumberOffset, activity);
         while (i++ < 100) {
-            n2 += getStepSizeUp(tur.singer.keySignature, noteObj[0], 1, temp);
+            n2 += getStepSizeUp(tur.singer.keySignature, noteObj[0], 1, temp, edo);
             if (n2 >= n1) break;
             noteObj = numberToPitch(n2, temp, undefined, tur.singer.pitchNumberOffset, activity);
         }
@@ -803,6 +804,7 @@ class Singer {
      */
     static processPitch(activity, note, octave, cents, turtle, blk) {
         const tur = activity.turtles.ithTurtle(turtle);
+        const edo = getCurrentEDO(activity.logo.synth.inTemperament);
         let noteObj = Singer.addScalarTransposition(
             activity.logo,
             turtle,
@@ -925,7 +927,13 @@ class Singer {
                     activity.logo.synth.inTemperament
                 );
                 nnote[0] = noteIsSolfege(note)
-                    ? getSolfege(nnote[0], tur.singer.keySignature, tur.singer.movable)
+                    ? getSolfege(
+                          nnote[0],
+                          tur.singer.keySignature,
+                          tur.singer.movable,
+                          activity.logo.synth.inTemperament,
+                          edo
+                      )
                     : nnote[0];
 
                 if (tur.singer.drumStyle.length > 0) {
@@ -975,7 +983,9 @@ class Singer {
                     noteObj[0] = getSolfege(
                         noteObj[0],
                         tur.singer.keySignature,
-                        tur.singer.movable
+                        tur.singer.movable,
+                        activity.logo.synth.inTemperament,
+                        edo
                     );
                 }
 
@@ -1042,7 +1052,9 @@ class Singer {
                     noteObj[0] = getSolfege(
                         noteObj[0],
                         tur.singer.keySignature,
-                        tur.singer.movable
+                        tur.singer.movable,
+                        activity.logo.synth.inTemperament,
+                        edo
                     );
                 }
 
@@ -1086,7 +1098,8 @@ class Singer {
                             getInterval(
                                 tur.singer.arpeggio[tur.singer.arpeggioIndex][0],
                                 tur.singer.keySignature,
-                                noteObj[0]
+                                noteObj[0],
+                                edo
                             ) + tur.singer.arpeggio[tur.singer.arpeggioIndex][1];
                         atrans += arpeggioTrans;
 
@@ -1167,7 +1180,7 @@ class Singer {
                 const noteObj2 = getNote(
                     noteObj1[0],
                     noteObj1[1],
-                    getInterval(intervals[i], tur.singer.keySignature, noteObj1[0]),
+                    getInterval(intervals[i], tur.singer.keySignature, noteObj1[0], edo),
                     tur.singer.keySignature,
                     tur.singer.movable,
                     null,
@@ -1200,7 +1213,7 @@ class Singer {
                 const noteObj2 = getNote(
                     noteObj1[0],
                     noteObj1[1],
-                    getInterval(chordInterval[0], tur.singer.keySignature, noteObj1[0]) +
+                    getInterval(chordInterval[0], tur.singer.keySignature, noteObj1[0], edo) +
                         chordInterval[1],
                     tur.singer.keySignature,
                     tur.singer.movable,
@@ -1316,7 +1329,13 @@ class Singer {
                 activity.logo.synth.inTemperament
             );
             nnote[0] = noteIsSolfege(note)
-                ? getSolfege(nnote[0], tur.singer.keySignature, tur.singer.movable)
+                ? getSolfege(
+                      nnote[0],
+                      tur.singer.keySignature,
+                      tur.singer.movable,
+                      activity.logo.synth.inTemperament,
+                      edo
+                  )
                 : nnote[0];
 
             if (tur.singer.drumStyle.length === 0) {
@@ -1381,7 +1400,7 @@ class Singer {
                 const noteObj2 = getNote(
                     noteObj1[0],
                     noteObj1[1],
-                    getInterval(intervals[i], tur.singer.keySignature, noteObj1[0]),
+                    getInterval(intervals[i], tur.singer.keySignature, noteObj1[0], edo),
                     tur.singer.keySignature,
                     tur.singer.movable,
                     null,

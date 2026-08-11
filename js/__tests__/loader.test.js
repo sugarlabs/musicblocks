@@ -142,6 +142,28 @@ describe("loader.js coverage", () => {
         );
     });
 
+    test("Maps enUS to the en locale file", async () => {
+        global.window.localStorage.languagePreference = "enUS";
+
+        await loadScript();
+
+        expect(mockI18next.init).toHaveBeenCalledWith(
+            expect.objectContaining({ lng: "en" }),
+            expect.any(Function)
+        );
+    });
+
+    test("Maps enUK to the en_GB locale file", async () => {
+        global.window.localStorage.languagePreference = "enUK";
+
+        await loadScript();
+
+        expect(mockI18next.init).toHaveBeenCalledWith(
+            expect.objectContaining({ lng: "en_GB" }),
+            expect.any(Function)
+        );
+    });
+
     test("Handles i18next initialization error", async () => {
         await loadScript({ initError: true });
 

@@ -396,6 +396,13 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                     window.localStorage.setItem("kanaPreference", "kanji");
                     return "ja";
                 }
+                // The language menu stores enUS/enUK, but the locale files are en/en_GB.
+                if (savedLanguage === "enUS") {
+                    return "en";
+                }
+                if (savedLanguage === "enUK") {
+                    return "en_GB";
+                }
                 return savedLanguage.startsWith("ja") ? "ja" : savedLanguage;
             }
         } catch (e) {

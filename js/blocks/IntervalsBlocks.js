@@ -94,6 +94,7 @@ function setupIntervalsBlocks(activity) {
             super("temperamentname", _("temperament name"));
             this.setCapability("valueDrivenLabel");
             this.setCapability("discreteChoice");
+            this.setCapability("wideLabel");
 
             // Set the palette, activity, extra width, and form the block with specific parameters
             this.setPalette("tone", activity);
@@ -121,6 +122,7 @@ function setupIntervalsBlocks(activity) {
             super("modename");
             this.setCapability("valueDrivenLabel");
             this.setCapability("discreteChoice");
+            this.setCapability("wideLabel");
 
             // Set the palette, activity, help string, extra width, and form the block with specific parameters
             this.setPalette("intervals", activity);
@@ -144,6 +146,7 @@ function setupIntervalsBlocks(activity) {
             super("chordname");
             this.setCapability("valueDrivenLabel");
             this.setCapability("discreteChoice");
+            this.setCapability("wideLabel");
 
             // Set the palette, activity, help string, extra width, and form the block with specific parameters
             this.setPalette("intervals", activity);
@@ -248,6 +251,7 @@ function setupIntervalsBlocks(activity) {
             super("intervalname");
             this.setCapability("valueDrivenLabel");
             this.setCapability("discreteChoice");
+            this.setCapability("wideLabel");
 
             // Set the palette, activity, help string, extra width, and form the block with specific parameters
             this.setPalette("intervals", activity);
@@ -1103,6 +1107,8 @@ function setupIntervalsBlocks(activity) {
          */
         constructor() {
             super("interval");
+            this.setCapability("collapsible");
+            this.setCapability("inlineCollapsible");
             this.setPalette("intervals", activity);
             this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
             this.beginnerBlock(true);
@@ -1156,6 +1162,8 @@ function setupIntervalsBlocks(activity) {
          */
         constructor() {
             super("definemode");
+            this.setCapability("collapsible");
+            this.setCapability("inlineCollapsible");
             this.setPalette("intervals", activity);
             this.setHelpString([
                 _(

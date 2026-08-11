@@ -32,8 +32,6 @@ global._ = s => s;
 global.NOINPUTERRORMSG = "NO_INPUT";
 global.DEFAULTDRUM = "kick";
 global.DEFAULTBLOCKSCALE = 1.0;
-global.COLLAPSIBLES = ["repeat", "forever", "if"];
-global.INLINECOLLAPSIBLES = ["newnote", "interval", "osctime"];
 global.last = arr => (arr && arr.length > 0 ? arr[arr.length - 1] : null);
 global.NOINPUTERRORMSG = "NO_INPUT";
 global.DEFAULTDRUM = "kick";
@@ -936,6 +934,18 @@ describe("RhythmBlocks", () => {
 
         test("osctime declares noteContainer capability", () => {
             expect(getBlock("osctime").getCapability("noteContainer")).toBe(true);
+        });
+    });
+
+    describe("inlineCollapsible capability", () => {
+        test("newnote declares collapsible and inlineCollapsible", () => {
+            expect(getBlock("newnote").getCapability("collapsible")).toBe(true);
+            expect(getBlock("newnote").getCapability("inlineCollapsible")).toBe(true);
+        });
+
+        test("osctime declares collapsible and inlineCollapsible", () => {
+            expect(getBlock("osctime").getCapability("collapsible")).toBe(true);
+            expect(getBlock("osctime").getCapability("inlineCollapsible")).toBe(true);
         });
     });
 

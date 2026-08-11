@@ -12,13 +12,13 @@
 /*
    global docById, define,
 
-   BACKWARDCOMPATIBILITYDICT, COLLAPSIBLES, DEFAULTACCIDENTAL,
-   DEFAULTBLOCKSCALE, DEFAULTDRUM, DEFAULTEFFECT, DEFAULTFILTER,
-   DEFAULTFILTERTYPE, DEFAULTINTERVAL, DEFAULTINVERT, DEFAULTMODE,
-   DEFAULTNOISE, DEFAULTOSCILLATORTYPE, DEFAULTTEMPERAMENT,
-   DEFAULTVOICE, INLINECOLLAPSIBLES, NATURAL, NUMBERBLOCKDEFAULT,
+    BACKWARDCOMPATIBILITYDICT, DEFAULTACCIDENTAL,
+    DEFAULTBLOCKSCALE, DEFAULTDRUM, DEFAULTEFFECT, DEFAULTFILTER,
+    DEFAULTFILTERTYPE, DEFAULTINTERVAL, DEFAULTINVERT, DEFAULTMODE,
+    DEFAULTNOISE, DEFAULTOSCILLATORTYPE, DEFAULTTEMPERAMENT,
+    DEFAULTVOICE, NATURAL, NUMBERBLOCKDEFAULT,
     STANDARDBLOCKHEIGHT, STRINGLEN, TEXTWIDTH,
-    WESTERN2EISOLFEGENAMES, WIDENAMES, addTemperamentToDictionary,
+    WESTERN2EISOLFEGENAMES, addTemperamentToDictionary,
    Block, closeBlkWidgets, ConnectionValidator, createjs, delayExecution, DEFAULTCHORD,
    deleteTemperamentFromList, getDrumSynthName, getNoiseName,
    getNoiseSynthName, getTemperamentsList, getTextWidth,
@@ -45,7 +45,7 @@
         setupBlockDragController
    - js/connection-validator.js
         ConnectionValidator
-   - js/piemenus.js
+   - js/piemenu-block-context.js
         piemenuBlockContext
    - js/protoblocks.js
         ProtoBlock
@@ -62,26 +62,6 @@
         updateTemperaments
 */
 // Constants moved to js/block-constants.js
-
-const PITCHBLOCKS = ["pitch", "steppitch", "hertz", "pitchnumber", "nthmodalpitch", "playdrum"];
-
-/**
- * Lazy-initialized Sets for O(1) collapsible type checks in hot paths.
- * Built on first access because the COLLAPSIBLES/INLINECOLLAPSIBLES
- * globals may not yet exist at module parse time in test environments.
- */
-let _collapsiblesSet = null;
-let _inlineCollapsiblesSet = null;
-
-function getCollapsiblesSet() {
-    if (!_collapsiblesSet) _collapsiblesSet = new Set(COLLAPSIBLES);
-    return _collapsiblesSet;
-}
-
-function getInlineCollapsiblesSet() {
-    if (!_inlineCollapsiblesSet) _inlineCollapsiblesSet = new Set(INLINECOLLAPSIBLES);
-    return _inlineCollapsiblesSet;
-}
 
 /**
  * Blocks holds the list of blocks and most of the block-associated
@@ -558,6 +538,9 @@ class Blocks {
                         this.adjustExpandableClampBlock();
                     }
                 }
+                if (adjustDock) {
+                    this.adjustDocks(blk, true);
+                }
             } else {
                 if (firstConnection !== null) {
                     connectionIdx = this.blockList[firstConnection].connections.indexOf(blk);
@@ -588,8 +571,9 @@ class Blocks {
         };
 
         /**
-         * Toggle state of collapsible blocks, except for note blocks,
-         * which are handled separately.
+         * Toggle state of collapsible blocks, except for inline-collapsible
+         * blocks (e.g. note, interval, osctime, definemode), which are
+         * handled separately.
          * @public
          * @returns {void}
          */
@@ -597,11 +581,11 @@ class Blocks {
             let allCollapsed = true;
             let someCollapsed = false;
             for (const myBlock of this.blockList) {
-                if (!myBlock || ["newnote", "interval", "osctime"].includes(myBlock.name)) {
+                if (!myBlock || myBlock.isInlineCollapsible()) {
                     continue;
                 }
 
-                if (COLLAPSIBLES.includes(myBlock.name) && !myBlock.trash) {
+                if (myBlock.isCollapsible() && !myBlock.trash) {
                     if (myBlock.collapsed) {
                         someCollapsed = true;
                     } else {
@@ -616,22 +600,22 @@ class Blocks {
                  * If any blocks are collapsed, collapse them all.
                  */
                 for (const myBlock of this.blockList) {
-                    if (!myBlock || ["newnote", "interval", "osctime"].includes(myBlock.name)) {
+                    if (!myBlock || myBlock.isInlineCollapsible()) {
                         continue;
                     }
 
-                    if (COLLAPSIBLES.includes(myBlock.name) && !myBlock.trash) {
+                    if (myBlock.isCollapsible() && !myBlock.trash) {
                         myBlock.collapseToggle();
                     }
                 }
             } else {
                 /** If no blocks are collapsed, collapse them all. */
                 for (const myBlock of this.blockList) {
-                    if (!myBlock || ["newnote", "interval", "osctime"].includes(myBlock.name)) {
+                    if (!myBlock || myBlock.isInlineCollapsible()) {
                         continue;
                     }
 
-                    if (COLLAPSIBLES.includes(myBlock.name) && !myBlock.trash) {
+                    if (myBlock.isCollapsible() && !myBlock.trash) {
                         if (!myBlock.collapsed) {
                             myBlock.collapseToggle();
                         }
@@ -775,8 +759,8 @@ class Blocks {
         this._getBlockSize = blk => {
             const myBlock = this.blockList[blk];
             if (myBlock === undefined) return 0;
-            /** Special case for collapsed note blocks. */
-            if (["newnote", "interval", "osctime"].includes(myBlock.name) && myBlock.collapsed) {
+            /** Special case for collapsed inline-collapsible blocks. */
+            if (myBlock.isInlineCollapsible() && myBlock.collapsed) {
                 return 1;
             }
 
@@ -1040,13 +1024,10 @@ class Blocks {
                 size = myBlock.size;
             }
 
-            /** If the note value block is collapsed, spoof size. */
+            /** If the inline-collapsible block is collapsed, spoof size. */
             if (this.blocksToCollapse.indexOf(blk) !== -1) {
                 size = 1;
-            } else if (
-                ["newnote", "interval", "osctime"].includes(myBlock.name) &&
-                myBlock.collapsed
-            ) {
+            } else if (myBlock.isInlineCollapsible() && myBlock.collapsed) {
                 size = 1;
             }
 
@@ -1577,12 +1558,12 @@ class Blocks {
                 }
 
                 const nextBlock = last(this.blockList[thisBlock].connections);
-                if (PITCHBLOCKS.includes(this.blockList[thisBlock].name)) {
+                if (this.blockList[thisBlock]?.isSoundSpecifier?.()) {
                     this._extractBlock(thisBlock, false);
                 } else if (["flat", "sharp"].includes(this.blockList[thisBlock].name)) {
                     /** The pitch block might be inside a sharp or flat block. */
                     const b = this.blockList[thisBlock].connections[1];
-                    if (this._blockInStack(b, PITCHBLOCKS)) {
+                    if (this._blockInStack(b, blk => blk?.isSoundSpecifier?.())) {
                         this._extractBlock(thisBlock, false);
                     }
                 }
@@ -1739,17 +1720,6 @@ class Blocks {
         this._testConnectionType = (type1, type2) => {
             return ConnectionValidator.testConnectionType(type1, type2);
         };
-
-        /**
-         * Exposes the collapsible-type lookups so BlockDragController (and
-         * any other consumer) can query block classification without
-         * owning or duplicating the COLLAPSIBLES/INLINECOLLAPSIBLES lists
-         * themselves.
-         * @public
-         * @returns {Set}
-         */
-        this.getCollapsiblesSet = getCollapsiblesSet;
-        this.getInlineCollapsiblesSet = getInlineCollapsiblesSet;
 
         /**
          * Ensure that all the blocks are where they are supposed to be.
@@ -2102,7 +2072,7 @@ class Blocks {
                     break;
             }
 
-            if (!WIDENAMES.includes(myBlock.name) && label.length > maxLength) {
+            if (!myBlock.hasWideLabel() && label.length > maxLength) {
                 label = label.substr(0, maxLength - 1) + "...";
             }
 
@@ -2229,11 +2199,15 @@ class Blocks {
          * @private
          * @returns boolean
          */
-        this._blockInStack = (thisBlock, names) => {
-            /** Is there a block of any of these names in this stack? */
+        this._blockInStack = (thisBlock, namesOrPredicate) => {
+            /** Is there a block of any of these names/predicates in this stack? */
             let counter = 0;
             while (thisBlock !== null) {
-                if (names.includes(this.blockList[thisBlock].name)) {
+                const matched =
+                    typeof namesOrPredicate === "function"
+                        ? namesOrPredicate(this.blockList[thisBlock])
+                        : namesOrPredicate.includes(this.blockList[thisBlock].name);
+                if (matched) {
                     return true;
                 }
 
@@ -3024,7 +2998,7 @@ class Blocks {
                             that.blockList[b].value = v;
                             let l = _(value.toString());
                             if (
-                                !WIDENAMES.includes(that.blockList[b].name) &&
+                                !that.blockList[b].hasWideLabel() &&
                                 getTextWidth(l, "bold 20pt Sans") > TEXTWIDTH
                             ) {
                                 l = l.substr(0, STRINGLEN) + "...";
@@ -3051,7 +3025,7 @@ class Blocks {
                         that.blockList[b].value = v;
                         let l = _(v.toString());
                         if (
-                            !WIDENAMES.includes(that.blockList[b].name) &&
+                            !that.blockList[b].hasWideLabel() &&
                             getTextWidth(l, "bold 20pt Sans") > TEXTWIDTH
                         ) {
                             l = l.substr(0, STRINGLEN) + "...";
@@ -4116,7 +4090,7 @@ class Blocks {
                 return null;
             }
 
-            if (PITCHBLOCKS.includes(this.blockList[blk].name)) {
+            if (this.blockList[blk]?.isSoundSpecifier?.()) {
                 return blk;
             } else if (this.blockList[blk].name === "rest2") {
                 return blk;
@@ -4956,7 +4930,8 @@ class Blocks {
                             break;
                     }
 
-                    if (COLLAPSIBLES.includes(name)) {
+                    const proto = this.protoBlockDict[name];
+                    if (proto && proto.hasCapability("collapsible")) {
                         if (
                             typeof blkData[1] === "object" &&
                             blkData[1].length > 1 &&
@@ -5391,7 +5366,12 @@ class Blocks {
                         blkInfo = [blkData[1][0], { value: null }];
                     } else if (["number", "string"].includes(typeof blkData[1][1])) {
                         blkInfo = [blkData[1][0], { value: blkData[1][1] }];
-                        if (COLLAPSIBLES.includes(blkData[1][0])) {
+                        const normName =
+                            blkData[1][0] in BACKWARDCOMPATIBILITYDICT
+                                ? BACKWARDCOMPATIBILITYDICT[blkData[1][0]]
+                                : blkData[1][0];
+                        const proto = this.protoBlockDict[normName];
+                        if (proto && proto.hasCapability("collapsible")) {
                             blkInfo[1]["collapsed"] = false;
                         }
                     } else {
@@ -5399,7 +5379,12 @@ class Blocks {
                     }
                 } else {
                     blkInfo = [blkData[1], { value: null }];
-                    if (COLLAPSIBLES.includes(blkData[1])) {
+                    const normName =
+                        blkData[1] in BACKWARDCOMPATIBILITYDICT
+                            ? BACKWARDCOMPATIBILITYDICT[blkData[1]]
+                            : blkData[1];
+                    const proto = this.protoBlockDict[normName];
+                    if (proto && proto.hasCapability("collapsible")) {
                         blkInfo[1]["collapsed"] = false;
                     }
                 }

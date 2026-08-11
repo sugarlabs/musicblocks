@@ -1143,6 +1143,107 @@ describe("PhraseMaker Widget", () => {
 
         expect(phraseMaker.activity.blocks.loadNewBlocks).toHaveBeenCalled();
     });
+    test("_save wires lastConnection identically across all block types (characterization)", () => {
+        global.PhraseMakerAudio = { collectNotesToPlay: jest.fn() };
+
+        phraseMaker._rows = [];
+        phraseMaker._rowBlocks = [];
+        phraseMaker._colBlocks = [];
+        phraseMaker._blockMap = {};
+        phraseMaker._rowMap = [];
+        phraseMaker._rowOffset = [];
+
+        phraseMaker.lyricsON = false;
+
+        phraseMaker._notesToPlay = [
+            [["440"], 4], // hertz
+            [["kick"], 4], // drum
+            [["http://x.wav"], 4], // drum url
+            [["arc: 50: 90"], 4], // 2-arg graphics
+            [["forward: 100"], 4], // 1-arg graphics
+            [["E4"], 4], // plain pitch, single-length note
+            [["C4", "G4"], 4] // multi pitch: exercises j !== length-1 vs j === length-1
+        ];
+        phraseMaker._outputAsTuplet = Array(7).fill([1, 4]);
+
+        phraseMaker._deps.getDrumName = jest.fn(n => (n === "kick" ? "kick" : null));
+        phraseMaker._deps.toFraction = jest.fn(() => [1, 4]);
+        phraseMaker._deps.isCustomTemperament = jest.fn(() => false);
+        phraseMaker._deps.SOLFEGECONVERSIONTABLE = { C: "do", G: "so" };
+
+        global.PhraseMakerUtils = {
+            MATRIXGRAPHICS: ["forward"],
+            MATRIXGRAPHICS2: ["arc"],
+            MATRIXSYNTHS: []
+        };
+
+        phraseMaker.activity = {
+            blocks: {
+                palettes: { dict: {} },
+                loadNewBlocks: jest.fn()
+            },
+            refreshCanvas: jest.fn(),
+            textMsg: jest.fn(),
+            logo: { synth: { inTemperament: "equal" } }
+        };
+
+        phraseMaker._save();
+
+        // Second run with lyricsON = true so the guard's `!this.lyricsON`
+        // half is false, forcing every block into the thisBlock+offset
+        // branch (the null branch is already exercised above).
+        phraseMaker.lyricsON = true;
+        phraseMaker._save();
+
+        // Narrow, non-brittle signature: for every block whose connections
+        // array is wired up by _computeLastConnection (hertz/playdrum/arc/
+        // forward/pitch — the 6 call sites the helper replaced), record only
+        // [blockType, lastConnection]. This pins down exactly what the
+        // extraction must preserve without hardcoding the surrounding
+        // newnote/vspace/divide/number scaffolding, which is unrelated to
+        // this refactor and would make the test brittle against unrelated
+        // future changes to _save()'s block-building logic.
+        const LAST_CONNECTION_TYPES = ["hertz", "playdrum", "arc", "forward", "pitch"];
+        const toLastConnectionSignature = newStack =>
+            newStack
+                .filter(entry => LAST_CONNECTION_TYPES.includes(entry[1]))
+                .map(entry => [entry[1], entry[4][entry[4].length - 1]]);
+
+        const [lyricsOffCall, lyricsOnCall] = phraseMaker.activity.blocks.loadNewBlocks.mock.calls;
+
+        // lyricsON = false, every note[0] is length 1 except the trailing
+        // multi-pitch note: the guard's `(note[0].length === 1 || ...)` half
+        // is true for every single-length note, so lastConnection is null
+        // there; the multi-pitch note's non-last pitch (C4) still resolves
+        // to thisBlock+3 via the `j === note[0].length - 1` half being false.
+        expect(toLastConnectionSignature(lyricsOffCall[0])).toEqual([
+            ["hertz", null],
+            ["playdrum", null], // kick
+            ["playdrum", null], // http url
+            ["arc", null],
+            ["forward", null],
+            ["pitch", null], // single-length E4
+            ["pitch", 54], // multi-pitch C4, j=0, not last -> thisBlock(51)+3
+            ["pitch", null] // multi-pitch G4, j=1, last
+        ]);
+
+        // lyricsON = true: the guard's `!this.lyricsON` half is always
+        // false, so lastConnection is thisBlock+offset for every block,
+        // regardless of position — pinning down each type's exact offset
+        // (hertz/playdrum/forward: +2, arc/pitch: +3).
+        expect(toLastConnectionSignature(lyricsOnCall[0])).toEqual([
+            ["hertz", 9], // thisBlock(7)+2
+            ["playdrum", 18], // kick, thisBlock(16)+2
+            ["playdrum", 27], // http url, thisBlock(25)+2
+            ["arc", 37], // thisBlock(34)+3
+            ["forward", 46], // thisBlock(44)+2
+            ["pitch", 56], // single-length E4, thisBlock(53)+3
+            ["pitch", 66], // multi-pitch C4, j=0, thisBlock(63)+3
+            ["pitch", 69] // multi-pitch G4, j=1, thisBlock(66)+3
+        ]);
+
+        expect(phraseMaker.activity.blocks.loadNewBlocks).toHaveBeenCalledTimes(2);
+    });
     test("_save covers 7-block tuplet branch", () => {
         phraseMaker._rows = [];
         phraseMaker._rowBlocks = [];
@@ -1277,6 +1378,98 @@ describe("PhraseMaker Widget", () => {
         phraseMaker.init(mockActivity);
 
         expect(mockActivity.textMsg).toHaveBeenCalled();
+    });
+    test("isInitial ensures the first-open message fires only once across repeated init() calls", () => {
+        const mockActivity = {
+            turtles: {
+                ithTurtle: jest.fn(() => ({
+                    singer: {
+                        beatsPerMeasure: 4,
+                        noteValuePerBeat: 4,
+                        keySignature: 0
+                    }
+                }))
+            },
+            logo: {
+                tupletRhythms: [["notes", 0, 4]],
+                synth: {
+                    inTemperament: "equal",
+                    stopSound: jest.fn(),
+                    stop: jest.fn(),
+                    loadSynth: jest.fn()
+                }
+            },
+            blocks: {
+                protoBlockDict: {
+                    forward: { staticLabels: ["Forward"] }
+                }
+            },
+            canvas: { width: 800, height: 600 },
+            getStageScale: jest.fn(() => 1),
+            hideMsgs: jest.fn(),
+            textMsg: jest.fn()
+        };
+
+        phraseMaker._rows = [];
+        phraseMaker._headcols = [];
+        phraseMaker._labelcols = [];
+        phraseMaker._blockMap = {};
+        phraseMaker.blockNo = 0;
+        phraseMaker.rowLabels = ["C", "kick", "forward"];
+        phraseMaker.rowArgs = [4, 4, 100];
+        phraseMaker._deps.getDrumName = jest.fn(name => (name === "kick" ? "kick" : null));
+        phraseMaker.lyricsON = true;
+
+        global.PhraseMakerUtils = {
+            MATRIXGRAPHICS: ["forward"],
+            MATRIXGRAPHICS2: [],
+            MATRIXSYNTHS: []
+        };
+
+        global.window.widgetWindows = {
+            windowFor: jest.fn().mockReturnValue({
+                clear: jest.fn(),
+                show: jest.fn(),
+                addButton: jest.fn().mockReturnValue({
+                    onclick: null,
+                    innerHTML: "",
+                    style: {},
+                    setAttribute: jest.fn()
+                }),
+                getWidgetBody: jest.fn().mockReturnValue({
+                    appendChild: jest.fn(),
+                    append: jest.fn()
+                }),
+                sendToCenter: jest.fn(),
+                destroy: jest.fn()
+            })
+        };
+        global.PhraseMakerUI = {
+            calculateNoteWidth: jest.fn(() => 80),
+            resetMatrix: jest.fn()
+        };
+
+        expect(phraseMaker.isInitial).toBe(true);
+
+        phraseMaker.init(mockActivity);
+
+        expect(mockActivity.textMsg).toHaveBeenCalledTimes(1);
+        expect(mockActivity.textMsg).toHaveBeenCalledWith("Click on the table to add notes.", 3000);
+        expect(phraseMaker.isInitial).toBe(false);
+
+        // init() itself doesn't clear row-building state between calls (the
+        // real caller always builds a fresh matrix); reset just enough of it
+        // here so a second call completes, to prove the first-open message
+        // does not repeat once isInitial has flipped to false.
+        phraseMaker._rows = [];
+        phraseMaker._headcols = [];
+        phraseMaker._labelcols = [];
+        phraseMaker._blockMap = {};
+
+        phraseMaker.init(mockActivity);
+
+        expect(mockActivity.textMsg).toHaveBeenCalledTimes(1);
+        expect(phraseMaker.isInitial).toBe(false);
     });
     test("_createColumnPieSubmenu executes", () => {
         phraseMaker.platformColor = {

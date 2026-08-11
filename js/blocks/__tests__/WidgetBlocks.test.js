@@ -60,6 +60,17 @@ class DummyFlowBlock {
     makeMacro(fn) {
         this.macroFunc = fn;
     }
+    setCapability(name, value = true) {
+        if (!this.capabilities) {
+            this.capabilities = Object.create(null);
+        }
+        this.capabilities[name] = !!value;
+    }
+    hasCapability(name) {
+        return Object.prototype.hasOwnProperty.call(this.capabilities || {}, name)
+            ? !!this.capabilities[name]
+            : false;
+    }
 }
 
 class DummyStackClampBlock extends DummyFlowBlock {

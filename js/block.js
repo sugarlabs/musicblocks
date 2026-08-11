@@ -64,7 +64,8 @@
    - js/logo.js
    - js/piemenus.js
         piemenuNumber, piemenuColor, piemenuNoteValue, piemenuBasic, piemenuBoolean, piemenuVoices,
-        piemenuIntervals, piemenuAccidentals, piemenuModes, piemenuPitches, piemenuCustomNotes,
+        piemenuIntervals, piemenuAccidentals, piemenuModes, piemenuPitches, piemenuCustomNotes
+   - js/piemenu-block-context.js
         piemenuBlockContext
    - js/utils/platformstyle.js
         platformColor
@@ -91,56 +92,6 @@ const STRINGLEN = 9;
  * @type {number}
  */
 const LONGPRESSTIME = 1500;
-const INLINECOLLAPSIBLES = ["newnote", "interval", "osctime", "definemode"];
-
-/**
- * List of block types that are collapsible inline.
- * @type {string[]}
- */
-const COLLAPSIBLES = [
-    "drum",
-    "start",
-    "action",
-    "temperament1",
-    "matrix",
-    "pitchdrummatrix",
-    "rhythmruler2",
-    "timbre",
-    "status",
-    "pitchstaircase",
-    "tempo",
-    "pitchslider",
-    "modewidget",
-    "newnote",
-    "musickeyboard",
-    "temperament",
-    "interval",
-    "osctime",
-    "definemode"
-];
-
-/**
- * List of block types whose names should be widened.
- * @type {string[]}
- */
-const WIDENAMES = [
-    "intervalname",
-    "accidentalname",
-    "drumname",
-    "effectsname",
-    "voicename",
-    "modename",
-    "chordname",
-    "temperamentname",
-    "noisename",
-    "outputtools"
-];
-
-/**
- * List of additional block types whose names should be widened.
- * @type {string[]}
- */
-const EXTRAWIDENAMES = [];
 
 /**
  * Async function to create bitmap from SVG data.
@@ -585,7 +536,7 @@ class Block {
      * @returns {boolean} - Returns true if the block is collapsible, otherwise false.
      */
     isCollapsible() {
-        return COLLAPSIBLES.includes(this.name);
+        return this.hasCapability("collapsible");
     }
 
     /**
@@ -593,7 +544,7 @@ class Block {
      * @returns {boolean} - Returns true if the block is inline collapsible, otherwise false.
      */
     isInlineCollapsible() {
-        return INLINECOLLAPSIBLES.includes(this.name);
+        return this.hasCapability("inlineCollapsible");
     }
 
     /**
@@ -1543,10 +1494,7 @@ class Block {
                 }
             }
 
-            if (
-                !WIDENAMES.includes(this.name) &&
-                getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH
-            ) {
+            if (!this.hasWideLabel() && getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
                 label = label.substr(0, STRINGLEN) + "...";
             }
 
@@ -1956,8 +1904,8 @@ class Block {
             return false;
         }
 
-        if (COLLAPSIBLES.includes(this.name)) {
-            if (!INLINECOLLAPSIBLES.includes(this.name)) {
+        if (this.isCollapsible()) {
+            if (!this.isInlineCollapsible()) {
                 return false;
             }
         }
@@ -2089,11 +2037,27 @@ class Block {
     }
 
     /**
+     * Checks if the block specifies a sound element (pitch, frequency, or drum).
+     * @returns {boolean} - True if the block has soundSpecifier capability.
+     */
+    isSoundSpecifier() {
+        return this.hasCapability("soundSpecifier");
+    }
+
+    /**
      * Checks if the block derives its visible inline label from its value.
      * @returns {boolean} - True if the block has value-driven label behavior.
      */
     hasValueDrivenLabel() {
         return this.hasCapability("valueDrivenLabel");
+    }
+
+    /**
+     * Checks if the block should keep a wide (untruncated) value label layout.
+     * @returns {boolean} - True if the block has wideLabel capability.
+     */
+    hasWideLabel() {
+        return this.hasCapability("wideLabel");
     }
 
     /**
@@ -2973,9 +2937,7 @@ class Block {
         if (this.hasValueDrivenLabel()) {
             this.text.textAlign = "center";
             this.text.x = Math.floor((VALUETEXTX * blockScale) / 2 + 10.0);
-            if (EXTRAWIDENAMES.includes(this.name)) {
-                this.text.x *= 3.0;
-            } else if (WIDENAMES.includes(this.name)) {
+            if (this.hasWideLabel()) {
                 this.text.x = Math.floor(this.text.x * 1.75 + 0.5);
             } else if (this.name === "text") {
                 this.text.x = Math.floor(this.width / 2 + 0.5);
@@ -4866,7 +4828,7 @@ class Block {
             label = _(this.value.toString());
         }
 
-        if (!WIDENAMES.includes(this.name) && getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
+        if (!this.hasWideLabel() && getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
             let slen = label.length - 5;
             let nlabel = "" + label.substr(0, slen) + "...";
             while (getTextWidth(nlabel, "bold 20pt Sans") > TEXTWIDTH) {

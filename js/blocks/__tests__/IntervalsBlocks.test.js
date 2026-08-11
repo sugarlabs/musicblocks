@@ -204,6 +204,33 @@ describe("setupIntervalsBlocks", () => {
         });
     });
 
+    describe("inlineCollapsible capability", () => {
+        it("interval declares collapsible and inlineCollapsible", () => {
+            expect(createdBlocks.interval.getCapability("collapsible")).toBe(true);
+            expect(createdBlocks.interval.getCapability("inlineCollapsible")).toBe(true);
+        });
+
+        // definemode was historically in INLINECOLLAPSIBLES and already declares
+        // inlineCollapsible; size/toggle paths must treat it like other inline blocks.
+        it("definemode declares collapsible and inlineCollapsible", () => {
+            expect(createdBlocks.definemode.getCapability("collapsible")).toBe(true);
+            expect(createdBlocks.definemode.getCapability("inlineCollapsible")).toBe(true);
+        });
+    });
+
+    describe("wideLabel capability", () => {
+        it("marks temperament/mode/chord/interval name blocks as wideLabel", () => {
+            expect(createdBlocks["temperamentname"].getCapability("wideLabel")).toBe(true);
+            expect(createdBlocks["modename"].getCapability("wideLabel")).toBe(true);
+            expect(createdBlocks["chordname"].getCapability("wideLabel")).toBe(true);
+            expect(createdBlocks["intervalname"].getCapability("wideLabel")).toBe(true);
+        });
+
+        it("does not mark intervalnumber as wideLabel", () => {
+            expect(createdBlocks["intervalnumber"].getCapability("wideLabel")).toBeUndefined();
+        });
+    });
+
     describe("Setup", () => {
         it("registers interval blocks", () => {
             expect(Object.keys(createdBlocks).length).toBeGreaterThan(0);
