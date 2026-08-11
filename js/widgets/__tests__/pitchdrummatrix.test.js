@@ -287,6 +287,8 @@ describe("PitchDrumMatrix Widget", () => {
             expect(img.src).toContain("header-icons/play-button.svg");
             expect(img.title).toBe("Play");
             expect(img.alt).toBe("Play");
+            expect(img.getAttribute("height")).toBe(String(PitchDrumMatrix.ICONSIZE));
+            expect(img.getAttribute("width")).toBe(String(PitchDrumMatrix.ICONSIZE));
         });
 
         test("should create img element with correct stop attributes", () => {
@@ -302,6 +304,8 @@ describe("PitchDrumMatrix Widget", () => {
             expect(img.src).toContain("header-icons/stop-button.svg");
             expect(img.title).toBe("Stop");
             expect(img.alt).toBe("Stop");
+            expect(img.getAttribute("height")).toBe(String(PitchDrumMatrix.ICONSIZE));
+            expect(img.getAttribute("width")).toBe(String(PitchDrumMatrix.ICONSIZE));
         });
     });
 
