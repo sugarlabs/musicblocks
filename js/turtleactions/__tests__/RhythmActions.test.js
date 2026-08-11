@@ -97,17 +97,13 @@ describe("setupRhythmActions", () => {
     });
 
     it("sets beat and measure to 0 when pickup not crossed", () => {
-        const enqueue = jest.fn();
-
-        Singer.RhythmActions.playNote(1, "note", 0, 1, enqueue);
+        Singer.RhythmActions.playNote(1, "note", 0, 1);
 
         expect(targetTurtle.singer.currentBeat).toBe(0);
         expect(targetTurtle.singer.currentMeasure).toBe(0);
     });
 
     it("sets correct beat and measure when pickup is crossed", () => {
-        const enqueue = jest.fn();
-
         targetTurtle.singer.notesPlayed = [2, 1]; // pickup crossed
         targetTurtle.singer.pickup = 0;
         targetTurtle.singer.noteValuePerBeat = 1;
@@ -115,29 +111,24 @@ describe("setupRhythmActions", () => {
         targetTurtle.singer.beatList = [];
         targetTurtle.singer.factorList = [];
 
-        Singer.RhythmActions.playNote(1, "note", 0, 1, enqueue);
+        Singer.RhythmActions.playNote(1, "note", 0, 1);
 
         expect(targetTurtle.singer.currentBeat).toBe(3);
         expect(targetTurtle.singer.currentMeasure).toBe(1);
     });
 
     it("triggers everybeat event when beatList contains 'everybeat'", () => {
-        const enqueue = jest.fn();
-
         targetTurtle.singer.notesPlayed = [1, 1]; // pickup crossed
         targetTurtle.singer.pickup = 0;
         targetTurtle.singer.beatList = ["everybeat"];
         targetTurtle.singer.factorList = [];
 
-        Singer.RhythmActions.playNote(1, "note", 0, 1, enqueue);
+        Singer.RhythmActions.playNote(1, "note", 0, 1);
 
-        expect(enqueue).not.toHaveBeenCalled();
         expect(activity.stage.dispatchEvent).toHaveBeenCalledWith("__everybeat_0__");
     });
 
     it("triggers specific beat event when beatList contains current beat", () => {
-        const enqueue = jest.fn();
-
         // setup so beat = 2
         targetTurtle.singer.notesPlayed = [1, 1]; // 1 beat played
         targetTurtle.singer.pickup = 0;
@@ -147,16 +138,13 @@ describe("setupRhythmActions", () => {
         targetTurtle.singer.beatList = [2];
         targetTurtle.singer.factorList = [];
 
-        Singer.RhythmActions.playNote(1, "note", 0, 1, enqueue);
+        Singer.RhythmActions.playNote(1, "note", 0, 1);
 
         expect(targetTurtle.singer.currentBeat).toBe(2);
-        expect(enqueue).not.toHaveBeenCalled();
         expect(activity.stage.dispatchEvent).toHaveBeenCalledWith("__beat_2_0__");
     });
 
     it("triggers offbeat event when beatList contains 'offbeat' and beat > 1", () => {
-        const enqueue = jest.fn();
-
         // make beat = 2
         targetTurtle.singer.notesPlayed = [1, 1]; // beat = 1 → beatValue = 2
         targetTurtle.singer.pickup = 0;
@@ -166,15 +154,12 @@ describe("setupRhythmActions", () => {
         targetTurtle.singer.beatList = ["offbeat"];
         targetTurtle.singer.factorList = [];
 
-        Singer.RhythmActions.playNote(1, "note", 0, 1, enqueue);
+        Singer.RhythmActions.playNote(1, "note", 0, 1);
 
         expect(targetTurtle.singer.currentBeat).toBe(2);
-        expect(enqueue).not.toHaveBeenCalled();
         expect(activity.stage.dispatchEvent).toHaveBeenCalledWith("__offbeat_0__");
     });
     it("triggers factorList beat event when beat matches factor", () => {
-        const enqueue = jest.fn();
-
         // beat = 2
         targetTurtle.singer.notesPlayed = [1, 1]; // beatValue = 2
         targetTurtle.singer.pickup = 0;
@@ -184,9 +169,8 @@ describe("setupRhythmActions", () => {
         targetTurtle.singer.beatList = [];
         targetTurtle.singer.factorList = [2];
 
-        Singer.RhythmActions.playNote(1, "note", 0, 1, enqueue);
+        Singer.RhythmActions.playNote(1, "note", 0, 1);
 
-        expect(enqueue).not.toHaveBeenCalled();
         expect(activity.stage.dispatchEvent).toHaveBeenCalledWith("__beat_2_0__");
     });
     it("adds rest note when inside a note block", () => {
@@ -524,10 +508,9 @@ describe("setupRhythmActions", () => {
         expect(targetTurtle.singer.beatFactor).toBeGreaterThan(0);
     });
     it("treats osctime differently from note duration", () => {
-        const enqueue = jest.fn();
         Singer.processNote.mockClear();
 
-        Singer.RhythmActions.playNote(2, "note", 0, 1, enqueue);
+        Singer.RhythmActions.playNote(2, "note", 0, 1);
         let listener = activity.logo.setTurtleListener.mock.calls[0][2];
         listener();
 
@@ -535,7 +518,7 @@ describe("setupRhythmActions", () => {
 
         Singer.processNote.mockClear();
 
-        Singer.RhythmActions.playNote(500, "osctime", 0, 1, enqueue);
+        Singer.RhythmActions.playNote(500, "osctime", 0, 1);
         listener = activity.logo.setTurtleListener.mock.calls[1][2];
         listener();
 
@@ -547,7 +530,7 @@ describe("setupRhythmActions", () => {
     it("activates multipleVoices for nested notes", () => {
         targetTurtle.singer.inNoteBlock = [10];
 
-        Singer.RhythmActions.playNote(1, "note", 0, 1, jest.fn());
+        Singer.RhythmActions.playNote(1, "note", 0, 1);
 
         expect(targetTurtle.singer.multipleVoices).toBe(true);
     });

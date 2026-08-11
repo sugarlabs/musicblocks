@@ -13,7 +13,7 @@
    global
 
    _, FlowBlock, NOINPUTERRORMSG, Singer, ValueBlock, mixedNumber,
-   FlowClampBlock, DEFAULTDRUM, Queue, i18nSolfege
+   FlowClampBlock, DEFAULTDRUM, i18nSolfege
  */
 
 /* exported setupRhythmBlocks */
@@ -194,15 +194,7 @@ function setupRhythmBlocks(activity) {
             const value =
                 args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
 
-            const _callback = () => {
-                const tur = activity.turtles.ithTurtle(turtle);
-
-                const queueBlock = new Queue(args[1], 1, blk, receivedArg);
-                tur.parentFlowQueue.push(blk);
-                tur.queue.push(queueBlock);
-            };
-
-            Singer.RhythmActions.playNote(value, "osctime", turtle, blk, _callback);
+            Singer.RhythmActions.playNote(value, "osctime", turtle, blk);
 
             return [args[1], 1];
         }
@@ -1094,15 +1086,7 @@ function setupRhythmBlocks(activity) {
             const value =
                 args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
 
-            const _callback = () => {
-                const tur = activity.turtles.ithTurtle(turtle);
-
-                const queueBlock = new Queue(args[1], 1, blk, receivedArg);
-                tur.parentFlowQueue.push(blk);
-                tur.queue.push(queueBlock);
-            };
-
-            Singer.RhythmActions.playNote(value, "note", turtle, blk, _callback);
+            Singer.RhythmActions.playNote(value, "note", turtle, blk);
 
             return [args[1], 1];
         }
@@ -1174,14 +1158,6 @@ function setupRhythmBlocks(activity) {
             const value =
                 args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
 
-            const _callback = () => {
-                const tur = activity.turtles.ithTurtle(turtle);
-
-                const queueBlock = new Queue(args[1], 1, blk, receivedArg);
-                tur.parentFlowQueue.push(blk);
-                tur.queue.push(queueBlock);
-            };
-
             const tur = activity.turtles.ithTurtle(turtle);
             if (tur.singer.inNoteBlock.length > 0) {
                 tur.singer.delayedNotes.push([blk, value]);
@@ -1190,7 +1166,7 @@ function setupRhythmBlocks(activity) {
             if (logo.inMatrix && value > 0) {
                 logo.tupletRhythms.push(["individual", 1, 1 / value]);
             }
-            Singer.RhythmActions.playNote(value, "newnote", turtle, blk, _callback);
+            Singer.RhythmActions.playNote(value, "newnote", turtle, blk);
             return [args[1], 1];
         }
     }
