@@ -16,7 +16,12 @@ global.INTERVALS = [
     ["perfect", "perfect", [1, 4, 5, 8]],
     ["minor", "minor", [2, 3, 6, 7]]
 ];
-global.INTERVALVALUES = { "perfect 1": [0, 1], "perfect 4": [0, 4] };
+global.INTERVALVALUES = {
+    "perfect 1": [0, 1],
+    "perfect 4": [0, 4],
+    "minor 2": [0, 2],
+    "minor 3": [0, 3]
+};
 global.DEFAULTVOLUME = 0.5;
 global.SHARP = "#";
 global.FLAT = "b";
@@ -326,7 +331,7 @@ describe("piemenus behavioral tests", () => {
             };
         });
 
-        test("sets enabled property on navItems based on activeTabs", () => {
+        test("sets enabled property on navItems based on activeTabs for perfect interval", () => {
             piemenuIntervals(mockBlock, "perfect 4");
 
             // Manually trigger the navigateFunction on the first interval (perfect)
@@ -339,8 +344,33 @@ describe("piemenus behavioral tests", () => {
             // j = 1 -> tab 2 (enabled = false)
             expect(mockBlock._intervalWheel.navItems[0].navItem.show).toHaveBeenCalled();
             expect(mockBlock._intervalWheel.navItems[0].enabled).toBe(true);
+
+            expect(mockBlock._intervalWheel.navItems[1].navItem.show).toHaveBeenCalled(); // inactive tab is not hidden
             expect(mockBlock._intervalWheel.navItems[1].enabled).toBe(false);
+
+            expect(mockBlock._intervalWheel.navItems[3].navItem.show).toHaveBeenCalled();
             expect(mockBlock._intervalWheel.navItems[3].enabled).toBe(true); // tab 4
+        });
+
+        test("sets enabled property on navItems based on activeTabs for minor interval", () => {
+            piemenuIntervals(mockBlock, "minor 3");
+
+            // Manually trigger the navigateFunction on the second interval (minor)
+            // Assuming "minor" is at index 1 based on INTERVALS setup
+            mockBlock._intervalNameWheel.navItems[1].navigateFunction();
+
+            // The minor interval (index 1) has active tabs [2, 3, 6, 7]
+            // We expect navItems 8-15 (l=1 * 8 + j) to be show()n
+            // j = 0 -> tab 1 (enabled = false)
+            // j = 1 -> tab 2 (enabled = true)
+            expect(mockBlock._intervalWheel.navItems[8].navItem.show).toHaveBeenCalled();
+            expect(mockBlock._intervalWheel.navItems[8].enabled).toBe(false);
+
+            expect(mockBlock._intervalWheel.navItems[9].navItem.show).toHaveBeenCalled();
+            expect(mockBlock._intervalWheel.navItems[9].enabled).toBe(true); // tab 2
+
+            expect(mockBlock._intervalWheel.navItems[10].navItem.show).toHaveBeenCalled();
+            expect(mockBlock._intervalWheel.navItems[10].enabled).toBe(true); // tab 3
         });
     });
 });
