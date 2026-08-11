@@ -45,7 +45,7 @@
         setupBlockDragController
    - js/connection-validator.js
         ConnectionValidator
-   - js/piemenus.js
+   - js/piemenu-block-context.js
         piemenuBlockContext
    - js/protoblocks.js
         ProtoBlock
