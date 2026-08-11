@@ -532,4 +532,26 @@ describe("KeyboardController", () => {
             expect(activity.workspaceLayoutController._findBlocks).toHaveBeenCalled();
         });
     });
+
+    describe("widget Windows null safety", () => {
+        it("handles undefined window.widgetWindows without throwing", () => {
+            const activity = makeActivity();
+            delete global.window.widgetWindows;
+            const controller = createController(activity);
+
+            expect(() => {
+                controller.__keyPressed(makeEvent({ keyCode: KEYCODE.UP }));
+            }).not.toThrow();
+        });
+
+        it("handles missing openWindows object gracefully", () => {
+            const activity = makeActivity();
+            global.window.widgetWindows = {};
+            const controller = createController(activity);
+
+            expect(() => {
+                controller.__keyPressed(makeEvent({ keyCode: KEYCODE.UP }));
+            }).not.toThrow();
+        });
+    });
 });
