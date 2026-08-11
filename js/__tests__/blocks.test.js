@@ -919,6 +919,41 @@ describe("Blocks Foundation", () => {
         let mockActivity;
         let blocks;
 
+        /**
+         * Build a block stand-in whose isCollapsible / isInlineCollapsible
+         * derive from a capabilities map (same contract as Block / ProtoBlock),
+         * rather than hard-coding isInlineCollapsible: () => true.
+         */
+        const makeCapabilityBlock = ({ name, capabilities = [], ...rest }) => {
+            const caps = Object.create(null);
+            for (const capability of capabilities) {
+                caps[capability] = true;
+            }
+
+            return {
+                name,
+                trash: false,
+                collapsed: false,
+                capabilities: caps,
+                hasCapability(capability) {
+                    return Object.prototype.hasOwnProperty.call(this.capabilities, capability)
+                        ? this.capabilities[capability]
+                        : false;
+                },
+                isCollapsible() {
+                    return this.hasCapability("collapsible");
+                },
+                isInlineCollapsible() {
+                    return this.hasCapability("inlineCollapsible");
+                },
+                isClampBlock() {
+                    return false;
+                },
+                connections: [null],
+                ...rest
+            };
+        };
+
         beforeEach(() => {
             mockActivity = {
                 storage: {},
@@ -941,124 +976,128 @@ describe("Blocks Foundation", () => {
         });
 
         it("toggleCollapsibles toggles standard collapsible blocks but excludes inlineCollapsible ones", () => {
-            const mockStartBlock = {
+            const startBlock = makeCapabilityBlock({
                 name: "start",
-                trash: false,
-                collapsed: false,
-                isCollapsible: () => true,
-                isInlineCollapsible: () => false,
+                capabilities: ["collapsible"],
                 collapseToggle: jest.fn(function () {
                     this.collapsed = !this.collapsed;
                 })
-            };
+            });
 
-            const mockDefinemodeBlock = {
-                name: "definemode",
-                trash: false,
-                collapsed: false,
-                isCollapsible: () => true,
-                isInlineCollapsible: () => true,
-                collapseToggle: jest.fn(function () {
-                    this.collapsed = !this.collapsed;
+            // newnote / interval / osctime: same exclude behavior as the old name list.
+            // definemode: intentionally excluded too — it declares inlineCollapsible and
+            // was part of historical INLINECOLLAPSIBLES; completing the capability migration.
+            const inlineBlocks = ["newnote", "interval", "osctime", "definemode"].map(name =>
+                makeCapabilityBlock({
+                    name,
+                    capabilities: ["collapsible", "inlineCollapsible"],
+                    collapseToggle: jest.fn(function () {
+                        this.collapsed = !this.collapsed;
+                    })
                 })
-            };
+            );
 
-            const mockNewNoteBlock = {
-                name: "newnote",
-                trash: false,
-                collapsed: false,
-                isCollapsible: () => true,
-                isInlineCollapsible: () => true,
-                collapseToggle: jest.fn(function () {
-                    this.collapsed = !this.collapsed;
-                })
-            };
+            blocks.blockList = [startBlock, ...inlineBlocks];
 
-            const mockIntervalBlock = {
-                name: "interval",
-                trash: false,
-                collapsed: false,
-                isCollapsible: () => true,
-                isInlineCollapsible: () => true,
-                collapseToggle: jest.fn(function () {
-                    this.collapsed = !this.collapsed;
-                })
-            };
-
-            blocks.blockList = [
-                mockStartBlock,
-                mockDefinemodeBlock,
-                mockNewNoteBlock,
-                mockIntervalBlock
-            ];
-
-            // All currently uncollapsed: collapse standard collapsibles, skip inline ones
             blocks.toggleCollapsibles();
 
-            expect(mockStartBlock.collapseToggle).toHaveBeenCalled();
-            expect(mockDefinemodeBlock.collapseToggle).not.toHaveBeenCalled();
-            expect(mockNewNoteBlock.collapseToggle).not.toHaveBeenCalled();
-            expect(mockIntervalBlock.collapseToggle).not.toHaveBeenCalled();
+            expect(startBlock.collapseToggle).toHaveBeenCalled();
+            for (const inlineBlock of inlineBlocks) {
+                expect(inlineBlock.collapseToggle).not.toHaveBeenCalled();
+            }
         });
 
         it("_getBlockSize spoofs size 1 for collapsed inlineCollapsible blocks including definemode", () => {
             blocks.blockList = [
-                {
+                makeCapabilityBlock({
                     name: "newnote",
                     size: 4,
                     collapsed: true,
-                    isInlineCollapsible: () => true
-                },
-                {
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                }),
+                makeCapabilityBlock({
+                    name: "interval",
+                    size: 4,
+                    collapsed: true,
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                }),
+                makeCapabilityBlock({
+                    name: "osctime",
+                    size: 4,
+                    collapsed: true,
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                }),
+                // Intentional: definemode joins compact-size path via inlineCollapsible.
+                makeCapabilityBlock({
                     name: "definemode",
                     size: 5,
                     collapsed: true,
-                    isInlineCollapsible: () => true
-                },
-                {
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                }),
+                makeCapabilityBlock({
                     name: "start",
                     size: 3,
                     collapsed: true,
-                    isInlineCollapsible: () => false
-                },
-                {
+                    capabilities: ["collapsible"]
+                }),
+                makeCapabilityBlock({
                     name: "newnote",
                     size: 4,
                     collapsed: false,
-                    isInlineCollapsible: () => true
-                }
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                })
             ];
 
             expect(blocks._getBlockSize(0)).toBe(1);
             expect(blocks._getBlockSize(1)).toBe(1);
-            expect(blocks._getBlockSize(2)).toBe(3);
-            expect(blocks._getBlockSize(3)).toBe(4);
+            expect(blocks._getBlockSize(2)).toBe(1);
+            expect(blocks._getBlockSize(3)).toBe(1);
+            expect(blocks._getBlockSize(4)).toBe(3);
+            expect(blocks._getBlockSize(5)).toBe(4);
         });
 
         it("_getStackSize spoofs size 1 for collapsed inlineCollapsible blocks including definemode", () => {
             blocks.blocksToCollapse = [];
             blocks._sizeCounter = 0;
             blocks.blockList = [
-                {
-                    name: "definemode",
-                    size: 5,
-                    collapsed: true,
-                    isClampBlock: () => false,
-                    isInlineCollapsible: () => true,
-                    connections: [null]
-                },
-                {
+                makeCapabilityBlock({
                     name: "newnote",
                     size: 4,
                     collapsed: true,
-                    isClampBlock: () => false,
-                    isInlineCollapsible: () => true,
-                    connections: [null]
-                }
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                }),
+                makeCapabilityBlock({
+                    name: "interval",
+                    size: 4,
+                    collapsed: true,
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                }),
+                makeCapabilityBlock({
+                    name: "osctime",
+                    size: 4,
+                    collapsed: true,
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                }),
+                // Intentional: definemode stack size spoofs like other inline collapsibles.
+                makeCapabilityBlock({
+                    name: "definemode",
+                    size: 5,
+                    collapsed: true,
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                }),
+                makeCapabilityBlock({
+                    name: "start",
+                    size: 3,
+                    collapsed: true,
+                    capabilities: ["collapsible"]
+                })
             ];
 
             expect(blocks._getStackSize(0)).toBe(1);
             expect(blocks._getStackSize(1)).toBe(1);
+            expect(blocks._getStackSize(2)).toBe(1);
+            expect(blocks._getStackSize(3)).toBe(1);
+            expect(blocks._getStackSize(4)).toBe(3);
         });
 
         it("_processOneBlock correctly uses ProtoBlock capability metadata to initialize collapsed state on load", () => {

@@ -937,6 +937,18 @@ describe("RhythmBlocks", () => {
         });
     });
 
+    describe("inlineCollapsible capability", () => {
+        test("newnote declares collapsible and inlineCollapsible", () => {
+            expect(getBlock("newnote").getCapability("collapsible")).toBe(true);
+            expect(getBlock("newnote").getCapability("inlineCollapsible")).toBe(true);
+        });
+
+        test("osctime declares collapsible and inlineCollapsible", () => {
+            expect(getBlock("osctime").getCapability("collapsible")).toBe(true);
+            expect(getBlock("osctime").getCapability("inlineCollapsible")).toBe(true);
+        });
+    });
+
     describe("Blocks note-container migration", () => {
         test("addDefaultBlock() adds vspace and rest2 inside a note container", () => {
             const blocks = createBlocksHarness();
