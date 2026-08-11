@@ -569,12 +569,13 @@ describe("setupToneActions", () => {
             expect(activity.logo.timbre.FMSynthParams).toContain(10);
         });
 
-        it("should show error when oscillators exist", () => {
+        it("should show error and halt when oscillators exist", () => {
             activity.logo.timbre.osc = [{}];
             Singer.ToneActions.defFMSynth(10, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith(
                 "Unable to use synth due to existing oscillator."
             );
+            expect(activity.logo.synth.createSynth).not.toHaveBeenCalled();
         });
 
         it("should not create parameters when not in timbre mode", () => {
@@ -614,12 +615,13 @@ describe("setupToneActions", () => {
             expect(activity.logo.timbre.AMSynthParams).toContain(5);
         });
 
-        it("should show error when oscillators exist", () => {
+        it("should show error and halt when oscillators exist", () => {
             activity.logo.timbre.osc = [{}];
             Singer.ToneActions.defAMSynth(5, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith(
                 "Unable to use synth due to existing oscillator."
             );
+            expect(activity.logo.synth.createSynth).not.toHaveBeenCalled();
         });
 
         it("should not create parameters when not in timbre mode", () => {
@@ -672,12 +674,13 @@ describe("setupToneActions", () => {
             expect(activity.logo.timbre.duoSynthParams).toContain(20);
         });
 
-        it("should show error when oscillators exist", () => {
+        it("should show error and halt when oscillators exist", () => {
             activity.logo.timbre.osc = [{}];
             Singer.ToneActions.defDuoSynth(10, 20, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith(
                 "Unable to use synth due to existing oscillator."
             );
+            expect(activity.logo.synth.createSynth).not.toHaveBeenCalled();
         });
 
         it("should not create parameters when not in timbre mode", () => {
