@@ -204,7 +204,7 @@ describe("setupIntervalsBlocks", () => {
         });
     });
 
-describe("inlineCollapsible capability", () => {
+    describe("inlineCollapsible capability", () => {
         it("interval declares collapsible and inlineCollapsible", () => {
             expect(createdBlocks.interval.getCapability("collapsible")).toBe(true);
             expect(createdBlocks.interval.getCapability("inlineCollapsible")).toBe(true);
