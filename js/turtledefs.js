@@ -463,6 +463,19 @@ const createHelpContent = activity => {
                 _("Music Blocks Guide")
             ],
             [
+                _("Interface Tour"),
+                _("New to Music Blocks? Take a short walkthrough of the window.") +
+                    " " +
+                    _(
+                        "We will highlight the toolbar, palettes, workspace, and other main sections so you know where everything lives."
+                    ) +
+                    " " +
+                    _("You only need to click Next — nothing on your project will change.") +
+                    " " +
+                    _("Click Start Tour below to begin!"),
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(MOUSEPALETTEICON))
+            ],
+            [
                 _("Play"),
                 _("Click the run button to run the project in fast mode."),
                 `data:image/svg+xml;base64,${window.btoa(base64Encode(RUNBUTTON))}`
