@@ -471,7 +471,12 @@ class Blocks {
             if (this.activeBlock !== null) {
                 /** Don't extract silence blocks. */
                 if (this.blockList[this.activeBlock].name !== "rest2") {
+                    const thisBlock = this.activeBlock;
+
+                    const parentExpandableBlk = this.insideExpandableBlock(thisBlock);
                     this._extractBlock(this.activeBlock, true);
+
+                    this.addDefaultBlock(parentExpandableBlk, thisBlock);
                 }
             }
         };
