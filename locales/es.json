@@ -894,6 +894,7 @@
   "control point 1": "punto de control 1",
   "The Bezier block draws a Bezier curve.": "El bloque \\\"Bezier\\\" dibuja una curva bezier.",
   "bezier": "bezier",
+  "The Arc block moves the mouse in an arc.": "El bloque \\\"Arco\\\" mueve el ratón en un arco.",
   "The Arc block moves the turtle in an arc.": "El bloque \\\"Arco\\\" mueve la tortuga en un arco.",
   "arc": "arco",
   "angle": "ángulo",

@@ -4922,6 +4922,9 @@ msgid "bezier"
 msgstr "bezier"
 
 #: js/blocks/GraphicsBlocks.js:588
+msgid "The Arc block moves the mouse in an arc."
+msgstr "El bloque \"Arco\" mueve el ratón en un arco."
+
 msgid "The Arc block moves the turtle in an arc."
 msgstr "El bloque \"Arco\" mueve la tortuga en un arco."
 
