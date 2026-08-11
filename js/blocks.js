@@ -540,6 +540,9 @@ class Blocks {
                         this.adjustExpandableClampBlock();
                     }
                 }
+                if (adjustDock) {
+                    this.adjustDocks(blk, true);
+                }
             } else {
                 if (firstConnection !== null) {
                     connectionIdx = this.blockList[firstConnection].connections.indexOf(blk);
