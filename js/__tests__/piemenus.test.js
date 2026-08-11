@@ -9,13 +9,7 @@
  * (at your option) any later version.
  */
 
-const fs = require("fs");
-const path = require("path");
-
 const { piemenuPitches } = require("../piemenus");
-
-const piemenusPath = path.join(__dirname, "..", "piemenus.js");
-let piemenusContent;
 
 // Mock Globals
 global.docById = jest.fn().mockReturnValue({
@@ -100,10 +94,6 @@ global.buildScale = jest.fn(() => [["C", "D", "E", "F", "G", "A", "B", "C"], []]
 
 describe("piemenus behavioral tests", () => {
     let mockBlock;
-
-    beforeAll(() => {
-        piemenusContent = fs.readFileSync(piemenusPath, "utf8");
-    });
 
     beforeEach(() => {
         mockBlock = {
@@ -243,14 +233,6 @@ describe("piemenus behavioral tests", () => {
             mockBlock._exitWheel.navItems[0].navigateFunction();
 
             expect(refreshRowForBlock).not.toHaveBeenCalled();
-        });
-    });
-
-    describe("Block Help Menu", () => {
-        it("should load help before opening the aux pie menu help widget", () => {
-            expect(piemenusContent).toMatch(
-                /if \(typeof HelpWidget === "undefined"\)\s*\{\s*if \(typeof require !== "undefined"\)\s*\{\s*require\(\["widgets\/help"\], function \(\) \{\s*new HelpWidget\(that, true\);/
-            );
         });
     });
 

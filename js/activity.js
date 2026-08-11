@@ -128,6 +128,7 @@ let MYDEFINES = [
     "activity/basicblocks",
     "activity/blockfactory",
     "activity/piemenus",
+    "activity/piemenu-block-context",
     "activity/planetInterface",
     "activity/rubrics",
     "activity/macros",

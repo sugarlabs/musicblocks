@@ -64,7 +64,8 @@
    - js/logo.js
    - js/piemenus.js
         piemenuNumber, piemenuColor, piemenuNoteValue, piemenuBasic, piemenuBoolean, piemenuVoices,
-        piemenuIntervals, piemenuAccidentals, piemenuModes, piemenuPitches, piemenuCustomNotes,
+        piemenuIntervals, piemenuAccidentals, piemenuModes, piemenuPitches, piemenuCustomNotes
+   - js/piemenu-block-context.js
         piemenuBlockContext
    - js/utils/platformstyle.js
         platformColor
