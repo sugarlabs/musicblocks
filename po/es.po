@@ -11,6 +11,29 @@ msgstr ""
 "Language: es\n"
 "X-Generator: Poedit 1.7.4\n"
 
+#: js/svgAssetSelector.js:63
+msgid "Choose an image"
+msgstr "Elige una imagen"
+
+#: js/svgAssetSelector.js:83
+msgid " Built-in images"
+msgstr " Imágenes incorporadas"
+
+#: js/svgAssetSelector.js:92
+msgid " Upload from device"
+msgstr " Cargar archivo"
+
+#: js/svgAssetSelector.js:156
+msgid " Choose file"
+msgstr " Seleccionar archivo"
+
+#: js/svgAssetSelector.js:160
+msgid "Supports PNG, JPG, SVG, GIF, and other image formats"
+msgstr "Admite PNG, JPG, SVG, GIF y otros formatos de imagen"
+
+#: js/svgAssetSelector.js:176
+msgid "Apply"
+msgstr "Aplicar"
 
 #: js/toolbar.js:111
 #: js/toolbar.js:230
@@ -199,6 +222,7 @@ msgstr "Guardar"
 #: planet/js/StringHelper.js:42
 #: planet/js/StringHelper.js:49
 #: planet/js/Planet.js:176
+#: js/svgAssetSelector.js:172
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -554,6 +578,7 @@ msgstr "Mover para recargar"
 #: js/widgets/temperament.js:1689
 #: js/widgets/widgetWindows.js:219
 #: planet/js/StringHelper.js:76
+#: js/svgAssetSelector.js:66
 msgid "Close"
 msgstr "Cerrar"
 
