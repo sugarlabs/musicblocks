@@ -808,7 +808,7 @@ msgstr "すうち"
 #: js/turtledefs.js:137
 #: js/turtledefs.js:235
 msgid "boolean"
-msgstr "くらべる"
+msgstr "比べる"
 
 
 #: js/turtledefs.js:138
@@ -2070,7 +2070,7 @@ msgstr "ド　レ　ミ　ファ　ソ　ラ　シ　ド"
 
 #: js/activity.js:2439
 msgid "Tuning string instruments"
-msgstr "楽器のチューニングをしているよ"
+msgstr "弦楽器のチューニングをしているよ"
 
 
 #: js/activity.js:2440
@@ -4368,7 +4368,7 @@ msgstr "太鼓"
 
 #: js/utils/synthutils.js:2091
 msgid "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
-msgstr "⚠️ サウンドは無効になっています。\n\nブラウザの設定 (サイト設定 > サウンド) を確認して、ミュージック・ブロックスの音声を許可してください。"
+msgstr "⚠⚠ 音声は ブロックされています。。。ブラウザー の設定 (サイトの せってい > 音声) を確認して、ミュージック・ブロックスの 音声を 許可して ください。"
 
 
 #: js/utils/synthutils.js:3548
@@ -4571,7 +4571,7 @@ msgstr "音律を明確にする"
 
 #: js/blocks/BooleanBlocks.js:44
 msgid "The Not block is the logical not operator."
-msgstr "Notブロックは論理的なNOT演算子です。"
+msgstr "「ではない」ブロックは論理的なNOT演算子です。"
 
 
 #: js/blocks/BooleanBlocks.js:62
@@ -4581,7 +4581,7 @@ msgstr "ではない"
 
 #: js/blocks/BooleanBlocks.js:133
 msgid "The And block is the logical and operator."
-msgstr "Andブロックは論理積（AND）演算子です。"
+msgstr "「かつ」ブロックは論理積（AND）演算子です。"
 
 
 #: js/blocks/BooleanBlocks.js:151
@@ -4591,7 +4591,7 @@ msgstr "かつ"
 
 #: js/blocks/BooleanBlocks.js:217
 msgid "The Or block is the logical or operator."
-msgstr "Orブロックは論理和（OR）演算子です。"
+msgstr "「または」ブロックは論理和（OR）演算子です。"
 
 
 #: js/blocks/BooleanBlocks.js:235
@@ -4611,22 +4611,22 @@ msgstr "XOR（エクスクルーシブ・オア）"
 
 #: js/blocks/BooleanBlocks.js:391
 msgid "The Greater-than block returns True if the top number is greater than the bottom number."
-msgstr "「＞」ブロックは、上の数値が下の数値より大きい場合に True を返します。"
+msgstr "「＞」ブロックは、上の数値が下の数値より大きい場合に「実」を返します。"
 
 
 #: js/blocks/BooleanBlocks.js:496
 msgid "The Less-than block returns True if the top number is less than the bottom number."
-msgstr "「＜」ブロックは、上の数値が下の数値より小さい場合に True を返します。"
+msgstr "「＜」ブロックは、上の数値が下の数値より小さい場合に「実」を返します。"
 
 
 #: js/blocks/BooleanBlocks.js:596
 msgid "The Less-than-or-equal-to block returns True if the top number is less than or equal to the bottom number."
-msgstr "「≦」ブロックは、上の数値が下の数値以下の場合に True を返します。"
+msgstr "「≦」ブロックは、上の数値が下の数値以下の場合に「実」を返します。"
 
 
 #: js/blocks/BooleanBlocks.js:696
 msgid "The Greater-than-or-equal-to block returns True if the top number is greater than or equal to the bottom number."
-msgstr "「≥」ブロックは、上の数値が下の数値以上である場合に True を返します。"
+msgstr "「≥」ブロックは、上の数値が下の数値以上である場合に「実」を返します。"
 
 
 #: js/blocks/BooleanBlocks.js:802
@@ -4636,12 +4636,12 @@ msgstr "<h2>しんぎブロック（等しい）</h2><br>２つのすうちを�
 
 #: js/blocks/BooleanBlocks.js:901
 msgid "The Not-equal-to block returns True if the two numbers are not equal to each other."
-msgstr "「≠」ブロックは2つの数字が等しくない場合にTrueを返します。"
+msgstr "「≠」ブロックは2つの数字が等しくない場合に「実」を返します。"
 
 
 #: js/blocks/BooleanBlocks.js:1001
 msgid "The Boolean block is used to specify true or false."
-msgstr "Booleanブロックはtrueまたはfalseを指定するために使われます。"
+msgstr "「比べる」ブロックは「実」または「偽」を指定するために使われます。"
 
 
 #: js/blocks/BoxesBlocks.js:53
@@ -5261,7 +5261,7 @@ msgstr "タートル間のビート数を同期させるブロックです。"
 
 #: js/blocks/EnsembleBlocks.js:907
 msgid "The Found mouse block will return true if the specified mouse can be found."
-msgstr "指定されたマウスが見つかった場合にtrueを返します。"
+msgstr "指定されたマウスが見つかった場合に「実」を返します。"
 
 
 #: js/blocks/EnsembleBlocks.js:915
@@ -5271,7 +5271,7 @@ msgstr "ネズミを見つけた"
 
 #: js/blocks/EnsembleBlocks.js:925
 msgid "The Found turtle block will return true if the specified turtle can be found."
-msgstr "指定されたタートルが見つかった場合にtrueを返します。"
+msgstr "指定されたタートルが見つかった場合に「実」を返します。"
 
 
 #: js/blocks/EnsembleBlocks.js:933
@@ -5982,7 +5982,7 @@ msgstr "ヒープの長さ"
 
 #: js/blocks/HeapBlocks.js:254
 msgid "The Heap-empty? block returns true if the heap is empty."
-msgstr "Heap-empty?ブロックはヒープが空の場合にtrueを返します。"
+msgstr "Heap-empty?ブロックはヒープが空の場合に「実」を返します。"
 
 
 #: js/blocks/HeapBlocks.js:268
@@ -6220,7 +6220,7 @@ msgstr "音符の高さを周波数表示へ"
 
 #: js/blocks/MediaBlocks.js:819
 msgid "The To frequency block converts a pitch name and octave to Hertz."
-msgstr "トゥーフリクエンシーブロックは音名とオクターブをヘルツに変換します。"
+msgstr "トゥーフリクエンシーブロックは音名とオクターヴをヘルツに変換します。"
 
 
 #: js/blocks/MediaBlocks.js:829
@@ -7146,7 +7146,7 @@ msgstr "レート (最初の引数) は、コーラス変調の速度 (1 秒あ�
 
 #: js/blocks/ToneBlocks.js:634
 msgid "The delay (second argument) sets the time delay between chorus voices (milliseconds)."
-msgstr "ディレイ(第 2 引数) は、コーラスボイス間の遅延時間 (ミリ秒) を設定します。"
+msgstr "ディレイ(第 2 引数) は、コーラス・ボイス間の遅延時間 (ミリ秒) を設定します。"
 
 
 #: js/blocks/ToneBlocks.js:638
@@ -7251,12 +7251,12 @@ msgstr "音色サンプルをアップロードして、音の高さを合わせ
 
 #: js/blocks/VolumeBlocks.js:35
 msgid "synth volume"
-msgstr "シンセノ音量"
+msgstr "シンセの音量"
 
 
 #: js/blocks/VolumeBlocks.js:39
 msgid "The Synth volume block returns the current volume of the current synthesizer."
-msgstr "Synth volumeブロックは現在のシンセサイザーの音量を返します。"
+msgstr "「シンセの音量」ブロックは現在のシンセサイザーの音量を返します。"
 
 
 #: js/blocks/VolumeBlocks.js:105
@@ -7272,13 +7272,13 @@ msgstr "Master volumeブロックはマスターボリュームを返します�
 #: js/blocks/VolumeBlocks.js:355
 #: js/blocks/VolumeBlocks.js:525
 msgid "set synth volume"
-msgstr "楽器の音量をせってい"
+msgstr "シンセの音量をせってい"
 
 
 #: js/blocks/VolumeBlocks.js:362
 #: js/blocks/VolumeBlocks.js:546
 msgid "synth"
-msgstr "楽器"
+msgstr "シンセ"
 
 
 #: js/blocks/VolumeBlocks.js:403
@@ -7291,7 +7291,7 @@ msgstr "音量を「0」にせっていします。"
 
 #: js/blocks/VolumeBlocks.js:440
 msgid "Synth not found"
-msgstr "シンセが見つかりません"
+msgstr "シンセ（楽器）が見つかりません"
 
 
 #: js/blocks/VolumeBlocks.js:495
@@ -7301,7 +7301,7 @@ msgstr "ドラムの音量をせってい"
 
 #: js/blocks/VolumeBlocks.js:531
 msgid "The Set synth volume block will change the volume of a particular synth, eg guitar violin snare drum etc."
-msgstr "「楽器の音量をせってい」ブロックは、ギター、バイオリン、スネアドラムなどの特定のシンセサイザーの音量を変更します。"
+msgstr "「シンセの音量をせってい」ブロックは、ギター、バイオリン、スネアドラムなどの特定のシンセサイザーの音量を変更します。"
 
 
 #: js/blocks/VolumeBlocks.js:535
@@ -7867,7 +7867,7 @@ msgstr "音を加える"
 
 #: js/blocks/OrnamentBlocks.js:293
 msgid "The Neighbor block rapidly switches between neighboring pitches."
-msgstr "<h2>音を加えるブロック</h2><br>２つの同じ高さの音のあいだに、音を１つ入れることができる。<br>図の例では、ソとソのあいだにラが入り、「ソラソ」とすばやくえんそうされる。<br><br>★音階とは<br>順番に並んだ音のまとまり。たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。"
+msgstr "<h2>音を加えるブロック</h2><br>２つの同じ高さの音のあいだに、音を１つ入れることができる。<br>図の例では、ソとソのあいだにラが入り、「ソ、ラ、ソ」とすばやくえんそうされる。<br><br>★音階とは<br>順番に並んだ音のまとまり。たとえば、「ド」を始まりの音にしたときの「ド、レ、ミ、ファ、ソ、ラ、シ、ド」、「ソ」を始まりの音にしたときの「ソ、ラ、シ、ド、レ、ミ、（♯ファ）、ソ」のこと。"
 
 
 #: js/blocks/OrnamentBlocks.js:364
@@ -8055,7 +8055,7 @@ msgstr "音高の数字を初期化"
 
 #: js/blocks/PitchBlocks.js:677
 msgid "The Set pitch number offset block is used to set the offset for mapping pitch numbers to pitch and octave."
-msgstr "ピッチ番号をピッチとオクターブにマッピングするためのオフセットを設定するために使われるブロックです。"
+msgstr "ピッチ番号をピッチとオクターヴにマッピングするためのオフセットを設定するために使われるブロックです。"
 
 
 #: js/blocks/PitchBlocks.js:716
@@ -8077,7 +8077,7 @@ msgstr "数値をオクターヴ表記へ"
 
 #: js/blocks/PitchBlocks.js:753
 msgid "The Number to octave block will convert a pitch number to an octave."
-msgstr "Number to octaveブロックはピッチ番号をオクターブに変換します。"
+msgstr "Number to octaveブロックはピッチ番号をオクターヴに変換します。"
 
 
 #: js/blocks/PitchBlocks.js:762
@@ -8152,7 +8152,7 @@ msgstr "登録"
 
 #: js/blocks/PitchBlocks.js:1065
 msgid "The Register block provides an easy way to modify the register (octave) of the notes that follow it."
-msgstr "Registerブロックは後に続く音符のオクターブ（レジスター）を簡単に変更する方法を提供します。"
+msgstr "Registerブロックは後に続く音符のオクターヴ（レジスター）を簡単に変更する方法を提供します。"
 
 
 #: js/blocks/PitchBlocks.js:1088
@@ -8288,7 +8288,7 @@ msgstr "nth Modal Pitchはモードの半音単位の音高パターンを取り
 
 #: js/blocks/PitchBlocks.js:1747
 msgid "starting from 1 and regardless of tonal framework (i.e. not always 8 notes in the octave)"
-msgstr "1から始まり、音階の枠組みに関係なく（つまりオクターブが常に8音とは限らない）"
+msgstr "1から始まり、音階の枠組みに関係なく（つまりオクターヴが常に8音とは限らない）"
 
 
 #: js/blocks/PitchBlocks.js:1790
@@ -8308,7 +8308,7 @@ msgstr "スケールディグリーは音楽で一般的な表記法です。ス
 
 #: js/blocks/PitchBlocks.js:1839
 msgid "Scale Degree 1 is always the first pitch in a given scale, regardless of octave."
-msgstr "スケールディグリー1は、オクターブに関係なく常に与えられたスケールの最初の音です。"
+msgstr "スケールディグリー1は、オクターヴに関係なく常に与えられたスケールの最初の音です。"
 
 
 #: js/blocks/PitchBlocks.js:1863
@@ -10043,7 +10043,7 @@ msgstr "反復"
 
 #: js/widgets/temperament.js:1843
 msgid "The octave ratio has changed. This changes temperament significantly."
-msgstr "オクターブ比が変わりました。これにより調律が大きく変わります。"
+msgstr "オクターヴ比が変わりました。これにより調律が大きく変わります。"
 
 
 #: js/widgets/temperament.js:1886
