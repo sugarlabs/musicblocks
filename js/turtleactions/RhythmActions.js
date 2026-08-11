@@ -47,12 +47,9 @@ function setupRhythmActions(activity) {
          * @param {String} blkName - note block type name
          * @param {Object} turtle - Turtle object
          * @param {Object} blk - corresponding Block object index in blocks.blockList or custom block number
-         * @param {Function} _enqueue - callback, no longer invoked by playNote. The note clamp's
-         *     child flow is queued by the interpreter from the flow block's `[childFlow, 1]` return
-         *     value (runFromBlockNow step 3); kept for signature compatibility.
          * @returns {void}
          */
-        static playNote(value, blkName, turtle, blk, _enqueue) {
+        static playNote(value, blkName, turtle, blk) {
             /**
              * The interpreter queues the child flow of the note clamp from the flow block's
              * `[childFlow, 1]` return value and, once all of the children are run, triggers a

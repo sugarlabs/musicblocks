@@ -323,8 +323,7 @@ describe("RhythmBlocks", () => {
                 200,
                 "osctime",
                 0,
-                5,
-                expect.any(Function)
+                5
             );
         });
 
@@ -597,15 +596,14 @@ describe("RhythmBlocks", () => {
     });
 
     describe("OscTimeBlock", () => {
-        test("flow calls playNote with callback that queues block", () => {
+        test("flow calls playNote", () => {
             const block = getBlock("osctime");
             block.flow([0.25, 1], logo, 0, 5, null);
             expect(global.Singer.RhythmActions.playNote).toHaveBeenCalledWith(
                 0.25,
                 "osctime",
                 0,
-                5,
-                expect.any(Function)
+                5
             );
         });
 
@@ -616,8 +614,7 @@ describe("RhythmBlocks", () => {
                 0.25,
                 "osctime",
                 0,
-                5,
-                expect.any(Function)
+                5
             );
         });
     });
@@ -693,13 +690,7 @@ describe("RhythmBlocks", () => {
         test("flow calls playNote with correct value", () => {
             const block = getBlock("note");
             block.flow([0.5, 1], logo, 0, 5, null);
-            expect(global.Singer.RhythmActions.playNote).toHaveBeenCalledWith(
-                0.5,
-                "note",
-                0,
-                5,
-                expect.any(Function)
-            );
+            expect(global.Singer.RhythmActions.playNote).toHaveBeenCalledWith(0.5, "note", 0, 5);
         });
     });
 
@@ -735,29 +726,11 @@ describe("RhythmBlocks", () => {
             turtle.singer.inNoteBlock = [];
             const block = getBlock("newnote");
             block.flow([0.5, 1], logo, 0, 5, null);
-            expect(global.Singer.RhythmActions.playNote).toHaveBeenCalledWith(
-                0.5,
-                "newnote",
-                0,
-                5,
-                expect.any(Function)
-            );
+            expect(global.Singer.RhythmActions.playNote).toHaveBeenCalledWith(0.5, "newnote", 0, 5);
         });
     });
 
     describe("Callback and listener body coverage", () => {
-        test("OscTimeBlock callback pushes to queue", () => {
-            let capturedCallback;
-            global.Singer.RhythmActions.playNote.mockImplementation((v, t, turtle, blk, cb) => {
-                capturedCallback = cb;
-            });
-            const block = getBlock("osctime");
-            block.flow([0.25, 1], logo, 0, 5, null);
-            capturedCallback();
-            expect(turtle.parentFlowQueue).toContain(5);
-            expect(turtle.queue.length).toBe(1);
-        });
-
         test("NewSwingBlock listener fires and pops swing when not suppressed", () => {
             let capturedListener;
             logo.setTurtleListener.mockImplementation((t, name, fn) => {
@@ -796,31 +769,6 @@ describe("RhythmBlocks", () => {
             expect(turtle.singer.skipFactor).toBe(0);
         });
 
-        test("NoteBlock callback pushes to queue", () => {
-            let capturedCallback;
-            global.Singer.RhythmActions.playNote.mockImplementation((v, t, turtle, blk, cb) => {
-                capturedCallback = cb;
-            });
-            const block = getBlock("note");
-            block.flow([0.5, 1], logo, 0, 5, null);
-            capturedCallback();
-            expect(turtle.parentFlowQueue).toContain(5);
-            expect(turtle.queue.length).toBe(1);
-        });
-
-        test("NewNoteBlock callback pushes to queue", () => {
-            let capturedCallback;
-            global.Singer.RhythmActions.playNote.mockImplementation((v, t, turtle, blk, cb) => {
-                capturedCallback = cb;
-            });
-            turtle.singer.inNoteBlock = [];
-            const block = getBlock("newnote");
-            block.flow([0.5, 1], logo, 0, 5, null);
-            capturedCallback();
-            expect(turtle.parentFlowQueue).toContain(5);
-            expect(turtle.queue.length).toBe(1);
-        });
-
         test("RhythmicDotBlock flow and listener update beatFactor", () => {
             let capturedListener;
             logo.setTurtleListener.mockImplementation((t, name, fn) => {
@@ -840,25 +788,6 @@ describe("RhythmBlocks", () => {
             const block = getBlock("rhythmicdot");
             block.flow([null, 1], logo, 0, 5);
             expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 5);
-        });
-    });
-
-    // ── NoteBlock callback (lines 193-197) ──────────────────────────────
-    describe("NoteBlock callback queue path", () => {
-        test("callback pushes queue block to turtle", () => {
-            const block = getBlock("osctime");
-            let capturedCallback;
-            global.Singer.RhythmActions.playNote.mockImplementation(
-                (val, type, turtle, blk, cb) => {
-                    capturedCallback = cb;
-                }
-            );
-            block.flow([200, true], logo, 0, 5, "receivedArg");
-            expect(capturedCallback).toBeDefined();
-            capturedCallback();
-            expect(turtle.parentFlowQueue).toContain(5);
-            expect(turtle.queue.length).toBe(1);
-            expect(turtle.queue[0].child).toBe(true);
         });
     });
 
