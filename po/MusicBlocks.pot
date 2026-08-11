@@ -2536,7 +2536,7 @@ msgid "Apply"
 msgstr ""
 
 #: js/utils/utils-logic.js:324
-msgid "Invalid input passed to rationalSum"
+msgid "Invalid input passed to rational sum"
 msgstr ""
 
 #: js/utils/utils-logic.js:331
