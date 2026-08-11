@@ -279,6 +279,29 @@ describe("Block Foundation", () => {
             expect(block.hasValueDrivenLabel()).toBe(false);
         });
 
+        it("hasWideLabel() should return true from capability metadata", () => {
+            mockProtoBlock.capabilities.wideLabel = true;
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.hasWideLabel()).toBe(true);
+        });
+
+        it("hasWideLabel() should respect explicit false metadata", () => {
+            mockProtoBlock.name = "drumname";
+            mockProtoBlock.capabilities.wideLabel = false;
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.hasWideLabel()).toBe(false);
+        });
+
+        it("hasWideLabel() should return false for ordinary blocks", () => {
+            mockProtoBlock.name = "forward";
+            mockProtoBlock.capabilities = Object.create(null);
+
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.hasWideLabel()).toBe(false);
+        });
+
         describe("isArgumentLikeBlock()", () => {
             it("should return true for a normal value block (style 'value' / isArgBlock())", () => {
                 mockProtoBlock.name = "number";

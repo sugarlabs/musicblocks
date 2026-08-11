@@ -100,7 +100,6 @@ global.NUMBERBLOCKDEFAULT = 0;
 global.STRINGLEN = 30;
 global.TEXTWIDTH = 100;
 global.WESTERN2EISOLFEGENAMES = {};
-global.WIDENAMES = [];
 global.BACKWARDCOMPATIBILITYDICT = {};
 global.DEFAULTCHORD = [];
 
@@ -1202,6 +1201,50 @@ describe("Blocks Foundation", () => {
             blocks._deletePitchBlocks(1);
 
             expect(blocks._extractBlock).toHaveBeenCalledWith(1, false);
+        });
+    });
+
+    describe("wideLabel Capability Migration", () => {
+        let blocks;
+
+        beforeEach(() => {
+            blocks = new Blocks({});
+        });
+
+        it("updateBlockText skips truncation for wideLabel blocks", () => {
+            const longLabel = "x".repeat(40);
+            const wideBlock = {
+                name: "drumname",
+                value: longLabel,
+                hasWideLabel: () => true,
+                text: { text: "" },
+                container: {
+                    children: { length: 1 },
+                    setChildIndex: jest.fn(),
+                    updateCache: jest.fn()
+                },
+                loadComplete: true
+            };
+            const normalBlock = {
+                name: "text",
+                value: longLabel,
+                hasWideLabel: () => false,
+                text: { text: "" },
+                container: {
+                    children: { length: 1 },
+                    setChildIndex: jest.fn(),
+                    updateCache: jest.fn()
+                },
+                loadComplete: true
+            };
+
+            blocks.blockList = [wideBlock, normalBlock];
+            blocks.updateBlockText(0);
+            blocks.updateBlockText(1);
+
+            expect(wideBlock.text.text).toBe(longLabel);
+            expect(normalBlock.text.text.endsWith("...")).toBe(true);
+            expect(normalBlock.text.text.length).toBeLessThan(longLabel.length);
         });
     });
 });

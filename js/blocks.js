@@ -18,7 +18,7 @@
     DEFAULTNOISE, DEFAULTOSCILLATORTYPE, DEFAULTTEMPERAMENT,
     DEFAULTVOICE, NATURAL, NUMBERBLOCKDEFAULT,
     STANDARDBLOCKHEIGHT, STRINGLEN, TEXTWIDTH,
-    WESTERN2EISOLFEGENAMES, WIDENAMES, addTemperamentToDictionary,
+    WESTERN2EISOLFEGENAMES, addTemperamentToDictionary,
    Block, closeBlkWidgets, ConnectionValidator, createjs, delayExecution, DEFAULTCHORD,
    deleteTemperamentFromList, getDrumSynthName, getNoiseName,
    getNoiseSynthName, getTemperamentsList, getTextWidth,
@@ -2072,7 +2072,7 @@ class Blocks {
                     break;
             }
 
-            if (!WIDENAMES.includes(myBlock.name) && label.length > maxLength) {
+            if (!myBlock.hasWideLabel() && label.length > maxLength) {
                 label = label.substr(0, maxLength - 1) + "...";
             }
 
@@ -2998,7 +2998,7 @@ class Blocks {
                             that.blockList[b].value = v;
                             let l = _(value.toString());
                             if (
-                                !WIDENAMES.includes(that.blockList[b].name) &&
+                                !that.blockList[b].hasWideLabel() &&
                                 getTextWidth(l, "bold 20pt Sans") > TEXTWIDTH
                             ) {
                                 l = l.substr(0, STRINGLEN) + "...";
@@ -3025,7 +3025,7 @@ class Blocks {
                         that.blockList[b].value = v;
                         let l = _(v.toString());
                         if (
-                            !WIDENAMES.includes(that.blockList[b].name) &&
+                            !that.blockList[b].hasWideLabel() &&
                             getTextWidth(l, "bold 20pt Sans") > TEXTWIDTH
                         ) {
                             l = l.substr(0, STRINGLEN) + "...";

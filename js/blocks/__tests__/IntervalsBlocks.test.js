@@ -218,6 +218,19 @@ describe("setupIntervalsBlocks", () => {
         });
     });
 
+    describe("wideLabel capability", () => {
+        it("marks temperament/mode/chord/interval name blocks as wideLabel", () => {
+            expect(createdBlocks["temperamentname"].getCapability("wideLabel")).toBe(true);
+            expect(createdBlocks["modename"].getCapability("wideLabel")).toBe(true);
+            expect(createdBlocks["chordname"].getCapability("wideLabel")).toBe(true);
+            expect(createdBlocks["intervalname"].getCapability("wideLabel")).toBe(true);
+        });
+
+        it("does not mark intervalnumber as wideLabel", () => {
+            expect(createdBlocks["intervalnumber"].getCapability("wideLabel")).toBeUndefined();
+        });
+    });
+
     describe("Setup", () => {
         it("registers interval blocks", () => {
             expect(Object.keys(createdBlocks).length).toBeGreaterThan(0);

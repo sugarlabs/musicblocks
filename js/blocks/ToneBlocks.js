@@ -925,6 +925,7 @@ function setupToneBlocks(activity) {
             super("voicename", _("set instrument"));
             this.setCapability("valueDrivenLabel");
             this.setCapability("discreteChoice");
+            this.setCapability("wideLabel");
             this.setPalette("tone", activity);
             this.setHelpString([
                 _(

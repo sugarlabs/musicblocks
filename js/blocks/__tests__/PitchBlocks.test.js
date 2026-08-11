@@ -854,6 +854,15 @@ describe("setupPitchBlocks", () => {
         it("does not mark pitchnumber as a value-driven label block", () => {
             expect(createdBlocks["pitchnumber"].getCapability("valueDrivenLabel")).toBeUndefined();
         });
+
+        it("marks accidentalname and outputtools as wideLabel", () => {
+            expect(createdBlocks["accidentalname"].getCapability("wideLabel")).toBe(true);
+            expect(createdBlocks["outputtools"].getCapability("wideLabel")).toBe(true);
+        });
+
+        it("does not mark solfege as wideLabel", () => {
+            expect(createdBlocks["solfege"].getCapability("wideLabel")).toBeUndefined();
+        });
     });
 
     describe("Comprehensive Block Coverage", () => {

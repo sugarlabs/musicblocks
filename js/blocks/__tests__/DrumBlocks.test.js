@@ -591,6 +591,12 @@ describe("real DrumBlocks instances - direct method coverage", () => {
         global.ValueBlock = origValueBlock;
     });
 
+    test("name selector blocks declare the wideLabel capability", () => {
+        expect(instances["noisename"].getCapability("wideLabel")).toBe(true);
+        expect(instances["drumname"].getCapability("wideLabel")).toBe(true);
+        expect(instances["effectsname"].getCapability("wideLabel")).toBe(true);
+    });
+
     test("real PlayNoiseBlock flow() calls errorMsg for invalid args", () => {
         instances["playnoise"].flow([], {}, 0, "blk1");
         expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, "blk1");
