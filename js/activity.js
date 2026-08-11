@@ -1526,19 +1526,9 @@ class Activity {
                 });
             }
 
-            if (this._idleWatcherIntervalId) {
-                clearInterval(this._idleWatcherIntervalId);
-                this._idleWatcherIntervalId = null;
-            }
-
             let lastActivity = Date.now();
             let lastIdleReset = lastActivity;
             this.isAppIdle = false;
-
-            // Prevent duplicate intervals
-            if (this._idleWatcherIntervalId) {
-                clearInterval(this._idleWatcherIntervalId);
-            }
 
             // Wake up function - restores full framerate
             // Stored as instance property for cleanup
