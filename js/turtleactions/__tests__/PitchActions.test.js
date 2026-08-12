@@ -388,11 +388,27 @@ describe("Tests for Singer.PitchActions setup", () => {
     });
 
     describe("Tests for setAccidental", () => {
-        test("named accidental path", () => {
-            Singer.PitchActions.setAccidental("sharp", 0, blkId);
+        test("named accidental from ACCIDENTALNAMES applies its value", () => {
+            Singer.PitchActions.setAccidental(ACCIDENTALNAMES[1], 0, blkId);
+            expect(turtle.singer.transposition).toBe(1);
         });
-        test("invalid accidental → default case", () => {
+        test("bare 'sharp' fallback applies +1 and registers a listener", () => {
+            const listenerSpy = jest.spyOn(activity.logo, "setTurtleListener");
+            Singer.PitchActions.setAccidental("sharp", 0, blkId);
+            expect(turtle.singer.transposition).toBe(1);
+            expect(listenerSpy).toHaveBeenCalledWith(
+                0,
+                "_accidental_0_" + blkId,
+                expect.any(Function)
+            );
+        });
+        test("bare 'flat' fallback applies -1", () => {
+            Singer.PitchActions.setAccidental("flat", 0, blkId);
+            expect(turtle.singer.transposition).toBe(-1);
+        });
+        test("invalid accidental → default case leaves transposition unchanged", () => {
             Singer.PitchActions.setAccidental("foo", 0, blkId);
+            expect(turtle.singer.transposition).toBe(0);
         });
     });
 
@@ -579,10 +595,14 @@ describe("Tests for Singer.PitchActions setup", () => {
             MusicBlocks.isRun = false;
         });
 
-        test('setAccidental early‑return for _("sharp") & _("flat")', () => {
+        test('setAccidental fallback for _("sharp") applies delta and registers a reversing listener', () => {
+            const callbacks = [];
+            activity.logo.setTurtleListener = (_turtle, _name, cb) => callbacks.push(cb);
             const before = turtle.singer.transposition;
             Singer.PitchActions.setAccidental(_("sharp"), 0, blkId);
-            Singer.PitchActions.setAccidental(_("flat"), 0, blkId);
+            expect(turtle.singer.transposition).toBe(before + 1);
+            expect(callbacks).toHaveLength(1);
+            callbacks[0]();
             expect(turtle.singer.transposition).toBe(before);
         });
 
