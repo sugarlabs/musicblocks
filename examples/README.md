@@ -54,6 +54,10 @@
 
 | Example | Description |
 | --- | --- |
+| polyrhythm-drums.html | Polyphonic drum rhythms with graphics |
+
+| Example | Description |
+| --- | --- |
 | rhythm-test.html | Variations of rhythm |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
@@ -369,8 +373,6 @@
 | virtual-whiteboard.html | An interactive musical staff "whiteboard" that shows pitch names. With a few tweaks it can show solfege or even frets on the guitar. |
 | harmonic-series.html | A demonstration of the harmonic series that uses the entire screen and maps the nodes to their proper places on a physical instrument (i.e. half, third, forth, fifth, etc.) |
 
-
-
 # Games
 
 | Example | Description |
@@ -427,3 +429,4 @@ Music Blocks has handy widgets for various musical concepts to create musical co
 | Example | Description |
 | --- | --- |
 | test-suite.html | Smoke test for many Music Blocks functions. |
+| test-EDO-chromatic-scales.html | Test of chromatic mode across different EDOs |
