@@ -321,7 +321,7 @@ var rationalSum = (a, b) => {
         if (typeof console !== "undefined") {
             console.warn("Invalid input passed to rationalSum:", a, b);
         }
-        return [[0, 1], _("Invalid input passed to rationalSum")];
+        return [[0, 1], _("Invalid input passed to rational sum")];
     }
 
     if (a[1] === 0 || b[1] === 0) {
