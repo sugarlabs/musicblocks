@@ -382,6 +382,7 @@ function setupToneActions(activity) {
                 activity.logo.timbre.FMSynthParams = [];
                 if (activity.logo.timbre.osc.length !== 0) {
                     activity.errorMsg(_("Unable to use synth due to existing oscillator."));
+                    return;
                 }
             }
 
@@ -421,6 +422,7 @@ function setupToneActions(activity) {
                 activity.logo.timbre.AMSynthParams = [];
                 if (activity.logo.timbre.osc.length !== 0) {
                     activity.errorMsg(_("Unable to use synth due to existing oscillator."));
+                    return;
                 }
             }
 
@@ -460,6 +462,7 @@ function setupToneActions(activity) {
             if (activity.logo.inTimbre) {
                 if (activity.logo.timbre.osc.length !== 0) {
                     activity.errorMsg(_("Unable to use synth due to existing oscillator."));
+                    return;
                 }
                 activity.logo.timbre.duoSynthParams = [];
             }
