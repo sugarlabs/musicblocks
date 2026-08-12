@@ -1570,13 +1570,14 @@ class Singer {
 
         partials = [1];
         if (tur.singer.inHarmonic.length > 0) {
-            if (partials.length === 0) {
+            const activePartials = last(tur.singer.partials);
+            if (!activePartials || activePartials.length === 0) {
                 //.TRANS: partials are weighted components in a harmonic series
                 activity.errorMsg(
                     _("You must have at least one Partial block inside of a Weighted-partial block")
                 );
             } else {
-                partials = last(tur.singer.partials);
+                partials = activePartials;
             }
         }
 
