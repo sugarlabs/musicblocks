@@ -312,6 +312,38 @@ describe("Arpeggio Widget", () => {
             expect(arpeggio._playing).toBe(false);
         });
 
+        test("play button uses a C4 quarter-note fallback when notesToPlay is empty", () => {
+            const cell = document.getElementById("2,0");
+            arpeggio.notesToPlay = [];
+            cell.onclick({ target: cell });
+            activityMock.logo.synth.trigger.mockClear();
+            global.getNote.mockClear();
+
+            arpeggio.playButton.onclick();
+
+            expect(arpeggio._playing).toBe(true);
+            expect(global.getNote).toHaveBeenCalledWith(
+                "C",
+                4,
+                expect.any(Number),
+                expect.anything(),
+                false,
+                null,
+                expect.anything()
+            );
+            expect(activityMock.logo.synth.trigger).toHaveBeenCalledWith(
+                0,
+                expect.anything(),
+                1 / 4,
+                DEFAULTVOICE,
+                null,
+                null,
+                null
+            );
+            arpeggio.playButton.onclick();
+            expect(arpeggio._playing).toBe(false);
+        });
+
         test("clear button unclicks all cells", () => {
             const cell = document.getElementById("2,1");
             cell.onclick({ target: cell });
