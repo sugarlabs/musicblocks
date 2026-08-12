@@ -226,6 +226,19 @@ describe("setupRhythmActions", () => {
         expect(targetTurtle.singer.beatFactor).toBe(1);
     });
 
+    it("dispatches error and preserves beatFactor when multiply factor is zero or invalid", () => {
+        activity.errorMsg = jest.fn();
+        [0, null, undefined, NaN, "invalid"].forEach(factor => {
+            targetTurtle.singer.beatFactor = 2;
+            Singer.RhythmActions.multiplyNoteValue(factor, 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Multiply factor must be a non-zero number.",
+                1
+            );
+            expect(targetTurtle.singer.beatFactor).toBe(2);
+        });
+    });
+
     it("adds swing when not suppressed", () => {
         targetTurtle.singer.suppressOutput = false;
         targetTurtle.singer.swing = [];
@@ -235,6 +248,29 @@ describe("setupRhythmActions", () => {
 
         expect(targetTurtle.singer.swing).toContain(0.5);
         expect(targetTurtle.singer.swingTarget).toContain(0.25);
+    });
+
+    it("dispatches error and preserves swing arrays when swing parameters are zero or invalid", () => {
+        activity.errorMsg = jest.fn();
+        targetTurtle.singer.suppressOutput = false;
+        [0, null, undefined, NaN, "invalid"].forEach(val => {
+            targetTurtle.singer.swing = [];
+            targetTurtle.singer.swingTarget = [];
+
+            Singer.RhythmActions.addSwing(val, 4, 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Swing value must be a non-zero number.",
+                1
+            );
+            expect(targetTurtle.singer.swing.length).toBe(0);
+
+            Singer.RhythmActions.addSwing(2, val, 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Note value must be a non-zero number.",
+                1
+            );
+            expect(targetTurtle.singer.swing.length).toBe(0);
+        });
     });
     it("removes swing on listener execution", () => {
         targetTurtle.singer.suppressOutput = false;
