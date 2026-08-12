@@ -52,7 +52,8 @@ global.docById = jest.fn().mockImplementation(id => {
 global.Singer = {
     setSynthVolume: jest.fn(),
     defaultBPMFactor: 60,
-    masterBPM: 60
+    masterBPM: 60,
+    masterVolume: [1]
 };
 
 // Mock slicePath (Wheelnav dependency)
@@ -421,5 +422,40 @@ describe("Meter Widget", () => {
             expect(() => widget.widgetWindow.onclose()).not.toThrow();
             expect(widget._playing).toBe(false);
         }
+    });
+
+    test("should restore master volume and stop playing when closed", () => {
+        const widgetWindow = window.widgetWindows.windowFor();
+        meterWidget._playing = true;
+
+        widgetWindow.onclose();
+
+        expect(meterWidget._playing).toBe(false);
+        expect(mockActivity.logo.synth.setMasterVolume).toHaveBeenCalledWith(1);
+        expect(widgetWindow.destroy).toHaveBeenCalled();
+    });
+
+    test("should stop scheduled beat playback safely when _playing is set to false", () => {
+        meterWidget._playing = false;
+
+        expect(() => {
+            meterWidget.__playOneBeat(0, 500);
+        }).not.toThrow();
+
+        expect(mockActivity.logo.synth.trigger).not.toHaveBeenCalled();
+    });
+
+    test("should not attempt to restore master volume when Singer.masterVolume is empty", () => {
+        const widgetWindow = window.widgetWindows.windowFor();
+        mockActivity.logo.synth.setMasterVolume.mockClear();
+        const originalMasterVolume = global.Singer.masterVolume;
+        global.Singer.masterVolume = [];
+
+        expect(() => {
+            widgetWindow.onclose();
+        }).not.toThrow();
+
+        expect(mockActivity.logo.synth.setMasterVolume).not.toHaveBeenCalled();
+        global.Singer.masterVolume = originalMasterVolume;
     });
 });

@@ -168,6 +168,9 @@ class MeterWidget {
          */
         widgetWindow.onclose = () => {
             this._playing = false;
+            if (Singer && Singer.masterVolume && Singer.masterVolume.length > 0) {
+                this.activity.logo.synth.setMasterVolume(last(Singer.masterVolume));
+            }
             this.activity.hideMsgs();
             widgetWindow.destroy();
         };
@@ -397,9 +400,17 @@ class MeterWidget {
      * @returns {void}
      */
     __playOneBeat(i, ms) {
+        if (!this._playing) {
+            return;
+        }
+
         if (this.__getPauseStatus()) {
-            for (let i = 0; i < this._strongBeats.length; i++) {
-                this._playWheel.navItems[i].navItem.hide();
+            if (this._playWheel && this._playWheel.navItems) {
+                for (let i = 0; i < this._strongBeats.length; i++) {
+                    if (this._playWheel.navItems[i] && this._playWheel.navItems[i].navItem) {
+                        this._playWheel.navItems[i].navItem.hide();
+                    }
+                }
             }
             return;
         }
@@ -409,8 +420,17 @@ class MeterWidget {
             j += this._strongBeats.length;
         }
 
-        this._playWheel.navItems[i].navItem.show();
-        this._playWheel.navItems[j].navItem.hide();
+        if (
+            this._playWheel &&
+            this._playWheel.navItems &&
+            this._playWheel.navItems[i] &&
+            this._playWheel.navItems[i].navItem &&
+            this._playWheel.navItems[j] &&
+            this._playWheel.navItems[j].navItem
+        ) {
+            this._playWheel.navItems[i].navItem.show();
+            this._playWheel.navItems[j].navItem.hide();
+        }
 
         if (this._strongBeats[i]) {
             this.__playDrum("snare drum");
@@ -419,7 +439,9 @@ class MeterWidget {
         }
 
         setTimeout(() => {
-            this.__playOneBeat((i + 1) % this._strongBeats.length, ms);
+            if (this._playing) {
+                this.__playOneBeat((i + 1) % this._strongBeats.length, ms);
+            }
         }, ms);
     }
 
