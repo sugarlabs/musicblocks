@@ -1761,4 +1761,107 @@ describe("TemperamentWidget basic tests", () => {
             expect(divAppend.style.marginLeft).toBe("-100px");
         });
     });
+
+    describe("DOM null safety and listener deduplication", () => {
+        test("safely handles missing pitchNumber_* element in __playLoop and updates existing neighbouring elements", () => {
+            widget.circleIsVisible = true;
+            widget.pitchNumber = 2;
+            widget.notes = ["C4", "D4"];
+            widget.ratiosNotesPair = [
+                [1, ["C", 4]],
+                [1.125, ["D", 4]]
+            ];
+            widget.playButton = document.createElement("div");
+            widget._logo = {
+                resetSynth: jest.fn(),
+                setUserTemperament: jest.fn(),
+                synth: { setMasterVolume: jest.fn(), trigger: jest.fn() }
+            };
+            global.parseNoteString = jest.fn(() => ["C", 4]);
+
+            const existingPitchEl = { style: { background: "" } };
+            global.docById = jest.fn(id => {
+                if (id === "wheelDiv4") return null;
+                if (id === "pitchNumber_0") return null; // pitch 0 missing
+                if (id === "pitchNumber_1") return existingPitchEl; // pitch 1 exists
+                return null;
+            });
+
+            widget.playbackForward = false;
+            expect(() => {
+                widget.playAll(); // starts playback, calls __playLoop(0)
+            }).not.toThrow();
+
+            expect(existingPitchEl.style.background).toBe(platformColor.selectorBackground);
+        });
+
+        test("showNoteInfo removes click handler from previously bound _editBtn when edit node is replaced or absent, and cleans up on close", () => {
+            const mockEditBtn1 = {
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn()
+            };
+            const mockEditBtn2 = {
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn()
+            };
+            const mockInfo = { appendChild: jest.fn() };
+            const mockWheelDiv2 = {
+                getBoundingClientRect: jest.fn().mockReturnValue({ left: 0, top: 0 })
+            };
+
+            let currentEditBtn = mockEditBtn1;
+            global.docById = jest.fn(id => {
+                if (id === "wheelDiv2") return mockWheelDiv2;
+                if (id === "edit") return currentEditBtn;
+                if (id === "information") return mockInfo;
+                if (id === "noteInfo") return { style: {}, remove: jest.fn() };
+                if (id === "close") return {};
+                return null;
+            });
+
+            widget.notesCircle = { navItemCount: 1 };
+            widget.ratios = [1];
+            widget.ratiosNotesPair = [[1, ["C", 4]]];
+
+            // First render: binds mockEditBtn1
+            widget.showNoteInfo({ target: { id: "wheelnav-wheelDiv2-slice-0" } });
+            const handler1 = mockEditBtn1.addEventListener.mock.calls[0][1];
+            expect(mockEditBtn1.addEventListener).toHaveBeenCalledWith("click", handler1);
+
+            // Second render: replaces edit node with mockEditBtn2
+            currentEditBtn = mockEditBtn2;
+            widget.showNoteInfo({ target: { id: "wheelnav-wheelDiv2-slice-0" } });
+            const handler2 = mockEditBtn2.addEventListener.mock.calls[0][1];
+            // Assert exact handler reference identity passed to removeEventListener
+            expect(mockEditBtn1.removeEventListener).toHaveBeenCalledWith("click", handler1);
+            expect(mockEditBtn2.addEventListener).toHaveBeenCalledWith("click", handler2);
+
+            // Third render: #edit is absent (null) -> unbinds mockEditBtn2 and resets properties
+            currentEditBtn = null;
+            widget.showNoteInfo({ target: { id: "wheelnav-wheelDiv2-slice-0" } });
+            expect(mockEditBtn2.removeEventListener).toHaveBeenCalledWith("click", handler2);
+            expect(widget._editBtn).toBeNull();
+            expect(widget._editClickHandler).toBeNull();
+
+            // Fourth: verify widget close cleanup when an edit button is active
+            currentEditBtn = mockEditBtn1;
+            widget.showNoteInfo({ target: { id: "wheelnav-wheelDiv2-slice-0" } });
+            const handler3 = mockEditBtn1.addEventListener.mock.calls[1][1];
+
+            const mockWidgetWindow = { destroy: jest.fn() };
+            const closeWidget = function () {
+                if (widget._editBtn && widget._editClickHandler) {
+                    widget._editBtn.removeEventListener("click", widget._editClickHandler);
+                    widget._editBtn = null;
+                    widget._editClickHandler = null;
+                }
+                mockWidgetWindow.destroy();
+            };
+
+            closeWidget();
+            expect(mockEditBtn1.removeEventListener).toHaveBeenCalledWith("click", handler3);
+            expect(widget._editBtn).toBeNull();
+            expect(widget._editClickHandler).toBeNull();
+        });
+    });
 });

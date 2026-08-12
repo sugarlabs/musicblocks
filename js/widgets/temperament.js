@@ -605,10 +605,19 @@ function TemperamentWidget() {
                     docById("noteInfo").remove();
                 };
 
-                if (docById("edit") !== null) {
-                    docById("edit").addEventListener("click", function (e) {
+                if (this._editBtn && this._editClickHandler) {
+                    this._editBtn.removeEventListener("click", this._editClickHandler);
+                    this._editBtn = null;
+                    this._editClickHandler = null;
+                }
+
+                const editBtn = docById("edit");
+                if (editBtn !== null) {
+                    this._editBtn = editBtn;
+                    this._editClickHandler = function (e) {
                         that.editFrequency(e);
-                    });
+                    };
+                    this._editBtn.addEventListener("click", this._editClickHandler);
                 }
             }
         }
@@ -2376,15 +2385,23 @@ function TemperamentWidget() {
                     that.notesCircle.refreshWheel();
                 }
             } else if (that.circleIsVisible === true && docById("wheelDiv4") === null) {
-                docById("pitchNumber_" + i).style.background = platformColor.labelColor;
+                const pitchElI = docById("pitchNumber_" + i);
+                if (pitchElI) {
+                    pitchElI.style.background = platformColor.labelColor;
+                }
                 if (that.playbackForward === false && i < pitchNumber) {
                     const j = i + 1;
-                    docById("pitchNumber_" + j).style.background = platformColor.selectorBackground;
+                    const pitchElJ = docById("pitchNumber_" + j);
+                    if (pitchElJ) {
+                        pitchElJ.style.background = platformColor.selectorBackground;
+                    }
                 } else {
                     if (i !== 0) {
                         const j = i - 1;
-                        docById("pitchNumber_" + j).style.background =
-                            platformColor.selectorBackground;
+                        const pitchElJ = docById("pitchNumber_" + j);
+                        if (pitchElJ) {
+                            pitchElJ.style.background = platformColor.selectorBackground;
+                        }
                     }
                 }
             } else if (docById("wheelDiv4") !== null) {
@@ -2479,7 +2496,9 @@ function TemperamentWidget() {
             if (this.circleIsVisible) {
                 for (let i = 0; i <= this.pitchNumber; i++) {
                     const pitchElement = docById("pitchNumber_" + i);
-                    pitchElement.style.background = platformColor.selectorBackground;
+                    if (pitchElement) {
+                        pitchElement.style.background = platformColor.selectorBackground;
+                    }
                 }
             }
 
@@ -2520,6 +2539,12 @@ function TemperamentWidget() {
             that._playing = false;
             that._logo.synth.stop();
             that._logo.synth.setMasterVolume(last(Singer.masterVolume));
+            if (that._editBtn && that._editClickHandler) {
+                that._editBtn.removeEventListener("click", that._editClickHandler);
+                that._editBtn = null;
+                that._editClickHandler = null;
+            }
+
             removeWheelIfPresent("wheelDiv2", that.notesCircle);
             removeWheelIfPresent("wheelDiv3", that.wheel);
             removeWheelIfPresent("wheelDiv4", that.wheel1);
