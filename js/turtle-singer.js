@@ -24,7 +24,8 @@
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
    noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction,
-   SEMITONES, normalizeNoteAccidentals, parseNoteString, getCurrentEDO, isTrueEDO
+   SEMITONES, normalizeNoteAccidentals, parseNoteString, getCurrentEDO, isTrueEDO,
+   clampNumber
  */
 
 /*
@@ -736,7 +737,7 @@ class Singer {
      */
     static setMasterVolume(logo, volume, blk) {
         const activity = logo.activity;
-        volume = Math.min(Math.max(volume, 0), 100);
+        volume = clampNumber(volume, 0, 100);
         if (blk) {
             const firstConnection = activity.blocks.blockList[blk].connections[0];
             const lastConnection = last(activity.blocks.blockList[blk].connections);
@@ -774,7 +775,7 @@ class Singer {
      * @returns {void}
      */
     static setSynthVolume(logo, turtle, synth, volume, blk) {
-        volume = Math.min(Math.max(volume, 0), 100);
+        volume = clampNumber(volume, 0, 100);
 
         if (logo.synth && typeof logo.synth.resolveInstrumentName === "function") {
             synth = logo.synth.resolveInstrumentName(synth);

@@ -24,7 +24,7 @@
    getOctaveRatio, getTemperament, getTemperamentKeys, getTemperamentRatio,
    isCustomTemperament, last, normalizeNoteAccidentals, parseNoteString, pitchToFrequency, platformColor,
    PREVIEWVOLUME, ratioToWheelAngle, rationalToFraction, setOctaveRatio, setOctaveRatio, SHARP, Singer,
-   slicePath, updateTemperaments, wheelnav, frequencyToPitch
+   slicePath, updateTemperaments, wheelnav, frequencyToPitch, clampNumber
  */
 
 /* exported TemperamentWidget */
@@ -722,7 +722,7 @@ function TemperamentWidget() {
             const max = parseFloat(sliderEl.getAttribute("max"));
             // Clamp the resulting frequency to the slider's allowed range so
             // user cannot move the pitch outside the neighbour boundaries.
-            const frequency = Math.min(Math.max(centsToFreq(cents), min), max);
+            const frequency = clampNumber(centsToFreq(cents), min, max);
             sliderEl.value = frequency;
             applyFrequency(frequency);
         };

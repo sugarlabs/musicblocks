@@ -20,7 +20,7 @@
 const fs = require("fs");
 const path = require("path");
 const { TextEncoder, TextDecoder } = require("util");
-jest.mock("tone");
+global.clampNumber = require("../utils-logic").clampNumber;
 
 describe("Utility Functions (logic-only)", () => {
     let whichTemperament,

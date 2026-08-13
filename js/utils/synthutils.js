@@ -18,7 +18,7 @@
    getOctaveRatio, isCustomTemperament, Singer, DOUBLEFLAT, DOUBLESHARP,
    DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
    getArticulation, piemenuPitches, docById, slicePath, wheelnav, platformColor,
-   DEFAULTVOICE, normalizeNoteAccidentals, parseNoteString
+   DEFAULTVOICE, normalizeNoteAccidentals, parseNoteString, clampNumber
 */
 
 /*
@@ -2512,7 +2512,7 @@ function Synth() {
 
     this.rampTo = (turtle, instrumentName, oldVol, volume, rampTime) => {
         // guard invalid UI/programmatic input (audio boundary safety)
-        volume = Math.max(0, Math.min(volume, 100));
+        volume = clampNumber(volume, 0, 100);
         if (
             percussionInstruments.includes(instrumentName) ||
             stringInstruments.includes(instrumentName)
@@ -2583,7 +2583,7 @@ function Synth() {
         // Resolve instrumentName to internal key
         instrumentName = this.resolveInstrumentName(instrumentName);
         // guard invalid UI/programmatic input (audio boundary safety)
-        volume = Math.max(0, Math.min(volume, 100));
+        volume = clampNumber(volume, 0, 100);
         // We pass in volume as a number from 0 to 100.
         // As per #1697, we adjust the volume of some instruments.
         let nv;
@@ -2634,7 +2634,7 @@ function Synth() {
             }, 200);
         } else {
             // guard invalid UI/programmatic input (audio boundary safety)
-            volume = Math.max(0, Math.min(volume, 100));
+            volume = clampNumber(volume, 0, 100);
             const gain = Math.max(0.0001, volume / 100);
             const db = Tone.gainToDb(gain);
             Tone.Destination.volume.rampTo(db, 0.01);

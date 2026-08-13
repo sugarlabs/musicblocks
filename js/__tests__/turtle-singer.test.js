@@ -20,6 +20,7 @@
 global.DEFAULTVOLUME = 100;
 global.TARGETBPM = 120;
 global.TONEBPM = 60;
+global.clampNumber = require("../utils/utils-logic").clampNumber;
 
 const Singer = require("../turtle-singer");
 
