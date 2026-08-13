@@ -21,7 +21,7 @@
    deepClone, fileBasename, fileExt, hex2rgb, hexToRGB, isSafeUrl, last,
    mixedNumber, nearestBeat, oneHundredToFraction, rationalSum, rgbToHex,
    safeSVG, safeJSONParse, toFixed2, toTitleCase, unescapeHTML, escapeHTML,
-   rationalToFraction, GCD, LCD, resolveObject
+   rationalToFraction, GCD, LCD, resolveObject, clampNumber
 */
 
 /**
@@ -528,6 +528,23 @@ var oneHundredToFraction = d => {
 };
 
 /**
+ * Clamps a numeric value between a minimum and maximum bound with fallback handling.
+ * @param {number} val - Value to clamp
+ * @param {number} min - Minimum allowed bound
+ * @param {number} max - Maximum allowed bound
+ * @param {number} [fallback=min] - Fallback value if val is non-numeric or NaN
+ * @returns {number} The clamped numeric value
+ */
+var clampNumber = (val, min, max, fallback = min) => {
+    if (typeof val !== "number" || Number.isNaN(val)) {
+        return fallback;
+    }
+    const lower = Math.min(min, max);
+    const upper = Math.max(min, max);
+    return Math.min(Math.max(val, lower), upper);
+};
+
+/**
  * Converts RGB values to a hexadecimal color code.
  */
 var rgbToHex = (r, g, b) => {
@@ -629,7 +646,8 @@ var UtilsLogic = {
     rgbToHex,
     hexToRGB,
     hex2rgb,
-    resolveObject
+    resolveObject,
+    clampNumber
 };
 
 if (typeof module !== "undefined" && module.exports) {
