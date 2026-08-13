@@ -494,6 +494,26 @@ describe("setupIntervalsActions", () => {
             expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("17 steps");
         });
 
+        test("falls back to 'N steps' when the row exists but has no entry for the computed letter gap", () => {
+            // The real SEMITONETOINTERVALMAP (js/utils/musicutils.js) is sparse: each row only
+            // defines the couple of letterGap keys matching that interval's conventional
+            // spellings, not all 7. Mirror that shape here instead of the dense array fixture
+            // used elsewhere in this file, so the missing-key fallback actually gets exercised.
+            global.SEMITONETOINTERVALMAP = {
+                1: { 0: "augmented unison", 1: "minor second" }
+            };
+
+            // B -> C, octave 0: a natural half-step (totalIntervals 1), but spelled with
+            // letters 6 apart (B is index 6, C is index 0), which isn't one of row 1's keys.
+            const notes = { firstNote: "B", secondNote: "C", octave: 0 };
+            GetNotesForInterval.mockReturnValueOnce(notes);
+            GetNotesForInterval.mockReturnValueOnce(notes);
+
+            const result = Singer.IntervalsActions.GetCurrentInterval(0);
+            expect(result).toBe("1 steps");
+            expect(result).not.toContain("undefined");
+        });
+
         describe("letter-gap direction and wrap-around", () => {
             beforeEach(() => {
                 // Each letterGap column maps to a distinct label so the returned
