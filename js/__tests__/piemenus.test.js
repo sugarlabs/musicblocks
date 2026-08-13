@@ -9,14 +9,18 @@
  * (at your option) any later version.
  */
 
-const { piemenuPitches } = require("../piemenus");
+const { piemenuPitches, piemenuNumber } = require("../piemenus");
 
 // Mock Globals
 global.docById = jest.fn().mockReturnValue({
     style: { display: "", opacity: "" },
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
-    getBoundingClientRect: jest.fn().mockReturnValue({ x: 0, y: 0 })
+    getBoundingClientRect: jest.fn().mockReturnValue({ x: 0, y: 0 }),
+    replaceChildren: jest.fn(),
+    classList: { add: jest.fn(), remove: jest.fn() },
+    value: "",
+    focus: jest.fn()
 });
 global.document = {
     getElementById: global.docById,
@@ -117,7 +121,10 @@ describe("piemenus behavioral tests", () => {
             updateCache: jest.fn(),
             text: { text: "" },
             value: "",
-            name: "notename"
+            name: "notename",
+            _exitKeyPressed: jest.fn(),
+            _labelChanged: jest.fn(),
+            _usePieNumberC1: jest.fn().mockReturnValue(false)
         };
         jest.clearAllMocks();
     });
@@ -257,7 +264,12 @@ describe("piemenus behavioral tests", () => {
             }
             return {
                 style: { display: "" },
-                contains: jest.fn().mockReturnValue(false)
+                contains: jest.fn().mockReturnValue(false),
+                replaceChildren: jest.fn(),
+                classList: { add: jest.fn(), remove: jest.fn() },
+                value: "",
+                addEventListener: jest.fn(),
+                focus: jest.fn()
             };
         });
 
@@ -285,5 +297,57 @@ describe("piemenus behavioral tests", () => {
         expect(mockNavigate).toHaveBeenCalled();
 
         jest.useRealTimers();
+    });
+
+    describe("piemenuNumber behavioral tests", () => {
+        beforeEach(() => {
+            mockBlock.protoblock = { scale: 1 };
+        });
+
+        test("selects the closest valid value when selectedValue is outside wheelValues", () => {
+            const wheelValues = [1, 2, 3, 4, 5, 6, 7, 8];
+            piemenuNumber(mockBlock, wheelValues, 10);
+
+            expect(mockBlock._numberWheel.navigateWheel).toHaveBeenCalledWith(7);
+        });
+
+        test("selects the closest valid value for float selectedValue", () => {
+            const wheelValues = [1, 2, 3, 4, 5, 6, 7, 8];
+            piemenuNumber(mockBlock, wheelValues, 3.7);
+
+            expect(mockBlock._numberWheel.navigateWheel).toHaveBeenCalledWith(3);
+        });
+
+        test("decrements value and updates navigation on minus button click", () => {
+            const wheelValues = [1, 2, 3, 4, 5, 6, 7, 8];
+            piemenuNumber(mockBlock, wheelValues, 5); // Index 4
+
+            const minusNavigate = mockBlock._exitWheel.navItems[1].navigateFunction;
+
+            mockBlock.value = 5;
+            mockBlock._numberWheel.navItems[3].navigateFunction = jest.fn();
+
+            minusNavigate();
+
+            expect(mockBlock.value).toBe(4);
+            expect(mockBlock.label.value).toBe(4);
+            expect(mockBlock._numberWheel.navigateWheel).toHaveBeenCalledWith(3);
+        });
+
+        test("increments value and updates navigation on plus button click", () => {
+            const wheelValues = [1, 2, 3, 4, 5, 6, 7, 8];
+            piemenuNumber(mockBlock, wheelValues, 5); // Index 4
+
+            const plusNavigate = mockBlock._exitWheel.navItems[2].navigateFunction;
+
+            mockBlock.value = 5;
+            mockBlock._numberWheel.navItems[5].navigateFunction = jest.fn();
+
+            plusNavigate();
+
+            expect(mockBlock.value).toBe(6);
+            expect(mockBlock.label.value).toBe(6);
+            expect(mockBlock._numberWheel.navigateWheel).toHaveBeenCalledWith(5);
+        });
     });
 });
