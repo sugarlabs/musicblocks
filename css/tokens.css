@@ -19,6 +19,7 @@
 
     --color-border-primary: #d1d5db;
     --color-border-secondary: #e5e7eb;
+    --color-border-tertiary: #ffffff;
 
     /* Semantic Brand & State Colors */
     --color-brand-primary: #3b82f6;
@@ -103,6 +104,7 @@ body.dark {
 
     --color-border-primary: #4b5563;
     --color-border-secondary: #374151;
+    --color-border-tertiary: #000000;
 
     /* Semantic Brand & State Colors */
     --color-brand-primary: #60a5fa;
@@ -148,6 +150,7 @@ body.highcontrast {
 
     --color-border-primary: #ffffff;
     --color-border-secondary: #ffffff;
+    --color-border-tertiary: #ffffff;
 
     /* Semantic Brand & State Colors */
     --color-brand-primary: #ffff00;

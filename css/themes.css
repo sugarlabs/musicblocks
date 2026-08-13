@@ -1,4 +1,4 @@
-/* Theme DropDown Styling */
+/* Theme Styling */
 
 #themedropdown {
     background-color: transparent;
@@ -107,7 +107,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .dark #loadingText {
-    color: white !important;
+    color: var(--color-text-primary) !important;
 }
 
 .dark .language-link {
@@ -120,7 +120,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 }
 
 .dark #submitLilypond {
-    background-color: rgb(0, 102, 255);
+    background-color: var(--color-info-bg);
 }
 
 .dark #search,
@@ -170,7 +170,7 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 
 .dark #movable {
     background: var(--color-bg-tertiary);
-    color: white;
+    color: var(--color-text-primary);
 }
 
 .dark .dropdown-content li > a {
