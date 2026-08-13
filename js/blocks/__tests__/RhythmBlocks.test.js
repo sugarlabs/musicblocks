@@ -783,7 +783,6 @@ describe("RhythmBlocks", () => {
             capturedListener({});
             expect(turtle.singer.dotCount).toBeDefined();
         });
-
         test("RhythmicDotBlock calls errorMsg when arg is null", () => {
             const block = getBlock("rhythmicdot");
             block.flow([null, 1], logo, 0, 5);
