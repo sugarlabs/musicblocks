@@ -1019,6 +1019,9 @@ class ModeWidget {
         this._activeEDO = this._getActiveEDO();
 
         this._buildWheels(this._activeEDO);
+
+        // Context Pre-load: read mode string from block context and apply pattern
+        this._loadModeFromBlockContext();
     }
 
     /**
@@ -1098,6 +1101,8 @@ class ModeWidget {
         // ─── 3. Note wheel: starts blank; root toggled by clicking " " ───
         const noteList = [" "]; // No X on first note, since we don't want to unselect it.
         this._selectedNotes = new Array(activeEDO).fill(false);
+        // Note 0 (the tonic) is always part of the mode: it can never be toggled off.
+        this._selectedNotes[0] = true;
         for (let i = 1; i < activeEDO; i++) {
             noteList.push("x");
         }
@@ -1133,6 +1138,9 @@ class ModeWidget {
         // previews its pitch so the sound matches the wedge that was clicked.
         const __setNote = () => {
             const i = this._modeWheel.selectedNavItemIndex;
+            if (i === 0) {
+                return; // Note 0 is always locked - cannot be toggled off.
+            }
             this._saveState();
             this._selectedNotes[i] = true;
             this._noteWheel.navItems[i].navItem.show();
@@ -1321,6 +1329,13 @@ class ModeWidget {
      * @returns {void}
      */
     _setActiveEDO(keyOrEdo) {
+        // EDO Switch Mapping: cache the current interval array, set new EDO,
+        // and map selected positions proportionally.
+        const oldEDO = this._activeEDO;
+        const oldSelectedNotes = this._selectedNotes
+            ? this._selectedNotes.slice()
+            : new Array(12).fill(false);
+
         const edoList = this._getEdoList();
         const entry =
             typeof keyOrEdo === "string"
@@ -1342,6 +1357,18 @@ class ModeWidget {
         // For non-EDO temperaments, the wheel geometry uses the pitchNumber
         // as slice count (e.g., 12 for just intonation, 19 for 1/3 comma meantone).
         // EDO systems use their natural step count.
+        // Proportionally map the previously selected notes to the new EDO.
+        const newSelectedNotes = new Array(this._activeEDO).fill(false);
+        for (let i = 0; i < Math.min(oldSelectedNotes.length, this._activeEDO); i++) {
+            if (oldSelectedNotes[i]) {
+                const newPos = Math.round((i * this._activeEDO) / oldEDO);
+                if (newPos < this._activeEDO) {
+                    newSelectedNotes[newPos] = true;
+                }
+            }
+        }
+        this._selectedNotes = newSelectedNotes;
+
         this._buildWheels(entry.edo);
         this._populateEdoSelect();
         this._setModeName();
@@ -1390,6 +1417,34 @@ class ModeWidget {
 
         this._setModeName();
     }
+
+    /**
+     * Pre-load the mode pattern from the block context that launched the
+     * widget.
+     *
+     * When the widget is opened from a "set key [C] mode [jazz minor]"
+     * block (via the "custom" slice of the mode pie menu), the mode name
+     * is passed along by the launcher so the wheel is populated with the
+     * current steps and the mode-name input is pre-filled.
+     *
+     * @private
+     * @returns {void}
+     */
+    _loadModeFromBlockContext() {
+        const mode = this._deps.mode || this._modeBlock;
+        if (mode && MUSICALMODES[mode]) {
+            this._applyPattern(MUSICALMODES[mode]);
+        }
+    }
+
+    /**
+     * Apply a step pattern (from MUSICALMODES) to the wheel.
+     *
+     * The pattern's steps sum to the EDO it was defined on. Loading a mode
+     * from a different tuning system than the one currently selected forces
+     * the widget over to the mode's EDO first: _setActiveEDO() rebuilds the
+     * wheels for the new slice count, applies the matching global
+     */
 }
 
 if (typeof module !== "undefined") {

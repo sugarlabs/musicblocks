@@ -3521,11 +3521,6 @@ const piemenuModes = (block, selectedMode) => {
 
     const that = block;
 
-    // Suppresses the mode-widget launch during programmatic wheel navigation
-    // (initial menu setup and group switching) so that only genuine user
-    // clicks on the "custom" slice open the circular mode editor.
-    let menuInitializing = true;
-
     // Opens the circular mode editor widget so the selected custom mode can
     // be built or edited on the N-slice wheel. The widget reads the active
     // temperament from the logo synth on construction.
@@ -3534,12 +3529,12 @@ const piemenuModes = (block, selectedMode) => {
             if (typeof require !== "undefined") {
                 require(["widgets/modewidget"], function () {
                     const act = block.activity;
-                    act.logo.modeWidget = new ModeWidget(act);
+                    act.logo.modeWidget = new ModeWidget(act, { mode: selectedMode });
                 });
             }
         } else {
             const act = block.activity;
-            act.logo.modeWidget = new ModeWidget(act);
+            act.logo.modeWidget = new ModeWidget(act, { mode: selectedMode });
         }
     };
 
@@ -3590,7 +3585,7 @@ const piemenuModes = (block, selectedMode) => {
 
             // Launch the circular mode editor when the user selects the
             // custom mode in the radial menu.
-            if (!menuInitializing && that.value === "custom") {
+            if (that.value === "custom") {
                 __launchModeWidget();
             }
         };
@@ -3709,11 +3704,7 @@ const piemenuModes = (block, selectedMode) => {
             i = 0; // major/ionian
         }
 
-        // Programmatic navigation during setup/group switching must not
-        // launch the mode editor; only a real user click does that.
-        menuInitializing = true;
         that._modeNameWheel.navigateWheel(i);
-        menuInitializing = false;
     };
 
     let timeout;
