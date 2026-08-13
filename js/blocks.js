@@ -4846,7 +4846,7 @@ class Blocks {
 
                 /** Don't make duplicate action names. */
                 /** Add a palette entry for any new storein blocks. */
-                const stringValues = {}; /** label: [blocks with that label] */
+                const stringValues = Object.create(null); /** label: [blocks with that label] */
                 const actionNames = {}; /** action block: label block */
                 const storeinNames = {}; /** storein block: label block */
                 const doNames = {}; /** do block: label block, nameddo block value */
