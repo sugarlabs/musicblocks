@@ -192,8 +192,8 @@
     "kana": "ミュージック・ブロックスはすでにこのテーマにせっていされています。"
   },
   "guide url": {
-    "kanji": "https://github.com/sugarlabs/musicblocks/tree/master/guide-ja/music_blocks_operation_manual.pdf",
-    "kana": "https://github.com/sugarlabs/musicblocks/tree/master/guide-ja/music_blocks_operation_manual.pdf"
+    "kanji": "Docs/guide-ja/music_blocks_operation_manual.pdf",
+    "kana": "Docs/guide-ja/music_blocks_operation_manual.pdf"
   },
   "Turtle Blocks": {
     "kanji": "タートル・ブロックス",

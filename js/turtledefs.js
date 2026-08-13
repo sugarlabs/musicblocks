@@ -39,7 +39,7 @@ const VERSION = "3.7.1";
 let LOGODEFAULT;
 let LOGOJA1 = LOGODEFAULT;
 let LOGOJA = LOGODEFAULT;
-//.TRANS: put the URL to the guide here, e.g., https://github.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md
+//.TRANS: put the URL to the guide here, e.g., Docs/guide/index.html
 let GUIDEURL = _("guide url");
 let NUMBERBLOCKDEFAULT;
 let DEFAULTPALETTE;
@@ -52,7 +52,8 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
     LOGOJA = LOGODEFAULT;
 
     if (GUIDEURL === "guide url" || GUIDEURL === "") {
-        GUIDEURL = "https://github.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md";
+	// Fix me: Move turtle guide to MB repo.
+        GUIDEURL = "Docs/guide/README.md";
     }
 
     NUMBERBLOCKDEFAULT = 100;
