@@ -209,6 +209,7 @@ describe("MusicKeyboard add-row submenu", () => {
     });
 
     test("creates pie submenu and sets z-index, top position, and exit wheel correctly", () => {
+        window.configureExitWheel = jest.fn();
         document.body.innerHTML =
             '<div id="wheelDivptm"></div><div id="_exitWheel"></div><div id="_tabsWheel"></div><div id="_durationWheel"></div><div id="cell-0"></div>';
         document.getElementById("cell-0").getBoundingClientRect = () => ({ x: 100, y: 400 });
@@ -227,9 +228,11 @@ describe("MusicKeyboard add-row submenu", () => {
         expect(keyboard._exitWheel.selectedNavItemIndex).toBeNull();
         expect(keyboard._exitWheel.navItems[1].enabled).toBe(false);
         expect(keyboard._exitWheel.navItems[0].sliceSelectedAttr.cursor).toBe("pointer");
+        expect(window.configureExitWheel).toHaveBeenCalledWith(keyboard._exitWheel);
     });
 
     test("creates column pie submenu and sets z-index, top position, and exit wheel correctly", () => {
+        window.configureExitWheel = jest.fn();
         document.body.innerHTML =
             '<div id="wheelDivptm"></div><div id="_exitWheel"></div><div id="labelcol0"></div>';
         document.getElementById("labelcol0").getBoundingClientRect = () => ({ x: 100, y: 400 });
@@ -252,6 +255,7 @@ describe("MusicKeyboard add-row submenu", () => {
         expect(keyboard._exitWheel.selectedNavItemIndex).toBeNull();
         expect(keyboard._exitWheel.navItems[1].enabled).toBe(false);
         expect(keyboard._exitWheel.navItems[0].sliceSelectedAttr.cursor).toBe("pointer");
+        expect(window.configureExitWheel).toHaveBeenCalledWith(keyboard._exitWheel);
     });
     test("creates keyboard without throwing and sets up idContainer", () => {
         global.PITCHES3 = ["C", "D", "E", "F", "G", "A", "B"];

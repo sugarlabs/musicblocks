@@ -1883,6 +1883,12 @@ function MusicKeyboard(activity) {
         return exitWheel;
     };
 
+    this._configureExitWheel = exitWheel => {
+        if (typeof window.configureExitWheel === "function") {
+            window.configureExitWheel(exitWheel);
+        }
+    };
+
     /**
      * Creates a pie submenu based on the cell's attributes.
      * @param {string} cellId - The ID of the cell triggering the submenu.
@@ -1972,6 +1978,7 @@ function MusicKeyboard(activity) {
             this._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
             this._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
         }
+        this._configureExitWheel(this._exitWheel);
 
         docById("wheelDivptm").style.position = "absolute";
         docById("wheelDivptm").style.height = "250px";
@@ -2226,6 +2233,7 @@ function MusicKeyboard(activity) {
             this._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
             this._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
         }
+        this._configureExitWheel(this._exitWheel);
 
         const x = docById("addnotes").getBoundingClientRect().x;
         const y = docById("addnotes").getBoundingClientRect().y;
@@ -2637,6 +2645,7 @@ function MusicKeyboard(activity) {
             this._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
             this._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
         }
+        this._configureExitWheel(this._exitWheel);
 
         const octaveLabels = [
             "8",
