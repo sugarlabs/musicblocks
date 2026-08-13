@@ -10,6 +10,7 @@
     --color-bg-primary: #ffffff;
     --color-bg-secondary: #f3f4f6;
     --color-bg-tertiary: #e5e7eb;
+    --color-fg-primary: #666666;
 
     --color-text-primary: #1f2937;
     --color-text-secondary: #4b5563;
@@ -95,6 +96,7 @@ body.dark {
     --color-bg-primary: #111827;
     --color-bg-secondary: #1f2937;
     --color-bg-tertiary: #374151;
+    --color-fg-primary: #d1d5db;
 
     --color-text-primary: #f9fafb;
     --color-text-secondary: #d1d5db;
@@ -141,6 +143,7 @@ body.highcontrast {
     --color-bg-primary: #000000;
     --color-bg-secondary: #000000;
     --color-bg-tertiary: #000000;
+    --color-fg-primary: #ffffff;
 
     --color-text-primary: #ffffff;
     --color-text-secondary: #ffff00;
