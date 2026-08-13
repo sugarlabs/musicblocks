@@ -557,9 +557,9 @@ msgid "Music Blocks is already set to this theme."
 msgstr "Music Blocksはすでにこのテーマに設定されています。"
 
 #: js/turtledefs.js:43
-#.TRANS: put the URL to the guide here, e.g., https://github.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md
+#.TRANS: put the URL to the guide here, e.g., Docs/guide/README.md
 msgid "guide url"
-msgstr "https://github.com/sugarlabs/musicblocks/tree/master/guide-ja/music_blocks_operation_manual.pdf"
+msgstr "Docs/guide-ja/music_blocks_operation_manual.pdf"
 
 #: js/turtledefs.js:88
 msgid "Turtle Blocks"
