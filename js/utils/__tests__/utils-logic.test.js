@@ -240,8 +240,16 @@ describe("Utility Logic Functions", () => {
             expect(hexToRGB("00ff00")).toEqual({ r: 0, g: 255, b: 0 });
         });
 
-        it("returns null for invalid hex", () => {
+        it("converts shorthand 3-digit hex to rgb object", () => {
+            expect(hexToRGB("#fff")).toEqual({ r: 255, g: 255, b: 255 });
+            expect(hexToRGB("f00")).toEqual({ r: 255, g: 0, b: 0 });
+            expect(hexToRGB("#0f0")).toEqual({ r: 0, g: 255, b: 0 });
+        });
+
+        it("returns null for invalid hex or non-string inputs", () => {
             expect(hexToRGB("#zzz")).toBeNull();
+            expect(hexToRGB(null)).toBeNull();
+            expect(hexToRGB(123)).toBeNull();
         });
     });
 
