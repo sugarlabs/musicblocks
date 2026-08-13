@@ -58,11 +58,12 @@ const _b64Cache = new Map();
    addTemperamentToList, getTemperament, deleteTemperamentFromList,
    addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
    DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
-    INTERVALVALUES, MUSICALMODES, getIntervalRatio, frequencyToPitch, NOTESTEP,
+   INTERVALVALUES, MUSICALMODES, getIntervalRatio, frequencyToPitch, NOTESTEP,
    GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP,
    SEMITONES, CHROMATIC_SOLFEGE, INTERVAL_CENTS, TEMPERAMENT_INTERVALS,
    INTERVAL_ORDER, generateNoteNames, getEdoNoteNamePosition,
-   scalePatternToEDO, PITCH_COLLECTIONS_EDO_OVERRIDES, getModePattern
+   scalePatternToEDO, PITCH_COLLECTIONS_EDO_OVERRIDES, getModePattern,
+   registerUserMode, getUserModeNames, removeUserMode
 */
 
 /**
@@ -935,7 +936,7 @@ const DEGREES = _("1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th");
 const getCurrentEDO = temperament => {
     if (!temperament) return 12;
     const t = TEMPERAMENT[temperament];
-    return t && t.pitchNumber ? t.pitchNumber : 12;
+    return t && t.pitchNumber ? t.pitchNumber : t && t.edo ? t.edo : 12;
 };
 
 const EDO_NOTE_NAMES = {};
@@ -1894,6 +1895,45 @@ for (const alias in PITCH_COLLECTION_ALIASES) {
 
 // User definition overrides this constant.
 MUSICALMODES["custom"] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+
+// Registry of modes defined by the user (via the "define mode" block or the
+// mode widget's Save button). This exists separately from MUSICALMODES
+// because user entries are only written there at run time, whereas the
+// widget's saved-modes ledger needs the list of user-defined modes up front.
+const USERMODES = new Set();
+
+/**
+ * Record a mode name as user-defined.
+ * @param {string} name - the mode name
+ * @returns {void}
+ */
+const registerUserMode = name => {
+    if (name && typeof name === "string") {
+        const trimmed = name.trim().toLowerCase();
+        if (trimmed) {
+            USERMODES.add(trimmed);
+        }
+    }
+};
+
+/**
+ * Get the sorted names of all user-defined modes.
+ * @returns {Array<string>} the registered mode names
+ */
+const getUserModeNames = () => {
+    return Array.from(USERMODES).sort();
+};
+
+/**
+ * Remove a mode name from the user-mode registry.
+ * @param {string} name - the mode name
+ * @returns {void}
+ */
+const removeUserMode = name => {
+    if (name && typeof name === "string") {
+        USERMODES.delete(name.trim().toLowerCase());
+    }
+};
 
 /**
  * Maqam table mapping specific maqams to their corresponding keys.
@@ -3136,12 +3176,6 @@ const DEFAULTOSCILLATORTYPE = "sine";
  * @constant {string}
  */
 const DEFAULTACCIDENTAL = "natural" + " " + NATURAL;
-
-/**
- * Custom mode from the musical modes dictionary.
- * @constant {Object}
- */
-const customMode = MUSICALMODES["custom"];
 
 /**
  * Get the invert mode name based on its identifier.
@@ -6017,9 +6051,10 @@ const PITCH_COLLECTIONS_EDO_OVERRIDES = {};
  * Get the step pattern for a mode in the given EDO.
  *
  * Lookup order: PITCH_COLLECTIONS_EDO_OVERRIDES[edo][mode] first, then the
- * scalePatternToEDO conversion of MUSICALMODES[mode]. For the "custom"
- * (chromatic) mode, 12-EDO uses the stored customMode pattern and non-12 EDO
- * returns a full EDO-length step-1 pattern.
+ * scalePatternToEDO conversion of MUSICALMODES[mode]. For the "custom" mode,
+ * the stored MUSICALMODES["custom"] pattern (maintained in the active EDO's
+ * steps) is returned when it forms a valid EDO-length pattern, otherwise a
+ * full EDO-length step-1 pattern is used as a safe fallback.
  * @function
  * @param {string} mode - The mode name (e.g. "major").
  * @param {number} edo - Number of steps per octave.
@@ -6031,8 +6066,15 @@ const getModePattern = (mode, edo = 12) => {
         return overrides[mode].slice();
     }
     if (mode.toLowerCase() === "custom") {
-        if (edo === 12) {
-            return customMode.slice();
+        // MUSICALMODES["custom"] is maintained in the active EDO's steps:
+        // defineMode() writes an EDO-step pattern for it and setTemperament()
+        // resizes it to the current EDO. Return it directly so user-defined
+        // custom modes are honored in every EDO (not just 12). The sum check
+        // keeps the fallback safe if the array is ever stale (e.g. a custom
+        // mode saved under a different EDO than the one currently active).
+        const custom = MUSICALMODES["custom"];
+        if (custom && custom.length > 0 && custom.reduce((acc, v) => acc + v, 0) === edo) {
+            return custom.slice();
         }
         return new Array(edo).fill(1);
     }
@@ -6106,10 +6148,10 @@ const buildScale = (keySignature, edo) => {
             idx = 0;
         }
 
-        // For "custom" (chromatic) mode in non-12 EDO, getModePattern returns a
-        // full EDO-length scale with step=1 for every pitch class, instead of
-        // converting the hardcoded 12-element customMode array (which would only
-        // produce ~12 notes and leave many pitch classes unreachable).
+        // For "custom" mode in non-12 EDO, getModePattern returns the
+        // user-defined EDO-step pattern stored in MUSICALMODES["custom"]
+        // (written by defineMode / resized by setTemperament), falling back
+        // to a full EDO-length chromatic only if that pattern is stale.
         const edoHalfSteps = getModePattern(obj[1], currentEDO);
 
         const scale = [myKeySignature];
@@ -7873,7 +7915,6 @@ if (typeof module !== "undefined" && module.exports) {
         addTemperamentToDictionary,
         DEFAULTINVERT,
         DEFAULTMODE,
-        customMode,
         getInvertMode,
         getIntervalNumber,
         getIntervalDirection,
@@ -7901,6 +7942,9 @@ if (typeof module !== "undefined" && module.exports) {
         getTemperamentCents,
         getTemperamentName,
         getCurrentEDO,
+        registerUserMode,
+        getUserModeNames,
+        removeUserMode,
         noteToObj,
         frequencyToPitch,
         getArticulation,

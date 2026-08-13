@@ -61,6 +61,37 @@ global.normalizeNoteAccidentals = jest.fn().mockImplementation(n => n);
 global.MUSICALMODES = {
     ionian: [2, 2, 1, 2, 2, 2, 1]
 };
+global.getModePattern = jest.fn((mode, edo) => global.MUSICALMODES[mode] || []);
+global.getCurrentEDO = jest.fn(() => 12);
+global.parseNoteString = jest.fn(() => ["C", 4]);
+global.TEMPERAMENT = {
+    "equal": { pitchNumber: 12, isEDO: true },
+    "equal5": { pitchNumber: 5, isEDO: true },
+    "equal19": { pitchNumber: 19, isEDO: true },
+    "equal17": { isEDO: true, edo: 17 },
+    "just intonation": { pitchNumber: 12, isEDO: false },
+    "Pythagorean": { pitchNumber: 12, isEDO: false },
+    "1/3 comma meantone": { pitchNumber: 19, isEDO: false },
+    "1/4 comma meantone": { pitchNumber: 21, isEDO: false },
+    "custom": { pitchNumber: 12 }
+};
+global.registerUserMode = jest.fn();
+global.getUserModeNames = jest.fn(() => []);
+global.removeUserMode = jest.fn();
+global.NOTESTABLE = {
+    0: "ti",
+    1: "do",
+    2: "do\u266F",
+    3: "re",
+    4: "re\u266F",
+    5: "mi",
+    6: "fa",
+    7: "fa\u266F",
+    8: "sol",
+    9: "sol\u266F",
+    10: "la",
+    11: "la\u266F"
+};
 
 // Mock slicePath
 global.slicePath = jest.fn().mockReturnValue({
@@ -77,6 +108,7 @@ global.wheelnav = jest.fn().mockImplementation(() => ({
     sliceSelectedPathCustom: {},
     sliceInitPathCustom: {},
     navItems: [],
+    removeWheel: jest.fn(),
     createWheel: jest.fn().mockImplementation(function (labels) {
         this.navItems = labels.map(() => ({
             navItem: {
@@ -130,23 +162,32 @@ window.widgetWindows = {
 if (typeof document === "undefined") {
     global.document = {};
 }
-document.createElement = jest.fn().mockImplementation(tag => ({
-    style: {},
-    setAttribute: jest.fn(),
-    innerHTML: "",
-    append: jest.fn(),
-    appendChild: jest.fn(),
-    replaceChildren: jest.fn(),
-    removeChild: jest.fn(),
-    firstChild: null,
-    insertRow: jest.fn().mockReturnValue({
-        insertCell: jest.fn().mockReturnValue({
-            style: {},
-            innerHTML: ""
-        })
-    }),
-    getElementById: jest.fn().mockReturnValue({ src: "" })
-}));
+document.createElement = jest.fn().mockImplementation(tag => {
+    const el = {
+        style: {},
+        setAttribute: jest.fn(),
+        innerHTML: "",
+        appendChild: jest.fn(),
+        removeChild: jest.fn(),
+        firstChild: null,
+        children: [],
+        insertRow: jest.fn().mockReturnValue({
+            insertCell: jest.fn().mockReturnValue({
+                style: {},
+                innerHTML: ""
+            })
+        }),
+        getElementById: jest.fn().mockReturnValue({ src: "" })
+    };
+    el.append = jest.fn((...nodes) => {
+        nodes.forEach(node => el.children.push(node));
+    });
+    el.replaceChildren = jest.fn((...nodes) => {
+        el.children = [];
+        nodes.forEach(node => el.children.push(node));
+    });
+    return el;
+});
 document.getElementById = document.createElement; // For internal usage
 
 describe("ModeWidget", () => {
@@ -158,6 +199,9 @@ describe("ModeWidget", () => {
             logo: {
                 modeBlock: 1,
                 resetSynth: jest.fn(),
+                setUserTemperament: jest.fn(k => {
+                    mockActivity.logo.synth.inTemperament = k;
+                }),
                 synth: {
                     trigger: jest.fn(),
                     stop: jest.fn()
@@ -177,6 +221,31 @@ describe("ModeWidget", () => {
             errorMsg: jest.fn(),
             refreshCanvas: jest.fn()
         };
+
+        global.MUSICALMODES = {
+            ionian: [2, 2, 1, 2, 2, 2, 1],
+            custom: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        };
+        global.getUserModeNames.mockReturnValue([]);
+        global.registerUserMode.mockClear();
+        global.removeUserMode.mockClear();
+        global.getCurrentEDO.mockReturnValue(12);
+        global.docById.mockReturnValue({
+            style: {},
+            innerHTML: "",
+            append: jest.fn(),
+            appendChild: jest.fn(),
+            replaceChildren: jest.fn(),
+            removeChild: jest.fn(),
+            firstChild: null,
+            rows: [{ cells: [{ innerHTML: "" }] }, { cells: [{ innerHTML: "" }] }],
+            insertRow: jest.fn().mockReturnValue({
+                insertCell: jest.fn().mockReturnValue({
+                    style: {},
+                    innerHTML: ""
+                })
+            })
+        });
 
         modeWidget = new ModeWidget(mockActivity);
     });
@@ -287,7 +356,6 @@ describe("ModeWidget", () => {
 
     test("should initialize correctly", () => {
         expect(global.wheelnav).toHaveBeenCalledTimes(3); // noteWheel, playWheel, etc.
-        expect(global.keySignatureToMode).toHaveBeenCalled();
         expect(mockActivity.textMsg).toHaveBeenCalled();
     });
 
@@ -396,5 +464,156 @@ describe("ModeWidget", () => {
 
         expect(mockActivity.logo.synth.stop).toHaveBeenCalled();
         expect(modeWidget._locked).toBe(false);
+    });
+
+    test("_save emits an action block and a define-mode block for a non-12 mode", () => {
+        global.docById.mockReturnValue({ rows: [{ cells: [{ textContent: "" }] }] });
+        mockActivity.blocks.loadNewBlocks = jest.fn();
+        modeWidget._setTimeout = fn => fn();
+        modeWidget._modeNameInput = { value: "my custom mode" };
+
+        // 19-EDO major-scale selection.
+        mockActivity.logo.synth.inTemperament = "equal19";
+        modeWidget._activeEDO = 19;
+        modeWidget._selectedNotes = Array(19).fill(false);
+        for (const pos of [0, 3, 6, 8, 11, 14, 17]) {
+            modeWidget._selectedNotes[pos] = true;
+        }
+
+        modeWidget._save();
+
+        // Storage write is gated to the empty/unnamed or explicitly named
+        // "custom" mode; named modes must not overwrite the built-in custom
+        // mode's persisted pattern.
+        expect(mockActivity.storage.custommode).toBeUndefined();
+
+        // Two block stacks are generated: action + define-mode.
+        expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalledTimes(2);
+
+        // First stack: action block with pitchnumber children.
+        const actionStack = mockActivity.blocks.loadNewBlocks.mock.calls[0][0];
+        expect(actionStack[0][1][0]).toBe("action");
+        expect(actionStack[1][1][0]).toBe("text");
+        expect(actionStack[1][1][1].value).toBe("my custom mode");
+        const actionNumbers = actionStack
+            .filter(b => Array.isArray(b[1]) && b[1][0] === "number")
+            .map(b => b[1][1].value)
+            .sort((a, b) => a - b);
+        expect(actionNumbers).toEqual([0, 3, 6, 8, 11, 14, 17]);
+        // Pitchnumber children must flow lowest to highest in chain order.
+        const actionNumbersInOrder = actionStack
+            .filter(b => Array.isArray(b[1]) && b[1][0] === "number")
+            .map(b => b[1][1].value);
+        expect(actionNumbersInOrder).toEqual([0, 3, 6, 8, 11, 14, 17]);
+
+        // Second stack: set-temperament + define-mode.
+        const defineStack = mockActivity.blocks.loadNewBlocks.mock.calls[1][0];
+        expect(defineStack[0][1]).toBe("settemperament");
+        expect(defineStack[0][4]).toEqual([null, 1, 2, 3, 4]);
+        expect(defineStack[1][1][0]).toBe("temperamentname");
+        expect(defineStack[1][1][1].value).toBe("equal19");
+        expect(defineStack[2][1][0]).toBe("notename");
+        expect(defineStack[3][1][0]).toBe("number");
+        expect(defineStack[3][1][1].value).toBe(4);
+
+        expect(defineStack[4][1][0]).toBe("definemode");
+        expect(defineStack[4][4]).toEqual([0, 5, 7, 6]);
+        expect(defineStack[5][1][1].value).toBe("my custom mode");
+        const defineNumbers = defineStack
+            .filter(b => Array.isArray(b[1]) && b[1][0] === "number")
+            .map(b => b[1][1].value)
+            .sort((a, b) => a - b);
+        expect(defineNumbers).toEqual([4, 0, 3, 6, 8, 11, 14, 17].sort((a, b) => a - b));
+    });
+
+    test("_save emits an action block and a bare define-mode stack for 12-EDO", () => {
+        global.docById.mockReturnValue({ rows: [{ cells: [{ textContent: "" }] }] });
+        mockActivity.blocks.loadNewBlocks = jest.fn();
+        modeWidget._setTimeout = fn => fn();
+        modeWidget._modeNameInput = { value: "plain major" };
+
+        modeWidget._activeEDO = 12;
+        modeWidget._selectedNotes = Array(12).fill(false);
+        for (const pos of [0, 2, 4, 5, 7, 9, 11]) {
+            modeWidget._selectedNotes[pos] = true;
+        }
+
+        modeWidget._save();
+
+        // Two block stacks: action + define-mode.
+        expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalledTimes(2);
+
+        // First stack: action block with solfege pitch children.
+        const actionStack = mockActivity.blocks.loadNewBlocks.mock.calls[0][0];
+        expect(actionStack[0][1][0]).toBe("action");
+        expect(actionStack[1][1][0]).toBe("text");
+        expect(actionStack[1][1][1].value).toBe("plain major");
+        expect(actionStack.some(b => b[1] === "pitch")).toBe(true);
+        // Pitches must flow lowest to highest (Do first, Ti last).
+        const solfegeValues = actionStack
+            .filter(b => Array.isArray(b[1]) && b[1][0] === "solfege")
+            .map(b => b[1][1].value);
+        expect(solfegeValues).toEqual(["do", "re", "mi", "fa", "sol", "la", "ti"]);
+
+        // Second stack: define-mode without set-temperament.
+        const defineStack = mockActivity.blocks.loadNewBlocks.mock.calls[1][0];
+        expect(defineStack[0][1][0]).toBe("definemode");
+        expect(defineStack[0][4]).toEqual([null, 1, 3, 2]);
+        expect(defineStack.some(b => Array.isArray(b[1]) && b[1][0] === "settemperament")).toBe(
+            false
+        );
+        const numbers = defineStack
+            .filter(b => Array.isArray(b[1]) && b[1][0] === "number")
+            .map(b => b[1][1].value)
+            .sort((a, b) => a - b);
+        expect(numbers).toEqual([0, 2, 4, 5, 7, 9, 11]);
+    });
+
+    test("_rotateRight does nothing when the wheel is empty", () => {
+        // Regression: with a blank slate (nothing selected), the animation
+        // loop could never terminate because the "first note selected" exit
+        // condition never became true.
+        modeWidget._selectedNotes = Array(12).fill(false);
+        modeWidget._setTimeout = jest.fn(fn => fn());
+
+        modeWidget._rotateRight();
+
+        expect(modeWidget._locked).toBe(false);
+        expect(modeWidget._setTimeout).not.toHaveBeenCalled();
+    });
+
+    test("_rotateLeft does nothing when the wheel is empty", () => {
+        modeWidget._selectedNotes = Array(12).fill(false);
+        modeWidget._setTimeout = jest.fn(fn => fn());
+
+        modeWidget._rotateLeft();
+
+        expect(modeWidget._locked).toBe(false);
+        expect(modeWidget._setTimeout).not.toHaveBeenCalled();
+    });
+
+    test("_save does not emit block stacks when the wheel is empty", () => {
+        // Regression: emitting an action block with zero selected notes
+        // referenced a non-existent child-flow block index and crashed
+        // Blocks.loadNewBlocks (blocks.js:5254).
+        modeWidget._selectedNotes = Array(12).fill(false);
+        modeWidget._setTimeout = fn => fn();
+        mockActivity.blocks.loadNewBlocks = jest.fn();
+
+        modeWidget._save();
+
+        expect(mockActivity.errorMsg).toHaveBeenCalled();
+        expect(mockActivity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+    });
+
+    test("_setActiveEDO applies a non-EDO temperament by its unique key", () => {
+        // Regression: dropdown option values used to collide on the integer
+        // step count, so a non-EDO temperament like 1/3 comma meantone (also
+        // 19 steps) was resolved to "equal19".
+        modeWidget._setActiveEDO("1/3 comma meantone");
+
+        expect(mockActivity.logo.setUserTemperament).toHaveBeenCalledWith("1/3 comma meantone");
+        expect(modeWidget._activeEDO).toBe(19);
+        expect(modeWidget._edoSelect.value).toBe("1/3 comma meantone");
     });
 });

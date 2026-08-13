@@ -65,7 +65,6 @@ const {
     deleteTemperamentFromList,
     DEFAULTINVERT,
     DEFAULTMODE,
-    customMode,
     getInvertMode,
     getIntervalNumber,
     getIntervalDirection,
@@ -199,6 +198,11 @@ describe("getCurrentEDO", () => {
 
     it("should return 19 for 'equal19' temperament", () => {
         expect(getCurrentEDO("equal19")).toBe(19);
+    });
+
+    it("should return 17 for a temperament with only an 'edo' field", () => {
+        global.TEMPERAMENT["equal17"] = { isEDO: true, edo: 17 };
+        expect(getCurrentEDO("equal17")).toBe(17);
     });
 
     it("should return 12 for undefined temperament", () => {
@@ -369,12 +373,6 @@ describe("Constants", () => {
     it("should have correct default values", () => {
         expect(DEFAULTINVERT).toBe("even");
         expect(DEFAULTMODE).toBe("major");
-    });
-});
-
-describe("customMode", () => {
-    it("should return custom mode from MUSICALMODES", () => {
-        expect(customMode).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     });
 });
 

@@ -791,7 +791,15 @@ function Synth() {
         if (this.inTemperament === "equal") {
             if (typeof notes === "string") {
                 const parsed = parseNoteString(notes);
-                return pitchToFrequency(parsed[0], parsed[1], 0, "c major");
+                const freq = pitchToFrequency(parsed[0], parsed[1], 0, "c major");
+                if (window.DEBUG_AUDIO) {
+                    console.log("[Audio Frequency Output]", {
+                        modeNote: notes,
+                        temperament: "equal",
+                        calculatedHz: freq
+                    });
+                }
+                return freq;
             } else if (typeof notes === "number") {
                 return notes;
             } else {
@@ -799,7 +807,15 @@ function Synth() {
                 for (let i = 0; i < notes.length; i++) {
                     if (typeof notes[i] === "string") {
                         const parsed = parseNoteString(notes[i]);
-                        results.push(pitchToFrequency(parsed[0], parsed[1], 0, "c major"));
+                        const freq = pitchToFrequency(parsed[0], parsed[1], 0, "c major");
+                        if (window.DEBUG_AUDIO) {
+                            console.log("[Audio Frequency Output]", {
+                                modeNote: notes[i],
+                                temperament: "equal",
+                                calculatedHz: freq
+                            });
+                        }
+                        results.push(freq);
                     } else {
                         results.push(notes[i]);
                     }
@@ -812,7 +828,21 @@ function Synth() {
         if (t && t.isEDO) {
             if (typeof notes === "string") {
                 const parsed = parseNoteString(notes);
-                return pitchToFrequency(parsed[0], parsed[1], 0, "c major", this.inTemperament);
+                const freq = pitchToFrequency(
+                    parsed[0],
+                    parsed[1],
+                    0,
+                    "c major",
+                    this.inTemperament
+                );
+                if (window.DEBUG_AUDIO) {
+                    console.log("[Audio Frequency Output]", {
+                        modeNote: notes,
+                        temperament: this.inTemperament,
+                        calculatedHz: freq
+                    });
+                }
+                return freq;
             } else if (typeof notes === "number") {
                 return notes;
             } else {
@@ -820,9 +850,21 @@ function Synth() {
                 for (let i = 0; i < notes.length; i++) {
                     if (typeof notes[i] === "string") {
                         const parsed = parseNoteString(notes[i]);
-                        results.push(
-                            pitchToFrequency(parsed[0], parsed[1], 0, "c major", this.inTemperament)
+                        const freq = pitchToFrequency(
+                            parsed[0],
+                            parsed[1],
+                            0,
+                            "c major",
+                            this.inTemperament
                         );
+                        if (window.DEBUG_AUDIO) {
+                            console.log("[Audio Frequency Output]", {
+                                modeNote: notes[i],
+                                temperament: this.inTemperament,
+                                calculatedHz: freq
+                            });
+                        }
+                        results.push(freq);
                     } else {
                         results.push(notes[i]);
                     }

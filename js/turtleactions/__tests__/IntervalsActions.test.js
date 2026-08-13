@@ -45,6 +45,8 @@ describe("setupIntervalsActions", () => {
             custom: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         };
 
+        global.registerUserMode = jest.fn();
+
         global.ALLNOTESTEP = {
             "Cb": 0,
             "C": 1,
@@ -725,6 +727,7 @@ describe("setupIntervalsActions", () => {
         listener();
 
         expect(MUSICALMODES.custom).toBeDefined();
+        expect(registerUserMode).toHaveBeenCalledWith("custom");
     });
 
     test("defineMode error paths", () => {

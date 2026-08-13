@@ -20,7 +20,7 @@
  */
 
 /*
-   global _, NOINPUTERRORMSG, Singer, MUSICALMODES, MusicBlocks, Mouse, getNote,
+   global _, NOINPUTERRORMSG, Singer, MUSICALMODES, registerUserMode, MusicBlocks, Mouse, getNote,
    getModeLength, isCustomTemperament, TEMPERAMENT, getCurrentEDO, EDOBOUNDEXCEEDED,
    pitchToNumber
 */
@@ -306,6 +306,7 @@ function setupIntervalsActions(activity) {
 
             const __listener = () => {
                 MUSICALMODES[modeName] = [];
+                registerUserMode(modeName);
                 if (!tur.singer.defineMode.includes(0)) {
                     tur.singer.defineMode.push(0);
                     activity.errorMsg(_("Adding missing pitch number 0."));
