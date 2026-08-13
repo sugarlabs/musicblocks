@@ -369,15 +369,17 @@ describe("setupIntervalsActions", () => {
     });
 
     describe("GetModename exact-vs-localized match precedence", () => {
-        test("falls back to default when neither exact key nor localized key matches", () => {
+        afterEach(() => {
+            global._ = x => x;
+        });
+
+        test("prioritizes exact mode name over localized mode name", () => {
             // With a non-identity _(), "_mode === mode" and "_(_mode) === mode" are genuinely
             // different conditions. This confirms the exact-match clause is what finds "minor"
             // here, not an incidental side effect of _() being the identity function elsewhere.
             global._ = x => `${x}_localized`;
 
             expect(Singer.IntervalsActions.GetModename("minor")).toBe("minor");
-
-            global._ = x => x;
         });
     });
 
@@ -499,6 +501,13 @@ describe("setupIntervalsActions", () => {
                 global.SEMITONETOINTERVALMAP = Array(60)
                     .fill(null)
                     .map(() => ["lg0", "lg1", "lg2", "lg3", "lg4", "lg5", "lg6"]);
+            });
+
+            afterEach(() => {
+                // Restore the default fixture so it can't leak into other describe blocks.
+                global.SEMITONETOINTERVALMAP = Array(13)
+                    .fill(null)
+                    .map(() => Array(7).fill("perfect"));
             });
 
             test("wraps the letter gap when the first letter index exceeds the second and octave !== 0", () => {
