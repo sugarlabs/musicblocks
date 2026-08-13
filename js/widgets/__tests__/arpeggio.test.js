@@ -312,7 +312,7 @@ describe("Arpeggio Widget", () => {
             expect(arpeggio._playing).toBe(false);
         });
 
-        test("play button uses a C4 quarter-note fallback when notesToPlay is empty", () => {
+        test("play button uses a C4 sixteenth-note fallback when notesToPlay is empty", () => {
             const cell = document.getElementById("2,0");
             arpeggio.notesToPlay = [];
             cell.onclick({ target: cell });
@@ -334,7 +334,7 @@ describe("Arpeggio Widget", () => {
             expect(activityMock.logo.synth.trigger).toHaveBeenCalledWith(
                 0,
                 expect.anything(),
-                1 / 4,
+                1 / 16,
                 DEFAULTVOICE,
                 null,
                 null,
@@ -621,7 +621,15 @@ describe("Arpeggio Widget", () => {
                 null,
                 expect.anything()
             );
-            expect(activityMock.logo.synth.trigger).toHaveBeenCalled();
+            expect(activityMock.logo.synth.trigger).toHaveBeenCalledWith(
+                0,
+                expect.anything(),
+                1 / 16,
+                DEFAULTVOICE,
+                null,
+                null,
+                null
+            );
         });
     });
 

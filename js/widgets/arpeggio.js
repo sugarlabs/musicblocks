@@ -547,7 +547,7 @@ class Arpeggio {
 
         this._playList = [];
         // Make a list of all the notes to play.
-        const notesToPlay = this.notesToPlay.length > 0 ? this.notesToPlay : [["C4", 1 / 4]];
+        const notesToPlay = this.notesToPlay.length > 0 ? this.notesToPlay : [["C4", 1 / 16]];
         for (let n = 0; n < notesToPlay.length; n++) {
             const noteValue = notesToPlay[n][1];
             const letter = notesToPlay[n][0].slice(0, -1);
@@ -693,7 +693,7 @@ class Arpeggio {
      */
     __playCell(rowIndex, colIndex, cell, playNote) {
         if (playNote) {
-            const noteData = this.notesToPlay[0] || ["C4", 1 / 4];
+            const noteData = this.notesToPlay[0] || ["C4", 1 / 16];
             const letter = noteData[0].slice(0, -1);
             const octave = Number(noteData[0].slice(-1));
             const noteObj = getNote(
