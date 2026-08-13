@@ -2014,6 +2014,7 @@ function Synth() {
                     if (paramsEffects.doDistortion) {
                         distortion = new Tone.Distortion(paramsEffects.distortionAmount);
                         chainNodes.push(distortion);
+                        effectsToDispose.push(distortion);
                     }
 
                     if (paramsEffects.doTremolo) {

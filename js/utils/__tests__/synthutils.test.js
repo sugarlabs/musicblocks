@@ -1800,6 +1800,53 @@ describe("Utility Functions (logic-only)", () => {
             jest.useRealTimers();
         });
 
+        it("should dispose the distortion node during effects cleanup", async () => {
+            jest.useFakeTimers();
+
+            const distortionDispose = jest.fn();
+            const originalDistortion = global.Tone.Distortion;
+            global.Tone.Distortion = jest.fn().mockImplementation(() => ({
+                dispose: distortionDispose
+            }));
+
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn(),
+                disconnect: jest.fn(),
+                connect: jest.fn(),
+                chain: jest.fn().mockReturnThis()
+            };
+            Synth.inTemperament = "equal";
+
+            const paramsEffects = {
+                doDistortion: true,
+                distortionAmount: 0.4
+            };
+
+            try {
+                await _performNotes.call(
+                    Synth,
+                    mockSynth,
+                    "C4",
+                    0.25,
+                    paramsEffects,
+                    null,
+                    false,
+                    0
+                );
+
+                expect(global.Tone.Distortion).toHaveBeenCalledWith(0.4);
+
+                // Fast-forward time to trigger the effects cleanup setTimeout
+                jest.advanceTimersByTime(2000);
+
+                expect(distortionDispose).toHaveBeenCalledTimes(1);
+            } finally {
+                global.Tone.Distortion = originalDistortion;
+                jest.useRealTimers();
+            }
+        });
+
         it("should catch errors when disconnect throws an error during effects cleanup", async () => {
             jest.useFakeTimers();
 
