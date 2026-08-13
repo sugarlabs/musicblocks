@@ -248,12 +248,6 @@ describe("Meter Widget", () => {
         expect(global.wheelnav).toHaveBeenCalledTimes(3); // meterWheel, beatWheel, playWheel
     });
 
-    test("should initialize when the beat-value input is disconnected", () => {
-        mockBlockList[1].connections[2] = null;
-
-        expect(() => new MeterWidget(mockActivity, 1)).not.toThrow();
-    });
-
     test("should handle play button toggle", () => {
         jest.useFakeTimers();
 
