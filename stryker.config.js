@@ -9,58 +9,19 @@
  *
  * Run with: npm run test:mutation
  *
- * --- Why js/utils/musicutils.js is NOT in the default scope -----------------
+ * The default mutation scope intentionally excludes musicutils.js.
  *
- * musicutils.js was measured (dry-run instrumentation) to generate 7,391 of
- * the ~9,911 mutants in what was previously a combined scope - i.e. it alone
- * accounts for the vast majority of mutants and, empirically, of runtime.
+ * musicutils.js contains many module-level lookup tables that produce static
+ * mutants. These cannot benefit from perTest test selection and make an
+ * unbounded mutation run impractical.
  *
- * The reason is structural, not incidental: musicutils.js is a flat module
- * with 222 top-level `const`/`let`/`var` declarations (large lookup tables -
- * note names, solfege, key signatures, temperament/EDO tables, colors, etc.),
- * evaluated once at module load. By contrast every file in js/turtleactions/
- * has 0 top-level declarations and piemenu-block-context.js has 1 - those
- * modules are class/method-scoped, so effectively all their mutants are
- * attributable to specific tests.
- *
- * Mutants inside top-level/module-scope code are classified by Stryker as
- * "static" mutants: they run during module load rather than inside a test,
- * so `perTest` coverage analysis cannot narrow down which tests exercise
- * them, and Stryker must re-run the *entire* test suite for each one.
- * Measured on a 94-mutant sample drawn from a musicutils.js constant-table
- * region: 739.46 tests run per mutant on average (essentially the full
- * 781-test suite, every time). Measured on DictActions.js (175 mutants,
- * class/method-scoped, well covered): 7.01 tests run per mutant on average -
- * about two orders of magnitude fewer per mutant, via perTest's normal
- * related-test narrowing. That ~100x per-mutant cost multiplier, applied
- * across musicutils.js's 7,391 mutants, is consistent with the previously
- * observed ~25 hour ETA and is the actual mechanism behind it - not merely
- * mutant *count*.
- *
- * Blanket `ignoreStatic: true` would hide this instead of addressing it (and
- * would silently drop real mutation signal on those tables), so it is
- * deliberately not used here. Instead, musicutils.js is mutated separately,
- * in bounded batches, using Stryker's line-range mutate syntax, e.g.:
+ * Mutate musicutils.js separately using bounded line ranges, for example:
  *
  *   npx stryker run --mutate "js/utils/musicutils.js:1-935"
  *
- * Pick ranges deliberately smaller than the whole file so a batch completes
- * in minutes, not hours, and re-run different ranges over time rather than
- * mutating the whole file in one command.
- *
- * --- concurrency / maxTestRunnerReuse ---------------------------------------
- *
- * Stryker's own default concurrency is `os.cpus().length - 1` worker
- * processes. The previous full-scope run reported child test-runner
- * processes terminating with SIGSEGV after ~29 minutes. That crash was not
- * reproduced in this investigation, but the resource math is a plausible
- * contributor: each Node worker's default heap ceiling is several GB, and
- * `cpus - 1` long-lived workers running large instrumented suites in
- * parallel can exceed available memory on common dev/CI machines. Halving
- * the default concurrency and periodically recycling worker processes
- * (`maxTestRunnerReuse`) reduces peak memory pressure and bounds any
- * per-process memory growth over a long run, without changing which mutants
- * run or how they're scored.
+ * The default concurrency is limited to half the available CPUs to reduce
+ * memory pressure during mutation runs. Test-runner processes are recycled
+ * periodically to bound long-running worker memory usage.
  */
 const os = require("os");
 
