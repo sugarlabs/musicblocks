@@ -52,7 +52,7 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
     LOGOJA = LOGODEFAULT;
 
     if (GUIDEURL === "guide url" || GUIDEURL === "") {
-	// Fix me: Move turtle guide to MB repo.
+        // Fix me: Move turtle guide to MB repo.
         GUIDEURL = "Docs/guide/README.md";
     }
 
