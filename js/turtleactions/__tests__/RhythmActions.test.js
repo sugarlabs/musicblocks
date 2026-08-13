@@ -96,13 +96,6 @@ describe("setupRhythmActions", () => {
         setupRhythmActions(activity);
     });
 
-    afterEach(() => {
-        // Reset globals mutated by dispatch/mouse-listener tests so later tests
-        // in the file don't observe a leaked MusicBlocks.isRun or mock mouse.
-        global.MusicBlocks.isRun = false;
-        global.Mouse.getMouseFromTurtle = jest.fn(() => ({ MB: { listeners: [] } }));
-    });
-
     it("sets beat and measure to 0 when pickup not crossed", () => {
         Singer.RhythmActions.playNote(1, "note", 0, 1);
 
@@ -352,6 +345,24 @@ describe("setupRhythmActions", () => {
         // same "dispatch via blockList, else register with the running mouse"
         // setup that doTie's own describe block already exercises. These mirror
         // that pattern for the remaining four block methods.
+
+        // Snapshot/restore, mirroring doTie's own beforeEach/afterEach below, so
+        // MusicBlocks.isRun and Mouse.getMouseFromTurtle don't leak into tests
+        // outside this describe block. Scoped here rather than at the top level
+        // since no other tests in this file touch these two globals.
+        let originalGetMouseFromTurtle;
+        let originalIsRun;
+
+        beforeEach(() => {
+            originalGetMouseFromTurtle = global.Mouse.getMouseFromTurtle;
+            originalIsRun = global.MusicBlocks.isRun;
+        });
+
+        afterEach(() => {
+            global.MusicBlocks.isRun = originalIsRun;
+            global.Mouse.getMouseFromTurtle = originalGetMouseFromTurtle;
+        });
+
         it("playNote dispatches block listener when blk is present in blockList", () => {
             activity.blocks.blockList = { 5: {} };
 
