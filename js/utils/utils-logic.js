@@ -538,14 +538,25 @@ var rgbToHex = (r, g, b) => {
  * Converts a hexadecimal color code to RGB values.
  */
 var hexToRGB = hex => {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result
-        ? {
-              r: parseInt(result[1], 16),
-              g: parseInt(result[2], 16),
-              b: parseInt(result[3], 16)
-          }
-        : null;
+    if (typeof hex !== "string") return null;
+    const cleanHex = hex.trim();
+    const fullResult = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(cleanHex);
+    if (fullResult) {
+        return {
+            r: parseInt(fullResult[1], 16),
+            g: parseInt(fullResult[2], 16),
+            b: parseInt(fullResult[3], 16)
+        };
+    }
+    const shortResult = /^#?([a-f\d])([a-f\d])([a-f\d])$/i.exec(cleanHex);
+    if (shortResult) {
+        return {
+            r: parseInt(shortResult[1] + shortResult[1], 16),
+            g: parseInt(shortResult[2] + shortResult[2], 16),
+            b: parseInt(shortResult[3] + shortResult[3], 16)
+        };
+    }
+    return null;
 };
 
 /**
