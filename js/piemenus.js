@@ -4082,14 +4082,14 @@ const piemenuKey = activity => {
             stacks.sort();
             let connectionsSetKey;
             let movable;
-            for (const i in stacks) {
-                if (activity.blocks.blockList[stacks[i]].name === "start") {
-                    const bottomBlock = activity.blocks.blockList[stacks[i]].connections[1];
+            for (const stackId of stacks) {
+                if (activity.blocks.blockList[stackId].name === "start") {
+                    const bottomBlock = activity.blocks.blockList[stackId].connections[1];
                     if (activity.KeySignatureEnv[2]) {
                         activity.blocks._makeNewBlockWithConnections(
                             "movable",
                             0,
-                            [stacks[i], null, null],
+                            [stackId, null, null],
                             null,
                             null
                         );
@@ -4105,7 +4105,7 @@ const piemenuKey = activity => {
                             activity.blocks.blockList.length - 1;
                         connectionsSetKey = [movable, null, null, bottomBlock];
                     } else {
-                        connectionsSetKey = [stacks[i], null, null, bottomBlock];
+                        connectionsSetKey = [stackId, null, null, bottomBlock];
                     }
 
                     activity.blocks._makeNewBlockWithConnections(
@@ -4120,10 +4120,10 @@ const piemenuKey = activity => {
                     activity.blocks.blockList[bottomBlock].connections[0] = setKey;
 
                     if (activity.KeySignatureEnv[2]) {
-                        activity.blocks.blockList[stacks[i]].connections[1] = movable;
+                        activity.blocks.blockList[stackId].connections[1] = movable;
                         activity.blocks.blockList[movable].connections[2] = setKey;
                     } else {
-                        activity.blocks.blockList[stacks[i]].connections[1] = setKey;
+                        activity.blocks.blockList[stackId].connections[1] = setKey;
                     }
 
                     activity.blocks.adjustExpandableClampBlock();
