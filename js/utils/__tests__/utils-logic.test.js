@@ -226,6 +226,32 @@ describe("Utility Logic Functions", () => {
         });
     });
 
+    describe("clampNumber()", () => {
+        it("clamps values within range", () => {
+            expect(clampNumber(5, 0, 10)).toBe(5);
+        });
+
+        it("clamps values below lower bound", () => {
+            expect(clampNumber(-5, 0, 10)).toBe(0);
+        });
+
+        it("clamps values above upper bound", () => {
+            expect(clampNumber(15, 0, 10)).toBe(10);
+        });
+
+        it("handles inverted min and max bounds", () => {
+            expect(clampNumber(5, 10, 0)).toBe(5);
+            expect(clampNumber(-2, 10, 0)).toBe(0);
+            expect(clampNumber(12, 10, 0)).toBe(10);
+        });
+
+        it("returns fallback for non-numeric or NaN inputs", () => {
+            expect(clampNumber("invalid", 0, 10)).toBe(0);
+            expect(clampNumber(NaN, 0, 10, 5)).toBe(5);
+            expect(clampNumber(null, 0, 10)).toBe(0);
+        });
+    });
+
     describe("rgbToHex()", () => {
         it("converts rgb to hex", () => {
             expect(rgbToHex(255, 0, 0)).toBe("#ff0000");
