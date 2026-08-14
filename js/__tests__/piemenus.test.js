@@ -9,7 +9,7 @@
  * (at your option) any later version.
  */
 
-const { piemenuPitches } = require("../piemenus");
+const { piemenuPitches, piemenuKey, piemenuNumber } = require("../piemenus");
 
 // Mock Globals
 global.docById = jest.fn().mockReturnValue({
@@ -30,14 +30,16 @@ global.window = {
 };
 global.wheelnav = jest.fn().mockImplementation(function (div) {
     const mockWheel = this;
-    this.navItems = Array.from({ length: 20 }, () => ({
+    this.id = div;
+    this.navItems = Array.from({ length: 30 }, () => ({
         title: "",
         enabled: true,
         navItem: { hide: jest.fn(), show: jest.fn() },
         sliceSelectedAttr: {},
         sliceHoverAttr: {},
         titleSelectedAttr: {},
-        titleHoverAttr: {}
+        titleHoverAttr: {},
+        titleAttr: {}
     }));
     this.selectedNavItemIndex = 0;
     this.colors = [];
@@ -91,6 +93,11 @@ global.DEFAULTVOICE = "sine";
 global.PREVIEWVOLUME = 0.5;
 global.getNote = jest.fn().mockReturnValue(["C", 4]);
 global.buildScale = jest.fn(() => [["C", "D", "E", "F", "G", "A", "B", "C"], []]);
+
+global.DEFAULTVOLUME = 0.5;
+global.Singer = { setSynthVolume: jest.fn() };
+global.SHARP = "♯";
+global.FLAT = "♭";
 
 describe("piemenus behavioral tests", () => {
     let mockBlock;
@@ -406,5 +413,56 @@ describe("piemenus behavioral tests", () => {
         );
 
         jest.useRealTimers();
+    });
+});
+
+describe("piemenuKey behavioral tests", () => {
+    let mockActivity;
+
+    beforeEach(() => {
+        mockActivity = {
+            blocks: {
+                blockList: { length: 2 },
+                findStacks: jest.fn(),
+                stackList: [],
+                _makeNewBlockWithConnections: jest.fn(),
+                adjustExpandableClampBlock: jest.fn()
+            },
+            logo: {
+                blocks: {
+                    blockList: { length: 2 }
+                },
+                synth: new global.Synth()
+            },
+            KeySignatureEnv: ["C", "major", false],
+            storage: {},
+            textMsg: jest.fn(),
+            turtles: { ithTurtle: jest.fn().mockReturnValue({ singer: { instrumentNames: [] } }) }
+        };
+        global.event = { clientX: 100, clientY: 100 };
+        jest.clearAllMocks();
+    });
+
+    test("generates setkey blocks correctly when exiting and no setkey exists", () => {
+        // Prepare blockList to trigger the for...of loops
+        mockActivity.blocks.blockList = {
+            0: { name: "start", connections: [null, 1] },
+            1: { name: "action", connections: [0] },
+            length: 2
+        };
+        // The start block is at index 0
+        mockActivity.blocks.stackList = [0];
+
+        piemenuKey(mockActivity);
+
+        // Find the exitWheel instance created in piemenuKey
+        const exitWheel = global.wheelnav.mock.instances.find(w => w.id === "exitWheel");
+        expect(exitWheel).toBeDefined();
+
+        // Trigger __exitMenu which calls __generateSetKeyBlocks
+        exitWheel.navItems[0].navigateFunction();
+
+        // Verify that blocks were created
+        expect(mockActivity.blocks._makeNewBlockWithConnections).toHaveBeenCalled();
     });
 });
