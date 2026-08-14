@@ -50,7 +50,9 @@ global.docById = jest.fn().mockImplementation(id => ({
     insertRow: jest.fn().mockReturnValue({
         insertCell: jest.fn().mockReturnValue({
             style: {},
-            innerHTML: ""
+            innerHTML: "",
+            appendChild: jest.fn(),
+            append: jest.fn()
         })
     })
 }));
@@ -61,6 +63,7 @@ global.normalizeNoteAccidentals = jest.fn().mockImplementation(n => n);
 global.MUSICALMODES = {
     ionian: [2, 2, 1, 2, 2, 2, 1]
 };
+global.getCurrentEDO = jest.fn().mockReturnValue(12);
 
 // Mock slicePath
 global.slicePath = jest.fn().mockReturnValue({
@@ -136,6 +139,8 @@ document.createElement = jest.fn().mockImplementation(tag => ({
     innerHTML: "",
     append: jest.fn(),
     appendChild: jest.fn(),
+    prepend: jest.fn(),
+    addEventListener: jest.fn(),
     replaceChildren: jest.fn(),
     removeChild: jest.fn(),
     firstChild: null,
@@ -396,5 +401,46 @@ describe("ModeWidget", () => {
 
         expect(mockActivity.logo.synth.stop).toHaveBeenCalled();
         expect(modeWidget._locked).toBe(false);
+    });
+
+    test("should initialize a custom mode with only the root selected", () => {
+        modeWidget._resetToCustom();
+
+        expect(modeWidget._selectedNotes[0]).toBe(true);
+        expect(modeWidget._selectedNotes.slice(1).every(v => v === false)).toBe(true);
+    });
+
+    test("should translate notes to a new EDO slice count", () => {
+        modeWidget._activeEDO = 12;
+        modeWidget._selectedNotes = [
+            true,
+            false,
+            true,
+            false,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true
+        ];
+
+        modeWidget._translateNotesToEDO(19);
+
+        expect(modeWidget._selectedNotes).toHaveLength(19);
+        expect(modeWidget._selectedNotes[0]).toBe(true);
+    });
+
+    test("should persist a custom mode to the registry and localStorage", () => {
+        const pattern = [2, 2, 1, 2, 2, 2, 1];
+        modeWidget._saveCustomMode("myMode", pattern);
+
+        expect(MUSICALMODES["myMode"]).toEqual(pattern);
+        const saved = JSON.parse(localStorage.getItem("customModes"));
+        expect(saved.some(m => m.name === "myMode" && m.pattern.join() === pattern.join())).toBe(
+            true
+        );
     });
 });
