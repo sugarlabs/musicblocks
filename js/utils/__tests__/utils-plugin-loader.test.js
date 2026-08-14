@@ -160,3 +160,53 @@ describe("processPluginData script cleanup", () => {
         debugSpy.mockRestore();
     });
 });
+
+describe("processPluginData - prototype pollution guard", () => {
+    let processPluginData;
+
+    beforeEach(() => {
+        jest.resetModules();
+        global._ = msg => msg;
+        global.PALETTEICONS = {};
+        global.PALETTEFILLCOLORS = {};
+        global.PALETTESTROKECOLORS = {};
+        global.PALETTEHIGHLIGHTCOLORS = {};
+        global.HIGHLIGHTSTROKECOLORS = {};
+        global.MULTIPALETTES = [[], [], []];
+        global.platformColor = { paletteColors: {} };
+        ({ processPluginData } = require("../utils.js"));
+    });
+
+    it("skips __proto__ and constructor keys in every plugin-data section", async () => {
+        const activity = createActivity();
+
+        const unsafe = '{"__proto__": {"polluted": true}, "constructor": {"polluted": true}}';
+        const maliciousData = `{
+            "PALETTEPLUGINS": ${unsafe}, "IMAGES": ${unsafe}, "FLOWPLUGINS": ${unsafe},
+            "ARGPLUGINS": ${unsafe}, "MACROPLUGINS": ${unsafe}, "SETTERPLUGINS": ${unsafe},
+            "BLOCKPLUGINS": ${unsafe}, "PARAMETERPLUGINS": ${unsafe}, "ONLOAD": ${unsafe},
+            "ONSTART": ${unsafe}, "ONSTOP": ${unsafe}
+        }`;
+
+        await processPluginData(activity, maliciousData, "plugins/test.json");
+
+        expect(Object.prototype.polluted).toBeUndefined();
+        expect({}.polluted).toBeUndefined();
+
+        const targets = [
+            PALETTEICONS,
+            activity.pluginsImages,
+            activity.logo.evalFlowDict,
+            activity.logo.evalArgDict,
+            activity.palettes.pluginMacros,
+            activity.logo.evalSetterDict,
+            activity.logo.evalParameterDict,
+            activity.logo.evalOnStartList,
+            activity.logo.evalOnStopList
+        ];
+        for (const dict of targets) {
+            expect(Object.prototype.hasOwnProperty.call(dict, "__proto__")).toBe(false);
+            expect(Object.prototype.hasOwnProperty.call(dict, "constructor")).toBe(false);
+        }
+    });
+});
