@@ -286,4 +286,125 @@ describe("piemenus behavioral tests", () => {
 
         jest.useRealTimers();
     });
+
+    test("outside click ignores interactive targets (labelDiv, movable, slices)", () => {
+        jest.useFakeTimers();
+
+        let mousedownHandler = null;
+        global.document.addEventListener = jest.fn().mockImplementation((event, handler) => {
+            if (event === "mousedown") {
+                mousedownHandler = handler;
+            }
+        });
+
+        const mockLabelDiv = { contains: jest.fn(t => t.id === "input-label") };
+        const mockMovable = { contains: jest.fn(t => t.id === "movable-btn") };
+        const mockChooseKeyDiv = {
+            style: { display: "block" },
+            contains: jest.fn(t => t.id === "wheel-slice")
+        };
+        const mockWheelDiv = {
+            style: { display: "none" },
+            contains: jest.fn().mockReturnValue(false)
+        };
+
+        global.docById.mockImplementation(id => {
+            if (id === "labelDiv") return mockLabelDiv;
+            if (id === "movable") return mockMovable;
+            if (id === "chooseKeyDiv") return mockChooseKeyDiv;
+            if (id === "wheelDiv") return mockWheelDiv;
+            return { style: { display: "none" }, contains: jest.fn().mockReturnValue(false) };
+        });
+
+        const mockExit = {
+            navItems: [
+                {
+                    navigateFunction: jest.fn(),
+                    selected: false,
+                    hovered: false,
+                    enabled: true
+                },
+                { enabled: false }
+            ],
+            selectedNavItemIndex: 0,
+            refreshWheel: jest.fn(),
+            raphael: { canvas: true }
+        };
+
+        window.configureExitWheel(mockExit);
+        jest.advanceTimersByTime(50);
+
+        expect(mousedownHandler).toBeInstanceOf(Function);
+
+        // Click inside labelDiv -> should not trigger exit
+        mousedownHandler({ target: { id: "input-label", tagName: "DIV" } });
+        expect(mockExit.navItems[0].navigateFunction).not.toHaveBeenCalled();
+
+        // Click inside movable -> should not trigger exit
+        mousedownHandler({ target: { id: "movable-btn", tagName: "INPUT" } });
+        expect(mockExit.navItems[0].navigateFunction).not.toHaveBeenCalled();
+
+        // Click inside slice element -> should not trigger exit
+        mousedownHandler({ target: { id: "wheel-slice", tagName: "path" } });
+        expect(mockExit.navItems[0].navigateFunction).not.toHaveBeenCalled();
+
+        // Click outside on background -> should trigger exit
+        mousedownHandler({ target: { id: "stage-bg", tagName: "CANVAS" } });
+        expect(mockExit.navItems[0].navigateFunction).toHaveBeenCalledTimes(1);
+
+        jest.useRealTimers();
+    });
+
+    test("fallback outside click hides all visible containers when activeExitWheel is not provided", () => {
+        jest.useFakeTimers();
+
+        let mousedownHandler = null;
+        global.document.addEventListener = jest.fn().mockImplementation((event, handler) => {
+            if (event === "mousedown") {
+                mousedownHandler = handler;
+            }
+        });
+        global.document.removeEventListener = jest.fn();
+
+        const mockWheelDiv = {
+            style: { display: "" },
+            contains: jest.fn().mockReturnValue(false)
+        };
+        const mockChooseKeyDiv = {
+            style: { display: "block" },
+            contains: jest.fn().mockReturnValue(false)
+        };
+        const mockMovable = {
+            style: { display: "block" },
+            contains: jest.fn().mockReturnValue(false)
+        };
+
+        global.docById.mockImplementation(id => {
+            if (id === "wheelDiv") return mockWheelDiv;
+            if (id === "chooseKeyDiv") return mockChooseKeyDiv;
+            if (id === "movable") return mockMovable;
+            return { style: { display: "none" }, contains: jest.fn().mockReturnValue(false) };
+        });
+
+        // Trigger showWheelDiv to register handler
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+        piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
+        jest.advanceTimersByTime(50);
+
+        // Remove activeExitWheel navigateFunction to test fallback branch
+        mockBlock._exitWheel.navItems[0].navigateFunction = null;
+
+        mousedownHandler({ target: { id: "bg", tagName: "BODY" } });
+
+        expect(mockWheelDiv.style.display).toBe("none");
+        expect(mockChooseKeyDiv.style.display).toBe("none");
+        expect(mockMovable.style.display).toBe("none");
+        expect(global.document.removeEventListener).toHaveBeenCalledWith(
+            "mousedown",
+            mousedownHandler
+        );
+
+        jest.useRealTimers();
+    });
 });

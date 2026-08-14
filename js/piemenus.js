@@ -122,19 +122,23 @@ const disableWheelResizeHandling = () => {
     clearTimeout(wheelResizeTimeout);
 };
 
+/**
+ * DOM container IDs that host pie menu / wheelnav instances.
+ */
+const PIE_MENU_CONTAINERS = [
+    "wheelDiv",
+    "wheelDivptm",
+    "chooseKeyDiv",
+    "helpfulWheelDiv",
+    "meterWheelDiv",
+    "wheelDiv2",
+    "wheelDiv3",
+    "wheelDiv4"
+];
+
 const isAnyPieMenuVisible = () => {
-    const containers = [
-        "wheelDiv",
-        "wheelDivptm",
-        "chooseKeyDiv",
-        "helpfulWheelDiv",
-        "meterWheelDiv",
-        "wheelDiv2",
-        "wheelDiv3",
-        "wheelDiv4"
-    ];
-    for (let i = 0; i < containers.length; i++) {
-        const div = docById(containers[i]);
+    for (let i = 0; i < PIE_MENU_CONTAINERS.length; i++) {
+        const div = docById(PIE_MENU_CONTAINERS[i]);
         if (div && div.style && div.style.display !== "none") {
             return true;
         }
@@ -156,18 +160,8 @@ const isInteractive = target => {
     }
 
     // 3. Check if inside any of the pie menu containers and is a slice/title/icon (not the container or SVG root)
-    const containers = [
-        "wheelDiv",
-        "wheelDivptm",
-        "chooseKeyDiv",
-        "helpfulWheelDiv",
-        "meterWheelDiv",
-        "wheelDiv2",
-        "wheelDiv3",
-        "wheelDiv4"
-    ];
-    for (let i = 0; i < containers.length; i++) {
-        const div = docById(containers[i]);
+    for (let i = 0; i < PIE_MENU_CONTAINERS.length; i++) {
+        const div = docById(PIE_MENU_CONTAINERS[i]);
         if (div && typeof div.contains === "function" && div.contains(target)) {
             if (target !== div && target.tagName && target.tagName.toLowerCase() !== "svg") {
                 return true;
@@ -194,20 +188,10 @@ const handleOutsideClick = event => {
             document.removeEventListener("mousedown", handleOutsideClick);
             activeExitWheel = null;
         } else {
-            const containers = [
-                "wheelDiv",
-                "wheelDivptm",
-                "chooseKeyDiv",
-                "helpfulWheelDiv",
-                "meterWheelDiv",
-                "wheelDiv2",
-                "wheelDiv3",
-                "wheelDiv4"
-            ];
-            for (let i = 0; i < containers.length; i++) {
-                const div = docById(containers[i]);
-                if (div && div.style.display !== "none") {
-                    if (containers[i] === "wheelDiv") {
+            for (let i = 0; i < PIE_MENU_CONTAINERS.length; i++) {
+                const div = docById(PIE_MENU_CONTAINERS[i]);
+                if (div && div.style && div.style.display !== "none") {
+                    if (PIE_MENU_CONTAINERS[i] === "wheelDiv") {
                         hideWheelDiv();
                     } else {
                         div.style.display = "none";
