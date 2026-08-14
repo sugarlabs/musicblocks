@@ -289,6 +289,23 @@ describe("Utility Logic Functions", () => {
             expect(hex2rgb("#00ff00")).toBe("rgba(0,255,0,1)");
         });
 
+        it("handles 3-digit shorthand hex codes", () => {
+            expect(hex2rgb("#f00")).toBe("rgba(255,0,0,1)");
+            expect(hex2rgb("f00")).toBe("rgba(255,0,0,1)");
+            expect(hex2rgb("#abc")).toBe("rgba(170,187,204,1)");
+        });
+
+        it("supports custom alpha transparency values", () => {
+            expect(hex2rgb("#ff0000", 0.5)).toBe("rgba(255,0,0,0.5)");
+            expect(hex2rgb("#00ff00", 0)).toBe("rgba(0,255,0,0)");
+        });
+
+        it("clamps alpha value between 0 and 1", () => {
+            expect(hex2rgb("#ff0000", 1.5)).toBe("rgba(255,0,0,1)");
+            expect(hex2rgb("#ff0000", -0.5)).toBe("rgba(255,0,0,0)");
+            expect(hex2rgb("#ff0000", "invalid")).toBe("rgba(255,0,0,1)");
+        });
+
         it("returns fallback rgba for invalid or non-string inputs", () => {
             expect(hex2rgb(null)).toBe("rgba(0,0,0,1)");
             expect(hex2rgb("invalid")).toBe("rgba(0,0,0,1)");
