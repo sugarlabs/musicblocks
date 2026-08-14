@@ -48,6 +48,26 @@ class OfflineCommitManager {
 
         // Auto-trigger on reconnect
         this._monitor = new NetworkMonitor(() => this._onOnline(), null);
+
+        // Bug fix: NetworkMonitor only fires _onOnline() on an offline→online
+        // TRANSITION. After a hard refresh (Ctrl+Shift+R) or a normal page reload
+        // the browser is already online from the start, so the initial probe sees
+        // no change and _onOnline() is never called — leaving pending offline
+        // drafts unsynced indefinitely.
+        //
+        // Fix: if the monitor reports online immediately, wait for ProjectStorage
+        // to finish loading its IndexedDB data (storage.dataLoaded), then run an
+        // initial sync pass. The 0ms setTimeout keeps it off the synchronous
+        // constructor path and ensures Planet finishes wiring everything up first.
+        if (this._monitor.isOnline) {
+            setTimeout(() => {
+                (this.storage.dataLoaded || Promise.resolve())
+                    .then(() => this._onOnline())
+                    .catch(err =>
+                        console.warn("[OfflineCommitManager] Initial sync on load failed:", err)
+                    );
+            }, 0);
+        }
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────
