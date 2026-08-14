@@ -1443,6 +1443,7 @@ if (typeof module !== "undefined" && module.exports) {
         prepareMacroExports,
         processPluginData,
         processMacroData,
+        updatePluginObj,
         announceToScreenReader,
         doUseCamera,
         doStopVideoCam,

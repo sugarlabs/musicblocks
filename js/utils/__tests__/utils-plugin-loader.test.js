@@ -210,3 +210,54 @@ describe("processPluginData - prototype pollution guard", () => {
         }
     });
 });
+
+describe("updatePluginObj - prototype pollution guard", () => {
+    let updatePluginObj;
+
+    beforeEach(() => {
+        jest.resetModules();
+        global._ = msg => msg;
+        ({ updatePluginObj } = require("../utils.js"));
+    });
+
+    it("skips __proto__ and constructor keys when merging into activity.pluginObjs", () => {
+        const activity = {
+            pluginObjs: {
+                PALETTEPLUGINS: {},
+                PALETTEFILLCOLORS: {},
+                PALETTESTROKECOLORS: {},
+                PALETTEHIGHLIGHTCOLORS: {},
+                FLOWPLUGINS: {},
+                ARGPLUGINS: {},
+                BLOCKPLUGINS: {},
+                MACROPLUGINS: {},
+                ONLOAD: {},
+                ONSTART: {},
+                ONSTOP: {}
+            }
+        };
+
+        const unsafe = '{"__proto__": {"polluted": true}, "constructor": {"polluted": true}}';
+        const maliciousObj = JSON.parse(`{
+            "PALETTEPLUGINS": ${unsafe}, "PALETTEFILLCOLORS": ${unsafe},
+            "PALETTESTROKECOLORS": ${unsafe}, "PALETTEHIGHLIGHTCOLORS": ${unsafe},
+            "FLOWPLUGINS": ${unsafe}, "ARGPLUGINS": ${unsafe}, "BLOCKPLUGINS": ${unsafe},
+            "MACROPLUGINS": ${unsafe}, "ONLOAD": ${unsafe}, "ONSTART": ${unsafe},
+            "ONSTOP": ${unsafe}
+        }`);
+
+        updatePluginObj(activity, maliciousObj);
+
+        expect(Object.prototype.polluted).toBeUndefined();
+        expect({}.polluted).toBeUndefined();
+
+        for (const section of Object.keys(activity.pluginObjs)) {
+            expect(
+                Object.prototype.hasOwnProperty.call(activity.pluginObjs[section], "__proto__")
+            ).toBe(false);
+            expect(
+                Object.prototype.hasOwnProperty.call(activity.pluginObjs[section], "constructor")
+            ).toBe(false);
+        }
+    });
+});
