@@ -1080,8 +1080,7 @@ Turtles.TurtlesView = class {
             });
             __collapse();
 
-            if (docById("helpfulWheelDiv").style.display !== "none") {
-                docById("helpfulWheelDiv").style.display = "none";
+            if (this.activity.closeHelpfulWheel()) {
                 this.activity.__tick();
             }
         };
@@ -1170,8 +1169,7 @@ Turtles.TurtlesView = class {
             this.masterStage.removeChild(turtlesStage);
             this.masterStage.addChildAt(turtlesStage, 0);
 
-            if (docById("helpfulWheelDiv").style.display !== "none") {
-                docById("helpfulWheelDiv").style.display = "none";
+            if (this.activity.closeHelpfulWheel()) {
                 this.activity.__tick();
             }
         };
