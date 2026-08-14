@@ -135,9 +135,9 @@ const {
     hideDOMLabel,
     displayMsg,
     makeKeyboardAccessible,
-    _,
     CameraManager,
-    announceToScreenReader
+    announceToScreenReader,
+    _
 } = require("../utils.js");
 
 describe("makeKeyboardAccessible()", () => {
