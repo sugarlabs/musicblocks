@@ -55,7 +55,7 @@ if (typeof module !== "undefined" && module.exports) {
    announceToScreenReader, changeImage, closeBlkWidgets,
    delayExecution,
    doPublish, doStopVideoCam, doSVG,
-   doUseCamera, format, getTextWidth, httpGet, httpPost, HttpRequest,
+   doUseCamera, format, getTextWidth,
    importMembers, isSVGEmpty, prepareMacroExports, preparePluginExports,
    processMacroData, processPluginData, processRawPluginData, waitForReadiness
 */

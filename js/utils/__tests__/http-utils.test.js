@@ -153,6 +153,85 @@ describe("HttpRequest()", () => {
         expect(global.XMLHttpRequest).toHaveBeenCalledTimes(1);
         expect(request.request).toBe(xhr);
     });
+
+    it("invokes callbacks on successful HTTP status via onload", () => {
+        let xhr;
+        const handler = jest.fn();
+        const userCallback = jest.fn();
+
+        global.self = {
+            location: { href: "http://localhost/" },
+            console
+        };
+
+        global.XMLHttpRequest = jest.fn(() => {
+            xhr = {
+                open: jest.fn(),
+                send: jest.fn(),
+                status: 200,
+                responseText: "ok body"
+            };
+            return xhr;
+        });
+
+        new HttpRequest("http://localhost/ok", handler, userCallback);
+        xhr.onload();
+
+        expect(handler).toHaveBeenCalledTimes(1);
+        expect(userCallback).toHaveBeenCalledWith(true, "ok body");
+    });
+
+    it("invokes callbacks on error HTTP status via onload", () => {
+        let xhr;
+        const handler = jest.fn();
+        const userCallback = jest.fn();
+
+        global.self = {
+            location: { href: "http://localhost/" },
+            console
+        };
+
+        global.XMLHttpRequest = jest.fn(() => {
+            xhr = {
+                open: jest.fn(),
+                send: jest.fn(),
+                status: 404,
+                responseText: "missing"
+            };
+            return xhr;
+        });
+
+        new HttpRequest("http://localhost/missing", handler, userCallback);
+        xhr.onload();
+
+        expect(handler).toHaveBeenCalledTimes(1);
+        expect(userCallback).toHaveBeenCalledWith(false, "Error: 404");
+    });
+
+    it("invokes callbacks on network failure via onerror", () => {
+        let xhr;
+        const handler = jest.fn();
+        const userCallback = jest.fn();
+
+        global.self = {
+            location: { href: "http://localhost/" },
+            console
+        };
+
+        global.XMLHttpRequest = jest.fn(() => {
+            xhr = {
+                open: jest.fn(),
+                send: jest.fn()
+            };
+            return xhr;
+        });
+
+        new HttpRequest("http://localhost/fail", handler, userCallback);
+        xhr.onerror();
+
+        expect(handler).toHaveBeenCalledTimes(1);
+        expect(userCallback).toHaveBeenCalledWith(false, "network error");
+    });
 });
 
 describe("compatibility surface", () => {
