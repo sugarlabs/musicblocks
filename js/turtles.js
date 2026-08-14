@@ -21,8 +21,8 @@
    setupPitchActions, setupIntervalsActions, setupToneActions, setupOrnamentActions,
    setupVolumeActions, setupDrumActions, setupDictActions, _, Turtle, TURTLESVG, METRONOMESVG,
    FILLCOLORS, STROKECOLORS, getMunsellColor, DEFAULTVALUE, DEFAULTCHROMA,
-   jQuery, docById, LEADING, CARTESIANBUTTON, piemenuGrid, CLEARBUTTON, COLLAPSEBUTTON,
-   EXPANDBUTTON, MBOUNDARY
+   jQuery, docById, LEADING, CARTESIANBUTTON, piemenuGrid, CLEARBUTTON, SPEAKBUTTON,
+   COLLAPSEBUTTON, EXPANDBUTTON, MBOUNDARY
  */
 
 /* exported Turtles */
@@ -991,7 +991,7 @@ Turtles.TurtlesView = class {
                     name: "Grid",
                     label: _("Grid")
                 },
-                this._w - 10 - 3 * 55,
+                this._w - 10 - 4 * 55,
                 70 + LEADING + 6
             );
             const that = this;
@@ -1008,13 +1008,50 @@ Turtles.TurtlesView = class {
                     name: "Clear",
                     label: _("Clear")
                 },
-                this._w - 5 - 2 * 55,
+                this._w - 5 - 3 * 55,
                 70 + LEADING + 6
             );
 
             // Assign click listener to the Clear button
             this._clearButton.onclick = () => {
                 this.activity._allClear();
+            };
+        };
+
+        const __makeSpeakToggleButton = () => {
+            this._speakToggleButton = _makeButton(
+                SPEAKBUTTON,
+                {
+                    name: "PieMenuSpeech",
+                    label: _("Pie menu speech on")
+                },
+                this._w - 5 - 2 * 55,
+                70 + LEADING + 6
+            );
+            this._speakToggleButton.id = "PieMenuSpeech";
+
+            const updateSpeakButton = () => {
+                const enabled =
+                    typeof window.getA11ySpeakEnabled === "function"
+                        ? window.getA11ySpeakEnabled()
+                        : true;
+                this._speakToggleButton.style.opacity = enabled ? "1" : "0.4";
+                const label = enabled ? _("Pie menu speech on") : _("Pie menu speech off");
+                this._speakToggleButton.setAttribute("data-tooltip", label);
+                this._speakToggleButton.setAttribute("aria-pressed", enabled ? "true" : "false");
+                this._speakToggleButton.setAttribute("aria-label", label);
+            };
+
+            updateSpeakButton();
+
+            this._speakToggleButton.onclick = () => {
+                if (
+                    typeof window.getA11ySpeakEnabled === "function" &&
+                    typeof window.setA11ySpeakEnabled === "function"
+                ) {
+                    window.setA11ySpeakEnabled(!window.getA11ySpeakEnabled());
+                }
+                updateSpeakButton();
             };
         };
 
@@ -1151,13 +1188,13 @@ Turtles.TurtlesView = class {
             this._clearButton.scaleX = 1;
             this._clearButton.scaleY = 1;
             this._clearButton.scale = 1;
-            this._clearButton.x = this._w - 5 - 2 * 55;
+            this._clearButton.x = this._w - 5 - 3 * 55;
 
             if (this.gridButton !== null) {
                 this.gridButton.scaleX = 1;
                 this.gridButton.scaleY = 1;
                 this.gridButton.scale = 1;
-                this.gridButton.x = this._w - 10 - 3 * 55;
+                this.gridButton.x = this._w - 10 - 4 * 55;
                 this.gridButton.visible = true;
             }
 
@@ -1194,6 +1231,7 @@ Turtles.TurtlesView = class {
             cont.setAttribute("id", "buttoncontainerTOP");
             __makeCollapseButton();
             __makeExpandButton();
+            __makeSpeakToggleButton();
             __makeClearButton();
             __makeGridButton();
             jQuery

@@ -1301,7 +1301,9 @@ describe("Toolbar Class", () => {
             textContent: "",
             appendChild: jest.fn(),
             addEventListener: jest.fn(),
+            removeEventListener: jest.fn(),
             querySelector: jest.fn(() => ({ textContent: "" })),
+            querySelectorAll: jest.fn(() => []),
             contains: jest.fn(() => false)
         };
         global.docById.mockImplementation(id => {
