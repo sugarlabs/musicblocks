@@ -1521,18 +1521,6 @@ class Activity {
             return bitmap;
         };
 
-        /**
-         * Creates and renders a message container.
-         * @param {string} fillColor - The fill color of the message container.
-         * @param {string} strokeColor - The stroke color of the message container.
-         * @param {function} callback - The callback function assigned to the message container.
-         * @param {number} y - The position on the canvas.
-
-
-        /*
-         * Builds the block list for search bar autocompletion.
-         */
-
         /*
          * Builds the block list for search bar autocompletion.
          */
@@ -2575,8 +2563,6 @@ class Activity {
             // Initialize Ticker with optimal framerate
             createjs.Ticker.framerate = 60;
 
-            // ===== Idle Ticker Optimization =====
-            // Throttle rendering when user is inactive and no music is playing
             this._initIdleWatcher();
 
             // Named event handlers for proper cleanup
