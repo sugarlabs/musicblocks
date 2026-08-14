@@ -32,7 +32,8 @@ const {
     unescapeHTML,
     deepClone,
     isSafeUrl,
-    isUnsafeObjectKey
+    isUnsafeObjectKey,
+    isValidHex
 } = require("../utils-logic.js");
 
 describe("Utility Logic Functions", () => {
@@ -310,6 +311,37 @@ describe("Utility Logic Functions", () => {
         it("returns fallback rgba for invalid or non-string inputs", () => {
             expect(hex2rgb(null)).toBe("rgba(0,0,0,1)");
             expect(hex2rgb("invalid")).toBe("rgba(0,0,0,1)");
+        });
+    });
+
+    describe("isValidHex()", () => {
+        it("returns true for valid 6-digit hex color codes with or without hash prefix", () => {
+            expect(isValidHex("#ffffff")).toBe(true);
+            expect(isValidHex("ffffff")).toBe(true);
+            expect(isValidHex("#FF0031")).toBe(true);
+            expect(isValidHex("00FF00")).toBe(true);
+        });
+
+        it("returns true for valid 3-digit shorthand hex color codes with or without hash prefix", () => {
+            expect(isValidHex("#fff")).toBe(true);
+            expect(isValidHex("fff")).toBe(true);
+            expect(isValidHex("#f00")).toBe(true);
+            expect(isValidHex("ABC")).toBe(true);
+        });
+
+        it("returns false for invalid length or non-hex characters", () => {
+            expect(isValidHex("#12345")).toBe(false);
+            expect(isValidHex("#1234567")).toBe(false);
+            expect(isValidHex("#gggggg")).toBe(false);
+            expect(isValidHex("invalid")).toBe(false);
+            expect(isValidHex("")).toBe(false);
+        });
+
+        it("returns false for non-string inputs", () => {
+            expect(isValidHex(null)).toBe(false);
+            expect(isValidHex(undefined)).toBe(false);
+            expect(isValidHex(123456)).toBe(false);
+            expect(isValidHex({})).toBe(false);
         });
     });
 
