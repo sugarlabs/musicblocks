@@ -2713,22 +2713,16 @@ class Activity {
             // Load any plugins saved in local storage.
             await this.pluginController.loadStoredPlugins();
 
-            // Load custom mode saved in local storage.
-            const custommodeData = this.storage.custommode;
-            if (custommodeData !== undefined) {
-                // Parse and update the custom musical mode with saved data.
-                try {
-                    const customModeDataObj = JSON.parse(custommodeData);
-                    const src = Array.isArray(customModeDataObj)
-                        ? customModeDataObj
-                        : Object.values(customModeDataObj);
-                    for (let i = 0; i < MUSICALMODES["custom"].length; i++) {
-                        const val = Number(src[i]);
-                        MUSICALMODES["custom"][i] = !isNaN(val) && val > 0 ? val : 1;
+            // Load custom modes saved in local storage so they survive a reload.
+            try {
+                const savedModes = JSON.parse(localStorage.getItem("customModes") || "[]");
+                for (const mode of savedModes) {
+                    if (mode && mode.name && Array.isArray(mode.pattern)) {
+                        MUSICALMODES[mode.name] = mode.pattern;
                     }
-                } catch (e) {
-                    ErrorHandler.recoverable(e, { operation: "parseCustomMode" });
                 }
+            } catch (e) {
+                ErrorHandler.recoverable(e, { operation: "loadCustomModes" });
             }
 
             this.allFilesChooser.addEventListener("click", event => {

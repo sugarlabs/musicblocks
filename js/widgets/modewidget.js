@@ -1,4 +1,5 @@
 // Copyright (c) 2016-21 Walter Bender
+// Copyright (c) 2026 Ashutosh Karnatak (Dependency Injection Refactoring)
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -13,9 +14,40 @@
 
    docById, _, platformColor, keySignatureToMode, MUSICALMODES,
    getNote, DEFAULTVOICE, last, NOTESTABLE, slicePath, wheelnav,
-   normalizeNoteAccidentals, getModePattern, getCurrentEDO,
+   normalizeNoteAccidentals, getCurrentEDO, getModePattern,
    numberToPitch, pitchToFrequency
  */
+
+/*
+    Global locations
+    - lib/wheelnav
+        slicePath, wheelnav
+    - js/utils/utils.js
+        _, last, docById
+    - js/utils/platformstyle.js
+        platformColor
+    - js/utils/musicutils.js
+        keySignatureToMode, MUSICALMODES, getModePattern, getNote, DEFAULTVOICE,
+        NOTESTABLE
+
+    Dependency Injection Pattern:
+    This widget uses dependency injection to reduce implicit global state.
+    Dependencies are passed via the constructor as part of the `activity` object.
+
+    Required Dependencies (accessed via this.activity):
+    - logo: Logo instance (provides synth, modeBlock, resetSynth)
+    - turtles: Turtles instance (provides ithTurtle for keySignature)
+    - blocks: Blocks instance (provides blockList, loadNewBlocks)
+    - hideMsgs: Function to hide messages
+    - textMsg: Function to display text messages
+    - errorMsg: Function to display error messages
+    - refreshCanvas: Function to refresh the canvas
+    - storage: Storage object for custom mode persistence
+
+    Note: `this.storage.custommode` persistence was replaced by
+    `localStorage["customModes"]` (see _saveCustomMode/_getCustomModes);
+    `storage` is no longer a widget dependency.
+*/
 
 /*exported ModeWidget*/
 
@@ -193,32 +225,19 @@ class ModeWidget {
     _edoOptions() {
         const inTemperament = this.logo.synth.inTemperament;
         const builtInTemperaments = [
-            { edo: 5, key: "5 equal", label: "5-EDO" },
-            { edo: 7, key: "7 equal", label: "7-EDO" },
+            { edo: 5, key: "equal5", label: "5-EDO" },
+            { edo: 7, key: "equal7", label: "7-EDO" },
             { edo: 12, key: "equal", label: "12-EDO (Equal)" },
-            { edo: 17, key: "17 equal", label: "17-EDO" },
-            { edo: 19, key: "19 equal", label: "19-EDO (Meantone)" },
-            { edo: 21, key: "21 equal", label: "21-EDO (MEAN)" },
-            { edo: 31, key: "31 equal", label: "31-EDO" }
+            { edo: 17, key: "equal17", label: "17-EDO" },
+            { edo: 19, key: "equal19", label: "19-EDO (Meantone)" },
+            { edo: 31, key: "equal31", label: "31-EDO" }
         ];
-        const builtInKeys = new Set(builtInTemperaments.map(t => t.key));
 
         const options = builtInTemperaments.map(t => ({
             value: t.edo,
             label: t.label,
             temperamentKey: t.key
         }));
-
-        const temperament = window.temperament || {};
-        for (const key of Object.keys(temperament)) {
-            if (!builtInKeys.has(key) && temperament[key]) {
-                const t = temperament[key];
-                const edo = t.pitchNumber || t.EDO || t.edo;
-                if (typeof edo === "number" && edo >= 5 && edo <= 55) {
-                    options.push({ value: edo, label: key, temperamentKey: key });
-                }
-            }
-        }
 
         if (!options.some(o => o.temperamentKey === inTemperament)) {
             options.unshift({
@@ -564,7 +583,11 @@ class ModeWidget {
             return;
         }
 
-        this._applyModePattern(currentMode);
+        this._applyModePattern(
+            this._getModeEDO(currentModeName[1])
+                ? currentMode
+                : getModePattern(currentModeName[1], this._activeEDO)
+        );
         this._setModeName();
     }
 
@@ -576,7 +599,10 @@ class ModeWidget {
             edoSelect.value = nativeEDO;
             this._rebuildWheel(nativeEDO);
         }
-        this._applyModePattern(mode);
+        // Built-in mode patterns are 12-EDO intervals; scale them to the
+        // active EDO. Custom modes carry EDO-specific patterns already.
+        const pattern = nativeEDO ? mode : getModePattern(modeName, this._activeEDO);
+        this._applyModePattern(pattern);
         this._setModeName();
     }
 
@@ -836,8 +862,14 @@ class ModeWidget {
                 null
             );
         } else {
-            const ratio = getModePattern(this._pitch + ":" + this.logo.synth.inTemperament, edo);
-            const freq = pitchToFrequency(this._pitch, 4, note, ks, ratio);
+            // note is a slice index = number of EDO steps above the root.
+            const freq = pitchToFrequency(
+                this._pitch,
+                4,
+                note * 100,
+                ks,
+                this._temperamentKeyForEDO(edo)
+            );
             this.logo.synth.trigger(0, freq, this._noteValue, DEFAULTVOICE, null, null);
         }
     }
@@ -906,9 +938,15 @@ class ModeWidget {
     _setModeName() {
         const currentMode = JSON.stringify(this._calculateMode());
         const currentKey = keySignatureToMode(this.turtles.ithTurtle(0).singer.keySignature)[0];
+        const customNames = new Set(this._getCustomModes().map(m => m.name));
 
         for (const mode in MUSICALMODES) {
-            if (JSON.stringify(MUSICALMODES[mode]) === currentMode) {
+            // Custom modes are stored with EDO-specific step patterns; built-in
+            // patterns are 12-EDO intervals scaled to the active EDO.
+            const pattern = customNames.has(mode)
+                ? MUSICALMODES[mode]
+                : getModePattern(mode, this._activeEDO);
+            if (JSON.stringify(pattern) === currentMode) {
                 if (this._modeBlock !== null) {
                     for (const i in this.blocks.blockList) {
                         if (this.blocks.blockList[i].name === "modename") {

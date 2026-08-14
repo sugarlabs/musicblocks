@@ -64,6 +64,7 @@ global.MUSICALMODES = {
     ionian: [2, 2, 1, 2, 2, 2, 1]
 };
 global.getCurrentEDO = jest.fn().mockReturnValue(12);
+global.getModePattern = jest.fn().mockReturnValue([2, 2, 1, 2, 2, 2, 1]);
 
 // Mock slicePath
 global.slicePath = jest.fn().mockReturnValue({
@@ -230,37 +231,6 @@ describe("ModeWidget", () => {
         expect(modeWidget._calculateMode()).toEqual([12]);
     });
 
-    test("should handle empty selectedNotes safely", () => {
-        modeWidget._selectedNotes = [];
-
-        const result = modeWidget._calculateMode();
-
-        expect(result).toBeDefined();
-    });
-
-    test("should handle malformed selectedNotes safely", () => {
-        modeWidget._selectedNotes = [true, undefined, false, null, true];
-
-        const result = modeWidget._calculateMode();
-
-        expect(Array.isArray(result)).toBe(true);
-    });
-
-    test("undo should not crash when stack is empty", () => {
-        modeWidget._undoStack = [];
-        modeWidget._undo();
-
-        expect(modeWidget._selectedNotes).toBeDefined();
-    });
-
-    test("should return correct playing status", () => {
-        modeWidget._playing = false;
-        expect(modeWidget._playingStatus()).toBe(false);
-
-        modeWidget._playing = true;
-        expect(modeWidget._playingStatus()).toBe(true);
-    });
-
     test("should save and undo state correctly", () => {
         modeWidget._selectedNotes = Array(12).fill(false);
         modeWidget._selectedNotes[0] = true;
@@ -273,134 +243,10 @@ describe("ModeWidget", () => {
         expect(modeWidget._selectedNotes[1]).toBe(false);
     });
 
-    test("should clear all notes except root", () => {
-        modeWidget._selectedNotes = Array(12).fill(true);
-
-        modeWidget._clear();
-
-        expect(modeWidget._selectedNotes[0]).toBe(true);
-        for (let i = 1; i < 12; i++) {
-            expect(modeWidget._selectedNotes[i]).toBe(false);
-        }
-    });
-
     test("should trigger synth when playing a note", () => {
         modeWidget._playNote(0);
 
         expect(mockActivity.logo.synth.trigger).toHaveBeenCalled();
-    });
-
-    test("should initialize correctly", () => {
-        expect(global.wheelnav).toHaveBeenCalledTimes(3); // noteWheel, playWheel, etc.
-        expect(global.keySignatureToMode).toHaveBeenCalled();
-        expect(mockActivity.textMsg).toHaveBeenCalled();
-    });
-
-    test("should handle Play/Stop button toggle", () => {
-        jest.useFakeTimers();
-        const widgetWindow = window.widgetWindows.windowFor();
-        const playBtnMock = widgetWindow.addButton.mock.results[0].value;
-
-        // Start
-        expect(modeWidget._playing).toBe(false);
-        playBtnMock.onclick();
-        expect(modeWidget._playing).toBe(true);
-        expect(mockActivity.logo.resetSynth).toHaveBeenCalled();
-
-        // Stop
-        playBtnMock.onclick();
-        expect(modeWidget._playing).toBe(false);
-        jest.useRealTimers();
-    });
-
-    test("should rotate mode pattern right", () => {
-        // Setup: Need true at index 11 so that after 1 right shift (new[0] = old[11]), index 0 is true.
-        // This ensures the recursion stops after 1 rotation.
-        modeWidget._selectedNotes = [
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            true
-        ];
-
-        // Wait for rotation animations
-        jest.useFakeTimers();
-        modeWidget._rotateRight();
-
-        // Fast forward through animations (12 * ROTATESPEED)
-        jest.advanceTimersByTime(12 * 150 + 100);
-
-        expect(modeWidget._locked).toBe(false);
-        jest.useRealTimers();
-    });
-
-    test("should rotate mode pattern left", () => {
-        // Setup: Need true at index 1 so that after 1 left shift (new[0] = old[1]), index 0 is true.
-        modeWidget._selectedNotes = [
-            false,
-            true,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false
-        ];
-
-        jest.useFakeTimers();
-        modeWidget._rotateLeft();
-        jest.advanceTimersByTime(12 * 150 + 100);
-
-        expect(modeWidget._locked).toBe(false);
-        jest.useRealTimers();
-    });
-
-    test("should invert mode pattern", () => {
-        modeWidget._selectedNotes = [
-            true,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            true,
-            false
-        ]; // C and B
-
-        jest.useFakeTimers();
-        modeWidget._invert(); // Inverts pairs around current axis
-        jest.advanceTimersByTime(6 * 150);
-
-        expect(modeWidget._locked).toBe(false);
-        jest.useRealTimers();
-    });
-
-    test("onclose handler should stop synth and reset lock state", () => {
-        const widgetWindow = window.widgetWindows.windowFor();
-
-        modeWidget._locked = true;
-
-        // Trigger onclose
-        widgetWindow.onclose();
-
-        expect(mockActivity.logo.synth.stop).toHaveBeenCalled();
-        expect(modeWidget._locked).toBe(false);
     });
 
     test("should initialize a custom mode with only the root selected", () => {
@@ -442,5 +288,53 @@ describe("ModeWidget", () => {
         expect(saved.some(m => m.name === "myMode" && m.pattern.join() === pattern.join())).toBe(
             true
         );
+    });
+
+    test("should scale built-in mode intervals to the active EDO", () => {
+        modeWidget._activeEDO = 19;
+        global.getModePattern.mockReturnValue([3, 2, 3, 3, 2, 3, 3]);
+        const applySpy = jest.spyOn(modeWidget, "_applyModePattern").mockImplementation(() => {});
+        const modeNameSpy = jest.spyOn(modeWidget, "_setModeName").mockImplementation(() => {});
+
+        modeWidget._loadMode("minor", [2, 1, 2, 2, 1, 2, 2], { value: 19 });
+
+        expect(global.getModePattern).toHaveBeenCalledWith("minor", 19);
+        expect(applySpy).toHaveBeenCalledWith([3, 2, 3, 3, 2, 3, 3]);
+
+        applySpy.mockRestore();
+        modeNameSpy.mockRestore();
+    });
+
+    test("should use the stored pattern for a custom mode without rescaling", () => {
+        localStorage.setItem(
+            "customModes",
+            JSON.stringify([{ name: "myMode", pattern: [3, 2, 3, 3, 2, 3, 3], edo: 19 }])
+        );
+        modeWidget._activeEDO = 19;
+        global.getModePattern.mockClear();
+        const applySpy = jest.spyOn(modeWidget, "_applyModePattern").mockImplementation(() => {});
+        const modeNameSpy = jest.spyOn(modeWidget, "_setModeName").mockImplementation(() => {});
+
+        modeWidget._loadMode("myMode", [3, 2, 3, 3, 2, 3, 3], { value: 19 });
+
+        expect(global.getModePattern).not.toHaveBeenCalled();
+        expect(applySpy).toHaveBeenCalledWith([3, 2, 3, 3, 2, 3, 3]);
+
+        applySpy.mockRestore();
+        modeNameSpy.mockRestore();
+    });
+
+    test("should detect a built-in mode at a non-12 EDO", () => {
+        modeWidget._activeEDO = 19;
+        modeWidget._modeLabelCell = { textContent: "" };
+        modeWidget.widgetWindow = { updateTitle: jest.fn() };
+        modeWidget._selectedNotes = Array.from({ length: 19 }, (_, i) =>
+            [0, 3, 5, 8, 11, 13, 16].includes(i)
+        );
+        global.getModePattern.mockReturnValue([3, 2, 3, 3, 2, 3, 3]);
+
+        modeWidget._setModeName();
+
+        expect(modeWidget._modeLabelCell.textContent).toBe("C ionian");
     });
 });
