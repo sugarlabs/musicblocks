@@ -41,8 +41,14 @@ function setupRhythmBlockPaletteBlocks(activity) {
      * @param {function} callback - The callback function.
      * @param {number} timeout - The timeout in milliseconds.
      */
-    const scheduleNote = (activity, beat, blk, turtle, callback, timeout) => {
-        setTimeout(() => Singer.processNote(activity, beat, false, blk, turtle, callback), timeout);
+    const scheduleNote = (logo, activity, beat, blk, turtle, callback, timeout) => {
+        const processNote = () => Singer.processNote(activity, beat, false, blk, turtle, callback);
+
+        if (logo._timerManager && typeof logo._timerManager.setGuardedTimeout === "function") {
+            logo._timerManager.setGuardedTimeout(processNote, timeout, () => logo.stopTurtle);
+        } else {
+            setTimeout(processNote, timeout);
+        }
     };
 
     /**
@@ -203,6 +209,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                     }
 
                     scheduleNote(
+                        logo,
                         activity,
                         noteBeatValue,
                         blk,
@@ -766,7 +773,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                             __callback = null;
                         }
 
-                        scheduleNote(activity, thisBeat, blk, turtle, __callback, timeout);
+                        scheduleNote(logo, activity, thisBeat, blk, turtle, __callback, timeout);
 
                         timeout += beatValue * 1000;
                         totalBeats += beatValue;
@@ -974,13 +981,6 @@ function setupRhythmBlockPaletteBlocks(activity) {
 
                 const beatValue = bpmFactor / noteBeatValue / arg0;
 
-                const __rhythmPlayNote = (thisBeat, blk, turtle, callback, timeout) => {
-                    setTimeout(
-                        () => Singer.processNote(activity, thisBeat, false, blk, turtle, callback),
-                        timeout
-                    );
-                };
-
                 let __callback = null;
                 for (let i = 0; i < arg0; i++) {
                     if (i === arg0 - 1) {
@@ -992,7 +992,9 @@ function setupRhythmBlockPaletteBlocks(activity) {
                         __callback = null;
                     }
 
-                    __rhythmPlayNote(
+                    scheduleNote(
+                        logo,
+                        activity,
                         noteBeatValue * arg0,
                         blk,
                         turtle,
