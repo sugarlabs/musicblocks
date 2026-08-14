@@ -193,6 +193,19 @@ describe("setupRhythmActions", () => {
         expect(targetTurtle.singer.noteBeatValues[1]).toContain(1);
         expect(targetTurtle.singer.pushedNote).toBe(true);
     });
+    it("does nothing when inNoteBlock is empty", () => {
+        targetTurtle.singer.inNoteBlock = [];
+
+        expect(() => Singer.RhythmActions.playRest(0)).not.toThrow();
+        expect(targetTurtle.singer.pushedNote).toBeUndefined();
+    });
+    it("does not push a rest when the active note has no pitches array yet", () => {
+        targetTurtle.singer.inNoteBlock = [7];
+        targetTurtle.singer.notePitches = {};
+
+        expect(() => Singer.RhythmActions.playRest(0)).not.toThrow();
+        expect(targetTurtle.singer.pushedNote).toBeUndefined();
+    });
     it("updates dotCount and beatFactor for valid dot value", () => {
         targetTurtle.singer.dotCount = 0;
         targetTurtle.singer.beatFactor = 1;
@@ -325,6 +338,162 @@ describe("setupRhythmActions", () => {
         const value = Singer.RhythmActions.getNoteValue(0);
 
         expect(value).toBe(0.25); // 1 / 4
+    });
+    it("falls back past noteValue when it is explicitly null", () => {
+        // clearNoteParams() in logo.js sets noteValue[blk] = null before a note
+        // is assigned a real value, so null is a realistic, not artificial, input.
+        targetTurtle.singer.inNoteBlock = [3];
+        targetTurtle.singer.noteValue = { 3: null };
+        targetTurtle.singer.lastNotePlayed = [null, 8];
+
+        const value = Singer.RhythmActions.getNoteValue(0);
+
+        expect(value).toBe(0.125); // falls through to lastNotePlayed, same as null noteValue never happened
+    });
+    it("does not fall back to noteBeat when notePitches is an empty array", () => {
+        targetTurtle.singer.inNoteBlock = [6];
+        targetTurtle.singer.noteValue = {};
+        targetTurtle.singer.lastNotePlayed = null;
+        targetTurtle.singer.notePitches = { 6: [] };
+        targetTurtle.singer.noteBeat = { 6: 4 };
+
+        const value = Singer.RhythmActions.getNoteValue(0);
+
+        expect(value).toBe(0);
+    });
+
+    describe("dispatch-block and mouse-listener registration", () => {
+        // playNote, doRhythmicDot, multiplyNoteValue, and addSwing all share the
+        // same "dispatch via blockList, else register with the running mouse"
+        // setup that doTie's own describe block already exercises. These mirror
+        // that pattern for the remaining four block methods.
+
+        // Snapshot/restore, mirroring doTie's own beforeEach/afterEach below, so
+        // MusicBlocks.isRun and Mouse.getMouseFromTurtle don't leak into tests
+        // outside this describe block. Scoped here rather than at the top level
+        // since no other tests in this file touch these two globals.
+        let originalGetMouseFromTurtle;
+        let originalIsRun;
+
+        beforeEach(() => {
+            originalGetMouseFromTurtle = global.Mouse.getMouseFromTurtle;
+            originalIsRun = global.MusicBlocks.isRun;
+        });
+
+        afterEach(() => {
+            global.MusicBlocks.isRun = originalIsRun;
+            global.Mouse.getMouseFromTurtle = originalGetMouseFromTurtle;
+        });
+
+        it("playNote dispatches block listener when blk is present in blockList", () => {
+            activity.blocks.blockList = { 5: {} };
+
+            Singer.RhythmActions.playNote(1, "note", 0, 5);
+
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(5, 0, "_playnote_0");
+        });
+        it("playNote does not dispatch or register a mouse listener when blk is absent from blockList and MusicBlocks is not running", () => {
+            activity.blocks.blockList = {};
+            global.MusicBlocks.isRun = false;
+
+            Singer.RhythmActions.playNote(1, "note", 0, 99);
+
+            expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+            expect(global.Mouse.getMouseFromTurtle).not.toHaveBeenCalled();
+        });
+        it("playNote registers listener with mouse when MusicBlocks.isRun and blk is undefined", () => {
+            const mockMouse = { MB: { listeners: [] } };
+            global.MusicBlocks.isRun = true;
+            global.Mouse.getMouseFromTurtle = jest.fn(() => mockMouse);
+
+            Singer.RhythmActions.playNote(1, "note", 0, undefined);
+
+            expect(mockMouse.MB.listeners).toContain("_playnote_0");
+        });
+
+        it("doRhythmicDot dispatches block listener when blk is present in blockList", () => {
+            activity.blocks.blockList = { 5: {} };
+
+            Singer.RhythmActions.doRhythmicDot(1, 0, 5);
+
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(5, 0, "_dot_0");
+        });
+        it("doRhythmicDot does not dispatch or register a mouse listener when blk is absent from blockList and MusicBlocks is not running", () => {
+            activity.blocks.blockList = {};
+            global.MusicBlocks.isRun = false;
+
+            Singer.RhythmActions.doRhythmicDot(1, 0, 99);
+
+            expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+            expect(global.Mouse.getMouseFromTurtle).not.toHaveBeenCalled();
+        });
+        it("doRhythmicDot registers listener with mouse when MusicBlocks.isRun and blk is undefined", () => {
+            const mockMouse = { MB: { listeners: [] } };
+            global.MusicBlocks.isRun = true;
+            global.Mouse.getMouseFromTurtle = jest.fn(() => mockMouse);
+
+            Singer.RhythmActions.doRhythmicDot(1, 0, undefined);
+
+            expect(mockMouse.MB.listeners).toContain("_dot_0");
+        });
+
+        it("multiplyNoteValue dispatches block listener when blk is present in blockList", () => {
+            activity.blocks.blockList = { 5: {} };
+
+            Singer.RhythmActions.multiplyNoteValue(2, 0, 5);
+
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(5, 0, "_multiplybeat_0");
+        });
+        it("multiplyNoteValue does not dispatch or register a mouse listener when blk is absent from blockList and MusicBlocks is not running", () => {
+            activity.blocks.blockList = {};
+            global.MusicBlocks.isRun = false;
+
+            Singer.RhythmActions.multiplyNoteValue(2, 0, 99);
+
+            expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+            expect(global.Mouse.getMouseFromTurtle).not.toHaveBeenCalled();
+        });
+        it("multiplyNoteValue registers listener with mouse when MusicBlocks.isRun and blk is undefined", () => {
+            const mockMouse = { MB: { listeners: [] } };
+            global.MusicBlocks.isRun = true;
+            global.Mouse.getMouseFromTurtle = jest.fn(() => mockMouse);
+
+            Singer.RhythmActions.multiplyNoteValue(2, 0, undefined);
+
+            expect(mockMouse.MB.listeners).toContain("_multiplybeat_0");
+        });
+
+        it("addSwing dispatches block listener when blk is present in blockList", () => {
+            targetTurtle.singer.swing = [];
+            targetTurtle.singer.swingTarget = [];
+            activity.blocks.blockList = { 5: {} };
+
+            Singer.RhythmActions.addSwing(2, 4, 0, 5);
+
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(5, 0, "_swing_0");
+        });
+        it("addSwing does not dispatch or register a mouse listener when blk is absent from blockList and MusicBlocks is not running", () => {
+            targetTurtle.singer.swing = [];
+            targetTurtle.singer.swingTarget = [];
+            activity.blocks.blockList = {};
+            global.MusicBlocks.isRun = false;
+
+            Singer.RhythmActions.addSwing(2, 4, 0, 99);
+
+            expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+            expect(global.Mouse.getMouseFromTurtle).not.toHaveBeenCalled();
+        });
+        it("addSwing registers listener with mouse when MusicBlocks.isRun and blk is undefined", () => {
+            targetTurtle.singer.swing = [];
+            targetTurtle.singer.swingTarget = [];
+            const mockMouse = { MB: { listeners: [] } };
+            global.MusicBlocks.isRun = true;
+            global.Mouse.getMouseFromTurtle = jest.fn(() => mockMouse);
+
+            Singer.RhythmActions.addSwing(2, 4, 0, undefined);
+
+            expect(mockMouse.MB.listeners).toContain("_swing_0");
+        });
     });
 
     describe("doTie", () => {
@@ -494,6 +663,15 @@ describe("setupRhythmActions", () => {
                 "_tie_0", // listener name
                 expect.any(Function) // callback
             );
+        });
+
+        it("does not dispatch when blk is defined but absent from blockList", () => {
+            activity.blocks.blockList = {};
+
+            Singer.RhythmActions.doTie(0, 99);
+
+            expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+            expect(global.Mouse.getMouseFromTurtle).not.toHaveBeenCalled();
         });
     });
 
