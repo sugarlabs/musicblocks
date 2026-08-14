@@ -34,6 +34,7 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
 function setupRhythmBlockPaletteBlocks(activity) {
     /**
      * Schedules a note to be played after a timeout.
+     * @param {object} logo - The Logo execution engine.
      * @param {object} activity - The activity object.
      * @param {number} beat - The beat value.
      * @param {string} blk - The block ID.
