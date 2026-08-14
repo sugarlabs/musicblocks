@@ -160,9 +160,70 @@ describe("Tests for Singer.PitchActions setup", () => {
         test("inverted path", () => {
             turtle.singer.lastNotePlayed = ["A4", 4];
             turtle.singer.inverted = true;
-            jest.spyOn(Singer, "calculateInvert").mockReturnValue(1);
-            jest.spyOn(getNote, "bind");
+            // delta_temp=3 makes transposition_temp = 2*3 = 6, distinguishable from 2/3.
+            jest.spyOn(Singer, "calculateInvert").mockReturnValue(3);
+            const spy = jest.spyOn(global, "getNote");
             Singer.PitchActions.stepPitch(3, 0, blkId);
+            // getNote's 3rd argument is transposition_temp; only reached if the
+            // inverted branch actually runs.
+            expect(spy.mock.calls[0][2]).toBe(6);
+            spy.mockRestore();
+        });
+
+        test("reset-to-default guard only fires when inMatrix, inMusicKeyboard, and inNoteBlock are all clear", () => {
+            // inMatrix=true blocks the reset even though the other two terms are satisfied,
+            // proving the guard is a genuine `&&` and not `||`/always-true.
+            Singer.addScalarTransposition.mockClear();
+            turtle.singer.lastNotePlayed = ["A4", 4];
+            activity.logo.inMatrix = true;
+            activity.logo.inMusicKeyboard = false;
+            turtle.singer.inNoteBlock = [];
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+            expect(Singer.addScalarTransposition).toHaveBeenCalledWith(activity.logo, 0, "A", 4, 1);
+        });
+
+        test("reset-to-default guard fires even when lastNotePlayed was not null", () => {
+            Singer.addScalarTransposition.mockClear();
+            turtle.singer.lastNotePlayed = ["A4", 4];
+            activity.logo.inMatrix = false;
+            activity.logo.inMusicKeyboard = false;
+            turtle.singer.inNoteBlock = [];
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+            expect(Singer.addScalarTransposition).toHaveBeenCalledWith(activity.logo, 0, "G", 4, 1);
+        });
+
+        test("justCounting guard requires BOTH justCounting non-empty AND lastNotePlayed null", () => {
+            // justCounting non-empty but lastNotePlayed already set → guard must stay false.
+            turtle.singer.justCounting = [1];
+            turtle.singer.lastNotePlayed = ["A4", 4];
+            turtle.singer.previousNotePlayed = ["X9", 9];
+            Singer.PitchActions.stepPitch(2, 0, blkId);
+            expect(turtle.singer.previousNotePlayed).toEqual(["X9", 9]);
+        });
+
+        test("justCounting guard: empty justCounting does not satisfy the length check", () => {
+            // inMatrix=true blocks the earlier reset-to-G4 guard so lastNotePlayed stays
+            // genuinely null here, isolating the justCounting.length check itself.
+            activity.logo.inMatrix = true;
+            turtle.singer.justCounting = [];
+            turtle.singer.lastNotePlayed = null;
+            turtle.singer.previousNotePlayed = ["X9", 9];
+            Singer.PitchActions.stepPitch(2, 0, blkId);
+            expect(turtle.singer.previousNotePlayed).toEqual(["X9", 9]);
+        });
+
+        test("non-numeric lastNotePlayed is sliced into pitch name and octave correctly", () => {
+            Singer.addScalarTransposition.mockClear();
+            turtle.singer.lastNotePlayed = ["F#4", 4];
+            activity.logo.inMatrix = true; // avoid the reset-to-G4 guard
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+            expect(Singer.addScalarTransposition).toHaveBeenCalledWith(
+                activity.logo,
+                0,
+                "F#",
+                4,
+                1
+            );
         });
 
         test("stepPitch handles numeric‑frequency lastNotePlayed branch", () => {
@@ -220,6 +281,39 @@ describe("Tests for Singer.PitchActions setup", () => {
                 Singer.PitchActions.playNthModalPitch(5.2, 3, 0, blkId);
             }).not.toThrow();
         });
+
+        // Ground-truth values below were obtained by running the real
+        // Singer.PitchActions.playNthModalPitch (via the real musicUtils.keySignatureToMode,
+        // not the per-test override used above) against these inputs, not derived by hand.
+        test("C major: exact scale-degree and octave-crossing boundaries", () => {
+            global.keySignatureToMode = musicUtils.keySignatureToMode;
+            turtle.singer.keySignature = "C major";
+            const spy = jest.spyOn(Singer, "processPitch");
+            const cases = [
+                { number: 0, expected: ["C", 4] }, // identity: deltaOctave=0, deltaSemi=0
+                { number: 7, expected: ["C", 5] }, // one full octave up (modeLength=7)
+                { number: -1, expected: ["B", 4] }, // isNegativeArg branch, no octave change
+                { number: -7, expected: ["C", 3] } // one full octave down
+            ];
+            for (const { number, expected } of cases) {
+                spy.mockClear();
+                Singer.PitchActions.playNthModalPitch(number, 4, 0, blkId);
+                expect([spy.mock.calls[0][1], spy.mock.calls[0][2]]).toEqual(expected);
+            }
+            spy.mockRestore();
+        });
+
+        test("G major: deltaSemi crosses the reference boundary on the very first upward step", () => {
+            // In G major the key note (ref) sits at semitone 7; stepping to scale degree 1
+            // (A) already crosses that boundary, so the octave increments on the very first
+            // step — a non-obvious case that exercises the semitones/ref comparison directly.
+            global.keySignatureToMode = musicUtils.keySignatureToMode;
+            turtle.singer.keySignature = "G major";
+            const spy = jest.spyOn(Singer, "processPitch");
+            Singer.PitchActions.playNthModalPitch(1, 4, 0, blkId);
+            expect([spy.mock.calls[0][1], spy.mock.calls[0][2]]).toEqual(["A", 5]);
+            spy.mockRestore();
+        });
     });
 
     describe("Tests for playPitchNumber", () => {
@@ -251,6 +345,51 @@ describe("Tests for Singer.PitchActions setup", () => {
             Singer.PitchActions.playPitchNumber(5, 0, blkId);
             expect(spyErr).toHaveBeenCalledWith(expected);
             spyErr.mockRestore();
+        });
+
+        test("no error when temperament is custom but transpositions net to zero", () => {
+            turtle.singer.inDefineMode = false;
+            turtle.singer.scalarTransposition = 0;
+            turtle.singer.transposition = 0;
+            global.isCustomTemperament = () => true;
+            const spyErr = jest.spyOn(activity, "errorMsg");
+            Singer.PitchActions.playPitchNumber(5, 0, blkId);
+            expect(spyErr).not.toHaveBeenCalled();
+            spyErr.mockRestore();
+        });
+
+        test("no error when temperament is not custom, even with non-zero transpositions", () => {
+            turtle.singer.inDefineMode = false;
+            turtle.singer.scalarTransposition = 1;
+            turtle.singer.transposition = 0;
+            global.isCustomTemperament = () => false;
+            const spyErr = jest.spyOn(activity, "errorMsg");
+            Singer.PitchActions.playPitchNumber(5, 0, blkId);
+            expect(spyErr).not.toHaveBeenCalled();
+            spyErr.mockRestore();
+        });
+
+        test("error fires from the sum of the transpositions, not their difference", () => {
+            // scalarTransposition=1, transposition=1 → sum=2 (non-zero, should error);
+            // a mutated subtraction would give 0 (would not error).
+            turtle.singer.inDefineMode = false;
+            turtle.singer.scalarTransposition = 1;
+            turtle.singer.transposition = 1;
+            global.isCustomTemperament = () => true;
+            const spyErr = jest.spyOn(activity, "errorMsg");
+            Singer.PitchActions.playPitchNumber(5, 0, blkId);
+            expect(spyErr).toHaveBeenCalled();
+            spyErr.mockRestore();
+        });
+
+        test("numberToPitch receives pitchNumber offset by addition, not subtraction", () => {
+            turtle.singer.inDefineMode = false;
+            turtle.singer.pitchNumberOffset = 5;
+            global.isCustomTemperament = () => false;
+            const spy = jest.spyOn(global, "numberToPitch");
+            Singer.PitchActions.playPitchNumber(10, 0, blkId);
+            expect(spy.mock.calls[0][0]).toBe(15); // 10 + 5
+            spy.mockRestore();
         });
     });
 
@@ -367,6 +506,70 @@ describe("Tests for Singer.PitchActions setup", () => {
         spyMark.mockRestore();
     });
 
+    describe("playHertz Lilypond guard — individual condition checks", () => {
+        // Each test keeps runningLilypond=true and inNoteBlock non-empty (so blockId !== null,
+        // already covered above) and makes exactly one other guard term falsy, to prove each
+        // term actually gates the export rather than the guard being effectively always-true.
+        beforeEach(() => {
+            turtle.singer.inNoteBlock = [blkId];
+            activity.logo.runningLilypond = true;
+            Singer.processPitch.mockImplementation(() => {});
+        });
+
+        test("notePitches missing entirely → guard short-circuits, no export", () => {
+            delete turtle.singer.notePitches;
+            turtle.singer.noteOctaves = { [blkId]: [] };
+            turtle.singer.noteCents = { [blkId]: [] };
+            const spyMark = jest.spyOn(activity.logo.notation, "notationMarkup");
+            Singer.PitchActions.playHertz(445, 0, blkId);
+            expect(spyMark).not.toHaveBeenCalled();
+            spyMark.mockRestore();
+        });
+
+        test("noteOctaves missing entirely → guard short-circuits, no export", () => {
+            turtle.singer.notePitches = { [blkId]: [] };
+            delete turtle.singer.noteOctaves;
+            turtle.singer.noteCents = { [blkId]: [] };
+            const spyMark = jest.spyOn(activity.logo.notation, "notationMarkup");
+            Singer.PitchActions.playHertz(445, 0, blkId);
+            expect(spyMark).not.toHaveBeenCalled();
+            spyMark.mockRestore();
+        });
+
+        test("noteCents missing entirely → guard short-circuits, no export", () => {
+            turtle.singer.notePitches = { [blkId]: [] };
+            turtle.singer.noteOctaves = { [blkId]: [] };
+            delete turtle.singer.noteCents;
+            const spyMark = jest.spyOn(activity.logo.notation, "notationMarkup");
+            Singer.PitchActions.playHertz(445, 0, blkId);
+            expect(spyMark).not.toHaveBeenCalled();
+            spyMark.mockRestore();
+        });
+
+        test("notePitches[blockId] missing (buffers initialized but not for this blockId) → no export", () => {
+            turtle.singer.notePitches = {}; // no entry for blkId
+            turtle.singer.noteOctaves = { [blkId]: [] };
+            turtle.singer.noteCents = { [blkId]: [] };
+            const spyMark = jest.spyOn(activity.logo.notation, "notationMarkup");
+            Singer.PitchActions.playHertz(445, 0, blkId);
+            expect(spyMark).not.toHaveBeenCalled();
+            spyMark.mockRestore();
+        });
+
+        test("notePitches[blockId].length not greater than startLength (processPitch pushed nothing new) → no export", () => {
+            // startLength is captured from notePitches[blockId].length before processPitch runs;
+            // a no-op processPitch (see beforeEach) leaves the length unchanged, so
+            // "length > startLength" is false even though every other term is true.
+            turtle.singer.notePitches = { [blkId]: ["existing"] };
+            turtle.singer.noteOctaves = { [blkId]: [4] };
+            turtle.singer.noteCents = { [blkId]: [0] };
+            const spyMark = jest.spyOn(activity.logo.notation, "notationMarkup");
+            Singer.PitchActions.playHertz(445, 0, blkId);
+            expect(spyMark).not.toHaveBeenCalled();
+            spyMark.mockRestore();
+        });
+    });
+
     test("playSynthFrequency preserves matrix row frequency", () => {
         activity.logo.inMatrix = true;
         activity.blocks.blockList[blkId] = { name: "square" };
@@ -376,6 +579,27 @@ describe("Tests for Singer.PitchActions setup", () => {
         expect(activity.logo.phraseMaker.addRowBlock).toHaveBeenCalledWith(blkId);
         expect(activity.logo.phraseMaker.rowLabels).toContain("square");
         expect(activity.logo.phraseMaker.rowArgs).toContain(440);
+        expect(activity.logo.pitchBlocks).toContain(blkId);
+    });
+
+    test("playSynthFrequency (matrix): does not duplicate an already-tracked pitchBlock", () => {
+        activity.logo.inMatrix = true;
+        activity.blocks.blockList[blkId] = { name: "square" };
+        activity.logo.pitchBlocks = [blkId];
+
+        Singer.PitchActions.playSynthFrequency(440, 0, blkId);
+
+        expect(activity.logo.pitchBlocks).toEqual([blkId]);
+    });
+
+    test("playSynthFrequency (legoWidget): does not duplicate an already-tracked pitchBlock", () => {
+        activity.logo.inLegoWidget = true;
+        activity.blocks.blockList[blkId] = { name: "triangle" };
+        activity.logo.pitchBlocks = [blkId];
+
+        Singer.PitchActions.playSynthFrequency(440, 0, blkId);
+
+        expect(activity.logo.pitchBlocks).toEqual([blkId]);
     });
 
     test("playSynthFrequency preserves pitch slider frequency", () => {
@@ -387,10 +611,75 @@ describe("Tests for Singer.PitchActions setup", () => {
         expect(activity.logo.pitchSlider.frequency).toBe(440);
     });
 
+    describe("playSynthFrequency: legoWidget and default synth-push paths", () => {
+        test("inLegoWidget path records row block, label, and args", () => {
+            activity.logo.inLegoWidget = true;
+            activity.logo.inMatrix = false;
+            activity.blocks.blockList[blkId] = { name: "triangle" };
+
+            Singer.PitchActions.playSynthFrequency(440, 0, blkId);
+
+            expect(activity.logo.legoWidget.addRowBlock).toHaveBeenCalledWith(blkId);
+            expect(activity.logo.legoWidget.rowLabels).toContain("triangle");
+            expect(activity.logo.legoWidget.rowArgs).toContain(440);
+            expect(activity.logo.pitchBlocks).toContain(blkId);
+        });
+
+        test("default synth-push path stores pitch/octave/cents/hertz/beat for a symbolic (0-cent) note", () => {
+            turtle.singer.inNoteBlock = [blkId];
+            turtle.singer.oscList = { [blkId]: [] };
+            turtle.singer.notePitches = { [blkId]: [] };
+            turtle.singer.noteOctaves = { [blkId]: [] };
+            turtle.singer.noteCents = { [blkId]: [] };
+            turtle.singer.noteHertz = { [blkId]: [] };
+            turtle.singer.noteBeatValues = { [blkId]: [] };
+            turtle.singer.beatFactor = 1.5;
+            activity.blocks.blockList[blkId] = { name: "sine" };
+
+            Singer.PitchActions.playSynthFrequency(440, 0, blkId); // 440Hz → A4, 0 cents
+
+            expect(turtle.singer.oscList[blkId]).toContain("sine");
+            expect(turtle.singer.noteCents[blkId]).toEqual([0]);
+            expect(turtle.singer.noteHertz[blkId]).toEqual([0]);
+            expect(turtle.singer.noteBeatValues[blkId]).toEqual([1.5]);
+            expect(turtle.singer.pushedNote).toBe(true);
+        });
+
+        test("default synth-push path computes noteHertz for a microtonal (non-zero-cent) note", () => {
+            turtle.singer.inNoteBlock = [blkId];
+            turtle.singer.oscList = { [blkId]: [] };
+            turtle.singer.notePitches = { [blkId]: [] };
+            turtle.singer.noteOctaves = { [blkId]: [] };
+            turtle.singer.noteCents = { [blkId]: [] };
+            turtle.singer.noteHertz = { [blkId]: [] };
+            turtle.singer.noteBeatValues = { [blkId]: [] };
+            turtle.singer.beatFactor = 1;
+            activity.blocks.blockList[blkId] = { name: "sine" };
+
+            Singer.PitchActions.playSynthFrequency(445, 0, blkId); // 445Hz → microtonal, non-zero cents
+
+            const [pitch, octave, cents] = musicUtils.frequencyToPitch(445);
+            const expectedHertz = musicUtils.pitchToFrequency(
+                pitch,
+                octave,
+                cents,
+                turtle.singer.keySignature,
+                activity.logo.synth.inTemperament
+            );
+            expect(cents).not.toBe(0);
+            expect(turtle.singer.noteCents[blkId]).toEqual([cents]);
+            expect(turtle.singer.noteHertz[blkId]).toEqual([expectedHertz]);
+            expect(turtle.singer.pushedNote).toBe(true);
+        });
+    });
+
     describe("Tests for setAccidental", () => {
         test("named accidental from ACCIDENTALNAMES applies its value", () => {
+            const dsp = jest.spyOn(activity.logo, "setDispatchBlock");
             Singer.PitchActions.setAccidental(ACCIDENTALNAMES[1], 0, blkId);
             expect(turtle.singer.transposition).toBe(1);
+            expect(dsp).toHaveBeenCalledWith(blkId, 0, "_accidental_0_" + blkId);
+            dsp.mockRestore();
         });
         test("bare 'sharp' fallback applies +1 and registers a listener", () => {
             const listenerSpy = jest.spyOn(activity.logo, "setTurtleListener");
@@ -410,16 +699,82 @@ describe("Tests for Singer.PitchActions setup", () => {
             Singer.PitchActions.setAccidental("foo", 0, blkId);
             expect(turtle.singer.transposition).toBe(0);
         });
+        test("blk defined but not in blockList → does not dispatch, only registers the turtle listener", () => {
+            const dsp = jest.spyOn(activity.logo, "setDispatchBlock");
+            const tl = jest.spyOn(activity.logo, "setTurtleListener");
+            Singer.PitchActions.setAccidental("sharp", 0, 999); // 999 is not a key in blockList
+            expect(dsp).not.toHaveBeenCalled();
+            expect(tl).toHaveBeenCalledWith(0, "_accidental_0_999", expect.any(Function));
+            dsp.mockRestore();
+            tl.mockRestore();
+        });
+        test("blk undefined and MusicBlocks.isRun false → dispatches to neither blockList nor Mouse listeners", () => {
+            const dsp = jest.spyOn(activity.logo, "setDispatchBlock");
+            const fakeMouse = { MB: { listeners: [] } };
+            const originalGetMouse = Mouse.getMouseFromTurtle;
+            Mouse.getMouseFromTurtle = () => fakeMouse;
+            MusicBlocks.isRun = false;
+            Singer.PitchActions.setAccidental("sharp", 0);
+            expect(dsp).not.toHaveBeenCalled();
+            expect(fakeMouse.MB.listeners).not.toContain("_accidental_0_undefined");
+            dsp.mockRestore();
+            Mouse.getMouseFromTurtle = originalGetMouse;
+        });
+        test("invertList non-empty flips the applied sign, and the undo listener flips it back", () => {
+            turtle.singer.invertList = [["C", 4, "even"]];
+            const callbacks = [];
+            activity.logo.setTurtleListener = (_t, _n, cb) => callbacks.push(cb);
+            const before = turtle.singer.transposition;
+            Singer.PitchActions.setAccidental("sharp", 0, blkId); // value=+1, flipped to -1 while inverted
+            expect(turtle.singer.transposition).toBe(before - 1);
+            callbacks[0]();
+            expect(turtle.singer.transposition).toBe(before);
+        });
     });
 
     describe("Tests for transpositions", () => {
         test("setScalarTranspose blockList path", () => {
             Singer.PitchActions.setScalarTranspose(1, 0, blkId);
+            expect(turtle.singer.scalarTransposition).toBe(1);
+            expect(turtle.singer.scalarTranspositionValues).toContain(1);
         });
         test("setScalarTranspose MusicBlocks.isRun path", () => {
             MusicBlocks.isRun = true;
             Singer.PitchActions.setScalarTranspose(1, 0);
+            expect(turtle.singer.scalarTransposition).toBe(1);
+            expect(turtle.singer.scalarTranspositionValues).toContain(1);
             MusicBlocks.isRun = false;
+        });
+        test("setScalarTranspose: blk defined but not in blockList → does not dispatch, only registers the turtle listener", () => {
+            const dsp = jest.spyOn(activity.logo, "setDispatchBlock");
+            const tl = jest.spyOn(activity.logo, "setTurtleListener");
+            Singer.PitchActions.setScalarTranspose(1, 0, 999); // 999 is not a key in blockList
+            expect(dsp).not.toHaveBeenCalled();
+            expect(tl).toHaveBeenCalledWith(0, "_scalar_transposition_0", expect.any(Function));
+            dsp.mockRestore();
+            tl.mockRestore();
+        });
+        test("setScalarTranspose: blk undefined and MusicBlocks.isRun false → dispatches to neither blockList nor Mouse listeners", () => {
+            const dsp = jest.spyOn(activity.logo, "setDispatchBlock");
+            const fakeMouse = { MB: { listeners: [] } };
+            const originalGetMouse = Mouse.getMouseFromTurtle;
+            Mouse.getMouseFromTurtle = () => fakeMouse;
+            MusicBlocks.isRun = false;
+            Singer.PitchActions.setScalarTranspose(1, 0);
+            expect(dsp).not.toHaveBeenCalled();
+            expect(fakeMouse.MB.listeners).not.toContain("_scalar_transposition_0");
+            dsp.mockRestore();
+            Mouse.getMouseFromTurtle = originalGetMouse;
+        });
+        test("setScalarTranspose: invertList non-empty flips the applied sign, and the undo listener flips it back", () => {
+            turtle.singer.invertList = [["C", 4, "even"]];
+            const callbacks = [];
+            activity.logo.setTurtleListener = (_t, _n, cb) => callbacks.push(cb);
+            const before = turtle.singer.scalarTransposition;
+            Singer.PitchActions.setScalarTranspose(3, 0, blkId); // flipped to -3 while inverted
+            expect(turtle.singer.scalarTransposition).toBe(before - 3);
+            callbacks[0]();
+            expect(turtle.singer.scalarTransposition).toBe(before);
         });
         test("setSemitoneTranspose both paths", () => {
             Singer.PitchActions.setSemitoneTranspose(1, 0, blkId);
@@ -427,11 +782,65 @@ describe("Tests for Singer.PitchActions setup", () => {
             Singer.PitchActions.setSemitoneTranspose(1, 0);
             MusicBlocks.isRun = false;
         });
+        test("setSemitoneTranspose: blk defined but not in blockList → does not dispatch, only registers the turtle listener", () => {
+            const dsp = jest.spyOn(activity.logo, "setDispatchBlock");
+            const tl = jest.spyOn(activity.logo, "setTurtleListener");
+            Singer.PitchActions.setSemitoneTranspose(1, 0, 999);
+            expect(dsp).not.toHaveBeenCalled();
+            expect(tl).toHaveBeenCalledWith(0, "_transposition_0", expect.any(Function));
+            dsp.mockRestore();
+            tl.mockRestore();
+        });
+        test("setSemitoneTranspose: blk undefined and MusicBlocks.isRun false → dispatches to neither blockList nor Mouse listeners", () => {
+            const dsp = jest.spyOn(activity.logo, "setDispatchBlock");
+            const fakeMouse = { MB: { listeners: [] } };
+            const originalGetMouse = Mouse.getMouseFromTurtle;
+            Mouse.getMouseFromTurtle = () => fakeMouse;
+            MusicBlocks.isRun = false;
+            Singer.PitchActions.setSemitoneTranspose(1, 0);
+            expect(dsp).not.toHaveBeenCalled();
+            expect(fakeMouse.MB.listeners).not.toContain("_transposition_0");
+            dsp.mockRestore();
+            Mouse.getMouseFromTurtle = originalGetMouse;
+        });
+        test("setSemitoneTranspose: invertList non-empty flips the applied sign, and the undo listener flips it back", () => {
+            turtle.singer.invertList = [["C", 4, "even"]];
+            const callbacks = [];
+            activity.logo.setTurtleListener = (_t, _n, cb) => callbacks.push(cb);
+            const before = turtle.singer.transposition;
+            Singer.PitchActions.setSemitoneTranspose(4, 0, blkId); // flipped to -4 while inverted
+            expect(turtle.singer.transposition).toBe(before - 4);
+            callbacks[0]();
+            expect(turtle.singer.transposition).toBe(before);
+        });
         test("setRatioTranspose both paths", () => {
             Singer.PitchActions.setRatioTranspose(2, 0, blkId);
+            expect(turtle.singer.transpositionRatios).toContain(2);
             MusicBlocks.isRun = true;
             Singer.PitchActions.setRatioTranspose(2, 0);
+            expect(turtle.singer.transpositionRatios).toContain(2);
             MusicBlocks.isRun = false;
+        });
+        test("setRatioTranspose: blk defined but not in blockList → does not dispatch, only registers the turtle listener", () => {
+            const dsp = jest.spyOn(activity.logo, "setDispatchBlock");
+            const tl = jest.spyOn(activity.logo, "setTurtleListener");
+            Singer.PitchActions.setRatioTranspose(2, 0, 999);
+            expect(dsp).not.toHaveBeenCalled();
+            expect(tl).toHaveBeenCalledWith(0, "_transposition_ratio_0", expect.any(Function));
+            dsp.mockRestore();
+            tl.mockRestore();
+        });
+        test("setRatioTranspose: blk undefined and MusicBlocks.isRun false → dispatches to neither blockList nor Mouse listeners", () => {
+            const dsp = jest.spyOn(activity.logo, "setDispatchBlock");
+            const fakeMouse = { MB: { listeners: [] } };
+            const originalGetMouse = Mouse.getMouseFromTurtle;
+            Mouse.getMouseFromTurtle = () => fakeMouse;
+            MusicBlocks.isRun = false;
+            Singer.PitchActions.setRatioTranspose(2, 0);
+            expect(dsp).not.toHaveBeenCalled();
+            expect(fakeMouse.MB.listeners).not.toContain("_transposition_ratio_0");
+            dsp.mockRestore();
+            Mouse.getMouseFromTurtle = originalGetMouse;
         });
     });
 
@@ -444,10 +853,29 @@ describe("Tests for Singer.PitchActions setup", () => {
 
     describe("Tests for invert", () => {
         test("numeric mode normalization", () => {
+            // 3 is odd (3 % 2 !== 0), so this exercises the "odd" branch specifically.
             Singer.PitchActions.invert("C", 4, 3, 0, blkId);
+            const last = turtle.singer.invertList.pop();
+            expect(last[2]).toBe("odd");
         });
         test("invalid mode ignored", () => {
+            const before = turtle.singer.invertList.length;
             Singer.PitchActions.invert("C", 4, "nonsense", 0, blkId);
+            expect(turtle.singer.invertList.length).toBe(before);
+        });
+        test("string 'odd' mode is accepted directly (not only via numeric normalization)", () => {
+            Singer.PitchActions.invert("C", 4, "odd", 0, blkId);
+            const last = turtle.singer.invertList.pop();
+            expect(last[2]).toBe("odd");
+        });
+        test("blk defined but not in blockList → does not dispatch, only registers the turtle listener", () => {
+            const dsp = jest.spyOn(activity.logo, "setDispatchBlock");
+            const tl = jest.spyOn(activity.logo, "setTurtleListener");
+            Singer.PitchActions.invert("C", 4, "even", 0, 999);
+            expect(dsp).not.toHaveBeenCalled();
+            expect(tl).toHaveBeenCalledWith(0, "_invert_0", expect.any(Function));
+            dsp.mockRestore();
+            tl.mockRestore();
         });
     });
 
@@ -458,6 +886,20 @@ describe("Tests for Singer.PitchActions setup", () => {
         });
         test("invalid input → throws", () => {
             expect(() => Singer.PitchActions.numToPitch(null, "pitch", 0)).toThrow("NoArgError");
+        });
+        test("undefined input also throws (distinguishes the guard from a null-only check)", () => {
+            // number !== null is true for undefined, so this only throws correctly if the
+            // typeof-number check is genuinely required too, not just the null check.
+            expect(() => Singer.PitchActions.numToPitch(undefined, "pitch", 0)).toThrow(
+                "NoArgError"
+            );
+        });
+        test("numToPitch adds pitchNumberOffset (not subtracts) before converting", () => {
+            turtle.singer.pitchNumberOffset = 5;
+            const spy = jest.spyOn(global, "numberToPitch");
+            Singer.PitchActions.numToPitch(10, "pitch", 0);
+            expect(spy.mock.calls[0][0]).toBe(15); // Math.floor(10) + 5
+            spy.mockRestore();
         });
     });
 
@@ -477,14 +919,53 @@ describe("Tests for Singer.PitchActions setup", () => {
             turtle.singer.previousNotePlayed = ["C4", 4];
             turtle.singer.lastNotePlayed = ["E4", 4];
             const val = Singer.PitchActions.deltaPitch("deltascalarpitch", 0);
-            expect(typeof val).toBe("number");
+            // Ground truth obtained by running the real implementation (not derived by hand):
+            // C4 → E4 is a 4-semitone gap (deltapitch=4) covered in 3 upward scalar steps.
+            expect(val).toBe(3);
         });
         test("deltascalarpitch returns a negative count when last < previous", () => {
             turtle.singer.previousNotePlayed = ["D4", 4];
             turtle.singer.lastNotePlayed = ["C4", 4];
             const count = Singer.PitchActions.deltaPitch("deltascalarpitch", 0);
-            expect(count).toBeLessThan(0);
+            // Ground truth obtained by running the real implementation: D4 → C4 is a
+            // 2-semitone gap covered in 2 downward scalar steps.
+            expect(count).toBe(-2);
         });
+        test("deltapitch/deltascalarpitch return 0 at the exact zero-delta boundary (same note)", () => {
+            turtle.singer.previousNotePlayed = ["C4", 4];
+            turtle.singer.lastNotePlayed = ["C4", 4];
+            expect(Singer.PitchActions.deltaPitch("deltapitch", 0)).toBe(0);
+            expect(Singer.PitchActions.deltaPitch("deltascalarpitch", 0)).toBe(0);
+        });
+        test("deltascalarpitch terminates (does not hang) when the temperament yields a zero step size", () => {
+            // Regression test for a real bug found during mutation analysis: getStepSizeUp/Down
+            // returns the raw `transposition` argument (which _calculate always passes as the
+            // literal 0) whenever isCustomTemperament() is true and the temperament has no
+            // .ratios table (confirmed directly against musicUtils, not assumed). With nhalf=0,
+            // `delta` never changes, so the original `while (delta > 0)` / `while (delta < 0)`
+            // loop never terminated — the `if (i > 100) return;` inside _calculate only returned
+            // from that inner closure and never broke the outer loop. Fixed by adding `&& i < 100`
+            // to both while conditions, giving an explicit, unambiguous cap of exactly 100
+            // iterations regardless of step size. This test itself is safe even if the fix
+            // regresses, because Jest's own test timeout will fail it rather than hang the
+            // whole process.
+            turtle.singer.previousNotePlayed = ["C4", 4];
+            turtle.singer.lastNotePlayed = ["E4", 4];
+            activity.logo.synth.inTemperament = "totally-not-a-real-temperament";
+            expect(
+                musicUtils.getStepSizeUp("C major", "C", 0, "totally-not-a-real-temperament")
+            ).toBe(0);
+            const result = Singer.PitchActions.deltaPitch("deltascalarpitch", 0);
+            expect(result).toBe(100); // exactly 100 iterations, matching the i < 100 cap
+        }, 10000);
+
+        test("deltascalarpitch terminates in the downward direction too", () => {
+            turtle.singer.previousNotePlayed = ["E4", 4];
+            turtle.singer.lastNotePlayed = ["C4", 4];
+            activity.logo.synth.inTemperament = "totally-not-a-real-temperament";
+            const result = Singer.PitchActions.deltaPitch("deltascalarpitch", 0);
+            expect(result).toBe(-100);
+        }, 10000);
     });
 
     describe("Tests for consonantStepSize", () => {
@@ -499,6 +980,18 @@ describe("Tests for Singer.PitchActions setup", () => {
             expect(Singer.PitchActions.consonantStepSize("up", 0)).toEqual(
                 musicUtils.getStepSizeUp("C", "G")
             );
+        });
+        test("falls back to 1 when the temperament lookup returns a non-number (custom temperament with no ratios table)", () => {
+            // musicUtils._getStepSize returns the raw `transposition` argument, un-typechecked,
+            // when isCustomTemperament(temperament) is true and the temperament has no .ratios
+            // table. consonantStepSize passes `undefined` as that argument, so the lookup itself
+            // returns `undefined` here — confirmed directly against musicUtils, not assumed.
+            turtle.singer.lastNotePlayed = ["F#4", 4];
+            activity.logo.synth.inTemperament = "totally-not-a-real-temperament";
+            expect(
+                musicUtils.getStepSizeDown("C", "F#", undefined, "totally-not-a-real-temperament")
+            ).toBeUndefined();
+            expect(Singer.PitchActions.consonantStepSize("down", 0)).toBe(1);
         });
     });
 
