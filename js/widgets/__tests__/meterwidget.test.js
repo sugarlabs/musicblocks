@@ -37,6 +37,7 @@ global.platformColor = {
 global.PREVIEWVOLUME = 0.5;
 global.TONEBPM = 60;
 global.last = arr => arr[arr.length - 1];
+global.clampNumber = require("../../utils/utils-logic.js").clampNumber;
 
 // Mock docById
 global.docById = jest.fn().mockImplementation(id => {
