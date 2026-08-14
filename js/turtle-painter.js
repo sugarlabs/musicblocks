@@ -17,7 +17,7 @@
 
 /*
    global _, getMunsellColor, getcolor, hex2rgb, STROKECOLORS, FILLCOLORS,
-   TURTLESVG, WRAP
+   TURTLESVG, WRAP, clampNumber
  */
 
 /*
@@ -1459,8 +1459,8 @@ class Painter {
         // Clamp scroll position to stay within buffer canvas bounds
         const maxScrollX = (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.width;
         const maxScrollY = (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.height;
-        turtles.gx = Math.max(0, Math.min(turtles.gx, maxScrollX));
-        turtles.gy = Math.max(0, Math.min(turtles.gy, maxScrollY));
+        turtles.gx = clampNumber(turtles.gx, 0, maxScrollX);
+        turtles.gy = clampNumber(turtles.gy, 0, maxScrollY);
 
         const newImgData = turtles.c1ctx.getImageData(
             turtles.gx,

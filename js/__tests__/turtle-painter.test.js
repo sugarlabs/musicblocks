@@ -20,6 +20,7 @@
 const Painter = require("../turtle-painter");
 global.WRAP = true;
 global.NANERRORMSG = "Not a number";
+global.clampNumber = require("../utils/utils-logic.js").clampNumber;
 
 // Mock external color and translation functions
 global.getcolor = jest.fn(() => [50, 100, "rgba(255,0,49,1)"]);
