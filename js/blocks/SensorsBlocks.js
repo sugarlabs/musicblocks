@@ -553,7 +553,7 @@ function setupSensorsBlocks(activity) {
 
             // Handle hex and rgb color formats
             if (colorString.includes("#")) {
-                colorString = hex2rgb(colorString.split("#")[1]);
+                colorString = hex2rgb(colorString);
             }
 
             const obj = colorString.split("(")[1].split(",");
