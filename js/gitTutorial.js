@@ -63,11 +63,11 @@ const GitTutorial = (() => {
             chipIcon: "mapPin",
             chip: "Save a Spot",
             title: "Save a Spot",
-            heading: "Reserve your space for your music!",
-            body: `Click <strong>Save a Spot</strong> in the Git menu and your project gets
-                      its very own home on the internet, called a <strong>repository</strong>.<br><br>
-                      It's like getting your own locker at school. Nobody else can touch it,
-                      and everything you make lives there safely.`,
+            heading: "Create a space for your project.",
+            body: `Click <strong>Save a Spot</strong> in the Git menu to give your project a home
+                      on the internet, called a <strong>repository</strong>.<br><br>
+                      It's like getting your own locker at school. Nobody else can touch it
+                      unless you choose to publish it.`,
             tip: "You only need to do this once per project. After that, your spot is saved forever!",
             media: { type: "video", src: "videos/git-save-a-spot.mp4" }
         },
@@ -75,9 +75,9 @@ const GitTutorial = (() => {
             chipIcon: "camera",
             chip: "Mark this Moment",
             title: "Mark this Moment",
-            heading: "Snap a photo of your music right now!",
+            heading: "Snap a copy of your project right now!",
             body: `Made something you like? Click <strong>Mark this Moment</strong> to save
-                      an exact copy of your music at this point in time.<br><br>
+                      an exact copy of your work at this point in time.<br><br>
                       Even if you change things later, you can always come back to
                       <em>this exact version</em>.`,
             tip: 'Type a short note like "added drums" so you remember what you changed!',
@@ -87,12 +87,12 @@ const GitTutorial = (() => {
             chipIcon: "clock",
             chip: "Timeline",
             title: "Timeline",
-            heading: "See every version of your music!",
+            heading: "See every version of your project!",
             body: `Click <strong>Timeline</strong> to see all the moments you marked,
                       from newest to oldest.<br><br>
                       See something you want to go back to? Hit <strong>Jump back here</strong>
-                      and your music goes right back to that version!`,
-            tip: "You can never permanently break your music. The Timeline always has your back!",
+                      and your project goes right back to that version!`,
+            tip: "Every version is saved. You can always undo changes with the Timeline.",
             media: { type: "video", src: "videos/git-timeline.mp4" }
         },
         {
