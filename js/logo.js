@@ -2203,8 +2203,9 @@ class Logo {
             if (logo.turtleDelay !== 0) {
                 let updatedParameterBlocks = false;
                 for (const pblk in tur.parameterQueue) {
-                    logo.blocks.updateParameterBlock(logo, turtle, tur.parameterQueue[pblk]);
-                    updatedParameterBlocks = true;
+                    if (logo.blocks.updateParameterBlock(logo, turtle, tur.parameterQueue[pblk])) {
+                        updatedParameterBlocks = true;
+                    }
                 }
 
                 if (updatedParameterBlocks) {

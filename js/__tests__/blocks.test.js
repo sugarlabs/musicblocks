@@ -377,6 +377,34 @@ describe("Blocks Foundation", () => {
         });
     });
 
+    describe("Parameter Block Cache Updates", () => {
+        it("only rebuilds the cache when the displayed value changes", () => {
+            const blocks = new Blocks(mockActivity);
+            const updateParameter = jest.fn(() => 0);
+            const updateCache = jest.fn();
+            const parameterBlock = {
+                name: "heading",
+                protoblock: { parameter: true, updateParameter },
+                text: { text: "heading" },
+                container: { updateCache }
+            };
+            blocks.blockList = [parameterBlock];
+
+            expect(blocks.updateParameterBlock({}, 0, 0)).toBe(true);
+            expect(parameterBlock.text.text).toBe("0");
+            expect(updateCache).toHaveBeenCalledTimes(1);
+
+            expect(blocks.updateParameterBlock({}, 0, 0)).toBe(false);
+            expect(updateCache).toHaveBeenCalledTimes(1);
+
+            updateParameter.mockReturnValue(10);
+
+            expect(blocks.updateParameterBlock({}, 0, 0)).toBe(true);
+            expect(parameterBlock.text.text).toBe("10");
+            expect(updateCache).toHaveBeenCalledTimes(2);
+        });
+    });
+
     describe("Sparse Array Safety", () => {
         it("should not throw TypeError in findStacks when blockList is sparse", () => {
             const blocks = new Blocks(mockActivity);
