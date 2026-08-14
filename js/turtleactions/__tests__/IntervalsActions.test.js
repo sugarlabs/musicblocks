@@ -368,6 +368,235 @@ describe("setupIntervalsActions", () => {
         });
     });
 
+    describe("GetModename exact-vs-localized match precedence", () => {
+        afterEach(() => {
+            global._ = x => x;
+        });
+
+        test("prioritizes exact mode name over localized mode name", () => {
+            // With a non-identity _(), "_mode === mode" and "_(_mode) === mode" are genuinely
+            // different conditions. This confirms the exact-match clause is what finds "minor"
+            // here, not an incidental side effect of _() being the identity function elsewhere.
+            global._ = x => `${x}_localized`;
+
+            expect(Singer.IntervalsActions.GetModename("minor")).toBe("minor");
+        });
+    });
+
+    describe("GetIntervalNumber precise octave and wrap-around values", () => {
+        // Same note letter on both ends keeps letterGap out of play, isolating the
+        // octave-sign handling (below-wrap at line ~110, Math.abs at line ~113).
+        test("octave === -1 wraps a single octave below", () => {
+            GetNotesForInterval.mockReturnValueOnce({
+                firstNote: "C",
+                secondNote: "C",
+                octave: -1
+            });
+            expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(11);
+        });
+
+        test("octave === -2 combines the below-wrap with the Math.abs(octave) accumulation", () => {
+            GetNotesForInterval.mockReturnValueOnce({
+                firstNote: "C",
+                secondNote: "C",
+                octave: -2
+            });
+            expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(35);
+        });
+
+        test("octave === 1 accumulates one temperament length without the below-wrap", () => {
+            GetNotesForInterval.mockReturnValueOnce({ firstNote: "C", secondNote: "C", octave: 1 });
+            expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(13);
+        });
+
+        test("overflow-guard boundary: totalIntervals === temperamentLength + 9 is exact, not exceeded", () => {
+            GetNotesForInterval.mockReturnValueOnce({ firstNote: "C", secondNote: "A", octave: 1 });
+            expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(21);
+        });
+
+        test("one semitone past the overflow-guard boundary still returns the raw (unreduced) count", () => {
+            // GetIntervalNumber never reduces the value itself; the reduction only
+            // happens later, in GetCurrentInterval. This pins the raw input to that step.
+            GetNotesForInterval.mockReturnValueOnce({
+                firstNote: "C",
+                secondNote: "A#",
+                octave: 1
+            });
+            expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(22);
+        });
+
+        test("uses the absolute step difference, not the sum, when the forward (wrap-around) distance is larger", () => {
+            // G (8) -> E (5): |8-5| = 3, but the forward distance (8 -> ... -> E going up)
+            // is 9. The smaller of the two (3) is correct; the raw sum (13) is not,
+            // and would incorrectly lose out to the forward distance in the min().
+            GetNotesForInterval.mockReturnValueOnce({ firstNote: "G", secondNote: "E", octave: 0 });
+            expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(3);
+        });
+    });
+
+    describe("GetCurrentInterval precise wording assertions", () => {
+        test.each([
+            [-2, "perfect,  two octaves below"],
+            [-3, "perfect,  three octaves below"],
+            [-4, "perfect,  four octaves below"],
+            [-5, "perfect,  five octaves below"],
+            [-6, "perfect,  six octaves below"],
+            [-7, "perfect,  seven octaves below"],
+            [-8, "perfect,  eight octaves below"],
+            [-9, "perfect,  nine octaves below"]
+        ])("octave === %i produces %j", (octave, expected) => {
+            const notes = { firstNote: "C", secondNote: "C", octave };
+            GetNotesForInterval.mockReturnValueOnce(notes);
+            GetNotesForInterval.mockReturnValueOnce(notes);
+
+            expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe(expected);
+        });
+
+        test("octave === -1 omits the octave-count prefix that only applies when octave < -1", () => {
+            const notes = { firstNote: "C", secondNote: "C", octave: -1 };
+            GetNotesForInterval.mockReturnValueOnce(notes);
+            GetNotesForInterval.mockReturnValueOnce(notes);
+
+            expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("perfect below");
+        });
+
+        test("overflow-guard 'plus one octave' wording uses singular octave and the 'one' word", () => {
+            const notes = { firstNote: "C", secondNote: "B", octave: 1 };
+            GetNotesForInterval.mockReturnValueOnce(notes);
+            GetNotesForInterval.mockReturnValueOnce(notes);
+
+            expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("perfect, plus one octave");
+        });
+
+        test("overflow-guard boundary: exactly temperamentLength + 9 reports raw step count, unreduced", () => {
+            const notes = { firstNote: "C", secondNote: "A", octave: 1 };
+            GetNotesForInterval.mockReturnValueOnce(notes);
+            GetNotesForInterval.mockReturnValueOnce(notes);
+
+            expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("21 steps");
+        });
+
+        test("overflow-guard boundary: one past temperamentLength + 9 triggers the reduction and suffix", () => {
+            const notes = { firstNote: "C", secondNote: "A#", octave: 1 };
+            GetNotesForInterval.mockReturnValueOnce(notes);
+            GetNotesForInterval.mockReturnValueOnce(notes);
+
+            expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("perfect, plus one octave");
+        });
+
+        test("falls back to 'N steps' when SEMITONETOINTERVALMAP has no entry for the interval", () => {
+            // G -> C, octave 1: letter-gap wraps and totalIntervals (17) has no
+            // corresponding row in the default 13-row SEMITONETOINTERVALMAP mock.
+            const notes = { firstNote: "G", secondNote: "C", octave: 1 };
+            GetNotesForInterval.mockReturnValueOnce(notes);
+            GetNotesForInterval.mockReturnValueOnce(notes);
+
+            expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("17 steps");
+        });
+
+        test("falls back to 'N steps' when the row exists but has no entry for the computed letter gap", () => {
+            // The real SEMITONETOINTERVALMAP (js/utils/musicutils.js) is sparse: each row only
+            // defines the couple of letterGap keys matching that interval's conventional
+            // spellings, not all 7. Mirror that shape here instead of the dense array fixture
+            // used elsewhere in this file, so the missing-key fallback actually gets exercised.
+            global.SEMITONETOINTERVALMAP = {
+                1: { 0: "augmented unison", 1: "minor second" }
+            };
+
+            // B -> C, octave 0: a natural half-step (totalIntervals 1), but spelled with
+            // letters 6 apart (B is index 6, C is index 0), which isn't one of row 1's keys.
+            const notes = { firstNote: "B", secondNote: "C", octave: 0 };
+            GetNotesForInterval.mockReturnValueOnce(notes);
+            GetNotesForInterval.mockReturnValueOnce(notes);
+
+            const result = Singer.IntervalsActions.GetCurrentInterval(0);
+            expect(result).toBe("1 steps");
+            expect(result).not.toContain("undefined");
+        });
+
+        describe("letter-gap direction and wrap-around", () => {
+            beforeEach(() => {
+                // Each letterGap column maps to a distinct label so the returned
+                // string directly reveals which letterGap value the code computed.
+                global.SEMITONETOINTERVALMAP = Array(60)
+                    .fill(null)
+                    .map(() => ["lg0", "lg1", "lg2", "lg3", "lg4", "lg5", "lg6"]);
+            });
+
+            afterEach(() => {
+                // Restore the default fixture so it can't leak into other describe blocks.
+                global.SEMITONETOINTERVALMAP = Array(13)
+                    .fill(null)
+                    .map(() => Array(7).fill("perfect"));
+            });
+
+            test("wraps the letter gap when the first letter index exceeds the second and octave !== 0", () => {
+                // G (index 4) -> C (index 0): raw gap 4, wrapped to NOTENAMES.length - 4 = 3.
+                const notes = { firstNote: "G", secondNote: "C", octave: 1 };
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                GetNotesForInterval.mockReturnValueOnce(notes);
+
+                expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("lg3");
+            });
+
+            test("does not wrap the letter gap when octave === 0, even if the first index exceeds the second", () => {
+                const notes = { firstNote: "G", secondNote: "C", octave: 0 };
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                GetNotesForInterval.mockReturnValueOnce(notes);
+
+                expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("lg4");
+            });
+
+            test("computes an asymmetric letter gap correctly (D -> G, no wrap needed)", () => {
+                // D (index 1) -> G (index 4): gap is |4-1| = 3, not index2+index1 = 5.
+                const notes = { firstNote: "D", secondNote: "G", octave: 0 };
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                GetNotesForInterval.mockReturnValueOnce(notes);
+
+                expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("lg3");
+            });
+
+            test("computes an asymmetric wrapped letter gap correctly (G -> D, wrap needed)", () => {
+                // G (index 4) -> D (index 1): raw gap 3, wrapped to NOTENAMES.length - 3 = 4.
+                const notes = { firstNote: "G", secondNote: "D", octave: 1 };
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                GetNotesForInterval.mockReturnValueOnce(notes);
+
+                expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("lg4");
+            });
+
+            test("uses only the note letter, ignoring accidentals, when computing the letter gap", () => {
+                // C# -> G#: substring(0, 1) must strip the "#" so this behaves like C -> G.
+                const notes = { firstNote: "C#", secondNote: "G#", octave: 0 };
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                GetNotesForInterval.mockReturnValueOnce(notes);
+
+                expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("lg4");
+            });
+
+            test("does not wrap when the first letter index equals the second, even with octave !== 0", () => {
+                // C -> C: index1 === index2, so the wrap condition (index1 > index2) must
+                // stay strictly false here rather than treating equal indices as a match.
+                const notes = { firstNote: "C", secondNote: "C", octave: 1 };
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                GetNotesForInterval.mockReturnValueOnce(notes);
+
+                expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("lg0");
+            });
+
+            test("re-derives the letter gap for octave < 0 independently of the earlier wrap", () => {
+                // G -> C, octave -1: the initial wrap (line ~142) sets letterGap to 3,
+                // then the octave < 0 branch (line ~183) re-derives it from scratch to 4.
+                // Skipping that re-derivation would leave the stale value of 3.
+                const notes = { firstNote: "G", secondNote: "C", octave: -1 };
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                GetNotesForInterval.mockReturnValueOnce(notes);
+
+                expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("lg4 below");
+            });
+        });
+    });
+
     test("setKey updates keySignature", () => {
         Singer.IntervalsActions.setKey("C", "major", 0);
         expect(turtle.singer.keySignature).toContain("C");

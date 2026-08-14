@@ -2214,13 +2214,18 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         (Math.round(selectorWidth * block.blocks.blockScale) * block.protoblock.scale) / 2 + "px";
     // Navigate to a the current number value.
     let i = wheelValues.indexOf(selectedValue);
-    if (i === -1 || selectedValue < 1 || selectedValue > 8) {
-        selectedValue = Math.min(Math.max(selectedValue, 1), 8);
-        i = wheelValues.indexOf(selectedValue);
-    }
-    // In case of float value, navigate to the nearest integer within the range
-    if (selectedValue % 1 !== 0) {
-        selectedValue = Math.min(Math.max(Math.floor(selectedValue + 0.5), 1), 8);
+    if (i === -1) {
+        // Find the closest valid value from the wheelValues array
+        let closest = wheelValues[0];
+        let minDiff = Math.abs(selectedValue - closest);
+        for (let j = 1; j < wheelValues.length; j++) {
+            const diff = Math.abs(selectedValue - wheelValues[j]);
+            if (diff < minDiff) {
+                minDiff = diff;
+                closest = wheelValues[j];
+            }
+        }
+        selectedValue = closest;
         i = wheelValues.indexOf(selectedValue);
     }
     if (i !== -1) {
@@ -2261,6 +2266,12 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
         that.label.value = that.value;
+
+        const newIndex = wheelValues.indexOf(that.value);
+        const navFunc = that._numberWheel.navItems[newIndex].navigateFunction;
+        that._numberWheel.navItems[newIndex].navigateFunction = null;
+        that._numberWheel.navigateWheel(newIndex);
+        that._numberWheel.navItems[newIndex].navigateFunction = navFunc;
     };
 
     block._exitWheel.navItems[2].navigateFunction = () => {
@@ -2283,6 +2294,12 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
         that.label.value = that.value;
+
+        const newIndex = wheelValues.indexOf(that.value);
+        const navFunc = that._numberWheel.navItems[newIndex].navigateFunction;
+        that._numberWheel.navItems[newIndex].navigateFunction = null;
+        that._numberWheel.navigateWheel(newIndex);
+        that._numberWheel.navItems[newIndex].navigateFunction = navFunc;
     };
 
     const __pitchPreviewForNum = () => {
@@ -4451,5 +4468,5 @@ const piemenuDissectNumber = widget => {
 };
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { piemenuPitches, piemenuKey };
+    module.exports = { piemenuPitches, piemenuKey, piemenuNumber };
 }
