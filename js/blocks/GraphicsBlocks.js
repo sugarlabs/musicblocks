@@ -584,12 +584,21 @@ function setupGraphicsBlocks(activity) {
             this.piemenuValuesC2 = [25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300];
 
             // Set the help string for the Arc block
-            this.setHelpString([
-                _("The Arc block moves the turtle in an arc."),
-                "documentation",
-                null,
-                "archelp"
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.setHelpString([
+                    _("The Arc block moves the mouse in an arc."),
+                    "documentation",
+                    null,
+                    "archelp"
+                ]);
+            } else {
+                this.setHelpString([
+                    _("The Arc block moves the turtle in an arc."),
+                    "documentation",
+                    null,
+                    "archelp"
+                ]);
+            }
 
             // Form the block with specific parameters
             this.formBlock({

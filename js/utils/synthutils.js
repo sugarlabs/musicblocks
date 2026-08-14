@@ -18,7 +18,7 @@
    getOctaveRatio, isCustomTemperament, Singer, DOUBLEFLAT, DOUBLESHARP,
    DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
    getArticulation, piemenuPitches, docById, slicePath, wheelnav, platformColor,
-   DEFAULTVOICE, normalizeNoteAccidentals, parseNoteString
+   DEFAULTVOICE, normalizeNoteAccidentals, parseNoteString, clampNumber
 */
 
 /*
@@ -1410,10 +1410,16 @@ function Synth() {
      */
     this.createDefaultSynth = turtle => {
         console.debug("create default poly/default/custom synth for turtle " + turtle);
-        const default_synth = new Tone.PolySynth(Tone.AMSynth, POLYCOUNT).toDestination();
-        instruments[turtle]["electronic synth"] = default_synth;
+        // "electronic synth" and "custom" must be separate instances. "custom" is a
+        // member of BUILTIN_SYNTHS, so ___createSynth disposes whatever sits under
+        // that key before rebuilding it. Sharing one node meant that rebuilding
+        // "custom" also destroyed the synth "electronic synth" was still pointing at.
+        instruments[turtle]["electronic synth"] = new Tone.PolySynth(
+            Tone.AMSynth,
+            POLYCOUNT
+        ).toDestination();
         instrumentsSource["electronic synth"] = [0, "electronic synth"];
-        instruments[turtle]["custom"] = default_synth;
+        instruments[turtle]["custom"] = new Tone.PolySynth(Tone.AMSynth, POLYCOUNT).toDestination();
         instrumentsSource["custom"] = [0, "custom"];
     };
 
@@ -2008,6 +2014,7 @@ function Synth() {
                     if (paramsEffects.doDistortion) {
                         distortion = new Tone.Distortion(paramsEffects.distortionAmount);
                         chainNodes.push(distortion);
+                        effectsToDispose.push(distortion);
                     }
 
                     if (paramsEffects.doTremolo) {
@@ -2463,6 +2470,9 @@ function Synth() {
 
     this.stopSound = (turtle, instrumentName, note) => {
         if (!instrumentsSource[instrumentName] || !instruments[turtle]?.[instrumentName]) return;
+        // A disposed node is still truthy and its key is still present, so the guard
+        // above lets it through. Calling into Tone at that point throws.
+        if (instruments[turtle][instrumentName].disposed) return;
         const flag = instrumentsSource[instrumentName][0];
         switch (flag) {
             case 1: // drum
@@ -2503,7 +2513,7 @@ function Synth() {
 
     this.rampTo = (turtle, instrumentName, oldVol, volume, rampTime) => {
         // guard invalid UI/programmatic input (audio boundary safety)
-        volume = Math.max(0, Math.min(volume, 100));
+        volume = clampNumber(volume, 0, 100);
         if (
             percussionInstruments.includes(instrumentName) ||
             stringInstruments.includes(instrumentName)
@@ -2574,7 +2584,7 @@ function Synth() {
         // Resolve instrumentName to internal key
         instrumentName = this.resolveInstrumentName(instrumentName);
         // guard invalid UI/programmatic input (audio boundary safety)
-        volume = Math.max(0, Math.min(volume, 100));
+        volume = clampNumber(volume, 0, 100);
         // We pass in volume as a number from 0 to 100.
         // As per #1697, we adjust the volume of some instruments.
         let nv;
@@ -2625,7 +2635,7 @@ function Synth() {
             }, 200);
         } else {
             // guard invalid UI/programmatic input (audio boundary safety)
-            volume = Math.max(0, Math.min(volume, 100));
+            volume = clampNumber(volume, 0, 100);
             const gain = Math.max(0.0001, volume / 100);
             const db = Tone.gainToDb(gain);
             Tone.Destination.volume.rampTo(db, 0.01);
@@ -3699,9 +3709,14 @@ function Synth() {
         this._tunerRafId = null;
         this._tunerSegments = null;
         if (this.tunerMic) {
+            if (this.tunerAnalyser) {
+                this.tunerMic.disconnect(this.tunerAnalyser);
+                this.tunerAnalyser.dispose();
+            }
             this.tunerMic.close();
         }
         this.tunerAnalyser = null;
+        this.tunerMic = null;
     };
 
     const frequencyToNote = frequency => {

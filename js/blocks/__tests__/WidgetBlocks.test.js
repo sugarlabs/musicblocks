@@ -800,14 +800,83 @@ describe("setupWidgetBlocks", () => {
             ["oscilloscope", "oscBlk", "Oscilloscope", global.Oscilloscope],
             ["modewidget", "modeBlk", "modeWidget", global.ModeWidget]
         ])("%s lazy-loads its widget once its listener fires", (type, blk, logoKey, Widget) => {
+            if (type === "meterwidget") {
+                activity.blocks.blockList = {
+                    1: { connections: [null, 2, 3] },
+                    2: { value: 4 },
+                    3: { connections: [null, 4, 5] },
+                    4: { value: 1 },
+                    5: { value: 4 }
+                };
+            }
+
             const block = getBlock(type);
             block.flow(["childBlk"], logo, 0, blk);
+            if (type === "meterwidget") {
+                logo._meterBlock = 1;
+            }
             const listener = logo.setTurtleListener.mock.calls[0][2];
 
             listener();
 
             expect(Widget).toHaveBeenCalledTimes(1);
             expect(logo[logoKey]).toBeDefined();
+        });
+
+        it("does not open when the meter block input is disconnected", () => {
+            activity.blocks.blockList = {
+                1: { connections: [null, 2, null] },
+                2: { value: 4 }
+            };
+
+            const meterWidget = getBlock("meterwidget");
+            meterWidget.flow(["childBlk"], logo, 0, "meterBlk");
+            logo._meterBlock = 1;
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+
+            listener();
+
+            expect(global.MeterWidget).not.toHaveBeenCalled();
+            expect(logo.insideMeterWidget).toBe(false);
+        });
+
+        it("does not open when the meter block is missing", () => {
+            logo._meterBlock = 1;
+            activity.blocks.blockList = {
+                1: { connections: [null, 2, 3] },
+                2: { value: 4 },
+                3: { connections: [null, 4, 5] },
+                4: { value: 1 },
+                5: { value: 4 }
+            };
+
+            const meterWidget = getBlock("meterwidget");
+            meterWidget.flow(["childBlk"], logo, 0, "meterBlk");
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+
+            listener();
+
+            expect(global.MeterWidget).not.toHaveBeenCalled();
+            expect(logo.insideMeterWidget).toBe(false);
+        });
+
+        it("does not open when the note value numerator is disconnected", () => {
+            activity.blocks.blockList = {
+                1: { connections: [null, 2, 3] },
+                2: { value: 4 },
+                3: { connections: [null, null, 4] },
+                4: { value: 4 }
+            };
+
+            const meterWidget = getBlock("meterwidget");
+            meterWidget.flow(["childBlk"], logo, 0, "meterBlk");
+            logo._meterBlock = 1;
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+
+            listener();
+
+            expect(global.MeterWidget).not.toHaveBeenCalled();
+            expect(logo.insideMeterWidget).toBe(false);
         });
 
         it("aimusic lazy-loads AIWidget once its listener fires", () => {

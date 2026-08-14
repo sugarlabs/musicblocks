@@ -18,7 +18,7 @@
 
 /*
    global Singer, MusicBlocks, Mouse, last, VOICENAMES, DRUMNAMES,
-   Tone, instruments, DEFAULTVOLUME, DEFAULTVOICE
+   Tone, instruments, DEFAULTVOLUME, DEFAULTVOICE, clampNumber
 */
 
 /*
@@ -116,7 +116,7 @@ function setupVolumeActions(activity) {
 
             for (const synth of synthList) {
                 let newVolume = (last(tur.singer.synthVolume[synth]) * (100 + volume)) / 100;
-                newVolume = Math.max(Math.min(newVolume, 100), -100);
+                newVolume = clampNumber(newVolume, -100, 100);
 
                 if (tur.singer.synthVolume[synth] === undefined) {
                     tur.singer.synthVolume[synth] = [newVolume];
@@ -169,7 +169,7 @@ function setupVolumeActions(activity) {
          * @returns {void}
          */
         static setMasterVolume(volume, turtle, blk) {
-            volume = Math.max(Math.min(volume, 100), 0);
+            volume = clampNumber(volume, 0, 100);
 
             if (volume === 0) activity.errorMsg(_("Setting volume to 0."), blk);
 
@@ -193,7 +193,7 @@ function setupVolumeActions(activity) {
          * @returns {void}
          */
         static setPanning(value, turtle) {
-            value = Math.max(Math.min(value, 100), -100) / 100;
+            value = clampNumber(value, -100, 100) / 100;
 
             const tur = activity.turtles.ithTurtle(turtle);
             if (!tur.singer.panner) {

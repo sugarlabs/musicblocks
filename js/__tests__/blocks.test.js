@@ -629,6 +629,25 @@ describe("Blocks Foundation", () => {
             expect(flagDuringLoad).toBe(true);
         });
 
+        it("loads a text block valued '__proto__' without throwing", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.protoBlockDict = {
+                text: { style: "value", hasCapability: () => false }
+            };
+            blocks.newStorein2Block = jest.fn();
+            blocks.newNamedboxBlock = jest.fn();
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks._processOneBlock = jest.fn();
+            blocks.customTemperamentDefined = true;
+
+            // Legacy (pre-value-object) text block shape, still accepted for
+            // backward compatibility and reachable via pasted project JSON.
+            const blockObjs = [[0, ["text", "__proto__"], 0, 0, [null]]];
+
+            expect(() => blocks.loadNewBlocks(blockObjs)).not.toThrow();
+        });
+
         it("resets _suppressRefresh on circular connection early return", () => {
             const blocks = new Blocks(mockActivity);
             blocks.blockList = [];
