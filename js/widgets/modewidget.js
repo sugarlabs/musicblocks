@@ -88,7 +88,8 @@ class ModeWidget {
         this._undoStack = [];
         this._playing = false;
         this._selectedNotes = [];
-        this._newPattern = [];
+        this._edoNoteCache = {};
+        this._edoNoteCache[this._activeEDO] = this._selectedNotes.slice();
         this._activeEDO = getCurrentEDO(this.logo.synth.inTemperament);
 
         this.widgetWindow = window.widgetWindows.windowFor(this, "custom mode");
@@ -290,7 +291,20 @@ class ModeWidget {
                 return;
             }
 
+            // Check cache first: if we have a pre-saved state for this EDO,
+            // restore it exactly rather than applying a translation mapping.
+            if (this._edoNoteCache[newEDO] !== undefined) {
+                this._selectedNotes = this._edoNoteCache[newEDO].slice();
+                this._activeEDO = newEDO;
+                this._rebuildWheel(newEDO);
+                this._setModeName();
+                return;
+            }
+
             this._translateNotesToEDO(newEDO);
+            // Save the resulting state for this EDO so future round-trips
+            // can restore it exactly.
+            this._edoNoteCache[newEDO] = this._selectedNotes.slice();
             this._rebuildWheel(newEDO);
 
             // Update mode name display without wiping the control bar.
