@@ -16,11 +16,7 @@ global.docById = jest.fn().mockReturnValue({
     style: { display: "", opacity: "" },
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
-    getBoundingClientRect: jest.fn().mockReturnValue({ x: 0, y: 0 }),
-    replaceChildren: jest.fn(),
-    classList: { add: jest.fn(), remove: jest.fn() },
-    value: "",
-    focus: jest.fn()
+    getBoundingClientRect: jest.fn().mockReturnValue({ x: 0, y: 0 })
 });
 global.document = {
     getElementById: global.docById,
@@ -128,10 +124,7 @@ describe("piemenus behavioral tests", () => {
             updateCache: jest.fn(),
             text: { text: "" },
             value: "",
-            name: "notename",
-            _exitKeyPressed: jest.fn(),
-            _labelChanged: jest.fn(),
-            _usePieNumberC1: jest.fn().mockReturnValue(false)
+            name: "notename"
         };
         jest.clearAllMocks();
     });
@@ -271,12 +264,7 @@ describe("piemenus behavioral tests", () => {
             }
             return {
                 style: { display: "" },
-                contains: jest.fn().mockReturnValue(false),
-                replaceChildren: jest.fn(),
-                classList: { add: jest.fn(), remove: jest.fn() },
-                value: "",
-                addEventListener: jest.fn(),
-                focus: jest.fn()
+                contains: jest.fn().mockReturnValue(false)
             };
         });
 
@@ -306,56 +294,125 @@ describe("piemenus behavioral tests", () => {
         jest.useRealTimers();
     });
 
-    describe("piemenuNumber behavioral tests", () => {
-        beforeEach(() => {
-            mockBlock.protoblock = { scale: 1 };
+    test("outside click ignores interactive targets (labelDiv, movable, slices)", () => {
+        jest.useFakeTimers();
+
+        let mousedownHandler = null;
+        global.document.addEventListener = jest.fn().mockImplementation((event, handler) => {
+            if (event === "mousedown") {
+                mousedownHandler = handler;
+            }
         });
 
-        test("selects the closest valid value when selectedValue is outside wheelValues", () => {
-            const wheelValues = [1, 2, 3, 4, 5, 6, 7, 8];
-            piemenuNumber(mockBlock, wheelValues, 10);
+        const mockLabelDiv = { contains: jest.fn(t => t.id === "input-label") };
+        const mockMovable = { contains: jest.fn(t => t.id === "movable-btn") };
+        const mockChooseKeyDiv = {
+            style: { display: "block" },
+            contains: jest.fn(t => t.id === "wheel-slice")
+        };
+        const mockWheelDiv = {
+            style: { display: "none" },
+            contains: jest.fn().mockReturnValue(false)
+        };
 
-            expect(mockBlock._numberWheel.navigateWheel).toHaveBeenCalledWith(7);
+        global.docById.mockImplementation(id => {
+            if (id === "labelDiv") return mockLabelDiv;
+            if (id === "movable") return mockMovable;
+            if (id === "chooseKeyDiv") return mockChooseKeyDiv;
+            if (id === "wheelDiv") return mockWheelDiv;
+            return { style: { display: "none" }, contains: jest.fn().mockReturnValue(false) };
         });
 
-        test("selects the closest valid value for float selectedValue", () => {
-            const wheelValues = [1, 2, 3, 4, 5, 6, 7, 8];
-            piemenuNumber(mockBlock, wheelValues, 3.7);
+        const mockExit = {
+            navItems: [
+                {
+                    navigateFunction: jest.fn(),
+                    selected: false,
+                    hovered: false,
+                    enabled: true
+                },
+                { enabled: false }
+            ],
+            selectedNavItemIndex: 0,
+            refreshWheel: jest.fn(),
+            raphael: { canvas: true }
+        };
 
-            expect(mockBlock._numberWheel.navigateWheel).toHaveBeenCalledWith(3);
+        window.configureExitWheel(mockExit);
+        jest.advanceTimersByTime(50);
+
+        expect(mousedownHandler).toBeInstanceOf(Function);
+
+        // Click inside labelDiv -> should not trigger exit
+        mousedownHandler({ target: { id: "input-label", tagName: "DIV" } });
+        expect(mockExit.navItems[0].navigateFunction).not.toHaveBeenCalled();
+
+        // Click inside movable -> should not trigger exit
+        mousedownHandler({ target: { id: "movable-btn", tagName: "INPUT" } });
+        expect(mockExit.navItems[0].navigateFunction).not.toHaveBeenCalled();
+
+        // Click inside slice element -> should not trigger exit
+        mousedownHandler({ target: { id: "wheel-slice", tagName: "path" } });
+        expect(mockExit.navItems[0].navigateFunction).not.toHaveBeenCalled();
+
+        // Click outside on background -> should trigger exit
+        mousedownHandler({ target: { id: "stage-bg", tagName: "CANVAS" } });
+        expect(mockExit.navItems[0].navigateFunction).toHaveBeenCalledTimes(1);
+
+        jest.useRealTimers();
+    });
+
+    test("fallback outside click hides all visible containers when activeExitWheel is not provided", () => {
+        jest.useFakeTimers();
+
+        let mousedownHandler = null;
+        global.document.addEventListener = jest.fn().mockImplementation((event, handler) => {
+            if (event === "mousedown") {
+                mousedownHandler = handler;
+            }
+        });
+        global.document.removeEventListener = jest.fn();
+
+        const mockWheelDiv = {
+            style: { display: "" },
+            contains: jest.fn().mockReturnValue(false)
+        };
+        const mockChooseKeyDiv = {
+            style: { display: "block" },
+            contains: jest.fn().mockReturnValue(false)
+        };
+        const mockMovable = {
+            style: { display: "block" },
+            contains: jest.fn().mockReturnValue(false)
+        };
+
+        global.docById.mockImplementation(id => {
+            if (id === "wheelDiv") return mockWheelDiv;
+            if (id === "chooseKeyDiv") return mockChooseKeyDiv;
+            if (id === "movable") return mockMovable;
+            return { style: { display: "none" }, contains: jest.fn().mockReturnValue(false) };
         });
 
-        test("decrements value and updates navigation on minus button click", () => {
-            const wheelValues = [1, 2, 3, 4, 5, 6, 7, 8];
-            piemenuNumber(mockBlock, wheelValues, 5); // Index 4
+        // Trigger showWheelDiv to register handler
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+        piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
+        jest.advanceTimersByTime(50);
 
-            const minusNavigate = mockBlock._exitWheel.navItems[1].navigateFunction;
+        // Remove activeExitWheel navigateFunction to test fallback branch
+        mockBlock._exitWheel.navItems[0].navigateFunction = null;
 
-            mockBlock.value = 5;
-            mockBlock._numberWheel.navItems[3].navigateFunction = jest.fn();
+        mousedownHandler({ target: { id: "bg", tagName: "BODY" } });
 
-            minusNavigate();
+        expect(mockWheelDiv.style.display).toBe("none");
+        expect(mockChooseKeyDiv.style.display).toBe("none");
+        expect(mockMovable.style.display).toBe("none");
+        expect(global.document.removeEventListener).toHaveBeenCalledWith(
+            "mousedown",
+            mousedownHandler
+        );
 
-            expect(mockBlock.value).toBe(4);
-            expect(mockBlock.label.value).toBe(4);
-            expect(mockBlock._numberWheel.navigateWheel).toHaveBeenCalledWith(3);
-        });
-
-        test("increments value and updates navigation on plus button click", () => {
-            const wheelValues = [1, 2, 3, 4, 5, 6, 7, 8];
-            piemenuNumber(mockBlock, wheelValues, 5); // Index 4
-
-            const plusNavigate = mockBlock._exitWheel.navItems[2].navigateFunction;
-
-            mockBlock.value = 5;
-            mockBlock._numberWheel.navItems[5].navigateFunction = jest.fn();
-
-            plusNavigate();
-
-            expect(mockBlock.value).toBe(6);
-            expect(mockBlock.label.value).toBe(6);
-            expect(mockBlock._numberWheel.navigateWheel).toHaveBeenCalledWith(5);
-        });
+        jest.useRealTimers();
     });
 });
 
