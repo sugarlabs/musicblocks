@@ -13,6 +13,7 @@
 
 const { platformColor } = require("../utils/platformstyle");
 global.platformColor = platformColor;
+global.makeKeyboardAccessible = require("../utils/dom-helpers").makeKeyboardAccessible;
 
 jest.mock("../utils/platformstyle", () => ({
     platformColor: { stopIconColor: "#ea174c" }
@@ -53,6 +54,8 @@ const createMockElement = id => ({
     appendChild: jest.fn(),
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
+    querySelectorAll: jest.fn(() => []),
+    contains: jest.fn(() => false),
     click: jest.fn(),
     focus: jest.fn()
 });

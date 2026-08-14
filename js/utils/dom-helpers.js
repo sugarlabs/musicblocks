@@ -23,8 +23,61 @@
 
 /* exported
    closeWidgets, displayMsg, docByClass, docById, docByName, docBySelector,
-   docByTagName, hideDOMLabel
+   docByTagName, hideDOMLabel, makeKeyboardAccessible
 */
+
+const keyboardAccessibleHandlers = new WeakMap();
+
+/**
+ * Adds keyboard semantics and activation behavior to a clickable element.
+ *
+ * @param {HTMLElement} element - The element that should behave as a button.
+ * @param {string} [label] - Accessible name for the element.
+ * @param {Function} [onActivate] - Optional activation callback for keyboard use.
+ * @returns {HTMLElement} The enhanced element.
+ */
+function makeKeyboardAccessible(element, label, onActivate) {
+    if (!element || typeof element.setAttribute !== "function") return element;
+
+    const getAttribute =
+        typeof element.getAttribute === "function" ? name => element.getAttribute(name) : () => "";
+    const accessibleLabel =
+        label ||
+        getAttribute("aria-label") ||
+        getAttribute("data-tooltip") ||
+        getAttribute("title") ||
+        element.id;
+
+    element.setAttribute("role", "button");
+    element.setAttribute("tabindex", "0");
+    if (accessibleLabel) {
+        element.setAttribute("aria-label", accessibleLabel);
+    }
+
+    const previousHandler = keyboardAccessibleHandlers.get(element);
+    if (previousHandler && typeof element.removeEventListener === "function") {
+        element.removeEventListener("keydown", previousHandler);
+    }
+
+    const keydownHandler = event => {
+        if (event.key !== "Enter" && event.key !== " " && event.key !== "Spacebar") return;
+
+        event.preventDefault();
+        event.stopPropagation();
+        if (typeof onActivate === "function") {
+            onActivate(event);
+        } else if (typeof element.click === "function") {
+            element.click();
+        }
+    };
+
+    if (typeof element.addEventListener === "function") {
+        element.addEventListener("keydown", keydownHandler);
+        keyboardAccessibleHandlers.set(element, keydownHandler);
+    }
+
+    return element;
+}
 
 /**
  * Retrieves a collection of elements by class name.
@@ -130,7 +183,8 @@ var DomHelpers = {
     docBySelector,
     hideDOMLabel,
     displayMsg,
-    closeWidgets
+    closeWidgets,
+    makeKeyboardAccessible
 };
 
 if (typeof module !== "undefined" && module.exports) {
@@ -153,4 +207,5 @@ if (typeof window !== "undefined" && (typeof module === "undefined" || !module.e
     window.hideDOMLabel = hideDOMLabel;
     window.displayMsg = displayMsg;
     window.closeWidgets = closeWidgets;
+    window.makeKeyboardAccessible = makeKeyboardAccessible;
 }
