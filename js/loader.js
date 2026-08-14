@@ -61,12 +61,16 @@ requirejs.config({
         "utils/browser-utils": {
             exports: "BrowserUtils"
         },
+        "utils/http-utils": {
+            exports: "HttpUtils"
+        },
         "utils/utils": {
             deps: [
                 "utils/platformstyle",
                 "utils/utils-logic",
                 "utils/dom-helpers",
-                "utils/browser-utils"
+                "utils/browser-utils",
+                "utils/http-utils"
             ],
             exports: "_"
         },

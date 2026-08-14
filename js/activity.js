@@ -102,6 +102,7 @@ let MYDEFINES = [
     // on demand when the widget is opened, saving ~3-5 MB of heap memory.
     // "Chart",
     "utils/utils-logic",
+    "utils/http-utils",
     "utils/utils",
     "utils/retryWithBackoff",
     "utils/error-handler",
