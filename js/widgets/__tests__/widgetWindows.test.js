@@ -20,6 +20,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+const fs = require("fs");
+const path = require("path");
+
 // Set up globals required by widgetWindows.js before importing
 global._ = str => str;
 global.docById = jest.fn(id => document.getElementById(id));
@@ -752,6 +755,31 @@ describe("widgetWindows", () => {
     });
 
     describe("widgetWindows global functions", () => {
+        test("keeps floating windows above the toolbar in play-only mode", () => {
+            const style = document.createElement("style");
+            style.textContent = fs.readFileSync(
+                path.resolve(__dirname, "../../../css/play-only-mode.css"),
+                "utf8"
+            );
+            document.head.appendChild(style);
+            document.documentElement.classList.add("play-only");
+            nav.id = "toolbars";
+            nav.style.position = "fixed";
+            nav.style.zIndex = "1001";
+
+            try {
+                expect(Number(getComputedStyle(floatingWindows).zIndex)).toBeGreaterThan(
+                    Number(getComputedStyle(nav).zIndex)
+                );
+            } finally {
+                style.remove();
+                document.documentElement.classList.remove("play-only");
+                nav.removeAttribute("id");
+                nav.style.removeProperty("position");
+                nav.style.removeProperty("z-index");
+            }
+        });
+
         test("windowFor creates and returns a window", () => {
             const widget = { blockNo: 900 };
             const win = windowFor(widget, "Global Test");
