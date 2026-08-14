@@ -755,11 +755,11 @@ function setupPitchActions(activity) {
                     };
 
                     if (delta > 0) {
-                        while (delta > 0) {
+                        while (delta > 0 && i < 100) {
                             _calculate("up");
                         }
                     } else {
-                        while (delta < 0) {
+                        while (delta < 0 && i < 100) {
                             _calculate("down");
                         }
                     }
