@@ -2245,7 +2245,6 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     block._exitWheel.navItems[1].navigateFunction = () => {
         const index = wheelValues.indexOf(that.value);
         if (index === -1) return;
-
         const isAscending = wheelValues[0] < wheelValues[wheelValues.length - 1];
 
         if (isAscending) {
@@ -4452,5 +4451,5 @@ const piemenuDissectNumber = widget => {
 };
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { piemenuPitches };
+    module.exports = { piemenuPitches, piemenuKey };
 }
