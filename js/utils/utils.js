@@ -834,39 +834,54 @@ const updatePluginObj = (activity, obj) => {
         return;
     }
 
-    for (const name of Object.keys(obj["PALETTEPLUGINS"])) {
-        if (isUnsafeObjectKey(name)) continue;
-        activity.pluginObjs["PALETTEPLUGINS"][name] = obj["PALETTEPLUGINS"][name];
+    if ("PALETTEPLUGINS" in obj) {
+        for (const name of Object.keys(obj["PALETTEPLUGINS"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["PALETTEPLUGINS"][name] = obj["PALETTEPLUGINS"][name];
+        }
     }
 
-    for (const name of Object.keys(obj["PALETTEFILLCOLORS"])) {
-        if (isUnsafeObjectKey(name)) continue;
-        activity.pluginObjs["PALETTEFILLCOLORS"][name] = obj["PALETTEFILLCOLORS"][name];
+    if ("PALETTEFILLCOLORS" in obj) {
+        for (const name of Object.keys(obj["PALETTEFILLCOLORS"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["PALETTEFILLCOLORS"][name] = obj["PALETTEFILLCOLORS"][name];
+        }
     }
 
-    for (const name of Object.keys(obj["PALETTESTROKECOLORS"])) {
-        if (isUnsafeObjectKey(name)) continue;
-        activity.pluginObjs["PALETTESTROKECOLORS"][name] = obj["PALETTESTROKECOLORS"][name];
+    if ("PALETTESTROKECOLORS" in obj) {
+        for (const name of Object.keys(obj["PALETTESTROKECOLORS"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["PALETTESTROKECOLORS"][name] = obj["PALETTESTROKECOLORS"][name];
+        }
     }
 
-    for (const name of Object.keys(obj["PALETTEHIGHLIGHTCOLORS"])) {
-        if (isUnsafeObjectKey(name)) continue;
-        activity.pluginObjs["PALETTEHIGHLIGHTCOLORS"][name] = obj["PALETTEHIGHLIGHTCOLORS"][name];
+    if ("PALETTEHIGHLIGHTCOLORS" in obj) {
+        for (const name of Object.keys(obj["PALETTEHIGHLIGHTCOLORS"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["PALETTEHIGHLIGHTCOLORS"][name] =
+                obj["PALETTEHIGHLIGHTCOLORS"][name];
+        }
     }
 
-    for (const flow of Object.keys(obj["FLOWPLUGINS"])) {
-        if (isUnsafeObjectKey(flow)) continue;
-        activity.pluginObjs["FLOWPLUGINS"][flow] = obj["FLOWPLUGINS"][flow];
+    if ("FLOWPLUGINS" in obj) {
+        for (const flow of Object.keys(obj["FLOWPLUGINS"])) {
+            if (isUnsafeObjectKey(flow)) continue;
+            activity.pluginObjs["FLOWPLUGINS"][flow] = obj["FLOWPLUGINS"][flow];
+        }
     }
 
-    for (const arg of Object.keys(obj["ARGPLUGINS"])) {
-        if (isUnsafeObjectKey(arg)) continue;
-        activity.pluginObjs["ARGPLUGINS"][arg] = obj["ARGPLUGINS"][arg];
+    if ("ARGPLUGINS" in obj) {
+        for (const arg of Object.keys(obj["ARGPLUGINS"])) {
+            if (isUnsafeObjectKey(arg)) continue;
+            activity.pluginObjs["ARGPLUGINS"][arg] = obj["ARGPLUGINS"][arg];
+        }
     }
 
-    for (const block of Object.keys(obj["BLOCKPLUGINS"])) {
-        if (isUnsafeObjectKey(block)) continue;
-        activity.pluginObjs["BLOCKPLUGINS"][block] = obj["BLOCKPLUGINS"][block];
+    if ("BLOCKPLUGINS" in obj) {
+        for (const block of Object.keys(obj["BLOCKPLUGINS"])) {
+            if (isUnsafeObjectKey(block)) continue;
+            activity.pluginObjs["BLOCKPLUGINS"][block] = obj["BLOCKPLUGINS"][block];
+        }
     }
 
     if ("MACROPLUGINS" in obj) {
@@ -887,19 +902,25 @@ const updatePluginObj = (activity, obj) => {
         activity.pluginObjs["IMAGES"] = obj["IMAGES"];
     }
 
-    for (const name of Object.keys(obj["ONLOAD"])) {
-        if (isUnsafeObjectKey(name)) continue;
-        activity.pluginObjs["ONLOAD"][name] = obj["ONLOAD"][name];
+    if ("ONLOAD" in obj) {
+        for (const name of Object.keys(obj["ONLOAD"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["ONLOAD"][name] = obj["ONLOAD"][name];
+        }
     }
 
-    for (const name of Object.keys(obj["ONSTART"])) {
-        if (isUnsafeObjectKey(name)) continue;
-        activity.pluginObjs["ONSTART"][name] = obj["ONSTART"][name];
+    if ("ONSTART" in obj) {
+        for (const name of Object.keys(obj["ONSTART"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["ONSTART"][name] = obj["ONSTART"][name];
+        }
     }
 
-    for (const name of Object.keys(obj["ONSTOP"])) {
-        if (isUnsafeObjectKey(name)) continue;
-        activity.pluginObjs["ONSTOP"][name] = obj["ONSTOP"][name];
+    if ("ONSTOP" in obj) {
+        for (const name of Object.keys(obj["ONSTOP"])) {
+            if (isUnsafeObjectKey(name)) continue;
+            activity.pluginObjs["ONSTOP"][name] = obj["ONSTOP"][name];
+        }
     }
 };
 
