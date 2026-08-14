@@ -19,6 +19,9 @@
 */
 
 /* exported SampleWidget */
+/** AMD module dependencies for lazy loading. */
+SampleWidget.dependencies = ["widgets/sampler"];
+
 /**
  * Represents a Sample Widget.
  * @constructor
@@ -541,7 +544,23 @@ function SampleWidget() {
             if (this._octavesWheel !== undefined) {
                 this._octavesWheel.removeWheel();
             }
+            // Dispose Tone.Analyser nodes to free Web Audio resources
+            for (const key in this.pitchAnalysers) {
+                if (
+                    this.pitchAnalysers[key] &&
+                    typeof this.pitchAnalysers[key].dispose === "function"
+                ) {
+                    this.pitchAnalysers[key].dispose();
+                }
+            }
             this.pitchAnalysers = {};
+
+            // Remove any dangling file chooser listener
+            const fileChooser = docById("myOpenAll");
+            if (fileChooser && this._fileChangeHandler) {
+                fileChooser.removeEventListener("change", this._fileChangeHandler);
+                this._fileChangeHandler = null;
+            }
 
             if (this._dropZone) {
                 this._dropZone.removeEventListener("dragover", this._dragOverHandler);
@@ -585,14 +604,20 @@ function SampleWidget() {
                 stopTuner();
                 const fileChooser = docById("myOpenAll");
 
-                const __readerAction = function (event) {
+                // Remove any previously attached listener to prevent duplicates
+                if (that._fileChangeHandler) {
+                    fileChooser.removeEventListener("change", that._fileChangeHandler);
+                }
+
+                that._fileChangeHandler = function (event) {
                     window.scroll(0, 0);
                     const sampleFile = fileChooser.files[0];
                     that.handleFiles(sampleFile);
-                    fileChooser.removeEventListener("change", __readerAction);
+                    fileChooser.removeEventListener("change", that._fileChangeHandler);
+                    that._fileChangeHandler = null;
                 };
 
-                fileChooser.addEventListener("change", __readerAction, false);
+                fileChooser.addEventListener("change", that._fileChangeHandler, false);
                 fileChooser.focus();
                 fileChooser.click();
                 window.scroll(0, 0);
@@ -1384,16 +1409,17 @@ function SampleWidget() {
      * Calculates the frequency in Hz for the current pitch.
      * @returns {number} The frequency in Hz
      */
-    this._calculateFrequency = function () {
+    this._calculateFrequency = function (edo) {
+        const currentEDO = edo || 12;
         let semitones = 0;
 
-        semitones += isNaN(this.octaveCenter) ? 0 : this.octaveCenter * 12;
+        semitones += isNaN(this.octaveCenter) ? 0 : this.octaveCenter * currentEDO;
         semitones += isNaN(this.pitchCenter) ? 0 : MAJORSCALE[this.pitchCenter];
         semitones += isNaN(this.accidentalCenter) ? 0 : this.accidentalCenter - 2;
 
         // A4 = 440Hz at semitone position 57
         const netChange = semitones - 57;
-        const frequency = Math.floor(440 * Math.pow(2, netChange / 12));
+        const frequency = Math.floor(440 * Math.pow(2, netChange / currentEDO));
 
         return frequency;
     };
@@ -1424,18 +1450,19 @@ function SampleWidget() {
      * Plays the reference pitch based on the current sample's pitch, accidental, and octave.
      * @returns {void}
      */
-    this._playReferencePitch = function () {
+    this._playReferencePitch = function (edo) {
+        const currentEDO = edo || 12;
         this._updateSamplePitchValues();
         this._updateBlocks();
 
         let finalCenter = 0;
 
-        finalCenter += isNaN(this.octaveCenter) ? 0 : this.octaveCenter * 12;
+        finalCenter += isNaN(this.octaveCenter) ? 0 : this.octaveCenter * currentEDO;
         finalCenter += isNaN(this.pitchCenter) ? 0 : MAJORSCALE[this.pitchCenter];
         finalCenter += isNaN(this.accidentalCenter) ? 0 : this.accidentalCenter - 2;
 
         const netChange = finalCenter - 57;
-        const reffinalpitch = Math.floor(440 * Math.pow(2, netChange / 12));
+        const reffinalpitch = Math.floor(440 * Math.pow(2, netChange / currentEDO));
 
         this.activity.logo.synth.trigger(
             0,
@@ -2079,21 +2106,12 @@ function SampleWidget() {
     /**
      * Convert frequency to note and cents
      */
-    const frequencyToNote = frequency => {
+    const frequencyToNote = (frequency, edo) => {
         if (frequency <= 0) return { note: "---", cents: 0 };
 
-        const A4 = 440;
-        const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-
-        const midiNote = 69 + 12 * Math.log2(frequency / A4);
-        const roundedMidi = Math.round(midiNote);
-
-        const noteIndex = roundedMidi % 12;
-        const octave = Math.floor(roundedMidi / 12) - 1;
-        const noteName = noteNames[noteIndex] + octave;
-
-        const nearestFreq = A4 * Math.pow(2, (roundedMidi - 69) / 12);
-        const centsOffset = Math.round(1200 * Math.log2(frequency / nearestFreq));
+        const result = TunerUtils.frequencyToPitch(frequency, edo);
+        const noteName = result[0] + result[1];
+        const centsOffset = result[2];
 
         return { note: noteName, cents: centsOffset };
     };

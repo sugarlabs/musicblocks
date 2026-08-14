@@ -83,8 +83,6 @@ global.setupBlockDragController = require("../block-drag-controller").setupBlock
 // Mock Constants
 global.DEFAULTBLOCKSCALE = 1.0;
 global.STANDARDBLOCKHEIGHT = 20;
-global.COLLAPSIBLES = ["repeat", "forever", "if"];
-global.INLINECOLLAPSIBLES = ["newnote", "interval", "osctime"];
 global.DEFAULTACCIDENTAL = "natural";
 global.DEFAULTDRUM = "snare";
 global.DEFAULTEFFECT = "none";
@@ -102,7 +100,6 @@ global.NUMBERBLOCKDEFAULT = 0;
 global.STRINGLEN = 30;
 global.TEXTWIDTH = 100;
 global.WESTERN2EISOLFEGENAMES = {};
-global.WIDENAMES = [];
 global.BACKWARDCOMPATIBILITYDICT = {};
 global.DEFAULTCHORD = [];
 
@@ -566,6 +563,165 @@ describe("Blocks Foundation", () => {
         });
     });
 
+    describe("_suppressRefresh during loading", () => {
+        const { PubSub } = require("../pubsub");
+        let mockActivity;
+        let loadContainer;
+
+        beforeEach(() => {
+            global.pubsub = new PubSub();
+            mockActivity = {
+                storage: {},
+                trashcan: {},
+                turtles: {},
+                boundary: {},
+                macroDict: {},
+                palettes: {
+                    dict: {},
+                    show: jest.fn(),
+                    updatePalettes: jest.fn(),
+                    showPalette: jest.fn()
+                },
+                logo: { synth: { loadSynth: jest.fn(), preloadProjectSamples: jest.fn() } },
+                blocksContainer: { x: 0, y: 0 },
+                canvas: { width: 800, height: 600 },
+                refreshCanvas: jest.fn(),
+                errorMsg: jest.fn(),
+                setSelectionMode: jest.fn(),
+                stopLoadAnimation: jest.fn(),
+                setHomeContainers: jest.fn(),
+                __tick: jest.fn(),
+                _suppressRefresh: false
+            };
+            loadContainer = document.createElement("div");
+            loadContainer.id = "load-container";
+            document.body.appendChild(loadContainer);
+        });
+
+        afterEach(() => {
+            loadContainer.remove();
+            delete global.pubsub;
+        });
+
+        it("sets _suppressRefresh true during loadNewBlocks", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks._processOneBlock = jest.fn();
+            blocks.protoBlockDict = {};
+            blocks.newStorein2Block = jest.fn();
+            blocks.newNamedboxBlock = jest.fn();
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks.customTemperamentDefined = true;
+
+            // Minimal valid block object: [id, name, x, y, connections]
+            const blockObjs = [[0, "forward", 0, 0, [null, null, null]]];
+
+            // Capture the flag state during the synchronous body
+            let flagDuringLoad = null;
+            const origProcessChunk = blocks._processOneBlock;
+            blocks._processOneBlock = jest.fn(() => {
+                flagDuringLoad = mockActivity._suppressRefresh;
+            });
+
+            blocks.loadNewBlocks(blockObjs);
+
+            // Flag should be true during processing (before cleanupAfterLoad resets it)
+            expect(flagDuringLoad).toBe(true);
+        });
+
+        it("loads a text block valued '__proto__' without throwing", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.protoBlockDict = {
+                text: { style: "value", hasCapability: () => false }
+            };
+            blocks.newStorein2Block = jest.fn();
+            blocks.newNamedboxBlock = jest.fn();
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks._processOneBlock = jest.fn();
+            blocks.customTemperamentDefined = true;
+
+            // Legacy (pre-value-object) text block shape, still accepted for
+            // backward compatibility and reachable via pasted project JSON.
+            const blockObjs = [[0, ["text", "__proto__"], 0, 0, [null]]];
+
+            expect(() => blocks.loadNewBlocks(blockObjs)).not.toThrow();
+        });
+
+        it("resets _suppressRefresh on circular connection early return", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+
+            // Block connected to itself: connections[0] === block id
+            const blockObjs = [[0, "forward", 0, 0, [0, null, null]]];
+
+            blocks.loadNewBlocks(blockObjs);
+
+            expect(mockActivity._suppressRefresh).toBe(false);
+        });
+
+        it("resets _suppressRefresh after cleanupAfterLoad finishes", async () => {
+            const blocks = new Blocks(mockActivity);
+            blocks._loadCounter = 1;
+            blocks.blockList = [];
+            blocks.blocksToCollapse = [];
+            blocks._findDrumURLs = jest.fn();
+            blocks.updateBlockPositions = jest.fn();
+            blocks._cleanupStacks = jest.fn();
+            blocks.actionMetadata = jest.fn();
+            blocks.newNameddoBlock = jest.fn();
+            blocks.newStorein2Block = jest.fn();
+            blocks.newNamedboxBlock = jest.fn();
+            blocks._rebuildSpatialGrid = jest.fn();
+
+            mockActivity._suppressRefresh = true;
+
+            await blocks.cleanupAfterLoad();
+
+            expect(mockActivity._suppressRefresh).toBe(false);
+            expect(mockActivity.refreshCanvas).toHaveBeenCalled();
+        });
+
+        it("resets _suppressRefresh even if cleanupAfterLoad body throws", async () => {
+            const blocks = new Blocks(mockActivity);
+            blocks._loadCounter = 1;
+            blocks.blockList = [];
+            blocks.blocksToCollapse = [];
+            blocks._findDrumURLs = jest.fn(() => {
+                throw new Error("test error");
+            });
+
+            mockActivity._suppressRefresh = true;
+
+            await expect(blocks.cleanupAfterLoad()).rejects.toThrow("test error");
+
+            expect(mockActivity._suppressRefresh).toBe(false);
+            expect(mockActivity.refreshCanvas).toHaveBeenCalled();
+        });
+
+        it("resets _suppressRefresh if loadNewBlocks throws", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.protoBlockDict = {};
+            blocks.newStorein2Block = jest.fn();
+            blocks.newNamedboxBlock = jest.fn();
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks.customTemperamentDefined = true;
+
+            // Valid block object to pass initial checks
+            const blockObjs = [[0, "forward", 0, 0, [null, null, null]]];
+
+            // Make the block repair loop throw by corrupting blockObjs after validation
+            const origProcessChunk = blocks._processOneBlock;
+            blocks._processOneBlock = jest.fn(() => {
+                throw new Error("simulated processing error");
+            });
+
+            expect(() => blocks.loadNewBlocks(blockObjs)).toThrow("simulated processing error");
+            expect(mockActivity._suppressRefresh).toBe(false);
+        });
+    });
+
     describe("renameNameddos", () => {
         let blocksInstance;
 
@@ -774,6 +930,340 @@ describe("Blocks Foundation", () => {
             blocks.findDragGroup(0);
 
             expect(spy).toHaveBeenCalledWith(0);
+        });
+    });
+
+    describe("Collapsible Capability Migration Behavior", () => {
+        let mockActivity;
+        let blocks;
+
+        /**
+         * Build a block stand-in whose isCollapsible / isInlineCollapsible
+         * derive from a capabilities map (same contract as Block / ProtoBlock),
+         * rather than hard-coding isInlineCollapsible: () => true.
+         */
+        const makeCapabilityBlock = ({ name, capabilities = [], ...rest }) => {
+            const caps = Object.create(null);
+            for (const capability of capabilities) {
+                caps[capability] = true;
+            }
+
+            return {
+                name,
+                trash: false,
+                collapsed: false,
+                capabilities: caps,
+                hasCapability(capability) {
+                    return Object.prototype.hasOwnProperty.call(this.capabilities, capability)
+                        ? this.capabilities[capability]
+                        : false;
+                },
+                isCollapsible() {
+                    return this.hasCapability("collapsible");
+                },
+                isInlineCollapsible() {
+                    return this.hasCapability("inlineCollapsible");
+                },
+                isClampBlock() {
+                    return false;
+                },
+                connections: [null],
+                ...rest
+            };
+        };
+
+        beforeEach(() => {
+            mockActivity = {
+                storage: {},
+                trashcan: {},
+                turtles: {},
+                boundary: {},
+                macroDict: {},
+                palettes: { dict: {}, show: jest.fn() },
+                logo: { synth: { loadSynth: jest.fn() } },
+                blocksContainer: { x: 0, y: 0 },
+                canvas: { width: 800, height: 600 },
+                refreshCanvas: jest.fn(),
+                errorMsg: jest.fn(),
+                setSelectionMode: jest.fn(),
+                stopLoadAnimation: jest.fn(),
+                setHomeContainers: jest.fn(),
+                __tick: jest.fn()
+            };
+            blocks = new Blocks(mockActivity);
+        });
+
+        it("toggleCollapsibles toggles standard collapsible blocks but excludes inlineCollapsible ones", () => {
+            const startBlock = makeCapabilityBlock({
+                name: "start",
+                capabilities: ["collapsible"],
+                collapseToggle: jest.fn(function () {
+                    this.collapsed = !this.collapsed;
+                })
+            });
+
+            // newnote / interval / osctime: same exclude behavior as the old name list.
+            // definemode: intentionally excluded too — it declares inlineCollapsible and
+            // was part of historical INLINECOLLAPSIBLES; completing the capability migration.
+            const inlineBlocks = ["newnote", "interval", "osctime", "definemode"].map(name =>
+                makeCapabilityBlock({
+                    name,
+                    capabilities: ["collapsible", "inlineCollapsible"],
+                    collapseToggle: jest.fn(function () {
+                        this.collapsed = !this.collapsed;
+                    })
+                })
+            );
+
+            blocks.blockList = [startBlock, ...inlineBlocks];
+
+            blocks.toggleCollapsibles();
+
+            expect(startBlock.collapseToggle).toHaveBeenCalled();
+            for (const inlineBlock of inlineBlocks) {
+                expect(inlineBlock.collapseToggle).not.toHaveBeenCalled();
+            }
+        });
+
+        it("_getBlockSize spoofs size 1 for collapsed inlineCollapsible blocks including definemode", () => {
+            blocks.blockList = [
+                makeCapabilityBlock({
+                    name: "newnote",
+                    size: 4,
+                    collapsed: true,
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                }),
+                makeCapabilityBlock({
+                    name: "interval",
+                    size: 4,
+                    collapsed: true,
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                }),
+                makeCapabilityBlock({
+                    name: "osctime",
+                    size: 4,
+                    collapsed: true,
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                }),
+                // Intentional: definemode joins compact-size path via inlineCollapsible.
+                makeCapabilityBlock({
+                    name: "definemode",
+                    size: 5,
+                    collapsed: true,
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                }),
+                makeCapabilityBlock({
+                    name: "start",
+                    size: 3,
+                    collapsed: true,
+                    capabilities: ["collapsible"]
+                }),
+                makeCapabilityBlock({
+                    name: "newnote",
+                    size: 4,
+                    collapsed: false,
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                })
+            ];
+
+            expect(blocks._getBlockSize(0)).toBe(1);
+            expect(blocks._getBlockSize(1)).toBe(1);
+            expect(blocks._getBlockSize(2)).toBe(1);
+            expect(blocks._getBlockSize(3)).toBe(1);
+            expect(blocks._getBlockSize(4)).toBe(3);
+            expect(blocks._getBlockSize(5)).toBe(4);
+        });
+
+        it("_getStackSize spoofs size 1 for collapsed inlineCollapsible blocks including definemode", () => {
+            blocks.blocksToCollapse = [];
+            blocks._sizeCounter = 0;
+            blocks.blockList = [
+                makeCapabilityBlock({
+                    name: "newnote",
+                    size: 4,
+                    collapsed: true,
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                }),
+                makeCapabilityBlock({
+                    name: "interval",
+                    size: 4,
+                    collapsed: true,
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                }),
+                makeCapabilityBlock({
+                    name: "osctime",
+                    size: 4,
+                    collapsed: true,
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                }),
+                // Intentional: definemode stack size spoofs like other inline collapsibles.
+                makeCapabilityBlock({
+                    name: "definemode",
+                    size: 5,
+                    collapsed: true,
+                    capabilities: ["collapsible", "inlineCollapsible"]
+                }),
+                makeCapabilityBlock({
+                    name: "start",
+                    size: 3,
+                    collapsed: true,
+                    capabilities: ["collapsible"]
+                })
+            ];
+
+            expect(blocks._getStackSize(0)).toBe(1);
+            expect(blocks._getStackSize(1)).toBe(1);
+            expect(blocks._getStackSize(2)).toBe(1);
+            expect(blocks._getStackSize(3)).toBe(1);
+            expect(blocks._getStackSize(4)).toBe(3);
+        });
+
+        it("_processOneBlock correctly uses ProtoBlock capability metadata to initialize collapsed state on load", () => {
+            blocks.protoBlockDict = {
+                start: {
+                    name: "start",
+                    hasCapability: capability => capability === "collapsible"
+                },
+                forward: {
+                    name: "forward",
+                    hasCapability: () => false
+                }
+            };
+
+            const blockObjs = [
+                [0, "start", 0, 0, [null]],
+                [1, "forward", 0, 0, [null]]
+            ];
+
+            blocks._makeNewBlockWithConnections = jest.fn();
+            blocks.turtles = { getTurtleCount: () => 1, addTurtle: jest.fn() };
+
+            blocks._processOneBlock(0, blockObjs, 0, true);
+            blocks._processOneBlock(1, blockObjs, 0, false);
+
+            expect(blocks._makeNewBlockWithConnections).toHaveBeenCalledTimes(2);
+            // Check that postProcess received blkInfo with collapsed: false for 'start'
+            const startCallArgs = blocks._makeNewBlockWithConnections.mock.calls[0];
+            expect(startCallArgs[4][1]).toEqual({ value: null, collapsed: false });
+
+            const forwardCallArgs = blocks._makeNewBlockWithConnections.mock.calls[1];
+            expect(forwardCallArgs[4]).toBeUndefined();
+        });
+    });
+
+    describe("SoundSpecifier Capability & Traversal Migration", () => {
+        let blocks;
+
+        beforeEach(() => {
+            blocks = new Blocks({});
+        });
+
+        it("_blockInStack matches using array of names and predicate function", () => {
+            blocks.blockList = [
+                { name: "start", connections: [null, 1] },
+                { name: "pitch", isSoundSpecifier: () => true, connections: [0] }
+            ];
+
+            expect(blocks._blockInStack(0, ["pitch"])).toBe(true);
+            expect(blocks._blockInStack(0, ["rest2"])).toBe(false);
+
+            expect(
+                blocks._blockInStack(0, blk => blk.isSoundSpecifier && blk.isSoundSpecifier())
+            ).toBe(true);
+            expect(blocks._blockInStack(0, blk => blk.name === "nonexistent")).toBe(false);
+        });
+
+        it("findFirstPitchBlock identifies soundSpecifier blocks and rest2 block", () => {
+            const pitchBlock = { name: "pitch", isSoundSpecifier: () => true, connections: [] };
+            const restBlock = { name: "rest2", isSoundSpecifier: () => false, connections: [] };
+            const forwardBlock = {
+                name: "forward",
+                isSoundSpecifier: () => false,
+                connections: [1]
+            };
+
+            blocks.blockList = [forwardBlock, pitchBlock, restBlock];
+
+            // Traversal from forward -> pitch
+            expect(blocks.findFirstPitchBlock(0)).toBe(1);
+
+            // Traversal for rest2
+            blocks.blockList[0].connections = [2];
+            expect(blocks.findFirstPitchBlock(0)).toBe(2);
+
+            // Traversal with no sound specifier or rest2
+            blocks.blockList[0].connections = [null];
+            expect(blocks.findFirstPitchBlock(0)).toBe(null);
+        });
+
+        it("_deletePitchBlocks extracts soundSpecifier blocks from note stack", () => {
+            const pitchBlock = {
+                name: "pitch",
+                isSoundSpecifier: () => true,
+                connections: [0, null]
+            };
+            const drumBlock = {
+                name: "playdrum",
+                isSoundSpecifier: () => true,
+                connections: [null]
+            };
+
+            blocks.blockList = [
+                { name: "note", isNoteContainer: () => true, connections: [null, 1] },
+                pitchBlock,
+                drumBlock
+            ];
+
+            blocks._extractBlock = jest.fn();
+
+            // Run _deletePitchBlocks starting on pitchBlock
+            blocks._deletePitchBlocks(1);
+
+            expect(blocks._extractBlock).toHaveBeenCalledWith(1, false);
+        });
+    });
+
+    describe("wideLabel Capability Migration", () => {
+        let blocks;
+
+        beforeEach(() => {
+            blocks = new Blocks({});
+        });
+
+        it("updateBlockText skips truncation for wideLabel blocks", () => {
+            const longLabel = "x".repeat(40);
+            const wideBlock = {
+                name: "drumname",
+                value: longLabel,
+                hasWideLabel: () => true,
+                text: { text: "" },
+                container: {
+                    children: { length: 1 },
+                    setChildIndex: jest.fn(),
+                    updateCache: jest.fn()
+                },
+                loadComplete: true
+            };
+            const normalBlock = {
+                name: "text",
+                value: longLabel,
+                hasWideLabel: () => false,
+                text: { text: "" },
+                container: {
+                    children: { length: 1 },
+                    setChildIndex: jest.fn(),
+                    updateCache: jest.fn()
+                },
+                loadComplete: true
+            };
+
+            blocks.blockList = [wideBlock, normalBlock];
+            blocks.updateBlockText(0);
+            blocks.updateBlockText(1);
+
+            expect(wideBlock.text.text).toBe(longLabel);
+            expect(normalBlock.text.text.endsWith("...")).toBe(true);
+            expect(normalBlock.text.text.length).toBeLessThan(longLabel.length);
         });
     });
 });

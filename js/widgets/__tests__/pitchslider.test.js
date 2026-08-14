@@ -21,6 +21,7 @@
  */
 
 global._ = msg => msg;
+global.getCurrentEDO = () => 12;
 
 const mockOscillator = {
     toDestination: jest.fn().mockReturnThis(),
@@ -105,7 +106,11 @@ describe("PitchSlider Widget", () => {
         global.document.removeEventListener = jest.fn();
 
         activityMock = {
-            logo: {},
+            logo: {
+                synth: {
+                    inTemperament: "equal"
+                }
+            },
             textMsg: jest.fn(),
             refreshCanvas: jest.fn(),
             blocks: {
@@ -124,10 +129,6 @@ describe("PitchSlider Widget", () => {
     describe("Static Properties", () => {
         test("ICONSIZE is 32", () => {
             expect(PitchSlider.ICONSIZE).toBe(32);
-        });
-
-        test("SEMITONE is correct", () => {
-            expect(PitchSlider.SEMITONE).toBeCloseTo(1.059463, 6);
         });
     });
 
@@ -338,7 +339,7 @@ describe("PitchSlider Widget", () => {
             const event = { key: "ArrowUp", preventDefault: jest.fn(), stopPropagation: jest.fn() };
             keyHandler(event);
 
-            const expected = 440 * PitchSlider.SEMITONE;
+            const expected = 440 * Math.pow(2, 1 / 12);
             expect(parseFloat(mockSliderObj.value)).toBeCloseTo(expected, 2);
         });
 
@@ -350,7 +351,7 @@ describe("PitchSlider Widget", () => {
             };
             keyHandler(event);
 
-            const expected = 440 * PitchSlider.SEMITONE;
+            const expected = 440 * Math.pow(2, 1 / 12);
             expect(parseFloat(mockSliderObj.value)).toBeCloseTo(expected, 2);
         });
 
@@ -362,7 +363,7 @@ describe("PitchSlider Widget", () => {
             };
             keyHandler(event);
 
-            const expected = 440 / PitchSlider.SEMITONE;
+            const expected = 440 / Math.pow(2, 1 / 12);
             expect(parseFloat(mockSliderObj.value)).toBeCloseTo(expected, 2);
         });
 
@@ -374,7 +375,7 @@ describe("PitchSlider Widget", () => {
             };
             keyHandler(event);
 
-            const expected = 440 / PitchSlider.SEMITONE;
+            const expected = 440 / Math.pow(2, 1 / 12);
             expect(parseFloat(mockSliderObj.value)).toBeCloseTo(expected, 2);
         });
 
@@ -425,7 +426,7 @@ describe("PitchSlider Widget", () => {
             const event = { key: "ArrowUp", preventDefault: jest.fn(), stopPropagation: jest.fn() };
             keyHandler(event);
 
-            const expected = 440 * PitchSlider.SEMITONE;
+            const expected = 440 * Math.pow(2, 1 / 12);
             expect(parseFloat(mockSliderObj.value)).toBeCloseTo(expected, 2);
         });
     });
@@ -477,7 +478,7 @@ describe("PitchSlider Widget", () => {
             const upBtn = slider.widgetWindow.getButtons().find(b => b.tip === "Move up");
             upBtn.onclick();
 
-            const expected = 440 * PitchSlider.SEMITONE;
+            const expected = 440 * Math.pow(2, 1 / 12);
             expect(parseFloat(rangeSlider.value)).toBeCloseTo(expected, 2);
         });
 
@@ -500,7 +501,7 @@ describe("PitchSlider Widget", () => {
             const downBtn = slider.widgetWindow.getButtons().find(b => b.tip === "Move down");
             downBtn.onclick();
 
-            const expected = 440 / PitchSlider.SEMITONE;
+            const expected = 440 / Math.pow(2, 1 / 12);
             expect(parseFloat(rangeSlider.value)).toBeCloseTo(expected, 2);
         });
 

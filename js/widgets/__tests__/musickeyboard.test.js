@@ -10,6 +10,7 @@ global.SOLFEGENAMES = ["do", "re", "mi", "fa", "sol", "la", "ti"];
 
 const musicutils = require("../../utils/musicutils.js");
 Object.assign(global, musicutils);
+global.debugLog = jest.fn();
 
 const MusicKeyboard = require("../musickeyboard.js");
 
@@ -171,6 +172,40 @@ describe("MusicKeyboard add-row submenu", () => {
             [1, ["solfege", { value: "do♯" }], 0, 0, [0]],
             [2, ["number", { value: 392 }], 0, 0, [0]]
         ]);
+    });
+
+    test("logs via debugLog for unrecognized label and when no valid aboveBlock exists", () => {
+        const loadNewBlocks = jest.fn();
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            blocks: {
+                blockList: [],
+                loadNewBlocks
+            },
+            errorMsg: jest.fn()
+        });
+
+        keyboard.layout = [
+            { noteName: "hertz", noteOctave: 392, blockNumber: 100001 },
+            { noteName: "hertz", noteOctave: 436, blockNumber: 100002 }
+        ];
+
+        keyboard._createAddRowPieSubmenu();
+
+        // Force selectedNavItemIndex out of bounds so VALUESLABEL[index] is undefined,
+        // hitting the default case in the switch statement.
+        keyboard._menuWheel.selectedNavItemIndex = 5;
+        global.debugLog.mockClear();
+
+        expect(() => keyboard._menuWheel.navItems[0].navigateFunction()).not.toThrow();
+
+        // The default case logs the unrecognized label.
+        expect(global.debugLog).toHaveBeenCalledWith("Nothing to do for undefined");
+        // All blockNumbers >= FAKEBLOCKNUMBER so else-branch fires too.
+        expect(global.debugLog).toHaveBeenCalledWith(
+            "Could not find anywhere to insert new block."
+        );
     });
 
     test("creates pie submenu and sets z-index, top position, and exit wheel correctly", () => {
@@ -937,6 +972,61 @@ describe("MusicKeyboard core logic", () => {
             expect(adjustDocks).toHaveBeenCalledWith(2, true);
             expect(keyboard.activity.blocks.clampBlocksToCheck).toEqual([[2, 0]]);
             expect(refreshCanvas).toHaveBeenCalled();
+        });
+    });
+
+    describe("_roundNoteDuration", () => {
+        test("rounds to the nearest sixteenth in normal mode", () => {
+            const keyboard = new MusicKeyboard({});
+
+            expect(keyboard._roundNoteDuration(0.3)).toBeCloseTo(0.3125);
+        });
+
+        test("rounds to the nearest eighth in beginner mode", () => {
+            const savedBeginnerMode = global.localStorage.beginnerMode;
+            global.localStorage.beginnerMode = "true";
+            const keyboard = new MusicKeyboard({});
+            global.localStorage.beginnerMode = savedBeginnerMode;
+
+            expect(keyboard._roundNoteDuration(0.2)).toBeCloseTo(0.25);
+        });
+
+        test("clamps a rounded-to-zero duration to the minimum positive value", () => {
+            const keyboard = new MusicKeyboard({});
+
+            expect(keyboard._roundNoteDuration(0.01)).toBe(0.125);
+        });
+
+        test("returns a positive duration for a negative input", () => {
+            const keyboard = new MusicKeyboard({});
+
+            expect(keyboard._roundNoteDuration(-0.3)).toBeCloseTo(0.3125);
+        });
+    });
+
+    describe("_updatePlayButtonIcon", () => {
+        test("shows a stop icon while playing", () => {
+            const keyboard = new MusicKeyboard({});
+            const cell = document.createElement("td");
+
+            keyboard._updatePlayButtonIcon(cell, true);
+
+            const img = cell.querySelector("img");
+            expect(img.src).toContain("header-icons/stop-button.svg");
+            expect(img.title).toBe("Stop");
+            expect(img.alt).toBe("Stop");
+        });
+
+        test("shows a play icon when stopped", () => {
+            const keyboard = new MusicKeyboard({});
+            const cell = document.createElement("td");
+
+            keyboard._updatePlayButtonIcon(cell, false);
+
+            const img = cell.querySelector("img");
+            expect(img.src).toContain("header-icons/play-button.svg");
+            expect(img.title).toBe("Play");
+            expect(img.alt).toBe("Play");
         });
     });
 });

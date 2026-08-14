@@ -35,6 +35,9 @@
 /* exported PitchStaircase */
 
 class PitchStaircase {
+    /** AMD module dependencies for lazy loading. */
+    static dependencies = ["widgets/pitchstaircase"];
+
     static BUTTONDIVWIDTH = 476; // 8 buttons 476 = (55 + 4) * 8
     static OUTERWINDOWWIDTH = 685;
     static INNERWINDOWWIDTH = 600;
@@ -208,7 +211,8 @@ class PitchStaircase {
                     stepCell.classList.remove("active");
                     stepCell.style.backgroundColor = "";
                     this._setButtonIcon(playCell, "play-button.svg", _("Play"));
-                    this.activity.logo.synth.stop();
+                    const frequency = Number(stepCell.getAttribute("id"));
+                    this.activity.logo.synth.stopSound(0, DEFAULTVOICE, frequency);
                     this._playingRowIndex = null;
                 } else {
                     this._playOne(stepCell, playCell);
@@ -742,7 +746,7 @@ class PitchStaircase {
                     stepCell.classList.remove("active");
                 }
                 this._setButtonIcon(this._playAllButton, "play-chord.svg", _("Play chord"));
-                this.activity.logo.synth.stop();
+                this.activity.logo.synth.stopSound(0, DEFAULTVOICE);
                 this._isPlayingAll = false;
             } else {
                 this._playAll();
@@ -763,7 +767,7 @@ class PitchStaircase {
                     stepCell.classList.remove("active");
                 }
                 this._setButtonIcon(this._playScaleButton, "play-scale.svg", _("Play scale"));
-                this.activity.logo.synth.stop();
+                this.activity.logo.synth.stopSound(0, DEFAULTVOICE);
                 this._isPlayingScale = false;
             } else {
                 this.playUpAndDown();

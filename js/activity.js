@@ -47,7 +47,7 @@ try {
    getMacroExpansion, getOctaveRatio, getTemperament, transcribeMidi,
    GOHOMEBUTTON, GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
    hideDOMLabel, initBasicProtoBlocks, initPalettes,
-   INLINECOLLAPSIBLES, JSEditor, LanguageBox, ThemeBox, MSGBLOCK,
+   JSEditor, LanguageBox, ThemeBox, MSGBLOCK,
    NANERRORMSG, NOACTIONERRORMSG, NOBOXERRORMSG, NOINPUTERRORMSG,
    NOMICERRORMSG, NOSQRTERRORMSG, NOSTRINGERRORMSG, PALETTEFILLCOLORS,
    PALETTESTROKECOLORS, PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
@@ -73,8 +73,14 @@ try {
  */
 const LEADING = 0;
 const BLOCKSCALES = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4];
-const _THIS_IS_MUSIC_BLOCKS_ = true;
-const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
+const _THIS_IS_MUSIC_BLOCKS_ =
+    typeof window !== "undefined" && typeof window._THIS_IS_MUSIC_BLOCKS_ !== "undefined"
+        ? window._THIS_IS_MUSIC_BLOCKS_
+        : true;
+const _THIS_IS_TURTLE_BLOCKS_ =
+    typeof window !== "undefined" && typeof window._THIS_IS_TURTLE_BLOCKS_ !== "undefined"
+        ? window._THIS_IS_TURTLE_BLOCKS_
+        : !_THIS_IS_MUSIC_BLOCKS_;
 
 // Responsive breakpoint constants
 const RESPONSIVE_BREAKPOINT_TABLET = 768;
@@ -122,6 +128,7 @@ let MYDEFINES = [
     "activity/basicblocks",
     "activity/blockfactory",
     "activity/piemenus",
+    "activity/piemenu-block-context",
     "activity/planetInterface",
     "activity/rubrics",
     "activity/macros",
@@ -1196,21 +1203,29 @@ class Activity {
              * Handles touch start event on the canvas.
              * @param {TouchEvent} event - The touch event object.
              */
-            myCanvas.addEventListener(
-                "touchstart",
-                event => {
-                    if (event.touches.length === 2) {
-                        for (let i = 0; i < 2; i++) {
-                            initialTouches[i][0] = event.touches[i].clientY;
-                            initialTouches[i][1] = event.touches[i].clientX;
-                        }
-                        const dx = event.touches[0].clientX - event.touches[1].clientX;
-                        const dy = event.touches[0].clientY - event.touches[1].clientY;
-                        initialPinchDistance = Math.hypot(dx, dy);
+            const __touchStartHandler = event => {
+                if (event.touches.length === 2) {
+                    for (let i = 0; i < 2; i++) {
+                        initialTouches[i][0] = event.touches[i].clientY;
+                        initialTouches[i][1] = event.touches[i].clientX;
                     }
-                },
-                { passive: true }
-            );
+                    const dx = event.touches[0].clientX - event.touches[1].clientX;
+                    const dy = event.touches[0].clientY - event.touches[1].clientY;
+                    initialPinchDistance = Math.hypot(dx, dy);
+                }
+            };
+
+            // Remove previous touchstart event listener if it exists
+            if (this._touchStartHandler) {
+                this.removeEventListener(myCanvas, "touchstart", this._touchStartHandler, {
+                    passive: true
+                });
+            }
+
+            // Store the handler reference for future cleanup
+            this._touchStartHandler = __touchStartHandler;
+
+            this.addEventListener(myCanvas, "touchstart", __touchStartHandler, { passive: true });
 
             myCanvas.style.touchAction = "none";
 
@@ -1218,76 +1233,94 @@ class Activity {
              * Handles touch move event on the canvas.
              * @param {TouchEvent} event - The touch event object.
              */
-            myCanvas.addEventListener(
-                "touchmove",
-                event => {
-                    if (event.touches.length === 2) {
-                        event.preventDefault();
-                        const dx = event.touches[0].clientX - event.touches[1].clientX;
-                        const dy = event.touches[0].clientY - event.touches[1].clientY;
-                        const currentPinchDistance = Math.hypot(dx, dy);
+            const __touchMoveHandler = event => {
+                if (event.touches.length === 2) {
+                    event.preventDefault();
+                    const dx = event.touches[0].clientX - event.touches[1].clientX;
+                    const dy = event.touches[0].clientY - event.touches[1].clientY;
+                    const currentPinchDistance = Math.hypot(dx, dy);
 
-                        if (initialPinchDistance !== null && !that.resizeDebounce) {
-                            const pinchDelta = currentPinchDistance - initialPinchDistance;
-                            if (Math.abs(pinchDelta) > 20) {
-                                if (pinchDelta > 0) {
-                                    that.doLargerBlocks();
-                                } else {
-                                    that.doSmallerBlocks();
-                                }
-                                initialPinchDistance = currentPinchDistance;
+                    if (initialPinchDistance !== null && !that.resizeDebounce) {
+                        const pinchDelta = currentPinchDistance - initialPinchDistance;
+                        if (Math.abs(pinchDelta) > 20) {
+                            if (pinchDelta > 0) {
+                                that.doLargerBlocks();
+                            } else {
+                                that.doSmallerBlocks();
                             }
+                            initialPinchDistance = currentPinchDistance;
                         }
-
-                        let totalDeltaY = 0;
-                        let totalDeltaX = 0;
-                        let count = 0;
-
-                        for (let i = 0; i < 2; i++) {
-                            const touchY = event.touches[i].clientY;
-                            const touchX = event.touches[i].clientX;
-
-                            if (initialTouches[i][0] !== null && initialTouches[i][1] !== null) {
-                                totalDeltaY += touchY - initialTouches[i][0];
-                                totalDeltaX += touchX - initialTouches[i][1];
-                                count++;
-                            }
-
-                            initialTouches[i][0] = touchY;
-                            initialTouches[i][1] = touchX;
-                        }
-
-                        if (count > 0) {
-                            const avgDeltaY = totalDeltaY / count;
-                            const avgDeltaX = totalDeltaX / count;
-
-                            if (avgDeltaY !== 0) {
-                                closeAnyOpenMenusAndLabels();
-                                that.blocksContainer.y -= avgDeltaY;
-                            }
-
-                            if (that.scrollBlockContainer && avgDeltaX !== 0) {
-                                closeAnyOpenMenusAndLabels();
-                                that.blocksContainer.x -= avgDeltaX;
-                            }
-                        }
-
-                        that.refreshCanvas();
                     }
-                },
-                { passive: false }
-            );
+
+                    let totalDeltaY = 0;
+                    let totalDeltaX = 0;
+                    let count = 0;
+
+                    for (let i = 0; i < 2; i++) {
+                        const touchY = event.touches[i].clientY;
+                        const touchX = event.touches[i].clientX;
+
+                        if (initialTouches[i][0] !== null && initialTouches[i][1] !== null) {
+                            totalDeltaY += touchY - initialTouches[i][0];
+                            totalDeltaX += touchX - initialTouches[i][1];
+                            count++;
+                        }
+
+                        initialTouches[i][0] = touchY;
+                        initialTouches[i][1] = touchX;
+                    }
+
+                    if (count > 0) {
+                        const avgDeltaY = totalDeltaY / count;
+                        const avgDeltaX = totalDeltaX / count;
+
+                        if (avgDeltaY !== 0) {
+                            closeAnyOpenMenusAndLabels();
+                            that.blocksContainer.y -= avgDeltaY;
+                        }
+
+                        if (that.scrollBlockContainer && avgDeltaX !== 0) {
+                            closeAnyOpenMenusAndLabels();
+                            that.blocksContainer.x -= avgDeltaX;
+                        }
+                    }
+
+                    that.refreshCanvas();
+                }
+            };
+
+            // Remove previous touchmove event listener if it exists
+            if (this._touchMoveHandler) {
+                this.removeEventListener(myCanvas, "touchmove", this._touchMoveHandler, {
+                    passive: false
+                });
+            }
+
+            // Store the handler reference for future cleanup
+            this._touchMoveHandler = __touchMoveHandler;
+
+            this.addEventListener(myCanvas, "touchmove", __touchMoveHandler, { passive: false });
 
             /**
              * Handles touch end event on the canvas.
              */
-            myCanvas.addEventListener("touchend", () => {
+            const __touchEndHandler = () => {
                 for (let i = 0; i < 2; i++) {
                     initialTouches[i][0] = null;
                     initialTouches[i][1] = null;
                 }
                 initialPinchDistance = null;
-            });
+            };
+
+            // Remove previous touchend event listener if it exists
+            if (this._touchEndHandler) {
+                this.removeEventListener(myCanvas, "touchend", this._touchEndHandler);
+            }
+
+            // Store the handler reference for future cleanup
+            this._touchEndHandler = __touchEndHandler;
+
+            this.addEventListener(myCanvas, "touchend", __touchEndHandler);
 
             /**
              * Handles wheel event on the canvas.
@@ -1520,19 +1553,9 @@ class Activity {
                 });
             }
 
-            if (this._idleWatcherIntervalId) {
-                clearInterval(this._idleWatcherIntervalId);
-                this._idleWatcherIntervalId = null;
-            }
-
             let lastActivity = Date.now();
             let lastIdleReset = lastActivity;
             this.isAppIdle = false;
-
-            // Prevent duplicate intervals
-            if (this._idleWatcherIntervalId) {
-                clearInterval(this._idleWatcherIntervalId);
-            }
 
             // Wake up function - restores full framerate
             // Stored as instance property for cleanup
@@ -2246,7 +2269,11 @@ class Activity {
         let maxRefreshTime = 0;
         let lastRefreshReport = performance.now();
 
+        /** Suppress intermediate refreshCanvas() calls during project loading. */
+        this._suppressRefresh = false;
+
         this.refreshCanvas = () => {
+            if (this._suppressRefresh) return;
             this.stageDirty = true;
             this.update = true;
             this._startRenderLoop();
@@ -2832,7 +2859,13 @@ class Activity {
                 // Parse and update the custom musical mode with saved data.
                 try {
                     const customModeDataObj = JSON.parse(custommodeData);
-                    Object.assign(MUSICALMODES["custom"], customModeDataObj);
+                    const src = Array.isArray(customModeDataObj)
+                        ? customModeDataObj
+                        : Object.values(customModeDataObj);
+                    for (let i = 0; i < MUSICALMODES["custom"].length; i++) {
+                        const val = Number(src[i]);
+                        MUSICALMODES["custom"][i] = !isNaN(val) && val > 0 ? val : 1;
+                    }
                 } catch (e) {
                     ErrorHandler.recoverable(e, { operation: "parseCustomMode" });
                 }

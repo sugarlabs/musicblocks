@@ -354,6 +354,10 @@ describe("Utility Functions (logic-only)", () => {
         it("converts hex to rgba string", () => {
             expect(hex2rgb("ff0000")).toBe("rgba(255,0,0,1)");
         });
+
+        it("handles leading hash prefix", () => {
+            expect(hex2rgb("#ff0000")).toBe("rgba(255,0,0,1)");
+        });
     });
 
     describe("format() function logic", () => {

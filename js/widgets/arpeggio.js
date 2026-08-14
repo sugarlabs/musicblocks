@@ -30,6 +30,9 @@
 /* exported Arpeggio */
 
 class Arpeggio {
+    /** AMD module dependencies for lazy loading. */
+    static dependencies = ["widgets/arpeggio"];
+
     static BUTTONDIVWIDTH = 295;
     static CELLSIZE = 28;
     static BUTTONSIZE = 53;
@@ -544,10 +547,11 @@ class Arpeggio {
 
         this._playList = [];
         // Make a list of all the notes to play.
-        for (let n = 0; n < this.notesToPlay.length; n++) {
-            const noteValue = this.notesToPlay[n][1];
-            const letter = this.notesToPlay[n][0].slice(0, -1);
-            const octave = Number(this.notesToPlay[n][0].substr(this.notesToPlay[n][0].length - 1));
+        const notesToPlay = this.notesToPlay.length > 0 ? this.notesToPlay : [["C4", 1 / 16]];
+        for (let n = 0; n < notesToPlay.length; n++) {
+            const noteValue = notesToPlay[n][1];
+            const letter = notesToPlay[n][0].slice(0, -1);
+            const octave = Number(notesToPlay[n][0].substr(notesToPlay[n][0].length - 1));
             for (let i = 0; i < pairs.length; i++) {
                 if (pairs[i][0] === -1) {
                     this._playList.push(["", noteValue]);
@@ -689,14 +693,9 @@ class Arpeggio {
      */
     __playCell(rowIndex, colIndex, cell, playNote) {
         if (playNote) {
-            let letter, octave;
-            if (this.notesToPlay.length === 0) {
-                letter = "C";
-                octave = 4;
-            } else {
-                letter = this.notesToPlay[0][0].slice(0, -1);
-                octave = Number(this.notesToPlay[0][0].substr(this.notesToPlay[0][0].length - 1));
-            }
+            const noteData = this.notesToPlay[0] || ["C4", 1 / 16];
+            const letter = noteData[0].slice(0, -1);
+            const octave = Number(noteData[0].slice(-1));
             const noteObj = getNote(
                 letter,
                 octave,
@@ -711,7 +710,7 @@ class Arpeggio {
             this._activity.logo.synth.trigger(
                 0,
                 normalizeNoteAccidentals(note),
-                this.notesToPlay[0][1],
+                noteData[1],
                 DEFAULTVOICE,
                 null,
                 null,

@@ -349,10 +349,6 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
         window.Materialize = M;
     }
 
-    // Define essential globals for core modules
-    window._THIS_IS_MUSIC_BLOCKS_ = true;
-    window._THIS_IS_TURTLE_BLOCKS_ = false;
-
     // Load highlight optionally
     requirejs(
         ["highlight"],
@@ -403,6 +399,13 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                     window.localStorage.setItem("languagePreference", "ja");
                     window.localStorage.setItem("kanaPreference", "kanji");
                     return "ja";
+                }
+                // The language menu stores enUS/enUK, but the locale files are en/en_GB.
+                if (savedLanguage === "enUS") {
+                    return "en";
+                }
+                if (savedLanguage === "enUK") {
+                    return "en_GB";
                 }
                 return savedLanguage.startsWith("ja") ? "ja" : savedLanguage;
             }

@@ -115,6 +115,46 @@ function setupWidgetBlocks(activity) {
     }
 
     /**
+     * Deferred widget loader for construction inside a turtle listener rather
+     * than directly in flow(). Unlike _ensureWidget, there is no "loading"
+     * guard or interruption signal: listener bodies already run once, after
+     * the interpreter has moved on, so there is nothing for an interruption
+     * to interrupt. Shares the same (logo, widgetKey, modules, factory, ...)
+     * argument shape as _ensureWidget so the two loading paths read the same
+     * way at the call site.
+     *
+     * @param {object} logo - The logo object.
+     * @param {string} widgetKey - The key for the widget in the logo object.
+     * @param {string[]} modules - The modules to require.
+     * @param {Function} factory - Builds the widget instance.
+     * @param {Function} [onReady] - Optional callback run after assignment.
+     */
+    function _lazyLoadWidget(logo, widgetKey, modules, factory, onReady) {
+        _lazyRequire(modules, function () {
+            logo[widgetKey] = factory();
+            onReady?.();
+        });
+    }
+
+    function _hasValidMeterWidgetInput(logo) {
+        const blockList = activity.blocks.blockList;
+        const meterBlock = blockList[logo._meterBlock];
+        const meterConnections = meterBlock?.connections;
+        const beatCountBlock = blockList[meterConnections?.[1]];
+        const beatValueBlock = blockList[meterConnections?.[2]];
+        const beatValueConnections = beatValueBlock?.connections;
+        const numeratorBlock = blockList[beatValueConnections?.[1]];
+        const denominatorBlock = blockList[beatValueConnections?.[2]];
+
+        return (
+            meterBlock &&
+            typeof beatCountBlock?.value === "number" &&
+            typeof numeratorBlock?.value === "number" &&
+            typeof denominatorBlock?.value === "number"
+        );
+    }
+
+    /**
      * Represents a block for controlling sound envelope (ADSR).
      * @extends FlowBlock
      */
@@ -293,6 +333,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("temperament");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.setHelpString([
                 _("The Temperament tool is used to define custom tuning."),
@@ -330,7 +371,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "temperament",
-                ["widgets/temperament"],
+                TemperamentWidget.dependencies,
                 () => new TemperamentWidget(),
                 turtle,
                 blk,
@@ -340,6 +381,8 @@ function setupWidgetBlocks(activity) {
 
             logo.insideTemperament = true;
             logo.temperament.inTemperament = args[0];
+            logo.synth.changeInTemperament = true;
+            logo.synth.temperamentChanged(args[0], logo.synth.startingPitch);
             const scale = [];
 
             if (
@@ -416,7 +459,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "sample",
-                ["widgets/sampler"],
+                SampleWidget.dependencies,
                 () => new SampleWidget(),
                 turtle,
                 blk,
@@ -449,6 +492,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("timbre");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.setHelpString();
 
@@ -506,7 +550,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "timbre",
-                ["widgets/timbre"],
+                TimbreWidget.dependencies,
                 () => new TimbreWidget(),
                 turtle,
                 blk,
@@ -610,15 +654,26 @@ function setupWidgetBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             logo.insideMeterWidget = true;
+            logo._meterBlock = null;
 
             const listenerName = "_meterwidget_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
-                _lazyRequire(["widgets/meterwidget"], function () {
-                    logo.meterWidget = new MeterWidget(activity, blk);
+                if (!_hasValidMeterWidgetInput(logo)) {
                     logo.insideMeterWidget = false;
-                });
+                    return;
+                }
+
+                _lazyLoadWidget(
+                    logo,
+                    "meterWidget",
+                    MeterWidget.dependencies,
+                    () => new MeterWidget(activity, blk),
+                    () => {
+                        logo.insideMeterWidget = false;
+                    }
+                );
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -687,10 +742,15 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
-                _lazyRequire(["widgets/oscilloscope"], function () {
-                    logo.Oscilloscope = new Oscilloscope(activity);
-                    logo.inOscilloscope = false;
-                });
+                _lazyLoadWidget(
+                    logo,
+                    "Oscilloscope",
+                    Oscilloscope.dependencies,
+                    () => new Oscilloscope(activity),
+                    () => {
+                        logo.inOscilloscope = false;
+                    }
+                );
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -709,6 +769,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("modewidget");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
@@ -746,10 +807,15 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
-                _lazyRequire(["widgets/modewidget"], function () {
-                    logo.modeWidget = new ModeWidget(activity);
-                    logo.insideModeWidget = false;
-                });
+                _lazyLoadWidget(
+                    logo,
+                    "modeWidget",
+                    ModeWidget.dependencies,
+                    () => new ModeWidget(activity),
+                    () => {
+                        logo.insideModeWidget = false;
+                    }
+                );
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -768,6 +834,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("tempo");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
@@ -805,7 +872,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "tempo",
-                ["widgets/tempo"],
+                Tempo.dependencies,
                 () => new Tempo(),
                 turtle,
                 blk,
@@ -882,7 +949,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "arpeggio",
-                ["widgets/arpeggio"],
+                Arpeggio.dependencies,
                 () => new Arpeggio(),
                 turtle,
                 blk,
@@ -923,6 +990,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("pitchdrummatrix");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.setHelpString([
                 _("The Pitch drum matrix is used to map pitches to drum sounds."),
@@ -964,7 +1032,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "pitchDrumMatrix",
-                ["widgets/pitchdrummatrix"],
+                PitchDrumMatrix.dependencies,
                 () => new PitchDrumMatrix(),
                 turtle,
                 blk,
@@ -1015,6 +1083,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("pitchslider");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
             this.setHelpString([
@@ -1045,7 +1114,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "pitchSlider",
-                ["widgets/pitchslider"],
+                PitchSlider.dependencies,
                 () => new PitchSlider(),
                 turtle,
                 blk,
@@ -1163,6 +1232,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("musickeyboard");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
@@ -1204,7 +1274,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "musicKeyboard",
-                ["widgets/musickeyboard"],
+                MusicKeyboard.dependencies,
                 () => new MusicKeyboard(activity),
                 turtle,
                 blk,
@@ -1242,6 +1312,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("pitchstaircase");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
@@ -1276,7 +1347,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "pitchStaircase",
-                ["widgets/pitchstaircase"],
+                PitchStaircase.dependencies,
                 () => new PitchStaircase(),
                 turtle,
                 blk,
@@ -1345,6 +1416,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("rhythmruler2");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
 
             this.setHelpString([
@@ -1391,7 +1463,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "rhythmRuler",
-                ["widgets/rhythmruler"],
+                RhythmRuler.dependencies,
                 () => new RhythmRuler(),
                 turtle,
                 blk,
@@ -1496,6 +1568,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("matrix");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
@@ -1599,13 +1672,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "phraseMaker",
-                [
-                    "widgets/PhraseMakerUtils",
-                    "widgets/PhraseMakerGrid",
-                    "widgets/PhraseMakerUI",
-                    "widgets/PhraseMakerAudio",
-                    "widgets/phrasemaker"
-                ],
+                PhraseMaker.dependencies,
                 () => {
                     // Create explicit dependency object for PhraseMaker
                     const phraseMakerDeps = {
@@ -1728,6 +1795,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             super("status");
+            this.setCapability("collapsible");
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
@@ -1853,12 +1921,6 @@ function setupWidgetBlocks(activity) {
             };
 
             const structuralFields = collectStatusFields();
-            if (!logo.statusMatrix.isOpen || logo.statusFields.length === 0) {
-                logo.statusFields = structuralFields.slice();
-            }
-
-            dedupeStatusFields();
-            logo.statusMatrix.init(activity);
             logo.statusFields = []; // Clear for the actual interpreter run
 
             logo.inStatusMatrix = true;
@@ -1929,7 +1991,7 @@ function setupWidgetBlocks(activity) {
                 const interruption = _ensureWidget(
                     logo,
                     "aiMusic",
-                    ["widgets/aiwidget"],
+                    AIWidget.dependencies,
                     () => new AIWidget(),
                     turtle,
                     blk,
@@ -1980,7 +2042,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "reflection",
-                ["widgets/reflection"],
+                ReflectionMatrix.dependencies,
                 () => new ReflectionMatrix(),
                 turtle,
                 blk,
@@ -1988,7 +2050,6 @@ function setupWidgetBlocks(activity) {
             );
             if (interruption) return interruption;
 
-            logo.reflection.init(activity);
             logo.statusFields = [];
 
             logo.inReflectionMatrix = true;
@@ -2065,7 +2126,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "legoWidget",
-                ["widgets/legobricks"],
+                LegoWidget.dependencies,
                 () => new LegoWidget(),
                 turtle,
                 blk,
@@ -2135,7 +2196,7 @@ function setupWidgetBlocks(activity) {
             const interruption = _ensureWidget(
                 logo,
                 "aiDebugger",
-                ["widgets/aidebugger"],
+                AIDebuggerWidget.dependencies,
                 () => new AIDebuggerWidget(),
                 turtle,
                 blk,

@@ -39,6 +39,8 @@ class Sampler {
         this.triggerRelease = jest.fn().mockReturnThis();
         this.triggerAttackRelease = jest.fn().mockReturnThis();
         this.chain = jest.fn().mockReturnThis();
+        this.playbackRate = { value: 1 };
+        this.loaded = true;
     }
 }
 
@@ -52,6 +54,17 @@ class Player {
         this.stop = jest.fn().mockReturnThis();
         this.dispose = jest.fn().mockReturnThis();
         this.triggerAttackRelease = jest.fn().mockReturnThis();
+        this.volume = {
+            value: 0,
+            cancelScheduledValues: jest.fn().mockReturnThis(),
+            setValueAtTime: jest.fn().mockReturnThis(),
+            linearRampToValueAtTime: jest.fn().mockReturnThis(),
+            rampTo: jest.fn().mockImplementation(val => {
+                this.volume.value = val;
+            })
+        };
+        this.playbackRate = { value: 1 };
+        this.loaded = true;
     }
 }
 
@@ -119,9 +132,23 @@ class PolySynth {
     constructor(synth, count) {
         this.synth = synth;
         this.count = count;
-        this.triggerAttack = jest.fn().mockReturnThis();
-        this.start = jest.fn().mockReturnThis();
-        this.triggerAttackRelease = jest.fn().mockReturnThis();
+        // Mirrors Tone.js: dispose() flips `disposed`, and triggering a disposed
+        // node throws "Synth was already disposed". Without this the mock silently
+        // tolerates use-after-dispose and such bugs pass unnoticed.
+        this.disposed = false;
+        this.dispose = jest.fn().mockImplementation(() => {
+            this.disposed = true;
+            return this;
+        });
+        const assertLive = () => {
+            if (this.disposed) {
+                throw new Error("Synth was already disposed");
+            }
+        };
+        this.triggerAttack = jest.fn().mockImplementation(assertLive);
+        this.start = jest.fn().mockImplementation(assertLive);
+        this.triggerRelease = jest.fn().mockImplementation(assertLive);
+        this.triggerAttackRelease = jest.fn().mockImplementation(assertLive);
         this.volume = {
             value: 0,
             cancelScheduledValues: jest.fn().mockReturnThis(),

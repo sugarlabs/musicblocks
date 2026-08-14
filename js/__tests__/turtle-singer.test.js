@@ -20,24 +20,36 @@
 global.DEFAULTVOLUME = 100;
 global.TARGETBPM = 120;
 global.TONEBPM = 60;
+global.clampNumber = require("../utils/utils-logic").clampNumber;
 
 const Singer = require("../turtle-singer");
 
 const mockGlobals = {
     getNote: jest.fn().mockReturnValue(["C", 4]),
     isCustomTemperament: jest.fn(),
+    isTrueEDO: jest.fn().mockReturnValue(true),
     getStepSizeUp: jest.fn().mockReturnValue(1),
     numberToPitch: jest.fn().mockReturnValue(["C", 4]),
     pitchToNumber: jest.fn().mockReturnValue(60),
-    getTemperament: jest.fn().mockReturnValue({ pitchNumber: 12 })
+    getTemperament: jest.fn().mockReturnValue({ pitchNumber: 12 }),
+    getCurrentEDO: jest.fn().mockReturnValue(12),
+    getEdoNoteNamePosition: jest.fn().mockReturnValue(0),
+    generateNoteNames: jest
+        .fn()
+        .mockReturnValue(["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"])
 };
 
 global.getNote = mockGlobals.getNote;
 global.isCustomTemperament = mockGlobals.isCustomTemperament;
+global.isTrueEDO = mockGlobals.isTrueEDO;
 global.getStepSizeUp = mockGlobals.getStepSizeUp;
 global.numberToPitch = mockGlobals.numberToPitch;
 global.pitchToNumber = mockGlobals.pitchToNumber;
 global.getTemperament = mockGlobals.getTemperament;
+global.getCurrentEDO = mockGlobals.getCurrentEDO;
+global.getEdoNoteNamePosition = mockGlobals.getEdoNoteNamePosition;
+global.generateNoteNames = mockGlobals.generateNoteNames;
+global.EDOBOUNDEXCEEDED = "Pitch index exceeds EDO range";
 global.last = jest.fn(array => array[array.length - 1]);
 global.deepClone = value => {
     if (typeof structuredClone === "function") {
@@ -962,6 +974,24 @@ describe("processNote regression behavior", () => {
         const setTimeoutSpy = jest.spyOn(global, "setTimeout");
         Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
         expect(setTimeoutSpy).not.toHaveBeenCalled();
+    });
+
+    test("shows an error when a weighted-partials clamp has no Partial blocks", () => {
+        activityMock.errorMsg = jest.fn();
+        singer.inHarmonic = ["mockBlk"];
+        singer.partials = [[]];
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+        expect(activityMock.errorMsg).toHaveBeenCalledWith(
+            "You must have at least one Partial block inside of a Weighted-partial block"
+        );
+    });
+
+    test("does not show the partials error when the clamp has Partial blocks", () => {
+        activityMock.errorMsg = jest.fn();
+        singer.inHarmonic = ["mockBlk"];
+        singer.partials = [[0, 1, 0]];
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+        expect(activityMock.errorMsg).not.toHaveBeenCalled();
     });
 });
 

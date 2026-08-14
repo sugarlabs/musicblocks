@@ -45,7 +45,7 @@ function setupOrnamentActions(activity) {
         static setStaccato(value, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            if (value === 0) {
+            if (typeof value !== "number" || isNaN(value) || value === 0) {
                 activity.errorMsg(_("Staccato value must be non-zero."), blk);
                 return;
             }
@@ -75,7 +75,7 @@ function setupOrnamentActions(activity) {
         static setSlur(value, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            if (value === 0) {
+            if (typeof value !== "number" || isNaN(value) || value === 0) {
                 activity.errorMsg(_("Slur value must be non-zero."), blk);
                 return;
             }

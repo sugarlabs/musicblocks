@@ -1,6 +1,6 @@
 {
     "name": "musicblocks",
-    "version": "3.4.1",
+    "version": "3.7.1",
     "main": "electron-main.js",
     "description": "A musical microworld",
     "repository": {
@@ -25,6 +25,7 @@
         "prod": "cross-env NODE_ENV=production node index.js",
         "test": "jest",
         "test:coverage": "jest --coverage",
+        "test:mutation": "stryker run",
         "cypress:run": "cypress run",
         "electron": "electron .",
         "dist": "electron-builder"
@@ -35,6 +36,11 @@
         "@babel/preset-env": "^7.29.5",
         "@commitlint/cli": "^19.0.0",
         "@commitlint/config-conventional": "^19.0.0",
+        "@stryker-mutator/api": "9.6.1",
+        "@stryker-mutator/core": "9.6.1",
+        "@stryker-mutator/instrumenter": "9.6.1",
+        "@stryker-mutator/jest-runner": "9.6.1",
+        "@stryker-mutator/util": "9.6.1",
         "cross-env": "^7.0.3",
         "cypress": "^15.15.0",
         "electron": "40.8.5",
@@ -92,10 +98,15 @@
         }
     },
     "overrides": {
+        "@electron/rebuild": "3.7.2",
+        "nanoid": "^3.3.17",
         "electron": "40.8.5",
         "flatted": "3.4.2",
         "lodash": "4.18.1",
         "brace-expansion": "2.0.3",
+        "minimatch@^10.0.0": {
+            "brace-expansion": "^5.0.5"
+        },
         "tar": "^7.5.10",
         "path-to-regexp": "^8.4.0",
         "picomatch": "^4.0.4",
@@ -107,13 +118,18 @@
         "@commitlint/config-validator": {
             "ajv": "^8.0.0"
         },
+        "@stryker-mutator/core": {
+            "ajv": "~8.18.0"
+        },
         "@isaacs/brace-expansion": "^5.0.1",
-        "immutable": "^5.1.5",
-        "svgo": "^4.0.1",
+        "immutable": "5.1.9",
+        "svgo": "4.0.2",
         "@xmldom/xmldom": "^0.8.13",
         "@gulp-sourcemaps/identity-map": {
             "postcss": "^8.4.31"
-        }
+        },
+        "body-parser": "2.3.0",
+        "qs": "6.15.3"
     },
     "lint-staged": {
         "*.{js,mjs}": [

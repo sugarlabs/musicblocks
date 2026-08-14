@@ -53,6 +53,9 @@
  * rotating, and inverting modes.
  */
 class ModeWidget {
+    /** AMD module dependencies for lazy loading. */
+    static dependencies = ["widgets/modewidget"];
+
     static ICONSIZE = 32;
     static BUTTONSIZE = 53;
     static ROTATESPEED = 125;

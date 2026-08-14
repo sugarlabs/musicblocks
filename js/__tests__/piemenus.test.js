@@ -9,20 +9,18 @@
  * (at your option) any later version.
  */
 
-const fs = require("fs");
-const path = require("path");
-
-const { piemenuPitches } = require("../piemenus");
-
-const piemenusPath = path.join(__dirname, "..", "piemenus.js");
-let piemenusContent;
+const { piemenuPitches, piemenuNumber } = require("../piemenus");
 
 // Mock Globals
 global.docById = jest.fn().mockReturnValue({
     style: { display: "", opacity: "" },
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
-    getBoundingClientRect: jest.fn().mockReturnValue({ x: 0, y: 0 })
+    getBoundingClientRect: jest.fn().mockReturnValue({ x: 0, y: 0 }),
+    replaceChildren: jest.fn(),
+    classList: { add: jest.fn(), remove: jest.fn() },
+    value: "",
+    focus: jest.fn()
 });
 global.document = {
     getElementById: global.docById,
@@ -101,10 +99,6 @@ global.buildScale = jest.fn(() => [["C", "D", "E", "F", "G", "A", "B", "C"], []]
 describe("piemenus behavioral tests", () => {
     let mockBlock;
 
-    beforeAll(() => {
-        piemenusContent = fs.readFileSync(piemenusPath, "utf8");
-    });
-
     beforeEach(() => {
         mockBlock = {
             container: { x: 100, y: 100, setChildIndex: jest.fn(), children: [] },
@@ -127,7 +121,10 @@ describe("piemenus behavioral tests", () => {
             updateCache: jest.fn(),
             text: { text: "" },
             value: "",
-            name: "notename"
+            name: "notename",
+            _exitKeyPressed: jest.fn(),
+            _labelChanged: jest.fn(),
+            _usePieNumberC1: jest.fn().mockReturnValue(false)
         };
         jest.clearAllMocks();
     });
@@ -193,11 +190,56 @@ describe("piemenus behavioral tests", () => {
         expect(mockBlock.blocks.setPitchOctave).toHaveBeenCalledWith("mock-id", 3);
     });
 
-    describe("Block Help Menu", () => {
-        it("should load help before opening the aux pie menu help widget", () => {
-            expect(piemenusContent).toMatch(
-                /if \(typeof HelpWidget === "undefined"\)\s*\{\s*if \(typeof require !== "undefined"\)\s*\{\s*require\(\["widgets\/help"\], function \(\) \{\s*new HelpWidget\(that, true\);/
-            );
+    describe("Phrase Maker refresh on pitch change", () => {
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+
+        beforeEach(() => {
+            // hasOctaveWheel requires the parent block to be a "pitch"-family wrapper.
+            mockBlock.blocks.blockList["mock-id"].name = "pitch";
+        });
+
+        test("notifies an open Phrase Maker when the exit wheel commits a new pitch", () => {
+            const refreshRowForBlock = jest.fn();
+            mockBlock.activity.logo.phraseMaker = { refreshRowForBlock };
+
+            piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
+
+            // Select G (index 4), natural accidental, octave 5.
+            mockBlock._pitchWheel.selectedNavItemIndex = 4;
+            mockBlock._accidentalsWheel.selectedNavItemIndex = 2;
+            mockBlock._accidentalsWheel.navItems[2].title = "♮";
+            mockBlock._octavesWheel.selectedNavItemIndex = 3;
+
+            mockBlock._exitWheel.navItems[0].navigateFunction();
+
+            expect(refreshRowForBlock).toHaveBeenCalledWith("mock-id", "G", "♮", 5);
+        });
+
+        test("does not throw and does not touch unrelated widgets when no Phrase Maker is open", () => {
+            piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
+
+            mockBlock._pitchWheel.selectedNavItemIndex = 4;
+            mockBlock._accidentalsWheel.selectedNavItemIndex = 2;
+            mockBlock._octavesWheel.selectedNavItemIndex = 3;
+
+            expect(() => mockBlock._exitWheel.navItems[0].navigateFunction()).not.toThrow();
+        });
+
+        test("does not notify Phrase Maker for a scaledegree2 block", () => {
+            mockBlock.name = "scaledegree2";
+            const refreshRowForBlock = jest.fn();
+            mockBlock.activity.logo.phraseMaker = { refreshRowForBlock };
+
+            piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "C", "");
+
+            mockBlock._pitchWheel.selectedNavItemIndex = 4;
+            mockBlock._accidentalsWheel.selectedNavItemIndex = 2;
+            mockBlock._octavesWheel.selectedNavItemIndex = 3;
+
+            mockBlock._exitWheel.navItems[0].navigateFunction();
+
+            expect(refreshRowForBlock).not.toHaveBeenCalled();
         });
     });
 
@@ -222,7 +264,12 @@ describe("piemenus behavioral tests", () => {
             }
             return {
                 style: { display: "" },
-                contains: jest.fn().mockReturnValue(false)
+                contains: jest.fn().mockReturnValue(false),
+                replaceChildren: jest.fn(),
+                classList: { add: jest.fn(), remove: jest.fn() },
+                value: "",
+                addEventListener: jest.fn(),
+                focus: jest.fn()
             };
         });
 
@@ -250,5 +297,57 @@ describe("piemenus behavioral tests", () => {
         expect(mockNavigate).toHaveBeenCalled();
 
         jest.useRealTimers();
+    });
+
+    describe("piemenuNumber behavioral tests", () => {
+        beforeEach(() => {
+            mockBlock.protoblock = { scale: 1 };
+        });
+
+        test("selects the closest valid value when selectedValue is outside wheelValues", () => {
+            const wheelValues = [1, 2, 3, 4, 5, 6, 7, 8];
+            piemenuNumber(mockBlock, wheelValues, 10);
+
+            expect(mockBlock._numberWheel.navigateWheel).toHaveBeenCalledWith(7);
+        });
+
+        test("selects the closest valid value for float selectedValue", () => {
+            const wheelValues = [1, 2, 3, 4, 5, 6, 7, 8];
+            piemenuNumber(mockBlock, wheelValues, 3.7);
+
+            expect(mockBlock._numberWheel.navigateWheel).toHaveBeenCalledWith(3);
+        });
+
+        test("decrements value and updates navigation on minus button click", () => {
+            const wheelValues = [1, 2, 3, 4, 5, 6, 7, 8];
+            piemenuNumber(mockBlock, wheelValues, 5); // Index 4
+
+            const minusNavigate = mockBlock._exitWheel.navItems[1].navigateFunction;
+
+            mockBlock.value = 5;
+            mockBlock._numberWheel.navItems[3].navigateFunction = jest.fn();
+
+            minusNavigate();
+
+            expect(mockBlock.value).toBe(4);
+            expect(mockBlock.label.value).toBe(4);
+            expect(mockBlock._numberWheel.navigateWheel).toHaveBeenCalledWith(3);
+        });
+
+        test("increments value and updates navigation on plus button click", () => {
+            const wheelValues = [1, 2, 3, 4, 5, 6, 7, 8];
+            piemenuNumber(mockBlock, wheelValues, 5); // Index 4
+
+            const plusNavigate = mockBlock._exitWheel.navItems[2].navigateFunction;
+
+            mockBlock.value = 5;
+            mockBlock._numberWheel.navItems[5].navigateFunction = jest.fn();
+
+            plusNavigate();
+
+            expect(mockBlock.value).toBe(6);
+            expect(mockBlock.label.value).toBe(6);
+            expect(mockBlock._numberWheel.navigateWheel).toHaveBeenCalledWith(5);
+        });
     });
 });

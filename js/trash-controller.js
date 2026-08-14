@@ -60,7 +60,7 @@ class TrashController {
 
         // Cache DOM element reference for performance
         const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-        if (helpfulWheelDiv.style.display !== "none") {
+        if (helpfulWheelDiv && helpfulWheelDiv.style.display !== "none") {
             helpfulWheelDiv.style.display = "none";
             activity.__tick();
         }
@@ -80,7 +80,7 @@ class TrashController {
 
         // Cache DOM element reference for performance
         const helpfulWheelDiv = document.getElementById("helpfulWheelDiv");
-        if (helpfulWheelDiv.style.display !== "none") {
+        if (helpfulWheelDiv && helpfulWheelDiv.style.display !== "none") {
             helpfulWheelDiv.style.display = "none";
             activity.__tick();
         }

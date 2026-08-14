@@ -1717,7 +1717,13 @@ class ToolbarUI {
 
             // Set up click handlers for each language
             languages.forEach(lang => {
-                docById(lang).onclick = () => {
+                const langElem = docById(lang);
+                if (!langElem) {
+                    console.warn(`No entry for "${lang}" in #languagedropdown`);
+                    return;
+                }
+
+                langElem.onclick = () => {
                     // Update highlight to newly selected language
                     updateSelectedLanguageHighlight(lang);
 

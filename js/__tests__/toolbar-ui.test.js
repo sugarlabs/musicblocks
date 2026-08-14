@@ -58,8 +58,6 @@ const createMockElement = id => ({
 });
 
 document.getElementById = jest.fn(createMockElement);
-jest.spyOn(document, "addEventListener").mockImplementation(() => {});
-jest.spyOn(document, "removeEventListener").mockImplementation(() => {});
 global.docById = id => document.getElementById(id);
 
 describe("ToolbarUI - Visual Helpers", () => {
@@ -169,6 +167,10 @@ describe("ToolbarUI - Visual Helpers", () => {
 });
 
 describe("FocusCycleManager - dispose", () => {
+    beforeEach(() => {
+        jest.spyOn(document, "addEventListener").mockImplementation(() => {});
+        jest.spyOn(document, "removeEventListener").mockImplementation(() => {});
+    });
     test("dispose removes all document-level event listeners", () => {
         const { FocusCycleManager } = require("../toolbar-ui");
         const manager = new FocusCycleManager();

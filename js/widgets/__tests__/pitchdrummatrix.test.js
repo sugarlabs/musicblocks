@@ -230,6 +230,85 @@ describe("PitchDrumMatrix Widget", () => {
         });
     });
 
+    // --- _setPlayButtonIcon Tests ---
+    describe("_setPlayButtonIcon", () => {
+        let mockActivity;
+
+        beforeEach(() => {
+            mockActivity = {
+                logo: {
+                    synth: { stop: jest.fn() },
+                    turtleDelay: 0
+                },
+                hideMsgs: jest.fn(),
+                textMsg: jest.fn()
+            };
+            pdm.init(mockActivity);
+        });
+
+        test("should set play icon when state is 'play'", () => {
+            const appendChildSpy = jest.fn();
+            pdm.playButton = {
+                textContent: "",
+                appendChild: appendChildSpy
+            };
+
+            pdm._setPlayButtonIcon("play");
+
+            // Should clear existing content first
+            expect(pdm.playButton.textContent).toBe("\u00A0\u00A0");
+            // Should append img and text node (2 calls)
+            expect(appendChildSpy).toHaveBeenCalledTimes(2);
+        });
+
+        test("should set stop icon when state is 'stop'", () => {
+            const appendChildSpy = jest.fn();
+            pdm.playButton = {
+                textContent: "",
+                appendChild: appendChildSpy
+            };
+
+            pdm._setPlayButtonIcon("stop");
+
+            expect(pdm.playButton.textContent).toBe("\u00A0\u00A0");
+            expect(appendChildSpy).toHaveBeenCalledTimes(2);
+        });
+
+        test("should create img element with correct play attributes", () => {
+            const appendedElements = [];
+            pdm.playButton = {
+                textContent: "",
+                appendChild: el => appendedElements.push(el)
+            };
+
+            pdm._setPlayButtonIcon("play");
+
+            const img = appendedElements[0];
+            expect(img.src).toContain("header-icons/play-button.svg");
+            expect(img.title).toBe("Play");
+            expect(img.alt).toBe("Play");
+            expect(img.getAttribute("height")).toBe(String(PitchDrumMatrix.ICONSIZE));
+            expect(img.getAttribute("width")).toBe(String(PitchDrumMatrix.ICONSIZE));
+        });
+
+        test("should create img element with correct stop attributes", () => {
+            const appendedElements = [];
+            pdm.playButton = {
+                textContent: "",
+                appendChild: el => appendedElements.push(el)
+            };
+
+            pdm._setPlayButtonIcon("stop");
+
+            const img = appendedElements[0];
+            expect(img.src).toContain("header-icons/stop-button.svg");
+            expect(img.title).toBe("Stop");
+            expect(img.alt).toBe("Stop");
+            expect(img.getAttribute("height")).toBe(String(PitchDrumMatrix.ICONSIZE));
+            expect(img.getAttribute("width")).toBe(String(PitchDrumMatrix.ICONSIZE));
+        });
+    });
+
     // --- Init & Close Cleanup Tests ---
     describe("onclose cleanup", () => {
         test("should set _playing to false and stop synth when closed", () => {

@@ -34,16 +34,16 @@ function fnBrowserDetect() {
     const userAgent = navigator.userAgent;
     let browserName;
 
-    if (userAgent.match(/chrome|chromium|crios/i)) {
+    if (userAgent.match(/edg/i)) {
+        browserName = "edge";
+    } else if (userAgent.match(/opr\//i)) {
+        browserName = "opera";
+    } else if (userAgent.match(/chrome|chromium|crios/i)) {
         browserName = "chrome";
     } else if (userAgent.match(/firefox|fxios/i)) {
         browserName = "firefox";
     } else if (userAgent.match(/safari/i)) {
         browserName = "safari";
-    } else if (userAgent.match(/opr\//i)) {
-        browserName = "opera";
-    } else if (userAgent.match(/edg/i)) {
-        browserName = "edge";
     } else {
         browserName = "No browser detection";
     }
@@ -97,7 +97,14 @@ function doBrowserCheck() {
  */
 function canvasPixelRatio() {
     const devicePixelRatio = window.devicePixelRatio || 1;
-    const context = document.querySelector("#myCanvas").getContext("2d");
+    const canvas = document.querySelector("#myCanvas");
+    if (!canvas) {
+        return devicePixelRatio;
+    }
+    const context = canvas.getContext("2d");
+    if (!context) {
+        return devicePixelRatio;
+    }
     const backingStoreRatio =
         context.webkitBackingStorePixelRatio ||
         context.mozBackingStorePixelRatio ||

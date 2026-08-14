@@ -31,6 +31,8 @@ function setupDrumBlocks(activity) {
             // Call the constructor of the parent class (ValueBlock)
             super("noisename", _("noise name"));
             this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
+            this.setCapability("wideLabel");
 
             /**
              * Sets the palette for the block.
@@ -75,6 +77,8 @@ function setupDrumBlocks(activity) {
             // Call the constructor of the parent class (ValueBlock)
             super("drumname", _("drum name"));
             this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
+            this.setCapability("wideLabel");
 
             /**
              * Sets the palette for the block.
@@ -120,6 +124,8 @@ function setupDrumBlocks(activity) {
             // Call the constructor of the parent class (ValueBlock)
             super("effectsname", _("effects name"));
             this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
+            this.setCapability("wideLabel");
 
             /**
              * Sets the palette for the block.
@@ -497,6 +503,7 @@ function setupDrumBlocks(activity) {
             /**
              * Set the palette, configure as a beginner block, and form the block.
              */
+            this.setCapability("soundSpecifier");
             this.setPalette("drum", activity);
             this.beginnerBlock(true);
 

@@ -248,4 +248,41 @@ describe("recorder", () => {
             expect(mockTrack.stop).toHaveBeenCalled();
         });
     });
+
+    describe("recordScreenWithTools", () => {
+        it("stops the getDisplayMedia tracks after recording is stopped", async () => {
+            const mockTrack = { stop: jest.fn(), addEventListener: jest.fn() };
+            const mockDisplayStream = { getTracks: () => [mockTrack] };
+
+            Object.defineProperty(global.navigator, "mediaDevices", {
+                value: { getDisplayMedia: jest.fn().mockResolvedValue(mockDisplayStream) },
+                configurable: true
+            });
+            global.localStorage = { getItem: jest.fn(() => null) };
+
+            const { doRecordButton, setupActivityRecorder } = require("../recorder");
+            const instance = {
+                textMsg: jest.fn(),
+                canvas: { height: 600 },
+                _onResize: jest.fn(),
+                logo: { synth: { tone: null } }
+            };
+            setupActivityRecorder(instance);
+            doRecordButton(instance);
+
+            // Fire the click handler recording() registered - this drives
+            // recordScreen() -> recordScreenWithTools() -> createRecorder()
+            const startHandler = mockStart._recordHandler;
+            await startHandler();
+
+            // Fire the stop handler that gets armed once recording begins
+            const stopHandler = mockStart.addEventListener.mock.calls
+                .filter(c => c[0] === "click")
+                .pop()[1];
+            stopHandler();
+            jest.runOnlyPendingTimers();
+
+            expect(mockTrack.stop).toHaveBeenCalled();
+        });
+    });
 });

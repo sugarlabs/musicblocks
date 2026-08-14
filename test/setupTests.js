@@ -1,3 +1,30 @@
+/**
+ * MusicBlocks v3.4.1
+ *
+ * @author Music Blocks Contributors
+ *
+ * @copyright 2026 Music Blocks Contributors
+ *
+ * @license
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+afterEach(() => {
+    jest.clearAllMocks();
+    jest.restoreAllMocks();
+});
+
 // Set up i18n function before loading musicutils
 global._ = x => x;
 
@@ -9,6 +36,7 @@ if (typeof global.TextEncoder === "undefined") {
 
 // Set up globals needed by musicutils.js
 global.INVALIDPITCH = "Not a valid pitch name";
+global.EDOBOUNDEXCEEDED = "Pitch index exceeds EDO range";
 
 // Load centralized music constants for all tests
 const {
@@ -39,7 +67,7 @@ const {
     FIXEDSOLFEGE1,
     CENTSSYMBOL,
     MUSICALMODES
-} = require("./js/utils/musicutils.js");
+} = require("../js/utils/musicutils.js");
 
 // Set commonly used constants as globals for backward compatibility with tests
 global.SHARP = SHARP;
@@ -113,3 +141,6 @@ Object.defineProperty(HTMLCanvasElement.prototype, "getContext", {
         return mockContext;
     })
 });
+
+// Minimal globals (ONLY safe defaults)
+global.requestAnimationFrame = cb => setTimeout(cb, 0);
