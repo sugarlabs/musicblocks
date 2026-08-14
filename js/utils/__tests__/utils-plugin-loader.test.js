@@ -260,4 +260,37 @@ describe("updatePluginObj - prototype pollution guard", () => {
             ).toBe(false);
         }
     });
+
+    it("does not throw when a plugin is missing optional sections", () => {
+        const activity = {
+            pluginObjs: {
+                PALETTEPLUGINS: {},
+                PALETTEFILLCOLORS: {},
+                PALETTESTROKECOLORS: {},
+                PALETTEHIGHLIGHTCOLORS: {},
+                FLOWPLUGINS: {},
+                ARGPLUGINS: {},
+                BLOCKPLUGINS: {},
+                MACROPLUGINS: {},
+                ONLOAD: {},
+                ONSTART: {},
+                ONSTOP: {}
+            }
+        };
+
+        // Shape of plugins/maths.json: no FLOWPLUGINS, ONLOAD, ONSTART, ONSTOP.
+        const mathsLike = JSON.parse(
+            '{"PALETTEPLUGINS":{"maths":{"name":"maths"}},"ARGPLUGINS":{"a":"code"},"BLOCKPLUGINS":{"b":"code"}}'
+        );
+        expect(() => updatePluginObj(activity, mathsLike)).not.toThrow();
+
+        // Shape of plugins/accelerometer.json: no PALETTEPLUGINS at all.
+        const accelerometerLike = JSON.parse(
+            '{"GLOBALS":"var x=1;","ARGPLUGINS":{"a":"code"},"BLOCKPLUGINS":{"b":"code"}}'
+        );
+        expect(() => updatePluginObj(activity, accelerometerLike)).not.toThrow();
+
+        expect(activity.pluginObjs["PALETTEPLUGINS"]["maths"]).toEqual({ name: "maths" });
+        expect(activity.pluginObjs["ARGPLUGINS"]["a"]).toBe("code");
+    });
 });
