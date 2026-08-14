@@ -775,13 +775,9 @@ class Painter {
      * @private
      */
     _processColor() {
-        if (this._canvasColor[0] === "#") {
-            this._canvasColor = hex2rgb(this._canvasColor.split("#")[1]);
-        }
-
-        const subrgb = this._canvasColor.substr(0, this._canvasColor.length - 2);
-        this.turtle.ctx.strokeStyle = subrgb + this._canvasAlpha + ")";
-        this.turtle.ctx.fillStyle = subrgb + this._canvasAlpha + ")";
+        const color = hex2rgb(this._canvasColor, this._canvasAlpha);
+        this.turtle.ctx.strokeStyle = color;
+        this.turtle.ctx.fillStyle = color;
     }
 
     /**
@@ -1400,10 +1396,7 @@ class Painter {
         this._fillState = false;
         this._hollowState = false;
 
-        this._canvasColor = getMunsellColor(this.color, this.value, this.chroma);
-        if (this._canvasColor[0] === "#") {
-            this._canvasColor = hex2rgb(this._canvasColor.split("#")[1]);
-        }
+        this._canvasColor = hex2rgb(getMunsellColor(this.color, this.value, this.chroma));
 
         this._svgOutput = "";
         this._svgPath = false;

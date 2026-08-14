@@ -910,7 +910,7 @@ describe("Internal Drawing Helpers and Hollow Lines", () => {
     test("_processColor should parse color hex codes", () => {
         painter.canvasColor = "#ff0031";
         painter._processColor();
-        expect(hex2rgb).toHaveBeenCalledWith("ff0031");
+        expect(hex2rgb).toHaveBeenCalledWith("#ff0031", 1);
         expect(mockTurtle.ctx.strokeStyle).toBe("rgba(255,0,49,1)");
     });
 

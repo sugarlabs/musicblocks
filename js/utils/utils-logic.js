@@ -577,18 +577,22 @@ var hexToRGB = hex => {
 };
 
 /**
- * Converts a hexcode to RGBA format.
+ * Converts a hexadecimal color code to RGBA format.
+ * Supports both 3-digit shorthand (#rgb) and 6-digit (#rrggbb) formats with an optional alpha parameter.
+ * @param {string} hex - Hex color code (3-digit or 6-digit, with or without #)
+ * @param {number} [alpha=1] - Alpha transparency value (0 to 1)
+ * @returns {string} RGBA formatted string e.g. "rgba(255,0,0,1)"
  */
-var hex2rgb = hex => {
+var hex2rgb = (hex, alpha = 1) => {
     if (typeof hex !== "string") return "rgba(0,0,0,1)";
-    const cleanHex = hex.startsWith("#") ? hex.slice(1) : hex;
-    const bigint = parseInt(cleanHex, 16);
-    if (Number.isNaN(bigint)) return "rgba(0,0,0,1)";
-    const r = (bigint >> 16) & 255;
-    const g = (bigint >> 8) & 255;
-    const b = bigint & 255;
-
-    return "rgba(" + r + "," + g + "," + b + ",1)";
+    const rgb = hexToRGB(hex);
+    if (!rgb) return "rgba(0,0,0,1)";
+    const safeAlpha = clampNumber(
+        typeof alpha === "number" && !Number.isNaN(alpha) ? alpha : 1,
+        0,
+        1
+    );
+    return `rgba(${rgb.r},${rgb.g},${rgb.b},${safeAlpha})`;
 };
 
 /**
