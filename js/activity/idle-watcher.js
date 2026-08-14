@@ -39,16 +39,24 @@ const setupActivityIdleWatcher = activityInstance => {
         activity._stopIdleWatcher();
 
         const IDLE_THRESHOLD = 5000; // 5 seconds
+        const ACTIVE_RESET_INTERVAL = 500;
         const ACTIVE_FPS = 60;
         const IDLE_FPS = 1;
 
         let lastActivity = Date.now();
+        let lastIdleReset = lastActivity;
         activity.isAppIdle = false;
 
         // Wake up function - restores full framerate
         // Stored as instance property for cleanup
         activity._resetIdleTimer = () => {
-            lastActivity = Date.now();
+            const now = Date.now();
+            if (!activity.isAppIdle && now - lastIdleReset < ACTIVE_RESET_INTERVAL) {
+                return;
+            }
+
+            lastActivity = now;
+            lastIdleReset = now;
             if (activity.isAppIdle) {
                 activity.isAppIdle = false;
                 createjs.Ticker.framerate = ACTIVE_FPS;
@@ -67,7 +75,10 @@ const setupActivityIdleWatcher = activityInstance => {
         // Periodic check for idle state - store interval ID for cleanup
         activity._idleWatcherInterval = setInterval(() => {
             // Check if music/code is playing
-            const isMusicPlaying = activity.turtles?.running() || false;
+            const isMusicPlaying =
+                activity.turtles && typeof activity.turtles.running === "function"
+                    ? activity.turtles.running()
+                    : false;
 
             if (!isMusicPlaying && Date.now() - lastActivity > IDLE_THRESHOLD) {
                 if (!activity.isAppIdle) {
