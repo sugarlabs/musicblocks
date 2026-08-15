@@ -109,7 +109,7 @@ function setupMeterActions(activity) {
         static setBPM(bpm, beatValue, turtle, blk) {
             let _bpm = (bpm * beatValue) / 0.25;
             let obj, target;
-            if (_bpm < 30) {
+            if (Number.isNaN(_bpm) || !Number.isFinite(_bpm) || _bpm < 30) {
                 obj = rationalToFraction(beatValue);
                 target = (30 * 0.25) / beatValue;
                 activity.errorMsg(
@@ -133,7 +133,7 @@ function setupMeterActions(activity) {
         static setMasterBPM(bpm, beatValue, blk) {
             const _bpm = (bpm * beatValue) / 0.25;
             let obj, target;
-            if (_bpm < 30) {
+            if (Number.isNaN(_bpm) || !Number.isFinite(_bpm) || _bpm < 30) {
                 obj = rationalToFraction(beatValue);
                 target = (30 * 0.25) / beatValue;
                 activity.errorMsg(

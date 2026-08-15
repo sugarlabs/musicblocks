@@ -135,8 +135,10 @@ describe("setupMeterActions", () => {
         test.each([
             [120, 0.25, [], 120, undefined],
             [10, 0.25, ["1/4 beats per minute must be greater than 30"], 30, 1],
-            [5000, 0.25, ["maximum 1/4 beats per minute is 1000"], 1000, 1]
-        ])("setBPM(%i) should handle %s range", (bpm, factor, errors, expected, errBlk) => {
+            [5000, 0.25, ["maximum 1/4 beats per minute is 1000"], 1000, 1],
+            [NaN, 0.25, ["1/4 beats per minute must be greater than 30"], 30, 1],
+            ["invalid", 0.25, ["1/4 beats per minute must be greater than 30"], 30, 1]
+        ])("setBPM(%s) should handle %s range", (bpm, factor, errors, expected, errBlk) => {
             activity.errorMsg.mockClear();
             Singer.MeterActions.setBPM(bpm, factor, 0, errBlk);
             if (errors.length) {
@@ -151,8 +153,10 @@ describe("setupMeterActions", () => {
             [100, [], 100],
             [500, [], 500],
             [10, ["1/4 beats per minute must be greater than 30"], 30],
-            [5000, ["maximum 1/4 beats per minute is 1000"], 1000]
-        ])("setMasterBPM(%i) should result in masterBPM %i", (bpm, errors, expected) => {
+            [5000, ["maximum 1/4 beats per minute is 1000"], 1000],
+            [NaN, ["1/4 beats per minute must be greater than 30"], 30],
+            ["invalid", ["1/4 beats per minute must be greater than 30"], 30]
+        ])("setMasterBPM(%s) should result in masterBPM %i", (bpm, errors, expected) => {
             activity.errorMsg.mockClear();
             Singer.MeterActions.setMasterBPM(bpm, 0.25, 1);
             if (errors.length) {
