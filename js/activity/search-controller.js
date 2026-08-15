@@ -300,6 +300,13 @@ class SearchController {
                 }
             });
 
+            // Anchor the dropdown to the search input now that the widget
+            // exists — see window.fixSearchAutocompletePosition in
+            // js/utils/jquery-setup.js (issue #8069).
+            if (typeof window.fixSearchAutocompletePosition === "function") {
+                window.fixSearchAutocompletePosition();
+            }
+
             const instance = $search.autocomplete("instance");
             if (instance) {
                 instance._renderItem = (ul, item) => {
