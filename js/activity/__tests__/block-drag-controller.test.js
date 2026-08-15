@@ -25,6 +25,7 @@ global.LONGSTACK = 300;
 global.delayExecution = jest.fn().mockResolvedValue(null);
 global.getTextWidth = jest.fn().mockReturnValue(100);
 global._ = jest.fn(str => str);
+global.announceToScreenReader = jest.fn();
 
 // NOTE: block collapsibility is determined via the capability-metadata system.
 // BlockDragController calls block.isCollapsible() / block.isInlineCollapsible()
