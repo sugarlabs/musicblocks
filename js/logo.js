@@ -114,24 +114,35 @@ class Logo {
         // `errorMsg` instead). instanceof is checked first as the strongest
         // signal; the typeof clause is a fallback for plain objects that satisfy
         // the shape but are not formal instances (e.g. after jest.resetModules()
-        // clears module identity). When the project migrates to ES modules the
-        // require fallback and typeof clause can be removed.
+        // clears module identity). Any other object is adapted as an Activity
+        // via fromActivity, whose LogoDependencies constructor validates the
+        // result, so both paths fail fast on a malformed shape. Non-objects
+        // (null, arrays, primitives) go straight to validate() for a clear error.
         const LD =
             typeof LogoDependencies !== "undefined"
                 ? LogoDependencies
                 : require("./LogoDependencies");
-        const isExplicitDeps =
-            activityOrDeps instanceof LD ||
-            (activityOrDeps !== null &&
-                activityOrDeps !== undefined &&
-                typeof activityOrDeps.errorHandler === "function");
+        const isLegacyActivity =
+            activityOrDeps !== null &&
+            typeof activityOrDeps === "object" &&
+            !Array.isArray(activityOrDeps) &&
+            !(activityOrDeps instanceof LD) &&
+            typeof activityOrDeps.errorHandler !== "function";
+        const isExplicitDeps = !isLegacyActivity;
 
         if (isExplicitDeps) {
+            LD.validate(activityOrDeps);
+
             // Explicit dependency container: use directly and build a
             // compatibility facade so callers that expect an activity object
             // still work (Notation constructor, plugins, getStatsFromNotation).
+            // A plain object that passed validation is wrapped in a real
+            // LogoDependencies so optional members (callbacks, config, storage,
+            // messageHandler) receive their defaults before the facade reads them.
 
-            this.deps = activityOrDeps;
+            this.deps = LD.isLogoDependencies(activityOrDeps)
+                ? activityOrDeps
+                : new LD(activityOrDeps);
             const deps = this.deps;
             this.activity = {
                 blocks: deps.blocks,
