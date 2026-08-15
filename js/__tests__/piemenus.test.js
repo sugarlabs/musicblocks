@@ -75,6 +75,7 @@ global.platformColor = {
     accidentalsWheelcolorspush: "#cccccc"
 };
 global._ = jest.fn(s => s);
+global.announceToScreenReader = jest.fn();
 global.Tone = {
     start: jest.fn().mockResolvedValue(),
     context: { state: "running" }
@@ -188,6 +189,42 @@ describe("piemenus behavioral tests", () => {
         // prevPitch+delta = 4+1 = 5. 5 > 4, so deltaOctave = -1.
         // Octave 4 -> 3.
         expect(mockBlock.blocks.setPitchOctave).toHaveBeenCalledWith("mock-id", 3);
+    });
+    test("announces the previewed note to screen readers on pitch navigation", async () => {
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+
+        mockBlock.blocks.blockList["mock-id"].name = "pitch";
+
+        piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "B", "");
+
+        const navigateFunc = mockBlock._pitchWheel.navItems[0].navigateFunction;
+        mockBlock._pitchWheel.selectedNavItemIndex = 0;
+        mockBlock._pitchWheel.navItems[0].title = "C";
+
+        await navigateFunc();
+
+        expect(global.announceToScreenReader).toHaveBeenCalledWith(expect.stringContaining("C"));
+    });
+
+    test("does not announce when the trigger is locked (rapid navigation)", async () => {
+        const noteLabels = ["C", "D", "E", "F", "G", "A", "B"];
+        const noteValues = ["C", "D", "E", "F", "G", "A", "B"];
+
+        mockBlock.blocks.blockList["mock-id"].name = "pitch";
+
+        piemenuPitches(mockBlock, noteLabels, noteValues, ["♯", "♭"], "B", "");
+
+        const navigateFunc = mockBlock._pitchWheel.navItems[0].navigateFunction;
+        mockBlock._pitchWheel.selectedNavItemIndex = 0;
+        mockBlock._pitchWheel.navItems[0].title = "C";
+
+        mockBlock._triggerLock = true;
+        global.announceToScreenReader.mockClear();
+
+        await navigateFunc();
+
+        expect(global.announceToScreenReader).not.toHaveBeenCalled();
     });
 
     describe("Phrase Maker refresh on pitch change", () => {
