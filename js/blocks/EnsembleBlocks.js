@@ -694,7 +694,9 @@ function setupEnsembleBlocks(activity) {
                 if (targetTurtle === thisTurtle.name) {
                     let obj;
                     if (thisTurtle.singer.lastNotePlayed !== null) {
-                        const [pitch, octave] = parseNoteString(thisTurtle.singer.lastNotePlayed[0]);
+                        const [pitch, octave] = parseNoteString(
+                            thisTurtle.singer.lastNotePlayed[0]
+                        );
 
                         obj = [pitch, octave];
                     } else if (thisTurtle.singer.notePitches.length > 0) {
