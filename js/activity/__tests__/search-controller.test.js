@@ -425,7 +425,7 @@ describe("SearchController.doSearch - result generation", () => {
 // doSearch — autocomplete initialization branches
 // ---------------------------------------------------------------------------
 
-function makeJQueryElem(alreadyInit = false) {
+function makeJQueryElem(alreadyInit = false, instance = null) {
     let capturedOpts = null;
     const initFlag = { value: alreadyInit };
     const elem = {
@@ -435,7 +435,7 @@ function makeJQueryElem(alreadyInit = false) {
         }),
         autocomplete: jest.fn(function (arg) {
             if (typeof arg === "object") capturedOpts = arg;
-            if (arg === "instance") return null;
+            if (arg === "instance") return instance;
         }),
         getOpts: () => capturedOpts
     };
@@ -564,6 +564,47 @@ describe("SearchController.doSearch - autocomplete initialization", () => {
         sc.doSearch();
 
         expect($elem.autocomplete).not.toHaveBeenCalledWith("search", expect.anything());
+    });
+
+    test("patches _renderMenu to apply fixed dropdown positioning", () => {
+        jest.useFakeTimers();
+        const originalRenderMenu = jest.fn();
+        const mockDropdown = { style: {} };
+        const mockInstance = { _renderMenu: originalRenderMenu };
+
+        $elem = makeJQueryElem(false, mockInstance);
+        global.window.jQuery = jest.fn(() => $elem);
+
+        const mockSearchEl = {
+            getBoundingClientRect: () => ({ left: 50, bottom: 100, width: 200 })
+        };
+        const origQuerySelector = document.querySelector;
+        document.querySelector = jest.fn(sel => (sel === "#search" ? mockSearchEl : null));
+
+        const activity = makeActivity();
+        setupSearchController(activity);
+        const sc = activity.searchController;
+        sc.prepSearchWidget();
+
+        activity.searchWidget.idInput_custom = "";
+        activity.searchWidget.value = "";
+        sc.doSearch();
+
+        const ul = [mockDropdown];
+        const items = [];
+        mockInstance._renderMenu(ul, items);
+
+        expect(originalRenderMenu).toHaveBeenCalledWith(ul, items);
+
+        jest.advanceTimersByTime(0);
+
+        expect(mockDropdown.style.position).toBe("fixed");
+        expect(mockDropdown.style.left).toBe("50px");
+        expect(mockDropdown.style.top).toBe("102px");
+        expect(mockDropdown.style.width).toBe("200px");
+
+        document.querySelector = origQuerySelector;
+        jest.useRealTimers();
     });
 });
 

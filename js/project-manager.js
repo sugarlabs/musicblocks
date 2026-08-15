@@ -416,6 +416,9 @@ class ProjectManager {
 
     prepareExport() {
         const activity = this.activity;
+        if (!activity.blocks || !activity.blocks.blockList) {
+            return "[]";
+        }
         const blockMap = [];
         const blockIndexById = new Map();
         activity.hasMatrixDataBlock = false;

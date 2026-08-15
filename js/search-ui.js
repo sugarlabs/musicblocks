@@ -239,6 +239,21 @@ class SearchUI {
 
         const instance = $search.autocomplete("instance");
         if (instance) {
+            const originalRenderMenu = instance._renderMenu;
+            instance._renderMenu = function (ul, items) {
+                originalRenderMenu.call(this, ul, items);
+                setTimeout(() => {
+                    const searchInput = document.querySelector("#search");
+                    const dropdown = ul[0];
+                    if (searchInput && dropdown) {
+                        const rect = searchInput.getBoundingClientRect();
+                        dropdown.style.position = "fixed";
+                        dropdown.style.left = rect.left + "px";
+                        dropdown.style.top = rect.bottom + 2 + "px";
+                        dropdown.style.width = rect.width + "px";
+                    }
+                }, 0);
+            };
             instance._renderItem = (ul, item) => this._renderMainItem($j, ul, item, dropCb);
         }
         $search.data("autocomplete-init", true);

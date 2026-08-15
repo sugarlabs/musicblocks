@@ -23,34 +23,12 @@
 
 describe("jquery-setup", () => {
     let readyCallbacks;
-    let mockSearch;
-    let mockInstance;
-    let mockDropdown;
     let originalJQuery;
-    let errorSpy;
 
     beforeEach(() => {
         jest.resetModules();
-        jest.useFakeTimers();
 
         readyCallbacks = [];
-
-        mockDropdown = {
-            style: {}
-        };
-
-        mockInstance = {
-            _renderMenu: jest.fn()
-        };
-
-        mockSearch = {
-            length: 1,
-            data: jest.fn(() => true),
-            autocomplete: jest.fn(() => mockInstance)
-        };
-
-        errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-
         originalJQuery = global.jQuery;
 
         const mockJQuery = jest.fn(selector => {
@@ -61,11 +39,6 @@ describe("jquery-setup", () => {
                     }
                 };
             }
-
-            if (selector === "#search") {
-                return mockSearch;
-            }
-
             return {};
         });
 
@@ -83,40 +56,17 @@ describe("jquery-setup", () => {
 
         global.jQuery = mockJQuery;
         global.$ = mockJQuery;
-
-        document.body.innerHTML = `
-            <input id="search" />
-        `;
-
-        document.querySelector = jest.fn(selector => {
-            if (selector === "#search") {
-                return {
-                    getBoundingClientRect: () => ({
-                        left: 100,
-                        bottom: 200,
-                        width: 300
-                    })
-                };
-            }
-
-            return null;
-        });
     });
 
     afterEach(() => {
-        jest.clearAllTimers();
-        jest.useRealTimers();
-
-        errorSpy.mockRestore();
-
         global.jQuery = originalJQuery;
         delete global.$;
     });
 
-    test("registers both document ready callbacks", () => {
+    test("registers document ready callback", () => {
         require("../jquery-setup");
 
-        expect(readyCallbacks).toHaveLength(2);
+        expect(readyCallbacks).toHaveLength(1);
     });
 
     test("bridges jQuery UI autocomplete with Materialize autocomplete", () => {
@@ -125,9 +75,7 @@ describe("jquery-setup", () => {
         readyCallbacks[0]();
 
         expect(jQuery.fn.materializeAutocomplete).toBe(jQuery.fn.autocomplete);
-
         expect(jQuery.widget.bridge).toHaveBeenCalledTimes(1);
-
         expect(jQuery.widget.bridge).toHaveBeenCalledWith("autocomplete", jQuery.ui.autocomplete);
     });
 
@@ -139,148 +87,6 @@ describe("jquery-setup", () => {
         readyCallbacks[0]();
 
         expect(jQuery.widget.bridge).not.toHaveBeenCalled();
-
         expect(jQuery.fn.materializeAutocomplete).toBeUndefined();
-    });
-
-    test("schedules autocomplete position fix after initial timeout", () => {
-        require("../jquery-setup");
-
-        readyCallbacks[1]();
-
-        expect(jest.getTimerCount()).toBeGreaterThan(0);
-    });
-
-    test("updates dropdown position styles when autocomplete instance exists", () => {
-        const originalRenderMenu = jest.fn();
-
-        mockInstance._renderMenu = originalRenderMenu;
-
-        require("../jquery-setup");
-
-        readyCallbacks[1]();
-
-        jest.advanceTimersByTime(1000);
-
-        expect(mockSearch.autocomplete).toHaveBeenCalledWith("instance");
-
-        const wrappedRenderMenu = mockInstance._renderMenu;
-
-        const ul = [mockDropdown];
-        const items = [];
-
-        wrappedRenderMenu.call(mockInstance, ul, items);
-
-        expect(originalRenderMenu).toHaveBeenCalledWith(ul, items);
-
-        jest.advanceTimersByTime(0);
-
-        expect(mockDropdown.style.position).toBe("fixed");
-        expect(mockDropdown.style.left).toBe("100px");
-        expect(mockDropdown.style.top).toBe("202px");
-        expect(mockDropdown.style.width).toBe("300px");
-    });
-
-    test("retries setup when autocomplete instance is unavailable", () => {
-        mockSearch.data = jest.fn(() => false);
-
-        require("../jquery-setup");
-
-        readyCallbacks[1]();
-
-        jest.advanceTimersByTime(1000);
-
-        expect(jest.getTimerCount()).toBeGreaterThan(0);
-    });
-
-    test("logs error after maximum retry attempts", () => {
-        mockSearch.data = jest.fn(() => false);
-
-        require("../jquery-setup");
-
-        readyCallbacks[1]();
-
-        jest.advanceTimersByTime(11000);
-
-        expect(console.error).toHaveBeenCalledTimes(1);
-
-        expect(console.error).toHaveBeenCalledWith(
-            expect.stringContaining(
-                "Autocomplete setup failed: Could not initialize ui-autocomplete"
-            )
-        );
-    });
-
-    test("does not throw when search element is missing", () => {
-        mockSearch.length = 0;
-
-        require("../jquery-setup");
-
-        readyCallbacks[1]();
-
-        expect(() => {
-            jest.advanceTimersByTime(11000);
-        }).not.toThrow();
-    });
-
-    test("does not modify dropdown styles when searchInput is null", () => {
-        document.querySelector = jest.fn(() => null);
-
-        const originalRenderMenu = jest.fn();
-
-        mockInstance._renderMenu = originalRenderMenu;
-
-        require("../jquery-setup");
-
-        readyCallbacks[1]();
-
-        jest.advanceTimersByTime(1000);
-
-        const wrappedRenderMenu = mockInstance._renderMenu;
-
-        const ul = [mockDropdown];
-        const items = [];
-
-        wrappedRenderMenu.call(mockInstance, ul, items);
-
-        jest.advanceTimersByTime(0);
-
-        expect(mockDropdown.style.position).toBeUndefined();
-        expect(mockDropdown.style.left).toBeUndefined();
-        expect(mockDropdown.style.top).toBeUndefined();
-        expect(mockDropdown.style.width).toBeUndefined();
-    });
-
-    test("does not override _renderMenu when autocomplete instance is null", () => {
-        mockSearch.autocomplete = jest.fn(() => null);
-
-        require("../jquery-setup");
-
-        readyCallbacks[1]();
-
-        jest.advanceTimersByTime(1000);
-
-        expect(mockSearch.autocomplete).toHaveBeenCalledWith("instance");
-    });
-
-    test("calls original _renderMenu before applying dropdown positioning", () => {
-        const originalRenderMenu = jest.fn();
-
-        mockInstance._renderMenu = originalRenderMenu;
-
-        require("../jquery-setup");
-
-        readyCallbacks[1]();
-
-        jest.advanceTimersByTime(1000);
-
-        const wrappedRenderMenu = mockInstance._renderMenu;
-
-        const ul = [mockDropdown];
-        const items = ["item"];
-
-        wrappedRenderMenu.call(mockInstance, ul, items);
-
-        expect(originalRenderMenu).toHaveBeenCalledWith(ul, items);
     });
 });

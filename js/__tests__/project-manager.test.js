@@ -702,6 +702,12 @@ describe("getClosestStandardNoteValue", () => {
 // ---------------------------------------------------------------------------
 
 describe("prepareExport", () => {
+    it("returns '[]' when activity.blocks or blockList is uninitialized", () => {
+        const activity = makeActivity({ blocks: undefined });
+        const pm = new ProjectManager(activity);
+        expect(pm.prepareExport()).toBe("[]");
+    });
+
     it("returns an empty JSON array when blockList is empty", () => {
         const activity = makeActivity();
         const pm = new ProjectManager(activity);

@@ -365,6 +365,51 @@ describe("SearchUI.setupMainAutocomplete", () => {
         $elem._capturedOpts.focus(event);
         expect(event.preventDefault).toHaveBeenCalled();
     });
+
+    test("patches _renderMenu to apply fixed dropdown positioning", () => {
+        jest.useFakeTimers();
+        const originalRenderMenu = jest.fn();
+        const mockDropdown = { style: {} };
+        const instance = { _renderMenu: originalRenderMenu };
+
+        $elem = {
+            _initFlag: false,
+            data: jest.fn(function (key, val) {
+                if (val !== undefined) this._initFlag = val;
+                return key === "autocomplete-init" ? this._initFlag : undefined;
+            }),
+            autocomplete: jest.fn(function (arg) {
+                if (arg === "instance") return instance;
+            })
+        };
+        global.window.jQuery = jest.fn(() => $elem);
+
+        const mockSearchEl = {
+            getBoundingClientRect: () => ({ left: 80, bottom: 120, width: 250 })
+        };
+        const origQuerySelector = document.querySelector;
+        document.querySelector = jest.fn(sel => (sel === "#search" ? mockSearchEl : null));
+
+        const activity = makeActivity();
+        const ui = new SearchUI(activity);
+        ui.setupMainAutocomplete(() => [], jest.fn(), jest.fn());
+
+        const ul = [mockDropdown];
+        const items = [];
+        instance._renderMenu(ul, items);
+
+        expect(originalRenderMenu).toHaveBeenCalledWith(ul, items);
+
+        jest.advanceTimersByTime(0);
+
+        expect(mockDropdown.style.position).toBe("fixed");
+        expect(mockDropdown.style.left).toBe("80px");
+        expect(mockDropdown.style.top).toBe("122px");
+        expect(mockDropdown.style.width).toBe("250px");
+
+        document.querySelector = origQuerySelector;
+        jest.useRealTimers();
+    });
 });
 
 // ---------------------------------------------------------------------------
