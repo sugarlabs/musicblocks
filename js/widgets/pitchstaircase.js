@@ -16,7 +16,7 @@
    global
 
    platformColor, _, SYNTHSVG, frequencyToPitch, DEFAULTVOICE,
-   normalizeNoteAccidentals, PREVIEWVOLUME, Singer, last
+   normalizeNoteAccidentals, PREVIEWVOLUME, Singer, last, clampNumber
  */
 
 /*
@@ -166,12 +166,17 @@ class PitchStaircase {
             playCell.style.cursor = "pointer";
             const stepCell = stepTableRow.insertCell();
             stepCell.setAttribute("id", frequency);
-            stepCell.style.width =
+            const safeFreq =
+                typeof frequency === "number" && Number.isFinite(frequency) && frequency > 0
+                    ? frequency
+                    : PitchStaircase.DEFAULTFREQUENCY;
+            const rawWidth =
                 (PitchStaircase.INNERWINDOWWIDTH *
-                    parseFloat(PitchStaircase.DEFAULTFREQUENCY / frequency) *
+                    (PitchStaircase.DEFAULTFREQUENCY / safeFreq) *
                     this._cellScale) /
-                    3 +
-                "px";
+                3;
+            const calculatedWidth = clampNumber(rawWidth, 20, PitchStaircase.INNERWINDOWWIDTH);
+            stepCell.style.width = calculatedWidth + "px";
             stepCell.replaceChildren(
                 document.createTextNode(frequency.toFixed(2)),
                 document.createElement("br"),
@@ -683,7 +688,7 @@ class PitchStaircase {
         }
 
         this.activity.blocks.loadNewBlocks(newStack);
-        activity.textMsg(_("New action block generated."), 3000);
+        this.activity.textMsg(_("New action block generated."), 3000);
     }
 
     /**
@@ -711,6 +716,13 @@ class PitchStaircase {
 
         const w = window.innerWidth;
         this._cellScale = w / 1200;
+
+        if (
+            window.widgetWindows &&
+            window.widgetWindows.openWindows &&
+            window.widgetWindows.openWindows["pitch staircase"]
+        )
+            return;
 
         const widgetWindow = window.widgetWindows.windowFor(
             this,
@@ -794,8 +806,10 @@ class PitchStaircase {
                 }
             };
         const wfbWidget = document.getElementsByClassName("wfbWidget")[0];
-        wfbWidget.style.maxHeight = 10 * PitchStaircase.BUTTONSIZE + "px";
-        wfbWidget.style.overflowY = "scroll";
+        if (wfbWidget && wfbWidget.style) {
+            wfbWidget.style.maxHeight = 10 * PitchStaircase.BUTTONSIZE + "px";
+            wfbWidget.style.overflowY = "scroll";
+        }
         this._musicRatio1 = widgetWindow.addInputButton("3");
         widgetWindow.addDivider();
         this._musicRatio2 = widgetWindow.addInputButton("2");
