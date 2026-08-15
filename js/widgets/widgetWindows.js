@@ -18,15 +18,53 @@ _, docById
 */
 
 /**
- * Normalizes a MouseEvent/TouchEvent into a {clientX, clientY} point so drag
- * handlers can share one code path for mouse and touch input.
+ * True if the event carries touch data (a touches/changedTouches list).
  * @param {MouseEvent|TouchEvent} e
- * @returns {{clientX: number, clientY: number}}
+ * @returns {boolean}
  */
-function _pointFromEvent(e) {
-    if (e.touches && e.touches.length) return e.touches[0];
-    if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0];
-    return e;
+function _isTouchEvent(e) {
+    return Boolean(e.touches || e.changedTouches);
+}
+
+/**
+ * Finds the Touch with the given identifier in a TouchList.
+ * @param {TouchList|undefined} touchList
+ * @param {number} identifier
+ * @returns {Touch|null}
+ */
+function _touchWithId(touchList, identifier) {
+    if (!touchList) return null;
+    for (let i = 0; i < touchList.length; i++) {
+        if (touchList[i].identifier === identifier) return touchList[i];
+    }
+    return null;
+}
+
+/**
+ * Picks the touch that triggered a touchstart — the one just added,
+ * not whichever happens to be first in the touches list (relevant when a
+ * second finger is already down elsewhere on the page).
+ * @param {TouchEvent} e
+ * @returns {Touch|null}
+ */
+function _startingTouch(e) {
+    return (e.changedTouches && e.changedTouches[0]) || (e.touches && e.touches[0]) || null;
+}
+
+/**
+ * Resolves the {clientX, clientY} point a drag should use for this event.
+ * Mouse events pass through unchanged. Touch events resolve to the specific
+ * touch identified by `touchId` (pass `null` to resolve the touch that is
+ * starting a new drag) so an unrelated second finger can neither hijack nor
+ * prematurely end an in-progress drag.
+ * @param {MouseEvent|TouchEvent} e
+ * @param {number|null} touchId
+ * @returns {{clientX: number, clientY: number}|null}
+ */
+function _pointFromEvent(e, touchId) {
+    if (!_isTouchEvent(e)) return e;
+    if (touchId === null) return _startingTouch(e);
+    return _touchWithId(e.touches, touchId) || _touchWithId(e.changedTouches, touchId);
 }
 
 window.widgetWindows = {
@@ -115,10 +153,18 @@ window.widgetWindows = {
         }
     },
     _handleGlobalTouchEnd(e) {
-        if (this.draggingWindow) {
-            this.draggingWindow._dragTopHandler(e);
-            this.draggingWindow = null;
+        const win = this.draggingWindow;
+        if (!win) return;
+
+        // Ignore touchend/touchcancel from an unrelated finger — only end
+        // the drag when the touch that started it has actually lifted.
+        if (win._activeTouchId !== null && !_touchWithId(e.changedTouches, win._activeTouchId)) {
+            return;
         }
+
+        win._dragTopHandler(e);
+        win._activeTouchId = null;
+        this.draggingWindow = null;
     },
     _handleGlobalMouseDown(e) {
         const isToolbarInteraction =
@@ -180,6 +226,9 @@ class WidgetWindow {
         this._dx = this._dy = 0;
         // RAF throttle flag for mousemove performance
         this._rafTicking = false;
+        // Identifier of the touch currently dragging this window (null for
+        // mouse drags, or when no drag is in progress).
+        this._activeTouchId = null;
 
         this._createUIelements();
         this._setupLanguage();
@@ -271,6 +320,8 @@ class WidgetWindow {
 
         const startDrag = (point, e) => {
             window.widgetWindows.draggingWindow = this;
+            this._activeTouchId = _isTouchEvent(e) ? point.identifier : null;
+
             if (this._maximized) {
                 // Perform special repositioning to make the drag feel right when
                 // restoring a window from maximized.
@@ -295,9 +346,14 @@ class WidgetWindow {
 
         this._nonclose.onmousedown = e => startDrag(e, e);
         // Touch counterpart so the title bar can be dragged on touch/mobile devices.
-        this._nonclose.addEventListener("touchstart", e => startDrag(_pointFromEvent(e), e), {
-            passive: false
-        });
+        this._nonclose.addEventListener(
+            "touchstart",
+            e => {
+                const point = _pointFromEvent(e, null);
+                if (point) startDrag(point, e);
+            },
+            { passive: false }
+        );
 
         this._nonclosebuttons = this._create("div", "nonclosebuttons", this._nonclose);
         this._nonclosebuttons.style.display = "flex";
@@ -381,9 +437,13 @@ class WidgetWindow {
     _docMouseMoveHandler(e) {
         // Throttle using requestAnimationFrame to prevent layout thrashing
         if (this._rafTicking) return;
-        this._rafTicking = true;
 
-        const point = _pointFromEvent(e);
+        // For touch, only react to the finger that started this drag — an
+        // unrelated second finger moving elsewhere must not jump the window.
+        const point = _pointFromEvent(e, this._activeTouchId);
+        if (!point) return;
+
+        this._rafTicking = true;
 
         requestAnimationFrame(() => {
             if (this._fullscreenEnabled && this._frame.style.top === "64px") {
