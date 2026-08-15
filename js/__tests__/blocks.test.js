@@ -377,6 +377,34 @@ describe("Blocks Foundation", () => {
         });
     });
 
+    describe("Parameter Block Cache Updates", () => {
+        it("only rebuilds the cache when the displayed value changes", () => {
+            const blocks = new Blocks(mockActivity);
+            const updateParameter = jest.fn(() => 0);
+            const updateCache = jest.fn();
+            const parameterBlock = {
+                name: "heading",
+                protoblock: { parameter: true, updateParameter },
+                text: { text: "heading" },
+                container: { updateCache }
+            };
+            blocks.blockList = [parameterBlock];
+
+            expect(blocks.updateParameterBlock({}, 0, 0)).toBe(true);
+            expect(parameterBlock.text.text).toBe("0");
+            expect(updateCache).toHaveBeenCalledTimes(1);
+
+            expect(blocks.updateParameterBlock({}, 0, 0)).toBe(false);
+            expect(updateCache).toHaveBeenCalledTimes(1);
+
+            updateParameter.mockReturnValue(10);
+
+            expect(blocks.updateParameterBlock({}, 0, 0)).toBe(true);
+            expect(parameterBlock.text.text).toBe("10");
+            expect(updateCache).toHaveBeenCalledTimes(2);
+        });
+    });
+
     describe("Sparse Array Safety", () => {
         it("should not throw TypeError in findStacks when blockList is sparse", () => {
             const blocks = new Blocks(mockActivity);
@@ -627,6 +655,25 @@ describe("Blocks Foundation", () => {
 
             // Flag should be true during processing (before cleanupAfterLoad resets it)
             expect(flagDuringLoad).toBe(true);
+        });
+
+        it("loads a text block valued '__proto__' without throwing", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.blockList = [];
+            blocks.protoBlockDict = {
+                text: { style: "value", hasCapability: () => false }
+            };
+            blocks.newStorein2Block = jest.fn();
+            blocks.newNamedboxBlock = jest.fn();
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks._processOneBlock = jest.fn();
+            blocks.customTemperamentDefined = true;
+
+            // Legacy (pre-value-object) text block shape, still accepted for
+            // backward compatibility and reachable via pasted project JSON.
+            const blockObjs = [[0, ["text", "__proto__"], 0, 0, [null]]];
+
+            expect(() => blocks.loadNewBlocks(blockObjs)).not.toThrow();
         });
 
         it("resets _suppressRefresh on circular connection early return", () => {

@@ -336,12 +336,18 @@ describe("setupToneActions", () => {
             Singer.ToneActions.doChorus(1.5, 20, 150, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Depth is out of range.", 1);
             expect(activity.logo.stopTurtle).toBe(true);
+            expect(targetTurtle.singer.chorusRate).toEqual([]);
+            expect(targetTurtle.singer.delayTime).toEqual([]);
+            expect(targetTurtle.singer.chorusDepth).toEqual([]);
         });
 
         it("should show error for negative chorus depth", () => {
             Singer.ToneActions.doChorus(1.5, 20, -10, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Depth is out of range.", 1);
             expect(activity.logo.stopTurtle).toBe(true);
+            expect(targetTurtle.singer.chorusRate).toEqual([]);
+            expect(targetTurtle.singer.delayTime).toEqual([]);
+            expect(targetTurtle.singer.chorusDepth).toEqual([]);
         });
 
         it("should NOT register a mouse listener when blk is undefined", () => {
@@ -414,12 +420,16 @@ describe("setupToneActions", () => {
             Singer.ToneActions.doTremolo(5, 150, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Depth is out of range.", 1);
             expect(activity.logo.stopTurtle).toBe(true);
+            expect(targetTurtle.singer.tremoloFrequency).toEqual([]);
+            expect(targetTurtle.singer.tremoloDepth).toEqual([]);
         });
 
         it("should show error for negative tremolo depth", () => {
             Singer.ToneActions.doTremolo(5, -50, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Depth is out of range.", 1);
             expect(activity.logo.stopTurtle).toBe(true);
+            expect(targetTurtle.singer.tremoloFrequency).toEqual([]);
+            expect(targetTurtle.singer.tremoloDepth).toEqual([]);
         });
 
         it("should NOT register a mouse listener when blk is undefined", () => {
@@ -456,12 +466,14 @@ describe("setupToneActions", () => {
             Singer.ToneActions.doDistortion(150, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Distortion must be from 0 to 100.", 1);
             expect(activity.logo.stopTurtle).toBe(true);
+            expect(targetTurtle.singer.distortionAmount).toEqual([]);
         });
 
         it("should show error for negative distortion amount", () => {
             Singer.ToneActions.doDistortion(-10, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith("Distortion must be from 0 to 100.", 1);
             expect(activity.logo.stopTurtle).toBe(true);
+            expect(targetTurtle.singer.distortionAmount).toEqual([]);
         });
 
         it("should NOT register a mouse listener when blk is undefined", () => {
@@ -569,12 +581,13 @@ describe("setupToneActions", () => {
             expect(activity.logo.timbre.FMSynthParams).toContain(10);
         });
 
-        it("should show error when oscillators exist", () => {
+        it("should show error and halt when oscillators exist", () => {
             activity.logo.timbre.osc = [{}];
             Singer.ToneActions.defFMSynth(10, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith(
                 "Unable to use synth due to existing oscillator."
             );
+            expect(activity.logo.synth.createSynth).not.toHaveBeenCalled();
         });
 
         it("should not create parameters when not in timbre mode", () => {
@@ -614,12 +627,13 @@ describe("setupToneActions", () => {
             expect(activity.logo.timbre.AMSynthParams).toContain(5);
         });
 
-        it("should show error when oscillators exist", () => {
+        it("should show error and halt when oscillators exist", () => {
             activity.logo.timbre.osc = [{}];
             Singer.ToneActions.defAMSynth(5, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith(
                 "Unable to use synth due to existing oscillator."
             );
+            expect(activity.logo.synth.createSynth).not.toHaveBeenCalled();
         });
 
         it("should not create parameters when not in timbre mode", () => {
@@ -672,12 +686,13 @@ describe("setupToneActions", () => {
             expect(activity.logo.timbre.duoSynthParams).toContain(20);
         });
 
-        it("should show error when oscillators exist", () => {
+        it("should show error and halt when oscillators exist", () => {
             activity.logo.timbre.osc = [{}];
             Singer.ToneActions.defDuoSynth(10, 20, 0, 1);
             expect(activity.errorMsg).toHaveBeenCalledWith(
                 "Unable to use synth due to existing oscillator."
             );
+            expect(activity.logo.synth.createSynth).not.toHaveBeenCalled();
         });
 
         it("should not create parameters when not in timbre mode", () => {

@@ -122,6 +122,30 @@ const disableWheelResizeHandling = () => {
     clearTimeout(wheelResizeTimeout);
 };
 
+/**
+ * DOM container IDs that host pie menu / wheelnav instances.
+ */
+const PIE_MENU_CONTAINERS = [
+    "wheelDiv",
+    "wheelDivptm",
+    "chooseKeyDiv",
+    "helpfulWheelDiv",
+    "meterWheelDiv",
+    "wheelDiv2",
+    "wheelDiv3",
+    "wheelDiv4"
+];
+
+const isAnyPieMenuVisible = () => {
+    for (let i = 0; i < PIE_MENU_CONTAINERS.length; i++) {
+        const div = docById(PIE_MENU_CONTAINERS[i]);
+        if (div && div.style && div.style.display !== "none") {
+            return true;
+        }
+    }
+    return false;
+};
+
 const isInteractive = target => {
     // 1. Check if inside number/text input label container
     const labelDiv = docById("labelDiv");
@@ -129,10 +153,15 @@ const isInteractive = target => {
         return true;
     }
 
-    // 2. Check if inside any of the pie menu containers and is a slice/title/icon (not the container or SVG root)
-    const containers = ["wheelDiv", "wheelDivptm", "chooseKeyDiv"];
-    for (let i = 0; i < containers.length; i++) {
-        const div = docById(containers[i]);
+    // 2. Check if inside movable container (used by piemenuKey)
+    const movable = docById("movable");
+    if (movable && typeof movable.contains === "function" && movable.contains(target)) {
+        return true;
+    }
+
+    // 3. Check if inside any of the pie menu containers and is a slice/title/icon (not the container or SVG root)
+    for (let i = 0; i < PIE_MENU_CONTAINERS.length; i++) {
+        const div = docById(PIE_MENU_CONTAINERS[i]);
         if (div && typeof div.contains === "function" && div.contains(target)) {
             if (target !== div && target.tagName && target.tagName.toLowerCase() !== "svg") {
                 return true;
@@ -144,12 +173,7 @@ const isInteractive = target => {
 };
 
 const handleOutsideClick = event => {
-    const wheelDiv = docById("wheelDiv");
-    const wheelDivptm = docById("wheelDivptm");
-    const wheelDivVisible = wheelDiv && wheelDiv.style.display !== "none";
-    const wheelDivptmVisible = wheelDivptm && wheelDivptm.style.display !== "none";
-
-    if (!wheelDivVisible && !wheelDivptmVisible) {
+    if (!isAnyPieMenuVisible()) {
         return;
     }
 
@@ -164,15 +188,22 @@ const handleOutsideClick = event => {
             document.removeEventListener("mousedown", handleOutsideClick);
             activeExitWheel = null;
         } else {
-            if (wheelDivVisible) {
-                hideWheelDiv();
-            } else if (wheelDivptmVisible) {
-                if (wheelDivptm) {
-                    wheelDivptm.style.display = "none";
+            for (let i = 0; i < PIE_MENU_CONTAINERS.length; i++) {
+                const div = docById(PIE_MENU_CONTAINERS[i]);
+                if (div && div.style && div.style.display !== "none") {
+                    if (PIE_MENU_CONTAINERS[i] === "wheelDiv") {
+                        hideWheelDiv();
+                    } else {
+                        div.style.display = "none";
+                    }
                 }
-                document.removeEventListener("mousedown", handleOutsideClick);
-                activeExitWheel = null;
             }
+            const movable = docById("movable");
+            if (movable) {
+                movable.style.display = "none";
+            }
+            document.removeEventListener("mousedown", handleOutsideClick);
+            activeExitWheel = null;
         }
     }
 };
@@ -184,7 +215,7 @@ const showWheelDiv = () => {
     enableWheelResizeHandling();
 
     setTimeout(() => {
-        if (wheelDiv.style.display !== "none") {
+        if (isAnyPieMenuVisible()) {
             document.addEventListener("mousedown", handleOutsideClick);
         }
     }, 50);
@@ -198,8 +229,10 @@ const hideWheelDiv = () => {
     wheelDiv.style.display = "none";
     disableWheelResizeHandling();
 
-    document.removeEventListener("mousedown", handleOutsideClick);
-    activeExitWheel = null;
+    if (!isAnyPieMenuVisible()) {
+        document.removeEventListener("mousedown", handleOutsideClick);
+        activeExitWheel = null;
+    }
 
     return wheelDiv;
 };
@@ -253,7 +286,7 @@ const enableWheelScroll = (wheel, itemCount) => {
             wheel.navItems[i].navigateFunction = null;
         }
 
-        // Navigate to the next item
+        // Rotate to the new index
         wheel.navigateWheel(nextIndex);
 
         // Restore navigate functions after a short delay
@@ -281,14 +314,9 @@ const configureExitWheel = exitWheel => {
     }
     activeExitWheel = exitWheel;
 
-    // Register mousedown listener after 50ms if either wheel is visible
+    // Register mousedown listener after 50ms if any pie menu is visible
     setTimeout(() => {
-        const wheelDiv = docById("wheelDiv");
-        const wheelDivptm = docById("wheelDivptm");
-        const isVisible =
-            (wheelDiv && wheelDiv.style.display !== "none") ||
-            (wheelDivptm && wheelDivptm.style.display !== "none");
-        if (isVisible) {
+        if (isAnyPieMenuVisible()) {
             document.addEventListener("mousedown", handleOutsideClick);
         }
     }, 50);
@@ -2214,13 +2242,18 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         (Math.round(selectorWidth * block.blocks.blockScale) * block.protoblock.scale) / 2 + "px";
     // Navigate to a the current number value.
     let i = wheelValues.indexOf(selectedValue);
-    if (i === -1 || selectedValue < 1 || selectedValue > 8) {
-        selectedValue = Math.min(Math.max(selectedValue, 1), 8);
-        i = wheelValues.indexOf(selectedValue);
-    }
-    // In case of float value, navigate to the nearest integer within the range
-    if (selectedValue % 1 !== 0) {
-        selectedValue = Math.min(Math.max(Math.floor(selectedValue + 0.5), 1), 8);
+    if (i === -1) {
+        // Find the closest valid value from the wheelValues array
+        let closest = wheelValues[0];
+        let minDiff = Math.abs(selectedValue - closest);
+        for (let j = 1; j < wheelValues.length; j++) {
+            const diff = Math.abs(selectedValue - wheelValues[j]);
+            if (diff < minDiff) {
+                minDiff = diff;
+                closest = wheelValues[j];
+            }
+        }
+        selectedValue = closest;
         i = wheelValues.indexOf(selectedValue);
     }
     if (i !== -1) {
@@ -2245,7 +2278,6 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     block._exitWheel.navItems[1].navigateFunction = () => {
         const index = wheelValues.indexOf(that.value);
         if (index === -1) return;
-
         const isAscending = wheelValues[0] < wheelValues[wheelValues.length - 1];
 
         if (isAscending) {
@@ -2262,6 +2294,12 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
         that.label.value = that.value;
+
+        const newIndex = wheelValues.indexOf(that.value);
+        const navFunc = that._numberWheel.navItems[newIndex].navigateFunction;
+        that._numberWheel.navItems[newIndex].navigateFunction = null;
+        that._numberWheel.navigateWheel(newIndex);
+        that._numberWheel.navItems[newIndex].navigateFunction = navFunc;
     };
 
     block._exitWheel.navItems[2].navigateFunction = () => {
@@ -2284,6 +2322,12 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
         that.label.value = that.value;
+
+        const newIndex = wheelValues.indexOf(that.value);
+        const navFunc = that._numberWheel.navItems[newIndex].navigateFunction;
+        that._numberWheel.navItems[newIndex].navigateFunction = null;
+        that._numberWheel.navigateWheel(newIndex);
+        that._numberWheel.navItems[newIndex].navigateFunction = navFunc;
     };
 
     const __pitchPreviewForNum = () => {
@@ -4082,14 +4126,14 @@ const piemenuKey = activity => {
             stacks.sort();
             let connectionsSetKey;
             let movable;
-            for (const i in stacks) {
-                if (activity.blocks.blockList[stacks[i]].name === "start") {
-                    const bottomBlock = activity.blocks.blockList[stacks[i]].connections[1];
+            for (const stackId of stacks) {
+                if (activity.blocks.blockList[stackId].name === "start") {
+                    const bottomBlock = activity.blocks.blockList[stackId].connections[1];
                     if (activity.KeySignatureEnv[2]) {
                         activity.blocks._makeNewBlockWithConnections(
                             "movable",
                             0,
-                            [stacks[i], null, null],
+                            [stackId, null, null],
                             null,
                             null
                         );
@@ -4105,7 +4149,7 @@ const piemenuKey = activity => {
                             activity.blocks.blockList.length - 1;
                         connectionsSetKey = [movable, null, null, bottomBlock];
                     } else {
-                        connectionsSetKey = [stacks[i], null, null, bottomBlock];
+                        connectionsSetKey = [stackId, null, null, bottomBlock];
                     }
 
                     activity.blocks._makeNewBlockWithConnections(
@@ -4120,10 +4164,10 @@ const piemenuKey = activity => {
                     activity.blocks.blockList[bottomBlock].connections[0] = setKey;
 
                     if (activity.KeySignatureEnv[2]) {
-                        activity.blocks.blockList[stacks[i]].connections[1] = movable;
+                        activity.blocks.blockList[stackId].connections[1] = movable;
                         activity.blocks.blockList[movable].connections[2] = setKey;
                     } else {
-                        activity.blocks.blockList[stacks[i]].connections[1] = setKey;
+                        activity.blocks.blockList[stackId].connections[1] = setKey;
                     }
 
                     activity.blocks.adjustExpandableClampBlock();
@@ -4452,5 +4496,5 @@ const piemenuDissectNumber = widget => {
 };
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { piemenuPitches, piemenuIntervals };
+    module.exports = { piemenuPitches, piemenuIntervals, piemenuKey, piemenuNumber };
 }

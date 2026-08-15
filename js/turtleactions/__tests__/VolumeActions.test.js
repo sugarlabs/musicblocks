@@ -17,6 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+global.clampNumber = require("../../utils/utils-logic").clampNumber;
 const setupVolumeActions = require("../VolumeActions");
 
 describe("setupVolumeActions", () => {

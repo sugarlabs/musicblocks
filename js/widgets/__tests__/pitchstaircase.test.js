@@ -746,6 +746,7 @@ describe("PitchStaircase Widget", () => {
             mockSynth = {
                 trigger: jest.fn(),
                 stop: jest.fn(),
+                stopSound: jest.fn(),
                 setMasterVolume: jest.fn()
             };
 
@@ -783,81 +784,57 @@ describe("PitchStaircase Widget", () => {
         });
 
         test("row click mid-play should stop row and synth", () => {
-            // First click plays
             psc.Stairs = [["A", "", 220.0]];
-            psc._stepTables = [{ rows: [{ cells: [null, mockStepCell] }] }];
+            psc.init({
+                logo: { synth: mockSynth },
+                textMsg: jest.fn(),
+                palettes: { dict: {} }
+            });
 
-            // Re-bind onclick handler mock logic in init or manually as in _makeStairs
-            const playCellClick = () => {
-                const i = Number(mockPlayCell.getAttribute("id"));
-                const stepCell = psc._stepTables[i].rows[0].cells[1];
-                if (psc._playingRowIndex === i) {
-                    clearTimeout(psc._rowStopTimeout);
-                    stepCell.classList.remove("active");
-                    stepCell.style.backgroundColor = "";
-                    psc._setButtonIcon(mockPlayCell, "play-button.svg", _("Play"));
-                    psc.activity.logo.synth.stop();
-                    psc._playingRowIndex = null;
-                } else {
-                    psc._playOne(stepCell, mockPlayCell);
-                }
-            };
+            const playCell = psc._stepTables[0].rows[0].cells[0];
+            playCell.setAttribute("id", "0");
+            playCell.replaceChildren = jest.fn();
 
             // Play the row
-            playCellClick();
+            playCell.onclick();
             expect(mockSynth.trigger).toHaveBeenCalled();
             expect(psc._playingRowIndex).toBe(0);
 
             // Click again to stop
-            mockPlayCell.replaceChildren.mockClear();
-            playCellClick();
+            playCell.replaceChildren.mockClear();
+            mockSynth.stopSound.mockClear();
+            playCell.onclick();
 
-            expect(mockSynth.stop).toHaveBeenCalled();
+            expect(mockSynth.stopSound).toHaveBeenCalledWith(0, global.DEFAULTVOICE, 220);
+            expect(mockSynth.stop).not.toHaveBeenCalled();
             expect(psc._playingRowIndex).toBeNull();
-            let img = mockPlayCell.replaceChildren.mock.calls[0][1];
+            let img = playCell.replaceChildren.mock.calls[0][0];
             expect(img.getAttribute("src")).toBe("header-icons/play-button.svg");
         });
 
         test("_playAll and header button click mid-play should play and stop", () => {
             psc.Stairs = [["A", "", 220.0]];
-            psc._stepTables = [{ rows: [{ cells: [null, mockStepCell] }] }];
-
-            const mockHeaderButton = {
-                replaceChildren: jest.fn(),
-                classList: {
-                    contains: jest.fn().mockReturnValue(false)
-                }
-            };
-            psc._playAllButton = mockHeaderButton;
-
-            const playAllClick = () => {
-                if (psc._isPlayingAll) {
-                    clearTimeout(psc._playAllTimeout);
-                    for (let i = 0; i < psc.Stairs.length; i++) {
-                        const stepCell = psc._stepTables[i].rows[0].cells[1];
-                        stepCell.classList.remove("active");
-                    }
-                    psc._setButtonIcon(psc._playAllButton, "play-chord.svg", _("Play chord"));
-                    psc.activity.logo.synth.stop();
-                    psc._isPlayingAll = false;
-                } else {
-                    psc._playAll();
-                }
-            };
+            psc.init({
+                logo: { synth: mockSynth },
+                textMsg: jest.fn(),
+                palettes: { dict: {} }
+            });
 
             // Start playing chord
-            playAllClick();
+            psc._playAllButton.onclick();
             expect(mockSynth.trigger).toHaveBeenCalled();
             expect(psc._isPlayingAll).toBe(true);
-            let img1 = mockHeaderButton.replaceChildren.mock.calls[0][0];
+            let img1 = psc._playAllButton.replaceChildren.mock.calls[0][0];
             expect(img1.getAttribute("src")).toBe("header-icons/stop-button.svg");
 
             // Stop playing chord
-            mockHeaderButton.replaceChildren.mockClear();
-            playAllClick();
-            expect(mockSynth.stop).toHaveBeenCalled();
+            psc._playAllButton.replaceChildren.mockClear();
+            mockSynth.stopSound.mockClear();
+            psc._playAllButton.onclick();
+            expect(mockSynth.stopSound).toHaveBeenCalledWith(0, global.DEFAULTVOICE);
+            expect(mockSynth.stop).not.toHaveBeenCalled();
             expect(psc._isPlayingAll).toBe(false);
-            let img2 = mockHeaderButton.replaceChildren.mock.calls[0][0];
+            let img2 = psc._playAllButton.replaceChildren.mock.calls[0][0];
             expect(img2.getAttribute("src")).toBe("header-icons/play-chord.svg");
         });
 
@@ -866,48 +843,28 @@ describe("PitchStaircase Widget", () => {
                 ["A", "", 220.0],
                 ["B", "", 240.0]
             ];
-            const mockRowA = { cells: [null, mockStepCell] };
-            const mockRowB = { cells: [null, mockStepCell] };
-            psc._stepTables = [{ rows: [mockRowA] }, { rows: [mockRowB] }];
-
-            const mockHeaderButton = {
-                replaceChildren: jest.fn(),
-                classList: {
-                    contains: jest.fn().mockReturnValue(false)
-                }
-            };
-            psc._playScaleButton = mockHeaderButton;
-
-            const playScaleClick = () => {
-                if (psc._isPlayingScale) {
-                    psc._scaleStopped = true;
-                    clearTimeout(psc._scaleTimeout);
-                    for (let i = 0; i < psc.Stairs.length; i++) {
-                        const stepCell = psc._stepTables[i].rows[0].cells[1];
-                        stepCell.classList.remove("active");
-                    }
-                    psc._setButtonIcon(psc._playScaleButton, "play-scale.svg", _("Play scale"));
-                    psc.activity.logo.synth.stop();
-                    psc._isPlayingScale = false;
-                } else {
-                    psc.playUpAndDown();
-                }
-            };
+            psc.init({
+                logo: { synth: mockSynth },
+                textMsg: jest.fn(),
+                palettes: { dict: {} }
+            });
 
             // Start playing scale
-            playScaleClick();
+            psc._playScaleButton.onclick();
             expect(mockSynth.trigger).toHaveBeenCalled();
             expect(psc._isPlayingScale).toBe(true);
-            let img1 = mockHeaderButton.replaceChildren.mock.calls[0][0];
+            let img1 = psc._playScaleButton.replaceChildren.mock.calls[0][0];
             expect(img1.getAttribute("src")).toBe("header-icons/stop-button.svg");
 
             // Stop playing scale
-            mockHeaderButton.replaceChildren.mockClear();
-            playScaleClick();
-            expect(mockSynth.stop).toHaveBeenCalled();
+            psc._playScaleButton.replaceChildren.mockClear();
+            mockSynth.stopSound.mockClear();
+            psc._playScaleButton.onclick();
+            expect(mockSynth.stopSound).toHaveBeenCalledWith(0, global.DEFAULTVOICE);
+            expect(mockSynth.stop).not.toHaveBeenCalled();
             expect(psc._isPlayingScale).toBe(false);
             expect(psc._scaleStopped).toBe(true);
-            let img2 = mockHeaderButton.replaceChildren.mock.calls[0][0];
+            let img2 = psc._playScaleButton.replaceChildren.mock.calls[0][0];
             expect(img2.getAttribute("src")).toBe("header-icons/play-scale.svg");
         });
 
@@ -933,9 +890,9 @@ describe("PitchStaircase Widget", () => {
             expect(psc._playAllButton.replaceChildren).toHaveBeenCalled();
 
             // Stop playing all
-            mockSynth.stop.mockClear();
+            mockSynth.stopSound.mockClear();
             psc._playAllButton.onclick();
-            expect(mockSynth.stop).toHaveBeenCalled();
+            expect(mockSynth.stopSound).toHaveBeenCalledWith(0, global.DEFAULTVOICE);
             expect(psc._isPlayingAll).toBe(false);
 
             // 2. Play Scale Button
@@ -945,9 +902,9 @@ describe("PitchStaircase Widget", () => {
             expect(psc._isPlayingScale).toBe(true);
 
             // Stop playing scale
-            mockSynth.stop.mockClear();
+            mockSynth.stopSound.mockClear();
             psc._playScaleButton.onclick();
-            expect(mockSynth.stop).toHaveBeenCalled();
+            expect(mockSynth.stopSound).toHaveBeenCalledWith(0, global.DEFAULTVOICE);
             expect(psc._isPlayingScale).toBe(false);
             expect(psc._scaleStopped).toBe(true);
         });
@@ -982,9 +939,9 @@ describe("PitchStaircase Widget", () => {
             expect(psc._playingRowIndex).toBe(0);
 
             // Stop playing row
-            mockSynth.stop.mockClear();
+            mockSynth.stopSound.mockClear();
             playCell.onclick();
-            expect(mockSynth.stop).toHaveBeenCalled();
+            expect(mockSynth.stopSound).toHaveBeenCalledWith(0, global.DEFAULTVOICE, 220);
             expect(psc._playingRowIndex).toBeNull();
         });
 

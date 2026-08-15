@@ -18,10 +18,10 @@
  */
 
 /* exported
-   deepClone, fileBasename, fileExt, hex2rgb, hexToRGB, isSafeUrl, last,
+   deepClone, fileBasename, fileExt, hex2rgb, hexToRGB, isSafeUrl, isUnsafeObjectKey, last,
    mixedNumber, nearestBeat, oneHundredToFraction, rationalSum, rgbToHex,
    safeSVG, safeJSONParse, toFixed2, toTitleCase, unescapeHTML, escapeHTML,
-   rationalToFraction, GCD, LCD, resolveObject
+   rationalToFraction, GCD, LCD, resolveObject, clampNumber
 */
 
 /**
@@ -189,6 +189,19 @@ var safeSVG = text => {
 };
 
 /**
+ * Reserved property names that must never be used as keys when copying
+ * externally-supplied data onto a plain object. Assigning to these keys
+ * via bracket notation can reach Object.prototype (prototype pollution)
+ * or overwrite the target's own constructor reference.
+ */
+var RESERVED_OBJECT_KEYS = ["__proto__", "constructor", "prototype"];
+
+/**
+ * Checks whether a key is unsafe to assign onto a plain object.
+ */
+var isUnsafeObjectKey = key => RESERVED_OBJECT_KEYS.includes(key);
+
+/**
  * Formats a number to at most two decimal places.
  * NOTE: This function removes trailing zeros (e.g., 3.10 becomes 3.1).
  */
@@ -321,7 +334,7 @@ var rationalSum = (a, b) => {
         if (typeof console !== "undefined") {
             console.warn("Invalid input passed to rationalSum:", a, b);
         }
-        return [[0, 1], _("Invalid input passed to rationalSum")];
+        return [[0, 1], _("Invalid input passed to rational sum")];
     }
 
     if (a[1] === 0 || b[1] === 0) {
@@ -528,6 +541,23 @@ var oneHundredToFraction = d => {
 };
 
 /**
+ * Clamps a numeric value between a minimum and maximum bound with fallback handling.
+ * @param {number} val - Value to clamp
+ * @param {number} min - Minimum allowed bound
+ * @param {number} max - Maximum allowed bound
+ * @param {number} [fallback=min] - Fallback value if val is non-numeric or NaN
+ * @returns {number} The clamped numeric value
+ */
+var clampNumber = (val, min, max, fallback = min) => {
+    if (typeof val !== "number" || Number.isNaN(val)) {
+        return fallback;
+    }
+    const lower = Math.min(min, max);
+    const upper = Math.max(min, max);
+    return Math.min(Math.max(val, lower), upper);
+};
+
+/**
  * Converts RGB values to a hexadecimal color code.
  */
 var rgbToHex = (r, g, b) => {
@@ -538,26 +568,44 @@ var rgbToHex = (r, g, b) => {
  * Converts a hexadecimal color code to RGB values.
  */
 var hexToRGB = hex => {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result
-        ? {
-              r: parseInt(result[1], 16),
-              g: parseInt(result[2], 16),
-              b: parseInt(result[3], 16)
-          }
-        : null;
+    if (typeof hex !== "string") return null;
+    const cleanHex = hex.trim();
+    const fullResult = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(cleanHex);
+    if (fullResult) {
+        return {
+            r: parseInt(fullResult[1], 16),
+            g: parseInt(fullResult[2], 16),
+            b: parseInt(fullResult[3], 16)
+        };
+    }
+    const shortResult = /^#?([a-f\d])([a-f\d])([a-f\d])$/i.exec(cleanHex);
+    if (shortResult) {
+        return {
+            r: parseInt(shortResult[1] + shortResult[1], 16),
+            g: parseInt(shortResult[2] + shortResult[2], 16),
+            b: parseInt(shortResult[3] + shortResult[3], 16)
+        };
+    }
+    return null;
 };
 
 /**
- * Converts a hexcode to RGBA format.
+ * Converts a hexadecimal color code to RGBA format.
+ * Supports both 3-digit shorthand (#rgb) and 6-digit (#rrggbb) formats with an optional alpha parameter.
+ * @param {string} hex - Hex color code (3-digit or 6-digit, with or without #)
+ * @param {number} [alpha=1] - Alpha transparency value (0 to 1)
+ * @returns {string} RGBA formatted string e.g. "rgba(255,0,0,1)"
  */
-var hex2rgb = hex => {
-    const bigint = parseInt(hex, 16);
-    const r = (bigint >> 16) & 255;
-    const g = (bigint >> 8) & 255;
-    const b = bigint & 255;
-
-    return "rgba(" + r + "," + g + "," + b + ",1)";
+var hex2rgb = (hex, alpha = 1) => {
+    if (typeof hex !== "string") return "rgba(0,0,0,1)";
+    const rgb = hexToRGB(hex);
+    if (!rgb) return "rgba(0,0,0,1)";
+    const safeAlpha = clampNumber(
+        typeof alpha === "number" && !Number.isNaN(alpha) ? alpha : 1,
+        0,
+        1
+    );
+    return `rgba(${rgb.r},${rgb.g},${rgb.b},${safeAlpha})`;
 };
 
 /**
@@ -604,6 +652,7 @@ var UtilsLogic = {
     unescapeHTML,
     isSafeUrl,
     safeSVG,
+    isUnsafeObjectKey,
     toFixed2,
     rationalToFraction,
     GCD,
@@ -615,7 +664,8 @@ var UtilsLogic = {
     rgbToHex,
     hexToRGB,
     hex2rgb,
-    resolveObject
+    resolveObject,
+    clampNumber
 };
 
 if (typeof module !== "undefined" && module.exports) {

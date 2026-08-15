@@ -20,7 +20,7 @@
    TONEBPM, Singer, _, delayExecution, deepClone, docById, ManagedTimer,
    calcNoteValueToDisplay, platformColor, beginnerMode, last,
    EIGHTHNOTEWIDTH, nearestBeat, rationalToFraction, DRUMNAMES,
-   VOICENAMES, EFFECTSNAMES
+   VOICENAMES, EFFECTSNAMES, clampNumber
 */
 /*
     Globals location
@@ -711,7 +711,7 @@ class RhythmRuler {
                 const inputValue = parseInt(this._dissectNumber.value, 10);
                 if (!isNaN(inputValue) && inputValue > 0) {
                     // Validate the input value - allow any number from 2 to 128
-                    const validatedValue = Math.min(Math.max(inputValue, 2), 128);
+                    const validatedValue = clampNumber(inputValue, 2, 128);
                     this._dissectNumber.value = validatedValue;
                 }
                 this._dissectNumber.blur();

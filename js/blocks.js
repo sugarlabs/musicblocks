@@ -471,7 +471,12 @@ class Blocks {
             if (this.activeBlock !== null) {
                 /** Don't extract silence blocks. */
                 if (this.blockList[this.activeBlock].name !== "rest2") {
+                    const thisBlock = this.activeBlock;
+
+                    const parentExpandableBlk = this.insideExpandableBlock(thisBlock);
                     this._extractBlock(this.activeBlock, true);
+
+                    this.addDefaultBlock(parentExpandableBlk, thisBlock);
                 }
             }
         };
@@ -4841,7 +4846,7 @@ class Blocks {
 
                 /** Don't make duplicate action names. */
                 /** Add a palette entry for any new storein blocks. */
-                const stringValues = {}; /** label: [blocks with that label] */
+                const stringValues = Object.create(null); /** label: [blocks with that label] */
                 const actionNames = {}; /** action block: label block */
                 const storeinNames = {}; /** storein block: label block */
                 const doNames = {}; /** do block: label block, nameddo block value */
@@ -6783,12 +6788,14 @@ class Blocks {
          * @param logo
          * @param turtle
          * @param blk
-         * @returns {void}
+         * @returns {boolean} Whether the displayed parameter value changed.
          */
         this.updateParameterBlock = (logo, turtle, blk) => {
             const name = this.blockList[blk].name;
 
             if (this.blockList[blk].protoblock.parameter && this.blockList[blk].text !== null) {
+                const text = this.blockList[blk].text;
+                const previousText = text.text;
                 let value = 0;
 
                 if (typeof this.blockList[blk].protoblock.updateParameter === "function") {
@@ -6803,32 +6810,39 @@ class Blocks {
                             name
                         );
                     } else {
-                        return;
+                        return false;
                     }
                 }
 
                 // Comprehensive safety check for all value types
                 if (value === null || value === undefined) {
-                    this.blockList[blk].text.text = "";
+                    text.text = "";
                 } else if (typeof value === "string") {
                     if (value.length > 6) {
                         value = value.substr(0, 5) + "...";
                     }
-                    this.blockList[blk].text.text = value;
+                    text.text = value;
                 } else if (name === "divide") {
-                    this.blockList[blk].text.text = mixedNumber(value);
+                    text.text = mixedNumber(value);
                 } else {
                     // Safe toString conversion
                     try {
-                        this.blockList[blk].text.text = value.toString();
+                        text.text = value.toString();
                     } catch (error) {
                         console.warn("Error converting value to string:", value, error);
-                        this.blockList[blk].text.text = "";
+                        text.text = "";
                     }
                 }
 
+                if (text.text === previousText) {
+                    return false;
+                }
+
                 this.blockList[blk].container.updateCache();
+                return true;
             }
+
+            return false;
         };
 
         /**

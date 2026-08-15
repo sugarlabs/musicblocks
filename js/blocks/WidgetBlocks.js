@@ -136,6 +136,24 @@ function setupWidgetBlocks(activity) {
         });
     }
 
+    function _hasValidMeterWidgetInput(logo) {
+        const blockList = activity.blocks.blockList;
+        const meterBlock = blockList[logo._meterBlock];
+        const meterConnections = meterBlock?.connections;
+        const beatCountBlock = blockList[meterConnections?.[1]];
+        const beatValueBlock = blockList[meterConnections?.[2]];
+        const beatValueConnections = beatValueBlock?.connections;
+        const numeratorBlock = blockList[beatValueConnections?.[1]];
+        const denominatorBlock = blockList[beatValueConnections?.[2]];
+
+        return (
+            meterBlock &&
+            typeof beatCountBlock?.value === "number" &&
+            typeof numeratorBlock?.value === "number" &&
+            typeof denominatorBlock?.value === "number"
+        );
+    }
+
     /**
      * Represents a block for controlling sound envelope (ADSR).
      * @extends FlowBlock
@@ -636,11 +654,17 @@ function setupWidgetBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             logo.insideMeterWidget = true;
+            logo._meterBlock = null;
 
             const listenerName = "_meterwidget_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
+                if (!_hasValidMeterWidgetInput(logo)) {
+                    logo.insideMeterWidget = false;
+                    return;
+                }
+
                 _lazyLoadWidget(
                     logo,
                     "meterWidget",

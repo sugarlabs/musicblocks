@@ -211,7 +211,8 @@ class PitchStaircase {
                     stepCell.classList.remove("active");
                     stepCell.style.backgroundColor = "";
                     this._setButtonIcon(playCell, "play-button.svg", _("Play"));
-                    this.activity.logo.synth.stop();
+                    const frequency = Number(stepCell.getAttribute("id"));
+                    this.activity.logo.synth.stopSound(0, DEFAULTVOICE, frequency);
                     this._playingRowIndex = null;
                 } else {
                     this._playOne(stepCell, playCell);
@@ -722,6 +723,13 @@ class PitchStaircase {
         widgetWindow.show();
         widgetWindow.onclose = () => {
             this.closed = true;
+            clearTimeout(this._rowStopTimeout);
+            clearTimeout(this._playAllTimeout);
+            clearTimeout(this._scaleTimeout);
+            this._scaleStopped = true;
+            this._isPlayingAll = false;
+            this._isPlayingScale = false;
+            this._playingRowIndex = null;
             this.activity.logo.synth.stop();
             // Restore the project's master volume so audio still works
             // after exiting mid-playback (was incorrectly left at PREVIEWVOLUME).
@@ -745,7 +753,7 @@ class PitchStaircase {
                     stepCell.classList.remove("active");
                 }
                 this._setButtonIcon(this._playAllButton, "play-chord.svg", _("Play chord"));
-                this.activity.logo.synth.stop();
+                this.activity.logo.synth.stopSound(0, DEFAULTVOICE);
                 this._isPlayingAll = false;
             } else {
                 this._playAll();
@@ -766,7 +774,7 @@ class PitchStaircase {
                     stepCell.classList.remove("active");
                 }
                 this._setButtonIcon(this._playScaleButton, "play-scale.svg", _("Play scale"));
-                this.activity.logo.synth.stop();
+                this.activity.logo.synth.stopSound(0, DEFAULTVOICE);
                 this._isPlayingScale = false;
             } else {
                 this.playUpAndDown();

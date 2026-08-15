@@ -24,7 +24,8 @@
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
    noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction,
-   SEMITONES, normalizeNoteAccidentals, parseNoteString, getCurrentEDO, isTrueEDO
+   SEMITONES, normalizeNoteAccidentals, parseNoteString, getCurrentEDO, isTrueEDO,
+   clampNumber
  */
 
 /*
@@ -736,7 +737,7 @@ class Singer {
      */
     static setMasterVolume(logo, volume, blk) {
         const activity = logo.activity;
-        volume = Math.min(Math.max(volume, 0), 100);
+        volume = clampNumber(volume, 0, 100);
         if (blk) {
             const firstConnection = activity.blocks.blockList[blk].connections[0];
             const lastConnection = last(activity.blocks.blockList[blk].connections);
@@ -774,7 +775,7 @@ class Singer {
      * @returns {void}
      */
     static setSynthVolume(logo, turtle, synth, volume, blk) {
-        volume = Math.min(Math.max(volume, 0), 100);
+        volume = clampNumber(volume, 0, 100);
 
         if (logo.synth && typeof logo.synth.resolveInstrumentName === "function") {
             synth = logo.synth.resolveInstrumentName(synth);
@@ -1570,13 +1571,14 @@ class Singer {
 
         partials = [1];
         if (tur.singer.inHarmonic.length > 0) {
-            if (partials.length === 0) {
+            const activePartials = last(tur.singer.partials);
+            if (!activePartials || activePartials.length === 0) {
                 //.TRANS: partials are weighted components in a harmonic series
                 activity.errorMsg(
                     _("You must have at least one Partial block inside of a Weighted-partial block")
                 );
             } else {
-                partials = last(tur.singer.partials);
+                partials = activePartials;
             }
         }
 

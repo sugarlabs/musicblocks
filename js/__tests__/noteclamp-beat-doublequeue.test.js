@@ -295,14 +295,8 @@ describe("note clamp + beat event double queue", () => {
         const newnote = makeFlowBlock(
             "newnote",
             [null, 1, 2, 4],
-            (args, l, t, blk, receivedArg) => {
-                const tur = l.turtles.ithTurtle(t);
-                const _callback = () => {
-                    const queueBlock = new Queue(args[1], 1, blk, receivedArg);
-                    tur.parentFlowQueue.push(blk);
-                    tur.queue.push(queueBlock);
-                };
-                Singer.RhythmActions.playNote(args[0], "newnote", t, blk, _callback);
+            (args, l, t, blk) => {
+                Singer.RhythmActions.playNote(args[0], "newnote", t, blk);
                 return [args[1], 1];
             },
             [null, "numberin", "in", "in"],
