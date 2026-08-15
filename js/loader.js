@@ -19,7 +19,9 @@ const ASSET_VERSION = window.location.protocol === "file:" ? "" : "v=999999_fix7
 requirejs.config({
     baseUrl: "./",
     urlArgs: ASSET_VERSION,
-    waitSeconds: 60,
+    // Keep the bootstrap alive while modules download or evaluate on slow
+    // connections. The loading splash remains visible until initialization completes.
+    waitSeconds: 0,
     shim: {
         "easeljs.min": {
             exports: "createjs"
