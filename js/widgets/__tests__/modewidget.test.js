@@ -279,6 +279,77 @@ describe("ModeWidget", () => {
         expect(modeWidget._selectedNotes[0]).toBe(true);
     });
 
+    test("should cache source EDO state before translating for round-trip restore", () => {
+        // Simulate a 12-EDO major: notes at 0,2,4,5,7,9,11
+        modeWidget._activeEDO = 12;
+        modeWidget._selectedNotes = [
+            true,
+            false,
+            true,
+            false,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true
+        ];
+        const originalNotes = modeWidget._selectedNotes.slice();
+
+        // Cache the 12-EDO state (as _wireEdoSelect now does)
+        modeWidget._edoNoteCache[12] = modeWidget._selectedNotes.slice();
+
+        // Switch to 5-EDO (translate + cache destination)
+        modeWidget._translateNotesToEDO(5);
+        modeWidget._edoNoteCache[5] = modeWidget._selectedNotes.slice();
+        modeWidget._activeEDO = 5;
+
+        expect(modeWidget._selectedNotes).toHaveLength(5);
+
+        // Switch back to 12-EDO — should restore from cache, not translate
+        modeWidget._selectedNotes = modeWidget._edoNoteCache[12].slice();
+        modeWidget._activeEDO = 12;
+
+        expect(modeWidget._selectedNotes).toHaveLength(12);
+        expect(modeWidget._selectedNotes).toEqual(originalNotes);
+    });
+
+    test("should show textMsg when notes are remapped on EDO switch", () => {
+        modeWidget._activeEDO = 12;
+        modeWidget._selectedNotes = [
+            true,
+            false,
+            true,
+            false,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true
+        ];
+
+        // Simulate _wireEdoSelect cache-miss path
+        modeWidget._edoNoteCache[12] = modeWidget._selectedNotes.slice();
+        const oldEDO = modeWidget._activeEDO;
+        modeWidget._translateNotesToEDO(5);
+        modeWidget._edoNoteCache[5] = modeWidget._selectedNotes.slice();
+
+        modeWidget.textMsg(
+            `Mode remapped from ${oldEDO}-EDO to 5-EDO. Some notes may have changed.`,
+            3000
+        );
+
+        expect(mockActivity.textMsg).toHaveBeenCalledWith(
+            expect.stringContaining("remapped from 12"),
+            3000
+        );
+    });
+
     test("should persist a custom mode to the registry and localStorage", () => {
         const pattern = [2, 2, 1, 2, 2, 2, 1];
         modeWidget._saveCustomMode("myMode", pattern);

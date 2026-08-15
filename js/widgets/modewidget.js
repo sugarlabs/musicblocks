@@ -89,7 +89,6 @@ class ModeWidget {
         this._playing = false;
         this._selectedNotes = [];
         this._edoNoteCache = {};
-        this._edoNoteCache[this._activeEDO] = this._selectedNotes.slice();
         this._activeEDO = getCurrentEDO(this.logo.synth.inTemperament);
 
         this.widgetWindow = window.widgetWindows.windowFor(this, "custom mode");
@@ -301,11 +300,23 @@ class ModeWidget {
                 return;
             }
 
+            // Cache the current EDO's state before translating so we can
+            // restore it losslessly when the user switches back.
+            this._edoNoteCache[this._activeEDO] = this._selectedNotes.slice();
+            const oldEDO = this._activeEDO;
+
             this._translateNotesToEDO(newEDO);
             // Save the resulting state for this EDO so future round-trips
             // can restore it exactly.
             this._edoNoteCache[newEDO] = this._selectedNotes.slice();
             this._rebuildWheel(newEDO);
+
+            this.textMsg(
+                _(
+                    `Mode remapped from ${oldEDO}-EDO to ${newEDO}-EDO. Some notes may have changed.`
+                ),
+                3000
+            );
 
             // Update mode name display without wiping the control bar.
             this._setModeName();
@@ -618,6 +629,16 @@ class ModeWidget {
         const pattern = nativeEDO ? mode : getModePattern(modeName, this._activeEDO);
         this._applyModePattern(pattern);
         this._setModeName();
+
+        // Show message if the mode pattern was scaled from a different EDO
+        if (nativeEDO && nativeEDO !== this._activeEDO) {
+            this.textMsg(
+                _(
+                    `Mode scaled from ${nativeEDO}-EDO to ${this._activeEDO}-EDO. Some notes may have changed.`
+                ),
+                3000
+            );
+        }
     }
 
     _applyModePattern(pattern) {
@@ -1103,46 +1124,6 @@ class ModeWidget {
         }, 2000);
     }
 
-    // ── Pie menu ──────────────────────────────────────────────────
-
-    _getModeLabelFont(edo) {
-        if (edo <= 5) {
-            return "100 26px sans-serif";
-        }
-        if (edo <= 7) {
-            return "100 22px sans-serif";
-        }
-        if (edo <= 12) {
-            return "100 16px sans-serif";
-        }
-        if (edo <= 19) {
-            return "100 12px sans-serif";
-        }
-        if (edo <= 24) {
-            return "100 10px sans-serif";
-        }
-        return "100 9px sans-serif";
-    }
-
-    _getNoteLabelFont(edo) {
-        if (edo <= 5) {
-            return "100 22px sans-serif";
-        }
-        if (edo <= 7) {
-            return "100 18px sans-serif";
-        }
-        if (edo <= 12) {
-            return "100 14px sans-serif";
-        }
-        if (edo <= 19) {
-            return "100 11px sans-serif";
-        }
-        if (edo <= 24) {
-            return "100 9px sans-serif";
-        }
-        return "100 8px sans-serif";
-    }
-
     _piemenuMode() {
         const n = this._activeEDO;
 
@@ -1169,7 +1150,9 @@ class ModeWidget {
         this._modeWheel.clickModeRotate = false;
         this._modeWheel.navAngle = -90;
         this._modeWheel.animatetime = 0;
-        this._modeWheel.titleFont = this._getModeLabelFont(n);
+
+        const titleFontSize = Math.min(48, Math.max(10, Math.floor(580 / n)));
+        this._modeWheel.titleFont = "400 " + titleFontSize + "px Times New Roman";
 
         const labels = [];
         for (let i = 0; i < n; i++) {
@@ -1181,13 +1164,12 @@ class ModeWidget {
         this._noteWheel.slicePathFunction = slicePath().DonutSlice;
         this._noteWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._noteWheel.slicePathCustom.minRadiusPercent = 0.75;
-        this._noteWheel.slicePathCustom.maxRadiusPercent = n > 12 ? 0.88 : 0.9;
+        this._noteWheel.slicePathCustom.maxRadiusPercent = 0.9;
         this._noteWheel.sliceSelectedPathCustom = this._noteWheel.slicePathCustom;
         this._noteWheel.sliceInitPathCustom = this._noteWheel.slicePathCustom;
         this._noteWheel.clickModeRotate = false;
         this._noteWheel.navAngle = -90;
         this._noteWheel.titleRotateAngle = 90;
-        this._noteWheel.titleFont = this._getNoteLabelFont(n);
 
         // Reconcile selectedNotes: preserve existing, ensure index 0 is always true
         const oldNotes = this._selectedNotes;
@@ -1202,7 +1184,7 @@ class ModeWidget {
         }
 
         // Slice 0: blank (no X toggle — root is always selected)
-        // Slices 1..n-1: "x" toggle
+        // Slices 1..n-1: "x" toggle (dynamic EDO layout)
         const noteList = [" "];
         for (let i = 1; i < n; i++) {
             noteList.push("x");
@@ -1213,7 +1195,7 @@ class ModeWidget {
         this._playWheel.slicePathFunction = slicePath().DonutSlice;
         this._playWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         this._playWheel.slicePathCustom.minRadiusPercent = 0.3;
-        this._playWheel.slicePathCustom.maxRadiusPercent = n > 12 ? 0.38 : 0.4;
+        this._playWheel.slicePathCustom.maxRadiusPercent = 0.4;
         this._playWheel.sliceSelectedPathCustom = this._playWheel.slicePathCustom;
         this._playWheel.sliceInitPathCustom = this._playWheel.slicePathCustom;
         this._playWheel.clickModeRotate = false;
@@ -1232,6 +1214,9 @@ class ModeWidget {
 
         const __setNote = () => {
             const i = this._modeWheel.selectedNavItemIndex;
+            if (i === 0) {
+                return;
+            }
             this._saveState();
             this._selectedNotes[i] = true;
             this._noteWheel.navItems[i].navItem.show();

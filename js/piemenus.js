@@ -3553,6 +3553,28 @@ const piemenuModes = (block, selectedMode) => {
 
     const that = block;
 
+    // Suppresses the mode-widget launch during programmatic wheel navigation
+    // (initial menu setup and group switching) so that only genuine user
+    // clicks on the "custom" slice open the circular mode editor.
+    let menuInitializing = true;
+
+    // Opens the circular mode editor widget so the selected custom mode can
+    // be built or edited on the N-slice wheel. The widget reads the active
+    // temperament from the logo synth on construction.
+    const __launchModeWidget = () => {
+        if (typeof ModeWidget === "undefined") {
+            if (typeof require !== "undefined") {
+                require(["widgets/modewidget"], function () {
+                    const act = block.activity;
+                    act.logo.modeWidget = new ModeWidget(act);
+                });
+            }
+        } else {
+            const act = block.activity;
+            act.logo.modeWidget = new ModeWidget(act);
+        }
+    };
+
     const __selectionChanged = () => {
         const title = that._modeNameWheel.navItems[that._modeNameWheel.selectedNavItemIndex].title;
         if (title === " ") {
@@ -3581,6 +3603,12 @@ const piemenuModes = (block, selectedMode) => {
             // Make sure text is on top.
             that.container.setChildIndex(that.text, that.container.children.length - 1);
             that.updateCache();
+        }
+
+        // Launch the circular mode editor when the user selects the
+        // custom mode in the radial menu.
+        if (!menuInitializing && that.value === "custom") {
+            __launchModeWidget();
         }
     };
 
@@ -3713,7 +3741,11 @@ const piemenuModes = (block, selectedMode) => {
             i = 0; // major/ionian
         }
 
+        // Programmatic navigation during setup/group switching must not
+        // launch the mode editor; only a real user click does that.
+        menuInitializing = true;
         that._modeNameWheel.navigateWheel(i);
+        menuInitializing = false;
     };
 
     let timeout;
