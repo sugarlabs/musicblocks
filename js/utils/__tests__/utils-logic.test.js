@@ -33,7 +33,8 @@ const {
     deepClone,
     isSafeUrl,
     isUnsafeObjectKey,
-    isValidHex
+    isValidHex,
+    formatSeconds
 } = require("../utils-logic.js");
 
 describe("Utility Logic Functions", () => {
@@ -251,6 +252,33 @@ describe("Utility Logic Functions", () => {
             expect(clampNumber("invalid", 0, 10)).toBe(0);
             expect(clampNumber(NaN, 0, 10, 5)).toBe(5);
             expect(clampNumber(null, 0, 10)).toBe(0);
+        });
+    });
+
+    describe("formatSeconds()", () => {
+        it("formats seconds into MM:SS format", () => {
+            expect(formatSeconds(0)).toBe("00:00");
+            expect(formatSeconds(5)).toBe("00:05");
+            expect(formatSeconds(65)).toBe("01:05");
+            expect(formatSeconds(125)).toBe("02:05");
+        });
+
+        it("formats large durations into HH:MM:SS format", () => {
+            expect(formatSeconds(3600)).toBe("01:00:00");
+            expect(formatSeconds(3665)).toBe("01:01:05");
+        });
+
+        it("handles numeric string inputs", () => {
+            expect(formatSeconds("125")).toBe("02:05");
+            expect(formatSeconds("65.8")).toBe("01:05");
+        });
+
+        it("returns fallback 00:00 for invalid or negative inputs", () => {
+            expect(formatSeconds(-10)).toBe("00:00");
+            expect(formatSeconds(NaN)).toBe("00:00");
+            expect(formatSeconds(null)).toBe("00:00");
+            expect(formatSeconds(undefined)).toBe("00:00");
+            expect(formatSeconds("invalid")).toBe("00:00");
         });
     });
 
