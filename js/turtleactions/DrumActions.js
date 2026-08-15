@@ -135,7 +135,7 @@ function setupDrumActions(activity) {
             const listenerName = "_setdrum_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
@@ -177,7 +177,7 @@ function setupDrumActions(activity) {
             const listenerName = "_mapdrum_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (MusicBlocks.isRun) {
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }

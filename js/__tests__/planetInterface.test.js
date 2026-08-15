@@ -18,18 +18,20 @@
  */
 
 const PlanetInterface = require("../planetInterface");
+const { PubSub } = require("../pubsub");
 global.platformColor = {
     header: "#8bc34a"
 };
 global._THIS_IS_MUSIC_BLOCKS_ = {};
 global.doSVG = jest.fn();
+global.pubsub = new PubSub();
 
 const mockActivity = {
     hideSearchWidget: jest.fn(),
     prepSearchWidget: jest.fn(),
     sendAllToTrash: jest.fn(),
     refreshCanvas: jest.fn(),
-    _loadStart: jest.fn(),
+    justLoadStart: jest.fn(),
     doLoadAnimation: jest.fn(),
     textMsg: jest.fn(),
     errorMsg: jest.fn(),
@@ -145,14 +147,14 @@ describe("PlanetInterface", () => {
         expect(planetInterface.showMusicBlocks).toHaveBeenCalled();
     });
 
-    test("newProject calls closePlanet, initialiseNewProject, _loadStart, and saveLocally", () => {
+    test("newProject calls closePlanet, initialiseNewProject, justLoadStart, and saveLocally", () => {
         jest.spyOn(planetInterface, "closePlanet").mockImplementation(() => {});
         jest.spyOn(planetInterface, "initialiseNewProject").mockImplementation(() => {});
         jest.spyOn(planetInterface, "saveLocally").mockImplementation(() => {});
         planetInterface.newProject();
         expect(planetInterface.closePlanet).toHaveBeenCalled();
         expect(planetInterface.initialiseNewProject).toHaveBeenCalled();
-        expect(mockActivity._loadStart).toHaveBeenCalled();
+        expect(mockActivity.justLoadStart).toHaveBeenCalled();
         expect(planetInterface.saveLocally).toHaveBeenCalled();
     });
     test("onConverterLoad sets window.Converter", () => {
@@ -445,25 +447,12 @@ describe("PlanetInterface", () => {
 
     it("loadProjectFromData removes finishedLoading listener after load", () => {
         planetInterface.iframe = { style: { display: "" } };
-        const removeSpy = jest.spyOn(document, "removeEventListener");
+        const offSpy = jest.spyOn(global.pubsub, "off");
         planetInterface.getCurrentProjectName = jest.fn(() => "foo");
         planetInterface.loadProjectFromData('{"test": 1}');
-        const event = new Event("finishedLoading");
-        document.dispatchEvent(event);
-        expect(removeSpy).toHaveBeenCalledWith("finishedLoading", expect.any(Function));
-        removeSpy.mockRestore();
-    });
-
-    it("loadProjectFromData uses attachEvent if addEventListener is missing", () => {
-        planetInterface.iframe = { style: { display: "" } };
-        const savedAdd = document.addEventListener;
-        document.addEventListener = undefined;
-        document.attachEvent = jest.fn();
-        planetInterface.getCurrentProjectName = jest.fn(() => "foo");
-        planetInterface.loadProjectFromData('{"test": 1}');
-        expect(document.attachEvent).toHaveBeenCalledWith("finishedLoading", expect.any(Function));
-        document.addEventListener = savedAdd;
-        delete document.attachEvent;
+        global.pubsub.emit("finishedLoading");
+        expect(offSpy).toHaveBeenCalledWith("finishedLoading", expect.any(Function));
+        offSpy.mockRestore();
     });
 
     it("loadProjectFromData catches JSON parse errors and calls activity.errorMsg", () => {

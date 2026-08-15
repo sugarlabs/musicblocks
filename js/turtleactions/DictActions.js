@@ -91,7 +91,7 @@ function setupDictActions(activity) {
                 if (targetTur.singer.lastNotePlayed !== null) {
                     const len = targetTur.singer.lastNotePlayed[0].length;
                     const pitch = targetTur.singer.lastNotePlayed[0].slice(0, len - 1);
-                    const octave = parseInt(targetTur.singer.lastNotePlayed[0].slice(len - 1));
+                    const octave = parseInt(targetTur.singer.lastNotePlayed[0].slice(len - 1), 10);
 
                     obj = [pitch, octave];
                 } else if (targetTur.singer.notePitches.length > 0) {

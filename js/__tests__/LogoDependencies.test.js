@@ -89,14 +89,14 @@ describe("LogoDependencies", () => {
             expect(deps.callbacks).toBe(callbacks);
         });
 
-        test("defaults optional deps to null", () => {
+        test("defaults optional deps to null/undefined when not provided", () => {
             const deps = new LogoDependencies(makeDeps());
-            expect(deps.instruments == null).toBe(true);
-            expect(deps.instrumentsFilters == null).toBe(true);
-            expect(deps.instrumentsEffects == null).toBe(true);
-            expect(deps.widgetWindows == null).toBe(true);
-            expect(deps.Singer == null).toBe(true);
-            expect(deps.Tone == null).toBe(true);
+            expect(deps.instruments).toBeFalsy();
+            expect(deps.instrumentsFilters).toBeFalsy();
+            expect(deps.instrumentsEffects).toBeFalsy();
+            expect(deps.widgetWindows).toBeFalsy();
+            expect(deps.Singer).toBeFalsy();
+            expect(deps.Tone).toBeFalsy();
         });
 
         test("stores optional deps when provided", () => {
@@ -187,7 +187,7 @@ describe("LogoDependencies.fromActivity", () => {
     test("errorHandler calls activity.errorMsg", () => {
         const deps = LogoDependencies.fromActivity(activity);
         deps.errorHandler("test error");
-        expect(activity.errorMsg).toHaveBeenCalledWith("test error");
+        expect(activity.errorMsg).toHaveBeenCalledWith("test error", undefined);
     });
 
     test("messageHandler.hide calls activity.hideMsgs", () => {

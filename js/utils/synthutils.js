@@ -18,7 +18,7 @@
    getOctaveRatio, isCustomTemperament, Singer, DOUBLEFLAT, DOUBLESHARP,
    DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
    getArticulation, piemenuPitches, docById, slicePath, wheelnav, platformColor,
-   DEFAULTVOICE, normalizeNoteAccidentals, parseNoteString
+   DEFAULTVOICE, normalizeNoteAccidentals, parseNoteString, clampNumber
 */
 
 /*
@@ -464,6 +464,60 @@ const instrumentsEffects = { 0: {} };
 const instrumentsFilters = { 0: {} };
 
 /**
+ * Transport wrapper — isolates Tone.Transport behind a stable interface.
+ * All timing/scheduling operations should go through this object so that
+ * Tone.js remains a swappable implementation detail of synthutils.js.
+ */
+const transport = {
+    get isAvailable() {
+        return typeof Tone !== "undefined" && Tone.Transport;
+    },
+    get isClockRunning() {
+        return (
+            this.isAvailable &&
+            typeof Tone.context !== "undefined" &&
+            Tone.context.state === "running" &&
+            Tone.Transport.state === "started"
+        );
+    },
+    start() {
+        if (this.isAvailable) Tone.Transport.start();
+    },
+    stop() {
+        if (this.isAvailable) Tone.Transport.stop();
+    },
+    cancel() {
+        if (this.isAvailable && typeof Tone.Transport.cancel === "function") {
+            Tone.Transport.cancel();
+        }
+    },
+    clear(id) {
+        if (this.isAvailable && typeof Tone.Transport.clear === "function") {
+            Tone.Transport.clear(id);
+        }
+    },
+    schedule(callback, time) {
+        if (this.isAvailable && typeof Tone.Transport.schedule === "function") {
+            return Tone.Transport.schedule(callback, time);
+        }
+        return null;
+    },
+    get seconds() {
+        if (this.isAvailable) return Tone.Transport.seconds;
+        return 0;
+    },
+    set seconds(v) {
+        if (this.isAvailable) Tone.Transport.seconds = v;
+    },
+    getSecondsAtTime(time) {
+        if (this.isAvailable && typeof Tone.Transport.getSecondsAtTime === "function") {
+            return Tone.Transport.getSecondsAtTime(time);
+        }
+        return this.seconds;
+    }
+};
+
+/**
  * Synth constructor function.
  * @constructor
  */
@@ -502,6 +556,7 @@ function Synth() {
     // Using Tone.js
     // this.tone = new Tone();
     this.tone = null;
+    this.transport = transport;
 
     Tone.Buffer.onload = () => {
         console.debug("sample loaded");
@@ -618,13 +673,29 @@ function Synth() {
             startPitch = startPitch.replace(SHARP, "#");
         }
 
-        const frequency = Tone.Frequency(startPitch).toFrequency();
+        let frequency;
+        if (t && !t.isEDO && t.noteLabels && t.ratios) {
+            // For JI/Pythagorean: compute from A0 reference, not 12-EDO Tone.Frequency
+            const startParsed = parseNoteString(startingPitch);
+            frequency = pitchToFrequency(startParsed[0], startParsed[1], 0, "C major", temperament);
+        } else {
+            frequency = Tone.Frequency(startPitch).toFrequency();
+        }
 
         const startParsed = parseNoteString(startingPitch);
         this.noteFrequencies = {
             // note: [octave, Frequency]
             [startParsed[0]]: [startParsed[1], frequency]
         };
+
+        // EDO temperaments compute frequencies via pitchToFrequency directly
+        // and never use noteFrequencies, so skip building the table.
+        // This also avoids crashing on microtonal interval names (e.g. "mid 2")
+        // that exist in the temperament definition but not in INTERVALVALUES.
+        if (t && t.isEDO) {
+            this.changeInTemperament = false;
+            return;
+        }
 
         for (const interval in t) {
             if (
@@ -640,15 +711,25 @@ function Synth() {
                 interval !== "octaveRatio" &&
                 interval !== "generator"
             ) {
-                const noteInfo = getNoteFromInterval(startingPitch, interval);
+                let noteInfo;
                 let ratio;
-                if (typeof t[interval] === "number") {
+                if (!isNaN(interval)) {
+                    const val = t[interval];
+                    if (Array.isArray(val) && val.length >= 3) {
+                        noteInfo = [val[1], val[2]];
+                        ratio = val[0];
+                    } else {
+                        continue;
+                    }
+                } else if (typeof t[interval] === "number") {
+                    noteInfo = getNoteFromInterval(startingPitch, interval);
                     ratio = t[interval];
                 } else if (
                     t[interval] &&
                     typeof t[interval] === "object" &&
                     typeof t[interval].ratio === "number"
                 ) {
+                    noteInfo = getNoteFromInterval(startingPitch, interval);
                     ratio = t[interval].ratio;
                 } else {
                     continue;
@@ -704,6 +785,7 @@ function Synth() {
                 //To get frequencies in Temperament Widget.
                 this.temperamentChanged(temperament, this.startingPitch);
             }
+            Singer.clearPitchToFrequencyCache();
         }
 
         if (this.inTemperament === "equal") {
@@ -726,9 +808,32 @@ function Synth() {
             }
         }
 
+        const t = getTemperament(this.inTemperament);
+        if (t && t.isEDO) {
+            if (typeof notes === "string") {
+                const parsed = parseNoteString(notes);
+                return pitchToFrequency(parsed[0], parsed[1], 0, "c major", this.inTemperament);
+            } else if (typeof notes === "number") {
+                return notes;
+            } else {
+                const results = [];
+                for (let i = 0; i < notes.length; i++) {
+                    if (typeof notes[i] === "string") {
+                        const parsed = parseNoteString(notes[i]);
+                        results.push(
+                            pitchToFrequency(parsed[0], parsed[1], 0, "c major", this.inTemperament)
+                        );
+                    } else {
+                        results.push(notes[i]);
+                    }
+                }
+                return results;
+            }
+        }
+
         const __getFrequency = oneNote => {
             const parsed = parseNoteString(oneNote);
-            const noteName = parsed[0];
+            const noteName = normalizeNoteAccidentals(parsed[0]);
             const octave = parsed[1];
 
             for (const note in this.noteFrequencies) {
@@ -739,7 +844,7 @@ function Synth() {
                     } else {
                         //Note to be played is not in the same octave.
                         const power = octave - this.noteFrequencies[note][0];
-                        return this.noteFrequencies[note][1] * Math.pow(2, power);
+                        return this.noteFrequencies[note][1] * Math.pow(getOctaveRatio(), power);
                     }
                 }
             }
@@ -895,26 +1000,30 @@ function Synth() {
             }
 
             // Load the sample module using require
-            require([sampleInfo.path], () => {
-                try {
-                    const sampleData = window[sampleInfo.global];
-                    if (sampleData) {
-                        this.samples[sampleType][sampleName] = sampleData();
-                        resolve();
-                    } else {
-                        console.error(
-                            `Global variable ${sampleInfo.global} not found for sample ${sampleName}`
-                        );
-                        reject(`Sample global not found: ${sampleName}`);
+            requirejs(
+                [sampleInfo.path],
+                () => {
+                    try {
+                        const sampleData = window[sampleInfo.global];
+                        if (sampleData) {
+                            this.samples[sampleType][sampleName] = sampleData();
+                            resolve();
+                        } else {
+                            console.error(
+                                `Global variable ${sampleInfo.global} not found for sample ${sampleName}`
+                            );
+                            reject(`Sample global not found: ${sampleName}`);
+                        }
+                    } catch (e) {
+                        console.error(`Error processing sample ${sampleName}:`, e);
+                        reject(e);
                     }
-                } catch (e) {
-                    console.error(`Error processing sample ${sampleName}:`, e);
-                    reject(e);
+                },
+                err => {
+                    console.error(`Failed to load sample module for ${sampleName}:`, err);
+                    reject(err);
                 }
-            }, err => {
-                console.error(`Failed to load sample module for ${sampleName}:`, err);
-                reject(err);
-            });
+            );
         });
     };
 
@@ -1301,10 +1410,16 @@ function Synth() {
      */
     this.createDefaultSynth = turtle => {
         console.debug("create default poly/default/custom synth for turtle " + turtle);
-        const default_synth = new Tone.PolySynth(Tone.AMSynth, POLYCOUNT).toDestination();
-        instruments[turtle]["electronic synth"] = default_synth;
+        // "electronic synth" and "custom" must be separate instances. "custom" is a
+        // member of BUILTIN_SYNTHS, so ___createSynth disposes whatever sits under
+        // that key before rebuilding it. Sharing one node meant that rebuilding
+        // "custom" also destroyed the synth "electronic synth" was still pointing at.
+        instruments[turtle]["electronic synth"] = new Tone.PolySynth(
+            Tone.AMSynth,
+            POLYCOUNT
+        ).toDestination();
         instrumentsSource["electronic synth"] = [0, "electronic synth"];
-        instruments[turtle]["custom"] = default_synth;
+        instruments[turtle]["custom"] = new Tone.PolySynth(Tone.AMSynth, POLYCOUNT).toDestination();
         instrumentsSource["custom"] = [0, "custom"];
     };
 
@@ -1721,7 +1836,33 @@ function Synth() {
         setNote,
         future
     ) => {
-        if (this.inTemperament !== "equal" && !isCustomTemperament(this.inTemperament)) {
+        const isStandardNote = note => {
+            if (typeof note !== "string") return true;
+            if (note.toUpperCase() === "R") return true;
+            return /^[A-Ga-g][#b]?-?\d+$/i.test(note);
+        };
+
+        const needsFreqConversion = () => {
+            if (this.inTemperament !== "equal" && !isCustomTemperament(this.inTemperament)) {
+                return true;
+            }
+            if (typeof notes === "string") {
+                return !isStandardNote(notes);
+            }
+            if (Array.isArray(notes)) {
+                return notes.some(n => !isStandardNote(n));
+            }
+            return false;
+        };
+
+        // Normalize Unicode accidentals to ASCII so Tone.js can parse the note names.
+        if (typeof notes === "string") {
+            notes = normalizeNoteAccidentals(notes);
+        } else if (Array.isArray(notes)) {
+            notes = notes.map(n => (typeof n === "string" ? normalizeNoteAccidentals(n) : n));
+        }
+
+        if (needsFreqConversion()) {
             if (typeof notes === "number") {
                 notes = notes;
             } else {
@@ -1749,7 +1890,10 @@ function Synth() {
 
         if (isCustomTemperament(this.inTemperament)) {
             const notes1 = notes;
-            if (notes.search("[+]") !== -1 || notes.search("[-]") !== -1) {
+            if (
+                typeof notes === "string" &&
+                (notes.search("[+]") !== -1 || notes.search("[-]") !== -1)
+            ) {
                 notes = this.getCustomFrequency(notes, this.inTemperament);
             }
             if (notes === undefined || notes === "undefined") {
@@ -1789,7 +1933,8 @@ function Synth() {
                             paramsEffects.doTremolo ||
                             paramsEffects.doPhaser ||
                             paramsEffects.doChorus ||
-                            paramsEffects.doNeighbor));
+                            paramsEffects.doNeighbor ||
+                            (paramsEffects.doPortamento && setNote)));
 
                 if (!_needsGraphRewire) {
                     // Apply in-place property mutations then take the fast path.
@@ -1869,6 +2014,7 @@ function Synth() {
                     if (paramsEffects.doDistortion) {
                         distortion = new Tone.Distortion(paramsEffects.distortionAmount);
                         chainNodes.push(distortion);
+                        effectsToDispose.push(distortion);
                     }
 
                     if (paramsEffects.doTremolo) {
@@ -1979,47 +2125,58 @@ function Synth() {
                     }
                 }
 
+                const timerManager =
+                    this._timerManager ||
+                    (this.activity && this.activity.logo && this.activity.logo._timerManager);
+                const cleanupFn = () => {
+                    try {
+                        // Dispose of effects
+                        effectsToDispose.forEach(effect => {
+                            if (effect && typeof effect.dispose === "function") {
+                                effect.dispose();
+                            }
+                        });
+
+                        // Dispose of filters
+                        if (temp_filters.length > 0) {
+                            temp_filters.forEach(filter => {
+                                if (filter && typeof filter.dispose === "function") {
+                                    filter.dispose();
+                                }
+                            });
+                        }
+
+                        // Re-establish the dry path only when no other effects chain
+                        // is still active on this synth; otherwise the direct
+                        // connection would bypass the in-flight chain.
+                        const remaining = (_effectsInFlight.get(synth) || 1) - 1;
+                        _effectsInFlight.set(synth, remaining);
+                        if (remaining === 0 && synth && typeof synth.toDestination === "function") {
+                            try {
+                                synth.disconnect();
+                            } catch (_) {
+                                // Already disconnected — safe to ignore.
+                            }
+                            synth.toDestination();
+                        }
+                    } catch (e) {
+                        console.debug("Error disposing effects:", e);
+                    }
+                };
+
                 // Schedule cleanup after the note duration.
                 // A 500 ms safety buffer is added beyond the note duration to prevent
                 // premature disposal caused by audio-clock drift or scheduler jitter,
                 // which would otherwise produce crackling artefacts in long sessions.
-                setTimeout(
-                    () => {
-                        try {
-                            // Dispose of effects
-                            effectsToDispose.forEach(effect => {
-                                if (effect && typeof effect.dispose === "function") {
-                                    effect.dispose();
-                                }
-                            });
-
-                            // Dispose of filters
-                            if (temp_filters.length > 0) {
-                                temp_filters.forEach(filter => {
-                                    if (filter && typeof filter.dispose === "function") {
-                                        filter.dispose();
-                                    }
-                                });
-                            }
-
-                            // Re-establish the dry path only when no other effects chain
-                            // is still active on this synth; otherwise the direct
-                            // connection would bypass the in-flight chain.
-                            const remaining = (_effectsInFlight.get(synth) || 1) - 1;
-                            _effectsInFlight.set(synth, remaining);
-                            if (
-                                remaining === 0 &&
-                                synth &&
-                                typeof synth.toDestination === "function"
-                            ) {
-                                synth.toDestination();
-                            }
-                        } catch (e) {
-                            console.debug("Error disposing effects:", e);
-                        }
-                    },
-                    beatValue * 1000 + 500
-                );
+                if (timerManager && typeof timerManager.setGuardedTimeout === "function") {
+                    timerManager.setGuardedTimeout(cleanupFn, beatValue * 1000 + 500, () =>
+                        Boolean(
+                            this.activity && this.activity.logo && this.activity.logo.stopTurtle
+                        )
+                    );
+                } else {
+                    setTimeout(cleanupFn, beatValue * 1000 + 500);
+                }
             }
         } catch (e) {
             console.error("Error in _performNotes:", e);
@@ -2180,10 +2337,14 @@ function Synth() {
                 future = 0.0;
             }
 
-            // Ensure synth is properly initialized
-            if (!tempSynth) {
-                console.warn("Synth not initialized, creating default synth");
-                this.createDefaultSynth(turtle);
+            // Ensure the requested instrument is properly initialized. It may be
+            // missing because all instruments are disposed on Stop, so reload it
+            // on demand instead of silently playing (or skipping) the note.
+            if (!tempSynth || !(instrumentName in instruments[turtle])) {
+                console.debug("Synth not initialized, loading " + instrumentName);
+                if (!instruments[turtle]["electronic synth"]) {
+                    this.createDefaultSynth(turtle);
+                }
                 await this.loadSynth(turtle, instrumentName);
 
                 // Check if instruments were disposed while we were waiting
@@ -2192,6 +2353,30 @@ function Synth() {
                 }
 
                 tempSynth = instruments[turtle][instrumentName];
+                flag = instrumentsSource[instrumentName] ? instrumentsSource[instrumentName][0] : 0;
+
+                // Wait for the sample buffer to finish decoding so the reloaded
+                // instrument is audible on the first trigger after a Stop.
+                // Tone.js exposes buffer readiness as a boolean `loaded` flag (it
+                // is not a promise), so wait on the global download queue, like
+                // _performNotes() does, when the sample is not ready yet.
+                if (tempSynth && typeof tempSynth.loaded === "boolean" && !tempSynth.loaded) {
+                    try {
+                        await Tone.ToneAudioBuffer.loaded();
+                    } catch (e) {
+                        console.debug("Error waiting for sample to load:", e);
+                    }
+                }
+
+                // Apply any cent adjustment to the freshly loaded sample
+                if (flag === 2 && tempSynth && tempSynth.playbackRate) {
+                    const sampleName = instrumentsSource[instrumentName][1];
+                    if (this.sampleCentAdjustments && this.sampleCentAdjustments[sampleName]) {
+                        const centAdjustment = this.sampleCentAdjustments[sampleName];
+                        const playbackRate = Math.pow(2, centAdjustment / 1200);
+                        tempSynth.playbackRate.value = playbackRate;
+                    }
+                }
             }
 
             // Final validation: ensure synth still exists and is valid
@@ -2285,6 +2470,9 @@ function Synth() {
 
     this.stopSound = (turtle, instrumentName, note) => {
         if (!instrumentsSource[instrumentName] || !instruments[turtle]?.[instrumentName]) return;
+        // A disposed node is still truthy and its key is still present, so the guard
+        // above lets it through. Calling into Tone at that point throws.
+        if (instruments[turtle][instrumentName].disposed) return;
         const flag = instrumentsSource[instrumentName][0];
         switch (flag) {
             case 1: // drum
@@ -2316,16 +2504,16 @@ function Synth() {
     };
 
     this.start = () => {
-        Tone.Transport.start();
+        this.transport.start();
     };
 
     this.stop = () => {
-        Tone.Transport.stop();
+        this.transport.stop();
     };
 
     this.rampTo = (turtle, instrumentName, oldVol, volume, rampTime) => {
         // guard invalid UI/programmatic input (audio boundary safety)
-        volume = Math.max(0, Math.min(volume, 100));
+        volume = clampNumber(volume, 0, 100);
         if (
             percussionInstruments.includes(instrumentName) ||
             stringInstruments.includes(instrumentName)
@@ -2396,7 +2584,7 @@ function Synth() {
         // Resolve instrumentName to internal key
         instrumentName = this.resolveInstrumentName(instrumentName);
         // guard invalid UI/programmatic input (audio boundary safety)
-        volume = Math.max(0, Math.min(volume, 100));
+        volume = clampNumber(volume, 0, 100);
         // We pass in volume as a number from 0 to 100.
         // As per #1697, we adjust the volume of some instruments.
         let nv;
@@ -2447,7 +2635,7 @@ function Synth() {
             }, 200);
         } else {
             // guard invalid UI/programmatic input (audio boundary safety)
-            volume = Math.max(0, Math.min(volume, 100));
+            volume = clampNumber(volume, 0, 100);
             const gain = Math.max(0.0001, volume / 100);
             const db = Tone.gainToDb(gain);
             Tone.Destination.volume.rampTo(db, 0.01);
@@ -2475,6 +2663,10 @@ function Synth() {
     };
 
     const _disposeRecordingPlayer = () => {
+        if (this._recordingPlayTimeout) {
+            clearTimeout(this._recordingPlayTimeout);
+            this._recordingPlayTimeout = null;
+        }
         if (this.player) {
             try {
                 if (typeof this.player.stop === "function") {
@@ -2527,11 +2719,45 @@ function Synth() {
      * @function
      * @memberof Synth
      */
-    this.playRecording = async () => {
+    this.playRecording = async onEnded => {
         _disposeRecordingPlayer();
+        if (!this.audioURL) {
+            if (typeof onEnded === "function") {
+                onEnded();
+            }
+            return;
+        }
+        await Tone.start();
+        if (
+            Tone.context &&
+            Tone.context.state !== "running" &&
+            typeof Tone.context.resume === "function"
+        ) {
+            await Tone.context.resume();
+        }
         this.player = new Tone.Player().toDestination();
+        let endedCalled = false;
+        const handleEnded = () => {
+            if (endedCalled) return;
+            endedCalled = true;
+            if (this._recordingPlayTimeout) {
+                clearTimeout(this._recordingPlayTimeout);
+                this._recordingPlayTimeout = null;
+            }
+            if (typeof onEnded === "function") {
+                onEnded();
+            }
+        };
+        this.player.onstop = handleEnded;
+        if ("onended" in this.player) {
+            this.player.onended = handleEnded;
+        }
         await this.player.load(this.audioURL);
         this.player.start();
+        if (this.player.buffer && this.player.buffer.duration) {
+            const durationMs = Math.ceil(this.player.buffer.duration * 1000) + 100;
+            this._recordingPlayTimeout = setTimeout(handleEnded, durationMs);
+        }
     };
 
     /**
@@ -2549,6 +2775,10 @@ function Synth() {
      * @memberof Synth
      */
     this.LiveWaveForm = () => {
+        if (this.analyser) {
+            this.mic.disconnect(this.analyser);
+            this.analyser.dispose();
+        }
         this.analyser = new Tone.Analyser("waveform", 8192);
         this.mic.connect(this.analyser);
     };
@@ -3035,7 +3265,7 @@ function Synth() {
                                                 const octave =
                                                     tempBlock._octavesWheel.navItems[i].title;
                                                 if (octave && !isNaN(octave)) {
-                                                    selectionState.octave = parseInt(octave);
+                                                    selectionState.octave = parseInt(octave, 10);
                                                     updateTargetNote();
                                                 }
                                             };
@@ -3100,7 +3330,7 @@ function Synth() {
                                         }
 
                                         // Adjust for octave (C4 is the reference octave)
-                                        const octaveDiff = parseInt(octave) - 4;
+                                        const octaveDiff = parseInt(octave, 10) - 4;
                                         freq *= Math.pow(2, octaveDiff);
 
                                         targetPitch.frequency = freq;
@@ -3479,9 +3709,14 @@ function Synth() {
         this._tunerRafId = null;
         this._tunerSegments = null;
         if (this.tunerMic) {
+            if (this.tunerAnalyser) {
+                this.tunerMic.disconnect(this.tunerAnalyser);
+                this.tunerAnalyser.dispose();
+            }
             this.tunerMic.close();
         }
         this.tunerAnalyser = null;
+        this.tunerMic = null;
     };
 
     const frequencyToNote = frequency => {
@@ -3644,7 +3879,7 @@ function Synth() {
 
         // Add event listener for slider changes
         slider.oninput = () => {
-            const value = parseInt(slider.value);
+            const value = parseInt(slider.value, 10);
             valueDisplay.textContent = (value >= 0 ? "+" : "") + value + "¢";
             this.centsValue = value;
             // Update tuner display if it exists
@@ -3701,6 +3936,16 @@ function Synth() {
         this._instrumentEpoch++;
         _disposeRecordingPlayer();
         _revokeRecordingURL();
+
+        if (this.analyser) {
+            try {
+                this.mic.disconnect(this.analyser);
+                this.analyser.dispose();
+            } catch (e) {
+                console.debug("Error disposing analyser:", e);
+            }
+            this.analyser = null;
+        }
 
         for (const turtle in instruments) {
             for (const instrumentName in instruments[turtle]) {
@@ -3765,7 +4010,7 @@ function Synth() {
     this.startingPitchOctave = 4;
     this.octaveTranspose = 0;
     this.inTemperament = "equal";
-    this.changeInTemperament = "equal";
+    this.changeInTemperament = false;
     this.inTransposition = 0;
     this.transposition = 2;
     this.playbackRate = 1;
@@ -3777,4 +4022,20 @@ function Synth() {
     this.mic = null;
 
     return this;
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        Synth,
+        NOISENAMES,
+        VOICENAMES,
+        DRUMNAMES,
+        EFFECTSNAMES,
+        CUSTOMSAMPLES,
+        instrumentsEffects,
+        instrumentsFilters,
+        instruments,
+        instrumentsSource,
+        DEFAULTSYNTHVOLUME
+    };
 }

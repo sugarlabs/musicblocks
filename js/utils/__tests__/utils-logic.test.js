@@ -9,6 +9,8 @@
  * (at your option) any later version.
  */
 
+global._ = msg => msg;
+
 const {
     toTitleCase,
     fileExt,
@@ -29,7 +31,8 @@ const {
     escapeHTML,
     unescapeHTML,
     deepClone,
-    isSafeUrl
+    isSafeUrl,
+    isUnsafeObjectKey
 } = require("../utils-logic.js");
 
 describe("Utility Logic Functions", () => {
@@ -174,7 +177,8 @@ describe("Utility Logic Functions", () => {
             expect(oneHundredToFraction(91)).toEqual([11, 12]);
             expect(oneHundredToFraction(96)).toEqual([31, 32]);
             expect(oneHundredToFraction(99)).toEqual([63, 64]);
-            expect(oneHundredToFraction(97)).toEqual([97, 100]);
+            expect(oneHundredToFraction(55)).toEqual([9, 16]);
+            expect(oneHundredToFraction(97)).toEqual([31, 32]);
         });
     });
 
@@ -193,30 +197,59 @@ describe("Utility Logic Functions", () => {
 
     describe("rationalSum()", () => {
         it("adds simple fractions", () => {
-            expect(rationalSum([1, 2], [1, 2])).toEqual([2, 2]);
+            expect(rationalSum([1, 2], [1, 2])).toEqual([[2, 2], null]);
         });
 
         it("handles unequal denominators", () => {
-            expect(rationalSum([1, 3], [1, 6])).toEqual([3, 6]);
+            expect(rationalSum([1, 3], [1, 6])).toEqual([[3, 6], null]);
         });
 
         it("handles invalid input", () => {
-            expect(rationalSum(null, [1, 2])).toEqual([0, 1]);
+            const [result] = rationalSum(null, [1, 2]);
+            expect(result).toEqual([0, 1]);
         });
 
         it("handles zero values", () => {
-            expect(rationalSum([0, 1], [1, 2])).toEqual([1, 2]);
-            expect(rationalSum([1, 2], [0, 1])).toEqual([1, 2]);
+            expect(rationalSum([0, 1], [1, 2])).toEqual([[1, 2], null]);
+            expect(rationalSum([1, 2], [0, 1])).toEqual([[1, 2], null]);
         });
 
         it("handles negative values", () => {
-            expect(rationalSum([-1, 2], [1, 2])).toEqual([0, 2]);
-            expect(rationalSum([1, 2], [-1, 2])).toEqual([0, 2]);
+            expect(rationalSum([-1, 2], [1, 2])).toEqual([[0, 2], null]);
+            expect(rationalSum([1, 2], [-1, 2])).toEqual([[0, 2], null]);
         });
 
         it("handles zero denominator", () => {
-            expect(rationalSum([1, 0], [1, 2])).toEqual([0, 1]);
-            expect(rationalSum([1, 2], [1, 0])).toEqual([0, 1]);
+            const [result1] = rationalSum([1, 0], [1, 2]);
+            expect(result1).toEqual([0, 1]);
+            const [result2] = rationalSum([1, 2], [1, 0]);
+            expect(result2).toEqual([0, 1]);
+        });
+    });
+
+    describe("clampNumber()", () => {
+        it("clamps values within range", () => {
+            expect(clampNumber(5, 0, 10)).toBe(5);
+        });
+
+        it("clamps values below lower bound", () => {
+            expect(clampNumber(-5, 0, 10)).toBe(0);
+        });
+
+        it("clamps values above upper bound", () => {
+            expect(clampNumber(15, 0, 10)).toBe(10);
+        });
+
+        it("handles inverted min and max bounds", () => {
+            expect(clampNumber(5, 10, 0)).toBe(5);
+            expect(clampNumber(-2, 10, 0)).toBe(0);
+            expect(clampNumber(12, 10, 0)).toBe(10);
+        });
+
+        it("returns fallback for non-numeric or NaN inputs", () => {
+            expect(clampNumber("invalid", 0, 10)).toBe(0);
+            expect(clampNumber(NaN, 0, 10, 5)).toBe(5);
+            expect(clampNumber(null, 0, 10)).toBe(0);
         });
     });
 
@@ -234,14 +267,49 @@ describe("Utility Logic Functions", () => {
             expect(hexToRGB("00ff00")).toEqual({ r: 0, g: 255, b: 0 });
         });
 
-        it("returns null for invalid hex", () => {
+        it("converts shorthand 3-digit hex to rgb object", () => {
+            expect(hexToRGB("#fff")).toEqual({ r: 255, g: 255, b: 255 });
+            expect(hexToRGB("f00")).toEqual({ r: 255, g: 0, b: 0 });
+            expect(hexToRGB("#0f0")).toEqual({ r: 0, g: 255, b: 0 });
+        });
+
+        it("returns null for invalid hex or non-string inputs", () => {
             expect(hexToRGB("#zzz")).toBeNull();
+            expect(hexToRGB(null)).toBeNull();
+            expect(hexToRGB(123)).toBeNull();
         });
     });
 
     describe("hex2rgb()", () => {
         it("converts hex to rgba string", () => {
             expect(hex2rgb("ff0000")).toBe("rgba(255,0,0,1)");
+        });
+
+        it("handles leading hash prefix", () => {
+            expect(hex2rgb("#ff0000")).toBe("rgba(255,0,0,1)");
+            expect(hex2rgb("#00ff00")).toBe("rgba(0,255,0,1)");
+        });
+
+        it("handles 3-digit shorthand hex codes", () => {
+            expect(hex2rgb("#f00")).toBe("rgba(255,0,0,1)");
+            expect(hex2rgb("f00")).toBe("rgba(255,0,0,1)");
+            expect(hex2rgb("#abc")).toBe("rgba(170,187,204,1)");
+        });
+
+        it("supports custom alpha transparency values", () => {
+            expect(hex2rgb("#ff0000", 0.5)).toBe("rgba(255,0,0,0.5)");
+            expect(hex2rgb("#00ff00", 0)).toBe("rgba(0,255,0,0)");
+        });
+
+        it("clamps alpha value between 0 and 1", () => {
+            expect(hex2rgb("#ff0000", 1.5)).toBe("rgba(255,0,0,1)");
+            expect(hex2rgb("#ff0000", -0.5)).toBe("rgba(255,0,0,0)");
+            expect(hex2rgb("#ff0000", "invalid")).toBe("rgba(255,0,0,1)");
+        });
+
+        it("returns fallback rgba for invalid or non-string inputs", () => {
+            expect(hex2rgb(null)).toBe("rgba(0,0,0,1)");
+            expect(hex2rgb("invalid")).toBe("rgba(0,0,0,1)");
         });
     });
 
@@ -330,6 +398,20 @@ describe("Utility Logic Functions", () => {
             expect(isSafeUrl("java\tscript:alert(1)")).toBe(false);
             expect(isSafeUrl("jav\rascript:alert(1)")).toBe(false);
             expect(isSafeUrl(" javascript:alert(1)")).toBe(false);
+        });
+    });
+
+    describe("isUnsafeObjectKey()", () => {
+        it("flags reserved prototype-related keys", () => {
+            expect(isUnsafeObjectKey("__proto__")).toBe(true);
+            expect(isUnsafeObjectKey("constructor")).toBe(true);
+            expect(isUnsafeObjectKey("prototype")).toBe(true);
+        });
+
+        it("allows ordinary keys", () => {
+            expect(isUnsafeObjectKey("myPlugin")).toBe(false);
+            expect(isUnsafeObjectKey("FLOWPLUGINS")).toBe(false);
+            expect(isUnsafeObjectKey("")).toBe(false);
         });
     });
 });

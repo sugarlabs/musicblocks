@@ -13,7 +13,7 @@
    global
    _, last, FlowBlock, ValueBlock, LeftBlock, NOINPUTERRORMSG,
    NANERRORMSG, mixedNumber, TONEBPM, DEFAULTDELAY, Singer,
-   StackClampBlock, platformColor, StatusMatrix
+   StackClampBlock, StatusMatrix
 */
 
 /* exported setupExtrasBlocks */
@@ -192,7 +192,8 @@ function setupExtrasBlocks(activity) {
                         '" width="' +
                         logo.canvas.width +
                         '" fill="' +
-                        platformColor.background +
+                        (getComputedStyle(document.body).getPropertyValue("--bg").trim() ||
+                            "#ffffff") +
                         '"/> ' +
                         logo.svgOutput;
                 }
@@ -553,6 +554,7 @@ function setupExtrasBlocks(activity) {
          */
         constructor() {
             super("drum");
+            this.setCapability("collapsible");
             this.setPalette("extras", activity);
             this.setHelpString();
 
@@ -671,6 +673,8 @@ function setupExtrasBlocks(activity) {
          */
         constructor() {
             super("grid");
+            this.setCapability("valueDrivenLabel");
+            this.setCapability("discreteChoice");
             this.setPalette("extras", activity);
             this.setHelpString();
             this.formBlock({ outType: "gridout" });

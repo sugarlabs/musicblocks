@@ -8,6 +8,9 @@
    _, piemenuVoices, docById, platformColor, noteToFrequency
 */
 
+/** AMD module dependencies for lazy loading. */
+LegoWidget.dependencies = ["widgets/legobricks"];
+
 /**
  * Represents a LEGO Bricks Widget with Phrase Maker functionality.
  * @constructor
@@ -17,6 +20,50 @@ function LegoWidget() {
     const WIDGETWIDTH = 1200;
     const WIDGETHEIGHT = 700;
     const ROW_HEIGHT = 40; // Fixed row height for both matrix and image canvas
+
+    // Hex codes for the color families used by the eye dropper and color
+    // detection visualization.
+    const COLOR_HEX_MAP = {
+        red: "#FF0000",
+        orange: "#FFA500",
+        yellow: "#FFFF00",
+        green: "#00FF00",
+        blue: "#0000FF",
+        purple: "#800080",
+        pink: "#FFC0CB",
+        cyan: "#00FFFF",
+        magenta: "#FF00FF",
+        white: "#FFFFFF",
+        black: "#000000",
+        gray: "#808080"
+    };
+
+    /**
+     * Creates a thin vertical separator span used between toolbar control groups.
+     * @returns {HTMLElement} The separator element.
+     */
+    const createControlSeparator = () => {
+        const separator = document.createElement("span");
+        separator.textContent = "|";
+        separator.style.margin = "0 8px";
+        separator.style.color = "#888";
+        return separator;
+    };
+
+    /**
+     * Creates an absolutely-positioned, draggable-ready wrapper div for
+     * displaying an uploaded image or webcam feed.
+     * @returns {HTMLElement} The wrapper element.
+     */
+    const createImageWrapper = () => {
+        const wrapper = document.createElement("div");
+        wrapper.style.position = "absolute";
+        wrapper.style.left = "0px";
+        wrapper.style.top = "0px";
+        wrapper.style.transformOrigin = "top left";
+        wrapper.style.cursor = "grab";
+        return wrapper;
+    };
 
     // Matrix data structure with pitch mappings
     this.matrixData = {
@@ -256,36 +303,48 @@ function LegoWidget() {
     };
 
     /**
-     * Initializes the LEGO Widget with Phrase Maker functionality.
-     * @param {object} activity - The activity object.
-     * @returns {void}
+     * Creates the widget window and wires up its close/maximize behavior.
+     * @private
+     * @returns {object} The created widget window.
      */
-    this.init = function (activity) {
-        this.activity = activity;
-        this.running = true;
-
-        // Initialize audio synthesizer
-        this._initAudio();
-
+    this._createWidgetWindow = function () {
         const widgetWindow = window.widgetWindows.windowFor(this, "LEGO BRICKS");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
 
         widgetWindow.onclose = () => {
+            this._stopPlayback();
             this._stopWebcam();
             this._deactivateEyeDropper(); // Clean up eye dropper mode
             this._cleanupDragListeners(); // Clean up drag event listeners
+            this.imageWrapper = null;
+            this.webcamVideo = null;
             this.running = false;
             widgetWindow.destroy();
         };
 
         widgetWindow.onmaximize = this._scale.bind(this);
 
-        // Add control buttons in left sidebar
+        return widgetWindow;
+    };
+
+    /**
+     * Adds the control buttons to the widget window's sidebar.
+     * @private
+     * @param {object} widgetWindow - The widget window to add buttons to.
+     * @returns {void}
+     */
+    this._createToolbarButtons = function (widgetWindow) {
         this.playButton = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
         this.playButton.onclick = () => {
-            this._playPhrase();
+            if (this.isPlaying) {
+                this._stopPlayback();
+            } else {
+                this._playPhrase();
+                const img = this.playButton.querySelector("img");
+                if (img) img.src = "header-icons/stop-button.svg";
+            }
         };
 
         this.saveButton = widgetWindow.addButton("save-button.svg", ICONSIZE, _("Save"));
@@ -316,6 +375,22 @@ function LegoWidget() {
         this.clearButton.onclick = () => {
             this._clearPhrase();
         };
+    };
+
+    /**
+     * Initializes the LEGO Widget with Phrase Maker functionality.
+     * @param {object} activity - The activity object.
+     * @returns {void}
+     */
+    this.init = function (activity) {
+        this.activity = activity;
+        this.running = true;
+
+        // Initialize audio synthesizer
+        this._initAudio();
+
+        const widgetWindow = this._createWidgetWindow();
+        this._createToolbarButtons(widgetWindow);
 
         // Create main container
         this.createMainContainer();
@@ -545,30 +620,14 @@ function LegoWidget() {
         this.fileInput.style.display = "none";
         this.fileInput.onchange = e => this._handleImageUpload(e);
         document.body.appendChild(this.fileInput);
-
-        // Initialize row headers
-        this._initializeRowHeaders();
     };
 
     /**
-     * Creates zoom controls with precise adjustments.
-     * @returns {void}
+     * Creates the instrument selector label and pie-menu button.
+     * @private
+     * @returns {HTMLElement[]} Elements to append, in display order.
      */
-    this.createZoomControls = function () {
-        this.zoomControls = document.createElement("div");
-        this.zoomControls.style.position = "absolute"; // Changed to absolute positioning
-        this.zoomControls.style.bottom = "0";
-        this.zoomControls.style.left = "180px"; // Align with image area
-        this.zoomControls.style.right = "0";
-        this.zoomControls.style.padding = "10px";
-        this.zoomControls.style.backgroundColor = "#f0f0f0";
-        this.zoomControls.style.borderTop = "1px solid #888";
-        this.zoomControls.style.display = "flex";
-        this.zoomControls.style.alignItems = "center";
-        this.zoomControls.style.gap = "8px";
-        this.zoomControls.style.zIndex = "20"; // Ensure it's above the grid
-
-        // Instrument selector (pie menu button)
+    this._createInstrumentControls = function () {
         const instrumentLabel = document.createElement("span");
         instrumentLabel.textContent = "Instrument:";
         instrumentLabel.style.fontSize = "12px";
@@ -586,6 +645,15 @@ function LegoWidget() {
         this.instrumentButton.style.cursor = "pointer";
         this.instrumentButton.onclick = () => this._createInstrumentPieMenu();
 
+        return [instrumentLabel, this.instrumentButton];
+    };
+
+    /**
+     * Creates the zoom label, +/- buttons, slider, and value display.
+     * @private
+     * @returns {HTMLElement[]} Elements to append, in display order.
+     */
+    this._createZoomSliderControls = function () {
         const zoomLabel = document.createElement("span");
         zoomLabel.textContent = "Zoom:";
         zoomLabel.style.fontSize = "12px";
@@ -612,13 +680,15 @@ function LegoWidget() {
         this.zoomValue.style.fontSize = "12px";
         this.zoomValue.style.minWidth = "40px";
 
-        // Add separator
-        const separator = document.createElement("span");
-        separator.textContent = "|";
-        separator.style.margin = "0 8px";
-        separator.style.color = "#888";
+        return [zoomLabel, zoomOut, this.zoomSlider, zoomIn, this.zoomValue];
+    };
 
-        // Add vertical spacing controls
+    /**
+     * Creates the column-spacing label, +/- buttons, slider, and value display.
+     * @private
+     * @returns {HTMLElement[]} Elements to append, in display order.
+     */
+    this._createSpacingControls = function () {
         const spacingLabel = document.createElement("span");
         spacingLabel.textContent = "Column Spacing:";
         spacingLabel.style.fontSize = "12px";
@@ -645,13 +715,15 @@ function LegoWidget() {
         this.spacingValue.style.fontSize = "12px";
         this.spacingValue.style.minWidth = "40px";
 
-        // Add separator
-        const separator2 = document.createElement("span");
-        separator2.textContent = "|";
-        separator2.style.margin = "0 8px";
-        separator2.style.color = "#888";
+        return [spacingLabel, spacingOut, this.spacingSlider, spacingIn, this.spacingValue];
+    };
 
-        // Add eye dropper button
+    /**
+     * Creates the eye dropper label and toggle button.
+     * @private
+     * @returns {HTMLElement[]} Elements to append, in display order.
+     */
+    this._createEyeDropperControls = function () {
         const eyeDropperLabel = document.createElement("span");
         eyeDropperLabel.textContent = "Eye Dropper:";
         eyeDropperLabel.style.fontSize = "12px";
@@ -668,13 +740,15 @@ function LegoWidget() {
         this.eyeDropperButton.title = "Click to activate eye dropper mode";
         this.eyeDropperButton.onclick = () => this._toggleEyeDropper();
 
-        // Add separator
-        const separator3 = document.createElement("span");
-        separator3.textContent = "|";
-        separator3.style.margin = "0 8px";
-        separator3.style.color = "#888";
+        return [eyeDropperLabel, this.eyeDropperButton];
+    };
 
-        // Add background color display
+    /**
+     * Creates the background color label and swatch display.
+     * @private
+     * @returns {HTMLElement[]} Elements to append, in display order.
+     */
+    this._createBackgroundColorControls = function () {
         const backgroundLabel = document.createElement("span");
         backgroundLabel.textContent = "Background:";
         backgroundLabel.style.fontSize = "12px";
@@ -695,25 +769,41 @@ function LegoWidget() {
         this.backgroundColorDisplay.style.minWidth = "60px";
         this.backgroundColorDisplay.style.textAlign = "center";
 
-        this.zoomControls.appendChild(instrumentLabel);
-        this.zoomControls.appendChild(this.instrumentButton);
-        this.zoomControls.appendChild(zoomLabel);
-        this.zoomControls.appendChild(zoomOut);
-        this.zoomControls.appendChild(this.zoomSlider);
-        this.zoomControls.appendChild(zoomIn);
-        this.zoomControls.appendChild(this.zoomValue);
-        this.zoomControls.appendChild(separator);
-        this.zoomControls.appendChild(spacingLabel);
-        this.zoomControls.appendChild(spacingOut);
-        this.zoomControls.appendChild(this.spacingSlider);
-        this.zoomControls.appendChild(spacingIn);
-        this.zoomControls.appendChild(this.spacingValue);
-        this.zoomControls.appendChild(separator2);
-        this.zoomControls.appendChild(eyeDropperLabel);
-        this.zoomControls.appendChild(this.eyeDropperButton);
-        this.zoomControls.appendChild(separator3);
-        this.zoomControls.appendChild(backgroundLabel);
-        this.zoomControls.appendChild(this.backgroundColorDisplay);
+        return [backgroundLabel, this.backgroundColorDisplay];
+    };
+
+    /**
+     * Creates zoom controls with precise adjustments.
+     * @returns {void}
+     */
+    this.createZoomControls = function () {
+        this.zoomControls = document.createElement("div");
+        Object.assign(this.zoomControls.style, {
+            position: "absolute", // Changed to absolute positioning
+            bottom: "0",
+            left: "180px", // Align with image area
+            right: "0",
+            padding: "10px",
+            backgroundColor: "#f0f0f0",
+            borderTop: "1px solid #888",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            zIndex: "20" // Ensure it's above the grid
+        });
+
+        const elements = [
+            ...this._createInstrumentControls(),
+            ...this._createZoomSliderControls(),
+            createControlSeparator(),
+            ...this._createSpacingControls(),
+            createControlSeparator(),
+            ...this._createEyeDropperControls(),
+            createControlSeparator(),
+            ...this._createBackgroundColorControls()
+        ];
+
+        elements.forEach(element => this.zoomControls.appendChild(element));
     };
 
     /**
@@ -942,47 +1032,45 @@ function LegoWidget() {
 
             // Check each row for non-background colors in this time range
             this.colorData.forEach((rowData, rowIndex) => {
-                if (rowData.colorSegments) {
-                    let currentTime = 0;
+                if (!rowData || !rowData.colorSegments) return;
+                let currentTime = 0;
 
-                    for (const segment of rowData.colorSegments) {
-                        const segmentStart = currentTime;
-                        const segmentEnd = currentTime + segment.duration;
+                for (const segment of rowData.colorSegments) {
+                    const segmentStart = currentTime;
+                    const segmentEnd = currentTime + segment.duration;
 
-                        // Check if this segment overlaps with our time column
-                        if (segmentStart < endTime && segmentEnd > startTime) {
-                            // Calculate the actual overlap duration
-                            const overlapStart = Math.max(segmentStart, startTime);
-                            const overlapEnd = Math.min(segmentEnd, endTime);
-                            const overlapDuration = overlapEnd - overlapStart;
+                    // Check if this segment overlaps with our time column
+                    if (segmentStart < endTime && segmentEnd > startTime) {
+                        // Calculate the actual overlap duration
+                        const overlapStart = Math.max(segmentStart, startTime);
+                        const overlapEnd = Math.min(segmentEnd, endTime);
+                        const overlapDuration = overlapEnd - overlapStart;
 
-                            // Only count as significant if overlap is substantial (>350ms)
-                            // This prevents spillovers <350ms across blue lines from creating duplicate notes
-                            if (overlapDuration > 1000) {
-                                // Check if color is not the selected background color (meaning note should play)
-                                if (segment.color !== this.selectedBackgroundColor.name) {
-                                    hasNonBackgroundColor = true;
+                        // Only count as significant if overlap is substantial (>350ms)
+                        // This prevents spillovers <350ms across blue lines from creating duplicate notes
+                        if (overlapDuration > 1000) {
+                            // Check if color is not the selected background color (meaning note should play)
+                            if (segment.color !== this.selectedBackgroundColor.name) {
+                                hasNonBackgroundColor = true;
 
-                                    // Convert row data to pitch information
-                                    const pitch = this._convertRowToPitch(rowData);
-                                    if (
-                                        pitch &&
-                                        !pitches.some(
-                                            p =>
-                                                p.solfege === pitch.solfege &&
-                                                p.octave === pitch.octave
-                                        )
-                                    ) {
-                                        pitches.push(pitch);
-                                    }
+                                // Convert row data to pitch information
+                                const pitch = this._convertRowToPitch(rowData);
+                                if (
+                                    pitch &&
+                                    !pitches.some(
+                                        p =>
+                                            p.solfege === pitch.solfege && p.octave === pitch.octave
+                                    )
+                                ) {
+                                    pitches.push(pitch);
                                 }
-                            } else if (segment.color !== this.selectedBackgroundColor.name) {
-                                // Ignore small overlaps without logging
                             }
+                        } else if (segment.color !== this.selectedBackgroundColor.name) {
+                            // Ignore small overlaps without logging
                         }
-
-                        currentTime += segment.duration;
                     }
+
+                    currentTime += segment.duration;
                 }
             });
 
@@ -1041,7 +1129,7 @@ function LegoWidget() {
 
         // Collect all segment end times
         this.colorData.forEach(rowData => {
-            if (rowData.colorSegments) {
+            if (rowData && rowData.colorSegments) {
                 let currentTime = 0;
                 rowData.colorSegments.forEach(segment => {
                     currentTime += segment.duration;
@@ -1078,7 +1166,7 @@ function LegoWidget() {
         if (!noteMatch) return null;
 
         const noteName = noteMatch[1];
-        const octave = parseInt(noteMatch[2]);
+        const octave = parseInt(noteMatch[2], 10);
 
         // Convert note name to solfege
         const noteToSolfege = {
@@ -1163,12 +1251,7 @@ function LegoWidget() {
             reader.onload = e => {
                 this.imageDisplayArea.replaceChildren();
 
-                this.imageWrapper = document.createElement("div");
-                this.imageWrapper.style.position = "absolute";
-                this.imageWrapper.style.left = "0px";
-                this.imageWrapper.style.top = "0px";
-                this.imageWrapper.style.transformOrigin = "top left";
-                this.imageWrapper.style.cursor = "grab";
+                this.imageWrapper = createImageWrapper();
 
                 const img = document.createElement("img");
                 img.src = e.target.result;
@@ -1181,9 +1264,7 @@ function LegoWidget() {
                 this.imageWrapper.appendChild(img);
                 this.imageDisplayArea.appendChild(this.imageWrapper);
 
-                this._makeImageDraggable(this.imageWrapper);
-                this._showZoomControls();
-                this._drawGridLines();
+                this._activateMediaDisplay();
 
                 this.activity.textMsg(_("Image uploaded successfully"));
             };
@@ -1199,12 +1280,7 @@ function LegoWidget() {
     this._startWebcam = function () {
         this.imageDisplayArea.replaceChildren();
 
-        this.imageWrapper = document.createElement("div");
-        this.imageWrapper.style.position = "absolute";
-        this.imageWrapper.style.left = "0px";
-        this.imageWrapper.style.top = "0px";
-        this.imageWrapper.style.transformOrigin = "top left";
-        this.imageWrapper.style.cursor = "grab";
+        this.imageWrapper = createImageWrapper();
 
         this.webcamVideo = document.createElement("video");
         this.webcamVideo.autoplay = true;
@@ -1219,9 +1295,36 @@ function LegoWidget() {
             .getUserMedia({ video: true })
             .then(stream => {
                 this.webcamVideo.srcObject = stream;
-                this._makeImageDraggable(this.imageWrapper);
-                this._showZoomControls();
-                this._drawGridLines();
+
+                const captureBtn = document.createElement("button");
+                captureBtn.textContent = " Capture";
+                captureBtn.style.cssText =
+                    "position:absolute;bottom:10px;left:50%;transform:translateX(-50%);" +
+                    "padding:8px 16px;font-size:14px;cursor:pointer;z-index:30;" +
+                    "background:#fff;border:2px solid #333;border-radius:6px;";
+                captureBtn.onclick = () => {
+                    const canvas = document.createElement("canvas");
+                    canvas.width = this.webcamVideo.videoWidth;
+                    canvas.height = this.webcamVideo.videoHeight;
+                    canvas.getContext("2d").drawImage(this.webcamVideo, 0, 0);
+                    this._stopWebcam();
+
+                    const img = document.createElement("img");
+                    img.src = canvas.toDataURL("image/png");
+                    img.style.maxWidth = "100%";
+                    img.style.maxHeight = "100%";
+                    img.style.objectFit = "contain";
+                    img.style.borderRadius = "8px";
+                    img.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
+                    this.imageWrapper.replaceChildren(img);
+                    captureBtn.remove();
+
+                    this._activateMediaDisplay();
+                    this.activity.textMsg(_("Photo captured"));
+                };
+                this.imageWrapper.appendChild(captureBtn);
+
+                this._activateMediaDisplay();
                 this.activity.textMsg(_("Webcam started"));
             })
             .catch(err => {
@@ -1300,8 +1403,10 @@ function LegoWidget() {
         }
 
         // Reset button appearance
-        this.eyeDropperButton.style.backgroundColor = "";
-        this.eyeDropperButton.style.color = "";
+        if (this.eyeDropperButton) {
+            this.eyeDropperButton.style.backgroundColor = "";
+            this.eyeDropperButton.style.color = "";
+        }
 
         // Remove event listeners
         if (this.imageDisplayArea) {
@@ -1525,21 +1630,7 @@ function LegoWidget() {
      * @returns {string} Hex color code
      */
     this._getColorHex = function (colorName) {
-        const colorMap = {
-            red: "#FF0000",
-            orange: "#FFA500",
-            yellow: "#FFFF00",
-            green: "#00FF00",
-            blue: "#0000FF",
-            purple: "#800080",
-            pink: "#FFC0CB",
-            cyan: "#00FFFF",
-            magenta: "#FF00FF",
-            white: "#FFFFFF",
-            black: "#000000",
-            gray: "#808080"
-        };
-        return colorMap[colorName] || "#808080";
+        return COLOR_HEX_MAP[colorName] || "#808080";
     };
 
     /**
@@ -1567,6 +1658,18 @@ function LegoWidget() {
             document.removeEventListener("mouseup", this._dragUpHandler);
             this._dragUpHandler = null;
         }
+    };
+
+    /**
+     * Activates the image/webcam display area: makes it draggable and
+     * refreshes the zoom controls and grid overlay for the new media.
+     * @private
+     * @returns {void}
+     */
+    this._activateMediaDisplay = function () {
+        this._makeImageDraggable(this.imageWrapper);
+        this._showZoomControls();
+        this._drawGridLines();
     };
 
     /**
@@ -1619,62 +1722,6 @@ function LegoWidget() {
     };
 
     /**
-     * Converts RGB values to a named color category with improved accuracy.
-     * @private
-     */
-    this._getColorFamily = function (r, g, b) {
-        const hsl = this._rgbToHsl(r, g, b);
-        const [hue, saturation, lightness] = hsl;
-
-        // Simple and accurate color detection
-
-        // Handle very dark colors first
-        if (lightness < 15) {
-            return { name: "black", hue: hue, saturation: saturation, lightness: lightness };
-        }
-
-        // Handle grayscale colors (low saturation) - keep it simple
-        if (saturation < 20) {
-            if (lightness > 85)
-                return { name: "white", hue: hue, saturation: saturation, lightness: lightness };
-            if (lightness < 25)
-                return { name: "black", hue: hue, saturation: saturation, lightness: lightness };
-            return { name: "gray", hue: hue, saturation: saturation, lightness: lightness };
-        }
-
-        // Improved hue-based detection with clear boundaries to prevent orange/purple confusion
-        let colorName = "unknown";
-
-        if (hue >= 345 || hue < 15) {
-            colorName = "red";
-        } else if (hue >= 15 && hue < 45) {
-            // Orange range - key fix for orange/purple confusion
-            colorName = "orange";
-        } else if (hue >= 45 && hue < 75) {
-            colorName = "yellow";
-        } else if (hue >= 75 && hue < 165) {
-            colorName = "green";
-        } else if (hue >= 165 && hue < 195) {
-            colorName = "cyan";
-        } else if (hue >= 195 && hue < 255) {
-            colorName = "blue";
-        } else if (hue >= 255 && hue < 285) {
-            // Purple range - separated clearly from orange
-            colorName = "purple";
-        } else if (hue >= 285 && hue < 315) {
-            colorName = "magenta";
-        } else if (hue >= 315 && hue < 345) {
-            colorName = "pink";
-        }
-
-        return {
-            name: colorName,
-            hue: hue,
-            saturation: saturation,
-            lightness: lightness
-        };
-    };
-    /**
      * Gets color family from HSL values
      * @private
      * @param {number} h - Hue (0-360)
@@ -1703,30 +1750,6 @@ function LegoWidget() {
         if (h >= 315 && h < 345) return { name: "pink", hue: 330 };
 
         return { name: "unknown", hue: h };
-    };
-
-    /**
-     * Gets color family by name with simple mapping.
-     * @private
-     * @param {string} colorName - The color name
-     * @returns {object} Color family object
-     */
-    this._getColorFamilyByName = function (colorName) {
-        const colorFamilies = {
-            red: { name: "red", hue: 0, saturation: 80, lightness: 50 },
-            orange: { name: "orange", hue: 30, saturation: 80, lightness: 50 },
-            yellow: { name: "yellow", hue: 60, saturation: 80, lightness: 50 },
-            green: { name: "green", hue: 120, saturation: 80, lightness: 50 },
-            cyan: { name: "cyan", hue: 180, saturation: 80, lightness: 50 },
-            blue: { name: "blue", hue: 240, saturation: 80, lightness: 50 },
-            purple: { name: "purple", hue: 270, saturation: 80, lightness: 50 },
-            magenta: { name: "magenta", hue: 300, saturation: 80, lightness: 50 },
-            pink: { name: "pink", hue: 330, saturation: 70, lightness: 75 },
-            white: { name: "white", hue: 0, saturation: 0, lightness: 95 },
-            gray: { name: "gray", hue: 0, saturation: 5, lightness: 50 },
-            black: { name: "black", hue: 0, saturation: 0, lightness: 5 }
-        };
-        return colorFamilies[colorName] || null;
     };
 
     /**
@@ -2235,11 +2258,11 @@ function LegoWidget() {
         this.matrixData.rows.forEach((row, index) => {
             if (!row.note) return; // Skip non-note rows
 
-            this.colorData.push({
+            this.colorData[index] = {
                 note: row.note,
                 label: row.label,
                 colorSegments: []
-            });
+            };
 
             // Calculate vertical position for this note - fixed to canvas grid
             const topPos = index * ROW_HEIGHT;
@@ -2252,7 +2275,7 @@ function LegoWidget() {
             // Skip if this row is completely outside canvas bounds
             if (clampedTopPos >= canvasHeight || clampedBottomPos <= 0) {
                 // Fill this row with selected background color for the entire duration
-                this.colorData[this.colorData.length - 1].colorSegments.push({
+                this.colorData[index].colorSegments.push({
                     color: this.selectedBackgroundColor.name,
                     duration: 5000, // Default scan duration
                     timestamp: performance.now()
@@ -2415,6 +2438,11 @@ function LegoWidget() {
     this._stopPlayback = function () {
         this.isPlaying = false;
 
+        this.activity.hideMsgs();
+
+        const img = this.playButton.querySelector("img");
+        if (img) img.src = "header-icons/play-button.svg";
+
         // Save final color segments for all lines
         if (this.scanningLines) {
             const now = performance.now();
@@ -2441,7 +2469,7 @@ function LegoWidget() {
         if (!this.hasGeneratedVisualization && this.colorData && this.colorData.length > 0) {
             // Check if any colorData actually has color segments (indicating scanning occurred)
             const hasScannedData = this.colorData.some(
-                row => row.colorSegments && row.colorSegments.length > 0
+                row => row && row.colorSegments && row.colorSegments.length > 0
             );
 
             if (hasScannedData) {
@@ -2463,7 +2491,7 @@ function LegoWidget() {
      */
     this._mergeConsecutiveColorSegments = function () {
         this.colorData.forEach(rowData => {
-            if (!rowData.colorSegments || rowData.colorSegments.length <= 1) return;
+            if (!rowData || !rowData.colorSegments || rowData.colorSegments.length <= 1) return;
 
             const mergedSegments = [];
             let currentSegment = null;
@@ -2726,9 +2754,10 @@ function LegoWidget() {
      */
     this._addColorSegment = function (rowIndex, color, duration) {
         if (!this.colorData[rowIndex]) {
+            const row = this.matrixData.rows[rowIndex];
             this.colorData[rowIndex] = {
-                note: this.this.matrixData.rows[rowIndex].note,
-                label: this.this.matrixData.rows[rowIndex].label,
+                note: row ? row.note : undefined,
+                label: row ? row.label : undefined,
                 colorSegments: []
             };
         }
@@ -2849,25 +2878,14 @@ function LegoWidget() {
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
         // Color mapping
-        const colorMap = {
-            red: "#FF0000",
-            orange: "#FFA500",
-            yellow: "#FFFF00",
-            green: "#00FF00",
-            blue: "#0000FF",
-            purple: "#800080",
-            pink: "#FFC0CB",
-            cyan: "#00FFFF",
-            magenta: "#FF00FF",
-            white: "#FFFFFF",
-            black: "#000000",
-            gray: "#808080",
-            unknown: "#C0C0C0"
-        };
+        const colorMap = { ...COLOR_HEX_MAP, unknown: "#C0C0C0" };
 
         // Draw each row
+        let visualRowIndex = 0;
         this.colorData.forEach((rowData, rowIndex) => {
-            const y = rowIndex * rowHeight;
+            if (!rowData) return;
+            const y = visualRowIndex * rowHeight;
+            visualRowIndex++;
 
             // Draw row background
             ctx.fillStyle =
@@ -3008,7 +3026,7 @@ function LegoWidget() {
 
             // Check each row for non-background colors in this time range
             colorData.forEach((rowData, rowIndex) => {
-                if (rowData.colorSegments && rowData.note) {
+                if (rowData && rowData.colorSegments && rowData.note) {
                     let currentTime = 0;
                     let hasNonBackgroundColor = false;
 

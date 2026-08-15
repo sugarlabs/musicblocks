@@ -606,10 +606,20 @@ Turtles.TurtlesModel = class {
      * (excluding turtles in the trash and companion turtles)
      */
     turtleCount() {
-        let count = 0;
         const totalTurtles = this.getTurtleCount();
+        const firstClaimer = new Int32Array(totalTurtles).fill(-1);
+
         for (let t = 0; t < totalTurtles; t++) {
-            if (this.companionTurtle(t) === t && !this.getTurtle(t).inTrash) {
+            const c = this.getTurtle(t).companionTurtle;
+            if (c !== undefined && firstClaimer[c] === -1) {
+                firstClaimer[c] = t;
+            }
+        }
+
+        let count = 0;
+        for (let t = 0; t < totalTurtles; t++) {
+            const comp = firstClaimer[t] !== -1 ? firstClaimer[t] : t;
+            if (comp === t && !this.getTurtle(t).inTrash) {
                 count += 1;
             }
         }
@@ -1029,8 +1039,8 @@ Turtles.TurtlesView = class {
                 if (auxToolbar.style.display === "block") {
                     const menuIcon = docById("menu");
                     auxToolbar.style.display = "none";
-                    menuIcon.innerHTML = "menu";
-                    docById("toggleAuxBtn").className -= "blue darken-1";
+                    menuIcon.textContent = "menu";
+                    docById("toggleAuxBtn").classList.remove("blue", "darken-1");
                 }
                 this._expandButton.style.visibility = "visible";
                 this._collapseButton.style.visibility = "hidden";
@@ -1052,8 +1062,8 @@ Turtles.TurtlesView = class {
             if (auxToolbar.style.display === "block") {
                 const menuIcon = docById("menu");
                 auxToolbar.style.display = "none";
-                menuIcon.innerHTML = "menu";
-                docById("toggleAuxBtn").className -= "blue darken-1";
+                menuIcon.textContent = "menu";
+                docById("toggleAuxBtn").classList.remove("blue", "darken-1");
             }
 
             this._expandButton.style.visibility = "visible";
@@ -1105,8 +1115,8 @@ Turtles.TurtlesView = class {
             if (auxToolbar.style.display === "block") {
                 const menuIcon = docById("menu");
                 auxToolbar.style.display = "none";
-                menuIcon.innerHTML = "menu";
-                docById("toggleAuxBtn").className -= "blue darken-1";
+                menuIcon.textContent = "menu";
+                docById("toggleAuxBtn").classList.remove("blue", "darken-1");
             }
             this.hideMenu();
             this.setStageScale(1.0);

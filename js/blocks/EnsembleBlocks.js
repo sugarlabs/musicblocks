@@ -14,7 +14,7 @@
 
    _, last, FlowBlock, ValueBlock, FlowClampBlock, LeftBlock, BooleanBlock,
    NOINPUTERRORMSG, NANERRORMSG, INVALIDPITCH, getNote, pitchToNumber,
-   TURTLESVG, _THIS_IS_MUSIC_BLOCKS_, getMunsellColor
+   TURTLESVG, _THIS_IS_MUSIC_BLOCKS_, getMunsellColor, pubsub
 */
 
 /* exported setupEnsembleBlocks, getTargetTurtle */
@@ -43,6 +43,7 @@ function getTargetTurtle(turtles, targetTurtle) {
 }
 
 function _blockFindTurtle(activity, turtle, blk, receivedArg) {
+    if (!activity.blocks.blockList[blk]) return null;
     const cblk = activity.blocks.blockList[blk].connections[1];
     if (cblk === null) {
         //Debug: connecting block not found, returning null
@@ -695,7 +696,10 @@ function setupEnsembleBlocks(activity) {
                     if (thisTurtle.singer.lastNotePlayed !== null) {
                         const len = thisTurtle.singer.lastNotePlayed[0].length;
                         const pitch = thisTurtle.singer.lastNotePlayed[0].slice(0, len - 1);
-                        const octave = parseInt(thisTurtle.singer.lastNotePlayed[0].slice(len - 1));
+                        const octave = parseInt(
+                            thisTurtle.singer.lastNotePlayed[0].slice(len - 1),
+                            10
+                        );
 
                         obj = [pitch, octave];
                     } else if (thisTurtle.singer.notePitches.length > 0) {
@@ -734,7 +738,7 @@ function setupEnsembleBlocks(activity) {
                 if (tur.singer.lastNotePlayed !== null) {
                     const len = tur.singer.lastNotePlayed[0].length;
                     const pitch = tur.singer.lastNotePlayed[0].slice(0, len - 1);
-                    const octave = parseInt(tur.singer.lastNotePlayed[0].slice(len - 1));
+                    const octave = parseInt(tur.singer.lastNotePlayed[0].slice(len - 1), 10);
                     obj = [pitch, octave];
                 } else if (tur.singer.notePitches.length > 0) {
                     obj = getNote(
@@ -1011,14 +1015,10 @@ function setupEnsembleBlocks(activity) {
                     logo.runFromBlock(logo, thisTurtle, blockNumber, 0, receivedArg);
                     // Dispatch an event to indicate logo this turtle is running
                     activity.stage.dispatchEvent(turtleName);
-                    document.removeEventListener("finishedLoading", __afterLoad);
+                    pubsub.off("finishedLoading", __afterLoad);
                 };
 
-                if (document.addEventListener) {
-                    document.addEventListener("finishedLoading", __afterLoad);
-                } else {
-                    document.attachEvent("finishedLoading", __afterLoad);
-                }
+                pubsub.on("finishedLoading", __afterLoad);
 
                 activity.blocks.loadNewBlocks(newBlock);
             } else {
@@ -1070,7 +1070,7 @@ function setupEnsembleBlocks(activity) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
             const heading = tur.orientation;
             // Heading needs to be set to 0 when we update the graphic.
-            if (heading != 0) {
+            if (heading !== 0) {
                 tur.painter.doSetHeading(0);
             }
 
@@ -1094,7 +1094,7 @@ function setupEnsembleBlocks(activity) {
             );
 
             // Restore the heading.
-            if (heading != 0) {
+            if (heading !== 0) {
                 tur.painter.doSetHeading(heading);
             }
         }

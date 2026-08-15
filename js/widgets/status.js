@@ -164,14 +164,25 @@ class StatusMatrix {
                     if (typeof label === "object" && label !== null && label.value) {
                         label = label.value;
                     }
+                    if (label === null || label === undefined) {
+                        label =
+                            this.activity.blocks.blockList[statusField[0]].protoblock
+                                .staticLabels[0];
+                    }
+                    label = _(label);
                     break;
-                default:
-                    label =
-                        this.activity.blocks.blockList[statusField[0]].protoblock.staticLabels[0];
+                default: {
+                    const block = this.activity.blocks.blockList[statusField[0]];
+                    label = block?.protoblock?.staticLabels?.[0] || "";
                     break;
+                }
             }
-            let str = label;
-            str = label.charAt(0).toUpperCase() + label.slice(1);
+
+            const str =
+                typeof label === "string" && label.length > 0
+                    ? label.charAt(0).toUpperCase() + label.slice(1)
+                    : "";
+
             // console.log(str);
             cell.textContent = "\u00A0";
             const b = document.createElement("b");
@@ -328,7 +339,7 @@ class StatusMatrix {
 
                 cell = this._statusTable.rows[i + 1].cells[activeTurtles + 1];
                 if (cell !== null) {
-                    cell.textContent = value;
+                    cell.textContent = value === "__INVALID_INPUT__" ? "" : value;
                 }
                 i++;
             }

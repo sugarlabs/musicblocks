@@ -116,6 +116,7 @@ class HelpWidget {
 
                 const helpScrollWrapper = document.createElement("div");
                 helpScrollWrapper.id = "helpScrollWrapper";
+                helpScrollWrapper.tabIndex = 0;
 
                 const helpBodyDiv = document.createElement("div");
                 helpBodyDiv.id = "helpBodyDiv";
@@ -444,7 +445,7 @@ class HelpWidget {
         img.alt = `${title} icon`;
 
         if (this._isLargeTourImage(title)) {
-            img.classList.add("help-tour-image");
+            img.classList.add("help-tour-image", "help-tour-large-image");
         } else if (this._isDetailedTourIcon(title)) {
             img.classList.add("help-tour-detailed-icon");
         } else {
@@ -726,6 +727,7 @@ class HelpWidget {
 
                 const helpScrollWrapper = document.createElement("div");
                 helpScrollWrapper.id = "helpScrollWrapper";
+                helpScrollWrapper.tabIndex = 0;
 
                 const helpBodyDiv = document.createElement("div");
                 helpBodyDiv.id = "helpBodyDiv";

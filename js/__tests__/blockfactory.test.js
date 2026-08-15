@@ -238,4 +238,82 @@ describe("SVG Class", () => {
             expect(svgString).toContain("</svg>");
         });
     });
+
+    describe("Dock Coordinate Rounding (Regression Tests)", () => {
+        const BLOCKSCALES = [
+            0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5, 3.75, 4.0
+        ];
+
+        BLOCKSCALES.forEach(scale => {
+            it(`should round all dock coordinates to integers at scale ${scale} for booleanCompare`, () => {
+                svg.setScale(scale);
+                svg.booleanCompare();
+
+                expect(svg.docks.length).toBeGreaterThan(0);
+                svg.docks.forEach(dock => {
+                    expect(Number.isInteger(dock[0])).toBe(true);
+                    expect(Number.isInteger(dock[1])).toBe(true);
+                });
+            });
+
+            it(`should round all dock coordinates to integers at scale ${scale} for booleanAndOr`, () => {
+                svg.setScale(scale);
+                svg.booleanAndOr();
+
+                expect(svg.docks.length).toBeGreaterThan(0);
+                svg.docks.forEach(dock => {
+                    expect(Number.isInteger(dock[0])).toBe(true);
+                    expect(Number.isInteger(dock[1])).toBe(true);
+                });
+            });
+
+            it(`should round all dock coordinates to integers at scale ${scale} for booleanNot`, () => {
+                svg.setScale(scale);
+                svg.booleanNot(false);
+
+                expect(svg.docks.length).toBeGreaterThan(0);
+                svg.docks.forEach(dock => {
+                    expect(Number.isInteger(dock[0])).toBe(true);
+                    expect(Number.isInteger(dock[1])).toBe(true);
+                });
+            });
+        });
+
+        it("should explicitly prevent fractional dock coordinates at scale 2.25 for booleanCompare", () => {
+            svg.setScale(2.25);
+            svg.booleanCompare();
+
+            // Expected integers matching our local patched build: [[1, 57], [116, 28], [116, 75]]
+            // Verify that none of them match the unrounded pattern (like x.125 or y.375)
+            expect(svg.docks).toEqual([
+                [1, 57],
+                [116, 28],
+                [116, 75]
+            ]);
+        });
+    });
+
+    describe("Slot and Tail Coordinate Rounding", () => {
+        it("should round dock coordinates correctly in _doSlot when _cap is true", () => {
+            svg.setScale(2.25);
+            svg.setSlot(false);
+            svg.setCap(true);
+            svg.clearDocks();
+            svg._doSlot();
+            expect(svg.docks.length).toBe(1);
+            expect(Number.isInteger(svg.docks[0][0])).toBe(true);
+            expect(Number.isInteger(svg.docks[0][1])).toBe(true);
+        });
+
+        it("should round dock coordinates correctly in _doTail when _tail is true", () => {
+            svg.setScale(2.25);
+            svg.setTab(false);
+            svg.setTail(true);
+            svg.clearDocks();
+            svg._doTail();
+            expect(svg.docks.length).toBe(1);
+            expect(Number.isInteger(svg.docks[0][0])).toBe(true);
+            expect(Number.isInteger(svg.docks[0][1])).toBe(true);
+        });
+    });
 });

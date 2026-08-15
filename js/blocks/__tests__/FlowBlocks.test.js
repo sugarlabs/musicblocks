@@ -31,6 +31,7 @@ global.POSNUMBER = "POS_NUMBER";
 class BaseBlock {
     constructor(name) {
         this.name = name;
+        this.capabilities = Object.create(null);
         this.dockTypes = [null];
         this.size = 1;
         this.lang = "en";
@@ -43,6 +44,16 @@ class BaseBlock {
 
     setHelpString(help) {
         this.help = help;
+    }
+
+    setCapability(name, value = true) {
+        this.capabilities[name] = !!value;
+    }
+
+    getCapability(name) {
+        return Object.prototype.hasOwnProperty.call(this.capabilities, name)
+            ? this.capabilities[name]
+            : undefined;
     }
 
     formBlock(defn) {
@@ -253,7 +264,7 @@ describe("FlowBlocks integration", () => {
         // Factor is multiplied before listener runs
         expect(turtle.singer.duplicateFactor).toBe(2);
         const listener = logo.setTurtleListener.mock.calls.pop()[2];
-        listener();
+        expect(listener()).toBeUndefined();
         expect(turtle.singer.duplicateFactor).toBe(1);
 
         // Path where another turtle already stored connections
@@ -301,6 +312,25 @@ describe("FlowBlocks integration", () => {
         }).toThrow();
 
         // The critical guarantee: lock is released even after an error
+        expect(logo.connectionStoreLock).toBe(false);
+    });
+
+    test("DuplicateBlock listener releases lock when restoration throws", () => {
+        const block = getBlock("duplicatenotes");
+        const blk = 0;
+        activity.blocks.blockList = {
+            0: { name: "duplicatenotes", connections: [null, 1, null, 2] },
+            1: { name: "visibleA", connections: [0, 2] },
+            2: { name: "hidden", connections: [1, null] }
+        };
+        activity.blocks.findBottomBlock = jest.fn(() => 1);
+        logo.connectionStore = { 0: {} };
+
+        block.flow([2, 1], logo, 0, blk, []);
+        logo.connectionStore[0][blk] = [["missing", 0, null]];
+        const listener = logo.setTurtleListener.mock.calls.pop()[2];
+
+        expect(() => listener()).toThrow();
         expect(logo.connectionStoreLock).toBe(false);
     });
 
@@ -484,6 +514,11 @@ describe("FlowBlocks integration", () => {
     test("Hidden block variants simply no-op", () => {
         expect(() => getBlock("hiddennoflow").flow()).not.toThrow();
         expect(() => getBlock("hidden").flow()).not.toThrow();
+    });
+
+    test("Hidden block variants declare the noHit capability", () => {
+        expect(getBlock("hiddennoflow").getCapability("noHit")).toBe(true);
+        expect(getBlock("hidden").getCapability("noHit")).toBe(true);
     });
 
     test("WaitForBlock ignores malformed args and While/Until guard arg length", () => {

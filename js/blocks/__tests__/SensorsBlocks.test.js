@@ -239,6 +239,7 @@ describe("setupSensorsBlocks", () => {
 
         beforeEach(() => {
             block = DummyFlowBlock.createdBlocks["getcolorpixel"];
+            global.platformColor.background = "rgb(200,200,200)";
             logo = {
                 inStatusMatrix: false,
                 statusFields: [],
@@ -337,6 +338,13 @@ describe("setupSensorsBlocks", () => {
                 expect(color).toBe("rgb(200,200,200)");
             });
 
+            it("should return hex background color for transparent pixel", () => {
+                global.platformColor.background = "#303030";
+                const pixelData = [100, 150, 200, 0];
+                const color = block.detectColor(pixelData);
+                expect(color).toBe("rgb(48,48,48)");
+            });
+
             it("should throw an error for invalid pixel data", () => {
                 const pixelData = [100, 150]; // Invalid length
                 expect(() => block.detectColor(pixelData)).toThrow("Invalid pixel data");
@@ -347,6 +355,18 @@ describe("setupSensorsBlocks", () => {
             it("should parse and return background color", () => {
                 const color = block.getBackgroundColor();
                 expect(color).toBe("rgb(200,200,200)");
+            });
+
+            it("should parse and return full hex background color", () => {
+                global.platformColor.background = "#F9F9F9";
+                const color = block.getBackgroundColor();
+                expect(color).toBe("rgb(249,249,249)");
+            });
+
+            it("should parse and return shorthand hex background color", () => {
+                global.platformColor.background = "#abc";
+                const color = block.getBackgroundColor();
+                expect(color).toBe("rgb(170,187,204)");
             });
         });
 

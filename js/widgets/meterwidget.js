@@ -12,7 +12,7 @@
 /* global
 
    Singer, _, last, platformColor, docById, wheelnav, slicePath,
-   PREVIEWVOLUME, TONEBPM
+   PREVIEWVOLUME, TONEBPM, clampNumber
 */
 
 /*
@@ -51,6 +51,9 @@
  * @exports MeterWidget
  */
 class MeterWidget {
+    /** AMD module dependencies for lazy loading. */
+    static dependencies = ["widgets/meterwidget"];
+
     // A pie menu is used to show the meter and strong beats
     /**
      * Width of the button div.
@@ -286,8 +289,8 @@ class MeterWidget {
             const el = divInput.children[0];
             const el2 = divInput2.children[0];
 
-            divInput.children[0].value = Math.min(el.max, Math.max(el.min, el.value));
-            divInput2.children[0].value = Math.min(el2.max, Math.max(el2.min, el2.value));
+            divInput.children[0].value = clampNumber(el.value, el.min, el.max);
+            divInput2.children[0].value = clampNumber(el2.value, el2.min, el2.max);
 
             const bnBlk = this.activity.blocks.blockList[c1]; // number of beats
             const bvBlk = this.activity.blocks.blockList[c3]; // beat value

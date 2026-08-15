@@ -820,6 +820,18 @@ window.widgetWindows.hideWindow = name => {
 };
 
 /**
+ * @public
+ * @param {string} name
+ */
+window.widgetWindows.closeWindow = name => {
+    const win = window.widgetWindows.openWindows[name];
+    if (!win) return;
+    if (typeof win.close === "function") {
+        win.close();
+    }
+};
+
+/**
  * @returns {void}
  */
 window.widgetWindows.showWindows = () => {

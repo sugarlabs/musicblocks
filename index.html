@@ -110,12 +110,21 @@
 
         <!-- <script src="lib/mespeak.js"></script> -->
 
+        <!-- Release config: resolves Turtle/Music mode from URL/hostname and seeds
+     window._THIS_IS_*_ globals. Must load first, synchronously, before
+     loader.js and activity.js read those globals. -->
+        <script src="js/releaseconfig.js"></script>
+
+
         <script src="dist/vendor.min.js"></script>
         <link
             rel="preload"
             href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"
             as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
         />
         <noscript
             ><link
@@ -136,7 +145,10 @@
             as="style"
             integrity="sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07"
             crossorigin="anonymous"
-            onload="this.onload=null;this.rel='stylesheet'"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
         />
         <noscript
             ><link
@@ -161,6 +173,7 @@
             });
         </script>
         <script src="lib/astring.min.js" defer></script>
+        <script src="lib/purify.min.js" defer></script>
         <script src="js/utils/mb-dialog.js" defer></script>
         <script src="js/svgAssetSelector.js" defer></script>
         <script src="lib/acorn.min.js" defer></script>
@@ -176,9 +189,22 @@
         />
         <link
             rel="preload"
+            href="css/tokens.css?v=fixed"
+            as="style"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
+        />
+        <noscript><link rel="stylesheet" href="css/tokens.css?v=fixed" /></noscript>
+        <link
+            rel="preload"
             href="css/themes.css?v=fixed"
             as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
+            onload="
+                this.onload = null;
+                this.rel = 'stylesheet';
+            "
         />
         <noscript><link rel="stylesheet" href="css/themes.css?v=fixed" /></noscript>
         <script>
@@ -260,38 +286,30 @@
             ></canvas>
 
             <!--hidden at the beginning whilst everything loads-->
-            <div
-                class="popupMsg"
-                id="printText"
-                tabindex="-1"
-                aria-live="polite"
-                role="status"
-            >
+            <div class="popupMsg" id="printText" tabindex="-1" aria-live="polite" role="status">
                 <div class="contentWrapper">
                     <span id="printTextContent"></span>
-                    <img
+                    <button
                         class="msgCloseIcon"
                         onclick="hidePrintText()"
-                        src="images/close.svg"
-                        alt="Close"
-                    />
+                        aria-label="Close notification"
+                        tabindex="0"
+                    >
+                        <img src="images/close.svg" alt="" aria-hidden="true" />
+                    </button>
                 </div>
             </div>
-            <div
-                class="popupMsg"
-                id="errorText"
-                tabindex="-1"
-                aria-live="assertive"
-                role="alert"
-            >
+            <div class="popupMsg" id="errorText" tabindex="-1" aria-live="assertive" role="alert">
                 <div class="contentWrapper">
                     <span id="errorTextContent"></span>
-                    <img
+                    <button
                         class="msgCloseIcon"
                         onclick="hideErrorText()"
-                        src="images/close.svg"
-                        alt="Close"
-                    />
+                        aria-label="Close error message"
+                        tabindex="0"
+                    >
+                        <img src="images/close.svg" alt="" aria-hidden="true" />
+                    </button>
                 </div>
             </div>
             <div id="hideContents" style="display: none" tabindex="-1">
@@ -473,7 +491,6 @@
                             tabindex="-1"
                         />
                         <ul class="matches"></ul>
-                        <input onkeypress="doPaste()" type="submit" value="" tabindex="-1" />
                     </div>
 
                     <div id="myProgress" tabindex="-1">
@@ -929,25 +946,25 @@
                         <li><a id="es" role="button" tabindex="0"></a></li>
                         <li><a id="pt" role="button" tabindex="0"></a></li>
                         <li><a id="fr" role="button" tabindex="0"></a></li>
-			<li><a id="it" role="button" tabindex="0"></a></li>
-			<li><a id="de" role="button" tabindex="0"></a></li>
+                        <li><a id="it" role="button" tabindex="0"></a></li>
+                        <li><a id="de" role="button" tabindex="0"></a></li>
                         <li><a id="ja" role="button" tabindex="0"></a></li>
                         <li><a id="kana" role="button" tabindex="0"></a></li>
                         <li><a id="ko" role="button" tabindex="0"></a></li>
                         <li><a id="zhCN" role="button" tabindex="0"></a></li>
                         <li><a id="th" role="button" tabindex="0"></a></li>
+                        <li><a id="tr" role="button" tabindex="0"></a></li>
                         <li><a id="ayc" role="button" tabindex="0"></a></li>
                         <li><a id="quz" role="button" tabindex="0"></a></li>
                         <li><a id="gug" role="button" tabindex="0"></a></li>
                         <li><a id="hi" role="button" tabindex="0"></a></li>
-			<li><a id="ta" role="button" tabindex="0"></a></li>
+                        <li><a id="ta" role="button" tabindex="0"></a></li>
                         <li><a id="te" role="button" tabindex="0"></a></li>
-                        <li><a id="bn" role="button" tabindex="0"></a></li>
                         <li><a id="ibo" role="button" tabindex="0"></a></li>
-                        <li><a id="tr" role="button" tabindex="0"></a></li>
                         <li><a id="ar" role="button" tabindex="0"></a></li>
-                        <li><a id="ur" role="button" tabindex="0"></a></li>
+                        <li><a id="bn" role="button" tabindex="0"></a></li>
                         <li><a id="he" role="button" tabindex="0"></a></li>
+                        <li><a id="ur" role="button" tabindex="0"></a></li>
                     </ul>
 
                     <ul style="display: none" id="themedropdown" class="dropdown-content">
@@ -1170,7 +1187,23 @@
                     }, 1500);
                 }, 3000);
 
-
+                const languageDropdown = document.getElementById("languagedropdown");
+                if (languageDropdown) {
+                    const langLinks = languageDropdown.querySelectorAll("a");
+                    langLinks.forEach(link => {
+                        link.addEventListener("click", function (e) {
+                            e.preventDefault(); // prevent default <a> behavior
+                            const selectedLang = this.id; // ID corresponds to language code
+                            const currentLang = readStorage("languagePreference");
+                            if (
+                                currentLang !== selectedLang &&
+                                writeStorage("languagePreference", selectedLang)
+                            ) {
+                                location.reload(); // automatically reload
+                            }
+                        });
+                    });
+                }
             });
         </script>
 
@@ -1302,7 +1335,7 @@
 
                 iconCode.textContent = isFullscreen ? "\ue5d1" : "\ue5d0";
 
-                if (fullScreenBtn && typeof _ === 'function') {
+                if (fullScreenBtn && typeof _ === "function") {
                     var tooltipText = isFullscreen ? _("Exit Fullscreen") : _("Enter Fullscreen");
                     fullScreenBtn.setAttribute("data-tooltip", tooltipText);
                     if (window.jQuery) {
@@ -1336,7 +1369,7 @@
                     if (!persistentNotification) {
                         persistentNotification = document.createElement("div");
                         persistentNotification.id = "persistentNotification";
-                        persistentNotification.innerHTML =
+                        persistentNotification.textContent =
                             "Play only mode enabled. For full Music Blocks experience, use a larger display.";
                         document.body.appendChild(persistentNotification);
                     }

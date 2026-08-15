@@ -43,6 +43,9 @@
  * @exports PitchDrumMatrix
  */
 class PitchDrumMatrix {
+    /** AMD module dependencies for lazy loading. */
+    static dependencies = ["widgets/pitchdrummatrix"];
+
     /**
      * Width of the button division.
      *
@@ -196,6 +199,8 @@ class PitchDrumMatrix {
 
         // For the button callbacks
         widgetWindow.onclose = () => {
+            this._playing = false;
+            this.activity.logo.synth.stop();
             pdmTableDiv.style.visibility = "hidden";
             this.activity.hideMsgs();
             widgetWindow.destroy();
@@ -601,6 +606,32 @@ class PitchDrumMatrix {
     }
 
     /**
+     * Updates the play button icon to show "Play" or "Stop".
+     *
+     * @private
+     * @param {"play"|"stop"} state - Which icon to show.
+     * @returns {void}
+     */
+    _setPlayButtonIcon(state) {
+        const icon = this.playButton;
+        const isStop = state === "stop";
+        const src = isStop ? "header-icons/stop-button.svg" : "header-icons/play-button.svg";
+        const label = isStop ? _("Stop") : _("Play");
+
+        icon.textContent = "\u00A0\u00A0";
+        const img = document.createElement("img");
+        img.src = src;
+        img.title = label;
+        img.alt = label;
+        img.setAttribute("height", PitchDrumMatrix.ICONSIZE);
+        img.setAttribute("width", PitchDrumMatrix.ICONSIZE);
+        img.setAttribute("vertical-align", "middle");
+        img.setAttribute("align-content", "center");
+        icon.appendChild(img);
+        icon.appendChild(document.createTextNode("\u00A0\u00A0"));
+    }
+
+    /**
      * Handles the scaling of the widget.
      *
      * @private
@@ -635,31 +666,10 @@ class PitchDrumMatrix {
      */
     _playAll() {
         // Play all of the pitch/drum combinations in the matrix.
-        const icon = this.playButton;
         if (this._playing) {
-            icon.textContent = "\u00A0\u00A0";
-            const img = document.createElement("img");
-            img.src = "header-icons/stop-button.svg";
-            img.title = _("Stop");
-            img.alt = _("Stop");
-            img.setAttribute("height", PitchDrumMatrix.ICONSIZE);
-            img.setAttribute("width", PitchDrumMatrix.ICONSIZE);
-            img.setAttribute("vertical-align", "middle");
-            img.setAttribute("align-content", "center");
-            icon.appendChild(img);
-            icon.appendChild(document.createTextNode("\u00A0\u00A0"));
+            this._setPlayButtonIcon("stop");
         } else {
-            icon.textContent = "\u00A0\u00A0";
-            const img = document.createElement("img");
-            img.src = "header-icons/play-button.svg";
-            img.title = _("Play");
-            img.alt = _("Play");
-            img.setAttribute("height", PitchDrumMatrix.ICONSIZE);
-            img.setAttribute("width", PitchDrumMatrix.ICONSIZE);
-            img.setAttribute("vertical-align", "middle");
-            img.setAttribute("align-content", "center");
-            icon.appendChild(img);
-            icon.appendChild(document.createTextNode("\u00A0\u00A0"));
+            this._setPlayButtonIcon("play");
             this._playing = false;
             return;
         }
@@ -701,34 +711,17 @@ class PitchDrumMatrix {
                 this._playPitchDrum(ii, pairs);
             }
             setTimeout(() => {
+                if (!this._playing) {
+                    return;
+                }
                 this._playing = false;
-                icon.textContent = "\u00A0\u00A0";
-                const img = document.createElement("img");
-                img.src = "header-icons/play-button.svg";
-                img.title = _("Play");
-                img.alt = _("Play");
-                img.setAttribute("height", PitchDrumMatrix.ICONSIZE);
-                img.setAttribute("width", PitchDrumMatrix.ICONSIZE);
-                img.setAttribute("vertical-align", "middle");
-                img.setAttribute("align-content", "center");
-                icon.appendChild(img);
-                icon.appendChild(document.createTextNode("\u00A0\u00A0"));
+                this._setPlayButtonIcon("play");
             }, pairs.length * 1000);
         } else {
             if (!this.widgetWindow._maximized) {
-                activity.textMsg(_("Click in the grid to map notes to drums."), 3000);
+                this.activity.textMsg(_("Click in the grid to map notes to drums."), 3000);
             }
-            icon.textContent = "\u00A0\u00A0";
-            const img = document.createElement("img");
-            img.src = "header-icons/play-button.svg";
-            img.title = _("Play");
-            img.alt = _("Play");
-            img.setAttribute("height", PitchDrumMatrix.ICONSIZE);
-            img.setAttribute("width", PitchDrumMatrix.ICONSIZE);
-            img.setAttribute("vertical-align", "middle");
-            img.setAttribute("align-content", "center");
-            icon.appendChild(img);
-            icon.appendChild(document.createTextNode("\u00A0\u00A0"));
+            this._setPlayButtonIcon("play");
         }
     }
 
@@ -741,26 +734,12 @@ class PitchDrumMatrix {
      * @returns {void}
      */
     _playPitchDrum(i, pairs) {
-        // Find the drum cell
-        let pdmTable = docById("pdmTable");
         if (!this._playing) {
-            for (let j = 0; j < i; j++) {
-                pdmTable.rows[j].cells[0].style.backgroundColor = platformColor.labelColor;
-            }
-            const icon = this.playButton;
-            icon.textContent = "\u00A0\u00A0";
-            const img = document.createElement("img");
-            img.src = "header-icons/play-button.svg";
-            img.title = _("Play");
-            img.alt = _("Play");
-            img.setAttribute("height", PitchDrumMatrix.ICONSIZE);
-            img.setAttribute("width", PitchDrumMatrix.ICONSIZE);
-            img.setAttribute("vertical-align", "middle");
-            img.setAttribute("align-content", "center");
-            icon.appendChild(img);
-            icon.appendChild(document.createTextNode("\u00A0\u00A0"));
             return;
         }
+
+        // Find the drum cell
+        let pdmTable = docById("pdmTable");
         const drumTable = docById("pdmDrumTable");
         let row = drumTable.rows[0];
         // const drumCell = row.cells[i];
@@ -784,6 +763,9 @@ class PitchDrumMatrix {
             }, 1000);
         } else {
             setTimeout(() => {
+                if (!this._playing) {
+                    return;
+                }
                 for (let ii = 0; ii < pdmTable.rows.length - 1; ii++) {
                     pdmTable.rows[ii].cells[0].style.backgroundColor = platformColor.labelColor;
                 }

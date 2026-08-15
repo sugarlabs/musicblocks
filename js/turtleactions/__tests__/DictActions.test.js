@@ -175,10 +175,27 @@ describe("setupDictActions", () => {
             Turtle.DictActions.SetDictValue(0, turtle, key, value);
             expect(targetTurtle.painter[method]).toHaveBeenCalledWith(...args);
         });
+
+        it("should handle unsupported key gracefully without doing anything", () => {
+            Turtle.DictActions.SetDictValue(0, turtle, "unsupportedKey", "value");
+            const painterMethods = [
+                "doSetColor",
+                "doSetValue",
+                "doSetChroma",
+                "doSetPensize",
+                "doSetFont",
+                "doSetHeading",
+                "doSetXY"
+            ];
+            painterMethods.forEach(method => {
+                expect(targetTurtle.painter[method]).not.toHaveBeenCalled();
+            });
+        });
     });
 
     describe("SerializeDict", () => {
         it("should serialize the turtle dictionary correctly", () => {
+            activity.logo.turtleDicts[turtle] = {}; // 0 not in turtleDicts[turtle]
             const serialized = Turtle.DictActions.SerializeDict(0, turtle);
             const expected = JSON.stringify({
                 "color": "red",
@@ -285,6 +302,24 @@ describe("setupDictActions", () => {
             Turtle.DictActions.setValue("newDict", "key", "value", turtle);
             expect(activity.logo.turtleDicts[turtle].newDict.key).toBe("value");
         });
+
+        it("should set value without logging to console", () => {
+            const consoleSpy = jest.spyOn(console, "log");
+            activity.logo.turtleDicts[turtle] = {};
+            Turtle.DictActions.setValue("testDict", "key", "value", turtle);
+            expect(consoleSpy).not.toHaveBeenCalled();
+            expect(activity.logo.turtleDicts[turtle]["testDict"]["key"]).toBe("value");
+            consoleSpy.mockRestore();
+        });
+
+        it("should set value in existing dictionary without recreating it", () => {
+            activity.logo.turtleDicts[turtle] = {
+                existingDict: { oldKey: "oldValue" }
+            };
+            Turtle.DictActions.setValue("existingDict", "newKey", "newValue", turtle);
+            expect(activity.logo.turtleDicts[turtle].existingDict.oldKey).toBe("oldValue");
+            expect(activity.logo.turtleDicts[turtle].existingDict.newKey).toBe("newValue");
+        });
     });
 
     describe("getValue", () => {
@@ -308,6 +343,13 @@ describe("setupDictActions", () => {
             };
             const result = Turtle.DictActions.getValue("testDict", "nonexistentKey", turtle);
             expect(result).toBe("Key with this name does not exist in testDict");
+        });
+
+        it("should initialize turtleDicts if it does not exist for the turtle", () => {
+            delete activity.logo.turtleDicts[turtle];
+            const result = Turtle.DictActions.getValue("testDict", "key", turtle);
+            expect(result).toBe("Dictionary with this name does not exist");
+            expect(activity.logo.turtleDicts[turtle]).toEqual({});
         });
     });
 });

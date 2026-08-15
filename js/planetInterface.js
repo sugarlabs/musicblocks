@@ -14,7 +14,7 @@
 // scratch. -- Walter Bender, October 2014.
 
 /*
-   globals _, docById, platformColor, doSVG, createjs, _THIS_IS_MUSIC_BLOCKS_
+   globals _, docById, platformColor, doSVG, createjs, _THIS_IS_MUSIC_BLOCKS_, pubsub
  */
 
 /*
@@ -75,7 +75,8 @@ class PlanetInterface {
             document.querySelector("#theme-color").content = platformColor.header;
             this.activity.stage.enableDOMEvents(true);
             window.scroll(0, 0);
-            docById("buttoncontainerBOTTOM").style.display = "block";
+            const buttonContainerBottom = docById("buttoncontainerBOTTOM");
+            if (buttonContainerBottom) buttonContainerBottom.style.display = "block";
             docById("buttoncontainerTOP").style.display = "block";
         };
 
@@ -161,14 +162,10 @@ class PlanetInterface {
             this.activity.blocks.palettes._hideMenus(true);
 
             const __afterLoad = () => {
-                document.removeEventListener("finishedLoading", __afterLoad);
+                pubsub.off("finishedLoading", __afterLoad);
             };
 
-            if (document.addEventListener) {
-                document.addEventListener("finishedLoading", __afterLoad);
-            } else {
-                document.attachEvent("finishedLoading", __afterLoad);
-            }
+            pubsub.on("finishedLoading", __afterLoad);
 
             try {
                 const obj = JSON.parse(data);
@@ -199,7 +196,7 @@ class PlanetInterface {
         this.newProject = () => {
             this.closePlanet();
             this.initialiseNewProject();
-            this.activity._loadStart();
+            this.activity.justLoadStart();
             this.saveLocally();
         };
 

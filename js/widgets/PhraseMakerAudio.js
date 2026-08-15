@@ -359,14 +359,17 @@ const PhraseMakerAudio = {
                         pm._("Play")
                     );
                     pm.playingNow = false;
-                    pm._playButton.innerHTML = `&nbsp;&nbsp;<img 
-                    src="header-icons/play-button.svg" 
-                    title="${pm._("Play")}" 
-                    alt="${pm._("Play")}" 
-                    height="${pm.constructor.ICONSIZE}" 
-                    width="${pm.constructor.ICONSIZE}" 
-                    vertical-align="middle"
-                >&nbsp;&nbsp;`;
+                    const playImg = document.createElement("img");
+                    playImg.src = "header-icons/play-button.svg";
+                    playImg.title = pm._("Play");
+                    playImg.alt = pm._("Play");
+                    playImg.height = pm.constructor.ICONSIZE;
+                    playImg.width = pm.constructor.ICONSIZE;
+                    playImg.style.verticalAlign = "middle";
+                    pm._playButton.textContent = "\u00A0\u00A0";
+                    pm._playButton.appendChild(playImg);
+                    const nbsp = document.createTextNode("\u00A0\u00A0");
+                    pm._playButton.appendChild(nbsp);
                 } else {
                     row = pm._noteValueRow;
                     cell = row.cells[pm._colIndex];

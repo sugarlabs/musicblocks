@@ -55,13 +55,31 @@ requirejs.config({
         "utils/utils-logic": {
             exports: "UtilsLogic"
         },
+        "utils/dom-helpers": {
+            exports: "DomHelpers"
+        },
+        "utils/browser-utils": {
+            exports: "BrowserUtils"
+        },
+        "utils/http-utils": {
+            exports: "HttpUtils"
+        },
         "utils/utils": {
-            deps: ["utils/platformstyle", "utils/utils-logic"],
+            deps: [
+                "utils/platformstyle",
+                "utils/utils-logic",
+                "utils/dom-helpers",
+                "utils/browser-utils",
+                "utils/http-utils"
+            ],
             exports: "_"
         },
         "utils/retryWithBackoff": {
             deps: ["utils/utils"],
             exports: "retryWithBackoff"
+        },
+        "utils/error-handler": {
+            exports: "ErrorHandler"
         },
         "activity/turtledefs": {
             deps: ["utils/utils"],
@@ -71,8 +89,21 @@ requirejs.config({
             deps: ["activity/turtledefs", "utils/retryWithBackoff"],
             exports: "Block"
         },
+        "activity/connection-validator": {
+            exports: "ConnectionValidator"
+        },
+        "activity/block-drag-controller": {
+            deps: ["activity/block-constants"],
+            exports: "setupBlockDragController"
+        },
         "activity/blocks": {
-            deps: ["activity/block"],
+            deps: [
+                "activity/block",
+                "activity/pubsub",
+                "activity/block-constants",
+                "activity/connection-validator",
+                "activity/block-drag-controller"
+            ],
             exports: "Blocks"
         },
         "activity/turtle-singer": {
@@ -104,23 +135,55 @@ requirejs.config({
         "utils/ManagedTimer": {
             exports: "ManagedTimer"
         },
+        "activity/embedded-graphics-scheduler": {
+            exports: "EmbeddedGraphicsScheduler"
+        },
+        "activity/LogoDependencies": {
+            exports: "LogoDependencies"
+        },
         "activity/logo": {
             deps: [
                 "activity/turtles",
                 "activity/notation",
                 "utils/synthutils",
                 "activity/logoconstants",
-                "utils/ManagedTimer"
+                "utils/ManagedTimer",
+                "activity/embedded-graphics-scheduler",
+                "activity/LogoDependencies"
             ],
             exports: "Logo"
         },
         "activity/activity": {
             deps: [
                 "utils/utils",
+                "utils/error-handler",
                 "activity/activity-context",
                 "activity/logo",
                 "activity/blocks",
-                "activity/turtles"
+                "activity/turtles",
+                "activity/recorder",
+                "activity/abc-parser",
+                "activity/idle-watcher",
+                "activity/grid-controller",
+                "activity/grid-renderer",
+                "activity/plugin-controller",
+                "widgets/plugin-dialog",
+                "activity/toolbar-controller",
+                "activity/focus-cycle-manager",
+                "activity/toolbar-ui",
+                "activity/alert-controller",
+                "activity/alert-renderer",
+                "palette/palette-loader",
+                "activity/search-controller",
+                "activity/workspace-layout-controller",
+                "activity/block-scale-controller",
+                "search-ui",
+                "project-manager",
+                "keyboard-controller",
+                "activity/selection-controller",
+                "activity/trash-controller",
+                "activity/help-controller",
+                "activity/context-menu-controller"
             ],
             exports: "Activity"
         },
@@ -154,6 +217,24 @@ requirejs.config({
         "utils": "js/utils",
         "widgets": "js/widgets",
         "activity": "js",
+        "activity/recorder": "js/activity/recorder",
+        "activity/exporters": "js/activity/exporters",
+        "activity/abc-parser": "js/activity/abc-parser",
+        "activity/idle-watcher": "js/activity/idle-watcher",
+        "activity/grid-controller": "js/activity/grid-controller",
+        "activity/grid-renderer": "js/activity/grid-renderer",
+        "activity/plugin-controller": "js/activity/plugin-controller",
+        "activity/toolbar-controller": "js/activity/toolbar-controller",
+        "activity/alert-controller": "js/activity/alert-controller",
+        "activity/alert-renderer": "js/activity/alert-renderer",
+        "palette/palette-loader": "js/palette/palette-loader",
+        "activity/search-controller": "js/activity/search-controller",
+        "activity/workspace-layout-controller": "js/activity/workspace-layout-controller",
+        "activity/selection-controller": "js/activity/selection-controller",
+        "search-ui": "js/search-ui",
+        "project-manager": "js/project-manager",
+        "keyboard-controller": "js/keyboard-controller",
+        "activity/pubsub": "js/pubsub",
         "easeljs.min": "lib/easeljs.min",
         "tweenjs.min": "lib/tweenjs.min",
         "prefixfree.min": "lib/prefixfree.min",
@@ -268,10 +349,6 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
         window.Materialize = M;
     }
 
-    // Define essential globals for core modules
-    window._THIS_IS_MUSIC_BLOCKS_ = true;
-    window._THIS_IS_TURTLE_BLOCKS_ = false;
-
     // Load highlight optionally
     requirejs(
         ["highlight"],
@@ -288,10 +365,24 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
 
     function updateContent() {
         if (!i18next.isInitialized) return;
+        const lang = i18next.language;
         const elements = document.querySelectorAll("[data-i18n]");
         elements.forEach(element => {
             const key = element.getAttribute("data-i18n");
-            element.textContent = i18next.t(key);
+            if (lang && lang.startsWith("ja")) {
+                const kanaPref =
+                    (window.localStorage && window.localStorage.getItem("kanaPreference")) ||
+                    "kanji";
+                const script = kanaPref === "kana" ? "kana" : "kanji";
+                const result = i18next.t(key, { returnObjects: true });
+                if (result && typeof result === "object") {
+                    element.textContent = result[script] || key;
+                } else {
+                    element.textContent = typeof result === "string" ? result : key;
+                }
+            } else {
+                element.textContent = i18next.t(key);
+            }
         });
     }
 
@@ -299,6 +390,23 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
         try {
             const savedLanguage = window.localStorage && window.localStorage.languagePreference;
             if (savedLanguage) {
+                if (savedLanguage === "kana" || savedLanguage === "ja-kana") {
+                    window.localStorage.setItem("languagePreference", "ja");
+                    window.localStorage.setItem("kanaPreference", "kana");
+                    return "ja";
+                }
+                if (savedLanguage === "ja-kanji") {
+                    window.localStorage.setItem("languagePreference", "ja");
+                    window.localStorage.setItem("kanaPreference", "kanji");
+                    return "ja";
+                }
+                // The language menu stores enUS/enUK, but the locale files are en/en_GB.
+                if (savedLanguage === "enUS") {
+                    return "en";
+                }
+                if (savedLanguage === "enUK") {
+                    return "en_GB";
+                }
                 return savedLanguage.startsWith("ja") ? "ja" : savedLanguage;
             }
         } catch (e) {
@@ -403,6 +511,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                 "tweenjs.min",
                 "utils/platformstyle",
                 "utils/utils",
+                "activity/pubsub",
                 "activity/turtledefs",
                 "activity/block",
                 "activity/blocks",

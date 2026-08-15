@@ -1,8 +1,8 @@
 /**
- * @file This contains the prototype of the JavaScript Editor Widget.
+ * @file This contains the prototype of the Oscilloscope Widget.
  * @author Saksham Mrig
  *
- * @copyright 2020 Saksham Mirg
+ * @copyright 2020 Saksham Mrig
  *
  * @license
  * This program is free software; you can redistribute it and/or modify it under the terms of the
@@ -38,6 +38,9 @@
  * @classdesc pertains to setting up all features of the Oscilloscope Widget.
  */
 class Oscilloscope {
+    /** AMD module dependencies for lazy loading. */
+    static dependencies = ["widgets/oscilloscope"];
+
     static ICONSIZE = 40;
     static analyserSize = 8192;
     static DRAW_TIMEOUT = 1000;
@@ -183,6 +186,15 @@ class Oscilloscope {
 
         document.removeEventListener("visibilitychange", this._handleVisibilityChange);
 
+        for (const key of Object.keys(this.pitchAnalysers)) {
+            if (
+                this.pitchAnalysers[key] &&
+                typeof this.pitchAnalysers[key].dispose === "function"
+            ) {
+                this.pitchAnalysers[key].dispose();
+            }
+        }
+
         this.drawVisualIDs = {};
         this._canvasState = {};
         this.pitchAnalysers = {};
@@ -295,7 +307,7 @@ class Oscilloscope {
         let width, height;
 
         const canvases = document.getElementsByClassName("oscilloscopeCanvas");
-        Array.prototype.forEach.call(canvases, ele => {
+        Array.from(canvases).forEach(ele => {
             this.widgetWindow.getWidgetBody().removeChild(ele);
         });
 

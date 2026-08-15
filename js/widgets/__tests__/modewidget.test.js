@@ -41,7 +41,11 @@ global.last = arr => arr[arr.length - 1];
 global.docById = jest.fn().mockImplementation(id => ({
     style: {},
     innerHTML: "",
+    append: jest.fn(),
     appendChild: jest.fn(),
+    replaceChildren: jest.fn(),
+    removeChild: jest.fn(),
+    firstChild: null,
     rows: [{ cells: [{ innerHTML: "" }] }, { cells: [{ innerHTML: "" }] }],
     insertRow: jest.fn().mockReturnValue({
         insertCell: jest.fn().mockReturnValue({
@@ -96,7 +100,13 @@ window.widgetWindows = {
         destroy: jest.fn(),
         updateTitle: jest.fn(),
         addButton: jest.fn().mockImplementation(() => {
-            const btn = {};
+            const btn = {
+                append: jest.fn(),
+                appendChild: jest.fn(),
+                replaceChildren: jest.fn(),
+                removeChild: jest.fn(),
+                firstChild: null
+            };
             btn.onclick = jest.fn();
             return btn;
         }),
@@ -122,8 +132,13 @@ if (typeof document === "undefined") {
 }
 document.createElement = jest.fn().mockImplementation(tag => ({
     style: {},
+    setAttribute: jest.fn(),
     innerHTML: "",
     append: jest.fn(),
+    appendChild: jest.fn(),
+    replaceChildren: jest.fn(),
+    removeChild: jest.fn(),
+    firstChild: null,
     insertRow: jest.fn().mockReturnValue({
         insertCell: jest.fn().mockReturnValue({
             style: {},
@@ -369,5 +384,17 @@ describe("ModeWidget", () => {
 
         expect(modeWidget._locked).toBe(false);
         jest.useRealTimers();
+    });
+
+    test("onclose handler should stop synth and reset lock state", () => {
+        const widgetWindow = window.widgetWindows.windowFor();
+
+        modeWidget._locked = true;
+
+        // Trigger onclose
+        widgetWindow.onclose();
+
+        expect(mockActivity.logo.synth.stop).toHaveBeenCalled();
+        expect(modeWidget._locked).toBe(false);
     });
 });
