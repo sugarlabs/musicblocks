@@ -49,6 +49,8 @@ class Arpeggio {
         this._blockMap = []; // pairs storage
         this.defaultCols = Arpeggio.DEFAULTCOLS;
         this._playTimeout = null;
+        this._arpeggioCellTables = []; // cached arpeggioCellTable elements
+        this._arpeggioTable = null; // cached arpeggioTable element
     }
 
     /**
@@ -151,7 +153,9 @@ class Arpeggio {
 
         // Each row in the arpeggio table contains a note label in the
         // first column and a table of buttons in the second column.
-        const arpeggioTable = docById("arpeggioTable");
+        this._arpeggioTable = docById("arpeggioTable");
+        const arpeggioTable = this._arpeggioTable;
+        this._arpeggioCellTables = [];
 
         let j = 0;
         let arpeggioTableRow;
@@ -180,7 +184,8 @@ class Arpeggio {
             cellTable.id = `arpeggioCellTable${j}`;
             cellTable.insertRow();
             arpeggioCell.append(cellTable);
-            arpeggioCellTable = docById("arpeggioCellTable" + j);
+            arpeggioCellTable = cellTable;
+            this._arpeggioCellTables.push(arpeggioCellTable);
 
             // We'll use this element to put the clickable notes for this row.
             arpeggioRow = arpeggioCellTable.insertRow();
@@ -339,12 +344,12 @@ class Arpeggio {
      */
     _addNote(arpeggioIdx) {
         const arpeggioName = (arpeggioIdx + 1).toString();
-        const arpeggioTable = docById("arpeggioTable");
+        const arpeggioTable = this._arpeggioTable;
         let table;
         let row;
         let cell;
         for (let i = 0; i < arpeggioTable.rows.length - 1; i++) {
-            table = docById("arpeggioCellTable" + i);
+            table = this._arpeggioCellTables[i];
             row = table.rows[0];
             cell = row.insertCell();
             cell.style.height = Arpeggio.CELLSIZE + "px";
@@ -393,7 +398,7 @@ class Arpeggio {
      * @returns {void}
      */
     makeClickable() {
-        const arpeggioTable = docById("arpeggioTable");
+        const arpeggioTable = this._arpeggioTable;
         const arpeggioNoteTable = docById("arpeggioNoteTable");
         let table;
         let cellRow;
@@ -401,7 +406,7 @@ class Arpeggio {
         let arpeggioCell;
         let cell;
         for (let i = 0; i < arpeggioTable.rows.length - 1; i++) {
-            table = docById("arpeggioCellTable" + i);
+            table = this._arpeggioCellTables[i];
             cellRow = table.rows[0];
 
             for (let j = 0; j < cellRow.cells.length; j++) {
@@ -456,7 +461,7 @@ class Arpeggio {
                 if (row < 0) {
                     continue;
                 }
-                table = docById("arpeggioCellTable" + row);
+                table = this._arpeggioCellTables[row];
                 cellRow = table.rows[0];
 
                 cell = cellRow.cells[col];
@@ -582,14 +587,14 @@ class Arpeggio {
         const pairs = [];
 
         // For each column (time), look for a selected cell.
-        const arpeggioTable = docById("arpeggioTable");
+        const arpeggioTable = this._arpeggioTable;
         let table;
         let row;
         let cell;
         for (let j = 0; j < this.defaultCols; j++) {
             let thisPair = [-1, j];
             for (let i = 0; i < arpeggioTable.rows.length - 1; i++) {
-                table = docById("arpeggioCellTable" + i);
+                table = this._arpeggioCellTables[i];
                 row = table.rows[0];
                 cell = row.cells[j];
                 if (cell.style.backgroundColor === "black") {
@@ -663,7 +668,7 @@ class Arpeggio {
         const rowi = Number(rowIndex);
 
         // Find the arpeggio cell
-        const table = docById("arpeggioCellTable" + rowi);
+        const table = this._arpeggioCellTables[rowi];
         const row = table.rows[0];
 
         const pitchBlock = this._rowBlocks[rowi];
@@ -726,7 +731,7 @@ class Arpeggio {
     _clearColumn(colIndex, rowIndex) {
         // "Unclick" every entry in a column in the matrix (except for
         // cell at col/rowIndex).
-        const arpeggioTable = docById("arpeggioTable");
+        const arpeggioTable = this._arpeggioTable;
         let table;
         let row;
         let cell;
@@ -734,7 +739,7 @@ class Arpeggio {
             if (i === rowIndex) {
                 continue;
             }
-            table = docById("arpeggioCellTable" + i);
+            table = this._arpeggioCellTables[i];
             row = table.rows[0];
             cell = row.cells[colIndex];
             if (cell.style.backgroundColor === "black") {
@@ -774,12 +779,12 @@ class Arpeggio {
             );
         }
         // "Unclick" every entry in the matrix.
-        const arpeggioTable = docById("arpeggioTable");
+        const arpeggioTable = this._arpeggioTable;
         let table;
         let row;
         let cell;
         for (let i = 0; i < arpeggioTable.rows.length - 1; i++) {
-            table = docById("arpeggioCellTable" + i);
+            table = this._arpeggioCellTables[i];
             row = table.rows[0];
             for (let j = 0; j < row.cells.length; j++) {
                 cell = row.cells[j];

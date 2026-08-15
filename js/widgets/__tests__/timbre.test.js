@@ -920,6 +920,38 @@ describe("TimbreWidget", () => {
             expect(global.instrumentsEffects[0]["custom"]["baseFrequency"]).toBe(400);
         });
 
+        test("should reuse existing Tremolo params", async () => {
+            timbre.tremoloEffect.push(1);
+            timbre.tremoloParams.push(15);
+            timbre.tremoloParams.push(0.2);
+            timbre._effects();
+            await selectEffect("Tremolo");
+            triggerChange("myRangeFx0", "16");
+            expect(global.instrumentsEffects[0]["custom"]["tremoloFrequency"]).toBe(16);
+        });
+
+        test("should reuse existing Chorus params", async () => {
+            timbre.chorusEffect.push(1);
+            timbre.chorusParams.push(5);
+            timbre.chorusParams.push(5);
+            timbre.chorusParams.push(50);
+            timbre._effects();
+            await selectEffect("Chorus");
+            triggerChange("myRangeFx1", "6");
+            expect(global.instrumentsEffects[0]["custom"]["delayTime"]).toBe(6);
+        });
+
+        test("should reuse existing Phaser params", async () => {
+            timbre.phaserEffect.push(1);
+            timbre.phaserParams.push(10);
+            timbre.phaserParams.push(2);
+            timbre.phaserParams.push(200);
+            timbre._effects();
+            await selectEffect("Phaser");
+            triggerChange("myRangeFx2", "250");
+            expect(global.instrumentsEffects[0]["custom"]["baseFrequency"]).toBe(250);
+        });
+
         test("should update Distortion params", async () => {
             timbre._effects();
             await selectEffect("Distortion");
