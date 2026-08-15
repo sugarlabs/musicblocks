@@ -33,7 +33,8 @@ const {
     deepClone,
     isSafeUrl,
     isUnsafeObjectKey,
-    isValidHex
+    isValidHex,
+    safeNumber
 } = require("../utils-logic.js");
 
 describe("Utility Logic Functions", () => {
@@ -251,6 +252,30 @@ describe("Utility Logic Functions", () => {
             expect(clampNumber("invalid", 0, 10)).toBe(0);
             expect(clampNumber(NaN, 0, 10, 5)).toBe(5);
             expect(clampNumber(null, 0, 10)).toBe(0);
+        });
+    });
+
+    describe("safeNumber()", () => {
+        it("returns finite numbers as is", () => {
+            expect(safeNumber(42)).toBe(42);
+            expect(safeNumber(3.14)).toBe(3.14);
+            expect(safeNumber(0)).toBe(0);
+            expect(safeNumber(-10)).toBe(-10);
+        });
+
+        it("parses valid numeric strings", () => {
+            expect(safeNumber("42")).toBe(42);
+            expect(safeNumber("  100  ")).toBe(100);
+            expect(safeNumber("-15.5")).toBe(-15.5);
+        });
+
+        it("returns fallback for non-numeric, NaN, or non-finite inputs", () => {
+            expect(safeNumber("invalid", 10)).toBe(10);
+            expect(safeNumber(NaN, 5)).toBe(5);
+            expect(safeNumber(Infinity, 0)).toBe(0);
+            expect(safeNumber(null, 7)).toBe(7);
+            expect(safeNumber(undefined, 0)).toBe(0);
+            expect(safeNumber({}, 0)).toBe(0);
         });
     });
 
