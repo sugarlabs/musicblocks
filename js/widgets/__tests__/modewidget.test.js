@@ -408,4 +408,64 @@ describe("ModeWidget", () => {
 
         expect(modeWidget._modeLabelCell.textContent).toBe("C ionian");
     });
+
+    test("should refuse to overwrite a built-in mode on save", () => {
+        const originalIonian = MUSICALMODES.ionian;
+
+        const result = modeWidget._saveCustomMode("ionian", [2, 2, 1, 2, 2, 2, 1]);
+
+        expect(result).toBe(false);
+        expect(MUSICALMODES.ionian).toEqual(originalIonian);
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+            expect.stringContaining("Cannot overwrite built-in mode")
+        );
+    });
+
+    test("should not list custom modes twice in the modes dropdown", () => {
+        localStorage.setItem(
+            "customModes",
+            JSON.stringify([{ name: "myMode", pattern: [3, 2, 3, 2, 2], edo: 12 }])
+        );
+        MUSICALMODES.myMode = [3, 2, 3, 2, 2];
+
+        const selectChildren = [];
+        const fakeSelect = { innerHTML: "", appendChild: el => selectChildren.push(el) };
+        const realCreateElement = document.createElement;
+        document.createElement = jest.fn(() => {
+            const el = {
+                style: {},
+                innerHTML: "",
+                value: "",
+                textContent: "",
+                label: "",
+                children: [],
+                appendChild: child => el.children.push(child)
+            };
+            return el;
+        });
+
+        modeWidget._populateModesDropdown(fakeSelect);
+        document.createElement = realCreateElement;
+
+        const builtIn = selectChildren.find(c => c.label === "Built-in Modes");
+        const custom = selectChildren.find(c => c.label === "Custom Modes");
+        expect(builtIn.children.map(c => c.value)).not.toContain("myMode");
+        expect(custom.children.map(c => c.value)).toContain("myMode");
+    });
+
+    test("should cancel in-flight animations and clear pending timeouts", () => {
+        modeWidget._locked = true;
+        modeWidget._playing = true;
+        modeWidget._timeouts = [123, 456];
+        modeWidget._newPattern = [true, false];
+        modeWidget._notesToPlay = [0, 2];
+
+        modeWidget._cancelAnimations();
+
+        expect(modeWidget._locked).toBe(false);
+        expect(modeWidget._playing).toBe(false);
+        expect(modeWidget._timeouts).toEqual([]);
+        expect(modeWidget._newPattern).toBeNull();
+        expect(modeWidget._notesToPlay).toBeNull();
+    });
 });

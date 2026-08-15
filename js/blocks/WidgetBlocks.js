@@ -77,9 +77,9 @@ function setupWidgetBlocks(activity) {
      * Environment-aware lazy module loader.
      * Uses AMD require() in the browser; calls callback synchronously in Node/Jest.
      */
-    function _lazyRequire(modules, callback) {
+    function _lazyRequire(modules, callback, onError) {
         if (typeof define === "function" && define.amd) {
-            require(Array.isArray(modules) ? modules : [modules], callback);
+            require(Array.isArray(modules) ? modules : [modules], callback, onError);
         } else {
             callback();
         }
@@ -141,11 +141,15 @@ function setupWidgetBlocks(activity) {
      * @param {Function} factory - Builds the widget instance.
      * @param {Function} [onReady] - Optional callback run after assignment.
      */
-    function _lazyLoadWidget(logo, widgetKey, modules, factory, onReady) {
-        _lazyRequire(modules, function () {
-            logo[widgetKey] = factory();
-            onReady?.();
-        });
+    function _lazyLoadWidget(logo, widgetKey, modules, factory, onReady, onError) {
+        _lazyRequire(
+            modules,
+            () => {
+                logo[widgetKey] = factory();
+                onReady?.();
+            },
+            () => onError?.()
+        );
     }
 
     function _hasValidMeterWidgetInput(logo) {
@@ -832,7 +836,18 @@ function setupWidgetBlocks(activity) {
             const listenerName = "_modewidget_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
+            const resetFlag = () => {
+                logo.insideModeWidget = false;
+            };
+
             const __listener = () => {
+                // Re-show an already-open widget instead of building a second
+                // instance (duplicate toolbar buttons, overwritten handlers).
+                if (logo.modeWidget && logo.modeWidget !== "loading") {
+                    logo.modeWidget.widgetWindow.show();
+                    resetFlag();
+                    return;
+                }
                 _lazyLoadWidget(
                     logo,
                     "modeWidget",
@@ -840,9 +855,8 @@ function setupWidgetBlocks(activity) {
                         "widgets/modewidget"
                     ]),
                     () => new ModeWidget(activity),
-                    () => {
-                        logo.insideModeWidget = false;
-                    }
+                    resetFlag,
+                    resetFlag
                 );
             };
 

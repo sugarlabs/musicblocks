@@ -1091,6 +1091,15 @@ describe("keySignatureToMode", () => {
         expect(keySignatureToMode("A minor")).toEqual(["A", "minor"]);
         expect(keySignatureToMode("E minor")).toEqual(["E", "minor"]);
     });
+    it("should match custom mode names case-insensitively", () => {
+        // A mixed-case custom mode registered in MUSICALMODES must resolve
+        // even when the key signature carries a different casing.
+        MUSICALMODES.MyMode = [3, 2, 3, 2, 2];
+        expect(keySignatureToMode("C MyMode")).toEqual(["C", "MyMode"]);
+        expect(keySignatureToMode("C mymode")).toEqual(["C", "MyMode"]);
+        expect(keySignatureToMode("C MYMODE")).toEqual(["C", "MyMode"]);
+        delete MUSICALMODES.MyMode;
+    });
 });
 
 describe("getScaleAndHalfSteps", () => {

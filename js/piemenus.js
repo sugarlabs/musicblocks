@@ -3484,6 +3484,18 @@ const piemenuModes = (block, selectedMode) => {
 
     showWheelDiv();
 
+    // Saved custom modes from the mode widget, shown in a dedicated "custom"
+    // pie menu group so they can be selected without opening the editor.
+    let savedCustomModes = [];
+    try {
+        const customModes = JSON.parse(localStorage.getItem("customModes") || "[]");
+        savedCustomModes = Array.isArray(customModes)
+            ? customModes.filter(m => m && typeof m.name === "string")
+            : [];
+    } catch (e) {
+        savedCustomModes = [];
+    }
+
     //Use advanced constructor for more wheelnav on same div
     block._modeWheel = new wheelnav("wheelDiv", null, 1200, 1200);
     block._modeGroupWheel = new wheelnav("_modeGroupWheel", block._modeWheel.raphael);
@@ -3528,6 +3540,9 @@ const piemenuModes = (block, selectedMode) => {
     for (const modegroup in MODE_PIE_MENUS) {
         xlabels.push(modegroup);
     }
+    if (savedCustomModes.length > 0) {
+        xlabels.push("custom");
+    }
 
     block._modeGroupWheel.createWheel(xlabels);
 
@@ -3553,26 +3568,16 @@ const piemenuModes = (block, selectedMode) => {
 
     const that = block;
 
-    // Suppresses the mode-widget launch during programmatic wheel navigation
-    // (initial menu setup and group switching) so that only genuine user
-    // clicks on the "custom" slice open the circular mode editor.
-    let menuInitializing = true;
-
-    // Opens the circular mode editor widget so the selected custom mode can
-    // be built or edited on the N-slice wheel. The widget reads the active
-    // temperament from the logo synth on construction.
-    const __launchModeWidget = () => {
-        if (typeof ModeWidget === "undefined") {
-            if (typeof require !== "undefined") {
-                require(["widgets/modewidget"], function () {
-                    const act = block.activity;
-                    act.logo.modeWidget = new ModeWidget(act);
-                });
+    // Mode list for a group; "custom" is dynamic, padded to the fixed 12-slot layout.
+    const __modesForGroup = grp => {
+        if (grp === "custom") {
+            const names = savedCustomModes.map(m => m.name).slice(0, 12);
+            while (names.length < 12) {
+                names.push(" ");
             }
-        } else {
-            const act = block.activity;
-            act.logo.modeWidget = new ModeWidget(act);
+            return names;
         }
+        return MODE_PIE_MENUS[grp];
     };
 
     const __selectionChanged = () => {
@@ -3590,8 +3595,9 @@ const piemenuModes = (block, selectedMode) => {
             } else if (that.text.text === `${_("minor")} / ${_("aeolian")}`) {
                 that.value = "aeolian";
             } else {
-                for (let i = 0; i < MODE_PIE_MENUS[modeGroup].length; i++) {
-                    const modename = MODE_PIE_MENUS[modeGroup][i];
+                const modes = __modesForGroup(modeGroup);
+                for (let i = 0; i < modes.length; i++) {
+                    const modename = modes[i];
 
                     if (_(modename) === that.text.text) {
                         that.value = modename;
@@ -3603,12 +3609,6 @@ const piemenuModes = (block, selectedMode) => {
             // Make sure text is on top.
             that.container.setChildIndex(that.text, that.container.children.length - 1);
             that.updateCache();
-        }
-
-        // Launch the circular mode editor when the user selects the
-        // custom mode in the radial menu.
-        if (!menuInitializing && that.value === "custom") {
-            __launchModeWidget();
         }
     };
 
@@ -3638,10 +3638,12 @@ const piemenuModes = (block, selectedMode) => {
 
         that._modeNameWheel.keynavigateEnabled = false;
 
+        const modes = __modesForGroup(grp);
+
         // Customize slicePaths
         const colors = [];
-        for (let i = 0; i < MODE_PIE_MENUS[grp].length; i++) {
-            const modename = MODE_PIE_MENUS[grp][i];
+        for (let i = 0; i < modes.length; i++) {
+            const modename = modes[i];
             if (modename === " ") {
                 colors.push(platformColor.modePieMenusIfColorPush);
             } else {
@@ -3660,8 +3662,8 @@ const piemenuModes = (block, selectedMode) => {
         // that._modeNameWheel.clickModeRotate = false;
         that._modeNameWheel.navAngle = -90;
         const labels = new Array();
-        for (let i = 0; i < MODE_PIE_MENUS[grp].length; i++) {
-            const modename = MODE_PIE_MENUS[grp][i];
+        for (let i = 0; i < modes.length; i++) {
+            const modename = modes[i];
             switch (modename) {
                 case "ionian":
                 case "major":
@@ -3715,10 +3717,10 @@ const piemenuModes = (block, selectedMode) => {
 
         // Set up tabs for each mode.
         let i = 0;
-        for (let j = 0; j < MODE_PIE_MENUS[grp].length; j++) {
-            const modename = MODE_PIE_MENUS[grp][j];
+        for (let j = 0; j < modes.length; j++) {
+            const modename = modes[j];
             const activeTabs = [0];
-            if (modename !== " ") {
+            if (modename !== " " && MUSICALMODES[modename]) {
                 const mode = MUSICALMODES[modename];
                 for (let k = 0; k < mode.length; k++) {
                     activeTabs.push(last(activeTabs) + mode[k]);
@@ -3730,8 +3732,8 @@ const piemenuModes = (block, selectedMode) => {
         }
 
         // Look for the selected mode.
-        for (i = 0; i < MODE_PIE_MENUS[grp].length; i++) {
-            if (MODE_PIE_MENUS[grp][i] === selectedMode) {
+        for (i = 0; i < modes.length; i++) {
+            if (modes[i] === selectedMode) {
                 break;
             }
         }
@@ -3741,11 +3743,7 @@ const piemenuModes = (block, selectedMode) => {
             i = 0; // major/ionian
         }
 
-        // Programmatic navigation during setup/group switching must not
-        // launch the mode editor; only a real user click does that.
-        menuInitializing = true;
         that._modeNameWheel.navigateWheel(i);
-        menuInitializing = false;
     };
 
     let timeout;
@@ -3878,6 +3876,7 @@ const piemenuModes = (block, selectedMode) => {
     }
 
     // navigate to a specific starting point
+    let foundMode = false;
     for (modeGroup in MODE_PIE_MENUS) {
         let j;
         for (j = 0; j < MODE_PIE_MENUS[modeGroup].length; j++) {
@@ -3888,8 +3887,13 @@ const piemenuModes = (block, selectedMode) => {
         }
 
         if (j < MODE_PIE_MENUS[modeGroup].length) {
+            foundMode = true;
             break;
         }
+    }
+
+    if (!foundMode && savedCustomModes.some(m => m.name === selectedMode)) {
+        modeGroup = "custom";
     }
 
     if (selectedMode === "major") {

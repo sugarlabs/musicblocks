@@ -14,7 +14,7 @@
 
    docById, _, platformColor, keySignatureToMode, MUSICALMODES,
    getNote, DEFAULTVOICE, last, NOTESTABLE, slicePath, wheelnav,
-   normalizeNoteAccidentals, getCurrentEDO, getModePattern,
+   normalizeNoteAccidentals, getCurrentEDO, getModePattern, DEFAULTMODE,
    numberToPitch, pitchToFrequency
  */
 
@@ -123,6 +123,14 @@ class ModeWidget {
             }
             this._locked = false;
             this.hideMsgs();
+            if (this.logo) {
+                // Release the singleton reference and the in-widget flag so a
+                // later run can open a fresh widget.
+                this.logo.insideModeWidget = false;
+                if (this.logo.modeWidget === this) {
+                    this.logo.modeWidget = null;
+                }
+            }
             this.widgetWindow.destroy();
         };
 
@@ -197,6 +205,19 @@ class ModeWidget {
         }, delay);
         this._timeouts.push(id);
         return id;
+    }
+
+    _cancelAnimations() {
+        // Clear stale rotate/invert/play callbacks before rebuilding for a
+        // new EDO; they reference old navItem indexes.
+        if (this._timeouts) {
+            this._timeouts.forEach(id => clearTimeout(id));
+            this._timeouts = [];
+        }
+        this._locked = false;
+        this._playing = false;
+        this._newPattern = null;
+        this._notesToPlay = null;
     }
 
     // ── Play state ────────────────────────────────────────────────
@@ -296,6 +317,7 @@ class ModeWidget {
                 this._selectedNotes = this._edoNoteCache[newEDO].slice();
                 this._activeEDO = newEDO;
                 this._rebuildWheel(newEDO);
+                this.textMsg(_(`Switched to ${newEDO}-EDO tuning.`), 3000);
                 this._setModeName();
                 return;
             }
@@ -336,6 +358,7 @@ class ModeWidget {
      * @param {number} edoCount - The number of steps per octave.
      */
     _rebuildWheel(edoCount) {
+        this._cancelAnimations();
         this._activeEDO = edoCount;
         this._updateTemperament(edoCount);
         this._piemenuMode();
@@ -397,21 +420,37 @@ class ModeWidget {
     }
 
     _saveCustomModesList(modes) {
-        localStorage.setItem("customModes", JSON.stringify(modes));
+        try {
+            localStorage.setItem("customModes", JSON.stringify(modes));
+            return true;
+        } catch (e) {
+            this.errorMsg(
+                _("Could not save the custom mode. Local storage is full or unavailable.")
+            );
+            return false;
+        }
     }
 
     _saveCustomMode(name, pattern) {
         const modes = this._getCustomModes();
         const existing = modes.findIndex(m => m.name === name);
+        // Refuse to overwrite a built-in mode; only registered customs may be updated.
+        if (existing < 0 && name in MUSICALMODES) {
+            this.errorMsg(_("Cannot overwrite built-in mode: ") + name);
+            return false;
+        }
         const entry = { name, pattern, edo: this._activeEDO };
         if (existing >= 0) {
             modes[existing] = entry;
         } else {
             modes.push(entry);
         }
-        this._saveCustomModesList(modes);
+        if (!this._saveCustomModesList(modes)) {
+            return false;
+        }
 
         MUSICALMODES[name] = pattern;
+        return true;
     }
 
     _deleteCustomMode(name) {
@@ -437,9 +476,17 @@ class ModeWidget {
         customOpt.textContent = _("Custom");
         select.appendChild(customOpt);
 
+        const customs = this._getCustomModes();
+        const customNames = new Set(customs.map(m => m.name));
+
         const builtIn = document.createElement("optgroup");
         builtIn.label = _("Built-in Modes");
         for (const mode of Object.keys(MUSICALMODES)) {
+            // Custom modes are registered in MUSICALMODES too, so exclude them
+            // from the built-in group to avoid listing them twice.
+            if (customNames.has(mode)) {
+                continue;
+            }
             const opt = document.createElement("option");
             opt.value = mode;
             opt.textContent = _(mode);
@@ -447,7 +494,6 @@ class ModeWidget {
         }
         select.appendChild(builtIn);
 
-        const customs = this._getCustomModes();
         if (customs.length > 0) {
             const group = document.createElement("optgroup");
             group.label = _("Custom Modes");
@@ -536,7 +582,9 @@ class ModeWidget {
                 return;
             }
             const pattern = this._calculateMode();
-            this._saveCustomMode(name, pattern);
+            if (!this._saveCustomMode(name, pattern)) {
+                return;
+            }
             this._populateModesDropdown(modeSelect);
             modeSelect.value = name;
             // Export the mode to the workspace blocks so the user can use it.
@@ -561,6 +609,16 @@ class ModeWidget {
             this._deleteCustomMode(name);
             this._populateModesDropdown(modeSelect);
             modeSelect.value = Object.keys(MUSICALMODES)[0];
+            // Reset a modename block still referencing the deleted mode.
+            if (this._modeBlock !== null) {
+                const modeBlock = this.blocks.blockList[this._modeBlock];
+                if (modeBlock && modeBlock.name === "modename" && modeBlock.value === name) {
+                    modeBlock.value = DEFAULTMODE;
+                    modeBlock.text.text = _(DEFAULTMODE);
+                    modeBlock.updateCache();
+                    this.refreshCanvas();
+                }
+            }
             this.textMsg(_("Mode deleted: ") + name, 3000);
         };
 
@@ -983,14 +1041,22 @@ class ModeWidget {
                 : getModePattern(mode, this._activeEDO);
             if (JSON.stringify(pattern) === currentMode) {
                 if (this._modeBlock !== null) {
-                    for (const i in this.blocks.blockList) {
-                        if (this.blocks.blockList[i].name === "modename") {
-                            this.blocks.blockList[i].value = mode;
-                            this.blocks.blockList[i].text.text = _(mode);
-                            this.blocks.blockList[i].updateCache();
-                        } else if (this.blocks.blockList[i].name === "notename") {
-                            this.blocks.blockList[i].value = currentKey;
-                            this.blocks.blockList[i].text.text = _(currentKey);
+                    // Only update the modename block connected to the widget's
+                    // setkey2 block, plus its sibling notename block.
+                    const modeBlock = this.blocks.blockList[this._modeBlock];
+                    if (modeBlock && modeBlock.name === "modename") {
+                        modeBlock.value = mode;
+                        modeBlock.text.text = _(mode);
+                        modeBlock.updateCache();
+
+                        const parent = this.blocks.blockList[modeBlock.connections[0]];
+                        const notenameBlock =
+                            parent?.name === "setkey2" &&
+                            this.blocks.blockList[parent.connections[1]];
+                        if (notenameBlock?.name === "notename") {
+                            notenameBlock.value = currentKey;
+                            notenameBlock.text.text = _(currentKey);
+                            notenameBlock.updateCache();
                         }
                     }
                     this.refreshCanvas();

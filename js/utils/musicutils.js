@@ -3219,8 +3219,9 @@ const getModeNumbers = name => {
         return m;
     };
 
+    const lowercaseName = name.toLowerCase();
     for (const mode in MUSICALMODES) {
-        if (mode === name.toLowerCase()) {
+        if (mode === lowercaseName || mode.toLowerCase() === lowercaseName) {
             return __convert(MUSICALMODES[mode]);
         }
     }
@@ -3823,12 +3824,23 @@ const keySignatureToMode = keySignature => {
 
     if (mode === "") {
         mode = "major";
-    } else {
-        mode = mode.toLowerCase();
     }
 
-    if (mode in MUSICALMODES) {
-        return [key, mode];
+    // Resolve the mode name case-insensitively. Built-in modes are registered
+    // lowercase, but user-defined modes keep their original casing (e.g.
+    // "MyMode"), so lowercasing the incoming name would fail the lookup.
+    let modeKey = mode;
+    if (!(modeKey in MUSICALMODES)) {
+        for (const m in MUSICALMODES) {
+            if (m.toLowerCase() === mode.toLowerCase()) {
+                modeKey = m;
+                break;
+            }
+        }
+    }
+
+    if (modeKey in MUSICALMODES) {
+        return [key, modeKey];
     } else {
         console.debug("Invalid mode name: " + mode + " reverting to major.");
         return [key, "major"];
