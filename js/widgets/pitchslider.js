@@ -13,7 +13,7 @@
 // from given frequency to nextoctave frequency(two times the given frequency)
 // in continuous manner.
 
-/* global _, Tone, getCurrentEDO */
+/* global _, Tone, getCurrentEDO, clampNumber */
 
 /*
    Global locations
@@ -92,10 +92,16 @@ class PitchSlider {
 
                     if (event.key === "ArrowUp" || event.key === "ArrowRight") {
                         // Move up by a semitone
-                        slider.value = Math.min(currentValue * semitone, max);
+                        slider.value = this._stepFrequency(currentValue, "up", semitone, min, max);
                     } else if (event.key === "ArrowDown" || event.key === "ArrowLeft") {
                         // Move down by a semitone
-                        slider.value = Math.max(currentValue / semitone, min);
+                        slider.value = this._stepFrequency(
+                            currentValue,
+                            "down",
+                            semitone,
+                            min,
+                            max
+                        );
                     }
 
                     const inputEvent = new Event("input", { bubbles: true });
@@ -162,7 +168,7 @@ class PitchSlider {
                 _("Move up"),
                 toolBarDiv
             ).onclick = () => {
-                slider.value = Math.min(parseFloat(slider.value) * semitone, max);
+                slider.value = this._stepFrequency(slider.value, "up", semitone, min, max);
                 changeFreq();
                 oscillators[id].triggerAttackRelease(this.frequencies[id], "4n");
             };
@@ -173,7 +179,7 @@ class PitchSlider {
                 _("Move down"),
                 toolBarDiv
             ).onclick = () => {
-                slider.value = Math.max(parseFloat(slider.value) / semitone, min);
+                slider.value = this._stepFrequency(slider.value, "down", semitone, min, max);
                 changeFreq();
                 oscillators[id].triggerAttackRelease(this.frequencies[id], "4n");
             };
@@ -195,6 +201,23 @@ class PitchSlider {
         activity.textMsg(_("Use the up/down buttons or arrow keys to change pitch."), 3000);
         activity.textMsg(_("Click on the slider to create a note block."), 3000);
         window.requestAnimationFrame(() => this.widgetWindow.sendToCenter());
+    }
+
+    /**
+     * Calculates semitone frequency step with bounds clamping.
+     *
+     * @private
+     * @param {number|string} currentValue
+     * @param {string} direction - "up" or "down"
+     * @param {number} semitone
+     * @param {number} min
+     * @param {number} max
+     * @returns {number} Clamped frequency value
+     */
+    _stepFrequency(currentValue, direction, semitone, min, max) {
+        const val = parseFloat(currentValue);
+        const target = direction === "up" ? val * semitone : val / semitone;
+        return clampNumber(target, min, max);
     }
 
     /**
