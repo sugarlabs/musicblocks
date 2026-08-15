@@ -2652,10 +2652,15 @@ function Synth() {
 
         if (this.mic) {
             this.mic.close();
+            if (typeof this.mic.dispose === "function") {
+                this.mic.dispose();
+            }
             this.mic = null;
         }
         if (this.recorder) {
-            this.recorder.dispose();
+            if (typeof this.recorder.dispose === "function") {
+                this.recorder.dispose();
+            }
             this.recorder = null;
         }
 
@@ -2716,13 +2721,20 @@ function Synth() {
      * @memberof Synth
      */
     this.stopRecording = async () => {
+        if (!this.recorder || !this.mic) {
+            return null;
+        }
         _disposeRecordingPlayer();
         _revokeRecordingURL();
         this.recording = await this.recorder.stop();
         this.mic.close();
-        this.mic.dispose();
+        if (typeof this.mic.dispose === "function") {
+            this.mic.dispose();
+        }
         this.mic = null;
-        this.recorder.dispose();
+        if (typeof this.recorder.dispose === "function") {
+            this.recorder.dispose();
+        }
         this.recorder = null;
         this.audioURL = URL.createObjectURL(this.recording);
         return this.audioURL;
