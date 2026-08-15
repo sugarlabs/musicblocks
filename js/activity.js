@@ -589,9 +589,6 @@ class Activity {
 
             this.setHelpfulSearchDiv();
 
-            // Setup mobile help toggle functionality
-            this._setupMobileHelpToggle();
-
             // Late initialization of GIF animator if it was missed in constructor
             if (!this.gifAnimator && typeof GIFAnimator !== "undefined") {
                 this.gifAnimator = new GIFAnimator();
@@ -669,6 +666,9 @@ class Activity {
                 helpDiv.classList.remove("show");
                 helpDiv.classList.add("hidden");
             };
+
+            // Setup mobile help toggle functionality
+            this._setupMobileHelpToggle();
         };
 
         /*
