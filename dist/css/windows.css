@@ -142,6 +142,12 @@
   background-color: #7bb5ee;
 }
 
+.wfbtItem:focus-visible {
+  outline: 3px solid #005a9c;
+  outline-offset: -3px;
+  background-color: #7bb5ee;
+}
+
 .wfbtItem > input {
   border: none;
   width: 100%;

@@ -312,6 +312,61 @@ describe("widgetWindows", () => {
 
             expect(win._buttons).toHaveLength(3);
         });
+
+        test("is keyboard-focusable with role and aria-label", () => {
+            const win = createTestWindow();
+            const btn = win.addButton("icon.svg", 24, "My Label");
+
+            expect(btn.getAttribute("role")).toBe("button");
+            expect(btn.getAttribute("tabindex")).toBe("0");
+            expect(btn.getAttribute("aria-label")).toBe("My Label");
+        });
+
+        test("Enter key activates the caller-assigned onclick", () => {
+            const win = createTestWindow();
+            const btn = win.addButton("icon.svg", 24, "Play");
+            btn.onclick = jest.fn();
+
+            btn.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+
+            expect(btn.onclick).toHaveBeenCalledTimes(1);
+        });
+
+        test("Space key activates onclick and prevents page scroll", () => {
+            const win = createTestWindow();
+            const btn = win.addButton("icon.svg", 24, "Play");
+            btn.onclick = jest.fn();
+
+            const event = new KeyboardEvent("keydown", {
+                key: " ",
+                bubbles: true,
+                cancelable: true
+            });
+            btn.dispatchEvent(event);
+
+            expect(btn.onclick).toHaveBeenCalledTimes(1);
+            expect(event.defaultPrevented).toBe(true);
+        });
+
+        test("other keys do not activate onclick", () => {
+            const win = createTestWindow();
+            const btn = win.addButton("icon.svg", 24, "Play");
+            btn.onclick = jest.fn();
+
+            btn.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+
+            expect(btn.onclick).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("modifyButton accessibility", () => {
+        test("updates the aria-label along with the icon", () => {
+            const win = createTestWindow();
+            win.addButton("old.svg", 24, "Old Label");
+            const btn = win.modifyButton(0, "new.svg", 24, "New Label");
+
+            expect(btn.getAttribute("aria-label")).toBe("New Label");
+        });
     });
 
     describe("addDivider", () => {

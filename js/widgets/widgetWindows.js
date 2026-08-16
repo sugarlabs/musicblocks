@@ -490,6 +490,7 @@ class WidgetWindow {
         img.height = iconSize;
         img.width = iconSize;
         this._buttons[index].replaceChildren(img);
+        this._buttons[index].setAttribute("aria-label", label);
         return this._buttons[index];
     }
 
@@ -546,6 +547,15 @@ class WidgetWindow {
         img.height = iconSize;
         img.width = iconSize;
         el.replaceChildren(img);
+        el.tabIndex = 0;
+        el.setAttribute("role", "button");
+        el.setAttribute("aria-label", label);
+        el.addEventListener("keydown", event => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                el.click();
+            }
+        });
         this._buttons.push(el);
         return el;
     }
