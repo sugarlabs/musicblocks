@@ -1297,7 +1297,7 @@ class ModeWidget {
         // 400px paper.
         const __sliceFontPx = (sliceCount, longestLabel, titleRadiusPercent) => {
             const arcPx = (2 * Math.PI * titleRadiusPercent * 200) / sliceCount;
-            return Math.min(20, Math.max(7, Math.floor((arcPx * 0.85) / (longestLabel * 0.6))));
+            return Math.min(24, Math.max(12, Math.floor((arcPx * 0.85) / (longestLabel * 0.6))));
         };
 
         // Outer ring: group wheel
@@ -1309,10 +1309,9 @@ class ModeWidget {
         this._modeGroupWheel.slicePathCustom.maxRadiusPercent = 0.3;
         this._modeGroupWheel.navAngle = -90;
         this._modeGroupWheel.animatetime = 0;
-        // Size labels to fit their slices on the 400px paper; the wheelnav
-        // default (48px) overflows every slice.
-        const longestGroupLabel = Math.max(...groupLabels.map(label => label.length), 1);
-        this._modeGroupWheel.titleFont = `100 ${__sliceFontPx(groupLabels.length, longestGroupLabel, 0.225)}px sans-serif`;
+        // Fixed readable size on the 400px paper; the wheelnav default (48px)
+        // overflows every slice and a computed size is too small.
+        this._modeGroupWheel.titleFont = "100 16px sans-serif";
         this._modeGroupWheel.createWheel(groupLabels);
 
         // Inner ring: mode-name wheel (rebuilt on group selection). Reopen on
