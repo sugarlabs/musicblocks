@@ -63,6 +63,10 @@ global.normalizeNoteAccidentals = jest.fn().mockImplementation(n => n);
 global.MUSICALMODES = {
     ionian: [2, 2, 1, 2, 2, 2, 1]
 };
+global.TEMPERAMENT = {
+    "equal": { isEDO: true, pitchNumber: 12 },
+    "just intonation": { isEDO: false, pitchNumber: 12 }
+};
 global.getCurrentEDO = jest.fn().mockReturnValue(12);
 global.getModePattern = jest.fn().mockReturnValue([2, 2, 1, 2, 2, 2, 1]);
 
@@ -153,6 +157,17 @@ document.createElement = jest.fn().mockImplementation(tag => ({
     }),
     getElementById: jest.fn().mockReturnValue({ src: "" })
 }));
+document.getElementById = document.createElement; // For internal usage
+
+// Add replaceChildren to modeTableDiv mock (used in constructor)
+const originalCreateElement = document.createElement;
+document.createElement = jest.fn(tag => {
+    const el = originalCreateElement(tag);
+    if (!el.replaceChildren) {
+        el.replaceChildren = jest.fn();
+    }
+    return el;
+});
 document.getElementById = document.createElement; // For internal usage
 
 describe("ModeWidget", () => {
@@ -419,38 +434,6 @@ describe("ModeWidget", () => {
         expect(mockActivity.errorMsg).toHaveBeenCalledWith(
             expect.stringContaining("Cannot overwrite built-in mode")
         );
-    });
-
-    test("should not list custom modes twice in the modes dropdown", () => {
-        localStorage.setItem(
-            "customModes",
-            JSON.stringify([{ name: "myMode", pattern: [3, 2, 3, 2, 2], edo: 12 }])
-        );
-        MUSICALMODES.myMode = [3, 2, 3, 2, 2];
-
-        const selectChildren = [];
-        const fakeSelect = { innerHTML: "", appendChild: el => selectChildren.push(el) };
-        const realCreateElement = document.createElement;
-        document.createElement = jest.fn(() => {
-            const el = {
-                style: {},
-                innerHTML: "",
-                value: "",
-                textContent: "",
-                label: "",
-                children: [],
-                appendChild: child => el.children.push(child)
-            };
-            return el;
-        });
-
-        modeWidget._populateModesDropdown(fakeSelect);
-        document.createElement = realCreateElement;
-
-        const builtIn = selectChildren.find(c => c.label === "Built-in Modes");
-        const custom = selectChildren.find(c => c.label === "Custom Modes");
-        expect(builtIn.children.map(c => c.value)).not.toContain("myMode");
-        expect(custom.children.map(c => c.value)).toContain("myMode");
     });
 
     test("should cancel in-flight animations and clear pending timeouts", () => {

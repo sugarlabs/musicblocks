@@ -3538,10 +3538,11 @@ const piemenuModes = (block, selectedMode) => {
 
     const xlabels = [];
     for (const modegroup in MODE_PIE_MENUS) {
+        // Only show the "custom" group if there are saved custom modes
+        if (modegroup === "custom" && savedCustomModes.length === 0) {
+            continue;
+        }
         xlabels.push(modegroup);
-    }
-    if (savedCustomModes.length > 0) {
-        xlabels.push("custom");
     }
 
     block._modeGroupWheel.createWheel(xlabels);

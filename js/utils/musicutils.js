@@ -1815,7 +1815,8 @@ const MODE_PIE_MENUS = {
         " ",
         " "
     ],
-    "12": ["chromatic", " ", " ", " ", " ", " ", "custom", " ", " ", " ", " ", " "]
+    "12": ["chromatic", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+    "custom": [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
 };
 
 // The table contains the intervals that define the modes.
@@ -3221,7 +3222,7 @@ const getModeNumbers = name => {
 
     const lowercaseName = name.toLowerCase();
     for (const mode in MUSICALMODES) {
-        if (mode === lowercaseName || mode.toLowerCase() === lowercaseName) {
+        if (mode.toLowerCase() === lowercaseName) {
             return __convert(MUSICALMODES[mode]);
         }
     }
