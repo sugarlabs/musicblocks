@@ -15,7 +15,7 @@
    docById, _, platformColor, keySignatureToMode, MUSICALMODES,
    getNote, DEFAULTVOICE, last, NOTESTABLE, slicePath, wheelnav,
    normalizeNoteAccidentals, getCurrentEDO, getModePattern, DEFAULTMODE,
-   numberToPitch, pitchToFrequency, MODE_PIE_MENUS, TEMPERAMENT
+   numberToPitch, pitchToFrequency, MODE_PIE_MENUS, TEMPERAMENT, generateNoteNames
  */
 
 /*
@@ -63,6 +63,7 @@ class ModeWidget {
     static ICONSIZE = 32;
     static ROTATESPEED = 125;
     static RESET_NOTES_DELAY = 500;
+    static WHEELSIZE = 400;
 
     /**
      * @param {object} activity
@@ -344,8 +345,10 @@ class ModeWidget {
             // Check cache first: if we have a pre-saved state for this EDO,
             // restore it exactly rather than applying a translation mapping.
             if (this._edoNoteCache[newEDO] !== undefined) {
-                this._selectedNotes = this._edoNoteCache[newEDO].slice();
-                this._activeEDO = newEDO;
+                // Cache outgoing state so round-trip preserves intermediate edits
+                this._cacheState(this._activeEDO);
+
+                this._restoreState(newEDO);
                 this._rebuildWheel(newEDO);
                 this.textMsg(_(`Switched to ${newEDO}-EDO tuning.`), 3000);
                 this._setModeName();
@@ -354,13 +357,13 @@ class ModeWidget {
 
             // Cache the current EDO's state before translating so we can
             // restore it losslessly when the user switches back.
-            this._edoNoteCache[this._activeEDO] = this._selectedNotes.slice();
+            this._cacheState(this._activeEDO);
             const oldEDO = this._activeEDO;
 
             this._translateNotesToEDO(newEDO);
             // Save the resulting state for this EDO so future round-trips
             // can restore it exactly.
-            this._edoNoteCache[newEDO] = this._selectedNotes.slice();
+            this._cacheState(newEDO);
             this._rebuildWheel(newEDO);
 
             // Only warn when going to a lesser EDO, where notes can be dropped
@@ -415,8 +418,7 @@ class ModeWidget {
             return;
         }
 
-        const newSelected = new Array(newEDO).fill(false);
-        newSelected[0] = true;
+        const newSelected = this._blankNotes(newEDO);
 
         for (let i = 1; i < n; i++) {
             if (this._selectedNotes[i]) {
@@ -426,6 +428,49 @@ class ModeWidget {
         }
 
         this._selectedNotes = newSelected;
+    }
+
+    // ── Note-state helpers ────────────────────────────────────────
+
+    /**
+     * Returns a notes array of length n with only the root (index 0) selected.
+     * @param {number} n - The number of steps per octave.
+     * @returns {boolean[]}
+     */
+    _blankNotes(n) {
+        const notes = new Array(n).fill(false);
+        notes[0] = true;
+        return notes;
+    }
+
+    /**
+     * Returns a notes array of length newEDO, preserving old notes that fit.
+     * Index 0 (the root) is always selected.
+     * @param {boolean[]} oldNotes
+     * @param {number} newEDO
+     * @returns {boolean[]}
+     */
+    _reconcileNotes(oldNotes, newEDO) {
+        const notes = this._blankNotes(newEDO);
+        if (Array.isArray(oldNotes)) {
+            for (let i = 1; i < Math.min(oldNotes.length, newEDO); i++) {
+                if (oldNotes[i]) {
+                    notes[i] = true;
+                }
+            }
+        }
+        return notes;
+    }
+
+    // ── EDO cache helpers ─────────────────────────────────────────
+
+    _cacheState(edo) {
+        this._edoNoteCache[edo] = this._selectedNotes.slice();
+    }
+
+    _restoreState(edo) {
+        this._selectedNotes = this._edoNoteCache[edo].slice();
+        this._activeEDO = edo;
     }
 
     // ── Modes dropdown helpers ────────────────────────────────────
@@ -509,6 +554,7 @@ class ModeWidget {
         edoLabel.style.fontSize = "12px";
 
         const edoSelect = this._createEdoSelect();
+        this._edoSelect = edoSelect;
         this._initEdoSelect(edoSelect);
         this._wireEdoSelect(edoSelect);
         edoSelect.style.fontSize = "12px";
@@ -625,8 +671,8 @@ class ModeWidget {
             return;
         }
         svg.style.pointerEvents = "none";
-        svg.setAttribute("height", `${400 * scale}px`);
-        svg.setAttribute("width", `${400 * scale}px`);
+        svg.setAttribute("height", `${ModeWidget.WHEELSIZE * scale}px`);
+        svg.setAttribute("width", `${ModeWidget.WHEELSIZE * scale}px`);
         this._setTimeout(() => {
             svg.style.pointerEvents = "auto";
         }, 100);
@@ -655,20 +701,36 @@ class ModeWidget {
         if (nativeEDO && nativeEDO !== this._activeEDO) {
             // The saved mode was authored in a different tuning, so sync the
             // tuning dropdown and rebuild the wheel before selecting intervals.
-            edoSelect.value = nativeEDO;
+            // Cache the outgoing state exactly like the dropdown handler so
+            // round-trips restore it losslessly.
+            this._cacheState(this._activeEDO);
+            if (edoSelect) {
+                // The dropdown may lack an option for an unusual native EDO
+                // (e.g. 21 from 1/4 comma meantone); add it so .value sticks.
+                if (!edoSelect.querySelector(`option[value="${nativeEDO}"]`)) {
+                    const opt = document.createElement("option");
+                    opt.value = nativeEDO;
+                    opt.textContent = nativeEDO + "-EDO";
+                    edoSelect.appendChild(opt);
+                }
+                edoSelect.value = nativeEDO;
+            }
             this._rebuildWheel(nativeEDO);
         }
         // Built-in mode patterns are 12-EDO intervals; scale them to the
         // active EDO. Custom modes carry EDO-specific patterns already.
         const pattern = nativeEDO ? mode : getModePattern(modeName, this._activeEDO);
         this._applyModePattern(pattern);
+        // Cache the incoming state so switching away and back preserves it.
+        if (nativeEDO) {
+            this._cacheState(nativeEDO);
+        }
         this._setModeName();
     }
 
     _applyModePattern(pattern) {
         const n = this._activeEDO;
-        this._selectedNotes = new Array(n).fill(false);
-        this._selectedNotes[0] = true;
+        this._selectedNotes = this._blankNotes(n);
 
         let pos = 0;
         for (let k = 0; k < pattern.length && pos < n; k++) {
@@ -746,8 +808,7 @@ class ModeWidget {
      */
     _resetToCustom() {
         this._saveState();
-        this._selectedNotes = new Array(this._activeEDO).fill(false);
-        this._selectedNotes[0] = true;
+        this._selectedNotes = this._blankNotes(this._activeEDO);
         this._resetNotes();
         this._updateModeDisplay("");
     }
@@ -1066,6 +1127,20 @@ class ModeWidget {
             0,
             this.activity
         );
+        // numberToPitch can return [undefined, NaN] when the temperament's
+        // per-note data is incomplete (e.g. the built-in "custom" entry or a
+        // saved custom temperament without octave digits). Fall back to the
+        // deterministic name/octave used by numberToPitch's true-EDO branch.
+        if (typeof octave !== "number" || isNaN(octave) || !name) {
+            const edoNames = generateNoteNames(this._activeEDO);
+            let aIndex = edoNames.indexOf("A");
+            if (aIndex === -1) {
+                aIndex = Math.round((9 / 12) * this._activeEDO);
+            }
+            const nameIndex =
+                (((j + aIndex) % this._activeEDO) + this._activeEDO) % this._activeEDO;
+            return [edoNames[nameIndex], Math.floor((j + aIndex) / this._activeEDO) + 4];
+        }
         return [name, octave + 4];
     }
 
@@ -1162,72 +1237,103 @@ class ModeWidget {
             this._meterWheelDiv.style.display = "";
         }
 
-        this._modeWheel = new wheelnav("modeWidgetWheelDiv", null, 400, 400);
+        this._modeWheel = new wheelnav(
+            "modeWidgetWheelDiv",
+            null,
+            ModeWidget.WHEELSIZE,
+            ModeWidget.WHEELSIZE
+        );
         this._noteWheel = new wheelnav("_noteWheel", this._modeWheel.raphael);
         this._playWheel = new wheelnav("_playWheel", this._modeWheel.raphael);
 
         wheelnav.cssMeter = true;
 
-        this._modeWheel.colors = platformColor.modeWheelcolors;
-        this._modeWheel.slicePathFunction = slicePath().DonutSlice;
-        this._modeWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._modeWheel.slicePathCustom.minRadiusPercent = 0.4;
-        this._modeWheel.slicePathCustom.maxRadiusPercent = 0.75;
-        this._modeWheel.sliceSelectedPathCustom = this._modeWheel.slicePathCustom;
-        this._modeWheel.sliceInitPathCustom = this._modeWheel.slicePathCustom;
-        this._modeWheel.clickModeRotate = false;
-        this._modeWheel.navAngle = -90;
-        this._modeWheel.animatetime = 0;
+        this._createModeWheel(n);
+        this._createNoteWheel(n);
+        this._createPlayWheel(n);
+        this._wireWheelEvents(n);
+    }
 
+    /**
+     * Applies the shared donut-slice configuration to a wheel: colors, radii,
+     * -90° start angle and zero animation. Options are only applied when
+     * provided, preserving each wheel's existing behavior.
+     * @param {object} wheel - The wheelnav instance to configure.
+     * @param {object} opts
+     * @returns {void}
+     */
+    _configureWheel(wheel, opts) {
+        wheel.colors = opts.colors;
+        wheel.slicePathFunction = slicePath().DonutSlice;
+        wheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        wheel.slicePathCustom.minRadiusPercent = opts.minRadius;
+        wheel.slicePathCustom.maxRadiusPercent = opts.maxRadius;
+        if (opts.clickModeRotate !== undefined) {
+            wheel.clickModeRotate = opts.clickModeRotate;
+        }
+        if (opts.selectionPaths) {
+            wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
+            wheel.sliceInitPathCustom = wheel.slicePathCustom;
+        }
+        wheel.navAngle = -90;
+        wheel.animatetime = 0;
+        if (opts.titleRotateAngle !== undefined) {
+            wheel.titleRotateAngle = opts.titleRotateAngle;
+        }
+        if (opts.titleFont !== undefined) {
+            wheel.titleFont = opts.titleFont;
+        }
+    }
+
+    _createModeWheel(n) {
         const titleFontSize = Math.min(48, Math.max(10, Math.floor(580 / n)));
-        this._modeWheel.titleFont = "400 " + titleFontSize + "px Times New Roman";
-
+        this._configureWheel(this._modeWheel, {
+            colors: platformColor.modeWheelcolors,
+            minRadius: 0.4,
+            maxRadius: 0.75,
+            clickModeRotate: false,
+            selectionPaths: true,
+            titleFont: "400 " + titleFontSize + "px Times New Roman"
+        });
         this._modeWheel.createWheel(Array.from({ length: n }, (_, i) => String(i)));
+    }
 
-        this._noteWheel.colors = platformColor.noteValueWheelcolors;
-        this._noteWheel.slicePathFunction = slicePath().DonutSlice;
-        this._noteWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._noteWheel.slicePathCustom.minRadiusPercent = 0.75;
-        this._noteWheel.slicePathCustom.maxRadiusPercent = 0.9;
-        this._noteWheel.sliceSelectedPathCustom = this._noteWheel.slicePathCustom;
-        this._noteWheel.sliceInitPathCustom = this._noteWheel.slicePathCustom;
-        this._noteWheel.clickModeRotate = false;
-        this._noteWheel.navAngle = -90;
-        this._noteWheel.titleRotateAngle = 90;
+    _createNoteWheel(n) {
+        this._configureWheel(this._noteWheel, {
+            colors: platformColor.noteValueWheelcolors,
+            minRadius: 0.75,
+            maxRadius: 0.9,
+            clickModeRotate: false,
+            selectionPaths: true,
+            titleRotateAngle: 90
+        });
 
         // Reconcile selectedNotes: preserve existing, ensure index 0 is always true
-        const oldNotes = this._selectedNotes;
-        this._selectedNotes = new Array(n).fill(false);
-        this._selectedNotes[0] = true;
-        if (Array.isArray(oldNotes)) {
-            for (let i = 1; i < Math.min(oldNotes.length, n); i++) {
-                if (oldNotes[i]) {
-                    this._selectedNotes[i] = true;
-                }
-            }
-        }
+        this._selectedNotes = this._reconcileNotes(this._selectedNotes, n);
 
         // Slice 0: blank (no X toggle — root is always selected)
         // Slices 1..n-1: "x" toggle (dynamic EDO layout)
         this._noteWheel.createWheel([" ", ...new Array(n - 1).fill("x")]);
+    }
 
-        this._playWheel.colors = [platformColor.orange];
-        this._playWheel.slicePathFunction = slicePath().DonutSlice;
-        this._playWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._playWheel.slicePathCustom.minRadiusPercent = 0.3;
-        this._playWheel.slicePathCustom.maxRadiusPercent = 0.4;
-        this._playWheel.sliceSelectedPathCustom = this._playWheel.slicePathCustom;
-        this._playWheel.sliceInitPathCustom = this._playWheel.slicePathCustom;
-        this._playWheel.clickModeRotate = false;
-        this._playWheel.navAngle = -90;
-        this._playWheel.titleRotateAngle = 90;
+    _createPlayWheel(n) {
+        this._configureWheel(this._playWheel, {
+            colors: [platformColor.orange],
+            minRadius: 0.3,
+            maxRadius: 0.4,
+            clickModeRotate: false,
+            selectionPaths: true,
+            titleRotateAngle: 90
+        });
 
         this._playWheel.createWheel(new Array(n).fill(" "));
 
         for (let i = 0; i < n; i++) {
             this._playWheel.navItems[i].navItem.hide();
         }
+    }
 
+    _wireWheelEvents(n) {
         const __setNote = () => {
             const i = this._modeWheel.selectedNavItemIndex;
             if (i === 0) {
@@ -1285,7 +1391,12 @@ class ModeWidget {
         this._meterWheelDiv.style.display = "none";
         this._modePiemenuDiv.style.display = "";
 
-        this._modePieWheel = new wheelnav("modePiemenuDiv", null, 400, 400);
+        this._modePieWheel = new wheelnav(
+            "modePiemenuDiv",
+            null,
+            ModeWidget.WHEELSIZE,
+            ModeWidget.WHEELSIZE
+        );
         this._modeNameWheel = null; // Built on first group selection.
 
         // All groups appear, including "custom": it always offers "+" to
@@ -1296,22 +1407,21 @@ class ModeWidget {
         // the arc at the ring's mid-radius (titleRadiusPercent of 200px) on a
         // 400px paper.
         const __sliceFontPx = (sliceCount, longestLabel, titleRadiusPercent) => {
-            const arcPx = (2 * Math.PI * titleRadiusPercent * 200) / sliceCount;
+            const arcPx =
+                (2 * Math.PI * titleRadiusPercent * (ModeWidget.WHEELSIZE / 2)) / sliceCount;
             return Math.min(24, Math.max(12, Math.floor((arcPx * 0.85) / (longestLabel * 0.6))));
         };
 
         // Outer ring: group wheel
         this._modeGroupWheel = new wheelnav("_modeGroupWheel", this._modePieWheel.raphael);
-        this._modeGroupWheel.colors = platformColor.modeGroupWheelcolors;
-        this._modeGroupWheel.slicePathFunction = slicePath().DonutSlice;
-        this._modeGroupWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._modeGroupWheel.slicePathCustom.minRadiusPercent = 0.15;
-        this._modeGroupWheel.slicePathCustom.maxRadiusPercent = 0.3;
-        this._modeGroupWheel.navAngle = -90;
-        this._modeGroupWheel.animatetime = 0;
         // Fixed readable size on the 400px paper; the wheelnav default (48px)
         // overflows every slice and a computed size is too small.
-        this._modeGroupWheel.titleFont = "100 16px sans-serif";
+        this._configureWheel(this._modeGroupWheel, {
+            colors: platformColor.modeGroupWheelcolors,
+            minRadius: 0.15,
+            maxRadius: 0.3,
+            titleFont: "100 16px sans-serif"
+        });
         this._modeGroupWheel.createWheel(groupLabels);
 
         // Inner ring: mode-name wheel (rebuilt on group selection). Reopen on
@@ -1343,15 +1453,13 @@ class ModeWidget {
             if (newWheel) {
                 this._modeNameWheel = new wheelnav("_modeNameWheel", this._modePieWheel.raphael);
                 this._modeNameWheel.keynavigateEnabled = false;
-                this._modeNameWheel.slicePathFunction = slicePath().DonutSlice;
-                this._modeNameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-                this._modeNameWheel.slicePathCustom.minRadiusPercent = 0.3;
-                this._modeNameWheel.slicePathCustom.maxRadiusPercent = 0.85;
-                this._modeNameWheel.sliceSelectedPathCustom = this._modeNameWheel.slicePathCustom;
-                this._modeNameWheel.sliceInitPathCustom = this._modeNameWheel.slicePathCustom;
-                this._modeNameWheel.titleRotateAngle = 0;
-                this._modeNameWheel.navAngle = -90;
-                this._modeNameWheel.animatetime = 0;
+                this._configureWheel(this._modeNameWheel, {
+                    colors,
+                    minRadius: 0.3,
+                    maxRadius: 0.85,
+                    selectionPaths: true,
+                    titleRotateAngle: 0
+                });
             }
 
             // Build per-slice colors and (possibly translated) labels.
@@ -1380,7 +1488,6 @@ class ModeWidget {
             }
 
             if (newWheel) {
-                this._modeNameWheel.colors = colors;
                 this._modeNameWheel.createWheel(labels);
             } else {
                 // wheelnav keeps per-state title copies; update them all (as
@@ -1461,14 +1568,7 @@ class ModeWidget {
                         // rebuild triggered by _loadMode() → _rebuildWheel() → _piemenuMode()
                         this._closeModePiemenu();
 
-                        // Find the edoSelect in the DOM
-                        const edoSelect = docById("edoSelect");
-                        if (edoSelect) {
-                            this._loadMode(modeName, mode, edoSelect);
-                        } else {
-                            // Fallback: rebuild wheel with current EDO
-                            this._loadMode(modeName, mode, { value: this._activeEDO });
-                        }
+                        this._loadMode(modeName, mode, this._edoSelect);
                     }
                 };
             }

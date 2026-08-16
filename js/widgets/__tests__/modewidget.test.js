@@ -331,6 +331,17 @@ describe("ModeWidget", () => {
         expect(modeWidget._selectedNotes).toEqual(originalNotes);
     });
 
+    test("should fall back to generated names when numberToPitch returns a NaN octave", () => {
+        modeWidget._activeEDO = 5;
+        global.numberToPitch = jest.fn().mockReturnValue([undefined, NaN]);
+        global.generateNoteNames = jest.fn().mockReturnValue(["C", "D", "E", "G", "A"]);
+
+        const result = modeWidget._pitchNameAndOctave(3);
+
+        // j=3 with aIndex=4 ("A" at index 4 in a 5-EDO table): name E, octave 5.
+        expect(result).toEqual(["E", 5]);
+    });
+
     test("should show textMsg when notes are remapped on EDO switch", () => {
         modeWidget._activeEDO = 12;
         modeWidget._selectedNotes = [
