@@ -242,12 +242,12 @@ describe("PitchSlider Widget", () => {
             expect(slider.widgetWindow.addRangeSlider).toHaveBeenCalledTimes(2);
         });
 
-        test("creates up/down/save buttons for each frequency", () => {
+        test("creates up/down/save/reset buttons for each frequency", () => {
             slider.frequencies = [440, 880];
             slider.init(activityMock);
 
-            // 3 buttons per frequency = 6 buttons total
-            expect(slider.widgetWindow.addButton).toHaveBeenCalledTimes(6);
+            // 4 buttons per frequency = 8 buttons total
+            expect(slider.widgetWindow.addButton).toHaveBeenCalledTimes(8);
         });
 
         test("each slider has correct min/max range", () => {
@@ -513,6 +513,25 @@ describe("PitchSlider Widget", () => {
             saveBtn.onclick();
 
             expect(saveSpy).toHaveBeenCalledWith(500);
+        });
+
+        test("Reset frequency button restores initial frequency value and plays preview", () => {
+            slider.frequencies = [440];
+            slider.init(activityMock);
+
+            // Change frequency via slider to 600
+            const rangeSlider = slider.sliders[0];
+            rangeSlider.value = "600";
+            slider.frequencies[0] = 600;
+
+            const resetBtn = slider.widgetWindow
+                .getButtons()
+                .find(b => b.tip === "Reset frequency");
+            resetBtn.onclick();
+
+            expect(parseFloat(rangeSlider.value)).toBe(440);
+            expect(slider.frequencies[0]).toBe(440);
+            expect(mockOscillator.triggerAttackRelease).toHaveBeenCalledWith(440, "4n");
         });
 
         test("slider registers mousedown event listener", () => {

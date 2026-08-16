@@ -48,6 +48,7 @@ class PitchSlider {
         const semitone = Math.pow(2, 1 / edo);
         if (window.widgetWindows.openWindows["slider"]) return;
         if (!this.frequencies || !this.frequencies.length) this.frequencies = [392];
+        this.initialFrequencies = [...this.frequencies];
 
         const oscillators = [];
         for (let i = 0; i < this.frequencies.length; i++) {
@@ -185,6 +186,21 @@ class PitchSlider {
                 toolBarDiv
             ).onclick = () => {
                 this._save(this.frequencies[id]);
+            };
+
+            this.widgetWindow.addButton(
+                "reload.svg",
+                PitchSlider.ICONSIZE,
+                _("Reset frequency"),
+                toolBarDiv
+            ).onclick = () => {
+                const initialFreq =
+                    this.initialFrequencies && this.initialFrequencies[id] !== undefined
+                        ? this.initialFrequencies[id]
+                        : 392;
+                slider.value = initialFreq;
+                changeFreq();
+                oscillators[id].triggerAttackRelease(this.frequencies[id], "4n");
             };
         };
 
