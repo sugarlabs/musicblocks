@@ -3337,13 +3337,31 @@ const piemenuIntervals = (block, selectedInterval) => {
         that._intervalNameWheel.navItems[i].navigateFunction = () => {
             for (let l = 0; l < labels.length; l++) {
                 for (let j = 0; j < 8; j++) {
+                    const navItemObj = that._intervalWheel.navItems[l * 8 + j];
                     if (l !== i) {
-                        that._intervalWheel.navItems[l * 8 + j].navItem.hide();
+                        navItemObj.navItem.hide();
                     } else {
-                        that._intervalWheel.navItems[l * 8 + j].navItem.show();
-                        that._intervalWheel.navItems[l * 8 + j].enabled = activeTabs.includes(
-                            j + 1
-                        );
+                        navItemObj.navItem.show();
+                        const isEnabled = activeTabs.includes(j + 1);
+                        navItemObj.enabled = isEnabled;
+                        const pointerEventsVal = isEnabled ? "auto" : "none";
+                        if (
+                            navItemObj.navItem &&
+                            typeof navItemObj.navItem.forEach === "function"
+                        ) {
+                            navItemObj.navItem.forEach(elem => {
+                                if (elem && elem.node && elem.node.style) {
+                                    elem.node.style.pointerEvents = pointerEventsVal;
+                                }
+                            });
+                        }
+                        if (
+                            navItemObj.navItem &&
+                            navItemObj.navItem.node &&
+                            navItemObj.navItem.node.style
+                        ) {
+                            navItemObj.navItem.node.style.pointerEvents = pointerEventsVal;
+                        }
                     }
                 }
             }
@@ -3397,6 +3415,9 @@ const piemenuIntervals = (block, selectedInterval) => {
         const number = that._intervalWheel.navItems[that._intervalWheel.selectedNavItemIndex].title;
 
         that.value = INTERVALS[that._intervalNameWheel.selectedNavItemIndex][1] + " " + number;
+        if (!INTERVALVALUES[that.value]) {
+            return;
+        }
         if (label === "perfect 1") {
             that.text.text = _("unison");
         } else {
