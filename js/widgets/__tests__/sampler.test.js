@@ -79,6 +79,12 @@ global.TunerDisplay = class {
 
 const { SampleWidget, PitchSmoother } = require("../sampler.js");
 
+describe("SampleWidget.dependencies", () => {
+    test("includes the tuner module used by the sampler", () => {
+        expect(SampleWidget.dependencies).toEqual(["widgets/tuner", "widgets/sampler"]);
+    });
+});
+
 describe("Sampler Widget", () => {
     beforeAll(() => {
         if (!HTMLCanvasElement.prototype.getContext) {
