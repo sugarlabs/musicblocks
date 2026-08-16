@@ -19,34 +19,9 @@
  */
 
 /*
-    Global locations
-    - lib/wheelnav
-        slicePath, wheelnav
-    - js/utils/utils.js
-        _, last, docById
-    - js/utils/platformstyle.js
-        platformColor
-    - js/utils/musicutils.js
-        keySignatureToMode, MUSICALMODES, getModePattern, getNote, DEFAULTVOICE,
-        NOTESTABLE
-
     Dependency Injection Pattern:
-    This widget uses dependency injection to reduce implicit global state.
-    Dependencies are passed via the constructor as part of the `activity` object.
-
-    Required Dependencies (accessed via this.activity):
-    - logo: Logo instance (provides synth, modeBlock, resetSynth)
-    - turtles: Turtles instance (provides ithTurtle for keySignature)
-    - blocks: Blocks instance (provides blockList, loadNewBlocks)
-    - hideMsgs: Function to hide messages
-    - textMsg: Function to display text messages
-    - errorMsg: Function to display error messages
-    - refreshCanvas: Function to refresh the canvas
-    - storage: Storage object for custom mode persistence
-
-    Note: `this.storage.custommode` persistence was replaced by
-    `localStorage["customModes"]` (see _saveCustomMode/_getCustomModes);
-    `storage` is no longer a widget dependency.
+    Dependencies are passed via the constructor as part of the `activity`
+    object: logo, turtles, blocks, hideMsgs, textMsg, errorMsg, refreshCanvas.
 */
 
 /*exported ModeWidget*/
@@ -160,7 +135,7 @@ class ModeWidget {
         );
         this._playButton.onclick = () => {
             this.logo.resetSynth(0);
-            if (this._playingStatus()) {
+            if (this._playing) {
                 this._playing = false;
                 this._setPlayButtonIcon("play-button.svg", _("Play all"));
             } else {
@@ -252,12 +227,6 @@ class ModeWidget {
         this._playing = false;
         this._newPattern = null;
         this._notesToPlay = null;
-    }
-
-    // ── Play state ────────────────────────────────────────────────
-
-    _playingStatus() {
-        return this._playing;
     }
 
     _setPlayButtonIcon(iconName, titleText) {
@@ -666,7 +635,12 @@ class ModeWidget {
         widgetBody.children[0].style.flexDirection = "column";
         widgetBody.children[0].style.alignItems = "center";
 
-        const svg = this.getWidgetBody().getElementsByTagName("svg")[0];
+        // When the mode piemenu is open, scale its SVG; otherwise scale
+        // the note-wheel SVG.  getElementsByTagName("svg")[0] always
+        // returns the meterWheelDiv SVG (first in DOM order) even when
+        // the mode piemenu is the visible one.
+        const svgContainer = this._modePiemenuOpen ? this._modePiemenuDiv : this._meterWheelDiv;
+        const svg = svgContainer.querySelector("svg");
         if (!svg) {
             return;
         }
@@ -688,12 +662,18 @@ class ModeWidget {
             return;
         }
 
-        this._applyModePattern(
-            this._getModeEDO(currentModeName[1])
-                ? currentMode
-                : getModePattern(currentModeName[1], this._activeEDO)
-        );
-        this._setModeName();
+        const nativeEDO = this._getModeEDO(currentModeName[1]);
+        if (nativeEDO && nativeEDO !== this._activeEDO) {
+            // Custom mode saved at a different EDO — rebuild the wheel to
+            // match its native tuning before applying the pattern.
+            // edoSelect is null here (built later); _loadMode handles that.
+            this._loadMode(currentModeName[1], currentMode, null);
+        } else {
+            this._applyModePattern(
+                nativeEDO ? currentMode : getModePattern(currentModeName[1], this._activeEDO)
+            );
+            this._setModeName();
+        }
     }
 
     _loadMode(modeName, mode, edoSelect) {
@@ -703,7 +683,8 @@ class ModeWidget {
             // tuning dropdown and rebuild the wheel before selecting intervals.
             // Cache the outgoing state exactly like the dropdown handler so
             // round-trips restore it losslessly.
-            this._cacheState(this._activeEDO);
+            const oldEDO = this._activeEDO;
+            this._cacheState(oldEDO);
             if (edoSelect) {
                 // The dropdown may lack an option for an unusual native EDO
                 // (e.g. 21 from 1/4 comma meantone); add it so .value sticks.
@@ -716,6 +697,12 @@ class ModeWidget {
                 edoSelect.value = nativeEDO;
             }
             this._rebuildWheel(nativeEDO);
+            this.textMsg(
+                _(
+                    `Mode ${modeName} is ${nativeEDO}-EDO; tuning switched from ${oldEDO}-EDO to ${nativeEDO}-EDO.`
+                ),
+                3000
+            );
         }
         // Built-in mode patterns are 12-EDO intervals; scale them to the
         // active EDO. Custom modes carry EDO-specific patterns already.
@@ -988,16 +975,7 @@ class ModeWidget {
     }
 
     _playNote(i) {
-        const ks = this.turtles.ithTurtle(0).singer.keySignature;
-        const noteToPlay = getNote(this._pitch, 4, i, ks, false, null, this.errorMsg);
-        this.logo.synth.trigger(
-            0,
-            normalizeNoteAccidentals(noteToPlay[0]) + noteToPlay[1],
-            this._noteValue,
-            DEFAULTVOICE,
-            null,
-            null
-        );
+        this._triggerNote(i, this._activeEDO);
     }
 
     // ── Undo / Clear ──────────────────────────────────────────────
@@ -1005,7 +983,7 @@ class ModeWidget {
     _saveState() {
         const state = JSON.stringify(this._selectedNotes);
         if (state !== last(this._undoStack)) {
-            this._undoStack.push(JSON.stringify(this._selectedNotes));
+            this._undoStack.push(state);
         }
     }
 
@@ -1450,19 +1428,10 @@ class ModeWidget {
             // removeWheel() on it: every wheel shares the root's paper, and
             // removeWheel() detaches the whole SVG from the DOM.
             const newWheel = this._modeNameWheel === null;
-            if (newWheel) {
-                this._modeNameWheel = new wheelnav("_modeNameWheel", this._modePieWheel.raphael);
-                this._modeNameWheel.keynavigateEnabled = false;
-                this._configureWheel(this._modeNameWheel, {
-                    colors,
-                    minRadius: 0.3,
-                    maxRadius: 0.85,
-                    selectionPaths: true,
-                    titleRotateAngle: 0
-                });
-            }
 
             // Build per-slice colors and (possibly translated) labels.
+            // Declared before the _configureWheel call below so the
+            // reference in the options object is not in the temporal dead zone.
             const colors = [];
             const labels = [];
             for (let i = 0; i < modes.length; i++) {
@@ -1488,23 +1457,36 @@ class ModeWidget {
             }
 
             if (newWheel) {
+                this._modeNameWheel = new wheelnav("_modeNameWheel", this._modePieWheel.raphael);
+                this._modeNameWheel.keynavigateEnabled = false;
+                this._configureWheel(this._modeNameWheel, {
+                    colors,
+                    minRadius: 0.3,
+                    maxRadius: 0.85,
+                    selectionPaths: true,
+                    titleRotateAngle: 0
+                });
+            }
+
+            if (newWheel) {
                 this._modeNameWheel.createWheel(labels);
             } else {
                 // wheelnav keeps per-state title copies; update them all (as
                 // piemenus.js does) before re-rendering.
                 for (let i = 0; i < this._modeNameWheel.navItems.length; i++) {
-                    this._modeNameWheel.navItems[i].title = labels[i];
-                    this._modeNameWheel.navItems[i].basicNavTitleMax.title = labels[i];
-                    this._modeNameWheel.navItems[i].basicNavTitleMin.title = labels[i];
-                    this._modeNameWheel.navItems[i].hoverNavTitleMax.title = labels[i];
-                    this._modeNameWheel.navItems[i].hoverNavTitleMin.title = labels[i];
-                    this._modeNameWheel.navItems[i].selectedNavTitleMax.title = labels[i];
-                    this._modeNameWheel.navItems[i].selectedNavTitleMin.title = labels[i];
-                    this._modeNameWheel.navItems[i].initNavTitle.title = labels[i];
-                    this._modeNameWheel.navItems[i].fillAttr = colors[i];
-                    this._modeNameWheel.navItems[i].sliceHoverAttr.fill = colors[i];
-                    this._modeNameWheel.navItems[i].slicePathAttr.fill = colors[i];
-                    this._modeNameWheel.navItems[i].sliceSelectedAttr.fill = colors[i];
+                    const item = this._modeNameWheel.navItems[i];
+                    item.title = labels[i];
+                    item.basicNavTitleMax.title = labels[i];
+                    item.basicNavTitleMin.title = labels[i];
+                    item.hoverNavTitleMax.title = labels[i];
+                    item.hoverNavTitleMin.title = labels[i];
+                    item.selectedNavTitleMax.title = labels[i];
+                    item.selectedNavTitleMin.title = labels[i];
+                    item.initNavTitle.title = labels[i];
+                    item.fillAttr = colors[i];
+                    item.sliceHoverAttr.fill = colors[i];
+                    item.slicePathAttr.fill = colors[i];
+                    item.sliceSelectedAttr.fill = colors[i];
                 }
                 this._modeNameWheel.refreshWheel();
             }
@@ -1513,12 +1495,11 @@ class ModeWidget {
             // so short names render large and only long ones shrink. Applied
             // post-createWheel via the per-item title attributes.
             for (let i = 0; i < this._modeNameWheel.navItems.length; i++) {
-                const fontSize = __sliceFontPx(modes.length, labels[i].length, 0.575);
-                this._modeNameWheel.navItems[i].titleAttr.font = `100 ${fontSize}px sans-serif`;
-                this._modeNameWheel.navItems[i].titleHoverAttr.font =
-                    `100 ${fontSize}px sans-serif`;
-                this._modeNameWheel.navItems[i].titleSelectedAttr.font =
-                    `100 ${fontSize}px sans-serif`;
+                const font = `100 ${__sliceFontPx(modes.length, labels[i].length, 0.575)}px sans-serif`;
+                const item = this._modeNameWheel.navItems[i];
+                item.titleAttr.font = font;
+                item.titleHoverAttr.font = font;
+                item.titleSelectedAttr.font = font;
             }
 
             // Set up action for each mode slice
