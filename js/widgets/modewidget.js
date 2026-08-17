@@ -274,13 +274,6 @@ class ModeWidget {
         return options;
     }
 
-    _createEdoSelect() {
-        const select = document.createElement("select");
-        select.id = "edoSelect";
-        select.style.fontSize = "12px";
-        return select;
-    }
-
     _initEdoSelect(select) {
         const inEDO = this._activeEDO;
         const inTemperament = this.logo.synth.inTemperament;
@@ -514,46 +507,86 @@ class ModeWidget {
         bar.style.flexWrap = "wrap";
         bar.style.alignItems = "center";
         bar.style.justifyContent = "center";
-        bar.style.gap = "10px";
-        bar.style.padding = "8px 12px";
+        bar.style.gap = "8px";
+        bar.style.padding = "6px 16px";
 
         // Icon button with MB theme styling (wfbtItem class).
-        const iconButton = (icon, label, onclick) => {
+        const iconButton = (icon, label, onclick, imgFilter) => {
             const btn = document.createElement("div");
             btn.className = "wfbtItem";
             btn.title = label;
             btn.setAttribute("role", "button");
             btn.setAttribute("aria-label", label);
             btn.setAttribute("tabindex", "0");
+            btn.style.flexShrink = "0";
+            btn.style.display = "flex";
+            btn.style.alignItems = "center";
+            btn.style.justifyContent = "center";
+            btn.style.padding = "4px";
+            btn.style.borderRadius = "6px";
             const img = document.createElement("img");
             img.src = `header-icons/${icon}`;
             img.alt = label;
             img.height = 24;
             img.width = 24;
+            if (imgFilter) img.style.filter = imgFilter;
             btn.appendChild(img);
             btn.onclick = onclick;
             return btn;
         };
 
-        // EDO/Tuning dropdown
-        const edoSelect = this._createEdoSelect();
+        // EDO/Tuning — transparent select overlay on top of the icon.
+        // The select is full-size but invisible; it IS the click target.
+        const tuningIcon = iconButton("menu-button.svg", _("Tuning"), null);
+        // Transparent select overlay — IS the click target; the icon behind
+        // it is purely decorative.
+        const edoSelect = document.createElement("select");
+        edoSelect.id = "edoSelect";
         this._edoSelect = edoSelect;
         this._initEdoSelect(edoSelect);
         this._wireEdoSelect(edoSelect);
         edoSelect.title = _("Tuning");
         edoSelect.setAttribute("aria-label", _("Tuning"));
+        Object.assign(edoSelect.style, {
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            opacity: 0,
+            cursor: "pointer",
+            zIndex: 1,
+            border: "none",
+            background: "transparent",
+            appearance: "none",
+            WebkitAppearance: "none",
+            MozAppearance: "none",
+            outline: "none",
+            boxShadow: "none"
+        });
+
+        const tuningGroup = document.createElement("div");
+        tuningGroup.style.position = "relative";
+        tuningGroup.style.display = "inline-flex";
+        tuningGroup.style.alignItems = "center";
+        tuningGroup.style.flexShrink = "0";
+        tuningGroup.appendChild(tuningIcon);
+        tuningGroup.appendChild(edoSelect);
 
         // Modes: open piemenu instead of a <select> dropdown
-        const modeBtn = iconButton("menu-button.svg", _("Select Mode"), () => {
+        const modeBtn = iconButton("pie-chart.svg", _("Select Mode"), () => {
             this._piemenuModes();
         });
         modeBtn.id = "modeSelectBtn";
 
-        // Mode name input
+        // Mode name input (kept narrow so the row fits on one line)
         const nameInput = document.createElement("input");
         nameInput.id = "customModeName";
         nameInput.type = "text";
         nameInput.placeholder = _("Mode name");
+        nameInput.style.width = "100px";
+        nameInput.style.minWidth = "80px";
+        nameInput.style.flexShrink = "1";
 
         // Save button
         const saveBtn = iconButton("save-button.svg", _("Save Mode"), () => {
@@ -603,7 +636,7 @@ class ModeWidget {
             this.textMsg(_("Mode deleted: ") + name, 3000);
         });
 
-        bar.appendChild(edoSelect);
+        bar.appendChild(tuningGroup);
         bar.appendChild(modeBtn);
         bar.appendChild(nameInput);
         bar.appendChild(saveBtn);
