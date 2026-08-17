@@ -135,7 +135,7 @@ global.TimbreWidget = jest.fn(() => ({
 }));
 global.TimbreWidget.dependencies = ["widgets/timbre"];
 global.SampleWidget = jest.fn(() => ({ init: jest.fn() }));
-global.SampleWidget.dependencies = ["widgets/sampler"];
+global.SampleWidget.dependencies = ["widgets/tuner", "widgets/sampler"];
 global.AIDebuggerWidget = jest.fn(() => ({ init: jest.fn() }));
 global.AIDebuggerWidget.dependencies = ["widgets/aidebugger"];
 global.TemperamentWidget = jest.fn(() => ({
@@ -702,26 +702,18 @@ describe("setupWidgetBlocks", () => {
         });
     });
 
-    describe("Widget dependency metadata wiring", () => {
+    describe("Widget dependency resolution", () => {
         // _ensureWidget()/_lazyLoadWidget() are local closures inside
         // setupWidgetBlocks() and aren't exported, so their `modules`
         // argument can't be intercepted at runtime without changing the
         // loader itself, and in this non-AMD test environment `_lazyRequire`
         // (which both of them delegate to) ignores `modules` entirely, so no
         // behavioural test can observe it either. As a last resort, a single
-        // source-text check confirms every call site reads modules from the
-        // widget's own static `dependencies` rather than a hardcoded
-        // literal; kept to one test (not one per widget) since it's the
-        // wiring itself being checked, not per-widget behaviour -- the
-        // behavioural tests below cover that.
-        //
-        // Caveat: this relies on source-text matching, which can become
-        // brittle during future refactors (e.g. reformatting the
-        // _ensureWidget/_lazyLoadWidget calls). If dependency resolution is
-        // ever exposed through a helper or otherwise made observable
-        // behaviourally, prefer replacing these regex assertions with
-        // behavioural tests.
-        it("every _ensureWidget/_lazyLoadWidget call site reads modules from its widget's dependencies", () => {
+        // source-text check confirms every call site resolves dependencies
+        // from the widget metadata when available and supplies a fallback
+        // module id when the widget is not part of the startup dependency
+        // graph. The behavioural tests below cover the loading paths.
+        it("resolves widget dependencies with startup-safe fallbacks", () => {
             const widgetBlocksSource = require("fs").readFileSync(
                 require("path").join(__dirname, "..", "WidgetBlocks.js"),
                 "utf8"
@@ -752,21 +744,19 @@ describe("setupWidgetBlocks", () => {
             const notWired = [];
             for (const [widgetKey, className] of ensureWidgetSites) {
                 const callSite = new RegExp(
-                    `_ensureWidget\\(\\s*logo,\\s*"${widgetKey}",\\s*${className}\\.dependencies,`
+                    `_ensureWidget\\(\\s*logo,\\s*"${widgetKey}",\\s*_getWidgetDependencies\\(\\s*typeof ${className} !== "undefined" \\? ${className} : null,`
                 );
                 if (!callSite.test(widgetBlocksSource)) {
-                    notWired.push(
-                        `_ensureWidget("${widgetKey}") should read ${className}.dependencies`
-                    );
+                    notWired.push(`_ensureWidget("${widgetKey}") is missing a dependency fallback`);
                 }
             }
             for (const [widgetKey, className] of lazyLoadWidgetSites) {
                 const callSite = new RegExp(
-                    `_lazyLoadWidget\\(\\s*logo,\\s*"${widgetKey}",\\s*${className}\\.dependencies,`
+                    `_lazyLoadWidget\\(\\s*logo,\\s*"${widgetKey}",\\s*_getWidgetDependencies\\(\\s*typeof ${className} !== "undefined" \\? ${className} : null,`
                 );
                 if (!callSite.test(widgetBlocksSource)) {
                     notWired.push(
-                        `_lazyLoadWidget("${widgetKey}") should read ${className}.dependencies`
+                        `_lazyLoadWidget("${widgetKey}") is missing a dependency fallback`
                     );
                 }
             }
@@ -774,9 +764,8 @@ describe("setupWidgetBlocks", () => {
             expect(notWired).toEqual([]);
         });
 
-        // Exercise the previously-untested call sites so the metadata read
-        // (Widget.dependencies) actually executes, not just gets matched
-        // textually above.
+        // Exercise the previously-untested call sites so dependency
+        // resolution actually executes, not just gets matched textually above.
         it.each([
             ["arpeggiomatrix", "arpBlk", "arpeggio", global.Arpeggio],
             ["pitchdrummatrix", "pdmBlk", "pitchDrumMatrix", global.PitchDrumMatrix],

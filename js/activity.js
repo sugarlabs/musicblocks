@@ -196,6 +196,8 @@ let MYDEFINES = [
     "widgets/widgetWindows"
 ];
 
+// Optional widget implementations are loaded by WidgetBlocks on first use.
+
 /**
  * Dynamically load one or more RequireJS modules on demand.
  * Returns a Promise that resolves once all modules are loaded.
@@ -216,35 +218,6 @@ function lazyLoad(modulePaths) {
             resolve();
         });
     });
-}
-
-if (_THIS_IS_MUSIC_BLOCKS_) {
-    const MUSICBLOCKS_EXTRAS = [
-        "widgets/modewidget",
-        "widgets/meterwidget",
-        "widgets/PhraseMakerUtils",
-        "widgets/PhraseMakerGrid",
-        "widgets/PhraseMakerUI",
-        "widgets/PhraseMakerAudio",
-        "widgets/phrasemaker",
-        "widgets/arpeggio",
-        "widgets/aiwidget",
-        "widgets/aidebugger",
-        "widgets/pitchdrummatrix",
-        "widgets/rhythmruler",
-        "widgets/pitchstaircase",
-        "widgets/temperament",
-        "widgets/tempo",
-        "widgets/pitchslider",
-        "widgets/musickeyboard",
-        "widgets/timbre",
-        "widgets/oscilloscope",
-        "widgets/tuner",
-        "widgets/sampler",
-        "widgets/reflection",
-        "widgets/legobricks"
-    ];
-    MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
 }
 
 // Module-scoped singleton reference to the active Activity instance.
