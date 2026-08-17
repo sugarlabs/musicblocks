@@ -2187,7 +2187,7 @@ the clamp. Every column has a slider that can be used to move up or
 down in frequency, continuously or in intervals of 1/12th of the
 starting frequency. The mouse is used to move the frequency up and
 down continuously. Buttons are used for intervals. Arrow keys can also
-be used to move up and down, or between columns.
+be used to move up and down, or between columns. There is a save button to export a note block, and a reset button to restore the initial starting pitch.
 
 ![widget](./pitchslider0a.svg "Pitch Slider Block")
 
