@@ -517,48 +517,46 @@ class ModeWidget {
         bar.style.gap = "10px";
         bar.style.padding = "8px 12px";
 
-        // EDO/Tuning dropdown
-        const edoLabel = document.createElement("span");
-        edoLabel.textContent = _("Tuning") + ":";
-        edoLabel.style.fontSize = "12px";
+        // Icon button with MB theme styling (wfbtItem class).
+        const iconButton = (icon, label, onclick) => {
+            const btn = document.createElement("div");
+            btn.className = "wfbtItem";
+            btn.title = label;
+            btn.setAttribute("role", "button");
+            btn.setAttribute("aria-label", label);
+            btn.setAttribute("tabindex", "0");
+            const img = document.createElement("img");
+            img.src = `header-icons/${icon}`;
+            img.alt = label;
+            img.height = 24;
+            img.width = 24;
+            btn.appendChild(img);
+            btn.onclick = onclick;
+            return btn;
+        };
 
+        // EDO/Tuning dropdown
         const edoSelect = this._createEdoSelect();
         this._edoSelect = edoSelect;
         this._initEdoSelect(edoSelect);
         this._wireEdoSelect(edoSelect);
-        edoSelect.style.fontSize = "12px";
-        edoSelect.style.minHeight = "30px";
+        edoSelect.title = _("Tuning");
+        edoSelect.setAttribute("aria-label", _("Tuning"));
 
         // Modes: open piemenu instead of a <select> dropdown
-        const modeLabel = document.createElement("span");
-        modeLabel.textContent = _("Mode") + ":";
-        modeLabel.style.fontSize = "12px";
-
-        const modeBtn = document.createElement("button");
-        modeBtn.id = "modeSelectBtn";
-        modeBtn.textContent = _("Select Mode");
-        modeBtn.style.fontSize = "12px";
-        modeBtn.style.minHeight = "30px";
-        modeBtn.onclick = () => {
+        const modeBtn = iconButton("menu-button.svg", _("Select Mode"), () => {
             this._piemenuModes();
-        };
+        });
+        modeBtn.id = "modeSelectBtn";
 
         // Mode name input
         const nameInput = document.createElement("input");
         nameInput.id = "customModeName";
         nameInput.type = "text";
         nameInput.placeholder = _("Mode name");
-        nameInput.style.fontSize = "12px";
-        nameInput.style.width = "90px";
-        nameInput.style.minHeight = "30px";
 
         // Save button
-        const saveBtn = document.createElement("button");
-        saveBtn.textContent = _("Save");
-        saveBtn.style.fontSize = "12px";
-        saveBtn.style.minHeight = "30px";
-        saveBtn.style.padding = "0 12px";
-        saveBtn.onclick = () => {
+        const saveBtn = iconButton("save-button.svg", _("Save Mode"), () => {
             const name = nameInput.value.trim();
             if (!name) {
                 this.errorMsg(_("Please enter a mode name."));
@@ -573,15 +571,10 @@ class ModeWidget {
             this._setModeName();
             this._save();
             this.textMsg(_("Mode saved: ") + name, 3000);
-        };
+        });
 
         // Delete button
-        const deleteBtn = document.createElement("button");
-        deleteBtn.textContent = _("Delete");
-        deleteBtn.style.fontSize = "12px";
-        deleteBtn.style.minHeight = "30px";
-        deleteBtn.style.padding = "0 12px";
-        deleteBtn.onclick = () => {
+        const deleteBtn = iconButton("delete.svg", _("Delete Mode"), () => {
             const name = this._selectedModeName;
             if (!name) {
                 this.errorMsg(_("No mode selected."));
@@ -608,11 +601,9 @@ class ModeWidget {
             // longer matches the deleted mode, the label clears.
             this._setModeName();
             this.textMsg(_("Mode deleted: ") + name, 3000);
-        };
+        });
 
-        bar.appendChild(edoLabel);
         bar.appendChild(edoSelect);
-        bar.appendChild(modeLabel);
         bar.appendChild(modeBtn);
         bar.appendChild(nameInput);
         bar.appendChild(saveBtn);
