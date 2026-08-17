@@ -21,7 +21,7 @@
    deepClone, fileBasename, fileExt, hex2rgb, hexToRGB, isSafeUrl, isUnsafeObjectKey, last,
    mixedNumber, nearestBeat, oneHundredToFraction, rationalSum, rgbToHex,
    safeSVG, safeJSONParse, toFixed2, toTitleCase, unescapeHTML, escapeHTML,
-   rationalToFraction, GCD, LCD, resolveObject, clampNumber
+   rationalToFraction, GCD, LCD, resolveObject, clampNumber, isValidHex
 */
 
 /**
@@ -609,6 +609,17 @@ var hex2rgb = (hex, alpha = 1) => {
 };
 
 /**
+ * Validates whether a given string is a valid 3-digit (#rgb) or 6-digit (#rrggbb) hexadecimal color code.
+ * @param {string} hex - Hex color string to validate
+ * @returns {boolean} True if string is a valid hex color code, false otherwise
+ */
+var isValidHex = hex => {
+    if (typeof hex !== "string") return false;
+    const cleanHex = hex.trim();
+    return /^#?([a-f\d]{3}|[a-f\d]{6})$/i.test(cleanHex);
+};
+
+/**
  * Environment-dependent helpers
  */
 
@@ -665,7 +676,8 @@ var UtilsLogic = {
     hexToRGB,
     hex2rgb,
     resolveObject,
-    clampNumber
+    clampNumber,
+    isValidHex
 };
 
 if (typeof module !== "undefined" && module.exports) {

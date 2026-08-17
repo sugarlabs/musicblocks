@@ -13,7 +13,7 @@
    global
 
    _, FlowBlock, NOINPUTERRORMSG, ValueBlock, docById, toFixed2,
-   LeftBlock, BooleanSensorBlock, NANERRORMSG, hex2rgb, searchColors,
+   LeftBlock, BooleanSensorBlock, NANERRORMSG, hex2rgb, hexToRGB, isValidHex, searchColors,
    Tone, platformColor, _THIS_IS_MUSIC_BLOCKS_
  */
 
@@ -552,7 +552,7 @@ function setupSensorsBlocks(activity) {
             let colorString = activity.turtles.getTurtle(turtle).painter.canvasColor;
 
             // Handle hex and rgb color formats
-            if (colorString.includes("#")) {
+            if (isValidHex(colorString)) {
                 colorString = hex2rgb(colorString);
             }
 
@@ -677,18 +677,11 @@ function setupSensorsBlocks(activity) {
             let b;
             const background = platformColor.background;
 
-            if (background.startsWith("#")) {
-                const hex =
-                    background.length === 4
-                        ? background
-                              .slice(1)
-                              .split("")
-                              .map(value => value + value)
-                              .join("")
-                        : background.slice(1);
-                r = parseInt(hex.slice(0, 2), 16);
-                g = parseInt(hex.slice(2, 4), 16);
-                b = parseInt(hex.slice(4, 6), 16);
+            if (isValidHex(background)) {
+                const rgb = hexToRGB(background);
+                r = rgb.r;
+                g = rgb.g;
+                b = rgb.b;
             } else {
                 [r, g, b] = background
                     .match(/\(([^)]+)\)/)[1]
