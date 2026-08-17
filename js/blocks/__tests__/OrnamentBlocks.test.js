@@ -249,6 +249,7 @@ describe("setupOrnamentBlocks", () => {
             const turtleObj = activity.turtles.ithTurtle(turtleIndex);
             turtleObj.singer.glide = [];
             const result = glideBlock.flow([0.1, 8], logo, turtleIndex, "blkGlide");
+            expect(glideBlock.hidden).toBe(true);
             expect(turtleObj.singer.glide).toContain(0.1);
             expect(turtleObj.singer.inGlide).toBe(true);
             expect(turtleObj.singer.glideBuffer).toEqual([]);

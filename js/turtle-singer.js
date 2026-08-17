@@ -1910,8 +1910,10 @@ class Singer {
             }
 
             const glideTime = tur.singer.turtleTime;
-            // Duration is the duration of the note to be played. doWait sets the wait time for the turtle before the next block is executed
-            const duration = tur.singer.inGlide ? 0 : noteBeatValue;
+            // Duration is the duration of the note to be played. During a glide,
+            // audio is scheduled from the buffer, so only the logical turtle time
+            // advances here; waiting again would delay the same notes twice.
+            const duration = noteBeatValue;
             // For the outermost note (when nesting), calculate the time for the next note
             if (duration > 0) {
                 tur.singer.previousTurtleTime = tur.singer.turtleTime;
@@ -1926,7 +1928,7 @@ class Singer {
                     }
 
                     tur.singer.turtleTime += bpmFactor / duration;
-                    if (!tur.singer.suppressOutput) {
+                    if (!tur.singer.suppressOutput && !tur.singer.inGlide) {
                         tur.doWait(Math.max(bpmFactor / duration - turtleLag, 0));
                     }
                     // Clear the list when the last note is played.
@@ -1947,13 +1949,6 @@ class Singer {
                 }
             }
 
-            if (tur.singer.inGlide) {
-                const waitSeconds = isOsc ? noteValue / 1000 : bpmFactor / noteValue;
-                tur.singer.turtleTime += waitSeconds;
-                if (!tur.singer.suppressOutput) {
-                    tur.doWait(waitSeconds);
-                }
-            }
             let forceSilence = false;
             if (tur.singer.skipFactor > 1) {
                 if (tur.singer.skipIndex % tur.singer.skipFactor > 0) {
@@ -2616,26 +2611,35 @@ class Singer {
      * @param {Object} activity - Activity object.
      * @param {Number} turtle - Turtle index.
      */
-    static playGlideBuffer(activity, turtle) {
+    static async playGlideBuffer(activity, turtle) {
         const tur = activity.turtles.ithTurtle(turtle);
         const buffer = tur.singer.glideBuffer;
         if (buffer.length === 0) return;
 
         const startTime = tur.singer.glideStartTime;
+        const glideDuration = Number.isFinite(tur.singer.turtleTime)
+            ? Math.max(0, tur.singer.turtleTime - startTime)
+            : 0;
         try {
-            buffer.forEach((noteObj, index) => {
+            for (let index = 0; index < buffer.length; index++) {
+                const noteObj = buffer[index];
                 const future = Math.max(0, (noteObj.future || 0) + noteObj.time - startTime);
-                activity.logo.synth.trigger(
+                const triggerResult = activity.logo.synth.trigger(
                     turtle,
                     noteObj.note,
-                    noteObj.duration,
+                    index === 0 && glideDuration > 0 ? glideDuration : noteObj.duration,
                     noteObj.target,
                     noteObj.paramsEffects,
                     noteObj.filters,
                     index > 0,
                     future
                 );
-            });
+                // A real synth trigger waits for audio buffers before starting the
+                // attack. Do not send setNote until that first attack is scheduled.
+                if (triggerResult && typeof triggerResult.then === "function") {
+                    await triggerResult;
+                }
+            }
         } finally {
             tur.singer.glideBuffer = [];
             activity.stageDirty = true;
