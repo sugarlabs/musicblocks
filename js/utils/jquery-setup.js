@@ -28,39 +28,37 @@ jQuery(document).ready(function () {
 });
 
 // Fix autocomplete dropdown position to stay anchored to the search input.
-jQuery(document).ready(function () {
-    let retries = 0;
-    const MAX_RETRIES = 20;
+// The #search autocomplete is created lazily by SearchController.doSearch()
+// (js/activity/search-controller.js), which runs late in activity startup —
+// a timer-based poll here cannot know when that happens and loses the race
+// on any load slower than its budget (issue #8069). Instead, doSearch()
+// calls this function immediately after initialising the widget.
+window.fixSearchAutocompletePosition = function () {
+    const $search = jQuery("#search");
+    if (!$search.length || !$search.data("ui-autocomplete")) {
+        return false;
+    }
 
-    const fixAutocompletePosition = function () {
-        const $search = jQuery("#search");
-        if ($search.length && $search.data("ui-autocomplete")) {
-            const instance = $search.autocomplete("instance");
-            if (instance) {
-                const originalRenderMenu = instance._renderMenu;
-                instance._renderMenu = function (ul, items) {
-                    originalRenderMenu.call(this, ul, items);
-                    setTimeout(() => {
-                        const searchInput = document.querySelector("#search");
-                        const dropdown = ul[0];
-                        if (searchInput && dropdown) {
-                            const rect = searchInput.getBoundingClientRect();
-                            dropdown.style.position = "fixed";
-                            dropdown.style.left = rect.left + "px";
-                            dropdown.style.top = rect.bottom + 2 + "px";
-                            dropdown.style.width = rect.width + "px";
-                        }
-                    }, 0);
-                };
+    const instance = $search.autocomplete("instance");
+    if (!instance || instance._mbPositionFixApplied) {
+        return false;
+    }
+
+    const originalRenderMenu = instance._renderMenu;
+    instance._renderMenu = function (ul, items) {
+        originalRenderMenu.call(this, ul, items);
+        setTimeout(() => {
+            const searchInput = document.querySelector("#search");
+            const dropdown = ul[0];
+            if (searchInput && dropdown) {
+                const rect = searchInput.getBoundingClientRect();
+                dropdown.style.position = "fixed";
+                dropdown.style.left = rect.left + "px";
+                dropdown.style.top = rect.bottom + 2 + "px";
+                dropdown.style.width = rect.width + "px";
             }
-        } else if (retries < MAX_RETRIES) {
-            retries++;
-            setTimeout(fixAutocompletePosition, 500);
-        } else {
-            console.error(
-                `Autocomplete setup failed: Could not initialize ui-autocomplete on #search after ${MAX_RETRIES} retries.`
-            );
-        }
+        }, 0);
     };
-    setTimeout(fixAutocompletePosition, 1000);
-});
+    instance._mbPositionFixApplied = true;
+    return true;
+};
