@@ -247,8 +247,13 @@ class MeterWidget {
             c1 = this.activity.blocks.blockList[this._meterBlock].connections[1];
             v1 = c1 !== null ? this.activity.blocks.blockList[c1].value : 4;
             c2 = this.activity.blocks.blockList[this._meterBlock].connections[2];
-            c3 = this.activity.blocks.blockList[c2].connections[2];
-            if (c2 !== null) {
+            c3 =
+                c2 !== null &&
+                this.activity.blocks.blockList[c2] &&
+                this.activity.blocks.blockList[c2].connections
+                    ? this.activity.blocks.blockList[c2].connections[2]
+                    : null;
+            if (c2 !== null && this.activity.blocks.blockList[c2]) {
                 this._beatValue = this.activity.blocks.blockList[c2].value;
             }
 
@@ -292,19 +297,27 @@ class MeterWidget {
             divInput.children[0].value = clampNumber(el.value, el.min, el.max);
             divInput2.children[0].value = clampNumber(el2.value, el2.min, el2.max);
 
-            const bnBlk = this.activity.blocks.blockList[c1]; // number of beats
-            const bvBlk = this.activity.blocks.blockList[c3]; // beat value
+            const bnBlk = c1 !== null ? this.activity.blocks.blockList[c1] : null;
+            const bvBlk = c3 !== null ? this.activity.blocks.blockList[c3] : null;
 
             const bnValue = divInput.children[0].value;
             const bvValue = divInput2.children[0].value;
 
-            bnBlk.value = bnValue;
-            bnBlk.text.text = bnValue;
-            bnBlk.container.setChildIndex(bnBlk.text, bnBlk.container.children.length - 1);
+            if (bnBlk) {
+                bnBlk.value = bnValue;
+                if (bnBlk.text) bnBlk.text.text = bnValue;
+                if (bnBlk.container && bnBlk.container.children) {
+                    bnBlk.container.setChildIndex(bnBlk.text, bnBlk.container.children.length - 1);
+                }
+            }
 
-            bvBlk.value = bvValue;
-            bvBlk.text.text = bvValue;
-            bvBlk.container.setChildIndex(bvBlk.text, bvBlk.container.children.length - 1);
+            if (bvBlk) {
+                bvBlk.value = bvValue;
+                if (bvBlk.text) bvBlk.text.text = bvValue;
+                if (bvBlk.container && bvBlk.container.children) {
+                    bvBlk.container.setChildIndex(bvBlk.text, bvBlk.container.children.length - 1);
+                }
+            }
 
             this.activity.logo.runLogoCommands(widgetBlock);
         };
