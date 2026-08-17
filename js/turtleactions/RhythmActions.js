@@ -391,7 +391,6 @@ function setupRhythmActions(activity) {
             const tur = activity.turtles.ithTurtle(turtle);
 
             if (typeof factor !== "number" || isNaN(factor) || factor === 0) {
-                activity.errorMsg(_("Multiply factor must be a non-zero number."), blk);
                 return;
             }
 
@@ -428,11 +427,9 @@ function setupRhythmActions(activity) {
                 activity.logo.notation.notationSwing(turtle);
             } else {
                 if (typeof swingValue !== "number" || isNaN(swingValue) || swingValue === 0) {
-                    activity.errorMsg(_("Swing value must be a non-zero number."), blk);
                     return;
                 }
                 if (typeof noteValue !== "number" || isNaN(noteValue) || noteValue === 0) {
-                    activity.errorMsg(_("Note value must be a non-zero number."), blk);
                     return;
                 }
                 tur.singer.swing.push(1 / swingValue);
