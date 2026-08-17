@@ -2410,13 +2410,16 @@ class TimbreWidget {
                     docById("sFx0").textContent = _("intensity");
                     docById("sFx1").textContent = _("rate");
 
+                    const myRangeFxs = [docById("myRangeFx0"), docById("myRangeFx1")];
+                    const myspanFxs = [docById("myspanFx0"), docById("myspanFx1")];
+
                     if (this.vibratoEffect.length > 0) {
-                        docById("myRangeFx0").value = parseFloat(this.vibratoParams[0]);
-                        docById("myspanFx0").textContent = this.vibratoParams[0];
+                        myRangeFxs[0].value = parseFloat(this.vibratoParams[0]);
+                        myspanFxs[0].textContent = this.vibratoParams[0];
                         // Scale of rate is 0 to 1, so we need to multiply by 100
-                        docById("myRangeFx1").value = 100 / parseFloat(this.vibratoParams[1]);
+                        myRangeFxs[1].value = 100 / parseFloat(this.vibratoParams[1]);
                         const obj = rationalToFraction(1 / parseFloat(this.vibratoParams[1]));
-                        docById("myspanFx1").textContent = obj[0] + "/" + obj[1]; // this.vibratoParams[1];
+                        myspanFxs[1].textContent = obj[0] + "/" + obj[1]; // this.vibratoParams[1];
                     } else {
                         // If necessary, add a vibrato block.
                         const topOfTimbreClamp =
@@ -2445,12 +2448,12 @@ class TimbreWidget {
                             topOfTimbreClamp
                         );
 
-                        docById("myRangeFx0").value = 5;
-                        docById("myspanFx0").textContent = "5";
+                        myRangeFxs[0].value = 5;
+                        myspanFxs[0].textContent = "5";
                         instrumentsEffects[0][this.instrumentName]["vibratoIntensity"] = 0.05;
 
-                        docById("myRangeFx1").value = 100 / 16;
-                        docById("myspanFx1").textContent = "1/16";
+                        myRangeFxs[1].value = 100 / 16;
+                        myspanFxs[1].textContent = "1/16";
                         instrumentsEffects[0][this.instrumentName]["vibratoFrequency"] = 1 / 16;
                     }
 
@@ -2458,8 +2461,8 @@ class TimbreWidget {
                     document.getElementById("wrapperFx0").addEventListener("change", event => {
                         const elem = event.target;
                         const val = parseFloat(elem.value);
-                        docById("myRangeFx0").value = val;
-                        docById("myspanFx0").textContent = elem.value;
+                        myRangeFxs[0].value = val;
+                        myspanFxs[0].textContent = elem.value;
                         instrumentsEffects[0][this.instrumentName]["vibratoIntensity"] = val / 100;
 
                         this._update(this.vibratoEffect.length - 1, elem.value, 0);
@@ -2469,9 +2472,9 @@ class TimbreWidget {
                     document.getElementById("wrapperFx1").addEventListener("change", event => {
                         const elem = event.target;
                         const val = parseFloat(elem.value);
-                        docById("myRangeFx1").value = val;
+                        myRangeFxs[1].value = val;
                         const obj = oneHundredToFraction(elem.value);
-                        docById("myspanFx1").textContent = obj[0] + "/" + obj[1];
+                        myspanFxs[1].textContent = obj[0] + "/" + obj[1];
                         const temp = parseFloat(obj[0]) / parseFloat(obj[1]);
 
                         instrumentsEffects[0][this.instrumentName]["vibratoFrequency"] = temp;
