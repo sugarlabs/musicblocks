@@ -18,7 +18,7 @@
    numberToPitch, pitchToFrequency, MODE_PIE_MENUS, TEMPERAMENT, generateNoteNames,
    getSavedCustomModes, getModeNamesForGroup, getModeLabel, getModeNameFromLabel,
    getModeSliceColors, updateModeWheelItems, getModeGroupTitleFont, getModeSliceFont,
-   MODEPIEMENU_GROUP_RING, MODEPIEMENU_NAME_RING
+   configureWheel, MODEPIEMENU_GROUP_RING, MODEPIEMENU_NAME_RING
  */
 
 /*
@@ -440,15 +440,6 @@ class ModeWidget {
 
     // ── Modes dropdown helpers ────────────────────────────────────
 
-    _getCustomModes() {
-        try {
-            const modes = JSON.parse(localStorage.getItem("customModes") || "[]");
-            return Array.isArray(modes) ? modes : [];
-        } catch (e) {
-            return [];
-        }
-    }
-
     _saveCustomModesList(modes) {
         try {
             localStorage.setItem("customModes", JSON.stringify(modes));
@@ -462,7 +453,7 @@ class ModeWidget {
     }
 
     _saveCustomMode(name, pattern) {
-        const modes = this._getCustomModes();
+        const modes = getSavedCustomModes();
         const existing = modes.findIndex(m => m.name === name);
         // Refuse to overwrite a built-in mode; only registered customs may be updated.
         if (existing < 0 && name in MUSICALMODES) {
@@ -484,7 +475,7 @@ class ModeWidget {
     }
 
     _deleteCustomMode(name) {
-        const modes = this._getCustomModes();
+        const modes = getSavedCustomModes();
         const filtered = modes.filter(m => m.name !== name);
         this._saveCustomModesList(filtered);
 
@@ -493,7 +484,7 @@ class ModeWidget {
 
     _getModeEDO(modeName) {
         // Saved custom modes carry their native EDO in the registry.
-        const custom = this._getCustomModes().find(m => m.name === modeName);
+        const custom = getSavedCustomModes().find(m => m.name === modeName);
         return custom && custom.edo ? custom.edo : null;
     }
 
@@ -616,7 +607,7 @@ class ModeWidget {
                 this.errorMsg(_("No mode selected."));
                 return;
             }
-            const customs = this._getCustomModes();
+            const customs = getSavedCustomModes();
             if (!customs.some(m => m.name === name)) {
                 this.errorMsg(_("Cannot delete a built-in mode."));
                 return;
@@ -1056,7 +1047,7 @@ class ModeWidget {
     _setModeName() {
         const currentMode = JSON.stringify(this._calculateMode());
         const currentKey = keySignatureToMode(this.turtles.ithTurtle(0).singer.keySignature)[0];
-        const customNames = new Set(this._getCustomModes().map(m => m.name));
+        const customNames = new Set(getSavedCustomModes().map(m => m.name));
 
         for (const mode in MUSICALMODES) {
             // Custom modes are stored with EDO-specific step patterns; built-in
@@ -1259,40 +1250,9 @@ class ModeWidget {
         this._wireWheelEvents(n);
     }
 
-    /**
-     * Applies the shared donut-slice configuration to a wheel: colors, radii,
-     * -90° start angle and zero animation. Options are only applied when
-     * provided, preserving each wheel's existing behavior.
-     * @param {object} wheel - The wheelnav instance to configure.
-     * @param {object} opts
-     * @returns {void}
-     */
-    _configureWheel(wheel, opts) {
-        wheel.colors = opts.colors;
-        wheel.slicePathFunction = slicePath().DonutSlice;
-        wheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        wheel.slicePathCustom.minRadiusPercent = opts.minRadius;
-        wheel.slicePathCustom.maxRadiusPercent = opts.maxRadius;
-        if (opts.clickModeRotate !== undefined) {
-            wheel.clickModeRotate = opts.clickModeRotate;
-        }
-        if (opts.selectionPaths) {
-            wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
-            wheel.sliceInitPathCustom = wheel.slicePathCustom;
-        }
-        wheel.navAngle = -90;
-        wheel.animatetime = 0;
-        if (opts.titleRotateAngle !== undefined) {
-            wheel.titleRotateAngle = opts.titleRotateAngle;
-        }
-        if (opts.titleFont !== undefined) {
-            wheel.titleFont = opts.titleFont;
-        }
-    }
-
     _createModeWheel(n) {
         const titleFontSize = Math.min(48, Math.max(10, Math.floor(580 / n)));
-        this._configureWheel(this._modeWheel, {
+        configureWheel(this._modeWheel, {
             colors: platformColor.modeWheelcolors,
             minRadius: 0.4,
             maxRadius: 0.75,
@@ -1304,7 +1264,7 @@ class ModeWidget {
     }
 
     _createNoteWheel(n) {
-        this._configureWheel(this._noteWheel, {
+        configureWheel(this._noteWheel, {
             colors: platformColor.noteValueWheelcolors,
             minRadius: 0.75,
             maxRadius: 0.9,
@@ -1322,7 +1282,7 @@ class ModeWidget {
     }
 
     _createPlayWheel(n) {
-        this._configureWheel(this._playWheel, {
+        configureWheel(this._playWheel, {
             colors: [platformColor.orange],
             minRadius: 0.3,
             maxRadius: 0.4,
@@ -1410,7 +1370,7 @@ class ModeWidget {
         this._modeGroupWheel = new wheelnav("_modeGroupWheel", this._modePieWheel.raphael);
         // Fixed readable size on the 400px paper; the wheelnav default (48px)
         // overflows every slice and a computed size is too small.
-        this._configureWheel(this._modeGroupWheel, {
+        configureWheel(this._modeGroupWheel, {
             colors: platformColor.modeGroupWheelcolors,
             minRadius: MODEPIEMENU_GROUP_RING.minRadius,
             maxRadius: MODEPIEMENU_GROUP_RING.maxRadius,
@@ -1439,7 +1399,7 @@ class ModeWidget {
             const newWheel = this._modeNameWheel === null;
 
             // Build per-slice colors and (possibly translated) labels.
-            // Declared before the _configureWheel call below so the
+            // Declared before the configureWheel call below so the
             // reference in the options object is not in the temporal dead zone.
             const colors = getModeSliceColors(modes, {
                 emptyColor: platformColor.modePieMenusIfColorPush,
@@ -1450,7 +1410,7 @@ class ModeWidget {
             if (newWheel) {
                 this._modeNameWheel = new wheelnav("_modeNameWheel", this._modePieWheel.raphael);
                 this._modeNameWheel.keynavigateEnabled = false;
-                this._configureWheel(this._modeNameWheel, {
+                configureWheel(this._modeNameWheel, {
                     colors,
                     minRadius: MODEPIEMENU_NAME_RING.minRadius,
                     maxRadius: MODEPIEMENU_NAME_RING.maxRadius,

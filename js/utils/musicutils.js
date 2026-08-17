@@ -2003,6 +2003,44 @@ const getModeSliceFont = (wheelRadius, sliceCount, labelLen) => {
     return `100 ${clamped}px ${MODEPIEMENU_FONT_FAMILY}`;
 };
 
+/**
+ * Applies the shared donut-slice configuration to a wheelnav instance:
+ * colors, radii, -90° start angle, zero animation, and optional selection
+ * paths, title rotation, and title font.
+ * @param {Object} wheel - The wheelnav instance to configure.
+ * @param {Object} opts - Configuration options.
+ * @param {Array} opts.colors - Slice colors.
+ * @param {number} opts.minRadius - Min radius percent (0-1).
+ * @param {number} opts.maxRadius - Max radius percent (0-1).
+ * @param {boolean} [opts.clickModeRotate] - Whether clicks rotate the wheel.
+ * @param {boolean} [opts.selectionPaths] - Whether to sync selected/init paths.
+ * @param {number} [opts.titleRotateAngle] - Title rotation angle.
+ * @param {string} [opts.titleFont] - Title font CSS string.
+ * @returns {void}
+ */
+const configureWheel = (wheel, opts) => {
+    wheel.colors = opts.colors;
+    wheel.slicePathFunction = slicePath().DonutSlice;
+    wheel.slicePathCustom = slicePath().DonutSliceCustomization();
+    wheel.slicePathCustom.minRadiusPercent = opts.minRadius;
+    wheel.slicePathCustom.maxRadiusPercent = opts.maxRadius;
+    if (opts.clickModeRotate !== undefined) {
+        wheel.clickModeRotate = opts.clickModeRotate;
+    }
+    if (opts.selectionPaths) {
+        wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
+        wheel.sliceInitPathCustom = wheel.slicePathCustom;
+    }
+    wheel.navAngle = -90;
+    wheel.animatetime = 0;
+    if (opts.titleRotateAngle !== undefined) {
+        wheel.titleRotateAngle = opts.titleRotateAngle;
+    }
+    if (opts.titleFont !== undefined) {
+        wheel.titleFont = opts.titleFont;
+    }
+};
+
 // The table contains the intervals that define the modes.
 // All of these modes assume 12 semitones per octave.
 // See http://www.pianoscales.org <== this is in no way definitive
@@ -8163,6 +8201,7 @@ if (typeof module !== "undefined" && module.exports) {
         getModeSliceColors,
         updateModeWheelItems,
         getModeGroupTitleFont,
-        getModeSliceFont
+        getModeSliceFont,
+        configureWheel
     };
 }

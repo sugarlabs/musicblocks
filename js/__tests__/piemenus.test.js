@@ -161,6 +161,8 @@ global.getModeSliceFont = (wheelRadius, sliceCount, labelLen) => {
     const clamped = Math.min(maxSize, Math.max(minSize, size));
     return `100 ${clamped}px sans-serif`;
 };
+global.configureWheel = jest.fn();
+
 global.Synth = jest.fn().mockImplementation(() => ({
     newTone: jest.fn(),
     tone: {},

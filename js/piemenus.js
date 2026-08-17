@@ -18,8 +18,8 @@
    PREVIEWVOLUME, DEFAULTVOLUME, MODE_PIE_MENUS,
    getSavedCustomModes, getModeNamesForGroup, getModeLabel,
    getModeNameFromLabel, getModeSliceColors, updateModeWheelItems,
-   getModeGroupTitleFont, getModeSliceFont, MODEPIEMENU_GROUP_RING,
-   MODEPIEMENU_NAME_RING,
+   getModeGroupTitleFont, getModeSliceFont, configureWheel,
+   MODEPIEMENU_GROUP_RING, MODEPIEMENU_NAME_RING,
    INTERVALVALUES, INTERVALS, getDrumSynthName, getVoiceSynthName,
    getMunsellColor, COLORS40, frequencyToPitch, instruments,
    DOUBLESHARP, NATURAL, DOUBLEFLAT, EQUIVALENTACCIDENTALS,
@@ -3499,40 +3499,20 @@ const piemenuModes = (block, selectedMode) => {
     // exit button
     block._exitWheel = new wheelnav("_exitWheel", block._modeWheel.raphael);
 
-    // Shared wheelnav factory: applies the common donut-slice styling so the
-    // three mode-selection wheels (mode, group, name) share identical visual
-    // configuration.
-    const makeWheel = (id, paper, { colors, minRadius, maxRadius, titleFont }) => {
-        const w = new wheelnav(id, paper);
-        w.colors = colors;
-        w.slicePathFunction = slicePath().DonutSlice;
-        w.slicePathCustom = slicePath().DonutSliceCustomization();
-        w.slicePathCustom.minRadiusPercent = minRadius;
-        w.slicePathCustom.maxRadiusPercent = maxRadius;
-        w.sliceSelectedPathCustom = w.slicePathCustom;
-        w.sliceInitPathCustom = w.slicePathCustom;
-        if (titleFont) w.titleFont = titleFont;
-        w.clickModeRotate = false;
-        w.navAngle = -90;
-        w.animatetime = 0;
-        return w;
-    };
-
-    block._modeWheel.colors = platformColor.modeWheelcolors;
-    block._modeWheel.slicePathFunction = slicePath().DonutSlice;
-    block._modeWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-    block._modeWheel.slicePathCustom.minRadiusPercent = 0.85;
-    block._modeWheel.slicePathCustom.maxRadiusPercent = 1;
-    block._modeWheel.sliceSelectedPathCustom = block._modeWheel.slicePathCustom;
-    block._modeWheel.sliceInitPathCustom = block._modeWheel.slicePathCustom;
-    block._modeWheel.clickModeRotate = false;
-    block._modeWheel.navAngle = -90;
-    block._modeWheel.animatetime = 0;
     const currentEDO = getCurrentEDO(block.activity.logo.synth.inTemperament);
     const modeWheelLabels = Array.from({ length: currentEDO }, (_, i) => String(i));
+
+    configureWheel(block._modeWheel, {
+        colors: platformColor.modeWheelcolors,
+        minRadius: 0.85,
+        maxRadius: 1,
+        clickModeRotate: false,
+        selectionPaths: true
+    });
     block._modeWheel.createWheel(modeWheelLabels);
 
-    block._modeGroupWheel = makeWheel("_modeGroupWheel", block._modeWheel.raphael, {
+    block._modeGroupWheel = new wheelnav("_modeGroupWheel", block._modeWheel.raphael);
+    configureWheel(block._modeGroupWheel, {
         colors: platformColor.modeGroupWheelcolors,
         minRadius: MODEPIEMENU_GROUP_RING.minRadius,
         maxRadius: MODEPIEMENU_GROUP_RING.maxRadius,
@@ -3550,14 +3530,13 @@ const piemenuModes = (block, selectedMode) => {
 
     block._modeGroupWheel.createWheel(xlabels);
 
-    block._exitWheel.colors = platformColor.exitWheelcolors;
-    block._exitWheel.slicePathFunction = slicePath().DonutSlice;
-    block._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-    block._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-    block._exitWheel.slicePathCustom.maxRadiusPercent = 0.15;
-    block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
-    block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
-    block._exitWheel.clickModeRotate = false;
+    configureWheel(block._exitWheel, {
+        colors: platformColor.exitWheelcolors,
+        minRadius: 0.0,
+        maxRadius: 0.15,
+        clickModeRotate: false,
+        selectionPaths: true
+    });
     block._exitWheel.initWheel(["×", "▶"]); // imgsrc:header-icons/play-button.svg']);
     block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
@@ -3617,7 +3596,8 @@ const piemenuModes = (block, selectedMode) => {
     const __buildModeNameWheel = grp => {
         let newWheel = false;
         if (that._modeNameWheel === null) {
-            that._modeNameWheel = makeWheel("_modeNameWheel", that._modeWheel.raphael, {
+            that._modeNameWheel = new wheelnav("_modeNameWheel", that._modeWheel.raphael);
+            configureWheel(that._modeNameWheel, {
                 colors: [],
                 minRadius: MODEPIEMENU_NAME_RING.minRadius,
                 maxRadius: MODEPIEMENU_NAME_RING.maxRadius
@@ -3824,28 +3804,31 @@ const piemenuModes = (block, selectedMode) => {
 
     // navigate to a specific starting point
     let foundMode = false;
-    for (modeGroup in MODE_PIE_MENUS) {
+    let matchedGroup = "";
+    for (const group in MODE_PIE_MENUS) {
         let j;
-        for (j = 0; j < MODE_PIE_MENUS[modeGroup].length; j++) {
-            const modename = MODE_PIE_MENUS[modeGroup][j];
+        for (j = 0; j < MODE_PIE_MENUS[group].length; j++) {
+            const modename = MODE_PIE_MENUS[group][j];
             if (modename === selectedMode) {
                 break;
             }
         }
 
-        if (j < MODE_PIE_MENUS[modeGroup].length) {
+        if (j < MODE_PIE_MENUS[group].length) {
             foundMode = true;
+            matchedGroup = group;
             break;
         }
     }
 
     if (!foundMode && savedCustomModes.some(m => m.name === selectedMode)) {
-        modeGroup = "custom";
+        matchedGroup = "custom";
     }
 
     if (selectedMode === "major") {
-        modeGroup = "7";
+        matchedGroup = "7";
     }
+    modeGroup = matchedGroup;
 
     const __buildModeWheel = () => {
         const i = that._modeGroupWheel.selectedNavItemIndex;
@@ -3855,12 +3838,8 @@ const piemenuModes = (block, selectedMode) => {
 
     for (let i = 0; i < block._modeGroupWheel.navItems.length; i++) {
         block._modeGroupWheel.navItems[i].navigateFunction = __buildModeWheel;
-    }
-
-    for (let i = 0; i < block._modeGroupWheel.navItems.length; i++) {
         if (block._modeGroupWheel.navItems[i].title === modeGroup) {
             block._modeGroupWheel.navigateWheel(i);
-            break;
         }
     }
 

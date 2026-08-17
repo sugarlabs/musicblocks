@@ -92,7 +92,8 @@ const {
     getModeSliceColors,
     updateModeWheelItems,
     getModeGroupTitleFont,
-    getModeSliceFont
+    getModeSliceFont,
+    configureWheel
 } = require("../../utils/musicutils.js");
 global.MODEPIEMENU_GROUP_RING = MODEPIEMENU_GROUP_RING;
 global.MODEPIEMENU_NAME_RING = MODEPIEMENU_NAME_RING;
@@ -104,6 +105,7 @@ global.getModeSliceColors = getModeSliceColors;
 global.updateModeWheelItems = updateModeWheelItems;
 global.getModeGroupTitleFont = getModeGroupTitleFont;
 global.getModeSliceFont = getModeSliceFont;
+global.configureWheel = configureWheel;
 
 // Mock slicePath
 global.slicePath = jest.fn().mockReturnValue({
