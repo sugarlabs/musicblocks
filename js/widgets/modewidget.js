@@ -456,9 +456,18 @@ class ModeWidget {
         const modes = getSavedCustomModes();
         const existing = modes.findIndex(m => m.name === name);
         // Refuse to overwrite a built-in mode; only registered customs may be updated.
-        if (existing < 0 && name in MUSICALMODES) {
-            this.errorMsg(_("Cannot overwrite built-in mode: ") + name);
-            return false;
+        // Check case-insensitively against built-in modes (which are all lowercase),
+        // but allow case-sensitive updates to existing custom modes via `existing`.
+        if (existing < 0) {
+            const customNamesLower = new Set(modes.map(m => m.name.toLowerCase()));
+            const isBuiltIn = Object.keys(MUSICALMODES).some(
+                k =>
+                    k.toLowerCase() === name.toLowerCase() && !customNamesLower.has(k.toLowerCase())
+            );
+            if (isBuiltIn) {
+                this.errorMsg(_("Cannot overwrite built-in mode: ") + name);
+                return false;
+            }
         }
         const entry = { name, pattern, edo: this._activeEDO };
         if (existing >= 0) {
