@@ -38,6 +38,7 @@ This PR fixes #
 - [ ] Tests — Adds or updates test coverage
 - [ ] Documentation — Updates to docs, comments, or README
 - [ ] Chore / Refactor — Maintenance, cleanup, or refactoring with no behavior change
+- [ ] i18n — Internationalization and localization changes
 - [ ] CI/CD — Changes to CI/CD workflows and automation
 
 ## Changes Made
@@ -65,6 +66,7 @@ This PR fixes #
 <!--- You can add or remove items as needed. -->
 
 - [ ] I have tested these changes locally and they work as expected.
+- [ ] I have included before/after screenshots if applicable, especially for UX/feature changes.
 - [ ] I have added/updated tests that prove the effectiveness of these changes.
 - [ ] I have updated the documentation to reflect these changes, if applicable.
 - [ ] I have followed the project's coding style guidelines.
