@@ -191,7 +191,7 @@ class PitchSlider {
             this.widgetWindow.addButton(
                 "reload.svg",
                 PitchSlider.ICONSIZE,
-                _("Reset frequency"),
+                _("Reset"),
                 toolBarDiv
             ).onclick = () => {
                 const initialFreq =

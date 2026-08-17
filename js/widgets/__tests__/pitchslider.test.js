@@ -524,9 +524,7 @@ describe("PitchSlider Widget", () => {
             rangeSlider.value = "600";
             slider.frequencies[0] = 600;
 
-            const resetBtn = slider.widgetWindow
-                .getButtons()
-                .find(b => b.tip === "Reset frequency");
+            const resetBtn = slider.widgetWindow.getButtons().find(b => b.tip === "Reset");
             resetBtn.onclick();
 
             expect(parseFloat(rangeSlider.value)).toBe(440);
