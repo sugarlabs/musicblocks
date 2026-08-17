@@ -2287,6 +2287,15 @@ class TimbreWidget {
         for (let i = 0; i < effectsName.length; i++) {
             effectsName[i].onclick = async event => {
                 effectChosen = event.target.value;
+
+                // Ensure the effects object exists for this instrument.
+                if (
+                    !instrumentsEffects[0][this.instrumentName] ||
+                    Array.isArray(instrumentsEffects[0][this.instrumentName])
+                ) {
+                    instrumentsEffects[0][this.instrumentName] = {};
+                }
+
                 subDiv.textContent = "";
                 const chosenNode = document.createElement("div");
                 chosenNode.id = "chosen";
