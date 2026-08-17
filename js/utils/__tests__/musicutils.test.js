@@ -124,7 +124,17 @@ const {
     scalePatternToEDO,
     PITCH_COLLECTIONS_EDO_OVERRIDES,
     getModePattern,
-    generateNoteNames
+    generateNoteNames,
+    MODEPIEMENU_GROUP_RING,
+    MODEPIEMENU_NAME_RING,
+    getSavedCustomModes,
+    getModeNamesForGroup,
+    getModeLabel,
+    getModeNameFromLabel,
+    getModeSliceColors,
+    updateModeWheelItems,
+    getModeGroupTitleFont,
+    getModeSliceFont
 } = require("../musicutils");
 
 const DOUBLESHARP = "\ud834\udd2a";
@@ -3773,5 +3783,123 @@ describe("getStepSizeDown with custom temperament", () => {
         // proportional 12-EDO result (-2) produced by the PITCHES2 walk.
         const result = getStepSizeDown("C major", "C#", 5, "testWithRatios19");
         expect(result).toBe(-1);
+    });
+});
+
+describe("mode pie menu shared helpers", () => {
+    describe("getModeNamesForGroup", () => {
+        it("returns the built-in group list untouched", () => {
+            const modes = getModeNamesForGroup("7", []);
+            expect(modes.length).toBe(12);
+            expect(modes).toContain("ionian");
+            expect(modes).toContain("aeolian");
+        });
+
+        it("pads the custom group to the fixed 12-slot layout and preserves caller sentinels", () => {
+            const modes = getModeNamesForGroup("custom", ["+", "my mode", "other"]);
+            expect(modes.length).toBe(12);
+            expect(modes.slice(0, 3)).toEqual(["+", "my mode", "other"]);
+            expect(modes.slice(3)).toEqual(new Array(9).fill(" "));
+        });
+    });
+
+    describe("getModeLabel", () => {
+        it("translates the major/ionian pair and leaves blank slots blank", () => {
+            expect(getModeLabel("major")).toBe("major / ionian");
+            expect(getModeLabel("ionian")).toBe("major / ionian");
+            expect(getModeLabel(" ")).toBe(" ");
+        });
+    });
+
+    describe("getModeNameFromLabel", () => {
+        const modes = ["ionian", " ", "dorian", " ", "aeolian"];
+
+        it("resolves the major/ionian label to major", () => {
+            expect(getModeNameFromLabel("major / ionian", modes)).toBe("major");
+        });
+
+        it("falls back to the label itself when nothing matches", () => {
+            expect(getModeNameFromLabel("unknown", modes)).toBe("unknown");
+        });
+    });
+
+    describe("getModeSliceColors", () => {
+        it("maps blanks to the empty color and modes to the filled color", () => {
+            const colors = getModeSliceColors([" ", "dorian", " "], {
+                emptyColor: "empty",
+                filledColor: "filled"
+            });
+            expect(colors).toEqual(["empty", "filled", "empty"]);
+        });
+    });
+
+    describe("updateModeWheelItems", () => {
+        it("updates every title copy and fill attribute then refreshes", () => {
+            const refreshWheel = jest.fn();
+            const wheel = {
+                navItems: [
+                    {
+                        title: "old",
+                        basicNavTitleMax: {},
+                        basicNavTitleMin: {},
+                        hoverNavTitleMax: {},
+                        hoverNavTitleMin: {},
+                        selectedNavTitleMax: {},
+                        selectedNavTitleMin: {},
+                        initNavTitle: {},
+                        fillAttr: "old",
+                        sliceHoverAttr: {},
+                        slicePathAttr: {},
+                        sliceSelectedAttr: {}
+                    }
+                ],
+                refreshWheel
+            };
+
+            updateModeWheelItems(wheel, ["new"], ["#123456"]);
+
+            const item = wheel.navItems[0];
+            expect(item.title).toBe("new");
+            expect(item.basicNavTitleMax.title).toBe("new");
+            expect(item.basicNavTitleMin.title).toBe("new");
+            expect(item.hoverNavTitleMax.title).toBe("new");
+            expect(item.hoverNavTitleMin.title).toBe("new");
+            expect(item.selectedNavTitleMax.title).toBe("new");
+            expect(item.selectedNavTitleMin.title).toBe("new");
+            expect(item.initNavTitle.title).toBe("new");
+            expect(item.fillAttr).toBe("#123456");
+            expect(item.sliceHoverAttr.fill).toBe("#123456");
+            expect(item.slicePathAttr.fill).toBe("#123456");
+            expect(item.sliceSelectedAttr.fill).toBe("#123456");
+            expect(refreshWheel).toHaveBeenCalled();
+        });
+    });
+
+    describe("shared mode pie menu geometry", () => {
+        it("scales the group title font with the wheel radius", () => {
+            expect(getModeGroupTitleFont(200)).toBe("100 16px sans-serif");
+            expect(getModeGroupTitleFont(600)).toBe("100 48px sans-serif");
+        });
+    });
+
+    describe("getSavedCustomModes", () => {
+        afterEach(() => {
+            localStorage.clear();
+        });
+
+        it("parses saved modes and keeps only entries with a string name", () => {
+            localStorage.setItem(
+                "customModes",
+                JSON.stringify([{ name: "my mode", pattern: [1, 2] }, { pattern: [1] }, null])
+            );
+            expect(getSavedCustomModes()).toEqual([{ name: "my mode", pattern: [1, 2] }]);
+        });
+
+        it("returns an empty list for corrupt or non-array data", () => {
+            localStorage.setItem("customModes", "{not json");
+            expect(getSavedCustomModes()).toEqual([]);
+            localStorage.setItem("customModes", JSON.stringify({ name: "not an array" }));
+            expect(getSavedCustomModes()).toEqual([]);
+        });
     });
 });

@@ -15,7 +15,10 @@
    docById, _, platformColor, keySignatureToMode, MUSICALMODES,
    getNote, DEFAULTVOICE, last, NOTESTABLE, slicePath, wheelnav,
    normalizeNoteAccidentals, getCurrentEDO, getModePattern, DEFAULTMODE,
-   numberToPitch, pitchToFrequency, MODE_PIE_MENUS, TEMPERAMENT, generateNoteNames
+   numberToPitch, pitchToFrequency, MODE_PIE_MENUS, TEMPERAMENT, generateNoteNames,
+   getSavedCustomModes, getModeNamesForGroup, getModeLabel, getModeNameFromLabel,
+   getModeSliceColors, updateModeWheelItems, getModeGroupTitleFont, getModeSliceFont,
+   MODEPIEMENU_GROUP_RING, MODEPIEMENU_NAME_RING
  */
 
 /*
@@ -1383,9 +1386,7 @@ class ModeWidget {
         if (this._modePiemenuOpen) return;
         this._modePiemenuOpen = true;
 
-        const savedCustomModes = this._getCustomModes().filter(
-            m => m && typeof m.name === "string"
-        );
+        const savedCustomModes = getSavedCustomModes();
 
         // Swap the note-edit wheel for the mode-selection piemenu. The piemenu
         // renders on its own div/paper, so the two never overlap or intercept
@@ -1405,24 +1406,15 @@ class ModeWidget {
         // create a new custom mode, even when none are saved yet.
         const groupLabels = Object.keys(MODE_PIE_MENUS);
 
-        // Font size that fits the longest label inside one slice, computed from
-        // the arc at the ring's mid-radius (titleRadiusPercent of 200px) on a
-        // 400px paper.
-        const __sliceFontPx = (sliceCount, longestLabel, titleRadiusPercent) => {
-            const arcPx =
-                (2 * Math.PI * titleRadiusPercent * (ModeWidget.WHEELSIZE / 2)) / sliceCount;
-            return Math.min(24, Math.max(12, Math.floor((arcPx * 0.85) / (longestLabel * 0.6))));
-        };
-
         // Outer ring: group wheel
         this._modeGroupWheel = new wheelnav("_modeGroupWheel", this._modePieWheel.raphael);
         // Fixed readable size on the 400px paper; the wheelnav default (48px)
         // overflows every slice and a computed size is too small.
         this._configureWheel(this._modeGroupWheel, {
             colors: platformColor.modeGroupWheelcolors,
-            minRadius: 0.15,
-            maxRadius: 0.3,
-            titleFont: "100 16px sans-serif"
+            minRadius: MODEPIEMENU_GROUP_RING.minRadius,
+            maxRadius: MODEPIEMENU_GROUP_RING.maxRadius,
+            titleFont: getModeGroupTitleFont(ModeWidget.WHEELSIZE / 2)
         });
         this._modeGroupWheel.createWheel(groupLabels);
 
@@ -1432,15 +1424,8 @@ class ModeWidget {
             ? this._modeGroupName
             : groupLabels[0];
 
-        const __modesForGroup = grp => {
-            if (grp === "custom") {
-                // "+" is the create-new-mode sentinel, always first.
-                const names = ["+", ...savedCustomModes.map(m => m.name)].slice(0, 12);
-                while (names.length < 12) names.push(" ");
-                return names;
-            }
-            return MODE_PIE_MENUS[grp];
-        };
+        const __modesForGroup = grp =>
+            getModeNamesForGroup(grp, ["+", ...savedCustomModes.map(m => m.name)]);
 
         const __buildModeNameWheel = grp => {
             currentGroup = grp;
@@ -1456,37 +1441,19 @@ class ModeWidget {
             // Build per-slice colors and (possibly translated) labels.
             // Declared before the _configureWheel call below so the
             // reference in the options object is not in the temporal dead zone.
-            const colors = [];
-            const labels = [];
-            for (let i = 0; i < modes.length; i++) {
-                const modename = modes[i];
-                colors.push(
-                    modename === " "
-                        ? platformColor.modePieMenusIfColorPush
-                        : platformColor.modePieMenusElseColorPush
-                );
-                switch (modename) {
-                    case "ionian":
-                    case "major":
-                        labels.push(`${_("major")} / ${_("ionian")}`);
-                        break;
-                    case "aeolian":
-                    case "minor":
-                        labels.push(`${_("minor")} / ${_("aeolian")}`);
-                        break;
-                    default:
-                        labels.push(modename === " " ? " " : _(modename));
-                        break;
-                }
-            }
+            const colors = getModeSliceColors(modes, {
+                emptyColor: platformColor.modePieMenusIfColorPush,
+                filledColor: platformColor.modePieMenusElseColorPush
+            });
+            const labels = modes.map(modename => getModeLabel(modename));
 
             if (newWheel) {
                 this._modeNameWheel = new wheelnav("_modeNameWheel", this._modePieWheel.raphael);
                 this._modeNameWheel.keynavigateEnabled = false;
                 this._configureWheel(this._modeNameWheel, {
                     colors,
-                    minRadius: 0.3,
-                    maxRadius: 0.85,
+                    minRadius: MODEPIEMENU_NAME_RING.minRadius,
+                    maxRadius: MODEPIEMENU_NAME_RING.maxRadius,
                     selectionPaths: true,
                     titleRotateAngle: 0
                 });
@@ -1495,31 +1462,18 @@ class ModeWidget {
             if (newWheel) {
                 this._modeNameWheel.createWheel(labels);
             } else {
-                // wheelnav keeps per-state title copies; update them all (as
-                // piemenus.js does) before re-rendering.
-                for (let i = 0; i < this._modeNameWheel.navItems.length; i++) {
-                    const item = this._modeNameWheel.navItems[i];
-                    item.title = labels[i];
-                    item.basicNavTitleMax.title = labels[i];
-                    item.basicNavTitleMin.title = labels[i];
-                    item.hoverNavTitleMax.title = labels[i];
-                    item.hoverNavTitleMin.title = labels[i];
-                    item.selectedNavTitleMax.title = labels[i];
-                    item.selectedNavTitleMin.title = labels[i];
-                    item.initNavTitle.title = labels[i];
-                    item.fillAttr = colors[i];
-                    item.sliceHoverAttr.fill = colors[i];
-                    item.slicePathAttr.fill = colors[i];
-                    item.sliceSelectedAttr.fill = colors[i];
-                }
-                this._modeNameWheel.refreshWheel();
+                updateModeWheelItems(this._modeNameWheel, labels, colors);
             }
 
             // Size each label to fit its own slice arc; the 12 slots are fixed,
             // so short names render large and only long ones shrink. Applied
             // post-createWheel via the per-item title attributes.
             for (let i = 0; i < this._modeNameWheel.navItems.length; i++) {
-                const font = `100 ${__sliceFontPx(modes.length, labels[i].length, 0.575)}px sans-serif`;
+                const font = getModeSliceFont(
+                    ModeWidget.WHEELSIZE / 2,
+                    modes.length,
+                    labels[i].length
+                );
                 const item = this._modeNameWheel.navItems[i];
                 item.titleAttr.font = font;
                 item.titleHoverAttr.font = font;
@@ -1553,18 +1507,7 @@ class ModeWidget {
                     }
 
                     // Strip translation wrapper for major/minor
-                    let modeName = title;
-                    if (title === `${_("major")} / ${_("ionian")}`) modeName = "major";
-                    else if (title === `${_("minor")} / ${_("aeolian")}`) modeName = "aeolian";
-                    else {
-                        const ms = __modesForGroup(currentGroup);
-                        for (const m of ms) {
-                            if (_(m) === title) {
-                                modeName = m;
-                                break;
-                            }
-                        }
-                    }
+                    const modeName = getModeNameFromLabel(title, __modesForGroup(currentGroup));
 
                     this._selectedModeName = modeName;
                     const mode = MUSICALMODES[modeName];

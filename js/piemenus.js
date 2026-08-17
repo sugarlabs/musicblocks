@@ -16,6 +16,10 @@
    platformColor, docById, Singer, slicePath, wheelnav,
    DEFAULTVOICE, getDrumName, getNote, MUSICALMODES last, SHARP, FLAT,
    PREVIEWVOLUME, DEFAULTVOLUME, MODE_PIE_MENUS,
+   getSavedCustomModes, getModeNamesForGroup, getModeLabel,
+   getModeNameFromLabel, getModeSliceColors, updateModeWheelItems,
+   getModeGroupTitleFont, getModeSliceFont, MODEPIEMENU_GROUP_RING,
+   MODEPIEMENU_NAME_RING,
    INTERVALVALUES, INTERVALS, getDrumSynthName, getVoiceSynthName,
    getMunsellColor, COLORS40, frequencyToPitch, instruments,
    DOUBLESHARP, NATURAL, DOUBLEFLAT, EQUIVALENTACCIDENTALS,
@@ -3486,15 +3490,7 @@ const piemenuModes = (block, selectedMode) => {
 
     // Saved custom modes from the mode widget, shown in a dedicated "custom"
     // pie menu group so they can be selected without opening the editor.
-    let savedCustomModes = [];
-    try {
-        const customModes = JSON.parse(localStorage.getItem("customModes") || "[]");
-        savedCustomModes = Array.isArray(customModes)
-            ? customModes.filter(m => m && typeof m.name === "string")
-            : [];
-    } catch (e) {
-        savedCustomModes = [];
-    }
+    const savedCustomModes = getSavedCustomModes();
 
     //Use advanced constructor for more wheelnav on same div
     block._modeWheel = new wheelnav("wheelDiv", null, 1200, 1200);
@@ -3503,7 +3499,24 @@ const piemenuModes = (block, selectedMode) => {
     // exit button
     block._exitWheel = new wheelnav("_exitWheel", block._modeWheel.raphael);
 
-    wheelnav.cssMode = true;
+    // Shared wheelnav factory: applies the common donut-slice styling so the
+    // three mode-selection wheels (mode, group, name) share identical visual
+    // configuration.
+    const makeWheel = (id, paper, { colors, minRadius, maxRadius, titleFont }) => {
+        const w = new wheelnav(id, paper);
+        w.colors = colors;
+        w.slicePathFunction = slicePath().DonutSlice;
+        w.slicePathCustom = slicePath().DonutSliceCustomization();
+        w.slicePathCustom.minRadiusPercent = minRadius;
+        w.slicePathCustom.maxRadiusPercent = maxRadius;
+        w.sliceSelectedPathCustom = w.slicePathCustom;
+        w.sliceInitPathCustom = w.slicePathCustom;
+        if (titleFont) w.titleFont = titleFont;
+        w.clickModeRotate = false;
+        w.navAngle = -90;
+        w.animatetime = 0;
+        return w;
+    };
 
     block._modeWheel.colors = platformColor.modeWheelcolors;
     block._modeWheel.slicePathFunction = slicePath().DonutSlice;
@@ -3512,29 +3525,19 @@ const piemenuModes = (block, selectedMode) => {
     block._modeWheel.slicePathCustom.maxRadiusPercent = 1;
     block._modeWheel.sliceSelectedPathCustom = block._modeWheel.slicePathCustom;
     block._modeWheel.sliceInitPathCustom = block._modeWheel.slicePathCustom;
-
-    // Disable rotation, set navAngle and create the menus
     block._modeWheel.clickModeRotate = false;
     block._modeWheel.navAngle = -90;
-    // block._modeWheel.selectedNavItemIndex = 2;
-    block._modeWheel.animatetime = 0; // 300;
+    block._modeWheel.animatetime = 0;
     const currentEDO = getCurrentEDO(block.activity.logo.synth.inTemperament);
     const modeWheelLabels = Array.from({ length: currentEDO }, (_, i) => String(i));
     block._modeWheel.createWheel(modeWheelLabels);
 
-    block._modeGroupWheel.colors = platformColor.modeGroupWheelcolors;
-    block._modeGroupWheel.slicePathFunction = slicePath().DonutSlice;
-    block._modeGroupWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-    block._modeGroupWheel.slicePathCustom.minRadiusPercent = 0.15;
-    block._modeGroupWheel.slicePathCustom.maxRadiusPercent = 0.3;
-    block._modeGroupWheel.sliceSelectedPathCustom = block._modeGroupWheel.slicePathCustom;
-    block._modeGroupWheel.sliceInitPathCustom = block._modeGroupWheel.slicePathCustom;
-
-    // Disable rotation, set navAngle and create the menus
-    // block._modeGroupWheel.clickModeRotate = false;
-    block._modeGroupWheel.navAngle = -90;
-    // block._modeGroupWheel.selectedNavItemIndex = 2;
-    block._modeGroupWheel.animatetime = 0; // 300;
+    block._modeGroupWheel = makeWheel("_modeGroupWheel", block._modeWheel.raphael, {
+        colors: platformColor.modeGroupWheelcolors,
+        minRadius: MODEPIEMENU_GROUP_RING.minRadius,
+        maxRadius: MODEPIEMENU_GROUP_RING.maxRadius,
+        titleFont: getModeGroupTitleFont(block._modeWheel.wheelRadius)
+    });
 
     const xlabels = [];
     for (const modegroup in MODE_PIE_MENUS) {
@@ -3570,16 +3573,11 @@ const piemenuModes = (block, selectedMode) => {
     const that = block;
 
     // Mode list for a group; "custom" is dynamic, padded to the fixed 12-slot layout.
-    const __modesForGroup = grp => {
-        if (grp === "custom") {
-            const names = savedCustomModes.map(m => m.name).slice(0, 12);
-            while (names.length < 12) {
-                names.push(" ");
-            }
-            return names;
-        }
-        return MODE_PIE_MENUS[grp];
-    };
+    const __modesForGroup = grp =>
+        getModeNamesForGroup(
+            grp,
+            savedCustomModes.map(m => m.name)
+        );
 
     const __selectionChanged = () => {
         const title = that._modeNameWheel.navItems[that._modeNameWheel.selectedNavItemIndex].title;
@@ -3591,21 +3589,7 @@ const piemenuModes = (block, selectedMode) => {
             that.text.text =
                 that._modeNameWheel.navItems[that._modeNameWheel.selectedNavItemIndex].title;
 
-            if (that.text.text === `${_("major")} / ${_("ionian")}`) {
-                that.value = "major";
-            } else if (that.text.text === `${_("minor")} / ${_("aeolian")}`) {
-                that.value = "aeolian";
-            } else {
-                const modes = __modesForGroup(modeGroup);
-                for (let i = 0; i < modes.length; i++) {
-                    const modename = modes[i];
-
-                    if (_(modename) === that.text.text) {
-                        that.value = modename;
-                        break;
-                    }
-                }
-            }
+            that.value = getModeNameFromLabel(that.text.text, __modesForGroup(modeGroup));
 
             // Make sure text is on top.
             that.container.setChildIndex(that.text, that.container.children.length - 1);
@@ -3633,87 +3617,49 @@ const piemenuModes = (block, selectedMode) => {
     const __buildModeNameWheel = grp => {
         let newWheel = false;
         if (that._modeNameWheel === null) {
-            that._modeNameWheel = new wheelnav("_modeNameWheel", that._modeWheel.raphael);
+            that._modeNameWheel = makeWheel("_modeNameWheel", that._modeWheel.raphael, {
+                colors: [],
+                minRadius: MODEPIEMENU_NAME_RING.minRadius,
+                maxRadius: MODEPIEMENU_NAME_RING.maxRadius
+            });
+            that._modeNameWheel.keynavigateEnabled = false;
             newWheel = true;
         }
-
-        that._modeNameWheel.keynavigateEnabled = false;
 
         const modes = __modesForGroup(grp);
 
         // Customize slicePaths
-        const colors = [];
-        for (let i = 0; i < modes.length; i++) {
-            const modename = modes[i];
-            if (modename === " ") {
-                colors.push(platformColor.modePieMenusIfColorPush);
-            } else {
-                colors.push(platformColor.modePieMenusElseColorPush);
-            }
-        }
+        const colors = getModeSliceColors(modes, {
+            emptyColor: platformColor.modePieMenusIfColorPush,
+            filledColor: platformColor.modePieMenusElseColorPush
+        });
 
         that._modeNameWheel.colors = colors;
-        that._modeNameWheel.slicePathFunction = slicePath().DonutSlice;
-        that._modeNameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        that._modeNameWheel.slicePathCustom.minRadiusPercent = 0.3; //0.15;
-        that._modeNameWheel.slicePathCustom.maxRadiusPercent = 0.85;
-        that._modeNameWheel.sliceSelectedPathCustom = that._modeNameWheel.slicePathCustom;
-        that._modeNameWheel.sliceInitPathCustom = that._modeNameWheel.slicePathCustom;
         that._modeNameWheel.titleRotateAngle = 0;
-        // that._modeNameWheel.clickModeRotate = false;
-        that._modeNameWheel.navAngle = -90;
         const labels = new Array();
         for (let i = 0; i < modes.length; i++) {
-            const modename = modes[i];
-            switch (modename) {
-                case "ionian":
-                case "major":
-                    labels.push(`${_("major")} / ${_("ionian")}`);
-                    break;
-                case "aeolian":
-                case "minor":
-                    labels.push(`${_("minor")} / ${_("aeolian")}`);
-                    break;
-                default:
-                    if (modename === " ") {
-                        labels.push(" ");
-                    } else {
-                        labels.push(_(modename));
-                    }
-                    break;
-            }
+            labels.push(getModeLabel(modes[i]));
         }
 
-        that._modeNameWheel.animatetime = 0; // 300;
+        that._modeNameWheel.animatetime = 0;
         if (newWheel) {
             that._modeNameWheel.createWheel(labels);
         } else {
-            for (let i = 0; i < that._modeNameWheel.navItems.length; i++) {
-                // Maybe there is a method that does this?
-                that._modeNameWheel.navItems[i].title = labels[i];
-                that._modeNameWheel.navItems[i].basicNavTitleMax.title = labels[i];
-                that._modeNameWheel.navItems[i].basicNavTitleMin.title = labels[i];
-                that._modeNameWheel.navItems[i].hoverNavTitleMax.title = labels[i];
-                that._modeNameWheel.navItems[i].hoverNavTitleMin.title = labels[i];
-                that._modeNameWheel.navItems[i].selectedNavTitleMax.title = labels[i];
-                that._modeNameWheel.navItems[i].selectedNavTitleMin.title = labels[i];
-                that._modeNameWheel.navItems[i].initNavTitle.title = labels[i];
-                that._modeNameWheel.navItems[i].fillAttr = colors[i];
-                that._modeNameWheel.navItems[i].sliceHoverAttr.fill = colors[i];
-                that._modeNameWheel.navItems[i].slicePathAttr.fill = colors[i];
-                that._modeNameWheel.navItems[i].sliceSelectedAttr.fill = colors[i];
-            }
-
-            that._modeNameWheel.refreshWheel();
+            updateModeWheelItems(that._modeNameWheel, labels, colors);
         }
 
-        // Special case for Japanese
-        const language = localStorage.languagePreference;
-        if (language === "ja") {
-            for (let i = 0; i < that._modeNameWheel.navItems.length; i++) {
-                that._modeNameWheel.navItems[i].titleAttr.font = "30 30px sans-serif";
-                that._modeNameWheel.navItems[i].titleSelectedAttr.font = "30 30px sans-serif";
-            }
+        // Size each label to fit its own slice arc; the 12 slots are fixed,
+        // so short names render large and only long ones shrink. Applied
+        // post-createWheel via the per-item title attributes.
+        for (let i = 0; i < that._modeNameWheel.navItems.length; i++) {
+            const font = getModeSliceFont(
+                that._modeWheel.wheelRadius,
+                labels.length,
+                labels[i].length
+            );
+            that._modeNameWheel.navItems[i].titleAttr.font = font;
+            that._modeNameWheel.navItems[i].titleHoverAttr.font = font;
+            that._modeNameWheel.navItems[i].titleSelectedAttr.font = font;
         }
 
         // Set up tabs for each mode.
@@ -4536,5 +4482,5 @@ const piemenuDissectNumber = widget => {
 };
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { piemenuPitches, piemenuKey, piemenuNumber };
+    module.exports = { piemenuPitches, piemenuKey, piemenuNumber, piemenuModes };
 }

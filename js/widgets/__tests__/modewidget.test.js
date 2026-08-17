@@ -32,6 +32,10 @@ global.platformColor = {
     selectorBackground: "#FFFFFF",
     selectorBackgroundHOVER: "#EEEEEE",
     modeWheelcolors: ["#FF0000", "#00FF00"],
+    modeGroupWheelcolors: ["#111111"],
+    modePieMenusIfColorPush: "#333333",
+    modePieMenusElseColorPush: "#444444",
+    textColor: "#ffffff",
     orange: "#FFA500"
 };
 global.DEFAULTVOICE = "piano";
@@ -69,6 +73,37 @@ global.TEMPERAMENT = {
 };
 global.getCurrentEDO = jest.fn().mockReturnValue(12);
 global.getModePattern = jest.fn().mockReturnValue([2, 2, 1, 2, 2, 2, 1]);
+global.DEFAULTMODE = "major";
+
+// Shared mode pie menu helpers, required from musicutils so the smoke tests
+// exercise the real extraction logic (modewidget.js sees them as globals).
+global.MODE_PIE_MENUS = {
+    5: ["minor pentatonic", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+    7: ["ionian", " ", "dorian", " ", " ", " ", " ", " ", " ", "aeolian", " ", " "],
+    custom: [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
+};
+const {
+    MODEPIEMENU_GROUP_RING,
+    MODEPIEMENU_NAME_RING,
+    getSavedCustomModes,
+    getModeNamesForGroup,
+    getModeLabel,
+    getModeNameFromLabel,
+    getModeSliceColors,
+    updateModeWheelItems,
+    getModeGroupTitleFont,
+    getModeSliceFont
+} = require("../../utils/musicutils.js");
+global.MODEPIEMENU_GROUP_RING = MODEPIEMENU_GROUP_RING;
+global.MODEPIEMENU_NAME_RING = MODEPIEMENU_NAME_RING;
+global.getSavedCustomModes = getSavedCustomModes;
+global.getModeNamesForGroup = getModeNamesForGroup;
+global.getModeLabel = getModeLabel;
+global.getModeNameFromLabel = getModeNameFromLabel;
+global.getModeSliceColors = getModeSliceColors;
+global.updateModeWheelItems = updateModeWheelItems;
+global.getModeGroupTitleFont = getModeGroupTitleFont;
+global.getModeSliceFont = getModeSliceFont;
 
 // Mock slicePath
 global.slicePath = jest.fn().mockReturnValue({
@@ -77,24 +112,61 @@ global.slicePath = jest.fn().mockReturnValue({
 });
 
 // Mock wheelnav
-global.wheelnav = jest.fn().mockImplementation(() => ({
-    raphael: {},
-    colors: [],
-    slicePathFunction: null,
-    slicePathCustom: {},
-    sliceSelectedPathCustom: {},
-    sliceInitPathCustom: {},
-    navItems: [],
-    createWheel: jest.fn().mockImplementation(function (labels) {
-        this.navItems = labels.map(() => ({
-            navItem: {
-                hide: jest.fn(),
-                show: jest.fn()
-            },
-            navigateFunction: null
-        }));
-    })
-}));
+global.wheelnav = jest.fn().mockImplementation(() => {
+    const navItemTemplate = () => ({
+        title: "",
+        navItem: {
+            hide: jest.fn(),
+            show: jest.fn()
+        },
+        navigateFunction: null,
+        fillAttr: "",
+        titleAttr: {},
+        titleHoverAttr: {},
+        titleSelectedAttr: {},
+        sliceHoverAttr: {},
+        slicePathAttr: {},
+        sliceSelectedAttr: {},
+        basicNavTitleMax: {},
+        basicNavTitleMin: {},
+        hoverNavTitleMax: {},
+        hoverNavTitleMin: {},
+        selectedNavTitleMax: {},
+        selectedNavTitleMin: {},
+        initNavTitle: {}
+    });
+    const mockWheel = {
+        raphael: {},
+        colors: [],
+        slicePathFunction: null,
+        slicePathCustom: {},
+        sliceSelectedPathCustom: {},
+        sliceInitPathCustom: {},
+        navItems: [],
+        titleFont: "",
+        selectedNavItemIndex: 0,
+        createWheel: jest.fn().mockImplementation(function (labels) {
+            this.navItems = labels.map((l, i) => {
+                const item = navItemTemplate();
+                item.title = l;
+                return item;
+            });
+        }),
+        navigateWheel: jest.fn().mockImplementation(function (index) {
+            this.selectedNavItemIndex = index;
+            if (
+                this.navItems[index] &&
+                typeof this.navItems[index].navigateFunction === "function"
+            ) {
+                this.navItems[index].navigateFunction();
+            }
+        }),
+        refreshWheel: jest.fn(),
+        removeWheel: jest.fn(),
+        initWheel: jest.fn()
+    };
+    return mockWheel;
+});
 
 // Mock Window
 if (typeof window === "undefined") {
@@ -461,5 +533,47 @@ describe("ModeWidget", () => {
         expect(modeWidget._timeouts).toEqual([]);
         expect(modeWidget._newPattern).toBeNull();
         expect(modeWidget._notesToPlay).toBeNull();
+    });
+
+    describe("_piemenuModes", () => {
+        const switchGroup = (widget, groupTitle) => {
+            const index = widget._modeGroupWheel.navItems.findIndex(
+                item => item.title === groupTitle
+            );
+            widget._modeGroupWheel.selectedNavItemIndex = index;
+            widget._modeGroupWheel.navItems[index].navigateFunction();
+        };
+
+        test("builds the group and mode-name wheels", () => {
+            modeWidget._piemenuModes();
+
+            expect(modeWidget._modePieWheel).toBeDefined();
+            expect(modeWidget._modeGroupWheel).toBeDefined();
+            expect(modeWidget._modeNameWheel).toBeDefined();
+            expect(modeWidget._modeNameWheel.navItems.length).toBe(12);
+        });
+
+        test("custom group leads with the create-mode sentinel and saved modes", () => {
+            localStorage.setItem(
+                "customModes",
+                JSON.stringify([{ name: "my mode", pattern: [1, 2] }])
+            );
+            modeWidget._piemenuModes();
+            switchGroup(modeWidget, "custom");
+
+            const titles = modeWidget._modeNameWheel.navItems.map(item => item.title);
+            expect(titles[0]).toBe("+");
+            expect(titles[1]).toBe("my mode");
+        });
+
+        test("selecting a mode slice resolves the internal mode name", () => {
+            modeWidget._piemenuModes();
+            switchGroup(modeWidget, "7");
+
+            modeWidget._modeNameWheel.selectedNavItemIndex = 0;
+            modeWidget._modeNameWheel.navItems[0].navigateFunction();
+
+            expect(modeWidget._selectedModeName).toBe("major");
+        });
     });
 });
