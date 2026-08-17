@@ -153,7 +153,12 @@ Follow these steps when contributing:
     ```
 
 6.  **Open a Pull Request:**
-    - Use a clear and descriptive title.
+    - Use a Conventional Commit title: `<type>: <subject>` (for example,
+      `fix: correct drag offset on touch devices`). Allowed types are
+      `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`,
+      `revert`, `style`, and `test`. The title is linted by
+      `pr-title-check.yml`. See [Releases and the Changelog](#releases-and-the-changelog)
+      for why this matters when a PR is squash-merged.
     - Link the related issue using `Related to #XXXX` or `Partially addresses #XXXX`.
     - Explain what changed and why.
     - Keep pull requests focused on a single topic or feature.
