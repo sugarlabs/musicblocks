@@ -37,6 +37,7 @@ global.PREVIEWVOLUME = 0.5;
 global.normalizeNoteAccidentals = jest.fn(n => n);
 global.Singer = { masterVolume: [50] };
 global.last = arr => arr[arr.length - 1];
+global.clampNumber = require("../../utils/utils-logic.js").clampNumber;
 
 window.innerWidth = 1200;
 window.btoa = jest.fn(s => s);
@@ -533,7 +534,7 @@ describe("PitchStaircase Widget", () => {
             expect(mockActivity.palettes.dict.foo.hideMenu).toHaveBeenCalledWith(true);
             expect(mockActivity.refreshCanvas).toHaveBeenCalled();
             expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalledWith(expect.any(Array));
-            expect(global.activity.textMsg).toHaveBeenCalled();
+            expect(mockActivity.textMsg).toHaveBeenCalled();
         });
 
         test("emits a pitch block when the pitch has zero cents", () => {
@@ -1012,6 +1013,15 @@ describe("PitchStaircase Widget", () => {
         test("_setButtonIcon should handle invalid or mock cells gracefully", () => {
             psc._setButtonIcon(null, "play-button.svg", "Play");
             psc._setButtonIcon({}, "play-button.svg", "Play");
+        });
+
+        test("_makeStairs should clamp step cell width for extreme frequencies", () => {
+            psc._pscTable = document.createElement("table");
+            psc.Stairs = [
+                ["C", "1", 10.0],
+                ["C", "8", 5000.0]
+            ];
+            expect(() => psc._makeStairs()).not.toThrow();
         });
     });
 });
